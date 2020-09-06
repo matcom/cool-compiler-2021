@@ -1,6 +1,6 @@
-from utils import ShiftReduceParser, ContainerSet
-from pycompiler import Item
-from automata import State
+from cmp.utils import ShiftReduceParser, ContainerSet
+from cmp.pycompiler import Item
+from cmp.automata import State
 
 
 def upd_table(table, head, symbol, production):

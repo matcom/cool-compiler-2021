@@ -265,9 +265,6 @@ class ShiftReduceParser:
                 stack.append(list(self.goto[stack[-1]][tag.Left])[0])
                 output.append(tag)
             elif action is ShiftReduceParser.OK:
-                stack.pop()
-                assert stack.pop() == self.G.startSymbol
-                assert len(stack) == 1
                 return output if not get_shift_reduce else (output, operations)
             else:
                 raise ValueError

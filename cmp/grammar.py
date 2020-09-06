@@ -1,5 +1,5 @@
-from pycompiler import Grammar
-from ast import *
+from cmp.pycompiler import Grammar
+from cmp.ast import *
 
 # grammar
 G = Grammar()
@@ -52,7 +52,7 @@ def_func %= idx + opar + param_list + cpar + colon + idx + ocur + expr + ccur + 
 
 param_list %= param, lambda h,s: [s[1]]
 param_list %= param + comma + param_list, lambda h,s: [s[1]] + s[3]
-param %= idx + colon + idx
+param %= idx + colon + idx, lambda h,s: (s[1], s[3])
 
 expr %= comp, lambda h,s: s[1]
 expr %= s_comp, lambda h,s: s[1]
