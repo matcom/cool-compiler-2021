@@ -3,6 +3,7 @@ from cmp.lexer import tokenize_text, pprint_tokens
 from cmp.tools import LR1Parser
 from cmp.evaluation import evaluate_reverse_parse
 from cmp.formatter import FormatVisitor
+from cmp.type_collector import TypeCollector
 
 
 def run_pipeline(G, text):
@@ -20,32 +21,26 @@ def run_pipeline(G, text):
     formatter = FormatVisitor()
     tree = formatter.visit(ast)
     print(tree)
+    print('============== COLLECTING TYPES ===============')
+    errors = []
+    collector = TypeCollector(errors)
+    collector.visit(ast)
+    context = collector.context
+    print('Errors:', errors)
+    print('Context:')
+    print(context)
     return ast
 
 
 text = '''
-    class A {
-        a : Z ;
-        suma ( a : int , b : B ) : int {
-            a + b
-        } ;
-        b : int <- 9 ;
-        c : C ;
-    } ;
-
-    class B inherits A {
-        c : A ;
-        f ( d : int , a : A ) : void {
-            {
-                let f : int <- 8 in f + 3 * d ;
-                c <- suma ( 5 , f ) ;
-            }
-        } ;
-        z : int ;
-    } ;
-
-    class C inherits Z {
-    } ;
+class C inherits B { } ;
+class A inherits B { } ;
+class B inherits A { } ;
+class C { } ;
+class D inherits E { } ;
+class E inherits F { } ;
+class F inherits D { } ;
+class G inherits F { } ;
 '''
 
 if __name__ == '__main__': ast = run_pipeline(G, text)
