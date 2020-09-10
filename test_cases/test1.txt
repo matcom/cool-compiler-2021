@@ -1,3 +1,5 @@
+
+//Expected errors
 text = '''
     class A {
         a : Z ;
@@ -20,5 +22,70 @@ text = '''
     } ;
 
     class C inherits Z {
+    } ;
+'''
+
+
+
+//No method main in Main class, even though Main class inherits from A, which does contain a method main
+text = '''
+    class A {
+        a : C ;
+        suma ( a : int , b : B ) : int {
+            a + b
+        } ;
+        b : int <- 9 ;
+        c : C ;
+        main ( ) : SELF_TYPE { 
+            a . copy ( )
+        } ;
+    } ;
+
+    class B inherits A {
+        f ( d : int , a : A ) : B {
+            {
+                let f : int <- 8 in f + 3 * d ;
+                c <- suma ( 5 , f ) ;
+            }
+        } ;
+        z : int ;
+    } ;
+
+    class C inherits A {
+    } ;
+
+    class Main inherits A { } ;
+'''
+
+
+
+//No errors
+text = '''
+    class A {
+        a : C ;
+        suma ( a : int , b : B ) : int {
+            a + b
+        } ;
+        b : int <- 9 ;
+        c : C ;
+    } ;
+
+    class B inherits A {
+        f ( d : int , a : A ) : B {
+            {
+                let f : int <- 8 in f + 3 * d ;
+                c <- suma ( 5 , f ) ;
+            }
+        } ;
+        z : int ;
+    } ;
+
+    class C inherits A {
+    } ;
+
+    class Main inherits A { 
+        main ( ) : SELF_TYPE { 
+            a . copy ( )
+        } ;
     } ;
 '''
