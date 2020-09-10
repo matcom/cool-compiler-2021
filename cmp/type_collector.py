@@ -28,8 +28,7 @@ class TypeCollector(object):
             self.context.types[typex.name] = typex
 
         self.check_parents()
-        self.check_cyclic_inheritance()
-    
+        self.check_cyclic_inheritance()    
      
     
     @visitor.when(ClassDeclarationNode)
@@ -74,7 +73,7 @@ class TypeCollector(object):
         intx.set_parent(objectx)
         boolx.set_parent(objectx)
 
-        built_in_types.extend([objectx, iox, stringx, intx, boolx])
+        built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type])
         
     def check_parents(self):
         for item in self.parent.keys():
