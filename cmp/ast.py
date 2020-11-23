@@ -44,6 +44,7 @@ class CallNode(ExpressionNode):
 class CaseNode(ExpressionNode):
     def __init__(self, expr, branch_list):
         self.expr = expr
+        #[(id, type, expr), ...]
         self.branch_list = branch_list
 
 class BlockNode(ExpressionNode):
@@ -63,6 +64,7 @@ class ConditionalNode(ExpressionNode):
 
 class LetNode(ExpressionNode):
     def __init__(self, id_list, body):
+        #[(id, type, expr), ...]
         self.id_list = id_list
         self.body = body
 
@@ -70,14 +72,20 @@ class AtomicNode(ExpressionNode):
     def __init__(self, lex):
         self.lex = lex
 
+class UnaryNode(ExpressionNode):
+    def __init__(self, expr):
+        self.expr = expr
+
 class BinaryNode(ExpressionNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
 
-class UnaryNode(ExpressionNode):
-    def __init__(self, expr):
-        self.expr = expr
+class ArithmeticNode(BinaryNode):
+    pass
+class ComparisonNode(BinaryNode):
+    pass
+
 
 class ConstantNumNode(AtomicNode):
     pass
@@ -94,22 +102,22 @@ class VariableNode(AtomicNode):
 class InstantiateNode(AtomicNode):
     pass
 
-class PlusNode(BinaryNode):
+class PlusNode(ArithmeticNode):
     pass
 
-class MinusNode(BinaryNode):
+class MinusNode(ArithmeticNode):
     pass
 
-class StarNode(BinaryNode):
+class StarNode(ArithmeticNode):
     pass
 
-class DivNode(BinaryNode):
+class DivNode(ArithmeticNode):
     pass
 
-class LeqNode(BinaryNode):
+class LeqNode(ComparisonNode):
     pass
 
-class LessNode(BinaryNode):
+class LessNode(ComparisonNode):
     pass
 
 class EqualNode(BinaryNode):
