@@ -20,28 +20,40 @@ class TypeCollector(object):
         self.context = Context()
         self.define_built_in_types()
         
-        for declaration in node.declarations:
-            self.visit(declaration)
-
         # Adding built-in types to context
         for typex in built_in_types:
             self.context.types[typex.name] = typex
 
+        for declaration in node.declarations:
+            self.visit(declaration)
+
         self.check_parents()
-        self.check_cyclic_inheritance()    
-     
+        self.check_cyclic_inheritance()
+
+        # Order class declarations according to their depth in the inheritance tree
+        node.declarations = self.order_types(node)
+       
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
-        if node.id in [typex.name for typex in built_in_types]:
-            self.errors.append('Invalid class name')
-        else:
+        # flag will be True if the class is succesfully added to the context
+        flag = False 
+        try:
+            self.context.create_type(node.id)
+            flag = True
+            self.parent[node.id] = node.parent
+        except SemanticError as ex:
+            self.errors.append(ex.text)
+
+        # changing class id so it can be added to context
+        while not flag:
+            node.id = f'1{node.id}'
             try:
                 self.context.create_type(node.id)
+                flag = True
                 self.parent[node.id] = node.parent
-            except SemanticError as ex:
-                self.errors.append(ex.text)
-            
+            except SemanticError:
+                pass
     
     def define_built_in_types(self):
         objectx = ObjectType()
@@ -79,6 +91,7 @@ class TypeCollector(object):
         for item in self.parent.keys():
             item_type = self.context.get_type(item)
             if self.parent[item] is None:
+                # setting Object as parent
                 item_type.set_parent(built_in_types[0])
             else:
                 try:
@@ -122,3 +135,24 @@ class TypeCollector(object):
         
 
 
+    def order_types(self, node):
+        sorted_declarations = []
+        flag = [False] * len(node.declarations)
+        obj_name = built_in_types[0].name
+        
+        change = True
+        while change:
+            change = False
+
+            current = []
+            for i, dec in enumerate(node.declarations):
+                if not flag[i]:
+                    typex = self.context.get_type(dec.id)
+                    if typex.parent.name in [item.id for item in sorted_declarations] or typex.parent.name == obj_name:
+                        current.append(dec)
+                        flag[i] = True
+                        change = True
+            
+            sorted_declarations.extend(current)
+
+        return sorted_declarations
