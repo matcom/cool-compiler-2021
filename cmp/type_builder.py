@@ -24,12 +24,9 @@ class TypeBuilder:
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
-        try:
-            self.current_type = self.context.get_type(node.id)
-            for feat in node.features:
-                self.visit(feat)
-        except SemanticError:
-            pass
+        self.current_type = self.context.get_type(node.id)
+        for feat in node.features:
+            self.visit(feat)
             
     
     @visitor.when(FuncDeclarationNode)
@@ -72,11 +69,20 @@ class TypeBuilder:
             attr_type = ErrorType()
         
         # Checking attribute name. No other attribute can have the same name
+        flag = False
         try:
             self.current_type.define_attribute(node.id, attr_type)
+            flag = True
         except SemanticError as ex:
             self.errors.append(ex.text)
         
+        while not flag:
+            node.id = f'1{node.id}'
+            try:
+                self.current_type.define_attribute(node.id, attr_type)
+                flag = True
+            except SemanticError:
+                pass
 
 
     def check_main_class(self):
