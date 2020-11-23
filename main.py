@@ -43,33 +43,10 @@ def run_pipeline(G, text):
 
 
 text = '''
-    class A {
-        a : C ;
-        suma ( a : int , b : B ) : int {
-            a + b
-        } ;
-        b : int <- 9 ;
-        c : C ;
-    } ;
-
-    class B inherits A {
-        f ( d : int , a : A ) : B {
-            {
-                let f : int <- 8 in f + 3 * d ;
-                c <- suma ( 5 , f ) ;
-            }
-        } ;
-        z : int ;
-    } ;
-
-    class C inherits A {
-    } ;
-
-    class Main inherits A { 
-        main ( ) : SELF_TYPE { 
-            a . copy ( )
-        } ;
-    } ;
+    class A inherits C { } ;
+    class C inherits B { } ;
+    class B { } ;
+    class B inherits A { } ;
 '''
 
 if __name__ == '__main__': ast = run_pipeline(G, text)
