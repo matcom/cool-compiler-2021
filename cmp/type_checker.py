@@ -22,7 +22,7 @@ class TypeChecker:
         self.current_method = None
         self.errors = errors
 
-        #built-in types
+        # built-in types
         self.obj_type = self.context.get_type('object')
         self.int_type = self.context.get_type('int')
         self.bool_type = self.context.get_type('bool')
@@ -58,7 +58,7 @@ class TypeChecker:
 
         if node.expr is not None:
             computed_type = self.visit(node.expr, scope)
-            if not computed_type.conforms_to(attr_type) and (isinstance(computed_type, SelfType) and not self.current_type.conforms_to(attr_type)):
+            if not self.check_conformance(computed_type, attr_type):
                 self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, attr_type.name))
 
 
@@ -66,7 +66,7 @@ class TypeChecker:
     def visit(self, node, scope):
         self.current_method = self.current_type.get_method(node.id)
         
-        #checking overwriting
+        # checking overwriting
         try:
             method = self.current_type.parent.get_method(node.id)
             if not len(self.current_method.param_types) == len(method.param_types):
@@ -82,7 +82,7 @@ class TypeChecker:
         except SemanticError:
             pass
         
-        #defining variables in new scope
+        # defining variables in new scope
         for i, var in enumerate(self.current_method.param_names):
             if scope.is_local(var):
                 self.errors.append(LOCAL_ALREADY_DEFINED %(var, self.current_method.name))
@@ -91,9 +91,9 @@ class TypeChecker:
                 
         computed_type = self.visit(node.body, scope)
         
-        #checking return type
+        # checking return type
         rtype = self.current_method.return_type
-        if not computed_type.conforms_to(rtype) and (isinstance(computed_type, SelfType) and not self.current_type.conforms_to(rtype)):
+        if not self.check_conformance(computed_type, rtype):
             self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, self.current_method.return_type.name))
         
         
@@ -102,7 +102,7 @@ class TypeChecker:
         if node.id == "self":
             self.errors.append(SELF_IS_READONLY)
                 
-        #checking variable is defined
+        # checking variable is defined
         var = scope.find_variable(node.id)
         if var is None:
             self.errors.append(VARIABLE_NOT_DEFINED %(node.id, self.current_type.name))
@@ -110,7 +110,7 @@ class TypeChecker:
         
         computed_type = self.visit(node.expr, scope.create_child())
         
-        if not computed_type.conforms_to(var.type) and (isinstance(computed_type, SelfType) and not self.current_type.conforms_to(var.type)):
+        if not self.check_conformance(computed_type, var.type):
             self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, var.type.name))
             
         return computed_type
@@ -129,8 +129,7 @@ class TypeChecker:
             except SemanticError as ex:
                 cast_type = ErrorType()
                 self.errors.append(ex.text)
-        
-        if not obj_type.conforms_to(cast_type) and (isinstance(obj_type, SelfType) and not self.current_type.conforms_to(cast_type)):
+        if not self.check_conformance(obj_type, cast_type):
             self.errors.append(INCOMPATIBLE_TYPES %(obj_type.name, cast_type.name))
         
         # Check this function is defined for cast_type
@@ -141,10 +140,10 @@ class TypeChecker:
                 return ErrorType()
             for i, arg in enumerate(node.args):
                 computed_type = self.visit(arg, scope)
-                if not computed_type.conforms_to(method.param_types[i]) and (isinstance(computed_type, SelfType) and not self.current_type.conforms_to(method.param_types[i])):
+                if not self.check_conformance(computed_type, method.param_types[i]):
                     self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, method.param_types[i].name))
             
-            #check self_type
+            # check self_type
             rtype = method.return_type
             if isinstance(rtype, SelfType):
                 rtype = obj_type
@@ -158,17 +157,17 @@ class TypeChecker:
 
     @visitor.when(CaseNode)
     def visit(self, node, scope):
-        #check expression
+        # check expression
         self.visit(node.expr, scope)
 
         nscope = scope.create_child()
 
-        #check branches
+        # check branches
         types = []
         for branch in node.branch_list:
             idx, typex, expr =  branch
             
-            #check idx is not self
+            # check idx is not self
             if idx == 'self':
                 self.errors.append(SELF_IS_READONLY)
 
@@ -191,12 +190,12 @@ class TypeChecker:
     def visit(self, node, scope):
         nscope = scope.create_child()
 
-        #Check expressions
+        # Check expressions
         computed_type = None
         for expr in node.expr_list:
             computed_type = self.visit(expr, nscope)
 
-        #return the type of the last expression of the list
+        # return the type of the last expression of the list
         return computed_type
 
 
@@ -204,12 +203,12 @@ class TypeChecker:
     def visit(self, node, scope):
         nscope = scope.create_child()
 
-        #checking condition: it must conform to bool
+        # checking condition: it must conform to bool
         cond_type = self.visit(node.condition, nscope)
         if not cond_type.conforms_to(self.bool_type):
             self.errors.append(INCOMPATIBLE_TYPES %(cond_type.name, self.bool_type.name))
 
-        #checking body
+        # checking body
         self.visit(node.body, nscope)
 
         return self.obj_type
@@ -219,7 +218,7 @@ class TypeChecker:
     def visit(self, node, scope):
         nscope = scope.create_child()
 
-        #check condition conforms to bool
+        # check condition conforms to bool
         cond_type = self.visit(node.condition, nscope)
         if not cond_type.conforms_to(self.bool_type):
             self.errors.append(INCOMPATIBLE_TYPES %(cond_type.name, self.bool_type.name))
@@ -248,7 +247,7 @@ class TypeChecker:
 
             if expr is not None:
                 expr_type = self.visit(expr, nscope)
-                if not expr_type.conforms_to(typex) and (isinstance(expr_type, SelfType) and not self.current_type.conforms_to(typex)):
+                if not self.check_conformance(expr_type, typex):
                     self.errors.append(INCOMPATIBLE_TYPES %(expr_type.name, typex.name))
 
             nscope.define_variable(idx, typex)
@@ -343,11 +342,11 @@ class TypeChecker:
 
 
     def LCA(self, types):
-        #check ErrorType:
+        # check ErrorType:
         if any(isinstance(item, ErrorType) for item in types):
             return ErrorType()
 
-        #check SELF_TYPE:
+        # check SELF_TYPE:
         if all(isinstance(item, SelfType) for item in types):
             return types[0]
 
@@ -364,17 +363,24 @@ class TypeChecker:
                 return current
             current = current.parent
 
-        #This part of the code is suposed to be unreachable
+        # This part of the code is supposed to be unreachable
         return None
 
 
     def check_expr(self, node, scope):
-        #checking left expr
+        # checking left expr
         left = self.visit(node.left, scope)
         if not left.conforms_to(self.int_type):
             self.errors.append(INCOMPATIBLE_TYPES %(left.name, self.int_type.name))
 
-        #checking right expr
+        # checking right expr
         right = self.visit(node.right, scope)
         if not right.conforms_to(self.int_type):
             self.errors.append(INCOMPATIBLE_TYPES %(right.name, self.int_type.name))
+
+
+    def check_conformance(self, computed_type, attr_type):
+        return (
+            computed_type.conforms_to(attr_type)
+            or (isinstance(computed_type, SelfType) and self.current_type.conforms_to(attr_type))
+        )
