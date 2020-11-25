@@ -97,7 +97,7 @@ class TypeCollector(object):
                 try:
                     typex = self.context.get_type(self.parent[item])
                     if not typex.can_be_inherited():
-                        self.errors.append(f'Class {item.name} can not inherit from {typex.name}')
+                        self.errors.append(f'Class {item} can not inherit from {typex.name}')
                         typex = built_in_types[0]
                     item_type.set_parent(typex)
                 except SemanticError as ex:
