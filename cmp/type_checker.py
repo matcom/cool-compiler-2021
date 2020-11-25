@@ -216,15 +216,14 @@ class TypeChecker:
 
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
-        nscope = scope.create_child()
 
         # check condition conforms to bool
-        cond_type = self.visit(node.condition, nscope)
+        cond_type = self.visit(node.condition, scope)
         if not cond_type.conforms_to(self.bool_type):
             self.errors.append(INCOMPATIBLE_TYPES %(cond_type.name, self.bool_type.name))
 
-        then_type = self.visit(node.then_body, nscope)
-        else_type = self.visit(node.else_body, nscope)
+        then_type = self.visit(node.then_body, scope.create_child())
+        else_type = self.visit(node.else_body, scope.create_child())
 
         return self.LCA([then_type, else_type])
 
