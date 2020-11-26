@@ -33,13 +33,6 @@ class AttrDeclarationNode:
         self.init_exp = init_exp
 
 
-class VarDeclarationNode:
-    def __init__(self, idx, typex, expr=None):
-        self.id = idx
-        self.type = typex
-        self.expr = expr
-
-
 class AssignNode(ExpressionNode):
     def __init__(self, idx, expr):
         self.id = idx
@@ -50,6 +43,13 @@ class LetNode(ExpressionNode):
     def __init__(self, identifiers, body):
         self.identifiers = identifiers
         self.body = body
+
+
+class VarDeclarationNode:
+    def __init__(self, idx, typex, expr=None):
+        self.id = idx
+        self.type = typex
+        self.expr = expr
 
 
 class IfNode(ExpressionNode):
@@ -78,13 +78,6 @@ class CaseItemNode(ExpressionNode):
         self.expr = exp
 
 
-# #atomic?
-# class NotNode(ExpressionNode):
-#     def __init__(self, exp):
-#         self.exp = exp
-
-# method_name=id, args,obj,type
-# aaaaaaaaaaaaaaaaaaaaaaaaaaaa que hago con estooooooooooooooooooooooooooo
 class CallNode(ExpressionNode):
     def __init__(self, idx, args, obj=None, at_type=None):
         self.obj = obj
