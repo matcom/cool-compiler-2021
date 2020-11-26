@@ -129,5 +129,3 @@ dmypy.json
 .pyre/
 
 result.txt
-
-test_cases/

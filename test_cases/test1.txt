@@ -1,0 +1,24 @@
+text = '''
+    class A {
+        a : Z ;
+        suma ( a : int , b : B ) : int {
+            a + b
+        } ;
+        b : int <- 9 ;
+        c : C ;
+    } ;
+
+    class B inherits A {
+        c : A ;
+        f ( d : int , a : A ) : void {
+            {
+                let f : int <- 8 in f + 3 * d ;
+                c <- suma ( 5 , f ) ;
+            }
+        } ;
+        z : int ;
+    } ;
+
+    class C inherits Z {
+    } ;
+'''
