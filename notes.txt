@@ -1,3 +1,0 @@
-Por perfeccionar:
--Que el tokenizer reconozca los string( Empiezan y terminan en comillas"),
--Ignorar comentarios
