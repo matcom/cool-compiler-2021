@@ -184,6 +184,16 @@ class IntType(Type):
 class SelfType(Type):
     def __init__(self):
         Type.__init__(self, 'SELF_TYPE')
+    
+    def can_be_inherited(self):
+        return False
+
+class AutoType(Type):
+    def __init__(self):
+        Type.__init__(self, 'AUTO_TYPE')
+
+    def can_be_inherited(self):
+        return False
 
 
 

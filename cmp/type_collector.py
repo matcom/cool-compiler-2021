@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cmp.semantic import SemanticError, Type, Context, ObjectType, IOType, StringType, IntType, BoolType, SelfType
+from cmp.semantic import SemanticError, Type, Context, ObjectType, IOType, StringType, IntType, BoolType, SelfType, AutoType
 from cmp.ast import ProgramNode, ClassDeclarationNode
 
 built_in_types = []
@@ -62,6 +62,7 @@ class TypeCollector(object):
         stringx = StringType()
         boolx = BoolType()
         self_type = SelfType()
+        autotype = AutoType()
 
         # Object Methods
         objectx.define_method('abort', [], [], objectx)
@@ -85,7 +86,7 @@ class TypeCollector(object):
         intx.set_parent(objectx)
         boolx.set_parent(objectx)
 
-        built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type])
+        built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type, autotype])
         
     def check_parents(self):
         for item in self.parent.keys():
