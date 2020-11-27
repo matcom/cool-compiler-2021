@@ -45,7 +45,12 @@ class TypeBuilder:
             if n == "self":
                 self.errors.append(SELF_IS_READONLY)
 
-            param_names.append(n)
+            while True:
+                if n in param_names:
+                    n = f'1{n}'
+                else:
+                    param_names.append(n)
+                    break
             try:
                 t = self.context.get_type(t)
             except SemanticError as ex:
