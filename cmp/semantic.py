@@ -8,9 +8,10 @@ class SemanticError(Exception):
         return self.args[0]
 
 class Attribute:
-    def __init__(self, name, typex):
+    def __init__(self, name, typex, idx=None):
         self.name = name
         self.type = typex
+        self.idx = idx
 
     def __str__(self):
         return f'[attrib] {self.name} : {self.type.name};'
@@ -19,11 +20,13 @@ class Attribute:
         return str(self)
 
 class Method:
-    def __init__(self, name, param_names, params_types, return_type):
+    def __init__(self, name, param_names, param_types, return_type, param_idx, ridx=None):
         self.name = name
         self.param_names = param_names
-        self.param_types = params_types
+        self.param_types = param_types
+        self.param_idx = param_idx
         self.return_type = return_type
+        self.ridx = ridx
 
     def __str__(self):
         params = ', '.join(f'{n}:{t.name}' for n,t in zip(self.param_names, self.param_types))
@@ -78,11 +81,11 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
 
-    def define_method(self, name:str, param_names:list, param_types:list, return_type):
+    def define_method(self, name:str, param_names:list, param_types:list, return_type, param_idx:list, ridx=None):
         if name in (method.name for method in self.methods):
             raise SemanticError(f'Method "{name}" already defined in {self.name}')
 
-        method = Method(name, param_names, param_types, return_type)
+        method = Method(name, param_names, param_types, return_type, param_idx, ridx)
         self.methods.append(method)
         return method
 
@@ -122,6 +125,9 @@ class Type:
 
     def __repr__(self):
         return str(self)
+
+    def __eq__(self, other):
+        return self.conforms_to(other) and other.conforms_to(self)
 
 class ErrorType(Type):
     def __init__(self):
@@ -195,7 +201,12 @@ class AutoType(Type):
     def can_be_inherited(self):
         return False
 
+    def conforms_to(self, other):
+        return True
 
+    def bypass(self):
+        return True
+    
 
 class Context:
     def __init__(self):
@@ -220,9 +231,10 @@ class Context:
         return str(self)
 
 class VariableInfo:
-    def __init__(self, name, vtype):
+    def __init__(self, name, vtype, idx):
         self.name = name
         self.type = vtype
+        self.idx = idx
 
 class Scope:
     def __init__(self, parent=None):
@@ -239,8 +251,8 @@ class Scope:
         self.children.append(child)
         return child
 
-    def define_variable(self, vname, vtype):
-        info = VariableInfo(vname, vtype)
+    def define_variable(self, vname, vtype, idx=None):
+        info = VariableInfo(vname, vtype, idx)
         self.locals.append(info)
         return info
 
@@ -256,3 +268,49 @@ class Scope:
 
     def is_local(self, vname):
         return any(True for x in self.locals if x.name == vname)
+
+
+class InferencerManager:
+    def __init__(self, context):
+        # given a type represented by int idx, types[idx] = (A, B), where A and B are sets
+        # if x in A then idx.conforms_to(x)
+        # if x in B then x.conforms_to(idx)
+        self.conforms_to = []
+        self.conformed_by = []
+        self.count = 0
+        self.context = context
+
+        self.obj = 'object'
+
+
+    def assign_id(self):
+        idx = self.count
+        self.conforms_to.append({self.obj})
+        self.conformed_by.append(set())
+        self.count += 1
+
+        return idx
+
+    def upd_conforms_to(self, idx, other):
+        sz = len(self.conforms_to[idx])
+        self.conforms_to[idx].update(other)
+
+        return sz != len(self.conforms_to[idx])
+
+    def upd_conformed_by(self, idx, other):
+        sz = len(self.conformed_by[idx])
+        self.conformed_by[idx].update(other)
+
+        return sz != len(self.conformed_by[idx])
+
+    def auto_to_type(self, idx, typex):
+        sz = len(self.conforms_to[idx])
+        self.conforms_to[idx].add(typex.name)
+
+        return sz != len(self.conforms_to[idx])
+
+    def type_to_auto(self, idx, typex):
+        sz = len(self.conformed_by[idx])
+        self.conformed_by[idx].add(typex.name)
+
+        return sz != len(self.conformed_by[idx])
