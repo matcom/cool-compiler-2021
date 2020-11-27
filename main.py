@@ -5,6 +5,7 @@ from cmp.evaluation import evaluate_reverse_parse
 from cmp.formatter import FormatVisitor
 from cmp.type_collector import TypeCollector
 from cmp.type_builder import TypeBuilder
+from cmp.type_checker import TypeChecker
 
 
 def run_pipeline(G, text):
@@ -33,17 +34,26 @@ def run_pipeline(G, text):
     print('=============== BUILDING TYPES ================')
     builder = TypeBuilder(context, errors)
     builder.visit(ast)
+    manager = builder.manager
     print('Errors: [')
     for error in errors:
         print('\t', error)
     print(']')
     print('Context:')
     print(context)
+    print('=============== CHECKING TYPES ================')
+    checker = TypeChecker(context, manager, errors)
+    checker.visit(ast, None)
+    print('Errors: [')
+    for error in errors:
+        print('\t', error)
+    print(']')
+    
     return ast
 
 
 text = '''
-    class A inherits C { } ;
+    class A inherits io { } ;
     class C inherits B { } ;
     class B { } ;
     class B inherits A { } ;
