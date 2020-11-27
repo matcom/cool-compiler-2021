@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType
+from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType
 from cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
 from cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
 from cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
@@ -16,11 +16,12 @@ INVALID_OPERATION = 'Operation is not defined between "%s" and "%s".'
 INVALID_TYPE = 'SELF_TYPE is not valid'
 
 class TypeChecker:
-    def __init__(self, context, errors=[]):
+    def __init__(self, context, manager, errors=[]):
         self.context = context
         self.current_type = None
         self.current_method = None
         self.errors = errors
+        self.manager = manager
 
         # built-in types
         self.obj_type = self.context.get_type('object')
@@ -46,7 +47,7 @@ class TypeChecker:
         attributes = self.current_type.all_attributes()
         for values in attributes:
             attr, _ = values
-            scope.define_variable(attr.name, attr.type)
+            scope.define_variable(attr.name, attr.type, attr.idx)
             
         for feature in node.features:
             self.visit(feature, scope.create_child())
@@ -87,7 +88,7 @@ class TypeChecker:
             if scope.is_local(var):
                 self.errors.append(LOCAL_ALREADY_DEFINED %(var, self.current_method.name))
             else:
-                scope.define_variable(var, self.current_method.param_types[i])
+                scope.define_variable(var, self.current_method.param_types[i], self.current_method.param_idx[i])
                 
         computed_type = self.visit(node.body, scope)
         
@@ -131,6 +132,10 @@ class TypeChecker:
                 self.errors.append(ex.text)
         if not self.check_conformance(obj_type, cast_type):
             self.errors.append(INCOMPATIBLE_TYPES %(obj_type.name, cast_type.name))
+
+        # if the obj that is calling the function is autotype, let it pass
+        if isinstance(cast_type, AutoType):
+            return cast_type
         
         # Check this function is defined for cast_type
         try:
@@ -232,6 +237,7 @@ class TypeChecker:
     def visit(self, node, scope):
         nscope = scope.create_child()
 
+        node.idx_list = []
         for item in node.id_list:
             idx, typex, expr = item
             
@@ -244,12 +250,16 @@ class TypeChecker:
                 self.errors.append(ex.text)
                 typex = ErrorType()
 
+            node.idx_list.append(None)
+            if isinstance(typex, AutoType):
+                node.idx_list[-1] = self.manager.assign_id()
+
             if expr is not None:
                 expr_type = self.visit(expr, nscope)
                 if not self.check_conformance(expr_type, typex):
                     self.errors.append(INCOMPATIBLE_TYPES %(expr_type.name, typex.name))
 
-            nscope.define_variable(idx, typex)
+            nscope.define_variable(idx, typex, node.idx_list[-1])
 
         return self.visit(node.body, nscope)
 
@@ -344,6 +354,10 @@ class TypeChecker:
         # check ErrorType:
         if any(isinstance(item, ErrorType) for item in types):
             return ErrorType()
+
+        # check AUTO_TYPE
+        if any(isinstance(item, AutoType) for item in types):
+            return AutoType()
 
         # check SELF_TYPE:
         if all(isinstance(item, SelfType) for item in types):
