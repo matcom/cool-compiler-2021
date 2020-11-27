@@ -12,16 +12,24 @@ def tokenize_text(token):
     except ValueError:
         return token.transform_to(idx)
 
-def pprint_tokens(tokens):
+def pprint_tokens(tokens, get=False):
     indent = 0
     pending = []
+    result = ''
     for token in tokens:
         pending.append(token)
         if token.token_type in { ocur, ccur, semi }:
             if token.token_type == ccur:
                 indent -= 1
-            print('    '*indent + ' '.join(str(t.token_type) for t in pending))
+            if get:
+                result += '    '*indent + ' '.join(str(t.token_type) for t in pending) + '\n'
+            else:
+                print('    '*indent + ' '.join(str(t.token_type) for t in pending))
             pending.clear()
             if token.token_type == ocur:
                 indent += 1
-    print(' '.join([str(t.token_type) for t in pending]))
+    if get:
+        result += ' '.join([str(t.token_type) for t in pending]) + '\n'
+        return result
+    else:
+        print(' '.join([str(t.token_type) for t in pending]))
