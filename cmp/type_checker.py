@@ -175,8 +175,6 @@ class TypeChecker:
 
             try:
                 var_type = self.context.get_type(typex)
-                if isinstance(var_type, AutoType):
-                    raise SemanticError('The type of branch in case can\'t be AUTO_TYPE')
             except SemanticError as ex:
                 self.errors.append(ex.text)
                 var_type = ErrorType()
