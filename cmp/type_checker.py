@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType
+from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType
 from cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
 from cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
 from cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
@@ -126,6 +126,8 @@ class TypeChecker:
         if node.type is not None:
             try:
                 cast_type = self.context.get_type(node.type)
+                if isinstance(cast_type, AutoType):
+                    raise SemanticError('AUTO_TYPE can\'t be the type on this type of dispatch')
             except SemanticError as ex:
                 cast_type = ErrorType()
                 self.errors.append(ex.text)
@@ -173,6 +175,8 @@ class TypeChecker:
 
             try:
                 var_type = self.context.get_type(typex)
+                if isinstance(var_type, AutoType):
+                    raise SemanticError('The type of branch in case can\'t be AUTO_TYPE')
             except SemanticError as ex:
                 self.errors.append(ex.text)
                 var_type = ErrorType()
@@ -333,6 +337,8 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             typex = self.context.get_type(node.lex)
+            if isinstance(typex, AutoType):
+                raise SemanticError('AUTO_TYPE can\'t be instanciate with new')
         except SemanticError as ex:
             self.errors.append(ex.text)
             typex = ErrorType()
