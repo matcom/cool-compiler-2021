@@ -2,6 +2,7 @@ import src.cmp.visitor as visitor
 import src.cmp.nbpackage
 import src.cmp.visitor as visitor
 
+from src.tset import Tset
 from src.cmp.semantic import (
     ObjectType,
     IntType,
@@ -46,33 +47,6 @@ from src.ast_nodes import (
 )
 
 
-class Tset:
-    def __init__(self, parent=None):
-        self.tsets_dict = {}
-        self.parent = parent
-        self.children = {}
-
-    def create_child(self, node):
-        child = Tset(self)
-        self.children[node] = child
-        return child
-
-    def __str__(self):
-        output = ""
-
-        for key, value in self.tsets_dict.items():
-            output += "\t" + str(key) + ":" + str(value) + "\n"
-        for key, chil in self.children.items():
-            output += "\n"
-            try:
-                output += key.id + "--->"
-            except AttributeError:
-                output += "let or case --->"
-            output += "\n"
-            output += str(chil)
-        return output
-
-
 class TSetBuilder:
     def __init__(self, context, errors=[]):
         self.context = context
@@ -101,9 +75,9 @@ class TSetBuilder:
     def visit(self, node, tset):
         static_type = self.context.get_type(node.type)
         if static_type.name == "AUTO_TYPE":
-            tset.tsets_dict[node.id] = self.get_autotype_set()
+            tset.locals[node.id] = self.get_autotype_set()
         else:
-            tset.tsets_dict[node.id] = set([static_type.name])
+            tset.locals[node.id] = set([static_type.name])
         if node.init_exp is not None:
             self.visit(node.init_exp, tset)
 
@@ -113,9 +87,9 @@ class TSetBuilder:
         for param in node.params:
             typex = self.context.get_type(param[1])
             if typex.name == "AUTO_TYPE":
-                child_set.tsets_dict[param[0]] = self.get_autotype_set()
+                child_set.locals[param[0]] = self.get_autotype_set()
             else:
-                child_set.tsets_dict[param[0]] = set([typex.name])
+                child_set.locals[param[0]] = set([typex.name])
 
         self.visit(node.body, child_set)
 
@@ -135,9 +109,9 @@ class TSetBuilder:
     def visit(self, node, tset):
         typex = self.context.get_type(node.type)
         if typex.name == "AUTO_TYPE":
-            tset.tsets_dict[node.id] = self.get_autotype_set()
+            tset.locals[node.id] = self.get_autotype_set()
         else:
-            tset.tsets_dict[node.id] = set([typex.name])
+            tset.locals[node.id] = set([typex.name])
 
         self.visit(node.expr, tset)
 
@@ -163,9 +137,9 @@ class TSetBuilder:
     def visit(self, node, tset):
         typex = self.context.get_type(node.type)
         if typex.name == "AUTO_TYPE":
-            tset.tsets_dict[node.id] = self.get_autotype_set()
+            tset.locals[node.id] = self.get_autotype_set()
         else:
-            tset.tsets_dict[node.id] = set([typex.name])
+            tset.locals[node.id] = set([typex.name])
 
         self.visit(node.expr, tset)
 

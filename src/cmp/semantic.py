@@ -122,7 +122,7 @@ class Type:
             or self == other
             or self.name == "AUTO_TYPE"
             or other.name == "AUTO_TYPE"
-            or self.parent is not None
+            or self.parent != None
             and self.parent.conforms_to(other)
         )
 
@@ -167,8 +167,8 @@ class VoidType(Type):
     def conforms_to(self, other):
         raise Exception("Invalid type at 'conforms_to' : void type.")
 
-    def bypass(self):
-        return True
+    # def bypass(self):
+    #     return True
 
     def __eq__(self, other):
         return isinstance(other, VoidType)

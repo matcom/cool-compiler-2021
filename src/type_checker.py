@@ -1,7 +1,6 @@
 import src.cmp.nbpackage
 import src.cmp.visitor as visitor
 
-# from cp13 import G, text
 from src.ast_nodes import Node, ProgramNode, ExpressionNode
 from src.ast_nodes import ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
 from src.ast_nodes import VarDeclarationNode, AssignNode, CallNode
@@ -34,15 +33,13 @@ from src.ast_nodes import (
 )
 from src.cool_visitor import FormatVisitor
 
-# from cp13 import FormatVisitor, tokenize_text, pprint_tokens
-
 from src.cmp.semantic import SemanticError
 from src.cmp.semantic import Attribute, Method, Type
 from src.cmp.semantic import VoidType, ErrorType, IntType
 from src.cmp.semantic import Context
 
-# from cp14 import TypeCollector, TypeBuilder, run_pipeline
 from src.cmp.semantic import Scope
+from src.cmp.utils import find_least_type
 
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
@@ -224,10 +221,9 @@ class TypeChecker:
 
     @visitor.when(IfNode)
     def visit(self, node, scope):
-        bool_type = self.context.get_type("Bool")
         predicate_type = self.visit(node.if_expr, scope)
 
-        if predicate_type != bool_type:
+        if predicate_type.name != "Bool" and predicate_type.name != "AUTO_TYPE":
             self.errors.append("Expression must be bool")
             return ErrorType()
 
@@ -413,27 +409,4 @@ class TypeChecker:
     @visitor.when(BooleanNode)
     def visit(self, node, scope):
         return self.context.get_type("Bool")
-
-
-def find_least_type(type_a, type_b, context):
-    if type_a is None:
-        return type_b
-
-    if type_b is None:
-        return type_a
-
-    if type_a.conforms_to(type_b):
-        return type_b
-
-    if type_b.conforms_to(type_a):
-        return type_a
-
-    solve = type_a.parent
-    while solve is not None:
-        print("Solve ----------------> " + str(solve))
-        if type_b.conforms_to(solve):
-            return solve
-        solve = solve.parent
-
-    return context.get_type("Object")
 

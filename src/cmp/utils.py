@@ -280,3 +280,52 @@ class DisjointNode:
 
     def __repr__(self):
         return str(self)
+
+
+def find_least_type(type_a, type_b, context):
+    if type_a is None:
+        return type_b
+
+    if type_b is None:
+        return type_a
+
+    if type_a.conforms_to(type_b):
+        return type_b
+
+    if type_b.conforms_to(type_a):
+        return type_a
+
+    solve = type_a.parent
+    while solve is not None:
+        if type_b.conforms_to(solve):
+            return solve
+        solve = solve.parent
+
+    return context.get_type("Object")
+
+
+def union(set_a, set_b):
+    for item in set_b:
+        set_a.add(item)
+    return set_a
+
+
+def intersection(set_a, set_b):
+    solve = set()
+    for item in set_a:
+        if item in set_b:
+            solve.add(item)
+    return solve
+
+
+def reduce_set(set_a, set_b):
+    if "InferenceError" in set_a:
+        return union(set_a, set_b)
+
+    _intersection = intersection(set_a, set_b)
+    if len(_intersection) == 0:
+        _union = union(set_a, set_b)
+        _union.add("InferenceError")
+        return _union
+    else:
+        return _intersection
