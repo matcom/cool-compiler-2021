@@ -5,4 +5,4 @@ src/cmp/__pycache__/
 src/cmp/tools/__pycache__/
 .directory/
 .pytest_cache/
-
+.vscode/
