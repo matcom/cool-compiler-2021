@@ -6,6 +6,7 @@ from cmp.formatter import FormatVisitor
 from cmp.type_collector import TypeCollector
 from cmp.type_builder import TypeBuilder
 from cmp.type_checker import TypeChecker
+from cmp.type_inferencer import TypeInferencer
 
 
 def run_pipeline(G, text):
@@ -42,21 +43,41 @@ def run_pipeline(G, text):
     print('Context:')
     print(context)
     print('=============== CHECKING TYPES ================')
+    checker = TypeChecker(context, manager, [])
+    scope = checker.visit(ast)
+    print('=============== INFERING TYPES ================')
+    temp_errors = []
+    inferencer = TypeInferencer(context, manager, temp_errors)
+    inferencer.visit(ast, scope)
+    print('Errors: [')
+    for error in temp_errors:
+        print('\t', error)
+    print(']')
+    print('=============== LAST CHECK ================')
+    errors.extend(temp_errors)
     checker = TypeChecker(context, manager, errors)
-    checker.visit(ast, None)
+    checker.visit(ast)
     print('Errors: [')
     for error in errors:
         print('\t', error)
     print(']')
+    formatter = FormatVisitor()
+    tree = formatter.visit(ast)
+    print(tree)
     
     return ast
 
 
 text = '''
-    class A inherits io { } ;
-    class C inherits B { } ;
-    class B { } ;
-    class B inherits A { } ;
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- c . substr ( 0 , a ) ;
+        } } ;
+    } ;
+    
 '''
 
 if __name__ == '__main__': ast = run_pipeline(G, text)

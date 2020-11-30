@@ -1,0 +1,24 @@
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- c . concat ( a ) ;
+            1 ;
+        } } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- c . substr ( 0 , a ) ;
+        } } ;
+    } ;
+    
+'''
