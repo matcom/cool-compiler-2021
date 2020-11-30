@@ -240,12 +240,16 @@ class TypeChecker:
     def visit(self, node, scope):
         nscope = scope.create_child()
 
-        node.idx_list = []
-        for item in node.id_list:
+        node.idx_list = [None] * len(node.id_list)
+        for i, item in enumerate(node.id_list):
             idx, typex, expr = item
+            # create a new_scope for every variable defined
+            new_scope = nscope.create_child()
             
             if idx == 'self':
                 self.errors.append(SELF_IS_READONLY)
+                idx = f'1{idx}'
+                node.id_list[i] = (idx, typex, expr)
             
             try:
                 typex = self.context.get_type(typex)
@@ -255,16 +259,16 @@ class TypeChecker:
                 self.errors.append(ex.text)
                 typex = ErrorType()
 
-            node.idx_list.append(None)
             if isinstance(typex, AutoType):
-                node.idx_list[-1] = self.manager.assign_id()
+                node.idx_list[i] = self.manager.assign_id(self.obj_type)
 
             if expr is not None:
-                expr_type = self.visit(expr, nscope)
+                expr_type = self.visit(expr, new_scope)
                 if not self.check_conformance(expr_type, typex):
                     self.errors.append(INCOMPATIBLE_TYPES %(expr_type.name, typex.name))
 
-            nscope.define_variable(idx, typex, node.idx_list[-1])
+            new_scope.define_variable(idx, typex, node.idx_list[i])
+            nscope = new_scope
 
         return self.visit(node.body, nscope)
 

@@ -327,14 +327,24 @@ class InferencerManager:
     def auto_to_type(self, idx, typex):
         if isinstance(typex, SelfType):
             typex = typex.fixed_type
-        if not isinstance(typex, ErrorType):
+        try:
+            assert not isinstance(typex, ErrorType)
+            assert not any(item.name == typex.name for item in self.conforms_to[idx])
+            
             self.conforms_to[idx].append(typex)
+        except AssertionError:
+            pass
 
     def type_to_auto(self, idx, typex):
         if isinstance(typex, SelfType):
             typex = typex.fixed_type
-        if not isinstance(typex, ErrorType):
+        try:
+            assert not isinstance(typex, ErrorType)
+            assert not any(item.name == typex.name for item in self.conformed_by[idx])
+            
             self.conformed_by[idx].append(typex)
+        except AssertionError:
+            pass
 
     def infer(self, idx):
         try:
@@ -352,7 +362,6 @@ class InferencerManager:
 
             except AssertionError:
                 self.infered_type[idx] = ErrorType()
-
             return True
         except AssertionError:
             return False
