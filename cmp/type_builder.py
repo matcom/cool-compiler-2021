@@ -3,6 +3,9 @@ from cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, Func
 from cmp.semantic import SemanticError, ErrorType, InferencerManager, AutoType, SelfType
 
 
+SELF_IS_READONLY = 'Variable "self" is read-only.'
+
+
 class TypeBuilder:
     def __init__(self, context, errors=[]):
         self.context = context
@@ -40,8 +43,19 @@ class TypeBuilder:
         node.index = []
         for param in node.params:
             n, t = param
-            param_names.append(n)
             node.index.append(None)
+
+            # Checking param name can't be self
+            if n == "self":
+                self.errors.append(SELF_IS_READONLY)
+
+            while True:
+                if n in param_names:
+                    n = f'1{n}'
+                else:
+                    param_names.append(n)
+                    break
+                    
             try:
                 t = self.context.get_type(t)
                 if isinstance(t, SelfType):
@@ -82,6 +96,10 @@ class TypeBuilder:
             attr_type = ErrorType()
 
         node.idx = self.manager.assign_id(self.obj_type) if isinstance(attr_type, AutoType) else None
+
+        #Checking attribute can't be named self
+        if node.id == "self":
+            self.errors.append(SELF_IS_READONLY)
         
         # Checking attribute name. No other attribute can have the same name
         flag = False
