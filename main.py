@@ -97,54 +97,54 @@ def main(G):
         try:
             st.title('Results:')
 
-            st.subheader('Tokens')
+            # st.subheader('Tokens')
             tokens = list(tokenize_text(text))
             p_tokens = pprint_tokens(tokens, get=True)
-            st.text(p_tokens)
+            # st.text(p_tokens)
 
-            st.subheader('Parse')
+            # st.subheader('Parse')
             parser = LR1Parser(G)
             parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
             p_parse = '\n'.join(repr(x) for x in parse)
-            st.text(p_parse)
+            # st.text(p_parse)
 
-            st.subheader('AST')
+            # st.subheader('AST')
             ast = evaluate_reverse_parse(parse, operations, tokens)
             formatter = FormatVisitor()
             tree = formatter.visit(ast)
-            st.text(tree)
+            # st.text(tree)
 
-            st.subheader('Collecting types')
+            # st.subheader('Collecting types')
             errors = []
             collector = TypeCollector(errors)
             collector.visit(ast)
             context = collector.context
-            for e in errors:
-                st.error(e)
-            st.text('Context:')
-            st.text(context)
+            # for e in errors:
+                # st.error(e)
+            # st.text('Context:')
+            # st.text(context)
 
-            st.subheader('Building types')
+            # st.subheader('Building types')
             builder = TypeBuilder(context, errors)
             builder.visit(ast)
             manager = builder.manager
-            for e in errors:
-                st.error(e)
-            st.text('Context:')
-            st.text(context)
+            # for e in errors:
+                # st.error(e)
+            # st.text('Context:')
+            # st.text(context)
 
-            st.subheader('Checking types')
+            # st.subheader('Checking types')
             checker = TypeChecker(context, manager, [])
             scope = checker.visit(ast)
 
-            st.subheader('Infering types')
+            # st.subheader('Infering types')
             temp_errors = []
             inferencer = TypeInferencer(context, manager, temp_errors)
             inferencer.visit(ast, scope)
-            for e in temp_errors:
-                st.error(e)
+            # for e in temp_errors:
+            #     st.error(e)
 
-            st.subheader('Las check')
+            # st.subheader('Last check')
             errors.extend(temp_errors)
             checker = TypeChecker(context, manager, errors)
             checker.visit(ast)
