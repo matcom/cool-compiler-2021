@@ -180,16 +180,18 @@ class TypeInferencer:
                 if isinstance(cast_type, AutoType):
                     cast_type = None
                 elif isinstance(cast_type, SelfType):
-                    cast_type = SelfType(self.current_type)
+                    cast_type = self.current_type
             except SemanticError:
                 pass
  
-        conforms_to_types = [] if cast_type is None else [cast_type]
         # Check object
+        conforms_to_types = [] if cast_type is None else [cast_type]
         obj_type, computed_types = self.visit(node.obj, scope, conforms_to_types)
 
         if cast_type is None:
             cast_type = obj_type
+            if isinstance(cast_type, SelfType):
+                cast_type = self.current_type
 
         # if the obj that is calling the function is autotype, let it pass
         if isinstance(cast_type, AutoType):

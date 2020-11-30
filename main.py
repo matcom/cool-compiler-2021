@@ -69,15 +69,18 @@ def run_pipeline(G, text):
 
 
 text = '''
-    class A {
-        b : AUTO_TYPE ;
-        a : AUTO_TYPE ;
-
-        f ( ) : AUTO_TYPE { {
-            let x : String , x : AUTO_TYPE <- a + b , self : AUTO_TYPE , x : AUTO_TYPE <- let c : AUTO_TYPE in a in x ;
-        } } ;
+class A {
+    f ( a : AUTO_TYPE , b : AUTO_TYPE ) : AUTO_TYPE {
+        if ( a = 1 ) then b else
+            g ( a + 1 , b / 2 )
+        fi
     } ;
-    
+    g ( a : AUTO_TYPE , b : AUTO_TYPE ) : AUTO_TYPE {
+        if ( b = 1 ) then a else
+            f ( a / 2 , b + 1 )
+        fi
+    } ;
+} ;
 '''
 
 if __name__ == '__main__': ast = run_pipeline(G, text)

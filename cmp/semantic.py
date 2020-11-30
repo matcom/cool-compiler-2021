@@ -144,8 +144,8 @@ class Type:
     def __repr__(self):
         return str(self)
 
-    def __eq__(self, other):
-        return self.conforms_to(other) and other.conforms_to(self)
+    # def __eq__(self, other):
+    #     return self.conforms_to(other) and other.conforms_to(self)
 
 class ErrorType(Type):
     def __init__(self):
@@ -407,30 +407,33 @@ class InferencerManager:
 
 
 def LCA(types):
-        # check ErrorType:
-        if any(isinstance(item, ErrorType) for item in types):
-            return ErrorType()
-
-        # check AUTO_TYPE
-        if any(isinstance(item, AutoType) for item in types):
-            return AutoType()
-
-        # check SELF_TYPE:
-        if all(isinstance(item, SelfType) for item in types):
-            return types[0]
-
-        for i, item in enumerate(types):
-            if isinstance(item, SelfType):
-                types[i] = item.fixed_type
-
-        current = types[0]
-        while current:
-            for item in types:
-                if not item.conforms_to(current):
-                    break
-            else:
-                return current
-            current = current.parent
-
-        # This part of the code is supposed to be unreachable
+    if len(types) == 0:
         return None
+
+    # check ErrorType:
+    if any(isinstance(item, ErrorType) for item in types):
+        return ErrorType()
+
+    # check AUTO_TYPE
+    if any(isinstance(item, AutoType) for item in types):
+        return AutoType()
+
+    # check SELF_TYPE:
+    if all(isinstance(item, SelfType) for item in types):
+        return types[0]
+
+    for i, item in enumerate(types):
+        if isinstance(item, SelfType):
+            types[i] = item.fixed_type
+
+    current = types[0]
+    while current:
+        for item in types:
+            if not item.conforms_to(current):
+                break
+        else:
+            return current
+        current = current.parent
+
+    # This part of the code is supposed to be unreachable
+    return None

@@ -36,7 +36,6 @@ class TypeBuilder:
             
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):
-
         ## Building param-names and param-types of the method
         param_names = []
         param_types = []

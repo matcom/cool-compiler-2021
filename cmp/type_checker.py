@@ -135,6 +135,9 @@ class TypeChecker:
         # if the obj that is calling the function is autotype, let it pass
         if isinstance(cast_type, AutoType):
             return cast_type
+
+        if isinstance(cast_type, SelfType):
+            cast_type = self.current_type
         
         # Check this function is defined for cast_type
         try:
