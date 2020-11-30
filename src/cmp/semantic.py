@@ -26,6 +26,7 @@ class Method:
         self.param_names = param_names
         self.param_types = params_types
         self.return_type = return_type
+        self.tset = None
 
     def __str__(self):
         params = ", ".join(
@@ -164,8 +165,8 @@ class VoidType(Type):
     def __init__(self):
         Type.__init__(self, "Void")
 
-    def conforms_to(self, other):
-        raise Exception("Invalid type at 'conforms_to' : void type.")
+    # def conforms_to(self, other):
+    #     raise Exception("Invalid type at 'conforms_to' : void type.")
 
     # def bypass(self):
     #     return True

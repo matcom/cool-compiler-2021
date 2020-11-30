@@ -304,6 +304,15 @@ def find_least_type(type_a, type_b, context):
     return context.get_type("Object")
 
 
+def least_type(type_set, context):
+    solve = None
+    for item in type_set:
+        typex = context.get_type(item)
+        solve = find_least_type(solve, typex, context)
+
+    return solve.name
+
+
 def union(set_a, set_b):
     for item in set_b:
         set_a.add(item)
@@ -319,6 +328,9 @@ def intersection(set_a, set_b):
 
 
 def reduce_set(set_a, set_b):
+    if "!static_type_declared" in set_a:
+        return set_a
+
     if "InferenceError" in set_a:
         return union(set_a, set_b)
 

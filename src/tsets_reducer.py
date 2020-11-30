@@ -51,6 +51,8 @@ from src.cmp.utils import find_least_type, union, intersection, reduce_set
 class TSetReducer:
     def __init__(self, context, errors=[]):
         self.context = context
+        self.current_type = None
+        self.current_method = None
         self.errors = errors
 
     def get_autotype_set(self):
@@ -62,12 +64,19 @@ class TSetReducer:
 
     @visitor.when(ProgramNode)
     def visit(self, node, tset):
-        for declaration in node.declarations:
-            self.visit(declaration, tset.children[declaration])
+        backup_tset = Tset()
+        while not backup_tset.compare(tset):
+            backup_tset = tset.clone()
+
+            for declaration in node.declarations:
+                self.visit(declaration, tset.children[declaration])
+
+        tset.clean()
         return tset
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, tset):
+        self.current_type = self.context.get_type(node.id)
         for feature in node.features:
             self.visit(feature, tset)
 
@@ -82,15 +91,20 @@ class TSetReducer:
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, tset):
+        method = self.current_type.get_method(node.id)
+        self.current_method = method
+
         current_tset = tset.children[node]
-        self.visit(node.body, current_tset)
+        body_set = self.visit(node.body, current_tset)
+        tset.locals[node.id] = reduce_set(tset.locals[node.id], body_set)
+        method.tset = tset.locals[node.id]
 
     @visitor.when(AssignNode)
     def visit(self, node, tset):
         expr_set = self.visit(node.expr, tset)
         var_set = tset.find_set(node.id)
         var_set[node.id] = reduce_set(var_set[node.id], expr_set)
-        return var_set
+        return var_set[node.id]
 
     @visitor.when(LetNode)
     def visit(self, node, tset):
@@ -119,18 +133,21 @@ class TSetReducer:
         then_expr_set = self.visit(node.then_expr, tset)
         else_expr_set = self.visit(node.else_expr, tset)
 
-        _union = union(then_expr_set, else_expr_set)
+        solve = intersection(then_expr_set, else_expr_set)
+        if len(solve) == 0:
+            solve = union(then_expr_set, else_expr_set)
 
-        current_type = None
-        for item in _union:
-            typex = self.context.get_type(item)
-            current_type = find_least_type(current_type, typex, self.context)
-
-        return {current_type.name}
+        return solve
 
     @visitor.when(WhileNode)
     def visit(self, node, tset):
         self.visit(node.condition, tset)
+
+        if isinstance(node.condition, VariableNode):
+            node_id = node.condition.lex
+            tset_locals = tset.find_set(node_id)
+            tset_locals[node_id] = reduce_set(tset_locals[node_id], {"Bool"})
+
         self.visit(node.body, tset)
 
         return {"Object"}
@@ -146,18 +163,67 @@ class TSetReducer:
 
         current_type = None
         for item in union_set:
-            current_type = find_least_type(current_type, item, self.context)
+            if item == "!static_type_declared":
+                continue
+            item_type = self.context.get_type(item)
+            current_type = find_least_type([current_type, item_type], self.context)
 
-        return current_type
+        return {current_type.name}
 
     @visitor.when(CaseItemNode)
     def visit(self, node, tset):
         expr_tset = self.visit(node.expr, tset)
-        return reduce_set(tset.locals[node.id], expr_tset)
+        tset.locals[node.id] = reduce_set(tset.locals[node.id], expr_tset)
+        return tset.locals[node.id]
 
     @visitor.when(CallNode)
     def visit(self, node, tset):
-        pass
+        for expr in node.args:
+            self.visit(expr, tset)
+
+        if node.obj is not None:
+            expr_set = self.visit(node.obj, tset)
+        else:
+            expr_set = {self.current_type.name}
+
+        types_with_method = set()
+        if node.at_type is not None:
+            types_with_method.add(node.at_type)
+
+        else:
+            for typex in self.context.types.values():
+                try:
+                    method = typex.get_method(node.id)
+                    if len(method.param_names) == len(node.args):
+                        types_with_method.add(typex.name)
+                except SemanticError:
+                    continue
+
+        # DUDA!!!!
+        # if len(types_with_method) == 0:
+        #     raise SemanticError(
+        #         f"There is no method named {node.id} that takes {len(node.args)} arguments"
+        #     )
+
+        if isinstance(node.obj, VariableNode):
+            node_id = node.obj.lex
+            tset_locals = tset.find_set(node_id)
+
+            tset_locals[node_id] = reduce_set(tset_locals[node_id], types_with_method)
+
+        types_reduced = intersection(expr_set, types_with_method)
+
+        if len(types_reduced) == 0:
+            return {"InferenceError"}
+
+        return_types = set()
+        for item in types_reduced:
+            item_type = self.context.get_type(item)
+            method = item_type.get_method(node.id)
+            for typex in method.tset:
+                return_types.add(typex)
+
+        return return_types
 
     @visitor.when(BlockNode)
     def visit(self, node, tset):
@@ -196,7 +262,8 @@ class TSetReducer:
 
     @visitor.when(EqualNode)
     def visit(self, node, tset):
-        pass
+        self.visit(node.left, tset)
+        self.visit(node.right, tset)
 
     @visitor.when(NotNode)
     def visit(self, node, tset):

@@ -11,7 +11,7 @@ def test():
            a : String ;
            b : Bool ;
            c : Int <- 0 ;
-           d : Void <- while c < 1 loop c = c + 1 pool  ;
+           d : Object <- while c < 1 loop c = c + 1 pool  ;
            step ( p : AUTO_TYPE ) : AUTO_TYPE { p . translate ( 1 , 1 ) } ;
        } ;
          
