@@ -101,6 +101,24 @@ class Type:
             plain[method.name] = (method, self)
         return plain.values() if clean else plain
 
+    def update_attr(self, attr_name, attr_type):
+        for i, item in enumerate(self.attributes):
+            if item.name == attr_name:
+                self.attributes[i] = Attribute(attr_name, attr_type)
+                break
+    
+    def update_method_rtype(self, method_name, rtype):
+        for i, item in enumerate(self.methods):
+            if item.name == method_name:
+                self.methods[i].return_type = rtype
+                break
+
+    def update_method_param(self, method_name, param_type, param_idx):
+        for i, item in enumerate(self.methods):
+            if item.name == method_name:
+                self.methods[i].param_types[param_idx] = param_type
+                break
+
     def conforms_to(self, other):
         return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
 
@@ -269,6 +287,13 @@ class Scope:
     def is_local(self, vname):
         return any(True for x in self.locals if x.name == vname)
 
+    def update_variable(self, vname, vtype, index=None):
+        locals = self.locals if index is None else itt.islice(self.locals, index)
+        for i, item in enumerate(locals):
+            if item.name == vname:
+                self.locals[i] = VariableInfo(vname, vtype, item.idx)
+                return True
+        return self.parent.update_variable(vname, vtype, self.index) if self.parent is not None else False
 
 class InferencerManager:
     def __init__(self, context):
