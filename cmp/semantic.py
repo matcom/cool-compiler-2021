@@ -145,21 +145,21 @@ class ErrorType(Type):
 
 class ObjectType(Type):
     def __init__(self):
-        Type.__init__(self, 'object')
+        Type.__init__(self, 'Object')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, ObjectType)    
 
 class IOType(Type):
     def __init__(self):
-        Type.__init__(self, 'io')
+        Type.__init__(self, 'IO')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, IOType)
 
 class StringType(Type):
     def __init__(self):
-        Type.__init__(self, 'string')
+        Type.__init__(self, 'String')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, StringType)
@@ -169,7 +169,7 @@ class StringType(Type):
 
 class BoolType(Type):
     def __init__(self):
-        Type.__init__(self, 'bool')
+        Type.__init__(self, 'Bool')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, BoolType)
@@ -179,7 +179,7 @@ class BoolType(Type):
 
 class IntType(Type):
     def __init__(self):
-        Type.__init__(self, 'int')
+        Type.__init__(self, 'Int')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, IntType)
