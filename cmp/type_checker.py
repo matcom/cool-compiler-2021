@@ -53,7 +53,8 @@ class TypeChecker:
            
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
-        attr_type = self.context.get_type(node.type)
+        var = scope.find_variable(node.id)
+        attr_type = var.type
 
         if node.expr is not None:
             computed_type = self.visit(node.expr, scope)
@@ -122,6 +123,8 @@ class TypeChecker:
         if node.type is not None:
             try:
                 cast_type = self.context.get_type(node.type)
+                if isinstance(cast_type, SelfType):
+                    cast_type = SelfType(self.current_type)
             except SemanticError as ex:
                 cast_type = ErrorType()
                 self.errors.append(ex.text)
@@ -163,8 +166,11 @@ class TypeChecker:
 
         # check branches
         types = []
+        node.branch_idx = []
         for branch in node.branch_list:
             idx, typex, expr =  branch
+            
+            node.branch_idx.append(None)
             
             # check idx is not self
             if idx == 'self':
@@ -172,19 +178,24 @@ class TypeChecker:
 
             try:
                 var_type = self.context.get_type(typex)
+                if isinstance(var_type, SelfType):
+                    var_type = SelfType(self.current_type)
             except SemanticError as ex:
                 self.errors.append(ex.text)
                 var_type = ErrorType()
+            
+            # check type is autotype and assign an id in the manager
+            if isinstance(var_type, AutoType):
+                node.branch_idx[-1] = self.manager.assign_id()
 
             new_scope = nscope.create_child()
-            new_scope.define_variable(idx, var_type)
+            new_scope.define_variable(idx, var_type, node.branch_idx[-1])
 
             computed_type = self.visit(expr, new_scope)
             types.append(computed_type)
 
         return LCA(types)
     
-
     @visitor.when(BlockNode)
     def visit(self, node, scope):
         nscope = scope.create_child()
@@ -237,6 +248,8 @@ class TypeChecker:
             
             try:
                 typex = self.context.get_type(typex)
+                if isinstance(typex, SelfType):
+                    typex = SelfType(self.current_type)
             except SemanticError as ex:
                 self.errors.append(ex.text)
                 typex = ErrorType()
@@ -332,6 +345,7 @@ class TypeChecker:
         try:
             typex = self.context.get_type(node.lex)
             if isinstance(typex, SelfType):
+                typex = SelfType(self.current_type)
         except SemanticError as ex:
             self.errors.append(ex.text)
             typex = ErrorType()
