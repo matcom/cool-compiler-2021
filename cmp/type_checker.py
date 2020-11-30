@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType
+from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType, LCA
 from cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
 from cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
 from cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
@@ -16,20 +16,21 @@ INVALID_OPERATION = 'Operation is not defined between "%s" and "%s".'
 INVALID_TYPE = 'SELF_TYPE is not valid'
 
 class TypeChecker:
-    def __init__(self, context, errors=[]):
+    def __init__(self, context, manager, errors=[]):
         self.context = context
         self.current_type = None
         self.current_method = None
         self.errors = errors
+        self.manager = manager
 
         # built-in types
-        self.obj_type = self.context.get_type('object')
-        self.int_type = self.context.get_type('int')
-        self.bool_type = self.context.get_type('bool')
-        self.string_type = self.context.get_type('string')
+        self.obj_type = self.context.get_type('Object')
+        self.int_type = self.context.get_type('Int')
+        self.bool_type = self.context.get_type('Bool')
+        self.string_type = self.context.get_type('String')
 
     @visitor.on('node')
-    def visit(self, node, scope):
+    def visit(self, node, scope=None):
         pass
 
     @visitor.when(ProgramNode)
@@ -39,28 +40,27 @@ class TypeChecker:
             self.visit(declaration, scope.create_child())
         return scope
 
-
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
         self.current_type = self.context.get_type(node.id)
+        scope.define_variable('self', SelfType(self.current_type))
         attributes = self.current_type.all_attributes()
         for values in attributes:
             attr, _ = values
-            scope.define_variable(attr.name, attr.type)
+            scope.define_variable(attr.name, attr.type, attr.idx)
             
         for feature in node.features:
             self.visit(feature, scope.create_child())
-        
-        
+           
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
-        attr_type = self.context.get_type(node.type)
+        var = scope.find_variable(node.id)
+        attr_type = var.type
 
         if node.expr is not None:
             computed_type = self.visit(node.expr, scope)
             if not self.check_conformance(computed_type, attr_type):
                 self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, attr_type.name))
-
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -87,7 +87,7 @@ class TypeChecker:
             if scope.is_local(var):
                 self.errors.append(LOCAL_ALREADY_DEFINED %(var, self.current_method.name))
             else:
-                scope.define_variable(var, self.current_method.param_types[i])
+                scope.define_variable(var, self.current_method.param_types[i], self.current_method.param_idx[i])
                 
         computed_type = self.visit(node.body, scope)
         
@@ -95,8 +95,7 @@ class TypeChecker:
         rtype = self.current_method.return_type
         if not self.check_conformance(computed_type, rtype):
             self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, self.current_method.return_type.name))
-        
-        
+            
     @visitor.when(AssignNode)
     def visit(self, node, scope):
         if node.id == "self":
@@ -114,8 +113,7 @@ class TypeChecker:
             self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, var.type.name))
             
         return computed_type
-        
-    
+          
     @visitor.when(CallNode)
     def visit(self, node, scope):
         # Evaluate object
@@ -128,11 +126,20 @@ class TypeChecker:
                 cast_type = self.context.get_type(node.type)
                 if isinstance(cast_type, AutoType):
                     raise SemanticError('AUTO_TYPE can\'t be the type on this type of dispatch')
+                if isinstance(cast_type, SelfType):
+                    cast_type = SelfType(self.current_type)
             except SemanticError as ex:
                 cast_type = ErrorType()
                 self.errors.append(ex.text)
         if not self.check_conformance(obj_type, cast_type):
             self.errors.append(INCOMPATIBLE_TYPES %(obj_type.name, cast_type.name))
+
+        # if the obj that is calling the function is autotype, let it pass
+        if isinstance(cast_type, AutoType):
+            return cast_type
+
+        if isinstance(cast_type, SelfType):
+            cast_type = self.current_type
         
         # Check this function is defined for cast_type
         try:
@@ -156,7 +163,6 @@ class TypeChecker:
             self.errors.append(ex.text)
             return ErrorType()
         
-
     @visitor.when(CaseNode)
     def visit(self, node, scope):
         # check expression
@@ -166,8 +172,11 @@ class TypeChecker:
 
         # check branches
         types = []
+        node.branch_idx = []
         for branch in node.branch_list:
             idx, typex, expr =  branch
+            
+            node.branch_idx.append(None)
             
             # check idx is not self
             if idx == 'self':
@@ -175,19 +184,24 @@ class TypeChecker:
 
             try:
                 var_type = self.context.get_type(typex)
+                if isinstance(var_type, SelfType):
+                    var_type = SelfType(self.current_type)
             except SemanticError as ex:
                 self.errors.append(ex.text)
                 var_type = ErrorType()
+            
+            # check type is autotype and assign an id in the manager
+            if isinstance(var_type, AutoType):
+                node.branch_idx[-1] = self.manager.assign_id(self.obj_type)
 
             new_scope = nscope.create_child()
-            new_scope.define_variable(idx, var_type)
+            new_scope.define_variable(idx, var_type, node.branch_idx[-1])
 
             computed_type = self.visit(expr, new_scope)
             types.append(computed_type)
 
-        return self.LCA(types)
+        return LCA(types)
     
-
     @visitor.when(BlockNode)
     def visit(self, node, scope):
         nscope = scope.create_child()
@@ -199,7 +213,6 @@ class TypeChecker:
 
         # return the type of the last expression of the list
         return computed_type
-
 
     @visitor.when(LoopNode)
     def visit(self, node, scope):
@@ -215,7 +228,6 @@ class TypeChecker:
 
         return self.obj_type
 
-
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
 
@@ -227,34 +239,43 @@ class TypeChecker:
         then_type = self.visit(node.then_body, scope.create_child())
         else_type = self.visit(node.else_body, scope.create_child())
 
-        return self.LCA([then_type, else_type])
-
+        return LCA([then_type, else_type])
 
     @visitor.when(LetNode)
     def visit(self, node, scope):
         nscope = scope.create_child()
 
-        for item in node.id_list:
+        node.idx_list = [None] * len(node.id_list)
+        for i, item in enumerate(node.id_list):
             idx, typex, expr = item
+            # create a new_scope for every variable defined
+            new_scope = nscope.create_child()
             
             if idx == 'self':
                 self.errors.append(SELF_IS_READONLY)
+                idx = f'1{idx}'
+                node.id_list[i] = (idx, typex, expr)
             
             try:
                 typex = self.context.get_type(typex)
+                if isinstance(typex, SelfType):
+                    typex = SelfType(self.current_type)
             except SemanticError as ex:
                 self.errors.append(ex.text)
                 typex = ErrorType()
 
+            if isinstance(typex, AutoType):
+                node.idx_list[i] = self.manager.assign_id(self.obj_type)
+
             if expr is not None:
-                expr_type = self.visit(expr, nscope)
+                expr_type = self.visit(expr, new_scope)
                 if not self.check_conformance(expr_type, typex):
                     self.errors.append(INCOMPATIBLE_TYPES %(expr_type.name, typex.name))
 
-            nscope.define_variable(idx, typex)
+            new_scope.define_variable(idx, typex, node.idx_list[i])
+            nscope = new_scope
 
         return self.visit(node.body, nscope)
-
 
     @visitor.when(ArithmeticNode)
     def visit(self, node, scope):
@@ -286,7 +307,6 @@ class TypeChecker:
         
         return self.bool_type
 
-
     @visitor.when(VoidNode)
     def visit(self, node, scope):
         self.visit(node.expr, scope)
@@ -308,7 +328,6 @@ class TypeChecker:
             self.errors.append(INCOMPATIBLE_TYPES %(typex.name, self.int_type.name))
         
         return self.int_type
-
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
@@ -337,37 +356,13 @@ class TypeChecker:
             typex = self.context.get_type(node.lex)
             if isinstance(typex, AutoType):
                 raise SemanticError('AUTO_TYPE can\'t be instanciate with new')
+            if isinstance(typex, SelfType):
+                typex = SelfType(self.current_type)
         except SemanticError as ex:
             self.errors.append(ex.text)
             typex = ErrorType()
         
         return typex
-
-
-    def LCA(self, types):
-        # check ErrorType:
-        if any(isinstance(item, ErrorType) for item in types):
-            return ErrorType()
-
-        # check SELF_TYPE:
-        if all(isinstance(item, SelfType) for item in types):
-            return types[0]
-
-        for i, item in enumerate(types):
-            if isinstance(item, SelfType):
-                types[i] = self.current_type
-
-        current = types[0]
-        while current:
-            for item in types:
-                if not item.conforms_to(current):
-                    break
-            else:
-                return current
-            current = current.parent
-
-        # This part of the code is supposed to be unreachable
-        return None
 
 
     def check_expr(self, node, scope):
@@ -380,7 +375,6 @@ class TypeChecker:
         right = self.visit(node.right, scope)
         if not right.conforms_to(self.int_type):
             self.errors.append(INCOMPATIBLE_TYPES %(right.name, self.int_type.name))
-
 
     def check_conformance(self, computed_type, attr_type):
         return (

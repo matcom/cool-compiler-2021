@@ -19,6 +19,7 @@ class ClassDeclarationNode(DeclarationNode):
 class FuncDeclarationNode(DeclarationNode):
     def __init__(self, idx, params, return_type, body):
         self.id = idx
+        # param = (name, type)
         self.params = params
         self.type = return_type
         self.body = body
