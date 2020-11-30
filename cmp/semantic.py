@@ -296,32 +296,106 @@ class Scope:
                 return True
         return self.parent.update_variable(vname, vtype, self.index) if self.parent is not None else False
 
+
 class InferencerManager:
-    def __init__(self, context):
+    def __init__(self):
         # given a type represented by int idx, types[idx] = (A, B), where A and B are sets
         # if x in A then idx.conforms_to(x)
         # if x in B then x.conforms_to(idx)
         self.conforms_to = []
         self.conformed_by = []
+        self.infered_type = []
         self.count = 0
-        self.context = context
 
-        self.obj = 'object'
-
-
-    def assign_id(self):
+    def assign_id(self, obj_type):
         idx = self.count
-        self.conforms_to.append({self.obj})
-        self.conformed_by.append(set())
+        self.conforms_to.append([obj_type])
+        self.conformed_by.append([])
+        self.infered_type.append(None)
         self.count += 1
 
         return idx
 
     def upd_conforms_to(self, idx, other):
-        sz = len(self.conforms_to[idx])
-        self.conforms_to[idx].update(other)
+        for item in other:
+            self.auto_to_type(idx, item)
 
-        return sz != len(self.conforms_to[idx])
+    def upd_conformed_by(self, idx, other):
+        for item in other:
+            self.type_to_auto(idx, item)
+
+    def auto_to_type(self, idx, typex):
+        if isinstance(typex, SelfType):
+            typex = typex.fixed_type
+        if not isinstance(typex, ErrorType):
+            self.conforms_to[idx].append(typex)
+
+    def type_to_auto(self, idx, typex):
+        if isinstance(typex, SelfType):
+            typex = typex.fixed_type
+        if not isinstance(typex, ErrorType):
+            self.conformed_by[idx].append(typex)
+
+    def infer(self, idx):
+        try:
+            assert self.infered_type[idx] is None
+            assert len(self.conforms_to[idx]) > 1 or len(self.conformed_by[idx]) > 0
+
+            try:
+                start = self.get_min(self.conforms_to[idx])
+                self.infered_type[idx] = start
+
+                if len(self.conformed_by[idx]) > 0:
+                    final = LCA(self.conformed_by[idx])
+                    assert final.conforms_to(start)
+                    self.infered_type[idx] = final
+
+            except AssertionError:
+                self.infered_type[idx] = ErrorType()
+
+            return True
+        except AssertionError:
+            return False
+
+    def infer_all(self):
+        change = False
+        for i in range(self.count):
+            change |= self.infer(i)
+        
+        return change
+
+    def infer_object(self, obj_type):
+        for i in range(self.count):
+            if self.infered_type[i] is None:
+                self.infered_type[i] = obj_type
+
+    def get_min(self, types):
+        path = []
+
+        def find(typex):
+            for i, item in enumerate(path):
+                if item.name == typex.name:
+                    return i
+            return len(path)
+
+
+        for item in types:
+            current = []
+            while item is not None:
+                idx = find(item)
+                if idx == len(path):
+                    current.append(item)
+                    item = item.parent
+                    continue
+                
+                assert idx == len(path) - 1 or len(current) == 0
+                break
+            current.reverse()
+            path.extend(current)
+
+        return path[-1]
+
+
 
 def LCA(types):
         # check ErrorType:
