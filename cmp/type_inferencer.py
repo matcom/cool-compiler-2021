@@ -322,8 +322,12 @@ class TypeInferencer:
         self.scope_children_id = 0
 
         for i, item in enumerate(node.id_list):
+            temp_scope_index = self.scope_children_id
+            new_scope = nscope.children[temp_scope_index]
+            self.scope_children_id = 0
+
             var_name, _, expr = item               
-            var = scope.find_variable(var_name)
+            var = new_scope.find_variable(var_name)
 
             if isinstance(var.type, AutoType):
                 inf_type =  self.manager.infered_type[node.idx_list[i]]
@@ -331,8 +335,8 @@ class TypeInferencer:
                     if isinstance(inf_type, ErrorType):
                         self.errors.append(AUTOTYPE_ERROR)
                     else:
-                        node.id_list[i] = inf_type.name
-                    scope.update_variable(var_name, inf_type)
+                        node.id_list[i] = (var_name, inf_type.name, expr)
+                    new_scope.update_variable(var_name, inf_type)
                     var.type = inf_type
             
             conforms_to_types = []
@@ -340,13 +344,15 @@ class TypeInferencer:
                 conforms_to_types.extend(self.manager.conforms_to[node.idx_list[i]])
             else:
                 conforms_to_types.append(var.type)
+            
             if expr is not None:
-                _, computed_types = self.visit(expr, nscope, conforms_to_types)
+                _, computed_types = self.visit(expr, new_scope, conforms_to_types)
                 if isinstance(var.type, AutoType):
                     self.manager.upd_conformed_by(node.idx_list[i], computed_types)
 
-        expr_type, computed_types = self.visit(node.body, nscope, types)
+            nscope = new_scope
 
+        expr_type, computed_types = self.visit(node.body, nscope, types)
         self.scope_children_id = scope_index + 1
         return expr_type, computed_types
 
