@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cmp.semantic import SemanticError, Type, Context, ObjectType, IOType, StringType, IntType, BoolType, SelfType
+from cmp.semantic import SemanticError, Type, Context, ObjectType, IOType, StringType, IntType, BoolType, SelfType, AutoType
 from cmp.ast import ProgramNode, ClassDeclarationNode
 
 built_in_types = []
@@ -33,7 +33,6 @@ class TypeCollector(object):
         # Order class declarations according to their depth in the inheritance tree
         node.declarations = self.order_types(node)
        
-    
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         # flag will be True if the class is succesfully added to the context
@@ -55,6 +54,7 @@ class TypeCollector(object):
             except SemanticError:
                 pass
     
+
     def define_built_in_types(self):
         objectx = ObjectType()
         iox = IOType()
@@ -62,22 +62,23 @@ class TypeCollector(object):
         stringx = StringType()
         boolx = BoolType()
         self_type = SelfType()
+        autotype = AutoType()
 
         # Object Methods
-        objectx.define_method('abort', [], [], objectx)
-        objectx.define_method('type_name', [], [], stringx)
-        objectx.define_method('copy', [], [], self_type)
+        objectx.define_method('abort', [], [], objectx, [])
+        objectx.define_method('type_name', [], [], stringx, [])
+        objectx.define_method('copy', [], [], self_type, [])
 
         # IO Methods
-        iox.define_method('out_string', ['x'], [stringx], self_type)
-        iox.define_method('out_int', ['x'], [intx], self_type)
-        iox.define_method('in_string', [], [], stringx)
-        iox.define_method('in_int', [], [], intx)
+        iox.define_method('out_string', ['x'], [stringx], self_type, [None])
+        iox.define_method('out_int', ['x'], [intx], self_type, [None])
+        iox.define_method('in_string', [], [], stringx, [])
+        iox.define_method('in_int', [], [], intx, [])
 
         # String Methods
-        stringx.define_method('length', [], [], intx)
-        stringx.define_method('concat', ['s'], [stringx], stringx)
-        stringx.define_method('substr', ['i', 'l'], [intx, intx], stringx)
+        stringx.define_method('length', [], [], intx, [])
+        stringx.define_method('concat', ['s'], [stringx], stringx, [None])
+        stringx.define_method('substr', ['i', 'l'], [intx, intx], stringx, [None])
         
         # Setting Object as parent
         iox.set_parent(objectx)
@@ -85,7 +86,7 @@ class TypeCollector(object):
         intx.set_parent(objectx)
         boolx.set_parent(objectx)
 
-        built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type])
+        built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type, autotype])
         
     def check_parents(self):
         for item in self.parent.keys():
@@ -104,7 +105,6 @@ class TypeCollector(object):
                     self.errors.append(ex.text)
                     item_type.set_parent(built_in_types[0])
     
-
     def check_cyclic_inheritance(self):
         flag = []
         
@@ -133,8 +133,6 @@ class TypeCollector(object):
             if idx == len(flag):
                 check_path(idx, item)
         
-
-
     def order_types(self, node):
         sorted_declarations = []
         flag = [False] * len(node.declarations)
