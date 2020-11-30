@@ -24,10 +24,10 @@ class TypeChecker:
         self.manager = manager
 
         # built-in types
-        self.obj_type = self.context.get_type('object')
-        self.int_type = self.context.get_type('int')
-        self.bool_type = self.context.get_type('bool')
-        self.string_type = self.context.get_type('string')
+        self.obj_type = self.context.get_type('Object')
+        self.int_type = self.context.get_type('Int')
+        self.bool_type = self.context.get_type('Bool')
+        self.string_type = self.context.get_type('String')
 
     @visitor.on('node')
     def visit(self, node, scope=None):
