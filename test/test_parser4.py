@@ -23,6 +23,7 @@ def test():
     tree = tree.replace("\t", "")
     tree = tree.replace("\n", "")
     tree = tree.replace("\\", "")
+
     assert (
         tree
         == "__ProgramNode [<class> ... <class>]__ClassDeclarationNode: class Point  { <feature> ... <feature> }__AttrDeclarationNode: x : AUTO_TYPE <- <exp>__NONE__AttrDeclarationNode: y : AUTO_TYPE <- <exp>__NONE__FuncDeclarationNode: init(n:Int, m:Int) : SELF_TYPE -> <body>__BlockNode: {<exp>; ... <exp>;}__AssignNode: x <- <expr>__ VariableNode: n__AssignNode: y <- <expr>__ VariableNode: m"

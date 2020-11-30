@@ -52,6 +52,8 @@ class Type:
     def set_parent(self, parent):
         if self.parent is not None:
             raise SemanticError(f"Parent type is already set for {self.name}.")
+        if parent.name == "String" or parent.name == "Bool" or parent.name == "Int":
+            raise SemanticError(f"Is not possible to inherit from {parent.name}")
         self.parent = parent
 
     def get_attribute(self, name: str):

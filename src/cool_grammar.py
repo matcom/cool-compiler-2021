@@ -58,7 +58,9 @@ def define_cool_grammar(print_grammar=False):
     semi, colon, comma, dot, opar, cpar, ocur, ccur, at, larrow, rarrow = G.Terminals(
         "; : , . ( ) { } @ <- =>"
     )
-    plus, minus, star, div, less, equal, lesseq, neg = G.Terminals("+ - * / < = <= ~")
+    equal, plus, minus, star, div, less, equal, lesseq, neg = G.Terminals(
+        "= + - * / < = <= ~"
+    )
     idx, num, new, string, true, false = G.Terminals("id int new string true false")
 
     # productions
@@ -175,4 +177,4 @@ def define_cool_grammar(print_grammar=False):
 
     if print_grammar:
         print(G)
-    return (G, idx, num)
+    return (G, idx, string, num)

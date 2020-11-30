@@ -18,7 +18,7 @@ def test():
             step ( p : AUTO_TYPE ) : AUTO_TYPE { p . translate ( 1 , 1 ) } ;
             main ( ) : Object {
                 let p : AUTO_TYPE <- new Point in {
-                    step ( p ) ; *Puede lanzar error semantico*
+                    step ( p ) ; (*Puede lanzar error semantico*)
                 }
             } ;
         } ;

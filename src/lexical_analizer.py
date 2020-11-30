@@ -1,15 +1,35 @@
 import ply.lex as lex
-import src.tokens_rules
+import src.tokens_rules as tokens_rules
 from src.cmp.utils import Token
 
 
-def tokenize_cool_text(grammar, data, printing=False):
+def pprint_tokens(tokens):
+    indent = 0
+    pending = []
+    for token in tokens:
+        pending.append(token)
+        if token.lex in {"{", "}", ";"}:
+            if token.lex == "}":
+                indent -= 1
+            print("    " * indent + " ".join(str(t.token_type) for t in pending))
+            pending.clear()
+            if token.lex == "{":
+                indent += 1
+    print(" ".join([str(t.token_type) for t in pending]))
+
+
+def tokenize_cool_text(grammar, idx, string, num, data, printing=False):
     lexer = lex.lex(module=tokens_rules)
 
     # Give the lexer some input
     lexer.input(data)
 
-    fixed_tokens = {t.Name: Token(t.Name, t) for t in grammar.terminals}
+    fixed_tokens = {
+        t.Name: Token(t.Name, t)
+        for t in grammar.terminals
+        if t not in {idx, string, num}
+    }
+
     tokens = []
     # Tokenize
     while True:
@@ -18,49 +38,20 @@ def tokenize_cool_text(grammar, data, printing=False):
             tokens.append(Token("$", grammar.EOF))
             break  # No more input
         else:
-            # tokens.append(tok)
             try:
                 tokens.append(fixed_tokens[tok.type])
             except:
-                tokens.append(fixed_tokens[tok.value])
+                try:  # for <=, ->, <-
+                    tokens.append(fixed_tokens[tok.value])
+                except:
+                    if tok.type == "string":
+                        tokens.append(Token(tok.value, string))
+                    elif tok.type == "id":
+                        tokens.append(Token(tok.value, idx))
+                    else:
+                        tokens.append(Token(tok.value, num))
+
     if printing:
-        print(tokens)
+        pprint_tokens(tokens)
     return tokens
 
-
-# To use the lexer, you first need to feed it some input text using its input() method.
-# After that, repeated calls to token() produce tokens. The following code shows how this
-# works:
-
-
-# Test it out
-# data = '''
-# 3 + 4 * 10
-# + -20 *2
-# '''
-
-# data = """
-#         class Cons inherits List{
-#             --class Cons super important comment
-#         xcar : Int ;
-#         xcdr : List ;
-#         ascommenterdnsideerdajajajaaquiiiedsacommentjajajaed(): Bool{true};
-#         isNill () : Bool{
-#                 false};
-
-#         init (hd : Int, tl : List) : Cons{
-#                 { xcar <- "hola \\t helou
-#                     sd";
-#                   xcdr <-  1 + 2;
-#                  self;}
-#         };
-#         };
-#         """
-
-
-# Compute column.
-#     input is the input text string
-#     token is a token instance
-def find_column(input, token):
-    line_start = input.rfind("\n", 0, token.lexpos) + 1
-    return (token.lexpos - line_start) + 1

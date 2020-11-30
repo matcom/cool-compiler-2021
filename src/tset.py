@@ -22,14 +22,14 @@ class Tset:
 
         for key, value in self.locals.items():
             output += "\t" + str(key) + ":" + str(value) + "\n"
-        for key, chil in self.children.items():
+        for key, child in self.children.items():
             output += "\n"
             try:
                 output += key.id + "--->"
             except AttributeError:
                 output += "let or case --->"
             output += "\n"
-            output += str(chil)
+            output += str(child)
         return output
 
     def clone(self):

@@ -1,4 +1,5 @@
-from src.cool_tokenizer import tokenize_cool_text
+# from src.cool_tokenizer import tokenize_cool_text
+from src.lexical_analizer import tokenize_cool_text
 from src.cool_grammar import define_cool_grammar
 from src.cool_visitor import FormatVisitor
 
@@ -10,10 +11,12 @@ from src.cmp.evaluation import evaluate_reverse_parse
 
 def run_pipeline(text):
     # define grammar
-    grammar, idx, num = define_cool_grammar()
+    grammar, idx, string, num = define_cool_grammar()
 
     # tokenize text
-    tokens = tokenize_cool_text(grammar, text, idx, num, True)
+    # tokens = tokenize_cool_text(grammar, text, idx, num, True)
+    tokens = tokenize_cool_text(grammar, idx, string, num, text, True)
+
     # print(tokens)
     # try:
     parser = LR1Parser(grammar)

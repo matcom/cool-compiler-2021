@@ -26,6 +26,6 @@ def test():
 
     assert (
         tree
-        == "__ProgramNode [<class> ... <class>]__ClassDeclarationNode: class Main inherits IO { <feature> ... <feature> }__FuncDeclarationNode: main() : AUTO_TYPE -> <body>__LetNode: let <identif-list> in <expr>__VarDeclarationNode: x : AUTO_TYPE <- <expr>__<expr> PlusNode <expr>__ ConstantNumNode: 3__ ConstantNumNode: 2__BlockNode: {<exp>; ... <exp>;}__LetNode: case <expr> of <case_block> esac__ VariableNode: x__CaseItemNode: y : Int => <exp>;__CallNode: out_string(<expr>, ..., <expr>)__ StringNode: Ok "
+        == "__ProgramNode [<class> ... <class>]__ClassDeclarationNode: class Main inherits IO { <feature> ... <feature> }__FuncDeclarationNode: main() : AUTO_TYPE -> <body>__LetNode: let <identif-list> in <expr>__VarDeclarationNode: x : AUTO_TYPE <- <expr>__<expr> PlusNode <expr>__ ConstantNumNode: 3__ ConstantNumNode: 2__BlockNode: {<exp>; ... <exp>;}__LetNode: case <expr> of <case_block> esac__ VariableNode: x__CaseItemNode: y : Int => <exp>;__CallNode: out_string(<expr>, ..., <expr>)__ StringNode:  Ok "
     )
 

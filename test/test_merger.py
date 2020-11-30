@@ -10,12 +10,12 @@ from src.cool_visitor import FormatVisitor
 
 def test():
     text = """
-        
-       class A { 
+
+       class A {
            a : String ;
            b : AUTO_TYPE ;
            c : AUTO_TYPE <- 0 ;
-           d : Object <- while c loop c + 1 pool  ; *first and second errors*
+           d : Object <- while c loop c + 1 pool  ; (*first and second errors*)
            j : AUTO_TYPE ;
            l : AUTO_TYPE ;
            fact ( n : AUTO_TYPE ) : AUTO_TYPE { if  n < 0  then 1 else  n + fact ( n - 1 )   fi } ;
@@ -23,13 +23,12 @@ def test():
                b <-
                 {
                     p + 5 ;
-                    j <- p ; *third error*
+                    j <- p ; (*third error*)
                     p <- false ;
                     isvoid d ;
 
-                    
                     l @ Point . main ( ) ;
-                } 
+                }
             } ;
         } ;
          class Point inherits A {
@@ -37,7 +36,7 @@ def test():
             k : AUTO_TYPE ;
             main ( ) : AUTO_TYPE {
                 let i : AUTO_TYPE <- new A in {
-                    isvoid i ; *Puede lanzar error semantico*
+                    isvoid i ; (*Puede lanzar error semantico*)
                 }
             } ;
             ackermann ( m : AUTO_TYPE , n : AUTO_TYPE ) : AUTO_TYPE {
@@ -48,7 +47,7 @@ def test():
                 fi
             } ;
         } ;
-        
+
         """
 
     ast = run_pipeline(text)
@@ -67,6 +66,7 @@ def test():
 
     print(errors)
     if errors != []:
+        print(errors)
         assert False
 
     tset_builder = TSetBuilder(context, errors)

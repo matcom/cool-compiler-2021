@@ -3,6 +3,15 @@ class Error(Exception):
     pass
 
 
+class tokenizer_error(Error):
+    "raised when tokenizer got unespected sequences of characters"
+
+    def __init__(self, text, line):
+        Error.__init__(
+            self, f"Got {text} while analizing line {line}",
+        )
+
+
 class parsing_table_error(Error):
     "raised when T[X,t] possess more than one production"
 

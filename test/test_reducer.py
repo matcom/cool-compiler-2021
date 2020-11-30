@@ -35,7 +35,7 @@ def test():
             k : AUTO_TYPE ;
             main ( ) : AUTO_TYPE {
                 let i : AUTO_TYPE <- new A in {
-                    isvoid i ; *Puede lanzar error semantico*
+                    isvoid i ; (*Puede lanzar error semantico*)
                 }
             } ;
             ackermann ( m : AUTO_TYPE , n : AUTO_TYPE ) : AUTO_TYPE {
