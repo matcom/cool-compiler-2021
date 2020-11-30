@@ -206,8 +206,9 @@ class IntType(Type):
         return False
 
 class SelfType(Type):
-    def __init__(self):
+    def __init__(self, fixed=None):
         Type.__init__(self, 'SELF_TYPE')
+        self.fixed_type = fixed
     
     def can_be_inherited(self):
         return False
