@@ -124,6 +124,8 @@ class TypeChecker:
         if node.type is not None:
             try:
                 cast_type = self.context.get_type(node.type)
+                if isinstance(cast_type, AutoType):
+                    raise SemanticError('AUTO_TYPE can\'t be the type on this type of dispatch')
                 if isinstance(cast_type, SelfType):
                     cast_type = SelfType(self.current_type)
             except SemanticError as ex:
@@ -352,6 +354,8 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             typex = self.context.get_type(node.lex)
+            if isinstance(typex, AutoType):
+                raise SemanticError('AUTO_TYPE can\'t be instanciate with new')
             if isinstance(typex, SelfType):
                 typex = SelfType(self.current_type)
         except SemanticError as ex:

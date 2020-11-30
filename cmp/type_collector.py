@@ -38,6 +38,8 @@ class TypeCollector(object):
         # flag will be True if the class is succesfully added to the context
         flag = False 
         try:
+            if node.id == 'AUTO_TYPE':
+                raise SemanticError('Name of class can\'t be autotype')
             self.context.create_type(node.id)
             flag = True
             self.parent[node.id] = node.parent
