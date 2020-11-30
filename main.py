@@ -161,5 +161,5 @@ def main(G):
 
 
 if __name__ == '__main__':
-    # main(G)
-    ast = run_pipeline(G, text)
+    main(G)
+    # ast = run_pipeline(G, text)
