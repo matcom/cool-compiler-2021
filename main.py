@@ -72,9 +72,9 @@ text = '''
     class A {
         b : AUTO_TYPE ;
         a : AUTO_TYPE ;
-        c : String ;
-        f ( ) : Int { {
-            b <- c . substr ( 0 , a ) ;
+
+        f ( ) : AUTO_TYPE { {
+            let x : String , x : AUTO_TYPE <- a + b , self : AUTO_TYPE , x : AUTO_TYPE <- let c : AUTO_TYPE in a in x ;
         } } ;
     } ;
     
