@@ -5,7 +5,7 @@ from src.parser_automatons import (
 )
 from src.methods import compute_firsts, compute_local_first, compute_follows
 from src.cmp.automata import State
-from src.errors import shift_reduce_error, invalid_sentence_error
+from src.rors import shift_reduce_error, invalid_sentence_error
 
 
 class ShiftReduceParser:
@@ -38,6 +38,7 @@ class ShiftReduceParser:
             # Detect error
             try:
                 action, tag = self.action[state, lookahead]
+
             except KeyError:
                 raise invalid_sentence_error(
                     w,

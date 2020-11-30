@@ -1,4 +1,4 @@
-from src.cool_tokenizer import tokenize_cool_text
+from src.lexical_analizer import tokenize_cool_text
 from src.cool_grammar import define_cool_grammar
 from src.cool_visitor import FormatVisitor
 
@@ -13,18 +13,19 @@ from src.shift_reduce_parsers import LR1Parser, DerivationTree
 from src.errors import parsing_table_error, Error
 
 from src.cmp.evaluation import evaluate_reverse_parse
- 
+
 
 def run_pipeline(text):
     # define grammar
-    grammar, idx, num = define_cool_grammar()
-
-    # tokenize text
-    tokens = tokenize_cool_text(grammar, text, idx, num)
+    grammar, idx, num  = define_cool_grammar()
 
     # try:
+    # tokens = tokenize_cool_text(grammar, text, idx, num)
+    tokens = tokenize_cool_text(grammar, text)
+
     parser = LR1Parser(grammar)
     parse, operations = parser([t.token_type for t in tokens])
+
     # print("\n".join(repr(x) for x in parse))
     # print(operations)
 
@@ -63,14 +64,15 @@ def run_pipeline(text):
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
 
-    # formatter = FormatVisitor()
-    # tree = formatter.visit(ast)
-    # print(tree)
-    #         derivation_list = parser(text)
-    #         derivation_tree_aut = DerivationTree(derivation_list[0], G)
 
-    # except Error as err:
-    #     print(err)
+# formatter = FormatVisitor()
+# tree = formatter.visit(ast)
+# print(tree)
+#         derivation_list = parser(text)
+#         derivation_tree_aut = DerivationTree(derivation_list[0], G)
+
+# except Error as err:
+#     print(err)
 
 
 # def run_pipeline_cmp_tools(text):
@@ -97,3 +99,23 @@ def run_pipeline(text):
 
 
 # run_pipeline_cmp_tools(text)
+data = """
+        class Cons inherits List {
+        xcar : Int ;
+        xcdr : List ;
+
+        isNill ( ) : Bool {
+                false
+        } ;
+
+        init ( hd : Int , tl : List ) : Cons {
+                {
+                xcar <- hd ;
+                xcdr <- tl ;
+                self ;
+                }
+        } ;
+        } ;
+        """
+
+run_pipeline(data)
