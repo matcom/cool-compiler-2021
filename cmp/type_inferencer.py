@@ -100,7 +100,7 @@ class TypeInferencer:
                     if isinstance(inf_type, ErrorType):
                         self.errors.append(AUTOTYPE_ERROR)
                     else:
-                        node.params[i][1] = inf_type.name
+                        node.params[i] = (node.params[i][0], inf_type.name)
                         self.current_type.update_method_param(name, inf_type, i)
                     scope.update_variable(name, inf_type)
                     t = inf_type

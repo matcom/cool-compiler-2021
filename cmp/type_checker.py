@@ -43,6 +43,7 @@ class TypeChecker:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
         self.current_type = self.context.get_type(node.id)
+        scope.define_variable('self', SelfType(self.current_type))
         attributes = self.current_type.all_attributes()
         for values in attributes:
             attr, _ = values
@@ -186,7 +187,7 @@ class TypeChecker:
             
             # check type is autotype and assign an id in the manager
             if isinstance(var_type, AutoType):
-                node.branch_idx[-1] = self.manager.assign_id()
+                node.branch_idx[-1] = self.manager.assign_id(self.obj_type)
 
             new_scope = nscope.create_child()
             new_scope.define_variable(idx, var_type, node.branch_idx[-1])
