@@ -98,6 +98,10 @@ def run_pipeline(text):
             checker = TypeChecker(context, errors)
             checker.visit(ast, None)
 
+            if errors != []:
+                st.header("Sorry we found some errors in your code:")
+                print_array(errors)
+
             if reduced_sets in selected_options:
                 st.header("Reduced Sets")
                 print_tset(reduced_set)

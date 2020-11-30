@@ -87,6 +87,9 @@ class TypeChecker:
             self.errors.append(e)
             return ErrorType()
 
+        if typex.name == "SELF_TYPE":
+            typex = self.current_type
+
         if node.init_exp != None:
             init_expr_type = self.visit(node.init_exp, scope)
             if not init_expr_type.conforms_to(typex):
@@ -97,6 +100,9 @@ class TypeChecker:
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
         self.current_method = self.current_type.get_method(node.id)
+        method_return_type = self.current_method.return_type
+        if method_return_type.name == "SELF_TYPE":
+            method_return_type = self.current_type
 
         child_scope = scope.create_child()
 
@@ -107,10 +113,9 @@ class TypeChecker:
 
         body_type = self.visit(node.body, child_scope)
 
-        if not body_type.conforms_to(self.current_method.return_type):
+        if not body_type.conforms_to(method_return_type):
             self.errors.append(
-                INCOMPATIBLE_TYPES
-                % (body_type.name, self.current_method.return_type.name)
+                INCOMPATIBLE_TYPES % (body_type.name, method_return_type.name)
             )
 
         if self.current_type.parent is not None:
@@ -125,6 +130,9 @@ class TypeChecker:
 
         try:
             return_type = self.context.get_type(node.type)
+            if return_type.name == "SELF_TYPE":
+                return self.current_type
+
             return return_type
 
         except SemanticError as e:
@@ -268,6 +276,8 @@ class TypeChecker:
         static_type = None
         try:
             static_type = self.context.get_type(node.type)
+            if static_type.name == "SELF_TYPE":
+                static_type = self.current_type
             scope.define_variable(node.id, static_type)
 
         except SemanticError as e:
@@ -312,6 +322,9 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             typex = self.context.get_type(node.lex)
+            if typex.name == "SELF_TYPE":
+                return self.current_type
+
             return typex
         except SemanticError as error:
             self.errors.append(error.text)
