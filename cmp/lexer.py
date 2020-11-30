@@ -1,7 +1,7 @@
 from cmp.utils import Token, tokenizer
 from cmp.grammar import *
 
-fixed_tokens = { t.Name: Token(t.Name, t) for t in G.terminals if t not in { idx, num }}
+fixed_tokens = { t.Name: Token(t.Name, t) for t in G.terminals if t not in { idx, num, stringx, boolx }}
 
 @tokenizer(G, fixed_tokens)
 def tokenize_text(token):
@@ -10,6 +10,10 @@ def tokenize_text(token):
         float(lex)
         return token.transform_to(num)
     except ValueError:
+        if lex[0] == '"' and lex[-1] == '"':
+            return token.transform_to(stringx)
+        if lex == 'true' or lex == 'false':
+            return token.transform_to(boolx)
         return token.transform_to(idx)
 
 def pprint_tokens(tokens, get=False):

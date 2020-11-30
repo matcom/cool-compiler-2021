@@ -8,9 +8,10 @@ class SemanticError(Exception):
         return self.args[0]
 
 class Attribute:
-    def __init__(self, name, typex):
+    def __init__(self, name, typex, idx=None):
         self.name = name
         self.type = typex
+        self.idx = idx
 
     def __str__(self):
         return f'[attrib] {self.name} : {self.type.name};'
@@ -19,11 +20,13 @@ class Attribute:
         return str(self)
 
 class Method:
-    def __init__(self, name, param_names, params_types, return_type):
+    def __init__(self, name, param_names, param_types, return_type, param_idx, ridx=None):
         self.name = name
         self.param_names = param_names
-        self.param_types = params_types
+        self.param_types = param_types
+        self.param_idx = param_idx
         self.return_type = return_type
+        self.ridx = ridx
 
     def __str__(self):
         params = ', '.join(f'{n}:{t.name}' for n,t in zip(self.param_names, self.param_types))
@@ -57,11 +60,11 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
 
-    def define_attribute(self, name:str, typex):
+    def define_attribute(self, name:str, typex, idx=None):
         try:
             self.get_attribute(name)
         except SemanticError:
-            attribute = Attribute(name, typex)
+            attribute = Attribute(name, typex, idx)
             self.attributes.append(attribute)
             return attribute
         else:
@@ -78,11 +81,11 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
 
-    def define_method(self, name:str, param_names:list, param_types:list, return_type):
+    def define_method(self, name:str, param_names:list, param_types:list, return_type, param_idx:list, ridx=None):
         if name in (method.name for method in self.methods):
             raise SemanticError(f'Method "{name}" already defined in {self.name}')
 
-        method = Method(name, param_names, param_types, return_type)
+        method = Method(name, param_names, param_types, return_type, param_idx, ridx)
         self.methods.append(method)
         return method
 
@@ -97,6 +100,24 @@ class Type:
         for method in self.methods:
             plain[method.name] = (method, self)
         return plain.values() if clean else plain
+
+    def update_attr(self, attr_name, attr_type):
+        for i, item in enumerate(self.attributes):
+            if item.name == attr_name:
+                self.attributes[i] = Attribute(attr_name, attr_type)
+                break
+    
+    def update_method_rtype(self, method_name, rtype):
+        for i, item in enumerate(self.methods):
+            if item.name == method_name:
+                self.methods[i].return_type = rtype
+                break
+
+    def update_method_param(self, method_name, param_type, param_idx):
+        for i, item in enumerate(self.methods):
+            if item.name == method_name:
+                self.methods[i].param_types[param_idx] = param_type
+                break
 
     def conforms_to(self, other):
         return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
@@ -123,6 +144,9 @@ class Type:
     def __repr__(self):
         return str(self)
 
+    # def __eq__(self, other):
+    #     return self.conforms_to(other) and other.conforms_to(self)
+
 class ErrorType(Type):
     def __init__(self):
         Type.__init__(self, '<error>')
@@ -139,21 +163,21 @@ class ErrorType(Type):
 
 class ObjectType(Type):
     def __init__(self):
-        Type.__init__(self, 'object')
+        Type.__init__(self, 'Object')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, ObjectType)    
 
 class IOType(Type):
     def __init__(self):
-        Type.__init__(self, 'io')
+        Type.__init__(self, 'IO')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, IOType)
 
 class StringType(Type):
     def __init__(self):
-        Type.__init__(self, 'string')
+        Type.__init__(self, 'String')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, StringType)
@@ -163,7 +187,7 @@ class StringType(Type):
 
 class BoolType(Type):
     def __init__(self):
-        Type.__init__(self, 'bool')
+        Type.__init__(self, 'Bool')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, BoolType)
@@ -173,7 +197,7 @@ class BoolType(Type):
 
 class IntType(Type):
     def __init__(self):
-        Type.__init__(self, 'int')
+        Type.__init__(self, 'Int')
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, IntType)
@@ -182,10 +206,26 @@ class IntType(Type):
         return False
 
 class SelfType(Type):
-    def __init__(self):
+    def __init__(self, fixed=None):
         Type.__init__(self, 'SELF_TYPE')
+        self.fixed_type = fixed
+    
+    def can_be_inherited(self):
+        return False
 
+class AutoType(Type):
+    def __init__(self):
+        Type.__init__(self, 'AUTO_TYPE')
 
+    def can_be_inherited(self):
+        return False
+
+    def conforms_to(self, other):
+        return True
+
+    def bypass(self):
+        return True
+    
 
 class Context:
     def __init__(self):
@@ -210,9 +250,10 @@ class Context:
         return str(self)
 
 class VariableInfo:
-    def __init__(self, name, vtype):
+    def __init__(self, name, vtype, idx):
         self.name = name
         self.type = vtype
+        self.idx = idx
 
 class Scope:
     def __init__(self, parent=None):
@@ -229,8 +270,8 @@ class Scope:
         self.children.append(child)
         return child
 
-    def define_variable(self, vname, vtype):
-        info = VariableInfo(vname, vtype)
+    def define_variable(self, vname, vtype, idx=None):
+        info = VariableInfo(vname, vtype, idx)
         self.locals.append(info)
         return info
 
@@ -239,10 +280,160 @@ class Scope:
         try:
             return next(x for x in locals if x.name == vname)
         except StopIteration:
-            return self.parent.find_variable(vname, self.index) if self.parent is None else None
+            return self.parent.find_variable(vname, self.index) if self.parent is not None else None
 
     def is_defined(self, vname):
         return self.find_variable(vname) is not None
 
     def is_local(self, vname):
         return any(True for x in self.locals if x.name == vname)
+
+    def update_variable(self, vname, vtype, index=None):
+        locals = self.locals if index is None else itt.islice(self.locals, index)
+        for i, item in enumerate(locals):
+            if item.name == vname:
+                self.locals[i] = VariableInfo(vname, vtype, item.idx)
+                return True
+        return self.parent.update_variable(vname, vtype, self.index) if self.parent is not None else False
+
+
+class InferencerManager:
+    def __init__(self):
+        # given a type represented by int idx, types[idx] = (A, B), where A and B are sets
+        # if x in A then idx.conforms_to(x)
+        # if x in B then x.conforms_to(idx)
+        self.conforms_to = []
+        self.conformed_by = []
+        self.infered_type = []
+        self.count = 0
+
+    def assign_id(self, obj_type):
+        idx = self.count
+        self.conforms_to.append([obj_type])
+        self.conformed_by.append([])
+        self.infered_type.append(None)
+        self.count += 1
+
+        return idx
+
+    def upd_conforms_to(self, idx, other):
+        for item in other:
+            self.auto_to_type(idx, item)
+
+    def upd_conformed_by(self, idx, other):
+        for item in other:
+            self.type_to_auto(idx, item)
+
+    def auto_to_type(self, idx, typex):
+        if isinstance(typex, SelfType):
+            typex = typex.fixed_type
+        try:
+            assert not isinstance(typex, ErrorType)
+            assert not any(item.name == typex.name for item in self.conforms_to[idx])
+            
+            self.conforms_to[idx].append(typex)
+        except AssertionError:
+            pass
+
+    def type_to_auto(self, idx, typex):
+        if isinstance(typex, SelfType):
+            typex = typex.fixed_type
+        try:
+            assert not isinstance(typex, ErrorType)
+            assert not any(item.name == typex.name for item in self.conformed_by[idx])
+            
+            self.conformed_by[idx].append(typex)
+        except AssertionError:
+            pass
+
+    def infer(self, idx):
+        try:
+            assert self.infered_type[idx] is None
+            assert len(self.conforms_to[idx]) > 1 or len(self.conformed_by[idx]) > 0
+
+            try:
+                start = self.get_min(self.conforms_to[idx])
+                self.infered_type[idx] = start
+
+                if len(self.conformed_by[idx]) > 0:
+                    final = LCA(self.conformed_by[idx])
+                    assert final.conforms_to(start)
+                    self.infered_type[idx] = final
+
+            except AssertionError:
+                self.infered_type[idx] = ErrorType()
+            return True
+        except AssertionError:
+            return False
+
+    def infer_all(self):
+        change = False
+        for i in range(self.count):
+            change |= self.infer(i)
+        
+        return change
+
+    def infer_object(self, obj_type):
+        for i in range(self.count):
+            if self.infered_type[i] is None:
+                self.infered_type[i] = obj_type
+
+    def get_min(self, types):
+        path = []
+
+        def find(typex):
+            for i, item in enumerate(path):
+                if item.name == typex.name:
+                    return i
+            return len(path)
+
+
+        for item in types:
+            current = []
+            while item is not None:
+                idx = find(item)
+                if idx == len(path):
+                    current.append(item)
+                    item = item.parent
+                    continue
+                
+                assert idx == len(path) - 1 or len(current) == 0
+                break
+            current.reverse()
+            path.extend(current)
+
+        return path[-1]
+
+
+
+def LCA(types):
+    if len(types) == 0:
+        return None
+
+    # check ErrorType:
+    if any(isinstance(item, ErrorType) for item in types):
+        return ErrorType()
+
+    # check AUTO_TYPE
+    if any(isinstance(item, AutoType) for item in types):
+        return AutoType()
+
+    # check SELF_TYPE:
+    if all(isinstance(item, SelfType) for item in types):
+        return types[0]
+
+    for i, item in enumerate(types):
+        if isinstance(item, SelfType):
+            types[i] = item.fixed_type
+
+    current = types[0]
+    while current:
+        for item in types:
+            if not item.conforms_to(current):
+                break
+        else:
+            return current
+        current = current.parent
+
+    # This part of the code is supposed to be unreachable
+    return None
