@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType
+from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType, LCA
 from cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
 from cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
 from cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
@@ -30,7 +30,7 @@ class TypeChecker:
         self.string_type = self.context.get_type('string')
 
     @visitor.on('node')
-    def visit(self, node, scope):
+    def visit(self, node, scope=None):
         pass
 
     @visitor.when(ProgramNode)
@@ -39,7 +39,6 @@ class TypeChecker:
         for declaration in node.declarations:
             self.visit(declaration, scope.create_child())
         return scope
-
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
@@ -51,8 +50,7 @@ class TypeChecker:
             
         for feature in node.features:
             self.visit(feature, scope.create_child())
-        
-        
+           
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
         attr_type = self.context.get_type(node.type)
@@ -61,7 +59,6 @@ class TypeChecker:
             computed_type = self.visit(node.expr, scope)
             if not self.check_conformance(computed_type, attr_type):
                 self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, attr_type.name))
-
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -96,8 +93,7 @@ class TypeChecker:
         rtype = self.current_method.return_type
         if not self.check_conformance(computed_type, rtype):
             self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, self.current_method.return_type.name))
-        
-        
+            
     @visitor.when(AssignNode)
     def visit(self, node, scope):
         if node.id == "self":
@@ -115,8 +111,7 @@ class TypeChecker:
             self.errors.append(INCOMPATIBLE_TYPES %(computed_type.name, var.type.name))
             
         return computed_type
-        
-    
+          
     @visitor.when(CallNode)
     def visit(self, node, scope):
         # Evaluate object
@@ -159,7 +154,6 @@ class TypeChecker:
             self.errors.append(ex.text)
             return ErrorType()
         
-
     @visitor.when(CaseNode)
     def visit(self, node, scope):
         # check expression
@@ -188,7 +182,7 @@ class TypeChecker:
             computed_type = self.visit(expr, new_scope)
             types.append(computed_type)
 
-        return self.LCA(types)
+        return LCA(types)
     
 
     @visitor.when(BlockNode)
@@ -202,7 +196,6 @@ class TypeChecker:
 
         # return the type of the last expression of the list
         return computed_type
-
 
     @visitor.when(LoopNode)
     def visit(self, node, scope):
@@ -218,7 +211,6 @@ class TypeChecker:
 
         return self.obj_type
 
-
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
 
@@ -230,8 +222,7 @@ class TypeChecker:
         then_type = self.visit(node.then_body, scope.create_child())
         else_type = self.visit(node.else_body, scope.create_child())
 
-        return self.LCA([then_type, else_type])
-
+        return LCA([then_type, else_type])
 
     @visitor.when(LetNode)
     def visit(self, node, scope):
@@ -263,7 +254,6 @@ class TypeChecker:
 
         return self.visit(node.body, nscope)
 
-
     @visitor.when(ArithmeticNode)
     def visit(self, node, scope):
         self.check_expr(node, scope)
@@ -294,7 +284,6 @@ class TypeChecker:
         
         return self.bool_type
 
-
     @visitor.when(VoidNode)
     def visit(self, node, scope):
         self.visit(node.expr, scope)
@@ -316,7 +305,6 @@ class TypeChecker:
             self.errors.append(INCOMPATIBLE_TYPES %(typex.name, self.int_type.name))
         
         return self.int_type
-
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
@@ -343,41 +331,12 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             typex = self.context.get_type(node.lex)
+            if isinstance(typex, SelfType):
         except SemanticError as ex:
             self.errors.append(ex.text)
             typex = ErrorType()
         
         return typex
-
-
-    def LCA(self, types):
-        # check ErrorType:
-        if any(isinstance(item, ErrorType) for item in types):
-            return ErrorType()
-
-        # check AUTO_TYPE
-        if any(isinstance(item, AutoType) for item in types):
-            return AutoType()
-
-        # check SELF_TYPE:
-        if all(isinstance(item, SelfType) for item in types):
-            return types[0]
-
-        for i, item in enumerate(types):
-            if isinstance(item, SelfType):
-                types[i] = self.current_type
-
-        current = types[0]
-        while current:
-            for item in types:
-                if not item.conforms_to(current):
-                    break
-            else:
-                return current
-            current = current.parent
-
-        # This part of the code is supposed to be unreachable
-        return None
 
 
     def check_expr(self, node, scope):
@@ -390,7 +349,6 @@ class TypeChecker:
         right = self.visit(node.right, scope)
         if not right.conforms_to(self.int_type):
             self.errors.append(INCOMPATIBLE_TYPES %(right.name, self.int_type.name))
-
 
     def check_conformance(self, computed_type, attr_type):
         return (

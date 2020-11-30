@@ -323,20 +323,31 @@ class InferencerManager:
 
         return sz != len(self.conforms_to[idx])
 
-    def upd_conformed_by(self, idx, other):
-        sz = len(self.conformed_by[idx])
-        self.conformed_by[idx].update(other)
+def LCA(types):
+        # check ErrorType:
+        if any(isinstance(item, ErrorType) for item in types):
+            return ErrorType()
 
-        return sz != len(self.conformed_by[idx])
+        # check AUTO_TYPE
+        if any(isinstance(item, AutoType) for item in types):
+            return AutoType()
 
-    def auto_to_type(self, idx, typex):
-        sz = len(self.conforms_to[idx])
-        self.conforms_to[idx].add(typex.name)
+        # check SELF_TYPE:
+        if all(isinstance(item, SelfType) for item in types):
+            return types[0]
 
-        return sz != len(self.conforms_to[idx])
+        for i, item in enumerate(types):
+            if isinstance(item, SelfType):
+                types[i] = item.fixed_type
 
-    def type_to_auto(self, idx, typex):
-        sz = len(self.conformed_by[idx])
-        self.conformed_by[idx].add(typex.name)
+        current = types[0]
+        while current:
+            for item in types:
+                if not item.conforms_to(current):
+                    break
+            else:
+                return current
+            current = current.parent
 
-        return sz != len(self.conformed_by[idx])
+        # This part of the code is supposed to be unreachable
+        return None
