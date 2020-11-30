@@ -136,7 +136,6 @@ class TypeCollector(object):
     def order_types(self, node):
         sorted_declarations = []
         flag = [False] * len(node.declarations)
-        obj_name = built_in_types[0].name
         
         change = True
         while change:
@@ -146,7 +145,7 @@ class TypeCollector(object):
             for i, dec in enumerate(node.declarations):
                 if not flag[i]:
                     typex = self.context.get_type(dec.id)
-                    if typex.parent.name in [item.id for item in sorted_declarations] or typex.parent.name == obj_name:
+                    if typex.parent.name in [item.id for item in sorted_declarations] or any(typex.parent.name == bit.name for bit in built_in_types):
                         current.append(dec)
                         flag[i] = True
                         change = True
