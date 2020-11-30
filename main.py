@@ -124,11 +124,42 @@ def main(G):
             st.text('Context:')
             st.text(context)
 
+            st.subheader('Building types')
+            builder = TypeBuilder(context, errors)
+            builder.visit(ast)
+            manager = builder.manager
+            for e in errors:
+                st.error(e)
+            st.text('Context:')
+            st.text(context)
+
+            st.subheader('Checking types')
+            checker = TypeChecker(context, manager, [])
+            scope = checker.visit(ast)
+
+            st.subheader('Infering types')
+            temp_errors = []
+            inferencer = TypeInferencer(context, manager, temp_errors)
+            inferencer.visit(ast, scope)
+            for e in temp_errors:
+                st.error(e)
+
+            st.subheader('Las check')
+            errors.extend(temp_errors)
+            checker = TypeChecker(context, manager, errors)
+            checker.visit(ast)
+            for e in errors:
+                st.error(e)
+                
+            formatter = FormatVisitor()
+            tree = formatter.visit(ast)
+            st.text(tree)
+
 
         except Exception as e:
             st.error(f'Unexpected error!!! You probably did something wrong :wink:')
 
 
 if __name__ == '__main__':
-    main(G)
-    # ast = run_pipeline(G, text)
+    # main(G)
+    ast = run_pipeline(G, text)
