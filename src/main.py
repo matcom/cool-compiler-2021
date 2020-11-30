@@ -7,7 +7,7 @@ from src.shift_reduce_parsers import LR1Parser, DerivationTree
 from src.errors import parsing_table_error, Error
 
 from src.cmp.evaluation import evaluate_reverse_parse
-
+ 
 
 def run_pipeline(text):
     # define grammar
@@ -58,4 +58,3 @@ def run_pipeline(text):
 
 
 # run_pipeline_cmp_tools(text)
-
