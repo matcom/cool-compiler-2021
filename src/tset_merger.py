@@ -45,12 +45,12 @@ from src.ast_nodes import (
     BooleanNode,
     StringNode,
 )
+from src.cmp.utils import least_type
 
 
-class TSetBuilder:
+class TSetMerger:
     def __init__(self, context, errors=[]):
         self.context = context
-        self.current_type = None
         self.errors = errors
 
     def get_autotype_set(self):
@@ -63,47 +63,37 @@ class TSetBuilder:
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self, node, tset=None):
-        tset = Tset()
+    def visit(self, node, tset):
         for declaration in node.declarations:
-            self.visit(declaration, tset.create_child(declaration))
-        return tset
+            self.visit(declaration, tset.children[declaration])
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, tset):
-        self.current_type = self.context.get_type(node.id)
         for feature in node.features:
             self.visit(feature, tset)
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, tset):
-        static_type = self.context.get_type(node.type)
-        if static_type.name == "AUTO_TYPE":
-            tset.locals[node.id] = self.get_autotype_set()
-        else:
-            tset.locals[node.id] = {static_type.name, "!static_type_declared"}
+        typex = least_type(tset.locals[node.id], self.context)
+        node.type = typex
+
         if node.init_exp is not None:
             self.visit(node.init_exp, tset)
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, tset):
-        if node.type == "AUTO_TYPE":
-            tset.locals[node.id] = self.get_autotype_set()
-        else:
-            tset.locals[node.id] = {node.type, "!static_type_declared"}
+        return_type = least_type(tset.locals[node.id], self.context)
+        node.type = return_type
 
-        method = self.current_type.get_method(node.id)
-        method.tset = tset.locals[node.id]
-
-        child_set = tset.create_child(node)
+        child_tset = tset.children[node]
+        args_types = []
         for param in node.params:
-            typex = self.context.get_type(param[1])
-            if typex.name == "AUTO_TYPE":
-                child_set.locals[param[0]] = self.get_autotype_set()
-            else:
-                child_set.locals[param[0]] = {typex.name, "!static_type_declared"}
+            typex = least_type(child_tset.locals[param[0]], self.context)
+            args_types.append((param[0], typex))
 
-        self.visit(node.body, child_set)
+        for i in range(len(args_types)):
+            node.params[i] = args_types[i]
+        self.visit(node.body, child_tset)
 
     @visitor.when(AssignNode)
     def visit(self, node, tset):
@@ -111,7 +101,7 @@ class TSetBuilder:
 
     @visitor.when(LetNode)
     def visit(self, node, tset):
-        child_set = tset.create_child(node)
+        child_set = tset.children[node]
         for var_dec in node.identifiers:
             self.visit(var_dec, child_set)
 
@@ -119,13 +109,11 @@ class TSetBuilder:
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node, tset):
-        typex = self.context.get_type(node.type)
-        if typex.name == "AUTO_TYPE":
-            tset.locals[node.id] = self.get_autotype_set()
-        else:
-            tset.locals[node.id] = {typex.name, "!static_type_declared"}
+        typex = least_type(tset.locals[node.id], self.context)
+        node.type = typex
 
-        self.visit(node.expr, tset)
+        if node.expr is not None:
+            self.visit(node.expr, tset)
 
     @visitor.when(IfNode)
     def visit(self, node, tset):
@@ -143,21 +131,18 @@ class TSetBuilder:
         self.visit(node.expr, tset)
 
         for item in node.case_items:
-            self.visit(item, tset.create_child(item))
+            self.visit(item, tset.children[item])
 
     @visitor.when(CaseItemNode)
     def visit(self, node, tset):
-        typex = self.context.get_type(node.type)
-        if typex.name == "AUTO_TYPE":
-            tset.locals[node.id] = self.get_autotype_set()
-        else:
-            tset.locals[node.id] = {typex.name, "!static_type_declared"}
-
+        typex = least_type(tset.locals[node.id], self.context)
+        node.type = typex
         self.visit(node.expr, tset)
 
     @visitor.when(CallNode)
     def visit(self, node, tset):
-        pass
+        for arg in node.args:
+            self.visit(arg, tset)
 
     @visitor.when(BlockNode)
     def visit(self, node, tset):

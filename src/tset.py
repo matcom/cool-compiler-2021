@@ -31,3 +31,42 @@ class Tset:
             output += "\n"
             output += str(chil)
         return output
+
+    def clone(self):
+        solve = Tset()
+        solve.parent = self.parent
+        for idx, typex in self.locals.items():
+            solve.locals[idx] = typex.copy()
+
+        for key, value in self.children.items():
+            solve.children[key] = value.clone()
+
+        return solve
+
+    def compare(self, other):
+        if len(self.locals) != len(other.locals) or len(self.children) != len(
+            other.children
+        ):
+            return False
+
+        for (idx, tset), (idx_other, tset_other) in zip(
+            self.locals.items(), other.locals.items()
+        ):
+            if idx != idx_other or tset != tset_other:
+                return False
+        for (key, value), (key_other, value_other) in zip(
+            self.children.items(), other.children.items()
+        ):
+            if key != key_other or not value.compare(value_other):
+                return False
+        return True
+
+    def clean(self):
+        for typex in self.locals.values():
+            if "InferenceError" in typex:
+                typex.remove("InferenceError")
+            if "!static_type_declared" in typex:
+                typex.remove("!static_type_declared")
+        for child in self.children.values():
+            child.clean()
+

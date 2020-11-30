@@ -184,10 +184,6 @@ class TypeChecker:
         else:
             typex = self.current_type
 
-        if typex == self.context.get_type("Void"):
-            self.errors.append("Void type cannot dispatch")
-            return ErrorType()
-
         method = None
         try:
             if node.at_type is not None:
@@ -195,7 +191,7 @@ class TypeChecker:
                 method = node_at_type.get_method(node.id)
                 if not typex.conforms_to(node_at_type):
                     self.errors.append(
-                        "The static type to the left of @ must conform to the type specified to the right of @ "
+                        f"The static type to the left of @ ({typex.name}) must conform to the type specified to the right of @ ({node_at_type.name}) "
                     )
                     return ErrorType()
             else:
@@ -224,7 +220,9 @@ class TypeChecker:
         predicate_type = self.visit(node.if_expr, scope)
 
         if predicate_type.name != "Bool" and predicate_type.name != "AUTO_TYPE":
-            self.errors.append("Expression must be bool")
+            self.errors.append(
+                f"Expression after 'if' must be bool, current is {predicate_type.name}"
+            )
             return ErrorType()
 
         then_type = self.visit(node.then_expr, scope)
@@ -238,8 +236,10 @@ class TypeChecker:
         condition_type = self.visit(node.condition, scope)
         bool_type = self.context.get_type("Bool")
 
-        if condition_type != bool_type:
-            self.errors.append("Expression must be bool")
+        if condition_type != bool_type and condition_type.name != "AUTO_TYPE":
+            self.errors.append(
+                f"Expression after 'while' must be bool, current is {condition_type.name}"
+            )
             return ErrorType()
 
         return self.context.get_type("Object")
@@ -284,10 +284,6 @@ class TypeChecker:
     @visitor.when(CaseNode)
     def visit(self, node, scope):
         self.visit(node.expr, scope)
-        # typex = self.visit(node.expr, scope)
-        # if typex == self.context.get_type("Void"):
-        #     self.errors.append("Case expression cannot be Void")
-        #     return ErrorType()
 
         current_case_type = None
         for item in node.case_items:
@@ -332,7 +328,9 @@ class TypeChecker:
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
 
-        if not left_type.conforms_to(int_type) or not right_type.conforms_to(int_type):
+        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
+            right_type != int_type and right_type.name != "AUTO_TYPE"
+        ):
             self.errors.append(INVALID_OPERATION % (left_type.name, right_type.name))
 
         return int_type
@@ -343,7 +341,9 @@ class TypeChecker:
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
 
-        if not left_type.conforms_to(int_type) or not right_type.conforms_to(int_type):
+        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
+            right_type != int_type and right_type.name != "AUTO_TYPE"
+        ):
             self.errors.append(INVALID_OPERATION % (left_type.name, right_type.name))
 
         return self.context.get_type("Bool")
@@ -359,20 +359,26 @@ class TypeChecker:
         right_type = self.visit(node.right, scope)
 
         if left_type in built_in_types or right_type in built_in_types:
-            if left_type != right_type:
+            if (
+                left_type != right_type
+                and left_type.name != "AUTO_TYPE"
+                and right_type.name != "AUTO_TYPE"
+            ):
                 self.errors.append(
-                    "Since one of the expressions of '=' operator is of type Int, String or Bool, the other must have the same static type"
+                    f"One of the expressions of '=' operator is of type Int, String or Bool, the other must have the same static type. Left type: {left_type.name}.Right type: {right_type.name}"
                 )
 
-        return self.context.get_type("Void")
+        return self.context.get_type("Bool")
 
     @visitor.when(NotNode)
     def visit(self, node, scope):
         bool_type = self.context.get_type("Bool")
         typex = self.visit(node.expr, scope)
 
-        if typex != bool_type:
-            self.errors.append("Expression must be Bool")
+        if typex != bool_type and not typex.name == "AUTO_TYPE":
+            self.errors.append(
+                f"Expression after 'not' must be Bool, current is {typex.name}"
+            )
             return ErrorType()
 
         return bool_type
@@ -382,8 +388,10 @@ class TypeChecker:
         int_type = self.context.get_type("Int")
         typex = self.visit(node.expr, scope)
 
-        if typex != int_type:
-            self.errors.append("Expression must be Int")
+        if typex != int_type and not typex.name == "AUTO_TYPE":
+            self.errors.append(
+                f"Expression after '~' must be Int, current is {typex.name}"
+            )
             return ErrorType()
 
         return int_type

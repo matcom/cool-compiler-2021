@@ -29,7 +29,6 @@ class TypeCollector(object):
         self.context = Context()
         self.context.types["Object"] = ObjectType()
         self.context.types["Int"] = IntType()
-        self.context.types["Void"] = VoidType()
         self.context.types["String"] = StringType()
         self.context.types["Bool"] = BoolType()
         self.context.types["AUTO_TYPE"] = AutoType()
