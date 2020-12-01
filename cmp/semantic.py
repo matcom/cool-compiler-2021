@@ -120,7 +120,7 @@ class Type:
                 break
 
     def conforms_to(self, other):
-        return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
+        return other.bypass() or self.name == other.name or self.parent is not None and self.parent.conforms_to(other)
 
     def bypass(self):
         return False
@@ -144,8 +144,8 @@ class Type:
     def __repr__(self):
         return str(self)
 
-    # def __eq__(self, other):
-    #     return self.conforms_to(other) and other.conforms_to(self)
+    def __eq__(self, other):
+        return self.conforms_to(other) and other.conforms_to(self)
 
 class ErrorType(Type):
     def __init__(self):
