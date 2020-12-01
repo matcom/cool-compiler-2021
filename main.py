@@ -95,6 +95,11 @@ def main(G):
 
     if text:
         try:
+            tokens = list(tokenize_text(text))
+            parser = LR1Parser(G)
+            parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
+            ast = evaluate_reverse_parse(parse, operations, tokens)
+
             st.title('Results:')
             
             errors = []
