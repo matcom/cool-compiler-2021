@@ -7,7 +7,6 @@ from cmp.ast import VoidNode, NotNode, NegNode
 from cmp.ast import ConstantNumNode, ConstantStringNode, ConstantBoolNode, VariableNode, InstantiateNode
 
 
-TYPE_CONFORMANCE = 'Type "%s" can not conform to type "%s"'
 AUTOTYPE_ERROR = 'Incorrect use of AUTO_TYPE'
 
 class TypeInferencer:
@@ -361,19 +360,11 @@ class TypeInferencer:
     @visitor.when(ArithmeticNode)
     def visit(self, node, scope, types):
         self.check_expr(node, scope)
-
-        # Check int type conforms to all the types in types
-        self.check_conformance(types, self.int_type)
-
         return self.int_type, [self.int_type]
 
     @visitor.when(ComparisonNode)
     def visit(self, node, scope, types):
         self.check_expr(node, scope)
-
-        # Check bool type conforms to all the types in types
-        self.check_conformance(types, self.bool_type)
-
         return self.bool_type, [self.bool_type]
 
     @visitor.when(EqualNode)
@@ -394,44 +385,33 @@ class TypeInferencer:
         elif check_equal(right):
             self.visit(node.left, scope, [right])
         
-        self.check_conformance(types, self.bool_type)
-        
         return self.bool_type, [self.bool_type]
 
     @visitor.when(VoidNode)
     def visit(self, node, scope, types):
         self.visit(node.expr, scope, [])
-        self.check_conformance(types, self.bool_type)
-
         return self.bool_type, [self.bool_type]
 
     @visitor.when(NotNode)
     def visit(self, node, scope, types):
         self.visit(node.expr, scope, [self.bool_type])
-        self.check_conformance(types, self.bool_type)
-        
         return self.bool_type, [self.bool_type]
 
     @visitor.when(NegNode)
     def visit(self, node, scope, types):
         self.visit(node.expr, scope, [self.int_type])
-        self.check_conformance(types, self.int_type)
-        
         return self.int_type, [self.int_type]
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope, types):
-        self.check_conformance(types, self.int_type)
         return self.int_type, [self.int_type]
 
     @visitor.when(ConstantBoolNode)
     def visit(self, node, scope, types):
-        self.check_conformance(types, self.bool_type)
         return self.bool_type, [self.bool_type]
 
     @visitor.when(ConstantStringNode)
     def visit(self, node, scope, types):
-        self.check_conformance(types, self.string_type)
         return self.string_type, [self.string_type]
 
     @visitor.when(VariableNode)
@@ -448,7 +428,6 @@ class TypeInferencer:
             self.manager.upd_conforms_to(var.idx, types)
             conformed_by.extend(self.manager.conformed_by[var.idx])
         else:
-            self.check_conformance(types, var.type)
             conformed_by.append(var.type)
 
         return var.type, conformed_by
@@ -461,18 +440,10 @@ class TypeInferencer:
                 typex = SelfType(self.current_type)
         except SemanticError:
             typex = ErrorType()
-
-        self.check_conformance(types, typex)
         
         return typex, [typex]
 
-
-    
+  
     def check_expr(self, node, scope):
         self.visit(node.left, scope, [self.int_type])
         self.visit(node.right, scope, [self.int_type])
-
-    def check_conformance(self, types, typex):
-        for item in types:
-            if not typex.conforms_to(item):
-                self.errors.append(TYPE_CONFORMANCE %(typex.name, item.name))
