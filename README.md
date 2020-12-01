@@ -81,7 +81,7 @@ La clase Inferencer Manager además, está equipada con métodos para actualizar
 
 El Type Inferencer por su parte, realizará un método de punto fijo para llevar a cabo la inferencia: 
 
-1. Realiza un recorrido del AST (Árbol de Sintaxis Abstracta) actualizando los conjuntos ya mencionados.
+1. Realiza un recorrido del AST (Árbol de Sintaxis Abstracta) actualizando los conjuntos ya mencionados. Cuando se visita un nodo, específicamente un *ExpressionNode*, este recibe como parámetro un conjunto de tipos a los que debe conformarse la expresión; a su vez retorna el tipo estático computado y el conjunto de tipos que se conforman a él. Esto es lo que permite actualizar las listas que están almacenadas en el *manager*.
 2. Infiere todos los tipos que pueda con la información recogida.
 3.  - Si pudo inferir al menos uno nuevo, regresa al punto 1; puesto que este tipo puede influir en la inferencia de otros.
     - Si no pudo inferir ninguno, significa que ya no hay más información que se pueda inferir, por tanto se realiza un último rerrido asignando tipo Object a todos los AUTO_TYPES que no pudieron ser inferidos.
