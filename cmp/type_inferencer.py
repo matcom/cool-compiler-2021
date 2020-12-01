@@ -246,14 +246,16 @@ class TypeInferencer:
         expr_types = []
         for i, (branch, child_scope) in enumerate(zip(node.branch_list, nscope.children)):
             branch_name, branch_type, expr =  branch
+            var = child_scope.find_variable(branch_name)
+            branch_type = var.type
             if isinstance(branch_type, AutoType):
                 inf_type =  self.manager.infered_type[node.branch_idx[i]]
                 if inf_type is not None:
                     if isinstance(inf_type, ErrorType):
                         self.errors.append(AUTOTYPE_ERROR)
                     else:
-                        node.branch_list[i][1] = inf_type.name
-                    scope.update_variable(branch_name, inf_type)
+                        node.branch_list[i] = (branch_name, inf_type.name, expr)
+                    child_scope.update_variable(branch_name, inf_type)
 
             self.scope_children_id = 0
 
