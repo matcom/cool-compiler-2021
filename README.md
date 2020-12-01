@@ -13,7 +13,7 @@ Se necesita también algún navegador web instalado como `chrome` o `firefox`
  
 
 ### Modo de uso
-Para ejecutar el proyecto, solamente abra la consola tal que la dirección raíz sea la del fichero donde se encuentra el mismo y ejecute la siguiente línea:
+Para ejecutar solamente abra la consola tal que la dirección raíz sea la del fichero donde se encuentra el proyecto y ejecute la siguiente línea:
 
 ```
 streamlit run main.py
@@ -51,7 +51,7 @@ A continuación se explicará el funcionamiento de cada uno:
 Esta fase se realiza mediante la clase *Type Collector* que sigue los siguientes pasos:
 
 - Definición de los *built-in types*, o sea, los tipos que son inherentes al lenguaje Cool : Int, String, Bool, IO, Object; incluyendo la definición de sus métodos. Además se añaden como tipos SELF_TYPE, AUTO_TYPE.
-- Recorrido por las declaraciones hechas en el programa colectando los tipos creados.
+- Recorrido por las declaraciones hechas en el programa recolectando los tipos creados.
 - Chequeo de los padres que están asignados a cada tipo. Como las clases pueden definirse de modo desordenado, el chequeo de la asignación correcta de padres para cada clase debe hacerse después de recolectar los tipos. De esta forma es posible capturar errores como que un tipo intente heredar de otro que no existe. Aquellas clases que no tengan un padre explícito se les asigna Object como padre.
 - Chequeo de herencia cíclica. En caso de detectar algún ciclo en la jerarquía de tipos, se reporta el error, y a la clase por la cual hubo problema se le asigna Object como padre, para continuar el análisis.
 - Una vez chequeados los puntos anteriores, se reorganiza la lista de nodos de declaración de clases que está guardada en el nodo Program. La reorganización se realiza tal que para cada tipo A, si este hereda del tipo B (siendo B otra de las clases definidas en el programa) la posición de B en la lista es menor que la de A. De esta manera, cuando se visite un nodo de declaración de clase, todas las clases de las cuales él es descendiente, ya fueron visitadas previamente.
@@ -79,23 +79,23 @@ Sea una variable con id = i, que está definida como AUTO_TYPE y sea A el tipo e
 
 La clase Inferencer Manager además, está equipada con métodos para actualizar las listas dado un id, y para realizar la inferencia dados los tipos almacenados.
 
-El Type Inferencer por su parte, realizará un método de punto fijo para llevar a cabo la inferencia: 
+El Type Inferencer por su parte, realizará un algoritmo de punto fijo para llevar a cabo la inferencia: 
 
 1. Realiza un recorrido del AST (Árbol de Sintaxis Abstracta) actualizando los conjuntos ya mencionados. Cuando se visita un nodo, específicamente un *ExpressionNode*, este recibe como parámetro un conjunto de tipos a los que debe conformarse la expresión; a su vez retorna el tipo estático computado y el conjunto de tipos que se conforman a él. Esto es lo que permite actualizar las listas que están almacenadas en el *manager*.
 2. Infiere todos los tipos que pueda con la información recogida.
 3.  - Si pudo inferir al menos uno nuevo, regresa al punto 1; puesto que este tipo puede influir en la inferencia de otros.
     - Si no pudo inferir ninguno, significa que ya no hay más información que se pueda inferir, por tanto se realiza un último rerrido asignando tipo Object a todos los AUTO_TYPES que no pudieron ser inferidos.
 
-**Nota:** Se considera que un tipo puede ser inferido, si no ha sido inferido anteriormente, y si su lista *conforms_to* contiene a otro tipo distinto de Object o su lista *conformed_by* contiene al menos un tipo.
+> Se considera que un tipo puede ser inferido, si no ha sido inferido anteriormente, y si su lista *conforms_to* contiene a otro tipo distinto de Object o su lista *conformed_by* contiene al menos un tipo.
 
 Por último se realiza un nuevo recorrido del AST con el Type Checker para detectar nuevamente los errores semánticos que puedan existir en el código, ahora con los AUTO_TYPES sustituidos por el tipo inferido.
 
 
-## Authors ✒️
+## Autores ✒️
 
 * **Carmen Irene Cabrera Rodríguez** - [cicr99](https://github.com/cicr99)
 * **Enrique Martínez González** - [kikeXD](https://github.com/kikeXD)
 
-## License
+## Licencia
 
-This project is under the License (MIT License) - see the file [LICENSE.md](LICENSE.md) for details.
+Este proyecto se encuentra bajo la Licencia (MIT License) - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
