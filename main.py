@@ -96,29 +96,12 @@ def main(G):
     if text:
         try:
             st.title('Results:')
-
-            # st.subheader('Tokens')
-            tokens = list(tokenize_text(text))
-            p_tokens = pprint_tokens(tokens, get=True)
-            # st.text(p_tokens)
-
-            # st.subheader('Parse')
-            parser = LR1Parser(G)
-            parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
-            p_parse = '\n'.join(repr(x) for x in parse)
-            # st.text(p_parse)
-
-            # st.subheader('AST')
-            ast = evaluate_reverse_parse(parse, operations, tokens)
-            formatter = FormatVisitor()
-            tree = formatter.visit(ast)
-            # st.text(tree)
-
-            # st.subheader('Collecting types')
+            
             errors = []
             collector = TypeCollector(errors)
             collector.visit(ast)
             context = collector.context
+
             # for e in errors:
                 # st.error(e)
             # st.text('Context:')
