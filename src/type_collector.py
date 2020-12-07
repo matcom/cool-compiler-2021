@@ -9,6 +9,7 @@ from src.cmp.semantic import (
     AutoType,
     ObjectType,
     SelfType,
+    IOType,
 )
 from src.cmp.semantic import Context
 from src.ast_nodes import ProgramNode, ClassDeclarationNode
@@ -33,6 +34,9 @@ class TypeCollector(object):
         self.context.types["Bool"] = BoolType()
         self.context.types["AUTO_TYPE"] = AutoType()
         self.context.types["SELF_TYPE"] = SelfType()
+        # Despues de entregar!!!!!
+        self.context.types["IO"] = IOType()
+        # -------------------
 
         object_type = self.context.get_type("Object")
         for typex in self.context.types.values():

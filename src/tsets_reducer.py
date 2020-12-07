@@ -161,20 +161,23 @@ class TSetReducer:
             item_set = self.visit(item, tset.children[item])
             union_set = union(union_set, item_set)
 
-        current_type = None
-        for item in union_set:
-            if item == "!static_type_declared":
-                continue
-            item_type = self.context.get_type(item)
-            current_type = find_least_type([current_type, item_type], self.context)
+        # current_type = None
+        # for item in union_set:
+        #     if item == "!static_type_declared":
+        #         continue
+        #     item_type = self.context.get_type(item)
+        #     current_type = find_least_type(current_type, item_type, self.context)
 
-        return {current_type.name}
+        # return {current_type.name}
+
+        return union_set
 
     @visitor.when(CaseItemNode)
     def visit(self, node, tset):
         expr_tset = self.visit(node.expr, tset)
-        tset.locals[node.id] = reduce_set(tset.locals[node.id], expr_tset)
-        return tset.locals[node.id]
+        # tset.locals[node.id] = reduce_set(tset.locals[node.id], expr_tset)
+        # return tset.locals[node.id]
+        return expr_tset
 
     @visitor.when(CallNode)
     def visit(self, node, tset):
@@ -223,6 +226,11 @@ class TSetReducer:
             for typex in method.tset:
                 return_types.add(typex)
 
+        # ------- Despues de la entrega!!!!!!!
+        if "SELF_TYPE" in return_types:
+            return_types.remove("SELF_TYPE")
+            return_types = union(return_types, {self.current_type.name})
+        # -------------------------------
         return return_types
 
     @visitor.when(BlockNode)

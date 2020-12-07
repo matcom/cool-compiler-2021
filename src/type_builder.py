@@ -23,6 +23,24 @@ class TypeBuilder:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
+        # Despues de entregar!!!!!!
+        io_type = self.context.get_type("IO")
+        self_type = self.context.get_type("SELF_TYPE")
+        int_type = self.context.get_type("Int")
+        string_type = self.context.get_type("String")
+
+        method = io_type.define_method("out_string", ["x"], [string_type], self_type)
+        method.tset = {"SELF_TYPE"}
+
+        method = io_type.define_method("out_int", ["x"], [int_type], self_type)
+        method.tset = {"SELF_TYPE"}
+
+        method = io_type.define_method("in_string", [], [], string_type)
+        method.tset = {"String"}
+
+        method = io_type.define_method("in_int", [], [], int_type)
+        method.tset = {"Int"}
+        # ----------------------------------------------------
         for declaration in node.declarations:
             self.visit(declaration)
 

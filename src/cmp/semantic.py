@@ -210,6 +210,15 @@ class SelfType(Type):
         Type.__init__(self, "SELF_TYPE")
 
 
+# Despues de entregar!!!!
+class IOType(Type):
+    def __init__(self):
+        Type.__init__(self, "IO")
+
+
+# ---------------------------
+
+
 class Context:
     def __init__(self):
         self.types = {}
