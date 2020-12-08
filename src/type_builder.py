@@ -49,8 +49,8 @@ class TypeBuilder:
         self.current_type = self.context.get_type(node.id)
 
         if node.parent is not None:
-            parent_type = self.get_type(node.parent)
             try:
+                parent_type = self.get_type(node.parent)
                 self.current_type.set_parent(parent_type)
             except SemanticError as error:
                 self.errors.append(error.text)
@@ -67,10 +67,10 @@ class TypeBuilder:
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):
         param_names = [fname for fname, ftype in node.params]
-        param_types = [self.get_type(ftype) for fname, ftype in node.params]
-        return_type = self.get_type(node.type)
 
         try:
+            param_types = [self.get_type(ftype) for fname, ftype in node.params]
+            return_type = self.get_type(node.type)
             self.current_type.define_method(
                 node.id, param_names, param_types, return_type
             )
@@ -79,9 +79,8 @@ class TypeBuilder:
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
-        attr_type = self.get_type(node.type)
-
         try:
+            attr_type = self.get_type(node.type)
             self.current_type.define_attribute(node.id, attr_type)
         except SemanticError as error:
             self.errors.append(error.text)

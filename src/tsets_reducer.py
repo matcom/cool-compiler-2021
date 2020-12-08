@@ -76,6 +76,7 @@ class TSetReducer:
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, tset):
+        tset.locals["self"] = {node.id}
         self.current_type = self.context.get_type(node.id)
         for feature in node.features:
             self.visit(feature, tset)
@@ -229,7 +230,7 @@ class TSetReducer:
         # ------- Despues de la entrega!!!!!!!
         if "SELF_TYPE" in return_types:
             return_types.remove("SELF_TYPE")
-            return_types = union(return_types, {self.current_type.name})
+            return_types = union(return_types, expr_set)
         # -------------------------------
         return return_types
 

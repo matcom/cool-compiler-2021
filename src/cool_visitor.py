@@ -169,7 +169,8 @@ class FormatVisitorST(object):
 
     @visitor.when(ProgramNode)
     def visit(self, node, tabs=0):
-        ans = "\\__\\__" * tabs + f"\\__ProgramNode [<class> ... <class>]"
+        self.tree = []
+        ans = "\\__\\__" * tabs + f"\\__ProgramNode [< class > ... < class >]"
         self.tree.append(ans)
         for child in node.declarations:
             self.visit(child, tabs + 1)

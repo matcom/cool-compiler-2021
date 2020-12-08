@@ -17,7 +17,7 @@ from src.shift_reduce_parsers import ShiftReduceParser
 
 def print_array(array):
     for item in array:
-        st.write(item)
+        st.write(str(item))
 
 
 def print_tset(tset):
