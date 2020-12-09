@@ -120,17 +120,17 @@ alp = [chr(n) for n in range(ord('a'),ord('z') + 1)]
 alp.extend([chr(n) for n in range(ord('A'),ord('Z') + 1)])
 letters = '|'.join(alp)
 
-alphabet_before = [chr(n) for n in range(1, ord('~') + 1) if n != 34 and n != 124]
-alphabet = '|'.join(alphabet_before)
 
 def eliminate_regex_conflict(text):
     result = ''
     for i in text:
-        if i in {'(', ')', '*', '\\'}:
+        if i in {'(', ')', '*', '\\', '|'}:
             result += '\\'
         result += i
     return result
 
+alphabet_before = [eliminate_regex_conflict(chr(n)) for n in range(1, ord('~') + 1) if n != 34]
+alphabet = '|'.join(alphabet_before)
 
 def tokenize_text(text):
     lexer = Lexer(
@@ -140,7 +140,7 @@ def tokenize_text(text):
         ('salto', '\n'),
         ('space', '  *'),
         (idx, f'({letters}|_)(_|{letters}|0|{nonzero_digits})*'),
-        (stringx, f'"({eliminate_regex_conflict(alphabet)})*"')],
+        (stringx, f'"({alphabet})*"')],
         G.EOF)
     
     tokens = lexer(text)
