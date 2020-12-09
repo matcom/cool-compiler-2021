@@ -80,11 +80,11 @@ class Main inherits IO {
     testing_fibonacci(n: Int) : IO {{
         out_string("Iterative Fibonacci : ");
         out_int(iterative_fibonacci(5));
-        out_string("asdf");
+        out_string("\n");
 
         out_string("Recursive Fibonacci : ");
         out_int(recursive_fibonacci(5));
-        out_string("asdfn");
+        out_string("\n");
     }};
 
     recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
@@ -171,5 +171,5 @@ def main(G):
 
 
 if __name__ == '__main__':
-    # main(G)
-    ast = run_pipeline(G, text)
+    main(G)
+    # ast = run_pipeline(G, text)

@@ -120,7 +120,7 @@ alp = [chr(n) for n in range(ord('a'),ord('z') + 1)]
 alp.extend([chr(n) for n in range(ord('A'),ord('Z') + 1)])
 letters = '|'.join(alp)
 
-alphabet_before = [chr(n) for n in range(32, ord('~') + 1) if n != 34 and n != 124]
+alphabet_before = [chr(n) for n in range(1, ord('~') + 1) if n != 34 and n != 124]
 alphabet = '|'.join(alphabet_before)
 
 def eliminate_regex_conflict(text):
