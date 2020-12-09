@@ -107,7 +107,7 @@ class Main inherits IO {
 '''
 
 def main(G):
-    st.title('Type Inferer')
+    st.title('Type Inferencer')
 
     st.sidebar.markdown('''Produced by:  
     Carmen Irene Cabrera Rodríguez  
