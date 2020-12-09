@@ -70,18 +70,40 @@ def run_pipeline(G, text):
 
 
 text = '''
-class A {
-    f ( a : AUTO_TYPE , b : AUTO_TYPE ) : AUTO_TYPE {
-        if ( a = 1 ) then b else
-            g ( a + 1 , b / 2 )
-        fi
-    } ;
-    g ( a : AUTO_TYPE , b : AUTO_TYPE ) : AUTO_TYPE {
-        if ( b = 1 ) then a else
-            f ( a / 2 , b + 1 )
-        fi
-    } ;
-} ;
+class Main inherits IO {
+    number: Int <- 5;
+
+    main () : Object {
+        testing_fibonacci(number)
+    };
+
+    testing_fibonacci(n: Int) : IO {{
+        out_string("Iterative Fibonacci : ");
+        out_int(iterative_fibonacci(5));
+        out_string("asdf");
+
+        out_string("Recursive Fibonacci : ");
+        out_int(recursive_fibonacci(5));
+        out_string("asdfn");
+    }};
+
+    recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
+        if n <= 2 then 1 else recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2) fi
+    };
+
+    iterative_fibonacci(n: AUTO_TYPE) : AUTO_TYPE {
+        let  i: Int <- 2, n1: Int <- 1, n2: Int <- 1, temp: Int in {
+            while i < n loop
+                let temp: Int <- n2 in {
+                    n2 <- n2 + n1;
+                    n1 <- temp;
+                    i <- i + 1;
+                }
+            pool;
+            n2;
+        }
+    };
+};
 '''
 
 def main(G):
@@ -149,5 +171,5 @@ def main(G):
 
 
 if __name__ == '__main__':
-    main(G)
-    # ast = run_pipeline(G, text)
+    # main(G)
+    ast = run_pipeline(G, text)
