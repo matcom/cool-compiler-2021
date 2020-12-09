@@ -129,14 +129,30 @@ def eliminate_regex_conflict(text):
         result += i
     return result
 
+def get_all_combinations(text, first_lower=False):
+    result = ''
+
+    first = text[0]
+    first = eliminate_regex_conflict(first)
+
+    if first_lower:
+        result += f'{first.lower()}'
+    else:
+        result += f'({first.lower()}|{first.upper()})'
+    for i in text[1:]:
+        temp = eliminate_regex_conflict(i)
+        result += f'({temp.lower()}|{temp.upper()})'
+
+    return result
+
 alphabet_before = [eliminate_regex_conflict(chr(n)) for n in range(1, ord('~') + 1) if n != 34]
 alphabet = '|'.join(alphabet_before)
 
 def tokenize_text(text):
     lexer = Lexer(
-        [(t, eliminate_regex_conflict(t.Name)) for t in G.terminals if t not in { idx, num, stringx, boolx }] +
-        [(boolx, 'true|false'),
-        (num, f'0|({nonzero_digits})(0|{nonzero_digits})*'),
+        [(t, get_all_combinations(t.Name)) for t in G.terminals if t not in { idx, num, stringx, boolx }] +
+        [(boolx, f'({get_all_combinations("true", True)})|({get_all_combinations("false", True)})'),
+        (num, f'0|(({nonzero_digits})(0|{nonzero_digits})*)'),
         ('salto', '\n'),
         ('space', '  *'),
         (idx, f'({letters}|_)(_|{letters}|0|{nonzero_digits})*'),
