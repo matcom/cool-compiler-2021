@@ -1,11 +1,11 @@
 from cmp.pycompiler import Grammar
 from cmp.utils import Token
-from cmp.tools2 import evaluate_parse
-from cmp.tools2 import metodo_predictivo_no_recursivo
-from cmp.tools2 import nfa_to_dfa
-from cmp.tools2 import automata_union, automata_concatenation, automata_closure, automata_minimization
-from cmp.tools2 import get_printer
-from cmp.tools2 import Node, AtomicNode, UnaryNode, BinaryNode, EpsilonNode, SymbolNode, ClosureNode, UnionNode, ConcatNode
+from cmp.tools import evaluate_parse
+from cmp.tools import metodo_predictivo_no_recursivo
+from cmp.tools import nfa_to_dfa
+from cmp.tools import automata_union, automata_concatenation, automata_closure, automata_minimization
+from cmp.tools import get_printer
+from cmp.tools import Node, AtomicNode, UnaryNode, BinaryNode, EpsilonNode, SymbolNode, ClosureNode, UnionNode, ConcatNode
 from pprint import pprint as pp
 import pydot
 
@@ -34,7 +34,7 @@ E = G.NonTerminal('E', True)
 T, F, A, X, Y, Z = G.NonTerminals('T F A X Y Z')
 pipe, star, opar, cpar, symbol, epsilon = G.Terminals('| * ( ) symbol ε')
 
-# > PRODUCTIONS???
+# > PRODUCTIONS
 E %= T + X, lambda h, s: s[2], None, lambda h, s: s[1]
 
 X %= pipe + T + X, lambda h, s: s[3], None, None, lambda h, s: UnionNode(h[0], s[2])
@@ -86,7 +86,5 @@ def regex_tokenizer(text, G, skip_whitespaces=True):
 
 
 parser = metodo_predictivo_no_recursivo(G)
-
-
 
 printer = get_printer(AtomicNode=AtomicNode, UnaryNode=UnaryNode, BinaryNode=BinaryNode)
