@@ -9,6 +9,7 @@ from src.ast_nodes import (
     FuncDeclarationNode,
 )
 import src.cmp.visitor as visitor
+from src.tset import Tset
 
 
 class TypeBuilder:
@@ -29,17 +30,26 @@ class TypeBuilder:
         int_type = self.context.get_type("Int")
         string_type = self.context.get_type("String")
 
+        parent_tset = Tset()
+        parent_tset.locals["out_string"] = {"SELF_TYPE"}
+        parent_tset.locals["out_int"] = {"SELF_TYPE"}
+        parent_tset.locals["in_string"] = {"String"}
+        parent_tset.locals["in_int"] = {"Int"}
+
         method = io_type.define_method("out_string", ["x"], [string_type], self_type)
-        method.tset = {"SELF_TYPE"}
+        method.tset = Tset(parent_tset)
+        method.tset.locals["x"] = {"String"}
 
         method = io_type.define_method("out_int", ["x"], [int_type], self_type)
-        method.tset = {"SELF_TYPE"}
+        method.tset = Tset(parent_tset)
+        method.tset.locals["x"] = {"Int"}
 
         method = io_type.define_method("in_string", [], [], string_type)
-        method.tset = {"String"}
+        method.tset = Tset(parent_tset)
 
         method = io_type.define_method("in_int", [], [], int_type)
-        method.tset = {"Int"}
+        method.tset = Tset(parent_tset)
+
         # ----------------------------------------------------
         for declaration in node.declarations:
             self.visit(declaration)

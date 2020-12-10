@@ -92,10 +92,10 @@ class TSetBuilder:
         else:
             tset.locals[node.id] = {node.type, "!static_type_declared"}
 
-        method = self.current_type.get_method(node.id)
-        method.tset = tset.locals[node.id]
-
         child_set = tset.create_child(node)
+        method = self.current_type.get_method(node.id)
+        method.tset = child_set
+
         for param in node.params:
             typex = self.context.get_type(param[1])
             if typex.name == "AUTO_TYPE":

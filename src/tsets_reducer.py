@@ -98,7 +98,7 @@ class TSetReducer:
         current_tset = tset.children[node]
         body_set = self.visit(node.body, current_tset)
         tset.locals[node.id] = reduce_set(tset.locals[node.id], body_set)
-        method.tset = tset.locals[node.id]
+        method.tset = current_tset
 
     @visitor.when(AssignNode)
     def visit(self, node, tset):
@@ -182,8 +182,9 @@ class TSetReducer:
 
     @visitor.when(CallNode)
     def visit(self, node, tset):
+        args_set = {}
         for expr in node.args:
-            self.visit(expr, tset)
+            args_set[expr] = self.visit(expr, tset)
 
         if node.obj is not None:
             expr_set = self.visit(node.obj, tset)
@@ -191,8 +192,10 @@ class TSetReducer:
             expr_set = {self.current_type.name}
 
         types_with_method = set()
+        method = None
         if node.at_type is not None:
             types_with_method.add(node.at_type)
+            method = self.context.get_type(node.at_type).get_method(node.id)
 
         else:
             for typex in self.context.types.values():
@@ -203,11 +206,16 @@ class TSetReducer:
                 except SemanticError:
                     continue
 
-        # DUDA!!!!
-        # if len(types_with_method) == 0:
-        #     raise SemanticError(
-        #         f"There is no method named {node.id} that takes {len(node.args)} arguments"
-        #     )
+        if len(types_with_method) == 1:
+            for arg, param in zip(node.args, method.param_names):
+                method.tset.locals[param] = reduce_set(
+                    method.tset.locals[param], args_set[arg]
+                )
+                if isinstance(arg, VariableNode):
+                    arg_locals = tset.find_set(arg.lex)
+                    arg_locals[arg.lex] = reduce_set(
+                        arg_locals[arg.lex], method.tset.locals[param]
+                    )
 
         if isinstance(node.obj, VariableNode):
             node_id = node.obj.lex
@@ -224,7 +232,7 @@ class TSetReducer:
         for item in types_reduced:
             item_type = self.context.get_type(item)
             method = item_type.get_method(node.id)
-            for typex in method.tset:
+            for typex in method.tset.parent.locals[node.id]:
                 return_types.add(typex)
 
         # ------- Despues de la entrega!!!!!!!
