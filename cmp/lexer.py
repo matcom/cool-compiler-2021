@@ -43,7 +43,8 @@ class Lexer:
                     final = state
                     final_lex = lex
             except TypeError:
-                # print(symbol, lex, string, state)
+                # print("entre ---", symbol )
+                # print(lex, string, state)
                 break
                 
         return final, final_lex
@@ -113,7 +114,7 @@ def tokenize_text(text):
         [(boolx, f'({get_all_combinations("true", True)})|({get_all_combinations("false", True)})'),
         (num, f'0|(({nonzero_digits})(0|{nonzero_digits})*)'),
         ('salto', '\n'),
-        ('space', '  *'),
+        ('space', '( |\t)( |\t)*'),
         (idx, f'({letters}|_)(_|{letters}|0|{nonzero_digits})*'),
         (stringx, f'"({alphabet})*"')],
         G.EOF)

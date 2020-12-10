@@ -345,7 +345,7 @@ class TypeChecker:
     def visit(self, node, scope):
         var = scope.find_variable(node.lex)
         if var is None:
-            self.errors.append(VARIABLE_NOT_DEFINED %(node.lex, self.current_type))
+            self.errors.append(VARIABLE_NOT_DEFINED %(node.lex, self.current_type.name))
             var = scope.define_variable(node.lex, ErrorType())
 
         return var.type

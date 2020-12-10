@@ -116,58 +116,64 @@ def main(G):
     text = st.text_area('Input your code here:')
 
     if text:
+        st.text(text)
         try:
             tokens = list(tokenize_text(text))
-            parser = LR1Parser(G)
-            parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
-            ast = evaluate_reverse_parse(parse, operations, tokens)
-
-            st.title('Results:')
-            
-            errors = []
-            collector = TypeCollector(errors)
-            collector.visit(ast)
-            context = collector.context
-
-            # for e in errors:
-                # st.error(e)
-            # st.text('Context:')
-            # st.text(context)
-
-            # st.subheader('Building types')
-            builder = TypeBuilder(context, errors)
-            builder.visit(ast)
-            manager = builder.manager
-            # for e in errors:
-                # st.error(e)
-            # st.text('Context:')
-            # st.text(context)
-
-            # st.subheader('Checking types')
-            checker = TypeChecker(context, manager, [])
-            scope = checker.visit(ast)
-
-            # st.subheader('Infering types')
-            temp_errors = []
-            inferencer = TypeInferencer(context, manager, temp_errors)
-            inferencer.visit(ast, scope)
-            # for e in temp_errors:
-            #     st.error(e)
-
-            # st.subheader('Last check')
-            errors.extend(temp_errors)
-            checker = TypeChecker(context, manager, errors)
-            checker.visit(ast)
-            for e in errors:
-                st.error(e)
-                
-            formatter = FormatVisitor()
-            tree = formatter.visit(ast)
-            st.text(tree)
-
-
         except Exception as e:
-            st.error(f'Unexpected error!!! You probably did something wrong :wink:')
+            st.error(f'Lexer Error: {str(e)}')
+        else:
+            try:
+                parser = LR1Parser(G)
+                parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
+            except Exception as e:
+                st.error(f'Parser Error: {str(e)}')
+            else:
+                ast = evaluate_reverse_parse(parse, operations, tokens)
+
+                st.title('Results:')
+                
+                errors = []
+                collector = TypeCollector(errors)
+                collector.visit(ast)
+                context = collector.context
+
+                # for e in errors:
+                    # st.error(e)
+                # st.text('Context:')
+                # st.text(context)
+
+                # st.subheader('Building types')
+                builder = TypeBuilder(context, errors)
+                builder.visit(ast)
+                manager = builder.manager
+                # for e in errors:
+                    # st.error(e)
+                # st.text('Context:')
+                # st.text(context)
+
+                # st.subheader('Checking types')
+                checker = TypeChecker(context, manager, [])
+                scope = checker.visit(ast)
+
+                # st.subheader('Infering types')
+                temp_errors = []
+                inferencer = TypeInferencer(context, manager, temp_errors)
+                inferencer.visit(ast, scope)
+                # for e in temp_errors:
+                #     st.error(e)
+
+                # st.subheader('Last check')
+                errors.extend(temp_errors)
+                checker = TypeChecker(context, manager, errors)
+                checker.visit(ast)
+                for e in errors:
+                    st.error(e)
+                    
+                formatter = FormatVisitor()
+                tree = formatter.visit(ast)
+                st.text(tree)
+        # except Exception as e:
+        #     st.error(f'Unexpected error!!! You probably did something wrong :wink:')
 
 
 if __name__ == '__main__':
