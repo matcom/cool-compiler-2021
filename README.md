@@ -1,44 +1,30 @@
 # TypeInferencer
+
 El objetivo de este proyecto es la implementación de un intérprete de COOL que permita la inferencia de tipos a partir del uso de AUTO_TYPE. Para el desarrollo del mismo se utilizaron como base los contenidos vistos en Clase Práctica durante el curso de Compilación.
 
-
-
 ### Requerimientos 📋
+
 El proyecto fue desarrollado haciendo uso de:
 
 - `python v-3.7.2`
 - `streamlit v-0.56.0`
 
 Se necesita también algún navegador web instalado como `chrome` o `firefox`
- 
 
 ### Modo de uso
+
 Para ejecutar solamente abra la consola tal que la dirección raíz sea la del fichero donde se encuentra el proyecto y ejecute la siguiente línea:
 
 ```
 streamlit run main.py
 ```
 
-Para insertar el texto que representará el código de COOL debe tener en cuenta que todas las palabras deberán estar separadas por espacio, como se muestra en el siguiente ejemplo:
-
-```
-class Point {
-    x : AUTO_TYPE ;
-    y : AUTO_TYPE ;
-    init ( n : Int , m : Int ) : SELF_TYPE { {
-        x <- n ;
-        y <- m ; 
-    } } ;
-} ;
-```
-
-El lexer del proyecto separa el texto de entrada por los espacios para generar los tokens; en caso de que no reciba el texto correctamente espaciado, no podrá parsearlo satisfactoriamente. Note que este comportamiento también se aplica a las constantes de tipo String: deben encontrarse cerradas por doble comilla y no deben existir espacios entre las palabras que la conformen; puede sustituir los espacios por guiones.
-
-Si ocurre algún error durante el parsing, debido a que no se tuvieron en cuenta los espacios o las reglas de sintaxis de COOL, este será reportado y no se llevará a cabo ningún análisis posterior. De lo contrario, se mostrarán los errores semánticos, si los hay, y se mostrará el árbol resultante del análisis donde todos los AUTO_TYPES habrán sido reemplazados por el tipo estático inferido.
+Para insertar el texto que representará el código de COOL debe tener en cuenta las reglas de sintaxis de este lenguaje. En caso contrario, ya sea durante el proceso del lexer o de parsing, obtendrá un error que será reportado y no se llevará a cabo ningún análisis posterior. Si el texto es sintácticamente correcto de acuerdo a Cool, se mostrarán los errores semánticos, si los hay, y se mostrará el árbol resultante del análisis donde todos los AUTO_TYPES habrán sido reemplazados por el tipo estático inferido.
 
 Si un AUTO_TYPE es usado de forma incorrecta, este no se verá sustituido en la salida del programa; no obstante el error sí es reportado.
 
 ### Pipeline
+
 Una vez terminada la fase de *parsing* se llevan a cabo los siguientes pasos:
 
 - Recolección de tipos
@@ -48,6 +34,7 @@ Una vez terminada la fase de *parsing* se llevan a cabo los siguientes pasos:
 A continuación se explicará el funcionamiento de cada uno:
 
 #### Recolección de tipos
+
 Esta fase se realiza mediante la clase *Type Collector* que sigue los siguientes pasos:
 
 - Definición de los *built-in types*, o sea, los tipos que son inherentes al lenguaje Cool : Int, String, Bool, IO, Object; incluyendo la definición de sus métodos. Además se añaden como tipos SELF_TYPE, AUTO_TYPE.
@@ -57,6 +44,7 @@ Esta fase se realiza mediante la clase *Type Collector* que sigue los siguientes
 - Una vez chequeados los puntos anteriores, se reorganiza la lista de nodos de declaración de clases que está guardada en el nodo Program. La reorganización se realiza tal que para cada tipo A, si este hereda del tipo B (siendo B otra de las clases definidas en el programa) la posición de B en la lista es menor que la de A. De esta manera, cuando se visite un nodo de declaración de clase, todas las clases de las cuales él es descendiente, ya fueron visitadas previamente.
 
 #### Construcción de tipos
+
 La construcción de tipos se desarrolla empleando la clase Type Builder. Esta se encarga de visitar los *features* de las declaraciones de clase, dígase: funciones y atributos; tal que cada tipo contenga los atributos y métodos que lo caracterizan.
 
 Además se encarga de chequear la existencia del tipo Main con su método main correspondiente, como es requerido en COOL.
@@ -64,11 +52,12 @@ Además se encarga de chequear la existencia del tipo Main con su método main c
 En esta clase también se hace uso de la clase Inferencer Manager que permitirá luego realizar la inferencia de tipo. Por tanto, a todo atributo, parámetro de método o tipo de retorno de método, que esté definido como AUTO_TYPE se le asigna un *id* que será manejado por el manager mencionado anteriormente. Este id será guardado en el nodo en cuestión para poder acceder a su información en el manager cuando sea necesario.
 
 #### Chequeo e Inferencia de tipos
+
 En primer lugar se utiliza la clase Type Checker para validar el correcto uso de los tipos definidos. Toma la instancia de clase Inferencer Manager utilizada en el Type Builder para continuar la asignación de id a otros elementos en el código que también pueden estar definidos como AUTO_TYPE, como es el caso de las variables definidas en la expresión Let. Las variables definidas en el Scope se encargarán de guardar el id asignado; en caso de que no se les haya asignado ninguno, el id será *None*.
 
 La instancia de Scope creada en el Type Checker, así como la de Inferencer Manager se pasarán al Type Inferencer para realizar la inferencia de tipos.
 
-Ahora bien, la clase Inferencer Manager guarda las listas *conforms_to*, *conformed_by*, *infered_type*. El id asignado a una variable representa la posición donde se encuentra la información relacionada a la misma en las listas. 
+Ahora bien, la clase Inferencer Manager guarda las listas *conforms_to*, *conformed_by*, *infered_type*. El id asignado a una variable representa la posición donde se encuentra la información relacionada a la misma en las listas.
 
 Sea una variable con id = i, que está definida como AUTO_TYPE y sea A el tipo estático que se ha de inferir:
 
@@ -79,7 +68,7 @@ Sea una variable con id = i, que está definida como AUTO_TYPE y sea A el tipo e
 
 La clase Inferencer Manager además, está equipada con métodos para actualizar las listas dado un id, y para realizar la inferencia dados los tipos almacenados.
 
-El Type Inferencer por su parte, realizará un algoritmo de punto fijo para llevar a cabo la inferencia: 
+El Type Inferencer por su parte, realizará un algoritmo de punto fijo para llevar a cabo la inferencia:
 
 1. Realiza un recorrido del AST (Árbol de Sintaxis Abstracta) actualizando los conjuntos ya mencionados. Cuando se visita un nodo, específicamente un *ExpressionNode*, este recibe como parámetro un conjunto de tipos a los que debe conformarse la expresión; a su vez retorna el tipo estático computado y el conjunto de tipos que se conforman a él. Esto es lo que permite actualizar las listas que están almacenadas en el *manager*.
 2. Infiere todos los tipos que pueda con la información recogida.
@@ -90,11 +79,10 @@ El Type Inferencer por su parte, realizará un algoritmo de punto fijo para llev
 
 Por último se realiza un nuevo recorrido del AST con el Type Checker para detectar nuevamente los errores semánticos que puedan existir en el código, ahora con los AUTO_TYPES sustituidos por el tipo inferido.
 
-
 ## Autores ✒️
 
-* **Carmen Irene Cabrera Rodríguez** - [cicr99](https://github.com/cicr99)
-* **Enrique Martínez González** - [kikeXD](https://github.com/kikeXD)
+- **Carmen Irene Cabrera Rodríguez** - [cicr99](https://github.com/cicr99)
+- **Enrique Martínez González** - [kikeXD](https://github.com/kikeXD)
 
 ## Licencia
 
