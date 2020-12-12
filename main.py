@@ -70,22 +70,44 @@ def run_pipeline(G, text):
 
 
 text = '''
-class A {
-    f ( a : AUTO_TYPE , b : AUTO_TYPE ) : AUTO_TYPE {
-        if ( a = 1 ) then b else
-            g ( a + 1 , b / 2 )
-        fi
-    } ;
-    g ( a : AUTO_TYPE , b : AUTO_TYPE ) : AUTO_TYPE {
-        if ( b = 1 ) then a else
-            f ( a / 2 , b + 1 )
-        fi
-    } ;
-} ;
+class Main inherits IO {
+    number: Int <- 5;
+
+    main () : Object {
+        testing_fibonacci(number)
+    };
+
+    testing_fibonacci(n: Int) : IO {{
+        out_string("Iterative Fibonacci : ");
+        out_int(iterative_fibonacci(5));
+        out_string("\n");
+
+        out_string("Recursive Fibonacci : ");
+        out_int(recursive_fibonacci(5));
+        out_string("\n");
+    }};
+
+    recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
+        if n <= 2 then 1 else recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2) fi
+    };
+
+    iterative_fibonacci(n: AUTO_TYPE) : AUTO_TYPE {
+        let  i: Int <- 2, n1: Int <- 1, n2: Int <- 1, temp: Int in {
+            while i < n loop
+                let temp: Int <- n2 in {
+                    n2 <- n2 + n1;
+                    n1 <- temp;
+                    i <- i + 1;
+                }
+            pool;
+            n2;
+        }
+    };
+};
 '''
 
 def main(G):
-    st.title('Type Inferer')
+    st.title('Type Inferencer')
 
     st.sidebar.markdown('''Produced by:  
     Carmen Irene Cabrera Rodríguez  
@@ -94,58 +116,64 @@ def main(G):
     text = st.text_area('Input your code here:')
 
     if text:
+        st.text(text)
         try:
             tokens = list(tokenize_text(text))
-            parser = LR1Parser(G)
-            parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
-            ast = evaluate_reverse_parse(parse, operations, tokens)
-
-            st.title('Results:')
-            
-            errors = []
-            collector = TypeCollector(errors)
-            collector.visit(ast)
-            context = collector.context
-
-            # for e in errors:
-                # st.error(e)
-            # st.text('Context:')
-            # st.text(context)
-
-            # st.subheader('Building types')
-            builder = TypeBuilder(context, errors)
-            builder.visit(ast)
-            manager = builder.manager
-            # for e in errors:
-                # st.error(e)
-            # st.text('Context:')
-            # st.text(context)
-
-            # st.subheader('Checking types')
-            checker = TypeChecker(context, manager, [])
-            scope = checker.visit(ast)
-
-            # st.subheader('Infering types')
-            temp_errors = []
-            inferencer = TypeInferencer(context, manager, temp_errors)
-            inferencer.visit(ast, scope)
-            # for e in temp_errors:
-            #     st.error(e)
-
-            # st.subheader('Last check')
-            errors.extend(temp_errors)
-            checker = TypeChecker(context, manager, errors)
-            checker.visit(ast)
-            for e in errors:
-                st.error(e)
-                
-            formatter = FormatVisitor()
-            tree = formatter.visit(ast)
-            st.text(tree)
-
-
         except Exception as e:
-            st.error(f'Unexpected error!!! You probably did something wrong :wink:')
+            st.error(f'Lexer Error: {str(e)}')
+        else:
+            try:
+                parser = LR1Parser(G)
+                parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
+            except Exception as e:
+                st.error(f'Parser Error: {str(e)}')
+            else:
+                ast = evaluate_reverse_parse(parse, operations, tokens)
+
+                st.title('Results:')
+                
+                errors = []
+                collector = TypeCollector(errors)
+                collector.visit(ast)
+                context = collector.context
+
+                # for e in errors:
+                    # st.error(e)
+                # st.text('Context:')
+                # st.text(context)
+
+                # st.subheader('Building types')
+                builder = TypeBuilder(context, errors)
+                builder.visit(ast)
+                manager = builder.manager
+                # for e in errors:
+                    # st.error(e)
+                # st.text('Context:')
+                # st.text(context)
+
+                # st.subheader('Checking types')
+                checker = TypeChecker(context, manager, [])
+                scope = checker.visit(ast)
+
+                # st.subheader('Infering types')
+                temp_errors = []
+                inferencer = TypeInferencer(context, manager, temp_errors)
+                inferencer.visit(ast, scope)
+                # for e in temp_errors:
+                #     st.error(e)
+
+                # st.subheader('Last check')
+                errors.extend(temp_errors)
+                checker = TypeChecker(context, manager, errors)
+                checker.visit(ast)
+                for e in errors:
+                    st.error(e)
+                    
+                formatter = FormatVisitor()
+                tree = formatter.visit(ast)
+                st.text(tree)
+        # except Exception as e:
+        #     st.error(f'Unexpected error!!! You probably did something wrong :wink:')
 
 
 if __name__ == '__main__':

@@ -139,32 +139,7 @@ class UnknownToken(Token):
     @property
     def is_valid(self):
         return False
-
-def tokenizer(G, fixed_tokens):
-    def decorate(func):
-        def tokenize_text(text):
-            tokens = []
-            for lex in text.split():
-                try:
-                    token = fixed_tokens[lex]
-                except KeyError:
-                    token = UnknownToken(lex)
-                    try:
-                        token = func(token)
-                    except TypeError:
-                        pass
-                tokens.append(token)
-            tokens.append(Token('$', G.EOF))
-            return tokens
-
-        if hasattr(func, '__call__'):
-            return tokenize_text
-        elif isinstance(func, str):
-            return tokenize_text(func)
-        else:
-            raise TypeError('Argument must be "str" or a callable object.')
-    return decorate
-
+        
 class DisjointSet:
     def __init__(self, *items):
         self.nodes = { x: DisjointNode(x) for x in items }
