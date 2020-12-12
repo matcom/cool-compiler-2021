@@ -120,13 +120,13 @@ def main(G):
         try:
             tokens = list(tokenize_text(text))
         except Exception as e:
-            st.error(f'Lexer Error: {str(e)}')
+            st.error(f'Lexer Error: You probably did something wrong :wink:')
         else:
             try:
                 parser = LR1Parser(G)
                 parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
             except Exception as e:
-                st.error(f'Parser Error: {str(e)}')
+                st.error(f'Parser Error: You probably did something wrong :wink:')
             else:
                 ast = evaluate_reverse_parse(parse, operations, tokens)
 
@@ -172,9 +172,6 @@ def main(G):
                 formatter = FormatVisitor()
                 tree = formatter.visit(ast)
                 st.text(tree)
-        # except Exception as e:
-        #     st.error(f'Unexpected error!!! You probably did something wrong :wink:')
-
 
 if __name__ == '__main__':
     main(G)
