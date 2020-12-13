@@ -70,7 +70,7 @@ class FormatVisitor(object):
         params = ", ".join(":".join(param) for param in node.params)
         ans = (
             "\t" * tabs
-            + f"\\__FuncDeclarationNode: {node.id}({params}) : {node.type} -> <body>"
+            + f"\\__FuncDeclarationNode: {node.id}({params}) : {node.type} {{ <body> }}"
         )
         body = self.visit(node.body, tabs + 1)
         return f"{ans}\n{body}"
@@ -148,7 +148,7 @@ class FormatVisitor(object):
 
     @visitor.when(CaseNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__LetNode: case <expr> of <case_block> esac"
+        ans = "\t" * tabs + f"\\__CaseNode: case <expr> of <case_block> esac"
         case_block = "\n".join(self.visit(child, tabs + 1) for child in node.case_items)
         expr = self.visit(node.expr, tabs + 1)
         return f"{ans}\n{expr}\n{case_block}"
@@ -214,7 +214,8 @@ class FormatVisitorST(object):
 
         if not node.expr is None:
             expr = self.visit(node.expr, tabs + 1)
-        self.tree.append(expr)
+        else:  # esto estaba antes sin el else
+            self.tree.append(expr)
 
         return
 
@@ -230,7 +231,7 @@ class FormatVisitorST(object):
         params = ", ".join(":".join(param) for param in node.params)
         ans = (
             "\\__\\__" * tabs
-            + f"\\__FuncDeclarationNode: {node.id}({params}) : {node.type} -> <body>"
+            + f"\\__FuncDeclarationNode: {node.id}({params}) : {node.type} {{ <body>}}"
         )
         self.tree.append(ans)
         self.visit(node.body, tabs + 1)
@@ -322,7 +323,7 @@ class FormatVisitorST(object):
 
     @visitor.when(CaseNode)
     def visit(self, node, tabs=0):
-        ans = "\\__\\__" * tabs + f"\\__LetNode: case <expr> of <case_block> esac"
+        ans = "\\__\\__" * tabs + f"\\__CaseNode: case <expr> of <case_block> esac"
         self.tree.append(ans)
         self.visit(node.expr, tabs + 1)
         for child in node.case_items:

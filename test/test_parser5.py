@@ -20,5 +20,5 @@ def test():
 
     assert (
         tree
-        == "__ProgramNode [<class> ... <class>]__ClassDeclarationNode: class Point  { <feature> ... <feature> }__FuncDeclarationNode: succ(n:Int) : AUTO_TYPE -> <body>__<expr> PlusNode <expr>__ VariableNode: n__ ConstantNumNode: 1"
+        == "__ProgramNode [<class> ... <class>]__ClassDeclarationNode: class Point  { <feature> ... <feature> }__FuncDeclarationNode: succ(n:Int) : AUTO_TYPE { <body> }__<expr> PlusNode <expr>__ VariableNode: n__ ConstantNumNode: 1"
     )
