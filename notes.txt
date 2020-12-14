@@ -117,3 +117,6 @@ class Main {
 } ;
 
 -Probar test1
+
+-probar que no se joda con la herencia ciclica buscando eternamente por emtodos o 
+atributos que no existen
