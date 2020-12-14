@@ -41,6 +41,8 @@ selected_options = st.multiselect(
 
 
 def run_pipeline(text):
+    main_error1 = ["A class Main with a method main most be provided"]
+    main_error2 = ['"main" method in class Main does not receive any parameters']
     # define grammar
     grammar, idx, string, num = define_cool_grammar()
 
@@ -74,10 +76,16 @@ def run_pipeline(text):
         checker = TypeChecker(context, errors)
         checker.visit(ast, None)
 
-        if errors != []:
+        if errors != [] and errors != main_error1 and errors != main_error2:
             st.header("Sorry we found some errors in your code:")
             print_array(errors)
         else:
+            if errors == main_error1 or errors == main_error2:
+                st.header("Warning")
+                st.write("We will continue the analisis but note that:")
+                st.write(errors[0])
+                errors = []
+
             tset_builder = TSetBuilder(context, errors)
             tset = tset_builder.visit(ast, None)
 
@@ -98,7 +106,7 @@ def run_pipeline(text):
             checker = TypeChecker(context, errors)
             checker.visit(ast, None)
 
-            if errors != []:
+            if errors != [] and errors != main_error1 and errors != main_error2:
                 st.header("Sorry we found some errors in your code:")
                 print_array(errors)
 

@@ -83,11 +83,11 @@ class Type:
                 f'Attribute "{name}" is already defined in {self.name}.'
             )
 
-    def get_method(self, name: str):
+    def get_method(self, name: str, non_rec=False):
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
-            if self.parent is None:
+            if non_rec or self.parent is None:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
             try:
                 return self.parent.get_method(name)

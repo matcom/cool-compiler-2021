@@ -65,8 +65,7 @@ def test():
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
 
-    print(errors)
-    if errors != []:
+    if errors != ["A class Main with a method main most be provided"]:
         print(errors)
         assert False
 
@@ -100,6 +99,8 @@ def test():
     print(tree)
 
     assert errors == [
+        "A class Main with a method main most be provided",
+        "A class Main with a method main most be provided",
         "Expression after 'while' must be bool, current is Object",
         'Operation is not defined between "Object" and "Int".',
         'Cannot convert "Object" into "Int".',

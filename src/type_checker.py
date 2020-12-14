@@ -105,11 +105,27 @@ class TypeChecker:
             method_return_type = self.current_type
 
         child_scope = scope.create_child()
+        # ------------parameters most have differente names------------
+        param_names = self.current_method.param_names
+        param_types = self.current_method.param_types
+        param_used = {}
 
-        for i in range(len(self.current_method.param_names)):
-            child_scope.define_variable(
-                self.current_method.param_names[i], self.current_method.param_types[i]
-            )
+        for i, param_name in enumerate(param_names):
+            try:
+                param_used[param_name]
+                self.errors.append(
+                    f"More tan one param in method {node.id} has the name {param_name}"
+                )
+            except:
+                param_used[param_name] = True
+                child_scope.define_variable(param_name, param_types[i])
+
+        # -------------------------------------------------------------
+
+        # for i in range(len(self.current_method.param_names)):
+        #     child_scope.define_variable(
+        #         self.current_method.param_names[i], self.current_method.param_types[i]
+        #     )
 
         body_type = self.visit(node.body, child_scope)
 
@@ -124,7 +140,13 @@ class TypeChecker:
                     self.current_method.name
                 )
                 if parent_method != self.current_method:
-                    self.errors.append(WRONG_SIGNATURE % (parent_method.name, "parent"))
+                    self.errors.append(
+                        WRONG_SIGNATURE
+                        % (
+                            parent_method.name,
+                            f"an ancestor of {self.current_type.name}",
+                        )
+                    )
             except SemanticError:
                 pass
 

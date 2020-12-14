@@ -76,4 +76,4 @@ def test():
     print(context)
     print(tset)
 
-    assert errors == []
+    assert errors == ["A class Main with a method main most be provided"]

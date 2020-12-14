@@ -36,4 +36,4 @@ def test():
     print("Context:")
     print(context)
 
-    assert errors == []
+    assert errors == ["A class Main with a method main most be provided"]

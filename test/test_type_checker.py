@@ -72,4 +72,4 @@ def test():
     print(context)
     print(scope)
 
-    assert errors == []
+    assert errors == ["A class Main with a method main most be provided"]

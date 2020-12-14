@@ -1,0 +1,4 @@
+Revisar:
+
+-Lo mas importante y que puede afectar la inferencia es lo de type builder,
+la seccion que annade los metodos de string
