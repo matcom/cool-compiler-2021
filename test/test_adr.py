@@ -89,4 +89,4 @@ def test():
     tree = tree.replace("\\", "")
 
     assert tree == final_tree
-    assert errors == ['Method "length" is not defined in String.']
+    assert errors == []

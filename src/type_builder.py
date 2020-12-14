@@ -30,7 +30,9 @@ class TypeBuilder:
         self_type = self.context.get_type("SELF_TYPE")
         int_type = self.context.get_type("Int")
         string_type = self.context.get_type("String")
+        object_type = self.context.get_type("Object")
 
+        # IO
         parent_tset = Tset()
         parent_tset.locals["out_string"] = {"SELF_TYPE"}
         parent_tset.locals["out_int"] = {"SELF_TYPE"}
@@ -51,25 +53,40 @@ class TypeBuilder:
         method = io_type.define_method("in_int", [], [], int_type)
         method.tset = Tset(parent_tset)
 
-        # # -------String
-        # parent_tset = Tset()
-        # parent_tset.locals["concat"] = {"String"}
-        # parent_tset.locals["substr"] = {"String"}
-        # parent_tset.locals["length"] = {"Int"}
+        # -------String
+        parent_tset = Tset()
+        parent_tset.locals["concat"] = {"String"}
+        parent_tset.locals["substr"] = {"String"}
+        parent_tset.locals["length"] = {"Int"}
 
-        # method = string_type.define_method("concat", ["s"], [string_type], string_type)
-        # method.tset = Tset(parent_tset)
-        # method.tset.locals["s"] = {"String"}
+        method = string_type.define_method("concat", ["s"], [string_type], string_type)
+        method.tset = Tset(parent_tset)
+        method.tset.locals["s"] = {"String"}
 
-        # method = string_type.define_method(
-        #     "substr", ["i", "l"], [int_type, int_type], string_type
-        # )
-        # method.tset = Tset(parent_tset)
-        # method.tset.locals["i"] = {"Int"}
-        # method.tset.locals["l"] = {"Int"}
+        method = string_type.define_method(
+            "substr", ["i", "l"], [int_type, int_type], string_type
+        )
+        method.tset = Tset(parent_tset)
+        method.tset.locals["i"] = {"Int"}
+        method.tset.locals["l"] = {"Int"}
 
-        # method = string_type.define_method("length", [], [], int_type)
-        # method.tset = Tset(parent_tset)
+        method = string_type.define_method("length", [], [], int_type)
+        method.tset = Tset(parent_tset)
+
+        # Object
+        parent_tset = Tset()
+        parent_tset.locals["abort"] = {"Object"}
+        parent_tset.locals["type_name"] = {"String"}
+        parent_tset.locals["copy"] = {"SELF_TYPE"}
+
+        method = object_type.define_method("abort", [], [], object_type)
+        method.tset = Tset(parent_tset)
+
+        method = object_type.define_method("type_name", [], [], string_type)
+        method.tset = Tset(parent_tset)
+
+        method = object_type.define_method("copy", [], [], self_type)
+        method.tset = Tset(parent_tset)
 
         # --------------------
 
