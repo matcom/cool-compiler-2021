@@ -67,4 +67,7 @@ def test():
     print(reduced_set)
     print(tree)
 
-    assert True
+    assert errors == [
+        "A class Main with a method main most be provided",
+        "A class Main with a method main most be provided",
+    ]

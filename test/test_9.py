@@ -7,7 +7,7 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
-
+# En este caso todas las variables son Int porque d participa en una operacion aritmetica. f tambien se infiere que devuelve Int.
 def test():
     text = """
 

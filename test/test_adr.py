@@ -7,7 +7,7 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
-
+# Probando case y let anidados
 def test():
     text = """
 

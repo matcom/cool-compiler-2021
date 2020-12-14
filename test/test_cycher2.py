@@ -8,6 +8,9 @@ from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
 
+# Probando detectar herencia ciclica
+
+
 def test():
     text = """
             class B inherits A { 

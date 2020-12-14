@@ -7,7 +7,10 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
-
+# Trabajando con self. Arreglado el error de la primera entrega
+# Se infiere:
+# main() : Main
+# pp : Main
 def test():
     text = """
 

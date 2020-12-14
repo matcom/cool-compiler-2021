@@ -7,6 +7,9 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
+# Aqui no inferimos el tipo de x0 y y0 a partir de x e y.
+# En la asignacion solo se reduce la variable al tipo de la expresion que se le esta asinando, no viceversa.
+
 
 def test():
     text = """

@@ -48,12 +48,6 @@ def test():
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
 
-    err = [
+    assert errors == [
         'Attribute "x" is already defined in Main.',
     ]
-
-    if errors != err:
-        print(errors)
-        assert False
-
-    assert True

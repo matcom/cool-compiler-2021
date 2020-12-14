@@ -7,6 +7,12 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
+# Probando inferencia en funciones recursivas
+# Se infiere:
+# m : Int porque se usa en operacion aritmetica
+# n : Int porque se usa en operacion aritmetica
+# ackerman() : Int porque es la interseccion entre los tipos que devuelve el then (Int) y los que devuelve el else(todos pues es AUTO_TYPE)
+
 
 def test():
     text = """

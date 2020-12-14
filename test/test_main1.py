@@ -49,14 +49,7 @@ def test():
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
 
-    err = [
+    assert errors == [
         'Attribute "x" is already defined in Main.',
         '"main" method in class Main does not receive any parameters',
     ]
-
-    if errors != err:
-        print(errors)
-        assert False
-
-    assert True
-

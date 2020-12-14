@@ -7,7 +7,17 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
-
+# Probando inferir los tipos de los parametros de un metodo a partir de los argumentos con los que se llama
+# Se infiere:
+# ---En el let de la clase Main ----
+#   id : Int por la asignacion id <- self.in_int();
+#   name : String por la asignacion name <- self.in_string();
+#   email : String por la asignacion email <- self.in_string();
+# --- En el metodo init() de la clase User---
+#   id_ : Int porque en el llamado (new User).init(id, name, email) id es de tipo Int
+#   name_ : String porque en el llamado (new User).init(id, name, email) name es de tipo String
+#   email_ : String porque en el llamado (new User).init(id, name, email) email_ es de tipo String
+#
 def test():
     text = """
 (* Testing IO *)

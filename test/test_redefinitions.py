@@ -47,15 +47,11 @@ def test():
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
 
-    default_errs = [
+    assert errors == [
         'Attribute "x" is already defined in B.',
         "A class Main with a method main most be provided",
         "More tan one param in method init has the name z",
         'Cannot convert "Int" into "Bool".',
         'Method "init" already defined in "an ancestor of B" with a different signature.',
     ]
-    if errors != default_errs:
-        print(errors)
-        assert False
 
-    assert True

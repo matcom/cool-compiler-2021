@@ -7,6 +7,13 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
+# Trabajando con IO. Probando inferir el tipo de 'a' a partir del tipo que recibe el metodo out_string()
+# Se infiere:
+# main(): IO
+# a : String
+# x : Int
+# y : IO
+
 
 def test():
     text = """
@@ -34,7 +41,9 @@ class Main {
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
 
-    if errors != ['"main" method in class Main does not receive any parameters']:
+    if errors != [
+        '"main" method in class Main does not receive any parameters',
+    ]:
         print(errors)
         assert False
 
@@ -67,4 +76,7 @@ class Main {
     print(reduced_set)
     print(tree)
 
-    assert True
+    assert errors == [
+        '"main" method in class Main does not receive any parameters',
+        '"main" method in class Main does not receive any parameters',
+    ]

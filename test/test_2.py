@@ -7,6 +7,12 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
+# Infiriendo el tipo de retorno del metodo a partir del body. Probando inicializar variables en el let. Arreglado el error del case.
+# Se inferiere:
+# main() : String.
+# x : Int
+# y : Int
+
 
 def test():
     text = """

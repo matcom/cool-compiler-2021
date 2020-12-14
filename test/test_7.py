@@ -7,6 +7,14 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
+# Probando inferencia en funciones recursivas
+# Se infiere:
+# a : Int porque se usa en una operacion aritmetica
+# b : Int porque se usa en una operacion aritmetica
+# f() : Int
+# g() : Int
+# Una vez inferido el tipo de a y b, en las proximas pasadas se infiere que el if devuelve Int en ambos metodos
+
 
 def test():
     text = """

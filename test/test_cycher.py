@@ -7,7 +7,7 @@ from src.tsets_reducer import TSetReducer
 from src.tset_merger import TSetMerger
 from src.cool_visitor import FormatVisitor
 
-
+# Probando detectar herencia ciclica
 def test():
     text = """
             class B inherits A { 
@@ -31,13 +31,8 @@ def test():
 
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
-
-    if errors != [
+    print(errors)
+    assert errors == [
         "B is involved in a cyclic heritage",
         "A class Main with a method main most be provided",
-    ]:
-        print(errors)
-        assert False
-
-    assert True
-
+    ]
