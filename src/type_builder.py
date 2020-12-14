@@ -137,7 +137,7 @@ class TypeBuilder:
                 queue.append(not_visited[0])
 
         try:
-            main_meth = self.context.get_type("Main").get_method("main", True)
+            main_meth = self.context.get_type("Main").get_method("main", non_rec=True)
             if len(main_meth.param_names) > 0:
                 self.errors.append(
                     '"main" method in class Main does not receive any parameters'

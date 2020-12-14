@@ -56,16 +56,23 @@ class Type:
             raise SemanticError(f"Is not possible to inherit from {parent.name}")
         self.parent = parent
 
-    def get_attribute(self, name: str):
+    def get_attribute(self, name: str, visited=None):
+        if visited is None:
+            visited = []
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
+            visited.append(self.name)
             if self.parent is None:
                 raise SemanticError(
                     f'Attribute "{name}" is not defined in {self.name}.'
                 )
             try:
-                return self.parent.get_attribute(name)
+                if self.parent.name in visited:
+                    raise SemanticError(
+                        f'Attribute "{name}" is not defined in {self.name}.'
+                    )
+                return self.parent.get_attribute(name, visited=visited)
             except SemanticError:
                 raise SemanticError(
                     f'Attribute "{name}" is not defined in {self.name}.'
@@ -83,14 +90,21 @@ class Type:
                 f'Attribute "{name}" is already defined in {self.name}.'
             )
 
-    def get_method(self, name: str, non_rec=False):
+    def get_method(self, name: str, non_rec=False, visited=None):
+        if visited is None:
+            visited = []
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
+            visited.append(self.name)
             if non_rec or self.parent is None:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
             try:
-                return self.parent.get_method(name)
+                if self.parent.name in visited:
+                    raise SemanticError(
+                        f'Method "{name}" is not defined in {self.name}.'
+                    )
+                return self.parent.get_method(name, visited=visited)
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
 
