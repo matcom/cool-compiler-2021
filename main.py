@@ -19,8 +19,8 @@ from src.ui import print_array, print_grammar, print_tset
 
 st.sidebar.header("About")
 st.sidebar.subheader("Segundo Proyecto de Compilacion: Cool Intrepreter")
-st.sidebar.text("Amalia Ibarra Rodriguez")
-st.sidebar.text("Gabriela B. Martinez Giraldo")
+st.sidebar.text("Amalia Ibarra Rodríguez")
+st.sidebar.text("Gabriela B. Martínez Giraldo")
 st.sidebar.text("Grupo: C-312")
 st.sidebar.text("Curso: 2019-2020")
 
