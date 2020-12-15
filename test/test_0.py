@@ -31,10 +31,11 @@ def test():
                 false
         } ;
 
-        init ( hd : Int , tl : String ) : String {
+        init ( hd : Int , tl : String ) : AUTO_TYPE {
                 {
                 xcar <- hd ;
                 xcdr <- tl ;
+                self;
                 }
         } ;
         } ;
@@ -55,7 +56,7 @@ def test():
     checker = TypeChecker(context, errors)
     checker.visit(ast, None)
 
-    if errors != []:
+    if errors != ["A class Main with a method main most be provided"]:
         print(errors)
         assert False
 
@@ -82,7 +83,10 @@ def test():
     formatter = FormatVisitor()
     tree = formatter.visit(ast)
 
-    if errors != []:
+    if errors != [
+        "A class Main with a method main most be provided",
+        "A class Main with a method main most be provided",
+    ]:
         print("Errors:", errors)
         print("Context:")
         print(context)
@@ -90,13 +94,11 @@ def test():
         print(tree)
         assert False
 
-    final_tree = """__ProgramNode [<class> ... <class>]__ClassDeclarationNode: class C inherits J { <feature> ... <feature> }__ClassDeclarationNode: class A inherits B { <feature> ... <feature> }__ClassDeclarationNode: class B inherits A { <feature> ... <feature> }__ClassDeclarationNode: class C  { <feature> ... <feature> }__ClassDeclarationNode: class D inherits E { <feature> ... <feature> }__ClassDeclarationNode: class E inherits F { <feature> ... <feature> }__ClassDeclarationNode: class F inherits D { <feature> ... <feature> }__ClassDeclarationNode: class G inherits F { <feature> ... <feature> }"""
-
+    final_tree = """__ProgramNode [<class> ... <class>]__ClassDeclarationNode: class Cons  { <feature> ... <feature> }__AttrDeclarationNode: xcar : Int <- <exp>__NONE__AttrDeclarationNode: xcdr : String <- <exp>__NONE__FuncDeclarationNode: isNill() : Bool { <body> }__ BooleanNode: false__FuncDeclarationNode: init(hd:Int, tl:String) : Cons { <body> }__BlockNode: {<exp>; ... <exp>;}__AssignNode: xcar <- <expr>__ VariableNode: hd__AssignNode: xcdr <- <expr>__ VariableNode: tl__ VariableNode: self"""
     tree = tree.replace("\t", "")
     tree = tree.replace("\n", "")
     tree = tree.replace("\\", "")
 
+    print(tree)
     assert tree == final_tree
 
-
-test()
