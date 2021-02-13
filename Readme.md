@@ -29,7 +29,7 @@ Opcionalmente pueden [crear una organización](https://github.com/organizations/
 Revise que el repositorio de su equipo está en su perfil.
 En este ejemplo se ha copiado a la cuenta de `github.com/apiad`.
 
-Debe indicar bajo el nombre del repositorio: `"forked from matcom/cool-compiler-2020"`.
+Debe indicar bajo el nombre del repositorio: `"forked from matcom/cool-compiler-2021"`.
 
 ![](img/img3.png)
 
@@ -37,17 +37,17 @@ Debe indicar bajo el nombre del repositorio: `"forked from matcom/cool-compiler-
 
 Busque la URL de su proyecto en la interfaz web de Github.
 
-Asegúrese de clonar **su copia** y no el proyecto original en `matcom/cool-compiler-2020`.
+Asegúrese de clonar **su copia** y no el proyecto original en `matcom/cool-compiler-2021`.
 
 ![](img/img4.png)
 
 ```bash
-$ git clone git@github.com:<usuario>/cool-compiler-2020.git
+$ git clone git@github.com:<usuario>/cool-compiler-2021.git
 ```
 
 > Donde `<usuario>` es posiblemente el nombre de su equipo o del miembro donde se hizo el _fork_.
 
-A partir de este punto debe tener un proyecto `cool-compiler-2020` local.
+A partir de este punto debe tener un proyecto `cool-compiler-2021` local.
 El siguiente paso depende de si usted ya tiene su código versionado con `git` o no.
 
 ### 5.A. Si tiene su proyecto en git (y no quiere perder la historia):
@@ -55,7 +55,7 @@ El siguiente paso depende de si usted ya tiene su código versionado con `git` o
 #### 5.1. Mezcle hacia el nuevo respositorio su repositorio anterior:
 
 ```bash
-$ cd cool-compiler-2020
+$ cd cool-compiler-2021
 $ git pull --allow-unrelated-histories <my-old-compiler-project> master
 ```
 
@@ -104,7 +104,7 @@ En este proyecto se realizarán entregas parciales a lo largo del curso. Para re
 
 - **base repository**: `matcom/cool-compiler-2021` (repositorio original)
   - **branch**: `master`
-- **head repository**: `<usuario>/cool-compiler-2020` (repositorio propio)
+- **head repository**: `<usuario>/cool-compiler-2021` (repositorio propio)
   - **branch**: `master` (o la que corresponda)
 
 > Asegúrese que se indica **Able to merge**. De lo contrario, existen cambios en el repositorio original que usted no tiene, y debe actualizarlos.
@@ -137,7 +137,7 @@ Si ve el mensaje **All checks have failed**, significa que su código no pasó l
 
 ![](img/img9.png)
 
-Para ver los resultados de las pruebas haga click en el link **Details** junto al ícono de `continuous-integration/travis-ci/pr`, o visite [este link](https://travis-ci.org/matcom/cool-compiler-2020/pull_requests) y busque su _pull request_.
+Para ver los resultados de las pruebas haga click en el link **Details** junto al ícono de `continuous-integration/travis-ci/pr`, o visite [este link](https://travis-ci.org/matcom/cool-compiler-2021/pull_requests) y busque su _pull request_.
 
 ![](img/img11.png)
 
@@ -167,7 +167,7 @@ Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o
 
 La carpeta `tests` contiene todos los casos de prueba que son obligatorios de pasar para que su proyecto tenga derecho a ser evaluado.
 
-Estos tests se ejecutan automáticamente cada vez que hace un _pull request_ al repositorio `matcom/cool-compiler-2020`. Solo aquellos proyectos que pasen todas las pruebas con éxito serán evaluados.
+Estos tests se ejecutan automáticamente cada vez que hace un _pull request_ al repositorio `matcom/cool-compiler-2021`. Solo aquellos proyectos que pasen todas las pruebas con éxito serán evaluados.
 
 Para ejecutar las pruebas localmente, debe tener instalado `Python 3.7`, `pip` y `make` (normalmente viene con Linux). Ejecute:
 
