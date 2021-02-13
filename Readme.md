@@ -128,22 +128,16 @@ Es posible que tenga que actualizar los cambios que se hayan hecho en el reposit
 > **This branch is out-of-date with base branch**
 
 Haga click en **Update branch** y siga las instrucciones.
-
-![](img/img12.png)
-
 ### 5. Verifique que no hubo errores en las pruebas.
 
-Si ve el mensaje **All checks have failed**, significa que su código no pasó las pruebas.
+Si ve el mensaje **(All | Some) checks have failed**, significa que su código no pasó las pruebas.
 
 ![](img/img9.png)
 
-Para ver los resultados de las pruebas haga click en el link **Details** junto al ícono de `continuous-integration/travis-ci/pr`, o visite [este link](https://travis-ci.org/matcom/cool-compiler-2021/pull_requests) y busque su _pull request_.
-
-![](img/img11.png)
-
-Haciendo click en el título de su _pull request_ (ej. **PR #1**) podrá ver los detalles de ejecución de todas las pruebas, así como las excepciones lanzadas.
+Para ver los resultados de las pruebas haga click en el link **Details**.
 
 ![](img/img10.png)
+
 
 ### 6. Arregle los errores y repita el paso 5 hasta que todas las pruebas pasen.
 
