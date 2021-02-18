@@ -1,32 +1,42 @@
 import visitor as visitor
 from AST import *
-import AST_CIL
+import AST_CIL, basic_classes
 
 class Build_CIL:
     def __init__(self, ast, sem):
         self.end_line = {}
+        self.info = sem
+        self.const = 'const_1'
         self.idCount = 0
         self.astCIL = AST_CIL.Program()
-        self.local_variables = [Var('self', 'SELF_TYPE')]
-        self.local_variables_map = [(0,0)]
-        self.local_variables_original = {}
-        self.local_variables_name = {}
+        self._self = Var('self', 'SELF_TYPE')
+        self._self.line = 0
+        self._self.index = 0
+        self.local_variables = [self._self]
         self.constructor = {}
         self.classmethods = {}
-        self.BFS(sem.graph, sem.classmethods_original)
+        self.class_attrs = sem.class_attrs
+        self.BFS(sem.graph, sem.classmethods_original, sem.classmethods)
         self.visit(ast, self.astCIL)
 
-    def BFS(self, graph, class_methods):
+    def BFS(self, graph, class_methods_original, inherits_methods):
+
         self.classmethods[('Object', 'abort')]        = 'function_Object_abort'
         self.classmethods[('Object', 'type_name')]    = 'function_Object_type_name'
         self.classmethods[('Object', 'copy')]         = 'function_Object_copy'
+
         self.classmethods[('IO', 'out_string')]       = 'function_IO_out_string'
         self.classmethods[('IO', 'out_int')]          = 'function_IO_out_int'
         self.classmethods[('IO', 'in_string')]        = 'function_IO_in_string'
         self.classmethods[('IO', 'in_int')]           = 'function_IO_in_int'
+
         self.classmethods[('String', 'length')]       = 'function_String_length'
         self.classmethods[('String', 'concat')]       = 'function_String_concat'
         self.classmethods[('String', 'substr')]       = 'function_String_substr'
+
+        for c, methods in class_methods_original.items():
+            for m in methods:
+                self.classmethods[(c, m)] = 'function_' + c + '_' + m
 
         l = ['Object']
         while len(l) > 0:
@@ -34,14 +44,18 @@ class Build_CIL:
             if not graph.__contains__(temp): continue
             for _class in graph[temp]:
                 l.append(_class)
-                for function in class_methods[temp]:
-                    self.classmethods[(_class, function)] = self.classmethods[(temp, function)]                
-
+                for function in inherits_methods[temp]:
+                    if self.classmethods.__contains__((_class, function)): continue
+                    self.classmethods[(_class, function)] = self.classmethods[(temp, function)]
 
     def get_local(self):
         dest = 'local_' + str(self.idCount)
         self.idCount += 1
         return dest
+    def get_label(self):
+        label = 'label' + str(self.idCount)
+        self.idCount+=1
+        return label
 
     @visitor.on('node')
     def visit(self, node, nodeCIL):
@@ -50,16 +64,7 @@ class Build_CIL:
     @visitor.when(Program)
     def visit(self, program, programCIL):
 
-        #añadir IO, Object, Int, String, Bool
-        _type_IO = AST_CIL.Type('IO')
-        func = 'function' + '_' + 'IO' + '_' + 'out_string'
-        _type_IO.methods['out_string'] = func
-        self.classmethods[('IO', 'out_string')] = func
-        f = AST_CIL.Function(func)
-        f.params.append('x')
-        f.instructions.append(AST_CIL.Print('x'))        
-        self.astCIL.code_section.append(f)
-        programCIL.type_section.append(_type_IO)
+        basic_classes.Build(self.astCIL.code_section, self.astCIL.type_section)
 
         for c in program.classes:
             self.visit(c, programCIL)
@@ -86,12 +91,20 @@ class Build_CIL:
         func = 'function' + '_' + self.current_class + '_' + method.id
         typeCIL.methods[method.id] = func
 
-        self.classmethods[(self.current_class, method.id)] = func
+        # self.classmethods[(self.current_class, method.id)] = func
 
         f = AST_CIL.Function(func)
 
         for arg in method.parameters:
             f.params.append(arg.id)
+
+        local = self.const
+        intr = AST_CIL.Allocate(local, 'Int')
+        intr2 = AST_CIL.SetAttrib(local, 0, 1)
+
+        f.instructions.insert(0, intr2)
+        f.instructions.insert(0, intr)
+        f.localvars.append(local)
 
         result = self.visit(method.expression, f)
         f.instructions.append(AST_CIL.Return(result))
@@ -99,15 +112,33 @@ class Build_CIL:
         self.astCIL.code_section.append(f)
 
         self.local_variables.clear()
-        self.local_variables_map.clear()
-        self.local_variables.append(Var('self','SELF_TYPE'))
-        self.local_variables_map.append((0,0))
+        self.local_variables.append(self._self) #Var('self','SELF_TYPE'))
         self.current_method = None 
-    
+
+    @visitor.when(Boolean)
+    def visit(self, _bool, functionCIL):
+        instance = self.get_local()
+        intr1 = AST_CIL.Allocate(instance, 'Bool')
+        value = 0
+        if _bool.value == 'true': value = 1
+        intr2 = AST_CIL.SetAttrib(instance, 0, value)
+        functionCIL.localvars.append(instance)
+        functionCIL.instructions.insert(0, intr2)
+        functionCIL.instructions.insert(0, intr1)
+        return instance
+
+    @visitor.when(Interger)
+    def visit(self, _int, functionCIL):
+        instance = self.get_local()
+        intr1 = AST_CIL.Allocate(instance, 'Int')
+        intr2 = AST_CIL.SetAttrib(instance, 0, _int.value)
+        functionCIL.localvars.append(instance)
+        functionCIL.instructions.insert(0, intr2)
+        functionCIL.instructions.insert(0, intr1)
+        return instance
+
     @visitor.when(String)
     def visit(self, string, functionCIL):
-        #crear tag
-        #annadir a data
         tag = 's' + str(len(self.astCIL.data_section))
 
         n = len(string.value)
@@ -117,7 +148,11 @@ class Build_CIL:
             s = '\"' + s
         else: s = '"' + s + '"'
 
-        self.astCIL.data_section[s] = tag
+        # self.astCIL.data_section[s] = tag
+        if self.astCIL.data_section.__contains__(s):
+            tag = self.astCIL.data_section[s]
+        else: self.astCIL.data_section[s] = tag
+
         d = self.get_local()
         intr = AST_CIL.Load(d, tag)
         functionCIL.localvars.append(d)
@@ -128,13 +163,168 @@ class Build_CIL:
     def visit(self, dispatch, functionCIL):
         dest = 'local_' + str(self.idCount)
         self.idCount += 1
-
-        for item in dispatch.parameters:    #e(e1,e2,...,en)
+        for item in dispatch.parameters:                                    #e(e1,e2,...,en)
             result = self.visit(item, functionCIL)
             functionCIL.instructions.append(AST_CIL.Arg(result))
 
         intr = AST_CIL.Call(dest, self.classmethods[(self.current_class, dispatch.func_id)])
         functionCIL.localvars.append(dest)
         functionCIL.instructions.append(intr)
-
         return dest
+
+    @visitor.when(Block)
+    def visit(self, block, functionCIL):
+        n = len(block.expressions) - 1
+        for i in range(n): self.visit(block.expressions[i], functionCIL)
+        result = self.visit(block.expressions[n], functionCIL)
+        return result
+
+    @visitor.when(LetVar)
+    def visit(self, let, functionCIL):
+        for item in let.declarations:            
+            self.visit(item, functionCIL)
+            self.local_variables.append(item)
+
+        result = self.visit(let.in_expression, functionCIL)
+        n = len(let.declarations)
+        m = len(self.local_variables)
+        for i in range(n): self.local_variables.pop(m - i - 1)
+        return result
+
+    @visitor.when(Attribute)
+    def visit(self, attr, functionCIL):
+        #declara un nuevo objeto y le asigna un valor
+        result = self.visit(attr.expr, functionCIL)
+        instance =  attr.id + '_' + str(attr.line) + '_' + str(attr.index)
+
+        intr1 = AST_CIL.Allocate(instance, attr.type)
+        functionCIL.instructions.insert(0, intr1)
+
+        intr2 = AST_CIL.Assign(instance, attr.type, result)
+
+        functionCIL.localvars.append(instance)
+        functionCIL.instructions.append(intr2)
+        return instance
+
+    @visitor.when(Var)
+    def visit(self, var, functionCIL):
+        #declara un nuevo objeto y le asigna un valor
+        instance =  var.id + '_' + str(var.line) + '_' + str(var.index)
+        intr1 = AST_CIL.Allocate(instance, var.type)
+        functionCIL.localvars.append(instance)
+        functionCIL.instructions.insert(0, intr1)
+        return instance
+
+    @visitor.when(Type) #expr --> ID
+    def visit(self, _type, functionCIL):
+        if _type.name == 'self': return 'self'
+        n = len(self.local_variables) - 1
+        for i in range(n, -1, -1):
+            local_id =  self.local_variables[i].id
+            if local_id == _type.name:
+                return local_id + '_' + str(self.local_variables[i].line) + '_' + str(self.local_variables[i].index)
+        if not self.current_method is None:
+            for arg_id in functionCIL.params:
+                if arg_id == _type.name:
+                    return arg_id        
+        d = self.get_local()
+        intr = AST_CIL.GetAttrib(d , 'self', self.class_attrs[self.current_class].index(_type.name))
+        functionCIL.localvars.append(d)
+        functionCIL.instructions.append(intr)
+        return d
+
+    @visitor.when(Plus)
+    def visit(self, plus, functionCIL):
+        d = 'temp'
+        if not d in functionCIL.localvars:
+            functionCIL.localvars.append(d)
+            intr1 = AST_CIL.Allocate(d, 'Int')
+            functionCIL.instructions.insert(0, intr1)
+        a = self.visit(plus.first, functionCIL)
+        b = self.visit(plus.second, functionCIL)
+        intr = AST_CIL.Plus(d, a, b)
+        functionCIL.instructions.append(intr)
+        return d
+
+    @visitor.when(Minus)
+    def visit(self, minus, functionCIL):
+        d = 'temp'
+        if not d in functionCIL.localvars:
+            functionCIL.localvars.append(d)
+            intr1 = AST_CIL.Allocate(d, 'Int')
+            functionCIL.instructions.insert(0, intr1)
+        a = self.visit(minus.first, functionCIL)
+        b = self.visit(minus.second, functionCIL)
+        intr = AST_CIL.Minus(d, a, b)
+        functionCIL.instructions.append(intr)
+        return d
+
+    @visitor.when(Assign)
+    def visit(self, assign, functionCIL):
+        result = self.visit(assign.expression, functionCIL)
+        n = len(self.local_variables) - 1
+        
+        for i in range(n, -1, -1):
+            local_id =  self.local_variables[i].id
+            local_type = self.local_variables[i].type
+            if local_id == assign.id:
+                local = local_id + '_' + str(self.local_variables[i].line) + '_' + str(self.local_variables[i].index)
+                intr = AST_CIL.Assign(local, local_type, result)
+                functionCIL.instructions.append(intr)
+                return local
+        
+        if not self.current_method is None:
+                for arg_id, arg_type in self.info.classmethods[self.current_class][self.current_method][0]:
+                    if arg_id == assign.id:
+                        intr = AST_CIL.Assign(arg_id, arg_type, result)                        
+                        functionCIL.instructions.append(intr)
+                        return arg_id
+ 
+        intr = AST_CIL.SetAttrib('self' , self.class_attrs[self.current_class].index(assign.id), result)
+        functionCIL.instructions.append(intr)
+        return result
+
+    @visitor.when(EqualThan)
+    def visit(self, equalThan, functionCIL):
+        d = self.get_local()
+        functionCIL.localvars.append(d)
+        intr1 = AST_CIL.Allocate(d, 'Bool')
+        functionCIL.instructions.insert(0, intr1)
+        a = self.visit(equalThan.first, functionCIL)
+        b = self.visit(equalThan.second, functionCIL)
+        intr = AST_CIL.Minus(d, a, b)
+        intr2 = AST_CIL.Minus(d, self.const, d)
+        functionCIL.instructions+=[intr, intr2]
+        return d
+
+    @visitor.when(Not)
+    def visit(self, neg, functionCIL):
+        d = self.get_local()
+        functionCIL.localvars.append(d)
+        intr1 = AST_CIL.Allocate(d, 'Bool')
+        functionCIL.instructions.insert(0, intr1)
+        a = self.visit(neg.expr, functionCIL)
+        intr = AST_CIL.Minus(d, self.const, a)
+        functionCIL.instructions.append(intr)
+        return d
+
+    @visitor.when(Loop)
+    def visit(self, loop, functionCIL):
+        start = self.get_label()
+        do = self.get_label()
+        end = self.get_label()        
+        intr1 = AST_CIL.Label(start)
+        functionCIL.instructions.append(intr1)
+        w = self.visit(loop.while_expression, functionCIL)
+        intr2 = AST_CIL.GotoIf(w, do)
+        functionCIL.instructions.append(intr2)
+        intr3 = AST_CIL.Goto(end)    
+        functionCIL.instructions.append(intr3) 
+        intr4 = AST_CIL.Label(do)
+        functionCIL.instructions.append(intr4)
+        l = self.visit(loop.loop_expression, functionCIL)
+        intr5 = AST_CIL.Goto(start)
+        functionCIL.instructions.append(intr5)
+        intr6 = AST_CIL.Label(end)
+        functionCIL.instructions.append(intr6)
+        return l
