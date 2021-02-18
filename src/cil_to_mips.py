@@ -2,9 +2,15 @@ from AST_CIL import *
 import visitor
 
 class Build_Mips:
-    def __init__(self, ast):
+    def __init__(self, ast, sem):
         self.lines = []
         self.current_function = None
+        self.attributes = {}
+        for c, a in sem.class_attrs.items():
+            self.attributes[c] = len(a)
+        self.attributes['Int'] = 1
+        self.attributes['String'] = 1
+        self.attributes['Bool'] = 1
         self.visit(ast)
 
     def add(self, line):
@@ -26,6 +32,7 @@ class Build_Mips:
         for _str, tag in program.data_section.items():
             self.add(tag + ':' + ' .asciiz ' + _str)
         self.add('.text')
+        self.add('.globl main')
         self.add('main:')
         self.add('jal function_Main_main')
         self.add('li $v0, 10') #exit()
@@ -88,15 +95,142 @@ class Build_Mips:
         self.add('la $t1, {}'.format(load.msg))
         self.add('sw $t1, {}($fp)'.format(index))
 
-    @visitor.when(Print)
+    @visitor.when(PrintStr)
     def visit(self, _print):
         self.add('li $v0, 4')		                    # system call code for print_str
         index = self.stack_pos(_print.str_addr)         #pos en la pila
         self.add('lw $a0, {}($fp)'.format(index)) 	    # str to print
         self.add('syscall')			                    # print it
 
+    @visitor.when(PrintInt)
+    def visit(self, _print):
+        self.add('li $v0, 1')		                    # system call code for print_int
+        index = self.stack_pos(_print.value)            # pos en la pila de la instancia        
+        self.add('lw $t0, {}($fp)'.format(index)) 	    # dir en el heap
+        self.add('lw $a0, 0($t0)')                      # int to print
+        self.add('syscall')			                    # print it
+
     @visitor.when(Return)
     def visit(self, ret):
-        index = self.stack_pos(ret.value)
-        self.add('lw $t1, {}($fp)'.format(index))
-        self.add('move $v0, $t1')
+        if not ret.value is None:
+            index = self.stack_pos(ret.value)
+            self.add('lw $t1, {}($fp)'.format(index))
+            self.add('move $v0, $t1')
+
+    @visitor.when(ReadInt)
+    def visit(self, r):
+        #leer un int de la consola
+        self.add('li $v0, 5')
+        self.add('syscall')
+        #el valor esta en $v0
+        index = self.stack_pos(r.dest)
+        self.add('move $t1, $v0')
+        self.add('sw $t1, {}($fp)'.format(index))
+
+    @visitor.when(ReadStr)
+    def visit(self, r):
+        index = self.stack_pos(r.dest)
+        #leer string de la consola
+
+    @visitor.when(GetAttrib)
+    def visit(self, get):
+        index = self.stack_pos(get.instance)
+        self.add('lw $s1, {}($fp)'.format(index))
+        self.add('lw $s0, {}($s1)'.format(4*get.attribute))
+        index = self.stack_pos(get.dest)
+        self.add('sw $so, {}($fp)'.format(index))
+
+    @visitor.when(SetAttrib)
+    def visit(self, _set):
+        index = self.stack_pos(_set.instance)  
+        self.add('lw $s1, {}($fp)'.format(index))	                    #s1 = this
+        if isinstance(_set.value, int):
+            self.add('li $s0, {}'.format(_set.value))
+        else:
+            index = self.stack_pos(_set.value)
+            self.add('lw $s0, {}($fp)'.format(index))        
+        self.add('sw $s0, {}($s1)'.format(4*_set.attribute))		    #this.data = data
+
+    @visitor.when(Allocate)
+    def visit(self, allocate):
+        #malloc(4)
+        #cuantos atributos tiene el objeto(1)
+        #devolver direccion de inicio del objeto
+        sizeof = self.attributes[allocate.ttype]*4
+        self.add('addiu $a0, $zero, {}'.format(sizeof))  #call sbrk(sizeof(Object))
+        self.add('li $v0, 9')                        			    #set syscall code for sbrk
+        self.add('syscall')
+        #en $v0 se encuentra la direccion de inicio del objeto
+        self.add('addu $s1, $zero, $v0')	                        #s1=this 
+        index = self.stack_pos(allocate.dest)    
+        self.add('sw $s1, {}($fp)'.format(index))
+        
+
+        # # li $a0, 3
+        # # move $s0, $a0  		    #s0=data
+
+        # addiu $a0, $zero, 8     #call sbrk(sizeof(ListNode))
+        
+        # #jal sbrk			    #	i.e.,sbrk(8)
+        # li $v0, 9 			    #set syscall code for sbrk
+        # syscall
+
+
+        # addu $s1, $zero, $v0	#s1=this
+        # sw $s0, 0($s1)		    #this.data = data
+        # addu $t0, $zero, $zero  #$t0 <-- null	(0)
+        # sw $t0, 4($s1)		    #this.next = null\\memory[$s1+4] <-- null
+        # addu $v0, $zero, $s1    #return this
+
+    @visitor.when(Assign)
+    def visit(self, assign):
+        index1 = self.stack_pos(assign.source)
+        self.add('lw $t0, {}($fp)'.format(index1))              #copia cada argumento
+        index2 = self.stack_pos(assign.dest)
+        self.add('lw $t1, {}($fp)'.format(index2))
+        n = self.attributes[assign.type]
+        for i in range(n):
+            self.add('lw $s0, {}($t0)'.format(4*i))
+            self.add('sw $s0, {}($t1)'.format(4*i))
+            
+    @visitor.when(Plus)
+    def visit(self, plus):
+        index = self.stack_pos(plus.left)
+        self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
+        self.add('lw $t1, 0($t0)')                                  #valor del int
+        index = self.stack_pos(plus.right)
+        self.add('lw $t0, {}($fp)'.format(index))
+        self.add('lw $t2, 0($t0)')
+        self.add('add $t1, $t1, $t2')                               #$t1 = a + b
+        index = self.stack_pos(plus.dest)
+        self.add('lw $t0, {}($fp)'.format(index))
+        self.add('sw $t1, 0($t0)')
+
+    @visitor.when(Minus)
+    def visit(self, minus):
+        index = self.stack_pos(minus.left)
+        self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
+        self.add('lw $t1, 0($t0)')                                  #valor del int
+        index = self.stack_pos(minus.right)
+        self.add('lw $t0, {}($fp)'.format(index))
+        self.add('lw $t2, 0($t0)')
+        self.add('sub $t1, $t1, $t2')                               #$t1 = a + b
+        index = self.stack_pos(minus.dest)
+        self.add('lw $t0, {}($fp)'.format(index))
+        self.add('sw $t1, 0($t0)')
+
+    @visitor.when(Label)
+    def visit(self, label):
+        self.add(label.name + ':')
+
+    @visitor.when(Goto)
+    def visit(self, goto):
+        self.add('j ' + goto.name)
+
+    @visitor.when(GotoIf)
+    def visit(self, goto_if):
+        index = self.stack_pos(goto_if.condition)
+        self.add('lw $t0, {}($fp)'.format(index))           #direccion en el heap
+        self.add('lw $t1, 0($t0)')                          
+        self.add('bnez $t1, {}'.format(goto_if.label))
+
