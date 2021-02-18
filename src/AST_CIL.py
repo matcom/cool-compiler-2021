@@ -27,29 +27,16 @@ class Function(Node):
         self.localvars = []
         self.instructions = []
 
-
-# class Param(Node):
-#     def __init__(self, vinfo):
-#         self.vinfo = vinfo
-#     def to_string(self):
-#         return "PARAM {}".format(self.vinfo)
-
-# class Local(Node):
-#     def __init__(self, vinfo):
-#         self.vinfo = vinfo
-#     def to_string(self):
-#         return "LOCAL {}".format(self.vinfo)
-
-
 class Instruction(Node):
     pass
 
 class Assign(Instruction):
-    def __init__(self, dest, source):
+    def __init__(self, dest, _type, source):
         self.dest = dest
+        self.type = _type
         self.source = source
     def to_string(self):
-        return "ASSIGN {} {}\n".format(self.dest, self.source)
+        return "{} <- {}".format(self.dest, self.source)
 
 class Arithmetic(Instruction):
     pass
@@ -89,18 +76,18 @@ class Div(Arithmetic):
 class GetAttrib(Instruction):
     def __init__(self, dest, instance, attribute):
         self.dest = dest
-        self.instance = instance
-        self.attribute = attribute
+        self.instance = instance    #local con la direccion en memoria
+        self.attribute = attribute  #indice del atributo(contando los heredados)
     def to_string(self):
         return "{} = GETATTR {} {}".format(self.dest, self.instance, self.attribute)
 
 class SetAttrib(Instruction):
     def __init__(self, instance, attribute, src):
-        self.instance = instance
-        self.attribute = attribute
-        self.src = src
+        self.instance = instance    #local con la direccion en memoria
+        self.attribute = attribute  #indice del atributo
+        self.value = src
     def to_string(self):
-        return "SETATTR {} {} {}".format(self.instance, self.attribute, self.src)
+        return "SETATTR {} {} {}".format(self.instance, self.attribute, self.value)
 
 class Allocate(Instruction):
     def __init__(self, dest, ttype):
@@ -212,15 +199,29 @@ class ToStr(Instruction):
         self.dest = dest
         self.ivalue = ivalue
 
-class Read(Instruction):
+class ReadStr(Instruction):
     def __init__(self, dest):
         self.dest = dest
+    def to_string(self):
+        return "{} = READ".format(self.dest)
 
-class Print(Instruction):
+class ReadInt(Instruction):
+    def __init__(self, dest):
+        self.dest = dest
+    def to_string(self):
+        return "{} = READ".format(self.dest)
+
+class PrintStr(Instruction):
     def __init__(self, str_addr):
         self.str_addr = str_addr
     def to_string(self):
         return "PRINT {}".format(self.str_addr)
+    
+class PrintInt(Instruction):
+    def __init__(self, value):
+        self.value = value
+    def to_string(self):
+        return "PRINT {}".format(self.value)
 
 class IsVoid(Instruction):
     def __init__(self, dest, obj):
@@ -239,8 +240,11 @@ class LowerEqualThan(Instruction):
 
 class EqualThan(Instruction):
     def __init__(self, dest, left_expr, right_expr):
-        self.left_expr = left_expr
-        self.right_expr = right_expr
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+    def to_string(self):
+        return "{} <- {} == {}".format(self.dest, self.left, self.right)
 
 class EqualStrThanStr(Instruction):
     def __init__(self, dest, left_expr, right_expr):
