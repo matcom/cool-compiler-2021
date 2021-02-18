@@ -145,7 +145,10 @@ class Semantic:
                 self.error.append('({}, {}) - SemanticError: Class {}, or an ancestor of {}, is involved in an inheritance cycle.'.format(c.line, c.index, c.name, c.name))
                 return False
 
-        self.classmethods_original.update(self.classmethods)
+        # self.classmethods_original.update(self.classmethods)
+        for c, d in self.classmethods.items():
+            self.classmethods_original[c] = d.copy()
+
         if not self.ComputeInheritsfeature(program):
             return False
 
