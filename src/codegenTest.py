@@ -20,7 +20,7 @@ def run(addr):
 
     cil = cool_to_cil.Build_CIL(ast, sem)
 
-    mips = cil_to_mips.Build_Mips(cil.astCIL)
+    mips = cil_to_mips.Build_Mips(cil.astCIL, sem)
 
     out_file = addr.split(".")
     out_file[-1] = "mips"
