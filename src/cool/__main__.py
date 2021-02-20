@@ -62,8 +62,7 @@ def parse(file: str, verbose: bool = False):
     ast = parser(tokens)
 
     if parser.contains_errors:
-        for e in parser.errors:
-            typer.echo(e, err=True)
+        typer.echo(parser.errors[0], err=True)
 
     return ast, parser
 
