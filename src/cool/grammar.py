@@ -222,8 +222,8 @@ def lexical_error(lexer):
 ###############
 program %= 'class-list', lambda s: ast.ProgramNode(s[1])
 
-class_list %= 'class-def', lambda s: [s[1]]
-class_list %= 'class-def class-list', lambda s: [s[1]] + s[2]
+class_list %= 'class-def ;', lambda s: [s[1]]
+class_list %= 'class-def ; class-list', lambda s: [s[1]] + s[2]
 
 class_def %= 'class type { feature-list }', lambda s: ast.ClassDeclarationNode(s[2], s[4])
 class_def %= 'class type inherits type { feature-list }', lambda s: ast.ClassDeclarationNode(s[2], s[6], s[4])
