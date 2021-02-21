@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 import cool.semantics.utils.astnodes as ast
 import cool.semantics.utils.errors as err
-import cool.semantics.visitor as visitor
+import cool.visitor as visitor
 from cool.semantics.utils.scope import Context, Method, Scope, Type, SemanticError
 
 

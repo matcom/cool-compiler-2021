@@ -1,7 +1,7 @@
 from typing import List
 
 import cool.semantics.utils.astnodes as ast
-import cool.semantics.visitor as visitor
+import cool.visitor as visitor
 from cool.semantics.utils.scope import Context, SemanticError
 
 
