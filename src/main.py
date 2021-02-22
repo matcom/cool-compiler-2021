@@ -33,6 +33,21 @@ class Compiler:
 
     def lexing(self):
         self.lexer = Lexer()
+        tokens = self.lexer.tokenizer(self.code)
+
+        for token in tokens:
+            print(token)
+
+        if len(self.lexer.errors) > 0:
+            for error in self.lexer.errors:
+                print(error)
+            exit(1)
+        elif len(tokens) == 0:
+            error_text = SyntaticError.ERROR % 'EOF'
+            print(SyntaticError(0, 0, error_text))
+            exit(1)
+        else:
+            print('COMPLETED LEXER!!!')
 
 def main():
     input_file = sys.argv[1]
