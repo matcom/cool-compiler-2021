@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+from utils.errors import *
+
 class Compiler:
     
     def __init__(self, input_file, output_file):
@@ -12,14 +14,16 @@ class Compiler:
         print(self.output_file)
 
         if not str(self.input_file).endswith('.cl'):
-            print('El archivo de entrada debe terminar en .cl')
+            error_text = CompilerError.WRONG_EXTENTION
+            print(CompilerError(0, 0, error_text))
             exit(1)
 
         try:
             with open(self.input_file, encoding = 'utf-8') as file:
                 self.code += file.read()
         except (IOError, FileNotFoundError):
-            print('El archivo de entrada no fue encontrado')
+            error_text = CompilerError.UNKNOWN_FILE % str(self.input_file)
+            print(CompilerError(0, 0, error_text))
             exit(1)
 
         self.steps = [ self.lexing ]
