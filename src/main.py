@@ -35,8 +35,8 @@ class Compiler:
         self.lexer = Lexer()
         tokens = self.lexer.tokenizer(self.code)
 
-        for token in tokens:
-            print(token)
+        # for token in tokens:
+        #     print(token)
 
         if len(self.lexer.errors) > 0:
             for error in self.lexer.errors:
@@ -46,8 +46,8 @@ class Compiler:
             error_text = SyntaticError.ERROR % 'EOF'
             print(SyntaticError(0, 0, error_text))
             exit(1)
-        else:
-            print('COMPLETED LEXER!!!')
+        # else:
+        #     print('COMPLETED LEXER!!!')
 
 def main():
     input_file = sys.argv[1]
