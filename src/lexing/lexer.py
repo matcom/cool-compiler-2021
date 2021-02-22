@@ -1,6 +1,6 @@
 import ply.lex as lex
 from utils.utils import Token
-# from utils.errors import LexicographicError
+from utils.errors import LexicographicError
 
 class Lexer:
 

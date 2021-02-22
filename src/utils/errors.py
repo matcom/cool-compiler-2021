@@ -1,3 +1,4 @@
+
 class CoolError(Exception):
     def __init__(self, line, column, text):
         super().__init__(text)
@@ -28,3 +29,18 @@ class CompilerError(CoolError):
     @property
     def error_type(self):
         return 'CompilerError'
+
+class LexicographicError(CoolError):
+    '''
+    Errores detectados por el lexer.
+    '''
+    UNKNOWN_TOKEN = 'ERROR "%s".'
+    UNTERMINATED_STRING = 'Unterminated string constant.'
+    EOF_COMMENT = 'EOF in comment.'
+    EOF_STRING = 'EOF in string constant.'
+    NULL_STRING = 'String contains null character.'
+
+    @property
+    def error_type(self):
+        return 'LexicographicError'
+
