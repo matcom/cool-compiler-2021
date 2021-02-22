@@ -34,13 +34,23 @@ class LexicographicError(CoolError):
     '''
     Errores detectados por el lexer.
     '''
-    UNKNOWN_TOKEN = 'ERROR "%s".'
-    UNTERMINATED_STRING = 'Unterminated string constant.'
-    EOF_COMMENT = 'EOF in comment.'
-    EOF_STRING = 'EOF in string constant.'
-    NULL_STRING = 'String contains null character.'
+    UNKNOWN_TOKEN = 'ERROR "%s"'
+    UNTERMINATED_STRING = 'Unterminated string constant'
+    EOF_COMMENT = 'EOF in comment'
+    EOF_STRING = 'EOF in string constant'
+    NULL_STRING = 'String contains null character'
 
     @property
     def error_type(self):
         return 'LexicographicError'
+
+class SyntaticError(CoolError):
+    '''
+    Errores detectados por el parser.
+    '''
+    ERROR = 'ERROR at or near "%s"'
+
+    @property
+    def error_type(self):
+        return 'SyntacticError'
 
