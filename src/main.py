@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 from utils.errors import *
+from lexing.lexer import Lexer
 
 class Compiler:
     
@@ -9,9 +10,7 @@ class Compiler:
         self.input_file = Path(input_file)
         self.output_file = Path(output_file)
         self.code = ''
-
-        print(self.input_file)
-        print(self.output_file)
+        self.lexer = None
 
         if not str(self.input_file).endswith('.cl'):
             error_text = CompilerError.WRONG_EXTENTION
@@ -33,7 +32,7 @@ class Compiler:
             step()
 
     def lexing(self):
-        print('lexing')
+        self.lexer = Lexer()
 
 def main():
     input_file = sys.argv[1]
