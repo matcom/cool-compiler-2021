@@ -14,7 +14,7 @@ Ud. podrá encontrar la especificación formal del lenguaje COOL en el documento
 
 ### Compilando su proyecto
 
-Si es necesario compilar su proyecto, incluya todas las instrucciones necesarias en un archivo [`/src/makefile`](/src/makefile).
+Si es necesario compilar su proyecto, incluya todas las instrucciones necesarias en un archivo [`makefile`](makefile).
 Durante la evaluación su proyecto se compilará ejecutando la siguiente secuencia:
 
 ```bash
@@ -25,7 +25,7 @@ $ make
 
 ### Ejecutando su proyecto
 
-Incluya en un archivo [`/src/coolc.sh`](/src/coolc.sh) todas las instrucciones que hacen falta para lanzar su compilador. Recibirá como entrada un archivo con extensión `.cl` y debe generar como salida un archivo `.mips` cuyo nombre será el mismo que la entrada.
+Incluya en un archivo [`coolc.sh`](coolc.sh) todas las instrucciones que hacen falta para lanzar su compilador. Recibirá como entrada un archivo con extensión `.cl` y debe generar como salida un archivo `.mips` cuyo nombre será el mismo que la entrada.
 
 Para lanzar el compilador, se ejecutará la siguiente instrucción:
 
