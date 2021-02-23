@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 from utils.ast import *
 from lexing.lexer import Lexer
-from utils.errors import SyntaticError
+from utils.errors import SyntacticError
 
 class Parser:
     def __init__(self, lexer=None):
@@ -411,17 +411,17 @@ class Parser:
 
     def p_error(self, parse):
         if parse:
-            error_text = SyntaticError.ERROR % parse.value
+            error_text = SyntacticError.ERROR % parse.value
             line = self.find_line(parse)
             column = self.lexer.find_column(parse.lexer, parse)
-            self.errors.append(SyntaticError(line, column, error_text))
+            self.errors.append(SyntacticError(line, column, error_text))
             print(self.errors[0])
             exit(1)
         else:
-            error_text = SyntaticError.ERROR % 'EOF'
+            error_text = SyntacticError.ERROR % 'EOF'
             line = self.find_line(parse)
             column = self.lexer.find_column(self.lexer.lexer, self.lexer.lexer)
-            self.errors.append(SyntaticError(line, column - 1, error_text))
+            self.errors.append(SyntacticError(line, column - 1, error_text))
     
     def find_line(self, parse):
         line = 0

@@ -44,7 +44,7 @@ class LexicographicError(CoolError):
     def error_type(self):
         return 'LexicographicError'
 
-class SyntaticError(CoolError):
+class SyntacticError(CoolError):
     '''
     Errores detectados por el parser.
     '''
