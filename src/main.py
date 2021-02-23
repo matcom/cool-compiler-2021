@@ -42,8 +42,9 @@ class Compiler:
         #     print(token)
 
         if len(self.lexer.errors) > 0:
-            for error in self.lexer.errors:
-                print(error)
+            # for error in self.lexer.errors:
+            #     print(error)
+            print(self.lexer.errors[0])
             exit(1)
         elif len(tokens) == 0:
             error_text = SyntacticError.ERROR % 'EOF'

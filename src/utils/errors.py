@@ -34,11 +34,11 @@ class LexicographicError(CoolError):
     '''
     Errores detectados por el lexer.
     '''
-    UNKNOWN_TOKEN = 'ERROR "%s"'
-    UNTERMINATED_STRING = 'Unterminated string constant'
-    EOF_COMMENT = 'EOF in comment'
-    EOF_STRING = 'EOF in string constant'
-    NULL_STRING = 'String contains null character'
+    UNKNOWN_TOKEN = 'ERROR "%s"\n'
+    UNTERMINATED_STRING = 'Unterminated string constant\n'
+    EOF_COMMENT = 'EOF in comment\n'
+    EOF_STRING = 'EOF in string constant\n'
+    NULL_STRING = 'String contains null character\n'
 
     @property
     def error_type(self):
