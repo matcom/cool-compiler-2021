@@ -46,8 +46,8 @@ class Compiler:
                 print(error)
             exit(1)
         elif len(tokens) == 0:
-            error_text = SyntaticError.ERROR % 'EOF'
-            print(SyntaticError(0, 0, error_text))
+            error_text = SyntacticError.ERROR % 'EOF'
+            print(SyntacticError(0, 0, error_text))
             exit(1)
         # else:
         #     print('COMPLETED LEXER!!!')
