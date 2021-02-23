@@ -3,6 +3,7 @@ from pathlib import Path
 
 from utils.errors import *
 from lexing.lexer import Lexer
+from parsing.parser import Parser
 
 class Compiler:
     
@@ -11,6 +12,8 @@ class Compiler:
         self.output_file = Path(output_file)
         self.code = ''
         self.lexer = None
+        self.parser = None
+        self.ast = None
 
         if not str(self.input_file).endswith('.cl'):
             error_text = CompilerError.WRONG_EXTENTION
@@ -25,7 +28,7 @@ class Compiler:
             print(CompilerError(0, 0, error_text))
             exit(1)
 
-        self.steps = [ self.lexing ]
+        self.steps = [ self.lexing, self.parsing ]
 
     def compile(self):
         for step in self.steps:
@@ -48,6 +51,16 @@ class Compiler:
             exit(1)
         # else:
         #     print('COMPLETED LEXER!!!')
+
+    def parsing(self):
+        self.parser = Parser(lexer=self.lexer)
+        self.ast = self.parser(self.code)
+
+        if len(self.parser.errors) > 0:
+            print(self.parser.errors[0])
+            exit(1)
+        else:
+            print('COMPLETED PARSING!!!')
 
 def main():
     input_file = sys.argv[1]
