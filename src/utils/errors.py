@@ -81,3 +81,14 @@ class SemanticError(CoolError):
     def error_type(self):
         return 'SemanticError'
 
+class NamesError(SemanticError):
+    '''
+    Errores detectados al referenciar un identificador 
+    en un ámbito en el que no es visible.
+    '''
+    VARIABLE_NOT_DEFINED = 'Undeclared identifier %s'
+    
+    @property
+    def error_type(self):
+        return 'NameError'
+
