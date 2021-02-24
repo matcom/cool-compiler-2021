@@ -54,3 +54,30 @@ class SyntacticError(CoolError):
     def error_type(self):
         return 'SyntacticError'
 
+class SemanticError(CoolError):
+    '''
+    Errores detectados por cualquier otro error semántico. 
+    '''
+    SELF_IS_READONLY = 'Cannot assign to \'self\''
+    SELF_IN_LET = '\'self\' cannot be bound in a \'let\' expression'
+    SELF_PARAM = "'self' cannot be the name of a formal parameter"
+    SELF_ATTR = "'self' cannot be the name of an attribute"
+    LOCAL_ALREADY_DEFINED = 'Variable "%s" is already defined in method "%s"'
+    ARGUMENT_ERROR = 'Method %s called with wrong number of arguments'
+    REDEFINITION_ERROR = 'Redefinition of basic class %s'
+    INHERIT_ERROR = 'Class %s cannot inherit class %s'
+    DUPLICATE_CASE_BRANCH = 'Duplicate branch %s in case statement'
+    TYPE_ALREADY_DEFINED = 'Classes may not be redefined'
+    ATTRIBUTE_ALREADY_DEFINED = 'Attribute %s is multiply defined in class'
+    ATTR_DEFINED_PARENT = 'Attribute %s is an attribute of an inherited class'
+    METHOD_ALREADY_DEFINED = 'Method %s is multiply defined'
+    CIRCULAR_DEPENDENCY = 'Class %s, or an ancestor of %s, is involved in an inheritance cycle'
+    WRONG_SIGNATURE_RETURN = 'In redefined method %s, return type %s is different from original return type %s'
+    WRONG_NUMBER_PARAM = 'Incompatible number of formal parameters in redefined method %s'
+    PARAMETER_MULTY_DEFINED = 'Formal parameter %s is multiply defined'
+    WRONG_SIGNATURE_PARAMETER = 'In redefined method %s, parameter type %s is different from original type %s'
+
+    @property
+    def error_type(self):
+        return 'SemanticError'
+
