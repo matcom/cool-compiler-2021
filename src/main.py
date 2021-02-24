@@ -51,8 +51,8 @@ class Compiler:
             error_text = SyntacticError.ERROR % 'EOF'
             print(SyntacticError(0, 0, error_text))
             exit(1)
-        else:
-            print('COMPLETED LEXER!!!')
+        # else:
+        #     print('COMPLETED LEXER!!!')
 
     def parsing(self):
         self.parser = Parser(lexer=self.lexer)
@@ -61,8 +61,8 @@ class Compiler:
         if len(self.parser.errors) > 0:
             print(self.parser.errors[0])
             exit(1)
-        else:
-            print('COMPLETED PARSING!!!')
+        # else:
+        #     print('COMPLETED PARSING!!!')
 
     def semantics(self):
         semantic_analyzer = SemanticAnalyzer(self.ast)
