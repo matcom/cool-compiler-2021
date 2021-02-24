@@ -92,3 +92,44 @@ class NamesError(SemanticError):
     def error_type(self):
         return 'NameError'
 
+class TypesError(SemanticError):
+    '''
+    Errores detectados al identificar un problema de tipos.
+    '''
+    INCOMPATIBLE_TYPES = 'Cannot convert "%s" into "%s"'
+    ATTR_TYPE_ERROR = 'Inferred type %s of initialization of attribute %s does not conform to declared type %s'
+    ATTR_TYPE_UNDEFINED = 'Class %s of attribute %s is undefined'
+    BOPERATION_NOT_DEFINED = 'non-Int arguments: %s %s %s'
+    COMPARISON_ERROR = 'Illegal comparison with a basic type'
+    UOPERATION_NOT_DEFINED = 'Argument of \'%s\' has type %s instead of %s'
+    CLASS_CASE_BRANCH_UNDEFINED  = 'Class %s of case branch is undefined'
+    PREDICATE_ERROR = 'Predicate of \'%s\' does not have type %s'
+    INCOSISTENT_ARG_TYPE = 'In call of method %s, type %s of parameter %s does not conform to declared type %s'
+    INCOMPATIBLE_TYPES_DISPATCH = 'Expression type %s does not conform to declared static dispatch type %s'
+    INHERIT_UNDEFINED = 'Class %s inherits from an undefined class %s'
+    UNCONFORMS_TYPE = 'Inferred type %s of initialization of %s does not conform to identifier\'s declared type %s'
+    UNDEFINED_TYPE_LET = 'Class %s of let-bound identifier %s is undefined'
+    LOOP_CONDITION_ERROR = 'Loop condition does not have type Bool'
+    RETURN_TYPE_ERROR = 'Inferred return type %s of method test does not conform to declared return type %s'
+    PARAMETER_UNDEFINED = 'Class %s of formal parameter %s is undefined'
+    RETURN_TYPE_UNDEFINED = 'Undefined return type %s in method %s'
+    NEW_UNDEFINED_CLASS = '\'new\' used with undefined class %s'
+    PARENT_ALREADY_DEFINED = 'Parent type is already set for "%s"'
+    TYPE_NOT_DEFINED = 'Type "%s" is not defined'
+
+    @property
+    def error_type(self):
+        return 'TypeError'
+
+class AttributesError(SemanticError):
+    '''
+    Errores detectados cuando un atributo o método 
+    se referencia pero no está definido.
+    '''
+    DISPATCH_UNDEFINED = 'Dispatch to undefined method %s'
+    METHOD_NOT_DEFINED = 'Method "%s" is not defined in "%s"'
+    ATTRIBUTE_NOT_DEFINED = 'Attribute "%s" is not defined in %s'
+
+    @property
+    def error_type(self):
+        return 'AttributeError'
