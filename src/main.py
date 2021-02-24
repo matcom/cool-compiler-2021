@@ -4,6 +4,7 @@ from pathlib import Path
 from utils.errors import *
 from lexing.lexer import Lexer
 from parsing.parser import Parser
+from semantic.semantic import SemanticAnalyzer
 
 class Compiler:
     
@@ -14,6 +15,8 @@ class Compiler:
         self.lexer = None
         self.parser = None
         self.ast = None
+        self.context = None
+        self.scope = None
 
         if not str(self.input_file).endswith('.cl'):
             error_text = CompilerError.WRONG_EXTENTION
@@ -28,7 +31,7 @@ class Compiler:
             print(CompilerError(0, 0, error_text))
             exit(1)
 
-        self.steps = [ self.lexing, self.parsing ]
+        self.steps = [ self.lexing, self.parsing, self.semantics ]
 
     def compile(self):
         for step in self.steps:
@@ -60,6 +63,16 @@ class Compiler:
             exit(1)
         else:
             print('COMPLETED PARSING!!!')
+
+    def semantics(self):
+        semantic_analyzer = SemanticAnalyzer(self.ast)
+        self.ast, self.context, self.scope = semantic_analyzer.analyze()
+
+        if len(semantic_analyzer.errors) > 0:
+            print(semantic_analyzer.errors[0])
+            exit(1)
+        else:
+            print('COMPLETED SEMANTIC ANALYSER!!!')
 
 def main():
     input_file = sys.argv[1]
