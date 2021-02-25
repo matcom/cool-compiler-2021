@@ -38,7 +38,7 @@ def test_lexer():
     programs, results = get_programs('lexer')
 
     for program, result in zip(programs, results):
-        tokens, lexer = tokenize(program)
+        _, lexer = tokenize(program)
         assert lexer.contain_errors and '\n'.join(lexer.errors) == result.strip()
 
 
@@ -47,7 +47,7 @@ def test_parser():
 
     for code, result in zip(programs, results):
         tokens, _ = tokenize(code)
-        ast, parser = parse(tokens)
+        _, parser = parse(tokens)
         assert parser.contains_errors and '\n'.join(parser.errors) == result
 
 

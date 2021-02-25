@@ -151,12 +151,12 @@ def single_line_comment(lexer):
 
 @G.terminal('multi_line_comment', r'\(\*')
 def multi_line_comment(lexer: Lexer):
-    stack = ['(*']
+    counter = 1
     text = lexer.text
     pos = lexer.position + 2
     lex = '(*'
 
-    while stack:
+    while counter > 1:
         if pos >= len(text):
             lexer.contain_errors = True
             lexer.position = pos
@@ -165,12 +165,12 @@ def multi_line_comment(lexer: Lexer):
             return None
 
         if text.startswith('(*', pos):
-            stack.append('(*')
+            counter += 1
             pos += 2
             lex += '(*'
             lexer.column += 2
         elif text.startswith('*)', pos):
-            stack.pop()
+            counter -= 1
             pos += 2
             lex += '*)'
             lexer.column += 2

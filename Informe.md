@@ -1,15 +1,16 @@
 Segundo Proyecto de Compilación
 ===============================
 
-Título:
+Título
 --------------------------------------------------------------------------------------------
+
 > Inferencia de tipos en el lenguaje de programación COOL, una aproximación a través de grafos.
 
-Estudiantes:
+Estudiantes
 -----------
 
->    - Alejandro Klever Clemente C-311
->    - Miguel Angel Gonzalez Calles C-311
+> - Alejandro Klever Clemente C-311
+> - Miguel Angel Gonzalez Calles C-311
 
 ### 1 Inferencia de Tipos
 
