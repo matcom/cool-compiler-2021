@@ -6,6 +6,7 @@ class SemanticException(Exception):
     def text(self):
         return self.args[0]
 
+
 # Representa un atributo en un tipo del programa
 class Attribute:
     def __init__(self, name : str, type, line : int, column : int, expression = None):
@@ -27,7 +28,6 @@ class Method:
         self.param_names = param_names
         self.param_types = param_types
         self.return_type = return_type
-        self.return_info = None
 
     def __str__(self):
         params = ', '.join(f'{n}: {t.name}' for n, t in zip(self.param_names, self.param_types))
@@ -55,15 +55,18 @@ class Type:
         if self.parent is not None:
             raise SemanticException(f'Parent type is already set for {self.name}.')
         if parent.sealed:
-            raise SemanticException(f'Parent type "{parent.name}" is sealed. Can\'t inherit from it.')
+            raise SemanticException(f'Cannot inherit from sealed type {parent.name}')
         self.parent = parent
         self.depth = parent.depth + 1
 
     # Retorna el tipo en el arbol de herencia de mayor profundidad
     # que es padre comun de ambos tipos
     def type_union(self, other):
-        if self is AutoType: return other
-        elif other is AutoType: return self
+        if self is VoidType or other is VoidType:
+            return VoidType()
+
+        if self is ErrorType or other is ErrorType:
+            return ErrorType()
 
         x, y = self, other
         while x.depth > y.depth:
@@ -92,13 +95,13 @@ class Type:
     # Define un atributo para el tipo actual con el nombre y el tipo correspondiente
     def define_attribute(self, name:str, typex, line, column):
         try:
-            self.get_attribute(name)
-        except SemanticException:
+            attribute = next(attr for attr in self.attributes if attr.name == name)
+        except StopIteration:
             attribute = Attribute(name, typex, line, column)
             self.attributes.append(attribute)
             return attribute
         else:
-            raise SemanticException(f'Attribute "{name}" is already defined in {self.name}.')
+            raise SemanticException(f'Attribute "{name}" is multiply defined in class.')
 
     # Retorna el metodo del tipo actual con el nombre correspondiente
     def get_method(self, name:str):
@@ -116,20 +119,24 @@ class Type:
     # retorno correspondientes
     def define_method(self, name:str, param_names:list, param_types:list, return_type, line, column):
         if name in self.methods:
-            raise SemanticException(f'Method "{name}" already defined in {self.name}')
+            raise SemanticException(f'Method {name} is multiply defined')
 
         method = self.methods[name] = Method(name, param_names, param_types, return_type)
         method.return_info = VariableInfo(f'{self.name}_{name}_returnType', return_type,
-                                          line, column, f'{self.name}_{name}_returnType')
+                                          line, column)
+
         return method
 
     # Returns true if other is a parent of current type
-    def inherits_from(self, other):
+    def conforms_to(self, other):
         return other.is_special_type() \
                or self.name == other.name \
-               or (self.parent is not None and self.parent.inherits_from(other))
+               or (self.parent is not None and self.parent.conforms_to(other))
 
     def is_special_type(self):
+        return False
+
+    def is_void_type(self):
         return False
 
     def __str__(self):
@@ -154,7 +161,7 @@ class SelfType(Type):
         Type.__init__(self, 'SELF_TYPE')
         self.sealed = True
 
-    def inherits_from(self, other):
+    def conforms_to(self, other):
         return False
 
     def is_special_type(self):
@@ -163,18 +170,21 @@ class SelfType(Type):
     def __eq__(self, other):
         return isinstance(other, SelfType)
 
-class AutoType(Type):
+class VoidType(Type):
     def __init__(self):
-        Type.__init__(self, 'AUTO_TYPE')
+        Type.__init__(self, 'VOID_TYPE')
         self.sealed = True
 
     def type_union(self, other):
         return self
 
-    def inherits_from(self, other):
+    def conforms_to(self, other):
         return True
 
     def is_special_type(self):
+        return True
+
+    def is_void_type(self):
         return True
 
     def __eq__(self, other):
@@ -188,7 +198,7 @@ class ErrorType(Type):
     def type_union(self, other):
         return self
 
-    def inherits_from(self, other):
+    def conforms_to(self, other):
         return True
 
     def is_special_type(self):
@@ -199,64 +209,17 @@ class ErrorType(Type):
 
 # Clase para representar una variable dentro del programa
 class VariableInfo:
-    def __init__(self, name, vtype, line, column, info):
+    def __init__(self, name, vtype, line, column):
         self.name = name
         self.type = vtype
-        self.info = info
         self.line = line
         self.column = column
-        self.infered = not isinstance(vtype, AutoType)
+
         self.upper = []
         self.lower = []
         self.dependencies = []
         self.weakDependencies = []
 
-    # Incluye un tipo entre los tipos posibles de los que hereda la variable
-    def set_upper_type(self, typex):
-        if not self.infered and not isinstance(typex, AutoType):
-            self.upper.append(typex)
-    def set_lower_type(self, typex):
-        if not self.infered and not isinstance(typex, AutoType):
-            self.lower.append(typex)
-
-    # Infiere el tipo de la variable, obtiene entre todos los tipos posibles
-    # uno de los que hereden todos los tipos definidos anteriormente, basicamente
-    # obtiene el lca de todos los tipos definidos anteriormente
-    def infer_type(self):
-        if not self.infered:
-            for d in self.dependencies:
-                if not isinstance(d, VariableInfo) or d.name == self.name:
-                    continue
-                if isinstance(d.type, AutoType):
-                    return False
-                self.lower.append(d.type)
-
-            upper_type = None
-            for x in self.upper:
-                if not upper_type or x.inherits_from(upper_type):
-                    upper_type = x
-                elif upper_type and not upper_type.inherits_from(x):
-                    upper_type = ErrorType()
-                    return False
-
-            lower_type = None
-            for typex in self.lower:
-                lower_type = typex if not lower_type else lower_type.type_union(typex)
-
-            if lower_type:
-                self.type = lower_type if not upper_type or lower_type.inherits_from(upper_type) else ErrorType()
-            else:
-                self.type = upper_type
-
-            if not self.type or isinstance(self.type, ErrorType):
-                self.type = AutoType()
-                return False
-
-            self.infered = not isinstance(self.type, AutoType)
-            self.upper, self.lower = [], []
-
-            return self.infered
-        return False
 
 # Clase para representar el contexto en el que se guardan las variables y los
 # tipos durante el chequeo semantico del programa
@@ -267,14 +230,14 @@ class Context:
     # Incluye un tipo dentro del contexto
     def add_type(self, type : Type):
         if type.name in self.types:
-            raise SemanticException(f'Type with the same name ({type.name}) already in context.')
+            raise SemanticException('Classes may not be redefined')
         self.types[type.name] = type
         return type
 
     # Crea un tipo dentro del contexto
     def create_type(self, name : str):
         if name in self.types:
-            raise SemanticException(f'Type with the same name ({name}) already in context.')
+            raise SemanticException('Classes may not be redefined')
         type = self.types[name] = Type(name)
         return type
 
@@ -283,7 +246,7 @@ class Context:
         try:
             return self.types[name]
         except KeyError:
-            raise SemanticException(f'Type ({name}) not defined.')
+            raise SemanticException(f'Type {name} not defined.')
 
     def __str__(self):
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
@@ -305,8 +268,8 @@ class Scope:
         return self.childs[-1]
 
     # Define una variable en el scope
-    def define_variable(self, name : str, type : Type, line : int, column : int, info : str = ''):
-        self.locals.append(VariableInfo(name, type, line, column, info))
+    def define_variable(self, name : str, type : Type, line : int, column : int):
+        self.locals.append(VariableInfo(name, type, line, column))
         return self.locals[-1]
 
     # Retorna una variable definida en el scope, None si no esta definida

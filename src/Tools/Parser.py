@@ -19,12 +19,12 @@ class DeclarationNode(Node):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx, features, parent=None):
+    def __init__(self, classx, idx, features, parent=None):
         self.id = idx
         self.parent = parent
         self.features = features
-        self.line = idx.line
-        self.column = idx.column
+        self.line = classx.line
+        self.column = classx.column
 
 
 class AttrDeclarationNode(DeclarationNode):
@@ -51,43 +51,43 @@ class ExpressionNode(Node):
 
 
 class IfThenElseNode(ExpressionNode):
-    def __init__(self, condition, if_body, else_body):
+    def __init__(self, ifx, condition, if_body, else_body):
         self.condition = condition
         self.if_body = if_body
         self.else_body = else_body
-        self.line = condition.line
-        self.column = condition.column
+        self.line = ifx.line
+        self.column = ifx.column
 
 
 class WhileLoopNode(ExpressionNode):
-    def __init__(self, condition, body):
+    def __init__(self, whilex, condition, body):
         self.condition = condition
         self.body = body
-        self.line = condition.line
-        self.column = condition.column
+        self.line = whilex.line
+        self.column = whilex.column
 
 
 class BlockNode(ExpressionNode):
-    def __init__(self, expressions):
+    def __init__(self, brace, expressions):
         self.expressions = expressions
-        self.line = expressions[-1].line
-        self.column = expressions[-1].column
+        self.line = brace.line
+        self.column = brace.column
 
 
 class LetInNode(ExpressionNode):
-    def __init__(self, let_body, in_body):
+    def __init__(self, let, let_body, in_body):
         self.let_body = let_body
         self.in_body = in_body
-        self.line = in_body.line
-        self.column = in_body.column
+        self.line = let.line
+        self.column = let.column
 
 
 class CaseOfNode(ExpressionNode):
-    def __init__(self, expression, branches):
+    def __init__(self, case, expression, branches):
         self.expression = expression
         self.branches = branches
-        self.line = expression.line
-        self.column = expression.column
+        self.line = case.line
+        self.column = case.column
 
 
 class AssignNode(ExpressionNode):
@@ -106,15 +106,18 @@ class UnaryNode(ExpressionNode):
 
 
 class NotNode(UnaryNode):
-    pass
+    def __init__(self, notx, expression):
+        super().__init__(expression)
+        self.line = notx.line
+        self.column = notx.column
 
 
 class BinaryNode(ExpressionNode):
-    def __init__(self, left, right):
+    def __init__(self, left, operator, right):
         self.left = left
         self.right = right
-        self.line = left.line
-        self.column = left.column
+        self.line = operator.line
+        self.column = operator.column
 
 
 class LessEqualNode(BinaryNode):
@@ -150,11 +153,17 @@ class DivNode(ArithmeticNode):
 
 
 class IsVoidNode(UnaryNode):
-    pass
+    def __init__(self, isvoid, expression):
+        super().__init__(expression)
+        self.line = isvoid.line
+        self.column = isvoid.column
 
 
 class ComplementNode(UnaryNode):
-    pass
+    def __init__(self, complement, expression):
+        super().__init__(expression)
+        self.line = complement.line
+        self.column = complement.column
 
 
 class FunctionCallNode(ExpressionNode):
@@ -163,8 +172,8 @@ class FunctionCallNode(ExpressionNode):
         self.id = idx
         self.args = args
         self.type = typex
-        self.line = idx.line
-        self.column = idx.column
+        self.line = obj.line
+        self.column = obj.column
 
 
 class MemberCallNode(ExpressionNode):
@@ -176,10 +185,10 @@ class MemberCallNode(ExpressionNode):
 
 
 class NewNode(ExpressionNode):
-    def __init__(self, typex):
+    def __init__(self, new, typex):
         self.type = typex
-        self.line = typex.line
-        self.column = typex.column
+        self.line = new.line
+        self.column = new.column
 
 
 class AtomicNode(ExpressionNode):
@@ -239,9 +248,9 @@ class_list %= def_class + class_list, lambda h, s: [s[1]] + s[2]
 class_list %= def_class, lambda h, s: [s[1]]
 
 # Defincicion de la clase
-def_class %= classx + typex + ocur + feature_list + ccur + semi, lambda h, s: ClassDeclarationNode(s[2], s[4])
+def_class %= classx + typex + ocur + feature_list + ccur + semi, lambda h, s: ClassDeclarationNode(s[1], s[2], s[4])
 def_class %= classx + typex + inherits + typex + ocur + feature_list + ccur + semi, lambda h, s: ClassDeclarationNode(
-    s[2], s[6], s[4])
+    s[1], s[2], s[6], s[4])
 
 # Lista de propiedades de la clase
 feature_list %= feature + feature_list, lambda h, s: [s[1]] + s[2]
@@ -270,32 +279,32 @@ param %= idx + colon + typex, lambda h, s: (s[1], s[3])
 
 ### Expresiones ###
 # Expresion Let-in
-expr_1 %= let + let_list + inx + expr_1, lambda h, s: LetInNode(s[2], s[4])
+expr_1 %= let + let_list + inx + expr_1, lambda h, s: LetInNode(s[1], s[2], s[4])
 let_list %= idx + colon + typex, lambda h, s: [(s[1], s[3], None)]
 let_list %= idx + colon + typex + larrow + expr_1, lambda h, s: [(s[1], s[3], s[5])]
 let_list %= idx + colon + typex + comma + let_list, lambda h, s: [(s[1], s[3], None)] + s[5]
 let_list %= idx + colon + typex + larrow + expr_1 + comma + let_list, lambda h, s: [(s[1], s[3], s[5])] + s[7]
 
 expr_1 %= idx + larrow + expr_1, lambda h, s: AssignNode(s[1], s[3])
-expr_1 %= notx + expr_1, lambda h, s: NotNode(s[2])
-expr_1 %= expr_2 + equal + expr_1, lambda h, s: EqualNode(s[1], s[3])
+expr_1 %= notx + expr_1, lambda h, s: NotNode(s[1], s[2])
+expr_1 %= expr_2 + equal + expr_1, lambda h, s: EqualNode(s[1], s[2], s[3])
 expr_1 %= expr_2, lambda h, s: s[1]
 
-expr_2 %= arith + less + arith, lambda h, s: LessNode(s[1], s[3])
-expr_2 %= arith + leq + arith, lambda h, s: LessEqualNode(s[1], s[3])
+expr_2 %= arith + less + arith, lambda h, s: LessNode(s[1], s[2], s[3])
+expr_2 %= arith + leq + arith, lambda h, s: LessEqualNode(s[1], s[2], s[3])
 expr_2 %= arith, lambda h, s: s[1]
 
 #Expresiones aritmeticas
-arith %= arith + plus + factor, lambda h, s: PlusNode(s[1], s[3])
-arith %= arith + minus + factor, lambda h, s: MinusNode(s[1], s[3])
+arith %= arith + plus + factor, lambda h, s: PlusNode(s[1], s[2], s[3])
+arith %= arith + minus + factor, lambda h, s: MinusNode(s[1], s[2], s[3])
 arith %= factor, lambda h, s: s[1]
 
-factor %= factor + star + atom, lambda h, s: StarNode(s[1], s[3])
-factor %= factor + div + atom, lambda h, s: DivNode(s[1], s[3])
+factor %= factor + star + atom, lambda h, s: StarNode(s[1], s[2], s[3])
+factor %= factor + div + atom, lambda h, s: DivNode(s[1], s[2], s[3])
 factor %= term, lambda h, s: s[1]
 
-term %= compl + term, lambda h, s: ComplementNode(s[2])
-term %= isvoid + term, lambda h, s: IsVoidNode(s[2])
+term %= compl + term, lambda h, s: ComplementNode(s[1], s[2])
+term %= isvoid + term, lambda h, s: IsVoidNode(s[1], s[2])
 term %= atom, lambda h, s: s[1]
 
 # Encapsulaciones atomicas
@@ -304,19 +313,19 @@ atom %= integer, lambda h, s: IntegerNode(s[1])
 atom %= string, lambda h, s: StringNode(s[1])
 atom %= boolx, lambda h, s: BoolNode(s[1])
 atom %= idx, lambda h, s: IdNode(s[1])
-atom %= ifx + expr_1 + then + expr_1 + elsex + expr_1 + fi, lambda h, s: IfThenElseNode(s[2], s[4], s[6])
-atom %= whilex + expr_1 + loop + expr_1 + pool, lambda h, s: WhileLoopNode(s[2], s[4])
+atom %= ifx + expr_1 + then + expr_1 + elsex + expr_1 + fi, lambda h, s: IfThenElseNode(s[1], s[2], s[4], s[6])
+atom %= whilex + expr_1 + loop + expr_1 + pool, lambda h, s: WhileLoopNode(s[1], s[2], s[4])
 
 # Expresion new
-atom %= new + typex, lambda h, s: NewNode(s[2])
+atom %= new + typex, lambda h, s: NewNode(s[1], s[2])
 
 # Encapsulamiento entre corchetes
-atom %= ocur + expr_list + ccur, lambda h, s: BlockNode(s[2])
+atom %= ocur + expr_list + ccur, lambda h, s: BlockNode(s[1], s[2])
 expr_list %= expr_1 + semi, lambda h, s: [s[1]]
 expr_list %= expr_1 + semi + expr_list, lambda h, s: [s[1]] + s[3]
 
 # Expresion Case of
-atom %= case + expr_1 + of + case_list + esac, lambda h, s: CaseOfNode(s[2], s[4])
+atom %= case + expr_1 + of + case_list + esac, lambda h, s: CaseOfNode(s[1], s[2], s[4])
 case_list %= idx + colon + typex + rarrow + expr_1 + semi, lambda h, s: [(s[1], s[3], s[5])]
 case_list %= idx + colon + typex + rarrow + expr_1 + semi + case_list, lambda h, s: [(s[1], s[3], s[5])] + s[7]
 

@@ -32,3 +32,35 @@ class SyntacticError(Error):
     def __repr__(self):
         return f'{self.line, self.column} - ' \
                f'SyntacticError: ERROR at or near {self.text}'
+
+class SemanticError(Error):
+    def __str__(self):
+        return f'{self.line, self.column} - ' \
+               f'SemanticError: {self.text}'
+    def __repr__(self):
+        return f'{self.line, self.column} - ' \
+               f'SemanticError: {self.text}'
+
+class TypeError(Error):
+    def __str__(self):
+        return f'{self.line, self.column} - ' \
+               f'TypeError: {self.text}'
+    def __repr__(self):
+        return f'{self.line, self.column} - ' \
+               f'TypeError: {self.text}'
+
+class NameError(Error):
+    def __str__(self):
+        return f'{self.line, self.column} - ' \
+               f'NameError: {self.text}'
+    def __repr__(self):
+        return f'{self.line, self.column} - ' \
+               f'NameError: {self.text}'
+
+class AttributeError(Error):
+    def __str__(self):
+        return f'{self.line, self.column} - ' \
+               f'AttributeError: {self.text}'
+    def __repr__(self):
+        return f'{self.line, self.column} - ' \
+               f'AttributeError: {self.text}'
