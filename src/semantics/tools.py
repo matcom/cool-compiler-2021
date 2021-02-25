@@ -2,7 +2,7 @@ import itertools as itt
 from collections import OrderedDict
 from typing import FrozenSet
 
-from semantics.utils import conform_to_condition, order_set_by_index
+from semantics.utils import conform_to_condition, from_dict_to_set, order_set_by_index
 
 class InternalError(Exception):
     @property
