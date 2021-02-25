@@ -1,0 +1,35 @@
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+
+        f ( ) : Int { {
+            let x : String , x : AUTO_TYPE <- a + b in x ;
+        } } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+
+        f ( ) : Int { {
+            let x : String , x : AUTO_TYPE <- a + b , self : AUTO_TYPE , x : AUTO_TYPE <- let c : AUTO_TYPE in a in x ;
+        } } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+
+        f ( ) : AUTO_TYPE { {
+            let x : String , x : AUTO_TYPE <- a + b , self : AUTO_TYPE , x : AUTO_TYPE <- let c : AUTO_TYPE in a in x ;
+        } } ;
+    } ;
+    
+'''

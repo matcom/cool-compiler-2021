@@ -1,0 +1,152 @@
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- c . concat ( a ) ;
+            1 ;
+        } } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- c . substr ( 0 , a ) ;
+        } } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- isvoid a ;
+            a ;
+        } } ;
+    } ;
+    
+'''
+
+se_jodio_el_self = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            case self of
+                x : Int => x ;
+                y : AUTO_TYPE => y ;
+            esac ;
+        } } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- a <- isvoid a ;
+            1 ;
+        } } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- foo ( a ) ;
+            1 ;
+        } } ;
+
+        foo ( k : AUTO_TYPE ) : AUTO_TYPE { k <- a } ;
+    } ;
+    
+'''
+
+text = '''
+    class A {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- foo ( a ) ;
+            b ;
+        } } ;
+
+        foo ( k : AUTO_TYPE ) : AUTO_TYPE { k <- a } ;
+    } ;
+    
+'''
+
+text = '''
+    class B {
+        k : AUTO_TYPE ;
+    } ;
+
+    class A inherits B {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b <- k + 1 ;
+            b ;
+        } } ;
+
+        foo ( k : AUTO_TYPE ) : AUTO_TYPE { k <- a } ;
+    } ;
+    
+'''
+
+text = '''
+    class B {
+        k : AUTO_TYPE ;
+    } ;
+
+    class A inherits B {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b + k + a ;
+            1 ;
+        } } ;
+
+        foo ( k : AUTO_TYPE ) : AUTO_TYPE { k <- a } ;
+    } ;
+    
+'''
+
+text = '''
+    class B {
+        k : AUTO_TYPE ;
+    } ;
+
+    class A inherits B {
+        b : AUTO_TYPE ;
+        a : AUTO_TYPE ;
+        c : String ;
+        f ( ) : Int { {
+            b + a ;
+            k <- b . copy ( ) ;
+        } } ;
+
+        foo ( k : AUTO_TYPE ) : AUTO_TYPE { k <- a } ;
+    } ;
+    
+'''
