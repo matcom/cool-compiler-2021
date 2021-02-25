@@ -1,0 +1,2 @@
+class SyntacticError:
+   pass

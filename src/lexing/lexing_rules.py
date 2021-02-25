@@ -1,6 +1,8 @@
 # Lexer rules
 #########################################################################################
 
+from lexing.utils import LexicographicError, set_pos
+
 literals = [
     '+', '-', '*', '/', '~', '=', '<', ':', '{',
     '}', '@', ',', '.', '(', ')', ';', '$'
@@ -43,6 +45,109 @@ states = (
     ('aux', 'exclusive'),
 )
 
+def t_plus(t):
+    r'\+'
+    t.type = '+'
+    set_pos(t)
+    return t
+
+def t_minus(t):
+    r'-'
+    t.type = '-'
+    set_pos(t)
+    return t
+
+def t_star(t):
+    r'\*'
+    t.type = '*'
+    set_pos(t)
+    return t
+
+def t_slash(t):
+    r'/'
+    t.type = '/'
+    set_pos(t)
+    return t
+
+def t_neg(t):
+    r'~'
+    t.type = '~'
+    set_pos(t)
+    return t
+
+def t_equal(t):
+    r'='
+    t.type = '='
+    set_pos(t)
+    return t
+
+
+def t_less(t):
+    r'<'
+    t.type = '<'
+    set_pos(t)
+    return t
+
+
+def t_colon(t):
+    r':'
+    t.type = ':'
+    set_pos(t)
+    return t
+
+def t_ocur(t):
+    r'\{'
+    t.type = '{'
+    set_pos(t)
+    return t
+
+def t_ccur(t):
+    r'\}'
+    t.type = '}'
+    set_pos(t)
+    return t
+
+def t_at(t):
+    r'@'
+    t.type = '@'
+    set_pos(t)
+    return t
+
+def t_comma(t):
+    r','
+    t.type = ','
+    set_pos(t)
+    return t
+
+def t_dot(t):
+    r'\.'
+    t.type = '.'
+    set_pos(t)
+    return t
+
+def t_opar(t):
+    r'\('
+    t.type = '('
+    set_pos(t)
+    return t
+
+def t_cpar(t):
+    r'\)'
+    t.type = ')'
+    set_pos(t)
+    return t
+
+def t_semicolon(t):
+    r';'
+    t.type = ';'
+    set_pos(t)
+    return t
+
+def t_dollar(t):
+    r'\$'
+    t.type = '$'
+    set_pos(t)
+    return t
 
 def t_LESSEQ(t):
     r'\<='
@@ -144,14 +249,12 @@ def t_WHITESPACE(t):
 
 
 def t_ANY_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    # print("Illegal character '%s'" % t.value[0])
+    t.error.append(LexicographicError(t.lineno, t.col, t.value[0]))
     t.lexer.skip(1)
 #########################################################################################
 
 
-def set_pos(token):
-    token.col = token.lexer.col
-    token.lexer.col += len(token.value)
-    # token.row = token.lexer.lineno
+
 
 # TODO: Add line and column for each token
