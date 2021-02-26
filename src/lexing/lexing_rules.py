@@ -96,7 +96,7 @@ def t_COMMENT(t):
     t.lexer.lineno += 1
     t.col = t.lexer.col
     t.lexer.col = 1
-    return t
+    # return t
 
 # Multiline comments rules
 
@@ -121,7 +121,7 @@ def t_aux_rcomment(t):
         t.type = "COMMENT"
         t.lexer.lineno += t.value.count('\n')
         t.lexer.begin('INITIAL')
-        return t
+        # return t
 
 
 def t_aux_pass(t):

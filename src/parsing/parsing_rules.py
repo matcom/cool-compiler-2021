@@ -255,7 +255,7 @@ def p_empty(p):
 
 
 def p_error(p):
-    print(f"Syntax error in input! {p} line:{p.lineno} col:{p.col}")
+    print(f"Syntax error in input! {p} ")#line:{p.lineno} col:{p.col}")
 
 
 
