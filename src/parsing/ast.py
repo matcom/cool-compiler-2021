@@ -57,7 +57,7 @@ class VarDeclarationNode(ExpressionNode):
     def __init__(self, idx, typex, expression=None):
         Node.__init__(self)
         self.id = idx
-        self.typex = typex
+        self.type = typex
         self.expr = expression
 
 

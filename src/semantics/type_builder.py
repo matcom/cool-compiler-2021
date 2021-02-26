@@ -47,7 +47,7 @@ class TypeCollector(object):
     def get_type_hierarchy(self):
         visited = set(["Object"])
         new_order = []
-        self.get_type_hierarchy("Object", self.type_graph, visited, new_order, 1)
+        self.dfs_type_graph("Object", self.type_graph, visited, new_order, 1)
 
         circular_heritage_errors = []
         for node in self.type_graph:
@@ -64,7 +64,7 @@ class TypeCollector(object):
 
         return new_order
 
-    def get_type_hierarchy(self, root, graph, visited:set, new_order, index):
+    def dfs_type_graph(self, root, graph, visited:set, new_order, index):
         if not root in graph:
             return
         
@@ -75,7 +75,7 @@ class TypeCollector(object):
             if node not in {"Int", "String", "IO", "Bool", "Object"}:
                 new_order.append(self.context.get_type(node))
             self.context.get_type(node).index = index
-            self.get_type_hierarchy(node, graph, visited, new_order, index + 1)
+            self.dfs_type_graph(node, graph, visited, new_order, index + 1)
     
     def check_circular_heritage(self, root, graph, path, visited):
         for node in graph[root]:
