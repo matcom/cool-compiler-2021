@@ -72,11 +72,11 @@ def p_param(p):
 
 
 def p_expression_list(p):
-    """expression_list : expression ';' expression
+    """expression_list : expression ';' expression_list
                        | expression ';' """
     if len(p) == 4:
         p[0] = [p[1]] + p[3]
-    else:
+    elif len(p) ==  3:
         p[0] = [p[1]]
 
 
@@ -255,7 +255,7 @@ def p_empty(p):
 
 
 def p_error(p):
-    print(f"Syntax error in input! {p}")
+    print(f"Syntax error in input! {p} line:{p.lineno} col:{p.col}")
 
 
 
