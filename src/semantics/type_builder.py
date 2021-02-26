@@ -1,6 +1,6 @@
 import semantics.visitor as visitor
 from parsing.ast import ProgramNode, ClassDeclarationNode, MethodDeclarationNode, AttrDeclarationNode
-from semantics.tools import SemanticError
+from semantics.tools import SemanticError, TypeBag
 from semantics.tools import ErrorType, SelfType
 from semantics.tools import Context
 
@@ -65,7 +65,9 @@ class TypeBuilder:
         
         params_type = []
         params_name = []
-        for p_name, p_type in node.params:
+        for var in node.params:
+            p_name = var.id
+            p_type = var.type
             try:
                 params_type.append(self.context.get_type(p_type))
             except SemanticError as err:
@@ -90,18 +92,23 @@ class TypeBuilder:
         Io.set_parent(Object)
         Bool.set_parent(Object)
 
-        Object.define_method("abort", [], [], Object)
-        Object.define_method("type_name", [], [], String)
-        Object.define_method("copy", [], [], SelfType())
+        p_Object = self.context.get_type("Object")
+        p_String = self.context.get_type("String")
+        p_Int = self.context.get_type("Int")
+        p_Self = TypeBag({SelfType()})
 
-        String.define_method("length", [], [], Int)
-        String.define_method("concat", ["s"], [String], String)
-        String.define_method("substr", ["i", "l"], [Int, Int], String)
+        Object.define_method("abort", [], [], p_Object)
+        Object.define_method("type_name", [], [], p_String)
+        Object.define_method("copy", [], [], p_Self)
 
-        Io.define_method("out_string", ["x"],[String], SelfType())
-        Io.define_method("out_int", ["x"],[Int], SelfType())
-        Io.define_method("in_string", [],[], String)
-        Io.define_method("in_int", [], [], Int)
+        String.define_method("length", [], [], p_Int)
+        String.define_method("concat", ["s"], [p_String], p_String)
+        String.define_method("substr", ["i", "l"], [p_Int, p_Int], p_String)
+
+        Io.define_method("out_string", ["x"],[p_String], p_Self)
+        Io.define_method("out_int", ["x"],[p_Int], p_Self)
+        Io.define_method("in_string", [],[], p_String)
+        Io.define_method("in_int", [], [], p_Int)
     
     def add_error(self, node, text:str):
         line, col = node.get_position() if node else 0, 0

@@ -36,8 +36,13 @@ def run_pipeline(program):
 folder_path = r'./zTests/Misc'
 filenames = os.listdir(folder_path)
 filenames.sort()
+count = 4
 
 for filename in filenames:
+    if count == 0:
+        print("Reach Count Limit")
+        break
+
     path = os.path.join(folder_path, filename)
     file = open(path, "r")
     program = file.read()
@@ -45,7 +50,8 @@ for filename in filenames:
 
     print(f"Running {filename}")
     run_pipeline(program)
-    input()
+    count -= 1
+    print("-------------------------------------------------------------------------\n")
 
 print("EndOfFiles")
 

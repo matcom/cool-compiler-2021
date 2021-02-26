@@ -1,7 +1,8 @@
 import itertools as itt
 from collections import OrderedDict
 from typing import FrozenSet
-#from semantics.utils import from_dict_to_set
+
+from semantics.utils import conform_to_condition, order_set_by_index
 
 class InternalError(Exception):
     @property
@@ -65,6 +66,16 @@ class Type:
             raise SemanticError(f'Cannot set \'{self.name}\' parent, \'{parent.name}\' type cannot be inherited.')
         self.parent = parent
 
+    def define_attribute(self, name:str, typex):
+        try:
+            self.get_attribute(name)
+        except SemanticError:
+            attribute = Attribute(name, typex)
+            self.attributes.append(attribute)
+            return attribute
+        else:
+            raise SemanticError(f'Attribute "{name}" is already defined in {self.name}.')
+
     def get_attribute(self, name:str):
         try:
             return next(attr for attr in self.attributes if attr.name == name)
@@ -97,7 +108,7 @@ class Type:
             parent_method = None
         if parent_method:
             error_list = []
-            if not return_type.conforms_to(parent_method.return_type):
+            if conforms(return_type, parent_method.return_type):
                 error_list.append(f"    -> Same return type: Redefined method has \'{return_type.name}\' as return type instead of \'{parent_method.return_type.name}\'.")
             if len(param_types) != len(parent_method.param_types):
                 error_list.append(f"    -> Same amount of params: Redefined method has {len(param_types)} params instead of {len(parent_method.param_types)}.")
@@ -176,8 +187,10 @@ class TypeBag:
     def __init__(self, type_set, heads = []) -> None:
         self.type_set:set = type_set if isinstance(type_set, set) else from_dict_to_set(type_set)
         self.heads:list = heads
-        if len(type_set) == 1:
+        if len(self.type_set) == 1:
             self.heads = list(self.type_set)
+        
+        self.name = self.generate_name()
         self.condition_list = []
         self.conform_list = []
     
@@ -185,10 +198,11 @@ class TypeBag:
         self.condition_list = condition_list
         self.conform_list = conform_list
         self.update_type_set_from_conforms()
+        self.name = self.generate_name()
 
     def update_type_set_from_conforms(self):
         intersect_set = set()
-        for conform_set in self.conforms_list:
+        for conform_set in self.conform_list:
             intersect_set = intersect_set.union(conform_set)
         self.type_set = self.type_set.intersection(intersect_set)
         self.update_heads()
@@ -196,7 +210,7 @@ class TypeBag:
     def update_heads(self):
         new_heads = []
         visited = set()
-        for head in self.upper_limmit:
+        for head in self.heads:
             if head in self.type_set:
                 new_heads.append(head)
                 continue
@@ -213,7 +227,7 @@ class TypeBag:
                     elif typex.index == lower_index:
                         new_heads.append(typex)
             new_heads += new_heads
-        self.upper_limmit = new_heads
+        self.heads = new_heads
 
     def swap_self_type(self, update_type):
         try:
@@ -231,6 +245,14 @@ class TypeBag:
             pass
         return self
     
+    def generate_name(self):
+        if len(self.type_set) == 1:
+            return self.heads[0].name
+
+        s = "{"
+        s += ', '.join(typex.name for typex in sorted(self.type_set, key = lambda t: t.index))
+        s += "}"
+        return s
 
     def clone(self):
         clone = TypeBag(self.type_set, self.heads)
@@ -241,6 +263,7 @@ class TypeBag:
 class SelfType(Type):
     def __init__(self):
         self.name = "SELF_TYPE"
+        self.index = 2**31
     def conforms_to(self, other):
         #if isinstance(other, SelfType):
         #    return True
@@ -248,10 +271,28 @@ class SelfType(Type):
     def bypass(self):
         raise InternalError("SELF_TYPE is yet to be assigned, cannot bypass.")
 
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return str(self)
+
 class ErrorType(Type):
     def __init__(self):
         self.name = "<error>"
-        self.type_set = FrozenSet()
+        self.index = 2**32
+        self.type_set = frozenset()
+    def conforms_to(self, other):
+        return True
+    def bypass(self):
+        return True
+
+    def swap_self_type(self, update_type):
+        return self
+
+    def set_conditions(self, *params):
+        return
 
 class Context:
     def __init__(self) -> None:
@@ -338,7 +379,7 @@ class Scope:
             return next(x for x in locals if x.name == vname)
         except StopIteration:
             try:
-                return self.parent.find_variable(vname, self.index)# if self.parent else None
+                return self.parent.find_variable(vname, self.index) if self.parent else None
             except AttributeError:
                 return None
 
@@ -357,8 +398,92 @@ class Scope:
         for child in self.children:
             child.reset()
 
-def from_dict_to_set(types:dict):
-    type_set = set()
-    for typex in types:
-        type_set.add(types[typex])
-    return type_set
+
+def conforms(bag1:TypeBag, bag2:TypeBag):
+    ordered_set = order_set_by_index(bag2.type_set)
+
+    condition_list = []
+    conform_list = []
+    for condition in ordered_set:
+        conform = conform_to_condition(bag1.type_set, condition)
+        for i in range(len(condition_list)):
+            conform_i = conform_list[i]
+            if len(conform_i) == len(conform) and len(conform.intersection(conform_i)) == len(conform):
+                condition_list[i].add(condition)
+                break
+        else:
+            condition_list.append({condition})
+            conform_list.append(conform)
+    
+    bag1.set_conditions(condition_list, conform_list)
+    return len(bag1.type_set) >= 1
+
+def join(bag1:TypeBag, bag2:TypeBag) -> TypeBag:
+    ancestor_set = set()
+    head_list = []
+    ordered_set1 = order_set_by_index(bag1.type_set)
+    ordered_set2 = order_set_by_index(bag2.type_set)
+    ordered_set1, ordered_set2 = (ordered_set1, ordered_set2) if len(ordered_set1) < len(ordered_set2) else (ordered_set2, ordered_set1)
+    for type1 in ordered_set1:
+        same_branch = False
+        previous_ancestor = None
+        previous_type = None
+        for type2 in ordered_set2:
+            if same_branch and type2.conforms_to(previous_type):
+                previous_type = type2
+                continue
+            common_ancestor = type1.least_common_ancestor(type2)
+            previous_type = type2
+            if not previous_ancestor:
+                smart_add(ancestor_set, head_list, common_ancestor)
+                previous_ancestor = common_ancestor
+            else:
+                if previous_ancestor == common_ancestor:
+                    same_branch = True
+                else:
+                    same_branch = False
+                    smart_add(ancestor_set, head_list, common_ancestor)
+                    previous_ancestor = common_ancestor
+    
+    join_result = TypeBag(ancestor_set, head_list)
+    return join_result
+
+def join_list(type_list):
+    join_result = type_list[0]
+    for i in range(1, len(type_list)):
+        type_i = type_list[i]
+        join_result = join(join_result, type_i)
+    return join_result
+
+def smart_add(type_set:set, head_list:list, typex:Type):
+    if isinstance(typex, TypeBag):
+        return auto_add(type_set, head_list, typex)
+
+    type_set.add(typex)
+    there_is = False
+    for i in range(len(head_list)):
+        head = head_list[i]
+        ancestor = typex.least_common_ancestor(head)
+        if ancestor in type_set:
+            there_is = True
+            if ancestor == typex:
+                head_list[i] = typex
+                break
+    if not there_is:
+        head_list.append(typex)
+    return head_list, type_set
+
+def auto_add(type_set:set, head_list:list, bag:TypeBag):
+    type_set = type_set.union(bag.type_set)
+    aux = set(bag.heads)
+    for i in range(len(head_list)):
+        head_i = head_list[i]
+        for head in bag.heads:
+            ancestor = head_i.least_common_ancestor(head)
+            if ancestor in type_set:
+                head_i[i] = ancestor
+                aux.pop(head)
+                break
+    head_list += [typex for typex in aux]
+    return head_list, type_set
+
