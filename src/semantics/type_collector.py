@@ -79,7 +79,7 @@ class TypeCollector(object):
             visited.add(node)
             if node not in {"Int", "String", "IO", "Bool", "Object"}:
                 new_order.append(self.node_dict[node])
-            self.context.get_type(node).index = index
+            self.context.get_type(node, unpacked=True).index = index
             self.dfs_type_graph(node, graph, visited, new_order, index + 1)
     
     def check_circular_heritage(self, root, graph, path, visited):

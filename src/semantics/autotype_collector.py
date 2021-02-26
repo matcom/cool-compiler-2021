@@ -7,7 +7,6 @@ class AutotypeCollector:
     def __init__(self, context:Context):
         self.context = context
         self.current_type = None
-        self.inference_graph = dict()
         self.errors = []
     
     @visitor.on('node')
@@ -87,10 +86,10 @@ class AutotypeCollector:
     
     @visitor.when(CaseNode)
     def visit(self, node, scope:Scope):
-        self.visit(node.expr, scope)
+        self.visit(node.case_expr, scope)
 
         type_list = []
-        for var in node.casevars:
+        for var in node.options:
             child = scope.create_child()
             self.visit(var, child)
             type_list.append(var.inferenced_type)

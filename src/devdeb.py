@@ -41,8 +41,7 @@ except FileNotFoundError:
     print("Error Importing Files")
 count = 4
 
-filenames = [r'/home/rodro/Aarka/Complementos de Compilacion/cool-compiler-2022/src/zTests/Misc/06FooBarRaz.cl']
-filenames = [r'/home/rodro/Aarka/Complementos de Compilacion/cool-compiler-2022/src/zTests/Misc/07MultipleClass.cl']
+filenames = [r'/home/rodro/Aarka/Complementos de Compilacion/cool-compiler-2022/src/zTests/Misc/10BiG.cl']
 
 for filename in filenames:
     if count == 0:
