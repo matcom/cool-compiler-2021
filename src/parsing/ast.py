@@ -23,7 +23,6 @@ class ProgramNode(Node):
 class DeclarationNode(Node):
     pass
 
-
 class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None):
         Node.__init__(self)

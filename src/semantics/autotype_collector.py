@@ -1,4 +1,4 @@
-from semantics.utils import conforms, join, join_list, smart_add
+from semantics.tools import conforms, join, join_list, smart_add
 import semantics.visitor as visitor
 from semantics.tools import Context, ErrorType, Scope, SelfType, SemanticError, TypeBag
 from parsing.ast import ArithmeticNode, AssignNode, AttrDeclarationNode, BlocksNode, BooleanNode, CaseNode, CaseOptionNode, ClassDeclarationNode, ComparerNode, ComplementNode, ConditionalNode, InstantiateNode, IntNode, IsVoidNode, LetNode, LoopNode, MethodCallNode, MethodDeclarationNode, NotNode, ProgramNode, StringNode, VarDeclarationNode, VariableNode
@@ -7,8 +7,6 @@ class AutotypeCollector:
     def __init__(self, context:Context):
         self.context = context
         self.current_type = None
-        self.current_method = None
-        self.current_attrb = None
         self.inference_graph = dict()
         self.errors = []
     
@@ -26,7 +24,7 @@ class AutotypeCollector:
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
-        self.current_type = self.context.get_type(node.id)
+        self.current_type = self.context.get_type(node.id, unpacked=True)
         scope.define_variable("self", self.current_type)
         for attr in self.current_type.attributes:
             scope.define_variable(attr.name, attr.type)
@@ -36,14 +34,14 @@ class AutotypeCollector:
     
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
-        node_type = self.current_type.get_attribute(node.id).swap_self_type(self.current_type)
+        node_type = self.current_type.get_attribute(node.id).type.swap_self_type(self.current_type)
         if not node.expr:
             node.inferenced_type = node_type
             return
         
         self.visit(node.expr, scope)
         node_expr = node.expr.inferenced_type
-        node_expr = conforms(node_expr, node_type)
+        conforms(node_expr, node_type)
 
         var = scope.find_variable(node.id)
         var.type = node_type
@@ -58,9 +56,9 @@ class AutotypeCollector:
             scope.define_variable(idx, typex)
         
         self.visit(node.body, scope)
-        ret_type_decl = self.current_method.return_type.swap_self_type(self.current_type)
+        ret_type_decl = current_method.return_type.swap_self_type(self.current_type)
         ret_type_expr = node.body.inferenced_type
-        ret_type_expr = conforms(ret_type_expr, ret_type_decl)
+        conforms(ret_type_expr, ret_type_decl)
         node.body.inferenced_type = ret_type_expr
 
         node.inferenced_type = ret_type_decl.clone()
@@ -68,20 +66,20 @@ class AutotypeCollector:
     
     @visitor.when(BlocksNode)
     def visit(self, node, scope):
-        for expr in node.body:
+        for expr in node.expr_list:
             self.visit(expr, scope)
-        node.inferenced_type = node.body[-1].inferenced_type
+        node.inferenced_type = node.expr_list[-1].inferenced_type
     
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
-        self.visit(node.condition)
+        self.visit(node.condition, scope)
         condition_type = node.condition.inferenced_type
         bool_type = self.context.get_type("Bool")
         conforms(condition_type, bool_type)
 
-        self.visit(node.then_body)
+        self.visit(node.then_body, scope)
         then_type = node.then_body.inferenced_type
-        self.visit(node.else_body)
+        self.visit(node.else_body, scope)
         else_type = node.else_body.inferenced_type
 
         joined_type = join(then_type, else_type)
@@ -118,13 +116,13 @@ class AutotypeCollector:
         bool_type = self.context.get_type("Bool")
         conforms(condition_type, bool_type)
 
-        self.visit(node.bodyexpr, scope)
+        self.visit(node.body, scope)
         node.inferenced_type = self.context.get_type("Object")
     
     @visitor.when(LetNode)
     def visit(self, node, scope):
         child = scope.create_child()
-        for var in node.var_decl:
+        for var in node.var_decl_list:
             self.visit(var, child)
         self.visit(node.in_expr, scope)
         node.inferenced_type = node.in_expr.inferenced_type
@@ -172,12 +170,12 @@ class AutotypeCollector:
     @visitor.when(MethodCallNode)
     def visit(self, node, scope):
         if node.expr == None:
-            caller = self.current_type
+            caller = TypeBag({self.current_type})
         elif node.type == None:
-            self.visit(node.expr)
+            self.visit(node.expr, scope)
             caller = node.expr.inferenced_type
         else:
-            self.visit(node.expr)
+            self.visit(node.expr, scope)
             bridge = node.expr.inferenced_type
             caller = self.context.get_type(node.type, selftype=False, autotype=False)
             conforms(bridge, caller)
@@ -194,7 +192,7 @@ class AutotypeCollector:
         elif len(caller.type_set) == 1:
             caller_type = caller.heads[0]
             try:
-                methods = [caller_type, caller_type.get_method(node.id)]
+                methods = [(caller_type, caller_type.get_method(node.id))]
             except SemanticError:
                 pass #Add Error
         
@@ -241,7 +239,7 @@ class AutotypeCollector:
     
     @visitor.when(VariableNode)
     def visit(self, node, scope):
-        var = scope.find_variable(node.expr)
+        var = scope.find_variable(node.value)
         if var:
             node.defined = True
             var_type = var.type
@@ -276,7 +274,7 @@ class AutotypeCollector:
     @visitor.when(InstantiateNode)
     def visit(self, node, scope):
         try:
-            node_type = self.context.get_type(node.expr, selftype=False, autotype=False)
+            node_type = self.context.get_type(node.value, selftype=False, autotype=False)
         except SemanticError as err:
             node_type = ErrorType()
         node.inferenced_type = node_type
