@@ -25,7 +25,7 @@ class AutotypeCollector:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
         self.current_type = self.context.get_type(node.id, unpacked=True)
-        scope.define_variable("self", self.current_type)
+        scope.define_variable("self", TypeBag({self.current_type}))
         for attr in self.current_type.attributes:
             scope.define_variable(attr.name, attr.type)
         

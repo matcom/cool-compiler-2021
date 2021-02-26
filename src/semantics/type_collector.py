@@ -30,8 +30,11 @@ class TypeCollector(object):
     def visit(self, node):
         try:
             self.context.create_type(node.id)
-            self.type_graph[node.id] = []
             self.node_dict[node.id] = node
+            try:
+                self.type_graph[node.id]
+            except KeyError:
+                self.type_graph[node.id] = []
             if node.parent:
                 if node.parent in {'String', 'Int, Bool'}:
                     raise SemanticError(f"Type \'{node.id}\' cannot inherit from \'{node.parent}\' beacuse is forbidden.")
@@ -56,7 +59,7 @@ class TypeCollector(object):
                 visited.add(node)
                 path = [node]
                 circular_heritage_errors.append(self.check_circular_heritage(node, self.type_graph, path, visited))
-                new_order = new_order + [self.context.get_type(node) for node in path]
+                new_order = new_order + [self.node_dict[node] for node in path]
             
         if circular_heritage_errors:
             print(circular_heritage_errors)
@@ -82,7 +85,7 @@ class TypeCollector(object):
     def check_circular_heritage(self, root, graph, path, visited):
         for node in graph[root]:
             if node in path:
-                return ' -> '.join(child for child in visited + [visited[0]])
+                return ' -> '.join(child for child in path + [path[0]])
 
             visited.add(node)
             path.append(node)

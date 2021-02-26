@@ -1,34 +1,46 @@
+class Main
+{
+	h:AUTO_TYPE <- new H;
+	a:AUTO_TYPE <- new A;
+	main(): Int 
+	{
+		{
+			3;
+		}
+	};
+};
+
 class H
 {
-	a:int;
+	a:Int;
 };
 
 class Z inherits H
 {
-	x:int;
+	x:Int;
 };
 
 class A inherits F
 {
-	b:int;
+	b:Int;
 };
 
 class B inherits A
 {
-	c:int;
+	c:Int;
 };
 
 class C inherits B
 {
-	e:int;
+	e:Int;
 };
 
 class D inherits C
 {
-	f:int;
+	f:Int;
 };
 
 class F inherits D
 {
-	g:int;
+	g:Int;
 };
