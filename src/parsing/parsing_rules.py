@@ -58,12 +58,15 @@ def p_method(p):
 
 def p_params_list(p):
     """params_list : param ',' params_list
-                   | param
-                   | empty"""
+                   | param"""
     if len(p) == 4:
         p[0] = [p[1]] + p[3]
     else:
         p[0] = [p[1]]
+
+def p_params_list_empty(p):
+    """params_list : empty"""
+    p[0] = []
 
 
 def p_param(p):
@@ -157,12 +160,16 @@ def p_expression_dispatch(p):
 
 def p_args_list(p):
     """args_list : expression ',' args_list
-                 | expression 
-                 | empty"""
+                 | expression"""
     if len(p) == 4:
         p[0] = [p[1]] + p[3]
     else:
         p[0] = [p[1]]
+
+
+def p_args_list_empty(p):
+    """args_list : empty"""
+    p[0] = []
 
 def p_expression_instatiate(p):
     """expression : NEW ID"""
@@ -251,7 +258,7 @@ def p_expression_int(p):
 
 def p_empty(p):
     """empty : """
-    pass
+    p[0] = []
 
 
 def p_error(p):
