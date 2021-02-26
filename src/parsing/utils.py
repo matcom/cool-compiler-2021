@@ -7,5 +7,3 @@ class SyntacticError:
    def __str__(self) -> str:
        return f'({self.line}, {self.col}) - \
        SyntacticError: ERROR at or near "{self.token}"'
-
-   

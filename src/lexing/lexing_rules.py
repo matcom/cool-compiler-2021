@@ -125,7 +125,7 @@ def t_aux_rcomment(t):
 
 
 def t_aux_pass(t):
-    r'[^.]'
+    r'[^\*\)]'
     pass
 
 # Rule so we can track line numbers
