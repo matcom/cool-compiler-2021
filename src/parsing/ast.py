@@ -16,6 +16,7 @@ class Node:
 
 class ProgramNode(Node):
     def __init__(self, declarations):
+        Node.__init__(self)
         self.declarations = declarations
 
 
@@ -25,6 +26,7 @@ class DeclarationNode(Node):
 
 class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None):
+        Node.__init__(self)
         self.id = idx
         self.parent = parent
         self.features = features
@@ -32,13 +34,15 @@ class ClassDeclarationNode(DeclarationNode):
 
 class AttrDeclarationNode(DeclarationNode):
     def __init__(self, idx, typex, expression=None):
+        Node.__init__(self)
         self.id = idx
-        self.typex = typex
-        self.expression = expression
+        self.type = typex
+        self.expr = expression
 
 
 class MethodDeclarationNode(DeclarationNode):
     def __init__(self, idx, params, return_type, body):
+        Node.__init__(self)
         self.id = idx
         self.params: List[VarDeclarationNode] = params
         self.type = return_type
@@ -51,6 +55,7 @@ class ExpressionNode(Node):
 
 class VarDeclarationNode(ExpressionNode):
     def __init__(self, idx, typex, expression=None):
+        Node.__init__(self)
         self.id = idx
         self.typex = typex
         self.expr = expression
@@ -58,12 +63,14 @@ class VarDeclarationNode(ExpressionNode):
 
 class AssignNode(ExpressionNode):
     def __init__(self, idx, expr):
+        Node.__init__(self)
         self.id = idx
         self.expr = expr
 
 
 class MethodCallNode(ExpressionNode):
     def __init__(self, expr=None, typex=None, idx=None, args=None):
+        Node.__init__(self)
         self.expr = expr
         self.type = typex
         self.id = idx
@@ -72,6 +79,7 @@ class MethodCallNode(ExpressionNode):
 
 class ConditionalNode(ExpressionNode):
     def __init__(self, condition: ExpressionNode, then_body: ExpressionNode, else_body: ExpressionNode):
+        Node.__init__(self)
         self.condition = condition
         self.then_body = then_body
         self.else_body = else_body
@@ -79,24 +87,28 @@ class ConditionalNode(ExpressionNode):
 
 class LoopNode(ExpressionNode):
     def __init__(self, condition: ExpressionNode, body: ExpressionNode):
+        Node.__init__(self)
         self.condition = condition
         self.body = body
 
 
 class LetNode(ExpressionNode):
     def __init__(self, var_decl_list: List[VarDeclarationNode], in_expr: ExpressionNode):
+        Node.__init__(self)
         self.var_decl_list = var_decl_list
         self.in_expr = in_expr
 
 
 class CaseNode(ExpressionNode):
     def __init__(self, case_expr, options):
+        Node.__init__(self)
         self.case_expr = case_expr
         self.options: List[CaseOptionNode] = options
 
 
 class CaseOptionNode(ExpressionNode):
     def __init__(self, idx, typex, ret_expr):
+        Node.__init__(self)
         self.id = idx
         self.type = typex
         self.expr = ret_expr
@@ -104,11 +116,13 @@ class CaseOptionNode(ExpressionNode):
 
 class BlocksNode(ExpressionNode):
     def __init__(self, expr_list):
+        Node.__init__(self)
         self.expr_list = expr_list
 
 
 class UnaryNode(ExpressionNode):
     def __init__(self, expr):
+        Node.__init__(self)
         self.expr = expr
 
 
@@ -126,6 +140,7 @@ class ComplementNode(UnaryNode):
 
 class BinaryNode(ExpressionNode):
     def __init__(self, left, right):
+        Node.__init__(self)
         self.left = left
         self.right = right
 
@@ -168,6 +183,7 @@ class DivNode(ArithmeticNode):
 
 class AtomicNode(ExpressionNode):
     def __init__(self, value):
+        Node.__init__(self)
         self.value = value
 
 
