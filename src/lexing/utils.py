@@ -6,6 +6,9 @@ class LexicographicError:
 
     def __str__(self) -> str:
         return f'({self.line},{self.col}) - LexicographicError: ERROR "{self.char}"'
+
+    def __repr__(self) -> str:
+        return str(self)
   
 
 

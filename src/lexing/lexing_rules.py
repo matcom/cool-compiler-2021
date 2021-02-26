@@ -45,109 +45,6 @@ states = (
     ('aux', 'exclusive'),
 )
 
-def t_plus(t):
-    r'\+'
-    t.type = '+'
-    set_pos(t)
-    return t
-
-def t_minus(t):
-    r'-'
-    t.type = '-'
-    set_pos(t)
-    return t
-
-def t_star(t):
-    r'\*'
-    t.type = '*'
-    set_pos(t)
-    return t
-
-def t_slash(t):
-    r'/'
-    t.type = '/'
-    set_pos(t)
-    return t
-
-def t_neg(t):
-    r'~'
-    t.type = '~'
-    set_pos(t)
-    return t
-
-def t_equal(t):
-    r'='
-    t.type = '='
-    set_pos(t)
-    return t
-
-
-def t_less(t):
-    r'<'
-    t.type = '<'
-    set_pos(t)
-    return t
-
-
-def t_colon(t):
-    r':'
-    t.type = ':'
-    set_pos(t)
-    return t
-
-def t_ocur(t):
-    r'\{'
-    t.type = '{'
-    set_pos(t)
-    return t
-
-def t_ccur(t):
-    r'\}'
-    t.type = '}'
-    set_pos(t)
-    return t
-
-def t_at(t):
-    r'@'
-    t.type = '@'
-    set_pos(t)
-    return t
-
-def t_comma(t):
-    r','
-    t.type = ','
-    set_pos(t)
-    return t
-
-def t_dot(t):
-    r'\.'
-    t.type = '.'
-    set_pos(t)
-    return t
-
-def t_opar(t):
-    r'\('
-    t.type = '('
-    set_pos(t)
-    return t
-
-def t_cpar(t):
-    r'\)'
-    t.type = ')'
-    set_pos(t)
-    return t
-
-def t_semicolon(t):
-    r';'
-    t.type = ';'
-    set_pos(t)
-    return t
-
-def t_dollar(t):
-    r'\$'
-    t.type = '$'
-    set_pos(t)
-    return t
 
 def t_LESSEQ(t):
     r'\<='
@@ -245,16 +142,130 @@ def t_WHITESPACE(t):
     t.lexer.col += len(t.value)
 
 
+def t_plus(t):
+    r'\+'
+    t.type = '+'
+    set_pos(t)
+    return t
+
+
+def t_minus(t):
+    r'-'
+    t.type = '-'
+    set_pos(t)
+    return t
+
+
+def t_star(t):
+    r'\*'
+    t.type = '*'
+    set_pos(t)
+    return t
+
+
+def t_slash(t):
+    r'/'
+    t.type = '/'
+    set_pos(t)
+    return t
+
+
+def t_neg(t):
+    r'~'
+    t.type = '~'
+    set_pos(t)
+    return t
+
+
+def t_equal(t):
+    r'='
+    t.type = '='
+    set_pos(t)
+    return t
+
+
+def t_less(t):
+    r'<'
+    t.type = '<'
+    set_pos(t)
+    return t
+
+
+def t_colon(t):
+    r':'
+    t.type = ':'
+    set_pos(t)
+    return t
+
+
+def t_ocur(t):
+    r'\{'
+    t.type = '{'
+    set_pos(t)
+    return t
+
+
+def t_ccur(t):
+    r'\}'
+    t.type = '}'
+    set_pos(t)
+    return t
+
+
+def t_at(t):
+    r'@'
+    t.type = '@'
+    set_pos(t)
+    return t
+
+
+def t_comma(t):
+    r','
+    t.type = ','
+    set_pos(t)
+    return t
+
+
+def t_dot(t):
+    r'\.'
+    t.type = '.'
+    set_pos(t)
+    return t
+
+
+def t_opar(t):
+    r'\('
+    t.type = '('
+    set_pos(t)
+    return t
+
+
+def t_cpar(t):
+    r'\)'
+    t.type = ')'
+    set_pos(t)
+    return t
+
+
+def t_semicolon(t):
+    r';'
+    t.type = ';'
+    set_pos(t)
+    return t
+
+
+def t_dollar(t):
+    r'\$'
+    t.type = '$'
+    set_pos(t)
+    return t
+
 # Error handling rule
 
 
 def t_ANY_error(t):
     # print("Illegal character '%s'" % t.value[0])
-    t.error.append(LexicographicError(t.lineno, t.col, t.value[0]))
+    set_pos(t)
+    t.lexer.errors.append(LexicographicError(t.lineno, t.col, t.value[0]))
     t.lexer.skip(1)
 #########################################################################################
-
-
-
-
-# TODO: Add line and column for each token

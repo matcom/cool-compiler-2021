@@ -258,6 +258,7 @@ def p_error(p):
     print(f"Syntax error in input! {p}")
 
 
+
 precedence = (
     ('right', 'ASSIGN'),
     ('right', 'NOT'),
