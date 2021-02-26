@@ -1,4 +1,4 @@
-from semantics.tools import Type, ErrorType, AutoType, TypeBag
+from semantics.tools import Type, TypeBag
 
 def conforms(bag1:TypeBag, bag2:TypeBag):
     ordered_set = order_set_by_index(bag2.type_set)
@@ -98,11 +98,7 @@ def auto_add(type_set:set, head_list:list, bag:TypeBag):
 def order_set_by_index(type_set):
     return sorted(list(type_set), lambda x: x.index)
 
-def from_dict_to_set(types:dict):
-    type_set = set()
-    for typex in types:
-        type_set.add(types[typex])
-    return type_set
+
 
 def set_intersection(parent, type_set) -> set:
     set_result = set()

@@ -1,107 +1,99 @@
 import semantics.visitor as visitor
-from parsing.ast import ProgramNode, ClassDeclarationNode, MethodDeclarationNode, AttrDeclarationNode
-from semantics.utils import SemanticError
-from semantics.utils import ErrorType, SelfType
-from semantics.utils import Context
+from parsing.ast import Node, ProgramNode, ClassDeclarationNode
+from semantics.tools import SemanticError
+from semantics.tools import Context
 
-class TypeBuilder:
-    def __init__(self, context: Context):
-        self.context = context
-        self.current_type = None
+class TypeCollector(object):
+    def __init__(self) -> None:
+        self.context = Context()
         self.errors = []
-    
+        self.type_graph = {"Object":["IO", "String", "Int", "Bool"], "IO":[], "String":[], "Int":[], "Bool":[]}
+        self.node_dict = dict()
+
     @visitor.on('node')
     def visit(self, node):
         pass
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        self.build_default_classes()
+        self.context = Context()
+        self.init_default_classes()
 
         for class_def in node.declarations:
             self.visit(class_def)
 
-        try:
-            self.context.get_type('Main').get_method('main', local=True)
-        except SemanticError as err:
-            self.add_error(node, err.text)
-    
+        new_declarations = self.get_type_hierarchy()
+        node.declarations = new_declarations
+        self.context.type_graph = self.type_graph
+
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
-        self.current_type = self.context.get_type(node.id)
-
-        if node.parent:
-            try:
-                parent_type = self.context.get_type(node.parent)
-                self.current_type.set_parent(parent_type)
-                for idx, _ in list(parent_type.all_attributes(True)):
-                    self.current_type.attributes.append(idx)
-            except SemanticError as err:
-                self.add_error(node, err.text)
-        
-        for feature in node.features:
-            self.visit(feature)
-
-    @visitor.when(AttrDeclarationNode)
-    def visit(self, node):
         try:
-            attr_type = self.context.get_type(node.type)
-        except SemanticError as err:
-            self.add_error(node, err.text)
-            attr_type = ErrorType()
-        
-        try:
-            self.current_type.define_attribute(node.id, attr_type)
-        except SemanticError as err:
-            self.add_error(err.text)
+            self.context.create_type(node.id)
+            self.type_graph[node.id] = []
+            self.node_dict[node.id] = node
+            if node.parent:
+                if node.parent in {'String', 'Int, Bool'}:
+                    raise SemanticError(f"Type \'{node.id}\' cannot inherit from \'{node.parent}\' beacuse is forbidden.")
+                try:
+                    self.type_graph[node.parent].append(node.id)
+                except KeyError:
+                    self.type_graph[node.parent] = [node.id]
+            else:
+                node.parent = "Object"
+                self.type_graph["Object"].append(node.id)
+        except SemanticError as error:
+            self.add_error(node, error.text)
     
-    @visitor.when(MethodDeclarationNode)
-    def visit(self, node):
-        try:
-            ret_type = self.context.get_type(node.type)
-        except SemanticError as err:
-            self.add_error(err.text)
-            ret_type = ErrorType()
+    def get_type_hierarchy(self):
+        visited = set(["Object"])
+        new_order = []
+        self.dfs_type_graph("Object", self.type_graph, visited, new_order, 1)
+
+        circular_heritage_errors = []
+        for node in self.type_graph:
+            if not node in visited:
+                visited.add(node)
+                path = [node]
+                circular_heritage_errors.append(self.check_circular_heritage(node, self.type_graph, path, visited))
+                new_order = new_order + [self.context.get_type(node) for node in path]
+            
+        if circular_heritage_errors:
+            print(circular_heritage_errors)
+            error = "Semantic Error: Circular Heritage:\n"
+            error += "\n".join(err for err in circular_heritage_errors)
+            self.add_error(None, error)
+
+        return new_order
+
+    def dfs_type_graph(self, root, graph, visited:set, new_order, index):
+        if not root in graph:
+            return
         
-        params_type = []
-        params_name = []
-        for p_name, p_type in node.params:
-            try:
-                params_type.append(self.context.get_type(p_type))
-            except SemanticError as err:
-                params_type.append(ErrorType())
-                self.add_error(node, err.text)
-            params_name.append(p_name)
-        
-        try:
-            self.current_type.define_method(node.id, params_name, params_type, ret_type)
-        except SemanticError as err:
-            self.add_error(node, err.text)
+        for node in graph[root]:
+            if node in visited:
+                continue
+            visited.add(node)
+            if node not in {"Int", "String", "IO", "Bool", "Object"}:
+                new_order.append(self.node_dict[node])
+            self.context.get_type(node).index = index
+            self.dfs_type_graph(node, graph, visited, new_order, index + 1)
+    
+    def check_circular_heritage(self, root, graph, path, visited):
+        for node in graph[root]:
+            if node in path:
+                return ' -> '.join(child for child in visited + [visited[0]])
 
-    def build_default_classes(self):
-        Object = self.context.get_type("Object")
-        String = self.context.get_type("String")
-        Int = self.context.get_type("Int")
-        Io = self.context.get_type("IO")
-        Bool = self.context.get_type("Bool")
+            visited.add(node)
+            path.append(node)
+            return self.check_circular_heritage(node, graph, path, visited)
 
-        String.set_parent(Object)
-        Int.set_parent(Object)
-        Io.set_parent(Object)
-        Bool.set_parent(Object)
-
-        Object.define_method("abort", [], [], Object)
-        Object.define_method("type_name", [], [], String)
-        Object.define_method("copy", [], [], SelfType())
-
-        String.define_method("length", [], [], Int)
-        String.define_method("concat", ["s"], [String], String)
-        String.define_method("substr", ["i", "l"], [Int, Int], String)
-
-        Io.define_method("out_string", ["x"],[String], SelfType())
-        Io.define_method("out_int", ["x"],[Int], SelfType())
-        Io.define_method("in_string", [],[], String)
-        Io.define_method("in_int", [], [], Int)
+    def init_default_classes(self):
+        self.context.create_type('Object').index = 0
+        self.context.create_type('String')
+        self.context.create_type('Int')
+        self.context.create_type('IO')
+        self.context.create_type('Bool')
     
     def add_error(self, node, text:str):
         line, col = node.get_position() if node else 0, 0

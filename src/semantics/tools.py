@@ -1,7 +1,7 @@
 import itertools as itt
 from collections import OrderedDict
 from typing import FrozenSet
-from semantics.utils import from_dict_to_set
+#from semantics.utils import from_dict_to_set
 
 class InternalError(Exception):
     @property
@@ -155,6 +155,22 @@ class Type:
             if this == None:
                 return None
         return this
+    
+    def __str__(self):
+        output = f'type {self.name}'
+        parent = '' if self.parent is None else f' : {self.parent.name}'
+        output += parent
+        output += ' {'
+        output += '\n\t' if self.attributes or self.methods else ''
+        output += '\n\t'.join(str(x) for x in self.attributes)
+        output += '\n\t' if self.attributes else ''
+        output += '\n\t'.join(str(x) for x in self.methods)
+        output += '\n' if self.methods else ''
+        output += '}\n'
+        return output
+
+    def __repr__(self):
+        return str(self)
 
 class TypeBag:
     def __init__(self, type_set, heads = []) -> None:
@@ -215,6 +231,7 @@ class TypeBag:
             pass
         return self
     
+
     def clone(self):
         clone = TypeBag(self.type_set, self.heads)
         clone.condition_list = self.condition_list
@@ -231,9 +248,6 @@ class SelfType(Type):
     def bypass(self):
         raise InternalError("SELF_TYPE is yet to be assigned, cannot bypass.")
 
-class AutoType(Type):
-    pass
-
 class ErrorType(Type):
     def __init__(self):
         self.name = "<error>"
@@ -248,18 +262,20 @@ class Context:
     def create_type(self, name:str) -> Type:
         if name in self.types:
             raise SemanticError(f'Type with the same name ({name}) already exists.')
-        if name[0] != name[0].upper:
+        if name[0] != name[0].upper():
             raise SemanticError(f'Type name ({name}) must start with upper case')
         typex = self.types[name] = Type(name)
         return typex
     
-    def get_type(self, name:str, selftype=True, autotype=True) -> Type:
+    def get_type(self, name:str, selftype=True, autotype=True, unpacked=False) -> Type:
         if selftype and name == "SELF_TYPE":
             return TypeBag({SelfType()}) #SelfType()
         if autotype and name == "AUTO_TYPE":
             self.num_autotypes += 1
             return TypeBag(self.types, [self.types['Object']]) #AutoType(f"T{self.num_autotypes}", [self.types["Object"]], self.types)
         try:
+            if unpacked:
+                return self.types[name]
             return TypeBag({self.types[name]})
         except KeyError:
             raise TypeError(f'Type "{name}" is not defined.')
@@ -340,3 +356,9 @@ class Scope:
         self.current_child = -1
         for child in self.children:
             child.reset()
+
+def from_dict_to_set(types:dict):
+    type_set = set()
+    for typex in types:
+        type_set.add(types[typex])
+    return type_set
