@@ -22,7 +22,7 @@ def run_pipeline(program):
     print('Context\n', context)
 
     auto_collector = autotype_collector.AutotypeCollector(context)
-    auto_collector.visit(ast)
+    scope = auto_collector.visit(ast)
 
     s = "Type Collector Errors:\n"
     s = format_errors(collector.errors, s)
@@ -30,13 +30,19 @@ def run_pipeline(program):
     s = format_errors(builder.errors, s)
     s += "Inference Gatherer Errors:\n"
     s = format_errors(auto_collector.errors, s)
-
+    s += "Scope:\n" +  scope.get_all_names()
     print(s)
 
-folder_path = r'./zTests/Misc'
-filenames = os.listdir(folder_path)
-filenames.sort()
+try:
+    folder_path = r'./zTests/Misc'
+    filenames = os.listdir(folder_path)
+    filenames.sort()
+except FileNotFoundError:
+    print("Error Importing Files")
 count = 4
+
+filenames = [r'/home/rodro/Aarka/Complementos de Compilacion/cool-compiler-2022/src/zTests/Misc/06FooBarRaz.cl']
+filenames = [r'/home/rodro/Aarka/Complementos de Compilacion/cool-compiler-2022/src/zTests/Misc/07MultipleClass.cl']
 
 for filename in filenames:
     if count == 0:

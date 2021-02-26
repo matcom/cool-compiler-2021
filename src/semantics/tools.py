@@ -76,25 +76,35 @@ class Type:
         else:
             raise SemanticError(f'Attribute "{name}" is already defined in {self.name}.')
 
-    def get_attribute(self, name:str):
+    def get_attribute(self, name:str, first=None):
+        if not first:
+            first = self.name
+        elif first == self.name:
+            raise AttributeError(f'Attribute "{name}" is not defined in {self.name}.')
+
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
             if self.parent is None:
                 raise AttributeError(f'Attribute "{name}" is not defined in {self.name}.')
             try:
-                return self.parent.get_attribute(name)
+                return self.parent.get_attribute(name, first=first)
             except SemanticError:
                 raise AttributeError(f'Attribute "{name}" is not defined in {self.name}.')
     
-    def get_method(self, name:str, local:bool = False):
+    def get_method(self, name:str, local:bool = False, first = None):
+        if not first:
+            first = self.name
+        elif first == self.name:
+            raise SemanticError(f'Method "{name}" is not defined in class {self.name}.')
+
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
                 raise SemanticError(f'Method "{name}" is not defined in class {self.name}.')
             try:
-                return self.parent.get_method(name)
+                return self.parent.get_method(name, first = first)
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in class {self.name}.')
 
@@ -108,7 +118,7 @@ class Type:
             parent_method = None
         if parent_method:
             error_list = []
-            if conforms(return_type, parent_method.return_type):
+            if not conforms(return_type, parent_method.return_type):
                 error_list.append(f"    -> Same return type: Redefined method has \'{return_type.name}\' as return type instead of \'{parent_method.return_type.name}\'.")
             if len(param_types) != len(parent_method.param_types):
                 error_list.append(f"    -> Same amount of params: Redefined method has {len(param_types)} params instead of {len(parent_method.param_types)}.")
@@ -116,7 +126,7 @@ class Type:
                 count = 0
                 err = []
                 for param_type, parent_param_type in zip(param_types, parent_method.param_types):
-                    if param_type != parent_param_type:
+                    if not conforms(param_type, parent_param_type):
                         err.append(f"        -Param number {count} has {param_type.name} as type instead of {parent_param_type.name}")
                     count += 1
                 if err:
@@ -130,20 +140,34 @@ class Type:
         self.methods.append(method)
         return method
 
-    def all_attributes(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
+    def all_attributes(self, clean=True, first=None):
+        if not first:
+            first = self.name
+        elif first == self.name:
+            return OrderedDict.values() if clean else OrderedDict()
+
+        plain = OrderedDict() if self.parent is None else self.parent.all_attributes(clean = False, first=first)
         for attr in self.attributes:
             plain[attr.name] = (attr, self)
         return plain.values() if clean else plain
 
-    def all_methods(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
+    def all_methods(self, clean=True, first=None):
+        if not first:
+            first = self.name
+        elif first == self.name:
+            return OrderedDict.values() if clean else OrderedDict()
+
+        plain = OrderedDict() if self.parent is None else self.parent.all_methods(clean = False, first=first)
         for method in self.methods:
             plain[method.name] = (method, self)
         return plain.values() if clean else plain
 
-    def conforms_to(self, other):
-        return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
+    def conforms_to(self, other, first=None):
+        if not first:
+            first = self.name
+        elif self.name == first:
+            return False
+        return other.bypass() or self == other or self.parent and self.parent.conforms_to(other, first)
 
     def bypass(self):
         return False
@@ -151,8 +175,7 @@ class Type:
     def least_common_ancestor(self, other):
         this = self
         if isinstance(this, ErrorType) or isinstance(other, ErrorType):
-            return ErrorType()
-            #raise SemanticError("Error Type detected while perfoming Join. Aborting.") 
+            return ErrorType() 
 
         while this.index < other.index:
             other = other.parent
@@ -397,6 +420,14 @@ class Scope:
         self.current_child = -1
         for child in self.children:
             child.reset()
+    
+    def get_all_names(self, s:str = "", level:int = 0):
+        if self.locals:
+            s += "\n ".join([x.name + ":" + str([typex.name for typex in x.type.type_set]) for x in self.locals])
+            s += "\n\n"
+        for child in  self.children:
+            s = child.get_all_names(s, level + 1)
+        return s
 
 
 def conforms(bag1:TypeBag, bag2:TypeBag):
