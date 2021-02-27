@@ -23,7 +23,6 @@ class ProgramNode(Node):
 class DeclarationNode(Node):
     pass
 
-
 class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None):
         Node.__init__(self)
@@ -57,7 +56,7 @@ class VarDeclarationNode(ExpressionNode):
     def __init__(self, idx, typex, expression=None):
         Node.__init__(self)
         self.id = idx
-        self.typex = typex
+        self.type = typex
         self.expr = expression
 
 
