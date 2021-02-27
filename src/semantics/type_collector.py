@@ -98,6 +98,6 @@ class TypeCollector(object):
         self.context.create_type('IO')
         self.context.create_type('Bool')
     
-    def add_error(self, node, text:str):
+    def add_error(self, node:Node, text:str):
         line, col = node.get_position() if node else 0, 0
-        self.errors.append(f"Line: {line} Col: {col} " + text)
+        self.errors.append(f"({line}, {col}) - " + text)
