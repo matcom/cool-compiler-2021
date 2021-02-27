@@ -1,14 +1,14 @@
 import semantics.visitor as visitor
-from parsing.ast import ProgramNode, ClassDeclarationNode, MethodDeclarationNode, AttrDeclarationNode
+from parsing.ast import Node, ProgramNode, ClassDeclarationNode, MethodDeclarationNode, AttrDeclarationNode
 from semantics.tools import SemanticError, TypeBag
 from semantics.tools import ErrorType, SelfType
 from semantics.tools import Context
 
 class TypeBuilder:
-    def __init__(self, context: Context):
+    def __init__(self, context: Context, errors):
         self.context = context
         self.current_type = None
-        self.errors = []
+        self.errors = errors
     
     @visitor.on('node')
     def visit(self, node): 
@@ -110,6 +110,6 @@ class TypeBuilder:
         Io.define_method("in_string", [],[], p_String)
         Io.define_method("in_int", [], [], p_Int)
     
-    def add_error(self, node, text:str):
+    def add_error(self, node:Node, text:str):
         line, col = node.get_position() if node else 0, 0
-        self.errors.append(f"Line: {line} Col: {col} " + text)
+        self.errors.append(f"({line}, {col}) - " + text)

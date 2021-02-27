@@ -118,6 +118,8 @@ class Type:
             parent_method = None
         if parent_method:
             error_list = []
+            return_type.swap_self_type(self)
+            parent_method.return_type.swap_self_type(self)
             if not conforms(return_type, parent_method.return_type):
                 error_list.append(f"    -> Same return type: Redefined method has \'{return_type.name}\' as return type instead of \'{parent_method.return_type.name}\'.")
             if len(param_types) != len(parent_method.param_types):
@@ -132,6 +134,8 @@ class Type:
                 if err:
                     s = f"    -> Same param types:\n" + "\n".join(child for child in err)
                     error_list.append(s)
+            return_type.swap_self_type(self, back = True)
+            parent_method.return_type.swap_self_type(self, back = True)
             if error_list:
                 err = f"Redifined method \"{name}\" in class {self.name} does not have:\n" + "\n".join(child for child in error_list)
                 raise SemanticError(err)
@@ -252,20 +256,25 @@ class TypeBag:
             new_heads += new_heads
         self.heads = new_heads
 
-    def swap_self_type(self, update_type):
-        try:
-            self.type_set.remove(SelfType())
-            self.type_set.add(update_type)
-        except KeyError:
-            pass
-        return self
-    
-    def swap_types(self, update_type, remove_type):
+    def swap_self_type(self, swap_type, back = False):
+        if not back:
+            remove_type = SelfType()
+            add_type = swap_type
+        else:
+            remove_type = swap_type
+            add_type = SelfType()
+
         try:
             self.type_set.remove(remove_type)
-            self.type_set.add(update_type)
+            self.type_set.add(add_type)
         except KeyError:
-            pass
+            return self
+        
+        for i in range(len(self.heads)):
+                typex = self.heads[i]
+                if typex.name == remove_type.name:
+                    self.heads[i] = add_type
+                    break
         return self
     
     def generate_name(self):
@@ -294,6 +303,11 @@ class SelfType(Type):
     def bypass(self):
         raise InternalError("SELF_TYPE is yet to be assigned, cannot bypass.")
 
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __eq__(self, o: object) -> bool:
+        return isinstance(o, SelfType)
 
     def __str__(self):
         return self.name
@@ -311,7 +325,7 @@ class ErrorType(Type):
     def bypass(self):
         return True
 
-    def swap_self_type(self, update_type):
+    def swap_self_type(self, swap_type):
         return self
 
     def set_conditions(self, *params):
