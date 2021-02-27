@@ -11,7 +11,7 @@ class TypeBuilder:
         self.errors = []
     
     @visitor.on('node')
-    def visit(self, node):
+    def visit(self, node): 
         pass
 
     @visitor.when(ProgramNode)

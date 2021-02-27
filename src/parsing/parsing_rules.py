@@ -6,7 +6,7 @@ from .ast import (AssignNode, AttrDeclarationNode, BlocksNode, BooleanNode,
                   InstantiateNode, IntNode, IsVoidNode, LessNode,
                   LessOrEqualNode, LetNode, LoopNode, MethodCallNode, MethodDeclarationNode,
                   MinusNode, NotNode, PlusNode, ProgramNode, StarNode,
-                  StringNode, VarDeclarationNode)
+                  StringNode, VarDeclarationNode, VariableNode)
 
 
 def p_program(p):
@@ -30,6 +30,9 @@ def p_class(p):
         p[0] = ClassDeclarationNode(p[2], p[6], p[4])
     elif len(p) == 6:
         p[0] = ClassDeclarationNode(p[2], p[4])
+    
+    p[0].set_position(p.slice[1].lineno, p.slice[1].col)
+    
 
 
 def p_feature_list(p):
@@ -238,7 +241,7 @@ def p_expression_string(p):
 
 def p_expression_variable(p):
     """expression : ID"""
-    p[0] = InstantiateNode(p[1])
+    p[0] = VariableNode(p[1])
 
 
 def p_expression_true(p):
@@ -261,8 +264,8 @@ def p_empty(p):
     p[0] = []
 
 
-def p_error(p):
-    print(f"Syntax error in input! {p} ")#line:{p.lineno} col:{p.col}")
+def p_error(t):
+    print(f"Syntax error in input! {t} ")#line:{p.lineno} col:{p.col}")
 
 
 

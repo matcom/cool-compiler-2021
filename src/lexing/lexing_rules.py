@@ -117,7 +117,7 @@ def t_aux_rcomment(t):
     r'\*\)'
     t.lexer.level -= 1
     if t.lexer.level == 0:
-        t.value = t.lexer.lexdata[t.lexer.comm_start:t.lexer.lexpos+1]
+        t.value = t.lexer.lexdata[t.lexer.comm_start:t.lexer.lexpos]
         t.type = "COMMENT"
         t.lexer.lineno += t.value.count('\n')
         t.lexer.begin('INITIAL')
@@ -131,7 +131,7 @@ def t_aux_pass(t):
 # Rule so we can track line numbers
 
 
-def t_ANY_newline(t):
+def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
     t.lexer.col = 1
