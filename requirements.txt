@@ -1,2 +1,5 @@
 pytest
 pytest-ordering
+
+typer
+sly
