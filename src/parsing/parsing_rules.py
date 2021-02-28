@@ -24,8 +24,8 @@ def p_class_list(p):
 
 
 def p_class(p):
-    """class : CLASS ID INHERITS ID '{' feature_list '}'
-             | CLASS ID '{' feature_list '}'"""
+    """class : CLASS TYPE INHERITS TYPE '{' feature_list '}'
+             | CLASS TYPE '{' feature_list '}'"""
     if len(p) == 8:
         p[0] = ClassDeclarationNode(p[2], p[6], p[4])
     elif len(p) == 6:
@@ -46,8 +46,8 @@ def p_feature_list(p):
 
 
 def p_attribute(p):
-    """attribute : ID ':' ID ASSIGN expression
-                 | ID ':' ID """
+    """attribute : ID ':' TYPE ASSIGN expression
+                 | ID ':' TYPE """
     if len(p) == 6:
         p[0] = AttrDeclarationNode(p[1], p[3], p[5])
     else:
@@ -57,7 +57,7 @@ def p_attribute(p):
 
 
 def p_method(p):
-    """method : ID '(' params_list ')' ':' ID '{' expression '}'"""
+    """method : ID '(' params_list ')' ':' TYPE '{' expression '}'"""
     p[0] = MethodDeclarationNode(p[1], p[3], p[6], p[8])
     p[0].set_position(p.slice[1].line, p.slice[1].col)
 
@@ -76,7 +76,7 @@ def p_params_list_empty(p):
 
 
 def p_param(p):
-    """param : ID ':' ID"""
+    """param : ID ':' TYPE"""
     p[0] = VarDeclarationNode(p[1], p[3])
     p[0].set_position(p.slice[1].line, p.slice[1].col)
 
@@ -136,8 +136,8 @@ def p_let_list(p):
 
 
 def p_let_single(p):
-    """let_single : ID ':' ID ASSIGN expression
-                  | ID ':' ID"""
+    """let_single : ID ':' TYPE ASSIGN expression
+                  | ID ':' TYPE"""
     if len(p) == 6:
         p[0] = VarDeclarationNode(p[1], p[3], p[5])
     else:
@@ -163,7 +163,7 @@ def p_case_list(p):
 
 
 def p_case_single(p):
-    """case_single : ID ':' ID RET expression ';'"""
+    """case_single : ID ':' TYPE RET expression ';'"""
     p[0] = CaseOptionNode(p[1],p[3],p[5])
     p[0].set_position(p.slice[1].line, p.slice[1].col)
 
@@ -171,7 +171,7 @@ def p_case_single(p):
 
 
 def p_expression_dispatch(p):
-    """expression : expression '@' ID '.' ID '(' args_list ')'
+    """expression : expression '@' TYPE '.' ID '(' args_list ')'
                   | expression '.' ID '(' args_list ')'
                   | ID '(' args_list ')'"""
     if len(p) == 9:
@@ -202,7 +202,7 @@ def p_args_list_empty(p):
     p[0] = []
 
 def p_expression_instatiate(p):
-    """expression : NEW ID"""
+    """expression : NEW TYPE"""
     p[0] = InstantiateNode(p[2])
     p[0].set_position(p.slice[1].line, p.slice[1].col)
 

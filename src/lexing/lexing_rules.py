@@ -32,6 +32,7 @@ tokens = [
     'ASSIGN',
     'RET',
     'ID',
+    'TYPE',
     'STRING',
     'INT',
     'COMMENT',
@@ -60,14 +61,19 @@ def t_RET(t):
     set_pos(t)
     return t
 
-
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
+def t_TYPE(t):
+    r'[A-Z][a-zA-Z_0-9]*'
     set_pos(t)
     lower_case = t.value.lower()
-    if lower_case in ('true', 'false') and t.value[0].isupper():
-        t.type = 'ID'
+    if lower_case in ('true', 'false'):
+        t.type = 'TYPE'
         return t
+    t.type = reserved.get(lower_case, 'TYPE')
+    return t
+
+def t_ID(t):
+    r'[a-z_][a-zA-Z_0-9]*'
+    set_pos(t)
     t.type = reserved.get(t.value.lower(), 'ID')
     return t
 
@@ -271,5 +277,4 @@ def t_ANY_error(t):
 
 
 # TODO: Add separate tokens for class (types) names and identifiers
-# TODO: Fix bug related to (line, col)-setting when the program contains comments
 # TODO: Handle errors inside comments (unbalanced multiline comments delimeters)
