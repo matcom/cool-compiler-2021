@@ -343,7 +343,7 @@ class AutotypeCollector:
         node.inferenced_type = self.context.get_type("Bool")
 
     def add_error(self, node:Node, text:str):
-        line, col = node.get_position() if node else 0, 0
+        line, col = node.get_position() if node else (0, 0)
         self.errors.append(f"({line}, {col}) - " + text)
 # todo: Revisar los auto types que me hace falta y que no
 # todo: completar de manera acorde el autotype collector
