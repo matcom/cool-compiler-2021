@@ -156,7 +156,7 @@ class CoolLexer(Lexer):
             LexicographicError(
                 self.lineno,
                 self.compute_column(t.index),
-                f"Unexpected `{t.value[0]}`.",
+                f"Unexpected `{repr(t.value[0])[1:-1]}`.",
             )
         )
         return t
@@ -181,7 +181,7 @@ class CoolMultilineCommentLexer(Lexer):
     def EOF(self):
         self.errors.append(
             LexicographicError(
-                self.lineno, self.compute_column(self.index), "Unexpected EOF."
+                self.lineno, self.compute_column(self.index), "Unexpected `EOF`."
             )
         )
 
@@ -220,7 +220,7 @@ class CoolStringLexer(Lexer):
     def EOF(self):
         self.errors.append(
             LexicographicError(
-                self.lineno, self.compute_column(self.index), "Unexpected EOF."
+                self.lineno, self.compute_column(self.index), "Unexpected `EOF`."
             )
         )
 
@@ -233,7 +233,7 @@ class CoolStringLexer(Lexer):
             LexicographicError(
                 self.lineno,
                 self.compute_column(t.index),
-                f"Unexpected `{t.value[0]}`.",
+                f"Unexpected `{repr(t.value[0])[1:-1]}`.",
             )
         )
         return t
