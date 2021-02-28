@@ -1,6 +1,3 @@
-# Lexer rules
-#########################################################################################
-
 from lexing.utils import LexicographicError, set_pos
 
 literals = [
@@ -139,7 +136,10 @@ def t_newline(t):
 
 def t_WHITESPACE(t):
     r'\s'
-    t.lexer.col += len(t.value)
+    if t.value == '\t':
+        t.lexer.col += 4
+    else:
+        t.lexer.col += len(t.value)
 
 
 def t_plus(t):
@@ -264,8 +264,11 @@ def t_dollar(t):
 
 
 def t_ANY_error(t):
-    # print("Illegal character '%s'" % t.value[0])
     set_pos(t)
     t.lexer.errors.append(LexicographicError(t.lineno, t.col, t.value[0]))
     t.lexer.skip(1)
-#########################################################################################
+
+
+# TODO: Add separate tokens for class (types) names and identifiers
+# TODO: Fix bug related to (line, col)-setting when program contains comments
+# TODO: Handle errors inside comments (unbalanced multiline comments delimeters)

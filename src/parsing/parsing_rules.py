@@ -31,7 +31,7 @@ def p_class(p):
     elif len(p) == 6:
         p[0] = ClassDeclarationNode(p[2], p[4])
     
-    p[0].set_position(p.slice[1].lineno, p.slice[1].col)
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
     
 
 
@@ -53,10 +53,13 @@ def p_attribute(p):
     else:
         p[0] = AttrDeclarationNode(p[1], p[3])
 
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 def p_method(p):
     """method : ID '(' params_list ')' ':' ID '{' expression '}'"""
     p[0] = MethodDeclarationNode(p[1], p[3], p[6], p[8])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
 
 
 def p_params_list(p):
@@ -75,6 +78,8 @@ def p_params_list_empty(p):
 def p_param(p):
     """param : ID ':' ID"""
     p[0] = VarDeclarationNode(p[1], p[3])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_list(p):
@@ -89,26 +94,36 @@ def p_expression_list(p):
 def p_expression_assigment(p):
     """expression : ID ASSIGN expression"""
     p[0] = AssignNode(p[1], p[3])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_if_then_else(p):
     """expression : IF expression THEN expression ELSE expression FI"""
     p[0] = ConditionalNode(p[2], p[4], p[6])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_while(p):
     """expression : WHILE expression LOOP expression POOL"""
     p[0] = LoopNode(p[2], p[4])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_block(p):
     """expression : '{' expression_list '}'"""
     p[0] = BlocksNode(p[2])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_let_in(p):
     """expression : LET let_list IN expression"""
     p[0] = LetNode(p[2], p[4])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_let_list(p):
@@ -127,11 +142,15 @@ def p_let_single(p):
         p[0] = VarDeclarationNode(p[1], p[3], p[5])
     else:
         p[0] = VarDeclarationNode(p[1], p[3])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+    
 
 
 def p_expression_case(p):
     """expression : CASE expression OF case_list ESAC"""
     p[0] = CaseNode(p[2], p[4])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_case_list(p):
@@ -145,7 +164,9 @@ def p_case_list(p):
 
 def p_case_single(p):
     """case_single : ID ':' ID RET expression ';'"""
-    p[0] = CaseOptionNode(p[1],p[3],p[5])   
+    p[0] = CaseOptionNode(p[1],p[3],p[5])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
     
 
 
@@ -155,10 +176,16 @@ def p_expression_dispatch(p):
                   | ID '(' args_list ')'"""
     if len(p) == 9:
         p[0] = MethodCallNode(p[1],p[3],p[5],p[7])
+        p[0].set_position(p.slice[2].line, p.slice[2].col)
+
     elif len(p) == 7:
         p[0] = MethodCallNode(p[1], None, p[3], p[5])
+        p[0].set_position(p.slice[2].line, p.slice[2].col)
+
     else:
         p[0]= MethodCallNode(None, None, p[1], p[3])
+        p[0].set_position(p.slice[1].line, p.slice[1].col)
+
     
 
 def p_args_list(p):
@@ -177,86 +204,114 @@ def p_args_list_empty(p):
 def p_expression_instatiate(p):
     """expression : NEW ID"""
     p[0] = InstantiateNode(p[2])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_isvoid(p):
     """expression : ISVOID expression"""
     p[0] = IsVoidNode(p[2])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
 
 
 def p_expression_not(p):
     """expression : NOT expression"""
     p[0] = NotNode(p[2])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_complement(p):
     """expression : '~' expression"""
     p[0] = ComplementNode(p[2])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_plus(p):
     """expression : expression '+' expression"""
     p[0] = PlusNode(p[1],p[3])
+    p[0].set_position(p.slice[2].line, p.slice[2].col)
+
 
 
 def p_expression_minus(p):
     """expression : expression '-' expression"""
     p[0] = MinusNode(p[1],p[3])
+    p[0].set_position(p.slice[2].line, p.slice[2].col)
+
 
 
 def p_expression_div(p):
     """expression : expression '/' expression"""
     p[0] = DivNode(p[1],p[3])
+    p[0].set_position(p.slice[2].line, p.slice[2].col)
 
 
 def p_expression_star(p):
     """expression : expression '*' expression"""
     p[0] = StarNode(p[1],p[3])
+    p[0].set_position(p.slice[2].line, p.slice[2].col)
 
 
 def p_expression_less(p):
     """expression : expression '<' expression"""
     p[0] = LessNode(p[1],p[3])
+    p[0].set_position(p.slice[2].line, p.slice[2].col)
 
 
 def p_expression_lesseq(p):
     """expression : expression LESSEQ expression"""
     p[0] = LessOrEqualNode(p[1],p[3])
+    p[0].set_position(p.slice[2].line, p.slice[2].col)
 
 
 def p_expression_equals(p):
     """expression : expression '=' expression"""
     p[0] = EqualsNode(p[1],p[3])
+    p[0].set_position(p.slice[2].line, p.slice[2].col)
 
 
 def p_expression_parentheses(p):
     """expression : '(' expression ')'"""
     p[0] = p[2]
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_string(p):
     """expression : STRING"""
     p[0] = StringNode(p[1])
+    p[0].set_position(p.slice[1].lineno, p.slice[1].col)
+
 
 
 def p_expression_variable(p):
     """expression : ID"""
     p[0] = VariableNode(p[1])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_true(p):
     """expression : TRUE"""
     p[0] = BooleanNode(True)
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_false(p):
     """expression : FALSE"""
     p[0] = BooleanNode(False)
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_expression_int(p):
     """expression : INT"""
     p[0] = IntNode(p[1])
+    p[0].set_position(p.slice[1].line, p.slice[1].col)
+
 
 
 def p_empty(p):
@@ -265,7 +320,7 @@ def p_empty(p):
 
 
 def p_error(t):
-    print(f"Syntax error in input! {t} ")#line:{p.lineno} col:{p.col}")
+    print(f"Syntax error in input! {t} line:{t.lineno} col:{t.col}")
 
 
 
