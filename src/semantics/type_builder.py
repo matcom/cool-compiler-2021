@@ -111,5 +111,5 @@ class TypeBuilder:
         Io.define_method("in_int", [], [], p_Int)
     
     def add_error(self, node:Node, text:str):
-        line, col = node.get_position() if node else 0, 0
-        self.errors.append(f"({line}, {col}) - " + text)
+        line, col = node.get_position() if node else (0, 0)
+        self.errors.append(((line,col), f"({line}, {col}) - " + text))

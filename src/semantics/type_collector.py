@@ -99,5 +99,5 @@ class TypeCollector(object):
         self.context.create_type('Bool')
     
     def add_error(self, node:Node, text:str):
-        line, col = node.get_position() if node else 0, 0
-        self.errors.append(f"({line}, {col}) - " + text)
+        line, col = node.get_position() if node else (0, 0)
+        self.errors.append(((line,col), f"({line}, {col}) - " + text))
