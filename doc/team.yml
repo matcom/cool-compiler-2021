@@ -1,10 +1,7 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Jorge Mederos Alvarado
+    github: jmederosalvarado
+    group: C412
+  - name: Rodrigo García Gómez
+    github: Rodrigo43
+    group: C412
