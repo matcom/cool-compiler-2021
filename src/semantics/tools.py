@@ -348,8 +348,6 @@ class Context:
     def create_type(self, name:str) -> Type:
         if name in self.types:
             raise SemanticError(f'Type with the same name ({name}) already exists.')
-        if name[0] != name[0].upper():
-            raise SemanticError(f'Type name ({name}) must start with upper case')
         typex = self.types[name] = Type(name)
         return typex
     
