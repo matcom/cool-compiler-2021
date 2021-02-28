@@ -54,13 +54,13 @@ class AutotypeCollector:
         for idx, typex in zip(current_method.param_names, current_method.param_types):
             scope.define_variable(idx, typex)
         
-        self.visit(node.body, scope)
         ret_type_decl = current_method.return_type.swap_self_type(self.current_type)
+        self.visit(node.body, scope)
         ret_type_expr = node.body.inferenced_type
 
         ret_expr_clone = ret_type_expr.clone()
         if not conforms(ret_expr_clone, ret_type_decl):
-            self.add_error(node, f"Type Error: In Class \'{self.current_type.name}\' method \'{current_method.name}\' return expression type({ret_type_expr.name} does not conforms to declared return type ({ret_type_decl.name}))")
+            self.add_error(node, f"Type Error: In Class \'{self.current_type.name}\' method \'{current_method.name}\' return expression type({ret_type_expr.name}) does not conforms to declared return type ({ret_type_decl.name})")
 
         node.body.inferenced_type = ret_type_expr
 
@@ -81,7 +81,7 @@ class AutotypeCollector:
         
         condition_clone = condition_type.clone()
         if not conforms(condition_clone, bool_type):
-            self.add_error(node, f"Type Error: If's condition type({condition_type.name} does not conforms to Bool type")
+            self.add_error(node, f"Type Error: If's condition type({condition_type.name}) does not conforms to Bool type.")
 
         self.visit(node.then_body, scope)
         then_type = node.then_body.inferenced_type
@@ -138,7 +138,7 @@ class AutotypeCollector:
         child = scope.create_child()
         for var in node.var_decl_list:
             self.visit(var, child)
-        self.visit(node.in_expr, scope)
+        self.visit(node.in_expr, child)
         node.inferenced_type = node.in_expr.inferenced_type
     
     @visitor.when(VarDeclarationNode)
@@ -229,13 +229,13 @@ class AutotypeCollector:
             for typex, method in methods:
                 ret_type = method.return_type.clone()
                 ret_type.swap_self_type(typex)
-                smart_add(type_set, heads, ret_type)
-                for i in range(len(node.args)):
-                    arg, param_type = node.args[i], method.param_types[i]
-                    self.visit(arg, scope)
-                    arg_type = arg.inferenced_type
-                    arg_clone = arg_type.clone()
-                    conforms(arg_clone, param_type)
+                type_set = smart_add(type_set, heads, ret_type)
+                #for i in range(len(node.args)):
+                #    arg, param_type = node.args[i], method.param_types[i]
+                #    self.visit(arg, scope)
+                #    arg_type = arg.inferenced_type
+                #    arg_clone = arg_type.clone()
+                #    conforms(arg_clone, param_type)
 
             node.inferenced_type = TypeBag(type_set, heads)
         else:
@@ -256,7 +256,7 @@ class AutotypeCollector:
             self.add_error(node, f"Type Error: Arithmetic Error: Left member type({left_clone.name}) does not conforms to Int type.")
             int_type = ErrorType()
         if not conforms(right_type, int_type):
-            self.add_error(node, f"Type Error: Arithmetic Error: Left member type({right_clone.name}) does not conforms to Int type.")
+            self.add_error(node, f"Type Error: Arithmetic Error: Right member type({right_clone.name}) does not conforms to Int type.")
             int_type = ErrorType()
         
         node.inferenced_type = int_type
@@ -276,13 +276,10 @@ class AutotypeCollector:
             self.add_error(node, f"Type Error: Left expression type({left_type.name}) does not conforms to right expression type({right_type.name})")
             node_type = ErrorType()
 
-        #node.left.inferenced_type = left_clone
-        #node.right.inferenced_type = right_clone
-
         node.inferenced_type = node_type
     
     @visitor.when(VariableNode)
-    def visit(self, node, scope):
+    def visit(self, node, scope:Scope):
         var = scope.find_variable(node.value)
         if var:
             node.defined = True
@@ -290,7 +287,7 @@ class AutotypeCollector:
         else:
             node.defined = False
             var_type = ErrorType()
-            self.add_error(node, f"Semantic Error: Variable '{node.id}' is not defined.")
+            self.add_error(node, f"Semantic Error: Variable '{node.value}' is not defined.")
         node.inferenced_type = var_type
 
     @visitor.when(NotNode)
@@ -327,6 +324,7 @@ class AutotypeCollector:
         try:
             node_type = self.context.get_type(node.value, selftype=False, autotype=False)
         except SemanticError as err:
+            self.add_error(f"Semantic Error: Could not instantiate type '{node.value}'.")
             node_type = ErrorType()
         node.inferenced_type = node_type
 
@@ -344,10 +342,6 @@ class AutotypeCollector:
 
     def add_error(self, node:Node, text:str):
         line, col = node.get_position() if node else (0, 0)
-        self.errors.append(f"({line}, {col}) - " + text)
-# todo: Revisar los auto types que me hace falta y que no
-# todo: completar de manera acorde el autotype collector
-# todo: Annadir error en VarDeclarationNode
-# todo: Annadir error en MethodCallNode (2)
-# todo: annadir error en INsyantiate Node
+        self.errors.append(((line,col), f"({line}, {col}) - " + text))
+
 # todo: Cambiar self.error a que cada error tengo la tupla de localizacion, asi permite organizar los errores

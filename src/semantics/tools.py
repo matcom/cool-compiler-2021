@@ -111,7 +111,7 @@ class Type:
     def define_method(self, name:str, param_names:list, param_types:list, return_type):
         if name in (method.name for method in self.methods):
             raise SemanticError(f'Method \'{name}\' already defined in \'{self.name}\'')
-
+        
         try:
             parent_method = self.get_method(name)
         except SemanticError:
@@ -119,17 +119,19 @@ class Type:
         if parent_method:
             error_list = []
             return_type.swap_self_type(self)
+            return_clone = return_type.clone()
             parent_method.return_type.swap_self_type(self)
             if not conforms(return_type, parent_method.return_type):
-                error_list.append(f"    -> Same return type: Redefined method has \'{return_type.name}\' as return type instead of \'{parent_method.return_type.name}\'.")
+                error_list.append(f"    -> Same return type: Redefined method has \'{return_clone.name}\' as return type instead of \'{parent_method.return_type.name}\'.")
             if len(param_types) != len(parent_method.param_types):
                 error_list.append(f"    -> Same amount of params: Redefined method has {len(param_types)} params instead of {len(parent_method.param_types)}.")
             else:
                 count = 0
                 err = []
                 for param_type, parent_param_type in zip(param_types, parent_method.param_types):
+                    param_clone = param_type.clone()
                     if not conforms(param_type, parent_param_type):
-                        err.append(f"        -Param number {count} has {param_type.name} as type instead of {parent_param_type.name}")
+                        err.append(f"        -Param number {count} has {param_clone.name} as type instead of {parent_param_type.name}")
                     count += 1
                 if err:
                     s = f"    -> Same param types:\n" + "\n".join(child for child in err)
@@ -137,11 +139,12 @@ class Type:
             return_type.swap_self_type(self, back = True)
             parent_method.return_type.swap_self_type(self, back = True)
             if error_list:
-                err = f"Redifined method \"{name}\" in class {self.name} does not have:\n" + "\n".join(child for child in error_list)
+                err = f"Redifined method \'{name}\' in class \'{self.name}\' does not have:\n" + "\n".join(child for child in error_list)
                 raise SemanticError(err)
-
+        
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
+
         return method
 
     def all_attributes(self, clean=True, first=None):
@@ -275,6 +278,8 @@ class TypeBag:
                 if typex.name == remove_type.name:
                     self.heads[i] = add_type
                     break
+        
+        self.name = self.generate_name()
         return self
     
     def generate_name(self):
@@ -287,9 +292,9 @@ class TypeBag:
         return s
 
     def clone(self):
-        clone = TypeBag(self.type_set, self.heads)
-        clone.condition_list = self.condition_list
-        clone.conform_list = self.conform_list
+        clone = TypeBag(self.type_set.copy(), self.heads.copy())
+        clone.condition_list = self.condition_list.copy()
+        clone.conform_list = self.conform_list.copy()
         return clone
 
 class SelfType(Type):
@@ -330,6 +335,9 @@ class ErrorType(Type):
 
     def set_conditions(self, *params):
         return
+    
+    def clone(self):
+        return self
 
 class Context:
     def __init__(self) -> None:
@@ -416,7 +424,7 @@ class Scope:
             return next(x for x in locals if x.name == vname)
         except StopIteration:
             try:
-                return self.parent.find_variable(vname, self.index) if self.parent else None
+                return self.parent.find_variable(vname, self.index) if self.parent is not None else None
             except AttributeError:
                 return None
 
@@ -516,7 +524,7 @@ def smart_add(type_set:set, head_list:list, typex:Type):
                 break
     if not there_is:
         head_list.append(typex)
-    return head_list, type_set
+    return type_set
 
 def auto_add(type_set:set, head_list:list, bag:TypeBag):
     type_set = type_set.union(bag.type_set)
@@ -530,5 +538,5 @@ def auto_add(type_set:set, head_list:list, bag:TypeBag):
                 aux.pop(head)
                 break
     head_list += [typex for typex in aux]
-    return head_list, type_set
+    return type_set
 
