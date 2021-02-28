@@ -117,6 +117,7 @@ def t_aux_rcomment(t):
         t.value = t.lexer.lexdata[t.lexer.comm_start:t.lexer.lexpos]
         t.type = "COMMENT"
         t.lexer.lineno += t.value.count('\n')
+        t.lexer.col = len(t.value) - t.value.rfind('\n')
         t.lexer.begin('INITIAL')
         # return t
 
@@ -270,5 +271,5 @@ def t_ANY_error(t):
 
 
 # TODO: Add separate tokens for class (types) names and identifiers
-# TODO: Fix bug related to (line, col)-setting when program contains comments
+# TODO: Fix bug related to (line, col)-setting when the program contains comments
 # TODO: Handle errors inside comments (unbalanced multiline comments delimeters)
