@@ -426,3 +426,6 @@ src/zTests/Misc/10BiG.cl
 .gitignore
 ./gitignore
 .gitignore
+src/type_logger.py
+src/zTests/Auto/00Simple.cl
+src/zTests/Auto/01Assign.cl

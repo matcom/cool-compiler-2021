@@ -74,7 +74,7 @@ class Type:
             self.attributes.append(attribute)
             return attribute
         else:
-            raise SemanticError(f'Attribute "{name}" is already defined in {self.name}.')
+            raise SemanticError(f'Attribute "{name}" is already defined in "{self.name}".')
 
     def get_attribute(self, name:str, first=None):
         if not first:
@@ -348,8 +348,6 @@ class Context:
     def create_type(self, name:str) -> Type:
         if name in self.types:
             raise SemanticError(f'Type with the same name ({name}) already exists.')
-        if name[0] != name[0].upper():
-            raise SemanticError(f'Type name ({name}) must start with upper case')
         typex = self.types[name] = Type(name)
         return typex
     
@@ -507,6 +505,11 @@ def join_list(type_list):
         type_i = type_list[i]
         join_result = join(join_result, type_i)
     return join_result
+
+def equal(bag1:TypeBag, bag2:TypeBag):
+    set1 = bag1.type_set
+    set2 = bag2.type_set
+    return len(set1) == len(set2) and len(set1.intersection(set2)) == len(set2)
 
 def smart_add(type_set:set, head_list:list, typex:Type):
     if isinstance(typex, TypeBag):
