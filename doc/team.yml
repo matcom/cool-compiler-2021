@@ -2,9 +2,6 @@ members:
   - name: Nombre Apellido1 Apellido2
     github: github_id
     group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Juan Carlos Casteleiro Wong
+    github: cwjki
+    group: C411
