@@ -7,7 +7,20 @@ from coolpyler.lexer import CoolLexer
 
 
 class CoolParser(Parser):
+    debugfile = "./parser.out"
     tokens = CoolLexer.tokens
+
+    precedence = (
+        ("left", "DOT"),
+        ("left", "AT"),
+        ("right", "TILDE"),
+        ("right", "ISVOID"),
+        ("left", "STAR", "SLASH"),
+        ("left", "PLUS", "MINUS"),
+        ("nonassoc", "LEQ", "LE", "EQ"),
+        ("right", "NOT"),
+        ("right", "LEFT_ARROW"),
+    )
 
     def __init__(self, errors=None):
         if errors is None:
@@ -24,7 +37,9 @@ class CoolParser(Parser):
         # class_
         pass
 
-    @_("OBJECT_ID OPAR [ param { COMMA param } ] CPAR COLON TYPE_ID OCURLY expr CCURLY")
+    @_(
+        "OBJECT_ID OPAR [ formal { COMMA formal } ] CPAR COLON TYPE_ID OCURLY expr CCURLY"
+    )
     def feature(self, p):
         # func_decl
         pass
@@ -35,7 +50,7 @@ class CoolParser(Parser):
         pass
 
     @_("OBJECT_ID COLON TYPE_ID")
-    def param(self, p):
+    def formal(self, p):
         # param
         pass
 
@@ -44,117 +59,41 @@ class CoolParser(Parser):
         # assign
         pass
 
-    @_("not_")
+    @_("expr AT TYPE_ID DOT OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
     def expr(self, p):
-        pass
-
-    @_("NOT not_")
-    def not_(self, p):
-        # not_
-        pass
-
-    @_("comparison")
-    def not_(self, p):
-        pass
-
-    @_("comparison LEQ arithmetic")
-    def comparison(self, p):
-        # comparison_leq
-        pass
-
-    @_("comparison LE arithmetic")
-    def comparison(self, p):
-        # comparison_le
-        pass
-
-    @_("comparison EQ arithmetic")
-    def comparison(self, p):
-        # comparison_eq
-        pass
-
-    @_("arithmetic")
-    def comparison(self, p):
-        pass
-
-    @_("arithmetic PLUS term")
-    def arithmetic(self, p):
-        # arithmetic_add
-        pass
-
-    @_("arithmetic MINUS term")
-    def arithmetic(self, p):
-        # arithmetic_sub
-        pass
-
-    @_("term")
-    def arithmetic(self, p):
-        pass
-
-    @_("term STAR factor")
-    def term(self, p):
-        # term_mul
-        pass
-
-    @_("term SLASH factor")
-    def term(self, p):
-        # term_div
-        pass
-
-    @_("factor")
-    def term(self, p):
-        pass
-
-    @_("ISVOID factor")
-    def factor(self, p):
-        # isvoid_expr
-        pass
-
-    @_("tilde")
-    def factor(self, p):
-        pass
-
-    @_("TILDE tilde")
-    def tilde(self, p):
-        # tilde_expr
-        pass
-
-    @_("dispatch")
-    def tilde(self, p):
-        pass
-
-    @_("[ dispatch DOT ] OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
-    def dispatch(self, p):
-        # dispatch
-        pass
-
-    @_("static_dispatch")
-    def dispatch(self, p):
-        pass
-
-    @_("static_dispatch AT TYPE_ID DOT OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
-    def static_dispatch(self, p):
         # static_dispatch
         pass
 
-    @_("atom")
-    def static_dispatch(self, p):
+    @_("expr DOT OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
+    def expr(self, p):
+        # dispatch
+        pass
+
+    @_("OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
+    def expr(self, p):
+        # dispatch
         pass
 
     @_("IF expr THEN expr ELSE expr FI")
-    def atom(self, p):
+    def expr(self, p):
         # if_expr
         pass
 
     @_("WHILE expr LOOP expr POOL")
-    def atom(self, p):
+    def expr(self, p):
         # while_expr
+        pass
+
+    @_("OCURLY expr SEMICOLON { expr SEMICOLON } CCURLY")
+    def expr(self, p):
+        # block_expr
         pass
 
     @_(
         "LET OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ] "
         + "{ COMMA OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ] } IN expr"
     )
-    def atom(self, p):
+    def expr(self, p):
         # let_expr
         pass
 
@@ -162,50 +101,91 @@ class CoolParser(Parser):
         "CASE expr OF OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr SEMICOLON "
         + "{ OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr SEMICOLON } ESAC"
     )
-    def atom(self, p):
+    def expr(self, p):
         # case_expr
         pass
 
-    @_("OCURLY expr SEMICOLON { expr SEMICOLON } CCURLY")
-    def atom(self, p):
-        # block_expr
-        pass
-
     @_("NEW TYPE_ID")
-    def atom(self, p):
+    def expr(self, p):
         # new_expr
         pass
 
+    @_("ISVOID expr")
+    def expr(self, p):
+        # isvoid_expr
+        pass
+
+    @_("expr PLUS expr")
+    def expr(self, p):
+        # arithmetic_add
+        pass
+
+    @_("expr MINUS expr")
+    def expr(self, p):
+        # arithmetic_sub
+        pass
+
+    @_("expr STAR expr")
+    def expr(self, p):
+        # term_mul
+        pass
+
+    @_("expr SLASH expr")
+    def expr(self, p):
+        # term_div
+        pass
+
+    @_("TILDE expr")
+    def expr(self, p):
+        # tilde_expr
+        pass
+
+    @_("expr LE expr")
+    def expr(self, p):
+        # comparison_le
+        pass
+
+    @_("expr LEQ expr")
+    def expr(self, p):
+        # comparison_leq
+        pass
+
+    @_("expr EQ expr")
+    def expr(self, p):
+        # comparison_eq
+        pass
+
+    @_("NOT expr")
+    def expr(self, p):
+        # not_
+        pass
+
     @_("OPAR expr CPAR")
-    def atom(self, p):
+    def expr(self, p):
         # parenthized_expr
         pass
 
     @_("OBJECT_ID")
-    def atom(self, p):
+    def expr(self, p):
         # var_expr
         pass
 
-    @_("constant")
-    def atom(self, p):
-        pass
-
     @_("INT")
-    def constant(self, p):
+    def expr(self, p):
         # integer_atom
         pass
 
     @_("STRING")
-    def constant(self, p):
+    def expr(self, p):
         # string_atom
         pass
 
     @_("TRUE")
-    def constant(self, p):
+    def expr(self, p):
         # bool_atom
         pass
 
     @_("FALSE")
-    def constant(self, p):
+    def expr(self, p):
         # bool_atom
         pass
