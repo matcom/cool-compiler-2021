@@ -9,4 +9,4 @@ echo "Copyright (c) 2019: Alejandro Klever Clemente, Laura Tamayo Blanco, Miguel
 #
 # Llamar al compilador
 # echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
-python cool run $INPUT_FILE
+python cool run ${INPUT_FILE}
