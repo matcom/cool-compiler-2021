@@ -2,7 +2,15 @@ from sly import Lexer
 from coolpyler.errors import LexicographicError
 
 
-class CoolLexer(Lexer):
+class CoolLexerBase(object):
+    def compute_column(self, index):
+        return index - max(self.text[:index].rfind("\n"), 0)
+
+    def EOF(self):
+        pass
+
+
+class CoolLexer(CoolLexerBase, Lexer):
     tokens = {
         "INLINE_COMMENT",
         "OCOMMENT",
@@ -112,10 +120,7 @@ class CoolLexer(Lexer):
 
     def tokenize(self, text, lineno=1, index=0):
         yield from super().tokenize(text, lineno=lineno, index=index)
-        try:
-            self.EOF()
-        except AttributeError:
-            pass
+        self.EOF()
 
     def INLINE_COMMENT(self, t):
         pass
@@ -137,7 +142,7 @@ class CoolLexer(Lexer):
         return t
 
     def STRING(self, t):
-        self.string = ""
+        self.string = t
         self.push_state(CoolStringLexer)
 
     def INT(self, t):
@@ -147,14 +152,11 @@ class CoolLexer(Lexer):
     def ignore_newline(self, t):
         self.lineno += 1
 
-    def compute_column(self, index):
-        return index - max(self.text[:index].rfind("\n"), 0)
-
     def error(self, t):
         self.index += 1
         self.errors.append(
             LexicographicError(
-                self.lineno,
+                t.lineno,
                 self.compute_column(t.index),
                 f"Unexpected `{repr(t.value[0])[1:-1]}`.",
             )
@@ -162,7 +164,7 @@ class CoolLexer(Lexer):
         return t
 
 
-class CoolMultilineCommentLexer(Lexer):
+class CoolMultilineCommentLexer(CoolLexerBase, Lexer):
     tokens = {"OCOMMENT", "CCOMMENT"}
 
     OCOMMENT = r"\(\*"
@@ -188,23 +190,21 @@ class CoolMultilineCommentLexer(Lexer):
     def ignore_newline(self, t):
         self.lineno += 1
 
-    def compute_column(self, index):
-        return index - max(self.text[:index].rfind("\n"), 0)
-
     def error(self, t):
         self.index += 1
 
 
-class CoolStringLexer(Lexer):
-    tokens = {"STRING", "ESCAPED_CHAR", "BODY"}
+class CoolStringLexer(CoolLexerBase, Lexer):
+    tokens = {"STRING", "ESCAPED_CHAR", "BODY", "EOL"}
 
     STRING = r"\""
     ESCAPED_CHAR = r"(?s:\\.?)"
     BODY = r"[^\x00\n\\\"]+"
+    EOL = r"\n"
 
     def STRING(self, t):
         self.pop_state()
-        t.value = self.string
+        t = self.string
         self.string = None
         return t
 
@@ -212,10 +212,24 @@ class CoolStringLexer(Lexer):
         special_map = {"b": "\b", "t": "\t", "n": "\n", "f": "\f"}
         if t.value[-1] == "\n":
             self.lineno += 1
-        self.string += special_map.get(t.value[-1], t.value[-1])
+        self.string.value += special_map.get(t.value[-1], t.value[-1])
 
     def BODY(self, t):
-        self.string += t.value
+        self.string.value += t.value
+
+    def EOL(self, t):
+        self.errors.append(
+            LexicographicError(
+                t.lineno,
+                self.compute_column(t.index),
+                f"Unexpected `{repr(t.value[0])[1:-1]}`.",
+            )
+        )
+        self.lineno += 1
+        self.pop_state()
+        t = self.string
+        self.string = None
+        return t
 
     def EOF(self):
         self.errors.append(
@@ -223,17 +237,16 @@ class CoolStringLexer(Lexer):
                 self.lineno, self.compute_column(self.index), "Unexpected `EOF`."
             )
         )
-
-    def compute_column(self, index):
-        return index - max(self.text[:index].rfind("\n"), 0)
+        t = self.string
+        self.string = None
+        return t
 
     def error(self, t):
         self.index += 1
         self.errors.append(
             LexicographicError(
-                self.lineno,
+                t.lineno,
                 self.compute_column(t.index),
                 f"Unexpected `{repr(t.value[0])[1:-1]}`.",
             )
         )
-        return t
