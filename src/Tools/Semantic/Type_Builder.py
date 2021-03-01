@@ -1,7 +1,7 @@
-from .Tools import visitor
-from .Tools.Semantic import *
-from .Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
-from .Tools.Errors import *
+from Tools.Tools import visitor
+from Tools.Tools.Semantic import *
+from Tools.Parser.Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
+from Tools.Tools.Errors import *
 
 # Visitor encargado de contruir los tipos. Una vez que se conocen los nombres
 # de los tipos que intervienen en el codifo COOL, este visitor les annade sus
@@ -103,7 +103,7 @@ class Type_Builder:
             attr_type = self.Context.get_type(node.type.lex)
         except SemanticException as ex:
             # Existio un error al tratar de obtener el tipo del atributo
-            self.errors.append(TypeError(node.line, node.column, ex.text))
+            self.errors.append(TypeError(node.type.line, node.type.column, ex.text))
             attr_type = ErrorType()
 
         try:
@@ -121,7 +121,7 @@ class Type_Builder:
                 type = self.Context.get_type(type.lex)
             except SemanticException as ex:
                 # Existio un error al tratar de obtener el tipo del parametro
-                self.errors.append(TypeError(name.line, name.column,
+                self.errors.append(TypeError(type.line, type.column,
                          f'Class {type.lex} of formal parameter {name.lex} is undefined'))
                 type = ErrorType()
             else:

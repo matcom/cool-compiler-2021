@@ -1,7 +1,7 @@
 import ply.lex as lex
-from .Tools.utils import Token
-from .Parser import CoolGrammar
-from .Tools.Errors import LexicographicError
+from Tools.Tools.utils import Token
+from Tools.Parser.Parser import CoolGrammar
+from Tools.Tools.Errors import LexicographicError
 
 class Lexer:
     states = (
@@ -242,7 +242,8 @@ class Lexer:
 
     def find_column(self, token):
         line_start = self.code.rfind('\n', 0, token.lexpos) + 1
-        return (token.lexpos - line_start) + 1
+        return (token.lexpos - line_start) + 1 \
+               + 3 * len([i for i in self.code[line_start:token.lexpos] if i == '\t'])
 
     def t_error(self, t):
         self.errors.append(LexicographicError(t.lineno,

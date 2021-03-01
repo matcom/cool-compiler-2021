@@ -209,16 +209,9 @@ class ErrorType(Type):
 
 # Clase para representar una variable dentro del programa
 class VariableInfo:
-    def __init__(self, name, vtype, line, column):
+    def __init__(self, name, vtype):
         self.name = name
         self.type = vtype
-        self.line = line
-        self.column = column
-
-        self.upper = []
-        self.lower = []
-        self.dependencies = []
-        self.weakDependencies = []
 
 
 # Clase para representar el contexto en el que se guardan las variables y los

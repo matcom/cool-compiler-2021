@@ -1,7 +1,7 @@
-from .Tools import visitor
-from .Tools.Semantic import *
-from .Parser import ProgramNode, ClassDeclarationNode
-from .Tools.Errors import SemanticError
+from Tools.Tools import visitor
+from Tools.Tools.Semantic import *
+from Tools.Parser.Parser import ProgramNode, ClassDeclarationNode
+from Tools.Tools.Errors import SemanticError
 
 # Visitor encargado de coleccionar los nombres de las clases que se definen
 # en el codigo del programa COOL, chequea ademas que no se redeclaren e

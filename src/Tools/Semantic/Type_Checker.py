@@ -1,11 +1,11 @@
-from .Tools import visitor
-from .Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode,\
+from Tools.Tools import visitor
+from Tools.Parser.Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode,\
                    IfThenElseNode, WhileLoopNode, BlockNode, LetInNode, CaseOfNode,\
                    AssignNode, LessEqualNode, LessNode, EqualNode, ArithmeticNode,\
                    NotNode, IsVoidNode, ComplementNode, FunctionCallNode, MemberCallNode, NewNode,\
                    IntegerNode, IdNode, StringNode, BoolNode
-from .Tools.Semantic import Context, Scope, SelfType, SemanticException, ErrorType
-from .Tools.Errors import *
+from Tools.Tools.Semantic import Context, Scope, SelfType, SemanticException, ErrorType
+from Tools.Tools.Errors import *
 
 # Este es el visitor encargado de terminar el chequeo semantico.
 # Revisa la compatibilidad de tipos, la compatibilidad en la herencia,

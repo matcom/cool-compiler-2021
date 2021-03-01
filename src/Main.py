@@ -1,9 +1,9 @@
-from Tools.Lexer import Lexer
-from Tools.Parser import CoolParser
+from Tools.Lexer.Lexer import Lexer
+from Tools.Parser.Parser import CoolParser
 from Tools.Tools.evaluation import evaluate_reverse_parse
-from Tools.Type_Collector import Type_Collector
-from Tools.Type_Builder import Type_Builder
-from Tools.Type_Checker import Type_Checker
+from Tools.Semantic.Type_Collector import Type_Collector
+from Tools.Semantic.Type_Builder import Type_Builder
+from Tools.Semantic.Type_Checker import Type_Checker
 
 def main(args):
     try:
