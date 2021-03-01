@@ -95,7 +95,9 @@ def run(file: str, verbose: bool = False):
 
         for error in errors:
             typer.echo(error, err=True)
-
+        exit(0)
+    else:
+        exit(1)
 
 @app.command()
 def serialize():

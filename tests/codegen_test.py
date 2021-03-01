@@ -1,6 +1,6 @@
 import pytest
 import os
-from utils import compare_outputs
+from .utils import compare_outputs
 
 tests_dir = __file__.rpartition('/')[0] + '/codegen/'
 print(tests_dir)
