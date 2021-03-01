@@ -2,6 +2,7 @@ import typer
 from pathlib import Path
 from coolpyler.errors import InvalidInputFileError
 from coolpyler.lexer import CoolLexer
+from coolpyler.parser import CoolParser
 
 
 def report_and_exit(errors):
@@ -22,11 +23,13 @@ def coolpyler(input: Path, output: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    code = input.read_text()  # noqa: F841
+    code = input.read_text()
 
     lexer = CoolLexer(errors)
     tokens = lexer.tokenize(code)
-    list(tokens)
+
+    parser = CoolParser(errors)
+    ast = parser.parse(tokens)  # noqa: F841
 
     if len(errors) > 0:
         report_and_exit(errors)

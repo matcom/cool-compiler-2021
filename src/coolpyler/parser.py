@@ -9,22 +9,27 @@ from coolpyler.lexer import CoolLexer
 class CoolParser(Parser):
     tokens = CoolLexer.tokens
 
-    @_("class_ SEMICOLON {class_ SEMICOLON}")
+    def __init__(self, errors=None):
+        if errors is None:
+            errors = []
+        self.errors = errors
+
+    @_("class_ SEMICOLON { class_ SEMICOLON }")
     def program(self, p):
         # program
         pass
 
-    @_("CLASS TYPE_ID [INHERITS TYPE_ID] OCURLY {feature SEMICOLON} CCURLY")
+    @_("CLASS TYPE_ID [ INHERITS TYPE_ID ] OCURLY { feature SEMICOLON } CCURLY")
     def class_(self, p):
         # class_
         pass
 
-    @_("OBJECT_ID OPAR [param {COMMA param}] CPAR COLON TYPE_ID OCURLY expr CCURLY")
+    @_("OBJECT_ID OPAR [ param { COMMA param } ] CPAR COLON TYPE_ID OCURLY expr CCURLY")
     def feature(self, p):
         # func_decl
         pass
 
-    @_("OBJECT_ID COLON TYPE_ID [LEFT_ARROW expr]")
+    @_("OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ]")
     def feature(self, p):
         # attr_decl
         pass
@@ -117,7 +122,7 @@ class CoolParser(Parser):
     def tilde(self, p):
         pass
 
-    @_("[dispatch DOT] OBJECT_ID OPAR [expr {COMMA expr}] CPAR")
+    @_("[ dispatch DOT ] OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
     def dispatch(self, p):
         # dispatch
         pass
@@ -126,7 +131,7 @@ class CoolParser(Parser):
     def dispatch(self, p):
         pass
 
-    @_("static_dispatch AT TYPE_ID DOT OBJECT_ID OPAR [expr {COMMA expr}] CPAR")
+    @_("static_dispatch AT TYPE_ID DOT OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
     def static_dispatch(self, p):
         # static_dispatch
         pass
@@ -146,8 +151,8 @@ class CoolParser(Parser):
         pass
 
     @_(
-        "LET OBJECT_ID COLON TYPE_ID [LEFT_ARROW expr]"
-        + "[{COMMA OBJECT_ID COLON TYPE_ID [LEFT_ARROW expr]}] IN expr"
+        "LET OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ] "
+        + "{ COMMA OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ] } IN expr"
     )
     def atom(self, p):
         # let_expr
@@ -155,13 +160,13 @@ class CoolParser(Parser):
 
     @_(
         "CASE expr OF OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr SEMICOLON "
-        + "{OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr SEMICOLON} ESAC"
+        + "{ OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr SEMICOLON } ESAC"
     )
     def atom(self, p):
         # case_expr
         pass
 
-    @_("OCURLY expr SEMICOLON [{expr SEMICOLON}] CCURLY")
+    @_("OCURLY expr SEMICOLON { expr SEMICOLON } CCURLY")
     def atom(self, p):
         # block_expr
         pass
