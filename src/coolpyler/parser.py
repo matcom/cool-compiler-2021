@@ -217,6 +217,7 @@ class CoolParser(Parser):
         pass
 
     # error rules
+    # TODO: parser recovery and resynchronization with error rules
 
     def error(self, token):
         if token is None:
@@ -224,6 +225,6 @@ class CoolParser(Parser):
         else:
             self.errors.append(
                 UnexpectedTokenError(
-                    token.lineno, token.columnno, f"<{token.type, token.value}>"
+                    token.lineno, token.columnno, f"({token.type}, {token.value})>"
                 )
             )
