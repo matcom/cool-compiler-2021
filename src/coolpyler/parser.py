@@ -1,14 +1,38 @@
+import os
 from sly import Parser
 from coolpyler.lexer import CoolLexer
-
 
 # pyright: reportUndefinedVariable=false
 # flake8: noqa
 
+DEBUG = True
+
+
+class CoolLogger(object):
+    def __init__(self, f=None):
+        if f is None:
+            f = open(os.devnull, "w")
+        self.f = open(f, "w") if isinstance(f, str) else f
+
+    def debug(self, msg, *args, **kwargs):
+        self.f.write((msg % args) + "\n")
+
+    info = debug
+
+    def warning(self, msg, *args, **kwargs):
+        self.f.write("WARNING: " + (msg % args) + "\n")
+
+    def error(self, msg, *args, **kwargs):
+        self.f.write("ERROR: " + (msg % args) + "\n")
+
+    critical = debug
+
 
 class CoolParser(Parser):
-    debugfile = "./parser.out"
-    tokens = CoolLexer.tokens
+    log = CoolLogger("./parser.log" if DEBUG else None)
+    debugfile = "./parser.out" if DEBUG else None
+
+    tokens = CoolLexer.tokens - {"INLINE_COMMENT", "OCOMMENT"}
 
     precedence = (
         ("left", "DOT"),
@@ -20,6 +44,7 @@ class CoolParser(Parser):
         ("nonassoc", "LEQ", "LE", "EQ"),
         ("right", "NOT"),
         ("right", "LEFT_ARROW"),
+        # ("right", "IN"),
     )
 
     def __init__(self, errors=None):
