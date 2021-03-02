@@ -1,5 +1,6 @@
 import os
 from sly import Parser
+from coolpyler.errors import UnexpectedEOFError, UnexpectedTokenError
 from coolpyler.lexer import CoolLexer
 
 # pyright: reportUndefinedVariable=false
@@ -214,3 +215,15 @@ class CoolParser(Parser):
     def expr(self, p):
         # bool_atom
         pass
+
+    # error rules
+
+    def error(self, token):
+        if token is None:
+            self.errors.append(UnexpectedEOFError())
+        else:
+            self.errors.append(
+                UnexpectedTokenError(
+                    token.lineno, token.columnno, f"<{token.type, token.value}>"
+                )
+            )

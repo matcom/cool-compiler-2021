@@ -100,7 +100,7 @@ class UnexpectedTokenError(SyntacticError):
     Reported the parser encounters an unexpected Token.
     """
 
-    def __init__(self, line: int, column: int, token: str, expected: set) -> None:
+    def __init__(self, line: int, column: int, token: str) -> None:
         SyntacticError.__init__(
             self,
             line,
@@ -114,7 +114,5 @@ class UnexpectedEOFError(SyntacticError):
     Reported the parser encounters end of file unexpectedly.
     """
 
-    def __init__(self, expected: set) -> None:
-        SyntacticError.__init__(
-            self, 0, 0, f"Unexpected end of file. Expected one of {expected}."
-        )
+    def __init__(self) -> None:
+        SyntacticError.__init__(self, 0, 0, "Unexpected EOF.")
