@@ -122,8 +122,7 @@ class Type:
             raise SemanticException(f'Method {name} is multiply defined')
 
         method = self.methods[name] = Method(name, param_names, param_types, return_type)
-        method.return_info = VariableInfo(f'{self.name}_{name}_returnType', return_type,
-                                          line, column)
+        method.return_info = VariableInfo(f'{self.name}_{name}_returnType', return_type)
 
         return method
 
@@ -262,7 +261,7 @@ class Scope:
 
     # Define una variable en el scope
     def define_variable(self, name : str, type : Type, line : int, column : int):
-        self.locals.append(VariableInfo(name, type, line, column))
+        self.locals.append(VariableInfo(name, type))
         return self.locals[-1]
 
     # Retorna una variable definida en el scope, None si no esta definida
