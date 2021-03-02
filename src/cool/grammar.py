@@ -156,7 +156,7 @@ def multi_line_comment(lexer: Lexer):
     pos = lexer.position + 2
     lex = '(*'
 
-    while counter > 1:
+    while counter > 0:
         if pos >= len(text):
             lexer.contain_errors = True
             lexer.position = pos

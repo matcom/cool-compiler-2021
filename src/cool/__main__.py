@@ -32,11 +32,12 @@ def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
     return ast, scope, context, errors
 
 
-def tokenize(file: str, verbose: bool = False):
-    path = Path.cwd() / file
+def tokenize(file: typer.FileText, verbose: bool = False):
+    path = Path.cwd() / file.name
     if not path.exists():
-        typer.echo(f'File {file} does not exist.')
-        exit()
+        typer.echo(f'File {file.name} does not exist.')
+        return None, None
+
     s = path.open('r').read()
     lexer = CoolLexer()
     tokens = lexer(s)
@@ -52,23 +53,27 @@ def tokenize(file: str, verbose: bool = False):
     return tokens, lexer
 
 
-def parse(file: str, verbose: bool = False):
+def parse(file: typer.FileText, verbose: bool = False):
     tokens, lexer = tokenize(file, verbose)
 
-    if lexer.contain_errors:
+    if lexer is None or lexer.contain_errors:
         return None, None
 
     parser = CoolParser(verbose)
     ast = parser(tokens)
 
     if parser.contains_errors:
-        typer.echo(parser.errors[0], err=True)
+        for e in parser.errors:
+            typer.echo(e, err=True)
 
     return ast, parser
 
 
 @app.command()
-def infer(file: str, verbose: bool = False):
+def infer(
+        file: typer.FileText = typer.Argument(..., help='Cool file'),
+        verbose: bool = typer.Argument(False, help='Execute in verbose mode.')
+):
     ast, _ = parse(file, verbose)
 
     if ast is not None:
@@ -80,7 +85,10 @@ def infer(file: str, verbose: bool = False):
 
 
 @app.command()
-def run(file: str, verbose: bool = False):
+def run(
+        file: typer.FileText = typer.Argument(..., help='Cool file'),
+        verbose: bool = typer.Argument(False, help='Execute in verbose mode.')
+):
     ast, parser = parse(file, verbose)
 
     if ast is not None:
@@ -95,9 +103,10 @@ def run(file: str, verbose: bool = False):
 
         for error in errors:
             typer.echo(error, err=True)
-        exit(0)
+        sys.exit(0)
     else:
         exit(1)
+
 
 @app.command()
 def serialize():
