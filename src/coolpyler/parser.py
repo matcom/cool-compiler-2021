@@ -1,7 +1,40 @@
 import os
 from sly import Parser
-from coolpyler.errors import UnexpectedEOFError, UnexpectedTokenError
 from coolpyler.lexer import CoolLexer
+from coolpyler.errors import UnexpectedEOFError, UnexpectedTokenError
+from coolpyler.ast.cool import (
+    CoolAssignNode,
+    CoolAttrDeclNode,
+    CoolBlockNode,
+    CoolBoolNode,
+    CoolCaseNode,
+    CoolCaseOfNode,
+    CoolClassNode,
+    CoolDispatchNode,
+    CoolDivNode,
+    CoolEqNode,
+    CoolFormalNode,
+    CoolFuncDeclNode,
+    CoolIfThenElseNode,
+    CoolIntNode,
+    CoolIsVoidNode,
+    CoolLeNode,
+    CoolLeqNode,
+    CoolLetDeclNode,
+    CoolLetInNode,
+    CoolMinusNode,
+    CoolMultNode,
+    CoolNewNode,
+    CoolNotNode,
+    CoolParenthNode,
+    CoolPlusNode,
+    CoolProgramNode,
+    CoolStaticDispatchNode,
+    CoolStringNode,
+    CoolTildeNode,
+    CoolVarNode,
+    CoolWhileNode,
+)
 
 # pyright: reportUndefinedVariable=false
 # flake8: noqa
@@ -53,168 +86,184 @@ class CoolParser(Parser):
             errors = []
         self.errors = errors
 
-    @_("class_ SEMICOLON { class_ SEMICOLON }")
+    @_("cool_class SEMICOLON { cool_class SEMICOLON }")
     def program(self, p):
-        # program
-        pass
+        classes = [p.cool_class0] + p.cool_class1
+        return CoolProgramNode(classes)
 
     @_("CLASS TYPE_ID [ INHERITS TYPE_ID ] OCURLY { feature SEMICOLON } CCURLY")
-    def class_(self, p):
-        # class_
-        pass
-
-    @_(
-        "OBJECT_ID OPAR [ formal { COMMA formal } ] CPAR COLON TYPE_ID OCURLY expr CCURLY"
-    )
-    def feature(self, p):
-        # func_decl
-        pass
+    def cool_class(self, p):
+        name, parent, features = p.TYPE_ID0, p.TYPE_ID1, p.feature
+        return CoolClassNode(name, features, parent=parent)
 
     @_("OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ]")
     def feature(self, p):
-        # attr_decl
-        pass
+        id, type, expr = p.OBJECT_ID, p.TYPE_ID, p.expr
+        return CoolAttrDeclNode(id, type, expr)
+
+    @_("OBJECT_ID OPAR [ formal_list ] CPAR COLON TYPE_ID OCURLY expr CCURLY")
+    def feature(self, p):
+        id = p.OBJECT_ID
+        params = p.formal_list if p.formal_list is not None else []
+        type, body = p.TYPE_ID, p.expr
+        return CoolFuncDeclNode(id, params, type, body)
+
+    @_("formal { COMMA formal }")
+    def formal_list(self, p):
+        return [p.formal0] + p.formal1
 
     @_("OBJECT_ID COLON TYPE_ID")
     def formal(self, p):
-        # param
-        pass
+        id, type = p.OBJECT_ID, p.TYPE_ID
+        return CoolFormalNode(id, type)
 
     @_("OBJECT_ID LEFT_ARROW expr")
     def expr(self, p):
-        # assign
-        pass
+        id, expr = p.OBJECT_ID, p.expr
+        return CoolAssignNode(id, expr)
 
-    @_("expr AT TYPE_ID DOT OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
+    @_("expr AT TYPE_ID DOT OBJECT_ID OPAR [ arg_list ] CPAR")
     def expr(self, p):
-        # static_dispatch
-        pass
+        expr, type, id = p.expr, p.TYPE_ID, p.OBJECT_ID
+        args = p.arg_list if p.arg_list is not None else []
+        return CoolStaticDispatchNode(expr, type, id, args)
 
-    @_("expr DOT OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
+    @_("expr DOT OBJECT_ID OPAR [ arg_list ] CPAR")
     def expr(self, p):
-        # dispatch
-        pass
+        expr, id = p.expr, p.OBJECT_ID
+        args = p.arg_list if p.arg_list is not None else []
+        return CoolDispatchNode(id, args, expr=expr)
 
-    @_("OBJECT_ID OPAR [ expr { COMMA expr } ] CPAR")
+    @_("OBJECT_ID OPAR [ arg_list ] CPAR")
     def expr(self, p):
-        # dispatch
-        pass
+        id = p.OBJECT_ID
+        args = p.arg_list if p.arg_list is not None else []
+        return CoolDispatchNode(id, args)
+
+    @_("expr { COMMA expr }")
+    def arg_list(self, p):
+        return [p.expr0] + p.expr1
 
     @_("IF expr THEN expr ELSE expr FI")
     def expr(self, p):
-        # if_expr
-        pass
+        cond, then_expr, else_expr = p.expr0, p.expr1, p.expr2
+        return CoolIfThenElseNode(cond, then_expr, else_expr)
 
     @_("WHILE expr LOOP expr POOL")
     def expr(self, p):
-        # while_expr
-        pass
+        cond, body = p.expr0, p.expr1
+        return CoolWhileNode(cond, body)
 
     @_("OCURLY expr SEMICOLON { expr SEMICOLON } CCURLY")
     def expr(self, p):
-        # block_expr
-        pass
+        expr_list = [p.expr0] + p.expr1
+        return CoolBlockNode(expr_list)
 
-    @_(
-        "LET OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ] "
-        + "{ COMMA OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ] } IN expr"
-    )
+    @_("LET let_decl { COMMA let_decl } IN expr")
     def expr(self, p):
-        # let_expr
-        pass
+        decl_list = [p.let_decl0] + p.let_decl1
+        expr = p.expr
+        return CoolLetInNode(decl_list, expr)
 
-    @_(
-        "CASE expr OF OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr SEMICOLON "
-        + "{ OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr SEMICOLON } ESAC"
-    )
+    @_("OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ]")
+    def let_decl(self, p):
+        id, type, expr = p.OBJECT_ID, p.TYPE_ID, p.expr
+        return CoolLetDeclNode(id, type, expr=expr)
+
+    @_("CASE expr OF case SEMICOLON { case SEMICOLON } ESAC")
     def expr(self, p):
-        # case_expr
-        pass
+        expr = p.expr
+        case_list = [p.case0] + p.case1
+        return CoolCaseOfNode(expr, case_list)
+
+    @_("OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr")
+    def case(self, p):
+        id, type, expr = p.OBJECT_ID, p.TYPE_ID, p.expr
+        return CoolCaseNode(id, type, expr)
 
     @_("NEW TYPE_ID")
     def expr(self, p):
-        # new_expr
-        pass
-
-    @_("ISVOID expr")
-    def expr(self, p):
-        # isvoid_expr
-        pass
-
-    @_("expr PLUS expr")
-    def expr(self, p):
-        # arithmetic_add
-        pass
-
-    @_("expr MINUS expr")
-    def expr(self, p):
-        # arithmetic_sub
-        pass
-
-    @_("expr STAR expr")
-    def expr(self, p):
-        # term_mul
-        pass
-
-    @_("expr SLASH expr")
-    def expr(self, p):
-        # term_div
-        pass
-
-    @_("TILDE expr")
-    def expr(self, p):
-        # tilde_expr
-        pass
-
-    @_("expr LE expr")
-    def expr(self, p):
-        # comparison_le
-        pass
-
-    @_("expr LEQ expr")
-    def expr(self, p):
-        # comparison_leq
-        pass
-
-    @_("expr EQ expr")
-    def expr(self, p):
-        # comparison_eq
-        pass
-
-    @_("NOT expr")
-    def expr(self, p):
-        # not_
-        pass
+        type = p.TYPE_ID
+        return CoolNewNode(type)
 
     @_("OPAR expr CPAR")
     def expr(self, p):
-        # parenthized_expr
-        pass
+        expr = p.expr
+        return CoolParenthNode(expr)
+
+    @_("ISVOID expr")
+    def expr(self, p):
+        expr = p.expr
+        return CoolIsVoidNode(expr)
+
+    @_("TILDE expr")
+    def expr(self, p):
+        expr = p.expr
+        return CoolTildeNode(expr)
+
+    @_("NOT expr")
+    def expr(self, p):
+        expr = p.expr
+        return CoolNotNode(expr)
+
+    @_("expr PLUS expr")
+    def expr(self, p):
+        left_expr, right_expr = p.expr0, p.expr1
+        return CoolPlusNode(left_expr, right_expr)
+
+    @_("expr MINUS expr")
+    def expr(self, p):
+        left_expr, right_expr = p.expr0, p.expr1
+        return CoolMinusNode(left_expr, right_expr)
+
+    @_("expr STAR expr")
+    def expr(self, p):
+        left_expr, right_expr = p.expr0, p.expr1
+        return CoolMultNode(left_expr, right_expr)
+
+    @_("expr SLASH expr")
+    def expr(self, p):
+        left_expr, right_expr = p.expr0, p.expr1
+        return CoolDivNode(left_expr, right_expr)
+
+    @_("expr LE expr")
+    def expr(self, p):
+        left_expr, right_expr = p.expr0, p.expr1
+        return CoolLeNode(left_expr, right_expr)
+
+    @_("expr LEQ expr")
+    def expr(self, p):
+        left_expr, right_expr = p.expr0, p.expr1
+        return CoolLeqNode(left_expr, right_expr)
+
+    @_("expr EQ expr")
+    def expr(self, p):
+        left_expr, right_expr = p.expr0, p.expr1
+        return CoolEqNode(left_expr, right_expr)
 
     @_("OBJECT_ID")
     def expr(self, p):
-        # var_expr
-        pass
+        return CoolVarNode(p.OBJECT_ID)
 
     @_("INT")
     def expr(self, p):
-        # integer_atom
-        pass
+        value = p.INT
+        return CoolIntNode(value)
 
     @_("STRING")
     def expr(self, p):
-        # string_atom
-        pass
+        value = p.STRING
+        return CoolStringNode(value)
 
     @_("TRUE")
     def expr(self, p):
-        # bool_atom
-        pass
+        value = p.TRUE
+        return CoolBoolNode(value)
 
     @_("FALSE")
     def expr(self, p):
-        # bool_atom
-        pass
+        value = p.FALSE
+        return CoolBoolNode(value)
 
     # error rules
     # TODO: parser recovery and resynchronization with error rules
