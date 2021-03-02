@@ -80,7 +80,7 @@ def string(lexer: Lexer):
             lexer.contain_errors = True
             lexer.position = pos
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno, lexer.column}) - LexicographicError: EOF in string constant')
+                            f'({lexer.lineno},{lexer.column}) - LexicographicError: EOF in string constant')
             return
 
         s = text[pos]
@@ -112,13 +112,13 @@ def string(lexer: Lexer):
             lexer.contain_errors = True
             lexer.position = pos
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno, lexer.column}) - LexicographicError: Unterminated string constant')
+                            f'({lexer.lineno},{lexer.column}) - LexicographicError: Unterminated string constant')
             return
         elif s == '\0':
             contains_null_character = True
             lexer.contain_errors = True
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno, lexer.column}) - LexicographicError: String contains null character')
+                            f'({lexer.lineno},{lexer.column}) - LexicographicError: String contains null character')
             pos += 1
             lexer.column += 1
         else:
@@ -161,7 +161,7 @@ def multi_line_comment(lexer: Lexer):
             lexer.contain_errors = True
             lexer.position = pos
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno, lexer.column}) - LexicographicError: EOF in comment')
+                            f'({lexer.lineno},{lexer.column}) - LexicographicError: EOF in comment')
             return None
 
         if text.startswith('(*', pos):
@@ -212,7 +212,7 @@ def tab(lexer):
 @G.lexical_error
 def lexical_error(lexer):
     lexer.add_error(lexer.lineno, lexer.column,
-                    f'({lexer.lineno, lexer.column}) - LexicographicError: ERROR "{lexer.token.lex}"')
+                    f'({lexer.lineno},{lexer.column}) - LexicographicError: ERROR "{lexer.token.lex}"')
     lexer.column += len(lexer.token.lex)
     lexer.position += len(lexer.token.lex)
 
@@ -304,37 +304,37 @@ G.add_terminal_error()
 
 @G.production("feature-list -> attribute error feature-list")
 def feature_attribute_error(s):
-    s.add_error(2, f'({s[2].line, s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
+    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
     return [s[1]] + s[3]
 
 
 @G.production("feature-list -> method error feature-list")
 def feature_method_error(s):
-    s.add_error(2, f'({s[2].line, s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
+    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
     return [s[1]] + s[3]
 
 
 @G.production("case-list -> id : type => expr error")
 def case_list_error(s):
-    s.add_error(6, f'({s[6].line, s[6].column}) - SyntacticError: ERROR at or near \"{s[6].lex}\"')
+    s.add_error(6, f'({s[6].line},{s[6].column}) - SyntacticError: ERROR at or near \"{s[6].lex}\"')
     return [(s[1], s[3], s[5])]
 
 
 @G.production("case-list -> id : type => expr error case-list")
 def case_list_error(s):
-    s.add_error(6, f"({s[6].line, s[6].column}) - SyntacticError:ERROR at or near \"{s[6].lex}\"")
+    s.add_error(6, f"({s[6].line},{s[6].column}) - SyntacticError:ERROR at or near \"{s[6].lex}\"")
     return [(s[1], s[3], s[5])] + s[7]
 
 
 @G.production("block -> expr error")
 def block_single_error(s):
-    s.add_error(2, f'({s[2].line, s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
+    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
     return [s[1]]
 
 
 @G.production("block -> expr error block")
 def block_single_error(s):
-    s.add_error(2, f'({s[2].line, s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
+    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near \"{s[2].lex}\"')
     return [s[1]] + s[3]
 
 

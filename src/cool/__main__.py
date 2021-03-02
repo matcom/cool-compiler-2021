@@ -103,7 +103,7 @@ def run(
 
         for error in errors:
             typer.echo(error, err=True)
-        sys.exit(0)
+        exit(0)
     else:
         exit(1)
 
