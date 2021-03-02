@@ -92,9 +92,7 @@ class UnexpectedCharError(LexicographicError):
     """
 
     def __init__(self, line: int, column: int, char: str) -> None:
-        LexicographicError.__init__(
-            self, line, column, f"Unexpected character `{char}`."
-        )
+        LexicographicError.__init__(self, line, column, f"Unexpected `{char}`.")
 
 
 class UnexpectedTokenError(SyntacticError):
@@ -107,7 +105,7 @@ class UnexpectedTokenError(SyntacticError):
             self,
             line,
             column,
-            f"Unexpected token `{token}`. Expected one of {expected}.",
+            f"Unexpected token `{token}`.",
         )
 
 

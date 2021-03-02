@@ -1,5 +1,5 @@
 from sly import Lexer
-from coolpyler.errors import LexicographicError
+from coolpyler.errors import UnexpectedCharError
 
 
 class CoolLexerBase(object):
@@ -155,10 +155,10 @@ class CoolLexer(CoolLexerBase, Lexer):
     def error(self, t):
         self.index += 1
         self.errors.append(
-            LexicographicError(
+            UnexpectedCharError(
                 t.lineno,
                 self.compute_column(t.index),
-                f"Unexpected `{repr(t.value[0])[1:-1]}`.",
+                repr(t.value[0])[1:-1],
             )
         )
         return t
@@ -182,9 +182,7 @@ class CoolMultilineCommentLexer(CoolLexerBase, Lexer):
 
     def EOF(self):
         self.errors.append(
-            LexicographicError(
-                self.lineno, self.compute_column(self.index), "Unexpected `EOF`."
-            )
+            UnexpectedCharError(self.lineno, self.compute_column(self.index), "EOF")
         )
 
     def ignore_newline(self, t):
@@ -219,10 +217,10 @@ class CoolStringLexer(CoolLexerBase, Lexer):
 
     def EOL(self, t):
         self.errors.append(
-            LexicographicError(
+            UnexpectedCharError(
                 t.lineno,
                 self.compute_column(t.index),
-                f"Unexpected `{repr(t.value[0])[1:-1]}`.",
+                repr(t.value[0])[1:-1],
             )
         )
         self.lineno += 1
@@ -233,9 +231,7 @@ class CoolStringLexer(CoolLexerBase, Lexer):
 
     def EOF(self):
         self.errors.append(
-            LexicographicError(
-                self.lineno, self.compute_column(self.index), "Unexpected `EOF`."
-            )
+            UnexpectedCharError(self.lineno, self.compute_column(self.index), "EOF")
         )
         t = self.string
         self.string = None
@@ -244,9 +240,9 @@ class CoolStringLexer(CoolLexerBase, Lexer):
     def error(self, t):
         self.index += 1
         self.errors.append(
-            LexicographicError(
+            UnexpectedCharError(
                 t.lineno,
                 self.compute_column(t.index),
-                f"Unexpected `{repr(t.value[0])[1:-1]}`.",
+                repr(t.value[0])[1:-1],
             )
         )
