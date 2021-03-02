@@ -2,9 +2,32 @@ from sly import Lexer
 from coolpyler.errors import UnexpectedCharError
 
 
+class CoolToken(object):
+    """
+    Representation of a single cool token.
+    """
+
+    @staticmethod
+    def from_sly_token(token, columnno):
+        return CoolToken(token.type, token.value, token.lineno, columnno, token.index)
+
+    def __init__(self, type, value, lineno, columnno, index):
+        self.type = type
+        self.value = value
+        self.lineno = lineno
+        self.columnno = columnno
+        self.index = index
+
+    def __repr__(self):
+        return (
+            f"Token(type={self.type!r}, value={self.value!r},"
+            + " lineno={self.lineno}, columnno={self.columnno}, index={self.index})"
+        )
+
+
 class CoolLexerBase(object):
     def compute_column(self, index):
-        return index - max(self.text[:index].rfind("\n"), 0)
+        return index - self.text[:index].rfind("\n")
 
     def EOF(self):
         pass
@@ -119,8 +142,20 @@ class CoolLexer(CoolLexerBase, Lexer):
         self.multiline_comment_balance = 0
 
     def tokenize(self, text, lineno=1, index=0):
-        yield from super().tokenize(text, lineno=lineno, index=index)
-        self.EOF()
+        tokens = [
+            CoolToken.from_sly_token(t, self.compute_column(t.index))
+            for t in super().tokenize(text, lineno=lineno, index=index)
+        ]
+
+        last_token = self.EOF()
+        if last_token is not None:
+            tokens.append(
+                CoolToken.from_sly_token(
+                    last_token, self.compute_column(last_token.index)
+                )
+            )
+
+        yield from tokens
 
     def INLINE_COMMENT(self, t):
         pass
@@ -153,6 +188,7 @@ class CoolLexer(CoolLexerBase, Lexer):
         self.lineno += 1
 
     def error(self, t):
+        t.value = t.value[0]
         self.index += 1
         self.errors.append(
             UnexpectedCharError(
