@@ -29,8 +29,8 @@ class CoolLogger(object):
 
 
 class CoolParser(Parser):
-    log = CoolLogger("./parser.log" if DEBUG else None)
-    debugfile = "./parser.out" if DEBUG else None
+    log = CoolLogger("parser.log" if DEBUG else None)
+    debugfile = "parser.out" if DEBUG else None
 
     tokens = CoolLexer.tokens - {"INLINE_COMMENT", "OCOMMENT"}
 
