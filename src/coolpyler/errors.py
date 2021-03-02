@@ -9,6 +9,9 @@ class CoolpylerError(object):
         self.type = type
         self.msg = msg
 
+    def __str__(self) -> str:
+        return f"({self.line}, {self.column}) - {self.type}: {self.msg}"
+
 
 class CompilerError(CoolpylerError):
     """

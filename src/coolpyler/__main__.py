@@ -10,7 +10,7 @@ def report_and_exit(errors):
         raise typer.Exit(code=0)
 
     for error in errors:
-        typer.echo(f"({error.line}, {error.column}) - {error.type}: {error.msg}")
+        typer.echo(error)
     raise typer.Exit(code=1)
 
 
