@@ -1,10 +1,8 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Luis Alejandro Lara ROjas
+    github: LuisLara-UH
+    group: C412
+  - name: Carlos Alejandro Arrieta Montes de Oca
+    github: Carlitonchin
+    group: C412
+Organization: Los-Mangotes-SA
