@@ -39,7 +39,7 @@ from coolpyler.ast.cool import (
 # pyright: reportUndefinedVariable=false
 # flake8: noqa
 
-DEBUG = True
+DEBUG = False
 
 
 class CoolLogger(object):
