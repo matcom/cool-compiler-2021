@@ -2,7 +2,7 @@ import os
 from sly import Parser
 from coolpyler.lexer import CoolLexer
 from coolpyler.errors import UnexpectedEOFError, UnexpectedTokenError
-from coolpyler.ast.cool import (
+from coolpyler.ast.cool.basic import (
     CoolAssignNode,
     CoolAttrDeclNode,
     CoolBlockNode,
