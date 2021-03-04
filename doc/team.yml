@@ -1,10 +1,10 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Damián O´Hallorans Toledo
+    github: NazDia
+    group: C412
+  - name: Luis Ernesto Ibarra Vázquez
+    github: luisoibarra
+    group: C411
+  - name: Luis Enrique Dalmau Coopat
+    github: LukeDalmau
+    group: C411
