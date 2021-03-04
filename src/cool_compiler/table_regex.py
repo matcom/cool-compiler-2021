@@ -3,6 +3,11 @@ from enum import  Enum
 class TokenType(Enum):
     pass
 
+class Token:
+    def __init__(self, lex, ttype : TokenType, pos : tuple) :
+        self.lex = lex
+        self.type = ttype
+        self.pos = pos
 
 class RegexTable:
 
