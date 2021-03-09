@@ -11,6 +11,7 @@ from cool_cmp.mips import MipsPipeline
 from cool_cmp.shared.token import Token
 from cool_cmp.shared.ast import BaseAST
 from cool_cmp.shared.ast.cool import ClassDeclarationNode, ProgramNode
+from cool_cmp.lexer.lexer import Lexer
 from typing import List
 
 # Mock implementations
@@ -19,13 +20,13 @@ class MockLexer(ILexer):
     """
     Mock implementation of lexer
     """
-    program = "class \nCoolClass\n{}"
-    mock_tokens = [
-            Token("class",0,0),
-            Token("CoolClass",1,0),
-            Token("{",2,0),
-            Token("}",2,1)
-        ]
+    program = "class \n\tCoolClass\n{}"
+    # mock_tokens = [
+    #         Token("class", "CLASS",0,0),
+    #         Token("CoolClass","ID",1,0),
+    #         Token("{","OCUR",2,0),
+    #         Token("}","CCUR",2,1)
+    #     ]
 
     @property
     def name(self)->str:
@@ -138,14 +139,16 @@ class MockMips2(IMips):
 
 # Testing pipeline
 
-pipe = LexerPipeline(MockLexer())
+# pipe = LexerPipeline(MockLexer())
 
-pipe = ParserPipeline(pipe, MockParser())
+pipe = LexerPipeline(Lexer())
 
-pipe = SemanticPipeline(pipe, MockSemantic1(), MockSemantic2())
+# pipe = ParserPipeline(pipe, MockParser())
 
-pipe = CilPipeline(pipe, MockCil1(), MockCil2())
+# pipe = SemanticPipeline(pipe, MockSemantic1(), MockSemantic2())
 
-pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
+# pipe = CilPipeline(pipe, MockCil1(), MockCil2())
+
+# pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
 
 print(pipe(MockLexer.program))
