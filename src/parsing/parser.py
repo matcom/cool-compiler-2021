@@ -18,7 +18,15 @@ class Parser:
     def __call__(self, code):
         return self.parser.parse(code)
 
-############################## GRAMMAR RULES ##############################
+    def find_line(self, parse):
+        line = 0
+        for token in self.lexer.list_tokens:
+            if token.value == parse.value and token.lexpos == parse.lexpos:
+                line = token.lineno
+                break
+        return line
+
+    # region GRAMMAR RULES
 
     def p_program(self, p):
         '''
@@ -423,10 +431,4 @@ class Parser:
             column = self.lexer.find_column(self.lexer.lexer, self.lexer.lexer)
             self.errors.append(SyntacticError(line, column - 1, error_text))
     
-    def find_line(self, parse):
-        line = 0
-        for token in self.lexer.list_tokens:
-            if token.value == parse.value and token.lexpos == parse.lexpos:
-                line = token.lineno
-                break
-        return line
+    # endregion

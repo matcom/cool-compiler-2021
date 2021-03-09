@@ -24,6 +24,9 @@ class Context:
         return graph
 
     def create_type(self, name:str, pos) -> Type:
+        '''
+        Permite crear un tipo definido en el lenguaje.
+        '''
         if name in self.types:
             error_text = SemanticError.TYPE_ALREADY_DEFINED
             raise SemanticError(*pos, error_text)
@@ -31,6 +34,9 @@ class Context:
         return typex
 
     def get_type(self, name:str, pos) -> Type:
+        '''
+        Permite obtener un tipo definido en el lenguaje.
+        '''
         try:
             return self.types[name]
         except KeyError:
@@ -91,17 +97,31 @@ class Scope:
         return str(self)
 
     def create_child(self):
+        '''
+        Crea un scope hijo que hereda las variables 
+        visibles hasta ese momento en el scope padre.
+        '''
         child = Scope(self)
         self.children.append(child)
         return child
 
     def define_variable(self, vname, vtype) -> VariableInfo:
+        '''
+        Registra localmente una variable en el 
+        scope a partir de su nombre y tipo.
+        '''
         info = VariableInfo(vname, vtype)
         if info not in self.locals:
             self.locals.append(info)
         return info
 
     def find_variable(self, vname, index=None) -> VariableInfo:
+        '''
+        Devuelve un VariableInfo con la información de la variable 
+        consultada a partir de su nombre. La variable devuelta no 
+        tiene por qué estar definida localmente. En caso de que la 
+        variable no esté definida devuelve None.
+        '''
         locals = self.attributes + self.locals
         locals = locals if index is None else itt.islice(locals, index)
         try:
@@ -129,9 +149,16 @@ class Scope:
         return self.parent.get_class_scope()
 
     def is_defined(self, vname) -> VariableInfo:
+        '''
+        Indica si la variable consultada es visible en el scope.
+        '''
         return self.find_variable(vname) is not None
 
     def is_local(self, vname):
+        '''
+        Indica si la variable consultada está 
+        definida localmente en el scope.
+        '''
         return any(True for x in self.locals if x.name == vname)
 
     def define_attribute(self, attr):

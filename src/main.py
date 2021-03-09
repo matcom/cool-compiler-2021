@@ -38,6 +38,9 @@ class Compiler:
             step()
 
     def lexing(self):
+        '''
+        Lleva a cabo el análisis lexicográfico.
+        '''
         self.lexer = Lexer()
         tokens = self.lexer.tokenizer(self.code)
 
@@ -55,6 +58,9 @@ class Compiler:
         #     print('COMPLETED LEXER!!!')
 
     def parsing(self):
+        '''
+        Lleva a cabo el análisis sintáctico.
+        '''
         self.parser = Parser(lexer=self.lexer)
         self.ast = self.parser(self.code)
 
@@ -65,6 +71,9 @@ class Compiler:
         #     print('COMPLETED PARSING!!!')
 
     def semantics(self):
+        '''
+        Lleva a cabo el análisis semántico.
+        '''
         semantic_analyzer = SemanticAnalyzer(self.ast)
         self.ast, self.context, self.scope = semantic_analyzer.analyze()
 

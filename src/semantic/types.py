@@ -2,6 +2,11 @@ from utils.errors import *
 from collections import OrderedDict
 
 class Attribute:
+    '''
+    Funciona como contenedor de los datos necesarios para 
+    representar los atributos del lenguaje.
+    '''
+
     def __init__(self, name, typex, index, tok=None):
         self.name = name
         self.type = typex
@@ -15,6 +20,11 @@ class Attribute:
         return str(self)
 
 class Method:
+    '''
+    Funciona como contenedor de los datos necesarios para 
+    representar los métodos del lenguaje.
+    '''
+
     def __init__(self, name, param_names, params_types, return_type):
         self.name = name
         self.param_names = param_names
@@ -38,6 +48,11 @@ class MethodError(Method):
         return f'[method] {self.name} ERROR'
 
 class Type:
+    '''
+    Funciona como descriptor de todos los atributos y métodos con 
+    que cuentan los tipos del lenguaje.
+    '''
+
     def __init__(self, name:str, pos, parent=True):
         if name == 'ObjectType':
             return ObjectType(pos)
@@ -144,6 +159,12 @@ class Type:
         return str(self)
 
 class ErrorType(Type):
+    '''
+    Se usa para manejar las situaciones en las que se refiere a un tipo 
+    que no ha sido declarado. Tiene la particularidad de ser iguales 
+    entre sí y a cualquier instancia de Type.
+    '''
+
     def __init__(self, pos=(0, 0)):
         Type.__init__(self, '<error>', pos)
 
@@ -160,6 +181,11 @@ class ErrorType(Type):
         return not isinstance(other, ErrorType)
 
 class VoidType(Type):
+    '''
+    Se usa para manejar el tipo de retorno void de los métodos. Tiene 
+    la particularidad de que todas sus instancias son iguales entre sí.
+    '''
+
     def __init__(self, pos=(0, 0)):
         Type.__init__(self, 'Void', pos)
 
@@ -173,6 +199,10 @@ class VoidType(Type):
         return isinstance(other, VoidType)
 
 class BoolType(Type):
+    '''
+    Se usa para manejar el tipo bool.
+    '''
+
     def __init__(self, pos=(0, 0)):
         self.name = 'Bool'
         self.attributes = {}
@@ -196,6 +226,10 @@ class BoolType(Type):
         return other.name != self.name and not isinstance(other, BoolType)
 
 class SelfType(Type):
+    '''
+    Se usa para manejar el tipo self.
+    '''
+
     def __init__(self, pos=(0, 0)):
         self.name = 'Self'
         self.attributes = {}
@@ -210,6 +244,10 @@ class SelfType(Type):
         return other.name != self.name and not isinstance(other, SelfType)
 
 class IntType(Type):
+    '''
+    Se usa para manejar el tipo int en los métodos.
+    '''
+
     def __init__(self, pos=(0, 0)):
         self.name = 'Int'
         self.attributes = {}
@@ -233,6 +271,10 @@ class IntType(Type):
         return other.name != self.name and not isinstance(other, IntType)
 
 class StringType(Type):
+    '''
+    Se usa para manejar el tipo string.
+    '''
+
     def __init__(self, pos=(0, 0)):
         self.name = 'String'
         self.attributes = {}
@@ -259,6 +301,10 @@ class StringType(Type):
         return other.name != self.name and not isinstance(other, StringType)
 
 class ObjectType(Type):
+    '''
+    Se usa para manejar el tipo object.
+    '''
+
     def __init__(self, pos=(0, 0)):
         self.name = 'Object'
         self.attributes = {}
@@ -279,6 +325,10 @@ class ObjectType(Type):
         return other.name != self.name and not isinstance(other, ObjectType)
 
 class AutoType(Type):
+    '''
+    Se usa para manejar el tipo auto.
+    '''
+
     def __init__(self):
         Type.__init__(self, 'AUTO_TYPE')
 
@@ -289,6 +339,10 @@ class AutoType(Type):
         return other.name != self.name and not isinstance(other, AutoType)
 
 class IOType(Type):
+    '''
+    Se usa para manejar el tipo IO (entrada/salida).
+    '''
+
     def __init__(self, pos=(0, 0)):
         self.name = 'IO'
         self.attributes = {}
