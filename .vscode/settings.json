@@ -1,0 +1,4 @@
+{
+  "python.pythonPath": "/Users/darien/Documents/School/cool-compiler-2021/.venv/bin/python3.9",
+  "python.formatting.provider": "black"
+}
