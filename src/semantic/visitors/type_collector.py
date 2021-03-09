@@ -1,6 +1,7 @@
 from utils.ast import *
 from utils import visitor
 from semantic.types import *
+from utils.utils import Utils
 from semantic.tools import Context
 from utils.errors import SemanticError
 
@@ -23,12 +24,12 @@ class TypeCollector(object):
         self.context.types['SELF_TYPE'] = SelfType()
         self.context.types['IO'] = IOType()
 
-        for dec in node.declarations:
-            self.visit(dec)
+        for declaration in node.declarations:
+            self.visit(declaration)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node:ClassDeclarationNode):
-        if node.id in ['String', 'Int', 'Object', 'Bool', 'SELF_TYPE', 'IO']:
+        if Utils.IsBasicType(node.id):
             error_text = SemanticError.REDEFINITION_ERROR % node.id
             self.errors.append(SemanticError(*node.pos, error_text))
 
