@@ -7,4 +7,15 @@ echo "Stranger Bugs Cool Compiler v0.1"
 echo "Copyright (c) 2019: Alejandro Klever Clemente, Laura Tamayo Blanco, Miguel Angel Gonzalez Calles"
 
 # Llamar al compilador
-python cool run ${INPUT_FILE}
+COOL_PATH="$(pwd)/src/cool"
+
+cd src
+STD_OUT=$(python3 "${COOL_PATH}" run ${INPUT_FILE})
+
+if [ $? -eq 1 ]
+then
+    echo "${STD_OUT}"
+    false
+else
+    true
+fi

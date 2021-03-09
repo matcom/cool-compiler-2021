@@ -35,7 +35,7 @@ def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
 def tokenize(file: typer.FileText, verbose: bool = False):
     path = Path.cwd() / file.name
     if not path.exists():
-        typer.echo(f'File {file.name} does not exist.')
+        print(f'File {file.name} does not exist.')
         return None, None
 
     s = path.open('r').read()
@@ -44,11 +44,11 @@ def tokenize(file: typer.FileText, verbose: bool = False):
 
     if lexer.contain_errors:
         for e in lexer.errors:
-            typer.echo(e, err=True)
+            print(e)
 
     if verbose:
         for t in tokens:
-            typer.echo(t)
+            print(t)
 
     return tokens, lexer
 
@@ -64,7 +64,7 @@ def parse(file: typer.FileText, verbose: bool = False):
 
     if parser.contains_errors:
         for e in parser.errors:
-            typer.echo(e, err=True)
+            print(e)
 
     return ast, parser
 
@@ -80,8 +80,8 @@ def infer(
         ast, _, _, errors = check_semantics(ast, Scope(), Context(), [])
         if errors:
             for e in errors:
-                typer.echo(e, err=True)
-        typer.echo(CodeBuilder().visit(ast, 0))
+                print(e)
+        print(CodeBuilder().visit(ast, 0))
 
 
 @app.command()
@@ -97,12 +97,12 @@ def run(
         if not errors and not parser.contains_errors:
             try:
                 Executor(context).visit(ast, Scope())
-                typer.echo('Program finished...')
+                print('Program finished...')
             except ExecutionError as e:
-                typer.echo(e.text, err=True)
+                print(e.text)
 
         for error in errors:
-            typer.echo(error, err=True)
+            print(error)
         exit(0)
     else:
         exit(1)
