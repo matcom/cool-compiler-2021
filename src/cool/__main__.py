@@ -91,6 +91,7 @@ def run(
 ):
     ast, parser = parse(file, verbose)
 
+
     if ast is not None:
         ast, _, context, errors = check_semantics(ast, Scope(), Context(), [])
 
@@ -98,14 +99,15 @@ def run(
             try:
                 Executor(context).visit(ast, Scope())
                 print('Program finished...')
+                exit(0)
             except ExecutionError as e:
                 print(e.text)
+                exit(1)
 
-        for error in errors:
-            print(error)
-        exit(0)
-    else:
-        exit(1)
+        for e in errors:
+            print(e)
+    
+    exit(1)
 
 
 @app.command()

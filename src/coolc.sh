@@ -14,7 +14,7 @@ then
 else
     cd src
     COOL_PATH="$(pwd)/cool"
-    STD_OUT=$(python3 ${COOL_PATH} run ${INPUT_FILE})
+    STD_OUT=$(python ${COOL_PATH} run ${INPUT_FILE})
     if [ $? -eq 1 ]
     then
         echo "${STD_OUT}"
