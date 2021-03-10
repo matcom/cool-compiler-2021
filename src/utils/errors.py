@@ -1,0 +1,1 @@
+LexicographicError = "(%d, %d) - LexicographicError: %s"
