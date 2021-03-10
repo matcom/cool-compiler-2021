@@ -1,16 +1,12 @@
 
 from cool_cmp.shared.ast import BaseAST
-from cool_cmp.shared.pipeline import IPipeable
+from cool_cmp.shared import ICoolService
 
-class IMips(IPipeable):
+class IMips(ICoolService):
     """
     MIPS interface to implement
     """
-
-    @property
-    def name(self)->str:
-        raise NotImplementedError()
-
+    
     def __call__(self, ast:BaseAST) -> BaseAST:
         raise NotImplementedError()
 

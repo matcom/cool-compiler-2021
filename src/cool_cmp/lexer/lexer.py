@@ -1,31 +1,43 @@
 """
 Lexer usando ply
 """
+from typing import List, Tuple
 
 from cool_cmp.lexer.interface import ILexer
-from cool_cmp.shared.token import Token
+from cool_cmp.shared.token import ICoolToken
+from cool_cmp.shared.errors import ErrorTracker
+from cool_cmp.lexer.errors import LexerCoolError
 import ply.lex as lex
 
-class Ply_Mix_Token(lex.LexToken, Token):
+class PlyCoolToken(lex.LexToken, ICoolToken):
 
-    def __init__(self, lex, typex, line, column):
+    def __init__(self, lex:str, typex:str, line:int, column:int):
         self.set_lex(lex)
         self.set_type(typex)
         self.set_position(line, column)
 
-    def set_lex(self, lex):
+    def set_lex(self, lex:str):
         self.lex = lex
         self.value = lex
 
-    def set_type(self, typex):
+    def set_type(self, typex:str):
         self.type = typex
         self.typex = typex
 
-    def set_position(self, line, column):
+    def set_position(self, line:int, column:int):
         self.lineno = line
         self.line = line
         self.column = column
         self.lexpos = column
+
+    def get_lex(self)->str:
+        return self.lex
+
+    def get_type(self)->str:
+        return self.typex
+
+    def get_position(self)->Tuple[int,int]:
+        return (self.line, self.column)
 
     def __str__(self):
         return f"{self.lex}:{self.type} Line {self.line} Column{self.column}"
@@ -33,7 +45,7 @@ class Ply_Mix_Token(lex.LexToken, Token):
     def __repr__(self):
         return str(self)
 
-class Lexer(ILexer):
+class PlyLexer(ILexer):
 
     @staticmethod
     def find_column(input, token):
@@ -41,6 +53,8 @@ class Lexer(ILexer):
         return (token.lexpos - line_start) + 1
 
     def __init__(self):
+        self.error_tracker = ErrorTracker() # Error tracker implementation
+
         reserved = {
             'if' : 'IF',
             'then' : 'THEN',
@@ -140,7 +154,8 @@ class Lexer(ILexer):
             t.lexer.lineno += t.value.count("\n")
 
         def t_error(t):
-            print("Illegal character '%s'" % t.value[0])
+            msg = f"Illegal character '{t.value[0]}'"
+            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lineno, t.lexpos))) # TODO Set Token column
             t.lexer.skip(1)
 
         self.lexer = lex.lex()
@@ -152,7 +167,14 @@ class Lexer(ILexer):
             tok = self.lexer.token()
             if not tok:
                 break
-            result.append(Ply_Mix_Token(tok.value, tok.type, tok.lineno, self.find_column(program_string, tok)))
-
+            result.append(PlyCoolToken(tok.value, tok.type, tok.lineno, self.find_column(program_string, tok)))
+        for tok in result:
+            print(tok)
         return result
 
+    def add_error(self, error:LexerCoolError):
+        self.error_tracker.add_error(error)
+    
+    def get_errors(self)->List[LexerCoolError]:
+        errors = self.error_tracker.get_errors()
+        return errors

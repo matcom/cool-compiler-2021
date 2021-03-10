@@ -8,11 +8,12 @@ from cool_cmp.cil.interface import ICil
 from cool_cmp.cil import CilPipeline
 from cool_cmp.mips.interface import IMips
 from cool_cmp.mips import MipsPipeline
-from cool_cmp.shared.token import Token
+from cool_cmp.shared.token import ICoolToken
 from cool_cmp.shared.ast import BaseAST
 from cool_cmp.shared.ast.cool import ClassDeclarationNode, ProgramNode
-from cool_cmp.lexer.lexer import Lexer
-from typing import List
+from cool_cmp.lexer.lexer import PlyLexer
+from cool_cmp.shared.errors import CoolError
+from typing import List, Tuple
 
 # Mock implementations
 
@@ -20,20 +21,56 @@ class MockLexer(ILexer):
     """
     Mock implementation of lexer
     """
-    program = "class \n\tCoolClass\n{}"
-    # mock_tokens = [
-    #         Token("class", "CLASS",0,0),
-    #         Token("CoolClass","ID",1,0),
-    #         Token("{","OCUR",2,0),
-    #         Token("}","CCUR",2,1)
-    #     ]
+    program = "class ` \n\tCoolClass\n{}"
+    class MockToken(ICoolToken):
+        def set_lex(self, lex:str):
+            self.lex = lex
+
+        def set_type(self, typex:str):
+            self.typex = typex
+
+        def set_position(self, line:int, column:int):
+            self.line = line
+            self.column = column
+
+        def get_lex(self)->str:
+            return self.lex
+
+        def get_type(self)->str:
+            return self.typex
+
+        def get_position(self)->Tuple[int,int]:
+            return (self.line, self.column)
+
+    @property
+    def mock_tokens(self)->List[ICoolToken]:
+        info = [
+            ("class", "CLASS", 0, 0),
+            ("CoolClass", "ID", 1, 0),
+            ("{", "OCUR", 2, 0),
+            ("}", "CCUR", 2, 1),
+        ]
+        tokens = []
+        for lex, typex, line, col in info:
+            token = MockLexer.MockToken()
+            token.set_lex(lex); token.set_type(typex); token.set_position(line, col)
+            tokens.append(token)
+        return tokens
+
 
     @property
     def name(self)->str:
         return "lexer"
+    
+    errors = []
 
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
 
-    def __call__(self, program_string:str) -> List[Token]:
+    def __call__(self, program_string:str) -> List[ICoolToken]:
         print("Tokenizing program:\n", program_string)
         return self.mock_tokens
 
@@ -46,10 +83,19 @@ class MockParser(IParser):
     def name(self)->str:
         return "parser"
 
-    def __call__(self, tokens:List[Token]) -> BaseAST:
+    def __call__(self, tokens:List[ICoolToken]) -> BaseAST:
         print("Building AST from tokens",tokens)
-        class_token = MockLexer.mock_tokens[0]
+        class_token = MockLexer().mock_tokens
+        class_token = class_token[0]
         return BaseAST(ProgramNode([ClassDeclarationNode(class_token.lex, [], None, class_token.line, class_token.column)]))
+
+    errors = []
+
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
 
 class MockSemantic1(ISemantic):
     """
@@ -68,6 +114,14 @@ class MockSemantic1(ISemantic):
         print("Setted mock1 property to true as a way of communicate between pipes")
         ast.mock1 = True
         return ast
+    
+    errors = []
+
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
 
 class MockSemantic2(ISemantic):
     """
@@ -83,6 +137,14 @@ class MockSemantic2(ISemantic):
         print("Verifying that ast has mock1 property", hasattr(ast, "mock1"))
         print("Converting COOL AST into CIL AST...")
         return ast
+    
+    errors = []
+
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
 
 class MockCil1(ICil):
     """
@@ -97,6 +159,14 @@ class MockCil1(ICil):
         print("Optimizing CIL AST...")
         return ast
 
+    errors = []
+
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
+
 class MockCil2(ICil):
     """
     Mock Cil interface 2
@@ -109,6 +179,14 @@ class MockCil2(ICil):
 
     def __call__(self, ast:BaseAST) -> BaseAST:
         return ast
+
+    errors = []
+
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
 
 class MockMips1(IMips):
     """
@@ -123,6 +201,14 @@ class MockMips1(IMips):
         print("Doing MIPS things...")
         return ast
 
+    errors = []
+
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
+
 class MockMips2(IMips):
     """
     Mock MIPS interface 2
@@ -136,19 +222,28 @@ class MockMips2(IMips):
         print("Generating MIPS code...")
         return ast
 
+    errors = []
+
+    def add_error(self, error:CoolError):
+        self.errors.append(error)
+    
+    def get_errors(self)->List[CoolError]:
+        return self.errors
 
 # Testing pipeline
 
-# pipe = LexerPipeline(MockLexer())
+pipe = LexerPipeline(MockLexer())
 
-pipe = LexerPipeline(Lexer())
+# pipe = LexerPipeline(PlyLexer())
 
-# pipe = ParserPipeline(pipe, MockParser())
+pipe = ParserPipeline(pipe, MockParser())
 
-# pipe = SemanticPipeline(pipe, MockSemantic1(), MockSemantic2())
+pipe = SemanticPipeline(pipe, MockSemantic1(), MockSemantic2())
 
-# pipe = CilPipeline(pipe, MockCil1(), MockCil2())
+pipe = CilPipeline(pipe, MockCil1(), MockCil2())
 
-# pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
+pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
 
-print(pipe(MockLexer.program))
+result = pipe(MockLexer.program)
+
+print(result.get_errors())
