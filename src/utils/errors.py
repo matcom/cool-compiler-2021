@@ -1,17 +1,18 @@
 class CoolError(Exception):
     def __init__(self, text: str, line: int, column: int):
+        #print(text)
+        #print(type(text))
         super().__init__(text)
-        self.text = text
         self.line = line
         self.column = column
 
-    @property()
+    @property
     def error_type(self) -> str:
         return 'CoolError'
     
-    @property()
+    @property
     def text(self) -> str:
-        return self.text
+        return self.args[0] 
 
     def __str__(self):
         return f'({self.line}, {self.column}) - {self.error_type}: {self.text}'
