@@ -73,4 +73,8 @@ class TypeBuilder:
             return_type = ErrorType()
             self.errors.append(e.text)
 
-        self.current_type.define_method(node.id, param_names, param_types, return_type)
+        try:
+            self.current_type.define_method(node.id, param_names, param_types, return_type)
+        except SemanticError as e:
+            self.errors.append(e.text)
+
