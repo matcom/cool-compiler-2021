@@ -55,24 +55,18 @@ G.add_terminals('+ - * / < <= = ~')
 @G.terminal('id', r'[a-z][a-zA-Z0-9_]*')
 def id_terminal(lexer: Lexer):
     lex = lexer.token.lex
-    print(lex)
     lexer.column += len(lex)
     lexer.position += len(lex)
     lexer.token.token_type = lex.lower() if lex.lower() in keywords_names else lexer.token.token_type
-    print(lexer.token)
-    print()
     return lexer.token
 
 
 @G.terminal('type', regex=r'[A-Z][a-zA-Z0-9_]*')
 def type_terminal(lexer: Lexer):
     lex = lexer.token.lex
-    print(lex)
     lexer.column += len(lex)
     lexer.position += len(lex)
     lexer.token.token_type = lex.lower() if lex.lower() in keywords_names - {'true', 'false'} else lexer.token.token_type
-    print(lexer.token)
-    print()
     return lexer.token
 
 ###############
