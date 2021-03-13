@@ -52,7 +52,7 @@ class Type:
 
     def set_parent(self, parent):
         if self.parent is not None:
-            raise SemanticError(f"Parent type is already set for {self.name}.")
+            raise SemanticError(f"Parent type is already set for `{self.name}``.")
         self.parent = parent
 
     def get_attribute(self, name: str):
@@ -61,13 +61,13 @@ class Type:
         except StopIteration:
             if self.parent is None:
                 raise SemanticError(
-                    f'Attribute "{name}" is not defined in {self.name}.'
+                    f"Attribute `{name}` is not defined in `{self.name}`."
                 )
             try:
                 return self.parent.get_attribute(name)
             except SemanticError:
                 raise SemanticError(
-                    f'Attribute "{name}" is not defined in {self.name}.'
+                    f"Attribute `{name}` is not defined in `{self.name}`."
                 )
 
     def define_attribute(self, name: str, typex):
@@ -79,7 +79,7 @@ class Type:
             return attribute
         else:
             raise SemanticError(
-                f'Attribute "{name}" is already defined in {self.name}.'
+                f"Attribute `{name}` is already defined in `{self.name}`."
             )
 
     def get_method(self, name: str):
@@ -87,17 +87,17 @@ class Type:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
+                raise SemanticError(f"Method `{name}` is not defined in `{self.name}`.")
             try:
                 return self.parent.get_method(name)
             except SemanticError:
-                raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
+                raise SemanticError(f"Method `{name}` is not defined in `{self.name}`.")
 
     def define_method(
         self, name: str, param_names: list, param_types: list, return_type
     ):
         if name in (method.name for method in self.methods):
-            raise SemanticError(f'Method "{name}" already defined in {self.name}')
+            raise SemanticError(f"Method `{name}` already defined in `{self.name}`")
 
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
@@ -147,7 +147,7 @@ class Type:
 
 class ErrorType(Type):
     def __init__(self):
-        Type.__init__(self, "<error>")
+        Type.__init__(self, "ERROR")
 
     def conforms_to(self, other):
         return True
@@ -209,33 +209,6 @@ class SelfType(Type):
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, SelfType)
-
-
-class Context:
-    def __init__(self):
-        self.types = {}
-
-    def create_type(self, name: str):
-        if name in self.types:
-            raise SemanticError(f"Type with the same name ({name}) already in context.")
-        typex = self.types[name] = Type(name)
-        return typex
-
-    def get_type(self, name: str):
-        try:
-            return self.types[name]
-        except KeyError:
-            raise SemanticError(f'Type "{name}" is not defined.')
-
-    def __str__(self):
-        return (
-            "{\n\t"
-            + "\n\t".join(y for x in self.types.values() for y in str(x).split("\n"))
-            + "\n}"
-        )
-
-    def __repr__(self):
-        return str(self)
 
 
 class VariableInfo:

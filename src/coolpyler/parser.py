@@ -2,7 +2,7 @@ import os
 from sly import Parser
 from coolpyler.lexer import CoolLexer
 from coolpyler.errors import UnexpectedEOFError, UnexpectedTokenError
-from coolpyler.ast.cool.basic import (
+from coolpyler.ast.cool.base import (
     CoolAssignNode,
     CoolAttrDeclNode,
     CoolBlockNode,
@@ -89,24 +89,24 @@ class CoolParser(Parser):
     @_("cool_class SEMICOLON { cool_class SEMICOLON }")
     def program(self, p):
         classes = [p.cool_class0] + p.cool_class1
-        return CoolProgramNode(classes)
+        return CoolProgramNode(p.lineno, 0, classes)
 
     @_("CLASS TYPE_ID [ INHERITS TYPE_ID ] OCURLY { feature SEMICOLON } CCURLY")
     def cool_class(self, p):
         name, parent, features = p.TYPE_ID0, p.TYPE_ID1, p.feature
-        return CoolClassNode(name, features, parent=parent)
+        return CoolClassNode(p.lineno, 0, name, features, parent=parent)
 
     @_("OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ]")
     def feature(self, p):
         id, type, expr = p.OBJECT_ID, p.TYPE_ID, p.expr
-        return CoolAttrDeclNode(id, type, expr)
+        return CoolAttrDeclNode(p.lineno, 0, id, type, expr)
 
     @_("OBJECT_ID OPAR [ formal_list ] CPAR COLON TYPE_ID OCURLY expr CCURLY")
     def feature(self, p):
         id = p.OBJECT_ID
         params = p.formal_list if p.formal_list is not None else []
         type, body = p.TYPE_ID, p.expr
-        return CoolFuncDeclNode(id, params, type, body)
+        return CoolFuncDeclNode(p.lineno, 0, id, params, type, body)
 
     @_("formal { COMMA formal }")
     def formal_list(self, p):
@@ -115,30 +115,30 @@ class CoolParser(Parser):
     @_("OBJECT_ID COLON TYPE_ID")
     def formal(self, p):
         id, type = p.OBJECT_ID, p.TYPE_ID
-        return CoolFormalNode(id, type)
+        return CoolFormalNode(p.lineno, 0, id, type)
 
     @_("OBJECT_ID LEFT_ARROW expr")
     def expr(self, p):
         id, expr = p.OBJECT_ID, p.expr
-        return CoolAssignNode(id, expr)
+        return CoolAssignNode(p.lineno, 0, id, expr)
 
     @_("expr AT TYPE_ID DOT OBJECT_ID OPAR [ arg_list ] CPAR")
     def expr(self, p):
         expr, type, id = p.expr, p.TYPE_ID, p.OBJECT_ID
         args = p.arg_list if p.arg_list is not None else []
-        return CoolStaticDispatchNode(expr, type, id, args)
+        return CoolStaticDispatchNode(p.lineno, 0, expr, type, id, args)
 
     @_("expr DOT OBJECT_ID OPAR [ arg_list ] CPAR")
     def expr(self, p):
         expr, id = p.expr, p.OBJECT_ID
         args = p.arg_list if p.arg_list is not None else []
-        return CoolDispatchNode(id, args, expr=expr)
+        return CoolDispatchNode(p.lineno, 0, id, args, expr=expr)
 
     @_("OBJECT_ID OPAR [ arg_list ] CPAR")
     def expr(self, p):
         id = p.OBJECT_ID
         args = p.arg_list if p.arg_list is not None else []
-        return CoolDispatchNode(id, args)
+        return CoolDispatchNode(p.lineno, 0, id, args)
 
     @_("expr { COMMA expr }")
     def arg_list(self, p):
@@ -147,123 +147,123 @@ class CoolParser(Parser):
     @_("IF expr THEN expr ELSE expr FI")
     def expr(self, p):
         cond, then_expr, else_expr = p.expr0, p.expr1, p.expr2
-        return CoolIfThenElseNode(cond, then_expr, else_expr)
+        return CoolIfThenElseNode(p.lineno, 0, cond, then_expr, else_expr)
 
     @_("WHILE expr LOOP expr POOL")
     def expr(self, p):
         cond, body = p.expr0, p.expr1
-        return CoolWhileNode(cond, body)
+        return CoolWhileNode(p.lineno, 0, cond, body)
 
     @_("OCURLY expr SEMICOLON { expr SEMICOLON } CCURLY")
     def expr(self, p):
         expr_list = [p.expr0] + p.expr1
-        return CoolBlockNode(expr_list)
+        return CoolBlockNode(p.lineno, 0, expr_list)
 
     @_("LET let_decl { COMMA let_decl } IN expr")
     def expr(self, p):
         decl_list = [p.let_decl0] + p.let_decl1
         expr = p.expr
-        return CoolLetInNode(decl_list, expr)
+        return CoolLetInNode(p.lineno, 0, decl_list, expr)
 
     @_("OBJECT_ID COLON TYPE_ID [ LEFT_ARROW expr ]")
     def let_decl(self, p):
         id, type, expr = p.OBJECT_ID, p.TYPE_ID, p.expr
-        return CoolLetDeclNode(id, type, expr=expr)
+        return CoolLetDeclNode(p.lineno, 0, id, type, expr=expr)
 
     @_("CASE expr OF case SEMICOLON { case SEMICOLON } ESAC")
     def expr(self, p):
         expr = p.expr
         case_list = [p.case0] + p.case1
-        return CoolCaseOfNode(expr, case_list)
+        return CoolCaseOfNode(p.lineno, 0, expr, case_list)
 
     @_("OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr")
     def case(self, p):
         id, type, expr = p.OBJECT_ID, p.TYPE_ID, p.expr
-        return CoolCaseNode(id, type, expr)
+        return CoolCaseNode(p.lineno, 0, id, type, expr)
 
     @_("NEW TYPE_ID")
     def expr(self, p):
         type = p.TYPE_ID
-        return CoolNewNode(type)
+        return CoolNewNode(p.lineno, 0, type)
 
     @_("OPAR expr CPAR")
     def expr(self, p):
         expr = p.expr
-        return CoolParenthNode(expr)
+        return CoolParenthNode(p.lineno, 0, expr)
 
     @_("ISVOID expr")
     def expr(self, p):
         expr = p.expr
-        return CoolIsVoidNode(expr)
+        return CoolIsVoidNode(p.lineno, 0, expr)
 
     @_("TILDE expr")
     def expr(self, p):
         expr = p.expr
-        return CoolTildeNode(expr)
+        return CoolTildeNode(p.lineno, 0, expr)
 
     @_("NOT expr")
     def expr(self, p):
         expr = p.expr
-        return CoolNotNode(expr)
+        return CoolNotNode(p.lineno, 0, expr)
 
     @_("expr PLUS expr")
     def expr(self, p):
         left_expr, right_expr = p.expr0, p.expr1
-        return CoolPlusNode(left_expr, right_expr)
+        return CoolPlusNode(p.lineno, 0, left_expr, right_expr)
 
     @_("expr MINUS expr")
     def expr(self, p):
         left_expr, right_expr = p.expr0, p.expr1
-        return CoolMinusNode(left_expr, right_expr)
+        return CoolMinusNode(p.lineno, 0, left_expr, right_expr)
 
     @_("expr STAR expr")
     def expr(self, p):
         left_expr, right_expr = p.expr0, p.expr1
-        return CoolMultNode(left_expr, right_expr)
+        return CoolMultNode(p.lineno, 0, left_expr, right_expr)
 
     @_("expr SLASH expr")
     def expr(self, p):
         left_expr, right_expr = p.expr0, p.expr1
-        return CoolDivNode(left_expr, right_expr)
+        return CoolDivNode(p.lineno, 0, left_expr, right_expr)
 
     @_("expr LE expr")
     def expr(self, p):
         left_expr, right_expr = p.expr0, p.expr1
-        return CoolLeNode(left_expr, right_expr)
+        return CoolLeNode(p.lineno, 0, left_expr, right_expr)
 
     @_("expr LEQ expr")
     def expr(self, p):
         left_expr, right_expr = p.expr0, p.expr1
-        return CoolLeqNode(left_expr, right_expr)
+        return CoolLeqNode(p.lineno, 0, left_expr, right_expr)
 
     @_("expr EQ expr")
     def expr(self, p):
         left_expr, right_expr = p.expr0, p.expr1
-        return CoolEqNode(left_expr, right_expr)
+        return CoolEqNode(p.lineno, 0, left_expr, right_expr)
 
     @_("OBJECT_ID")
     def expr(self, p):
-        return CoolVarNode(p.OBJECT_ID)
+        return CoolVarNode(p.lineno, 0, p.OBJECT_ID)
 
     @_("INT")
     def expr(self, p):
         value = p.INT
-        return CoolIntNode(value)
+        return CoolIntNode(p.lineno, 0, value)
 
     @_("STRING")
     def expr(self, p):
         value = p.STRING
-        return CoolStringNode(value)
+        return CoolStringNode(p.lineno, 0, value)
 
     @_("TRUE")
     def expr(self, p):
         value = p.TRUE
-        return CoolBoolNode(value)
+        return CoolBoolNode(p.lineno, 0, value)
 
     @_("FALSE")
     def expr(self, p):
         value = p.FALSE
-        return CoolBoolNode(value)
+        return CoolBoolNode(p.lineno, 0, value)
 
     # error rules
     # TODO: parser recovery and resynchronization with error rules
