@@ -19,3 +19,11 @@ isort = "^5.7.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "lexer: comments lexer",
+    "error",
+]
+filterwarnings = ["ignore::DeprecationWarning"]

@@ -1,17 +1,19 @@
-from src.shared.errors import CoolError
 from src.shared.constants import (
-    LEXICOGRAPHIC_ERROR,
     EOF_IN_COMMENT,
+    EOF_IN_STRING_CONSTANT,
+    LEXICOGRAPHIC_ERROR,
+    STRING_CONTAINS_NULL_CHAR,
     UNEXPECTED_CHARACTER,
     UNTERMINATED_STRING_CONSTANT,
-    EOF_IN_STRING_CONSTANT,
-    STRING_CONTAINS_NULL_CHAR,
 )
+from src.shared.errors import BaseError
+
+a = "hola %d".format()
 
 
-class LexicographicError(CoolError):
+class LexicographicError(BaseError):
     def __init__(self, line: int, column: int, err_message: str):
-        CoolError.__init__(self, line, column, LEXICOGRAPHIC_ERROR, err_message)
+        BaseError.__init__(self, line, column, LEXICOGRAPHIC_ERROR, err_message)
 
     @staticmethod
     def EOFInComment(line: int, column: int):

@@ -18,8 +18,8 @@ STRING = QUOTE + _STRING_ESC_INNER + QUOTE
 #
 # Names (Variables)
 #
-LCASE_LETTER = r"[a-z]"
-UCASE_LETTER = r"[A-Z]"
+L_CASE_LETTER = r"[a-z]"
+U_CASE_LETTER = r"[A-Z]"
 
 LETTER = r"[a-zA-Z]"
 WORD = r"[a-zA-Z]+"
@@ -30,8 +30,15 @@ TYPE_NAME = r"[A-Z][a-zA-Z0-9_]*"
 #
 # Whitespace
 #
-WS_INLINE = r"[ \t\f]"
+WS_INLINE = r"[ \t\v\f\r]"
 
 CR = r"\r"
 LF = r"\n"
-NEWLINE = r"\r?\n+"
+NEWLINE = r"\n+"
+
+#
+# Comments
+#
+INLINE_COMMENT = r"--[^\n]*"
+OPEN_BLOCK_COMMENT = r"\(\*"
+CLOSE_BLOCK_COMMENT = r"\*\)"

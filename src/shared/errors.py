@@ -1,4 +1,4 @@
-class CoolError:
+class BaseError:
     """COOL error"""
 
     def __init__(self, line: int, column: int, err_type: str, err_message: str):
@@ -13,7 +13,7 @@ class CoolError:
     __repr__ = __str__
 
 
-class GenericAppError(CoolError):
+class GenericAppError(BaseError):
     """A generic app error used for unknown errors"""
 
     def __init__(
