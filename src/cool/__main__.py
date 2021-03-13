@@ -7,16 +7,68 @@ import typer
 
 sys.path.append(os.getcwd())
 
-from cool.grammar import serialize_parser_and_lexer
+from cool.grammar import serialize_parser_and_lexer, Token
 from cool.lexertab import CoolLexer
 from cool.parsertab import CoolParser
 from cool.semantics import TypeCollector, TypeBuilder, OverriddenMethodChecker, TypeChecker, topological_sorting
 from cool.semantics.execution import Executor, ExecutionError
-from cool.semantics.formatter import CodeBuilder
+from cool.semantics.formatter import CodeBuilder, Formatter
 from cool.semantics.type_inference import InferenceChecker
 from cool.semantics.utils.scope import Context, Scope
 
 app = typer.Typer()
+
+
+def log_success(s: str):
+    styled_e = typer.style(s, fg=typer.colors.GREEN, bold=True)
+    typer.echo(styled_e)
+
+
+def log_error(s: str):
+    styled_e = typer.style(s, fg=typer.colors.RED, bold=True)
+    typer.echo(styled_e)
+
+
+def format_tokens(tokens: List[Token]) -> str:
+    s = ''
+    last_line = 1
+    for t in tokens:
+        if t.line != last_line:
+            last_line = t.line
+            s += '\n' + ' ' * t.column
+        else:
+            s += ' '
+        s += t.token_type.name
+    return s
+
+
+def tokenize(program: str, verbose: bool = False):
+    lexer = CoolLexer()
+    tokens = lexer(program)
+
+    if lexer.contain_errors:
+        for e in lexer.errors:
+            log_error(e)
+
+    if verbose:
+        log_success('Tokens:')
+        log_success('-' * 80)
+        log_success(format_tokens(tokens) + '\n')
+        log_success('-' * 80)
+        print()
+    
+    return tokens, lexer
+
+
+def parse(tokens: List[Token], verbose: bool = False):
+    parser = CoolParser(verbose)
+    ast = parser(tokens)
+
+    if parser.contains_errors:
+        for e in parser.errors:
+            log_error(e)
+
+    return ast, parser
 
 
 def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
@@ -27,46 +79,69 @@ def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
     ast.declarations = declarations
     if not errors:
         OverriddenMethodChecker(context, errors).visit(ast)
-        InferenceChecker(context, errors).visit(ast, scope)
-        TypeChecker(context, errors).visit(ast, scope)
+        # InferenceChecker(context, errors).visit(ast, scope)
+        # TypeChecker(context, errors).visit(ast, scope)
     return ast, scope, context, errors
 
 
-def tokenize(file: typer.FileText, verbose: bool = False):
-    path = Path.cwd() / file.name
-    if not path.exists():
-        print(f'File {file.name} does not exist.')
-        return None, None
+@app.command()
+def run(
+        input_file: typer.FileText = typer.Argument(..., help='Cool file'),
+        verbose: bool = typer.Option(False, help='Execute in verbose mode.')
+):
+    ast, parser = parse(input_file, verbose)
 
-    s = path.open('r').read()
-    lexer = CoolLexer()
-    tokens = lexer(s)
+    
+    # parsing process failed
+    if ast is None:
+        exit(1)
 
-    if lexer.contain_errors:
-        for e in lexer.errors:
-            print(e)
+    ast, _, context, errors = check_semantics(ast, Scope(), Context(), [])
 
-    if verbose:
-        for t in tokens:
-            print(t)
+    if  errors or parser.contains_errors:
+        for e in errors:
+            log_error(e)
+        exit(1)
+    
+    try:
+        Executor(context).visit(ast, Scope())
+        log_success('Program finished...')
+        exit(0)
+    except ExecutionError as e:
+        log_error(e.text)
+        exit(1)
 
-    return tokens, lexer
 
-
-def parse(file: typer.FileText, verbose: bool = False):
-    tokens, lexer = tokenize(file, verbose)
+@app.command()
+def compile(
+        input_file: typer.FileText = typer.Argument(..., help='Cool file'),
+        output_file: typer.FileTextWrite = typer.Argument('a.mips', help='Mips file'),
+        verbose: bool = typer.Option(False, help='Run in verbose mode.')
+):
+    program = input_file.read()
+    tokens, lexer = tokenize(program, verbose)
 
     if lexer is None or lexer.contain_errors:
-        return None, None
+        exit(1)
 
-    parser = CoolParser(verbose)
-    ast = parser(tokens)
+    if not tokens[:-1]:  # there is always at least the EOF token
+        log_error('(0, 0) - SyntacticError: ERROR at or near EOF')
+        exit(1)
+    
+    ast, parser = parse(tokens, verbose)
 
-    if parser.contains_errors:
-        for e in parser.errors:
-            print(e)
+    # parsing process failed
+    if ast is None:
+        exit(1)
 
-    return ast, parser
+    ast, _, _, errors = check_semantics(ast, Scope(), Context(), [])
+
+    if errors or parser.contains_errors:
+        for e in errors:
+            log_error(e)
+        exit(1)
+    
+    exit(0)
 
 
 @app.command()
@@ -80,34 +155,8 @@ def infer(
         ast, _, _, errors = check_semantics(ast, Scope(), Context(), [])
         if errors:
             for e in errors:
-                print(e)
-        print(CodeBuilder().visit(ast, 0))
-
-
-@app.command()
-def run(
-        file: typer.FileText = typer.Argument(..., help='Cool file'),
-        verbose: bool = typer.Argument(False, help='Execute in verbose mode.')
-):
-    ast, parser = parse(file, verbose)
-
-
-    if ast is not None:
-        ast, _, context, errors = check_semantics(ast, Scope(), Context(), [])
-
-        if not errors and not parser.contains_errors:
-            try:
-                Executor(context).visit(ast, Scope())
-                print('Program finished...')
-                exit(0)
-            except ExecutionError as e:
-                print(e.text)
-                exit(1)
-
-        for e in errors:
-            print(e)
-    
-    exit(1)
+                log_error(e)
+        log_success(CodeBuilder().visit(ast, 0))
 
 
 @app.command()
