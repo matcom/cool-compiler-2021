@@ -657,7 +657,7 @@ class InferenceTypeSubstitute:
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode, scope: Scope):
         child_scope = scope.children[0]
-        for i, expr in enumerate(node.expressions):
+        for _, expr in enumerate(node.expressions):
             self.visit(expr, child_scope)
 
     @visitor.when(ast.ConditionalNode)
@@ -674,7 +674,7 @@ class InferenceTypeSubstitute:
     @visitor.when(ast.SwitchCaseNode)
     def visit(self, node: ast.SwitchCaseNode, scope: Scope):
         self.visit(node.expr, scope)
-        for i, (_id, _type, _expr) in enumerate(node.cases):
+        for i, (_, _, _expr) in enumerate(node.cases):
             self.visit(_expr, scope.children[i])
 
     @visitor.when(ast.MethodCallNode)
