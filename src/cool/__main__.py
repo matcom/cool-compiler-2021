@@ -118,6 +118,10 @@ def compile(
         output_file: typer.FileTextWrite = typer.Argument('a.mips', help='Mips file'),
         verbose: bool = typer.Option(False, help='Run in verbose mode.')
 ):
+    # In case of encoding conflict
+    if input_file.encoding.lower != 'utf-8':
+        input_file = open(input_file.name, encoding='utf-8')
+    
     program = input_file.read()
     tokens, lexer = tokenize(program, verbose)
 
