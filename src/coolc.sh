@@ -10,16 +10,8 @@ echo "Copyright (c) 2019: Alejandro Klever Clemente, Laura Tamayo Blanco, Miguel
 
 if [[ $(pwd) == *src ]] 
 then
-    python cool run ${INPUT_FILE}
+    python cool compile "${INPUT_FILE}" "${OUTPUT_FILE}"
 else
     cd src
-    COOL_PATH="$(pwd)/cool"
-    STD_OUT=$(python ${COOL_PATH} run ${INPUT_FILE})
-    if [ $? -eq 1 ]
-    then
-        echo "${STD_OUT}"
-        false
-    else
-        true
-    fi
+    python cool compile "${INPUT_FILE}" "${OUTPUT_FILE}"
 fi

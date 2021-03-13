@@ -1,8 +1,8 @@
 import inspect
 import time
 
-from pyjapt import Grammar, Lexer, ShiftReduceParser
-from pyjapt.lexing import Token
+from pyjapt import Grammar, Lexer, ShiftReduceParser, Token
+from pyjapt.parsing import RuleList
 
 import cool.semantics.utils.astnodes as ast
 
@@ -26,6 +26,7 @@ expr_list = G.add_non_terminal('expr-list')
 not_empty_expr_list = G.add_non_terminal('not-empty-expr-list')
 expr = G.add_non_terminal('expr')
 comp = G.add_non_terminal('comp')
+negable = G.add_non_terminal('negable')
 arith = G.add_non_terminal('arith')
 term = G.add_non_terminal('term')
 factor = G.add_non_terminal('factor')
@@ -88,7 +89,7 @@ def string(lexer: Lexer):
             lexer.contain_errors = True
             lexer.position = pos
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno},{lexer.column}) - LexicographicError: EOF in string constant')
+                            f'({lexer.lineno}, {lexer.column}) - LexicographicError: EOF in string constant')
             return
 
         s = text[pos]
@@ -120,13 +121,13 @@ def string(lexer: Lexer):
             lexer.contain_errors = True
             lexer.position = pos
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno},{lexer.column}) - LexicographicError: Unterminated string constant')
+                            f'({lexer.lineno}, {lexer.column}) - LexicographicError: Unterminated string constant')
             return
         elif s == '\0':
             contains_null_character = True
             lexer.contain_errors = True
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno},{lexer.column}) - LexicographicError: String contains null character')
+                            f'({lexer.lineno}, {lexer.column}) - LexicographicError: String contains null character')
             pos += 1
             lexer.column += 1
         else:
@@ -162,6 +163,7 @@ def multi_line_comment(lexer: Lexer):
     counter = 1
     text = lexer.text
     pos = lexer.position + 2
+    lexer.column += 2
     lex = '(*'
 
     while counter > 0:
@@ -169,7 +171,7 @@ def multi_line_comment(lexer: Lexer):
             lexer.contain_errors = True
             lexer.position = pos
             lexer.add_error(lexer.lineno, lexer.column,
-                            f'({lexer.lineno},{lexer.column}) - LexicographicError: EOF in comment')
+                            f'({lexer.lineno}, {lexer.column}) - LexicographicError: EOF in comment')
             return None
 
         if text.startswith('(*', pos):
@@ -220,7 +222,7 @@ def tab(lexer):
 @G.lexical_error
 def lexical_error(lexer):
     lexer.add_error(lexer.lineno, lexer.column,
-                    f'({lexer.lineno},{lexer.column}) - LexicographicError: ERROR "{lexer.token.lex}"')
+                    f'({lexer.lineno}, {lexer.column}) - LexicographicError: ERROR "{lexer.token.lex}"')
     lexer.column += len(lexer.token.lex)
     lexer.position += len(lexer.token.lex)
 
@@ -251,17 +253,18 @@ param_list %= 'id : type , param-list', lambda s: [(s[1], s[3])] + s[5]
 
 expr %= 'id <- expr', lambda s: ast.AssignNode(s[1], s[3])
 expr %= '{ block }', lambda s: ast.BlockNode(s[2])
-expr %= 'if expr then expr else expr fi', lambda s: ast.ConditionalNode(s[2], s[4], s[6])
 expr %= 'while expr loop expr pool', lambda s: ast.WhileNode(s[2], s[4])
 expr %= 'let declaration-list in expr', lambda s: ast.LetNode(s[2], s[4])
 expr %= 'case expr of case-list esac', lambda s: ast.SwitchCaseNode(s[2], s[4])
-expr %= 'not expr', lambda s: ast.NegationNode(s[2])
 expr %= 'comp', lambda s: s[1]
 
-comp %= 'arith < arith', lambda s: ast.LessThanNode(s[1], s[2], s[3])
-comp %= 'arith <= arith', lambda s: ast.LessEqualNode(s[1], s[2], s[3])
-comp %= 'arith = arith', lambda s: ast.EqualNode(s[1], s[2], s[3])
-comp %= 'arith', lambda s: s[1]
+comp %= 'negable < negable', lambda s: ast.LessThanNode(s[1], s[2], s[3])
+comp %= 'negable <= negable', lambda s: ast.LessEqualNode(s[1], s[2], s[3])
+comp %= 'negable = negable', lambda s: ast.EqualNode(s[1], s[2], s[3])
+comp %= 'negable', lambda s: s[1]
+
+negable %= 'not arith', lambda s: ast.NegationNode(s[2])
+negable %= 'arith', lambda s: s[1]
 
 arith %= 'arith + term', lambda s: ast.PlusNode(s[1], s[2], s[3])
 arith %= 'arith - term', lambda s: ast.MinusNode(s[1], s[2], s[3])
@@ -280,6 +283,7 @@ atom %= 'true', lambda s: ast.BooleanNode(s[1])
 atom %= 'false', lambda s: ast.BooleanNode(s[1])
 atom %= 'int', lambda s: ast.IntegerNode(s[1])
 atom %= 'string', lambda s: ast.StringNode(s[1])
+atom %= 'if expr then expr else expr fi', lambda s: ast.ConditionalNode(s[2], s[4], s[6])
 atom %= 'function-call', lambda s: s[1]
 atom %= 'new type', lambda s: ast.InstantiateNode(s[2])
 atom %= '( expr )', lambda s: s[2]
@@ -313,42 +317,42 @@ G.add_terminal_error()
 @G.parsing_error
 def parsing_error(parser: ShiftReduceParser):
     t = parser.current_token
-    parser.add_error(t.line, t.column, f'({t.line},{t.column}) - SyntacticError: ERROR at or near "{t.lex}"')
+    parser.add_error(t.line, t.column, f'({t.line}, {t.column}) - SyntacticError: ERROR at or near "{t.lex}"')
 
 
 @G.production("feature-list -> attribute error feature-list")
 def feature_attribute_error(s):
-    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
+    s.add_error(2, f'({s[2].line}, {s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
     return [s[1]] + s[3]
 
 
 @G.production("feature-list -> method error feature-list")
 def feature_method_error(s):
-    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
+    s.add_error(2, f'({s[2].line}, {s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
     return [s[1]] + s[3]
 
 
 @G.production("case-list -> id : type => expr error")
 def case_list_error(s):
-    s.add_error(6, f'({s[6].line},{s[6].column}) - SyntacticError: ERROR at or near "{s[6].lex}"')
+    s.add_error(6, f'({s[6].line}, {s[6].column}) - SyntacticError: ERROR at or near "{s[6].lex}"')
     return [(s[1], s[3], s[5])]
 
 
 @G.production("case-list -> id : type => expr error case-list")
 def case_list_error(s):
-    s.add_error(6, f'({s[6].line},{s[6].column}) - SyntacticError:ERROR at or near "{s[6].lex}"')
+    s.add_error(6, f'({s[6].line}, {s[6].column}) - SyntacticError:ERROR at or near "{s[6].lex}"')
     return [(s[1], s[3], s[5])] + s[7]
 
 
 @G.production("block -> expr error")
 def block_single_error(s):
-    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
+    s.add_error(2, f'({s[2].line}, {s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
     return [s[1]]
 
 
 @G.production("block -> expr error block")
 def block_single_error(s):
-    s.add_error(2, f'({s[2].line},{s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
+    s.add_error(2, f'({s[2].line}, {s[2].column}) - SyntacticError: ERROR at or near "{s[2].lex}"')
     return [s[1]] + s[3]
 
 
@@ -356,10 +360,14 @@ def block_single_error(s):
 # Serialize API #
 #################
 def serialize_parser_and_lexer():
+    import typer
+
     t = time.time()
     G.serialize_lexer('CoolLexer', inspect.getmodulename(__file__))
     G.serialize_parser('lalr1', 'CoolParser', inspect.getmodulename(__file__))
-    print('Serialization Time :', time.time() - t, 'seconds')
+    
+    styled_e = typer.style(f'Serialization Time : {time.time() - t} seconds', fg=typer.colors.GREEN, bold=True)
+    typer.echo(styled_e)
 
 
 if __name__ == '__main__':
