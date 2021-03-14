@@ -29,3 +29,8 @@ def map_to_module(obj: object, map_attr, module):
     args = inspect.getfullargspec(module_obj.__init__).args[1:]
     module_obj_args = [map_attr(getattr(obj, arg)) for arg in args]
     return module_obj(*module_obj_args)
+
+
+def from_module(module):
+    caller_frame = inspect.currentframe().f_back
+    exec(inspect.getsource(module), caller_frame.f_globals, caller_frame.f_locals)
