@@ -4,14 +4,18 @@ class CoolError:
     Base Cool Error
     """
 
+    ERROR_TYPE = "CoolError"
+
+    FORMAT = "{}: {}"
+
     def __init__(self, msg:str):
         self.error = msg
     
     def print_error(self):
-        print(self.error)
+        print(str(self))
 
     def __str__(self):
-        return f"Error: {self.error}"
+        return self.FORMAT.format(self.ERROR_TYPE, self.error)
 
     def __repr__(self):
         return str(self)

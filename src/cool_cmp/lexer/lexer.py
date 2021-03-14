@@ -111,7 +111,8 @@ class PlyLexer(ILexer):
             try:
                 int(t.value)
             except ValueError:
-                print("Integer value too large %d", t.value)
+                msg = "Integer value too large %d", t.value
+                self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lineno, t.lexpos))) # TODO Set Token column
                 t.value = 'Invalid'
             return t
 
@@ -154,8 +155,8 @@ class PlyLexer(ILexer):
             t.lexer.lineno += t.value.count("\n")
 
         def t_error(t):
-            msg = f"Illegal character '{t.value[0]}'"
-            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lineno, t.lexpos))) # TODO Set Token column
+            msg = f'ERROR "{t.value[0]}"'
+            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value[0], t.type, t.lineno, t.lexpos))) # TODO Set Token column
             t.lexer.skip(1)
 
         self.lexer = lex.lex()
@@ -168,8 +169,6 @@ class PlyLexer(ILexer):
             if not tok:
                 break
             result.append(PlyCoolToken(tok.value, tok.type, tok.lineno, self.find_column(program_string, tok)))
-        for tok in result:
-            print(tok)
         return result
 
     def add_error(self, error:LexerCoolError):

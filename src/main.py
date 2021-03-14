@@ -232,18 +232,33 @@ class MockMips2(IMips):
 
 # Testing pipeline
 
-pipe = LexerPipeline(MockLexer())
+# pipe = LexerPipeline(MockLexer())
 
-# pipe = LexerPipeline(PlyLexer())
+# # pipe = LexerPipeline(PlyLexer())
 
-pipe = ParserPipeline(pipe, MockParser())
+# pipe = ParserPipeline(pipe, MockParser())
 
-pipe = SemanticPipeline(pipe, MockSemantic1(), MockSemantic2())
+# pipe = SemanticPipeline(pipe, MockSemantic1(), MockSemantic2())
 
-pipe = CilPipeline(pipe, MockCil1(), MockCil2())
+# pipe = CilPipeline(pipe, MockCil1(), MockCil2())
 
-pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
+# pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
 
-result = pipe(MockLexer.program)
+# result = pipe(MockLexer.program)
 
-print(result.get_errors())
+# print(result.get_errors())
+
+if __name__ == "__main__":
+    import sys
+    with open(sys.argv[1]) as file:
+        program = file.read()
+        pipe = LexerPipeline(PlyLexer())
+        result = pipe(program)
+        for err in result.get_errors():
+            err.print_error()
+        if result.get_errors():
+            exit(1)
+    with open(sys.argv[2], 'w') as file:
+        file.write("GENERATED MIPS")
+    
+    exit(0)
