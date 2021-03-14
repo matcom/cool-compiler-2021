@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 #
-# Copyright (c) 2013 Curtis Schlak
+# Copyright (c) 2019 Curtis Schlak
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -67,11 +67,8 @@ class Dispatcher(object):
         else:
             issub = issubclass
             t = self.targets
-            ks = t.keys()
-            ans = [t[k](*args, **kw) for k in ks if issub(typ, k)]
-            if len(ans) == 1:
-                return ans.pop()
-            return ans
+            ks = iter(t)
+            return [t[k](*args, **kw) for k in ks if issub(typ, k)]
 
     def add_target(self, typ, target):
         self.targets[typ] = target
