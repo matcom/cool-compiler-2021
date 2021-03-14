@@ -2,7 +2,7 @@
 import lexer.lexer as lexer
 import c_parser.parser as parser
 
-with open('/home/yumenio/Documents/cmp/cool-compiler-2021/cool-compiler-2021/tests/lexer/comment1.cl') as f:
+with open('/home/yumenio/Documents/cmp/cool-compiler-2021/cool-compiler-2021/tests/lexer/string3.cl') as f:
     program =  f.read()
 
 coolLexer = lexer.CoolLexer()

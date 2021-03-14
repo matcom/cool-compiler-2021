@@ -58,6 +58,7 @@ class CoolLexer:
     tokens = _tokens
     states = (
         ('chunkComment', 'exclusive'),
+        ('string', 'inclusive')
     )
 
     # Define a rule so we can track line numbers
@@ -147,7 +148,19 @@ class CoolLexer:
 
     t_rArrow = r'=>'
 
-    t_string = r'\"[^\"]*\"'
+    def t_string(self, t):
+        r'\"'
+        t.lexer.begin('string')
+        pass
+
+    def t_string_string(self, t):
+        r'[^\"]*\"'
+        t.lexer.begin('INITIAL')
+        return t
+
+    def t_string_error(self, t):
+        print(f'ERROR tokenizando un string en {t.lexer.lineno}')
+        t.lexer.skip(1)
 
     t_arroba = r'@'
 
