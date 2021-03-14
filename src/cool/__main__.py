@@ -80,7 +80,7 @@ def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
     if not errors:
         OverriddenMethodChecker(context, errors).visit(ast)
         # InferenceChecker(context, errors).visit(ast, scope)
-        # TypeChecker(context, errors).visit(ast, scope)
+        TypeChecker(context, errors).visit(ast, scope)
     return ast, scope, context, errors
 
 
