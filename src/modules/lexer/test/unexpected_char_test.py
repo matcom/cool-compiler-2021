@@ -10,5 +10,5 @@ from .utils import compare_results
 @pytest.mark.lexer
 @pytest.mark.error
 @pytest.mark.run(order=1)
-def test_iis():
+def test_unexpected_char():
     compare_results(tests_dir)

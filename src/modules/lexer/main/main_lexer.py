@@ -9,6 +9,8 @@ from src.grammars.common import (
     INT,
 )
 from src.modules.lexer.comments import BlockCommentLexer
+
+from src.modules.lexer.strings import StringsLexer
 from src.modules.lexer.errors import LexicographicError
 
 
@@ -84,13 +86,18 @@ class CoolLexer(BaseLexer):
     @_(r"\(\*")
     def OPEN_BLOCK_COMMENT(self, token):
         self.comment_nesting_level += 1
-        # print("I'm in comment ", (self.lineno, find_column(self.text, token.index)))
         self.push_state(BlockCommentLexer)
 
     @_(r"\d+")
     def INT(self, token):
         token.value = int(token.value)
         return token
+
+    @_(r"\"")
+    def QUOTE(self, token):
+        print("Enter string state")
+        self.current_string_value = ""
+        self.push_state(StringsLexer)
 
     OPEN_PARENTHESIS = r"\("
     CLOSED_PARENTHESIS = r"\)"

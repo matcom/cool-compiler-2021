@@ -24,6 +24,7 @@ class BaseLexer(Lexer):
     def __init__(self, lexer_errors=[]):
         self.lexer_errors = lexer_errors
         self.comment_nesting_level = 0
+        self.current_string_value = None
 
     def error(self, token):
         self.lexer_errors.append(

@@ -3,7 +3,6 @@ import os
 
 tests_dir = __file__.rpartition("/")[0] + "/input/comments/"
 
-from src.modules.lexer import CoolLexer
 from .utils import compare_results
 
 
