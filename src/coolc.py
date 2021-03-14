@@ -11,9 +11,6 @@ print('Copyright (c) 2019: Alejandro Klever Clemente, Laura Tamayo Blanco, Migue
 def run():
     sp = subprocess.run(['python', 'cool', 'compile', input_file, output_file], capture_output=True, timeout=100)        
     print(sp.stdout.decode())
-    print(input_file)
-    print(output_file)
-    print(sp.returncode)
     exit(sp.returncode)
 
 if os.getcwd().endswith('src'):
