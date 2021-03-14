@@ -50,15 +50,51 @@ _tokens = [
     'newline',
     'type',
     'id'
-    #ress
 ]
 _tokens += list(reserved.values())
+def find_all(s):
+    b = [] 
+    a = s.find('a')
+    while a != -1:
+        b.append(a)
+        a = s.find('a', a + 1)
+    return b
+
+def find_last(text, row, col):
+    first = text.find("\n")
+    temp_text = text
+    add_col= first
+    add_row = 0
+    loop = True
+    while loop:
+        if first > 0:
+            if temp_text[first-1] == "\\":
+                temp_text = temp_text[first+1: ]
+                add_col = first
+                first = temp_text.find("\n")
+                add_row += 1
+                loop = True
+            else:
+                loop = False
+                if first + 1 == len(temp_text):
+                    eof = True
+                else:
+                    eof = False
+        else:
+            # para cuando no hay newline 
+            add_col = len(temp_text) + 1
+            eof = True
+            break
+    if add_row == 0:
+        add_col += col
+    add_row += row
+    return (add_row, add_col, eof)
 
 class CoolLexer:
     tokens = _tokens
     states = (
         ('chunkComment', 'exclusive'),
-        ('string', 'inclusive')
+        ('string', 'exclusive')
     )
 
     # Define a rule so we can track line numbers
@@ -147,6 +183,7 @@ class CoolLexer:
     t_assignArrow = r'<\-'
 
     t_rArrow = r'=>'
+# <<<<<<< HEAD
 
     def t_string(self, t):
         r'\"'
@@ -154,39 +191,68 @@ class CoolLexer:
         pass
 
     def t_string_string(self, t):
-        r'[^\"]*\"'
+        r"([^\n]|(?<!\\)(\\\\)*?\\\n)*?(?<!\\)(\\\\)*?\""
+        col = self.find_column(t.lexer.lexdata,t)+1
+        row = t.lineno
+        errors = []
+        for c in t.value[1:]:
+            if c =='\x00':
+                errors.append(LexicographicError % (row, col, f'String contains null character'))
+            if c == '\n':
+                t.lexer.lineno += 1
+                col = 0
+            col += 1
         t.lexer.begin('INITIAL')
-        return t
+        if len(errors) != 0:
+            self.errors += errors
+        else:
+            return t
+    # t_string = r"\"([^\x00\n]|(?<!\\)(\\\\)*?\\\n)*?(?<!\\)(\\\\)*?\""
+    # t_string = r'\"[^\"]*\"'
 
     def t_string_error(self, t):
-        print(f'ERROR tokenizando un string en {t.lexer.lineno}')
-        t.lexer.skip(1)
-
+        row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
+        if eof:
+            self.errors.append(LexicographicError % (row, col, f'EOF in string constant'))
+            t.lexer.skip(len(t.value))
+        else:
+            self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
+            t.lexer.skip(1)
+        
+        t.lexer.begin('INITIAL')
+        
     t_arroba = r'@'
 
     t_ignore_tab = r'\t+'
-
-    # t_newline = r'\n+'
 
     def t_type(self, t):
         r'[A-Z][a-zA-Z0-9_]*'
         lex =  t.value.lower()
         if lex in reserved:
-            # if lex in ('true', 'false'):
-            #     t.type = 'type'
-            # else:
             t.type = reserved[lex]
         return t
 
     def t_id(self, t):
-        r'[a-z_][a-zA-Z0-9_]*'
+        r'[a-z][a-zA-Z0-9_]*'
         if t.value.lower() in reserved:
             t.type = reserved[t.value.lower()]
         return t
 
+    def t_eof(self, t):
+        a = 0
+    
     # Error handling rule
     def t_error(self,t):
-        print("Illegal character '%s'" % t.value[0])
+        # errores del string
+        # if t.value[0] == '"':
+        #     row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
+        #     if eof:
+        #         self.errors.append(LexicographicError % (row, col, f'EOF in string constant'))
+        #         t.lexer.skip(len(t.value))
+        #     else:
+        #         self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
+        # else:
+        self.errors.append(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
         t.lexer.skip(1)
 
     def t_chunkComment_error(self,t):
@@ -195,6 +261,7 @@ class CoolLexer:
 
     # Build the lexer
     def build(self,**kwargs):
+        self.errors = []
         self.lexer = lex.lex(module=self, **kwargs)
 
     def input(self, data):
