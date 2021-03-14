@@ -1,0 +1,21 @@
+"{\"name\": \"test_other\", \"result\": null, \"errors\": [\"Method \\\"a\\\" already defined in \\\"A\\\" with a different signature. Line:10 Column:5\"]}"
+
+class A {
+    a:Int;
+    a(a:Object):Object {
+        a
+    };
+}
+
+class B inherits A {
+    -- a:Int;
+    a(self:Int):Object {
+        a
+    };
+}
+
+class Main inherits IO {
+   main():B {
+       new B
+   };
+}

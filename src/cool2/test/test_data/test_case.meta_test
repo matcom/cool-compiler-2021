@@ -1,0 +1,14 @@
+"{\"name\": \"test_case\", \"result\": 50, \"errors\": []}"
+
+class Main inherits Object {
+   main():Object {
+       {
+           a:Object <- case 20+40 of
+           -- a:Bool => if a then true else false fi;
+           b:Int => if b = 60 then 50 else 0 fi;
+           c:Object => c;
+           esac;
+           a;
+       }
+   };
+}

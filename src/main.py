@@ -148,4 +148,8 @@ pipe = CilPipeline(pipe, MockCil1(), MockCil2())
 
 pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
 
-print(pipe(MockLexer.program))
+# print(pipe(MockLexer.program))
+
+from cool2.main import main 
+
+main('a.cl', None,False,False,False,False,False)

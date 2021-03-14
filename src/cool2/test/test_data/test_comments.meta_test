@@ -1,0 +1,12 @@
+"{\"name\": \"test_comments\", \"result\": 0, \"errors\": []}"
+
+class Main inherits Object {
+   (* this is a comment *)
+   -- This is also a comment
+   (* This is a nested (* very nested comment *) *)
+   (* -- Double comment? *)
+   -- Double (* comment again *)
+   main():Object {
+       0
+   };
+}

@@ -1,0 +1,19 @@
+"{\"name\": \"test_auto_5\", \"result\": 1, \"errors\": []}"
+
+class Main inherits Object {
+    main():AUTO_TYPE {
+        f(1,1)
+    };
+    
+    f(a: AUTO_TYPE, b: AUTO_TYPE) : AUTO_TYPE {
+        if (a=1) then b else
+            g(a + 1, b/2)
+        fi
+    };
+    
+    g(a: AUTO_TYPE, b: AUTO_TYPE) : AUTO_TYPE {
+        if (b=1) then a else
+            f(a/2, b+1)
+        fi
+    };
+}

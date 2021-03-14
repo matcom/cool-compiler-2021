@@ -1,0 +1,12 @@
+"{\"name\": \"test_case_no_type\", \"result\": 50, \"errors\": [\"No branch can be selected. Type Int is not conformed by any of the branches. Line: 4 Column: 28\"]}"
+
+class Main inherits Object {
+    main():Object {
+        {
+            a:Object <- case 20+40 of
+                a:Bool => if a then true else false fi;
+            esac;
+            a;
+        }
+    };
+}

@@ -1,0 +1,10 @@
+"{\"name\": \"test_zero_division\", \"result\": 0, \"errors\": [\"Divison by 0 not defined. Line:5 Column:15\"]}"
+
+class Main
+{
+    main():Int {
+        {
+            10/0;
+        }
+    };
+}
