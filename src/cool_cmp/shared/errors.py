@@ -1,5 +1,5 @@
 from typing import List
-class CoolError:
+class CoolError(Exception):
     """
     Base Cool Error
     """
