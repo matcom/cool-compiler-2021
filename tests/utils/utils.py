@@ -54,9 +54,6 @@ def compare_errors(compiler_path: str, cool_file_path: str, error_file_path: str
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
 
-    print(['python', compiler_path, cool_file_path])
-    print(return_code, platform.system())
-    print(output)
     assert return_code == 1, TEST_MUST_FAIL % get_file_name(cool_file_path)
 
     fd = open(error_file_path, 'r')
