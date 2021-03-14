@@ -34,3 +34,7 @@ def map_to_module(obj: object, map_attr, module):
 def from_module(module):
     caller_frame = inspect.currentframe().f_back
     exec(inspect.getsource(module), caller_frame.f_globals, caller_frame.f_locals)
+
+
+def get_bases(name):
+    return inspect.currentframe().f_back.f_globals[name].__bases__

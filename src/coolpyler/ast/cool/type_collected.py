@@ -3,17 +3,15 @@ import coolpyler.ast.cool.base as base
 
 meta.from_module(base)
 
-cool_ast_node = globals()["CoolAstNode"]
 
-
-class CoolProgramNode(cool_ast_node):
+class CoolProgramNode(*meta.get_bases("CoolProgramNode")):
     def __init__(self, lineno, columnno, classes, types):
         super().__init__(lineno, columnno)
         self.classes = classes
         self.types = types
 
 
-class CoolClassNode(cool_ast_node):
+class CoolClassNode(*meta.get_bases("CoolClassNode")):
     def __init__(self, lineno, columnno, type, features, parent=None):
         super().__init__(lineno, columnno)
         self.type = type
