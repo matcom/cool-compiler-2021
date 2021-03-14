@@ -37,7 +37,7 @@ class TypeCollector:
         bool_type.set_parent(object_type)
 
         object_type.define_method('abort', [], [], object_type)
-        object_type.define_method('get_type', [], [], string_type)
+        object_type.define_method('type_name', [], [], string_type)
         object_type.define_method('copy', [], [], self_type)
 
         io_type.define_method('out_string', ['x'], [string_type], self_type)
