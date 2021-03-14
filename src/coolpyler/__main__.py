@@ -3,6 +3,7 @@ from pathlib import Path
 from coolpyler.errors import InvalidInputFileError
 from coolpyler.lexer import CoolLexer
 from coolpyler.parser import CoolParser
+from coolpyler.visitors.visitor import Visitor
 
 
 def report_and_exit(errors):
@@ -30,6 +31,9 @@ def coolpyler(input: Path, output: Path = None):
 
     parser = CoolParser(errors)
     ast = parser.parse(tokens)  # noqa: F841
+
+    visitor = Visitor(errors)
+    ast = visitor.visit(ast)
 
     if len(errors) > 0:
         report_and_exit(errors)

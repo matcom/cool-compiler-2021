@@ -63,7 +63,9 @@ class TypeCollectorVisitor(object):
 
         classes = [self.visit(c) for c in node.classes]
 
-        return type_collected.CoolProgramNode(classes, self.types)
+        return type_collected.CoolProgramNode(
+            node.lineno, node.columnno, classes, self.types
+        )
 
     @visitor.when(base.CoolClassNode)  # noqa: F811
     def visit(self, node: base.CoolClassNode):
@@ -77,4 +79,6 @@ class TypeCollectorVisitor(object):
         else:
             type = self.types[node.id] = Type(node.id)
 
-        return type_collected.CoolClassNode(type, node.features, parent=node.parent)
+        return type_collected.CoolClassNode(
+            node.lineno, node.columnno, type, node.features, parent=node.parent
+        )

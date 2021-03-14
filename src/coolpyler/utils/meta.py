@@ -6,7 +6,7 @@ def map_hierarchy(root: type, overrides: List[type], new_module):
     overrides = {override.__name__: override for override in overrides}
 
     def map_class(class_: type):
-        print("mapping", class_.__name__)
+        # print("mapping", class_.__name__)
         try:
             new_class = overrides[class_.__name__]
         except KeyError:
