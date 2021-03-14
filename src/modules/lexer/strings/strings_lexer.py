@@ -7,6 +7,12 @@ class StringsLexer(BaseLexer):
 
     @_(r"[^\"\\\n\x00]+(?:\\[\s\S][^\"\\\n\x00]*)*")
     def ESCAPED_INNER_STRING(self, token):
+        """Catch a valid cool string inner part, includes escaped characters(newline, etc)
+        TODO: Verify the regex please
+
+        Args:
+            token (Lexer.Token): Token matched
+        """
         self.lineno += len(token.value.split("\n")) - 1
         self.current_string_value = token
 
