@@ -18,3 +18,4 @@
 #4 STR_CONST "alkjfldajf"
 #4 ERROR "Unterminated string constant"
 *)
+
