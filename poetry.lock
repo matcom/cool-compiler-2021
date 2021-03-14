@@ -140,18 +140,6 @@ MarkupSafe = ">=0.23"
 i18n = ["Babel (>=0.8)"]
 
 [[package]]
-name = "lark-parser"
-version = "0.11.2"
-description = "a modern parsing library"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.extras]
-nearley = ["js2py"]
-regex = ["regex"]
-
-[[package]]
 name = "markupsafe"
 version = "1.1.1"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -348,7 +336,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "50af242e34e63fd7b815df4a9894d5a1aff2e8072a190dfc03627b3337ad2299"
+content-hash = "647e2e426ce13513e9ac1b4064c9479044b91890b66a083039bb675a03d33b67"
 
 [metadata.files]
 appdirs = [
@@ -397,9 +385,6 @@ isort = [
 jinja2 = [
     {file = "Jinja2-2.11.3-py2.py3-none-any.whl", hash = "sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419"},
     {file = "Jinja2-2.11.3.tar.gz", hash = "sha256:a6d58433de0ae800347cab1fa3043cebbabe8baa9d29e668f1c768cb87a333c6"},
-]
-lark-parser = [
-    {file = "lark-parser-0.11.2.tar.gz", hash = "sha256:ef610461ebf2b243502f337d9d49879e39f9add846a4749e88c8dcdc1378bb6b"},
 ]
 markupsafe = [
     {file = "MarkupSafe-1.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:09027a7803a62ca78792ad89403b1b7a73a01c8cb65909cd876f7fcebd79b161"},
