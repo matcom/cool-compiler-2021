@@ -7,13 +7,13 @@ from coolpyler.ast.cool.base import (
     CoolAttrDeclNode,
     CoolBlockNode,
     CoolBoolNode,
+    CoolCaseBranchNode,
     CoolCaseNode,
-    CoolCaseOfNode,
     CoolClassNode,
     CoolDispatchNode,
     CoolDivNode,
     CoolEqNode,
-    CoolFuncDeclNode,
+    CoolMethodDeclNode,
     CoolIfThenElseNode,
     CoolIntNode,
     CoolIsVoidNode,
@@ -108,7 +108,7 @@ class CoolParser(Parser):
             [],
         )
         type, body = p.TYPE_ID, p.expr
-        return CoolFuncDeclNode(p.lineno, 0, id, param_names, param_types, type, body)
+        return CoolMethodDeclNode(p.lineno, 0, id, param_names, param_types, type, body)
 
     @_("OBJECT_ID COLON TYPE_ID { COMMA OBJECT_ID COLON TYPE_ID }")
     def formal_list(self, p):
@@ -129,13 +129,14 @@ class CoolParser(Parser):
     def expr(self, p):
         expr, id = p.expr, p.OBJECT_ID
         args = p.arg_list if p.arg_list is not None else []
-        return CoolDispatchNode(p.lineno, 0, id, args, expr=expr)
+        return CoolDispatchNode(p.lineno, 0, expr, id, args)
 
     @_("OBJECT_ID OPAR [ arg_list ] CPAR")
     def expr(self, p):
+        expr = CoolVarNode(p.lineno, 0, "self")
         id = p.OBJECT_ID
         args = p.arg_list if p.arg_list is not None else []
-        return CoolDispatchNode(p.lineno, 0, id, args)
+        return CoolDispatchNode(p.lineno, 0, expr, id, args)
 
     @_("expr { COMMA expr }")
     def arg_list(self, p):
@@ -170,13 +171,13 @@ class CoolParser(Parser):
     @_("CASE expr OF case SEMICOLON { case SEMICOLON } ESAC")
     def expr(self, p):
         expr = p.expr
-        case_list = [p.case0] + p.case1
-        return CoolCaseOfNode(p.lineno, 0, expr, case_list)
+        case_branches = [p.case0] + p.case1
+        return CoolCaseNode(p.lineno, 0, expr, case_branches)
 
     @_("OBJECT_ID COLON TYPE_ID RIGHT_ARROW expr")
     def case(self, p):
         id, type, expr = p.OBJECT_ID, p.TYPE_ID, p.expr
-        return CoolCaseNode(p.lineno, 0, id, type, expr)
+        return CoolCaseBranchNode(p.lineno, 0, id, type, expr)
 
     @_("NEW TYPE_ID")
     def expr(self, p):

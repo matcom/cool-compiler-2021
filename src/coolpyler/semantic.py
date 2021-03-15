@@ -205,8 +205,8 @@ class StringType(Type):
 class IOType(Type):
     def __init__(self):
         Type.__init__(self, "IO")
-        self.define_method("out_string", ["x"], [StringType()], SelfType())
-        self.define_method("out_int", ["x"], [IntType()], SelfType())
+        self.define_method("out_string", ["x"], [StringType()], SelfType(self))
+        self.define_method("out_int", ["x"], [IntType()], SelfType(self))
         self.define_method("in_string", [], [], StringType())
         self.define_method("in_int", [], [], IntType())
 

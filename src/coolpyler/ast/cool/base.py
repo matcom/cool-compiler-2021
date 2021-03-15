@@ -39,7 +39,7 @@ class CoolAttrDeclNode(CoolFeatureNode):
         self.body = body
 
 
-class CoolFuncDeclNode(CoolFeatureNode):
+class CoolMethodDeclNode(CoolFeatureNode):
     def __init__(self, lineno, columnno, id, param_names, param_types, type, body):
         super().__init__(lineno, columnno)
         # self.lineno = lineno
@@ -67,13 +67,13 @@ class CoolAssignNode(CoolExprNode):
 
 
 class CoolStaticDispatchNode(CoolExprNode):
-    def __init__(self, lineno, columnno, expr, type, id, args):
+    def __init__(self, lineno, columnno, expr, static_type, id, args):
         super().__init__(lineno, columnno)
         # self.lineno = lineno
         # self.columnno = columnno
 
         self.expr = expr
-        self.type = type
+        self.static_type = static_type
         self.id = id
         self.args = args
 
@@ -84,11 +84,9 @@ class CoolDispatchNode(CoolExprNode):
         # self.lineno = lineno
         # self.columnno = columnno
 
+        self.expr = expr
         self.id = id
         self.args = args
-        if expr is None:
-            expr = CoolVarNode(lineno, columnno, "self")
-        self.expr = expr
 
 
 class CoolIfThenElseNode(CoolExprNode):
@@ -142,17 +140,17 @@ class CoolLetDeclNode(CoolAstNode):
         self.expr = expr
 
 
-class CoolCaseOfNode(CoolExprNode):
-    def __init__(self, lineno, columnno, expr, case_list):
+class CoolCaseNode(CoolExprNode):
+    def __init__(self, lineno, columnno, expr, case_branches):
         super().__init__(lineno, columnno)
         # self.lineno = lineno
         # self.columnno = columnno
 
         self.expr = expr
-        self.case_list = case_list
+        self.case_branches = case_branches
 
 
-class CoolCaseNode(CoolAstNode):
+class CoolCaseBranchNode(CoolAstNode):
     def __init__(self, lineno, columnno, id, type, expr):
         super().__init__(lineno, columnno)
         # self.lineno = lineno

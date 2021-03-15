@@ -76,8 +76,8 @@ class TypeBuilderVisitor:
             node.lineno, node.columnno, attr_info, body=body
         )
 
-    @visitor.when(type_collected.CoolFuncDeclNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolFuncDeclNode):
+    @visitor.when(type_collected.CoolMethodDeclNode)  # noqa: F811
+    def visit(self, node: type_collected.CoolMethodDeclNode):
         param_types = []
         for ptype_name in node.param_types:
             try:
@@ -96,7 +96,7 @@ class TypeBuilderVisitor:
             return_type = ErrorType()
 
         try:
-            func_info = self.current_type.define_method(
+            method_info = self.current_type.define_method(
                 node.id,
                 node.param_names,
                 param_types,
@@ -106,8 +106,10 @@ class TypeBuilderVisitor:
             self.errors.append(
                 errors.SemanticError(node.lineno, node.columnno, error.text)
             )
-            func_info = None  # TODO: check
+            method_info = None  # TODO: check
 
         body = self.visit(node.body)
 
-        return type_built.CoolFuncDeclNode(node.lineno, node.columnno, func_info, body)
+        return type_built.CoolMethodDeclNode(
+            node.lineno, node.columnno, method_info, body
+        )

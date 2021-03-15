@@ -18,8 +18,8 @@ class CoolAttrDeclNode(*meta.get_bases("CoolAttrDeclNode")):
         self.body = body
 
 
-class CoolFuncDeclNode(*meta.get_bases("CoolFuncDeclNode")):
-    def __init__(self, lineno, columnno, func_info, body):
+class CoolMethodDeclNode(*meta.get_bases("CoolMethodDeclNode")):
+    def __init__(self, lineno, columnno, method_info, body):
         super().__init__(lineno, columnno)
-        self.func_info = func_info
+        self.method_info = method_info
         self.body = body

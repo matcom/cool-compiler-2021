@@ -13,6 +13,9 @@ class CoolpylerError(object):
         return f"({self.line}, {self.column}) - {self.type}: {self.msg}"
 
 
+# Compiler errors
+
+
 class CompilerError(CoolpylerError):
     """
     Error reported when an anomaly in the compiler's input is detected.
@@ -21,6 +24,18 @@ class CompilerError(CoolpylerError):
 
     def __init__(self, msg) -> None:
         CoolpylerError.__init__(self, 0, 0, "CompilerError", msg)
+
+
+class InvalidInputFileError(CompilerError):
+    """
+    Reported when input file is invalid.
+    """
+
+    def __init__(self, path: str) -> None:
+        CompilerError.__init__(self, f"File `{path}` is not a valid file.")
+
+
+# Lexicographic errors
 
 
 class LexicographicError(CoolpylerError):
@@ -32,6 +47,18 @@ class LexicographicError(CoolpylerError):
         CoolpylerError.__init__(self, line, column, "LexicographicError", msg)
 
 
+class UnexpectedCharError(LexicographicError):
+    """
+    Reported the lexer encounters an unexpected character.
+    """
+
+    def __init__(self, line: int, column: int, char: str) -> None:
+        LexicographicError.__init__(self, line, column, f"Unexpected `{char}`.")
+
+
+# Syntactic errors
+
+
 class SyntacticError(CoolpylerError):
     """
     Error reported by parser
@@ -39,6 +66,32 @@ class SyntacticError(CoolpylerError):
 
     def __init__(self, line: int, column: int, msg: str) -> None:
         CoolpylerError.__init__(self, line, column, "SyntacticError", msg)
+
+
+class UnexpectedTokenError(SyntacticError):
+    """
+    Reported the parser encounters an unexpected Token.
+    """
+
+    def __init__(self, line: int, column: int, token: str) -> None:
+        SyntacticError.__init__(
+            self,
+            line,
+            column,
+            f"Unexpected token `{token}`.",
+        )
+
+
+class UnexpectedEOFError(SyntacticError):
+    """
+    Reported the parser encounters end of file unexpectedly.
+    """
+
+    def __init__(self) -> None:
+        SyntacticError.__init__(self, 0, 0, "Unexpected EOF.")
+
+
+# Semantic errors
 
 
 class NameError(CoolpylerError):
@@ -80,42 +133,18 @@ class SemanticError(CoolpylerError):
         CoolpylerError.__init__(self, line, column, "SemanticError", msg)
 
 
-class InvalidInputFileError(CompilerError):
-    """
-    Reported when input file is invalid.
-    """
-
-    def __init__(self, path: str) -> None:
-        CompilerError.__init__(self, f"File `{path}` is not a valid file.")
-
-
-class UnexpectedCharError(LexicographicError):
-    """
-    Reported the lexer encounters an unexpected character.
-    """
-
-    def __init__(self, line: int, column: int, char: str) -> None:
-        LexicographicError.__init__(self, line, column, f"Unexpected `{char}`.")
-
-
-class UnexpectedTokenError(SyntacticError):
-    """
-    Reported the parser encounters an unexpected Token.
-    """
-
-    def __init__(self, line: int, column: int, token: str) -> None:
-        SyntacticError.__init__(
-            self,
-            line,
-            column,
-            f"Unexpected token `{token}`.",
+class IncompatibleTypesError(SemanticError):
+    def __init__(self, line, column, type_a, type_b) -> None:
+        SemanticError.__init__(
+            self, line, column, f"Cannot convert {type_a} into {type_b}."
         )
 
 
-class UnexpectedEOFError(SyntacticError):
-    """
-    Reported the parser encounters end of file unexpectedly.
-    """
-
-    def __init__(self) -> None:
-        SyntacticError.__init__(self, 0, 0, "Unexpected EOF.")
+class WrongSignatureError(SemanticError):
+    def __init__(self, line, column, method) -> None:
+        SemanticError.__init__(
+            self,
+            line,
+            column,
+            f"Method {method} already defined with a different signature.",
+        )
