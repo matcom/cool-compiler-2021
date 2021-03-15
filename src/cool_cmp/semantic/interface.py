@@ -99,7 +99,11 @@ class IContext:
     def add_type(self, name:str)->IType:
         raise NotImplementedError()
     
-    def get_type(self, name:str)->IType:
+    def get_type(self, name:str, father:IType)->IType:
+        raise NotImplementedError()
+    
+    @property
+    def types(self)->List[IType]:
         raise NotImplementedError()
     
 

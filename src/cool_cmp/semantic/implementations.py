@@ -1,7 +1,7 @@
 from cool_cmp.semantic.interface import IContext, IVariableInfo, IAttributeInfo, IMethodInfo, IType, IScope
 from cool_cmp.semantic.errors import SemanticError, VARIABLE_ALREADY_DEFINED, ATTRIBUTE_ALREADY_DEFINED, \
     METHOD_ALREADY_DEFINED, METHOD_REDEFINITION_INVALID, METHOD_NOT_DEFINED, ATTRIBUTE_NOT_DEFINED, \
-    TYPE_NOT_DEFINED, TYPE_ALREADY_DEFINED, VARIABLE_NOT_DEFINED, TYPE_NOT_INHERITABLE
+    TYPE_NOT_DEFINED, TYPE_ALREADY_DEFINED, VARIABLE_NOT_DEFINED, TYPE_NOT_INHERITABLE, METHOD_PARAMS_NAMES_EQUALS
 from typing import List
 
 class VariableInfo(IVariableInfo):
@@ -103,6 +103,11 @@ class CoolType(IType):
             return False
         
     def add_method(self, name:str, params:List[IVariableInfo], return_type:IType)->IMethodInfo:
+        names = { x.name for x in params }
+        
+        if len(names) != len(params):
+            raise SemanticError(METHOD_PARAMS_NAMES_EQUALS(name))
+        
         try:
             # Checking if a local method already exist with the given signature
             local_method = next(x for x in self._methods if x.name == name and len(x.parameters) == len(params))
@@ -133,7 +138,7 @@ class CoolType(IType):
     
     def get_method(self, name:str, params_count:int)->IMethodInfo:
         try:
-            method = next(x for x in self.methods if x.name == name and len(x.parameters) == len(params))
+            method = next(x for x in self.methods if x.name == name and len(x.parameters) == params_count)
             return method
         except StopIteration:
             raise SemanticError(METHOD_NOT_DEFINED(name, params_count, self.name))
@@ -141,6 +146,7 @@ class CoolType(IType):
     def get_attribute(self, name:str)->IAttributeInfo:
         try:
             attr = next(x for x in self.attributes if x.name == name)
+            return attr
         except StopIteration:
             raise SemanticError(ATTRIBUTE_NOT_DEFINED(name, self.name))
     
@@ -185,6 +191,11 @@ class Context(IContext):
             return typex
         except StopIteration:
             raise SemanticError(TYPE_NOT_DEFINED(name))
+        
+    @property
+    def types(self)->List[IType]:
+        return self._types
+
 
 class Scope(IScope):
     """
