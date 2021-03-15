@@ -81,10 +81,16 @@ def find_last(text, row, col):
                 else:
                     eof = False
         else:
-            # para cuando no hay newline 
-            add_col = len(temp_text) + 1
-            eof = True
+            # cuando no hay newline
+            if first == -1:
+                add_col = len(temp_text) + 1
+                eof = True
+            # cuando hay newline pero al inicio :)
+            else:
+                add_col = 0
+                eof = False
             break
+                
     if add_row == 0:
         add_col += col
     add_row += row
@@ -94,6 +100,7 @@ class CoolLexer:
     tokens = _tokens
     states = (
         ('chunkComment', 'exclusive'),
+        ('string', 'exclusive')
     )
 
     # Define a rule so we can track line numbers
@@ -182,9 +189,15 @@ class CoolLexer:
     t_assignArrow = r'<\-'
 
     t_rArrow = r'=>'
-    
+# <<<<<<< HEAD
+
     def t_string(self, t):
-        r"\"([^\n]|(?<!\\)(\\\\)*?\\\n)*?(?<!\\)(\\\\)*?\""
+        r'\"'
+        t.lexer.begin('string')
+        pass
+
+    def t_string_string(self, t):
+        r"([^\n]|(?<!\\)(\\\\)*?\\\n)*?(?<!\\)(\\\\)*?\""
         col = self.find_column(t.lexer.lexdata,t)+1
         row = t.lineno
         errors = []
@@ -195,6 +208,7 @@ class CoolLexer:
                 t.lexer.lineno += 1
                 col = 0
             col += 1
+        t.lexer.begin('INITIAL')
         if len(errors) != 0:
             self.errors += errors
         else:
@@ -202,6 +216,18 @@ class CoolLexer:
     # t_string = r"\"([^\x00\n]|(?<!\\)(\\\\)*?\\\n)*?(?<!\\)(\\\\)*?\""
     # t_string = r'\"[^\"]*\"'
 
+    def t_string_error(self, t):
+        a = self.find_column(t.lexer.lexdata,t)
+        row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
+        if eof:
+            self.errors.append(LexicographicError % (row, col, f'EOF in string constant'))
+            t.lexer.skip(len(t.value))
+        else:
+            self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
+            t.lexer.skip(1)
+        
+        t.lexer.begin('INITIAL')
+        
     t_arroba = r'@'
 
     t_ignore_tab = r'\t+'
@@ -225,15 +251,15 @@ class CoolLexer:
     # Error handling rule
     def t_error(self,t):
         # errores del string
-        if t.value[0] == '"':
-            row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
-            if eof:
-                self.errors.append(LexicographicError % (row, col, f'EOF in string constant'))
-                t.lexer.skip(len(t.value))
-            else:
-                self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
-        else:
-            self.errors.append(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
+        # if t.value[0] == '"':
+        #     row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
+        #     if eof:
+        #         self.errors.append(LexicographicError % (row, col, f'EOF in string constant'))
+        #         t.lexer.skip(len(t.value))
+        #     else:
+        #         self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
+        # else:
+        self.errors.append(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
         t.lexer.skip(1)
 
     def t_chunkComment_error(self,t):

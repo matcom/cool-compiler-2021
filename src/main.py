@@ -2,7 +2,7 @@
 import lexer.lexer as lexer
 import c_parser.parser as parser
 
-with open('/home/regnod/Documents/cmp_compiler/cmp/cool-compiler-2021/tests/lexer/string1.cl') as f:
+with open('/home/regnod/Documents/cmp_compiler 4to/cool-compiler-2021/tests/lexer/string4.cl') as f:
     program =  f.read()
 
 coolLexer = lexer.CoolLexer()
