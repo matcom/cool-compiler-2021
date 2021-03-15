@@ -24,7 +24,16 @@ def map_hierarchy(root: type, overrides: List[type], new_module):
     map_class(root)
 
 
-def map_to_module(obj: object, map_attr, module):
+def map_to_module(obj: object, module):
+    def map_attr(attr):
+        attr_class = attr.__class__
+        if attr_class.__module__ == module and hasattr(module, attr_class.__name__):
+            return map_to_module(attr, map_attr, module)
+        elif isinstance(attr, (tuple, list)):
+            return [map_attr(a) for a in attr]
+        else:
+            return attr
+
     module_obj = getattr(module, obj.__class__.__name__)
     args = inspect.getfullargspec(module_obj.__init__).args[1:]
     module_obj_args = [map_attr(getattr(obj, arg)) for arg in args]

@@ -215,11 +215,17 @@ class IOType(Type):
 
 
 class SelfType(Type):
-    def __init__(self):
-        Type.__init__(self, "SELF_TYPE")
+    def __init__(self, type):
+        Type.__init__(self, f"SELF_TYPE_{type.name}")
+        self.type = type
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, SelfType)
+
+    def conforms_to(self, other):
+        return (
+            isinstance(other, SelfType) and self.type == other.type
+        ) or self.type.conforms_to(other.type)
 
 
 class VariableInfo:

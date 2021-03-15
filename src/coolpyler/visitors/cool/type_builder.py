@@ -27,15 +27,7 @@ class TypeBuilderVisitor:
 
     @visitor.when(type_collected.CoolAstNode)  # noqa: F811
     def visit(self, node: type_collected.CoolAstNode):
-        def map_attr(attr):
-            if isinstance(attr, type_collected.CoolAstNode):
-                return meta.map_to_module(attr, map_attr, type_built)
-            elif isinstance(attr, (tuple, list)):
-                return [meta.map_to_module(a, map_attr, type_built) for a in attr]
-            else:
-                return attr
-
-        return meta.map_to_module(node, map_attr, type_built)
+        return meta.map_to_module(node, type_built)
 
     @visitor.when(type_collected.CoolProgramNode)  # noqa: F811
     def visit(self, node: type_collected.CoolProgramNode):
