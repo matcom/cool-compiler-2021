@@ -13,7 +13,6 @@ from coolpyler.ast.cool.base import (
     CoolDispatchNode,
     CoolDivNode,
     CoolEqNode,
-    CoolFormalNode,
     CoolFuncDeclNode,
     CoolIfThenElseNode,
     CoolIntNode,
@@ -104,18 +103,16 @@ class CoolParser(Parser):
     @_("OBJECT_ID OPAR [ formal_list ] CPAR COLON TYPE_ID OCURLY expr CCURLY")
     def feature(self, p):
         id = p.OBJECT_ID
-        params = p.formal_list if p.formal_list is not None else []
+        param_names, param_types = (
+            p.formal_list if p.formal_list is not None else [],
+            [],
+        )
         type, body = p.TYPE_ID, p.expr
-        return CoolFuncDeclNode(p.lineno, 0, id, params, type, body)
+        return CoolFuncDeclNode(p.lineno, 0, id, param_names, param_types, type, body)
 
-    @_("formal { COMMA formal }")
+    @_("OBJECT_ID COLON TYPE_ID { COMMA OBJECT_ID COLON TYPE_ID }")
     def formal_list(self, p):
-        return [p.formal0] + p.formal1
-
-    @_("OBJECT_ID COLON TYPE_ID")
-    def formal(self, p):
-        id, type = p.OBJECT_ID, p.TYPE_ID
-        return CoolFormalNode(p.lineno, 0, id, type)
+        return [p.OBJECT_ID0] + p.OBJECT_ID1, [p.TYPE_ID0] + p.TYPE_ID1
 
     @_("OBJECT_ID LEFT_ARROW expr")
     def expr(self, p):

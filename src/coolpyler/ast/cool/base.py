@@ -40,25 +40,16 @@ class CoolAttrDeclNode(CoolFeatureNode):
 
 
 class CoolFuncDeclNode(CoolFeatureNode):
-    def __init__(self, lineno, columnno, id, params, type, body):
+    def __init__(self, lineno, columnno, id, param_names, param_types, type, body):
         super().__init__(lineno, columnno)
         # self.lineno = lineno
         # self.columnno = columnno
 
         self.id = id
-        self.params = params
+        self.param_names = param_names
+        self.param_types = param_types
         self.type = type
         self.body = body
-
-
-class CoolFormalNode(CoolAstNode):
-    def __init__(self, lineno, columnno, id, type):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.id = id
-        self.type = type
 
 
 class CoolExprNode(CoolAstNode):

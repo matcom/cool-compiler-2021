@@ -50,10 +50,18 @@ class Type:
         self.methods = []
         self.parent = None
 
+        self.reachable = [self]
+        self.sealed = False
+
     def set_parent(self, parent):
         if self.parent is not None:
-            raise SemanticError(f"Parent type is already set for `{self.name}``.")
+            raise SemanticError(f"Parent type is already set for `{self.name}`.")
+        if parent.sealed:
+            raise SemanticError(f"Cannot inherit from `{parent.name}`.")
+        if parent in self.reachable:
+            raise SemanticError(f"Cycle in hierarchy involving `{self.name}`.")
         self.parent = parent
+        self.parent.reachable.extend(self.reachable)
 
     def get_attribute(self, name: str):
         try:
@@ -170,6 +178,7 @@ class ObjectType(Type):
 class IntType(Type):
     def __init__(self):
         Type.__init__(self, "Int")
+        self.sealed = True
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, IntType)
@@ -178,6 +187,7 @@ class IntType(Type):
 class BoolType(Type):
     def __init__(self):
         Type.__init__(self, "Bool")
+        self.sealed = True
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, BoolType)
@@ -186,6 +196,7 @@ class BoolType(Type):
 class StringType(Type):
     def __init__(self):
         Type.__init__(self, "String")
+        self.sealed = True
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, StringType)

@@ -31,7 +31,7 @@ class TypeCollectorVisitor(object):
             if isinstance(attr, base.CoolAstNode):
                 return meta.map_to_module(attr, map_attr, type_collected)
             elif isinstance(attr, (tuple, list)):
-                return [meta.map_to_module(a, map_attr, type_collected) for a in attr]
+                return [map_attr(a) for a in attr]
             else:
                 return attr
 
@@ -79,6 +79,8 @@ class TypeCollectorVisitor(object):
         else:
             type = self.types[node.id] = Type(node.id)
 
+        features = [self.visit(feat) for feat in node.features]
+
         return type_collected.CoolClassNode(
-            node.lineno, node.columnno, type, node.features, parent=node.parent
+            node.lineno, node.columnno, type, features, parent=node.parent
         )
