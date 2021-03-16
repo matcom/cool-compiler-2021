@@ -5,8 +5,10 @@ from semantic.types import *
 from semantic.tools import Context
 
 class TypeBuilder:
-    def __init__(self):
-        pass
+    def __init__(self, context : Context, errors : list) -> None:
+        self.context:Context = context
+        self.errors:list = errors
+        self.current_type:Type = None
 
     @visitor.on('node')
     def visit(self, node):
