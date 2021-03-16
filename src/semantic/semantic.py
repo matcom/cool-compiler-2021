@@ -1,4 +1,4 @@
-
+from semantic.visitors.type_collector import TypeCollector
 
 class SemanticAnalyzer:
 
@@ -11,4 +11,11 @@ class SemanticAnalyzer:
 
     def analyze(self):
         
+        collector = TypeCollector(self.errors)
+        collector.visit(self.ast)
+        self.context = collector.context
+        print(self.context)
+
+
+
         return self.ast, self.context, self.scope
