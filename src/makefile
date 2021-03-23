@@ -1,7 +1,7 @@
 .PHONY: clean
 
 main:
-	# Compiling the compiler :)
+	python -m cool_compiler string3.cl
 
 clean:
 	rm -rf build/*
