@@ -1,3 +1,4 @@
+from semantic.visitors.type_builder import TypeBuilder
 from semantic.visitors.type_collector import TypeCollector
 
 class SemanticAnalyzer:
@@ -15,6 +16,9 @@ class SemanticAnalyzer:
         collector.visit(self.ast)
         self.context = collector.context
         print(self.context)
+
+        builder = TypeBuilder(self.context, self.errors)
+        builder.visit(self.ast)
 
 
 
