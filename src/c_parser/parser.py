@@ -2,6 +2,7 @@ import lexer.lexer as lexer
 from lexer.lexer import _tokens
 from cool_ast.cool_ast import *
 import ply.yacc as yacc
+from utils.errors import SyntacticError
 coolLexer = lexer.CoolLexer()
 tokens = _tokens
 
@@ -16,18 +17,26 @@ precedence = (
     ( 'left', 'not'),
     ( 'nonassoc', 'assignArrow')
 )
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3ace997f0e9e89cdaebac0f589a9993ea441e2f7
 errors = []
 class CoolParser:
     # def __init__(self):
-    
 
     def parse(self, lexer, program):
         self.tokens = _tokens
         self.lexer = lexer
         self.lexer.build()
         ast = self.parser.parse(program)
+<<<<<<< HEAD
         return ast
         
+=======
+        self.errors = errors
+        return ast
+>>>>>>> 3ace997f0e9e89cdaebac0f589a9993ea441e2f7
         
     def p_program(p):
         'program : class_list'
@@ -91,16 +100,22 @@ class CoolParser:
         p[0] = FuncDeclarationNode(p[1],p[3],p[6],p[8])
 
     def p_arg_list(p):
-        '''arg_list : arg
-                    | arg comma arg_list
+        '''arg_list : non_empty_arg_list
                     | 
+        '''
+        if len(p) == 2: #p[1] == 'non_empty_arg_list':
+            p[0] = p[1]
+        else:
+            p[0] = []
+
+    def p_non_empty_arg_list(p):
+        '''non_empty_arg_list   : arg
+                                | arg comma non_empty_arg_list
         '''
         if len(p) == 4:
             p[0] = [p[1]] + p[3]
         elif len(p) == 2:
             p[0] = [p[1]]
-        else:
-            p[0] = []
 
     def p_arg(p):
         'arg : id colon type'
@@ -266,7 +281,33 @@ class CoolParser:
         else:
             p[0] = [(p[1], p[3], p[5], p[7])]
     
+<<<<<<< HEAD
     def p_error(p):
         a = 0
     
+=======
+    # Compute column.
+    #   input is the input text string
+    #   token is a token instance
+    def find_column(input, token):
+        line_start = input.rfind('\n', 0, token.lexpos) + 1
+        return (token.lexpos - line_start) + 1  #parentesis?
+
+    def p_error(p):
+        global errors
+        def find_column(input, token):
+            line_start = input.rfind('\n', 0, token.lexpos) + 1
+            return (token.lexpos - line_start) + 1  #parentesis?
+
+        if not p:
+            errors.append(SyntacticError % (0,0,'EOF'))
+            return
+
+        token_column = find_column(p.lexer.lexdata, p)
+        errors.append(SyntacticError % (p.lineno, token_column, p.value))
+        # print(SyntacticError % (p.lineno, token_column, p.value))
+        # print(f'({p.lineno}, {token_column}) - SyntacticError: ERROR at or near "{p.value}"')
+        a=0
+
+>>>>>>> 3ace997f0e9e89cdaebac0f589a9993ea441e2f7
     parser = yacc.yacc(debug = True)
