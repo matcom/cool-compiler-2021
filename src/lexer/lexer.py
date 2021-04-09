@@ -189,7 +189,6 @@ class CoolLexer:
     t_assignArrow = r'<\-'
 
     t_rArrow = r'=>'
-# <<<<<<< HEAD
 
     def t_string(self, t):
         r'\"'
@@ -221,9 +220,11 @@ class CoolLexer:
         row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
         if eof:
             self.errors.append(LexicographicError % (row, col, f'EOF in string constant'))
+            # print(LexicographicError % (row, col, f'EOF in string constant'))
             t.lexer.skip(len(t.value))
         else:
             self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
+            # print(LexicographicError % (row, col, f'Unterminated string constant'))
             t.lexer.skip(1)
         
         t.lexer.begin('INITIAL')
@@ -260,6 +261,7 @@ class CoolLexer:
         #         self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
         # else:
         self.errors.append(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
+        # print(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
         t.lexer.skip(1)
 
     def t_chunkComment_error(self,t):
