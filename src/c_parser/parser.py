@@ -16,7 +16,7 @@ precedence = (
     ( 'left', 'not'),
     ( 'nonassoc', 'assignArrow')
 )
-
+errors = []
 class CoolParser:
     # def __init__(self):
     
@@ -25,7 +25,9 @@ class CoolParser:
         self.tokens = _tokens
         self.lexer = lexer
         self.lexer.build()
-        return self.parser.parse(program)
+        ast = self.parser.parse(program)
+        return ast
+        
         
     def p_program(p):
         'program : class_list'
@@ -263,5 +265,8 @@ class CoolParser:
             p[0] = [(p[1], p[3], p[5])]
         else:
             p[0] = [(p[1], p[3], p[5], p[7])]
+    
+    def p_error(p):
+        a = 0
     
     parser = yacc.yacc(debug = True)

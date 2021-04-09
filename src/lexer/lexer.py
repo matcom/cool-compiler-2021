@@ -189,7 +189,6 @@ class CoolLexer:
     t_assignArrow = r'<\-'
 
     t_rArrow = r'=>'
-# <<<<<<< HEAD
 
     def t_string(self, t):
         r'\"'
