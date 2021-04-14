@@ -276,5 +276,4 @@ def t_ANY_error(t):
     t.lexer.skip(1)
 
 
-# TODO: Add separate tokens for class (types) names and identifiers
 # TODO: Handle errors inside comments (unbalanced multiline comments delimeters)

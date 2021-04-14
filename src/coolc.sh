@@ -8,4 +8,6 @@ echo "LINEA_CON_NOMBRE_Y_VERSION_DEL_COMPILADOR"        # TODO: Recuerde cambiar
 echo "Copyright (c) 2021: Adrian, Rodrigo"    # TODO: líneas a los valores correctos
 
 # Llamar al compilador
-echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
+# echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
+
+exec python3 __main__.py $INPUT_FILE 
