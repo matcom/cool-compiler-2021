@@ -355,6 +355,12 @@ class TypeBag:
         clone.conform_list = self.conform_list.copy()
         return clone
 
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return str(self)
+
 
 class SelfType(Type):
     def __init__(self):
@@ -566,6 +572,13 @@ def conforms(bag1: TypeBag, bag2: TypeBag):
 
     bag1.set_conditions(condition_list, conform_list)
     return len(bag1.type_set) >= 1
+
+
+def try_conform(bag1: TypeBag, bag2: TypeBag):
+    clone1 = bag1.clone()
+    if not conforms(bag1, bag2):
+        return clone1
+    return bag2
 
 
 def join(bag1: TypeBag, bag2: TypeBag) -> TypeBag:
