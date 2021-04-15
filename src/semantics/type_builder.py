@@ -1,17 +1,24 @@
 import semantics.visitor as visitor
-from parsing.ast import Node, ProgramNode, ClassDeclarationNode, MethodDeclarationNode, AttrDeclarationNode
+from ast.parser_ast import (
+    Node,
+    ProgramNode,
+    ClassDeclarationNode,
+    MethodDeclarationNode,
+    AttrDeclarationNode,
+)
 from semantics.tools import SemanticError, TypeBag
 from semantics.tools import ErrorType, SelfType
 from semantics.tools import Context
+
 
 class TypeBuilder:
     def __init__(self, context: Context, errors):
         self.context = context
         self.current_type = None
-        self.errors = errors
-    
-    @visitor.on('node')
-    def visit(self, node): 
+        self.errors: list = errors
+
+    @visitor.on("node")
+    def visit(self, node):
         pass
 
     @visitor.when(ProgramNode)
@@ -22,12 +29,12 @@ class TypeBuilder:
             self.visit(class_def)
 
         try:
-            self.context.get_type('Main', unpacked=True).get_method('main', local=True)
+            self.context.get_type("Main", unpacked=True).get_method("main", local=True)
         except SemanticError as err:
             self.add_error(node, err.text)
-    
+
     @visitor.when(ClassDeclarationNode)
-    def visit(self, node):
+    def visit(self, node: ClassDeclarationNode):
         self.current_type = self.context.get_type(node.id, unpacked=True)
 
         if node.parent:
@@ -38,7 +45,7 @@ class TypeBuilder:
                     self.current_type.attributes.append(idx)
             except SemanticError as err:
                 self.add_error(node, err.text)
-        
+
         for feature in node.features:
             self.visit(feature)
 
@@ -49,12 +56,12 @@ class TypeBuilder:
         except SemanticError as err:
             self.add_error(node, err.text)
             attr_type = ErrorType()
-        
+
         try:
             self.current_type.define_attribute(node.id, attr_type)
         except SemanticError as err:
             self.add_error(err.text)
-    
+
     @visitor.when(MethodDeclarationNode)
     def visit(self, node):
         try:
@@ -62,7 +69,7 @@ class TypeBuilder:
         except SemanticError as err:
             self.add_error(err.text)
             ret_type = ErrorType()
-        
+
         params_type = []
         params_name = []
         for var in node.params:
@@ -74,7 +81,7 @@ class TypeBuilder:
                 params_type.append(ErrorType())
                 self.add_error(node, err.text)
             params_name.append(p_name)
-        
+
         try:
             self.current_type.define_method(node.id, params_name, params_type, ret_type)
         except SemanticError as err:
@@ -105,11 +112,11 @@ class TypeBuilder:
         String.define_method("concat", ["s"], [p_String], p_String)
         String.define_method("substr", ["i", "l"], [p_Int, p_Int], p_String)
 
-        Io.define_method("out_string", ["x"],[p_String], p_Self)
-        Io.define_method("out_int", ["x"],[p_Int], p_Self)
-        Io.define_method("in_string", [],[], p_String)
+        Io.define_method("out_string", ["x"], [p_String], p_Self)
+        Io.define_method("out_int", ["x"], [p_Int], p_Self)
+        Io.define_method("in_string", [], [], p_String)
         Io.define_method("in_int", [], [], p_Int)
-    
-    def add_error(self, node:Node, text:str):
+
+    def add_error(self, node: Node, text: str):
         line, col = node.get_position() if node else (0, 0)
-        self.errors.append(((line,col), f"({line}, {col}) - " + text))
+        self.errors.append(((line, col), f"({line}, {col}) - " + text))

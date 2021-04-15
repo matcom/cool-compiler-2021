@@ -1,16 +1,23 @@
 import semantics.visitor as visitor
-from parsing.ast import Node, ProgramNode, ClassDeclarationNode
+from ast.parser_ast import Node, ProgramNode, ClassDeclarationNode
 from semantics.tools import SemanticError
 from semantics.tools import Context
+
 
 class TypeCollector(object):
     def __init__(self) -> None:
         self.context = Context()
         self.errors = []
-        self.type_graph = {"Object":["IO", "String", "Int", "Bool"], "IO":[], "String":[], "Int":[], "Bool":[]}
+        self.type_graph = {
+            "Object": ["IO", "String", "Int", "Bool"],
+            "IO": [],
+            "String": [],
+            "Int": [],
+            "Bool": [],
+        }
         self.node_dict = dict()
 
-    @visitor.on('node')
+    @visitor.on("node")
     def visit(self, node):
         pass
 
@@ -36,8 +43,10 @@ class TypeCollector(object):
             except KeyError:
                 self.type_graph[node.id] = []
             if node.parent:
-                if node.parent in {'String', 'Int, Bool'}:
-                    raise SemanticError(f"Type \'{node.id}\' cannot inherit from \'{node.parent}\' beacuse is forbidden.")
+                if node.parent in {"String", "Int, Bool"}:
+                    raise SemanticError(
+                        f"Type '{node.id}' cannot inherit from '{node.parent}' beacuse is forbidden."
+                    )
                 try:
                     self.type_graph[node.parent].append(node.id)
                 except KeyError:
@@ -47,7 +56,7 @@ class TypeCollector(object):
                 self.type_graph["Object"].append(node.id)
         except SemanticError as error:
             self.add_error(node, error.text)
-    
+
     def get_type_hierarchy(self):
         visited = set(["Object"])
         new_order = []
@@ -58,9 +67,11 @@ class TypeCollector(object):
             if not node in visited:
                 visited.add(node)
                 path = [node]
-                circular_heritage_errors.append(self.check_circular_heritage(node, self.type_graph, path, visited))
+                circular_heritage_errors.append(
+                    self.check_circular_heritage(node, self.type_graph, path, visited)
+                )
                 new_order = new_order + [self.node_dict[node] for node in path]
-            
+
         if circular_heritage_errors:
             print(circular_heritage_errors)
             error = "Semantic Error: Circular Heritage:\n"
@@ -69,10 +80,10 @@ class TypeCollector(object):
 
         return new_order
 
-    def dfs_type_graph(self, root, graph, visited:set, new_order, index):
+    def dfs_type_graph(self, root, graph, visited: set, new_order, index):
         if not root in graph:
             return
-        
+
         for node in graph[root]:
             if node in visited:
                 continue
@@ -81,23 +92,23 @@ class TypeCollector(object):
                 new_order.append(self.node_dict[node])
             self.context.get_type(node, unpacked=True).index = index
             self.dfs_type_graph(node, graph, visited, new_order, index + 1)
-    
+
     def check_circular_heritage(self, root, graph, path, visited):
         for node in graph[root]:
             if node in path:
-                return ' -> '.join(child for child in path + [path[0]])
+                return " -> ".join(child for child in path + [path[0]])
 
             visited.add(node)
             path.append(node)
             return self.check_circular_heritage(node, graph, path, visited)
 
     def init_default_classes(self):
-        self.context.create_type('Object').index = 0
-        self.context.create_type('String')
-        self.context.create_type('Int')
-        self.context.create_type('IO')
-        self.context.create_type('Bool')
-    
-    def add_error(self, node:Node, text:str):
+        self.context.create_type("Object").index = 0
+        self.context.create_type("String")
+        self.context.create_type("Int")
+        self.context.create_type("IO")
+        self.context.create_type("Bool")
+
+    def add_error(self, node: Node, text: str):
         line, col = node.get_position() if node else (0, 0)
-        self.errors.append(((line,col), f"({line}, {col}) - " + text))
+        self.errors.append(((line, col), f"({line}, {col}) - " + text))
