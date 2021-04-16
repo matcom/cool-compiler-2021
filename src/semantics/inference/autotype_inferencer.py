@@ -1,7 +1,15 @@
-from parsing.parsing_rules import p_param
-import semantics.visitor as visitor
-from parsing.ast import ArithmeticNode, AssignNode, AttrDeclarationNode, BlocksNode, CaseNode, CaseOptionNode, ClassDeclarationNode, ComparerNode, ComplementNode, ConditionalNode, EqualsNode, IsVoidNode, LetNode, LoopNode, MethodCallNode, MethodDeclarationNode, Node, NotNode, ProgramNode, VarDeclarationNode, VariableNode
-from semantics.tools import Context, ErrorType, Scope, TypeBag, conforms, equal, join, join_list, smart_add
+from ast.parser_ast import (ArithmeticNode, AssignNode, AttrDeclarationNode,
+                            BlocksNode, CaseNode, CaseOptionNode,
+                            ClassDeclarationNode, ComparerNode, ComplementNode,
+                            ConditionalNode, EqualsNode, IsVoidNode, LetNode,
+                            LoopNode, MethodCallNode, MethodDeclarationNode,
+                            Node, NotNode, ProgramNode, VarDeclarationNode,
+                            VariableNode)
+
+from utils import visitor
+from semantics.tools import (Context, ErrorType, Scope, TypeBag, conforms,
+                             equal, join, join_list, smart_add)
+
 
 class AutotypeInferencer:
     def __init__(self, context:Context, errors) -> None:

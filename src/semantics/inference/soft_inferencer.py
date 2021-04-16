@@ -26,12 +26,12 @@ from ast.parser_ast import (
     VariableNode,
 )
 
-import semantics.visitor as visitor
+from utils import visitor
+from semantics.errors import SemanticError
 from semantics.tools import (
     Context,
     ErrorType,
     Scope,
-    SemanticError,
     TypeBag,
     conforms,
     join,

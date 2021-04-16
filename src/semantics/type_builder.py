@@ -1,4 +1,4 @@
-import semantics.visitor as visitor
+from utils import visitor
 from ast.parser_ast import (
     Node,
     ProgramNode,
@@ -6,8 +6,8 @@ from ast.parser_ast import (
     MethodDeclarationNode,
     AttrDeclarationNode,
 )
-from semantics.tools import SemanticError, TypeBag
-from semantics.tools import ErrorType, SelfType
+from semantics.errors import SemanticError 
+from semantics.tools import  SelfType,TypeBag,ErrorType
 from semantics.tools import Context
 
 

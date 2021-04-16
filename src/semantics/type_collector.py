@@ -1,10 +1,11 @@
-import semantics.visitor as visitor
-from ast.parser_ast import Node, ProgramNode, ClassDeclarationNode
-from semantics.tools import SemanticError
+from ast.parser_ast import ClassDeclarationNode, Node, ProgramNode
+
+from semantics.errors import SemanticError
 from semantics.tools import Context
+from utils import visitor
 
 
-class TypeCollector(object):
+class TypeCollector:
     def __init__(self) -> None:
         self.context = Context()
         self.errors = []

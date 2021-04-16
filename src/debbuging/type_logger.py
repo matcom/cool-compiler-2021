@@ -1,4 +1,4 @@
-import semantics.visitor as visitor
+from utils import visitor
 from ast.inferencer_ast import (
     AssignNode,
     AtomicNode,

@@ -2,7 +2,8 @@ import os
 
 from debbuging import type_logger
 from parsing import parser
-from semantics import type_collector, type_builder, soft_inferencer
+from semantics import type_collector, type_builder 
+from semantics.inference import soft_inferencer
 
 
 def format_errors(errors, s=""):
@@ -53,8 +54,8 @@ except FileNotFoundError:
 count = 100
 
 filenames = [
-    r"/home/rodro/Aarka/Complementos de Compilacion/cool-cows/src/debbuging/tests/Auto/"
-    r"01Assign.cl"
+    r"/home/adrian/Desktop/4to/PrimerSemestre/ComplementosCompilacion/cool-compiler-2021/src/cool_example.cl"
+    # r"01Assign.cl"
 ]
 
 for filename in filenames:
