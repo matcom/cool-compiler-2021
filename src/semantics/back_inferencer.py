@@ -59,20 +59,21 @@ class BackInferencer:
         expr_type = expr_node.inferenced_type
 
         decl_type = node.inferenced_type
-        # try conforms trata de disminuir la bolsa de tipos de decl_type a base de los que tiene
-        # expr_type, en caso de que se quede vacio, se mantiene sin cambios en la bolsa grande
+        # try conforms trata de disminuir la bolsa de tipos de decl_type a base de los
+        # que tiene expr_type, en caso de que se quede vacio, se mantiene sin cambios
+        # en la bolsa decl_type
         decl_type = try_conform(decl_type, expr_type)
 
         attr_node.expr = expr_node
         attr_node.inferenced_type = decl_type
         return attr_node
 
-    # Ten ojo con los selftype dentro de los typebags ... Antes de trabajar con los selftypes
-    # tienes que cambiarlo por el tipo determinado segun el contexo, utiliza el metodo
-    # swap_self_type de los objetos TypeBag para realizar esto. Si se te escapa un selftype cuando
-    # se intente realizar una operacion con el se lanza error
+    # Ten ojo con los selftype dentro de los typebags ... Antes de trabajar con los
+    # selftypes tienes que cambiarlo por el tipo determinado segun el contexo, utiliza
+    # el metodo swap_self_type de los objetos TypeBag para realizar esto. Si se te
+    # escapa un selftype cuando se intente realizar una operacion con el se lanza error
 
-    # Este metodo deberia ser innecesario pues ya todos los errores han sido recogidos previamente
+    # Este metodo deber ser innecesario pues todos los errores son recogidos previamente
     def add_error(self, node: Node, text: str):
-        line, col = node.get_position() if node else (0, 0)
+        line, col = node.get_position() if node is not None else (0, 0)
         self.errors.append(((line, col), f"({line}, {col}) - " + text))

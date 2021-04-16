@@ -407,6 +407,7 @@ class ErrorType(Type):
         self.name = "<error>"
         self.index = 2 ** 32
         self.type_set = frozenset()
+        self.heads = frozenset()
 
     def conforms_to(self, other):
         return True

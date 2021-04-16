@@ -104,7 +104,7 @@ class VarDeclarationNode(ExpressionNode):
         self.id = node.id
         self.expr = None  # Expression is set later if it exists
         self.defined = False
-        # For debbugi purposes
+        # For debbugin purposes
         self.type = node.type
 
 
@@ -117,9 +117,10 @@ class AssignNode(ExpressionNode):
 
 
 class MethodCallNode(ExpressionNode):
-    def __init__(self, caller_type, args, node):
+    def __init__(self, caller_type, expression, args, node):
         Node.__init__(self, node)
         self.caller_type = caller_type
+        self.expression = expression
         self.args = args
         self.id = node.id
 
