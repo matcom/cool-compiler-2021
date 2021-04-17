@@ -1,34 +1,14 @@
+from ast.parser_ast import (AssignNode, AttrDeclarationNode, BlocksNode,
+                            BooleanNode, CaseNode, CaseOptionNode,
+                            ClassDeclarationNode, ComplementNode,
+                            ConditionalNode, DivNode, EqualsNode,
+                            InstantiateNode, IntNode, IsVoidNode, LessNode,
+                            LessOrEqualNode, LetNode, LoopNode, MethodCallNode,
+                            MethodDeclarationNode, MinusNode, NotNode,
+                            PlusNode, ProgramNode, StarNode, StringNode,
+                            VarDeclarationNode, VariableNode)
+
 from lexing.lexing_rules import tokens
-from ast.parser_ast import (
-    AssignNode,
-    AttrDeclarationNode,
-    BlocksNode,
-    BooleanNode,
-    CaseNode,
-    CaseOptionNode,
-    ClassDeclarationNode,
-    ComplementNode,
-    ConditionalNode,
-    DivNode,
-    EqualsNode,
-    InstantiateNode,
-    IntNode,
-    IsVoidNode,
-    LessNode,
-    LessOrEqualNode,
-    LetNode,
-    LoopNode,
-    MethodCallNode,
-    MethodDeclarationNode,
-    MinusNode,
-    NotNode,
-    PlusNode,
-    ProgramNode,
-    StarNode,
-    StringNode,
-    VarDeclarationNode,
-    VariableNode,
-)
 
 
 def p_program(p):

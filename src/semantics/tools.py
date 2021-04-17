@@ -1,6 +1,6 @@
 import itertools as itt
 from collections import OrderedDict
-from typing import FrozenSet, List, Set
+from typing import FrozenSet, List, Set, Tuple
 
 from semantics.errors import *
 
@@ -363,16 +363,16 @@ class SelfType(Type):
 
 
 class FuncType(Type):
-    def __init__(self, name: str, params: List[Type], ret_type: Type) -> None:
+    def __init__(self, name: str, params: Tuple[Type, ...], ret_type: Type) -> None:
         self.name = name
         self.params = params
         self.ret_type = ret_type
 
-    def conforms_to(self, other, first):
+    def conforms_to(self, other):
         if not isinstance(other, FuncType):
             raise InternalError(
                 (
-                    "A Function Type can only conform to other Function"
+                    "A FunctionType can only conform to other Function"
                     f"Type, not to {other.__class__.__name__}"
                 )
             )
