@@ -336,7 +336,7 @@ class FormatVisitor(object):
 class TypeCollector(object):
     def __init__(self, errors=[], context=None):
         self.context = context
-        self.errors = errorsTrue
+        self.errors = errors
     
     @visitor.on('node')
     def visit(self, node):

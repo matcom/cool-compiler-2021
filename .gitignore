@@ -318,6 +318,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# lib named project folders
+!src/cool2/lib
+!src/cool2/cool/lib
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

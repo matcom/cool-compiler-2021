@@ -152,4 +152,4 @@ pipe = MipsPipeline(pipe, MockMips1(), MockMips2())
 
 from cool2.main import main 
 
-main('a.cl', None,False,False,False,False,False)
+main('src/a.cl', None,False,False,False,False,False)
