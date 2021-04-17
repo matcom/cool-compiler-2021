@@ -11,7 +11,7 @@ from cool_cmp.mips import MipsPipeline
 from cool_cmp.shared.token import ICoolToken
 from cool_cmp.shared.ast import BaseAST
 from cool_cmp.shared.ast.cool import ClassDeclarationNode, ProgramNode
-from cool_cmp.lexer.lexer import PlyLexer
+# from cool_cmp.lexer.lexer import PlyLexer
 from cool_cmp.shared.errors import CoolError
 from typing import List, Tuple
 
@@ -256,10 +256,13 @@ if __name__ == "__main__":
     import sys
     with open(sys.argv[1]) as file:
         program = file.read()
-        pipe = LexerPipeline(PlyLexer())
+        pipe = LexerPipeline()
         result = pipe(program)
         for err in result.get_errors():
-            err.print_error()
+            if isinstance(err, str):
+                print(err)
+            else:
+                err.print_error()
         if result.get_errors():
             exit(1)
     with open(sys.argv[2], 'w') as file:

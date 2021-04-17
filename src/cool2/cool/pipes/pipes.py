@@ -60,33 +60,63 @@ def remove_comments_pipe(result:dict, comment_grammar=C, comment_lexer=comment_l
 
 remove_comments_pipe = Pipe(remove_comments_pipe)
 
-def parse_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexer, language_parser=cool_parser):
+def tokenize_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexer, language_parser=cool_parser):
     """
-    Parse the text
+    Tokenize the text
     """
     text = result['text']
     
     lang = LanguageLR(language_grammar, language_lexer, language_parser)
     
-    
     errors = []
-    parse, tokens = lang(text,errors)
+    tokens = lang.get_tokens(text, errors)
     
     result.update({
-        "language": lang,
         "parser": language_parser,
         "lexer": language_lexer,
-        "text_parse": parse,
+        "language": lang,
         "text_tokens": tokens,
     })
+
+    if result.get("verbose",False):
+        if errors:
+            print_errors("Lexer Errors", errors)
+        print('================== TOKENS =====================')
+        pprint_tokens(tokens)
+    
+    result["errors"].extend(errors)
+
+    return result
+
+tokenize_text_pipe = Pipe(tokenize_text_pipe)
+
+def parse_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexer, language_parser=cool_parser):
+    """
+    Parse the text
+    """
+    text = result['text']
+    tokens = result.get('text_tokens')
+    
+    lang = result.get('language', LanguageLR(language_grammar, language_lexer, language_parser))
+    
+    errors = []
+    parse, tokens = lang(text, errors, tokens)
+    
     
     if result.get("verbose",False):
         if errors:
             print_errors("Parsing Text Errors", errors)
-        print('================== TOKENS =====================')
-        pprint_tokens(tokens)
+        if not 'text_tokens' in result:
+            print('================== TOKENS =====================')
+            pprint_tokens(tokens)
         print('=================== PARSE =====================')
         print('\n'.join(repr(x) for x in parse))
+    
+    result.update({
+        "text_parse": parse,
+        "language": lang,
+        "text_tokens": tokens,
+    })
     
     result["errors"].extend(errors)
 

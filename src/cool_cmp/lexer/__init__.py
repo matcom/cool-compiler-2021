@@ -6,10 +6,13 @@ from cool_cmp.shared.token import ICoolToken
 from cool_cmp.lexer.interface import ILexer
 from cool_cmp.shared.pipeline import Pipeline, Pipe
 from cool_cmp.shared import SymbolTable
+from cool_cmp.lexer.lexer2 import CoolLexer2
+
+default_lexer = CoolLexer2()
 
 class LexerPipeline(Pipeline):
 
-    def __init__(self, lexer:ILexer):
+    def __init__(self, lexer:ILexer=default_lexer):
         result = SymbolTable()
 
         def get_tokens(program:str):

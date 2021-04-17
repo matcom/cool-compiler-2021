@@ -31,13 +31,13 @@ class Language():
                     errors.append(f'The grammar does not recognize the token {x}')
         return fix_tokens
 
-    def __call__(self, text, errors):
+    def __call__(self, text, errors, tokens=None):
         """
         returns a tuple of the parse and the tokens of the text
         """
 
-        tokens = self.lexer(text)
-        tokens = self._fix_tokens(tokens,errors)
+        if tokens is None:
+            tokens = self.get_tokens(text, errors)
 
         parse_errors = []
         parse = self.parser(tokens,parse_errors)
@@ -50,6 +50,19 @@ class Language():
         
         return parse,tokens
     
+    def get_tokens(self, text, errors):
+        """
+        Return the text tokens
+        """
+        tokens = self.lexer(text)
+        tokens = self._fix_tokens(tokens,errors)
+        for tok in tokens:
+            if tok.token_type == "UNKNOWN":
+                errors.append(f"Unknown Token {tok.lex[0]} at Line: {tok.lex[1]} Column: {tok.lex[2]}")
+        tokens = [x for x in tokens if x.token_type != "UNKNOWN"]
+        
+        return tokens
+        
     def find_conflict(self):
         return self.parser.find_conflict()
     
