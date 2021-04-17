@@ -1,7 +1,2 @@
-from . import lexing_rules
-from ply import lex
+from .lexer import Lexer
 
-lexer = lex.lex(module=lexing_rules)
-# Set starting col
-lexer.col = 1
-lexer.errors = []

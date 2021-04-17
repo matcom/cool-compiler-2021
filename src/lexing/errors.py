@@ -10,9 +10,3 @@ class LexicographicError:
     def __repr__(self) -> str:
         return str(self)
   
-
-
-def set_pos(token):
-    token.col = token.lexer.col
-    token.line = token.lexer.lineno
-    token.lexer.col += len(token.value)

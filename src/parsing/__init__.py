@@ -1,5 +1,1 @@
-from ply import yacc
-from . import parsing_rules
-
-parser = yacc.yacc(module=parsing_rules)
-parser.errors = []
+from .parser import Parser

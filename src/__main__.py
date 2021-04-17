@@ -1,7 +1,11 @@
 import sys
 
-from lexing import lexer
-from parsing import parser
+from ply.lex import lex
+
+from lexing import Lexer
+
+# from parsing import Parser
+from parsing import Parser
 from semantics import TypeBuilder, TypeCollector, TypeChecker
 from semantics.inference import (
     AutotypeCollector,
@@ -34,7 +38,9 @@ def run_pipeline(program_ast):
     # s = format_errors(errors, s)
     # print(s)
 
+
 input_file = "src/test.cl"
+
 
 def main():
 
@@ -44,12 +50,24 @@ def main():
     #     raise Exception("Incorrect number of arguments")
 
     program = open(input_file).read()
-    lexer.input(program)
-    tokens = []
-    for token in lexer:
-        tokens.append(token)
+
+    lexer = Lexer()
+
+    # parser = Parser(lexer)
+    # ast = parser.parse(program)
+    # print(ast)
+
+    tokens = list(lexer.tokenize(program))
+    # print(tokens)
+    # print(lexer.errors)
+
+    # lexer.input(program)
+    # tokens = []
+    # for token in lexer:
+    # #     tokens.append(token)
     if lexer.errors:
-        print(lexer.errors[0])
+        for error in lexer.errors:
+            print(error)
         exit(1)
 
     # ast = parser.parse(program)
