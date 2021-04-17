@@ -41,6 +41,8 @@ other = [
 cool_tokens_def = keywords+operators+signs+other+ignore
 # cool_lexer = Lexer(cool_token_def,G.EOF)
 
-cool_lexer_path = 'src/cool2/cool/lexer/cool_lexer.obj'
+import os
+base_dir = os.path.dirname(__file__)
+cool_lexer_path = os.path.join(base_dir, 'cool_lexer.obj')
 # cool_lexer = save_lexer(cool_tokens_def,cool_lexer_path,G)
 cool_lexer = load_lexer(cool_lexer_path)

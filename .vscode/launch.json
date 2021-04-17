@@ -8,9 +8,8 @@
             "name": "Python: Archivo actual",
             "type": "python",
             "request": "launch",
-            "program": "src/main.py",
-            "console": "integratedTerminal",
-            "args": ["src/cas.cl","src/cas.mips"]
+            "program": "${file}",
+            "console": "integratedTerminal"
         }
     ]
 }

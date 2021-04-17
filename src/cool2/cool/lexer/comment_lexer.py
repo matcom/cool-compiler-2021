@@ -17,6 +17,8 @@ comment_tokens_def = [
 
 # comment_lexer = Lexer(comment_tokens_def,C.EOF)
 
-comment_lexer_path = 'src/cool2/cool/lexer/comment_lexer.obj'
+import os
+base_dir = os.path.dirname(__file__)
+comment_lexer_path = os.path.join(base_dir, 'comment_lexer.obj')
 # comment_lexer = save_lexer(comment_tokens_def,comment_lexer_path,C)
 comment_lexer = load_lexer(comment_lexer_path)

@@ -45,11 +45,15 @@ def get_file_name(path: str):
 
 def compare_errors(compiler_path: str, cool_file_path: str, error_file_path: str, cmp=first_error, timeout=100):
     try:
-        sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        f = open("test_log.txt",mode="x")
+    except:
+        f = open("test_log.txt", mode="a")
+    try:
+        sp = subprocess.run(['bash', compiler_path, cool_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
         return_code, output = sp.returncode, sp.stdout.decode()
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
-
+    f.write(output + "\n")
     assert return_code == 1, TEST_MUST_FAIL % get_file_name(cool_file_path)
 
     fd = open(error_file_path, 'r')

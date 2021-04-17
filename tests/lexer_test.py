@@ -11,3 +11,5 @@ tests = [(file) for file in os.listdir(tests_dir) if file.endswith('.cl')]
 @pytest.mark.parametrize("cool_file", tests)
 def test_lexer_errors(compiler_path, cool_file):
     compare_errors(compiler_path, tests_dir + cool_file, tests_dir + cool_file[:-3] + '_error.txt')
+
+test_lexer_errors("/media/luiso/Data/Universidad/Cuarto/Compilación/cool-compiler-2021/src/coolc.sh", tests[1])

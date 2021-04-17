@@ -58,7 +58,7 @@ class Language():
         tokens = self._fix_tokens(tokens,errors)
         for tok in tokens:
             if tok.token_type == "UNKNOWN":
-                errors.append(f"Unknown Token {tok.lex[0]} at Line: {tok.lex[1]} Column: {tok.lex[2]}")
+                errors.append(f'({tok.lex[1]+1}, {tok.lex[2]+1}) - LexicographicError: ERROR "{tok.lex[0]}"')
         tokens = [x for x in tokens if x.token_type != "UNKNOWN"]
         
         return tokens
