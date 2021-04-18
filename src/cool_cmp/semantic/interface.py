@@ -1,5 +1,6 @@
 from cool_cmp.shared.ast import BaseAST
 from cool_cmp.shared import ICoolService
+from cool2.cmp.pycompiler import AttributeProduction
 from typing import List
 
 class ISemantic(ICoolService):
@@ -7,7 +8,7 @@ class ISemantic(ICoolService):
     Semantic interface to implement
     """
 
-    def __call__(self, ast:BaseAST) -> BaseAST:
+    def __call__(self, parse:List[AttributeProduction]) -> BaseAST:
         raise NotImplementedError()
 
 

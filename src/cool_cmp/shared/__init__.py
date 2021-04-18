@@ -4,13 +4,32 @@ Shared code between packages
 
 from cool_cmp.shared.pipeline import IPipeable, Pipe, Pipeline
 from cool_cmp.shared.errors import ErrorTracker, IErrorTraceable, CoolError
-from typing import List
+from typing import List, Dict
 
 class ICoolService(IErrorTraceable, IPipeable):
     """
     Interface that should implement all parts of the cool pipeline
     """
-    pass
+    
+    def __call__(self, arg:object, context:Dict[str,object]):
+        raise NotImplementedError()
+    
+    def add_extra_info(self, key:str, value:object):
+        """
+        Add extra information that will be pass to all following CoolServices
+        """
+        if not hasattr(self, "_extra"):
+            self._extra = {}
+        self._extra[key] = value
+    
+    def get_extra_info(self) -> Dict[str,object]:
+        """
+        Get current extra information
+        """
+        if not hasattr(self, "_extra"):
+            self._extra = {}
+        return self._extra
+        
 
 class SymbolTable(IErrorTraceable):
     """
@@ -21,6 +40,7 @@ class SymbolTable(IErrorTraceable):
 
     def __init__(self):
         self.last = None
+        self.context = {}
         self.__errors = ErrorTracker()
 
     def __setattr__(self, name:str, value):
@@ -43,13 +63,14 @@ class SymbolTable(IErrorTraceable):
 
 class InterfacePipeline(Pipeline):
 
-    def __init__(self, pipeline:'InterfacePipeline', *interfaces:List[IPipeable]):
+    def __init__(self, pipeline:'InterfacePipeline', *interfaces:List[ICoolService]):
 
         def make_pipe(result:SymbolTable, interface:ICoolService):
-            returned = interface(result.last)
+            returned = interface(result.last, result.context.copy())
             for error in interface.get_errors():
                 result.add_error(error)
             result.__setattr__(interface.name, returned)
+            result.context.update(interface.get_extra_info())
             return result
 
         pipes = []

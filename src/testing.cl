@@ -1,11 +1,46 @@
-(* Integers, Identifiers, and Special Notation *)
+class Main inherits IO {
+    number: Int <- 5;
 
+    main () : Object {
+        testing_fibonacci(number)
+    };
+
+    testing_fibonacci(n: Int) : IO {{
+        out_string("Iterative Fibonacci : ");
+        out_int(iterative_fibonacci(5));
+        out_string("\n");
+
+        out_string("Recursive Fibonacci : ");
+        out_int(recursive_fibonacci(5));
+        out_string("\n");
+    }};
+
+    recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
+        if n <= 2 then 1 else recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2) fi
+    };
+
+    iterative_fibonacci(n: AUTO_TYPE) : AUTO_TYPE {
+        let  i: Int <- 2, n1: Int <- 1, n2: Int <- 1, temp: Int in {
+            while i < n loop
+                let temp: Int <- n2 in {
+                    n2 <- n2 + n1;
+                    n1 <- temp;
+                    i <- i + 1;
+                }
+            pool;
+            n2;
+        }
+    };
+}
+
+(* Integers, Identifiers, and Special Notation *)
+(*
 0007 123 +1 -1 +90 -09 +11113 -4r *a *self* c++ 
 5! = 120, 2 + 2 = 5 or E = mc2; p + 1 @ p = 1:  for x in range(len(b))
 new / <- <<==> {( Int: Objet, Bool; String.string SELF_TYPE isvoid })
 class Class if then else fi testing Testing ~007agent_bond james_007B0N3SS___
 loop pool while tRuE or noT faLsE let in case of ESAC
-
+*)
 (*
 #3 INT_CONST 0007
 #3 INT_CONST 123

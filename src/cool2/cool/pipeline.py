@@ -9,12 +9,11 @@ lexer_pipeline = Pipeline(start_pipe,
                           change_escaped_lines,
                           remove_comments_pipe,
                           tokenize_text_pipe,
+                          string_escape_pipe,
                           )
 
-syntax_pipeline = Pipeline(
-                         parse_text_pipe,
-                         string_escape_pipe
-                        )
+syntax_pipeline = Pipeline(parse_text_pipe,
+                          )
 
 semantic_pipeline = Pipeline(add_std_pipe,
                              ast_pipe, 

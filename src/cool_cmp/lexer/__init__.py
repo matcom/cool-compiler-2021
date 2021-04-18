@@ -19,6 +19,7 @@ class LexerPipeline(Pipeline):
             tokens = lexer(program)
             result.tokens = tokens
             errors = lexer.get_errors()
+            result.context.update(lexer.get_extra_info())
             for error in errors:
                 result.add_error(error)
             return result

@@ -11,5 +11,5 @@ class IPipeable:
     def name(self)->str:
         raise NotImplementedError()
 
-    def __call__(self, arg):
+    def __call__(self, *args, **kwargs):
         raise NotImplementedError()

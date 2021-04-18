@@ -55,6 +55,11 @@ class CoolLexer2(ILexer):
         tokens = result["text_tokens"]
         for err in result["errors"]:
             self.add_error(err)
+        
+        # Adding context
+        for key, value in result.items():
+            self.add_extra_info(key, value)
+        
         return [self.__DetailToken2CoolToken2(tok) for tok in tokens]
     
     def add_error(self, error:LexerCoolError):

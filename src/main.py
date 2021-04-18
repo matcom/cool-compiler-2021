@@ -257,6 +257,7 @@ if __name__ == "__main__":
     with open(sys.argv[1]) as file:
         program = file.read()
         pipe = LexerPipeline()
+        pipe = ParserPipeline(pipe)
         result = pipe(program)
         for err in result.get_errors():
             if isinstance(err, str):
