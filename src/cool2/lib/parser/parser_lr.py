@@ -7,6 +7,7 @@ from cmp.utils import ContainerSet, DisjointNode, DisjointSet, Token
 from lib.parser.parser import Parser
 from lib.grammar.grammar_fixer import fix_non_derive_terminal
 from lib.utils.automaton import state_transpose
+from cool.error.errors import SyntacticCoolError, SYNTACTIC_ERROR
 
 ######################  LR0 and SLR1  ###########################
 def get_state(visited,pending,item):
@@ -99,7 +100,8 @@ class ShiftReduceParser(Parser):
             except KeyError:
                 # errors.append(f'Invalid transition ({state},{lookahead}) doesnt exist expected {[ x[1] for x in self.action if x[0] == state ]}')
                 posibles = [x for x in self.action if x[0] == state ]
-                errors.append(f"Invalid transition near '{lookahead.lex[0]}'. Expected: {', '.join([ str(x[1]) for x in posibles ])}. Line:{lookahead.lex[1] + 1} Column:{lookahead.lex[2] + 1}")
+                errors.append(SyntacticCoolError(SYNTACTIC_ERROR, lookahead.lex[0], token=lookahead))
+                # errors.append(f"Invalid transition near '{lookahead.lex[0]}'. Expected: {', '.join([ str(x[1]) for x in posibles ])}. Line:{lookahead.lex[1] + 1} Column:{lookahead.lex[2] + 1}")
                 if len(posibles) == 1:
                     tokens.insert(cursor + 1, Token((str(posibles[0][1]), lookahead.lex[1], lookahead.lex[2]), posibles[0][1]))
                     cursor += 1

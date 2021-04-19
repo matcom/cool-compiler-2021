@@ -1,3 +1,7 @@
+STRING_TOO_LONG = "String too long. Max length is 1024 chars, have {0} chars"
+
+SYNTACTIC_ERROR = 'at or near "{0}"'
+
 WRONG_SIGNATURE = 'Method "{0}" already defined in "{1}" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
 ATTRIBUTE_NOT_DEFINED = 'Attribute "{0}" is not defined in class "{1}".'
@@ -27,21 +31,92 @@ METHOD_CANT_INFER = "No method '{0}' with {1} params in inferred types."
 TYPE_NOT_DEFINED = "Type '{0}' is not defined."
 TYPE_ALREADY_DEFINED = "Type with the same name ({0}) already in context."
 TYPE_CANT_INFER = "Cant infer type in given context."
+TYPE_CANT_BE_INHERITED = "Type {0} cant be inherited"
+NO_COMMON_TYPE = "No common types between {0} and {1}"
 
+READ_IS_NOT_INT = "Invalid type: {0} is not an Int"
 class CoolError(Exception):
+    """
+    Base Cool Error
+    """
+    
     @property
     def text(self):
-        return self.args[0]
+        return str(self)
 
+    ERROR_TYPE = "CoolError"
 
-class SemanticError(CoolError):
-    pass
+    FORMAT = "{}: {}"
+
+    def __init__(self, msg:str, *args):
+        self.error = msg
+        self.args = args
+    
+    def print_error(self):
+        print(str(self))
+
+    def __str__(self):
+        return CoolError.FORMAT.format(self.ERROR_TYPE, self.error.format(*self.args))
+
+    def __repr__(self):
+        return str(self)
+
+class PositionError(CoolError):
+    """
+    Error class for positional errors
+    """
+    
+    FORMAT = "({}, {}) - {}: ERROR {}"
+
+    def __init__(self, error_message:str, *args, **kwargs):
+        """
+        kwargs:  
+        token: The token where the error is  
+        row: Row error  
+        column: Column error  
+        lex: Representation of the error  
+        """
+        super().__init__(error_message, *args)
+        self.row = kwargs.get("row")
+        self.column = kwargs.get("column")
+        self.lex = kwargs.get("lex")
+        if "token" in kwargs:
+            self.row = kwargs["token"].lex[1]
+            self.column = kwargs["token"].lex[2]
+            self.lex = kwargs["token"].lex[0]
+
+    def set_position(self, row:int, column:int):
+        self.row = row
+        self.column = column
+
+    def __str__(self):
+        if self.row == None or self.column == None:
+            return super().__str__()
+        return self.FORMAT.format(self.row,self.column, self.ERROR_TYPE, self.error.format(*self.args))
+
+class LexerCoolError(PositionError):
+    """
+    Error class for lexical errors
+    """
+    
+    ERROR_TYPE = "LexicographicError"
+
+class SyntacticCoolError(PositionError):
+    """
+    Error class for syntactic errors
+    """
+
+    ERROR_TYPE = "SyntacticError"
+
+class SemanticError(PositionError):
+    FORMAT = "({}, {}) - {}: {}"
+    ERROR_TYPE = "SemanticError"
+    
+class TypeCoolError(SemanticError):
+    ERROR_TYPE = "TypeError"
 
 class InferError(SemanticError):
-    pass
+    ERROR_TYPE = "InferenceError"
 
 class RunError(CoolError):
-    pass
-
-class CoolTypeError(CoolError):
-    pass
+    ERROR_TYPE = "RunError"

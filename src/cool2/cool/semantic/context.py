@@ -22,10 +22,10 @@ class Context(DeprecatedContext):
         try:
             return self.types[name]
         except KeyError:
-            raise SemanticError(TYPE_NOT_DEFINED.format(name))
+            raise SemanticError(TYPE_NOT_DEFINED, name)
     
     def create_type(self, name:str):
         if name in self.types:
-            raise SemanticError(TYPE_ALREADY_DEFINED.format(name))
+            raise SemanticError(TYPE_ALREADY_DEFINED, name)
         typex = self.types[name] = Type(name)
         return typex

@@ -31,16 +31,14 @@ class Main inherits IO {
             n2;
         }
     };
-}
+};
 
 (* Integers, Identifiers, and Special Notation *)
-(*
-0007 123 +1 -1 +90 -09 +11113 -4r *a *self* c++ 
+(* 0007 123 +1 -1 +90 -09 +11113 -4r *a *self* c++ 
 5! = 120, 2 + 2 = 5 or E = mc2; p + 1 @ p = 1:  for x in range(len(b))
 new / <- <<==> {( Int: Objet, Bool; String.string SELF_TYPE isvoid })
 class Class if then else fi testing Testing ~007agent_bond james_007B0N3SS___
-loop pool while tRuE or noT faLsE let in case of ESAC
-*)
+loop pool while tRuE or noT faLsE let in case of ESAC *)
 (*
 #3 INT_CONST 0007
 #3 INT_CONST 123

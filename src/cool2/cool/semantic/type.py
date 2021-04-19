@@ -3,10 +3,11 @@ from cmp.semantic import Type as DeprecatedType
 from cmp.semantic import SemanticError as DeprecatedSemanticError
 from cool.ast.ast import VoidNode,ConstantNumNode,StringNode,BoolNode,SpecialNode,InstantiateNode
 from cool.semantic.atomic import ClassInstance
-from cool.error.errors import RunError, SemanticError, CoolTypeError, InferError, \
+from cool.error.errors import RunError, SemanticError, TypeCoolError, InferError, \
     VOID_TYPE_CONFORMS, METHOD_NOT_DEFINED, METHOD_ALREADY_DEFINED, \
     SUBSTR_OUT_RANGE, ATTRIBUTE_NOT_DEFINED, ATTRIBUTE_ALREADY_DEFINED, \
-    ATTRIBUTE_CANT_INFER, METHOD_CANT_INFER, TYPE_CANT_INFER
+    ATTRIBUTE_CANT_INFER, METHOD_CANT_INFER, TYPE_CANT_INFER, TYPE_CANT_BE_INHERITED, \
+    NO_COMMON_TYPE, READ_IS_NOT_INT
 import cool.visitors.utils as ut
 
 class Type(DeprecatedType):
@@ -21,7 +22,7 @@ class Type(DeprecatedType):
         DeprecatedType.set_parent(self,parent)
         if not parent.can_have_children:
             self.parent = None
-            raise SemanticError(f"Type {parent.name} cant be inherited")
+            raise SemanticError(TYPE_CANT_BE_INHERITED, parent.name)
     
     def __hash__(self):
         return hash(self.name)
@@ -35,17 +36,17 @@ class Type(DeprecatedType):
             return next(method for method in self.methods if method.name == name and len(method.param_names)==args)
         except StopIteration:
             if self.parent is None:
-                raise SemanticError(METHOD_NOT_DEFINED.format(name, "", self.name, args))
+                raise SemanticError(METHOD_NOT_DEFINED,name, "", self.name, args)
             try:
                 if not only_local:
                     return self.parent.get_method(name,args)
                 raise SemanticError()
             except SemanticError:
-                raise SemanticError(METHOD_NOT_DEFINED.format(name, "" if not only_local else " locally", self.name, args))
+                raise SemanticError(METHOD_NOT_DEFINED, name, "" if not only_local else " locally", self.name, args)
     
     def define_method(self, name:str, param_names:list, param_types:list, return_type):
         if (name,len(param_names)) in ((method.name,len(method.param_names)) for method in self.methods):
-            raise SemanticError(METHOD_ALREADY_DEFINED.format(name, len(param_names), self.name))
+            raise SemanticError(METHOD_ALREADY_DEFINED, name, len(param_names), self.name)
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
         return method
@@ -62,11 +63,11 @@ class Type(DeprecatedType):
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
             if self.parent is None:
-                raise SemanticError(ATTRIBUTE_NOT_DEFINED.format(name, self.name))
+                raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
             try:
                 return self.parent.get_attribute(name)
             except SemanticError:
-                raise SemanticError(ATTRIBUTE_NOT_DEFINED.format(name, self.name))
+                raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
     
     def define_attribute(self, name:str, typex):
         try:
@@ -76,7 +77,7 @@ class Type(DeprecatedType):
             self.attributes.append(attribute)
             return attribute
         else:
-            raise SemanticError(ATTRIBUTE_ALREADY_DEFINED.format(name, self.name))
+            raise SemanticError(ATTRIBUTE_ALREADY_DEFINED, name, self.name)
     
     def conforms_to(self,other,current_type):
         self_type = self if not isinstance(self,SelfType) else current_type
@@ -107,7 +108,7 @@ class Type(DeprecatedType):
         for common in self_types:
             if common in other_types:
                 return common
-        raise CoolTypeError(f"No common types between {self.name} and {other.name}")
+        raise TypeCoolError(NO_COMMON_TYPE, self.name, other.name)
         
     @property
     def can_have_children(self):
@@ -208,7 +209,7 @@ class StringType(Type):
         typex = context.get_type('String')
         value_sliced = value[i:i+l]
         if len(value) < l-i or l < 0:
-            raise RunError(SUBSTR_OUT_RANGE.format(value,i,l))
+            raise RunError(SUBSTR_OUT_RANGE,value,i,l)
         return ClassInstance(typex,context,operator,errors,value=value_sliced)
     
     @property
@@ -288,7 +289,7 @@ class IOType(Type):
             else:
                 raise ValueError()
         except ValueError:
-            raise RunError(f'Invalid type: {value} is not an Int')
+            raise RunError(READ_IS_NOT_INT, value)
 
 class AutoType(Type):
     def __init__(self,context):
@@ -305,13 +306,13 @@ class AutoType(Type):
     def get_attribute(self,name):
         self.update_possibles([x for x in self.possibles if any(attr for attr,typex in x.all_attributes() if attr.name==name)])
         if not self.possibles:
-            raise InferError(ATTRIBUTE_CANT_INFER.format(name))
+            raise InferError(ATTRIBUTE_CANT_INFER, name)
         return self.possibles[-1].get_attribute(name)
         
     def get_method(self,name,args,current_type = None):
         self.update_possibles([x for x in self.possibles if any(meth for meth,typex in x.all_methods() if (meth.name==name and len(meth.param_names) == args))])
         if not self.possibles:
-            raise InferError(METHOD_CANT_INFER.format(name, args))
+            raise InferError(METHOD_CANT_INFER, name, args)
         return self.possibles[-1].get_method(name,args)
    
     def conforms_to(self,other,current_type):

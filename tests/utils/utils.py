@@ -53,6 +53,7 @@ def compare_errors(compiler_path: str, cool_file_path: str, error_file_path: str
         return_code, output = sp.returncode, sp.stdout.decode()
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
+    f.write(cool_file_path + "\n")
     f.write(output + "\n")
     assert return_code == 1, TEST_MUST_FAIL % get_file_name(cool_file_path)
 

@@ -10,6 +10,7 @@ import plac
 # plac annotation (description, type of arg [option, flag, positional], abrev, type, choices)
 def main(
     program_dir:("Path to cool program", "positional"),
+    output_dir:("Path for the compiled mips", "positional"),
     out_infer:("Creates a file containing the inferred types", 'flag', 'i'),
     verbose:("Print more info", 'flag', 'v'),
     update_cool_parser:("Update pickled cool parser", 'flag', 'ucp'),
@@ -48,7 +49,7 @@ def main(
 
     if program_dir == None:
         print("If no update flag is provided 'program_dir' is required")
-        exit()
+        exit(1)
     
     with open(program_dir) as file:
         file_content = file.read()
@@ -64,9 +65,11 @@ def main(
             file.write(reconstr)
     
     if g_errors:
-        print("Errors\n", *[f"- {x}\n" for x in g_errors])
-    if hasattr(value, "value"):
-        print("Value:",value.value)    
+        for err in g_errors:
+            print(err)
+        exit(1)
+    # if hasattr(value, "value"):
+    #     print("Value:",value.value)    
     
 if __name__ == "__main__":
     plac.call(main)

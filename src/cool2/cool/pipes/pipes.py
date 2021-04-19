@@ -116,6 +116,7 @@ def parse_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexer, 
         "text_parse": parse,
         "language": lang,
         "text_tokens": tokens,
+        "parser":language_parser
     })
     
     result["errors"].extend(errors)

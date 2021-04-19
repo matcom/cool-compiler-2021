@@ -33,11 +33,11 @@ class_list %= def_class, lambda h,s: [s[1]]
 class_list %= def_class + class_list, lambda h,s: [s[1]] + s[2]
 
 # <def-class>    ???
-def_class %= classx + typex + ocur + feature_list + ccur, lambda h,s: ClassDeclarationNode(s[2][0],s[4],row=s[1][1] ,column=s[1][2])
-def_class %= classx + typex + inherits + typex + ocur + feature_list + ccur, lambda h,s: ClassDeclarationNode(s[2][0],s[6],s[4][0],row=s[1][1] ,column=s[1][2])
+def_class %= classx + typex + ocur + feature_list + ccur + semi, lambda h,s: ClassDeclarationNode(s[2][0],s[4],row=s[1][1] ,column=s[1][2])
+def_class %= classx + typex + inherits + typex + ocur + feature_list + ccur + semi, lambda h,s: ClassDeclarationNode(s[2][0],s[6],s[4][0],row=s[1][1] ,column=s[1][2])
 
-def_class %= classx + typex + ocur + ccur, lambda h,s: ClassDeclarationNode(s[2][0],[],row=s[1][1] ,column=s[1][2])
-def_class %= classx + typex + inherits + typex + ocur + ccur, lambda h,s: ClassDeclarationNode(s[2][0],[],s[4][0],row=s[1][1] ,column=s[1][2])
+def_class %= classx + typex + ocur + ccur + semi, lambda h,s: ClassDeclarationNode(s[2][0],[],row=s[1][1] ,column=s[1][2])
+def_class %= classx + typex + inherits + typex + ocur + ccur + semi, lambda h,s: ClassDeclarationNode(s[2][0],[],s[4][0],row=s[1][1] ,column=s[1][2])
 
 # <feature-list> ???
 feature_list %= feature + semi, lambda h,s: [s[1]]
