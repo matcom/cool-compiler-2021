@@ -1,11 +1,7 @@
 .PHONY: clean
 
 main:
-	for file in ../tests/lexer/*.cl; do  ./coolc.sh $$file; done
-
-install:
-	pip3 install pytest
-	pip3 install pytest-ordering
+	for file in ../tests/lexer/*.cl; do  ./coolc.sh $$file; echo; done
 
 clean:
 	rm -rf build/*
