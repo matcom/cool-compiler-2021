@@ -44,10 +44,10 @@ input_file = "src/test.cl"
 
 def main():
 
-    # if len(sys.argv) > 1:
-    #     input_file = sys.argv[1]
-    # else:
-    #     raise Exception("Incorrect number of arguments")
+    if len(sys.argv) > 1:
+        input_file = sys.argv[1]
+    else:
+        raise Exception("Incorrect number of arguments")
 
     program = open(input_file).read()
 

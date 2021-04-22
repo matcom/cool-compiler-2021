@@ -54,11 +54,12 @@ class Lexer:
             "TYPE",
             "STRING",
             "INT",
-            "COMMENT",
+            "ONELINECOMMENT",
         ]
         self.tokens = self.tokens + list(self.reserved.values())
-        self.states = (("aux", "exclusive"),)
+        self.states = (("comment", "exclusive"),("string", "exclusive"))
         self._end_comment = True
+        self._end_string = True
         self._build()
 
     def _build(self):
@@ -114,7 +115,7 @@ class Lexer:
         return t
 
     def t_ID(self, t):
-        r"[a-z_][a-zA-Z_0-9]*"
+        r"[a-z][a-zA-Z_0-9]*"
         self._set_pos(t)
         t.type = self.reserved.get(t.value.lower(), "ID")
         return t
@@ -132,35 +133,39 @@ class Lexer:
         return t
 
     # One-line comments rule
-    def t_COMMENT(self, t):
+    def t_ONELINECOMMENT(self, t):
         r"(--.*(\n | $))"
         t.lexer.lineno += 1
         t.col = t.lexer.col
         t.lexer.col = 1
 
+    # String rules
+    def t_string():
+        pass
+
     # Multiline comments rules
-    def t_aux(self, t):
+    def t_comment(self, t):
         r"\(\*"
         t.lexer.comm_start = t.lexer.lexpos - 2
         t.lexer.level = 1
-        t.lexer.begin("aux")
+        t.lexer.begin("comment")
 
-    def t_aux_lcomment(self, t):
+    def t_comment_lcomment(self, t):
         r"\(\*"
         t.lexer.level += 1
 
-    def t_aux_rcomment(self, t):
+    def t_comment_rcomment(self, t):
         r"\*\)"
         t.lexer.level -= 1
         if t.lexer.level == 0:
             t.value = t.lexer.lexdata[t.lexer.comm_start : t.lexer.lexpos]
-            t.type = "COMMENT"
+            t.type = "ONELINECOMMENT"
             t.lexer.lineno += t.value.count("\n")
             t.lexer.col = len(t.value) - t.value.rfind("\n")
             self._end_comment = True
             t.lexer.begin("INITIAL")
 
-    def t_aux_pass(self, t):
+    def t_comment_pass(self, t):
         r".|\n"
         self._end_comment = False
         pass
