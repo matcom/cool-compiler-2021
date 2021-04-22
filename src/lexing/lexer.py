@@ -57,23 +57,34 @@ class Lexer:
             "ONELINECOMMENT",
         ]
         self.tokens = self.tokens + list(self.reserved.values())
-        self.states = (("comment", "exclusive"),("string", "exclusive"))
-        self._end_comment = True
+        self.states = (("comment", "exclusive"), ("string", "exclusive"))
+
+        self._string_value = ""
+        self._string_start = -1
+        self._string_col = -1
+        self._string_line = -1
+        self._string_slash = False
         self._end_string = True
+
+        self._end_comment = True
         self._build()
 
     def _build(self):
         self._lexer = lex.lex(module=self)
-        self._lexer.col = 0
+        self._lexer.col = 1
 
     def tokenize(self, data):
         self._lexer.input(data)
         while True:
             tok = self._lexer.token()
-            if not self._end_comment:
+            if not self._end_comment and self._lexer.lexpos - 1 <= len(data):
                 line, col = self._get_current_pos(data)
                 self.errors.append(LexicographicError(line, col, "INVALID COMMENT"))
                 break
+            if not self._end_string and self._lexer.lexpos -1 <=  len(data) :
+                line = self._lexer.lineno
+                col = self._lexer.col + 1 
+                self.errors.append(LexicographicError(line, col, "UNTERMINATED STRING"))
             if not tok:
                 break
             yield tok
@@ -120,11 +131,6 @@ class Lexer:
         t.type = self.reserved.get(t.value.lower(), "ID")
         return t
 
-    def t_STRING(self, t):
-        r"\"([^\\\n]|(\\.))*?\""
-        self._set_pos(t)
-        t.value = str(t.value)
-        return t
 
     def t_INT(self, t):
         r"\d+"
@@ -140,14 +146,63 @@ class Lexer:
         t.lexer.col = 1
 
     # String rules
-    def t_string():
-        pass
+    def t_string(self, t):
+        r'"'
+        self._string_value = '"'
+        t.lexer.col += 1
+        self._string_value += t.value
+        self._string_line = t.lexer.lineno
+        self._string_col = t.lexer.col - 1
+        self._end_string = False
+        t.lexer.begin("string")
+
+
+    def t_string_end(self, t):
+        r'(?<!\\)"'
+        col = len(t.value)
+        t.lexer.col += col
+        self._end_string = True
+        t.lexer.begin("INITIAL")
+        t.type = "STRING"
+        t.value = self._string_value + t.value
+        t.col = self._string_col
+        t.line = self._string_line
+        for index,char in enumerate(t.value[1:-1]):
+            if char == '\0':
+                null_col = t.col + index
+                null_line =  t.line
+                self.errors.append(LexicographicError(null_line,null_col,"NULL CHARACTER"))
+        return t
+
+    def t_string_space(self, t):
+        r"\s"
+        self._string_value += t.value
+        t.lexer.col += len(t.value)
+        if t.value == "\n":
+            if not self._string_slash:
+                line = t.lexer.lineno
+                col = t.lexer.col -1
+                t.lexer.col = 1
+                self.errors.append(LexicographicError(line, col, "\\n"))
+                t.lexer.begin("INITIAL")
+            t.lexer.lineno += 1
+            t.lexer.col = 0 
+
+    def t_string_pass(self, t):
+        r"."
+        if t.value == '\\':
+            self._string_slash = True
+        else:
+            self._string_slash = False
+        self._string_value += t.value
+        t.lexer.col += len(t.value)
 
     # Multiline comments rules
     def t_comment(self, t):
         r"\(\*"
         t.lexer.comm_start = t.lexer.lexpos - 2
         t.lexer.level = 1
+        self._end_comment = False
         t.lexer.begin("comment")
 
     def t_comment_lcomment(self, t):
@@ -160,15 +215,19 @@ class Lexer:
         if t.lexer.level == 0:
             t.value = t.lexer.lexdata[t.lexer.comm_start : t.lexer.lexpos]
             t.type = "ONELINECOMMENT"
-            t.lexer.lineno += t.value.count("\n")
-            t.lexer.col = len(t.value) - t.value.rfind("\n")
+            # t.lexer.lineno += t.value.count("\n")
+            # t.lexer.col = len(t.value) - t.value.rfind("\n")
             self._end_comment = True
             t.lexer.begin("INITIAL")
 
     def t_comment_pass(self, t):
         r".|\n"
         self._end_comment = False
-        pass
+        if t.value == "\n":
+            t.lexer.lineno += 1
+            t.lexer.col = 1
+        else:
+            t.lexer.col += len(t.value)
 
     # Rule so we can track line numbers
     def t_newline(self, t):
@@ -284,9 +343,8 @@ class Lexer:
         self._set_pos(t)
         line = t.lineno
         col = t.col
-        # it's an unterminated string
-        if t.value[0] == '"':
-            col = len(t.value)
+        # # it's an unterminated string
+        # if t.value[0] == '"':
+        #     col = len(t.value)
         self.errors.append(LexicographicError(line, col, t.value[0]))
         t.lexer.skip(1)
-        return None
