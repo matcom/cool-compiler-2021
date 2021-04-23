@@ -5,7 +5,7 @@ from ast.inferencer_ast import (
     Node,
 )
 from semantics.tools import Context, Scope, try_conform
-import semantics.visitor as visitor
+from utils import visitor
 
 # Reducir los AUTO_TYPE declarados a base de el tipo de sus expresiones:
 

@@ -1,34 +1,8 @@
 import itertools as itt
 from collections import OrderedDict
-from typing import FrozenSet, List, Set
+from typing import FrozenSet, List, Set, Tuple
 
-from ply.yacc import errok
-
-from semantics.utils import conform_to_condition, from_dict_to_set, order_set_by_index
-
-
-class InternalError(Exception):
-    @property
-    def text(self):
-        return "Internal Error: " + self.args[0]
-
-
-class SemanticError(Exception):
-    @property
-    def text(self):
-        return "Semantic Error: " + self.args[0]
-
-
-class TypeError(SemanticError):
-    @property
-    def text(self):
-        return "Type Error: " + self.args[0]
-
-
-class AttributeError(SemanticError):
-    @property
-    def text(self):
-        return "Attribute Error: " + self.args[0]
+from semantics.errors import *
 
 
 class Attribute:
@@ -389,16 +363,16 @@ class SelfType(Type):
 
 
 class FuncType(Type):
-    def __init__(self, name: str, params: List[Type], ret_type: Type) -> None:
+    def __init__(self, name: str, params: Tuple[Type, ...], ret_type: Type) -> None:
         self.name = name
         self.params = params
         self.ret_type = ret_type
 
-    def conforms_to(self, other, first):
+    def conforms_to(self, other):
         if not isinstance(other, FuncType):
             raise InternalError(
                 (
-                    "A Function Type can only conform to other Function"
+                    "A FunctionType can only conform to other Function"
                     f"Type, not to {other.__class__.__name__}"
                 )
             )
@@ -669,4 +643,31 @@ def auto_add(type_set: set, head_list: list, bag: TypeBag):
                 aux.remove(head_j)
                 break
     head_list += [typex for typex in aux]
+    return type_set
+
+
+def conform_to_condition(type_set, parent) -> set:
+    set_result = set()
+    for typex in type_set:
+        if typex.conforms_to(parent):
+            set_result.add(typex)
+    return set_result
+
+
+def order_set_by_index(type_set):
+    return sorted(list(type_set), key=lambda x: x.index)
+
+
+def set_intersection(parent, type_set) -> set:
+    set_result = set()
+    for typex in type_set:
+        if typex.conforms_to(parent):
+            set_result.add(typex)
+    return set_result
+
+
+def from_dict_to_set(types: dict):
+    type_set = set()
+    for typex in types:
+        type_set.add(types[typex])
     return type_set

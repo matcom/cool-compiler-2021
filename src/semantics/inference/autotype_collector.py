@@ -1,6 +1,3 @@
-from semantics.tools import conforms, join, join_list, smart_add
-import semantics.visitor as visitor
-from semantics.tools import Context, ErrorType, Scope, SemanticError, TypeBag
 from ast.parser_ast import (
     ArithmeticNode,
     AssignNode,
@@ -26,6 +23,20 @@ from ast.parser_ast import (
     StringNode,
     VarDeclarationNode,
     VariableNode,
+)
+
+from utils import visitor
+from semantics.tools import (
+    Context,
+    ErrorType,
+    Scope,
+    SelfType,
+    SemanticError,
+    TypeBag,
+    conforms,
+    join,
+    join_list,
+    smart_add,
 )
 
 
