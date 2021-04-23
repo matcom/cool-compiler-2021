@@ -1,4 +1,5 @@
 from semantic.visitors.type_builder import TypeBuilder
+from semantic.visitors.var_collector import VarCollector
 from semantic.visitors.type_collector import TypeCollector
 
 class SemanticAnalyzer:
@@ -20,6 +21,10 @@ class SemanticAnalyzer:
         builder = TypeBuilder(self.context, self.errors)
         builder.visit(self.ast)
 
+        checker = VarCollector(self.context, self.errors)
+        self.scope = checker.visit(self.ast)
+        print(self.scope)
+        
 
 
         return self.ast, self.context, self.scope

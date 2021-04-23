@@ -33,7 +33,7 @@ class Method:
 
     def __str__(self):
         params = ', '.join(f'{n}:{t.name}' for n,t in zip(self.param_names, self.param_types))
-        return f'[method] {self.name}({params}): {self.return_type.name};'
+        return f'[method] {self.name}({params}):{self.return_type.name};'
 
     def __eq__(self, other):
         return other.name == self.name and \
