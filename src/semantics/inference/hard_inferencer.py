@@ -92,7 +92,7 @@ class HardInferencer:
             self.add_error(
                 node,
                 (
-                    f"Type Error: In class '{self.current_type.name}' attribue"
+                    f"TypeError: In class '{self.current_type.name}' attribue"
                     f"'{node.id}' expression type({expr_clone.name}) does not conforms"
                     f"to declared type ({node_type.name})."
                 ),
@@ -118,7 +118,7 @@ class HardInferencer:
         if not conforms(body_type, node_type):
             self.add_error(
                 node,
-                f"Type Error: In Class '{self.current_type.name}' method "
+                f"TypeError: In Class '{self.current_type.name}' method "
                 f"'{method_node.id}' return expression type({body_clone.name})"
                 f" does not conforms to declared return type ({node_type.name})",
             )
@@ -149,7 +149,7 @@ class HardInferencer:
             if not conforms(condition_type, bool_type):
                 self.add_error(
                     node,
-                    f"Type Error: If's condition type({condition_clone.name})"
+                    f"TypeError: If's condition type({condition_clone.name})"
                     " does not conforms to Bool type.",
                 )
                 condition_node.inferenced_type = ErrorType()
@@ -201,7 +201,7 @@ class HardInferencer:
             if not conforms(condition_type, bool_type):
                 self.add_error(
                     node,
-                    f"Type Error: Loop condition type({condition_clone.name})"
+                    f"TypeError: Loop condition type({condition_clone.name})"
                     " does not conforms to Bool type.",
                 )
                 condition_node.inferenced_type = ErrorType()
@@ -275,7 +275,7 @@ class HardInferencer:
             if not conforms(expr_type, decl_type):
                 self.add_error(
                     node,
-                    f"Type Error: Cannot assign new value to variable '{node.id}'."
+                    f"TypeError: Cannot assign new value to variable '{node.id}'."
                     f" Expression type({expr_clone.name}) does not conforms to"
                     f" declared type ({decl_type.name}).",
                 )
@@ -287,6 +287,7 @@ class HardInferencer:
     @visitor.when(MethodCallNode)
     def visit(self, node, scope):
         caller_type = node.caller_type
+        expr_node = None
         if node.type is not None and node.expr is not None:
             expr_node = self.visit(node.expr, scope)
             expr_type = expr_node.inferenced_type
@@ -295,7 +296,7 @@ class HardInferencer:
                 if not conforms(expr_type, caller_type):
                     self.add_error(
                         node,
-                        f"Semantic Error: Cannot effect dispatch because expression"
+                        f"SemanticError: Cannot effect dispatch because expression"
                         f"type({expr_clone.name}) does not conforms to "
                         f"caller type({caller_type.name}).",
                     )
@@ -310,7 +311,7 @@ class HardInferencer:
             conforms(caller_type, TypeBag(set(types), types))
             if len(caller_type.heads) > 1:
                 error = (
-                    f"Semantic Error: Method '{node.id}' found in"
+                    f"SemanticError: Method '{node.id}' found in"
                     f" {len(caller_type.heads)} unrelated types:\n"
                 )
                 error += "   -Found in: "
@@ -320,7 +321,7 @@ class HardInferencer:
             elif len(caller_type.heads) == 0:
                 self.add_error(
                     node,
-                    f"There is no method called {node.id} which takes"
+                    f" SemanticError: There is no method called {node.id} which takes"
                     f" {len(node.args)} paramters.",
                 )
                 caller_type = ErrorType()
@@ -332,7 +333,7 @@ class HardInferencer:
             if len(node.args) != len(method.param_types):
                 self.add_error(
                     node,
-                    f"Semantic Error: Method '{node.id}' from class "
+                    f"SemanticError: Method '{node.id}' from class "
                     f"'{caller_type.name}' takes {len(node.args)} arguments but"
                     f" {method.param_types} were given.'",
                 )
@@ -354,7 +355,7 @@ class HardInferencer:
                 if not conforms(arg_type, param_type):
                     self.add_error(
                         new_args[-1],
-                        f"Type Error: Argument expression type({arg_clone.name}) does"
+                        f"TypeError: Argument expression type({arg_clone.name}) does"
                         f" not conforms parameter declared type({param_type.name})",
                     )
             infered_type = TypeBag(type_set, heads)
@@ -380,7 +381,7 @@ class HardInferencer:
                 left_clone = left_type.clone()
                 self.add_error(
                     node.left,
-                    f"Type Error: Arithmetic Error: Left member type({left_clone.name})"
+                    f"TypeError: Arithmetic Error: Left member type({left_clone.name})"
                     "does not conforms to Int type.",
                 )
                 left_node.inferenced_type = ErrorType()
@@ -411,7 +412,7 @@ class HardInferencer:
                 left_clone = left_type.clone()
                 self.add_error(
                     node.left,
-                    f"Type Error: Comparer Error: Left expression"
+                    f"TypeError: Comparer Error: Left expression"
                     f" type({left_clone.name}) "
                     f" does not conforms to right expression type ({right_type.name}).",
                 )
@@ -422,7 +423,7 @@ class HardInferencer:
             if not conforms(right_type, left_type):
                 self.add_error(
                     node.right,
-                    f"Type Error: Comparer Error: Right expression"
+                    f"TypeError: Comparer Error: Right expression"
                     f" type({right_clone.name})"
                     f" does not conforms to left expression type ({left_type.name}).",
                 )
@@ -454,7 +455,7 @@ class HardInferencer:
             if not conforms(expr_type, bool_type):
                 self.add_error(
                     node,
-                    f"Type Error: Not's expresion type({expr_clone.name} does not"
+                    f"TypeError: Not's expresion type({expr_clone.name} does not"
                     " conforms to Bool type",
                 )
                 expr_node.inferenced_type = ErrorType()
@@ -473,7 +474,7 @@ class HardInferencer:
             if not conforms(expr_type, int_type):
                 self.add_error(
                     node,
-                    f"Type Error: ~ expresion type({expr_clone.name} does not"
+                    f"TypeError: ~ expresion type({expr_clone.name} does not"
                     " conforms to Bool type",
                 )
                 expr_node.inferenced_type = ErrorType()

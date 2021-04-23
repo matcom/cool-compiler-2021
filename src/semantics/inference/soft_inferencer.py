@@ -95,7 +95,7 @@ class SoftInferencer:
             self.add_error(
                 node,
                 (
-                    f"Type Error: In class '{self.current_type.name}' attribue"
+                    f"TypeError: In class '{self.current_type.name}' attribue"
                     f"'{node.id}' expression type({expr_clone.name}) does not conforms"
                     f"to declared type ({node_type.name})."
                 ),
@@ -121,9 +121,9 @@ class SoftInferencer:
         if not conforms(ret_type_expr, ret_type_decl):
             self.add_error(
                 node,
-                f"Type Error: In Class '{self.current_type.name}' method "
-                f"'{current_method.name}' return expression type({ret_expr_clone.name})"
-                f" does not conforms todeclared return type ({ret_type_decl.name})",
+                f"TypeError: In Class '{self.current_type.name}' method"
+                f" '{current_method.name}' return expression type({ret_expr_clone.name})"
+                f" does not conforms to declared return type ({ret_type_decl.name})",
             )
             body_node.inferenced_type = ErrorType()
 
@@ -154,7 +154,7 @@ class SoftInferencer:
         if not conforms(condition_type, bool_type):
             self.add_error(
                 node,
-                f"Type Error: If's condition type({condition_clone.name})"
+                f"TypeError: If's condition type({condition_clone.name})"
                 " does not conforms to Bool type.",
             )
             condition_node.inferenced_type = ErrorType()
@@ -186,7 +186,7 @@ class SoftInferencer:
             if var_type in types_visited:
                 self.add_error(
                     node,
-                    "Semantic Error: Case Expression can't have branches"
+                    "SemanticError: Case Expression can't have branches"
                     f"with same case type({var_type.name})",
                 )
 
@@ -221,7 +221,7 @@ class SoftInferencer:
         if not conforms(condition_type, bool_type):
             self.add_error(
                 node,
-                f"Type Error: Loop condition type({condition_clone.name})"
+                f"TypeError: Loop condition type({condition_clone.name})"
                 " does not conforms to Bool type.",
             )
             condition_node.inferenced_type = ErrorType()
@@ -263,7 +263,7 @@ class SoftInferencer:
         else:
             self.add_error(
                 node,
-                f"Semantic Error: Variable '{node.id}' already defined"
+                f"SemanticError: Variable '{node.id}' already defined"
                 " in current scope.",
             )
             node_type = ErrorType()
@@ -277,7 +277,7 @@ class SoftInferencer:
             if not conforms(expr_type, node_type):
                 self.add_error(
                     node,
-                    f"Semantic Error: Variable '{node.id}' expressiontype"
+                    f"TypeError: Variable '{node.id}' expressiontype"
                     f"({expr_clone.name}) does not conforms to declared"
                     f"type({node_type.name}).",
                 )
@@ -295,7 +295,7 @@ class SoftInferencer:
         if not var:
             self.add_error(
                 node,
-                f"Scope Error: Cannot assign new value to"
+                f"ScopeError: Cannot assign new value to"
                 f"{node.id} beacuse it is not defined in the current scope",
             )
             decl_type = ErrorType()
@@ -307,7 +307,7 @@ class SoftInferencer:
             if var.name == "self":
                 self.add_error(
                     node,
-                    "Semantic Error: Cannot assign new value. "
+                    "SemanticError: Cannot assign new value. "
                     "Variable 'self' is Read-Only.",
                 )
                 decl_type = ErrorType()
@@ -317,7 +317,7 @@ class SoftInferencer:
             if not conforms(expr_type, decl_type):
                 self.add_error(
                     node,
-                    f"Type Error: Cannot assign new value to variable '{node.id}'."
+                    f"TypeError: Cannot assign new value to variable '{node.id}'."
                     f" Expression type({expr_clone.name}) does not conforms to"
                     f" declared type ({decl_type.name}).",
                 )
@@ -344,7 +344,7 @@ class SoftInferencer:
             if not conforms(expr_type, caller_type):
                 self.add_error(
                     node,
-                    f"Semantic Error: Cannot effect dispatch because expression"
+                    f"TypeError: Cannot effect dispatch because expression"
                     f"type({expr_clone.name}) does not conforms to "
                     f"caller type({caller_type.name}).",
                 )
@@ -362,21 +362,21 @@ class SoftInferencer:
             else:
                 self.add_error(
                     node,
-                    f"Semantic Error: There is no method '{node.id}'"
+                    f"SemanticError: There is no method '{node.id}'"
                     f"that recieves {len(node.params)} arguments in"
                     f"types {caller_type.name}.",
                 )
                 caller_type = ErrorType()
         elif len(caller_type.type_set) == 1:
-            caller_type = caller_type.heads[0]
+            caller = caller_type.heads[0]
             try:
-                methods = [(caller_type.get_method(node.id), caller_type)]
+                methods = [(caller, caller.get_method(node.id))]
             except SemanticError:
                 self.add_error(
                     node,
-                    f"Semantic Error: There is no method '{node.id}'"
+                    f"SemanticError: There is no method '{node.id}'"
                     f"that recieves {len(node.params)} arguments in"
-                    f"Type '{caller_type.name}'.",
+                    f"Type '{caller.name}'.",
                 )
                 caller_type = ErrorType()
 
@@ -416,15 +416,15 @@ class SoftInferencer:
         if not conforms(left_type, int_type):
             self.add_error(
                 node.left,
-                f"Type Error: Arithmetic Error: Left member type({left_clone.name})"
-                "does not conforms to Int type.",
+                f"TypeError: ArithmeticError: Left member type({left_clone.name})"
+                " does not conforms to Int type.",
             )
             left_node.inferenced_type = ErrorType()
         if not conforms(right_type, int_type):
             self.add_error(
                 node.right,
-                f"Type Error: Arithmetic Error: Right member type({right_clone.name})"
-                "does not conforms to Int type.",
+                f"TypeError: ArithmeticError: Right member type({right_clone.name})"
+                " does not conforms to Int type.",
             )
             right_node.inferenced_type = ErrorType()
 
@@ -445,14 +445,14 @@ class SoftInferencer:
         if not conforms(left_type, right_type):
             self.add_error(
                 node,
-                f"Type Error: Left expression type({left_clone.name})"
+                f"TypeError: Left expression type({left_clone.name})"
                 f"does not conforms to right expression type({right_type.name})",
             )
             left_node.inferenced_type = ErrorType()
         elif not conforms(right_type, left_type):
             self.add_error(
                 node,
-                f"Type Error: Right expression type({right_clone.name})"
+                f"TypeError: Right expression type({right_clone.name})"
                 f"does not conforms to left expression type({left_type.name})",
             )
             right_node.inferenced_type = ErrorType()
@@ -472,7 +472,7 @@ class SoftInferencer:
         else:
             var_type = ErrorType()
             self.add_error(
-                node, f"Semantic Error: Variable '{node.value}' is not defined."
+                node, f"SemanticError: Variable '{node.value}' is not defined."
             )
         var_node.inferenced_type = var_type
         return var_node
@@ -487,7 +487,7 @@ class SoftInferencer:
         if not conforms(expr_type, bool_type):
             self.add_error(
                 node,
-                f"Type Error: Not's expresion type({expr_clone.name} does not"
+                f"TypeError: Not's expresion type({expr_clone.name} does not"
                 " conforms to Bool type",
             )
             expr_node.inferenced_type = ErrorType()
@@ -506,7 +506,7 @@ class SoftInferencer:
         if not conforms(expr_type, int_type):
             self.add_error(
                 node,
-                f"Type Error: ~ expresion type({expr_clone.name} does not"
+                f"TypeError: ~ expresion type({expr_clone.name} does not"
                 " conforms to Int type",
             )
             expr_node.inferenced_type = ErrorType()
@@ -532,7 +532,7 @@ class SoftInferencer:
         except SemanticError as err:
             self.add_error(
                 node,
-                err + f"\nSemantic Error: Could not instantiate type '{node.value}'.",
+                err.text + f" Could not instantiate type '{node.value}'.",
             )
             node_type = ErrorType()
         instantiate_node.inferenced_type = node_type
