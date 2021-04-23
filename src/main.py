@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 from utils.errors import *
+from utils.utils import Utils
 from lexing.lexer import Lexer
 from parsing.parser import Parser
 from semantic.semantic import SemanticAnalyzer
@@ -18,6 +19,9 @@ class Compiler:
         self.context = None
         self.scope = None
 
+        name = Utils.GetName(input_file)
+        self.debug_path = f'./debug/{name}'
+
         if not str(self.input_file).endswith('.cl'):
             error_text = CompilerError.WRONG_EXTENTION
             print(CompilerError(0, 0, error_text))
@@ -31,6 +35,7 @@ class Compiler:
             print(CompilerError(0, 0, error_text))
             exit(1)
 
+        Utils.Write(self.debug_path, '.cl', self.code)
         self.steps = [ self.lexing, self.parsing, self.semantics ]
 
     def compile(self):
