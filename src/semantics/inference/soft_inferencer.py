@@ -120,7 +120,7 @@ class SoftInferencer:
         ret_expr_clone = ret_type_expr.clone()
         if not conforms(ret_type_expr, ret_type_decl):
             self.add_error(
-                node,
+                body_node,
                 f"TypeError: In Class '{self.current_type.name}' method"
                 f" '{current_method.name}' return expression type({ret_expr_clone.name})"
                 f" does not conforms to declared return type ({ret_type_decl.name})",

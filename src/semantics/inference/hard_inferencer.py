@@ -117,7 +117,7 @@ class HardInferencer:
         body_clone = body_type.clone()
         if not conforms(body_type, node_type):
             self.add_error(
-                node,
+                body_node,
                 f"TypeError: In Class '{self.current_type.name}' method "
                 f"'{method_node.id}' return expression type({body_clone.name})"
                 f" does not conforms to declared return type ({node_type.name})",
