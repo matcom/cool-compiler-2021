@@ -51,27 +51,21 @@ def main():
     program = open(input_file).read()
 
     lexer = Lexer()
-
-    # parser = Parser(lexer)
-    # ast = parser.parse(program)
-    # print(ast)
-
     tokens = list(lexer.tokenize(program))
-    # print(tokens)
-    # print(lexer.errors)
+    # for token in tokens:
+    #     print(token, token.line, token.col)
 
-    # lexer.input(program)
-    # tokens = []
-    # for token in lexer:
-    # #     tokens.append(token)
     if lexer.errors:
         for error in lexer.errors:
             print(error)
         exit(1)
 
-    # ast = parser.parse(program)
-
-    # run_pipeline(ast)
+    parser = Parser(Lexer())
+    ast = parser.parse(program)
+    if parser.errors:
+        for error in parser.errors:
+            print(error)
+        exit(1)
 
 
 main()

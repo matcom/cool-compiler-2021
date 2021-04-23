@@ -81,9 +81,9 @@ class Lexer:
                 line, col = self._get_current_pos(data)
                 self.errors.append(LexicographicError(line, col, "INVALID COMMENT"))
                 break
-            if not self._end_string and self._lexer.lexpos -1 <=  len(data) :
+            if not self._end_string and self._lexer.lexpos - 1 <= len(data):
                 line = self._lexer.lineno
-                col = self._lexer.col + 1 
+                col = self._lexer.col + 1
                 self.errors.append(LexicographicError(line, col, "UNTERMINATED STRING"))
             if not tok:
                 break
@@ -131,7 +131,6 @@ class Lexer:
         t.type = self.reserved.get(t.value.lower(), "ID")
         return t
 
-
     def t_INT(self, t):
         r"\d+"
         self._set_pos(t)
@@ -156,7 +155,6 @@ class Lexer:
         self._end_string = False
         t.lexer.begin("string")
 
-
     def t_string_end(self, t):
         r'(?<!\\)"'
         col = len(t.value)
@@ -167,11 +165,13 @@ class Lexer:
         t.value = self._string_value + t.value
         t.col = self._string_col
         t.line = self._string_line
-        for index,char in enumerate(t.value[1:-1]):
-            if char == '\0':
+        for index, char in enumerate(t.value[1:-1]):
+            if char == "\0":
                 null_col = t.col + index
-                null_line =  t.line
-                self.errors.append(LexicographicError(null_line,null_col,"NULL CHARACTER"))
+                null_line = t.line
+                self.errors.append(
+                    LexicographicError(null_line, null_col, "NULL CHARACTER")
+                )
         return t
 
     def t_string_space(self, t):
@@ -181,16 +181,16 @@ class Lexer:
         if t.value == "\n":
             if not self._string_slash:
                 line = t.lexer.lineno
-                col = t.lexer.col -1
+                col = t.lexer.col - 1
                 t.lexer.col = 1
                 self.errors.append(LexicographicError(line, col, "\\n"))
                 t.lexer.begin("INITIAL")
             t.lexer.lineno += 1
-            t.lexer.col = 0 
+            t.lexer.col = 0
 
     def t_string_pass(self, t):
         r"."
-        if t.value == '\\':
+        if t.value == "\\":
             self._string_slash = True
         else:
             self._string_slash = False
@@ -200,6 +200,7 @@ class Lexer:
     # Multiline comments rules
     def t_comment(self, t):
         r"\(\*"
+        t.lexer.col += len(t.value)
         t.lexer.comm_start = t.lexer.lexpos - 2
         t.lexer.level = 1
         self._end_comment = False
@@ -208,15 +209,15 @@ class Lexer:
     def t_comment_lcomment(self, t):
         r"\(\*"
         t.lexer.level += 1
+        t.lexer.col += len(t.value)
 
     def t_comment_rcomment(self, t):
         r"\*\)"
+        t.lexer.col += len(t.value)
         t.lexer.level -= 1
         if t.lexer.level == 0:
             t.value = t.lexer.lexdata[t.lexer.comm_start : t.lexer.lexpos]
             t.type = "ONELINECOMMENT"
-            # t.lexer.lineno += t.value.count("\n")
-            # t.lexer.col = len(t.value) - t.value.rfind("\n")
             self._end_comment = True
             t.lexer.begin("INITIAL")
 
@@ -343,8 +344,5 @@ class Lexer:
         self._set_pos(t)
         line = t.lineno
         col = t.col
-        # # it's an unterminated string
-        # if t.value[0] == '"':
-        #     col = len(t.value)
         self.errors.append(LexicographicError(line, col, t.value[0]))
         t.lexer.skip(1)
