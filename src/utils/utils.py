@@ -29,6 +29,7 @@ class Utils:
         with open(path + extention, 'w+') as file:
             file.write(text)
 
+    @staticmethod
     def GetRulesParsing():
         path = 'parsing/parser.out'
         file = open(path, encoding='utf-8')
