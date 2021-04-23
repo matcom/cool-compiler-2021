@@ -1,3 +1,4 @@
+from semantics.inference.hard_inferencer import HardInferencer
 import sys
 
 from ply.lex import lex
@@ -8,8 +9,6 @@ from lexing import Lexer
 from parsing import Parser
 from semantics import TypeBuilder, TypeCollector, TypeChecker
 from semantics.inference import (
-    AutotypeCollector,
-    AutotypeInferencer,
     BackInferencer,
     SoftInferencer,
 )
@@ -28,8 +27,8 @@ def run_pipeline(program_ast):
     soft = SoftInferencer(context)
     soft_ast = soft.visit(program_ast)
 
-    # auto_inferencer = autotype_inferencer.AutotypeInferencer(context, errors)
-    # auto_inferencer.visit(ast, scope)
+    hard = HardInferencer(context)
+    hard_ast = hard.visit(program_ast)
 
     # logger = type_logger.TypeLogger(context)
     # log = logger.visit(soft_ast, soft_ast.scope)
