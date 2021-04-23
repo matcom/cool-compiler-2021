@@ -18,6 +18,18 @@ class Token:
 class Utils:
 
     @staticmethod
+    def GetName(input_file):
+        path, _ = os.path.splitext(input_file)
+        arr = path.split('/')
+        name = arr[-1]
+        return name
+
+    @staticmethod
+    def Write(path, extention, text):
+        with open(path + extention, 'w+') as file:
+            file.write(text)
+
+    @staticmethod
     def PathToObjet(typex):
         path = []
         c_type = typex
