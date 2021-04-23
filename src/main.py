@@ -48,6 +48,7 @@ class Compiler:
         '''
         self.lexer = Lexer()
         tokens = self.lexer.tokenizer(self.code)
+        Utils.Write(self.debug_path, '.lexer', '\n'.join(repr(token) for token in tokens))
 
         # for token in tokens:
         #     print(token)
