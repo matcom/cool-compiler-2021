@@ -79,7 +79,7 @@ class Compiler:
         '''
         Lleva a cabo el análisis semántico.
         '''
-        semantic_analyzer = SemanticAnalyzer(self.ast)
+        semantic_analyzer = SemanticAnalyzer(self.ast, self.debug_path)
         self.ast, self.context, self.scope = semantic_analyzer.analyze()
 
         if len(semantic_analyzer.errors) > 0:

@@ -1,0 +1,46 @@
+{
+    type String {
+        [method] abort():String;
+        [method] type_name():String;
+        [method] copy():Self;
+        [method] length():Int;
+        [method] concat(str:String):String;
+        [method] substr(pos:Int, length:Int):String;
+    }
+    
+    type Int {
+        [method] abort():Int;
+        [method] type_name():String;
+        [method] copy():Self;
+    }
+    
+    type Object {
+        [method] abort():Object;
+        [method] type_name():String;
+        [method] copy():Self;
+    }
+    
+    type Bool {
+        [method] abort():Bool;
+        [method] type_name():String;
+        [method] copy():Self;
+    }
+    
+    type Self {}
+    
+    type IO : Object {
+        [method] out_string(str:String):Self;
+        [method] out_int(str:Int):Self;
+        [method] in_string():String;
+        [method] in_int():Int;
+    }
+    
+    type A : Object {}
+    
+    type B : Object {}
+    
+    type C : Object {}
+    
+    type Main : Object {}
+    
+}
