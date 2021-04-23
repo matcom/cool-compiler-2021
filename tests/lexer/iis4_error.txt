@@ -1,1 +1,1 @@
-(6, 49) - LexicographicError: ERROR "!"  
+(6, 49) - LexicographicError: ERROR "%"  

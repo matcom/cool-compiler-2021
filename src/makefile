@@ -1,7 +1,7 @@
 .PHONY: clean
 
 main:
-	./coolc.sh ../tests/lexer/comment1.cl
+	for file in ../tests/lexer/*.cl;  do echo $$file; ./coolc.sh $$file; echo; done
 
 clean:
 	rm -rf build/*

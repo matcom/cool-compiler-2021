@@ -8,7 +8,7 @@ def main():
     errors = []
     lexer = Lexer(errors)
     tokens = lexer.Tokenizer(open(input_file).read())
-    
+
     if errors:
         for err in errors:
             print(err)
