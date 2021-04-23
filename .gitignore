@@ -429,3 +429,4 @@ src/zTests/Misc/10BiG.cl
 src/type_logger.py
 src/zTests/Auto/00Simple.cl
 src/zTests/Auto/01Assign.cl
+src/semantics/notes.md

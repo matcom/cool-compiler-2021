@@ -83,7 +83,11 @@ class AutotypeCollector:
         if not conforms(node_expr, node_type):
             self.add_error(
                 node,
-                f"Type Error: In class '{self.current_type.name}' attribue '{node.id}' expression type({expr_clone.name}) does not conforms to declared type ({node_type.name}).",
+                (
+                    f"Type Error: In class '{self.current_type.name}' attribue"
+                    f"'{node.id}' expression type({expr_clone.name}) does not conforms"
+                    f"to declared type ({node_type.name})."
+                ),
             )
             # What is made error type here!!!
 

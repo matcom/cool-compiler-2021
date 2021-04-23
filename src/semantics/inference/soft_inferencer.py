@@ -336,17 +336,16 @@ class SoftInferencer:
             caller_type = expr_node.inferenced_type
         else:
             expr_node = self.visit(node.expr, scope)
-            bridge_type = expr_node.inferenced_type
+            expr_type = expr_node.inferenced_type
             caller_type = self.context.get_type(
                 node.type, selftype=False, autotype=False
             )
-
-            bridge_clone = bridge_type.clone()
-            if not conforms(bridge_type, caller_type):
+            expr_clone = expr_type.clone()
+            if not conforms(expr_type, caller_type):
                 self.add_error(
                     node,
                     f"Semantic Error: Cannot effect dispatch because expression"
-                    f"type({bridge_clone.name}) does not conforms to "
+                    f"type({expr_clone.name}) does not conforms to "
                     f"caller type({caller_type.name}).",
                 )
                 caller_type = ErrorType()
@@ -354,10 +353,12 @@ class SoftInferencer:
         methods = None
         if len(caller_type.type_set) > 1:
             methods_by_name = self.context.get_method_by_name(node.id, len(node.args))
-            types = [typex for _, typex in methods_by_name]
+            types = [typex for typex, _ in methods_by_name]
             conforms(caller_type, TypeBag(set(types), types))
             if len(caller_type.type_set):
-                methods = [(typex, typex.get_method) for typex in caller_type.heads]
+                methods = [
+                    (typex, typex.get_method(node.id)) for typex in caller_type.heads
+                ]
             else:
                 self.add_error(
                     node,
@@ -369,7 +370,7 @@ class SoftInferencer:
         elif len(caller_type.type_set) == 1:
             caller_type = caller_type.heads[0]
             try:
-                methods = [(caller_type, caller_type.get_method(node.id))]
+                methods = [(caller_type.get_method(node.id), caller_type)]
             except SemanticError:
                 self.add_error(
                     node,
@@ -441,7 +442,6 @@ class SoftInferencer:
         right_type = right_node.inferenced_type
         right_clone = right_type.clone()
 
-        bool_type = self.context.get_type("Bool")
         if not conforms(left_type, right_type):
             self.add_error(
                 node,
@@ -458,7 +458,7 @@ class SoftInferencer:
             right_node.inferenced_type = ErrorType()
 
         comparer_node = inf_ast.ComparerNode(left_node, right_node, node)
-        comparer_node.inferenced_type = bool_type
+        comparer_node.inferenced_type = self.context.get_type("Bool")
         return comparer_node
 
     @visitor.when(VariableNode)
@@ -467,8 +467,8 @@ class SoftInferencer:
 
         var = scope.find_variable(node.value)
         if var:
-            node.defined = True
-            var_type = var.type
+            var_node.defined = True
+            var_type = var.get_type()
         else:
             var_type = ErrorType()
             self.add_error(
@@ -502,17 +502,17 @@ class SoftInferencer:
 
         expr_type = expr_node.inferenced_type
         expr_clone = expr_type.clone()
-        node_type = self.context.get_type("Int")
-        if not conforms(expr_type, node_type):
+        int_type = self.context.get_type("Int")
+        if not conforms(expr_type, int_type):
             self.add_error(
                 node,
                 f"Type Error: ~ expresion type({expr_clone.name} does not"
                 " conforms to Int type",
             )
-            node_type = ErrorType()
+            expr_node.inferenced_type = ErrorType()
 
         complement_node = inf_ast.ComplementNode(expr_node, node)
-        complement_node.inferenced_type = node_type
+        complement_node.inferenced_type = int_type
         return complement_node
 
     @visitor.when(IsVoidNode)
