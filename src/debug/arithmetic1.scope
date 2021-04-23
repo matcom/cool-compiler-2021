@@ -1,0 +1,10 @@
+A    
+    self : A
+B    
+    self : B
+C    
+    self : C
+Main    
+    self : Main
+    [method] main        
+        

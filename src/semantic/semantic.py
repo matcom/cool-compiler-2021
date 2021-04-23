@@ -28,7 +28,8 @@ class SemanticAnalyzer:
         checker = VarCollector(self.context, self.errors)
         self.scope = checker.visit(self.ast)
         print(self.scope)
-        
+        Utils.Write(self.debug_path, '.scope', str(self.scope)) if self.debug_path else None
 
+        
 
         return self.ast, self.context, self.scope
