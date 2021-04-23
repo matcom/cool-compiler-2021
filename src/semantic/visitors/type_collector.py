@@ -7,8 +7,8 @@ from utils.errors import SemanticError
 
 class TypeCollector(object):
     def __init__(self, errors=[]):
-        self.context = None
-        self.errors = errors
+        self.context:Context = None
+        self.errors:list = errors
     
     @visitor.on('node')
     def visit(self, node):

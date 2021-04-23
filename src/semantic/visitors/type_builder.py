@@ -5,8 +5,8 @@ from semantic.types import *
 from semantic.tools import Context
 
 class TypeBuilder:
-    def __init__(self, context : Context, errors : list) -> None:
-        self.context:Context = context
+    def __init__(self, context:Context, errors:list) -> None:
+        self.context = context
         self.errors:list = errors
         self.current_type:Type = None
 
@@ -15,12 +15,12 @@ class TypeBuilder:
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self, node : ProgramNode):
+    def visit(self, node:ProgramNode):
         for declaration in node.declarations:
             self.visit(declaration)
 
     @visitor.when(ClassDeclarationNode)
-    def visit(self, node : ClassDeclarationNode):
+    def visit(self, node:ClassDeclarationNode):
         try:
             self.current_type = self.context.get_type(node.id, node.pos)
         except SemanticError as exception:
@@ -56,20 +56,20 @@ class TypeBuilder:
             self.visit(feature)
         
     @visitor.when(FuncDeclarationNode)
-    def visit(self, node : FuncDeclarationNode):
+    def visit(self, node:FuncDeclarationNode):
         args_names, args_types = [], []
 
-        for name, type_ in node.params:
+        for name,typex in node.params:
             if name in args_names:
                 error_text = SemanticError.PARAMETER_MULTY_DEFINED % name
-                self.errors.append(SemanticError(*type_.pos, error_text))
+                self.errors.append(SemanticError(*typex.pos, error_text))
             args_names.append(name)
             
             try:
-                arg_type = self.context.get_type(type_.value, type_.pos)
+                arg_type = self.context.get_type(typex.value, typex.pos)
             except SemanticError:
-                error_text = TypesError.PARAMETER_UNDEFINED % (type_.value, name)
-                self.errors.append(TypesError(*type_.pos, error_text))
+                error_text = TypesError.PARAMETER_UNDEFINED % (typex.value, name)
+                self.errors.append(TypesError(*typex.pos, error_text))
                 arg_type = ErrorType()
 
             args_types.append(arg_type)
@@ -87,7 +87,7 @@ class TypeBuilder:
             self.errors.append(exception)
     
     @visitor.when(AttrDeclarationNode)
-    def visit(self, node : AttrDeclarationNode):
+    def visit(self, node:AttrDeclarationNode):
         try:
             attr_type = self.context.get_type(node.type, node.pos)
         except SemanticError as exception:

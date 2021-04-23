@@ -6,10 +6,10 @@ from semantic.types import *
 
 class VarCollector:
     def __init__(self, context=Context, errors=[]):
-        self.context = context
-        self.errors = errors
-        self.current_type = None
-        self.current_method = None
+        self.context:Context = context
+        self.errors:list = errors
+        self.current_type:Type = None
+        self.current_method:Method = None
         
     @visitor.on('node')
     def visit(self, node, scope):
