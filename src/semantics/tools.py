@@ -2,6 +2,8 @@ import itertools as itt
 from collections import OrderedDict
 from typing import FrozenSet, List, Set
 
+from ply.yacc import errok
+
 from semantics.utils import conform_to_condition, from_dict_to_set, order_set_by_index
 
 
@@ -300,7 +302,7 @@ class TypeBag:
             if head in self.type_set:
                 new_heads.append(head)
                 continue
-            new_heads = []
+            pos_new_head = []
             lower_index = 2 ** 32
             for typex in self.type_set:
                 if typex in visited:
@@ -308,11 +310,11 @@ class TypeBag:
                 if typex.conforms_to(head):
                     visited.add(typex)
                     if typex.index < lower_index:
-                        new_heads = [typex]
+                        pos_new_head = [typex]
                         lower_index = typex.index
                     elif typex.index == lower_index:
-                        new_heads.append(typex)
-            new_heads += new_heads
+                        pos_new_head.append(typex)
+            new_heads += pos_new_head
         self.heads = new_heads
 
     def swap_self_type(self, swap_type, back=False):
@@ -455,10 +457,10 @@ class Context:
     def get_method_by_name(self, name: str, args: int) -> list:
         def dfs(root: str, results: list):
             try:
-                for typex in self.type_tree[root]:
+                for typex in self.type_graph[root]:
                     for method in self.types[typex].methods:
                         if name == method.name and args == len(method.param_names):
-                            results.append((method, self.types[typex]))
+                            results.append((self.types[typex], method))
                             break
                     else:
                         dfs(typex, results)
@@ -481,9 +483,14 @@ class Context:
 
 
 class VariableInfo:
-    def __init__(self, name, vtype):
-        self.name = name
-        self.type = vtype
+    def __init__(self, name, vtype) -> None:
+        self.name: str = name
+        self.type: TypeBag = vtype
+
+    def get_type(self) -> TypeBag or ErrorType:
+        if isinstance(self.type, ErrorType):
+            self.type = ErrorType()
+        return self.type
 
     def __str__(self):
         return self.name + ":" + self.type
@@ -553,7 +560,7 @@ class Scope:
         return s
 
 
-def conforms(bag1: TypeBag, bag2: TypeBag):
+def conforms(bag1: TypeBag, bag2: TypeBag) -> bool:
     ordered_set = order_set_by_index(bag2.type_set)
 
     condition_list = []
@@ -575,7 +582,7 @@ def conforms(bag1: TypeBag, bag2: TypeBag):
     return len(bag1.type_set) >= 1
 
 
-def try_conform(bag1: TypeBag, bag2: TypeBag):
+def try_conform(bag1: TypeBag, bag2: TypeBag) -> TypeBag:
     clone1 = bag1.clone()
     if not conforms(bag1, bag2):
         return clone1
@@ -655,11 +662,11 @@ def auto_add(type_set: set, head_list: list, bag: TypeBag):
     aux = set(bag.heads)
     for i in range(len(head_list)):
         head_i = head_list[i]
-        for head in bag.heads:
-            ancestor = head_i.least_common_ancestor(head)
+        for head_j in bag.heads:
+            ancestor = head_i.least_common_ancestor(head_j)
             if ancestor in type_set:
-                head_i[i] = ancestor
-                aux.pop(head)
+                head_list[i] = ancestor
+                aux.remove(head_j)
                 break
     head_list += [typex for typex in aux]
     return type_set
