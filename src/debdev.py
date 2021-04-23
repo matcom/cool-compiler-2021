@@ -2,7 +2,7 @@ import os
 
 from debbuging import type_logger
 from parsing import parser
-from semantics import type_collector, type_builder, soft_inferencer
+from semantics import type_collector, type_builder, soft_inferencer, hard_inferencer
 
 
 def format_errors(errors, s=""):
@@ -30,12 +30,18 @@ def run_pipeline(program):
 
     soft = soft_inferencer.SoftInferencer(context)
     soft_ast = soft.visit(ast)
+    errors += soft.errors
 
+    hard = hard_inferencer.HardInferencer(context)
+    hard_ast = hard.visit(soft_ast)
+
+    hard_ast = hard.visit(hard_ast)
+    errors += hard.errors
     # auto_inferencer = autotype_inferencer.AutotypeInferencer(context, errors)
     # auto_inferencer.visit(ast, scope)
 
     logger = type_logger.TypeLogger(context)
-    log = logger.visit(soft_ast, soft_ast.scope)
+    log = logger.visit(hard_ast, hard_ast.scope)
     print(log)
     s = "Semantic Errors:\n"
     s = format_errors(errors, s)
@@ -49,12 +55,12 @@ try:
     filenames = os.listdir(folder_path)
     filenames.sort()
 except FileNotFoundError:
-    print("Error Importing Files")
+    print("Error Locating Files")
 count = 100
 
 filenames = [
     r"/home/rodro/Aarka/Complementos de Compilacion/cool-cows/src/debbuging/tests/Auto/"
-    r"01Assign.cl"
+    r"03Many.cl"
 ]
 
 for filename in filenames:
@@ -78,4 +84,4 @@ for filename in filenames:
 print("EndOfFiles")
 
 
-# todo: Manejar los self types dentro de los type bags correctamente (acualizar metodo swap swlf types)
+# todo: Manejar los self types dentro de los type bags correctamente
