@@ -29,7 +29,7 @@ class Compiler:
             exit(1)
 
         try:
-            with open(self.input_file, encoding = 'utf-8') as file:
+            with open(self.input_file, encoding='utf-8') as file:
                 self.code += file.read()
         except (IOError, FileNotFoundError):
             error_text = CompilerError.UNKNOWN_FILE % str(self.input_file)
@@ -71,6 +71,8 @@ class Compiler:
         '''
         self.parser = Parser(lexer=self.lexer)
         self.ast = self.parser(self.code)
+        Utils.Write(self.debug_path, '.parser', '\n'.join(repr(rule) 
+                for rule in Utils.GetRulesParsing())) if self.debug else None
 
         if len(self.parser.errors) > 0:
             print(self.parser.errors[0])
