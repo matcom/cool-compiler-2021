@@ -24,8 +24,7 @@ from ast.inferencer_ast import (
     VarDeclarationNode,
     VariableNode,
 )
-
-import semantics.visitor as visitor
+from utils import visitor
 from semantics.tools import (
     Context,
     ErrorType,
