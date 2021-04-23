@@ -1,5 +1,4 @@
-from parsing.parsing_rules import p_param
-import semantics.visitor as visitor
+from utils.visitor import visitor
 from ast.parser_ast import (
     ArithmeticNode,
     AssignNode,
