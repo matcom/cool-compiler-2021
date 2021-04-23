@@ -117,12 +117,13 @@ class AssignNode(ExpressionNode):
 
 
 class MethodCallNode(ExpressionNode):
-    def __init__(self, caller_type, expression, args, node):
+    def __init__(self, caller_type, expr, args, node):
         Node.__init__(self, node)
         self.caller_type = caller_type
-        self.expression = expression
+        self.expr = expr
         self.args = args
         self.id = node.id
+        self.type = node.type
 
 
 class UnaryNode(ExpressionNode):
