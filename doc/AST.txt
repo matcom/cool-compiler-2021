@@ -1,0 +1,76 @@
+Node
+   |
+   |__ProgramNode
+   |
+   |
+   |__DeclarationNode
+   |                |
+   |                |__ClassNode
+   |                |
+   |                |
+   |                |__MethodoNode
+   |                |
+   |                |
+   |                |__AttributeNode
+   |
+   |
+   |__ExpressionNode
+                   |
+                   |
+                   |__AssignmentNode, ConditionalNode, LoopsNode, NewNode
+                   |
+                   |
+                   |__LetNode, BlockNode, DispatchNode, CaseNode, VoidNode
+                   |
+                   |
+                   |__AtomicNode
+                   |           |                               
+                   |           |
+                   |           |__IdentifierNode
+                   |           |
+                   |           |
+                   |           |__TypeNode
+                   |           |
+                   |           |
+                   |           |__ConstantNode
+                   |                         |
+                   |                         |
+                   |                         |__IntegerNode
+                   |                         |
+                   |                         |
+                   |                         |__StringNode
+                   |                         |
+                   |                         |
+                   |                         |__BoolNode
+                   |
+                   |__UnaryNode
+                   |          |
+                   |          |
+                   |          |__ComplementNode
+                   |          |
+                   |          |
+                   |          |__NegationNode
+                   |
+                   |__BinaryNode
+                               |
+                               |
+                               |__PlusNode
+                               |
+                               |
+                               |__MinusNode
+                               |
+                               |
+                               |__StarNode
+                               |
+                               |
+                               |__DivideNode
+                               |
+                               |
+                               |__LessNode
+                               |
+                               |
+                               |__LequalNode
+                               |
+                               |
+                               |__EqualNode
+
