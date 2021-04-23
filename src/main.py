@@ -18,6 +18,7 @@ class Compiler:
         self.ast = None
         self.context = None
         self.scope = None
+        self.debug = True
 
         name = Utils.GetName(input_file)
         self.debug_path = f'./debug/{name}'
@@ -48,7 +49,8 @@ class Compiler:
         '''
         self.lexer = Lexer()
         tokens = self.lexer.tokenizer(self.code)
-        Utils.Write(self.debug_path, '.lexer', '\n'.join(repr(token) for token in tokens))
+        Utils.Write(self.debug_path, '.lexer', '\n'.join(repr(token) 
+                                for token in tokens)) if self.debug else None
 
         # for token in tokens:
         #     print(token)
@@ -80,7 +82,8 @@ class Compiler:
         '''
         Lleva a cabo el análisis semántico.
         '''
-        semantic_analyzer = SemanticAnalyzer(self.ast, self.debug_path)
+        semantic_analyzer = SemanticAnalyzer(self.ast, 
+                                        self.debug_path, debug=self.debug)
         self.ast, self.context, self.scope = semantic_analyzer.analyze()
 
         if len(semantic_analyzer.errors) > 0:

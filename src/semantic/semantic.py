@@ -5,7 +5,7 @@ from semantic.visitors.type_collector import TypeCollector
 
 class SemanticAnalyzer:
 
-    def __init__(self, ast, debug_path, debug=True):
+    def __init__(self, ast, debug_path, debug=False):
         self.ast = ast
         self.debug_path = debug_path
         self.debug = debug
