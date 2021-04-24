@@ -88,7 +88,11 @@ class Operator:
 class OperationDict:
     def __init__(self, default:"(operator,*types)->(func_operator,return_type)"={}):
         self.operations = default
-        
+    
+    def get_valid_operators_of(self, operator):
+        valid_operators_types = [args for op,args in self.operations if op == operator]
+        return valid_operators_types
+    
     def get(self,key,default=None):
         operator, types = key
         types = list(types)

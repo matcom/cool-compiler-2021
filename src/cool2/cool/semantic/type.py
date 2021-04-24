@@ -19,11 +19,14 @@ class Type(DeprecatedType):
         f.node.body.type = old_type
     
     def set_parent(self,parent):
-        DeprecatedType.set_parent(self,parent)
-        if not parent.can_have_children:
-            self.parent = None
-            raise SemanticError(TYPE_CANT_BE_INHERITED, parent.name)
-    
+        try:
+            DeprecatedType.set_parent(self,parent)
+            if not parent.can_have_children:
+                self.parent = None
+                raise SemanticError(TYPE_CANT_BE_INHERITED, self.name, parent.name)
+        except DeprecatedSemanticError as er:
+            raise SemanticError(er.text)
+        
     def __hash__(self):
         return hash(self.name)
 

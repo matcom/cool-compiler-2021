@@ -8,7 +8,7 @@
             "name": "Python: Archivo actual",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "src/cool2/main.py",
             "args": ["src/testing.cl", "src/testing.mips"],
             "console": "integratedTerminal"
         }

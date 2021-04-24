@@ -360,21 +360,27 @@ class TypeCollector(object):
                 })
         
         for class_decl in node.declarations:
-            try:
-                self.context.create_type(class_decl.id)
-            except SemanticError as er:
-                self.add_semantic_error(er, class_decl.row, class_decl.column)
-        
-        for class_decl in node.declarations:
-            try:
-                curr_type = self.context.get_type(class_decl.id)
-            except SemanticError as er:
-                self.add_semantic_error(er, class_decl.row, class_decl.column)
-            if class_decl.parent:
+            if class_decl.id in self.context.special_types:
+                self.add_semantic_error(SemanticError(REDEFINITION_BASIC_CLASS, class_decl.id), class_decl.row, class_decl.column)
+            else:
                 try:
-                    curr_type.set_parent(self.context.get_type(class_decl.parent))
+                    self.context.create_type(class_decl.id)
                 except SemanticError as er:
                     self.add_semantic_error(er, class_decl.row, class_decl.column)
+        
+        for class_decl in node.declarations:
+            if not class_decl.id in self.context.special_types:
+                try:
+                    curr_type = self.context.get_type(class_decl.id)
+                except SemanticError as er:
+                    self.add_semantic_error(er, class_decl.row, class_decl.column)
+                if class_decl.parent:
+                    try:
+                        parent_type = self.context.get_type(class_decl.parent)
+                        if not curr_type.parent:
+                            curr_type.set_parent(parent_type)
+                    except SemanticError as er:
+                        self.add_semantic_error(er, class_decl.row, class_decl.column)
         
         cycles = ut.any_cycles(ut.build_graph_dict(self.context.types))
         
@@ -505,7 +511,7 @@ class TypeChecker:
         self.visit(node.expr,scope)
         
         if not node.expr.type.conforms_to(node.type,self.current_type):
-            self.add_semantic_error(TypeCoolError(INCOMPATIBLE_TYPES, node.expr.type.name, node.type.name),node.row,node.column)
+            self.add_semantic_error(TypeCoolError(ATTRIBUTE_INCOMPATIBLE_TYPES, node.id, node.type.name, node.expr.type.name),node.row,node.column)
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -529,7 +535,7 @@ class TypeChecker:
         self.visit(node.body,f_scope)
         
         if not isinstance(node.type,VoidType) and not node.body.type.conforms_to(node.type,self.current_type):
-            err = TypeCoolError(INCOMPATIBLE_TYPES, node.body.type.name,node.type.name)
+            err = TypeCoolError(METHOD_INCOMPATIBLE_RETURN_TYPE, node.id, node.type.name, node.body.type.name)
             self.add_semantic_error(err, node.row, node.column)
 
     @visitor.when(ParamNode)
@@ -580,13 +586,11 @@ class TypeChecker:
         self.visit(node.expr,scope)
         
         if not scope.is_defined(node.id):
-            er = SemanticError(VARIABLE_NOT_DEFINED, node.id,self.current_method.name)
+            er = NameCoolError(VARIABLE_NOT_DEFINED, node.id)
             self.add_semantic_error(er, node.row, node.column)
-            node.type = node.expr.type
-        else:
-            var_info = scope.find_variable(node.id)
-            node.type = var_info.type
         
+        node.type = node.expr.type
+
         if not node.expr.type.conforms_to(node.type,self.current_type):
             er = TypeCoolError(INCOMPATIBLE_TYPES, node.expr.type.name, node.type.name)
             self.add_semantic_error(er, node.row, node.column)
@@ -604,15 +608,22 @@ class TypeChecker:
                 if not node.obj.type.conforms_to(node.at,self.current_type):
                     er = TypeCoolError(INCOMPATIBLE_TYPES, node.obj.type.name, node.at.name)
                     self.add_semantic_error(er, node.row, node.column)
-                method = node.at.get_method(node.id,len(node.args),self.current_type)
+                dispatch_type = node.at
             else:
-                method = node.obj.type.get_method(node.id,len(node.args),self.current_type)
-            not_conform = [(x,y.type) for x,y in zip(method.param_types,node.args) if not y.type.conforms_to(x,self.current_type)]
-            for x,y in not_conform:
-                er = TypeCoolError(INCOMPATIBLE_TYPES, y.name, x.name)
-                self.add_semantic_error(er, node.row, node.column)
-            node.type = method.return_type if method.return_type.name != "SELF_TYPE" else node.obj.type
-            
+                dispatch_type = node.obj.type
+            try:
+                method = dispatch_type.get_method(node.id,len(node.args),self.current_type)
+                not_conform = [(x,y.type) for x,y in zip(method.param_types,node.args) if not y.type.conforms_to(x,self.current_type)]
+                for x,y in not_conform:
+                    er = TypeCoolError(INCOMPATIBLE_TYPES, y.name, x.name)
+                    self.add_semantic_error(er, node.row, node.column)
+                node.type = method.return_type if method.return_type.name != "SELF_TYPE" else node.obj.type
+            except SemanticError as er:
+                if not any(meth for meth, typex in dispatch_type.all_methods() if meth.name == node.id):
+                    raise AttributeCoolError(DISPATCH_UNDEFINED_METHOD, node.id)
+                else:
+                    raise SemanticError(DISPATCH_METHOD_WRONG_ARGS, node.id)
+
         except SemanticError as er:
             node.type = ErrorType()
             self.add_semantic_error(er, node.row, node.column)
@@ -633,8 +644,8 @@ class TypeChecker:
         self.visit(node.then_expr,scope)
         self.visit(node.else_expr,scope)
         
-        if node.condition.type != self.context.get_type('Bool') and node.condition.type != ErrorType():
-            er = TypeCoolError(NOT_BOOLEAN_CONDITION, node.condition.type.name)
+        if node.condition.type != self.context.get_type('Bool') and not node.condition.type is ErrorType:
+            er = TypeCoolError(NOT_BOOLEAN_CONDITION)
             self.add_semantic_error(er, node.row, node.column)
         try:
             node.type = node.get_return_type(self.current_type)
@@ -669,7 +680,13 @@ class TypeChecker:
             er = SemanticError(SELF_IS_READONLY)
             self.add_semantic_error(er, node.row, node.column)
         
-        node.type = self.context.get_type(node.type)
+        try:
+            node.type = self.context.get_type(node.type)
+        except SemanticError:
+            er = TypeCoolError(UNDEFINED_CLASS_CASE_BRANCH, node.type)
+            self.add_semantic_error(er, node.row, node.column)
+            node.type = ErrorType()
+
         node.scope = scope.create_child()
         node.scope.define_variable(node.id,node.type)
         
@@ -683,13 +700,16 @@ class TypeChecker:
         self.visit(node.expr,scope)
         
         types = []
+        param_types = []
         for i,param in enumerate(node.params):
             self.visit(param,scope)
             # if not (node.expr.type.conforms_to(param.type,self.current_type) or param.type.conforms_to(node.expr.type,self.current_type)):
             #     self.errors.append(f"Incompatible types {param.type.name} with {node.expr.type.name}" + f' Line:{node.row} Column:{node.column}')
-            if any(x for x in types if x[1] == param.type):
-                er = TypeCoolError(CASE_TYPES_REPEATED, param.expr.type.name)
+            if any(x for x in param_types if x == param.type):
+                er = SemanticError(CASE_TYPES_REPEATED, param.type.name)
                 self.add_semantic_error(er, param.row, param.column)
+            else:
+                param_types.append(param.type)
             types.append((i,param.expr.type))
         
         static_type = types[0][1]
@@ -703,7 +723,15 @@ class TypeChecker:
         
         if not self.operator.operation_defined(node,node.member.type):
             node.type = ErrorType()
-            er = TypeCoolError(INVALID_UNARY_OPERATION, self.operator.get_operator(node), node.member.type.name)
+            node_operator = self.operator.get_operator(node)
+            correct_types = self.operator.operations.get_valid_operators_of(node_operator)
+            unary_correct_types = [x for x in correct_types if len(x) == 1]
+            if len(unary_correct_types) == 0:
+                correct_type_name = "No Type"
+            else:
+                correct_type_name = " or ".join([x[0].name for x in unary_correct_types])
+                
+            er = TypeCoolError(INVALID_UNARY_OPERATION, node_operator, node.member.type.name, correct_type_name)
             self.add_semantic_error(er, node.row, node.column)
         else:
             node.type = self.operator.type_of_operation(node,node.member.type)
@@ -746,7 +774,7 @@ class TypeChecker:
             node.type = var.type
         else:
             node.type = ErrorType()
-            er = SemanticError(VARIABLE_NOT_DEFINED, node.lex, self.current_method.name)
+            er = NameCoolError(VARIABLE_NOT_DEFINED, node.lex)
             self.add_semantic_error(er, node.row, node.column)
 
     @visitor.when(InstantiateNode)
