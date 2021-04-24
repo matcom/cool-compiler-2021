@@ -43,17 +43,17 @@ input_file = "src/test.cl"
 
 def main():
 
-    if len(sys.argv) > 1:
-        input_file = sys.argv[1]
-    else:
-        raise Exception("Incorrect number of arguments")
+    # if len(sys.argv) > 1:
+    #     input_file = sys.argv[1]
+    # else:
+    #     raise Exception("Incorrect number of arguments")
 
     program = open(input_file).read()
 
     lexer = Lexer()
     tokens = list(lexer.tokenize(program))
-    # for token in tokens:
-    #     print(token, token.line, token.col)
+    for token in tokens:
+        print(token, token.line, token.col)
 
     if lexer.errors:
         for error in lexer.errors:
