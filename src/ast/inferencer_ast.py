@@ -103,7 +103,7 @@ class VarDeclarationNode(ExpressionNode):
         Node.__init__(self, node)
         self.id = node.id
         self.expr = None  # Expression is set later if it exists
-        self.defined = False
+        self.index = None
         # For debbugin purposes
         self.type = node.type
 
