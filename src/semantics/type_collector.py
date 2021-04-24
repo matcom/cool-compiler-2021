@@ -46,7 +46,7 @@ class TypeCollector:
             if node.parent:
                 if node.parent in {"String", "Int, Bool"}:
                     raise SemanticError(
-                        f"Type '{node.id}' cannot inherit from '{node.parent}' beacuse is forbidden."
+                        f"Type '{node.id}' cannot inherit from '{node.parent}' beacuse it is forbidden."
                     )
                 try:
                     self.type_graph[node.parent].append(node.id)
@@ -68,16 +68,21 @@ class TypeCollector:
             if not node in visited:
                 visited.add(node)
                 path = [node]
-                circular_heritage_errors.append(
-                    self.check_circular_heritage(node, self.type_graph, path, visited)
-                )
-                new_order = new_order + [self.node_dict[node] for node in path]
+                err = self.check_circular_heritage(node, self.type_graph, path, visited)
+                if len(err) > 0:  # Nodes with invalid parents will be checked to ;)
+                    circular_heritage_errors.append(
+                        (path[1 if len(path) - 1 else 0], err)
+                    )
+                    # path[1] to detect circular heritage same place tests do :(
+                try:
+                    new_order = new_order + [self.node_dict[node] for node in path]
+                except KeyError:
+                    pass
 
-        if circular_heritage_errors:
-            print(circular_heritage_errors)
-            error = "Semantic Error: Circular Heritage:\n"
-            error += "\n".join(err for err in circular_heritage_errors)
-            self.add_error(None, error)
+        for node_id, err in circular_heritage_errors:
+            self.add_error(
+                self.node_dict[node_id], "SemanticError: Circular Heritage: " + err
+            )
 
         return new_order
 
@@ -102,6 +107,7 @@ class TypeCollector:
             visited.add(node)
             path.append(node)
             return self.check_circular_heritage(node, graph, path, visited)
+        return ""
 
     def init_default_classes(self):
         self.context.create_type("Object").index = 0

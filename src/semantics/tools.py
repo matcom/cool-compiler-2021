@@ -93,19 +93,21 @@ class Type:
         if not first:
             first = self.name
         elif first == self.name:
-            raise SemanticError(f'Method "{name}" is not defined in class {self.name}.')
+            raise AttributeError(
+                f'Method "{name}" is not defined in class {self.name}.'
+            )
 
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise SemanticError(
+                raise AttributeError(
                     f'Method "{name}" is not defined in class {self.name}.'
                 )
             try:
                 return self.parent.get_method(name, first=first)
-            except SemanticError:
-                raise SemanticError(
+            except AttributeError:
+                raise AttributeError(
                     f'Method "{name}" is not defined in class {self.name}.'
                 )
 
@@ -252,15 +254,16 @@ class TypeBag:
         if len(self.type_set) == 1:
             self.heads = list(self.type_set)
 
-        self.name = self.generate_name()
+        self.name = "undefined"
         self.condition_list = []
         self.conform_list = []
+        self.generate_name()
 
     def set_conditions(self, condition_list, conform_list):
         self.condition_list = condition_list
         self.conform_list = conform_list
         self.update_type_set_from_conforms()
-        self.name = self.generate_name()
+        self.generate_name()
 
     def update_type_set_from_conforms(self):
         intersect_set = set()
@@ -311,18 +314,20 @@ class TypeBag:
                 self.heads[i] = add_type
                 break
 
-        self.name = self.generate_name()
+        self.generate_name()
         return self
 
     def generate_name(self):
         if len(self.type_set) == 1:
-            return self.heads[0].name
+            self.name = self.heads[0].name
+            return self.name
 
         s = "{"
         s += ", ".join(
             typex.name for typex in sorted(self.type_set, key=lambda t: t.index)
         )
         s += "}"
+        self.name = s
         return s
 
     def clone(self):
@@ -378,9 +383,9 @@ class FuncType(Type):
             )
 
 
-class ErrorType(Type):
+class ErrorType(TypeBag):
     def __init__(self):
-        self.name = "<error>"
+        self.name = "<error-type>"
         self.index = 2 ** 32
         self.type_set = frozenset()
         self.heads = frozenset()
@@ -391,11 +396,14 @@ class ErrorType(Type):
     def bypass(self):
         return True
 
-    def swap_self_type(self, swap_type):
+    def swap_self_type(self, swap_type, back=False):
         return self
 
     def set_conditions(self, *params):
         return
+
+    def generate_name(self):
+        return "<error-type>"
 
     def clone(self):
         return self
@@ -462,7 +470,7 @@ class VariableInfo:
         self.type: TypeBag = vtype
 
     def get_type(self) -> TypeBag or ErrorType:
-        if isinstance(self.type, ErrorType):
+        if len(self.type.type_set) == 0:
             self.type = ErrorType()
         return self.type
 
@@ -505,6 +513,9 @@ class Scope:
             except AttributeError:
                 return None
 
+    def get_local_by_index(self, index):
+        return self.locals[index]
+
     def is_defined(self, vname):
         return self.find_variable(vname) is not None
 
@@ -535,6 +546,9 @@ class Scope:
 
 
 def conforms(bag1: TypeBag, bag2: TypeBag) -> bool:
+    if isinstance(bag1, ErrorType) or isinstance(bag2, ErrorType):
+        return True
+
     ordered_set = order_set_by_index(bag2.type_set)
 
     condition_list = []
@@ -564,6 +578,11 @@ def try_conform(bag1: TypeBag, bag2: TypeBag) -> TypeBag:
 
 
 def join(bag1: TypeBag, bag2: TypeBag) -> TypeBag:
+    if isinstance(bag1, ErrorType):
+        return bag2
+    if isinstance(bag2, ErrorType):
+        return bag1
+
     ancestor_set = set()
     head_list = []
     ordered_set1: Set[Type] = order_set_by_index(bag1.type_set)
@@ -607,6 +626,8 @@ def join_list(type_list):
 
 
 def equal(bag1: TypeBag, bag2: TypeBag):
+    if isinstance(bag1, ErrorType) or isinstance(bag2, ErrorType):
+        return True
     set1 = bag1.type_set
     set2 = bag2.type_set
     return len(set1) == len(set2) and len(set1.intersection(set2)) == len(set2)
