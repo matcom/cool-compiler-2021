@@ -11,9 +11,12 @@ from ast.parser_ast import (
     ComparerNode,
     ComplementNode,
     ConditionalNode,
+    EqualsNode,
     InstantiateNode,
     IntNode,
     IsVoidNode,
+    LessNode,
+    LessOrEqualNode,
     LetNode,
     LoopNode,
     MethodCallNode,
@@ -27,7 +30,7 @@ from ast.parser_ast import (
 )
 
 from utils import visitor
-from semantics.errors import SemanticError
+from semantics.errors import SemanticError, AttributeError
 from semantics.tools import (
     Context,
     ErrorType,
@@ -37,6 +40,7 @@ from semantics.tools import (
     join,
     join_list,
     smart_add,
+    try_conform,
 )
 
 
@@ -66,7 +70,8 @@ class SoftInferencer:
         scope.define_variable("self", TypeBag({self.current_type}))
 
         for attr in self.current_type.attributes:
-            scope.define_variable(attr.name, attr.type)
+            if attr.name != "self":
+                scope.define_variable(attr.name, attr.type)
 
         new_features = []
         for feature in node.features:
@@ -77,6 +82,9 @@ class SoftInferencer:
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
+        if node.id == "self":
+            self.add_error(node, "SemanticError: An attribute cannot be named 'self'")
+
         node_type = self.current_type.get_attribute(node.id).type.swap_self_type(
             self.current_type
         )
@@ -90,14 +98,14 @@ class SoftInferencer:
 
         node_expr = expr_node.inferenced_type
 
-        expr_clone = node_expr.clone()
+        expr_name = node_expr.generate_name()
         if not conforms(node_expr, node_type):
             self.add_error(
                 node,
                 (
                     f"TypeError: In class '{self.current_type.name}' attribue"
-                    f"'{node.id}' expression type({expr_clone.name}) does not conforms"
-                    f"to declared type ({node_type.name})."
+                    f" '{node.id}' expression type({expr_name}) does not conforms"
+                    f" to declared type ({node_type.name})."
                 ),
             )
             expr_node.inferenced_type = ErrorType()
@@ -111,6 +119,16 @@ class SoftInferencer:
         current_method = self.current_type.get_method(node.id)
 
         for idx, typex in zip(current_method.param_names, current_method.param_types):
+            if idx == "self":
+                self.add_error(
+                    node,
+                    "SemanticError: Cannot use 'self' as formal parameter identifier",
+                )
+            if scope.is_local(idx):
+                self.add_error(
+                    node,
+                    f"SemanticError: Formal parameter '{idx}' has been defined multiple times.",
+                )
             scope.define_variable(idx, typex)
 
         ret_type_decl = current_method.return_type.swap_self_type(self.current_type)
@@ -182,13 +200,17 @@ class SoftInferencer:
             child = scope.create_child()
             new_options.append(self.visit(option, child))
             type_list.append(new_options[-1].inferenced_type)
-            var_type = child.find_variable(option.id).type
+            var_type = child.find_variable(option.id).get_type()
+            var_type = (
+                var_type.heads[0] if not isinstance(var_type, ErrorType) else var_type
+            )
             if var_type in types_visited:
                 self.add_error(
-                    node,
-                    "SemanticError: Case Expression can't have branches"
+                    option,
+                    "SemanticError: Case Expression have 2 or more branches"
                     f"with same case type({var_type.name})",
                 )
+            types_visited.add(var_type)
 
         joined_type = join_list(type_list)
 
@@ -201,7 +223,7 @@ class SoftInferencer:
         try:
             node_type = self.context.get_type(node.type, selftype=False, autotype=False)
         except SemanticError as err:
-            self.add_error(node, err)
+            self.add_error(node, err.text)
             node_type = ErrorType()
 
         scope.define_variable(node.id, node_type)
@@ -255,18 +277,17 @@ class SoftInferencer:
             )
         except SemanticError as err:
             node_type = ErrorType()
-            self.add_error(node, err)
+            self.add_error(node, err.text)
 
-        if not scope.is_local(node.id):
-            scope.define_variable(node.id, node_type)
-            var_decl_node.defined = True
-        else:
+        if node.id == "self":
             self.add_error(
                 node,
-                f"SemanticError: Variable '{node.id}' already defined"
-                " in current scope.",
+                "SemanticError: Cannot bound self in a let expression.",
             )
-            node_type = ErrorType()
+            var_decl_node.id = "<error-name(self)>"
+
+        var = scope.define_variable(var_decl_node.id, node_type)
+        var_decl_node.index = len(scope.locals) - 1
 
         var_decl_node.inferenced_type = node_type
 
@@ -277,12 +298,14 @@ class SoftInferencer:
             if not conforms(expr_type, node_type):
                 self.add_error(
                     node,
-                    f"TypeError: Variable '{node.id}' expressiontype"
-                    f"({expr_clone.name}) does not conforms to declared"
-                    f"type({node_type.name}).",
+                    f"TypeError: Variable '{node.id}' expression type"
+                    f" ({expr_clone.name}) does not conforms to declared"
+                    f" type({node_type.name}).",
                 )
                 expr_node.inferenced_type = ErrorType()
             var_decl_node.expr = expr_node
+            var_decl_node.inferenced_type = expr_node.inferenced_type
+            # var.type = var_decl_node.inferenced_type
 
         return var_decl_node
 
@@ -295,7 +318,7 @@ class SoftInferencer:
         if not var:
             self.add_error(
                 node,
-                f"ScopeError: Cannot assign new value to"
+                f"SemanticError: Cannot assign new value to"
                 f"{node.id} beacuse it is not defined in the current scope",
             )
             decl_type = ErrorType()
@@ -318,12 +341,12 @@ class SoftInferencer:
                 self.add_error(
                     node,
                     f"TypeError: Cannot assign new value to variable '{node.id}'."
-                    f" Expression type({expr_clone.name}) does not conforms to"
+                    f" expression type({expr_clone.name}) does not conforms to"
                     f" declared type ({decl_type.name}).",
                 )
                 expr_node.inferenced_type = ErrorType()
 
-        assign_node.inferenced_type = decl_type
+        assign_node.inferenced_type = expr_node.inferenced_type
         return assign_node
 
     @visitor.when(MethodCallNode)
@@ -362,21 +385,19 @@ class SoftInferencer:
             else:
                 self.add_error(
                     node,
-                    f"SemanticError: There is no method '{node.id}'"
-                    f"that recieves {len(node.params)} arguments in"
-                    f"types {caller_type.name}.",
+                    f"AtributeError: There is no method '{node.id}'"
+                    f" that recieves {len(node.params)} arguments in"
+                    f" types {caller_type.name}.",
                 )
                 caller_type = ErrorType()
         elif len(caller_type.type_set) == 1:
             caller = caller_type.heads[0]
             try:
                 methods = [(caller, caller.get_method(node.id))]
-            except SemanticError:
+            except AttributeError as err:
                 self.add_error(
                     node,
-                    f"SemanticError: There is no method '{node.id}'"
-                    f"that recieves {len(node.params)} arguments in"
-                    f"Type '{caller.name}'.",
+                    err.text,
                 )
                 caller_type = ErrorType()
 
@@ -404,33 +425,33 @@ class SoftInferencer:
 
     @visitor.when(ArithmeticNode)
     def visit(self, node, scope):
-        left_node = self.visit(node.left, scope)
-        left_type = left_node.inferenced_type
-        left_clone = left_type.clone()
-
-        right_node = self.visit(node.right, scope)
-        right_type = right_node.inferenced_type
-        right_clone = right_type.clone()
-
-        int_type = self.context.get_type("Int")
-        if not conforms(left_type, int_type):
-            self.add_error(
-                node.left,
-                f"TypeError: ArithmeticError: Left member type({left_clone.name})"
-                " does not conforms to Int type.",
-            )
-            left_node.inferenced_type = ErrorType()
-        if not conforms(right_type, int_type):
-            self.add_error(
-                node.right,
-                f"TypeError: ArithmeticError: Right member type({right_clone.name})"
-                " does not conforms to Int type.",
-            )
-            right_node.inferenced_type = ErrorType()
-
+        left_node, right_node = self.__arithmetic_operation(node, scope)
         arith_node = inf_ast.ArithmeticNode(left_node, right_node, node)
-        arith_node.inferenced_type = int_type
+        arith_node.inferenced_type = self.context.get_type("Int")
         return arith_node
+
+    @visitor.when(LessNode)
+    def visit(self, node, scope: Scope):
+        left_node, right_node = self.__arithmetic_operation(node, scope)
+        less_node = inf_ast.LessNode(left_node, right_node, node)
+        less_node.inferenced_type = self.context.get_type("Bool")
+        return less_node
+
+    @visitor.when(LessOrEqualNode)
+    def visit(self, node, scope: Scope):
+        left_node, right_node = self.__arithmetic_operation(node, scope)
+        lesseq_node = inf_ast.LessOrEqualNode(left_node, right_node, node)
+        lesseq_node.inferenced_type = self.context.get_type("Bool")
+        return lesseq_node
+
+    @visitor.when(EqualsNode)
+    def visit(self, node, scope: Scope):
+        left_node = self.visit(node.left, scope)
+        right_node = self.visit(node.right, scope)
+
+        equal_node = inf_ast.EqualsNode(left_node, right_node, node)
+        equal_node.inferenced_type = self.context.get_type("Bool")
+        return equal_node
 
     @visitor.when(ComparerNode)
     def visit(self, node, scope):
@@ -471,9 +492,7 @@ class SoftInferencer:
             var_type = var.get_type()
         else:
             var_type = ErrorType()
-            self.add_error(
-                node, f"SemanticError: Variable '{node.value}' is not defined."
-            )
+            self.add_error(node, f"NameError: Variable '{node.value}' is not defined.")
         var_node.inferenced_type = var_type
         return var_node
 
@@ -506,7 +525,7 @@ class SoftInferencer:
         if not conforms(expr_type, int_type):
             self.add_error(
                 node,
-                f"TypeError: ~ expresion type({expr_clone.name} does not"
+                f"TypeError: ~ expresion type({expr_clone.name}) does not"
                 " conforms to Int type",
             )
             expr_node.inferenced_type = ErrorType()
@@ -518,7 +537,7 @@ class SoftInferencer:
     @visitor.when(IsVoidNode)
     def visit(self, node, scope):
         node_expr = self.visit(node.expr, scope)
-        is_void_node = IsVoidNode(node_expr, node)
+        is_void_node = inf_ast.IsVoidNode(node_expr, node)
         is_void_node.inferenced_type = self.context.get_type("Bool")
         return is_void_node
 
@@ -555,6 +574,32 @@ class SoftInferencer:
         bool_node = inf_ast.BooleanNode(node)
         bool_node.inferenced_type = self.context.get_type("Bool")
         return bool_node
+
+    def __arithmetic_operation(self, node, scope):
+        left_node = self.visit(node.left, scope)
+        left_type = left_node.inferenced_type
+        left_clone = left_type.clone()
+
+        right_node = self.visit(node.right, scope)
+        right_type = right_node.inferenced_type
+        right_clone = right_type.clone()
+
+        int_type = self.context.get_type("Int")
+        if not conforms(left_type, int_type):
+            self.add_error(
+                node.left,
+                f"TypeError: ArithmeticError: Left member type({left_clone.name})"
+                " does not conforms to Int type.",
+            )
+            left_node.inferenced_type = ErrorType()
+        if not conforms(right_type, int_type):
+            self.add_error(
+                node.right,
+                f"TypeError: ArithmeticError: Right member type({right_clone.name})"
+                " does not conforms to Int type.",
+            )
+            right_node.inferenced_type = ErrorType()
+        return left_node, right_node
 
     def add_error(self, node: Node, text: str):
         line, col = node.get_position() if node else (0, 0)
