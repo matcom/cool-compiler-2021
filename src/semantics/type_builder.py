@@ -6,16 +6,16 @@ from ast.parser_ast import (
     MethodDeclarationNode,
     AttrDeclarationNode,
 )
-from semantics.errors import SemanticError 
-from semantics.tools import  SelfType,TypeBag,ErrorType
+from semantics.errors import SemanticError
+from semantics.tools import SelfType, TypeBag, ErrorType
 from semantics.tools import Context
 
 
 class TypeBuilder:
-    def __init__(self, context: Context, errors):
+    def __init__(self, context: Context):
         self.context = context
         self.current_type = None
-        self.errors: list = errors
+        self.errors: list = []
 
     @visitor.on("node")
     def visit(self, node):
@@ -29,7 +29,13 @@ class TypeBuilder:
             self.visit(class_def)
 
         try:
-            self.context.get_type("Main", unpacked=True).get_method("main", local=True)
+            main = self.context.get_type("Main", unpacked=True).get_method(
+                "main", local=True
+            )
+            if len(main.param_names) > 0:
+                raise SemanticError(
+                    "Method 'main' in class 'Main' must not have formal parameters"
+                )
         except SemanticError as err:
             self.add_error(node, err.text)
 
@@ -60,14 +66,14 @@ class TypeBuilder:
         try:
             self.current_type.define_attribute(node.id, attr_type)
         except SemanticError as err:
-            self.add_error(err.text)
+            self.add_error(node, err.text)
 
     @visitor.when(MethodDeclarationNode)
     def visit(self, node):
         try:
             ret_type = self.context.get_type(node.type)
         except SemanticError as err:
-            self.add_error(err.text)
+            self.add_error(node, err.text)
             ret_type = ErrorType()
 
         params_type = []
