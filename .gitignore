@@ -430,3 +430,8 @@ src/type_logger.py
 src/zTests/Auto/00Simple.cl
 src/zTests/Auto/01Assign.cl
 src/semantics/notes.md
+src/test.cl
+src/test.cl
+src/class1_error.txt
+src/class1.cl
+src/test.cl
