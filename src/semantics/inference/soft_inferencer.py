@@ -453,35 +453,6 @@ class SoftInferencer:
         equal_node.inferenced_type = self.context.get_type("Bool")
         return equal_node
 
-    @visitor.when(ComparerNode)
-    def visit(self, node, scope):
-        left_node = self.visit(node.left, scope)
-        left_type = left_node.inferenced_type
-        left_clone = left_type.clone()
-
-        right_node = self.visit(node.right, scope)
-        right_type = right_node.inferenced_type
-        right_clone = right_type.clone()
-
-        if not conforms(left_type, right_type):
-            self.add_error(
-                node,
-                f"TypeError: Left expression type({left_clone.name})"
-                f"does not conforms to right expression type({right_type.name})",
-            )
-            left_node.inferenced_type = ErrorType()
-        elif not conforms(right_type, left_type):
-            self.add_error(
-                node,
-                f"TypeError: Right expression type({right_clone.name})"
-                f"does not conforms to left expression type({left_type.name})",
-            )
-            right_node.inferenced_type = ErrorType()
-
-        comparer_node = inf_ast.ComparerNode(left_node, right_node, node)
-        comparer_node.inferenced_type = self.context.get_type("Bool")
-        return comparer_node
-
     @visitor.when(VariableNode)
     def visit(self, node, scope: Scope):
         var_node = inf_ast.VariableNode(node)
