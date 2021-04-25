@@ -263,7 +263,6 @@ class TypeBag:
         self.condition_list = condition_list
         self.conform_list = conform_list
         self.update_type_set_from_conforms()
-        self.generate_name()
 
     def update_type_set_from_conforms(self):
         intersect_set = set()
@@ -284,15 +283,16 @@ class TypeBag:
             for typex in self.type_set:
                 if typex in visited:
                     continue
-                if typex.conforms_to(head):
-                    visited.add(typex)
-                    if typex.index < lower_index:
-                        pos_new_head = [typex]
-                        lower_index = typex.index
-                    elif typex.index == lower_index:
-                        pos_new_head.append(typex)
+                # if typex.conforms_to(head):
+                visited.add(typex)
+                if typex.index < lower_index:
+                    pos_new_head = [typex]
+                    lower_index = typex.index
+                elif typex.index == lower_index:
+                    pos_new_head.append(typex)
             new_heads += pos_new_head
         self.heads = new_heads
+        self.generate_name()
 
     def swap_self_type(self, swap_type, back=False):
         if not back:
@@ -308,14 +308,29 @@ class TypeBag:
         except KeyError:
             return self
 
-        for i in range(len(self.heads)):
-            typex = self.heads[i]
-            if typex.name == remove_type.name:
-                self.heads[i] = add_type
-                break
-
-        self.generate_name()
+        # for i in range(len(self.heads)):
+        #    typex = self.heads[i]
+        #    if typex.name == remove_type.name:
+        #        self.heads[i] = add_type
+        #        break
+        #
+        # self.generate_name()
+        self.update_heads()
         return self
+
+    def add_self_type(self, add_type) -> bool:
+        if SelfType() in self.type_set and not add_type in self.type_set:
+            self.type_set.add(add_type)
+            return True
+        return False
+
+    def remove_self_type(self, remove_type):
+        try:
+            self.type_set.remove(remove_type)
+        except KeyError:
+            pass
+        self.type_set.add(SelfType())
+        self.update_heads()
 
     def generate_name(self):
         if len(self.type_set) == 1:
@@ -349,9 +364,13 @@ class SelfType(Type):
         self.index = 2 ** 31
 
     def conforms_to(self, other):
+        if isinstance(other, SelfType):
+            return True
+        return False
         raise InternalError("SELF_TYPE is yet to be assigned, cannot conform.")
 
     def bypass(self):
+        return False
         raise InternalError("SELF_TYPE is yet to be assigned, cannot bypass.")
 
     def __hash__(self) -> int:
@@ -422,13 +441,11 @@ class Context:
         return typex
 
     def get_type(self, name: str, selftype=True, autotype=True, unpacked=False) -> Type:
-        if selftype and name == "SELF_TYPE":
-            return TypeBag({SelfType()})  # SelfType()
+        if not selftype and name == "SELF_TYPE":
+            raise TypeError(f"Cannot use SELF_TYPE.")  # return TypeBag({SelfType()})
         if autotype and name == "AUTO_TYPE":
             self.num_autotypes += 1
-            return TypeBag(
-                self.types, [self.types["Object"]]
-            )  # AutoType(f"T{self.num_autotypes}", [self.types["Object"]], self.types)
+            return TypeBag(self.types, [self.types["Object"]])
         try:
             if unpacked:
                 return self.types[name]
