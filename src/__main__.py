@@ -1,17 +1,12 @@
-from os import close, error
-from semantics.inference.hard_inferencer import HardInferencer
 import sys
 
-from ply.lex import lex
-
 from lexing import Lexer
-
-# from parsing import Parser
 from parsing import Parser
 from semantics import TypeBuilder, TypeCollector
 from semantics.inference import (
-    BackInferencer,
     SoftInferencer,
+    HardInferencer,
+    BackInferencer,
 )
 
 
@@ -19,7 +14,7 @@ def format_errors(errors, s=""):
     # errors.sort(key=lambda x: x[0])
     for error in errors:
         s += error[1] + "\n"
-    return s[:-1]
+    return s[:]
 
 
 def run_pipeline(program_ast):
@@ -41,21 +36,27 @@ def run_pipeline(program_ast):
     hard_ast = hard.visit(soft_ast)
     errors += hard.errors
 
+    # back = BackInferencer(context)
+    # back_ast = back.visit(hard_ast)
+    # errors += back.errors
+
     # logger = type_logger.TypeLogger(context)
     # log = logger.visit(soft_ast, soft_ast.scope)
     # print(log)
     if len(errors) > 0:
-        s = format_errors(errors)
-        print(s)
+        for error in errors:
+            print(error[1])
+        # s = format_errors(errors)
+        # print(s)
         exit(1)
     # print(s)
 
 
 def main():
     if len(sys.argv) > 1:
-        input_file = sys.argv[1] + " " + sys.argv[2] + " " + sys.argv[3]
+        input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "self3.cl"
+        input_file = "src/test.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
@@ -64,9 +65,6 @@ def main():
 
     lexer = Lexer()
     tokens = list(lexer.tokenize(program))
-    for token in tokens:
-        print(token, token.line, token.col)
-
     if lexer.errors:
         for error in lexer.errors:
             print(error)

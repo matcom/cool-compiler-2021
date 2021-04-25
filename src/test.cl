@@ -1,23 +1,22 @@
---For each branch, let Ti be the static type of <expri>. The static type of a case expression is Join 1≤i≤n Ti.
+--The static types of the two sub-expressions must be Int.
 
-class A { };
-class B inherits A { };
-class C inherits B { };
-class D inherits B { };
-class E inherits B { }; 
-class F inherits A { }; 
+class Main {
+	a : B <- new B;
+	b : B;
+	main(): B {
+		{
+			b <- a.method(); 
+			b;
+		}
+	};
+};
 
-class Main inherits IO {
-	main(): IO { out_string("Hello World!")};
+class A {
+	method(): SELF_TYPE {
+		new A
+	};
+};
 
-	b: B <- case "true" of
-				i: Int => New C;
-				b: Bool => New D;
-				s: String => New E;
-			esac;
-
-	test: B <- case 0 of
-				b: Bool => new F;
-				i: Int => new E;
-			esac;
-};  
+class B inherits A {
+	
+};
