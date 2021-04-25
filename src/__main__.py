@@ -1,5 +1,6 @@
 from os import close, error
 from semantics.inference.hard_inferencer import HardInferencer
+from debbuging.type_logger import TypeLogger
 import sys
 
 from ply.lex import lex
@@ -41,9 +42,9 @@ def run_pipeline(program_ast):
     hard_ast = hard.visit(soft_ast)
     errors += hard.errors
 
-    # logger = type_logger.TypeLogger(context)
-    # log = logger.visit(soft_ast, soft_ast.scope)
-    # print(log)
+    logger = TypeLogger(context)
+    log = logger.visit(hard_ast, hard_ast.scope)
+    print(log)
     if len(errors) > 0:
         s = format_errors(errors)
         print(s)
@@ -55,7 +56,9 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1] + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "self3.cl"
+        path = "/home/rodro/Aarka/Complementos de Compilacion/cool-cows/src/debbuging/tests/Auto/"
+        input_file = path + "selftype4.cl"
+        # input_file = "dispatch6.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
