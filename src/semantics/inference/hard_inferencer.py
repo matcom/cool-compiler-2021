@@ -1,4 +1,4 @@
-from semantics.errors import InternalError, AttributeError
+from semantics.tools.errors import InternalError, AttributeError
 from ast.inferencer_ast import (
     ArithmeticNode,
     AssignNode,
@@ -33,6 +33,7 @@ from semantics.tools import (
     Context,
     ErrorType,
     Scope,
+    SelfType,
     TypeBag,
     conforms,
     equal,
@@ -255,7 +256,7 @@ class HardInferencer:
                 )
                 expr_node.inferenced_type = ErrorType()
 
-        # var_decl_node.inferenced_type = expr_node.inferenced_type
+        var_decl_node.inferenced_type = expr_node.inferenced_type
         return var_decl_node
 
     @visitor.when(AssignNode)
@@ -332,6 +333,7 @@ class HardInferencer:
             infered_type = ErrorType()
         else:
             caller = caller_type.heads[0]
+            caller = self.current_type if isinstance(caller, SelfType) else caller
             try:
                 method = caller.get_method(node.id)
             except AttributeError as err:
@@ -358,7 +360,8 @@ class HardInferencer:
                 for i in range(len(node.args)):
                     new_args.append(self.visit(node.args[i], scope))
                     if i < len(method.param_types):
-                        arg_type = new_args[-1].inferenced_type
+                        arg_type: TypeBag = new_args[-1].inferenced_type
+                        added_type = arg_type.add_self_type(self.current_type)
                         arg_name = arg_type.generate_name()
                         param_type = method.param_types[i]
                         if not conforms(arg_type, param_type):
@@ -367,6 +370,8 @@ class HardInferencer:
                                 f"TypeError: Argument expression type({arg_name}) does"
                                 f" not conforms parameter declared type({param_type.name})",
                             )
+                        if added_type:
+                            arg_type.remove_self_type(self.current_type)
                 infered_type = TypeBag(type_set, heads)
 
         call_node = MethodCallNode(caller_type, expr_node, new_args, node)

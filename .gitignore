@@ -435,3 +435,7 @@ src/test.cl
 src/class1_error.txt
 src/class1.cl
 src/test.cl
+src/dispatch6.cl
+src/arithmetic8_error.txt
+src/arithmetic8.cl
+src/dispatch6_error.txt

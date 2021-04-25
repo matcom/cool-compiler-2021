@@ -6,9 +6,8 @@ from ast.parser_ast import (
     MethodDeclarationNode,
     AttrDeclarationNode,
 )
-from semantics.errors import SemanticError
-from semantics.tools import SelfType, TypeBag, ErrorType
-from semantics.tools import Context
+from semantics.tools.errors import SemanticError
+from semantics.tools import SelfType, TypeBag, ErrorType, Context
 
 
 class TypeBuilder:
@@ -82,10 +81,26 @@ class TypeBuilder:
             p_name = var.id
             p_type = var.type
             try:
-                params_type.append(self.context.get_type(p_type))
+                params_type.append(self.context.get_type(p_type, selftype=False))
             except SemanticError as err:
                 params_type.append(ErrorType())
-                self.add_error(node, err.text)
+                self.add_error(
+                    node,
+                    err.text
+                    + f" While defining parameter {var.id} in method {node.id}.",
+                )
+            if p_name in params_name:
+                self.add_error(
+                    node,
+                    f"SemanticError: Formal parameter '{p_name}' has been defined multiple times.",
+                )
+                p_name = f"error({p_name})"
+            if p_name == "self":
+                self.add_error(
+                    node,
+                    "SemanticError: Cannot use 'self' as formal parameter identifier.",
+                )
+                p_name = f"error({p_name})"
             params_name.append(p_name)
 
         try:

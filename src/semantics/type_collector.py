@@ -1,7 +1,7 @@
 from ast.parser_ast import ClassDeclarationNode, Node, ProgramNode
 
-from semantics.errors import SemanticError
-from semantics.tools import Context
+from semantics.tools.errors import SemanticError
+from semantics.tools import Context, SelfType
 from utils import visitor
 
 
@@ -115,6 +115,9 @@ class TypeCollector:
         self.context.create_type("Int")
         self.context.create_type("IO")
         self.context.create_type("Bool")
+
+    def init_self_type(self):
+        self.context.types["SELF_TYPE"] = SelfType()
 
     def add_error(self, node: Node, text: str):
         line, col = node.get_position() if node else (0, 0)
