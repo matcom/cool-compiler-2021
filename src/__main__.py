@@ -42,16 +42,16 @@ def run_pipeline(program_ast):
     back =  BackInferencer(context)
     back_ast = back.visit(hard_ast)
 
+    print(back_ast)
     # logger = TypeLogger(context)
     # log = logger.visit(hard_ast, back_ast.scope)
     # print(log)
     if len(errors) > 0:
-        for error in errors:
-            print(error[1])
-        # s = format_errors(errors)
-        # print(s)
+        # for error in errors:
+        #     print(error[1])
+        s = format_errors(errors)
+        print(s)
         exit(1)
-    print(s)
 
 
 def main():
