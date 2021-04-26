@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-=======
 from os import close, error
 from semantics.inference.hard_inferencer import HardInferencer
 from debbuging.type_logger import TypeLogger
->>>>>>> 55759b8cb59c5d6caf6a83058531f096817f19e0
 import sys
 
 from lexing import Lexer
@@ -42,16 +39,19 @@ def run_pipeline(program_ast):
     hard_ast = hard.visit(soft_ast)
     errors += hard.errors
 
-    logger = TypeLogger(context)
-    log = logger.visit(hard_ast, hard_ast.scope)
-    print(log)
+    back =  BackInferencer(context)
+    back_ast = back.visit(hard_ast)
+
+    # logger = TypeLogger(context)
+    # log = logger.visit(hard_ast, back_ast.scope)
+    # print(log)
     if len(errors) > 0:
         for error in errors:
             print(error[1])
         # s = format_errors(errors)
         # print(s)
         exit(1)
-    # print(s)
+    print(s)
 
 
 def main():

@@ -10,4 +10,5 @@ from semantics.tools.type import (
     join_list,
     smart_add,
     try_conform,
+    Type,
 )

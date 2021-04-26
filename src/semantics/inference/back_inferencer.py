@@ -1,5 +1,7 @@
 from copy import deepcopy
 
+from semantics.tools.type import Method, Type
+
 from ast.inferencer_ast import (
     BinaryNode,
     BooleanNode,
@@ -29,17 +31,7 @@ from ast.inferencer_ast import (
     VarDeclarationNode,
     AssignNode,
     MethodCallNode,
-    ArithmeticNode,
 )
-
-# Reducir los AUTO_TYPE declarados a base de el tipo de sus expresiones:
-
-# No te debe hacer falta tirar ningun metodo nuevo, es solo ensamblar.
-
-# Si te hace falta algo en tools.py al final hay varios metodos para trabajar con
-# tipos, si no entiendes me escribes o me llamas. Si crees que te hace falta realizar
-# una operacion que esos metodos no satisfacen la annades al repertorio, pero avisame
-# tambien xq puede estar tirado por una esquina algo que haga algo parecido
 
 
 class BackInferencer:
@@ -92,12 +84,19 @@ class BackInferencer:
 
     @visitor.when(MethodDeclarationNode)
     def visit(self, node: MethodDeclarationNode, scope) -> MethodDeclarationNode:
-        # decl_type = node.inferenced_type
         scope = scope.create_child()
+        current_method = self.current_type.get_method(node.id)
+
+        for idx, typex in zip(current_method.param_names, current_method.param_types):
+            scope.define_variable(idx, typex)
+
         new_body_node = self.visit(node.body, scope)
         body_type = new_body_node.inferenced_type
         new_node = MethodDeclarationNode(node.type, new_body_node, node)
-        
+        decl_type = node.inferenced_type
+        body_type = new_body_node.inferenced_type
+        new_node.inferenced_type = try_conform(decl_type, body_type)
+        return new_node
 
     @visitor.when(BlocksNode)
     def visit(self, node: BlocksNode, scope) -> BlocksNode:
@@ -106,7 +105,7 @@ class BackInferencer:
             new_expr_list.append(self.visit(expr, scope))
 
         new_node = BlocksNode(new_expr_list, node)
-        decl_type = new_node.inferenced_type
+        decl_type = node.inferenced_type
         expr_type = new_expr_list[-1].inferenced_type
         new_node.inferenced_type = try_conform(decl_type, expr_type)
         return new_node
@@ -201,7 +200,19 @@ class BackInferencer:
 
     @visitor.when(MethodCallNode)
     def visit(self, node: MethodCallNode, scope) -> MethodCallNode:
-        pass
+        caller_type: Type = node.caller_type.heads[0]
+        method: Method = caller_type.get_method(node.id)
+
+        new_args = []
+        for arg_expr, param_type in zip(node.args, method.param_types):
+            arg_node = self.visit(arg_expr, scope)
+            arg_node.inferenced_type = try_conform(arg_node.inferenced_type, param_type)
+            new_args.append(arg_node)
+
+        new_expr = self.visit(node.expr,scope) if node.expr else None
+        new_node = MethodCallNode(node.caller_type, new_expr, new_args, node)
+        new_node.inferenced_type = try_conform(node.inferenced_type, method.return_type)
+        return new_node
 
     @visitor.when(BinaryNode)
     def visit(self, node: BinaryNode, scope) -> BinaryNode:

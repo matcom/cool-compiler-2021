@@ -1,22 +1,11 @@
 --The static types of the two sub-expressions must be Int.
 
 class Main {
-	a : B <- new B;
-	b : B;
-	main(): B {
+	a : AUTO_TYPE <- 12;
+	hola(b: AUTO_TYPE): AUTO_TYPE {b};
+	main(): Int {
 		{
-			b <- a.method(); 
-			b;
+			hola(a) + 12;
 		}
 	};
-};
-
-class A {
-	method(): SELF_TYPE {
-		new A
-	};
-};
-
-class B inherits A {
-	
 };
