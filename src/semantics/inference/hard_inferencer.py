@@ -110,9 +110,13 @@ class HardInferencer:
     def visit(self, node, scopex: Scope):
         scope = scopex.next_child()
 
+        new_params = []
+        for param in node.params:
+            new_params.append(self.visit(param,scope))
+
         body_node = self.visit(node.body, scope)
         body_type = body_node.inferenced_type
-        method_node = MethodDeclarationNode(node.type, body_node, node)
+        method_node = MethodDeclarationNode(new_params, node.type, body_node, node)
         method_node.inferenced_type = node.inferenced_type
 
         if equal(body_type, node.body.inferenced_type):

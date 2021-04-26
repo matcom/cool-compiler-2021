@@ -11,4 +11,5 @@ from semantics.tools.type import (
     smart_add,
     try_conform,
     Type,
+    unify
 )

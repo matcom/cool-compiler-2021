@@ -120,8 +120,11 @@ class SoftInferencer:
         scope = scopex.create_child()
         current_method = self.current_type.get_method(node.id)
 
-        for idx, typex in zip(current_method.param_names, current_method.param_types):
-            scope.define_variable(idx, typex)
+        # for idx, typex in zip(current_method.param_names, current_method.param_types):
+        #     scope.define_variable(idx, typex)
+        new_params = []
+        for param in node.params:
+            new_params.append(self.visit(param, scope))
 
         ret_type_decl: TypeBag = current_method.return_type
 
@@ -142,7 +145,9 @@ class SoftInferencer:
         if added_self:
             ret_type_expr.remove_self_type(self.current_type)
 
-        method_node = inf_ast.MethodDeclarationNode(node.type, body_node, node)
+        method_node = inf_ast.MethodDeclarationNode(
+            new_params, node.type, body_node, node
+        )
         method_node.inferenced_type = ret_type_decl
         return method_node
 

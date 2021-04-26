@@ -41,13 +41,15 @@ class AttrDeclarationNode(DeclarationNode):
 
 
 class MethodDeclarationNode(DeclarationNode):
-    def __init__(self, return_type, body, node):
+    def __init__(self, params, return_type, body, node):
         Node.__init__(self, node)
         self.id = node.id
+        # this is a patch, the ideal is to recv a copy of the params
+        self.params: List[VarDeclarationNode] = params
         self.type = return_type
         self.body = body
         # for debbugin purposes
-        self.params = node.params
+        # self.params = node.params
 
 
 class ExpressionNode(Node):

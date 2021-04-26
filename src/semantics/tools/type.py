@@ -557,3 +557,18 @@ def from_dict_to_set(types: dict):
     for typex in types:
         type_set.add(types[typex])
     return type_set
+
+
+def unify(a: TypeBag, b: TypeBag) -> None:
+
+    intersection = set()
+    for type1 in a.type_set:
+        for type2 in b.type_set:
+            if type1.name == type2.name:
+                intersection.add(type1)
+
+    a.type_set = intersection
+    a.update_heads()
+    b.type_set = intersection
+    b.update_heads()
+    return a

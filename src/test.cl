@@ -5,7 +5,7 @@ class Main {
 	hola(b: AUTO_TYPE): AUTO_TYPE {b};
 	main(): Int {
 		{
-			hola(a) + 12;
+			hola(a);
 		}
 	};
 };
