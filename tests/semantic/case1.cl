@@ -17,8 +17,7 @@ class Main inherits IO {
 			esac;
 
 	test: B <- case 0 of
-				b
-				: Bool => new F;
+				b: Bool => new F;
 				i: Int => new E;
 			esac;
 };  

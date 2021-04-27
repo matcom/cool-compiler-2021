@@ -1,4 +1,3 @@
-import types
 from semantics.tools.type import ErrorType
 from utils import visitor
 

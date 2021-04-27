@@ -38,10 +38,10 @@ def run_pipeline(program_ast):
     hard_ast = hard.visit(soft_ast)
     errors += hard.errors
 
-    if len(errors) > 0:
-        s = format_errors(errors)
-        print(s)
-        exit(1)
+    # if len(errors) > 0:
+    #     s = format_errors(errors)
+    #     print(s)
+    #     exit(1)
 
     back = BackInferencer(context)
     back_ast = back.visit(hard_ast)
