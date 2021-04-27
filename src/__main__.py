@@ -11,6 +11,7 @@ from semantics.inference import (
     HardInferencer,
     BackInferencer,
 )
+from semantics.inference.types_inferencer import TypesInferencer
 
 
 def format_errors(errors, s=""):
@@ -39,10 +40,12 @@ def run_pipeline(program_ast):
     hard_ast = hard.visit(soft_ast)
     errors += hard.errors
 
-    # back =  BackInferencer(context)
-    # back_ast = back.visit(hard_ast)
+    back =  BackInferencer(context)
+    back_ast = back.visit(hard_ast)
 
-    # print(back_ast)
+    type_ast = TypesInferencer().visit(back_ast)
+
+    print("Hi")
     # logger = TypeLogger(context)
     # log = logger.visit(hard_ast, back_ast.scope)
     # print(log)

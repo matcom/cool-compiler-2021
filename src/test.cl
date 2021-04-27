@@ -2,7 +2,7 @@
 
 class Main {
 	a : AUTO_TYPE <- 12;
-	hola(b: AUTO_TYPE): AUTO_TYPE {b};
+	hola(b: Int): AUTO_TYPE {b};
 	main(): Int {
 		{
 			hola(a);
