@@ -3,7 +3,9 @@ En este ejemplo se muestra como en la primera etapa de el inferenciador se manej
 *)
 
 class Main inherits IO {
-    main(a : AUTO_TYPE, b : AUTO_TYPE) : AUTO_TYPE {
+    a : AUTO_TYPE; b : AUTO_TYPE;
+
+    main() : AUTO_TYPE {
 		{
 			if b then not b else a fi;
 			case 3 + 5 of

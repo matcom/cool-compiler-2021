@@ -366,7 +366,7 @@ class SoftInferencer:
             caller_type = TypeBag({self.current_type})
         elif node.type is None:
             expr_node = self.visit(node.expr, scope)
-            caller_type = expr_node.inferenced_type.clone()
+            caller_type = expr_node.inferenced_type
         else:
             try:
                 caller_type = self.context.get_type(
