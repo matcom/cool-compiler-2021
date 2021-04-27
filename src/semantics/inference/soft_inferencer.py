@@ -12,6 +12,7 @@ from ast.parser_ast import (
     ComparerNode,
     ComplementNode,
     ConditionalNode,
+    DivNode,
     EqualsNode,
     InstantiateNode,
     IntNode,
@@ -22,9 +23,12 @@ from ast.parser_ast import (
     LoopNode,
     MethodCallNode,
     MethodDeclarationNode,
+    MinusNode,
     Node,
     NotNode,
+    PlusNode,
     ProgramNode,
+    StarNode,
     StringNode,
     VarDeclarationNode,
     VariableNode,
@@ -441,7 +445,14 @@ class SoftInferencer:
     @visitor.when(ArithmeticNode)
     def visit(self, node, scope):
         left_node, right_node = self.__arithmetic_operation(node, scope)
-        arith_node = inf_ast.ArithmeticNode(left_node, right_node, node)
+        if isinstance(node, PlusNode):
+            arith_node = inf_ast.PlusNode(left_node, right_node, node)
+        elif isinstance(node, MinusNode):
+            arith_node = inf_ast.MinusNode(left_node, right_node, node)
+        elif isinstance(node, StarNode):
+            arith_node = inf_ast.StarNode(left_node, right_node, node)
+        elif isinstance(node, DivNode):
+            arith_node = inf_ast.DivNode(left_node, right_node, node)
         arith_node.inferenced_type = self.context.get_type("Int")
         return arith_node
 

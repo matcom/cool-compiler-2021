@@ -48,6 +48,7 @@ class BackInferencer:
         for declaration in node.declarations:
             new_declaration.append(self.visit(declaration, scope.next_child()))
 
+        scope.reset()
         program = ProgramNode(new_declaration, scope, node)
         return program
 
@@ -90,7 +91,7 @@ class BackInferencer:
         new_params = []
         for param in node.params:
             new_params.append(self.visit(param, scope))
-        
+
         current_method.param_types = [param.inferenced_type for param in new_params]
 
         new_body_node = self.visit(node.body, scope)
@@ -181,7 +182,9 @@ class BackInferencer:
     @visitor.when(VarDeclarationNode)
     def visit(self, node: VarDeclarationNode, scope: Scope) -> VarDeclarationNode:
 
-        scope.define_variable(node.id, node.inferenced_type.swap_self_type(self.current_type))
+        scope.define_variable(
+            node.id, node.inferenced_type.swap_self_type(self.current_type)
+        )
         new_node = VarDeclarationNode(node)
 
         if node.expr:
@@ -215,7 +218,6 @@ class BackInferencer:
             arg_node = self.visit(arg_expr, scope)
             arg_node.inferenced_type = unify(arg_node.inferenced_type, param_type)
             new_args.append(arg_node)
-
 
         new_expr = self.visit(node.expr, scope) if node.expr else None
         new_node = MethodCallNode(node.caller_type, new_expr, new_args, node)
