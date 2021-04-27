@@ -120,8 +120,8 @@ class SoftInferencer:
         scope = scopex.create_child()
         current_method = self.current_type.get_method(node.id)
 
-        # for idx, typex in zip(current_method.param_names, current_method.param_types):
-        #     scope.define_variable(idx, typex)
+        for idx, typex in zip(current_method.param_names, current_method.param_types):
+            scope.define_variable(idx, typex)
         new_params = []
         for param in node.params:
             new_params.append(self.visit(param, scope))

@@ -39,10 +39,10 @@ def run_pipeline(program_ast):
     hard_ast = hard.visit(soft_ast)
     errors += hard.errors
 
-    back =  BackInferencer(context)
-    back_ast = back.visit(hard_ast)
+    # back =  BackInferencer(context)
+    # back_ast = back.visit(hard_ast)
 
-    print(back_ast)
+    # print(back_ast)
     # logger = TypeLogger(context)
     # log = logger.visit(hard_ast, back_ast.scope)
     # print(log)

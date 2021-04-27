@@ -108,11 +108,16 @@ class HardInferencer:
 
     @visitor.when(MethodDeclarationNode)
     def visit(self, node, scopex: Scope):
-        scope = scopex.next_child()
+        scope: Scope = scopex.next_child()
+        current_method = self.current_type.get_method(node.id)
+
+        for idx, typex in zip(current_method.param_names, current_method.param_types):
+            scope.define_variable(idx, typex)
 
         new_params = []
         for param in node.params:
-            new_params.append(self.visit(param,scope))
+            new_params.append(self.visit(param, scope))
+            # scope.define_variable(param.name, )
 
         body_node = self.visit(node.body, scope)
         body_type = body_node.inferenced_type
