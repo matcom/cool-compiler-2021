@@ -90,5 +90,3 @@ def main():
 
 main()
 
-
-# TODO: la varibel 'self' no tiene inferenced_type
