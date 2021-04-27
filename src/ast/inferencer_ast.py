@@ -126,7 +126,7 @@ class MethodCallNode(ExpressionNode):
         self.expr = expr
         self.args = args
         self.id = node.id
-        self.type = node.type
+        self.at_type = node.type
 
 
 class UnaryNode(ExpressionNode):
