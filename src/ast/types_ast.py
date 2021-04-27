@@ -197,9 +197,7 @@ class StringNode(AtomicNode):
 
 
 class VariableNode(AtomicNode):
-    def __init__(self, node):
-        super().__init__(node)
-        self.defined = False
+    pass
 
 
 class InstantiateNode(AtomicNode):
