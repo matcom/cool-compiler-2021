@@ -6,6 +6,7 @@ class Main {
 	main(): Int {
 		{
 			hola(a);
+			self;
 		}
 	};
 };

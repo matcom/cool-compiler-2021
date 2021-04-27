@@ -43,7 +43,8 @@ from ast.inferencer_ast import (
 
 class TypesInferencer:
     def __init__(self) -> None:
-        pass
+        self.errors = []
+        
 
     @visitor.on("node")
     def visit(self, node):
@@ -227,6 +228,9 @@ class TypesInferencer:
     def _reduce_to_type(self, bag: TypeBag, node: Node):
         if len(bag.heads) > 1:
             self.add_error(node, "ErrorType: Ambiguous type declaration")
+            return ErrorType()
+        if len(bag.heads) == 0:
+            self.add_error(node, "ErrorType: Cannot infer type")
             return ErrorType()
         return bag.heads[0]
 

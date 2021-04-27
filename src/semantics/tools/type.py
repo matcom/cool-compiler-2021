@@ -331,9 +331,10 @@ class TypeBag:
         self.update_heads()
 
     def generate_name(self):
-        if len(self.type_set) == 1:
-            self.name = self.heads[0].name
-            return self.name
+        # TODO: Cuando se tiene en el type_set un SelfType() y no hay nada en head explota
+        # if len(self.type_set) == 1:
+        #     self.name = self.heads[0].name
+        #     return self.name
 
         s = "{"
         s += ", ".join(
@@ -564,8 +565,10 @@ def unify(a: TypeBag, b: TypeBag) -> None:
     intersection = set()
     for type1 in a.type_set:
         for type2 in b.type_set:
-            if type1.name == type2.name:
+            if type1.name  == type2.name:
+            # if type1.conforms_to(type2) or type2.conforms_to(type1):
                 intersection.add(type1)
+
 
     a.type_set = intersection
     a.update_heads()
