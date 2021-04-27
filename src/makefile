@@ -1,7 +1,12 @@
 .PHONY: clean
 
+VERSION := 2.0.0
+
 main:
 	# Compiling the compiler :)
+
+version:
+	@echo "COOL Compiler $(VERSION)"
 
 install:
 	pip3 install ply
