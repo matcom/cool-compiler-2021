@@ -73,7 +73,7 @@ class CaseOptionNode(ExpressionNode):
     def __init__(self, ret_expr, node):
         Node.__init__(self, node)
         self.id = node.id
-        self.decl_type = node.type
+        self.decl_type = node.decl_type
         self.expr = ret_expr
 
 
@@ -114,6 +114,7 @@ class MethodCallNode(ExpressionNode):
         self.expr = expr
         self.args = args
         self.id = node.id
+        self.at_type = node.at_type
 
 
 class UnaryNode(ExpressionNode):
