@@ -561,14 +561,12 @@ def from_dict_to_set(types: dict):
 
 
 def unify(a: TypeBag, b: TypeBag) -> None:
-
     intersection = set()
     for type1 in a.type_set:
         for type2 in b.type_set:
-            if type1.name  == type2.name:
-            # if type1.conforms_to(type2) or type2.conforms_to(type1):
+            if type1.name == type2.name:
+                # if type1.conforms_to(type2) or type2.conforms_to(type1):
                 intersection.add(type1)
-
 
     a.type_set = intersection
     a.update_heads()
