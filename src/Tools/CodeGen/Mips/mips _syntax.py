@@ -105,14 +105,7 @@ class Mips:
     def write_data(self, data: str, tabs: int = 0):
         self.DOTDATA.append(f"{data}")
 
-    def compile(self):
-        return "\n".join(
-            [Directive.data.value]
-            + self.DOTDATA
-            + []
-            + [Directive.text.value]
-            + self.DOTTEXT
-        )
+
 
     def push(self, register: Register):
         self.addi(Reg.sp, Reg.sp, -DATA_SIZE)
