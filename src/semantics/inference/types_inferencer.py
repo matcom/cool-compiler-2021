@@ -1,9 +1,22 @@
+import types
 from semantics.tools.type import ErrorType
 from utils import visitor
 
 from semantics.tools import TypeBag
 import ast.types_ast as types_ast
 from ast.inferencer_ast import (
+    BinaryNode,
+    BooleanNode,
+    ComplementNode,
+    DivNode,
+    EqualsNode,
+    InstantiateNode,
+    IntNode,
+    LessNode,
+    LessOrEqualNode,
+    MinusNode,
+    NotNode,
+    PlusNode,
     ProgramNode,
     ClassDeclarationNode,
     MethodDeclarationNode,
@@ -14,20 +27,17 @@ from ast.inferencer_ast import (
     CaseOptionNode,
     LoopNode,
     LetNode,
+    StarNode,
+    StringNode,
     VarDeclarationNode,
     AssignNode,
     MethodCallNode,
-    BinaryNode,
-    BooleanNode,
     ClassDeclarationNode,
-    InstantiateNode,
-    IntNode,
     ProgramNode,
     AttrDeclarationNode,
     Node,
-    StringNode,
-    UnaryNode,
     VariableNode,
+    IsVoidNode,
 )
 
 
@@ -98,10 +108,121 @@ class TypesInferencer:
 
     @visitor.when(CaseOptionNode)
     def visit(self, node: CaseOptionNode) -> types_ast.CaseOptionNode:
-        return types_ast.CaseOptionNode(self.visit(node.expr),node)
+        return types_ast.CaseOptionNode(self.visit(node.expr), node)
 
-    @visitor.when()
-        
+    @visitor.when(LoopNode)
+    def visit(self, node: LoopNode) -> types_ast.LoopNode:
+        condition = self.visit(node.condition)
+        body = self.visit(node.body)
+        new_node = types_ast.LoopNode(condition, body, node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(LetNode)
+    def visit(self, node: LetNode) -> types_ast.LetNode:
+        var_decl_list = [self.visit(var_decl) for var_decl in node.var_decl_list]
+        in_expr = self.visit(node.in_expr)
+        new_node = types_ast.LetNode(var_decl_list, in_expr, node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(VarDeclarationNode)
+    def visit(self, node: VarDeclarationNode) -> types_ast.VarDeclarationNode:
+        new_node = types_ast.VarDeclarationNode(node)
+        if node.expr:
+            new_node.expr = self.visit(node.expr)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(AssignNode)
+    def visit(self, node: AssignNode) -> types_ast.AssignNode:
+        expr = self.visit(node.expr)
+        new_node = types_ast.AssignNode(expr, node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(MethodCallNode)
+    def visit(self, node: MethodCallNode) -> types_ast.MethodCallNode:
+        args = [self.visit(arg) for arg in node.args]
+        caller_expr = self.visit(node.expr)
+        new_node = types_ast.MethodCallNode(node.caller_type, caller_expr, args, node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(VariableNode)
+    def visit(self, node: VariableNode) -> types_ast.VariableNode:
+        new_node = types_ast.VariableNode(node)
+        if node.defined:
+            new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(IsVoidNode)
+    def visit(self, node: IsVoidNode) -> types_ast.IsVoidNode:
+        expr = self.visit(node.expr)
+        new_node = types_ast.IsVoidNode(expr, node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(NotNode)
+    def visit(self, node: NotNode) -> types_ast.NotNode:
+        expr = self.visit(node.expr)
+        new_node = types_ast.NotNode(expr, node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(ComplementNode)
+    def visit(self, node: ComplementNode) -> types_ast.ComplementNode:
+        expr = self.visit(node.expr)
+        new_node = types_ast.ComplementNode(expr, node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(BinaryNode)
+    def visit(self, node: EqualsNode) -> types_ast.PlusNode:
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+
+        if isinstance(PlusNode):
+            new_node = types_ast.PlusNode(left, right, node)
+        elif isinstance(MinusNode):
+            new_node = types_ast.MinusNode(left, right, node)
+        elif isinstance(DivNode):
+            new_node = types_ast.DivNode(left, right, node)
+        elif isinstance(StarNode):
+            new_node = types_ast.StarNode(left, right, node)
+        elif isinstance(LessNode):
+            new_node = types_ast.LessNode(left, right, node)
+        elif isinstance(LessOrEqualNode):
+            new_node = types_ast.LessOrEqualNode(left, right, node)
+        elif isinstance(EqualsNode):
+            new_node = types_ast.EqualsNode(left, right, node)
+
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(BooleanNode)
+    def visit(self, node: BooleanNode) -> types_ast.BooleanNode:
+        new_node = types_ast.BooleanNode(node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(StringNode)
+    def visit(self, node: StringNode) -> types_ast.StringNode:
+        new_node = types_ast.StringNode(node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(IntNode)
+    def visit(self, node: IntNode) -> types_ast.IntNode:
+        new_node = types_ast.IntNode(node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
+
+    @visitor.when(InstantiateNode)
+    def visit(self, node: InstantiateNode) -> types_ast.InstantiateNode:
+        new_node = types_ast.InstantiateNode(node)
+        new_node.type = self._reduce_to_type(node.inferenced_type)
+        return new_node
 
     def _reduce_to_type(self, bag: TypeBag, node: Node):
         if bag.heads > 1:
