@@ -82,6 +82,7 @@ class CaseOptionNode(ExpressionNode):
         Node.__init__(self, node)
         self.id = node.id
         self.expr = ret_expr
+        self.decl_type = node.type
         # For debbuging purposes
         self.type = node.type
 
