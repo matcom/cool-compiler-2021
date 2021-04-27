@@ -1,5 +1,3 @@
-from os import close, error
-from semantics.inference.hard_inferencer import HardInferencer
 from debbuging.type_logger import TypeLogger
 import sys
 
@@ -10,8 +8,8 @@ from semantics.inference import (
     SoftInferencer,
     HardInferencer,
     BackInferencer,
+    TypesInferencer,
 )
-from semantics.inference.types_inferencer import TypesInferencer
 
 
 def format_errors(errors, s=""):
@@ -40,23 +38,26 @@ def run_pipeline(program_ast):
     hard_ast = hard.visit(soft_ast)
     errors += hard.errors
 
-    back =  BackInferencer(context)
-    back_ast = back.visit(hard_ast)
-
-    types = TypesInferencer()
-    types_ast  = types.visit(back_ast)
-    errors += types.errors
-
-    print("Hi")
-    # logger = TypeLogger(context)
-    # log = logger.visit(hard_ast, back_ast.scope)
-    # print(log)
     if len(errors) > 0:
-        # for error in errors:
-        #     print(error[1])
         s = format_errors(errors)
         print(s)
         exit(1)
+
+    back = BackInferencer(context)
+    back_ast = back.visit(hard_ast)
+
+    types = TypesInferencer()
+    types_ast = types.visit(back_ast)
+    errors += types.errors
+
+    if len(errors) > 0:
+        s = format_errors(errors)
+        print(s)
+        exit(1)
+
+    # logger = TypeLogger(context)
+    # log = logger.visit(hard_ast, back_ast.scope)
+    # print(log)
 
 
 def main():
@@ -88,3 +89,6 @@ def main():
 
 
 main()
+
+
+# TODO: la varibel 'self' no tiene inferenced_type

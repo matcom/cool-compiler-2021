@@ -2,10 +2,11 @@
 
 class Main {
 	a : AUTO_TYPE <- 12;
-	hola(b: Int): AUTO_TYPE {b};
-	main(): Int {
+--	hola(b: Int): AUTO_TYPE {b};
+	main(): AUTO_TYPE {
 		{
-			hola(a);
+--			hola(a);
+--			a;
 			self;
 		}
 	};

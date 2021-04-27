@@ -94,7 +94,7 @@ class BackInferencer:
         current_method.param_types = [param.inferenced_type for param in new_params]
 
         new_body_node = self.visit(node.body, scope)
-        body_type = new_body_node.inferenced_type
+        body_type = new_body_node.inferenced_type.swap_self_type(self.current_type)
         new_node = MethodDeclarationNode(new_params, node.type, new_body_node, node)
         decl_type = node.inferenced_type
         body_type = new_body_node.inferenced_type
@@ -181,7 +181,7 @@ class BackInferencer:
     @visitor.when(VarDeclarationNode)
     def visit(self, node: VarDeclarationNode, scope: Scope) -> VarDeclarationNode:
 
-        scope.define_variable(node.id, node.inferenced_type)
+        scope.define_variable(node.id, node.inferenced_type.swap_self_type(self.current_type))
         new_node = VarDeclarationNode(node)
 
         if node.expr:
@@ -245,7 +245,7 @@ class BackInferencer:
     def visit(self, node: VariableNode, scope: Scope) -> VariableNode:
         new_node = deepcopy(node)
         if node.defined:
-            decl_type = node.inferenced_type
+            decl_type = node.inferenced_type.swap_self_type(self.current_type)
             expr_type = scope.find_variable(node.value).get_type()
             new_node.inferenced_type = unify(decl_type, expr_type)
             return new_node
