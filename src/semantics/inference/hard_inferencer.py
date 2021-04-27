@@ -11,6 +11,7 @@ from ast.inferencer_ast import (
     ComparerNode,
     ComplementNode,
     ConditionalNode,
+    DivNode,
     EqualsNode,
     InstantiateNode,
     IntNode,
@@ -21,9 +22,12 @@ from ast.inferencer_ast import (
     LoopNode,
     MethodCallNode,
     MethodDeclarationNode,
+    MinusNode,
     Node,
     NotNode,
+    PlusNode,
     ProgramNode,
+    StarNode,
     StringNode,
     VarDeclarationNode,
     VariableNode,
@@ -390,7 +394,14 @@ class HardInferencer:
     @visitor.when(ArithmeticNode)
     def visit(self, node, scope):
         left_node, right_node = self.__arithmetic_operation(node, scope)
-        arith_node = ArithmeticNode(left_node, right_node, node)
+        if isinstance(node, PlusNode):
+            arith_node = PlusNode(left_node, right_node, node)
+        elif isinstance(node, MinusNode):
+            arith_node = MinusNode(left_node, right_node, node)
+        elif isinstance(node, StarNode):
+            arith_node = StarNode(left_node, right_node, node)
+        elif isinstance(node, DivNode):
+            arith_node = DivNode(left_node, right_node, node)
         arith_node.inferenced_type = self.context.get_type("Int")
         return arith_node
 
