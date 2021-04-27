@@ -1,5 +1,6 @@
 class Main inherits IO {
-    main(n : AUTO_TYPE) : AUTO_TYPE {
+	n:AUTO_TYPE;
+    	main() : AUTO_TYPE {
 		n + 1 
 	}; 
 };
