@@ -4,6 +4,8 @@ from Tools.Tools.evaluation import evaluate_reverse_parse
 from Tools.Semantic.Type_Collector import Type_Collector
 from Tools.Semantic.Type_Builder import Type_Builder
 from Tools.Semantic.Type_Checker import Type_Checker
+from Tools.CIL.COOLToCILVisitor import COOLToCILVisitor
+from Tools.CIL.CILAst import get_formatter
 
 def main(args):
     try:
@@ -23,26 +25,31 @@ def main(args):
     for e in CoolParser.errors:
         print(e)
     if any(CoolParser.errors): exit(1)
-    ast = evaluate_reverse_parse(productions, operations, tokens)
+    COOLast = evaluate_reverse_parse(productions, operations, tokens)
 
     type_Collector = Type_Collector()
-    type_Collector.visit(ast)
+    type_Collector.visit(COOLast)
     for e in type_Collector.errors:
         print(e)
     if any(type_Collector.errors): exit(1)
     context = type_Collector.Context
 
     type_Builder = Type_Builder(context)
-    type_Builder.visit(ast)
+    type_Builder.visit(COOLast)
     for e in type_Builder.errors:
         print(e)
     if any(type_Builder.errors): exit(1)
 
     type_Checker = Type_Checker(context)
-    type_Checker.visit(ast)
+    scope = type_Checker.visit(COOLast)
     for e in type_Checker.errors:
         print(e)
     if any(type_Checker.errors): exit(1)
+
+    CILVisitor = COOLToCILVisitor(type_Checker.Context)
+    CILast = CILVisitor.visit(COOLast, scope)
+    print(get_formatter()(CILast))
+
 
 
 

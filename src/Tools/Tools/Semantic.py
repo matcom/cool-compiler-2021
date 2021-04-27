@@ -240,6 +240,10 @@ class Context:
         except KeyError:
             raise SemanticException(f'Type {name} not defined.')
 
+    def subtree(self, name : str):
+        type = self.get_type(name)
+        return (i for i in self.types.values() if i.conforms_to(type))
+
     def __str__(self):
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
 
@@ -252,7 +256,7 @@ class Scope:
     def __init__(self, parent = None):
         self.parent = parent
         self.locals = []
-        self.childs = []
+        self.childs : [Scope] = []
 
     # Crea un scope hijo
     def create_child(self):

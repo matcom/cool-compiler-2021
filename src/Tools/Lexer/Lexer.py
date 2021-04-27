@@ -211,7 +211,7 @@ class Lexer:
 
     def t_string_SCAPED_CHARACTER(self, t):
         r'\\.'
-        self.current_string += t.value[1]
+        self.current_string += '\\' + t.value[1]
 
     def t_string_eof(self, t):
         self.errors.append(LexicographicError(t.lineno,
