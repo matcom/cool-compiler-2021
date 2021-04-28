@@ -1,4 +1,5 @@
 import os
+import argparse
 import itertools
 from semantic.types import Type, SelfType
 
@@ -16,6 +17,20 @@ class Token:
         return str(self)
 
 class Utils:
+
+    @staticmethod
+    def GetArguments():
+
+        parser = argparse.ArgumentParser(description='Run a COOL Compiler.')
+
+        parser.add_argument('input_file', type=str,  
+                                help='Path of the COOL program.')
+        parser.add_argument('output_file', type=str, 
+                                help='Path of the MIPS program.')
+        parser.add_argument('-d', '--debug', type=bool, dest='debug', 
+                    default=False, help='Save all files for debugging.')
+
+        return parser.parse_args()
 
     @staticmethod
     def GetName(input_file : str) -> str:
