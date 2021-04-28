@@ -5,7 +5,7 @@ from semantic.visitors.type_collector import TypeCollector
 
 class SemanticAnalyzer:
 
-    def __init__(self, ast, debug_path, debug=False):
+    def __init__(self, ast, debug_path, debug):
         self.ast = ast
         self.debug_path = debug_path
         self.debug = debug
@@ -28,7 +28,7 @@ class SemanticAnalyzer:
         checker = VarCollector(self.context, self.errors)
         self.scope = checker.visit(self.ast)
         print(self.scope)
-        Utils.Write(self.debug_path, '.scope', str(self.scope)) if self.debug_path else None
+        Utils.Write(self.debug_path, '.scope', str(self.scope)) if self.debug else None
 
         
 
