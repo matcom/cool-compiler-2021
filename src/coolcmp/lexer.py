@@ -1,7 +1,10 @@
 from ply import lex
 from ply.lex import TOKEN
 
-import errors as err
+try:
+    import errors as err
+except ImportError:
+    import coolcmp.errors as err
 
 
 class Lexer:
@@ -13,7 +16,7 @@ class Lexer:
         self.errors = []
 
         if build_lexer:
-            self.lexer = lex.lex(module=self, debug=True)
+            self.lexer = lex.lex(module=self, debug=debug)
 
     def build(self, **kwargs):
         self.lexer = lex.lex(module=self, **kwargs)
@@ -251,4 +254,4 @@ if __name__ == '__main__':
         except IndexError:
             break
 
-    print(len(lexer.errors))
+    # print(len(lexer.errors))
