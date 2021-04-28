@@ -25,6 +25,16 @@ clean: ## Remove temporary files
 	rm -rf build/*
 	rm -rf ../tests/*/*.mips
 
+my_clean: ## Remove others temporary files
+	rm -rf debug/*.*
+	rm -rf lexing/__pycache__/
+	rm -rf parsing/__pycache__/
+	rm -rf parsing/parser.out
+	rm -rf parsing/parsetab.py
+	rm -rf semantic/__pycache__/
+	rm -rf semantic/visitors/__pycache__/
+	rm -rf utils/__pycache__/
+
 test: ## Run test cases for each stage
 	pytest ../tests -v --tb=short -m=${TAG}
 
