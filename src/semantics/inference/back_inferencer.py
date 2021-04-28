@@ -68,6 +68,7 @@ class BackInferencer:
         attr_node = AttrDeclarationNode(node)
 
         if not node.expr:
+            attr_node.inferenced_type = node.inferenced_type
             return attr_node
 
         expr_node = self.visit(node.expr, scope)
@@ -120,12 +121,12 @@ class BackInferencer:
         new_then_node = self.visit(node.then_body, scope)
         new_else_node = self.visit(node.else_body, scope)
 
-        join_type = join(
-            new_condition_node.inferenced_type, new_else_node.inferenced_type
-        )
+        join_type = join(new_then_node.inferenced_type, new_else_node.inferenced_type)
         decl_type = node.inferenced_type
         expr_type = join_type
-        new_node = ConditionalNode(new_then_node, new_then_node, new_else_node, node)
+        new_node = ConditionalNode(
+            new_condition_node, new_then_node, new_else_node, node
+        )
         new_node.inferenced_type = unify(decl_type, expr_type)
         return new_node
 

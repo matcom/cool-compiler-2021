@@ -64,7 +64,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "debbuging/tests/Auto/point2.cl"
+        input_file = "src/test.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
