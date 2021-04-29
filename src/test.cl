@@ -8,6 +8,6 @@ class Main {
         c <- b;
         d <- c;
         e <- f;
-        f <- 12; 
+        f + 12; 
     }}; 
 };

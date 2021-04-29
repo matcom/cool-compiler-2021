@@ -228,7 +228,7 @@ class BackInferencer:
 
     @visitor.when(BinaryNode)
     def visit(self, node: BinaryNode, scope) -> BinaryNode:
-        new_node = deepcopy(node)
+        new_node = copy(node)
         new_left_node = self.visit(node.left, scope)
         new_right_node = self.visit(node.right, scope)
 
