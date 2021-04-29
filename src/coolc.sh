@@ -5,7 +5,7 @@ OUTPUT_FILE=${INPUT_FILE:0: -2}mips
 
 # Si su compilador no lo hace ya, aquí puede imprimir la información de contacto
 echo "COOL-Compiler v0.0.1"        # TODO: Recuerde cambiar estas
-echo "Copyright (c) 2021: Samuel David Suárez Roddríguez, Enmanuel Verdesia Suárez"    # TODO: líneas a los valores correctos
+# echo "Copyright (c) 2021: Samuel David Suárez Roddríguez, Enmanuel Verdesia Suárez"    # TODO: líneas a los valores correctos
 
 # Llamar al compilador
 echo "Compiling $INPUT_FILE into $OUTPUT_FILE"

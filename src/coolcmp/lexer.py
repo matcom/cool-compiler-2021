@@ -161,16 +161,21 @@ class Lexer:
 
         if lookahead == '\n':
             t.lexer.lineno += 1
-        elif lookahead == '0':  # TODO: Not detecting null caracter in sting3.cl
-            line, col = t.lexer.lineno, self.find_column(t.lexer.lexdata, t)
-            self.errors.append(err.NULL_STR % (line, col + 1))
 
-    @TOKEN(r'[^"\n\\\0]+')
+    @TOKEN(r'\x00')
+    def t_STR_null(self, t: lex.LexToken):
+        t.lexer.skip(1)
+        line, col = t.lexer.lineno, self.find_column(t.lexer.lexdata, t)
+        self.errors.append(err.NULL_STR % (line, col))
+
+    @TOKEN(r'[^"\n\\\x00]+')
     def t_STR_char(self, t: lex.LexToken):
         pass
 
     def t_STR_error(self, t: lex.LexToken):
         t.lexer.skip(1)
+        line, col = t.lexer.lineno, self.find_column(t.lexer.lexdata, t)
+        self.errors.append(err.EOF_STR % (line, col))
 
     def t_STR_eof(self, t: lex.LexToken):
         line, col = t.lexer.lineno, self.find_column(t.lexer.lexdata, t)
