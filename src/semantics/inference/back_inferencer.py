@@ -1,4 +1,4 @@
-from copy import deepcopy
+from copy import copy, deepcopy
 
 from semantics.tools.type import Method, Type
 from semantics.tools import Context, Scope, TypeBag, join, join_list, unify
@@ -43,12 +43,11 @@ class BackInferencer:
 
     @visitor.when(ProgramNode)
     def visit(self, node: ProgramNode) -> ProgramNode:
-        scope: Scope = node.scope
+        scope = Scope()
         new_declaration = []
         for declaration in node.declarations:
-            new_declaration.append(self.visit(declaration, scope.next_child()))
+            new_declaration.append(self.visit(declaration, scope.create_child()))
 
-        scope.reset()
         program = ProgramNode(new_declaration, scope, node)
         return program
 
@@ -240,7 +239,7 @@ class BackInferencer:
 
     @visitor.when(UnaryNode)
     def visit(self, node: UnaryNode, scope) -> UnaryNode:
-        new_node = deepcopy(node)
+        new_node = copy(node)
         new_expr_node = self.visit(node.expr, scope)
 
         new_node.expr = new_expr_node
@@ -248,7 +247,7 @@ class BackInferencer:
 
     @visitor.when(VariableNode)
     def visit(self, node: VariableNode, scope: Scope) -> VariableNode:
-        new_node = deepcopy(node)
+        new_node = copy(node)
         if node.defined:
             decl_type = node.inferenced_type.swap_self_type(self.current_type)
             expr_type = scope.find_variable(node.value).get_type()
@@ -258,16 +257,16 @@ class BackInferencer:
 
     @visitor.when(InstantiateNode)
     def visit(self, node, scope) -> InstantiateNode:
-        return deepcopy(node)
+        return copy(node)
 
     @visitor.when(IntNode)
     def visit(self, node, scope) -> IntNode:
-        return deepcopy(node)
+        return copy(node)
 
     @visitor.when(StringNode)
     def visit(self, node, scope) -> StringNode:
-        return deepcopy(node)
+        return copy(node)
 
     @visitor.when(BooleanNode)
     def visit(self, node, scope) -> BooleanNode:
-        return deepcopy(node)
+        return copy(node)
