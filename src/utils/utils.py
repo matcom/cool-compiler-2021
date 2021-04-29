@@ -27,8 +27,9 @@ class Utils:
                                 help='Path of the COOL program.')
         parser.add_argument('output_file', type=str, 
                                 help='Path of the MIPS program.')
-        parser.add_argument('-d', '--debug', type=bool, dest='debug', 
-                    default=False, help='Save all files for debugging.')
+        parser.add_argument('-d', '--debug', action='store_true', 
+                            dest='debug', default=False, 
+                                help='Save all files for debugging.')
 
         return parser.parse_args()
 
