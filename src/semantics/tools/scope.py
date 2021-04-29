@@ -8,8 +8,8 @@ class VariableInfo:
         self.type: TypeBag = vtype
 
     def get_type(self) -> TypeBag or ErrorType:
-        if len(self.type.type_set) == 0:
-            self.type = ErrorType()
+        # if len(self.type.type_set) == 0:
+        #     self.type = ErrorType()
         return self.type
 
     def __str__(self):

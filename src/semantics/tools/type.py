@@ -257,6 +257,10 @@ class TypeBag:
         self.conform_list = []
         self.generate_name()
 
+    @property
+    def error_type(self):
+        return len(self.heads) > 0
+
     def set_conditions(self, condition_list, conform_list):
         self.condition_list = condition_list
         self.conform_list = conform_list
@@ -306,13 +310,6 @@ class TypeBag:
         except KeyError:
             return self
 
-        # for i in range(len(self.heads)):
-        #    typex = self.heads[i]
-        #    if typex.name == remove_type.name:
-        #        self.heads[i] = add_type
-        #        break
-        #
-        # self.generate_name()
         self.update_heads()
         return self
 
@@ -331,7 +328,10 @@ class TypeBag:
         self.update_heads()
 
     def generate_name(self):
-        # TODO: Cuando se tiene en el type_set un SelfType() y no hay nada en head explota
+        if self.error_type:
+            self.name = "<error-type>"
+            return self.name
+
         if len(self.type_set) == 1:
             self.name = self.heads[0].name
             return self.name

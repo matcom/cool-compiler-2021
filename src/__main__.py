@@ -9,6 +9,7 @@ from semantics.inference import (
     HardInferencer,
     BackInferencer,
     TypesInferencer,
+    types_inferencer,
 )
 
 
@@ -45,7 +46,9 @@ def run_pipeline(program_ast):
 
     back = BackInferencer(context)
     back_ast = back.visit(hard_ast)
+    # back_ast = hard.visit(back_ast)
     back_ast = back.visit(back_ast)
+    # back_ast = hard.visit(back_ast)
     back_ast = back.visit(back_ast)
     back_ast = back.visit(back_ast)
 
@@ -53,21 +56,23 @@ def run_pipeline(program_ast):
     types_ast = types.visit(back_ast)
     errors += types.errors
 
-    # logger = TypeLogger(context)
-    # log = logger.visit(back_ast, back_ast.scope)
-    # print(log)
+    logger = TypeLogger(context)
+    log = logger.visit(back_ast, back_ast.scope)
+    print(log)
 
     if len(errors) > 0:
         s = format_errors(errors)
         print(s)
         exit(1)
 
+    return types_ast
+
 
 def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "src/test.cl"
+        input_file = "src/debbuging/tests/Auto/simple3.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
