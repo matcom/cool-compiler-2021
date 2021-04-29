@@ -86,14 +86,14 @@ class BackInferencer:
         scope = scope.create_child()
         current_method: Method = self.current_type.get_method(node.id)
 
-        # for idx, typex in zip(current_method.param_names, current_method.param_types):
-        #     scope.define_variable(idx, typex)
-
         new_params = []
         for param in node.params:
             new_params.append(self.visit(param, scope))
 
-        current_method.param_types = [param.inferenced_type for param in new_params]
+        current_method.param_types  = [
+            unify(new_param.inferenced_type, typex)
+            for new_param, typex in zip(new_params, current_method.param_types)
+        ]
 
         new_body_node = self.visit(node.body, scope)
         body_type = new_body_node.inferenced_type.swap_self_type(self.current_type)
@@ -184,7 +184,7 @@ class BackInferencer:
     def visit(self, node: VarDeclarationNode, scope: Scope) -> VarDeclarationNode:
 
         scope.define_variable(
-            node.id, node.inferenced_type #.swap_self_type(self.current_type)
+            node.id, node.inferenced_type.swap_self_type(self.current_type)
         )
         new_node = VarDeclarationNode(node)
 
@@ -271,8 +271,3 @@ class BackInferencer:
     @visitor.when(BooleanNode)
     def visit(self, node, scope) -> BooleanNode:
         return deepcopy(node)
-
-    # Este metodo deber ser innecesario pues todos los errores son recogidos previamente
-    def add_error(self, node: Node, text: str):
-        line, col = node.get_position() if node is not None else (0, 0)
-        self.errors.append(((line, col), f"({line}, {col}) - " + text))
