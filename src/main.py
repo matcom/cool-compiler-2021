@@ -9,16 +9,16 @@ from semantic.semantic import SemanticAnalyzer
 
 class Compiler:
     
-    def __init__(self, input_file, output_file):
+    def __init__(self, input_file:str, output_file:str, debug:bool):
         self.input_file = Path(input_file)
         self.output_file = Path(output_file)
+        self.debug = debug
         self.code = ''
         self.lexer = None
         self.parser = None
         self.ast = None
         self.context = None
         self.scope = None
-        self.debug = True
 
         name = Utils.GetName(input_file)
         self.debug_path = f'./debug/{name}'
@@ -36,7 +36,7 @@ class Compiler:
             print(CompilerError(0, 0, error_text))
             exit(1)
 
-        Utils.Write(self.debug_path, '.cl', self.code)
+        Utils.Write(self.debug_path, '.cl', self.code) if self.debug else None
         self.steps = [ self.lexing, self.parsing, self.semantics ]
 
     def compile(self):
@@ -95,10 +95,14 @@ class Compiler:
             print('COMPLETED SEMANTIC ANALYSER!!!')
 
 def main():
-    input_file = sys.argv[1]
-    output_file = sys.argv[2]
 
-    Compiler(input_file, output_file).compile()
+    args = Utils.GetArguments()
+
+    input_file = args.input_file
+    output_file = args.output_file
+    debug = args.debug
+
+    Compiler(input_file, output_file, debug).compile()
 
 if __name__ == '__main__':
     main()
