@@ -184,7 +184,7 @@ class BackInferencer:
     def visit(self, node: VarDeclarationNode, scope: Scope) -> VarDeclarationNode:
 
         scope.define_variable(
-            node.id, node.inferenced_type.swap_self_type(self.current_type)
+            node.id, node.inferenced_type #.swap_self_type(self.current_type)
         )
         new_node = VarDeclarationNode(node)
 
@@ -203,9 +203,11 @@ class BackInferencer:
         new_expr_node = self.visit(node.expr, scope)
         if node.defined:
             decl_type = scope.find_variable(node.id).get_type()
-        decl_type = node.inferenced_type
+        else:
+            decl_type = new_expr_node.inferenced_type
         expr_type = new_expr_node.inferenced_type
         new_node = AssignNode(new_expr_node, node)
+        new_node.defined = node.defined
         new_node.inferenced_type = unify(decl_type, expr_type)
         return new_node
 
@@ -255,7 +257,7 @@ class BackInferencer:
         return new_node
 
     @visitor.when(InstantiateNode)
-    def visit(self, node: InstantiateNode, scope) -> InstantiateNode:
+    def visit(self, node, scope) -> InstantiateNode:
         return deepcopy(node)
 
     @visitor.when(IntNode)

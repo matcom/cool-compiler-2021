@@ -3,7 +3,7 @@ class Main inherits IO {
     b : AUTO_TYPE;
     c : AUTO_TYPE;
     d : AUTO_TYPE;
-    main(n : AUTO_TYPE) : AUTO_TYPE {
+    main() : AUTO_TYPE {
 		{
 			a <- b;
 			b <- c;

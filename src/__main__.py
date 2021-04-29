@@ -45,6 +45,8 @@ def run_pipeline(program_ast):
 
     back = BackInferencer(context)
     back_ast = back.visit(hard_ast)
+    back_ast = back.visit(back_ast)
+    back_ast = back.visit(back_ast)
 
     types = TypesInferencer()
     types_ast = types.visit(back_ast)

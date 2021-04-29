@@ -567,10 +567,24 @@ def unify(a: TypeBag, b: TypeBag) -> None:
             if type1.name  == type2.name:
                 # TODO: Mejorar la interseccion
             # if type1.conforms_to(type2) or type2.conforms_to(type1):
-                intersection.add(type1)
+                intersection.add(type1.name)
+    to_remove = []
+    for typex in a.type_set:
+        if typex.name not in intersection:
+            to_remove.append(typex)
+    for typex in to_remove:
+        a.type_set.remove(typex)
 
-    a.type_set = intersection
+    to_remove = []
+    for typex in b.type_set:
+        if typex.name not in intersection:
+            to_remove.append(typex)
+    for typex in to_remove:
+        b.type_set.remove(typex)
+          
+
+    # a.type_set = intersection
     a.update_heads()
-    b.type_set = intersection
+    # b.type_set = intersection
     b.update_heads()
     return a

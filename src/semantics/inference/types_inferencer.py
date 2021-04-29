@@ -177,7 +177,7 @@ class TypesInferencer:
         return new_node
 
     @visitor.when(BinaryNode)
-    def visit(self, node: EqualsNode) -> types_ast.PlusNode:
+    def visit(self, node) -> types_ast.BinaryNode:
         left = self.visit(node.left)
         right = self.visit(node.right)
 
