@@ -95,14 +95,14 @@ class HardInferencer:
         if equal(expr_type, node.expr.inferenced_type):
             return attr_node
 
-        expr_clone = expr_type.clone()
+        expr_name = expr_type.generate_name()
         node_type = attr_node.inferenced_type
         if not conforms(expr_type, attr_node.inferenced_type):
             self.add_error(
                 node,
                 (
                     f"TypeError: In class '{self.current_type.name}' attribue"
-                    f"'{node.id}' expression type({expr_clone.name}) does not conforms"
+                    f"'{node.id}' expression type({expr_name}) does not conforms"
                     f"to declared type ({node_type.name})."
                 ),
             )
