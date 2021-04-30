@@ -225,7 +225,10 @@ class TypesInferencer:
 
     def _reduce_to_type(self, bag: TypeBag, node: Node):
         if len(bag.heads) > 1:
-            self.add_error(node, f"TypeError: Ambiguous type declaration, multiple values {bag.generate_name()}")
+            self.add_error(
+                node,
+                f"TypeError: Ambiguous type declaration, multiple values {bag.generate_name()}",
+            )
             return ErrorType()
         if len(bag.heads) == 0:
             self.add_error(node, "TypeError: Cannot infer type")
