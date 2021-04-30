@@ -56,7 +56,7 @@ class SyntacticError(CoolError):
 
 class SemanticError(CoolError):
     '''
-    Errores detectados por cualquier otro error semántico. 
+    Errores detectados en el chequeo semántico. 
     '''
     SELF_IS_READONLY = 'Cannot assign to \'self\''
     SELF_IN_LET = '\'self\' cannot be bound in a \'let\' expression'
