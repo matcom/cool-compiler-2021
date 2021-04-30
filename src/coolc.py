@@ -1,21 +1,25 @@
 """
 Main entry point of COOL compiler
 """
-from coolcmp.lexer import Lexer
+from coolcmp.lexing_parsing.lexer import errors as lexer_errors
+from coolcmp.lexing_parsing.parser import parser, errors as parser_errors
 
 
 def main(cool_program):
-    lexer = Lexer(build_lexer=True)
-    lexer.input(cool_program)
+    parser.parse(cool_program)
 
-    [(t.value, t.type) for t in lexer]  # make lexer process the input
-    errors = lexer.errors
-
-    if errors:
-        for e in errors:
-            print(e)
+    if lexer_errors:
+        for er in lexer_errors:
+            print(er)
 
         exit(1)
+
+    if parser_errors:
+        for er in parser_errors:
+            print(er)
+
+        exit(1)
+
 
 if __name__ == '__main__':
     import sys
