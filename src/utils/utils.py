@@ -87,5 +87,5 @@ class Utils:
         return current_type if typex == SelfType() else typex
 
     @staticmethod
-    def IsBasicType(type_name : str):
+    def IsBasicType(type_name : str) -> bool:
         return type_name in ['String', 'Int', 'Object', 'Bool', 'SELF_TYPE', 'IO']
