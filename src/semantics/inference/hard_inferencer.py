@@ -35,7 +35,6 @@ from ast.inferencer_ast import (
 from utils import visitor
 from semantics.tools import (
     Context,
-    ErrorType,
     Scope,
     SelfType,
     TypeBag,
@@ -106,7 +105,6 @@ class HardInferencer:
                     f"to declared type ({node_type.name})."
                 ),
             )
-            expr_node.inferenced_type = ErrorType()
 
         return attr_node
 
@@ -140,7 +138,6 @@ class HardInferencer:
                 f"'{method_node.id}' return expression type({body_name})"
                 f" does not conforms to declared return type ({node_type.name})",
             )
-            body_node.inferenced_type = ErrorType()
 
         return method_node
 
@@ -170,7 +167,6 @@ class HardInferencer:
                     f"TypeError: If's condition type({condition_clone.name})"
                     " does not conforms to Bool type.",
                 )
-                condition_node.inferenced_type = ErrorType()
 
         if_node = ConditionalNode(condition_node, then_node, else_node, node)
 
@@ -223,7 +219,6 @@ class HardInferencer:
                     f"TypeError: Loop condition type({condition_clone.name})"
                     " does not conforms to Bool type.",
                 )
-                condition_node.inferenced_type = ErrorType()
 
         body_node = self.visit(node.body, scope)
         loop_node = LoopNode(condition_node, body_node, node)
@@ -267,7 +262,6 @@ class HardInferencer:
                     f" ({expr_clone.name}) does not conforms to declared"
                     f" type({node_type.name}).",
                 )
-                expr_node.inferenced_type = ErrorType()
 
         var_decl_node.inferenced_type = expr_node.inferenced_type
         return var_decl_node
@@ -278,7 +272,6 @@ class HardInferencer:
         assign_node = AssignNode(expr_node, node)
 
         if not node.defined or node.id == "self":
-            assign_node.inferenced_type = ErrorType()
             return assign_node
 
         assign_node.defined = True
@@ -294,7 +287,6 @@ class HardInferencer:
                     f" Expression type({expr_clone.name}) does not conforms to"
                     f" declared type ({decl_type.name}).",
                 )
-                expr_node.inferenced_type = ErrorType()
 
         assign_node.inferenced_type = expr_node.inferenced_type
         return assign_node
@@ -315,7 +307,6 @@ class HardInferencer:
                         f" type({expr_clone.name}) does not conforms to "
                         f" caller type({caller_type.name}).",
                     )
-                    caller_type = ErrorType()
         elif node.expr is not None:
             expr_node = self.visit(node.expr, scope)
             caller_type = expr_node.inferenced_type
@@ -332,18 +323,16 @@ class HardInferencer:
                 error += "   -Found in: "
                 error += ", ".join(typex.name for typex in caller_type.heads)
                 self.add_error(node, error)
-                caller_type = ErrorType()
             elif len(caller_type.heads) == 0:
                 self.add_error(
                     node,
                     f" SemanticError: There is no method called {node.id} which takes"
                     f" {len(node.args)} paramters.",
                 )
-                caller_type = ErrorType()
 
         if len(caller_type.heads) != 1:
             new_args = []
-            infered_type = ErrorType()
+            infered_type = TypeBag(set())
         else:
             caller = caller_type.heads[0]
             caller = self.current_type if isinstance(caller, SelfType) else caller
@@ -352,7 +341,7 @@ class HardInferencer:
             except AttributeError as err:
                 # self.add_error(node, err.text) Error notified in soft inferencer
                 new_args = []
-                infered_type = ErrorType()
+                infered_type = TypeBag(set())
             else:
                 if len(node.args) != len(method.param_types):
                     self.add_error(
@@ -361,7 +350,6 @@ class HardInferencer:
                         f"'{caller_type.name}' takes {len(method.param_types)}"
                         f" positional arguments but {len(node.args)} were given.'",
                     )
-                    node.inferenced_type = ErrorType()
 
                 decl_return_type = method.return_type.clone()
                 decl_return_type.swap_self_type(caller)
@@ -434,7 +422,6 @@ class HardInferencer:
     def visit(self, node, scope: Scope):
         var_node = VariableNode(node)
         if not node.defined:
-            var_node.inferenced_type = ErrorType()
             return var_node
 
         var_node.defined = True
@@ -455,7 +442,6 @@ class HardInferencer:
                     f"TypeError: Not's expresion type({expr_clone.name} does not"
                     " conforms to Bool type",
                 )
-                expr_node.inferenced_type = ErrorType()
 
         not_node = NotNode(expr_node, node)
         not_node.inferenced_type = bool_type
@@ -474,7 +460,6 @@ class HardInferencer:
                     f"TypeError: ~ expresion type({expr_clone.name} does not"
                     " conforms to Int type",
                 )
-                expr_node.inferenced_type = ErrorType()
 
         complement_node = ComplementNode(expr_node, node)
         complement_node.inferenced_type = int_type
@@ -572,7 +557,6 @@ class HardInferencer:
                 f"TypeError: Equal Node: Expression type({node_name})"
                 f"does not conforms to expression({bag.name})",
             )
-            node.inferenced_type = ErrorType()
 
     def __arithmetic_operation(self, node, scope):
         left_node = self.visit(node.left, scope)
@@ -590,22 +574,21 @@ class HardInferencer:
                     f"TypeError: Arithmetic Error: Left member type({left_clone.name})"
                     "does not conforms to Int type.",
                 )
-                left_node.inferenced_type = ErrorType()
+
         if not equal(right_type, node.right.inferenced_type):
             right_clone = right_type.clone()
             if not conforms(right_type, int_type):
                 self.add_error(
                     node.right,
-                    f"Type Error: Arithmetic Error: Right member "
+                    f"TypeError: Arithmetic Error: Right member "
                     f"type({right_clone.name})does not conforms to Int type.",
                 )
-                right_node.inferenced_type = ErrorType()
 
         return left_node, right_node
 
     def __unrelated_types(self, node):
-        typex = node.inferenced_type
-        if isinstance(typex, ErrorType):
+        typex: TypeBag = node.inferenced_type
+        if typex.error_type:
             return True
         if len(typex.heads) > 1:
             self.add_error(
@@ -614,6 +597,6 @@ class HardInferencer:
                 + ", ".join(typez.name for typez in typex.heads),
                 +"}",
             )
-            node.inferenced_type = ErrorType()
+            node.inferenced_type = TypeBag(set())
             return True
         return False
