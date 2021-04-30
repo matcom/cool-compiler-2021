@@ -44,20 +44,17 @@ def run_pipeline(program_ast):
         print(s)
         exit(1)
 
-    # back = BackInferencer(context)
-    # back_ast = back.visit(hard_ast)
-    ## back_ast = hard.visit(back_ast)
-    # back_ast = back.visit(back_ast)
-    ## back_ast = hard.visit(back_ast)
-    # back_ast = back.visit(back_ast)
-    ## back_ast = hard.visit(back_ast)
-    ## back_ast = back.visit(back_ast)
-    ## back_ast = back.visit(back_ast)
-    ## back_ast = back.visit(back_ast)
-    #
-    # types = TypesInferencer()
-    # types_ast = types.visit(back_ast)
-    # errors += types.errors
+    back = BackInferencer(context)
+    back_ast = back.visit(hard_ast)
+    # back_ast = hard.visit(back_ast)
+    back_ast = back.visit(back_ast)
+    # back_ast = hard.visit(back_ast)
+    back_ast = back.visit(back_ast)
+    back_ast = back.visit(back_ast)
+
+    types = TypesInferencer()
+    types_ast = types.visit(back_ast)
+    errors += types.errors
 
     logger = TypeLogger(context)
     log = logger.visit(hard_ast, hard_ast.scope)

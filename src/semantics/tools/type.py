@@ -363,6 +363,16 @@ class TypeBag:
         clone.conform_list = self.conform_list.copy()
         return clone
 
+    def update(self, other):
+        self.name = other.name
+        self.condition_list = other.condition_list
+        self.conform_list = other.conform_list
+        self.type_set = other.type_set
+        self.heads = other.heads
+        
+
+
+
     def __str__(self):
         return self.name
 
@@ -582,30 +592,16 @@ def from_dict_to_set(types: dict):
     return type_set
 
 
-def unify(a: TypeBag, b: TypeBag) -> None:
+def unify(a: TypeBag, b: TypeBag) -> TypeBag:
     intersection = set()
     for type1 in a.type_set:
         for type2 in b.type_set:
             if type1.name == type2.name:
-                # TODO: Mejorar la interseccion
-                # if type1.conforms_to(type2) or type2.conforms_to(type1):
-                intersection.add(type1.name)
-    to_remove = []
-    for typex in a.type_set:
-        if typex.name not in intersection:
-            to_remove.append(typex)
-    for typex in to_remove:
-        a.type_set.remove(typex)
+                intersection.add(type1)
 
-    to_remove = []
-    for typex in b.type_set:
-        if typex.name not in intersection:
-            to_remove.append(typex)
-    for typex in to_remove:
-        b.type_set.remove(typex)
-
-    # a.type_set = intersection
+    a.type_set = intersection
     a.update_heads()
-    # b.type_set = intersection
+    b.type_set = intersection
     b.update_heads()
     return a
+
