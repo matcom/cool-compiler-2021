@@ -57,7 +57,7 @@ def run_pipeline(program_ast):
     errors += types.errors
 
     logger = TypeLogger(context)
-    log = logger.visit(back_ast, back_ast.scope)
+    log = logger.visit(hard_ast, hard_ast.scope)
     print(log)
 
     if len(errors) > 0:
@@ -65,14 +65,14 @@ def run_pipeline(program_ast):
         print(s)
         exit(1)
 
-    return types_ast
+    # return types_ast
 
 
 def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "src/debbuging/tests/Auto/simple2.cl"
+        input_file = "./debbuging/tests/Auto/simple2.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)

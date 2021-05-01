@@ -1,5 +1,5 @@
 from semantics.tools.errors import *
-from typing import Set
+from typing import List, Set
 from collections import OrderedDict
 
 
@@ -248,32 +248,40 @@ class TypeBag:
         self.type_set: set = (
             type_set if isinstance(type_set, set) else from_dict_to_set(type_set)
         )
-        self.heads: list = heads
+        self.heads: List[Type] = heads
         if len(self.type_set) == 1:
             self.heads = list(self.type_set)
 
-        self.name = "undefined"
         self.condition_list = []
         self.conform_list = []
-        self.generate_name()
 
     @property
-    def error_type(self):
-        return len(self.heads) > 0
+    def error_type(self) -> bool:
+        return len(self.heads) == 0
 
-    def set_conditions(self, condition_list, conform_list):
+    @property
+    def name(self) -> str:
+        return self.generate_name()
+
+    def set_conditions(self, condition_list, conform_list) -> None:
+        if self.error_type:
+            return
+
         self.condition_list = condition_list
         self.conform_list = conform_list
-        self.update_type_set_from_conforms()
+        self.__update_type_set_from_conforms()
 
-    def update_type_set_from_conforms(self):
+    def __update_type_set_from_conforms(self) -> None:
         intersect_set = set()
         for conform_set in self.conform_list:
             intersect_set = intersect_set.union(conform_set)
         self.type_set = self.type_set.intersection(intersect_set)
         self.update_heads()
 
-    def update_heads(self):
+    def update_heads(self) -> None:
+        if self.error_type:
+            return
+
         new_heads = []
         visited = set()
         for head in self.heads:
@@ -285,6 +293,7 @@ class TypeBag:
             for typex in self.type_set:
                 if typex in visited:
                     continue
+
                 # if typex.conforms_to(head):
                 visited.add(typex)
                 if typex.index < lower_index:
@@ -294,9 +303,11 @@ class TypeBag:
                     pos_new_head.append(typex)
             new_heads += pos_new_head
         self.heads = new_heads
-        self.generate_name()
 
     def swap_self_type(self, swap_type, back=False):
+        if self.error_type:
+            return
+
         if not back:
             remove_type = SelfType()
             add_type = swap_type
@@ -311,15 +322,19 @@ class TypeBag:
             return self
 
         self.update_heads()
-        return self
 
     def add_self_type(self, add_type) -> bool:
+        if self.error_type:
+            return False
+
         if SelfType() in self.type_set and not add_type in self.type_set:
             self.type_set.add(add_type)
             return True
         return False
 
-    def remove_self_type(self, remove_type):
+    def remove_self_type(self, remove_type) -> None:
+        if self.error_type:
+            return
         try:
             self.type_set.remove(remove_type)
         except KeyError:
@@ -327,21 +342,19 @@ class TypeBag:
         self.type_set.add(SelfType())
         self.update_heads()
 
-    def generate_name(self):
+    def generate_name(self) -> str:
         if self.error_type:
-            self.name = "<error-type>"
-            return self.name
+            return "<error-type>"
 
         if len(self.type_set) == 1:
-            self.name = self.heads[0].name
-            return self.name
+            name = self.heads[0].name
+            return name
 
         s = "{"
         s += ", ".join(
             typex.name for typex in sorted(self.type_set, key=lambda t: t.index)
         )
         s += "}"
-        self.name = s
         return s
 
     def clone(self):
@@ -423,6 +436,9 @@ class ErrorType(TypeBag):
 
 def conforms(bag1: TypeBag, bag2: TypeBag) -> bool:
     if isinstance(bag1, ErrorType) or isinstance(bag2, ErrorType):
+        raise InternalError("Use of deprecated ErrorType in conforms")
+
+    if bag1.error_type or bag2.error_type:
         return True
 
     ordered_set = order_set_by_index(bag2.type_set)
@@ -454,9 +470,12 @@ def try_conform(bag1: TypeBag, bag2: TypeBag) -> TypeBag:
 
 
 def join(bag1: TypeBag, bag2: TypeBag) -> TypeBag:
-    if isinstance(bag1, ErrorType):
+    if isinstance(bag1, ErrorType) or isinstance(bag2, ErrorType):
+        raise InternalError("Use of deprecated ErrorType in Join")
+
+    if bag1.error_type:
         return bag2
-    if isinstance(bag2, ErrorType):
+    if bag2.error_type:
         return bag1
 
     ancestor_set = set()
@@ -503,7 +522,10 @@ def join_list(type_list):
 
 def equal(bag1: TypeBag, bag2: TypeBag):
     if isinstance(bag1, ErrorType) or isinstance(bag2, ErrorType):
+        raise InternalError("Use of deprecated type ErrorType")
+    if bag1.error_type or bag2.error_type:
         return True
+
     set1 = bag1.type_set
     set2 = bag2.type_set
     return len(set1) == len(set2) and len(set1.intersection(set2)) == len(set2)
@@ -528,7 +550,7 @@ def smart_add(type_set: set, head_list: list, typex: Type):
     return type_set
 
 
-def auto_add(type_set: set, head_list: list, bag: TypeBag):
+def auto_add(type_set: set, head_list: List[TypeBag], bag: TypeBag):
     type_set = type_set.union(bag.type_set)
     aux = set(bag.heads)
     for i in range(len(head_list)):
