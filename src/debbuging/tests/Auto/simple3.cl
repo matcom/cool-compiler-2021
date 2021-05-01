@@ -7,7 +7,7 @@ class Main {
         c <- b;
         d <- c;
         e <- f;
-        d <- "Test";
+       -- d <- "Test";
         f <- 12;
     }}; 
 };

@@ -48,7 +48,7 @@ def run_pipeline(program_ast):
     back_ast = back.visit(hard_ast)
     # back_ast = hard.visit(back_ast)
     back_ast = back.visit(back_ast)
-    # back_ast = hard.visit(back_ast)
+    # # back_ast = hard.visit(back_ast)
     back_ast = back.visit(back_ast)
     back_ast = back.visit(back_ast)
 
@@ -72,7 +72,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "src/debbuging/tests/Auto/simple3.cl"
+        input_file = "src/debbuging/tests/Auto/simple2.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
