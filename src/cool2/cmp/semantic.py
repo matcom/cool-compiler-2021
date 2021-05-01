@@ -87,13 +87,13 @@ class Type:
         return method
 
     def all_attributes(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
+        plain = OrderedDict() if self.parent is None or self.parent == self else self.parent.all_attributes(False)
         for attr in self.attributes:
             plain[attr.name] = (attr, self)
         return plain.values() if clean else plain
 
     def all_methods(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
+        plain = OrderedDict() if self.parent is None or self.parent == self else self.parent.all_methods(False)
         for method in self.methods:
             plain[method.name] = (method, self)
         return plain.values() if clean else plain
