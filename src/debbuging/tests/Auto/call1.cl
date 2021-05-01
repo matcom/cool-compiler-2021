@@ -2,7 +2,7 @@ class Main inherits IO {
 	main(): String
 	{
 		"Kabuki"
-	}
+	};
     	test(x : AUTO_TYPE, y : AUTO_TYPE) : AUTO_TYPE {
 		{
 			if true then x.me() else y.myself() fi;

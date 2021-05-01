@@ -5,9 +5,9 @@ class Main {
         a <- e;
         b <- a;
         c <- b;
-        d <- c;
+        d <- c; -- debe dar error aqui
         e <- f;
-       -- d <- "Test";
+        d <- "Test";
         f <- 12;
     }}; 
 };

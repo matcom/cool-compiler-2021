@@ -229,10 +229,10 @@ class TypesInferencer:
                 node,
                 f"TypeError: Ambiguous type declaration, multiple values {bag.generate_name()}",
             )
-            return ErrorType()
+            return TypeBag(set())
         if len(bag.heads) == 0:
-            self.add_error(node, "TypeError: Cannot infer type")
-            return ErrorType()
+            self.add_error(node, "TypeError: Cannot infer expression's type")
+            return TypeBag(set())
         return bag.heads[0]
 
     def add_error(self, node, text: str):

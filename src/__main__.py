@@ -44,21 +44,19 @@ def run_pipeline(program_ast):
         print(s)
         exit(1)
 
+    change = True
     back = BackInferencer(context)
-    back_ast = back.visit(hard_ast)
-    # back_ast = hard.visit(back_ast)
-    back_ast = back.visit(back_ast)
-    # # back_ast = hard.visit(back_ast)
-    back_ast = back.visit(back_ast)
-    back_ast = back.visit(back_ast)
+
+    while change:
+        back_ast, change = back.visit(hard_ast)
 
     types = TypesInferencer()
     types_ast = types.visit(back_ast)
     errors += types.errors
 
-    logger = TypeLogger(context)
-    log = logger.visit(hard_ast, hard_ast.scope)
-    print(log)
+    # logger = TypeLogger(context)
+    # log = logger.visit(hard_ast, hard_ast.scope)
+    # print(log)
 
     if len(errors) > 0:
         s = format_errors(errors)
@@ -72,7 +70,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "./debbuging/tests/Auto/simple2.cl"
+        input_file = "src/debbuging/tests/Auto/not_that_simple.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)

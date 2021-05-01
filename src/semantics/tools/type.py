@@ -1,5 +1,5 @@
 from semantics.tools.errors import *
-from typing import List, Set
+from typing import List, Set, Tuple
 from collections import OrderedDict
 
 
@@ -322,6 +322,7 @@ class TypeBag:
             return self
 
         self.update_heads()
+        return self
 
     def add_self_type(self, add_type) -> bool:
         if self.error_type:
@@ -369,9 +370,6 @@ class TypeBag:
         self.conform_list = other.conform_list
         self.type_set = other.type_set
         self.heads = other.heads
-        
-
-
 
     def __str__(self):
         return self.name
@@ -592,16 +590,34 @@ def from_dict_to_set(types: dict):
     return type_set
 
 
-def unify(a: TypeBag, b: TypeBag) -> TypeBag:
+def unify(a: TypeBag, b: TypeBag) -> Tuple[TypeBag, bool]:
+    if a.error_type:
+        return b, False
+    if b.error_type:
+        return a, False
+
     intersection = set()
+    if len(a.type_set)==1 and len(b.type_set)==1:
+        type_a = list(a.type_set)[0]
+        type_b = list(b.type_set)[0]
+        if type_b.conforms_to(type_a):
+            return a, False
+        return TypeBag(set()), False
+        
     for type1 in a.type_set:
         for type2 in b.type_set:
-            if type1.name == type2.name:
+            if type2 == type1:
                 intersection.add(type1)
 
+    changed = (not equals_set(a.type_set, intersection)) or (
+        not equals_set(b.type_set, intersection)
+    )
     a.type_set = intersection
     a.update_heads()
     b.type_set = intersection
     b.update_heads()
-    return a
+    return a, changed
 
+
+def equals_set(a: set, b: set) -> bool:
+    return a.issubset(b) and b.issubset(a)
