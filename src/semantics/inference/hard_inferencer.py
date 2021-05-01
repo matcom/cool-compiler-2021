@@ -414,7 +414,7 @@ class HardInferencer:
 
         self.__check_member_types(left_node, right_node)
 
-        eq_node = ComparerNode(left_node, right_node, node)
+        eq_node = EqualsNode(left_node, right_node, node)
         eq_node.inferenced_type = node.inferenced_type  # Bool Type :)
         return eq_node
 
