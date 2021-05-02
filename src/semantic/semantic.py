@@ -1,5 +1,6 @@
 from utils.utils import Utils
 from semantic.visitors.type_builder import TypeBuilder
+from semantic.visitors.type_checker import TypeChecker
 from semantic.visitors.var_collector import VarCollector
 from semantic.visitors.type_collector import TypeCollector
 
@@ -30,6 +31,7 @@ class SemanticAnalyzer:
         print(self.scope)
         Utils.Write(self.debug_path, '.scope', str(self.scope)) if self.debug else None
 
-        
+        checker = TypeChecker(self.context, self.errors)
+        checker.visit(self.ast, self.scope)
 
         return self.ast, self.context, self.scope
