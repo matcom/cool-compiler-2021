@@ -46,7 +46,7 @@ class Utils:
             file.write(text)
 
     @staticmethod
-    def GetRulesParsing():
+    def GetRulesParsing() -> list:
         path = 'parsing/parser.out'
         file = open(path, encoding='utf-8')
         lines = file.readlines()
@@ -56,8 +56,7 @@ class Utils:
         return rules
 
     @staticmethod
-    def PathToObjet(typex) -> list:
-        print(f'tipo de tipex es {type(typex)} en PathToObject')
+    def PathToObjet(typex : Type) -> list:
         path = []
         c_type = typex
 
@@ -69,17 +68,15 @@ class Utils:
         return path
 
     @staticmethod
-    def GetCommonBaseType(types):
-        print(f'tipo de types es {type(types)} en GetCommonBaseType')
+    def GetCommonBaseType(types : list) -> Type:
         paths = [ Utils.PathToObjet(typex) for typex in types ]
         tuples = zip(*paths)
 
-        for i, t in enumerate(tuples):
-            gr = itertools.groupby(t)
-            if len(list(gr)) > 1:
-                return paths[0][i-1]
+        for idx,tup in enumerate(tuples):
+            group_by = itertools.groupby(tup)
+            if len(list(group_by)) > 1:
+                return paths[0][idx-1]
 
-        print(f'tipo de paths[0][-1] es {type(paths[0][-1])} en GetCommonBaseType')
         return paths[0][-1]
 
     @staticmethod
