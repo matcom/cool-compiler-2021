@@ -17,7 +17,7 @@ class Main
                 };
             }
             of
-                y : AUTO_TYPE => let i: AUTO_TYPE <- y in y ;
+                y : Int => let i: AUTO_TYPE <- y in y ;
             esac ;
         } } ;
     } ;
