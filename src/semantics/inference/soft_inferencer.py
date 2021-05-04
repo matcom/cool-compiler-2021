@@ -126,8 +126,8 @@ class SoftInferencer:
         for idx, typex in zip(current_method.param_names, current_method.param_types):
             scope.define_variable(idx, typex)
         new_params = []
-        for param in node.params:
-            new_params.append(self.visit(param, scope))
+        # for param in node.params:
+        #     new_params.append(self.visit(param, scope))
 
         ret_type_decl: TypeBag = current_method.return_type
 
@@ -334,12 +334,12 @@ class SoftInferencer:
 
             expr_type: TypeBag = expr_node.inferenced_type
             added_type = expr_type.add_self_type(self.current_type)
-            expr_clone = expr_type.clone()
+            expr_name = expr_type.name
             if not conforms(expr_type, decl_type):
                 self.add_error(
                     node,
                     f"TypeError: Cannot assign new value to variable '{node.id}'."
-                    f" expression type({expr_clone.name}) does not conforms to"
+                    f" Expression type({expr_name}) does not conforms to"
                     f" declared type ({decl_type.name}).",
                 )
             if added_type:
@@ -474,6 +474,8 @@ class SoftInferencer:
             var_type = var.get_type()
         else:
             self.add_error(node, f"NameError: Variable '{node.value}' is not defined.")
+            var_type = TypeBag(set())
+
         var_node.inferenced_type = var_type
         return var_node
 
@@ -530,6 +532,7 @@ class SoftInferencer:
                 node,
                 err.text + f" Could not instantiate type '{node.value}'.",
             )
+            node_type = TypeBag(set())
 
         instantiate_node.inferenced_type = node_type
         return instantiate_node

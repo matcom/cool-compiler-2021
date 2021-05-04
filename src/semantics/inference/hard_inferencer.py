@@ -117,9 +117,9 @@ class HardInferencer:
             scope.define_variable(idx, typex)
 
         new_params = []
-        for param in node.params:
-            new_params.append(self.visit(param, scope))
-            # scope.define_variable(param.name, )
+        # for param in node.params:
+        #     new_params.append(self.visit(param, scope))
+        #     # scope.define_variable(param.name, )
 
         body_node = self.visit(node.body, scope)
         body_type = body_node.inferenced_type
@@ -272,6 +272,7 @@ class HardInferencer:
         assign_node = AssignNode(expr_node, node)
 
         if not node.defined or node.id == "self":
+            assign_node.inferenced_type = TypeBag(set())
             return assign_node
 
         assign_node.defined = True
@@ -422,6 +423,7 @@ class HardInferencer:
     def visit(self, node, scope: Scope):
         var_node = VariableNode(node)
         if not node.defined:
+            var_node.inferenced_type = TypeBag(set())
             return var_node
 
         var_node.defined = True
