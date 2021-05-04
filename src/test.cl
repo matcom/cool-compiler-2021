@@ -1,5 +1,6 @@
-a = TRuE
+(* A non-escaped newline character may not appear in a string *)
 
-
-
-b = sdsdfsd
+"This \
+is OK"
+"This is not
+OK"

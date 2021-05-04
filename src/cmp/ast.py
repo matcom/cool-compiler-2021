@@ -1,18 +1,21 @@
-#Root
+#region Root
 class Node:
     pass
+#endregion 
 
-#Node
+#region Node
 class ProgramNode(Node):
     def __init__(self, class_list):
         self.class_list = class_list
 
 class DeclarationNode(Node):
     pass
+
 class ExpressionNode(Node):
     pass
+#endregion
 
-#DeclarationNode
+#region DeclarationNode
 class ClassNode(DeclarationNode):
     def __init__(self, ttype, feature_list, parent=None):
         self.type = ttype
@@ -31,14 +34,15 @@ class AttributeNode(DeclarationNode):
         self.type = ttype
         self.id = identifier
         self.expression = expression
+#endregion
 
-#ExpressionNode
+#region ExpressionNode
 class AssignmentNode(ExpressionNode):
     def __init__(self, identifier, expression):
         self.id = identifier
         self.expression = expression
 
-class Dispatch(ExpressionNode):
+class DispatchNode(ExpressionNode):
     def __init__(self, identifier, expression_list, expression=None, ttype=None):
         self.type = ttype
         self.id = identifier
@@ -74,7 +78,7 @@ class NewNode(ExpressionNode):
     def __init__(self, ttype):
         self.type = ttype
 
-class VoidNode(ExpressionNode):
+class IsvoidNode(ExpressionNode):
     def __init__(self, expression):
         self.expression = expression
 
@@ -90,41 +94,57 @@ class BinaryNode(ExpressionNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
+#endregion
 
-#AtomicNode
+#region AtomicNode
 class IdentifierNode(AtomicNode):
     pass
+
 class TypeNode(AtomicNode):
     pass
+
 class ConstantNode(AtomicNode):
     pass
+#endregion
 
-#UnaryNode
+#region UnaryNode
 class ComplementNode(UnaryNode):
     pass
+
 class NegationNode(UnaryNode):
     pass
+#endregion
 
-#BinaryNode
+#region BinaryNode
 class PlusNode(BinaryNode):
     pass
+
 class MinusNode(BinaryNode):
     pass
+
 class StarNode(BinaryNode):
     pass
+
 class DivideNode(BinaryNode):
     pass
+
 class LessNode(BinaryNode):
     pass
+
 class LequalNode(BinaryNode):
     pass
+
 class EqualNode(BinaryNode):
     pass
+#endregion
 
-#ConstantNode
+#region ConstantNode
 class IntegerNode(ConstantNode):
     pass
+
 class StringNode(ConstantNode):
     pass
+
 class BoolNode(ConstantNode):
     pass
+#endregion
