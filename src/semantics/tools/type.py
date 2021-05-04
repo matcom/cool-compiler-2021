@@ -597,13 +597,13 @@ def unify(a: TypeBag, b: TypeBag) -> Tuple[TypeBag, bool]:
         return a, False
 
     intersection = set()
-    if len(a.type_set)==1 and len(b.type_set)==1:
+    if len(a.type_set) == 1 and len(b.type_set) == 1:
         type_a = list(a.type_set)[0]
         type_b = list(b.type_set)[0]
         if type_b.conforms_to(type_a):
             return a, False
         return TypeBag(set()), False
-        
+
     for type1 in a.type_set:
         for type2 in b.type_set:
             if type2 == type1:

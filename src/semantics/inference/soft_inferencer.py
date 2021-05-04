@@ -225,6 +225,7 @@ class SoftInferencer:
             self.add_error(
                 node, err.text + f" While defining Case Option variable {node.id}."
             )
+            node_type = TypeBag(set())
 
         scope.define_variable(node.id, node_type)
         expr_node = self.visit(node.expr, scope)

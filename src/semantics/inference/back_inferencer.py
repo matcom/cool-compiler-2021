@@ -1,4 +1,5 @@
 from copy import copy, deepcopy
+from semantics.tools.errors import SemanticError
 from typing import Tuple
 
 from semantics.tools.type import Method, SelfType, Type
@@ -142,7 +143,7 @@ class BackInferencer:
         return new_node
 
     @visitor.when(CaseNode)
-    def visit(self, node: CaseNode, scope) -> CaseNode:
+    def visit(self, node: CaseNode, scope: Scope) -> CaseNode:
         new_case_node = self.visit(node.case_expr, scope)
         new_options_nodes = []
         for option in node.options:
@@ -159,12 +160,20 @@ class BackInferencer:
         return new_node
 
     @visitor.when(CaseOptionNode)
-    def visit(self, node: CaseOptionNode, scope) -> CaseOptionNode:
+    def visit(self, node: CaseOptionNode, scope: Scope) -> CaseOptionNode:
+        try:
+            node_type = self.context.get_type(node.type, selftype=False, autotype=False)
+        except SemanticError as err:
+            node_type = TypeBag(set())
+
+        scope.define_variable(node.id, node_type)
+
         new_node_expr = self.visit(node.expr, scope)
         new_node = CaseOptionNode(new_node_expr, node)
         decl_type = node.inferenced_type
         expr_type = new_node_expr.inferenced_type
         new_node.inferenced_type, changed = unify(decl_type, expr_type)
+
         self.changed |= changed
         return new_node
 
@@ -235,13 +244,17 @@ class BackInferencer:
         new_args = []
         for arg_expr, param_type in zip(node.args, method.param_types):
             arg_node = self.visit(arg_expr, scope)
-            arg_node.inferenced_type, changed = unify(arg_node.inferenced_type, param_type)
+            arg_node.inferenced_type, changed = unify(
+                arg_node.inferenced_type, param_type
+            )
             self.changed |= changed
             new_args.append(arg_node)
 
         new_expr = self.visit(node.expr, scope) if node.expr else None
         new_node = MethodCallNode(node.caller_type, new_expr, new_args, node)
-        new_node.inferenced_type, changed = unify(node.inferenced_type, method.return_type)
+        new_node.inferenced_type, changed = unify(
+            node.inferenced_type, method.return_type
+        )
         self.changed |= changed
         return new_node
 
@@ -269,7 +282,11 @@ class BackInferencer:
         new_node = copy(node)
         if node.defined:
             decl_type = node.inferenced_type.swap_self_type(self.current_type)
-            expr_type = scope.find_variable(node.value).get_type().swap_self_type(self.current_type)
+            expr_type = (
+                scope.find_variable(node.value)
+                .get_type()
+                .swap_self_type(self.current_type)
+            )
             new_node.inferenced_type, changed = unify(decl_type, expr_type)
             self.changed |= changed
             return new_node
