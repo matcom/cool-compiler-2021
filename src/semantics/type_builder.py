@@ -7,7 +7,7 @@ from ast.parser_ast import (
     AttrDeclarationNode,
 )
 from semantics.tools.errors import SemanticError
-from semantics.tools import SelfType, TypeBag, ErrorType, Context
+from semantics.tools import SelfType, TypeBag, Context
 
 
 class TypeBuilder:
@@ -60,7 +60,7 @@ class TypeBuilder:
             attr_type = self.context.get_type(node.type)
         except SemanticError as err:
             self.add_error(node, err.text)
-            attr_type = ErrorType()
+            attr_type = TypeBag(set())
 
         try:
             self.current_type.define_attribute(node.id, attr_type)
@@ -73,7 +73,7 @@ class TypeBuilder:
             ret_type = self.context.get_type(node.type)
         except SemanticError as err:
             self.add_error(node, err.text)
-            ret_type = ErrorType()
+            ret_type = TypeBag(set())
 
         params_type = []
         params_name = []
@@ -83,7 +83,7 @@ class TypeBuilder:
             try:
                 params_type.append(self.context.get_type(p_type, selftype=False))
             except SemanticError as err:
-                params_type.append(ErrorType())
+                params_type.append(TypeBag(set()))
                 self.add_error(
                     node,
                     err.text
