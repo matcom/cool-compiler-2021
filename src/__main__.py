@@ -71,7 +71,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "debbuging/tests/Auto/not_that_simple1.cl"
+        input_file = "src/debbuging/tests/Auto/recursive1.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
