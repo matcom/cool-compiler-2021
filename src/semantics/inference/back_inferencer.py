@@ -282,11 +282,11 @@ class BackInferencer:
         new_node = copy(node)
         if node.defined:
             decl_type = node.inferenced_type.swap_self_type(self.current_type)
-            expr_type = (
-                scope.find_variable(node.value)
-                .get_type()
-                .swap_self_type(self.current_type)
-            )
+            expr_type = scope.find_variable(node.value)
+            if expr_type is not None:
+                expr_type = expr_type.get_type().swap_self_type(self.current_type)
+            else:
+                expr_type = decl_type
             new_node.inferenced_type, changed = unify(decl_type, expr_type)
             self.changed |= changed
             return new_node
