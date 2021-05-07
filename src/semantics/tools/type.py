@@ -306,7 +306,7 @@ class TypeBag:
 
     def swap_self_type(self, swap_type, back=False):
         if self.error_type:
-            return
+            return self
 
         if not back:
             remove_type = SelfType()
@@ -617,6 +617,29 @@ def unify(a: TypeBag, b: TypeBag) -> Tuple[TypeBag, bool]:
     b.type_set = intersection
     b.update_heads()
     return a, changed
+
+
+# def unify(a: TypeBag, b: TypeBag) -> Tuple[TypeBag, bool]:
+#     if a.error_type:
+#         return b, False
+#     if b.error_type:
+#         return a, False
+
+#     if len(a.type_set) == 1 and len(b.type_set) == 1:
+#         type_a = list(a.type_set)[0]
+#         type_b = list(b.type_set)[0]
+#         if type_b.conforms_to(type_a):
+#             return a, False
+#         return TypeBag(set()), False
+
+#     a_clone = a.clone()
+#     change = conforms(a_clone, b)
+#     if not change:
+#         return a, change
+
+#     a.type_set = a_clone.type_set
+#     a.update_heads()
+#     return a, change
 
 
 def equals_set(a: set, b: set) -> bool:
