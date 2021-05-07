@@ -28,6 +28,7 @@ from ast.parser_ast import (
     StringNode,
     VarDeclarationNode,
     VariableNode,
+    ParamNode,
 )
 from parsing.errors import SyntacticError
 
@@ -118,7 +119,7 @@ class Parser:
 
     def p_param(self, p):
         """param : ID ':' TYPE"""
-        p[0] = VarDeclarationNode(p[1], p[3])
+        p[0] = ParamNode(p[1], p[3])
         p[0].set_position(p.slice[1].line, p.slice[1].col)
 
     def p_expression_list(self, p):
