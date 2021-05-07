@@ -9,11 +9,11 @@ class Main {
         }
     };
 
-    d : B;
+    d : B; 
     method1(a: AUTO_TYPE) : AUTO_TYPE {
         {
             method0(a);
-            d <- a;
+            d <- a; -- si se comenta esta linea 'a' deberia ser de tipo 'A'
             a;
         }
     };
