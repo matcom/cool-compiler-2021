@@ -1,6 +1,6 @@
 import sys
-from pathlib import Path
 
+from pathlib import Path
 from utils.errors import *
 from utils.utils import Utils
 from lexing.lexer import Lexer
