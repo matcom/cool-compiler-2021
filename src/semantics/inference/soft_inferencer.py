@@ -125,9 +125,10 @@ class SoftInferencer:
 
         for idx, typex in zip(current_method.param_names, current_method.param_types):
             scope.define_variable(idx, typex)
+        
         new_params = []
-        # for param in node.params:
-        #     new_params.append(self.visit(param, scope))
+        for param in node.params:
+            new_params.append(self.visit(param, scope))
 
         ret_type_decl: TypeBag = current_method.return_type
 

@@ -1,4 +1,5 @@
-from semantics.tools.type import join_list
+from typing import List
+from semantics.tools.type import Type, join_list
 from utils import visitor
 
 from semantics.tools import TypeBag, Scope
@@ -78,7 +79,7 @@ class TypesInferencer:
         scope = scope.create_child()
         
         for param in node.params:
-            param_type = self._reduce_to_type(param.inferenced_type, general=True)
+            param_type = self._reduce_to_type(param.inferenced_type,node, general=True)
             scope.define_variable(param.id, param_type)
 
         params = [self.visit(param, scope) for param in node.params]
@@ -147,10 +148,8 @@ class TypesInferencer:
             new_node.expr = self.visit(node.expr, scope)
 
         var_info = scope.find_variable(node.id)
-        if var_info is None:
-            new_node.type = self._reduce_to_type(node.inferenced_type, node)
-        else:
-            new_node.type = var_info.type
+        general = var_info is not None # it's a param
+        new_node.type = self._reduce_to_type(node.inferenced_type,node, general)
 
         return new_node
 
@@ -175,11 +174,9 @@ class TypesInferencer:
         
         if node.defined:
             var_info = scope.find_variable(node.value)
-            if var_info is None:
-                new_node.type = self._reduce_to_type(node.inferenced_type, node)
-            else:
-                new_node.type = var_info.type
-
+            general = var_info is not None
+            new_node.type = self._reduce_to_type(node.inferenced_type, node, general)
+         
         return new_node
 
     @visitor.when(IsVoidNode)
@@ -273,7 +270,13 @@ class TypesInferencer:
             if typex.index == higher_index:
                 higher_index_types.append(typex)
 
-        return join_list(higher_index_types)
+        return self._join_types(higher_index_types)
+
+    def _join_types(self, types : List[Type]):
+        types_bags = []
+        for typex in types:
+            types_bags.append(TypeBag({typex}, heads=[typex]))
+        return join_list(types_bags).heads[0]
 
     def add_error(self, node, text: str):
         line, col = node.get_position() if node else (0, 0)

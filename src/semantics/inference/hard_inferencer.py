@@ -117,9 +117,8 @@ class HardInferencer:
             scope.define_variable(idx, typex)
 
         new_params = []
-        # for param in node.params:
-        #     new_params.append(self.visit(param, scope))
-        #     # scope.define_variable(param.name, )
+        for param in node.params:
+            new_params.append(self.visit(param, scope))
 
         body_node = self.visit(node.body, scope)
         body_type = body_node.inferenced_type

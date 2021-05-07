@@ -98,7 +98,7 @@ class BackInferencer:
             new_params.append(self.visit(param, scope))
 
         param_types = [
-            unify(new_param.inferenced_type, typex)
+            unify(typex, new_param.inferenced_type )
             for new_param, typex in zip(new_params, current_method.param_types)
         ]
         current_method.param_types = [i[0] for i in param_types]
@@ -245,7 +245,7 @@ class BackInferencer:
         for arg_expr, param_type in zip(node.args, method.param_types):
             arg_node = self.visit(arg_expr, scope)
             arg_node.inferenced_type, changed = unify(
-                arg_node.inferenced_type, param_type
+                param_type, arg_node.inferenced_type 
             )
             self.changed |= changed
             new_args.append(arg_node)
