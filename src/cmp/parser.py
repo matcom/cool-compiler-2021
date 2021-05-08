@@ -73,7 +73,7 @@ class Parser(object):
         try:
             p[0] = p[1]
         except IndexError:
-            p[0] = None
+            p[0] = []
 
     def p_parameters(self, p):
         '''parameters : ID COLON TYPE
@@ -85,7 +85,7 @@ class Parser(object):
    
     def p_expression_assignment(self, p):
         ''' expression : ID LDASH expression'''
-        p[0] = AssignmentNode(p[1], p[3])
+        p[0] = AssignmentNode(p[1], p[3], p[2])
     
     def p_expression_dispatch(self, p):
         '''expression : ID LPAREN argumentslist RPAREN
@@ -105,7 +105,7 @@ class Parser(object):
         try:
             p[0] = p[1]
         except IndexError:
-            p[0] = None
+            p[0] = []
 
     def p_argument(self, p):
         '''argument : expression
@@ -117,15 +117,15 @@ class Parser(object):
 
     def p_expression_conditionals(self, p):
         '''expression : IF expression THEN expression ELSE expression FI'''
-        p[0] = ConditionalNode(p[2], p[4], p[6])
+        p[0] = ConditionalNode(p[2], p[4], p[6], p[1])
 
     def p_expression_loops(self, p):
         '''expression : WHILE expression LOOP expression POOL'''
-        p[0] = LoopsNode(p[2], p[4])
+        p[0] = LoopsNode(p[2], p[4], p[1])
 
     def p_expression_blocks(self, p):
         '''expression : LCURLY expressionlist RCURLY'''
-        p[0] = BlockNode(p[2])
+        p[0] = BlockNode(p[2], p[1])
 
     def p_expressionlist(self, p):
         '''expressionlist : expression SEMICOLON
@@ -137,7 +137,7 @@ class Parser(object):
 
     def p_expression_let(self, p):
         '''expression : LET variableslist IN expression'''
-        p[0] = LetNode(p[2], p[4])
+        p[0] = LetNode(p[2], p[4], p[1])
 
     def p_variableslist(self, p):
         '''variableslist : variable
@@ -151,13 +151,13 @@ class Parser(object):
         '''variable : ID COLON TYPE
                     | ID COLON TYPE LDASH expression'''
         try:
-            p[0] = [(p[1], p[3], p[5])]
+            p[0] = (p[1], p[3], p[5])
         except IndexError:
-            p[0] = [(p[1], p[3], None)]
+            p[0] = (p[1], p[3], None)
 
     def p_expression_case(self, p):
         '''expression : CASE expression OF typetestlist ESAC'''
-        p[0] = CaseNode(p[2], p[4])
+        p[0] = CaseNode(p[2], p[4], p[1])
 
     def p_typetestlist(self, p):
         '''typetestlist : ID COLON TYPE GEQUAL expression SEMICOLON
@@ -169,39 +169,39 @@ class Parser(object):
 
     def p_expression_new(self, p):
         '''expression : NEW TYPE'''
-        p[0] = NewNode(p[2])
+        p[0] = NewNode(p[2], p[1])
 
     def p_expression_isvoid(self, p):
         '''expression : ISVOID expression'''
-        p[0] = IsvoidNode(p[2])
+        p[0] = IsvoidNode(p[2], p[1])
 
     def p_expression_plus(self, p):
         '''expression : expression PLUS expression'''
-        p[0] = PlusNode(p[1], p[3])
+        p[0] = PlusNode(p[1], p[3], p[2])
 
     def p_expression_minus(self, p):
         '''expression : expression MINUS expression'''
-        p[0] = MinusNode(p[1], p[3])
+        p[0] = MinusNode(p[1], p[3], p[2])
     
     def p_expression_star(self, p):
         '''expression : expression STAR expression'''
-        p[0] = StarNode(p[1], p[3])
+        p[0] = StarNode(p[1], p[3], p[2])
 
     def p_expression_divide(self, p):
         '''expression : expression DIVIDE expression'''
-        p[0] = DivideNode(p[1], p[3])
+        p[0] = DivideNode(p[1], p[3], p[2])
 
     def p_expression_less(self, p):
         '''expression : expression LESS expression'''
-        p[0] = LessNode(p[1], p[3])
+        p[0] = LessNode(p[1], p[3], p[2])
 
     def p_expression_lequal(self, p):
         '''expression : expression LEQUAL expression'''
-        p[0] = LequalNode(p[1], p[3])
+        p[0] = LequalNode(p[1], p[3], p[2])
 
     def p_expression_equal(self, p):
         '''expression : expression EQUAL expression'''
-        p[0] = EqualNode(p[1], p[3])
+        p[0] = EqualNode(p[1], p[3], p[2])
 
     def p_expression_complement(self, p):
         '''expression : TILDE expression'''

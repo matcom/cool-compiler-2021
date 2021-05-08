@@ -110,12 +110,14 @@ class Lexer(object):
     def t_string(self, t):
         r'"'
         t.lexer.string = ''
+        t.lexer.begin_string = t.lexer.lexpos
         t.lexer.begin('string')
 
     def t_string_end(self, t):
         r'"'   
         t.type = "STRING"
         t.value = t.lexer.string
+        t.lexpos = t.lexer.begin_string - 1
         t.value = Token(t)
         t.lexer.begin('INITIAL')
         return t
@@ -301,7 +303,7 @@ class Lexer(object):
 
     #region general rules
     def t_newline(self, t):
-        r'(\n|\f|\r|\v|\t)+'
+        r'(\n|\r)+'
         t.lexer.lineno += len(t.value)
 
     def t_error(self, t):
