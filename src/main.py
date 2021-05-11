@@ -8,8 +8,12 @@ from parsing.parser import Parser
 from semantic.semantic import SemanticAnalyzer
 
 class Compiler:
-    
+
     def __init__(self, input_file:str, output_file:str, debug:bool):
+        '''
+        Inicializa las variables a utilizar y 
+        ejecuta el pipeline del proyecto.
+        '''
         self.input_file = Path(input_file)
         self.output_file = Path(output_file)
         self.debug = debug
@@ -37,9 +41,12 @@ class Compiler:
             exit(1)
 
         Utils.Write(self.debug_path, '.cl', self.code) if self.debug else None
-        self.steps = [ self.lexing, self.parsing, self.semantics ]
+        self.steps = [ self.lexing, self.parsing, self.semantics, self.code_generation ]
 
     def compile(self):
+        '''
+        Ejecuta el pipeline para correr cada fase.
+        '''
         for step in self.steps:
             step()
 
@@ -91,8 +98,17 @@ class Compiler:
         if len(semantic_analyzer.errors) > 0:
             print(semantic_analyzer.errors[0])
             exit(1)
-        else:
-            print('COMPLETED SEMANTIC ANALYSER!!!')
+        # else:
+        #     print('COMPLETED SEMANTIC ANALYSER!!!')
+
+    def code_generation(self):
+        '''
+        Lleva a cabo la generación de código.
+        '''
+        # codigo referente a la generacion de codigo y en la 
+        # carpeta code_generation tambien se pueden poner los 
+        # metodos auxiliares
+        pass
 
 def main():
 
