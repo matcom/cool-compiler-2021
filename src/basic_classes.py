@@ -39,7 +39,7 @@ class Build:
         f = AST_CIL.Function(func)
         f.params.append('x')
         f.instructions.append(AST_CIL.PrintStr('x'))
-        f.instructions.append(AST_CIL.Return())
+        f.instructions.append(AST_CIL.Return('self'))
         code.append(f)
         ################################################
         func = 'function' + '_' + 'IO' + '_' + 'out_int'
@@ -47,7 +47,7 @@ class Build:
         f = AST_CIL.Function(func)
         f.params.append('x')
         f.instructions.append(AST_CIL.PrintInt('x'))
-        f.instructions.append(AST_CIL.Return())
+        f.instructions.append(AST_CIL.Return('self'))
         code.append(f)
         ################################################
         func = 'function' + '_' + 'IO' + '_' + 'in_int'
