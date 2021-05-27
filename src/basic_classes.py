@@ -16,6 +16,14 @@ class Build:
 
     def build_Object(self, code, types):
         # abort() : Object
+        _type_Object = AST_CIL.Type('Object')
+        func = 'function' + '_' + 'Object' + '_' + 'abort'
+        _type_Object.methods['abort'] = func
+
+        f = AST_CIL.Function(func)
+        f.instructions.append(AST_CIL.EndProgram())
+        code.append(f)
+
         # type_name() : String
         # copy() : SELF_TYPE
         pass
@@ -33,26 +41,32 @@ class Build:
         pass
 
     def build_IO(self, code, types):
+
         _type_IO = AST_CIL.Type('IO')
         func = 'function' + '_' + 'IO' + '_' + 'out_string'
         _type_IO.methods['out_string'] = func
         f = AST_CIL.Function(func)
-        f.params.append('x')
+        f.params = ['self', 'x']
         f.instructions.append(AST_CIL.PrintStr('x'))
         f.instructions.append(AST_CIL.Return('self'))
         code.append(f)
+
         ################################################
+
         func = 'function' + '_' + 'IO' + '_' + 'out_int'
         _type_IO.methods['out_int'] = func
         f = AST_CIL.Function(func)
-        f.params.append('x')
+        f.params = ['self', 'x']
         f.instructions.append(AST_CIL.PrintInt('x'))
         f.instructions.append(AST_CIL.Return('self'))
         code.append(f)
+
         ################################################
+
         func = 'function' + '_' + 'IO' + '_' + 'in_int'
         _type_IO.methods['in_int'] = func
         f = AST_CIL.Function(func)
+        f.params = ['self']
         d = self.get_local()
         f.localvars.append(d)
         f.instructions.append(AST_CIL.ReadInt(d))
@@ -61,6 +75,6 @@ class Build:
         intr2 = AST_CIL.SetAttrib(instance, 0, d)
         f.localvars.append(instance)
         f.instructions += [intr1, intr2]
-        f.instructions.append(AST_CIL.Return(instance))        
+        f.instructions.append(AST_CIL.Return(instance))
         code.append(f)
         types.append(_type_IO)

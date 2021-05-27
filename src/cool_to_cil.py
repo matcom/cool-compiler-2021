@@ -289,7 +289,12 @@ class Build_CIL:
 
     @visitor.when(Plus)
     def visit(self, plus, functionCIL):
+        #d = 'temp'
+
         d = self.get_local()
+
+        #if not d in functionCIL.localvars:
+
         functionCIL.localvars.append(d)
         intr1 = AST_CIL.Allocate(d, 'Int')
         functionCIL.instructions.insert(0, intr1)
@@ -303,7 +308,12 @@ class Build_CIL:
 
     @visitor.when(Minus)
     def visit(self, minus, functionCIL):
+        #d = 'temp'
+
         d = self.get_local()
+
+        #if not d in functionCIL.localvars:
+
         functionCIL.localvars.append(d)
         intr1 = AST_CIL.Allocate(d, 'Int')
         functionCIL.instructions.insert(0, intr1)
@@ -317,7 +327,11 @@ class Build_CIL:
 
     @visitor.when(Div)
     def visit(self, div, functionCIL):
+        #d = 'temp'
+
         d = self.get_local()
+
+        # if not d in functionCIL.localvars:
 
         functionCIL.localvars.append(d)
         intr1 = AST_CIL.Allocate(d, 'Int')
@@ -332,7 +346,12 @@ class Build_CIL:
 
     @visitor.when(Star)
     def visit(self, star, functionCIL):
+        #d = 'temp'
+
         d = self.get_local()
+
+        # if not d in functionCIL.localvars:
+
         functionCIL.localvars.append(d)
         intr1 = AST_CIL.Allocate(d, 'Int')
         functionCIL.instructions.insert(0, intr1)

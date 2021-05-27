@@ -20,6 +20,9 @@ class Data(Node):
         self.vname = vname
         self.value = value
 
+
+
+
 class Function(Node):
     def __init__(self, fname):
         self.fname = fname
@@ -223,6 +226,14 @@ class PrintInt(Instruction):
     def to_string(self):
         return "PRINT {}".format(self.value)
 
+class EndProgram(Instruction):
+    def __init__(self):
+        pass
+
+    def to_string(self):
+        return "PROGRAM END WITH ERROR"
+
+
 class IsVoid(Instruction):
     def __init__(self, dest, obj):
         self.dest = dest
@@ -230,13 +241,19 @@ class IsVoid(Instruction):
 
 class LowerThan(Instruction):
     def __init__(self, dest, left_expr, right_expr):
-        self.left_expr = left_expr
-        self.right_expr = right_expr
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+    def to_string(self):
+        return "{} <- {} < {}".format(self.dest, self.left, self.right)
 
 class LowerEqualThan(Instruction):
     def __init__(self, dest, left_expr, right_expr):
-        self.left_expr = left_expr
-        self.right_expr = right_expr
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+    def to_string(self):
+        return "{} <- {} <= {}".format(self.dest, self.left, self.right)
 
 class EqualThan(Instruction):
     def __init__(self, dest, left_expr, right_expr):
@@ -246,7 +263,16 @@ class EqualThan(Instruction):
     def to_string(self):
         return "{} <- {} == {}".format(self.dest, self.left, self.right)
 
+class Exit(Instruction):
+    def __init__(self):
+        pass
+    def to_string(self):
+        return 'Exit'
+
 class EqualStrThanStr(Instruction):
     def __init__(self, dest, left_expr, right_expr):
-        self.left_expr = left_expr
-        self.right_expr = right_expr
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+    def to_string(self):
+        return "{} <- {} == {}".format(self.dest, self.left, self.right)
