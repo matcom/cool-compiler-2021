@@ -62,13 +62,19 @@ class Type(DeprecatedType):
             return []
         
     def get_attribute(self, name:str):
+        return self._get_attribute(name, set())
+        
+    def _get_attribute(self, name:str, visited_types:set):
+        if self in visited_types:
+            raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
             if self.parent is None or self.parent == self:
                 raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
             try:
-                return self.parent.get_attribute(name)
+                visited_types.add(self)
+                return self.parent._get_attribute(name, visited_types)
             except SemanticError:
                 raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
     

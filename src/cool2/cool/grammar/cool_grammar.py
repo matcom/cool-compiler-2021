@@ -52,7 +52,7 @@ def_attr %= idx + colon + typex, lambda h,s: AttrDeclarationNode(s[1][0],s[3][0]
 def_attr %= idx + colon + typex + assign + expr, lambda h,s: AttrDeclarationNode(s[1][0],s[3][0],s[5],row=s[1][1] ,column=s[1][2])
 
 # <def-func>     ??? 
-def_func %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur, lambda h,s: FuncDeclarationNode(s[1][0],s[3],s[6][0],s[8],row=s[1][1] ,column=s[1][2])
+def_func %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur, lambda h,s: FuncDeclarationNode(s[1][0],s[3],s[6],s[8],row=s[1][1] ,column=s[1][2])
 
 param_list %= G.Epsilon, lambda h,s: [ ]
 param_list %= param, lambda h,s: [ s[1] ]
@@ -128,7 +128,7 @@ atom %= string, lambda h,s: StringNode(s[1][0],row=s[1][1] ,column=s[1][2])
 atom %= true, lambda h,s: BoolNode(s[1][0],row=s[1][1] ,column=s[1][2])
 atom %= false, lambda h,s: BoolNode(s[1][0],row=s[1][1] ,column=s[1][2])
 atom %= idx, lambda h,s: VariableNode(s[1][0],row=s[1][1] ,column=s[1][2])
-atom %= new + typex, lambda h,s: InstantiateNode(s[2][0],row=s[1][1] ,column=s[1][2])
+atom %= new + typex, lambda h,s: InstantiateNode(s[2],row=s[1][1] ,column=s[1][2])
 atom %= func_call, lambda h,s: CallNode(s[1][0],s[1][1],s[1][2],None,row=s[1][3] ,column=s[1][4])
 atom %= at + typex + dot + func_call, lambda h,s: CallNode(s[4][0],s[4][1],s[4][2],s[2][0],row=s[4][3] ,column=s[4][4])
 atom %= opar + expr + cpar, lambda h,s: s[2]

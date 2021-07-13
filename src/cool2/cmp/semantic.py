@@ -93,7 +93,14 @@ class Type:
         return plain.values() if clean else plain
 
     def all_methods(self, clean=True):
-        plain = OrderedDict() if self.parent is None or self.parent == self else self.parent.all_methods(False)
+        return self._all_methods(clean, set())
+        
+    def _all_methods(self, clean:bool, visited_types:set):
+        if self.parent is None or self.parent == self or self in visited_types:
+            plain = OrderedDict()
+        else:
+            visited_types.add(self)
+            plain = self.parent._all_methods(False, visited_types)
         for method in self.methods:
             plain[method.name] = (method, self)
         return plain.values() if clean else plain
