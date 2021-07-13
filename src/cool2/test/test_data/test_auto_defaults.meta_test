@@ -8,4 +8,4 @@ class Main {
     {
         let b:AUTO_TYPE in a + b + 10
     };
-}
+};

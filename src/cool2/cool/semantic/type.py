@@ -308,7 +308,7 @@ class AutoType(Type):
         Type.__init__(self, 'AUTO_TYPE')
         self.parent = None
         self.context = context
-        self.possibles = [ x for x in context.types.values() if not isinstance(x, ErrorType) ]
+        self.possibles = [ x for x in context.types.values() if all([not isinstance(x, ErrorType), not isinstance(x, VoidType)])]
         self.equals = [self,]
     
     def update_possibles(self, new_possibles):

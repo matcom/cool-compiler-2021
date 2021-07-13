@@ -3,11 +3,11 @@
 class A
 {
 
-}
+};
 class B
 {
 
-}
+};
 
 class Main
 {
@@ -25,4 +25,4 @@ class Main
             (c = (a = b)) = true;
         }
     };
-}
+};

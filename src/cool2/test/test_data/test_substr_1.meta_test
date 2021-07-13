@@ -8,4 +8,4 @@ class Main
             s.substr(0,10).concat(s.substr(0,5)).concat(s.substr(5,5));
         }
     };
-}
+};

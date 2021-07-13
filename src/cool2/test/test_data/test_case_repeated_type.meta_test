@@ -12,4 +12,4 @@ class Main inherits Object {
            a;
        }
    };
-}
+};

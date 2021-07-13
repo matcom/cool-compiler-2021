@@ -9,4 +9,4 @@ class Main
     {
         b.type_name()
     };
-}
+};

@@ -16,4 +16,4 @@ class Main inherits Object {
             f(a/2, b+1)
         fi
     };
-}
+};

@@ -6,8 +6,8 @@ class M{
             30;
         }
     };
-}
+};
 
 class Main inherits M{
 
-}
+};

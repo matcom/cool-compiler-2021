@@ -10,4 +10,4 @@ class Main inherits IO {
             counter;
        }
    };
-}
+};

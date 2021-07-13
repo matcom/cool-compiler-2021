@@ -4,21 +4,21 @@ class Base {
     base():AUTO_TYPE {
         self
     };
-}
+};
 
 class OtraBase {
     otraBase():AUTO_TYPE {
         self
     };
-}
+};
 
 class ConcBase1 inherits Base {
 
-}
+};
 
 class ConcBase2 inherits OtraBase {
 
-}
+};
 
 class Main {
     a:AUTO_TYPE;
@@ -101,4 +101,4 @@ class Main {
         }
     };
 
-}
+};

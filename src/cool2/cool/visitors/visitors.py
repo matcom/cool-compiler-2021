@@ -361,6 +361,8 @@ class TypeCollector(object):
         
         for class_decl in node.declarations:
             if class_decl.id in self.context.special_types:
+                typex = self.context.get_type(class_decl.id)
+                typex.class_node = class_decl
                 self.add_semantic_error(SemanticError(REDEFINITION_BASIC_CLASS, class_decl.id), class_decl.row, class_decl.column)
             else:
                 try:
@@ -833,6 +835,10 @@ class AutoResolver:
     def __init__(self, context:Context, errors=[]):
         self.context = context
         self.errors = errors
+
+    def add_semantic_error(self, error:SemanticError, row:int, column:int):
+        error.set_position(row, column)
+        self.errors.append(error)
 
     def change_auto_to_concrete_type(self, node, node_type_name="type", less_concrete=False):
         typex = getattr(node, node_type_name)
