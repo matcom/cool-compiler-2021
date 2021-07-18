@@ -36,7 +36,9 @@ class FuncDeclarationNode(DeclarationNode):
         super().__init__(row,column)
         self.id = idx
         self.params = params
-        self.type = return_type
+        self.type = return_type[0]
+        self.type_row = return_type[1]
+        self.type_column = return_type[2]
         self.body = body
     
     def __iter__(self):
@@ -228,7 +230,11 @@ class VariableNode(AtomicNode):
     pass
 
 class InstantiateNode(AtomicNode):
-    pass
+    
+    def __init__(self, type, row=None,column=None):
+        super().__init__(type[0], row, column)
+        self.type_row = type[1]
+        self.type_column = type[2]
 
 class NotNode(UnaryNode):
     pass

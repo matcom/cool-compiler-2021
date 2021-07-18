@@ -5,4 +5,4 @@ class Main inherits IO {
         succ(10)
     };
     succ(n : Int) : AUTO_TYPE { n + 1 };
-}
+};

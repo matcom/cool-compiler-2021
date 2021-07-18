@@ -1,11 +1,11 @@
 "{\"name\": \"test_conditional\", \"result\": 3, \"errors\": []}"
 
 
-    class A { }
-    class B inherits A { }
-    class C inherits B { }
-    class D inherits B { }
-    class E inherits A { }
+    class A { };
+    class B inherits A { };
+    class C inherits B { };
+    class D inherits B { };
+    class E inherits A { };
 
     class Main inherits IO {
            
@@ -21,4 +21,4 @@
                 
             }
         };
-    }
+    };

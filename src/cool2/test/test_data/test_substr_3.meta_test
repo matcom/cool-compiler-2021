@@ -8,4 +8,4 @@ class Main
             s.substr(0,11);
         }
     };
-}
+};

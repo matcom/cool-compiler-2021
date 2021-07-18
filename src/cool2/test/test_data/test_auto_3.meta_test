@@ -6,4 +6,4 @@ class Main inherits IO {
     main():AUTO_TYPE {
        succ(10)
     };
-}
+};

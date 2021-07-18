@@ -1,6 +1,6 @@
 "{\"name\": \"test_default\", \"result\": true, \"errors\": []}"
 
-class B {}
+class B {};
 
 class Main inherits IO {
     a:Int;
@@ -30,4 +30,4 @@ class Main inherits IO {
             fi;
         }
     };
-}
+};

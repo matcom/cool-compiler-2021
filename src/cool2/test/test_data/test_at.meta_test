@@ -7,7 +7,7 @@ class A {
     name2():String {
         "class A"
     };
-}
+};
 
 class B inherits A {
     name():String {
@@ -16,7 +16,7 @@ class B inherits A {
     name2():String {
         "class B"
     };
-}
+};
 
 class Main inherits IO {
    main():String {
@@ -25,4 +25,4 @@ class Main inherits IO {
             b@A.name();
        }
    };
-}
+};

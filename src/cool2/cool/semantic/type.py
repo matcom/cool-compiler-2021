@@ -7,7 +7,7 @@ from cool.error.errors import RunError, SemanticError, TypeCoolError, InferError
     VOID_TYPE_CONFORMS, METHOD_NOT_DEFINED, METHOD_ALREADY_DEFINED, \
     SUBSTR_OUT_RANGE, ATTRIBUTE_NOT_DEFINED, ATTRIBUTE_ALREADY_DEFINED, \
     ATTRIBUTE_CANT_INFER, METHOD_CANT_INFER, TYPE_CANT_INFER, TYPE_CANT_BE_INHERITED, \
-    NO_COMMON_TYPE, READ_IS_NOT_INT
+    NO_COMMON_TYPE, READ_IS_NOT_INT, ATTRIBUTE_ALREADY_DEFINED_IN_PARENT
 import cool.visitors.utils as ut
 
 class Type(DeprecatedType):
@@ -19,11 +19,14 @@ class Type(DeprecatedType):
         f.node.body.type = old_type
     
     def set_parent(self,parent):
-        DeprecatedType.set_parent(self,parent)
-        if not parent.can_have_children:
-            self.parent = None
-            raise SemanticError(TYPE_CANT_BE_INHERITED, parent.name)
-    
+        try:
+            DeprecatedType.set_parent(self,parent)
+            if not parent.can_have_children:
+                self.parent = None
+                raise SemanticError(TYPE_CANT_BE_INHERITED, self.name, parent.name)
+        except DeprecatedSemanticError as er:
+            raise SemanticError(er.text)
+        
     def __hash__(self):
         return hash(self.name)
 
@@ -35,7 +38,7 @@ class Type(DeprecatedType):
         try:
             return next(method for method in self.methods if method.name == name and len(method.param_names)==args)
         except StopIteration:
-            if self.parent is None:
+            if self.parent is None or self.parent == self:
                 raise SemanticError(METHOD_NOT_DEFINED,name, "", self.name, args)
             try:
                 if not only_local:
@@ -46,7 +49,7 @@ class Type(DeprecatedType):
     
     def define_method(self, name:str, param_names:list, param_types:list, return_type):
         if (name,len(param_names)) in ((method.name,len(method.param_names)) for method in self.methods):
-            raise SemanticError(METHOD_ALREADY_DEFINED, name, len(param_names), self.name)
+            raise SemanticError(METHOD_ALREADY_DEFINED, name)
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
         return method
@@ -59,25 +62,34 @@ class Type(DeprecatedType):
             return []
         
     def get_attribute(self, name:str):
+        return self._get_attribute(name, set())
+        
+    def _get_attribute(self, name:str, visited_types:set):
+        if self in visited_types:
+            raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
-            if self.parent is None:
+            if self.parent is None or self.parent == self:
                 raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
             try:
-                return self.parent.get_attribute(name)
+                visited_types.add(self)
+                return self.parent._get_attribute(name, visited_types)
             except SemanticError:
                 raise SemanticError(ATTRIBUTE_NOT_DEFINED, name, self.name)
     
     def define_attribute(self, name:str, typex):
         try:
-            self.get_attribute(name)
+            attribute = self.get_attribute(name)
         except SemanticError:
             attribute = Attribute(name, typex)
             self.attributes.append(attribute)
             return attribute
         else:
-            raise SemanticError(ATTRIBUTE_ALREADY_DEFINED, name, self.name)
+            if attribute in self.attributes:
+                raise SemanticError(ATTRIBUTE_ALREADY_DEFINED, name)
+            else:
+                raise SemanticError(ATTRIBUTE_ALREADY_DEFINED_IN_PARENT, name)
     
     def conforms_to(self,other,current_type):
         self_type = self if not isinstance(self,SelfType) else current_type
@@ -296,7 +308,7 @@ class AutoType(Type):
         Type.__init__(self, 'AUTO_TYPE')
         self.parent = None
         self.context = context
-        self.possibles = [ x for x in context.types.values() if not isinstance(x, ErrorType) ]
+        self.possibles = [ x for x in context.types.values() if all([not isinstance(x, ErrorType), not isinstance(x, VoidType)])]
         self.equals = [self,]
     
     def update_possibles(self, new_possibles):

@@ -9,4 +9,4 @@ class Main inherits Object {
    main():Object {
        0
    };
-}
+};
