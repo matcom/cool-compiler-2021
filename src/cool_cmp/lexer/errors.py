@@ -19,4 +19,4 @@ class LexerCoolError(CoolError):
         self.token = error_token
 
     def __str__(self):
-        return self.FORMAT.format(self.token.get_position()[0],self.token.get_position()[1], self.ERROR_TYPE, f'ERROR "{self.token.get_lex()}"')
+        return self.FORMAT.format(self.token.get_position()[0],self.token.get_position()[1], self.ERROR_TYPE, self.error)

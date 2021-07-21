@@ -7,8 +7,10 @@ from cool_cmp.lexer.interface import ILexer
 from cool_cmp.shared.pipeline import Pipeline, Pipe
 from cool_cmp.shared import SymbolTable
 from cool_cmp.lexer.lexer2 import CoolLexer2
+from cool_cmp.lexer.lexer import PlyLexer
 
-default_lexer = CoolLexer2()
+
+default_lexer = PlyLexer()
 
 class LexerPipeline(Pipeline):
 

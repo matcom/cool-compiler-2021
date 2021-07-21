@@ -78,7 +78,8 @@ class PlyLexer(ILexer):
         }
 
         tokens = (
-            'ID',
+            'OBJECTID',
+            'TYPEID',
             'NUMBER',
             'PLUS',
             'MINUS',
@@ -104,7 +105,50 @@ class PlyLexer(ILexer):
         ) + tuple(reserved[x] for x in reserved.keys())
 
 
-        t_STRING = r'"([^\n"\\]|(\\.)){0,1024}"'
+        def t_COMMENTMULTI(t):
+            r'\(\*(.|\n)*?\*\)'
+            t.lexer.lineno += t.value.count("\n")
+
+        def t_COMMENTMULTIUNFINISHED(t):
+            r'\(\*(.|\n)*'
+            t.lexer.lineno += t.value.count("\n")
+            msg = 'EOF in comment'
+            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
+
+        def t_STRING(t):
+            r'"([^\r\n"\\]|(\\\n)|(\\.)){0,1024}"'
+            t.lexer.lineno += t.value.count("\n")
+            null_ch = 'String contains null character'
+            for i in range(len(t.value)):
+                if t.value[i] == '\x00':
+                    pos = t.lexer.lexpos - (len(t.value) - i)
+                    line = t.lexer.lineno - t.value[:i].count("\n")
+                    self.add_error(LexerCoolError(null_ch, PlyCoolToken(t.value, t.type, line, pos)))
+            return t
+
+        def t_STRINGUNFINISHED(t):
+            r'"([^\r\n"\\]|(\\\n)|(\\.)){0,1024}\n'
+            t.lexer.lineno += t.value.count("\n")
+            null_ch = 'String contains null character'
+            for i in range(len(t.value)):
+                if t.value[i] == '\x00':
+                    pos = t.lexer.lexpos - (len(t.value) - i)
+                    line = t.lexer.lineno - t.value[:i].count("\n")
+                    self.add_error(LexerCoolError(null_ch, PlyCoolToken(t.value, t.type, line, pos)))
+            msg = 'Unfinished string constant'
+            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
+
+        def t_STRINGUNFINISHEDEOF(t):
+            r'"([^\r\n"\\]|(\\\n)|(\\.)){0,1024}'
+            t.lexer.lineno += t.value.count("\n")
+            null_ch = 'String contains null character'
+            for i in range(len(t.value)):
+                if t.value[i] == '\x00':
+                    pos = t.lexer.lexpos - (len(t.value) - i)
+                    line = t.lexer.lineno - t.value[:i].count("\n")
+                    self.add_error(LexerCoolError(null_ch, PlyCoolToken(t.value, t.type, line, pos)))
+            msg = 'EOF in string constant'
+            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno, t.lexer.lexpos)))
 
         def t_NUMBER(t):
             r'\d+'
@@ -116,17 +160,29 @@ class PlyLexer(ILexer):
                 t.value = 'Invalid'
             return t
 
-        def t_ID(t):
-            r'[a-zA-Z_][a-zA-Z0-9_]*'
+        def t_OBJECTID(t):
+            r'[a-z][a-zA-Z0-9_]*'
             low = t.value.lower()
-            if (t.value[0] == 't' or t.value[0] == 'f') and (reserved.get(low) == 'TRUE' or reserved.get(low) == 'FALSE'):
-                t.type = reserved.get(low)
-            else:
-                t.type = reserved.get(t.value,'ID')
+            t.type = reserved.get(low,'OBJECTID')
             return t
 
-        def t_COMMENT(t):
-            r'(--.*)|(\(\*(.|\n)*\*\))'
+        def t_TYPEID(t):
+            r'[A-Z][a-zA-Z0-9_]*'
+            low = t.value.lower()
+            if low == 'true':
+                t.type = 'TYPEID'
+
+            elif low == 'false':
+                t.type = 'TYPEID'
+
+            else:
+                t.type = reserved.get(low, 'TYPEID')
+
+            return t
+
+        def t_COMMENTSINGLE(t):
+            r'(--.*)'
+        
 
         t_PLUS      = r'\+'
         t_MINUS     = r'-'
@@ -169,6 +225,10 @@ class PlyLexer(ILexer):
             if not tok:
                 break
             result.append(PlyCoolToken(tok.value, tok.type, tok.lineno, self.find_column(program_string, tok)))
+
+        for error in self.error_tracker.get_errors():
+            error.token.set_position(error.token.lineno, self.find_column(program_string, error.token))
+            
         return result
 
     def add_error(self, error:LexerCoolError):
