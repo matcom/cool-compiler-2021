@@ -26,7 +26,7 @@ Actualemnte esta fase del proyecto ya fue completada parcialmente, obteniéndoce
 
 En la fase del parser al igual que en la fase anterir se empleó la biblioteca de python ```ply.yacc```. En este caso y de fomra inicial se crea una gerarquía de tokens que indica el orden de procedencia de las expresiones. Luego se procede a definir la gramática que va a ser la base del lenguaje cool apoyándonos de toda la información que aparece en el manual de cool. Esta fase se encuentra completada con un 100% de aceptación en los test propuestos. Una vez finalizada esta fase además de detectar todos los posibles errores de parse se obtiene el AST(árbol de sintaxis abstracto) el cual nos permite avanzar a la siguiente fase.
 
-###Semántica
+### Semántica
 
 En esta fase se van a definir todas las reglas semánticas de nuestro compilador, este consiste en hacer varios recorriodos por el AST apoyándonos en el patron ```visitor``` donde cada uno tiene una funcionalidad diferente y se dividen de la siguiente manera.
 
