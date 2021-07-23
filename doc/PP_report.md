@@ -47,6 +47,6 @@ En este ultimo recorrido se va a analizar todos los nodos del AST donde se va a 
 
 A pesar de que esta ultima fase tiene un 100% en los test de prueba propuesto aun quedan errores semanticos que detectar, y en una planificacion esta seria finalizado para finales de Septimebre principio de Octubres.
 
-###Generacion de codigo 
+### Generacion de codigo 
 
 Esta ultima fase del proyecto se realizaria de octubre a principos de diciembre incluso un poco antes, en el caso que se finalice con antelacion la fase anteriro. 
