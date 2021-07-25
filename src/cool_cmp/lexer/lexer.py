@@ -22,6 +22,7 @@ class PlyCoolToken(lex.LexToken, ICoolToken):
 
     def set_type(self, typex:str):
         self.type = typex
+        self.token_type = typex
         self.typex = typex
 
     def set_position(self, line:int, column:int):
@@ -228,6 +229,11 @@ class PlyLexer(ILexer):
 
         for error in self.error_tracker.get_errors():
             error.token.set_position(error.token.lineno, self.find_column(program_string, error.token))
+
+        self.add_extra_info('text', program_string)
+        self.add_extra_info('verbose', False)
+        self.add_extra_info('text_tokens', result)
+        self.add_extra_info('errors', self.get_errors())
             
         return result
 
