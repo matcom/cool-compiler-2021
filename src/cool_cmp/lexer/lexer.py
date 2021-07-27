@@ -106,15 +106,15 @@ class PlyLexer(ILexer):
         ) + tuple(reserved[x] for x in reserved.keys())
 
 
-        def t_COMMENTMULTI(t):
-            r'\(\*(.|\n)*?\*\)'
-            t.lexer.lineno += t.value.count("\n")
+        # def t_COMMENTMULTI(t):
+        #     r'\(\*(.|\n)*?\*\)'
+        #     t.lexer.lineno += t.value.count("\n")
 
-        def t_COMMENTMULTIUNFINISHED(t):
-            r'\(\*(.|\n)*'
-            t.lexer.lineno += t.value.count("\n")
-            msg = 'EOF in comment'
-            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
+        # def t_COMMENTMULTIUNFINISHED(t):
+        #     r'\(\*(.|\n)*'
+        #     t.lexer.lineno += t.value.count("\n")
+        #     msg = 'EOF in comment'
+        #     self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
 
         def t_STRING(t):
             r'"([^\r\n"\\]|(\\\n)|(\\.)){0,1024}"'
@@ -219,13 +219,54 @@ class PlyLexer(ILexer):
         self.lexer = lex.lex()
 
     def __call__(self, program_string:str):
-        self.lexer.input(program_string)
+        count = 0
+        lines = 0
+        passes = 0
+        semi_clean_string = []
+        for i in range(len(program_string)):
+            if passes > 0:
+                passes -= 1
+            elif program_string[i] == '(' and i + 1 < len(program_string) and program_string[i + 1] == '*':
+                count += 1
+                semi_clean_string.append(' ')
+                semi_clean_string.append(' ')
+                if i + 2 < len(program_string) and program_string[i + 2] == ')':
+                    semi_clean_string.append(' ')
+                    passes = 2
+                
+                else:
+                    passes = 1
+
+            elif program_string[i] == '*' and i + 1 < len(program_string) and program_string[i + 1] == ')' and count > 0:
+                count -= 1
+                semi_clean_string.append(' ')
+                semi_clean_string.append(' ')
+                passes = 1
+
+            elif count > 0 and program_string[i] != '\n':
+                semi_clean_string.append(' ')
+
+            elif program_string[i] == '\n':
+                semi_clean_string.append(program_string[i])
+                lines += 1
+
+            else:
+                semi_clean_string.append(program_string[i])
+
+        clean = ''.join(semi_clean_string)
+        print(clean)
+        print(len(clean))
+        print(len(program_string))
+        self.lexer.input(clean)
         result = []
         while True:
             tok = self.lexer.token()
             if not tok:
                 break
             result.append(PlyCoolToken(tok.value, tok.type, tok.lineno, self.find_column(program_string, tok)))
+
+        if count > 0:
+            self.add_error(LexerCoolError('EOF in comment', PlyCoolToken('', '', lines + 1, len(program_string))))
 
         for error in self.error_tracker.get_errors():
             error.token.set_position(error.token.lineno, self.find_column(program_string, error.token))
