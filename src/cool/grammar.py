@@ -24,8 +24,9 @@ function_call = G.add_non_terminal('function-call')
 expr_list = G.add_non_terminal('expr-list')
 not_empty_expr_list = G.add_non_terminal('not-empty-expr-list')
 expr = G.add_non_terminal('expr')
+negable_comp = G.add_non_terminal('negable-comp')
 comp = G.add_non_terminal('comp')
-negable = G.add_non_terminal('negable')
+negable_arith = G.add_non_terminal('negable-arith')
 arith = G.add_non_terminal('arith')
 term = G.add_non_terminal('term')
 factor = G.add_non_terminal('factor')
@@ -255,18 +256,18 @@ expr %= '{ block }', lambda s: ast.BlockNode(s[2])
 expr %= 'while expr loop expr pool', lambda s: ast.WhileNode(s[2], s[4])
 expr %= 'let declaration-list in expr', lambda s: ast.LetNode(s[2], s[4])
 expr %= 'case expr of case-list esac', lambda s: ast.SwitchCaseNode(s[2], s[4])
-expr %= 'negable', lambda s: s[1]
+expr %= 'negable-comp', lambda s: s[1]
 
-negable %= 'not comp', lambda s: ast.NegationNode(s[2])
-negable %= 'comp', lambda s: s[1]
+negable_comp %= 'not comp', lambda s: ast.NegationNode(s[2])
+negable_comp %= 'comp', lambda s: s[1]
 
-comp %= 'comp < arith', lambda s: ast.LessThanNode(s[1], s[2], s[3])
-comp %= 'comp <= arith', lambda s: ast.LessEqualNode(s[1], s[2], s[3])
-comp %= 'comp = arith', lambda s: ast.EqualNode(s[1], s[2], s[3])
-comp %= 'comp = not arith', lambda s: ast.EqualNode(s[1], s[2], ast.NegationNode(s[4]))
-comp %= 'comp < not arith', lambda s: ast.LessThanNode(s[1], s[2], ast.NegationNode(s[4]))
-comp %= 'comp <= not arith', lambda s: ast.LessEqualNode(s[1], s[2], ast.NegationNode(s[4]))
+comp %= 'comp < negable-arith', lambda s: ast.LessThanNode(s[1], s[2], s[3])
+comp %= 'comp <= negable-arith', lambda s: ast.LessEqualNode(s[1], s[2], s[3])
+comp %= 'comp = negable-arith', lambda s: ast.EqualNode(s[1], s[2], s[3])
 comp %= 'arith', lambda s: s[1]
+
+negable_arith %= 'not arith', lambda s: ast.NegationNode(s[2])
+negable_arith %= 'arith', lambda s: s[1]
 
 arith %= 'arith + term', lambda s: ast.PlusNode(s[1], s[2], s[3])
 arith %= 'arith - term', lambda s: ast.MinusNode(s[1], s[2], s[3])
