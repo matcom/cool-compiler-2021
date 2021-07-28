@@ -40,8 +40,16 @@ from typing import Dict, List, Optional, Set, Tuple, Deque
 import cool.semantics.utils.astnodes as ast
 import cool.semantics.utils.errors as err
 import cool.visitor as visitor
-from cool.semantics.utils.scope import (Attribute, Context, ErrorType, Method,
-                                        Scope, SemanticError, Type, VariableInfo)
+from cool.semantics.utils.scope import (
+    Attribute,
+    Context,
+    ErrorType,
+    Method,
+    Scope,
+    SemanticError,
+    Type,
+    VariableInfo,
+)
 
 
 class DependencyNode:
@@ -66,7 +74,7 @@ class AtomNode(DependencyNode):
         pass
 
     def __str__(self):
-        return f'Atom({self.type.name})'
+        return f"Atom({self.type.name})"
 
 
 class VariableInfoNode(DependencyNode):
@@ -78,7 +86,7 @@ class VariableInfoNode(DependencyNode):
         self.type = self.variable_info.type = _type
 
     def __str__(self):
-        return f'VarInfo({self.variable_info.name}, {self.type.name})'
+        return f"VarInfo({self.variable_info.name}, {self.type.name})"
 
 
 class AttributeNode(DependencyNode):
@@ -90,7 +98,7 @@ class AttributeNode(DependencyNode):
         self.type = self.attribute.type = _type
 
     def __str__(self):
-        return f'Attr({self.attribute.name}, {self.type.name})'
+        return f"Attr({self.attribute.name}, {self.type.name})"
 
 
 class ParameterNode(DependencyNode):
@@ -103,7 +111,7 @@ class ParameterNode(DependencyNode):
         self.type = self.method.param_types[self.index] = _type
 
     def __str__(self):
-        return f'Param({self.method.name}, {self.index}, {self.type.name})'
+        return f"Param({self.method.name}, {self.index}, {self.type.name})"
 
 
 class ReturnTypeNode(DependencyNode):
@@ -115,7 +123,7 @@ class ReturnTypeNode(DependencyNode):
         self.type = self.method.return_type = _type
 
     def __str__(self):
-        return f'Return({self.method.name}, {self.type.name})'
+        return f"Return({self.method.name}, {self.type.name})"
 
 
 class BranchedNode(DependencyNode, ABC):
@@ -123,7 +131,7 @@ class BranchedNode(DependencyNode, ABC):
 
     @property
     def is_ready(self) -> bool:
-        return all(x.type.name != 'AUTO_TYPE' for x in self.branches)
+        return all(x.type.name != "AUTO_TYPE" for x in self.branches)
 
 
 class ConditionalNode(BranchedNode):
@@ -135,7 +143,7 @@ class ConditionalNode(BranchedNode):
         self.type = _type
 
     def __str__(self):
-        return f'ConditionalNode({self.type.name})'
+        return f"ConditionalNode({self.type.name})"
 
 
 class CaseOfNode(BranchedNode):
@@ -147,7 +155,7 @@ class CaseOfNode(BranchedNode):
         self.type = _type
 
     def __str__(self):
-        return f'CaseOfNode({self.type.name})'
+        return f"CaseOfNode({self.type.name})"
 
 
 class DependencyGraph:
@@ -166,7 +174,9 @@ class DependencyGraph:
         self.add_node(other)
 
     def update_dependencies(self, default_type: Type = None):
-        queue: Deque[DependencyNode] = deque(node for node in self.dependencies if isinstance(node, AtomNode))
+        queue: Deque[DependencyNode] = deque(
+            node for node in self.dependencies if isinstance(node, AtomNode)
+        )
         visited: Set[DependencyNode] = set(queue)
 
         while queue:
@@ -186,8 +196,11 @@ class DependencyGraph:
             if isinstance(node, BranchedNode) and node.is_ready:
                 node.update(Type.multi_join([x.type for x in node.branches]))
 
-        queue = deque(node for node in self.dependencies
-                      if isinstance(node, BranchedNode) and node.type.name != 'AUTO_TYPE')
+        queue = deque(
+            node
+            for node in self.dependencies
+            if isinstance(node, BranchedNode) and node.type.name != "AUTO_TYPE"
+        )
         visited.update(queue)
         while queue:
             node = queue.popleft()
@@ -203,7 +216,11 @@ class DependencyGraph:
                     node.update(default_type)
 
     def __str__(self):
-        return '{\n\t' + '\n\t'.join(f'{key}: {value}' for key, value in self.dependencies.items()) + '\n}'
+        return (
+            "{\n\t"
+            + "\n\t".join(f"{key}: {value}" for key, value in self.dependencies.items())
+            + "\n}"
+        )
 
 
 class InferenceChecker:
@@ -219,7 +236,9 @@ class InferenceChecker:
         self.graph = DependencyGraph()
 
     @staticmethod
-    def build_attributes_reference(context: Context) -> Dict[Tuple[str, str], AttributeNode]:
+    def build_attributes_reference(
+        context: Context,
+    ) -> Dict[Tuple[str, str], AttributeNode]:
         attributes = {}
 
         for typex in context:
@@ -229,18 +248,24 @@ class InferenceChecker:
         return attributes
 
     @staticmethod
-    def build_methods_reference(context: Context) -> Dict[Tuple[str, str], Tuple[List[ParameterNode], ReturnTypeNode]]:
+    def build_methods_reference(
+        context: Context,
+    ) -> Dict[Tuple[str, str], Tuple[List[ParameterNode], ReturnTypeNode]]:
         methods = {}
 
         for typex in context:
             for method in typex.methods:
                 methods[typex.name, method.name] = (
-                    [ParameterNode(t, method, i) for i, t in enumerate(method.param_types)],
-                    ReturnTypeNode(method.return_type, method))
+                    [
+                        ParameterNode(t, method, i)
+                        for i, t in enumerate(method.param_types)
+                    ],
+                    ReturnTypeNode(method.return_type, method),
+                )
 
         return methods
 
-    @visitor.on('node')
+    @visitor.on("node")
     def visit(self, node, scope):
         pass
 
@@ -253,7 +278,7 @@ class InferenceChecker:
             self.visit(item, scope.create_child())
 
         # print(self.graph, '\n')
-        self.graph.update_dependencies(default_type=self.context.get_type('Object'))
+        self.graph.update_dependencies(default_type=self.context.get_type("Object"))
         # print(self.graph, '\n')
         InferenceTypeSubstitute(self.context, self.errors).visit(node, scope)
 
@@ -261,8 +286,16 @@ class InferenceChecker:
     def visit(self, node: ast.ClassDeclarationNode, scope: Scope):
         self.current_type = self.context.get_type(node.id)
 
-        attrs = [feature for feature in node.features if isinstance(feature, ast.AttrDeclarationNode)]
-        methods = [feature for feature in node.features if isinstance(feature, ast.MethodDeclarationNode)]
+        attrs = [
+            feature
+            for feature in node.features
+            if isinstance(feature, ast.AttrDeclarationNode)
+        ]
+        methods = [
+            feature
+            for feature in node.features
+            if isinstance(feature, ast.MethodDeclarationNode)
+        ]
 
         for attr in attrs:
             self.visit(attr, scope)
@@ -273,15 +306,21 @@ class InferenceChecker:
     @visitor.when(ast.AttrDeclarationNode)
     def visit(self, node: ast.AttrDeclarationNode, scope: Scope):
         # Solve the expression of the attribute
-        expr_node = self.visit(node.expr, scope.create_child()) if node.expr is not None else None
+        expr_node = (
+            self.visit(node.expr, scope.create_child())
+            if node.expr is not None
+            else None
+        )
 
         # Define attribute in the scope
         var_info = scope.define_variable(node.id, self.context.get_type(node.type))
 
         # Set and get the reference to the variable info node
-        var_info_node = self.variables[var_info] = VariableInfoNode(self.context.get_type(node.type), var_info)
+        var_info_node = self.variables[var_info] = VariableInfoNode(
+            self.context.get_type(node.type), var_info
+        )
 
-        if node.type == 'AUTO_TYPE':
+        if node.type == "AUTO_TYPE":
             # Get the reference to the attribute node
             attr_node = self.attributes[self.current_type.name, node.id]
 
@@ -299,7 +338,7 @@ class InferenceChecker:
         self.current_method = self.current_type.get_method(node.id)
 
         # Define 'self' as a variable in the scope
-        self_var = scope.define_variable('self', self.current_type)
+        self_var = scope.define_variable("self", self.current_type)
 
         # Set the reference of 'self' variable info node
         self.variables[self_var] = VariableInfoNode(self.current_type, self_var)
@@ -312,11 +351,15 @@ class InferenceChecker:
             param_var_info = scope.define_variable(param_name, param_type)
 
             # Set the reference to the variable info node
-            param_var_info_node = self.variables[param_var_info] = VariableInfoNode(param_type, param_var_info)
+            param_var_info_node = self.variables[param_var_info] = VariableInfoNode(
+                param_type, param_var_info
+            )
 
-            if param_type.name == 'AUTO_TYPE':
+            if param_type.name == "AUTO_TYPE":
                 # Get the parameter node
-                parameter_node = self.methods[self.current_type.name, self.current_method.name][0][i]
+                parameter_node = self.methods[
+                    self.current_type.name, self.current_method.name
+                ][0][i]
 
                 # Create the cycle of two nodes between param_var_info_node and parameter_node
                 self.graph.add_edge(param_var_info_node, parameter_node)
@@ -325,9 +368,11 @@ class InferenceChecker:
         # Solve the body of the method
         body_node = self.visit(node.body, scope)
 
-        if self.current_method.return_type.name == 'AUTO_TYPE':
+        if self.current_method.return_type.name == "AUTO_TYPE":
             # Get the return type node and add an edge body_node -> return_type_node
-            return_type_node = self.methods[self.current_type.name, self.current_method.name][1]
+            return_type_node = self.methods[
+                self.current_type.name, self.current_method.name
+            ][1]
             self.graph.add_edge(body_node, return_type_node)
 
     @visitor.when(ast.LetNode)
@@ -338,19 +383,23 @@ class InferenceChecker:
                 var_info = scope.define_variable(_id, self.context.get_type(_type))
             except SemanticError:
                 var_info = scope.define_variable(_id, ErrorType())
-            var_info_node = self.variables[var_info] = VariableInfoNode(var_info.type, var_info)
+            var_info_node = self.variables[var_info] = VariableInfoNode(
+                var_info.type, var_info
+            )
 
-            expr_node = self.visit(_expr, scope.create_child()) if _expr is not None else None
+            expr_node = (
+                self.visit(_expr, scope.create_child()) if _expr is not None else None
+            )
 
-            if var_info.type.name == 'AUTO_TYPE':
+            if var_info.type.name == "AUTO_TYPE":
                 # Create an edge or add an new node only if it is AutoType
                 if expr_node is not None:
                     self.graph.add_edge(expr_node, var_info_node)
-                    if expr_node.type.name == 'AUTO_TYPE':
+                    if expr_node.type.name == "AUTO_TYPE":
                         self.graph.add_edge(var_info_node, expr_node)
                 else:
                     self.graph.add_node(var_info_node)
-            elif expr_node is not None and expr_node.type.name == 'AUTO_TYPE':
+            elif expr_node is not None and expr_node.type.name == "AUTO_TYPE":
                 self.graph.add_edge(var_info_node, expr_node)
 
         return self.visit(node.expr, scope.create_child())
@@ -362,11 +411,17 @@ class InferenceChecker:
         expr_node = self.visit(node.expr, scope.create_child())
 
         if var_info is not None:
-            if expr_node.type.name != 'AUTO_TYPE' and var_info.type.name == 'AUTO_TYPE':
+            if expr_node.type.name != "AUTO_TYPE" and var_info.type.name == "AUTO_TYPE":
                 self.graph.add_edge(expr_node, self.variables[var_info])
-            elif var_info.type.name != 'AUTO_TYPE' and expr_node.type.name == 'AUTO_TYPE':
-                self.graph.add_edge(AtomNode(self.context.get_type(var_info.type.name)), expr_node)
-            elif var_info.type.name == 'AUTO_TYPE' and expr_node.type.name == 'AUTO_TYPE':
+            elif (
+                var_info.type.name != "AUTO_TYPE" and expr_node.type.name == "AUTO_TYPE"
+            ):
+                self.graph.add_edge(
+                    AtomNode(self.context.get_type(var_info.type.name)), expr_node
+                )
+            elif (
+                var_info.type.name == "AUTO_TYPE" and expr_node.type.name == "AUTO_TYPE"
+            ):
                 # Create a cycle
                 self.graph.add_edge(expr_node, self.variables[var_info])
                 self.graph.add_edge(self.variables[var_info], expr_node)
@@ -388,7 +443,7 @@ class InferenceChecker:
         if_node = self.visit(node.if_expr, scope)
 
         if not isinstance(if_node, AtomNode):
-            self.graph.add_edge(AtomNode(self.context.get_type('Bool')), if_node)
+            self.graph.add_edge(AtomNode(self.context.get_type("Bool")), if_node)
 
         then_node = self.visit(node.then_expr, scope.create_child())
         else_node = self.visit(node.else_expr, scope.create_child())
@@ -396,7 +451,9 @@ class InferenceChecker:
         if isinstance(then_node, AtomNode) and isinstance(else_node, AtomNode):
             return AtomNode(then_node.type.join(else_node.type))
 
-        conditional_node = ConditionalNode(self.context.get_type('AUTO_TYPE'), then_node, else_node)
+        conditional_node = ConditionalNode(
+            self.context.get_type("AUTO_TYPE"), then_node, else_node
+        )
         if isinstance(then_node, AtomNode) and not isinstance(else_node, AtomNode):
             self.graph.add_edge(then_node, else_node)
         elif not isinstance(then_node, AtomNode) and isinstance(else_node, AtomNode):
@@ -413,7 +470,7 @@ class InferenceChecker:
     def visit(self, node: ast.WhileNode, scope: Scope):
         self.visit(node.condition, scope)
         self.visit(node.body, scope.create_child())
-        return AtomNode(self.context.get_type('Object'))
+        return AtomNode(self.context.get_type("Object"))
 
     @visitor.when(ast.SwitchCaseNode)
     def visit(self, node: ast.SwitchCaseNode, scope: Scope):
@@ -434,12 +491,12 @@ class InferenceChecker:
                 not_defined_nodes.append(case_node)
             case_nodes.append(case_node)
 
-        if any(e.type.name == 'AUTO_TYPE' for e in case_nodes):
+        if any(e.type.name == "AUTO_TYPE" for e in case_nodes):
             if defined_nodes:
                 t = Type.multi_join([x.type for x in defined_nodes])
                 for x in not_defined_nodes:
                     self.graph.add_edge(AtomNode(t), x)
-            case_of_node = CaseOfNode(self.context.get_type('AUTO_TYPE'), case_nodes)
+            case_of_node = CaseOfNode(self.context.get_type("AUTO_TYPE"), case_nodes)
             self.graph.add_node(case_of_node)
             return case_of_node
         return AtomNode(Type.multi_join([e.type for e in case_nodes]))
@@ -447,7 +504,7 @@ class InferenceChecker:
     @visitor.when(ast.MethodCallNode)
     def visit(self, node: ast.MethodCallNode, scope: Scope):
         if node.obj is None:
-            node.obj = ast.VariableNode('self')
+            node.obj = ast.VariableNode("self")
         obj_node = self.visit(node.obj, scope)
 
         if isinstance(obj_node, AtomNode) and obj_node.type.contains_method(node.id):
@@ -461,43 +518,47 @@ class InferenceChecker:
                     continue
 
                 if isinstance(arg_node, AtomNode):
-                    if param_nodes[i].type.name == 'AUTO_TYPE':
+                    if param_nodes[i].type.name == "AUTO_TYPE":
                         self.graph.add_edge(arg_node, param_nodes[i])
                     else:
                         continue
                 else:
-                    if param_nodes[i].type.name != 'AUTO_TYPE':
+                    if param_nodes[i].type.name != "AUTO_TYPE":
                         self.graph.add_edge(param_nodes[i], arg_node)
                     else:
                         self.graph.add_edge(param_nodes[i], arg_node)
                         self.graph.add_edge(arg_node, param_nodes[i])
 
-            if return_node.type.name == 'AUTO_TYPE':
+            if return_node.type.name == "AUTO_TYPE":
                 return return_node
-            return AtomNode(return_node.type if return_node.type.name != 'SELF_TYPE' else obj_node.type)
+            return AtomNode(
+                return_node.type
+                if return_node.type.name != "SELF_TYPE"
+                else obj_node.type
+            )
 
         for arg in node.args:
             self.visit(arg, scope)
-        return AtomNode(self.context.get_type('Object'))
+        return AtomNode(self.context.get_type("Object"))
 
     @visitor.when(ast.IntegerNode)
     def visit(self, node: ast.IntegerNode, scope: Scope):
-        return AtomNode(self.context.get_type('Int'))
+        return AtomNode(self.context.get_type("Int"))
 
     @visitor.when(ast.StringNode)
     def visit(self, node: ast.StringNode, scope: Scope):
-        return AtomNode(self.context.get_type('String'))
+        return AtomNode(self.context.get_type("String"))
 
     @visitor.when(ast.BooleanNode)
     def visit(self, node: ast.BooleanNode, scope: Scope):
-        return AtomNode(self.context.get_type('Bool'))
+        return AtomNode(self.context.get_type("Bool"))
 
     @visitor.when(ast.VariableNode)
     def visit(self, node: ast.VariableNode, scope: Scope):
         var_info = scope.find_variable(node.lex)
 
         if var_info is not None:
-            if var_info.type.name == 'AUTO_TYPE':
+            if var_info.type.name == "AUTO_TYPE":
                 return self.variables[var_info]
             else:
                 return AtomNode(var_info.type)
@@ -508,54 +569,68 @@ class InferenceChecker:
     def visit(self, node: ast.InstantiateNode, scope: Scope):
         if node.lex in self.context.types:
             return AtomNode(self.context.get_type(node.lex))
-        return AtomNode(self.context.get_type('Object'))
+        return AtomNode(self.context.get_type("Object"))
 
     @visitor.when(ast.NegationNode)
     def visit(self, node: ast.NegationNode, scope: Scope):
         self.visit(node.expr, scope)
-        return AtomNode(self.context.get_type('Bool'))
+        return AtomNode(self.context.get_type("Bool"))
 
     @visitor.when(ast.ComplementNode)
     def visit(self, node: ast.ComplementNode, scope: Scope):
         self.visit(node.expr, scope)
-        return AtomNode(self.context.get_type('Int'))
+        return AtomNode(self.context.get_type("Int"))
 
     @visitor.when(ast.IsVoidNode)
     def visit(self, node: ast.IsVoidNode, scope: Scope):
         self.visit(node.expr, scope)
-        return AtomNode(self.context.get_type('Bool'))
+        return AtomNode(self.context.get_type("Bool"))
 
     @visitor.when(ast.PlusNode)
     def visit(self, node: ast.PlusNode, scope: Scope):
-        return self._visit_arithmetic_node(node, scope, self.context.get_type('Int'), self.context.get_type('Int'))
+        return self._visit_arithmetic_node(
+            node, scope, self.context.get_type("Int"), self.context.get_type("Int")
+        )
 
     @visitor.when(ast.MinusNode)
     def visit(self, node: ast.MinusNode, scope: Scope):
-        return self._visit_arithmetic_node(node, scope, self.context.get_type('Int'), self.context.get_type('Int'))
+        return self._visit_arithmetic_node(
+            node, scope, self.context.get_type("Int"), self.context.get_type("Int")
+        )
 
     @visitor.when(ast.StarNode)
     def visit(self, node: ast.StarNode, scope: Scope):
-        return self._visit_arithmetic_node(node, scope, self.context.get_type('Int'), self.context.get_type('Int'))
+        return self._visit_arithmetic_node(
+            node, scope, self.context.get_type("Int"), self.context.get_type("Int")
+        )
 
     @visitor.when(ast.DivNode)
     def visit(self, node: ast.DivNode, scope: Scope):
-        return self._visit_arithmetic_node(node, scope, self.context.get_type('Int'), self.context.get_type('Int'))
+        return self._visit_arithmetic_node(
+            node, scope, self.context.get_type("Int"), self.context.get_type("Int")
+        )
 
     @visitor.when(ast.LessEqualNode)
     def visit(self, node: ast.LessEqualNode, scope: Scope):
-        return self._visit_arithmetic_node(node, scope, self.context.get_type('Int'), self.context.get_type('Bool'))
+        return self._visit_arithmetic_node(
+            node, scope, self.context.get_type("Int"), self.context.get_type("Bool")
+        )
 
     @visitor.when(ast.LessThanNode)
     def visit(self, node: ast.LessThanNode, scope: Scope):
-        return self._visit_arithmetic_node(node, scope, self.context.get_type('Int'), self.context.get_type('Bool'))
+        return self._visit_arithmetic_node(
+            node, scope, self.context.get_type("Int"), self.context.get_type("Bool")
+        )
 
     @visitor.when(ast.EqualNode)
     def visit(self, node: ast.EqualNode, scope: Scope):
         self.visit(node.left, scope)
         self.visit(node.right, scope)
-        return AtomNode(self.context.get_type('Bool'))
+        return AtomNode(self.context.get_type("Bool"))
 
-    def _visit_arithmetic_node(self, node: ast.BinaryNode, scope: Scope, member_types: Type, return_type: Type):
+    def _visit_arithmetic_node(
+        self, node: ast.BinaryNode, scope: Scope, member_types: Type, return_type: Type
+    ):
         left = self.visit(node.left, scope)
         right = self.visit(node.right, scope)
 
@@ -575,7 +650,7 @@ class InferenceTypeSubstitute:
         self.current_type: Optional[Type] = None
         self.current_method: Optional[Method] = None
 
-    @visitor.on('node')
+    @visitor.on("node")
     def visit(self, node, tabs):
         pass
 
@@ -589,8 +664,16 @@ class InferenceTypeSubstitute:
     def visit(self, node: ast.ClassDeclarationNode, scope: Scope):
         self.current_type = self.context.get_type(node.id)
 
-        attrs = [feature for feature in node.features if isinstance(feature, ast.AttrDeclarationNode)]
-        methods = [feature for feature in node.features if isinstance(feature, ast.MethodDeclarationNode)]
+        attrs = [
+            feature
+            for feature in node.features
+            if isinstance(feature, ast.AttrDeclarationNode)
+        ]
+        methods = [
+            feature
+            for feature in node.features
+            if isinstance(feature, ast.MethodDeclarationNode)
+        ]
 
         i = 0
         for attr in attrs:
@@ -610,8 +693,8 @@ class InferenceTypeSubstitute:
         if node.expr is not None:
             self.visit(node.expr, scope.children[node.index])
 
-        if attr_type == self.context.get_type('AUTO_TYPE'):
-            if var_info.type == self.context.get_type('AUTO_TYPE'):
+        if attr_type == self.context.get_type("AUTO_TYPE"):
+            if var_info.type == self.context.get_type("AUTO_TYPE"):
                 self.errors.append(err.INFERENCE_ERROR_ATTRIBUTE % node.id)
             node.type = var_info.type.name
 
@@ -622,14 +705,14 @@ class InferenceTypeSubstitute:
 
         for i, (name, expr_body_type) in enumerate(node.params):
             variable_info = scope.find_variable(name)
-            if variable_info.type == self.context.get_type('AUTO_TYPE'):
+            if variable_info.type == self.context.get_type("AUTO_TYPE"):
                 self.errors.append(err.INFERENCE_ERROR_ATTRIBUTE % name)
             node.params[i] = (name, variable_info.type.name)
 
         self.visit(node.body, scope)
 
-        if return_type == self.context.get_type('AUTO_TYPE'):
-            if self.current_method.return_type == self.context.get_type('AUTO_TYPE'):
+        if return_type == self.context.get_type("AUTO_TYPE"):
+            if self.current_method.return_type == self.context.get_type("AUTO_TYPE"):
                 self.errors.append(err.INFERENCE_ERROR_ATTRIBUTE % node.id)
             node.return_type = self.current_method.return_type.name
 
@@ -643,8 +726,8 @@ class InferenceTypeSubstitute:
                 self.visit(_expr, scope.children[child_index])
                 child_index += 1
 
-            if _type == 'AUTO_TYPE':
-                if variable_info.type == self.context.get_type('AUTO_TYPE'):
+            if _type == "AUTO_TYPE":
+                if variable_info.type == self.context.get_type("AUTO_TYPE"):
                     self.errors.append(err.INFERENCE_ERROR_ATTRIBUTE % _id)
                 node.declarations[i] = (_id, variable_info.type.name, _expr)
 

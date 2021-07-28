@@ -7,13 +7,12 @@ import typer
 
 sys.path.append(os.getcwd())
 
-from cool.grammar import serialize_parser_and_lexer, Token
+from cool.grammar import Token, serialize_parser_and_lexer
 from cool.lexertab import CoolLexer
 from cool.parsertab import CoolParser
-from cool.semantics import TypeCollector, TypeBuilder, OverriddenMethodChecker, TypeChecker, topological_sorting
-from cool.semantics.execution import Executor, ExecutionError
-from cool.semantics.formatter import CodeBuilder, Formatter
-from cool.semantics.type_inference import InferenceChecker
+from cool.semantics import (OverriddenMethodChecker, PositionAssigner,
+                            TypeBuilderForFeatures, TypeBuilderForInheritance, TypeChecker, TypeCollector,
+                            topological_sorting)
 from cool.semantics.utils.scope import Context, Scope
 
 app = typer.Typer()
@@ -73,44 +72,13 @@ def parse(tokens: List[Token], verbose: bool = False):
 
 def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
     TypeCollector(context, errors).visit(ast)
-    TypeBuilder(context, errors).visit(ast)
-    declarations = ast.declarations
+    TypeBuilderForInheritance(context, errors).visit(ast)
     topological_sorting(ast, context, errors)
-    ast.declarations = declarations
     if not errors:
+        TypeBuilderForFeatures(context, errors).visit(ast)
         OverriddenMethodChecker(context, errors).visit(ast)
-        # InferenceChecker(context, errors).visit(ast, scope)
         TypeChecker(context, errors).visit(ast, scope)
     return ast, scope, context, errors
-
-
-@app.command()
-def run(
-        input_file: typer.FileText = typer.Argument(..., help='Cool file'),
-        verbose: bool = typer.Option(False, help='Execute in verbose mode.')
-):
-    ast, parser = parse(input_file, verbose)
-
-    
-    # parsing process failed
-    if ast is None:
-        exit(1)
-
-    ast, _, context, errors = check_semantics(ast, Scope(), Context(), [])
-
-    if  errors or parser.contains_errors:
-        for e in errors:
-            log_error(e)
-        exit(1)
-    
-    try:
-        Executor(context).visit(ast, Scope())
-        log_success('Program finished...')
-        exit(0)
-    except ExecutionError as e:
-        log_error(e.text)
-        exit(1)
-
 
 @app.command()
 def compile(
@@ -138,6 +106,7 @@ def compile(
     if ast is None:
         exit(1)
 
+    PositionAssigner(tokens).visit(ast)
     ast, _, _, errors = check_semantics(ast, Scope(), Context(), [])
 
     if errors or parser.contains_errors:
@@ -146,22 +115,6 @@ def compile(
         exit(1)
     
     exit(0)
-
-
-@app.command()
-def infer(
-        file: typer.FileText = typer.Argument(..., help='Cool file'),
-        verbose: bool = typer.Argument(False, help='Execute in verbose mode.')
-):
-    ast, _ = parse(file, verbose)
-
-    if ast is not None:
-        ast, _, _, errors = check_semantics(ast, Scope(), Context(), [])
-        if errors:
-            for e in errors:
-                log_error(e)
-        log_success(CodeBuilder().visit(ast, 0))
-
 
 @app.command()
 def serialize():

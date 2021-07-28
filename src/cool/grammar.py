@@ -2,7 +2,6 @@ import inspect
 import time
 
 from pyjapt import Grammar, Lexer, ShiftReduceParser, Token
-from pyjapt.parsing import RuleList
 
 import cool.semantics.utils.astnodes as ast
 
@@ -256,15 +255,18 @@ expr %= '{ block }', lambda s: ast.BlockNode(s[2])
 expr %= 'while expr loop expr pool', lambda s: ast.WhileNode(s[2], s[4])
 expr %= 'let declaration-list in expr', lambda s: ast.LetNode(s[2], s[4])
 expr %= 'case expr of case-list esac', lambda s: ast.SwitchCaseNode(s[2], s[4])
-expr %= 'comp', lambda s: s[1]
+expr %= 'negable', lambda s: s[1]
 
-comp %= 'negable < negable', lambda s: ast.LessThanNode(s[1], s[2], s[3])
-comp %= 'negable <= negable', lambda s: ast.LessEqualNode(s[1], s[2], s[3])
-comp %= 'negable = negable', lambda s: ast.EqualNode(s[1], s[2], s[3])
-comp %= 'negable', lambda s: s[1]
+negable %= 'not comp', lambda s: ast.NegationNode(s[2])
+negable %= 'comp', lambda s: s[1]
 
-negable %= 'not arith', lambda s: ast.NegationNode(s[2])
-negable %= 'arith', lambda s: s[1]
+comp %= 'comp < arith', lambda s: ast.LessThanNode(s[1], s[2], s[3])
+comp %= 'comp <= arith', lambda s: ast.LessEqualNode(s[1], s[2], s[3])
+comp %= 'comp = arith', lambda s: ast.EqualNode(s[1], s[2], s[3])
+comp %= 'comp = not arith', lambda s: ast.EqualNode(s[1], s[2], ast.NegationNode(s[4]))
+comp %= 'comp < not arith', lambda s: ast.LessThanNode(s[1], s[2], ast.NegationNode(s[4]))
+comp %= 'comp <= not arith', lambda s: ast.LessEqualNode(s[1], s[2], ast.NegationNode(s[4]))
+comp %= 'arith', lambda s: s[1]
 
 arith %= 'arith + term', lambda s: ast.PlusNode(s[1], s[2], s[3])
 arith %= 'arith - term', lambda s: ast.MinusNode(s[1], s[2], s[3])

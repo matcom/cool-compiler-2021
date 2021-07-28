@@ -3,7 +3,9 @@ classes defined here follows the visitor pattern using the module visitor, with 
 inspection. """
 
 from .formatter import CodeBuilder, Formatter
-from .type_builder import TypeBuilder
-from .type_collector import TypeCollector
 from .overridden import OverriddenMethodChecker, topological_sorting
+from .position_assigner import PositionAssigner
+from .type_builder_for_features import TypeBuilderForFeatures
+from .type_builder_for_inheritance import TypeBuilderForInheritance
 from .type_checker import TypeChecker
+from .type_collector import TypeCollector

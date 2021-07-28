@@ -1,14 +1,20 @@
 from typing import List, Union, Tuple, Optional
 
-Feature = Union['MethodDeclarationNode', 'AttrDeclarationNode']
+Feature = Union["MethodDeclarationNode", "AttrDeclarationNode"]
 
 
 class Node:
-    pass
+    line: int
+    column: int
+
+    def set_main_position(self, line: int, col: int) -> "Node":
+        self.line = line
+        self.column = col
+        return self
 
 
 class ProgramNode(Node):
-    def __init__(self, declarations: List['ClassDeclarationNode']):
+    def __init__(self, declarations: List["ClassDeclarationNode"]):
         self.declarations: List[ClassDeclarationNode] = declarations
 
 
@@ -17,25 +23,39 @@ class DeclarationNode(Node):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx: str, features: List[Feature], parent: Optional[str] =None):
+    def __init__(self, idx: str, features: List[Feature], parent: Optional[str] = None):
         self.id: str = idx
         self.parent: str = parent
         self.features: List[Feature] = features
 
+        self.parent_position: Tuple[int, int] = -1, -1
+
 
 class MethodDeclarationNode(DeclarationNode):
-    def __init__(self, idx: str, params: List[Tuple[str, str]], return_type: str, body: 'ExprNode'):
+    def __init__(
+        self,
+        idx: str,
+        params: List[Tuple[str, str]],
+        return_type: str,
+        body: "ExprNode",
+    ):
         self.id: str = idx
         self.params: List[Tuple[str, str]] = params
         self.return_type: str = return_type
         self.body: ExprNode = body
 
+        self.param_types_positions: List[Tuple[int, int]] = []
+        self.return_type_position: Tuple[int, int] = -1, -1
+
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, idx: str, typex: str, expr: 'ExprNode' = None):
+    def __init__(self, idx: str, typex: str, expr: "ExprNode" = None):
         self.id: str = idx
         self.type: str = typex
         self.expr: ExprNode = expr
+
+        self.type_position: Tuple[int, int] = -1, -1
+        self.expr_position: Tuple[int, int] = -1, -1
 
 
 class ExprNode(Node):
@@ -43,8 +63,8 @@ class ExprNode(Node):
 
 
 class ParenthesisExpr(ExprNode):
-    def __init__(self, expr: 'ExprNode'):
-        self.expr: 'ExprNode' = expr
+    def __init__(self, expr: "ExprNode"):
+        self.expr: "ExprNode" = expr
 
 
 class BlockNode(ExprNode):
@@ -57,18 +77,16 @@ class LetNode(ExprNode):
         self.declarations: List[Tuple[str, str, Optional[ExprNode]]] = declarations
         self.expr: ExprNode = expr
 
+        self.declaration_names_positions: List[Tuple[int, int]] = []
+        self.declaration_types_positions: List[Tuple[int, int]] = []
+
 
 class SwitchCaseNode(ExprNode):
     def __init__(self, expr, cases):
         self.expr: ExprNode = expr
         self.cases: List[Tuple[str, str, ExprNode]] = cases
 
-
-# class CaseNode(ExprNode):
-#     def __init__(self, idx, typex, expr):
-#         self.id: str = idx
-#         self.type: str = typex
-#         self.expr: ExprNode = expr
+        self.cases_positions: List[Tuple[int, int]] = []
 
 
 class AssignNode(ExprNode):
@@ -97,6 +115,10 @@ class MethodCallNode(ExprNode):
         self.args: List[ExprNode] = args
         self.type: str = typex
 
+        self.id_position: Tuple[int, int] = -1, -1
+        self.type_position: Tuple[int, int] = -1, -1
+        self.args_positions: List[Tuple[int, int]] = []
+
 
 class AtomicNode(ExprNode):
     def __init__(self, lex):
@@ -106,6 +128,8 @@ class AtomicNode(ExprNode):
 class UnaryNode(ExprNode):
     def __init__(self, expr):
         self.expr: ExprNode = expr
+
+        self.operation_position: Tuple[int, int] = -1, -1
 
 
 class BinaryNode(ExprNode):
@@ -120,7 +144,10 @@ class VariableNode(AtomicNode):
 
 
 class InstantiateNode(AtomicNode):
-    pass
+    def __init__(self, lex):
+        super().__init__(lex)
+
+        self.type_position: Tuple[int, int] = -1, -1
 
 
 class IntegerNode(AtomicNode):

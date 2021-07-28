@@ -11,10 +11,10 @@ class SemanticError(Exception):
 class Attribute:
     def __init__(self, name, typex):
         self.name: str = name
-        self.type: 'Type' = typex
+        self.type: "Type" = typex
 
     def __str__(self):
-        return f'[attrib] {self.name} : {self.type.name};'
+        return f"[attrib] {self.name} : {self.type.name};"
 
     def __repr__(self):
         return str(self)
@@ -24,17 +24,21 @@ class Method:
     def __init__(self, name, param_names, params_types, return_type):
         self.name: str = name
         self.param_names: List[str] = param_names
-        self.param_types: List['Type'] = params_types
-        self.return_type: 'Type' = return_type
+        self.param_types: List["Type"] = params_types
+        self.return_type: "Type" = return_type
 
     def __str__(self):
-        params = ', '.join(f'{n}: {t.name}' for n, t in zip(self.param_names, self.param_types))
-        return f'[method] {self.name}({params}): {self.return_type.name};'
+        params = ", ".join(
+            f"{n}: {t.name}" for n, t in zip(self.param_names, self.param_types)
+        )
+        return f"[method] {self.name}({params}): {self.return_type.name};"
 
     def __eq__(self, other):
-        return (other.name == self.name and
-                other.return_type == self.return_type and
-                tuple(other.param_types) == tuple(self.param_types))
+        return (
+            other.name == self.name
+            and other.return_type == self.return_type
+            and tuple(other.param_types) == tuple(self.param_types)
+        )
 
 
 class Type:
@@ -42,7 +46,7 @@ class Type:
         self.name: str = name
         self.attributes_dict: OrderedDict[str, Attribute] = OrderedDict()
         self.methods_dict: OrderedDict[str, Method] = OrderedDict()
-        self.parent: Optional['Type'] = None
+        self.parent: Optional["Type"] = None
 
     @property
     def attributes(self):
@@ -52,12 +56,14 @@ class Type:
     def methods(self):
         return [x for _, x in self.methods_dict.items()]
 
-    def set_parent(self, parent: 'Type') -> None:
+    def set_parent(self, parent: "Type") -> None:
         if self.parent is not None:
-            raise SemanticError(f'Parent type is already set for {self.name}.')
+            raise SemanticError(f"Parent type is already set for {self.name}.")
         self.parent = parent
 
-    def get_attribute(self, name: str, get_owner: bool = False) -> Union[Attribute, Tuple[Attribute, 'Type']]:
+    def get_attribute(
+        self, name: str, get_owner: bool = False
+    ) -> Union[Attribute, Tuple[Attribute, "Type"]]:
         """
         Search the innermost declaration of the attribute with the given name and return it, if "get_owner" has
         value "True" the returned object is a tuple (attribute, type) where type is the innermost `Type` in th Type
@@ -72,16 +78,24 @@ class Type:
         :return: the desired attribute and it's optional type owner.
         """
         try:
-            return self.attributes_dict[name] if not get_owner else (self.attributes_dict[name], self)
+            return (
+                self.attributes_dict[name]
+                if not get_owner
+                else (self.attributes_dict[name], self)
+            )
         except KeyError:
             if self.parent is None:
-                raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
+                raise SemanticError(
+                    f'Attribute "{name}" is not defined in {self.name}.'
+                )
             try:
                 return self.parent.get_attribute(name, get_owner)
             except SemanticError:
-                raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
+                raise SemanticError(
+                    f'Attribute "{name}" is not defined in {self.name}.'
+                )
 
-    def define_attribute(self, name: str, typex: 'Type') -> Attribute:
+    def define_attribute(self, name: str, typex: "Type") -> Attribute:
         try:
             self.get_attribute(name)
         except SemanticError:
@@ -89,12 +103,20 @@ class Type:
             self.attributes_dict[name] = attribute
             return attribute
         else:
-            raise SemanticError(f'Attribute "{name}" is already defined in {self.name}.')
+            raise SemanticError(
+                f'Attribute "{name}" is already defined in {self.name}.'
+            )
 
     def contains_attribute(self, name: str) -> bool:
-        return name in self.attributes_dict or self.parent is not None and self.parent.contains_attribute(name)
+        return (
+            name in self.attributes_dict
+            or self.parent is not None
+            and self.parent.contains_attribute(name)
+        )
 
-    def get_method(self, name: str, get_owner: bool = False) -> Union[Method, Tuple[Method, 'Type']]:
+    def get_method(
+        self, name: str, get_owner: bool = False
+    ) -> Union[Method, Tuple[Method, "Type"]]:
         """
         Search the innermost declaration of the method with the given name and return it, if "get_owner" has
         value "True" the returned object is a tuple (method, type) where type is the innermost `Type` in th Type
@@ -109,7 +131,11 @@ class Type:
         :return: the desired method and it's optional type owner.
         """
         try:
-            return self.methods_dict[name] if not get_owner else (self.methods_dict[name], self)
+            return (
+                self.methods_dict[name]
+                if not get_owner
+                else (self.methods_dict[name], self)
+            )
         except KeyError:
             if self.parent is None:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
@@ -118,10 +144,13 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
 
-    def define_method(self, name: str,
-                      param_names: List[str],
-                      param_types: List['Type'],
-                      return_type: 'Type') -> Method:
+    def define_method(
+        self,
+        name: str,
+        param_names: List[str],
+        param_types: List["Type"],
+        return_type: "Type",
+    ) -> Method:
         if name in self.methods_dict:
             raise SemanticError(f'Method "{name}" already defined in {self.name}')
 
@@ -130,22 +159,35 @@ class Type:
         return method
 
     def contains_method(self, name) -> bool:
-        return name in self.methods_dict or (self.parent is not None and self.parent.contains_method(name))
+        return name in self.methods_dict or (
+            self.parent is not None and self.parent.contains_method(name)
+        )
 
-    def all_attributes(self) -> List[Tuple[Attribute, 'Type']]:
+    def all_attributes(self) -> List[Tuple[Attribute, "Type"]]:
         attributes = [] if self.parent is None else self.parent.all_attributes()
         attributes += [(x, self) for x in self.attributes]
         return attributes
 
-    def all_methods(self) -> List[Tuple[Method, 'Type']]:
+    def all_methods(self) -> List[Tuple[Method, "Type"]]:
         methods = [] if self.parent is None else self.parent.all_methods()
         methods += [(x, self) for x in self.methods]
         return methods
 
-    def conforms_to(self, other: 'Type') -> bool:
-        return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
+    def conforms_to(self, other: "Type") -> bool:
+        return (
+            other.bypass()
+            or self == other
+            or self.parent is not None
+            and self.parent.conforms_to(other)
+        )
 
-    def join(self, other: 'Type') -> 'Type':
+    def join(self, other: "Type") -> "Type":
+        if isinstance(self, ErrorType):
+            return other
+
+        if isinstance(other, ErrorType):
+            return self
+
         self_ancestors = set(self.get_ancestors())
 
         current_type = other
@@ -156,7 +198,7 @@ class Type:
         return current_type
 
     @staticmethod
-    def multi_join(types: List['Type']) -> 'Type':
+    def multi_join(types: List["Type"]) -> "Type":
         static_type = types[0]
         for t in types[1:]:
             static_type = static_type.join(t)
@@ -171,16 +213,16 @@ class Type:
         return [self] + self.parent.get_ancestors()
 
     def __str__(self):
-        output = f'type {self.name}'
-        parent = '' if self.parent is None else f' : {self.parent.name}'
+        output = f"type {self.name}"
+        parent = "" if self.parent is None else f" : {self.parent.name}"
         output += parent
-        output += ' {'
-        output += '\n\t' if self.attributes or self.methods else ''
-        output += '\n\t'.join(str(x) for x in self.attributes)
-        output += '\n\t' if self.attributes_dict else ''
-        output += '\n\t'.join(str(x) for x in self.methods)
-        output += '\n' if self.methods_dict else ''
-        output += '}\n'
+        output += " {"
+        output += "\n\t" if self.attributes or self.methods else ""
+        output += "\n\t".join(str(x) for x in self.attributes)
+        output += "\n\t" if self.attributes_dict else ""
+        output += "\n\t".join(str(x) for x in self.methods)
+        output += "\n" if self.methods_dict else ""
+        output += "}\n"
         return output
 
     def __repr__(self):
@@ -189,7 +231,7 @@ class Type:
 
 class ErrorType(Type):
     def __init__(self):
-        super().__init__('Error')
+        super().__init__("Error")
 
     def conforms_to(self, other):
         return True
@@ -207,7 +249,7 @@ class Context:
 
     def create_type(self, name: str) -> Type:
         if name in self.types:
-            raise SemanticError(f'Type with the same name ({name}) already in context.')
+            raise SemanticError(f"Type with the same name ({name}) already in context.")
         typex = self.types[name] = Type(name)
         return typex
 
@@ -218,7 +260,11 @@ class Context:
             raise SemanticError(f'Type "{name}" is not defined.')
 
     def __str__(self):
-        return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
+        return (
+            "{\n\t"
+            + "\n\t".join(y for x in self.types.values() for y in str(x).split("\n"))
+            + "\n}"
+        )
 
     def __repr__(self):
         return str(self)
@@ -233,16 +279,16 @@ class VariableInfo:
         self.type: Type = var_type
 
     def __str__(self):
-        return self.name + ': ' + self.type.name
+        return self.name + ": " + self.type.name
 
 
 class Scope:
-    def __init__(self, parent: Optional['Scope'] = None):
+    def __init__(self, parent: Optional["Scope"] = None):
         self.locals: Dict[str, VariableInfo] = {}
-        self.parent: Optional['Scope'] = parent
+        self.parent: Optional["Scope"] = parent
         self.children: List[Scope] = []
 
-    def create_child(self) -> 'Scope':
+    def create_child(self) -> "Scope":
         child = Scope(self)
         self.children.append(child)
         return child
@@ -256,7 +302,9 @@ class Scope:
         try:
             return self.locals[var_name]
         except KeyError:
-            return self.parent.find_variable(var_name) if self.parent is not None else None
+            return (
+                self.parent.find_variable(var_name) if self.parent is not None else None
+            )
 
     def is_defined(self, var_name) -> bool:
         return self.find_variable(var_name) is not None
