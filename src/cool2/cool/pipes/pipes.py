@@ -1,5 +1,7 @@
 
 from cool.lexer.cool_lexer import cool_lexer
+from cool.lexer.lexer import PlyLexer
+# from cool2.cool.lexer.lexer import PlyLexer
 from cool.lexer.comment_lexer import comment_lexer
 from lib.lang.language_lr import LanguageLR
 from cool.parser.cool_parser import cool_parser
@@ -89,6 +91,37 @@ def tokenize_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexe
     return result
 
 tokenize_text_pipe = Pipe(tokenize_text_pipe)
+
+def ply_lexer_pipe(result:dict, language_grammar=G, language_lexer=PlyLexer(), language_parser=cool_parser):
+    """
+    Tokenize with ply
+    """
+    text = result["text"]
+
+    lang = LanguageLR(language_grammar, language_lexer, language_parser)
+
+    errors = []
+    tokens = lang.get_tokens(text, errors)
+
+    result.update({
+        "parser"        : language_parser,
+        "lexer"         : language_lexer,
+        "language"      : lang,
+        "text_tokens"   : tokens
+    })
+
+    if result.get("verbose", False):
+        if errors:
+            print_errors("Lexer Errors", errors)
+
+        print('================== TOKENS =====================')
+        pprint_tokens(tokens)
+
+    result["errors"].extend(errors)
+
+    return result
+
+ply_lexer_pipe = Pipe(ply_lexer_pipe)
 
 def parse_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexer, language_parser=cool_parser):
     """

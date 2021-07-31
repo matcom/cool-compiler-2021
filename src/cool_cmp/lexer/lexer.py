@@ -136,7 +136,7 @@ class PlyLexer(ILexer):
                     pos = t.lexer.lexpos - (len(t.value) - i)
                     line = t.lexer.lineno - t.value[:i].count("\n")
                     self.add_error(LexerCoolError(null_ch, PlyCoolToken(t.value, t.type, line, pos)))
-            msg = 'Unfinished string constant'
+            msg = 'Unterminated string constant'
             self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
 
         def t_STRINGUNFINISHEDEOF(t):
@@ -254,9 +254,9 @@ class PlyLexer(ILexer):
                 semi_clean_string.append(program_string[i])
 
         clean = ''.join(semi_clean_string)
-        print(clean)
-        print(len(clean))
-        print(len(program_string))
+        # print(clean)
+        # print(len(clean))
+        # print(len(program_string))
         self.lexer.input(clean)
         result = []
         while True:

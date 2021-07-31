@@ -24,6 +24,9 @@ class LexerPipeline(Pipeline):
             result.context.update(lexer.get_extra_info())
             for error in errors:
                 result.add_error(error)
+
+            print(errors)
+            print()
             return result
 
         super().__init__(Pipe(get_tokens))
