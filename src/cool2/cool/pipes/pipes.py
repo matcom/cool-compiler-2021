@@ -123,7 +123,7 @@ def ply_lexer_pipe(result:dict, language_grammar=G, language_lexer=PlyLexer(), l
 
 ply_lexer_pipe = Pipe(ply_lexer_pipe)
 
-def parse_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexer, language_parser=cool_parser):
+def parse_text_pipe(result:dict, language_grammar=G, language_lexer=PlyLexer(), language_parser=cool_parser):
     """
     Parse the text
     """

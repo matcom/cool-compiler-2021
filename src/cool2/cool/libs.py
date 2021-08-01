@@ -1,5 +1,5 @@
 import os
-from cool.pipes.pipes import start_pipe, change_escaped_lines, remove_comments_pipe, parse_text_pipe, ast_pipe, type_collector_pipe, build_types_pipe, check_types_pipe
+from cool.pipes.pipes import start_pipe, ply_lexer_pipe, change_escaped_lines, remove_comments_pipe, parse_text_pipe, ast_pipe, type_collector_pipe, build_types_pipe, check_types_pipe
 from cool.pipes.pipeline import Pipeline, Pipe
 
 def get_std():
@@ -10,8 +10,9 @@ def get_std():
 
 def get_std_context():
     std_pipeline = Pipeline(start_pipe,
-                            change_escaped_lines,
-                            remove_comments_pipe, 
+                            ply_lexer_pipe,
+                            # change_escaped_lines,
+                            # remove_comments_pipe, 
                             parse_text_pipe,
                             ast_pipe, 
                             type_collector_pipe, 

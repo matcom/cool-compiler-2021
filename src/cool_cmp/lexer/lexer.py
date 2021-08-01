@@ -9,6 +9,35 @@ from cool_cmp.shared.errors import ErrorTracker
 from cool_cmp.lexer.errors import LexerCoolError
 import ply.lex as lex
 
+class Lex():
+    def __init__(self, lex):
+        self.lex = lex
+
+    def set_type(self, new):
+        self.type = new
+
+    def set_row(self, new):
+        self.row = new
+
+    def set_column(self, new):
+        self.column = new
+
+    def __str__(self):
+        return self.lex
+
+    def __getitem__(self, i):
+        if i == 0:
+            return self.lex
+
+        elif i == 1:
+            return self.row
+
+        elif i == 2:
+            return self.column
+
+        elif i == 3:
+            return self.type
+
 class PlyCoolToken(lex.LexToken, ICoolToken):
 
     def __init__(self, lex:str, typex:str, line:int, column:int):
@@ -17,15 +46,21 @@ class PlyCoolToken(lex.LexToken, ICoolToken):
         self.set_position(line, column)
 
     def set_lex(self, lex:str):
-        self.lex = lex
-        self.value = lex
+        self.lex = Lex(lex)
+        self.value = Lex(lex)
 
     def set_type(self, typex:str):
+        self.lex.set_type(typex)
+        self.value.set_type(typex)
         self.type = typex
         self.token_type = typex
         self.typex = typex
 
     def set_position(self, line:int, column:int):
+        self.lex.set_row(line)
+        self.value.set_row(line)
+        self.lex.set_column(line)
+        self.value.set_column(line)
         self.lineno = line
         self.line = line
         self.column = column
