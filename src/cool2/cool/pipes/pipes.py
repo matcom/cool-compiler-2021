@@ -5,7 +5,7 @@ from lib.lang.language_lr import LanguageLR
 from cool.parser.cool_parser import cool_parser
 from cool.parser.comment_parser import comment_parser
 from cool.visitors.visitors import *
-from cool.grammar.cool_grammar import G
+from cool.grammar.cool_grammar import G, comment_open, comment_close
 from cool.grammar.comment_grammar import C
 from cool.semantic.scope import Scope
 from cool.pipes.utils import pprint_tokens, print_errors
@@ -38,7 +38,7 @@ def remove_comments_pipe(result:dict, comment_grammar=C, comment_lexer=comment_l
     """
     text = result["text"]
     
-    lang = LanguageLR(C, comment_lexer, comment_parser)
+    lang = LanguageLR(comment_grammar, comment_lexer, comment_parser)
     errors = []
     parse, tokens = lang(text, errors)
     if not errors:
@@ -59,6 +59,43 @@ def remove_comments_pipe(result:dict, comment_grammar=C, comment_lexer=comment_l
     return result
 
 remove_comments_pipe = Pipe(remove_comments_pipe)
+
+def remove_comment_tokens_pipe(result:dict):
+    """
+    Remove all tokens between (* *) and their respective errors if any
+    """
+    tokens = result["text_tokens"]
+    errors = result["errors"]
+    new_tokens = []
+    new_errors = []
+    deep = 0
+    start_comment_position, end_comment_position = None, None
+    for tok in tokens:
+        if tok.token_type == comment_open:
+            deep+=1
+            start_comment_position = (tok.lex[1], tok.lex[2])
+        elif tok.token_type == comment_close:
+            deep-=1
+            if deep == 0:
+                end_comment_position = (tok.lex[1], tok.lex[2])
+                # Removing errors related to comments
+                errors = [x for x in errors if not (start_comment_position <= (x.row, x.column) <= end_comment_position)]
+        elif not deep:
+            new_tokens.append(tok)
+            
+    if result.get("verbose",False):
+        if errors:
+            print_errors("Nested Comment Elimination Errors", errors)
+    
+    result["errors"] = errors
+    result["errors"].extend(new_errors)
+    
+    result.update({
+        "text_tokens": new_tokens
+    })
+    return result
+
+remove_comment_tokens_pipe = Pipe(remove_comment_tokens_pipe)
 
 def tokenize_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexer, language_parser=cool_parser):
     """

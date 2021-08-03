@@ -28,11 +28,13 @@ signs = [
 lower_case = 'qwertyuiopasdfghjklzxcvbnm'
 upper_case = 'QWERTYUIOPASDFGHJKLZXCVBNM'
 numbers = '1234567890'
-text = f'[{lower_case}{upper_case}_{numbers}~`\'!,:;<@=> \\[\\]\\*/-\\+.\\?\\(\\)\\\\#$%^&\\|'+'{}'+']*'
+text = f'[{lower_case}{upper_case}_{numbers}~`\'!,:;<@=>≤”“ \\[\\]\\*/-\\+.\\?\\(\\)\\\\#$%^&\\|'+'{}'+']*'
 
 ignore = [('space',f'[ \n\r\b\f\t\v]+|(--({text}|")*\n)')]
 
 other = [
+    (comment_open, "\\(\\*"),
+    (comment_close, "\\*\\)"),
     (idx, f'[{lower_case}][{lower_case}{upper_case}_{numbers}]*'),
     (typex, f'[{upper_case}][{lower_case}{upper_case}_{numbers}]*'),
     (num, f'[123456789][{numbers}]*(.[{numbers}]+)?|0'),
