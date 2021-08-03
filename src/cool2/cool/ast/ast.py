@@ -23,7 +23,9 @@ class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None,row=None,column=None):
         super().__init__(row,column)
         self.id = idx
-        self.parent = parent if parent else 'Object'
+        self.parent = parent[0] if parent else 'Object'
+        self.parent_row = parent[1] if parent else -1
+        self.parent_column = parent[2] if parent else -1
         self.features = features
     
     def __iter__(self):

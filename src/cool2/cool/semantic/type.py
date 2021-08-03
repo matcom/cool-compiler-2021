@@ -125,10 +125,10 @@ class Type(DeprecatedType):
     @property
     def can_have_children(self):
         return True
-
+    
     @property
     def default(self):
-        return InstantiateNode("Void")
+        return InstantiateNode(("Void", -1, -1), -1, -1)
 
 class ObjectType(Type):
     def __init__(self):

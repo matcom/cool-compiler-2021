@@ -381,8 +381,8 @@ class TypeCollector(object):
                     try:
                         parent_type = self.context.get_type(class_decl.parent)
                     except SemanticError as er:
-                        er = SemanticError(UNDEFINED_INHERITED_TYPE, class_decl.id, class_decl.parent)
-                        self.add_semantic_error(er, class_decl.row, class_decl.column)
+                        er = TypeCoolError(UNDEFINED_INHERITED_TYPE, class_decl.id, class_decl.parent)
+                        self.add_semantic_error(er, class_decl.parent_row, class_decl.parent_column)
                     try:
                         if not curr_type.parent:
                             curr_type.set_parent(parent_type)
@@ -532,7 +532,7 @@ class TypeChecker:
         self.visit(node.expr,scope)
         
         if not node.expr.type.conforms_to(node.type,self.current_type):
-            self.add_semantic_error(TypeCoolError(ATTRIBUTE_INCOMPATIBLE_TYPES, node.id, node.type.name, node.expr.type.name),node.row,node.column)
+            self.add_semantic_error(TypeCoolError(ATTRIBUTE_INCOMPATIBLE_TYPES, node.id, node.type.name, node.expr.type.name),node.expr.row,node.expr.column)
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -643,7 +643,7 @@ class TypeChecker:
                 node.at = self.context.get_type(node.at)
                 if not node.obj.type.conforms_to(node.at,self.current_type):
                     er = TypeCoolError(STATIC_DISPATCH_INCOMPATIBLE_TYPES, node.obj.type.name, node.at.name)
-                    self.add_semantic_error(er, node.row, node.column)
+                    self.add_semantic_error(er, node.obj.row, node.obj.column)
                 dispatch_type = node.at
             else:
                 dispatch_type = node.obj.type

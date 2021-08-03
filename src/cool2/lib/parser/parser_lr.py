@@ -118,7 +118,7 @@ class ShiftReduceParser(Parser):
                 for i in range(len(tag.Right)):
                     stack.pop()
                     top = stack.pop()
-                    if not top == tag.Right[-(i+1)]:
+                    if top != tag.Right[-(i+1)]:
                         errors.append(f"Productions reduce doesnt match: {top} != {tag.Right[-(i+1)]}")
                         
                 index = self.goto[stack[-1],tag.Left]
