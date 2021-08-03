@@ -1,5 +1,5 @@
 from cmp.utils import Token
-
+from cool.error.errors import LexerCoolError
 class Language():
 
     parser = None
@@ -59,7 +59,9 @@ class Language():
         for tok in tokens:
             tok.lex = (tok.lex[0], tok.lex[1] + 1, tok.lex[2] - len(tok.lex[0]) + 1) 
             if tok.token_type == "UNKNOWN":
-                errors.append(f'({tok.lex[1]}, {tok.lex[2]}) - LexicographicError: ERROR "{tok.lex[0]}"')
+                er = LexerCoolError('"{}"', tok.lex[0], token=tok)
+                # errors.append(f'({tok.lex[1]}, {tok.lex[2]}) - LexicographicError: ERROR "{tok.lex[0]}"')
+                errors.append(er)
         tokens = [x for x in tokens if x.token_type != "UNKNOWN"]
         
         return tokens
