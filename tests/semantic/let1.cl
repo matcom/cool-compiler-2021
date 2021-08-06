@@ -10,6 +10,6 @@ class F inherits A { };
 class Main inherits IO {
 	main(): IO { out_string("Hello World!")};
 
-	b: B <- let a: Bool, a: Int <- 5, a: String, a: A <- new F, b: B <- new E in b;
-	test: B <- let a: Bool, a: Int <- 5, a: String, a: A <- new F, b: C <- new E in b;
+	b: B <- let a: Bool, a: Int <- 5, a: String, a : A <- new F, b: B <- new E in b;
+	test: B <- let a: Bool, a: Int <- 5, a: String, a : A <- new F, b: C <- new E in b;
 }; 

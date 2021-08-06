@@ -67,6 +67,7 @@ class Type:
             try:
                 return self.parent.get_attribute(name, typex, visited, get_owner)
             except SemanticError:
+                # self.errors.append(_NameError % ())
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
 
     def define_attribute(self, name: str, typex: 'Type') -> Attribute:

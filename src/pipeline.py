@@ -3,6 +3,7 @@ from visitors.Depicter import Depicter#, Formatter
 from visitors.Collector import TypeCollector
 from visitors.Builder import TypeBuilder
 from visitors.Checker import TypeChecker
+from visitors.Inferencer import Inferencer
 from visitors.Executor import Executor, RuntimeException
 
 class Pipeline():
@@ -38,10 +39,12 @@ class Pipeline():
         
         self.typeCollector = TypeCollector(self.context, self.errors)
         self.typeCollector.visit(self.ast)
-        self.typeBuilder = TypeBuilder(self.context, self.errors)
-        self.typeBuilder.visit(self.ast)
-        self.typeChecker = TypeChecker(self.context, self.errors)
-        self.typeChecker.visit(self.ast, Scope())
+        if len(self.errors) == 0:
+            self.typeBuilder = TypeBuilder(self.context, self.errors)
+            self.typeBuilder.visit(self.ast)
+            if len(self.errors) == 0:
+                self.typeChecker = TypeChecker(self.context, self.errors)
+                self.typeChecker.visit(self.ast, Scope())
         
         if verbose:
             print('This is after infering types:')

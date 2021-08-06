@@ -1,6 +1,7 @@
 from cool_ast.cool_ast import ProgramNode, ClassDeclarationNode
 import visitors.visitor as visitor
 from utils.semantic import Context, SemanticError
+from utils.errors import _SemanticError
 
 
 class TypeCollector:
@@ -20,7 +21,7 @@ class TypeCollector:
         self.context.create_type('String')
         self.context.create_type('IO')
         self.context.create_type('SELF_TYPE')
-        self.context.create_type('AUTO_TYPE')
+        # self.context.create_type('AUTO_TYPE')
         
         for declaration in node.declarations:
             self.visit(declaration)
@@ -30,4 +31,9 @@ class TypeCollector:
         try:
             self.context.create_type(node.id)
         except SemanticError as e:
-            self.errors.append(e.text)
+            f = e.text.find(')')
+            typo = e.text[25:f]
+            if typo in ("Int", "String", "Bool", "SELF_TYPE", "IO", "Object"):
+                self.errors.append(_SemanticError % (node.token_list[1].lineno, node.token_list[1].col, f"Redefinition of basic class {typo}."))
+            else:
+                self.errors.append(_SemanticError % (node.token_list[1].lineno, node.token_list[1].col, f"Classes may not be redefined"))

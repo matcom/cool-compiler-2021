@@ -1,5 +1,5 @@
 import ply.lex as lex
-from utils.errors import LexicographicError
+from utils.errors import _LexicographicError
 reserved = {
     'class' : 'class',
     'new' : 'new',
@@ -102,11 +102,12 @@ class CoolLexer:
         ('chunkComment', 'exclusive'),
         ('string', 'exclusive')
     )
-
+    col = 0
     # Define a rule so we can track line numbers
     def t_newline(self, t):
         r'\n+'
         t.lexer.lineno += len(t.value)
+        self.col = 0
 
     # Compute column.
     #   input is the input text string
@@ -116,8 +117,15 @@ class CoolLexer:
         return (token.lexpos - line_start) + 1  #parentesis?
 
     t_ignore_space = r'[ ]+'
+    # def t_space(self,t):
+    #     r'[ ]+'
+    #     pass
 
-    t_ignore_lineComment = r'--.*'
+    # t_ignore_lineComment = r'--.*'
+    # preguntarle a andy como no hacer esto con la precedencia...
+    def t_ignore_lineComment(self, t):
+        r'--.*'
+        pass
 
     # t_ignore_chunkComment = r'\(\*[^$]*\*\)'
 
@@ -153,43 +161,110 @@ class CoolLexer:
 
     def t_chunkComment_eof(self, t):
         if t.lexer.level > 0:
-            print(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), 'EOF in comment'))
+            self.errors.append(_LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), 'EOF in comment'))
+            print(_LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), 'EOF in comment'))
         return None
 
+    # t_assignArrow = r'<\-'
+    def t_assignArrow(self, t):
+        r'<\-'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_rArrow = r'=>'
+    def t_rArrow(self, t):
+        r'=>'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_leq = r'<='
+    def t_leq(self, t):
+        r'<='
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
     def t_number(self, t):
         r'\d+'
         t.value = int(t.value)
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
         return t
 
-    t_semi = r';'
+    # t_semi = r';'
+    def t_semi(self, t):
+        r';'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_colon = r':'
+    def t_colon(self, t):
+        r':'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_comma = r','
+    def t_comma(self, t):
+        r','
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_dot = r'\.'
+    def t_dot(self, t):
+        r'\.'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_opar = r'\('
+    def t_opar(self, t):
+        r'\('
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_cpar = r'\)'
+    def t_cpar(self, t):
+        r'\)'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
 
-    t_colon = r':'
+    # t_ocur = r'\{'
+    def t_ocur(self, t):
+        r'\{'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_ccur = r'\}'
+    def t_ccur(self, t):
+        r'\}'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
 
-    t_comma = r','
+    # t_plus = r'\+'
+    def t_plus(self,t):
+        r'\+'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_minus = r'\-'
+    def t_minus(self,t):
+        r'\-'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    
+    # t_star = r'\*'
+    def t_star(self,t):
+        r'\*'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_div = r'/'
+    def t_div(self,t):
+        r'/'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
 
-    t_dot = r'\.'
-
-    t_opar = r'\('
-    t_cpar = r'\)'
-
-    t_ocur = r'\{'
-    t_ccur = r'\}'
-
-    t_plus = r'\+'
-    t_minus = r'\-'
-    t_star = r'\*'
-    t_div = r'/'
-
-    t_equal = r'='
-    t_lneq = r'<'
-    t_leq = r'<='
-
-    t_complement = r'\~'
-
-    t_assignArrow = r'<\-'
-
-    t_rArrow = r'=>'
-
+    # t_equal = r'='
+    def t_equal(self,t):
+        r'='
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_lneq = r'<'
+    def t_lneq(self, t):
+        r'<'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
+    # t_complement = r'\~'
+    def t_complement(self, t):
+        r'\~'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
     def t_string(self, t):
         r'\"'
         t.lexer.begin('string')
@@ -202,7 +277,7 @@ class CoolLexer:
         errors = []
         for c in t.value[1:]:
             if c =='\x00':
-                errors.append(LexicographicError % (row, col, f'String contains null character'))
+                errors.append(_LexicographicError % (row, col, f'String contains null character'))
             if c == '\n':
                 t.lexer.lineno += 1
                 col = 0
@@ -211,6 +286,8 @@ class CoolLexer:
         if len(errors) != 0:
             self.errors += errors
         else:
+            t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4) -1
+            t.value = '"'+t.value
             return t
     # t_string = r"\"([^\x00\n]|(?<!\\)(\\\\)*?\\\n)*?(?<!\\)(\\\\)*?\""
     # t_string = r'\"[^\"]*\"'
@@ -229,21 +306,31 @@ class CoolLexer:
         
         t.lexer.begin('INITIAL')
         
-    t_arroba = r'@'
+    # t_arroba = r'@'
+    def t_arroba(self, t):
+        r'@'
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
+        return t
 
-    t_ignore_tab = r'\t+'
-
+    # t_ignore_tab = r'\t+'
+    def t_tab(self, t):
+        r'\t+'
+        self.col += 4*len(t.value)
+        # t.lexer.skip(len(t.value))
+        
     def t_type(self, t):
         r'[A-Z][a-zA-Z0-9_]*'
         lex =  t.value.lower()
         if lex in reserved:
             t.type = reserved[lex]
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
         return t
 
     def t_id(self, t):
         r'[a-z][a-zA-Z0-9_]*'
         if t.value.lower() in reserved:
             t.type = reserved[t.value.lower()]
+        t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)
         return t
 
     def t_eof(self, t):
@@ -260,7 +347,7 @@ class CoolLexer:
         #     else:
         #         self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
         # else:
-        self.errors.append(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
+        self.errors.append(_LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
         # print(LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), f'ERROR "{t.value[0]}"'))
         t.lexer.skip(1)
 
