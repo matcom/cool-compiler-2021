@@ -7,6 +7,7 @@ from cool_cmp.lexer.interface import ILexer
 from cool_cmp.shared.token import ICoolToken
 from cool_cmp.shared.errors import ErrorTracker
 from cool_cmp.lexer.errors import LexerCoolError
+from cool.grammar import cool_grammar as cool_G
 import ply.lex as lex
 
 class Lex():
@@ -140,6 +141,54 @@ class PlyLexer(ILexer):
             'COMMA'
         ) + tuple(reserved[x] for x in reserved.keys())
 
+        
+        self.terminals = {
+            'IF'            : cool_G.ifx,
+            'THEN'          : cool_G.then,
+            'ELSE'          : cool_G.elsex,
+            'FI'            : cool_G.if_r,
+            'WHILE'         : cool_G.whilex,
+            'LOOP'          : cool_G.loop,
+            'POOL'          : cool_G.loop_r,
+            'OCUR'          : cool_G.ocur,
+            'CCUR'          : cool_G.ccur,
+            'COLON'         : cool_G.colon,
+            'SEMI'          : cool_G.semi,
+            'COMMA'         : cool_G.comma,
+            'DOT'           : cool_G.dot,
+            'OPAR'          : cool_G.opar,
+            'CPAR'          : cool_G.cpar,
+            'PLUS'          : cool_G.plus,
+            'MINUS'         : cool_G.minus,
+            'DIV'           : cool_G.div,
+            'STAR'          : cool_G.star,
+            'NOT'           : cool_G.notx,
+            'NEG'           : cool_G.roof,
+            'LESS'          : cool_G.less,
+            'LEQ'           : cool_G.less_eq,
+            # 'GREAT'         : cool_G.greater,
+            # 'GEQ'           : cool_G.greater_eq,
+            'EQ'            : cool_G.equal,
+            'LET'           : cool_G.let,
+            'IN'            : cool_G.inx,
+            'CASE'          : cool_G.case,
+            'OF'            : cool_G.of,
+            'ESAC'          : cool_G.case_r,
+            'SIGNALER'      : cool_G.arrow,
+            'ASSIGN'        : cool_G.assign,
+            'TRUE'          : cool_G.true,
+            'FALSE'         : cool_G.false,
+            'NUMBER'        : cool_G.num,
+            'STRING'        : cool_G.string,
+            'CLASS'         : cool_G.classx,
+            'INHERITS'      : cool_G.inherits,
+            'NEW'           : cool_G.new,
+            'ISVOID'        : cool_G.isvoid,
+            'OBJECTID'      : cool_G.idx,
+            'TYPEID'        : cool_G.typex,
+            'ARROBA'        : cool_G.at,
+            'COMMENT'       : cool_G.comment_open,
+            'COMMENT'       : cool_G.comment_close}
 
         # def t_COMMENTMULTI(t):
         #     r'\(\*(.|\n)*?\*\)'
@@ -310,6 +359,9 @@ class PlyLexer(ILexer):
         self.add_extra_info('verbose', False)
         self.add_extra_info('text_tokens', result)
         self.add_extra_info('errors', self.get_errors())
+            
+        for token in result:
+            token.set_type(self.terminals[token.token_type])
             
         return result
 
