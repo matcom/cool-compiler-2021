@@ -41,7 +41,7 @@ class Lex():
 
 class PlyCoolToken(lex.LexToken, ICoolToken):
 
-    def __init__(self, lex:str, typex:str, line:int, column:int):
+    def __init__(self, lex:str, typex, line:int, column:int):
         self.set_lex(lex)
         self.set_type(typex)
         self.set_position(line, column)
@@ -343,11 +343,15 @@ class PlyLexer(ILexer):
         # print(len(program_string))
         self.lexer.input(clean)
         result = []
+        base_line = -1
         while True:
             tok = self.lexer.token()
+            if base_line < 0:
+                base_line = tok.lineno - 1
+
             if not tok:
                 break
-            result.append(PlyCoolToken(tok.value, tok.type, tok.lineno, self.find_column(program_string, tok)))
+            result.append(PlyCoolToken(tok.value, tok.type, tok.lineno - base_line, self.find_column(program_string, tok)))
 
         if count > 0:
             self.add_error(LexerCoolError('EOF in comment', PlyCoolToken('', '', lines + 1, len(program_string))))
@@ -362,7 +366,10 @@ class PlyLexer(ILexer):
             
         for token in result:
             token.set_type(self.terminals[token.token_type])
-            
+
+        result.append(PlyCoolToken('$', cool_G.G.EOF, lines - 1, len(program_string)))
+        result[-1].set_position(result[-1].line, self.find_column(program_string, result[-1]))
+
         return result
 
     def add_error(self, error:LexerCoolError):
