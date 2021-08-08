@@ -223,14 +223,17 @@ class ShiftReduceParser(Parser):
             return None
         return result
     
-    def evaluate(self,tokens,errors:list,return_ast=False):
+    def evaluate(self,tokens,errors:list,return_ast=False,parsed_tokens=None):
         """
         If no errors then returns the evaluated tokens\n
         else fills errors with errors returning None
         """
         parser = self.__call__
         new_errors = []
-        right_parse = parser(tokens,new_errors)
+        if parsed_tokens is None:
+            right_parse = parser(tokens,new_errors)
+        else:
+            right_parse = parsed_tokens
         if not new_errors:
             right_parse.reverse()
             ast = self.evaluate_parse(right_parse, tokens)
