@@ -168,11 +168,12 @@ def ast_pipe(result:dict):
     """
     parser = result["parser"]
     tokens = result["text_tokens"]
+    text_parsed = result.get("text_parse", None)
     
     errors = []
-    ast = parser.evaluate(tokens,errors,True)
-    
-    result["ast"] = ast
+    if text_parsed or tokens:
+        ast = parser.evaluate(tokens,errors,True,text_parsed)
+        result["ast"] = ast
         
     if result.get("verbose", False):
         if errors:
