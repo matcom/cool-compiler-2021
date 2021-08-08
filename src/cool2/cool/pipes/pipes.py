@@ -13,6 +13,8 @@ from cool.semantic.scope import Scope
 from cool.pipes.utils import pprint_tokens, print_errors
 from cool.pipes.pipeline import Pipe
 
+ply_lexer = PlyLexer()
+
 def start_pipe(text, verbose = False):
     """
     Start the pipeline  
@@ -129,7 +131,7 @@ def tokenize_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexe
 
 tokenize_text_pipe = Pipe(tokenize_text_pipe)
 
-def ply_lexer_pipe(result:dict, language_grammar=G, language_lexer=PlyLexer(), language_parser=cool_parser):
+def ply_lexer_pipe(result:dict, language_grammar=G, language_lexer=ply_lexer, language_parser=cool_parser):
     """
     Tokenize with ply
     """
@@ -139,6 +141,8 @@ def ply_lexer_pipe(result:dict, language_grammar=G, language_lexer=PlyLexer(), l
 
     errors = []
     tokens = lang.get_tokens(text, errors)
+
+    errors = language_lexer.get_errors()
 
     result.update({
         "parser"        : language_parser,
