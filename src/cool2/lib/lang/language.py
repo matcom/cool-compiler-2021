@@ -46,7 +46,7 @@ class Language():
             errors.append(x)
 
         if parse_errors:
-            return [],[]
+            return [],tokens
         
         return parse,tokens
     
@@ -55,14 +55,14 @@ class Language():
         Return the text tokens
         """
         tokens = self.lexer(text)
-        tokens = self._fix_tokens(tokens,errors)
-        for tok in tokens:
-            tok.lex = (tok.lex[0], tok.lex[1] + 1, tok.lex[2] - len(tok.lex[0]) + 1) 
-            if tok.token_type == "UNKNOWN":
-                er = LexerCoolError('"{}"', tok.lex[0], token=tok)
-                # errors.append(f'({tok.lex[1]}, {tok.lex[2]}) - LexicographicError: ERROR "{tok.lex[0]}"')
-                errors.append(er)
-        tokens = [x for x in tokens if x.token_type != "UNKNOWN"]
+        # tokens = self._fix_tokens(tokens,errors)
+        # for tok in tokens:
+        #     tok.lex = (tok.lex[0], tok.lex[1] + 1, tok.lex[2] - len(tok.lex[0]) + 1) 
+        #     if tok.token_type == "UNKNOWN":
+        #         er = LexerCoolError('"{}"', tok.lex[0], token=tok)
+        #         # errors.append(f'({tok.lex[1]}, {tok.lex[2]}) - LexicographicError: ERROR "{tok.lex[0]}"')
+        #         errors.append(er)
+        # tokens = [x for x in tokens if x.token_type != "UNKNOWN"]
         
         return tokens
         
