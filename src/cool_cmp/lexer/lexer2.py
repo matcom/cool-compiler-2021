@@ -7,13 +7,13 @@ from cool_cmp.lexer.interface import ILexer
 from cool_cmp.shared.token import ICoolToken
 from cool_cmp.shared.errors import ErrorTracker
 from cool_cmp.lexer.errors import LexerCoolError
-from cool2.cool.lexer.cool_lexer import cool_lexer
-from cool2.cool.lexer.comment_lexer import comment_lexer
-from cool2.cool.pipeline import lexer_pipeline
+# from cool2.cool.lexer.cool_lexer import cool_lexer
+# from cool2.cool.lexer.comment_lexer import comment_lexer
+# from cool2.cool.pipeline import lexer_pipeline
 
-from cool2.lib.lexer.lexer import DetailToken, DetailLexer
+# from cool2.lib.lexer.lexer import DetailToken, DetailLexer
 
-class CoolToken2(DetailToken, ICoolToken):
+class CoolToken2(ICoolToken):
     
     def set_lex(self, lex:str):
         self.lex = (lex, self.row, self.column)
@@ -69,5 +69,5 @@ class CoolLexer2(ILexer):
         errors = self.error_tracker.get_errors()
         return errors
     
-    def __DetailToken2CoolToken2(self, detail_token:DetailToken)->CoolToken2:
+    def __DetailToken2CoolToken2(self, detail_token)->CoolToken2:
         return CoolToken2(detail_token.lex, detail_token.token_type)

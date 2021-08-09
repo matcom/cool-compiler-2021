@@ -132,6 +132,12 @@ class ShiftReduceParser(Parser):
             else:
                 errors.append(f"Invalid case: {action}")
                 return None if not finding_conflict else (state,lookahead,output)
+
+        if cursor == len(tokens):
+            errors.append('EOF token missing')
+
+        else:
+            errors.append('No valid derivation tree can be built with the given tokens')
     
     def _register(self, table, key, value):
         if key in table:
