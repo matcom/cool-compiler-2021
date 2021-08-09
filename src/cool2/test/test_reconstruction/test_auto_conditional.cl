@@ -28,7 +28,7 @@ class ConcBase2 inherits OtraBase
 
 class Main
 {
-    a:Object;
+    a:AUTO_TYPE <- new Void;
     main(): Int
     {
         {
@@ -56,7 +56,7 @@ class Main
                 else
                     new ConcBase2
                 fi;
-            d:Object <- 
+            d:AUTO_TYPE <- 
                 if
                     true
                 then
@@ -68,7 +68,7 @@ class Main
                     .ret2(
                     )
                 fi;
-            e:Object <- 
+            e:AUTO_TYPE <- 
                 if
                     true
                 then
