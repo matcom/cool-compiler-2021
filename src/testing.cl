@@ -1,19 +1,37 @@
---The parent-child relation on classes defines a graph. This graph may not contain cycles.
+(* An assignment has the form <id> <- <expr> *)
 
-class Main inherits IO {
-	main(): IO { out_string("hi!") };
-
-	main: IO <- out_string("bye!");
+class Main {
+    main(): Object {
+        (new Alpha).print()
+    };
 };
 
-class A inherits B {
-	x: Int <- 3;
+class Test {
+    test1: Object;
+    
+    testing1(): Int {
+        2 + 2
+    };
 
-	x(): String { ":)" };
+    test2: Int <- 1;
+
+    test3: String <- "1";
+
+    testing2(a: Alpha, b: Int): Int {
+        2 + 2
+    };
+
+    testing3(): String {
+        "2 + 2"
+    };
+
+    testing4(): String {
+        Test1 <- "Hello World" -- Identifiers begin with a lower case letter
+    };
 };
 
-class B inherits A {
-	y: Int <- 2;
-
-	div(a: Int, b: Int): Int { a / b};
+class Alpha inherits IO {
+    print() : Object {
+        out_string("reached!!\n")
+    };
 };
