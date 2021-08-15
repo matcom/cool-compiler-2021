@@ -1,5 +1,8 @@
-import cmp.visitor as visitor
-from cmp.ast import *
+import compiler.visitors.visitor as visitor
+from ..cmp.ast import ProgramNode, ClassDeclarationNode, FuncDeclarationNode
+from ..cmp.ast import AttrDeclarationNode, AssignNode, CallNode
+from ..cmp.ast import CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode, InstantiateNode
+from ..cmp.ast import UnaryNode, BinaryNode, AtomicNode
 
 class FormatVisitor(object):
     @visitor.on('node')

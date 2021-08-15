@@ -1,8 +1,8 @@
-from cmp.utils import ShiftReduceParser, ContainerSet, DisjointSet
-from cmp.pycompiler import Item, EOF
-from cmp.automata import State
-from cmp.nfa_dfa import DFA, NFA
-import cmp.visitor as visitor
+from .utils import ShiftReduceParser, ContainerSet, DisjointSet
+from .pycompiler import Item, EOF
+from .automata import State
+from .nfa_dfa import DFA, NFA
+import compiler.visitors.visitor as visitor
 from itertools import islice
 
 

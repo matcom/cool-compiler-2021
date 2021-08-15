@@ -1,6 +1,6 @@
-import cmp.visitor as visitor
-from cmp.semantic import SemanticError, Type, Context, ObjectType, IOType, StringType, IntType, BoolType, SelfType, AutoType
-from cmp.ast import ProgramNode, ClassDeclarationNode
+import compiler.visitors.visitor as visitor
+from ..cmp.semantic import SemanticError, Type, Context, ObjectType, IOType, StringType, IntType, BoolType, SelfType, AutoType
+from ..cmp.ast import ProgramNode, ClassDeclarationNode
 
 built_in_types = []
 
