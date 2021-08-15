@@ -1,7 +1,7 @@
-from cmp.grammar import *
-from cmp.utils import Token
-from cmp.regex import Regex
-from cmp.automata import State
+from ..cmp.grammar import *
+from ..cmp.utils import Token
+from ..cmp.regex import Regex
+from ..cmp.automata import State
 
 
 class Lexer:

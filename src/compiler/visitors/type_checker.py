@@ -1,10 +1,10 @@
-import cmp.visitor as visitor
-from cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType, LCA
-from cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
-from cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
-from cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
-from cmp.ast import VoidNode, NotNode, NegNode
-from cmp.ast import ConstantNumNode, ConstantStringNode, ConstantBoolNode, VariableNode, InstantiateNode
+import compiler.visitors.visitor as visitor
+from ..cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType, LCA
+from ..cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
+from ..cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
+from ..cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
+from ..cmp.ast import VoidNode, NotNode, NegNode
+from ..cmp.ast import ConstantNumNode, ConstantStringNode, ConstantBoolNode, VariableNode, InstantiateNode
 
 
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'

@@ -1,13 +1,13 @@
 import streamlit as st
-from cmp.grammar import G
-from cmp.lexer import tokenize_text, pprint_tokens
-from cmp.tools import LR1Parser
-from cmp.evaluation import evaluate_reverse_parse
-from cmp.formatter import FormatVisitor
-from cmp.type_collector import TypeCollector
-from cmp.type_builder import TypeBuilder
-from cmp.type_checker import TypeChecker
-from cmp.type_inferencer import TypeInferencer
+from compiler.cmp.grammar import G
+from compiler.lexer.lexer import tokenize_text, pprint_tokens
+from compiler.cmp.tools import LR1Parser
+from compiler.cmp.evaluation import evaluate_reverse_parse
+from compiler.visitors.formatter import FormatVisitor
+from compiler.visitors.type_collector import TypeCollector
+from compiler.visitors.type_builder import TypeBuilder
+from compiler.visitors.type_checker import TypeChecker
+from compiler.visitors.type_inferencer import TypeInferencer
 
 
 def run_pipeline(G, text):
@@ -174,5 +174,5 @@ def main(G):
                 st.text(tree)
 
 if __name__ == '__main__':
-    main(G)
-    # ast = run_pipeline(G, text)
+    # main(G)
+    ast = run_pipeline(G, text)

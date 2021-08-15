@@ -1,5 +1,5 @@
-from cmp.pycompiler import Grammar
-from cmp.ast import *
+from .pycompiler import Grammar
+from .ast import *
 
 # grammar
 G = Grammar()

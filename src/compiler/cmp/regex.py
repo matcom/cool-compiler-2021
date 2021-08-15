@@ -1,11 +1,11 @@
-from cmp.pycompiler import Grammar
-from cmp.utils import Token
-from cmp.tools import evaluate_parse
-from cmp.tools import metodo_predictivo_no_recursivo
-from cmp.tools import nfa_to_dfa
-from cmp.tools import automata_union, automata_concatenation, automata_closure, automata_minimization
-from cmp.tools import get_printer
-from cmp.tools import Node, AtomicNode, UnaryNode, BinaryNode, EpsilonNode, SymbolNode, ClosureNode, UnionNode, ConcatNode
+from .pycompiler import Grammar
+from .utils import Token
+from .tools import evaluate_parse
+from .tools import metodo_predictivo_no_recursivo
+from .tools import nfa_to_dfa
+from .tools import automata_union, automata_concatenation, automata_closure, automata_minimization
+from .tools import get_printer
+from .tools import Node, AtomicNode, UnaryNode, BinaryNode, EpsilonNode, SymbolNode, ClosureNode, UnionNode, ConcatNode
 from pprint import pprint as pp
 import pydot
 

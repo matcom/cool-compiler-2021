@@ -1,6 +1,6 @@
-import cmp.visitor as visitor
-from cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
-from cmp.semantic import SemanticError, ErrorType, InferencerManager, AutoType, SelfType
+import compiler.visitors.visitor as visitor
+from ..cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
+from ..cmp.semantic import SemanticError, ErrorType, InferencerManager, AutoType, SelfType
 
 
 SELF_IS_READONLY = 'Variable "self" is read-only.'
