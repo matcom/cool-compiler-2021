@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>COOLCompiler</class>
+ <widget class="QMainWindow" name="COOLCompiler">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1350</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>COOL Compiler</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../imgs/Qt.ico</normaloff>../../imgs/Qt.ico</iconset>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabCOOLMenu">
+      <property name="font">
+       <font>
+        <family>Tahoma</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="currentIndex">
+       <number>6</number>
+      </property>
+      <widget class="QWidget" name="tabCode">
+       <attribute name="title">
+        <string>Code</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QPlainTextEdit" name="textCode">
+          <property name="font">
+           <font>
+            <pointsize>18</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabLexer">
+       <attribute name="title">
+        <string>Lexer</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="textLexer">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>591</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QPlainTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tabParser">
+       <attribute name="title">
+        <string>Parser</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="textParser">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>591</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QPlainTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tabContext">
+       <attribute name="title">
+        <string>Context</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="textContext">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>591</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QPlainTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tabScope">
+       <attribute name="title">
+        <string>Scope</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="textScope">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>591</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QPlainTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tabCIL">
+       <attribute name="title">
+        <string>CIL</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="textCIL">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>591</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QPlainTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tabMIPS">
+       <attribute name="title">
+        <string>MIPS</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QPlainTextEdit" name="textMIPS">
+          <property name="font">
+           <font>
+            <pointsize>18</pointsize>
+           </font>
+          </property>
+          <property name="undoRedoEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="lineWrapMode">
+           <enum>QPlainTextEdit::NoWrap</enum>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabErrors">
+       <property name="maximumSize">
+        <size>
+         <width>1328</width>
+         <height>803</height>
+        </size>
+       </property>
+       <attribute name="title">
+        <string>Errors</string>
+       </attribute>
+       <widget class="QPlainTextEdit" name="textErrors">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>1261</width>
+          <height>591</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="lineWrapMode">
+         <enum>QPlainTextEdit::NoWrap</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1350</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>Fi&amp;le</string>
+    </property>
+    <widget class="QMenu" name="menuSave">
+     <property name="title">
+      <string>&amp;Save ...</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../../imgs/arrow-000.png</normaloff>../../imgs/arrow-000.png</iconset>
+     </property>
+     <addaction name="actionCode"/>
+     <addaction name="actionLexer"/>
+     <addaction name="actionParser"/>
+     <addaction name="actionContext"/>
+     <addaction name="actionScope"/>
+     <addaction name="actionCIL"/>
+     <addaction name="actionMIPS"/>
+     <addaction name="actionErrors"/>
+    </widget>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionNewCode"/>
+    <addaction name="actionLoadCode"/>
+    <addaction name="separator"/>
+    <addaction name="menuSave"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuRun">
+    <property name="title">
+     <string>A&amp;nalyser</string>
+    </property>
+    <addaction name="actionRun"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>O&amp;ptions</string>
+    </property>
+    <addaction name="actionHelp_2"/>
+    <addaction name="separator"/>
+    <addaction name="actionOrientation"/>
+    <addaction name="actionReport"/>
+    <addaction name="separator"/>
+    <addaction name="actionAboutAuthors"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuRun"/>
+   <addaction name="menuOptions"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+  </widget>
+  <action name="actionNewCode">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/selection-input.png</normaloff>../../imgs/selection-input.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;New code</string>
+   </property>
+   <property name="statusTip">
+    <string>New code</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionGuardarResultados">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/disk--pencil.png</normaloff>images/disk--pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>Guardar resultados</string>
+   </property>
+   <property name="statusTip">
+    <string>Guardar resultados</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionLoadCode">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/blue-folder-horizontal-open.png</normaloff>../../imgs/blue-folder-horizontal-open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Load code</string>
+   </property>
+   <property name="statusTip">
+    <string>Load code</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/cross-circle.png</normaloff>../../imgs/cross-circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+   <property name="statusTip">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F4</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../images/question.png</normaloff>../../images/question.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ayuda</string>
+   </property>
+   <property name="statusTip">
+    <string>¿Cómo usar?</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionHelp_2">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/question.png</normaloff>../../imgs/question.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Help</string>
+   </property>
+   <property name="statusTip">
+    <string>Help</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionAcercaInferenciaTipos">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../images/lifebuoy.png</normaloff>../../images/lifebuoy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Acerca de Inferencia de Tipos</string>
+   </property>
+   <property name="statusTip">
+    <string>Acerca de Inferencia de Tipos</string>
+   </property>
+  </action>
+  <action name="actionSaveGrammarAs">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../images/disk--pencil.png</normaloff>../../images/disk--pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>Guardar gramática como ...</string>
+   </property>
+   <property name="statusTip">
+    <string>Guardar Gramática Como</string>
+   </property>
+  </action>
+  <action name="actionAnalyse">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/control.png</normaloff>images/control.png</iconset>
+   </property>
+   <property name="text">
+    <string>Analizar</string>
+   </property>
+   <property name="toolTip">
+    <string>Analizar</string>
+   </property>
+   <property name="statusTip">
+    <string>Analizar</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionQuickAnalyse">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/controlx2.png</normaloff>images/controlx2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Análisis rápido</string>
+   </property>
+   <property name="toolTip">
+    <string>Análisis rápido</string>
+   </property>
+   <property name="statusTip">
+    <string>Análisis rápido</string>
+   </property>
+   <property name="shortcut">
+    <string>F9</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/control.png</normaloff>../../imgs/control.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Run</string>
+   </property>
+   <property name="statusTip">
+    <string>Run</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionQuickAnalyse_2">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../images/controlx2.png</normaloff>../../images/controlx2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Análisis rápido de la gramática</string>
+   </property>
+   <property name="shortcut">
+    <string>F9</string>
+   </property>
+  </action>
+  <action name="actionAboutAuthors">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/home.png</normaloff>../../imgs/home.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;About authors</string>
+   </property>
+   <property name="statusTip">
+    <string>About authors</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
+  </action>
+  <action name="actionOrientation">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/lifebuoy.png</normaloff>../../imgs/lifebuoy.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Orientation</string>
+   </property>
+   <property name="statusTip">
+    <string>Orientation</string>
+   </property>
+  </action>
+  <action name="actionReport">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/lifebuoy.png</normaloff>../../imgs/lifebuoy.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Report</string>
+   </property>
+   <property name="statusTip">
+    <string>Report</string>
+   </property>
+  </action>
+  <action name="actionasdasd">
+   <property name="text">
+    <string>asdasd</string>
+   </property>
+  </action>
+  <action name="actionCode">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Code</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="actionLexer">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk--pencil.png</normaloff>../../imgs/disk--pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Lexer</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+  </action>
+  <action name="actionParser">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Parser</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+  </action>
+  <action name="actionContext">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk--pencil.png</normaloff>../../imgs/disk--pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>C&amp;ontext</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
+  </action>
+  <action name="actionScope">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Scope</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="actionCIL">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk--pencil.png</normaloff>../../imgs/disk--pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>C&amp;IL</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
+   </property>
+  </action>
+  <action name="actionMIPS">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;MIPS</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
+   </property>
+  </action>
+  <action name="actionErrors">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../imgs/disk--pencil.png</normaloff>../../imgs/disk--pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Errors</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
