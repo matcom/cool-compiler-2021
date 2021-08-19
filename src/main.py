@@ -4,7 +4,8 @@ import c_parser.parser as parser
 from pipeline import Pipeline
 
 
-with open('/home/regnod/Documents/cmp_compiler 4to/cool-compiler-2021/tests/semantic/self4.cl') as f:
+# with open('/home/yumenio/Documents/cmp/cool-compiler-2021/cool-compiler-2021/tests/semantic/self4.cl') as f:
+with open('/home/yumenio/Documents/cmp/cool-compiler-2021/cool-compiler-2021/tests/boku/test1.cl') as f:
     program =  f.read()
 
 coolLexer = lexer.CoolLexer()

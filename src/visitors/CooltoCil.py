@@ -1,4 +1,3 @@
-
 from cool_ast.cool_ast import *
 import cil_ast.cil_ast as cil
 from utils.semantic import Context, SemanticError, Type, Method, Scope, ErrorType, VariableInfo
@@ -63,10 +62,7 @@ class BaseCOOLToCILVisitor:
         vname = f'data_{len(self.dotdata)}'
         data_node = cil.DataNode(vname, value)
         self.dotdata.append(data_node)
-        return data_node
-    
-    
-    
+
 
 class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
@@ -223,7 +219,11 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         
         # Your code here!!!
-        pass
+        dest = self.define_internal_local()
+        left = self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        self.register_instruction(cil.PlusNode(dest, left, right))
+        return dest
 
     @visitor.when(MinusNode)
     def visit(self, node, scope):
@@ -233,7 +233,11 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         
         # Your code here!!!
-        pass
+        dest = self.define_internal_local()
+        left = self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        self.register_instruction(cil.MinusNode(dest, left, right))
+        return dest
 
     @visitor.when(StarNode)
     def visit(self, node, scope):
@@ -243,7 +247,11 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         
         # Your code here!!!
-        pass
+        dest = self.define_internal_local()
+        left = self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        self.register_instruction(cil.StarNode(dest, left, right))
+        return dest
 
     @visitor.when(DivNode)
     def visit(self, node, scope):
@@ -253,6 +261,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         
         # Your code here!!!
-        pass
         
-    # ======================================================================
+        dest = self.define_internal_local()
+        left = self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        self.register_instruction(cil.DivNode(dest, left, right))
+        return dest
