@@ -106,13 +106,12 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         attributes = []
         methods = []
         
-        current = node
         current_type = self.current_type
-        while current.parent is not None:
+        while current_type.parent is not None:
             attr_temp = []
             method_temp = []
-            for attr in current.attributes:
-                self.attr_set.add(attr.name)
+            for attr in current_type.attributes:
+                # self.attr_set.add(attr.name)
                 attr_temp.append(attr.name)
             
             for method in current_type.methods:
@@ -120,8 +119,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             
             attributes = attr_temp + attributes
             methods = method_temp + methods
-            current = current.parent
-            current_type = self.context.get_type(current.id)
+            
+            current_type = current_type.parent
+            
         
         type_node.attributes = attributes
         type_node.methods = methods
@@ -142,14 +142,25 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.body -> [ ExpressionNode ... ]
         ###############################
         
-        self.current_method = self.current_type.get_method(node.id)
+        self.current_method = self.current_type.get_method(node.id, self.current_type, False)
         
         # Your code here!!! (Handle PARAMS)
+        self.current_function = self.register_function(self.to_function_name(node.id, self.current_type.name))
+
+        self.params.append(cil.ParamNode('self'))
+        for arg_name, _ in node.params:
+            self.params.append(cil.ParamNode(arg_name))
         
-        for instruction, child_scope in zip(node.body, scope.children):
-            value = self.visit(instruction, child_scope)
+        return_value = self.visit(node.body, scope.children[0])
+        # for instruction, child_scope in zip(node.body, scope.children):
+        #     value = self.visit(instruction, child_scope)
+
         # Your code here!!! (Handle RETURN)
-        
+        if node.body and 'Void' != node.type: 
+            self.register_instruction(cil.ReturnNode(return_value))
+        else:
+            self.register_instruction(cil.ReturnNode())
+            
         self.current_method = None
 
     @visitor.when(VarDeclarationNode)
