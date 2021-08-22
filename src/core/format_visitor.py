@@ -1,4 +1,4 @@
-from Tools import visitor
+from core import visitor
 from Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
 from Parser import IfThenElseNode, WhileLoopNode, BlockNode, LetInNode, CaseOfNode
 from Parser import AssignNode, UnaryNode, BinaryNode

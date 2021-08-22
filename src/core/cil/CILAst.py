@@ -1,4 +1,4 @@
-from ..Tools import visitor
+from ..tools import visitor
 
 class Node:
     pass
@@ -394,7 +394,7 @@ def get_formatter():
 
         @visitor.when(LengthNode)
         def visit(self, node: LengthNode):
-            return f'{node.dest} = {node.source}.lenght'
+            return f'{node.dest} = LENGTH {node.source}'
 
         @visitor.when(EqualNode)
         def visit(self, node: EqualNode):

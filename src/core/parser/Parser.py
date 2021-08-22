@@ -1,6 +1,6 @@
-from Tools.Tools.pycompiler import Grammar
-from Tools.Tools.Parser_LR1 import LR1Parser
-from Tools.Tools.COOLAst import *
+from core.tools.pycompiler import Grammar
+from core.tools.Parser_LR1 import LR1Parser
+from core.tools.COOLAst import *
 
 
 # Representacion de la gramatica de COOL utilizando la clase grammar

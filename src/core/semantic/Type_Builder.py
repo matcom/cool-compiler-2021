@@ -1,10 +1,10 @@
-from Tools.Tools import visitor
-from Tools.Tools.Semantic import *
-from Tools.Parser.Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
-from Tools.Tools.Errors import *
+from core.tools import visitor
+from core.tools.Semantic import *
+from core.parser.Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
+from core.tools.Errors import *
 
 # Visitor encargado de contruir los tipos. Una vez que se conocen los nombres
-# de los tipos que intervienen en el codifo COOL, este visitor les annade sus
+# de los tipos que intervienen en el codigo COOL, este visitor les annade sus
 # metodos y atributos, asi como el tipo padre.
 
 class Type_Builder:

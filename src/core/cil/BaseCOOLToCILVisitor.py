@@ -1,5 +1,5 @@
-from ..CIL import CILAst as cil
-from ..Tools.Semantic import VariableInfo
+from ..cil import CILAst as cil
+from ..tools.Semantic import VariableInfo
 
 
 class BaseCOOLToCILVisitor:

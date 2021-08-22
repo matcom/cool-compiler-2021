@@ -1,7 +1,7 @@
-import Tools.Tools.COOLAst as cool
+import core.tools.COOLAst as cool
 from .BaseCOOLToCILVisitor import *
-from Tools.Tools import visitor
-from ..Tools.Semantic import Scope
+from core.tools import visitor
+from ..tools.Semantic import Scope
 
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def __init__(self, context):
@@ -14,11 +14,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.ProgramNode)
     def visit(self, node : cool.ProgramNode, scope : Scope):
         self.current_function = self.register_function('entry')
-        return_value = self.define_internal_local()
         main_instance = self.define_internal_local()
         self.register_instruction(cil.StaticCallNode(self.init_name('Main'), main_instance))
         self.register_instruction(cil.ArgNode(main_instance))
-        self.register_instruction(cil.StaticCallNode(self.to_function_name('main', 'Main'), return_value))
+        self.register_instruction(cil.StaticCallNode(self.to_function_name('main', 'Main'), main_instance))
         self.register_instruction(cil.ReturnNode(0))
 
         #self.register_builtin()
@@ -35,16 +34,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_type = self.context.get_type(node.id.lex)
 
         # Inicializando los atributos de la clase y llamando al constructor del padre
-        self.current_function = self.register_function(self.init_attr_name(node.id.lex))
         if self.current_type.parent.name not in ('Object', 'IO'):
-            # TODO: Este self deberia ser el que paso por parametro?
             variable = self.define_internal_local()
             self.register_instruction(cil.ArgNode(self.vself.name))
             self.register_instruction(cil.StaticCallNode(
                 self.init_attr_name(self.current_type.parent.name), variable))
+
+        self.current_function = self.register_function(self.init_attr_name(node.id.lex))
+        instance = self.register_param(VariableInfo('instance', ''))
         for feat, child in zip(node.features, scope.childs):
             if isinstance(feat, cool.AttrDeclarationNode):
                 self.visit(feat, child)
+                self.register_instruction(cil.SetAttribNode(
+                    instance, feat.id.lex, feat.ret_expr, feat.type.lex))
         # TODO: Deberia retornar algo aqui?
 
         type = self.register_type(node.id.lex)
@@ -59,7 +61,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             if isinstance(feat, cool.FuncDeclarationNode):
                 self.visit(feat, child)
 
-        # TODO: Que hacer si la clase ya tiene definido el metodo init?
         self.current_function = self.register_function(self.init_name(node.id.lex))
         instance = self.define_internal_local()
         self.register_instruction(cil.AllocateNode(node.id.lex, instance))
@@ -67,6 +68,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         variable = self.define_internal_local()
         self.register_instruction(cil.ArgNode(instance))
         self.register_instruction(cil.StaticCallNode(self.init_attr_name(node.id.lex), variable))
+
+        if 'init' in self.current_type.methods.keys():
+            self.register_instruction(cil.ArgNode(instance))
+            self.register_instruction(cil.StaticCallNode(
+                self.to_function_name('init', self.current_type.name), variable))
+
         self.register_instruction(cil.ReturnNode(instance))
 
         self.current_function = None
@@ -74,16 +81,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node : cool.AttrDeclarationNode, scope : Scope):
+        variable = self.define_internal_local()
         if node.expression:
             self.visit(node.expression, scope.childs[0])
-            self.register_instruction(cil.SetAttribNode(
-                self.vself.name, node.id, node.expression.ret_expr, self.current_type))
+            self.register_instruction(cil.AssignNode(variable, node.expression.ret_expr))
         elif node.type.lex in self.value_types:
-            variable = self.define_internal_local()
             self.register_instruction(cil.AllocateNode(node.type.lex, variable))
-            self.register_instruction(cil.SetAttribNode(
-                self.vself.name, node.id, variable, self.current_type))
-        variable = self.register_local(VariableInfo(node.id.lex, node.type.lex))
+        self.register_local(VariableInfo(node.id.lex, node.type.lex))
         node.ret_expr = variable
 
     @visitor.when(cool.FuncDeclarationNode)
@@ -173,9 +177,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.visit(node.expression, scope.childs[0])
         self.register_instruction(cil.TypeOfNode(vtype, node.expression.ret_expr))
 
-        void = cil.VoidNode()
         isvoid = self.define_internal_local()
-        self.register_instruction(cil.EqualNode(isvoid, node.expression.ret_expr, void))
+        self.register_instruction(cil.EqualNode(isvoid, node.expression.ret_expr, cil.VoidNode()))
         self.register_runtime_error(isvoid, f'{node.expression.line, node.expression.column} - '
                                             f'RuntimeError: Case on void')
 
@@ -346,13 +349,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
         ret = self.define_internal_local()
-        value = self.define_internal_local()
         answer = self.define_internal_local()
 
         void = cil.VoidNode()
         self.visit(node.expression, scope.childs[0])
-        self.register_instruction(cil.AssignNode(value, node.expression.ret_expr))
-        self.register_instruction(cil.EqualNode(answer, value, void))
+        self.register_instruction(cil.EqualNode(answer, node.expression.ret_expr, void))
 
         self.register_instruction(cil.ArgNode(answer))
         self.register_instruction(cil.StaticCallNode(self.init_name('Bool'), ret))
@@ -381,7 +382,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         type_int = self.define_internal_local()
         type_string = self.define_internal_local()
         type_bool = self.define_internal_local()
-        type = self.define_internal_local()
         equal = self.define_internal_local()
         value = self.define_internal_local()
 
@@ -447,6 +447,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.EqualNode(isvoid, node.obj.ret_expr, void))
         self.register_runtime_error(isvoid, f'{node.id.line, node.id.column} - RuntimeError: Dispatch on void')
 
+        # TODO: Creo que deberia annadir los parametros al reves para luego sacarlos en el orden correcto
         self.register_instruction(cil.ArgNode(node.obj.ret_expr))
         for arg in args: self.register_instruction(arg)
 
@@ -470,6 +471,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.visit(arg, child)
             args.append(cil.ArgNode(arg.ret_expr))
 
+        # TODO: Creo que deberia annadir los parametros al reves para luego sacarlos en el orden correcto
         self.register_instruction(cil.ArgNode(self.vself.name))
         for arg in args: self.register_instruction(arg)
 
@@ -483,6 +485,9 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if node.type == 'SELF_TYPE':
             variable = self.define_internal_local()
             self.register_instruction(cil.TypeOfNode(ret, self.vself.name))
+            # TODO: ALLOCATE a veces recibe el nombre de la clase como string, necesito cambiar este ya
+            #  que el nombre de la clase se encuentra dentro de la variable, o cambiar los demas para
+            #  que funcionen con self.register_instruction(cil.LoadNode(variable, data))
             self.register_instruction(cil.AllocateNode(variable, ret))
         else:
             if node.type == 'Int':
@@ -522,6 +527,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.IntegerNode, scope: Scope):
         ret = self.define_internal_local()
 
+        # TODO: Hay algunos ArgNode que reciben variables y otros valores especificos
         self.register_instruction(cil.ArgNode(node.token.lex))
         self.register_instruction(cil.StaticCallNode(self.init_name('Int'), ret))
         node.ret_expr = ret
@@ -530,6 +536,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.BoolNode, scope: Scope):
         ret = self.define_internal_local()
 
+        # TODO: Hay algunos ArgNode que reciben variables y otros valores especificos
         self.register_instruction(cil.ArgNode(node.token.lex))
         self.register_instruction(cil.StaticCallNode(self.init_name('Bool'), ret))
         node.ret_expr = ret

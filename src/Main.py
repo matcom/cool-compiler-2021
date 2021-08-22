@@ -1,11 +1,11 @@
-from Tools.Lexer.Lexer import Lexer
-from Tools.Parser.Parser import CoolParser
-from Tools.Tools.evaluation import evaluate_reverse_parse
-from Tools.Semantic.Type_Collector import Type_Collector
-from Tools.Semantic.Type_Builder import Type_Builder
-from Tools.Semantic.Type_Checker import Type_Checker
-from Tools.CIL.COOLToCILVisitor import COOLToCILVisitor
-from Tools.CIL.CILAst import get_formatter
+from core.lexer.Lexer import Lexer
+from core.parser.Parser import CoolParser
+from core.tools.evaluation import evaluate_reverse_parse
+from core.semantic.Type_Collector import Type_Collector
+from core.semantic.Type_Builder import Type_Builder
+from core.semantic.Type_Checker import Type_Checker
+from core.cil.COOLToCILVisitor import COOLToCILVisitor
+from core.cil.CILAst import get_formatter
 
 def main(args):
     try:

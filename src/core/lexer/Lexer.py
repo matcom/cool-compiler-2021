@@ -1,7 +1,7 @@
 import ply.lex as lex
-from Tools.Tools.utils import Token
-from Tools.Parser.Parser import CoolGrammar
-from Tools.Tools.Errors import LexicographicError
+from core.tools.utils import Token
+from core.parser.Parser import CoolGrammar
+from core.tools.Errors import LexicographicError
 
 class Lexer:
     states = (
