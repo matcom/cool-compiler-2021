@@ -87,6 +87,7 @@ class MainWindow(QMainWindow):
             self.ui.textCode.setPlainText(code)
             self.update_status()
             self.clear_windows()
+            self.go_dialog(0)
     
     def save(self, path, text):
         try:
@@ -412,7 +413,7 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def report(self):
-        path = '../doc/report.pdf'
+        path = '../doc/report/report.pdf'
         webbrowser.open_new(path)
 
     def about_authors(self):
