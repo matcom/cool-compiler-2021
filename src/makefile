@@ -1,12 +1,15 @@
 .PHONY: clean
 
 NAME 	   	:= COOL Compiler
-VERSION		:= 2.0.0
+VERSION		:= 3.0.0
 DEVELOPERS	:= Juan José López, Juan Carlos Esquivel, Ariel Plasencia
 COPYRIGHT  	:= Copyright © 2021: $(DEVELOPERS)
 
 main: ## Compiling the compiler :)
 	@echo "Compiling the compiler :)"
+
+visual: ## Open the app desktop ;)
+	python3 visual.py
 
 info: ## Display project description
 	@echo "$(NAME) v$(VERSION)"
@@ -33,6 +36,7 @@ my_clean: ## Remove others temporary files
 	rm -rf parsing/parsetab.py
 	rm -rf semantic/__pycache__/
 	rm -rf semantic/visitors/__pycache__/
+	rm -rf uis/__pycache__/
 	rm -rf utils/__pycache__/
 
 test: ## Run test cases for each stage
