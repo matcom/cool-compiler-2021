@@ -50,7 +50,7 @@ def check(ast, context, errors):
 
 def main():
     input_file = sys.argv[1]
-    output_file = input_file[:-2] + 'mips'
+    output_file = sys.argv[2]
 
     data = open(input_file).read()
     errors = []
