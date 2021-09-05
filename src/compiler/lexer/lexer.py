@@ -74,13 +74,6 @@ class Lexer:
     def __call__(self, text):
         return [ Token(lex, ttype) for lex, ttype in self._tokenize(text) ]
 
-
-nonzero_digits = '|'.join(str(n) for n in range(1,10))
-alp = [chr(n) for n in range(ord('a'),ord('z') + 1)]
-alp.extend([chr(n) for n in range(ord('A'),ord('Z') + 1)])
-letters = '|'.join(alp)
-
-
 def eliminate_regex_conflict(text):
     result = ''
     for i in text:
@@ -105,6 +98,10 @@ def get_all_combinations(text, first_lower=False):
 
     return result
 
+nonzero_digits = '|'.join(str(n) for n in range(1,10))
+alp = [chr(n) for n in range(ord('a'),ord('z') + 1)]
+alp.extend([chr(n) for n in range(ord('A'),ord('Z') + 1)])
+letters = '|'.join(alp)
 alphabet_before = [eliminate_regex_conflict(chr(n)) for n in range(1, ord('~') + 1) if n != 34]
 alphabet = '|'.join(alphabet_before)
 
@@ -113,8 +110,9 @@ def tokenize_text(text):
         [(t, get_all_combinations(t.Name)) for t in G.terminals if t not in { idx, num, stringx, boolx }] +
         [(boolx, f'({get_all_combinations("true", True)})|({get_all_combinations("false", True)})'),
         (num, f'0|(({nonzero_digits})(0|{nonzero_digits})*)'),
-        ('salto', '\n'),
-        ('space', '( |\t)( |\t)*'),
+        ('space', '')
+        # ('salto', '\n'),
+        # ('space', '( |\t)( |\t)*'),
         (idx, f'({letters}|_)(_|{letters}|0|{nonzero_digits})*'),
         (stringx, f'"({alphabet})*"')],
         G.EOF)
