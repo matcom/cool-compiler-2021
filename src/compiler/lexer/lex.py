@@ -3,7 +3,17 @@ import re
 from ..cmp.grammar import G
 
 
-class CoolLexer(object): 
+class CoolLexer(object):
+
+    __init__(self):
+        self.count = 0
+        self.build()
+
+    states = (
+        ('string','exclusive'),
+        ('comment','exclusive'),
+    )
+
     reserved = {
         'class': 'CLASS',
         'inherits': 'INHERITS',
@@ -96,4 +106,141 @@ class CoolLexer(object):
         'NUMBER': G.num,
         'STRING': G.stringx
     }
+
+    def t_NUMBER(t):
+        r'\d+'
+        t.value = int(t.value)
+        self.add_column(t)
+        return t
+
+    # Define a rule so we can track line numbers
+    def t_newline(t):
+        r'\n+'
+        t.lexer.lineno += len(t.value)
+        self.count = t.lexpos + len(t.value)
+
+    # A string containing ignored characters (spaces and tabs)
+    t_ignore  = ' \t\f\r\v'
+
+    def t_COMMENTLINE(self, t):
+        r'--.*'
+
+    def t_TYPEIDENTIFIER(self, t):
+        r'[A-Z][0-9A-Za-z_]*'
+        val = t.value.lower()
+        if val not in ['true', 'false']:
+            t.type = self.reserved.get(val, 'TYPEIDENTIFIER')
+        self.add_column(t)
+        return t
+
+    def t_OBJECTIDENTIFIER(self, t):
+        r'[a-z][0-9A-Za-z_]*'
+        val = t.value.lower()
+        t.type = self.reserved.get(val, 'OBJECTIDENTIFIER')
+        self.add_column(t)
+        return t
+         
+    def t_SEMICOLON(self, t):
+        r';'
+        self.add_column(t)
+        return t
+
+    def t_COLON(self, t):
+        r':'
+        self.add_column(t)
+        return t
+
+    def t_COMMA(self, t):
+        r','
+        self.add_column(t)
+        return t
+    
+    def t_DOT(self, t):
+        r'\.'
+        self.add_column(t)
+        return t
+    
+    def t_OPAR(self, t):
+        r'\('
+        self.add_column(t)
+        return t
+    
+    def t_CPAR(self, t):
+        r'\)'
+        self.add_column(t)
+        return t
+
+    def t_OCUR(self, t):
+        r'{'
+        self.add_column(t)
+        return t
+
+    def t_CCUR(self, t):
+        r'}'
+        self.add_column(t)
+        return t
+
+    def t_LARROW(self, t):
+        r'<-'
+        self.add_column(t)
+        return t
+
+    def t_RARROW(self, t):
+        r'=>'
+        self.add_column(t)
+        return t
+
+    def t_AT(self, t):
+        r'@'
+        self.add_column(t)
+        return t
+
+    def t_EQUAL(self, t):
+        r'='
+        self.add_column(t)
+        return t
+
+    def t_PLUS(self, t):
+        r'\+'
+        self.add_column(t)
+        return t
+
+    def t_MINUS(self, t):
+        r'-'
+        self.add_column(t)
+        return t
+
+    def t_STAR(self, t):
+        r'\*'
+        self.add_column(t)
+        return t
+
+    def t_DIV(self, t):
+        r'/'
+        self.add_column(t)
+        return t
+
+    def t_LESS(self, t):
+        r'<'
+        self.add_column(t)
+        return t
+
+    def t_LEQ(self, t):
+        r'<='
+        self.add_column(t)
+        return t
+
+    def T_NEG(self, t):
+        r'~'
+        self.add_column(t)
+        return t
+
+
+    # Build the lexer
+    def build(self,**kwargs):
+        self.lexer = lex.lex(module=self, **kwargs)
+
+
+    def add_column(self, t):
+        t.col = t.lexpos - self.count
 
