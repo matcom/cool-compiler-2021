@@ -2,7 +2,7 @@
 
 NAME 	   	:= COOL Compiler
 VERSION		:= 3.0.0
-DEVELOPERS	:= Juan José López, Juan Carlos Esquivel, Ariel Plasencia
+DEVELOPERS	:= Juan José López, Juan Carlos Esquivel, Carlos Martínez, Ariel Plasencia
 COPYRIGHT  	:= Copyright © 2021: $(DEVELOPERS)
 
 main: ## Compiling the compiler :)
