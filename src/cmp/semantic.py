@@ -2,9 +2,10 @@ import itertools as itt
 from cmp.errors import SemanticError
 
 class Attribute:
-    def __init__(self, name, typex):
+    def __init__(self, name, typex, expression=None):
         self.name = name
         self.type = typex
+        self.expression = expression
 
     def __str__(self):
         _type = str(self.type) if self.type.name == 'AUTO_TYPE' else self.type.name
@@ -39,8 +40,6 @@ class Type:
         self.errors = errors
 
     def set_parent(self, parent):
-        if self.parent is not None:
-            print('Revisarrrrrrrrr')
         self.parent = parent
     
     def get_attribute(self, name:str):
@@ -54,11 +53,11 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Attribute {name} is not defined in {self.name}.')
 
-    def define_attribute(self, name:str, typex):
+    def define_attribute(self, name:str, typex, expression = None):
         try:
             self.get_attribute(name)
         except SemanticError as err:
-            attribute = Attribute(name, typex)
+            attribute = Attribute(name, typex, expression)
             self.attributes.append(attribute)
             return attribute
         else:
@@ -89,17 +88,17 @@ class Type:
         self.methods.append(method)
         return method
 
-    def all_attributes(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
-        for attr in self.attributes:
-            plain[attr.name] = (attr, self)
-        return plain.values() if clean else plain
+    #def all_attributes(self, clean=True):
+    #    plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
+    #    for attr in self.attributes:
+    #        plain[attr.name] = (attr, self)
+    #    return plain.values() if clean else plain
 
-    def all_methods(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
-        for method in self.methods:
-            plain[method.name] = (method, self)
-        return plain.values() if clean else plain
+    #def all_methods(self, clean=True):
+    #    plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
+    #    for method in self.methods:
+    #        plain[method.name] = (method, self)
+    #    return plain.values() if clean else plain
 
     def conforms_to(self, other):
         return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
@@ -157,11 +156,16 @@ class Context:
     #endregion
     
     def built_it(self):
+        Object = self.create_type('Object')
         Io = self.create_type('IO')
         Int = self.create_type('Int')
-        Bool = self.create_type('Bool')
-        Object = self.create_type('Object')
         String = self.create_type('String')
+        Bool = self.create_type('Bool')
+
+        Io.set_parent(Object)
+        Int.set_parent(Object)
+        String.set_parent(Object)
+        Bool.set_parent(Object)
         
         Object.define_method('abort', [], [], Object)
         Object.define_method('type_name', [], [], String)

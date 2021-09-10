@@ -240,8 +240,8 @@ class TypeCheck(object):
                 else:
                     type_list.append(variable_type.name)
 
-            new_scope.define_variable(iid, variable_type)
-            self.visit(expression, scope)
+            new_scope.define_variable(iid.value, variable_type)
+            self.visit(expression, new_scope)
             variable_type = expression.computed_type
 
             if not node_type:
@@ -353,8 +353,7 @@ class TypeCheck(object):
         node.computed_type = self.context.get_type('Bool')
 
     @visitor.when(IdentifierNode)
-    def visit(self, node, scope):     
-        
+    def visit(self, node, scope):  
         if scope.is_defined(node.lexer.value, self.scope_class, self.current_type):
             variable = scope.find_variable(node.lexer.value, self.scope_class, self.current_type)
             node_type = variable.type

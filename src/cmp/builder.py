@@ -48,7 +48,7 @@ class TypeBuilder(object):
             attr_type = ErrorType()
 
         try:
-            self.current_type.define_attribute(node.id.value, attr_type)
+            self.current_type.define_attribute(node.id.value, attr_type, node.expression)
         except SemanticError as err:
             self.errors.append(SemanticError.set_error(node.id.line, node.id.column, err.text))
 
@@ -88,10 +88,10 @@ class TypeBuilder(object):
             
             for (cid, ctype), pid, ptype in zip(node.parameter_list, param_parent_names, param_paren_types):
                 if cid.value == pid:
-                    if not ptype.conforms_to(self.context.get_type(ctype.value)):
+                    if not self.context.get_type(ctype.value).conforms_to(ptype):
                         self.errors.append(SemanticError.set_error(cid.line, cid.column, f'In redefined method {node.id.value}, parameter type {ctype.value} is different from original type {ptype.name}.'))
             
-            if not method.return_type.conforms_to(self.context.get_type(node.type.value)):
+            if not self.context.get_type(node.type.value).conforms_to(method.return_type):
                 self.errors.append(SemanticError.set_error(node.type.line, node.type.column, f'In redefined method {node.id.value}, return type {node.type.value} is different from original return type {method.return_type.name}.'))
         
         except ParamError as err:
