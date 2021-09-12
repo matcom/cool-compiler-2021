@@ -1,13 +1,12 @@
 .PHONY: clean
 
 main:
-	@echo ${TAG}
+	# Compiling the compiler :)
 
 clean:
 	rm -rf build/*
 	rm -rf ../tests/*/*.mips
 
 test:
-	pytest-3 ../tests -v --tb=short -m=${TAG} -p no:warnings
-	
+	pytest ../tests -v --tb=short -m=${TAG}
 
