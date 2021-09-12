@@ -107,19 +107,105 @@ class CoolLexer(object):
         'STRING': G.stringx
     }
 
-    def t_NUMBER(t):
+    def t_begin_STARTSTRING(self, t):
+        r'"'
+        self.string = ""
+        self.lexer.begin('string')
+
+    def t_string_ENDSTRING(self, t):
+        r'"'
+        self.lexer.begin('INITIAL')
+        t.value = self.string
+        t.type = 'STRING'
+        self.add_column(t)
+        return t
+
+    def t_string_NULL(self, t):
+        r'\0'
+        self.lexer.begin('INITIAL')
+        self.add_column(t)
+        t.type = 'ERROR'
+        t.value = f"({t.lineno, t.col}) - LexicographicError: String contains null character"
+        return t
+
+    def t_string_escaped_newline(self, t):
+        r'\\\n'
+        self.string += '\n'
+        t.lexer.lineno += 1
+
+    def t_string_invalid_newline1(self, t):
+        r'\\n'
+        self.lexer.begin('INITIAL')
+        self.add_column(t)
+        t.type = 'ERROR'
+        t.value = f"({t.lineno, t.col}) - LexicographicError: Unterminated string constant"
+        return t
+
+    def t_string_invalid_newline2(self, t):
+        r'\n'
+        self.lexer.begin('INITIAL')
+        self.add_column(t)
+        t.type = 'ERROR'
+        t.value = f"({t.lineno, t.col}) - LexicographicError: Unterminated string constant"
+        t.lexer.lineno += 1
+        return t
+
+    def t_string_special_character(self, t):
+        r'\\[btf]'
+        self.string += t.value
+
+    def t_string_escaped_character(self, t):
+        r'\\.'
+        self.string += t.value[1]
+
+    def t_strings_character(self, t):
+        r'.'
+        self.string += t.value
+
+    def t_strings_eof(self, t):
+        t.lexer.begin("INITIAL")
+        self.add_column(t)
+        t.type = "ERROR"
+        t.value = f"({t.lineno},{t.col}) - LexicographicError: EOF in string constant"
+        return t
+
+    def t_begin_STARTCOMMENT(self, t):
+        r'\(\*'
+        self.comment_level = 1
+        self.lexer.begin('comment')
+
+    def t_comment_STARTCOMMENT(self, t):
+        r'\(\*'
+        self.comment_level += 1
+    
+    def t_comment_ENDCOMMENT(self, t):
+        r'\*\)'
+        self.comment_level -= 1
+        if self.comment_level == 0:
+            self.lexer.begin('INITIAL')
+
+    def t_comment_character(self, t):
+        r'.'
+
+    def t_comment_eof(self, t):
+        self.add_column(t)
+        t.type = 'ERROR'
+        t.value = f'({t.lexer.lineno}, {t.col}) - LexicographicError: EOF in comment'
+        self.lexer.begin('INITIAL')
+        return t
+
+    def t_NUMBER(self, t):
         r'\d+'
         t.value = int(t.value)
         self.add_column(t)
         return t
 
     # Define a rule so we can track line numbers
-    def t_newline(t):
+    def t_ANY_newline(self, t):
         r'\n+'
         t.lexer.lineno += len(t.value)
         self.count = t.lexpos + len(t.value)
 
-    # A string containing ignored characters (spaces and tabs)
     t_ignore  = ' \t\f\r\v'
 
     def t_COMMENTLINE(self, t):
@@ -235,6 +321,16 @@ class CoolLexer(object):
         self.add_column(t)
         return t
 
+    def t_eof(self, t):
+        t.lexer.eof =(t.lexer.lineno, self.add_column(t))
+        return None
+
+    def t_error(self, t):
+        self.add_column(t)
+        t.type = 'ERROR'
+        error_msg = t.value[0]
+        t.value = f"({t.lineno}, {t.col}) - LexicographicError: ERROR \"{error_msg}\""
+        return t
 
     # Build the lexer
     def build(self,**kwargs):
