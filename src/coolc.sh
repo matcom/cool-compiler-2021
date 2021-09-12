@@ -8,4 +8,4 @@ echo "cool-compiler-2021"
 echo "Copyright (c) 2021: Reinaldo Barrera Travieso"
 
 # Llamar al compilador
-python3 $INPUT_FILE $OUTPUT_FILE
+python3 main.py $INPUT_FILE $OUTPUT_FILE

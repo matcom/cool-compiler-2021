@@ -8,5 +8,5 @@ clean:
 	rm -rf ../tests/*/*.mips
 
 test:
-	pytest ../tests -v --tb=short -m=${TAG}
+	pytest-3 ../tests -v --tb=short -m=${TAG} -p no:warnings
 
