@@ -1,6 +1,3 @@
-import visitors.visitor as visitor
-
-
 class Node:
     pass
 
@@ -78,7 +75,6 @@ class GetIndexNode(InstructionNode):
         self.array = array
         self.index = index
 
-
 class SetIndexNode(InstructionNode):
     def __init__(self, array, index, source):
         self.array = array
@@ -91,9 +87,9 @@ class AllocateNode(InstructionNode):
         self.dest = dest
 
 class ArrayNode(InstructionNode):
-    #ask jp
-    pass
-
+    def __init__(self, length):
+        #preguntar a jp
+        pass
 class TypeOfNode(InstructionNode):
     def __init__(self, obj, dest):
         self.obj = obj
@@ -108,7 +104,7 @@ class GotoNode(InstructionNode):
         self.label = label
 
 class GotoIfNode(InstructionNode):
-    def __init__(self, name, condition):
+    def __init__(self, label, condition):
         self.label = label
         self.condition = condition
 
@@ -172,9 +168,7 @@ class ReadNode(InstructionNode):
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
-
 def get_formatter():
-
     class PrintVisitor(object):
         @visitor.on('node')
         def visit(self, node):

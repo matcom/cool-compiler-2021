@@ -163,6 +163,8 @@ class TypeChecker:
             if not value_t.conforms_to(attrType):
                 # self.errors.append(f"Can't convert {value_t.name} to {attrType.name}.")
                 self.errors.append(_TypeError %(node.value.token_list[0].lineno, node.value.token_list[0].col, f'Infered type {value_t.name} of initialization of attribute {node.id} does not conform to declared type {attrType.name}'))
+        else:
+            scope.create_child()
 
         scope.define_variable(node.id, attrType)
         
