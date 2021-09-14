@@ -50,7 +50,6 @@ class CoolLexer:
         'ARROW',
         'INT',
         'STRING',
-        'BOOLEAN',
         'NOT'
     ] + list(reserved.values())
 
@@ -63,7 +62,6 @@ class CoolLexer:
     def add_row_column(self, t):
         t.row = t.lexer.lineno
         t.column = self.find_column(t)
-
 
 
 
@@ -99,12 +97,88 @@ class CoolLexer:
         self.add_row_column(t)
         return t
 
+    def t_COMMA(self, t):
+        r','
+        self.add_line_column(t)
+        return t
+
     def t_DOT(self, t):
         r'\.'
         self.add_row_column(t)
         return t
 
+    def t_AT(self, t):
+        r'@'
+        self.add_row_column(t)
+        return t
 
+    def t_ASSIGN(self, t):
+        r'<-'
+        self.add_row_column(t)
+        return t
+
+    def t_PLUS(self, t):
+        r'\+'
+        self.add_row_column(t)
+        return t
+
+    def t_MINUS(self, t):
+        r'-'
+        self.add_row_column(t)
+        return t
+
+    def t_STAR(self, t):
+        r'\*'
+        self.add_row_column(t)
+        return t
+
+    def t_DIV(self, t):
+        r'/'
+        self.add_row_column(t)
+        return t
+
+    def t_EQUAL(self, t):
+        r'='
+        self.add_row_column(t)
+        return t
+
+    def t_LESS(self, t):
+        r'<'
+        self.add_row_column(t)
+        return t
+
+    def t_LESSEQ(self, t):
+        r'<='
+        self.add_row_column(t)
+        return t
+
+    def t_ARROW(self, t):
+        r'=>'
+        self.add_row_column(t)
+        return t
+
+    def t_NOT(self, t):
+        r'~'
+        self.add_row_column(t)
+        return t
+
+    def t_INT(self, t):
+        r'\d+'
+        t.value = int(t.value)
+        self.add_row_column(t)
+        return t
+
+    def t_ID(self, t):
+        r'[a-z][a-zA-Z_0-9]*'
+        t.type = self.reserved.get(t.value.lower(), 'ID')
+        self.add_row_column(t)
+        return t
+
+    def t_TYPE(self, t):
+        r'[A-Z][a-zA-Z_0-9]*'
+        t.type = self.reserved.get(t.value.lower(), 'TYPE')
+        self.add_row_column(t)
+        return t
 
 
 
