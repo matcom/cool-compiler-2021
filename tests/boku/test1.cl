@@ -1,5 +1,6 @@
 class A {
 	a: Int;
+	f1(): Int { a <- 3 };
 };
 
 class B inherits A {
@@ -11,6 +12,7 @@ class C inherits B {
 };
 
 class Main inherits IO {
-	main(): IO { out_string("Hello World!")};
+	a: A <- new A;
+	main(): Int { a.f1() };
 	test: Int <- let x: Int <- 1 in x;
 };

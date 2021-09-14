@@ -43,11 +43,12 @@ class Pipeline():
         if len(self.errors) == 0:
             self.typeBuilder = TypeBuilder(self.context, self.errors)
             self.typeBuilder.visit(self.ast)
+            scope = Scope()
             if len(self.errors) == 0:
                 self.typeChecker = TypeChecker(self.context, self.errors)
-                self.typeChecker.visit( self.ast, Scope())
+                self.typeChecker.visit( self.ast, scope)
             self.coolToCil = MiniCOOLToCILVisitor(self.context)
-            self.coolToCil.visit(self.ast, Scope())
+            self.coolToCil.visit(self.ast, scope)
 
 
         if verbose:

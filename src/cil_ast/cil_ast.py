@@ -65,10 +65,10 @@ class GetAttribNode(InstructionNode):
         self.attr = attr
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, inst, attr, dest):
+    def __init__(self, inst, attr, source):
         self.inst = inst
         self.attr = attr
-        self.dest = dest
+        self.source = source
 
 class GetIndexNode(InstructionNode):
     def __init__(self, array, index):
