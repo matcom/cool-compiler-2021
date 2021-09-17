@@ -1,6 +1,6 @@
 
 from cool.lexer.cool_lexer import cool_lexer
-from cool2.cool.lexer.ply_cool_lexer import PlyLexer
+from cool.lexer.ply_cool_lexer import PlyLexer
 from cool.lexer.comment_lexer import comment_lexer
 from lib.lang.language_lr import LanguageLR
 from cool.parser.cool_parser import cool_parser

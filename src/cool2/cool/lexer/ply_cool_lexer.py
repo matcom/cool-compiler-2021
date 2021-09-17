@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from cool2.cool.error.error_tracker import ErrorTracker
-from cool2.cool.error.errors import LexerCoolError
+from cool.error.error_tracker import ErrorTracker
+from cool.error.errors import LexerCoolError
 from cool.grammar import cool_grammar as cool_G
 import ply.lex as lex
 

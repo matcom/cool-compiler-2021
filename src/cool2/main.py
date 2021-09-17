@@ -1,6 +1,6 @@
-import os, sys
-base_dir = os.path.dirname(__file__)
-sys.path.append(os.path.join(base_dir, ".."))
+# import os, sys
+# base_dir = os.path.dirname(__file__)
+# sys.path.append(os.path.join(base_dir, ".."))
 
 from cool.pipeline import cool_pipeline, reconstr_pipeline
 from cool.grammar.cool_grammar import G

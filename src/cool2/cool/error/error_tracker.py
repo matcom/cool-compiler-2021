@@ -1,5 +1,5 @@
 from typing import List
-from cool2.cool.error.errors import CoolError
+from cool.error.errors import CoolError
 
 class ErrorTracker():
     """
