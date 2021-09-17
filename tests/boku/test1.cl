@@ -13,6 +13,6 @@ class C inherits B {
 
 class Main inherits IO {
 	a: A <- new A;
-	main(): Int { a.f1() };
+	main(): Int { if true then let x: Int <- 0  in x else x <- x+1 fi };
 	test: Int <- let x: Int <- 1 in x;
 };

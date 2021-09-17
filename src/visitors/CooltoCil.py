@@ -129,7 +129,6 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         type_node.attributes = attributes
         type_node.methods = methods
         
-        
         # func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
         for feature, child_scope in zip(node.features, scope.children):
             if isinstance(feature, FuncDeclarationNode):
@@ -271,8 +270,12 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         # node.lex -> str
         ###############################
-        
-        pass
+
+        if node.lex in self.locals:
+            return self.locals[node.lex]
+        elif node.lex in self.attrs:
+            self.register_instruction(cil.GetAttribNode(self.instances[-1], node.lex))
+        return node.lex
 
     @visitor.when(InstantiateNode)
     def visit(self, node, scope):
@@ -337,3 +340,111 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         right = self.visit(node.right, scope)
         self.register_instruction(cil.DivNode(dest, left, right))
         return dest
+
+    @visitor.when(ChunkNode)
+    def visit(self, node, scope):
+        ###############################
+        # node.chunk -> [ ExpressionNode... ]
+        ###############################
+
+        for expression in node.chunk:
+            value = self.visit(expression, scope.children[0])
+        return value
+
+    @visitor.when(ConditionalNode)
+    def visit(self, node, scope):
+        ###############################
+        # node.ifChunk -> ExpressionNode
+        # node.thenChunk -> ExpressionNode
+        # node.elseChunk -> ExpressionNode
+        ###############################
+
+        then_label = self.define_internal_local()
+        else_label = self.define_internal_local()
+
+        ifexpr = self.visit(node.ifChunk, scope.children[0])
+        self.register_instruction(cil.GotoIfNode(thenlabel, ifexpr))
+
+        elseexpr = self.visit(node.elseChunk, scope.children[2])
+        self.register_instruction(cil.GotoNode(else_label))
+
+        self.register_instruction(cil.LabelNode(then_label))
+
+        thenexpr = self.visit(node.thenChunk, scope.children[1])
+
+        self.register_instruction(else_label)
+
+        if ifexpr == '1':
+            return thenexpr
+        elif ifexpr =='0':
+            return elseexpr
+        else:
+            raise Exception('something went wrong D:')
+
+    @visitor.when(LetInNode)
+    def visit(self, node, scope):
+        ###############################
+        # node.decl_list -> [ DeclarationNode... ]
+        # node.expression -> ExpressionNode
+        ###############################
+
+        for decl in node.decl_list:
+            self.visit(decl, scope)
+
+        value = self.visit(node.expression)
+        
+        return value
+
+    @visitor.when(WhileNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(NotNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(IsVoidNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(ComplementNode)
+    def visit(self, node, scope):
+        pass
+
+
+
+    @visitor.when(SwitchCaseNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(TrueNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(FalseNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(StringNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(LessNode)
+    def visit(self, node, scope):
+        pass
+
+    @visitor.when(LeqNode)
+    def visit(self, node, scope):
+        pass
+
+
+    @visitor.when(EqualNode)
+    def visit(self, node, scope):
+        pass

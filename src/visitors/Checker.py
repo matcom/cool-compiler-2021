@@ -91,9 +91,9 @@ class TypeChecker:
 
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
-        ifT = self.visit(node.ifChunk, scope)
-        thenT = self.visit(node.thenChunk, scope)
-        elseT = self.visit(node.elseChunk, scope)
+        ifT = self.visit(node.ifChunk, scope.create_child())
+        thenT = self.visit(node.thenChunk, scope.create_child())
+        elseT = self.visit(node.elseChunk, scope.create_child())
 
         if ifT != self.context.get_type('Bool'):
             # self.errors.append(f"Can't convert {ifT.name} to Bool.")
