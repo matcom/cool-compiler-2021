@@ -1,6 +1,6 @@
 class Main
 {
-    main(): Object
+    main(): AUTO_TYPE
     {
         self
         .f(
@@ -8,7 +8,7 @@ class Main
             1
         )
     };
-    f(a:Int, b:Int): Object
+    f(a:Int, b:Int): AUTO_TYPE
     {
         if
             (a = 1)
@@ -22,7 +22,7 @@ class Main
             )
         fi
     };
-    g(a:Int, b:Int): Object
+    g(a:Int, b:Int): AUTO_TYPE
     {
         if
             (b = 1)

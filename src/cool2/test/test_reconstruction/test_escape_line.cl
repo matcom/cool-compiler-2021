@@ -3,7 +3,8 @@ class Main
     main(): String
     {
         {
-            "Hello             People";
+            "Hello \
+            People";
         }
     };
 }

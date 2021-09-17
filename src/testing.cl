@@ -1,19 +1,26 @@
---The parent-child relation on classes defines a graph. This graph may not contain cycles.
+--evaluates to true if expr is void and evaluates to false if expr is not void.
+
+class A { };
+class B inherits A { };
+class C inherits B { };
+class D inherits B { };
+class E inherits B { }; 
+class F inherits A { }; 
 
 class Main inherits IO {
-	main(): IO { out_string("hi!") };
+    main(): IO { out_string("Hello World!")};
 
-	main: IO <- out_string("bye!");
-};
+    b: B <- if isvoid new F then 
+                new C 
+            else 
+                if false then new D 
+                else new E fi
+            fi;
 
-class A inherits B {
-	x: Int <- 3;
-
-	x(): String { ":)" };
-};
-
-class B inherits A {
-	y: Int <- 2;
-
-	div(a: Int, b: Int): Int { a / b};
-};
+    test: B <- isvoid ( if isvoid new F then 
+                new C 
+            else 
+                if false then new D 
+                else new E fi
+            fi );
+}; 
