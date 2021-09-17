@@ -2,17 +2,17 @@ import sys
 
 from ply.lex import lex
 
-from lexer.lexer import Lexer
+from Parser.parser import Parser
 
 def check_errors(errors):
     for e in errors:
         print(e)
 
-def lexer(data, errors):
-    lexer = Lexer(errors)
-    lexer.tokenizer(data)
+def parser(data, errors):
+    parser = Parser(errors)
+    ast = parser(data)
     check_errors(errors)
-    return lex
+    return ast
 
 def main():
     errors = list()
@@ -22,7 +22,7 @@ def main():
 
     data = open(input_file, 'r').read()
 
-    lex = lexer(data, errors)
+    ast = parser(data, errors)
 
     exit(0) if not errors else exit(1)
 

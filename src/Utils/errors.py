@@ -1,13 +1,13 @@
 class Error:
-    def __init__(self, line, column, text) -> None:
+    def __init__(self, line, column, text):
         self.line = line
         self.text = text
         self.column = column
     
-    def __str__(self) -> str:
+    def __str__(self):
         return f'({self.line}, {self.column}) - {type(self).__name__}: {self.text}'
     
-    def __repr__(self) -> str:
+    def __repr__(self):
         return str(self)
 
 class TypesError(Error): pass

@@ -1,15 +1,15 @@
 import ply.lex as lex 
 
-from utils.token import Token
-from utils.errors import LexicographicError
+from Utils.token import Token
+from Utils.errors import LexicographicError
 
 class Lexer:
-    def __init__(self, errors) -> None:
+    def __init__(self, errors=[]):
         self.errors = errors
         self.build()
 
     #########################################################################
-    ##                               Propetys                              ##
+    ##                             Propertys                               ##
     #########################################################################
     
     @property
