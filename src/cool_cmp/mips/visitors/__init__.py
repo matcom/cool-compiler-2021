@@ -1,3 +1,0 @@
-"""
-MIPS Visitors
-"""
