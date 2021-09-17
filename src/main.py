@@ -3,6 +3,7 @@ import sys
 from ply.lex import lex
 
 from Parser.parser import Parser
+from Semantic.collector import Type_Collector
 
 def check_errors(errors):
     for e in errors:
@@ -11,8 +12,12 @@ def check_errors(errors):
 def parser(data, errors):
     parser = Parser(errors)
     ast = parser(data)
-    check_errors(errors)
     return ast
+
+def collector(ast, errors):
+    collector = Type_Collector(errors)
+    context = collector.visit(ast)
+    return context
 
 def main():
     errors = list()
@@ -23,7 +28,9 @@ def main():
     data = open(input_file, 'r').read()
 
     ast = parser(data, errors)
+    context = collector(ast, errors)
 
+    check_errors(errors)
     exit(0) if not errors else exit(1)
 
 if __name__=='__main__':

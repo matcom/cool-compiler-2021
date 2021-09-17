@@ -1,3 +1,3 @@
-class Main {
-    casa
+class A {
 };
+class Int{};
