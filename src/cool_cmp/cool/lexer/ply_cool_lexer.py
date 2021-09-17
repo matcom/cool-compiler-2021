@@ -193,7 +193,7 @@ class PlyLexer():
         #     r'\(\*(.|\n)*'
         #     t.lexer.lineno += t.value.count("\n")
         #     msg = 'EOF in comment'
-        #     self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
+        #     self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
 
         def t_STRING(t):
             r'"([^\r\n"\\]|(\\\n)|(\\.)){0,1024}"'
@@ -203,7 +203,7 @@ class PlyLexer():
                 if t.value[i] == '\x00':
                     pos = t.lexer.lexpos - (len(t.value) - i)
                     line = t.lexer.lineno - t.value[:i].count("\n")
-                    self.add_error(LexerCoolError(null_ch, PlyCoolToken(t.value, t.type, line, pos)))
+                    self.add_error(LexerCoolError(null_ch, token = PlyCoolToken(t.value, t.type, line, pos)))
             return t
 
         def t_STRINGUNFINISHED(t):
@@ -214,9 +214,9 @@ class PlyLexer():
                 if t.value[i] == '\x00':
                     pos = t.lexer.lexpos - (len(t.value) - i)
                     line = t.lexer.lineno - t.value[:i].count("\n")
-                    self.add_error(LexerCoolError(null_ch, PlyCoolToken(t.value, t.type, line, pos)))
+                    self.add_error(LexerCoolError(null_ch, token = PlyCoolToken(t.value, t.type, line, pos)))
             msg = 'Unterminated string constant'
-            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
+            self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value, t.type, t.lexer.lineno - 1, t.lexer.lexpos - 1)))
 
         def t_STRINGUNFINISHEDEOF(t):
             r'"([^\r\n"\\]|(\\\n)|(\\.)){0,1024}'
@@ -226,9 +226,9 @@ class PlyLexer():
                 if t.value[i] == '\x00':
                     pos = t.lexer.lexpos - (len(t.value) - i)
                     line = t.lexer.lineno - t.value[:i].count("\n")
-                    self.add_error(LexerCoolError(null_ch, PlyCoolToken(t.value, t.type, line, pos)))
+                    self.add_error(LexerCoolError(null_ch, token = PlyCoolToken(t.value, t.type, line, pos)))
             msg = 'EOF in string constant'
-            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lexer.lineno, t.lexer.lexpos)))
+            self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value, t.type, t.lexer.lineno, t.lexer.lexpos)))
 
         def t_NUMBER(t):
             r'\d+'
@@ -236,7 +236,7 @@ class PlyLexer():
                 int(t.value)
             except ValueError:
                 msg = "Integer value too large %d", t.value
-                self.add_error(LexerCoolError(msg, PlyCoolToken(t.value, t.type, t.lineno, t.lexpos))) # TODO Set Token column
+                self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value, t.type, t.lineno, t.lexpos))) # TODO Set Token column
                 t.value = 'Invalid'
             return t
 
@@ -292,7 +292,7 @@ class PlyLexer():
 
         def t_error(t):
             msg = f'ERROR "{t.value[0]}"'
-            self.add_error(LexerCoolError(msg, PlyCoolToken(t.value[0], t.type, t.lineno, t.lexpos))) # TODO Set Token column
+            self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value[0], t.type, t.lineno, t.lexpos))) # TODO Set Token column
             t.lexer.skip(1)
 
         self.lexer = lex.lex()
@@ -350,7 +350,7 @@ class PlyLexer():
             result.append(PlyCoolToken(tok.value, tok.type, tok.lineno, self.find_column(program_string, tok)))
 
         if count > 0:
-            self.add_error(LexerCoolError('EOF in comment', PlyCoolToken('', '', lines + 1, len(program_string))))
+            self.add_error(LexerCoolError('EOF in comment', token = PlyCoolToken('', '', lines + 1, len(program_string))))
 
         for error in self.error_tracker.get_errors():
             error.token.set_position(error.token.lineno, self.find_column(program_string, error.token))

@@ -3,7 +3,7 @@
 INPUT_FILE=$1
 OUTPUT_FILE=${INPUT_FILE:0: -2}mips
 BASEDIR=$(dirname "$0")
-PROGRAM=$BASEDIR/cool2/main.py
+PROGRAM=$BASEDIR/cool_cmp/main.py
 
 # Si su compilador no lo hace ya, aquí puede imprimir la información de contacto
 echo "WLD CoolCompiler v0.0"

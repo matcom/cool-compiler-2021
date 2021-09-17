@@ -100,17 +100,28 @@ class PositionError(CoolError):
         lex: Representation of the error  
         """
         super().__init__(error_message, *args)
-        self.row = kwargs.get("row")
-        self.column = kwargs.get("column")
+        self.__row = kwargs.get("row")
+        self.__column = kwargs.get("column")
         self.lex = kwargs.get("lex")
         if "token" in kwargs:
-            self.row = kwargs["token"].lex[1]
-            self.column = kwargs["token"].lex[2]
+            self.__row = kwargs["token"].lex[1]
+            self.__column = kwargs["token"].lex[2]
             self.lex = kwargs["token"].lex[0]
+            self.token = kwargs["token"]
+        else:
+            self.token = None
+
+    @property
+    def row(self):
+        return self.__row if self.token == None else self.token.line
+    
+    @property
+    def column(self):
+        return self.__column if self.token == None else self.token.column 
 
     def set_position(self, row:int, column:int):
-        self.row = row
-        self.column = column
+        self.__row = row
+        self.__column = column
 
     def __str__(self):
         if self.row == None or self.column == None:

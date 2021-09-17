@@ -1,5 +1,4 @@
 from cmp.utils import Token
-from cool.error.errors import LexerCoolError
 class Language():
 
     parser = None
@@ -55,21 +54,11 @@ class Language():
         Return the text tokens
         """
         tokens = self.lexer(text)
-        # tokens = self._fix_tokens(tokens,errors)
-        # for tok in tokens:
-        #     tok.lex = (tok.lex[0], tok.lex[1] + 1, tok.lex[2] - len(tok.lex[0]) + 1) 
-        #     if tok.token_type == "UNKNOWN":
-        #         er = LexerCoolError('"{}"', tok.lex[0], token=tok)
-        #         # errors.append(f'({tok.lex[1]}, {tok.lex[2]}) - LexicographicError: ERROR "{tok.lex[0]}"')
-        #         errors.append(er)
-        # tokens = [x for x in tokens if x.token_type != "UNKNOWN"]
-        
         return tokens
         
     def find_conflict(self):
         return self.parser.find_conflict()
     
     def evaluate(self, text, errors:list,return_ast = False):
-        # tokens = [ x for x in self.lexer(text) if x.token_type != 'space']
         tokens = self._fix_tokens(self.lexer(text),errors)
         return self.parser.evaluate(tokens,errors,return_ast)
