@@ -1,37 +1,26 @@
-(* An assignment has the form <id> <- <expr> *)
+--evaluates to true if expr is void and evaluates to false if expr is not void.
 
-class Main {
-    main(): Object {
-        (new Alpha).print()
-    };
-};
+class A { };
+class B inherits A { };
+class C inherits B { };
+class D inherits B { };
+class E inherits B { }; 
+class F inherits A { }; 
 
-class Test {
-    test1: Object;
-    
-    testing1(): Int {
-        2 + 2
-    };
+class Main inherits IO {
+    main(): IO { out_string("Hello World!")};
 
-    test2: Int <- 1;
+    b: B <- if isvoid new F then 
+                new C 
+            else 
+                if false then new D 
+                else new E fi
+            fi;
 
-    test3: String <- "1";
-
-    testing2(a: Alpha, b: Int): Int {
-        2 + 2
-    };
-
-    testing3(): String {
-        "2 + 2"
-    };
-
-    testing4(): String {
-        Test1 <- "Hello World" -- Identifiers begin with a lower case letter
-    };
-};
-
-class Alpha inherits IO {
-    print() : Object {
-        out_string("reached!!\n")
-    };
-};
+    test: B <- isvoid ( if isvoid new F then 
+                new C 
+            else 
+                if false then new D 
+                else new E fi
+            fi );
+}; 
