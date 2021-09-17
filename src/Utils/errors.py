@@ -17,3 +17,12 @@ class SemanticError(Error): pass
 class SyntacticError(Error): pass
 class AttributesError(Error): pass
 class LexicographicError(Error): pass
+
+class TypeException(Exception): pass
+class NameException(Exception): pass
+class ParamException(Exception): pass
+class SemanticException(Exception): pass
+class SyntacticException(Exception): pass
+class AttributeException(Exception): pass
+class MethodException(Exception): pass
+class LexicographicException(Exception): pass

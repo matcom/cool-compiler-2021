@@ -1,3 +1,6 @@
+from Utils.errors import AttributeException, MethodException, SemanticException, TypeException
+
+
 class Attribute:
     def __init__(self, name, type, expr=None):
         self.name = name
@@ -25,6 +28,8 @@ class Type:
         self.attributes = []
   
     def set_parent(self, parent):
+        if parent.name in ['Bool', 'Int', 'String']:
+            raise SemanticException(f'Class {self.name} cannot inherit class {parent.name}.')
         self.parent = parent
 
     def get_attribute(self, name):
@@ -32,37 +37,34 @@ class Type:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
             if self.parent is None:
-                raise Exception(f'Attribute {name} is not defined in {self.name}.')
-            else:
-                return self.parent.get_attribute(name)
+                raise AttributeException(f'Attribute {name} is not defined in {self.name}.')
+            else: return self.parent.get_attribute(name)
 
     def define_attribute(self, name:str, type, expr=None):
         try:
             self.get_attribute(name)
-        except Exception as err:
+        except AttributeException:
             attribute = Attribute(name, type, expr)
             self.attributes.append(attribute)
             return attribute
         else:
             try:
                 self.parent.get_attribute(name)
-            except Exception:
-                raise Exception(f'Attribute {name} is already defined in {self.name}.')
-            else:
-                raise Exception(f'Attribute {name} is an attribute of an inherited class')
+            except AttributeException:
+                raise AttributeException(f'Attribute {name} is already defined in {self.name}.')
+            else: raise AttributeException(f'Attribute {name} is an attribute of an inherited class')
 
     def get_method(self, name:str):
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise Exception(f'Method "{name}" is not defined in {self.name}.')
-            else:
-                return self.parent.get_method(name)
+                raise MethodException(f'Method "{name}" is not defined in {self.name}.')
+            else: return self.parent.get_method(name)
 
     def define_method(self, name:str, param_names:list, param_types:list, return_type):
         if name in (method.name for method in self.methods):
-            raise Exception(f'Method {name} is multiply defined.')
+            raise MethodException(f'Method {name} is multiply defined.')
         
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
@@ -80,10 +82,16 @@ class Type:
 
 class ErrorType(Type):
     def __init__(self):
-        super().__init__('error_type')
-    
+        super().__init__(self, '<error>')
+
+    def conforms_to(self, other):
+        return True
+
     def bypass(self):
         return True
+
+    def __eq__(self, other):
+        return isinstance(other, Type)
 
 class Context:
     def __init__(self):
@@ -95,18 +103,15 @@ class Context:
         try:
             self.types[name]
             if name in self.basic:
-                raise Exception(f'Redefinition of basic class {name}.')
+                raise TypeException(f'Redefinition of basic class {name}.')
             else:
-                raise Exception(f'Class {name} was previously defined.')
+                raise TypeException(f'Class {name} was previously defined.')
         except KeyError:
             type = self.types[name] = Type(name, parent)
             return type
 
     def get_type(self, name:str):
-        try:
-            return self.types[name]
-        except KeyError:
-            raise Exception(f'Type "{name}" is no defained.')
+        return self.types[name]
 
     def create_basic(self):
         Object = self.create_type('Object')

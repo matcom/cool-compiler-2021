@@ -3,6 +3,7 @@ import sys
 from ply.lex import lex
 
 from Parser.parser import Parser
+from Semantic.builder import TypeBuilder
 from Semantic.collector import Type_Collector
 
 def check_errors(errors):
@@ -19,6 +20,10 @@ def collector(ast, errors):
     context = collector.visit(ast)
     return context
 
+def builder(ast, context, errors):
+    builder = TypeBuilder(context, errors)
+    builder.visit(ast)
+
 def main():
     errors = list()
     
@@ -29,6 +34,7 @@ def main():
 
     ast = parser(data, errors)
     context = collector(ast, errors)
+    builder(ast, context, errors)
 
     check_errors(errors)
     exit(0) if not errors else exit(1)
