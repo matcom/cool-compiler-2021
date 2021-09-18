@@ -34,7 +34,7 @@ class AssignmentNode(ExpressionNode):
     def __init__(self, id, expr, key):
         self.id = id
         self.key = key
-        self.exp = expr
+        self.expr = expr
 
 class DispatchNode(ExpressionNode):
     def __init__(self, id, args, expr=None, type=None):
@@ -74,14 +74,14 @@ class CaseNode(ExpressionNode):
         self.tests = tests
 
 class NewNode(ExpressionNode):
-    def __init__(self, ttype, keyword):
+    def __init__(self, ttype, key):
         self.type = ttype
-        self.keyword = keyword
+        self.key = key
 
 class IsvoidNode(ExpressionNode):
-    def __init__(self, expression, keyword):
-        self.expression = expression
-        self.keyword = keyword
+    def __init__(self, expr, key):
+        self.expr = expr
+        self.key = key
 
 class AtomicNode(ExpressionNode):
     def __init__(self, lexer):
@@ -92,10 +92,10 @@ class UnaryNode(ExpressionNode):
         self.node = node
 
 class BinaryNode(ExpressionNode):
-    def __init__(self, left, right, keyword):
+    def __init__(self, left, right, key):
         self.left = left
         self.right = right
-        self.keyword = keyword
+        self.key = key
 
 class IdentifierNode(AtomicNode):
     pass

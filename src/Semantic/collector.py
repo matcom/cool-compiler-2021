@@ -2,7 +2,7 @@ import Utils.visitor as visitor
 
 from Utils.token import Token
 from Utils.context import Context
-from Utils.errors import SemanticError, TypeException
+from Utils.errors import SemanticErrors, TypeException
 from Parser.ast import ProgramNode, ClassNode
 
 class Type_Collector:
@@ -30,7 +30,7 @@ class Type_Collector:
             self.context.create_type(node.type.value)
             self.type_level[node.type.value] = node.parent
         except TypeException as error:
-            self.errors.append(SemanticError(node.type.line, node.type.column, error))
+            self.errors.append(SemanticErrors(node.type.line, node.type.column, error))
 
     def get_type_level(self, type):
             try:
@@ -39,7 +39,7 @@ class Type_Collector:
                 return 0
             
             if parent == 0:
-                self.errors.append(SemanticError(type.line, type.column, f'Class {type.value}, or an ancestor of {type.value}, is involved in an inheritance cycle.'))
+                self.errors.append(SemanticErrors(type.line, type.column, f'Class {type.value}, or an ancestor of {type.value}, is involved in an inheritance cycle.'))
             elif not isinstance(parent, int):
                 self.type_level[type.value] = 0 if parent else 1
                 if isinstance(parent, Token):

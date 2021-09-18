@@ -82,7 +82,7 @@ class Type:
 
 class ErrorType(Type):
     def __init__(self):
-        super().__init__(self, '<error>')
+        super().__init__('<error>')
 
     def conforms_to(self, other):
         return True

@@ -1,7 +1,7 @@
 import ply.lex as lex 
 
 from Utils.token import Token
-from Utils.errors import LexicographicError
+from Utils.errors import LexicographicErrors
 
 class Lexer:
     def __init__(self, errors=[]):
@@ -63,7 +63,7 @@ class Lexer:
         t.lexer.lineno += len(t.value)
 
     def t_comments_eof(self, t):
-        self.errors.append(LexicographicError(
+        self.errors.append(LexicographicErrors(
             t.lexer.lineno, 
             Token.find_column(t), 
             'EOF in comment'))
@@ -112,7 +112,7 @@ class Lexer:
     
     def t_string_null(self, t):
         r'\0'
-        self.errors.append(LexicographicError(
+        self.errors.append(LexicographicErrors(
             t.lexer.lineno, 
             Token.find_column(t), 
             'String contains null character'))
@@ -131,7 +131,7 @@ class Lexer:
 
     def t_string_newline(self, t):
         r'\n'
-        self.errors.append(LexicographicError(
+        self.errors.append(LexicographicErrors(
             t.lexer.lineno, 
             Token.find_column(t), 
             'Unterminated string constant'))
@@ -140,7 +140,7 @@ class Lexer:
     
     def t_string_eof(self, t):
         t.lexer.begin('INITIAL')
-        self.errors.append(LexicographicError(
+        self.errors.append(LexicographicErrors(
             t.lexer.lineno, 
             Token.find_column(t), 
             'EOF in string constant'))
@@ -286,7 +286,7 @@ class Lexer:
         t.lexer.lineno += len(t.value)
 
     def t_error(self, t):
-        self.errors.append(LexicographicError(
+        self.errors.append(LexicographicErrors(
             t.lexer.lineno, 
             Token.find_column(t), 
             f'ERROR "{t.value[0]}"'))

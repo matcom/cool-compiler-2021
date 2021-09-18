@@ -2,7 +2,7 @@ import ply.yacc as yacc
 
 from Parser.lexer import Lexer
 from Parser.ast import *
-from Utils.errors import SyntacticError
+from Utils.errors import SyntacticErrors
 
 class Parser:
     def __init__(self, errors=[]):
@@ -237,9 +237,9 @@ class Parser:
     
     def p_error(self, p):
         if not p:
-            self.parser_errors.append(SyntacticError(0, 0, 'ERROR at or near "EOF"'))
+            self.parser_errors.append(SyntacticErrors(0, 0, 'ERROR at or near "EOF"'))
         else:
-            self.parser_errors.append(SyntacticError(p.value.line, p.value.column, f'ERROR at or near "{p.value.value}"'))     
+            self.parser_errors.append(SyntacticErrors(p.value.line, p.value.column, f'ERROR at or near "{p.value.value}"'))     
 
     def __call__(self, data):
         ast = self.parser.parse(input=data, lexer=self.lexer.lexer)
