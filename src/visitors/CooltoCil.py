@@ -139,7 +139,6 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         
         self.current_type = None
 
-
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
         ###############################
@@ -272,7 +271,11 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.lex -> str
         ###############################
         
-        pass
+        if node.lex in self.locals:
+            return self.locals[node.lex]
+        elif node.lex in self.attrs:
+            self.register_instruction(cil.GetAttribNode(self.instances[-1], node.lex))
+        return node.lex
 
     @visitor.when(InstantiateNode)
     def visit(self, node, scope):
@@ -337,3 +340,61 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         right = self.visit(node.right, scope)
         self.register_instruction(cil.DivNode(dest, left, right))
         return dest
+    
+
+    @visitor.when(ChunkNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(ConditionalNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(LetInNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(WhileNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(NotNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(IsVoidNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(ComplementNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(SwitchCaseNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(TrueNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(FalseNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(StringNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(LessNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(LeqNode)
+    def visit(self, node, scope):
+        pass
+    
+    @visitor.when(EqualNode)
+    def visit(self, node, scope):
+        pass
+    
