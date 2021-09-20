@@ -5,7 +5,7 @@ cwd = os.getcwd()
 
 logging.basicConfig(
      level = logging.DEBUG,
-     filename = f"{cwd}/src/cool/parser/output/parselog.txt",
+     filename = f"{cwd}/cool/parser/output/parselog.txt",
      filemode = "w",
      format = "%(filename)10s:%(lineno)4d:%(message)s"
 )

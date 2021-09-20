@@ -1,6 +1,5 @@
-import subprocess
 import re
-
+import subprocess
 
 COMPILER_TIMEOUT = 'El compilador tarda mucho en responder.'
 SPIM_TIMEOUT = 'El spim tarda mucho en responder.'
