@@ -57,7 +57,7 @@ def_func %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur,
 
 param_list %= G.Epsilon, lambda h,s: [ ]
 param_list %= param, lambda h,s: [ s[1] ]
-param_list %= param + comma + param_list, lambda h,s: [ s[1] ] + s[3]
+param_list %= param_list + comma + param, lambda h,s: s[1] + [ s[3] ]
 
 # <param>        ???
 param %= idx + colon + typex, lambda h,s: ParamNode(s[1][0],s[3][0],row=s[1][1],column = s[1][2])
@@ -66,7 +66,7 @@ def_var %= idx + colon + typex + assign + expr, lambda h,s: VarDeclarationNode(s
 def_var %= idx + colon + typex, lambda h,s: VarDeclarationNode(s[1][0],s[3][0],None,row=s[1][1] ,column=s[1][2])
 
 def_var_list %= def_var, lambda h,s: [ s[1] ]
-def_var_list %= def_var + comma + def_var_list, lambda h,s: [ s[1] ] + s[3]
+def_var_list %= def_var_list + comma + def_var, lambda h,s: s[1] + [ s[3] ]
 
 case_check %= idx + colon + typex + arrow + expr + semi, lambda h,s: CheckNode(s[1][0],s[3][0],s[5],row=s[1][1] ,column=s[1][2])
 
@@ -79,7 +79,6 @@ expr %= idx + assign + expr, lambda h,s: AssignNode(s[1][0],s[3],row=s[1][1] ,co
 expr %= idx + colon + typex + assign + expr, lambda h,s: VarDeclarationNode(s[1][0],s[3][0],s[5],row=s[1][1] ,column=s[1][2])
 expr %= boolean, lambda h,s: s[1]
 expr %= ocur + expr_list + ccur, lambda h,s: BlockNode(s[2],row=s[1][1] ,column=s[1][2])
-expr %= ifx + expr + then + expr + elsex + expr + if_r, lambda h,s: ConditionalNode(s[2],s[4],s[6],row=s[1][1] ,column=s[1][2])
 expr %= let + def_var_list + inx + expr, lambda h,s: LetNode(s[2],s[4],row=s[1][1] ,column=s[1][2])
 expr %= case + expr + of + case_check_list + case_r, lambda h,s: CaseNode(s[2],s[4],row=s[1][1] ,column=s[1][2])
 expr %= whilex + expr + loop + expr + loop_r, lambda h,s: WhileNode(s[2],s[4],row=s[1][1] ,column=s[1][2])
@@ -93,11 +92,11 @@ boolean %= notx + boolean, lambda h,s: NotNode(s[2],s[1][1],s[1][2])
 boolean %= compare, lambda h,s: s[1]
 
 # <compare>         ???
-compare %= arith + equal + arith     , lambda h,s: EqualNode(s[1],s[3],s[2][1],s[2][2])
-compare %= arith + less + arith      , lambda h,s: LesserNode(s[1],s[3],s[2][1],s[2][2])
-compare %= arith + less_eq + arith   , lambda h,s: LesserEqualNode(s[1],s[3],s[2][1],s[2][2])
-compare %= arith + greater + arith   , lambda h,s: GreaterNode(s[1],s[3],s[2][1],s[2][2])
-compare %= arith + greater_eq + arith, lambda h,s: GreaterEqualNode(s[1],s[3],s[2][1],s[2][2])
+compare %= arith + equal + boolean     , lambda h,s: EqualNode(s[1],s[3],s[2][1],s[2][2])
+compare %= arith + less +  boolean     , lambda h,s: LesserNode(s[1],s[3],s[2][1],s[2][2])
+compare %= arith + less_eq + boolean   , lambda h,s: LesserEqualNode(s[1],s[3],s[2][1],s[2][2])
+compare %= arith + greater + boolean   , lambda h,s: GreaterNode(s[1],s[3],s[2][1],s[2][2])
+compare %= arith + greater_eq + boolean, lambda h,s: GreaterEqualNode(s[1],s[3],s[2][1],s[2][2])
 compare %= arith, lambda h,s: s[1]
 
 # <arith>        ???
@@ -111,7 +110,7 @@ term %= term + div + factor,  lambda h,s: DivNode(s[1],s[3],row=s[2][1] ,column=
 term %= factor,  lambda h,s: s[1]
 
 # <factor>       ???
-factor %= isvoid + factor, lambda h,s: IsVoidNode(s[2],row=s[1][1] ,column=s[1][2])
+factor %= isvoid + negate, lambda h,s: IsVoidNode(s[2],row=s[1][1] ,column=s[1][2])
 factor %= negate, lambda h,s: s[1]
 
 # <negate>
@@ -131,12 +130,13 @@ atom %= false, lambda h,s: BoolNode(s[1][0],row=s[1][1] ,column=s[1][2])
 atom %= idx, lambda h,s: VariableNode(s[1][0],row=s[1][1] ,column=s[1][2])
 atom %= new + typex, lambda h,s: InstantiateNode(s[2],row=s[1][1] ,column=s[1][2])
 atom %= func_call, lambda h,s: CallNode(s[1][0],s[1][1],s[1][2],None,row=s[1][3] ,column=s[1][4])
-atom %= at + typex + dot + func_call, lambda h,s: CallNode(s[4][0],s[4][1],s[4][2],s[2][0],row=s[4][3] ,column=s[4][4])
+# atom %= at + typex + dot + func_call, lambda h,s: CallNode(s[4][0],s[4][1],s[4][2],s[2][0],row=s[4][3] ,column=s[4][4])
 atom %= opar + expr + cpar, lambda h,s: s[2]
+atom %= ifx + expr + then + expr + elsex + expr + if_r, lambda h,s: ConditionalNode(s[2],s[4],s[6],row=s[1][1] ,column=s[1][2])
 
 # <func-call>    ???
 func_call %= idx + opar + arg_list + cpar, lambda h,s: (VariableNode('self',s[1][1],s[1][2]),s[1][0],s[3],s[1][1],s[1][2])
 
 arg_list %= G.Epsilon, lambda h,s: [ ]
 arg_list %= expr, lambda h,s: [ s[1] ]
-arg_list %= expr + comma + arg_list, lambda h,s: [ s[1] ] + s[3]
+arg_list %= arg_list + comma + expr, lambda h,s: s[1] + [ s[3] ]

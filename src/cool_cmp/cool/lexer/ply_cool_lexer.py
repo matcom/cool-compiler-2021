@@ -36,10 +36,15 @@ class Lex():
 
 class PlyCoolToken(lex.LexToken):
 
-    def __init__(self, lex:str, typex, line:int, column:int):
+    def __init__(self, lex:str, typex, line:int, column:int, is_eof=False):
         self.set_lex(lex)
         self.set_type(typex)
         self.set_position(line, column)
+        self.__is_eof = is_eof
+        
+    @property
+    def is_eof(self):
+        return self.__is_eof
 
     def set_lex(self, lex:str):
         self.lex = Lex(lex)
@@ -358,7 +363,7 @@ class PlyLexer():
         for token in result:
             token.set_type(self.terminals[token.token_type])
 
-        result.append(PlyCoolToken('$', cool_G.G.EOF, lines + 1, len(program_string)))
+        result.append(PlyCoolToken('EOF', cool_G.G.EOF, lines + 1, len(program_string), True))
         result[-1].set_position(result[-1].line, self.find_column(program_string, result[-1]))
 
         return result

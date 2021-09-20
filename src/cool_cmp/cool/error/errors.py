@@ -1,6 +1,6 @@
 STRING_TOO_LONG = "String too long. Max length is 1024 chars, have {0} chars"
 
-SYNTACTIC_ERROR = 'at or near "{0}"'
+SYNTACTIC_ERROR = 'at or near {0}'
 REDEFINITION_BASIC_CLASS = 'Redefinition of basic class {0}.'
 METHOD_REDEFINED_WRONG_SIGNATURE_PARAM = 'In redefined method {0}, parameter type {1} is different from original type {2}.'
 METHOD_REDEFINED_WRONG_SIGNATURE_RETURN = "In redefined method {0}, return type {1} is different from original return type {2}."

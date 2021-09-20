@@ -170,9 +170,12 @@ def parse_text_pipe(result:dict, language_grammar=G, language_lexer=PlyLexer(), 
     text = result['text']
     tokens = result.get('text_tokens')
     
+    errors = []
+    if len(tokens) == 1:
+        tokens[0].set_position(0,0) # EOF token must be at 0,0
+    
     lang = result.get('language', LanguageLR(language_grammar, language_lexer, language_parser))
     
-    errors = []
     parse, tokens = lang(text, errors, tokens)
     
     
