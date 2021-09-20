@@ -8,8 +8,8 @@ if __name__ == '__main__':
     # in_ = sys.argv[1]
     #out_ = sys.argv[2]
     # print(f'Argv: {sys.argv} ')
-    _in = sys.argv[1] if len(sys.argv) > 1 else f'{Path.cwd()}/cool/code.cl'
-    _out = sys.argv[2] if len(sys.argv) > 1 else None
+    # _in = sys.argv[1] if len(sys.argv) > 1 else f'{Path.cwd()}/cool/code.cl'
+    # _out = sys.argv[2] if len(sys.argv) > 1 else None
 
     # print(_in, _out)
     # in_ = f'{sys.argv[1]} {sys.argv[2]}'
@@ -17,12 +17,12 @@ if __name__ == '__main__':
 
     # print(f'{in_}')
 
-    # _in = sys.argv[1]
-    # _out = sys.argv[2]
+    _in = sys.argv[1]
+    _out = sys.argv[2]
 
     text: str = ''
 
-    with open(_in)as file:
+    with open(_in) as file:
         text = file.read()
 
     lexer = main(text, _out)
