@@ -11,6 +11,7 @@ if __name__ == '__main__':
     _in = sys.argv[1] if len(sys.argv) > 1 else f'{Path.cwd()}/cool/code.cl'
     _out = sys.argv[2] if len(sys.argv) > 1 else None
 
+    # print(_in, _out)
     # in_ = f'{sys.argv[1]} {sys.argv[2]}'
     # out_ = f'{sys.argv[3]} {sys.argv[4]}'
 
@@ -26,9 +27,9 @@ if __name__ == '__main__':
 
     lexer = main(text, _out)
     
-    print(lexer)
+    # print(lexer)
 
-    parser = CoolParser(lexer)
-    result = parser.parse(text)
+    # parser = CoolParser(lexer)
+    # result = parser.parse(text)
     
-    print(result)
+    # print(result)
