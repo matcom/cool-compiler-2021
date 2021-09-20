@@ -1,8 +1,11 @@
-from ..utils import reservedKeywords, literals, ignored, tokens, Token, errors
 from pathlib import Path
-from typing import List
 from pprint import pprint
+from typing import List
+
 import ply.lex as lex
+
+from ..utils import Token, errors, ignored, literals, reservedKeywords, tokens
+
 
 class CoolLexer:
     def __init__(self, **kwargs):
@@ -90,7 +93,7 @@ class CoolLexer:
         t.lexer.linestart = t.lexer.lexpos 
 
         if not t.lexer.backslash:
-            error_text = errors.LexicographicError.UNDETERMINATED_STRING
+            error_text = errors.LexicographicError.UNDETERMINED_STRING
             self.errors.append(errors.LexicographicError(error_text, t.lineno, t.column))
             t.lexer.begin('INITIAL')
 
@@ -278,18 +281,23 @@ class CoolLexer:
         
         return tokens
 
-def main(input, output = None):
+def main(text: str, output = None):
     lexer = CoolLexer()
-    text: str = ''
-    # print(f'Path: {input}')
-    with open(input)as file:
-        text = file.read()
 
-    lexer.tokenize(text)
+    # print(f'Path: {input}')
+
+    a = lexer.tokenize(text)
+    
+    for i in a:
+        print(i)
+
     if lexer.errors:
         for e in lexer.errors:
             print(e)
         raise Exception()
+
+    return lexer
+    
 
 if __name__ == '__main__':
     main()

@@ -23,7 +23,7 @@ class CoolError(Exception):
 class LexicographicError(CoolError):
 
     UNKNOWN_TOKEN = 'ERROR "%s"'
-    UNDETERMINATED_STRING = 'Undeterminated string constant'
+    UNDETERMINED_STRING = 'Undetermined string constant'
     EOF_COMMENT = 'EOF in comment'
     EOF_STRING = 'EOF in string constant'
     NULL_STRING = 'String contains null character'
@@ -31,3 +31,13 @@ class LexicographicError(CoolError):
     @property
     def error_type(self) -> str:
         return 'LexicographicError'
+
+
+class SyntacticError(CoolError):
+    'Errores detectados en el cool_parser'
+
+    ERROR = 'ERROR at or near "%s"'
+
+    @property
+    def error_type(self):
+        return 'SyntacticError'
