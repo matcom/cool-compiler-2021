@@ -1,6 +1,8 @@
 import sys
 
 from ply.lex import lex
+from CIL.cil import CIL
+from MIPS.mips import MIPS
 
 from Parser.parser import Parser
 from Semantic.builder import TypeBuilder
@@ -36,11 +38,23 @@ def check(ast, contex, errors):
     check_errors(errors)
     return scope
 
+def cil(ast, contex, cil_file):
+    cil = CIL(contex)
+    cil_ast = cil.visit(ast)
+    open(cil_file, 'w').write(str(cil_ast))
+    return cil_ast
+
+def mips(ast, output_file):
+    mips = MIPS()
+    mips_ast = mips.visit(ast) 
+    open(output_file, 'w').write(str(mips_ast))
+
 def main():
     errors = list()
     
     input_file = sys.argv[1]
     output_file = sys.argv[2]
+    cil_file = f'{input_file[:-2]}.cil'
 
     data = open(input_file, 'r').read()
 
@@ -48,6 +62,8 @@ def main():
     context = collector(ast, errors)
     builder(ast, context, errors)
     scope = check(ast, context, errors)
+    cil_ast = cil(ast, context, cil_file)
+    #mips(cil_ast, output_file)
 
     exit(0) 
 

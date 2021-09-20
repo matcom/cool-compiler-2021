@@ -1,0 +1,66 @@
+.TYPE
+
+type Object{
+	method abort:Object_abort ;
+	method type_name:Object_type_name ;
+	method copy:Object_copy ;
+}
+type IO{
+	method abort:Object_abort ;
+	method type_name:Object_type_name ;
+	method copy:Object_copy ;
+	method out_string:IO_out_string ;
+	method out_int:IO_out_int ;
+	method in_string:IO_in_string ;
+	method in_int:IO_in_int ;
+}
+type Int{
+	attribute int ;
+	method abort:Object_abort ;
+	method type_name:Object_type_name ;
+	method copy:Object_copy ;
+}
+type String{
+	attribute length ;
+	attribute str ;
+	method abort:Object_abort ;
+	method type_name:Object_type_name ;
+	method copy:Object_copy ;
+	method length:String_length ;
+	method concat:String_concat ;
+	method substr:String_substr ;
+}
+type Bool{
+	attribute bool ;
+	method abort:Object_abort ;
+	method type_name:Object_type_name ;
+	method copy:Object_copy ;
+}
+type Main{
+	method abort:Object_abort ;
+	method type_name:Object_type_name ;
+	method copy:Object_copy ;
+	method main:Main_main ;
+}
+
+.DATA
+
+
+.CODE
+
+function Main.init {
+	 PARAM self ;
+
+
+}
+
+function Main_main {
+	 PARAM self ;
+	 PARAM c ;
+
+	 LOCAL local_0 ;
+
+	local_0 = CALL Object_abort ;
+	RETURN local_0 ;
+}
+

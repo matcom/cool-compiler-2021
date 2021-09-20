@@ -129,6 +129,11 @@ class Context:
         Io.define_method('in_string', [], [], String)
         Io.define_method('in_int', [], [], Int)
 
+        String.define_attribute('length', Int)
+        String.define_attribute('str', String)
         String.define_method('length', [], [], Int)
         String.define_method('concat', ['s'], [String], String)
         String.define_method('substr', ['i', 'l'], [Int, Int], String)
+
+        Int.define_attribute('int', Int)
+        Bool.define_attribute('bool', Bool)

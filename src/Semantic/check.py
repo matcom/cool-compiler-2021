@@ -274,12 +274,12 @@ class TypeCheck:
     def visit(self, node, scope):
         self.visit(node.node, scope)
         
-        node_line = node.node.line
-        node_column = node.node.column
+        node.line = node.node.line
+        node.column = node.node.column
         node_type = node.node.computed_type
 
         if not node_type.conforms_to(self.basic_type['bool']):
-            self.errors.append(TypeErrors(node_line, node_column, f'Argument of \'not\' has type {node_type.name} instead of Bool.'))
+            self.errors.append(TypeErrors(node.line, node.column, f'Argument of \'not\' has type {node_type.name} instead of Bool.'))
 
         node.computed_type = self.basic_type['bool']
 
