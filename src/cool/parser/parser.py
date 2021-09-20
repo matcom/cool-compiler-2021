@@ -386,15 +386,10 @@ class CoolParser(Parser):
             line = self.lexer.lexer.lineno
             print(SyntacticError(error_text, line, column - 1))
 
+        raise Exception()
+
     def print_error(self, tok):    
         error_text = SyntacticError.ERROR % tok.value
         line, column = tok.lineno, tok.column
         print(SyntacticError(error_text, line, column))
 
-
-if __name__ == "__main__":   
-    s = ''''''
-    parser = CoolParser()
-    result = parser.parse(s)
-    
-    print(result)

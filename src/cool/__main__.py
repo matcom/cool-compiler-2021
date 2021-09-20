@@ -28,6 +28,7 @@ if __name__ == '__main__':
     lexer = main(text, _out)
     
     # print(lexer)
+    lexer.lexer.lineno = 1
 
     parser = CoolParser(lexer)
     result = parser.parse(text)
