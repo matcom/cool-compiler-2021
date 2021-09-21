@@ -1,0 +1,11 @@
+"{\"name\": \"test_recursive\", \"result\": 21, \"errors\": []}"
+
+class Main inherits Object {
+   main():Int {
+       fibo(7)
+   };
+   
+   fibo(n:Int):Int {
+       if n > 1 then fibo(n-1) + fibo(n-2) else 1 fi
+   };
+};

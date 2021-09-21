@@ -1,0 +1,11 @@
+"{\"name\": \"test_substr_3\", \"result\": \"\", \"errors\": [\"Index out of range in substr, word:'0123456789' substr begin:0 substr length:11. Line:20 Column:10\"]}"
+
+class Main
+{
+    main():String {
+        {
+            s:String <- "0123456789";
+            s.substr(0,11);
+        }
+    };
+};

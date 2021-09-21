@@ -1,0 +1,15 @@
+"{\"name\": \"test_case_repeated_type\", \"result\": 50, \"errors\": [\"Type Int already present in case expression. Line:7 Column:12\"]}"
+
+class Main inherits Object {
+   main():Object {
+       {
+           a:Object <- case 20+40 of
+           -- a:Bool => if a then true else false fi;
+           b:Int => if b = 60 then 50 else 0 fi;
+           b:Int => if b = 60 then 40 else 0 fi;
+           c:Object => c;
+           esac;
+           a;
+       }
+   };
+};

@@ -1,0 +1,12 @@
+"{\"name\": \"test_entry_point_1\", \"result\": 30, \"errors\": [\"Method 'main' is not defined locally in 'Main' with 0 params. The program must define a 'main' method with no parameters in the 'Main' class\"]}"
+
+
+class Main{
+
+    main(a:Int) : Int {
+        {
+            30;
+        }
+    };
+
+};

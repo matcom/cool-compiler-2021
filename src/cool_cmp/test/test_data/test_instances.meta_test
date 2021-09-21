@@ -1,0 +1,21 @@
+"{\"name\": \"test_instances\", \"result\": 30, \"errors\": []}"
+
+class Main {
+    a:Int;
+    
+    set(v:Int):Int {
+        a <- v
+    };
+    
+    get():Int {
+        a
+    };
+    main():Int {
+        {
+            a <- 10;
+            b:Main <- copy();
+            a <- 20;
+            b.get() + get();
+        }
+    };
+};
