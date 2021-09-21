@@ -9,7 +9,6 @@ from semantics.inference import (
     HardInferencer,
     BackInferencer,
     TypesInferencer,
-    types_inferencer,
 )
 
 
@@ -64,14 +63,14 @@ def run_pipeline(program_ast):
         print(s)
         exit(1)
 
-    # return types_ast
+    return types_ast
 
 
 def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "debbuging/tests/Auto/equals1.cl"
+        input_file = "debbuging/tests/Auto/call1.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)

@@ -384,6 +384,7 @@ class SoftInferencer:
         if len(caller_type.type_set) > 1:
             methods_by_name = self.context.get_method_by_name(node.id, len(node.args))
             types = [typex for typex, _ in methods_by_name]
+            caller_type_name = caller_type.generate_name()
             conforms(caller_type, TypeBag(set(types), types))
             if len(caller_type.type_set):
                 methods = [
@@ -394,7 +395,7 @@ class SoftInferencer:
                     node,
                     f"AtributeError: There is no method '{node.id}'"
                     f" that recieves {len(node.params)} arguments in"
-                    f" types {caller_type.name}.",
+                    f" types {caller_type_name}.",
                 )
         elif len(caller_type.type_set) == 1:
             caller = caller_type.heads[0]
@@ -426,7 +427,6 @@ class SoftInferencer:
         else:
             # Errors already notified previuosly
             method_call_node.inferenced_type = TypeBag(set())  # ErrorType
-
         return method_call_node
 
     @visitor.when(ArithmeticNode)
