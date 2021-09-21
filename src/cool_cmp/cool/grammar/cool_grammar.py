@@ -13,6 +13,7 @@ expr, boolean, compare, arith, term, factor, negate, atom = \
 func_call, arg_list, dispatch  = G.NonTerminals('<func-call> <arg-list> <dispatch>')
 def_var, def_var_list = G.NonTerminals('<def-var> <def-var-list>')
 case_check, case_check_list = G.NonTerminals('<case-check> <case-check-list>')
+param_list_not_empty, arg_list_not_empty = G.NonTerminals('<param-list-not-empty> <arg-list-not-empty>')
 
 # Terminals
 
@@ -56,8 +57,9 @@ def_attr %= idx + colon + typex + assign + expr, lambda h,s: AttrDeclarationNode
 def_func %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur, lambda h,s: FuncDeclarationNode(s[1][0],s[3],s[6],s[8],row=s[1][1] ,column=s[1][2])
 
 param_list %= G.Epsilon, lambda h,s: [ ]
-param_list %= param, lambda h,s: [ s[1] ]
-param_list %= param_list + comma + param, lambda h,s: s[1] + [ s[3] ]
+param_list %= param_list_not_empty, lambda h,s: s[1]
+param_list_not_empty %= param, lambda h,s: [ s[1] ]
+param_list_not_empty %= param_list_not_empty + comma + param, lambda h,s: s[1] + [ s[3] ]
 
 # <param>        ???
 param %= idx + colon + typex, lambda h,s: ParamNode(s[1][0],s[3][0],row=s[1][1],column = s[1][2])
@@ -76,7 +78,7 @@ case_check_list %= case_check + case_check_list, lambda h,s: [ s[1] ] + s[2]
 
 # <expr>         ???
 expr %= idx + assign + expr, lambda h,s: AssignNode(s[1][0],s[3],row=s[1][1] ,column=s[1][2])
-expr %= idx + colon + typex + assign + expr, lambda h,s: VarDeclarationNode(s[1][0],s[3][0],s[5],row=s[1][1] ,column=s[1][2])
+# expr %= idx + colon + typex + assign + expr, lambda h,s: VarDeclarationNode(s[1][0],s[3][0],s[5],row=s[1][1] ,column=s[1][2])
 expr %= boolean, lambda h,s: s[1]
 expr %= ocur + expr_list + ccur, lambda h,s: BlockNode(s[2],row=s[1][1] ,column=s[1][2])
 expr %= let + def_var_list + inx + expr, lambda h,s: LetNode(s[2],s[4],row=s[1][1] ,column=s[1][2])
@@ -138,5 +140,6 @@ atom %= ifx + expr + then + expr + elsex + expr + if_r, lambda h,s: ConditionalN
 func_call %= idx + opar + arg_list + cpar, lambda h,s: (VariableNode('self',s[1][1],s[1][2]),s[1][0],s[3],s[1][1],s[1][2])
 
 arg_list %= G.Epsilon, lambda h,s: [ ]
-arg_list %= expr, lambda h,s: [ s[1] ]
-arg_list %= arg_list + comma + expr, lambda h,s: s[1] + [ s[3] ]
+arg_list %= arg_list_not_empty, lambda h,s: s[1] 
+arg_list_not_empty %= expr, lambda h,s: [ s[1] ]
+arg_list_not_empty %= arg_list_not_empty + comma + expr, lambda h,s: s[1] + [ s[3] ]
