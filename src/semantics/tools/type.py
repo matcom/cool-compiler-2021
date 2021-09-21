@@ -282,27 +282,25 @@ class TypeBag:
         if self.error_type:
             return
 
-        new_heads = []
-        visited = set()
-        for head in self.heads:
-            if head in self.type_set:
-                new_heads.append(head)
-                continue
-            pos_new_head = []
-            lower_index = 2 ** 32
-            for typex in self.type_set:
-                if typex in visited:
-                    continue
+        # new_heads = []
+        # visited = set()
+        # for head in self.heads:
+            # if head in self.type_set:
+                # new_heads.append(head)
+                # continue
+        pos_new_head = []
+        lower_index = 2 ** 32
+        for typex in self.type_set:
+            #if typex in visited:
+            #    continue
 
-                # if typex.conforms_to(head):
-                visited.add(typex)
-                if typex.index < lower_index:
-                    pos_new_head = [typex]
-                    lower_index = typex.index
-                elif typex.index == lower_index:
-                    pos_new_head.append(typex)
-            new_heads += pos_new_head
-        self.heads = new_heads
+            if typex.index < lower_index:
+                pos_new_head = [typex]
+                lower_index = typex.index
+            elif typex.index == lower_index:
+                pos_new_head.append(typex)
+        #new_heads += pos_new_head
+        self.heads = pos_new_head#new_heads
 
     def swap_self_type(self, swap_type, back=False):
         if self.error_type:
