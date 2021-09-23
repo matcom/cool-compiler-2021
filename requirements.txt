@@ -1,2 +1,4 @@
-pytest
+pytest~=6.2.4
 pytest-ordering
+
+ply~=3.11
