@@ -12,13 +12,13 @@ def main():
 	
 	if len(files) == 0:
 		print(CompilerError(0, 0, "No file is given to coolc compiler."))
-		return
+		exit(1)
 
 	# Check all files have the *.cl extension.
 	for file in files:
 		if not str(file).endswith(".cl"):
 			print(CompilerError(0, 0, "Cool program files must end with a .cl extension."))
-			return
+			exit(1)
 	
 	input = ""
 	
@@ -29,23 +29,23 @@ def main():
 				input += file.read()
 		except (IOError, FileNotFoundError):
 			print(CompilerError(0, 0, "Error! File \"{0}\" was not found".format(file)))
-			return
+			exit(1)
 	
 	#Lexical and Syntax Analysis
 	lexer = MyLexer(input)
 	lexer.build()
 	if lexer.check():
-		exit()
+		exit(1)
 	parser = MyParser(lexer)
 	parser.build()
 	ast = parser.parse(input)
 	if parser.errors:
-		exit()
+		exit(1)
 	
 	#Semantic and Types Analysis
 	st = SemanticsAndTypes(ast)
 	if not st.check():
-		exit()
+		exit(1)
 	
 	#Code Generation
 	ctcil = CodeToCIL(st.types)
