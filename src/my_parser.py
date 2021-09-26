@@ -255,7 +255,6 @@ class MyParser:
 				| num
 				| str
 				| bool
-				| negnum
 				| LPAREN v_expr RPAREN'''
 		if parse[1] == '(':
 			parse[0] = parse[2]
@@ -278,10 +277,6 @@ class MyParser:
 		'''bool : TRUE
 		        | FALSE'''
 		parse[0] = ast.BooleanNode(parse[1], parse.lineno(1), parse.lexpos(1))
-		
-	def p_negnum(self, parse):
-		'''negnum : MINUS term'''
-		parse[0] = ast.NegationNode(parse[2], parse.lineno(1), parse.lexpos(1))
 		
 	def p_empty(self, parse):
 		'''empty :'''

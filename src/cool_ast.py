@@ -237,5 +237,3 @@ class BooleanNode(ExpressionNode):
 		self.line = line
 		self.index = index
 		
-class NegationNode(UnaryOperator):
-	pass

@@ -370,13 +370,3 @@ class CheckTypes:
 	def visit(self, node):
 		node.type_expr = self.types.get_type("Bool")
 		return node.type_expr
-
-	@visitor.when(ast.NegationNode)
-	def visit(self, node):
-		type_int = self.types.get_type("Int")
-		node.type_expr = type_int
-		expr = self.visit(node.expr)
-		if expr != type_int:
-			self.errors = True
-			print(TypeError(node.line, node.index, "Negation operator is only valid with Integers"))
-		return node.type_expr

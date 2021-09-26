@@ -56,7 +56,7 @@ class CreateTypes:
 			print(SemanticError(node.line, node.index, "Redefinition of basic class {}.".format(node.type)))
 		elif self.types.is_defined(node.type):
 			self.errors = True
-			print(SemanticError(node.line, node.index, "Classes may not be redefined"))
+			print(SemanticError(node.line, node.index-2, "Classes may not be redefined"))
 		elif node.inherits in ["Int", "String", "Bool"]:
 			self.errors = True
 			print(SemanticError(node.line, node.index2, "Class {} cannot inherit class {}.".format(node.type, node.inherits)))

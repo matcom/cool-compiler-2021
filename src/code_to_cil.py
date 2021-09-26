@@ -483,15 +483,6 @@ class CodeToCIL:
 	def visit(self, node):
 		return node.value
 
-	@visitor.when(ast.NegationNode)
-	def visit(self, node):
-		expr = self.visit(node.expr)
-		if not type(expr) == int:
-			var = self.register_local_var()
-			var.type = node.type_expr
-			self.instructions.append(cil.MinusNode(var, 0, expr))
-			return var
-		return -expr
 
 class Type:
     def __init__(self, name, attrb, methods):

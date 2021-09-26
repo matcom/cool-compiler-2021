@@ -160,6 +160,3 @@ class CheckSemantics:
 		else:
 			node.var_info = VarInfo("self", self.current_type)
 		
-	@visitor.when(ast.NegationNode)
-	def visit(self, node, scope):
-		self.visit(node.expr, scope)

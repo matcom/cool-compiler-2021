@@ -8,6 +8,8 @@ from code_gen import CodeGen
 
 def main():
 	files = sys.argv[1:]
+	#files = ["C:\\Users\\PabloAdrianFuentes\\Desktop\\cool-compiler-2021-master2\\tests\\parser\\assignment2.cl"]
+	
 	if len(files) == 0:
 		print(CompilerError(0, 0, "No file is given to coolc compiler."))
 		return
