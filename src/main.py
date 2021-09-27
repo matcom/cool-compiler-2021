@@ -6,7 +6,6 @@ from semantics import SemanticsAndTypes
 from code_to_cil import CodeToCIL
 from code_gen import CodeGen
 
-
 	input_file = sys.argv[1]
 		
 	# if not str(input_file).endswith(".cl"):
@@ -14,8 +13,8 @@ from code_gen import CodeGen
 			# exit(1)
 	
 	input = ""
-		with open(input_file, encoding="utf-8") as file:
-			input = file.read()
+	with open(input_file, encoding="utf-8") as file:
+		input = file.read()
 	
 	
 	#Lexical and Syntax Analysis
