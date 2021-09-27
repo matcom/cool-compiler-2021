@@ -34,7 +34,7 @@ class UtilNode(Node):
     pass
 
 class DeclarationNode(UtilNode):
-	def __init__(self, id, type, expr, line, index, index2, index3):
+	def __init__(self, id, type, expr, line, index, index2=0, index3=0):
 		UtilNode.__init__(self)
 		self.id = id
 		self.type = type
@@ -58,7 +58,7 @@ class MethodNode(AtomicNode):
 		self.info = None
 		
 class AssignNode(AtomicNode):
-	def __init__(self, id, expr, line, index, index2):
+	def __init__(self, id, expr, line, index=0, index2=0):
 		AtomicNode.__init__(self)
 		self.id = id
 		self.expr = expr
@@ -68,7 +68,7 @@ class AssignNode(AtomicNode):
 		self.var_info = None
 		
 class WhileNode(AtomicNode):
-	def __init__(self, conditional, expr, line, index, index2):
+	def __init__(self, conditional, expr, line, index, index2=0):
 		AtomicNode.__init__(self)
 		self.conditional = conditional
 		self.expr = expr
@@ -77,7 +77,7 @@ class WhileNode(AtomicNode):
 		self.index2 = index2
 		
 class IfNode(AtomicNode):
-	def __init__(self, conditional, expr_then, expr_else, line, index):
+	def __init__(self, conditional, expr_then, expr_else, line, index=0):
 		AtomicNode.__init__(self)
 		self.conditional = conditional
 		self.expr_then = expr_then
@@ -102,7 +102,7 @@ class CaseNode(AtomicNode):
 		self.index = index
 		
 class CaseItemNode(AtomicNode):
-	def __init__(self, variable, expr, line, index, index2):
+	def __init__(self, variable, expr, line, index, index2=0):
 		AtomicNode.__init__(self)
 		self.variable = variable
 		self.expr = expr
@@ -131,7 +131,7 @@ class DispatchInstanceNode(ExpressionNode):
 		self.type_method = None
 
 class DispatchParentInstanceNode(ExpressionNode):
-	def __init__(self, variable, id_parent, id_method, params, line, index, index2, index3):
+	def __init__(self, variable, id_parent, id_method, params, line, index, index2=0, index3=0):
 		ExpressionNode.__init__(self)
 		self.variable = variable
 		self.id_parent = id_parent
@@ -150,7 +150,7 @@ class BlockNode(AtomicNode):
 		self.index = index
 		
 class BinaryOperatorNode(ExpressionNode):
-	def __init__(self, left, right, line, index, index2):
+	def __init__(self, left, right, line, index, index2=0):
 		ExpressionNode.__init__(self)
 		self.left = left
 		self.right = right
@@ -171,7 +171,7 @@ class DivNode(BinaryOperatorNode):
     pass
 
 class UnaryOperator(ExpressionNode):
-	def __init__(self, expr, line, index, index2):
+	def __init__(self, expr, line, index, index2=0):
 		ExpressionNode.__init__(self)
 		self.expr = expr
 		self.line = line

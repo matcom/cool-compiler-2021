@@ -7,29 +7,20 @@ from code_to_cil import CodeToCIL
 from code_gen import CodeGen
 
 def main():
-	files = sys.argv[1:]
-	#files = ["C:\\Users\\PabloAdrianFuentes\\Desktop\\cool-compiler-2021-master2\\tests\\parser\\assignment2.cl"]
-	
-	if len(files) == 0:
-		print(CompilerError(0, 0, "No file is given to coolc compiler."))
-		exit(1)
 
-	# Check all files have the *.cl extension.
-	for file in files:
-		if not str(file).endswith(".cl"):
+	input_file = sys.argv[1]
+		
+	if not str(input_file).endswith(".cl"):
 			print(CompilerError(0, 0, "Cool program files must end with a .cl extension."))
 			exit(1)
 	
 	input = ""
-	
-	# Read all files source codes and store it in memory.
-	for file in files:
-		try:
-			with open(file, encoding="utf-8") as file:
-				input += file.read()
-		except (IOError, FileNotFoundError):
-			print(CompilerError(0, 0, "Error! File \"{0}\" was not found".format(file)))
-			exit(1)
+	try:
+		with open(input_file, encoding="utf-8") as file:
+			input += file.read()
+	except (IOError, FileNotFoundError):
+		print(CompilerError(0, 0, "Error! File \"{}\" was not found".format(input_file)))
+		exit(1)
 	
 	#Lexical and Syntax Analysis
 	lexer = MyLexer(input)
@@ -53,9 +44,9 @@ def main():
 	cg = CodeGen()
 	cg.visit(cil, st.types)
 	
-	f = open(files[0][:-3] + ".mips", 'w')
-	f.writelines(cg.output)
-	f.close()
+	with open(input_file[0:-3] + ".mips", 'w') as file:
+		file.writelines(cg.output)
+		file.close()
 	
 if __name__ == '__main__':
 	main()

@@ -126,11 +126,11 @@ class CheckTypes:
 		self.visit(node.variable, "case")
 		if node.variable.type in list:
 			self.errors = True
-			print(SemanticError(node.line, node.index, "Duplicate branch {} in case statement.".format(node.variable.type.name)))
+			print(SemanticError(node.line, node.index2, "Duplicate branch {} in case statement.".format(node.variable.type.name)))
 		aux = self.visit(node.expr)
 		if aux == None:
 			self.errors = True
-			print(SemanticError(node.line, node.index, "The expresion is None"))
+			print(SemanticError(node.line, node.index2, "The expresion is None"))
 		else:
 			node.type_expr = aux
 		return node.type_expr

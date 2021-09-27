@@ -16,10 +16,10 @@ class MyParser:
 		self.parser = yacc.yacc(module=self, **kwargs)
 	
 	def parse(self, code):
-		try:			
-			return self.parser.parse(code)
-		except:
-			return None
+		#try:			
+		return self.parser.parse(code)
+		#except:
+		#	return None
 	
 	#Precedence rules
 	precedence = (
@@ -155,13 +155,13 @@ class MyParser:
 		
 	def p_case_list(self, parse):
 		'''case_list : declare_method ACTION expr SEMICOLON case_list_a'''
-		parse[0] = [ast.CaseItemNode(parse[1], parse[3], parse[1].line, parse[1].index2)] + parse[5]
+		parse[0] = [ast.CaseItemNode(parse[1], parse[3], parse[1].line, parse[1].index, parse[1].index2)] + parse[5]
 		
 	def p_case_list_a(self, parse):
 		'''case_list_a : declare_method ACTION expr SEMICOLON case_list_a
 					   | empty'''
 		if len(parse) > 2:
-			parse[0] = [ast.CaseItemNode(parse[1], parse[3], parse[1].line, parse[1].index2)] + parse[5]
+			parse[0] = [ast.CaseItemNode(parse[1], parse[3], parse[1].line, parse[1].index, parse[1].index2)] + parse[5]
 		else:
 			parse[0] = []
 			
