@@ -11,6 +11,7 @@ from cool.grammar.comment_grammar import C
 from cool.semantic.scope import Scope
 from cool.pipes.utils import pprint_tokens, print_errors
 from cool.pipes.pipeline import Pipe
+from cool.visitors.cil_visitor import CILPrintVisitor, COOLToCILVisitor
 
 ply_lexer = PlyLexer()
 
@@ -403,3 +404,42 @@ def string_escape_pipe(result:dict):
     return result
     
 string_escape_pipe = Pipe(string_escape_pipe)
+
+def cool_to_cil_pipe(result: dict, cool_to_cil=COOLToCILVisitor):
+    context = result.get("context",None) # TODO Ver bien que hace falta aqui
+    scope = result.get("scope", None)
+    ast = result.get("ast",)
+    if any(x == None for x in [context, ast, scope]):
+        return result # TODO se devuelve result pq el error ya deveria de estar seteado
+    
+    errors = []
+    cool_to_cil_visitor = cool_to_cil(context, errors) # TODO Ver los argumentos 
+    
+    cil_ast = cool_to_cil_visitor.visit(ast, scope) # TODO Devuelve un AST de CIL
+    
+    result['cil_ast'] = cil_ast
+    
+    if result.get("verbose", False):
+        if errors:
+            print_errors("COOL to CIL Errors", errors)
+    
+    result["errors"].extend(errors)
+    
+    return result
+        
+cool_to_cil_pipe = Pipe(cool_to_cil_pipe)
+
+def cil_ast_to_text_pipe(result: dict, formatter=CILPrintVisitor):
+    ast = result.get("cil_ast",None)
+    if any(x == None for x in [ast]):
+        return result
+    
+    formatter = formatter()
+    cil_text = formatter.visit(ast)
+    if result.get("verbose", False):
+        print("============== CIL Text ===============")
+        print(cil_text)
+    result['cil_text'] = cil_text
+    return result
+
+cil_ast_to_text_pipe = Pipe(cil_ast_to_text_pipe)

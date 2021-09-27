@@ -70,9 +70,10 @@ class ParamNode(DeclarationNode):
         yield self
 
 class SpecialNode(ExpressionNode):
-    def __init__(self, func,row=None,column=None):
+    def __init__(self, func,row=None,column=None, cil_node_type=None):
         super().__init__(row,column)
         self.func = func
+        self.cil_node_type = cil_node_type
 
     def __iter__(self):
         yield self

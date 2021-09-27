@@ -121,16 +121,25 @@ class LoadNode(InstructionNode):
         self.msg = msg
 
 class LengthNode(InstructionNode):
-    pass
+    def __init__(self, dest, string) -> None:
+        self.dest = dest
+        self.string = string
 
 class ConcatNode(InstructionNode):
-    pass
+    def __init__(self, dest, string1, string2) -> None:
+        self.dest = dest
+        self.string1 = string1
+        self.string2 = string2
 
 class PrefixNode(InstructionNode):
     pass
 
 class SubstringNode(InstructionNode):
-    pass
+    def __init__(self, dest, string, index, length) -> None:
+        self.dest = dest
+        self.string = string
+        self.index = index
+        self.length = length
 
 class ToStrNode(InstructionNode):
     def __init__(self, dest, ivalue):
@@ -144,6 +153,14 @@ class ReadNode(InstructionNode):
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+class AbortNode(InstructionNode):
+    pass
+
+class CopyNode(InstructionNode):
+    def __init__(self, instance, result):
+        self.instance = instance
+        self.result = result
 
 def get_formatter():
 

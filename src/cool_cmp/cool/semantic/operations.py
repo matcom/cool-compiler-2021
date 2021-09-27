@@ -1,5 +1,5 @@
 from cool.error.errors import SemanticError,RunError, NO_OPERATION_DEFINDED, MULTIPLE_OPERATION_DEFINED, ZERO_DIVISION
-from cool.ast.ast import * 
+from cool.ast.cool_ast import * 
 from cool.semantic.type import *
 from cool.semantic.atomic import *
 

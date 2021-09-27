@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cool.ast.ast import *
+from cool.ast.cool_ast import *
 from cool.semantic.type import Type,ErrorType,StringType,IntType,IOType,BoolType,ObjectType,SelfType,VoidType,AutoType
 from cool.semantic.context import Context
 from cool.semantic.atomic import ClassInstance
@@ -363,6 +363,8 @@ class TypeCollector(object):
             if class_decl.id in self.context.special_types:
                 typex = self.context.get_type(class_decl.id)
                 typex.class_node = class_decl
+                if typex.name != "Object":
+                    typex.parent = self.context.get_type(class_decl.parent) if class_decl.parent is not None else None
                 self.add_semantic_error(SemanticError(REDEFINITION_BASIC_CLASS, class_decl.id), class_decl.row, class_decl.column)
             else:
                 try:
