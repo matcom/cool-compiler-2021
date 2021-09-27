@@ -11,4 +11,4 @@ echo "Copyright (c) 2021 School of Math and Computer Science, University of Hava
 # Llamar al compilador
 # echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
 
-python3 main.py $INPUT_FILE
+python main.py ${INPUT_FILE} ${OUTPUT_FILE}
