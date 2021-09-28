@@ -251,25 +251,30 @@ def t_error(t):
     t.lexer.skip(1)
 
 
-if __name__ == '__main__':
-    # coolc [ -o fileout ] file1.cl file2.cl ... filen.cl
-    if len(sys.argv) > 1 or sys.argv[0] != 'coolc':
-        print('Input Form: coolc [ -o fileout ] file1.cl file2.cl ... filen.cl')
-        sys.exit(1)
+# if __name__ == '__main__':
+#     # coolc [ -o fileout ] file1.cl file2.cl ... filen.cl
+#     if len(sys.argv) > 1 or sys.argv[0] != 'coolc':
+#         print('Input Form: coolc [ -o fileout ] file1.cl file2.cl ... filen.cl')
+#         sys.exit(1)
+#
+#     lexer = lex.lex()
+#     files_list = sys.argv[1:].split()
+#     files_count = len(files_list)
+#     lexer.num_count = 0
+#
+#     for file in files_list:
+#         try:
+#             with open(file, 'r') as f:
+#                 lexer.input(f.read())
+#         except:
+#             print("File not found.")
+#             exit(1)
+#
+#         for token in lexer:
+#             if token is not None:
+#                 print("Token " + "(" + str(token.value) + " " + str(token.type) + ")")
 
+def tokenize(text):
     lexer = lex.lex()
-    files_list = sys.argv[1:].split()
-    files_count = len(files_list)
-    lexer.num_count = 0
-
-    for file in files_list:
-        try:
-            with open(file, 'r') as f:
-                lexer.input(f.read())
-        except:
-            print("File not found.")
-            exit(1)
-
-        for token in lexer:
-            if token is not None:
-                print("Token " + "(" + str(token.value) + " " + str(token.type) + ")")
+    lexer.input(text)
+    return lexer
