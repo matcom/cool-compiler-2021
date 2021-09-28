@@ -406,11 +406,14 @@ def string_escape_pipe(result:dict):
 string_escape_pipe = Pipe(string_escape_pipe)
 
 def cool_to_cil_pipe(result: dict, cool_to_cil=COOLToCILVisitor):
-    context = result.get("context",None) # TODO Ver bien que hace falta aqui
+    context = result.get("context",None)
     scope = result.get("scope", None)
-    ast = result.get("ast",)
+    ast = result.get("ast", None)
     if any(x == None for x in [context, ast, scope]):
-        return result # TODO se devuelve result pq el error ya deveria de estar seteado
+        return result
+    
+    if result.get("errors"):
+        return result
     
     errors = []
     cool_to_cil_visitor = cool_to_cil(context, errors) # TODO Ver los argumentos 

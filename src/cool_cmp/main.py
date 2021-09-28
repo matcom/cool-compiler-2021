@@ -61,7 +61,7 @@ def main(
     if out_infer:
         result = reconstr_pipeline(file_content, verbose=verbose)
     else:
-        result = cool_pipeline(file_content,verbose=True)
+        result = cool_pipeline(file_content,verbose=verbose)
     ast, g_errors, parse, tokens, context, scope, operator, value, reconstr, cil_text = [result.get(x, None) for x in ["ast", "errors", "text_parse", "text_tokens", "context", "scope", "operator", "value", "reconstructed_text", "cil_text"]] 
     
     if reconstr and out_infer:

@@ -42,8 +42,9 @@ type IO {
 	method in_int: function_in_int_at_IO
 }
 type Main {
-	
+	attribute msg
 
+	method $init_msg_at_Main: init_msg_at_Main
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -55,7 +56,7 @@ type Main {
 }
 
 .DATA
-data_0 = "Hello"
+data_0 = "Hello World"
 
 .CODE
 function entry {
@@ -63,9 +64,13 @@ function entry {
 
 	LOCAL local__internal_0
 	LOCAL local__internal_1
+	LOCAL local__internal_2
+	LOCAL local__internal_3
 
-	local__internal_0 = ALLOCATE Main
-	ARG local__internal_0
+	local__internal_2 = ALLOCATE Main
+	ARG local__internal_2
+	local__internal_3 = CALL init_msg_at_Main
+	ARG local__internal_2
 	local__internal_1 = CALL function_main_at_Main
 	RETURN 0
 }
@@ -155,13 +160,22 @@ function function_in_int_at_IO {
 	local_in_int_at_IO_internal_0 = READ
 	RETURN local_in_int_at_IO_internal_0
 }
+function init_msg_at_Main {
+	PARAM self
+
+	LOCAL local_at_Main_internal_0
+
+	local_at_Main_internal_0 = LOAD data_0
+	SETATTR self msg local_at_Main_internal_0
+	RETURN 
+}
 function function_main_at_Main {
 	PARAM self
 
 	LOCAL local_main_at_Main_internal_0
 	LOCAL local_main_at_Main_internal_1
 
-	local_main_at_Main_internal_0 = LOAD data_0
+	local_main_at_Main_internal_0 = GETATTR self msg
 	ARG self
 	ARG local_main_at_Main_internal_0
 	local_main_at_Main_internal_1 = VCALL Main out_string

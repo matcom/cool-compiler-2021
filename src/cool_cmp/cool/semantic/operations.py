@@ -162,6 +162,9 @@ class OperationDict:
     
     def __getitem__(self,key):
         operator,types = key
+        if operator == "=" and len(types) == 2: # Special Equal Restriction
+            if any(isinstance(types[0], x) for x in [BoolType, IntType, StringType] ) and types[0] != types[1]:
+                raise KeyError()
         try:
             return self.operations[key]
         except KeyError:

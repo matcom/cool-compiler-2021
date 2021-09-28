@@ -63,16 +63,28 @@ class DivNode(ArithmeticNode):
     pass
 
 class GetAttribNode(InstructionNode):
-    pass
+    def __init__(self, source, attr, dest):
+        self.source = source
+        self.attr = attr
+        self.dest = dest
 
 class SetAttribNode(InstructionNode):
-    pass
+    def __init__(self, source, attr, value):
+        self.source = source
+        self.attr = attr
+        self.value = value
 
 class GetIndexNode(InstructionNode):
-    pass
+    def __init__(self, source, index, dest):
+        self.source = source
+        self.index = index
+        self.dest = dest
 
 class SetIndexNode(InstructionNode):
-    pass
+    def __init__(self, source, index, value):
+        self.source = source
+        self.index = index
+        self.value = value
 
 class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):

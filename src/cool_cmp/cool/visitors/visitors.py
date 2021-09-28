@@ -531,7 +531,10 @@ class TypeChecker:
                 node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
             else:
                 return # No default expr can be assing at this moment
-        self.visit(node.expr,scope)
+        a_scope = scope.create_child()
+        self.visit(node.expr,a_scope)
+        
+        node.scope = a_scope
         
         if not node.expr.type.conforms_to(node.type,self.current_type):
             self.add_semantic_error(TypeCoolError(ATTRIBUTE_INCOMPATIBLE_TYPES, node.id, node.type.name, node.expr.type.name),node.expr.row,node.expr.column)

@@ -80,6 +80,14 @@ class CILPrintVisitor():
     def visit(self, node):
         return f'{node.dest} = VCALL {node.type} {node.method}'
 
+    @visitor.when(cil.GetAttribNode)
+    def visit(self, node):
+        return f'{node.dest} = GETATTR {node.source} {node.attr}'
+
+    @visitor.when(cil.SetAttribNode)
+    def visit(self, node:cil.SetAttribNode):
+        return f'SETATTR {node.source} {node.attr} {node.value}'
+
     @visitor.when(cil.ArgNode)
     def visit(self, node):
         return f'ARG {node.name}'
@@ -162,6 +170,9 @@ class COOLToCILVisitor():
         self.instructions.append(instruction)
         return instruction
     
+    def to_init_attr_function_name(self, attr_name, type_name):
+        return f'init_{attr_name}_at_{type_name}'
+    
     def to_function_name(self, method_name, type_name):
         return f'function_{method_name}_at_{type_name}'
     
@@ -196,7 +207,10 @@ class COOLToCILVisitor():
         instance = self.define_internal_local()
         result = self.define_internal_local()
         main_method_name = self.to_function_name('main', 'Main')
-        self.register_instruction(cil.AllocateNode('Main', instance))
+        main_type = self.context.get_type("Main")
+        main_node = InstantiateNode(("Main",0,0),0,0)
+        instance = self.visit(main_node, main_type.class_node.scope)
+        # self.register_instruction(cil.AllocateNode('Main', instance)) # TODO Hacer Inicializador para los Allocate y los atributos
         self.register_instruction(cil.ArgNode(instance))
         self.register_instruction(cil.StaticCallNode(main_method_name, result))
         self.register_instruction(cil.ReturnNode(0))
@@ -225,6 +239,10 @@ class COOLToCILVisitor():
         
         for attr,typex in self.current_type.all_attributes():
             type_node.attributes.append(attr.name)
+            new_function = self.register_function(self.to_init_attr_function_name(attr.name, self.current_type.name))
+            type_node.methods.append((f"${new_function.name}", new_function.name)) # Prefixed with $ to avoid collisions
+            self.current_function = new_function
+            self.visit(attr.node, attr.node.scope)
 
         for method,typex in self.current_type.all_methods(): # Register methods  
             if typex != self.current_type:
@@ -235,12 +253,14 @@ class COOLToCILVisitor():
                     new_function = next(x for x in self.dotcode if x.name == method_name)
                 type_node.methods.append((method.name,new_function.name))
 
+
+
         
         func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
-        for feature, child_scope in zip(func_declarations, scope.children):
+        for feature in func_declarations:
             self.current_function = self.register_function(self.to_function_name(feature.id,self.current_type.name))
             type_node.methods.append((feature.id,self.current_function.name))
-            self.visit(feature, child_scope)
+            self.visit(feature, feature.scope)
                 
         self.current_type = None
                 
@@ -266,6 +286,14 @@ class COOLToCILVisitor():
         self.register_instruction(cil.ReturnNode(value))
         self.current_method = None
 
+    @visitor.when(AttrDeclarationNode)
+    def visit(self, node, scope):
+        self.current_function.params.append(cil.ParamNode('self'))
+        result = self.visit(node.expr, scope)
+        self.register_instruction(cil.SetAttribNode("self", node.id, result))
+        self.register_instruction(cil.ReturnNode())
+        return result
+    
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
         ###############################
@@ -425,7 +453,7 @@ class COOLToCILVisitor():
                 return node.lex # Param
             else:
                 value = self.define_internal_local() # Attr
-                self.register_instruction(cil.GetAttribNode('self',node.lex,value))
+                self.register_instruction(cil.GetAttribNode('self',node.lex, value))
                 return value
         
     @visitor.when(InstantiateNode)
@@ -437,6 +465,12 @@ class COOLToCILVisitor():
         # Your code here!!!
         instance = self.define_internal_local()
         self.register_instruction(cil.AllocateNode(node.lex, instance))
+        instance_typex = self.context.get_type(node.lex)
+        for attr,typex in instance_typex.all_attributes(): # Initialize Attributes
+            result = self.define_internal_local()
+            self.register_instruction(cil.ArgNode(instance))
+            self.register_instruction(cil.StaticCallNode(
+                self.to_init_attr_function_name(attr.name, instance_typex.name), result))
         return instance
         
     @visitor.when(PlusNode)
