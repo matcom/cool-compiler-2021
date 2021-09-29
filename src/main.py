@@ -1,6 +1,6 @@
 import sys
 import os
-from lexer import tokenize
+from lexer import tokenize, lexer_errors
 
 programs_directory = sys.argv[1]
 programs_files = [file for file in os.listdir(programs_directory) if file.endswith('.cl')]
@@ -12,4 +12,5 @@ for program_file in programs_files:
         tokens = tokenize(f.read())
 
     for token in tokens:
-        print(token)
+        pass
+    print(lexer_errors)
