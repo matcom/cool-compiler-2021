@@ -91,6 +91,12 @@ def t_INTEGER(t):
     t.value = int(t.value)
     return t
 
+# Booleans are true=True or false=False
+def t_BOOL(t):
+    r'[t][rR][uU][eE]|[f][aA][lL][sS][eE]'
+    t.value = True if t.value.lower() == 'true' else False
+    return t
+
 
 # Type identifiers begin with a capital letter
 # Object identifiers begin with a lower case letter
@@ -102,13 +108,6 @@ def t_TYPES(t):
             t.type = 'OBJECT_ID'
         else:
             t.type = 'TYPE_ID'
-    return t
-
-
-# Booleans are true=True or false=False
-def t_BOOL(t):
-    r'true|false'
-    t.value = True if t.value == 'true' else False
     return t
 
 
