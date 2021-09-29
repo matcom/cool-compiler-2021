@@ -68,12 +68,14 @@ class ParenthesisExpr(ExprNode):
 
 
 class BlockNode(ExprNode):
-    def __init__(self, expressions):
+    def __init__(self, expressions: List[ExprNode]):
         self.expressions: List[ExprNode] = expressions
 
 
 class LetNode(ExprNode):
-    def __init__(self, declarations, expr):
+    def __init__(
+        self, declarations: List[Tuple[str, str, Optional[ExprNode]]], expr: ExprNode
+    ):
         self.declarations: List[Tuple[str, str, Optional[ExprNode]]] = declarations
         self.expr: ExprNode = expr
 

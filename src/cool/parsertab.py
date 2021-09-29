@@ -10,7 +10,11 @@ class CoolParser(ShiftReduceParser, ABC):
         self.action = self.__action_table()
         self.goto = self.__goto_table()
         self._errors = []
-        self.error_handler = G.parsing_error_handler if G.parsing_error_handler is not None else self.error 
+        self.error_handler = (
+            G.parsing_error_handler
+            if G.parsing_error_handler is not None
+            else self.error
+        )
 
     @staticmethod
     def __action_table():
@@ -110,7 +114,10 @@ class CoolParser(ShiftReduceParser, ABC):
             (17, G[","]): ("SHIFT", 18),
             (17, G["in"]): ("REDUCE", G["declaration-list -> id : type"]),
             (18, G["id"]): ("SHIFT", 15),
-            (19, G["in"]): ("REDUCE", G["declaration-list -> id : type , declaration-list"]),
+            (19, G["in"]): (
+                "REDUCE",
+                G["declaration-list -> id : type , declaration-list"],
+            ),
             (20, G["int"]): ("SHIFT", 31),
             (20, G["true"]): ("SHIFT", 25),
             (20, G["id"]): ("SHIFT", 46),
@@ -785,7 +792,10 @@ class CoolParser(ShiftReduceParser, ABC):
             (67, G["{"]): ("SHIFT", 10),
             (67, G["int"]): ("SHIFT", 31),
             (67, G["true"]): ("SHIFT", 25),
-            (68, G[")"]): ("REDUCE", G["not-empty-expr-list -> expr , not-empty-expr-list"]),
+            (68, G[")"]): (
+                "REDUCE",
+                G["not-empty-expr-list -> expr , not-empty-expr-list"],
+            ),
             (69, G["type"]): ("SHIFT", 70),
             (70, G["."]): ("SHIFT", 71),
             (71, G["id"]): ("SHIFT", 72),
@@ -807,27 +817,90 @@ class CoolParser(ShiftReduceParser, ABC):
             (73, G["int"]): ("SHIFT", 31),
             (73, G["true"]): ("SHIFT", 25),
             (74, G[")"]): ("SHIFT", 75),
-            (75, G["."]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["else"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["="]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G[","]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["fi"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G[";"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["error"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["loop"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["@"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["pool"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["+"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["-"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["in"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["*"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["}"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["/"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["of"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["<="]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["<"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G[")"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
-            (75, G["then"]): ("REDUCE", G["function-call -> atom @ type . id ( expr-list )"]),
+            (75, G["."]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["else"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["="]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G[","]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["fi"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G[";"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["error"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["loop"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["@"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["pool"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["+"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["-"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["in"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["*"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["}"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["/"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["of"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["<="]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["<"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G[")"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
+            (75, G["then"]): (
+                "REDUCE",
+                G["function-call -> atom @ type . id ( expr-list )"],
+            ),
             (76, G["else"]): ("REDUCE", G["comp -> comp < negable-arith"]),
             (76, G["="]): ("REDUCE", G["comp -> comp < negable-arith"]),
             (76, G["in"]): ("REDUCE", G["comp -> comp < negable-arith"]),
@@ -927,10 +1000,16 @@ class CoolParser(ShiftReduceParser, ABC):
             (87, G["error"]): ("SHIFT", 90),
             (88, G["id"]): ("SHIFT", 83),
             (88, G["esac"]): ("REDUCE", G["case-list -> id : type => expr ;"]),
-            (89, G["esac"]): ("REDUCE", G["case-list -> id : type => expr ; case-list"]),
+            (89, G["esac"]): (
+                "REDUCE",
+                G["case-list -> id : type => expr ; case-list"],
+            ),
             (90, G["id"]): ("SHIFT", 83),
             (90, G["esac"]): ("REDUCE", G["case-list -> id : type => expr error"]),
-            (91, G["esac"]): ("REDUCE", G["case-list -> id : type => expr error case-list"]),
+            (91, G["esac"]): (
+                "REDUCE",
+                G["case-list -> id : type => expr error case-list"],
+            ),
             (92, G["esac"]): ("SHIFT", 93),
             (93, G["else"]): ("REDUCE", G["expr -> case expr of case-list esac"]),
             (93, G["in"]): ("REDUCE", G["expr -> case expr of case-list esac"]),
@@ -947,7 +1026,10 @@ class CoolParser(ShiftReduceParser, ABC):
             (94, G["in"]): ("REDUCE", G["declaration-list -> id : type <- expr"]),
             (94, G[","]): ("SHIFT", 95),
             (95, G["id"]): ("SHIFT", 15),
-            (96, G["in"]): ("REDUCE", G["declaration-list -> id : type <- expr , declaration-list"]),
+            (96, G["in"]): (
+                "REDUCE",
+                G["declaration-list -> id : type <- expr , declaration-list"],
+            ),
             (97, G["in"]): ("SHIFT", 98),
             (98, G["id"]): ("SHIFT", 46),
             (98, G["if"]): ("SHIFT", 12),
@@ -1160,7 +1242,10 @@ class CoolParser(ShiftReduceParser, ABC):
             (130, G["true"]): ("SHIFT", 25),
             (131, G["}"]): ("SHIFT", 132),
             (132, G[";"]): ("REDUCE", G["method -> id ( param-list ) : type { expr }"]),
-            (132, G["error"]): ("REDUCE", G["method -> id ( param-list ) : type { expr }"]),
+            (132, G["error"]): (
+                "REDUCE",
+                G["method -> id ( param-list ) : type { expr }"],
+            ),
             (133, G["type"]): ("SHIFT", 134),
             (134, G[";"]): ("REDUCE", G["attribute -> id : type"]),
             (134, G["error"]): ("REDUCE", G["attribute -> id : type"]),
@@ -1199,13 +1284,19 @@ class CoolParser(ShiftReduceParser, ABC):
             (146, G["}"]): ("REDUCE", G["feature-list -> method error feature-list"]),
             (147, G["id"]): ("SHIFT", 4),
             (147, G["}"]): ("REDUCE", G["feature-list -> e"]),
-            (148, G["}"]): ("REDUCE", G["feature-list -> attribute error feature-list"]),
+            (148, G["}"]): (
+                "REDUCE",
+                G["feature-list -> attribute error feature-list"],
+            ),
             (149, G["type"]): ("SHIFT", 150),
             (150, G["{"]): ("SHIFT", 151),
             (151, G["id"]): ("SHIFT", 4),
             (151, G["}"]): ("REDUCE", G["feature-list -> e"]),
             (152, G["}"]): ("SHIFT", 153),
-            (153, G[";"]): ("REDUCE", G["class-def -> class type inherits type { feature-list }"]),
+            (153, G[";"]): (
+                "REDUCE",
+                G["class-def -> class type inherits type { feature-list }"],
+            ),
             (154, G["$"]): ("OK", None),
             (155, G["$"]): ("REDUCE", G["program -> class-list"]),
             (156, G[";"]): ("SHIFT", 157),
