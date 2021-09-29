@@ -9,9 +9,9 @@ tokens = ['INTEGER',  # Non-empty strings of digits 0-9
 
           'BOOL', 'STRING',
           'COMMENT',
-          'PLUS', 'MINUS', 'MULT', 'DIV', 'EQ',
+          'PLUS', 'MINUS', 'MULT', 'DIV',
           'EQ', 'LT', 'LTEQ', 'ASSIGN', 'ACTION', 'INT_COMP',
-          'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'DOT', 'COMMA', 'COLON', 'SEMMICOLON', 'AT',
+          'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'DOT', 'COMMA', 'COLON', 'SEMICOLON', 'AT',
 
           ]
 

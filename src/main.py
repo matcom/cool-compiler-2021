@@ -1,9 +1,15 @@
 import sys
-from Lexer import tokenize
+import os
+from lexer import tokenize
 
-program_file = sys.argv[1]
-with open(program_file, 'r') as f:
-    tokens = tokenize(f.read())
+programs_directory = sys.argv[1]
+programs_files = [file for file in os.listdir(programs_directory) if file.endswith('.cl')]
 
-for token in tokens:
-    print(token)
+for program_file in programs_files:
+    input('Press enter to analyze ' + program_file)
+    program_route = programs_directory+'/'+program_file
+    with open(program_route, 'r') as f:
+        tokens = tokenize(f.read())
+
+    for token in tokens:
+        print(token)
