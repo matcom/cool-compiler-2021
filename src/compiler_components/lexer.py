@@ -91,8 +91,12 @@ class Tokenizer:
         return t
 
     def t_comment(self, t):
-        r'--[^\n]*[\n]'
+        r'--[^\n]*\n'
         t.lexer.lineno += 1
+
+    def t_comment_end_string(self, t):
+        r'--[^$]*$'
+        t.lexer.lineno += 1  
 
     def t_newline(self, t):
         r'\n+'
@@ -140,11 +144,12 @@ class Lexer(CompilerComponent):
             print(e)
 
 ########################### Testing ##############################
-data = '''hola=5+d/4<3
---aaaa
-b
-'''
+data = '''--aaaa
+--bbbbadsfdasg
+a+4class{}(a)let if fi while = <=<
+--aaa'''
 lexer = Lexer(data)
 lexer.execute()
+print()
 lexer.print_errors()
 ##### borrar luego ########################################
