@@ -14,13 +14,13 @@ def p_program(p):
     p[0] = ProgramNode(p[1])
 
 def p_class_list(p):
-    '''class_list : def_class
-                  | def_class class_list
+    '''class_list : def_class SEMICOLON
+                  | def_class SEMICOLON class_list
        '''
-    if len(p) == 2:
+    if len(p) == 3:
         p[0] = [p[1]]
     else:
-        p[0] = [p[1]] + p[2]  
+        p[0] = [p[1]] + p[3]  
 
 def p_def_class(p):
     '''def_class : CLASS ID LBRACE feature_list RBRACE
@@ -36,14 +36,14 @@ def p_empty(p):
     pass
 
 def p_feature_list(p):
-    '''feature_list : def_attr feature_list
-                    | def_func feature_list
+    '''feature_list : def_attr SEMICOLON feature_list
+                    | def_func SEMICOLON feature_list
                     | empty
     '''
     if len(p) == 2:
         p[0] = []
     else:
-        p[0] = [p[1]] + p[2]
+        p[0] = [p[1]] + p[3]
 
 def p_def_attr(p):
     '''def_attr : ID DOUBLE_DOT ID SEMICOLON
@@ -51,7 +51,7 @@ def p_def_attr(p):
     p[0] = AttrDeclarationNode(p[1], p[3])
 
 def p_def_func(p):
-    '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT ID LBRACE expr_list RBRACE
+    '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT ID LBRACE expr RBRACE
     '''
     p[0] = FuncDeclarationNode(p[1], p[3], p[6], p[8])
 
@@ -62,7 +62,7 @@ def p_param_list(p):
     if len(p) == 2:
         p[0] = [p[1]]
     else:
-        [p[1]] + p[3]
+        p[0] = [p[1]] + p[3]
 
 def p_param(p):
     '''param : ID DOUBLE_DOT ID
@@ -133,7 +133,7 @@ def p_atom1(p):
 
 def p_atom2(p):
     'atom : NUMBER'
-    p[0] = ConstantNumNode(p[2])
+    p[0] = ConstantNumNode(p[1])
 
 def p_atom3(p):
     'atom : func_call'
@@ -158,6 +158,9 @@ def p_arg_list(p):
     else:
         p[0] = [p[1]] + p[3]
 
+def p_error(p):
+    print(p)
+
 ############## End Grammar ############################
 
 
@@ -176,7 +179,10 @@ class Parser(CompilerComponent):
     def print_errors(self):
         pass
 
-data = 'class A { f : int ;}'  
+data = '''class A { 
+    f(a:int,b:bool,c:hijo):hello{1};
+
+    };'''  
 parser = yacc.yacc()
-result = parser.parse(data)
-print(result)
+result = parser.parse(data, debug=True)
+print(result.visit())

@@ -60,7 +60,7 @@ class Tokenizer:
     t_TIMES = r'\*'
     t_DIVIDE = r'/'
     t_SEMICOLON = r';'
-    r_COMMA = r','
+    t_COMMA = r','
     t_MINOR = r'<'
     t_MINOR_EQUALS = r'<='
     t_EQUALS = r'='
@@ -144,10 +144,10 @@ class Lexer(CompilerComponent):
             print(e)
 
 ########################### Testing ##############################
-data = '''--aaaa
---bbbbadsfdasg
-a+4class{}(a)let if fi while = <=<
---aaa'''
-lexer = Lexer(data)
+data = '''class A { 
+    f(a:int ,b:bool,c:hijo):hello{1};
 
+    };''' 
+lexer = Lexer(data)
+#lexer.execute()
 ##### borrar luego ########################################
