@@ -46,9 +46,13 @@ def p_feature_list(p):
         p[0] = [p[1]] + p[3]
 
 def p_def_attr(p):
-    '''def_attr : ID DOUBLE_DOT ID SEMICOLON
+    '''def_attr : ID DOUBLE_DOT ID
+                | ID DOUBLE_DOT ID LEFT_ARROW expr
     '''
-    p[0] = AttrDeclarationNode(p[1], p[3])
+    if len(p) == 5:
+        p[0] = AttrDeclarationNode(p[1], p[3])
+    else:
+        p[0] = AttrDeclarationNode(p[1], p[3], p[5])
 
 def p_def_func(p):
     '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT ID LBRACE expr RBRACE
@@ -180,6 +184,7 @@ class Parser(CompilerComponent):
         pass
 
 data = '''class A { 
+    a:int <- 8;
     f(a:int,b:bool,c:hijo):hello{1};
 
     };'''  

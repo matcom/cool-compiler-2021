@@ -46,13 +46,16 @@ class FuncDeclarationNode(DeclarationNode):
         return f'{ans}\n{body}'
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, idx, typex):
+    def __init__(self, idx, typex, expr = None):
         self.id = idx
         self.type = typex
+        self.expr = expr
 
     def visit(self, tabs = 0):
         node = self
-        ans = '\t' * tabs + f'\\__AttrDeclarationNode: {node.id} : {node.type}'
+        ans = '\t' * tabs + f'\\__AttrDeclarationNode: {node.id} : {node.type} <-- <expr>'
+        if not self.expr is None:
+            ans += "\n" + self.expr.visit(tabs+1)
         return f'{ans}'
 
 class VarDeclarationNode(ExpressionNode):
