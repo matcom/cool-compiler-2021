@@ -65,3 +65,7 @@ class PlusNode(BinaryNode):
     pass
 class MinusNode(BinaryNode):
     pass
+class StarNode(BinaryNode):
+    pass
+class DivNode(BinaryNode):
+    pass

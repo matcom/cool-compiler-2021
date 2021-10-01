@@ -48,7 +48,7 @@ class Tokenizer:
     }
 
     tokens = ['STRING', 'LPAREN', 'RPAREN', 'LBRACE' , 'RBRACE', 'PLUS', 'MINUS',
-    'TIMES', 'DIVIDE', 'SEMICOLON', 'COLON', 'ID', 'MINOR', 'MINOR_EQUALS', "EQUALS", 
+    'TIMES', 'DIVIDE', 'SEMICOLON', 'COMMA', 'ID', 'MINOR', 'MINOR_EQUALS', "EQUALS", 
     'LEFT_ARROW', 'RIGHT_ARROW', 'DOT', 'DOUBLE_DOT', "ARROBA", 'NUMBER'] + list(reserved.values())
 
     t_LPAREN = r'\('
@@ -60,7 +60,7 @@ class Tokenizer:
     t_TIMES = r'\*'
     t_DIVIDE = r'/'
     t_SEMICOLON = r';'
-    r_COLON = r','
+    r_COMMA = r','
     t_MINOR = r'<'
     t_MINOR_EQUALS = r'<='
     t_EQUALS = r'='
@@ -149,7 +149,5 @@ data = '''--aaaa
 a+4class{}(a)let if fi while = <=<
 --aaa'''
 lexer = Lexer(data)
-lexer.execute()
-print()
-lexer.print_errors()
+
 ##### borrar luego ########################################
