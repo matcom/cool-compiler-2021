@@ -7,8 +7,8 @@ programs_files = [file for file in os.listdir(programs_directory) if file.endswi
 
 for program_file in programs_files:
     input('Press enter to analyze ' + program_file)
-    program_route = programs_directory+'/'+program_file
-    with open(program_route, 'r') as f:
+    program_route = programs_directory + '/' + program_file
+    with open(program_route, 'r', encoding='UTF-8') as f:
         tokens = tokenize(f.read())
 
     for token in tokens:
