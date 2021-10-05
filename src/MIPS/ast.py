@@ -116,6 +116,10 @@ class JrNode(R_TypeNode):
     def __str__(self):
         return f'\t\tjr\t\t${self.r0}'
 
+class MoveNode(R_TypeNode):
+    def __str__(self):
+        return f'\t\tmove\t\t${self.r0}, ${self.r1}'
+
 class I_TypeNode(InstructionNode):
     def __init__(self, r0, const, r1=None):
         self.r0 = r0
@@ -125,10 +129,6 @@ class I_TypeNode(InstructionNode):
 class AddiNode(I_TypeNode):
     def __str__(self):
         return f'\t\taddi\t\t${self.r0}, ${self.r1}, {self.const}'
-
-class MoveNode(I_TypeNode):
-    def __str__(self):
-        return f'\t\taddi\t\t${self.r0}, ${self.r1}, 0'
 
 class AddiuNode(I_TypeNode):
     def __str__(self):

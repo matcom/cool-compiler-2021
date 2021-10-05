@@ -84,7 +84,8 @@ class ParamNode(Node):
         return f'{self.id}'
 
 class AbortNode(Node):
-    pass
+    def __str__(self):
+        return f'ABORT'
 
 class InstructionNode (Node):  
     def __init__(self, value_1, value_2=None, value_3=None):

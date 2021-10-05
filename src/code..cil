@@ -21,7 +21,7 @@ type Int{
 	method copy:Object_copy ;
 }
 type String{
-	attribute length ;
+	attribute len ;
 	attribute str ;
 	method abort:Object_abort ;
 	method type_name:Object_type_name ;
@@ -48,19 +48,21 @@ type Main{
 
 .CODE
 
-function Main.init {
-	 PARAM self ;
+function main {
 
+	 LOCAL local_0 ;
+	 LOCAL local_1 ;
 
+	local_0 = ALLOCATE Main ;
+	ARG local_0 ;
+	local_1 = CALL main ;
 }
 
-function Main_main {
+function Main.main {
 	 PARAM self ;
 	 PARAM c ;
 
-	 LOCAL local_0 ;
 
-	local_0 = CALL Object_abort ;
-	RETURN local_0 ;
+	RETURN 1 ;
 }
 

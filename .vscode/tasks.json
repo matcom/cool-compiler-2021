@@ -6,7 +6,7 @@
         {
             "label": "excecute",
             "type": "shell",
-            "command": "cd src; bash coolc.sh code.cl",
+            "command": "cd src; bash coolc.sh code.cl; xspim code.mips",
             "problemMatcher": [],
             "group": {
                 "kind": "build",

@@ -1,6 +1,5 @@
 from Utils.errors import AttributeException, MethodException, SemanticException, TypeException
 
-
 class Attribute:
     def __init__(self, name, type, expr=None):
         self.name = name
@@ -93,6 +92,19 @@ class ErrorType(Type):
     def __eq__(self, other):
         return isinstance(other, Type)
 
+class VoidType(Type):
+    def __init__(self):
+        super().__init__('<void>')
+
+    def conforms_to(self, other):
+        return True
+
+    def bypass(self):
+        return True
+
+    def __eq__(self, other):
+        return isinstance(other, Type)
+
 class Context:
     def __init__(self):
         self.types = {}
@@ -129,7 +141,7 @@ class Context:
         Io.define_method('in_string', [], [], String)
         Io.define_method('in_int', [], [], Int)
 
-        String.define_attribute('length', Int)
+        String.define_attribute('len', Int)
         String.define_attribute('str', String)
         String.define_method('length', [], [], Int)
         String.define_method('concat', ['s'], [String], String)

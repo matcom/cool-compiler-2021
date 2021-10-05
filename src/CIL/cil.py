@@ -2,7 +2,7 @@ import CIL.ast as cil
 import Utils.visitor as visitor
 
 from Parser.ast import *
-from CIL.builder import builder_init, builder_params, builder_types
+from CIL.builder import builder_init, builder_main, builder_params, builder_types
 
 class CIL:
     def __init__(self, context):
@@ -15,8 +15,8 @@ class CIL:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        self.code = []
         self.data = {}
+        self.code = [builder_main()]
         self.types = builder_types(self.context)
 
         for def_class in node.class_list:
@@ -27,7 +27,9 @@ class CIL:
     @visitor.when(ClassNode)
     def visit(self, node):
         self.current = self.context.get_type(node.type.value)
-        self.code.append(builder_init(self))
+        
+        if self.current.attributes:
+            self.code.append(builder_init(self))
 
         for feature in node.feature_list:
             self.visit(feature)
@@ -42,7 +44,7 @@ class CIL:
         self.visit(node.expr)
 
         self.instructions.append(cil.ReturnNode(node.expr.computed_value))
-        self.code.append(cil.CodeNode(f'{self.current.name}_{node.id.value}', self.params, self.locals.values(), self.instructions))
+        self.code.append(cil.CodeNode(f'{self.current.name}.{node.id.value}', self.params, self.locals.values(), self.instructions))
 
     @visitor.when(LetNode)
     def visit(self, node):
@@ -217,10 +219,10 @@ class CIL:
     def visit(self, node):
         self.visit(node.left)
         local_1 = self.add_local()
-        self.instructions.append(local_1, node.left.computed_value)
+        self.instructions.append(cil.AssignmentNode(local_1, node.left.computed_value))
         self.visit(node.right)
         local_2 = self.add_local()
-        self.instructions.append(local_2, node.right.computed_value)
+        self.instructions.append(cil.AssignmentNode(local_2, node.right.computed_value))
         local_3 = self.add_local()
         self.instructions.append(cil.MinusNode(local_3, local_1, local_2))
         label_1 = self.add_label()
@@ -237,10 +239,10 @@ class CIL:
     def visit(self, node):
         self.visit(node.left)
         local_1 = self.add_local()
-        self.instructions.append(local_1, node.left.computed_value)
+        self.instructions.append(cil.AssignmentNode(local_1, node.left.computed_value))
         self.visit(node.right)
         local_2 = self.add_local()
-        self.instructions.append(local_2, node.right.computed_value)
+        self.instructions.append(cil.AssignmentNode(local_2, node.right.computed_value))
         local_3 = self.add_local()
         self.instructions.append(cil.DivideNode(local_3, local_1, local_2))
         label_1 = self.add_label()
@@ -257,10 +259,10 @@ class CIL:
     def visit(self, node):
         self.visit(node.left)
         local_1 = self.add_local()
-        self.instructions.append(local_1, node.left.computed_value)
+        self.instructions.append(cil.AssignmentNode(local_1, node.left.computed_value))
         self.visit(node.right)
         local_2 = self.add_local()
-        self.instructions.append(local_2, node.right.computed_value)
+        self.instructions.append(cil.AssignmentNode(local_2, node.right.computed_value))
         local_3 = self.add_local()
         self.instructions.append(cil.DivideNode(local_3, local_1, local_2))
         label_1 = self.add_label()
@@ -340,7 +342,7 @@ class CIL:
         
         node.computed_value = self.add_local()
         if node.type:
-            self.instructions.append(cil.StaticCallNode(node.computed_value, f'{node.type.value}_{node.id.value}'))
+            self.instructions.append(cil.StaticCallNode(node.computed_value, f'{node.type.value}.{node.id.value}'))
         else:
             self.instructions.append(cil.DynamicCallNode(node.computed_value, local_1, node.id.value))
 

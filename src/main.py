@@ -46,8 +46,8 @@ def cil(ast, contex, cil_file):
 
 def mips(ast, output_file):
     mips = MIPS()
-    mips_ast = mips.visit(ast) 
-    open(output_file, 'w').write(str(mips_ast))
+    code = mips.visit(ast) 
+    open(output_file, 'w').write(code)
 
 def main():
     errors = list()

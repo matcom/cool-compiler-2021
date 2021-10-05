@@ -35,10 +35,13 @@ def builder_init(self):
     self.params = [ParamNode('self')]
 
     for attr in self.current.attributes:
-        self.visit(attr.expr)
-        self.instructions.append(SetAttributeNode(self.params[0], attr.name, attr.expr.computed_value))
+        if attr.expr:
+            self.visit(attr.expr)
+            self.instructions.append(SetAttributeNode(self.params[0], attr.name, attr.expr.computed_value))
 
-    return CodeNode(f'{self.current.name}.init', self.params, self.locals.values(), self.instructions)
+    self.instructions.append(ReturnNode(self.params[0]))
+
+    return CodeNode(f'{self.current.name}_init', self.params, self.locals.values(), self.instructions)
 
 def builder_params(metho):
     params = {'self': ParamNode('self')}
@@ -49,11 +52,11 @@ def builder_params(metho):
 def builder_main():
     return CodeNode('main', [], 
     [
-        LocalNode('__main__'),
-        LocalNode('__return__')
+        LocalNode('local_0'),
+        LocalNode('local_1')
     ],
     [
-        AllocateNode('__main__', 'Main'),
-        ArgumentNode('__main__'),
-        DynamicCallNode('__return__', 'Main', 'main')
+        AllocateNode('local_0', 'Main'),
+        ArgumentNode('local_0'),
+        StaticCallNode('local_1', 'main')
     ])

@@ -1,200 +1,21 @@
 		.data
-int_const_0:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	6
-		.word	-1
 
-str_const_0:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	int_const_0
-		.ascii	"Object"
-		.word	-1
+_abort_msg:	    .asciiz "Abort called from class "
+_colon_msg:	    .asciiz ":"
+_dispatch_msg:  .asciiz ": Dispatch to void.\n"
+_cabort_msg:	.asciiz "No match in case statement for Class "
+_cabort_msg2:   .asciiz "Match on void in case statement.\n"
+_nl:		    .asciiz "\n"
+_term_msg:	    .asciiz "COOL program successfully executed\n"
+_sabort_msg1:	.asciiz	"Index to substr is negative\n"
+_sabort_msg2:	.asciiz	"Index to substr is too big\n"
+_sabort_msg3:	.asciiz	"Length to substr too long\n"
+_sabort_msg4:	.asciiz	"Length to substr is negative\n"
+_sabort_msg:	.asciiz "Execution aborted.\n"
+_objcopy_msg:	.asciiz "Object.copy: Invalid object size.\n"
+_gc_abort_msg:	.asciiz "GC bug!\n"
 
-Object_disp:
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Object.copy
-
-Object_proto:
+heap:
 		.word	0
-		.word	3
-		.word	Object_disp
-		.word	-1
-
-int_const_1:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	2
-		.word	-1
-
-str_const_1:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	int_const_1
-		.ascii	"IO"
-		.word	-1
-
-IO_disp:
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Object.copy
-		.word	IO.out_string
-		.word	IO.out_int
-		.word	IO.in_string
-		.word	IO.in_int
-
-IO_proto:
-		.word	1
-		.word	3
-		.word	IO_disp
-		.word	-1
-
-int_const_2:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	3
-		.word	-1
-
-str_const_2:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	int_const_2
-		.ascii	"Int"
-		.word	-1
-
-Int_disp:
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Object.copy
-
-Int_proto:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	0
-		.word	-1
-
-int_const_3:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	6
-		.word	-1
-
-str_const_3:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	int_const_3
-		.ascii	"String"
-		.word	-1
-
-String_disp:
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Object.copy
-		.word	String.length
-		.word	String.concat
-		.word	String.substr
-
-String_proto:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	Int_proto
-		.byte	0
-		.word	-1
-
-int_const_4:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	4
-		.word	-1
-
-str_const_4:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	int_const_4
-		.ascii	"Bool"
-		.word	-1
-
-Bool_disp:
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Object.copy
-
-Bool_proto:
-		.word	4
-		.word	4
-		.word	Bool_disp
-		.word	0
-		.word	-1
-
-int_const_5:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	1
-		.word	-1
-
-str_const_5:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	int_const_5
-		.ascii	"A"
-		.word	-1
-
-A_disp:
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Object.copy
-
-A_proto:
-		.word	5
-		.word	6
-		.word	A_disp
-		.word	Int_proto
-		.word	String_proto
-		.word	Bool_proto
-		.word	-1
-
-int_const_6:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	4
-		.word	-1
-
-str_const_6:
-		.word	3
-		.word	5
-		.word	String_disp
-		.word	int_const_6
-		.ascii	"Main"
-		.word	-1
-
-Main_disp:
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Object.copy
-		.word	Main.main
-
-Main_proto:
-		.word	6
-		.word	4
-		.word	Main_disp
-		.word	0
-		.word	-1
 
 		.text
