@@ -1,0 +1,1 @@
+Los atributos se inicializan llamando a las funciones CIL generadas para eso.

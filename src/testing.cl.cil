@@ -174,10 +174,17 @@ function function_main_at_Main {
 
 	LOCAL local_main_at_Main_internal_0
 	LOCAL local_main_at_Main_internal_1
+	LOCAL local_main_at_Main_internal_2
+	LOCAL local_main_at_Main_internal_3
 
-	local_main_at_Main_internal_0 = GETATTR self msg
-	ARG self
-	ARG local_main_at_Main_internal_0
-	local_main_at_Main_internal_1 = VCALL Main out_string
-	RETURN local_main_at_Main_internal_1
+	local_main_at_Main_internal_0 = VOID
+	LABEL main_at_Main_label_0
+	IF 0 GOTO main_at_Main_label_1
+	GOTO main_at_Main_label_2
+	LABEL main_at_Main_label_1
+	local_main_at_Main_internal_2 = 3 + 2
+	local_main_at_Main_internal_3 = 3 - 2
+	GOTO main_at_Main_label_0
+	LABEL main_at_Main_label_2
+	RETURN local_main_at_Main_internal_0
 }

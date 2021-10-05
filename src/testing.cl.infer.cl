@@ -1,12 +1,16 @@
 class Main inherits IO
 {
     msg:String <- "Hello World";
-    main(): IO
+    main(): Object
     {
-        self
-        .out_string(
-            msg
-        )
+        while
+            false
+        loop
+            {
+                (3 + 2);
+                (3 - 2);
+            }
+        pool
     };
 }
 

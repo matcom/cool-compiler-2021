@@ -29,4 +29,24 @@ class IOInStringNode(InstructionNode):
         
 class IOInIntNode(InstructionNode):
     pass
+
+class UnaryArithmeticNode(InstructionNode):
+    def __init__(self, dest, value) -> None:
+        self.dest = dest
+        self.value = value
         
+class NotNode(UnaryArithmeticNode):
+    pass
+
+class EqualNode(ArithmeticNode):
+    pass
+
+class GreaterNode(ArithmeticNode):
+    pass
+
+class LesserNode(ArithmeticNode):
+    pass
+
+class VoidNode(InstructionNode):
+    def __init__(self, dest) -> None:
+        self.dest = dest

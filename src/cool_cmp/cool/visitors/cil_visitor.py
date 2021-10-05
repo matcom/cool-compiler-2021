@@ -131,7 +131,40 @@ class CILPrintVisitor():
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode):
         return f'{node.dest} = LOAD {node.msg}'
-
+    
+    @visitor.when(cil.LabelNode)
+    def visit(self, node:cil.LabelNode):
+        return f'LABEL {node.label}'
+    
+    @visitor.when(cil.GotoIfNode)
+    def visit(self, node:cil.GotoIfNode):
+        return f'IF {node.condition_value} GOTO {node.label}'
+    
+    @visitor.when(cil.GotoNode)
+    def visit(self, node:cil.GotoNode):
+        return f'GOTO {node.label}'
+    
+    @visitor.when(cil.NotNode)
+    def visit(self, node:cil.NotNode):
+        return f'{node.dest} = NOT {node.value}'
+    
+    @visitor.when(cil.EqualNode)
+    def visit(self, node:cil.EqualNode):
+        return f'{node.dest} = EQUAL {node.left} {node.right}'
+    
+    @visitor.when(cil.GreaterNode)
+    def visit(self, node:cil.GreaterNode):
+        return f'{node.dest} = {node.left} > {node.right}'
+    
+    @visitor.when(cil.LesserNode)
+    def visit(self, node:cil.LesserNode):
+        return f'{node.dest} = {node.left} < {node.right}'
+    
+    @visitor.when(cil.VoidNode)
+    def visit(self, node:cil.VoidNode):
+        return f'{node.dest} = VOID'
+    
+    
 class COOLToCILVisitor():
     
     def __init__(self, context:Context, errors=[]):
@@ -153,6 +186,10 @@ class COOLToCILVisitor():
         return self.current_function.localvars
     
     @property
+    def labels(self):
+        return self.current_function.labels
+    
+    @property
     def instructions(self):
         return self.current_function.instructions
     
@@ -166,6 +203,12 @@ class COOLToCILVisitor():
         vinfo = VariableInfo('internal', None)
         return self.register_local(vinfo)
 
+    def define_label(self):
+        name = f'{self.current_function.name[9:]}_label_{len(self.labels)}'
+        label_node = cil.LabelNode(name)
+        self.labels.append(label_node)
+        return label_node
+        
     def register_instruction(self, instruction):
         self.instructions.append(instruction)
         return instruction
@@ -177,7 +220,7 @@ class COOLToCILVisitor():
         return f'function_{method_name}_at_{type_name}'
     
     def register_function(self, function_name):
-        function_node = cil.FunctionNode(function_name, [], [], [])
+        function_node = cil.FunctionNode(function_name, [], [], [], [])
         self.dotcode.append(function_node)
         return function_node
     
@@ -430,7 +473,160 @@ class COOLToCILVisitor():
         self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result))
         
         return result
+    
+    @visitor.when(LetNode)
+    def visit(self, node, scope):
+        # TODO
+        raise NotImplementedError()
+    
+    @visitor.when(CheckNode)
+    def visit(self, node, scope):
+        # TODO
+        raise NotImplementedError()
+    
+    @visitor.when(CaseNode)
+    def visit(self, node, scope):
+        # TODO
+        raise NotImplementedError()
+    
+    @visitor.when(IsVoidNode)
+    def visit(self, node, scope):
+        # TODO
+        raise NotImplementedError()
+    
+    @visitor.when(ConditionalNode)
+    def visit(self, node:ConditionalNode, scope):
         
+        result = self.define_internal_local()
+        condition_value = self.visit(node.condition, scope)
+        then_label = self.define_label()
+        end_label = self.define_label()
+        
+        self.register_instruction(cil.GotoIfNode(condition_value, then_label.label))
+        
+        else_value = self.visit(node.else_expr, scope)
+        self.register_instruction(cil.AssignNode(result, else_value))
+        self.register_instruction(cil.GotoNode(end_label.label))
+        
+        self.register_instruction(then_label)
+        then_value = self.visit(node.then_expr,scope)
+        self.register_instruction(cil.AssignNode(result, then_value))
+        
+        self.register_instruction(end_label)
+        return result
+        
+    @visitor.when(BlockNode)
+    def visit(self, node:BlockNode, scope):
+        result = self.define_internal_local()
+        for expr in node.expr_list:
+            result = self.visit(expr, scope)
+        return result
+
+    @visitor.when(WhileNode)
+    def visit(self, node:WhileNode, scope):
+        result = self.visit(VoidNode(None), scope)
+        start_label = self.define_label()
+        loop_label = self.define_label()
+        end_label = self.define_label()
+        
+        self.register_instruction(start_label)
+        condition_result = self.visit(node.condition, scope)
+        
+        self.register_instruction(cil.GotoIfNode(condition_result, loop_label.label))
+        self.register_instruction(cil.GotoNode(end_label.label))
+        
+        self.register_instruction(loop_label)
+        self.visit(node.expr, scope)
+        
+        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(end_label)
+        
+        return result
+    
+    @visitor.when(NotNode)
+    def visit(self, node, scope):
+        result = self.define_internal_local()
+        value = self.visit(node.member, scope)
+        self.register_instruction(cil.NotNode(result, value))
+        return result
+    
+    @visitor.when(RoofNode)
+    def visit(self, node:RoofNode, scope):
+        result = self.define_internal_local()
+        value = self.visit(node.member, scope)
+        self.register_instruction(cil.MinusNode(result, "0", value))
+        return result
+    
+    @visitor.when(EqualNode)
+    def visit(self, node:EqualNode, scope):
+        result = self.define_internal_local()
+        
+        value1 = self.visit(node.left, scope)
+        value2 = self.visit(node.right, scope)
+
+        self.register_instruction(cil.EqualNode(result, value1, value2))
+        
+        return result
+    
+    @visitor.when(GreaterNode)
+    def visit(self, node:GreaterNode, scope):
+        result = self.define_internal_local()
+        
+        value1 = self.visit(node.left, scope)
+        value2 = self.visit(node.right, scope)
+
+        self.register_instruction(cil.GreaterNode(result, value1, value2))
+        
+        return result
+    
+    @visitor.when(GreaterEqualNode)
+    def visit(self, node, scope):
+        result = self.define_internal_local()
+        
+        value1 = self.visit(node.left, scope)
+        value2 = self.visit(node.right, scope)
+
+        self.register_instruction(cil.LesserNode(result, value1, value2))
+        self.register_instruction(cil.NotNode(result, result))
+        
+        return result
+    
+    @visitor.when(LesserNode)
+    def visit(self, node, scope):
+        result = self.define_internal_local()
+        
+        value1 = self.visit(node.left, scope)
+        value2 = self.visit(node.right, scope)
+
+        self.register_instruction(cil.LesserNode(result, value1, value2))
+        
+        return result
+
+    @visitor.when(LesserEqualNode)
+    def visit(self, node, scope):
+        result = self.define_internal_local()
+        
+        value1 = self.visit(node.left, scope)
+        value2 = self.visit(node.right, scope)
+
+        self.register_instruction(cil.GreaterNode(result, value1, value2))
+        self.register_instruction(cil.NotNode(result, result))
+        
+        return result
+    
+    @visitor.when(VoidNode)
+    def visit(self, node, scope):
+        result = self.define_internal_local()
+        self.register_instruction(cil.VoidNode(result))
+        return result
+
+    @visitor.when(BoolNode)
+    def visit(self, node, scope):
+        ###############################
+        # node.lex -> str
+        ###############################
+        return "0" if node.lex.lower() == "false" else "1"
+    
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
         ###############################

@@ -22,11 +22,12 @@ class DataNode(Node):
         self.value = value
 
 class FunctionNode(Node):
-    def __init__(self, fname, params, localvars, instructions):
+    def __init__(self, fname, params, localvars, instructions, labels):
         self.name = fname
         self.params = params
         self.localvars = localvars
         self.instructions = instructions
+        self.labels = labels
 
 class ParamNode(Node):
     def __init__(self, name):
@@ -100,13 +101,17 @@ class TypeOfNode(InstructionNode):
         self.dest = dest
 
 class LabelNode(InstructionNode):
-    pass
+    def __init__(self, label) -> None:
+        self.label = label
 
 class GotoNode(InstructionNode):
-    pass
+    def __init__(self, label) -> None:
+        self.label = label
 
 class GotoIfNode(InstructionNode):
-    pass
+    def __init__(self, condition_value, label) -> None:
+        self.condition_value = condition_value
+        self.label = label
 
 class StaticCallNode(InstructionNode):
     def __init__(self, function, dest):
