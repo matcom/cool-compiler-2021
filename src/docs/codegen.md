@@ -47,3 +47,25 @@ Cada nodo de este nuevo AST se representa a si mismo en cil.
 
 ### Function Declaration Node \<func>
 
+```
+todo
+```
+
+### Function Declaration Node info() <func_info>
+
+```
+todo
+```
+
+### Attribute Declaration Node \<attr>
+
+```
+todo
+```
+
+### Attribute Declaration Node info() \<attr_info>
+
+```
+todo
+```
+
