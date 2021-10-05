@@ -90,6 +90,7 @@ def t_INTEGER(t):
     t.value = int(t.value)
     return t
 
+
 # Booleans are true=True or false=False
 def t_BOOL(t):
     r'[t][rR][uU][eE]|[f][aA][lL][sS][eE]'
@@ -115,11 +116,11 @@ t_STRING_ignore = ''
 
 
 # A string start with " caracter
-def t_STRING_start(t):
+def t_start_string(t):
     r'\"'
     t.lexer.push_state("STRING")  # Changes the lexing state and saves old on stack
-    t.lexer.string_backslashed = False
-    t.lexer.stringbuf = ""  # start string with no chart
+    t.lexer.string_backslash = False
+    t.lexer.string_buffer = ""  # start string with no chart
 
 
 # A non-escaped newline character may not appear in a string. Example:
@@ -129,63 +130,73 @@ def t_STRING_start(t):
 # "This is not
 # OK"
 def t_STRING_newline(t):
-    r"\n"
-    t.lexer.lineno += 1
-    if not t.lexer.string_backslashed:
-        print("A non-escaped newline character may not appear in a string")
-        t.lexer.skip(1)
+    r'\n'
+    if not t.lexer.string_backslash:  # FATAL ERROR
+        errors.append('(%s)- LexicographicError: STRING ERROR NON-ESCAPED NEWLINE CHARACTER' % t.lexer.lineno)
+        t.lexer.pop_state()
     else:
-        t.lexer.string_backslashed = False
+        t.lexer.string_backslash = False
+    t.lexer.lineno += 1
+
+
+# A string ends with " caracter
+def t_STRING_end(t):
+    r'\"'
+    if t.lexer.string_backslash:
+        t.lexer.string_buffer += '\"'
+        t.lexer.string_backslash = False
+    else:
+        t.lexer.pop_state()
+        t.value = t.lexer.string_buffer
+        t.type = "STRING"
+        return t
+
+
+def t_STRING_null(t):
+    r'\0'
+    errors.append('(%s)- LexicographicError: STRING NULL ERROR' % t.lexer.lineno)
+    t.lexer.skip(1)
 
 
 # Within a string, a sequence ‘\c’ denotes the character ‘c’, with the exception of the following:
 # \b backspace
 # \t tab
 # \f formfeed
-# \\ backsalached caracter
-# \n newline
-# A string may not contain EOF
+# \\ backslash caracter
 # A string may not contain the null
-def t_STRING_no_newline(t):
-    r"[^\n]"
-    if not t.lexer.string_backslashed:  # if the previosur chat is not '\'
+def t_STRING_something(t):
+    r'[^\n]'
+    if not t.lexer.string_backslash:  # if the previosur chat is not '\'
         if t.value == '\\':
-            t.lexer.string_backslashed = True  # backsalached caracter
+            t.lexer.string_backslash = True  # backslash caracter
         else:
-            t.lexer.stringbuf += t.value  # no backsalached caracter situation
+            t.lexer.string_buffer += t.value  # no backslash caracter situation
     else:
-        t.lexer.string_backslashed = False
-        if t.value == 0:  # A string may not contain the null (character \0). Check for EOF??
-            print('A string may not contain the null')
-            t.lexer.skip(1)
-        elif t.value == 'b':  # \b backspace
-            t.lexer.stringbuf = '\b'
+        t.lexer.string_backslash = False
+        if t.value == 'b':  # \b backspace
+            t.lexer.string_buffer += '\b'
         elif t.value == 't':  # \t tab
-            t.lexer.stringbuf = '\t'
+            t.lexer.string_buffer += '\t'
         elif t.value == 'f':  # \f formfeed
-            t.lexer.stringbuf = '\f'
-        elif t.value == '\\':  # \\ backsalached caracter
-            t.lexer.stringbuf = '\\'
+            t.lexer.string_buffer += '\f'
+        elif t.value == '\\':  # \\ backslash caracter
+            t.lexer.string_buffer += '\\'
+            t.lexer.string_backslash = True
         else:
-            t.lexer.stringbuf += t.value
-
-
-# A string ends with " caracter
-def t_STRING_end(t):
-    r"\""
-    if t.lexer.string_backslashed:
-        t.lexer.stringbuf += '"'
-        t.lexer.string_backslashed = False
-    else:
-        t.lexer.pop_state()
-        t.value = t.lexer.stringbuf
-        return t
+            t.lexer.string_buffer += t.value
 
 
 # String Error handling
 def t_STRING_error(t):
-    lexer_errors.append('Illegal string character "%s" at line %s' % (t.value[0], t.lexer.lineno))
+    errors.append('(%s)- LexicographicError: STRING ERROR %s ' % (t.lexer.lineno, t.value[0]))
     t.lexer.skip(1)
+
+
+# A string may not contain EOF
+# STRING EOF handling
+def t_STRING_eof(t):
+    if t.lexer.current_state():
+        errors.append('(%s)- LexicographicError: EOF ERROR IN STRING STATE' % t.lexer.lineno)
 
 
 # Exist two forms of comments in Cool:
@@ -197,19 +208,21 @@ t_COMMENT_ignore = ''
 # COMMENT TYPE 1:  “--” and the next newline (or EOF, if there is no next newline)
 def t_COMMENT(t):
     r'\-\-[^\n]*'
-    pass
+    t.value = t.value[2:]
+    return t
 
 
 # COMMENT TYPE 2:  enclosing text in (∗ . . . ∗)
 def t_start_comment(t):
-    r"\(\*"
+    r'\(\*'
     t.lexer.push_state("COMMENT")  # Changes the lexing state and saves old on stack
     t.lexer.comment_count = 0
+    t.lexer.string_buffer = ""
 
 
 # A comment start with " (* "
 def t_COMMENT_start(t):
-    r"\(\*"
+    r'\(\*'
     t.lexer.comment_count += 1
 
 
@@ -221,17 +234,33 @@ def t_COMMENT_newline(t):
 
 # A comment finish with " *) "
 def t_COMMENT_end(t):
-    r"\*\)"
+    r'\*\)'
     if t.lexer.comment_count == 0:
         t.lexer.pop_state()
+        t.value = t.lexer.string_buffer
+        t.type = "COMMENT"
+        return t
     else:
         t.lexer.comment_count -= 1
 
 
+# any caracter in a COMMENT
+def t_COMMENT_something(t):
+    r'[^\n]'
+    t.lexer.string_buffer += t.value
+
+
 # Comment Error handling
 def t_COMMENT_error(t):
-    lexer_errors.append('Comment error at line %s' % t.lexer.lineno)
+    errors.append('(%s)- LEXICOGRAPHIC ERROR: COMMENT ERROR ' % t.lexer.lineno)
     t.lexer.skip(1)
+
+
+# comment may not contain EOF
+# Comment EOF handling
+def t_COMMENT_eof(t):
+    if t.lexer.current_state():
+        errors.append('(%s)- LexicographicError: EOF ERROR IN COMMENT STATE' % t.lexer.lineno)
 
 
 # Ignore blanks, tabs, carriage return, form feed
@@ -246,15 +275,13 @@ def t_newline(t):
 
 # Error handling rule
 def t_error(t):
-    lexer_errors.append('Illegal character "%s" at line %s' % (t.value[0], t.lexer.lineno))
+    errors.append('(%s)- LexicographicError: ILLEGAL CHARACTER "%s"' % (t.lexer.lineno, t.value[0]))
     t.lexer.skip(1)
 
 
 def tokenize(text: str) -> lex.Lexer:
+    global errors
     errors = []
     lexer = lex.lex()
     lexer.input(text)
-    return lexer
-
-
-lexer_errors = []
+    return lexer, errors
