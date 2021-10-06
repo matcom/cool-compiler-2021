@@ -1,21 +1,412 @@
 		.data
-
-_abort_msg:	    .asciiz "Abort called from class "
-_colon_msg:	    .asciiz ":"
-_dispatch_msg:  .asciiz ": Dispatch to void.\n"
-_cabort_msg:	.asciiz "No match in case statement for Class "
-_cabort_msg2:   .asciiz "Match on void in case statement.\n"
-_nl:		    .asciiz "\n"
-_term_msg:	    .asciiz "COOL program successfully executed\n"
-_sabort_msg1:	.asciiz	"Index to substr is negative\n"
-_sabort_msg2:	.asciiz	"Index to substr is too big\n"
-_sabort_msg3:	.asciiz	"Length to substr too long\n"
-_sabort_msg4:	.asciiz	"Length to substr is negative\n"
-_sabort_msg:	.asciiz "Execution aborted.\n"
-_objcopy_msg:	.asciiz "Object.copy: Invalid object size.\n"
-_gc_abort_msg:	.asciiz "GC bug!\n"
-
+string_const_0:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_0
+		.ascii	""
+		.byte	0
+		.word	-1
+string_const_1:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_1
+		.ascii	"Object"
+		.byte	0
+		.word	-1
+string_const_2:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_2
+		.ascii	"IO"
+		.byte	0
+		.word	-1
+string_const_3:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_3
+		.ascii	"Int"
+		.byte	0
+		.word	-1
+string_const_4:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_1
+		.ascii	"String"
+		.byte	0
+		.word	-1
+string_const_5:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_4
+		.ascii	"Bool"
+		.byte	0
+		.word	-1
+string_const_6:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_3
+		.ascii	"A_b"
+		.byte	0
+		.word	-1
+string_const_7:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_4
+		.ascii	"Main"
+		.byte	0
+		.word	-1
+string_const_8:
+		.word	3
+		.word	6
+		.word	String_disp
+		.word	int_const_4
+		.ascii	"Hola"
+		.byte	0
+		.word	-1
+int_const_0:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	0
+		.word	-1
+int_const_1:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	6
+		.word	-1
+int_const_2:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	2
+		.word	-1
+int_const_3:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	3
+		.word	-1
+int_const_4:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	4
+		.word	-1
+int_const_5:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	800
+		.word	-1
+int_const_6:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	5
+		.word	-1
+bool_const_0:
+		.word	4
+		.word	4
+		.word	Bool_disp
+		.word	0
+		.word	-1
+bool_const_1:
+		.word	4
+		.word	4
+		.word	Bool_disp
+		.word	1
+		.word	-1
+name_tab:
+		.word	string_const_1
+		.word	string_const_2
+		.word	string_const_3
+		.word	string_const_4
+		.word	string_const_5
+		.word	string_const_6
+		.word	string_const_7
+object_tab:
+		.word	Object_proto
+		.word	Object_init
+		.word	IO_proto
+		.word	IO_init
+		.word	Int_proto
+		.word	Int_init
+		.word	String_proto
+		.word	String_init
+		.word	Bool_proto
+		.word	Bool_init
+		.word	A_b_proto
+		.word	A_b_init
+		.word	Main_proto
+		.word	Main_init
+Object_disp:
+		.word	Object_abort
+		.word	Object_type_name
+		.word	Object_copy
+IO_disp:
+		.word	Object_abort
+		.word	Object_type_name
+		.word	Object_copy
+		.word	IO_out_string
+		.word	IO_out_int
+		.word	IO_in_string
+		.word	IO_in_int
+Int_disp:
+		.word	Object_abort
+		.word	Object_type_name
+		.word	Object_copy
+String_disp:
+		.word	Object_abort
+		.word	Object_type_name
+		.word	Object_copy
+		.word	String_length
+		.word	String_concat
+		.word	String_substr
+Bool_disp:
+		.word	Object_abort
+		.word	Object_type_name
+		.word	Object_copy
+A_b_disp:
+		.word	Object_abort
+		.word	Object_type_name
+		.word	Object_copy
+Main_disp:
+		.word	Object_abort
+		.word	Object_type_name
+		.word	Object_copy
+		.word	IO_out_string
+		.word	IO_out_int
+		.word	IO_in_string
+		.word	IO_in_int
+		.word	Main_main
+		.word	Main_suma
+Object_proto:
+		.word	0
+		.word	3
+		.word	Object_disp
+		.word	-1
+IO_proto:
+		.word	1
+		.word	3
+		.word	IO_disp
+		.word	-1
+Int_proto:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	0
+		.word	-1
+String_proto:
+		.word	3
+		.word	5
+		.word	String_disp
+		.word	int_const_0
+		.word	0
+		.word	-1
+Bool_proto:
+		.word	4
+		.word	4
+		.word	Bool_disp
+		.word	0
+		.word	-1
+A_b_proto:
+		.word	5
+		.word	7
+		.word	A_b_disp
+		.word	int_const_0
+		.word	0
+		.word	string_const_0
+		.word	bool_const_0
+		.word	-1
+Main_proto:
+		.word	6
+		.word	4
+		.word	Main_disp
+		.word	int_const_0
+		.word	-1
 heap:
 		.word	0
-
 		.text
+Object_init:
+		addiu   $sp $sp -12
+		sw		$fp 12($sp)
+		sw		$s0 8($sp)
+		sw		$ra 4($sp)
+		addiu	$fp $sp 4
+		move	$s0 $a0
+		move	$a0 $s0
+		lw		$fp 12($sp)
+		lw		$s0 8($sp)
+		lw		$ra 4($sp)
+		addiu	$sp $sp 12
+		jr	$ra
+IO_init:
+		addiu	$sp $sp -12
+		sw		$fp 12($sp)
+		sw		$s0 8($sp)
+		sw		$ra 4($sp)
+		addiu	$fp $sp 4
+		move	$s0 $a0
+		jal		Object_init
+		move	$a0 $s0
+		lw		$fp 12($sp)
+		lw		$s0 8($sp)
+		lw		$ra 4($sp)
+		addiu	$sp $sp 12
+		jr	$ra	
+Int_init:
+		addiu	$sp $sp -12
+		sw		$fp 12($sp)
+		sw		$s0 8($sp)
+		sw		$ra 4($sp)
+		addiu	$fp $sp 4
+		move	$s0 $a0
+		jal		Object_init
+		move	$a0 $s0
+		lw		$fp 12($sp)
+		lw		$s0 8($sp)
+		lw		$ra 4($sp)
+		addiu	$sp $sp 12
+		jr	$ra
+String_init:
+		addiu	$sp $sp -12
+		sw		$fp 12($sp)
+		sw		$s0 8($sp)
+		sw		$ra 4($sp)
+		addiu	$fp $sp 4
+		move	$s0 $a0
+		jal		Object_init
+		move	$a0 $s0
+		lw		$fp 12($sp)
+		lw		$s0 8($sp)
+		lw		$ra 4($sp)
+		addiu	$sp $sp 12
+		jr		$ra	
+Bool_init:
+		addiu	$sp $sp -12
+		sw		$fp 12($sp)
+		sw		$s0 8($sp)
+		sw		$ra 4($sp)
+		addiu	$fp $sp 4
+		move	$s0 $a0
+		jal		Object_init
+		move	$a0 $s0
+		lw		$fp 12($sp)
+		lw		$s0 8($sp)
+		lw		$ra 4($sp)
+		addiu	$sp $sp 12
+		jr		$ra	
+A_b_init:
+		addiu   $sp -12
+		sw      $fp 12($sp)
+		sw      $s0 8($sp)
+		sw      $ra 4($sp)
+        la      $a0 int_const_3
+        sw      $a0 12($s0)
+        la      $a0 string_const_8
+        sw      $a0 20($s0)
+        la      $a0 bool_const_1
+        sw      $a0 24($s0)
+		lw      $fp 12($sp)
+		lw      $s0 8($sp)
+		lw      $ra 4($sp)
+		addiu   $sp $sp 12
+		jr      $ra
+Main_init:
+		addiu   $sp -12
+		sw      $fp 12($sp)
+		sw      $s0 8($sp)
+		sw      $ra 4($sp)
+        la      $a0 int_const_5
+        sw      $a0 12($s0)
+		lw      $fp 12($sp)
+		lw      $s0 8($sp)
+		lw      $ra 4($sp)
+		addiu   $sp $sp 12
+		jr      $ra
+
+Object.copy:
+		addiu	$sp $sp -8			# create stack frame
+		sw		$ra 8($sp)			# save $ra in stack 
+		sw		$a0 4($sp)			# save proto in stack
+
+		lw		$a0 4($sp)			
+		jal		object_copy_allocate
+		
+		addiu	$gp $gp 4			# add 4 for new object
+
+		lw		$a0 4($sp)			# the self object
+		lw		$ra 8($sp)			# restore return address
+		addiu	$sp $sp 8			# remove frame
+
+		jr		$ra					# return
+
+object_copy_allocate:
+		addiu	$sp $sp -8			
+		sw		$ra 8($sp)			# save ra
+		sw		$gp 4($sp)			# save gp
+		
+		lw		$t1 4($a0)			# get object size
+while:
+		beq		$0 $t1	end_while	# if t1 == 0 jump 
+		
+		lw		$t0	0($a0)
+		sw		$t0 0($gp)
+
+		addiu	$gp $gp	4
+		addiu	$a0 $a0	4
+
+		addiu	$t1 $t1	-1
+		jal		while
+end_while:
+
+		li		$t0 -1				
+		sw		$t0	0($gp)			# add -1 on end
+
+		lw		$v0 4($sp)			# get ra
+		lw		$ra 8($sp)			# get ra
+		addiu	$sp $sp 8 			
+		
+		jr		$ra					# return
+Main.main:
+		addiu   $sp -12
+		sw      $fp 12($sp)
+		sw      $s0 8($sp)
+		sw      $ra 4($sp)
+        la      $a0 int_const_6
+        sw      $a0 12($s0)
+		lw      $fp 12($sp)
+		lw      $s0 8($sp)
+		lw      $ra 4($sp)
+		addiu   $sp $sp 12
+		jr      $ra
+Main.suma:
+		addiu   $sp -12
+		sw      $fp 12($sp)
+		sw      $s0 8($sp)
+		sw      $ra 4($sp)
+		lw      $fp 12($sp)
+		lw      $s0 8($sp)
+		lw      $ra 4($sp)
+		addiu   $sp $sp 12
+		jr      $ra
+main:
+		la		$a0 Main_proto		# create the Main object
+		jal		Object.copy			# Call copy
+		
+		move	$s0 $v0
+		
+		jal		Main_init			# initialize the Main object
+		jal		Main.main			# Invoke main method
+		
+		li 		$v0 10
+		syscall						# syscall 10 (exit)

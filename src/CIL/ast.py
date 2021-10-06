@@ -48,11 +48,13 @@ class DataNode(Node):
         return f'{self.id} = "{self.value}";'
 
 class CodeNode(Node):
-    def __init__(self, id, params, locals, instrs):
+    def __init__(self, type, id, params, locals, instrs, parent=None):
         self.id = id
+        self.type = type
         self.params = params
         self.locals = locals
         self.instrs = instrs
+        self.parent = parent
 
     def __str__(self):
         params_text = ''
@@ -66,8 +68,14 @@ class CodeNode(Node):
         instr_text = ''
         for instr in self.instrs:
             instr_text += f'\t{instr}\n'
-        
-        return f'function {self.id} {{\n{params_text}\n{local_text}\n{instr_text}}}\n'
+
+        if not self.type:
+            self.name = self.id
+        elif self.id == 'init':
+            self.name = f'{self.type}_{self.id}'
+        else:
+            self.name = f'{self.type}.{self.id}'
+        return f'function {self.name} {{\n{params_text}\n{local_text}\n{instr_text}}}\n'
 
 class LocalNode(Node):
     def __init__(self, id):

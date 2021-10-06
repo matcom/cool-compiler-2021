@@ -63,7 +63,7 @@ def main():
     builder(ast, context, errors)
     scope = check(ast, context, errors)
     cil_ast = cil(ast, context, cil_file)
-    #mips(cil_ast, output_file)
+    mips(cil_ast, output_file)
 
     exit(0) 
 

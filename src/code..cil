@@ -36,33 +36,74 @@ type Bool{
 	method type_name:Object_type_name ;
 	method copy:Object_copy ;
 }
-type Main{
+type A_b{
+	attribute x ;
+	attribute b ;
+	attribute c ;
+	attribute d ;
 	method abort:Object_abort ;
 	method type_name:Object_type_name ;
 	method copy:Object_copy ;
+}
+type Main{
+	attribute x ;
+	method abort:Object_abort ;
+	method type_name:Object_type_name ;
+	method copy:Object_copy ;
+	method out_string:IO_out_string ;
+	method out_int:IO_out_int ;
+	method in_string:IO_in_string ;
+	method in_int:IO_in_int ;
 	method main:Main_main ;
+	method suma:Main_suma ;
 }
 
 .DATA
 
+data_0 = "Hola";
 
 .CODE
 
-function main {
+function A_b_init {
+	 PARAM self ;
 
 	 LOCAL local_0 ;
-	 LOCAL local_1 ;
 
-	local_0 = ALLOCATE Main ;
-	ARG local_0 ;
-	local_1 = CALL main ;
+	SETATTR self x 3 ;
+	local_0 = LOAD data_0 ;
+	SETATTR self c local_0 ;
+	SETATTR self d 1 ;
+	RETURN self ;
+}
+
+function Main_init {
+	 PARAM self ;
+
+
+	SETATTR self x 800 ;
+	RETURN self ;
 }
 
 function Main.main {
 	 PARAM self ;
-	 PARAM c ;
 
 
-	RETURN 1 ;
+	SETATTR self x 5 ;
+	RETURN 5 ;
+}
+
+function Main.suma {
+	 PARAM self ;
+	 PARAM a ;
+	 PARAM b ;
+
+	 LOCAL local_0 ;
+	 LOCAL local_1 ;
+	 LOCAL local_2 ;
+
+	local_0 = a ;
+	local_1 = b ;
+	local_2 = local_0 + local_1 ;
+	RETURN local_2 ;
 }
 

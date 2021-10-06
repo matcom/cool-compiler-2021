@@ -40,8 +40,7 @@ def builder_init(self):
             self.instructions.append(SetAttributeNode(self.params[0], attr.name, attr.expr.computed_value))
 
     self.instructions.append(ReturnNode(self.params[0]))
-
-    return CodeNode(f'{self.current.name}_init', self.params, self.locals.values(), self.instructions)
+    return CodeNode(f'{self.current.name}', f'init', self.params, self.locals.values(), self.instructions, self.current.parent)
 
 def builder_params(metho):
     params = {'self': ParamNode('self')}
@@ -50,7 +49,7 @@ def builder_params(metho):
     return params
 
 def builder_main():
-    return CodeNode('main', [], 
+    return CodeNode(None, 'main', [], 
     [
         LocalNode('local_0'),
         LocalNode('local_1')

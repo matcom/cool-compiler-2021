@@ -16,7 +16,7 @@ class CIL:
     @visitor.when(ProgramNode)
     def visit(self, node):
         self.data = {}
-        self.code = [builder_main()]
+        self.code = []
         self.types = builder_types(self.context)
 
         for def_class in node.class_list:
@@ -28,8 +28,7 @@ class CIL:
     def visit(self, node):
         self.current = self.context.get_type(node.type.value)
         
-        if self.current.attributes:
-            self.code.append(builder_init(self))
+        self.code.append(builder_init(self))
 
         for feature in node.feature_list:
             self.visit(feature)
@@ -44,7 +43,7 @@ class CIL:
         self.visit(node.expr)
 
         self.instructions.append(cil.ReturnNode(node.expr.computed_value))
-        self.code.append(cil.CodeNode(f'{self.current.name}.{node.id.value}', self.params, self.locals.values(), self.instructions))
+        self.code.append(cil.CodeNode(f'{self.current.name}', f'{node.id.value}', self.params, self.locals.values(), self.instructions))
 
     @visitor.when(LetNode)
     def visit(self, node):
@@ -310,8 +309,7 @@ class CIL:
     @visitor.when(AssignmentNode)
     def visit(self, node):
         self.visit(node.expr)
-        node.computed_value = self.add_local()
-        self.instructions.append(cil.AssignmentNode(node.computed_value, node.expr.computed_value))
+        node.computed_value = node.expr.computed_value
         try:
             self.locals[node.id.value]
             self.instructions.append(cil.AssignmentNode(node.id.value, node.computed_value))
