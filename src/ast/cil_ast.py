@@ -10,8 +10,58 @@ class Node:
 class ExpressionNode:
     pass
 
-class StringNode(Node):
+class AtomicNode(ExpressionNode):
     pass
+
+class StringNode(AtomicNode):
+    pass
+
+class IntNode(AtomicNode):
+    pass
+
+class VariableNode(ExpressionNode):
+    pass
+
+class VarDeclarationNode(ExpressionNode):
+    pass
+
+class LetNode(ExpressionNode):
+    pass
+
+class LoopNonde(ExpressionNode):
+    pass
+
+class CaseOptionNode(ExpressionNode):
+    pass
+
+class CaseNode(ExpressionNode):
+    def __init__(self, case_expr:ExpressionNode, options:List[CaseOptionNode]) -> None:
+        super().__init__()
+        self.case_expr = case_expr
+        self.options = options
+
+class ConditionalNode(ExpressionNode):
+    def __init__(self, condition:ExpressionNode, then_node:ExpressionNode, else_node:ExpressionNode) -> None:
+        super().__init__()
+        self.condition = condition
+        self.then_node = then_node
+        self.else_node = else_node
+
+    def __str__(self):
+        # ToDo
+        pass
+
+class BlocksNode(ExpressionNode):
+    def __init__(self, expression_list:List[ExpressionNode]) -> None:
+        super().__init__()
+        self.expression_list = expression_list
+
+    def __str__(self):
+        block_str = "{\n"
+        block_str += ";\n".join(expression for expression in self.expression_list)
+        block_str += ";\n}\n"
+        return block_str
+
 
 class LetVarDeclarationNode(ExpressionNode):
     def __init__(self, idx:str, typex:str, expression=None):
