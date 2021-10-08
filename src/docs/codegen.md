@@ -117,7 +117,7 @@ let <id1>:<type1>, ... <idn>:<typen> in <expr>
 ...
 <init idn>
 
-# Si existe alguna variable let inicializada con una expresion, ejecutarla
+# Si existe alguna variable let inicializada con una expresion, ejecutar dicha expresion
 <do_idq_expr_and_save_to_idq>
 <do_idk_expr_and_save_to_idk>
 ...
