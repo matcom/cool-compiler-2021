@@ -49,7 +49,7 @@ class ConstructorCreator:
             attrs += [
                 feature
                 for feature in ancestor.features
-                if isinstance(feature, ast.Attribute)
+                if isinstance(feature, ast.AttrDeclarationNode)
             ]
 
         expressions: List[ast.ExprNode] = []
@@ -59,7 +59,7 @@ class ConstructorCreator:
             if expr:
                 expressions.append(expr)
 
-        body = ast.BlockNode(expr)
+        body = ast.BlockNode(expressions)
         constructor = ast.MethodDeclarationNode(
             "__init__", [], self.current_type.name, body
         )

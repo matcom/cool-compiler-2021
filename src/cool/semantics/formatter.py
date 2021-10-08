@@ -52,7 +52,9 @@ class CodeBuilder:
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode, tabs: int = 0):
         body = ";\n".join(self.visit(child, tabs + 1) for child in node.expressions)
-        return "    " * tabs + f"{{\n{body};\n" + "    " * tabs + "}"
+        if body:
+            body += ";"
+        return "    " * tabs + f"{{\n{body}\n" + "    " * tabs + "}"
 
     @visitor.when(ast.ConditionalNode)
     def visit(self, node: ast.ConditionalNode, tabs: int = 0):

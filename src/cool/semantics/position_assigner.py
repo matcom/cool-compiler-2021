@@ -363,12 +363,27 @@ class PositionAssigner:
         *
         new type
         """
+        
         token = self.tokens[self.position]
+
+        count = 0
+        while token.lex == "(":
+            count += 1
+            self.inc_position()
+            token = self.tokens[self.position]
+
+
+        assert token.lex == "new", f"Expected 'new' instead of '{token.lex}'" 
+
         node.set_main_position(token.line, token.column)
 
         token = self.tokens[self.position + 1]
         node.type_position = token.line, token.column
         self.inc_position(2)  # ends after `type`
+
+        while count:
+            self.inc_position()
+            count -= 1
 
     @visitor.when(ast.NegationNode)
     def visit(self, node: ast.NegationNode):

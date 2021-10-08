@@ -11,6 +11,7 @@ from cool.grammar import Token, serialize_parser_and_lexer
 from cool.lexertab import CoolLexer
 from cool.parsertab import CoolParser
 from cool.semantics import (
+    CodeBuilder,
     OverriddenMethodChecker,
     PositionAssigner,
     TypeBuilderForFeatures,
@@ -19,6 +20,7 @@ from cool.semantics import (
     TypeCollector,
     topological_sorting,
 )
+from cool.code_generation import ConstructorCreator
 from cool.semantics.utils.scope import Context, Scope
 
 app = typer.Typer()
@@ -114,12 +116,15 @@ def compile(
         exit(1)
 
     PositionAssigner(tokens).visit(ast)
-    ast, _, _, errors = check_semantics(ast, Scope(), Context(), [])
+    ast, scope, context, errors = check_semantics(ast, Scope(), Context(), [])
 
     if errors or parser.contains_errors:
         for e in errors:
             log_error(e)
         exit(1)
+
+    ast = ConstructorCreator(context).visit(ast, scope)
+    log_success(CodeBuilder().visit(ast))
 
     exit(0)
 
