@@ -25,11 +25,11 @@ with open(path, 'r') as _file:
     if errors.any(): sys.exit(1)
 
     visitorList = [ CreateType ]
-
+ 
     for visitorClass in visitorList:
         ast = visitorClass(errors).visit(ast)
         if errors.any(): sys.exit(1)
 
-    
+
 
     

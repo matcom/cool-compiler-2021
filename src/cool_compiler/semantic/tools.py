@@ -13,30 +13,38 @@ def defVisitClass(*func):
     return Visit
 
 class VisitBase:
-    def __init__(self, global_class) -> None:
-        self.gclss : VisitorBase = global_class
-    
-    def visit(self, *args, **kw):
-        pass
-    
     def get_type(self, type_name, error_handler):
-        find_result = find_type(type_name, self.gclss.global_types)
+        find_result = find_type(type_name, self.global_types)
         return find_result.get_value( if_fail_do= error_handler().add_semantic_error )
     
     def visit_all(self, list_node, *args):
         result = []
         for n in list_node:
-            result.append(self.gclss.visit(n, *args))
+            result.append(self.visit(n, *args))
         
         return result
+    
+    def get_se_handler(self, node):
+        return self.cool_error.get_handler(node.lineno, node.index)
+
+
+    def get_parent_type(self, node, error_handler):
+        if node.parent is None: return Object()
+            
+        find_result = find_type(node.parent, self.global_types)
+        parent_type = find_result.get_value( if_fail_do= error_handler().add_semantic_error )
+            
+        if parent_type.is_shield or parent_type.name == self.current_type.name: 
+            error_handler().add_semantic_error( f"class {self.current_type.name} can't be inherited from {parent_type.name}" )
+            return ErrorType()
+
+        return parent_type 
+
 
 class VisitorBase:
     def __init__(self, error) -> None:
         self.cool_error = error
         self.current_type : Type = None
-    
-    def get_se_handler(self, node):
-        return self.cool_error.get_handler(node.lineno, node.index)
     
     def type_checking(self, tbase : Type, ttype : Type):
         if tbase.is_self_type : tbase = self.current_type
@@ -46,10 +54,6 @@ class VisitorBase:
             return False
         
         return True
-    
-    def visit(self, *args, **kw):
-        pass
-        
 
 class Result:
     def __init__(self, succ, result, error) -> None:

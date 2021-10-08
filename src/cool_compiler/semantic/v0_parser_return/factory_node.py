@@ -1,4 +1,4 @@
-from .__dependency import factory, decored, Nodes
+from ..__dependency import factory, decored, Nodes
 from .factory_return_ast import *
 
 @factory
