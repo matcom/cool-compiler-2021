@@ -162,6 +162,48 @@ def p_atomSelf(p):
     'atom : SELF'
     p[0] = SelfNode(None)
 
+def p_atomIF(p):
+    'atom : IF expr THEN expr ELSE expr FI'
+    p[0] = IfNode(p[2], p[4], p[6])
+
+def p_atomCicle(p):
+    'atom : WHILE expr LOOP expr POOL'
+
+def p_atomBlock(p):
+    'atom : LBRACE expr_list RBRACE'
+    p[0] = BlockNode(p[2])
+
+def p_atomLet(p):
+    'atom : LET atr_decl_list IN expr'
+    p[0] = LetNode(p[2], p[4])
+
+def p_atr_decl_list(p):
+    '''atr_decl_list : def_attr
+                     | def_attr COMMA atr_decl_list    
+    
+    '''
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[3]
+
+def p_atomCase(p):
+    'atom : CASE expr OF case_list ESAC'
+    p[0] = CaseNode(p[2], p[4])
+
+def p_caseList(p):
+    '''case_list : ID DOUBLE_DOT ID RIGHT_ARROW expr SEMICOLON
+                 | ID DOUBLE_DOT ID RIGHT_ARROW expr SEMICOLON case_list
+    '''
+    if len(p) == 7:
+        p[0] = [AttrDeclarationNode(p[1], p[3], p[5])]
+    else:
+        p[0] = [AttrDeclarationNode(p[1], p[3], p[5])] + p[7]
+
+def p_atomIsVoid(p):
+    'atom : ISVOID atom'
+    p[0] = IsVoidNode(p[2])
+
 def p_func_call(p):
     '''func_call : factor DOT ID LPAREN arg_list RPAREN
     '''
@@ -169,6 +211,24 @@ def p_func_call(p):
         p[0] = CallNode(p[1], p[3], p[5])
     else:
         p[0] = CallNode(p[1], p[3])
+
+def p_func_call2(p):
+    'func_call : ID LPAREN arg_list RPAREN'
+    print("#######################")
+    for i in range(len(p)):
+        print(p[i])
+    print("##########################")
+    if not p[3][0] is None:
+        p[0] = CallNode(None, p[1], p[3])
+    else:
+        p[0] = CallNode(None, p[1])
+
+def p_func_call3(p):
+    'func_call : factor ARROBA ID DOT ID LPAREN arg_list RPAREN'
+    if not p[7][0] is None:
+        p[0] = CallNode(p[1], p[5], args = p[7], type = p[3])
+    else:
+        p[0] = CallNode(p[1], p[5], args = None, type = p[3])
 
 
 def p_arg_list(p):
@@ -212,10 +272,8 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = '''class A inheritS B{ 
-    a:int ;
-    f(a:int,b:bool,c:hijo):hello{hola <- f()};
-
+data = '''class A {
+    a:a<- isvoid f.f().f()@T.f();
     };'''  
 parser = yacc.yacc()
 result = parser.parse(data)

@@ -17,6 +17,14 @@ class DeclarationNode(Node):
 class ExpressionNode(Node):
     pass
 
+class AtomicNode(ExpressionNode):
+    def __init__(self, lex):
+        self.lex = lex
+
+    def visit(self, tabs = 0):
+        node = self
+        return '\t' * tabs + f'\\__ {node.__class__.__name__}: {node.lex}'
+
 class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None):
         self.id = idx
@@ -70,7 +78,7 @@ class VarDeclarationNode(ExpressionNode):
         expr = node.expr.visit( tabs + 1)
         return f'{ans}\n{expr}'
 
-class AssignNode(ExpressionNode):
+class AssignNode(AtomicNode):
     def __init__(self, idx, expr):
         self.id = idx
         self.expr = expr
@@ -81,36 +89,104 @@ class AssignNode(ExpressionNode):
         expr = node.expr.visit( tabs + 1)
         return f'{ans}\n{expr}'
 
-class CallNode(ExpressionNode):
-    def __init__(self, obj, idx, type = None, args = None):
+class IsVoidNode(AtomicNode):
+    def __init__(self, expr):
+        self.expr = expr
+    
+    def visit(self, tabs = 0):
+        ans = '\t'*tabs + "\\__IsVoid <expr>"
+        return ans + '\n' + '\t'*(tabs+1) + self.expr.visit()
+        
+
+class CallNode(AtomicNode):
+    def __init__(self, obj, idx, args = None, type = None):
         self.obj = obj
         self.id = idx
         self.args = args
+        self.type = type
 
     def visit(self, tabs = 0):
         node = self
-        obj = node.obj.visit( tabs + 1)
-        
-        if not self.args is None:
-            ans = '\t' * tabs + f'\\__CallNode: <obj>.{node.id}(<expr>, ..., <expr>)'
+        if not self.obj is None:
+            obj = node.obj.visit( tabs + 1)
         else:
-            ans = '\t' * tabs + f'\\__CallNode: <obj>.{node.id}()'
+            obj = ""
+        if not self.type is None:
+            arroba = f'@{self.type}'
+        else:
+            arroba = ""
+
+        if not self.args is None:
+            ans = '\t' * tabs + f'\\__CallNode: <obj>{arroba}.{node.id}(<expr>, ..., <expr>)'
+        else:
+            ans = '\t' * tabs + f'\\__CallNode: <obj>{arroba}.{node.id}()'
         if not self.args is None:
             args = '\n'.join(arg.visit( tabs + 1) for arg in node.args)
         else:
             args = ""
-        if self.type is None:
-            return f'{ans}\n{obj}\n{args}'
-        else:
-            return f'@{self.type}{ans}\n{obj}\n{args}'
-
-class AtomicNode(ExpressionNode):
-    def __init__(self, lex):
-        self.lex = lex
-
+        
+        return f'{ans}\n{obj}\n{args}'
+        
+class IfNode(AtomicNode):
+    def __init__(self, if_c, then_c, else_c):
+        self.if_c = if_c
+        self.then_c = then_c
+        self.else_c = else_c
+        
     def visit(self, tabs = 0):
         node = self
-        return '\t' * tabs + f'\\__ {node.__class__.__name__}: {node.lex}'
+        ans = '\t'*tabs + 'if <expr> then <expr> else <expr> fi'
+        ans += "\n" + '\t'*(tabs +1) + "IF: " + self.if_c.visit()
+        ans += "\n" + '\t'*(tabs +1) + "then: " + self.then_c.visit()
+        ans += "\n" + '\t'*(tabs +1) + "else: " + self.else_c.visit()
+        return ans
+
+class WhileNode(AtomicNode):
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+        
+    def visit(self, tabs = 0):
+        node = self
+        ans = '\t'*tabs + 'while <expr> loop <expr> pool'
+        ans += "\n" + '\t'*(tabs +1) + "condition: " + self.if_c.visit()
+        ans += "\n" + '\t'*(tabs +1) + "body: " + self.then_c.visit()
+        
+        return ans
+
+class BlockNode(AtomicNode):
+    def __init__(self, expr_list):
+        self.expr_list = expr_list
+
+    def visit(self, tabs = 0):
+        ans = '\t'*tabs + " {<expr>; .... <expr>;}\n"
+        exprs = '\n'.join(param.visit( tabs + 1) for param in self.expr_list)
+        return ans+exprs
+
+class LetNode(AtomicNode):
+    def __init__(self, list_decl, expr):
+        self.list_decl = list_decl
+        self.expr = expr
+
+    def visit(self, tabs = 0):
+        ans = '\t'*tabs + " LET <decl>, <decl> ... <decl> in <expr>\n "
+        decl = '\n'.join('\t'*(tabs+1) + "decl: " + param.visit()  for param in self.list_decl)
+        expr = "\n" + "IN" + self.expr.visit(tabs+1)
+        return ans+decl+expr
+
+class CaseNode(AtomicNode):
+    def __init__(self, expr, list_case):
+        self.list_case = list_case
+        self.expr = expr
+
+    def visit(self, tabs = 0):
+        ans = '\t'*tabs + "\\__Case <expre> in <list-assign> esac"
+        expr = '\t'*(tabs+1) + self.expr.visit()
+        l = '\n'.join('\t'*(tabs+1) + "list_case[i]: " +  e.visit() for e in self.list_case)
+        return ans+"\n"+expr+"\n" +l
+        
+
+
 
 class BinaryNode(ExpressionNode):
     def __init__(self, left, right):

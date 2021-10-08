@@ -24,7 +24,6 @@ class Tokenizer:
         self.errors = []    
 
     reserved = {
-
         'class':'CLASS',
         'else':'ELSE',
         'false':'FALSE',
@@ -149,7 +148,7 @@ class Lexer(CompilerComponent):
 
 ########################### Testing ##############################
 data = '''class A { 
-    f(a:int ,b:bool,c:hijo):hello{1};
+    f(a:int ,b:bool,c:hijo):hello{g@};
 
     };''' 
 lexer = Lexer(data)
