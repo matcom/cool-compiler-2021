@@ -7,6 +7,7 @@ import ply.lex as lex
 t = Tokenizer()
 tokens = t.tokens
 lexer = lex.lex(t)
+errors = []
 
 ##### Grammar ####################
 def p_program(p):
@@ -24,7 +25,7 @@ def p_class_list(p):
 
 def p_def_class(p):
     '''def_class : CLASS ID LBRACE feature_list RBRACE
-                 | CLASS ID DOUBLE_DOT ID LBRACE feature_list RBRACE
+                 | CLASS ID INHERITS ID LBRACE feature_list RBRACE
     '''
     if len(p) == 6:
         p[0] = ClassDeclarationNode(p[2], p[4])
@@ -49,7 +50,7 @@ def p_def_attr(p):
     '''def_attr : ID DOUBLE_DOT ID
                 | ID DOUBLE_DOT ID LEFT_ARROW expr
     '''
-    if len(p) == 5:
+    if len(p) == 4:
         p[0] = AttrDeclarationNode(p[1], p[3])
     else:
         p[0] = AttrDeclarationNode(p[1], p[3], p[5])
@@ -87,13 +88,8 @@ def p_expr(p):
     p[0] = p[1]
 
 def p_expr2(p):
-    '''expr : LET ID DOUBLE_DOT ID EQUALS expr
-            | LET ID EQUALS expr
-    '''
-    if len(p) > 5:
-        p[0] = VarDeclarationNode(p[2], p[4], p[6])
-    else:
-        p[0] = AssignNode(p[2], p[4])
+    'expr : ID LEFT_ARROW expr'
+    p[0] = AssignNode(p[1], p[3])
 
 def p_arith(p):
     '''arith : term
@@ -148,22 +144,49 @@ def p_atom4(p):
     '''
     p[0] = InstantiateNode(p[2])
 
+def p_atomString(p):
+    'atom : STRING'
+    print(p[1][1:len(p[1]) -1 ])
+    p[0] = ConstantStringNode(p[1][1:len(p[1]) -1 ])
+
+def p_atomBool(p):
+    '''atom : TRUE
+            | FALSE
+    '''
+    if p[1].lower() == "true":
+        p[0] = ConstantBooleanNode(True)
+    else:
+        p[0] = ConstantBooleanNode(False)
+
+def p_atomSelf(p):
+    'atom : SELF'
+    p[0] = SelfNode(None)
+
 def p_func_call(p):
     '''func_call : factor DOT ID LPAREN arg_list RPAREN
     '''
-    p[0] = CallNode(p[1], p[3], p[5])
+    if not p[5][0] is None:
+        p[0] = CallNode(p[1], p[3], p[5])
+    else:
+        p[0] = CallNode(p[1], p[3])
+
 
 def p_arg_list(p):
     '''arg_list : expr
                 | expr COMMA arg_list
+                | empty
     '''
     if len(p) == 2:
         p[0] = [p[1]]
     else:
         p[0] = [p[1]] + p[3]
 
+
 def p_error(p):
-    print(p)
+    if p:
+        errors.append("sintax error at line " + str(p.lineno) + " --> token: '" + p.value + "'")
+    else:
+        errors.append("sintanx error at end of file")
 
 ############## End Grammar ############################
 
@@ -175,19 +198,30 @@ class Parser(CompilerComponent):
         self.lexer = lexer
 
     def execute(self):
-       pass
+       parser = yacc.yacc()
+       errors = []
+       self.ast = parser.parse(self.lexer.cool_program)
 
     def has_errors(self):
-        pass
+        return len(errors) == 0
 
     def print_errors(self):
-        pass
+        for e in errors:
+            print(e)
+        print()
 
-data = '''class A { 
-    a:int <- 8;
-    f(a:int,b:bool,c:hijo):hello{1};
+
+################ TEsting zone ###########################
+data = '''class A inheritS B{ 
+    a:int ;
+    f(a:int,b:bool,c:hijo):hello{hola <- f()};
 
     };'''  
 parser = yacc.yacc()
-result = parser.parse(data, debug=True)
-print(result.visit())
+result = parser.parse(data)
+if len(errors) == 0:
+    print(result.visit())
+else:
+    print(errors)
+
+########################################################

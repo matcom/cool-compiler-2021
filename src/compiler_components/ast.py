@@ -82,7 +82,7 @@ class AssignNode(ExpressionNode):
         return f'{ans}\n{expr}'
 
 class CallNode(ExpressionNode):
-    def __init__(self, obj, idx, args):
+    def __init__(self, obj, idx, type = None, args = None):
         self.obj = obj
         self.id = idx
         self.args = args
@@ -90,9 +90,19 @@ class CallNode(ExpressionNode):
     def visit(self, tabs = 0):
         node = self
         obj = node.obj.visit( tabs + 1)
-        ans = '\t' * tabs + f'\\__CallNode: <obj>.{node.id}(<expr>, ..., <expr>)'
-        args = '\n'.join(arg.visit( tabs + 1) for arg in node.args)
-        return f'{ans}\n{obj}\n{args}'
+        
+        if not self.args is None:
+            ans = '\t' * tabs + f'\\__CallNode: <obj>.{node.id}(<expr>, ..., <expr>)'
+        else:
+            ans = '\t' * tabs + f'\\__CallNode: <obj>.{node.id}()'
+        if not self.args is None:
+            args = '\n'.join(arg.visit( tabs + 1) for arg in node.args)
+        else:
+            args = ""
+        if self.type is None:
+            return f'{ans}\n{obj}\n{args}'
+        else:
+            return f'@{self.type}{ans}\n{obj}\n{args}'
 
 class AtomicNode(ExpressionNode):
     def __init__(self, lex):
@@ -116,6 +126,34 @@ class BinaryNode(ExpressionNode):
 
 class ConstantNumNode(AtomicNode):
     pass
+
+class ConstantStringNode(AtomicNode):
+    pass
+
+class ConstantBooleanNode(AtomicNode):
+    pass
+
+class SelfNode(AtomicNode):
+    pass
+
+class DispatchNode(ExpressionNode):
+    def __init__(self, expr, f, params, type = None):
+        super().__init__(None)
+        self.id = id
+        self.f = f
+        self.params = params
+        self.type = type
+    
+    def visit(self, tabs = 0):
+        node = self
+        if not self.type:
+            ans = '\t' * tabs + f'\\__<expr>.{self.f} <params>'
+        else:
+            ans = '\t' * tabs + f'\\__<expr>@{self.type}.{self.f} <params>'
+        expr = node.expr.visit( tabs + 1)
+        params = '\n'.join(param.visit( tabs + 1) for param in node.params)
+        return f'{ans}\n{expr}\n{params}'
+
 class VariableNode(AtomicNode):
     pass
 class InstantiateNode(AtomicNode):
