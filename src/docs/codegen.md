@@ -22,20 +22,19 @@ $$
 &&\text{Expression}\\
 &&\text{\}}\\
 \\
-\text{Expression} &\rarr& \text{id = AtomicOp}\\
+\text{Expression} &\rarr& \text{id = ReturnOp}\\
 &|& \text{goto id}\\
 &|& \text{label id}\\
 &|& \text{return Atom}\\
 &|& \text{setattr id id Atom}\\
 &|& \text{if Atom goto id}\\
-&|& \text{ArgList id = call id}\\
-&|& \text{ArgList id = vcall id id }\\
-&|& \text{\{ExpressionList\}}\\
+&|& \text{ArgList id = call id integer}\\
+&|& \text{ArgList id = vcall id id integer }\\
+&|& \text{ExpressionList}\\
 \text{ExpressionList} &\rarr& \text{Expression; ExpressionList } | \text{ Expression} \\
 \text{ArgList} &\rarr& \text{arg id; ArgList } | \space\epsilon \\
 
-\text{AtomicOp} &\rarr& \text{Atom + Atom}\\
-&|& \text{Atom + Atom}\\
+\text{ReturnOp} &\rarr& \text{Atom + Atom}\\
 &|& \text{Atom - Atom}\\
 &|& \text{Atom * Atom}\\
 &|& \text{Atom / Atom}\\
@@ -51,5 +50,229 @@ $$
 \text{Constant} &\rarr& \text{ integer } | \text{ string } | \text{ boolean }
 \end{array}
 $$
-Remaining = {Let, Case }
+
+## Transformaciones
+
+#### While Loop
+
+**Cool Input**
+
+```
+while (<cond_expr>) loop <expr> pool
+```
+
+**CCIL Output**
+
+```assembly
+label while_init
+x = <resultado_numerico_de_cond_expr>
+neg_x = neg x
+if neg_x goto while_end
+
+<do_body_expr>
+
+goto while_init
+label while_end
+```
+
+#### If Then Else
+
+**Cool Input**
+
+```
+if <if_expr> then <then_expr> else <else_expr> fi
+```
+
+**CCIL Output**
+
+```assembly
+x = <resultado_numerico_de_if_expr>
+if x goto then_expr
+label else_expr
+
+<do_else_expr>
+
+goto endif
+
+label then_expr
+
+<do then_expr>
+
+label endif
+```
+
+#### Let In
+
+**Cool Input**
+
+```
+let <id1>:<type1>, ... <idn>:<typen> in <expr>
+```
+
+**CCIL Output**
+
+```assembly
+<init id1>
+<init id2>
+...
+<init idn>
+
+# Si existe alguna variable let inicializada con una expresion, ejecutarla
+<do_idq_expr_and_save_to_idq>
+<do_idk_expr_and_save_to_idk>
+...
+<do_idm_expr_and_save_to_idm>
+
+<do_expr>
+```
+
+#### Case Of
+
+**Cool Input**
+
+```
+case <case_expr> of
+	<id1>:<type1> => <expr1>
+	<id2>:<type2> => <expr2>
+	...
+	<idn>:<typen> => <exprn>
+esac
+```
+
+**CCIL Output**
+
+```assembly
+<init id1>
+<init id2>
+...
+<init idn>
+
+x = <case_expr_result>
+t = typeof x
+label init_case
+t1 = typeof <id1>
+b1 = t1 == t
+if b1 goto branch1
+
+t2 = typeof <id2>
+b2 = t2 == t
+if b2 goto branch2
+
+...
+
+tn = typeof <idn>
+bn = tn == t
+if bn goto branchn
+
+label branch1
+<do_expr1>
+goto end_case
+
+label branch2
+<do_expr2>
+goto end_case
+
+...
+
+label branchn
+<do_exprn>
+goto end_case
+
+label end_case
+```
+
+El typeof tambien se conforma con un ancestro.  Que evaluaria la operacion de igualdad para escoger la rama adecuada? Lanzar un runtime error si no se escoge ninguna rama(eso puede pasar despues del cheque semantico?)
+
+#### Function Static Call
+
+**Cool Input**
+
+```
+<func_id>(<arg1>, <arg2>, ..., <argn>);
+```
+
+**CCIL Output**
+
+```assembly
+<init arg1>
+<init arg2>
+...
+<init argn>
+r = call <func_id> n
+```
+
+#### Function Dynamic Call
+
+**Cool Input**
+
+```
+<type1>@<type2><func_id>(<arg1>, <arg2>, ..., <argn>);
+```
+
+**CCIL Output**
+
+```assembly
+<init arg1>
+<init arg2>
+...
+<init argn>
+t = allocate <type2>
+r = vcall t <func_id>  n
+```
+
+#### Method Declaration
+
+**Cool Input**
+
+```
+<function_id>(<arg1>:<type1>, ..., <argn>:<typen>) : <return_type>
+{
+	<function_expression>
+}
+```
+
+**CCIL Output**
+
+```assembly
+function <function_id> {
+	param <arg1>
+	param <arg2>
+	...
+	param <argn>
+	local <id1>
+	local <id2>
+	...
+	local <idn>
+	<do_expresion>
+	r = <expression_result>
+	return r
+}
+```
+
+#### Expression Block
+
+**Cool Input**
+
+```
+{
+	<expr1>;
+	<expr2>;
+	...
+	<exprn>;
+}
+```
+
+**CCIL Output**
+
+```
+<init expr1 locals>
+<init expr2 locals>
+...
+<init exprn locals>
+
+<do_expr1>
+<do_expr2>
+...
+<do_exprn>
+```
 
