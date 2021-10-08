@@ -1,15 +1,14 @@
 [tool.poetry]
-name = "cmp"
+name = "cool-compiler-2021"
 version = "0.1.0"
 description = ""
 authors = ["dany"]
 
 [tool.poetry.dependencies]
-python = "3.8.5"
-pytest = "^6.2.2"
+python = "^3.9"
+pytest = "^6.2.5"
 pytest-ordering = "^0.6"
 sly = "^0.4"
-ply = "^3.11"
 
 [tool.poetry.dev-dependencies]
 
