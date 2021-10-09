@@ -11,7 +11,7 @@ from cool.grammar.comment_grammar import C
 from cool.semantic.scope import Scope
 from cool.pipes.utils import pprint_tokens, print_errors
 from cool.pipes.pipeline import Pipe
-from cool.visitors.cil_visitor import CILPrintVisitor, COOLToCILVisitor
+from cool.visitors.cil_visitor import CILPrintVisitor, CILRunnerVisitor, COOLToCILVisitor
 
 ply_lexer = PlyLexer()
 
@@ -446,3 +446,20 @@ def cil_ast_to_text_pipe(result: dict, formatter=CILPrintVisitor):
     return result
 
 cil_ast_to_text_pipe = Pipe(cil_ast_to_text_pipe)
+
+def run_cil_pipe(result: dict, runner= CILRunnerVisitor):
+    ast = result.get("cil_ast",None)
+    if ast is None:
+        return result
+    
+    runner = runner()
+    value = runner.visit(ast)
+    result["errors"].extend(runner.errors)
+    if result.get("verbose", False):
+        print("============== CIL Result ===============")
+        print(value)
+        print_errors("============ CIL Run Error =============", runner.errors)
+    result['cil_value'] = value
+    return result
+
+run_cil_pipe = Pipe(run_cil_pipe)

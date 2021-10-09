@@ -1,35 +1,34 @@
-class A inherits IO {
-    p(): Int {
-        0
-    };
-};
+class Main inherits IO {
+    number: Int <- 5;
 
-class Main inherits A {
-
-	msg:String <- "Hello World";
-
-    p(): Int {
-        1
+    main () : Object {
+        testing_fibonacci(number)
     };
 
-    main(): AUTO_TYPE {
-		--new IO
-        --out_string(msg)
-        --if not 5 + 10 = 15 then 0 else 1 fi
-        --if not 5 + 10 < 15 then 0 else 1 fi
-        --while false loop
-        --{
-        --    3+2;
-        --    3-2;
-        --}
-        --pool
-        --self@A.p()
-        let x0: Int <- 0,
-            x1: Int <- 1, 
-            x2: Int <- 
-                let x1: Int <- 2, 
-                    x2: Int <- x1 + 1 
-                in x0 + x1 + x2 
-            in x1 + x2 
+    testing_fibonacci(n: Int) : IO {{
+        out_string("Iterative Fibonacci : ");
+        out_int(iterative_fibonacci(5));
+        out_string("\n");
+
+        out_string("Recursive Fibonacci : ");
+        out_int(recursive_fibonacci(5));
+        out_string("\n");
+    }};
+
+    recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
+        if n <= 2 then 1 else recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2) fi
+    };
+
+    iterative_fibonacci(n: AUTO_TYPE) : AUTO_TYPE {
+        let  i: Int <- 2, n1: Int <- 1, n2: Int <- 1, temp: Int in {
+            while i < n loop
+                let temp: Int <- n2 in {
+                    n2 <- n2 + n1;
+                    n1 <- temp;
+                    i <- i + 1;
+                }
+            pool;
+            n2;
+        }
     };
 };

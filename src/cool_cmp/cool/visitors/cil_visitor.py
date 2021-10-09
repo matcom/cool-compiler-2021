@@ -3,6 +3,7 @@ from cool.ast.cool_ast import *
 import cmp.visitor as visitor
 from cmp.semantic import VariableInfo
 from cool.semantic.context import Context
+from cool.error.errors import RunError, ZERO_DIVISION
 
 class CILPrintVisitor():
     @visitor.on('node')
@@ -164,7 +165,353 @@ class CILPrintVisitor():
     def visit(self, node:cil.VoidNode):
         return f'{node.dest} = VOID'
     
+class CILRunnerVisitor():
     
+    def __init__(self) -> None:
+        self.data = {}
+        self.types = {}
+        self.function = {}
+        self.errors = []
+    
+    def jump_to(self, label):
+        return ("jump",label)
+    
+    def return_value(self, value):
+        return ("return", value)
+    
+    def next_instruction(self):
+        return ("next", None)
+    
+    def raise_error(self, message, *args):
+        raise RunError(message, *args)
+    
+    def get_value(self, source, function_scope):
+        try:
+            value = int(source)
+        except ValueError:
+            if source not in function_scope:
+                self.raise_error("Variable {0} doesn't exist", source)
+            value = function_scope[source]
+        return value
+    
+    def set_value(self, dest, value, function_scope):
+        if dest not in function_scope:
+            self.raise_error("Variable {0} isn't defined", dest)
+        function_scope[dest] = value
+    
+    def get_value_str(self, source, function_scope, error):
+        value = self.get_value(source, function_scope)
+        if not isinstance(value, str):
+            self.raise_error(error)
+        return value
+    
+    def get_value_int(self, source, function_scope, error):
+        value = self.get_value(source, function_scope)
+        if not isinstance(value, int):
+            self.raise_error(error)
+        return value
+    
+    
+    def get_type(self, type_name) -> cil.TypeNode:
+        try:
+            return self.types[type_name]
+        except KeyError:
+            self.raise_error("Type {0} isn't defined", type_name)
+    
+    def binary_node(self, node, function_scope, func):
+        left = self.get_value_int(node.left, function_scope, "OPERATION not defined with non Int argument")
+        right = self.get_value_int(node.right, function_scope, "OPERATION not defined with non Int argument")
+        value = func(left, right)
+        self.set_value(node.dest, value, function_scope)
+        return self.next_instruction()
+    
+    @visitor.on('node')
+    def visit(self, node):
+        pass
+
+    @visitor.when(cil.ProgramNode)
+    def visit(self, node:cil.ProgramNode):
+        for t in node.dottypes:
+            self.visit(t)
+        for t in node.dotdata:
+            self.visit(t)
+        for t in node.dotcode:
+            self.visit(t)
+        try:
+            return self.visit(cil.StaticCallNode("entry", "result"), [], {"result":None})
+        except RunError as er:
+            self.errors.append(er)
+            return None
+
+    @visitor.when(cil.DataNode)
+    def visit(self, node:cil.DataNode):
+        if node.name in self.data:
+            self.raise_error("Data {0} already defined")
+        self.data[node.name] = node.value
+
+    @visitor.when(cil.TypeNode)
+    def visit(self, node:cil.TypeNode):
+        if node.name in self.types:
+            self.raise_error("Type {0} already defined", node.name)
+        self.types[node.name] = node
+
+    @visitor.when(cil.FunctionNode)
+    def visit(self, node):
+        self.function[node.name] = node
+        
+    @visitor.when(cil.StaticCallNode)
+    def visit(self, node:cil.StaticCallNode, args: list, caller_fun_scope: dict):
+        try:
+            func_node = self.function[node.function]
+        except KeyError:
+            self.raise_error("Function {0} doesn't exist", node.function)
+        
+        fun_scope = {}
+        label_dict = {}
+        current_args = []
+        if len(args) != len(func_node.params):
+            self.raise_error("Argument amount {0} doesn't match with params amount {1} at {2}", len(args), len(func_node.params), node.function)
+        
+        for p in func_node.params:
+            self.visit(p, args, fun_scope)
+        
+        for i,label_node in [(i,x) for i,x in enumerate(func_node.instructions) if isinstance(x, cil.LabelNode)]:
+            if label_node.label in label_dict:
+                self.raise_error("Repeated label {0} at {1}", label_node.name, node.function)
+            label_dict[label_node.label] = i
+        
+        for local in func_node.localvars:
+            self.visit(local, current_args, fun_scope)
+        
+        i = 0
+        while i < len(func_node.instructions):
+            instr = func_node.instructions[i]
+            action,action_info = self.visit(instr, current_args, fun_scope)
+            i+=1
+            if action == "jump":
+                try:
+                    i = label_dict[action_info]
+                except KeyError:
+                    self.raise_error("Missing label {0} at function {1}", action_info, node.function)   
+            if action == "return":
+                if isinstance(instr, cil.ReturnNode):
+                    self.set_value(node.dest, action_info, caller_fun_scope)
+                    return self.return_value(action_info)
+                else: # A Function call
+                    self.set_value(instr.dest, action_info, fun_scope)
+        self.raise_error("Missing return at {0}", node.function)
+                    
+    @visitor.when(cil.DynamicCallNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        typex = self.get_type(node.type)
+        try:
+            func_name = next(static_name for name, static_name in typex.methods if name == node.method)
+        except StopIteration:
+            self.raise_error("Type {0} doesn't contains method {1}", node.type, node.method)
+        return self.visit(cil.StaticCallNode(func_name, node.dest), args, caller_fun_scope)
+
+    @visitor.when(cil.ParamNode)
+    def visit(self, node:cil.ParamNode, args: list, caller_fun_scope: dict):
+        if node.name in caller_fun_scope:
+            self.raise_error("Parameter {0} already defined", node.name)
+        value = args.pop(0) # Removes argument from caller's list
+        caller_fun_scope[node.name] = value
+        return self.next_instruction()
+
+    @visitor.when(cil.LocalNode)
+    def visit(self, node:cil.LocalNode, args: list, caller_fun_scope: dict):
+        if node.name in caller_fun_scope:
+            self.raise_error("Variable {0} already defined", node.name)
+        caller_fun_scope[node.name] = None
+        return self.next_instruction()
+
+    @visitor.when(cil.AssignNode)
+    def visit(self, node:cil.AssignNode, args: list, caller_fun_scope: dict):
+        value = self.get_value(node.source, caller_fun_scope)
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.PlusNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        return self.binary_node(node, caller_fun_scope, lambda x,y: x+y)
+
+    @visitor.when(cil.MinusNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        return self.binary_node(node, caller_fun_scope, lambda x,y: x-y)
+
+    @visitor.when(cil.StarNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        return self.binary_node(node, caller_fun_scope, lambda x,y: x*y)
+
+    @visitor.when(cil.DivNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        try:
+            return self.binary_node(node, caller_fun_scope, lambda x,y: x/y)
+        except ZeroDivisionError:
+            self.raise_error(ZERO_DIVISION)
+        
+    @visitor.when(cil.AllocateNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        typex = self.get_type(node.type)
+        value = {
+            "$type": typex,
+        }
+        for attr in typex.attributes:
+            value[attr] = None
+            
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.TypeOfNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = self.get_value(node.obj)
+        if isinstance(value, int):
+            self.set_value(node.dest, "Int", caller_fun_scope)
+        elif isinstance(value, str):
+            self.set_value(node.dest, "String", caller_fun_scope)
+        else:
+            self.set_value(node.dest, value["$type"].name, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.GetAttribNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        obj_value = self.get_value(node.source, caller_fun_scope)
+        try:
+            value = obj_value[node.attr]
+        except KeyError:
+            self.raise_error("Attribute {0} not found at object {1}", node.attr, node.source)
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.SetAttribNode)
+    def visit(self, node:cil.SetAttribNode, args: list, caller_fun_scope: dict):
+        obj_value = self.get_value(node.source, caller_fun_scope)
+        if node.attr not in obj_value:
+            self.raise_error("Attribute {0} not found at object {1}", node.attr, node.source)
+        obj_value[node.attr] = self.get_value(node.value, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.ArgNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = self.get_value(node.name, caller_fun_scope)
+        args.append(value)
+        return self.next_instruction()
+
+    @visitor.when(cil.ReturnNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        if node.value is not None:
+            value = self.get_value(node.value, caller_fun_scope)
+        else:
+            value = None
+        return self.return_value(value)
+    
+    @visitor.when(cil.AbortNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        self.raise_error("Execution aborted")
+    
+    @visitor.when(cil.CopyNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = self.get_value(node.instance, caller_fun_scope)
+        value = value.copy()
+        self.set_value(node.result, value, caller_fun_scope)
+        return self.next_instruction()
+    
+    @visitor.when(cil.LengthNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = self.get_value_str(node.string, caller_fun_scope, "LENGTH operation undefined with non String type")
+        self.set_value(node.dest, len(value), caller_fun_scope)
+        return self.next_instruction()
+    
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        error = "CONCAT operation undefined with non String type"
+        value1 = self.get_value_str(node.string1, caller_fun_scope, error)
+        value2 = self.get_value_str(node.string2, caller_fun_scope, error)
+        self.set_value(node.dest, value1 + value2, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.SubstringNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        error1 = "SUBSTRING operation undefined with non String type"
+        error2 = "SUBSTRING operation undefined with non Int index"
+        error3 = "SUBSTRING operation undefined with non Int length"
+        value1 = self.get_value_str(node.string, caller_fun_scope, error1)
+        value2 = self.get_value_str(node.index, caller_fun_scope, error2)
+        value3 = self.get_value_str(node.length, caller_fun_scope, error3)
+        self.set_value(node.dest, value1[value2:value2+value3], caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.PrintNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = self.get_value_str(node.str_addr, caller_fun_scope, "PRINT operation undefined with non String type")
+        print(value, end="")
+        return self.next_instruction()
+
+    @visitor.when(cil.ToStrNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = self.get_value_int(node.ivalue, caller_fun_scope, "TOSTR operation undefined with non Int type")
+        value = str(value)
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.ReadNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = input()
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
+
+    @visitor.when(cil.LoadNode)
+    def visit(self, node:cil.LoadNode, args: list, caller_fun_scope: dict):
+        try:
+            value = self.data[node.msg]
+        except KeyError:
+            self.raise_error("Data {0} isn't defined", node.msg)
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
+    
+    @visitor.when(cil.LabelNode)
+    def visit(self, node:cil.LabelNode, args: list, caller_fun_scope: dict):
+        return self.next_instruction()
+    
+    @visitor.when(cil.GotoIfNode)
+    def visit(self, node:cil.GotoIfNode, args: list, caller_fun_scope: dict):
+        value = self.get_value(node.condition_value, caller_fun_scope)
+        jump = True
+        if isinstance(value, int):
+            jump = value != 0
+        if value is None:
+            jump = False
+        if jump:
+            return self.jump_to(node.label)
+        return self.next_instruction()            
+    
+    @visitor.when(cil.GotoNode)
+    def visit(self, node:cil.GotoNode, args: list, caller_fun_scope: dict):
+        return self.jump_to(node.label)
+    
+    @visitor.when(cil.NotNode)
+    def visit(self, node:cil.NotNode, args: list, caller_fun_scope: dict):
+        value = self.get_value(node.value, caller_fun_scope)
+        self.set_value(node.dest, not bool(value), caller_fun_scope)
+        return self.next_instruction()
+    
+    @visitor.when(cil.EqualNode)
+    def visit(self, node:cil.EqualNode, args: list, caller_fun_scope: dict):
+        return self.binary_node(node, caller_fun_scope, lambda x,y: x==y)
+    
+    @visitor.when(cil.GreaterNode)
+    def visit(self, node:cil.GreaterNode, args: list, caller_fun_scope: dict):
+        return self.binary_node(node, caller_fun_scope, lambda x,y: x>y)
+    
+    @visitor.when(cil.LesserNode)
+    def visit(self, node:cil.LesserNode, args: list, caller_fun_scope: dict):
+        return self.binary_node(node, caller_fun_scope, lambda x,y: x<y)
+    
+    @visitor.when(cil.VoidNode)
+    def visit(self, node:cil.VoidNode, args: list, caller_fun_scope: dict):
+        self.set_value(node.dest, None, caller_fun_scope)
+        return self.next_instruction()
+
 class COOLToCILVisitor():
     
     def __init__(self, context:Context, errors=[]):
@@ -256,7 +603,7 @@ class COOLToCILVisitor():
         # self.register_instruction(cil.AllocateNode('Main', instance)) # TODO Hacer Inicializador para los Allocate y los atributos
         self.register_instruction(cil.ArgNode(instance))
         self.register_instruction(cil.StaticCallNode(main_method_name, result))
-        self.register_instruction(cil.ReturnNode(0))
+        self.register_instruction(cil.ReturnNode("0"))
         self.current_function = None
         
         for type_name, typex in self.context.types.items():
