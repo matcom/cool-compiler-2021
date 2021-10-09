@@ -194,10 +194,10 @@ class COOLToCILVisitor():
         return self.current_function.instructions
     
     def register_local(self, vinfo):
-        vinfo.name = f'local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}'
-        local_node = cil.LocalNode(vinfo.name)
+        vinfo.cil_name = f'local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}'
+        local_node = cil.LocalNode(vinfo.cil_name)
         self.localvars.append(local_node)
-        return vinfo.name
+        return vinfo.cil_name
 
     def define_internal_local(self):
         vinfo = VariableInfo('internal', None)
@@ -214,7 +214,7 @@ class COOLToCILVisitor():
         return instruction
     
     def to_init_attr_function_name(self, attr_name, type_name):
-        return f'init_{attr_name}_at_{type_name}'
+        return f'$init_{attr_name}_at_{type_name}' # Prefixed with $ to avoid collisions
     
     def to_function_name(self, method_name, type_name):
         return f'function_{method_name}_at_{type_name}'
@@ -283,7 +283,7 @@ class COOLToCILVisitor():
         for attr,typex in self.current_type.all_attributes():
             type_node.attributes.append(attr.name)
             new_function = self.register_function(self.to_init_attr_function_name(attr.name, self.current_type.name))
-            type_node.methods.append((f"${new_function.name}", new_function.name)) # Prefixed with $ to avoid collisions
+            type_node.methods.append((new_function.name, new_function.name)) 
             self.current_function = new_function
             self.visit(attr.node, attr.node.scope)
 
@@ -347,7 +347,6 @@ class COOLToCILVisitor():
         # Your code here!!!
         local = scope.find_variable(node.id)
         cil_local = self.register_local(local) 
-        local.cil = cil_local
         value = self.visit(node.expr,scope)
         self.register_instruction(cil.AssignNode(cil_local,value))
         return cil_local
@@ -435,9 +434,9 @@ class COOLToCILVisitor():
         ###############################
         local = scope.find_variable(node.id)
         value = self.visit(node.expr,scope)
-        if hasattr(local,'cil'):
-            self.register_instruction(cil.AssignNode(local.cil,value))
-            return local.cil
+        if hasattr(local,'cil_name'):
+            self.register_instruction(cil.AssignNode(local.cil_name,value))
+            return local.cil_name
         else:
             if any(x for x in self.current_function.params if x.name == local.name):
                 self.register_instruction(cil.AssignNode(local.name,value)) # Param
@@ -449,7 +448,7 @@ class COOLToCILVisitor():
                 return value # or self ?
 
     @visitor.when(CallNode)
-    def visit(self, node, scope):
+    def visit(self, node:CallNode, scope):
         ###############################
         # node.obj -> AtomicNode
         # node.id -> str
@@ -459,7 +458,11 @@ class COOLToCILVisitor():
         obj_value = self.visit(node.obj,scope)
 
         args = []
-        method = node.obj.type.get_method(node.id, len(node.args))
+        if node.at:
+            method = node.at.get_method(node.id, len(node.args))
+        else:
+            method = node.obj.type.get_method(node.id, len(node.args))
+            
         for arg_node in node.args:
             value = self.visit(arg_node,scope)
             args.append(value)
@@ -470,14 +473,22 @@ class COOLToCILVisitor():
         for arg,value in zip(method.param_names,args):
             self.register_instruction(cil.ArgNode(value))
         
-        self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result))
+        if node.at:
+            self.register_instruction(cil.DynamicCallNode(node.at.name, node.id, result))
+        else:
+            self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result))
         
         return result
     
     @visitor.when(LetNode)
-    def visit(self, node, scope):
-        # TODO
-        raise NotImplementedError()
+    def visit(self, node:LetNode, scope):
+        current_scope = node.scope
+        for param in node.params:
+            current_scope = current_scope.children[0]
+            self.visit(param, current_scope)
+        current_scope = current_scope.children[-1]
+        result = self.visit(node.expr, current_scope)
+        return result            
     
     @visitor.when(CheckNode)
     def visit(self, node, scope):
@@ -490,9 +501,13 @@ class COOLToCILVisitor():
         raise NotImplementedError()
     
     @visitor.when(IsVoidNode)
-    def visit(self, node, scope):
-        # TODO
-        raise NotImplementedError()
+    def visit(self, node:IsVoidNode, scope):
+        result = self.define_internal_local()
+        value = self.visit(node.member, scope)
+        void_value = self.define_internal_local()
+        self.register_instruction(cil.VoidNode(void_value))
+        self.register_instruction(cil.EqualNode(result, value, void_value))
+        return result 
     
     @visitor.when(ConditionalNode)
     def visit(self, node:ConditionalNode, scope):
@@ -643,7 +658,7 @@ class COOLToCILVisitor():
 
         # Your code here!!!
         try:
-            return scope.find_variable(node.lex).cil # is a Local Variable
+            return scope.find_variable(node.lex).cil_name # is a Local Variable
         except AttributeError:
             if any(x for x in self.current_function.params if x.name == node.lex):
                 return node.lex # Param

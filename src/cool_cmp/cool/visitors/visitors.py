@@ -697,6 +697,7 @@ class TypeChecker:
     @visitor.when(LetNode)
     def visit(self, node: LetNode, scope):
         let_scope = scope.create_child()
+        node.scope = let_scope
         curr_scope = let_scope
         for var_node in node.params:
             attr_scope = curr_scope.create_child()
