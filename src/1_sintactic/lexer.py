@@ -1,13 +1,14 @@
 import ply.lex as lex
 from utils.errors import *
 
-class CoolLexer:
 
+class CoolLexer:
     def __init__(self, **kwargs):
         self.errors = []
         self.lexer = lex.lex(modele=self, **kwargs)
         self.lexer.lineno = 1
-        self.lexer.linestart = 0 
+        self.lexer.linestart = 0
+        self.errors = []
 
     states = (
         ('comments', 'exclusive'),
@@ -76,13 +77,13 @@ class CoolLexer:
     def t_comments_open(self, t):
         r'\(\*'
         t.lexer.level += 1
- 
+
     def t_comments_close(self, t):
         r'\*\)'
         t.lexer.level -= 1
         if t.lexer.level == 0:
             t.lexer.begin('INITIAL')
-    
+
     def t_comments_newline(self, t):
         r'\n+'
         t.lexer.lineno += len(t.value)
@@ -90,15 +91,15 @@ class CoolLexer:
 
     def t_comments_error(self, t):
         t.lexer.skip(1)
-    
+
     def t_comments_eof(self, t):
         line = t.lexer.lineno
         column = self.find_column(t)
-        add_lexer_error(line, column, "EOF in comment")
+        self.errors.append(LexicographicError("EOF in comment", line, column))
 
     t_comments_ignore = '  \t\f\r\v'
-    
-    # Strings 
+
+    # Strings
     t_strings_ignore = ''
 
     def t_strings(self, t):
@@ -110,9 +111,9 @@ class CoolLexer:
 
     def t_strings_end(self, t):
         r'\"'
-        self.add_row_column(t)
+        self.add_line_column(t)
 
-        if  t.lexer.backslash:
+        if t.lexer.backslash:
             t.lexer.string += '"'
             t.lexer.backslash = False
         else:
@@ -120,22 +121,24 @@ class CoolLexer:
             t.type = 'string'
             t.lexer.begin('INITIAL')
             return t
-        
+
     def t_strings_newline(self, t):
         r'\n'
         t.lexer.lineno += 1
-        self.add_row_column(t)
+        self.add_line_column(t)
 
         t.lexer.linestart = t.lexer.lexpos
 
         if not t.lexer.backslash:
-            add_lexer_error(t.row, t.column, 'Undeterminated string constant')
+            self.errors.append(LexicographicError(
+                'Undeterminated string constant'), t.line, t.column)
             t.lexer.begin('INITIAL')
 
     def t_strings_nill(self, t):
         r'\0'
-        self.add_row_column(t)
-        add_lexer_error(t.row, t.column, 'Null caracter in string')
+        self.add_line_column(t)
+        self.errors.append(LexicographicErroricError(
+            'Null caracter in string', t.line, t.column))
 
     def t_strings_consume(self, t):
         r'[^\n]'
@@ -162,47 +165,48 @@ class CoolLexer:
                 t.lexer.backslash = True
 
     def t_strings_eof(self, t):
-        self.add_row_column(t)
-        add_lexer_error(t.row, r.column, 'EOF in string constant')
+        self.add_line_column(t)
+        self.errors.append(LexicographicErroricError(
+            'EOF in string constant', t.line, t.column))
 
     def find_column(self, t):
         line_start = self.text.rfind('\n', 0, t.lexpos) + 1
         return (t.lexpos - line_start) + 1
 
-    def add_row_column(self, t):
-        t.row = t.lexer.lineno
+    def add_line_column(self, t):
+        t.line = t.lexer.lineno
         t.column = self.find_column(t)
 
     t_ignore = '  \t\f\r\t\v'
 
     def t_LPAREN(self, t):
         r'\('
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_RPAREN(self, t):
         r'\)'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_LBRACE(self, t):
         r'\{'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_RPAREN(self, t):
         r'\}'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_COLON(self, t):
         r':'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_SEMICOLON(self, t):
         r';'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_COMMA(self, t):
@@ -212,88 +216,122 @@ class CoolLexer:
 
     def t_DOT(self, t):
         r'\.'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_AT(self, t):
         r'@'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_ASSIGN(self, t):
         r'<-'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_PLUS(self, t):
         r'\+'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_MINUS(self, t):
         r'-'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_STAR(self, t):
         r'\*'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_DIV(self, t):
         r'/'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_EQUAL(self, t):
         r'='
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_LESS(self, t):
         r'<'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_LESSEQ(self, t):
         r'<='
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_ARROW(self, t):
         r'=>'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_NOT(self, t):
         r'~'
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_INT(self, t):
         r'\d+'
         t.value = int(t.value)
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_ID(self, t):
         r'[a-z][a-zA-Z_0-9]*'
         t.type = self.reserved.get(t.value.lower(), 'ID')
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_TYPE(self, t):
         r'[A-Z][a-zA-Z_0-9]*'
         t.type = self.reserved.get(t.value.lower(), 'TYPE')
-        self.add_row_column(t)
+        self.add_line_column(t)
         return t
 
     def t_newline(self, t):
-        
+        r'\n+'
+        t.lexer.lineno += len(t.value)
+        t.lexer.linestart = t.lexer.lexpos
 
-    
+    def t_error(self, t):
+        self.add_line_column(t)
+        self.errors.append(LexicographicError(
+            f'ERROR \"{t.value[0]}\"', line, column))
+        t.lexer.skip(1)
+
+    def tokenize(self, text):
+        self.lexer.input(text)
+        tokens = []
+        for token in self.lexer:
+            tokens.append(Token(token.value, token.type,
+                                token.row, token.column))
+        self.lexer.lineno = 1
+        self.linestart = 0
+        return tokens
+
+    def run(self, text):
+        tokens = self.tokenize(text)
+        if self.errors:
+            for error in self.errors:
+                print(error)
+            raise Exception()
+
+        return tokens
 
 
+class Token:
+    def __init__(self, lex, token_type, row, column):
+        self.lex = lex
+        self.type = token_type
+        self.line = line
+        self.column = column
 
+    def __str__(self):
+        return f'{self.type}: {self.lex} ({self.line}, {self.column})'
 
-
+    def __repr__(self):
+        return str(self)

@@ -1,15 +1,17 @@
-LEXER_ERRORS = []
-PARSER_ERRORS = []
-SEMANTIC_ERRORS = []
+class CoolError():
+    def __init__(self, error_type, text, line, column):
+        self.type = type
+        self.text = text
+        self.line = line
+        self.column = column
+
+    def __str__(self):
+        return f'({self.line, self.column}) - {self.error_type}: {self.text}'
+
+    def __repr__(self):
+        return str(self)
 
 
-def add_lexer_error(line, column, message):
-    LEXER_ERRORS.append(f'({line}, {column}) - LexicographicError: {message}')
-
-
-def add_parser_error(line, column, message):
-    PARSER_ERRORS.append(f'({line}, {column}) - SyntacticError: {message}')
-
-
-def add_semantic_error(line, column, message):
-    SEMANTIC_ERRORS.append(f'({line}, {column}) - SemanticError: {message}')
+class LexicographicError(CoolError):
+    def __init__(self, text, line, column):
+        super().__init__('LexicograficError', text, line, column)
