@@ -91,4 +91,96 @@ class CaseOptionNode(ExpressionNode):
         self.id = id
         self.expr = expr
         self.type = type
-        
+
+
+class VarNode(ExpressionNode):
+    def __init__(self, id):
+        super().__init__()
+        self.id = id
+
+
+class NewNode(ExpressionNode):
+    def __init__(self, type):
+        super().__init__()
+        self.type = type
+
+
+# ---------------- Binary Nodes ------------------
+
+class BinaryNode(ExpressionNode):
+    def __init__(self, lvalue, rvalue):
+        super().__init__()
+        self.lvalue = lvalue
+        self.rvalue = rvalue
+
+
+class PlusNode(BinaryNode):
+    pass
+
+
+class MinusNode(BinaryNode):
+    pass
+
+
+class StarNode(BinaryNode):
+    pass
+
+
+class DivNode(BinaryNode):
+    pass
+
+
+class LessThanNode(BinaryNode):
+    pass
+
+
+class LessEqNode(BinaryNode):
+    pass
+
+
+class EqNode(BinaryNode):
+    pass
+
+
+# ---------------- Unary Nodes ------------------
+
+class UnaryNode(ExpressionNode):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+
+
+class NotNode(UnaryNode):
+    pass
+
+
+class LogicNotNode(UnaryNode):
+    pass
+
+
+class AtomicNode(UnaryNode):
+    pass
+
+
+class IsVoidNode(UnaryNode):
+    pass
+
+
+# ---------------- Constant Nodes ------------------
+
+class ConstantNode(ExpressionNode):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+
+
+class IntNode(ConstantNode):
+    pass
+
+
+class BoolNode(ConstantNode):
+    pass
+
+
+class StringNode(ConstantNode):
+    pass
