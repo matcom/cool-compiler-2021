@@ -159,8 +159,6 @@ class Tokenizer:
         for i in range(t.lexer.lineno - 1):
             count += len(s[i])
 
-        print(t.lexer.lexpos)
-        print(count)
         posAtLine = t.lexer.lexpos - count - t.lexer.lineno + 2
         error = "(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ') - LexicographicError: ERROR "' + t.lexer.lexdata[t.lexer.lexpos] + '"'
         self.errors.append(error)
@@ -202,22 +200,9 @@ class Lexer(CompilerComponent):
             print(e)
 
 ########################### Testing ##############################
-data = '''"lkjdsafkljdsalfj\u0000dsafdsaf\u0000djafslkjdsalf\nsdajf\" lkjfdsasdkjfl"123
-adsfasklj#
-LKldsajf iNhERITS
-"lkdsajf"
+data = '''''' 
 
-(*
-#1 STR_CONST "lkjdsafkljdsalfju0000dsafdsafu0000djafslkjdsalf\nsdajf\" lkjfdsasdkjfl"
-#1 INT_CONST 123
-#2 OBJECTID adsfasklj
-#2 ERROR "#"
-#3 TYPEID LKldsajf
-#3 INHERITS
-#4 STR_CONST "lkdsajf"
-*)''' 
 lexer = Lexer(data)
 lexer.execute()
 lexer.print_errors()
-print(len(data))
 ##### borrar luego ########################################
