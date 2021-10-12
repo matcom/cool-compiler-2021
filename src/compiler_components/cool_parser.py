@@ -241,36 +241,37 @@ def p_atomNhanhara(p):
 def p_func_call(p):
     '''func_call : factor DOT ID LPAREN arg_list RPAREN
     '''
-    if not p[5][0] is None:
-        p[0] = CallNode(p[1], p[3], p[5])
-    else:
-        p[0] = CallNode(p[1], p[3])
+    p[0] = CallNode(p[1], p[3], p[5])
 
 def p_func_call2(p):
     'func_call : ID LPAREN arg_list RPAREN'
-    
-    if not p[3][0] is None:
-        p[0] = CallNode(None, p[1], p[3])
-    else:
-        p[0] = CallNode(None, p[1])
+
+    p[0] = CallNode(None, p[1])
 
 def p_func_call3(p):
     'func_call : factor ARROBA TYPE_ID DOT ID LPAREN arg_list RPAREN'
-    if not p[7][0] is None:
-        p[0] = CallNode(p[1], p[5], args = p[7], type = p[3])
-    else:
-        p[0] = CallNode(p[1], p[5], args = None, type = p[3])
+    
+    p[0] = CallNode(p[1], p[5], args = p[7], type = p[3])
+
 
 
 def p_arg_list(p):
-    '''arg_list : expr
-                | expr COMMA arg_list
+    '''arg_list : expr arg_list2
                 | empty
     '''
-    if len(p) == 2:
-        p[0] = [p[1]]
+    if len(p) == 3:
+        p[0] = [p[1]] + p[2]
     else:
-        p[0] = [p[1]] + p[3]
+        p[0] = []
+
+def p_arg_list2(p):
+    '''arg_list2 : COMMA expr arg_list2
+                 | empty
+    '''
+    if len(p) == 4:
+        p[0] = [p[2]] + p[3]
+    else:
+        p[0] = []
 
 
 def p_error(p):
@@ -303,7 +304,7 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = '''class A{f(a:A,b:B):B{1};};'''  
+data = ''''''  
 parser = yacc.yacc()
 result = parser.parse(data)
 if len(errors) == 0:
