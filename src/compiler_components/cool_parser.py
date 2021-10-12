@@ -58,11 +58,15 @@ def p_def_attr(p):
 def p_def_func(p):
     '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT ID LBRACE expr RBRACE
     '''
-    p[0] = FuncDeclarationNode(p[1], p[3], p[6], p[8])
+    if p[3][0] == None:
+        params = []
+    else:
+        params = p[3]
+    p[0] = FuncDeclarationNode(p[1], params, p[6], p[8])
 
 def p_param_list(p):
-    '''param_list : param
-                  | param COMMA param_list
+    '''param_list : param COMMA param_list
+                  | empty
     '''
     if len(p) == 2:
         p[0] = [p[1]]
@@ -280,11 +284,7 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = '''class A { (*(*
-a
-*)*)
-    a:;
-    };'''  
+data = '''class A {o():f{a};};'''  
 parser = yacc.yacc()
 result = parser.parse(data)
 if len(errors) == 0:
