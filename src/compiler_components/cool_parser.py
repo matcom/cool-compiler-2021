@@ -145,7 +145,7 @@ def p_atom3(p):
     p[0] = p[1]
 
 def p_atom4(p):
-    '''atom : NEW ID LPAREN RPAREN 
+    '''atom : NEW ID 
     '''
     p[0] = InstantiateNode(p[2])
 
@@ -282,7 +282,7 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = '''class A {o(a:int):f{a};};'''  
+data = '''class A{a:B <- (new A);};'''  
 parser = yacc.yacc()
 result = parser.parse(data)
 if len(errors) == 0:
