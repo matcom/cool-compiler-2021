@@ -58,21 +58,26 @@ def p_def_attr(p):
 def p_def_func(p):
     '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT TYPE_ID LBRACE expr RBRACE
     '''
-    if p[3][0] == None:
-        params = []
-    else:
-        params = p[3]
-    p[0] = FuncDeclarationNode(p[1], params, p[6], p[8])
+
+    p[0] = FuncDeclarationNode(p[1], p[3], p[6], p[8])
 
 def p_param_list(p):
-    '''param_list : param COMMA param_list
-                  | param
+    '''param_list : param param_list2
                   | empty
     '''
-    if len(p) == 2:
-        p[0] = [p[1]]
+    if len(p) == 3:
+        p[0] = [p[1]] + p[2]
     else:
-        p[0] = [p[1]] + p[3]
+        p[0] = []
+
+def p_param_list2(p):
+    '''param_list2 : COMMA param param_list2
+                   | empty
+    '''
+    if len(p) == 4:
+        p[0] = [p[2]] + p[3]
+    else:
+        p[0] = [] 
 
 def p_param(p):
     '''param : ID DOUBLE_DOT TYPE_ID
@@ -89,8 +94,24 @@ def p_expr_list(p):
         p[0] = [p[1]] + p[3]
 
 def p_expr(p):
-    'expr : arith'
+    'expr : bool'
     p[0] = p[1]
+
+def p_bool(p):
+    '''bool : arith MINOR arith
+            | arith MINOR_EQUALS arith
+            | arith EQUALS arith
+            | arith
+    '''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        if p[2] == '<':
+            p[0] = MinorNode(p[1], p[3])
+        elif p[2] == '<=':
+            p[0] = MinorEqualsNode(p[1], p[3])
+        else:
+            p[0] = EqualsNode(p[1], p[3])
 
 def p_expr2(p):
     'expr : ID LEFT_ARROW expr'
@@ -254,7 +275,7 @@ def p_arg_list(p):
 
 def p_error(p):
     if p:
-        errors.append("sintax error at line " + str(p.lineno) + " --> token: '" + p.value + "'")
+        errors.append("sintax error at line " + str(p.lineno) + " --> token: '" + str(p.value) + "'")
     else:
         errors.append("sintanx error at end of file")
 
@@ -282,7 +303,7 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = ''''''  
+data = '''class A{f(a:A,b:B):B{1};};'''  
 parser = yacc.yacc()
 result = parser.parse(data)
 if len(errors) == 0:

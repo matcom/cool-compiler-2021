@@ -260,3 +260,10 @@ class StarNode(BinaryNode):
     pass
 class DivNode(BinaryNode):
     pass
+
+class MinorNode(BinaryNode):
+    pass
+class MinorEqualsNode(BinaryNode):
+    pass
+class EqualsNode(BinaryNode):
+    pass
