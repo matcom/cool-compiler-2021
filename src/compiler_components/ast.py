@@ -96,6 +96,22 @@ class IsVoidNode(AtomicNode):
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__IsVoid <expr>"
         return ans + '\n' + '\t'*(tabs+1) + self.expr.visit()
+
+class NotNode(AtomicNode):
+    def __init__(self, expr):
+        self.expr = expr
+    
+    def visit(self, tabs = 0):
+        ans = '\t'*tabs + "\\__NOT <expr>"
+        return ans + '\n' + '\t'*(tabs+1) + self.expr.visit()
+
+class NhanharaNode(AtomicNode):
+    def __init__(self, expr):
+        self.expr = expr
+    
+    def visit(self, tabs = 0):
+        ans = '\t'*tabs + "\\__~ <expr>"
+        return ans + '\n' + '\t'*(tabs+1) + self.expr.visit()
         
 
 class CallNode(AtomicNode):

@@ -48,7 +48,7 @@ class Tokenizer:
 
     tokens = ['STRING', 'LPAREN', 'RPAREN', 'LBRACE' , 'RBRACE', 'PLUS', 'MINUS',
     'TIMES', 'DIVIDE', 'SEMICOLON', 'COMMA', 'ID', 'MINOR', 'MINOR_EQUALS', "EQUALS", 
-    'LEFT_ARROW', 'RIGHT_ARROW', 'DOT', 'DOUBLE_DOT', "ARROBA", 'NUMBER', 'SELF'] + list(reserved.values())
+    'LEFT_ARROW', 'RIGHT_ARROW', 'DOT', 'DOUBLE_DOT', "ARROBA", 'NUMBER', 'SELF', 'NHANHARA'] + list(reserved.values())
 
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -68,6 +68,7 @@ class Tokenizer:
     t_DOT = r'\.'
     t_DOUBLE_DOT = r':'
     t_ARROBA = r'@'
+    t_NHANHARA = r'~'
     
     def t_SELF(self, t):
         r'self'
@@ -96,6 +97,47 @@ class Tokenizer:
     def t_comment(self, t):
         r'--[^\n]*\n'
         t.lexer.lineno += 1
+    
+    def t_commentMultiline(self, t):
+        r'\(\*'
+        s = ''
+        count = 1
+        end_re = lex.re.compile('\*\)')
+        open_re = lex.re.compile('\(\*')
+        any_re = lex.re.compile('[^\(\)\*]*')
+        while count > 0:
+            if t.lexer.lexpos == len(t.lexer.lexdata):
+                break
+
+            m = end_re.match(t.lexer.lexdata[t.lexer.lexpos:])
+            
+            if not m is None:
+                s+= m.group()
+                t.lexer.skip(2)
+                count -= 1
+                continue
+            
+            m = open_re.match(t.lexer.lexdata[t.lexer.lexpos:])
+            if not m is None:
+                s+=m.group()
+                t.lexer.skip(2)
+                count += 1
+                continue
+
+            m = any_re.match(t.lexer.lexdata[t.lexer.lexpos:])
+            if m.group() == '':
+                s+= str(t.lexer.lexdata[t.lexer.lexpos])
+                t.lexer.skip(1)
+            else:
+                s += m.group()
+                t.lexer.skip(len(m.group()))
+
+        t.lexer.lineno += len(s.split('\n')) - 1
+        if count > 0:
+            self.errors.append("(" + str(t.lexer.lineno) + ", " + str(t.lexer.lexpos) + ") - LexicographicError: EOF in comment")
+
+
+
 
     def t_comment_end_string(self, t):
         r'--[^$]*$'
@@ -147,10 +189,63 @@ class Lexer(CompilerComponent):
             print(e)
 
 ########################### Testing ##############################
-data = '''class A { 
-    f(a:int ,b:bool,c:hijo):hello{g@};
+data = '''--Any characters between two dashes “--” and the next newline
+--(or EOF, if there is no next newline) are treated as comments
 
-    };''' 
+(*(*(*
+Comments may also be written by enclosing
+text in (∗ . . . ∗). The latter form of comment may be nested.
+Comments cannot cross file boundaries.
+*)*)*)
+
+class Error() {
+
+        (* There was once a comment,
+         that was quite long.
+         But, the reader soon discovered that
+         the comment was indeed longer than
+         previously assumed. Now, the reader
+         was in a real dilemma; is the comment
+         ever gonna end? If I stop reading, will
+         it end?
+         He started imagining all sorts of things.
+         He thought about heisenberg's cat and how
+         how that relates to the end of the sentence.
+         He thought to himself "I'm gonna stop reading".
+         "If I keep reading this comment, I'm gonna know
+         the fate of this sentence; That will be disastorous."
+         He knew that such a comment was gonna extend to
+         another file. It was too awesome to be contained in
+         a single file. And he would have kept reading too...
+         if only...
+         cool wasn't a super-duper-fab-awesomest language;
+         but cool is that language;
+         "This comment shall go not cross this file" said cool.
+         Alas! The reader could read no more.
+         There was once a comment,
+         that was quite long.
+         But, the reader soon discovered that
+         the comment was indeed longer than
+         previously assumed. Now, the reader
+         was in a real dilemma; is the comment
+         ever gonna end? If I stop reading, will
+         it end?
+         He started imagining all sorts of things.
+         He thought about heisenberg's cat and how
+         how that relates to the end of the sentence.
+         He thought to himself "I'm gonna stop reading".
+         "If I keep reading this comment, I'm gonna know
+         the fate of this sentence; That will be disastorous."
+         He knew that such a comment was gonna extend to
+         another file. It was too awesome to be contained in
+         a single file. And he would have kept reading too...
+         if only...
+         cool wasn't a super-duper-fab-awesomest language;
+         but cool is that language;
+         "This comment shall go not cross this file" said cool.
+         Alas! The reader could read no more.''' 
 lexer = Lexer(data)
-#lexer.execute()
+lexer.execute()
+lexer.print_errors()
+print(len(data))
 ##### borrar luego ########################################

@@ -201,8 +201,16 @@ def p_caseList(p):
         p[0] = [AttrDeclarationNode(p[1], p[3], p[5])] + p[7]
 
 def p_atomIsVoid(p):
-    'atom : ISVOID atom'
+    'atom : ISVOID factor'
     p[0] = IsVoidNode(p[2])
+
+def p_atomNot(p):
+    'atom : NOT factor'
+    p[0] = NotNode(p[2])
+
+def p_atomNhanhara(p):
+    'atom : NHANHARA factor'
+    p[0] = NhanharaNode(p[2])
 
 def p_func_call(p):
     '''func_call : factor DOT ID LPAREN arg_list RPAREN
@@ -272,8 +280,10 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = '''class A {
-    a:a<- isvoid f.f().f()@T.f();
+data = '''class A { (*(*
+a
+*)*)
+    a:;
     };'''  
 parser = yacc.yacc()
 result = parser.parse(data)
