@@ -31,12 +31,12 @@ class Test {
 
     testing5(a: String, b: String): IO {
         If a.length() < b.length() THeN
-            new IO.out_string("La cadena \"".concat(b).concat("\" es mas larga que la cadena \"").concat(a).concat("\"."))
+            new IO.out_string("La cadena ".concat(b).concat(" es mas larga que la cadena ").concat(a).concat("\."))
         eLSe
             if a.length() = b.length() THeN
-                new IO.out_string("La cadena \"".concat(a).concat("\" mide igual que la cadena \"").concat(b).concat("\"."))
+                new IO.out_string("La cadena ".concat(a).concat(" mide igual que la cadena ").concat(b).concat("."))
             ElsE
-                new IO.out_string("La cadena \"".concat(a).concat("\" es mas larga que la cadena \"").concat(b).concat("\"."))
+                new IO.out_string("La cadena ".concat(a).concat(" es mas larga que la cadena ").concat(b).concat("."))
             fI
         Fi
     };
