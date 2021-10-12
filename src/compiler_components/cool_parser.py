@@ -66,6 +66,7 @@ def p_def_func(p):
 
 def p_param_list(p):
     '''param_list : param COMMA param_list
+                  | param
                   | empty
     '''
     if len(p) == 2:
@@ -226,10 +227,7 @@ def p_func_call(p):
 
 def p_func_call2(p):
     'func_call : ID LPAREN arg_list RPAREN'
-    print("#######################")
-    for i in range(len(p)):
-        print(p[i])
-    print("##########################")
+    
     if not p[3][0] is None:
         p[0] = CallNode(None, p[1], p[3])
     else:
@@ -284,7 +282,7 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = '''class A {o():f{a};};'''  
+data = '''class A {o(a:int):f{a};};'''  
 parser = yacc.yacc()
 result = parser.parse(data)
 if len(errors) == 0:
