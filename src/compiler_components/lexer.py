@@ -48,7 +48,7 @@ class Tokenizer:
 
     tokens = ['STRING', 'LPAREN', 'RPAREN', 'LBRACE' , 'RBRACE', 'PLUS', 'MINUS',
     'TIMES', 'DIVIDE', 'SEMICOLON', 'COMMA', 'ID', 'MINOR', 'MINOR_EQUALS', "EQUALS", 
-    'LEFT_ARROW', 'RIGHT_ARROW', 'DOT', 'DOUBLE_DOT', "ARROBA", 'NUMBER', 'SELF', 'NHANHARA'] + list(reserved.values())
+    'LEFT_ARROW', 'RIGHT_ARROW', 'DOT', 'DOUBLE_DOT', "ARROBA", 'NUMBER', 'SELF', 'NHANHARA', 'TYPE_ID'] + list(reserved.values())
 
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -84,7 +84,7 @@ class Tokenizer:
         return t    
 
     def t_ID(self, t):
-        r'[a-zA-Z][a-zA-Z_0-9]*'
+        r'[a-z][a-zA-Z_0-9]*'
         v = t.value.lower()
         #true o false tienen que escribirse en letra inicial minuscula, de lo contrario son IDs
         if v == 'true' or v == 'false':
@@ -92,6 +92,17 @@ class Tokenizer:
                 return t
 
         t.type = self.reserved.get(t.value.lower(), 'ID')
+        return t
+
+    def t_TYPE_ID(self, t):
+        r'[A-Z][a-zA-Z_0-9]*'
+        v = t.value.lower()
+        #true o false tienen que escribirse en letra inicial minuscula, de lo contrario son IDs
+        if v == 'true' or v == 'false':
+            if t.value[0] == 'T' or t.value[0] == 'F':
+                return t
+
+        t.type = self.reserved.get(t.value.lower(), 'TYPE_ID')
         return t
 
     def t_comment(self, t):

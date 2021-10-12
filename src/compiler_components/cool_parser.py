@@ -24,8 +24,8 @@ def p_class_list(p):
         p[0] = [p[1]] + p[3]  
 
 def p_def_class(p):
-    '''def_class : CLASS ID LBRACE feature_list RBRACE
-                 | CLASS ID INHERITS ID LBRACE feature_list RBRACE
+    '''def_class : CLASS TYPE_ID LBRACE feature_list RBRACE
+                 | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE
     '''
     if len(p) == 6:
         p[0] = ClassDeclarationNode(p[2], p[4])
@@ -47,8 +47,8 @@ def p_feature_list(p):
         p[0] = [p[1]] + p[3]
 
 def p_def_attr(p):
-    '''def_attr : ID DOUBLE_DOT ID
-                | ID DOUBLE_DOT ID LEFT_ARROW expr
+    '''def_attr : ID DOUBLE_DOT TYPE_ID
+                | ID DOUBLE_DOT TYPE_ID LEFT_ARROW expr
     '''
     if len(p) == 4:
         p[0] = AttrDeclarationNode(p[1], p[3])
@@ -56,7 +56,7 @@ def p_def_attr(p):
         p[0] = AttrDeclarationNode(p[1], p[3], p[5])
 
 def p_def_func(p):
-    '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT ID LBRACE expr RBRACE
+    '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT TYPE_ID LBRACE expr RBRACE
     '''
     if p[3][0] == None:
         params = []
@@ -75,7 +75,7 @@ def p_param_list(p):
         p[0] = [p[1]] + p[3]
 
 def p_param(p):
-    '''param : ID DOUBLE_DOT ID
+    '''param : ID DOUBLE_DOT TYPE_ID
     '''
     p[0] = [p[1], p[3]]
 
@@ -145,7 +145,7 @@ def p_atom3(p):
     p[0] = p[1]
 
 def p_atom4(p):
-    '''atom : NEW ID 
+    '''atom : NEW TYPE_ID 
     '''
     p[0] = InstantiateNode(p[2])
 
@@ -197,8 +197,8 @@ def p_atomCase(p):
     p[0] = CaseNode(p[2], p[4])
 
 def p_caseList(p):
-    '''case_list : ID DOUBLE_DOT ID RIGHT_ARROW expr SEMICOLON
-                 | ID DOUBLE_DOT ID RIGHT_ARROW expr SEMICOLON case_list
+    '''case_list : ID DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON
+                 | ID DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON case_list
     '''
     if len(p) == 7:
         p[0] = [AttrDeclarationNode(p[1], p[3], p[5])]
@@ -234,7 +234,7 @@ def p_func_call2(p):
         p[0] = CallNode(None, p[1])
 
 def p_func_call3(p):
-    'func_call : factor ARROBA ID DOT ID LPAREN arg_list RPAREN'
+    'func_call : factor ARROBA TYPE_ID DOT ID LPAREN arg_list RPAREN'
     if not p[7][0] is None:
         p[0] = CallNode(p[1], p[5], args = p[7], type = p[3])
     else:
@@ -282,7 +282,7 @@ class Parser(CompilerComponent):
 
 
 ################ TEsting zone ###########################
-data = '''class A{a:B <- (new A);};'''  
+data = ''''''  
 parser = yacc.yacc()
 result = parser.parse(data)
 if len(errors) == 0:
