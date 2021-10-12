@@ -10,7 +10,9 @@ class Node:
 
 
 class ExpressionNode(Node):
-    def __init__(self, locals: List = []) -> None:
+    def __init__(self, locals: List = None ) -> None:
+        if locals is None:
+            self.locals = []
         self.locals = locals
 
 
@@ -51,8 +53,10 @@ class CaseNode(ExpressionNode):
         self,
         case_expr: ExpressionNode,
         options: List[CaseOptionNode],
-        locals: List = [],
+        locals: List = None,
     ) -> None:
+        if locals is None:
+            locals = []
         super().__init__(locals=locals)
         self.case_expr = case_expr
         self.options = options
@@ -64,8 +68,10 @@ class ConditionalNode(ExpressionNode):
         condition: ExpressionNode,
         then_node: ExpressionNode,
         else_node: ExpressionNode,
-        locals: List = [],
+        locals: List = None,
     ) -> None:
+        if locals is None:
+            locals = []
         super().__init__(locals=locals)
         self.condition = condition
         self.then_node = then_node
@@ -89,7 +95,9 @@ class BlocksNode(ExpressionNode):
 
 
 class LetVarDeclarationNode(ExpressionNode):
-    def __init__(self, idx: str, typex: str, expression=None, locals=[]):
+    def __init__(self, idx: str, typex: str, expression=None, locals=None):
+        if locals is None:
+            locals = []
         super().__init__(self, locals=locals)
         self.idx = idx
         self.type = typex
