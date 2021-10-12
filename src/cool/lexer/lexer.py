@@ -288,8 +288,8 @@ def main(text: str, output = None):
 
     a = lexer.tokenize(text)
     
-    # for i in a:
-        # print(i)
+    for i in a:
+        print(i)
 
     if lexer.errors:
         for e in lexer.errors:
