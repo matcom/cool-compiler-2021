@@ -28,6 +28,7 @@ $$
 &|& \text{return Atom}\\
 &|& \text{setattr id id Atom}\\
 &|& \text{if Atom goto id}\\
+&|& \text{ifFalse Atom goto id}\\
 &|& \text{ArgList id = call id integer}\\
 &|& \text{ArgList id = vcall id id integer }\\
 &|& \text{ExpressionList}\\
@@ -66,8 +67,7 @@ while (<cond_expr>) loop <expr> pool
 ```assembly
 label while_init
 x = <resultado_numerico_de_cond_expr>
-neg_x = neg x
-if neg_x goto while_end
+ifFalse x goto while_end
 
 <do_body_expr>
 
@@ -87,16 +87,15 @@ if <if_expr> then <then_expr> else <else_expr> fi
 
 ```assembly
 x = <resultado_numerico_de_if_expr>
-if x goto then_expr
-label else_expr
-
-<do_else_expr>
-
-goto endif
-
+ifFalse x goto else_expr
 label then_expr
 
 <do then_expr>
+
+goto endif
+label else_expr
+
+<do_else_expr>
 
 label endif
 ```
