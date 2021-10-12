@@ -84,7 +84,7 @@ class Tokenizer:
         return t    
 
     def t_ID(self, t):
-        r'[a-zA-Z_][a-zA-Z_0-9]*'
+        r'[a-zA-Z][a-zA-Z_0-9]*'
         v = t.value.lower()
         #true o false tienen que escribirse en letra inicial minuscula, de lo contrario son IDs
         if v == 'true' or v == 'false':
@@ -134,7 +134,8 @@ class Tokenizer:
 
         t.lexer.lineno += len(s.split('\n')) - 1
         if count > 0:
-            self.errors.append("(" + str(t.lexer.lineno) + ", " + str(t.lexer.lexpos) + ") - LexicographicError: EOF in comment")
+            posAtLine = len(t.lexer.lexdata.split('\n')[t.lexer.lineno - 1]) + 1
+            self.errors.append("(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ") - LexicographicError: EOF in comment")
 
 
 
@@ -148,8 +149,20 @@ class Tokenizer:
         t.lexer.lineno += len(t.value)
 
     def t_error(self, t):
-        error = 'Error en la linea ' + str(t.lexer.lineno) + ': \'' + printLine(t.lexer.lexdata, t.lexer.lineno)
-        error += '\' -->  Problema con el caracter \'' + t.value[0] + '\''
+        #error = 'Error en la linea ' + str(t.lexer.lineno) + ': \'' + printLine(t.lexer.lexdata, t.lexer.lineno)
+        #error += '\' -->  Problema con el caracter \'' + t.value[0] + '\''
+
+        
+
+        s = t.lexer.lexdata.split('\n')
+        count = 0
+        for i in range(t.lexer.lineno - 1):
+            count += len(s[i])
+
+        print(t.lexer.lexpos)
+        print(count)
+        posAtLine = t.lexer.lexpos - count - t.lexer.lineno + 2
+        error = "(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ') - LexicographicError: ERROR "' + t.lexer.lexdata[t.lexer.lexpos] + '"'
         self.errors.append(error)
         t.lexer.skip(1)
 
@@ -189,61 +202,20 @@ class Lexer(CompilerComponent):
             print(e)
 
 ########################### Testing ##############################
-data = '''--Any characters between two dashes “--” and the next newline
---(or EOF, if there is no next newline) are treated as comments
+data = '''"lkjdsafkljdsalfj\u0000dsafdsaf\u0000djafslkjdsalf\nsdajf\" lkjfdsasdkjfl"123
+adsfasklj#
+LKldsajf iNhERITS
+"lkdsajf"
 
-(*(*(*
-Comments may also be written by enclosing
-text in (∗ . . . ∗). The latter form of comment may be nested.
-Comments cannot cross file boundaries.
-*)*)*)
-
-class Error() {
-
-        (* There was once a comment,
-         that was quite long.
-         But, the reader soon discovered that
-         the comment was indeed longer than
-         previously assumed. Now, the reader
-         was in a real dilemma; is the comment
-         ever gonna end? If I stop reading, will
-         it end?
-         He started imagining all sorts of things.
-         He thought about heisenberg's cat and how
-         how that relates to the end of the sentence.
-         He thought to himself "I'm gonna stop reading".
-         "If I keep reading this comment, I'm gonna know
-         the fate of this sentence; That will be disastorous."
-         He knew that such a comment was gonna extend to
-         another file. It was too awesome to be contained in
-         a single file. And he would have kept reading too...
-         if only...
-         cool wasn't a super-duper-fab-awesomest language;
-         but cool is that language;
-         "This comment shall go not cross this file" said cool.
-         Alas! The reader could read no more.
-         There was once a comment,
-         that was quite long.
-         But, the reader soon discovered that
-         the comment was indeed longer than
-         previously assumed. Now, the reader
-         was in a real dilemma; is the comment
-         ever gonna end? If I stop reading, will
-         it end?
-         He started imagining all sorts of things.
-         He thought about heisenberg's cat and how
-         how that relates to the end of the sentence.
-         He thought to himself "I'm gonna stop reading".
-         "If I keep reading this comment, I'm gonna know
-         the fate of this sentence; That will be disastorous."
-         He knew that such a comment was gonna extend to
-         another file. It was too awesome to be contained in
-         a single file. And he would have kept reading too...
-         if only...
-         cool wasn't a super-duper-fab-awesomest language;
-         but cool is that language;
-         "This comment shall go not cross this file" said cool.
-         Alas! The reader could read no more.''' 
+(*
+#1 STR_CONST "lkjdsafkljdsalfju0000dsafdsafu0000djafslkjdsalf\nsdajf\" lkjfdsasdkjfl"
+#1 INT_CONST 123
+#2 OBJECTID adsfasklj
+#2 ERROR "#"
+#3 TYPEID LKldsajf
+#3 INHERITS
+#4 STR_CONST "lkdsajf"
+*)''' 
 lexer = Lexer(data)
 lexer.execute()
 lexer.print_errors()
