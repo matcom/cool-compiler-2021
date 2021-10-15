@@ -47,7 +47,13 @@ class AssignNode(ExpressionNode):
         self.expr = expr
 
 
-# FUNC CALLS NODES MISSING
+class FuncCallNode(ExpressionNode):
+    def __init__(self, id, args, object=None, type=None):
+        super().__init__()
+        self.id = id
+        self.args = args
+        self.object = object
+        self.type = type
 
 
 class IfNode(ExpressionNode):
