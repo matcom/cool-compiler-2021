@@ -15,3 +15,13 @@ class CoolError():
 class LexicographicError(CoolError):
     def __init__(self, text, line, column):
         super().__init__('LexicograficError', text, line, column)
+
+
+class SyntacticError(CoolError):
+    def __init__(self, text, line, column):
+        super().__init__('SyntacticError', text, line, column)
+
+
+class SemanticError(CoolError):
+    def __init__(self, text, line, column):
+        super().__init__('SemanticError', text, line, column)

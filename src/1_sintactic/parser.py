@@ -1,11 +1,23 @@
-from ast import *
 import ply.yacc as yacc
+from ast import *
+from utils.utils import *
 
 
 class CoolParser:
     def __init__(self, lexer):
         self.lexer = lexer
         self.parser = yacc.yacc(start='program', module=self)
+        self.errors = []
+
+    procedence = (
+        ('left, AT'),
+        ('left, NOT'),
+        ('left, ISVOID'),
+        ('left, EQUAL, LESS, LESSEQ'),
+        ('left, PLUS, MINUS'),
+        ('left, STAR, DIV'),
+        ('left, DOT')
+    )
 
     def parse(self, program):
         pass
@@ -24,12 +36,15 @@ class CoolParser:
         p[0] = [p[1]] if len(p) == 3 else [p[1]] + p[3]
 
     def p_def_class(self, p):
-        '''def_class : CLASS TYPE LPAREN feature_list RPAREN 
+        '''def_class : CLASS TYPE LPAREN feature_list RPAREN
                      | CLASS TYPE INHERITS TYPE LPAREN feature_list RPAREN'''
         if len(p) == 8:
             p[0] = ClassDeclarationNode(p[2], p[6], p[4])
         else:
             p[0] = ClassDeclarationNode(p[2], p[4])
+
+        p[0].add_line_column(p.lineno(2), find_column(
+            p.lexer.lexdata, p.lexpos(2)))
 
     def p_feature_list(self, p):
         '''feature_list : def_attr SEMICOLON feature_list
@@ -38,12 +53,15 @@ class CoolParser:
         p[0] = [p[1]] + p[3] if len(p) == 4 else []
 
     def p_def_attr(self, p):
-        '''def_attr : ID COLON TYPE  
+        '''def_attr : ID COLON TYPE
                     | ID COLON TYPE ASSIGN expr'''
         if len(p) == 4:
             p[0] = AttrDeclarationNode(p[1], p[3])
         else:
             p[0] = AttrDeclarationNode(p[1], p[3], p[5])
+
+        p[0].add_line_column(p.lineno(3), find_column(
+            p.lexer.lexdata, p.lexpos(3)))
 
     def p_def_func(self, p):
         '''def_func : ID LPAREN params RPAREN COLON TYPE LBRACE expr RBRACE'''
@@ -80,9 +98,11 @@ class CoolParser:
     def p_case_option(self, p):
         '''case_option : ID COLON TYPE ARROW expr'''
         p[0] = CaseOptionNode(p[1], p[3], p[5])
+        p[0].add_line_column(p.lineno(3), find_column(
+            p.lexer.lexdata, p.lexpos(3)))
 
     def p_args(self, p):
-        '''args : arg_list 
+        '''args : arg_list
                 | arg_list_empty'''
         p[0] = p[1]
 
@@ -98,36 +118,50 @@ class CoolParser:
     def p_atom_int(self, p):
         '''atom : INT'''
         p[0] = IntNode(int(p[1]))
+        p[0].add_line_column(p.lineno(1), find_column(
+            p.lexer.lexdata, p.lexpos(1)))
 
     def p_atom_id(self, p):
         '''atom : ID'''
         p[0] = VarNode(p[1])
+        p[0].add_line_column(p.lineno(1), find_column(
+            p.lexer.lexdata, p.lexpos(1)))
 
     def p_atom_bool(self, p):
         '''atom : BOOL'''
         p[0] = BoolNode(p[1])
+        p[0].add_line_column(p.lineno(1), find_column(
+            p.lexer.lexdata, p.lexpos(1)))
 
     def p_atom_string(self, p):
         '''atom : STRING'''
         p[0] = StringNode(p[1])
+        p[0].add_line_column(p.lineno(1), find_column(
+            p.lexer.lexdata, p.lexpos(1)))
 
     def p_atom_new(self, p):
         '''atom : NEW TYPE'''
         p[0] = NewNode(p[2])
-    
+        p[0].add_line_column(p.lineno(2), find_column(
+            p.lexer.lexdata, p.lexpos(2)))
+
     def p_atom_block(self, p):
         '''atom : block'''
         p[0] = p[1]
-    
+
     def p_block(self, p):
         '''block : LBRACE block_list RBRACE'''
         p[0] = p[2]
-    
+
     def p_block_list(self, p):
         ''' block_list : expr SEMICOLON
                        | expr SEMICOLON block_list'''
-        p[0] = BlockNode([p[1]]) if len(p) == 3 else BlockNode([p[1]] + p[3].exprs)
+        p[0] = BlockNode([p[1]]) if len(
+            p) == 3 else BlockNode([p[1]] + p[3].exprs)
 
     def p_error(self, p):
-        pass 
-
+        if p:
+            self.lexer.add_line_column(p)
+            self.errors.append(SyntacticError(f'ERROR at or near {p.value}', p.line, p.column)
+        else:
+            self.errors.append(SyntacticError(f'ERROR at or near EOF', 0, 0)

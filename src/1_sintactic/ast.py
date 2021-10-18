@@ -1,6 +1,11 @@
 class Node():
     def __init__(self):
-        pass
+        self.line = 0
+        self.column = 0
+
+    def add_line_column(self, line, column):
+        self.line = line
+        self.column = column
 
 
 class ProgramNode(Node):
