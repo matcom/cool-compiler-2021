@@ -303,7 +303,10 @@ class CILRunnerVisitor():
                     
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        typex = self.get_type(node.type)
+        if node.type in caller_fun_scope: # TODO Remove duality between Value and ReferencedValue
+            typex = self.get_type(caller_fun_scope[node.type])
+        else:
+            typex = self.get_type(node.type)
         try:
             func_name = next(static_name for name, static_name in typex.methods if name == node.method)
         except StopIteration:
@@ -352,7 +355,10 @@ class CILRunnerVisitor():
         
     @visitor.when(cil.AllocateNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        typex = self.get_type(node.type)
+        if node.type in caller_fun_scope: # TODO Remove duality between Value and ReferencedValue
+            typex = self.get_type(caller_fun_scope[node.type])
+        else:
+            typex = self.get_type(node.type)
         value = {
             "$type": typex,
         }
@@ -364,7 +370,7 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.TypeOfNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        value = self.get_value(node.obj)
+        value = self.get_value(node.obj, caller_fun_scope)
         if isinstance(value, int):
             self.set_value(node.dest, "Int", caller_fun_scope)
         elif isinstance(value, str):
@@ -632,7 +638,7 @@ class COOLToCILVisitor():
         type_node = self.register_type(self.current_type.name)
         
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
-        type_node.methods.append((init_function.name, init_function.name))
+        type_node.methods.append(("$init", init_function.name))
         self.params.append(cil.ParamNode('self'))
         
         for attr,typex in self.current_type.all_attributes():
@@ -1040,9 +1046,18 @@ class COOLToCILVisitor():
         # Your code here!!!
         instance = self.define_internal_local()
         instance_typex = self.context.get_type(node.lex)
-        self.register_instruction(cil.AllocateNode(instance_typex.name, instance))
-        self.register_instruction(cil.ArgNode(instance))
-        self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(instance_typex.name), instance))
+        if instance_typex.name == "Void":
+            self.register_instruction(cil.VoidNode(instance))
+        elif instance_typex.name == "SELF_TYPE":
+            dynamic_type = self.define_internal_local()
+            self.register_instruction(cil.TypeOfNode("self", dynamic_type))
+            self.register_instruction(cil.AllocateNode(dynamic_type, instance))
+            self.register_instruction(cil.ArgNode(instance))
+            self.register_instruction(cil.DynamicCallNode(dynamic_type, "$init", instance))
+        else:
+            self.register_instruction(cil.AllocateNode(instance_typex.name, instance))
+            self.register_instruction(cil.ArgNode(instance))
+            self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(instance_typex.name), instance))
         return instance
         
     @visitor.when(PlusNode)

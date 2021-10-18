@@ -80,7 +80,7 @@ El pipeline encargado de esta etapa es `syntax_pipeline` el cual evalúa el pars
 
 ##### Gramática
 
-La gramática propuesta para COOL se encuentra en `cool/grammar/cool_grammar.py`. Esta es una gramática atributada la cual al ser evaluada devuelve el AST correspondiente al de entrada de COOL.
+La gramática propuesta para COOL se encuentra en `cool/grammar/cool_grammar.py`. Esta es una gramática atributada la cual al ser evaluada devuelve el AST correspondiente al programa de entrada de COOL.
 
 ##### Parser
 

@@ -2,7 +2,7 @@
 type Object {
 	
 
-	method $init_Object_type: $init_Object_type
+	method $init: $init_Object_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -10,7 +10,7 @@ type Object {
 type String {
 	
 
-	method $init_String_type: $init_String_type
+	method $init: $init_String_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -21,7 +21,7 @@ type String {
 type Bool {
 	
 
-	method $init_Bool_type: $init_Bool_type
+	method $init: $init_Bool_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -29,7 +29,7 @@ type Bool {
 type Int {
 	
 
-	method $init_Int_type: $init_Int_type
+	method $init: $init_Int_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -37,7 +37,7 @@ type Int {
 type IO {
 	
 
-	method $init_IO_type: $init_IO_type
+	method $init: $init_IO_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -46,11 +46,35 @@ type IO {
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
 }
-type Main {
-	attribute number
+type A {
+	attribute a
 
-	method $init_Main_type: $init_Main_type
-	method $init_number_at_Main: $init_number_at_Main
+	method $init: $init_A_type
+	method $init_a_at_A: $init_a_at_A
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method get: function_get_at_A
+	method get2: function_get2_at_A
+	method get3: function_get3_at_A
+}
+type B {
+	attribute a
+
+	method $init: $init_B_type
+	method $init_a_at_B: $init_a_at_B
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method get: function_get_at_A
+	method get2: function_get2_at_A
+	method get3: function_get3_at_A
+	method get4: function_get4_at_B
+}
+type Main {
+	
+
+	method $init: $init_Main_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -59,16 +83,10 @@ type Main {
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
 	method main: function_main_at_Main
-	method testing_fibonacci: function_testing_fibonacci_at_Main
-	method recursive_fibonacci: function_recursive_fibonacci_at_Main
-	method iterative_fibonacci: function_iterative_fibonacci_at_Main
 }
 
 .DATA
-data_0 = "Iterative Fibonacci : "
-data_1 = "\n"
-data_2 = "Recursive Fibonacci : "
-data_3 = "\n"
+
 
 .CODE
 function entry {
@@ -206,147 +224,155 @@ function function_in_int_at_IO {
 	local_in_int_at_IO_internal_0 = READ
 	RETURN local_in_int_at_IO_internal_0
 }
-function $init_Main_type {
+function $init_A_type {
 	PARAM self
 
-	LOCAL local_Main_type_internal_0
+	LOCAL local_A_type_internal_0
 
 	ARG self
-	local_Main_type_internal_0 = CALL $init_number_at_Main
+	local_A_type_internal_0 = CALL $init_a_at_A
 	RETURN self
 }
-function $init_number_at_Main {
+function $init_a_at_A {
+	PARAM self
+
+	LOCAL local_a_at_A_internal_0
+
+	local_a_at_A_internal_0 = VOID
+	SETATTR self a local_a_at_A_internal_0
+	RETURN 
+}
+function function_get_at_A {
 	PARAM self
 
 	
 
-	SETATTR self number 5
+	RETURN self
+}
+function function_get2_at_A {
+	PARAM self
+
+	LOCAL local_get2_at_A_internal_0
+	LOCAL local_get2_at_A_internal_1
+
+	local_get2_at_A_internal_1 = TYPEOF self
+	local_get2_at_A_internal_0 = ALLOCATE local_get2_at_A_internal_1
+	ARG local_get2_at_A_internal_0
+	local_get2_at_A_internal_0 = VCALL local_get2_at_A_internal_1 $init
+	RETURN local_get2_at_A_internal_0
+}
+function function_get3_at_A {
+	PARAM self
+
+	LOCAL local_get3_at_A_internal_0
+	LOCAL local_get3_at_A_internal_1
+	LOCAL local_get3_at_A_internal_2
+	LOCAL local_get3_at_A_internal_3
+
+	local_get3_at_A_internal_2 = TYPEOF self
+	local_get3_at_A_internal_1 = ALLOCATE local_get3_at_A_internal_2
+	ARG local_get3_at_A_internal_1
+	local_get3_at_A_internal_1 = VCALL local_get3_at_A_internal_2 $init
+	SETATTR self a local_get3_at_A_internal_1
+	local_get3_at_A_internal_3 = GETATTR self a
+	RETURN local_get3_at_A_internal_3
+}
+function $init_B_type {
+	PARAM self
+
+	LOCAL local_B_type_internal_0
+
+	ARG self
+	local_B_type_internal_0 = CALL $init_a_at_B
+	RETURN self
+}
+function $init_a_at_B {
+	PARAM self
+
+	LOCAL local_a_at_B_internal_0
+
+	local_a_at_B_internal_0 = VOID
+	SETATTR self a local_a_at_B_internal_0
 	RETURN 
+}
+function function_get4_at_B {
+	PARAM self
+
+	LOCAL local_get4_at_B_internal_0
+
+	ARG self
+	local_get4_at_B_internal_0 = VCALL B get3
+	RETURN local_get4_at_B_internal_0
+}
+function $init_Main_type {
+	PARAM self
+
+	
+
+	RETURN self
 }
 function function_main_at_Main {
 	PARAM self
 
-	LOCAL local_main_at_Main_internal_0
+	LOCAL local_main_at_Main_a_0
 	LOCAL local_main_at_Main_internal_1
+	LOCAL local_main_at_Main_b_2
+	LOCAL local_main_at_Main_internal_3
+	LOCAL local_main_at_Main_internal_4
+	LOCAL local_main_at_Main_internal_5
+	LOCAL local_main_at_Main_internal_6
+	LOCAL local_main_at_Main_internal_7
+	LOCAL local_main_at_Main_internal_8
+	LOCAL local_main_at_Main_internal_9
+	LOCAL local_main_at_Main_internal_10
+	LOCAL local_main_at_Main_internal_11
+	LOCAL local_main_at_Main_internal_12
+	LOCAL local_main_at_Main_internal_13
+	LOCAL local_main_at_Main_internal_14
+	LOCAL local_main_at_Main_internal_15
+	LOCAL local_main_at_Main_internal_16
+	LOCAL local_main_at_Main_internal_17
 
-	local_main_at_Main_internal_0 = GETATTR self number
+	local_main_at_Main_internal_1 = ALLOCATE A
+	ARG local_main_at_Main_internal_1
+	local_main_at_Main_internal_1 = CALL $init_A_type
+	local_main_at_Main_a_0 = local_main_at_Main_internal_1
+	local_main_at_Main_internal_3 = ALLOCATE B
+	ARG local_main_at_Main_internal_3
+	local_main_at_Main_internal_3 = CALL $init_B_type
+	local_main_at_Main_b_2 = local_main_at_Main_internal_3
+	ARG local_main_at_Main_b_2
+	local_main_at_Main_internal_4 = VCALL B get
+	ARG local_main_at_Main_internal_4
+	local_main_at_Main_internal_5 = VCALL B type_name
+	ARG local_main_at_Main_b_2
+	local_main_at_Main_internal_6 = VCALL B get2
+	ARG local_main_at_Main_internal_6
+	local_main_at_Main_internal_7 = VCALL B type_name
+	ARG local_main_at_Main_internal_5
+	ARG local_main_at_Main_internal_7
+	local_main_at_Main_internal_8 = VCALL String concat
+	ARG local_main_at_Main_b_2
+	local_main_at_Main_internal_9 = VCALL B get3
+	ARG local_main_at_Main_internal_9
+	local_main_at_Main_internal_10 = VCALL B type_name
+	ARG local_main_at_Main_internal_8
+	ARG local_main_at_Main_internal_10
+	local_main_at_Main_internal_11 = VCALL String concat
+	ARG local_main_at_Main_b_2
+	local_main_at_Main_internal_12 = VCALL B get4
+	ARG local_main_at_Main_internal_12
+	local_main_at_Main_internal_13 = VCALL B type_name
+	ARG local_main_at_Main_internal_11
+	ARG local_main_at_Main_internal_13
+	local_main_at_Main_internal_14 = VCALL String concat
 	ARG self
-	ARG local_main_at_Main_internal_0
-	local_main_at_Main_internal_1 = VCALL Main testing_fibonacci
-	RETURN local_main_at_Main_internal_1
-}
-function function_testing_fibonacci_at_Main {
-	PARAM self
-	PARAM n
-
-	LOCAL local_testing_fibonacci_at_Main_internal_0
-	LOCAL local_testing_fibonacci_at_Main_internal_1
-	LOCAL local_testing_fibonacci_at_Main_internal_2
-	LOCAL local_testing_fibonacci_at_Main_internal_3
-	LOCAL local_testing_fibonacci_at_Main_internal_4
-	LOCAL local_testing_fibonacci_at_Main_internal_5
-	LOCAL local_testing_fibonacci_at_Main_internal_6
-	LOCAL local_testing_fibonacci_at_Main_internal_7
-	LOCAL local_testing_fibonacci_at_Main_internal_8
-	LOCAL local_testing_fibonacci_at_Main_internal_9
-	LOCAL local_testing_fibonacci_at_Main_internal_10
-	LOCAL local_testing_fibonacci_at_Main_internal_11
-	LOCAL local_testing_fibonacci_at_Main_internal_12
-
-	local_testing_fibonacci_at_Main_internal_1 = LOAD data_0
+	local_main_at_Main_internal_15 = VCALL Main type_name
+	ARG local_main_at_Main_internal_14
+	ARG local_main_at_Main_internal_15
+	local_main_at_Main_internal_16 = VCALL String concat
 	ARG self
-	ARG local_testing_fibonacci_at_Main_internal_1
-	local_testing_fibonacci_at_Main_internal_2 = VCALL Main out_string
-	ARG self
-	ARG 5
-	local_testing_fibonacci_at_Main_internal_3 = VCALL Main iterative_fibonacci
-	ARG self
-	ARG local_testing_fibonacci_at_Main_internal_3
-	local_testing_fibonacci_at_Main_internal_4 = VCALL Main out_int
-	local_testing_fibonacci_at_Main_internal_5 = LOAD data_1
-	ARG self
-	ARG local_testing_fibonacci_at_Main_internal_5
-	local_testing_fibonacci_at_Main_internal_6 = VCALL Main out_string
-	local_testing_fibonacci_at_Main_internal_7 = LOAD data_2
-	ARG self
-	ARG local_testing_fibonacci_at_Main_internal_7
-	local_testing_fibonacci_at_Main_internal_8 = VCALL Main out_string
-	ARG self
-	ARG 5
-	local_testing_fibonacci_at_Main_internal_9 = VCALL Main recursive_fibonacci
-	ARG self
-	ARG local_testing_fibonacci_at_Main_internal_9
-	local_testing_fibonacci_at_Main_internal_10 = VCALL Main out_int
-	local_testing_fibonacci_at_Main_internal_11 = LOAD data_3
-	ARG self
-	ARG local_testing_fibonacci_at_Main_internal_11
-	local_testing_fibonacci_at_Main_internal_12 = VCALL Main out_string
-	RETURN local_testing_fibonacci_at_Main_internal_12
-}
-function function_recursive_fibonacci_at_Main {
-	PARAM self
-	PARAM n
-
-	LOCAL local_recursive_fibonacci_at_Main_internal_0
-	LOCAL local_recursive_fibonacci_at_Main_internal_1
-	LOCAL local_recursive_fibonacci_at_Main_internal_2
-	LOCAL local_recursive_fibonacci_at_Main_internal_3
-	LOCAL local_recursive_fibonacci_at_Main_internal_4
-	LOCAL local_recursive_fibonacci_at_Main_internal_5
-	LOCAL local_recursive_fibonacci_at_Main_internal_6
-
-	local_recursive_fibonacci_at_Main_internal_1 = n > 2
-	local_recursive_fibonacci_at_Main_internal_1 = NOT local_recursive_fibonacci_at_Main_internal_1
-	IF local_recursive_fibonacci_at_Main_internal_1 GOTO recursive_fibonacci_at_Main_label_0
-	local_recursive_fibonacci_at_Main_internal_2 = n - 1
-	ARG self
-	ARG local_recursive_fibonacci_at_Main_internal_2
-	local_recursive_fibonacci_at_Main_internal_3 = VCALL Main recursive_fibonacci
-	local_recursive_fibonacci_at_Main_internal_4 = n - 2
-	ARG self
-	ARG local_recursive_fibonacci_at_Main_internal_4
-	local_recursive_fibonacci_at_Main_internal_5 = VCALL Main recursive_fibonacci
-	local_recursive_fibonacci_at_Main_internal_6 = local_recursive_fibonacci_at_Main_internal_3 + local_recursive_fibonacci_at_Main_internal_5
-	local_recursive_fibonacci_at_Main_internal_0 = local_recursive_fibonacci_at_Main_internal_6
-	GOTO recursive_fibonacci_at_Main_label_1
-	LABEL recursive_fibonacci_at_Main_label_0
-	local_recursive_fibonacci_at_Main_internal_0 = 1
-	LABEL recursive_fibonacci_at_Main_label_1
-	RETURN local_recursive_fibonacci_at_Main_internal_0
-}
-function function_iterative_fibonacci_at_Main {
-	PARAM self
-	PARAM n
-
-	LOCAL local_iterative_fibonacci_at_Main_i_0
-	LOCAL local_iterative_fibonacci_at_Main_n1_1
-	LOCAL local_iterative_fibonacci_at_Main_n2_2
-	LOCAL local_iterative_fibonacci_at_Main_temp_3
-	LOCAL local_iterative_fibonacci_at_Main_internal_4
-	LOCAL local_iterative_fibonacci_at_Main_internal_5
-	LOCAL local_iterative_fibonacci_at_Main_internal_6
-	LOCAL local_iterative_fibonacci_at_Main_temp_7
-	LOCAL local_iterative_fibonacci_at_Main_internal_8
-	LOCAL local_iterative_fibonacci_at_Main_internal_9
-	LOCAL local_iterative_fibonacci_at_Main_internal_10
-
-	local_iterative_fibonacci_at_Main_i_0 = 2
-	local_iterative_fibonacci_at_Main_n1_1 = 1
-	local_iterative_fibonacci_at_Main_n2_2 = 1
-	local_iterative_fibonacci_at_Main_temp_3 = 0
-	local_iterative_fibonacci_at_Main_internal_5 = VOID
-	LABEL iterative_fibonacci_at_Main_label_0
-	local_iterative_fibonacci_at_Main_internal_6 = local_iterative_fibonacci_at_Main_i_0 < n
-	IF local_iterative_fibonacci_at_Main_internal_6 GOTO iterative_fibonacci_at_Main_label_1
-	GOTO iterative_fibonacci_at_Main_label_2
-	LABEL iterative_fibonacci_at_Main_label_1
-	local_iterative_fibonacci_at_Main_temp_7 = local_iterative_fibonacci_at_Main_n2_2
-	local_iterative_fibonacci_at_Main_internal_9 = local_iterative_fibonacci_at_Main_n2_2 + local_iterative_fibonacci_at_Main_n1_1
-	local_iterative_fibonacci_at_Main_n2_2 = local_iterative_fibonacci_at_Main_internal_9
-	local_iterative_fibonacci_at_Main_n1_1 = local_iterative_fibonacci_at_Main_temp_7
-	local_iterative_fibonacci_at_Main_internal_10 = local_iterative_fibonacci_at_Main_i_0 + 1
-	local_iterative_fibonacci_at_Main_i_0 = local_iterative_fibonacci_at_Main_internal_10
-	GOTO iterative_fibonacci_at_Main_label_0
-	LABEL iterative_fibonacci_at_Main_label_2
-	RETURN local_iterative_fibonacci_at_Main_n2_2
+	ARG local_main_at_Main_internal_16
+	local_main_at_Main_internal_17 = VCALL Main out_string
+	RETURN local_main_at_Main_internal_17
 }

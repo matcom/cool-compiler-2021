@@ -62,9 +62,9 @@ def main(
         file_content = file.read()
     
     if run_cool:
-        result = generate_cool_pipeline(file_content, verbose=verbose)
-    elif out_infer:
         result = interprete_cool_pipeline(file_content, verbose=verbose)
+    elif out_infer:
+        result = generate_cool_pipeline(file_content, verbose=verbose)
     elif run_cil:
         result = interprete_cil_pipeline(file_content, verbose=verbose)
     elif out_cil:

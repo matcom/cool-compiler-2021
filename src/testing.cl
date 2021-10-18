@@ -1,34 +1,32 @@
-class Main inherits IO {
-    number: Int <- 5;
-
-    main () : Object {
-        testing_fibonacci(number)
+class A{
+    a:SELF_TYPE;
+    get():SELF_TYPE {
+        self
     };
-
-    testing_fibonacci(n: Int) : IO {{
-        out_string("Iterative Fibonacci : ");
-        out_int(iterative_fibonacci(5));
-        out_string("\n");
-
-        out_string("Recursive Fibonacci : ");
-        out_int(recursive_fibonacci(5));
-        out_string("\n");
-    }};
-
-    recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
-        if n <= 2 then 1 else recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2) fi
+    get2():SELF_TYPE {
+        new SELF_TYPE
     };
-
-    iterative_fibonacci(n: AUTO_TYPE) : AUTO_TYPE {
-        let  i: Int <- 2, n1: Int <- 1, n2: Int <- 1, temp: Int in {
-            while i < n loop
-                let temp: Int <- n2 in {
-                    n2 <- n2 + n1;
-                    n1 <- temp;
-                    i <- i + 1;
-                }
-            pool;
-            n2;
+    get3():SELF_TYPE {
+        {
+            a  <- new SELF_TYPE;
+            a;
         }
+    };
+};
+
+class B inherits A {
+    get4(): SELF_TYPE {
+        get3()
+    };
+ };
+
+class Main inherits IO {
+    main() : AUTO_TYPE {
+        out_string(let a:A <- new A, b:B <- new B in
+            b.get().type_name().concat(
+            b.get2().type_name()).concat(
+            b.get3().type_name()).concat(
+            b.get4().type_name()).concat(
+            type_name()))
     };
 };
