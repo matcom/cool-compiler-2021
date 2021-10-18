@@ -291,7 +291,7 @@ def main(text: str, output=None):
     a = lexer.tokenize(text)
 
     # for i in a:
-    #     print(i)
+        # print(i)
 
     if lexer.errors:
         for e in lexer.errors:
