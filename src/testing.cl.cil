@@ -2,6 +2,7 @@
 type Object {
 	
 
+	method $init_Object_type: $init_Object_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -9,6 +10,7 @@ type Object {
 type String {
 	
 
+	method $init_String_type: $init_String_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -19,6 +21,7 @@ type String {
 type Bool {
 	
 
+	method $init_Bool_type: $init_Bool_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -26,6 +29,7 @@ type Bool {
 type Int {
 	
 
+	method $init_Int_type: $init_Int_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -33,6 +37,7 @@ type Int {
 type IO {
 	
 
+	method $init_IO_type: $init_IO_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -44,6 +49,7 @@ type IO {
 type Main {
 	attribute number
 
+	method $init_Main_type: $init_Main_type
 	method $init_number_at_Main: $init_number_at_Main
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
@@ -68,17 +74,23 @@ data_3 = "\n"
 function entry {
 	
 
-	LOCAL local__internal_0
-	LOCAL local__internal_1
-	LOCAL local__internal_2
-	LOCAL local__internal_3
+	LOCAL local_y_internal_0
+	LOCAL local_y_internal_1
+	LOCAL local_y_internal_2
 
-	local__internal_2 = ALLOCATE Main
-	ARG local__internal_2
-	local__internal_3 = CALL $init_number_at_Main
-	ARG local__internal_2
-	local__internal_1 = CALL function_main_at_Main
+	local_y_internal_2 = ALLOCATE Main
+	ARG local_y_internal_2
+	local_y_internal_2 = CALL $init_Main_type
+	ARG local_y_internal_2
+	local_y_internal_1 = CALL function_main_at_Main
 	RETURN 0
+}
+function $init_Object_type {
+	PARAM self
+
+	
+
+	RETURN self
 }
 function function_abort_at_Object {
 	PARAM self
@@ -103,6 +115,13 @@ function function_copy_at_Object {
 
 	local_copy_at_Object_internal_0 = COPY self
 	RETURN local_copy_at_Object_internal_0
+}
+function $init_String_type {
+	PARAM self
+
+	
+
+	RETURN self
 }
 function function_length_at_String {
 	PARAM self
@@ -130,6 +149,27 @@ function function_substr_at_String {
 
 	local_substr_at_String_internal_0 = SUBSTRING self i l
 	RETURN local_substr_at_String_internal_0
+}
+function $init_Bool_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function $init_Int_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function $init_IO_type {
+	PARAM self
+
+	
+
+	RETURN self
 }
 function function_out_string_at_IO {
 	PARAM self
@@ -165,6 +205,15 @@ function function_in_int_at_IO {
 
 	local_in_int_at_IO_internal_0 = READ
 	RETURN local_in_int_at_IO_internal_0
+}
+function $init_Main_type {
+	PARAM self
+
+	LOCAL local_Main_type_internal_0
+
+	ARG self
+	local_Main_type_internal_0 = CALL $init_number_at_Main
+	RETURN self
 }
 function $init_number_at_Main {
 	PARAM self
