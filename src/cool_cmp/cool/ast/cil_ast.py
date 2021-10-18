@@ -34,7 +34,12 @@ class UnaryArithmeticNode(InstructionNode):
     def __init__(self, dest, value) -> None:
         self.dest = dest
         self.value = value
-        
+
+class GetFatherNode(InstructionNode):
+    def __init__(self, dest, type) -> None:
+        self.dest = dest
+        self.type = type
+
 class NotNode(UnaryArithmeticNode):
     pass
 

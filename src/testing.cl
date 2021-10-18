@@ -22,11 +22,10 @@ class B inherits A {
 
 class Main inherits IO {
     main() : AUTO_TYPE {
-        out_string(let a:A <- new A, b:B <- new B in
-            b.get().type_name().concat(
-            b.get2().type_name()).concat(
-            b.get3().type_name()).concat(
-            b.get4().type_name()).concat(
-            type_name()))
+        out_int(case new B of 
+            obj: Object => 0;
+            a: A => 1;
+            b: B => 2;
+        esac)
     };
 };

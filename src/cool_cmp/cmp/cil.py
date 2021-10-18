@@ -11,8 +11,9 @@ class ProgramNode(Node):
         self.dotcode = dotcode
 
 class TypeNode(Node):
-    def __init__(self, name):
+    def __init__(self, name, parent):
         self.name = name
+        self.parent = parent
         self.attributes = []
         self.methods = []
 
@@ -93,7 +94,11 @@ class AllocateNode(InstructionNode):
         self.dest = dest
 
 class ArrayNode(InstructionNode):
-    pass
+    def __init__(self, dest, type, length) -> None:
+        super().__init__()
+        self.dest = dest
+        self.type = type
+        self.length = length
 
 class TypeOfNode(InstructionNode):
     def __init__(self, obj, dest):

@@ -1,5 +1,6 @@
 .TYPES
 type Object {
+	parent: None
 	
 
 	method $init: $init_Object_type
@@ -8,6 +9,7 @@ type Object {
 	method copy: function_copy_at_Object
 }
 type String {
+	parent: Object
 	
 
 	method $init: $init_String_type
@@ -19,6 +21,7 @@ type String {
 	method substr: function_substr_at_String
 }
 type Bool {
+	parent: Object
 	
 
 	method $init: $init_Bool_type
@@ -27,6 +30,7 @@ type Bool {
 	method copy: function_copy_at_Object
 }
 type Int {
+	parent: Object
 	
 
 	method $init: $init_Int_type
@@ -35,6 +39,7 @@ type Int {
 	method copy: function_copy_at_Object
 }
 type IO {
+	parent: Object
 	
 
 	method $init: $init_IO_type
@@ -47,6 +52,7 @@ type IO {
 	method in_int: function_in_int_at_IO
 }
 type A {
+	parent: Object
 	attribute a
 
 	method $init: $init_A_type
@@ -59,6 +65,7 @@ type A {
 	method get3: function_get3_at_A
 }
 type B {
+	parent: A
 	attribute a
 
 	method $init: $init_B_type
@@ -72,6 +79,7 @@ type B {
 	method get4: function_get4_at_B
 }
 type Main {
+	parent: IO
 	
 
 	method $init: $init_Main_type
@@ -102,6 +110,30 @@ function entry {
 	ARG local_y_internal_2
 	local_y_internal_1 = CALL function_main_at_Main
 	RETURN 0
+}
+function type_distance {
+	PARAM type1
+	PARAM type2
+
+	LOCAL local_distance_internal_0
+	LOCAL local_distance_internal_1
+	LOCAL local_distance_internal_2
+	LOCAL local_distance_internal_3
+
+	local_distance_internal_3 = VOID
+	local_distance_internal_0 = 0
+	LABEL distance_label_0
+	local_distance_internal_1 = EQUAL type1 type2
+	IF local_distance_internal_1 GOTO distance_label_1
+	type1 = FATHER type1
+	local_distance_internal_2 = EQUAL type1 local_distance_internal_3
+	IF local_distance_internal_2 GOTO distance_label_2
+	local_distance_internal_0 = local_distance_internal_0 + 1
+	GOTO distance_label_0
+	LABEL distance_label_2
+	local_distance_internal_0 = -1
+	LABEL distance_label_1
+	RETURN local_distance_internal_0
 }
 function $init_Object_type {
 	PARAM self
@@ -314,9 +346,9 @@ function $init_Main_type {
 function function_main_at_Main {
 	PARAM self
 
-	LOCAL local_main_at_Main_a_0
+	LOCAL local_main_at_Main_internal_0
 	LOCAL local_main_at_Main_internal_1
-	LOCAL local_main_at_Main_b_2
+	LOCAL local_main_at_Main_internal_2
 	LOCAL local_main_at_Main_internal_3
 	LOCAL local_main_at_Main_internal_4
 	LOCAL local_main_at_Main_internal_5
@@ -327,52 +359,56 @@ function function_main_at_Main {
 	LOCAL local_main_at_Main_internal_10
 	LOCAL local_main_at_Main_internal_11
 	LOCAL local_main_at_Main_internal_12
-	LOCAL local_main_at_Main_internal_13
-	LOCAL local_main_at_Main_internal_14
-	LOCAL local_main_at_Main_internal_15
-	LOCAL local_main_at_Main_internal_16
-	LOCAL local_main_at_Main_internal_17
 
-	local_main_at_Main_internal_1 = ALLOCATE A
+	local_main_at_Main_internal_0 = ALLOCATE Object
+	ARG local_main_at_Main_internal_0
+	local_main_at_Main_internal_0 = CALL $init_Object_type
+	local_main_at_Main_internal_1 = TYPEOF local_main_at_Main_internal_0
+	local_main_at_Main_internal_2 = ARRAY Int 2
+	SETINDEX local_main_at_Main_internal_2 0 A
+	SETINDEX local_main_at_Main_internal_2 1 B
+	local_main_at_Main_internal_3 = -1
+	local_main_at_Main_internal_5 = -2
+	LABEL main_at_Main_label_0
+	local_main_at_Main_internal_3 = local_main_at_Main_internal_3 + 1
+	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_3 2
+	IF local_main_at_Main_internal_8 GOTO main_at_Main_label_2
+	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_3
 	ARG local_main_at_Main_internal_1
-	local_main_at_Main_internal_1 = CALL $init_A_type
-	local_main_at_Main_a_0 = local_main_at_Main_internal_1
-	local_main_at_Main_internal_3 = ALLOCATE B
-	ARG local_main_at_Main_internal_3
-	local_main_at_Main_internal_3 = CALL $init_B_type
-	local_main_at_Main_b_2 = local_main_at_Main_internal_3
-	ARG local_main_at_Main_b_2
-	local_main_at_Main_internal_4 = VCALL B get
-	ARG local_main_at_Main_internal_4
-	local_main_at_Main_internal_5 = VCALL B type_name
-	ARG local_main_at_Main_b_2
-	local_main_at_Main_internal_6 = VCALL B get2
-	ARG local_main_at_Main_internal_6
-	local_main_at_Main_internal_7 = VCALL B type_name
-	ARG local_main_at_Main_internal_5
 	ARG local_main_at_Main_internal_7
-	local_main_at_Main_internal_8 = VCALL String concat
-	ARG local_main_at_Main_b_2
-	local_main_at_Main_internal_9 = VCALL B get3
-	ARG local_main_at_Main_internal_9
-	local_main_at_Main_internal_10 = VCALL B type_name
-	ARG local_main_at_Main_internal_8
-	ARG local_main_at_Main_internal_10
-	local_main_at_Main_internal_11 = VCALL String concat
-	ARG local_main_at_Main_b_2
-	local_main_at_Main_internal_12 = VCALL B get4
-	ARG local_main_at_Main_internal_12
-	local_main_at_Main_internal_13 = VCALL B type_name
-	ARG local_main_at_Main_internal_11
-	ARG local_main_at_Main_internal_13
-	local_main_at_Main_internal_14 = VCALL String concat
+	local_main_at_Main_internal_6 = CALL type_distance
+	local_main_at_Main_internal_9 = EQUAL local_main_at_Main_internal_6 -1
+	IF local_main_at_Main_internal_9 GOTO main_at_Main_label_0
+	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_1
+	local_main_at_Main_internal_10 = local_main_at_Main_internal_5 > local_main_at_Main_internal_6
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_1
+	GOTO main_at_Main_label_0
+	LABEL main_at_Main_label_1
+	local_main_at_Main_internal_5 = local_main_at_Main_internal_6
+	local_main_at_Main_internal_4 = local_main_at_Main_internal_3
+	GOTO main_at_Main_label_0
+	LABEL main_at_Main_label_2
+	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_3
+	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_4
+	local_main_at_Main_internal_11 = EQUAL A local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_5
+	local_main_at_Main_internal_0 = 1
+	GOTO main_at_Main_label_4
+	LABEL main_at_Main_label_5
+	local_main_at_Main_internal_11 = EQUAL B local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_6
+	local_main_at_Main_internal_0 = 2
+	GOTO main_at_Main_label_4
+	LABEL main_at_Main_label_6
+	LABEL main_at_Main_label_3
+	ABORT
+	LABEL main_at_Main_label_4
 	ARG self
-	local_main_at_Main_internal_15 = VCALL Main type_name
-	ARG local_main_at_Main_internal_14
-	ARG local_main_at_Main_internal_15
-	local_main_at_Main_internal_16 = VCALL String concat
-	ARG self
-	ARG local_main_at_Main_internal_16
-	local_main_at_Main_internal_17 = VCALL Main out_string
-	RETURN local_main_at_Main_internal_17
+	ARG local_main_at_Main_internal_0
+	local_main_at_Main_internal_12 = VCALL Main out_int
+	RETURN local_main_at_Main_internal_12
 }

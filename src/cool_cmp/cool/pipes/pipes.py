@@ -416,9 +416,9 @@ def cool_to_cil_pipe(result: dict, cool_to_cil=COOLToCILVisitor):
         return result
     
     errors = []
-    cool_to_cil_visitor = cool_to_cil(context, errors) # TODO Ver los argumentos 
+    cool_to_cil_visitor = cool_to_cil(context, errors) 
     
-    cil_ast = cool_to_cil_visitor.visit(ast, scope) # TODO Devuelve un AST de CIL
+    cil_ast = cool_to_cil_visitor.visit(ast, scope)
     
     result['cil_ast'] = cil_ast
     
