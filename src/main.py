@@ -27,8 +27,8 @@ if __name__ == '__main__':
 
     # print(lexer)
 
-    # lexer.lexer.lineno = 1
-    # lexer.lexer.linestart = 0
+    lexer.lexer.lineno = 1
+    lexer.lexer.linestart = 0
 
     parser = CoolParser(lexer)
     result = parser.parse(text)
