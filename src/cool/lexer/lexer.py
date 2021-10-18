@@ -4,7 +4,7 @@ from typing import List
 
 import ply.lex as lex
 
-from ..utils import Token, errors, ignored, literals, reservedKeywords, tokens
+from src.cool.utils import Token, errors, ignored, literals, reservedKeywords, tokens
 
 
 class CoolLexer:
