@@ -7,6 +7,6 @@ OUTPUT_FILE=${INPUT_FILE:0: -2}mips
 echo "Cool Compiler 2021 v1"        # TODO: Recuerde cambiar estas
 echo "Copyright (c): Jose Carlos Hdez"    # TODO: líneas a los valores correctos
 
-FILE="src"
+FILE="main.py"
 
-python -m ${FILE} $INPUT_FILE $OUTPUT_FILE
+python ${FILE} $INPUT_FILE $OUTPUT_FILE

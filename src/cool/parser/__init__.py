@@ -1,1 +1,1 @@
-from src.cool.parser import *
+from .parser import *

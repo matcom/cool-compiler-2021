@@ -1,11 +1,11 @@
 import ply.yacc as yacc
 
-from src.cool.lexer.lexer import CoolLexer
-from src.cool.utils.ast import *
-from src.cool.utils.errors import SyntacticError
-from src.cool.utils.helpers import find_column
-from src.cool.utils.tokens import tokens
-from src.cool.utils.logger import log
+from ..lexer.lexer import CoolLexer
+from ..utils.ast import *
+from ..utils.errors import SyntacticError
+from ..utils.helpers import find_column
+from ..utils.tokens import tokens
+from ..utils.logger import log
 
 
 class Parser:

@@ -1,15 +1,15 @@
 import sys
 from pathlib import Path
 
-from src.cool.lexer import CoolLexer, main
-from src.cool.parser.parser import CoolParser
-from src.cool.utils.errors import SyntacticError
+from cool.lexer import CoolLexer, main
+from cool.parser.parser import CoolParser
+from cool.utils.errors import SyntacticError
 
 if __name__ == '__main__':
     # print(f'Argv: {sys.argv} ')
 
     # path: str = f"{Path.cwd()}/cool/code.cl"  # debug mode
-    path: str = f"{Path.cwd()}/src/cool/code.cl"  # normal mode
+    path: str = f"{Path.cwd()}/cool/code.cl"  # normal mode
 
     _in = sys.argv[1] if len(sys.argv) > 1 else path
     _out = sys.argv[2] if len(sys.argv) > 2 else None

@@ -1,10 +1,8 @@
 from pathlib import Path
 from pprint import pprint
 from typing import List
-
 import ply.lex as lex
-
-from src.cool.utils import Token, errors, ignored, literals, reservedKeywords, tokens
+from ..utils import Token, errors, ignored, literals, reservedKeywords, tokens
 
 
 class CoolLexer:
@@ -291,7 +289,7 @@ def main(text: str, output=None):
     a = lexer.tokenize(text)
 
     # for i in a:
-        # print(i)
+    # print(i)
 
     if lexer.errors:
         for e in lexer.errors:

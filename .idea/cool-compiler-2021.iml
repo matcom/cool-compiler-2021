@@ -2,7 +2,7 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <sourceFolder url="file://$MODULE_DIR$/src/cool" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (cool-compiler-2021)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -14,7 +14,7 @@
   <component name="PyNamespacePackagesService">
     <option name="namespacePackageFolders">
       <list>
-        <option value="$MODULE_DIR$/src" />
+        <option value="$MODULE_DIR$/src/cool" />
       </list>
     </option>
   </component>
