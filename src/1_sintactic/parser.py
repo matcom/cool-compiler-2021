@@ -66,6 +66,8 @@ class CoolParser:
     def p_def_func(self, p):
         '''def_func : ID LPAREN params RPAREN COLON TYPE LBRACE expr RBRACE'''
         p[0] = FuncDeclarationNode(p[1], p[3], p[6], p[8])
+        p[0].add_line_column(p.lineno(6), find_column(
+            p.lexer.lexdata, p.lexpos(6)))
 
     def p_params(self, p):
         '''params : param_list
@@ -84,6 +86,36 @@ class CoolParser:
     def p_param(self, p):
         '''param : ID COLON TYPE'''
         p[0] = (p[1], p[3])
+
+    def p_expr_flow(self, p):
+        '''expr : LET let_attrs IN expr
+                | CASE expr OF case_list ESAC
+                | IF expr THEN expr ELSE expr FI
+                | WHILE expr LOOP expr POOL'''
+
+        if p[1].lower() == 'let':
+            p[0] = LetNode(p[2], p[4])
+        elif p[1].lower() == 'case':
+            p[0] = CaseNode(p[2], p[4])
+        elif p[1].lower() == 'if':
+            p[0] = IfNode(p[2], p[4], p[6])
+        elif p[1].lower() == 'while':
+            p[0] = WhileNode(p[2], p[4])
+
+        p[0].add_line_column(p.lineno(2), find_column(
+            p.lexer.lexdata, p.lexpos(2)))
+
+    def p_expr_assign(self, p):
+        '''expr : ID ASSIGN expr'''
+        p[0] = AssignNode(p[1], p[3])
+        p[0].add_line_column(p.lineno(1), find_column(
+            p.lexer.lexdata, p.lexpos(1)))
+
+    def p_expr_func_call(self, p):
+        '''expr : expr AT TYPE DOT ID LPAREN args RPAREN
+                | expr DOT ID LPAREN args RPAREN
+                | ID LPAREN args RPAREN'''
+        pass
 
     def p_let_attrs(self, p):
         '''let_attrs : def_attr
