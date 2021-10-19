@@ -1,6 +1,5 @@
 import sys
 from lexer import CoolLexer
-from parser import CoolParser
 
 
 def main(input, output):
