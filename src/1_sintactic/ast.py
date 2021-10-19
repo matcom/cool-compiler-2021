@@ -141,7 +141,7 @@ class DivNode(BinaryNode):
     pass
 
 
-class LessThanNode(BinaryNode):
+class LessNode(BinaryNode):
     pass
 
 
@@ -149,7 +149,7 @@ class LessEqNode(BinaryNode):
     pass
 
 
-class EqNode(BinaryNode):
+class EqualNode(BinaryNode):
     pass
 
 
@@ -162,10 +162,6 @@ class UnaryNode(ExpressionNode):
 
 
 class NotNode(UnaryNode):
-    pass
-
-
-class LogicNotNode(UnaryNode):
     pass
 
 

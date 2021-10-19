@@ -115,7 +115,71 @@ class CoolParser:
         '''expr : expr AT TYPE DOT ID LPAREN args RPAREN
                 | expr DOT ID LPAREN args RPAREN
                 | ID LPAREN args RPAREN'''
-        pass
+        if len(p) == 9:
+            if p[7] is None:
+                p[7] = []
+            p[0] = FuncCallNode(p[5], p[7], p[1], p[3])
+            p[0].add_line_column(p.lineno(5), find_column(
+                p.lexer.lexdata, p.lexpos(5)))
+        elif len(p) == 7:
+            if p[5] is None:
+                p[5] = []
+            p[0] = FuncCallNode(p[3], p[5], p[1])
+            p[0].add_line_column(p.lineno(3), find_column(
+                p.lexer.lexdata, p.lexpos(3)))
+        else:
+            if p[3] is None:
+                p[3] = []
+            p[0] = FuncCallNode(p[1], p[3])
+            p[0].add_line_column(p.lineno(1), find_column(
+                p.lexer.lexdata, p.lexpos(1)))
+
+        p[0].lineno = p.lineno(0)
+
+    def p_expr_operators_binary(self, p):
+        '''expr : expr PLUS expr
+                | expr MINUS expr
+                | expr STAR expr
+                | expr DIV expr
+                | expr LESS expr
+                | expr LESSEQ expr
+                | expr EQUAL expr'''
+        if p[2] == '+':
+            p[0] = PlusNode(p[1], p[3])
+        elif p[2] == '-':
+            p[0] = MinusNode(p[1], p[3])
+        elif p[2] == '*':
+            p[0] = StarNode(p[1], p[3])
+        elif p[2] == '/':
+            p[0] = DivNode(p[1], p[3])
+        elif p[2] == '<':
+            p[0] = LessNode(p[1], p[3])
+        elif p[2] == '<=':
+            p[0] = LessEqNode(p[1], p[3])
+        elif p[2] == '<=':
+            p[0] = EqualNode(p[1], p[3])
+
+        p[0].add_line_column(p.lineno(0), find_column(
+            p.lexer.lexdata, p.lexpos(0)))
+
+    def p_expr_operators_unary(self, p):
+        '''expr : NOT expr
+                | ISVOID expr'''
+        if p[1] == '~':
+            p[0] = NegationNode(p[2])
+        elif p[1].lower() == 'isvoid':
+            p[0] = IsVoidNode(p[2]):
+
+        p[0].add_line_column(p.lineno(2), find_column(
+            p.lexer.lexdata, p.lexpos(2)))
+
+    def p_expr_group(self, p):
+        '''expr : LPAREN expr RPAREN'''
+        p[0] = p[2]
+
+    def p_expr_atom(self, p):
+        '''expr : atom'''
+        p[0] = p[1]
 
     def p_let_attrs(self, p):
         '''let_attrs : def_attr
