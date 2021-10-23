@@ -1,6 +1,6 @@
 from cool_compiler.semantic.visitor import result
 from .__dependency import CoolTypeBuildInManager, SemanticError, ErrorType, Type, Object 
-from .scope import Scope
+from .v2_semantic_checking.scope import Scope
 
 def defVisitClass(*func):
     class Visit(VisitBase):

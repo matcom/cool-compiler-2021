@@ -1,6 +1,6 @@
 from .. import visitor
 from ..__dependency import Type, SemanticError, Object, ErrorType, Int, Bool, Str
-from ..v0_parser_return import factory_return_ast as AST
+from ..v0_parser_return import factory_parser_return_ast as AST
 from . import create_type_ast as ASTR
 from ..tools import VisitBase, find_type
 
