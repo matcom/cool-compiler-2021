@@ -7,9 +7,10 @@ class Node:
         self.index = index
 
 ####################################################################
-
- 
-    
+class Program(Node):
+    def __init__(self, class_list) -> None:
+        self.class_list = class_list
+        
 class CoolClass(Node):
     def __init__(self, typee, parent_typee, feature_list) -> None:
         self.type = typee
@@ -156,5 +157,3 @@ class Str(Atomic):
 
 class Bool(Atomic):
     pass
-
-

@@ -19,7 +19,6 @@ class CoolClass(Node):
 class Feature(Node):
     pass
 
-
 class AtrDef(Feature):
     def __init__(self, name, atype, expr) -> None:
         self.name = name

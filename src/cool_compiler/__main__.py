@@ -24,7 +24,7 @@ with open(path, 'r') as _file:
     ast = parser.parse(iter(tokens))
     if errors.any(): sys.exit(1)
 
-    visitorList = [ CreateType ]
+    visitorList = [ CreateType, SemanticChecking ]
  
     for visitorClass in visitorList:
         ast = visitorClass(errors).visit(ast)

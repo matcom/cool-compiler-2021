@@ -6,8 +6,7 @@ from ..tools import VisitBase, find_type
 
 class CoolCreateType(VisitBase):
     def __init__(self, errors) -> None:
-        self.cool_error = errors
-        self.current_type : Type = None
+        super().__init__(errors)
         self.global_types = {}
 
     def get_parent_type(self, node, error_handler):

@@ -1,27 +1,44 @@
-from typing import SupportsComplex
-from .ASTs import ast1_create_type_return as AST_init
-from .ASTs import ast2_semantic_checking_return as AST_result
-from . import visitor
+from ..tools import VisitBase, find_type
+from .. import visitor
+from ..__dependency import Type, SemanticError, Object, ErrorType, Int, Bool, Str
+from ..v1_create_type import create_type_ast as AST
+from . import semantic_checking_ast as ASTR
 from .scope import Scope
-from .__dependency import Type, SemanticError, ErrorType, Int, Bool, Object, Str
-from .tools import VisitorBase, type_checking, find_variable, parent_common
-from .semantic_checking_funcs import *
 
-class SemanticChecking(VisitorBase):
-    def __init__(self, error) -> None:
-        super().__init__(error)
-        self.casting_error_type = lambda a,b : a if not type(a) is ErrorType else b
+class CoolSemanticChecking(VisitBase): 
+    def __init__(self, errors) -> None:
+        super().__init__(errors)
     
     @visitor.on("node")
-    def visit(self, node, scope) -> AST_result.Node:
+    def visit(node, scope):
         pass
 
- 
-
+    @visitor.when(AST.Program)
+    @visitor.result(ASTR.Program)
+    def visit(self, node : AST.Program, scope = Scope()) : 
+        return self.visit_all(node.class_list, scope),
     
-    @visitor.when(AST_init.AtrDef)
-    @visitor.result(AST_result.AtrDef)
-    def visit(self, node: AST_init.AtrDef, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.CoolClass)
+    @visitor.result(ASTR.CoolClass)
+    def visit(self, node : AST.CoolClass, scope: Scope) : 
+        cls_scope : Scope = scope.create_child()
+        self.current_type = node.type
+        error_handler = self.get_se_handler(node)
+
+        if node.parent_type.conforms_to(node.type):
+            error_handler().add_semantic_error(f"class {self.current_type.name} has circular inheritance")        
+        
+        cls_scope.define_variable('self', self.current_type)
+        for name, a_type in node.type.ite_attributes:
+            if not cls_scope.is_local(name):
+                cls_scope.define_variable(name, a_type)
+
+        feature_list = self.visit_all(node.feature_list, cls_scope)
+        return node.type, node.parent_type, feature_list
+    
+    @visitor.when(AST.AtrDef)
+    @visitor.result(ASTR.AtrDef)
+    def visit(self, node: AST.AtrDef, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
         
         try: 
@@ -36,19 +53,19 @@ class SemanticChecking(VisitorBase):
             error_handler().add_semantic_error(f"can't save {expr.static_type.name} into {node.type}")  
 
         return node.name, node.type, expr
-
-    @visitor.when(AST_init.FuncDef)
-    @visitor.result(AST_result.FuncDef)
-    def visit(self, node: AST_init.FuncDef, scope : Scope) -> AST_result.Node:
+   
+    @visitor.when(AST.FuncDef)
+    @visitor.result(ASTR.FuncDef)
+    def visit(self, node: AST.FuncDef, scope : Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
         
         try: 
             func = self.current_type.parent.get_method(node.name)
 
-            for pn, fn in zip(node.params, func.params):
-                name, tparams = pn
-                _, tbase_params = fn
-                if not self.type_checking(tbase_params, tparams):
+            for tuple_param_node, tuple_param_func in zip(node.params, func.params):
+                name, t_params = tuple_param_node
+                _, t_base_params = tuple_param_func
+                if not self.type_checking(t_base_params, t_params):
                     error_handler().add_semantic_error(f"the {name} parameters of the {node.name} function breaks the polymorphism rule")  
 
             if not self.type_checking(func.return_type, node.return_type):
@@ -57,19 +74,19 @@ class SemanticChecking(VisitorBase):
             pass
         
         new_scope : Scope = scope.create_child()
-        for param, ptype in node.params:
-            new_scope.define_variable(param, ptype)
+        for param, p_type in node.params:
+            new_scope.define_variable(param, p_type)
 
         expr = self.visit(node.expr, new_scope)
         
-        if not type_checking(node.return_type, expr.static_type):
+        if not self.type_checking(node.return_type, expr.static_type):
             self.cool_error(node.lineno, node.index).add_type_error(node.return_type.name, expr.static_type.name ) 
 
         return node.name, node.params, node.return_type, expr
-
-    @visitor.when(AST_init.CastingDispatch)
-    @visitor.result(AST_result.CastingDispatch)
-    def visit(self, node: AST_init.CastingDispatch, scope: Scope) -> AST_result.Node:
+    
+    @visitor.when(AST.CastingDispatch)
+    @visitor.result(ASTR.CastingDispatch)
+    def visit(self, node: AST.CastingDispatch, scope: Scope) -> ASTR.Node:
         
         expr = self.visit(node.expr, scope)
         if not expr.static_type.conforms_to(node.type):
@@ -92,9 +109,9 @@ class SemanticChecking(VisitorBase):
 
         return expr, node.type, node.id, params, static_type
 
-    @visitor.when(AST_init.Dispatch)
-    @visitor.result(AST_result.Dispatch)
-    def visit(self, node: AST_init.Dispatch, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Dispatch)
+    @visitor.result(ASTR.Dispatch)
+    def visit(self, node: AST.Dispatch, scope: Scope) -> ASTR.Node:
         expr = self.visit(node.expr, scope) 
 
         params = []
@@ -114,9 +131,9 @@ class SemanticChecking(VisitorBase):
 
         return expr, node.id, params, static_type
        
-    @visitor.when(AST_init.StaticDispatch)
-    @visitor.result(AST_result.StaticDispatch)
-    def visit(self, node: AST_init.StaticDispatch, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.StaticDispatch)
+    @visitor.result(ASTR.StaticDispatch)
+    def visit(self, node: AST.StaticDispatch, scope: Scope) -> ASTR.Node:
         params = []
         for p in node.params:
             params.append(self.visit(p,scope))
@@ -134,9 +151,9 @@ class SemanticChecking(VisitorBase):
 
         return node.id, params, static_type
 
-    @visitor.when(AST_init.Assing)
-    @visitor.result(AST_result.Assing)
-    def visit(self, node: AST_init.Assing, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Assing)
+    @visitor.result(ASTR.Assing)
+    def visit(self, node: AST.Assing, scope: Scope) -> ASTR.Node:
         try: 
             v = scope.find_variable(node.id)
             static_type = v.type
@@ -149,9 +166,9 @@ class SemanticChecking(VisitorBase):
        
         return node.id, expr, self.casting_error_type(static_type, expr.static_type)      
     
-    @visitor.when(AST_init.IfThenElse)
-    @visitor.result(AST_result.IfThenElse)
-    def visit(self, node: AST_init.IfThenElse, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.IfThenElse)
+    @visitor.result(ASTR.IfThenElse)
+    def visit(self, node: AST.IfThenElse, scope: Scope) -> ASTR.Node:
         cond = self.visit(node.condition, scope)
         self.type_checking(Bool(), cond.static_type, node)
 
@@ -160,26 +177,26 @@ class SemanticChecking(VisitorBase):
 
         return cond, then_expr, else_expr, self.parent_common(then_expr.static_type, else_expr.static_type)
 
-    @visitor.when(AST_init.While)
-    @visitor.result(AST_result.While)
-    def visit(self, node: AST_init.While, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.While)
+    @visitor.result(ASTR.While)
+    def visit(self, node: AST.While, scope: Scope) -> ASTR.Node:
         cond = self.visit(node.condition, scope)
         self.type_checking(Bool(), cond.static_type, node)
 
         return cond, self.visit(node.loop_expr, scope), Object()
 
-    @visitor.when(AST_init.Block)
-    @visitor.result(AST_result.Block)
-    def visit(self, node: AST_init.Block, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Block)
+    @visitor.result(ASTR.Block)
+    def visit(self, node: AST.Block, scope: Scope) -> ASTR.Node:
         block_list= []
         for b in node.expr_list:
             block_list.append(self.visit(b, scope))
         
         return block_list, block_list[-1].static_type
 
-    @visitor.when(AST_init.LetIn)
-    @visitor.result(AST_result.LetIn)
-    def visit(self, node: AST_init.LetIn, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.LetIn)
+    @visitor.result(ASTR.LetIn)
+    def visit(self, node: AST.LetIn, scope: Scope) -> ASTR.Node:
         new_scope = scope.create_child()
         
         assing_list = []
@@ -192,9 +209,9 @@ class SemanticChecking(VisitorBase):
         expr = self.visit(node.expr, new_scope)
         return assing_list, expr, expr.static_type
 
-    @visitor.when(AST_init.Case)
-    @visitor.result(AST_result.Case)
-    def visit(self, node: AST_init.Case, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Case)
+    @visitor.result(ASTR.Case)
+    def visit(self, node: AST.Case, scope: Scope) -> ASTR.Node:
         expr_cond = self.visit(node.expr, scope)
 
         static_type = None
@@ -210,9 +227,9 @@ class SemanticChecking(VisitorBase):
         
         return expr_cond, case_list, static_type
 
-    @visitor.when(AST_init.Sum)
-    @visitor.result(AST_result.Sum)
-    def visit(self, node: AST_init.Sum, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Sum)
+    @visitor.result(ASTR.Sum)
+    def visit(self, node: AST.Sum, scope: Scope) -> ASTR.Node:
         left = self.visit(node.left, scope)
         self.type_checking(Int(), left.static_type, node)
 
@@ -221,9 +238,9 @@ class SemanticChecking(VisitorBase):
         
         return left, right, Int()
 
-    @visitor.when(AST_init.Rest)
-    @visitor.result(AST_result.Rest)
-    def visit(self, node: AST_init.Rest, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Rest)
+    @visitor.result(ASTR.Rest)
+    def visit(self, node: AST.Rest, scope: Scope) -> ASTR.Node:
         left = self.visit(node.left, scope)
         self.type_checking(Int(), left.static_type, node)
 
@@ -232,9 +249,9 @@ class SemanticChecking(VisitorBase):
         
         return left, right, Int()
 
-    @visitor.when(AST_init.Mult)
-    @visitor.result(AST_result.Mult)
-    def visit(self, node: AST_init.Mult, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Mult)
+    @visitor.result(ASTR.Mult)
+    def visit(self, node: AST.Mult, scope: Scope) -> ASTR.Node:
         left = self.visit(node.left, scope)
         self.type_checking(Int(), left.static_type, node)
 
@@ -243,9 +260,9 @@ class SemanticChecking(VisitorBase):
         
         return left, right, Int()
 
-    @visitor.when(AST_init.Div)
-    @visitor.result(AST_result.Div)
-    def visit(self, node: AST_init.Div, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Div)
+    @visitor.result(ASTR.Div)
+    def visit(self, node: AST.Div, scope: Scope) -> ASTR.Node:
         left = self.visit(node.left, scope)
         self.type_checking(Int(), left.static_type, node)
 
@@ -254,9 +271,9 @@ class SemanticChecking(VisitorBase):
         
         return left, right, Int()
 
-    @visitor.when(AST_init.Less)
-    @visitor.result(AST_result.Less)
-    def visit(self, node: AST_init.Less, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Less)
+    @visitor.result(ASTR.Less)
+    def visit(self, node: AST.Less, scope: Scope) -> ASTR.Node:
         left = self.visit(node.left, scope)
         self.type_checking(Int(), left.static_type, node)
 
@@ -265,9 +282,9 @@ class SemanticChecking(VisitorBase):
         
         return left, right, Bool()
 
-    @visitor.when(AST_init.LessOrEquals)
-    @visitor.result(AST_result.LessOrEquals)
-    def visit(self, node: AST_init.LessOrEquals, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.LessOrEquals)
+    @visitor.result(ASTR.LessOrEquals)
+    def visit(self, node: AST.LessOrEquals, scope: Scope) -> ASTR.Node:
         left = self.visit(node.left, scope)
         self.type_checking(Int(), left.static_type, node)
 
@@ -276,9 +293,9 @@ class SemanticChecking(VisitorBase):
         
         return left, right, Bool()
 
-    @visitor.when(AST_init.Equals)
-    @visitor.result(AST_result.Equals)
-    def visit(self, node: AST_init.Equals, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Equals)
+    @visitor.result(ASTR.Equals)
+    def visit(self, node: AST.Equals, scope: Scope) -> ASTR.Node:
         left = self.visit(node.left, scope)
         right = self.visit(node.right, scope)
         list_type = [ Str, Int, Bool]
@@ -288,33 +305,33 @@ class SemanticChecking(VisitorBase):
         
         return left, right, Bool()
 
-    @visitor.when(AST_init.Void)
-    @visitor.result(AST_result.Void)
-    def visit(self, node: AST_init.Void, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Void)
+    @visitor.result(ASTR.Void)
+    def visit(self, node: AST.Void, scope: Scope) -> ASTR.Node:
         return self.visit(node.item, scope), Bool()
         
-    @visitor.when(AST_init.New)
-    @visitor.result(AST_result.New)
-    def visit(self, node: AST_init.New, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.New)
+    @visitor.result(ASTR.New)
+    def visit(self, node: AST.New, scope: Scope) -> ASTR.Node:
         return node.item, node.item
 
-    @visitor.when(AST_init.Complement)
-    @visitor.result(AST_result.Complement)
-    def visit(self, node: AST_init.Complement, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Complement)
+    @visitor.result(ASTR.Complement)
+    def visit(self, node: AST.Complement, scope: Scope) -> ASTR.Node:
         expr = self.visit(node.item, scope)
         self.type_checking(Int(), expr.static_type, node)
         return expr, Int()
 
-    @visitor.when(AST_init.Neg)
-    @visitor.result(AST_result.Neg)
-    def visit(self, node: AST_init.Neg, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Neg)
+    @visitor.result(ASTR.Neg)
+    def visit(self, node: AST.Neg, scope: Scope) -> ASTR.Node:
         expr = self.visit(node.item, scope)
         self.type_checking(Bool(), expr.static_type)
         return expr, Bool()
 
-    @visitor.when(AST_init.Id)
-    @visitor.result(AST_result.Id)
-    def visit(self, node: AST_init.Id, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Id)
+    @visitor.result(ASTR.Id)
+    def visit(self, node: AST.Id, scope: Scope) -> ASTR.Node:
         try: 
             v = scope.find_variable(node.item)
             return node.item, v.type
@@ -322,17 +339,17 @@ class SemanticChecking(VisitorBase):
             self.cool_error(node.lineno, node.index).add_name_error(node.item)
             return node.item, ErrorType()         
 
-    @visitor.when(AST_init.Int)
-    @visitor.result(AST_result.Int)
-    def visit(self, node: AST_init.Int, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Int)
+    @visitor.result(ASTR.Int)
+    def visit(self, node: AST.Int, scope: Scope) -> ASTR.Node:
         return node.item, Int()
 
-    @visitor.when(AST_init.Bool)
-    @visitor.result(AST_result.Bool)
-    def visit(self, node: AST_init.Bool, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Bool)
+    @visitor.result(ASTR.Bool)
+    def visit(self, node: AST.Bool, scope: Scope) -> ASTR.Node:
         return node.item, Bool()
 
-    @visitor.when(AST_init.Str)
-    @visitor.result(AST_result.Str)
-    def visit(self, node: AST_init.Str, scope: Scope) -> AST_result.Node:
+    @visitor.when(AST.Str)
+    @visitor.result(ASTR.Str)
+    def visit(self, node: AST.Str, scope: Scope) -> ASTR.Node:
         return node.item, Str()

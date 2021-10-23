@@ -2,17 +2,11 @@ from cool_compiler.semantic.visitor import result
 from .__dependency import CoolTypeBuildInManager, SemanticError, ErrorType, Type, Object 
 from .v2_semantic_checking.scope import Scope
 
-def defVisitClass(*func):
-    class Visit(VisitBase):
-        def visit(self, node,*args, **kw):
-            error_handler = self.gclss.get_se_handler(node)
-            result = []
-            for f in func:
-                result.append(f(self, node, error_handler,*args, **kw))
-            return tuple(result)
-    return Visit
-
 class VisitBase:
+    def __init__(self, error) -> None:
+        self.cool_error = error
+        self.current_type : Type = None
+
     def get_type(self, type_name, error_handler):
         find_result = find_type(type_name, self.global_types)
         return find_result.get_value( if_fail_do= error_handler().add_semantic_error )
@@ -39,21 +33,16 @@ class VisitBase:
             return ErrorType()
 
         return parent_type 
-
-
-class VisitorBase:
-    def __init__(self, error) -> None:
-        self.cool_error = error
-        self.current_type : Type = None
     
-    def type_checking(self, tbase : Type, ttype : Type):
-        if tbase.is_self_type : tbase = self.current_type
-        if ttype.is_self_type : ttype = self.current_type
+    def type_checking(self, t_base : Type, t_type : Type):
+        if t_base.is_self_type : t_base = self.current_type
+        if t_type.is_self_type : t_type = self.current_type
 
-        if not ttype.conforms_to(tbase):
+        if not t_type.conforms_to(t_base):
             return False
         
         return True
+
 
 class Result:
     def __init__(self, succ, result, error) -> None:
