@@ -59,6 +59,8 @@ class Type:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
 
     def define_attribute(self, name:str, typex):
+        if name == "self":
+            raise SemanticError("Can't define attribute with name self")
         try:
             self.get_attribute(name)
         except SemanticError:
@@ -84,6 +86,12 @@ class Type:
         if name in (method.name for method in self.methods):
             raise SemanticError(f'Method "{name}" already defined in {self.name}')
 
+        names = ['self']
+        for _name, _t in params:
+            if _name in names:
+                raise SemanticError(f"Formal parameter a is multiply defined")
+            names.append(_name)
+        
         method = Method(name, params, return_type)
         self.methods.append(method)
         return method
@@ -117,6 +125,7 @@ class Type:
 
     def __repr__(self):
         return str(self)
+
     
 
    

@@ -1,5 +1,6 @@
+from os import confstr
 from .. import visitor
-from ..__dependency import Type, SemanticError, Object, ErrorType, Int, Bool, Str
+from ..__dependency import Type, SemanticError, Object, ErrorType, Int, Bool, Str, Self, CoolTypeBuildInManager
 from ..v0_parser_return import factory_parser_return_ast as AST
 from . import create_type_ast as ASTR
 from ..tools import VisitBase, find_type
@@ -7,20 +8,20 @@ from ..tools import VisitBase, find_type
 class CoolCreateType(VisitBase):
     def __init__(self, errors) -> None:
         super().__init__(errors)
-        self.global_types = {}
+        self.global_types = CoolTypeBuildInManager().dictt
+
 
     def get_parent_type(self, node, error_handler):
         if node.parent is None: return Object()
             
         find_result = find_type(node.parent, self.global_types)
-        parent_type = find_result.get_value( if_fail_do= error_handler().add_semantic_error )
+        parent_type = find_result.get_value( if_fail_do= error_handler().add_type_error )
             
         if parent_type.is_shield or parent_type.name == self.current_type.name: 
             error_handler().add_semantic_error( f"class {self.current_type.name} can't be inherited from {parent_type.name}" )
             return ErrorType()
 
         return parent_type 
-
 
     @visitor.on("node")
     def visit(node):
@@ -42,12 +43,19 @@ class CoolCreateType(VisitBase):
     @visitor.result(ASTR.CoolClass)
     def visit(self, node : AST.CoolClass) : 
         self.current_type = self.global_types[node.name]
+        
         error_handler = self.get_se_handler(node)
         
         parent_type = self.get_parent_type(node, error_handler)
-        try: self.current_type.set_parent(parent_type)
-        except SemanticError: pass
-
+        try: 
+            if parent_type.conforms_to(self.current_type):
+                error_handler().add_semantic_error(f"class {self.current_type.name} has circular inheritance")
+                parent_type = ErrorType()
+            self.current_type.set_parent(parent_type)
+        except AttributeError: pass
+        except SemanticError as se: 
+            error_handler().add_semantic_error(se.text)
+        
         feature_list = self.visit_all(node.feature_list)
         
         return self.current_type, parent_type, feature_list
@@ -58,7 +66,9 @@ class CoolCreateType(VisitBase):
         error_handler = self.get_se_handler(node)
         
         atype = self.get_type(node.type, error_handler)
-        self.current_type.define_attribute(node.name, atype)
+        try: self.current_type.define_attribute(node.name, atype)
+        except SemanticError as se: 
+            error_handler().add_semantic_error(se.text)
 
         expr = self.visit(node.expr)
         return node.name, atype, expr
@@ -75,7 +85,10 @@ class CoolCreateType(VisitBase):
             param_type = self.get_type(ptype, error_handler)
             params.append((name, param_type))
 
-        self.current_type.define_method(node.name, params, return_type)
+        try: self.current_type.define_method(node.name, params, return_type)
+        except SemanticError as se: 
+            error_handler().add_semantic_error(se.text)
+            
         expr = self.visit(node.expr)
         return node.name, params, return_type, expr  
 
@@ -85,7 +98,7 @@ class CoolCreateType(VisitBase):
         error = self.get_se_handler(node)
         return tuple([
             self.visit(node.expr),
-            self.get_type(node, error),
+            self.get_type(node.type, error),
             node.id,
             self.visit_all(node.params)
         ])
@@ -110,6 +123,10 @@ class CoolCreateType(VisitBase):
     @visitor.when(AST.Assing)
     @visitor.result(ASTR.Assing)
     def visit(self, node: AST.Assing):
+        error_handler = self.get_se_handler(node)
+        if node.id == 'self': 
+            error_handler().add_semantic_error("Self assign intro let")
+
         return tuple([
             node.id,
             self.visit(node.expr)
@@ -155,6 +172,8 @@ class CoolCreateType(VisitBase):
 
         assing_list = []
         for name, atype, expr in node.assing_list:
+            if name == 'self': 
+                error_handler().add_semantic_error("Self assign intro let")
             rtype = self.get_type(atype, error_handler) 
             assing_list.append((name, rtype, self.visit(expr)))
  
@@ -166,9 +185,14 @@ class CoolCreateType(VisitBase):
         error_handler = self.get_se_handler(node)
 
         case_list = []
+        sett = set()
         for name, atype, expr in node.case_list:
-            rtype = self.get_type(atype, error_handler) 
+            branch_error_handler = self.get_se_handler(expr)
+            rtype = self.get_type(atype, branch_error_handler) 
+            sett.add(str(rtype))
             case_list.append((name, rtype, self.visit(expr)))
+            if len(sett) != len(case_list): branch_error_handler().add_semantic_error(f"Type {rtype.name} branch duplicate ")
+
  
         return self.visit(node.expr), case_list
 

@@ -1,5 +1,5 @@
 from cool_compiler.semantic.visitor import result
-from .__dependency import CoolTypeBuildInManager, SemanticError, ErrorType, Type, Object 
+from .__dependency import CoolTypeBuildInManager, SemanticError, ErrorType, Type, Object, CoolError
 from .v2_semantic_checking.scope import Scope
 
 class VisitBase:
@@ -9,7 +9,7 @@ class VisitBase:
 
     def get_type(self, type_name, error_handler):
         find_result = find_type(type_name, self.global_types)
-        return find_result.get_value( if_fail_do= error_handler().add_semantic_error )
+        return find_result.get_value( if_fail_do= error_handler().add_type_error )
     
     def visit_all(self, list_node, *args):
         result = []
@@ -73,9 +73,10 @@ def find_type(name, global_types) -> Result:
     except SemanticError as se:        
         return Result.fail( se.text, neutro = ErrorType() )
 
-def parent_common(self, t1: Type, t2: Type):
+def parent_common(t1: Type, t2: Type):
     while True:
-        if None in (t1,t2): return Object()
+        if None is t1: return Object()
+        if None is t2: return Object()
         if t1.conforms_to(t2): return t2
         if t2.conforms_to(t1): return t1
 

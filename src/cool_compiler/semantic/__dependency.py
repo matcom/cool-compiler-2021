@@ -10,3 +10,4 @@ from ..types import String as Str
 from ..types import Object as Object
 from ..types import Self as Self
 from ..types import CoolTypeBuildInManager as CoolTypeBuildInManager 
+from ..error import CoolError

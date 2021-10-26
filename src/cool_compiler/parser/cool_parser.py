@@ -12,9 +12,9 @@ class CoolParser(Parser):
         ('left', '+', '-'),
         ('left', '*', '/'),
         ('left', "ISVOID"),
-        ('left', '.'),
-        ('left', '@'),
         ('left', '~'),
+        ('left', '@'),
+        ('left', '.'),
         ('right', 'IN'),
     )
     def __init__(self, factory, errors):
@@ -189,7 +189,7 @@ class CoolParser(Parser):
     @_('CASE expr OF case_list ESAC')
     def expr(self, prod):
         self.factory.get_pos_to_errors(prod.lineno, prod.index)
-        return self.factory( NodesName.Case, prod.expr, prod.case_list)
+        return self.factory( NodesName.Case, prod.case_list, prod.expr)
 
     @_('ID ":" TYPE LOGICAR expr ";" case_list')
     def case_list(self, prod):
