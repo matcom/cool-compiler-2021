@@ -168,7 +168,7 @@ class CoolParser:
         if p[1] == '~':
             p[0] = NegationNode(p[2])
         elif p[1].lower() == 'isvoid':
-            p[0] = IsVoidNode(p[2]):
+            p[0] = IsVoidNode(p[2])
 
         p[0].add_line_column(p.lineno(2), find_column(
             p.lexer.lexdata, p.lexpos(2)))
@@ -258,6 +258,7 @@ class CoolParser:
     def p_error(self, p):
         if p:
             self.lexer.add_line_column(p)
-            self.errors.append(SyntacticError(f'ERROR at or near {p.value}', p.line, p.column)
+            self.errors.append(SyntacticError(
+                f'ERROR at or near {p.value}', p.line, p.column))
         else:
-            self.errors.append(SyntacticError(f'ERROR at or near EOF', 0, 0)
+            self.errors.append(SyntacticError(f'ERROR at or near EOF', 0, 0))
