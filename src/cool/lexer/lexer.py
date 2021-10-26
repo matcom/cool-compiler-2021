@@ -2,7 +2,7 @@ from pathlib import Path
 from pprint import pprint
 from typing import List
 import ply.lex as lex
-from ..utils import Token, errors, ignored, literals, reservedKeywords, tokens
+from ..utils import Token, errors, ignored, literals, reservedKeywords, tokens, CoolError
 
 
 class CoolLexer:
@@ -13,96 +13,8 @@ class CoolLexer:
         self.lexer = lex.lex(self, **kwargs)
         self.lexer.lineno = 1
         self.lexer.linestart = 0
-class SemanticError(CoolError):
-    'Otros errores semanticos'
 
-    SELF_IS_READONLY = 'Cannot assign to \'self\'.'
-    SELF_IN_LET = '\'self\' cannot be bound in a \'let\' expression.'
-    SELF_PARAM = "'self' cannot be the name of a formal parameter."
-    SELF_ATTR = "'self' cannot be the name of an attribute."
-
-    LOCAL_ALREADY_DEFINED = 'Variable "%s" is already defined in method "%s".'
-    ARGUMENT_ERROR = 'Method %s called with wrong number of arguments.'
-
-    REDEFINITION_ERROR = 'Redefinition of basic class %s'
-    INHERIT_ERROR = 'Class %s cannot inherit class %s.'
-
-    DUPLICATE_CASE_BRANCH = 'Duplicate branch %s in case statement.'
-    TYPE_ALREADY_DEFINED = 'Classes may not be redefined.'
-
-    ATTRIBUTE_ALREADY_DEFINED = 'Attribute "%s" is multiply defined in class.'
-    ATTR_DEFINED_PARENT = 'Attribute %s is an attribute of an inherited class.'
-
-    METHOD_ALREADY_DEFINED = 'Method "%s" is multiply defined.'
-
-    CIRCULAR_DEPENDENCY = 'Class %s, or an ancestor of %s, is involved in an inheritance cycle.'
-
-    WRONG_SIGNATURE_RETURN = 'In redefined method %s, return type %s is different from original return type %s.'
-    WRONG_NUMBER_PARAM = 'Incompatible number of formal parameters in redefined method %s.'
-
-    PARAMETER_MULTY_DEFINED = 'Formal parameter %s is multiply defined.'
-    WRONG_SIGNATURE_PARAMETER = 'In redefined method %s, parameter type %s is different from original type %s.'
-
-    @property
-    def error_type(self):
-        return 'SemanticError'
-
-
-class NamesError(SemanticError):
-    'Se reporta al referenciar a un identificador en un ambito en el que no es visible'
-
-    VARIABLE_NOT_DEFINED = 'Undeclared identifier %s.'
-
-    @property
-    def error_type(self):
-        return 'NameError'
-
-
-class TypesError(SemanticError):
-    'Se reporta al detectar un problema de tipos'
-
-    INCOMPATIBLE_TYPES = 'Cannot convert "%s" into "%s".'
-
-    ATTR_TYPE_ERROR = 'Inferred type %s of initialization of attribute %s does not conform to declared type %s.'
-    ATTR_TYPE_UNDEFINED = 'Class %s of attribute %s is undefined.'
-    BOPERATION_NOT_DEFINED = 'non-Int arguments: %s %s %s.'
-    COMPARISON_ERROR = 'Illegal comparison with a basic type.'
-    UOPERATION_NOT_DEFINED = 'Argument of \'%s\' has type %s instead of %s.'
-    CLASS_CASE_BRANCH_UNDEFINED = 'Class %s of case branch is undefined.'
-    PREDICATE_ERROR = 'Predicate of \'%s\' does not have type %s.'
-    INCOSISTENT_ARG_TYPE = 'In call of method %s, type %s of parameter %s does not conform to declared type %s.'
-    INCOMPATIBLE_TYPES_DISPATCH = 'Expression type %s does not conform to declared static dispatch type %s.'
-    INHERIT_UNDEFINED = 'Class %s inherits from an undefined class %s.'
-    UNCONFORMS_TYPE = 'Inferred type %s of initialization of %s does not conform to identifier\'s declared type %s.'
-    UNDEFINED_TYPE_LET = 'Class %s of let-bound identifier %s is undefined.'
-    LOOP_CONDITION_ERROR = 'Loop condition does not have type Bool.'
-    RETURN_TYPE_ERROR = 'Inferred return type %s of method test does not conform to declared return type %s.'
-    PARAMETER_UNDEFINED = 'Class %s of formal parameter %s is undefined.'
-    RETURN_TYPE_UNDEFINED = 'Undefined return type %s in method %s.'
-    NEW_UNDEFINED_CLASS = '\'new\' used with undefined class %s.'
-
-    PARENT_ALREADY_DEFINED = 'Parent type is already set for "%s"'
-    TYPE_NOT_DEFINED = 'Type "%s" is not defined.'
-
-    @property
-    def error_type(self):
-        return 'TypeError'
-
-
-class AttributesError(SemanticError):
-    'Se reporta cuando un atributo o método se referencia pero no está definido'
-
-    DISPATCH_UNDEFINED = 'Dispatch to undefined method %s.'
-
-    METHOD_NOT_DEFINED = 'Method "%s" is not defined in "%s"'
-    ATTRIBUTE_NOT_DEFINED = 'Attribute "%s" is not defined in %s'
-
-    @property
-    def error_type(self):
-        return 'AttributeError'
-
-
-    def updateColumn(self, t):
+    def update_column(self, t):
         t.column = t.lexpos - t.lexer.linestart + 1
 
     states = (
@@ -143,7 +55,7 @@ class AttributesError(SemanticError):
         t.lexer.skip(1)
 
     def t_comments_eof(self, t):
-        self.updateColumn(t)
+        self.update_column(t)
         if t.lexer.level > 0:
             error_text = errors.LexicographicError.EOF_COMMENT
             self.errors.append(errors.LexicographicError(error_text, t.lineno, t.column))
@@ -160,7 +72,7 @@ class AttributesError(SemanticError):
 
     def t_strings_end(self, t):
         r'\"'
-        self.updateColumn(t)
+        self.update_column(t)
 
         if t.lexer.backslash:
             t.lexer.myString += '"'
@@ -174,7 +86,7 @@ class AttributesError(SemanticError):
     def t_strings_newline(self, t):
         r'\n'
         t.lexer.lineno += 1
-        self.updateColumn(t)
+        self.update_column(t)
 
         t.lexer.linestart = t.lexer.lexpos
 
@@ -186,7 +98,7 @@ class AttributesError(SemanticError):
     def t_strings_nill(self, t):
         r'\0'
         error_text = errors.LexicographicError.NULL_STRING
-        self.updateColumn(t)
+        self.update_column(t)
 
         self.errors.append(errors.LexicographicError(error_text, t.lineno, t.column))
 
@@ -210,7 +122,7 @@ class AttributesError(SemanticError):
         pass
 
     def t_strings_eof(self, t):
-        self.updateColumn(t)
+        self.update_column(t)
 
         error_text = errors.LexicographicError.EOF_STRING
         self.errors.append(errors.LexicographicError(error_text, t.lineno, t.column))
@@ -219,127 +131,127 @@ class AttributesError(SemanticError):
 
     def t_semi(self, t):
         r';'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_colon(self, t):
         r':'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_comma(self, t):
         r','
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_dot(self, t):
         r'\.'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_opar(self, t):
         r'\('
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_cpar(self, t):
         r'\)'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_ocur(self, t):
         r'\{'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_ccur(self, t):
         r'\}'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_larrow(self, t):
         r'<-'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_arroba(self, t):
         r'@'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_rarrow(self, t):
         r'=>'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_nox(self, t):
         r'~'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_equal(self, t):
         r'='
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_plus(self, t):
         r'\+'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_of(self, t):
         r'of'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_minus(self, t):
         r'-'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_star(self, t):
         r'\*'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_div(self, t):
         r'/'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_lesseq(self, t):
         r'<='
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_less(self, t):
         r'<'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_inherits(self, t):
         r'inherits'
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     def t_type(self, t):
         r'[A-Z][a-zA-Z_0-9]*'
         t.type = self.reserved.get(t.value.lower(), 'type')
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     # Check for reserved words:
     def t_id(self, t):
         r'[a-z][a-zA-Z_0-9]*'
         t.type = self.reserved.get(t.value.lower(), 'id')
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     # Get Numbers
     def t_num(self, t):
         r'\d+(\.\d+)? '
         t.value = float(t.value)
-        self.updateColumn(t)
+        self.update_column(t)
         return t
 
     # Define a rule so we can track line numbers
@@ -351,7 +263,7 @@ class AttributesError(SemanticError):
         # Error handling rule
 
     def t_error(self, t):
-        self.updateColumn(t)
+        self.update_column(t)
         error_text = errors.LexicographicError.UNKNOWN_TOKEN % t.value[0]
 
         self.errors.append(errors.LexicographicError(error_text, t.lineno, t.column))
