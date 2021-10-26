@@ -31,6 +31,6 @@ if __name__ == '__main__':
     lexer.lexer.linestart = 0
 
     parser = CoolParser(lexer)
-    result = parser.parse(text)
+    ast = parser.parse(text)
 
     # print(result)
