@@ -282,6 +282,11 @@ def t_error(t):
 def tokenize(text: str) -> lex.Lexer:
     global errors
     errors = []
-    lexer = lex.lex()
+    lexer = get_a_lexer()
     lexer.input(text)
     return lexer, errors
+
+
+def get_a_lexer():
+    lexer = lex.lex()
+    return lexer

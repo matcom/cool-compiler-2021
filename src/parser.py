@@ -278,30 +278,41 @@ def p_error(p):
     print('Syntax error in input at {!r}'.format(p))
 
 
-# Create parser
-yacc.yacc()
+# # Create parser
+# yacc.yacc()
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
+#
+#     import sys
+#
+#     # Get file as argument
+#
+#     if len(sys.argv) != 2:
+#         print('You need to specify a cool source file to read from.', file=sys.stderr)
+#         sys.exit(1)
+#     if not sys.argv[1].endswith('.cl'):
+#         print('Argument needs to be a cool source file ending on ".cl".', file=sys.stderr)
+#         sys.exit(1)
+#
+#     sourcefile = sys.argv[1]
+#
+#     # Read and parse source file
+#
+#     with open(sourcefile, 'r') as source:
+#         t = yacc.parse(source.read())
+#
+#     # Print AST
+#
+#     print_ast(t)
 
-    import sys
+def parse(text: str):
+    lex = lexer.get_a_lexer()
+    parser = get_a_parser()
+    tree = parser.parse(text, lex)
+    return tree
 
-    # Get file as argument
 
-    if len(sys.argv) != 2:
-        print('You need to specify a cool source file to read from.', file=sys.stderr)
-        sys.exit(1)
-    if not sys.argv[1].endswith('.cl'):
-        print('Argument needs to be a cool source file ending on ".cl".', file=sys.stderr)
-        sys.exit(1)
-
-    sourcefile = sys.argv[1]
-
-    # Read and parse source file
-
-    with open(sourcefile, 'r') as source:
-        t = yacc.parse(source.read())
-
-    # Print AST
-
-    print_ast(t)
+def get_a_parser():
+    parser = yacc.yacc()
+    return parser
