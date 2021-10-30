@@ -20,7 +20,7 @@ from cool.semantics import (
     TypeCollector,
     topological_sorting,
 )
-from cool.code_generation import ConstructorCreator
+from cool.code_generation import ConstructorCreator, CoolToCILVisitor, CILFormatter
 from cool.semantics.utils.scope import Context, Scope
 
 app = typer.Typer()
@@ -89,6 +89,10 @@ def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
     return ast, scope, context, errors
 
 
+def cool_to_cil():
+    pass
+
+
 @app.command()
 def compile(
     input_file: typer.FileText = typer.Argument(..., help="Cool file"),
@@ -123,8 +127,21 @@ def compile(
             log_error(e)
         exit(1)
 
-    ast = ConstructorCreator(context).visit(ast, scope)
-    log_success(CodeBuilder().visit(ast))
+    ###################
+    # Code Generation #
+    ###################
+    # icool_ast = ConstructorCreator(context).visit(ast, scope)
+
+    # if verbose:
+    #     log_success(CodeBuilder().visit(icool_ast))
+
+    # cil_ast = CoolToCILVisitor(context).visit(icool_ast, scope)
+
+    # if verbose or True:
+    #     log_success(CILFormatter().visit(cil_ast))
+    #######
+    # End #
+    #######
 
     exit(0)
 

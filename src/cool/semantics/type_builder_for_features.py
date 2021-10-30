@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-import cool.semantics.utils.astnodes as ast
+import cool.semantics.utils.astnodes as cool
 import cool.semantics.utils.errors as err
 import cool.visitor as visitor
 from cool.semantics.utils.scope import Context, SemanticError, Type, ErrorType
@@ -24,20 +24,20 @@ class TypeBuilderForFeatures:
     def visit(self, node):
         pass
 
-    @visitor.when(ast.ProgramNode)
-    def visit(self, node: ast.ProgramNode):
+    @visitor.when(cool.ProgramNode)
+    def visit(self, node: cool.ProgramNode):
         for declaration in node.declarations:
             self.visit(declaration)
 
-    @visitor.when(ast.ClassDeclarationNode)
-    def visit(self, node: ast.ClassDeclarationNode):
+    @visitor.when(cool.ClassDeclarationNode)
+    def visit(self, node: cool.ClassDeclarationNode):
         self.current_type = self.context.get_type(node.id)
 
         for feature in node.features:
             self.visit(feature)
 
-    @visitor.when(ast.AttrDeclarationNode)
-    def visit(self, node: ast.AttrDeclarationNode):
+    @visitor.when(cool.AttrDeclarationNode)
+    def visit(self, node: cool.AttrDeclarationNode):
         try:
             attr_type = self.context.get_type(node.type)
         except SemanticError:
@@ -56,8 +56,8 @@ class TypeBuilderForFeatures:
                 % (node.line, node.column, node.id, self.current_type.name)
             )
 
-    @visitor.when(ast.MethodDeclarationNode)
-    def visit(self, node: ast.MethodDeclarationNode):
+    @visitor.when(cool.MethodDeclarationNode)
+    def visit(self, node: cool.MethodDeclarationNode):
         param_names = []
         param_types = []
 

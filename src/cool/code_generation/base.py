@@ -16,6 +16,10 @@ class BaseCOOLToCILVisitor:
 
         self.context: Context = context
 
+        self.locals_dict = {}
+        self.param_set = set()
+        self.attr_set = set()
+
     @property
     def params(self) -> List[cil.ParamNode]:
         return self.current_function.params
@@ -32,12 +36,13 @@ class BaseCOOLToCILVisitor:
         local_name = (
             f"local_{self.current_function.name[9:]}_{var_name}_{len(self.localvars)}"
         )
+        local_name = var_name
         local_node = cil.LocalNode(local_name)
         self.localvars.append(local_node)
         return local_name
 
     def define_internal_local(self) -> str:
-        return self.register_local("internal")
+        return self.register_local(f"internal_{len(self.localvars)}")
 
     def register_instruction(
         self, instruction: cil.InstructionNode

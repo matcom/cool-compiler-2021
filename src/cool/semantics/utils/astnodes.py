@@ -92,20 +92,20 @@ class SwitchCaseNode(ExprNode):
 
 
 class AssignNode(ExprNode):
-    def __init__(self, idx, expr):
+    def __init__(self, idx: str, expr: ExprNode):
         self.id: str = idx
         self.expr: ExprNode = expr
 
 
 class ConditionalNode(ExprNode):
-    def __init__(self, ifx, then, elsex):
+    def __init__(self, ifx: ExprNode, then: ExprNode, elsex: ExprNode):
         self.if_expr: ExprNode = ifx
         self.then_expr: ExprNode = then
         self.else_expr: ExprNode = elsex
 
 
 class WhileNode(ExprNode):
-    def __init__(self, condition, body):
+    def __init__(self, condition: ExprNode, body: ExprNode):
         self.condition: ExprNode = condition
         self.body: ExprNode = body
 
@@ -123,12 +123,12 @@ class MethodCallNode(ExprNode):
 
 
 class AtomicNode(ExprNode):
-    def __init__(self, lex):
+    def __init__(self, lex: str):
         self.lex: str = lex
 
 
 class UnaryNode(ExprNode):
-    def __init__(self, expr):
+    def __init__(self, expr: ExprNode):
         self.expr: ExprNode = expr
 
         self.operation_position: Tuple[int, int] = -1, -1

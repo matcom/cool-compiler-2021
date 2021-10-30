@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-import cool.semantics.utils.astnodes as ast
+import cool.semantics.utils.astnodes as cool
 import cool.semantics.utils.errors as err
 import cool.visitor as visitor
 from cool.semantics.utils.scope import Context, SemanticError, Type, ErrorType
@@ -24,13 +24,13 @@ class TypeBuilderForInheritance:
     def visit(self, node):
         pass
 
-    @visitor.when(ast.ProgramNode)
-    def visit(self, node: ast.ProgramNode):
+    @visitor.when(cool.ProgramNode)
+    def visit(self, node: cool.ProgramNode):
         for declaration in node.declarations:
             self.visit(declaration)
 
-    @visitor.when(ast.ClassDeclarationNode)
-    def visit(self, node: ast.ClassDeclarationNode):
+    @visitor.when(cool.ClassDeclarationNode)
+    def visit(self, node: cool.ClassDeclarationNode):
         self.current_type = self.context.get_type(node.id)
 
         if node.parent is not None:

@@ -1,13 +1,13 @@
 from typing import List, Dict, Optional, OrderedDict
 
-import cool.semantics.utils.astnodes as ast
+import cool.semantics.utils.astnodes as cool
 import cool.semantics.utils.errors as err
 import cool.visitor as visitor
 from cool.semantics.utils.scope import Context, ErrorType, Type, SemanticError
 
 
 def topological_sorting(
-    program_node: ast.ProgramNode, context: Context, errors: List[str]
+    program_node: cool.ProgramNode, context: Context, errors: List[str]
 ) -> bool:
     """Set an order in the program node of de ast such that for all class A with parent B, class B is before A in the
     list, if in the process is detected a cycle an error is added to the `error` parameter
@@ -85,21 +85,21 @@ class OverriddenMethodChecker:
     def visit(self, node):
         pass
 
-    @visitor.when(ast.ProgramNode)
-    def visit(self, node: ast.ProgramNode):
+    @visitor.when(cool.ProgramNode)
+    def visit(self, node: cool.ProgramNode):
         for declaration in node.declarations:
             self.visit(declaration)
 
-    @visitor.when(ast.ClassDeclarationNode)
-    def visit(self, node: ast.ClassDeclarationNode):
+    @visitor.when(cool.ClassDeclarationNode)
+    def visit(self, node: cool.ClassDeclarationNode):
         self.current_type = self.context.get_type(node.id)
 
         for feature in node.features:
-            if isinstance(feature, ast.MethodDeclarationNode):
+            if isinstance(feature, cool.MethodDeclarationNode):
                 self.visit(feature)
 
-    @visitor.when(ast.AttrDeclarationNode)
-    def visit(self, node: ast.AttrDeclarationNode):
+    @visitor.when(cool.AttrDeclarationNode)
+    def visit(self, node: cool.AttrDeclarationNode):
         try:
             attribute, owner = self.current_type.parent.get_attribute(node.id)
             self.errors.append(
@@ -108,8 +108,8 @@ class OverriddenMethodChecker:
         except SemanticError:
             pass
 
-    @visitor.when(ast.MethodDeclarationNode)
-    def visit(self, node: ast.MethodDeclarationNode):
+    @visitor.when(cool.MethodDeclarationNode)
+    def visit(self, node: cool.MethodDeclarationNode):
         # TODO: Change the comparison overriding
         current_method = self.current_type.get_method(node.id)
         try:

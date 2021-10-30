@@ -207,7 +207,7 @@ class Type:
     def bypass(self) -> bool:
         return False
 
-    def get_ancestors(self):
+    def get_ancestors(self) -> List["Type"]:
         if self.parent is None:
             return [self]
         return [self] + self.parent.get_ancestors()

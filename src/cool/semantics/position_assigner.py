@@ -1,7 +1,7 @@
 from typing import List
 from cool.code_generation.cil import PlusNode
 
-import cool.semantics.utils.astnodes as ast
+import cool.semantics.utils.astnodes as cool
 import cool.visitor as visitor
 from pyjapt import Token
 
@@ -18,8 +18,8 @@ class PositionAssigner:
     def visit(self, node):
         pass
 
-    @visitor.when(ast.ProgramNode)
-    def visit(self, node: ast.ProgramNode):
+    @visitor.when(cool.ProgramNode)
+    def visit(self, node: cool.ProgramNode):
 
         for declaration in node.declarations:
             self.visit(declaration)
@@ -30,8 +30,8 @@ class PositionAssigner:
         ]  # There is always one or more declarations
         node.set_main_position(first_declaration.line, first_declaration.column)
 
-    @visitor.when(ast.ClassDeclarationNode)
-    def visit(self, node: ast.ClassDeclarationNode):
+    @visitor.when(cool.ClassDeclarationNode)
+    def visit(self, node: cool.ClassDeclarationNode):
         """
           *
         class type [inherits type] { feature-list }
@@ -63,8 +63,8 @@ class PositionAssigner:
 
         self.inc_position()  # ends after `}`
 
-    @visitor.when(ast.AttrDeclarationNode)
-    def visit(self, node: ast.AttrDeclarationNode):
+    @visitor.when(cool.AttrDeclarationNode)
+    def visit(self, node: cool.AttrDeclarationNode):
         """
         *
         id : type [<- expr]
@@ -88,8 +88,8 @@ class PositionAssigner:
 
         self.inc_position(3)
 
-    @visitor.when(ast.MethodDeclarationNode)
-    def visit(self, node: ast.MethodDeclarationNode):
+    @visitor.when(cool.MethodDeclarationNode)
+    def visit(self, node: cool.MethodDeclarationNode):
         """
         *
         id ( [params] ) : type { expr }
@@ -121,8 +121,8 @@ class PositionAssigner:
         self.visit(node.body)
         self.inc_position()  # ends after `}`
 
-    @visitor.when(ast.LetNode)
-    def visit(self, node: ast.LetNode):
+    @visitor.when(cool.LetNode)
+    def visit(self, node: cool.LetNode):
         """
         *
         let declaration-list in expr
@@ -154,8 +154,8 @@ class PositionAssigner:
 
         self.visit(node.expr)
 
-    @visitor.when(ast.AssignNode)
-    def visit(self, node: ast.AssignNode):
+    @visitor.when(cool.AssignNode)
+    def visit(self, node: cool.AssignNode):
         """
         *
         id <- expr
@@ -170,8 +170,8 @@ class PositionAssigner:
         self.inc_position(2)  # ends after `<-`
         self.visit(node.expr)
 
-    @visitor.when(ast.BlockNode)
-    def visit(self, node: ast.BlockNode):
+    @visitor.when(cool.BlockNode)
+    def visit(self, node: cool.BlockNode):
         """
         *
         { block }
@@ -201,8 +201,8 @@ class PositionAssigner:
 
         self.inc_position()  # ends after `}`
 
-    @visitor.when(ast.ConditionalNode)
-    def visit(self, node: ast.ConditionalNode):
+    @visitor.when(cool.ConditionalNode)
+    def visit(self, node: cool.ConditionalNode):
         """
         *
         if expr then expr else expr fi
@@ -236,8 +236,8 @@ class PositionAssigner:
         ), f'Expected "fi" instead of "{token.lex}" in conditional'
         self.inc_position()  # ends after `fi`
 
-    @visitor.when(ast.WhileNode)
-    def visit(self, node: ast.WhileNode):
+    @visitor.when(cool.WhileNode)
+    def visit(self, node: cool.WhileNode):
         """
         *
         while expr loop expr pool
@@ -254,8 +254,8 @@ class PositionAssigner:
 
         self.inc_position()  # ends after `pool`
 
-    @visitor.when(ast.SwitchCaseNode)
-    def visit(self, node: ast.SwitchCaseNode):
+    @visitor.when(cool.SwitchCaseNode)
+    def visit(self, node: cool.SwitchCaseNode):
         """
         *
         case expr of case-list esac
@@ -282,8 +282,8 @@ class PositionAssigner:
 
         self.inc_position()  # ends afte `esac`
 
-    @visitor.when(ast.MethodCallNode)
-    def visit(self, node: ast.MethodCallNode):
+    @visitor.when(cool.MethodCallNode)
+    def visit(self, node: cool.MethodCallNode):
         """
         *
         id ( expr-list )
@@ -341,29 +341,29 @@ class PositionAssigner:
         else:
             self.inc_position()
 
-    @visitor.when(ast.IntegerNode)
-    def visit(self, node: ast.IntegerNode):
+    @visitor.when(cool.IntegerNode)
+    def visit(self, node: cool.IntegerNode):
         self._atom_node(node)
 
-    @visitor.when(ast.StringNode)
-    def visit(self, node: ast.StringNode):
+    @visitor.when(cool.StringNode)
+    def visit(self, node: cool.StringNode):
         self._atom_node(node)
 
-    @visitor.when(ast.BooleanNode)
-    def visit(self, node: ast.BooleanNode):
+    @visitor.when(cool.BooleanNode)
+    def visit(self, node: cool.BooleanNode):
         self._atom_node(node)
 
-    @visitor.when(ast.VariableNode)
-    def visit(self, node: ast.VariableNode):
+    @visitor.when(cool.VariableNode)
+    def visit(self, node: cool.VariableNode):
         self._atom_node(node)
 
-    @visitor.when(ast.InstantiateNode)
-    def visit(self, node: ast.InstantiateNode):
+    @visitor.when(cool.InstantiateNode)
+    def visit(self, node: cool.InstantiateNode):
         """
         *
         new type
         """
-        
+
         token = self.tokens[self.position]
 
         count = 0
@@ -372,8 +372,7 @@ class PositionAssigner:
             self.inc_position()
             token = self.tokens[self.position]
 
-
-        assert token.lex == "new", f"Expected 'new' instead of '{token.lex}'" 
+        assert token.lex == "new", f"Expected 'new' instead of '{token.lex}'"
 
         node.set_main_position(token.line, token.column)
 
@@ -385,47 +384,47 @@ class PositionAssigner:
             self.inc_position()
             count -= 1
 
-    @visitor.when(ast.NegationNode)
-    def visit(self, node: ast.NegationNode):
+    @visitor.when(cool.NegationNode)
+    def visit(self, node: cool.NegationNode):
         self._check_unary_operation(node)
 
-    @visitor.when(ast.ComplementNode)
-    def visit(self, node: ast.ComplementNode):
+    @visitor.when(cool.ComplementNode)
+    def visit(self, node: cool.ComplementNode):
         self._check_unary_operation(node)
 
-    @visitor.when(ast.IsVoidNode)
-    def visit(self, node: ast.IsVoidNode):
+    @visitor.when(cool.IsVoidNode)
+    def visit(self, node: cool.IsVoidNode):
         self._check_unary_operation(node)
 
-    @visitor.when(ast.PlusNode)
-    def visit(self, node: ast.PlusNode):
+    @visitor.when(cool.PlusNode)
+    def visit(self, node: cool.PlusNode):
         self._check_binary_operation(node)
 
-    @visitor.when(ast.MinusNode)
-    def visit(self, node: ast.MinusNode):
+    @visitor.when(cool.MinusNode)
+    def visit(self, node: cool.MinusNode):
         self._check_binary_operation(node)
 
-    @visitor.when(ast.StarNode)
-    def visit(self, node: ast.StarNode):
+    @visitor.when(cool.StarNode)
+    def visit(self, node: cool.StarNode):
         self._check_binary_operation(node)
 
-    @visitor.when(ast.DivNode)
-    def visit(self, node: ast.DivNode):
+    @visitor.when(cool.DivNode)
+    def visit(self, node: cool.DivNode):
         self._check_binary_operation(node)
 
-    @visitor.when(ast.LessEqualNode)
-    def visit(self, node: ast.LessEqualNode):
+    @visitor.when(cool.LessEqualNode)
+    def visit(self, node: cool.LessEqualNode):
         self._check_binary_operation(node)
 
-    @visitor.when(ast.LessThanNode)
-    def visit(self, node: ast.LessThanNode):
+    @visitor.when(cool.LessThanNode)
+    def visit(self, node: cool.LessThanNode):
         self._check_binary_operation(node)
 
-    @visitor.when(ast.EqualNode)
-    def visit(self, node: ast.EqualNode):
+    @visitor.when(cool.EqualNode)
+    def visit(self, node: cool.EqualNode):
         self._check_binary_operation(node)
 
-    def _check_binary_operation(self, node: ast.BinaryNode):
+    def _check_binary_operation(self, node: cool.BinaryNode):
         """
         expr operation expr
         """
@@ -437,7 +436,7 @@ class PositionAssigner:
 
         self.visit(node.right)
 
-    def _check_unary_operation(self, node: ast.UnaryNode):
+    def _check_unary_operation(self, node: cool.UnaryNode):
         """
         operation expr
         """
@@ -450,7 +449,7 @@ class PositionAssigner:
         self.inc_position()  # ends after `operation`
         self.visit(node.expr)
 
-    def _atom_node(self, node: ast.Node):
+    def _atom_node(self, node: cool.Node):
         token = self.tokens[self.position]
         node.set_main_position(token.line, token.column)
         self.inc_position()  # ends after `atom`

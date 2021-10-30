@@ -3,7 +3,7 @@ import time
 
 from pyjapt import Grammar, Lexer, ShiftReduceParser, Token
 
-import cool.semantics.utils.astnodes as ast
+import cool.semantics.utils.astnodes as cool
 
 G = Grammar()
 
@@ -253,76 +253,76 @@ def lexical_error(lexer):
 ###############
 # Productions #
 ###############
-program %= "class-list", lambda s: ast.ProgramNode(s[1])
+program %= "class-list", lambda s: cool.ProgramNode(s[1])
 
 class_list %= "class-def ;", lambda s: [s[1]]
 class_list %= "class-def ; class-list", lambda s: [s[1]] + s[3]
 
-class_def %= "class type { feature-list }", lambda s: ast.ClassDeclarationNode(
+class_def %= "class type { feature-list }", lambda s: cool.ClassDeclarationNode(
     s[2], s[4]
 )
 class_def %= (
     "class type inherits type { feature-list }",
-    lambda s: ast.ClassDeclarationNode(s[2], s[6], s[4]),
+    lambda s: cool.ClassDeclarationNode(s[2], s[6], s[4]),
 )
 
 feature_list %= "", lambda s: []
 feature_list %= "attribute ; feature-list", lambda s: [s[1]] + s[3]
 feature_list %= "method ; feature-list", lambda s: [s[1]] + s[3]
 
-attribute %= "id : type", lambda s: ast.AttrDeclarationNode(s[1], s[3])
-attribute %= "id : type <- expr", lambda s: ast.AttrDeclarationNode(s[1], s[3], s[5])
+attribute %= "id : type", lambda s: cool.AttrDeclarationNode(s[1], s[3])
+attribute %= "id : type <- expr", lambda s: cool.AttrDeclarationNode(s[1], s[3], s[5])
 
-method %= "id ( ) : type { expr }", lambda s: ast.MethodDeclarationNode(
+method %= "id ( ) : type { expr }", lambda s: cool.MethodDeclarationNode(
     s[1], [], s[5], s[7]
 )
-method %= "id ( param-list ) : type { expr }", lambda s: ast.MethodDeclarationNode(
+method %= "id ( param-list ) : type { expr }", lambda s: cool.MethodDeclarationNode(
     s[1], s[3], s[6], s[8]
 )
 
 param_list %= "id : type", lambda s: [(s[1], s[3])]
 param_list %= "id : type , param-list", lambda s: [(s[1], s[3])] + s[5]
 
-expr %= "id <- expr", lambda s: ast.AssignNode(s[1], s[3])
-expr %= "{ block }", lambda s: ast.BlockNode(s[2])
-expr %= "while expr loop expr pool", lambda s: ast.WhileNode(s[2], s[4])
-expr %= "let declaration-list in expr", lambda s: ast.LetNode(s[2], s[4])
-expr %= "case expr of case-list esac", lambda s: ast.SwitchCaseNode(s[2], s[4])
+expr %= "id <- expr", lambda s: cool.AssignNode(s[1], s[3])
+expr %= "{ block }", lambda s: cool.BlockNode(s[2])
+expr %= "while expr loop expr pool", lambda s: cool.WhileNode(s[2], s[4])
+expr %= "let declaration-list in expr", lambda s: cool.LetNode(s[2], s[4])
+expr %= "case expr of case-list esac", lambda s: cool.SwitchCaseNode(s[2], s[4])
 expr %= "negable-comp", lambda s: s[1]
 
-negable_comp %= "not comp", lambda s: ast.NegationNode(s[2])
+negable_comp %= "not comp", lambda s: cool.NegationNode(s[2])
 negable_comp %= "comp", lambda s: s[1]
 
-comp %= "comp < negable-arith", lambda s: ast.LessThanNode(s[1], s[2], s[3])
-comp %= "comp <= negable-arith", lambda s: ast.LessEqualNode(s[1], s[2], s[3])
-comp %= "comp = negable-arith", lambda s: ast.EqualNode(s[1], s[2], s[3])
+comp %= "comp < negable-arith", lambda s: cool.LessThanNode(s[1], s[2], s[3])
+comp %= "comp <= negable-arith", lambda s: cool.LessEqualNode(s[1], s[2], s[3])
+comp %= "comp = negable-arith", lambda s: cool.EqualNode(s[1], s[2], s[3])
 comp %= "arith", lambda s: s[1]
 
-negable_arith %= "not arith", lambda s: ast.NegationNode(s[2])
+negable_arith %= "not arith", lambda s: cool.NegationNode(s[2])
 negable_arith %= "arith", lambda s: s[1]
 
-arith %= "arith + term", lambda s: ast.PlusNode(s[1], s[2], s[3])
-arith %= "arith - term", lambda s: ast.MinusNode(s[1], s[2], s[3])
+arith %= "arith + term", lambda s: cool.PlusNode(s[1], s[2], s[3])
+arith %= "arith - term", lambda s: cool.MinusNode(s[1], s[2], s[3])
 arith %= "term", lambda s: s[1]
 
-term %= "term * factor", lambda s: ast.StarNode(s[1], s[2], s[3])
-term %= "term / factor", lambda s: ast.DivNode(s[1], s[2], s[3])
+term %= "term * factor", lambda s: cool.StarNode(s[1], s[2], s[3])
+term %= "term / factor", lambda s: cool.DivNode(s[1], s[2], s[3])
 term %= "factor", lambda s: s[1]
 
-factor %= "isvoid factor", lambda s: ast.IsVoidNode(s[2])
-factor %= "~ factor", lambda s: ast.ComplementNode(s[2])
+factor %= "isvoid factor", lambda s: cool.IsVoidNode(s[2])
+factor %= "~ factor", lambda s: cool.ComplementNode(s[2])
 factor %= "atom", lambda s: s[1]
 
-atom %= "id", lambda s: ast.VariableNode(s[1])
-atom %= "true", lambda s: ast.BooleanNode(s[1])
-atom %= "false", lambda s: ast.BooleanNode(s[1])
-atom %= "int", lambda s: ast.IntegerNode(s[1])
-atom %= "string", lambda s: ast.StringNode(s[1])
-atom %= "if expr then expr else expr fi", lambda s: ast.ConditionalNode(
+atom %= "id", lambda s: cool.VariableNode(s[1])
+atom %= "true", lambda s: cool.BooleanNode(s[1])
+atom %= "false", lambda s: cool.BooleanNode(s[1])
+atom %= "int", lambda s: cool.IntegerNode(s[1])
+atom %= "string", lambda s: cool.StringNode(s[1])
+atom %= "if expr then expr else expr fi", lambda s: cool.ConditionalNode(
     s[2], s[4], s[6]
 )
 atom %= "function-call", lambda s: s[1]
-atom %= "new type", lambda s: ast.InstantiateNode(s[2])
+atom %= "new type", lambda s: cool.InstantiateNode(s[2])
 atom %= "( expr )", lambda s: s[2]
 
 block %= "expr ;", lambda s: [s[1]]
@@ -342,11 +342,11 @@ declaration_list %= (
 case_list %= "id : type => expr ;", lambda s: [(s[1], s[3], s[5])]
 case_list %= "id : type => expr ; case-list", lambda s: [(s[1], s[3], s[5])] + s[7]
 
-function_call %= "id ( expr-list )", lambda s: ast.MethodCallNode(s[1], s[3])
-function_call %= "atom . id ( expr-list )", lambda s: ast.MethodCallNode(
+function_call %= "id ( expr-list )", lambda s: cool.MethodCallNode(s[1], s[3])
+function_call %= "atom . id ( expr-list )", lambda s: cool.MethodCallNode(
     s[3], s[5], s[1]
 )
-function_call %= "atom @ type . id ( expr-list )", lambda s: ast.MethodCallNode(
+function_call %= "atom @ type . id ( expr-list )", lambda s: cool.MethodCallNode(
     s[5], s[7], s[1], s[3]
 )
 
