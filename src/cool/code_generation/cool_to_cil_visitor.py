@@ -214,11 +214,10 @@ class CoolToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.IntegerNode, scope: Scope):
         return node.lex, self.context.get_type("Int")
 
-    
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope: Scope):
         return node.lex, self.context.get_type("String")
-    
+
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
         return node.lex, self.context.get_type("Bool")

@@ -204,10 +204,9 @@ class TypeChecker:
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
-        child_scope = scope.create_child()
         return_type = ErrorType()
         for expr in node.expressions:
-            return_type = self.visit(expr, child_scope)
+            return_type = self.visit(expr, scope)
         return return_type
 
     @visitor.when(cool.ConditionalNode)
@@ -230,7 +229,7 @@ class TypeChecker:
                 % (node.line, node.column, condition.name, "Bool")
             )
 
-        self.visit(node.body, scope.create_child())
+        self.visit(node.body, scope)
         return self.context.get_type("Object")
 
     @visitor.when(cool.SwitchCaseNode)

@@ -7,11 +7,13 @@ import typer
 
 sys.path.append(os.getcwd())
 
+from cool.code_generation import CILFormatter, ConstructorCreator, CoolToCILVisitor
 from cool.grammar import Token, serialize_parser_and_lexer
 from cool.lexertab import CoolLexer
 from cool.parsertab import CoolParser
 from cool.semantics import (
     CodeBuilder,
+    InferenceChecker,
     OverriddenMethodChecker,
     PositionAssigner,
     TypeBuilderForFeatures,
@@ -20,7 +22,6 @@ from cool.semantics import (
     TypeCollector,
     topological_sorting,
 )
-from cool.code_generation import ConstructorCreator, CoolToCILVisitor, CILFormatter
 from cool.semantics.utils.scope import Context, Scope
 
 app = typer.Typer()
@@ -85,6 +86,7 @@ def check_semantics(ast, scope: Scope, context: Context, errors: List[str]):
     if not errors:
         TypeBuilderForFeatures(context, errors).visit(ast)
         OverriddenMethodChecker(context, errors).visit(ast)
+        InferenceChecker(context, errors).visit(ast, Scope())
         TypeChecker(context, errors).visit(ast, scope)
     return ast, scope, context, errors
 
