@@ -360,18 +360,19 @@ function function_main_at_Main {
 	LOCAL local_main_at_Main_internal_11
 	LOCAL local_main_at_Main_internal_12
 
-	local_main_at_Main_internal_0 = ALLOCATE Object
+	local_main_at_Main_internal_0 = ALLOCATE B
 	ARG local_main_at_Main_internal_0
-	local_main_at_Main_internal_0 = CALL $init_Object_type
+	local_main_at_Main_internal_0 = CALL $init_B_type
 	local_main_at_Main_internal_1 = TYPEOF local_main_at_Main_internal_0
-	local_main_at_Main_internal_2 = ARRAY Int 2
-	SETINDEX local_main_at_Main_internal_2 0 A
-	SETINDEX local_main_at_Main_internal_2 1 B
+	local_main_at_Main_internal_2 = ARRAY Int 3
+	SETINDEX local_main_at_Main_internal_2 0 Object
+	SETINDEX local_main_at_Main_internal_2 1 A
+	SETINDEX local_main_at_Main_internal_2 2 B
 	local_main_at_Main_internal_3 = -1
 	local_main_at_Main_internal_5 = -2
 	LABEL main_at_Main_label_0
 	local_main_at_Main_internal_3 = local_main_at_Main_internal_3 + 1
-	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_3 2
+	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_3 3
 	IF local_main_at_Main_internal_8 GOTO main_at_Main_label_2
 	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_3
 	ARG local_main_at_Main_internal_1
@@ -392,18 +393,24 @@ function function_main_at_Main {
 	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
 	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_3
 	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_4
-	local_main_at_Main_internal_11 = EQUAL A local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = EQUAL Object local_main_at_Main_internal_7
 	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
 	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_5
-	local_main_at_Main_internal_0 = 1
+	local_main_at_Main_internal_0 = 0
 	GOTO main_at_Main_label_4
 	LABEL main_at_Main_label_5
-	local_main_at_Main_internal_11 = EQUAL B local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = EQUAL A local_main_at_Main_internal_7
 	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
 	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_6
-	local_main_at_Main_internal_0 = 2
+	local_main_at_Main_internal_0 = 1
 	GOTO main_at_Main_label_4
 	LABEL main_at_Main_label_6
+	local_main_at_Main_internal_11 = EQUAL B local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_7
+	local_main_at_Main_internal_0 = 2
+	GOTO main_at_Main_label_4
+	LABEL main_at_Main_label_7
 	LABEL main_at_Main_label_3
 	ABORT
 	LABEL main_at_Main_label_4

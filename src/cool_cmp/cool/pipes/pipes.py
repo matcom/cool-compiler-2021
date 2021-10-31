@@ -12,6 +12,7 @@ from cool.semantic.scope import Scope
 from cool.pipes.utils import pprint_tokens, print_errors
 from cool.pipes.pipeline import Pipe
 from cool.visitors.cil_visitor import CILPrintVisitor, CILRunnerVisitor, COOLToCILVisitor
+from mips.visitors.mips_visitors import CILToMIPSVisitor, MIPSPrintVisitor
 
 ply_lexer = PlyLexer()
 
@@ -463,3 +464,35 @@ def run_cil_pipe(result: dict, runner= CILRunnerVisitor):
     return result
 
 run_cil_pipe = Pipe(run_cil_pipe)
+
+def cil_to_mips_pipe(result: dict, cil_to_mips=CILToMIPSVisitor):
+    ast = result.get("cil_ast",None)
+    if ast is None:
+        return result
+    
+    converter = cil_to_mips()
+    value = converter.visit(ast)
+    result["errors"].extend(converter.errors)
+    if result.get("verbose", False):
+        print("============== CIL to MIPS Result ===============")
+        print(value)
+        print_errors("============ CIL to MIPS Error =============", converter.errors)
+    result['mips_ast'] = value
+    return result
+
+cil_to_mips_pipe = Pipe(cil_to_mips_pipe)
+
+def mips_ast_to_text_pipe(result: dict, formatter=MIPSPrintVisitor):
+    ast = result.get("mips_ast",None)
+    if any(x == None for x in [ast]):
+        return result
+    
+    formatter = formatter()
+    mips_text = formatter.visit(ast)
+    if result.get("verbose", False):
+        print("============== MIPS Text ===============")
+        print(mips_text)
+    result['mips_text'] = mips_text
+    return result
+
+mips_ast_to_text_pipe = Pipe(mips_ast_to_text_pipe)

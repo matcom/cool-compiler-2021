@@ -1,0 +1,17 @@
+# TODO Change this message for a meaningful one
+.text
+# Entry function
+main:
+# Load message direction
+la $a0, hello_world
+# $v0 = 4 For printing string
+addi $v0, $zero, 4
+# Prints Hello world
+syscall
+# $v0 = 10 For exit
+addi $v0, $zero, 10
+# Exit
+syscall
+.data
+# Message to print
+hello_world: .asciiz "Hello World\n"
