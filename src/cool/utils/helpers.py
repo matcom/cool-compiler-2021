@@ -1,5 +1,5 @@
 import itertools
-from semantic.types import Type, SelfType
+from ..semantic.types import Type, SelfType
 
 
 def find_column(lexer, token):
