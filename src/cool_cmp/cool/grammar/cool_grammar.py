@@ -1,5 +1,5 @@
 from cmp.pycompiler import Grammar, NonTerminal, Terminal
-from cool.ast.ast import *
+from cool.ast.cool_ast import *
 
 G = Grammar()
 

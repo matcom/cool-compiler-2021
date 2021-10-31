@@ -1,0 +1,414 @@
+.TYPES
+type Object {
+	parent: None
+	
+
+	method $init: $init_Object_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+}
+type String {
+	parent: Object
+	
+
+	method $init: $init_String_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method length: function_length_at_String
+	method concat: function_concat_at_String
+	method substr: function_substr_at_String
+}
+type Bool {
+	parent: Object
+	
+
+	method $init: $init_Bool_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+}
+type Int {
+	parent: Object
+	
+
+	method $init: $init_Int_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+}
+type IO {
+	parent: Object
+	
+
+	method $init: $init_IO_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+}
+type A {
+	parent: Object
+	attribute a
+
+	method $init: $init_A_type
+	method $init_a_at_A: $init_a_at_A
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method get: function_get_at_A
+	method get2: function_get2_at_A
+	method get3: function_get3_at_A
+}
+type B {
+	parent: A
+	attribute a
+
+	method $init: $init_B_type
+	method $init_a_at_B: $init_a_at_B
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method get: function_get_at_A
+	method get2: function_get2_at_A
+	method get3: function_get3_at_A
+	method get4: function_get4_at_B
+}
+type Main {
+	parent: IO
+	
+
+	method $init: $init_Main_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method main: function_main_at_Main
+}
+
+.DATA
+
+
+.CODE
+function entry {
+	
+
+	LOCAL local_y_internal_0
+	LOCAL local_y_internal_1
+	LOCAL local_y_internal_2
+
+	local_y_internal_2 = ALLOCATE Main
+	ARG local_y_internal_2
+	local_y_internal_2 = CALL $init_Main_type
+	ARG local_y_internal_2
+	local_y_internal_1 = CALL function_main_at_Main
+	RETURN 0
+}
+function type_distance {
+	PARAM type1
+	PARAM type2
+
+	LOCAL local_distance_internal_0
+	LOCAL local_distance_internal_1
+	LOCAL local_distance_internal_2
+	LOCAL local_distance_internal_3
+
+	local_distance_internal_3 = VOID
+	local_distance_internal_0 = 0
+	LABEL distance_label_0
+	local_distance_internal_1 = EQUAL type1 type2
+	IF local_distance_internal_1 GOTO distance_label_1
+	type1 = FATHER type1
+	local_distance_internal_2 = EQUAL type1 local_distance_internal_3
+	IF local_distance_internal_2 GOTO distance_label_2
+	local_distance_internal_0 = local_distance_internal_0 + 1
+	GOTO distance_label_0
+	LABEL distance_label_2
+	local_distance_internal_0 = -1
+	LABEL distance_label_1
+	RETURN local_distance_internal_0
+}
+function $init_Object_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function function_abort_at_Object {
+	PARAM self
+
+	
+
+	ABORT
+	RETURN 0
+}
+function function_type_name_at_Object {
+	PARAM self
+
+	LOCAL local_type_name_at_Object_internal_0
+
+	local_type_name_at_Object_internal_0 = TYPEOF self
+	RETURN local_type_name_at_Object_internal_0
+}
+function function_copy_at_Object {
+	PARAM self
+
+	LOCAL local_copy_at_Object_internal_0
+
+	local_copy_at_Object_internal_0 = COPY self
+	RETURN local_copy_at_Object_internal_0
+}
+function $init_String_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function function_length_at_String {
+	PARAM self
+
+	LOCAL local_length_at_String_internal_0
+
+	local_length_at_String_internal_0 = LENGTH self
+	RETURN local_length_at_String_internal_0
+}
+function function_concat_at_String {
+	PARAM self
+	PARAM s
+
+	LOCAL local_concat_at_String_internal_0
+
+	local_concat_at_String_internal_0 = CONCAT self s
+	RETURN local_concat_at_String_internal_0
+}
+function function_substr_at_String {
+	PARAM self
+	PARAM i
+	PARAM l
+
+	LOCAL local_substr_at_String_internal_0
+
+	local_substr_at_String_internal_0 = SUBSTRING self i l
+	RETURN local_substr_at_String_internal_0
+}
+function $init_Bool_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function $init_Int_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function $init_IO_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function function_out_string_at_IO {
+	PARAM self
+	PARAM x
+
+	
+
+	PRINT x
+	RETURN 0
+}
+function function_out_int_at_IO {
+	PARAM self
+	PARAM x
+
+	LOCAL local_out_int_at_IO_internal_0
+
+	local_out_int_at_IO_internal_0 = TOSTR x
+	PRINT local_out_int_at_IO_internal_0
+	RETURN 0
+}
+function function_in_string_at_IO {
+	PARAM self
+
+	LOCAL local_in_string_at_IO_internal_0
+
+	local_in_string_at_IO_internal_0 = READ
+	RETURN local_in_string_at_IO_internal_0
+}
+function function_in_int_at_IO {
+	PARAM self
+
+	LOCAL local_in_int_at_IO_internal_0
+
+	local_in_int_at_IO_internal_0 = READ
+	RETURN local_in_int_at_IO_internal_0
+}
+function $init_A_type {
+	PARAM self
+
+	LOCAL local_A_type_internal_0
+
+	ARG self
+	local_A_type_internal_0 = CALL $init_a_at_A
+	RETURN self
+}
+function $init_a_at_A {
+	PARAM self
+
+	LOCAL local_a_at_A_internal_0
+
+	local_a_at_A_internal_0 = VOID
+	SETATTR self a local_a_at_A_internal_0
+	RETURN 
+}
+function function_get_at_A {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function function_get2_at_A {
+	PARAM self
+
+	LOCAL local_get2_at_A_internal_0
+	LOCAL local_get2_at_A_internal_1
+
+	local_get2_at_A_internal_1 = TYPEOF self
+	local_get2_at_A_internal_0 = ALLOCATE local_get2_at_A_internal_1
+	ARG local_get2_at_A_internal_0
+	local_get2_at_A_internal_0 = VCALL local_get2_at_A_internal_1 $init
+	RETURN local_get2_at_A_internal_0
+}
+function function_get3_at_A {
+	PARAM self
+
+	LOCAL local_get3_at_A_internal_0
+	LOCAL local_get3_at_A_internal_1
+	LOCAL local_get3_at_A_internal_2
+	LOCAL local_get3_at_A_internal_3
+
+	local_get3_at_A_internal_2 = TYPEOF self
+	local_get3_at_A_internal_1 = ALLOCATE local_get3_at_A_internal_2
+	ARG local_get3_at_A_internal_1
+	local_get3_at_A_internal_1 = VCALL local_get3_at_A_internal_2 $init
+	SETATTR self a local_get3_at_A_internal_1
+	local_get3_at_A_internal_3 = GETATTR self a
+	RETURN local_get3_at_A_internal_3
+}
+function $init_B_type {
+	PARAM self
+
+	LOCAL local_B_type_internal_0
+
+	ARG self
+	local_B_type_internal_0 = CALL $init_a_at_B
+	RETURN self
+}
+function $init_a_at_B {
+	PARAM self
+
+	LOCAL local_a_at_B_internal_0
+
+	local_a_at_B_internal_0 = VOID
+	SETATTR self a local_a_at_B_internal_0
+	RETURN 
+}
+function function_get4_at_B {
+	PARAM self
+
+	LOCAL local_get4_at_B_internal_0
+
+	ARG self
+	local_get4_at_B_internal_0 = VCALL B get3
+	RETURN local_get4_at_B_internal_0
+}
+function $init_Main_type {
+	PARAM self
+
+	
+
+	RETURN self
+}
+function function_main_at_Main {
+	PARAM self
+
+	LOCAL local_main_at_Main_internal_0
+	LOCAL local_main_at_Main_internal_1
+	LOCAL local_main_at_Main_internal_2
+	LOCAL local_main_at_Main_internal_3
+	LOCAL local_main_at_Main_internal_4
+	LOCAL local_main_at_Main_internal_5
+	LOCAL local_main_at_Main_internal_6
+	LOCAL local_main_at_Main_internal_7
+	LOCAL local_main_at_Main_internal_8
+	LOCAL local_main_at_Main_internal_9
+	LOCAL local_main_at_Main_internal_10
+	LOCAL local_main_at_Main_internal_11
+	LOCAL local_main_at_Main_internal_12
+
+	local_main_at_Main_internal_0 = ALLOCATE Object
+	ARG local_main_at_Main_internal_0
+	local_main_at_Main_internal_0 = CALL $init_Object_type
+	local_main_at_Main_internal_1 = TYPEOF local_main_at_Main_internal_0
+	local_main_at_Main_internal_2 = ARRAY Int 2
+	SETINDEX local_main_at_Main_internal_2 0 A
+	SETINDEX local_main_at_Main_internal_2 1 B
+	local_main_at_Main_internal_3 = -1
+	local_main_at_Main_internal_5 = -2
+	LABEL main_at_Main_label_0
+	local_main_at_Main_internal_3 = local_main_at_Main_internal_3 + 1
+	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_3 2
+	IF local_main_at_Main_internal_8 GOTO main_at_Main_label_2
+	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_3
+	ARG local_main_at_Main_internal_1
+	ARG local_main_at_Main_internal_7
+	local_main_at_Main_internal_6 = CALL type_distance
+	local_main_at_Main_internal_9 = EQUAL local_main_at_Main_internal_6 -1
+	IF local_main_at_Main_internal_9 GOTO main_at_Main_label_0
+	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_1
+	local_main_at_Main_internal_10 = local_main_at_Main_internal_5 > local_main_at_Main_internal_6
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_1
+	GOTO main_at_Main_label_0
+	LABEL main_at_Main_label_1
+	local_main_at_Main_internal_5 = local_main_at_Main_internal_6
+	local_main_at_Main_internal_4 = local_main_at_Main_internal_3
+	GOTO main_at_Main_label_0
+	LABEL main_at_Main_label_2
+	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_3
+	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_4
+	local_main_at_Main_internal_11 = EQUAL A local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_5
+	local_main_at_Main_internal_0 = 1
+	GOTO main_at_Main_label_4
+	LABEL main_at_Main_label_5
+	local_main_at_Main_internal_11 = EQUAL B local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_6
+	local_main_at_Main_internal_0 = 2
+	GOTO main_at_Main_label_4
+	LABEL main_at_Main_label_6
+	LABEL main_at_Main_label_3
+	ABORT
+	LABEL main_at_Main_label_4
+	ARG self
+	ARG local_main_at_Main_internal_0
+	local_main_at_Main_internal_12 = VCALL Main out_int
+	RETURN local_main_at_Main_internal_12
+}

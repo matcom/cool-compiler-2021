@@ -11,6 +11,7 @@ from cool.grammar.comment_grammar import C
 from cool.semantic.scope import Scope
 from cool.pipes.utils import pprint_tokens, print_errors
 from cool.pipes.pipeline import Pipe
+from cool.visitors.cil_visitor import CILPrintVisitor, CILRunnerVisitor, COOLToCILVisitor
 
 ply_lexer = PlyLexer()
 
@@ -403,3 +404,62 @@ def string_escape_pipe(result:dict):
     return result
     
 string_escape_pipe = Pipe(string_escape_pipe)
+
+def cool_to_cil_pipe(result: dict, cool_to_cil=COOLToCILVisitor):
+    context = result.get("context",None)
+    scope = result.get("scope", None)
+    ast = result.get("ast", None)
+    if any(x == None for x in [context, ast, scope]):
+        return result
+    
+    if result.get("errors"):
+        return result
+    
+    errors = []
+    cool_to_cil_visitor = cool_to_cil(context, errors) 
+    
+    cil_ast = cool_to_cil_visitor.visit(ast, scope)
+    
+    result['cil_ast'] = cil_ast
+    
+    if result.get("verbose", False):
+        if errors:
+            print_errors("COOL to CIL Errors", errors)
+    
+    result["errors"].extend(errors)
+    
+    return result
+        
+cool_to_cil_pipe = Pipe(cool_to_cil_pipe)
+
+def cil_ast_to_text_pipe(result: dict, formatter=CILPrintVisitor):
+    ast = result.get("cil_ast",None)
+    if any(x == None for x in [ast]):
+        return result
+    
+    formatter = formatter()
+    cil_text = formatter.visit(ast)
+    if result.get("verbose", False):
+        print("============== CIL Text ===============")
+        print(cil_text)
+    result['cil_text'] = cil_text
+    return result
+
+cil_ast_to_text_pipe = Pipe(cil_ast_to_text_pipe)
+
+def run_cil_pipe(result: dict, runner= CILRunnerVisitor):
+    ast = result.get("cil_ast",None)
+    if ast is None:
+        return result
+    
+    runner = runner()
+    value = runner.visit(ast)
+    result["errors"].extend(runner.errors)
+    if result.get("verbose", False):
+        print("============== CIL Result ===============")
+        print(value)
+        print_errors("============ CIL Run Error =============", runner.errors)
+    result['cil_value'] = value
+    return result
+
+run_cil_pipe = Pipe(run_cil_pipe)

@@ -1,7 +1,8 @@
 from cmp.semantic import Attribute, Method
 from cmp.semantic import Type as DeprecatedType
 from cmp.semantic import SemanticError as DeprecatedSemanticError
-from cool.ast.ast import VoidNode,ConstantNumNode,StringNode,BoolNode,SpecialNode,InstantiateNode
+from cool.ast.cool_ast import VoidNode,ConstantNumNode,StringNode,BoolNode,SpecialNode,InstantiateNode
+import cool.ast.cil_ast as cil
 from cool.semantic.atomic import ClassInstance
 from cool.error.errors import RunError, SemanticError, TypeCoolError, InferError, \
     VOID_TYPE_CONFORMS, METHOD_NOT_DEFINED, METHOD_ALREADY_DEFINED, \
@@ -12,10 +13,10 @@ import cool.visitors.utils as ut
 
 class Type(DeprecatedType):
     
-    def add_special_method(self,func,method_name,method_args):
+    def add_special_method(self,func,method_name,method_args, cil_node_type):
         f = self.get_method(method_name,method_args)
         old_type = f.node.body.type
-        f.node.body = SpecialNode(func,f.node.row,f.node.column)
+        f.node.body = SpecialNode(func,f.node.row,f.node.column, cil_node_type)
         f.node.body.type = old_type
     
     def set_parent(self,parent):
@@ -136,9 +137,9 @@ class ObjectType(Type):
         self.parent = None
         
     def complete(self):
-        self.add_special_method(self.abort,'abort',0)
-        self.add_special_method(self.copy,'copy',0)
-        self.add_special_method(self.type_name,'type_name',0)
+        self.add_special_method(self.abort,'abort',0, cil.ObjectAbortNode)
+        self.add_special_method(self.copy,'copy',0, cil.ObjectCopyNode)
+        self.add_special_method(self.type_name,'type_name',0, cil.ObjectTypeNameNode)
         
     def set_parent(self,parent):
         pass
@@ -196,9 +197,9 @@ class StringType(Type):
         Type.__init__(self, 'String')
     
     def complete(self):
-        self.add_special_method(self.length,'length',0)
-        self.add_special_method(self.concat,'concat',1)
-        self.add_special_method(self.substr,'substr',2)
+        self.add_special_method(self.length,'length',0, cil.StringLengthNode)
+        self.add_special_method(self.concat,'concat',1, cil.StringConcatNode)
+        self.add_special_method(self.substr,'substr',2, cil.StringSubstringNode)
         
     @staticmethod
     def length(scope,context,operator,errors,**kwargs):
@@ -264,10 +265,10 @@ class IOType(Type):
         Type.__init__(self, 'IO')
     
     def complete(self):
-        self.add_special_method(self.out_string,'out_string',1)
-        self.add_special_method(self.out_int,'out_int',1)
-        self.add_special_method(self.in_string,'in_string',0)
-        self.add_special_method(self.in_int,'in_int',0)
+        self.add_special_method(self.out_string,'out_string',1, cil.IOOutStringNode)
+        self.add_special_method(self.out_int,'out_int',1, cil.IOOutIntNode)
+        self.add_special_method(self.in_string,'in_string',0, cil.IOInStringNode)
+        self.add_special_method(self.in_int,'in_int',0, cil.IOInIntNode)
         
     @staticmethod
     def out_string(scope,context,operator,errors,**kwargs):

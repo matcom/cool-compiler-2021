@@ -133,6 +133,8 @@ class LexerCoolError(PositionError):
     Error class for lexical errors
     """
     
+    FORMAT = "({}, {}) - {}: {}"
+    
     ERROR_TYPE = "LexicographicError"
 
 class SyntacticCoolError(PositionError):

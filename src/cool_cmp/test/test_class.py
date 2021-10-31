@@ -3,7 +3,7 @@ import pytest
 import os
 base_dir = os.path.dirname(__file__)
 sys.path.append(os.path.join(base_dir, ".."))
-from cool.pipeline import cool_pipeline, reconstr_pipeline
+from cool.pipeline import cool_pipeline, generate_cool_pipeline
 from cool.error.errors import CoolError
 from .tests import tests, tests_run
 
@@ -19,11 +19,11 @@ class TestPrograms:
     
     @pytest.mark.parametrize("name,program", [(x[0],x[1]) for x in tests if "in_out" not in x[0]])
     def test_reconstruction(self, name, program):
-        result = reconstr_pipeline(program)
+        result = generate_cool_pipeline(program)
         ast, errors, context, scope, operator, out, reconstr_text = [result.get(x,None) for x in ["ast", "errors", "context", "scope", "operator", "value", "reconstructed_text"]]
         with open(os.path.join(base_dir, "test_reconstruction", name + ".cl"), "w") as f:
             f.write(reconstr_text)
-        result = reconstr_pipeline(reconstr_text)
+        result = generate_cool_pipeline(reconstr_text)
         ast2, errors2, context2, scope2, operator2, out2, reconstr_text2 = [result.get(x,None) for x in ["ast", "errors", "context", "scope", "operator", "value", "reconstructed_text"]]
         assert len(errors) == len(errors2)
         assert reconstr_text == reconstr_text2

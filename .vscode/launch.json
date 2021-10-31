@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "src/cool_cmp/main.py",
-            "args": ["src/testing.cl", "src/testing.mips"],
+            "args": ["src/testing.cl", "src/testing.mips", "-icil", "-c"],
             "console": "integratedTerminal"
         }
     ]

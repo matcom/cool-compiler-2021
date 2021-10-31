@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cool.ast.ast import *
+from cool.ast.cool_ast import *
 from cool.semantic.type import Type,ErrorType,StringType,IntType,IOType,BoolType,ObjectType,SelfType,VoidType,AutoType
 from cool.semantic.context import Context
 from cool.semantic.atomic import ClassInstance
@@ -363,6 +363,8 @@ class TypeCollector(object):
             if class_decl.id in self.context.special_types:
                 typex = self.context.get_type(class_decl.id)
                 typex.class_node = class_decl
+                if typex.name != "Object":
+                    typex.parent = self.context.get_type(class_decl.parent) if class_decl.parent is not None else None
                 self.add_semantic_error(SemanticError(REDEFINITION_BASIC_CLASS, class_decl.id), class_decl.row, class_decl.column)
             else:
                 try:
@@ -529,7 +531,10 @@ class TypeChecker:
                 node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
             else:
                 return # No default expr can be assing at this moment
-        self.visit(node.expr,scope)
+        a_scope = scope.create_child()
+        self.visit(node.expr,a_scope)
+        
+        node.scope = a_scope
         
         if not node.expr.type.conforms_to(node.type,self.current_type):
             self.add_semantic_error(TypeCoolError(ATTRIBUTE_INCOMPATIBLE_TYPES, node.id, node.type.name, node.expr.type.name),node.expr.row,node.expr.column)
@@ -692,6 +697,7 @@ class TypeChecker:
     @visitor.when(LetNode)
     def visit(self, node: LetNode, scope):
         let_scope = scope.create_child()
+        node.scope = let_scope
         curr_scope = let_scope
         for var_node in node.params:
             attr_scope = curr_scope.create_child()

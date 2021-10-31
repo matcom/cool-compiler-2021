@@ -1,4 +1,4 @@
-from cool.pipes.pipes import start_pipe, change_escaped_lines, remove_comments_pipe,\
+from cool.pipes.pipes import cil_ast_to_text_pipe, cool_to_cil_pipe, run_cil_pipe, start_pipe, change_escaped_lines, remove_comments_pipe,\
     parse_text_pipe, ast_pipe, type_collector_pipe, build_types_pipe, \
     check_types_pipe, run_program_pipe, reconstruct_pipe, void_as_type_pipe, \
     auto_resolver_pipe, string_escape_pipe, tokenize_text_pipe, ply_lexer_pipe, remove_comment_tokens_pipe
@@ -66,15 +66,26 @@ semantic_pipeline = Pipeline(add_std_pipe,
                              pre_semantic_pipeline,
                              )
 
-execution_pipeline = Pipeline(run_program_pipe)
+execution_pipe = Pipe(run_program_pipe)
 
-cool_pipeline = Pipeline(lexer_pipeline,
-                         syntax_pipeline,
-                         semantic_pipeline,
-                         execution_pipeline)
+base_cool_pipeline = Pipeline(lexer_pipeline,
+                              syntax_pipeline,
+                              semantic_pipeline,)
 
-reconstr_pipeline = Pipeline(lexer_pipeline,
-                             syntax_pipeline,
-                             semantic_pipeline,
-                             reconstruct_pipe,
-                             execution_pipeline)
+cool_pipeline = Pipeline(base_cool_pipeline,
+                         cool_to_cil_pipe,
+                         cil_ast_to_text_pipe)
+
+generate_cil_pipeline = Pipeline(base_cool_pipeline,
+                                 cool_to_cil_pipe,
+                                 cil_ast_to_text_pipe)
+
+interprete_cil_pipeline = Pipeline(generate_cil_pipeline,
+                                   run_cil_pipe)
+
+generate_cool_pipeline = Pipeline(base_cool_pipeline,
+                                  reconstruct_pipe)
+
+interprete_cool_pipeline = Pipeline(generate_cool_pipeline,
+                                    execution_pipe)
+
