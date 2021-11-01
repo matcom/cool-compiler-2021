@@ -4,6 +4,7 @@ from pathlib import Path
 
 from cool.lexer import CoolLexer, main
 from cool.parser.parser import CoolParser
+from cool.semantic.semantic import main_semantic
 from cool.utils.errors import SyntacticError
 
 if __name__ == '__main__':
@@ -35,4 +36,12 @@ if __name__ == '__main__':
     parser = CoolParser(lexer)
     ast = parser.parse(text)
 
-    # print(result)
+    if parser.errors:
+        raise Exception()
+
+    ast, errors, context, scope = main_semantic(ast, True)
+
+    if errors:
+        for err in errors:
+            print(err)
+        raise Exception()

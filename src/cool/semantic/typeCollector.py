@@ -5,7 +5,7 @@ from .types import *
 
 
 class TypeCollector:
-    def __int__(self, errors=[]):
+    def __init__(self, errors=[]):
         self.context = None
         self.errors = errors
 

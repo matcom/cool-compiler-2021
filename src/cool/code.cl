@@ -1,37 +1,11 @@
-(* An assignment has the form <id> <- <expr> *)
+--The static types of the two sub-expressions must be Int.
 
-class Main {
-    main(): Object {
-        (new Alpha).print()
-    };
-};
+class A { };
+class B inherits A { };
+class C inherits B { };
 
-class Test {
-    test1: Object;
-    
-    testing1(): Int {
-        2 + 2
-    };
-
-    test2: Int <- 1;
-
-    test3: String <- "1";
-
-    testing2(a: Alpha, b: Int): Int {
-        2 + 2
-    };
-
-    testing3(): String {
-        "2 + 2"
-    };
-
-    testing4(): String {
-        Test1 <- "Hello World" -- Identifiers begin with a lower case letter
-    };
-};
-
-class Alpha inherits IO {
-    print() : Object {
-        out_string("reached!!\n")
-    };
+class Main inherits IO {
+	main(): IO { out_string("Hello World!")};
+	test: Int <- let x: Int <- 1 * 2 / 3 - 4 + new A.type_name().concat(new B.type_name().concat(new C.type_name())).length()
+				in x <- x + new A.type_name().concat(new B.type_name().concat(new C.type_name()));
 };

@@ -6,7 +6,7 @@ from typing import List
 
 
 class TypeBuilder:
-    def __int__(self, context: Context, errors=[]):
+    def __init__(self, context: Context, errors=[]):
         self.context: Context = context
         self.errors: List = errors
         self.current_type: Type = None
