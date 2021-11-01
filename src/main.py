@@ -42,7 +42,7 @@ if __name__ == '__main__':
     if parser.errors:
         raise Exception()
 
-    ast, errors, context, scope = main_semantic(ast, True)
+    ast, errors, context, scope = main_semantic(ast, False)
 
     if errors:
         for err in errors:
