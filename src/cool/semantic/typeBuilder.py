@@ -87,3 +87,20 @@ class TypeBuilder:
             self.current_type.define_method(node.id, args_names, args_types, return_type, node.pos)
         except SemanticError as e:
             self.errors.append(e)
+
+    @visitor.when(AttrDeclarationNode)
+    def visit(self, node: AttrDeclarationNode):
+        try:
+            attr_type = self.context.get_type(node.type, node.pos)
+        except SemanticError as e:
+            error_text = TypesError.ATTR_TYPE_UNDEFINED % (node.type, node.id)
+            attr_type = ErrorType(node.type_pos)
+            self.errors.append(TypesError(error_text, *node.type_pos))
+
+        if node.id == 'self':
+            self.errors.append(SemanticError(SemanticError.SELF_ATTR, *node.pos))
+
+        try:
+            self.current_type.define_attribute(node.id, attr_type, node.pos)
+        except SemanticError as e:
+            self.errors.append(e)

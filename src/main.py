@@ -21,6 +21,9 @@ if __name__ == '__main__':
 
     lexer = main(text, _out)
 
+    lexer.lexer.lineno = 1
+    lexer.lexer.linestart = 0
+
     tokens = lexer.tokenize(text)
 
     if len(tokens) == 0:
