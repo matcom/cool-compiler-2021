@@ -130,12 +130,6 @@ class MyParser():
         '''
         p[0] = (p[1],) if len(p) == 2 else tuple(p[1]) + (p[2],)
 
-    def p_action(self, p):
-        '''
-        action : ID COLON TYPE ARROW expr SEMIC
-        '''
-        p[0] = ActionNode(
-            name=p[1], act_type=p[3], body=p[5], row=p.lineno(1), col=self.find_col(p.lexer.lexdata, p.lexpos(1)))
 
     def p_let_var(self, p):
         '''
@@ -186,6 +180,13 @@ class MyParser():
                       | empty
         '''
         p[0] = tuple() if p.slice[1].type == "empty" else p[1]
+
+    def p_action(self, p):
+        '''
+        action : ID COLON TYPE ARROW expr SEMIC
+        '''
+        p[0] = ActionNode(
+            name=p[1], act_type=p[3], body=p[5], row=p.lineno(1), col=self.find_col(p.lexer.lexdata, p.lexpos(1)))
 
     def p_expr_dynamic_call(self, p):
         '''

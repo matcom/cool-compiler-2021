@@ -43,15 +43,6 @@ class AttrDefNode(AST):
         self.row = row
         self.col = col
 
-class ActionNode(AST):
-    def __init__(self, name, act_type, body, row , col):
-        super(ActionNode, self).__init__()
-        self.name = name
-        self.act_type = act_type
-        self.body = body
-        self.row = row
-        self.col = col
-
 class LetInitNode(AST):
     def __init__(self, name, let_type, expression, row , col):
         super(LetInitNode, self).__init__()

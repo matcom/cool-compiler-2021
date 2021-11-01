@@ -5,6 +5,15 @@ class ExpressionNode(AST):
         super(ExpressionNode, self).__init__()
         self.expr_type = None
 
+class ActionNode(ExpressionNode):
+    def __init__(self, name, act_type, body, row , col):
+        super(ActionNode, self).__init__()
+        self.name = name
+        self.act_type = act_type
+        self.body = body
+        self.row = row
+        self.col = col
+
 class DynamicCallNode(ExpressionNode):
     def __init__(self, obj, method, args, row , col):
         super(DynamicCallNode, self).__init__()
@@ -88,6 +97,8 @@ class IdNode(ExpressionNode):
     def __init__(self, name, row, col):
         super(IdNode, self).__init__()
         self.name = name
+        self.row = row
+        self.col = col
 
 class EqualsNode(ExpressionNode):
     def __init__(self, left, right, row, col):
