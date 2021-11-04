@@ -25,7 +25,6 @@ class Build_Mips:
         index = 4*temp.index(name)
         return -index
 
-
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -34,8 +33,8 @@ class Build_Mips:
     def visit(self, program):
 
         self.add('.data')
-        #self.add('p_error' + ':' + ' .asciiz ' + '"Abort called"')#"')
         self.add('p_error' + ':' + ' .asciiz ' + '"Abort called from class String\\n"')#"')
+        #self.add('String' + ':' + ' .asciiz ' + '"String"')
 
         for _str, tag in program.data_section.items():
             self.add(tag + ':' + ' .asciiz ' + _str)
@@ -86,6 +85,7 @@ class Build_Mips:
 
     @visitor.when(Arg)
     def visit(self, arg):
+        self.add('#Arg')
         self.add('addi $sp, $sp, -4')   # adjust stack for 1 item
         #localizar el valor de arg en las variables locales
         index = self.stack_pos(arg.vinfo)
@@ -96,6 +96,7 @@ class Build_Mips:
     @visitor.when(Call)
     def visit(self, call):
         #ya se pusieron los argumentos en la pila
+        self.add('#Call')
         self.add('jal ' + call.func)
         index = self.stack_pos(call.dest)
         self.add('sw $v0, {}($fp)'.format(index))
@@ -103,12 +104,14 @@ class Build_Mips:
     @visitor.when(Load)
     def visit(self, load):
         index = self.stack_pos(load.dest)
+        self.add('#Load')
         self.add('la $t1, {}'.format(load.msg))
         self.add('lw $t2, {}($fp)'.format(index))      #direccion en el heap 
         self.add('sw $t1, 0($t2)')
 
     @visitor.when(PrintStr)
     def visit(self, _print):
+        self.add('#PrintStr')
         self.add('li $v0, 4')		                    # system call code for print_str
         index = self.stack_pos(_print.str_addr)         # pos en la pila
         self.add('lw $t0, {}($fp)'.format(index)) 	    # dir en el heap
@@ -117,6 +120,7 @@ class Build_Mips:
 
     @visitor.when(PrintInt)
     def visit(self, _print):
+        self.add('#PrintInt')
         self.add('li $v0, 1')		                    # system call code for print_int
         index = self.stack_pos(_print.value)            # pos en la pila de la instancia        
         self.add('lw $t0, {}($fp)'.format(index)) 	    # dir en el heap
@@ -127,6 +131,7 @@ class Build_Mips:
     def visit(self, ret):
         if not ret.value is None:
             index = self.stack_pos(ret.value)
+            self.add('#Return')
             self.add('lw $t1, {}($fp)'.format(index))
             self.add('move $v0, $t1')
 
@@ -149,6 +154,7 @@ class Build_Mips:
     def visit(self, get):
 
         index = self.stack_pos(get.instance)
+        self.add('#GetAttrib') 
         self.add('lw $s1, {}($fp)'.format(index))
         self.add('lw $s0, {}($s1)'.format(4*get.attribute))             #?????????????????????????????
         index = self.stack_pos(get.dest)
@@ -157,7 +163,8 @@ class Build_Mips:
     @visitor.when(SetAttrib)
     def visit(self, _set):
 
-        index = self.stack_pos(_set.instance)  
+        index = self.stack_pos(_set.instance) 
+        self.add('#SetAttrib') 
         self.add('lw $s1, {}($fp)'.format(index))	                    #s1 = this
 
         if isinstance(_set.value, int):
@@ -169,15 +176,14 @@ class Build_Mips:
 
         self.add('sw $s0, {}($s1)'.format(4*_set.attribute))		    #this.data = data
 
-
-
     @visitor.when(Allocate)
     def visit(self, allocate):
         #malloc(4)
         #cuantos atributos tiene el objeto(1)
         #devolver direccion de inicio del objeto
 
-        sizeof = self.attributes[allocate.ttype]*4 + 1
+        sizeof = self.attributes[allocate.ttype]*4# + 1
+        self.add('#Allocate')
         self.add('addiu $a0, $zero, {}'.format(sizeof))  #call sbrk(sizeof(Object))
         self.add('li $v0, 9')                        			    #set syscall code for sbrk
         self.add('syscall')
@@ -190,6 +196,7 @@ class Build_Mips:
     @visitor.when(Assign)
     def visit(self, assign):
         index1 = self.stack_pos(assign.source)
+        self.add('#Assign:' + assign.type)
         self.add('lw $t0, {}($fp)'.format(index1))              #copia cada argumento
         index2 = self.stack_pos(assign.dest)
         self.add('lw $t1, {}($fp)'.format(index2))
@@ -201,6 +208,7 @@ class Build_Mips:
     @visitor.when(Plus)
     def visit(self, plus):
         index = self.stack_pos(plus.left)
+        self.add('#Plus')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
         self.add('lw $t1, 0($t0)')                                  #valor del int
         index = self.stack_pos(plus.right)
@@ -214,6 +222,7 @@ class Build_Mips:
     @visitor.when(Minus)
     def visit(self, minus):
         index = self.stack_pos(minus.left)
+        self.add('#Minus')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
         self.add('lw $t1, 0($t0)')                                  #valor del int
         index = self.stack_pos(minus.right)
@@ -227,6 +236,7 @@ class Build_Mips:
     @visitor.when(Star)
     def visit(self, star):
         index = self.stack_pos(star.left)
+        self.add('#Star')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
         self.add('lw $t1, 0($t0)')                                  #valor del int
         index = self.stack_pos(star.right)
@@ -240,6 +250,7 @@ class Build_Mips:
     @visitor.when(Div)
     def visit(self, div):
         index = self.stack_pos(div.left)
+        self.add('#Div')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
         self.add('lw $t1, 0($t0)')                                  #valor del int
         index = self.stack_pos(div.right)
@@ -254,15 +265,18 @@ class Build_Mips:
 
     @visitor.when(Label)
     def visit(self, label):
+        self.add('#Label')
         self.add(label.name + ':')
 
     @visitor.when(Goto)
     def visit(self, goto):
+        self.add('#Goto')
         self.add('j ' + goto.name)
 
     @visitor.when(GotoIf)
     def visit(self, goto_if):
         index = self.stack_pos(goto_if.condition)
+        self.add('#GotoIf')
         self.add('lw $t0, {}($fp)'.format(index))           #direccion en el heap
         self.add('lw $t1, 0($t0)') 
         self.add('bnez $t1, {}'.format(goto_if.label))      #Branch on Not Equal Zero
@@ -273,6 +287,7 @@ class Build_Mips:
         index_left = self.stack_pos(equal.left)
         index_right = self.stack_pos(equal.right)
 
+        self.add('#EqualThan')
         self.add('lw $t2, {}($fp)'.format(index_left))
         self.add('lw $t3, {}($fp)'.format(index_right))
         
@@ -295,6 +310,7 @@ class Build_Mips:
         index_left = self.stack_pos(equal.left)
         index_right = self.stack_pos(equal.right)
 
+        self.add('#LowerThan')
         self.add('lw $t2, {}($fp)'.format(index_left))
         self.add('lw $t3, {}($fp)'.format(index_right))
         
@@ -317,6 +333,7 @@ class Build_Mips:
         index_left = self.stack_pos(equal.left)
         index_right = self.stack_pos(equal.right)
 
+        self.add('#LowerEqualThan')
         self.add('lw $t2, {}($fp)'.format(index_left))
         self.add('lw $t3, {}($fp)'.format(index_right))
         
@@ -335,14 +352,21 @@ class Build_Mips:
 
     @visitor.when(EndProgram)
     def visit(self, end):
+        self.add('#EndProgram')
         self.add('li $v0, 4')		    # system call code for print_str
         self.add('la $a0, p_error') 	# buscar el tag
         self.add('syscall')			    # print it
+
+        #self.add('li $v0, 4')		        # system call code for print_str
+        #self.add('la $a0, ' + end.type) 	# buscar el tag
+        #self.add('syscall')			        # print it
+
         self.add('li $v0, 10')
         self.add('syscall')
 
     @visitor.when(Exit)
     def visit(self, exit):
+        self.add('#Exit')
         self.add('li $v0, 10')
         self.add('syscall')
 

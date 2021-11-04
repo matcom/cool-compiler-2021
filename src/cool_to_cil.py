@@ -107,7 +107,7 @@ class Build_CIL:
         self_instance = 'self'                                              #   --->  reservo espacio en el heap para self
         intr = AST_CIL.Allocate(self_instance, _class.name)                 #   --->  reservo para la cant de atributos del Main
 
-        f.instructions.append(intr)
+        #f.instructions.append(intr)
         f.localvars += [self_instance]
 
         #################################
@@ -115,14 +115,16 @@ class Build_CIL:
         index = 0
         for att in _class.attributes:
             attribute_instance = self.visit(att, f)
-            f.instructions.append(AST_CIL.SetAttrib(self_instance, index, attribute_instance))
+            _intr = AST_CIL.SetAttrib(self_instance, index, attribute_instance)
+            f.instructions.insert(1, _intr) #<------cambio
+            # f.instructions.append(_intr)
             index += 1
         #################################
 
+        f.instructions.insert(0, intr)
 
         f.instructions.append(AST_CIL.Return(self_instance))
         self.astCIL.code_section.append(f)
-
 
         #visito los metodos
         for m in _class.methods: self.visit(m, _type)
@@ -243,8 +245,10 @@ class Build_CIL:
         #declara un nuevo objeto y le asigna un valor
         result = self.visit(attr.expr, functionCIL)
         instance = attr.id + '_' + str(attr.line) + '_' + str(attr.index)        #creo una instancia con el nombre del atributo
+
         intr1 = AST_CIL.Allocate(instance, attr.type)
         functionCIL.instructions.insert(0, intr1)
+
         intr2 = AST_CIL.Assign(instance, attr.type, result)
         # ---> poner los atributos en su indice
         functionCIL.localvars.append(instance)
