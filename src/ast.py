@@ -91,7 +91,7 @@ class IsVoidNode(ExpressionNode):
         self.expr = expr
 
 
-class TildeNode(ExpressionNode):
+class IntCompNode(ExpressionNode):
     def __init__(self, expr):
         self.expr = expr
 

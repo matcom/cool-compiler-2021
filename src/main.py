@@ -38,8 +38,8 @@ for program_file in programs_files:
     # To test parser
     if sys.argv[1] == 'parser':
         with open(program_route, 'r', encoding='UTF-8') as f:
-            tree = parse(f.read())
-            print_ast(tree)
+            tree, errors = parse(f.read())
+            print(errors)
 
     else:
         print('Invalid section to test: ' + sys.argv[1])
