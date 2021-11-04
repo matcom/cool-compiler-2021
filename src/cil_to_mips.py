@@ -34,7 +34,8 @@ class Build_Mips:
     def visit(self, program):
 
         self.add('.data')
-        self.add('p_error' + ':' + ' .asciiz ' + '"Abort called"')#"')
+        #self.add('p_error' + ':' + ' .asciiz ' + '"Abort called"')#"')
+        self.add('p_error' + ':' + ' .asciiz ' + '"Abort called from class String\\n"')#"')
 
         for _str, tag in program.data_section.items():
             self.add(tag + ':' + ' .asciiz ' + _str)
