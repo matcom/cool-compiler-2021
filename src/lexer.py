@@ -279,7 +279,7 @@ def t_error(t):
     t.lexer.skip(1)
 
 
-def tokenize(text: str) -> lex.Lexer:
+def tokenize(text: str) -> (lex.Lexer, list):
     global errors
     errors = []
     lexer = get_a_lexer()
@@ -287,6 +287,6 @@ def tokenize(text: str) -> lex.Lexer:
     return lexer, errors
 
 
-def get_a_lexer():
+def get_a_lexer() -> lex.Lexer:
     lexer = lex.lex()
     return lexer

@@ -25,7 +25,7 @@ for program_file in programs_files:
     # To test lexer
     if sys.argv[1] == 'lexer':
         with open(program_route, 'r', encoding='UTF-8') as f:
-            tokens,errors = tokenize(f.read())
+            tokens, errors = tokenize(f.read())
 
         for token in tokens:
             print(token)
@@ -39,6 +39,8 @@ for program_file in programs_files:
     if sys.argv[1] == 'parser':
         with open(program_route, 'r', encoding='UTF-8') as f:
             tree, errors = parse(f.read())
+            print(str(tree))
+
             print(errors)
 
     else:

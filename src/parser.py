@@ -366,7 +366,7 @@ def p_error(p):
     errors.append(('Syntax error in input at {!r}'.format(p)))
 
 
-def parse(text: str):
+def parse(text: str) -> (yacc.LRParser, list):
     global errors
     errors = []
     lex = lexer.get_a_lexer()
@@ -375,6 +375,6 @@ def parse(text: str):
     return tree, errors
 
 
-def get_a_parser():
+def get_a_parser() -> yacc.LRParser:
     parser = yacc.yacc()
     return parser
