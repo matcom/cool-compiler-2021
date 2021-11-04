@@ -467,7 +467,6 @@ class Build_CIL:
 
     @visitor.when(Conditional)
     def visit(self, cond, functionCIL):
-
         then = self.get_label()
         fi = self.get_label()
         dest = self.get_local()
@@ -478,11 +477,22 @@ class Build_CIL:
         if_expression = self.visit(cond.if_expression, functionCIL)
         functionCIL.instructions.append(AST_CIL.GotoIf(if_expression, then))
         result1 = self.visit(cond.else_expression, functionCIL)
-        functionCIL.instructions.append(AST_CIL.Assign(dest, cond.else_expression.static_type, result1))
+        
+        #change
+        #functionCIL.instructions.append(AST_CIL.Assign(dest, cond.else_expression.static_type, result1))
+        functionCIL.instructions.append(AST_CIL.Assign(dest, cond.static_type, result1))
+        
+        
         functionCIL.instructions.append(AST_CIL.Goto(fi))
         functionCIL.instructions.append(AST_CIL.Label(then))
         result2 = self.visit(cond.then_expression, functionCIL)
-        functionCIL.instructions.append(AST_CIL.Assign(dest, cond.then_expression.static_type, result2))
+        
+        
+        #change 
+        #functionCIL.instructions.append(AST_CIL.Assign(dest, cond.then_expression.static_type, result2))
+        functionCIL.instructions.append(AST_CIL.Assign(dest, cond.static_type, result2))
+
+
         functionCIL.instructions.append(AST_CIL.Label(fi))
         return dest
 
