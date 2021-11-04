@@ -1,3 +1,5 @@
+import enum
+
 class Node:
     def __init__(self,row=None,column=None,comment=None):
         self.row = row
@@ -182,6 +184,14 @@ class LabelNode(InstructionNode):
 class SyscallNode(InstructionNode):
     def __init__(self, row=None, column=None, comment=None):
         super().__init__(row=row, column=column, comment=comment)
+
+class MipsTypes(enum.Enum):
+    ascii = '.ascii'
+    asciiz = '.asciiz'
+    byte = '.byte'
+    halfword = '.halfword'
+    word = '.word'
+    space = '.space'
 
 # class PrintIntNode(InstructionNode):
 #     pass
