@@ -415,3 +415,5 @@ venv/
 #   settings from IntelliJ IDE
 .idea/
 ################################
+/src/local_tests/assignment1.cl
+/src/parsetab.py
