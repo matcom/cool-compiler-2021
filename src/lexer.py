@@ -209,7 +209,7 @@ t_COMMENT_ignore = ''
 def t_COMMENT(t):
     r'\-\-[^\n]*'
     t.value = t.value[2:]
-    return t
+    # return t
 
 
 # COMMENT TYPE 2:  enclosing text in (∗ . . . ∗)
@@ -239,7 +239,7 @@ def t_COMMENT_end(t):
         t.lexer.pop_state()
         t.value = t.lexer.string_buffer
         t.type = "COMMENT"
-        return t
+        # return t
     else:
         t.lexer.comment_count -= 1
 
