@@ -1,6 +1,11 @@
-import ply.yacc as yacc
-import lexer
 import ast as ast
+import lexer
+import ply.yacc as yacc
+
+from utils import find_column
+
+global errors
+global input_text
 
 
 tokens = lexer.tokens
@@ -253,7 +258,7 @@ def p_let_var_list(p):
                  | OBJECT_ID COLON type COMMA let_var_list
                  | OBJECT_ID COLON type ASSIGN expr COMMA let_var_list
     """
-    fourth_token = p.slice[4].type if len(p) > 1 else None
+    fourth_token = p.slice[4].type if len(p) > 4 else None
     if len(p) == 4:
         p[0] = [(p[1], p[3], None)]
     elif len(p) == 8:
@@ -363,12 +368,16 @@ def p_empty(p):
 
 
 def p_error(p):
-    errors.append(('Syntax error in input at {!r}'.format(p)))
+    col_no = find_column(input_text, p)
+    errors.append(('(%s, %s) - SyntacticError:  ERROR at or near  "%s"'.format(p) % (p.lineno, col_no, p.value)))
 
 
 def parse(text: str) -> (yacc.LRParser, list):
     global errors
+    global input_text
+
     errors = []
+    input_text = text
     lex = lexer.get_a_lexer()
     parser = get_a_parser()
     tree = parser.parse(text, lex)

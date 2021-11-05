@@ -61,3 +61,8 @@ def print_ast(tree, level=0, inline=False):
     else:
 
         print(indent(repr(tree), level, inline))
+
+
+def find_column(input_text, token):
+    line_start = input_text.rfind('\n', 0, token.lexpos) + 1
+    return (token.lexpos - line_start) + 1
