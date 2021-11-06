@@ -275,7 +275,7 @@ def p_branch_list(p):
                 | OBJECT_ID COLON type ACTION expr SEMICOLON branch_list
     """
     if len(p) == 7:
-        p[0] = (p[1], p[3], p[5])
+        p[0] = [(p[1], p[3], p[5])]
     else:
         p[0] = [(p[1], p[3], p[5])] + p[7]
 
@@ -368,8 +368,11 @@ def p_empty(p):
 
 
 def p_error(p):
-    col_no = find_column(input_text, p)
-    errors.append(('(%s, %s) - SyntacticError:  ERROR at or near  "%s"'.format(p) % (p.lineno, col_no, p.value)))
+    if p is None:
+        errors.append('SyntacticError: ERROR at or near EOF')
+    else:
+        col_no = find_column(input_text, p)
+        errors.append(('(%s, %s) - SyntacticError:  ERROR at or near  "%s"'.format(p) % (p.lineno, col_no, p.value)))
 
 
 def parse(text: str) -> (yacc.LRParser, list):
