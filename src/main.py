@@ -31,16 +31,18 @@ for program_file in programs_files:
         with open(program_route, 'r', encoding='UTF-8') as f:
             tokens, errors = tokenize(f.read())
 
-        for token in tokens:
-            print(token)
+        # for token in tokens:
+        #     print(token)
         print()
         if len(errors):
             print('ERRORS:')
             for error in errors:
                 print(error)
+        else:
+            print('NO ERRORS')
 
     # To test parser
-    if sys.argv[1] == 'parser':
+    elif sys.argv[1] == 'parser':
         with open(program_route, 'r', encoding='UTF-8') as f:
             tree, errors = parse(f.read())
             print(str(tree))
