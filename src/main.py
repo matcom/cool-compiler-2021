@@ -31,8 +31,9 @@ for program_file in programs_files:
         with open(program_route, 'r', encoding='UTF-8') as f:
             tokens, errors = tokenize(f.read())
 
-        # for token in tokens:
-        #     print(token)
+        for token in tokens:
+            continue
+            # print(token)
         print()
         if len(errors):
             print('ERRORS:')
