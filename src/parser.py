@@ -373,9 +373,6 @@ def p_error(p):
         errors.append('(%s, 0) - SyntacticError: ERROR at or near EOF' % line_no)
     else:
         col_no = find_column(input_text, p)
-        if p.type in ['ASSIGN', 'DARROW']:
-            errors.append(('(%s, %s) - SyntacticError: ERROR at or near %s'.format(p) % (p.lineno, col_no, p.type)))
-
         errors.append(('(%s, %s) - SyntacticError: ERROR at or near "%s"'.format(p) % (p.lineno, col_no, p.value)))
 
 
