@@ -1,26 +1,24 @@
 import sys
-import os
-from lexer import tokenize
-from parser import parse
-from testers import parser_tester
+from testers import test_parser, test_lexer
 
-#########################################################
-# To use this script execute in terminal:               #
-#   python3 main.py module_to_test test_directories     #
-#                                                       #
-# module_to_test can be:                                #
-#   - lexer     - parser                                #
-# test_directories is the dir where tests are, ex:      #
-#   ../tests/lexer                                      #
-#   ../tests/parser                                     #
-#########################################################
+################################################
+#   To use this script execute in terminal:    #
+#     python3 main.py module_to_test           #
+#                                              #
+#   module_to_test can be:                     #
+#     - lexer     - parser                     #
+################################################
+
+tester = sys.argv[1]
+
+if tester == 'parser':
+    test_parser()
+elif tester == 'lexer':
+    test_lexer()
+
 
 # programs_directory = sys.argv[2]
-programs_directory = '../tests/parser'
-programs_files = [file for file in os.listdir(programs_directory) if file.endswith('.cl')]
-
-parser_tester(programs_directory)
-
+# programs_files = [file for file in os.listdir(programs_directory) if file.endswith('.cl')]
 
 # for program_file in programs_files:
 #     input('Press enter to analyze ' + program_file)

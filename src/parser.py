@@ -2,7 +2,7 @@ import ast as ast
 import lexer
 import ply.yacc as yacc
 
-from utils import find_column
+from utils import find_column, find_last_line
 
 global errors
 global input_text
@@ -369,10 +369,14 @@ def p_empty(p):
 
 def p_error(p):
     if p is None:
-        errors.append('SyntacticError: ERROR at or near EOF')
+        line_no = find_last_line(input_text)
+        errors.append('(%s, 0) - SyntacticError: ERROR at or near EOF' % line_no)
     else:
         col_no = find_column(input_text, p)
-        errors.append(('(%s, %s) - SyntacticError:  ERROR at or near  "%s"'.format(p) % (p.lineno, col_no, p.value)))
+        if p.type in ['ASSIGN', 'DARROW']:
+            errors.append(('(%s, %s) - SyntacticError: ERROR at or near %s'.format(p) % (p.lineno, col_no, p.type)))
+
+        errors.append(('(%s, %s) - SyntacticError: ERROR at or near "%s"'.format(p) % (p.lineno, col_no, p.value)))
 
 
 def parse(text: str) -> (yacc.LRParser, list):
