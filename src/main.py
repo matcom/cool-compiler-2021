@@ -35,7 +35,7 @@ for program_file in programs_files:
     program_route = program_directory + '/' + program_file
 
     # To run lexer
-    if sys.argv[1] == 'lexer':
+    if module_to_execute == 'lexer':
         with open(program_route, 'r', encoding='UTF-8') as f:
             tokens, errors = tokenize(f.read())
 
@@ -48,7 +48,7 @@ for program_file in programs_files:
                 print(error)
 
     # To run parser
-    if sys.argv[1] == 'parser':
+    elif module_to_execute == 'parser':
         with open(program_route, 'r', encoding='UTF-8') as f:
             tree, errors = parse(f.read())
             if len(errors):
@@ -58,4 +58,4 @@ for program_file in programs_files:
                 # print ast
 
     else:
-        print('Invalid section to test: ' + sys.argv[1])
+        print('Invalid section to execute: ' + module_to_execute)
