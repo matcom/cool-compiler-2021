@@ -207,6 +207,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def __init__(self, errors=[]) -> None:
         self.errors = errors
         self.program_node = None
+        self.func_dirs = {}
     
     def add_instruction(self, instr:Node):
         self.program_node.instructions.append(instr)
@@ -232,4 +233,23 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(SyscallNode(comment="Exit"))
         self.add_data(ASCIIZNode("hello_world", '"Hello World\\n"', comment="Message to print"))
         
+
+
+        #
+        # OJO
+        #
+        # Esta tiene que ser la ultima parte de la generacion
+        # de MIPS o habria que visitar dos veces
+        #
+        for typex in node.dottypes:
+            self.visit(typex)
+
         return program
+
+    @visitor.when(cil.TypeNode)
+    def visit(self, node:cil.TypeNode):
+        for attr in node.attributes:
+            self.add_data(DataNode(attr.name + '_definition', MipsTypes.word, self.func_dirs['set_' + attr.name], 0, 0, ''))
+
+        for func in node.methods:
+            self.add_data(DataNode(func.name + '_def_in_type', MipsTypes.word, self.func_dirs[func.name], 0, 0, ''))
