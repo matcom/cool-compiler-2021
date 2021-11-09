@@ -2,7 +2,7 @@ import sys
 import os
 from lexer import tokenize
 from parser import parse
-from testers import parser_tester
+from testers import test_parser
 
 #########################################################################
 # To use this script execute in terminal:                               #
@@ -24,7 +24,7 @@ program_directory = sys.argv[3]
 # TEST
 if execute_mode == 'test':
     if module_to_execute == 'parser':
-        parser_tester(program_directory)
+        test_parser(program_directory)
     else:
         raise Exception('Not implemented Test Mode for %s' % module_to_execute)
 

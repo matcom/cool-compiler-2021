@@ -30,30 +30,9 @@ def compare_errors(errors1: str, errors2: str) -> bool:
             return True
 
 
-def test_lexer():
-    programs_directory = '../tests/lexer '
-    programs_files = [file for file in os.listdir(programs_directory) if file.endswith('.cl')]
-
-    for program_file in programs_files:
-        input('Press enter to analyze ' + program_file)
-        program_route = programs_directory + '/' + program_file
-
-        with open(program_route, 'r', encoding='UTF-8') as f:
-            tokens, errors = tokenize(f.read())
-
-        for token in tokens:
-            print(token)
-        print()
-        if len(errors):
-            print('ERRORS:')
-            for error in errors:
-                print(error)
-
-
-def test_parser():
-    file_directory = '../tests/parser'
+def test_parser(file_directory):
+    # file_directory = '../tests/parser'
     file_dict = find_files(file_directory)
-    # print(file_dict)
 
     correct_tests = 0
 
