@@ -192,10 +192,13 @@ class Prefix(Instruction):
         self.pos = pos
 
 class Substring(Instruction):
-    def __init__(self, dest, str_addr, pos):
+    def __init__(self, dest, str_addr, pos, length):
         self.dest = dest
         self.str_addr = str_addr
         self.pos = pos
+        self.length = length
+    def to_string(self):
+        return "{} = Substring {} {} {}".format(self.dest, self.str_addr, self.pos, self.length)
 
 class ToStr(Instruction):
     def __init__(self, dest, ivalue):

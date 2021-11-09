@@ -11,7 +11,7 @@ class Program(Node):
 class Class(Node):
     def __init__(self, _type, inherit, features=None):
         self.name = _type
-        self.inherit = inherit
+        self.inherit = inherit#parent
         self.methods = []
         self.attributes = []
 
@@ -48,7 +48,7 @@ class Attribute(Feature):
         self.id = id
 
 class Expression(Node):
-    pass
+    computed_type = None
 
 class Atom(Expression):
     pass

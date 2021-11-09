@@ -26,13 +26,47 @@ class Build:
 
         # type_name() : String
         # copy() : SELF_TYPE
-        pass
+        types.append(_type_Object)
 
     def build_String(self, code, types):
         # length() : Int
+        _type_String = AST_CIL.Type('String')
+        func = 'function' + '_' + 'String' + '_' + 'length'
+        _type_String.methods['length'] = func
+        f = AST_CIL.Function(func)
+        f.params = ['self']
+        d = self.get_local()
+        f.localvars.append(d)
+        f.instructions.append(AST_CIL.Length(d,'self'))
+        instance = self.get_local()
+        intr1 = AST_CIL.Allocate(instance, 'Int')
+        intr2 = AST_CIL.SetAttrib(instance, 0, d)
+        f.localvars.append(instance)
+        f.instructions += [intr1, intr2]
+        f.instructions.append(AST_CIL.Return(instance))
+        code.append(f)
+
+        ################################################
+
         # concat(s : String) : String
+
         # substr(i : Int, l : Int) : String
-        pass
+        _type_String = AST_CIL.Type('String')
+        func = 'function' + '_' + 'String' + '_' + 'substr'
+        _type_String.methods['substr'] = func
+        f = AST_CIL.Function(func)
+        f.params = ['self', 'i', 'l']
+        d = self.get_local()
+        f.localvars.append(d)
+        f.instructions.append(AST_CIL.Substring(d,'self','i', 'l'))
+        instance = self.get_local()
+        intr1 = AST_CIL.Allocate(instance, 'String')
+        intr2 = AST_CIL.SetAttrib(instance, 0, d)
+        f.localvars.append(instance)
+        f.instructions += [intr1, intr2]
+        f.instructions.append(AST_CIL.Return(instance))
+        code.append(f)
+        types.append(_type_String)
 
     def build_Int(self, code, types):
         pass
@@ -63,12 +97,33 @@ class Build:
 
         ################################################
 
+        func = 'function' + '_' + 'IO' + '_' + 'in_string'
+        _type_IO.methods['in_string'] = func
+        f = AST_CIL.Function(func)
+        f.params = ['self']
+
+        d = self.get_local()
+        f.localvars.append(d)
+
+        f.instructions.append(AST_CIL.ReadStr(d))
+        instance = self.get_local()
+        intr1 = AST_CIL.Allocate(instance, 'String')
+        intr2 = AST_CIL.SetAttrib(instance, 0, d)
+        f.localvars.append(instance)
+        f.instructions += [intr1, intr2]
+        f.instructions.append(AST_CIL.Return(instance))
+        code.append(f)
+
+        ################################################
+
         func = 'function' + '_' + 'IO' + '_' + 'in_int'
         _type_IO.methods['in_int'] = func
         f = AST_CIL.Function(func)
         f.params = ['self']
+
         d = self.get_local()
         f.localvars.append(d)
+
         f.instructions.append(AST_CIL.ReadInt(d))
         instance = self.get_local()
         intr1 = AST_CIL.Allocate(instance, 'Int')

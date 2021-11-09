@@ -8,7 +8,8 @@ class Build_CIL:
         self.end_line = {}
         self.info = sem
         self.current_method = None
-        self.const = 'const_1'
+        self.const_1 = 'const_1'
+        self.null_const = 'const_0'
         self.idCount = 0
         self.astCIL = AST_CIL.Program()
         self._self = Var('self', 'SELF_TYPE')
@@ -124,6 +125,23 @@ class Build_CIL:
         f.instructions.insert(0, intr)
 
         f.instructions.append(AST_CIL.Return(self_instance))
+
+        ##########################################
+        local = self.const_1
+        intr1 = AST_CIL.Allocate(local, 'Int')
+        intr2 = AST_CIL.SetAttrib(local, 0, 1)
+        f.instructions.insert(0, intr2)
+        f.instructions.insert(0, intr1)
+        f.localvars.append(local)
+
+        local2 = self.null_const
+        intr3 = AST_CIL.Allocate(local2, 'Int')
+        intr4 = AST_CIL.SetAttrib(local2, 0, 0)
+        f.instructions.insert(0, intr4)
+        f.instructions.insert(0, intr3)
+        f.localvars.append(local2)   
+        #########################################
+
         self.astCIL.code_section.append(f)
 
         #visito los metodos
@@ -139,16 +157,30 @@ class Build_CIL:
         typeCIL.methods[method.id] = func
         f = AST_CIL.Function(func)
         f.params.insert(0, 'self')
+
         for arg in method.parameters:
-            f.params.append(arg.id)
-        local = self.const
+            f.params.append(arg.id)        
+
+        result = self.visit(method.expression, f)
+
+        f.instructions.append(AST_CIL.Return(result))
+
+        ##########################################
+        local = self.const_1
         intr = AST_CIL.Allocate(local, 'Int')
         intr2 = AST_CIL.SetAttrib(local, 0, 1)
         f.instructions.insert(0, intr2)
         f.instructions.insert(0, intr)
         f.localvars.append(local)
-        result = self.visit(method.expression, f)
-        f.instructions.append(AST_CIL.Return(result))
+
+        local2 = self.null_const
+        intr3 = AST_CIL.Allocate(local2, 'Int')
+        intr4 = AST_CIL.SetAttrib(local2, 0, 0)
+        f.instructions.insert(0, intr4)
+        f.instructions.insert(0, intr3)
+        f.localvars.append(local2)   
+        #########################################     
+
         self.astCIL.code_section.append(f)
         self.local_variables.clear()
         self.local_variables.append(self._self)
@@ -207,15 +239,21 @@ class Build_CIL:
     def visit(self, dispatch, functionCIL):
         dest = 'local_' + str(self.idCount)
         self.idCount += 1
-
         args_list = []
         for item in dispatch.parameters: args_list.append(self.visit(item, functionCIL))
-        functionCIL.instructions.append(AST_CIL.Arg('self'))
-        for item in args_list: functionCIL.instructions.append(AST_CIL.Arg(item))
-
-        intr = AST_CIL.Call(dest, self.classmethods[(self.current_class, dispatch.func_id)])
-        functionCIL.localvars.append(dest)
-        functionCIL.instructions.append(intr)
+        if dispatch.left_expression is None:
+            functionCIL.instructions.append(AST_CIL.Arg('self'))
+            for item in args_list: functionCIL.instructions.append(AST_CIL.Arg(item))
+            intr = AST_CIL.Call(dest, self.classmethods[(self.current_class, dispatch.func_id)])
+            functionCIL.localvars.append(dest)
+            functionCIL.instructions.append(intr)
+        else:
+            result = self.visit(dispatch.left_expression, functionCIL)
+            functionCIL.instructions.append(AST_CIL.Arg(result))
+            for item in args_list: functionCIL.instructions.append(AST_CIL.Arg(item))
+            intr = AST_CIL.Call(dest, self.classmethods[(dispatch.left_expression.static_type, dispatch.func_id)])
+            functionCIL.localvars.append(dest)
+            functionCIL.instructions.append(intr)
         return dest
 
 
@@ -401,9 +439,14 @@ class Build_CIL:
         intr1 = AST_CIL.Allocate(d, 'Bool')
         functionCIL.instructions.insert(0, intr1)
         a = self.visit(equalThan.first, functionCIL)
-        b = self.visit(equalThan.second, functionCIL)        
-        intr = AST_CIL.EqualThan(d, a, b)
-        functionCIL.instructions += [intr]
+        b = self.visit(equalThan.second, functionCIL)
+
+        if equalThan.first.static_type == 'String':
+            intr=AST_CIL.EqualStrThanStr(d, a, b)
+            functionCIL.instructions += [intr]
+        else:
+            intr = AST_CIL.EqualThan(d, a, b)
+            functionCIL.instructions += [intr]
         return d
 
 
@@ -432,7 +475,6 @@ class Build_CIL:
         functionCIL.instructions += [intr]
         return d
 
-
     @visitor.when(Not)
     def visit(self, neg, functionCIL):
         d = self.get_local()
@@ -440,7 +482,18 @@ class Build_CIL:
         intr1 = AST_CIL.Allocate(d, 'Bool')
         functionCIL.instructions.insert(0, intr1)
         a = self.visit(neg.expr, functionCIL)
-        intr = AST_CIL.Minus(d, self.const, a)
+        intr = AST_CIL.Minus(d, self.const_1, a)
+        functionCIL.instructions.append(intr)
+        return d
+
+    @visitor.when(IntegerComplement)
+    def visit(self, integerComplement, functionCIL):
+        d = self.get_local()
+        functionCIL.localvars.append(d)
+        intr1 = AST_CIL.Allocate(d, 'Int')
+        functionCIL.instructions.insert(0, intr1)
+        a = self.visit(integerComplement.expression, functionCIL)
+        intr = AST_CIL.Minus(d, self.null_const, a)
         functionCIL.instructions.append(intr)
         return d
 
