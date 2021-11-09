@@ -1,5 +1,10 @@
 import ply.lex as lex
 
+from utils import find_column
+
+global errors
+global input_text
+
 tokens = ['INTEGER',  # Non-empty strings of digits 0-9
           'ID',  # Letters, digits, and the underscore character
           'TYPE_ID',  # Begin with a capital letter
@@ -188,7 +193,8 @@ def t_STRING_something(t):
 
 # String Error handling
 def t_STRING_error(t):
-    errors.append('(%s)- LexicographicError: STRING ERROR %s ' % (t.lexer.lineno, t.value[0]))
+    col = find_column(input_text, t)
+    errors.append('(%s, %s)- LexicographicError: ERROR %s ' % (col, t.lexer.lineno, t.value[0]))
     t.lexer.skip(1)
 
 
@@ -252,7 +258,8 @@ def t_COMMENT_something(t):
 
 # Comment Error handling
 def t_COMMENT_error(t):
-    errors.append('(%s)- LEXICOGRAPHIC ERROR: COMMENT ERROR ' % t.lexer.lineno)
+    col = find_column(input_text, t)
+    errors.append('(%s, %s)- LexicographicError: COMMENT ERROR ' % (col, t.lexer.lineno))
     t.lexer.skip(1)
 
 
@@ -260,7 +267,8 @@ def t_COMMENT_error(t):
 # Comment EOF handling
 def t_COMMENT_eof(t):
     if t.lexer.current_state():
-        errors.append('(%s)- LexicographicError: EOF ERROR IN COMMENT STATE' % t.lexer.lineno)
+        col = find_column(input_text, t)
+        errors.append('(%s, %s)- LexicographicError: EOF in comment' % (col, t.lexer.lineno))
 
 
 # Ignore blanks, tabs, carriage return, form feed
@@ -275,13 +283,17 @@ def t_newline(t):
 
 # Error handling rule
 def t_error(t):
-    errors.append('(%s)- LexicographicError: ILLEGAL CHARACTER "%s"' % (t.lexer.lineno, t.value[0]))
+    col = find_column(input_text, t)
+    errors.append('(%s, %s)- LexicographicError: ILLEGAL CHARACTER "%s"' % (col, t.lexer.lineno, t.value[0]))
     t.lexer.skip(1)
 
 
 def tokenize(text: str) -> (lex.Lexer, list):
     global errors
+    global input_text
+
     errors = []
+    input_text = text
     lexer = get_a_lexer()
     lexer.input(text)
     return lexer, errors
