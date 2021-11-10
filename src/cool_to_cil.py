@@ -219,7 +219,7 @@ class Build_CIL:
             intr2 = AST_CIL.SetAttrib(instance, 0, 0)            
             functionCIL.instructions.insert(0, intr2)
         
-        else:
+        elif not _newType.type_name  == 'IO' and not _newType.type_name  == 'Object' and not _newType.type_name  == 'String':
             intr3 = AST_CIL.Call(instance, 'function_' + _newType.type_name + '_' + '__init__')
             functionCIL.instructions.append(intr3)
 
