@@ -210,6 +210,22 @@ class Build_CIL:
         functionCIL.instructions.insert(0, intr1)
         return instance
 
+    @visitor.when(NewType)
+    def visit(self, _newType, functionCIL):
+        instance = self.get_local()
+        intr1 = AST_CIL.Allocate(instance, _newType.type_name)
+
+        if _newType.type_name == 'Int' or _newType.type_name == 'Bool':
+            intr2 = AST_CIL.SetAttrib(instance, 0, 0)            
+            functionCIL.instructions.insert(0, intr2)
+        
+        else:
+            intr3 = AST_CIL.Call(instance, 'function_' + _newType.type_name + '_' + '__init__')
+            functionCIL.instructions.append(intr3)
+
+        functionCIL.localvars.append(instance)
+        functionCIL.instructions.insert(0, intr1)
+        return instance
 
     @visitor.when(String)
     def visit(self, string, functionCIL):
@@ -299,6 +315,11 @@ class Build_CIL:
         #declara un nuevo objeto y le asigna un valor
         instance =  var.id + '_' + str(var.line) + '_' + str(var.index)
         intr1 = AST_CIL.Allocate(instance, var.type)
+
+        if var.type == 'Int' or var.type == 'Bool':
+            intr2 = AST_CIL.SetAttrib(instance, 0, 0)            
+            functionCIL.instructions.insert(0, intr2)
+
         functionCIL.localvars.append(instance)
         functionCIL.instructions.insert(0, intr1)
         return instance
@@ -497,6 +518,16 @@ class Build_CIL:
         functionCIL.instructions.append(intr)
         return d
 
+    @visitor.when(IsVoid)
+    def visit(self, isVoid, functionCIL):
+        d = self.get_local()
+        functionCIL.localvars.append(d)
+        intr1 = AST_CIL.Allocate(d, 'Bool')
+        intr2 = AST_CIL.SetAttrib(d, 0, 0)
+        functionCIL.instructions.insert(0, intr2)
+        functionCIL.instructions.insert(0, intr1)
+        a = self.visit(isVoid.expression, functionCIL)        
+        return d
 
     @visitor.when(Loop)
     def visit(self, loop, functionCIL):
