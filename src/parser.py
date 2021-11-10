@@ -187,22 +187,47 @@ def p_factor(p):
 
 def p_atom(p):
     """
-    atom : INTEGER
-         | OBJECT_ID
-         | STRING
-         | BOOL
-         | LPAREN expr RPAREN
-         | OBJECT_ID ASSIGN atom
-         | NEW TYPE_ID
-         | IF expr THEN expr ELSE expr FI
-         | WHILE expr LOOP expr POOL
-         | LBRACE expr_list RBRACE
-         | LET let_var_list IN atom
-         | CASE expr OF branch_list ESAC
-         | NOT atom
-         | ISVOID atom
-         | INT_COMP atom
-         | func_call
+    atom : known_end_atom
+         | unknown_end_atom
+    """
+    p[0] = p[1]
+
+
+def p_unknown_end_atom(p):
+    """
+    unknown_end_atom : OBJECT_ID ASSIGN atom
+                     | LET let_var_list IN atom
+                     | NOT atom
+                     | ISVOID atom
+                     | INT_COMP atom
+    """
+    first_token = p.slice[1].type if len(p) > 1 else None
+    second_token = p.slice[2].type if len(p) > 2 else None
+    if first_token == 'OBJECT_ID' and second_token == 'ASSIGN':
+        p[0] = ast.AssignNode(p[1], p[3])
+    elif first_token == 'LET':
+        p[0] = ast.CaseNode(p[2], p[4])
+    elif first_token == 'NOT':
+        p[0] = ast.NotNode(p[2])
+    elif first_token == 'ISVOID':
+        p[0] = ast.IsVoidNode(p[2])
+    elif first_token == 'INT_COMP':
+        p[0] = ast.IntCompNode(p[2])
+
+
+def p_known_end_atom(p):
+    """
+    known_end_atom : INTEGER
+                   | OBJECT_ID
+                   | STRING
+                   | BOOL
+                   | LPAREN expr RPAREN
+                   | NEW TYPE_ID
+                   | IF expr THEN expr ELSE expr FI
+                   | WHILE expr LOOP expr POOL
+                   | LBRACE expr_list RBRACE
+                   | CASE expr OF branch_list ESAC
+                   | func_call
     """
     first_token = p.slice[1].type if len(p) > 1 else None
     second_token = p.slice[2].type if len(p) > 2 else None
@@ -216,8 +241,6 @@ def p_atom(p):
         p[0] = ast.BoolNode(p[1])
     elif first_token == 'LPAREN':
         p[0] = p[2]
-    elif first_token == 'OBJECT_ID' and second_token == 'ASSIGN':
-        p[0] = ast.AssignNode(p[1], p[3])
     elif first_token == 'NEW':
         p[0] = ast.InstantiateNode(p[2])
     elif first_token == 'IF':
@@ -226,16 +249,8 @@ def p_atom(p):
         p[0] = ast.LoopNode(p[2], p[4])
     elif first_token == 'LBRACE':
         p[0] = ast.BlockNode(p[2])
-    elif first_token == 'LET':
-        p[0] = ast.LetNode(p[2], p[4])
     elif first_token == 'CASE':
         p[0] = ast.CaseNode(p[2], p[4])
-    elif first_token == 'NOT':
-        p[0] = ast.NotNode(p[2])
-    elif first_token == 'ISVOID':
-        p[0] = ast.IsVoidNode(p[2])
-    elif first_token == 'INT_COMP':
-        p[0] = ast.IntCompNode(p[2])
     elif first_token == 'func_call':
         p[0] = p[1]
 
@@ -282,9 +297,9 @@ def p_branch_list(p):
 
 def p_func_call(p):
     """
-    func_call : obj DOT OBJECT_ID LPAREN arg_list RPAREN
+    func_call : known_end_atom DOT OBJECT_ID LPAREN arg_list RPAREN
               | OBJECT_ID LPAREN arg_list RPAREN
-              | obj AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
+              | known_end_atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
     """
     if len(p) == 7:
         p[0] = ast.CallNode(p[1], p[3], p[5])
@@ -292,46 +307,6 @@ def p_func_call(p):
         p[0] = ast.CallNode(None, p[1], p[3])
     elif len(p) == 9:
         p[0] = ast.CallNode(p[1], p[5], p[7], p[3])
-
-
-def p_obj(p):
-    """
-    obj : INTEGER
-        | OBJECT_ID
-        | STRING
-        | BOOL
-        | LPAREN expr RPAREN
-        | NEW TYPE_ID
-        | IF expr THEN expr ELSE expr FI
-        | WHILE expr LOOP expr POOL
-        | LBRACE expr_list RBRACE
-        | CASE expr OF branch_list ESAC
-        | func_call
-    """
-    first_token = p.slice[1].type if len(p) > 1 else None
-    second_token = p.slice[2].type if len(p) > 2 else None
-    if first_token == 'INTEGER':
-        p[0] = ast.ConstantNumNode(p[1])
-    elif first_token == 'OBJECT_ID' and second_token is None:
-        p[0] = ast.VariableNode(p[1])
-    elif first_token == 'STRING':
-        p[0] = ast.StringNode(p[1])
-    elif first_token == 'BOOL':
-        p[0] = ast.BoolNode(p[1])
-    elif first_token == 'LPAREN':
-        p[0] = p[2]
-    elif first_token == 'NEW':
-        p[0] = ast.InstantiateNode(p[2])
-    elif first_token == 'IF':
-        p[0] = ast.ConditionalNode(p[2], p[4], p[6])
-    elif first_token == 'WHILE':
-        p[0] = ast.LoopNode(p[2], p[4])
-    elif first_token == 'LBRACE':
-        p[0] = ast.BlockNode(p[2])
-    elif first_token == 'CASE':
-        p[0] = ast.CaseNode(p[2], p[4])
-    elif first_token == 'func_call':
-        p[0] = p[1]
 
 
 def p_arg_list(p):
