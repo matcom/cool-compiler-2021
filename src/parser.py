@@ -286,11 +286,11 @@ def p_func_call(p):
               | OBJECT_ID LPAREN arg_list RPAREN
               | obj AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
     """
-    if len(p) == 6:
+    if len(p) == 7:
         p[0] = ast.CallNode(p[1], p[3], p[5])
-    elif len(p) == 4:
+    elif len(p) == 5:
         p[0] = ast.CallNode(None, p[1], p[3])
-    elif len(p) == 8:
+    elif len(p) == 9:
         p[0] = ast.CallNode(p[1], p[5], p[7], p[3])
 
 
