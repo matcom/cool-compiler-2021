@@ -311,13 +311,25 @@ class Build_CIL:
 
 
     @visitor.when(Var)
-    def visit(self, var, functionCIL):
-        #declara un nuevo objeto y le asigna un valor
+    def visit(self, var, functionCIL):  #expr --> ID : TYPE
+        #declara un nuevo objeto y le asigna un valor inicial
         instance =  var.id + '_' + str(var.line) + '_' + str(var.index)
         intr1 = AST_CIL.Allocate(instance, var.type)
 
         if var.type == 'Int' or var.type == 'Bool':
-            intr2 = AST_CIL.SetAttrib(instance, 0, 0)            
+            intr2 = AST_CIL.SetAttrib(instance, 0, 0)
+            functionCIL.instructions.insert(0, intr2)
+            
+        elif var.type == 'String':
+            tag = 's' + str(len(self.astCIL.data_section))
+            s = '""'
+            # self.astCIL.data_section[s] = tag
+            if self.astCIL.data_section.__contains__(s):
+                tag = self.astCIL.data_section[s]
+            else: self.astCIL.data_section[s] = tag
+
+            intr1 = AST_CIL.Allocate(instance, 'String')
+            intr2 = AST_CIL.Load(instance, tag)
             functionCIL.instructions.insert(0, intr2)
 
         functionCIL.localvars.append(instance)
