@@ -231,7 +231,7 @@ class Build_CIL:
     def visit(self, string, functionCIL):
         tag = 's' + str(len(self.astCIL.data_section))
         n = len(string.value)
-        if string.value[n-1] == '\n':
+        if n > 0 and string.value[n-1] == '\n':
             s = string.value.replace("\n", '\\n\"')
             s = '\"' + s
         else: s = '"' + string.value + '"'

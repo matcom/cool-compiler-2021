@@ -15,10 +15,8 @@ class Build_Mips:
         self.attributes['Object'] = 0
         self.visit(ast)
 
-
     def add(self, line):
         self.lines.append(line)
-
 
     def stack_pos(self, name):
         temp = self.current_function.params + self.current_function.localvars
@@ -55,6 +53,243 @@ class Build_Mips:
 
         for f in program.code_section:
             self.visit(f)
+        
+        self.add('''
+        str_len:
+                li $v0,0
+                move $v1, $a0
+            __lenLoop:
+                lbu $t1, 0($v1)
+                beq $t1,$0,__lenExit
+                addu $v0,$v0,1
+                addu $v1,$v1,1
+                b __lenLoop
+            __lenExit:
+                jr $ra
+
+        str_copy:
+            lw $a0, -4($fp)
+            lw $a1, -8($fp)
+            lw $a2, -12($fp)
+            
+            move $v0, $a0
+            
+            str__while_copy:
+            beqz $a2, str__end_copy
+            
+            xor $t0, $t0, $t0
+            lb $t0, 0($a1)
+            sb $t0, 0($a0)
+            
+            subu $a2, $a2,1
+            addu $a0, $a0,1
+            addu $a1, $a1,1
+            j str__while_copy
+            
+            str__end_copy:
+            jr $ra
+            
+            str_index_error:
+                li $v0, 4
+                la $a0, runtime_error
+                syscall
+                li $v0, 10
+                syscall
+                jr $ra
+
+        str_substring:
+            # load arguments
+            move $t5, $a0
+            move $t3, $a1
+            li $t4, 0
+            move $t2, $a2
+
+            # check for index out of range
+            move $a3, $ra
+            jal str_len
+            move $ra, $a3
+
+            addu $t6, $t3, $t2
+            bgt $t6, $v0, str_index_error
+
+            # create substring
+            move $a0, $t2           #length
+            addu $a0, $a0, 1
+            li $v0, 9       #make space
+            syscall
+            # tenemos en $v0 la direccion del nuevo string
+
+            addu $t5, $t5, $t3
+
+            subu $sp, $sp, 4
+            sw $ra, 0($sp)
+            subu $sp, $sp, 4
+            sw $fp, 0($sp)
+            move $fp,$sp
+            subu $sp, $sp, 4
+            sw $v0, 0($sp)
+            subu $sp, $sp, 4
+            sw $t5, 0($sp)
+            subu $sp, $sp, 4
+            sw $t2, 0($sp)
+
+            jal str_copy
+            move $sp,$fp
+
+            lw $fp, 0($sp)
+            addi $sp,$sp, 4
+
+            lw $ra, 0($sp)
+            addi $sp,$sp, 4
+
+            addu $t9, $v0, $t2          #null terminated
+            sb $0, 0($t9)
+            jr $ra
+
+
+            #$a0 el prefijo, y en $a1, el str.
+        
+        str1_prefix_of_str2:
+            lb $t0, 0($a0)
+            lb $t1, 0($a1)
+            beqz $t0, prefixTrue
+            bne	 $t0, $t1, prefixFalse
+            addu $a0,$a0,1
+            addu $a1,$a1,1
+            b str1_prefix_of_str2
+            prefixFalse:
+                li $v0, 0
+                jr $ra
+            prefixTrue:
+                li $v0, 1
+                jr $ra
+
+        str_comparer:
+            move $a0, $a2
+            move $a1, $ra
+            jal str_len       #$v0=len(message1)
+            move $ra, $a1
+
+            move $s1, $v0
+
+            move $a0, $a3
+
+            move $a1, $ra
+            jal str_len       #$v0=len(message2)
+            move $ra, $a1
+
+            beq $v0, $s1, string_length_comparer_end
+            li $v0, 0
+            j string_comparer_end
+
+            string_length_comparer_end:
+            move $a0, $a2
+            move $a1, $a3
+            move $s1, $ra
+            jal str1_prefix_of_str2
+            move $ra, $s1
+            string_comparer_end:
+            jr $ra
+
+        str_concat:
+            move $a3, $ra
+            jal str_len
+            move $ra, $a3
+
+            # guardamos en $t4, la longitud de str1
+            move $t4, $v0
+            # el str1
+            move $t5, $a0
+            move $a0, $a1
+            move $t8, $a1
+
+            move $a3, $ra
+            jal str_len
+            move $ra, $a3
+
+            # reservamos espacio para el nuevo string
+            # guardamos en $t7 la longitud de str2
+            move $t7, $v0
+            addu $v0, $t4, $v0
+            addu $v0, $v0, 1
+            move $a0, $v0
+            li $v0, 9
+            syscall
+
+            # en $t5 esta str1, y en $t8, str2-------------------------
+
+            # save str1 part------------------------------------------
+            # push $ra
+            subu $sp, $sp, 4
+            sw $ra, 0($sp)
+            # push $fp
+            subu $sp, $sp, 4
+            sw $fp, 0($sp)
+
+            move $fp, $sp
+
+            # push dest to copy pointer
+            subu $sp, $sp, 4
+            sw $v0, 0($sp)
+
+            # push copy from
+            subu $sp, $sp, 4
+            sw $t5, 0($sp)
+
+            # push how much to copy
+            subu $sp, $sp, 4
+            sw $t4, 0($sp)
+
+            jal str_copy
+
+            move $sp, $fp
+
+            lw $fp, 0($sp)
+            addu $sp, $sp, 4
+
+            lw $ra, 0($sp)
+            addu $sp, $sp, 4
+
+            # save str2 part-------------
+            # push $ra
+            subu $sp, $sp, 4
+            sw $ra, 0($sp)
+
+            # push $fp
+            subu $sp, $sp, 4
+            sw $fp, 0($sp)
+
+            move $fp, $sp
+
+            # push where to copy
+            move $t9, $v0
+            addu $t0, $v0, $t4
+            subu $sp, $sp, 4
+            sw $t0, 0($sp)
+
+            # push copy from
+            subu $sp, $sp, 4
+            sw $t8, 0($sp)
+
+            subu $sp, $sp, 4
+            sw $t7, 0($sp)
+
+            jal str_copy
+
+            move $sp, $fp
+
+            lw $fp, 0($sp)
+            addu $sp, $sp, 4
+
+            lw $ra, 0($sp)
+            addu $sp, $sp, 4
+
+            addu $v0, $t7, $v0
+            sb $0, 0($v0)
+
+            move $v0, $t9
+            jr $ra
+        ''')
 
     @visitor.when(Function)
     def visit(self, function):
@@ -168,20 +403,31 @@ class Build_Mips:
         self.add('#str_Length')
         index1 = self.stack_pos(length.str_addr)         # pos en la pila
         self.add('lw $s0, {}($fp)'.format(index1)) 	    # dir en el heap
-        self.add('lw $t0, 4($s0)')        
-        self.add('li $t1,0')        
-        self.add('loop:')
-        self.add('lb   $a0,0($t0)')
-        self.add('beqz $a0,done')
-        self.add('addi $t0,$t0,1')
-        self.add('addi $t1,$t1,1')
-        self.add('j     loop')
-        self.add('done:')
-        ## $t1 = count
+        self.add('lw $a0, 4($s0)')   
+
+        self.add('jal str_len')
                         
-        #el valor esta en $t1
+        #el valor esta en $v0
         index = self.stack_pos(length.dest)
-        self.add('sw $t1, {}($fp)'.format(index))
+        self.add('sw $v0, {}($fp)'.format(index))
+
+    @visitor.when(Concat)
+    def visit(self, concat):
+        self.add('#concat')# Recibe en $a0 str1 y en $a1 str2
+        index_str1 = self.stack_pos(concat.head)
+        index_str2 = self.stack_pos(concat.tail)
+        index_dest = self.stack_pos(concat.dest)
+
+        self.add('lw $s0, {}($fp)'.format(index_str1)) 	    # dir en el heap
+        self.add('lw $a0, 4($s0)')
+
+        self.add('lw $s0, {}($fp)'.format(index_str2)) 	    # dir en el heap
+        self.add('lw $a1, 4($s0)')
+
+        self.add('jal str_concat')
+
+        #el str esta en $v0
+        self.add('sw $v0, {}($fp)'.format(index_dest))
 
     @visitor.when(Substring)
     def visit(self, substring):
@@ -196,97 +442,7 @@ class Build_Mips:
         self.add('lw $s0, {}($fp)'.format(index3)) 	        # dir en el heap
         self.add('lw $a2, 4($s0)')
 
-        self.add('j __get_substring')
-
-        self.add('str__copy:')
-        self.add('    lw $a0, -4($fp)')
-        self.add('    lw $a1, -8($fp)')
-        self.add('    lw $a2, -12($fp)')
-            
-        self.add('    move $v0, $a0')
-            
-        self.add('    __while_copy:')
-        self.add('    beqz $a2, __end_copy')
-            
-        self.add('    xor $t0, $t0, $t0')
-        self.add('    lb $t0, 0($a1)')
-        self.add('    sb $t0, 0($a0)') 
-            
-        self.add('    subu $a2, $a2,1')
-        self.add('    addu $a0, $a0,1')
-        self.add('    addu $a1, $a1,1')
-        self.add('    j __while_copy')
-            
-        self.add('    __end_copy:')
-        self.add('    jr $ra')
-
-        self.add('__str_len:')
-        self.add('        li $v0,0')
-        self.add('        move $v1, $a0')
-        self.add('    __lenLoop:')
-        self.add('        lbu $t1, 0($v1)')
-        self.add('        beq $t1,$0,__lenExit')
-        self.add('        addu $v0,$v0,1')
-        self.add('        addu $v1,$v1,1')
-        self.add('        b __lenLoop')
-        self.add('    __lenExit:')
-        self.add('        jr $ra')        
-
-        self.add('__abort_substrig_error:')
-        self.add('    li $v0, 4')
-        self.add('    la $a0, runtime_error')
-        self.add('    syscall')
-        self.add('    li $v0, 10')
-        self.add('    syscall')
-        self.add('    jr $ra')
-
-        self.add('__get_substring:')
-        # load arguments
-        self.add('move $t5, $a0')
-        self.add('move $t3, $a1')
-        self.add('li $t4, 0')
-        self.add('move $t2, $a2')
-
-        # check for index out of range
-        self.add('move $a3, $ra')
-        self.add('jal __str_len')
-        self.add('move $ra, $a3')
-
-        self.add('addu $t6, $t3, $t2')
-        self.add('bgt $t6, $v0, __abort_substrig_error')
-
-        # create substring
-        self.add('move $a0, $t2')           #length
-        self.add('addu $a0, $a0, 1')
-        self.add('li $v0, 9')       #make space
-        self.add('syscall')
-        # tenemos en $v0 la direccion del nuevo string
-
-        self.add('addu $t5, $t5, $t3')
-
-        self.add('subu $sp, $sp, 4')
-        self.add('sw $ra, 0($sp)')
-        self.add('subu $sp, $sp, 4')
-        self.add('sw $fp, 0($sp)')
-        self.add('move $fp,$sp')
-        self.add('subu $sp, $sp, 4')
-        self.add('sw $v0, 0($sp)')
-        self.add('subu $sp, $sp, 4')
-        self.add('sw $t5, 0($sp)')
-        self.add('subu $sp, $sp, 4')
-        self.add('sw $t2, 0($sp)')
-
-        self.add('jal str__copy')
-        self.add('move $sp,$fp')
-
-        self.add('lw $fp, 0($sp)')
-        self.add('addi $sp,$sp, 4')
-
-        self.add('lw $ra, 0($sp)')
-        self.add('addi $sp,$sp, 4')
-
-        self.add('addu $t9, $v0, $t2')          #null terminated
-        self.add('sb $0, 0($t9)')
+        self.add('jal str_substring')        
 
         #el str esta en $v0
         index = self.stack_pos(substring.dest)
@@ -295,66 +451,24 @@ class Build_Mips:
     @visitor.when(EqualStrThanStr)
     def visit(self, equalStrThanStr):
         self.add('#string_comparer')
-        self.add('j str_comparer')
-
-        #Recibe en $a0 el prefijo, y en $a1, el str.
-        #:param output:
-        #:return: Devuelve en $v0 1 si es prefijo, 0 en otro caso.
-        self.add('__get_if_its_prefix:')
-        self.add('    lb $t0, 0($a0)')
-        self.add('    lb $t1, 0($a1)')
-        self.add('    beqz $t0, prefixTrue')
-        self.add('    bne	 $t0, $t1, prefixFalse')
-        self.add('    addu $a0,$a0,1')
-        self.add('    addu $a1,$a1,1')
-        self.add('    b __get_if_its_prefix')
-        self.add('    prefixFalse:')
-        self.add('        li $v0, 0')
-        self.add('        jr $ra')
-        self.add('    prefixTrue:')
-        self.add('        li $v0, 1')
-        self.add('        jr $ra') 
-
-        self.add('str_comparer:')
         index1 = self.stack_pos(equalStrThanStr.left)         # pos en la pila
-        self.add('lw $s0, {}($fp)'.format(index1)) 	        # dir en el heap
-        self.add('lw $a0, 4($s0)')
-
-        self.add('move $a3, $ra')
-        self.add('jal __str_len')       #$v0=len(message1)
-        self.add('move $ra, $a3')
-
-        self.add('move $s1, $v0')
-
         index2 = self.stack_pos(equalStrThanStr.right)         # pos en la pila
-        self.add('lw $s0, {}($fp)'.format(index2)) 	        # dir en el heap
-        self.add('lw $a0, 4($s0)')
-
-        self.add('move $a3, $ra')
-        self.add('jal __str_len')       #$v0=len(message2)
-        self.add('move $ra, $a3')
-
-        self.add('beq $v0, $s1, string_length_comparer_end')
-        self.add('li $v0, 0')
-        self.add('j string_comparer_end')
-
-        self.add('string_length_comparer_end:')
-        self.add('lw $s0, {}($fp)'.format(index1)) 	        # dir en el heap
-        self.add('lw $a0, 4($s0)')
-
-        self.add('lw $s0, {}($fp)'.format(index2)) 	        # dir en el heap
-        self.add('lw $a1, 4($s0)')
-        self.add('jal __get_if_its_prefix')
-        self.add('string_comparer_end:')
-
-        #el resultado esta en $v0
         index = self.stack_pos(equalStrThanStr.dest)        # pos en la pila
+        self.add('lw $s0, {}($fp)'.format(index1)) 	        # dir en el heap
+        self.add('lw $a2, 4($s0)')
+        self.add('lw $s0, {}($fp)'.format(index2)) 	        # dir en el heap
+        self.add('lw $a3, 4($s0)')
+
+        self.add('jal str_comparer')        
+
+        #el resultado esta en $v0        
         self.add('lw $s0, {}($fp)'.format(index))           # dir en el heap
         self.add('sw $v0, 4($s0)')                          # store bool result
 
     @visitor.when(ReadStr)
     def visit(self, r):
         #leer string de la consola
+        self.add('#read_string')
         self.add('li $v0, 9')           #make space
         self.add('li $a0, 100')         #space=100
         self.add('syscall')
@@ -366,7 +480,7 @@ class Build_Mips:
         self.add('move $t5, $a0')       #$t5=buffer(str start)
 
         self.add('move $a3, $ra')
-        self.add('jal __str_len')       #$v0=len(message2)
+        self.add('jal str_len')       #$v0=len(message2)
         self.add('move $ra, $a3')
 
         self.add('subu $v0, $v0, 1')

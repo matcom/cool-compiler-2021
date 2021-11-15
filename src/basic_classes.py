@@ -64,6 +64,20 @@ class Build:
         ################################################
 
         # concat(s : String) : String
+        func = 'function' + '_' + 'String' + '_' + 'concat'
+        _type_String.methods['concat'] = func
+        f = AST_CIL.Function(func)
+        f.params = ['self', 's']
+        d = self.get_local()
+        f.localvars.append(d)
+        f.instructions.append(AST_CIL.Concat(d,'self','s'))
+        instance = self.get_local()
+        intr1 = AST_CIL.Allocate(instance, 'String')
+        intr2 = AST_CIL.SetAttrib(instance, 0, d)
+        f.localvars.append(instance)
+        f.instructions += [intr1, intr2]
+        f.instructions.append(AST_CIL.Return(instance))
+        code.append(f)
 
         # substr(i : Int, l : Int) : String
         func = 'function' + '_' + 'String' + '_' + 'substr'
