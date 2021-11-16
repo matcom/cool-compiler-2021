@@ -232,8 +232,8 @@ class Build_CIL:
         tag = 's' + str(len(self.astCIL.data_section))
         n = len(string.value)
         if n > 0 and string.value[n-1] == '\n':
-            s = string.value.replace("\n", '\\n\"')
-            s = '\"' + s
+            s = string.value.replace("\n", '\\n')
+            s = '\"' + s + '\"'
         else: s = '"' + string.value + '"'
 
         # self.astCIL.data_section[s] = tag
