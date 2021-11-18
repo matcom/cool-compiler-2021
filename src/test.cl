@@ -1,11 +1,23 @@
---The static types of the two sub-expressions must be Int.
+-- Missing type
 
 class A { };
 class B inherits A { };
 class C inherits B { };
+class D inherits B { };
+class E inherits B { }; 
+class F inherits A { }; 
 
 class Main inherits IO {
 	main(): IO { out_string("Hello World!")};
-	test: Int <- let x: Int <- 1 * 2 / 3 - 4 + new A.type_name().concat(new B.type_name().concat(new C.type_name())).length()
-				in x <- x + new A.type_name().concat(new B.type_name().concat(new C.type_name()));
+
+	b: B <- case "true" of
+				i: Int => New C;
+				b: Bool => New D;
+				s: String => New E;
+			esac;
+
+	test: A <- case 0 of
+				b: Bool => new F;
+				i: Ball => new E;
+			esac;
 };
