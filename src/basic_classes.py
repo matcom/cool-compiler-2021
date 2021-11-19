@@ -41,6 +41,12 @@ class Build:
 
 
         # copy() : SELF_TYPE
+        _type_Object = AST_CIL.Type('Object')
+        func = 'function' + '_' + 'Object' + '_' + 'copy'
+        _type_Object.methods['copy'] = func
+        f = AST_CIL.Function(func)
+        f.instructions.append(AST_CIL.EndProgram())             #IMPLEMENTAR
+        code.append(f)
         types.append(_type_Object)
 
     def build_String(self, code, types):

@@ -2,7 +2,6 @@ import visitor as visitor
 from AST import *
 import AST_CIL, basic_classes
 
-
 class Build_CIL:
     def __init__(self, ast, sem):
         self.end_line = {}
@@ -18,12 +17,15 @@ class Build_CIL:
         self.local_variables = [self._self]
         self.constructor = {}
         self.classmethods = {}
+        self.class_functions_list = {}
         self.class_attrs = {}
         for item in sem.class_attrs.items():
             self.class_attrs[item[0]] = [x.id for x in item[1]]
+        
         self.BFS(sem.graph, sem.classmethods_original, sem.classmethods)
+        self.compute_function_list(sem.classmethods_original, sem.graph)
+                
         self.visit(ast, self.astCIL)
-
 
     def BFS(self, graph, class_methods_original, inherits_methods):
         self.classmethods[('Object', 'abort')]        = 'function_Object_abort'
@@ -50,23 +52,55 @@ class Build_CIL:
                     if self.classmethods.__contains__((_class, function)): continue
                     self.classmethods[(_class, function)] = self.classmethods[(temp, function)]
 
+    def compute_function_list(self, class_methods_original, graph):
+        for c, methods in class_methods_original.items():
+            for m in methods:
+                fname = 'function_' + c + '_' + m
+                if not self.class_functions_list.__contains__(c):
+                    self.class_functions_list[c] = []
+                self.class_functions_list[c].append(fname)
+
+        l = ['Object']
+        while len(l) > 0:
+            
+            temp = l.pop(0)
+            
+            if not graph.__contains__(temp): continue
+            
+            for _class in graph[temp]:
+                
+                l.append(_class)
+                index = 0
+                if not self.class_functions_list.__contains__(_class):
+                    self.class_functions_list[_class] = []
+                
+                for function in self.class_functions_list[temp]:        #lista de funciones de parent
+                    
+                    k = len(temp)
+                    end = len(function)
+                    fname = 'function_' + _class + '_' + function[10 + k : end]     
+
+                    if self.class_functions_list[_class].__contains__(fname):
+                        self.class_functions_list[_class].remove(fname)
+                        self.class_functions_list[_class].insert(index, fname)                      #is a original function 
+                    else:
+                        self.class_functions_list[_class].insert(index, function)                   #is a inherit function 
+
+                    index += 1
 
     def get_local(self):
         dest = 'local_' + str(self.idCount)
         self.idCount += 1
         return dest
 
-
     def get_label(self):
         label = 'label' + str(self.idCount)
         self.idCount+=1
         return label
 
-
     @visitor.on('node')
     def visit(self, node, nodeCIL):
         pass
-
 
     @visitor.when(Program)
     def visit(self, program, programCIL):
@@ -90,7 +124,6 @@ class Build_CIL:
         
         for c in program.classes:
             self.visit(c, programCIL)
-
 
     @visitor.when(Class)
     def visit(self, _class, programCIL):
@@ -149,7 +182,6 @@ class Build_CIL:
         programCIL.type_section.append(_type)
         self.current_class = None
 
-
     @visitor.when(Method)
     def visit(self, method, typeCIL):
         self.current_method = method.id
@@ -186,7 +218,6 @@ class Build_CIL:
         self.local_variables.append(self._self)
         self.current_method = None
 
-
     @visitor.when(Boolean)
     def visit(self, _bool, functionCIL):
         instance = self.get_local()
@@ -198,7 +229,6 @@ class Build_CIL:
         functionCIL.instructions.insert(0, intr2)
         functionCIL.instructions.insert(0, intr1)
         return instance
-
 
     @visitor.when(Interger)
     def visit(self, _int, functionCIL):
@@ -250,7 +280,6 @@ class Build_CIL:
         functionCIL.instructions.insert(0, intr1)
         return instance
 
-
     @visitor.when(Dispatch)
     def visit(self, dispatch, functionCIL):
         dest = 'local_' + str(self.idCount)
@@ -263,15 +292,20 @@ class Build_CIL:
             intr = AST_CIL.Call(dest, self.classmethods[(self.current_class, dispatch.func_id)])
             functionCIL.localvars.append(dest)
             functionCIL.instructions.append(intr)
-        else:
+        
+        else:            
             result = self.visit(dispatch.left_expression, functionCIL)
-            functionCIL.instructions.append(AST_CIL.Arg(result))
+
+            functionCIL.instructions.append(AST_CIL.Arg(result))        #Bind self
+
             for item in args_list: functionCIL.instructions.append(AST_CIL.Arg(item))
-            intr = AST_CIL.Call(dest, self.classmethods[(dispatch.left_expression.static_type, dispatch.func_id)])
+
+            #intr = AST_CIL.Call(dest, self.classmethods[(dispatch.left_expression.static_type, dispatch.func_id)])
+            intr = AST_CIL.Dynamic_Call(dest, dispatch.left_expression.static_type, self.classmethods[(dispatch.left_expression.static_type, dispatch.func_id)], result)
+
             functionCIL.localvars.append(dest)
             functionCIL.instructions.append(intr)
         return dest
-
 
     @visitor.when(Block)
     def visit(self, block, functionCIL):
@@ -279,7 +313,6 @@ class Build_CIL:
         for i in range(n): self.visit(block.expressions[i], functionCIL)
         result = self.visit(block.expressions[n], functionCIL)
         return result
-
 
     @visitor.when(LetVar)
     def visit(self, let, functionCIL):
@@ -292,7 +325,6 @@ class Build_CIL:
         m = len(self.local_variables)        
         for i in range(n): self.local_variables.pop(m - i - 1)        
         return result
-
 
     @visitor.when(Attribute)#ok
     def visit(self, attr, functionCIL):
@@ -309,9 +341,8 @@ class Build_CIL:
         functionCIL.instructions.append(intr2)
         return instance
 
-
     @visitor.when(Var)
-    def visit(self, var, functionCIL):  #expr --> ID : TYPE
+    def visit(self, var, functionCIL): #expr --> ID : TYPE
         #declara un nuevo objeto y le asigna un valor inicial
         instance =  var.id + '_' + str(var.line) + '_' + str(var.index)
         intr1 = AST_CIL.Allocate(instance, var.type)
@@ -335,7 +366,6 @@ class Build_CIL:
         functionCIL.localvars.append(instance)
         functionCIL.instructions.insert(0, intr1)
         return instance
-
 
     @visitor.when(Type)     #expr --> ID
     def visit(self, _type, functionCIL):
@@ -361,7 +391,6 @@ class Build_CIL:
         functionCIL.instructions.append(intr)
         return d
 
-
     @visitor.when(Plus)
     def visit(self, plus, functionCIL):
         #d = 'temp'
@@ -379,7 +408,6 @@ class Build_CIL:
         intr = AST_CIL.Plus(d, a, b)
         functionCIL.instructions.append(intr)
         return d
-
 
     @visitor.when(Minus)
     def visit(self, minus, functionCIL):
@@ -399,7 +427,6 @@ class Build_CIL:
         functionCIL.instructions.append(intr)
         return d
 
-
     @visitor.when(Div)
     def visit(self, div, functionCIL):
         #d = 'temp'
@@ -417,7 +444,6 @@ class Build_CIL:
         intr = AST_CIL.Div(d, a, b)
         functionCIL.instructions.append(intr)
         return d
-
 
     @visitor.when(Star)
     def visit(self, star, functionCIL):
@@ -437,7 +463,6 @@ class Build_CIL:
         intr = AST_CIL.Star(d, a, b)
         functionCIL.instructions.append(intr)
         return d
-
 
     @visitor.when(Assign)
     def visit(self, assign, functionCIL):
@@ -459,11 +484,21 @@ class Build_CIL:
                         intr = AST_CIL.Assign(arg_id, arg_type, result)                        
                         functionCIL.instructions.append(intr)
                         return arg_id
- 
-        intr = AST_CIL.SetAttrib('self' , self.class_attrs[self.current_class].index(assign.id), result)
-        functionCIL.instructions.append(intr)
-        return result
 
+        if assign.expression.static_type == 'Int':
+            d = self.get_local()
+            functionCIL.localvars.append(d)
+            intr_1 = AST_CIL.Allocate(d, 'Int')
+            intr_2 = AST_CIL.Assign(d, 'Int', result)
+            intr = AST_CIL.SetAttrib('self' , self.class_attrs[self.current_class].index(assign.id), d)
+            functionCIL.instructions.insert(0, intr_1)
+            functionCIL.instructions.append(intr_2)       
+            functionCIL.instructions.append(intr)
+        else:
+            intr = AST_CIL.SetAttrib('self' , self.class_attrs[self.current_class].index(assign.id), result)
+            functionCIL.instructions.append(intr)
+
+        return result
 
     @visitor.when(EqualThan)
     def visit(self, equalThan, functionCIL):
@@ -482,7 +517,6 @@ class Build_CIL:
             functionCIL.instructions += [intr]
         return d
 
-
     @visitor.when(LowerThan)
     def visit(self, lower, functionCIL):
         d = self.get_local()
@@ -494,7 +528,6 @@ class Build_CIL:
         intr = AST_CIL.LowerThan(d, a, b)
         functionCIL.instructions += [intr]
         return d
-
 
     @visitor.when(LowerEqualThan)
     def visit(self, lowerEq, functionCIL):
@@ -563,7 +596,6 @@ class Build_CIL:
         intr6 = AST_CIL.Label(end)
         functionCIL.instructions.append(intr6)
         return l
-
 
     @visitor.when(Conditional)
     def visit(self, cond, functionCIL):

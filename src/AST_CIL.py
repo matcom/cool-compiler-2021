@@ -141,11 +141,12 @@ class Call(Instruction):
     def to_string(self):
         return "{} = CALL {}".format(self.dest, self.func)
 
-class VCall(Instruction):
-    def __init__(self, dest, ttype, func):
+class Dynamic_Call(Instruction):
+    def __init__(self, dest, ttype, func, left):
         self.dest = dest
         self.ttype = ttype
         self.func = func
+        self.left = left
     def to_string(self):
         return "{} = VCALL {} {}".format(self.dest, self.ttype, self.func)
 

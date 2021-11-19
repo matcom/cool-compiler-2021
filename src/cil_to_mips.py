@@ -2,11 +2,12 @@ from AST_CIL import *
 import visitor
 
 class Build_Mips:
-    def __init__(self, ast, sem):
+    def __init__(self, ast, sem, class_functions_list):
         self.lines = []
         self.idCount = 0
         self.current_function = None
         self.attributes = {}
+        self.class_functions_list = class_functions_list
         for c, a in sem.class_attrs.items():
             self.attributes[c] = len(a)
         self.attributes['Int'] = 1
@@ -342,13 +343,30 @@ class Build_Mips:
         index = self.stack_pos(call.dest)
         self.add('sw $v0, {}($fp)'.format(index))
 
+    @visitor.when(Dynamic_Call)
+    def visit(self, dynamic_Call):
+        #ya se pusieron los argumentos en la pila
+        self.add('#Dynamic_Call')
+
+        index_left = self.stack_pos(dynamic_Call.left)
+        index_function = self.class_functions_list[dynamic_Call.ttype].index(dynamic_Call.func)
+
+        self.add('lw $t0, {}($fp)'.format(index_left)) 	        # Dir en el heap
+        self.add('lw $a0, 4($t0)')                              # Dispatch pointer
+        self.add('lw $a1, {}($a0)'.format(4*index_function))    # Load function
+
+        self.add('jalr $a1')
+        
+        index = self.stack_pos(dynamic_Call.dest)
+        self.add('sw $v0, {}($fp)'.format(index))
+
     @visitor.when(Load)
     def visit(self, load):
         index = self.stack_pos(load.dest)
         self.add('#Load')
         self.add('la $t1, {}'.format(load.msg))
         self.add('lw $t2, {}($fp)'.format(index))      #direccion en el heap 
-        self.add('sw $t1, 4($t2)')
+        self.add('sw $t1, 8($t2)')
 
     @visitor.when(PrintStr)
     def visit(self, _print):
@@ -356,7 +374,7 @@ class Build_Mips:
         self.add('li $v0, 4')		                    # system call code for print_str
         index = self.stack_pos(_print.str_addr)         # pos en la pila
         self.add('lw $t0, {}($fp)'.format(index)) 	    # dir en el heap
-        self.add('lw $a0, 4($t0)')                      # str to print
+        self.add('lw $a0, 8($t0)')                      # str to print
         self.add('syscall')			                    # print it
 
     @visitor.when(PrintInt)
@@ -365,7 +383,7 @@ class Build_Mips:
         self.add('li $v0, 1')		                    # system call code for print_int
         index = self.stack_pos(_print.value)            # pos en la pila de la instancia        
         self.add('lw $t0, {}($fp)'.format(index)) 	    # dir en el heap
-        self.add('lw $a0, 4($t0)')                      # int to print
+        self.add('lw $a0, 8($t0)')                      # int to print
         self.add('syscall')			                    # print it
 
     @visitor.when(Return)
@@ -403,7 +421,7 @@ class Build_Mips:
         self.add('#str_Length')
         index1 = self.stack_pos(length.str_addr)         # pos en la pila
         self.add('lw $s0, {}($fp)'.format(index1)) 	    # dir en el heap
-        self.add('lw $a0, 4($s0)')   
+        self.add('lw $a0, 8($s0)')   
 
         self.add('jal str_len')
                         
@@ -419,10 +437,10 @@ class Build_Mips:
         index_dest = self.stack_pos(concat.dest)
 
         self.add('lw $s0, {}($fp)'.format(index_str1)) 	    # dir en el heap
-        self.add('lw $a0, 4($s0)')
+        self.add('lw $a0, 8($s0)')
 
         self.add('lw $s0, {}($fp)'.format(index_str2)) 	    # dir en el heap
-        self.add('lw $a1, 4($s0)')
+        self.add('lw $a1, 8($s0)')
 
         self.add('jal str_concat')
 
@@ -434,13 +452,13 @@ class Build_Mips:
         self.add('#substring')
         index1 = self.stack_pos(substring.str_addr)         # pos en la pila
         self.add('lw $s0, {}($fp)'.format(index1)) 	        # dir en el heap
-        self.add('lw $a0, 4($s0)')
+        self.add('lw $a0, 8($s0)')
         index2 = self.stack_pos(substring.pos)
         self.add('lw $s0, {}($fp)'.format(index2)) 	        # dir en el heap
-        self.add('lw $a1, 4($s0)')
+        self.add('lw $a1, 8($s0)')
         index3 = self.stack_pos(substring.length)
         self.add('lw $s0, {}($fp)'.format(index3)) 	        # dir en el heap
-        self.add('lw $a2, 4($s0)')
+        self.add('lw $a2, 8($s0)')
 
         self.add('jal str_substring')        
 
@@ -451,19 +469,19 @@ class Build_Mips:
     @visitor.when(EqualStrThanStr)
     def visit(self, equalStrThanStr):
         self.add('#string_comparer')
-        index1 = self.stack_pos(equalStrThanStr.left)         # pos en la pila
+        index1 = self.stack_pos(equalStrThanStr.left)          # pos en la pila
         index2 = self.stack_pos(equalStrThanStr.right)         # pos en la pila
-        index = self.stack_pos(equalStrThanStr.dest)        # pos en la pila
+        index = self.stack_pos(equalStrThanStr.dest)           # pos en la pila
         self.add('lw $s0, {}($fp)'.format(index1)) 	        # dir en el heap
-        self.add('lw $a2, 4($s0)')
+        self.add('lw $a2, 8($s0)')
         self.add('lw $s0, {}($fp)'.format(index2)) 	        # dir en el heap
-        self.add('lw $a3, 4($s0)')
+        self.add('lw $a3, 8($s0)')
 
         self.add('jal str_comparer')        
 
         #el resultado esta en $v0        
         self.add('lw $s0, {}($fp)'.format(index))           # dir en el heap
-        self.add('sw $v0, 4($s0)')                          # store bool result
+        self.add('sw $v0, 8($s0)')                          # store bool result
 
     @visitor.when(ReadStr)
     def visit(self, r):
@@ -498,7 +516,7 @@ class Build_Mips:
         index = self.stack_pos(get.instance)
         self.add('#GetAttrib') 
         self.add('lw $s1, {}($fp)'.format(index))
-        self.add('lw $s0, {}($s1)'.format(4*get.attribute + 4))             #?????????????????????????????
+        self.add('lw $s0, {}($s1)'.format(4*get.attribute + 8))             #?????????????????????????????
         index = self.stack_pos(get.dest)
         self.add('sw $s0, {}($fp)'.format(index))
 
@@ -516,7 +534,7 @@ class Build_Mips:
             index = self.stack_pos(_set.value)
             self.add('lw $s0, {}($fp)'.format(index)) 
 
-        self.add('sw $s0, {}($s1)'.format(4*_set.attribute + 4))		    #this.data = data
+        self.add('sw $s0, {}($s1)'.format(4*_set.attribute + 8))		    #this.data = data
 
     @visitor.when(Allocate)
     def visit(self, allocate):
@@ -524,14 +542,31 @@ class Build_Mips:
         #cuantos atributos tiene el objeto(1)
         #devolver direccion de inicio del objeto
 
-        sizeof = self.attributes[allocate.ttype]*4 + 4      #   + tag_name
-        self.add('#Allocate')
+        sizeof = self.attributes[allocate.ttype]*4 + 8      #   + tag_name + Dispatch pointer
+        self.add('#---Allocate-----')
         self.add('addiu $a0, $zero, {}'.format(sizeof))  #call sbrk(sizeof(Object))
         self.add('li $v0, 9')                        			    #set syscall code for sbrk
         self.add('syscall')
         
         #en $v0 se encuentra la direccion de inicio del objeto
         self.add('addu $s1, $zero, $v0')	                        #s1=this
+
+        #############################################################################################
+
+        count = len(self.class_functions_list[allocate.ttype])
+        sizeof_dispatch = count*4                                               #Dispatch size
+        self.add('addiu $a0, $zero, {}'.format(sizeof_dispatch))                #call sbrk(sizeof(Object))
+        self.add('li $v0, 9')                        			                #set syscall code for sbrk
+        self.add('syscall')
+        
+        #en $v0 se encuentra la direccion de inicio del objeto
+        self.add('addu $s0, $zero, $v0')
+        for i in range(count):
+            self.add('la $a0, {}'.format(self.class_functions_list[allocate.ttype][i]))
+            self.add('sw $a0, {}($s0)'.format(4*i))
+        self.add('sw $s0, 4($s1)')              #$s1[1]=Dispatch pointer
+
+        #############################################################################################
 
         #class tag
         self.add('la $a0, {}'.format(allocate.ttype))
@@ -542,73 +577,77 @@ class Build_Mips:
 
     @visitor.when(Assign)
     def visit(self, assign):
+        
         index1 = self.stack_pos(assign.source)
         self.add('#Assign:' + assign.type)
         self.add('lw $t0, {}($fp)'.format(index1))              #copia cada argumento
+        
         index2 = self.stack_pos(assign.dest)
         self.add('lw $t1, {}($fp)'.format(index2))
+
         n = self.attributes[assign.type]
+        
         for i in range(n):
-            self.add('lw $s0, {}($t0)'.format(4*(i+1)))         #---error
-            self.add('sw $s0, {}($t1)'.format(4*(i+1)))         #---error
+            self.add('lw $s0, {}($t0)'.format(4*(i+2)))         #---error
+            self.add('sw $s0, {}($t1)'.format(4*(i+2)))         #---error
             
     @visitor.when(Plus)
     def visit(self, plus):
         index = self.stack_pos(plus.left)
         self.add('#Plus')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
-        self.add('lw $t1, 4($t0)')                                  #valor del int
+        self.add('lw $t1, 8($t0)')                                  #valor del int
         index = self.stack_pos(plus.right)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('lw $t2, 4($t0)')
+        self.add('lw $t2, 8($t0)')
         self.add('add $t1, $t1, $t2')                               #$t1 = a + b
         index = self.stack_pos(plus.dest)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('sw $t1, 4($t0)')
+        self.add('sw $t1, 8($t0)')
 
     @visitor.when(Minus)
     def visit(self, minus):
         index = self.stack_pos(minus.left)
         self.add('#Minus')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
-        self.add('lw $t1, 4($t0)')                                  #valor del int
+        self.add('lw $t1, 8($t0)')                                  #valor del int
         index = self.stack_pos(minus.right)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('lw $t2, 4($t0)')
+        self.add('lw $t2, 8($t0)')
         self.add('sub $t1, $t1, $t2')                               #$t1 = a - b
         index = self.stack_pos(minus.dest)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('sw $t1, 4($t0)')
+        self.add('sw $t1, 8($t0)')
 
     @visitor.when(Star)
     def visit(self, star):
         index = self.stack_pos(star.left)
         self.add('#Star')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
-        self.add('lw $t1, 4($t0)')                                  #valor del int
+        self.add('lw $t1, 8($t0)')                                  #valor del int
         index = self.stack_pos(star.right)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('lw $t2, 4($t0)')
+        self.add('lw $t2, 8($t0)')
         self.add('mul $t1, $t1, $t2')                               #$t1 = a * b
         index = self.stack_pos(star.dest)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('sw $t1, 4($t0)')
+        self.add('sw $t1, 8($t0)')
 
     @visitor.when(Div)
     def visit(self, div):
         index = self.stack_pos(div.left)
         self.add('#Div')
         self.add('lw $t0, {}($fp)'.format(index))                   #direccion en el heap del int
-        self.add('lw $t1, 4($t0)')                                  #valor del int
+        self.add('lw $t1, 8($t0)')                                  #valor del int
         index = self.stack_pos(div.right)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('lw $t2, 4($t0)')
+        self.add('lw $t2, 8($t0)')
 
         self.add('div $t1, $t1, $t2')                               #$t1 = a / b
 
         index = self.stack_pos(div.dest)
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('sw $t1, 4($t0)')
+        self.add('sw $t1, 8($t0)')
 
     @visitor.when(Label)
     def visit(self, label):
@@ -625,7 +664,7 @@ class Build_Mips:
         index = self.stack_pos(goto_if.condition)
         self.add('#GotoIf')
         self.add('lw $t0, {}($fp)'.format(index))           #direccion en el heap
-        self.add('lw $t1, 4($t0)') 
+        self.add('lw $t1, 8($t0)')                          #value
         self.add('bnez $t1, {}'.format(goto_if.label))      #Branch on Not Equal Zero
 
     @visitor.when(EqualThan)
@@ -638,8 +677,8 @@ class Build_Mips:
         self.add('lw $t2, {}($fp)'.format(index_left))
         self.add('lw $t3, {}($fp)'.format(index_right))
         
-        self.add('lw $a0, 4($t2)')
-        self.add('lw $a1, 4($t3)')
+        self.add('lw $a0, 8($t2)')
+        self.add('lw $a1, 8($t3)')
 
         label = 'eq_false_' + str(self.idCount)
         self.idCount += 1
@@ -649,7 +688,7 @@ class Build_Mips:
         self.add('li $t1, 1') #true
         self.add(label + ':')
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('sw $t1, 4($t0)')
+        self.add('sw $t1, 8($t0)')
 
     @visitor.when(LowerThan)
     def visit(self, equal):
@@ -661,8 +700,8 @@ class Build_Mips:
         self.add('lw $t2, {}($fp)'.format(index_left))
         self.add('lw $t3, {}($fp)'.format(index_right))
         
-        self.add('lw $a0, 4($t2)')
-        self.add('lw $a1, 4($t3)')
+        self.add('lw $a0, 8($t2)')
+        self.add('lw $a1, 8($t3)')
 
         label = 'eq_false_' + str(self.idCount)
         self.idCount += 1
@@ -672,7 +711,7 @@ class Build_Mips:
         self.add('li $t1, 1') #true
         self.add(label + ':')
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('sw $t1, 4($t0)')
+        self.add('sw $t1, 8($t0)')
 
     @visitor.when(LowerEqualThan)
     def visit(self, equal):
@@ -684,8 +723,8 @@ class Build_Mips:
         self.add('lw $t2, {}($fp)'.format(index_left))
         self.add('lw $t3, {}($fp)'.format(index_right))
         
-        self.add('lw $a0, 4($t2)')
-        self.add('lw $a1, 4($t3)')
+        self.add('lw $a0, 8($t2)')          #load atributo1
+        self.add('lw $a1, 8($t3)')          #load atributo2
 
         label = 'eq_false_' + str(self.idCount)
         self.idCount += 1
@@ -695,7 +734,7 @@ class Build_Mips:
         self.add('li $t1, 1') #true
         self.add(label + ':')
         self.add('lw $t0, {}($fp)'.format(index))
-        self.add('sw $t1, 4($t0)')
+        self.add('sw $t1, 8($t0)')
 
     @visitor.when(EndProgram)
     def visit(self, end):
