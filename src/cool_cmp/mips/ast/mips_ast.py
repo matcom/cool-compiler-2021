@@ -13,15 +13,18 @@ class ProgramNode(Node):
         self.data = []
 
 class DataNode(Node):
-    def __init__(self, name, type, value, row, column, comment):
+    def __init__(self, name, type, values, row=None, column=None, comment=None):
+        """
+        values: Value List. Must be a LIST
+        """
         super().__init__(row=row, column=column, comment=comment)
         self.name = name
         self.type = type
-        self.value = value
+        self.values = values
 
 class ASCIIZNode(DataNode):
     def __init__(self, name, string, row=None, column=None, comment=None):
-        super().__init__(name, ".asciiz", string, row=row, column=column, comment=comment)
+        super().__init__(name, MipsTypes.asciiz, [string], row=row, column=column, comment=comment)
 
 class ArithmeticNode(Node):
     pass
@@ -185,7 +188,7 @@ class SyscallNode(InstructionNode):
     def __init__(self, row=None, column=None, comment=None):
         super().__init__(row=row, column=column, comment=comment)
 
-class MipsTypes(enum.Enum):
+class MipsTypes():
     ascii = '.ascii'
     asciiz = '.asciiz'
     byte = '.byte'

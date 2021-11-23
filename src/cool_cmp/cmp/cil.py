@@ -124,10 +124,11 @@ class StaticCallNode(InstructionNode):
         self.dest = dest
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
+    def __init__(self, xtype, method, dest, base_type=None):
         self.type = xtype
         self.method = method
         self.dest = dest
+        self.base_type = base_type # Needed for SELF_TYPE handling. Is the Type where the SELF_TYPE was defined
 
 class ArgNode(InstructionNode):
     def __init__(self, name):

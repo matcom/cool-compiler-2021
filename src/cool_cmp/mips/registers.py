@@ -48,3 +48,19 @@ class Reg:
     def ra():
         return Reg.__register("ra")
     
+    @staticmethod
+    def fp():
+        return Reg.__register("fp")
+    
+    @staticmethod
+    def sp():
+        return Reg.__register("sp")
+    
+    @staticmethod
+    def low():
+        return Reg.__register("low")
+    
+    @staticmethod
+    def hi():
+        return Reg.__register("hi")
+    

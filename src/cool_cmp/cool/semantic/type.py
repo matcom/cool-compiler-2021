@@ -161,7 +161,8 @@ class ObjectType(Type):
 
 class SelfType(Type):
     
-    def __init__(self):
+    def __init__(self, defining_type):
+        self.defining_type = defining_type
         Type.__init__(self, 'SELF_TYPE')
     
     @property
