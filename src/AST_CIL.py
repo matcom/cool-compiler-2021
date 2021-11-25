@@ -41,6 +41,15 @@ class Assign(Instruction):
     def to_string(self):
         return "{} <- {}".format(self.dest, self.source)
 
+
+class Copy(Instruction):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+    def to_string(self):
+        return "{} <- {}".format(self.dest, self.source)
+
+
 class Arithmetic(Instruction):
     pass
 
@@ -76,6 +85,17 @@ class Div(Arithmetic):
     def to_string(self):
         return "{} = {} / {}".format(self.dest, self.left, self.right)
 
+
+class GetParent(Instruction):
+    def __init__(self, dest, instance, array, length):
+        self.dest = dest
+        self.instance = instance    #local con la direccion en memoria
+        self.array_name = array     #indice del atributo(contando los heredados)
+        self.length = length
+    def to_string(self):
+        return "{} = GETPARENT {} {}".format(self.dest, self.instance, self.array_name)
+
+
 class GetAttrib(Instruction):
     def __init__(self, dest, instance, attribute):
         self.dest = dest
@@ -100,10 +120,17 @@ class Allocate(Instruction):
     def to_string(self):
         return "{} = ALLOCATE {}".format(self.dest, self.ttype)
 
+# class Array(Instruction):
+#     def __init__(self, dest, src):
+#         self.dest = dest
+#         self.src = src
+
 class Array(Instruction):
-    def __init__(self, dest, src):
-        self.dest = dest
-        self.src = src
+    def __init__(self, name, data):
+        self.name = name
+        self.data_list = data
+    def to_string(self):
+        return "ARRAY {}".format(self.name)
 
 class TypeOf(Instruction):
     def __init__(self, dest, var):

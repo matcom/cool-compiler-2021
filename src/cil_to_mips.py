@@ -14,7 +14,21 @@ class Build_Mips:
         self.attributes['String'] = 1
         self.attributes['Bool'] = 1
         self.attributes['Object'] = 0
+        self.conform = {}
+        self.compute_parents(sem.class_parent)
         self.visit(ast)
+
+    def compute_parents(self, inherit):
+        self.conform['Object'] = ['Object']
+        class_list = []
+        for c, _ in inherit.items():
+            self.conform[c] = [c]
+            class_list.append(c)
+        for c in class_list:
+            current = c
+            while not current == 'Object':
+                self.conform[c].append(inherit[current])
+                current = inherit[current]
 
     def add(self, line):
         self.lines.append(line)
@@ -35,11 +49,13 @@ class Build_Mips:
         self.add('p_error' + ':' + ' .asciiz ' + '"Abort called from class String\\n"')#"')
         self.add('runtime_error: .asciiz "RuntimeError: Index out of range Error\\n"')
         for c, _ in self.attributes.items():
-            self.add(c + ': .asciiz "' + c + '"')
-
-        #self.add('buffer: .space 1025')
-
-        #self.add('String' + ':' + ' .asciiz ' + '"String"')
+            self.add(c + '_class_name' + ': .asciiz "' + c + '"')
+        
+        for c, conform_list in self.conform.items():
+            line = c + '_conforms_to: .word '+ conform_list[0] + '_class_name'
+            n = len(conform_list)
+            for i in range(1, n): line += ', ' + conform_list[i] + '_class_name'
+            self.add(line)
 
         for _str, tag in program.data_section.items():
             self.add(tag + ':' + ' .asciiz ' + _str)
@@ -56,241 +72,273 @@ class Build_Mips:
             self.visit(f)
         
         self.add('''
-        str_len:
-                li $v0,0
-                move $v1, $a0
-            __lenLoop:
-                lbu $t1, 0($v1)
-                beq $t1,$0,__lenExit
-                addu $v0,$v0,1
-                addu $v1,$v1,1
-                b __lenLoop
-            __lenExit:
+            str_len:
+                    li $v0,0
+                    move $v1, $a0
+                __lenLoop:
+                    lbu $t1, 0($v1)
+                    beq $t1,$0,__lenExit
+                    addu $v0,$v0,1
+                    addu $v1,$v1,1
+                    b __lenLoop
+                __lenExit:
+                    jr $ra
+
+            str_copy:
+                lw $a0, -4($fp)
+                lw $a1, -8($fp)
+                lw $a2, -12($fp)
+                
+                move $v0, $a0
+                
+                str__while_copy:
+                beqz $a2, str__end_copy
+                
+                xor $t0, $t0, $t0
+                lb $t0, 0($a1)
+                sb $t0, 0($a0)
+                
+                subu $a2, $a2,1
+                addu $a0, $a0,1
+                addu $a1, $a1,1
+                j str__while_copy
+                
+                str__end_copy:
+                jr $ra
+                
+                str_index_error:
+                    li $v0, 4
+                    la $a0, runtime_error
+                    syscall
+                    li $v0, 10
+                    syscall
+                    jr $ra
+
+            str_substring:
+                # load arguments
+                move $t5, $a0
+                move $t3, $a1
+                li $t4, 0
+                move $t2, $a2
+
+                # check for index out of range
+                move $a3, $ra
+                jal str_len
+                move $ra, $a3
+
+                addu $t6, $t3, $t2
+                bgt $t6, $v0, str_index_error
+
+                # create substring
+                move $a0, $t2           #length
+                addu $a0, $a0, 1
+                li $v0, 9       #make space
+                syscall
+                # tenemos en $v0 la direccion del nuevo string
+
+                addu $t5, $t5, $t3
+
+                subu $sp, $sp, 4
+                sw $ra, 0($sp)
+                subu $sp, $sp, 4
+                sw $fp, 0($sp)
+                move $fp,$sp
+                subu $sp, $sp, 4
+                sw $v0, 0($sp)
+                subu $sp, $sp, 4
+                sw $t5, 0($sp)
+                subu $sp, $sp, 4
+                sw $t2, 0($sp)
+
+                jal str_copy
+                move $sp,$fp
+
+                lw $fp, 0($sp)
+                addi $sp,$sp, 4
+
+                lw $ra, 0($sp)
+                addi $sp,$sp, 4
+
+                addu $t9, $v0, $t2          #null terminated
+                sb $0, 0($t9)
                 jr $ra
 
-        str_copy:
-            lw $a0, -4($fp)
-            lw $a1, -8($fp)
-            lw $a2, -12($fp)
+
+                #$a0 el prefijo, y en $a1, el str.
             
-            move $v0, $a0
-            
-            str__while_copy:
-            beqz $a2, str__end_copy
-            
-            xor $t0, $t0, $t0
-            lb $t0, 0($a1)
-            sb $t0, 0($a0)
-            
-            subu $a2, $a2,1
-            addu $a0, $a0,1
-            addu $a1, $a1,1
-            j str__while_copy
-            
-            str__end_copy:
-            jr $ra
-            
-            str_index_error:
-                li $v0, 4
-                la $a0, runtime_error
-                syscall
-                li $v0, 10
-                syscall
-                jr $ra
+            str1_prefix_of_str2:
+                lb $t0, 0($a0)
+                lb $t1, 0($a1)
+                beqz $t0, prefixTrue
+                bne	 $t0, $t1, prefixFalse
+                addu $a0,$a0,1
+                addu $a1,$a1,1
+                b str1_prefix_of_str2
+                prefixFalse:
+                    li $v0, 0
+                    jr $ra
+                prefixTrue:
+                    li $v0, 1
+                    jr $ra
 
-        str_substring:
-            # load arguments
-            move $t5, $a0
-            move $t3, $a1
-            li $t4, 0
-            move $t2, $a2
+            str_comparer:
+                move $a0, $a2
+                move $a1, $ra
+                jal str_len       #$v0=len(message1)
+                move $ra, $a1
 
-            # check for index out of range
-            move $a3, $ra
-            jal str_len
-            move $ra, $a3
+                move $s1, $v0
 
-            addu $t6, $t3, $t2
-            bgt $t6, $v0, str_index_error
+                move $a0, $a3
 
-            # create substring
-            move $a0, $t2           #length
-            addu $a0, $a0, 1
-            li $v0, 9       #make space
-            syscall
-            # tenemos en $v0 la direccion del nuevo string
+                move $a1, $ra
+                jal str_len       #$v0=len(message2)
+                move $ra, $a1
 
-            addu $t5, $t5, $t3
-
-            subu $sp, $sp, 4
-            sw $ra, 0($sp)
-            subu $sp, $sp, 4
-            sw $fp, 0($sp)
-            move $fp,$sp
-            subu $sp, $sp, 4
-            sw $v0, 0($sp)
-            subu $sp, $sp, 4
-            sw $t5, 0($sp)
-            subu $sp, $sp, 4
-            sw $t2, 0($sp)
-
-            jal str_copy
-            move $sp,$fp
-
-            lw $fp, 0($sp)
-            addi $sp,$sp, 4
-
-            lw $ra, 0($sp)
-            addi $sp,$sp, 4
-
-            addu $t9, $v0, $t2          #null terminated
-            sb $0, 0($t9)
-            jr $ra
-
-
-            #$a0 el prefijo, y en $a1, el str.
-        
-        str1_prefix_of_str2:
-            lb $t0, 0($a0)
-            lb $t1, 0($a1)
-            beqz $t0, prefixTrue
-            bne	 $t0, $t1, prefixFalse
-            addu $a0,$a0,1
-            addu $a1,$a1,1
-            b str1_prefix_of_str2
-            prefixFalse:
+                beq $v0, $s1, string_length_comparer_end
                 li $v0, 0
+                j string_comparer_end
+
+                string_length_comparer_end:
+                move $a0, $a2
+                move $a1, $a3
+                move $s1, $ra
+                jal str1_prefix_of_str2
+                move $ra, $s1
+                string_comparer_end:
                 jr $ra
-            prefixTrue:
-                li $v0, 1
+
+            case_conform:
+                move $s0, $a0
+                move $s1, $a1
+                START_CASE_LOOP:
+
+                    lw $a1, 0($s0)
+
+                    addi $s0, $s0, 4
+
+                    move $t0, $s1	# Address of 1st element in array.
+                    li $v0, 4		# System call code 4 (print_string).
+                    li $t1, 0		# Initialize array offset.
+
+                loop_INTERNAL:
+
+                    # Use the address mode label(register).
+
+                    lw $a0, 0($t0)	# Load value at address str_array + $t1 (offset).	
+
+                    beq $a0, $a1, END_CASE_LOOP
+
+                    addi $t0, $t0, 4	# Next element, i.e., increment offset by 4.
+                    addi $t1, $t1, 4	# Next element, i.e., increment offset by 4.
+
+                    # Done or loop once more?
+
+                    ble $t1, $a2, loop_INTERNAL
+                    b START_CASE_LOOP
+                END_CASE_LOOP:
+                move $v0, $a0
                 jr $ra
 
-        str_comparer:
-            move $a0, $a2
-            move $a1, $ra
-            jal str_len       #$v0=len(message1)
-            move $ra, $a1
+            str_concat:
+                move $a3, $ra
+                jal str_len
+                move $ra, $a3
 
-            move $s1, $v0
+                # guardamos en $t4, la longitud de str1
+                move $t4, $v0
+                # el str1
+                move $t5, $a0
+                move $a0, $a1
+                move $t8, $a1
 
-            move $a0, $a3
+                move $a3, $ra
+                jal str_len
+                move $ra, $a3
 
-            move $a1, $ra
-            jal str_len       #$v0=len(message2)
-            move $ra, $a1
+                # reservamos espacio para el nuevo string
+                # guardamos en $t7 la longitud de str2
+                move $t7, $v0
+                addu $v0, $t4, $v0
+                addu $v0, $v0, 1
+                move $a0, $v0
+                li $v0, 9
+                syscall
 
-            beq $v0, $s1, string_length_comparer_end
-            li $v0, 0
-            j string_comparer_end
+                # en $t5 esta str1, y en $t8, str2-------------------------
 
-            string_length_comparer_end:
-            move $a0, $a2
-            move $a1, $a3
-            move $s1, $ra
-            jal str1_prefix_of_str2
-            move $ra, $s1
-            string_comparer_end:
-            jr $ra
+                # save str1 part------------------------------------------
+                # push $ra
+                subu $sp, $sp, 4
+                sw $ra, 0($sp)
+                # push $fp
+                subu $sp, $sp, 4
+                sw $fp, 0($sp)
 
-        str_concat:
-            move $a3, $ra
-            jal str_len
-            move $ra, $a3
+                move $fp, $sp
 
-            # guardamos en $t4, la longitud de str1
-            move $t4, $v0
-            # el str1
-            move $t5, $a0
-            move $a0, $a1
-            move $t8, $a1
+                # push dest to copy pointer
+                subu $sp, $sp, 4
+                sw $v0, 0($sp)
 
-            move $a3, $ra
-            jal str_len
-            move $ra, $a3
+                # push copy from
+                subu $sp, $sp, 4
+                sw $t5, 0($sp)
 
-            # reservamos espacio para el nuevo string
-            # guardamos en $t7 la longitud de str2
-            move $t7, $v0
-            addu $v0, $t4, $v0
-            addu $v0, $v0, 1
-            move $a0, $v0
-            li $v0, 9
-            syscall
+                # push how much to copy
+                subu $sp, $sp, 4
+                sw $t4, 0($sp)
 
-            # en $t5 esta str1, y en $t8, str2-------------------------
+                jal str_copy
 
-            # save str1 part------------------------------------------
-            # push $ra
-            subu $sp, $sp, 4
-            sw $ra, 0($sp)
-            # push $fp
-            subu $sp, $sp, 4
-            sw $fp, 0($sp)
+                move $sp, $fp
 
-            move $fp, $sp
+                lw $fp, 0($sp)
+                addu $sp, $sp, 4
 
-            # push dest to copy pointer
-            subu $sp, $sp, 4
-            sw $v0, 0($sp)
+                lw $ra, 0($sp)
+                addu $sp, $sp, 4
 
-            # push copy from
-            subu $sp, $sp, 4
-            sw $t5, 0($sp)
+                # save str2 part-------------
+                # push $ra
+                subu $sp, $sp, 4
+                sw $ra, 0($sp)
 
-            # push how much to copy
-            subu $sp, $sp, 4
-            sw $t4, 0($sp)
+                # push $fp
+                subu $sp, $sp, 4
+                sw $fp, 0($sp)
 
-            jal str_copy
+                move $fp, $sp
 
-            move $sp, $fp
+                # push where to copy
+                move $t9, $v0
+                addu $t0, $v0, $t4
+                subu $sp, $sp, 4
+                sw $t0, 0($sp)
 
-            lw $fp, 0($sp)
-            addu $sp, $sp, 4
+                # push copy from
+                subu $sp, $sp, 4
+                sw $t8, 0($sp)
 
-            lw $ra, 0($sp)
-            addu $sp, $sp, 4
+                subu $sp, $sp, 4
+                sw $t7, 0($sp)
 
-            # save str2 part-------------
-            # push $ra
-            subu $sp, $sp, 4
-            sw $ra, 0($sp)
+                jal str_copy
 
-            # push $fp
-            subu $sp, $sp, 4
-            sw $fp, 0($sp)
+                move $sp, $fp
 
-            move $fp, $sp
+                lw $fp, 0($sp)
+                addu $sp, $sp, 4
 
-            # push where to copy
-            move $t9, $v0
-            addu $t0, $v0, $t4
-            subu $sp, $sp, 4
-            sw $t0, 0($sp)
+                lw $ra, 0($sp)
+                addu $sp, $sp, 4
 
-            # push copy from
-            subu $sp, $sp, 4
-            sw $t8, 0($sp)
+                addu $v0, $t7, $v0
+                sb $0, 0($v0)
 
-            subu $sp, $sp, 4
-            sw $t7, 0($sp)
-
-            jal str_copy
-
-            move $sp, $fp
-
-            lw $fp, 0($sp)
-            addu $sp, $sp, 4
-
-            lw $ra, 0($sp)
-            addu $sp, $sp, 4
-
-            addu $v0, $t7, $v0
-            sb $0, 0($v0)
-
-            move $v0, $t9
-            jr $ra
-        ''')
+                move $v0, $t9
+                jr $ra
+            ''')
 
     @visitor.when(Function)
     def visit(self, function):
@@ -406,15 +454,16 @@ class Build_Mips:
     
     @visitor.when(TypeOf)
     def visit(self, typeOf):
-        self.add('#str_')
-        index1 = self.stack_pos(typeOf.var)         # pos en la pila
+        self.add('#typeOf')
+        index1 = self.stack_pos(typeOf.var)             # pos en la pila
         self.add('lw $s0, {}($fp)'.format(index1)) 	    # dir en el heap
-        self.add('lw $t1, 0($s0)')
+        self.add('lw $t1, 0($s0)')                      # dir del array
+        self.add('lw $t2, 0($t1)')                      # primer elemento del array
         ## $t1 = typeOf
                         
         #el valor esta en $t1
         index = self.stack_pos(typeOf.dest)
-        self.add('sw $t1, {}($fp)'.format(index))
+        self.add('sw $t2, {}($fp)'.format(index))
 
     @visitor.when(Length)
     def visit(self, length):
@@ -569,11 +618,18 @@ class Build_Mips:
         #############################################################################################
 
         #class tag
-        self.add('la $a0, {}'.format(allocate.ttype))
+        self.add('la $a0, {}'.format(allocate.ttype + '_conforms_to'))
         self.add('sw $a0, 0($s1)')              #$s1[0]=tag_name
 
         index = self.stack_pos(allocate.dest)    
         self.add('sw $s1, {}($fp)'.format(index))
+
+    @visitor.when(Copy)
+    def visit(self, copy):
+        index_dest = self.stack_pos(copy.dest)
+        index_source = self.stack_pos(copy.source)
+        self.add('lw $t0, {}($fp)'.format(index_source))
+        self.add('sw $t0, {}($fp)'.format(index_dest))
 
     @visitor.when(Assign)
     def visit(self, assign):
@@ -735,6 +791,29 @@ class Build_Mips:
         self.add(label + ':')
         self.add('lw $t0, {}($fp)'.format(index))
         self.add('sw $t1, 8($t0)')
+
+    @visitor.when(Array)
+    def visit(self, array):
+        line = array.name + ': .word ' + array.data_list[0]                #str_array: .word one, two, three
+        n = len(array.data_list)
+        for i in range(1, n):
+            line += ', ' + array.data_list[i]
+        self.lines.insert(1, line)
+
+    @visitor.when(GetParent)
+    def visit(self, get_parent):
+        self.add('#GetParent') 
+        index = self.stack_pos(get_parent.instance)
+        index_dest = self.stack_pos(get_parent.dest)
+        self.add('lw $s1, {}($fp)'.format(index))
+        self.add('lw $a0, 0($s1)')
+        self.add('la $a1, {}'.format(get_parent.array_name))
+        self.add('li $a2, {}'.format((get_parent.length - 1) * 4))
+        
+        self.add('jal case_conform')
+        
+        #el valor esta en $v0
+        self.add('sw $v0, {}($fp)'.format(index_dest))
 
     @visitor.when(EndProgram)
     def visit(self, end):

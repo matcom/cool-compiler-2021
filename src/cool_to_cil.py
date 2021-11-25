@@ -280,6 +280,29 @@ class Build_CIL:
         functionCIL.instructions.insert(0, intr1)
         return instance
 
+    @visitor.when(StaticDispatch)
+    def visit(self, static_dispatch, functionCIL):
+        dest = 'local_' + str(self.idCount)
+        self.idCount += 1
+
+        args_list = []
+        for item in static_dispatch.parameters: args_list.append(self.visit(item, functionCIL))
+
+        result = self.visit(static_dispatch.left_expression, functionCIL)
+
+        functionCIL.instructions.append(AST_CIL.Arg(result))        #Bind self
+
+        for item in args_list: functionCIL.instructions.append(AST_CIL.Arg(item))
+
+        intr = AST_CIL.Call(dest, self.classmethods[(static_dispatch.parent_type, static_dispatch.func_id)])
+        #intr = AST_CIL.Dynamic_Call(dest, static_dispatch.left_expression.static_type, self.classmethods[(static_dispatch.left_expression.static_type, static_dispatch.func_id)], result)
+
+        functionCIL.localvars.append(dest)
+
+        functionCIL.instructions.append(intr)
+
+        return dest
+
     @visitor.when(Dispatch)
     def visit(self, dispatch, functionCIL):
         dest = 'local_' + str(self.idCount)
@@ -289,7 +312,10 @@ class Build_CIL:
         if dispatch.left_expression is None:
             functionCIL.instructions.append(AST_CIL.Arg('self'))
             for item in args_list: functionCIL.instructions.append(AST_CIL.Arg(item))
-            intr = AST_CIL.Call(dest, self.classmethods[(self.current_class, dispatch.func_id)])
+            
+            #intr = AST_CIL.Call(dest, self.classmethods[(self.current_class, dispatch.func_id)])
+            intr = AST_CIL.Dynamic_Call(dest, self.current_class, self.classmethods[(self.current_class, dispatch.func_id)], 'self')
+            
             functionCIL.localvars.append(dest)
             functionCIL.instructions.append(intr)
         
@@ -604,30 +630,78 @@ class Build_CIL:
         dest = self.get_local()
         functionCIL.localvars.append(dest)
 
-        intr = AST_CIL.Allocate(dest, cond.static_type)
-        functionCIL.instructions.insert(0, intr)
+        # intr = AST_CIL.Allocate(dest, cond.static_type)
+        # functionCIL.instructions.insert(0, intr)
+
         if_expression = self.visit(cond.if_expression, functionCIL)
         functionCIL.instructions.append(AST_CIL.GotoIf(if_expression, then))
         result1 = self.visit(cond.else_expression, functionCIL)
         
         #change
         #functionCIL.instructions.append(AST_CIL.Assign(dest, cond.else_expression.static_type, result1))
-        functionCIL.instructions.append(AST_CIL.Assign(dest, cond.static_type, result1))
-        
-        
+        #functionCIL.instructions.append(AST_CIL.Assign(dest, cond.static_type, result1))
+        functionCIL.instructions.append(AST_CIL.Copy(dest, result1))        
         functionCIL.instructions.append(AST_CIL.Goto(fi))
         functionCIL.instructions.append(AST_CIL.Label(then))
         result2 = self.visit(cond.then_expression, functionCIL)
         
-        
         #change 
         #functionCIL.instructions.append(AST_CIL.Assign(dest, cond.then_expression.static_type, result2))
-        functionCIL.instructions.append(AST_CIL.Assign(dest, cond.static_type, result2))
-
-
+        #functionCIL.instructions.append(AST_CIL.Assign(dest, cond.static_type, result2))
+        functionCIL.instructions.append(AST_CIL.Copy(dest, result2))
         functionCIL.instructions.append(AST_CIL.Label(fi))
         return dest
 
+    @visitor.when(Case)
+    def visit(self, case, functionCIL):
+        current_type = self.get_local()
+        parent = self.get_local()
+        comparer = self.get_local()
+        d = self.get_local()
+        dest = self.get_local()
+        functionCIL.localvars += [current_type, parent, comparer, d, dest]
 
+        intr1 = AST_CIL.Allocate(comparer, 'Bool')
+        intr2 = AST_CIL.Allocate(current_type, 'String')
+        intr3 = AST_CIL.Allocate(parent, 'String')
+        functionCIL.instructions.insert(0, intr1)
+        functionCIL.instructions.insert(0, intr2)
+        functionCIL.instructions.insert(0, intr3)
 
+        expr_0 = self.visit(case.case_expression, functionCIL)
+
+        name = 'Case_' + str(self.idCount)
+        case_types = []
+        for item in case.implications:
+            case_types.append(item.var.type + '_class_name')
+        intr4 = AST_CIL.Array(name, case_types)
+        functionCIL.instructions.insert(0, intr4)
+
+        intr5 = AST_CIL.GetParent(d, expr_0, name, len(case_types))
+        intr6 = AST_CIL.SetAttrib(parent, 0, d)
+        functionCIL.instructions.append(intr5)
+        functionCIL.instructions.append(intr6)
+
+        n = len(case.implications)
+        labels = []
+        for i in range(n): labels.append(self.get_label())
+        label_end = self.get_label()
+
+        for i in range(n):
+            branch = case.implications[i]
+            intr7 = AST_CIL.Load(current_type, branch.var.type + '_class_name')
+            functionCIL.instructions.append(intr7)
+            intr8 = AST_CIL.EqualStrThanStr(comparer, current_type, parent)
+            functionCIL.instructions.append(intr8)
+            intr9 = AST_CIL.GotoIf(comparer, labels[i])
+            functionCIL.instructions.append(intr9)
+
+        for i in range(n):
+            branch = case.implications[i]
+            functionCIL.instructions.append(AST_CIL.Label(labels[i]))
+            result = self.visit(branch.expr, functionCIL)  
+            functionCIL.instructions.append(AST_CIL.Copy(dest, result))          
+            functionCIL.instructions.append(AST_CIL.Goto(label_end))        
+        functionCIL.instructions.append(AST_CIL.Label(label_end))
+        return dest
 
