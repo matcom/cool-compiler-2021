@@ -7,7 +7,12 @@ import typer
 
 sys.path.append(os.getcwd())
 
-from cool.code_generation import CILFormatter, ConstructorCreator, CoolToCILVisitor
+from cool.code_generation import (
+    CILFormatter,
+    ICoolTranslator,
+    ICoolTypeChecker,
+    CoolToCilTranslator,
+)
 from cool.grammar import Token, serialize_parser_and_lexer
 from cool.lexertab import CoolLexer
 from cool.parsertab import CoolParser
@@ -132,15 +137,18 @@ def compile(
     ###################
     # Code Generation #
     ###################
-    # icool_ast = ConstructorCreator(context).visit(ast, scope)
+    icool_ast = ICoolTranslator(context).visit(ast)
 
-    # if verbose:
-    #     log_success(CodeBuilder().visit(icool_ast))
-
-    # cil_ast = CoolToCILVisitor(context).visit(icool_ast, scope)
+    scope = Scope()
+    ICoolTypeChecker(context, errors).visit(icool_ast, scope)
 
     # if verbose or True:
-    #     log_success(CILFormatter().visit(cil_ast))
+    #     log_success(CodeBuilder().visit(icool_ast))
+
+    cil_ast = CoolToCilTranslator(context).visit(icool_ast, scope)
+
+    if verbose or True:
+        log_success(CILFormatter().visit(cil_ast))
     #######
     # End #
     #######

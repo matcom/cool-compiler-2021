@@ -60,16 +60,16 @@ class InstructionNode(Node):
 
 
 class AssignNode(InstructionNode):
-    def __init__(self, dest, source):
-        self.dest = dest
-        self.source = source
+    def __init__(self, dest: str, source: str):
+        self.dest: str = dest
+        self.source: str = source
 
 
 class ArithmeticNode(InstructionNode):
-    def __init__(self, dest, left, right):
-        self.dest = dest
-        self.left = left
-        self.right = right
+    def __init__(self, dest: str, left: str, right: str):
+        self.dest: str = dest
+        self.left: str = left
+        self.right: str = right
 
 
 class PlusNode(ArithmeticNode):
@@ -88,12 +88,30 @@ class DivNode(ArithmeticNode):
     pass
 
 
-class GetAttribNode(InstructionNode):
+class LessEqualNode(ArithmeticNode):
     pass
+
+
+class LessThanNode(ArithmeticNode):
+    pass
+
+
+class EqualNode(ArithmeticNode):
+    pass
+
+
+class GetAttribNode(InstructionNode):
+    def __init__(self, dest: str, instance: str, attr: str) -> None:
+        self.dest: str = dest
+        self.instance: str = instance
+        self.attr: str = attr
 
 
 class SetAttribNode(InstructionNode):
-    pass
+    def __init__(self, instance: str, attr: str, source: str) -> None:
+        self.instance: str = instance
+        self.attr: str = attr
+        self.source: str = source
 
 
 class GetIndexNode(InstructionNode):
@@ -115,9 +133,9 @@ class ArrayNode(InstructionNode):
 
 
 class TypeOfNode(InstructionNode):
-    def __init__(self, obj, dest):
-        self.obj = obj
-        self.dest = dest
+    def __init__(self, obj: str, dest: str):
+        self.obj: str = obj
+        self.dest: str = dest
 
 
 class LabelNode(InstructionNode):
@@ -264,6 +282,14 @@ class CILFormatter(object):
     @visitor.when(DynamicCallNode)
     def visit(self, node):
         return f"{node.dest} = VCALL {node.type} {node.method}"
+
+    @visitor.when(GetAttribNode)
+    def visit(self, node: GetAttribNode):
+        return f"{node.dest} = GETATTR {node.instance} {node.attr}"
+
+    @visitor.when(SetAttribNode)
+    def visit(self, node: SetAttribNode):
+        return f"SETATTR {node.instance} {node.attr} {node.source}"
 
     @visitor.when(ArgNode)
     def visit(self, node):

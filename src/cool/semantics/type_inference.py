@@ -315,7 +315,7 @@ class InferenceChecker:
             return
 
         scope.define_variable("self", self.current_type)
-        
+
         # Solve the expression of the attribute
         expr_node = (
             self.visit(node.expr, scope.create_child())
@@ -454,10 +454,10 @@ class InferenceChecker:
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope: Scope):
         if_node = self.visit(node.if_expr, scope)
-        
+
         if if_node is not None and not isinstance(if_node, AtomNode):
             self.graph.add_edge(AtomNode(self.context.get_type("Bool")), if_node)
-        
+
         then_node = self.visit(node.then_expr, scope.create_child())
         else_node = self.visit(node.else_expr, scope.create_child())
 
@@ -470,7 +470,7 @@ class InferenceChecker:
 
         if then_node is None or else_node is None:
             return conditional_node
-        
+
         if isinstance(then_node, AtomNode) and not isinstance(else_node, AtomNode):
             self.graph.add_edge(then_node, else_node)
         elif not isinstance(then_node, AtomNode) and isinstance(else_node, AtomNode):
@@ -532,7 +532,7 @@ class InferenceChecker:
         if isinstance(obj_node, AtomNode) and obj_node.type.contains_method(node.id):
             method, owner = obj_node.type.get_method(node.id, get_owner=True)
             param_nodes, return_node = self.methods[owner.name, method.name]
-            
+
             count_of_args = min(len(node.args), len(param_nodes))
             for i in range(count_of_args):
                 arg = node.args[i]
@@ -702,17 +702,11 @@ class InferenceTypeSubstitute:
 
         i = 0
         for attr in attrs:
-            count = len(scope.children)
-            
             if attr.expr is not None:
                 attr.index = i
                 i += 1
-            
-            self.visit(attr, scope)
-            
-            if count < len(scope.children):
-                i -= 1
 
+            self.visit(attr, scope)
 
         # print(scope.children, len(methods), i)
         for i, method in enumerate(methods, i):
@@ -737,7 +731,7 @@ class InferenceTypeSubstitute:
     @visitor.when(cool.MethodDeclarationNode)
     def visit(self, node: cool.MethodDeclarationNode, scope: Scope):
         self.current_method = self.current_type.get_method(node.id)
-        
+
         try:
             return_type = self.context.get_type(node.return_type)
         except SemanticError:
@@ -746,12 +740,21 @@ class InferenceTypeSubstitute:
         for i, (name, _) in enumerate(node.params):
             variable_info = scope.find_variable(name)
             if variable_info.type == self.context.get_type("AUTO_TYPE"):
-                self.errors.append(err.INFERENCE_ERROR_ATTRIBUTE % (node.param_types_positions[i][0], node.param_types_positions[i][1], name))
+                self.errors.append(
+                    err.INFERENCE_ERROR_ATTRIBUTE
+                    % (
+                        node.param_types_positions[i][0],
+                        node.param_types_positions[i][1],
+                        name,
+                    )
+                )
             node.params[i] = (name, variable_info.type.name)
 
         self.visit(node.body, scope)
 
-        if return_type is not None and return_type == self.context.get_type("AUTO_TYPE"):
+        if return_type is not None and return_type == self.context.get_type(
+            "AUTO_TYPE"
+        ):
             if self.current_method.return_type == self.context.get_type("AUTO_TYPE"):
                 self.errors.append(err.INFERENCE_ERROR_ATTRIBUTE % node.id)
             node.return_type = self.current_method.return_type.name

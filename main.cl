@@ -1,6 +1,8 @@
 class Main {
+    number: Int <- 0;
+
     main() : Object {
-        let io: IO <- new IO, p: Point <- (new Point).init(1, 2) in {
+        let x: Int <- number + 2, io: IO <- new IO, p: Point <- (new Point).init(1, 2) in {
             io.out_string("(");
             io.out_int(p.get_x());
             io.out_string(",");

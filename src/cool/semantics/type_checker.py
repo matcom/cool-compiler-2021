@@ -186,7 +186,7 @@ class TypeChecker:
         if var_info.name == "self":
             self.errors.append(err.SELF_IS_READONLY % (node.line, node.column))
 
-        expr_type = self.visit(node.expr, scope.create_child())
+        expr_type = self.visit(node.expr, scope)
 
         if var_info is None:
             self.errors.append(
