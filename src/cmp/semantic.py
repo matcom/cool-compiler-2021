@@ -1,6 +1,8 @@
 import itertools as itt
 from collections import OrderedDict
 
+from utils.COOL_Lexer import Token
+
 
 class SemanticError(Exception):
     @property
@@ -124,30 +126,12 @@ class Type:
 
     def join(self, other):
         if self is ErrorType(): return ErrorType()
-        if self.name == 'AUTO_TYPE' or other.name == 'AUTO_TYPE':
-            return self if self.name != 'AUTO_TYPE' else other
 
         current_parent = other
         while not self.conforms_to(current_parent):
             current_parent = current_parent.parent
 
         return current_parent
-
-class AutoType(Type):
-    def __init__(self):
-        Type.__init__(self, 'AUTO_TYPE')
-
-    def conforms_to(self, other):
-        return True
-
-    def bypass(self):
-        return True
-
-    def get_method(self, name:str):
-        raise SemanticError(None)
-
-    def __eq__(self, other):
-        return isinstance(other, Type)
 
 class ErrorType(Type):
     def __init__(self):
@@ -189,13 +173,15 @@ class Context:
     def __init__(self):
         self.types = {}
 
-    def create_type(self, name:str):
+    def create_type(self, token):
+        name = token.lex if isinstance(token, Token) else token
         if name in self.types:
             raise SemanticError(f'Type with the same name ({name}) already in context.')
         typex = self.types[name] = Type(name)
         return typex
 
-    def get_type(self, name:str):
+    def get_type(self, token):
+        name = token.lex if isinstance(token, Token) else token
         if name == '<error>':
             return ErrorType()
             
