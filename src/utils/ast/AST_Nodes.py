@@ -23,7 +23,7 @@ class ast_nodes:
             self.id = token.lex
             self.line = token.line
             self.column = token.column
-            self.parent = parent
+            self.parent = parent.lex if parent else parent
             self.features = features
 
     class MethDeclarationNode(DeclarationNode):
@@ -31,8 +31,8 @@ class ast_nodes:
             self.id = token.lex
             self.line = token.line
             self.column = token.column
-            self.params = params
-            self.type = return_type
+            self.params = [[item.lex if isinstance(item, Token) else item for item in _list] for _list in params]
+            self.type = return_type.lex
             self.body = body
 
     class AttrDeclarationNode(DeclarationNode):
@@ -52,7 +52,7 @@ class ast_nodes:
 
     class CallNode(ExpressionNode):
         def __init__(self, token, args, obj = None, typex = None):
-            self.obj = obj.lex
+            self.obj = obj
             self.type = typex
             self.id = token.lex
             self.line = token.line
