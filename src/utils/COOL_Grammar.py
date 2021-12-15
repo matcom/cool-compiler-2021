@@ -46,24 +46,24 @@ def build_COOL_Grammar():
 
     param %= idx + colon + typex, lambda h,s: [s[1],s[3]]
 
-    expr %= idx + arrow + expr, lambda h,s: node.AssignNode(s[1],s[3])
-    expr %= ifx + expr + then + expr + elsex + expr + fi, lambda h,s: node.IfThenElseNode(s[2],s[4],s[6])
-    expr %= whilex + expr + loop + expr + pool, lambda h,s: node.WhileNode(s[2],s[4])
-    expr %= notx + expr, lambda h,s: node.NotNode(s[2])
+    expr %= idx + arrow + expr, lambda h,s: node.AssignNode(s[1],s[3],s[2])
+    expr %= ifx + expr + then + expr + elsex + expr + fi, lambda h,s: node.IfThenElseNode(s[2],s[4],s[6],s[1])
+    expr %= whilex + expr + loop + expr + pool, lambda h,s: node.WhileNode(s[2],s[4],s[1])
+    expr %= notx + expr, lambda h,s: node.NotNode(s[2],s[1])
 
-    expr %= ocur + expr_list + ccur, lambda h,s: node.BlockNode(s[2])
+    expr %= ocur + expr_list + ccur, lambda h,s: node.BlockNode(s[2],s[1])
 
     expr_list %= expr + semi, lambda h,s: [s[1]]
     expr_list %= expr + semi + expr_list, lambda h,s: [s[1]] + s[3]
     
-    expr %= let + id_list + inx + expr, lambda h,s: node.LetNode(s[2],s[4])
+    expr %= let + id_list + inx + expr, lambda h,s: node.LetNode(s[2],s[4],s[1])
 
     id_list %= idx + colon + typex, lambda h,s: [(s[1],s[3],None)]
     id_list %= idx + colon + typex + arrow + expr, lambda h,s: [(s[1],s[3],s[5])]
     id_list %= idx + colon + typex + comma + id_list, lambda h,s: [(s[1],s[3],None)] + s[5]
     id_list %= idx + colon + typex + arrow + expr + comma + id_list, lambda h,s: [(s[1],s[3],s[5])] + s[7]
 
-    expr %= case + expr + of + case_list + esac, lambda h,s: node.CaseNode(s[2],s[4])
+    expr %= case + expr + of + case_list + esac, lambda h,s: node.CaseNode(s[2],s[4],s[1])
 
     case_list %= idx + colon + typex + darrow + expr + semi, lambda h,s: [(s[1],s[3],s[5])]
     case_list %= idx + colon + typex + darrow + expr + semi + case_list, lambda h,s: [(s[1],s[3],s[5])] + s[7]
