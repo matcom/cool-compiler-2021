@@ -28,8 +28,8 @@ class TypeBuilder:
 
         if node.parent is not None:
 
-            if node.parent.lex in ['Int', 'String', 'SELF_TYPE', 'Bool']:
-                self.errors.append(NOT_INHERIT_FROM_BASICS_TYPES % (node.id.line, node.id.column, node.id.lex, node.parent.lex))
+            if node.parent in ['Int', 'String', 'SELF_TYPE', 'Bool']:
+                self.errors.append(NOT_INHERIT_FROM_BASICS_TYPES % (node.line, node.column, node.id, node.parent))
 
             else:
                 try:
