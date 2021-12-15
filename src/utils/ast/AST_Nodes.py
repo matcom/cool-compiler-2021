@@ -79,9 +79,10 @@ class ast_nodes:
             self.lex = lex
 
     class BinaryNode(ExpressionNode):
-        def __init__(self, left, right):
+        def __init__(self, left, right, symbol):
             self.left = left
             self.right = right
+            self.symbol = symbol
 
 
     class ConstantNumNode(AtomicNode):

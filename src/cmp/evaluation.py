@@ -12,6 +12,7 @@ def evaluate_reverse_parse(G, right_parse, operations, tokens):
         if operation == ShiftReduceParser.SHIFT:
             token = next(tokens)
             stack.append(token)
+            
         elif operation == ShiftReduceParser.REDUCE:
             production = next(right_parse)
             head, body = production

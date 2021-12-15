@@ -50,7 +50,8 @@ class Type:
             raise SemanticError(f'Parent type is already set for {self.name}.')
         self.parent = parent
 
-    def get_attribute(self, name:str):
+    def get_attribute(self, token):
+        name = token if isinstance(token, str) else token.lex
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
@@ -61,7 +62,8 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
 
-    def define_attribute(self, name:str, typex):
+    def define_attribute(self, token, typex):
+        name = token if isinstance(token, str) else token.lex
         try:
             self.get_attribute(name)
         except SemanticError:
@@ -71,7 +73,8 @@ class Type:
         else:
             raise SemanticError(f'Attribute "{name}" is already defined in {self.name}.')
 
-    def get_method(self, name:str):
+    def get_method(self, token):
+        name = token if isinstance(token, str) else token.lex
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
@@ -82,7 +85,8 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
 
-    def define_method(self, name:str, param_names:list, param_types:list, return_type):
+    def define_method(self, token, param_names:list, param_types:list, return_type):
+        name = token if isinstance(token, str) else token.lex
         if name in (method.name for method in self.methods):
             raise SemanticError(f'Method "{name}" already defined in {self.name}')
 
@@ -143,7 +147,7 @@ class ErrorType(Type):
     def bypass(self):
         return True
 
-    def get_method(self, name:str):
+    def get_method(self, token):
         raise SemanticError(None)
     
     def __eq__(self, other):
@@ -174,14 +178,14 @@ class Context:
         self.types = {}
 
     def create_type(self, token):
-        name = token.lex if isinstance(token, Token) else token
+        name = token if isinstance(token, str) else token.lex
         if name in self.types:
             raise SemanticError(f'Type with the same name ({name}) already in context.')
         typex = self.types[name] = Type(name)
         return typex
 
     def get_type(self, token):
-        name = token.lex if isinstance(token, Token) else token
+        name = token if isinstance(token, str) else token.lex
         if name == '<error>':
             return ErrorType()
             
@@ -200,20 +204,6 @@ class VariableInfo:
     def __init__(self, name, vtype):
         self.name = name
         self.type = vtype
-        self.expected_types = []
-
-    def update_type(self):
-        infered_type = self.expected_types[0] if self.expected_types else None
-        
-        for typex in self.expected_types[1:]:
-            infered_type = infered_type.join(typex)
-            
-        self.type = infered_type
-        
-        if not self.type:
-            self.type = AutoType()
-        
-        self.expected_types = []
 
 
 class Scope:
@@ -231,20 +221,24 @@ class Scope:
         self.children.append(child)
         return child
 
-    def define_variable(self, vname, vtype):
+    def define_variable(self, token, vtype):
+        vname = token if isinstance(token, str) else token.lex
         info = VariableInfo(vname, vtype)
         self.locals.append(info)
         return info
 
-    def find_variable(self, vname, index=None):
+    def find_variable(self, token, index=None):
+        vname = token if isinstance(token, str) else token.lex
         locals = self.locals if index is None else itt.islice(self.locals, index)
         try:
             return next(x for x in locals if x.name == vname)
         except StopIteration:
             return self.parent.find_variable(vname, self.index) if self.parent is not None else None
 
-    def is_defined(self, vname):
+    def is_defined(self, token):
+        vname = token if isinstance(token, str) else token.lex
         return self.find_variable(vname) is not None
 
-    def is_local(self, vname):
+    def is_local(self, token):
+        vname = token if isinstance(token, str) else token.lex
         return any(True for x in self.locals if x.name == vname)

@@ -14,7 +14,7 @@ class Token:
         self.column = column
  
     def __str__(self): 
-        return f'{self.ttype}: {self.lex}'
+        return f'{self.token_type}: {self.lex}'
  
 '''
 El lexer es el resultado de la union de todas las expresiones regulares que forman
@@ -50,7 +50,7 @@ class Lexer:
                 if len(text) <= 0: continue
 
             lexeme = match.group()
-            self.column += len(lexeme)
+            self.column += len(lexeme) if lexeme != '\t' else 4
 
             if lexeme == '\n':
                 self.line += 1
@@ -134,7 +134,6 @@ class Lexer:
 
             token_type = match.lastgroup if lexeme.lower() not in self.keywords and match.lastgroup is not None else match.group().lower()
 
-            a = self.column - len(lexeme) + 1 if lexeme[:2] != '(*' and lexeme[0] != '"' else self.column
             yield lexeme, token_type, self.line, self.column - len(lexeme) + 1 if lexeme[:2] != '(*' and lexeme[0] != '"' else self.column 
  
             text = text[match.end():] if lexeme[:2] != '(*' and lexeme[0] != '"' else text

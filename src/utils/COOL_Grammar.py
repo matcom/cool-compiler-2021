@@ -70,17 +70,17 @@ def build_COOL_Grammar():
 
     expr %= comp, lambda h,s: s[1]
 
-    comp %= comp + less + arith, lambda h,s: node.LessThanNode(s[1],s[3])
-    comp %= comp + lesse + arith, lambda h,s: node.LessEqualNode(s[1],s[3])
-    comp %= comp + equal + arith, lambda h,s: node.EqualNode(s[1],s[3])
+    comp %= comp + less + arith, lambda h,s: node.LessThanNode(s[1],s[3],s[2])
+    comp %= comp + lesse + arith, lambda h,s: node.LessEqualNode(s[1],s[3],s[2])
+    comp %= comp + equal + arith, lambda h,s: node.EqualNode(s[1],s[3],s[2])
     comp %= arith, lambda h,s: s[1]
 
-    arith %= arith + plus + term, lambda h,s: node.PlusNode(s[1],s[3])
-    arith %= arith + minus + term, lambda h,s: node.MinusNode(s[1],s[3])
+    arith %= arith + plus + term, lambda h,s: node.PlusNode(s[1],s[3],s[2])
+    arith %= arith + minus + term, lambda h,s: node.MinusNode(s[1],s[3],s[2])
     arith %= term, lambda h,s:s[1]
 
-    term %= term + star + factor, lambda h,s: node.StarNode(s[1],s[3])
-    term %= term + div + factor, lambda h,s: node.DivNode(s[1],s[3])
+    term %= term + star + factor, lambda h,s: node.StarNode(s[1],s[3],s[2])
+    term %= term + div + factor, lambda h,s: node.DivNode(s[1],s[3],s[2])
     term %= factor, lambda h,s: s[1]
 
     factor %= isvoid + factor, lambda h,s: node.IsVoidNode(s[2])
@@ -105,5 +105,3 @@ def build_COOL_Grammar():
     arg_list %= G.Epsilon, lambda h,s: []
 
     return G
-
-

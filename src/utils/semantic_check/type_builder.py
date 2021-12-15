@@ -2,6 +2,9 @@ import cmp.visitor as visitor
 from utils.ast.AST_Nodes import ast_nodes as nodes
 from cmp.semantic import SemanticError, ErrorType
 
+NOT_INHERIT_FROM_BASICS_TYPES = '(%s, %s) - TypeError: Type %s cannot inherit from basic type %s'
+
+
 class TypeBuilder:
     def __init__(self, context, errors):
         self.context = context
@@ -26,7 +29,7 @@ class TypeBuilder:
         if node.parent is not None:
 
             if node.parent.lex in ['Int', 'String', 'SELF_TYPE', 'Bool']:
-                self.errors.append(f'Cannot inherit from {node.parent}')
+                self.errors.append(NOT_INHERIT_FROM_BASICS_TYPES % (node.id.line, node.id.column, node.id.lex, node.parent.lex))
 
             else:
                 try:
