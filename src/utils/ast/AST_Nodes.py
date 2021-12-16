@@ -38,9 +38,9 @@ class ast_nodes:
     class AttrDeclarationNode(DeclarationNode):
         def __init__(self, token, typex, expr = None):
             self.id = token.lex
-            self.line = token.line
-            self.column = token.column
-            self.type = typex
+            self.line = expr.line if expr else token.line
+            self.column = expr.column if expr else token.column
+            self.type = typex.lex
             self.expr = expr
 
     class AssignNode(ExpressionNode):
@@ -52,11 +52,11 @@ class ast_nodes:
 
     class CallNode(ExpressionNode):
         def __init__(self, token, args, obj = None, typex = None):
-            self.obj = obj
+            self.obj = obj.lex if isinstance(obj, Token) else obj
             self.type = typex
             self.id = token.lex
-            self.line = token.line
-            self.column = token.column
+            self.line = obj.line if obj else token.line
+            self.column = obj.column if obj else token.column
             self.args = args
     
     class IfThenElseNode(ExpressionNode):
@@ -97,12 +97,12 @@ class ast_nodes:
     class NotNode(ExpressionNode):
         def __init__(self, expr, token):
             self.expr = expr
-            self.line = token.line
-            self.column = token.column
+            self.line = token.line + 4
+            self.column = token.column + 4
 
     class AtomicNode(ExpressionNode):
         def __init__(self, token):
-            self.lex = token.lex
+            self.lex = token.lex if isinstance(token, Token) else token
             self.line = token.line
             self.column = token.column
 
@@ -123,7 +123,10 @@ class ast_nodes:
     class VariableNode(AtomicNode):
         pass
     class InstantiateNode(AtomicNode):
-        pass
+        def __init__(self, typex, token):
+            self.lex =  typex.lex
+            self.line = token.line
+            self.column = token.column
     class IsVoidNode(AtomicNode):
         pass
     class ComplementNode(AtomicNode):

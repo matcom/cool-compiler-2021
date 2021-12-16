@@ -49,7 +49,7 @@ def build_COOL_Grammar():
     expr %= idx + arrow + expr, lambda h,s: node.AssignNode(s[1],s[3],s[2])
     expr %= ifx + expr + then + expr + elsex + expr + fi, lambda h,s: node.IfThenElseNode(s[2],s[4],s[6],s[1])
     expr %= whilex + expr + loop + expr + pool, lambda h,s: node.WhileNode(s[2],s[4],s[1])
-    expr %= notx + expr, lambda h,s: node.NotNode(s[2],s[1])
+    expr %= notx + expr, lambda h,s: node.NotNode(s[2])
 
     expr %= ocur + expr_list + ccur, lambda h,s: node.BlockNode(s[2],s[1])
 
@@ -92,7 +92,7 @@ def build_COOL_Grammar():
     atom %= string, lambda h,s: node.ConstantStringNode(s[1])
     atom %= num, lambda h,s: node.ConstantNumNode(s[1])
     atom %= idx, lambda h,s: node.VariableNode(s[1])
-    atom %= new + typex, lambda h,s: node.InstantiateNode(s[2])
+    atom %= new + typex, lambda h,s: node.InstantiateNode(s[2],s[1])
     atom %= opar + expr + cpar, lambda h,s: s[2]
     atom %= dispatch, lambda h,s: s[1]
 
