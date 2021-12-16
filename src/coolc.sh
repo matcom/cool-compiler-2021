@@ -1,4 +1,4 @@
-# Incluya aquí las instrucciones necesarias para ejecutar su compilador
+﻿# Incluya aquí las instrucciones necesarias para ejecutar su compilador
 
 INPUT_FILE=$1
 OUTPUT_FILE=${INPUT_FILE:0: -2}mips
@@ -9,3 +9,4 @@ echo "Copyright (c) 2019: Nombre1, Nombre2, Nombre3"    # TODO: líneas a los va
 
 # Llamar al compilador
 echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
+python main.py -f $INPUT_FILE
