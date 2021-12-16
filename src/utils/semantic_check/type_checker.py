@@ -12,10 +12,12 @@ SELF_TYPE_ERROR = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a parameter
 SELF_TYPE_IN_DISPATCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a type of a dispatch'
 SELF_TYPE_IN_CASE_BRANCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a type of a case branch'
 
+INCOMPATIBLE_TYPES_ATTR = '(%s, %s) - TypeError: Inferred type %s of initialization of attribute %s does not conform to declared type %s.'
+INCOMPATIBLE_TYPES_COMPLEMENT = '(%s, %s) - TypeError: Argument of %s has type %s instead of %s.'
 INCOMPATIBLE_TYPES = '(%s, %s) - TypeError: Cannot convert %s into %s.'
 WRONG_SIGNATURE = '(%s, %s) - TypeError: Method %s already defined in %s with a different signature.'
 LOCAL_ALREADY_DEFINED = '(%s, %s) - TypeError: Variable %s is already defined in method %s.'
-INVALID_OPERATION = '(%s, %s) - TypeError: Operation "%s" is not defined between %s and %s.'
+INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
 VARIABLE_NOT_DEFINED = '(%s, %s) - TypeError: Variable %s is not defined in %s.'
 INHERIT_ERROR = '(%s, %s) - TypeError: Class %s cannot inherit from class %s because they form a cycle.'
 METHOD_PARAMETERS = '(%s, %s) - TypeError: Method %s defined in %s receive %d parameters'
@@ -94,7 +96,7 @@ class TypeChecker:
             type_expr = self.visit(node.expr, scope.create_child())
 
             if not type_expr.conforms_to(attr_type):
-                self.errors.append(INCOMPATIBLE_TYPES % (node.line, node.column, type_expr.name, attr_type.name))
+                self.errors.append(INCOMPATIBLE_TYPES_ATTR % (node.line, node.column, type_expr.name, node.id, attr_type.name))
 
         if node.id == 'self':
             self.errors.append(SELF_ERROR % (node.line, node.column))
@@ -358,7 +360,7 @@ class TypeChecker:
         typex = self.visit(node.lex, scope)
 
         if not typex.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.line, node.column, typex.name, 'Int'))
+            self.errors.append(INCOMPATIBLE_TYPES_COMPLEMENT % (node.line, node.column, '~' ,typex.name, 'Int'))
             return ErrorType()
 
         return typex
@@ -370,7 +372,7 @@ class TypeChecker:
         type_right = self.visit(node.right, scope)
 
         if not type_left.conforms_to(self.context.get_type('Int')) or not type_right.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INVALID_OPERATION % (node.line, node.column, '+', type_left.name, type_right.name))
+            self.errors.append(INVALID_OPERATION % (node.line, node.column, type_left.name, '+', type_right.name))
             return ErrorType()
 
         else:
@@ -383,7 +385,7 @@ class TypeChecker:
         type_right = self.visit(node.right, scope)
 
         if not type_left.conforms_to(self.context.get_type('Int')) or not type_right.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INVALID_OPERATION % (node.line, node.column, '-', type_left.name, type_right.name))
+            self.errors.append(INVALID_OPERATION % (node.line, node.column, type_left.name, '-', type_right.name))
             return ErrorType()
 
         else:
@@ -396,7 +398,7 @@ class TypeChecker:
         type_right = self.visit(node.right, scope)
 
         if not type_left.conforms_to(self.context.get_type('Int')) or not type_right.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INVALID_OPERATION % (node.line, node.column, '*', type_left.name, type_right.name))
+            self.errors.append(INVALID_OPERATION % (node.line, node.column, type_left.name, '*', type_right.name))
             return ErrorType()
 
         else:
@@ -409,7 +411,7 @@ class TypeChecker:
         type_right = self.visit(node.right, scope)
 
         if not type_left.conforms_to(self.context.get_type('Int')) or not type_right.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INVALID_OPERATION % (node.line, node.column, '/', type_left.name, type_right.name))
+            self.errors.append(INVALID_OPERATION % (node.line, node.column, type_left.name, '/', type_right.name))
             return ErrorType()
 
         else:
@@ -422,7 +424,7 @@ class TypeChecker:
         type_right = self.visit(node.right, scope)
 
         if not type_left.conforms_to(self.context.get_type('Int')) or not type_right.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INVALID_OPERATION % (node.line, node.column, '<', type_left.name, type_right.name))
+            self.errors.append(INVALID_OPERATION % (node.line, node.column, type_left.name, '<', type_right.name))
             return ErrorType()
 
         else:
@@ -435,7 +437,7 @@ class TypeChecker:
         type_right = self.visit(node.right, scope)
 
         if not type_left.conforms_to(self.context.get_type('Int')) or not type_right.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INVALID_OPERATION % (node.line, node.column, '<=', type_left.name, type_right.name))
+            self.errors.append(INVALID_OPERATION % (node.line, node.column, type_left.name, '<=', type_right.name))
             return ErrorType()
 
         else:
@@ -454,7 +456,7 @@ class TypeChecker:
         if type_left.name == 'AUTO_TYPE' or type_right.name == 'AUTO_TYPE':
             pass
         elif (type_left == int_type and not type_right.conforms_to(int_type)) or (type_right == int_type and not type_left.conforms_to(int_type)) or (type_left == bool_type and not type_right.conforms_to(bool_type)) or (type_right == bool_type and not type_left.conforms_to(bool_type)) or (type_left == string_type and not type_right.conforms_to(string_type)) or (type_right == string_type and not type_left.conforms_to(string_type)):
-            self.errors.append(INVALID_OPERATION % (node.line, node.column, '=', type_left.name, type_right.name))
+            self.errors.append(INVALID_OPERATION % (node.line, node.column, type_left.name, '=', type_right.name))
             return ErrorType()
 
         return bool_type
