@@ -3,12 +3,11 @@ import AST
 #from expressions import *
 
 from operator import add, mul
-#from expressions import BinaryOperation, Number
 
 my_bool = False
 result = ''
 
-# Parsing rules
+#Parsing rules
 precedence = (
     ('right', 'ASSIGN'),
     ('right', 'NOT'),
@@ -20,17 +19,24 @@ precedence = (
     ('left', 'AT'),
     ('left', 'DOT')
 )
+
+
+
+
 # precedence = (
-#     ('left','PLUS','MINUS'),
-#     ('left','MULTIPLY','DIVIDE'),
-#     ('right','ASSIGN'),
-#     ('left','NOT'),
-#     ('nonassoc','LT','LTEQ','EQ'),
-#     ('right','ISVOID'),
-#     ('right','INT_COMP'),
-#     ('left','AT'),
-#     ('left','DOT')
+#     ('left',  'PLUS','MINUS'),
+#     ('left',  'MULTIPLY','DIVIDE'),
+#     ('right', 'ASSIGN'),
+#     ('left',  'NOT'),
+#     ('nonassoc',  'LT','LTEQ','EQ'),
+#     ('right', 'ISVOID'),
+#     ('right', 'INT_COMP'),
+#     ('left',  'AT'),
+#     ('left',  'DOT')
 # )
+
+
+
 
 def p_program(production):
     '''program : classSet'''
@@ -96,7 +102,7 @@ def p_temp(production):
     '''
     if len(production) == 2:
         production[0] = production[1]
-    else: 
+    else: #en este caso creo un atributo para el let
         production[0] = AST.Attribute(production[1].id, production[1].type, production[3])
         production[0].line = production.lineno(2)
         line_start = production.lexer.lexdata.rfind('\n', 0, production.lexpos(2)) + 1
@@ -167,7 +173,7 @@ def p_expression_g(production):
             production[0].line = production.lineno(1)
             line_start = production.lexer.lexdata.rfind('\n', 0, production.lexpos(1)) + 1
             production[0].index = production.lexpos(1) - line_start + 1
-        else: 
+        else:
             production[0] = AST.IntegerComplement(production[2])
             production[0].line = production.lineno(1)
             production[0].index = production[2].index
@@ -262,7 +268,6 @@ def p_arguments_list_opt(production):
     """
     production[0] = [] if production.slice[1].type == "empty" else production[1]
 
-
 def p_empty(production):
     'empty :'
     production[0] = None
@@ -319,7 +324,6 @@ def p_derivate(production):
     line_start = production.lexer.lexdata.rfind('\n', 0, production.lexpos(2)) + 1
     production[0].index = production.lexpos(2) - line_start + 1
 
-
 def p_expression_cmp(production):
     '''expr : expr LT expr
             | expr LTEQ expr
@@ -333,7 +337,6 @@ def p_expression_cmp(production):
     production[0].line = production.lineno(2)
     line_start = production.lexer.lexdata.rfind('\n', 0, production.lexpos(2)) + 1
     production[0].index = production.lexpos(2) - line_start + 1
-
 
 def p_expression_assign(production):
     'expr : ID ASSIGN expr'

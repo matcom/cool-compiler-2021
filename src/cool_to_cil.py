@@ -148,10 +148,14 @@ class Build_CIL:
         #visito los atributos
         index = 0
         for att in _class.attributes:
+            
             attribute_instance = self.visit(att, f)
+            
             _intr = AST_CIL.SetAttrib(self_instance, index, attribute_instance)
-            f.instructions.insert(1, _intr) #<------cambio
-            # f.instructions.append(_intr)
+            
+            #f.instructions.insert(1, _intr)    #<------cambio
+            f.instructions.append(_intr)        #<------comment
+            
             index += 1
         #################################
 
@@ -261,7 +265,7 @@ class Build_CIL:
     def visit(self, string, functionCIL):
         tag = 's' + str(len(self.astCIL.data_section))
         n = len(string.value)
-        if n > 0 and string.value[n-1] == '\n':
+        if n > 0 and string.value.__contains__('\n'):       #[n-1] == '\n':
             s = string.value.replace("\n", '\\n')
             s = '\"' + s + '\"'
         else: s = '"' + string.value + '"'
@@ -342,29 +346,38 @@ class Build_CIL:
 
     @visitor.when(LetVar)
     def visit(self, let, functionCIL):
-        for item in let.declarations:            
-            self.visit(item, functionCIL)            
-            self.local_variables.append(item)        
+        for item in let.declarations:
+            self.visit(item, functionCIL)
+            self.local_variables.append(item)
         result = self.visit(let.in_expression, functionCIL)
-        
+
         n = len(let.declarations)        
         m = len(self.local_variables)        
-        for i in range(n): self.local_variables.pop(m - i - 1)        
+        for i in range(n): self.local_variables.pop(m - i - 1)
         return result
 
     @visitor.when(Attribute)#ok
     def visit(self, attr, functionCIL):
+       
         #declara un nuevo objeto y le asigna un valor
+       
         result = self.visit(attr.expr, functionCIL)
+       
         instance = attr.id + '_' + str(attr.line) + '_' + str(attr.index)        #creo una instancia con el nombre del atributo
 
-        intr1 = AST_CIL.Allocate(instance, attr.type)
-        functionCIL.instructions.insert(0, intr1)
+        #intr1 = AST_CIL.Allocate(instance, attr.type)          # <--------- change
+        #functionCIL.instructions.insert(0, intr1)              # <--------- change
+        #intr2 = AST_CIL.Assign(instance, attr.type, result)    # <--------- change
 
-        intr2 = AST_CIL.Assign(instance, attr.type, result)
+        #change-------------------------------------------------------------------
+        
+        intr2 = AST_CIL.Copy(instance, result)
+
         # ---> poner los atributos en su indice
         functionCIL.localvars.append(instance)
+        
         functionCIL.instructions.append(intr2)
+
         return instance
 
     @visitor.when(Var)
@@ -652,6 +665,19 @@ class Build_CIL:
         functionCIL.instructions.append(AST_CIL.Label(fi))
         return dest
 
+    # @visitor.when(LetVar)
+    # def visit(self, let, functionCIL):
+    #     for item in let.declarations:
+    #         self.visit(item, functionCIL)
+    #         self.local_variables.append(item)
+        
+    #     result = self.visit(let.in_expression, functionCIL)
+
+    #     n = len(let.declarations)        
+    #     m = len(self.local_variables)        
+    #     for i in range(n): self.local_variables.pop(m - i - 1)
+    #     return result
+
     @visitor.when(Case)
     def visit(self, case, functionCIL):
         current_type = self.get_local()
@@ -699,7 +725,18 @@ class Build_CIL:
         for i in range(n):
             branch = case.implications[i]
             functionCIL.instructions.append(AST_CIL.Label(labels[i]))
+
+            self.local_variables.append(branch.var)
+            instance =  branch.var.id + '_' + str(branch.var.line) + '_' + str(branch.var.index)
+            functionCIL.localvars.append(instance)
+            intr = AST_CIL.Copy(instance, expr_0)
+            functionCIL.instructions.append(intr)
+            
             result = self.visit(branch.expr, functionCIL)  
+
+            m = len(self.local_variables)
+            self.local_variables.pop(m - 1)
+            
             functionCIL.instructions.append(AST_CIL.Copy(dest, result))          
             functionCIL.instructions.append(AST_CIL.Goto(label_end))        
         functionCIL.instructions.append(AST_CIL.Label(label_end))

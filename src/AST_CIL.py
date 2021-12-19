@@ -47,7 +47,7 @@ class Copy(Instruction):
         self.dest = dest
         self.source = source
     def to_string(self):
-        return "{} <- {}".format(self.dest, self.source)
+        return "{} Copy {}".format(self.dest, self.source)
 
 
 class Arithmetic(Instruction):

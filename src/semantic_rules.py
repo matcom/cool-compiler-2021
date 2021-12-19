@@ -2,7 +2,6 @@ import visitor as visitor
 from AST import *
 import tools
 
-
 class Semantic:
     def __init__(self):
         self.error = []
@@ -94,7 +93,6 @@ class Semantic:
                                         return False
         return True
 
-
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -149,8 +147,7 @@ class Semantic:
         for c, d in self.classmethods.items():
             self.classmethods_original[c] = d.copy()
 
-        if not self.ComputeInheritsfeature(program):
-            return False
+        if not self.ComputeInheritsfeature(program): return False
 
         for _cl in classes:
             for _item in self.classmethods[_cl].items():
@@ -233,8 +230,6 @@ class Semantic:
             return False
         return True
 
-
-
     @visitor.when(Block)
     def visit(self, block):
 
@@ -245,8 +240,6 @@ class Semantic:
         n = len(block.expressions) - 1
         block.static_type = block.expressions[n].static_type
         return True
-
-
 
     @visitor.when(Star)
     def visit(self, star):
@@ -296,10 +289,6 @@ class Semantic:
         div.static_type = 'Int'
         return True
 
-
-
-
-
     @visitor.when(LowerEqualThan)
     def visit(self, lowerEqualThan):
         if not self.visit(lowerEqualThan.first):
@@ -344,8 +333,6 @@ class Semantic:
         lowerThan.static_type = 'Bool'
         return True
 
-
-
     @visitor.when(Not)
     def visit(self, negation):
         if not self.visit(negation.expr):
@@ -371,7 +358,6 @@ class Semantic:
         I_complement.static_type = 'Int'
         return True
 
-
     @visitor.when(IsVoid)
     def visit(self, is_void):
 
@@ -380,11 +366,6 @@ class Semantic:
 
         is_void.static_type = 'Bool'
         return True
-
-
-
-
-
 
     @visitor.when(Type)
     def visit(self, _type):
@@ -403,7 +384,7 @@ class Semantic:
                     return True
 
             if not self.current_method is None:
-                for args_id,args_type in self.classmethods[self.current_class][self.current_method][0]:
+                for args_id, args_type in self.classmethods[self.current_class][self.current_method][0]:
                     if args_id == _type.name:
                         _type.static_type = args_type
                         return True
@@ -419,7 +400,6 @@ class Semantic:
         self.error.append('({}, {}) - NameError: Undeclared identifier {}.'.format(_type.line, _type.index, _type.name))
         return False
 
-
     @visitor.when(NewType)
     def visit(self, new_type):
         if new_type.type_name == 'SELF_TYPE':
@@ -430,7 +410,6 @@ class Semantic:
                 return False
             new_type.static_type = new_type.type_name
         return True
-
 
     @visitor.when(Boolean)
     def visit(self, boolean):
@@ -446,8 +425,6 @@ class Semantic:
     def visit(self, string):
         string.static_type = 'String'
         return True
-
-
 
     @visitor.when(Conditional)
     def visit(self, cond):
@@ -485,8 +462,6 @@ class Semantic:
 
         return True
 
-
-
     @visitor.when(LetVar)
     def visit(self, let):
 
@@ -514,8 +489,6 @@ class Semantic:
         let.static_type = let.in_expression.static_type
 
         return True
-
-
 
     @visitor.when(Assign)
     def visit(self, assign):
@@ -565,9 +538,6 @@ class Semantic:
         assign.static_type = assign.expression.static_type
         return True
 
-
-
-
     @visitor.when(Attribute)
     def visit(self, attr):
 
@@ -600,7 +570,6 @@ class Semantic:
 
         var.static_type = var.type
         return True
-
 
     @visitor.when(Dispatch)
     def visit(self, dispatch):
@@ -636,7 +605,6 @@ class Semantic:
                 return False
         dispatch.static_type = _static_type
         return True
-
 
     @visitor.when(StaticDispatch)
     def visit(self, static_dispatch):
