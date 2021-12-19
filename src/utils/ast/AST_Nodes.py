@@ -125,8 +125,8 @@ class ast_nodes:
     class InstantiateNode(AtomicNode):
         def __init__(self, typex, token):
             self.lex =  typex.lex
-            self.line = token.line
-            self.column = token.column
+            self.line = token.line + 4
+            self.column = token.column + 4
     class IsVoidNode(AtomicNode):
         pass
     class ComplementNode(AtomicNode):

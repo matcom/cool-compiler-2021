@@ -14,7 +14,7 @@ class Token:
         self.column = column
  
     def __str__(self): 
-        return f'{self.token_type}: {self.lex}'
+        return f'({self.line}, {self.column}) - {self.token_type}: {self.lex}'
  
 '''
 El lexer es el resultado de la union de todas las expresiones regulares que forman
@@ -22,12 +22,13 @@ el lenguaje
 '''
 class Lexer: 
 
-    def __init__(self, table, keywords, ignored_tokens, eof):
+    def __init__(self, table, keywords, ignored_tokens, tokens_toFix, eof):
         self.line = 1
         self.column = 0
         self.table = table
         self.keywords = keywords
         self.ignored_tokens = ignored_tokens
+        self.tokens_toFix = tokens_toFix
         self.regex = self._build_regex(table)
         self.errors = []
         self.eof = eof
@@ -142,10 +143,18 @@ class Lexer:
  
     def _build_regex(sef,table):
         return re.compile('|'.join([f'(?P<{name}>{regex})' if name != regex else f'({name})' for name,regex in table.items()]))
- 
+    
     def __call__(self, text): 
-        return [Token(lex, ttype, line, column) for lex, ttype, line, column in self.tokenize(text) if ttype not in self.ignored_tokens]
+        return self.fixed_tokens([Token(lex, ttype, line, column) for lex, ttype, line, column in self.tokenize(text) if ttype not in self.ignored_tokens])
 
+    def fixed_tokens(self, tokens):
+        for i, token in enumerate(tokens):
+            if token.lex in self.tokens_toFix:
+                token.line = tokens[i + 1].line
+                token.column = tokens[i + 1].column
+
+
+    
 
 '''
 Esta clase guardara las propiedades sintacticas de COOL
@@ -205,4 +214,7 @@ class COOL_Lexer(Lexer):
 
         self.ignored_tokens = ['newline','whitespace','tabulation','comment']
 
-        Lexer.__init__(self, self.regexs, self.keywords, self.ignored_tokens, 'eof')
+        self.tokens_toFix = ['inherits','isvoid','class','while','then','else','loop','case',
+        'let','new','not','if','in','of']
+
+        Lexer.__init__(self, self.regexs, self.keywords, self.ignored_tokens, self.tokens_toFix, 'eof')

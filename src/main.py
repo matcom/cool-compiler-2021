@@ -7,8 +7,6 @@ from cmp.semantic import Context
 from utils.semantic_check.type_collector import TypeCollector
 from utils.semantic_check.type_builder import TypeBuilder
 from utils.semantic_check.type_checker import TypeChecker
-from utils.semantic_check.type_inference import TypeInference
-from utils.print_code import PrintCode
 
 def main(args):
     
