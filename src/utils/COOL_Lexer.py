@@ -145,13 +145,14 @@ class Lexer:
         return re.compile('|'.join([f'(?P<{name}>{regex})' if name != regex else f'({name})' for name,regex in table.items()]))
     
     def __call__(self, text): 
-        return self.fixed_tokens([Token(lex, ttype, line, column) for lex, ttype, line, column in self.tokenize(text) if ttype not in self.ignored_tokens])
+        return [Token(lex, ttype, line, column) for lex, ttype, line, column in self.tokenize(text) if ttype not in self.ignored_tokens]
 
     def fixed_tokens(self, tokens):
         for i, token in enumerate(tokens):
             if token.lex in self.tokens_toFix:
                 token.line = tokens[i + 1].line
                 token.column = tokens[i + 1].column
+        return tokens
 
 
     

@@ -35,9 +35,9 @@ def main(args):
     if parser.error:
         print(parser.error)
         exit(1)
-
+        
     # ast       
-    ast = evaluate_reverse_parse(G, derivation, operations, tokens)
+    ast = evaluate_reverse_parse(G, derivation, operations, lexer.fixed_tokens(tokens))
             
     context = Context()
     semantic_errors = []
