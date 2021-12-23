@@ -8,8 +8,10 @@ from cool.semantic.semantic import main_semantic
 from cool.utils.errors import SyntacticError
 
 if __name__ == '__main__':
-    path: str = f"{Path.cwd()}/src/cool/code.cl" if os.path.exists(
-        f"{Path.cwd()}/src/cool/code.cl") else f"{Path.cwd()}/cool/code.cl"
+    add = "semantic/arithmetic2.cl"
+
+    path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
+        f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
 
     _in = sys.argv[1] if len(sys.argv) > 1 else path
     _out = sys.argv[2] if len(sys.argv) > 2 else None
@@ -19,7 +21,7 @@ if __name__ == '__main__':
     with open(_in) as file:
         text = file.read()
 
-    lexer = main(text, _out)
+    lexer = main(text, _out) # into call to tokenize text
 
     lexer.lexer.lineno = 1
     lexer.lexer.linestart = 0
@@ -33,10 +35,10 @@ if __name__ == '__main__':
 
     # print(lexer)
 
-    lexer.lexer.lineno = 1
-    lexer.lexer.linestart = 0
+    # lexer.lexer.lineno = 1
+    # lexer.lexer.linestart = 0
 
-    parser = CoolParser(lexer)
+    parser = CoolParser(CoolLexer())
     ast = parser.parse(text)
 
     if parser.errors:

@@ -104,13 +104,27 @@ class CoolLexer:
 
     def t_strings_consume(self, t):
         r'[^\n]'
+        # self._update_column(t)
 
         if t.lexer.backslash:
-            if t.value in ['b', 't', 'f', 'n', '\\']:
-                t.lexer.myString += f'\{t.value}'
+            if t.value == 'b':
+                t.lexer.myString += '\b'
+
+            elif t.value == 't':
+                t.lexer.myString += '\t'
+
+
+            elif t.value == 'f':
+                t.lexer.myString += '\f'
+
+
+            elif t.value == 'n':
+                t.lexer.myString += '\n'
+
+            elif t.value == '\\':
+                t.lexer.myString += '\\'
             else:
                 t.lexer.myString += t.value
-
             t.lexer.backslash = False
         else:
             if t.value != '\\':
