@@ -71,7 +71,7 @@ class TypeChecker:
             except SemanticError:
                 pass
 
-        ans = self.visit(node.body, node.pos)
+        ans = self.visit(node.body, scope)
         return_type = get_type(c_m.return_type, self.current_type)
 
         if not ans.conforms_to(return_type):

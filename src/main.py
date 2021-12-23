@@ -8,7 +8,7 @@ from cool.semantic.semantic import main_semantic
 from cool.utils.errors import SyntacticError
 
 if __name__ == '__main__':
-    add = "semantic/arithmetic2.cl"
+    add = "semantic/self3.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
