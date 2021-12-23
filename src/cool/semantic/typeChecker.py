@@ -80,7 +80,7 @@ class TypeChecker:
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node: VarDeclarationNode, scope: Scope):
-        _type = get_type(self.context.get_type(node.type, node.pos), self.current_type)
+        _type = get_type(self._get_type(node.type, node.type_pos), self.current_type)
 
         if node.expr is not None:
             _n_type = self.visit(node.expr, scope)
