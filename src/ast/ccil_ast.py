@@ -1,18 +1,28 @@
-from typing import List
+from typing import List, Tuple
 
 
 class Node:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, node) -> None:
+        self.line: int = node.line
+        self.col: int = node.col
+        self.type = None
 
-    def __str__(self) -> str:
-        raise NotImplementedError()
+    def get_position(self) -> Tuple[int, int]:
+        return self.line, self.col
 
 
 class ExpressionNode(Node):
-    def __init__(self, locals: List = None ) -> None:
+    def __init__(self, node, value: str, locals: List[str] = None) -> None:
+        """
+        Parameters:
+        node <-  Node to set this node positon in the original cool program.
+        value <- Name of the local variable where the expresion final value is going to be stored.
+        locals <- list of local variables needed to be initialized to expression to work.
+        """
+        super().__init__(node)
         if locals is None:
             self.locals = []
+        self.value = value
         self.locals = locals
 
 
@@ -33,7 +43,11 @@ class VariableNode(ExpressionNode):
 
 
 class VarDeclarationNode(ExpressionNode):
-    pass
+    def __init__(
+        self, expr: ExpressionNode, node, value: str, locals: List = None
+    ) -> None:
+        super().__init__(node, value, locals=locals)
+        self.expression = expr
 
 
 class LetNode(ExpressionNode):
@@ -53,11 +67,11 @@ class CaseNode(ExpressionNode):
         self,
         case_expr: ExpressionNode,
         options: List[CaseOptionNode],
+        node,
+        value: str,
         locals: List = None,
     ) -> None:
-        if locals is None:
-            locals = []
-        super().__init__(locals=locals)
+        super().__init__(node, value, locals=locals)
         self.case_expr = case_expr
         self.options = options
 
@@ -68,64 +82,46 @@ class ConditionalNode(ExpressionNode):
         condition: ExpressionNode,
         then_node: ExpressionNode,
         else_node: ExpressionNode,
+        node,
+        value: str,
         locals: List = None,
     ) -> None:
-        if locals is None:
-            locals = []
-        super().__init__(locals=locals)
+        super().__init__(node, value, locals=locals)
         self.condition = condition
         self.then_node = then_node
         self.else_node = else_node
 
-    def __str__(self):
-        # ToDo
-        pass
-
 
 class BlocksNode(ExpressionNode):
-    def __init__(self, expression_list: List[ExpressionNode]) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        expression_list: List[ExpressionNode],
+        node,
+        value: str,
+        locals: List = None,
+    ) -> None:
+        super().__init__(node, value, locals=locals)
         self.expression_list = expression_list
-
-    def __str__(self):
-        block_str = "{\n"
-        block_str += ";\n".join(expression for expression in self.expression_list)
-        block_str += ";\n}\n"
-        return block_str
 
 
 class LetVarDeclarationNode(ExpressionNode):
-    def __init__(self, idx: str, typex: str, expression=None, locals=None):
-        if locals is None:
-            locals = []
-        super().__init__(self, locals=locals)
-        self.idx = idx
-        self.type = typex
+    def __init__(self, expression: ExpressionNode, node, value: str, locals=None):
+        super().__init__(self, node, value, locals=locals)
+        self.id = node.id
+        self.type = node.type
         self.expression = expression
 
 
 class DeclarationNode(Node):
-    def info(self):
-        raise NotImplementedError()
+    pass
 
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(
-        self,
-        idx: str,
-        typex: str,
-        expression: ExpressionNode = None,
-    ) -> None:
-        super().__init__()
-        self.id = idx
-        self.type = typex
+    def __init__(self, expression: ExpressionNode, node) -> None:
+        super().__init__(node)
+        self.id = node.id
+        self.type = node.type
         self.expression = expression
-
-    def __str__(self) -> str:
-        return f"attribute {self.id}"
-
-    def info(self):
-        pass
 
 
 class MethodDeclarationNode(DeclarationNode):
@@ -135,60 +131,30 @@ class MethodDeclarationNode(DeclarationNode):
         params: List[ParamNodes],
         body: ExpressionNode,
         return_type: str,
+        node,
     ) -> None:
-        super().__init__()
+        super().__init__(node)
         self.idx = idx
         self.paramas = params
         self.return_type = return_type
         self.body = body
 
-    def __str__(self):
-        # Return func name and address
-        pass
-
-    def info(self):
-        # Return all the code of the function
-        pass
-
 
 class ClassDeclarationNode(Node):
-    def __init__(self, idx: str, parent: str, features: List[DeclarationNode]) -> None:
-        super().__init__()
-        self.idx = idx
-        self.parent = parent
+    def __init__(self, features: List[DeclarationNode], node) -> None:
+        super().__init__(node)
+        self.idx = node.id
+        self.parent = "?"
         self.features = features
-
-    def __str__(self) -> str:
-        type_str = (
-            "type "
-            + self.idx
-            + (f" : {self.parent}" if self.parent != "" else "")
-            + " {\n"
-        )
-        type_str += " ;\n".join(str(feature) for feature in self.features)
-        type_str += ";\n}\n"
 
 
 class ProgramNode(Node):
     def __init__(
         self,
         types: List[ClassDeclarationNode],
-        data: List[StringNode],
-        code: List[MethodDeclarationNode],
+        data: List[str],
+        node,
     ) -> None:
-        super().__init__()
+        super().__init__(node)
         self.types = types
         self.data = data
-        self.code = code
-
-    def __str__(self) -> str:
-        types = ".TYPE\n"
-        types += "\n".join(str(typex) for typex in self.types)
-
-        data = ".DATA\n"
-        data = "\n".join(str(string_node) for string_node in self.data)
-
-        code = ".CODE\n"
-        code += "\n".join(func_node.info() for func_node in self.code)
-
-        return f"{types}\n{data}\n{code}"

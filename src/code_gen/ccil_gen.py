@@ -21,7 +21,8 @@ import ast.ccil_ast as ccil
 
 class CCILGenerator:
     def __init__(self) -> None:
-        self.count = 0
+        self.count: int = 0
+        self.data: List[str] = []
 
     @visitor.on("node")
     def visit(self, node):
@@ -33,8 +34,7 @@ class CCILGenerator:
         for declaration in node.declarations:
             class_decl.append(self.visit(declaration))
 
-        # The other things need should be deleted?
-        return ccil.ProgramNode(class_decl)
+        return ccil.ProgramNode(class_decl, self.data, node)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode) -> ccil.ClassDeclarationNode:
@@ -42,8 +42,7 @@ class CCILGenerator:
         for feature in node.features:
             class_features.append(self.visit(feature))
 
-        # Parent apparently is not needed?
-        return ccil.ClassDeclarationNode(node.id, parent="?", features=class_features)
+        return ccil.ClassDeclarationNode(class_features, node)
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode) -> ccil.AttrDeclarationNode:
@@ -67,7 +66,7 @@ class CCILGenerator:
         expr_list: List[ccil.ExpressionNode] = [
             self.visit(expr) for expr in node.expr_list
         ]
-        return ccil.BlocksNode(expr_list)
+        return ccil.BlocksNode(expr_list, node)
 
     @visitor.when(ConditionalNode)
     def visit(self, node: ConditionalNode) -> ccil.ConditionalNode:
@@ -75,7 +74,8 @@ class CCILGenerator:
         then_body: ccil.ExpressionNode = self.visit(node.then_body)
         else_body: ccil.ExpressionNode = self.visit(node.else_body)
 
-        return ccil.ConditionalNode(condition, then_body, else_body)
+        value = self.generate_var_name()
+        return ccil.ConditionalNode(condition, then_body, else_body, value, [value])
 
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode) -> ccil.CaseNode:
@@ -91,15 +91,22 @@ class CCILGenerator:
 
     @visitor.when(LetNode)
     def visit(self, node: LetNode) -> ccil.LetNode:
-        pass
+        new_decl_list: List[VarDeclarationNode] = []
+        for let_decl_node in node.var_decl_list:
+            new_decl_list.append(self.visit(let_decl_node))
+        node_expr: ccil.ExpressionNode = self.visit(node.in_expr)
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node: VarDeclarationNode) -> ccil.VarDeclarationNode:
-        pass
+        value = self.generate_var_name()
+        if node.expr is not None:
+            ccil_node_expr: ccil.ExpressionNode = self.visit(node.expr)
+            return ccil.VarDeclarationNode(ccil_node_expr, node, value, [value])
+        return ccil.VarDeclarationNode(None, node, value, [value])
 
     @visitor.when(VariableNode)
     def visit(self, node: VariableNode) -> ccil.VariableNode:
-        pass
+        return ccil.VariableNode(node, value=node.id)
 
     @visitor.when(StringNode)
     def visit(self, node: StringNode) -> ccil.StringNode:
@@ -107,7 +114,7 @@ class CCILGenerator:
 
     @visitor.when(IntNode)
     def visit(self, node: IntNode) -> ccil.IntNode:
-        pass
+        return ccil.IntNode(node, value="")
 
     def generate_var_name(self) -> str:
         """Generate a new local name"""
