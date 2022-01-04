@@ -54,6 +54,100 @@ $$
 
 ## Transformaciones
 
+#### Program Declaration
+
+**Cool Input**
+
+```haskell
+class A1 { ... }
+class A2 { ... }
+...
+class AN { ... }
+```
+
+**CCIL Output**
+
+```assembly
+<class_A1_attr_and_func_declaration>
+...
+<class_AN_attr_and_func_declaration>
+
+# Pending, should string literals be added here?
+<all_constant_data_from_program>
+
+<all_code_from_class_A1>
+...
+<all_code_from_class_AN
+```
+
+#### Class Declaration
+
+En que momento se ejecuta la inicializacion de los atributos?
+
+**Cool Input**
+
+```haskell
+class C {
+	-- Initialized attributes
+    a1: <attr_type> <- <expression>;
+    a2: <attr_type> <- <expression>;
+    ...
+    am: <attr_type> <- <expression>;
+    -- Uninitialized attributes
+    aq: <attr_type>;
+    ...
+    ak: <attr_type>;
+    
+    -- Functions
+	f1(<param_list>) { <expression> }
+    f2(<param_list>) { <expression> }
+    ...
+    fn(<param_list>) { <expression> }
+    
+}
+```
+
+**CCIL Output**
+
+```assembly
+type C {
+	# Initialized and uninitialized attributes together
+	attribute a1;
+	...
+	attribute am;
+	attribute aq;
+	...
+	attribute ak;
+	
+	method f1 : <func_code_name>;
+	...
+	method fn : <func_code_name>;
+}
+```
+
+#### Class Inheritance
+
+Se annade sobre la que ya tiene A, como se maneja la memoria, se annaden los atributos de B, despues de las funciones de A, o despues de los atributos de A
+
+**Cool Input**
+
+```haskell
+class A {
+	
+}
+
+class B inherits A {
+
+}
+```
+
+**CCIL Output**
+
+```
+```
+
+
+
 #### While Loop
 
 **Cool Input**
