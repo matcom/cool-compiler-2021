@@ -1,6 +1,7 @@
 from typing import Dict, List
+from code_gen.constants import ATTR_NAME
 from utils import visitor
-from ast.types_ast import (
+from asts.types_ast import (
     CaseNode,
     CaseOptionNode,
     ConditionalNode,
@@ -16,15 +17,21 @@ from ast.types_ast import (
     VarDeclarationNode,
     VariableNode,
 )
-from code_gen.tools import make_id
-import ast.ccil_ast as ccil
+from code_gen.tools import Feature, make_id
+import asts.ccil_ast as ccil
 
 
 class CCILGenerator:
     def __init__(self) -> None:
-        self.constant_data: List[str]
-        # This is not needed in this layer of abstraction
+        self.warnings: List[str] = []
+        self.constant_data: List[str] = []
         self.count: Dict[str, int] = {"while": 0, "if": 0, "case": 0, "function": 0}
+
+        self.class_name: str
+        self.attr_count: int
+        self.func_count: int
+        self.feature_name: str
+        self.local_var_count: int
 
     @visitor.on("node")
     def visit(self, _):
@@ -34,20 +41,35 @@ class CCILGenerator:
     def visit(self, node: ProgramNode) -> ccil.ProgramNode:
         class_decl: List[ccil.ClassDeclarationNode] = []
         for declaration in node.declarations:
+            self.set_class_params(declaration.id)
             class_decl.append(self.visit(declaration))
 
         return ccil.ProgramNode(class_decl, self.constant_data, node)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode) -> ccil.ClassDeclarationNode:
-        class_features: List[ccil.DeclarationNode] = []
-        for feature in node.features:
-            class_features.append(self.visit(feature))
+        class_attr: List[ccil.AttrDeclarationNode] = []
+        class_func: List[ccil.MethodDeclarationNode] = []
+        class_feat: List[Feature] = []
 
-        return ccil.ClassDeclarationNode(class_features, node)
+        # Sort by putting attributes first, delete if this is the case already
+        node.features.sort(key=lambda x: isinstance(x, AttrDeclarationNode))
+        for feature in node.features:
+            self.set_feature_params(feature.id)
+            if isinstance(feature, AttrDeclarationNode):
+                class_attr.append(self.visit(feature))
+                class_feat.append(Feature(feature.id, "ccil_name", True))
+            else:
+                class_func.append(self.visit(feature))
+                class_feat.append(Feature(feature.id, "ccil_name", False))
+
+        return ccil.ClassDeclarationNode(class_attr, class_func, class_feat, node)
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode) -> ccil.AttrDeclarationNode:
+        ccil_node_name = make_id(
+            ATTR_NAME,
+        )
         ccil_node: ccil.AttrDeclarationNode = ccil.AttrDeclarationNode(
             node.id, node.type, None
         )
@@ -78,7 +100,7 @@ class CCILGenerator:
         else_body: ccil.ExpressionNode = self.visit(node.else_body)
 
         value = self.generate_var_name()
-        return ccil.ConditionalNode(condition, then_body, else_body, value, [value])
+        return ccil.ConditionalNode(condition, then_body, else_body, [value])
 
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode) -> ccil.CaseNode:
@@ -119,3 +141,12 @@ class CCILGenerator:
     @visitor.when(IntNode)
     def visit(self, node: IntNode) -> ccil.IntNode:
         return ccil.IntNode(node, value="")
+
+    def set_class_params(self, name: str):
+        self.class_name = name
+        self.attr_count = 0
+        self.func_count = 0
+
+    def set_feature_params(self, name: str):
+        self.feature_name = name
+        self.local_var_count = 0
