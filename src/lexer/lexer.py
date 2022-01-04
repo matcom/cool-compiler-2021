@@ -1,14 +1,9 @@
-import ply.lex as lex
-from utils.errors import *
+from ply import lex
+from src.utils.errors import LexicographicError
+from src.utils.utils import Token
 
 
 class CoolLexer:
-    def __init__(self, **kwargs):
-        self.errors = []
-        self.lexer = lex.lex(modele=self, **kwargs)
-        self.lexer.lineno = 1
-        self.lexer.linestart = 0
-        self.errors = []
 
     states = (
         ('comments', 'exclusive'),
@@ -63,11 +58,15 @@ class CoolLexer:
         'NOT'
     ] + list(reserved.values())
 
+    def __init__(self, **kwargs):
+        self.errors = []
+        self.lexer = lex.lex(module=self, **kwargs)
+        self.lexer.lineno = 1
+        self.lexer.linestart = 0
+        self.errors = []
+        self.text = None
+
     # Comments
-    def t_comment(self, t):
-        r'--.*($|\n)'
-        t.lexer.lineno += 1
-        t.lexer.linestart = t.lexer.lexpos
 
     def t_comments(self, t):
         r'\(\*'
@@ -131,13 +130,13 @@ class CoolLexer:
 
         if not t.lexer.backslash:
             self.errors.append(LexicographicError(
-                'Undeterminated string constant'), t.line, t.column)
+                'Undeterminated string constant', t.line, t.column))
             t.lexer.begin('INITIAL')
 
     def t_strings_nill(self, t):
         r'\0'
         self.add_line_column(t)
-        self.errors.append(LexicographicErroricError(
+        self.errors.append(LexicographicError(
             'Null caracter in string', t.line, t.column))
 
     def t_strings_consume(self, t):
@@ -157,7 +156,7 @@ class CoolLexer:
             else:
                 t.lexer.string += t.value
 
-            t.backslash = FALSE
+            t.backslash = False
         else:
             if t.value != '\\':
                 t.lexer.string += t.value
@@ -166,7 +165,7 @@ class CoolLexer:
 
     def t_strings_eof(self, t):
         self.add_line_column(t)
-        self.errors.append(LexicographicErroricError(
+        self.errors.append(LexicographicError(
             'EOF in string constant', t.line, t.column))
 
     def find_column(self, t):
@@ -194,7 +193,7 @@ class CoolLexer:
         self.add_line_column(t)
         return t
 
-    def t_RPAREN(self, t):
+    def t_RBRACE(self, t):
         r'\}'
         self.add_line_column(t)
         return t
@@ -300,17 +299,18 @@ class CoolLexer:
     def t_error(self, t):
         self.add_line_column(t)
         self.errors.append(LexicographicError(
-            f'ERROR \"{t.value[0]}\"', line, column))
+            f'ERROR \"{t.value[0]}\"', t.line, t.column))
         t.lexer.skip(1)
 
     def tokenize(self, text):
+        self.text = text
         self.lexer.input(text)
         tokens = []
         for token in self.lexer:
             tokens.append(Token(token.value, token.type,
                                 token.row, token.column))
         self.lexer.lineno = 1
-        self.linestart = 0
+        self.lexer.linestart = 0
         return tokens
 
     def run(self, text):
