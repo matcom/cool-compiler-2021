@@ -1,4 +1,5 @@
 from typing import List, Tuple
+from __future__ import annotations
 
 
 class Node:
@@ -12,7 +13,7 @@ class Node:
 
 
 class ProgramNode(Node):
-    def __init__(self, declarations, node: Node):
+    def __init__(self, declarations: List[ClassDeclarationNode], node: Node):
         Node.__init__(self, node)
         self.declarations = declarations
 
@@ -22,10 +23,13 @@ class DeclarationNode(Node):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, features, node):
+    def __init__(
+        self, features: List[AttrDeclarationNode | MethodDeclarationNode], node
+    ):
         Node.__init__(self, node)
-        self.features = features
-        self.id = node.id
+        self.id: str = node.id
+        self.features: List[AttrDeclarationNode | MethodDeclarationNode] = features
+        self.parent = node.parent
 
 
 class AttrDeclarationNode(DeclarationNode):
