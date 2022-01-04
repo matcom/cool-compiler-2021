@@ -240,6 +240,7 @@ esac
 ...
 <init idn>
 
+<do_case_expr>
 x = <case_expr_result>
 t = typeof x
 label init_case
