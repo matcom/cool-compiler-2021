@@ -1,4 +1,5 @@
 from ply import lex
+
 from src.utils.errors import LexicographicError
 from src.utils.utils import Token
 

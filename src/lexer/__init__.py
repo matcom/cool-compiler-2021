@@ -1,1 +1,1 @@
-from lexer.lexer import CoolLexer
+from src.lexer.lexer import CoolLexer

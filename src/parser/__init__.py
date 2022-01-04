@@ -1,1 +1,1 @@
-from parser.parser import CoolParser
+from src.parser.parser import CoolParser

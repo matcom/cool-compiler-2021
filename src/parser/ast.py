@@ -28,15 +28,15 @@ class FuncDeclarationNode(Node):
         self.name = name
         self.params = params
         self.return_type = return_type
-        self.exp = exp
+        self.expr = expr
 
 
 class AttrDeclarationNode(Node):
-    def __init__(self, name, type, expr=None):
+    def __init__(self, name, typex, expr=None):
         super().__init__()
         self.name = name
-        self.type = type
-        self.exp = exp
+        self.type = typex
+        self.expr = expr
 
 
 class ExpressionNode(Node):
@@ -53,12 +53,12 @@ class AssignNode(ExpressionNode):
 
 
 class FuncCallNode(ExpressionNode):
-    def __init__(self, id, args, object=None, type=None):
+    def __init__(self, idx, args, obj=None, typex=None):
         super().__init__()
-        self.id = id
+        self.id = idx
         self.args = args
-        self.object = object
-        self.type = type
+        self.object = obj
+        self.type = typex
 
 
 class IfNode(ExpressionNode):
@@ -93,27 +93,27 @@ class CaseNode(ExpressionNode):
     def __init__(self, expr, case_list):
         super().__init__()
         self.expr = expr
-        self.case_list = case_list:
+        self.case_list = case_list
 
 
 class CaseOptionNode(ExpressionNode):
-    def __init__(self, id, type, expr):
+    def __init__(self, idx, typex, expr):
         super().__init__()
-        self.id = id
+        self.id = idx
         self.expr = expr
-        self.type = type
+        self.type = typex
 
 
 class VarNode(ExpressionNode):
-    def __init__(self, id):
+    def __init__(self, idx):
         super().__init__()
-        self.id = id
+        self.id = idx
 
 
 class NewNode(ExpressionNode):
-    def __init__(self, type):
+    def __init__(self, typex):
         super().__init__()
-        self.type = type
+        self.type = typex
 
 
 # ---------------- Binary Nodes ------------------
