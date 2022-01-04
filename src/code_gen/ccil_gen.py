@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 from utils import visitor
 from ast.types_ast import (
     CaseNode,
@@ -16,16 +16,18 @@ from ast.types_ast import (
     VarDeclarationNode,
     VariableNode,
 )
+from code_gen.tools import make_id
 import ast.ccil_ast as ccil
 
 
 class CCILGenerator:
     def __init__(self) -> None:
-        self.count: int = 0
-        self.data: List[str] = []
+        self.constant_data: List[str]
+        # This is not needed in this layer of abstraction
+        self.count: Dict[str, int] = {"while": 0, "if": 0, "case": 0, "function": 0}
 
     @visitor.on("node")
-    def visit(self, node):
+    def visit(self, _):
         pass
 
     @visitor.when(ProgramNode)
@@ -34,7 +36,7 @@ class CCILGenerator:
         for declaration in node.declarations:
             class_decl.append(self.visit(declaration))
 
-        return ccil.ProgramNode(class_decl, self.data, node)
+        return ccil.ProgramNode(class_decl, self.constant_data, node)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode) -> ccil.ClassDeclarationNode:
@@ -55,10 +57,11 @@ class CCILGenerator:
 
     @visitor.when(MethodDeclarationNode)
     def visit(self, node: MethodDeclarationNode) -> ccil.MethodDeclarationNode:
-        # What to do about parameter ?? Unanswered question from the past...
+
+        for param in node.params:
+            pass
 
         body: ccil.ExpressionNode = self.visit(node.body)
-        # Fill return with something :(
         return MethodDeclarationNode()
 
     @visitor.when(BlocksNode)
@@ -79,7 +82,8 @@ class CCILGenerator:
 
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode) -> ccil.CaseNode:
-        pass
+        locals = []
+        expressions = []
 
     @visitor.when(CaseOptionNode)
     def visit(self, node: CaseOptionNode) -> ccil.CaseOptionNode:
@@ -115,8 +119,3 @@ class CCILGenerator:
     @visitor.when(IntNode)
     def visit(self, node: IntNode) -> ccil.IntNode:
         return ccil.IntNode(node, value="")
-
-    def generate_var_name(self) -> str:
-        """Generate a new local name"""
-        self.count += 1
-        return f"v{self.count}"
