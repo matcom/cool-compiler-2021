@@ -1,5 +1,7 @@
 from typing import List, Tuple
 
+from code_gen.tools import LocalVar
+
 
 class Node:
     def __init__(self, node) -> None:
@@ -12,18 +14,22 @@ class Node:
 
 
 class ExpressionNode(Node):
-    def __init__(self, node, value: str, locals: List[str] = None) -> None:
+    def __init__(self, node, locals: List[LocalVar] = None) -> None:
         """
         Parameters:
         node <-  Node to set this node positon in the original cool program.
-        value <- Name of the local variable where the expresion final value is going to be stored.
         locals <- List of local variables needed to be initialized to execute expression.
+        value <- Name of the local variable where the expresion final value is going to be stored.
         """
         super().__init__(node)
         if locals is None:
-            self.locals = []
-        self.value = value
+            locals = []
+
         self.locals = locals
+
+    @property
+    def value(self):
+        return self.locals[-1]
 
 
 class AtomicNode(ExpressionNode):
@@ -43,10 +49,8 @@ class VariableNode(ExpressionNode):
 
 
 class VarDeclarationNode(ExpressionNode):
-    def __init__(
-        self, expr: ExpressionNode, node, value: str, locals: List = None
-    ) -> None:
-        super().__init__(node, value, locals=locals)
+    def __init__(self, expr: ExpressionNode, node, locals: List = None) -> None:
+        super().__init__(node, locals=locals)
         self.expression = expr
 
 
@@ -68,10 +72,9 @@ class CaseNode(ExpressionNode):
         case_expr: ExpressionNode,
         options: List[CaseOptionNode],
         node,
-        value: str,
         locals: List = None,
     ) -> None:
-        super().__init__(node, value, locals=locals)
+        super().__init__(node, locals=locals)
         self.case_expr = case_expr
         self.options = options
 
@@ -83,10 +86,9 @@ class ConditionalNode(ExpressionNode):
         then_node: ExpressionNode,
         else_node: ExpressionNode,
         node,
-        value: str,
         locals: List = None,
     ) -> None:
-        super().__init__(node, value, locals=locals)
+        super().__init__(node, locals=locals)
         self.condition = condition
         self.then_node = then_node
         self.else_node = else_node
@@ -97,16 +99,15 @@ class BlocksNode(ExpressionNode):
         self,
         expression_list: List[ExpressionNode],
         node,
-        value: str,
         locals: List = None,
     ) -> None:
-        super().__init__(node, value, locals=locals)
+        super().__init__(node, locals=locals)
         self.expression_list = expression_list
 
 
 class LetVarDeclarationNode(ExpressionNode):
-    def __init__(self, expression: ExpressionNode, node, value: str, locals=None):
-        super().__init__(self, node, value, locals=locals)
+    def __init__(self, expression: ExpressionNode, node, locals=None):
+        super().__init__(self, node, locals=locals)
         self.id = node.id
         self.type = node.type
         self.expression = expression
@@ -117,35 +118,43 @@ class DeclarationNode(Node):
 
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, expression: ExpressionNode, node) -> None:
+    def __init__(self, expression: ExpressionNode | None, node) -> None:
         super().__init__(node)
         self.id = node.id
         self.type = node.type
         self.expression = expression
+        self.value = expression.value if expression is not None else None
 
 
 class MethodDeclarationNode(DeclarationNode):
     def __init__(
         self,
         idx: str,
-        params: List[ParamNodes],
+        params: List[VarDeclarationNode],
         body: ExpressionNode,
-        return_type: str,
         node,
     ) -> None:
         super().__init__(node)
-        self.idx = idx
-        self.paramas = params
-        self.return_type = return_type
-        self.body = body
+        self.idx: str = idx
+        self.params: List[VarDeclarationNode] = params
+        self.body: ExpressionNode = body
+        self.value = body.value
 
 
 class ClassDeclarationNode(Node):
-    def __init__(self, features: List[DeclarationNode], node) -> None:
+    def __init__(
+        self,
+        attributes: List[AttrDeclarationNode],
+        methods: List[MethodDeclarationNode],
+        feature_info: List,
+        node,
+    ) -> None:
         super().__init__(node)
-        self.idx = node.id
-        self.parent = "?"
-        self.features = features
+        self.idx: str = node.id
+        self.parent: str = node.parent
+        self.attributes: List[AttrDeclarationNode] = attributes
+        self.methods: List[MethodDeclarationNode] = methods
+        self.feature_info: List = feature_info
 
 
 class ProgramNode(Node):
