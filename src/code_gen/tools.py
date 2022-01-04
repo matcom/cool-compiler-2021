@@ -4,6 +4,17 @@ from asts.ccil_ast import ExpressionNode
 
 
 @dataclass
+class Feature:
+    cool_name: str
+    ccil_name: str
+    attribute: bool
+
+    @property
+    def is_attribute(self):
+        return self.attribute
+
+
+@dataclass
 class LocalVar:
     cool_name: str
     ccil_name: str
