@@ -1,5 +1,5 @@
 from ply.yacc import yacc
-from ast.parser_ast import (
+from asts.parser_ast import (
     AssignNode,
     AttrDeclarationNode,
     BlocksNode,
