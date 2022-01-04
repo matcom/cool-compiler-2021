@@ -3,8 +3,8 @@ from semantics.tools.type import Type, join_list
 from utils import visitor
 
 from semantics.tools import TypeBag, Scope
-import ast.types_ast as types_ast
-from ast.inferencer_ast import (
+import asts.types_ast as types_ast
+from asts.inferencer_ast import (
     BinaryNode,
     BooleanNode,
     ComplementNode,

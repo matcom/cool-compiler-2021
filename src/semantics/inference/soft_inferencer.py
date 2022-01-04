@@ -1,7 +1,7 @@
 from inspect import currentframe
 from typing import Type
-import ast.inferencer_ast as inf_ast
-from ast.parser_ast import (
+import asts.inferencer_ast as inf_ast
+from asts.parser_ast import (
     ArithmeticNode,
     AssignNode,
     AttrDeclarationNode,

@@ -1,5 +1,5 @@
 from utils import visitor
-from ast.inferencer_ast import (
+from asts.inferencer_ast import (
     AssignNode,
     AtomicNode,
     AttrDeclarationNode,

@@ -5,7 +5,7 @@ from typing import Tuple
 from semantics.tools.type import Method, SelfType, Type
 from semantics.tools import Context, Scope, TypeBag, join, join_list, unify
 from utils import visitor
-from ast.inferencer_ast import (
+from asts.inferencer_ast import (
     ProgramNode,
     ClassDeclarationNode,
     MethodDeclarationNode,

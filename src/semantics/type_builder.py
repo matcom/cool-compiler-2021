@@ -1,5 +1,5 @@
 from utils import visitor
-from ast.parser_ast import (
+from asts.parser_ast import (
     Node,
     ProgramNode,
     ClassDeclarationNode,

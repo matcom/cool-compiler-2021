@@ -1,4 +1,4 @@
-from ast.parser_ast import ClassDeclarationNode, Node, ProgramNode
+from asts.parser_ast import ClassDeclarationNode, Node, ProgramNode
 
 from semantics.tools.errors import SemanticError
 from semantics.tools import Context, SelfType

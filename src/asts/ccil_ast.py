@@ -17,7 +17,7 @@ class ExpressionNode(Node):
         Parameters:
         node <-  Node to set this node positon in the original cool program.
         value <- Name of the local variable where the expresion final value is going to be stored.
-        locals <- list of local variables needed to be initialized to expression to work.
+        locals <- List of local variables needed to be initialized to execute expression.
         """
         super().__init__(node)
         if locals is None:

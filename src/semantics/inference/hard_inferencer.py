@@ -1,5 +1,5 @@
 from semantics.tools.errors import InternalError, AttributeError
-from ast.inferencer_ast import (
+from asts.inferencer_ast import (
     ArithmeticNode,
     AssignNode,
     AttrDeclarationNode,
