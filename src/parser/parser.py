@@ -1,6 +1,7 @@
-import ply.yacc as yacc
-from ast import *
-from utils.utils import *
+from ply import yacc
+from src.parser.ast import *
+from src.utils.errors import SyntacticError
+from src.utils.utils import find_column
 
 
 class CoolParser:
@@ -28,7 +29,6 @@ class CoolParser:
 
     def p_epsilon(self, p):
         'epsilon :'
-        pass
 
     def p_class_list(self, p):
         '''class_list : def_class SEMICOLON class_list
@@ -166,7 +166,7 @@ class CoolParser:
         '''expr : NOT expr
                 | ISVOID expr'''
         if p[1] == '~':
-            p[0] = NegationNode(p[2])
+            p[0] = NotNode(p[2])
         elif p[1].lower() == 'isvoid':
             p[0] = IsVoidNode(p[2])
 
@@ -207,7 +207,7 @@ class CoolParser:
                     | expr COMMA arg_list'''
         p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[3]
 
-    def p_arg_list_empty(p):
+    def p_arg_list_empty(self, p):
         '''arg_list_empty : epsilon'''
         p[0] = []
 
@@ -261,4 +261,4 @@ class CoolParser:
             self.errors.append(SyntacticError(
                 f'ERROR at or near {p.value}', p.line, p.column))
         else:
-            self.errors.append(SyntacticError(f'ERROR at or near EOF', 0, 0))
+            self.errors.append(SyntacticError('ERROR at or near EOF', 0, 0))
