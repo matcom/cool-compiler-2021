@@ -7,7 +7,7 @@ class Token:
     def __init__(self, lex, token_type, row, column):
         self.lex = lex
         self.type = token_type
-        self.line = line
+        self.line = row
         self.column = column
 
     def __str__(self):

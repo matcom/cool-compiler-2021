@@ -1,12 +1,12 @@
 class CoolError():
     def __init__(self, error_type, text, line, column):
-        self.type = type
+        self.type = error_type
         self.text = text
         self.line = line
         self.column = column
 
     def __str__(self):
-        return f'({self.line, self.column}) - {self.error_type}: {self.text}'
+        return f'({self.line, self.column}) - {self.type}: {self.text}'
 
     def __repr__(self):
         return str(self)

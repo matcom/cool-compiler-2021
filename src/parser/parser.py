@@ -21,7 +21,7 @@ class CoolParser:
     )
 
     def parse(self, program):
-        pass
+        return self.parser.parse(program, self.lexer.lexer)
 
     def p_program(self, p):
         'program : class_list'

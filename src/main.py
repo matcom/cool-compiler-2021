@@ -1,6 +1,7 @@
 import sys
-from parser import CoolParser
-from lexer import CoolLexer
+
+from src.lexer import CoolLexer
+from src.parser import CoolParser
 
 
 def main(input, output):
@@ -10,16 +11,21 @@ def main(input, output):
 
         lexer = CoolLexer()
         tokens = lexer.run(text)
+        print(tokens)
 
         parser = CoolParser(lexer)
-        ast = parser.parse(text, debug=True)
+
+        ast = parser.parse(text)
+        print(ast)
+        if parser.errors:
+            raise Exception()
 
     except FileNotFoundError:
         pass
 
 
 if __name__ == "__main__":
-    input = sys.argv[1]
-    output = sys.argv[2]
+    input_ = sys.argv[1]
+    output_ = sys.argv[2]
 
-    main(input, output)
+    main(input_, output_)
