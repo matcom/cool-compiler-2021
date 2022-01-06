@@ -1,13 +1,15 @@
 import sys
 
-from src.lexer import CoolLexer
-from src.parser import CoolParser
+from lexer import CoolLexer
+from parser import CoolParser
 
 
-def main(input, output):
+def main(input_):
     try:
-        with open(input) as f:
+        with open(input_) as f:
             text = f.read()
+
+        print(text)
 
         lexer = CoolLexer()
         tokens = lexer.run(text)
@@ -25,7 +27,9 @@ def main(input, output):
 
 
 if __name__ == "__main__":
-    input_ = sys.argv[1]
-    output_ = sys.argv[2]
+    # input_ = sys.argv[1]
+    # output_ = sys.argv[2]
+    # main(input_, output_)
 
-    main(input_, output_)
+    input_ = 'mytest.cl'
+    main(input_)

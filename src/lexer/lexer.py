@@ -1,7 +1,7 @@
 from ply import lex
 
-from src.utils.errors import LexicographicError
-from src.utils.utils import Token
+from utils.errors import LexicographicError
+from utils.utils import Token
 
 
 class CoolLexer:

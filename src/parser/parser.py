@@ -1,7 +1,7 @@
 from ply import yacc
-from src.parser.ast import *
-from src.utils.errors import SyntacticError
-from src.utils.utils import find_column
+from ast import *
+from utils.errors import SyntacticError
+from utils.utils import find_column
 
 
 class CoolParser:
