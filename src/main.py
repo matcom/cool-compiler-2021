@@ -33,5 +33,5 @@ if __name__ == "__main__":
     # output_ = sys.argv[2]
     # main(input_, output_)
 
-    input_ = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/src/mytest.cl'
+    input_ = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/lexer/iis2.cl'
     main(input_)

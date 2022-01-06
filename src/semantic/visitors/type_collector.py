@@ -1,4 +1,6 @@
 from utils import visitor
+from utils.ast import ProgramNode, ClassDeclarationNode
+from semantic.
 
 
 
@@ -16,7 +18,7 @@ class TypeCollector(object):
     
     @visitor.when(ProgramNode)
     def visit(self, node):
-        pass
+        self.context = Context()
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):

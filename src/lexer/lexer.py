@@ -205,6 +205,11 @@ class CoolLexer:
         self.add_line_column(t)
         return t
 
+    def t_ARROW(self, t):
+        r'=>'
+        self.add_line_column(t)
+        return t
+
     def t_EQUAL(self, t):
         r'='
         self.add_line_column(t)
@@ -217,11 +222,6 @@ class CoolLexer:
 
     def t_LESSEQ(self, t):
         r'<='
-        self.add_line_column(t)
-        return t
-
-    def t_ARROW(self, t):
-        r'=>'
         self.add_line_column(t)
         return t
 
