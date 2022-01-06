@@ -1,3 +1,4 @@
+import cil_ast as cil
 class BaseCOOLToCILVisitor:
     def __init__(self, context):
         self.dottypes = []
