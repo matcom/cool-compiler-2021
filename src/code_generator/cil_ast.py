@@ -1,55 +1,51 @@
-class ASTNode:
-    def __init__(self):
-        pass
-    def __repr__(self):
-        return str(self)
+class Node:
+    pass
 
-class ProgramNode(ASTNode):
+class ProgramNode(Node):
     def __init__(self, dottypes, dotdata, dotcode):
         self.dottypes = dottypes
         self.dotdata = dotdata
         self.dotcode = dotcode
 
 #.TYPE
-class TypeNode(ASTNode):
+class TypeNode(Node):
     def __init__(self, name):
         self.name = name
         self.attributes = []
-        self.methods = {}
+        self.methods = []
 
 #.DATA
-class DataNode(ASTNode):
+class DataNode(Node):
     def __init__(self, vname, value):
         self.name = vname
         self.value = value
         
 #.CODE
-class FunctionNode(ASTNode):
+class FunctionNode(Node):
     def __init__(self, name, params=[], localvars=[], instructions =[]):
         self.name = name
         self.params = params
         self.localvars = localvars
         self.instructions = instructions
 
-class ExpressionNode(ASTNode):
+class InstructionNode(Node):
     def __init__(self):
         pass
 
-#sin type expression
-class ParamNode(ExpressionNode):
+class ParamNode(InstructionNode):
     def __init__(self, name):
         self.name = name
 
-class LocalNode(ExpressionNode):
+class LocalNode(InstructionNode):
     def __init__(self, name):
         self.name = name
 
-class AssignNode(ExpressionNode):
-    def __init__(self, dest, expr):
+class AssignNode(InstructionNode):
+    def __init__(self, dest, source):
         self.dest = dest
-        self.expr = expr
+        self.source = source
 
-class ArithExpressionNode(ExpressionNode):
+class ArithExpressionNode(InstructionNode):
     def __init__(self, dest, left, right):
         self.dest = dest
         self.left = left
@@ -78,14 +74,14 @@ class EqualNode(ArithExpressionNode):
     pass
 
 #Attr
-class GetAttrNode(ExpressionNode):
+class GetAttrNode(InstructionNode):
     def __init__(self, dest, instance, attr, static_type):
         self.local_dest = dest
         self.instance = instance
         self.attr = attr
         self.static_type = static_type
         
-class SetAttrNode(ExpressionNode):
+class SetAttrNode(InstructionNode):
     def __init__(self, instance, attr, value, static_type):
         self.instance = instance
         self.attr = attr
@@ -94,41 +90,41 @@ class SetAttrNode(ExpressionNode):
 
 
 #Arrays and Strings
-class GetIndexNode(ExpressionNode):
+class GetIndexNode(InstructionNode):
     pass
-class SetIndexNode(ExpressionNode):
+class SetIndexNode(InstructionNode):
     pass
 
 #Memory
-class AllocateNode(ExpressionNode):
+class AllocateNode(InstructionNode):
     def __init__(self, t, dest):
         self.type = t
         self.local_dest = dest
         
-class ArrayNode(ExpressionNode):
+class ArrayNode(InstructionNode):
     pass
 
-class TypeOfNode(ExpressionNode):
-    def __init__(self, t, dest):
-        self.var = t
+class TypeOfNode(InstructionNode):
+    def __init__(self, obj, dest):
+        self.obj = obj
         self.local_dest = dest
 
 #Jumps
-class LabelNode(ExpressionNode):
+class LabelNode(InstructionNode):
     def __init__(self, label):
         self.label = label
 
-class GoToNode(ExpressionNode):
+class GoToNode(InstructionNode):
     def __init__(self, label):
         self.label = label
 
-class IfGoTo(ExpressionNode):
+class IfGoTo(InstructionNode):
     def __init__(self, condition, label):
         self.condition = condition
         self.label = label
 
 #Static Invocation
-class CallNode(ExpressionNode):
+class CallNode(InstructionNode):
     def __init__(self, dest, func, args, static_type, ret_type):
         self.local_dest = dest
         self.function = func
@@ -137,7 +133,7 @@ class CallNode(ExpressionNode):
         self.ret_type = ret_type
 
 #Dynamic Invocation
-class VCallNode(ExpressionNode):
+class VCallNode(InstructionNode):
     def __init__(self, instance, dest, func, args, dynamic_type, ret_type):
         self.instance = instance
         self.local_dest = dest
@@ -148,55 +144,61 @@ class VCallNode(ExpressionNode):
 
 
 #Args
-class ArgNode(ExpressionNode):
+class ArgNode(InstructionNode):
     def __init__(self, name):
         self.name = name
 
 
 #Return
-class ReturnNode(ExpressionNode):
+class ReturnNode(InstructionNode):
     def __init__(self, value):
         self.value = value
 
 #IO
-class LoadNode(ExpressionNode):
+class LoadNode(InstructionNode):
     def __init__(self, dest, msg):
         self.local_dest = dest
         self.msg = msg
 
-class LengthNode(ExpressionNode):
+class LengthNode(InstructionNode):
     def __init__(self, dest, arg):
         self.local_dest = dest
         self.arg = arg
         
-class ConcatNode(ExpressionNode):
+class ConcatNode(InstructionNode):
     def __init__(self, dest, head, tail):
         self.local_dest = dest
         self.head = head
         self.tail = tail
 
-class PrefixNode(ExpressionNode):
+class PrefixNode(InstructionNode):
     def __init__(self, dest, string, n):
         self.local_dest = dest
         self.string = string
         self.n = n
 
-class SubstringNode(ExpressionNode):
+class SubstringNode(InstructionNode):
     def __init__(self, dest, string, begin, final):
         self.local_dest = dest
         self.begin = begin
         self.string = string
         self.final = final
 
-class StrNode(ExpressionNode):
+class StrNode(InstructionNode):
     def __init__(self, dest, value):
         self.local_dest = dest
         self.value = value
 
-class ReadNode(ExpressionNode):
+class ToStrNode(InstructionNode):
+    def __init__(self, dest, ivalue):
+        self.dest = dest
+        self.ivalue = ivalue
+
+class ReadNode(InstructionNode):
     def __init__(self, dest):
         self.local_dest = dest
 
-class PrintNode(ExpressionNode):
+class PrintNode(InstructionNode):
     def __init__(self, value):
         self.value = value
+
