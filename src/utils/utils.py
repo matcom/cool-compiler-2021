@@ -15,3 +15,51 @@ class Token:
 
     def __repr__(self):
         return str(self)
+
+
+reserved = {
+    'class': 'CLASS',
+    'else': 'ELSE',
+    'fi': 'FI',
+    'if': 'IF',
+    'in': 'IN',
+    'inherits': 'INHERITS',
+    'isvoid': 'ISVOID',
+    'let': 'LET',
+    'loop': 'LOOP',
+    'pool': 'POOL',
+    'then': 'THEN',
+    'while': 'WHILE',
+    'case': 'CASE',
+    'esac': 'ESAC',
+    'new': 'NEW',
+    'of': 'OF',
+    'not': 'LNOT'
+}
+
+tokens = [
+    'ID',
+    'TYPE',
+    'LPAREN',
+    'RPAREN',
+    'LBRACE',
+    'RBRACE',
+    'COLON',
+    'SEMICOLON',
+    'COMMA',
+    'DOT',
+    'AT',
+    'ASSIGN',
+    'PLUS',
+    'MINUS',
+    'STAR',
+    'DIV',
+    'EQUAL',
+    'LESS',
+    'LESSEQ',
+    'ARROW',
+    'INT',
+    'STRING',
+    'NOT',
+    'BOOL'
+] + list(reserved.values())

@@ -1,12 +1,13 @@
 from ply import yacc
 from utils.ast import *
 from utils.errors import SyntacticError
-from utils.utils import find_column
+from utils.utils import find_column, tokens
 
 
 class CoolParser:
     def __init__(self, lexer):
         self.lexer = lexer
+        self.tokens = tokens
         self.parser = yacc.yacc(start='program', module=self)
         self.errors = []
 
@@ -80,7 +81,7 @@ class CoolParser:
         p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[3]
 
     def p_param_list_empty(self, p):
-        '''para,_list_empty : epsilon'''
+        '''param_list_empty : epsilon'''
         p[0] = []
 
     def p_param(self, p):
@@ -164,11 +165,14 @@ class CoolParser:
 
     def p_expr_operators_unary(self, p):
         '''expr : NOT expr
-                | ISVOID expr'''
+                | ISVOID expr
+                | LNOT expr'''
         if p[1] == '~':
-            p[0] = NotNode(p[2])
+            p[0] = NegationNode(p[2])
         elif p[1].lower() == 'isvoid':
             p[0] = IsVoidNode(p[2])
+        elif p[1].lower() == 'not':
+            p[0] = LogicNegationNode(p[2])
 
         p[0].add_line_column(p.lineno(2), find_column(
             p.lexer.lexdata, p.lexpos(2)))

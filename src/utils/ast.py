@@ -161,7 +161,11 @@ class UnaryNode(ExpressionNode):
         self.value = value
 
 
-class NotNode(UnaryNode):
+class NegationNode(UnaryNode):
+    pass
+
+
+class LogicNegationNode(UnaryNode):
     pass
 
 

@@ -1,7 +1,7 @@
 from ply import lex
 
 from utils.errors import LexicographicError
-from utils.utils import Token
+from utils.utils import Token, tokens, reserved
 
 
 class CoolLexer:
@@ -11,60 +11,13 @@ class CoolLexer:
         ('strings', 'exclusive')
     )
 
-    reserved = {
-        'class': 'CLASS',
-        'else': 'ELSE',
-        'false': 'FALSE',
-        'fi': 'FI',
-        'if': 'IF',
-        'in': 'IN',
-        'inherits': 'INHERITS',
-        'isvoid': 'ISVOID',
-        'let': 'LET',
-        'loop': 'LOOP',
-        'pool': 'POOL',
-        'then': 'THEN',
-        'while': 'WHILE',
-        'case': 'CASE',
-        'esac': 'ESAC',
-        'new': 'NEW',
-        'of': 'OF',
-        'not': 'NOT',
-        'true': 'TRUE'
-    }
-
-    tokens = [
-        'ID',
-        'TYPE',
-        'LPAREN',
-        'RPAREN',
-        'LBRACE',
-        'RBRACE',
-        'COLON',
-        'SEMICOLON',
-        'COMMA',
-        'DOT',
-        'AT',
-        'ASSIGN',
-        'PLUS',
-        'MINUS',
-        'STAR',
-        'DIV',
-        'EQUAL',
-        'LESS',
-        'LESSEQ',
-        'ARROW',
-        'INT',
-        'STRING',
-        'NOT'
-    ] + list(reserved.values())
-
     def __init__(self, **kwargs):
         self.errors = []
+        self.reserved = reserved
+        self.tokens = tokens
         self.lexer = lex.lex(module=self, **kwargs)
         self.lexer.lineno = 1
         self.lexer.linestart = 0
-        self.errors = []
         self.text = None
 
     # Comments
@@ -107,7 +60,7 @@ class CoolLexer:
         t.lexer.string_start = t.lexer.lexpos
         t.lexer.string = ''
         t.lexer.backslash = False
-        t.lexer.begin('string')
+        t.lexer.begin('strings')
 
     def t_strings_end(self, t):
         r'\"'
@@ -118,7 +71,7 @@ class CoolLexer:
             t.lexer.backslash = False
         else:
             t.value = t.lexer.string
-            t.type = 'string'
+            t.type = 'STRING'
             t.lexer.begin('INITIAL')
             return t
 
@@ -163,6 +116,9 @@ class CoolLexer:
                 t.lexer.string += t.value
             else:
                 t.lexer.backslash = True
+
+    def t_strings_error(self, t):
+        pass
 
     def t_strings_eof(self, t):
         self.add_line_column(t)
@@ -319,6 +275,5 @@ class CoolLexer:
         if self.errors:
             for error in self.errors:
                 print(error)
-            raise Exception()
 
         return tokens
