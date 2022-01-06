@@ -33,7 +33,8 @@ class InstructionNode(Node):
         pass
 
 class ParamNode(InstructionNode):
-    def __init__(self, name):
+    def __init__(self, type, name):
+        self.type = type
         self.name = name
 
 class LocalNode(InstructionNode):

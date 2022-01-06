@@ -21,22 +21,20 @@ class BaseCOOLToCILVisitor:
     def instructions(self):
         return self.current_function.instructions
     
-    def register_param(self, vinfo):
+    def register_param(self, type, name):
         #'param_{self.current_function.name[9:]}_{vinfo.name}_{len(self.params)}'
-        vinfo.name = vinfo.name
-        param_node = cil.ParamNode(vinfo.name)
+        param_node = cil.ParamNode(type, name)
         self.params.append(param_node)
-        return vinfo.name
+        return name
     
-    def register_local(self, vinfo):
-        vinfo.name = f'local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}'
-        local_node = cil.LocalNode(vinfo.name)
+    def register_local(self, name):
+        #vinfo.name = f'local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}'
+        local_node = cil.LocalNode(name)
         self.localvars.append(local_node)
-        return vinfo.name
+        return name
 
     def define_internal_local(self):
-        vinfo = VariableInfo('internal', None)
-        return self.register_local(vinfo)
+        return self.register_local('internal')
 
     def register_instruction(self, instruction):
         self.instructions.append(instruction)
