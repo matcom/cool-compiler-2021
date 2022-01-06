@@ -1,4 +1,4 @@
---Any characters between two dashes “--” and the next newline
+--Any characters between two dashes "-- and the next newline
 --(or EOF, if there is no next newline) are treated as comments
 
 (*(*(*

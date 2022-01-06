@@ -1,5 +1,5 @@
 from ply import yacc
-from ast import *
+from utils.ast import *
 from utils.errors import SyntacticError
 from utils.utils import find_column
 

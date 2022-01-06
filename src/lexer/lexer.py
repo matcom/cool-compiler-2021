@@ -309,7 +309,7 @@ class CoolLexer:
         tokens = []
         for token in self.lexer:
             tokens.append(Token(token.value, token.type,
-                                token.row, token.column))
+                                token.line, token.column))
         self.lexer.lineno = 1
         self.lexer.linestart = 0
         return tokens
