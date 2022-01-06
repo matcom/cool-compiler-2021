@@ -147,5 +147,56 @@ class VCallNode(ExpressionNode):
         self.ret_type = ret_type
 
 
+#Args
+class ArgNode(ExpressionNode):
+    def __init__(self, name):
+        self.name = name
 
 
+#Return
+class ReturnNode(ExpressionNode):
+    def __init__(self, value):
+        self.value = value
+
+#IO
+class LoadNode(ExpressionNode):
+    def __init__(self, dest, msg):
+        self.local_dest = dest
+        self.msg = msg
+
+class LengthNode(ExpressionNode):
+    def __init__(self, dest, arg):
+        self.local_dest = dest
+        self.arg = arg
+        
+class ConcatNode(ExpressionNode):
+    def __init__(self, dest, head, tail):
+        self.local_dest = dest
+        self.head = head
+        self.tail = tail
+
+class PrefixNode(ExpressionNode):
+    def __init__(self, dest, string, n):
+        self.local_dest = dest
+        self.string = string
+        self.n = n
+
+class SubstringNode(ExpressionNode):
+    def __init__(self, dest, string, begin, final):
+        self.local_dest = dest
+        self.begin = begin
+        self.string = string
+        self.final = final
+
+class StrNode(ExpressionNode):
+    def __init__(self, dest, value):
+        self.local_dest = dest
+        self.value = value
+
+class ReadNode(ExpressionNode):
+    def __init__(self, dest):
+        self.local_dest = dest
+
+class PrintNode(ExpressionNode):
+    def __init__(self, value):
+        self.value = value
