@@ -25,3 +25,4 @@ class SyntacticError(CoolError):
 class SemanticError(CoolError):
     def __init__(self, text, line, column):
         super().__init__('SemanticError', text, line, column)
+
