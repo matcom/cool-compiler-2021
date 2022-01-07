@@ -9,20 +9,12 @@ def main(input_):
         with open(input_) as f:
             text = f.read()
 
-        print("****LEXER****")
         lexer = CoolLexer()
         tokens = lexer.run(text)
 
-        print("TOKENS")
-        print(tokens)
-
-        print("****PARSER****")
         parser = CoolParser(lexer)
 
         ast = parser.parse(text)
-        print(ast)
-        if parser.errors:
-            print("HUBO ERRORES")
 
     except FileNotFoundError:
         pass
