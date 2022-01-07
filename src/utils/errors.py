@@ -6,7 +6,7 @@ class CoolError():
         self.column = column
 
     def __str__(self):
-        return f'({self.line, self.column}) - {self.type}: {self.text}'
+        return f'{self.line, self.column} - {self.type}: {self.text}'
 
     def __repr__(self):
         return str(self)
