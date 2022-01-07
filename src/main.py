@@ -17,7 +17,7 @@ def main(input_):
         # ast = parser.parse(text)
 
     except FileNotFoundError:
-        pass
+        raise Exception()
 
 
 if __name__ == "__main__":
