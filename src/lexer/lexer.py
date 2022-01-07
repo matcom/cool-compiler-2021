@@ -275,5 +275,6 @@ class CoolLexer:
         if self.errors:
             for error in self.errors:
                 print(error)
+            raise Exception()
 
         return tokens
