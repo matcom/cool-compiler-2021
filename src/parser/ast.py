@@ -28,7 +28,7 @@ class FuncDeclarationNode(Node):
         self.name = name
         self.params = params
         self.return_type = return_type
-        self.exp = exp
+        self.exp = expr
 
 
 class AttrDeclarationNode(Node):
@@ -36,7 +36,7 @@ class AttrDeclarationNode(Node):
         super().__init__()
         self.name = name
         self.type = type
-        self.exp = exp
+        self.exp = expr
 
 
 class ExpressionNode(Node):
@@ -93,7 +93,7 @@ class CaseNode(ExpressionNode):
     def __init__(self, expr, case_list):
         super().__init__()
         self.expr = expr
-        self.case_list = case_list:
+        self.case_list = case_list
 
 
 class CaseOptionNode(ExpressionNode):

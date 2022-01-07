@@ -64,7 +64,7 @@ class Type:
         except KeyError:
             try:
                 self.get_attribute(name, position)
-            except SemanticError:
+            except SemanticError():
                 attribute = Attribute(name, typex, len(self.attributes))
                 self.attributes[name] = attribute
                 return attribute
