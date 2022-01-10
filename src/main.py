@@ -4,26 +4,26 @@ from lexer import CoolLexer
 from cparser import CoolParser
 
 
-def main(input_, output_):
-    try:
-        with open(input_) as f:
-            text = f.read()
+def main(_input, _output):
 
-        lexer = CoolLexer()
-        tokens = lexer.run(text)
+    with open(_input) as file:
+        text = file.read()
 
-        # parser = CoolParser(lexer)
+    lexer = CoolLexer()
+    tokens = lexer.run(text)
 
-        # ast = parser.parse(text)
+    # parser = CoolParser(lexer)
 
-    except FileNotFoundError:
-        raise Exception()
+    # ast = parser.parse(text)
 
 
 if __name__ == "__main__":
-    input_ = sys.argv[1]
-    output_ = sys.argv[2]
-    main(input_, output_)
+
+    path = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/lexer/iis1.cl'
+    _input = sys.argv[1] if len(sys.argv) > 1 else path
+    _output = sys.argv[2] if len(sys.argv) > 2 else None
+
+    main(_input, _output)
 
     # input_ = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/lexer/iis4.cl'
     # main(input_)
