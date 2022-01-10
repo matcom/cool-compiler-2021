@@ -14,7 +14,7 @@ class CoolError():
 
 class LexicographicError(CoolError):
     def __init__(self, text, line, column):
-        super().__init__('LexicograficError', text, line, column)
+        super().__init__('LexicographicError', text, line, column)
 
 
 class SyntacticError(CoolError):
@@ -25,4 +25,3 @@ class SyntacticError(CoolError):
 class SemanticError(CoolError):
     def __init__(self, text, line, column):
         super().__init__('SemanticError', text, line, column)
-
