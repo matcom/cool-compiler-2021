@@ -28,24 +28,15 @@ class FuncDeclarationNode(Node):
         self.name = name
         self.params = params
         self.return_type = return_type
-<<<<<<< HEAD:src/utils/ast.py
         self.expr = expr
-=======
-        self.exp = expr
->>>>>>> livi:src/parser/ast.py
 
 
 class AttrDeclarationNode(Node):
     def __init__(self, name, typex, expr=None):
         super().__init__()
         self.name = name
-<<<<<<< HEAD:src/utils/ast.py
         self.type = typex
         self.expr = expr
-=======
-        self.type = type
-        self.exp = expr
->>>>>>> livi:src/parser/ast.py
 
 
 class ExpressionNode(Node):
