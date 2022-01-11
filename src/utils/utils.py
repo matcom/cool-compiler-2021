@@ -7,11 +7,11 @@ class Token:
     def __init__(self, lex, token_type, row, column):
         self.lex = lex
         self.type = token_type
-        self.line = row
+        self.lineno = row
         self.column = column
 
     def __str__(self):
-        return f'{self.type}: {self.lex} ({self.line}, {self.column})'
+        return f'{self.type}: {self.lex} ({self.lineno}, {self.column})'
 
     def __repr__(self):
         return str(self)
