@@ -59,6 +59,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         for feature, child_scope in zip(func_declarations, scopes):
             self.visit(feature, child_scope)
 
+        self.current_type = None
+
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):        
         self.current_method = self.current_type.get_method(node.id)
@@ -79,5 +81,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.current_method = None
 
+    @visitor.when(AttrDeclarationNode)
+    def visit(self, node, scope):
+        if node.expr:
+            self.visit(node.expr, scope)
+            self.register_instruction(cil.SetAttrNode(self.vself.name, node.id, scope.ret_expr, self.current_type))
+        elif node.type in self.value_types:
+            local_value = self.define_internal_local()
+            self.register_instruction(cil.AllocateNode(node.type, local_value))
+            self.register_instruction(cil.SetAttrNode(self.vself.name, node.id, local_value, self.current_type))
 
 
