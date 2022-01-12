@@ -118,7 +118,7 @@ class CoolLexer:
             else:
                 t.lexer.string += t.value
 
-            t.backslash = False
+            t.lexer.backslash = False
         else:
             if t.value != '\\':
                 t.lexer.string += t.value
