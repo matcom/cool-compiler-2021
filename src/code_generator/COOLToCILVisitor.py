@@ -91,4 +91,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.AllocateNode(node.type, local_value))
             self.register_instruction(cil.SetAttrNode(self.vself.name, node.id, local_value, self.current_type))
 
+    @visitor.when(AssignNode)
+    def visit(self, node, scope):
+        var_info = scope.find_local(node.id)
+        value, typex = self.visit(node.expr, scope)
+        if var_info is None:
+            var_info = scope.find_attribute(node.id)
+            attributes_names = [attr.name for attr, attr_type in self.current_type.get_all_attributes()]
+            self.register_instruction(cil.SetAttrNode('self', var_info.name, self.current_type.name, value))
+        else:
+            local_name = self.to_variable_name(var_info.name)
+            self.register_instruction(cil.AssignNode(local_name, value))
+        return value, typex
 
+    @visitor.when(FuncCallNode)
+    def visit(self, node, scope):
+        pass

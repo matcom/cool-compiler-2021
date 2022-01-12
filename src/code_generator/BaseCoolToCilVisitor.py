@@ -46,6 +46,9 @@ class BaseCOOLToCILVisitor:
 
     def to_attribute_name(self, attr_name, type_name):
         return f'function_{attr_name}_at_{type_name}'
+
+    def to_variable_name(self, var_name):
+        return f'function_{var_name}'
     
     def register_function(self, function_name):
         function_node = cil.FunctionNode(function_name, [], [], [])
