@@ -1,7 +1,7 @@
 import cil_ast as cil
 from BaseCOOLToCILVisitor import *
 from utils import visitor
-from parser.ast import *
+from utils.ast import *
 
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
@@ -47,8 +47,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             scopes = list(scope.functions.values())
 
         for attr, a_type in cil_type_node.attributes:
-            cil_type_node.attributes.append((attr.name, self.to_attr_name(attr.name, a_type.name)))
-            self.initialize_attr(constructor, attr, scope)            ## add the initialization code in the constructor
+            cil_type_node.attributes.append((attr.name, self.to_attribute_name(attr.name, a_type.name)))
+            self.initialize_attr(constructor, attr, scope)
         if cil_type_node.attributes:
             constructor.body.expr_list.append(SelfNode())
 
@@ -58,6 +58,26 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         func_declarations += [f for f in node.features if isinstance(f, FuncDeclarationNode)] 
         for feature, child_scope in zip(func_declarations, scopes):
             self.visit(feature, child_scope)
+
+    @visitor.when(FuncDeclarationNode)
+    def visit(self, node, scope):        
+        self.current_method = self.current_type.get_method(node.id)
+        cil_name = self.to_function_name(node.id, self.current_type.name)
+        self.current_function = self.register_function(cil_name)
+
+        self.register_param('self', self.current_type.name)
+        for param_name, param_type in node.params:
+            self.register_param(param_name, param_type.value)
+        
+        ret_value = self.visit(node.body, scope)
+        if not isinstance(ret_value, str):
+            result = self.define_internal_local()
+            self.register_instruction(cil.AssignNode(result, ret_value))
+            self.register_instruction(cil.ReturnNode(result))
+        else:
+            self.register_instruction(cil.ReturnNode(ret_value))   
+
+        self.current_method = None
 
 
 
