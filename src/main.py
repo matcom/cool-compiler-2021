@@ -12,9 +12,10 @@ def main(_input, _output):
     lexer = CoolLexer()
     tokens = lexer.run(text)
 
-    # parser = CoolParser(lexer)
-
-    # ast = parser.parse(text)
+    parser = CoolParser(lexer)
+    ast = parser.parse(text)
+    if parser.errors:
+        raise Exception()
 
 
 if __name__ == "__main__":
