@@ -37,8 +37,8 @@ class CoolParser:
         p[0] = [p[1]] if len(p) == 3 else [p[1]] + p[3]
 
     def p_def_class(self, p):
-        '''def_class : CLASS TYPE LPAREN feature_list RPAREN
-                     | CLASS TYPE INHERITS TYPE LPAREN feature_list RPAREN'''
+        '''def_class : CLASS TYPE LBRACE feature_list RBRACE
+                     | CLASS TYPE INHERITS TYPE LBRACE feature_list RBRACE'''
         if len(p) == 8:
             p[0] = ClassDeclarationNode(p[2], p[6], p[4])
         else:
