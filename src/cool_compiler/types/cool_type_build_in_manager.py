@@ -1,5 +1,8 @@
 from .tools import SemanticError
 import inspect
+
+OBJECT_NAME = 'Object'
+
 def type_body_def(cls):
     for n, f  in inspect.getmembers(cls, predicate=inspect.ismethod):
         if n == '__init__': continue
@@ -20,6 +23,13 @@ def build_in_type(cls):
 class CoolTypeBuildInManager(metaclass=Singleton):
     def __init__(self) -> None:
         self.dictt = {}
+
+    def all_inherence_of_object(self):
+        obj = self.dictt[OBJECT_NAME]
+   
+        for key in self.dictt.keys():
+            if key != OBJECT_NAME and self.dictt[key].parent is None:
+                self.dictt[key].parent = obj
 
     def __iter__(self):
         return self.dictt.__iter__()

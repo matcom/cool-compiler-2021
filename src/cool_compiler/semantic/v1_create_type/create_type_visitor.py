@@ -1,5 +1,5 @@
 from os import confstr
-from .. import visitor
+from ...cmp import visitor
 from ..__dependency import Type, SemanticError, Object, ErrorType, Int, Bool, Str, Self, CoolTypeBuildInManager
 from ..v0_parser_return import factory_parser_return_ast as AST
 from . import create_type_ast as ASTR

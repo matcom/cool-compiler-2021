@@ -1,10 +1,16 @@
-from os import error
-from ..tools import VisitBase, find_type, parent_common
-from .. import visitor
-from ..__dependency import Type, SemanticError, Object, ErrorType, Int, Bool, Str
+from os import name
+from cool_compiler.types.cool_type_build_in_manager import CoolTypeBuildInManager
+from ..tools import VisitBase, parent_common
+from ...cmp import visitor
+from ..__dependency import SemanticError, Object, ErrorType, Int, Bool, Str
 from ..v1_create_type import create_type_ast as AST
 from . import semantic_checking_ast as ASTR
 from .scope import Scope
+
+
+CoolInt = CoolTypeBuildInManager().find("Int")
+CoolBool = CoolTypeBuildInManager().find("Bool")
+CoolStr = CoolTypeBuildInManager().find("String")
 
 class CoolSemanticChecking(VisitBase): 
     def __init__(self, errors) -> None:
@@ -22,7 +28,7 @@ class CoolSemanticChecking(VisitBase):
     @visitor.when(AST.CoolClass)
     @visitor.result(ASTR.CoolClass)
     def visit(self, node : AST.CoolClass, scope: Scope) : 
-        cls_scope : Scope = scope.create_child()
+        cls_scope : Scope = scope.create_child(f"Class {node.type.name}")
         self.current_type = node.type
         error_handler = self.get_se_handler(node)
 
@@ -77,7 +83,7 @@ class CoolSemanticChecking(VisitBase):
         except SemanticError as se:
             pass
         
-        new_scope : Scope = scope.create_child()
+        new_scope : Scope = scope.create_child(f"Func {node.name}")
         for param, p_type in node.params:
             new_scope.define_variable(param, p_type)
 
@@ -114,7 +120,7 @@ class CoolSemanticChecking(VisitBase):
         except SemanticError:
             error_handler().add_attribute_error(node.type.name, node.id ) 
 
-        return expr, node.type, node.id, params, expr.static_type if static_type.is_self_type else static_type
+        return expr, node.type, node.id, params, expr.static_type.real_type(self.current_type) if static_type.is_self_type else static_type.real_type(self.current_type)
 
     @visitor.when(AST.Dispatch)
     @visitor.result(ASTR.Dispatch)
@@ -141,13 +147,12 @@ class CoolSemanticChecking(VisitBase):
         except SemanticError:
             error_handler().add_attribute_error(expr.static_type.name, node.id ) 
 
-        return expr, node.id, params, expr.static_type if static_type.is_self_type else static_type
+        return expr, node.id, params, expr.static_type.real_type(self.current_type) if static_type.is_self_type else static_type.real_type(self.current_type)
        
     @visitor.when(AST.StaticDispatch)
     @visitor.result(ASTR.StaticDispatch)
     def visit(self, node: AST.StaticDispatch, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
-
         params = []
         for p in node.params:
             params.append(self.visit(p,scope))
@@ -167,7 +172,7 @@ class CoolSemanticChecking(VisitBase):
         except SemanticError:
             error_handler().add_attribute_error(self.current_type.name, node.id ) 
 
-        return node.id, params, static_type
+        return node.id, params, static_type.real_type(self.current_type)
 
     @visitor.when(AST.Assing)
     @visitor.result(ASTR.Assing)
@@ -184,27 +189,27 @@ class CoolSemanticChecking(VisitBase):
         if not self.type_checking(static_type, expr.static_type):
             error_handler().add_type_error(f"Can't  assign {expr.static_type.name} intro {static_type.name}")
        
-        return node.id, expr, expr.static_type 
+        return node.id, expr, expr.static_type.real_type(self.current_type) 
     
     @visitor.when(AST.IfThenElse)
     @visitor.result(ASTR.IfThenElse)
     def visit(self, node: AST.IfThenElse, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
         cond = self.visit(node.condition, scope)
-        if not self.type_checking(Bool(), cond.static_type):
+        if not self.type_checking(CoolBool, cond.static_type):
             error_handler().add_type_error("Bool", cond.static_type.name)
 
         then_expr = self.visit(node.then_expr, scope)
         else_expr = self.visit(node.else_expr, scope)
 
-        return cond, then_expr, else_expr, parent_common(then_expr.static_type, else_expr.static_type)
+        return cond, then_expr, else_expr, parent_common(then_expr.static_type, else_expr.static_type).real_type(self.current_type)
 
     @visitor.when(AST.While)
     @visitor.result(ASTR.While)
     def visit(self, node: AST.While, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
         cond = self.visit(node.condition, scope)
-        if not self.type_checking(Bool(), cond.static_type):
+        if not self.type_checking(CoolBool, cond.static_type):
             error_handler().add_type_error("Bool", cond.static_type.name)
 
         return cond, self.visit(node.loop_expr, scope), Object()
@@ -216,18 +221,19 @@ class CoolSemanticChecking(VisitBase):
         for b in node.expr_list:
             block_list.append(self.visit(b, scope))
         
-        return block_list, block_list[-1].static_type
+        return block_list, block_list[-1].static_type.real_type(self.current_type)
 
     @visitor.when(AST.LetIn)
     @visitor.result(ASTR.LetIn)
     def visit(self, node: AST.LetIn, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
-        new_scope = scope.create_child()
+        new_scope = scope.create_child("LetIn")
         
         assing_list = []
         for name, atype, expr in node.assing_list:
             if expr: 
                 exp = self.visit(expr, new_scope)
+                
                 if not self.type_checking(atype, exp.static_type):
                     error_handler().add_type_error(atype.name, exp.static_type.name)
             else: exp = None    
@@ -236,7 +242,7 @@ class CoolSemanticChecking(VisitBase):
             new_scope.define_variable(name,atype)
 
         expr = self.visit(node.expr, new_scope)
-        return assing_list, expr, expr.static_type
+        return assing_list, expr, expr.static_type.real_type(self.current_type)
 
     @visitor.when(AST.Case)
     @visitor.result(ASTR.Case)
@@ -246,7 +252,7 @@ class CoolSemanticChecking(VisitBase):
         static_type = None
         case_list = []
         for name, atype , expr in node.case_list:
-            new_scope = scope.create_child()
+            new_scope = scope.create_child(f'Case {name}')
             new_scope.define_variable(name, atype)
             exp = self.visit(expr, new_scope)
 
@@ -254,21 +260,21 @@ class CoolSemanticChecking(VisitBase):
             else: static_type = parent_common(static_type, exp.static_type)
             case_list.append((name, atype, exp))
         
-        return expr_cond, case_list, static_type
+        return expr_cond, case_list, static_type.real_type(self.current_type)
 
     @visitor.when(AST.Sum)
     @visitor.result(ASTR.Sum)
     def visit(self, node: AST.Sum, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
         left = self.visit(node.left, scope)
-        if not self.type_checking(Int(), left.static_type):
+        if not self.type_checking(CoolInt, left.static_type):
             error_handler().add_type_error("Int", left.static_type.name)
 
         right = self.visit(node.right, scope)
-        if not self.type_checking(Int(), right.static_type):
+        if not self.type_checking(CoolInt, right.static_type):
             error_handler().add_type_error("Int", right.static_type.name)
         
-        return left, right, Int()
+        return left, right, CoolInt
 
     @visitor.when(AST.Rest)
     @visitor.result(ASTR.Rest)
@@ -276,14 +282,14 @@ class CoolSemanticChecking(VisitBase):
         error_handler = self.get_se_handler(node)
 
         left = self.visit(node.left, scope)
-        if not self.type_checking(Int(), left.static_type):
+        if not self.type_checking(CoolInt, left.static_type):
             error_handler().add_type_error("Int", left.static_type.name)
 
         right = self.visit(node.right, scope)
-        if not self.type_checking(Int(), right.static_type):
+        if not self.type_checking(CoolInt, right.static_type):
             error_handler().add_type_error("Int", right.static_type.name)
         
-        return left, right, Int()
+        return left, right, CoolInt
 
     @visitor.when(AST.Mult)
     @visitor.result(ASTR.Mult)
@@ -291,14 +297,14 @@ class CoolSemanticChecking(VisitBase):
         error_handler = self.get_se_handler(node)
 
         left = self.visit(node.left, scope)
-        if not self.type_checking(Int(), left.static_type):
+        if not self.type_checking(CoolInt, left.static_type):
             error_handler().add_type_error("Int", left.static_type.name)
 
         right = self.visit(node.right, scope)
-        if not self.type_checking(Int(), right.static_type):
+        if not self.type_checking(CoolInt, right.static_type):
             error_handler().add_type_error("Int", right.static_type.name)
         
-        return left, right, Int()
+        return left, right, CoolInt
 
     @visitor.when(AST.Div)
     @visitor.result(ASTR.Div)
@@ -306,14 +312,14 @@ class CoolSemanticChecking(VisitBase):
         error_handler = self.get_se_handler(node)
 
         left = self.visit(node.left, scope)
-        if not self.type_checking(Int(), left.static_type):
+        if not self.type_checking(CoolInt, left.static_type):
             error_handler().add_type_error("Int", left.static_type.name)
 
         right = self.visit(node.right, scope)
-        if not self.type_checking(Int(), right.static_type):
+        if not self.type_checking(CoolInt, right.static_type):
             error_handler().add_type_error("Int", right.static_type.name)
         
-        return left, right, Int()
+        return left, right, CoolInt
 
     @visitor.when(AST.Less)
     @visitor.result(ASTR.Less)
@@ -321,14 +327,14 @@ class CoolSemanticChecking(VisitBase):
         error_handler = self.get_se_handler(node)
 
         left = self.visit(node.left, scope)
-        if not self.type_checking(Int(), left.static_type):
+        if not self.type_checking(CoolInt, left.static_type):
             error_handler().add_type_error("Int", left.static_type.name)
 
         right = self.visit(node.right, scope)
-        if not self.type_checking(Int(), right.static_type):
+        if not self.type_checking(CoolInt, right.static_type):
             error_handler().add_type_error("Int", right.static_type.name)
         
-        return left, right, Bool()
+        return left, right, CoolBool
 
     @visitor.when(AST.LessOrEquals)
     @visitor.result(ASTR.LessOrEquals)
@@ -336,14 +342,14 @@ class CoolSemanticChecking(VisitBase):
         error_handler = self.get_se_handler(node)
 
         left = self.visit(node.left, scope)
-        if not self.type_checking(Int(), left.static_type):
+        if not self.type_checking(CoolInt, left.static_type):
             error_handler().add_type_error("Int", left.static_type.name)
 
         right = self.visit(node.right, scope)
-        if not self.type_checking(Int(), right.static_type):
+        if not self.type_checking(CoolInt, right.static_type):
             error_handler().add_type_error("Int", right.static_type.name)
         
-        return left, right, Bool()
+        return left, right, CoolBool
 
     @visitor.when(AST.Equals)
     @visitor.result(ASTR.Equals)
@@ -351,18 +357,18 @@ class CoolSemanticChecking(VisitBase):
         error_handler = self.get_se_handler(node)
         left = self.visit(node.left, scope)
         right = self.visit(node.right, scope)
-        list_type = [ Str, Int, Bool]
-  
-        if type(left.static_type) in list_type or type(right.static_type) in list_type:
+        list_type = [ CoolInt, CoolBool, CoolStr]
+     
+        if left.static_type in list_type or right.static_type in list_type:
             if not left.static_type == right.static_type:
                 error_handler().add_type_error(left.static_type.name, right.static_type.name)
         
-        return left, right, Bool()
+        return left, right, CoolBool
 
     @visitor.when(AST.Void)
     @visitor.result(ASTR.Void)
     def visit(self, node: AST.Void, scope: Scope) -> ASTR.Node:
-        return self.visit(node.item, scope), Bool()
+        return self.visit(node.item, scope), CoolBool
         
     @visitor.when(AST.New)
     @visitor.result(ASTR.New)
@@ -374,24 +380,24 @@ class CoolSemanticChecking(VisitBase):
     def visit(self, node: AST.Complement, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
         expr = self.visit(node.item, scope)
-        if not self.type_checking(Int(), expr.static_type):
+        if not self.type_checking(CoolInt, expr.static_type):
             error_handler().add_type_error("Int", expr.static_type.name)
-        return expr, Int()
+        return expr, CoolInt
 
     @visitor.when(AST.Neg)
     @visitor.result(ASTR.Neg)
     def visit(self, node: AST.Neg, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
         expr = self.visit(node.item, scope)
-        if not self.type_checking(Bool(), expr.static_type):
+        if not self.type_checking(CoolBool, expr.static_type):
             error_handler().add_type_error("Bool", expr.static_type.name)
-        return expr, Bool()
+        return expr, CoolBool
 
     @visitor.when(AST.Id)
     @visitor.result(ASTR.Id)
     def visit(self, node: AST.Id, scope: Scope) -> ASTR.Node:
         error_handler = self.get_se_handler(node)
-
+ 
         try: 
             v = scope.find_variable(node.item)
             return node.item, v.type
@@ -404,14 +410,14 @@ class CoolSemanticChecking(VisitBase):
     @visitor.when(AST.Int)
     @visitor.result(ASTR.Int)
     def visit(self, node: AST.Int, scope: Scope) -> ASTR.Node:
-        return node.item, Int()
+        return node.item, CoolInt
 
     @visitor.when(AST.Bool)
     @visitor.result(ASTR.Bool)
     def visit(self, node: AST.Bool, scope: Scope) -> ASTR.Node:
-        return node.item, Bool()
+        return node.item, CoolBool
 
     @visitor.when(AST.Str)
     @visitor.result(ASTR.Str)
     def visit(self, node: AST.Str, scope: Scope) -> ASTR.Node:
-        return node.item, Str()
+        return node.item, CoolStr

@@ -13,3 +13,6 @@ class Self(Type):
     @property
     def is_self_type(self):
         return True
+
+    def real_type(self, possible):
+        return possible

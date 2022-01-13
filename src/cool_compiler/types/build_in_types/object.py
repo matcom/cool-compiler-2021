@@ -1,4 +1,4 @@
-from ..cool_type_build_in_manager import build_in_type
+from ..cool_type_build_in_manager import build_in_type, OBJECT_NAME
 from ..type import Type
 from ..tools import type_body_def
 from . import *
@@ -6,7 +6,7 @@ from . import *
 @build_in_type
 class Object(Type):
     def __init__(self):
-        super().__init__("Object")
+        super().__init__(OBJECT_NAME)
         type_body_def(self)
         
     def copy(self):

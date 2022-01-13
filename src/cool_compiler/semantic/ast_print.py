@@ -1,6 +1,6 @@
 from .ASTs import ast0_factory_return as AST_init
 from .ASTs import ast1_create_type_return as AST_result
-from . import visitor
+from ..cmp import visitor
 
 class ASTPrint:
     def __init__(self, error) -> None:

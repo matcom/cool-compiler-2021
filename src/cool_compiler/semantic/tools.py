@@ -1,4 +1,4 @@
-from cool_compiler.semantic.visitor import result
+from cool_compiler.cmp.visitor import result
 from .__dependency import CoolTypeBuildInManager, SemanticError, ErrorType, Type, Object, CoolError
 from .v2_semantic_checking.scope import Scope
 

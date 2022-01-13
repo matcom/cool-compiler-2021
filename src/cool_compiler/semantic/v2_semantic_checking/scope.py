@@ -11,6 +11,7 @@ class VariableInfo:
 
 class Scope:
     def __init__(self, parent=None):
+        self.name = "Program"
         self.locals = []
         self.parent = parent
         self.children = []
@@ -19,8 +20,9 @@ class Scope:
     def __len__(self):
         return len(self.locals)
 
-    def create_child(self,):
+    def create_child(self, name=None):
         child = Scope(self)
+        child.name = name
         self.children.append(child)
         return child
 

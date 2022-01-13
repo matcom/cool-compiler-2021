@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from .tools import  *
 
+
 class Type:
     def __init__(self, name:str):
         self.name = name
@@ -26,6 +27,10 @@ class Type:
 
     def bypass(self):
         return False
+
+    
+    def real_type(self, possible):
+        return self
     
     def conforms_to(self, other):
         return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)

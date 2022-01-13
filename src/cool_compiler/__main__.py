@@ -4,6 +4,7 @@ from .lexer import CoolLexer
 from .parser import CoolParser
 from .semantic import *
 from .types import CoolTypeBuildInManager
+from .codegen import CILGenerate
 
 path = ""
 if len(sys.argv) > 1:
@@ -14,7 +15,8 @@ with open(path, 'r') as _file:
     text = _file.read()
     errors = CoolError(text)
     lexer = CoolLexer(errors)
-    CoolTypeBuildInManager()
+    type_manager = CoolTypeBuildInManager()
+    type_manager.all_inherence_of_object()
     parser = CoolParser(CoolFactory(errors), errors)
 
     
@@ -24,7 +26,7 @@ with open(path, 'r') as _file:
     ast = parser.parse(iter(tokens))
     if errors.any(): sys.exit(1)
 
-    visitorList = [ CreateType, SemanticChecking ]
+    visitorList = [ CreateType, SemanticChecking, CILGenerate ]
  
     for visitorClass in visitorList:
         ast = visitorClass(errors).visit(ast)

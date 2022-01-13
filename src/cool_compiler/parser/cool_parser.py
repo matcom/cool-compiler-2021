@@ -14,8 +14,9 @@ class CoolParser(Parser):
         ('left', "ISVOID"),
         ('left', '~'),
         ('left', '@'),
-        ('left', '.'),
         ('right', 'IN'),
+        ('left', '.'),
+  
     )
     def __init__(self, factory, errors):
         self.factory = factory
