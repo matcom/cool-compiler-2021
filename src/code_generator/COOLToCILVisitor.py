@@ -106,4 +106,83 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(FuncCallNode)
     def visit(self, node, scope):
-        pass
+        obj, otype = self.visit(node.obj, scope)
+        
+        meth = otype.get_method(node.id)
+        args_node = [cil.ArgNode(obj)] + self.handle_arguments(node.args, scope, meth.param_types)
+
+        rtype = meth.return_type
+        result = None if isinstance(rtype, VoidType) else self.define_internal_local()
+
+        continue_label = cil.LabelNode(f'continue__{self.index}') 
+        isvoid = self.check_void(obj)
+        self.register_instruction(cil.IfGoToNode(isvoid, continue_label.label))
+        self.register_instruction(cil.ErrorNode('dispatch_error'))
+        self.register_instruction(continue_label)
+
+        #desambiguar segun sea el llamado, dinamico o estatico
+        # self.register_instruction(cil.StaticCallNode(node.type, node.id, result, args_node, rtype.name))
+        # return result, self._return_type(otype, node)
+
+        # self.register_instruction(cil.DynamicCallNode(self.current_type.name, 'self', node.id, result, args_node, rtype.name))
+        # return result, self._return_type(self.current_type, node)
+
+        # if otype in [StringType(), IntType(), BoolType()]:
+        #     self.register_instruction(cil.StaticCallNode(otype.name, node.id, result, args_node, rtype.name))
+        # else:
+        #     self.register_instruction(cil.DynamicCallNode(otype.name, obj, node.id, result, args_node, rtype.name))
+        # return result, self._return_type(otype, node)
+
+        return
+
+    @visitor.when(IfNode)
+    def visit(self, node, scope):
+        vcondition = self.define_internal_local()
+        value = self.visit(node.condition, scope)
+
+        then_label_node = self.register_label('then_label')
+        else_label_node = self.register_label('else_label')
+        continue_label_node = self.register_label('continue_label')
+
+        #If condition GOTO then_label
+        self.visit(node.condition)
+        self.register_instruction(cil.GetAttrNode(vcondition, scope.ret_expr, 'value', 'Bool'))
+        self.register_instruction(cil.IfGoToNode(vcondition, then_label_node.label))
+        #GOTO else_label
+        self.register_instruction(cil.GoToNode(else_label_node.label))
+        #Label then_label
+        self.register_instruction(then_label_node)
+        self.visit(node.then_expr, scope)
+        self.register_instruction(cil.AssignNode(vcondition, scope.ret_expr))
+        self.register_instruction(cil.GoToNode(continue_label_node.label))
+        #Label else_label
+        self.register_instruction(else_label_node)
+        self.visit(node.else_expr, scope)
+        self.register_instruction(cil.AssignNode(vcondition, scope.ret_expr))
+
+        self.register_instruction(continue_label_node)
+        scope.ret_expr = vcondition
+
+    @visitor.when(WhileNode)
+    def visit(self, node, scope):
+        start_label = cil.LabelNode(f'start__{self.idx}')
+        end_label = cil.LabelNode(f'end__{self.idx}')
+        
+        result = self.define_internal_local()
+        self.register_instruction(cil.VoidConstantNode(result))
+        self.register_instruction(start_label)
+
+        cond, _ = self.visit(node.cond, scope)
+        self.register_instruction(cil.IfGoToNode(cond, end_label.label))
+        expr, typex = self.visit(node.expr, scope)
+        self.register_instruction(cil.AssignNode(result, expr))
+        self.register_instruction(cil.GoToNode(start_label.label))
+        self.register_instruction(end_label)
+        
+    @visitor.when(BlockNode)
+    def visit(self, node, scope):
+        for expr in node.exprs:
+            value, typex = self.visit(expr, scope)
+        result = self.define_internal_local()
+        self.register_instruction(cil.AssignNode(result, value))
+        return result, typex
