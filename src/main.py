@@ -1,3 +1,4 @@
+from ast import parse
 import sys
 
 from lexer import CoolLexer
@@ -15,12 +16,13 @@ def main(_input, _output):
     parser = CoolParser(lexer)
     ast = parser.parse(text)
     if parser.errors:
+        parser.print_error()
         raise Exception()
 
 
 if __name__ == "__main__":
 
-    path = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/lexer/comment1.cl'
+    path = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/parser/assignment1.cl'
     _input = sys.argv[1] if len(sys.argv) > 1 else path
     _output = sys.argv[2] if len(sys.argv) > 2 else None
 
