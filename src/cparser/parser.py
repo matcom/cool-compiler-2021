@@ -157,7 +157,7 @@ class CoolParser:
             p[0] = LessNode(p[1], p[3])
         elif p[2] == '<=':
             p[0] = LessEqNode(p[1], p[3])
-        elif p[2] == '<=':
+        elif p[2] == '=':
             p[0] = EqualNode(p[1], p[3])
 
         p[0].add_line_column(p.lineno(0), find_column(
