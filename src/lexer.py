@@ -1,6 +1,6 @@
 import ply.lex as lex
 
-from utils import find_column
+from utils.utils import find_column
 
 global errors
 global input_text

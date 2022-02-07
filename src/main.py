@@ -1,5 +1,6 @@
 import sys
 import os
+import ast_print
 from lexer import tokenize
 from parser import parse
 from testers import test_parser
@@ -50,12 +51,14 @@ for program_file in programs_files:
     # To run parser
     elif module_to_execute == 'parser':
         with open(program_route, 'r', encoding='UTF-8') as f:
-            tree, errors = parse(f.read())
+            ast, errors = parse(f.read())
             if len(errors):
                 print(errors)
             else:
-                pass
                 # print ast
+                formatter = ast_print.FormatVisitor()
+                tree = formatter.visit(ast)
+                print(str(tree))
 
     else:
         print('Invalid section to execute: ' + module_to_execute)

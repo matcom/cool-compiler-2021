@@ -1,8 +1,8 @@
-import ast as ast
+import ast_hierarchy as ast
 import lexer
 import ply.yacc as yacc
 
-from utils import find_column, find_last_line
+from utils.utils import find_column, find_last_line
 
 global errors
 global input_text
