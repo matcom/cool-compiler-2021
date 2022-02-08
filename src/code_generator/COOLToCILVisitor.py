@@ -272,3 +272,5 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node, scope):
         return self._define_binary_node(node, scope, cil.EqualNode)
 
+#nuevo cambio
+
