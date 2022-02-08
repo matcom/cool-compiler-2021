@@ -1,6 +1,7 @@
 import sys
 import os
 import ast_print
+import type_collector
 from lexer import tokenize
 from parser import parse
 from testers import test_parser
@@ -12,7 +13,7 @@ from testers import test_parser
 # execute_mode is to use the tester or just run the program(s), ex:     #
 #   - test      - run                                                   #
 # module_to_execute can be:                                             #
-#   - lexer     - parser                                                #
+#   - lexer     - parser     - semantic                                 #
 # program_directory is the dir where program(s) is(are), ex:            #
 #   ../tests/lexer                                                      #
 #   ../tests/parser                                                     #
@@ -59,6 +60,18 @@ for program_file in programs_files:
                 formatter = ast_print.FormatVisitor()
                 tree = formatter.visit(ast)
                 print(str(tree))
+
+    # To run semantic
+    elif module_to_execute == 'semantic':
+        with open(program_route, 'r', encoding='UTF-8') as f:
+            ast, errors = parse(f.read())
+
+            type_collector = type_collector.TypeCollector(errors)
+            type_collector.visit(ast)
+            context = type_collector.context
+
+            if len(errors):
+                print(errors)
 
     else:
         print('Invalid section to execute: ' + module_to_execute)
