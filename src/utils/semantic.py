@@ -1,5 +1,17 @@
 import itertools as itt
 from collections import OrderedDict
+from enum import Enum
+
+
+class BasicTypes(Enum):
+    BOOL = "Bool"
+    INT = "Int"
+    STRING = "String"
+    SELF = "SELF_TYPE"
+    OBJECT = "Object"
+    IO = "IO"
+    AUTO = "AUTO_TYPE"
+    ERROR = "<error>"
 
 
 class SemanticError(Exception):
@@ -145,7 +157,7 @@ class Type:
 
 class ErrorType(Type):
     def __init__(self):
-        Type.__init__(self, "<error>")
+        Type.__init__(self, BasicTypes.ERROR.value)
         self.parent = ObjType()
 
     def conforms_to(self, other):
@@ -160,7 +172,7 @@ class ErrorType(Type):
 
 class ObjType(Type):
     def __init__(self):
-        Type.__init__(self, "Object")
+        Type.__init__(self, BasicTypes.OBJECT.value)
         self.parent = None
 
     def __eq__(self, other):
@@ -169,9 +181,10 @@ class ObjType(Type):
     def bypass(self):
         return True
 
+
 class IntType(Type):
     def __init__(self):
-        Type.__init__(self, "Int")
+        Type.__init__(self, BasicTypes.INT.value)
         self.parent = ObjType()
 
     def __eq__(self, other):
@@ -180,7 +193,7 @@ class IntType(Type):
 
 class StrType(Type):
     def __init__(self):
-        Type.__init__(self, "String")
+        Type.__init__(self, BasicTypes.STRING.value)
         self.parent = ObjType()
 
     def __eq__(self, other):
@@ -189,7 +202,7 @@ class StrType(Type):
 
 class BoolType(Type):
     def __init__(self):
-        Type.__init__(self, "Bool")
+        Type.__init__(self, BasicTypes.BOOL.value)
         self.parent = ObjType()
 
     def __eq__(self, other):
@@ -198,7 +211,7 @@ class BoolType(Type):
 
 class SelfType(Type):
     def __init__(self):
-        Type.__init__(self, "SELF_TYPE")
+        Type.__init__(self, BasicTypes.SELF.value)
         self.parent = ObjType()
 
     def __eq__(self, other):
@@ -207,7 +220,7 @@ class SelfType(Type):
 
 class AutoType(Type):
     def __init__(self):
-        Type.__init__(self, "AUTO_TYPE")
+        Type.__init__(self, BasicTypes.AUTO.value)
         self.parent = ObjType()
 
     def bypass(self):

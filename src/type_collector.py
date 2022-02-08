@@ -1,6 +1,6 @@
 import utils.visitor as visitor
 from ast_hierarchy import *
-from utils.semantic import SemanticError, Context
+from utils.semantic import SemanticError, Context, BasicTypes
 from utils.semantic import ObjType, IntType, StrType, SelfType, AutoType, BoolType, ErrorType, Type
 
 
@@ -36,14 +36,14 @@ class TypeCollector(object):
         auto_type.set_parent(obj_type)
         error_type.set_parent(obj_type)
 
-        self.context.types["Bool"] = bool_type
-        self.context.types["Int"] = int_type
-        self.context.types["String"] = str_type
-        self.context.types["SELF_TYPE"] = self_type
-        self.context.types["Object"] = obj_type
-        self.context.types["IO"] = io_type
-        self.context.types["AUTO_TYPE"] = auto_type
-        self.context.types["<error>"] = error_type
+        self.context.types[BasicTypes.BOOL.value] = bool_type
+        self.context.types[BasicTypes.INT.value] = int_type
+        self.context.types[BasicTypes.STRING.value] = str_type
+        self.context.types[BasicTypes.SELF.value] = self_type
+        self.context.types[BasicTypes.OBJECT.value] = obj_type
+        self.context.types[BasicTypes.IO.value] = io_type
+        self.context.types[BasicTypes.AUTO.value] = auto_type
+        self.context.types[BasicTypes.ERROR.value] = error_type
 
         for class_dec_node in node.declarations:
             self.visit(class_dec_node)
@@ -52,7 +52,7 @@ class TypeCollector(object):
     def visit(self, node):
         try:
             typex = self.context.create_type(node.id)
-            typex.set_parent(self.context.types["Object"])
+            typex.set_parent(self.context.types[BasicTypes.OBJECT.value])
         except SemanticError as error:
             self.errors.append(error.text)
 
@@ -74,7 +74,7 @@ def _create_object_type(str_type, self_type):
 
 
 def _create_io_type(str_type, self_type, int_type):
-    io_type = Type("IO")
+    io_type = Type(BasicTypes.IO.value)
     io_type.define_method("out_string", ["x"], [str_type], self_type)
     io_type.define_method("out_int", ["x"], [int_type], self_type)
     io_type.define_method("in_string", [], [], str_type)
