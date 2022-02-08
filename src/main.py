@@ -2,6 +2,7 @@ import sys
 import os
 import ast_print
 import type_collector
+import type_builder
 from lexer import tokenize
 from parser import parse
 from testers import test_parser
@@ -69,6 +70,9 @@ for program_file in programs_files:
             type_collector = type_collector.TypeCollector(errors)
             type_collector.visit(ast)
             context = type_collector.context
+
+            type_builder = type_builder.TypeBuilder(context, errors)
+            type_builder.visit(ast)
 
             if len(errors):
                 print(errors)
