@@ -119,7 +119,7 @@ class GoToNode(InstructionNode):
     def __init__(self, label):
         self.label = label
 
-class IfGoToNode(InstructionNode):
+class IfGoTo(InstructionNode):
     def __init__(self, condition, label):
         self.condition = condition
         self.label = label

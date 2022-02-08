@@ -22,7 +22,7 @@ def main(_input, _output):
 
 if __name__ == "__main__":
 
-    path = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/parser/operation1.cl'
+    path = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/parser/conditional4.cl'
     _input = sys.argv[1] if len(sys.argv) > 1 else path
     _output = sys.argv[2] if len(sys.argv) > 2 else None
 

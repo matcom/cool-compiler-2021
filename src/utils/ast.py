@@ -176,9 +176,6 @@ class AtomicNode(UnaryNode):
 class IsVoidNode(UnaryNode):
     pass
 
-class SelfNode(UnaryNode):
-    pass
-
 
 # ---------------- Constant Nodes ------------------
 
