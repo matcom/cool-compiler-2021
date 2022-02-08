@@ -22,7 +22,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ReturnNode(0))
         self.current_function = None
 
-       # self.create_built_in()
+        self.define_built_in()
 
         for declaration, child_scope in zip(node.declarations, scope.children):
             self.visit(declaration, child_scope)
@@ -178,6 +178,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.AssignNode(result, expr))
         self.register_instruction(cil.GoToNode(start_label.label))
         self.register_instruction(end_label)
+
+        return result, ObjectType()
         
     @visitor.when(BlockNode)
     def visit(self, node, scope):
@@ -244,6 +246,16 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         
         return instance, typex
 
+    @visitor.when(NegationNode)
+    def visit(self, node, scope):
+        return self._define_unary_node(node, scope, cil.LogicalNotNode)
+
+    @visitor.when(IsVoidNode)
+    def visit(self, node, scope):
+        expr, _ = self.visit(node.expr, scope)
+        result = self.check_void(expr)
+        return result, BoolType()
+
     @visitor.when(PlusNode)
     def visit(self, node, scope):
         return self._define_binary_node(node, scope, cil.PlusNode)
@@ -272,5 +284,4 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node, scope):
         return self._define_binary_node(node, scope, cil.EqualNode)
 
-#nuevo cambio
 
