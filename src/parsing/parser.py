@@ -4,10 +4,8 @@ from .ast import *
 
 class COOL_Parser:
 
-
     def __init__(self):
         self.tokens = COOL_Lexer.tokens
-    
 
     def parse(self, input_string):
         l = COOL_Lexer()
@@ -18,7 +16,6 @@ class COOL_Parser:
         self.input = input_string
         result =  self.parser.parse(input_string, lexer=self.lex.lexer)
         return result, self.errors
-
 
     ######################################################################
     #                           Grammar                                  #
@@ -68,22 +65,22 @@ class COOL_Parser:
     @staticmethod
     def p_attr(p):
         'def_attr : OBJECTID COLON TYPEID SEMICOLON'
-        p[0] = AttrDeclarationNode( p[1],p[3] )
+        p[0] = AttrDeclarationNode(p[1],p[3])
 
     @staticmethod
     def p_attr_exp(p):
         'def_attr : OBJECTID COLON TYPEID ASSIGN exp SEMICOLON'
-        p[0] = AttrDeclarationNode( p[1],p[3],p[5] )
+        p[0] = AttrDeclarationNode(p[1],p[3],p[5])
 
     @staticmethod
     def p_func(p):
         'def_func : OBJECTID OPAR CPAR COLON TYPEID OCUR exp CCUR SEMICOLON'
-        p[0] = FuncDeclarationNode(p[1], [], p[5], p[7])
+        p[0] = FuncDeclarationNode(p[1],[],p[5],p[7])
 
     @staticmethod
     def p_func_param(p):
         'def_func : OBJECTID OPAR param_list CPAR COLON TYPEID OCUR exp CCUR SEMICOLON'
-        p[0] = FuncDeclarationNode(p[1], p[3], p[6], p[8])
+        p[0] = FuncDeclarationNode(p[1],p[3],p[6],p[8])
 
     @staticmethod
     def p_param_list_single(p):
@@ -98,7 +95,7 @@ class COOL_Parser:
     @staticmethod
     def p_param(p):
         'param : OBJECTID COLON TYPEID'
-        p[0] = (p[1],p[3])
+        p[0] = VarDeclarationNode(p[1],p[3])
 
     @staticmethod
     def p_exp_assign(p):
@@ -123,12 +120,12 @@ class COOL_Parser:
     @staticmethod
     def p_iden(p):
         'iden : OBJECTID COLON TYPEID'
-        p[0] = (p[1],p[3],None)
+        p[0] = AttrDeclarationNode(p[1],p[3],None)
 
     @staticmethod
     def p_iden_init(p):
         'iden : OBJECTID COLON TYPEID ASSIGN exp'
-        p[0] = (p[1],p[3],p[5])
+        p[0] = AttrDeclarationNode(p[1],p[3],p[5])
         
     @staticmethod
     def p_case_list_single(p):
@@ -143,7 +140,7 @@ class COOL_Parser:
     @staticmethod
     def p_branch(p):
         'branch : OBJECTID COLON TYPEID CASSIGN exp SEMICOLON'
-        p[0] = (p[1],p[3],p[5])
+        p[0] = CaseAttrNode(p[1],p[3],p[5])
 
     @staticmethod
     def p_exp_not(p):
@@ -168,17 +165,18 @@ class COOL_Parser:
     @staticmethod
     def p_comp_leq(p):
         'comp : arith LEQ arith'
-        p[0] = LessEqualNode(p[1],p[3])
+        p[0] = ElessNode(p[1],p[3])
 
     @staticmethod
     def p_comp_equal(p):
         'comp : arith EQUAL arith'
-        p[0] = EqualNode(p[1],p[3])
+        p[0] = EqualsNode(p[1],p[3])
     
+    # ??????
     @staticmethod
     def p_comp_equal_not(p):
         'comp : arith EQUAL NOT exp'
-        p[0] = EqualNode(p[1],p[4])
+        p[0] = EqualsNode(p[1],p[4])
 
     @staticmethod
     def p_arith_term(p):
@@ -218,7 +216,7 @@ class COOL_Parser:
     @staticmethod
     def p_factor_neg(p):
         'factor : TILDE factor'
-        p[0] = NegNode(p[2])
+        p[0] = PrimeNode(p[2])
     
     @staticmethod
     def p_factor_case(p):
@@ -263,24 +261,27 @@ class COOL_Parser:
     @staticmethod
     def p_atom_string(p):
         'atom : STRING_CONST'
-        p[0] = ConstantStringNode(p[1])
+        p[0] = StringNode(p[1])
 
     @staticmethod
-    def p_atom_bool(p):
-        '''atom : TRUE
-                | FALSE
-        '''
-        p[0] = ConstantBoolNode(p[1])
+    def p_atom_true(p):
+        'atom : TRUE'
+        p[0] = TrueNode(p[1])
+
+    @staticmethod
+    def p_atom_false(p):
+        'atom : FALSE'
+        p[0] = FalseNode(p[1])
 
     @staticmethod
     def p_atom_var(p):
         'atom : OBJECTID'
-        p[0]= VariableNode(p[1])
+        p[0] = VariableNode(p[1])
 
     @staticmethod
     def p_atom_new(p):
         'atom : NEW TYPEID'
-        p[0]= InstantiateNode(p[2])
+        p[0] = InstantiateNode(p[2])
 
     @staticmethod
     def p_atom_func_call(p):
@@ -295,17 +296,17 @@ class COOL_Parser:
     @staticmethod
     def p_func_call_self(p):
         'func_call : OBJECTID OPAR arg_list CPAR'
-        p[0] = CallNode(VariableNode('self'),p[1],p[3])
+        p[0] = DispatchNode(VariableNode('self'),p[1],p[3])
 
     @staticmethod
     def p_func_call(p):
         'func_call : atom DOT OBJECTID OPAR arg_list CPAR'
-        p[0] = CallNode(p[1],p[3],p[5])
+        p[0] = DispatchNode(p[1],p[3],p[5])
 
     @staticmethod
     def p_func_call_at(p):
         'func_call : atom AT TYPEID DOT OBJECTID OPAR arg_list CPAR'
-        p[0] = CallNode(p[1],p[5],p[7],p[3])
+        p[0] = DispatchNode(p[1],p[5],p[7],p[3])
 
     @staticmethod
     def p_arg_list_empty(p):
@@ -347,7 +348,6 @@ class COOL_Parser:
         val = p.value
         #(29, 9) - SyntacticError: ERROR at or near "Test1"
         self.errors.append(f'({line}, {col}) - SyntacticError: ERROR at or near "{val}"')
-    
     
     def __find_column(self, token):
         input_s = self.input

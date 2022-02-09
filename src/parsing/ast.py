@@ -11,27 +11,29 @@ class DeclarationNode(Node):
 class ExpressionNode(Node):
     pass
 
+# Class
 class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None):
         self.id = idx
         self.parent = parent
         self.features = features
 
+# Features
 class FuncDeclarationNode(DeclarationNode):
     def __init__(self, idx, params, return_type, body):
         self.id = idx
         self.params = params
-        self.return_type = return_type
-        self.body = body
+        self.type = return_type
+        self.expr = body
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, idx, typex, expr = None):
+    def __init__(self, idx, typex, expr=None):
         self.id = idx
         self.type = typex
         self.expr = expr
 
 class VarDeclarationNode(ExpressionNode):
-    def __init__(self, idx, typex, expr):
+    def __init__(self, idx, typex, expr=None):
         self.id = idx
         self.type = typex
         self.expr = expr
@@ -41,13 +43,12 @@ class AssignNode(ExpressionNode):
         self.id = idx
         self.expr = expr
 
-class CallNode(ExpressionNode):
-    def __init__(self, obj, idx, args, from_type= None):
-        self.obj = obj
+class DispatchNode(ExpressionNode):
+    def __init__(self, obj, idx, args, from_type=None):
+        self.expr = obj
         self.id = idx
-        self.args = args
-        self.from_type = from_type
-
+        self.arg = args
+        self.type = from_type
 
 class BinaryNode(ExpressionNode):
     def __init__(self, left, right):
@@ -56,65 +57,63 @@ class BinaryNode(ExpressionNode):
 
 class UnaryNode(ExpressionNode):
     def __init__(self, exp):
-        self.exp = exp
-
+        self.expr = exp
 
 class ConditionalNode(ExpressionNode):
-    def __init__(self,if_exp,then_exp,else_exp):
-        self.if_exp = if_exp
-        self.then_exp = then_exp
-        self.else_exp = else_exp
+    def __init__(self, if_exp, then_exp, else_exp):
+        self.predicate = if_exp
+        self.then = then_exp
+        self.elsex = else_exp
 
 class LoopNode(ExpressionNode):
-    def __init__(self,while_exp, loop_exp):
-        self.while_exp = while_exp
-        self.loop_exp = loop_exp
+    def __init__(self, while_exp, loop_exp):
+        self.predicate = while_exp
+        self.body = loop_exp
 
 class BlockNode(ExpressionNode):
-    def __init__(self,exp_list):
-        self.exp_list = exp_list
+    def __init__(self, exp_list):
+        self.expr_lis = exp_list
 
 class LetNode(ExpressionNode):
     def __init__(self, var_list, in_exp):
-        self.var_list = var_list
-        self.in_exp = in_exp
+        self.variables = var_list
+        self.expr = in_exp
 
 class CaseNode(ExpressionNode):
-    def __init__(self,cond, case_list):
-        self.cond = cond
-        self.case_list = case_list
+    def __init__(self, cond, case_list):
+        self.expr = cond
+        self.cases = case_list
 
+class CaseAttrNode(ExpressionNode):
+    def __init__(self, idx, typex, expr):
+        self.id = idx
+        self.type = typex
+        self.expr = expr
 
 class AtomicNode(ExpressionNode):
     def __init__(self, lex):
         self.lex = lex
 
-
+# Atomic Expressions
 class ConstantNumNode(AtomicNode):
     pass
 
-class ConstantStringNode(AtomicNode):
+class StringNode(AtomicNode):
     pass
 
-class ConstantBoolNode(AtomicNode):
+class TrueNode(AtomicNode):
     pass
+
+class FalseNode(AtomicNode):
+    pass       
 
 class VariableNode(AtomicNode):
-    pass
+    pass  
 
 class InstantiateNode(AtomicNode):
     pass
 
-class IsVoidNode(UnaryNode):
-    pass
-
-class NotNode(UnaryNode):
-    pass
-
-class NegNode(UnaryNode):
-    pass
-
-
+# Arithmetic Operations
 class PlusNode(BinaryNode):
     pass
 
@@ -127,12 +126,26 @@ class StarNode(BinaryNode):
 class DivNode(BinaryNode):
     pass
 
+# Comparison Operations
 class LessNode(BinaryNode):
     pass
 
-class LessEqualNode(BinaryNode):
+class ElessNode(BinaryNode):
+    pass  
+
+class EqualsNode(BinaryNode):
     pass
 
-class EqualNode(BinaryNode):
+# Unary Operations
+class NotNode(UnaryNode):
     pass
+
+class PrimeNode(UnaryNode):
+    pass  
+
+class IsVoidNode(UnaryNode): 
+    pass
+
+
+
 
