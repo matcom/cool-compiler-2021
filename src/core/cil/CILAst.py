@@ -92,12 +92,6 @@ class SetAttribNode(InstructionNode):
         self.value = value
         self.computed_type = computed_type
 
-class GetIndexNode(InstructionNode):
-    pass
-
-class SetIndexNode(InstructionNode):
-    pass
-
 class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):
         self.type = itype
@@ -415,14 +409,6 @@ def get_formatter():
         @visitor.when(LessEqualNode)
         def visit(self, node: LessEqualNode):
             return f'{node.dest} = {node.left} <= {node.right}'
-
-        @visitor.when(GetIndexNode)
-        def visit(self, node: GetIndexNode):
-            return f'GETINDEXNODE'
-
-        @visitor.when(SetIndexNode)
-        def visit(self, node: SetIndexNode):
-            return f'SETINDEXNODE'
 
         @visitor.when(PrefixNode)
         def visit(self, node: PrefixNode):

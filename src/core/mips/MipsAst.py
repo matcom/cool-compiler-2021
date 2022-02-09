@@ -217,9 +217,31 @@ class LoadWordNode(InstructionNode):
         self.reg = reg
         self.addr = addr
 
+class LoadAddressNode(InstructionNode):
+    def __init__(self, reg, label):
+        self.reg   = reg
+        self.label = label
+
+class BranchOnNotEqualNode(InstructionNode):
+    def __init__(self, reg1, reg2, label):
+        self.reg1 = reg1
+        self.reg2 = reg2
+        self.label = label
+
+class LabelNode(InstructionNode):
+    def __init__(self, name):
+        self.name = name
+
+class NotNode(InstructionNode):
+    def __init__(self, dest, src):
+        self.dest = dest
+        self.src = src
+
 class DataNode(Node):
     def __init__(self, label):
         self.label = label
+
+
 
 class StringConst(DataNode):
     def __init__(self, label, string):
@@ -276,3 +298,32 @@ class LabelRelativeLocation(MemoryLocation):
     def offset(self):
         return self._offset
 
+
+def push_register(reg):
+    move_stack = AdditionInmediateNode(SP_REG, SP_REG, -DOUBLE_WORD)
+    save_location = RegisterRelativeLocation(SP_REG, 0)
+    save_register = StoreWordNode(reg, save_location)
+    return [move_stack, save_register]
+
+def pop_register(reg):
+    load_value = LoadWordNode(reg, RegisterRelativeLocation(SP_REG, 0))
+    move_stack = AdditionInmediateNode(SP_REG, SP_REG, DOUBLE_WORD)
+    return [load_value, move_stack]
+
+
+def create_object(reg1, reg2):
+    instructions = []
+
+    instructions.append(ShiftLeftLogicalNode(reg1, reg1, 2))
+    instructions.append(LoadAddressNode(reg2, PROTO_TABLE_LABEL))
+    instructions.append(AddUnsignedNode(reg2, reg2, reg1))
+    instructions.append(LoadWordNode(reg2, RegisterRelativeLocation(reg2, 0)))
+    instructions.append(LoadWordNode(ARG_REGISTERS[0], RegisterRelativeLocation(reg2, 4)))
+    instructions.append(ShiftLeftLogicalNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 2))
+    instructions.append(JumpAndLinkNode("malloc"))
+    instructions.append(MoveNode(ARG_REGISTERS[2], ARG_REGISTERS[0]))
+    instructions.append(MoveNode(ARG_REGISTERS[0], reg2))
+    instructions.append(MoveNode(ARG_REGISTERS[1], V0_REG))
+    instructions.append(JumpAndLinkNode("copy"))
+
+    return instructions
