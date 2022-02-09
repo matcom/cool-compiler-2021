@@ -74,6 +74,11 @@ class LessEqualNode(ArithExpressionNode):
 class EqualNode(ArithExpressionNode):
     pass
 
+class NotNode(Node):
+    def __init__(self, dest, expr):
+        self.dest = dest
+        self.expr = expr
+
 #Attr
 class GetAttrNode(InstructionNode):
     def __init__(self, dest, instance, attr, static_type):
@@ -93,6 +98,7 @@ class SetAttrNode(InstructionNode):
 #Arrays and Strings
 class GetIndexNode(InstructionNode):
     pass
+
 class SetIndexNode(InstructionNode):
     pass
 
@@ -189,11 +195,6 @@ class StrNode(InstructionNode):
     def __init__(self, dest, value):
         self.local_dest = dest
         self.value = value
-
-class ToStrNode(InstructionNode):
-    def __init__(self, dest, ivalue):
-        self.dest = dest
-        self.ivalue = ivalue
 
 class ReadNode(InstructionNode):
     def __init__(self, dest):

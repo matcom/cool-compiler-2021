@@ -74,6 +74,10 @@ def get_formatter():
         @visitor.when(EqualNode)
         def visit(self, node):
             return f'{node.dest} = {node.left} = {node.right}'
+
+        @visitor.when(NotNode)
+        def visit(self, node):
+            return f'{node.dest} = NOT {node.expr}'
         #Attr
         @visitor.when(GetAttrNode)
         def visit(self, node):
@@ -137,7 +141,7 @@ def get_formatter():
         def visit(self, node):
             return f'{node.dest} = SUBSTRING {node.word} {node.begin} {node.end}'
 
-        @visitor.when(ToStrNode)
+        @visitor.when(StrNode)
         def visit(self, node):
             return f'{node.dest} = STR {node.ivalue}'
 

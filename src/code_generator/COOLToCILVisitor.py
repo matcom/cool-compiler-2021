@@ -1,5 +1,5 @@
 import cil_ast as cil
-from BaseCOOLToCILVisitor import *
+from BaseCoolToCilVisitor import *
 from utils import visitor
 from utils.ast import *
 
@@ -106,34 +106,63 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(FuncCallNode)
     def visit(self, node, scope):
-        obj, otype = self.visit(node.obj, scope)
+        # obj, otype = self.visit(node.obj, scope)
         
-        meth = otype.get_method(node.id)
-        args_node = [cil.ArgNode(obj)] + self.handle_arguments(node.args, scope, meth.param_types)
+        # meth = otype.get_method(node.id)
+        # args_node = [cil.ArgNode(obj)] + self.handle_arguments(node.args, scope, meth.param_types)
 
-        rtype = meth.return_type
-        result = None if isinstance(rtype, VoidType()) else self.define_internal_local()
+        # rtype = meth.return_type
+        # result = None if isinstance(rtype, VoidType()) else self.define_internal_local()
 
-        continue_label = cil.LabelNode(f'continue__{self.index}') 
-        isvoid = self.check_void(obj)
-        self.register_instruction(cil.IfGoToNode(isvoid, continue_label.label))
-        self.register_instruction(cil.ErrorNode('dispatch_error'))
-        self.register_instruction(continue_label)
+        # continue_label = cil.LabelNode(f'continue__{self.index}') 
+        # isvoid = self.check_void(obj)
+        # self.register_instruction(cil.IfGoToNode(isvoid, continue_label.label))
+        # self.register_instruction(cil.ErrorNode('dispatch_error'))
+        # self.register_instruction(continue_label)
 
-        #desambiguar segun sea el llamado, dinamico o estatico
-        # self.register_instruction(cil.StaticCallNode(node.type, node.id, result, args_node, rtype.name))
-        # return result, self._return_type(otype, node)
+        # #desambiguar segun sea el llamado, dinamico o estatico
+        # # self.register_instruction(cil.StaticCallNode(node.type, node.id, result, args_node, rtype.name))
+        # # return result, self._return_type(otype, node)
 
-        # self.register_instruction(cil.DynamicCallNode(self.current_type.name, 'self', node.id, result, args_node, rtype.name))
-        # return result, self._return_type(self.current_type, node)
+        # # self.register_instruction(cil.DynamicCallNode(self.current_type.name, 'self', node.id, result, args_node, rtype.name))
+        # # return result, self._return_type(self.current_type, node)
 
-        # if otype in [StringType(), IntType(), BoolType()]:
-        #     self.register_instruction(cil.StaticCallNode(otype.name, node.id, result, args_node, rtype.name))
-        # else:
-        #     self.register_instruction(cil.DynamicCallNode(otype.name, obj, node.id, result, args_node, rtype.name))
-        # return result, self._return_type(otype, node)
+        # # if otype in [StringType(), IntType(), BoolType()]:
+        # #     self.register_instruction(cil.StaticCallNode(otype.name, node.id, result, args_node, rtype.name))
+        # # else:
+        # #     self.register_instruction(cil.DynamicCallNode(otype.name, obj, node.id, result, args_node, rtype.name))
+        # # return result, self._return_type(otype, node)
 
-        return
+        result_local = self.define_internal_local(scope = scope, name = "result")
+        expr_value = self.visit(node.instance, scope)
+
+        func_call_args = []
+        for arg in node.args:
+            param_local = self.visit(arg, scope)
+            func_call_args.append(cil.ArgNode(param_local))
+        func_call_args.append(cil.ArgNode(expr_value))
+
+        static_instance = self.define_internal_local(scope=scope, name='static_instance')
+        self.register_instruction(cil.AllocateNode(node.static_type,self.context.get_type(node.static_type).tag ,static_instance))
+        
+        self.register_instruction(cil.VCallNode(result_local, node.method, func_call_args, node.static_type, static_instance))
+        return result_local
+
+    @visitor.when(MemberCallNode)
+    def visit(self, node, scope):
+        result_local = self.define_internal_local(scope = scope, name = "result")
+        expr_value = self.visit(node.instance, scope)
+
+        member_call_args = []
+        for arg in node.args:
+            param_local = self.visit(arg, scope)
+            member_call_args.append(cil.ArgNode(param_local))
+        member_call_args.append(cil.ArgNode(expr_value))
+
+        dynamic_type = node.instance.computed_type.name
+        self.register_instruction(cil.VCallNode(result_local, node.method, member_call_args, dynamic_type, expr_value))
+        
+        return result_local
 
     @visitor.when(IfNode)
     def visit(self, node, scope):
@@ -248,7 +277,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(NegationNode)
     def visit(self, node, scope):
-        return self._define_unary_node(node, scope, cil.LogicalNotNode)
+        return self._define_unary_node(node, scope, cil.NotNode)
 
     @visitor.when(IsVoidNode)
     def visit(self, node, scope):

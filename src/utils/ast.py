@@ -1,3 +1,6 @@
+from ast import arg
+
+
 class Node():
     def __init__(self):
         self.line = 0
@@ -60,6 +63,11 @@ class FuncCallNode(ExpressionNode):
         self.object = obj
         self.type = typex
 
+class MemberCallNode(ExpressionNode):
+    def __init__(self, idx, args):
+        super().__init__()
+        self.id = idx
+        self.args = args
 
 class IfNode(ExpressionNode):
     def __init__(self, condition, then_expr, else_expr):
