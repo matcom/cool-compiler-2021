@@ -112,7 +112,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         args_node = [cil.ArgNode(obj)] + self.handle_arguments(node.args, scope, meth.param_types)
 
         rtype = meth.return_type
-        result = None if isinstance(rtype, VoidType) else self.define_internal_local()
+        result = None if isinstance(rtype, VoidType()) else self.define_internal_local()
 
         continue_label = cil.LabelNode(f'continue__{self.index}') 
         isvoid = self.check_void(obj)

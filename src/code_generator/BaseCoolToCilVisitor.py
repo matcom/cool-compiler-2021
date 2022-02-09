@@ -183,3 +183,13 @@ class BaseCOOLToCILVisitor:
                 cil.TypeNode("String", [],  string_methods), 
                 cil.TypeNode('Int', [], int_methods),
                 cil.TypeNode('Bool', [], bool_methods)]
+
+    #este metodo tiene que ver con los types de la semantica REVISAAAARRRR!
+    def get_type(self, name) -> Type:
+        try:
+            return self.types[name]
+        except KeyError:
+            error_text = TypesError.TYPE_NOT_DEFINED % name
+            raise TypesError(error_text)
+
+    
