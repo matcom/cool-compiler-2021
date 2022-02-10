@@ -67,20 +67,31 @@ for program_file in programs_files:
     elif module_to_execute == 'semantic':
         with open(program_route, 'r', encoding='UTF-8') as f:
             ast, errors = parse(f.read())
+            if len(errors):
+                print(errors)
+                continue
 
-            type_collector = type_collector.TypeCollector(errors)
-            type_collector.visit(ast)
+            collector = type_collector.TypeCollector(errors)
+            collector.visit(ast)
+            if len(errors):
+                print(errors)
+                continue
 
-            context = type_collector.context
-            type_builder = type_builder.TypeBuilder(context, errors)
-            type_builder.visit(ast)
+            context = collector.context
+            builder = type_builder.TypeBuilder(context, errors)
+            builder.visit(ast)
+            if len(errors):
+                print(errors)
+                continue
 
             inferred_types = {}
-            type_checker = type_checker.TypeChecker(context, errors, inferred_types)
-            _, _, auto_types = type_checker.visit(ast)
+            checker = type_checker.TypeChecker(context, errors, inferred_types)
+            _, _, auto_types = checker.visit(ast)
             while True:
                 old_len = len(auto_types)
-                scope, inferred_types, auto_types = type_checker.visit(ast)
+                errors = []
+                checker = type_checker.TypeChecker(context, errors, inferred_types)
+                scope, inferred_types, auto_types = checker.visit(ast)
                 if len(auto_types) == old_len:
                     break
 
@@ -88,6 +99,7 @@ for program_file in programs_files:
 
             if len(errors):
                 print(errors)
+                continue
 
     else:
         print('Invalid section to execute: ' + module_to_execute)

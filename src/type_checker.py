@@ -1,5 +1,5 @@
 import utils.visitor as visitor
-from utils.semantic import Scope, StrType
+from utils.semantic import Scope, StrType, BasicTypes
 from utils.semantic import SemanticError
 from utils.semantic import SelfType, AutoType
 from utils.semantic import ErrorType, IntType, BoolType, ObjType
@@ -447,6 +447,8 @@ class TypeChecker:
     def visit(self, node, scope, set_type=None):
         # print('call')
         obj_type = self.visit(node.obj, scope)
+        if not obj_type:
+            obj_type = self.context.get_type(BasicTypes.SELF.value)
         t0 = obj_type
         if isinstance(t0, SelfType):
             t0 = self.current_type
