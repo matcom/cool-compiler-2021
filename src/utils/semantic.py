@@ -325,3 +325,14 @@ class Scope:
                     return local, s.id
             s = s.parent
         return None, None
+
+    def __str__(self, tabs=0):
+        ans = "\t" * tabs + f"\\__ID:{self.id}, VARS:"
+        for var_info in self.locals:
+            ans += f" ({var_info.name},{var_info.type.name})"
+
+        children = "\n".join(child.__str__(tabs + 1) for child in self.children)
+
+        if len(self.children) == 0:
+            return f"{ans}"
+        return f"{ans}\n{children}"

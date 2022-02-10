@@ -84,6 +84,8 @@ for program_file in programs_files:
                 if len(auto_types) == old_len:
                     break
 
+            print(str(scope))
+
             if len(errors):
                 print(errors)
 
