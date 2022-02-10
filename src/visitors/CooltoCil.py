@@ -387,7 +387,6 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
         for decl in node.decl_list:
             var = self.visit(decl, scope)
-            
 
         value = self.visit(node.expression, scope)
         
@@ -437,7 +436,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(LessNode)
     def visit(self, node, scope):
         pass
-
+    
     @visitor.when(LeqNode)
     def visit(self, node, scope):
         pass
