@@ -3,7 +3,11 @@ import cool.visitor as visitor
 
 
 class Node:
-    pass
+    comment: str = ""
+
+    def set_comment(self, comment: str) -> "Node":
+        self.comment = comment
+        return self
 
 
 class ProgramNode(Node):
@@ -115,11 +119,17 @@ class SetAttribNode(InstructionNode):
 
 
 class GetIndexNode(InstructionNode):
-    pass
+    def __init__(self, dest: str, instance: str, index: str) -> None:
+        self.dest: str = dest
+        self.instance: str = instance
+        self.index: str = index
 
 
 class SetIndexNode(InstructionNode):
-    pass
+    def __init__(self, instance: str, index: int, source: str) -> None:
+        self.instance: str = instance
+        self.index: int = index
+        self.source: str = source
 
 
 class AllocateNode(InstructionNode):
@@ -129,7 +139,9 @@ class AllocateNode(InstructionNode):
 
 
 class ArrayNode(InstructionNode):
-    pass
+    def __init__(self, dest: str, size: int) -> None:
+        self.dest: str = dest
+        self.size: int = size
 
 
 class TypeOfNode(InstructionNode):
@@ -138,16 +150,26 @@ class TypeOfNode(InstructionNode):
         self.dest: str = dest
 
 
+class AncestorNode(InstructionNode):
+    def __init__(self, obj: str, dest: str):
+        self.obj: str = obj
+        self.dest: str = dest
+
+
 class LabelNode(InstructionNode):
-    pass
+    def __init__(self, label: str):
+        self.label: str = label
 
 
 class GotoNode(InstructionNode):
-    pass
+    def __init__(self, address: str):
+        self.address: str = address
 
 
 class GotoIfNode(InstructionNode):
-    pass
+    def __init__(self, condition: str, address: str):
+        self.condition: str = condition
+        self.address: str = address
 
 
 class StaticCallNode(InstructionNode):
@@ -211,7 +233,17 @@ class PrintNode(InstructionNode):
         self.str_addr = str_addr
 
 
-class CILFormatter(object):
+class CommentNode(InstructionNode):
+    def __init__(self, comment):
+        self.comment = comment
+
+
+class EmptyInstruction(InstructionNode):
+    def __init__(self):
+        pass
+
+
+class CILFormatter:
     @visitor.on("node")
     def visit(self, node):
         pass
@@ -240,61 +272,209 @@ class CILFormatter(object):
         return f"function {node.name} {{\n\t{params}\n\n\t{local_vars}\n\n\t{instructions}\n}}"
 
     @visitor.when(ParamNode)
-    def visit(self, node):
-        return f"PARAM {node.name}"
+    def visit(self, node: ParamNode):
+        return (
+            f"PARAM {node.name}"
+            if node.comment == ""
+            else f"PARAM {node.name} # {node.comment}"
+        )
 
     @visitor.when(LocalNode)
     def visit(self, node):
-        return f"LOCAL {node.name}"
+        return (
+            f"LOCAL {node.name}"
+            if node.comment == ""
+            else f"LOCAL {node.name} # {node.comment}"
+        )
 
     @visitor.when(AssignNode)
     def visit(self, node):
-        return f"{node.dest} = {node.source}"
+        return (
+            f"{node.dest} = {node.source}"
+            if node.comment == ""
+            else f"{node.dest} = {node.source} # {node.comment}"
+        )
 
     @visitor.when(PlusNode)
     def visit(self, node):
-        return f"{node.dest} = {node.left} + {node.right}"
+        return (
+            f"{node.dest} = {node.left} + {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = {node.left} + {node.right} # {node.comment}"
+        )
 
     @visitor.when(MinusNode)
     def visit(self, node):
-        return f"{node.dest} = {node.left} - {node.right}"
+        return (
+            f"{node.dest} = {node.left} - {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = {node.left} - {node.right} # {node.comment}"
+        )
 
     @visitor.when(StarNode)
     def visit(self, node):
-        return f"{node.dest} = {node.left} * {node.right}"
+        return (
+            f"{node.dest} = {node.left} * {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = {node.left} * {node.right} # {node.comment}"
+        )
 
     @visitor.when(DivNode)
     def visit(self, node):
-        return f"{node.dest} = {node.left} / {node.right}"
+        return (
+            f"{node.dest} = {node.left} / {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = {node.left} / {node.right} # {node.comment}"
+        )
+
+    @visitor.when(EqualNode)
+    def visit(self, node: EqualNode):
+        return (
+            f"{node.dest} = {node.left} == {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = {node.left} + {node.right} # {node.comment}"
+        )
+    
+    @visitor.when(LessThanNode)
+    def visit(self, node: LessThanNode):
+        return (
+            f"{node.dest} = {node.left} < {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = {node.left} < {node.right} # {node.comment}"
+        )
+    
+    @visitor.when(LessEqualNode)
+    def visit(self, node: LessEqualNode):
+        return (
+            f"{node.dest} = {node.left} <= {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = {node.left} <= {node.right} # {node.comment}"
+        )
 
     @visitor.when(AllocateNode)
     def visit(self, node):
-        return f"{node.dest} = ALLOCATE {node.type}"
+        return (
+            f"{node.dest} = ALLOCATE {node.type}"
+            if node.comment == ""
+            else f"{node.dest} = ALLOCATE {node.type} # {node.comment}"
+        )
 
     @visitor.when(TypeOfNode)
     def visit(self, node):
-        return f"{node.dest} = TYPEOF {node.type}"
+        return (
+            f"{node.dest} = TYPEOF {node.obj}"
+            if node.comment == ""
+            else f"{node.dest} = TYPEOF {node.obj} # {node.comment}"
+        )
+
+    @visitor.when(AncestorNode)
+    def visit(self, node):
+        return (
+            f"{node.dest} = ANCESTOR {node.obj}"
+            if node.comment == ""
+            else f"{node.dest} = ANCESTOR {node.obj} # {node.comment}"
+        )
 
     @visitor.when(StaticCallNode)
     def visit(self, node):
-        return f"{node.dest} = CALL {node.function}"
+        return (
+            f"{node.dest} = CALL {node.function}"
+            if node.comment == ""
+            else f"{node.dest} = CALL {node.function} # {node.comment}"
+        )
 
     @visitor.when(DynamicCallNode)
     def visit(self, node):
-        return f"{node.dest} = VCALL {node.type} {node.method}"
+        return (
+            f"{node.dest} = VCALL {node.type} {node.method}"
+            if node.comment == ""
+            else f"{node.dest} = VCALL {node.type} {node.method} # {node.comment}"
+        )
 
     @visitor.when(GetAttribNode)
     def visit(self, node: GetAttribNode):
-        return f"{node.dest} = GETATTR {node.instance} {node.attr}"
+        return (
+            f"{node.dest} = GETATTR {node.instance} {node.attr}"
+            if node.comment == ""
+            else f"{node.dest} = GETATTR {node.instance} {node.attr} # {node.comment}"
+        )
 
     @visitor.when(SetAttribNode)
     def visit(self, node: SetAttribNode):
-        return f"SETATTR {node.instance} {node.attr} {node.source}"
+        return (
+            f"SETATTR {node.instance} {node.attr} {node.source}"
+            if node.comment == ""
+            else f"SETATTR {node.instance} {node.attr} {node.source} # {node.comment}"
+        )
 
     @visitor.when(ArgNode)
     def visit(self, node):
-        return f"ARG {node.name}"
+        return (
+            f"ARG {node.name}"
+            if node.comment == ""
+            else f"ARG {node.name} # {node.comment}"
+        )
 
     @visitor.when(ReturnNode)
     def visit(self, node):
-        return f'\n\tRETURN {node.value if node.value is not None else ""}'
+        return (
+            f"\n\tRETURN {node.value if node.value is not None else 0}"
+            if node.comment == ""
+            else f"\n\tRETURN {node.value if node.value is not None else 0} # {node.comment}"
+        )
+
+    @visitor.when(GotoNode)
+    def visit(self, node: GotoNode):
+        return (
+            f"GOTO {node.address}"
+            if node.comment == ""
+            else f"GOTO {node.address} # {node.comment}"
+        )
+
+    @visitor.when(GotoIfNode)
+    def visit(self, node: GotoNode):
+        return (
+            f"IF {node.condition} GOTO {node.address}"
+            if node.comment == ""
+            else f"IF {node.condition} GOTO {node.address} # {node.comment}"
+        )
+
+    @visitor.when(LabelNode)
+    def visit(self, node):
+        return (
+            f"{node.label}:"
+            if node.comment == ""
+            else f"{node.label}: # {node.comment}"
+        )
+
+    @visitor.when(ArrayNode)
+    def visit(self, node: ArrayNode):
+        return (
+            f"{node.dest} = ARRAY {node.size}"
+            if node.comment == ""
+            else f"{node.dest} = ARRAY {node.size} # {node.comment}"
+        )
+
+    @visitor.when(GetIndexNode)
+    def visit(self, node: GetIndexNode):
+        return (
+            f"{node.dest} = GETINDEX {node.instance} {node.index}"
+            if node.comment == ""
+            else f"{node.dest} = GETINDEX {node.instance} {node.index} # {node.comment}"
+        )
+
+    @visitor.when(SetIndexNode)
+    def visit(self, node: SetIndexNode):
+        return (
+            f"SETINDEX {node.instance} {node.index} {node.source}"
+            if node.comment == ""
+            else f"SETINDEX {node.instance} {node.index} {node.source} # {node.comment}"
+        )
+
+    @visitor.when(CommentNode)
+    def visit(self, node):
+        return f"# {node.comment}"
+
+    @visitor.when(EmptyInstruction)
+    def visit(self, node):
+        return ""

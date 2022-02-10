@@ -32,17 +32,17 @@ class BaseCOOLToCILVisitor:
     def instructions(self) -> List[cil.InstructionNode]:
         return self.current_function.instructions
 
-    def register_local(self, var_name: str) -> str:
+    def register_local(self, var_name: str, comment: str = "") -> str:
         local_name = (
             f"local_{self.current_function.name[9:]}_{var_name}_{len(self.localvars)}"
         )
         local_name = var_name
-        local_node = cil.LocalNode(local_name)
+        local_node = cil.LocalNode(local_name).set_comment(comment)
         self.localvars.append(local_node)
         return local_name
 
-    def define_internal_local(self) -> str:
-        return self.register_local(f"internal_{len(self.localvars)}")
+    def define_internal_local(self, comment: str = "") -> str:
+        return self.register_local(f"internal_{len(self.localvars)}", comment)
 
     def register_instruction(
         self, instruction: cil.InstructionNode

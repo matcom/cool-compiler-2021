@@ -253,7 +253,7 @@ class TypeChecker:
                     err.UNDEFINED_TYPE_IN_BRANCH % (line, column, type_name)
                 )
 
-            # Cannot be dublicate Branches types
+            # Cannot be duplicated Branches types
             if type_name in visited:
                 line, column = node.cases_positions[i]
                 self.errors.append(

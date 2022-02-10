@@ -681,6 +681,161 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
             source, inst_type = self.visit(expr, scope)
         return source, inst_type
 
+    @visitor.when(cool.ConditionalNode)
+    def visit(self, node: cool.ConditionalNode, scope: Scope):
+        self.register_instruction(cil.CommentNode("Conditional"))
+
+        node_id = hash(node)
+        result_address = self.define_internal_local()
+        conditional_address = self.define_internal_local()
+        source, _ = self.visit(node.if_expr, scope)
+
+        self.register_instruction(cil.AssignNode(conditional_address, source))
+        self.register_instruction(
+            cil.GotoIfNode(conditional_address, f"then_{node_id}")
+        )
+        self.register_instruction(cil.GotoNode(f"else_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstruction())
+        self.register_instruction(cil.LabelNode(f"then_{node_id}"))
+        then_source, then_type = self.visit(node.then_expr, scope)
+        self.register_instruction(cil.AssignNode(result_address, then_source))
+        self.register_instruction(cil.GotoNode(f"end_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstruction())
+        self.register_instruction(cil.LabelNode(f"else_{node_id}"))
+        else_source, else_type = self.visit(node.else_expr, scope)
+        self.register_instruction(cil.AssignNode(result_address, else_source))
+        self.register_instruction(cil.GotoNode(f"end_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstruction())
+        self.register_instruction(cil.LabelNode(f"endif_{node_id}"))
+
+        return result_address, then_type.join(else_type)
+
+    @visitor.when(cool.WhileNode)
+    def visit(self, node: cool.WhileNode, scope: Scope):
+        # result_addres = self.define_internal_local()
+        node_id = hash(node)
+        conditional_address = self.define_internal_local()
+
+        # self.register_instruction(cil.AssignNode(result_addres, 0))
+        self.register_instruction(cil.LabelNode(f"while_start_{node_id}"))
+
+        conditional_source, _ = self.visit(node.condition, scope)
+        self.register_instruction(
+            cil.AssignNode(conditional_address, conditional_source)
+        )
+        self.register_instruction(
+            cil.GotoIfNode(conditional_address, f"while_continue_{node_id}")
+        )
+        self.register_instruction(cil.GotoNode(f"while_end_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstruction())
+        self.register_instruction(cil.LabelNode(f"while_continue_{node_id}"))
+        self.visit(node.body, scope)
+        self.register_instruction(cil.GotoNode(f"while_start_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstruction())
+        self.register_instruction(cil.LabelNode(f"while_end_{node_id}"))
+
+        return 0, self.context.get_type("Object")
+
+    @visitor.when(cool.SwitchCaseNode)
+    def visit(self, node: cool.SwitchCaseNode, scope: Scope):
+        node_id = hash(node)
+        expr_address, _ = self.visit(node.expr, scope)
+        counter = self.define_internal_local(
+            "Counter to know how many ancestors has the expression type"
+        )
+        expr_type_address = self.define_internal_local("Expression type")
+        # boolean_array_address = self.define_internal_local()
+        ancestor_type = self.define_internal_local("Ancestor type")
+        comparisson_address = self.define_internal_local("Comparison result")
+        array = self.define_internal_local("Array of ancestors")
+        resutl_address = self.define_internal_local(
+            "Result of the switch expression address"
+        )
+
+        types = [self.context.get_type(type_name) for _, type_name, _ in node.cases]
+
+        self.register_instruction(
+            cil.TypeOfNode(expr_address, expr_type_address).set_comment(
+                "Get the switch expression type"
+            )
+        )
+        self.register_instruction(
+            cil.AssignNode(ancestor_type, expr_type_address).set_comment(
+                "The first ancestor will be the type itself"
+            )
+        )
+
+        self.register_instruction(cil.EmptyInstruction())
+        self.register_instruction(cil.LabelNode("while_start"))
+        self.register_instruction(
+            cil.EqualNode(comparisson_address, ancestor_type, "0")
+        )
+        self.register_instruction(cil.GotoIfNode(comparisson_address, "while_end"))
+
+        self.register_instruction(
+            cil.PlusNode(counter, counter, "1").set_comment(
+                "Increment the counter"
+            )
+        )
+        self.register_instruction(
+            cil.AncestorNode(ancestor_type, ancestor_type)
+        )
+        self.register_instruction(cil.GotoNode("while_start"))
+
+        self.register_instruction(cil.LabelNode("while_end"))
+        self.register_instruction(cil.EmptyInstruction())
+        
+        self.register_instruction(
+            cil.AssignNode(ancestor_type, expr_type_address).set_comment(
+                "The first ancestor will be the type itself"
+            )
+        )
+        self.register_instruction(cil.ArrayNode(array, counter).set_comment("Create an array of ancestors"))
+        index = self.define_internal_local("Iteration index")
+        comparison = self.define_internal_local("Foreach comparison")
+        self.register_instruction(cil.AssignNode(index, "0").set_comment("Initialize the index with the value 0"))
+        self.register_instruction(cil.LabelNode("foreach_start"))
+        self.register_instruction(cil.LessThanNode(comparison, index, counter).set_comment("Check if the index is less than the counter"))
+        self.register_instruction(cil.GotoIfNode(comparison, "foreach_body"))
+        self.register_instruction(cil.GotoNode("foreach_end"))
+        self.register_instruction(cil.LabelNode("foreach_body"))
+
+        self.register_instruction(cil.SetIndexNode(array, index, ancestor_type).set_comment("Set the index of the array with the ancestor type"))
+        self.register_instruction(cil.AncestorNode(ancestor_type, ancestor_type).set_comment("Get the next ancestor"))
+        self.register_instruction(cil.PlusNode(index, index, "1").set_comment("Increment index"))
+        self.register_instruction(cil.GotoNode("foreach_start"))
+        self.register_instruction(cil.LabelNode("foreach_end"))
+
+        # for type in types:
+        #     self.register_instruction(cil.TypeOfNode(expr_address, type_address))
+        #     comparison_address = self.define_internal_local()
+        #     self.register_instruction(
+        #         cil.EqualNode(comparison_address, type_address, type.name)
+        #     )  # TODO: type.name is temporal
+        #     self.register_instruction(
+        #         cil.GotoIfNode(comparison_address, f"case_{type.name}_{node_id}")
+        #     )
+
+        # self.register_instruction(cil.EmptyInstruction())
+        # for i, (id, type, expr) in enumerate(node.cases):
+        #     self.register_instruction(cil.LabelNode(f"case_{type}_{node_id}"))
+        #     local_var = self.register_local(id)
+        #     self.register_instruction(cil.AssignNode(local_var, expr_address))
+
+        #     source, _ = self.visit(expr, scope.children[i])
+        #     self.register_instruction(cil.AssignNode(resutl_address, source))
+        #     self.register_instruction(cil.GotoNode(f"case_end_{node_id}"))
+        #     self.register_instruction(cil.EmptyInstruction())
+
+        # self.register_instruction(cil.LabelNode(f"case_end_{node_id}"))
+
+        return resutl_address, Type.multi_join(types)
+
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):
         obj_source, obj_type = self.visit(node.obj, scope)
@@ -713,11 +868,11 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
-        return node.lex, self.context.get_type("Bool")
+        return (1 if node.lex == "true" else 0), self.context.get_type("Bool")
 
     @visitor.when(icool.NullNode)
     def visit(self, node: icool.NullNode, scope: Scope):
-        return node.lex, icool.NullType()
+        return node.lex, icool.NullType
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
@@ -768,7 +923,6 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
     def visit(self, node: cool.EqualNode, scope: Scope):
         return self.visit_arith_node(node, scope, cil.EqualNode)
 
-
     def visit_arith_node(
         self, node: cool.BinaryNode, scope: Scope, cil_type: type
     ) -> Tuple[str, Type]:
@@ -777,3 +931,16 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
         dest = self.define_internal_local()
         self.register_instruction(cil_type(dest, left, right))
         return dest, self.context.get_type("Int")
+    
+    def foreach(self, start: int, end: int, list_of_instructions: List[int]):
+        index = self.define_internal_local("Iteration index")
+        comparison = self.define_internal_local("Iteration comparison")
+        self.register_instruction(cil.AssignNode(index, start))
+        self.register_instruction(cil.LabelNode("foreach_start"))
+        self.register_instruction(cil.LessThanNode(comparison, index, end))
+        self.register_instruction(cil.GotoIfNode(comparison, "foreach_body"))
+        self.register_instruction(cil.GotoNode("foreach_end"))
+        self.register_instruction(cil.LabelNode("foreach_body"))
+        self.register_instruction(cil.PlusNode(index, index, "1").set_comment("Increment"))
+        self.register_instruction(cil.GotoNode("foreach_start"))
+        self.register_instruction(cil.LabelNode("foreach_end"))

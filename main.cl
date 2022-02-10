@@ -1,3 +1,4 @@
+(*
 class Main {
     number: Int <- 0;
 
@@ -47,5 +48,25 @@ class Point3D inherits Point {
 
     get_z(): Int {
         z
+    };
+};
+*)
+
+class Main {
+    number: Int <- 0;
+
+    main() : Object {
+        {   
+            -- if true then "Hello" else "World" fi;
+            -- while true loop
+            --     number <- number + 1
+            -- pool;
+
+            case 1 of
+                a: Int => 0;
+                b: Bool => 1;
+                c: String => 2;
+            esac;
+        }
     };
 };
