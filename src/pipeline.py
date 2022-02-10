@@ -6,6 +6,7 @@ from visitors.Checker import TypeChecker
 from visitors.Inferencer import Inferencer
 from visitors.Executor import Executor, RuntimeException
 from visitors.CooltoCil import MiniCOOLToCILVisitor
+from visitors.CilDepicter import get_formatter
 
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
@@ -48,8 +49,8 @@ class Pipeline():
                 self.typeChecker = TypeChecker(self.context, self.errors)
                 self.typeChecker.visit( self.ast, scope)
             self.coolToCil = MiniCOOLToCILVisitor(self.context)
-            self.coolToCil.visit(self.ast, scope)
-
+            cil_ast = self.coolToCil.visit(self.ast, scope)
+            print(get_formatter(cil_ast))
 
         if verbose:
             print('This is after infering types:')

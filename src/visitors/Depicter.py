@@ -175,3 +175,4 @@ class Depicter(object):
         right = self.visit(node.right)
         depiction = f'{left} <= {right}'
         return depiction
+

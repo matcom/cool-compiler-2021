@@ -129,7 +129,6 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         type_node.attributes = attributes
         type_node.methods = methods
         
-        
         # func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
         for feature, child_scope in zip(node.features, scope.children):
             if isinstance(feature, FuncDeclarationNode):
@@ -160,7 +159,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             self.params.append(cil.ParamNode(arg_name))
         
         self.locals.clear()
-        return_value = self.visit(node.body, scope.children[0])
+        return_value = self.visit(node.body, scope)
         # for instruction, child_scope in zip(node.body, scope.children):
         #     value = self.visit(instruction, child_scope)
 
@@ -199,7 +198,6 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.AssignNode(dest, source))
         return dest
             
-
     @visitor.when(AssignNode) # 
     def visit(self, node, scope):
         ###############################
@@ -270,7 +268,6 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         # node.lex -> str
         ###############################
-        
         if node.lex in self.locals:
             return self.locals[node.lex]
         elif node.lex in self.attrs:
@@ -340,61 +337,112 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         right = self.visit(node.right, scope)
         self.register_instruction(cil.DivNode(dest, left, right))
         return dest
-    
 
     @visitor.when(ChunkNode)
     def visit(self, node, scope):
-        pass
-    
+        ###############################
+        # node.chunk -> [ ExpressionNode... ]
+        ###############################
+
+        for expression in node.chunk:
+            value = self.visit(expression, scope.children[0])
+        return value
+
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
-        pass
-    
+        ###############################
+        # node.ifChunk -> ExpressionNode
+        # node.thenChunk -> ExpressionNode
+        # node.elseChunk -> ExpressionNode
+        ###############################
+
+        then_label = self.define_internal_local()
+        else_label = self.define_internal_local()
+
+        ifexpr = self.visit(node.ifChunk, scope.children[0])
+        self.register_instruction(cil.GotoIfNode(then_label, ifexpr))
+
+        elseexpr = self.visit(node.elseChunk, scope.children[2])
+        self.register_instruction(cil.GotoNode(else_label))
+
+        self.register_instruction(cil.LabelNode(then_label))
+
+        thenexpr = self.visit(node.thenChunk, scope.children[1])
+
+        self.register_instruction(cil.LabelNode(else_label))
+
+        if ifexpr == '1':
+            return thenexpr
+        elif ifexpr =='0':
+            return elseexpr
+        else:
+            raise Exception('something went wrong D:')
+
     @visitor.when(LetInNode)
     def visit(self, node, scope):
-        pass
-    
+        ###############################
+        # node.decl_list -> [ DeclarationNode... ]
+        # node.expression -> ExpressionNode
+        ###############################
+
+        for decl in node.decl_list:
+            var = self.visit(decl, scope)
+            
+
+        value = self.visit(node.expression, scope)
+        
+        return value
+
     @visitor.when(WhileNode)
     def visit(self, node, scope):
         pass
-    
+
+
     @visitor.when(NotNode)
     def visit(self, node, scope):
         pass
-    
+
+
     @visitor.when(IsVoidNode)
     def visit(self, node, scope):
         pass
-    
+
+
     @visitor.when(ComplementNode)
     def visit(self, node, scope):
         pass
-    
+
+
+
     @visitor.when(SwitchCaseNode)
     def visit(self, node, scope):
         pass
-    
+
+
     @visitor.when(TrueNode)
     def visit(self, node, scope):
-        pass
-    
+        return '1'
+
+
     @visitor.when(FalseNode)
     def visit(self, node, scope):
-        pass
-    
+        return '0'
+
+
     @visitor.when(StringNode)
     def visit(self, node, scope):
         pass
-    
+
+
     @visitor.when(LessNode)
     def visit(self, node, scope):
         pass
-    
+
     @visitor.when(LeqNode)
     def visit(self, node, scope):
         pass
-    
+
+
     @visitor.when(EqualNode)
     def visit(self, node, scope):
         pass
-    
