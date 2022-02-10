@@ -152,7 +152,7 @@ class B inherits A {
 
 **Cool Input**
 
-```
+```assembly
 while (<cond_expr>) loop <expr> pool
 ```
 
@@ -180,16 +180,20 @@ if <if_expr> then <then_expr> else <else_expr> fi
 **CCIL Output**
 
 ```assembly
-x = <resultado_numerico_de_if_expr>
-ifFalse x goto else_expr
-label then_expr
+LOCAL f # Init var which will store if result
+<if_cond_expr_locals_init> # Init all local vars from the condition expression
+<do_if_cond_expr> # Execute the condition
+x = <if_cond_expr_result>  # And store it in a local var!
+ifFalse x goto else_expr # 0 means True, otherwise False
 
+label then_expr # Not really needed!
 <do then_expr>
-
+f = <then_expr_result>
 goto endif
-label else_expr
 
+label else_expr
 <do_else_expr>
+f = <else_expr_result>
 
 label endif
 ```
@@ -210,12 +214,17 @@ let <id1>:<type1>, ... <idn>:<typen> in <expr>
 ...
 <init idn>
 
-# Si existe alguna variable let inicializada con una expresion, ejecutar dicha expresion
-<do_idq_expr_and_save_to_idq>
-<do_idk_expr_and_save_to_idk>
-...
-<do_idm_expr_and_save_to_idm>
+# Execute expressions of let vars
+<init_idq_expr_locals>
+<do_idq_expr_and_store_in_idq>
 
+<init_idk_locals>
+<do_idk_expr_and_store_in_idk>
+...
+<init_idm_expr_locals>
+<do_idm_expr_and_store_in_idm>
+
+<init_final_expression_locals>
 <do_expr>
 ```
 
@@ -243,9 +252,9 @@ esac
 <do_case_expr>
 x = <case_expr_result>
 t = typeof x
-label init_case
+label init_case # This is not really needed
 t1 = typeof <id1>
-b1 = t1 == t
+b1 = t1 == t # Comparing types, they must be all equal
 if b1 goto branch1
 
 t2 = typeof <id2>
@@ -256,7 +265,8 @@ if b2 goto branch2
 
 tn = typeof <idn>
 bn = tn == t
-if bn goto branchn
+if bn goto brannch
+# It is not possible to avoid pattern matching
 
 label branch1
 <do_expr1>
@@ -300,7 +310,7 @@ r = call <func_id> n
 **Cool Input**
 
 ```
-<type1>@<type2><func_id>(<arg1>, <arg2>, ..., <argn>);
+<type1>@<type2>.<func_id>(<arg1>, <arg2>, ..., <argn>);
 ```
 
 **CCIL Output**
@@ -310,7 +320,7 @@ r = call <func_id> n
 <init arg2>
 ...
 <init argn>
-t = allocate <type2>
+t = allocate <type2> # It needs to give the same attributes that type one has
 r = vcall t <func_id>  n
 ```
 
@@ -369,4 +379,78 @@ function <function_id> {
 ...
 <do_exprn>
 ```
+
+#### Arithmetic Expression
+
+###### Simple 
+
+**Cool Input**
+
+```c#
+3 + 5
+```
+
+**CCIL Output**
+
+```
+t = 3 + 5
+```
+
+----
+
+###### More than one
+
+**Cool Input**
+
+```
+3 + 5 + 7
+```
+
+**CCIL Output**
+
+```assembly
+# Naive
+t1 = 5 + 7
+t2 = 3 + t1 
+# A little better
+t1 = 5 + 7
+t1 = 3 + t1
+```
+
+
+
+----
+
+###### Using non commutative operations
+
+```python
+3 - 5 - 7
+# -2 -7
+# -9
+```
+
+```assembly
+t1 = 
+```
+
+----
+
+**Cool Input**
+
+```
+100 / 20 / 5 / 2
+```
+
+**CCIL Output**
+
+```
+```
+
+
+
+## Convenciones de variables en Cool
+
+Si es una variable definida por el usuario se le agrega el prefijo _user_. Se aplica tanto a variables definidas en un _let in_ como en _atributos_.
+
+Si es una variable creada cuando se analiza una expresion en particular se convierte en: _<expression_name>\_<expresssion_amounts>_\__<extra_name>_
 
