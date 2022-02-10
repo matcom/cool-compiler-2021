@@ -31,22 +31,29 @@ class TypeChecker:
         if _char not in ''.join(chr(n) for n in range(ord('A'),ord('Z')+1)):
             self.errors.append((f'Class names must be capitalized'))
 
-        attrs = []
-        methods = []
-        for feature in node.features:
-            if isinstance(feature,AttrDeclarationNode):
-                attrs.append(feature)
-            else:
-                methods.append(feature)
+        # attrs = []
+        # methods = []
+        # for feature in node.features:
+        #     if isinstance(feature,AttrDeclarationNode):
+        #         attrs.append(feature)
+        #     else:
+        #         methods.append(feature)
                 
         for attr, owner in self.current_type.all_attributes(): #definir atributos de los ancestros
             if owner != self.current_type:
                 scope.define_variable(attr.name, attr.type)
-        for attr in attrs:
-            self.visit(attr, scope)
+        # for attr in attrs:
+        #     self.visit(attr, scope)
 
-        for method in methods:
-            self.visit(method, scope.create_child())
+        # for method in methods:
+        #     self.visit(method, scope.create_child())
+
+        for feature in node.features:
+            if isinstance(feature,AttrDeclarationNode):
+                self.visit(feature, scope)
+            else:
+                self.visit(feature, scope.create_child())
+
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):

@@ -160,7 +160,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             self.params.append(cil.ParamNode(arg_name))
         
         self.locals.clear()
-        return_value = self.visit(node.body, scope.children[0])
+        return_value = self.visit(node.body, scope)
         # for instruction, child_scope in zip(node.body, scope.children):
         #     value = self.visit(instruction, child_scope)
 
@@ -363,7 +363,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         else_label = self.define_internal_local()
 
         ifexpr = self.visit(node.ifChunk, scope.children[0])
-        self.register_instruction(cil.GotoIfNode(thenlabel, ifexpr))
+        self.register_instruction(cil.GotoIfNode(then_label, ifexpr))
 
         elseexpr = self.visit(node.elseChunk, scope.children[2])
         self.register_instruction(cil.GotoNode(else_label))
@@ -389,9 +389,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
 
         for decl in node.decl_list:
-            self.visit(decl, scope)
+            var = self.visit(decl, scope)
 
-        value = self.visit(node.expression)
+        value = self.visit(node.expression, scope)
         
         return value
 
@@ -423,12 +423,12 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(TrueNode)
     def visit(self, node, scope):
-        pass
+        return '1'
 
 
     @visitor.when(FalseNode)
     def visit(self, node, scope):
-        pass
+        '0'
 
 
     @visitor.when(StringNode)
@@ -439,7 +439,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(LessNode)
     def visit(self, node, scope):
         pass
-
+    
     @visitor.when(LeqNode)
     def visit(self, node, scope):
         pass
