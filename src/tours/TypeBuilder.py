@@ -1,7 +1,16 @@
 from parsing.ast import *
 from cmp.semantic import SemanticError
-from cmp.semantic import ErrorType, StringType, IntType, AutoType, BoolType, ObjectType, IOType, SelfType 
+from cmp.semantic import ErrorType, StringType, IntType, AutoType, BoolType, ObjectType, SelfType 
 import cmp.visitor as visitor 
+
+
+CANNOT_INHERIT = 'SemanticError: Class %s cannot inherit class %s.'
+MAIN_NOT_DEFINED = 'Method "main" must be defined in "Main" class.'
+MAIN_NOT_HERITABLE = 'Class "Main" is not heritable.'
+CYCLES_IN_CLASES = 'The graph defined by parent-child relation on classes may not contain cycles.'
+NOT_SELF_TYPE = 'The type of the parameter "%s" can not be SELF_TYPE in method "%s" in class "%s".'
+IDENTIFIER_USED = 'The identifier "%s" is already used in the param list of method "%s" in class "%s.'
+
 
 class TypeBuilder:
     def __init__(self, context, errors=[]):
@@ -24,7 +33,7 @@ class TypeBuilder:
             try:
                 main_type.get_method('main')
             except SemanticError:
-                self.errors.append("Method 'main' must be defined in 'Main' class.")
+                self.errors.append(MAIN_NOT_DEFINED)
         except SemanticError:
             pass
        
@@ -38,13 +47,13 @@ class TypeBuilder:
             try:
                 parent = self.context.get_type(node.parent)
                 if parent == BoolType() or parent == IntType() or parent == StringType() or parent == SelfType() or parent == AutoType():
-                    self.errors.append(f"Class '{parent.name}' is not heritable.")
+                    self.errors.append(CANNOT_INHERIT.replace('%s', node.id, 1).replace('%s', parent.name, 1))
                     parent = ErrorType()
                 else:
                     try:
                         main_type = self.context.get_type('Main')
                         if parent == main_type:
-                            self.errors.append(f"Class 'Main' is not heritable.")
+                            self.errors.append(MAIN_NOT_HERITABLE)
                             parent = ErrorType()
                     except SemanticError:
                         pass
@@ -53,10 +62,11 @@ class TypeBuilder:
                 parent = ErrorType()      
 
             if parent.conforms_to(self.current_type):
-                self.errors.append(f"The graph defined by parent-child relation on classes may not contain cycles.")
+                self.errors.append(CYCLES_IN_CLASES)
                 parent = ErrorType() 
-                                    
-        self.current_type.set_parent(parent)
+        
+        if self.current_type != ObjectType():                            
+            self.current_type.set_parent(parent)
 
         for feature in node.features:
             self.visit(feature)        
@@ -88,14 +98,14 @@ class TypeBuilder:
             try:
                 param_type = self.context.get_type(var.type)
                 if param_type == SelfType():
-                    self.errors.append(f"The type of the parameter '{var.id}' can not be SELF_TYPE in method '{node.id}' in class '{self.current_type.name}'.")
+                    self.errors.append(NOT_SELF_TYPE.replace('%s', var.id, 1).replace('%s', node.id, 1).replace('%s', self.current_type.name, 1))
                     param_type = ErrorType() 
             except SemanticError as error:
                 self.errors.append(error.text)
                 param_type = ErrorType()
             
             if var.id in params:
-                self.errors.append(f"The identifier '{var.id}' is already used in the param list of method '{node.id}' in class '{self.current_type.name}'.")
+                self.errors.append(IDENTIFIER_USED.replace('%s', var.id, 1).replace('%s', node.id, 1).replace('%s', self.current_type.name, 1))
             
             params.append(var.id)
             types.append(param_type)    

@@ -1,10 +1,12 @@
 import itertools as itt
 from collections import OrderedDict
 
+
 class SemanticError(Exception):
     @property
     def text(self):
         return self.args[0]
+
 
 class Attribute:
     def __init__(self, name, typex):
@@ -16,6 +18,7 @@ class Attribute:
 
     def __repr__(self):
         return str(self)
+
 
 class Method:
     def __init__(self, name, param_names, params_types, return_type):
@@ -33,7 +36,7 @@ class Method:
             other.return_type == self.return_type and \
             other.param_types == self.param_types
 
-# Types
+
 class Type:
     def __init__(self, name:str):
         self.name = name
@@ -142,6 +145,7 @@ class Type:
     def __repr__(self):
         return str(self)
 
+
 class ErrorType(Type):
     def __init__(self):
         Type.__init__(self, '<error>')
@@ -155,12 +159,14 @@ class ErrorType(Type):
     def __eq__(self, other):
         return isinstance(other, ErrorType)
 
+
 class ObjectType(Type):
     def __init__(self):
         Type.__init__(self, 'Object')
    
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, ObjectType)    
+
 
 class IntType(Type):
     def __init__(self):
@@ -170,6 +176,7 @@ class IntType(Type):
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, IntType)
 
+
 class StringType(Type):
     def __init__(self):
         Type.__init__(self, 'String')
@@ -177,6 +184,7 @@ class StringType(Type):
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, StringType)
+
 
 class BoolType(Type):
     def __init__(self):
@@ -186,6 +194,7 @@ class BoolType(Type):
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, BoolType)
 
+
 class AutoType(Type):
     def __init__(self):
         Type.__init__(self, 'AUTO_TYPE')
@@ -194,12 +203,14 @@ class AutoType(Type):
     def __eq__(self, other):
         return isinstance(other, AutoType)
 
+
 class SelfType(Type):
     def __init__(self):
        Type.__init__(self, 'SELF_TYPE')
 
     def __eq__(self, other):
         return isinstance(other, SelfType)
+
 
 class IOType(Type):
     def __init__(self):
@@ -209,6 +220,7 @@ class IOType(Type):
     def __eq__(self, other):
         return isinstance(other, IOType)
     
+
 class Context:
     def __init__(self):
         self.types = {}
@@ -231,10 +243,12 @@ class Context:
     def __repr__(self):
         return str(self)
 
+
 class VariableInfo:
     def __init__(self, name, vtype):
         self.name = name
         self.type = vtype
+
 
 class Scope:
     def __init__(self, parent=None):
@@ -259,6 +273,9 @@ class Scope:
         info = VariableInfo(vname, vtype)
         self.locals.append(info)
         return info
+
+    def remove_variable(self, vname):
+        self.locals = [v for v in self.locals if v.name == vname]
 
     def find_variable(self, vname, index=None):
         locals = self.locals if index is None else itt.islice(self.locals, index)

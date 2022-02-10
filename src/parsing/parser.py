@@ -2,6 +2,7 @@ import ply.yacc as yacc
 from .lexer import COOL_Lexer
 from .ast import *
 
+
 class COOL_Parser:
 
     def __init__(self):
@@ -100,7 +101,7 @@ class COOL_Parser:
     @staticmethod
     def p_exp_assign(p):
         'exp : OBJECTID ASSIGN exp'
-        p[0] = AssignNode(p[1],p[3])
+        p[0] = AssignNode(VariableNode(p[1]),p[3])
 
     @staticmethod
     def p_exp_let(p):
@@ -120,12 +121,12 @@ class COOL_Parser:
     @staticmethod
     def p_iden(p):
         'iden : OBJECTID COLON TYPEID'
-        p[0] = AttrDeclarationNode(p[1],p[3],None)
+        p[0] = VarDeclarationNode(p[1],p[3],None)
 
     @staticmethod
     def p_iden_init(p):
         'iden : OBJECTID COLON TYPEID ASSIGN exp'
-        p[0] = AttrDeclarationNode(p[1],p[3],p[5])
+        p[0] = VarDeclarationNode(p[1],p[3],p[5])
         
     @staticmethod
     def p_case_list_single(p):
@@ -172,7 +173,6 @@ class COOL_Parser:
         'comp : arith EQUAL arith'
         p[0] = EqualsNode(p[1],p[3])
     
-    # ??????
     @staticmethod
     def p_comp_equal_not(p):
         'comp : arith EQUAL NOT exp'

@@ -4,6 +4,7 @@ from cmp.semantic import Scope, SemanticError
 from cmp.semantic import Type, ObjectType, IntType, StringType, BoolType, AutoType, ErrorType, SelfType, IOType
 import cmp.visitor as visitor
 
+
 class TypeInferencer:
     def __init__(self, context=None, errors=[]):
         self.context = context

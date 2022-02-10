@@ -4,17 +4,24 @@ from cmp.semantic import Scope, SemanticError
 from cmp.semantic import Type, ObjectType, IntType, StringType, BoolType, AutoType, ErrorType, SelfType, IOType
 import cmp.visitor as visitor
 
+
 SELF_IS_READONLY = "Variable 'self' is read-only."
 LOCAL_ALREADY_DEFINED = "Variable '%s' is already defined in method '%s'."
-INCOMPATIBLE_TYPES = "Can not convert '%s' into '%s'."
-VARIABLE_NOT_DEFINED = "Variable '%s' is not defined in '%s'."
-INVALID_OPERATION = "Operation '%s' is not defined between '%s' and '%s'."
+INCOMPATIBLE_ATTRIBUTE_TYPE = "TypeError: Inferred type %s of initialization of attribute %s does not conform to declared type %s."
+INCOMPATIBLE_RET_FUNC_TYPE = "TypeError: Inferred return type %s of method %s does not conform to declared return type %s."
+INCOMPATIBLE_DISPATCH_TYPE = "TypeError: In call of method %s, type %s of parameter %s does not conform to declared type %s."
+INCOMPATIBLE_DISPATCH_DEC_TYPE = "TypeError: Expression type %s does not conform to declared static dispatch type %s."
+VARIABLE_NOT_DEFINED = "NameError: Undeclared identifier %s."
+INVALID_OPERATION = "TypeError: non-Int arguments: %s %s %s"
 OPERATION_NOT_DEFINED = "Operation '%s' is not defined for type '%s'."
-PREDICATE_OPERATIONS = "Predicate of the '%s' operation must be bool in method '%s'."
+UNARY_OPERATION_NOT_DEFINED = "TypeError: Argument of '%s' has type %s instead of %s."
+PREDICATE_OPERATIONS = "TypeError: Predicate of '%s' does not have type Bool." 
 TYPE_VOID = "The expression can not be void."
 ATTRIBUTE_NOT_INFERED = "Can not infered attribute '%s' in class '%s'."
 RETURN_TYPE_METHOD = "Can not infered the return type of the method '%s' in class '%s'."
 VAR_TYPE_NOT_INFERED = "Can not infered the type of the '%s' '%s' in method '%s' in class '%s'."
+WRONG_NUMBER_ARGUMENTS = "SemanticError: Method %s called with wrong number of arguments."
+
 
 class TypeChecker:
     def __init__(self, context, errors=[]):
@@ -72,7 +79,7 @@ class TypeChecker:
                 expr_type = self.current_type
         
             if node_type != AutoType() and expr_type != AutoType() and not expr_type.conforms_to(node_type):
-                self.errors.append(INCOMPATIBLE_TYPES.replace('%s', expr_type.name, 1).replace('%s', node_type.name, 1))
+                self.errors.append(INCOMPATIBLE_ATTRIBUTE_TYPE.replace('%s', expr_type.name, 1).replace('%s', node.id, 1).replace('%s', node_type.name, 1))
             elif node_type == AutoType() and expr_type != AutoType():
                 InferType(self.current_type, node_type, expr_type)
             elif node_type != AutoType() and expr_type == AutoType():
@@ -103,7 +110,7 @@ class TypeChecker:
 
         if return_type_met != AutoType() and return_type_exp != AutoType():
             if not return_type_exp.conforms_to(return_type_met):
-                self.errors.append(INCOMPATIBLE_TYPES.replace('%s',return_type_exp.name , 1).replace('%s',return_type_met.name , 1))       
+                self.errors.append(INCOMPATIBLE_RET_FUNC_TYPE.replace('%s', return_type_exp.name, 1).replace('%s',node.id , 1).replace('%s',return_type_met.name , 1))       
         elif return_type_met == AutoType() and return_type_exp != AutoType():
             InferType(self.current_type, return_type_met, return_type_exp)
         elif return_type_met != AutoType() and return_type_exp == AutoType():
@@ -126,7 +133,7 @@ class TypeChecker:
                 try:
                     typex = self.context.get_type(node.type)
                     if not obj_type.conforms_to(typex):
-                        self.errors.append(INCOMPATIBLE_TYPES.replace('%s', node.obj.name, 1).replace('%s', typex.name, 1))
+                        self.errors.append(INCOMPATIBLE_DISPATCH_DEC_TYPE.replace('%s', obj_type.name, 1).replace('%s', typex.name, 1))
                         typex = ErrorType()
                     obj_type = typex    
                 except SemanticError as error:
@@ -139,12 +146,12 @@ class TypeChecker:
             method = obj_type.get_method(node.id)
             if (node.arg is None and method.arg is None) or (len(node.arg) == len(method.param_types)):
                 if node.arg is not None:
-                    for arg, param_type in zip(node.arg, method.param_types):
+                    for arg, param_type, param_name in zip(node.arg, method.param_types, method.param_names):
                         self.visit(arg, scope)
                         arg_type = arg.computed_type if arg.computed_type != SelfType() else self.current_type 
                     
                         if param_type != AutoType() and arg_type != AutoType() and not arg_type.conforms_to(param_type):
-                            self.errors.append(INCOMPATIBLE_TYPES.replace('%s', arg_type.name, 1).replace('%s', param_type.name, 1))
+                            self.errors.append(INCOMPATIBLE_DISPATCH_TYPE.replace('%s', node.id, 1).replace('%s', arg_type.name, 1).replace('%s', param_name, 1).replace('%s', param_type.name, 1))
                             typee = ErrorType()
                         elif param_type == AutoType() and arg_type != AutoType():
                             InferType(self.current_type, param_type, arg_type)
@@ -152,7 +159,7 @@ class TypeChecker:
                         elif param_type != AutoType() and arg_type == AutoType():
                             InferType(self.current_type, arg_type, param_type)
             else:
-                self.errors.append(f"Method '{method.name}' only accepts '{len(method.param_types)}' arguments.")           
+                self.errors.append(WRONG_NUMBER_ARGUMENTS.replace('%s', method.name, 1))           
 
             if typee is None:
                 ret_type = method.return_type if method.return_type != SelfType() else obj_type 
@@ -176,7 +183,7 @@ class TypeChecker:
         if predicate_type != AutoType() and predicate_type.conforms_to(BoolType()):
             node.computed_type = find_parent_type(self.current_type, node.then.computed_type, node.elsex.computed_type)
         elif predicate_type != AutoType(): 
-            self.errors.append(PREDICATE_OPERATIONS.replace('%s', "Conditional", 1).replace('%s', self.current_method.name, 1))
+            self.errors.append(PREDICATE_OPERATIONS.replace('%s', "if", 1))
             node.computed_type = ErrorType()
         else:
             InferType(self.current_type, predicate_type, BoolType())
@@ -228,7 +235,7 @@ class TypeChecker:
         if predicate_type != AutoType() and predicate_type.conforms_to(BoolType()):            
             node.computed_type = ObjectType()
         elif predicate_type != AutoType():    
-            self.errors.append(PREDICATE_OPERATIONS.replace('%s',"Loop", 1).replace('%s', self.current_method, 1))
+            self.errors.append(PREDICATE_OPERATIONS.replace('%s',"Loop", 1))
             node.computed_type = ErrorType()
         else:
             InferType(self.current_type, predicate_type, BoolType())
@@ -294,17 +301,17 @@ class TypeChecker:
         right_type = node.right.computed_type
     
         if isinstance(node, PlusNode):
-            operation = "plus"
+            operation = "+"
         elif isinstance(node, MinusNode):
-            operation= "minus"
+            operation= "-"
         elif isinstance(node, DivNode):
-            operation = "division" 
+            operation = "/" 
         elif isinstance(node, StarNode):
-            operation = "multiplication"  
+            operation = "*"  
         elif isinstance(node, ElessNode):
-            operation = "less or equals"
+            operation = "<="
         elif isinstance(node, LessNode):
-            operation = "less"           
+            operation = "<"           
         
         if left_type != AutoType() and right_type != AutoType():
             if not isinstance(node, EqualsNode):
@@ -317,7 +324,7 @@ class TypeChecker:
                     if(left_type == right_type):
                         self.errors.append(OPERATION_NOT_DEFINED.replace('%s', operation, 1).replace('%s', left_type.name, 1))
                     else:
-                        self.errors.append(INVALID_OPERATION.replace('%s', operation, 1).replace('%s', left_type.name, 1).replace('%s', right_type.name, 1))
+                        self.errors.append(INVALID_OPERATION.replace('%s', left_type.name, 1).replace('%s', operation, 1).replace('%s', right_type.name, 1))
                     node.computed_type = ErrorType()
             else:
                 if left_type == right_type:
@@ -327,7 +334,7 @@ class TypeChecker:
                         self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', left_type.name, 1))
                         node.computed_type = ErrorType() 
                 else:
-                    self.errors.append(INVALID_OPERATION.replace('%s', 'equals', 1).replace('%s', left_type.name, 1).replace('%s', right_type.name, 1))
+                    self.errors.append(INVALID_OPERATION.replace('%s', left_type.name, 1).replace('%s', "=", 1).replace('%s', right_type.name, 1))
                     node.computed_type = ErrorType()
         
         else:
@@ -379,7 +386,7 @@ class TypeChecker:
             if type_expr == AutoType():
                 InferType(self.current_type, type_expr, IntType())
         else:     
-            self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "Prime", 1).replace('%s', type_expr, 1))
+            self.errors.append(UNARY_OPERATION_NOT_DEFINED.replace('%s', "~", 1).replace('%s', type_expr.name, 1).replace('%s', "Int", 1))
             node.computed_type = ErrorType()
    
     @visitor.when(NotNode)
@@ -392,7 +399,7 @@ class TypeChecker:
             if type_expr == AutoType():
                 InferType(self.current_type, type_expr, BoolType())
         else:     
-            self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "Not", 1).replace('%s', type_expr.name, 1))
+            self.errors.append(UNARY_OPERATION_NOT_DEFINED.replace('%s', "not", 1).replace('%s', type_expr.name, 1).replace('%s', "Bool", 1))
             node.computed_type = ErrorType()
 
     @visitor.when(StringNode)
@@ -413,7 +420,7 @@ class TypeChecker:
         if scope.is_defined(node.lex, self.current_type):
             var_type = scope.find_variable_or_attribute(node.lex, self.current_type).type
         else:
-            self.errors.append(VARIABLE_NOT_DEFINED.replace('%s', node.lex, 1).replace('%s', self.current_type.name, 1))
+            self.errors.append(VARIABLE_NOT_DEFINED.replace('%s', node.lex, 1))
             var_type = ErrorType()
         node.computed_type = var_type    
    

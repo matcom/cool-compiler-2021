@@ -1,5 +1,6 @@
 import ply.lex as lex
 
+
 class COOL_Lexer:
     tokens = [
         'OBJECTID', # object identifiers
@@ -233,5 +234,3 @@ class COOL_Lexer:
 
     def register_error(self, line, column, text):
         self.errors.append(f'{line,column} - {text}')
-
-

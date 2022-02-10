@@ -3,6 +3,12 @@ from cmp.semantic import SemanticError, Context
 from cmp.semantic import ObjectType, StringType, IntType, AutoType, BoolType, IOType, SelfType
 import cmp.visitor as visitor 
 
+
+BASIC_CLASS_REDEFINED = 'SemanticError: Redefinition of basic class %s.'
+CLASS_REDEFINED = 'SemanticError: Classes may not be redefined'
+MAIN_NOT_DEFINED = 'Class Main must be defined.'
+
+
 class TypeCollector(object):
     def __init__(self):
         self.context = None
@@ -17,7 +23,7 @@ class TypeCollector(object):
         self.context = Context()
         
         # Define base classes and their methods
-        DefineBaseClasses(self.context)
+        define_base_classes(self.context)
 
         for dec in node.declarations:
             self.visit(dec)
@@ -26,18 +32,25 @@ class TypeCollector(object):
         try:
             self.context.get_type('Main')
         except SemanticError:
-            self.errors.append("Class 'Main' must be defined.")
+            self.errors.append(MAIN_NOT_DEFINED)
         
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         try:
             self.context.get_type(node.id)
-            self.errors.append(f"Class '{node.id}' is already defined.")
+            if is_base_class(node.id):
+                self.errors.append(BASIC_CLASS_REDEFINED.replace('%s', node.id, 1))
+            else:
+                self.errors.append(CLASS_REDEFINED)
         except SemanticError:
             self.context.create_type(node.id)
 
 
-def DefineBaseClasses(context):
+def is_base_class(id):
+    return id in ['Object', 'IO', 'Int', 'String', 'Bool']
+
+
+def define_base_classes(context):
     object_type = context.types['Object'] = ObjectType()
     io_type = context.types['IO'] = IOType()
     int_type = context.types['Int'] = IntType()

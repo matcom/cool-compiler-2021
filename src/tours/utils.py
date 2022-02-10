@@ -2,6 +2,7 @@ from parsing.ast import *
 from cmp.semantic import SemanticError, Attribute, Method, Context
 from cmp.semantic import Type, ErrorType, StringType, IntType, AutoType, BoolType, ObjectType, IOType, SelfType 
 
+
 def AnalizeClassAutoTypes(class_type, errors, inferences):
     for attribute in class_type.attributes:
         if attribute.type == AutoType():
@@ -17,6 +18,7 @@ def AnalizeClassAutoTypes(class_type, errors, inferences):
             else:
                 inferences.append(f"The return type of the method '{method.name}' of the class '{class_type.name}' was infered to '{method.return_type.infered_type.name}'.")
 
+
 def AnalizeScopeAutoTypes(scope, errors, inferences):
     stack = [scope]
     while len(stack) != 0:
@@ -30,6 +32,7 @@ def AnalizeScopeAutoTypes(scope, errors, inferences):
                     errors.append(f"Can not infered the type of the variable '{var.name}' of the class '{temp.class_name}'.")
                 else:
                     inferences.append(f"The type of the variable '{var.name}' of the class '{temp.class_name}' was infered to '{var.type.infered_type.name}'.")
+
 
 def find_parent_type(current_type, type1, type2):
     if type1 == AutoType() and type2 != AutoType():
@@ -62,6 +65,7 @@ def find_parent_type(current_type, type1, type2):
         return temp 
     else:
         return parent3 
+
 
 def InferType(current_type, auto_var, not_auto_var):
     if not_auto_var != ErrorType():
