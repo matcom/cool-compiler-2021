@@ -3,6 +3,7 @@ import os
 import ast_print
 import type_collector
 import type_builder
+import type_checker
 from lexer import tokenize
 from parser import parse
 from testers import test_parser
@@ -69,10 +70,19 @@ for program_file in programs_files:
 
             type_collector = type_collector.TypeCollector(errors)
             type_collector.visit(ast)
-            context = type_collector.context
 
+            context = type_collector.context
             type_builder = type_builder.TypeBuilder(context, errors)
             type_builder.visit(ast)
+
+            inferred_types = {}
+            type_checker = type_checker.TypeChecker(context, errors, inferred_types)
+            _, _, auto_types = type_checker.visit(ast)
+            while True:
+                old_len = len(auto_types)
+                scope, inferred_types, auto_types = type_checker.visit(ast)
+                if len(auto_types) == old_len:
+                    break
 
             if len(errors):
                 print(errors)
