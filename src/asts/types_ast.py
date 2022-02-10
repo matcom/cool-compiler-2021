@@ -1,5 +1,5 @@
-from typing import List, Tuple
 from __future__ import annotations
+from typing import List, Tuple
 
 
 class Node:
