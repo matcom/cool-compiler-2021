@@ -20,7 +20,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.StaticCallNode(self.to_function_name('main', 'Main'), main_instance))
         self.register_instruction(cil.ReturnNode(0))
 
-        #self.register_builtin()
+        self.register_builtin()
         self.current_function = None
 
         for x, y in zip(node.declarations, scope.childs):
@@ -53,9 +53,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         type.attributes = [i.name for i in self.current_type.attributes]
         iter_type = self.current_type
         while iter_type is not None:
-            type.methods += [self.to_function_name(i, iter_type.name) for i in iter_type.methods.keys()]
+            type.methods.update({i: self.to_function_name(i, iter_type.name) for i in iter_type.methods.keys()})
             iter_type = iter_type.parent
-        type.methods.reverse()
 
         for feat, child in zip(node.features, scope.childs):
             if isinstance(feat, cool.FuncDeclarationNode):
@@ -457,7 +456,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         else:
             type = self.define_internal_local()
             self.register_instruction(cil.TypeOfNode(type, node.obj.ret_expr))
-            self.register_instruction(cil.DynamicCallNode(type, node.id, ret))
+            stype = node.obj.static_type.name
+            self.register_instruction(cil.DynamicCallNode(stype, type, self.types_map[stype].methods[node.id.lex], ret))
         node.ret_expr = ret
 
     @visitor.when(cool.MemberCallNode)
@@ -475,7 +475,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ArgNode(self.vself.name))
         for arg in args: self.register_instruction(arg)
 
-        self.register_instruction(cil.DynamicCallNode(type, node.id, ret))
+        stype = self.current_type.name
+        self.register_instruction(cil.DynamicCallNode(stype, type, self.types_map[stype].methods[node.id.lex], ret))
         node.ret_expr = ret
 
     @visitor.when(cool.NewNode)

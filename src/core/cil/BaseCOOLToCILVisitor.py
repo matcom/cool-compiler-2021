@@ -8,6 +8,7 @@ class BaseCOOLToCILVisitor:
         self.dotdata = []
         self.dotcode = []
 
+        self.types_map = {}
         self.current_type = None
         self.current_method = None
         self.current_function = None
@@ -71,6 +72,7 @@ class BaseCOOLToCILVisitor:
 
     def register_type(self, name):
         type_node = cil.TypeNode(name)
+        self.types_map[name] = type_node
         self.dottypes.append(type_node)
         return type_node
 
@@ -137,8 +139,8 @@ class BaseCOOLToCILVisitor:
         self.register_instruction(cil.CopyNode(result, self.vself.name))
         self.register_instruction(cil.ReturnNode(result))
 
-        type_node.methods = [self.to_function_name(name, 'Object') for name in ['abort', 'type_name', 'copy']]
-        type_node.methods += [self.init_name('Object')]
+        type_node.methods = {name: self.to_function_name(name, 'Object') for name in ['abort', 'type_name', 'copy']}
+        type_node.methods['init'] = self.init_name('Object')
         obj_methods = ['abort', 'type_name', 'copy']
 
         # IO
@@ -151,24 +153,24 @@ class BaseCOOLToCILVisitor:
 
         self.current_function = self.register_function(self.to_function_name('out_string', 'IO'))
         self.register_param(self.vself)
-        self.register_param(VariableInfo('x', None))
+        x = self.register_param(VariableInfo('x', None))
         vname = self.define_internal_local()
-        self.register_instruction(cil.GetAttribNode(vname, 'x', 'value', 'String'))
+        self.register_instruction(cil.GetAttribNode(vname, x, 'value', 'String'))
         self.register_instruction(cil.PrintStringNode(vname))
         self.register_instruction(cil.ReturnNode(self.vself.name))
 
         self.current_function = self.register_function(self.to_function_name('out_int', 'IO'))
         self.register_param(self.vself)
-        self.register_param(VariableInfo('x', None))
+        x = self.register_param(VariableInfo('x', None))
         vname = self.define_internal_local()
-        self.register_instruction(cil.GetAttribNode(vname, 'x', 'value', 'Int'))
+        self.register_instruction(cil.GetAttribNode(vname, x, 'value', 'Int'))
         self.register_instruction(cil.PrintIntNode(vname))
         self.register_instruction(cil.ReturnNode(self.vself.name))
 
         self.current_function = self.register_function(self.to_function_name('in_string', 'IO'))
         self.register_param(self.vself)
         result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
+        self.register_instruction(cil.ReadStringNode(result))
         instance = self.define_internal_local()
         self.register_instruction(cil.ArgNode(result))
         self.register_instruction(cil.StaticCallNode(self.init_name('String'), instance))
@@ -177,28 +179,28 @@ class BaseCOOLToCILVisitor:
         self.current_function = self.register_function(self.to_function_name('in_int', 'IO'))
         self.register_param(self.vself)
         result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
+        self.register_instruction(cil.ReadIntNode(result))
         instance = self.define_internal_local()
         self.register_instruction(cil.ArgNode(result))
         self.register_instruction(cil.StaticCallNode(self.init_name('Int'), instance))
         self.register_instruction(cil.ReturnNode(instance))
 
-        type_node.methods = [self.to_function_name(method, 'Object') for method in obj_methods]
-        type_node.methods += [self.to_function_name(name, 'IO') for name in
-                              ['out_string', 'out_int', 'in_string', 'in_int']]
-        type_node.methods += [self.init_name('IO')]
+        type_node.methods = {method: self.to_function_name(method, 'Object') for method in obj_methods}
+        type_node.methods.update({name: self.to_function_name(name, 'IO') for name in
+                              ['out_string', 'out_int', 'in_string', 'in_int']})
+        type_node.methods['init'] = self.init_name('IO')
 
         # String
         type_node = self.register_type('String')
         type_node.attributes = ['value', 'length']
 
         self.current_function = self.register_function(self.init_name('String'))
-        self.register_param(VariableInfo('val', None))
+        val = self.register_param(VariableInfo('val', None))
         instance = self.define_internal_local()
         self.register_instruction(cil.AllocateNode('String', instance))
-        self.register_instruction(cil.SetAttribNode(instance, 'value', 'val', 'String'))
+        self.register_instruction(cil.SetAttribNode(instance, 'value', val, 'String'))
         result = self.define_internal_local()
-        self.register_instruction(cil.LengthNode(result, 'val'))
+        self.register_instruction(cil.LengthNode(result, val))
         attr = self.define_internal_local()
         self.register_instruction(cil.ArgNode(result))
         self.register_instruction(cil.StaticCallNode(self.init_name('Int'), attr))
@@ -213,15 +215,15 @@ class BaseCOOLToCILVisitor:
 
         self.current_function = self.register_function(self.to_function_name('concat', 'String'))
         self.register_param(self.vself)
-        self.register_param(VariableInfo('s', None))
+        s = self.register_param(VariableInfo('s', None))
         str_1 = self.define_internal_local()
         str_2 = self.define_internal_local()
         length_1 = self.define_internal_local()
         length_2 = self.define_internal_local()
         self.register_instruction(cil.GetAttribNode(str_1, self.vself.name, 'value', 'String'))
-        self.register_instruction(cil.GetAttribNode(str_2, 's', 'value', 'String'))
+        self.register_instruction(cil.GetAttribNode(str_2, s, 'value', 'String'))
         self.register_instruction(cil.GetAttribNode(length_1, self.vself.name, 'length', 'String'))
-        self.register_instruction(cil.GetAttribNode(length_2, 's', 'length', 'String'))
+        self.register_instruction(cil.GetAttribNode(length_2, s, 'length', 'String'))
         self.register_instruction(cil.GetAttribNode(length_1, length_1, 'value', 'Int'))
         self.register_instruction(cil.GetAttribNode(length_2, length_2, 'value', 'Int'))
         self.register_instruction(cil.PlusNode(length_1, length_1, length_2))
@@ -235,8 +237,8 @@ class BaseCOOLToCILVisitor:
 
         self.current_function = self.register_function(self.to_function_name('substr', 'String'))
         self.register_param(self.vself)
-        self.register_param(VariableInfo('i', None))
-        self.register_param(VariableInfo('l', None))
+        i = self.register_param(VariableInfo('i', None))
+        l = self.register_param(VariableInfo('l', None))
         result = self.define_internal_local()
         index_value = self.define_internal_local()
         length_value = self.define_internal_local()
@@ -245,8 +247,8 @@ class BaseCOOLToCILVisitor:
         less_value = self.define_internal_local()
         str_value = self.define_internal_local()
         self.register_instruction(cil.GetAttribNode(str_value, self.vself.name, 'value', 'String'))
-        self.register_instruction(cil.GetAttribNode(index_value, 'i', 'value', 'Int'))
-        self.register_instruction(cil.GetAttribNode(length_value, 'l', 'value', 'Int'))
+        self.register_instruction(cil.GetAttribNode(index_value, i, 'value', 'Int'))
+        self.register_instruction(cil.GetAttribNode(length_value, l, 'value', 'Int'))
         # Check Out of range error
         self.register_instruction(cil.GetAttribNode(length_attr, self.vself.name, 'length', 'String'))
         self.register_instruction(cil.PlusNode(length_substr, length_value, index_value))
@@ -258,36 +260,36 @@ class BaseCOOLToCILVisitor:
         self.register_instruction(cil.StaticCallNode(self.init_name('String'), instance))
         self.register_instruction(cil.ReturnNode(instance))
 
-        type_node.methods = [self.to_function_name(method, 'Object') for method in obj_methods]
-        type_node.methods += [self.to_function_name(name, 'String') for name in ['length', 'concat', 'substr']]
-        type_node.methods += [self.init_name('String')]
+        type_node.methods = {method: self.to_function_name(method, 'Object') for method in obj_methods}
+        type_node.methods.update({name: self.to_function_name(name, 'String') for name in ['length', 'concat', 'substr']})
+        type_node.methods['init'] = self.init_name('String')
 
         # Int
         type_node = self.register_type('Int')
         type_node.attributes = ['value']
 
         self.current_function = self.register_function(self.init_name('Int'))
-        self.register_param(VariableInfo('val', None))
+        val = self.register_param(VariableInfo('val', None))
         instance = self.define_internal_local()
         self.register_instruction(cil.AllocateNode('Int', instance))
-        self.register_instruction(cil.SetAttribNode(instance, 'value', 'val', 'Int'))
+        self.register_instruction(cil.SetAttribNode(instance, 'value', val, 'Int'))
         self.register_instruction(cil.ReturnNode(instance))
 
-        type_node.methods = [self.to_function_name(method, 'Object') for method in obj_methods]
-        type_node.methods += [self.init_name('Int')]
+        type_node.methods = {method:self.to_function_name(method, 'Object') for method in obj_methods}
+        type_node.methods['init'] = self.init_name('Int')
 
         # Bool
         type_node = self.register_type('Bool')
         type_node.attributes = ['value']
 
         self.current_function = self.register_function(self.init_name('Bool'))
-        self.register_param(VariableInfo('val', None))
+        val = self.register_param(VariableInfo('val', None))
         instance = self.define_internal_local()
         self.register_instruction(cil.AllocateNode('Bool', instance))
-        self.register_instruction(cil.SetAttribNode(instance, 'value', 'val', 'Bool'))
+        self.register_instruction(cil.SetAttribNode(instance, 'value', val, 'Bool'))
         self.register_instruction(cil.ReturnNode(instance))
 
-        type_node.methods = [self.to_function_name(method, 'Object') for method in obj_methods]
-        type_node.methods += [self.init_name('Bool')]
+        type_node.methods = {method: self.to_function_name(method, 'Object') for method in obj_methods}
+        type_node.methods['init'] = self.init_name('Bool')
 
 

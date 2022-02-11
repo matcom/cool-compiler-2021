@@ -13,7 +13,7 @@ class TypeNode(Node):
     def __init__(self, name):
         self.name = name
         self.attributes = []
-        self.methods = []
+        self.methods = {}
 
 class DataNode(Node):
     def __init__(self, vname, value):
@@ -139,8 +139,9 @@ class StaticCallNode(InstructionNode):
         return f"{self.dest} = CALL {self.function}"
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
-        self.type = xtype
+    def __init__(self, type, obj,  method, dest):
+        self.type = type
+        self.obj = obj
         self.method = method
         self.dest = dest
 
@@ -198,7 +199,11 @@ class ToStrNode(InstructionNode):
         self.dest = dest
         self.value = value
 
-class ReadNode(InstructionNode):
+class ReadStringNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
+class ReadIntNode(InstructionNode):
     def __init__(self, dest):
         self.dest = dest
 
@@ -316,7 +321,7 @@ def get_formatter():
 
         @visitor.when(DynamicCallNode)
         def visit(self, node):
-            return f'{node.dest} = VCALL {node.type} {node.method.lex}'
+            return f'{node.dest} = VCALL {node.type} {node.method}'
 
         @visitor.when(ArgNode)
         def visit(self, node):
@@ -354,8 +359,12 @@ def get_formatter():
         def visit(self, node: ErrorNode):
             return f'ERROR {self.visit(node.data)}'
 
-        @visitor.when(ReadNode)
-        def visit(self, node: ReadNode):
+        @visitor.when(ReadStringNode)
+        def visit(self, node: ReadStringNode):
+            return f'{node.dest} = READ'
+
+        @visitor.when(ReadIntNode)
+        def visit(self, node: ReadIntNode):
             return f'{node.dest} = READ'
 
         @visitor.when(SetAttribNode)

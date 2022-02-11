@@ -6,6 +6,7 @@ from core.semantic.Type_Builder import Type_Builder
 from core.semantic.Type_Checker import Type_Checker
 from core.cil.COOLToCILVisitor import COOLToCILVisitor
 from core.cil.CILAst import get_formatter
+from core.mips.CilToMipsVisitor import CILToMIPSVisitor
 
 def main(args):
     try:
@@ -49,6 +50,10 @@ def main(args):
     CILVisitor = COOLToCILVisitor(type_Checker.Context)
     CILast = CILVisitor.visit(COOLast, scope)
     print(get_formatter()(CILast))
+
+    MIPSVisitor = CILToMIPSVisitor()
+    MIPSAst = MIPSVisitor.visit(CILast)
+    print("here")
 
 
 

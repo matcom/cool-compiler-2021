@@ -1,9 +1,9 @@
-
-
 DOUBLE_WORD = 4
 REGISTERS_NAMES  = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8']
 ARG_REGISTERS_NAMES = ['a0', 'a1', 'a2', 'a3']
 
+TYPES_LABEL   = "types_table"
+PROTOTYPE_LABEL       = "prototype_table"
 
 class Register:
     def __init__(self, name):
@@ -32,7 +32,7 @@ class ProgramNode(Node):
 
 
 class FunctionNode(Node):
-    def __init__(self, label, instructions, params, localvars):
+    def __init__(self, label, params, localvars):
         self.label = label
         self.instructions = []
         self.params = params
@@ -237,6 +237,15 @@ class NotNode(InstructionNode):
         self.dest = dest
         self.src = src
 
+class ShiftLeftNode(InstructionNode):
+    def __init__(self, dest, src, bits):
+        self.dest = dest
+        self.src  = src
+        self.bits = bits
+
+class SyscallNode(InstructionNode):
+    pass
+
 class DataNode(Node):
     def __init__(self, label):
         self.label = label
@@ -314,16 +323,16 @@ def pop_register(reg):
 def create_object(reg1, reg2):
     instructions = []
 
-    instructions.append(ShiftLeftLogicalNode(reg1, reg1, 2))
-    instructions.append(LoadAddressNode(reg2, PROTO_TABLE_LABEL))
-    instructions.append(AddUnsignedNode(reg2, reg2, reg1))
+    instructions.append(ShiftLeftNode(reg1, reg1, 2))
+    instructions.append(LoadAddressNode(reg2, PROTOTYPE_LABEL))
+    instructions.append(AdditionNode(reg2, reg2, reg1))
     instructions.append(LoadWordNode(reg2, RegisterRelativeLocation(reg2, 0)))
     instructions.append(LoadWordNode(ARG_REGISTERS[0], RegisterRelativeLocation(reg2, 4)))
-    instructions.append(ShiftLeftLogicalNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 2))
-    instructions.append(JumpAndLinkNode("malloc"))
+    instructions.append(ShiftLeftNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 2))
+    instructions.append(JalNode("malloc"))
     instructions.append(MoveNode(ARG_REGISTERS[2], ARG_REGISTERS[0]))
     instructions.append(MoveNode(ARG_REGISTERS[0], reg2))
     instructions.append(MoveNode(ARG_REGISTERS[1], V0_REG))
-    instructions.append(JumpAndLinkNode("copy"))
+    instructions.append(JalNode("copy"))
 
     return instructions
