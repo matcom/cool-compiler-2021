@@ -37,19 +37,24 @@ class CCILGenerator:
 
         return(operations, in_fval)
 
-    # Still haven't thought have to handle non initialized vars!
     @visitor.when(sem_ast.VarDeclarationNode)
     def visit(self, node: sem_ast.VarDeclarationNode) -> VISITOR_RESULT:
+        fvalue_id:str = USER + node.id
+
         if node.expr is None:
-            raise Exception("Uninitialized variables are not implemented in CCIL yet!")
+            return ([], create_uninitialized_storage(node, fvalue_id))
 
         (expr_ops, expr_fv) =  self.visit(node.expr)
-        
-        fvalue_id:str = USER + node.id
         expr_fv.id = fvalue_id
 
         return (expr_ops, expr_fv)
 
+    @visitor.when(sem_ast.AssignNode)
+    def visit(self, node: sem_ast.AssignNode) -> VISITOR_RESULT:
+        (expr_ops, expr_fval) = self.visit(node.expr)
+        expr_fval.id = USER + node.id 
+
+        return (expr_ops, expr_fval)
 
     @visitor.when(sem_ast.ConditionalNode)
     def visit(self, node: sem_ast.ConditionalNode) -> VISITOR_RESULT:
@@ -72,6 +77,10 @@ class CCILGenerator:
 
         return ([*if_ops, if_false, *then_ops, else_label, *else_ops, fvalue], fvalue)
 
+    @visitor.when(sem_ast.CaseNode)
+    def visit(self, node:sem_ast.CaseNode):
+        pass
+
     @visitor.when(sem_ast.LoopNode)
     def visit(self, node: sem_ast.LoopNode) -> VISITOR_RESULT:
         times = self.times(node)
@@ -89,10 +98,11 @@ class CCILGenerator:
         if_false = IfFalseNode(node, cond_fval, end_loop_label)
         go_to = GoToNode(node, loop_label)
 
+        fval = create_uninitialized_storage(node, f"loop_{times}_fv"),
         # Loop Nodes have void return type, how to express it??
         return (
-            [*cond_ops, loop_label, if_false, *body_ops, go_to, end_loop_label],
-            None,
+            [*cond_ops, loop_label, if_false, *body_ops, go_to, end_loop_label, fval],
+            fval
         )
 
     @visitor.when(sem_ast.ArithmeticNode)
@@ -106,19 +116,23 @@ class CCILGenerator:
         right_id = extract_id(node, right_fval)
 
         op: ReturnOpNode
+        fval_id: str
         match node:
             case sem_ast.PlusNode:
                 op = SumOpNode(left_id, right_id)
+                fval_id = f"sum_{times}"
             case sem_ast.MinusNode:
                 op = MinusOpNode(left_id, right_id)
+                fval_id = f"minus_{times}"
             case sem_ast.StarNode:
                 op = MultOpNode(left_id, right_id)
+                fval_id = f"mult_{times}"
             case sem_ast.DivNode:
                 op = DivOpNode(left_id, right_id)
+                fval_id = f"div_{times}"
             case _:
                 raise Exception("Pattern match failure visiting artihmetic expression")
 
-        fval_id = f"arith_{times}"
         fval = StorageNode(node, fval_id, op)
 
         return ([*left_ops, *right_ops, fval], fval)
