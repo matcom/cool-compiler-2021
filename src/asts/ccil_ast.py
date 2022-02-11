@@ -52,6 +52,26 @@ class BinaryOpNode(ReturnOpNode):
         self.right = right
 
 
+class SumOpNode(ReturnOpNode):
+    def __init__(self, node) -> None:
+        super().__init__(node)
+
+
+class MinusOpNode(ReturnOpNode):
+    def __init__(self, node) -> None:
+        super().__init__(node)
+
+
+class MultOpNode(ReturnOpNode):
+    def __init__(self, node) -> None:
+        super().__init__(node)
+
+
+class DivOpNode(ReturnOpNode):
+    def __init__(self, node) -> None:
+        super().__init__(node)
+
+
 class AtomOpNode(ReturnOpNode):
     def __init__(self, node) -> None:
         """
@@ -81,14 +101,14 @@ class FlowControlNode(OperationNode):
 
 
 class IfNode(FlowControlNode):
-    def __init__(self, node, eval_value: StorageNode, target: LabelNode) -> None:
+    def __init__(self, node, eval_value: AtomOpNode, target: LabelNode) -> None:
         super().__init__(node)
         self.eval_value = eval_value
         self.target = target
 
 
 class IfFalseNode(IfNode):
-    def __init__(self, node, eval_value: StorageNode, target: LabelNode) -> None:
+    def __init__(self, node, eval_value: AtomOpNode, target: LabelNode) -> None:
         super().__init__(node, eval_value, target)
 
 
@@ -106,3 +126,7 @@ class LabelNode(FlowControlNode):
 
 def create_assignation(node, idx: str, target: str):
     return StorageNode(node, idx, IdNode(node, target))
+
+
+def extract_id(node, storage_node: StorageNode) -> IdNode:
+    return IdNode(node, storage_node.id)
