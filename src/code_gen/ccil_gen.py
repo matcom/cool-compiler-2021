@@ -7,6 +7,8 @@ from typing import Tuple, List
 # All operations that define an expression and where it is stored
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
 
+USER = "user"
+
 # CCIL stands for Cool Cows Intermediate Language ;)
 class CCILGenerator:
     """
@@ -19,6 +21,35 @@ class CCILGenerator:
     @visitor.on("node")
     def visit(self, _):
         self.time_record: Dict[str, int] = Dict()
+
+    @visitor.when(sem_ast.LetNode)
+    def visit(self, node: sem_ast.LetNode) -> VISITOR_RESULT:
+        operations: List[OperationNode] = []
+        fvalues: List[StorageNode] = []
+
+        for var in node.var_decl_list:
+           (var_ops, var_fv) = self.visit(var) 
+           operations += var_ops
+           fvalues += var_fv
+
+        (in_ops, in_fval) = self.visit(node.in_expr)
+        operations += in_ops
+
+        return(operations, in_fval)
+
+    # Still haven't thought have to handle non initialized vars!
+    @visitor.when(sem_ast.VarDeclarationNode)
+    def visit(self, node: sem_ast.VarDeclarationNode) -> VISITOR_RESULT:
+        if node.expr is None:
+            raise Exception("Uninitialized variables are not implemented in CCIL yet!")
+
+        (expr_ops, expr_fv) =  self.visit(node.expr)
+        
+        fvalue_id:str = USER + node.id
+        expr_fv.id = fvalue_id
+
+        return (expr_ops, expr_fv)
+
 
     @visitor.when(sem_ast.ConditionalNode)
     def visit(self, node: sem_ast.ConditionalNode) -> VISITOR_RESULT:
