@@ -66,6 +66,9 @@ for program_file in programs_files:
     # To run semantic
     elif module_to_execute == 'semantic':
         with open(program_route, 'r', encoding='UTF-8') as f:
+            program_route = program_route[:len(program_route)-3] + '_error.txt'
+            with open(program_route, 'r', encoding='UTF-8') as f1:
+                print(f1.read())
             ast, errors = parse(f.read())
             if len(errors):
                 print(errors)
@@ -73,29 +76,20 @@ for program_file in programs_files:
 
             collector = type_collector.TypeCollector(errors)
             collector.visit(ast)
-            if len(errors):
-                print(errors)
-                continue
+            # if len(errors):
+            #     print(errors)
+            #     continue
 
             context = collector.context
             builder = type_builder.TypeBuilder(context, errors)
             builder.visit(ast)
-            if len(errors):
-                print(errors)
-                continue
+            # if len(errors):
+            #     print(errors)
+            #     continue
 
-            inferred_types = {}
-            checker = type_checker.TypeChecker(context, errors, inferred_types)
-            _, _, auto_types = checker.visit(ast)
-            while True:
-                old_len = len(auto_types)
-                errors = []
-                checker = type_checker.TypeChecker(context, errors, inferred_types)
-                scope, inferred_types, auto_types = checker.visit(ast)
-                if len(auto_types) == old_len:
-                    break
-
-            print(str(scope))
+            checker = type_checker.TypeChecker(context, errors)
+            scope = checker.visit(ast)
+            # print(str(scope))
 
             if len(errors):
                 print(errors)
