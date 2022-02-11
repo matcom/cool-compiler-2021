@@ -39,6 +39,12 @@ class ReturnOpNode(OperationNode):
         super().__init__(node)
 
 
+class VoidNode(ReturnOpNode):
+    """Operation that indicate that the Storage Node is not initialized"""
+
+    pass
+
+
 class BinaryOpNode(ReturnOpNode):
     def __init__(self, node, left: AtomOpNode, right: AtomOpNode) -> None:
         """
@@ -52,24 +58,48 @@ class BinaryOpNode(ReturnOpNode):
         self.right = right
 
 
-class SumOpNode(ReturnOpNode):
-    def __init__(self, node) -> None:
-        super().__init__(node)
+class SumOpNode(BinaryOpNode):
+    pass
 
 
-class MinusOpNode(ReturnOpNode):
-    def __init__(self, node) -> None:
-        super().__init__(node)
+class MinusOpNode(BinaryOpNode):
+    pass
 
 
-class MultOpNode(ReturnOpNode):
-    def __init__(self, node) -> None:
-        super().__init__(node)
+class MultOpNode(BinaryOpNode):
+    pass
 
 
-class DivOpNode(ReturnOpNode):
-    def __init__(self, node) -> None:
-        super().__init__(node)
+class DivOpNode(BinaryOpNode):
+    pass
+
+
+class EqualOpNode(BinaryOpNode):
+    pass
+
+
+class LessrOrEqualOpNode(BinaryOpNode):
+    pass
+
+
+class LesserOpNode(BinaryOpNode):
+    pass
+
+
+class UnaryOpNode(ReturnOpNode):
+    pass
+
+
+class GetTypeOpNode(UnaryOpNode):
+    """Extracts the type of a node"""
+
+    pass
+
+
+class IsVoidNode(UnaryOpNode):
+    """Operation that returns true if the Storage Node is uninitialized"""
+
+    pass
 
 
 class AtomOpNode(ReturnOpNode):
@@ -126,6 +156,10 @@ class LabelNode(FlowControlNode):
 
 def create_assignation(node, idx: str, target: str):
     return StorageNode(node, idx, IdNode(node, target))
+
+
+def create_uninitialized_storage(node, idx: str):
+    return StorageNode(node, idx, VoidNode(node))
 
 
 def extract_id(node, storage_node: StorageNode) -> IdNode:
