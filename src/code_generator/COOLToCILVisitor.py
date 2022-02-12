@@ -1,5 +1,5 @@
 import cil_ast as cil
-from BaseCoolToCilVisitor import *
+from BaseCoolToCilVisitor import BaseCOOLToCILVisitor
 from utils import visitor
 from utils.ast import *
 
@@ -52,7 +52,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if cil_type_node.attributes:
             constructor.body.expr_list.append(SelfNode())
 
-        for method, mtype in self.current_type.all_methods():
+        for method, mtype in self.current_type.get_all_methods():
             cil_type_node.methods.append((method.name, self.to_function_name(method.name, mtype.name)))
 
         func_declarations += [f for f in node.features if isinstance(f, FuncDeclarationNode)] 
@@ -61,6 +61,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.current_type = None
 
+#this get_method is from semantic types
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):        
         self.current_method = self.current_type.get_method(node.id)
@@ -91,6 +92,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.AllocateNode(node.type, local_value))
             self.register_instruction(cil.SetAttrNode(self.vself.name, node.id, local_value, self.current_type))
 
+#this find_local, find_attribute is from scope
     @visitor.when(AssignNode)
     def visit(self, node, scope):
         var_info = scope.find_local(node.id)
@@ -251,11 +253,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(end_label)
         return result, typex
 
+#this find_local, find_attribute is from scope, this get_type is separate, nedd to do it well
     visitor.when(VarNode)
     def visit(self, node, scope):
         try:
             typex = scope.find_local(node.lex).type
-            name = self.to_var_name(node.lex)
+            name = self.to_variable_name(node.lex)
             return name, get_type(typex, self.current_type)
         except:
             var_info = scope.find_attribute(node.lex)

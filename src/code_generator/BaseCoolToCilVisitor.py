@@ -49,6 +49,26 @@ class BaseCOOLToCILVisitor:
 
     def to_variable_name(self, var_name):
         return f'function_{var_name}'
+
+    def define_method(self, name, param_names, param_types, return_type, pos):
+        if name in self.methods:
+            error_text = SemanticError.METHOD_ALREADY_DEFINED % name
+            raise SemanticError(error_text, *pos)
+
+        method = self.methods[name] = Method(name, param_names, param_types, return_type)
+        return method
+
+    def initialize_attr(self, constructor, attr, scope):
+        if attr.expr:
+            constructor.body.expr_list.append(AssignNode(attr.name, attr.expr))
+        elif attr.type == 'Int':
+            constructor.body.expr_list.append(AssignNode(attr.name, ConstantNumNode(0)))
+        elif attr.type == 'Bool':
+            constructor.body.expr_list.append(AssignNode(attr.name, ConstantBoolNode(False)))
+        elif attr.type == 'String':
+            constructor.body.expr_list.append(AssignNode(attr.name, ConstantStrNode("")))
+        else:
+            constructor.body.expr_list.append(AssignNode(attr.name, ConstantVoidNode(atrr.name)))
     
     def register_function(self, function_name):
         function_node = cil.FunctionNode(function_name, [], [], [])
@@ -65,6 +85,18 @@ class BaseCOOLToCILVisitor:
         data_node = cil.DataNode(vname, value)
         self.dotdata.append(data_node)
         return data_node
+
+    def get_all_attributes(self, clean=True):
+        plain = OrderedDict() if self.parent is None else self.parent.get_all_attributes(False)
+        for attr in self.attributes.values():
+            plain[attr.name] = (attr, self)
+        return plain.values() if clean else plain
+
+    def get_all_methods(self, clean=True):
+        plain = OrderedDict() if self.parent is None else self.parent.get_all_methods(False)
+        for method in self.methods.values():
+            plain[method.name] = (method, self)
+        return plain.values() if clean else plain
 
     def define_built_in(self):
         #regular function
@@ -192,4 +224,28 @@ class BaseCOOLToCILVisitor:
             error_text = TypesError.TYPE_NOT_DEFINED % name
             raise TypesError(error_text)
 
-    
+    def check_void(self, expr):
+        result = self.define_internal_local()
+        self.register_instruction(cil.TypeOfNode(expr, result))
+        
+        void_expr = self.define_internal_local()
+        self.register_instruction(cil.LoadNode(void_expr, self.void_data))
+        self.register_instruction(cil.EqualNode(result, result, void_expr))
+        return result
+
+    def sort_option_nodes_by_type(self, case_list):
+        return sorted(case_list, reverse=True,
+                    key=lambda x: self.context.get_depth(x.typex))
+
+    #esto esta asociado al context que define la semantica
+    def get_depth(self, class_name):
+        typex = self.types[class_name]
+        if typex.parent is None:
+            return 0
+        return 1 + self.get_depth(typex.parent.name)
+
+    def _define_unary_node(self, node, scope, cil_node):
+        result = self.define_internal_local()
+        expr, typex = self.visit(node.expr, scope)
+        self.register_instruction(cil_node(result, expr))
+        return result, typex
