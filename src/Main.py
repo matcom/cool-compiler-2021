@@ -8,6 +8,7 @@ from core.cil.COOLToCILVisitor import COOLToCILVisitor
 from core.cil.CILAst import get_formatter
 from core.mips.CilToMipsVisitor import CILToMIPSVisitor
 
+
 def main(args):
     try:
         with open(args.file, 'r') as fd:
@@ -54,8 +55,6 @@ def main(args):
     MIPSVisitor = CILToMIPSVisitor()
     MIPSAst = MIPSVisitor.visit(CILast)
     print("here")
-
-
 
 
 if __name__ == "__main__":
