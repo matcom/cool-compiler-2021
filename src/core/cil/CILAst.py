@@ -1,27 +1,34 @@
 from ..tools import visitor
 
 class Node:
-    pass
+    def __init__(self, line=0, column=0):
+        self.line = line
+        self.column = column
+
 
 class ProgramNode(Node):
-    def __init__(self, dottypes, dotdata, dotcode):
+    def __init__(self, dottypes, dotdata, dotcode, line, column):
+        super().__init__(line,column)
         self.dottypes = dottypes
         self.dotdata = dotdata
         self.dotcode = dotcode
 
 class TypeNode(Node):
-    def __init__(self, name):
+    def __init__(self, name, line, column):
+        super().__init__(line, column)
         self.name = name
         self.attributes = []
         self.methods = []
 
 class DataNode(Node):
-    def __init__(self, vname, value):
+    def __init__(self, vname, value, line, column):
+        super().__init__(line, column)
         self.name = vname
         self.value = value
 
 class FunctionNode(Node):
-    def __init__(self, fname, params, localvars, instructions):
+    def __init__(self, fname, params, localvars, instructions, line, column):
+        super().__init__(line, column)
         self.name = fname
         self.params = params
         self.localvars = localvars
@@ -29,23 +36,27 @@ class FunctionNode(Node):
         self.labels_count = 0
 
 class ParamNode(Node):
-    def __init__(self, name):
+    def __init__(self, name, line, column):
+        super().__init__(line, column)
         self.name = name
 
 class LocalNode(Node):
-    def __init__(self, name):
+    def __init__(self, name, line, column):
+        super().__init__(line, column)
         self.name = name
 
 class InstructionNode(Node):
     pass
 
 class AssignNode(InstructionNode):
-    def __init__(self, dest, source):
+    def __init__(self, dest, source, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.source = source
 
 class ArithmeticNode(InstructionNode):
-    def __init__(self, dest, left, right):
+    def __init__(self, dest, left, right, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.left = left
         self.right = right
@@ -75,7 +86,8 @@ class LessEqualNode(ArithmeticNode):
     pass
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, dest, obj, attr, computed_type):
+    def __init__(self, dest, obj, attr, computed_type, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.obj = obj
         self.attr = attr
@@ -86,7 +98,8 @@ class GetAttribNode(InstructionNode):
 
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, obj, attr, value, computed_type):
+    def __init__(self, obj, attr, value, computed_type, line, column):
+        super().__init__(line, column)
         self.obj = obj
         self.attr = attr
         self.value = value
@@ -99,12 +112,14 @@ class SetIndexNode(InstructionNode):
     pass
 
 class AllocateNode(InstructionNode):
-    def __init__(self, itype, dest):
+    def __init__(self, itype, dest, line, column):
+        super().__init__(line, column)
         self.type = itype
         self.dest = dest
 
 class TypeOfNode(InstructionNode):
-    def __init__(self, dest, obj):
+    def __init__(self, dest, obj, line, column):
+        super().__init__(line, column)
         self.obj = obj
         self.dest = dest
 
@@ -113,7 +128,8 @@ class TypeOfNode(InstructionNode):
 
 
 class LabelNode(InstructionNode):
-    def __init__(self, label):
+    def __init__(self, label, line, column):
+        super().__init__(line, column)
         self.label = label
 
     def __repr__(self):
@@ -121,7 +137,8 @@ class LabelNode(InstructionNode):
 
 
 class GotoNode(InstructionNode):
-    def __init__(self, label):
+    def __init__(self, label, line, column):
+        super().__init__(line, column)
         self.label = label
 
     def __repr__(self):
@@ -129,7 +146,8 @@ class GotoNode(InstructionNode):
 
 
 class GotoIfNode(InstructionNode):
-    def __init__(self, condition, label):
+    def __init__(self, condition, label, line, column):
+        super().__init__(line, column)
         self.condition = condition
         self.label = label
 
@@ -137,7 +155,8 @@ class GotoIfNode(InstructionNode):
         return f"GOTO {self.label} if {self.condition}"
 
 class StaticCallNode(InstructionNode):
-    def __init__(self, function, dest):
+    def __init__(self, function, dest, line, column):
+        super().__init__(line, column)
         self.function = function
         self.dest = dest
 
@@ -145,7 +164,8 @@ class StaticCallNode(InstructionNode):
         return f"{self.dest} = CALL {self.function}"
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
+    def __init__(self, xtype, method, dest, line, column):
+        super().__init__(line, column)
         self.type = xtype
         self.method = method
         self.dest = dest
@@ -154,7 +174,8 @@ class DynamicCallNode(InstructionNode):
         return f"{self.dest} = VCALL {self.type} {self.method}"
 
 class ArgNode(InstructionNode):
-    def __init__(self, name):
+    def __init__(self, name, line, column):
+        super().__init__(line, column)
         self.name = name
 
     def __repr__(self):
@@ -162,7 +183,8 @@ class ArgNode(InstructionNode):
 
 
 class ReturnNode(InstructionNode):
-    def __init__(self, value=None):
+    def __init__(self, line, column, value=None):
+        super().__init__(line, column)
         self.value = value
 
     def __repr__(self):
@@ -170,7 +192,8 @@ class ReturnNode(InstructionNode):
 
 
 class LoadNode(InstructionNode):
-    def __init__(self, dest, msg):
+    def __init__(self, dest, msg, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.msg = msg
 
@@ -178,12 +201,14 @@ class LoadNode(InstructionNode):
         return f"{self.dest} LOAD {self.msg}"
 
 class LengthNode(InstructionNode):
-    def __init__(self, dest, source):
+    def __init__(self, dest, source, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.source = source
 
 class ConcatNode(InstructionNode):
-    def __init__(self, dest, prefix, suffix, length):
+    def __init__(self, dest, prefix, suffix, length, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.prefix = prefix
         self.suffix = suffix
@@ -193,56 +218,66 @@ class PrefixNode(InstructionNode):
     pass
 
 class SubstringNode(InstructionNode):
-    def __init__(self, dest, str_value, index, length):
+    def __init__(self, dest, str_value, index, length, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.str_value = str_value
         self.index = index
         self.length = length
 
 class ToStrNode(InstructionNode):
-    def __init__(self, dest, value):
+    def __init__(self, dest, value, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.value = value
 
 class ReadNode(InstructionNode):
-    def __init__(self, dest):
+    def __init__(self, dest, line, column):
+        super().__init__(line, column)
         self.dest = dest
 
 class PrintStringNode(InstructionNode):
-    def __init__(self, str_addr):
+    def __init__(self, str_addr, line, column):
+        super().__init__(line, column)
         self.str_addr = str_addr
 
 class PrintIntNode(InstructionNode):
-    def __init__(self, value):
+    def __init__(self, value, line, column):
+        super().__init__(line, column)
         self.value = value
 
 class ExitNode(InstructionNode):
     pass
 
 class CopyNode(InstructionNode):
-    def __init__(self, dest, value):
+    def __init__(self, dest, value, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.value = value
 
 class ErrorNode(InstructionNode):
-    def __init__(self, data):
+    def __init__(self, data, line, column):
+        super().__init__(line, column)
         self.data = data
 
 class VoidNode(InstructionNode):
     pass
 
 class NameNode(InstructionNode):
-    def __init__(self, dest, value):
+    def __init__(self, dest, value, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.value = value
 
 class NotNode(InstructionNode):
-    def __init__(self, dest, value):
+    def __init__(self, dest, value, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.value = value
 
 class ComplementNode(InstructionNode):
-    def __init__(self, dest, value):
+    def __init__(self, dest, value, line, column):
+        super().__init__(line, column)
         self.dest = dest
         self.value = value
 
