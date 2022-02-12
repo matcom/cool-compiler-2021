@@ -5,23 +5,11 @@ class CoolAstNode:
 
 
 class CoolProgramNode(CoolAstNode):
-    def __init__(self, lineno, columnno, classes):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.classes = classes
+    pass
 
 
 class CoolClassNode(CoolAstNode):
-    def __init__(self, lineno, columnno, id, features, parent=None):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.id = id
-        self.parent = parent
-        self.features = features
+    pass
 
 
 class CoolFeatureNode(CoolAstNode):
@@ -29,27 +17,11 @@ class CoolFeatureNode(CoolAstNode):
 
 
 class CoolAttrDeclNode(CoolFeatureNode):
-    def __init__(self, lineno, columnno, id, type, body=None):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.id = id
-        self.type = type
-        self.body = body
+    pass
 
 
 class CoolMethodDeclNode(CoolFeatureNode):
-    def __init__(self, lineno, columnno, id, param_names, param_types, type, body):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.id = id
-        self.param_names = param_names
-        self.param_types = param_types
-        self.type = type
-        self.body = body
+    pass
 
 
 class CoolExprNode(CoolAstNode):
@@ -57,135 +29,54 @@ class CoolExprNode(CoolAstNode):
 
 
 class CoolAssignNode(CoolExprNode):
-    def __init__(self, lineno, columnno, id, expr):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.id = id
-        self.expr = expr
+    pass
 
 
 class CoolStaticDispatchNode(CoolExprNode):
-    def __init__(self, lineno, columnno, expr, static_type, id, args):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.expr = expr
-        self.static_type = static_type
-        self.id = id
-        self.args = args
+    pass
 
 
 class CoolDispatchNode(CoolExprNode):
-    def __init__(self, lineno, columnno, id, args, expr=None):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.expr = expr
-        self.id = id
-        self.args = args
+    pass
 
 
 class CoolIfThenElseNode(CoolExprNode):
-    def __init__(self, lineno, columnno, cond, then_expr, else_expr):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.cond = cond
-        self.then_expr = then_expr
-        self.else_expr = else_expr
+    pass
 
 
 class CoolWhileNode(CoolExprNode):
-    def __init__(self, lineno, columnno, cond, body):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.cond = cond
-        self.body = body
+    pass
 
 
 class CoolBlockNode(CoolExprNode):
-    def __init__(self, lineno, columnno, expr_list):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.expr_list = expr_list
+    pass
 
 
 class CoolLetInNode(CoolExprNode):
-    def __init__(self, lineno, columnno, decl_list, expr):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.decl_list = decl_list
-        self.expr = expr
+    pass
 
 
 class CoolLetDeclNode(CoolAstNode):
-    def __init__(self, lineno, columnno, id, type, expr=None):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.id = id
-        self.type = type
-        self.expr = expr
-
+    pass
 
 class CoolCaseNode(CoolExprNode):
-    def __init__(self, lineno, columnno, expr, case_branches):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.expr = expr
-        self.case_branches = case_branches
+    pass
 
 
 class CoolCaseBranchNode(CoolAstNode):
-    def __init__(self, lineno, columnno, id, type, expr):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.id = id
-        self.type = type
-        self.expr = expr
+    pass
 
 
 class CoolNewNode(CoolExprNode):
-    def __init__(self, lineno, columnno, type):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.type = type
+    pass
 
 
 class CoolParenthNode(CoolExprNode):
-    def __init__(self, lineno, columnno, expr):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.expr = expr
+    pass
 
 
 class CoolUnaryExprNode(CoolExprNode):
-    def __init__(self, lineno, columnno, expr):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.expr = expr
+    pass
 
 
 class CoolIsVoidNode(CoolUnaryExprNode):
@@ -201,13 +92,7 @@ class CoolTildeNode(CoolUnaryExprNode):
 
 
 class CoolBinaryExprNode(CoolExprNode):
-    def __init__(self, lineno, columnno, left_expr, right_expr):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.left_expr = left_expr
-        self.right_expr = right_expr
+    pass
 
 
 class CoolComparisonNode(CoolBinaryExprNode):
@@ -247,12 +132,7 @@ class CoolDivNode(CoolArithmeticNode):
 
 
 class CoolAtomNode(CoolExprNode):
-    def __init__(self, lineno, columnno, value):
-        super().__init__(lineno, columnno)
-        # self.lineno = lineno
-        # self.columnno = columnno
-
-        self.value = value
+    pass
 
 
 class CoolIntNode(CoolAtomNode):

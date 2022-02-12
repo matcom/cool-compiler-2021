@@ -13,7 +13,7 @@ class CoolpylerError(object):
         return f"({self.line}, {self.column}) - {self.type}: {self.msg}"
 
 
-# Compiler errors
+# Compiler errors {{{
 
 
 class CompilerError(CoolpylerError):
@@ -35,7 +35,10 @@ class InvalidInputFileError(CompilerError):
         CompilerError.__init__(self, f"File `{path}` is not a valid file.")
 
 
-# Lexicographic errors
+# }}}
+
+
+# Lexicographic errors {{{
 
 
 class LexicographicError(CoolpylerError):
@@ -56,7 +59,9 @@ class UnexpectedCharError(LexicographicError):
         LexicographicError.__init__(self, line, column, f"Unexpected `{char}`.")
 
 
-# Syntactic errors
+# }}}
+
+# Syntactic errors {{{
 
 
 class SyntacticError(CoolpylerError):
@@ -91,7 +96,10 @@ class UnexpectedEOFError(SyntacticError):
         SyntacticError.__init__(self, 0, 0, "Unexpected EOF.")
 
 
-# Semantic errors
+# }}}
+
+
+# Semantic errors {{{
 
 
 class NameError(CoolpylerError):
@@ -148,3 +156,21 @@ class WrongSignatureError(SemanticError):
             column,
             f"Method {method} already defined with a different signature.",
         )
+
+
+# }}}
+
+
+# {{{
+
+
+class InternalError(object):
+    """
+    Internal compiler errors
+    """
+    def __init__(self, message, context):
+        self.message = message
+        self.context = context
+
+
+# }}}

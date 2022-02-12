@@ -1,6 +1,8 @@
+from coolpyler.ast.cool import parsed
 import coolpyler.errors as errors
 import coolpyler.utils.meta as meta
 import coolpyler.utils.visitor as visitor
+import coolpyler.ast.cool.base as base
 import coolpyler.ast.cool.type_collected as type_collected
 import coolpyler.ast.cool.type_built as type_built
 import coolpyler.semantic as semantic
@@ -13,7 +15,7 @@ class TypeBuilderVisitor:
             errors = []
         self.errors = errors
         self.current_type = None
-        self.types = None
+        self.types = dict()
 
     def get_type(self, name):
         try:
@@ -25,19 +27,19 @@ class TypeBuilderVisitor:
     def visit(self, node):
         pass
 
-    @visitor.when(type_collected.CoolAstNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolAstNode):
-        return meta.map_to_module(node, type_built)
+    @visitor.when(base.CoolAstNode)
+    def visit(self, node: base.CoolAstNode):
+        return node
 
-    @visitor.when(type_collected.CoolProgramNode)  # noqa: F811
+    @visitor.when(type_collected.CoolProgramNode)
     def visit(self, node: type_collected.CoolProgramNode):
         self.types = node.types
         classes = [self.visit(c) for c in node.classes]
         return type_built.CoolProgramNode(
-            node.lineno, node.columnno, classes, node.types
+            node.lineno, node.columnno, classes
         )
 
-    @visitor.when(type_collected.CoolClassNode)  # noqa: F811
+    @visitor.when(type_collected.CoolClassNode)
     def visit(self, node: type_collected.CoolClassNode):
         self.current_type = node.type
 
@@ -57,8 +59,8 @@ class TypeBuilderVisitor:
 
         return type_built.CoolClassNode(node.lineno, node.columnno, node.type, features)
 
-    @visitor.when(type_collected.CoolAttrDeclNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolAttrDeclNode):
+    @visitor.when(parsed.CoolAttrDeclNode)
+    def visit(self, node: parsed.CoolAttrDeclNode):
         try:
             type = self.get_type(node.type)
         except semantic.SemanticError as e:
@@ -76,7 +78,7 @@ class TypeBuilderVisitor:
             node.lineno, node.columnno, attr_info, body=body
         )
 
-    @visitor.when(type_collected.CoolMethodDeclNode)  # noqa: F811
+    @visitor.when(type_collected.CoolMethodDeclNode)
     def visit(self, node: type_collected.CoolMethodDeclNode):
         param_types = []
         for ptype_name in node.param_types:
