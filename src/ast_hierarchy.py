@@ -1,9 +1,11 @@
 class Node:
-    pass
+    def __init__(self, line_no: int):
+        self.lineno = line_no
 
 
 class ProgramNode(Node):
-    def __init__(self, declarations):
+    def __init__(self, line_no, declarations):
+        super().__init__(line_no)
         self.declarations = declarations
 
 
@@ -16,14 +18,16 @@ class ExpressionNode(Node):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx, features, parent=None):
+    def __init__(self, line_no, idx, features, parent=None):
+        super().__init__(line_no)
         self.id = idx
         self.parent = parent
         self.features = features
 
 
 class FuncDeclarationNode(DeclarationNode):
-    def __init__(self, idx, params, return_type, body):
+    def __init__(self, line_no, idx, params, return_type, body):
+        super().__init__(line_no)
         self.id = idx
         self.params = params
         self.type = return_type
@@ -31,50 +35,58 @@ class FuncDeclarationNode(DeclarationNode):
 
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, idx, typex, val=None):
+    def __init__(self, line_no, idx, typex, val=None):
+        super().__init__(line_no)
         self.id = idx
         self.type = typex
         self.val = val
 
 
 class ConditionalNode(ExpressionNode):
-    def __init__(self, if_expr, then_expr, else_expr):
+    def __init__(self, line_no, if_expr, then_expr, else_expr):
+        super().__init__(line_no)
         self.if_expr = if_expr
         self.then_expr = then_expr
         self.else_expr = else_expr
 
 
 class LoopNode(ExpressionNode):
-    def __init__(self, condition, body):
+    def __init__(self, line_no, condition, body):
+        super().__init__(line_no)
         self.condition = condition
         self.body = body
 
 
 class BlockNode(ExpressionNode):
-    def __init__(self, expr_list):
+    def __init__(self, line_no, expr_list):
+        super().__init__(line_no)
         self.expr_list = expr_list
 
 
 class LetNode(ExpressionNode):
-    def __init__(self, var_list, body):
+    def __init__(self, line_no, var_list, body):
+        super().__init__(line_no)
         self.var_list = var_list
         self.body = body
 
 
 class CaseNode(ExpressionNode):
-    def __init__(self, expr, branch_list):
+    def __init__(self, line_no, expr, branch_list):
+        super().__init__(line_no)
         self.expr = expr
         self.branch_list = branch_list
 
 
 class AssignNode(ExpressionNode):
-    def __init__(self, idx, expr):
+    def __init__(self, line_no, idx, expr):
+        super().__init__(line_no)
         self.id = idx
         self.expr = expr
 
 
 class CallNode(ExpressionNode):
-    def __init__(self, obj, idx, args, ancestor_type=None):
+    def __init__(self, line_no, obj, idx, args, ancestor_type=None):
+        super().__init__(line_no)
         self.obj = obj
         self.id = idx
         self.args = args
@@ -82,27 +94,32 @@ class CallNode(ExpressionNode):
 
 
 class NotNode(ExpressionNode):
-    def __init__(self, expr):
+    def __init__(self, line_no, expr):
+        super().__init__(line_no)
         self.expr = expr
 
 
 class IsVoidNode(ExpressionNode):
-    def __init__(self, expr):
+    def __init__(self, line_no, expr):
+        super().__init__(line_no)
         self.expr = expr
 
 
 class IntCompNode(ExpressionNode):
-    def __init__(self, expr):
+    def __init__(self, line_no, expr):
+        super().__init__(line_no)
         self.expr = expr
 
 
 class AtomicNode(ExpressionNode):
-    def __init__(self, lex):
+    def __init__(self, line_no, lex):
+        super().__init__(line_no)
         self.lex = lex
 
 
 class BinaryNode(ExpressionNode):
-    def __init__(self, left, right):
+    def __init__(self, line_no, left, right):
+        super().__init__(line_no)
         self.left = left
         self.right = right
 
