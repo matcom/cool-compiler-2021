@@ -28,7 +28,8 @@ def p_program(p):
     """
     program : class_list
     """
-    p[0] = ast.ProgramNode(p[1])
+    p[0] = ast.ProgramNode(p.lineno(1), p[1])
+    pass
 
 
 def p_class_list(p):
@@ -48,9 +49,9 @@ def p_def_class(p):
               | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE SEMICOLON
     """
     if len(p) == 7:
-        p[0] = ast.ClassDeclarationNode(p[2], p[4])
+        p[0] = ast.ClassDeclarationNode(p.lineno(1), p[2], p[4])
     else:
-        p[0] = ast.ClassDeclarationNode(p[2], p[6], p[4])
+        p[0] = ast.ClassDeclarationNode(p.lineno(1), p[2], p[6], p[4])
 
 
 def p_feature_list(p):
@@ -82,16 +83,16 @@ def p_attr_def(p):
              | OBJECT_ID COLON type ASSIGN expr
     """
     if len(p) == 4:
-        p[0] = ast.AttrDeclarationNode(p[1], p[3])
+        p[0] = ast.AttrDeclarationNode(p.lineno(1), p[1], p[3])
     else:
-        p[0] = ast.AttrDeclarationNode(p[1], p[3], p[5])
+        p[0] = ast.AttrDeclarationNode(p.lineno(1), p[1], p[3], p[5])
 
 
 def p_meth_def(p):
     """
     meth_def : OBJECT_ID LPAREN param_list RPAREN COLON type LBRACE expr RBRACE
     """
-    p[0] = ast.FuncDeclarationNode(p[1], p[3], p[6], p[8])
+    p[0] = ast.FuncDeclarationNode(p.lineno(1), p[1], p[3], p[6], p[8])
 
 
 def p_param_list(p):
@@ -141,11 +142,11 @@ def p_comparer(p):
     if operator is None:
         p[0] = p[1]
     elif operator == 'LT':
-        p[0] = ast.LessNode(p[1], p[3])
+        p[0] = ast.LessNode(p.lineno(1), p[1], p[3])
     elif operator == 'LTEQ':
-        p[0] = ast.LessEqualNode(p[1], p[3])
+        p[0] = ast.LessEqualNode(p.lineno(1), p[1], p[3])
     elif operator == 'EQ':
-        p[0] = ast.EqualNode(p[1], p[3])
+        p[0] = ast.EqualNode(p.lineno(1), p[1], p[3])
 
 
 def p_arith(p):
@@ -158,9 +159,9 @@ def p_arith(p):
     if operator is None:
         p[0] = p[1]
     elif operator == 'PLUS':
-        p[0] = ast.PlusNode(p[1], p[3])
+        p[0] = ast.PlusNode(p.lineno(1), p[1], p[3])
     elif operator == 'MINUS':
-        p[0] = ast.MinusNode(p[1], p[3])
+        p[0] = ast.MinusNode(p.lineno(1), p[1], p[3])
 
 
 def p_term(p):
@@ -173,9 +174,9 @@ def p_term(p):
     if operator is None:
         p[0] = p[1]
     elif operator == 'MULT':
-        p[0] = ast.StarNode(p[1], p[3])
+        p[0] = ast.StarNode(p.lineno(1), p[1], p[3])
     elif operator == 'DIV':
-        p[0] = ast.DivNode(p[1], p[3])
+        p[0] = ast.DivNode(p.lineno(1), p[1], p[3])
 
 
 def p_factor(p):
@@ -204,15 +205,15 @@ def p_unknown_end_atom(p):
     first_token = p.slice[1].type if len(p) > 1 else None
     second_token = p.slice[2].type if len(p) > 2 else None
     if first_token == 'OBJECT_ID' and second_token == 'ASSIGN':
-        p[0] = ast.AssignNode(p[1], p[3])
+        p[0] = ast.AssignNode(p.lineno(1), p[1], p[3])
     elif first_token == 'LET':
-        p[0] = ast.CaseNode(p[2], p[4])
+        p[0] = ast.CaseNode(p.lineno(1), p[2], p[4])
     elif first_token == 'NOT':
-        p[0] = ast.NotNode(p[2])
+        p[0] = ast.NotNode(p.lineno(1), p[2])
     elif first_token == 'ISVOID':
-        p[0] = ast.IsVoidNode(p[2])
+        p[0] = ast.IsVoidNode(p.lineno(1), p[2])
     elif first_token == 'INT_COMP':
-        p[0] = ast.IntCompNode(p[2])
+        p[0] = ast.IntCompNode(p.lineno(1), p[2])
 
 
 def p_known_end_atom(p):
@@ -232,25 +233,25 @@ def p_known_end_atom(p):
     first_token = p.slice[1].type if len(p) > 1 else None
     second_token = p.slice[2].type if len(p) > 2 else None
     if first_token == 'INTEGER':
-        p[0] = ast.ConstantNumNode(p[1])
+        p[0] = ast.ConstantNumNode(p.lineno(1), p[1])
     elif first_token == 'OBJECT_ID' and second_token is None:
-        p[0] = ast.VariableNode(p[1])
+        p[0] = ast.VariableNode(p.lineno(1), p[1])
     elif first_token == 'STRING':
-        p[0] = ast.StringNode(p[1])
+        p[0] = ast.StringNode(p.lineno(1), p[1])
     elif first_token == 'BOOL':
-        p[0] = ast.BoolNode(p[1])
+        p[0] = ast.BoolNode(p.lineno(1), p[1])
     elif first_token == 'LPAREN':
         p[0] = p[2]
     elif first_token == 'NEW':
-        p[0] = ast.InstantiateNode(p[2])
+        p[0] = ast.InstantiateNode(p.lineno(1), p[2])
     elif first_token == 'IF':
-        p[0] = ast.ConditionalNode(p[2], p[4], p[6])
+        p[0] = ast.ConditionalNode(p.lineno(1), p[2], p[4], p[6])
     elif first_token == 'WHILE':
-        p[0] = ast.LoopNode(p[2], p[4])
+        p[0] = ast.LoopNode(p.lineno(1), p[2], p[4])
     elif first_token == 'LBRACE':
-        p[0] = ast.BlockNode(p[2])
+        p[0] = ast.BlockNode(p.lineno(1), p[2])
     elif first_token == 'CASE':
-        p[0] = ast.CaseNode(p[2], p[4])
+        p[0] = ast.CaseNode(p.lineno(1), p[2], p[4])
     elif first_token == 'func_call':
         p[0] = p[1]
 
@@ -302,11 +303,11 @@ def p_func_call(p):
               | known_end_atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
     """
     if len(p) == 7:
-        p[0] = ast.CallNode(p[1], p[3], p[5])
+        p[0] = ast.CallNode(p.lineno(1), p[1], p[3], p[5])
     elif len(p) == 5:
-        p[0] = ast.CallNode(None, p[1], p[3])
+        p[0] = ast.CallNode(p.lineno(1), None, p[1], p[3])
     elif len(p) == 9:
-        p[0] = ast.CallNode(p[1], p[5], p[7], p[3])
+        p[0] = ast.CallNode(p.lineno(1), p[1], p[5], p[7], p[3])
 
 
 def p_arg_list(p):
@@ -359,7 +360,7 @@ def parse(text: str) -> (yacc.LRParser, list):
     input_text = text
     lex = lexer.get_a_lexer()
     parser = get_a_parser()
-    tree = parser.parse(text, lex)
+    tree = parser.parse(text, lex, tracking=True)
     return tree, errors
 
 
