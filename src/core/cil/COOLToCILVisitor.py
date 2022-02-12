@@ -106,7 +106,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                                                              self.current_type.name),
                                                        line=node.line, column=node.column)
 
-        self.register_param(self.vself, line=node.line, column=node.column)
+        self_param = self.register_param(self.vself, line=node.line, column=node.column)
+        self.vself.name = self_param
         for param, type in node.params:
             self.register_param(VariableInfo(param.lex, type.lex), line=param.line, column=param.column)
 
@@ -114,6 +115,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ReturnNode(value=node.body.ret_expr,
                                                  line=node.body.line, column=node.body.column))
         self.current_method = None
+        self.vself.name = 'self'
 
     @visitor.when(cool.IfThenElseNode)
     def visit(self, node: cool.IfThenElseNode, scope: Scope):
@@ -515,23 +517,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(arg)
 
         ret = self.define_internal_local(line=node.line, column=node.column)
-        if node.type:
-            self.register_instruction(cil.StaticCallNode(self.to_function_name(node.id, node.type.name), ret,
-                                                         line=node.line, column=node.column))
-        else:
-            type = self.define_internal_local(line=node.line, column=node.column)
-            self.register_instruction(cil.TypeOfNode(type, node.obj.ret_expr,
-                                                     line=node.obj.line, column=node.obj.column))
-            stype = node.obj.static_type.name
-            self.register_instruction(cil.DynamicCallNode(stype, type, self.types_map[stype].methods[node.id.lex], ret,
+        stype = node.type
+        if stype is None: stype = node.obj.static_type.name
+        self.register_instruction(cil.StaticCallNode(self.types_map[stype].methods[node.id.lex], ret,
                                                           line=node.id.line, column=node.id.column))
         node.ret_expr = ret
 
     @visitor.when(cool.MemberCallNode)
     def visit(self, node: cool.MemberCallNode, scope: Scope):
         ret = self.define_internal_local(line=node.line, column=node.column)
-        type = self.define_internal_local(line=node.line, column=node.column)
-        self.register_instruction(cil.TypeOfNode(type, self.vself.name, line=node.line, column=node.column))
 
         args = []
         for arg, child in zip(node.args, scope.childs):
@@ -543,7 +537,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         for arg in args: self.register_instruction(arg)
 
         stype = self.current_type.name
-        self.register_instruction(cil.DynamicCallNode(stype, type, self.types_map[stype].methods[node.id.lex], ret, line=node.id.line, column=node.id.column))
+        self.register_instruction(cil.StaticCallNode(self.types_map[stype].methods[node.id.lex], ret, line=node.id.line, column=node.id.column))
         node.ret_expr = ret
 
     @visitor.when(cool.NewNode)
