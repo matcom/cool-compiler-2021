@@ -76,16 +76,10 @@ for program_file in programs_files:
 
             collector = type_collector.TypeCollector(errors)
             collector.visit(ast)
-            # if len(errors):
-            #     print(errors)
-            #     continue
 
             context = collector.context
             builder = type_builder.TypeBuilder(context, errors)
             builder.visit(ast)
-            # if len(errors):
-            #     print(errors)
-            #     continue
 
             checker = type_checker.TypeChecker(context, errors)
             scope = checker.visit(ast)
