@@ -14,11 +14,12 @@ from src.cmp.semantic import (
 from src.cmp.semantic import Context
 from src.ast_nodes import ProgramNode, ClassDeclarationNode
 import src.cmp.visitor as visitor
+from cool_visitor import CopyVisitor
 
 
 class TypeCollector(object):
     def __init__(self, errors=[]):
-        self.context = Context()
+        self.context = None
         self.errors = errors
 
     @visitor.on("node")
@@ -27,15 +28,15 @@ class TypeCollector(object):
 
     @visitor.when(ProgramNode)
     def visit(self, node):
+        self.context = Context()
+        # Es necesario crear estos tipos especificos?
         self.context.types["Object"] = ObjectType()
         self.context.types["Int"] = IntType()
         self.context.types["String"] = StringType()
         self.context.types["Bool"] = BoolType()
         self.context.types["AUTO_TYPE"] = AutoType()
         self.context.types["SELF_TYPE"] = SelfType()
-        # Despues de entregar!!!!!
         self.context.types["IO"] = IOType()
-        # -------------------
 
         object_type = self.context.get_type("Object")
         for typex in self.context.types.values():
@@ -45,6 +46,15 @@ class TypeCollector(object):
 
         for declaration in node.declarations:
             self.visit(declaration)
+
+        copy_visitor = CopyVisitor()
+        newAst = copy_visitor.visit(node)
+
+        newAst.context = self.context.copy()
+        self.context = None
+        # self.errors tambien deberia volver a su estado inicial
+        # devolver (newAst,errors) ???
+        return newAst
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
