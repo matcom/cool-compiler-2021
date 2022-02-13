@@ -23,11 +23,11 @@ class CCILGenerator:
         self.time_record: Dict[str, int] = Dict()
 
     @visitor.when(sem_ast.BlocksNode)
-    def visit(self, node:sem_ast.BlocksNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.BlocksNode) -> VISITOR_RESULT:
         times = self.times(node)
 
-        operations:List[OperationNode] = []
-        fvalues:List[StorageNode] = []
+        operations: List[OperationNode] = []
+        fvalues: List[StorageNode] = []
         for expr in node.expr_list:
             (expr_ops, expr_fval) = self.visit(expr)
             operations += expr_ops
@@ -44,23 +44,23 @@ class CCILGenerator:
         fvalues: List[StorageNode] = []
 
         for var in node.var_decl_list:
-           (var_ops, var_fv) = self.visit(var) 
-           operations += var_ops
-           fvalues += var_fv
+            (var_ops, var_fv) = self.visit(var)
+            operations += var_ops
+            fvalues += var_fv
 
         (in_ops, in_fval) = self.visit(node.in_expr)
         operations += in_ops
 
-        return(operations, in_fval)
+        return (operations, in_fval)
 
     @visitor.when(sem_ast.VarDeclarationNode)
     def visit(self, node: sem_ast.VarDeclarationNode) -> VISITOR_RESULT:
-        fvalue_id:str = USER + node.id
+        fvalue_id: str = USER + node.id
 
         if node.expr is None:
             return ([], create_uninitialized_storage(node, fvalue_id))
 
-        (expr_ops, expr_fv) =  self.visit(node.expr)
+        (expr_ops, expr_fv) = self.visit(node.expr)
         expr_fv.id = fvalue_id
 
         return (expr_ops, expr_fv)
@@ -68,7 +68,7 @@ class CCILGenerator:
     @visitor.when(sem_ast.AssignNode)
     def visit(self, node: sem_ast.AssignNode) -> VISITOR_RESULT:
         (expr_ops, expr_fval) = self.visit(node.expr)
-        expr_fval.id = USER + node.id 
+        expr_fval.id = USER + node.id
 
         return (expr_ops, expr_fval)
 
@@ -94,7 +94,7 @@ class CCILGenerator:
         return ([*if_ops, if_false, *then_ops, else_label, *else_ops, fvalue], fvalue)
 
     @visitor.when(sem_ast.CaseNode)
-    def visit(self, node:sem_ast.CaseNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.CaseNode) -> VISITOR_RESULT:
         times = self.times(node)
 
         # Visiting case expression
@@ -102,10 +102,8 @@ class CCILGenerator:
 
         # Storing the type of the resulting case expression
         type_of = create_type_of(
-                    node,
-                    f"case_{times}_typeOf",
-                    extract_id(node, case_expr_fv)
-                )
+            node, f"case_{times}_typeOf", extract_id(node, case_expr_fv)
+        )
 
         # Final label where all branch must jump to
         final_label_id = f"case_{times}_end"
@@ -127,20 +125,18 @@ class CCILGenerator:
             # Initializing var which holds the branch var type
             branch_var_type_id = f"case_{times}_optionTypeOf_{i}"
             branch_var_type_of = create_type_of(
-                                option,
-                                branch_var_type_id,
-                                extract_id(node, branch_var)
-                            )
+                option, branch_var_type_id, extract_id(node, branch_var)
+            )
 
             # Initializng var which holds the comparison result between
             # the case expression type of and branch var type of
             select_branch_id = f"case_{times}_optionSelect_{i}"
             select_branch = create_equality(
-                    option, 
-                    select_branch_id,
-                    extract_id(node, type_of), 
-                    extract_id(node, branch_var_type_of)
-                )
+                option,
+                select_branch_id,
+                extract_id(node, type_of),
+                extract_id(node, branch_var_type_of),
+            )
 
             # Label that means the start of this branch logic
             branch_label_id = f"case_{times}_branch_{i}"
@@ -161,25 +157,22 @@ class CCILGenerator:
 
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
-    
+
         fval_id = f"case_{times}_fv"
-        fval = create_assignation(node,fval_id, pre_fvalue_id)
+        fval = create_assignation(node, fval_id, pre_fvalue_id)
         operations = [
-                *case_expr_ops, type_of,
-                *pattern_match_ops,
-                *branch_ops,
-                final_label,
-                fval
-            ]    
+            *case_expr_ops,
+            type_of,
+            *pattern_match_ops,
+            *branch_ops,
+            final_label,
+            fval,
+        ]
         return (operations, fval)
 
-
-
     @visitor.when(sem_ast.CaseOptionNode)
-    def visit(self, node:sem_ast.CaseOptionNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.CaseOptionNode) -> VISITOR_RESULT:
         times = self.times(node)
-
-        
 
     @visitor.when(sem_ast.LoopNode)
     def visit(self, node: sem_ast.LoopNode) -> VISITOR_RESULT:
@@ -198,11 +191,11 @@ class CCILGenerator:
         if_false = IfFalseNode(node, cond_fval, end_loop_label)
         go_to = GoToNode(node, loop_label)
 
-        fval = create_uninitialized_storage(node, f"loop_{times}_fv"),
+        fval = (create_uninitialized_storage(node, f"loop_{times}_fv"),)
         # Loop Nodes have void return type, how to express it??
         return (
             [*cond_ops, loop_label, if_false, *body_ops, go_to, end_loop_label, fval],
-            fval
+            fval,
         )
 
     @visitor.when(sem_ast.ArithmeticNode)
