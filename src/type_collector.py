@@ -54,7 +54,7 @@ class TypeCollector(object):
             typex = self.context.create_type(node.id)
             typex.set_parent(self.context.types[BasicTypes.OBJECT.value])
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
 
 
 def _create_string_type(int_type):

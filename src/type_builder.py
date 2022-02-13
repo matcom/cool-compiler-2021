@@ -26,7 +26,7 @@ class TypeBuilder:
             self.current_type = self.context.get_type(node.id)
         except SemanticError as error:
             # it should be registered in type_collector
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
             return
 
         if node.parent is not None:
@@ -37,7 +37,7 @@ class TypeBuilder:
                 while True:
                     if current.name == node.id:
                         self.errors.append(
-                            f'Cyclic inheritance between classes "{node.id}" and "{node.parent}".'
+                            f'(Line {node.lineno}) Cyclic inheritance between classes "{node.id}" and "{node.parent}".'
                         )
                         parent_type = self.context.get_type(BasicTypes.OBJECT.value)
                         break
@@ -45,7 +45,7 @@ class TypeBuilder:
                         break
                     current = current.parent
             except SemanticError as error:
-                self.errors.append(error.text)
+                self.errors.append(f'(Line {node.lineno}) {error.text}')
                 parent_type = self.context.get_type(BasicTypes.ERROR.value)
                 node.parent = BasicTypes.ERROR.value
             self.current_type.set_parent(parent_type)
@@ -58,14 +58,14 @@ class TypeBuilder:
         try:
             typex = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
             typex = self.context.get_type(BasicTypes.ERROR.value)
             node.type = BasicTypes.OBJECT.value
 
         try:
             self.current_type.define_attribute(node.id, typex)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):
@@ -77,17 +77,17 @@ class TypeBuilder:
             try:
                 typex = self.context.get_type(param[1])
             except SemanticError as error:
-                self.errors.append(error.text)
+                self.errors.append(f'(Line {node.lineno}) {error.text}')
                 typex = self.context.get_type(BasicTypes.ERROR.value)
             param_types.append(typex)
 
         try:
             typex = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
             typex = self.context.get_type(BasicTypes.ERROR.value)
 
         try:
             self.current_type.define_method(node.id, param_names, param_types, typex)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
