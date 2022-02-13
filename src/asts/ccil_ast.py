@@ -32,6 +32,7 @@ class StorageNode(OperationNode):
         super().__init__(node)
         self.id = idx
         self.operation = operation
+        self.decl_type = node.decl_type
 
 
 class ReturnOpNode(OperationNode):
@@ -78,11 +79,11 @@ class EqualOpNode(BinaryOpNode):
     pass
 
 
-class LessrOrEqualOpNode(BinaryOpNode):
+class LessOrEqualOpNode(BinaryOpNode):
     pass
 
 
-class LesserOpNode(BinaryOpNode):
+class LessOpNode(BinaryOpNode):
     pass
 
 
@@ -98,9 +99,17 @@ class GetTypeOpNode(UnaryOpNode):
     pass
 
 
-class IsVoidNode(UnaryOpNode):
+class IsVoidOpNode(UnaryOpNode):
     """Operation that returns true if the Storage Node is uninitialized"""
 
+    pass
+
+
+class NotOpNode(UnaryOpNode):
+    pass
+
+
+class NegOpNode(UnaryOpNode):
     pass
 
 
