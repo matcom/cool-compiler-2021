@@ -1,4 +1,3 @@
-from CodeGen.Intermediate.Generator import COOL_Intermediate_Code
 from Semantic.Semantic import COOL_Semantic_Checker
 from Parser.Parser import COOL_Parser
 from Semantic.scope import COOL_Scope
