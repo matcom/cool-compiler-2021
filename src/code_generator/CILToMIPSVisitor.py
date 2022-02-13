@@ -93,7 +93,125 @@ class COOLToCILVisitor(BaseCILToMIPSVisitor):
     def visit(self, node):
         rdest = self.addr_desc.get_var_reg(node.dest)
         rsrc = self.save_to_register(node.expr)
-        self.code.append(f'# {node.dest} <- ~{node.expr}')
-        self.code.append(f'not ${rdest}, ${rsrc}')
-        self.code.append(f'addi ${rdest}, ${rdest}, 1')
+        self.code.append(f'# {node.dest} <- not {node.expr}')
+        self.code.append(f'beqz ${rsrc}, false_{self.loop_idx}')
+        self.code.append(f'li ${rdest}, 0')
+        self.code.append(f'j end_{self.loop_idx}')
+        self.code.append(f'false_{self.loop_idx}:')
+        self.code.append(f'li ${rdest}, 1')
+        self.code.append(f'end_{self.loop_idx}:')
+        self.loop_idx += 1
+        self.var_address[node.dest] = AddrType.BOOL
+
+    @visitor.when(cil.PlusNode)
+    def visit(self, node):
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        self.code.append(f'# {node.dest} <- {node.left} + {node.right}')
+        if self.is_variable(node.left):
+            rleft = self.addr_desc.get_var_reg(node.left)
+            if self.is_variable(node.right):
+                rright = self.addr_desc.get_var_reg(node.right)
+                self.code.append(f"add ${rdest}, ${rleft}, ${rright}")
+            elif self.is_int(node.right):
+                self.code.append(f"addi ${rdest}, ${rleft}, {node.right}")
+        elif self.is_int(node.left):
+            if self.is_int(node.right):
+                self.code.append(f"li ${rdest}, {node.left + node.right}")
+            elif self.is_variable(node.right):
+                rright = self.addr_desc.get_var_reg(node.right)
+                self.code.append(f"addi ${rdest}, ${rright}, {node.left}")
         self.var_address[node.dest] = AddrType.INT
+
+    @visitor.when(cil.MinusNode)
+    def visit(self, node):
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        self.code.append(f'# {node.dest} <- {node.left} - {node.right}')
+        if self.is_variable(node.left):
+            rleft = self.addr_desc.get_var_reg(node.left)
+            if self.is_variable(node.right):
+                rright = self.addr_desc.get_var_reg(node.right)
+                self.code.append(f"sub ${rdest}, ${rleft}, ${rright}")
+            elif self.is_int(node.right):
+                self.code.append(f"addi ${rdest}, ${rleft}, -{node.right}")
+        elif self.is_int(node.left):
+            if self.is_int(node.right):
+                self.code.append(f"li ${rdest}, {node.left-node.right}")
+            elif self.is_variable(node.right):
+                rright = self.addr_desc.get_var_reg(node.right)
+                self.code.append(f"sub $t9, $zero, {rright}")
+                self.code.append(f"addi ${rdest}, {node.left}, $t9")
+        self.var_address[node.dest] = AddrType.INT
+
+    @visitor.when(cil.StarNode)
+    def visit(self, node):
+        self.code.append(f'# {node.dest} <- {node.left} * {node.right}')
+        self._code_to_mult_div(node,'mult', func_op=lambda x, y: x*y)
+
+    @visitor.when(cil.DivNode)
+    def visit(self, node):
+        self.code.append(f'# {node.dest} <- {node.left} / {node.right}')
+        self._code_to_mult_div(node,'div', func_op=lambda x, y: int(x / y))
+
+    def _code_to_mult_div(self, node, op, func_op):
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        if self.is_int(node.left) and self.is_int(node.right):
+            try:
+                self.code.append(f"li ${rdest}, {func_op(node.left, node.right)}")
+            except ZeroDivisionError:
+                self.code.append('la $a0, zero_error')
+                self.code.append('j .raise')
+        else:
+            if self.is_variable(node.left):
+                rleft = self.addr_desc.get_var_reg(node.left)
+                if self.is_variable(node.right):
+                    rright = self.addr_desc.get_var_reg(node.right)
+                elif self.is_int(node.right):
+                    self.code.append(f"li $t9, {node.right}")
+                    rright = 't9'
+            elif self.is_int(node.left):
+                rright = self.addr_desc.get_var_reg(node.right)
+                self.code.append(f"li $t9, {node.left}")
+                rleft = 't9'
+            if op == 'div':
+                self.code.append('la $a0, zero_error')
+                self.code.append(f'beqz ${rright}, .raise')
+            self.code.append(f"{op} ${rleft}, ${rright}")
+            self.code.append(f"mflo ${rdest}")
+        self.var_address[node.dest] = AddrType.INT
+
+    @visitor.when(cil.LessNode)
+    def visit(self, node):
+        self.code.append(f'# {node.dest} <- {node.left} < {node.right}')
+        self._code_to_comp(node, 'slt', lambda x, y: x < y)
+
+    @visitor.when(cil.LessEqNode)
+    def visit(self, node):
+        self.code.append(f'# {node.dest} <- {node.left} <= {node.right}')
+        self._code_to_comp(node, 'sle', lambda x, y: x <= y)
+
+    @visitor.when(cil.EqualNode)
+    def visit(self, node):
+        self.code.append(f'# {node.dest} <- {node.left} = {node.right}')
+        if self.is_variable(node.left) and self.is_variable(node.right) and self.var_address[node.left] == AddrType.STR and self.var_address[node.right] == AddrType.STR:
+            self.compare_strings(node)
+        else:
+            self._code_to_comp(node, 'seq', lambda x, y: x == y)
+    
+    def _code_to_comp(self, node, op, func_op):
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        if self.is_variable(node.left):
+            rleft = self.addr_desc.get_var_reg(node.left)
+            if self.is_variable(node.right):
+                rright = self.addr_desc.get_var_reg(node.right)
+                self.code.append(f"{op} ${rdest}, ${rleft}, ${rright}")
+            elif self.is_int(node.right):
+                self.code.append(f"li $t9, {node.right}")
+                self.code.append(f"{op} ${rdest}, ${rleft}, $t9")
+        elif self.is_int(node.left):
+            if self.is_int(node.right):
+                self.code.append(f"li ${rdest}, {int(func_op(node.left, node.right))}")
+            elif self.is_variable(node.right):
+                rright = self.addr_desc.get_var_reg(node.right)
+                self.code.append(f"li $t9, {node.left}")
+                self.code.append(f"{op} ${rdest}, $t9, ${rright}")
+        self.var_address[node.dest] = AddrType.BOOL
