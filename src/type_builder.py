@@ -19,6 +19,14 @@ class TypeBuilder:
     def visit(self, node):
         for dec in node.declarations:
             self.visit(dec)
+        try:
+            main_type = self.context.get_type('Main')
+            try:
+                main_type.get_method('main')
+            except SemanticError as error:
+                self.errors.append(error.text)
+        except SemanticError as error:
+            self.errors.append(error.text)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
