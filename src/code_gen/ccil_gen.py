@@ -206,9 +206,10 @@ class CCILGenerator:
         left_id = extract_id(node, left_fval)
         right_id = extract_id(node, right_fval)
 
-        op: ReturnOpNode
         fval_id: str
+        op: BinaryOpNode
         match node:
+            # Arithmetic Binary Nodes
             case sem_ast.PlusNode:
                 op = SumOpNode(left_id, right_id)
                 fval_id = f"sum_{times}"
@@ -221,6 +222,7 @@ class CCILGenerator:
             case sem_ast.DivNode:
                 op = DivOpNode(left_id, right_id)
                 fval_id = f"div_{times}"
+            # Boolean Binary Nodes
             case sem_ast.EqualsNode:
                 op = EqualOpNode(left_id, right_id)
                 fval_id = f"eq_{times}"
@@ -234,8 +236,46 @@ class CCILGenerator:
                 raise Exception("Pattern match failure visiting binary expression")
 
         fval = StorageNode(node, fval_id, op)
-
         return ([*left_ops, *right_ops, fval], fval)
+
+    @visitor.when(sem_ast.UnaryNode)
+    def visit(self, node: sem_ast.UnaryNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        (expr_op, expr_fval) = self.visit(node.expr)
+        expr_id = extract_id(node.expr, expr_fval)
+
+        fval_id: str
+        op: UnaryOpNode
+        match node:
+            case sem_ast.IsVoidNode:
+                fval_id = "isVoid_{times}"
+                op = IsVoidOpNode(node, expr_id)
+            case sem_ast.NotNode:
+                fval_id = "not_{times}"
+                op = NotOpNode(node, expr_id)
+            case sem_ast.ComplementNode:
+                fval_id = "neg_{times}"
+                op = NegOpNode(node, expr_id)
+            case _:
+                raise Exception("Pattern match failure while visiting unary expression")
+
+        fval = StorageNode(node, fval_id, op)
+        return [*expr_op, fval], fval
+
+    @visitor.when(sem_ast.MethodCallNode)
+    def visit(self, node: sem_ast.MethodCallNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        # Translate all call arguments to ccil
+        args_ops: List[OperationNode] = []
+        args_fvals: List[StorageNode] = []
+        for arg_expr in node.args:
+            (arg_op, arg_fval) = self.visit(arg_expr)
+            args_ops += arg_op
+            args_fvals += [arg_fval]
+
+        
 
     def times(self, node):
         key: str = type(node).__name__
