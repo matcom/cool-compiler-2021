@@ -97,20 +97,83 @@ class CCILGenerator:
     def visit(self, node:sem_ast.CaseNode) -> VISITOR_RESULT:
         times = self.times(node)
 
+        # Visiting case expression
         (case_expr_ops, case_expr_fv) = self.visit(node.case_expr)
 
+        # Storing the type of the resulting case expression
         type_of = create_type_of(
                     node,
                     f"case_{times}_typeOf",
                     extract_id(node, case_expr_fv)
                 )
 
-        operations = [*case_expr_ops, type_of]
+        # Final label where all branch must jump to
+        final_label_id = f"case_{times}_end"
+        final_label = LabelNode(node, final_label_id)
 
+        # Inconditional jump to final label
+        final_goto = GoToNode(node, final_label)
+
+        # All branch must end in a var named like this
+        pre_fvalue_id = f"case_{times}_pre_fv"
+        pattern_match_ops = []
+        branch_ops = []
         for (i, option) in enumerate(node.options):
-            option_id = f"case_{times}_option_{i}"
-            options_st = create_uninitialized_storage(option, option_id)
-            # The type of the option node must be stored to do the pattern matching!
+            # Initializing the branch var
+            branch_var_id = f"case_{times}_option_{i}"
+            branch_var = create_uninitialized_storage(option, branch_var_id)
+            branch_var.decl_type = option.branch_type
+
+            # Initializing var which holds the branch var type
+            branch_var_type_id = f"case_{times}_optionTypeOf_{i}"
+            branch_var_type_of = create_type_of(
+                                option,
+                                branch_var_type_id,
+                                extract_id(node, branch_var)
+                            )
+
+            # Initializng var which holds the comparison result between
+            # the case expression type of and branch var type of
+            select_branch_id = f"case_{times}_optionSelect_{i}"
+            select_branch = create_equality(
+                    option, 
+                    select_branch_id,
+                    extract_id(node, type_of), 
+                    extract_id(node, branch_var_type_of)
+                )
+
+            # Label that means the start of this branch logic
+            branch_label_id = f"case_{times}_branch_{i}"
+            branch_label = LabelNode(option, branch_label_id)
+
+            # Conditional jump to the right branch label
+            if_op = IfNode(option, extract_id(option, branch_var_type_of), branch_label)
+            pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
+
+            # Visiting the branch logic
+            (expr_ops, expr_fval) = self.visit(option.expr)
+
+            # Renaming the last stored value of the expression accordingly
+            expr_fval.id = pre_fvalue_id
+
+            # Storing logic to jump to branch logic if this branch is selected
+            pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
+
+            # Translating to ccil of branch logic
+            branch_ops += [branch_label, *expr_ops, final_goto]
+    
+        fval_id = f"case_{times}_fv"
+        fval = create_assignation(node,fval_id, pre_fvalue_id)
+        operations = [
+                *case_expr_ops, type_of,
+                *pattern_match_ops,
+                *branch_ops,
+                final_label,
+                fval
+            ]    
+        return (operations, fval)
+
+
 
     @visitor.when(sem_ast.CaseOptionNode)
     def visit(self, node:sem_ast.CaseOptionNode) -> VISITOR_RESULT:
