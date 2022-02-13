@@ -158,6 +158,8 @@ class CCILGenerator:
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
 
+        # Merging all expression operations in correct order
+        # and saving to expression final value
         fval_id = f"case_{times}_fv"
         fval = create_assignation(node, fval_id, pre_fvalue_id)
         operations = [
@@ -169,10 +171,6 @@ class CCILGenerator:
             fval,
         ]
         return (operations, fval)
-
-    @visitor.when(sem_ast.CaseOptionNode)
-    def visit(self, node: sem_ast.CaseOptionNode) -> VISITOR_RESULT:
-        times = self.times(node)
 
     @visitor.when(sem_ast.LoopNode)
     def visit(self, node: sem_ast.LoopNode) -> VISITOR_RESULT:
@@ -198,8 +196,8 @@ class CCILGenerator:
             fval,
         )
 
-    @visitor.when(sem_ast.ArithmeticNode)
-    def visit(self, node: sem_ast.ArithmeticNode) -> VISITOR_RESULT:
+    @visitor.when(sem_ast.BinaryNode)
+    def visit(self, node: sem_ast.BinaryNode) -> VISITOR_RESULT:
         times = self.times(node)
 
         (left_ops, left_fval) = self.visit(node.left)
@@ -223,8 +221,17 @@ class CCILGenerator:
             case sem_ast.DivNode:
                 op = DivOpNode(left_id, right_id)
                 fval_id = f"div_{times}"
+            case sem_ast.EqualsNode:
+                op = EqualOpNode(left_id, right_id)
+                fval_id = f"eq_{times}"
+            case sem_ast.LessNode:
+                op = LessOpNode(left_id, right_id)
+                fval_id = f"le_{times}"
+            case sem_ast.LessOrEqualNode:
+                op = LessOrEqualOpNode(left_id, right_id)
+                fval_id = f"leq_{times}"
             case _:
-                raise Exception("Pattern match failure visiting artihmetic expression")
+                raise Exception("Pattern match failure visiting binary expression")
 
         fval = StorageNode(node, fval_id, op)
 
