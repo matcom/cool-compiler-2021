@@ -314,7 +314,10 @@ class TypeChecker:
         return_type = method.return_type
 
         if return_type.name == BasicTypes.SELF.value:
-            return self.current_type
+            if self.current_type.conforms_to(obj_type):
+                return self.current_type
+            else:
+                return obj_type
         return return_type
 
     @visitor.when(ArithBinaryNode)
