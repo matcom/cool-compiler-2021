@@ -87,7 +87,9 @@ class LesserOpNode(BinaryOpNode):
 
 
 class UnaryOpNode(ReturnOpNode):
-    pass
+    def __init__(self, node, atom: AtomOpNode) -> None:
+        super().__init__(node)
+        self.atom = atom
 
 
 class GetTypeOpNode(UnaryOpNode):
@@ -160,6 +162,14 @@ def create_assignation(node, idx: str, target: str):
 
 def create_uninitialized_storage(node, idx: str):
     return StorageNode(node, idx, VoidNode(node))
+
+
+def create_type_of(node, idx: str, target: AtomOpNode):
+    return StorageNode(node, idx, GetTypeOpNode(node, target))
+
+
+def create_equality(node, idx, left: AtomOpNode, right: AtomOpNode):
+    return StorageNode(node, idx, EqualOpNode(node, left, right))
 
 
 def extract_id(node, storage_node: StorageNode) -> IdNode:
