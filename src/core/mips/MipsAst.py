@@ -62,28 +62,6 @@ class FunctionNode(Node):
 class InstructionNode(Node):
     pass
 
-
-class PrintIntNode(InstructionNode):
-    # $a0 = integer
-    pass
-
-class PrintStringNode(InstructionNode):
-    # $a0 = string
-    pass
-
-class ReadIntNode(InstructionNode):
-    # integer(int $v0)
-    pass
-
-class ReadStringNode(InstructionNode):
-    # integer(int $v0)
-    pass
-
-class ExitNode(InstructionNode):
-    pass
-
-
-
 class AbsoluteNode(InstructionNode):
     # rdest <- abs(rsrc)
     def __init__(self, rdest, rsrc):
@@ -246,16 +224,18 @@ class ShiftLeftNode(InstructionNode):
 class SyscallNode(InstructionNode):
     pass
 
+
+
+
 class DataNode(Node):
     def __init__(self, label):
         self.label = label
-
-
 
 class StringConst(DataNode):
     def __init__(self, label, string):
         super().__init__(label)
         self.string = string
+
 
 class MIPSType:
     def __init__(self, label, name_addr, attributes,
