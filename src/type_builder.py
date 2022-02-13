@@ -41,6 +41,9 @@ class TypeBuilder:
             try:
                 parent_type = self.context.get_type(node.parent)
 
+                if parent_type.name in [BasicTypes.BOOL.value, BasicTypes.STRING.value, BasicTypes.INT.value]:
+                    self.errors.append(f'(Line {node.lineno}) No class can inherit from "Bool", "String" or "Int"')
+
                 current = parent_type
                 while True:
                     if current.name == node.id:
