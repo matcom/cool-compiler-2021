@@ -200,8 +200,11 @@ class HardInferencer:
     @visitor.when(CaseOptionNode)
     def visit(self, node, scope: Scope):
         expr_node = self.visit(node.expr, scope)
-        opt_node = CaseOptionNode(expr_node, node)
+        opt_node = CaseOptionNode(expr_node, node.branch_type, node)
+
         opt_node.inferenced_type = expr_node.inferenced_type
+        # opt_node.branch_type = node.branch_type
+
         return opt_node
 
     @visitor.when(LoopNode)

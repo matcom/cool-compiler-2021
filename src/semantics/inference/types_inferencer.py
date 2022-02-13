@@ -59,7 +59,9 @@ class TypesInferencer:
         return types_ast.ProgramNode(class_decl, node)
 
     @visitor.when(ClassDeclarationNode)
-    def visit(self, node: ClassDeclarationNode, scope: Scope) -> types_ast.ClassDeclarationNode:
+    def visit(
+        self, node: ClassDeclarationNode, scope: Scope
+    ) -> types_ast.ClassDeclarationNode:
         features = []
         for feature in node.features:
             features.append(self.visit(feature, scope))
@@ -67,7 +69,9 @@ class TypesInferencer:
         return types_ast.ClassDeclarationNode(features, node)
 
     @visitor.when(AttrDeclarationNode)
-    def visit(self, node: AttrDeclarationNode, scope: Scope) -> types_ast.AttrDeclarationNode:
+    def visit(
+        self, node: AttrDeclarationNode, scope: Scope
+    ) -> types_ast.AttrDeclarationNode:
         new_node = types_ast.AttrDeclarationNode(node)
         if node.expr:
             new_node.expr = self.visit(node.expr, scope)
@@ -75,17 +79,19 @@ class TypesInferencer:
         return new_node
 
     @visitor.when(MethodDeclarationNode)
-    def visit(self, node: MethodDeclarationNode, scope: Scope) -> types_ast.MethodDeclarationNode:
+    def visit(
+        self, node: MethodDeclarationNode, scope: Scope
+    ) -> types_ast.MethodDeclarationNode:
         scope = scope.create_child()
-        
+
         for param in node.params:
-            param_type = self._reduce_to_type(param.inferenced_type,node, general=True)
+            param_type = self._reduce_to_type(param.inferenced_type, node, general=True)
             scope.define_variable(param.id, param_type)
 
         params = [self.visit(param, scope) for param in node.params]
-        
+
         body = self.visit(node.body, scope)
-        
+
         ret_type = self._reduce_to_type(node.inferenced_type, node)
         return types_ast.MethodDeclarationNode(params, ret_type, body, node)
 
@@ -110,7 +116,7 @@ class TypesInferencer:
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode, scope: Scope) -> types_ast.CaseNode:
         expr = self.visit(node.case_expr, scope)
-        
+
         case_options = []
         for option in node.options:
             child_scope = scope.create_child()
@@ -122,7 +128,9 @@ class TypesInferencer:
 
     @visitor.when(CaseOptionNode)
     def visit(self, node: CaseOptionNode, scope: Scope) -> types_ast.CaseOptionNode:
-        return types_ast.CaseOptionNode(self.visit(node.expr, scope), node)
+        return types_ast.CaseOptionNode(
+            self.visit(node.expr, scope), node.branch_type, node
+        )
 
     @visitor.when(LoopNode)
     def visit(self, node: LoopNode, scope: Scope) -> types_ast.LoopNode:
@@ -136,20 +144,22 @@ class TypesInferencer:
     def visit(self, node: LetNode, scope: Scope) -> types_ast.LetNode:
         scope = scope.create_child()
         var_decl_list = [self.visit(var_decl, scope) for var_decl in node.var_decl_list]
-        in_expr = self.visit(node.in_expr,scope)
+        in_expr = self.visit(node.in_expr, scope)
         new_node = types_ast.LetNode(var_decl_list, in_expr, node)
         new_node.type = self._reduce_to_type(node.inferenced_type, node)
         return new_node
 
     @visitor.when(VarDeclarationNode)
-    def visit(self, node: VarDeclarationNode, scope: Scope) -> types_ast.VarDeclarationNode:
+    def visit(
+        self, node: VarDeclarationNode, scope: Scope
+    ) -> types_ast.VarDeclarationNode:
         new_node = types_ast.VarDeclarationNode(node)
         if node.expr:
             new_node.expr = self.visit(node.expr, scope)
 
         var_info = scope.find_variable(node.id)
-        general = var_info is not None # it's a param
-        new_node.type = self._reduce_to_type(node.inferenced_type,node, general)
+        general = var_info is not None  # it's a param
+        new_node.type = self._reduce_to_type(node.inferenced_type, node, general)
 
         return new_node
 
@@ -171,12 +181,12 @@ class TypesInferencer:
     @visitor.when(VariableNode)
     def visit(self, node: VariableNode, scope: Scope) -> types_ast.VariableNode:
         new_node = types_ast.VariableNode(node)
-        
+
         if node.defined:
             var_info = scope.find_variable(node.value)
             general = var_info is not None
             new_node.type = self._reduce_to_type(node.inferenced_type, node, general)
-         
+
         return new_node
 
     @visitor.when(IsVoidNode)
@@ -272,7 +282,7 @@ class TypesInferencer:
 
         return self._join_types(higher_index_types)
 
-    def _join_types(self, types : List[Type]):
+    def _join_types(self, types: List[Type]):
         types_bags = []
         for typex in types:
             types_bags.append(TypeBag({typex}, heads=[typex]))

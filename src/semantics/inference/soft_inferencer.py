@@ -232,7 +232,7 @@ class SoftInferencer:
         scope.define_variable(node.id, node_type)
         expr_node = self.visit(node.expr, scope)
 
-        case_opt_node = inf_ast.CaseOptionNode(expr_node, node)
+        case_opt_node = inf_ast.CaseOptionNode(expr_node, node_type, node)
         case_opt_node.inferenced_type = expr_node.inferenced_type
         return case_opt_node
 

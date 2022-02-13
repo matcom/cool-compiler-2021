@@ -74,10 +74,11 @@ class CaseNode(ExpressionNode):
 
 
 class CaseOptionNode(ExpressionNode):
-    def __init__(self, ret_expr, node):
+    def __init__(self, ret_expr, branch_type, node):
         Node.__init__(self, node)
         self.id = node.id
         self.decl_type = node.decl_type
+        self.branch_type = branch_type
         self.expr = ret_expr
 
 
