@@ -249,13 +249,13 @@ class CCILGenerator:
         op: UnaryOpNode
         match node:
             case sem_ast.IsVoidNode:
-                fval_id = "isVoid_{times}"
+                fval_id = f"isVoid_{times}"
                 op = IsVoidOpNode(node, expr_id)
             case sem_ast.NotNode:
-                fval_id = "not_{times}"
+                fval_id = f"not_{times}"
                 op = NotOpNode(node, expr_id)
             case sem_ast.ComplementNode:
-                fval_id = "neg_{times}"
+                fval_id = f"neg_{times}"
                 op = NegOpNode(node, expr_id)
             case _:
                 raise Exception("Pattern match failure while visiting unary expression")
