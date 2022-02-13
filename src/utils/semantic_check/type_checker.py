@@ -13,12 +13,13 @@ SELF_TYPE_IN_DISPATCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a typ
 SELF_TYPE_IN_CASE_BRANCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a type of a case branch'
 
 INCOMPATIBLE_TYPES_ATTR = '(%s, %s) - TypeError: Inferred type %s of initialization of attribute %s does not conform to declared type %s.'
-INCOMPATIBLE_TYPES_COMPLEMENT = '(%s, %s) - TypeError: Argument of %s has type %s instead of %s.'
+INCOMPATIBLE_TYPES_ARG = '(%s, %s) - TypeError: Argument of \'%s\' has type %s instead of %s.'
+INCOMPATIBLE_TYPES_METH = '(%s, %s) - TypeError: Inferred return type %s of method %s does not conform to declared return type %s.'
 INCOMPATIBLE_TYPES = '(%s, %s) - TypeError: Cannot convert %s into %s.'
 WRONG_SIGNATURE = '(%s, %s) - TypeError: Method %s already defined in %s with a different signature.'
 LOCAL_ALREADY_DEFINED = '(%s, %s) - TypeError: Variable %s is already defined in method %s.'
 INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
-VARIABLE_NOT_DEFINED = '(%s, %s) - TypeError: Variable %s is not defined in %s.'
+VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Undeclared identifier %s.'
 INHERIT_ERROR = '(%s, %s) - TypeError: Class %s cannot inherit from class %s because they form a cycle.'
 METHOD_PARAMETERS = '(%s, %s) - TypeError: Method %s defined in %s receive %d parameters'
 
@@ -76,6 +77,10 @@ class TypeChecker:
                 self.errors.append(INHERIT_ERROR % (node.line, node.column, self.current_type.name, self.current_type.parent.name))
                 self.current_type.parent = ErrorType()
                 break
+            
+            for attr in current_parent.attributes:
+                scope.define_variable(attr.name, attr.type)
+
             current_parent = current_parent.parent
         
         attrs = [feat for feat in node.features if isinstance(feat, nodes.AttrDeclarationNode)]
@@ -149,7 +154,7 @@ class TypeChecker:
             returnType = ErrorType()
 
         if not body_type.conforms_to(returnType):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.line, node.column, body_type.name, returnType.name))
+            self.errors.append(INCOMPATIBLE_TYPES_METH % (node.body_line, node.body_column, body_type.name , node.id, returnType.name ))
 
         return
 
@@ -161,7 +166,7 @@ class TypeChecker:
         type_expr = self.visit(node.expr, scope.create_child())
 
         if var is None:
-            self.errors.append(VARIABLE_NOT_DEFINED % (node.line, node.column, node.id, self.current_method.name))
+            self.errors.append(VARIABLE_NOT_DEFINED % (node.line, node.column, node.id))
 
         elif var.name == 'self':
             self.errors.append(SELF_IS_READONLY % (node.line, node.column))
@@ -305,7 +310,7 @@ class TypeChecker:
         typex = self.visit(node.expr, scope)
 
         if not typex.conforms_to(self.context.get_type('Bool')):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.line, node.column, typex.name, 'Bool'))
+            self.errors.append(INCOMPATIBLE_TYPES_ARG % (node.line, node.column, 'not' ,typex.name, 'Bool'))
             return ErrorType()
 
         return typex
@@ -331,7 +336,7 @@ class TypeChecker:
         var = scope.find_variable(node.lex)
 
         if var is None:
-            self.errors.append(VARIABLE_NOT_DEFINED % (node.line, node.column, node.lex, self.current_method.name))
+            self.errors.append(VARIABLE_NOT_DEFINED % (node.line, node.column, node.lex))
             return ErrorType()
 
         return var.type
@@ -360,7 +365,7 @@ class TypeChecker:
         typex = self.visit(node.lex, scope)
 
         if not typex.conforms_to(self.context.get_type('Int')):
-            self.errors.append(INCOMPATIBLE_TYPES_COMPLEMENT % (node.line, node.column, '~' ,typex.name, 'Int'))
+            self.errors.append(INCOMPATIBLE_TYPES_ARG % (node.line, node.column, '~' ,typex.name, 'Int'))
             return ErrorType()
 
         return typex
