@@ -10,7 +10,6 @@ class BaseCILToMIPSVisitor:
         
         self.obj_table: ObjTable = ObjTable(self.dispatch_table)
         self.initialize_methods()
-        self.load_abort_messages()
         self.var_address = {'self': AddrType.REF}
        
         self.loop_idx = 0 
@@ -27,141 +26,84 @@ class BaseCILToMIPSVisitor:
     def initialize_data_code(self):
         self.data_code = ['.data'] 
 
-    def initialize_runtime_errors(self):
-        self.code.append('# Raise exception method')
-        self.code.append('.raise:')
-        self.code.append('li $v0, 4')
-        self.code.append('syscall')
-        self.code.append('li $v0, 17')
-        self.code.append('li $a0, 1')
-        self.code.append('syscall\n')
-        self.data_code.append('zero_error: .asciiz \"Division by zero error\n\"')
-        self.data_code.append('case_void_error: .asciiz \"Case on void error\n\"')
-        self.data_code.append('dispatch_error: .asciiz \"Dispatch on void error\n\"'  )
-        self.data_code.append('case_error: .asciiz \"Case statement without a matching branch error\n\"'  )
-        self.data_code.append('index_error: .asciiz \"Substring out of range error\n\"')
-        self.data_code.append('heap_error: .asciiz \"Heap overflow error\n\"')
-
-
     def get_basic_blocks(self, instructions):
         leaders = self.find_leaders(instructions)
         blocks = [instructions[leaders[i-1]:leaders[i]] for i in range(1, len(leaders))]
         return blocks
 
-
-    def find_leaders(self, instructions):
-        leaders = {0, len(instructions)}
-        for i, inst in enumerate(instructions):
-            if isinstance(inst, GoToNode) or isinstance(inst, IfGoToNode) or isinstance(inst, ReturnNode) \
-                or isinstance(inst, CallNode) or isinstance(inst, VCallNode):
-                leaders.add(i+1)
-            elif isinstance(inst, LabelNode) or isinstance(inst, FunctionNode):
-                leaders.add(i)
-        return sorted(list(leaders))
-
     def is_variable(self, expr):
         return isinstance(expr, str)
 
-    def is_int(self, expr):
-        return isinstance(expr, int)
+    def construct_next_use(self, basic_blocks):
+        next_use = {}
+        for basic_block in basic_blocks:
+            for x in self.symbol_table:
+                self.symbol_table[x].is_live = False
+                self.symbol_table[x].next_use = None
+
+            for inst in reversed(basic_block):
+                in1 = inst.in1 if self.is_variable(inst.in1) else None
+                in2 = inst.in2 if self.is_variable(inst.in2) else None
+                out = inst.out if self.is_variable(inst.out) else None
+        
+                in1nextuse = None
+                in2nextuse = None
+                outnextuse = None
+                in1islive = False
+                in2islive = False
+                outislive = False
+
+                entry_in1 = self.symbol_table.lookup(in1)
+                entry_in2 = self.symbol_table.lookup(in2)
+                entry_out = self.symbol_table.lookup(out)
+                if out is not None:
+                    if entry_out is not None:
+                        outnextuse = entry_out.next_use
+                        outislive = entry_out.is_live
+                    else:
+                        entry_out = SymbolTabEntry(out)
+                    entry_out.next_use = None
+                    entry_out.is_live = False
+                    self.symbol_table.insert(entry_out)
+                if in1 is not None:
+                    if entry_in1 is not None:
+                        in1nextuse = entry_in1.next_use
+                        in1islive = entry_in1.is_live
+                    else:
+                        entry_in1 = SymbolTabEntry(out)
+                    entry_in1.next_use = inst.index
+                    entry_in1.is_live = True
+                    self.symbol_table.insert(entry_in1)
+                if in2 is not None:
+                    if entry_in2 is not None:
+                        in2nextuse = entry_in2.next_use
+                        in2islive = entry_in2.is_live
+                    else:
+                        entry_in2 = SymbolTabEntry(in2)
+                    entry_in2.next_use = inst.index
+                    entry_in2.is_live = True
+                    self.symbol_table.insert(entry_in2)
+
+                n_entry = NextUseEntry(in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive)
+                next_use[inst.index] = n_entry
+        return next_use
+
 
     def get_reg(self, inst):
         if self.is_variable(inst.in1):
             in1_reg = self.get_reg_var(inst.in1)
         if self.is_variable(inst.in2):
-            in2_reg = self.get_reg_var(inst.in2) 
-        
-        nu_entry = self.next_use[inst.index]
-        if nu_entry.in1islive and nu_entry.in1nextuse < inst.index:
-            self.update_register(inst.out, in1_reg)
-            return  
-        if nu_entry.in2islive and nu_entry.in2nextuse < inst.index:
-            self.update_register(inst.out, in2_reg)
-            return 
-        if self.is_variable(inst.out):
-            self.get_reg_var(inst.out) 
+            in2_reg = self.get_reg_var(inst.in2)
 
-
-    def get_reg_var(self, var):
-        curr_inst = self.inst
-        register = self.addr_desc.get_var_reg(var)
-        if register is not None:
-            return register
-
-        var_st = self.symbol_table.lookup(var)
-        register = self.reg_desc.find_empty_reg()
-        if register is not None:
-            self.update_register(var, register)
-            self.load_var_code(var)
-            return register
-
-        next_use = self.next_use[curr_inst.index]
-        score = self.initialize_score()
-        for inst in self.block[1:]:
-            inst: InstructionNode
-            if self.is_variable(inst.in1) and inst.in1 not in [curr_inst.in1, curr_inst.in2, curr_inst.out] and next_use.in1islive:
-                self._update_score(score, inst.in1)  
-            if self.is_variable(inst.in2) and inst.in2 not in [curr_inst.in1, curr_inst.in2, curr_inst.out] and next_use.in2islive:
-                self._update_score(score, inst.in2)
-            if self.is_variable(inst.out) and inst.out not in [curr_inst.in1, curr_inst.in2, curr_inst.out] and next_use.outislive:
-                self._update_score(score, inst.out)
-        
-        register = min(score, key=lambda x: score[x])
-
-        self.update_register(var, register)
-        self.load_var_code(var)
-        return register
-
-    def initialize_score(self):
-        score = {}
-        for reg in self.reg_desc.registers:
-            score[reg] = 0
-        try:
-            reg = self.addr_desc.get_var_reg(self.inst.in1) 
-            if reg:
-                score[reg] = 999
-        except: pass
-        try:
-            reg = self.addr_desc.get_var_reg(self.inst.in2) 
-            if reg:
-                score[reg] = 999
-        except: pass
-        try:
-            reg = self.addr_desc.get_var_reg(self.inst.out) 
-            if reg:
-                score[reg] = 999
-        except: pass
-        return score        
-
-    def _update_score(self, score, var):
-        reg = self.addr_desc.get_var_reg(var) 
-        if reg is None:
-            return
-        try:
-            score[reg] += 1
-        except:
-            score[reg] = 1
-
-    def update_register(self, var, register):
-        content = self.reg_desc.get_content(register)
-        if content is not None:
-            self.save_var_code(content)
-            self.addr_desc.set_var_reg(content, None)
-        self.reg_desc.insert_register(register, var)
-        self.addr_desc.set_var_reg(var, register)
+    def used_registers(self):
+        return [(k, v) for k, v in self.registers.items() if v is not None]
 
     def save_var_code(self, var):
         memory, register, _= self.addr_desc.get_var_storage(var)
         self.code.append(f"sw ${register}, -{memory}($fp)")
 
-    def load_var_code(self, var):
-        memory, register, _ = self.addr_desc.get_var_storage(var)
-        self.code.append(f'lw ${register}, -{memory}($fp)')
-       
-    def load_used_reg(self, used_reg):
-        for reg in used_reg:
-            self.code.append('addiu $sp, $sp, 4')
-            self.code.append(f'lw ${reg}, ($sp)')
+    def insert_register(self, register, content):
+        self.registers[register] = content
 
     def empty_registers(self, save=True):
         registers = self.reg_desc.used_registers()
@@ -169,15 +111,20 @@ class BaseCILToMIPSVisitor:
             if save:
                 self.save_var_code(var)
             self.addr_desc.set_var_reg(var, None)
-            self.reg_desc.insert_register(reg, None)     
+            self.reg_desc.insert_register(reg, None)
 
-    def push_register(self, register):
-        self.code.append(f'sw ${register}, ($sp)')    
-        self.code.append('addiu $sp, $sp, -4')
+    def get_type(self, xtype):
+        if xtype == 'Int':
+            return AddrType.INT
+        elif xtype == 'Bool':
+            return AddrType.BOOL
+        elif xtype == 'String':
+            return AddrType.STR
+        return AddrType.REF
 
-    def pop_register(self, register):
-        self.code.append('addiu $sp, $sp, 4')   
-        self.code.append(f'lw ${register}, ($sp)')    
+    
+    def is_int(self, expr):
+        return isinstance(expr, int)
 
     def save_to_register(self, expr):
         if self.is_int(expr):
@@ -186,58 +133,67 @@ class BaseCILToMIPSVisitor:
         elif self.is_variable(expr):
             return self.addr_desc.get_var_reg(expr)
 
-    def get_attr_offset(self, attr_name:str, type_name:str):
-        return self.obj_table[type_name].attr_offset(attr_name)
 
-    def get_method_offset(self, type_name, method_name):
-        self.obj_table[type_name].method_offset(method_name)
 
-    def save_meth_addr(self, func_nodes):
-        self.methods += [funct.name for funct in func_nodes]
-        words = 'methods: .word ' + ', '.join(map(lambda x: '0', self.methods))
-        self.data_code.append(words)
-        self.code.append('# Save method directions in the methods array')
-        self.code.append('la $v0, methods')
-        for i, meth in enumerate(self.methods):
-            self.code.append(f'la $t9, {meth}')
-            self.code.append(f'sw $t9, {4*i}($v0)')
 
-    def save_types_addr(self, type_nodes):
-        words = 'types: .word ' + ', '.join(map(lambda x: '0', self.inherit_graph))
-        self.data_code.append(words)
-        self.code.append('# Save types directions in the types array')
-        self.code.append('la $t9, types')
-        self.types = []
-        self.code.append('# Save space to locate the type info')
-        for i, (ntype, nparent) in enumerate(self.inherit_graph.items()):
-            self.code.append('# Allocating memory')
-            self.code.append('li $v0, 9')
-            self.code.append(f'li $a0, 12')      
-            self.code.append('syscall')
-            self.types.append(ntype)
+class AddressDescriptor:
+    def __init__(self):
+        self.vars = {}
 
-            self.code.append('# Filling table methods')
-            self.code.append(f'la $t8, type_{ntype}')
-            self.code.append(f'sw $t8, 0($v0)')
+    def insert_var(self, name, address, register=None, stack=None):
+        if address is not None:
+            self.vars[name] = [4*address, register, stack]
+        else:
+            self.vars[name] = [address, register, stack]
             
-            self.code.append('# Copying direction to array')
-            self.code.append(f'sw $v0, {4*i}($t9)')
-            
-            self.code.append('# Table addr is now stored in t8')
-            self.code.append('move $t8, $v0')
-            self.code.append('# Creating the dispatch table')
-            self.create_dispatch_table(ntype)
-            self.code.append('sw $v0, 8($t8)')
+    def get_var_addr(self, name):
+        return self.vars[name][0]
+
+    def set_var_addr(self, name, addr):
+        self.vars[name][0] = 4*addr
+
+    def get_var_reg(self, var):
+        return self.vars[var][1]
+
+    def set_var_reg(self, name, reg):
+        self.vars[name][1] = reg
+
+    def get_var_stack(self, name):
+        return self.vars[name][2]
+
+    def set_var_stack(self, name, stack_pos):
+        self.vars[name][1] = stack_pos
+
+    def get_var_storage(self, name):
+        return self.vars[name]
 
 
-        self.code.append('# Copying parents')
-        for i, ntype in enumerate(self.types):
-            self.code.append(f'lw $v0, {4*i}($t9)')
-            nparent = self.inherit_graph[ntype]
-            if nparent is not None:
-                parent_idx = self.types.index(nparent)
 
-                self.code.append(f'lw $t8, {4*parent_idx}($t9)')
-            else:
-                self.code.append('li $t8, 0')
-            self.code.append('sw $t8, 4($v0)')
+
+class SymbolTabEntry:
+    def __init__(self, name, is_live=False, next_use=None):
+        self.name = name
+        self.is_live = is_live
+        self.next_use = next_use
+
+class SymbolTable:
+    def __init__(self, entries = None):
+        values = entries if entries is not None else []
+        self.entries = {v.name: v for v in values}
+
+    def lookup(self, entry_name: str) -> SymbolTabEntry:
+        if entry_name != None:
+            if entry_name in self.entries.keys():
+                return self.entries[entry_name]
+           
+    def insert(self, entry):
+        self.entries[entry.name] = entry
+
+    def insert_name(self, name):
+        self.entries[name] = SymbolTabEntry(name)
+
+    def __getitem__(self, item):
+        return self.entries[item]
+
+    def __iter__(self):
+        return iter(self.entries)

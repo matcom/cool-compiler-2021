@@ -8,6 +8,7 @@ class BaseCOOLToCILVisitor:
         self.current_method = None
         self.current_function = None
         self.context = context
+        self.inherit_graph = {}
     
     @property
     def params(self):
