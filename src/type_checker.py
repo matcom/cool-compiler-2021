@@ -50,8 +50,8 @@ INVALID_OPERATION = 'Operation is not defined between "%s" and "%s".'
 
 
 class TypeChecker:
-    def __init__(self, context, errors=[]):
-        self.context = context
+    def __init__(self, errors=[]):
+        self.context = None
         self.current_type = None
         self.current_method = None
         self.errors = errors
@@ -63,8 +63,14 @@ class TypeChecker:
     @visitor.when(ProgramNode)
     def visit(self, node, scope=None):
         scope = Scope()
+        self.context = node.context.copy()
         for declaration in node.declarations:
             self.visit(declaration, scope.create_child())
+
+        self.context = None
+        self.current_type = None
+        self.current_method = None
+
         return scope
 
     @visitor.when(ClassDeclarationNode)
@@ -452,4 +458,3 @@ class TypeChecker:
     @visitor.when(BooleanNode)
     def visit(self, node, scope):
         return self.context.get_type("Bool")
-

@@ -11,11 +11,12 @@ from src.ast_nodes import (
 import src.cmp.visitor as visitor
 from src.tset import Tset
 from collections import deque
+from cool_visitor import CopyVisitor
 
 
 class TypeBuilder:
-    def __init__(self, context, errors=[]):
-        self.context = context
+    def __init__(self, errors=[]):
+        self.context = None
         self.current_type = None
         self.errors = errors
 
@@ -25,7 +26,8 @@ class TypeBuilder:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        # Despues de entregar!!!!!!
+        self.context = node.context.copy()
+
         io_type = self.context.get_type("IO")
         self_type = self.context.get_type("SELF_TYPE")
         int_type = self.context.get_type("Int")
@@ -53,7 +55,7 @@ class TypeBuilder:
         method = io_type.define_method("in_int", [], [], int_type)
         method.tset = Tset(parent_tset)
 
-        # -------String
+        # String
         parent_tset = Tset()
         parent_tset.locals["concat"] = {"String"}
         parent_tset.locals["substr"] = {"String"}
@@ -87,8 +89,6 @@ class TypeBuilder:
 
         method = object_type.define_method("copy", [], [], self_type)
         method.tset = Tset(parent_tset)
-
-        # --------------------
 
         # ------checking for in order definitions and cyclic heritage
         parent_child_dict = {}
@@ -149,6 +149,15 @@ class TypeBuilder:
         # ----------------------------------------------------
         # for declaration in node.declarations:
         #     self.visit(declaration)
+
+        copy_visitor = CopyVisitor()
+        newAst = copy_visitor.visit(node)
+        newAst.context = self.context.copy()
+
+        self.context = None
+        self.current_type = None
+
+        return newAst
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):

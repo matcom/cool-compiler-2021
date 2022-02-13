@@ -29,7 +29,7 @@ class TypeCollector(object):
     @visitor.when(ProgramNode)
     def visit(self, node):
         self.context = Context()
-        # Es necesario crear estos tipos especificos?
+        # TODO: Es necesario crear estos tipos especificos?
         self.context.types["Object"] = ObjectType()
         self.context.types["Int"] = IntType()
         self.context.types["String"] = StringType()
@@ -52,7 +52,7 @@ class TypeCollector(object):
 
         newAst.context = self.context.copy()
         self.context = None
-        # self.errors tambien deberia volver a su estado inicial
+        # TODO: self.errors tambien deberia volver a su estado inicial
         # devolver (newAst,errors) ???
         return newAst
 
