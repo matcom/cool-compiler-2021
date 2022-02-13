@@ -1,0 +1,5 @@
+LXERR = "LexicographicError: ERROR"
+LXUSC = "LexicographicError: Unterminated string constant"
+LXSCN = "LexicographicError: String contains null character"
+LXESC = "LexicographicError: EOF in string constant"
+LXEIC = "LexicographicError: EOF in comment"
