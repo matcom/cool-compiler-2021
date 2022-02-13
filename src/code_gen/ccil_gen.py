@@ -22,6 +22,22 @@ class CCILGenerator:
     def visit(self, _):
         self.time_record: Dict[str, int] = Dict()
 
+    @visitor.when(sem_ast.BlocksNode)
+    def visit(self, node:sem_ast.BlocksNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        operations:List[OperationNode] = []
+        fvalues:List[StorageNode] = []
+        for expr in node.expr_list:
+            (expr_ops, expr_fval) = self.visit(expr)
+            operations += expr_ops
+            fvalues += expr_fval
+
+        fval = fvalues[-1]
+        fval.id = f"block_{times}"
+
+        return (operations, fval)
+
     @visitor.when(sem_ast.LetNode)
     def visit(self, node: sem_ast.LetNode) -> VISITOR_RESULT:
         operations: List[OperationNode] = []
@@ -78,8 +94,29 @@ class CCILGenerator:
         return ([*if_ops, if_false, *then_ops, else_label, *else_ops, fvalue], fvalue)
 
     @visitor.when(sem_ast.CaseNode)
-    def visit(self, node:sem_ast.CaseNode):
-        pass
+    def visit(self, node:sem_ast.CaseNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        (case_expr_ops, case_expr_fv) = self.visit(node.case_expr)
+
+        type_of = create_type_of(
+                    node,
+                    f"case_{times}_typeOf",
+                    extract_id(node, case_expr_fv)
+                )
+
+        operations = [*case_expr_ops, type_of]
+
+        for (i, option) in enumerate(node.options):
+            option_id = f"case_{times}_option_{i}"
+            options_st = create_uninitialized_storage(option, option_id)
+            # The type of the option node must be stored to do the pattern matching!
+
+    @visitor.when(sem_ast.CaseOptionNode)
+    def visit(self, node:sem_ast.CaseOptionNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        
 
     @visitor.when(sem_ast.LoopNode)
     def visit(self, node: sem_ast.LoopNode) -> VISITOR_RESULT:
