@@ -207,7 +207,7 @@ def p_unknown_end_atom(p):
     if first_token == 'OBJECT_ID' and second_token == 'ASSIGN':
         p[0] = ast.AssignNode(p.lineno(1), p[1], p[3])
     elif first_token == 'LET':
-        p[0] = ast.CaseNode(p.lineno(1), p[2], p[4])
+        p[0] = ast.LetNode(p.lineno(1), p[2], p[4])
     elif first_token == 'NOT':
         p[0] = ast.NotNode(p.lineno(1), p[2])
     elif first_token == 'ISVOID':
