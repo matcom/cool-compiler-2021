@@ -145,16 +145,21 @@ class ArrayNode(InstructionNode):
 
 
 class TypeOfNode(InstructionNode):
-    def __init__(self, obj: str, dest: str):
+    def __init__(self, dest: str, obj: str, ):
         self.obj: str = obj
         self.dest: str = dest
 
 
 class AncestorNode(InstructionNode):
-    def __init__(self, obj: str, dest: str):
+    def __init__(self, dest: str, obj: str):
         self.obj: str = obj
         self.dest: str = dest
 
+
+class TypeDirectionNode(InstructionNode):
+    def __init__(self, dest: str, name: str):
+        self.name: str = name
+        self.dest: str = dest
 
 class LabelNode(InstructionNode):
     def __init__(self, label: str):
@@ -332,9 +337,9 @@ class CILFormatter:
         return (
             f"{node.dest} = {node.left} == {node.right}"
             if node.comment == ""
-            else f"{node.dest} = {node.left} + {node.right} # {node.comment}"
+            else f"{node.dest} = {node.left} == {node.right} # {node.comment}"
         )
-    
+
     @visitor.when(LessThanNode)
     def visit(self, node: LessThanNode):
         return (
@@ -342,7 +347,7 @@ class CILFormatter:
             if node.comment == ""
             else f"{node.dest} = {node.left} < {node.right} # {node.comment}"
         )
-    
+
     @visitor.when(LessEqualNode)
     def visit(self, node: LessEqualNode):
         return (
@@ -365,6 +370,14 @@ class CILFormatter:
             f"{node.dest} = TYPEOF {node.obj}"
             if node.comment == ""
             else f"{node.dest} = TYPEOF {node.obj} # {node.comment}"
+        )
+
+    @visitor.when(TypeDirectionNode)
+    def visit(self, node: TypeDirectionNode):
+        return (
+            f"{node.dest} = TYPEDIR {node.name}"
+            if node.comment == ""
+            else f"{node.dest} = TYPEDIR {node.name} # {node.comment}"
         )
 
     @visitor.when(AncestorNode)
@@ -476,5 +489,5 @@ class CILFormatter:
         return f"# {node.comment}"
 
     @visitor.when(EmptyInstruction)
-    def visit(self, node):
-        return ""
+    def visit(self, node: EmptyInstruction):
+        return "" if node.comment == "" else f"# {node.comment}"

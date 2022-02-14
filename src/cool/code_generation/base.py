@@ -68,3 +68,9 @@ class BaseCOOLToCILVisitor:
         data_node = cil.DataNode(data_name, value)
         self.dotdata.append(data_node)
         return data_node
+
+    def register_comment(self, comment: str) -> cil.CommentNode:
+        self.register_instruction(cil.CommentNode(comment))
+    
+    def register_empty_instruction(self):
+        self.register_instruction(cil.EmptyInstruction())
