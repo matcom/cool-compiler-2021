@@ -1,4 +1,6 @@
 from cil_ast import *
+from typing import List, Dict
+from enum import Enum
 
 class BaseCILToMIPSVisitor:
     def __init__(self, inherit_graph):
@@ -134,6 +136,121 @@ class BaseCILToMIPSVisitor:
             return self.addr_desc.get_var_reg(expr)
 
 
+class AddrType(Enum):
+    REF = 1,
+    STR = 2,
+    BOOL = 3,
+    INT = 4,
+    VOID = 5
+
+
+class NextUseEntry:
+	"""For each line : for all three variables involved their next use and is live information"""
+	def __init__(self, in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive):
+		self.in1 = in1
+		self.in2 = in2
+		self.out = out
+		self.in1nextuse = in1nextuse
+		self.in2nextuse = in2nextuse
+		self.outnextuse = outnextuse
+		self.in1islive = in1islive
+		self.in2islive = in2islive
+		self.outislive = outislive
+
+
+class ObjTabEntry:
+    def __init__(self, name, methods, attrs):   
+        self.class_tag: str = name
+        self.size: int = 3 + len(attrs)
+        self.dispatch_table_size = len(methods)
+        self.dispatch_table_entry = methods
+        self.attrs = attrs
+    
+    @property
+    def class_tag_offset(self):
+        return 0
+
+    @property
+    def size_offset(self):
+        return 1
+
+    @property
+    def dispatch_ptr_offset(self):
+        return 2
+
+    def attr_offset(self, attr):
+        return self.attrs.index(attr) + 3
+
+    def method_offset(self, meth):
+        "Method offset in dispatch table"
+        return self.dispatch_table_entry.index(meth)
+
+
+class ObjTable:
+    def __init__(self, dispatch_table):
+        self.objects: Dict[str, ObjTabEntry] = {} #self.initialize_built_in()
+        self.dispatch_table = dispatch_table
+
+    def initialize_built_in(self):
+        object_methods = [
+            'function_abort_Object', 
+            'function_type_name_Object', 
+            'function_copy_Object']
+        io_methods = [
+            'function_out_string_IO',
+            'function_out_int_IO',
+            'function_in_string_IO',
+            'function_in_int_IO']
+        str_methods = [
+            'function_length_String', 
+            'function_concat_String', 
+            'function_substr_String' ]
+        return {
+            'Int': ObjTabEntry('Int', [], []), 
+            'Bool': ObjTabEntry('Bool', [], []),
+            'IO': ObjTabEntry('IO', io_methods, []),
+            'String': ObjTabEntry('String', str_methods, []),
+            'Object': ObjTabEntry('Object', object_methods, [])
+        }
+
+    def add_entry(self, name, methods, attrs):
+        methods = [y for x, y in methods]
+        attrs = [x for x, y in attrs]
+        self.objects[name] = ObjTabEntry(name, methods, attrs)
+        self.dispatch_table.add_class(name, methods)
+
+    def size_of_entry(self, name):
+        return self.objects[name].size
+
+    def __getitem__(self, item) -> ObjTabEntry:
+        return self.objects[item]
+
+    def __iter__(self):
+        return iter(self.objects.values())
+
+class RegisterDescriptor:
+    def __init__(self):
+        registers = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 'a1', 'a2', 'a3', \
+                    's0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 'v1']
+        self.registers = {reg: None for reg in registers}
+
+    def insert_register(self, register:str, content:str):
+        self.registers[register] = content
+
+    def get_content(self, register: str):
+        return self.registers[register]
+
+    def find_empty_reg(self):
+        for k, v in self.registers.items():
+            if v is None:
+                return k
+
+    def used_registers(self):
+        return [(k, v) for k, v in self.registers.items() if v is not None]
+
+    def empty_registers(self):
+        for k in self.registers:
+            self.registers[k] = None
 
 
 class AddressDescriptor:

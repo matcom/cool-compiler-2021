@@ -89,20 +89,6 @@ class COOLToCILVisitor(BaseCILToMIPSVisitor):
             self.var_address[node.dest] = AddrType.INT
         self.save_var_code(node.dest)
 
-    @visitor.when(cil.NotNode)
-    def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        rsrc = self.save_to_register(node.expr)
-        self.code.append(f'# {node.dest} <- not {node.expr}')
-        self.code.append(f'beqz ${rsrc}, false_{self.loop_idx}')
-        self.code.append(f'li ${rdest}, 0')
-        self.code.append(f'j end_{self.loop_idx}')
-        self.code.append(f'false_{self.loop_idx}:')
-        self.code.append(f'li ${rdest}, 1')
-        self.code.append(f'end_{self.loop_idx}:')
-        self.loop_idx += 1
-        self.var_address[node.dest] = AddrType.BOOL
-
     @visitor.when(cil.PlusNode)
     def visit(self, node):
         rdest = self.addr_desc.get_var_reg(node.dest)
@@ -184,7 +170,7 @@ class COOLToCILVisitor(BaseCILToMIPSVisitor):
         self.code.append(f'# {node.dest} <- {node.left} < {node.right}')
         self._code_to_comp(node, 'slt', lambda x, y: x < y)
 
-    @visitor.when(cil.LessEqNode)
+    @visitor.when(cil.LessEqualNode)
     def visit(self, node):
         self.code.append(f'# {node.dest} <- {node.left} <= {node.right}')
         self._code_to_comp(node, 'sle', lambda x, y: x <= y)
@@ -215,3 +201,41 @@ class COOLToCILVisitor(BaseCILToMIPSVisitor):
                 self.code.append(f"li $t9, {node.left}")
                 self.code.append(f"{op} ${rdest}, $t9, ${rright}")
         self.var_address[node.dest] = AddrType.BOOL
+
+    @visitor.when(cil.NotNode)
+    def visit(self, node):
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        rsrc = self.save_to_register(node.expr)
+        self.code.append(f'# {node.dest} <- not {node.expr}')
+        self.code.append(f'beqz ${rsrc}, false_{self.loop_idx}')
+        self.code.append(f'li ${rdest}, 0')
+        self.code.append(f'j end_{self.loop_idx}')
+        self.code.append(f'false_{self.loop_idx}:')
+        self.code.append(f'li ${rdest}, 1')
+        self.code.append(f'end_{self.loop_idx}:')
+        self.loop_idx += 1
+        self.var_address[node.dest] = AddrType.BOOL
+
+    @visitor.when(cil.GetAttrNode)
+    def visit(self, node):
+        self.code.append(f'# {node.dest} <- GET {node.obj} . {node.attr}')
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        self.var_address[node.dest] = self.get_type(node.attr_type)
+        rsrc = self.addr_desc.get_var_reg(node.obj)
+        attr_offset = 4*self.get_attr_offset(node.attr, node.type_name)
+        self.code.append(f'lw ${rdest}, {attr_offset}(${rsrc})')
+
+    @visitor.when(cil.SetAttrNode)
+    def visit(self, node):
+        self.code.append(f'# {node.obj} . {node.attr} <- SET {node.value}')
+        rdest = self.addr_desc.get_var_reg(node.obj)
+        attr_offset = 4*self.get_attr_offset(node.attr, node.type_name)
+        if self.is_variable(node.value):
+            rsrc = self.addr_desc.get_var_reg(node.value)
+        elif self.is_int(node.value):
+            self.code.append(f'li $t9, {node.value}')
+            rsrc = 't9'
+        elif self.is_void(node.value):
+            self.code.append(f'la $t9, type_{VOID_NAME}')
+            rsrc = 't9'
+        self.code.append(f'sw ${rsrc}, {attr_offset}(${rdest})')
