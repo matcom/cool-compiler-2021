@@ -16,6 +16,7 @@ def main(args):
             code = fd.read()
     except Exception as e:
         print(f"(0,0) - CompilerError: {e.args}")
+        print(args.file)
         exit(1)
 
     lexer = Lexer()
@@ -57,6 +58,13 @@ def main(args):
     MIPSFormatter = MIPSAstFormatter()
     mipsCode = MIPSFormatter.visit(MIPSAst)
     print(mipsCode)
+
+    out_file = args.file.split(".")
+    out_file[-1] = "mips"
+    out_file = ".".join(out_file)
+
+    with open(out_file, 'w') as f:
+        f.write(mipsCode)
 
 
 if __name__ == "__main__":

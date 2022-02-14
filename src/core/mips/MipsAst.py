@@ -118,7 +118,7 @@ class NegateNode(InstructionNode):
 class SubstractionNode(InstructionNode):
     def __init__(self, rdest, rsrc1, rsrc2):
         '''
-        Put the difference of register rsrc1 and src2 into register rdest.
+        Put the difference of register rsrc1 and rsrc2 into register rdest.
         '''
         self.rdest = rdest
         self.rsrc1 = rsrc1
@@ -197,6 +197,9 @@ class LoadWordNode(InstructionNode):
 
 class LoadAddressNode(InstructionNode):
     def __init__(self, reg, label):
+        '''
+        Load computed address , not the contents of the location, into register rdest
+        '''
         self.reg   = reg
         self.label = label
 
@@ -215,7 +218,7 @@ class NotNode(InstructionNode):
         self.dest = dest
         self.src = src
 
-class ShiftLeftNode(InstructionNode):
+class ShiftLeftNode(InstructionNode): # Shift Left Logical
     def __init__(self, dest, src, bits):
         self.dest = dest
         self.src  = src
@@ -223,9 +226,6 @@ class ShiftLeftNode(InstructionNode):
 
 class SyscallNode(InstructionNode):
     pass
-
-
-
 
 class DataNode(Node):
     def __init__(self, label):

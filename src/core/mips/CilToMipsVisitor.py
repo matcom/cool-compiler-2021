@@ -554,7 +554,7 @@ class CILToMIPSVisitor:
 
         reg = mips.REGISTERS[0]
         instructions.append(mips.LoadWordNode(reg, self.get_var_location(node.source)))
-        instructions.append(mips.push_register(reg))
+        instructions.extend(mips.push_register(reg))
 
         instructions.append(mips.JalNode("len"))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest)))
