@@ -333,7 +333,7 @@ function function_get4_at_B {
 	LOCAL local_get4_at_B_internal_0
 
 	ARG self
-	local_get4_at_B_internal_0 = VCALL B get3
+	local_get4_at_B_internal_0 = CALL function_get3_at_A
 	RETURN local_get4_at_B_internal_0
 }
 function __init_Main_type {
@@ -416,6 +416,6 @@ function function_main_at_Main {
 	LABEL main_at_Main_label_4
 	ARG self
 	ARG local_main_at_Main_internal_0
-	local_main_at_Main_internal_12 = VCALL Main out_int
+	local_main_at_Main_internal_12 = CALL function_out_int_at_IO
 	RETURN local_main_at_Main_internal_12
 }

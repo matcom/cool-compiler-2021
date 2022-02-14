@@ -2,6 +2,7 @@ from typing import List
 from mips.ast.mips_ast import *
 import cmp.visitor as visitor
 import cool.ast.cil_ast as cil
+from mips.error.errors import MetaCILInvalidError
 from mips.registers import Reg
 
 class MIPSPrintVisitor():
@@ -241,12 +242,48 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def _load_local_variable(self, dest, name):
         self.add_instruction(LoadWordNode(dest, self.local_variable_offset[name], Reg.fp())) # Stack address for local variable
 
+    def _load_type_variable(self, dest, name):
+        self.add_instruction(LoadAddressNode(dest, name))
+
     def _store_local_variable(self, source, name):
         self.add_instruction(StoreWordNode(source, self.local_variable_offset[name], Reg.fp())) # Stores allocated memory address in destination variable
 
     def _call_with_register(self, register):
         self.add_instruction(JumpRegisterNode(register))
     
+    def _add_copy_function(self):
+        """
+        Function that copies the instance passed in $a0 and returns the copy address
+        in $v0 
+        """
+        
+        self.add_instruction(LabelNode("__copy"))
+        
+        self.add_instruction(MoveNode(Reg.t(0), Reg.a(0)))
+        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(0))) # t1 = instance type dir
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.t(1))) # a0 = instance size
+        self._allocate_heap_space(Reg.a(0)) # v0 = allocated space
+        
+        start_label_name = "__start_copy_loop"
+        end_label_name = "__end_copy_loop"
+        
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0)))
+        self.add_instruction(MoveNode(Reg.t(3), Reg.v(0)))
+        
+        self.add_instruction(LabelNode(start_label_name))
+        self.add_instruction(BranchLessEqualNode(Reg.t(1), Reg.zero(), end_label_name))
+        
+        self.add_instruction(LoadWordNode(Reg.t(2), 0, Reg.t(0)))
+        self.add_instruction(StoreWordNode(Reg.t(2), 0, Reg.t(3)))
+        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), 4))
+        self.add_instruction(AddImmediateNode(Reg.t(3), Reg.t(3), 4))
+        self.add_instruction(AddImmediateNode(Reg.t(1), Reg.t(1), -1))
+        
+        self.add_instruction(JumpNode(start_label_name))
+        self.add_instruction(LabelNode(end_label_name))
+        
+        self.add_instruction(JumpRegisterNode(Reg.ra()))
+        
     def _add_get_ra_function(self):
         """
         Adds a function that returns in $v0 2 instructions after the caller instruction
@@ -264,13 +301,26 @@ class CILToMIPSVisitor(): # TODO Complete the transition
             value = int(value1)
             self.add_instruction(LoadImmediateNode(dest1, value))
         except ValueError:
-            self._load_local_variable(dest1, value1)
+            try:
+                self._load_local_variable(dest1, value1)
+            except KeyError:
+                self._load_type_variable(dest1, value1)
     
     def _binary_operation(self, node: cil.ArithmeticNode, instruction_type, reg1, reg2, temp_reg):        
         self._load_value(reg1, node.left)
         self._load_value(reg2, node.right)
         self.add_instruction(instruction_type(temp_reg, reg1, reg2))
         self._store_local_variable(temp_reg, node.dest)
+    
+    def _allocate_heap_space(self, reg_with_amount):
+        """
+        Stores in `a0` the `reg_with_amount` and makes a system call
+        to reserve space. The reserve space address will be in `v0`
+        """
+        if reg_with_amount != Reg.a(0):
+            self.add_instruction(MoveNode(Reg.a(0), reg_with_amount)) # Saves in $a0 the bytes size for current type
+        self.add_instruction(LoadImmediateNode(Reg.v(0), 9)) # Reserve space arg
+        self.add_instruction(SyscallNode()) # Returns in $v0 the allocated memory
     
     def add_instruction(self, instr:Node):
         self.program_node.instructions.append(instr)
@@ -284,18 +334,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.ProgramNode)
     def visit(self, node:cil.ProgramNode):
-        # EXAMPLE HELLO WORLD
-
-        # program = ProgramNode("TODO Change this message for a meaningful one")
-        # self.program_node = program
-        # self.add_instruction(LabelNode("main",comment="Entry function"))
-        # self.add_instruction(LoadAddressNode(Reg.a(0), "hello_world",comment="Load message direction"))
-        # self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 4, comment="$v0 = 4 For printing string"))
-        # self.add_instruction(SyscallNode(comment="Prints Hello world"))
-        # self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 10, comment="$v0 = 10 For exit"))
-        # self.add_instruction(SyscallNode(comment="Exit"))
-        # self.add_data(ASCIIZNode("hello_world", '"Hello World\\n"', comment="Message to print"))
-        
+     
         for type_node in node.dottypes:
             self.type_method_dict_list[type_node.name] = type_node.methods.copy()
             for method,static_method in type_node.methods:
@@ -305,6 +344,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.program_node = program
 
         self._add_get_ra_function()
+        self._add_copy_function()
 
         for function in node.dotcode:
             self.current_function = function
@@ -347,13 +387,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):
-        self.add_instruction(LoadImmediateNode(Reg.v(0), 9)) # Reserve space arg
         if node.type[0].isupper(): # Is a Type name
             self.add_instruction(LoadAddressNode(Reg.a(0), node.type)) # Type address into $a0
         else:
             self._load_local_variable(Reg.a(0), node.type)
         self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Saves in $a0 the bytes size for current type
-        self.add_instruction(SyscallNode()) # Returns in $v0 the allocated memory
+        self._allocate_heap_space(Reg.a(0))
         self._store_local_variable(Reg.v(0), node.dest)
 
     @visitor.when(cil.AbortNode)
@@ -441,4 +480,119 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
     @visitor.when(cil.ParamNode)
     def visit(self, node:cil.ParamNode):
+        pass # Function Node already do this work
+    
+    @visitor.when(cil.ArrayNode)
+    def visit(self, node:cil.ArrayNode):
+        self._load_value(Reg.a(0), node.length) # Saves in $a0 the array's byte size
+        self._allocate_heap_space(Reg.a(0))
+        self._store_local_variable(Reg.v(0), node.dest)
+    
+    @visitor.when(cil.GetIndexNode)
+    def visit(self, node:cil.GetIndexNode):
+        self._load_value(Reg.t(0), node.index)
+        self._load_value(Reg.t(1), node.source)
+        
+        # Calculating Offset
+        self.add_instruction(LoadImmediateNode(Reg.t(2), self.WORD_SIZE))
+        self.add_instruction(MultiplyNoOverflowNode(Reg.t(2), Reg.t(2), Reg.t(0))) # Offset in t2
+        
+        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(1))) # t1 is at the array's first position
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(2), Reg.t(1))) # t1 is at the index position
+        
+        self._store_local_variable(Reg.t(1), node.dest)
+        
+    @visitor.when(cil.SetIndexNode)
+    def visit(self, node:cil.SetIndexNode):
+        self._load_value(Reg.t(0), node.index)
+        self._load_value(Reg.t(1), node.source)
+        self._load_value(Reg.t(3), node.value)
+        
+        # Calculating Offset
+        self.add_instruction(LoadImmediateNode(Reg.t(2), self.WORD_SIZE))
+        self.add_instruction(MultiplyNoOverflowNode(Reg.t(2), Reg.t(2), Reg.t(0))) # Offset in t2
+        
+        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(1))) # t1 is at the array's first position
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(2), Reg.t(1))) # t1 is at the index position
+        
+        self.add_instruction(StoreWordNode(Reg.t(3), 0, Reg.t(1)))
+        
+    @visitor.when(cil.CopyNode)
+    def visit(self, node:cil.CopyNode):
+        self._load_value(Reg.a(0), node.instance) # t0 = instance
+        self.add_instruction(JumpAndLinkNode("__copy"))
+        self._store_local_variable(Reg.v(0), node.result)
+    
+    @visitor.when(cil.GotoNode)
+    def visit(self, node:cil.GotoNode):
+        self.add_instruction(JumpNode(node.label))
+    
+    @visitor.when(cil.LabelNode)
+    def visit(self, node:cil.LabelNode):
+        self.add_instruction(LabelNode(node.label))
+    
+    @visitor.when(cil.GetFatherNode)
+    def visit(self, node:cil.GetFatherNode):
+        self._load_value(Reg.t(0), node.type) # t0 = Type Address
+        # TODO CHECK IF THE INSTRUCTION BELOW IS REQUIRED
+        # self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0))) # t0 = t0[0] -> FatherAddress
+        self._store_local_variable(Reg.t(0), node.dest)
+        
+    
+    @visitor.when(cil.ObjectCopyNode)
+    def visit(self, node:cil.ObjectCopyNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.ObjectAbortNode)
+    def visit(self, node:cil.ObjectAbortNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.ObjectTypeNameNode)
+    def visit(self, node:cil.ObjectTypeNameNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.StringConcatNode)
+    def visit(self, node:cil.IOInIntNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.StringLengthNode)
+    def visit(self, node:cil.StringLengthNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.StringSubstringNode)
+    def visit(self, node:cil.StringSubstringNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.IOInIntNode)
+    def visit(self, node:cil.IOInIntNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.IOInStringNode)
+    def visit(self, node:cil.IOInStringNode):
+        raise MetaCILInvalidError()
+
+    @visitor.when(cil.IOOutIntNode)
+    def visit(self, node:cil.IOOutIntNode):
+        raise MetaCILInvalidError()
+    
+    @visitor.when(cil.IOOutStringNode)
+    def visit(self, node:cil.IOOutStringNode):
+        raise MetaCILInvalidError()
+    
+    # TODO
+    
+    @visitor.when(cil.GetAttribNode)
+    def visit(self, node:cil.GetAttribNode):
+        pass
+    
+    @visitor.when(cil.SetAttribNode)
+    def visit(self, node:cil.SetAttribNode):
+        pass
+    
+    @visitor.when(cil.GotoIfNode)
+    def visit(self, node:cil.GotoIfNode):
+        pass
+    
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node:cil.ConcatNode):
         pass

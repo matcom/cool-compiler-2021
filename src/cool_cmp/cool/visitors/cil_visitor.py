@@ -860,81 +860,6 @@ class COOLToCILVisitor():
         self.register_instruction(cil.AssignNode(cil_local,value))
         return cil_local
 
-    @visitor.when(SpecialNode)
-    def visit(self, node, scope=None):
-        return self.visit(node.cil_node_type(), scope)
-
-    @visitor.when(cil.ObjectCopyNode)
-    def visit(self, node, scope=None):
-        instance = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.CopyNode(instance.name, result))
-        return result
-    
-    @visitor.when(cil.ObjectAbortNode)
-    def visit(self, node, scope=None):
-        self.register_instruction(cil.AbortNode())
-        return "0"
-    
-    @visitor.when(cil.ObjectTypeNameNode)
-    def visit(self, node, scope=None):
-        instance = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.TypeOfNode(instance.name, result))
-        return result
-
-    @visitor.when(cil.StringConcatNode)
-    def visit(self, node, scope=None):
-        string1 = self.params[0]
-        string2 = self.params[1]
-        result = self.define_internal_local()
-        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name))
-        return result
-    
-    @visitor.when(cil.StringLengthNode)
-    def visit(self, node, scope=None):
-        string = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.LengthNode(result, string.name))
-        return result
-        
-    
-    @visitor.when(cil.StringSubstringNode)
-    def visit(self, node, scope=None):
-        string = self.params[0]
-        index = self.params[1]
-        length = self.params[2]
-        result = self.define_internal_local()
-        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name))
-        return result
-    
-    @visitor.when(cil.IOInStringNode)
-    def visit(self, node, scope=None):
-        result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
-        return result
-
-    @visitor.when(cil.IOInIntNode)
-    def visit(self, node, scope=None):
-        result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
-        # TODO Convertir String a Int
-        return result
-    
-    @visitor.when(cil.IOOutIntNode)
-    def visit(self, node, scope=None):
-        integer = self.params[1]
-        string_message = self.define_internal_local()
-        self.register_instruction(cil.ToStrNode(string_message, integer.name))
-        self.register_instruction(cil.PrintNode(string_message))
-        return "0"
-    
-    @visitor.when(cil.IOOutStringNode)
-    def visit(self, node, scope=None):
-        string = self.params[1]
-        self.register_instruction(cil.PrintNode(string.name))
-        return "0"
-
     @visitor.when(AssignNode)
     def visit(self, node, scope):
         ###############################
@@ -1358,4 +1283,82 @@ class COOLToCILVisitor():
         self.register_instruction(cil.LoadNode(result, value.name))
         return result
         
+    @visitor.when(SpecialNode)
+    def visit(self, node, scope=None):
+        return self.visit(node.cil_node_type(), scope)
+
+    # META INSTRUCTIONS ONLY USED IN CODE
+    # TRANSLATION THAT DOESN'T BELONG TO CIL'S
+    # INSTRUCTION SET
+    @visitor.when(cil.ObjectCopyNode)
+    def visit(self, node, scope=None):
+        instance = self.params[0]
+        result = self.define_internal_local()
+        self.register_instruction(cil.CopyNode(instance.name, result))
+        return result
+    
+    @visitor.when(cil.ObjectAbortNode)
+    def visit(self, node, scope=None):
+        self.register_instruction(cil.AbortNode())
+        return "0"
+    
+    @visitor.when(cil.ObjectTypeNameNode)
+    def visit(self, node, scope=None):
+        instance = self.params[0]
+        result = self.define_internal_local()
+        self.register_instruction(cil.TypeOfNode(instance.name, result))
+        return result
+
+    @visitor.when(cil.StringConcatNode)
+    def visit(self, node, scope=None):
+        string1 = self.params[0]
+        string2 = self.params[1]
+        result = self.define_internal_local()
+        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name))
+        return result
+    
+    @visitor.when(cil.StringLengthNode)
+    def visit(self, node, scope=None):
+        string = self.params[0]
+        result = self.define_internal_local()
+        self.register_instruction(cil.LengthNode(result, string.name))
+        return result
+        
+    
+    @visitor.when(cil.StringSubstringNode)
+    def visit(self, node, scope=None):
+        string = self.params[0]
+        index = self.params[1]
+        length = self.params[2]
+        result = self.define_internal_local()
+        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name))
+        return result
+    
+    @visitor.when(cil.IOInStringNode)
+    def visit(self, node, scope=None):
+        result = self.define_internal_local()
+        self.register_instruction(cil.ReadNode(result))
+        return result
+
+    @visitor.when(cil.IOInIntNode)
+    def visit(self, node, scope=None):
+        result = self.define_internal_local()
+        self.register_instruction(cil.ReadNode(result))
+        # TODO Convertir String a Int
+        return result
+    
+    @visitor.when(cil.IOOutIntNode)
+    def visit(self, node, scope=None):
+        integer = self.params[1]
+        string_message = self.define_internal_local()
+        self.register_instruction(cil.ToStrNode(string_message, integer.name))
+        self.register_instruction(cil.PrintNode(string_message))
+        return "0"
+    
+    @visitor.when(cil.IOOutStringNode)
+    def visit(self, node, scope=None):
+        string = self.params[1]
+        self.register_instruction(cil.PrintNode(string.name))
+        return "0"
+
     # ======================================================================
