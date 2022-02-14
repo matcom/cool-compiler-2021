@@ -145,7 +145,6 @@ class AddrType(Enum):
 
 
 class NextUseEntry:
-	"""For each line : for all three variables involved their next use and is live information"""
 	def __init__(self, in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive):
 		self.in1 = in1
 		self.in2 = in2
@@ -182,13 +181,12 @@ class ObjTabEntry:
         return self.attrs.index(attr) + 3
 
     def method_offset(self, meth):
-        "Method offset in dispatch table"
         return self.dispatch_table_entry.index(meth)
 
 
 class ObjTable:
     def __init__(self, dispatch_table):
-        self.objects: Dict[str, ObjTabEntry] = {} #self.initialize_built_in()
+        self.objects: Dict[str, ObjTabEntry] = {}
         self.dispatch_table = dispatch_table
 
     def initialize_built_in(self):
