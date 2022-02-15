@@ -11,7 +11,7 @@ from utils.semantic_check.type_builder import TypeBuilder
 from utils.semantic_check.type_checker import TypeChecker 
 
 if __name__ == "__main__":
-    add = "lexer/comment1.cl"
+    add = "lexer/string2.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"

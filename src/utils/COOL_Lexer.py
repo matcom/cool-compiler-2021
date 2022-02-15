@@ -129,7 +129,7 @@ class Lexer:
                             break
                 
                 else:
-                    self.errors.append(f'({self.line}, {self.column + 1}) - LexicographicError: EOF in string constant')
+                    self.errors.append(f'({self.line}, {self.column}) - LexicographicError: EOF in string constant')
 
 
 
