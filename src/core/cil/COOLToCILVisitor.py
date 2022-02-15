@@ -8,6 +8,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def __init__(self, context):
         super().__init__(context)
 
+    def collect_types(self, node):
+        self.types_map[node.id.lex] = type = self.register_type(node.id.lex, node.id.line, node.id.column)
+        # Guardar métodos de las clases padres
+        iter_type = self.context.get_type(node.id.lex)
+        while iter_type is not None:
+            type.methods.update({i: self.to_function_name(i, iter_type.name) for i in iter_type.methods.keys()})
+            iter_type = iter_type.parent
+
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -24,6 +32,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.register_builtin()
         self.current_function = None
+        for x in node.declarations:
+            self.collect_types(x)
 
         for x, y in zip(node.declarations, scope.childs):
             self.visit(x, y)
@@ -34,6 +44,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
         self.current_type = self.context.get_type(node.id.lex)
 
+        self.current_function = self.register_function(self.init_attr_name(node.id.lex),
+                                                       line=node.line, column=node.column)
         # Inicializando los atributos de la clase y llamando al constructor del padre
         if self.current_type.parent.name not in ('Object', 'IO'):
             variable = self.define_internal_local(line=node.line, column=node.column)
@@ -42,8 +54,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 self.init_attr_name(self.current_type.parent.name), variable, line=node.line, column=node.column))
 
         # Inicializando los atributos de la clase
-        self.current_function = self.register_function(self.init_attr_name(node.id.lex),
-                                                       line=node.line, column=node.column)
         instance = self.register_param(VariableInfo('instance', ''), line=node.line, column=node.column)
         for feat, child in zip(node.features, scope.childs):
             if isinstance(feat, cool.AttrDeclarationNode):
@@ -53,14 +63,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # TODO: Deberia retornar algo aqui?
 
         # TypeNode de la clase
-        type = self.register_type(node.id.lex, line=node.line, column=node.column)
+        type = self.types_map[node.id.lex]
         type.attributes = [i.name for i in self.current_type.attributes]
-
-        # Guardar métodos de las clases padres
-        iter_type = self.current_type
-        while iter_type is not None:
-            type.methods.update({i: self.to_function_name(i, iter_type.name) for i in iter_type.methods.keys()})
-            iter_type = iter_type.parent
 
         # Visitar funciones dentro de la clase
         for feat, child in zip(node.features, scope.childs):
@@ -397,9 +401,9 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         void = cil.VoidNode()
         self.visit(node.expression, scope.childs[0])
         self.register_instruction(cil.EqualNode(answer, node.expression.ret_expr, void,
-                                                line=node.expression.line, column=node.expression.node))
+                                                line=node.expression.line, column=node.expression.column))
 
-        self.register_instruction(cil.ArgNode(answer, line=node.expression.line, column=node.expression.node))
+        self.register_instruction(cil.ArgNode(answer, line=node.expression.line, column=node.expression.column))
         self.register_instruction(cil.StaticCallNode(self.init_name('Bool'), ret, line=node.line, column=node.column))
         node.ret_expr = ret
 
@@ -411,11 +415,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.visit(node.expression, scope.childs[0])
         self.register_instruction(cil.GetAttribNode(value, node.expression.ret_expr, 'value', 'Int',
-                                                    line=node.expression.line, column=node.expression.node))
+                                                    line=node.expression.line, column=node.expression.column))
         self.register_instruction(cil.ComplementNode(answer, value,
-                                                     line=node.expression.line, column=node.expression.node))
+                                                     line=node.expression.line, column=node.expression.column))
 
-        self.register_instruction(cil.ArgNode(answer,line=node.expression.line, column=node.expression.node))
+        self.register_instruction(cil.ArgNode(answer,line=node.expression.line, column=node.expression.column))
         self.register_instruction(cil.StaticCallNode(self.init_name('Int'), ret, line=node.line, column=node.column))
         node.ret_expr = ret
 

@@ -88,8 +88,8 @@ arith %= arith + plus + factor, lambda h, s: PlusNode(s[1], s[2], s[3])
 arith %= arith + minus + factor, lambda h, s: MinusNode(s[1], s[2], s[3])
 arith %= factor, lambda h, s: s[1]
 
-factor %= factor + star + atom, lambda h, s: StarNode(s[1], s[2], s[3])
-factor %= factor + div + atom, lambda h, s: DivNode(s[1], s[2], s[3])
+factor %= factor + star + term, lambda h, s: StarNode(s[1], s[2], s[3])
+factor %= factor + div + term, lambda h, s: DivNode(s[1], s[2], s[3])
 factor %= term, lambda h, s: s[1]
 
 term %= compl + term, lambda h, s: ComplementNode(s[1], s[2])
