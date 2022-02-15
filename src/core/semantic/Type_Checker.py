@@ -45,15 +45,25 @@ class Type_Checker:
     @visitor.when(ProgramNode)
     def visit(self, node : ProgramNode, scope : Scope = None):
         scope = Scope()
+
+        # Calculate depth for classes
+        for declaration in node.declarations:
+            current = self.Context.get_type(declaration.id.lex)
+            parent = current.parent
+            while parent is not None:
+                current.depth += 1
+                parent = parent.parent
+
         for declaration in node.declarations:
             self.visit(declaration, scope.create_child())
+
         return scope
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node : ClassDeclarationNode, scope : Scope):
         self.Current_Type = self.Context.get_type(node.id.lex)
 
-        # Incluyo cada uno de los atributos de los padres en su resoectivo orden
+        # Incluyo cada uno de los atributos de los padres en su respectivo orden
         current = self.Current_Type
         attributtes = []
         while current.parent:

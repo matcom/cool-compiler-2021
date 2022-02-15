@@ -57,7 +57,6 @@ class Type:
         if parent.sealed:
             raise SemanticException(f'Cannot inherit from sealed type {parent.name}')
         self.parent = parent
-        self.depth = parent.depth + 1
 
     # Retorna el tipo en el arbol de herencia de mayor profundidad
     # que es padre comun de ambos tipos
