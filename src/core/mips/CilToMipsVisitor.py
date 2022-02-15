@@ -366,7 +366,7 @@ class CILToMIPSVisitor:
         instructions = []
         reg = mips.REGISTERS[0]
         if isinstance(node.name, int):
-            instructions.append(mips.LoadInmediateNode(mips.ARG_REGISTERS[0], node.name,
+            instructions.append(mips.LoadInmediateNode(reg, node.name,
                                                        line=node.line, column=node.column))
         else:
             instructions.append(mips.LoadWordNode(reg, self.get_var_location(node.name),

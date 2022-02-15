@@ -46,6 +46,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.current_function = self.register_function(self.init_attr_name(node.id.lex),
                                                        line=node.line, column=node.column)
+        self_param = self.register_param(self.vself, line=node.line, column=node.column)
+        self.vself.name = self_param
         # Inicializando los atributos de la clase y llamando al constructor del padre
         if self.current_type.parent.name not in ('Object', 'IO'):
             variable = self.define_internal_local(line=node.line, column=node.column)
@@ -70,6 +72,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         for feat, child in zip(node.features, scope.childs):
             if isinstance(feat, cool.FuncDeclarationNode):
                 self.visit(feat, child)
+        self.vself.name = 'self'
 
         # Allocate de la clase
         self.current_function = self.register_function(self.init_name(node.id.lex), line=node.line, column=node.column)
@@ -519,7 +522,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ArgNode(node.obj.ret_expr, line=node.obj.line, column=node.obj.column))
         for arg in args:
             self.register_instruction(arg)
-
         ret = self.define_internal_local(line=node.line, column=node.column)
         if node.type is None:
             stype = node.obj.static_type.name
