@@ -8,6 +8,7 @@ from core.cil.COOLToCILVisitor import COOLToCILVisitor
 from core.cil.CILAst import get_formatter
 from core.mips.CilToMipsVisitor import CILToMIPSVisitor
 from core.mips.MIPSAstFormatter import MIPSAstFormatter
+import subprocess, re
 
 
 def main(args):
@@ -65,6 +66,23 @@ def main(args):
 
     with open(out_file, 'w') as f:
         f.write(mipsCode)
+
+    # TODO: Comment this lines
+    try:
+        fd = open(args.file, 'rb')
+        sp = subprocess.run(['spim', '-file', mipsCode], input=fd.read(), capture_output=True, timeout=100)
+        fd.close()
+        SPIM_HEADER = r'''^SPIM Version .+ of .+
+        Copyright .+\, James R\. Larus\.
+        All Rights Reserved\.
+        See the file README for a full copyright notice\.
+        (?:Loaded: .+\n)*'''
+        mo = re.match(SPIM_HEADER, sp.stdout.decode())
+        if mo:
+            output = mo.string[mo.end():]
+            print(output)
+    except subprocess.TimeoutExpired:
+        assert False, "Too Long"
 
 
 if __name__ == "__main__":

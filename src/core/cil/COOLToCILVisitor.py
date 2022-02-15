@@ -464,7 +464,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.register_instruction(cil.EqualNode(value, node.left.ret_expr, node.right.ret_expr,
                                                 line=node.left.line, column=node.left.column))
-        self.register_instruction(cil.GotoNode(continue_label,
+        self.register_instruction(cil.GotoNode(continue_label.label,
                                                line=node.left.line, column=node.left.column))
 
         self.register_instruction(int_comparisson)
@@ -473,7 +473,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.GetAttribNode(right, node.right.ret_expr, 'value', 'Int',
                                                     line=node.right.line, column=node.right.column))
         self.register_instruction(cil.EqualNode(value, left, right, line=node.line, column=node.column))
-        self.register_instruction(cil.GotoNode(continue_label, line=node.line, column=node.column))
+        self.register_instruction(cil.GotoNode(continue_label.label, line=node.line, column=node.column))
 
         self.register_instruction(string_comparisson)
         self.register_instruction(cil.GetAttribNode(left, node.left.ret_expr, 'value', 'String',
@@ -482,7 +482,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                                     line=node.right.line, column=node.right.column))
         self.register_instruction(cil.EqualStringNode(value, left, right,
                                                       line=node.right.line, column=node.right.column))
-        self.register_instruction(cil.GotoNode(continue_label, line=node.line, column=node.column))
+        self.register_instruction(cil.GotoNode(continue_label.label, line=node.line, column=node.column))
 
         self.register_instruction(bool_comparisson)
         self.register_instruction(cil.GetAttribNode(left, node.left.ret_expr, 'value', 'Bool',
@@ -491,7 +491,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                                     line=node.right.line, column=node.right.column))
         self.register_instruction(cil.EqualNode(value, left, right,
                                                 line=node.right.line, column=node.right.column))
-        self.register_instruction(cil.GotoNode(continue_label, line=node.line, column=node.column))
+        self.register_instruction(cil.GotoNode(continue_label.label, line=node.line, column=node.column))
 
         self.register_instruction(continue_label)
 

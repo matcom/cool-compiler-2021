@@ -560,7 +560,8 @@ class CILToMIPSVisitor:
 
     @visitor.when(cil.LabelNode)
     def visit(self, node: cil.LabelNode):
-        return [mips.LabelNode(self.get_label(node.label), line=node.line, column=node.column)]
+        mips_label = self.get_label(node.label)
+        return [mips.LabelNode(mips_label, line=node.line, column=node.column)]
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
