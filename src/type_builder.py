@@ -24,9 +24,9 @@ class TypeBuilder:
             try:
                 main_type.get_method('main')
             except SemanticError as error:
-                self.errors.append(error.text)
+                self.errors.append(f'(Line {node.lineno}) {error.text}')
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):

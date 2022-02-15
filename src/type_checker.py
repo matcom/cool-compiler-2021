@@ -164,7 +164,7 @@ class TypeChecker:
         cond_type = self.visit(node.condition, scope)
         bool_type = self.context.get_type(BasicTypes.BOOL.value)
         if not cond_type.conforms_to(bool_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (cond_type.name, BasicTypes.BOOL.value))
+            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, cond_type.name, BasicTypes.BOOL.value))
 
         self.visit(node.body, scope)
         obj_type = self.context.get_type(BasicTypes.OBJECT.value)
@@ -195,7 +195,7 @@ class TypeChecker:
             try:
                 var_type = self.context.get_type(typex)
             except SemanticError as error:
-                self.errors.append(error.text)
+                self.errors.append(f'(Line {node.lineno}) {error.text}')
                 error_type = self.context.get_type(BasicTypes.ERROR.value)
                 var_type = error_type
 
@@ -224,7 +224,7 @@ class TypeChecker:
             try:
                 var_type = self.context.get_type(typex)
             except SemanticError as error:
-                self.errors.append(error.text)
+                self.errors.append(f'(Line {node.lineno}) {error.text}')
                 var_type = error_type
 
             if var_type.name != BasicTypes.ERROR.value:
@@ -298,7 +298,7 @@ class TypeChecker:
         try:
             method, _ = t0.get_method(node.id)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
             return error_type
 
         if not len(method.param_names) == len(node.args):
@@ -385,7 +385,7 @@ class TypeChecker:
         try:
             instance_type = self.context.get_type(node.lex)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(f'(Line {node.lineno}) {error.text}')
             error_type = self.context.get_type(BasicTypes.ERROR.value)
             instance_type = error_type
 
