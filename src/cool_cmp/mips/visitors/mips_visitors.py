@@ -395,7 +395,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.ReturnNode)
     def visit(self, node:cil.ReturnNode):
-        self._store_local_variable(Reg.v(0), node.value)
+        if node.value:
+            self._store_local_variable(Reg.v(0), node.value)
     
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):

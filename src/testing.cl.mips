@@ -37,17 +37,19 @@ sw $v0, 8($fp)
 sw $t0, 8($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local_n_internal_2
+jal __init_Main_type
 sw $v0, 8($fp)
 sw $t0, 8($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local_n_internal_1
+jal function_main_at_Main
 sw $v0, 4($fp)
+addi $v0, $zero, 0
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 12
+jr $ra
 type_distance:
 addiu $sp, $sp, -16
 move $t0, $sp
@@ -69,10 +71,12 @@ distance_label_2:
 li $t0, -1
 sw $t0, 0($fp)
 distance_label_1:
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 24
+jr $ra
 __init_Object_type:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -80,10 +84,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 function_abort_at_Object:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -93,10 +99,12 @@ sw $fp, 4($sp)
 move $fp, $t0
 addi $v0, $zero, 10
 syscall
+addi $v0, $zero, 0
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 function_type_name_at_Object:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -107,10 +115,12 @@ move $fp, $t0
 lw $t0, 4($fp)
 lw $t0, 0($t0)
 sw $t0, 0($fp)
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 function_copy_at_Object:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -121,10 +131,12 @@ move $fp, $t0
 lw $a0, 4($fp)
 jal __copy
 sw $v0, 0($fp)
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 __init_String_type:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -132,10 +144,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 function_length_at_String:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -143,10 +157,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 function_concat_at_String:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -154,10 +170,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 12
+jr $ra
 function_substr_at_String:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -165,10 +183,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 16
+jr $ra
 __init_Bool_type:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -176,10 +196,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 __init_Int_type:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -187,10 +209,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 __init_IO_type:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -198,10 +222,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 function_out_string_at_IO:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -209,21 +235,33 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+lw $t0, 0($fp)
+addi $v0, $zero, 4
+syscall
+sw $a0, 0($fp)
+addi $v0, $zero, 0
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 function_out_int_at_IO:
-addiu $sp, $sp, -4
+addiu $sp, $sp, 0
 move $t0, $sp
 addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+lw $t0, 0($fp)
+addi $v0, $zero, 1
+syscall
+sw $a0, 0($fp)
+addi $v0, $zero, 0
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
-addiu $sp, $sp, 12
+addiu $sp, $sp, 8
+jr $ra
 function_in_string_at_IO:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -231,10 +269,21 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+addi $v0, $zero, 8
+li $a1, 1024
+move $a0, $a1
+li $v0, 9
+syscall
+# HERE
+move $a0, $v0
+syscall
+sw $a0, 0($fp)
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 function_in_int_at_IO:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -242,10 +291,15 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+addi $v0, $zero, 5
+syscall
+sw $v0, 0($fp)
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 __init_A_type:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -256,12 +310,14 @@ move $fp, $t0
 sw $t0, 4($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local__init_A_type_internal_0
+jal __init_a_at_A
 sw $v0, 0($fp)
+sw $v0, 4($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 __init_a_at_A:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -273,6 +329,7 @@ lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 function_get_at_A:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -280,10 +337,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 function_get2_at_A:
 addiu $sp, $sp, -8
 move $t0, $sp
@@ -309,10 +368,12 @@ jal __get_ra
 move $ra, $v0
 jr $t0
 sw $v0, 0($fp)
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 12
+jr $ra
 function_get3_at_A:
 addiu $sp, $sp, -16
 move $t0, $sp
@@ -338,10 +399,12 @@ jal __get_ra
 move $ra, $v0
 jr $t0
 sw $v0, 4($fp)
+sw $v0, 12($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 20
+jr $ra
 __init_B_type:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -352,12 +415,14 @@ move $fp, $t0
 sw $t0, 4($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local__init_B_type_internal_0
+jal __init_a_at_B
 sw $v0, 0($fp)
+sw $v0, 4($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 __init_a_at_B:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -369,6 +434,7 @@ lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 function_get4_at_B:
 addiu $sp, $sp, -4
 move $t0, $sp
@@ -379,12 +445,14 @@ move $fp, $t0
 sw $t0, 4($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local_get4_at_B_internal_0
+jal function_get3_at_A
+sw $v0, 0($fp)
 sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 8
+jr $ra
 __init_Main_type:
 addiu $sp, $sp, 0
 move $t0, $sp
@@ -392,10 +460,12 @@ addiu $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
+sw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 4
+jr $ra
 function_main_at_Main:
 addiu $sp, $sp, -52
 move $t0, $sp
@@ -411,7 +481,7 @@ sw $v0, 0($fp)
 sw $t0, 0($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local_main_at_Main_internal_0
+jal __init_B_type
 sw $v0, 0($fp)
 lw $t0, 0($fp)
 lw $t0, 0($t0)
@@ -466,7 +536,7 @@ sw $t0, 0($sp)
 sw $t0, 28($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local_main_at_Main_internal_6
+jal type_distance
 sw $v0, 24($fp)
 j main_at_Main_label_0
 main_at_Main_label_1:
@@ -505,12 +575,14 @@ sw $t0, 0($sp)
 sw $t0, 0($fp)
 addiu $sp, $sp, -4
 sw $t0, 0($sp)
-jal local_main_at_Main_internal_12
+jal function_out_int_at_IO
+sw $v0, 48($fp)
 sw $v0, 48($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addiu $sp, $sp, 8
 addiu $sp, $sp, 56
+jr $ra
 .data
 Object: .word 0, 4, __init_Object_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
 String: .word Object, 4, __init_String_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_length_at_String, function_concat_at_String, function_substr_at_String

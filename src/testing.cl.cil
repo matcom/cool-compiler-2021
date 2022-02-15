@@ -234,10 +234,9 @@ function function_out_int_at_IO {
 	PARAM self
 	PARAM x
 
-	LOCAL local_out_int_at_IO_internal_0
+	
 
-	local_out_int_at_IO_internal_0 = TOSTR x
-	PRINT local_out_int_at_IO_internal_0
+	PRINTINT x
 	RETURN 0
 }
 function function_in_string_at_IO {
@@ -253,7 +252,7 @@ function function_in_int_at_IO {
 
 	LOCAL local_in_int_at_IO_internal_0
 
-	local_in_int_at_IO_internal_0 = READ
+	local_in_int_at_IO_internal_0 = READINT
 	RETURN local_in_int_at_IO_internal_0
 }
 function __init_A_type {
