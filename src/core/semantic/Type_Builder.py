@@ -19,17 +19,21 @@ class Type_Builder:
 
         self.IO_Type = self.Context.get_type('IO')
         self.IO_Type.set_parent(self.Object_Type)
+        self.IO_Type.depth = 1
 
         self.Int_Type = self.Context.get_type('Int')
         self.Int_Type.set_parent(self.Object_Type)
+        self.Int_Type.depth = 1
         self.Int_Type.sealed = True
 
         self.String_Type = self.Context.get_type('String')
         self.String_Type.set_parent(self.Object_Type)
+        self.String_Type.depth = 1
         self.String_Type.sealed = True
 
         self.Bool_Type = self.Context.get_type('Bool')
         self.Bool_Type.set_parent(self.Object_Type)
+        self.Bool_Type.depth = 1
         self.Bool_Type.sealed = True
 
         self.IO_Type.define_method('out_string', ['x'], [self.String_Type], SelfType(), 0, 0)
