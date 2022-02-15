@@ -1,5 +1,7 @@
-import argparse 
+import argparse
 import os
+import sys
+from pathlib import Path
 from utils.COOL_Grammar import build_COOL_Grammar
 from utils.COOL_Lexer import COOL_Lexer
 from utils.parser.COOL_parser import COOL_Parser
@@ -9,15 +11,16 @@ from utils.semantic_check.type_collector import TypeCollector
 from utils.semantic_check.type_builder import TypeBuilder
 from utils.semantic_check.type_checker import TypeChecker 
 
-def main(args):
+if __name__ == "__main__":
+    add = "lexer/comment1.cl"
+
+    path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
+        f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
+
+    _in = sys.argv[1] if len(sys.argv) > 1 else path
     
-    try:
-        #with open(args.file, 'r') as file:
-        with open(os.getcwd() + '/tester/semantic/' + args, 'r') as file:
-            code = file.read()
-    except:
-        print(f"(0,0) - CompilerError: file {args.file} not found")
-        exit(1)
+    with open(_in) as file:
+        code = file.read()
 
     G = build_COOL_Grammar()
 
@@ -57,13 +60,3 @@ def main(args):
         for error in semantic_errors:
             print(error)                          
         raise Exception()
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='description')
-    parser.add_argument('-f', '--file', type=str, default='', help='file to read')
-
-    args = parser.parse_args()
-    main(args)
-
-#main('dispatch1.cl')
