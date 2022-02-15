@@ -29,27 +29,40 @@ class TypeChecker:
 
     @visitor.when(ProgramNode)
     def visit(self, node, scope=None, set_type=None):
+        to_revisit = []
         scope = Scope(self.scope_id)
         self.scope_id += 1
         for declaration in node.declarations:
             child_scope = scope.create_child(self.scope_id)
             self.scope_id += 1
-            self.visit(declaration, child_scope)
+            visited = self.visit(declaration, child_scope)
+            if not visited:
+                to_revisit.append(declaration)
+        while to_revisit:
+            declaration = to_revisit.pop(0)
+            visited = self.visit(declaration, None)
+            if not visited:
+                to_revisit.append(declaration)
         return scope
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope, set_type=None):
         # print('class declaration')
-        self_type = self.context.get_type(BasicTypes.SELF.value)
-        scope.define_variable("self", self_type)
-        self.current_type = self.context.get_type(node.id)
-        self.type_scope[self.current_type.name] = scope
+        try:
+            self.current_type = self.context.get_type(node.id)
+            scope = self.type_scope[self.current_type.name]
+        except KeyError:
+            self_type = self.context.get_type(BasicTypes.SELF.value)
+            scope.define_variable("self", self_type)
+            self.current_type = self.context.get_type(node.id)
+            self.type_scope[self.current_type.name] = scope
         if self.current_type.parent.name not in {
             BasicTypes.OBJECT.value,
             BasicTypes.INT.value,
             BasicTypes.BOOL.value,
             BasicTypes.STRING.value,
             BasicTypes.IO.value,
+            BasicTypes.ERROR.value
         }:
             try:
                 parent_scope = self.type_scope[self.current_type.parent.name]
@@ -57,11 +70,10 @@ class TypeChecker:
                 scope.parent = parent_scope
                 parent_scope.children.append(scope)
             except KeyError:
-                self.errors.append(
-                    f'(Line {node.lineno}) Class "{self.current_type.name}" parent not declared before inheritance.'
-                )
+                return False
         for feature in node.features:
             self.visit(feature, scope)
+        return True
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode, scope: Scope, set_type=None):
