@@ -7,9 +7,7 @@ from cmp.evaluation import evaluate_reverse_parse
 from cmp.semantic import Context
 from utils.semantic_check.type_collector import TypeCollector
 from utils.semantic_check.type_builder import TypeBuilder
-from utils.semantic_check.type_checker import TypeChecker
-
-a = 'arithmetic1.cl' 
+from utils.semantic_check.type_checker import TypeChecker 
 
 def main(args):
     
@@ -38,7 +36,7 @@ def main(args):
     
     if parser.error:
         print(parser.error)
-        exit(1)
+        raise Exception()
         
     # ast       
     ast = evaluate_reverse_parse(G, derivation, operations, lexer.fixed_tokens(tokens))
@@ -58,14 +56,14 @@ def main(args):
     if semantic_errors:
         for error in semantic_errors:
             print(error)                          
-        exit(1)
+        raise Exception()
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     parser = argparse.ArgumentParser(description='description')
-#     parser.add_argument('-f', '--file', type=str, default='', help='file to read')
+    parser = argparse.ArgumentParser(description='description')
+    parser.add_argument('-f', '--file', type=str, default='', help='file to read')
 
-#     args = parser.parse_args()
-#     main(args)
+    args = parser.parse_args()
+    main(args)
 
-main('dispatch1.cl')
+#main('dispatch1.cl')
