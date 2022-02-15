@@ -156,7 +156,7 @@ class Lexer:
     
 
 '''
-Esta clase guardara las propiedades sintacticas de COOL
+Esta clase guarda las propiedades sintacticas de COOL
 '''
 class COOL_Lexer(Lexer):
     def __init__(self):
@@ -164,7 +164,7 @@ class COOL_Lexer(Lexer):
         'id'        : r'[a-z][a-zA-Z0-9_]*'         ,
         'type'      : r'[A-Z][a-zA-Z0-9_]*'         ,
         'string'    : r'\"'                         ,
-        'int'       : r'\d'                         ,
+        'int'       : r'\d+'                         ,
         'comment'   : r'(\(\*)|--.*'                ,
         'newline'   : r'\n'                         ,
         'whitespace': r' +'                         ,
