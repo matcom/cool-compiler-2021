@@ -553,17 +553,15 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.PrintNode)
     def visit(self, node:cil.PrintNode):
-        self._load_value(Reg.t(0), node.str_addr)
+        self._load_value(Reg.a(0), node.str_addr)
         self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 4)) # 4 System call code for print string
         self.add_instruction(SyscallNode())
-        self._store_local_variable(Reg.a(0), node.str_addr)
     
     @visitor.when(cil.PrintIntNode)
     def visit(self, node:cil.PrintIntNode):
-        self._load_value(Reg.t(0), node.int_addr)
+        self._load_value(Reg.a(0), node.int_addr)
         self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 1)) # 1 System call code for print int
         self.add_instruction(SyscallNode())
-        self._store_local_variable(Reg.a(0), node.int_addr)
       
     
     @visitor.when(cil.ReadNode)
@@ -580,6 +578,11 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 5)) # 5 System call code for read int
         self.add_instruction(SyscallNode()) # Returns the read integer in v0
         self._store_local_variable(Reg.v(0), node.dest) 
+    
+    @visitor.when(cil.LoadNode)
+    def visit(self, node:cil.LoadNode):
+        self.add_instruction(LoadAddressNode(Reg.t(0), node.msg))
+        self._store_local_variable(Reg.t(0), node.dest)        
     
     @visitor.when(cil.ObjectCopyNode)
     def visit(self, node:cil.ObjectCopyNode):
