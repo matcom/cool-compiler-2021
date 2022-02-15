@@ -64,8 +64,8 @@ class Main {
 
             case 1 of
                 a: Int => 0;
-                b: Bool => 1;
-                c: String => 2;
+                b: Bool => not true;
+                c: String => new IO;
             esac;
         }
     };

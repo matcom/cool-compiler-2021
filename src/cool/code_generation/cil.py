@@ -104,6 +104,10 @@ class EqualNode(ArithmeticNode):
     pass
 
 
+class XorNode(ArithmeticNode):
+    pass
+
+
 class GetAttribNode(InstructionNode):
     def __init__(self, dest: str, instance: str, attr: str) -> None:
         self.dest: str = dest
@@ -354,6 +358,14 @@ class CILFormatter:
             f"{node.dest} = {node.left} <= {node.right}"
             if node.comment == ""
             else f"{node.dest} = {node.left} <= {node.right} # {node.comment}"
+        )
+
+    @visitor.when(XorNode)
+    def visit(self, node: XorNode):
+        return (
+            f"{node.dest} = XOR {node.left} {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = XOR {node.left} {node.right} # {node.comment}"
         )
 
     @visitor.when(AllocateNode)

@@ -976,7 +976,7 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
-        return (1 if node.lex == "true" else 0), self.context.get_type("Bool")
+        return ("1" if node.lex == "true" else "0"), self.context.get_type("Bool")
 
     @visitor.when(icool.NullNode)
     def visit(self, node: icool.NullNode, scope: Scope):
@@ -999,9 +999,33 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.InstantiateNode)
     def visit(self, node: cool.InstantiateNode, scope: Scope):
-        local = self.define_internal_local()
-        self.instructions.append(cil.AllocateNode(node.lex, local))
+        local = self.define_internal_local(f"Store an instance of the class {node.lex}")
+        self.register_instruction(cil.AllocateNode(node.lex, local).set_comment(f"Allocate the object {node.lex}"))
+        self.register_instruction(cil.ArgNode(local).set_comment("Pass the instance to the constructor"))
+        self.register_instruction(cil.DynamicCallNode(node.lex, self.to_function_name("__init__", node.lex), local).set_comment("Call the constructor"))
         return local, self.context.get_type(node.lex)
+
+    @visitor.when(cool.NegationNode)
+    def visit(self, node: cool.NegationNode, scope: Scope):
+        source, _ = self.visit(node.expr, scope)
+        result = self.define_internal_local(f"Store the negation of {source}")
+        self.register_instruction(cil.XorNode(result, source, "1").set_comment(f"not {source}"))
+        return result, self.context.get_type("Bool")
+
+    @visitor.when(cool.ComplementNode)
+    def visit(self, node: cool.ComplementNode, scope: Scope):
+        source, _ = self.visit(node.expr, scope)
+        result = self.define_internal_local(f"Store the complement a2 of {source}")
+        self.register_instruction(cil.XorNode(result, source, f"{2**32 - 1}").set_comment(f"Getting the complement a1 of {source}"))
+        self.register_instruction(cil.PlusNode(result, result, "1").set_comment(f"Adding 1 to the complement a1 we get the complement a2 of {source}")) 
+        return result, self.context.get_type("Int")
+    
+    @visitor.when(cool.IsVoidNode)
+    def visit(self, node: cool.IsVoidNode, scope: Scope):
+        source, _ = self.visit(node.expr, scope)
+        result = self.define_internal_local(f"Store if {source} is null")
+        self.register_instruction(cil.EqualNode(result, source, "null"))
+        return result, self.context.get_type("Bool")
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope: Scope):
@@ -1039,18 +1063,3 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
         dest = self.define_internal_local()
         self.register_instruction(cil_type(dest, left, right))
         return dest, self.context.get_type("Int")
-
-    def foreach(self, start: int, end: int, list_of_instructions: List[int]):
-        index = self.define_internal_local("Iteration index")
-        comparison = self.define_internal_local("Iteration comparison")
-        self.register_instruction(cil.AssignNode(index, start))
-        self.register_instruction(cil.LabelNode("foreach_start"))
-        self.register_instruction(cil.LessThanNode(comparison, index, end))
-        self.register_instruction(cil.GotoIfNode(comparison, "foreach_body"))
-        self.register_instruction(cil.GotoNode("foreach_end"))
-        self.register_instruction(cil.LabelNode("foreach_body"))
-        self.register_instruction(
-            cil.PlusNode(index, index, "1").set_comment("Increment")
-        )
-        self.register_instruction(cil.GotoNode("foreach_start"))
-        self.register_instruction(cil.LabelNode("foreach_end"))
