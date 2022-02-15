@@ -133,14 +133,24 @@ class TypeChecker:
 
         child_scope = scope.create_child(self.scope_id)
         self.scope_id += 1
+        var_added = []
         for i in range(0, len(method.param_names)):
-            if method.param_names[i] == "self":
+            param_type = method.param_types[i]
+            param_name = method.param_names[i]
+
+            if param_name == "self":
                 self.errors.append(
                     f'(Line {node.lineno}) "self" is used as argument name in method: "{method.name}", type: "{self.current_type.name}". '
                 )
                 continue
-            param_type = method.param_types[i]
-            child_scope.define_variable(method.param_names[i], param_type)
+
+            if param_name in var_added:
+                self.errors.append(
+                    f'(Line {node.lineno}) Argument "{param_name}" is multiply defined in method "{method.name}"'
+                )
+            else:
+                child_scope.define_variable(param_name, param_type)
+                var_added.append(param_name)
 
         return_type = method.return_type
         expr_type = self.visit(node.body, child_scope)
