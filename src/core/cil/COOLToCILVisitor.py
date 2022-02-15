@@ -521,8 +521,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(arg)
 
         ret = self.define_internal_local(line=node.line, column=node.column)
-        stype = node.type
-        if stype is None: stype = node.obj.static_type.name
+        if node.type is None:
+            stype = node.obj.static_type.name
+        else:
+            stype = node.type.lex
         self.register_instruction(cil.StaticCallNode(self.types_map[stype].methods[node.id.lex], ret,
                                                           line=node.id.line, column=node.id.column))
         node.ret_expr = ret
