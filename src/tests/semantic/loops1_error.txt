@@ -1,1 +1,0 @@
-(7, 27) - TypeError: Loop condition does not have type Bool.

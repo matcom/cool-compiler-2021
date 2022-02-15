@@ -1,1 +1,0 @@
-(32, 49) - NameError: Undeclared identifier d.

@@ -1,1 +1,0 @@
-(9, 22) - SemanticError: 'self' cannot be bound in a 'let' expression.

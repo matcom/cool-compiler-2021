@@ -1,1 +1,0 @@
-(9, 19) - TypeError: Inferred type Int of initialization of attribute test does not conform to declared type Bool.

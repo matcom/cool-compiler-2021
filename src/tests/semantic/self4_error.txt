@@ -1,1 +1,0 @@
-(9, 5) - SemanticError: 'self' cannot be the name of an attribute.

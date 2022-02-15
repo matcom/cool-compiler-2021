@@ -1,2 +1,7 @@
 pytest
+<<<<<<< HEAD
 pytest-ordering
+=======
+pytest-ordering
+ply~=3.11
+>>>>>>> deac2a5cd44acaf60cc5f106ff68b289e987ff8c

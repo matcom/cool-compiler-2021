@@ -1,1 +1,0 @@
-(9, 10) - SemanticError: 'self' cannot be the name of a formal parameter.

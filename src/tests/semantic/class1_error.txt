@@ -1,2 +1,0 @@
-(7, 5) - SemanticError: Classes may not be redefined
- 
