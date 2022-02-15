@@ -208,6 +208,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     WORD_SIZE = 4
     TO_METHODS_OFFSET = 8 # 4 Father, 4 Instance Size, METHODS
+    MAX_STRING_LENGTH = 1024 # Max amount reserved when a read system call is made
     
     def __init__(self, errors=[]) -> None:
         self.errors = errors
@@ -245,8 +246,14 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def _load_type_variable(self, dest, name):
         self.add_instruction(LoadAddressNode(dest, name))
 
-    def _store_local_variable(self, source, name):
-        self.add_instruction(StoreWordNode(source, self.local_variable_offset[name], Reg.fp())) # Stores allocated memory address in destination variable
+    def _store_local_variable(self, source, name_or_value):
+        try:
+            # Int literal
+            int_value = int(name_or_value)
+            self.add_instruction(AddImmediateNode(source, Reg.zero(), int_value))
+        except ValueError:
+            # Variable
+            self.add_instruction(StoreWordNode(source, self.local_variable_offset[name_or_value], Reg.fp())) # Stores allocated memory address in destination variable
 
     def _call_with_register(self, register):
         self.add_instruction(JumpRegisterNode(register))
@@ -384,7 +391,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         
         self._pop(saved_registers)
         self._deallocate_stack_space(allocated_space + len(node.params) * self.WORD_SIZE) # Deallocate also the params
-
+        self.add_instruction(JumpRegisterNode(Reg.ra()))
+    
+    @visitor.when(cil.ReturnNode)
+    def visit(self, node:cil.ReturnNode):
+        self._store_local_variable(Reg.v(0), node.value)
+    
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):
         if node.type[0].isupper(): # Is a Type name
@@ -402,7 +414,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.StaticCallNode)
     def visit(self, node:cil.StaticCallNode):
-        self.add_instruction(JumpAndLinkNode(node.dest)) # Jumps to label
+        self.add_instruction(JumpAndLinkNode(node.function)) # Jumps to label
         self._store_local_variable(Reg.v(0), node.dest)
         
     @visitor.when(cil.DynamicCallNode)
@@ -537,7 +549,36 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         # TODO CHECK IF THE INSTRUCTION BELOW IS REQUIRED
         # self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0))) # t0 = t0[0] -> FatherAddress
         self._store_local_variable(Reg.t(0), node.dest)
-        
+    
+    @visitor.when(cil.PrintNode)
+    def visit(self, node:cil.PrintNode):
+        self._load_value(Reg.t(0), node.str_addr)
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 4)) # 4 System call code for print string
+        self.add_instruction(SyscallNode())
+        self._store_local_variable(Reg.a(0), node.str_addr)
+    
+    @visitor.when(cil.PrintIntNode)
+    def visit(self, node:cil.PrintIntNode):
+        self._load_value(Reg.t(0), node.int_addr)
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 1)) # 1 System call code for print int
+        self.add_instruction(SyscallNode())
+        self._store_local_variable(Reg.a(0), node.int_addr)
+      
+    
+    @visitor.when(cil.ReadNode)
+    def visit(self, node:cil.ReadNode):
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 8)) # 8 System call code for read string
+        self.add_instruction(LoadImmediateNode(Reg.a(1), self.MAX_STRING_LENGTH)) # a1 = Allocated lenght Save the lenght in a1
+        self._allocate_heap_space(Reg.a(1)) # Allocates 1024 bytes and return the address un v0
+        self.add_instruction(MoveNode(Reg.a(0), Reg.v(0), comment="HERE")) # a0 = v0 Save the address in a0
+        self.add_instruction(SyscallNode()) # Fills the address in a0 with the string
+        self._store_local_variable(Reg.a(0), node.dest) # Save the address in the final destination
+    
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node:cil.ReadIntNode):
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 5)) # 5 System call code for read int
+        self.add_instruction(SyscallNode()) # Returns the read integer in v0
+        self._store_local_variable(Reg.v(0), node.dest) 
     
     @visitor.when(cil.ObjectCopyNode)
     def visit(self, node:cil.ObjectCopyNode):

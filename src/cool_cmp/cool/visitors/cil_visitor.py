@@ -122,13 +122,17 @@ class CILPrintVisitor():
     def visit(self, node):
         return f'PRINT {node.str_addr}'
 
-    @visitor.when(cil.ToStrNode)
+    @visitor.when(cil.PrintIntNode)
     def visit(self, node):
-        return f'{node.dest} = TOSTR {node.ivalue}'
+        return f'PRINTINT {node.int_addr}'
 
     @visitor.when(cil.ReadNode)
     def visit(self, node):
         return f'{node.dest} = READ'
+
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node):
+        return f'{node.dest} = READINT'
 
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode):
@@ -534,12 +538,11 @@ class CILRunnerVisitor():
         value = self.get_value_str(node.str_addr, caller_fun_scope, "PRINT operation undefined with non String type")
         print(value, end="")
         return self.next_instruction()
-
-    @visitor.when(cil.ToStrNode)
+    
+    @visitor.when(cil.PrintIntNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        value = self.get_value_int(node.ivalue, caller_fun_scope, "TOSTR operation undefined with non Int type")
-        value = str(value)
-        self.set_value(node.dest, value, caller_fun_scope)
+        value = self.get_value_int(node.int_addr, caller_fun_scope, "PRINTINT operation undefined with non Int type")
+        print(value, end="")
         return self.next_instruction()
 
     @visitor.when(cil.ReadNode)
@@ -547,6 +550,16 @@ class CILRunnerVisitor():
         value = input()
         self.set_value(node.dest, value, caller_fun_scope)
         return self.next_instruction()
+
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = input()
+        try:
+            value = int(value)
+            self.set_value(node.dest, value, caller_fun_scope)
+            return self.next_instruction()
+        except ValueError:
+            raise RunError(f"Readed value {value} isn't an integer")
 
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode, args: list, caller_fun_scope: dict):
@@ -1343,16 +1356,13 @@ class COOLToCILVisitor():
     @visitor.when(cil.IOInIntNode)
     def visit(self, node, scope=None):
         result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
-        # TODO Convertir String a Int
+        self.register_instruction(cil.ReadIntNode(result))
         return result
     
     @visitor.when(cil.IOOutIntNode)
     def visit(self, node, scope=None):
         integer = self.params[1]
-        string_message = self.define_internal_local()
-        self.register_instruction(cil.ToStrNode(string_message, integer.name))
-        self.register_instruction(cil.PrintNode(string_message))
+        self.register_instruction(cil.PrintIntNode(integer.name))
         return "0"
     
     @visitor.when(cil.IOOutStringNode)

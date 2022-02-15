@@ -1,3 +1,4 @@
+from typing import Optional
 import cmp.visitor as visitor
 
 
@@ -29,7 +30,12 @@ class FunctionNode(Node):
         self.localvars = localvars
         self.instructions = instructions
         self.labels = labels
-
+        
+    @property
+    def return_instruction(self) -> 'Optional[ReturnNode]':
+        if self.instructions:
+            return self.instructions[-1] if isinstance(self.instructions[-1], ReturnNode) else None
+        return None
 class ParamNode(Node):
     def __init__(self, name):
         self.name = name
@@ -164,18 +170,21 @@ class SubstringNode(InstructionNode):
         self.index = index
         self.length = length
 
-class ToStrNode(InstructionNode):
-    def __init__(self, dest, ivalue):
-        self.dest = dest
-        self.ivalue = ivalue
-
 class ReadNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
+class ReadIntNode(InstructionNode):
     def __init__(self, dest):
         self.dest = dest
 
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+class PrintIntNode(InstructionNode):
+    def __init__(self, int_addr):
+        self.int_addr = int_addr
 
 class AbortNode(InstructionNode):
     pass
