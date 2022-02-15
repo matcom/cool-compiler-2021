@@ -1,5 +1,4 @@
 import re
-import sys
 
 '''
 Recibe como parametros el lexema, tipo, linea y columna donde se encuentra
