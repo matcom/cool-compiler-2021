@@ -7,6 +7,7 @@ class BaseCOOLToCILVisitor:
         self.current_type = None
         self.current_method = None
         self.current_function = None
+        self.constructors = []
         self.context = context
         self.inherit_graph = {}
     
