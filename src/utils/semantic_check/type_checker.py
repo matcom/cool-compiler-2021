@@ -15,6 +15,7 @@ SELF_TYPE_IN_CASE_BRANCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a 
 INCOMPATIBLE_TYPES_ATTR = '(%s, %s) - TypeError: Inferred type %s of initialization of attribute %s does not conform to declared type %s.'
 INCOMPATIBLE_TYPES_ARG = '(%s, %s) - TypeError: Argument of \'%s\' has type %s instead of %s.'
 INCOMPATIBLE_TYPES_METH = '(%s, %s) - TypeError: Inferred return type %s of method %s does not conform to declared return type %s.'
+INCOMPATIBLE_TYPES_IF = '(%s, %s) - TypeError: Predicate of \'%s\' does not have type %s.'
 INCOMPATIBLE_TYPES = '(%s, %s) - TypeError: Cannot convert %s into %s.'
 WRONG_SIGNATURE = '(%s, %s) - TypeError: Method %s already defined in %s with a different signature.'
 LOCAL_ALREADY_DEFINED = '(%s, %s) - TypeError: Variable %s is already defined in method %s.'
@@ -22,6 +23,9 @@ INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
 VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Undeclared identifier %s.'
 INHERIT_ERROR = '(%s, %s) - TypeError: Class %s cannot inherit from class %s because they form a cycle.'
 METHOD_PARAMETERS = '(%s, %s) - TypeError: Method %s defined in %s receive %d parameters'
+
+DUPLICATE_BRANCH = '(%s, %s) - SemanticError: Duplicate branch %s in case statement.'
+UNDEFINED_TYPE_BRANCH = '(%s, %s) - TypeError: Class %s of case branch is undefined.'
 
 
 
@@ -77,7 +81,7 @@ class TypeChecker:
                 self.errors.append(INHERIT_ERROR % (node.line, node.column, self.current_type.name, self.current_type.parent.name))
                 self.current_type.parent = ErrorType()
                 break
-            
+
             for attr in current_parent.attributes:
                 scope.define_variable(attr.name, attr.type)
 
@@ -225,7 +229,7 @@ class TypeChecker:
         if_type = self.visit(node.if_expr, scope.create_child())
 
         if not if_type.conforms_to(self.context.get_type('Bool')):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.line, node.column, if_type.name, 'Bool'))
+            self.errors.append(INCOMPATIBLE_TYPES_IF % (node.line, node.column,'if','Bool'))
         
         then_type = self.visit(node.then_expr, scope.create_child())
         else_type = self.visit(node.else_expr, scope.create_child())
@@ -284,9 +288,13 @@ class TypeChecker:
         self.visit(node.predicate, scope)
         case_type = None
 
-        for idx, typex, expr in node.branches:
+        for i,branch in enumerate(node.branches):
+            (idx, typex, expr) = branch
+            (line,column) = node.branchesPos[i]
+            if typex in [b[1] for b in node.branches[:i]]:
+                self.errors.append(DUPLICATE_BRANCH % (line, column, typex))
             if typex == 'SELF_TYPE':
-                self.errors.append(SELF_TYPE_IN_CASE_BRANCH % (node.line, node.column))
+                self.errors.append(SELF_TYPE_IN_CASE_BRANCH % (line, column))
                 id_type = ErrorType()
                 
             else:
@@ -294,7 +302,7 @@ class TypeChecker:
                     id_type = self.context.get_type(typex)
                 except SemanticError as se:
                     id_type = ErrorType()
-                    self.errors.append(se.text)
+                    self.errors.append(UNDEFINED_TYPE_BRANCH % (line, column, typex))
             
             inner_scope = scope.create_child()
             inner_scope.define_variable(idx, id_type)

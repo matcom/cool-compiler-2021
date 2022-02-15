@@ -2,6 +2,9 @@ import cmp.visitor as visitor
 from utils.ast.AST_Nodes import ast_nodes as nodes
 from cmp.semantic import SemanticError
 
+NOT_REDEFINE_BASIC_TYPES = '(%s, %s) - SemanticError: Redefinition of basic class %s.'
+NOT_REDEFINE_CLASSES = '(%s, %s) - SemanticError: Classes may not be redefined'
+
 class TypeCollector(object):
     def __init__(self, context, errors):
         self.context = context
@@ -50,7 +53,10 @@ class TypeCollector(object):
     @visitor.when(nodes.ClassDeclarationNode)
     def visit(self,node):
         try:
+            if node.id in ["Object", "Int", "String", "Bool", "IO"]:
+                self.errors.append(NOT_REDEFINE_BASIC_TYPES % (node.line, node.column, node.id))
+                node.id = 'error_type'
             self.context.create_type(node.id)
         except SemanticError as se:
-            self.errors.append(se.text)
+            self.errors.append(NOT_REDEFINE_CLASSES % (node.classt_line, node.classt_column))
         return

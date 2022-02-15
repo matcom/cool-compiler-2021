@@ -28,17 +28,17 @@ def build_COOL_Grammar():
     class_list %= def_class + semi, lambda h,s: [s[1]]
     class_list %= def_class + semi + class_list, lambda h,s: [s[1]] + s[3]
 
-    def_class %= classx + typex + ocur + feature_list + ccur, lambda h,s: node.ClassDeclarationNode(s[2],s[4])
-    def_class %= classx + typex + inherits + typex + ocur + feature_list + ccur, lambda h,s: node.ClassDeclarationNode(s[2],s[6],s[4])
+    def_class %= classx + typex + ocur + feature_list + ccur, lambda h,s: node.ClassDeclarationNode(s[2],s[4],s[1])
+    def_class %= classx + typex + inherits + typex + ocur + feature_list + ccur, lambda h,s: node.ClassDeclarationNode(s[2],s[6],s[1],s[4])
 
     feature_list %= def_attr + semi + feature_list, lambda h,s: [s[1]] + s[3]
     feature_list %= def_meth + semi + feature_list, lambda h,s: [s[1]] + s[3]
     feature_list %= G.Epsilon, lambda h,s: []
 
     def_attr %= idx + colon + typex, lambda h,s: node.AttrDeclarationNode(s[1],s[3])
-    def_attr %= idx + colon + typex + arrow + expr, lambda h,s: node.AttrDeclarationNode(s[1],s[3],s[5])
+    def_attr %= idx + colon + typex + arrow + expr, lambda h,s: node.AttrDeclarationNode(s[1],s[3],s[4],s[5])
 
-    def_meth %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur, lambda h,s: node.MethDeclarationNode(s[1],s[3],s[6],s[8])
+    def_meth %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur, lambda h,s: node.MethDeclarationNode(s[1],s[3],s[6],s[8],s[7])
 
     param_list %= param, lambda h,s: [s[1]]
     param_list %= param + comma + param_list, lambda h,s: [s[1]] + s[3]
@@ -84,7 +84,7 @@ def build_COOL_Grammar():
     term %= factor, lambda h,s: s[1]
 
     factor %= isvoid + factor, lambda h,s: node.IsVoidNode(s[2])
-    factor %= tilde + factor, lambda h,s: node.ComplementNode(s[2])
+    factor %= tilde + factor, lambda h,s: node.ComplementNode(s[2], s[1])
     factor %= atom, lambda h,s: s[1]
 
     atom %= true, lambda h,s: node.ConstantBoolNode(s[1])

@@ -19,27 +19,32 @@ class ast_nodes:
 
 
     class ClassDeclarationNode(DeclarationNode):
-        def __init__(self, token, features, parent=None):
-            self.id = token.lex
-            self.line = token.line
-            self.column = token.column
+        def __init__(self, idx, features, token, parent=None):
+            self.id = idx.lex
+            self.line = idx.line
+            self.column = idx.column
+            self.classt_line = token.line
+            self.classt_column = token.column + 4
             self.parent = parent.lex if parent else parent
+            self.parent_column = parent.column if parent else None
             self.features = features
 
     class MethDeclarationNode(DeclarationNode):
-        def __init__(self, token, params, return_type, body):
-            self.id = token.lex
-            self.line = token.line
-            self.column = token.column
+        def __init__(self, idx, params, return_type, body, ocurToken):
+            self.id = idx.lex
+            self.line = idx.line
+            self.column = idx.column
+            self.body_line = ocurToken.next_token.line
+            self.body_column = ocurToken.next_token.column
             self.params = [[item.lex if isinstance(item, Token) else item for item in _list] for _list in params]
             self.type = return_type.lex
             self.body = body
 
     class AttrDeclarationNode(DeclarationNode):
-        def __init__(self, token, typex, expr = None):
-            self.id = token.lex
-            self.line = expr.line if expr else token.line
-            self.column = expr.column if expr else token.column
+        def __init__(self, idx, typex, arrowToken = None, expr = None):
+            self.id = idx.lex
+            self.line = arrowToken.next_token.line if expr else typex.line
+            self.column = arrowToken.next_token.column if expr else typex.column
             self.type = typex.lex
             self.expr = expr
 
@@ -64,8 +69,8 @@ class ast_nodes:
             self.if_expr = if_expr
             self.then_expr = then_expr
             self.else_expr = else_expr
-            self.line = token.line
-            self.column = token.column
+            self.line = token.next_token.line
+            self.column = token.next_token.column
     
     class WhileNode(ExpressionNode):
         def __init__(self, conditional_expr, loop_expr, token):
@@ -90,21 +95,26 @@ class ast_nodes:
     class CaseNode(ExpressionNode):
         def __init__(self, predicate, branches, token):
             self.predicate = predicate
-            self.branches = [tuple([item.lex if isinstance(item, Token) else item for item in _list]) for _list in branches]
+            self.branches = []
+            self.branchesPos = []
+            for branch in branches:
+                self.branches.append(tuple([item.lex if isinstance(item, Token) else item for item in branch]))
+                _,typex,_ = branch
+                self.branchesPos.append((typex.line,typex.column))
             self.line = token.line
             self.column = token.column
     
     class NotNode(ExpressionNode):
         def __init__(self, expr, token):
             self.expr = expr
-            self.line = token.line + 4
-            self.column = token.column + 4
+            self.line = token.next_token.line
+            self.column = token.next_token.column
 
     class AtomicNode(ExpressionNode):
-        def __init__(self, token):
-            self.lex = token.lex if isinstance(token, Token) else token
-            self.line = token.line
-            self.column = token.column
+        def __init__(self, expr):
+            self.lex = expr.lex if isinstance(expr, Token) else expr
+            self.line = expr.line
+            self.column = expr.column
 
     class BinaryNode(ExpressionNode):
         def __init__(self, left, right, token):
@@ -125,12 +135,15 @@ class ast_nodes:
     class InstantiateNode(AtomicNode):
         def __init__(self, typex, token):
             self.lex =  typex.lex
-            self.line = token.line + 4
-            self.column = token.column + 4
+            self.line = token.next_token.line
+            self.column = token.next_token.column
     class IsVoidNode(AtomicNode):
         pass
     class ComplementNode(AtomicNode):
-        pass
+        def __init__(self, expr, token):
+            self.lex = expr.lex if isinstance(expr, Token) else expr
+            self.line = token.next_token.line
+            self.column = token.next_token.column
 
 
     class PlusNode(BinaryNode):

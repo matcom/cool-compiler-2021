@@ -1,4 +1,5 @@
 import argparse 
+import os
 from utils.COOL_Grammar import build_COOL_Grammar
 from utils.COOL_Lexer import COOL_Lexer
 from utils.parser.COOL_parser import COOL_Parser
@@ -8,10 +9,13 @@ from utils.semantic_check.type_collector import TypeCollector
 from utils.semantic_check.type_builder import TypeBuilder
 from utils.semantic_check.type_checker import TypeChecker
 
+a = 'arithmetic1.cl' 
+
 def main(args):
     
     try:
-        with open(args.file, 'r') as file:
+        #with open(args.file, 'r') as file:
+        with open(os.getcwd() + '/tester/semantic/' + args, 'r') as file:
             code = file.read()
     except:
         print(f"(0,0) - CompilerError: file {args.file} not found")
@@ -26,7 +30,7 @@ def main(args):
     if lexer.errors:
         for error in lexer.errors:
             print(error)
-        exit(1)
+        raise Exception()
 
     # parser
     parser = COOL_Parser(G)
@@ -56,10 +60,12 @@ def main(args):
             print(error)                          
         exit(1)
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='description')
-    parser.add_argument('-f', '--file', type=str, default='', help='file to read')
+#     parser = argparse.ArgumentParser(description='description')
+#     parser.add_argument('-f', '--file', type=str, default='', help='file to read')
 
-    args = parser.parse_args()
-    main(args)
+#     args = parser.parse_args()
+#     main(args)
+
+main('dispatch1.cl')

@@ -12,6 +12,7 @@ class Token:
         self.token_type = ttype
         self.line = line
         self.column = column
+        self.next_token = None
  
     def __str__(self): 
         return f'({self.line}, {self.column}) - {self.token_type}: {self.lex}'
@@ -135,7 +136,7 @@ class Lexer:
 
             token_type = match.lastgroup if lexeme.lower() not in self.keywords and match.lastgroup is not None else match.group().lower()
 
-            yield lexeme, token_type, self.line, self.column - len(lexeme) + 1 if lexeme[:2] != '(*' and lexeme[0] != '"' else self.column 
+            yield lexeme, token_type, self.line, self.column - len(lexeme) + 1
  
             text = text[match.end():] if lexeme[:2] != '(*' and lexeme[0] != '"' else text
 
@@ -148,10 +149,8 @@ class Lexer:
         return [Token(lex, ttype, line, column) for lex, ttype, line, column in self.tokenize(text) if ttype not in self.ignored_tokens]
 
     def fixed_tokens(self, tokens):
-        for i, token in enumerate(tokens):
-            if token.lex in self.tokens_toFix:
-                token.line = tokens[i + 1].line
-                token.column = tokens[i + 1].column
+        for i, token in enumerate(tokens[:(len(tokens) - 1)]):
+                token.next_token = tokens[i+1]
         return tokens
 
 
@@ -216,6 +215,6 @@ class COOL_Lexer(Lexer):
         self.ignored_tokens = ['newline','whitespace','tabulation','comment']
 
         self.tokens_toFix = ['inherits','isvoid','class','while','then','else','loop','case',
-        'let','new','not','if','in','of']
+        'let','new','not','if','in','of', '<-']
 
         Lexer.__init__(self, self.regexs, self.keywords, self.ignored_tokens, self.tokens_toFix, 'eof')
