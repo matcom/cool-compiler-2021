@@ -66,8 +66,9 @@ All Rights Reserved\.
 See the file README for a full copyright notice\.
 (?:Loaded: .+\n)*'''
 def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: str, output_file_path: str, timeout=100):
+    print(compiler_path, cool_file_path, input_file_path, output_file_path)
     try:
-        sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        sp = subprocess.run(['bash', compiler_path, cool_file_path], timeout=timeout)
         assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
@@ -76,7 +77,7 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
 
     try:
         fd = open(input_file_path, 'rb')
-        sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), capture_output=True, timeout=timeout)
+        sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), timeout=timeout)
         fd.close()
         mo = re.match(SPIM_HEADER, sp.stdout.decode())
         if mo:
