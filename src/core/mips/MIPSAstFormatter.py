@@ -14,7 +14,6 @@ class MIPSAstFormatter:
 
     @visitor.when(FunctionNode)
     def visit(self, node):
-        print([self.visit(i) for i in node.instructions])
         return f'{node.label}:\n\t' + \
                f'\n\t'.join(self.visit(i) for i in node.instructions)
 
