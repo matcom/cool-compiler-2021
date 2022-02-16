@@ -48,20 +48,23 @@ class Type:
             raise SemanticError(f'Parent type is already set for {self.name}.')
         self.parent = parent
 
-    def get_attribute(self, name:str):
+    def get_attribute(self, name:str, typex:str):
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
             if self.parent is None:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
             try:
-                return self.parent.get_attribute(name)
+                if self.parent.name != typex:
+                    return self.parent.get_attribute(name, typex)
+                raise SemanticError()
+
             except SemanticError:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
 
     def define_attribute(self, name:str, typex):
         try:
-            self.get_attribute(name)
+            self.get_attribute(name, self.name)
         except SemanticError:
             attribute = Attribute(name, typex)
             self.attributes.append(attribute)

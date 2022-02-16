@@ -22,7 +22,7 @@ WRONG_SIGNATURE = '(%s, %s) - SemanticError: Incompatible number of formal param
 LOCAL_ALREADY_DEFINED = '(%s, %s) - SemanticError: Variable %s is already defined in method %s.'
 INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
 VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Undeclared identifier %s.'
-INHERIT_ERROR = '(%s, %s) - TypeError: Class %s cannot inherit from class %s because they form a cycle.'
+INHERIT_ERROR = '(%s, %s) - SemanticError: Class %s cannot inherit from class %s because they form a cycle.'
 METHOD_PARAMETERS = '(%s, %s) - TypeError: Method %s defined in %s receive %d parameters'
 
 DUPLICATE_BRANCH = '(%s, %s) - SemanticError: Duplicate branch %s in case statement.'
@@ -157,7 +157,6 @@ class TypeChecker:
         try:
             returnType = self.context.get_type(node.type) if node.type != 'SELF_TYPE' else self.current_type
         except SemanticError as se:
-            self.errors.append(se.text)
             returnType = ErrorType()
 
         if not body_type.conforms_to(returnType):

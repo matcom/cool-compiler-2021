@@ -7,6 +7,7 @@ MULTIDEFINED_METHOD = '(%s, %s) - SemanticError: Method %s is multiply defined.'
 INHERIT_ERROR = '(%s, %s) - TypeError: Class %s inherits from an undefined class %s.'
 PARAMETER_TYPE_UNDEFINED = '(%s, %s) - TypeError: Class %s of formal parameter %s is undefined.'
 REDEFINED_ATTRIBUTES = '(%s, %s) - SemanticError: Attribute %s is an attribute of an inherited class.'
+RETURN_TYPE_UNDEFINED = '(%s, %s) - TypeError: Undefined return type %s in method %s.'
 
 
 class TypeBuilder:
@@ -84,7 +85,7 @@ class TypeBuilder:
         try:       
             returnType = self.context.get_type(node.type)
         except SemanticError as se:
-            self.errors.append(se.text)
+            self.errors.append(RETURN_TYPE_UNDEFINED % (node.line, node.column, node.type, node.id))
             returnType = ErrorType()
         
         try:
