@@ -5,6 +5,8 @@ from cmp.semantic import SemanticError, ErrorType
 NOT_INHERIT_FROM_BASICS_TYPES = '(%s, %s) - SemanticError: Class %s cannot inherit class %s.'
 MULTIDEFINED_METHOD = '(%s, %s) - SemanticError: Method %s is multiply defined.'
 INHERIT_ERROR = '(%s, %s) - TypeError: Class %s inherits from an undefined class %s.'
+PARAMETER_TYPE_UNDEFINED = '(%s, %s) - TypeError: Class %s of formal parameter %s is undefined.'
+REDEFINED_ATTRIBUTES = '(%s, %s) - SemanticError: Attribute %s is an attribute of an inherited class.'
 
 
 class TypeBuilder:
@@ -60,8 +62,7 @@ class TypeBuilder:
             attrType = self.context.get_type(node.type)
             self.current_type.define_attribute(node.id, attrType)
         except SemanticError as se:
-            self.errors.append(se.text)
-            self.current_type.define_attribute(node.id, ErrorType())
+            self.errors.append(REDEFINED_ATTRIBUTES % (node.line, node.column, node.id))
 
         return
 
@@ -77,7 +78,7 @@ class TypeBuilder:
             try:
                 param_types.append(self.context.get_type(typex))
             except SemanticError as se:
-                self.errors.append(se.text)
+                self.errors.append(PARAMETER_TYPE_UNDEFINED % (node.line, node.column, typex, name))
                 param_types.append(ErrorType())
 
         try:       

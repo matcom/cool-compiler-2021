@@ -16,8 +16,9 @@ INCOMPATIBLE_TYPES_ATTR = '(%s, %s) - TypeError: Inferred type %s of initializat
 INCOMPATIBLE_TYPES_ARG = '(%s, %s) - TypeError: Argument of \'%s\' has type %s instead of %s.'
 INCOMPATIBLE_TYPES_METH = '(%s, %s) - TypeError: Inferred return type %s of method %s does not conform to declared return type %s.'
 INCOMPATIBLE_TYPES_IF = '(%s, %s) - TypeError: Predicate of \'%s\' does not have type %s.'
+INCOMPATIBLE_TYPES_LET = '(%s, %s) - TypeError: Inferred type %s of initialization of %s does not conform to identifier\'s declared type %s.'
 INCOMPATIBLE_TYPES = '(%s, %s) - TypeError: Cannot convert %s into %s.'
-WRONG_SIGNATURE = '(%s, %s) - TypeError: Method %s already defined in %s with a different signature.'
+WRONG_SIGNATURE = '(%s, %s) - SemanticError: Incompatible number of formal parameters in redefined method %s.'
 LOCAL_ALREADY_DEFINED = '(%s, %s) - SemanticError: Variable %s is already defined in method %s.'
 INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
 VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Undeclared identifier %s.'
@@ -132,7 +133,7 @@ class TypeChecker:
             try:
                 parent_method = current_parent.get_method(node.id)
                 if parent_method != self.current_method:
-                    self.errors.append(WRONG_SIGNATURE % (node.line, node.column, self.current_method.name, self.current_type.name))
+                    self.errors.append(WRONG_SIGNATURE % (node.line, node.column, self.current_method.name))
                     break
             except:
                 pass
@@ -271,14 +272,15 @@ class TypeChecker:
                 self.errors.append(se.text)
             
             if scope.is_local(idx):
-                self.errors.append(LOCAL_ALREADY_DEFINED % (node.line, node.column, idx, self.current_method.name))
+                scope = scope.create_child()
+                scope.define_variable(idx, id_type)
             else:
                 scope.define_variable(idx, id_type)
             
             if id_expr is not None:
                 id_expr_type = self.visit(id_expr, scope.create_child())
                 if not id_expr_type.conforms_to(id_type):
-                    self.errors.append(INCOMPATIBLE_TYPES % (node.line, node.column, id_expr_type.name, id_type.name))
+                    self.errors.append(INCOMPATIBLE_TYPES_LET % (node.line, node.column, id_expr_type.name, idx, id_type.name))
             
         body_type = self.visit(node.in_expr, scope.create_child())
 
