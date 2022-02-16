@@ -1,5 +1,5 @@
-import src.cmp.visitor as visitor
-from src.ast_nodes import (
+import cmp.visitor as visitor
+from ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     FuncDeclarationNode,

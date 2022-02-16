@@ -1,7 +1,7 @@
-from src.cmp.pycompiler import Item
-from src.cmp.automata import State, lr0_formatter, multiline_formatter
-from src.cmp.utils import ContainerSet
-from src.methods import compute_firsts, compute_local_first, compute_follows
+from cmp.pycompiler import Item
+from cmp.automata import State, lr0_formatter, multiline_formatter
+from cmp.utils import ContainerSet
+from methods import compute_firsts, compute_local_first, compute_follows
 
 # LR0 automaton -> for SLR and LALR parsers
 def build_LR0_automaton(G):

@@ -1,6 +1,6 @@
-from src.cmp.semantic import SemanticError
-from src.cmp.semantic import Attribute, Method, Type
-from src.cmp.semantic import (
+from cmp.semantic import SemanticError
+from cmp.semantic import Attribute, Method, Type
+from cmp.semantic import (
     VoidType,
     IntType,
     ErrorType,
@@ -11,9 +11,9 @@ from src.cmp.semantic import (
     SelfType,
     IOType,
 )
-from src.cmp.semantic import Context
-from src.ast_nodes import ProgramNode, ClassDeclarationNode
-import src.cmp.visitor as visitor
+from cmp.semantic import Context
+from ast_nodes import ProgramNode, ClassDeclarationNode
+import cmp.visitor as visitor
 from cool_visitor import CopyVisitor
 
 

@@ -1,15 +1,15 @@
-from src.cmp.semantic import SemanticError
-from src.cmp.semantic import Attribute, Method, Type
-from src.cmp.semantic import VoidType, IntType, ErrorType, StringType, BoolType
-from src.cmp.semantic import Context
-from src.ast_nodes import (
+from cmp.semantic import SemanticError
+from cmp.semantic import Attribute, Method, Type
+from cmp.semantic import VoidType, IntType, ErrorType, StringType, BoolType
+from cmp.semantic import Context
+from ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     AttrDeclarationNode,
     FuncDeclarationNode,
 )
-import src.cmp.visitor as visitor
-from src.tset import Tset
+import cmp.visitor as visitor
+from tset import Tset
 from collections import deque
 from cool_visitor import CopyVisitor
 

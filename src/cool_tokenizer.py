@@ -1,4 +1,4 @@
-from src.cmp.utils import Token, tokenizer
+from cmp.utils import Token, tokenizer
 
 
 def tokenize_cool_text(G, text, idx, num, print_tokens=False):
@@ -40,4 +40,3 @@ def pprint_tokens(tokens):
 
 # if __name__ == "__main__":
 #     pprint_tokens(tokens)
-

@@ -1,4 +1,4 @@
-import src.cmp.visitor as visitor
+import cmp.visitor as visitor
 
 
 class Node:
@@ -40,7 +40,9 @@ class BinaryNode(Node):
 
 
 def get_printer(
-    AtomicNode=AtomicNode, UnaryNode=UnaryNode, BinaryNode=BinaryNode,
+    AtomicNode=AtomicNode,
+    UnaryNode=UnaryNode,
+    BinaryNode=BinaryNode,
 ):
     class PrintVisitor(object):
         @visitor.on("node")
@@ -66,4 +68,3 @@ def get_printer(
 
     printer = PrintVisitor()
     return lambda ast: printer.visit(ast)
-

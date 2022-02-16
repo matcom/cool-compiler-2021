@@ -1,6 +1,6 @@
 import ply.lex as lex
-import src.tokens_rules as tokens_rules
-from src.cmp.utils import Token
+import tokens_rules as tokens_rules
+from cmp.utils import Token
 
 
 def pprint_tokens(tokens):
@@ -54,4 +54,3 @@ def tokenize_cool_text(grammar, idx, string, num, data, printing=False):
     if printing:
         pprint_tokens(tokens)
     return tokens
-

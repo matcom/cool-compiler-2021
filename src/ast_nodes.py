@@ -1,4 +1,4 @@
-from src.cmp.semantic import Context
+from cmp.semantic import Context
 
 
 class Node:

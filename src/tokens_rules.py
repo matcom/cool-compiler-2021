@@ -1,7 +1,7 @@
 # https://www.dabeaz.com/ply/ply.html
 # file for PLY rules
 
-from src.errors import tokenizer_error
+from errors import tokenizer_error
 
 
 # def find_column(input, lexpos):
@@ -133,7 +133,7 @@ def t_comment1(t):
 
 
 def t_string(t):
-    r"\""
+    r"\" "
     string_list = []
     text = t.lexer.lexdata
     initial = t.lexer.lexpos
