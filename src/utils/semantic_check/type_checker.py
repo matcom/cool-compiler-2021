@@ -8,7 +8,7 @@ MAIN_METHOD_DONT_HAVE_PARAMS = '(%s, %s) - TypeError: main method must not have 
 
 SELF_ERROR_ATTR = '(%s, %s) - SemanticError: \'self\' cannot be the name of an attribute.'
 SELF_ERROR_LET = '(%s, %s) - SemanticError: \'self\' cannot be bound in a \'let\' expression.'
-SELF_IS_READONLY = '(%s, %s) - TypeError: Variable "self" is read-only.'
+SELF_IS_READONLY = '(%s, %s) - SemanticError: Variable "self" is read-only.'
 SELF_TYPE_ERROR = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a parameter type in method %s'
 SELF_TYPE_IN_DISPATCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a type of a dispatch'
 SELF_TYPE_IN_CASE_BRANCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a type of a case branch'
@@ -31,6 +31,7 @@ METHOD_PARAMETERS = '(%s, %s) - TypeError: Method %s defined in %s receive %d pa
 DUPLICATE_BRANCH = '(%s, %s) - SemanticError: Duplicate branch %s in case statement.'
 UNDEFINED_TYPE_BRANCH = '(%s, %s) - TypeError: Class %s of case branch is undefined.'
 UNDEFINED_TYPE_NEW = '(%s, %s) - TypeError: \'new\' used with undefined class %s.'
+UNDEFINED_TYPE_LET = '(%s, %s) - TypeError: Class %s of let-bound identifier %s is undefined.'
 UNDEFINED_METHOD = '(%s, %s) - AttributeError: Dispatch to undefined method %s. '
 
 
@@ -273,7 +274,7 @@ class TypeChecker:
                 id_type = self.context.get_type(typex) if typex != 'SELF_TYPE' else self.current_type
             except SemanticError as se:
                 id_type = ErrorType()
-                self.errors.append(se.text)
+                self.errors.append(UNDEFINED_TYPE_LET % (node.line, node.column, typex, idx))
             
             if idx == 'self':
                 self.errors.append(SELF_ERROR_LET % (node.line, node.column))
