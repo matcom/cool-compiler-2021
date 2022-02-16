@@ -11,7 +11,7 @@ def build_COOL_Grammar():
     feature_list, def_attr, def_meth, arg_list = G.NonTerminals('<feature-list> <def-attr> <def-meth> <arg-list>')
     expr, expr_list, id_list, case_list, comp = G.NonTerminals('<expr> <expr-list> <id-list> <case-list> <comp>')
     expr, arith, term, factor, atom, dispatch = G.NonTerminals('<expr> <arith> <term> <factor> <atom> <dispatch>')
-    boolean = G.NonTerminal('<boolean>')
+    not_empty = G.NonTerminal('<not_empty>')
 
     #terminales
     classx, let, inx = G.Terminals('class let in')
@@ -47,7 +47,6 @@ def build_COOL_Grammar():
     param %= idx + colon + typex, lambda h,s: [s[1],s[3]]
 
     expr %= idx + arrow + expr, lambda h,s: node.AssignNode(s[1],s[3],s[2])
-    expr %= ifx + expr + then + expr + elsex + expr + fi, lambda h,s: node.IfThenElseNode(s[2],s[4],s[6],s[1])
     expr %= whilex + expr + loop + expr + pool, lambda h,s: node.WhileNode(s[2],s[4],s[1])
     
 
@@ -68,10 +67,7 @@ def build_COOL_Grammar():
     case_list %= idx + colon + typex + darrow + expr + semi, lambda h,s: [(s[1],s[3],s[5])]
     case_list %= idx + colon + typex + darrow + expr + semi + case_list, lambda h,s: [(s[1],s[3],s[5])] + s[7]
 
-    expr %= boolean, lambda h,s: s[1]
-
-    boolean %= comp, lambda h,s: s[1]
-    boolean %= notx + comp, lambda h,s: node.NotNode(s[2], s[1])
+    expr %= comp, lambda h,s: s[1]
 
     comp %= comp + less + arith, lambda h,s: node.LessThanNode(s[1],s[3],s[2])
     comp %= comp + lesse + arith, lambda h,s: node.LessEqualNode(s[1],s[3],s[2])
@@ -88,6 +84,7 @@ def build_COOL_Grammar():
 
     factor %= isvoid + factor, lambda h,s: node.IsVoidNode(s[2])
     factor %= tilde + factor, lambda h,s: node.ComplementNode(s[2], s[1])
+    factor %= notx + atom, lambda h,s: node.NotNode(s[2],s[1])
     factor %= atom, lambda h,s: s[1]
 
     atom %= true, lambda h,s: node.ConstantBoolNode(s[1])
@@ -96,6 +93,7 @@ def build_COOL_Grammar():
     atom %= num, lambda h,s: node.ConstantNumNode(s[1])
     atom %= idx, lambda h,s: node.VariableNode(s[1])
     atom %= new + typex, lambda h,s: node.InstantiateNode(s[2],s[1])
+    atom %= ifx + expr + then + expr + elsex + expr + fi, lambda h,s: node.IfThenElseNode(s[2],s[4],s[6],s[1])
     atom %= opar + expr + cpar, lambda h,s: s[2]
     atom %= dispatch, lambda h,s: s[1]
 

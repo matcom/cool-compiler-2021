@@ -10,8 +10,10 @@ from utils.semantic_check.type_collector import TypeCollector
 from utils.semantic_check.type_builder import TypeBuilder
 from utils.semantic_check.type_checker import TypeChecker 
 
+from utils.parser.LALR_1 import LALR1_Parser
+
 if __name__ == "__main__":
-    add = "parser/operation3.cl"
+    add = "parser/mixed1.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
@@ -34,7 +36,9 @@ if __name__ == "__main__":
         raise Exception()
 
     # parser
-    parser = COOL_Parser(G)
+    #parser = COOL_Parser(G)
+
+    parser = LALR1_Parser(G)
         
     derivation, operations = parser(tokens)
     
