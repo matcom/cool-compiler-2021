@@ -13,7 +13,7 @@ from utils.semantic_check.type_checker import TypeChecker
 from utils.parser.LALR_1 import LALR1_Parser
 
 if __name__ == "__main__":
-    add = "semantic/arithmetic12.cl"
+    add = "lexer/iis5.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
@@ -22,12 +22,6 @@ if __name__ == "__main__":
     
     with open(_in) as file:
         code = file.read()
-
-    code = '''class Main {
-    main(): Object {
-        if true = not false then 4 else 5 fi
-    };
-};'''
 
     G = build_COOL_Grammar()
 
