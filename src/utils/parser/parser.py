@@ -1,7 +1,5 @@
 from cmp.utils import ContainerSet
-from cmp.pycompiler import Sentence
 from itertools import islice
-from collections import deque
 
 class Parser:
     def __init__(self,G):

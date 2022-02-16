@@ -139,7 +139,7 @@ class Lexer:
  
             text = text[match.end():] if lexeme[:2] != '(*' and lexeme[0] != '"' else text
 
-        yield '$', self.eof, self.line, 1
+        yield '$', self.eof, 0, 0
  
     def _build_regex(sef,table):
         return re.compile('|'.join([f'(?P<{name}>{regex})' if name != regex else f'({name})' for name,regex in table.items()]))

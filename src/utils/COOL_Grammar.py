@@ -11,7 +11,7 @@ def build_COOL_Grammar():
     feature_list, def_attr, def_meth, arg_list = G.NonTerminals('<feature-list> <def-attr> <def-meth> <arg-list>')
     expr, expr_list, id_list, case_list, comp = G.NonTerminals('<expr> <expr-list> <id-list> <case-list> <comp>')
     expr, arith, term, factor, atom, dispatch = G.NonTerminals('<expr> <arith> <term> <factor> <atom> <dispatch>')
-    not_empty = G.NonTerminal('<not_empty>')
+    boolean = G.NonTerminal('<boolean>')
 
     #terminales
     classx, let, inx = G.Terminals('class let in')
@@ -49,7 +49,7 @@ def build_COOL_Grammar():
     expr %= idx + arrow + expr, lambda h,s: node.AssignNode(s[1],s[3],s[2])
     expr %= ifx + expr + then + expr + elsex + expr + fi, lambda h,s: node.IfThenElseNode(s[2],s[4],s[6],s[1])
     expr %= whilex + expr + loop + expr + pool, lambda h,s: node.WhileNode(s[2],s[4],s[1])
-    expr %= notx + expr, lambda h,s: node.NotNode(s[2],s[1])
+    
 
     expr %= ocur + expr_list + ccur, lambda h,s: node.BlockNode(s[2],s[1])
 
@@ -68,7 +68,10 @@ def build_COOL_Grammar():
     case_list %= idx + colon + typex + darrow + expr + semi, lambda h,s: [(s[1],s[3],s[5])]
     case_list %= idx + colon + typex + darrow + expr + semi + case_list, lambda h,s: [(s[1],s[3],s[5])] + s[7]
 
-    expr %= comp, lambda h,s: s[1]
+    expr %= boolean, lambda h,s: s[1]
+
+    boolean %= comp, lambda h,s: s[1]
+    boolean %= notx + comp, lambda h,s: node.NotNode(s[2], s[1])
 
     comp %= comp + less + arith, lambda h,s: node.LessThanNode(s[1],s[3],s[2])
     comp %= comp + lesse + arith, lambda h,s: node.LessEqualNode(s[1],s[3],s[2])

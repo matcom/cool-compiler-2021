@@ -11,7 +11,7 @@ from utils.semantic_check.type_builder import TypeBuilder
 from utils.semantic_check.type_checker import TypeChecker 
 
 if __name__ == "__main__":
-    add = "parser/dispatch8.cl"
+    add = "parser/operation3.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
@@ -20,6 +20,7 @@ if __name__ == "__main__":
     
     with open(_in) as file:
         code = file.read()
+
 
     G = build_COOL_Grammar()
 
@@ -34,6 +35,7 @@ if __name__ == "__main__":
 
     # parser
     parser = COOL_Parser(G)
+        
     derivation, operations = parser(tokens)
     
     if parser.error:
