@@ -42,11 +42,13 @@ class Type:
         self.attributes = []
         self.methods = []
         self.parent = None
+        self.child = None
 
     def set_parent(self, parent):
         if self.parent is not None:
             raise SemanticError(f'Parent type is already set for {self.name}.')
         self.parent = parent
+        parent.child = self
 
     def get_attribute(self, name:str, typex:str):
         try:

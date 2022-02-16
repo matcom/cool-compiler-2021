@@ -85,7 +85,7 @@ class TypeChecker:
 
         while current_parent != self.context.get_type('Object') and current_parent != None:
             if current_parent == self.current_type:
-                self.errors.append(INHERIT_ERROR % (self.current_type.parent.line, self.current_type.parent.column, self.current_type.parent.name, self.current_type.parent.name))
+                self.errors.append(INHERIT_ERROR % (self.current_type.child.line, self.current_type.child.column, self.current_type.child.name, self.current_type.child.name))
                 self.current_type.parent = ErrorType()
                 break
 
