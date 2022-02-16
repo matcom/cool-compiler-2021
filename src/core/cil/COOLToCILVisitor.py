@@ -51,6 +51,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                                        line=node.line, column=node.column)
         self_param = self.register_param(self.vself, line=node.line, column=node.column)
         self.localvars.extend(type.attributes.values())
+        self.var_names.update({i:j.name for i,j in type.attributes.items()})
 
         self.vself.name = self_param
         # Inicializando los atributos de la clase y llamando al constructor del padre
@@ -109,9 +110,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                                      line=node.expression.line, column=node.expression.column))
         elif node.type.lex in self.value_types:
             self.register_instruction(cil.AllocateNode(node.type.lex, variable, line=node.line, column=node.column))
-        type = self.types_map[self.current_type.name]
-        attr = type.attributes[node.id.lex]
-        self.var_names[node.id.lex] = attr.name
         node.ret_expr = variable
 
     @visitor.when(cool.FuncDeclarationNode)
