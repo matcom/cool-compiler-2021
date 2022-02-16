@@ -41,7 +41,7 @@ def build_COOL_Grammar():
     def_meth %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur, lambda h,s: node.MethDeclarationNode(s[1],s[3],s[6],s[8],s[7])
 
     param_list %= param, lambda h,s: [s[1]]
-    param_list %= param + comma + param_list, lambda h,s: [s[1]] + s[3]
+    param_list %= param_list + comma + param, lambda h,s: [s[1]] + s[3]
     param_list %= G.Epsilon, lambda h,s: []
 
     param %= idx + colon + typex, lambda h,s: [s[1],s[3]]
@@ -102,7 +102,7 @@ def build_COOL_Grammar():
     dispatch %= atom + at + typex + dot + idx + opar + arg_list + cpar, lambda h,s: node.CallNode(s[5],s[7],s[1],s[3])
 
     arg_list %= expr, lambda h,s: [s[1]]
-    arg_list %= expr + comma + arg_list, lambda h,s: [s[1]] + s[3]
+    arg_list %= arg_list + comma + expr, lambda h,s: [s[1]] + s[3]
     arg_list %= G.Epsilon, lambda h,s: []
 
     return G
