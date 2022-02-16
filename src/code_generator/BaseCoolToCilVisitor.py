@@ -239,7 +239,7 @@ class BaseCOOLToCILVisitor:
         return sorted(case_list, reverse=True,
                     key=lambda x: self.context.get_depth(x.typex))
 
-    #esto esta asociado al context que define la semantica
+    #esto esta asociado al context que define la semantica igual que el hierarchy_types
     def get_depth(self, class_name):
         typex = self.types[class_name]
         if typex.parent is None:
@@ -251,3 +251,15 @@ class BaseCOOLToCILVisitor:
         expr, typex = self.visit(node.expr, scope)
         self.register_instruction(cil_node(result, expr))
         return result, typex
+
+    def load_var_if_occupied(self, var):
+        if var is not None:
+            self.code.append(f'# Restore {var}')
+            self.load_var_code(var)
+
+    def save_reg_if_occupied(self, reg):
+        var = self.reg_desc.get_content(reg)
+        if var is not None:
+            self.code.append(f'# Saving {reg} to memory')
+            self.save_var_code(var)
+        return var

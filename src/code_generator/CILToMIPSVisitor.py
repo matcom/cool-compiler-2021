@@ -443,7 +443,116 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.code.append(f'sub ${rdest}, $t8, ${reg}')
         self.loop_idx += 1
 
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node):
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        self.code.append('# Allocating memory for buffer')
+        self.code.append('li $a0, 356')
+        self.code.append('li $v0, 9')
+        self.code.append('syscall')
+        self.code.append(f'move ${rdest}, $v0')
+        rsrc1 = self.addr_desc.get_var_reg(node.arg1)
+        if node.arg2 is not None:
+            rsrc2 = self.addr_desc.get_var_reg(node.arg2)
+        self.code.append('# Copy the first string to dest')
+        var = self.save_reg_if_occupied('a1')
+        self.code.append(f'move $a0, ${rsrc1}')
+        self.code.append(f'move $a1, ${rdest}')
+        self.push_register('ra')
+        self.code.append('jal strcopier')
+        if node.arg2 is not None:
+            self.code.append('# Concat second string on buffers result')
+            self.code.append(f'move $a0, ${rsrc2}')
+            self.code.append(f'move $a1, $v0')
+            self.code.append('jal strcopier')
+        self.code.append('sb $0, 0($v0)')
+        self.pop_register('ra')
+        self.code.append(f'j finish_{self.loop_idx}')
+        if self.first_defined['strcopier']:
+            self.code.append('# Definition of strcopier')
+            self.code.append('strcopier:')
+            self.code.append('# In a0 is source and in a1 is dest')
+            self.code.append(f'loop_{self.loop_idx}:')
+            self.code.append('lb $t8, ($a0)')
+            self.code.append(f'beq $t8, $zero, end_{self.loop_idx}')
+            self.code.append('addiu $a0, $a0, 1')
+            self.code.append('sb $t8, ($a1)')
+            self.code.append('addiu $a1, $a1, 1')
+            self.code.append(f'b loop_{self.loop_idx}')
+            self.code.append(f'end_{self.loop_idx}:')
+            self.code.append('move $v0, $a1')
+            self.code.append('jr $ra')
+            self.first_defined['strcopier'] = False
+        self.code.append(f'finish_{self.loop_idx}:')
+        self.load_var_if_occupied(var)
+        self.loop_idx += 1
 
+    @visitor.when(cil.SubstringNode)
+    def visit(self, node):
+        rdest = self.addr_desc.get_var_reg(node.dest)
+        self.code.append('# Allocating memory for buffer')
+        self.code.append('li $a0, 356')
+        self.code.append('li $v0, 9')
+        self.code.append('syscall')
+        self.code.append(f'move ${rdest}, $v0')
+        if self.is_variable(node.begin):
+            rstart = self.addr_desc.get_var_reg(node.begin)
+        elif self.is_int(node.begin):
+            rstart = 't8'
+            self.code.append(f'li $t8, {node.begin}')
+        if self.is_variable(node.end):
+            rend = self.addr_desc.get_var_reg(node.end)
+            var = None
+        elif self.is_int(node.end):
+            var = self.save_reg_if_occupied('a3')
+            rend = 'a3'
+            self.code.append(f'li $a3, {node.end}')
+        self.get_reg_var(node.word)
+        rself = self.addr_desc.get_var_reg(node.word)
+        self.code.append("# Getting substring")
+        start = f'start_{self.loop_idx}'
+        error = f'error_{self.loop_idx}'
+        end_lp = f'end_len_{self.loop_idx}'
+        self.code.append('# Move to the begining')
+        self.code.append('li $v0, 0')
+        self.code.append(f'move $t8, ${rself}')
+        self.code.append(f'{start}:')
+        self.code.append('lb $t9, 0($t8)')
+        self.code.append(f'beqz $t9, {error}')
+        self.code.append('addi $v0, 1')
+        self.code.append(f'bgt $v0, ${rstart}, {end_lp}')
+        self.code.append(f'addi $t8, 1')
+        self.code.append(f'j {start}')
+        self.code.append(f'{end_lp}:')
+        self.code.append('# Saving dest')
+        self.code.append(f'move $v0, ${rdest}')
+        loop = f'loop_{self.loop_idx}'
+        end = f'end_{self.loop_idx}'
+        self.code.append(f'{loop}:')
+        self.code.append(f'sub $t9, $v0, ${rdest}') 
+        self.code.append(f'beq $t9, ${rend}, {end}')
+        self.code.append(f'lb $t9, 0($t8)')
+        self.code.append(f'beqz $t9, {error}')     
+        self.code.append(f'sb $t9, 0($v0)')
+        self.code.append('addi $t8, $t8, 1')
+        self.code.append(f'addi $v0, $v0, 1')
+        self.code.append(f'j {loop}')
+        self.code.append(f'{error}:')
+        self.code.append('la $a0, index_error')
+        self.code.append('li $v0, 4')
+        self.code.append(f'move $a0, ${rself}')
+        self.code.append('syscall')
+        self.code.append('li $v0, 1')
+        self.code.append(f'move $a0, ${rstart}')
+        self.code.append('syscall')
+        self.code.append('li $v0, 1')
+        self.code.append(f'move $a0, ${rend}')
+        self.code.append('syscall')
+        self.code.append('j .raise')
+        self.code.append(f'{end}:')
+        self.code.append('sb $0, 0($v0)')
+        self.load_var_if_occupied(var)
+        self.loop_idx += 1
 
 
 
