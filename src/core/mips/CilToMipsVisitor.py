@@ -105,7 +105,7 @@ class CILToMIPSVisitor:
         if node.name == "String":
             defaults = [('value', 'default_str'), ('len', 'type_4_proto')]
 
-        type = mips.MIPSType(type_label, name_label, node.attributes, methods,
+        type = mips.MIPSType(type_label, name_label, list(node.attributes.keys()), methods,
                              len(self._types_section), defaults)
         self._types_section[node.name] = type
 

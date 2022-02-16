@@ -17,7 +17,7 @@ class TypeNode(Node):
     def __init__(self, name, line, column):
         super().__init__(line, column)
         self.name = name
-        self.attributes = []
+        self.attributes = {}
         self.methods = {}
 
 class DataNode(Node):
@@ -41,6 +41,11 @@ class ParamNode(Node):
         self.name = name
 
 class LocalNode(Node):
+    def __init__(self, name, line, column):
+        super().__init__(line, column)
+        self.name = name
+
+class AttributeNode(Node):
     def __init__(self, name, line, column):
         super().__init__(line, column)
         self.name = name
@@ -322,6 +327,10 @@ def get_formatter():
         @visitor.when(LocalNode)
         def visit(self, node):
             return f'LOCAL {node.name}'
+
+        @visitor.when(AttributeNode)
+        def visit(self, node):
+            return f'ATTRIBUTE {node.name}'
 
         @visitor.when(AssignNode)
         def visit(self, node):

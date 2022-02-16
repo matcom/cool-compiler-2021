@@ -53,6 +53,11 @@ class BaseCOOLToCILVisitor:
         self.var_names[name] = vinfo.name
         return vinfo.name
 
+    def register_attribute(self, name, type, line, column):
+        name =  f'attr_{type}_{name}'
+        return cil.AttributeNode(name, line, column)
+
+
     def define_internal_local(self, line, column):
         vinfo = VariableInfo('internal', None)
         return self.register_local(vinfo, line, column)
@@ -192,7 +197,7 @@ class BaseCOOLToCILVisitor:
 
         # String
         type_node = self.register_type('String', line, column)
-        type_node.attributes = ['value', 'length']
+        type_node.attributes = {name:self.register_attribute(name, 'String', 0, 0) for name in ['value', 'length']}
 
         self.current_function = self.register_function(self.init_name('String'), line, column)
         val = self.register_param(VariableInfo('val', None), line, column)
@@ -266,7 +271,7 @@ class BaseCOOLToCILVisitor:
 
         # Int
         type_node = self.register_type('Int', line, column)
-        type_node.attributes = ['value']
+        type_node.attributes = {name:self.register_attribute(name, 'Int', 0, 0) for name in ['value']}
 
         self.current_function = self.register_function(self.init_name('Int'), line, column)
         val = self.register_param(VariableInfo('val', None), line, column)
@@ -280,7 +285,7 @@ class BaseCOOLToCILVisitor:
 
         # Bool
         type_node = self.register_type('Bool', line, column)
-        type_node.attributes = ['value']
+        type_node.attributes = {name:self.register_attribute(name, 'Bool', 0, 0) for name in ['value']}
 
         self.current_function = self.register_function(self.init_name('Bool'), line, column)
         val = self.register_param(VariableInfo('val', None), line, column)

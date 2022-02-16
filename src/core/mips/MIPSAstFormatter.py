@@ -95,7 +95,7 @@ class MIPSAstFormatter:
 
     @visitor.when(LabelNode)
     def visit(self, node):
-        return f'{self.visit(node.name)}'
+        return f'{self.visit(node.name)}:'
 
     @visitor.when(NotNode)
     def visit(self, node):

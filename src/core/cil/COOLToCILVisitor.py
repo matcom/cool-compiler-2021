@@ -15,7 +15,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         while iter_type is not None:
             type.methods.update({i: self.to_function_name(i, iter_type.name) for i in iter_type.methods.keys()})
-            type.attributes.extend([i.name for i in iter_type.attributes])
+            type.attributes.update({i.name:self.register_attribute(i.name, iter_type.name, iter_type.line, iter_type.column) for i in iter_type.attributes})
             iter_type = iter_type.parent
 
     @visitor.on('node')
@@ -45,10 +45,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
         self.current_type = self.context.get_type(node.id.lex)
+        type = self.types_map[node.id.lex]
 
         self.current_function = self.register_function(self.init_attr_name(node.id.lex),
                                                        line=node.line, column=node.column)
         self_param = self.register_param(self.vself, line=node.line, column=node.column)
+        self.localvars.extend(type.attributes.values())
+
         self.vself.name = self_param
         # Inicializando los atributos de la clase y llamando al constructor del padre
         if self.current_type.parent.name not in ('Object', 'IO'):
@@ -78,6 +81,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         # Allocate de la clase
         self.current_function = self.register_function(self.init_name(node.id.lex), line=node.line, column=node.column)
+        self.localvars.extend(type.attributes.values())
         instance = self.define_internal_local(line=node.line, column=node.column)
         self.register_instruction(cil.AllocateNode(node.id.lex, instance, line=node.line, column=node.column))
 
@@ -105,15 +109,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                                      line=node.expression.line, column=node.expression.column))
         elif node.type.lex in self.value_types:
             self.register_instruction(cil.AllocateNode(node.type.lex, variable, line=node.line, column=node.column))
-        self.register_local(VariableInfo(node.id.lex, node.type.lex), line=node.line, column=node.column)
+        type = self.types_map[self.current_type.name]
+        attr = type.attributes[node.id.lex]
+        self.var_names[node.id.lex] = attr.name
         node.ret_expr = variable
 
     @visitor.when(cool.FuncDeclarationNode)
     def visit(self, node: cool.FuncDeclarationNode, scope: Scope):
         self.current_method = self.current_type.get_method(node.id.lex)
+        type = self.types_map[self.current_type.name]
         self.current_function = self.register_function(self.to_function_name(self.current_method.name,
                                                                              self.current_type.name),
                                                        line=node.line, column=node.column)
+        self.localvars.extend(type.attributes.values())
 
         self_param = self.register_param(self.vself, line=node.line, column=node.column)
         self.vself.name = self_param

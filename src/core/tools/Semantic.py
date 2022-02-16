@@ -40,7 +40,7 @@ class Method:
 
 #Clase base para representar los tipos del programa
 class Type:
-    def __init__(self, name:str, sealed=False):
+    def __init__(self, name:str, line, column, sealed=False):
         self.name = name
         self.attributes = []
         self.methods = {}
@@ -49,6 +49,8 @@ class Type:
         self.depth = 0
         # True si la clase esta sellada (no se puede heredar de ella)
         self.sealed = sealed
+        self.line = line
+        self.column = column
 
     def set_parent(self, parent):
         # Si el padre esta definido o es un tipo sellado entonces hay un error semantico
@@ -156,7 +158,7 @@ class Type:
 # Special_Types
 class SelfType(Type):
     def __init__(self):
-        Type.__init__(self, 'SELF_TYPE')
+        Type.__init__(self, 'SELF_TYPE', 0, 0)
         self.sealed = True
 
     def conforms_to(self, other):
@@ -170,7 +172,7 @@ class SelfType(Type):
 
 class VoidType(Type):
     def __init__(self):
-        Type.__init__(self, 'VOID_TYPE')
+        Type.__init__(self, 'VOID_TYPE', 0, 0)
         self.sealed = True
 
     def type_union(self, other):
@@ -190,7 +192,7 @@ class VoidType(Type):
 
 class ErrorType(Type):
     def __init__(self):
-        Type.__init__(self, '<error>')
+        Type.__init__(self, '<error>', 0, 0)
         self.sealed = True
 
     def type_union(self, other):
@@ -226,10 +228,10 @@ class Context:
         return type
 
     # Crea un tipo dentro del contexto
-    def create_type(self, name : str):
+    def create_type(self, name : str, line, column):
         if name in self.types:
             raise SemanticException('Classes may not be redefined')
-        type = self.types[name] = Type(name)
+        type = self.types[name] = Type(name, line, column)
         return type
 
     # Obtiene un tipo del contexto con el nombre correspondiente

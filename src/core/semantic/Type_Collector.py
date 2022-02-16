@@ -15,11 +15,11 @@ class Type_Collector:
 
         self.Context.add_type(SelfType())
 
-        self.Context.create_type('Object')
-        self.Context.create_type('String')
-        self.Context.create_type('IO')
-        self.Context.create_type('Int')
-        self.Context.create_type('Bool')
+        self.Context.create_type('Object', 0, 0)
+        self.Context.create_type('String', 0, 0)
+        self.Context.create_type('IO', 0, 0)
+        self.Context.create_type('Int', 0, 0)
+        self.Context.create_type('Bool', 0, 0)
 
     @visitor.on('node')
     def visit(self, node):
@@ -33,6 +33,6 @@ class Type_Collector:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node : ClassDeclarationNode):
         try:
-            self.Context.create_type(node.id.lex)
+            self.Context.create_type(node.id.lex, node.line, node.column)
         except SemanticException as ex:
             self.errors.append(SemanticError(node.line, node.column, ex.text))

@@ -53,12 +53,13 @@ def main(args):
 
     CILVisitor = COOLToCILVisitor(type_Checker.Context)
     CILast = CILVisitor.visit(COOLast, scope)
+    # print(get_formatter()(CILast))
 
     MIPSVisitor = CILToMIPSVisitor()
     MIPSAst = MIPSVisitor.visit(CILast)
     MIPSFormatter = MIPSAstFormatter()
     mipsCode = MIPSFormatter.visit(MIPSAst)
-    print(mipsCode)
+    # print(mipsCode)
 
     out_file = args.file.split(".")
     out_file[-1] = "mips"
