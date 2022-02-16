@@ -71,6 +71,7 @@ class Type_Checker:
             for att in reversed(current.attributes):
                 attributtes.append(att)
 
+        scope.define_variable('self', self.Current_Type, node.line, node.column)
         for att in reversed(attributtes):    
             scope.define_variable(att.name, att.type, att.line, att.column)
 
@@ -132,7 +133,6 @@ class Type_Checker:
             except SemanticException:
                 pass
 
-        scope.define_variable('self', self.Current_Type, node.line, node.column)
 
         # Defino cada uno de los parametros de metodo
         for pname, ptype in zip(self.Current_Method.param_names, self.Current_Method.param_types):
@@ -509,7 +509,7 @@ class Type_Checker:
         node.static_type = self.Bool_Type
 
     @visitor.when(IdNode)
-    def visit(self, node: IntegerNode, scope: Scope):
+    def visit(self, node: IdNode, scope: Scope):
         # Chequeo que la variable exista
         if scope.is_defined(node.token.lex):
             node.static_type = scope.find_variable(node.token.lex).type

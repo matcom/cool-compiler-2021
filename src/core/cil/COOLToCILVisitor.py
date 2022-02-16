@@ -12,8 +12,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.types_map[node.id.lex] = type = self.register_type(node.id.lex, node.id.line, node.id.column)
         # Guardar métodos de las clases padres
         iter_type = self.context.get_type(node.id.lex)
+
         while iter_type is not None:
             type.methods.update({i: self.to_function_name(i, iter_type.name) for i in iter_type.methods.keys()})
+            type.attributes.extend([i.name for i in iter_type.attributes])
             iter_type = iter_type.parent
 
     @visitor.on('node')
@@ -60,13 +62,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         for feat, child in zip(node.features, scope.childs):
             if isinstance(feat, cool.AttrDeclarationNode):
                 self.visit(feat, child)
-                self.register_instruction(cil.SetAttribNode(instance, feat.id.lex, feat.ret_expr, feat.type.lex,
+                self.register_instruction(cil.SetAttribNode(instance, feat.id.lex, feat.ret_expr, node.id.lex,
                                                             line=node.line, column=node.column))
         # TODO: Deberia retornar algo aqui?
 
         # TypeNode de la clase
-        type = self.types_map[node.id.lex]
-        type.attributes = [i.name for i in self.current_type.attributes]
+        # type = self.types_map[node.id.lex]
+        # type.attributes = [i.name for i in self.current_type.attributes]
 
         # Visitar funciones dentro de la clase
         for feat, child in zip(node.features, scope.childs):
