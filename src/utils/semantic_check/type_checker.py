@@ -26,7 +26,7 @@ LOCAL_ALREADY_DEFINED = '(%s, %s) - SemanticError: Variable %s is already define
 INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
 VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Undeclared identifier %s.'
 INHERIT_ERROR = '(%s, %s) - SemanticError: Class %s, or an ancestor of %s, is involved in an inheritance cycle.'
-METHOD_PARAMETERS = '(%s, %s) - TypeError: Method %s defined in %s receive %d parameters'
+METHOD_PARAMETERS = '(%s, %s) - SemanticError: Method %s defined in %s receive %d parameters'
 
 DUPLICATE_BRANCH = '(%s, %s) - SemanticError: Duplicate branch %s in case statement.'
 UNDEFINED_TYPE_BRANCH = '(%s, %s) - TypeError: Class %s of case branch is undefined.'
@@ -106,7 +106,10 @@ class TypeChecker:
 
     @visitor.when(nodes.AttrDeclarationNode)
     def visit(self, node, scope):
-        attr_type = self.context.get_type(node.type) if node.type != 'SELF_TYPE' else self.current_type
+        try:
+            attr_type = self.context.get_type(node.type) if node.type != 'SELF_TYPE' else self.current_type
+        except SemanticError:
+            attr_type = ErrorType()
 
         if node.id == 'self':
             self.errors.append(SELF_ERROR_ATTR % (node.line, node.column))

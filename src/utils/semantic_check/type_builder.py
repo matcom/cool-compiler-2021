@@ -8,6 +8,7 @@ INHERIT_ERROR = '(%s, %s) - TypeError: Class %s inherits from an undefined class
 PARAMETER_TYPE_UNDEFINED = '(%s, %s) - TypeError: Class %s of formal parameter %s is undefined.'
 REDEFINED_ATTRIBUTES = '(%s, %s) - SemanticError: Attribute %s is an attribute of an inherited class.'
 RETURN_TYPE_UNDEFINED = '(%s, %s) - TypeError: Undefined return type %s in method %s.'
+TYPE_NOT_DEFINED_ATTR = '(%s, %s) - TypeError: Class %s of attribute %s is undefined.'
 
 
 class TypeBuilder:
@@ -61,6 +62,11 @@ class TypeBuilder:
     def visit(self,node):
         try:
             attrType = self.context.get_type(node.type)
+        except SemanticError as se:
+            self.errors.append(TYPE_NOT_DEFINED_ATTR % (node.line, node.column, node.type, node.id))
+            attrType = ErrorType()
+
+        try:
             self.current_type.define_attribute(node.id, attrType)
         except SemanticError as se:
             self.errors.append(REDEFINED_ATTRIBUTES % (node.line, node.column, node.id))
