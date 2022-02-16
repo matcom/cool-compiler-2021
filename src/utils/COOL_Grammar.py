@@ -68,11 +68,13 @@ def build_COOL_Grammar():
     case_list %= idx + colon + typex + darrow + expr + semi, lambda h,s: [(s[1],s[3],s[5])]
     case_list %= idx + colon + typex + darrow + expr + semi + case_list, lambda h,s: [(s[1],s[3],s[5])] + s[7]
 
+    expr %= notx + expr, lambda h,s: node.NotNode(s[2],s[1])
+    expr %= comp + equal + expr, lambda h,s: node.EqualNode(s[1],s[3],s[2])
+
     expr %= comp, lambda h,s: s[1]
 
     comp %= comp + less + arith, lambda h,s: node.LessThanNode(s[1],s[3],s[2])
     comp %= comp + lesse + arith, lambda h,s: node.LessEqualNode(s[1],s[3],s[2])
-    comp %= comp + equal + arith, lambda h,s: node.EqualNode(s[1],s[3],s[2])
     comp %= arith, lambda h,s: s[1]
 
     arith %= arith + plus + term, lambda h,s: node.PlusNode(s[1],s[3],s[2])
@@ -85,7 +87,6 @@ def build_COOL_Grammar():
 
     factor %= isvoid + factor, lambda h,s: node.IsVoidNode(s[2])
     factor %= tilde + factor, lambda h,s: node.ComplementNode(s[2], s[1])
-    factor %= notx + atom, lambda h,s: node.NotNode(s[2],s[1])
     factor %= atom, lambda h,s: s[1]
 
     atom %= true, lambda h,s: node.ConstantBoolNode(s[1])

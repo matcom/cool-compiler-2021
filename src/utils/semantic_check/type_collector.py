@@ -56,7 +56,9 @@ class TypeCollector(object):
             if node.id in ["Object", "Int", "String", "Bool", "IO"]:
                 self.errors.append(NOT_REDEFINE_BASIC_TYPES % (node.line, node.column, node.id))
                 node.id = 'error_type'
-            self.context.create_type(node.id)
+            typex = self.context.create_type(node.id)
+            typex.line = node.line
+            typex.column = node.column
         except SemanticError as se:
             self.errors.append(NOT_REDEFINE_CLASSES % (node.classt_line, node.classt_column))
         return

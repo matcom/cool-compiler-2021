@@ -6,7 +6,8 @@ MAIN_DONT_EXISTS = '(0, 0) - TypeError: COOL program must have a class Main'
 MAIN_METHOD_DONT_EXISTS = '(%s, %s) - TypeError: Main class must have a method main()'
 MAIN_METHOD_DONT_HAVE_PARAMS = '(%s, %s) - TypeError: main method must not have params'
 
-SELF_ERROR = '(%s, %s) - SemanticError: \'self\' cannot be the name of an attribute.'
+SELF_ERROR_ATTR = '(%s, %s) - SemanticError: \'self\' cannot be the name of an attribute.'
+SELF_ERROR_LET = '(%s, %s) - SemanticError: \'self\' cannot be bound in a \'let\' expression.'
 SELF_IS_READONLY = '(%s, %s) - TypeError: Variable "self" is read-only.'
 SELF_TYPE_ERROR = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a parameter type in method %s'
 SELF_TYPE_IN_DISPATCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a type of a dispatch'
@@ -17,16 +18,20 @@ INCOMPATIBLE_TYPES_ARG = '(%s, %s) - TypeError: Argument of \'%s\' has type %s i
 INCOMPATIBLE_TYPES_METH = '(%s, %s) - TypeError: Inferred return type %s of method %s does not conform to declared return type %s.'
 INCOMPATIBLE_TYPES_IF = '(%s, %s) - TypeError: Predicate of \'%s\' does not have type %s.'
 INCOMPATIBLE_TYPES_LET = '(%s, %s) - TypeError: Inferred type %s of initialization of %s does not conform to identifier\'s declared type %s.'
+INCOMPATIBLE_TYPES_CALL = '(%s, %s) - TypeError: Expression type %s does not conform to declared static dispatch type %s.'
 INCOMPATIBLE_TYPES = '(%s, %s) - TypeError: Cannot convert %s into %s.'
+
 WRONG_SIGNATURE = '(%s, %s) - SemanticError: Incompatible number of formal parameters in redefined method %s.'
 LOCAL_ALREADY_DEFINED = '(%s, %s) - SemanticError: Variable %s is already defined in method %s.'
 INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
 VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Undeclared identifier %s.'
-INHERIT_ERROR = '(%s, %s) - SemanticError: Class %s cannot inherit from class %s because they form a cycle.'
+INHERIT_ERROR = '(%s, %s) - SemanticError: Class %s, or an ancestor of %s, is involved in an inheritance cycle.'
 METHOD_PARAMETERS = '(%s, %s) - TypeError: Method %s defined in %s receive %d parameters'
 
 DUPLICATE_BRANCH = '(%s, %s) - SemanticError: Duplicate branch %s in case statement.'
 UNDEFINED_TYPE_BRANCH = '(%s, %s) - TypeError: Class %s of case branch is undefined.'
+UNDEFINED_TYPE_NEW = '(%s, %s) - TypeError: \'new\' used with undefined class %s.'
+UNDEFINED_METHOD = '(%s, %s) - AttributeError: Dispatch to undefined method %s. '
 
 
 
@@ -79,7 +84,7 @@ class TypeChecker:
 
         while current_parent != self.context.get_type('Object') and current_parent != None:
             if current_parent == self.current_type:
-                self.errors.append(INHERIT_ERROR % (node.line, node.column, self.current_type.name, self.current_type.parent.name))
+                self.errors.append(INHERIT_ERROR % (self.current_type.parent.line, self.current_type.parent.column, self.current_type.parent.name, self.current_type.parent.name))
                 self.current_type.parent = ErrorType()
                 break
 
@@ -103,7 +108,7 @@ class TypeChecker:
         attr_type = self.context.get_type(node.type) if node.type != 'SELF_TYPE' else self.current_type
 
         if node.id == 'self':
-            self.errors.append(SELF_ERROR % (node.line, node.column))
+            self.errors.append(SELF_ERROR_ATTR % (node.line, node.column))
 
         if node.expr:
             type_expr = self.visit(node.expr, scope.create_child())
@@ -197,20 +202,20 @@ class TypeChecker:
 
             else:
                 try:
-                    typex = self.context.get_type(node.type)
+                    typex = self.context.get_type(node.type.lex)
                 except SemanticError as se:
                     self.errors.append(se.text)
                     typex = ErrorType()
 
                 if not obj_type.conforms_to(typex):
-                    self.errors.append(INCOMPATIBLE_TYPES % (node.line, node.column, obj_type.name, typex.name))
+                    self.errors.append(INCOMPATIBLE_TYPES_CALL % (node.line, node.column, obj_type.name, typex.name))
 
             obj_type = typex
 
         try:
             meth = obj_type.get_method(node.id)
         except SemanticError as se:
-            if se.text: self.errors.append(se.text)
+            if se.text: self.errors.append(UNDEFINED_METHOD % (node.line, node.column, node.id))
             for arg in node.args:
                 self.visit(arg, scope)
             return ErrorType()
@@ -269,6 +274,9 @@ class TypeChecker:
             except SemanticError as se:
                 id_type = ErrorType()
                 self.errors.append(se.text)
+            
+            if idx == 'self':
+                self.errors.append(SELF_ERROR_LET % (node.line, node.column))
             
             if scope.is_local(idx):
                 scope = scope.create_child()
@@ -361,7 +369,7 @@ class TypeChecker:
         try:
             return self.context.get_type(node.lex)
         except SemanticError as se:
-            self.errors.append(se.text)
+            self.errors.append(UNDEFINED_TYPE_NEW % (node.line, node.column, node.lex))
             return ErrorType()
 
     
