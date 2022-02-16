@@ -18,7 +18,7 @@ INCOMPATIBLE_TYPES_METH = '(%s, %s) - TypeError: Inferred return type %s of meth
 INCOMPATIBLE_TYPES_IF = '(%s, %s) - TypeError: Predicate of \'%s\' does not have type %s.'
 INCOMPATIBLE_TYPES = '(%s, %s) - TypeError: Cannot convert %s into %s.'
 WRONG_SIGNATURE = '(%s, %s) - TypeError: Method %s already defined in %s with a different signature.'
-LOCAL_ALREADY_DEFINED = '(%s, %s) - TypeError: Variable %s is already defined in method %s.'
+LOCAL_ALREADY_DEFINED = '(%s, %s) - SemanticError: Variable %s is already defined in method %s.'
 INVALID_OPERATION = '(%s, %s) - TypeError: non-Int arguments: %s %s %s'
 VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Undeclared identifier %s.'
 INHERIT_ERROR = '(%s, %s) - TypeError: Class %s cannot inherit from class %s because they form a cycle.'
@@ -103,7 +103,7 @@ class TypeChecker:
 
         if node.id == 'self':
             self.errors.append(SELF_ERROR % (node.line, node.column))
-            
+
         if node.expr:
             type_expr = self.visit(node.expr, scope.create_child())
 
