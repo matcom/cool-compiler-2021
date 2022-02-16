@@ -138,18 +138,15 @@ class MIPSAstFormatter:
 
     @visitor.when(RegisterRelativeLocation)
     def visit(self, node):
-        return f'{node._offset}({self.visit(node._register)})    '\
-               f'#line: {node.line} column: {node.column}'
+        return f'{node._offset}({self.visit(node._register)}'
 
     @visitor.when(LabelRelativeLocation)
     def visit(self, node):
-        return f'{node._label} + {node._offset}    '\
-               f'#line: {node.line} column: {node.column}'
+        return f'{node._label} + {node._offset}'
 
     @visitor.when(Register)
     def visit(self, node):
-        return f'{node.name}    '\
-               f'#line: {node.line} column: {node.column}'
+        return f'{node.name}'
 
     @visitor.when(int)
     def visit(self, node):
