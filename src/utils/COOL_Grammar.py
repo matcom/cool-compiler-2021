@@ -11,7 +11,7 @@ def build_COOL_Grammar():
     feature_list, def_attr, def_meth, arg_list = G.NonTerminals('<feature-list> <def-attr> <def-meth> <arg-list>')
     expr, expr_list, id_list, case_list, comp = G.NonTerminals('<expr> <expr-list> <id-list> <case-list> <comp>')
     expr, arith, term, factor, atom, dispatch = G.NonTerminals('<expr> <arith> <term> <factor> <atom> <dispatch>')
-    not_empty = G.NonTerminal('<not_empty>')
+    nonEmpty_argList, nonEmpty_paramList = G.NonTerminals('<nonEmpty-argList> <nonEmpty-paramList>')
 
     #terminales
     classx, let, inx = G.Terminals('class let in')
@@ -40,15 +40,16 @@ def build_COOL_Grammar():
 
     def_meth %= idx + opar + param_list + cpar + colon + typex + ocur + expr + ccur, lambda h,s: node.MethDeclarationNode(s[1],s[3],s[6],s[8],s[7])
 
-    param_list %= param, lambda h,s: [s[1]]
-    param_list %= param_list + comma + param, lambda h,s: [s[1]] + s[3]
     param_list %= G.Epsilon, lambda h,s: []
+    param_list %= nonEmpty_paramList, lambda h,s: s[1]
+
+    nonEmpty_paramList %= param, lambda h,s: [s[1]]
+    nonEmpty_paramList %= param + comma + nonEmpty_paramList, lambda h,s: [s[1]] + s[3]
 
     param %= idx + colon + typex, lambda h,s: [s[1],s[3]]
 
     expr %= idx + arrow + expr, lambda h,s: node.AssignNode(s[1],s[3],s[2])
     expr %= whilex + expr + loop + expr + pool, lambda h,s: node.WhileNode(s[2],s[4],s[1])
-    
 
     expr %= ocur + expr_list + ccur, lambda h,s: node.BlockNode(s[2],s[1])
 
@@ -101,8 +102,10 @@ def build_COOL_Grammar():
     dispatch %= idx + opar + arg_list + cpar, lambda h,s: node.CallNode(s[1],s[3])
     dispatch %= atom + at + typex + dot + idx + opar + arg_list + cpar, lambda h,s: node.CallNode(s[5],s[7],s[1],s[3])
 
-    arg_list %= expr, lambda h,s: [s[1]]
-    arg_list %= arg_list + comma + expr, lambda h,s: [s[1]] + s[3]
     arg_list %= G.Epsilon, lambda h,s: []
+    arg_list %= nonEmpty_argList, lambda h,s: s[1]
+
+    nonEmpty_argList %= expr, lambda h,s: [s[1]]
+    nonEmpty_argList %= expr + comma + nonEmpty_argList, lambda h,s: [s[1]] + s[3]
 
     return G
