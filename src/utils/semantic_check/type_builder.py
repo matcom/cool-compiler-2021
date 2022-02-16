@@ -2,7 +2,9 @@ import cmp.visitor as visitor
 from utils.ast.AST_Nodes import ast_nodes as nodes
 from cmp.semantic import SemanticError, ErrorType
 
-NOT_INHERIT_FROM_BASICS_TYPES = '(%s, %s) - SemanticError: Class %s cannot inherit class %s. '
+NOT_INHERIT_FROM_BASICS_TYPES = '(%s, %s) - SemanticError: Class %s cannot inherit class %s.'
+MULTIDEFINED_METHOD = '(%s, %s) - SemanticError: Method %s is multiply defined.'
+INHERIT_ERROR = '(%s, %s) - TypeError: Class %s inherits from an undefined class %s.'
 
 
 class TypeBuilder:
@@ -36,7 +38,7 @@ class TypeBuilder:
                     parent_type = self.context.get_type(node.parent)
                 except SemanticError as se:
                     parent_type = ErrorType()
-                    self.errors.append(se.text)
+                    self.errors.append(INHERIT_ERROR % (node.line, node.parent_column, node.id, node.parent))
                     
                 try:
                     self.current_type.set_parent(parent_type)
@@ -87,6 +89,6 @@ class TypeBuilder:
         try:
             self.current_type.define_method(node.id, param_names, param_types, returnType)
         except SemanticError as se:
-            self.errors.append(se.text)
+            self.errors.append(MULTIDEFINED_METHOD % (node.line, node.column, node.id))
 
         return

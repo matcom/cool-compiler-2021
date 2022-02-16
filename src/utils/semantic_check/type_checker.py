@@ -6,7 +6,7 @@ MAIN_DONT_EXISTS = '(0, 0) - TypeError: COOL program must have a class Main'
 MAIN_METHOD_DONT_EXISTS = '(%s, %s) - TypeError: Main class must have a method main()'
 MAIN_METHOD_DONT_HAVE_PARAMS = '(%s, %s) - TypeError: main method must not have params'
 
-SELF_ERROR = '(%s, %s) - TypeError: self cannot be used as an attribute name'
+SELF_ERROR = '(%s, %s) - SemanticError: \'self\' cannot be the name of an attribute.'
 SELF_IS_READONLY = '(%s, %s) - TypeError: Variable "self" is read-only.'
 SELF_TYPE_ERROR = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a parameter type in method %s'
 SELF_TYPE_IN_DISPATCH = '(%s, %s) - TypeError: SELF_TYPE cannot be used as a type of a dispatch'
@@ -101,14 +101,16 @@ class TypeChecker:
     def visit(self, node, scope):
         attr_type = self.context.get_type(node.type) if node.type != 'SELF_TYPE' else self.current_type
 
+        if node.id == 'self':
+            self.errors.append(SELF_ERROR % (node.line, node.column))
+            
         if node.expr:
             type_expr = self.visit(node.expr, scope.create_child())
 
             if not type_expr.conforms_to(attr_type):
                 self.errors.append(INCOMPATIBLE_TYPES_ATTR % (node.line, node.column, type_expr.name, node.id, attr_type.name))
 
-        if node.id == 'self':
-            self.errors.append(SELF_ERROR % (node.line, node.column))
+        
 
         scope.define_variable(node.id, attr_type)
 
