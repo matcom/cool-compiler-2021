@@ -10,6 +10,7 @@ class MIPSAstFormatter:
     def visit(self, node):
         return f'.data\n' + \
                '\n'.join(self.visit(i) for i in node.data) + '\n' + \
+               '.text\n.globl main\n' + \
                '\n'.join(self.visit(i) for i in node.functions) + '\n'
 
     @visitor.when(FunctionNode)
@@ -138,7 +139,7 @@ class MIPSAstFormatter:
 
     @visitor.when(RegisterRelativeLocation)
     def visit(self, node):
-        return f'{node._offset}({self.visit(node._register)}'
+        return f'{node._offset}({self.visit(node._register)})'
 
     @visitor.when(LabelRelativeLocation)
     def visit(self, node):
@@ -146,7 +147,7 @@ class MIPSAstFormatter:
 
     @visitor.when(Register)
     def visit(self, node):
-        return f'{node.name}'
+        return f'${node.name}'
 
     @visitor.when(int)
     def visit(self, node):
