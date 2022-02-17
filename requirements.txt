@@ -1,36 +1,11 @@
-atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and sys_platform == "win32" or sys_platform == "win32" and python_version >= "3.6" and python_full_version >= "3.4.0" \
-    --hash=sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197 \
-    --hash=sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a
-attrs==20.3.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6" \
-    --hash=sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6 \
-    --hash=sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700
-colorama==0.4.4; python_version >= "3.6" and python_full_version < "3.0.0" and sys_platform == "win32" or sys_platform == "win32" and python_version >= "3.6" and python_full_version >= "3.5.0" \
-    --hash=sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2 \
-    --hash=sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b
-iniconfig==1.1.1; python_version >= "3.6" \
-    --hash=sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3 \
-    --hash=sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32
-packaging==20.9; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6" \
-    --hash=sha256:67714da7f7bc052e064859c05c595155bd1ee9f69f76557e21f051443c20947a \
-    --hash=sha256:5b327ac1320dc863dca72f4514ecc086f31186744b84a230374cc1fd776feae5
-pluggy==0.13.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6" \
-    --hash=sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d \
-    --hash=sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0
-py==1.10.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6" \
-    --hash=sha256:3b80836aa6d1feeaa108e046da6423ab8f6ceda6468545ae8d02d9d58d18818a \
-    --hash=sha256:21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3
-pyparsing==2.4.7; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.6" \
-    --hash=sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b \
-    --hash=sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1
-pytest-ordering==0.6 \
-    --hash=sha256:561ad653626bb171da78e682f6d39ac33bb13b3e272d406cd555adb6b006bda6 \
-    --hash=sha256:27fba3fc265f5d0f8597e7557885662c1bdc1969497cd58aff6ed21c3b617de2 \
-    --hash=sha256:3f314a178dbeb6777509548727dc69edf22d6d9a2867bf2d310ab85c403380b6
-pytest==6.2.5; python_version >= "3.6" \
-    --hash=sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134 \
-    --hash=sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89
-sly==0.4 \
-    --hash=sha256:e5f2266a231322cc17519fbc3a3ba1c6335fed5a9a55abe0e598a35aea0ac32a
-toml==0.10.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.6" \
-    --hash=sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b \
-    --hash=sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f
+attrs @ file:///Users/dany/Library/Caches/pypoetry/artifacts/52/ae/a5/4a6ce9001a7aff209cf585904d049b7697203ce2255c73f2318b9ee39b/attrs-20.3.0-py2.py3-none-any.whl
+iniconfig @ file:///Users/dany/Library/Caches/pypoetry/artifacts/1d/67/0c/79706e7a41ef01be0b1a38aa3b4ddc9bd800a95ccd8d8dc7de4e090623/iniconfig-1.1.1-py2.py3-none-any.whl
+numpy @ file:///Users/dany/Library/Caches/pypoetry/artifacts/5a/1f/3b/b802d219fbe7847bdfd579c618b07d2fc25c6eb960b9943dd1ae35635d/numpy-1.22.1-cp310-cp310-macosx_11_0_arm64.whl
+packaging @ file:///Users/dany/Library/Caches/pypoetry/artifacts/49/ac/9b/fe8c98d6e71c0a3bbd2124fa7390ece04a29f1ff457bc73c8860d994fa/packaging-20.9-py2.py3-none-any.whl
+pluggy @ file:///Users/dany/Library/Caches/pypoetry/artifacts/5c/74/60/0a66715d8599e4bd0cf44f05ca11f99f9a3674820bd68856704692b818/pluggy-0.13.1-py2.py3-none-any.whl
+py @ file:///Users/dany/Library/Caches/pypoetry/artifacts/56/47/ba/83cd275e2a70e4b5358d0e580cb41f3f84031c5a2d690714ba00b0e112/py-1.10.0-py2.py3-none-any.whl
+pyparsing @ file:///Users/dany/Library/Caches/pypoetry/artifacts/99/c8/f8/0954d73c6d7d441bc4ed58326f3f13cdc63bfedf6e46e0d16eddd10c58/pyparsing-2.4.7-py2.py3-none-any.whl
+pytest @ file:///Users/dany/Library/Caches/pypoetry/artifacts/d3/5c/6c/ecc815bbb070306dcb67bef0ec365f599b0f4b6ce85fc620f675c77231/pytest-6.2.5-py3-none-any.whl
+pytest-ordering @ file:///Users/dany/Library/Caches/pypoetry/artifacts/5a/35/4a/047f280bf7fcc4bcf8c1807667b4484d34dfdd366358d2803160045c71/pytest_ordering-0.6-py3-none-any.whl
+sly @ file:///Users/dany/Library/Caches/pypoetry/artifacts/55/b5/e7/aaa630b234bb48bde56d4bcbcf27d7b7ac4d8ee2f49024202c26f68170/sly-0.4.tar.gz
+toml @ file:///Users/dany/Library/Caches/pypoetry/artifacts/51/ac/24/674da558495229c57c3d2333cb23e24aac7aadf723ced29e2cc41a9e6e/toml-0.10.2-py2.py3-none-any.whl

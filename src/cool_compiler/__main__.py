@@ -32,6 +32,5 @@ with open(path, 'r') as _file:
         ast = visitorClass(errors).visit(ast)
         if errors.any(): sys.exit(1)
 
-
-
+    print(ast)
     
