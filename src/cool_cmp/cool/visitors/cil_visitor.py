@@ -855,11 +855,8 @@ class COOLToCILVisitor():
     def visit(self, node, scope):
         self.params.append(cil.ParamNode('self'))
         result = self.visit(node.expr, scope)
-        attr_offset = self.current_type.get_attribute_index(
-            node.id, self.current_type)
-        self.register_instruction(cil.SetAttribNode(
-        "self", node.id, result, attr_offset))
-
+        attr_offset = self.current_type.get_attribute_index(node.id, self.current_type)
+        self.register_instruction(cil.SetAttribNode("self", node.id, result, attr_offset))
         self.register_instruction(cil.ReturnNode())
         return result
     
@@ -893,10 +890,8 @@ class COOLToCILVisitor():
                 self.register_instruction(cil.AssignNode(local.name,value)) # Param
                 return local.name
             else:
-                attr_offset = self.current_type.get_attribute_index(
-                    local.name, self.current_type)
-                self.register_instruction(cil.SetAttribNode(
-                    'self', local.name, value, attr_offset))
+                attr_offset = self.current_type.get_attribute_index(local.name, self.current_type)
+                self.register_instruction(cil.SetAttribNode('self',local.name, value, attr_offset))
                 # value = self.define_internal_local() # Attr
                 # self.register_instruction(cil.GetAttribNode('self',local.name,value))
                 return value # or self ?
@@ -1209,8 +1204,7 @@ class COOLToCILVisitor():
             if any(x for x in self.params if x.name == node.lex):
                 return node.lex # Param
             else:
-                attr_offset = self.current_type.get_attribute_index(
-                    node.lex, self.current_type)
+                attr_offset = self.current_type.get_attribute_index(node.lex, self.current_type)
                 value = self.define_internal_local() # Attr
                 self.register_instruction(cil.GetAttribNode('self',node.lex, value, attr_offset))
                 return value

@@ -35,7 +35,7 @@ El stack crece para abajo:
 0xfffffff  |         |
 0xffffffe  |         |   |
 0xffffffd  |         |  \ /
-0xffffffc  |         |
+0xffffffc  |         |   
 
 O sea, se resta para crecer
 

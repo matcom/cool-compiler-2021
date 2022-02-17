@@ -587,9 +587,9 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._store_local_variable(Reg.v(0), node.dest) 
     
     @visitor.when(cil.LoadNode)
-    def visit(self, node: cil.LoadNode):
+    def visit(self, node:cil.LoadNode):
         self.add_instruction(LoadAddressNode(Reg.t(0), node.msg))
-        self._store_local_variable(Reg.t(0), node.dest)
+        self._store_local_variable(Reg.t(0), node.dest)        
     
     @visitor.when(cil.ObjectCopyNode)
     def visit(self, node:cil.ObjectCopyNode):
