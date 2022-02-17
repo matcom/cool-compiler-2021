@@ -88,18 +88,20 @@ class DivNode(ArithmeticNode):
         super().__init__(dest,left,right,row,column,comment=None)
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, source, attr, dest, row, column, comment=None) -> None:
+    def __init__(self, source, attr, dest, attribute_index, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
         self.source = source
         self.attr = attr
         self.dest = dest
+        self.attribute_index = attribute_index
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, source, attr, value, row, column, comment=None) -> None:
+    def __init__(self, source, attr, value, attribute_index, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
         self.source = source
         self.attr = attr
         self.value = value
+        self.attribute_index = attribute_index
 
 class GetIndexNode(InstructionNode):
     def __init__(self, source, index, dest, row, column, comment=None) -> None:
