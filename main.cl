@@ -58,6 +58,7 @@ class Main {
     main() : Object {
         {   
             -- if true then "Hello" else "World" fi;
+            
             -- while true loop
             --     number <- number + 1
             -- pool;
@@ -66,6 +67,7 @@ class Main {
                 a: Int => 0;
                 b: Bool => not true;
                 c: String => new IO;
+                d: Object => ~25;
             esac;
         }
     };
