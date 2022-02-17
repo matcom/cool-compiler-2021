@@ -31,6 +31,14 @@ LOCALVAR1 <- Aquí estaría apuntando el FP de la función
 RA  
 FP(Viejo)  
 
+El stack crece para abajo:
+0xfffffff  |         |
+0xffffffe  |         |   |
+0xffffffd  |         |  \ /
+0xffffffc  |         |   
+
+O sea, se resta para crecer
+
 ## Instancias
 
 Espacio de memoria de tamaño la cantidad de bytes que se lleva según la cantidad de atributos que posee el tipo.

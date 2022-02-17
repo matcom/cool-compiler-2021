@@ -235,10 +235,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._deallocate_stack_space(4*len(registers))
     
     def _allocate_stack_space(self, bytes_amount: int):
-        self.add_instruction(AddImmediateUnsignedNode(Reg.sp(), Reg.sp(), -bytes_amount))
+        self.add_instruction(AddImmediateNode(Reg.sp(), Reg.sp(), -bytes_amount))
 
     def _deallocate_stack_space(self, bytes_amount: int):
-        self.add_instruction(AddImmediateUnsignedNode(Reg.sp(), Reg.sp(), bytes_amount))
+        self.add_instruction(AddImmediateNode(Reg.sp(), Reg.sp(), bytes_amount))
 
     def _load_local_variable(self, dest, name):
         self.add_instruction(LoadWordNode(dest, self.local_variable_offset[name], Reg.fp())) # Stack address for local variable
@@ -329,6 +329,9 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(LoadImmediateNode(Reg.v(0), 9)) # Reserve space arg
         self.add_instruction(SyscallNode()) # Returns in $v0 the allocated memory
     
+    def _attribute_index_to_offset(self, index):
+        return self.WORD_SIZE + index * self.WORD_SIZE # Object Type address first and then the attributes
+
     def add_instruction(self, instr:Node):
         self.program_node.instructions.append(instr)
     
@@ -624,20 +627,30 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def visit(self, node:cil.IOOutStringNode):
         raise MetaCILInvalidError()
     
-    # TODO
-    
     @visitor.when(cil.GetAttribNode)
     def visit(self, node:cil.GetAttribNode):
-        pass
+        self._load_value(Reg.t(0), node.source) # Load the object address
+        attr_offset = self._attribute_index_to_offset(node.attribute_index) # Get the attribute offset
+        self.add_instruction(LoadWordNode(Reg.t(0), attr_offset, Reg.t(0))) # Fetch the attribute value 
+        self._store_local_variable(Reg.t(0), node.dest) # Assign attribute value
+        
     
     @visitor.when(cil.SetAttribNode)
     def visit(self, node:cil.SetAttribNode):
-        pass
+        self._load_value(Reg.t(0), node.source) # Load the object address
+        attr_offset = self._attribute_index_to_offset(node.attribute_index) # Get the attribute offset
+        self._load_value(Reg.t(1), node.value) # Load the value to be setted into t1 
+        self.add_instruction(StoreWordNode(Reg.t(1), attr_offset, Reg.t(0))) # Save the attribute value 
+ 
     
     @visitor.when(cil.GotoIfNode)
     def visit(self, node:cil.GotoIfNode):
-        pass
+        self._load_value(Reg.t(0), node.condition_value) # Load condition value
+        self.add_instruction(BranchNotEqualNode(Reg.t(0), Reg.zero(), node.label)) # Not 0 is True. If not zero jump to label
     
+    # TODO
+
+
     @visitor.when(cil.ConcatNode)
     def visit(self, node:cil.ConcatNode):
         pass

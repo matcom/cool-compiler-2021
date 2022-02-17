@@ -71,16 +71,18 @@ class DivNode(ArithmeticNode):
     pass
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, source, attr, dest):
+    def __init__(self, source, attr, dest, attribute_index):
         self.source = source
         self.attr = attr
         self.dest = dest
+        self.attribute_index = attribute_index
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, source, attr, value):
+    def __init__(self, source, attr, value, attribute_index):
         self.source = source
         self.attr = attr
         self.value = value
+        self.attribute_index = attribute_index
 
 class GetIndexNode(InstructionNode):
     def __init__(self, source, index, dest):
