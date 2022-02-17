@@ -20,6 +20,7 @@ V0_REG = Register('v0')
 V1_REG = Register('v1')
 ZERO_REG = Register('zero')
 LOW_REG = Register('lo')
+GP_REG = Register('gp')
 
 
 class Node:
@@ -112,6 +113,16 @@ class DivideNode(InstructionNode):
         self.rsrc1 = rsrc1
         self.rsrc2 = rsrc2
 
+class MoveLowNode(InstructionNode):
+
+    def __init__(self, dest, line, column):
+        '''
+        Put the content of register low into register rsrc.
+        '''
+        super().__init__(line, column)
+        self.dest = dest
+
+
 
 class MultiplyNode(InstructionNode):
     def __init__(self, rdest, rsrc1, rsrc2, line, column):
@@ -196,6 +207,14 @@ class JumpNode(InstructionNode):
         '''
         super().__init__(line, column)
         self.label = label
+
+class JumpRegisterNode(InstructionNode):
+    def __init__(self, reg, line, column):
+        '''
+        Unconditionally jump to the instruction at the label.
+        '''
+        super().__init__(line, column)
+        self.reg = reg
 
 
 class JalNode(InstructionNode):

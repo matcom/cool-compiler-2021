@@ -132,6 +132,8 @@ class CILToMIPSVisitor:
                 self.register_label(instruction.label, mips_label)
 
         instructions = []
+        if node.name == 'entry':
+            instructions.append(mips.MoveNode(mips.V1_REG, mips.GP_REG, 0, 0))
         instructions.extend(mips.push_register(mips.FP_REG, line=node.line, column=node.column))
         instructions.append(mips.AdditionInmediateNode(mips.FP_REG, mips.SP_REG, 4, line=node.line, column=node.column))
         instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, -size_for_locals,
@@ -149,7 +151,7 @@ class CILToMIPSVisitor:
         instructions.extend(mips.pop_register(mips.FP_REG, line=node.line, column=node.column))
 
         if self._current_function.label != 'main':
-            instructions.append(mips.JumpNode(mips.RA_REG, line=node.line, column=node.column))
+            instructions.append(mips.JumpRegisterNode(mips.RA_REG, line=node.line, column=node.column))
         else:
             instructions.append(mips.LoadInmediateNode(mips.V0_REG, 10, line=node.line, column=node.column))
             instructions.append(mips.SyscallNode())
@@ -268,9 +270,9 @@ class CILToMIPSVisitor:
             instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                                   line=node.line, column=node.column))
 
-        reg3 = mips.LOW_REG
         instructions.append(mips.DivideNode(reg1, reg2, line=node.line, column=node.column))
-        instructions.append(mips.StoreWordNode(reg3, self.get_var_location(node.dest),
+        instructions.append(mips.MoveLowNode(reg1, line=node.line, column=node.column))
+        instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
 
         return instructions
