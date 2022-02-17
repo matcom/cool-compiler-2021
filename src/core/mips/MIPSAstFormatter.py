@@ -8,10 +8,27 @@ class MIPSAstFormatter:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        return f'.data\n' + \
-               '\n'.join(self.visit(i) for i in node.data) + '\n' + \
-               '.text\n.globl main\n' + \
-               '\n'.join(self.visit(i) for i in node.functions) + '\n'
+
+        data = f'.data\n' + '\n'.join(self.visit(i) for i in node.data) + '\n'
+
+        names_table = f"{TYPES_LABEL}:\n" + "\n".join([f"\t.word\t{tp.name}" for tp in node.types])
+        proto_table = f"{PROTOTYPE_LABEL}:\n" + "\n".join([f"\t.word\t{tp.label}_prototype" for tp in node.types])
+
+        types = "\n\n\n".join([self.visit(tp) for tp in node.types])
+        code = '\n\n'.join(self.visit(i) for i in node.functions) + '\n'
+
+        return f'{data}\n\n{names_table}\n\n{proto_table}\n\n{types}\n\n\n.text\n.globl main\n{code}'
+
+    @visitor.when(MIPSType)
+    def visit(self, node):
+        methods = "\n".join([f"\t.word\t {m}" for m in node.methods])
+        dispatch_table = f"{node.label}_dispatch:\n{methods}"
+        proto_begin = f"{node.label}_prototype:\n\t.word\t{node.index}\n\t.word\t{node.size}\n\t.word\t{node.label}_dispatch"
+        proto_attr = "\n".join([f'\t.word\t0' for attr in node.attributes])
+        proto_end = f"\t.word\t-1"
+        proto = f"{proto_begin}\n{proto_attr}\n{proto_end}" if proto_attr != "" else f"{proto_begin}\n{proto_end}"
+
+        return f'{dispatch_table}\n\n{proto}'
 
     @visitor.when(FunctionNode)
     def visit(self, node):

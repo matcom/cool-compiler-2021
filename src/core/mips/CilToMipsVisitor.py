@@ -622,7 +622,7 @@ class CILToMIPSVisitor:
                                               line=node.line, column=node.column))
         instructions.extend(mips.push_register(reg, line=node.line, column=node.column))
 
-        instructions.append(mips.JalNode("len", line=node.line, column=node.column))
+        instructions.append(mips.JalNode("length", line=node.line, column=node.column))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
 

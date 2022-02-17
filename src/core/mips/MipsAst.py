@@ -19,7 +19,7 @@ RA_REG = Register('ra')
 V0_REG = Register('v0')
 V1_REG = Register('v1')
 ZERO_REG = Register('zero')
-LOW_REG = Register('low')
+LOW_REG = Register('lo')
 
 
 class Node:

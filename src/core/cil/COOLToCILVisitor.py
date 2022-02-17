@@ -619,6 +619,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ret = self.define_internal_local(line=node.line, column=node.column)
 
         # TODO: Hay algunos ArgNode que reciben variables y otros valores especificos
-        self.register_instruction(cil.ArgNode(node.token.lex, line=node.token.line, column=node.token.column))
+        self.register_instruction(cil.ArgNode(1 if node.token.lex else 0, line=node.token.line, column=node.token.column))
         self.register_instruction(cil.StaticCallNode(self.init_name('Bool'), ret, line=node.line, column=node.column))
         node.ret_expr = ret

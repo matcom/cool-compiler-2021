@@ -59,6 +59,10 @@ def main(args):
     MIPSAst = MIPSVisitor.visit(CILast)
     MIPSFormatter = MIPSAstFormatter()
     mipsCode = MIPSFormatter.visit(MIPSAst)
+
+    with open('core/mips/mips_basics.asm', 'r') as f:
+        mipsCode = mipsCode + "".join(f.readlines())
+
     # print(mipsCode)
 
     out_file = args.file.split(".")
@@ -69,21 +73,23 @@ def main(args):
         f.write(mipsCode)
 
     # TODO: Comment this lines
-    try:
-        fd = open(args.file, 'rb')
-        sp = subprocess.run(['spim', '-file', out_file], input=fd.read(), timeout=100)
-        fd.close()
-        SPIM_HEADER = r'''^SPIM Version .+ of .+
-        Copyright .+\, James R\. Larus\.
-        All Rights Reserved\.
-        See the file README for a full copyright notice\.
-        (?:Loaded: .+\n)*'''
-        mo = re.match(SPIM_HEADER, sp.stdout.decode())
-        if mo:
-            output = mo.string[mo.end():]
-            print(output)
-    except subprocess.TimeoutExpired:
-        assert False, "Too Long"
+
+    #try:
+    #    fd = open(args.file, 'rb')
+    #    sp = subprocess.run(['spim', '-file', out_file], input=fd.read(), timeout=100)
+    #    fd.close()
+    #    SPIM_HEADER = r'''^SPIM Version .+ of .+
+    #    Copyright .+\, James R\. Larus\.
+    #    All Rights Reserved\.
+    #    See the file README for a full copyright notice\.
+    #    (?:Loaded: .+\n)*'''
+    #    mo = re.match(SPIM_HEADER, sp.stdout.decode())
+    #    if mo:
+    #        output = mo.string[mo.end():]
+    #        print(output)
+    #except subprocess.TimeoutExpired:
+    #    assert False, "Too Long"
+
 
 
 if __name__ == "__main__":
