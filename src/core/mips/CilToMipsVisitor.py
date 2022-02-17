@@ -134,21 +134,19 @@ class CILToMIPSVisitor:
         instructions = []
         if node.name == 'entry':
             instructions.append(mips.MoveNode(mips.V1_REG, mips.GP_REG, 0, 0))
+        instructions.extend(mips.push_register(mips.RA_REG, node.line, node.column))
         instructions.extend(mips.push_register(mips.FP_REG, line=node.line, column=node.column))
-        instructions.append(mips.AdditionInmediateNode(mips.FP_REG, mips.SP_REG, 4, line=node.line, column=node.column))
+        instructions.append(mips.AdditionInmediateNode(mips.FP_REG, mips.SP_REG, 8, line=node.line, column=node.column))
         instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, -size_for_locals,
                                                        line=node.line, column=node.column))
 
-        reg = mips.REGISTERS[0]
-        for param in params:
-            instructions.append(mips.LoadWordNode(reg, self.get_var_location(param),
-                                                  line=node.line, column=node.column))
         for i in node.instructions:
             instructions.extend(self.visit(i))
 
         instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, size_for_locals,
                                                        line=node.line, column=node.column))
         instructions.extend(mips.pop_register(mips.FP_REG, line=node.line, column=node.column))
+        instructions.extend(mips.pop_register(mips.RA_REG, node.line, node.column))
 
         if self._current_function.label != 'main':
             instructions.append(mips.JumpRegisterNode(mips.RA_REG, line=node.line, column=node.column))
@@ -569,24 +567,23 @@ class CILToMIPSVisitor:
     def visit(self, node: cil.SubstringNode):
         instructions = []
 
-        reg1 = mips.REGISTERS[0]
+        reg1 = mips.ARG_REGISTERS[0]
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.str_value),
                                               line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg1, line=node.line, column=node.column))
 
+        reg1 = mips.ARG_REGISTERS[1]
         if type(node.index) == int:
             instructions.append(mips.LoadInmediateNode(reg1, node.index, line=node.line, column=node.column))
         else:
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.index),
                                                   line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg1, line=node.line, column=node.column))
 
+        reg1 = mips.ARG_REGISTERS[2]
         if type(node.index) == int:
             instructions.append(mips.LoadInmediateNode(reg1, node.length, line=node.line, column=node.column))
         else:
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.length),
                                                   line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg1, line=node.line, column=node.column))
 
         instructions.append(mips.JalNode("substr", line=node.line, column=node.column))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
@@ -597,18 +594,17 @@ class CILToMIPSVisitor:
     def visit(self, node: cil.ConcatNode):
         instructions = []
 
-        reg = mips.REGISTERS[0]
+        reg = mips.ARG_REGISTERS[0]
         instructions.append(
             mips.LoadWordNode(reg, self.get_var_location(node.prefix), line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg, line=node.line, column=node.column))
 
+        reg = mips.ARG_REGISTERS[1]
         instructions.append(
             mips.LoadWordNode(reg, self.get_var_location(node.suffix), line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg, line=node.line, column=node.column))
 
+        reg = mips.ARG_REGISTERS[2]
         instructions.append(
-            mips.LoadWordNode(reg, self.get_var_location(node.suffix), line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg, line=node.line, column=node.column))
+            mips.LoadWordNode(reg, self.get_var_location(node.length), line=node.line, column=node.column))
 
         instructions.append(mips.JalNode("concat", line=node.line, column=node.column))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
@@ -619,10 +615,9 @@ class CILToMIPSVisitor:
     def visit(self, node: cil.LengthNode):
         instructions = []
 
-        reg = mips.REGISTERS[0]
+        reg = mips.ARG_REGISTERS[0]
         instructions.append(mips.LoadWordNode(reg, self.get_var_location(node.source),
                                               line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg, line=node.line, column=node.column))
 
         instructions.append(mips.JalNode("length", line=node.line, column=node.column))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
@@ -676,6 +671,7 @@ class CILToMIPSVisitor:
         reg1 = mips.REGISTERS[0]
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                               line=node.line, column=node.column))
+        # TODO: Ver si se hace usando los registros de parametros
         instructions.extend(mips.push_register(reg1, line=node.line, column=node.column))
 
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.right),
@@ -685,6 +681,8 @@ class CILToMIPSVisitor:
         instructions.append(mips.JalNode("equal_str", line=node.line, column=node.column))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        instructions.extend(mips.pop_register(reg1, line=node.line, column=node.column))
+        instructions.extend(mips.pop_register(reg1, line=node.line, column=node.column))
 
         return instructions
 

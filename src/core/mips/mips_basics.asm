@@ -77,7 +77,7 @@ len_end:
     jr $ra
 
 
-
+# TODO: Necesita tambien un puntero al indice del substring en a1
 # SUBSTRING
 # a0 Pointer to beginning of string
 # a2 Size of substring
