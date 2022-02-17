@@ -546,7 +546,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode):
-        self._load_value(Reg.t(0), node.type) # t0 = Type Address
+        self._load_value(Reg.t(0), node.variable) # t0 = Type Address
         # TODO CHECK IF THE INSTRUCTION BELOW IS REQUIRED
         # self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0))) # t0 = t0[0] -> FatherAddress
         self._store_local_variable(Reg.t(0), node.dest)

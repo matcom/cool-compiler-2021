@@ -172,7 +172,7 @@ class CILPrintVisitor():
     
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode):
-        return f'{node.dest} = FATHER {node.type}'
+        return f'{node.dest} = FATHER {node.variable}'
     
     @visitor.when(cil.ArrayNode)
     def visit(self, node:cil.ArrayNode):
@@ -408,7 +408,7 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode, args: list, caller_fun_scope: dict):
-        typex = self.get_dynamic_type(node.type, caller_fun_scope)
+        typex = self.get_dynamic_type(node.variable, caller_fun_scope)
         if typex.parent == None:
             value = None
         else:
@@ -791,7 +791,7 @@ class COOLToCILVisitor():
         
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
         type_node.methods.append(("__init", init_function.name))
-        self.params.append(cil.ParamNode('self'))
+        self.params.append(cil.ParamNode('self',node=node))
         
         for attr,typex in self.current_type.all_attributes():
             # Defining attribute's init functions
@@ -804,7 +804,7 @@ class COOLToCILVisitor():
             # Calling function in type init function
             self.current_function = init_function
             dest = self.define_internal_local()
-            self.register_instruction(cil.ArgNode('self'))
+            self.register_instruction(cil.ArgNode('self',node=node))
             self.register_instruction(cil.StaticCallNode(new_function.name, dest))
 
         self.register_instruction(cil.ReturnNode('self')) # Returning created instance
