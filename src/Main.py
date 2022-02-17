@@ -60,9 +60,6 @@ def main(args):
     MIPSFormatter = MIPSAstFormatter()
     mipsCode = MIPSFormatter.visit(MIPSAst)
 
-    with open('core/mips/mips_basics.asm', 'r') as f:
-        mipsCode = mipsCode + "".join(f.readlines())
-
     # print(mipsCode)
 
     out_file = args.file.split(".")
