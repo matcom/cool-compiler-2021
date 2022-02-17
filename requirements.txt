@@ -1,10 +1,9 @@
-attrs @ file:///Users/dany/Library/Caches/pypoetry/artifacts/52/ae/a5/4a6ce9001a7aff209cf585904d049b7697203ce2255c73f2318b9ee39b/attrs-20.3.0-py2.py3-none-any.whl
+attrs @ file:///Users/dany/Library/Caches/pypoetry/artifacts/c4/ee/75/fcd6c2f4c5a1d60b1bcd97014702ca01b3f032fd927d88780b38708409/attrs-21.4.0-py2.py3-none-any.whl
 iniconfig @ file:///Users/dany/Library/Caches/pypoetry/artifacts/1d/67/0c/79706e7a41ef01be0b1a38aa3b4ddc9bd800a95ccd8d8dc7de4e090623/iniconfig-1.1.1-py2.py3-none-any.whl
-numpy @ file:///Users/dany/Library/Caches/pypoetry/artifacts/5a/1f/3b/b802d219fbe7847bdfd579c618b07d2fc25c6eb960b9943dd1ae35635d/numpy-1.22.1-cp310-cp310-macosx_11_0_arm64.whl
-packaging @ file:///Users/dany/Library/Caches/pypoetry/artifacts/49/ac/9b/fe8c98d6e71c0a3bbd2124fa7390ece04a29f1ff457bc73c8860d994fa/packaging-20.9-py2.py3-none-any.whl
-pluggy @ file:///Users/dany/Library/Caches/pypoetry/artifacts/5c/74/60/0a66715d8599e4bd0cf44f05ca11f99f9a3674820bd68856704692b818/pluggy-0.13.1-py2.py3-none-any.whl
-py @ file:///Users/dany/Library/Caches/pypoetry/artifacts/56/47/ba/83cd275e2a70e4b5358d0e580cb41f3f84031c5a2d690714ba00b0e112/py-1.10.0-py2.py3-none-any.whl
-pyparsing @ file:///Users/dany/Library/Caches/pypoetry/artifacts/99/c8/f8/0954d73c6d7d441bc4ed58326f3f13cdc63bfedf6e46e0d16eddd10c58/pyparsing-2.4.7-py2.py3-none-any.whl
+packaging @ file:///Users/dany/Library/Caches/pypoetry/artifacts/d3/1f/90/3f2473250ebd055fe7f0856810677783949fc0d2e5f25bbb4dc00ad0a9/packaging-21.3-py3-none-any.whl
+pluggy @ file:///Users/dany/Library/Caches/pypoetry/artifacts/49/3e/55/309ec3705ba3309d817d531002c0a02f643d06c5d5a889ce43236130d5/pluggy-1.0.0-py2.py3-none-any.whl
+py @ file:///Users/dany/Library/Caches/pypoetry/artifacts/71/fb/64/bfdc833c2055a893883f33deaac35ef2cbdd95d58031cfc69a630f32bf/py-1.11.0-py2.py3-none-any.whl
+pyparsing @ file:///Users/dany/Library/Caches/pypoetry/artifacts/dd/d9/cf/3501b38e834b80f9ba80633358cced32539bea5dc1e786f4c2b1d2f682/pyparsing-3.0.7-py3-none-any.whl
 pytest @ file:///Users/dany/Library/Caches/pypoetry/artifacts/d3/5c/6c/ecc815bbb070306dcb67bef0ec365f599b0f4b6ce85fc620f675c77231/pytest-6.2.5-py3-none-any.whl
 pytest-ordering @ file:///Users/dany/Library/Caches/pypoetry/artifacts/5a/35/4a/047f280bf7fcc4bcf8c1807667b4484d34dfdd366358d2803160045c71/pytest_ordering-0.6-py3-none-any.whl
 sly @ file:///Users/dany/Library/Caches/pypoetry/artifacts/55/b5/e7/aaa630b234bb48bde56d4bcbcf27d7b7ac4d8ee2f49024202c26f68170/sly-0.4.tar.gz
