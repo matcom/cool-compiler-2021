@@ -126,9 +126,81 @@ def p_other_param(p):
 
 def p_expr(p):
     """
-    expr : comparer
+    expr : comparer LT open_expr_lvl1
+         | comparer LTEQ open_expr_lvl1
+         | comparer EQ open_expr_lvl1
+         | open_expr_lvl1
+         | comparer
     """
-    p[0] = p[1]
+    operator = p.slice[2].type if len(p) > 2 else None
+    if operator == 'LT':
+        p[0] = ast.LessNode(p.lineno(1), p[1], p[3])
+    elif operator == 'LTEQ':
+        p[0] = ast.LessEqualNode(p.lineno(1), p[1], p[3])
+    elif operator == 'EQ':
+        p[0] = ast.EqualNode(p.lineno(1), p[1], p[3])
+    else:
+        p[0] = p[1]
+
+
+def p_open_expr_lvl1(p):
+    """
+    open_expr_lvl1 : arith PLUS open_expr_lvl2
+                   | arith MINUS open_expr_lvl2
+                   | open_expr_lvl2
+    """
+    operator = p.slice[2].type if len(p) > 2 else None
+    if operator == 'PLUS':
+        p[0] = ast.PlusNode(p.lineno(1), p[1], p[3])
+    elif operator == 'MINUS':
+        p[0] = ast.MinusNode(p.lineno(1), p[1], p[3])
+    else:
+        p[0] = p[1]
+
+
+def p_open_expr_lvl2(p):
+    """
+    open_expr_lvl2 : term MULT open_expr_lvl3
+                   | term DIV open_expr_lvl3
+                   | open_expr_lvl3
+    """
+    operator = p.slice[2].type if len(p) > 2 else None
+    if operator == 'MULT':
+        p[0] = ast.StarNode(p.lineno(1), p[1], p[3])
+    elif operator == 'DIV':
+        p[0] = ast.DivNode(p.lineno(1), p[1], p[3])
+    else:
+        p[0] = p[1]
+
+
+def p_open_expr_lvl3(p):
+    """
+    open_expr_lvl3 : ISVOID open_expr_lvl3
+                   | INT_COMP open_expr_lvl3
+                   | open_expr
+    """
+    first_token = p.slice[1].type if len(p) > 1 else None
+    if first_token == 'ISVOID':
+        p[0] = ast.IsVoidNode(p.lineno(1), p[2])
+    elif first_token == 'INT_COMP':
+        p[0] = ast.IntCompNode(p.lineno(1), p[1])
+    else:
+        p[0] = p[1]
+
+
+def p_open_expr(p):
+    """
+    open_expr : LET let_var_list IN expr
+              | OBJECT_ID ASSIGN expr
+              | NOT expr
+    """
+    first_token = p.slice[1].type if len(p) > 1 else None
+    if first_token == 'LET':
+        p[0] = ast.LetNode(p.lineno(1), p[2], p[4])
+    elif first_token == 'OBJECT_ID':
+        p[0] = ast.AssignNode(p.lineno(1), p[1], p[3])
+    elif first_token == 'NOT':
+        p[0] = ast.NotNode(p.lineno(1), p[2])
 
 
 def p_comparer(p):
@@ -139,14 +211,14 @@ def p_comparer(p):
              | arith
     """
     operator = p.slice[2].type if len(p) > 2 else None
-    if operator is None:
-        p[0] = p[1]
-    elif operator == 'LT':
-        p[0] = ast.LessNode(p.lineno(1), p[1], p[3])
+    if operator == 'LT':
+        p[0] = ast.LessNode(p.lineno(1), p[1], None)
     elif operator == 'LTEQ':
-        p[0] = ast.LessEqualNode(p.lineno(1), p[1], p[3])
+        p[0] = ast.LessEqualNode(p.lineno(1), p[1], None)
     elif operator == 'EQ':
-        p[0] = ast.EqualNode(p.lineno(1), p[1], p[3])
+        p[0] = ast.EqualNode(p.lineno(1), p[1], None)
+    else:
+        p[0] = p[1]
 
 
 def p_arith(p):
@@ -181,54 +253,32 @@ def p_term(p):
 
 def p_factor(p):
     """
-    factor : atom
+    factor : ISVOID factor
+           | INT_COMP factor
+           | atom
     """
-    p[0] = p[1]
+    first_token = p.slice[1].type if len(p) > 1 else None
+    if first_token == 'ISVOID':
+        p[0] = ast.IsVoidNode(p.lineno(1), p[2])
+    elif first_token == 'INT_COMP':
+        p[0] = ast.IntCompNode(p.lineno(1), p[2])
+    else:
+        p[0] = p[1]
 
 
 def p_atom(p):
     """
-    atom : known_end_atom
-         | unknown_end_atom
-    """
-    p[0] = p[1]
-
-
-def p_unknown_end_atom(p):
-    """
-    unknown_end_atom : OBJECT_ID ASSIGN atom
-                     | LET let_var_list IN atom
-                     | NOT atom
-                     | ISVOID atom
-                     | INT_COMP atom
-    """
-    first_token = p.slice[1].type if len(p) > 1 else None
-    second_token = p.slice[2].type if len(p) > 2 else None
-    if first_token == 'OBJECT_ID' and second_token == 'ASSIGN':
-        p[0] = ast.AssignNode(p.lineno(1), p[1], p[3])
-    elif first_token == 'LET':
-        p[0] = ast.LetNode(p.lineno(1), p[2], p[4])
-    elif first_token == 'NOT':
-        p[0] = ast.NotNode(p.lineno(1), p[2])
-    elif first_token == 'ISVOID':
-        p[0] = ast.IsVoidNode(p.lineno(1), p[2])
-    elif first_token == 'INT_COMP':
-        p[0] = ast.IntCompNode(p.lineno(1), p[2])
-
-
-def p_known_end_atom(p):
-    """
-    known_end_atom : INTEGER
-                   | OBJECT_ID
-                   | STRING
-                   | BOOL
-                   | LPAREN expr RPAREN
-                   | NEW TYPE_ID
-                   | IF expr THEN expr ELSE expr FI
-                   | WHILE expr LOOP expr POOL
-                   | LBRACE expr_list RBRACE
-                   | CASE expr OF branch_list ESAC
-                   | func_call
+    atom : INTEGER
+         | OBJECT_ID
+         | STRING
+         | BOOL
+         | LPAREN expr RPAREN
+         | NEW TYPE_ID
+         | IF expr THEN expr ELSE expr FI
+         | WHILE expr LOOP expr POOL
+         | LBRACE expr_list RBRACE
+         | CASE expr OF branch_list ESAC
+         | func_call
     """
     first_token = p.slice[1].type if len(p) > 1 else None
     second_token = p.slice[2].type if len(p) > 2 else None
@@ -298,9 +348,9 @@ def p_branch_list(p):
 
 def p_func_call(p):
     """
-    func_call : known_end_atom DOT OBJECT_ID LPAREN arg_list RPAREN
+    func_call : atom DOT OBJECT_ID LPAREN arg_list RPAREN
               | OBJECT_ID LPAREN arg_list RPAREN
-              | known_end_atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
+              | atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
     """
     if len(p) == 7:
         p[0] = ast.CallNode(p.lineno(1), p[1], p[3], p[5])
