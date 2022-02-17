@@ -46,9 +46,9 @@ def p_class_def(p):
     """
     if len(p) == 8:
         p[0] = ast.ClassDeclarationNode(p[2], p[6], p[4])
+        p[0].parent_pos = (p.lineno(4), find_column(p.lexer.lexdata, p.lexpos(4)))
     else:
         p[0] = ast.ClassDeclarationNode(p[2], p[4])
-
     p[0].set_pos(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)))
 
 
@@ -58,7 +58,7 @@ def p_feature_list(p):
                  | func_def SEMI feature_list
                  | empty
     """
-    if len(p) == 3:
+    if len(p) == 4:
         p[0] = [p[1]] + p[3]
     else:
         p[0] = []
@@ -71,10 +71,12 @@ def p_attr_def(p):
     """
     if len(p) == 6:
         p[0] = ast.AttrDeclarationNode(p[1], p[3], p[5])
+        p[0].expr_pos = p[5].pos
     else:
         p[0] = ast.AttrDeclarationNode(p[1], p[3])
 
-    p[0].set_pos(p.lineno(3), find_column(p.lexer.lexdata, p.lexpos(3)))
+    p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+    p[0].type_pos = (p.lineno(3), find_column(p.lexer.lexdata, p.lexpos(3)))
 
 
 def p_func_def(p):
@@ -84,10 +86,12 @@ def p_func_def(p):
     """
     if len(p) == 10:
         p[0] = ast.FuncDeclarationNode(p[1], p[3], p[6], p[8])
-        p[0].set_pos(p.lineno(6), find_column(p.lexer.lexdata, p.lexpos(6)))
+        p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+        p[0].type_pos = (p.lineno(6), find_column(p.lexer.lexdata, p.lexpos(6)))
     else:
         p[0] = ast.FuncDeclarationNode(p[1], [], p[5], p[7])
-        p[0].set_pos(p.lineno(5), find_column(p.lexer.lexdata, p.lexpos(5)))
+        p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+        p[0].type_pos = (p.lineno(5), find_column(p.lexer.lexdata, p.lexpos(5)))
 
 
 def p_param_list(p):
@@ -95,10 +99,13 @@ def p_param_list(p):
     param_list : ID COLON TYPE COMMA param_list
                | ID COLON TYPE
     """
+    param = ast.ParamNode(p[1], p[3])
+    param.set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+    param.type_pos = (p.lineno(3), find_column(p.lexer.lexdata, p.lexpos(3)))
     if len(p) == 6:
-        p[0] = [ast.ParamNode(p[1], p[3])] + p[5]
-    else:
-        p[0] = [ast.ParamNode(p[1], p[3])]
+        p[0] = [param] + p[5]
+    elif len(p) == 4:
+        p[0] = [param]
 
 
 # expr productions
@@ -109,7 +116,7 @@ def p_expr_assign(p):
     """
     p[0] = ast.AssignNode(p[1], p[3])
 
-    p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+    p[0].set_pos(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)))
 
 
 def p_expr_list(p):
@@ -156,6 +163,7 @@ def p_expr_func_call(p):
     else:
         p[0] = ast.CallNode(p[5], p[7], p[1], p[3])
         p[0].set_pos(p.lineno(5), find_column(p.lexer.lexdata, p.lexpos(5)))
+        p[0].parent_pos = (p.lineno(3), find_column(p.lexer.lexdata, p.lexpos(3)))
 
 
 def p_expr_if(p):
@@ -203,15 +211,33 @@ def p_decl_list(p):
               | ID COLON TYPE ASSIGN expr
               | ID COLON TYPE
     """
-    if len(p) == 8:
-        p[0] = [ast.LetDeclarationNode(p[1], p[3], p[5])] + p[7]
-    elif len(p) == 6:
-        if p[4] == ',':
-            p[0] = [ast.LetDeclarationNode(p[1], p[3])] + p[5]
+    if len(p) > 4 and p[4] == '<-':
+        declaration = ast.LetDeclarationNode(p[1], p[3], p[5])
+        declaration.type_pos = (p.lineno(3), find_column(p.lexer.lexdata, p.lexpos(3)))
+        declaration.expr_pos = p[5].pos
+        declaration.set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+        if len(p) == 8:
+            p[0] = [declaration] + p[7]
         else:
-            p[0] = [ast.LetDeclarationNode(p[1], p[3], p[5])]
+            p[0] = [declaration]
     else:
-        p[0] = [ast.LetDeclarationNode(p[1], p[3])]
+        declaration = ast.LetDeclarationNode(p[1], p[3])
+        declaration.type_pos = (p.lineno(3), find_column(p.lexer.lexdata, p.lexpos(3)))
+        declaration.set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+        if len(p) == 6:
+            p[0] = [declaration] + p[5]
+        else:
+            p[0] = [declaration]
+
+    # if len(p) == 8:
+    #     p[0] = [ast.LetDeclarationNode(p[1], p[3], p[5])] + p[7]
+    # elif len(p) == 6:
+    #     if p[4] == ',':
+    #         p[0] = [ast.LetDeclarationNode(p[1], p[3])] + p[5]
+    #     else:
+    #         p[0] = [ast.LetDeclarationNode(p[1], p[3], p[5])]
+    # else:
+    #     p[0] = [ast.LetDeclarationNode(p[1], p[3])]
 
 
 def p_expr_let(p):
@@ -228,10 +254,14 @@ def p_case_list(p):
     case_list : ID COLON TYPE ARROW expr SEMI case_list
               | ID COLON TYPE ARROW expr SEMI
     """
+    branch = ast.CaseBranchNode(p[1], p[3], p[5])
+    branch.set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
+    branch.type_pos = (p.lineno(3), find_column(p.lexer.lexdata, p.lexpos(3)))
+
     if len(p) == 8:
-        p[0] = [(p[1], p[3], p[5])] + p[7]  # maybe here is better to use a Node
+        p[0] = [branch] + p[7]
     else:
-        p[0] = [(p[1], p[3], p[5])]
+        p[0] = [branch]
 
 
 def p_expr_case(p):
@@ -249,7 +279,7 @@ def p_expr_new(p):
     """
     p[0] = ast.InstantiateNode(p[2])
 
-    p[0].set_pos(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)))
+    p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
 
 
 def p_expr_isvoid(p):
@@ -258,7 +288,7 @@ def p_expr_isvoid(p):
     """
     p[0] = ast.IsVoidNode(p[2])
 
-    p[0].set_pos(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)))
+    p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
 
 
 def p_expr_binary_op(p):
@@ -277,6 +307,8 @@ def p_expr_binary_op(p):
         p[0] = ast.MinusNode(p[1], p[2], p[3])
     elif p[2] == '/':
         p[0] = ast.DivNode(p[1], p[2], p[3])
+    elif p[2] == '*':
+        p[0] = ast.StarNode(p[1], p[2], p[3])
     elif p[2] == '<':
         p[0] = ast.LessThanNode(p[1], p[2], p[3])
     elif p[2] == '<=':
@@ -291,7 +323,9 @@ def p_expr_comp(p):
     """
     expr : COMP expr
     """
-    p[0] = p[1]
+    p[0] = ast.ComplementNode(p[2])
+
+    p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
 
 
 def p_expr_not(p):
@@ -300,7 +334,7 @@ def p_expr_not(p):
     """
     p[0] = ast.NegationNode(p[2])
 
-    p[0].set_pos(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)))
+    p[0].set_pos(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)))
 
 
 def p_expr_pars(p):
