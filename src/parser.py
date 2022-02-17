@@ -212,11 +212,11 @@ def p_comparer(p):
     """
     operator = p.slice[2].type if len(p) > 2 else None
     if operator == 'LT':
-        p[0] = ast.LessNode(p.lineno(1), p[1], None)
+        p[0] = ast.LessNode(p.lineno(1), p[1], p[3])
     elif operator == 'LTEQ':
-        p[0] = ast.LessEqualNode(p.lineno(1), p[1], None)
+        p[0] = ast.LessEqualNode(p.lineno(1), p[1], p[3])
     elif operator == 'EQ':
-        p[0] = ast.EqualNode(p.lineno(1), p[1], None)
+        p[0] = ast.EqualNode(p.lineno(1), p[1], p[3])
     else:
         p[0] = p[1]
 
