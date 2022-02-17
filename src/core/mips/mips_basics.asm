@@ -73,6 +73,7 @@ len_end:
     # Return original content to registers
     lw $t0 0($sp)
     lw $t1 4($sp)
+    addiu $sp $sp 8
 
     jr $ra
 
@@ -207,4 +208,7 @@ concat_end:
     lw $ra 20($sp)
     addiu $sp $sp 24
 
+    jr $ra
+
+read_string:
     jr $ra

@@ -56,8 +56,8 @@ class FunctionNode(Node):
 
     def get_local_stack_location(self, name):
         index = self.localvars.index(name)
-        offset = index * DOUBLE_WORD
-        return RegisterRelativeLocation(SP_REG, offset)
+        offset = (len(self.localvars) + 2 - index) * DOUBLE_WORD
+        return RegisterRelativeLocation(FP_REG, -offset)
 
     def get_var_location(self, name):
         try:

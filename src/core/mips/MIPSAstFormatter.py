@@ -9,7 +9,7 @@ class MIPSAstFormatter:
     @visitor.when(ProgramNode)
     def visit(self, node):
 
-        data = f'.data\n' + '\n'.join(self.visit(i) for i in node.data) + '\n'
+        data = f'.data\n' + '\n.word 0\n'.join(self.visit(i) for i in node.data) + '\n'
 
         names_table = f"{TYPES_LABEL}:\n" + "\n".join([f"\t.word\t{tp.name}" for tp in node.types])
         proto_table = f"{PROTOTYPE_LABEL}:\n" + "\n".join([f"\t.word\t{tp.label}_prototype" for tp in node.types])
@@ -175,7 +175,7 @@ class MIPSAstFormatter:
 
     @visitor.when(LabelRelativeLocation)
     def visit(self, node):
-        return f'{node._label} + {node._offset}'
+        return f'{node._label}'
 
     @visitor.when(Register)
     def visit(self, node):
