@@ -71,13 +71,13 @@ All Rights Reserved\.
 See the file README for a full copyright notice\.
 (?:Loaded: .+\n)*'''
 def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: str, output_file_path: str, timeout=100):
+    spim_file = cool_file_path[:-2] + 'mips'
+
     try:
-        sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        sp = subprocess.run(['python3', compiler_path, cool_file_path, spim_file, '-m'], capture_output=True, timeout=timeout)
         assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
-
-    spim_file = cool_file_path[:-2] + 'mips'
 
     try:
         fd = open(input_file_path, 'rb')
@@ -94,3 +94,22 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
     fd.close()
 
     assert output == eoutput, UNEXPECTED_OUTPUT % (spim_file, repr(output), repr(eoutput))
+
+def compare_outputs_icil(compiler_path: str, cool_file_path: str, input_file_path: str, output_file_path, timeout=100):
+    out_file = cool_file_path[:-2] + 'mips'
+
+    try:
+        sp = subprocess.run(['python3', compiler_path, cool_file_path, spim_file, '-icil', '-c'], capture_output=True, timeout=timeout)
+        assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
+    except subprocess.TimeoutExpired:
+        assert False, COMPILER_TIMEOUT
+    
+    ofd = open(out_file, 'r')
+    output = ofd.read()
+    ofd.close()
+
+    fd = open(output_file_path, 'r')
+    eoutput = fd.read()
+    fd.close()
+
+    assert output == eoutput, UNEXPECTED_OUTPUT % (cool_file_path, repr(output), repr(eoutput))
