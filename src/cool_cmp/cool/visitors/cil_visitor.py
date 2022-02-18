@@ -799,7 +799,7 @@ class COOLToCILVisitor():
         
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
         type_node.methods.append(("__init", init_function.name))
-        self.params.append(cil.ParamNode('self',node=node))
+        self.params.append(cil.ParamNode('self',node.row, node.column ,"params node"))
         
         for attr,typex in self.current_type.all_attributes():
             # Defining attribute's init functions
@@ -812,10 +812,10 @@ class COOLToCILVisitor():
             # Calling function in type init function
             self.current_function = init_function
             dest = self.define_internal_local()
-            self.register_instruction(cil.ArgNode('self',node=node))
-            self.register_instruction(cil.StaticCallNode(new_function.name, dest))
+            self.register_instruction(cil.ArgNode('self',node.row, node.column, "arg node"))
+            self.register_instruction(cil.StaticCallNode(new_function.name, dest, node.row, node.column, "static call node"))
 
-        self.register_instruction(cil.ReturnNode('self')) # Returning created instance
+        self.register_instruction(cil.ReturnNode('self',node.row, node.column, "return node")) # Returning created instance
 
         for method,typex in self.current_type.all_methods(): # Register methods  
             if typex != self.current_type:
@@ -849,23 +849,23 @@ class COOLToCILVisitor():
         self.current_method = self.current_type.get_method(node.id, len(node.params))
         
         # Your code here!!! (Handle PARAMS)
-        self.params.append(cil.ParamNode('self'))
+        self.params.append(cil.ParamNode('self',node.row, node.column, "params node"))
         for param in self.current_method.param_names:
-            self.params.append(cil.ParamNode(param))
+            self.params.append(cil.ParamNode(param,node.row, node.column, "params node"))
 
         value = self.visit(node.body, scope)
         
         # Your code here!!! (Handle RETURN)
-        self.register_instruction(cil.ReturnNode(value))
+        self.register_instruction(cil.ReturnNode(value,node.row, node.column, "return node"))
         self.current_method = None
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
-        self.params.append(cil.ParamNode('self'))
+        self.params.append(cil.ParamNode('self',node.row, node.column, "params node"))
         result = self.visit(node.expr, scope)
         attr_offset = self.current_type.get_attribute_index(node.id, self.current_type)
-        self.register_instruction(cil.SetAttribNode("self", node.id, result, attr_offset))
-        self.register_instruction(cil.ReturnNode())
+        self.register_instruction(cil.SetAttribNode("self", node.id, result, attr_offset, node.row, node.column, "set attr node"))
+        self.register_instruction(cil.ReturnNode(row=node.row, column=node.column, comment="return node"))
         return result
     
     @visitor.when(VarDeclarationNode)
@@ -879,7 +879,7 @@ class COOLToCILVisitor():
         local = scope.find_variable(node.id)
         cil_local = self.register_local(local) 
         value = self.visit(node.expr,scope)
-        self.register_instruction(cil.AssignNode(cil_local,value))
+        self.register_instruction(cil.AssignNode(cil_local,value,node.row, node.column, "assign node"))
         return cil_local
 
     @visitor.when(AssignNode)
@@ -891,15 +891,15 @@ class COOLToCILVisitor():
         local = scope.find_variable(node.id)
         value = self.visit(node.expr,scope)
         if hasattr(local,'cil_name'):
-            self.register_instruction(cil.AssignNode(local.cil_name,value))
+            self.register_instruction(cil.AssignNode(local.cil_name,value,node.row, node.column, "assign node"))
             return local.cil_name
         else:
             if any(x for x in self.params if x.name == local.name):
-                self.register_instruction(cil.AssignNode(local.name,value)) # Param
+                self.register_instruction(cil.AssignNode(local.name, value, node.row, node.column, "assing node")) # Param
                 return local.name
             else:
                 attr_offset = self.current_type.get_attribute_index(local.name, self.current_type)
-                self.register_instruction(cil.SetAttribNode('self',local.name, value, attr_offset))
+                self.register_instruction(cil.SetAttribNode('self',local.name, value, attr_offset, node.row, node.column, "set attr node"))
                 # value = self.define_internal_local() # Attr
                 # self.register_instruction(cil.GetAttribNode('self',local.name,value))
                 return value # or self ?
@@ -926,27 +926,27 @@ class COOLToCILVisitor():
             
         result = self.define_internal_local()
         
-        self.register_instruction(cil.ArgNode(obj_value)) # self
+        self.register_instruction(cil.ArgNode(obj_value,node.row,node.column,"arg node")) # self
         for arg,value in zip(method.param_names,args):
-            self.register_instruction(cil.ArgNode(value))
+            self.register_instruction(cil.ArgNode(value,node.row,node.column,"arg node"))
 
         defining_type = None
         if node.at:
             if isinstance(node.at, SelfType):
                 defining_type = node.at.defining_type
-                self.register_instruction(cil.DynamicCallNode(node.at.name, node.id, result, defining_type))
+                self.register_instruction(cil.DynamicCallNode(node.at.name, node.id, result, defining_type, node.row, node.column, "dynamic call node"))
             else:
                 type_node = next(x for x in self.dottypes if x.name == node.at.name)
                 cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
-                self.register_instruction(cil.StaticCallNode(cil_name, result))
+                self.register_instruction(cil.StaticCallNode(cil_name, result, node.row, node.column, "static call node"))
         else:
             if isinstance(node.obj.type, SelfType):
                 defining_type = node.obj.type.defining_type
-                self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result, defining_type))
+                self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result, defining_type, node.row, node.column, "dynamic call node"))
             else:
                 type_node = next(x for x in self.dottypes if x.name == node.obj.type.name)
                 cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
-                self.register_instruction(cil.StaticCallNode(cil_name, result))
+                self.register_instruction(cil.StaticCallNode(cil_name, result, node.row, node.column, "static call node"))
         
         return result
     
@@ -971,22 +971,22 @@ class COOLToCILVisitor():
         value = self.visit(node.expr, scope)
         
         type_value = self.define_internal_local()
-        self.register_instruction(cil.TypeOfNode(value, type_value))
+        self.register_instruction(cil.TypeOfNode(value, type_value, node.row, node.column, "type of node"))
         checks = len(node.params)
         
         array_types = self.define_internal_local()
-        self.register_instruction(cil.ArrayNode(array_types, "Int", str(checks))) # Type Int because at the end all are Ints
+        self.register_instruction(cil.ArrayNode(array_types, "Int", str(checks),node.row, node.column, "array node")) # Type Int because at the end all are Ints
         
         for i,param in enumerate(node.params):
-            self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name))
+            self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name, node.row, node.column, "set index node"))
         
         index = self.define_internal_local()
         minim_index = self.define_internal_local()
         minim = self.define_internal_local()
         distance = self.define_internal_local()
         current_type = self.define_internal_local()
-        self.register_instruction(cil.AssignNode(index, "-1"))
-        self.register_instruction(cil.AssignNode(minim, "-2"))
+        self.register_instruction(cil.AssignNode(index, "-1", node.row, node.column, "assign node"))
+        self.register_instruction(cil.AssignNode(minim, "-2", node.row, node.column, "assign node"))
         
         start_label = self.define_label()
         minim_label = self.define_label()
@@ -997,54 +997,54 @@ class COOLToCILVisitor():
         minim_cond = self.define_internal_local()
         
         self.register_instruction(start_label)
-        self.register_instruction(cil.PlusNode(index, index, "1"))
-        self.register_instruction(cil.EqualNode(stop_for, index, str(checks)))
-        self.register_instruction(cil.GotoIfNode(stop_for, end_label.label))
+        self.register_instruction(cil.PlusNode(index, index, "1", node.row, node.column, "plus node"))
+        self.register_instruction(cil.EqualNode(stop_for, index, str(checks), node.row, node.column, "equal node"))
+        self.register_instruction(cil.GotoIfNode(stop_for, end_label.label, node.row, node.column, "goto if node"))
         
         
-        self.register_instruction(cil.GetIndexNode(array_types, index, current_type))
+        self.register_instruction(cil.GetIndexNode(array_types, index, current_type, node.row, node.column, "get index node"))
         
-        self.register_instruction(cil.ArgNode(type_value))
-        self.register_instruction(cil.ArgNode(current_type))
-        self.register_instruction(cil.StaticCallNode("type_distance", distance))
+        self.register_instruction(cil.ArgNode(type_value, node.row, node.column, "arg node"))
+        self.register_instruction(cil.ArgNode(current_type, node.row, node.column, "arg node"))
+        self.register_instruction(cil.StaticCallNode("type_distance", distance, node.row, node.column, "static call node"))
         
-        self.register_instruction(cil.EqualNode(not_valid_distance, distance, "-1"))
-        self.register_instruction(cil.GotoIfNode(not_valid_distance, start_label.label))
+        self.register_instruction(cil.EqualNode(not_valid_distance, distance, "-1", node.row, node.column, "equal node"))
+        self.register_instruction(cil.GotoIfNode(not_valid_distance, start_label.label, node.row, node.column, "goto if node"))
         
-        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2"))
-        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label))
-        self.register_instruction(cil.GreaterNode(minim_cond, minim, distance))
-        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label))
-        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "equal node"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "goto if node"))
+        self.register_instruction(cil.GreaterNode(minim_cond, minim, distance, node.row, node.column, "greater node"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "goto if node"))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "goto node"))
         
         self.register_instruction(minim_label)
-        self.register_instruction(cil.AssignNode(minim, distance))
-        self.register_instruction(cil.AssignNode(minim_index, index))
+        self.register_instruction(cil.AssignNode(minim, distance, node.row, node.column, "assign node"))
+        self.register_instruction(cil.AssignNode(minim_index, index, node.row, node.column, "assign node"))
         
-        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "goto node"))
         self.register_instruction(end_label)
         
-        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2"))
-        self.register_instruction(cil.GotoIfNode(minim_cond, abort_label.label))
+        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "equal node"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, abort_label.label, node.row, node.column, "goto if node"))
         
-        self.register_instruction(cil.GetIndexNode(array_types, minim_index, current_type))
+        self.register_instruction(cil.GetIndexNode(array_types, minim_index, current_type, node.row, node.column, "get index node"))
         
         final_label = self.define_label()
         not_equal_types = self.define_internal_local()
         end_labels = [self.define_label() for _ in node.params]
         for lbl, param, child_scope in zip(end_labels, node.params, scope.children):
-            self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type))
-            self.register_instruction(cil.NotNode(not_equal_types, not_equal_types))
-            self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label))
+            self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type, node.row, node.column, "equal node"))
+            self.register_instruction(cil.NotNode(not_equal_types, not_equal_types, node.row, node.column, "not node"))
+            self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label, node.row, node.column, "goto if node"))
             
             result = self.visit(param, child_scope)
-            self.register_instruction(cil.AssignNode(value, result))
+            self.register_instruction(cil.AssignNode(value, result, node.row, node.column, "assign node"))
             
-            self.register_instruction(cil.GotoNode(final_label.label))
+            self.register_instruction(cil.GotoNode(final_label.label, node.row, node.column, "goto node"))
             self.register_instruction(lbl)
         
         self.register_instruction(abort_label)
-        self.register_instruction(cil.AbortNode())
+        self.register_instruction(cil.AbortNode(node.row, node.column, "abort node"))
         self.register_instruction(final_label)
                 
         return value
@@ -1054,8 +1054,8 @@ class COOLToCILVisitor():
         result = self.define_internal_local()
         value = self.visit(node.member, scope)
         void_value = self.define_internal_local()
-        self.register_instruction(cil.VoidNode(void_value))
-        self.register_instruction(cil.EqualNode(result, value, void_value))
+        self.register_instruction(cil.VoidNode(void_value, node.row, node.column, "void node"))
+        self.register_instruction(cil.EqualNode(result, value, void_value, node.row, node.column, "equal node"))
         return result 
     
     @visitor.when(ConditionalNode)
@@ -1066,15 +1066,15 @@ class COOLToCILVisitor():
         then_label = self.define_label()
         end_label = self.define_label()
         
-        self.register_instruction(cil.GotoIfNode(condition_value, then_label.label))
+        self.register_instruction(cil.GotoIfNode(condition_value, then_label.label, node.row, node.column, "goto if node"))
         
         else_value = self.visit(node.else_expr, scope)
-        self.register_instruction(cil.AssignNode(result, else_value))
-        self.register_instruction(cil.GotoNode(end_label.label))
+        self.register_instruction(cil.AssignNode(result, else_value, node.row, node.column, "assign node"))
+        self.register_instruction(cil.GotoNode(end_label.label, node.row, node.column, "goto node"))
         
         self.register_instruction(then_label)
         then_value = self.visit(node.then_expr,scope)
-        self.register_instruction(cil.AssignNode(result, then_value))
+        self.register_instruction(cil.AssignNode(result, then_value, node.row, node.column, "assign node"))
         
         self.register_instruction(end_label)
         return result
@@ -1096,13 +1096,13 @@ class COOLToCILVisitor():
         self.register_instruction(start_label)
         condition_result = self.visit(node.condition, scope)
         
-        self.register_instruction(cil.GotoIfNode(condition_result, loop_label.label))
-        self.register_instruction(cil.GotoNode(end_label.label))
+        self.register_instruction(cil.GotoIfNode(condition_result, loop_label.label, node.row, node.column, "goto if node"))
+        self.register_instruction(cil.GotoNode(end_label.label, node.row, node.column, "goto node"))
         
         self.register_instruction(loop_label)
         self.visit(node.expr, scope)
         
-        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "goto node"))
         self.register_instruction(end_label)
         
         return result
@@ -1111,14 +1111,14 @@ class COOLToCILVisitor():
     def visit(self, node, scope):
         result = self.define_internal_local()
         value = self.visit(node.member, scope)
-        self.register_instruction(cil.NotNode(result, value))
+        self.register_instruction(cil.NotNode(result, value, node.row, node.column, "not node"))
         return result
     
     @visitor.when(RoofNode)
     def visit(self, node:RoofNode, scope):
         result = self.define_internal_local()
         value = self.visit(node.member, scope)
-        self.register_instruction(cil.MinusNode(result, "0", value))
+        self.register_instruction(cil.MinusNode(result, "0", value, node.row, node.column, "minus node"))
         return result
     
     @visitor.when(EqualNode)
@@ -1128,7 +1128,7 @@ class COOLToCILVisitor():
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.EqualNode(result, value1, value2))
+        self.register_instruction(cil.EqualNode(result, value1, value2, node.row, node.column, "equal node"))
         
         return result
     
@@ -1139,7 +1139,7 @@ class COOLToCILVisitor():
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.GreaterNode(result, value1, value2))
+        self.register_instruction(cil.GreaterNode(result, value1, value2, node.row, node.column, "greater node"))
         
         return result
     
@@ -1150,8 +1150,8 @@ class COOLToCILVisitor():
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.LesserNode(result, value1, value2))
-        self.register_instruction(cil.NotNode(result, result))
+        self.register_instruction(cil.LesserNode(result, value1, value2, node.row, node.column, "lesser node"))
+        self.register_instruction(cil.NotNode(result, result, node.row, node.column, "not node"))
         
         return result
     
@@ -1162,7 +1162,7 @@ class COOLToCILVisitor():
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.LesserNode(result, value1, value2))
+        self.register_instruction(cil.LesserNode(result, value1, value2, node.row, node.column, "lesser node"))
         
         return result
 
@@ -1173,15 +1173,15 @@ class COOLToCILVisitor():
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.GreaterNode(result, value1, value2))
-        self.register_instruction(cil.NotNode(result, result))
+        self.register_instruction(cil.GreaterNode(result, value1, value2, node.row, node.column, "greater node"))
+        self.register_instruction(cil.NotNode(result, result, node.row, node.column, "not node"))
         
         return result
     
     @visitor.when(VoidNode)
     def visit(self, node, scope):
         result = self.define_internal_local()
-        self.register_instruction(cil.VoidNode(result))
+        self.register_instruction(cil.VoidNode(result, node.row, node.column, "void node"))
         return result
 
     @visitor.when(BoolNode)
@@ -1214,7 +1214,7 @@ class COOLToCILVisitor():
             else:
                 attr_offset = self.current_type.get_attribute_index(node.lex, self.current_type)
                 value = self.define_internal_local() # Attr
-                self.register_instruction(cil.GetAttribNode('self',node.lex, value, attr_offset))
+                self.register_instruction(cil.GetAttribNode('self',node.lex, value, attr_offset, node.row, node.column, "get attr node"))
                 return value
         
     @visitor.when(InstantiateNode)
@@ -1227,17 +1227,17 @@ class COOLToCILVisitor():
         instance = self.define_internal_local()
         instance_typex = self.context.get_type(node.lex, current_type = self.current_type)
         if instance_typex.name == "Void":
-            self.register_instruction(cil.VoidNode(instance))
+            self.register_instruction(cil.VoidNode(instance, node.row, node.column, "void node"))
         elif instance_typex.name == "SELF_TYPE":
             dynamic_type = self.define_internal_local()
-            self.register_instruction(cil.TypeOfNode("self", dynamic_type))
-            self.register_instruction(cil.AllocateNode(dynamic_type, instance))
-            self.register_instruction(cil.ArgNode(instance))
-            self.register_instruction(cil.DynamicCallNode(dynamic_type, "__init", instance, instance_typex.defining_type))
+            self.register_instruction(cil.TypeOfNode("self", dynamic_type, node.row, node.column, "type of node"))
+            self.register_instruction(cil.AllocateNode(dynamic_type, instance, node.row, node.column, "allocate node"))
+            self.register_instruction(cil.ArgNode(instance, node.row, node.column, "arg node"))
+            self.register_instruction(cil.DynamicCallNode(dynamic_type, "__init", instance, instance_typex.defining_type, node.row, node.column, "dynamic call node"))
         else:
-            self.register_instruction(cil.AllocateNode(instance_typex.name, instance))
-            self.register_instruction(cil.ArgNode(instance))
-            self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(instance_typex.name), instance))
+            self.register_instruction(cil.AllocateNode(instance_typex.name, instance, node.row, node.column, "allocate node"))
+            self.register_instruction(cil.ArgNode(instance, node.row, node.column, "arg node"))
+            self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(instance_typex.name), instance, node.row, node.column, "static call node"))
         return instance
         
     @visitor.when(PlusNode)
@@ -1252,7 +1252,7 @@ class COOLToCILVisitor():
         right = self.visit(node.right,scope)
         
         value = self.define_internal_local()
-        self.register_instruction(cil.PlusNode(value,left,right))
+        self.register_instruction(cil.PlusNode(value,left,right,node.row,node.column, "plus node"))
         return value
 
     @visitor.when(MinusNode)
@@ -1267,7 +1267,7 @@ class COOLToCILVisitor():
         right = self.visit(node.right,scope)
         
         value = self.define_internal_local()
-        self.register_instruction(cil.MinusNode(value,left,right))
+        self.register_instruction(cil.MinusNode(value,left,right,node.row,node.column, "minus node"))
         return value
 
     @visitor.when(StarNode)
@@ -1282,7 +1282,7 @@ class COOLToCILVisitor():
         right = self.visit(node.right,scope)
         
         value = self.define_internal_local()
-        self.register_instruction(cil.StarNode(value,left,right))
+        self.register_instruction(cil.StarNode(value,left,right,node.row,node.column, "star node"))
         return value
 
     @visitor.when(DivNode)
@@ -1297,14 +1297,14 @@ class COOLToCILVisitor():
         right = self.visit(node.right,scope)
         
         value = self.define_internal_local()
-        self.register_instruction(cil.DivNode(value,left,right))
+        self.register_instruction(cil.DivNode(value,left,right,node.row,node.column, "div node"))
         return value
         
     @visitor.when(StringNode)
     def visit(self, node, scope):
         value = self.register_data(node.lex)
         result = self.define_internal_local()
-        self.register_instruction(cil.LoadNode(result, value.name))
+        self.register_instruction(cil.LoadNode(result, value.name, node.row, node.column, "load node"))
         return result
         
     @visitor.when(SpecialNode)
@@ -1318,19 +1318,19 @@ class COOLToCILVisitor():
     def visit(self, node, scope=None):
         instance = self.params[0]
         result = self.define_internal_local()
-        self.register_instruction(cil.CopyNode(instance.name, result))
+        self.register_instruction(cil.CopyNode(instance.name, result, node.row, node.column, "copy node"))
         return result
     
     @visitor.when(cil.ObjectAbortNode)
     def visit(self, node, scope=None):
-        self.register_instruction(cil.AbortNode())
+        self.register_instruction(cil.AbortNode(node.row, node.column, "abort node"))
         return "0"
     
     @visitor.when(cil.ObjectTypeNameNode)
     def visit(self, node, scope=None):
         instance = self.params[0]
         result = self.define_internal_local()
-        self.register_instruction(cil.TypeOfNode(instance.name, result))
+        self.register_instruction(cil.TypeOfNode(instance.name, result, node.row, node.column, "type of node"))
         return result
 
     @visitor.when(cil.StringConcatNode)
@@ -1338,14 +1338,14 @@ class COOLToCILVisitor():
         string1 = self.params[0]
         string2 = self.params[1]
         result = self.define_internal_local()
-        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name))
+        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name, node.row, node.column, "concat node"))
         return result
     
     @visitor.when(cil.StringLengthNode)
     def visit(self, node, scope=None):
         string = self.params[0]
         result = self.define_internal_local()
-        self.register_instruction(cil.LengthNode(result, string.name))
+        self.register_instruction(cil.LengthNode(result, string.name, node.row, node.column, "length node"))
         return result
         
     
@@ -1355,31 +1355,31 @@ class COOLToCILVisitor():
         index = self.params[1]
         length = self.params[2]
         result = self.define_internal_local()
-        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name))
+        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name, node.row, node.column, "substring node"))
         return result
     
     @visitor.when(cil.IOInStringNode)
     def visit(self, node, scope=None):
         result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
+        self.register_instruction(cil.ReadNode(result, node.row, node.column, "read node"))
         return result
 
     @visitor.when(cil.IOInIntNode)
     def visit(self, node, scope=None):
         result = self.define_internal_local()
-        self.register_instruction(cil.ReadIntNode(result))
+        self.register_instruction(cil.ReadIntNode(result, node.row, node.column, "read int node"))
         return result
     
     @visitor.when(cil.IOOutIntNode)
     def visit(self, node, scope=None):
         integer = self.params[1]
-        self.register_instruction(cil.PrintIntNode(integer.name))
+        self.register_instruction(cil.PrintIntNode(integer.name, node.row, node.column, "print int node"))
         return "0"
     
     @visitor.when(cil.IOOutStringNode)
     def visit(self, node, scope=None):
         string = self.params[1]
-        self.register_instruction(cil.PrintNode(string.name))
+        self.register_instruction(cil.PrintNode(string.name, node.row, node.column, "print node"))
         return "0"
 
     # ======================================================================
