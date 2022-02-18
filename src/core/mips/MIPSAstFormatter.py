@@ -154,6 +154,11 @@ class MIPSAstFormatter:
         return f'mflo {self.visit(node.dest)}'.ljust(50) + \
                f'#line: {node.line} column: {node.column}'
 
+    @visitor.when(MoveHighNode)
+    def visit(self, node):
+        return f'mfhi {self.visit(node.dest)}'.ljust(50) + \
+               f'#line: {node.line} column: {node.column}'
+
     @visitor.when(ShiftLeftNode)
     def visit(self, node):
         return f'sll {self.visit(node.dest)} {self.visit(node.src)} {self.visit(node.bits)}'.ljust(50) + \

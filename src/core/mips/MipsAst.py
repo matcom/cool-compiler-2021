@@ -122,6 +122,15 @@ class MoveLowNode(InstructionNode):
         super().__init__(line, column)
         self.dest = dest
 
+class MoveHighNode(InstructionNode):
+
+    def __init__(self, dest, line, column):
+        '''
+        Put the content of register Hi into register rsrc.
+        '''
+        super().__init__(line, column)
+        self.dest = dest
+
 
 
 class MultiplyNode(InstructionNode):
