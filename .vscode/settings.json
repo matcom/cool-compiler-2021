@@ -1,7 +1,6 @@
 {
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
-    "editor.tabSize": 2,
     "prettier.useTabs": true,
     "editor.formatOnSave": true
 }

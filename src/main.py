@@ -19,6 +19,9 @@ def main(_input, _output):
         parser.print_error()
         raise Exception()
 
+    
+    ast, errors, context, scope = SemanticAn
+
 
 if __name__ == "__main__":
 
