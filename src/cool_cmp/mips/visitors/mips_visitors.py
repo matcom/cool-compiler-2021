@@ -80,6 +80,10 @@ class MIPSPrintVisitor():
     def visit(self, node:OrNode):
         return f"or {node.result}, {node.first_arg}, {node.second_arg}"
     
+    @visitor.when(NorNode)
+    def visit(self, node:NorNode):
+        return f"nor {node.result}, {node.first_arg}, {node.second_arg}"
+    
     @visitor.when(AndImmediateNode)
     def visit(self, node:AndImmediateNode):
         return f"andi {node.result}, {node.first_arg}, {node.second_arg}"
@@ -158,12 +162,32 @@ class MIPSPrintVisitor():
     
     @visitor.when(SetLessThanNode)
     def visit(self, node:SetLessThanNode):
-        return f"slt {node.first_arg}, {node.second_arg}, {node.result}"
+        return f"slt {node.result}, {node.first_arg}, {node.second_arg}"
+    
+    @visitor.when(SetLessOrEqualThanNode)
+    def visit(self, node:SetLessOrEqualThanNode):
+        return f"sle {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SetLessThanImmediateNode)
     def visit(self, node:SetLessThanNode):
-        return f"slti {node.first_arg}, {node.second_arg}, {node.result}"
+        return f"slti {node.result}, {node.first_arg}, {node.second_arg}"
     
+    @visitor.when(SetGreaterThanNode)
+    def visit(self, node:SetGreaterThanNode):
+        return f"sgt {node.result}, {node.first_arg}, {node.second_arg}"
+    
+    @visitor.when(SetGreaterOrEqualThanNode)
+    def visit(self, node:SetGreaterOrEqualThanNode):
+        return f"sge {node.result}, {node.first_arg}, {node.second_arg}"
+    
+    @visitor.when(SetEqualToNode)
+    def visit(self, node:SetEqualToNode):
+        return f"seq {node.result}, {node.first_arg}, {node.second_arg}"
+    
+    @visitor.when(SetNotEqualToNode)
+    def visit(self, node:SetNotEqualToNode):
+        return f"sne {node.result}, {node.first_arg}, {node.second_arg}"
+
     @visitor.when(JumpNode)
     def visit(self, node:JumpNode):
         return f"j {node.address}"
@@ -399,7 +423,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.ReturnNode)
     def visit(self, node:cil.ReturnNode):
         if node.value:
-            self._store_local_variable(Reg.v(0), node.value)
+            self._load_value(Reg.v(0), node.value)
     
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):
@@ -487,6 +511,24 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.PlusNode)
     def visit(self, node:cil.PlusNode):
         self._binary_operation(node, AddNode, Reg.t(0), Reg.t(1), Reg.t(2))
+
+    @visitor.when(cil.EqualNode)
+    def visit(self, node:cil.EqualNode):
+        self._binary_operation(node, SetEqualToNode, Reg.t(0), Reg.t(1), Reg.t(2))
+
+    @visitor.when(cil.GreaterNode)
+    def visit(self, node:cil.GreaterNode):
+        self._binary_operation(node, SetGreaterThanNode, Reg.t(0), Reg.t(1), Reg.t(2))
+
+    @visitor.when(cil.LesserNode)
+    def visit(self, node:cil.LesserNode):
+        self._binary_operation(node, SetLessThanNode, Reg.t(0), Reg.t(1), Reg.t(2))
+
+    @visitor.when(cil.NotNode)
+    def visit(self, node:cil.NotNode):
+        self._load_value(Reg.t(0), node.value)
+        self.add_instruction(NorNode(Reg.t(0), Reg.t(0), Reg.t(0))) # Not equivalent
+        self._store_local_variable(Reg.t(0), node.dest)
 
     @visitor.when(cil.TypeOfNode)
     def visit(self, node:cil.TypeOfNode):

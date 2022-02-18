@@ -63,6 +63,9 @@ class AndNode(BinaryArithmeticNode):
 class OrNode(BinaryArithmeticNode):
     pass
 
+class NorNode(BinaryArithmeticNode):
+    pass
+
 class AndImmediateNode(BinaryArithmeticNode):
     pass
 
@@ -78,7 +81,22 @@ class ShiftRightNode(BinaryArithmeticNode):
 class SetLessThanNode(BinaryArithmeticNode):
     pass
 
+class SetLessOrEqualThanNode(BinaryArithmeticNode):
+    pass
+
 class SetLessThanImmediateNode(BinaryArithmeticNode):
+    pass
+
+class SetGreaterOrEqualThanNode(BinaryArithmeticNode):
+    pass
+
+class SetGreaterThanNode(BinaryArithmeticNode):
+    pass
+
+class SetEqualToNode(BinaryArithmeticNode):
+    pass
+
+class SetNotEqualToNode(BinaryArithmeticNode):
     pass
 
 class OperationOverflowNode(ArithmeticNode):
