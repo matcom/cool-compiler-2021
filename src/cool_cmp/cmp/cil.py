@@ -8,7 +8,6 @@ class Node:
         self.column = column
         self.comment = comment
         
-
 class ProgramNode(Node):
     def __init__(self, dottypes, dotdata, dotcode, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
@@ -44,6 +43,7 @@ class FunctionNode(Node):
         if self.instructions:
             return self.instructions[-1] if isinstance(self.instructions[-1], ReturnNode) else None
         return None
+
 class ParamNode(Node):
     def __init__(self, name, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
