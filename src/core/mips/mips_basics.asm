@@ -81,6 +81,7 @@ len_end:
 # TODO: Necesita tambien un puntero al indice del substring en a1
 # SUBSTRING
 # a0 Pointer to beginning of string
+# a1 Pointer to beginning of substring
 # a2 Size of substring
 
 
@@ -97,6 +98,7 @@ substr:
     sw $ra 28($sp)
 
     move $t0 $a0                                     # t0 points to beginning o string
+    add $t0 $t0 $a1
     li $t1 4                                         # t1 Word size
 
     div $a2 $t1                                      # Size of substring / wordsize
@@ -113,7 +115,7 @@ substr_allign_size:
 substr_new_block:
     move $a0 $t1                                     # Store in a0 size of space to reserve via malloc
     jal malloc                                       # Malloc
-    move $t3 $a1                                     # Pointer to beginning of reserved space
+    move $t3 $v0                                     # Pointer to beginning of reserved space
     move $t1 $zero                                   # Count
     addu $t0 $t0 $a0                                 # t0 Beginning of string
 
