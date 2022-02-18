@@ -139,7 +139,6 @@ substr_new_block:
     jal malloc                                       # Malloc
     move $t3 $v0                                     # Pointer to beginning of reserved space
     move $t1 $zero                                   # Count
-    addu $t0 $t0 $a0                                 # t0 Beginning of string
 
 substr_copy_loop:
     beq $t1 $a2 substr_end                           # Copy finished
@@ -265,7 +264,6 @@ read_string:
     read_loop_continue:
 
     bne $t0 $t2 null_terminated
-    addiu $t0 $t0 4
     addiu $t2 $t2 4
     null_terminated:
 
