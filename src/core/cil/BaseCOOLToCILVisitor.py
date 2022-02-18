@@ -247,6 +247,7 @@ class BaseCOOLToCILVisitor:
         result = self.define_internal_local(line, column)
         index_value = self.define_internal_local(line, column)
         length_value = self.define_internal_local(line, column)
+        length_wrapper = self.define_internal_local(line, column)
         length_attr = self.define_internal_local(line, column)
         length_substr = self.define_internal_local(line, column)
         less_value = self.define_internal_local(line, column)
@@ -255,7 +256,8 @@ class BaseCOOLToCILVisitor:
         self.register_instruction(cil.GetAttribNode(index_value, i, 'value', 'Int', line, column))
         self.register_instruction(cil.GetAttribNode(length_value, l, 'value', 'Int', line, column))
         # Check Out of range error
-        self.register_instruction(cil.GetAttribNode(length_attr, self_param, 'length', 'String', line, column))
+        self.register_instruction(cil.GetAttribNode(length_wrapper, self_param, 'length', 'String', line, column))
+        self.register_instruction(cil.GetAttribNode(length_attr, length_wrapper, 'value', 'Int', line, column))
         self.register_instruction(cil.PlusNode(length_substr, length_value, index_value, line, column))
         self.register_instruction(cil.LessNode(less_value, length_attr, length_substr, line, column))
         self.register_runtime_error(less_value, 'Substring out of range', line, column)
