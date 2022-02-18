@@ -1,0 +1,129 @@
+.TYPE
+
+type Object{
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+}
+type IO{
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method IO.init ;
+	method IO.out_string ;
+	method IO.out_int ;
+	method IO.in_string ;
+	method IO.in_int ;
+}
+type Int{
+	attribute int ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method Int.init ;
+}
+type Bool{
+	attribute bool ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method Bool.init ;
+}
+type String{
+	attribute len ;
+	attribute str ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method String.init ;
+	method String.length ;
+	method String.concat ;
+	method String.substr ;
+}
+type CellularAutomaton{
+	attribute population_map ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method IO.init ;
+	method IO.out_string ;
+	method IO.out_int ;
+	method IO.in_string ;
+	method IO.in_int ;
+	method CellularAutomaton.init ;
+	method CellularAutomaton.print ;
+	method CellularAutomaton.num_cells ;
+	method CellularAutomaton.cell ;
+	method CellularAutomaton.cell_left_neighbor ;
+	method CellularAutomaton.cell_right_neighbor ;
+	method CellularAutomaton.cell_at_next_evolution ;
+	method CellularAutomaton.evolve ;
+}
+type Main{
+	attribute cells ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method Main.main ;
+}
+
+.DATA
+
+
+.CODE
+
+function main {
+	LOCAL main_add ;
+	LOCAL main_return ;
+	main_add = ALLOCATE Main ;
+	ARG main_add ;
+	main_return = VCALL Main Main.main ;
+	RETURN main_return ;
+}
+function Object.init {
+	PARAM self ;
+	RETURN self ;
+}
+function IO.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function Int.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function Bool.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function String.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function CellularAutomaton.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL IO.init ;
+	RETURN self ;
+}
+function Main.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}

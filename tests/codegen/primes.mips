@@ -1,0 +1,263 @@
+		.data
+string_const0:
+		.word	4
+		.word	6
+		.word	String_disp
+		.word	int_const0
+		.ascii	""
+		.word	-1
+string_const1:
+		.word	4
+		.word	6
+		.word	String_disp
+		.word	int_const1
+		.ascii	"Object"
+		.word	-1
+string_const2:
+		.word	4
+		.word	6
+		.word	String_disp
+		.word	int_const2
+		.ascii	"IO"
+		.word	-1
+string_const3:
+		.word	4
+		.word	6
+		.word	String_disp
+		.word	int_const3
+		.ascii	"Int"
+		.word	-1
+string_const4:
+		.word	4
+		.word	6
+		.word	String_disp
+		.word	int_const4
+		.ascii	"Bool"
+		.word	-1
+string_const5:
+		.word	4
+		.word	6
+		.word	String_disp
+		.word	int_const1
+		.ascii	"String"
+		.word	-1
+string_const6:
+		.word	4
+		.word	6
+		.word	String_disp
+		.word	int_const4
+		.ascii	"Main"
+		.word	-1
+int_const0:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	0
+		.word	-1
+int_const1:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	6
+		.word	-1
+int_const2:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	2
+		.word	-1
+int_const3:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	3
+		.word	-1
+int_const4:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	4
+		.word	-1
+bool_const_0:
+		.word	3
+		.word	4
+		.word	Bool_disp
+		.word	0
+		.word	-1
+bool_const_1:
+		.word	3
+		.word	4
+		.word	Bool_disp
+		.word	1
+		.word	-1
+names_tab:
+		.word	string_const1
+		.word	string_const2
+		.word	string_const3
+		.word	string_const4
+		.word	string_const5
+		.word	string_const6
+Object_disp:
+		.word	Object.init
+		.word	Object.copy
+		.word	Object.abort
+		.word	Object.type_name
+IO_disp:
+		.word	Object.init
+		.word	Object.copy
+		.word	Object.abort
+		.word	Object.type_name
+		.word	IO.init
+		.word	IO.out_string
+		.word	IO.out_int
+		.word	IO.in_string
+		.word	IO.in_int
+Int_disp:
+		.word	Object.init
+		.word	Object.copy
+		.word	Object.abort
+		.word	Object.type_name
+		.word	Int.init
+Bool_disp:
+		.word	Object.init
+		.word	Object.copy
+		.word	Object.abort
+		.word	Object.type_name
+		.word	Bool.init
+String_disp:
+		.word	Object.init
+		.word	Object.copy
+		.word	Object.abort
+		.word	Object.type_name
+		.word	String.init
+		.word	String.length
+		.word	String.concat
+		.word	String.substr
+Main_disp:
+		.word	Object.init
+		.word	Object.copy
+		.word	Object.abort
+		.word	Object.type_name
+		.word	IO.init
+		.word	IO.out_string
+		.word	IO.out_int
+		.word	IO.in_string
+		.word	IO.in_int
+		.word	Main.main
+Object_proto:
+		.word	0
+		.word	3
+		.word	Object_disp
+		.word	-1
+IO_proto:
+		.word	1
+		.word	3
+		.word	IO_disp
+		.word	-1
+Int_proto:
+		.word	2
+		.word	4
+		.word	Int_disp
+		.word	0
+		.word	-1
+Bool_proto:
+		.word	3
+		.word	4
+		.word	Bool_disp
+		.word	0
+		.word	-1
+String_proto:
+		.word	4
+		.word	5
+		.word	String_disp
+		.word	int_const_0
+		.word	0
+		.word	-1
+Main_proto:
+		.word	5
+		.word	8
+		.word	Main_disp
+		.word	int_const_0
+		.word	int_const_0
+		.word	int_const_0
+		.word	int_const_0
+		.word	0
+		.word	-1
+heap:
+		.word	0
+		.text
+main:
+		la   	 $a0 Main_proto
+		jal  	 Object_copy
+		move 	 $a0 $v0		lw    	 $fp 12($sp)
+		lw    	 $ra 8($sp)
+		lw    	 $s0 2($sp)
+		addiu 	 $sp $sp 12
+		jr    	 $ra
+Object.init:
+		addiu 	 $sp $sp -12
+		sw    	 $fp 12($sp)
+		sw    	 $ra 8($sp)
+		sw    	 $s0 4($sp)
+		addiu 	 $fp $fp 4
+		lw    	 $fp 12($sp)
+		lw    	 $ra 8($sp)
+		lw    	 $s0 2($sp)
+		addiu 	 $sp $sp 12
+		jr    	 $ra
+IO.init:
+		addiu 	 $sp $sp -12
+		sw    	 $fp 12($sp)
+		sw    	 $ra 8($sp)
+		sw    	 $s0 4($sp)
+		addiu 	 $fp $fp 4
+		lw    	 $fp 12($sp)
+		lw    	 $ra 8($sp)
+		lw    	 $s0 2($sp)
+		addiu 	 $sp $sp 12
+		jr    	 $ra
+Int.init:
+		addiu 	 $sp $sp -12
+		sw    	 $fp 12($sp)
+		sw    	 $ra 8($sp)
+		sw    	 $s0 4($sp)
+		addiu 	 $fp $fp 4
+		lw    	 $fp 12($sp)
+		lw    	 $ra 8($sp)
+		lw    	 $s0 2($sp)
+		addiu 	 $sp $sp 12
+		jr    	 $ra
+Bool.init:
+		addiu 	 $sp $sp -12
+		sw    	 $fp 12($sp)
+		sw    	 $ra 8($sp)
+		sw    	 $s0 4($sp)
+		addiu 	 $fp $fp 4
+		lw    	 $fp 12($sp)
+		lw    	 $ra 8($sp)
+		lw    	 $s0 2($sp)
+		addiu 	 $sp $sp 12
+		jr    	 $ra
+String.init:
+		addiu 	 $sp $sp -12
+		sw    	 $fp 12($sp)
+		sw    	 $ra 8($sp)
+		sw    	 $s0 4($sp)
+		addiu 	 $fp $fp 4
+		lw    	 $fp 12($sp)
+		lw    	 $ra 8($sp)
+		lw    	 $s0 2($sp)
+		addiu 	 $sp $sp 12
+		jr    	 $ra
+Main.init:
+		addiu 	 $sp $sp -12
+		sw    	 $fp 12($sp)
+		sw    	 $ra 8($sp)
+		sw    	 $s0 4($sp)
+		addiu 	 $fp $fp 4
+		lw    	 $fp 12($sp)
+		lw    	 $ra 8($sp)
+		lw    	 $s0 2($sp)
+		addiu 	 $sp $sp 12
+		jr    	 $ra
+

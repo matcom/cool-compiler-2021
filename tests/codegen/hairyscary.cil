@@ -1,0 +1,222 @@
+.TYPE
+
+type Object{
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+}
+type IO{
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method IO.init ;
+	method IO.out_string ;
+	method IO.out_int ;
+	method IO.in_string ;
+	method IO.in_int ;
+}
+type Int{
+	attribute int ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method Int.init ;
+}
+type Bool{
+	attribute bool ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method Bool.init ;
+}
+type String{
+	attribute len ;
+	attribute str ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method String.init ;
+	method String.length ;
+	method String.concat ;
+	method String.substr ;
+}
+type Foo{
+	attribute h ;
+	attribute g ;
+	attribute i ;
+	attribute a ;
+	attribute b ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method IO.init ;
+	method IO.out_string ;
+	method IO.out_int ;
+	method IO.in_string ;
+	method IO.in_int ;
+	method Bazz.printh ;
+	method Bazz.doh ;
+	method Foo.doh ;
+}
+type Bar{
+	attribute h ;
+	attribute g ;
+	attribute i ;
+	attribute a ;
+	attribute b ;
+	attribute e ;
+	attribute f ;
+	attribute c ;
+	attribute d ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method IO.init ;
+	method IO.out_string ;
+	method IO.out_int ;
+	method IO.in_string ;
+	method IO.in_int ;
+	method Bazz.printh ;
+	method Bazz.doh ;
+	method Foo.doh ;
+}
+type Razz{
+	attribute h ;
+	attribute g ;
+	attribute i ;
+	attribute a ;
+	attribute b ;
+	attribute e ;
+	attribute f ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method IO.init ;
+	method IO.out_string ;
+	method IO.out_int ;
+	method IO.in_string ;
+	method IO.in_int ;
+	method Bazz.printh ;
+	method Bazz.doh ;
+	method Foo.doh ;
+}
+type Bazz{
+	attribute h ;
+	attribute g ;
+	attribute i ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method IO.init ;
+	method IO.out_string ;
+	method IO.out_int ;
+	method IO.in_string ;
+	method IO.in_int ;
+	method Bazz.printh ;
+	method Bazz.doh ;
+}
+type Main{
+	attribute a ;
+	attribute b ;
+	attribute c ;
+	attribute d ;
+	method Object.init ;
+	method Object.copy ;
+	method Object.abort ;
+	method Object.type_name ;
+	method Main.main ;
+}
+
+.DATA
+
+
+.CODE
+
+function main {
+	LOCAL main_add ;
+	LOCAL main_return ;
+	main_add = ALLOCATE Main ;
+	ARG main_add ;
+	main_return = VCALL Main Main.main ;
+	RETURN main_return ;
+}
+function Object.init {
+	PARAM self ;
+	RETURN self ;
+}
+function IO.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function Int.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function Bool.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function String.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	RETURN self ;
+}
+function Foo.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Bazz.init ;
+	SETATTR self a 3 ;
+	SETATTR self b 3 ;
+	RETURN self ;
+}
+function Bar.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Razz.init ;
+	SETATTR self c 3 ;
+	SETATTR self d 3 ;
+	RETURN self ;
+}
+function Razz.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Foo.init ;
+	SETATTR self e 3 ;
+	SETATTR self f 3 ;
+	RETURN self ;
+}
+function Bazz.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL IO.init ;
+	SETATTR self h 3 ;
+	SETATTR self g 3 ;
+	SETATTR self i 3 ;
+	RETURN self ;
+}
+function Main.init {
+	PARAM self ;
+	LOCAL local_0 ;
+	local_0 = CALL Object.init ;
+	SETATTR self a 3 ;
+	SETATTR self b 3 ;
+	SETATTR self c 3 ;
+	SETATTR self d 3 ;
+	RETURN self ;
+}
