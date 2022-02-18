@@ -19,6 +19,10 @@ class ClassDeclarationNode(Node):
         super().__init__()
         self.name = name
         self.features = features
+        if parent:
+            self.parent = parent.value
+            self.parent
+
         self.parent = parent
 
 
