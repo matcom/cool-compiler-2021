@@ -211,7 +211,48 @@ concat_end:
     jr $ra
 
 read_string:
+    addiu $sp $sp -4
+    sw $ra 0($sp)
+
+    move $t0 $v1
+    move $t1 $zero
+    move $t2 $t0
+    li $t3 10
+
+    read_loop:
+
+    li $v0 8
+    move $a0 $t0
+    li $a1 4
+    syscall
+    addiu $t2 $t2 4
+
+    check_newline_loop:
+
+    lb $t1 0($t0)
+    addiu $t0 $t0 1
+
+    beq $t1 $t3 read_loop_continue
+    beq $t0 $t2 check_newline_loop_continue
+    j check_newline_loop
+    check_newline_loop_continue:
+    j read_loop
+
+    read_loop_continue:
+
+    bne $t0 $t2 null_terminated
+    addiu $t0 $t0 4
+    addiu $t2 $t2 4
+    null_terminated:
+
+    move $v0 $v1
+    move $v1 $t0
+
+    lw $ra 0($sp)
+    addiu $sp $sp 4
     jr $ra
+
+
 
 
 # EQUAL STRING
