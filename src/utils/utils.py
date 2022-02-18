@@ -1,6 +1,6 @@
-def find_column(lexer, token):
-    line_start = lexer.lexdata.rfind('\n', 0, token.lexpos)
-    return (token.lexpos - line_start)
+def find_column(text, pos):
+    line_start = text.rfind('\n', 0, pos) + 1
+    return (pos - line_start) + 1
 
 
 class Token:
