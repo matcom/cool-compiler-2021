@@ -1,4 +1,7 @@
-from Utils.errors import AttributeException, MethodException, SemanticException, TypeException
+class TypeException(Exception): pass
+class MethodException(Exception): pass
+class SemanticException(Exception): pass
+class AttributeException(Exception): pass
 
 class Attribute:
     def __init__(self, name, type, expr=None):
@@ -37,7 +40,7 @@ class Type:
         except StopIteration:
             if self.parent is None:
                 raise AttributeException(f'Attribute {name} is not defined in {self.name}.')
-            else: return self.parent.get_attribute(name)
+        return self.parent.get_attribute(name)
 
     def define_attribute(self, name:str, type, expr=None):
         try:
@@ -46,12 +49,11 @@ class Type:
             attribute = Attribute(name, type, expr)
             self.attributes.append(attribute)
             return attribute
-        else:
-            try:
-                self.parent.get_attribute(name)
-            except AttributeException:
-                raise AttributeException(f'Attribute {name} is already defined in {self.name}.')
-            else: raise AttributeException(f'Attribute {name} is an attribute of an inherited class')
+        try:
+            self.parent.get_attribute(name)
+        except AttributeException:
+            raise AttributeException(f'Attribute {name} is already defined in {self.name}.')
+        raise AttributeException(f'Attribute {name} is an attribute of an inherited class')
 
     def get_method(self, name:str):
         try:
@@ -59,11 +61,13 @@ class Type:
         except StopIteration:
             if self.parent is None:
                 raise MethodException(f'Method "{name}" is not defined in {self.name}.')
-            else: return self.parent.get_method(name)
+        return self.parent.get_method(name)
 
     def define_method(self, name:str, param_names:list, param_types:list, return_type):
         if name in (method.name for method in self.methods):
             raise MethodException(f'Method {name} is multiply defined.')
+        elif name == 'main' and self.name == 'Main' and param_names:
+            raise MethodException(f'Method {name} in {self.name} class should no arguments.')
         
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
@@ -92,32 +96,17 @@ class ErrorType(Type):
     def __eq__(self, other):
         return isinstance(other, Type)
 
-class VoidType(Type):
-    def __init__(self):
-        super().__init__('<void>')
-
-    def conforms_to(self, other):
-        return True
-
-    def bypass(self):
-        return True
-
-    def __eq__(self, other):
-        return isinstance(other, Type)
-
 class Context:
     def __init__(self):
         self.types = {}
-        self.basic = ['Object', 'IO', 'Int', 'String', 'Bool']
         self.create_basic()
  
     def create_type(self, name:str, parent=None):
         try:
             self.types[name]
-            if name in self.basic:
+            if name in ['Object', 'IO', 'Int', 'String', 'Bool']:
                 raise TypeException(f'Redefinition of basic class {name}.')
-            else:
-                raise TypeException(f'Class {name} was previously defined.')
+            raise TypeException(f'Class {name} was previously defined.')
         except KeyError:
             type = self.types[name] = Type(name, parent)
             return type
@@ -126,26 +115,32 @@ class Context:
         return self.types[name]
 
     def create_basic(self):
-        Object = self.create_type('Object')
+        Object = self.create_type('Object')          
         Io = self.create_type('IO', Object)
         Int = self.create_type('Int', Object)
-        String = self.create_type('String', Object)
         Bool = self.create_type('Bool', Object)
+        String = self.create_type('String', Object)           
         
+        Object.define_method('init', [], [], Object)
+        Object.define_method('copy', [], [], Object)
         Object.define_method('abort', [], [], Object)
         Object.define_method('type_name', [], [], String)
-        Object.define_method('copy', [], [], Object)
-
+        
+        Io.define_method('init', ['x'], [String], Io)
         Io.define_method('out_string', ['x'], [String], Io)
         Io.define_method('out_int', ['x'], [Int], Io)
         Io.define_method('in_string', [], [], String)
         Io.define_method('in_int', [], [], Int)
-
-        String.define_attribute('len', Int)
-        String.define_attribute('str', String)
+        
+        String.define_method('init', [], [], String)
         String.define_method('length', [], [], Int)
         String.define_method('concat', ['s'], [String], String)
         String.define_method('substr', ['i', 'l'], [Int, Int], String)
 
+        Int.define_method('init', [], [], Int)
+        Bool.define_method('init', [], [], Bool)
+
+        String.define_attribute('len', Int)
+        String.define_attribute('str', String)
         Int.define_attribute('int', Int)
         Bool.define_attribute('bool', Bool)

@@ -1,71 +1,51 @@
 import sys
 
-from ply.lex import lex
-from CIL.cil import CIL
-from MIPS.mips import MIPS
-
-from Parser.parser import Parser
-from Semantic.builder import TypeBuilder
-from Semantic.check import TypeCheck
-from Semantic.collector import Type_Collector
+from Parser import Parser
+from Semantic import *
+from CIL import CIL, cil
+from MIPS import MIPS
 
 def check_errors(errors):
-    if  errors:
-        for e in errors:
-            print(e)
+    if errors: 
+        for error in errors: 
+            print(error)
         exit(1)
 
-def parser(data, errors):
-    parser = Parser(errors)
-    ast = parser(data)
-    check_errors(errors)
-    return ast
-
-def collector(ast, errors):
-    collector = Type_Collector(errors)
-    context = collector.visit(ast)
-    check_errors(errors)
-    return context
-
-def builder(ast, context, errors):
-    builder = TypeBuilder(context, errors)
-    builder.visit(ast)
-    check_errors(errors)
-
-def check(ast, contex, errors):
-    check = TypeCheck(contex, errors)
-    scope = check.visit(ast)
-    check_errors(errors)
-    return scope
-
-def cil(ast, contex, cil_file):
-    cil = CIL(contex)
-    cil_ast = cil.visit(ast)
-    open(cil_file, 'w').write(str(cil_ast))
-    return cil_ast
-
-def mips(ast, output_file):
-    mips = MIPS()
-    code = mips.visit(ast) 
-    open(output_file, 'w').write(code)
-
 def main():
+    #Input and Output files
+    cool_file = sys.argv[1]
+    cil_file = sys.argv[2]
+    mips_file = sys.argv[3]
+
+    # List of the errors
     errors = list()
     
-    input_file = sys.argv[1]
-    output_file = sys.argv[2]
-    cil_file = f'{input_file[:-2]}.cil'
+    # Read a cool file
+    code = open(cool_file, 'r').read()
 
-    data = open(input_file, 'r').read()
+    # Lexer and Parser
+    parser = Parser(errors)
+    ast = parser(code)
+    check_errors(errors)
 
-    ast = parser(data, errors)
-    context = collector(ast, errors)
-    builder(ast, context, errors)
-    scope = check(ast, context, errors)
-    cil_ast = cil(ast, context, cil_file)
-    mips(cil_ast, output_file)
+    # Semantic
+    context = TypeCollector(errors).visit(ast)
+    check_errors(errors)
+    TypeBuilder(context, errors).visit(ast)
+    check_errors(errors)
+    TypeCheck(context, errors).visit(ast)
+    check_errors(errors)
 
-    exit(0) 
+    # Generate code
+    cil = CIL(context).visit(ast)
+    open(cil_file, 'w').write(str(cil))
+
+    mips = MIPS()
+    mips.visit(cil)
+    open(mips_file, 'w').write(str(mips))
+
+    # Check of errors and exit program
+    exit(0)
 
 if __name__=='__main__':
     main()

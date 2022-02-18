@@ -34,7 +34,7 @@ class Scope:
             return next(x for x in locals if x.name == vname)
         except StopIteration:
             variable = self.parent.find_variable(vname, scope_class, current_type, self.index) if self.parent is not None else None
-            if variable is None and current_type.parent is not None and current_type.parent.name is not 'Object':
+            if variable is None and current_type.parent != None and current_type.parent.name != 'Object':
                 variable = scope_class[current_type.parent.name].find_variable(vname, scope_class, current_type.parent)
             return variable
 

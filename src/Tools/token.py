@@ -7,12 +7,6 @@ class Token:
         self.value = token.value
         self.column = Token.find_column(token)
 
-    def __str__(self) -> str:
-        return str(self.value)
-
-    def __repr__(self) -> str:
-        return str(self)
-
     @staticmethod
     def find_column(token):
         line_star = token.lexer.lexdata.rfind('\n', 0, token.lexpos) + 1

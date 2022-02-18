@@ -1,20 +1,21 @@
-import ply.yacc as yacc
-
-from Parser.lexer import Lexer
 from Parser.ast import *
-from Utils.errors import SyntacticErrors
+
+from Lexer import Lexer
+from Tools import SyntacticErrors
+
+import ply.yacc as yacc
 
 class Parser:
     def __init__(self, errors=[]):
         self.errors = errors
         
         self.lexer_errors = []
-        self.parser_errors = []
+        self.parse_errors = []
         
         self.lexer = Lexer(self.lexer_errors)
         self.tokens = self.lexer.tokens
         
-        self.parser = yacc.yacc(module=self)
+        self.parse = yacc.yacc(module=self)
     
     @property
     def precedence(self): 
@@ -237,12 +238,12 @@ class Parser:
     
     def p_error(self, p):
         if not p:
-            self.parser_errors.append(SyntacticErrors(0, 0, 'ERROR at or near "EOF"'))
+            self.parse_errors.append(SyntacticErrors(0, 0, 'ERROR at or near "EOF".'))
         else:
-            self.parser_errors.append(SyntacticErrors(p.value.line, p.value.column, f'ERROR at or near "{p.value.value}"'))     
+            self.parse_errors.append(SyntacticErrors(p.value.line, p.value.column, f'ERROR at or near "{p.value.value}".'))     
 
     def __call__(self, data):
-        ast = self.parser.parse(input=data, lexer=self.lexer.lexer)
-        for error in self.lexer_errors + self.parser_errors:
+        ast = self.parse.parse(input=data, lexer=self.lexer.lexer)
+        for error in self.lexer_errors + self.parse_errors:
             self.errors.append(error)
         return ast

@@ -1,6 +1,9 @@
 class Node:
     pass
 
+class ErrorNode(Node):
+    pass
+
 class ProgramNode(Node):
     def __init__(self, class_list):
         self.class_list = class_list

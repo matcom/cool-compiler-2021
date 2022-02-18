@@ -1,57 +1,50 @@
-import MIPS.ast as mips
-from MIPS.builder import *
-import Utils.visitor as visitor
-
+from MIPS.builder import create_bool, create_disp, create_int, create_proto, create_string
 from CIL.ast import *
+import Tools.visitor as visitor
 
 class MIPS:
     def __init__(self):
         self.data = ''
         self.text = ''
-        self.text_local = ''
-        
-        self.int_data = ''
-        self.string_data = ''
-        self.bool_data = ''
 
-        self.string_const = {}
+        self.int_data = ''
         self.int_const = {}
         
+        self.string_data = ''
+        self.string_const = {}   
+        
+        self.bool_data = ''
         self.bool_const = {
             0:'bool_const_0', 
             1:'bool_const_1'}
-    
-    def __str__(self):
-        data = self.string_data + self.int_data
-        data +=  self.bool_data + self.data
-
-        text = all_init
-        for init in self.functions_init:
-            text += init
-        text += self.text
         
-        return f'\t\t.data\n{data}\n\t\t.text\n{text}'
+    def __str__(self):
+        data = self.string_data \
+            + self.int_data \
+            + self.bool_data \
+            + self.name_tab \
+            + self.disp \
+            + self.proto \
+            + self.data
 
-    def add_data(self, value):
-        self.data += f'{value}'
+        return f'\t\t.data\n{data}\t\t.text\n{self.text}\n'
 
     def add_int_const(self, value=0):
-        name = f'int_const_{len(self.int_const)}'
         try:
             return self.int_const[value]
         except KeyError:
-            tag = self.class_tag['Int']
-            self.int_data += add_int(name, str(self.class_tag['Int']), str(value))
+            name = f'int_const{len(self.int_const)}'
+            self.int_data += create_int(name, self.tag['Int'], value)
             self.int_const[value] = name
             return name
     
     def add_string_const(self, value=''):
-        name = f'string_const_{len(self.string_const)}'
         try:
             return self.string_const[value]
         except KeyError:
-            length = self.add_int_const(len(value))
-            self.string_data += add_string(name, str(self.class_tag['String']), length, value)
+            name = f'string_const{len(self.string_const)}'
+            lenght = self.add_int_const(len(value))
+            self.string_data += create_string(name, self.tag['String'], lenght, value)
             self.string_const[value] = name
             return name
 
@@ -61,90 +54,66 @@ class MIPS:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        self.name_tab = ''
-        self.object_tab = ''
-        self.disp = ''
-        self.proto = ''
-        self.attr_name = {}
-        self.attr_type = {}
-        self.functions_init = []
-        self.class_tag = {type.name:i for i, type in enumerate(node.types)}
+        self.disp = ''                  # Dispatsh of all object
+        self.proto = ''                 # Prototype of all object
+        self.name_tab = 'names_tab:\n'  # Table of all object name
 
-        self.bool_data += add_bool(str(self.class_tag['Bool']), 0)
-        self.bool_data += add_bool(str(self.class_tag['Bool']), 1)
-        self.add_int_const(0)
-        self.add_string_const('')
+        self.tag = {current_type.name : i for i, current_type in enumerate(node.types)}
 
+        # Create Bool default values
+        self.bool_data += create_bool(self.tag['Bool'])
+        
+        # Create Int and String default values
+        self.add_string_const() 
+
+        # Visit Type
         for type in node.types:
             self.visit(type)
 
-        self.add_data('name_tab:\n' + self.name_tab)
-        self.add_data('object_tab:\n' + self.object_tab)
-        self.add_data(self.disp)
-        self.add_data(self.proto)
-        
-        self.cil_string = {}
-        for dat in node.data:
-            self.visit(dat)
-
-        self.text += basic_build
-        
+        # Visit Code
         for code in node.code:
             self.visit(code)
 
-        self.text +=  main
-
-        self.add_data('heap:\n\t\t.word\t0')
-        return str(self)
+        self.data += f'heap:\n\t\t.word\t0\n'
 
     @visitor.when(TypeNode)
     def visit(self, node):
-        self.name_tab += create_name_item(self.add_string_const(node.name))
-        self.object_tab += create_object_item(node.name)
+        self.name_tab += f'\t\t.word\t{self.add_string_const(node.name)}\n'
         self.disp += create_disp(node.name, node.meths)
-        self.proto += create_proto(node.name, self.class_tag[node.name], node.attrs)
-        self.attr_name[node.name] = [attr[0] for attr in node.attrs]
-        self.attr_type[node.name] = [attr[1].name for attr in node.attrs]
+        self.proto += create_proto(node.name, self.tag[node.name], node.attrs)
     
-    @visitor.when(DataNode)
-    def visit(self, node):
-        self.add_string_const(node.value)
-        self.cil_string[node.id] = node.value
-
     @visitor.when(CodeNode)
     def visit(self, node):
-        self.current_type = node.type
-
-        try:
-            self.current_attr_name = self.attr_name[self.current_type]
-            self.current_attr_type = self.attr_type[self.current_type]
-        except KeyError:
-            pass
-
-        self.text_local = ''  
-        for inst in node.instrs:
-            self.visit(inst)
+        self.current_function = node.meth
         
-        if node.id == 'init':
-            self.functions_init.append(call_methodo(node.name, self.text_local))
-        else:
-            self.text += call_methodo(node.name, self.text_local)
-            
+        self.visit(node.meth)
+        for instr in node.instrs:
+            self.visit(instr)
+       
+    @visitor.when(MethodNode)
+    def visit(self, node):
+        self.text += f'{node}:\n'
         
-    @visitor.when(SetAttributeNode)
-    def visit(self, node):
-        i = self.current_attr_name.index(node.value_2)
-        if self.current_attr_type[i] == 'Int':
-            self.text_local += f'        la      $a0 {self.add_int_const(node.value_3)}\n'
-            self.text_local += f'        sw      $a0 {(3+i)*4}($s0)\n'
-        if self.current_attr_type[i] == 'String':
-            temp = self.add_string_const(self.cil_string[node.value_3])
-            self.text_local += f'        la      $a0 {temp}\n'
-            self.text_local += f'        sw      $a0 {(3+i)*4}($s0)\n'
-        if self.current_attr_type[i] == 'Bool':
-            self.text_local += f'        la      $a0 {self.bool_const[node.value_3]}\n'
-            self.text_local += f'        sw      $a0 {(3+i)*4}($s0)\n'
+        if str(node) != 'main':
+            self.text += f'\t\taddiu \t $sp $sp -12\n'
+            self.text += f'\t\tsw    \t $fp 12($sp)\n'
+            self.text += f'\t\tsw    \t $ra 8($sp)\n'
+            self.text += f'\t\tsw    \t $s0 4($sp)\n'
+            self.text += f'\t\taddiu \t $fp $fp 4\n'
 
-    @visitor.when(LoadAddressNode)
+    @visitor.when(AllocateNode)
     def visit(self, node):
-        self.cil_string[node.value_1] = self.cil_string[node.value_2]
+        self.text += f'\t\tla   \t $a0 {node.value_2}_proto\n'
+        self.text += f'\t\tjal  \t Object_copy\n'
+
+    @visitor.when(ArgumentNode)
+    def visit(self, node):
+        self.text += f'\t\tmove \t $a0 $v0'
+
+    @visitor.when(ReturnNode)
+    def visit(self, node):
+        self.text += f'\t\tlw    \t $fp 12($sp)\n'
+        self.text += f'\t\tlw    \t $ra 8($sp)\n'
+        self.text += f'\t\tlw    \t $s0 2($sp)\n'
+        self.text += f'\t\taddiu \t $sp $sp 12\n'
+        self.text += f'\t\tjr    \t $ra\n'

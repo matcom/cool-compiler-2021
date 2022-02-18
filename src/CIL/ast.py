@@ -31,13 +31,29 @@ class TypeNode(Node):
     def __str__(self):
         attr_text = ''
         for attr in self.attrs:
-            attr_text += f'\tattribute {attr[0]} ;\n'
+            attr_text += str(attr)
         
         meth_text = ''
         for meth in self.meths:
-            meth_text += f'\tmethod {meth[0]}:{meth[1]}_{meth[0]} ;\n'
+            meth_text += f'\tmethod {str(meth)} ;\n'
 
         return f'type {self.name}{{\n{attr_text}{meth_text}}}'
+
+class MethodNode(Node):
+    def __init__(self, name, type=None):
+        self.name = name
+        self.type = type
+
+    def __str__(self):
+        return f'{self.type}.{self.name}' if self.type else self.name
+
+class AttributeNode(Node):
+    def __init__(self, name, type):
+        self.name = name 
+        self.type = type
+
+    def __str__(self):
+        return f'\tattribute {self.name} ;\n'
 
 class DataNode(Node):
     def __init__(self, id, value):
@@ -45,37 +61,29 @@ class DataNode(Node):
         self.value = value
 
     def __str__(self):
-        return f'{self.id} = "{self.value}";'
+        return f'{self.id} = "{self.value}" ;\n'
 
 class CodeNode(Node):
-    def __init__(self, type, id, params, locals, instrs, parent=None):
-        self.id = id
-        self.type = type
+    def __init__(self, meth, params, locals, instrs):
+        self.meth = meth
         self.params = params
         self.locals = locals
         self.instrs = instrs
-        self.parent = parent
 
     def __str__(self):
         params_text = ''
         for param in self.params:
-            params_text += f'\t PARAM {param} ;\n'
+            params_text += f'\tPARAM {param} ;\n'
         
         local_text = ''
         for local in self.locals:
-            local_text += f'\t LOCAL {local} ;\n'
+            local_text += f'\tLOCAL {local} ;\n'
 
         instr_text = ''
         for instr in self.instrs:
             instr_text += f'\t{instr}\n'
-
-        if not self.type:
-            self.name = self.id
-        elif self.id == 'init':
-            self.name = f'{self.type}_{self.id}'
-        else:
-            self.name = f'{self.type}.{self.id}'
-        return f'function {self.name} {{\n{params_text}\n{local_text}\n{instr_text}}}\n'
+        
+        return f'function {self.meth} {{\n{params_text}{local_text}{instr_text}}}'
 
 class LocalNode(Node):
     def __init__(self, id):

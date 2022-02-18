@@ -1,8 +1,5 @@
-import Utils.visitor as visitor
-
-from Utils.context import ErrorType
-from Utils.errors import AttributeException, MethodException, SemanticErrors, SemanticException, TypeErrors
-from Parser.ast import ProgramNode, ClassNode, AttributeNode, MethodNode
+from Tools import *
+from Parser.ast import *
 
 class TypeBuilder:
     def __init__(self, context, errors):
@@ -15,13 +12,14 @@ class TypeBuilder:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        self.object_type = self.context.get_type('Object')
+        self.object_type = self.context.types['Object']
+        
         for def_class in node.class_list:
             self.visit(def_class)
 
     @visitor.when(ClassNode)
     def visit(self, node):
-        self.current_type = self.context.get_type(node.type.value)
+        self.current_type = self.context.types[node.type.value]
 
         if node.parent:
             try: 
@@ -36,6 +34,13 @@ class TypeBuilder:
         for feature in node.feature_list:
             self.visit(feature)
 
+        if self.current_type.name == 'Main':
+            try:
+                self.current_type.get_method('main')
+            except MethodException:
+                self.errors.append(SemanticErrors(node.type.line, node.type.column, 'No "main" method in class Main.'))
+
+
     @visitor.when(AttributeNode)
     def visit(self, node):
         try:
@@ -43,7 +48,6 @@ class TypeBuilder:
         except KeyError:
             self.errors.append(TypeErrors(node.type.line, node.type.column, f'Class {node.type.value} of attribute {node.id.value} is undefined.'))
             attr_type = ErrorType()
-
         try:
             self.current_type.define_attribute(node.id.value, attr_type, node.expr)
         except AttributeException as error:
@@ -51,10 +55,8 @@ class TypeBuilder:
 
     @visitor.when(MethodNode)
     def visit(self, node):
-
         param_names = [] 
         param_types = []
-
         for id, type in node.params:
             try:
                 if id.value == 'self':
@@ -105,4 +107,3 @@ class TypeBuilder:
             self.current_type.define_method(node.id.value, param_names, param_types, ret_type)
         except MethodException as error:
             self.errors.append(SemanticErrors(node.id.line, node.id.column, error))
-        
