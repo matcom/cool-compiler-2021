@@ -4,6 +4,7 @@ import cmp.visitor as visitor
 from cmp.semantic import VariableInfo
 from cool.semantic.context import Context
 from cool.error.errors import RunError, ZERO_DIVISION
+from cool.semantic.type import SelfType
 
 class CILPrintVisitor():
     @visitor.on('node')
@@ -121,13 +122,17 @@ class CILPrintVisitor():
     def visit(self, node):
         return f'PRINT {node.str_addr}'
 
-    @visitor.when(cil.ToStrNode)
+    @visitor.when(cil.PrintIntNode)
     def visit(self, node):
-        return f'{node.dest} = TOSTR {node.ivalue}'
+        return f'PRINTINT {node.int_addr}'
 
     @visitor.when(cil.ReadNode)
     def visit(self, node):
         return f'{node.dest} = READ'
+
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node):
+        return f'{node.dest} = READINT'
 
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode):
@@ -200,7 +205,7 @@ class CILRunnerVisitor():
     
     def get_type(self, typex) -> cil.TypeNode:
         if isinstance(typex, dict):
-            return typex["$type"]
+            return typex["__type"]
         try:
             return self.types[typex]
         except KeyError:
@@ -219,7 +224,7 @@ class CILRunnerVisitor():
     def create_type_instance(self, name):
         typex = self.get_type(name)
         return {
-            "$type": typex,
+            "__type": typex,
         }
     
     def get_value(self, source, function_scope):
@@ -269,14 +274,14 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node:cil.ProgramNode):
-        for t in node.dottypes + [cil.TypeNode("$Array", None)]:
+        for t in node.dottypes + [cil.TypeNode("__Array", None)]:
             self.visit(t)
         for t in node.dotdata:
             self.visit(t)
         for t in node.dotcode:
             self.visit(t)
         try:
-            result = self.visit(cil.StaticCallNode("entry", "result"), [], {"result":None})
+            result = self.visit(cil.StaticCallNode("main", "result"), [], {"result":None})
             return result
         except RunError as er:
             self.errors.append(er)
@@ -417,7 +422,7 @@ class CILRunnerVisitor():
         array_type = self.get_dynamic_type(node.type, caller_fun_scope)
         length = self.get_value_int(node.length, caller_fun_scope)
         value = {
-            "$type": self.get_type("$Array"),
+            "__type": self.get_type("__Array"),
             "length": length,
             "items": [None for _ in range(length)]
         }
@@ -457,7 +462,7 @@ class CILRunnerVisitor():
         elif isinstance(value, str):
             self.set_value(node.dest, self.create_type_instance("String"), caller_fun_scope)
         else:
-            self.set_value(node.dest, self.create_type_instance(value["$type"].name), caller_fun_scope)
+            self.set_value(node.dest, self.create_type_instance(value["__type"].name), caller_fun_scope)
         return self.next_instruction()
 
     @visitor.when(cil.GetAttribNode)
@@ -533,12 +538,11 @@ class CILRunnerVisitor():
         value = self.get_value_str(node.str_addr, caller_fun_scope, "PRINT operation undefined with non String type")
         print(value, end="")
         return self.next_instruction()
-
-    @visitor.when(cil.ToStrNode)
+    
+    @visitor.when(cil.PrintIntNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        value = self.get_value_int(node.ivalue, caller_fun_scope, "TOSTR operation undefined with non Int type")
-        value = str(value)
-        self.set_value(node.dest, value, caller_fun_scope)
+        value = self.get_value_int(node.int_addr, caller_fun_scope, "PRINTINT operation undefined with non Int type")
+        print(value, end="")
         return self.next_instruction()
 
     @visitor.when(cil.ReadNode)
@@ -546,6 +550,16 @@ class CILRunnerVisitor():
         value = input()
         self.set_value(node.dest, value, caller_fun_scope)
         return self.next_instruction()
+
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        value = input()
+        try:
+            value = int(value)
+            self.set_value(node.dest, value, caller_fun_scope)
+            return self.next_instruction()
+        except ValueError:
+            raise RunError(f"Readed value {value} isn't an integer")
 
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode, args: list, caller_fun_scope: dict):
@@ -596,9 +610,9 @@ class CILRunnerVisitor():
                 cmp1 = None
                 cmp2 = None
                 if x is not None:
-                    cmp1 = x["$type"].name
+                    cmp1 = x["__type"].name
                 if y is not None:
-                    cmp2 = y["$type"].name
+                    cmp2 = y["__type"].name
                 return cmp1 == cmp2
             else:
                 self.raise_error("OPERATION must have both argument ")
@@ -668,25 +682,39 @@ class COOLToCILVisitor():
         return instruction
     
     def to_init_attr_function_name(self, attr_name, type_name):
-        return f'$init_{attr_name}_at_{type_name}' # Prefixed with $ to avoid collisions
+        return f'__init_{attr_name}_at_{type_name}' # Prefixed with __ to avoid collisions
     
     def to_init_type_function_name(self, type_name):
-        return f"$init_{type_name}_type"
+        return f"__init_{type_name}_type"
     
     def to_function_name(self, method_name, type_name):
         return f'function_{method_name}_at_{type_name}'
     
     def register_function(self, function_name):
+        funcs = [x for x in self.dotcode if isinstance(x, cil.FunctionNode) and x.name == function_name]
+        if len(funcs) > 0:
+            self.dotcode.remove(funcs[0])
+
         function_node = cil.FunctionNode(function_name, [], [], [], [])
         self.dotcode.append(function_node)
         return function_node
     
-    def register_type(self, name, parent):
+    def register_type(self, name, parent=None):
         if parent:
+            for t in self.dottypes:
+                if t.name == name and ((t.parent and parent.name != t.parent.name) or not t.parent):
+                    t.parent = [x for x in self.dottypes if x.name == parent.name][0]
+                    return t
+
             parent = parent.name
-        type_node = cil.TypeNode(name, parent)
-        self.dottypes.append(type_node)
-        return type_node
+
+        if len([x for x in self.dottypes if x.name == name]) == 0:
+            type_node = cil.TypeNode(name, parent)
+            self.dottypes.append(type_node)
+            return type_node
+
+        else:
+            return [x for x in self.dottypes if x.name == name][0]
 
     def register_data(self, value):
         vname = f'data_{len(self.dotdata)}'
@@ -695,7 +723,7 @@ class COOLToCILVisitor():
         return data_node
     
     def create_entry_function(self):
-        self.current_function = self.register_function('entry')
+        self.current_function = self.register_function('main')
         instance = self.define_internal_local()
         result = self.define_internal_local()
         main_method_name = self.to_function_name('main', 'Main')
@@ -740,6 +768,16 @@ class COOLToCILVisitor():
         self.register_instruction(cil.ReturnNode(index))
         
         self.current_function = None
+
+    def create_empty_methods(self, typex, dottype):
+        for m in typex.methods:
+            name = self.to_function_name(m.name, dottype.name)
+            self.register_function(name)
+            if len([x for (_, x) in dottype.methods if x == name]) == 0:
+                dottype.methods.append((m.name, name))
+
+        if typex.parent:
+            self.create_empty_methods(typex.parent, dottype)
         
     @visitor.on('node')
     def visit(self, node):
@@ -754,6 +792,16 @@ class COOLToCILVisitor():
         self.create_entry_function()
         self.create_type_distance_function()
         
+        for type_name, typex in self.context.types.items():
+            if type_name not in ["Error", "Void"]:
+                self.register_type(type_name)
+                self.register_type(type_name, typex.parent)
+
+        for type_name, typex in self.context.types.items():
+            if type_name not in ["Error", "Void"]:
+                this_type = next(x for x in self.dottypes if x.name == type_name)
+                self.create_empty_methods(typex, this_type)
+
         for type_name, typex in self.context.types.items():
             if type_name in self.context.special_types and type_name not in ["Error", "Void"]:
                 self.visit(typex.class_node, typex.class_node.scope)
@@ -776,7 +824,7 @@ class COOLToCILVisitor():
         type_node = self.register_type(self.current_type.name, self.current_type.parent)
         
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
-        type_node.methods.append(("$init", init_function.name))
+        type_node.methods.append(("__init", init_function.name))
         self.params.append(cil.ParamNode('self'))
         
         for attr,typex in self.current_type.all_attributes():
@@ -841,7 +889,8 @@ class COOLToCILVisitor():
     def visit(self, node, scope):
         self.params.append(cil.ParamNode('self'))
         result = self.visit(node.expr, scope)
-        self.register_instruction(cil.SetAttribNode("self", node.id, result))
+        attr_offset = self.current_type.get_attribute_index(node.id, self.current_type)
+        self.register_instruction(cil.SetAttribNode("self", node.id, result, attr_offset))
         self.register_instruction(cil.ReturnNode())
         return result
     
@@ -859,81 +908,6 @@ class COOLToCILVisitor():
         self.register_instruction(cil.AssignNode(cil_local,value))
         return cil_local
 
-    @visitor.when(SpecialNode)
-    def visit(self, node, scope=None):
-        return self.visit(node.cil_node_type(), scope)
-
-    @visitor.when(cil.ObjectCopyNode)
-    def visit(self, node, scope=None):
-        instance = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.CopyNode(instance.name, result))
-        return result
-    
-    @visitor.when(cil.ObjectAbortNode)
-    def visit(self, node, scope=None):
-        self.register_instruction(cil.AbortNode())
-        return "0"
-    
-    @visitor.when(cil.ObjectTypeNameNode)
-    def visit(self, node, scope=None):
-        instance = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.TypeOfNode(instance.name, result))
-        return result
-
-    @visitor.when(cil.StringConcatNode)
-    def visit(self, node, scope=None):
-        string1 = self.params[0]
-        string2 = self.params[1]
-        result = self.define_internal_local()
-        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name))
-        return result
-    
-    @visitor.when(cil.StringLengthNode)
-    def visit(self, node, scope=None):
-        string = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.LengthNode(result, string.name))
-        return result
-        
-    
-    @visitor.when(cil.StringSubstringNode)
-    def visit(self, node, scope=None):
-        string = self.params[0]
-        index = self.params[1]
-        length = self.params[2]
-        result = self.define_internal_local()
-        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name))
-        return result
-    
-    @visitor.when(cil.IOInStringNode)
-    def visit(self, node, scope=None):
-        result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
-        return result
-
-    @visitor.when(cil.IOInIntNode)
-    def visit(self, node, scope=None):
-        result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
-        # TODO Convertir String a Int
-        return result
-    
-    @visitor.when(cil.IOOutIntNode)
-    def visit(self, node, scope=None):
-        integer = self.params[1]
-        string_message = self.define_internal_local()
-        self.register_instruction(cil.ToStrNode(string_message, integer.name))
-        self.register_instruction(cil.PrintNode(string_message))
-        return "0"
-    
-    @visitor.when(cil.IOOutStringNode)
-    def visit(self, node, scope=None):
-        string = self.params[1]
-        self.register_instruction(cil.PrintNode(string.name))
-        return "0"
-
     @visitor.when(AssignNode)
     def visit(self, node, scope):
         ###############################
@@ -950,7 +924,8 @@ class COOLToCILVisitor():
                 self.register_instruction(cil.AssignNode(local.name,value)) # Param
                 return local.name
             else:
-                self.register_instruction(cil.SetAttribNode('self',local.name,value))
+                attr_offset = self.current_type.get_attribute_index(local.name, self.current_type)
+                self.register_instruction(cil.SetAttribNode('self',local.name, value, attr_offset))
                 # value = self.define_internal_local() # Attr
                 # self.register_instruction(cil.GetAttribNode('self',local.name,value))
                 return value # or self ?
@@ -980,11 +955,24 @@ class COOLToCILVisitor():
         self.register_instruction(cil.ArgNode(obj_value)) # self
         for arg,value in zip(method.param_names,args):
             self.register_instruction(cil.ArgNode(value))
-        
+
+        defining_type = None
         if node.at:
-            self.register_instruction(cil.DynamicCallNode(node.at.name, node.id, result))
+            if isinstance(node.at, SelfType):
+                defining_type = node.at.defining_type
+                self.register_instruction(cil.DynamicCallNode(node.at.name, node.id, result, defining_type))
+            else:
+                type_node = next(x for x in self.dottypes if x.name == node.at.name)
+                cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
+                self.register_instruction(cil.StaticCallNode(cil_name, result))
         else:
-            self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result))
+            if isinstance(node.obj.type, SelfType):
+                defining_type = node.obj.type.defining_type
+                self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result, defining_type))
+            else:
+                type_node = next(x for x in self.dottypes if x.name == node.obj.type.name)
+                cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
+                self.register_instruction(cil.StaticCallNode(cil_name, result))
         
         return result
     
@@ -1250,8 +1238,9 @@ class COOLToCILVisitor():
             if any(x for x in self.params if x.name == node.lex):
                 return node.lex # Param
             else:
+                attr_offset = self.current_type.get_attribute_index(node.lex, self.current_type)
                 value = self.define_internal_local() # Attr
-                self.register_instruction(cil.GetAttribNode('self',node.lex, value))
+                self.register_instruction(cil.GetAttribNode('self',node.lex, value, attr_offset))
                 return value
         
     @visitor.when(InstantiateNode)
@@ -1262,7 +1251,7 @@ class COOLToCILVisitor():
         
         # Your code here!!!
         instance = self.define_internal_local()
-        instance_typex = self.context.get_type(node.lex)
+        instance_typex = self.context.get_type(node.lex, current_type = self.current_type)
         if instance_typex.name == "Void":
             self.register_instruction(cil.VoidNode(instance))
         elif instance_typex.name == "SELF_TYPE":
@@ -1270,7 +1259,7 @@ class COOLToCILVisitor():
             self.register_instruction(cil.TypeOfNode("self", dynamic_type))
             self.register_instruction(cil.AllocateNode(dynamic_type, instance))
             self.register_instruction(cil.ArgNode(instance))
-            self.register_instruction(cil.DynamicCallNode(dynamic_type, "$init", instance))
+            self.register_instruction(cil.DynamicCallNode(dynamic_type, "__init", instance, instance_typex.defining_type))
         else:
             self.register_instruction(cil.AllocateNode(instance_typex.name, instance))
             self.register_instruction(cil.ArgNode(instance))
@@ -1344,4 +1333,79 @@ class COOLToCILVisitor():
         self.register_instruction(cil.LoadNode(result, value.name))
         return result
         
+    @visitor.when(SpecialNode)
+    def visit(self, node, scope=None):
+        return self.visit(node.cil_node_type(), scope)
+
+    # META INSTRUCTIONS ONLY USED IN CODE
+    # TRANSLATION THAT DOESN'T BELONG TO CIL'S
+    # INSTRUCTION SET
+    @visitor.when(cil.ObjectCopyNode)
+    def visit(self, node, scope=None):
+        instance = self.params[0]
+        result = self.define_internal_local()
+        self.register_instruction(cil.CopyNode(instance.name, result))
+        return result
+    
+    @visitor.when(cil.ObjectAbortNode)
+    def visit(self, node, scope=None):
+        self.register_instruction(cil.AbortNode())
+        return "0"
+    
+    @visitor.when(cil.ObjectTypeNameNode)
+    def visit(self, node, scope=None):
+        instance = self.params[0]
+        result = self.define_internal_local()
+        self.register_instruction(cil.TypeOfNode(instance.name, result))
+        return result
+
+    @visitor.when(cil.StringConcatNode)
+    def visit(self, node, scope=None):
+        string1 = self.params[0]
+        string2 = self.params[1]
+        result = self.define_internal_local()
+        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name))
+        return result
+    
+    @visitor.when(cil.StringLengthNode)
+    def visit(self, node, scope=None):
+        string = self.params[0]
+        result = self.define_internal_local()
+        self.register_instruction(cil.LengthNode(result, string.name))
+        return result
+        
+    
+    @visitor.when(cil.StringSubstringNode)
+    def visit(self, node, scope=None):
+        string = self.params[0]
+        index = self.params[1]
+        length = self.params[2]
+        result = self.define_internal_local()
+        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name))
+        return result
+    
+    @visitor.when(cil.IOInStringNode)
+    def visit(self, node, scope=None):
+        result = self.define_internal_local()
+        self.register_instruction(cil.ReadNode(result))
+        return result
+
+    @visitor.when(cil.IOInIntNode)
+    def visit(self, node, scope=None):
+        result = self.define_internal_local()
+        self.register_instruction(cil.ReadIntNode(result))
+        return result
+    
+    @visitor.when(cil.IOOutIntNode)
+    def visit(self, node, scope=None):
+        integer = self.params[1]
+        self.register_instruction(cil.PrintIntNode(integer.name))
+        return "0"
+    
+    @visitor.when(cil.IOOutStringNode)
+    def visit(self, node, scope=None):
+        string = self.params[1]
+        self.register_instruction(cil.PrintNode(string.name))
+        return "0"
+
     # ======================================================================

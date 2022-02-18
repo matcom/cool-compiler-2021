@@ -1,0 +1,594 @@
+# Genereted MIPS
+.text
+__get_ra:
+move $v0, $ra
+addi $v0, $v0, 8
+jr $ra
+__copy:
+move $t0, $a0
+lw $t1, 0($t0)
+lw $a0, 4($t1)
+li $v0, 9
+syscall
+move $t1, $a0
+move $t3, $v0
+__start_copy_loop:
+ble $t1, $zero, __end_copy_loop
+lw $t2, 0($t0)
+sw $t2, 0($t3)
+addi $t0, $t0, 4
+addi $t3, $t3, 4
+addi $t1, $t1, -1
+j __start_copy_loop
+__end_copy_loop:
+jr $ra
+main:
+addiu $sp, $sp, -12
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+la $a0, Main
+lw $a0, 4($a0)
+li $v0, 9
+syscall
+sw $v0, 8($fp)
+sw $t0, 8($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal __init_Main_type
+sw $v0, 8($fp)
+sw $t0, 8($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal function_main_at_Main
+sw $v0, 4($fp)
+addi $v0, $zero, 0
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 12
+jr $ra
+type_distance:
+addiu $sp, $sp, -16
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+li $t0, 0
+sw $t0, 0($fp)
+distance_label_0:
+lw $t0, 20($fp)
+sw $t0, 20($fp)
+lw $t0, 0($fp)
+li $t1, 1
+add $t2, $t0, $t1
+sw $t2, 0($fp)
+j distance_label_0
+distance_label_2:
+li $t0, -1
+sw $t0, 0($fp)
+distance_label_1:
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 24
+jr $ra
+__init_Object_type:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+function_abort_at_Object:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+addi $v0, $zero, 10
+syscall
+addi $v0, $zero, 0
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+function_type_name_at_Object:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $t0, 4($fp)
+lw $t0, 0($t0)
+sw $t0, 0($fp)
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+function_copy_at_Object:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $a0, 4($fp)
+jal __copy
+sw $v0, 0($fp)
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+__init_String_type:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+function_length_at_String:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+function_concat_at_String:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 12
+jr $ra
+function_substr_at_String:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 16
+jr $ra
+__init_Bool_type:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+__init_Int_type:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+__init_IO_type:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+function_out_string_at_IO:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $t0, 0($fp)
+addi $v0, $zero, 4
+syscall
+sw $a0, 0($fp)
+addi $v0, $zero, 0
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+function_out_int_at_IO:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $t0, 0($fp)
+addi $v0, $zero, 1
+syscall
+sw $a0, 0($fp)
+addi $v0, $zero, 0
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+function_in_string_at_IO:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+addi $v0, $zero, 8
+li $a1, 1024
+move $a0, $a1
+li $v0, 9
+syscall
+# HERE
+move $a0, $v0
+syscall
+sw $a0, 0($fp)
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+function_in_int_at_IO:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+addi $v0, $zero, 5
+syscall
+sw $v0, 0($fp)
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+__init_A_type:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $t0, 4($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal __init_a_at_A
+sw $v0, 0($fp)
+sw $v0, 4($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+__init_a_at_A:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+function_get_at_A:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+function_get2_at_A:
+addiu $sp, $sp, -8
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $t0, 8($fp)
+lw $t0, 0($t0)
+sw $t0, 4($fp)
+lw $a0, 4($fp)
+lw $a0, 4($a0)
+li $v0, 9
+syscall
+sw $v0, 0($fp)
+sw $t0, 0($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+lw $t0, 4($fp)
+sw $t0, 0($t0)
+sw $t0, 8($t0)
+jal __get_ra
+move $ra, $v0
+jr $t0
+sw $v0, 0($fp)
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 12
+jr $ra
+function_get3_at_A:
+addiu $sp, $sp, -16
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $t0, 16($fp)
+lw $t0, 0($t0)
+sw $t0, 8($fp)
+lw $a0, 8($fp)
+lw $a0, 4($a0)
+li $v0, 9
+syscall
+sw $v0, 4($fp)
+sw $t0, 4($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+lw $t0, 8($fp)
+sw $t0, 0($t0)
+sw $t0, 8($t0)
+jal __get_ra
+move $ra, $v0
+jr $t0
+sw $v0, 4($fp)
+sw $v0, 12($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 20
+jr $ra
+__init_B_type:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $t0, 4($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal __init_a_at_B
+sw $v0, 0($fp)
+sw $v0, 4($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+__init_a_at_B:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+function_get4_at_B:
+addiu $sp, $sp, -4
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $t0, 4($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal function_get3_at_A
+sw $v0, 0($fp)
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 8
+jr $ra
+__init_Main_type:
+addiu $sp, $sp, 0
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+sw $v0, 0($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 4
+jr $ra
+function_main_at_Main:
+addiu $sp, $sp, -52
+move $t0, $sp
+addiu $sp, $sp, -8
+sw $ra, 0($sp)
+sw $fp, 4($sp)
+move $fp, $t0
+la $a0, B
+lw $a0, 4($a0)
+li $v0, 9
+syscall
+sw $v0, 0($fp)
+sw $t0, 0($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal __init_B_type
+sw $v0, 0($fp)
+lw $t0, 0($fp)
+lw $t0, 0($t0)
+sw $t0, 4($fp)
+li $a0, 3
+li $v0, 9
+syscall
+sw $v0, 8($fp)
+li $t0, 0
+lw $t1, 8($fp)
+la $t3, Object
+li $t2, 4
+mul $t2, $t2, $t0
+lw $t1, 0($t1)
+add $t1, $t2, $t1
+sw $t3, 0($t1)
+li $t0, 1
+lw $t1, 8($fp)
+la $t3, A
+li $t2, 4
+mul $t2, $t2, $t0
+lw $t1, 0($t1)
+add $t1, $t2, $t1
+sw $t3, 0($t1)
+li $t0, 2
+lw $t1, 8($fp)
+la $t3, B
+li $t2, 4
+mul $t2, $t2, $t0
+lw $t1, 0($t1)
+add $t1, $t2, $t1
+sw $t3, 0($t1)
+li $t0, -1
+sw $t0, 12($fp)
+li $t0, -2
+sw $t0, 20($fp)
+main_at_Main_label_0:
+lw $t0, 12($fp)
+li $t1, 1
+add $t2, $t0, $t1
+sw $t2, 12($fp)
+lw $t0, 12($fp)
+lw $t1, 8($fp)
+li $t2, 4
+mul $t2, $t2, $t0
+lw $t1, 0($t1)
+add $t1, $t2, $t1
+sw $t1, 28($fp)
+sw $t0, 4($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+sw $t0, 28($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal type_distance
+sw $v0, 24($fp)
+j main_at_Main_label_0
+main_at_Main_label_1:
+lw $t0, 24($fp)
+sw $t0, 20($fp)
+lw $t0, 12($fp)
+sw $t0, 16($fp)
+j main_at_Main_label_0
+main_at_Main_label_2:
+lw $t0, 16($fp)
+lw $t1, 8($fp)
+li $t2, 4
+mul $t2, $t2, $t0
+lw $t1, 0($t1)
+add $t1, $t2, $t1
+sw $t1, 28($fp)
+li $t0, 0
+sw $t0, 0($fp)
+j main_at_Main_label_4
+main_at_Main_label_5:
+li $t0, 1
+sw $t0, 0($fp)
+j main_at_Main_label_4
+main_at_Main_label_6:
+li $t0, 2
+sw $t0, 0($fp)
+j main_at_Main_label_4
+main_at_Main_label_7:
+main_at_Main_label_3:
+addi $v0, $zero, 10
+syscall
+main_at_Main_label_4:
+sw $t0, 52($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+sw $t0, 0($fp)
+addiu $sp, $sp, -4
+sw $t0, 0($sp)
+jal function_out_int_at_IO
+sw $v0, 48($fp)
+sw $v0, 48($fp)
+lw $ra, 0($sp)
+lw $fp, 4($sp)
+addiu $sp, $sp, 8
+addiu $sp, $sp, 56
+jr $ra
+.data
+Object: .word 0, 4, __init_Object_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
+String: .word Object, 4, __init_String_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_length_at_String, function_concat_at_String, function_substr_at_String
+Bool: .word Object, 4, __init_Bool_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
+Int: .word Object, 4, __init_Int_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
+IO: .word Object, 4, __init_IO_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO
+A: .word Object, 8, __init_A_type, __init_a_at_A, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_get_at_A, function_get2_at_A, function_get3_at_A
+B: .word A, 8, __init_B_type, __init_a_at_B, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_get_at_A, function_get2_at_A, function_get3_at_A, function_get4_at_B
+Main: .word IO, 4, __init_Main_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, function_main_at_Main

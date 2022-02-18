@@ -1,3 +1,4 @@
+from typing import Optional
 import cmp.visitor as visitor
 
 
@@ -29,7 +30,12 @@ class FunctionNode(Node):
         self.localvars = localvars
         self.instructions = instructions
         self.labels = labels
-
+        
+    @property
+    def return_instruction(self) -> 'Optional[ReturnNode]':
+        if self.instructions:
+            return self.instructions[-1] if isinstance(self.instructions[-1], ReturnNode) else None
+        return None
 class ParamNode(Node):
     def __init__(self, name):
         self.name = name
@@ -65,16 +71,18 @@ class DivNode(ArithmeticNode):
     pass
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, source, attr, dest):
+    def __init__(self, source, attr, dest, attribute_index):
         self.source = source
         self.attr = attr
         self.dest = dest
+        self.attribute_index = attribute_index
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, source, attr, value):
+    def __init__(self, source, attr, value, attribute_index):
         self.source = source
         self.attr = attr
         self.value = value
+        self.attribute_index = attribute_index
 
 class GetIndexNode(InstructionNode):
     def __init__(self, source, index, dest):
@@ -124,10 +132,11 @@ class StaticCallNode(InstructionNode):
         self.dest = dest
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
+    def __init__(self, xtype, method, dest, base_type=None):
         self.type = xtype
         self.method = method
         self.dest = dest
+        self.base_type = base_type # Needed for SELF_TYPE handling. Is the Type where the SELF_TYPE was defined
 
 class ArgNode(InstructionNode):
     def __init__(self, name):
@@ -163,18 +172,21 @@ class SubstringNode(InstructionNode):
         self.index = index
         self.length = length
 
-class ToStrNode(InstructionNode):
-    def __init__(self, dest, ivalue):
-        self.dest = dest
-        self.ivalue = ivalue
-
 class ReadNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
+class ReadIntNode(InstructionNode):
     def __init__(self, dest):
         self.dest = dest
 
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+class PrintIntNode(InstructionNode):
+    def __init__(self, int_addr):
+        self.int_addr = int_addr
 
 class AbortNode(InstructionNode):
     pass

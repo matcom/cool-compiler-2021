@@ -1,0 +1,27 @@
+.text
+
+get_ra:
+    move 	$v0, $ra		# $v0 = $ra
+    addi	$v0, $v0, 8			# $v0 = v0 + 8
+    jr		$ra					# jump to $ra
+    
+
+print_msg:
+    li		$v0, 4		# system call #4 - print string
+    la		$a0, msg
+    syscall				# execute
+    jr		$ra					# jump to $ra
+    
+
+main:
+    la		$t2, print_msg		# 
+    jal		get_ra				# jump to get_ra and save position to $ra
+    move 	$ra, $v0		# $ra = $v0
+    jr		$t2					# jump to $v0
+    jal		print_msg				# jump to print_msg and save position to $ra
+    addi $v0, $zero, 10
+    syscall
+
+.data
+
+msg: .asciiz "Hello World!"

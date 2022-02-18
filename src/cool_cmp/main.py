@@ -2,7 +2,8 @@
 # base_dir = os.path.dirname(__file__)
 # sys.path.append(os.path.join(base_dir, ".."))
 
-from cool.pipeline import cool_pipeline, generate_cool_pipeline, interprete_cil_pipeline, interprete_cool_pipeline, generate_cil_pipeline
+from cool.pipeline import cool_pipeline, generate_cool_pipeline, interprete_cil_pipeline,\
+                          interprete_cool_pipeline, generate_cil_pipeline, generate_mips_pipeline
 from cool.grammar.cool_grammar import G
 from cool.parser.cool_parser import save_parser,cool_parser_path, cool_parser
 from cool.lexer.cool_lexer import save_lexer,cool_lexer_path, cool_tokens_def
@@ -17,6 +18,7 @@ def main(
     output_dir:("Path for the compiled mips", "positional"),
     out_infer:("Creates a file containing the inferred types", 'flag', 'i'),
     out_cil:("Creates a file containing the generated CIL code", 'flag', 'c'),
+    out_mips:("Creates a file containing the generated MIPS code", 'flag', 'm'),
     run_cil:("Run interpreter on the generated CIL code", 'flag', 'icil'),
     run_cool:("Run interpreter on the COOL code", 'flag', 'icool'),
     verbose:("Print more info", 'flag', 'v'),
@@ -69,9 +71,11 @@ def main(
         result = interprete_cil_pipeline(file_content, verbose=verbose)
     elif out_cil:
         result = generate_cil_pipeline(file_content, verbose=verbose)
+    elif out_mips:
+        result = generate_mips_pipeline(file_content, verbose=verbose)
     else:
         result = cool_pipeline(file_content,verbose=verbose)
-    ast, g_errors, parse, tokens, context, scope, operator, value, reconstr, cil_text, cil_value = [result.get(x, None) for x in ["ast", "errors", "text_parse", "text_tokens", "context", "scope", "operator", "value", "reconstructed_text", "cil_text", "cil_value"]] 
+    ast, g_errors, parse, tokens, context, scope, operator, value, reconstr, cil_text, cil_value, mips_text = [result.get(x, None) for x in ["ast", "errors", "text_parse", "text_tokens", "context", "scope", "operator", "value", "reconstructed_text", "cil_text", "cil_value", "mips_text"]] 
     
     if reconstr and out_infer:
         with open(program_dir + ".infer.cl", "w") as file:
@@ -81,7 +85,9 @@ def main(
         with open(program_dir + ".cil", "w") as file:
             file.write(cil_text)
             
-    
+    if mips_text and out_mips:
+        with open(program_dir + ".mips", "w") as file:
+            file.write(mips_text)
     
     if g_errors:
         for err in g_errors:

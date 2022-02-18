@@ -10,12 +10,12 @@ class Context(DeprecatedContext):
         for name in self.special_types:
             self.types[name] = self.special_types[name]()
     
-    def get_type(self, name:str,self_type=None):
+    def get_type(self, name:str,self_type=None,current_type=None):
         if name == 'SELF_TYPE':
             if self_type:
                 name = self_type.name
             else:
-                return SelfType()
+                return SelfType(current_type)
                 # raise TypeError('Wrong argument combination: name is "SELF_TYPE" and no self_type given')
         elif name == 'AUTO_TYPE':
             return AutoType(self)

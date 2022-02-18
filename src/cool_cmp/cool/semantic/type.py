@@ -4,7 +4,7 @@ from cmp.semantic import SemanticError as DeprecatedSemanticError
 from cool.ast.cool_ast import VoidNode,ConstantNumNode,StringNode,BoolNode,SpecialNode,InstantiateNode
 import cool.ast.cil_ast as cil
 from cool.semantic.atomic import ClassInstance
-from cool.error.errors import RunError, SemanticError, TypeCoolError, InferError, \
+from cool.error.errors import CoolError, RunError, SemanticError, TypeCoolError, InferError, \
     VOID_TYPE_CONFORMS, METHOD_NOT_DEFINED, METHOD_ALREADY_DEFINED, \
     SUBSTR_OUT_RANGE, ATTRIBUTE_NOT_DEFINED, ATTRIBUTE_ALREADY_DEFINED, \
     ATTRIBUTE_CANT_INFER, METHOD_CANT_INFER, TYPE_CANT_INFER, TYPE_CANT_BE_INHERITED, \
@@ -122,7 +122,14 @@ class Type(DeprecatedType):
             if common in other_types:
                 return common
         raise TypeCoolError(NO_COMMON_TYPE, self.name, other.name)
-        
+    
+    def get_attribute_index(self, attribute_name, current_type):
+        self = self if not isinstance(self,SelfType) else current_type
+        for i,(x,_) in enumerate(self.all_attributes()):
+            if x.name == attribute_name:
+                return i
+        raise CoolError(f"Attribute {attribute_name} defined at type {self.name}")
+
     @property
     def can_have_children(self):
         return True
@@ -161,7 +168,8 @@ class ObjectType(Type):
 
 class SelfType(Type):
     
-    def __init__(self):
+    def __init__(self, defining_type):
+        self.defining_type = defining_type
         Type.__init__(self, 'SELF_TYPE')
     
     @property

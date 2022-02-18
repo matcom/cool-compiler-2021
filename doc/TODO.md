@@ -7,3 +7,4 @@
 [ ] Arreglar los test hechos por nosotros del proyecto
 [ ] Ver si la dicotomia entre el valor de las variables y lo que apunta el valor de las varibles en CIL influye en la generación luego
 [ ] VERIFICAR LOS TODOS que hay por ahí
+[ ] Borrar los archivos innecesarios en doc antes de submit
