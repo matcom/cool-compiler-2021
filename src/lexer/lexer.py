@@ -20,8 +20,6 @@ class CoolLexer:
         self.lexer.linestart = 0
         self.text = None
 
-
-
     # Comments
 
     def t_comment(self, t):
