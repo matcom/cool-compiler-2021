@@ -216,13 +216,13 @@ class CoolLexer:
         self.compute_column(t)
         return t
 
-    def t_LESS(self, t):
-        r'<'
+    def t_LESSEQ(self, t):
+        r'<='
         self.compute_column(t)
         return t
 
-    def t_LESSEQ(self, t):
-        r'<='
+    def t_LESS(self, t):
+        r'<'
         self.compute_column(t)
         return t
 

@@ -160,6 +160,7 @@ class CoolParser:
         elif p[2] == '=':
             p[0] = EqualNode(p[1], p[3])
 
+
         p[0].add_line_column(p.lineno(0), find_column(
             p.lexer.lexdata, p.lexpos(0)))
 
