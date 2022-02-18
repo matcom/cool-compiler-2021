@@ -5,7 +5,7 @@ from parser_automatons import (
 )
 from methods import compute_firsts, compute_local_first, compute_follows
 from cmp.automata import State
-from errors import shift_reduce_error, invalid_sentence_error
+from errors import shift_reduce_error, invalid_sentence_error, SyntacticError
 
 
 class ShiftReduceParser:
@@ -13,12 +13,13 @@ class ShiftReduceParser:
     REDUCE = "REDUCE"
     OK = "OK"
 
-    def __init__(self, G, verbose=False):
+    def __init__(self, G, errors, verbose=False):
         self.G = G
         self.verbose = verbose
         self.action = {}
         self.goto = {}
         self.automaton = self._build_parsing_table()
+        self.errors = errors
 
     def _build_parsing_table(self):
         raise NotImplementedError()
@@ -40,15 +41,14 @@ class ShiftReduceParser:
                 action, tag = self.action[state, lookahead]
 
             except KeyError:
-                raise invalid_sentence_error(
-                    w,
-                    cursor,
-                    lookahead,
-                    None,
-                    "No transition available. Sentence given does not belong to the grammar",
-                    output,
-                    operations,
+                self.errors.append(
+                    SyntacticError(
+                        cursor,
+                        0,
+                        "No transition available. Sentence given does not belong to the grammar",
+                    )
                 )
+                return output, operations
             # Exception(
             #         "No transition available"
             #     )  # string does not belong to this grammar
@@ -72,25 +72,24 @@ class ShiftReduceParser:
                 return output, operations
             # Invalid case
             else:
-                raise invalid_sentence_error(
-                    w,
-                    cursor,
-                    lookahead,
-                    None,
-                    "Invalid case. Sentence given does not belong to the grammar",
+                self.errors.append(
+                    SyntacticError(
+                        cursor,
+                        0,
+                        "Invalid case. Sentence given does not belong to the grammar",
+                    )
                 )
-                # raise Exception("Invalid case")
-                # break
+                return output, operations
 
             if cursor >= len(w):  # or not stack
-                raise invalid_sentence_error(
-                    w,
-                    cursor - 1,
-                    lookahead,
-                    None,
-                    "Exceed word length while looking for a viable derivation. Sentence given does not belong to the grammar",
+                self.errors.append(
+                    SyntacticError(
+                        cursor - 1,
+                        0,
+                        "Exceed word length while looking for a viable derivation. Sentence given does not belong to the grammar",
+                    )
                 )
-            # raise Exception("Invalid sentence")
+                return output, operations
 
 
 class SLR1Parser(ShiftReduceParser):

@@ -49,11 +49,12 @@ class TypeCollector(object):
 
         copy_visitor = CopyVisitor()
         newAst = copy_visitor.visit(node)
+        newAst.context = self.context
 
-        newAst.context = self.context.copy()
+        # Reset state
         self.context = None
-        # TODO: self.errors tambien deberia volver a su estado inicial
-        # devolver (newAst,errors) ???
+        self.errors = None
+
         return newAst
 
     @visitor.when(ClassDeclarationNode)

@@ -41,23 +41,29 @@ def pipeline(input_file: Path, output_file: Path = None):
     # define grammar
     grammar, idx, string, num = define_cool_grammar()
 
-    tokens = tokenize_cool_text(grammar, idx, string, num, text)
-    parser = LR1Parser(grammar)
+    tokens = tokenize_cool_text(grammar, idx, string, num, text, errors)
+    if len(errors) > 0:
+        report_and_exit(errors)
+    parser = LR1Parser(grammar, errors)
+
+    if len(errors) > 0:
+        report_and_exit(errors)
+
     parse, operations = parser([t.token_type for t in tokens])
 
     ast = evaluate_reverse_parse(parse, operations, tokens)
     # formatter = FormatVisitorST()
     # tree = formatter.visit(ast)
 
-    visitors = [TypeCollector(errors), TypeBuilder(errors), TypeChecker(errors)]
+    visitors = [TypeCollector(errors), TypeBuilder(errors)]
     for visitor in visitors:
         ast = visitor.visit(ast)
 
     if len(errors) > 0:
         report_and_exit(errors)
 
-    if output is None:
-        output = input.with_suffix(".mips")
+    if output_file is None:
+        output_file = input.with_suffix(".mips")
 
 
 if __name__ == "__main__":

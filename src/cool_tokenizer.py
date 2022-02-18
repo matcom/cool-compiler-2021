@@ -36,7 +36,3 @@ def pprint_tokens(tokens):
             if token.lex == "{":
                 indent += 1
     print(" ".join([str(t.token_type) for t in pending]))
-
-
-# if __name__ == "__main__":
-#     pprint_tokens(tokens)

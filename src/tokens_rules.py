@@ -1,7 +1,13 @@
 # https://www.dabeaz.com/ply/ply.html
 # file for PLY rules
 
-from errors import tokenizer_error
+from errors import (
+    tokenizer_error,
+    LexicographicError,
+    UnexpectedCharError,
+    UnexpectedEOFError,
+    UnexpectedTokenError,
+)
 
 
 # def find_column(input, lexpos):
@@ -97,14 +103,21 @@ def t_comments_clsymb(t):
 
 # For bad characters. In this case we just skip over everything but (* or *)
 def t_comments_error(t):
+    # t.lexer.errors.append(
+    #     LexicographicError(
+    #         t.lexer.lineno,
+    #         0,
+    #         "Illegal character inside comment",
+    #     )
+    # )
     t.lexer.skip(1)
 
 
 # EOF handling rule
 def t_comments_eof(t):
     if t.lexer.level > 0:  # guardar este error y actuar acorde
-        print(f"code_start{t.lexer.code_start}")
-        raise tokenizer_error("Comments can not cross file boundaries", t.lexer.lineno)
+        # print(f"code_start{t.lexer.code_start}")
+        t.lexer.errors.append(LexicographicError(t.lexer.lineno, 0, "EOF in comment"))
     return None
 
 
@@ -139,7 +152,6 @@ def t_string(t):
     initial = t.lexer.lexpos
     index = t.lexer.lexpos
     final = len(text)
-
     while index < final and text[index] != '"':
         if text[index] == "\\":
             if text[index + 1] in ["t", "b", "f", "n"]:
@@ -150,10 +162,14 @@ def t_string(t):
                 string_list.append("\n")
             elif text[index + 1] == "0":  # null character \0 is not allowed
                 # print("Illegal character \\0 inside string")  # do something about it
-                raise tokenizer_error(
-                    "Illegal character \\0 inside string",
-                    t.lexer.lineno + text[initial : index + 1].count("\n"),
+                t.lexer.errors.append(
+                    LexicographicError(
+                        t.lexer.lineno + text[initial : index + 1].count("\n"),
+                        0,
+                        "Illegal character \\0 inside string",
+                    )
                 )
+                return t
             else:
                 string_list.append(
                     text[index : index + 2]
@@ -163,11 +179,16 @@ def t_string(t):
 
         elif text[index] == "\n":  # \n whithout and extra \ is not allowed
             # print("Illegal character \\n inside string")  # do something about it
-            raise tokenizer_error(
-                "Illegal character \\n inside string",
-                t.lexer.lineno + text[initial : index + 1].count("\n"),
+            t.lexer.errors.append(
+                LexicographicError(
+                    t.lexer.lineno + text[initial : index + 1].count("\n"),
+                    0,
+                    "Illegal character \\n inside string",
+                )
             )
             index += 1
+            return t
+
         else:
             string_list.append(text[index])
             # string_to_append += text[index + 1]
@@ -175,10 +196,14 @@ def t_string(t):
 
     if index == final:
         # print("String may not cross file boundaries")  # do something about it
-        raise tokenizer_error(
-            "String may not cross file boundaries",
-            t.lexer.lineno + text[initial : index + 1].count("\n"),
+        t.lexer.errors.append(
+            LexicographicError(
+                t.lexer.lineno + text[initial : index + 1].count("\n"),
+                0,
+                "String may not cross file boundaries",
+            )
         )
+        return t
     else:
         index += 1
 
@@ -208,5 +233,11 @@ t_ignore = " \t"
 
 # Error handling rule
 def t_error(t):
-    raise tokenizer_error(f"Illegal character {t.value[0]}", t.lexer.lineno)
+    t.lexer.errors.append(
+        LexicographicError(
+            t.lexer.lineno,
+            0,
+            f"ERROR {t.value[0]}",
+        )
+    )
     t.lexer.skip(1)

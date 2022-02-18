@@ -365,8 +365,7 @@ class CopyVisitor(object):
         declarations = []
         for child in node.declarations:
             declarations.append(self.visit(child))
-        context = node.context.copy()
-        return ProgramNode(declarations, context)
+        return ProgramNode(declarations)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
@@ -412,7 +411,7 @@ class CopyVisitor(object):
         for arg in node.args:
             args.append(self.visit(arg))
 
-        return CallNode(node.idx, args, obj, node.at_type)
+        return CallNode(node.id, args, obj, node.at_type)
 
     @visitor.when(BlockNode)
     def visit(self, node):
@@ -453,7 +452,7 @@ class CopyVisitor(object):
     @visitor.when(CaseItemNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        return CaseItemNode(node.idx, node.type, expr)
+        return CaseItemNode(node.id, node.type, expr)
 
     @visitor.when(PlusNode)
     def visit(self, node):

@@ -1,3 +1,4 @@
+import copy
 from cmp.semantic import SemanticError
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import VoidType, IntType, ErrorType, StringType, BoolType
@@ -26,7 +27,7 @@ class TypeBuilder:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        self.context = node.context.copy()
+        self.context = copy.copy(node.context)
 
         io_type = self.context.get_type("IO")
         self_type = self.context.get_type("SELF_TYPE")
@@ -152,10 +153,12 @@ class TypeBuilder:
 
         copy_visitor = CopyVisitor()
         newAst = copy_visitor.visit(node)
-        newAst.context = self.context.copy()
+        newAst.context = self.context
 
+        # Reset state
         self.context = None
         self.current_type = None
+        self.errors = None
 
         return newAst
 
