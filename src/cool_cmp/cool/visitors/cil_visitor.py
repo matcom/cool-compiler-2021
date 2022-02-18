@@ -771,7 +771,7 @@ class COOLToCILVisitor():
 
     def create_empty_methods(self, typex, dottype):
         for m in typex.methods:
-            name = self.to_function_name(m.name, dottype.name)
+            name = self.to_function_name(m.name, typex.name)
             self.register_function(name)
             if len([x for (_, x) in dottype.methods if x == name]) == 0:
                 dottype.methods.append((m.name, name))
