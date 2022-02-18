@@ -11,9 +11,31 @@
 
 #TODO Parametros en la pila
 malloc:
-    move $v0 $v1
-    add $v1 $a0 $v1
+    addiu $sp $sp -12                                # Save content of registers in sp
+    sw $a0 0($sp)
+    sw $t1 4($sp)
+    sw $t2 8($sp)
 
+    li $t1 4
+    div $a0 $t1                                      # Size of string / wordsize
+    mfhi $t2                                         # t2 holds remainder of division
+
+    bne $t2 $zero malloc_allign_size
+    move $t1 $a0
+    j malloc_end
+
+malloc_allign_size:
+    sub $t1 $t1 $t2                                  # Convert t1 to multiple of 4
+    add $t1 $t1 $a0
+
+malloc_end:
+    move $v0 $v1
+    add $v1 $t1 $v1
+
+    lw $a0 0($sp)                                    # Return original content to registers
+    lw $t1 4($sp)
+    lw $t2 8($sp)
+    addiu $sp $sp 12
     jr $ra
 
 
