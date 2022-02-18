@@ -581,6 +581,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(JumpAndLinkNode("__copy"))
         self._store_local_variable(Reg.v(0), node.result)
     
+    @visitor.when(cil.VoidNode)
+    def visit(self, node:cil.VoidNode):
+        self._store_local_variable(Reg.zero(), node.dest)
+
     @visitor.when(cil.GotoNode)
     def visit(self, node:cil.GotoNode):
         self.add_instruction(JumpNode(node.label))
