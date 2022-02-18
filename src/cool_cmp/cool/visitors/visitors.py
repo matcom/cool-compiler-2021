@@ -531,6 +531,9 @@ class TypeChecker:
                 node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
             else:
                 return # No default expr can be assing at this moment
+        
+        scope.define_variable(node.id,node.type)
+        
         a_scope = scope.create_child()
         self.visit(node.expr,a_scope)
         
@@ -594,25 +597,20 @@ class TypeChecker:
                 er = TypeCoolError(LET_BOUND_TYPE_NOT_DEFINED, node.type, node.id)
             node.type = ErrorType()
             self.add_semantic_error(er, node.row, node.column)
-        if not node.expr:
-            if node.type.name != "AUTO_TYPE":
-                node.expr = node.type.default
-                node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
-            else:
-                if scope.is_local(node.id):
-                    er = SemanticError(LOCAL_ALREADY_DEFINED, node.id, self.current_method.name)
-                    self.add_semantic_error(er, node.row, node.column)
-                else:
-                    scope.define_variable(node.id,node.type)
-                return # No default expr can be assing at this moment
+        if not node.expr and node.type.name != "AUTO_TYPE":
+            node.expr = node.type.default
+            node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
 
-        self.visit(node.expr,scope)
-        
         if scope.is_local(node.id):
             er = SemanticError(LOCAL_ALREADY_DEFINED, node.id, self.current_method.name)
             self.add_semantic_error(er, node.row, node.column)
         else:
             scope.define_variable(node.id,node.type)
+
+        if not node.expr and node.type.name == "AUTO_TYPE":
+            return # No default expr can be assing at this moment
+
+        self.visit(node.expr,scope)
         
         if not node.expr.type.conforms_to(node.type,self.current_type):
             er = TypeCoolError(INCOMPATIBLE_TYPES, node.expr.type.name, node.id, node.type.name)

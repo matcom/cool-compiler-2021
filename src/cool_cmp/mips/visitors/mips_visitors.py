@@ -615,10 +615,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.ReadNode)
     def visit(self, node:cil.ReadNode):
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 8)) # 8 System call code for read string
-        self.add_instruction(LoadImmediateNode(Reg.a(1), self.MAX_STRING_LENGTH)) # a1 = Allocated lenght Save the lenght in a1
+        self.add_instruction(LoadImmediateNode(Reg.a(1), self.MAX_STRING_LENGTH)) # a1 = Allocated length Save the length in a1
         self._allocate_heap_space(Reg.a(1)) # Allocates 1024 bytes and return the address un v0
         self.add_instruction(MoveNode(Reg.a(0), Reg.v(0), comment="HERE")) # a0 = v0 Save the address in a0
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 8)) # 8 System call code for read string
         self.add_instruction(SyscallNode()) # Fills the address in a0 with the string
         self._store_local_variable(Reg.a(0), node.dest) # Save the address in the final destination
     
