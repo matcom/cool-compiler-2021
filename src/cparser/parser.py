@@ -263,10 +263,13 @@ class CoolParser:
         if p:
             self.add_error(p)
         else:
-            column = find_column(self.lexer.lexer, self.lexer.lexer)
-            line = self.lexer.lexer.lineno
-            self.errors.append(SyntacticError(
-                'ERROR at or near EOF', line, column - 1))
+            self.errors.append(SyntacticError('ERROR at or near EOF',0 ,0))
+
+            # column = find_column(p.lexer.lexdata, p.lexpos)
+            # line = self.lexer.lexer.lineno
+            # self.errors.append(SyntacticError(
+            #     'ERROR at or near EOF', line, column - 1))
+
 
     def add_error(self, p):
         self.errors.append(SyntacticError(
