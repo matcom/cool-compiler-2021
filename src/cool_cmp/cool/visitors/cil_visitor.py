@@ -93,6 +93,10 @@ class CILPrintVisitor():
     @visitor.when(cil.ArgNode)
     def visit(self, node):
         return f'ARG {node.name}'
+    
+    @visitor.when(cil.CommentNode)
+    def visit(self, node):
+        return f'# {node.string}'
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node):
@@ -489,6 +493,10 @@ class CILRunnerVisitor():
         args.append(value)
         return self.next_instruction()
 
+    @visitor.when(cil.CommentNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
+        return self.next_instruction()
+
     @visitor.when(cil.ReturnNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         if node.value is not None:
@@ -775,7 +783,7 @@ class COOLToCILVisitor():
         for declaration, child_scope in zip(node.declarations, scope.children):
             self.visit(declaration, child_scope)
 
-        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
+        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode, node.row, node.column, "Program Start")
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
