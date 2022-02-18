@@ -52,4 +52,4 @@ class Error() {
          cool wasn't a super-duper-fab-awesomest language;
          but cool is that language;
          "This comment shall go not cross this file" said cool.
-         Alas! The reader could read no more. iF
+         Alas! The reader could read no more.

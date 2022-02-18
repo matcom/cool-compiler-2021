@@ -16,10 +16,14 @@ app = typer.Typer()
 
 
 def read_file(file_name: str):
-    with open(file_name, 'r') as f: 
+    with open(file_name, 'r', encoding='utf-8') as f: 
         s = f.read()
     return s
+    
 
+def log_error(s: str):
+    styled_e = typer.style(s, fg=typer.colors.RED, bold=True)
+    typer.echo(styled_e)
 
 def parse(program: str, debug: bool = False):
     return parser.parse(program, debug=debug)
@@ -193,38 +197,40 @@ def test_semantics(program_file: str, debug: bool = False):
     else:
         print('Check Succesful')
 
-# @app.command()
-def final_execution(program_file: str, program_file_out: str, debug: bool = False, verbose=False):
+def print_list(list):
+    for item in list:
+        print(item)
+
+@app.command()
+def final_execution(program_file, program_file_out, debug: bool = False, verbose=False):
     context = Context()
     
     errors, program = tokenize(program_file, debug, verbose)
 
     if errors:
-        return '\n'.join(errors) == program_file_out
-        
+        for e in errors:
+            log_error(e)
+        exit(1)
+    exit(0)
+	
+    # ast = parse(program, debug)
 
-    ast = parse(program, debug)
-
-    # print('\n', ast, '\n')
-    # print("hi")
-
-
-    if ast is None:
-        # errors.append('Syntactic Errors')
-        print('Syntactic Errors')
-    else:
-        TypeCollector(context, errors).visit(ast)
-        TypeBuilder(context, errors).visit(ast)
-        CyclicDependency(context, errors)
-        if not errors:
-            InferenceTypeChecker(context, errors).visit(ast, Scope())
-            CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
-            Execution(context).visit(ast, Scope())
+    # if ast is None:
+    #     # errors.append('Syntactic Errors')
+    #     print('Syntactic Errors')
+    # else:
+    #     TypeCollector(context, errors).visit(ast)
+    #     TypeBuilder(context, errors).visit(ast)
+    #     CyclicDependency(context, errors)
+    #     if not errors:
+    #         InferenceTypeChecker(context, errors).visit(ast, Scope())
+    #         CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
+    #         Execution(context).visit(ast, Scope())
             
-        else:
-            return '\n'.join(errors) == program_file_out
-    return "\n".join(errors) == program_file_out
-
+    #     else:
+    #         return '\n'.join(errors) 
+    # return "\n".join(errors) 
+    
 if __name__ == '__main__':
     app()
     # test_execution("testing/inference/program10.cl")
