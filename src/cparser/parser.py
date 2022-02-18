@@ -160,7 +160,6 @@ class CoolParser:
         elif p[2] == '=':
             p[0] = EqualNode(p[1], p[3])
 
-
         p[0].add_line_column(p.lineno(0), find_column(
             p.lexer.lexdata, p.lexpos(0)))
 
@@ -264,18 +263,17 @@ class CoolParser:
         if p:
             self.add_error(p)
         else:
-            self.errors.append(SyntacticError('ERROR at or near EOF',0 ,0))
+            self.errors.append(SyntacticError('ERROR at or near EOF', 0, 0))
 
             # column = find_column(p.lexer.lexdata, p.lexpos)
             # line = self.lexer.lexer.lineno
             # self.errors.append(SyntacticError(
             #     'ERROR at or near EOF', line, column - 1))
 
-
     def add_error(self, p):
         self.errors.append(SyntacticError(
             f'ERROR at or near {p.value}', p.lineno, p.column))
-    
+
     def print_error(self):
         for error in self.errors:
             print(error)
