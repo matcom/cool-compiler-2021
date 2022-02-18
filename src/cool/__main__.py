@@ -9,8 +9,8 @@ sys.path.append(os.getcwd())
 
 from cool.code_generation import (
     CILFormatter,
-    ICoolTranslator,
-    ICoolTypeChecker,
+    ExtendedCoolTranslator,
+    ExtendedCoolTypeChecker,
     CoolToCilTranslator,
 )
 from cool.grammar import Token, serialize_parser_and_lexer
@@ -137,10 +137,10 @@ def compile(
     ###################
     # Code Generation #
     ###################
-    icool_ast = ICoolTranslator(context).visit(ast)
+    icool_ast = ExtendedCoolTranslator(context).visit(ast)
 
     scope = Scope()
-    ICoolTypeChecker(context, errors).visit(icool_ast, scope)
+    ExtendedCoolTypeChecker(context, errors).visit(icool_ast, scope)
 
     # if verbose or True:
     #     log_success(CodeBuilder().visit(icool_ast))

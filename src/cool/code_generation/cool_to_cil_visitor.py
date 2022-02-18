@@ -1,14 +1,12 @@
-from itertools import count
 from typing import Dict, List, Optional, Tuple
 
 import cool.code_generation.cil as cil
-import cool.code_generation.icool as icool
+import cool.code_generation.extended_cool as extended_cool
 import cool.semantics.utils.astnodes as cool
 import cool.semantics.utils.errors as err
 import cool.visitor as visitor
 import cool.visitor.visitor as visitor
 from cool.code_generation.base import BaseCOOLToCILVisitor
-from cool.semantics import TypeChecker
 from cool.semantics.utils.scope import (
     Attribute,
     Context,
@@ -20,7 +18,12 @@ from cool.semantics.utils.scope import (
 )
 
 
-class ICoolTranslator:
+class ExtendedCoolTranslator:
+    """
+    This class translate the Cool AST to a ExtendedCool AST, adding the new
+    features like the new keyword null in the asignments and the creation of
+    a default constructor for every class defined in the program.
+    """
     def __init__(self, context: Context):
         self.current_type: Optional[Type] = None
         self.current_method: Optional[Method] = None
@@ -105,7 +108,7 @@ class ICoolTranslator:
                 expr = cool.StringNode('""')
             else:
                 expr = (
-                    icool.NullNode()
+                    extended_cool.NullNode()
                 )  # cool.WhileNode(cool.BooleanNode("false"), cool.IntegerNode("0"))
 
             return cool.AssignNode(node.id, expr)
@@ -113,7 +116,7 @@ class ICoolTranslator:
         return cool.AssignNode(node.id, node.expr)
 
 
-class ICoolTypeChecker:
+class ExtendedCoolTypeChecker:
     def __init__(self, context: Context, errors: List[str]):
         self.context: Context = context
         self.errors: List[str] = errors
@@ -441,9 +444,9 @@ class ICoolTypeChecker:
     def visit(self, node: cool.BooleanNode, scope: Scope):
         return self.context.get_type("Bool")
 
-    @visitor.when(icool.NullNode)
-    def visit(self, node: icool.NullNode, scope: Scope):
-        return icool.NullType()
+    @visitor.when(extended_cool.NullNode)
+    def visit(self, node: extended_cool.NullNode, scope: Scope):
+        return extended_cool.NullType()
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
@@ -567,11 +570,10 @@ class ICoolTypeChecker:
         return ErrorType()
 
 
-# Notes:
-# 1 - All the expression nodes are going to return a tuple [str, Type]
-
-
 class CoolToCilTranslator(BaseCOOLToCILVisitor):
+    # Notes:
+    # 1 - All the expression nodes are going to return a tuple [str, Type]
+    
     @visitor.on("node")
     def visit(self, node, scope):
         pass
@@ -975,9 +977,9 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
     def visit(self, node: cool.BooleanNode, scope: Scope):
         return ("1" if node.lex == "true" else "0"), self.context.get_type("Bool")
 
-    @visitor.when(icool.NullNode)
-    def visit(self, node: icool.NullNode, scope: Scope):
-        return node.lex, icool.NullType
+    @visitor.when(extended_cool.NullNode)
+    def visit(self, node: extended_cool.NullNode, scope: Scope):
+        return node.lex, extended_cool.NullType
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
