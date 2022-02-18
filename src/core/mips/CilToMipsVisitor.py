@@ -673,15 +673,13 @@ class CILToMIPSVisitor:
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                               line=node.line, column=node.column))
         # TODO: Ver si se hace usando los registros de parametros
-        instructions.extend(mips.push_register(reg1, line=node.line, column=node.column))
+        instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg1, line=node.line, column=node.column))
 
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.right),
                                               line=node.line, column=node.column))
-        instructions.extend(mips.push_register(reg1, line=node.line, column=node.column))
+        instructions.append(mips.MoveNode(mips.ARG_REGISTERS[1], reg1, line=node.line, column=node.column))
 
         instructions.append(mips.JalNode("equal_str", line=node.line, column=node.column))
-        instructions.extend(mips.pop_register(reg1, line=node.line, column=node.column))
-        instructions.extend(mips.pop_register(reg1, line=node.line, column=node.column))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
 
