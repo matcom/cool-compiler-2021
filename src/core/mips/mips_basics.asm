@@ -121,7 +121,7 @@ substr_copy_loop:
     beq $t1 $a2 substr_end                           # Copy finished
     lb $t2 0($t0)                                    # Load byte from string into t2 temporal
     sb $t2 0($t3)                                    # Savebyte from t2 into t3
-addiu $t0 $t0 1                                      # Increase pointer to string
+    addiu $t0 $t0 1                                  # Increase pointer to string
     addiu $t3 $t3 1                                  # Increase pointer to reserved space
     addiu $t1 $t1 1                                  # Increase count
     j substr_copy_loop
@@ -211,4 +211,57 @@ concat_end:
     jr $ra
 
 read_string:
+    jr $ra
+
+
+# EQUAL STRING
+
+equal_str:
+    # a0 pointer to string 1
+    # a1 pointer to string 2
+    # v0 answer
+
+    # Save content of registers
+    addiu $sp $sp -24
+    sw $t0 0($sp)
+    sw $t1 4($sp)
+    sw $a0 8($sp)
+    sw $a1 12($sp)
+    sw $t2 16($sp)
+    sw $t3 20($sp)
+
+    move $t0 $a0
+    move $t1 $a1
+
+equal_str_loop:
+    lb $t2 0($t0)
+    lb $t3 0($t1)
+    bne $t2 $t3 equal_str_different_strings
+    beq $t2 $zero equal_str_finished_first
+    beq $t3 $zero equal_str_finished_second
+    addi $t1 $t1 1
+    addi $t0 $t0 1
+    j equal_str_loop
+
+equal_str_different_strings:
+    move $v0 $zero
+    j equal_str_end
+
+equal_str_finished_first:
+    beq $t1 $zero equal_str_finished_second
+    move $v0 $zero
+    j equal_str_end
+
+equal_str_finished_second:
+    li $v0 1
+
+equal_str_end:
+    lw $t0 0($sp)
+    lw $t1 4($sp)
+    lw $a0 8($sp)
+    lw $a1 12($sp)
+    lw $t2 16($sp)
+    lw $t3 20($sp)
+    addiu $sp $sp 24
+
     jr $ra

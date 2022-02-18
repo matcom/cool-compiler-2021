@@ -77,7 +77,7 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
 
     try:
         fd = open(input_file_path, 'rb')
-        sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), timeout=timeout)
+        sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), timeout=timeout, capture_output=True)
         fd.close()
         mo = re.match(SPIM_HEADER, sp.stdout.decode())
         if mo:
