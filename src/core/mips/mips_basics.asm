@@ -182,7 +182,7 @@ concat:
     sw $a1 16($sp)
     sw $ra 20($sp)
 
-move $t0 $a0                                         # t0 pointer to string 1
+    move $t0 $a0                                         # t0 pointer to string 1
     move $t1 $a1                                     # t1 pointer to string 2
 
 
@@ -201,7 +201,7 @@ concat_allign_size:
 
 concat_size_alligned:
     jal malloc                                       # a0 stores size to reserve
-    move $t2 $a1                                     # t2 is pointer to empty space
+    move $t2 $v0                                     # t2 is pointer to empty space
     j concat_copy_first_loop
 
 concat_copy_first_loop:
@@ -246,23 +246,23 @@ read_string:
 
     li $v0 8
     move $a0 $t0
-    li $a1 4
+    li $a1 5
     syscall
     addiu $t2 $t2 4
 
     check_newline_loop:
 
     lb $t1 0($t0)
-    addiu $t0 $t0 1
 
     beq $t1 $t3 read_loop_continue
+    addiu $t0 $t0 1
     beq $t0 $t2 check_newline_loop_continue
     j check_newline_loop
     check_newline_loop_continue:
     j read_loop
 
     read_loop_continue:
-
+    sb $zero 0($t0)
     bne $t0 $t2 null_terminated
     addiu $t2 $t2 4
     null_terminated:
@@ -311,7 +311,7 @@ equal_str_different_strings:
     j equal_str_end
 
 equal_str_finished_first:
-    beq $t1 $zero equal_str_finished_second
+    beq $t3 $zero equal_str_finished_second
     move $v0 $zero
     j equal_str_end
 
