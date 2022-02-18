@@ -691,16 +691,30 @@ class COOLToCILVisitor():
         return f'function_{method_name}_at_{type_name}'
     
     def register_function(self, function_name):
+        funcs = [x for x in self.dotcode if isinstance(x, cil.FunctionNode) and x.name == function_name]
+        if len(funcs) > 0:
+            self.dotcode.remove(funcs[0])
+
         function_node = cil.FunctionNode(function_name, [], [], [], [])
         self.dotcode.append(function_node)
         return function_node
     
-    def register_type(self, name, parent):
+    def register_type(self, name, parent=None):
         if parent:
+            for t in self.dottypes:
+                if t.name == name and ((t.parent and parent.name != t.parent.name) or not t.parent):
+                    t.parent = [x for x in self.dottypes if x.name == parent.name][0]
+                    return t
+
             parent = parent.name
-        type_node = cil.TypeNode(name, parent)
-        self.dottypes.append(type_node)
-        return type_node
+
+        if len([x for x in self.dottypes if x.name == name]) == 0:
+            type_node = cil.TypeNode(name, parent)
+            self.dottypes.append(type_node)
+            return type_node
+
+        else:
+            return [x for x in self.dottypes if x.name == name][0]
 
     def register_data(self, value):
         vname = f'data_{len(self.dotdata)}'
@@ -754,6 +768,16 @@ class COOLToCILVisitor():
         self.register_instruction(cil.ReturnNode(index))
         
         self.current_function = None
+
+    def create_empty_methods(self, typex, dottype):
+        for m in typex.methods:
+            name = self.to_function_name(m.name, dottype.name)
+            self.register_function(name)
+            if len([x for (_, x) in dottype.methods if x == name]) == 0:
+                dottype.methods.append((m.name, name))
+
+        if typex.parent:
+            self.create_empty_methods(typex.parent, dottype)
         
     @visitor.on('node')
     def visit(self, node):
@@ -768,6 +792,16 @@ class COOLToCILVisitor():
         self.create_entry_function()
         self.create_type_distance_function()
         
+        for type_name, typex in self.context.types.items():
+            if type_name not in ["Error", "Void"]:
+                self.register_type(type_name)
+                self.register_type(type_name, typex.parent)
+
+        for type_name, typex in self.context.types.items():
+            if type_name not in ["Error", "Void"]:
+                this_type = next(x for x in self.dottypes if x.name == type_name)
+                self.create_empty_methods(typex, this_type)
+
         for type_name, typex in self.context.types.items():
             if type_name in self.context.special_types and type_name not in ["Error", "Void"]:
                 self.visit(typex.class_node, typex.class_node.scope)
