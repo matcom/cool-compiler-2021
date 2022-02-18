@@ -62,11 +62,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 self.init_attr_name(self.current_type.parent.name), variable, line=node.line, column=node.column))
 
         # Inicializando los atributos de la clase
-        instance = self.register_param(VariableInfo('instance', ''), line=node.line, column=node.column)
         for feat, child in zip(node.features, scope.childs):
             if isinstance(feat, cool.AttrDeclarationNode):
                 self.visit(feat, child)
-                self.register_instruction(cil.SetAttribNode(instance, feat.id.lex, feat.ret_expr, node.id.lex,
+                self.register_instruction(cil.SetAttribNode(self_param, feat.id.lex, feat.ret_expr, node.id.lex,
                                                             line=node.line, column=node.column))
         # TODO: Deberia retornar algo aqui?
 
