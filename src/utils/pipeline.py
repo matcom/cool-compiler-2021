@@ -99,7 +99,7 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
                 while program[current_pos] != '\n':
                     column += 1
                     current_pos -= 1
-                errors.append(f'({t[1]}, {column}) - LexicographicError: {t[3]}')
+                errors.append(f'({t[1]}, {column - 1}) - LexicographicError: ERROR \"{t[3]}\"')
         elif t.type == 'STRING':
             if t.value.find('\0') != -1:
                 pos = t.value.index('\0')
