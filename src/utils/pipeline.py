@@ -1,8 +1,9 @@
+from cmath import log
 from os import error
 from typing import Counter
 import typer
 
-from cool_grammar import parser
+from cool_grammar import parser, errors as errrroooo
 from cool_lexer import lexer
 from utils.cyclic_dependency import CyclicDependency
 from utils.formatter import Formatter, CodeBuilder
@@ -84,6 +85,7 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
     program = read_file(program_file)
 
     errors, program = erase_multiline_comment(program)
+    program = erase_single_line_comment(program) #### Aca es el error
     
     lexer.input(program)
     # print(program)
@@ -121,6 +123,26 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
             print(t)
 
     return errors, program
+
+def erase_single_line_comment(program: str):
+    temp = ''
+    pos = 0
+    while pos < len(program):
+        if program[pos] == '-' and (pos + 1) < len(program):
+            if program[pos + 1] == '-':
+                while pos < len(program) and program[pos] != '\n':
+                    pos += 1
+                # temp += program[pos]
+            else:
+                temp += program[pos]
+                pos += 1
+        else:
+            temp += program[pos]
+            pos += 1
+                
+    return temp
+    
+
 
 def test_parse(program_file: str, debug: bool = False):
     program = read_file(program_file)
@@ -211,13 +233,16 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         for e in errors:
             log_error(e)
         exit(1)
-    exit(0)
 	
-    # ast = parse(program, debug)
+    ast = parse(program, debug)
 
-    # if ast is None:
-    #     # errors.append('Syntactic Errors')
-    #     print('Syntactic Errors')
+    # if ast == None:
+    if errrroooo:
+        for (line, lexpos, value) in errrroooo:
+            totallines = program.count('\n')
+            col = get_tokencolumn(program, lexpos)
+            log_error(f'({line - totallines}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
+        exit(1)
     # else:
     #     TypeCollector(context, errors).visit(ast)
     #     TypeBuilder(context, errors).visit(ast)

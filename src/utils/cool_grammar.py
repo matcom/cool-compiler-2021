@@ -4,6 +4,7 @@ import utils.ast_nodes as ast
 
 tokens = lex.tokens
 
+errors = []
 
 def p_program(p):
     'program : class_list'
@@ -260,7 +261,7 @@ def p_empty(p):
 
 def p_error(p):
     if p:
-        print(f'{p} ({p.lineno}, {p.lexpos}) - SyntacticError: ERROR at or near "{p.value}"')
+        errors.append((p.lineno, p.lexpos, p.value))
 
 
 parser = yacc.yacc()

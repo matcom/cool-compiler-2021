@@ -70,24 +70,16 @@ def t_ID(t):
 def t_STRING(t):
     # r'\"(.|\\\n)*\"'
     r'\"([^\r\n\"\\]|(\\\n)|(\\.))*\"'
-    i = 0
-    counter = 0
-    while i < len(t.value):
-        if i == '\n':
-            counter += 1
-        i += 1
-    t.lineno += counter
+    
+    t.lineno += t.value.count('\n')
     t.type = reserved.get(t.value,'STRING') 
     return t
 
 def t_USTRING(t):
     # r'\"(.|\\\n)*\"'
     r'\"([^\r\n\"\\]|(\\\n)|(\\.))*'
-    i = 0
-    while i < len(t.value):
-        if i == '\n':
-            t.lineno += 1
-        i += 1
+    
+    t.lineno += t.value.count('\n')
     t.type = reserved.get(t.value,'USTRING') 
     return t
 
