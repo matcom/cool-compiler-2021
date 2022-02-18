@@ -269,7 +269,7 @@ class CILToMIPSVisitor:
                                                   line=node.line, column=node.column))
 
         instructions.append(mips.DivideNode(reg1, reg2, line=node.line, column=node.column))
-        instructions.append(mips.MoveHighNode(reg1, line=node.line, column=node.column))
+        instructions.append(mips.MoveLowNode(reg1, line=node.line, column=node.column))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
 
