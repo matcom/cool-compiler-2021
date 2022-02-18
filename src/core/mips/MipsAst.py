@@ -235,6 +235,15 @@ class JalNode(InstructionNode):
         super().__init__(line, column)
         self.label = label
 
+class JalrNode(InstructionNode):
+    def __init__(self, reg1, reg2, line, column):
+        '''
+        Unconditionally jump to the instruction at target register. Save the address of the next
+        instruction in register ra (rd said the manual).
+        '''
+        super().__init__(line, column)
+        self.reg1 = reg1
+        self.reg2 = reg2
 
 class MoveNode(InstructionNode):
     def __init__(self, reg1, reg2, line, column):

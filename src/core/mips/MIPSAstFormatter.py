@@ -110,6 +110,11 @@ class MIPSAstFormatter:
         return f'jal {self.visit(node.label)}'.ljust(50) + \
                f'#line: {node.line} column: {node.column}'
 
+    @visitor.when(JalrNode)
+    def visit(self, node):
+        return f'jalr {self.visit(node.reg1)} {self.visit(node.reg2)}'.ljust(50) + \
+               f'#line: {node.line} column: {node.column}'
+
     @visitor.when(MoveNode)
     def visit(self, node):
         return f'move {self.visit(node.reg1)} {self.visit(node.reg2)}'.ljust(50) + \

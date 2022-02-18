@@ -339,20 +339,16 @@ class CILToMIPSVisitor:
         method = type.methods.index(self._function_names[node.method])
 
         reg1 = mips.REGISTERS[0]
-        reg2 = mips.REGISTERS[1]
-        instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.obj),
+        instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(mips.SP_REG, 0),
                                               line=node.line, column=node.column))
-        instructions.append(mips.LoadAddressNode(reg2, mips.PROTOTYPE_LABEL, line=node.line, column=node.column))
-        instructions.append(mips.ShiftLeftNode(reg2, reg1, 2, line=node.line, column=node.column))
-        instructions.append(mips.AdditionNode(reg1, reg1, reg2, line=node.line, column=node.column))
-        instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(reg1, 0),
-                                              line=node.line, column=node.column))
+        instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4, node.line, node.column))
+        self._pushed_args -= 1
+
         instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(reg1, 8),
                                               line=node.line, column=node.column))
-        instructions.append(mips.AdditionInmediateNode(reg1, reg1, method * 4, line=node.line, column=node.column))
-        instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(reg1, 0),
+        instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(reg1, method * 4),
                                               line=node.line, column=node.column))
-        instructions.append(mips.JalNode(reg1, line=node.line, column=node.column))
+        instructions.append(mips.JalrNode(mips.RA_REG, reg1, line=node.line, column=node.column))
 
         if self._pushed_args > 0:
             instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG,

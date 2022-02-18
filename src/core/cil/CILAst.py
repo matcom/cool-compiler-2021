@@ -163,10 +163,9 @@ class StaticCallNode(InstructionNode):
         return f"{self.dest} = CALL {self.function}"
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, type, obj,  method, dest, line, column):
+    def __init__(self, type,  method, dest, line, column):
         super().__init__(line, column)
         self.type = type
-        self.obj = obj
         self.method = method
         self.dest = dest
 

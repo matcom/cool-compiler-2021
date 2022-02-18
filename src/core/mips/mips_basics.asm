@@ -9,7 +9,6 @@
 # a0 size to alloc
 # v0 return memory address
 
-#TODO Parametros en la pila
 malloc:
     addiu $sp $sp -12                                # Save content of registers in sp
     sw $a0 0($sp)
@@ -100,7 +99,6 @@ len_end:
     jr $ra
 
 
-# TODO: Necesita tambien un puntero al indice del substring en a1
 # SUBSTRING
 # a0 Pointer to beginning of string
 # a1 Pointer to beginning of substring
@@ -256,6 +254,7 @@ read_string:
 
     beq $t1 $t3 read_loop_continue
     addiu $t0 $t0 1
+
     beq $t0 $t2 check_newline_loop_continue
     j check_newline_loop
     check_newline_loop_continue:
@@ -263,6 +262,7 @@ read_string:
 
     read_loop_continue:
     sb $zero 0($t0)
+
     bne $t0 $t2 null_terminated
     addiu $t2 $t2 4
     null_terminated:

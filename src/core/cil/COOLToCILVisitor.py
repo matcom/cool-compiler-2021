@@ -13,10 +13,17 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # Guardar métodos de las clases padres
         iter_type = self.context.get_type(node.id.lex)
 
+        generation = []
         while iter_type is not None:
-            type.methods.update({i: self.to_function_name(i, iter_type.name) for i in iter_type.methods.keys()})
-            type.attributes.update({i.name:self.register_attribute(i.name, iter_type.name, iter_type.line, iter_type.column) for i in iter_type.attributes})
+            generation.append(iter_type)
             iter_type = iter_type.parent
+
+        generation.reverse()
+        for i in generation:
+            for meth in i.methods:
+                type.methods[meth] = self.to_function_name(meth, i.name)
+            for attr in i.attributes:
+                type.attributes[attr.name] = self.register_attribute(attr.name, i.name, i.line, i.column)
 
     @visitor.on('node')
     def visit(self, node):
@@ -525,17 +532,16 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_runtime_error(isvoid, f'{node.id.line, node.id.column} - RuntimeError: Dispatch on void',
                                     line=node.id.line, column=node.id.column)
 
-        # TODO: Creo que deberia annadir los parametros al reves para luego sacarlos en el orden correcto
         self.register_instruction(cil.ArgNode(node.obj.ret_expr, line=node.obj.line, column=node.obj.column))
-        for arg in args:
-            self.register_instruction(arg)
+        for arg in args: self.register_instruction(arg)
+        self.register_instruction(cil.ArgNode(node.obj.ret_expr, line=node.obj.line, column=node.obj.column))
         ret = self.define_internal_local(line=node.line, column=node.column)
         if node.type is None:
             stype = node.obj.static_type.name
         else:
             stype = node.type.lex
-        self.register_instruction(cil.StaticCallNode(self.types_map[stype].methods[node.id.lex], ret,
-                                                          line=node.id.line, column=node.id.column))
+        self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.id.lex],
+                                                      ret, line=node.id.line, column=node.id.column))
         node.ret_expr = ret
 
     @visitor.when(cool.MemberCallNode)
