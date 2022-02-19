@@ -1,128 +1,157 @@
-class Node():
-    def __init__(self):
-        self.line = 0
-        self.column = 0
+from cmath import exp
+from select import select
 
-    def add_line_column(self, line, column):
-        self.line = line
-        self.column = column
+
+class Node():
+    pass
 
 
 class ProgramNode(Node):
     def __init__(self, declarations):
-        super().__init__()
         self.declarations = declarations
 
 
-class ClassDeclarationNode(Node):
-    def __init__(self, name, features, parent=None):
-        super().__init__()
-        self.name = name
+class DeclarationNode(Node):
+    pass
+
+
+class ClassDeclarationNode(DeclarationNode):
+    def __init__(self, idx, features, parent):
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
         self.features = features
-        self.parent = parent
+        if parent:
+            self.parent = parent.value
+            self.parentLine = parent.lineno
+            self.parentCol = parent.column
+        else:
+            self.parent = None
+            self.parentLine = 0
+            self.parentCol = 0
 
 
-class FuncDeclarationNode(Node):
-    def __init__(self, name, params, return_type, expr=None):
-        super().__init__()
-        self.name = name
-        self.params = [(pname.value, ptype.value, ptype.lineno, ptype.column) for pname, ptype in params]
-        self.return_type = return_type
-        self.expr = expr
+class FuncDeclarationNode(DeclarationNode):
+    def __init__(self, idx, params, return_type, body):
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
+        self.params = [(pname.value, ptype.value, ptype.lineno,
+                        ptype.column) for pname, ptype in params]
+        self.type = return_type.value
+        self.typeLine = return_type.lineno
+        self.typeCol = return_type.col
+        self.body = body
 
 
-class AttrDeclarationNode(Node):
-    def __init__(self, name, typex, expr=None):
-        super().__init__()
-        self.name = name
-        self.type = typex
+class AttrDeclarationNode(DeclarationNode):
+    def __init__(self, idx, typex, expr=None):
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
+        self.type = typex.value
+        self.typeLine = typex.lineno
+        self.typeCol = typex.col
         self.expr = expr
 
 
 class ExpressionNode(Node):
-    def __init__(self):
-        super().__init__()
-        self.computed_type = None
+    pass
 
 
 class AssignNode(ExpressionNode):
-    def __init__(self, name, expr):
-        super().__init__()
-        self.name = name
+    def __init__(self, idx, expr):
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
         self.expr = expr
 
 
 class FuncCallNode(ExpressionNode):
-    def __init__(self, idx, args, obj=None, typex=None):
-        super().__init__()
-        self.id = idx
+    def __init__(self, obj, idx, args, typex):
+        self.obj = obj
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
         self.args = args
-        self.object = obj
-        self.type = typex
+        self.type = typex.value
+        self.typeLine = typex.lineno
+        self.typeCol = typex.col
 
 
-class IfNode(ExpressionNode):
-    def __init__(self, condition, then_expr, else_expr):
-        super().__init__()
+class MemberCallNode(ExpressionNode):
+    def __init__(self, idx, args):
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
+        self.args = args
+
+
+class IfThenElseNode(ExpressionNode):
+    def __init__(self, condition, ifBody, elseBody, token):
         self.condition = condition
-        self.then_expr = then_expr
-        self.else_expr = else_expr
+        self.ifBody = ifBody
+        self.elseBody = elseBody
+        self.line = token.lineno
+        self.col = token.column
 
 
 class WhileNode(ExpressionNode):
-    def __init__(self, condition, body):
-        super().__init__()
+    def __init__(self, condition, body, token):
         self.condition = condition
         self.body = body
+        self.line = token.lineno
+        self.col = token.column
 
 
 class BlockNode(ExpressionNode):
-    def __init__(self, exprs):
-        super().__init__()
-        self.exprs = exprs
+    def __init__(self, exprs, token):
+        self.expr = exprs
+        self.line = token.lineno
+        self.col = token.column
 
 
-class LetNode(ExpressionNode):
-    def __init__(self, let_attrs, expr):
-        super().__init__()
-        self.let_attrs = let_attrs
-        self.expr = expr
+class LetInNode(ExpressionNode):
+    def __init__(self, letBody, inBody, token):
+        self.letBody = letBody
+        self.inBody = inBody
+        self.line = token.lineno
+        self.col = token.column
 
 
 class CaseNode(ExpressionNode):
-    def __init__(self, expr, case_list):
-        super().__init__()
+    def __init__(self, expr, caseList, token):
         self.expr = expr
-        self.case_list = case_list
+        self.caseList = caseList
+        self.line = token.lineno
+        self.col = token.column
 
 
 class CaseOptionNode(ExpressionNode):
     def __init__(self, idx, typex, expr):
-        super().__init__()
-        self.id = idx
-        self.expr = expr
-        self.type = typex
-
-
-class VarNode(ExpressionNode):
-    def __init__(self, idx):
-        super().__init__()
-        self.id = idx
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
+        self.type = typex.value
+        self.typeLine = typex.lineno
+        self.typeCol = typex.col
 
 
 class NewNode(ExpressionNode):
     def __init__(self, typex):
-        super().__init__()
-        self.type = typex
+        self.type = typex.value
+        self.typeLine = typex.lineno
+        self.typeCol = typex.col
 
+        # ---------------- Binary Nodes ------------------
 
-# ---------------- Binary Nodes ------------------
 
 class BinaryNode(ExpressionNode):
     def __init__(self, lvalue, rvalue):
-        super().__init__()
         self.lvalue = lvalue
         self.rvalue = rvalue
+        self.line = lvalue.line
+        self.col = lvalue.col
 
 
 class PlusNode(BinaryNode):
@@ -156,9 +185,10 @@ class EqualNode(BinaryNode):
 # ---------------- Unary Nodes ------------------
 
 class UnaryNode(ExpressionNode):
-    def __init__(self, value):
-        super().__init__()
-        self.value = value
+    def __init__(self, expr, token):
+        self.expr = expr
+        self.line = token.lineno
+        self.column = token.column
 
 
 class NegationNode(UnaryNode):
@@ -169,29 +199,34 @@ class LogicNegationNode(UnaryNode):
     pass
 
 
-class AtomicNode(UnaryNode):
-    pass
-
-
 class IsVoidNode(UnaryNode):
     pass
 
 
-# ---------------- Constant Nodes ------------------
+# ---------------- Atomic Nodes ------------------
 
-class ConstantNode(ExpressionNode):
-    def __init__(self, value):
-        super().__init__()
-        self.value = value
+class AtomicNode(ExpressionNode):
+    def __init__(self, token):
+        try:
+            self.id = token.value
+            self.line = token.lineno
+            self.col = token.col
+        except:
+            self.id = token
+            self.line = 0
+            self.col = 0
 
 
-class IntNode(ConstantNode):
+class IdNode(AtomicNode):
+    pass
+
+class IntNode(AtomicNode):
     pass
 
 
-class BoolNode(ConstantNode):
+class BoolNode(AtomicNode):
     pass
 
 
-class StringNode(ConstantNode):
+class StringNode(AtomicNode):
     pass

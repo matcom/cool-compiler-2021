@@ -65,7 +65,7 @@ class TypeBuilder:
         argsNames = []
         argsTypes = []
         for name, typex in funcDeclarationNode.params:
-            if name.value in argsNames:
+            if name in argsNames:
                 errorText = f'Formal parameter {name} is multiply defined.'
                 self.errors.append(SemanticError(errorText, funcDeclarationNode.line, funcDeclarationNode.column))
 
@@ -77,8 +77,12 @@ class TypeBuilder:
                 errorText = f'Class {typex.value} of formal parameter {typex.value} is undefined.'
                 self.errors.append(SemanticError(errorText, funcDeclarationNode.line, funcDeclarationNode.column))
                 argType = ErrorType()
-                
+
             argsTypes.append(argType)
+        
+        try:
+            returnType = self.context.get_type(funcDeclarationNode.return_type, )
+        except SemanticError as error:
 
         
 
