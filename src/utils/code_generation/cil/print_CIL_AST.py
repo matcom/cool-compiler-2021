@@ -143,6 +143,10 @@ def get_formatter():
         def visit(self, node):
             return f'PRINT {node.value}'
         
+        @visitor.when(nodes.ErrorNode)
+        def visit(self, node):
+            return f'ERROR {node.data_node}'
+        
     printer = PrintVisitor()
     return (lambda ast: printer.visit(ast))
     
