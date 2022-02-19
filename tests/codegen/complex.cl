@@ -15,8 +15,8 @@ class Complex inherits IO {
 
     init(a : Int, b : Int) : Complex {
 	{
-	    x = a;
-	    y = b;
+	    x <- a;
+	    y <- b;
 	    self;
 	}
     };
@@ -30,22 +30,22 @@ class Complex inherits IO {
 
     reflect_0() : Complex {
 	{
-	    x = ~x;
-	    y = ~y;
+	    x <- ~x;
+	    y <- ~y;
 	    self;
 	}
     };
 
     reflect_X() : Complex {
 	{
-	    y = ~y;
+	    y <- ~y;
 	    self;
 	}
     };
 
     reflect_Y() : Complex {
 	{
-	    x = ~x;
+	    x <- ~x;
 	    self;
 	}
     };

@@ -58,7 +58,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.current_function = self.register_function(self.init_attr_name(node.id.lex),
                                                        line=node.line, column=node.column)
-        type.methods['init_attr'] = self.current_function.name
+        type.methods['__init_attr'] = self.current_function.name
         self_param = self.register_param(self.vself, line=node.line, column=node.column)
         self.localvars.extend(type.attributes.values())
         self.var_names.update({i:cil.AttributeNode(j.name, type.name, node.line, node.column)
@@ -78,7 +78,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 self.visit(feat, child)
                 self.register_instruction(cil.SetAttribNode(self_param, feat.id.lex, feat.ret_expr, node.id.lex,
                                                             line=node.line, column=node.column))
-        # TODO: Deberia retornar algo aqui?
+        self.register_instruction(cil.ReturnNode(node.line, node.column, self_param))
 
         # TypeNode de la clase
         # type = self.types_map[node.id.lex]
@@ -92,7 +92,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         # Allocate de la clase
         self.current_function = self.register_function(self.init_name(node.id.lex), line=node.line, column=node.column)
-        type.methods['_init'] = self.current_function.name
+        type.methods['__init'] = self.current_function.name
         self.localvars.extend(type.attributes.values())
         instance = self.define_internal_local(line=node.line, column=node.column)
         self.register_instruction(cil.AllocateNode(node.id.lex, instance, line=node.line, column=node.column))
@@ -101,11 +101,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ArgNode(instance, line=node.line, column=node.column))
         self.register_instruction(cil.StaticCallNode(self.init_attr_name(node.id.lex), variable,
                                                      line=node.line, column=node.column))
-
-        if 'init' in self.current_type.methods.keys():
-            self.register_instruction(cil.ArgNode(instance, line=node.line, column=node.column))
-            self.register_instruction(cil.StaticCallNode(
-                self.to_function_name('init', self.current_type.name), variable, line=node.line, column=node.column))
 
         self.register_instruction(cil.ReturnNode(value=instance, line=node.line, column=node.column))
 

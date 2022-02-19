@@ -92,10 +92,10 @@ class BaseCOOLToCILVisitor:
         return cil.LabelNode(lname, line, column)
 
     def init_name(self, name):
-        return f'_init_at_{name}'
+        return f'__init_at_{name}'
 
     def init_attr_name(self, name):
-        return f'_init_attr_at_{name}'
+        return f'__init_attr_at_{name}'
 
     def register_runtime_error(self, condition, msg, line, column):
         error_node = self.register_label('error_label', line, column)
