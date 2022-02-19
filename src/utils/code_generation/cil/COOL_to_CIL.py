@@ -1,10 +1,9 @@
 import cmp.visitor as visitor
 from utils.ast.AST_Nodes import ast_nodes as nodes
 
-class COOL_to_CIL:
-    def __init__(self, context, scope):
+class COOLtoCIL:
+    def __init__(self, context):
         self.context = context
-        self.scope = scope
 
 
     @visitor.on('node')
