@@ -1,10 +1,10 @@
-import src.cmp.nbpackage
-import src.cmp.visitor as visitor
+import cmp.nbpackage
+import cmp.visitor as visitor
 
-from src.ast_nodes import Node, ProgramNode, ExpressionNode
-from src.ast_nodes import ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
-from src.ast_nodes import VarDeclarationNode, AssignNode, CallNode
-from src.ast_nodes import (
+from ast_nodes import Node, ProgramNode, ExpressionNode
+from ast_nodes import ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
+from ast_nodes import VarDeclarationNode, AssignNode, CallNode
+from ast_nodes import (
     AtomicNode,
     BinaryNode,
     ArithmeticOperation,
@@ -17,7 +17,7 @@ from src.ast_nodes import (
     BlockNode,
     IsvoidNode,
 )
-from src.ast_nodes import (
+from ast_nodes import (
     ConstantNumNode,
     VariableNode,
     InstantiateNode,
@@ -31,15 +31,15 @@ from src.ast_nodes import (
     BooleanNode,
     StringNode,
 )
-from src.cool_visitor import FormatVisitor
+from cool_visitor import FormatVisitor
 
-from src.cmp.semantic import SemanticError
-from src.cmp.semantic import Attribute, Method, Type
-from src.cmp.semantic import VoidType, ErrorType, IntType
-from src.cmp.semantic import Context
+from cmp.semantic import SemanticError
+from cmp.semantic import Attribute, Method, Type
+from cmp.semantic import VoidType, ErrorType, IntType
+from cmp.semantic import Context
 
-from src.cmp.semantic import Scope
-from src.cmp.utils import find_least_type
+from cmp.semantic import Scope
+from cmp.utils import find_least_type
 
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
@@ -50,21 +50,27 @@ INVALID_OPERATION = 'Operation is not defined between "%s" and "%s".'
 
 
 class TypeChecker:
-    def __init__(self, context, errors=[]):
-        self.context = context
+    def __init__(self, errors=[]):
+        self.context = None
         self.current_type = None
         self.current_method = None
         self.errors = errors
 
     @visitor.on("node")
-    def visit(self, node, scope):
+    def visit(self, node, scope=None):
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self, node, scope=None):
+    def visit(self, node):
         scope = Scope()
+        self.context = node.context.copy()
         for declaration in node.declarations:
             self.visit(declaration, scope.create_child())
+
+        self.context = None
+        self.current_type = None
+        self.current_method = None
+
         return scope
 
     @visitor.when(ClassDeclarationNode)
@@ -452,4 +458,3 @@ class TypeChecker:
     @visitor.when(BooleanNode)
     def visit(self, node, scope):
         return self.context.get_type("Bool")
-

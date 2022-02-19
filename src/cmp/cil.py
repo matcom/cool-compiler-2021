@@ -1,4 +1,4 @@
-import src.cmp.visitor as visitor
+import cmp.visitor as visitor
 
 
 class Node:
@@ -264,4 +264,3 @@ def get_formatter():
 
     printer = PrintVisitor()
     return lambda ast: printer.visit(ast)
-

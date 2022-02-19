@@ -224,13 +224,9 @@ class SelfType(Type):
         Type.__init__(self, "SELF_TYPE")
 
 
-# Despues de entregar!!!!
 class IOType(Type):
     def __init__(self):
         Type.__init__(self, "IO")
-
-
-# ---------------------------
 
 
 class Context:
@@ -258,6 +254,12 @@ class Context:
 
     def __repr__(self):
         return str(self)
+
+    def __copy__(self):
+        newContext = Context()
+        for key, value in self.types.items():
+            newContext.types[key] = value
+        return newContext
 
 
 class VariableInfo:

@@ -1,21 +1,23 @@
-from src.cmp.semantic import SemanticError
-from src.cmp.semantic import Attribute, Method, Type
-from src.cmp.semantic import VoidType, IntType, ErrorType, StringType, BoolType
-from src.cmp.semantic import Context
-from src.ast_nodes import (
+import copy
+from cmp.semantic import SemanticError
+from cmp.semantic import Attribute, Method, Type
+from cmp.semantic import VoidType, IntType, ErrorType, StringType, BoolType
+from cmp.semantic import Context
+from ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     AttrDeclarationNode,
     FuncDeclarationNode,
 )
-import src.cmp.visitor as visitor
-from src.tset import Tset
+import cmp.visitor as visitor
+from tset import Tset
 from collections import deque
+from cool_visitor import CopyVisitor
 
 
 class TypeBuilder:
-    def __init__(self, context, errors=[]):
-        self.context = context
+    def __init__(self, errors=[]):
+        self.context = None
         self.current_type = None
         self.errors = errors
 
@@ -25,7 +27,8 @@ class TypeBuilder:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
-        # Despues de entregar!!!!!!
+        self.context = copy.copy(node.context)
+
         io_type = self.context.get_type("IO")
         self_type = self.context.get_type("SELF_TYPE")
         int_type = self.context.get_type("Int")
@@ -53,7 +56,7 @@ class TypeBuilder:
         method = io_type.define_method("in_int", [], [], int_type)
         method.tset = Tset(parent_tset)
 
-        # -------String
+        # String
         parent_tset = Tset()
         parent_tset.locals["concat"] = {"String"}
         parent_tset.locals["substr"] = {"String"}
@@ -87,8 +90,6 @@ class TypeBuilder:
 
         method = object_type.define_method("copy", [], [], self_type)
         method.tset = Tset(parent_tset)
-
-        # --------------------
 
         # ------checking for in order definitions and cyclic heritage
         parent_child_dict = {}
@@ -149,6 +150,17 @@ class TypeBuilder:
         # ----------------------------------------------------
         # for declaration in node.declarations:
         #     self.visit(declaration)
+
+        copy_visitor = CopyVisitor()
+        newAst = copy_visitor.visit(node)
+        newAst.context = self.context
+
+        # Reset state
+        self.context = None
+        self.current_type = None
+        self.errors = None
+
+        return newAst
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):

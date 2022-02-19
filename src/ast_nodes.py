@@ -1,10 +1,14 @@
+from cmp.semantic import Context
+
+
 class Node:
     pass
 
 
 class ProgramNode(Node):
-    def __init__(self, declarations):
+    def __init__(self, declarations, context=None):
         self.declarations = declarations
+        self.context = context
 
 
 class ExpressionNode(Node):

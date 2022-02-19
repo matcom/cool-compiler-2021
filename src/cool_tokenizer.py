@@ -1,4 +1,4 @@
-from src.cmp.utils import Token, tokenizer
+from cmp.utils import Token, tokenizer
 
 
 def tokenize_cool_text(G, text, idx, num, print_tokens=False):
@@ -36,8 +36,3 @@ def pprint_tokens(tokens):
             if token.lex == "{":
                 indent += 1
     print(" ".join([str(t.token_type) for t in pending]))
-
-
-# if __name__ == "__main__":
-#     pprint_tokens(tokens)
-

@@ -1,5 +1,5 @@
-import src.cmp.visitor as visitor
-from src.ast_nodes import (
+import cmp.visitor as visitor
+from ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     FuncDeclarationNode,
@@ -17,6 +17,23 @@ from src.ast_nodes import (
     BinaryNode,
     AtomicNode,
     UnaryNode,
+    ArithmeticOperation,
+    ComparisonOperation,
+    ConstantNumNode,
+    VariableNode,
+    StringNode,
+    BooleanNode,
+    InstantiateNode,
+    NotNode,
+    IsvoidNode,
+    NegNode,
+    PlusNode,
+    MinusNode,
+    StarNode,
+    DivNode,
+    LessNode,
+    LessEqualNode,
+    EqualNode,
 )
 
 
@@ -337,3 +354,179 @@ class FormatVisitorST(object):
         self.visit(node.expr, tabs + 1)
         return
 
+
+class CopyVisitor(object):
+    @visitor.on("node")
+    def visit(self, node):
+        pass
+
+    @visitor.when(ProgramNode)
+    def visit(self, node):
+        declarations = []
+        for child in node.declarations:
+            declarations.append(self.visit(child))
+        return ProgramNode(declarations)
+
+    @visitor.when(ClassDeclarationNode)
+    def visit(self, node):
+        features = []
+        for feat in node.features:
+            features.append(self.visit(feat))
+        return ClassDeclarationNode(node.id, features, node.parent)
+
+    @visitor.when(AttrDeclarationNode)
+    def visit(self, node):
+        init_exp = None
+        if not node.init_exp is None:
+            init_exp = self.visit(node.init_exp)
+
+        return AttrDeclarationNode(node.id, node.type, init_exp)
+
+    @visitor.when(VarDeclarationNode)
+    def visit(self, node):
+        expr = None
+        if not node.expr is None:
+            expr = self.visit(node.expr)
+
+        return VarDeclarationNode(node.id, node.type, expr)
+
+    @visitor.when(AssignNode)
+    def visit(self, node):
+        expr = self.visit(node.expr)
+        return AssignNode(node.id, expr)
+
+    @visitor.when(FuncDeclarationNode)
+    def visit(self, node):
+        params = [p for p in node.params]
+        body = self.visit(node.body)
+        return FuncDeclarationNode(node.id, params, node.type, body)
+
+    @visitor.when(CallNode)
+    def visit(self, node):
+        obj = None
+        if not node.obj is None:
+            obj = self.visit(node.obj)
+
+        args = []
+        for arg in node.args:
+            args.append(self.visit(arg))
+
+        return CallNode(node.id, args, obj, node.at_type)
+
+    @visitor.when(BlockNode)
+    def visit(self, node):
+        expression_list = []
+        for child in node.expression_list:
+            expression_list.append(self.visit(child))
+        return BlockNode(expression_list)
+
+    @visitor.when(IfNode)
+    def visit(self, node):
+        if_expr = self.visit(node.if_expr)
+        then_expr = self.visit(node.then_expr)
+        else_expr = self.visit(node.else_expr)
+        return IfNode(if_expr, then_expr, else_expr)
+
+    @visitor.when(WhileNode)
+    def visit(self, node):
+        condition = self.visit(node.condition)
+        body = self.visit(node.body)
+        return WhileNode(condition, body)
+
+    @visitor.when(LetNode)
+    def visit(self, node):
+        identifiers = []
+        for child in node.identifiers:
+            identifiers.append(self.visit(child))
+        body = self.visit(node.body)
+        return LetNode(identifiers, body)
+
+    @visitor.when(CaseNode)
+    def visit(self, node):
+        expr = self.visit(node.expr)
+        case_items = []
+        for child in node.case_items:
+            case_items.append(self.visit(child))
+        return CaseNode(expr, case_items)
+
+    @visitor.when(CaseItemNode)
+    def visit(self, node):
+        expr = self.visit(node.expr)
+        return CaseItemNode(node.id, node.type, expr)
+
+    @visitor.when(PlusNode)
+    def visit(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return PlusNode(left, right)
+
+    @visitor.when(MinusNode)
+    def visit(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return MinusNode(left, right)
+
+    @visitor.when(StarNode)
+    def visit(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return StarNode(left, right)
+
+    @visitor.when(DivNode)
+    def visit(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return DivNode(left, right)
+
+    @visitor.when(LessNode)
+    def visit(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return LessNode(left, right)
+
+    @visitor.when(LessEqualNode)
+    def visit(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return LessEqualNode(left, right)
+
+    @visitor.when(EqualNode)
+    def visit(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return EqualNode(left, right)
+
+    @visitor.when(ConstantNumNode)
+    def visit(self, node):
+        return ConstantNumNode(node.lex)
+
+    @visitor.when(VariableNode)
+    def visit(self, node):
+        return VariableNode(node.lex)
+
+    @visitor.when(StringNode)
+    def visit(self, node):
+        return StringNode(node.lex)
+
+    @visitor.when(BooleanNode)
+    def visit(self, node):
+        return BooleanNode(node.lex)
+
+    @visitor.when(InstantiateNode)
+    def visit(self, node):
+        return InstantiateNode(node.lex)
+
+    @visitor.when(NotNode)
+    def visit(self, node):
+        expr = self.visit(node.expr)
+        return NotNode(expr)
+
+    @visitor.when(IsvoidNode)
+    def visit(self, node):
+        expr = self.visit(node.expr)
+        return IsvoidNode(expr)
+
+    @visitor.when(NegNode)
+    def visit(self, node):
+        expr = self.visit(node.expr)
+        return NegNode(expr)

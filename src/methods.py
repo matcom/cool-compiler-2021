@@ -1,4 +1,4 @@
-from src.cmp.pycompiler import (
+from cmp.pycompiler import (
     Symbol,
     NonTerminal,
     Terminal,
@@ -9,9 +9,9 @@ from src.cmp.pycompiler import (
     Production,
     Grammar,
 )
-from src.cmp.utils import ContainerSet
-from src.errors import parsing_table_error, invalid_sentence_error
-from src.cmp.automata import State
+from cmp.utils import ContainerSet
+from errors import parsing_table_error, invalid_sentence_error
+from cmp.automata import State
 
 
 # Computes First(alpha), given First(Vt) and First(Vn)
@@ -146,4 +146,3 @@ def compute_follows(G, firsts):
 
     # Follow(Vn)
     return follows
-
