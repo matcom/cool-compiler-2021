@@ -26,7 +26,7 @@ class FuncDeclarationNode(Node):
     def __init__(self, name, params, return_type, expr=None):
         super().__init__()
         self.name = name
-        self.params = params
+        self.params = [(pname.value, ptype.value, ptype.lineno, ptype.column) for pname, ptype in params]
         self.return_type = return_type
         self.expr = expr
 

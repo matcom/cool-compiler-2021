@@ -25,7 +25,7 @@ class TypeBuilder:
         try:
             self.currentType = self.context.get_type(
                 classDeclarationNode.name, (classDeclarationNode.line, classDeclarationNode.column))
-        except Exception as error:
+        except SemanticError as error:
             self.currentType = ErrorType
             self.errors.append(error)
 
@@ -50,10 +50,35 @@ class TypeBuilder:
                         raise SemanticError(
                             errorText, classDeclarationNode.line, classDeclarationNode.column)
                     current = current.parent
-            except Exception as error:
+            except SemanticError as error:
                 parent = ErrorType()
-                self.errors.append(e)
+                self.errors.append(error)
+
             self.currentType.set_parent(parent)
 
         for feature in classDeclarationNode.features:
             self.visit(feature)
+
+
+    @visit.when(FuncDeclarationNode)
+    def visit(self, funcDeclarationNode):
+        argsNames = []
+        argsTypes = []
+        for name, typex in funcDeclarationNode.params:
+            if name.value in argsNames:
+                errorText = f'Formal parameter {name} is multiply defined.'
+                self.errors.append(SemanticError(errorText, funcDeclarationNode.line, funcDeclarationNode.column))
+
+            argsNames.append(name)
+
+            try:
+                argsTypes = self.context.get_type(typex.value, funcDeclarationNode.line, funcDeclarationNode.column)
+            except SemanticError:
+                errorText = f'Class {typex.value} of formal parameter {typex.value} is undefined.'
+                self.errors.append(SemanticError(errorText, funcDeclarationNode.line, funcDeclarationNode.column))
+                argType = ErrorType()
+                
+            argsTypes.append(argType)
+
+        
+

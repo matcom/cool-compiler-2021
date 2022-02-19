@@ -35,7 +35,7 @@ class TypeCollector(object):
         try:
             self.context.create_type(
                 classDeclarationNode.name, (classDeclarationNode.line, classDeclarationNode.column))
-        except Exception as error:
+        except SemanticError as error:
             self.errors.append(error)
 
         if not classDeclarationNode.parent:
