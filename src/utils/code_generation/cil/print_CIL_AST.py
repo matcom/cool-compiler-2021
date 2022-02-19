@@ -163,6 +163,14 @@ def get_formatter():
         def visit(self, node):
             return f'{node.dest} = COPY {node.copy}'
         
+        @visitor.when(nodes.ReadIntNode)
+        def visit(self, node):
+            return f'{node.dest} = READINT'
+
+        @visitor.when(nodes.PrintIntNode)
+        def visit(self, node):
+            return f'PRINT {node.value}'
+        
     printer = PrintVisitor()
     return (lambda ast: printer.visit(ast))
     

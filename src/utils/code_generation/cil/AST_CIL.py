@@ -187,3 +187,11 @@ class cil_ast:
         def __init__(self, dest, copy):
             self.dest = dest
             self.copy = copy
+    
+    class ReadIntNode(InstructionNode):
+        def __init__(self, dest):
+            self.dest = dest 
+
+    class PrintIntNode(InstructionNode):
+        def __init__(self, value):
+            self.value = value

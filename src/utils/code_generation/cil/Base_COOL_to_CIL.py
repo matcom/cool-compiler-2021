@@ -97,6 +97,12 @@ class BaseCOOLToCIL:
         data_node = self.register_data(msg)
         self.register_instruction(nodes.ErrorNode(data_node))
         self.register_instruction(continue_node)
+    
+    def register_built_in(self):
+        self._register_Object()
+        self._register_IO()
+
+
 
 
     # tipos y funciones integrados en COOL
@@ -138,8 +144,49 @@ class BaseCOOLToCIL:
 
         type_node.methods = [(name, self.to_function_name(name, 'Object')) for name in ['abort', 'type_name', 'copy']]
         type_node.methods += [('init', self.init_name('Object'))]
-        return ['abort', 'type_name', 'copy']
+    
+    def _register_IO(self):
+        type_node = self.register_type('IO')
 
-    def register_built_in(self):
-        obj_methods = self._register_Object()
-        
+        self.current_function = self.register_function(self.init_name('IO'))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.AllocateNode('IO', instance))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        self.current_function = self.register_function(self.to_function_name('out_string', 'IO'))
+        self.register_param(self.vself)
+        self.register_param(VariableInfo('x', None))
+        vname = self.define_internal_local()
+        self.register_instruction(nodes.GetAttrNode(vname, 'x', 'value', 'String'))
+        self.register_instruction(nodes.PrintStrNode(vname))
+        self.register_instruction(nodes.ReturnNode(self.vself.name))
+
+        self.current_function = self.register_function(self.to_function_name('out_int', 'IO'))
+        self.register_param(self.vself)
+        self.register_param(VariableInfo('x', None))
+        vname = self.define_internal_local()
+        self.register_instruction(nodes.GetAttrNode(vname, 'x', 'value', 'Int'))
+        self.register_instruction(nodes.PrintIntNode(vname))
+        self.register_instruction(nodes.ReturnNode(self.vself.name)) 
+
+        self.current_function = self.register_function(self.to_function_name('in_string', 'IO'))
+        self.register_param(self.vself)
+        result = self.define_internal_local()
+        self.register_instruction(nodes.ReadStrNode(result))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.ArgNode(result))
+        self.register_instruction(nodes.StaticCallNode(self.init_name('String'), instance))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        self.current_function = self.register_function(self.to_function_name('in_int', 'IO'))
+        self.register_param(self.vself)
+        result = self.define_internal_local()
+        self.register_instruction(nodes.ReadIntNode(result))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.ArgNode(result))
+        self.register_instruction(nodes.StaticCallNode(self.init_name('Int'), instance))
+        self.register_instruction(nodes.ReturnNode(instance))  
+
+        type_node.methods = [(method, self.to_function_name(method, 'Object')) for method in ['type_name','abort','copy']]
+        type_node.methods += [(name, self.to_function_name(name, 'IO')) for name in ['out_string', 'out_int', 'in_string', 'in_int']]
+        type_node.methods += [('init', self.init_name('IO'))]
