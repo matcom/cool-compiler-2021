@@ -30,12 +30,13 @@ class TypeCollector(object):
     def visit(self, classDeclarationNode):
         if classDeclarationNode.name in ['Int', 'String', 'Bool', 'Object', 'SELF_TYPE', 'IO']:
             errorText = f'Redefinition of basic class {classDeclarationNode.name}'
-            self.errors.append(SemanticError(errorText, *classDeclarationNode.position))
+            self.errors.append(SemanticError(
+                errorText, classDeclarationNode.line, classDeclarationNode.column))
         try:
-            self.context.create_type(classDeclarationNode.name, classDeclarationNode.position)
+            self.context.create_type(
+                classDeclarationNode.name, classDeclarationNode.line, classDeclarationNode.column)
         except Exception as error:
             self.errors.append(error)
-        
+
         if not classDeclarationNode.parent:
             classDeclarationNode.parent = 'Object'
-
