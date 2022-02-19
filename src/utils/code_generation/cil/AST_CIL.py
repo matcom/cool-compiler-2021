@@ -16,8 +16,8 @@ class cil_ast:
             self.methods = []
 
     class DataNode(Node):
-        def __init__(self, vname, value):
-            self.name = vname
+        def __init__(self, idx, value):
+            self.id = idx
             self.value = value
 
     class FunctionNode(Node):
@@ -83,9 +83,6 @@ class cil_ast:
             self.idx = idx
             self.attr = attr
             self.computed_type = computed_type
-        
-        def __repr__(self):
-            return f"{self.dest} = GETATTR {self.idx} {self.attr}"
 
     class SetAttrNode(InstructionNode):
         def __init__(self, idx, attr, value, computed_type):
@@ -93,33 +90,21 @@ class cil_ast:
             self.attr = attr
             self.value = value
             self.computed_type = computed_type
-    
-        def __repr__(self):
-            return f"SETATTR {self.idx} {self.attr} {self.value}"
 
     class AllocateNode(InstructionNode):
         def __init__(self, dest, typex):
             self.dest = dest
             self.type = typex
-        
-        def __repr__(self):
-            return f"{self.dest} = ALLOCATE {self.type}"
 
     class TypeOfNode(InstructionNode):
         def __init__(self, idx, dest):
             self.id = idx
             self.dest = dest
 
-        def __repr__(self):
-            return f"{self.dest} = TYPEOF {self.id}"
-
     class StaticCallNode(InstructionNode):
         def __init__(self, function, dest):
             self.function = function
             self.dest = dest
-        
-        def __repr__(self):
-            return f"{self.dest} = CALL {self.function}"
 
     class DynamicCallNode(InstructionNode):
         def __init__(self, typex, function, dest, computed_type):
@@ -127,53 +112,32 @@ class cil_ast:
             self.function = function
             self.dest = dest
             self.computed_type = computed_type
-        
-        def __repr__(self):
-            return f"{self.dest} = VCALL {self.type} {self.function}"
 
     class ArgNode(InstructionNode):
         def __init__(self, idx):
             self.id = idx
-
-        def __repr__(self):
-            return f"ARG {self.id}"
     
     class IfGotoNode(InstructionNode):
         def __init__(self, if_cond, label):
             self.if_cond = if_cond
             self.label = label
-        
-        def __repr__(self):
-            return f"GOTO {self.label} if {self.if_cond}"
 
     class LabelNode(InstructionNode):
         def __init__(self, label):
             self.label = label
-        
-        def __repr__(self):
-            return f"LABEL {self.label}:"
     
     class GotoNode(InstructionNode):
         def __init__(self, label):
             self.label = label
-        
-        def __repr__(self):
-            return f"GOTO {self.label}"
 
     class ReturnNode(InstructionNode):
         def __init__(self, idx=None):
             self.id = idx
-        
-        def __repr__(self):
-            return f"RETURN {self.id}"
 
     class LoadNode(InstructionNode):
         def __init__(self, dest, msg):
             self.dest = dest
             self.msg = msg
-
-        def __repr__(self):
-            return f"{self.dest} LOAD {self.msg}"
 
     class LengthNode(InstructionNode):
         def __init__(self, dest, idx):
@@ -201,6 +165,3 @@ class cil_ast:
     class PrintStrNode(InstructionNode):
         def __init__(self, value):
             self.value = value
-        
-        def __repr__(self):
-            return f"PRINTSTR {self.value}"
