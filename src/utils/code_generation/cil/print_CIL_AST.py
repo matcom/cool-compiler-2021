@@ -147,6 +147,14 @@ def get_formatter():
         def visit(self, node):
             return f'ERROR {node.data_node}'
         
+        @visitor.when(nodes.TypeNameNode)
+        def visit(self, node):
+            return f'{node.dest} = TYPENAME {node.type}'
+
+        @visitor.when(nodes.NameNode)
+        def visit(self, node):
+            return f'{node.dest} = NAME {node.id}'
+        
     printer = PrintVisitor()
     return (lambda ast: printer.visit(ast))
     

@@ -169,3 +169,13 @@ class cil_ast:
     class ErrorNode(InstructionNode):
         def __init__(self, data_node):
             self.data_node = data_node
+
+    class TypeNameNode(InstructionNode):
+        def __init__(self, dest, typex):
+            self.dest = dest
+            self.type = typex
+    
+    class NameNode(InstructionNode):
+        def __init__(self, dest, idx):
+            self.dest = dest
+            self.id = idx
