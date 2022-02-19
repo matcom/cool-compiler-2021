@@ -77,9 +77,6 @@ class cil_ast:
         def __repr__(self):
             return f"{self.dest} = {self.op_l} == {self.op_r}"
 
-    # class EqualStrNode(ArithmeticNode):
-    #     pass
-
     class GetAttrNode(InstructionNode):
         def __init__(self, dest, idx, attr, computed_type):
             self.dest = dest
@@ -100,12 +97,6 @@ class cil_ast:
         def __repr__(self):
             return f"SETATTR {self.idx} {self.attr} {self.value}"
 
-    # class GetIndexNode(InstructionNode):
-    #     pass
-
-    # class SetIndexNode(InstructionNode):
-    #     pass
-
     class AllocateNode(InstructionNode):
         def __init__(self, dest, typex):
             self.dest = dest
@@ -113,9 +104,6 @@ class cil_ast:
         
         def __repr__(self):
             return f"{self.dest} = ALLOCATE {self.type}"
-
-    # class ArrayNode(InstructionNode):
-    #     pass
 
     class TypeOfNode(InstructionNode):
         def __init__(self, idx, dest):
