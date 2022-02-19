@@ -20,7 +20,7 @@ def main(_input, _output):
         raise Exception()
 
     
-    ast, errors, context, scope = SemanticAn
+    # ast, errors, context, scope = SemanticAn
 
 
 if __name__ == "__main__":

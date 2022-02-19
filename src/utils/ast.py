@@ -9,9 +9,9 @@ class Node():
 
 
 class ProgramNode(Node):
-    def __init__(self, classes):
+    def __init__(self, declarations):
         super().__init__()
-        self.classes = classes
+        self.declarations = declarations
 
 
 class ClassDeclarationNode(Node):

@@ -23,7 +23,7 @@ class TypeCollector(object):
         self.context.types['SELF_TYPE'] = SelfType()
         self.context.types['IO'] = IOType()
 
-        for classDeclarationNode in programNode.classes:
+        for classDeclarationNode in programNode.declarations:
             self.visit(self, classDeclarationNode)
 
     @visitor.when(ClassDeclarationNode)
@@ -34,7 +34,7 @@ class TypeCollector(object):
                 errorText, classDeclarationNode.line, classDeclarationNode.column))
         try:
             self.context.create_type(
-                classDeclarationNode.name, classDeclarationNode.line, classDeclarationNode.column)
+                classDeclarationNode.name, (classDeclarationNode.line, classDeclarationNode.column))
         except Exception as error:
             self.errors.append(error)
 

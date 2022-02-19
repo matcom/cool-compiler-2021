@@ -1,4 +1,4 @@
-
+from semantic.visitors.typeCollector import TypeCollector
 
 def semanticAnalizer(ast):
     errors = []
@@ -6,6 +6,7 @@ def semanticAnalizer(ast):
     typeCollector = TypeCollector(errors)
     typeCollector.visit(ast)
     context = typeCollector.context
+    
 
     typeBuilder = TypeBuilder(context, errors)
     typeBuilder.visit(ast)
@@ -17,5 +18,5 @@ def semanticAnalizer(ast):
     typeChecker.visit(ast, scope)
 
     return ast, errors, context, scope
-    
+
 

@@ -1,4 +1,4 @@
-class CoolError():
+class CoolError(Exception):
     def __init__(self, error_type, text, line, column):
         self.type = error_type
         self.text = text
