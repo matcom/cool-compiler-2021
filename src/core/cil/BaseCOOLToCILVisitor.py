@@ -42,20 +42,20 @@ class BaseCOOLToCILVisitor:
         name = f'local_param_{self.current_function.name}_{vinfo.name}_{len(self.params)}'
         param_node = cil.ParamNode(name, line, column)
         self.params.append(param_node)
-        self.var_names[vinfo.name] = name
-        return name
+        self.var_names[vinfo.name] = cil.VarNode(name, line, column)
+        return self.var_names[vinfo.name]
 
     def register_local(self, vinfo, line, column):
         name = vinfo.name
         vinfo.name = f'local_{self.current_function.name}_{vinfo.name}_{len(self.localvars)}'
         local_node = cil.LocalNode(vinfo.name, line, column)
         self.localvars.append(local_node)
-        self.var_names[name] = vinfo.name
-        return vinfo.name
+        self.var_names[name] = cil.VarNode(vinfo.name, line, column)
+        return self.var_names[name]
 
     def register_attribute(self, name, type, line, column):
         name =  f'attr_{type}_{name}'
-        return cil.AttributeNode(name, line, column)
+        return cil.AttributeNode(name, type, line, column)
 
 
     def define_internal_local(self, line, column):
@@ -92,10 +92,10 @@ class BaseCOOLToCILVisitor:
         return cil.LabelNode(lname, line, column)
 
     def init_name(self, name):
-        return f'init_at_{name}'
+        return f'_init_at_{name}'
 
     def init_attr_name(self, name):
-        return f'init_attr_at_{name}'
+        return f'_init_attr_at_{name}'
 
     def register_runtime_error(self, condition, msg, line, column):
         error_node = self.register_label('error_label', line, column)

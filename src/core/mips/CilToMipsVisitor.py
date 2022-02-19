@@ -54,8 +54,12 @@ class CILToMIPSVisitor:
     def get_label(self, label):
         return self._labels[label]
 
-    def get_var_location(self, name):
-        return self._current_function.get_var_location(name)
+    def get_var_location(self, node):
+        if isinstance(node, cil.AttributeNode):
+            return mips.RegisterRelativeLocation(mips.SP_REG, 0)
+        if isinstance(node, str):
+            return self._current_function.get_var_location(node)
+        return self._current_function.get_var_location(node.name)
 
     @visitor.on('node')
     def collect_func_names(self, node):
@@ -163,16 +167,24 @@ class CILToMIPSVisitor:
 
         if isinstance(node.source, cil.VoidNode):
             reg1 = mips.ZERO_REG
-        elif node.source.isnumeric():
+        elif isinstance(node.source, int):
             reg1 = mips.REGISTERS[0]
             instructions.append(mips.LoadInmediateNode(reg1, int(node.source), line=node.line, column=node.column))
         else:
             reg1 = mips.REGISTERS[0]
+            instructions.extend(self.visit(node.source))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.source),
                                                   line=node.line, column=node.column))
+            if isinstance(node.source, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         return instructions
 
     @visitor.when(cil.PlusNode)
@@ -183,20 +195,32 @@ class CILToMIPSVisitor:
         if isinstance(node.left, int):
             instructions.append(mips.LoadInmediateNode(reg1, node.left, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.left))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                                   line=node.line, column=node.column))
+            if isinstance(node.left, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
         if isinstance(node.right, int):
             instructions.append(mips.LoadInmediateNode(reg2, node.right, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.right))
             instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                                   line=node.line, column=node.column))
+            if isinstance(node.right, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg3 = mips.REGISTERS[0]
         instructions.append(mips.AdditionNode(reg3, reg1, reg2, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg3, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -208,20 +232,32 @@ class CILToMIPSVisitor:
         if isinstance(node.left, int):
             instructions.append(mips.LoadInmediateNode(reg1, node.left, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.left))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                                   line=node.line, column=node.column))
+            if isinstance(node.left, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
         if isinstance(node.right, int):
             instructions.append(mips.LoadInmediateNode(reg2, node.right, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.right))
             instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                                   line=node.line, column=node.column))
+            if isinstance(node.right, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg3 = mips.REGISTERS[0]
         instructions.append(mips.SubstractionNode(reg3, reg1, reg2, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg3, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -233,20 +269,32 @@ class CILToMIPSVisitor:
         if isinstance(node.left, int):
             instructions.append(mips.LoadInmediateNode(reg1, node.left, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.left))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                                   line=node.line, column=node.column))
+            if isinstance(node.left, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
         if isinstance(node.right, int):
             instructions.append(mips.LoadInmediateNode(reg2, node.right, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.right))
             instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                                   line=node.line, column=node.column))
+            if isinstance(node.right, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg3 = mips.REGISTERS[0]
         instructions.append(mips.MultiplyNode(reg3, reg1, reg2, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg3, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -258,20 +306,32 @@ class CILToMIPSVisitor:
         if isinstance(node.left, int):
             instructions.append(mips.LoadInmediateNode(reg1, node.left, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.left))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                                   line=node.line, column=node.column))
+            if isinstance(node.left, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
         if isinstance(node.right, int):
             instructions.append(mips.LoadInmediateNode(reg2, node.right, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.right))
             instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                                   line=node.line, column=node.column))
+            if isinstance(node.right, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         instructions.append(mips.DivideNode(reg1, reg2, line=node.line, column=node.column))
         instructions.append(mips.MoveLowNode(reg1, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -289,8 +349,12 @@ class CILToMIPSVisitor:
 
         instructions.append(mips.LoadInmediateNode(reg1, type, line=node.line, column=node.column))
         instructions.extend(mips.create_object(reg1, reg2, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -301,8 +365,12 @@ class CILToMIPSVisitor:
         reg1 = mips.REGISTERS[0]
         reg2 = mips.REGISTERS[1]
 
+        instructions.extend(self.visit(node.obj))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.obj),
                                               line=node.line, column=node.column))
+        if isinstance(node.obj, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.LoadWordNode(reg2, mips.RegisterRelativeLocation(reg1, 0),
                                               line=node.line, column=node.column))
         instructions.append(mips.ShiftLeftNode(reg2, reg2, 2, node.line, node.column))
@@ -310,8 +378,12 @@ class CILToMIPSVisitor:
         instructions.append(mips.AdditionNode(reg1, reg1, reg2, node.line, node.column))
         instructions.append(mips.LoadWordNode(reg2, mips.RegisterRelativeLocation(reg1, 0),
                                               line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg2, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -326,8 +398,12 @@ class CILToMIPSVisitor:
                                                            self._pushed_args * mips.DOUBLE_WORD,
                                                            line=node.line, column=node.column))
             self._pushed_args = 0
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -355,8 +431,12 @@ class CILToMIPSVisitor:
                                                            self._pushed_args * mips.DOUBLE_WORD,
                                                            line=node.line, column=node.column))
             self._pushed_args = 0
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -369,8 +449,12 @@ class CILToMIPSVisitor:
             instructions.append(mips.LoadInmediateNode(reg, node.name,
                                                        line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.name))
             instructions.append(mips.LoadWordNode(reg, self.get_var_location(node.name),
                                                   line=node.line, column=node.column))
+            if isinstance(node.name, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
         instructions.extend(mips.push_register(reg, line=node.line, column=node.column))
         return instructions
 
@@ -384,8 +468,12 @@ class CILToMIPSVisitor:
             instructions.append(mips.LoadInmediateNode(mips.V0_REG, node.value,
                                                        line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.value))
             instructions.append(mips.LoadWordNode(mips.V0_REG, self.get_var_location(node.value),
                                                   line=node.line, column=node.column))
+            if isinstance(node.value, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
         return instructions
 
     @visitor.when(cil.LoadNode)
@@ -394,8 +482,12 @@ class CILToMIPSVisitor:
 
         reg = mips.REGISTERS[0]
         instructions.append(mips.LoadAddressNode(reg, self._data_section[node.msg.name].label, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg, self.get_var_location(node.dest)
                                                , line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -403,8 +495,12 @@ class CILToMIPSVisitor:
     def visit(self, node: cil.PrintStringNode):
         instructions = []
         instructions.append(mips.LoadInmediateNode(mips.V0_REG, 4, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.str_addr))
         instructions.append(mips.LoadWordNode(mips.ARG_REGISTERS[0], self.get_var_location(node.str_addr),
                                               line=node.line, column=node.column))
+        if isinstance(node.str_addr, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.SyscallNode())
         return instructions
 
@@ -412,8 +508,12 @@ class CILToMIPSVisitor:
     def visit(self, node: cil.PrintIntNode):
         instructions = []
         instructions.append(mips.LoadInmediateNode(mips.V0_REG, 1, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.value))
         instructions.append(mips.LoadWordNode(mips.ARG_REGISTERS[0], self.get_var_location(node.value),
                                               line=node.line, column=node.column))
+        if isinstance(node.value, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.SyscallNode())
         return instructions
 
@@ -429,8 +529,12 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.value))
         instructions.append(mips.LoadWordNode(reg, self.get_var_location(node.value),
                                               line=node.line, column=node.column))
+        if isinstance(node.value, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.LoadWordNode(mips.ARG_REGISTERS[0], mips.RegisterRelativeLocation(reg, 4),
                                               line=node.line, column=node.column))
         instructions.append(mips.ShiftLeftNode(mips.ARG_REGISTERS[0], mips.ARG_REGISTERS[0], 2,
@@ -441,8 +545,12 @@ class CILToMIPSVisitor:
         instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg, line=node.line, column=node.column))
         instructions.append(mips.MoveNode(mips.ARG_REGISTERS[1], mips.V0_REG, line=node.line, column=node.column))
         instructions.append(mips.JalNode("copy", line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest)
                                                , line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -452,15 +560,23 @@ class CILToMIPSVisitor:
 
         reg1 = mips.REGISTERS[0]
         reg2 = mips.REGISTERS[1]
+        instructions.extend(self.visit(node.obj))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.obj),
                                               line=node.line, column=node.column))
+        if isinstance(node.obj, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         tp = self._types_section[node.computed_type]
         offset = (tp.attributes.index(node.attr) + 3) * mips.DOUBLE_WORD
         instructions.append(mips.LoadWordNode(reg2, mips.RegisterRelativeLocation(reg1, offset),
                                               line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg2, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -483,8 +599,12 @@ class CILToMIPSVisitor:
 
         instructions.append(mips.LoadInmediateNode(mips.V0_REG, 5, line=node.line, column=node.column))
         instructions.append(mips.SyscallNode())
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -493,8 +613,11 @@ class CILToMIPSVisitor:
         instructions = []
 
         instructions.append(mips.JalNode('read_string', node.line, node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest), node.line, node.column))
-
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         return instructions
 
     @visitor.when(cil.SetAttribNode)
@@ -505,16 +628,24 @@ class CILToMIPSVisitor:
         offset = (tp.attributes.index(node.attr) + 3) * mips.DOUBLE_WORD
 
         reg1 = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.obj))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.obj),
                                               line=node.line, column=node.column))
+        if isinstance(node.obj, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
         if type(node.value) == int:
             instructions.append(mips.LoadInmediateNode(reg2, node.value,
                                                        line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.value))
             instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.value),
                                                   line=node.line, column=node.column))
+            if isinstance(node.value, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         instructions.append(mips.StoreWordNode(reg2, mips.RegisterRelativeLocation(reg1, offset),
                                                line=node.line, column=node.column))
@@ -525,15 +656,27 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg1 = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.left))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                               line=node.line, column=node.column))
+        if isinstance(node.left, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
+        instructions.extend(self.visit(node.right))
         instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                               line=node.line, column=node.column))
+        if isinstance(node.right, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.LessNode(reg2, reg1, reg2, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg2, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -543,8 +686,12 @@ class CILToMIPSVisitor:
         mips_label = self.get_label(node.label)
 
         reg1 = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.condition))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.condition),
                                               line=node.line, column=node.column))
+        if isinstance(node.condition, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.BranchOnNotEqualNode(reg1, mips.ZERO_REG, mips_label,
                                                       line=node.line, column=node.column))
 
@@ -565,26 +712,42 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg1 = mips.ARG_REGISTERS[0]
+        instructions.extend(self.visit(node.str_value))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.str_value),
                                               line=node.line, column=node.column))
+        if isinstance(node.str_value, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         reg1 = mips.ARG_REGISTERS[1]
         if type(node.index) == int:
             instructions.append(mips.LoadInmediateNode(reg1, node.index, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.index))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.index),
                                                   line=node.line, column=node.column))
+            if isinstance(node.index, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg1 = mips.ARG_REGISTERS[2]
         if type(node.index) == int:
             instructions.append(mips.LoadInmediateNode(reg1, node.length, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.length))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.length),
                                                   line=node.line, column=node.column))
+            if isinstance(node.length, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         instructions.append(mips.JalNode("substr", line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         return instructions
 
     @visitor.when(cil.ConcatNode)
@@ -592,20 +755,33 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg = mips.ARG_REGISTERS[0]
+        instructions.extend(self.visit(node.prefix))
         instructions.append(
             mips.LoadWordNode(reg, self.get_var_location(node.prefix), line=node.line, column=node.column))
-
+        if isinstance(node.prefix, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         reg = mips.ARG_REGISTERS[1]
+        instructions.extend(self.visit(node.suffix))
         instructions.append(
             mips.LoadWordNode(reg, self.get_var_location(node.suffix), line=node.line, column=node.column))
-
+        if isinstance(node.suffix, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         reg = mips.ARG_REGISTERS[2]
+        instructions.extend(self.visit(node.length))
         instructions.append(
             mips.LoadWordNode(reg, self.get_var_location(node.length), line=node.line, column=node.column))
-
+        if isinstance(node.length, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.JalNode("concat", line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         return instructions
 
     @visitor.when(cil.LengthNode)
@@ -613,12 +789,20 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg = mips.ARG_REGISTERS[0]
+        instructions.extend(self.visit(node.source))
         instructions.append(mips.LoadWordNode(reg, self.get_var_location(node.source),
                                               line=node.line, column=node.column))
+        if isinstance(node.source, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         instructions.append(mips.JalNode("length", line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -630,19 +814,31 @@ class CILToMIPSVisitor:
         if type(node.left) == cil.VoidNode:
             instructions.append(mips.LoadInmediateNode(reg1, 0, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.left))
             instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                                   line=node.line, column=node.column))
+            if isinstance(node.left, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
         if type(node.right) == cil.VoidNode:
             instructions.append(mips.LoadInmediateNode(reg2, 0, line=node.line, column=node.column))
         else:
+            instructions.extend(self.visit(node.right))
             instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                                   line=node.line, column=node.column))
+            if isinstance(node.right, cil.AttributeNode):
+                instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                               node.line, node.column))
 
         instructions.append(mips.EqualNode(reg1, reg1, reg2, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         return instructions
 
     @visitor.when(cil.NameNode)
@@ -657,8 +853,12 @@ class CILToMIPSVisitor:
         instructions.append(mips.LoadWordNode(reg, mips.RegisterRelativeLocation(reg, 0),
                                               line=node.line, column=node.column))
 
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         return instructions
 
     @visitor.when(cil.EqualStringNode)
@@ -666,18 +866,30 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg1 = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.left))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                               line=node.line, column=node.column))
+        if isinstance(node.left, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         # TODO: Ver si se hace usando los registros de parametros
         instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg1, line=node.line, column=node.column))
 
+        instructions.extend(self.visit(node.right))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.right),
                                               line=node.line, column=node.column))
+        if isinstance(node.right, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.MoveNode(mips.ARG_REGISTERS[1], reg1, line=node.line, column=node.column))
 
         instructions.append(mips.JalNode("equal_str", line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(mips.V0_REG, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -686,13 +898,21 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg1 = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.value))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.value),
                                               line=node.line, column=node.column))
+        if isinstance(node.value, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         instructions.append(mips.NotNode(reg1, reg1, line=node.line, column=node.column))
         instructions.append(mips.AdditionInmediateNode(reg1, reg1, 1, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         return instructions
 
@@ -701,16 +921,28 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg1 = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.left))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.left),
                                               line=node.line, column=node.column))
+        if isinstance(node.left, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         reg2 = mips.REGISTERS[1]
+        instructions.extend(self.visit(node.right))
         instructions.append(mips.LoadWordNode(reg2, self.get_var_location(node.right),
                                               line=node.line, column=node.column))
+        if isinstance(node.right, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
         instructions.append(mips.LessEqualNode(reg1, reg1, reg2, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         return instructions
 
     '''
@@ -728,10 +960,40 @@ class CILToMIPSVisitor:
         instructions = []
 
         reg1 = mips.REGISTERS[0]
+        instructions.extend(self.visit(node.value))
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(node.value),
                                               line=node.line, column=node.column))
+        if isinstance(node.value, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
         instructions.append(mips.NotNode(reg1, reg1, line=node.line, column=node.column))
+        instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
                                                line=node.line, column=node.column))
+        if isinstance(node.dest, cil.AttributeNode):
+            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
+                                                           node.line, node.column))
 
+        return instructions
+
+    @visitor.when(cil.VarNode)
+    def visit(self, node: cil.VarNode):
+        return []
+
+    @visitor.when(cil.ParamNode)
+    def visit(self, node: cil.ParamNode):
+        return []
+
+    @visitor.when(cil.AttributeNode)
+    def visit(self, node: cil.AttributeNode):
+        instructions = []
+
+        self_var = self._current_function.params[0]
+        reg1 = mips.REGISTERS[0]
+        instructions.append(mips.LoadWordNode(reg1, self.get_var_location(self_var), node.line, node.column))
+
+        index = self._types_section[node.type].attributes.index(node.name) + 3
+        instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(reg1, index * 4),
+                                              line=node.line, column=node.column))
+        instructions.extend(mips.push_register(reg1, node.line, node.column))
         return instructions

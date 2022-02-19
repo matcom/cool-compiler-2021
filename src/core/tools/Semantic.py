@@ -21,6 +21,9 @@ class Attribute:
     def __repr__(self):
         return str(self)
 
+    def __lt__(self, other):
+        return self.name < other.name
+
 # Representa un metodo en un tipo del programa
 class Method:
     def __init__(self, name : str, param_names : list, param_types : list, return_type):

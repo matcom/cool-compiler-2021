@@ -35,17 +35,7 @@ class FunctionNode(Node):
         self.instructions = instructions
         self.labels_count = 0
 
-class ParamNode(Node):
-    def __init__(self, name, line, column):
-        super().__init__(line, column)
-        self.name = name
-
 class LocalNode(Node):
-    def __init__(self, name, line, column):
-        super().__init__(line, column)
-        self.name = name
-
-class AttributeNode(Node):
     def __init__(self, name, line, column):
         super().__init__(line, column)
         self.name = name
@@ -285,6 +275,20 @@ class ComplementNode(InstructionNode):
         self.dest = dest
         self.value = value
 
+class VarNode(InstructionNode):
+    def __init__(self, name, line, column):
+        super().__init__(line, column)
+        self.name = name
+
+class AttributeNode(VarNode):
+    def __init__(self, name, type, line, column):
+        super().__init__(name, line, column)
+        self.type = type
+
+class ParamNode(VarNode):
+    def __init__(self, name, line, column):
+        super().__init__(name, line, column)
+
 def get_formatter():
 
     class PrintVisitor(object):
@@ -433,7 +437,7 @@ def get_formatter():
 
         @visitor.when(SubstringNode)
         def visit(self, node: SubstringNode):
-            return f'{node.dest} = SUBSTRING {node.str_value}[{node.index}:{node.index + node.length}]'
+            return f'{node.dest} = SUBSTRING {node.str_value}[{node.index}:{node.index} up to {node.length}]'
 
         @visitor.when(ConcatNode)
         def visit(self, node: ConcatNode):

@@ -20,10 +20,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         generation.reverse()
         for i in generation:
-            for meth in i.methods:
+            methods = sorted(i.methods)
+            attributes = sorted(i.attributes)
+            for meth in methods:
                 type.methods[meth] = self.to_function_name(meth, i.name)
-            for attr in i.attributes:
-                type.attributes[attr.name] = self.register_attribute(attr.name, i.name, i.line, i.column)
+            for attr in attributes:
+                type.attributes[attr.name] = cil.AttributeNode(attr.name, i.name, i.line, i.column)
 
     @visitor.on('node')
     def visit(self, node):
@@ -56,9 +58,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.current_function = self.register_function(self.init_attr_name(node.id.lex),
                                                        line=node.line, column=node.column)
+        type.methods['init_attr'] = self.current_function.name
         self_param = self.register_param(self.vself, line=node.line, column=node.column)
         self.localvars.extend(type.attributes.values())
-        self.var_names.update({i:j.name for i,j in type.attributes.items()})
+        self.var_names.update({i:cil.AttributeNode(j.name, type.name, node.line, node.column)
+                               for i,j in type.attributes.items()})
 
         self.vself.name = self_param
         # Inicializando los atributos de la clase y llamando al constructor del padre
@@ -88,6 +92,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         # Allocate de la clase
         self.current_function = self.register_function(self.init_name(node.id.lex), line=node.line, column=node.column)
+        type.methods['_init'] = self.current_function.name
         self.localvars.extend(type.attributes.values())
         instance = self.define_internal_local(line=node.line, column=node.column)
         self.register_instruction(cil.AllocateNode(node.id.lex, instance, line=node.line, column=node.column))
