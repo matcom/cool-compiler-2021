@@ -154,6 +154,14 @@ def get_formatter():
         @visitor.when(nodes.NameNode)
         def visit(self, node):
             return f'{node.dest} = NAME {node.id}'
+
+        @visitor.when(nodes.AbortNode)
+        def visit(self, node):
+            return f'ABORT'
+        
+        @visitor.when(nodes.CopyNode)
+        def visit(self, node):
+            return f'{node.dest} = COPY {node.copy}'
         
     printer = PrintVisitor()
     return (lambda ast: printer.visit(ast))

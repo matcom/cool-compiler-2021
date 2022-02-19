@@ -97,3 +97,49 @@ class BaseCOOLToCIL:
         data_node = self.register_data(msg)
         self.register_instruction(nodes.ErrorNode(data_node))
         self.register_instruction(continue_node)
+
+
+    # tipos y funciones integrados en COOL
+    def _register_Object(self):
+        type_node = self.register_type('Object')
+
+        self.current_function = self.register_function(self.init_name('Object'))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.AllocateNode('Object', instance))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        self.current_function = self.register_function(self.to_function_name('abort', 'Object'))
+        self.register_param(self.vself)
+        vname = self.define_internal_local()
+        data_node = [dn for dn in self.dotdata if dn.value == 'Abort called from class '][0]
+        self.register_instruction(nodes.LoadNode(vname, data_node))
+        self.register_instruction(nodes.PrintStrNode(vname))
+        self.register_instruction(nodes.TypeNameNode(vname, self.vself.name))
+        self.register_instruction(nodes.PrintStrNode(vname))
+        data_node = self.register_data('\n')
+        self.register_instruction(nodes.LoadNode(vname, data_node))
+        self.register_instruction(nodes.PrintStrNode(vname))
+        self.register_instruction(nodes.AbortNode())
+
+        self.current_function = self.register_function(self.to_function_name('type_name', 'Object'))
+        self.register_param(self.vself)
+        result = self.define_internal_local()
+        self.register_instruction(nodes.TypeNameNode(result, self.vself.name))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.ArgNode(result))
+        self.register_instruction(nodes.StaticCallNode(self.init_name('String'), instance))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        self.current_function = self.register_function(self.to_function_name('copy', 'Object'))
+        self.register_param(self.vself)
+        result = self.define_internal_local()
+        self.register_instruction(nodes.CopyNode(result, self.vself.name))
+        self.register_instruction(nodes.ReturnNode(result))
+
+        type_node.methods = [(name, self.to_function_name(name, 'Object')) for name in ['abort', 'type_name', 'copy']]
+        type_node.methods += [('init', self.init_name('Object'))]
+        return ['abort', 'type_name', 'copy']
+
+    def register_built_in(self):
+        obj_methods = self._register_Object()
+        

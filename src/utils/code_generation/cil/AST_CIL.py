@@ -179,3 +179,11 @@ class cil_ast:
         def __init__(self, dest, idx):
             self.dest = dest
             self.id = idx
+    
+    class AbortNode(InstructionNode):
+        pass
+
+    class CopyNode(InstructionNode):
+        def __init__(self, dest, copy):
+            self.dest = dest
+            self.copy = copy

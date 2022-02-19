@@ -13,7 +13,7 @@ from utils.semantic_check.type_checker import TypeChecker
 from utils.parser.LALR_1 import LALR1_Parser
 
 if __name__ == "__main__":
-    add = "semantic/inheritance4.cl"
+    add = "codegen/arith.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
@@ -46,6 +46,7 @@ if __name__ == "__main__":
     # ast       
     ast = evaluate_reverse_parse(G, derivation, operations, lexer.fixed_tokens(tokens))
             
+    # chequeo semantico
     context = Context()
     semantic_errors = []
 
@@ -62,3 +63,5 @@ if __name__ == "__main__":
         for error in semantic_errors:
             print(error)                          
         raise Exception()
+
+# generacion de codigo
