@@ -989,11 +989,10 @@ class CILToMIPSVisitor:
         instructions = []
 
         self_var = self._current_function.params[0]
-        reg1 = mips.REGISTERS[0]
+        reg1 = mips.REGISTERS[4]
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(self_var), node.line, node.column))
 
         index = self._types_section[node.type].attributes.index(node.name) + 3
-        instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(reg1, index * 4),
-                                              line=node.line, column=node.column))
+        instructions.append(mips.AdditionInmediateNode(reg1, reg1, index * 4, line=node.line, column=node.column))
         instructions.extend(mips.push_register(reg1, node.line, node.column))
         return instructions

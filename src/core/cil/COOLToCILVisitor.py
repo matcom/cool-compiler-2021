@@ -68,7 +68,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # Inicializando los atributos de la clase y llamando al constructor del padre
         if self.current_type.parent.name not in ('Object', 'IO'):
             variable = self.define_internal_local(line=node.line, column=node.column)
-            self.register_instruction(cil.ArgNode(self.vself.name, line=node.line, column=node.column))
+            self.register_instruction(cil.ArgNode(self_param, line=node.line, column=node.column))
             self.register_instruction(cil.StaticCallNode(
                 self.init_attr_name(self.current_type.parent.name), variable, line=node.line, column=node.column))
 
@@ -102,7 +102,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.StaticCallNode(self.init_attr_name(node.id.lex), variable,
                                                      line=node.line, column=node.column))
 
-        self.register_instruction(cil.ReturnNode(value=instance, line=node.line, column=node.column))
+        self.register_instruction(cil.ReturnNode(value=variable, line=node.line, column=node.column))
 
         self.current_function = None
         self.current_type = None
@@ -114,7 +114,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.visit(node.expression, scope.childs[0])
             self.register_instruction(cil.AssignNode(variable, node.expression.ret_expr,
                                                      line=node.expression.line, column=node.expression.column))
-        elif node.type.lex in self.value_types:
+        else:
             self.register_instruction(cil.AllocateNode(node.type.lex, variable, line=node.line, column=node.column))
         node.ret_expr = variable
 
@@ -534,14 +534,18 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.register_instruction(cil.ArgNode(node.obj.ret_expr, line=node.obj.line, column=node.obj.column))
         for arg in args: self.register_instruction(arg)
-        self.register_instruction(cil.ArgNode(node.obj.ret_expr, line=node.obj.line, column=node.obj.column))
         ret = self.define_internal_local(line=node.line, column=node.column)
-        if node.type is None:
-            stype = node.obj.static_type.name
-        else:
+        if node.type is not None:
             stype = node.type.lex
-        self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.id.lex],
-                                                      ret, line=node.id.line, column=node.id.column))
+            self.register_instruction(cil.StaticCallNode(self.types_map[stype].methods[node.id.lex],
+                                                          ret, line=node.id.line, column=node.id.column))
+        else:
+            stype = node.obj.static_type.name
+            self.register_instruction(cil.ArgNode(node.obj.ret_expr, line=node.obj.line, column=node.obj.column))
+            self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.id.lex],
+                                                          ret, line=node.id.line, column=node.id.column))
+
+
         node.ret_expr = ret
 
     @visitor.when(cool.MemberCallNode)
