@@ -53,30 +53,21 @@ type IO {
 }
 type A {
 	parent: Object
-	attribute a
+	
 
 	method __init: __init_A_type
-	method __init_a_at_A: __init_a_at_A
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
-	method get: function_get_at_A
-	method get2: function_get2_at_A
-	method get3: function_get3_at_A
 }
 type B {
 	parent: A
-	attribute a
+	
 
 	method __init: __init_B_type
-	method __init_a_at_B: __init_a_at_B
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
-	method get: function_get_at_A
-	method get2: function_get2_at_A
-	method get3: function_get3_at_A
-	method get4: function_get4_at_B
 }
 type Main {
 	parent: IO
@@ -258,82 +249,16 @@ function function_in_int_at_IO {
 function __init_A_type {
 	PARAM self
 
-	LOCAL local__init_A_type_internal_0
+	
 
-	ARG self
-	local__init_A_type_internal_0 = CALL __init_a_at_A
 	RETURN self
 }
-function __init_a_at_A {
-	PARAM self
-
-	LOCAL local__init_a_at_A_internal_0
-
-	local__init_a_at_A_internal_0 = VOID
-	SETATTR self a local__init_a_at_A_internal_0
-	RETURN 
-}
-function function_get_at_A {
+function __init_B_type {
 	PARAM self
 
 	
 
 	RETURN self
-}
-function function_get2_at_A {
-	PARAM self
-
-	LOCAL local_get2_at_A_internal_0
-	LOCAL local_get2_at_A_internal_1
-
-	local_get2_at_A_internal_1 = TYPEOF self
-	local_get2_at_A_internal_0 = ALLOCATE local_get2_at_A_internal_1
-	ARG local_get2_at_A_internal_0
-	local_get2_at_A_internal_0 = VCALL local_get2_at_A_internal_1 __init
-	RETURN local_get2_at_A_internal_0
-}
-function function_get3_at_A {
-	PARAM self
-
-	LOCAL local_get3_at_A_internal_0
-	LOCAL local_get3_at_A_internal_1
-	LOCAL local_get3_at_A_internal_2
-	LOCAL local_get3_at_A_internal_3
-
-	local_get3_at_A_internal_2 = TYPEOF self
-	local_get3_at_A_internal_1 = ALLOCATE local_get3_at_A_internal_2
-	ARG local_get3_at_A_internal_1
-	local_get3_at_A_internal_1 = VCALL local_get3_at_A_internal_2 __init
-	SETATTR self a local_get3_at_A_internal_1
-	local_get3_at_A_internal_3 = GETATTR self a
-	RETURN local_get3_at_A_internal_3
-}
-function __init_B_type {
-	PARAM self
-
-	LOCAL local__init_B_type_internal_0
-
-	ARG self
-	local__init_B_type_internal_0 = CALL __init_a_at_B
-	RETURN self
-}
-function __init_a_at_B {
-	PARAM self
-
-	LOCAL local__init_a_at_B_internal_0
-
-	local__init_a_at_B_internal_0 = VOID
-	SETATTR self a local__init_a_at_B_internal_0
-	RETURN 
-}
-function function_get4_at_B {
-	PARAM self
-
-	LOCAL local_get4_at_B_internal_0
-
-	ARG self
-	local_get4_at_B_internal_0 = CALL function_get3_at_A
-	RETURN local_get4_at_B_internal_0
 }
 function __init_Main_type {
 	PARAM self
@@ -363,15 +288,14 @@ function function_main_at_Main {
 	ARG local_main_at_Main_internal_0
 	local_main_at_Main_internal_0 = CALL __init_B_type
 	local_main_at_Main_internal_1 = TYPEOF local_main_at_Main_internal_0
-	local_main_at_Main_internal_2 = ARRAY Int 3
-	SETINDEX local_main_at_Main_internal_2 0 Object
-	SETINDEX local_main_at_Main_internal_2 1 A
-	SETINDEX local_main_at_Main_internal_2 2 B
+	local_main_at_Main_internal_2 = ARRAY Object 2
+	SETINDEX local_main_at_Main_internal_2 0 A
+	SETINDEX local_main_at_Main_internal_2 1 B
 	local_main_at_Main_internal_3 = -1
 	local_main_at_Main_internal_5 = -2
 	LABEL main_at_Main_label_0
 	local_main_at_Main_internal_3 = local_main_at_Main_internal_3 + 1
-	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_3 3
+	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_3 2
 	IF local_main_at_Main_internal_8 GOTO main_at_Main_label_2
 	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_3
 	ARG local_main_at_Main_internal_1
@@ -392,24 +316,18 @@ function function_main_at_Main {
 	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
 	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_3
 	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_4
-	local_main_at_Main_internal_11 = EQUAL Object local_main_at_Main_internal_7
-	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
-	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_5
-	local_main_at_Main_internal_0 = 0
-	GOTO main_at_Main_label_4
-	LABEL main_at_Main_label_5
 	local_main_at_Main_internal_11 = EQUAL A local_main_at_Main_internal_7
 	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
-	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_6
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_5
 	local_main_at_Main_internal_0 = 1
 	GOTO main_at_Main_label_4
-	LABEL main_at_Main_label_6
+	LABEL main_at_Main_label_5
 	local_main_at_Main_internal_11 = EQUAL B local_main_at_Main_internal_7
 	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
-	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_7
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_6
 	local_main_at_Main_internal_0 = 2
 	GOTO main_at_Main_label_4
-	LABEL main_at_Main_label_7
+	LABEL main_at_Main_label_6
 	LABEL main_at_Main_label_3
 	ABORT
 	LABEL main_at_Main_label_4

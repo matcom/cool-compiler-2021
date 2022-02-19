@@ -268,6 +268,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(LoadWordNode(dest, self.local_variable_offset[name], Reg.fp())) # Stack address for local variable
 
     def _load_type_variable(self, dest, name):
+        if isinstance(name, cil.TypeNode):
+            name = name.name
         self.add_instruction(LoadAddressNode(dest, name))
 
     def _store_local_variable(self, source, name_or_value):
@@ -354,7 +356,24 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(SyscallNode()) # Returns in $v0 the allocated memory
     
     def _attribute_index_to_offset(self, index):
+        """
+        Returns the offset for the given attribute's index in the object memory space 
+        """
         return self.WORD_SIZE + index * self.WORD_SIZE # Object Type address first and then the attributes
+
+    def _get_array_index(self, dest_reg, aux_reg, index):
+        """
+        Returns in `dest_reg` the actual offset for `index` in an array, `aux_reg` is used
+        for computing this value.
+        """
+        try:
+            offset = int(index) * self.WORD_SIZE
+            self._load_value(dest_reg, offset) # Offset in dest_reg
+        except ValueError:
+            self._load_value(aux_reg, index)
+            self.add_instruction(LoadImmediateNode(dest_reg, self.WORD_SIZE))
+            self.add_instruction(MultiplyNoOverflowNode(dest_reg, dest_reg, aux_reg)) # Offset in dest_reg
+
 
     def add_instruction(self, instr:Node):
         self.program_node.instructions.append(instr)
@@ -542,39 +561,38 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.ArrayNode)
     def visit(self, node:cil.ArrayNode):
-        self._load_value(Reg.a(0), node.length) # Saves in $a0 the array's byte size
-        self._allocate_heap_space(Reg.a(0))
+        # Calculating Length
+        self._get_array_index(Reg.a(0), Reg.t(0), node.length)
+        # $a0 = Array Length
+        
+        self._allocate_heap_space(Reg.a(0)) # Allocated address in $v0
         self._store_local_variable(Reg.v(0), node.dest)
     
     @visitor.when(cil.GetIndexNode)
     def visit(self, node:cil.GetIndexNode):
-        self._load_value(Reg.t(0), node.index)
-        self._load_value(Reg.t(1), node.source)
-        
         # Calculating Offset
-        self.add_instruction(LoadImmediateNode(Reg.t(2), self.WORD_SIZE))
-        self.add_instruction(MultiplyNoOverflowNode(Reg.t(2), Reg.t(2), Reg.t(0))) # Offset in t2
+        self._get_array_index(Reg.t(2), Reg.t(0), node.index) # Offset in t2
+
+        self._load_value(Reg.t(1), node.source) # Load array direction into t1
         
-        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(1))) # t1 is at the array's first position
-        self.add_instruction(AddNode(Reg.t(1), Reg.t(2), Reg.t(1))) # t1 is at the index position
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.t(2))) # t1 is at the index position
         
-        self._store_local_variable(Reg.t(1), node.dest)
+        self.add_instruction(LoadWordNode(Reg.t(2), 0, Reg.t(1)))
+        self._store_local_variable(Reg.t(2), node.dest)
         
     @visitor.when(cil.SetIndexNode)
     def visit(self, node:cil.SetIndexNode):
-        self._load_value(Reg.t(0), node.index)
-        self._load_value(Reg.t(1), node.source)
-        self._load_value(Reg.t(3), node.value)
-        
         # Calculating Offset
-        self.add_instruction(LoadImmediateNode(Reg.t(2), self.WORD_SIZE))
-        self.add_instruction(MultiplyNoOverflowNode(Reg.t(2), Reg.t(2), Reg.t(0))) # Offset in t2
+        self._get_array_index(Reg.t(2), Reg.t(0), node.index) # Offset in t2
+
+        self._load_value(Reg.t(3), node.value) # Set value in t3
+
+        self._load_value(Reg.t(1), node.source) # Array address in t1
         
-        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(1))) # t1 is at the array's first position
-        self.add_instruction(AddNode(Reg.t(1), Reg.t(2), Reg.t(1))) # t1 is at the index position
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.t(2))) # t1 is at the index position
         
         self.add_instruction(StoreWordNode(Reg.t(3), 0, Reg.t(1)))
-        
+
     @visitor.when(cil.CopyNode)
     def visit(self, node:cil.CopyNode):
         self._load_value(Reg.a(0), node.instance) # t0 = instance
@@ -596,8 +614,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode):
         self._load_value(Reg.t(0), node.type) # t0 = Type Address
-        # TODO CHECK IF THE INSTRUCTION BELOW IS REQUIRED
-        # self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0))) # t0 = t0[0] -> FatherAddress
+        self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0))) # t0 = t0[0] -> FatherAddress
         self._store_local_variable(Reg.t(0), node.dest)
     
     @visitor.when(cil.PrintNode)
@@ -627,7 +644,16 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 5)) # 5 System call code for read int
         self.add_instruction(SyscallNode()) # Returns the read integer in v0
         self._store_local_variable(Reg.v(0), node.dest) 
-    
+
+    @visitor.when(cil.InitInstanceFather)
+    def visit(self, node:cil.InitInstanceFather):
+        self._load_local_variable(Reg.t(0), node.source) # Load object address in t0
+        if node.father:
+            self._load_type_variable(Reg.t(1), node.father) # Load father type in t1
+            self.add_instruction(StoreWordNode(Reg.t(1), 0, Reg.t(0))) # Assing father type to first position in object address
+        else:
+            self.add_instruction(StoreWordNode(Reg.zero(), 0, Reg.t(0))) # Assing void to first position in object address
+
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode):
         self.add_instruction(LoadAddressNode(Reg.t(0), node.msg))

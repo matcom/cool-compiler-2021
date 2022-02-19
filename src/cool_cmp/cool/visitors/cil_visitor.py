@@ -826,6 +826,7 @@ class COOLToCILVisitor():
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
         type_node.methods.append(("__init", init_function.name))
         self.params.append(cil.ParamNode('self'))
+        self.register_instruction(cil.InitInstanceFather('self', type_node.parent))
         
         for attr,typex in self.current_type.all_attributes():
             # Defining attribute's init functions
@@ -1001,7 +1002,7 @@ class COOLToCILVisitor():
         checks = len(node.params)
         
         array_types = self.define_internal_local()
-        self.register_instruction(cil.ArrayNode(array_types, "Int", str(checks))) # Type Int because at the end all are Ints
+        self.register_instruction(cil.ArrayNode(array_types, "Object", checks)) # Type Object because at the end all are Objects
         
         for i,param in enumerate(node.params):
             self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name))

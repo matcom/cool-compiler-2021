@@ -18,3 +18,24 @@
 - Hacer algo inteligente para eliminar generacion de variables innecesarias
 - Hacer mecanismo para reducir codigo generado eliminando el codigo que no se usa o no alcanzable
 - **PASAR TESTING GENERACION Locales y en Github**
+
+
+## Generacion
+
+- [x] Input/Output
+- [x] Condicionales
+- [x] Ciclos
+- [x] Let in (Simple)
+- [x] Llamado de funciones
+- [x] Set y Get de Atributos
+- [x] isvoid
+- [ ] case of
+- [ ] Llamado dinamico self type
+- [ ] At @
+- Funciones nativas:
+  - [ ] Copy
+  - [ ] Length
+  - [ ] Substring
+  - [ ] Concat
+  - [ ] TypeName?
+  
