@@ -165,3 +165,7 @@ class cil_ast:
     class PrintStrNode(InstructionNode):
         def __init__(self, value):
             self.value = value
+        
+    class ErrorNode(InstructionNode):
+        def __init__(self, data_node):
+            self.data_node = data_node
