@@ -151,6 +151,11 @@ class MIPSAstFormatter:
 
     @visitor.when(NotNode)
     def visit(self, node):
+        return f'xori {self.visit(node.dest)} {self.visit(node.src)} 1'.ljust(50) + \
+               f'#line: {node.line} column: {node.column}'
+
+    @visitor.when(ComplementNode)
+    def visit(self, node):
         return f'not {self.visit(node.dest)} {self.visit(node.src)}'.ljust(50) + \
                f'#line: {node.line} column: {node.column}'
 

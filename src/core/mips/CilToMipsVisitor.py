@@ -905,7 +905,7 @@ class CILToMIPSVisitor:
             instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
                                                            node.line, node.column))
 
-        instructions.append(mips.NotNode(reg1, reg1, line=node.line, column=node.column))
+        instructions.append(mips.ComplementNode(reg1, reg1, line=node.line, column=node.column))
         instructions.append(mips.AdditionInmediateNode(reg1, reg1, 1, line=node.line, column=node.column))
         instructions.extend(self.visit(node.dest))
         instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),

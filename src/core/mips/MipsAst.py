@@ -303,6 +303,12 @@ class NotNode(InstructionNode):
         self.dest = dest
         self.src = src
 
+class ComplementNode(InstructionNode):
+    def __init__(self, dest, src, line, column):
+        super().__init__(line, column)
+        self.dest = dest
+        self.src = src
+
 
 class ShiftLeftNode(InstructionNode):  # Shift Left Logical
     def __init__(self, dest, src, bits, line, column):
