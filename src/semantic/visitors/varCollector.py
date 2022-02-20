@@ -1,8 +1,8 @@
 import imp
 from src.utils import visitor
-from src.utils.ast import AssignNode, AttrDeclarationNode, ClassDeclarationNode, FuncDeclarationNode, IntNode, ProgramNode
+from src.utils.ast import AssignNode, AttrDeclarationNode, ClassDeclarationNode, FuncDeclarationNode, IntNode, ProgramNode, VarDeclarationNode
 from src.semantic.semantic import ErrorType, IntType, Scope, define_default_value
-from src.utils.errors import SemanticError
+from src.utils.errors import SemanticError, TypexError
 
 
 class VarCollector:
@@ -81,18 +81,32 @@ class VarCollector:
             self.errors.append(e)
             return ErrorType()
 
-    @visit.when(AssignNode)
-    def visit(self, assignNode, scope):
-        if assignNode.id == 'self':
+    @visit.when(VarDeclarationNode)
+    def visit(self, varDeclarationNode, scope):
+        if varDeclarationNode.id == 'self':
             errorText = '\'self\' cannot be bound in a \'let\' expression.'
             self.errors.append(SemanticError(
-                errorText, assignNode.line, assignNode.col))
+                errorText, varDeclarationNode.line, varDeclarationNode.col))
             return
 
         try:
-            vType = self.context.get_type(assignNode.type, assignNode.line, assignNode.col)
+            vType = self.context.get_type(
+                varDeclarationNode.type, varDeclarationNode.line, varDeclarationNode.col)
         except:
-            errorText = f'Class {assignNode.type} of let-bound identifier %s is undefined.'
+            errorText = f'Class {varDeclarationNode.type} of let-bound identifier {varDeclarationNode.id} is undefined.'
+            self.errors.append(TypexError(
+                errorText, varDeclarationNode.typeLine, varDeclarationNode.typeCol))
+            vType = ErrorType()
 
-        vInfo = scope.find_variable(assignNode.id)
-        if vInfo
+        vType = self._get_type(
+            varDeclarationNode.type, (varDeclarationNode.typeLine, varDeclarationNode.typeCol))
+        varInfo = scope.define_variable(varDeclarationNode.id, vType)
+
+        if varDeclarationNode.expr is not None:
+            self.visit(varDeclarationNode.expr, scope)
+        else:
+            define_default_value(vType, varDeclarationNode)
+
+    @visit.when(AssignNode)
+    def visit(self, assignNode, scope):
+        
