@@ -16,7 +16,7 @@ class DeclarationNode(Node):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx, features, parent):
+    def __init__(self, idx, features, parent=None):
         self.id = idx.value
         self.line = idx.lineno
         self.col = idx.column
@@ -40,7 +40,7 @@ class FuncDeclarationNode(DeclarationNode):
                         ptype.column) for pname, ptype in params]
         self.type = return_type.value
         self.typeLine = return_type.lineno
-        self.typeCol = return_type.col
+        self.typeCol = return_type.column
         self.body = body
 
 
@@ -51,7 +51,7 @@ class AttrDeclarationNode(DeclarationNode):
         self.col = idx.column
         self.type = typex.value
         self.typeLine = typex.lineno
-        self.typeCol = typex.col
+        self.typeCol = typex.column
         self.expr = expr
 
 
@@ -76,7 +76,7 @@ class ArrobaCallNode(ExpressionNode):
         self.args = args
         self.type = typex.value
         self.typeLine = typex.lineno
-        self.typeCol = typex.col
+        self.typeCol = typex.column
 
 
 class DotCallNode(ExpressionNode):
@@ -143,7 +143,7 @@ class CaseOptionNode(ExpressionNode):
         self.col = idx.column
         self.type = typex.value
         self.typeLine = typex.lineno
-        self.typeCol = typex.col
+        self.typeCol = typex.column
 
         # ---------------- Binary Nodes ------------------
 
@@ -212,7 +212,7 @@ class AtomicNode(ExpressionNode):
         try:
             self.id = token.value
             self.line = token.lineno
-            self.col = token.col
+            self.col = token.column
         except:
             self.id = token
             self.line = 0

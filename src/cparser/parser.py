@@ -41,7 +41,7 @@ class CoolParser:
         '''def_class : CLASS TYPE LBRACE feature_list RBRACE
                      | CLASS TYPE INHERITS TYPE LBRACE feature_list RBRACE'''
         if len(p) == 8:
-            p[0] = ClassDeclarationNode(p, slice[2], p[6], p.slice[4])
+            p[0] = ClassDeclarationNode(p.slice[2], p[6], p.slice[4])
         else:
             p[0] = ClassDeclarationNode(p.slice[2], p[4])
 
