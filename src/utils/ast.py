@@ -155,6 +155,7 @@ class CaseOptionNode(ExpressionNode):
         self.type = typex.value
         self.typeLine = typex.lineno
         self.typeCol = typex.column
+        self.expr = expr
 
         # ---------------- Binary Nodes ------------------
 
