@@ -281,14 +281,100 @@ class COOLtoCIL(BaseCOOLToCIL):
 
     @visitor.when(nodes.LessThanNode)
     def visit(self, node, scope):
-        pass
+        vname = self.define_internal_local()
+        left_value = self.define_internal_local()
+        right_value = self.define_internal_local()
+        instance = self.define_internal_local()
+
+        self.visit(node.left, scope)
+        left = scope._return
+
+        self.visit(node.right, scope)
+        right = scope._return
+
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, left, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, right, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.LessThanNode(vname, left_value, right_value))
+
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Bool'), instance))
+        scope._return = instance
 
     
     @visitor.when(nodes.LessEqualNode)
     def visit(self, node, scope):
-        pass
+        vname = self.define_internal_local()
+        left_value = self.define_internal_local()
+        right_value = self.define_internal_local()
+        instance = self.define_internal_local()
+
+        self.visit(node.left, scope)
+        left = scope._return
+
+        self.visit(node.right, scope)
+        right = scope._return
+
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, left, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, right, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.LessEqualNode(vname, left_value, right_value))
+        
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Bool'), instance))
+        scope._return = instance
     
 
     @visitor.when(nodes.EqualNode)
     def visit(self, node, scope):
-        pass
+        vname = self.define_internal_local()
+        type_left = self.define_internal_local()
+        _bool = self.define_internal_local()
+        _string = self.define_internal_local()
+        _int = self.define_internal_local()
+        left_value = self.define_internal_local()
+        right_value = self.define_internal_local()
+        vresult = self.define_internal_local()
+        instance = self.define_internal_local()
+
+        self.visit(node.left, scope)
+        left = scope._return
+
+        self.visit(node.right, scope)
+        right = scope._return
+
+        self.register_instruction(nodes_cil.TypeNameNode(type_left, left))
+        self.register_instruction(nodes_cil.NameNode(_int, 'Int'))
+        self.register_instruction(nodes_cil.NameNode(_bool, 'Bool'))
+        self.register_instruction(nodes_cil.NameNode(_string, 'String'))
+
+        string_node = self.register_label('string_label')
+        int_node = self.register_label('int_label')
+        reference_node = self.register_label('reference_label')
+        continue_node = self.register_label('continue_label')
+
+        self.register_instruction(nodes_cil.EqualNode(vresult, type_left, _int))
+        self.register_instruction(nodes_cil.IfGotoNode(vresult, int_node.label))
+        self.register_instruction(nodes_cil.EqualNode(vresult, type_left, _bool))
+        self.register_instruction(nodes_cil.IfGotoNode(vresult, int_node.label))
+        self.register_instruction(nodes_cil.EqualNode(vresult, type_left, _string))
+        self.register_instruction(nodes_cil.IfGotoNode(vresult, string_node.label))
+        self.register_instruction(nodes_cil.GotoNode(reference_node.label))
+
+        self.register_instruction(int_node)
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, left, 'value', 'Int'))
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, right, 'value', 'Int'))
+        self.register_instruction(nodes_cil.EqualNode(vname, left_value, right_value))
+        self.register_instruction(nodes_cil.GotoNode(continue_node.label))
+
+        self.register_instruction(string_node)
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, left, 'value', 'String'))
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, right, 'value', 'String'))
+        self.register_instruction(nodes_cil.EqualStrNode(vname, left_value, right_value))
+        self.register_instruction(nodes_cil.GotoNode(continue_node.label))
+
+        self.register_instruction(reference_node)
+        self.register_instruction(nodes_cil.EqualNode(vname, left, right))
+
+        self.register_instruction(continue_node)
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Bool'), instance))
+        scope._return = instance

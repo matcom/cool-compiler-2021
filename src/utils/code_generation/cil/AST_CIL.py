@@ -45,9 +45,6 @@ class cil_ast:
         def __init__(self, left, right):
             self.left = left
             self.right = right
-        
-        def __repr__(self):
-            return f"{self.left} = {self.right}"
 
     class ArithmeticNode(InstructionNode):
         def __init__(self, dest, op_l, op_r):
@@ -74,8 +71,10 @@ class cil_ast:
         pass
 
     class EqualNode(ArithmeticNode):
-        def __repr__(self):
-            return f"{self.dest} = {self.op_l} == {self.op_r}"
+        pass
+    
+    class EqualStrNode(EqualNode):
+        pass
 
     class GetAttrNode(InstructionNode):
         def __init__(self, dest, idx, attr, computed_type):
