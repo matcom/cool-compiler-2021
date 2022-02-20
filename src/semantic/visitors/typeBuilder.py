@@ -1,5 +1,5 @@
 from semantic.semantic import ErrorType
-from src.utils.errors import SemanticError, TypexError
+from utils.errors import SemanticError, TypexError
 from utils import visitor
 from utils.ast import *
 

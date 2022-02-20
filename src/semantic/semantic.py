@@ -1,4 +1,4 @@
-from src.utils.ast import BoolNode, IntNode, IsVoidNode, StringNode
+from utils.ast import BoolNode, IntNode, IsVoidNode, StringNode
 from utils.errors import SemanticError
 from collections import OrderedDict
 import itertools as itt

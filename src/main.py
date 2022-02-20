@@ -3,10 +3,10 @@ import sys
 
 from lexer import CoolLexer
 from cparser import CoolParser
-from src.semantic.visitors.typeBuilder import TypeBuilder
-from src.semantic.visitors.typeChecker import TypeChecker
-from src.semantic.visitors.typeCollector import TypeCollector
-from src.semantic.visitors.varCollector import VarCollector
+from semantic.visitors.typeBuilder import TypeBuilder
+from semantic.visitors.typeChecker import TypeChecker
+from semantic.visitors.typeCollector import TypeCollector
+from semantic.visitors.varCollector import VarCollector
 
 
 def main(_input, _output):

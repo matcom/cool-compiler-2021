@@ -1,4 +1,4 @@
-from src.utils.errors import SemanticError
+from utils.errors import SemanticError
 from utils import visitor
 from utils.ast import ProgramNode, ClassDeclarationNode
 from semantic.semantic import Context, IntType, StringType, BoolType, ObjectType, SelfType, IOType

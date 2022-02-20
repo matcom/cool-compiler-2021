@@ -1,7 +1,7 @@
-from src.utils import visitor
-from src.utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, VarDeclarationNode, WhileNode
-from src.semantic.semantic import ErrorType, IntType, Scope, define_default_value
-from src.utils.errors import NamexError, SemanticError, TypexError
+from utils import visitor
+from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, VarDeclarationNode, WhileNode
+from semantic.semantic import ErrorType, IntType, Scope, define_default_value
+from utils.errors import NamexError, SemanticError, TypexError
 
 
 class VarCollector:

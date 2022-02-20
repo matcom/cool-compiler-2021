@@ -1,6 +1,5 @@
 from utils import visitor
 from semantic.semantic import *
-from semantic.types import *
 from utils.ast import *
 from utils.errors import SemanticError, AttributesError, TypesError, NamesError
 from utils import get_type, get_common_basetype
