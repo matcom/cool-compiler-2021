@@ -1,5 +1,5 @@
 from utils import visitor
-from semantic.tools import *
+from semantic.semantic import *
 from semantic.types import *
 from utils.ast import *
 from utils.errors import SemanticError, AttributesError, TypesError, NamesError

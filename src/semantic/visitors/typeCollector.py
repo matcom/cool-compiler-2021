@@ -28,13 +28,13 @@ class TypeCollector(object):
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, classDeclarationNode):
-        if classDeclarationNode.name in ['Int', 'String', 'Bool', 'Object', 'SELF_TYPE', 'IO']:
-            errorText = f'Redefinition of basic class {classDeclarationNode.name}'
+        if classDeclarationNode.id in ['Int', 'String', 'Bool', 'Object', 'SELF_TYPE', 'IO']:
+            errorText = f'Redefinition of basic class {classDeclarationNode.id}'
             self.errors.append(SemanticError(
-                errorText, classDeclarationNode.line, classDeclarationNode.column))
+                errorText, classDeclarationNode.line, classDeclarationNode.col))
         try:
             self.context.create_type(
-                classDeclarationNode.name, (classDeclarationNode.line, classDeclarationNode.column))
+                classDeclarationNode.id, (classDeclarationNode.line, classDeclarationNode.col))
         except SemanticError as error:
             self.errors.append(error)
 
