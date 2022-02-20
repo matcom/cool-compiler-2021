@@ -220,8 +220,8 @@ class CoolParser:
     def p_block_list(self, p):
         ''' block_list : expr SEMICOLON
                        | expr SEMICOLON block_list'''
-        p[0] = BlockNode([p[1]], p.slice[1]) if len(
-            p) == 3 else BlockNode([p[1]] + p[3].exprs, p.slice[1])
+        p[0] = BlockNode([p[1]], p.slice[2]) if len(
+            p) == 3 else BlockNode([p[1]] + p[3].exprs, p.slice[2])
 
     def p_error(self, p):
         if p:

@@ -115,7 +115,7 @@ class WhileNode(ExpressionNode):
 
 class BlockNode(ExpressionNode):
     def __init__(self, exprs, token):
-        self.expr = exprs
+        self.exprs = exprs
         self.line = token.lineno
         self.col = token.column
 
