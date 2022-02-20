@@ -106,7 +106,26 @@ class COOLtoCIL(BaseCOOLToCIL):
 
     @visitor.when(nodes.AssignNode)
     def visit(self, node, scope):
-        pass
+        self.visit(node.expr, scope)
+
+        try:
+            self.current_type.get_attribute(node.id)
+            self.register_instruction(nodes_cil.SetAttrNode(self.vself.name, node.id, scope._return, self.current_type.name))
+        
+        except AttributeError:
+            vname = None
+            param_names = [pn.name for pn in self.current_function.params]
+            if node.id in param_names:
+                for n in param_names:
+                    if node.id in n.split("_"):
+                        vname = n
+                        break
+            else:
+                for n in [lv.name for lv in self.current_function.localvars]:
+                    if node.id in n.split("_"):
+                        vname = n
+                        break
+            self.register_instruction(nodes_cil.AssignNode(vname, scope._return))
 
 
     @visitor.when(nodes.IfThenElseNode)
@@ -146,7 +165,7 @@ class COOLtoCIL(BaseCOOLToCIL):
         
         self.register_instruction(while_label_node)
         self.visit(node.conditional_expr, scope)
-        self.register_instruction(nodes_cil.GetAttrNode(vcondition, scope.ret_expr, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.GetAttrNode(vcondition, scope._return, 'value', 'Bool'))
         self.register_instruction(nodes_cil.IfGotoNode(vcondition, loop_label_node.label))
         
         self.register_instruction(nodes_cil.GotoNode(pool_label_node.label))
@@ -156,17 +175,34 @@ class COOLtoCIL(BaseCOOLToCIL):
         self.register_instruction(nodes_cil.GotoNode(while_label_node.label))
         self.register_instruction(pool_label_node)
 
-        scope.ret_expr = nodes_cil.VoidNode()
+        scope._return = nodes_cil.VoidNode()
     
 
     @visitor.when(nodes.BlockNode)
     def visit(self, node, scope):
-        pass
+        for expr in node.exprs:
+            self.visit(node.expr_list, scope)
 
     
     @visitor.when(nodes.LetNode)
     def visit(self, node, scope):
-        pass
+        vresult = self.register_local(VariableInfo('let_in_value', None))
+
+        for idx, typex, id_expr in node.identifiers:
+            if idx in self.ids:
+                vname = self.ids[idx]
+            else:
+                vname = self.register_local(VariableInfo(idx, typex), id=True)
+
+            if id_expr:
+                self.visit(id_expr, scope)
+                self.register_instruction(nodes_cil.AssignNode(vname, scope._return))
+            elif typex in self.value_types:
+                self.register_instruction(nodes_cil.AllocateNode(typex, vname))
+
+        self.visit(node.in_expr, scope)
+        self.register_instruction(nodes_cil.AssignNode(vresult, scope._return))
+        scope._return = vresult
             
 
     @visitor.when(nodes.CaseNode)
@@ -176,7 +212,17 @@ class COOLtoCIL(BaseCOOLToCIL):
     
     @visitor.when(nodes.NotNode)
     def visit(self, node, scope):
-        pass
+        vname = self.define_internal_local()
+        value = self.define_internal_local()
+        instance = self.define_internal_local()
+
+        self.visit(node.expr, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(value, scope._return, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.MinusNode(vname, 1, value))
+
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Bool'), instance))
+        scope._return = instance
 
     
     @visitor.when(nodes.ConstantNumNode)
