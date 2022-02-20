@@ -277,6 +277,33 @@ class CILRunnerVisitor():
         value = func(left, right)
         self.set_value(node.dest, value, function_scope)
         return self.next_instruction()
+
+    def string_cleaner(self, string):
+        semi = string[1:-1]
+        temp = []
+        escape = False
+        for ch in semi:
+            if ch == '\\' and not escape:
+                escape = True
+            elif ch == 'n' and escape:
+                temp.append('\n')
+                escape = False
+            elif ch == 't' and escape:
+                temp.append('\t')
+                escape = False
+            elif ch == 'b' and escape:
+                temp.append('\b')
+                escape = False
+            elif ch == 'f' and escape:
+                temp.append('\f')
+                escape = False
+            elif escape:
+                temp.append(ch)
+                escape = False
+            else:
+                temp.append(ch)
+
+        return ''.join(temp)
     
     @visitor.on('node')
     def visit(self, node):
@@ -301,7 +328,7 @@ class CILRunnerVisitor():
     def visit(self, node:cil.DataNode):
         if node.name in self.data:
             self.raise_error("Data {0} already defined")
-        self.data[node.name] = node.value
+        self.data[node.name] = self.string_cleaner(node.value)
 
     @visitor.when(cil.TypeNode)
     def visit(self, node:cil.TypeNode):
