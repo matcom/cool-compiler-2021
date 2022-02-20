@@ -28,7 +28,7 @@ class CILPrintVisitor():
         attributes = '\n\t'.join(f'attribute {x}' for x in node.attributes)
         methods = '\n\t'.join(f'method {x}: {y}' for x,y in node.methods)
 
-        return f'type {node.name} {{\n\tparent: {node.parent}\n\t{attributes}\n\n\t{methods}\n}}'
+        return f'type {node.name} {{\n\tparent: {node.parent if not isinstance(node.parent, cil.TypeNode) else node.parent.name}\n\t{attributes}\n\n\t{methods}\n}}'
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node):
@@ -186,6 +186,11 @@ class CILPrintVisitor():
     def visit(self, node:cil.GetIndexNode):
         return f'{node.dest} = GETINDEX {node.source} {node.index}'
     
+    @visitor.when(cil.InitInstanceFather)
+    def visit(self, node:cil.InitInstanceFather):
+        return ""
+
+
 class CILRunnerVisitor():
     
     def __init__(self) -> None:
@@ -630,6 +635,11 @@ class CILRunnerVisitor():
     def visit(self, node:cil.VoidNode, args: list, caller_fun_scope: dict):
         self.set_value(node.dest, None, caller_fun_scope)
         return self.next_instruction()
+
+    @visitor.when(cil.InitInstanceFather)
+    def visit(self, node:cil.InitInstanceFather, args: list, caller_fun_scope: dict):
+        return self.next_instruction()
+
 
 class COOLToCILVisitor():
     
