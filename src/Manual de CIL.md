@@ -148,28 +148,20 @@ function function_main_at_Main {
 
 ### KeyWords
 
-* PARAM
-    > Indica que la función acepta el parametro siguiente al comando
+* ABORT
+    >Indica que se debe abortar la ejecucion del programa
 
     ```python
     # Ejemplo
-    PARAM self
+    ABORT
     ```
 
-* LOCAL
-    > Indica que la función acepta la variable local siguiente al comando
+* ALLOCATE
+    > Reserva memoria para un objeto
 
     ```python
     # Ejemplo
-    LOCAL local_main_at_Main_internal_0
-    ```
-
-* RETURN
-    > Indica que la función retorna la siguiente expresion
-
-    ```python
-    # Ejemplo
-    RETURN local_main_at_Main_internal_1
+    a = ALLOCATE b 
     ```
 
 * ARG
@@ -181,6 +173,14 @@ function function_main_at_Main {
     CALL __init_Main_type
     ```
 
+* ARRAY
+    > Crea un arreglo de objetos
+
+    ```python
+    # Ejemplo
+    a = ARRAY b lenght
+    ```
+
 * CALL
     >Indica que la siguiente expresion es una llamada a una función
 
@@ -190,48 +190,20 @@ function function_main_at_Main {
     CALL __init_Main_type
     ```
 
-* LOAD
-    >Indica que la siguiente expresion es una carga de un dato
+* CONCAT
+    > Devuelve la concatenacion de dos objetos
 
     ```python
     # Ejemplo
-    LOAD data_0
+    a = CONCAT b c
     ```
 
-* LABEL
-    >Indica que la siguiente expresion es una etiqueta
+* COPY
+    >Copia el valor de un objeto a otro objeto
 
     ```python
     # Ejemplo
-    LABEL label_0
-    ```
-
-    >Etiquetas son utilizadas para definir un punto de entrada a una parte del código tanto para ciclos como para anotaciones.
-
-* VOID
-    >Hace funcion de null
-
-    ```python
-    # Ejemplo
-    local_distance_internal_3 = VOID
-    ```
-
-    >Para indicar que una variable no tiene un valor.
-
-* IFGOTO
-    >Indica que la siguiente expresion es una condicion y que se debe ir a la etiqueta siguiente al comando GOTO de cumplirse la condicion
-
-    ```python
-    # Ejemplo
-    IF local_distance_internal_3 == VOID GOTO label_1
-    ```
-
-* GOTO
-    >Indica que se debe ir a la etiqueta siguiente al comando
-
-    ```python
-    # Ejemplo
-    GOTO label_1
+    a = COPY local_distance_internal_3
     ```
 
 * EQUAL
@@ -250,29 +222,47 @@ function function_main_at_Main {
     father = FATHER local_distance_internal_3
     ```
 
-* ABORT
-    >Indica que se debe abortar la ejecucion del programa
+* GETATTR
+    > Obtiene un atributo de un objeto
 
     ```python
     # Ejemplo
-    ABORT
+    a = GETATTR b c
     ```
 
-* TYPEOF
-    >Devuelve el tipo del siguente objeto
+* GETINDEX
+    > Obtiene un objeto de un indice de un arreglo
 
     ```python
     # Ejemplo
-    a = TYPEOF local_distance_internal_3
+    a = GETINDEX b c
     ```
 
-* COPY
-    >Copia el valor de un objeto a otro objeto
+* GOTO
+    >Indica que se debe ir a la etiqueta siguiente al comando
 
     ```python
     # Ejemplo
-    a = COPY local_distance_internal_3
+    GOTO label_1
     ```
+
+* IFGOTO
+    >Indica que la siguiente expresion es una condicion y que se debe ir a la etiqueta siguiente al comando GOTO en caso de cumplirse la condicion
+
+    ```python
+    # Ejemplo
+    IF local_distance_internal_3 == VOID GOTO label_1
+    ```
+
+* LABEL
+    >Indica que la siguiente expresion es una etiqueta
+
+    ```python
+    # Ejemplo
+    LABEL label_0
+    ```
+
+    >Etiquetas son utilizadas para definir un punto de entrada a una parte del código tanto para ciclos como para anotaciones.
 
 * LENGTH
     >Devuelve la longitud de un objeto
@@ -282,12 +272,84 @@ function function_main_at_Main {
     a = LENGTH local_distance_internal_3
     ```
 
-* CONCAT
-    > Devuelve la concatenacion de dos objetos
+* LOAD
+    >Indica que la siguiente expresion es una carga de un dato
 
     ```python
     # Ejemplo
-    a = CONCAT b c
+    LOAD data_0
+    ```
+
+* LOCAL
+    > Indica que la función acepta la variable local siguiente al comando
+
+    ```python
+    # Ejemplo
+    LOCAL local_main_at_Main_internal_0
+    ```
+
+* NOT
+    > Devuelve la negación de la expresion siguente al comando
+
+    ```python
+    # Ejemplo
+    a = NOT b
+    ```
+
+* PARAM
+    > Indica que la función acepta el parametro siguiente al comando
+
+    ```python
+    # Ejemplo
+    PARAM self
+    ```
+
+* PRINT
+    > Imprime un objeto
+
+    ```python
+    # Ejemplo
+    PRINT a
+    ```
+
+* READ
+    > Lee de consola un input
+
+    ```python
+    # Ejemplo
+    a = READ
+    ```
+
+* READINT
+    > Lee un entero de consola
+
+    ```python
+    # Ejemplo
+    a = READINT
+    ```
+
+* RETURN
+    > Indica que la función retorna la siguiente expresion
+
+    ```python
+    # Ejemplo
+    RETURN local_main_at_Main_internal_1
+    ```
+
+* SETATTR
+    > Asigna un atributo a un objeto
+
+    ```python
+    # Ejemplo
+    SETATTR b c a
+    ```
+
+* SETINDEX
+    > Asigna un objeto a un indice de un arreglo
+
+    ```python
+    # Ejemplo
+    SETINDEX a b c
     ```
 
 * SUBSTRING
@@ -298,11 +360,28 @@ function function_main_at_Main {
     a = SUBSTRING b c lenght
     ```
 
-* PRINT
-    > Imprime un objeto
+* TYPEOF
+    >Devuelve el tipo del siguente objeto
 
     ```python
     # Ejemplo
-    PRINT a
-    ````
+    a = TYPEOF local_distance_internal_3
+    ```
 
+* VCALL
+    > Llamada a una funcion virtual
+
+    ```python
+    # Ejemplo
+    a = VCALL b c
+    ```
+
+* VOID
+    >Hace funcion de null
+
+    ```python
+    # Ejemplo
+    local_distance_internal_3 = VOID
+    ```
+
+    >Para indicar que una variable no tiene un valor.
