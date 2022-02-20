@@ -209,6 +209,9 @@ class CILRunnerVisitor():
         return ("next", None)
     
     def get_type(self, typex) -> cil.TypeNode:
+        if isinstance(typex, cil.TypeNode):
+            return typex
+
         if isinstance(typex, dict):
             return typex["__type"]
         try:
@@ -782,15 +785,22 @@ class COOLToCILVisitor():
         self.current_function = None
 
     def create_empty_methods(self, typex, dottype):
+        if typex.parent:
+            self.create_empty_methods(typex.parent, dottype)
+        
         for m in typex.methods:
             name = self.to_function_name(m.name, typex.name)
             self.register_function(name)
             if len([x for (_, x) in dottype.methods if x == name]) == 0:
                 dottype.methods.append((m.name, name))
 
+    def create_empty_attrs(self, typex, dottype):
         if typex.parent:
-            self.create_empty_methods(typex.parent, dottype)
-        
+            self.create_empty_attrs(typex.parent, dottype)
+
+        for m in typex.attributes:
+            name = dottype.attributes.append(m.name)
+
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -813,6 +823,7 @@ class COOLToCILVisitor():
             if type_name not in ["Error", "Void"]:
                 this_type = next(x for x in self.dottypes if x.name == type_name)
                 self.create_empty_methods(typex, this_type)
+                self.create_empty_attrs(typex, this_type)
 
         for type_name, typex in self.context.types.items():
             if type_name in self.context.special_types and type_name not in ["Error", "Void"]:
