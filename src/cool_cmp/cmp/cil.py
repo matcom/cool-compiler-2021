@@ -22,6 +22,9 @@ class TypeNode(Node):
         self.parent = parent
         self.attributes = []
         self.methods = []
+    
+    def __str__(self):
+        return self.name
 
 class DataNode(Node):
     def __init__(self, vname, value, row, column, comment=None) -> None:
@@ -183,10 +186,11 @@ class LoadNode(InstructionNode):
         self.msg = msg
 
 class LengthNode(InstructionNode):
-    def __init__(self, dest, string, row, column, comment=None) -> None:
+    def __init__(self, dest, string_var, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
         self.dest = dest
-        self.string = string
+        self.string_var = string_var
+        
 
 class ConcatNode(InstructionNode):
     def __init__(self, dest, string1, string2, row, column, comment=None) -> None:

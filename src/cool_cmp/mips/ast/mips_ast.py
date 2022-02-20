@@ -121,8 +121,21 @@ class LoadWordNode(InstructionNode):
         self.offset = offset
         self.base_source_dir = base_source_dir
 
+class LoadByteNode(InstructionNode):
+    def __init__(self, dest, offset, base_source_dir, row=None, column=None, comment=None):
+        super().__init__(row=row, column=column, comment=comment)
+        self.dest = dest
+        self.offset = offset
+        self.base_source_dir = base_source_dir
 
 class StoreWordNode(InstructionNode):
+    def __init__(self, source, offset, base_dest_dir, row=None, column=None, comment=None):
+        super().__init__(row=row, column=column, comment=comment)        
+        self.source = source
+        self.offset = offset
+        self.base_dest_dir = base_dest_dir
+
+class StoreByteNode(InstructionNode):
     def __init__(self, source, offset, base_dest_dir, row=None, column=None, comment=None):
         super().__init__(row=row, column=column, comment=comment)        
         self.source = source

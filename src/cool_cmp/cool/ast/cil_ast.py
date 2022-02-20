@@ -92,3 +92,8 @@ class LesserNode(ArithmeticNode):
 ################################################################################
 
 
+class InitInstance(InstructionNode): # TODO Add to META MIPS Section
+    def __init__(self, source, instance_type, row, column, comment=None)-> None:
+        super().__init__(row, column, comment)
+        self.source = source
+        self.instance_type = instance_type

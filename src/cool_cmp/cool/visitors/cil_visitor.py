@@ -112,7 +112,7 @@ class CILPrintVisitor():
     
     @visitor.when(cil.LengthNode)
     def visit(self, node):
-        return f'{node.dest} = LENGTH {node.string}'
+        return f'{node.dest} = LENGTH {node.string_var}'
     
     @visitor.when(cil.ConcatNode)
     def visit(self, node):
@@ -190,6 +190,11 @@ class CILPrintVisitor():
     def visit(self, node:cil.GetIndexNode):
         return f'{node.dest} = GETINDEX {node.source} {node.index}'
     
+    @visitor.when(cil.InitInstance)
+    def visit(self, node:cil.InitInstance):
+        return ""
+
+
 class CILRunnerVisitor():
     
     def __init__(self) -> None:
@@ -208,9 +213,14 @@ class CILRunnerVisitor():
         return ("next", None)
     
     def get_type(self, typex) -> cil.TypeNode:
+        if isinstance(typex, cil.TypeNode):
+            return typex
+
         if isinstance(typex, dict):
             return typex["__type"]
         try:
+            if isinstance(typex, cil.TypeNode):
+                return typex
             return self.types[typex]
         except KeyError:
             self.raise_error("Type {0} isn't defined", typex)
@@ -536,8 +546,14 @@ class CILRunnerVisitor():
         error2 = "SUBSTRING operation undefined with non Int index"
         error3 = "SUBSTRING operation undefined with non Int length"
         value1 = self.get_value_str(node.string, caller_fun_scope, error1)
-        value2 = self.get_value_str(node.index, caller_fun_scope, error2)
-        value3 = self.get_value_str(node.length, caller_fun_scope, error3)
+        value2 = self.get_value_int(node.index, caller_fun_scope, error2)
+        value3 = self.get_value_int(node.length, caller_fun_scope, error3)
+        if value2 > len(value1):
+            self.raise_error("SUBSTRING Out of range index")
+        if value3 < 0:
+            self.raise_error("SUBSTRING Negative length")
+        if value2 + value3 > len(value1):
+            self.raise_error("SUBSTRING Length too long for operation")
         self.set_value(node.dest, value1[value2:value2+value3], caller_fun_scope)
         return self.next_instruction()
 
@@ -638,6 +654,11 @@ class CILRunnerVisitor():
     def visit(self, node:cil.VoidNode, args: list, caller_fun_scope: dict):
         self.set_value(node.dest, None, caller_fun_scope)
         return self.next_instruction()
+
+    @visitor.when(cil.InitInstance)
+    def visit(self, node:cil.InitInstance, args: list, caller_fun_scope: dict):
+        return self.next_instruction()
+
 
 class COOLToCILVisitor():
     
@@ -778,15 +799,22 @@ class COOLToCILVisitor():
         self.current_function = None
 
     def create_empty_methods(self, typex, dottype):
+        if typex.parent:
+            self.create_empty_methods(typex.parent, dottype)
+        
         for m in typex.methods:
             name = self.to_function_name(m.name, typex.name)
             self.register_function(name)
             if len([x for (_, x) in dottype.methods if x == name]) == 0:
                 dottype.methods.append((m.name, name))
 
+    def create_empty_attrs(self, typex, dottype):
         if typex.parent:
-            self.create_empty_methods(typex.parent, dottype)
-        
+            self.create_empty_attrs(typex.parent, dottype)
+
+        for m in typex.attributes:
+            name = dottype.attributes.append(m.name)
+
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -809,6 +837,7 @@ class COOLToCILVisitor():
             if type_name not in ["Error", "Void"]:
                 this_type = next(x for x in self.dottypes if x.name == type_name)
                 self.create_empty_methods(typex, this_type)
+                self.create_empty_attrs(typex, this_type)
 
         for type_name, typex in self.context.types.items():
             if type_name in self.context.special_types and type_name not in ["Error", "Void"]:
@@ -833,7 +862,9 @@ class COOLToCILVisitor():
         
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
         type_node.methods.append(("__init", init_function.name))
-        self.params.append(cil.ParamNode('self',node.row, node.column ,"params node"))
+        self.params.append(cil.ParamNode('self',type_node.row, type_node.column ,"params node"))
+        self.register_instruction(cil.InitInstance(
+            'self', type_node.name, type_node.row, type_node.column, "init instance"))
         
         for attr,typex in self.current_type.all_attributes():
             # Defining attribute's init functions
@@ -996,6 +1027,9 @@ class COOLToCILVisitor():
     
     @visitor.when(CheckNode)
     def visit(self, node:CheckNode, scope):
+        scope = node.scope
+        local = scope.find_variable(node.id)
+        cil_local = self.register_local(local) 
         result = self.visit(node.expr, scope)
         return result
     
@@ -1009,7 +1043,7 @@ class COOLToCILVisitor():
         checks = len(node.params)
         
         array_types = self.define_internal_local()
-        self.register_instruction(cil.ArrayNode(array_types, "Int", str(checks),node.row, node.column, "array node")) # Type Int because at the end all are Ints
+        self.register_instruction(cil.ArrayNode(array_types, "Object", checks, node.row, node.column, "array node")) # Type Object because at the end all are Objects
         
         for i,param in enumerate(node.params):
             self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name, node.row, node.column, "set index node"))
@@ -1066,7 +1100,7 @@ class COOLToCILVisitor():
         final_label = self.define_label()
         not_equal_types = self.define_internal_local()
         end_labels = [self.define_label() for _ in node.params]
-        for lbl, param, child_scope in zip(end_labels, node.params, scope.children):
+        for lbl, param, child_scope in zip(end_labels, node.params, node.scope.children):
             self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type, node.row, node.column, "equal node"))
             self.register_instruction(cil.NotNode(not_equal_types, not_equal_types, node.row, node.column, "not node"))
             self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label, node.row, node.column, "goto if node"))
@@ -1115,6 +1149,7 @@ class COOLToCILVisitor():
         
     @visitor.when(BlockNode)
     def visit(self, node:BlockNode, scope):
+        scope = node.scope
         result = self.define_internal_local()
         for expr in node.expr_list:
             result = self.visit(expr, scope)

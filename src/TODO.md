@@ -18,3 +18,26 @@
 - Hacer algo inteligente para eliminar generacion de variables innecesarias
 - Hacer mecanismo para reducir codigo generado eliminando el codigo que no se usa o no alcanzable
 - **PASAR TESTING GENERACION Locales y en Github**
+
+
+## Generacion
+
+- [x] Input/Output
+- [x] Condicionales
+- [x] Ciclos
+- [x] Let in (Simple)
+- [x] Llamado de funciones
+- [x] Set y Get de Atributos
+- [x] isvoid
+- Funciones nativas:
+  - [x] Copy
+  - [x] Length
+  - [x] Substring
+  - [ ] Concat
+  - [ ] TypeName
+  - [ ] Copy especifico String, Int
+- [ ] At @
+- [ ] Llamado dinamico self type
+- [ ] case of
+- [ ] Verificar que los atributos se inicialicen correctamente en caso de que uno dependa de otro y a la hora de asiganrle valor uno no este inicializado.
+- [ ] Verificar que se aborte cuando ocurre una excepcion en ejecucion. Los casos se especifican en el manual de Cool pagina 29
