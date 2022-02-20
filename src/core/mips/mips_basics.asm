@@ -12,28 +12,22 @@
 malloc:
     addiu $sp $sp -12                                # Save content of registers in sp
     sw $a0 0($sp)
-    sw $t1 4($sp)
-    sw $t2 8($sp)
+    sw $t0 4($sp)
+    sw $t1 8($sp)
 
-    li $t1 4
-    div $a0 $t1                                      # Size of string / wordsize
-    mfhi $t2                                         # t2 holds remainder of division
+    li $t0 4
+    div $a0 $t0                                      # Size of string / wordsize
+    mfhi $t1                                         # t2 holds remainder of division
 
-    bne $t2 $zero malloc_allign_size
-    move $t1 $a0
-    j malloc_end
+    sub $t0 $t0 $t1                                  # Convert t1 to multiple of 4
+    add $a0 $a0 $t0
 
-malloc_allign_size:
-    sub $t1 $t1 $t2                                  # Convert t1 to multiple of 4
-    add $t1 $t1 $a0
-
-malloc_end:
-    move $v0 $v1
-    add $v1 $t1 $v1
+    li $v0 9
+    syscall
 
     lw $a0 0($sp)                                    # Return original content to registers
-    lw $t1 4($sp)
-    lw $t2 8($sp)
+    lw $t0 4($sp)
+    lw $t1 8($sp)
     addiu $sp $sp 12
     jr $ra
 
@@ -231,6 +225,7 @@ concat_end:
 
     jr $ra
 
+# TODO: Change this procedure to use the new malloc
 read_string:
     addiu $sp $sp -4
     sw $ra 0($sp)
@@ -273,6 +268,45 @@ read_string:
     lw $ra 0($sp)
     addiu $sp $sp 4
     jr $ra
+
+# Lee a lo sumo $a1 caracteres y los guarda en la direccion
+# a la que apunta $a0, $a1 debe ser divisible por 4
+# retorna en $v0 1 si se leyo un \n
+read_string_up_to:
+    move $t0 $a0
+    move $t1 $zero
+    move $t2 $t0
+    li $t3 10
+    move $t4 $zero
+    move $t5 $a1
+
+    read_loop:
+
+    li $v0 8
+    move $a0 $t0
+    li $a1 5
+    syscall
+    addiu $t2 $t2 4
+
+    check_newline_loop:
+
+    lb $t1 0($t0)
+
+    beq $t1 $t3 read_loop_continue
+    addiu $t0 $t0 1
+
+    beq $t0 $t2 check_newline_loop_continue
+    j check_newline_loop
+    check_newline_loop_continue:
+    j read_loop
+
+    read_loop_continue:
+    sb $zero 0($t0)
+
+    bne $t0 $t2 null_terminated
+    addiu $t2 $t2 4
+    null_terminated:
+
 
 
 
