@@ -3,17 +3,17 @@ class Node:
 
 
 class ProgramNode(Node):
-    def __init__(self, dottypes, dotdata, dotcode, idx=None):
-        self.dottypes = dottypes
-        self.dotdata = dotdata
-        self.dotcode = dotcode
+    def __init__(self, type_node, data, func_node, idx=None):
+        self.type_node = type_node
+        self.data = data
+        self.fun_node = func_node
         self.index = idx
 
 
 class TypeNode(Node):
-    def __init__(self, name, atributes=None, methods=None, idx=None):
+    def __init__(self, name, attributes=None, methods=None, idx=None):
         self.name = name
-        self.attributes = atributes if atributes is not None else []
+        self.attributes = attributes if attributes is not None else []
         self.methods = methods if methods is not None else []
         self.index = idx
 
@@ -372,8 +372,6 @@ class CopyNode(InstructionNode):
 
 
 class ConformsNode(InstructionNode):
-    "Checks if the type of expr conforms to type2"
-
     def __init__(self, dest, expr, type2, idx=None):
         super().__init__(idx)
         self.dest = dest

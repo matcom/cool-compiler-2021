@@ -9,6 +9,8 @@ from utils.ast import *
 class BaseCil:
     def __init__(self, context):
         self.current_function = None
+        self.current_type: Type = None
+        self.current_method: Method = None
         self.fun_nodes = []
         self.data = []
         self.types_nodes = []
