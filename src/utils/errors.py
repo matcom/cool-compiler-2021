@@ -30,3 +30,8 @@ class SemanticError(CoolError):
 class TypexError(SemanticError):
     def __init__(self, text, line, column):
         super().__init__('TypeError', text, line, column)
+
+
+class NamexError(SemanticError):
+    def __init__(self, text, line, column):
+        super().__init__('NameError', text, line, column)

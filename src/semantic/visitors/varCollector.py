@@ -1,8 +1,8 @@
 import imp
 from src.utils import visitor
-from src.utils.ast import AssignNode, AttrDeclarationNode, ClassDeclarationNode, FuncDeclarationNode, IntNode, ProgramNode, VarDeclarationNode
+from src.utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, CaseNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, VarDeclarationNode, WhileNode
 from src.semantic.semantic import ErrorType, IntType, Scope, define_default_value
-from src.utils.errors import SemanticError, TypexError
+from src.utils.errors import NamexError, SemanticError, TypexError
 
 
 class VarCollector:
@@ -81,7 +81,7 @@ class VarCollector:
             self.errors.append(e)
             return ErrorType()
 
-    @visit.when(VarDeclarationNode)
+    @visitor.when(VarDeclarationNode)
     def visit(self, varDeclarationNode, scope):
         if varDeclarationNode.id == 'self':
             errorText = '\'self\' cannot be bound in a \'let\' expression.'
@@ -107,6 +107,94 @@ class VarCollector:
         else:
             define_default_value(vType, varDeclarationNode)
 
-    @visit.when(AssignNode)
+    @visitor.when(AssignNode)
     def visit(self, assignNode, scope):
-        
+        if assignNode.id == 'self':
+            errorText = 'Cannot assign to \'self\'.'
+            self.errors.append(SemanticError(
+                errorText, assignNode.line, assignNode.col))
+            return
+
+        vInfo = scope.find_variable(assignNode.id)
+        if vInfo is None:
+            varInfo = scope.find_attribute(assignNode.id)
+            if varInfo is None:
+                errorText = f'Undeclared identifier {assignNode.id}.'
+                self.errors.append(NamexError(
+                    errorText, assignNode.line, assignNode.col))
+                vType = ErrorType()
+                scope.define_variable(assignNode.id, vType)
+
+        self.visit(assignNode.expr, scope)
+
+    @visitor.when(BlockNode)
+    def visit(self, blockNode, scope):
+        for expr in blockNode.exprs:
+            self.visit(expr, scope)
+
+    @visitor.when(LetInNode)
+    def visit(self, letInNode, scope):
+        newScope = scope.create_child()
+        scope.expr_dict[letInNode] = newScope
+        for letDeclaration in letInNode.letBody:
+            self.visit(letDeclaration, newScope)
+
+        self.visit(letInNode.inBody, newScope)
+
+    @visitor.when(IdNode)
+    def visit(self, idNode, scope):
+        try:
+            return self.currentType.get_attribute(idNode.id, (idNode.line, idNode.col)).type
+        except:
+            if not scope.is_defined(idNode.id):
+                errorText = f'Undeclared identifier {idNode.id}.'
+                self.errors.append(NamexError(
+                    errorText, idNode.line, idNode.col))
+                vInfo = scope.define_variable(
+                    idNode.id, ErrorType((idNode.line, idNode.col)))
+            else:
+                vInfo = scope.find_variable(idNode.id)
+
+            return vInfo.type
+
+    @visitor.when(WhileNode)
+    def visit(self, whileNode, scope):
+        self.visit(whileNode.condition, scope)
+        self.visit(whileNode.body, scope)
+
+    @visitor.when(IfThenElseNode)
+    def visit(self, ifThenElseNode, scope):
+        self.visit(ifThenElseNode.condition, scope)
+        self.visit(ifThenElseNode.ifBody, scope)
+        self.visit(ifThenElseNode.elseBody, scope)
+
+    @visitor.when(IsVoidNode)
+    def visit(self, isVoidNode, scope):
+        self.visit(isVoidNode.expr, scope)
+
+    @visitor.when(ArrobaCallNode)
+    def visit(self, arrobaCallNode, scope):
+        self.visit(arrobaCallNode.obj, scope)
+        for arg in arrobaCallNode.args:
+            self.visit(arg)
+
+    @visitor.when(DotCallNode)
+    def visit(self, dotCallNode, scope):
+        self.visit(dotCallNode.obj, scope)
+        for arg in dotCallNode.args:
+            self.visit(arg)
+
+    @visitor.when(MemberCallNode)
+    def visit(self, memberCallNode, scope):
+        for arg in memberCallNode.args:
+            self.visit(arg)
+
+
+    @visitor.when(CaseNode)
+    def visit(self, caseNode, scope):
+        self.visit(caseNode.expr, scope)
+        newScope = scope.create_child()
+        scope.expr_dict[caseNode] = newScope
+
+        for 
+

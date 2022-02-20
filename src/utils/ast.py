@@ -140,9 +140,9 @@ class LetInNode(ExpressionNode):
 
 
 class CaseNode(ExpressionNode):
-    def __init__(self, expr, caseList, token):
+    def __init__(self, expr, optionList, token):
         self.expr = expr
-        self.caseList = caseList
+        self.optionList = optionList
         self.line = token.lineno
         self.col = token.column
 
