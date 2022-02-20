@@ -51,7 +51,7 @@ class COOLtoCIL(BaseCOOLToCIL):
         instance = self.register_local(VariableInfo('instance', None))
         self.register_instruction(nodes_cil.AllocateNode(node.id, instance))  
 
-        func = self.current_function
+        temp_f = self.current_function
         vtemp = self.define_internal_local()
 
         self.current_function = self.register_function(self.init_name(node.id, attr=True))
@@ -63,23 +63,46 @@ class COOLtoCIL(BaseCOOLToCIL):
         for feature in attr_declarations:
             self.visit(feature, scope)
         
-        self.current_function = func
+        self.current_function = temp_f
         self.register_instruction(nodes_cil.ArgNode(instance))
         self.register_instruction(nodes_cil.StaticCallNode(self.init_name(node.id, attr=True), vtemp))
-
         self.register_instruction(nodes_cil.ReturnNode(instance))
         self.current_function = None
-                
         self.current_type = None
+
 
     @visitor.when(nodes.AttrDeclarationNode)
     def visit(self, node, scope):
-        pass
+        if node.expr:
+            self.visit(node.expr, scope)
+            self.register_instruction(nodes_cil.SetAttrNode(self.vself.name, node.id, scope._return, self.current_type))
+        elif node.type in self.value_types:
+            vtemp = self.define_internal_local()
+            self.register_instruction(nodes_cil.AllocateNode(node.type, vtemp))
+            self.register_instruction(nodes_cil.SetAttrNode(self.vself.name, node.id, vtemp, self.current_type))
     
 
     @visitor.when(nodes.MethDeclarationNode)
     def visit(self, node, scope):
-        pass
+        self.current_method = self.current_type.get_method(node.id)
+        self.current_function = self.register_function(self.to_function_name(self.current_method.name, self.current_type.name))
+        
+        self.register_param(self.vself)
+        for param_name, _ in node.params:
+            self.register_param(VariableInfo(param_name, None))
+        
+        scope._return = None
+        self.visit(node.body, scope)
+
+        if scope._return is None:
+            self.register_instruction(nodes_cil.ReturnNode(''))
+        elif self.current_function.name == 'entry':
+            self.register_instruction(nodes_cil.ReturnNode(0))
+        else:
+            self.register_instruction(nodes_cil.ReturnNode(scope._return))
+        
+        self.current_method = None
+
 
     @visitor.when(nodes.AssignNode)
     def visit(self, node, scope):
@@ -88,7 +111,30 @@ class COOLtoCIL(BaseCOOLToCIL):
 
     @visitor.when(nodes.IfThenElseNode)
     def visit(self, node, scope):
-        pass
+        vresult = self.register_local(VariableInfo('if_then_else_value', None))
+        vcondition = self.define_internal_local()
+
+        then_label_node = self.register_label('then_label')
+        else_label_node = self.register_label('else_label')
+        continue_label_node = self.register_label('continue_label')
+
+        self.visit(node.if_expr, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(vcondition, scope._return, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.IfGotoNode(vcondition, then_label_node.label))
+        
+        self.register_instruction(nodes_cil.GotoNode(else_label_node.label))
+        
+        self.register_instruction(then_label_node)
+        self.visit(node.then_expr, scope)
+        self.register_instruction(nodes_cil.AssignNode(vresult, scope._return))
+        self.register_instruction(nodes_cil.GotoNode(continue_label_node.label))
+        
+        self.register_instruction(else_label_node)
+        self.visit(node.else_expr, scope)
+        self.register_instruction(nodes_cil.AssignNode(vresult, scope._return))
+
+        self.register_instruction(continue_label_node)
+        scope._return = vresult
 
 
     @visitor.when(nodes.WhileNode)
