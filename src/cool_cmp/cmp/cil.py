@@ -17,6 +17,9 @@ class TypeNode(Node):
         self.parent = parent
         self.attributes = []
         self.methods = []
+    
+    def __str__(self):
+        return self.name
 
 class DataNode(Node):
     def __init__(self, vname, value):

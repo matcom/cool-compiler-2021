@@ -28,7 +28,7 @@ class CILPrintVisitor():
         attributes = '\n\t'.join(f'attribute {x}' for x in node.attributes)
         methods = '\n\t'.join(f'method {x}: {y}' for x,y in node.methods)
 
-        return f'type {node.name} {{\n\tparent: {node.parent if not isinstance(node.parent, cil.TypeNode) else node.parent.name}\n\t{attributes}\n\n\t{methods}\n}}'
+        return f'type {node.name} {{\n\tparent: {node.parent}\n\t{attributes}\n\n\t{methods}\n}}'
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node):
@@ -186,8 +186,8 @@ class CILPrintVisitor():
     def visit(self, node:cil.GetIndexNode):
         return f'{node.dest} = GETINDEX {node.source} {node.index}'
     
-    @visitor.when(cil.InitInstanceFather)
-    def visit(self, node:cil.InitInstanceFather):
+    @visitor.when(cil.InitInstance)
+    def visit(self, node:cil.InitInstance):
         return ""
 
 
@@ -212,6 +212,8 @@ class CILRunnerVisitor():
         if isinstance(typex, dict):
             return typex["__type"]
         try:
+            if isinstance(typex, cil.TypeNode):
+                return typex
             return self.types[typex]
         except KeyError:
             self.raise_error("Type {0} isn't defined", typex)
@@ -636,8 +638,8 @@ class CILRunnerVisitor():
         self.set_value(node.dest, None, caller_fun_scope)
         return self.next_instruction()
 
-    @visitor.when(cil.InitInstanceFather)
-    def visit(self, node:cil.InitInstanceFather, args: list, caller_fun_scope: dict):
+    @visitor.when(cil.InitInstance)
+    def visit(self, node:cil.InitInstance, args: list, caller_fun_scope: dict):
         return self.next_instruction()
 
 
@@ -836,7 +838,7 @@ class COOLToCILVisitor():
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
         type_node.methods.append(("__init", init_function.name))
         self.params.append(cil.ParamNode('self'))
-        self.register_instruction(cil.InitInstanceFather('self', type_node.parent))
+        self.register_instruction(cil.InitInstance('self', type_node.name))
         
         for attr,typex in self.current_type.all_attributes():
             # Defining attribute's init functions
@@ -999,6 +1001,9 @@ class COOLToCILVisitor():
     
     @visitor.when(CheckNode)
     def visit(self, node:CheckNode, scope):
+        scope = node.scope
+        local = scope.find_variable(node.id)
+        cil_local = self.register_local(local) 
         result = self.visit(node.expr, scope)
         return result
     
@@ -1069,7 +1074,7 @@ class COOLToCILVisitor():
         final_label = self.define_label()
         not_equal_types = self.define_internal_local()
         end_labels = [self.define_label() for _ in node.params]
-        for lbl, param, child_scope in zip(end_labels, node.params, scope.children):
+        for lbl, param, child_scope in zip(end_labels, node.params, node.scope.children):
             self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type))
             self.register_instruction(cil.NotNode(not_equal_types, not_equal_types))
             self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label))
@@ -1118,6 +1123,7 @@ class COOLToCILVisitor():
         
     @visitor.when(BlockNode)
     def visit(self, node:BlockNode, scope):
+        scope = node.scope
         result = self.define_internal_local()
         for expr in node.expr_list:
             result = self.visit(expr, scope)

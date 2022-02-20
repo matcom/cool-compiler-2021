@@ -56,7 +56,7 @@ class VoidNode(InstructionNode):
     def __init__(self, dest) -> None:
         self.dest = dest
 
-class InitInstanceFather(InstructionNode): # TODO Add to META MIPS Section
-    def __init__(self, source, father) -> None:
+class InitInstance(InstructionNode): # TODO Add to META MIPS Section
+    def __init__(self, source, instance_type) -> None:
         self.source = source
-        self.father = father
+        self.instance_type = instance_type

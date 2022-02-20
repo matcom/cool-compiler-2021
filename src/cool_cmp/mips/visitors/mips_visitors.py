@@ -292,7 +292,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         
         self.add_instruction(LabelNode("__copy"))
         
-        self.add_instruction(MoveNode(Reg.t(0), Reg.a(0)))
+        self.add_instruction(MoveNode(Reg.t(0), Reg.a(0))) # t0 = object address
         self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(0))) # t1 = instance type dir
         self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.t(1))) # a0 = instance size
         self._allocate_heap_space(Reg.a(0)) # v0 = allocated space
@@ -300,22 +300,23 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         start_label_name = "__start_copy_loop"
         end_label_name = "__end_copy_loop"
         
-        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0)))
-        self.add_instruction(MoveNode(Reg.t(3), Reg.v(0)))
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = instance size
+        self.add_instruction(ShiftRightNode(Reg.t(1), Reg.t(1), 2)) # t1 = bytes amount = instance size / 4
+        self.add_instruction(MoveNode(Reg.t(3), Reg.v(0))) # t3 = new object memory address
         
         self.add_instruction(LabelNode(start_label_name))
-        self.add_instruction(BranchLessEqualNode(Reg.t(1), Reg.zero(), end_label_name))
+        self.add_instruction(BranchLessEqualNode(Reg.t(1), Reg.zero(), end_label_name)) # End cycle condition
         
-        self.add_instruction(LoadWordNode(Reg.t(2), 0, Reg.t(0)))
-        self.add_instruction(StoreWordNode(Reg.t(2), 0, Reg.t(3)))
-        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), 4))
-        self.add_instruction(AddImmediateNode(Reg.t(3), Reg.t(3), 4))
-        self.add_instruction(AddImmediateNode(Reg.t(1), Reg.t(1), -1))
+        self.add_instruction(LoadWordNode(Reg.t(2), 0, Reg.t(0))) # Get value from original object
+        self.add_instruction(StoreWordNode(Reg.t(2), 0, Reg.t(3))) # Set value copied value into the new object
+        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), 4)) # Next position old object
+        self.add_instruction(AddImmediateNode(Reg.t(3), Reg.t(3), 4)) # Next position new object
+        self.add_instruction(AddImmediateNode(Reg.t(1), Reg.t(1), -1)) # Copy amount -= 1
         
         self.add_instruction(JumpNode(start_label_name))
         self.add_instruction(LabelNode(end_label_name))
         
-        self.add_instruction(JumpRegisterNode(Reg.ra()))
+        self.add_instruction(JumpRegisterNode(Reg.ra())) # In v0 is the new object address
         
     def _add_get_ra_function(self):
         """
@@ -645,14 +646,11 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(SyscallNode()) # Returns the read integer in v0
         self._store_local_variable(Reg.v(0), node.dest) 
 
-    @visitor.when(cil.InitInstanceFather)
-    def visit(self, node:cil.InitInstanceFather):
+    @visitor.when(cil.InitInstance)
+    def visit(self, node:cil.InitInstance):
         self._load_local_variable(Reg.t(0), node.source) # Load object address in t0
-        if node.father:
-            self._load_type_variable(Reg.t(1), node.father) # Load father type in t1
-            self.add_instruction(StoreWordNode(Reg.t(1), 0, Reg.t(0))) # Assing father type to first position in object address
-        else:
-            self.add_instruction(StoreWordNode(Reg.zero(), 0, Reg.t(0))) # Assing void to first position in object address
+        self._load_type_variable(Reg.t(1), node.instance_type) # Load type in t1
+        self.add_instruction(StoreWordNode(Reg.t(1), 0, Reg.t(0))) # Assing type to first position in object address
 
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode):

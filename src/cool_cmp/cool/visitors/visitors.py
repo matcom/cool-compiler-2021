@@ -739,6 +739,8 @@ class TypeChecker:
     def visit(self, node:CaseNode, scope):
         self.visit(node.expr,scope)
         
+        node.scope = scope = scope.create_child()
+
         types = []
         param_types = []
         for i,param in enumerate(node.params):
