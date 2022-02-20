@@ -47,7 +47,8 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         for i, var in enumerate(node.localvars, len(node.params)):
             self.visit(var, i)
         self.locals = len(node.params) + len(node.localvars)
-        blocks = self.get_basic_blocks(node.instructions)
+        leaders = self.find_leaders(node.instructions)
+        blocks = [node.instructions[leaders[i-1]:leaders[i]] for i in range(1, len(leaders))]
         self.next_use = self.construct_next_use(blocks)
         for block in blocks:
             self.block = block
@@ -290,7 +291,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         size = 4*self.obj_table.size_of_entry(node.type)
         self.code.append(f'li $a0, {size}')
         self.code.append('syscall')
-        addrs_stack = self.addr_desc.get_var_addr(node.dest)
+        addrs_stack = self.addr_desc.get_addr(node.dest)
         self.code.append('# Loads the name of the variable and saves the name like the first field')
         self.code.append(f'la $t9, type_{node.type}')
         self.code.append(f'sw $t9, 0($v0)')
@@ -553,6 +554,3 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.code.append('sb $0, 0($v0)')
         self.load_var_if_occupied(var)
         self.loop_idx += 1
-
-
-

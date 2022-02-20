@@ -108,33 +108,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(FuncCallNode)
     def visit(self, node, scope):
-        # obj, otype = self.visit(node.obj, scope)
-        
-        # meth = otype.get_method(node.id)
-        # args_node = [cil.ArgNode(obj)] + self.handle_arguments(node.args, scope, meth.param_types)
-
-        # rtype = meth.return_type
-        # result = None if isinstance(rtype, VoidType()) else self.define_internal_local()
-
-        # continue_label = cil.LabelNode(f'continue__{self.index}') 
-        # isvoid = self.check_void(obj)
-        # self.register_instruction(cil.IfGoToNode(isvoid, continue_label.label))
-        # self.register_instruction(cil.ErrorNode('dispatch_error'))
-        # self.register_instruction(continue_label)
-
-        # #desambiguar segun sea el llamado, dinamico o estatico
-        # # self.register_instruction(cil.StaticCallNode(node.type, node.id, result, args_node, rtype.name))
-        # # return result, self._return_type(otype, node)
-
-        # # self.register_instruction(cil.DynamicCallNode(self.current_type.name, 'self', node.id, result, args_node, rtype.name))
-        # # return result, self._return_type(self.current_type, node)
-
-        # # if otype in [StringType(), IntType(), BoolType()]:
-        # #     self.register_instruction(cil.StaticCallNode(otype.name, node.id, result, args_node, rtype.name))
-        # # else:
-        # #     self.register_instruction(cil.DynamicCallNode(otype.name, obj, node.id, result, args_node, rtype.name))
-        # # return result, self._return_type(otype, node)
-
         result_local = self.define_internal_local(scope = scope, name = "result")
         expr_value = self.visit(node.instance, scope)
 
@@ -253,7 +226,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(end_label)
         return result, typex
 
-#this find_local, find_attribute is from scope, this get_type is separate, nedd to do it well
+#this find_local, find_attribute is from scope, this get_type is separate, need to do it well
     visitor.when(VarNode)
     def visit(self, node, scope):
         try:
@@ -315,5 +288,4 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(EqualNode)
     def visit(self, node, scope):
         return self._define_binary_node(node, scope, cil.EqualNode)
-
 

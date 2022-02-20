@@ -5,13 +5,16 @@ from enum import Enum
 class BaseCILToMIPSVisitor:
     def __init__(self, inherit_graph):
         self.code: list = ['.text', '.globl main', 'main:']
-        self.initialize_data_code()
+        self.data_code = ['.data']
         self.symbol_table = SymbolTable()
         self.reg_desc = RegisterDescriptor()
         self.addr_desc = AddressDescriptor()
         
         self.obj_table: ObjTable = ObjTable(self.dispatch_table)
-        self.initialize_methods()
+        self.methods = [] 
+        for entry in self.obj_table:
+            entry: ObjTabEntry
+            self.methods.extend(entry.dispatch_table_entry)
         self.var_address = {'self': AddrType.REF}
        
         self.loop_idx = 0 
@@ -19,19 +22,6 @@ class BaseCILToMIPSVisitor:
         self.inherit_graph = inherit_graph
         self.space_idx = 0
 
-    def initialize_methods(self):
-        self.methods = [] 
-        for entry in self.obj_table:
-            entry: ObjTabEntry
-            self.methods.extend(entry.dispatch_table_entry)
-
-    def initialize_data_code(self):
-        self.data_code = ['.data'] 
-
-    def get_basic_blocks(self, instructions):
-        leaders = self.find_leaders(instructions)
-        blocks = [instructions[leaders[i-1]:leaders[i]] for i in range(1, len(leaders))]
-        return blocks
 
     def is_variable(self, expr):
         return isinstance(expr, str)
@@ -226,6 +216,7 @@ class ObjTable:
     def __iter__(self):
         return iter(self.objects.values())
 
+
 class RegisterDescriptor:
     def __init__(self):
         registers = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 'a1', 'a2', 'a3', \
@@ -261,10 +252,10 @@ class AddressDescriptor:
         else:
             self.vars[name] = [address, register, stack]
             
-    def get_var_addr(self, name):
+    def get_addr(self, name):
         return self.vars[name][0]
 
-    def set_var_addr(self, name, addr):
+    def set_addr(self, name, addr):
         self.vars[name][0] = 4*addr
 
     def get_var_reg(self, var):

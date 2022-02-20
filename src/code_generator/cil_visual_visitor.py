@@ -151,5 +151,4 @@ def get_formatter():
 
     printer = PrintVisitor()
     return lambda ast: printer.visit(ast)
-        
-        
+             
