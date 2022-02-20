@@ -55,6 +55,17 @@ class AttrDeclarationNode(DeclarationNode):
         self.expr = expr
 
 
+class VarDeclarationNode(DeclarationNode):
+    def __init__(self, idx, typex, expr=None):
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
+        self.type = typex.value
+        self.typeLine = typex.lineno
+        self.typeCol = typex.column
+        self.expr = expr
+
+
 class ExpressionNode(Node):
     pass
 

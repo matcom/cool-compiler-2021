@@ -162,9 +162,17 @@ class CoolParser:
         p[0] = p[1]
 
     def p_let_attrs(self, p):
-        '''let_attrs : def_attr
-                     | def_attr COMMA let_attrs'''
+        '''let_attrs : def_var
+                     | def_var COMMA let_attrs'''
         p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[3]
+
+    def p_def_var(self, p):
+        '''def_var : ID COLON TYPE
+                   | ID COLON TYPE ASSIGN expr'''
+        if len(p) == 4:
+            p[0] = VarDeclarationNode(p.slice[1], p.slice[3])
+        else:
+            p[0] = VarDeclarationNode(p.slice[1], p.slice[3], p[5])
 
     def p_case_list(self, p):
         '''case_list : case_option SEMICOLON

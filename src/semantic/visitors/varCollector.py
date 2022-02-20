@@ -1,11 +1,11 @@
 import imp
 from src.utils import visitor
-from src.utils.ast import AttrDeclarationNode, ClassDeclarationNode, FuncDeclarationNode, IntNode, ProgramNode
-from src.semantic.semantic import IntType, Scope, define_default_value
+from src.utils.ast import AssignNode, AttrDeclarationNode, ClassDeclarationNode, FuncDeclarationNode, IntNode, ProgramNode
+from src.semantic.semantic import ErrorType, IntType, Scope, define_default_value
 from src.utils.errors import SemanticError
 
 
-class TypeInferer:
+class VarCollector:
     def __init__(self, context, errors):
         self.context = context
         self.errors = errors
@@ -53,14 +53,14 @@ class TypeInferer:
         attr.expr = attrDeclarationNode.expr
         scope.define_attribute(attr)
 
-
     @visitor.when(FuncDeclarationNode)
     def visit(self, funcDeclarationNode, scope):
         parent = self.currentType.parent
         pnames = [param[0] for param in funcDeclarationNode.params]
         ptypes = [param[1] for param in funcDeclarationNode.params]
 
-        self.currentMethod = self.currentType.get_method(funcDeclarationNode.id, (funcDeclarationNode.line, funcDeclarationNode.col))
+        self.currentMethod = self.currentType.get_method(
+            funcDeclarationNode.id, (funcDeclarationNode.line, funcDeclarationNode.col))
 
         newScope = scope.create_child()
         scope.functions[funcDeclarationNode.id] = newScope
@@ -69,7 +69,30 @@ class TypeInferer:
             if pname == 'self':
                 errorText = "'self' cannot be the name of a formal parameter."
                 self.errors.append(SemanticError(errorText, pline, pcol))
-            newScope.define_variable(pname, self._get_type(ptype, (pline,pcol)))
-        
+            newScope.define_variable(
+                pname, self._get_type(ptype, (pline, pcol)))
+
         self.visit(funcDeclarationNode.body, newScope)
 
+    def _get_type(self, ntype, pos):
+        try:
+            return self.context.get_type(ntype, pos)
+        except SemanticError as e:
+            self.errors.append(e)
+            return ErrorType()
+
+    @visit.when(AssignNode)
+    def visit(self, assignNode, scope):
+        if assignNode.id == 'self':
+            errorText = '\'self\' cannot be bound in a \'let\' expression.'
+            self.errors.append(SemanticError(
+                errorText, assignNode.line, assignNode.col))
+            return
+
+        try:
+            vType = self.context.get_type(assignNode.type, assignNode.line, assignNode.col)
+        except:
+            errorText = f'Class {assignNode.type} of let-bound identifier %s is undefined.'
+
+        vInfo = scope.find_variable(assignNode.id)
+        if vInfo
