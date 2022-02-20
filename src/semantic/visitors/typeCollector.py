@@ -5,7 +5,7 @@ from semantic.semantic import Context, IntType, StringType, BoolType, ObjectType
 
 
 class TypeCollector(object):
-    def __init__(self, errors=[]):
+    def __init__(self, errors):
         self.context = None
         self.errors = errors
 

@@ -5,7 +5,7 @@ from utils.ast import *
 
 
 class TypeBuilder:
-    def __init__(self, context, errors=[]):
+    def __init__(self, context, errors):
         self.context = context
         self.currentType = None
         self.errors = errors
