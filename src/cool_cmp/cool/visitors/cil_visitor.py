@@ -108,7 +108,7 @@ class CILPrintVisitor():
     
     @visitor.when(cil.LengthNode)
     def visit(self, node):
-        return f'{node.dest} = LENGTH {node.string}'
+        return f'{node.dest} = LENGTH {node.string_var}'
     
     @visitor.when(cil.ConcatNode)
     def visit(self, node):

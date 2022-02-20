@@ -155,9 +155,9 @@ class LoadNode(InstructionNode):
         self.msg = msg
 
 class LengthNode(InstructionNode):
-    def __init__(self, dest, string) -> None:
+    def __init__(self, dest, string_var) -> None:
         self.dest = dest
-        self.string = string
+        self.string_var = string_var
 
 class ConcatNode(InstructionNode):
     def __init__(self, dest, string1, string2) -> None:

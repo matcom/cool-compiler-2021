@@ -112,6 +112,10 @@ class MIPSPrintVisitor():
     def visit(self, node:LoadWordNode):
         return f"lw {node.dest}, {node.offset}({node.base_source_dir})"
     
+    @visitor.when(LoadByteNode)
+    def visit(self, node:LoadByteNode):
+        return f"lb {node.dest}, {node.offset}({node.base_source_dir})"
+    
     @visitor.when(StoreWordNode)
     def visit(self, node:StoreWordNode):
         return f"sw {node.source}, {node.offset}({node.base_dest_dir})"
@@ -317,7 +321,29 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(LabelNode(end_label_name))
         
         self.add_instruction(JumpRegisterNode(Reg.ra())) # In v0 is the new object address
+    
+    def _add_length_function(self):
+        """
+        Function that returns in $v0 the length of the string passed in $a0
+        """
+        self.add_instruction(LabelNode("__string_length"))
+
+        self.add_instruction(LoadImmediateNode(Reg.v(0), 0)) # v0 = current length
+        start_loop = "__string_length_start_loop"
+        end_loop = "__string_length_end_loop"
+        self.add_instruction(LabelNode(start_loop))
+        self.add_instruction(LoadByteNode(Reg.t(0), 0, Reg.a(0))) # Load current char
         
+        self.add_instruction(BranchEqualNode(Reg.t(0), Reg.zero(), end_loop)) # Is null char? end
+
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.v(0), 1)) # Increment length
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(0), 1)) # Next char
+
+        self.add_instruction(JumpNode(start_loop))
+        self.add_instruction(LabelNode(end_loop))
+
+        self.add_instruction(JumpRegisterNode(Reg.ra())) # In v0 is the string length
+
     def _add_get_ra_function(self):
         """
         Adds a function that returns in $v0 2 instructions after the caller instruction
@@ -399,6 +425,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
         self._add_get_ra_function()
         self._add_copy_function()
+        self._add_length_function()
 
         for function in node.dotcode:
             self.current_function = function
@@ -600,6 +627,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(JumpAndLinkNode("__copy"))
         self._store_local_variable(Reg.v(0), node.result)
     
+    @visitor.when(cil.LengthNode)
+    def visit(self, node:cil.LengthNode):
+        self._load_value(Reg.a(0), node.string_var) # a0 = instance
+        self.add_instruction(JumpAndLinkNode("__string_length"))
+        self._store_local_variable(Reg.v(0), node.dest)
+
     @visitor.when(cil.VoidNode)
     def visit(self, node:cil.VoidNode):
         self._store_local_variable(Reg.zero(), node.dest)

@@ -29,13 +29,13 @@
 - [x] Llamado de funciones
 - [x] Set y Get de Atributos
 - [x] isvoid
-- [ ] case of
-- [ ] Llamado dinamico self type
-- [ ] At @
 - Funciones nativas:
-  - [ ] Copy
-  - [ ] Length
+  - [x] Copy
+  - [x] Length
   - [ ] Substring
   - [ ] Concat
-  - [ ] TypeName?
-  
+  - [ ] TypeName
+- [ ] At @
+- [ ] Llamado dinamico self type
+- [ ] case of
+- [ ] Verificar que los atributos se inicialicen correctamente en caso de que uno dependa de otro y a la hora de asiganrle valor uno no este inicializado.
