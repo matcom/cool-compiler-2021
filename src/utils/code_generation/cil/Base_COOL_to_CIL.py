@@ -99,14 +99,19 @@ class BaseCOOLToCIL:
         self.register_instruction(continue_node)
     
     def register_built_in(self):
-        self._register_Object()
-        self._register_IO()
+        self.__register_Object()
+        self.__register_IO()
+        self.__register_Int()
+        self.__register_String()
+        self.__register_Bool()
 
 
 
 
-    # tipos y funciones integrados en COOL
-    def _register_Object(self):
+
+
+    # convirtiendo tipos y funciones integrados en COOL en CIL
+    def __register_Object(self):
         type_node = self.register_type('Object')
 
         self.current_function = self.register_function(self.init_name('Object'))
@@ -117,7 +122,7 @@ class BaseCOOLToCIL:
         self.current_function = self.register_function(self.to_function_name('abort', 'Object'))
         self.register_param(self.vself)
         vname = self.define_internal_local()
-        data_node = [dn for dn in self.dotdata if dn.value == 'Abort called from class '][0]
+        data_node = [dn for dn in self.dotdata if dn.value == 'Aborting... in class '][0]
         self.register_instruction(nodes.LoadNode(vname, data_node))
         self.register_instruction(nodes.PrintStrNode(vname))
         self.register_instruction(nodes.TypeNameNode(vname, self.vself.name))
@@ -145,7 +150,7 @@ class BaseCOOLToCIL:
         type_node.methods = [(name, self.to_function_name(name, 'Object')) for name in ['abort', 'type_name', 'copy']]
         type_node.methods += [('init', self.init_name('Object'))]
     
-    def _register_IO(self):
+    def __register_IO(self):
         type_node = self.register_type('IO')
 
         self.current_function = self.register_function(self.init_name('IO'))
@@ -190,3 +195,105 @@ class BaseCOOLToCIL:
         type_node.methods = [(method, self.to_function_name(method, 'Object')) for method in ['type_name','abort','copy']]
         type_node.methods += [(name, self.to_function_name(name, 'IO')) for name in ['out_string', 'out_int', 'in_string', 'in_int']]
         type_node.methods += [('init', self.init_name('IO'))]
+    
+    def __register_Int(self):
+        type_node = self.register_type('Int')
+        type_node.attributes = ['value']
+
+        self.current_function = self.register_function(self.init_name('Int'))
+        self.register_param(VariableInfo('val', None))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.AllocateNode('Int', instance))
+        self.register_instruction(nodes.SetAttrNode(instance, 'value', 'val', 'Int'))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        type_node.methods = [(method, self.to_function_name(method, 'Object')) for method in ['type_name','abort','copy']]
+        type_node.methods += [('init', self.init_name('Int'))]
+    
+    def __register_String(self):
+        type_node = self.register_type('String')
+        type_node.attributes = ['value', 'length']
+
+        self.current_function = self.register_function(self.init_name('String'))
+        self.register_param(VariableInfo('val', None))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.AllocateNode('String', instance))
+        self.register_instruction(nodes.SetAttrNode(instance, 'value', 'val', 'String'))
+        result = self.define_internal_local()
+        self.register_instruction(nodes.LengthNode(result, 'val'))
+        attr = self.define_internal_local()
+        self.register_instruction(nodes.ArgNode(result))
+        self.register_instruction(nodes.StaticCallNode(self.init_name('Int'), attr))
+        self.register_instruction(nodes.SetAttrNode(instance, 'length', attr, 'String'))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        self.current_function = self.register_function(self.to_function_name('length', 'String'))
+        self.register_param(self.vself)
+        result = self.define_internal_local()
+        self.register_instruction(nodes.GetAttrNode(result, self.vself.name, 'length', 'String'))
+        self.register_instruction(nodes.ReturnNode(result))
+
+        self.current_function = self.register_function(self.to_function_name('concat', 'String'))
+        self.register_param(self.vself)
+        self.register_param(VariableInfo('s', None))
+        str_1 = self.define_internal_local()
+        str_2 = self.define_internal_local()
+        length_1 = self.define_internal_local()
+        length_2 = self.define_internal_local()
+        self.register_instruction(nodes.GetAttrNode(str_1, self.vself.name, 'value', 'String'))
+        self.register_instruction(nodes.GetAttrNode(str_2, 's', 'value', 'String'))
+        self.register_instruction(nodes.GetAttrNode(length_1, self.vself.name, 'length', 'String'))
+        self.register_instruction(nodes.GetAttrNode(length_2, 's', 'length', 'String'))
+        self.register_instruction(nodes.GetAttrNode(length_1, length_1, 'value', 'Int'))
+        self.register_instruction(nodes.GetAttrNode(length_2, length_2, 'value', 'Int'))
+        self.register_instruction(nodes.PlusNode(length_1, length_1, length_2))
+
+        result = self.define_internal_local()
+        self.register_instruction(nodes.ConcatNode(result, str_1, str_2, length_1))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.ArgNode(result))
+        self.register_instruction(nodes.StaticCallNode(self.init_name('String'), instance))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        self.current_function = self.register_function(self.to_function_name('substr', 'String'))
+        self.register_param(self.vself)
+        self.register_param(VariableInfo('i', None))
+        self.register_param(VariableInfo('l', None))
+        result = self.define_internal_local()
+        index_value = self.define_internal_local()
+        length_value = self.define_internal_local()
+        length_attr = self.define_internal_local()
+        length_substr = self.define_internal_local()
+        less_value = self.define_internal_local()
+        str_value = self.define_internal_local()
+        self.register_instruction(nodes.GetAttrNode(str_value, self.vself.name, 'value', 'String'))
+        self.register_instruction(nodes.GetAttrNode(index_value, 'i', 'value', 'Int'))
+        self.register_instruction(nodes.GetAttrNode(length_value, 'l', 'value', 'Int'))
+      
+        self.register_instruction(nodes.GetAttrNode(length_attr, self.vself.name, 'length', 'String'))
+        self.register_instruction(nodes.PlusNode(length_substr, length_value, index_value))
+        self.register_instruction(nodes.LessThanNode(less_value, length_attr, length_substr))
+        self.register_runtime_error(less_value, 'Substring out of range')
+        self.register_instruction(nodes.SubstringNode(result, str_value, index_value, length_value))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.ArgNode(result))
+        self.register_instruction(nodes.StaticCallNode(self.init_name('String'), instance))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        type_node.methods = [(method, self.to_function_name(method, 'Object')) for method in ['type_name','abort','copy']]
+        type_node.methods += [(name, self.to_function_name(name, 'String')) for name in ['length', 'concat', 'substr']]
+        type_node.methods += [('init', self.init_name('String'))]
+    
+    def __register_Bool(self):
+        type_node = self.register_type('Bool')
+        type_node.attributes = ['value']
+
+        self.current_function = self.register_function(self.init_name('Bool'))
+        self.register_param(VariableInfo('val', None))
+        instance = self.define_internal_local()
+        self.register_instruction(nodes.AllocateNode('Bool', instance))
+        self.register_instruction(nodes.SetAttrNode(instance, 'value', 'val', 'Bool'))
+        self.register_instruction(nodes.ReturnNode(instance))
+
+        type_node.methods = [(method, self.to_function_name(method, 'Object')) for method in ['type_name','abort','copy']]
+        type_node.methods += [('init', self.init_name('Bool'))]
