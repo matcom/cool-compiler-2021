@@ -9,8 +9,8 @@ from cmp.semantic import Context
 from utils.semantic_check.type_collector import TypeCollector
 from utils.semantic_check.type_builder import TypeBuilder
 from utils.semantic_check.type_checker import TypeChecker 
-
-from utils.parser.LALR_1 import LALR1_Parser
+from utils.code_generation.cil.COOL_to_CIL import COOLtoCIL
+from utils.code_generation.cil.print_CIL_AST import get_formatter
 
 if __name__ == "__main__":
     add = "codegen/arith.cl"
@@ -65,3 +65,7 @@ if __name__ == "__main__":
         raise Exception()
 
 # generacion de codigo
+cil_visitor = COOLtoCIL(context)
+cil_ast = cil_visitor.visit(ast, scope)
+
+print(get_formatter()(cil_ast))

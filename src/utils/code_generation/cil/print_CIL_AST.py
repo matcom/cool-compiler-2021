@@ -3,7 +3,8 @@ import cmp.visitor as visitor
 
 def get_formatter():
 
-    class PrintVisitor(object):
+    class PrintCIL(object):
+        
         @visitor.on('node')
         def visit(self, node):
             pass
@@ -21,11 +22,11 @@ def get_formatter():
             attributes = '\n\t'.join(f'attribute {x}' for x in node.attributes)
             methods = '\n\t'.join(f'method {x}: {y}' for x,y in node.methods)
 
-            return f'type {node.name} {{\n\t{attributes}\n\n\t{methods}\n}}'
+            return f'type {node.id} {{\n\t{attributes}\n\n\t{methods}\n}}'
 
         @visitor.when(nodes.DataNode)
         def visit(self, node):
-            return f'{node.idx} = {node.value}'
+            return f'{node.id} = {node.value}'
 
         @visitor.when(nodes.FunctionNode)
         def visit(self, node):
@@ -67,7 +68,7 @@ def get_formatter():
         def visit(self, node):
             return f'{node.dest} = {node.op_l} <= {node.op_r}'
 
-        @visitor.when(nodes.LessNode)
+        @visitor.when(nodes.LessThanNode)
         def visit(self, node):
             return f'{node.dest} = {node.op_l} < {node.op_r}'
 
@@ -81,7 +82,7 @@ def get_formatter():
 
         @visitor.when(nodes.SetAttrNode)
         def visit(self, node):
-            return f'SETATTR {node.idx} {node.attr} {node.value}'
+            return f'SETATTR {node.id} {node.attr} {node.value}'
 
         @visitor.when(nodes.AllocateNode)
         def visit(self, node):
@@ -171,6 +172,6 @@ def get_formatter():
         def visit(self, node):
             return f'PRINT {node.value}'
         
-    printer = PrintVisitor()
+    printer = PrintCIL()
     return (lambda ast: printer.visit(ast))
     

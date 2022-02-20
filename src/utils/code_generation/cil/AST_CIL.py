@@ -80,13 +80,13 @@ class cil_ast:
     class GetAttrNode(InstructionNode):
         def __init__(self, dest, idx, attr, computed_type):
             self.dest = dest
-            self.idx = idx
+            self.id = idx
             self.attr = attr
             self.computed_type = computed_type
 
     class SetAttrNode(InstructionNode):
         def __init__(self, idx, attr, value, computed_type):
-            self.idx = idx
+            self.id = idx
             self.attr = attr
             self.value = value
             self.computed_type = computed_type

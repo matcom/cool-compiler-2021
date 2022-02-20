@@ -37,10 +37,10 @@ class BaseCOOLToCIL:
         return vinfo.name
     
     def register_local(self, vinfo, id=False):
-        if len(self.current_function.name) >= 8 and self.current_function.name[:8] == 'function':
-            name = f'local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}'
+        if len(self.current_function.id) >= 8 and self.current_function.id[:8] == 'function':
+            name = f'local_{self.current_function.id[9:]}_{vinfo.name}_{len(self.localvars)}'
         else:
-            name = f'local_{self.current_function.name[5:]}_{vinfo.name}_{len(self.localvars)}'
+            name = f'local_{self.current_function.id[5:]}_{vinfo.name}_{len(self.localvars)}'
         
         new_vinfo = VariableInfo(name, None)
         local_node = nodes.LocalNode(new_vinfo.name)
