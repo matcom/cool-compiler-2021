@@ -2,6 +2,7 @@ from parsing.ast import *
 from cmp.semantic import SemanticError, Context
 from cmp.semantic import ObjectType, StringType, IntType, AutoType, BoolType, IOType, SelfType
 import cmp.visitor as visitor 
+from .utils import is_base_class
 
 
 BASIC_CLASS_REDEFINED = 'SemanticError: Redefinition of basic class %s.'
@@ -44,10 +45,6 @@ class TypeCollector(object):
                 self.errors.append(CLASS_REDEFINED)
         except SemanticError:
             self.context.create_type(node.id)
-
-
-def is_base_class(id):
-    return id in ['Object', 'IO', 'Int', 'String', 'Bool']
 
 
 def define_base_classes(context):

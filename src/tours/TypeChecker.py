@@ -1,26 +1,40 @@
 from parsing.ast import *
-from .utils import find_parent_type, InferType 
+from .utils import find_parent_type, InferType, is_base_class
 from cmp.semantic import Scope, SemanticError
 from cmp.semantic import Type, ObjectType, IntType, StringType, BoolType, AutoType, ErrorType, SelfType, IOType
 import cmp.visitor as visitor
 
 
-SELF_IS_READONLY = "Variable 'self' is read-only."
+SELF_IS_READONLY = "SemanticError: Cannot assign to 'self'."
+SELF_IS_READONLY_LET = "SemanticError: 'self' cannot be bound in a 'let' expression."
+SELF_IS_READONLY_PARAM = "SemanticError: 'self' cannot be the name of a formal parameter."
+SELF_IS_READONLY_ATTRIBUTE = "SemanticError: 'self' cannot be the name of an attribute."
 LOCAL_ALREADY_DEFINED = "Variable '%s' is already defined in method '%s'."
 INCOMPATIBLE_ATTRIBUTE_TYPE = "TypeError: Inferred type %s of initialization of attribute %s does not conform to declared type %s."
+INCOMPATIBLE_VARIABLE_TYPE = "TypeError: Inferred type %s of initialization of %s does not conform to identifier's declared type %s." 
 INCOMPATIBLE_RET_FUNC_TYPE = "TypeError: Inferred return type %s of method %s does not conform to declared return type %s."
 INCOMPATIBLE_DISPATCH_TYPE = "TypeError: In call of method %s, type %s of parameter %s does not conform to declared type %s."
 INCOMPATIBLE_DISPATCH_DEC_TYPE = "TypeError: Expression type %s does not conform to declared static dispatch type %s."
 VARIABLE_NOT_DEFINED = "NameError: Undeclared identifier %s."
 INVALID_OPERATION = "TypeError: non-Int arguments: %s %s %s"
+INVALID_BASIC_COMPARISON = "TypeError: Illegal comparison with a basic type."
 OPERATION_NOT_DEFINED = "Operation '%s' is not defined for type '%s'."
 UNARY_OPERATION_NOT_DEFINED = "TypeError: Argument of '%s' has type %s instead of %s."
-PREDICATE_OPERATIONS = "TypeError: Predicate of '%s' does not have type Bool." 
+PREDICATE_OPERATIONS = "TypeError: %s condition does not have type Bool." 
 TYPE_VOID = "The expression can not be void."
 ATTRIBUTE_NOT_INFERED = "Can not infered attribute '%s' in class '%s'."
 RETURN_TYPE_METHOD = "Can not infered the return type of the method '%s' in class '%s'."
 VAR_TYPE_NOT_INFERED = "Can not infered the type of the '%s' '%s' in method '%s' in class '%s'."
 WRONG_NUMBER_ARGUMENTS = "SemanticError: Method %s called with wrong number of arguments."
+DUPLICATE_BRANCH = "SemanticError: Duplicate branch %s in case statement."
+CASE_TYPE_UNDEFINED = "TypeError: Class %s of case branch is undefined."
+UNDEFINED_METHOD = "AttributeError: Dispatch to undefined method %s."
+PARENT_ATTRIBUTE_REDEFINED = "SemanticError: Attribute %s is an attribute of an inherited class."
+UNDEFINED_VARIABLE_TYPE = "TypeError: Class %s of let-bound identifier %s is undefined."
+METHOD_REDEFINED_PARAM = "SemanticError: In redefined method %s, parameter type %s is different from original type %s."
+METHOD_REDEFINED_RETURN = "SemanticError: In redefined method %s, return type %s is different from original return type %s."
+METHOD_REDEFINED_NPARAM = "SemanticError: Incompatible number of formal parameters in redefined method %s."
+UNDEFINED_NEW_TYPE = "TypeError: 'new' used with undefined class %s."
 
 
 class TypeChecker:
@@ -64,10 +78,13 @@ class TypeChecker:
         if parent is not None:
             try:
                 parent.get_attribute(node.id)
-                self.errors.append(f'Attribute "{node.id}" is already defined in {parent.name}.')
+                self.errors.append(PARENT_ATTRIBUTE_REDEFINED.replace('%s', node.id, 1))
             except SemanticError:
                 pass
-
+        
+        if node.id == "self":
+            self.errors.append(SELF_IS_READONLY_ATTRIBUTE)
+         
         node_type = self.current_type.get_attribute(node.id).type
         if node_type == SelfType():
             node_type = self.current_type
@@ -95,13 +112,23 @@ class TypeChecker:
         if parent is not None:
             try:
                 method = parent.get_method(node.id)
-                if method != self.current_method:
-                    self.errors.append(f"Method '{self.current_method.name}' already defined in '{parent.name}' with a different signature.")
+                if method.return_type != self.current_method.return_type:
+                    self.errors.append(METHOD_REDEFINED_RETURN.replace('%s', node.id, 1).replace('%s', self.current_method.return_type.name, 1).replace('%s', method.return_type.name, 1))
+                if len(self.current_method.param_types) != len(method.param_types):
+                    self.errors.append(METHOD_REDEFINED_NPARAM.replace('%s', node.id, 1))
+                else:
+                    for type_child, type_parent in zip(self.current_method.param_types, method.param_types):
+                        if type_child != type_parent:
+                            self.errors.append(METHOD_REDEFINED_PARAM.replace('%s', node.id, 1).replace('%s', type_child.name, 1).replace('%s', type_parent.name, 1))
+
             except SemanticError:
                 pass
                 
         for name, typex in zip(self.current_method.param_names, self.current_method.param_types):
-            child.define_variable(name, typex)
+            if name != "self":
+                child.define_variable(name, typex)
+            else:
+                 self.errors.append(SELF_IS_READONLY_PARAM)
         
         self.visit(node.expr, child)
 
@@ -167,8 +194,8 @@ class TypeChecker:
                 ret_type = typee
         
         except SemanticError as error:
-            self.errors.append(error.text)
-            ret_type = ErrorType()   
+           self.errors.append(UNDEFINED_METHOD.replace('%s',node.id))
+           ret_type = ErrorType()   
         
         node.computed_type = ret_type 
 
@@ -183,7 +210,7 @@ class TypeChecker:
         if predicate_type != AutoType() and predicate_type.conforms_to(BoolType()):
             node.computed_type = find_parent_type(self.current_type, node.then.computed_type, node.elsex.computed_type)
         elif predicate_type != AutoType(): 
-            self.errors.append(PREDICATE_OPERATIONS.replace('%s', "if", 1))
+            self.errors.append(PREDICATE_OPERATIONS.replace('%s', "If", 1))
             node.computed_type = ErrorType()
         else:
             InferType(self.current_type, predicate_type, BoolType())
@@ -200,12 +227,12 @@ class TypeChecker:
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
         if node.id == 'self':
-            self.errors.append(SELF_IS_READONLY) 
+            self.errors.append(SELF_IS_READONLY_LET) 
         
         try:
             var_type = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(str(error))
+            self.errors.append(UNDEFINED_VARIABLE_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1))
             var_type = ErrorType()
         
         if node.expr is not None:    
@@ -213,7 +240,7 @@ class TypeChecker:
             expresion_type = node.expr.computed_type if node.expr.computed_type != SelfType() else self.current_type 
             
             if expresion_type != AutoType() and var_type != AutoType() and not expresion_type.conforms_to(var_type):
-                self.errors.append(INCOMPATIBLE_TYPES.replace('%s', expresion_type.name, 1).replace('%s', var_type.name, 1))
+                self.errors.append(INCOMPATIBLE_VARIABLE_TYPE.replace('%s', expresion_type.name, 1).replace('%s', node.id, 1).replace('%s', var_type.name, 1))
             elif var_type == AutoType() and expresion_type != AutoType():
                 InferType(self.current_type, var_type, expresion_type)
             elif var_type != AutoType() and expresion_type == AutoType():
@@ -244,15 +271,20 @@ class TypeChecker:
     @visitor.when(CaseNode)
     def visit(self, node, scope):
         self.visit(node.expr, scope)
+        
+        types_computed = []
         types = []
-
         for attr in node.cases:
             self.visit(attr, scope)
-            types.append(attr.computed_type)
+            types_computed.append(attr.computed_type)
+            if attr.type in types:
+                self.errors.append(DUPLICATE_BRANCH.replace('%s', attr.type, 1))
+            else:
+                types.append(attr.type)
     
-        typex = types[0] 
-        for i in range(1,len(types)):
-            typex =  find_parent_type(self.current_type, typex, types[i])
+        typex = types_computed[0] 
+        for i in range(1,len(types_computed)):
+            typex =  find_parent_type(self.current_type, typex, types_computed[i])
         node.computed_type = typex     
 
     @visitor.when(CaseAttrNode)
@@ -263,7 +295,7 @@ class TypeChecker:
                 self.errors.append("The type of a case attribute can not be AUTO_TYPE.")
                 typex = ErrorType()
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(CASE_TYPE_UNDEFINED.replace('%s', node.type, 1))
             typex = ErrorType()
 
         child_scope = scope.create_child(scope.class_name, scope.method_name)
@@ -282,7 +314,7 @@ class TypeChecker:
         
         node.computed_type = expresion_type
 
-        if node.id == 'self':
+        if node.id.lex == 'self':
             self.errors.append(SELF_IS_READONLY)
             node.computed_type = ErrorType() 
         elif var_type != AutoType() and expresion_type != AutoType() and not expresion_type.conforms_to(var_type):
@@ -334,8 +366,11 @@ class TypeChecker:
                         self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', left_type.name, 1))
                         node.computed_type = ErrorType() 
                 else:
-                    self.errors.append(INVALID_OPERATION.replace('%s', left_type.name, 1).replace('%s', "=", 1).replace('%s', right_type.name, 1))
-                    node.computed_type = ErrorType()
+                    if is_base_class(left_type.name) or is_base_class(right_type.name):
+                        self.errors.append(INVALID_BASIC_COMPARISON)
+                        node.computed_type = ErrorType()
+                    else:
+                        node.computed_type = BoolType()    
         
         else:
             if left_type == AutoType() and right_type == AutoType():
@@ -440,7 +475,7 @@ class TypeChecker:
                 self.errors.append('Class AUTO_TYPE can not be instantiated.')
                 var_type = ErrorType() 
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(UNDEFINED_NEW_TYPE.replace('%s', node.lex, 1))
             var_type = ErrorType()  
         
         node.computed_type =  var_type     

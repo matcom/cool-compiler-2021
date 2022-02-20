@@ -80,3 +80,7 @@ def InferType(current_type, auto_var, not_auto_var):
             return True
 
     return False
+
+
+def is_base_class(id):
+    return id in ['Object', 'IO', 'Int', 'String', 'Bool']

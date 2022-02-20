@@ -7,9 +7,17 @@ import cmp.visitor as visitor
 CANNOT_INHERIT = 'SemanticError: Class %s cannot inherit class %s.'
 MAIN_NOT_DEFINED = 'Method "main" must be defined in "Main" class.'
 MAIN_NOT_HERITABLE = 'Class "Main" is not heritable.'
-CYCLES_IN_CLASES = 'The graph defined by parent-child relation on classes may not contain cycles.'
+CYCLES_IN_CLASES = 'SemanticError: Class %s, or an ancestor of %s, is involved in an inheritance cycle.'
 NOT_SELF_TYPE = 'The type of the parameter "%s" can not be SELF_TYPE in method "%s" in class "%s".'
-IDENTIFIER_USED = 'The identifier "%s" is already used in the param list of method "%s" in class "%s.'
+SELF_IS_READONLY = "Variable 'self' is read-only."
+IDENTIFIER_USED = 'SemanticError: Formal parameter %s is multiply defined.'
+ATTRIBUTE_REDEFINED = "SemanticError: Attribute %s is multiply defined in class."
+METHOD_REDEFINED = "SemanticError: Method %s is multiply defined in class."
+UNDEFINED_ATTRIBUTE_TYPE ="TypeError: Class %s of attribute %s is undefined."
+PARENT_ATTRIBUTE_REDEFINED = "SemanticError: Attribute %s is an attribute of an inherited class."
+PARENT_NOT_DEFINED = "TypeError: Class %s inhertits from an undefined class %s."
+UNDEFINED_PARAM_TYPE = "TypeError: Class %s of formal parameter %s is undefined."
+UNDEFINED_RETURN_TYPE = "TypeError: Undefined return type %s in method %s."
 
 
 class TypeBuilder:
@@ -58,11 +66,11 @@ class TypeBuilder:
                     except SemanticError:
                         pass
             except SemanticError as error:
-                self.errors.append(error.text)
+                self.errors.append(PARENT_NOT_DEFINED.replace('%s', node.id, 1).replace('%s', node.parent, 1))
                 parent = ErrorType()      
 
             if parent.conforms_to(self.current_type):
-                self.errors.append(CYCLES_IN_CLASES)
+                self.errors.append(CYCLES_IN_CLASES.replace('%s', node.id, 2))
                 parent = ErrorType() 
         
         if self.current_type != ObjectType():                            
@@ -76,20 +84,24 @@ class TypeBuilder:
         try:
             att_type = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(UNDEFINED_ATTRIBUTE_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1))
             att_type = ErrorType()
         
         try:
             self.current_type.define_attribute(node.id, att_type)
         except SemanticError as error:
-            self.errors.append(error.text)
-
+                x = self.current_type.get_attribute_parent(node.id)
+                if x == self.current_type:
+                    self.errors.append(ATTRIBUTE_REDEFINED.replace('%s', node.id, 1))
+                else:
+                    self.errors.append(PARENT_ATTRIBUTE_REDEFINED.replace('%s', node.id, 1))
+                    
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):  
         try:
             return_type = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(UNDEFINED_RETURN_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1))
             return_type = ErrorType() 
         
         params = []
@@ -101,11 +113,11 @@ class TypeBuilder:
                     self.errors.append(NOT_SELF_TYPE.replace('%s', var.id, 1).replace('%s', node.id, 1).replace('%s', self.current_type.name, 1))
                     param_type = ErrorType() 
             except SemanticError as error:
-                self.errors.append(error.text)
+                self.errors.append(UNDEFINED_PARAM_TYPE.replace('%s', var.type, 1).replace('%s', var.id, 1))
                 param_type = ErrorType()
             
             if var.id in params:
-                self.errors.append(IDENTIFIER_USED.replace('%s', var.id, 1).replace('%s', node.id, 1).replace('%s', self.current_type.name, 1))
+                self.errors.append(IDENTIFIER_USED.replace('%s', var.id, 1))
             
             params.append(var.id)
             types.append(param_type)    
@@ -113,4 +125,4 @@ class TypeBuilder:
         try:
             self.current_type.define_method(node.id, params, types, return_type)
         except SemanticError as error:
-            self.errors.append(error.text)
+            self.errors.append(METHOD_REDEFINED.replace('%s', node.id, 1))
