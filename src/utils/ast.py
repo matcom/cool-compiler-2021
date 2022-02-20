@@ -67,7 +67,7 @@ class AssignNode(ExpressionNode):
         self.expr = expr
 
 
-class FuncCallNode(ExpressionNode):
+class ArrobaCallNode(ExpressionNode):
     def __init__(self, obj, idx, args, typex):
         self.obj = obj
         self.id = idx.value
@@ -77,6 +77,15 @@ class FuncCallNode(ExpressionNode):
         self.type = typex.value
         self.typeLine = typex.lineno
         self.typeCol = typex.col
+
+
+class DotCallNode(ExpressionNode):
+    def __init__(self, obj, idx, args):
+        self.obj = obj
+        self.id = idx.value
+        self.line = idx.lineno
+        self.col = idx.column
+        self.args = args
 
 
 class MemberCallNode(ExpressionNode):
@@ -132,13 +141,6 @@ class CaseOptionNode(ExpressionNode):
         self.id = idx.value
         self.line = idx.lineno
         self.col = idx.column
-        self.type = typex.value
-        self.typeLine = typex.lineno
-        self.typeCol = typex.col
-
-
-class NewNode(ExpressionNode):
-    def __init__(self, typex):
         self.type = typex.value
         self.typeLine = typex.lineno
         self.typeCol = typex.col
@@ -217,8 +219,13 @@ class AtomicNode(ExpressionNode):
             self.col = 0
 
 
+class NewNode(AtomicNode):
+    pass
+
+
 class IdNode(AtomicNode):
     pass
+
 
 class IntNode(AtomicNode):
     pass
