@@ -2,9 +2,10 @@ from .collector import TypeCollector
 from .builder import TypeBuilder
 from .consistence import TypeConsistence
 from .checker import TypeChecker
+from coolcmp.utils.semantic import Context, Scope
 
 
-def check_semantics(ast) -> list[str]:
+def check_semantics(ast) -> tuple[list[str], Context, Scope]:
     collector = TypeCollector()
     collector.visit(ast)
 
@@ -15,6 +16,6 @@ def check_semantics(ast) -> list[str]:
     cons.visit(ast)
 
     checker = TypeChecker(cons.context, cons.errors)
-    checker.visit(ast)
+    scope = checker.visit(ast)
 
-    return checker.errors
+    return checker.errors, checker.context, scope

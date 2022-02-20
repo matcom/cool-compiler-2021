@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from coolcmp import visitor, errors as err
-from coolcmp.ast import ProgramNode, ClassDeclarationNode
-from coolcmp.semantic import Context, SemanticError
+from coolcmp import errors as err
+from coolcmp.utils import visitor
+from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode
+from coolcmp.utils.semantic import Context, SemanticError
 
 
 class TypeCollector(object):

@@ -2,6 +2,7 @@
 Cool AST.
 """
 from __future__ import annotations
+from typing import Type
 
 
 class Node:
@@ -19,7 +20,7 @@ class Node:
 
 
 class ProgramNode(Node):
-    def __init__(self, declarations: list[DeclarationNode]):
+    def __init__(self, declarations: list[ClassDeclarationNode]):
         super().__init__()
 
         self.declarations = declarations
@@ -58,7 +59,11 @@ class ParamNode(DeclarationNode):
 
 
 class FuncDeclarationNode(DeclarationNode):
-    def __init__(self, idx: str, params: list[ParamNode], return_type: str, body):
+    def __init__(self,
+                 idx: str,
+                 params: list[ParamNode],
+                 return_type: str,
+                 body: ExpressionNode):
         super().__init__()
 
         self.id = idx
@@ -160,7 +165,11 @@ class WhileNode(ExpressionNode):
 
 
 class CallNode(ExpressionNode):
-    def __init__(self, idx: str, args, obj: ExpressionNode = None, typex: str = None):
+    def __init__(self,
+                 idx: str,
+                 args: list[ExpressionNode],
+                 obj: ExpressionNode = None,
+                 typex: str = None):
         super().__init__()
 
         self.obj = obj

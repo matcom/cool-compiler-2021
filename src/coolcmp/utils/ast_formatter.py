@@ -1,10 +1,16 @@
-from coolcmp import visitor
-from coolcmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode, LetNode, \
+from __future__ import annotations
+
+from . import visitor
+from .ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode, LetNode, \
     AssignNode, BlockNode, ConditionalNode, WhileNode, CaseNode, CallNode, BinaryNode, AtomicNode, InstantiateNode, \
-    UnaryNode
+    UnaryNode, VariableNode
 
 
-class FormatVisitor(object):
+class ASTFormatter(object):
+
+    def __init__(self):
+        self.current_type: str | None = None
+
     @visitor.on('node')
     def visit(self, node, tabs):
         pass
@@ -17,6 +23,8 @@ class FormatVisitor(object):
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode, tabs: int = 0):
+        self.current_type = node.id
+
         parent = '' if node.parent is None else f": {node.parent}"
         ans = '  ' * tabs + f'\\__ClassDeclarationNode: class {node.id} {parent} {{ <feature> ... <feature> }}'
         features = '\n'.join(self.visit(child, tabs + 1) for child in node.features)
@@ -25,7 +33,8 @@ class FormatVisitor(object):
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode, tabs: int = 0):
         ans = '  ' * tabs + f'\\__AttrDeclarationNode: {node.id} : {node.type}'
-        return f'{ans}'
+        expr = f'\n{self.visit(node.expr, tabs + 1)}' if node.expr is not None else ''
+        return f'{ans}{expr}'
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node: FuncDeclarationNode, tabs: int = 0):
@@ -110,7 +119,7 @@ class FormatVisitor(object):
 
     @visitor.when(CallNode)
     def visit(self, node: CallNode, tabs: int = 0):
-        obj = self.visit(node.obj, tabs + 1)
+        obj = self.visit(node.obj or VariableNode('self'), tabs + 1) + ' <obj>'
         ans = '  ' * tabs + f'\\__CallNode: <obj>.{node.id}(<expr>, ..., <expr>)'
         args = '\n'.join(self.visit(arg, tabs + 1) for arg in node.args)
         return f'{ans}\n{obj}\n{args}'

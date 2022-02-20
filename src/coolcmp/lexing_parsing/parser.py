@@ -1,6 +1,6 @@
 import ply.yacc as yacc
 
-from coolcmp import ast
+from coolcmp.utils import ast
 from coolcmp import errors as err
 from coolcmp.lexing_parsing import lexer
 from coolcmp.utils import find_column

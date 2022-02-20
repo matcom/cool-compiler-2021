@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from coolcmp.ast import ProgramNode, ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
-from coolcmp.semantic import SemanticError, Context, ErrorType, Type
-from coolcmp import visitor, errors as err
+from coolcmp import errors as err
+from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
+from coolcmp.utils.semantic import SemanticError, Context, ErrorType, Type
+from coolcmp.utils import visitor
 
 
 class TypeBuilder:

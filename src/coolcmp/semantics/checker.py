@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from coolcmp import visitor, errors as err
-from coolcmp.semantic import Context, Method, Type, SemanticError, ErrorType, Scope
-from coolcmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode, BlockNode, \
+from coolcmp import errors as err
+from coolcmp.utils import visitor
+from coolcmp.utils.semantic import Context, Method, Type, SemanticError, ErrorType, Scope
+from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode, BlockNode, \
     LetNode, CaseNode, AssignNode, ConditionalNode, WhileNode, CallNode, VariableNode, InstantiateNode, IntegerNode, \
     StringNode, BooleanNode, PlusNode, MinusNode, StarNode, DivNode, LessThanNode, LessEqualNode, EqualNode, \
     IsVoidNode, NegationNode, ComplementNode, BinaryNode, UnaryNode, CaseBranchNode, LetDeclarationNode, ParamNode
@@ -21,28 +22,24 @@ class TypeChecker:
 
     @visitor.when(ProgramNode)
     def visit(self, node: ProgramNode, scope: Scope = None):
-        if scope is None:
-            scope = Scope()
-
-        # for declaration in node.declarations:
-        #     self.visit(declaration, scope.create_child())
+        scope = Scope('Object')
 
         pending = [(class_node.id, class_node) for class_node in node.declarations]
-        scopes = {'IO': scope.create_child()}
+        scopes = {'Object': scope, 'IO': scope.create_child('IO')}
 
         while pending:
 
             actual = pending.pop(0)
             type_ = self.context.get_type(actual[0])
 
-            if type_.parent.name not in ('Object', '<error>'):
+            if type_.parent.name != '<error>':
                 try:
-                    scopes[type_.name] = scopes[type_.parent.name].create_child()
+                    scopes[type_.name] = scopes[type_.parent.name].create_child(type_.name)
                     self.visit(actual[1], scopes[type_.name])
                 except KeyError:  # Parent not visited yet
                     pending.append(actual)
             else:
-                scopes[type_.name] = scope.create_child()
+                scopes[type_.name] = scope.create_child(type_.name)
                 self.visit(actual[1], scopes[type_.name])
 
         return scope
@@ -56,7 +53,7 @@ class TypeChecker:
             if isinstance(feature, AttrDeclarationNode):
                 self.visit(feature, scope)
             elif isinstance(feature, FuncDeclarationNode):
-                self.visit(feature, scope.create_child())
+                self.visit(feature, scope.create_child(feature.id))
             else:
                 raise Exception(f'Invalid feature at class {node.id}')
 
@@ -79,11 +76,11 @@ class TypeChecker:
             self.errors.append(err.UNDEFINED_TYPE % (node.type_pos, node.type))
 
         if node.expr is not None:
-            expr_type = self.visit(node.expr, scope.create_child())
+            expr_type = self.visit(node.expr, scope)
             if not expr_type.conforms_to(attr_type):
                 self.errors.append(err.INCOMPATIBLE_TYPES % (node.expr_pos, expr_type.name, attr_type.name))
 
-        scope.define_variable(node.id, attr_type)
+        scope.define_variable(node.id, attr_type, is_attr=True)
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node: FuncDeclarationNode, scope: Scope):
@@ -97,7 +94,7 @@ class TypeChecker:
         except SemanticError:
             pass
 
-        scope.define_variable('self', self.current_type)
+        scope.define_variable('self', self.current_type, is_param=True)
 
         for param_node in node.params:
             self.visit(param_node, scope)
@@ -126,7 +123,7 @@ class TypeChecker:
                     # this error is logged by the type builder
                     # self.errors.append(err.UNDEFINED_TYPE % (node.type_pos, node.type))
                     type_ = ErrorType()
-            scope.define_variable(node.id, type_)
+            scope.define_variable(node.id, type_, is_param=True)
         else:
             self.errors.append(err.LOCAL_ALREADY_DEFINED % (node.pos, node.id, self.current_method.name))
 

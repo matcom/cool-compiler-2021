@@ -2,8 +2,6 @@ from __future__ import annotations
 import itertools as itt
 from collections import OrderedDict
 
-from coolcmp.ast import Node, ParamNode
-
 
 class SemanticError(Exception):
     @property
@@ -224,8 +222,9 @@ class VariableInfo:
 
 
 class Scope:
-    def __init__(self, parent: Scope = None):
+    def __init__(self, tag: str = None, parent: Scope = None):
         self.locals: list[VariableInfo] = []
+        self.tag = tag
         self.parent = parent
         self.children: list[Scope] = []
         self.index = 0 if parent is None else len(parent)
@@ -233,8 +232,8 @@ class Scope:
     def __len__(self) -> int:
         return len(self.locals)
 
-    def create_child(self) -> Scope:
-        child = Scope(self)
+    def create_child(self, tag_type: str = None) -> Scope:
+        child = Scope(tag_type, self)
         self.children.append(child)
         return child
 
@@ -256,11 +255,40 @@ class Scope:
     def is_local(self, vname: str) -> bool:
         return any(True for x in self.locals if x.name == vname)
 
-    def __str__(self) -> str:
-        s = 'Scope\n'
+    def get_tagged_scope(self, tag: str) -> Scope | None:
+        scope = None
+        if self.tag is not None and self.tag == tag:
+            scope = self
+        else:
+            for child in self.children:
+                if (child_scope := child.get_tagged_scope(tag)) is not None:
+                    scope = child_scope
+                    break
+        return scope
+
+    def all_locals(self) -> list[VariableInfo]:
+        if self.parent is None:
+            return self.locals
+        else:
+            return self.locals + self.parent.all_locals()
+
+    def to_str(self, tabs: int = 0) -> str:
+        s = f'Scope ({self.tag}):\n'
         for v in self.locals:
-            s += f'{v.name}: {v.type.name}\n'
+            if v.is_attr:
+                tag = 'attr'
+            elif v.is_param:
+                tag = 'param'
+            else:
+                tag = 'local'
+            s += '  ' * tabs + f'\\__ [{tag}] {v.name}: {v.type.name}\n'
         if self.children:
             for child in self.children:
-                s += str(child)
+                s += '  ' * tabs + f'\\__ {child.to_str(tabs + 1)}'
         return s
+
+    def __str__(self):
+        return self.to_str()
+
+    def __repr__(self):
+        return str(self)
