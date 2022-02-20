@@ -261,22 +261,82 @@ class COOLtoCIL(BaseCOOLToCIL):
 
     @visitor.when(nodes.PlusNode)
     def visit(self, node, scope):
-        pass
+        vname = self.define_internal_local()
+        left_value = self.define_internal_local()
+        right_value = self.define_internal_local()
+
+        self.visit(node.left, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, scope._return, 'value', 'Int'))
+        self.visit(node.right, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, scope._return, 'value', 'Int'))
+
+        self.register_instruction(nodes_cil.PlusNode(vname, left_value, right_value))
+        instance = self.define_internal_local()
+
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Int'), instance))
+        scope._return = instance
     
 
     @visitor.when(nodes.MinusNode)
     def visit(self, node, scope):
-       pass
+        vname = self.define_internal_local()
+        left_value = self.define_internal_local()
+        right_value = self.define_internal_local()
+
+        self.visit(node.left, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, scope._return, 'value', 'Int'))
+        self.visit(node.right, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, scope._return, 'value', 'Int'))
+
+        self.register_instruction(nodes_cil.MinusNode(vname, left_value, right_value))
+        instance = self.define_internal_local()
+
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Int'), instance))
+        scope._return = instance
 
     
     @visitor.when(nodes.StarNode)
     def visit(self, node, scope):
-       pass
+        vname = self.define_internal_local()
+        left_value = self.define_internal_local()
+        right_value = self.define_internal_local()
+
+        self.visit(node.left, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, scope._return, 'value', 'Int'))
+        self.visit(node.right, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, scope._return, 'value', 'Int'))
+
+        self.register_instruction(nodes_cil.StarNode(vname, left_value, right_value))
+        instance = self.define_internal_local()
+
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Int'), instance))
+        scope._return = instance
 
 
     @visitor.when(nodes.DivNode)
     def visit(self, node, scope):
-       pass
+        vname = self.define_internal_local()
+        left_value = self.define_internal_local()
+        right_value = self.define_internal_local()
+
+        self.visit(node.left, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(left_value, scope._return, 'value', 'Int'))
+        self.visit(node.right, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(right_value, scope._return, 'value', 'Int'))
+
+        vresult = self.define_internal_local()
+        self.register_instruction(nodes_cil.EqualNode(vresult, right_value, 0))
+        self.register_runtime_error(vresult, f'({node.line},{node.column}) - RuntimeError: Division by zero\n')
+
+        self.register_instruction(nodes_cil.DivNode(vname, left_value, right_value))
+        instance = self.define_internal_local()
+        
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Int'), instance))
+        scope._return = instance
     
 
     @visitor.when(nodes.LessThanNode)
