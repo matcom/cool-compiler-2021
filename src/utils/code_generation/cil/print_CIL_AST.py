@@ -172,6 +172,10 @@ def get_formatter():
         def visit(self, node):
             return f'PRINT {node.value}'
         
+        @visitor.when(nodes.VoidNode)
+        def visit(self, node):
+            return 'VOID'
+        
     printer = PrintCIL()
     return (lambda ast: printer.visit(ast))
     

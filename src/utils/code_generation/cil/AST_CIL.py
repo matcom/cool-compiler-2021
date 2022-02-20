@@ -195,3 +195,6 @@ class cil_ast:
     class PrintIntNode(InstructionNode):
         def __init__(self, value):
             self.value = value
+    
+    class VoidNode(InstructionNode):
+        pass
