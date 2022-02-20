@@ -538,8 +538,14 @@ class CILRunnerVisitor():
         error2 = "SUBSTRING operation undefined with non Int index"
         error3 = "SUBSTRING operation undefined with non Int length"
         value1 = self.get_value_str(node.string, caller_fun_scope, error1)
-        value2 = self.get_value_str(node.index, caller_fun_scope, error2)
-        value3 = self.get_value_str(node.length, caller_fun_scope, error3)
+        value2 = self.get_value_int(node.index, caller_fun_scope, error2)
+        value3 = self.get_value_int(node.length, caller_fun_scope, error3)
+        if value2 > len(value1):
+            self.raise_error("SUBSTRING Out of range index")
+        if value3 < 0:
+            self.raise_error("SUBSTRING Negative length")
+        if value2 + value3 > len(value1):
+            self.raise_error("SUBSTRING Length too long for operation")
         self.set_value(node.dest, value1[value2:value2+value3], caller_fun_scope)
         return self.next_instruction()
 

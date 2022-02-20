@@ -135,6 +135,13 @@ class StoreWordNode(InstructionNode):
         self.offset = offset
         self.base_dest_dir = base_dest_dir
 
+class StoreByteNode(InstructionNode):
+    def __init__(self, source, offset, base_dest_dir, row=None, column=None, comment=None):
+        super().__init__(row=row, column=column, comment=comment)        
+        self.source = source
+        self.offset = offset
+        self.base_dest_dir = base_dest_dir
+
 class LoadAddressNode(InstructionNode):
     def __init__(self, dest, label, row=None, column=None, comment=None):
         super().__init__(row=row, column=column, comment=comment)

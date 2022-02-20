@@ -32,10 +32,12 @@
 - Funciones nativas:
   - [x] Copy
   - [x] Length
-  - [ ] Substring
+  - [x] Substring
   - [ ] Concat
   - [ ] TypeName
+  - [ ] Copy especifico String, Int
 - [ ] At @
 - [ ] Llamado dinamico self type
 - [ ] case of
 - [ ] Verificar que los atributos se inicialicen correctamente en caso de que uno dependa de otro y a la hora de asiganrle valor uno no este inicializado.
+- [ ] Verificar que se aborte cuando ocurre una excepcion en ejecucion. Los casos se especifican en el manual de Cool pagina 29

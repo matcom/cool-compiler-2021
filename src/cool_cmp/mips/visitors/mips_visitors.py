@@ -120,6 +120,10 @@ class MIPSPrintVisitor():
     def visit(self, node:StoreWordNode):
         return f"sw {node.source}, {node.offset}({node.base_dest_dir})"
 
+    @visitor.when(StoreByteNode)
+    def visit(self, node:StoreByteNode):
+        return f"sb {node.source}, {node.offset}({node.base_dest_dir})"
+
     @visitor.when(LoadAddressNode)
     def visit(self, node:LoadAddressNode):
         return f"la {node.dest}, {node.label}"
@@ -288,6 +292,14 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def _call_with_register(self, register):
         self.add_instruction(JumpRegisterNode(register))
     
+    def _add_abort_instructions(self):
+        """
+        Add the abort instructions 
+        """
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 10)) # 10 System call code for abort
+        self.add_instruction(SyscallNode())
+
+
     def _add_copy_function(self):
         """
         Function that copies the instance passed in $a0 and returns the copy address
@@ -343,6 +355,65 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(LabelNode(end_loop))
 
         self.add_instruction(JumpRegisterNode(Reg.ra())) # In v0 is the string length
+
+    def _add_substring_function(self):
+        """
+        Returns in $v0 the result of the substring in $a0 starting in index $a1 with length $a2
+        """
+
+        self.add_instruction(LabelNode("__string_substring"))
+
+        saved_register = [Reg.a(0), Reg.a(1), Reg.a(2), Reg.ra()]
+        self._push(saved_register) # Save arguments
+        self.add_instruction(JumpAndLinkNode("__string_length"))
+        # $v0 = length of string
+        self._pop(saved_register) # Restore arguments
+
+        abort_label = "__string_substring_abort"
+
+        # If index >= length(string) then abort
+        self.add_instruction(BranchGreaterEqualNode(Reg.a(1), Reg.v(0), abort_label))
+
+        self.add_instruction(AddNode(Reg.t(0), Reg.a(1), Reg.a(2))) # t0 = index + length
+        # If index + length >= length(string) then abort
+        self.add_instruction(BranchGreaterEqualNode(Reg.t(0), Reg.v(0), abort_label))
+        
+        # If 0 < 0 then abort
+        self.add_instruction(BranchLessNode(Reg.a(2), Reg.zero(), abort_label))
+
+        # Here the operation can be safetly made
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # Saving the string address
+
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(2), 1)) # a0 = length + 1. Extra space for null character
+        self._allocate_heap_space(Reg.a(0))
+        # v0 = new String address
+
+        self.add_instruction(MoveNode(Reg.t(2), Reg.v(0))) # Saving the new string address
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(0), -1)) # Removing the last null space from copy
+
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.a(1))) # Advance index positions in original string
+
+        start_loop = "__string_substring_start_copy"
+        end_loop = "__string_substring_end_copy"
+        self.add_instruction(LabelNode(start_loop))
+        self.add_instruction(BranchLessEqualNode(Reg.a(0), Reg.zero(), end_loop)) # if length <= 0 then end loop, missing null
+        
+        self.add_instruction(LoadByteNode(Reg.t(3), 0, Reg.t(1))) # t3 = char to copy
+        self.add_instruction(StoreByteNode(Reg.t(3), 0, Reg.t(2))) # copy char to corresponding address position 
+        self.add_instruction(AddImmediateNode(Reg.t(1), Reg.t(1), 1)) # Next original string address 
+        self.add_instruction(AddImmediateNode(Reg.t(2), Reg.t(2), 1)) # Next copy string address
+
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(0), -1)) # Decrease amount
+        self.add_instruction(JumpNode(start_loop))
+
+        self.add_instruction(LabelNode(end_loop))
+        self.add_instruction(StoreByteNode(Reg.zero(), 0, Reg.t(2))) # Final null character
+
+        self.add_instruction(JumpRegisterNode(Reg.ra())) # Return the address of the new String
+
+        self.add_instruction(LabelNode(abort_label))
+        self._add_abort_instructions()
+
 
     def _add_get_ra_function(self):
         """
@@ -426,6 +497,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._add_get_ra_function()
         self._add_copy_function()
         self._add_length_function()
+        self._add_substring_function()
 
         for function in node.dotcode:
             self.current_function = function
@@ -484,8 +556,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
     @visitor.when(cil.AbortNode)
     def visit(self, node:cil.AbortNode):
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 10)) # 10 System call code for abort
-        self.add_instruction(SyscallNode())
+        self._add_abort_instructions()
     
     @visitor.when(cil.StaticCallNode)
     def visit(self, node:cil.StaticCallNode):
@@ -631,6 +702,14 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def visit(self, node:cil.LengthNode):
         self._load_value(Reg.a(0), node.string_var) # a0 = instance
         self.add_instruction(JumpAndLinkNode("__string_length"))
+        self._store_local_variable(Reg.v(0), node.dest)
+
+    @visitor.when(cil.SubstringNode)
+    def visit(self, node:cil.SubstringNode):
+        self._load_value(Reg.a(0), node.string)
+        self._load_value(Reg.a(1), node.index)
+        self._load_value(Reg.a(2), node.length)
+        self.add_instruction(JumpAndLinkNode("__string_substring"))
         self._store_local_variable(Reg.v(0), node.dest)
 
     @visitor.when(cil.VoidNode)
