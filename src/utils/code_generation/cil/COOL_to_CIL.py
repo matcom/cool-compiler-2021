@@ -76,7 +76,7 @@ class COOLtoCIL(BaseCOOLToCIL):
         if node.expr:
             self.visit(node.expr, scope)
             self.register_instruction(nodes_cil.SetAttrNode(self.vself.name, node.id, scope._return, self.current_type))
-        elif node.type in self.value_types:
+        elif node.type in ['String', 'Int', 'Bool']:
             vtemp = self.define_internal_local()
             self.register_instruction(nodes_cil.AllocateNode(node.type, vtemp))
             self.register_instruction(nodes_cil.SetAttrNode(self.vself.name, node.id, vtemp, self.current_type))
@@ -96,7 +96,7 @@ class COOLtoCIL(BaseCOOLToCIL):
 
         if scope._return is None:
             self.register_instruction(nodes_cil.ReturnNode(''))
-        elif self.current_function.name == 'entry':
+        elif self.current_function.id == 'entry':
             self.register_instruction(nodes_cil.ReturnNode(0))
         else:
             self.register_instruction(nodes_cil.ReturnNode(scope._return))
@@ -139,7 +139,24 @@ class COOLtoCIL(BaseCOOLToCIL):
 
     @visitor.when(nodes.WhileNode)
     def visit(self, node, scope):
-        pass
+        vcondition = self.define_internal_local()
+        while_label_node = self.register_label('while_label')
+        loop_label_node = self.register_label('loop_label')
+        pool_label_node = self.register_label('pool_label')
+        
+        self.register_instruction(while_label_node)
+        self.visit(node.conditional_expr, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(vcondition, scope.ret_expr, 'value', 'Bool'))
+        self.register_instruction(nodes_cil.IfGotoNode(vcondition, loop_label_node.label))
+        
+        self.register_instruction(nodes_cil.GotoNode(pool_label_node.label))
+        self.register_instruction(loop_label_node)
+        self.visit(node.loop_expr, scope)
+        
+        self.register_instruction(nodes_cil.GotoNode(while_label_node.label))
+        self.register_instruction(pool_label_node)
+
+        scope.ret_expr = nodes_cil.VoidNode()
     
 
     @visitor.when(nodes.BlockNode)
