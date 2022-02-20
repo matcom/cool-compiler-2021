@@ -385,3 +385,87 @@ function function_main_at_Main {
     ```
 
     >Para indicar que una variable no tiene un valor.
+
+### Operadores
+
+* **\+**
+    >Suma de dos objetos
+
+    ```python
+    # Ejemplo
+    a = b + c
+    ```
+
+* **\-**
+    >Resta de dos objetos
+
+    ```python
+    # Ejemplo
+    a = b - c
+    ```
+
+* **\***
+    >Multiplicacion de dos objetos
+
+    ```python
+    # Ejemplo
+    a = b * c
+    ```
+
+* **/**
+    >Division de dos objetos
+
+    ```python
+    # Ejemplo
+    a = b / c
+    ```
+
+* **<**
+    >Menor que de dos objetos
+
+    ```python
+    # Ejemplo
+    a = b < c
+    ```
+
+* **\>**
+    >Mayor que de dos objetos
+
+    ```python
+    # Ejemplo
+    a = b > c
+    ```
+
+### Asignaciones
+
+* **=**
+    >Asignacion de un objeto a otro objeto
+
+    ```python
+    # Ejemplo
+    a = b
+    ```
+
+### Funciones
+
+* function
+    >Definicion de una funcion
+
+    ```python
+    # Ejemplo
+    function main
+    {
+        PARAM self
+        LOCAL local_internal_0
+        local_internal_0 = READINT
+        PRINT local_internal_0
+        local_internal_0 = local_internal_0 + 1
+        RETURN local_internal_0
+        }
+    ```
+
+    >Para definir una funcion se utiliza la palabra reservada function y se le asigna un nombre.
+    >
+    >Seguido se define una lista de parametros y una lista de variables locales.
+    >
+    >Finalmente se define el cuerpo de la funcion.
