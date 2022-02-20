@@ -35,6 +35,7 @@ class CILGenerate:
     def visit(self, node: AST.CoolClass):
         self.currentType = ASTR.Type(node.type.name)
         self.currentClass = node.type
+        self.new_type_func = ASTR.Function(f'new@ctr@{node.type.name}')
         self.program.add_type(self.currentType)
 
         for parent in parent_list(node):
@@ -42,10 +43,37 @@ class CILGenerate:
                 self.currentType.attr_push(attr.name)
             for func in parent.methods:
                 self.currentType.method_push(func.name, f'{parent.name}@{func.name}')
+        
+        self.new_type_func.local_push('instance')
+        self.new_type_func.expr_push(ASTR.ALLOCATE('instance', node.type.name))
 
         for feat in node.feature_list:
             self.visit(feat)
+
+        if node.type.name == 'Main':
+            self.new_type_func.local_push(result)
+            self.new_type_func.expr_push(ASTR.Arg('instance'))
+            self.new_type_func.expr_push(ASTR.Call(result, 'Main', 'main@Main'))
+            self.new_type_func.expr_push(ASTR.Return(0))
+        else:
+            return_name = self.new_type_func.param_push(result, True)
+            self.new_type_func.expr_push(ASTR.Assign(return_name, 'instance'))
+
+        self.program.add_func(self.new_type_func)
     
+    @visitor.when(AST.AtrDef)
+    def visit(self, node: AST.AtrDef):
+        if not node.expr is None:
+            save_current_func = self.currentFunc
+            self.currentFunc = self.new_type_func
+            attr_name = self.new_type_func.param_push(node.name)
+            exp_list = self.visit(node.expr)
+            exp_list[-1].set_value(attr_name)
+            exp_list.append(ASTR.SetAttr('instance', node.name, attr_name))
+            self.new_type_func.expr += exp_list
+            self.currentFunc = save_current_func
+
+
     @visitor.when(AST.FuncDef)
     def visit(self, node: AST.FuncDef):
         self.currentFunc = ASTR.Function(f'{self.currentType.name}@{node.name}')

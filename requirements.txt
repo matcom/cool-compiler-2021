@@ -1,10 +1,9 @@
-attrs @ file:///Users/dany/Library/Caches/pypoetry/artifacts/c4/ee/75/fcd6c2f4c5a1d60b1bcd97014702ca01b3f032fd927d88780b38708409/attrs-21.4.0-py2.py3-none-any.whl
-iniconfig @ file:///Users/dany/Library/Caches/pypoetry/artifacts/1d/67/0c/79706e7a41ef01be0b1a38aa3b4ddc9bd800a95ccd8d8dc7de4e090623/iniconfig-1.1.1-py2.py3-none-any.whl
-packaging @ file:///Users/dany/Library/Caches/pypoetry/artifacts/d3/1f/90/3f2473250ebd055fe7f0856810677783949fc0d2e5f25bbb4dc00ad0a9/packaging-21.3-py3-none-any.whl
-pluggy @ file:///Users/dany/Library/Caches/pypoetry/artifacts/49/3e/55/309ec3705ba3309d817d531002c0a02f643d06c5d5a889ce43236130d5/pluggy-1.0.0-py2.py3-none-any.whl
-py @ file:///Users/dany/Library/Caches/pypoetry/artifacts/71/fb/64/bfdc833c2055a893883f33deaac35ef2cbdd95d58031cfc69a630f32bf/py-1.11.0-py2.py3-none-any.whl
-pyparsing @ file:///Users/dany/Library/Caches/pypoetry/artifacts/dd/d9/cf/3501b38e834b80f9ba80633358cced32539bea5dc1e786f4c2b1d2f682/pyparsing-3.0.7-py3-none-any.whl
-pytest @ file:///Users/dany/Library/Caches/pypoetry/artifacts/d3/5c/6c/ecc815bbb070306dcb67bef0ec365f599b0f4b6ce85fc620f675c77231/pytest-6.2.5-py3-none-any.whl
-pytest-ordering @ file:///Users/dany/Library/Caches/pypoetry/artifacts/5a/35/4a/047f280bf7fcc4bcf8c1807667b4484d34dfdd366358d2803160045c71/pytest_ordering-0.6-py3-none-any.whl
-sly @ file:///Users/dany/Library/Caches/pypoetry/artifacts/55/b5/e7/aaa630b234bb48bde56d4bcbcf27d7b7ac4d8ee2f49024202c26f68170/sly-0.4.tar.gz
-toml @ file:///Users/dany/Library/Caches/pypoetry/artifacts/51/ac/24/674da558495229c57c3d2333cb23e24aac7aadf723ced29e2cc41a9e6e/toml-0.10.2-py2.py3-none-any.whl
+attrs==21.4.0
+iniconfig==1.1.1
+packaging==21.3
+pluggy==1.0.0
+py==1.11.0
+pyparsing==3.0.7
+pytest==7.0.1
+sly==0.4
+tomli==2.0.1

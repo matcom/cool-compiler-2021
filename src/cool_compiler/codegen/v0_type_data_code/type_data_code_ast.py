@@ -198,3 +198,6 @@ class VCall(Expression):
 
 class Load(Expression):
     pass
+
+class ALLOCATE(Expression):
+    pass
