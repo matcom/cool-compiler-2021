@@ -179,12 +179,20 @@ class CILToMIPSVisitor:
                 instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
                                                                node.line, node.column))
 
-        instructions.extend(self.visit(node.dest))
-        instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
-                                               line=node.line, column=node.column))
         if isinstance(node.dest, cil.AttributeNode):
-            instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
-                                                           node.line, node.column))
+            self_var = self._current_function.params[0]
+            reg2 = mips.REGISTERS[1]
+            instructions.append(mips.LoadWordNode(reg2, self.get_var_location(self_var), node.line, node.column))
+
+            index = self._types_section[node.dest.type].attributes.index(node.dest.name) + 3
+            instructions.append(mips.AdditionInmediateNode(reg2, reg2, index * 4,
+                                                  line=node.line, column=node.column))
+            instructions.append(mips.StoreWordNode(reg1, mips.RegisterRelativeLocation(reg2, 0),
+                                                   line=node.line, column=node.column))
+        else:
+            instructions.append(mips.StoreWordNode(reg1, self.get_var_location(node.dest),
+                                                   line=node.line, column=node.column))
+
         return instructions
 
     @visitor.when(cil.PlusNode)
@@ -993,6 +1001,7 @@ class CILToMIPSVisitor:
         instructions.append(mips.LoadWordNode(reg1, self.get_var_location(self_var), node.line, node.column))
 
         index = self._types_section[node.type].attributes.index(node.name) + 3
-        instructions.append(mips.AdditionInmediateNode(reg1, reg1, index * 4, line=node.line, column=node.column))
+        instructions.append(mips.LoadWordNode(reg1, mips.RegisterRelativeLocation(reg1, index * 4),
+                                              line=node.line, column=node.column))
         instructions.extend(mips.push_register(reg1, node.line, node.column))
         return instructions

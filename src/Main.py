@@ -53,7 +53,7 @@ def main(args):
 
     CILVisitor = COOLToCILVisitor(type_Checker.Context)
     CILast = CILVisitor.visit(COOLast, scope)
-    #print(get_formatter()(CILast))
+    print(get_formatter()(CILast))
 
     MIPSVisitor = CILToMIPSVisitor()
     MIPSAst = MIPSVisitor.visit(CILast)
