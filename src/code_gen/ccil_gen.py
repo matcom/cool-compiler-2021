@@ -8,8 +8,10 @@ from code_gen.tools import *
 # All operations that define an expression and where it is stored
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
 CLASS_VISITOR_RESULT = Tuple[ClassNode, List[MethodNode]]
+METHOD_VISITOR_RESULT = MethodNode
 
 USER = "user"
+ATTR = "attr"
 
 # CCIL stands for Cool Cows Intermediate Language ;)
 class CCILGenerator:
@@ -44,7 +46,7 @@ class CCILGenerator:
 
         for feature in node.features:
             if isinstance(feature, sem_ast.AttrDeclarationNode):
-                attributes.append(Attribute(feature.id, feature.type.name))
+                attributes.append(Attribute(ATTR + feature.id, feature.type.name))
                 (attr_ops, _) = self.visit(feature)
                 init_attr_ops += attr_ops
             else:
@@ -52,15 +54,35 @@ class CCILGenerator:
                 method_node = self.visit(feature)
                 class_code.append(method_node)
 
-        return ClassNode(attributes, methods, init_attr_ops), class_code
+        return (
+            ClassNode(attributes, methods, init_attr_ops),
+            class_code,
+        )
 
     @visitor.when(sem_ast.AttrDeclarationNode)
-    def visis(self, node: sem_ast.AttrDeclarationNode):
-        pass
+    def visit(self, node: sem_ast.AttrDeclarationNode) -> VISITOR_RESULT:
+        fval_id = ATTR + node.id
+
+        if node.expr is None:
+            op = LocalNode(node, fval_id, node.type.name)
+            return [op], op
+
+        (expr_op, expr_fval) = self.visit(node.expr)
+        expr_fval.id = fval_id
+
+        return (expr_op, expr_fval)
+
 
     @visitor.when(sem_ast.MethodDeclarationNode)
     def visit(self, node: sem_ast.MethodDeclarationNode):
-        pass
+        operations: List[OperationNode] = []
+        for param in node.params:
+            operations.append(ParamNode(param.id, param.type.name))
+
+        (expr_op, _) = self.visit(node.body)
+
+        operations += expr_op
+        return MethodNode(node, node.id, operations)
 
     @visitor.when(sem_ast.BlocksNode)
     def visit(self, node: sem_ast.BlocksNode) -> VISITOR_RESULT:
