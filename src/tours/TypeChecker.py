@@ -9,7 +9,6 @@ SELF_IS_READONLY = "SemanticError: Cannot assign to 'self'."
 SELF_IS_READONLY_LET = "SemanticError: 'self' cannot be bound in a 'let' expression."
 SELF_IS_READONLY_PARAM = "SemanticError: 'self' cannot be the name of a formal parameter."
 SELF_IS_READONLY_ATTRIBUTE = "SemanticError: 'self' cannot be the name of an attribute."
-LOCAL_ALREADY_DEFINED = "Variable '%s' is already defined in method '%s'."
 INCOMPATIBLE_ATTRIBUTE_TYPE = "TypeError: Inferred type %s of initialization of attribute %s does not conform to declared type %s."
 INCOMPATIBLE_VARIABLE_TYPE = "TypeError: Inferred type %s of initialization of %s does not conform to identifier's declared type %s." 
 INCOMPATIBLE_RET_FUNC_TYPE = "TypeError: Inferred return type %s of method %s does not conform to declared return type %s."
@@ -18,13 +17,9 @@ INCOMPATIBLE_DISPATCH_DEC_TYPE = "TypeError: Expression type %s does not conform
 VARIABLE_NOT_DEFINED = "NameError: Undeclared identifier %s."
 INVALID_OPERATION = "TypeError: non-Int arguments: %s %s %s"
 INVALID_BASIC_COMPARISON = "TypeError: Illegal comparison with a basic type."
-OPERATION_NOT_DEFINED = "Operation '%s' is not defined for type '%s'."
+OPERATION_NOT_DEFINED = "TypeError: Operation '%s' is not defined for type '%s'."
 UNARY_OPERATION_NOT_DEFINED = "TypeError: Argument of '%s' has type %s instead of %s."
 PREDICATE_OPERATIONS = "TypeError: %s condition does not have type Bool." 
-TYPE_VOID = "The expression can not be void."
-ATTRIBUTE_NOT_INFERED = "Can not infered attribute '%s' in class '%s'."
-RETURN_TYPE_METHOD = "Can not infered the return type of the method '%s' in class '%s'."
-VAR_TYPE_NOT_INFERED = "Can not infered the type of the '%s' '%s' in method '%s' in class '%s'."
 WRONG_NUMBER_ARGUMENTS = "SemanticError: Method %s called with wrong number of arguments."
 DUPLICATE_BRANCH = "SemanticError: Duplicate branch %s in case statement."
 CASE_TYPE_UNDEFINED = "TypeError: Class %s of case branch is undefined."
@@ -318,7 +313,7 @@ class TypeChecker:
             self.errors.append(SELF_IS_READONLY)
             node.computed_type = ErrorType() 
         elif var_type != AutoType() and expresion_type != AutoType() and not expresion_type.conforms_to(var_type):
-            self.errors.append(INCOMPATIBLE_TYPES.replace('%s', expresion_type.name, 1).replace('%s', var_type.name, 1))
+            self.errors.append(INCOMPATIBLE_VARIABLE_TYPE.replace('%s', expresion_type.name, 1).replace('%s', node.id.lex).replace('%s', var_type.name, 1))
             node.computed_type = ErrorType() 
         elif var_type == AutoType() and expresion_type != AutoType():
             InferType(self.current_type, var_type, expresion_type)

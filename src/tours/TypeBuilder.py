@@ -4,13 +4,12 @@ from cmp.semantic import ErrorType, StringType, IntType, AutoType, BoolType, Obj
 import cmp.visitor as visitor 
 
 
-CANNOT_INHERIT = 'SemanticError: Class %s cannot inherit class %s.'
-MAIN_NOT_DEFINED = 'Method "main" must be defined in "Main" class.'
-MAIN_NOT_HERITABLE = 'Class "Main" is not heritable.'
-CYCLES_IN_CLASES = 'SemanticError: Class %s, or an ancestor of %s, is involved in an inheritance cycle.'
-NOT_SELF_TYPE = 'The type of the parameter "%s" can not be SELF_TYPE in method "%s" in class "%s".'
-SELF_IS_READONLY = "Variable 'self' is read-only."
-IDENTIFIER_USED = 'SemanticError: Formal parameter %s is multiply defined.'
+CANNOT_INHERIT = "SemanticError: Class %s cannot inherit class %s."
+MAIN_NOT_DEFINED = "SemanticError: Method main must be defined in Main class."
+MAIN_NOT_HERITABLE = "SemanticError: Class Main is not heritable."
+CYCLES_IN_CLASES = "SemanticError: Class %s, or an ancestor of %s, is involved in an inheritance cycle."
+NOT_SELF_TYPE = "TypeError: The type of the parameter %s can not be SELF_TYPE in method %s in class %s."
+IDENTIFIER_USED = "SemanticError: Formal parameter %s is multiply defined."
 ATTRIBUTE_REDEFINED = "SemanticError: Attribute %s is multiply defined in class."
 METHOD_REDEFINED = "SemanticError: Method %s is multiply defined in class."
 UNDEFINED_ATTRIBUTE_TYPE ="TypeError: Class %s of attribute %s is undefined."

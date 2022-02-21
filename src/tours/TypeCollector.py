@@ -5,9 +5,9 @@ import cmp.visitor as visitor
 from .utils import is_base_class
 
 
-BASIC_CLASS_REDEFINED = 'SemanticError: Redefinition of basic class %s.'
-CLASS_REDEFINED = 'SemanticError: Classes may not be redefined'
-MAIN_NOT_DEFINED = 'Class Main must be defined.'
+BASIC_CLASS_REDEFINED = "SemanticError: Redefinition of basic class %s."
+CLASS_REDEFINED = "SemanticError: Classes may not be redefined"
+MAIN_NOT_DEFINED = "SemanticError: Class Main must be defined."
 
 
 class TypeCollector(object):
