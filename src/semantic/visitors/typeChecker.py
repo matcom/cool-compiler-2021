@@ -1,9 +1,4 @@
-from ast import Div
-from distutils.log import error
-import re
-
-from click import option
-from semantic.semantic import AutoType, BoolType, ErrorType, IntType, MethodError, ObjectType, StringType
+from semantic.semantic import AutoType, BoolType, ErrorType, IntType, MethodError, ObjectType, StringType, VariableInfo, VoidType
 from utils.errors import AttributexError, SemanticError, TypexError
 from utils import visitor
 from utils.utils import get_type, get_common_basetype
@@ -15,8 +10,8 @@ class TypeChecker:
         self.context = context
         self.currentType = None
         self.currentMethod = None
-        self.errors = errors
         self.currentIndex = None
+        self.errors = errors
 
     @visitor.on('node')
     def visit(self, node, scope):
@@ -104,7 +99,7 @@ class TypeChecker:
             return varType
         else:
             typex = self.visit(varDeclarationNode.expr, scope)
-            if not typex.conform_to(varType):
+            if not typex.conforms_to(varType):
                 errorText = f'Inferred type {typex.name} of initialization of {varDeclarationNode.id} does not conform to identifier\'s declared type {varType.name}.'
                 self.errors.append(TypexError(
                     errorText, varDeclarationNode.typeLine, varDeclarationNode.typeCol))
@@ -411,3 +406,11 @@ class TypeChecker:
                 errorText = f'Dispatch to undefined method {name}.'
                 self.errors.append(AttributexError(errorText, *pos))
             return MethodError(name, [], [], ErrorType())
+
+    def find_variable(self, scope, lex):
+        var_info = scope.find_local(lex)
+        if var_info is None:
+            var_info = scope.find_attribute(lex)
+        if lex in self.currentType.attributes and var_info is None:
+            return VariableInfo(lex, VoidType())
+        return var_info

@@ -1,6 +1,6 @@
 from utils import visitor
-from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, VarDeclarationNode, WhileNode
-from semantic.semantic import ErrorType, IntType, Scope, define_default_value
+from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, BoolNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, StringNode, VarDeclarationNode, WhileNode
+from semantic.semantic import ErrorType, IntType, Scope, StringType
 from utils.errors import NamexError, SemanticError, TypexError
 
 
@@ -17,7 +17,7 @@ class VarCollector:
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self, programNode, scope):
+    def visit(self, programNode, scope=None):
         scope = Scope()
         for declaration in programNode.declarations:
             self.visit(declaration, scope.create_child())
@@ -67,7 +67,7 @@ class VarCollector:
         attr = self.currentType.get_attribute(
             attrDeclarationNode.id, (attrDeclarationNode.line, attrDeclarationNode.col))
         if attrDeclarationNode.expr is None:
-            define_default_value(attr.type, attrDeclarationNode)
+            self.define_default_value(attr.type, attrDeclarationNode)
         else:
             self.visit(attrDeclarationNode.expr, scope)
         attr.expr = attrDeclarationNode.expr
@@ -104,7 +104,7 @@ class VarCollector:
         if varDeclarationNode.expr is not None:
             self.visit(varDeclarationNode.expr, scope)
         else:
-            define_default_value(vType, varDeclarationNode)
+            self.define_default_value(vType, varDeclarationNode)
 
     @visitor.when(AssignNode)
     def visit(self, assignNode, scope):
@@ -210,3 +210,11 @@ class VarCollector:
                 vInfo = scope.find_variable(idNode.id)
 
             return vInfo.type
+
+    def define_default_value(self, typex, node):
+        if typex == IntType():
+            node.expr = IntNode(0)
+        elif typex == StringType():
+            node.expr = StringNode("")
+        else:
+            node.expr = BoolNode('false')

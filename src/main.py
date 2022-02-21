@@ -7,6 +7,7 @@ from semantic.visitors.typeBuilder import TypeBuilder
 from semantic.visitors.typeChecker import TypeChecker
 from semantic.visitors.typeCollector import TypeCollector
 from semantic.visitors.varCollector import VarCollector
+from utils.errors import SemanticError
 
 
 def main(_input, _output):
@@ -29,16 +30,31 @@ def main(_input, _output):
     semanticErrors = []
     typeCollector = TypeCollector(semanticErrors)
     typeCollector.visit(ast)
+    print("TYPE COLLECTOR")
+    if semanticErrors:
+        for error in semanticErrors:
+            print(error)
+
     context = typeCollector.context
     typeBuilder = TypeBuilder(context, semanticErrors)
     typeBuilder.visit(ast)
-    typeInferer = VarCollector(context, semanticErrors)
-    scope = typeInferer.visit(ast)
+    print("TYPE Builder")
+    if semanticErrors:
+        for error in semanticErrors:
+            print(error)
+
+    varCollector = VarCollector(context, semanticErrors)
+    scope = varCollector.visit(ast)
+    print("Var Collector")
+    if semanticErrors:
+        for error in semanticErrors:
+            print(error)
+    
     typeChecker = TypeChecker(context, semanticErrors)
     typeChecker.visit(ast, scope)
     if semanticErrors:
         for error in semanticErrors:
-            print(semanticErrors)
+            print(error)
             raise Exception()
 
     # Code Generation
@@ -47,7 +63,7 @@ def main(_input, _output):
     # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":
 
-    path = '/home/cwjki/Projects/cool-compiler-2021/tests/lexer/comment1.cl'
+    path = '/home/cwjki/Projects/cool-compiler-2021/tests/semantic/arithmetic1.cl'
     _input = sys.argv[1] if len(sys.argv) > 1 else path
     _output = sys.argv[2] if len(sys.argv) > 2 else None
 

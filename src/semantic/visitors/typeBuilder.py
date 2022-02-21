@@ -43,7 +43,7 @@ class TypeBuilder:
                 parent = None
             try:
                 current = parent
-                while current is None:
+                while current is not None:
                     if current.name == self.currentType.name:
                         errorText = f'Class {self.currentType.name}, or an ancestor of {self.currentType.name}, is involved in an inheritance cycle.'
                         raise SemanticError(
@@ -80,7 +80,7 @@ class TypeBuilder:
 
         try:
             returnType = self.context.get_type(
-                funcDeclarationNode.type, funcDeclarationNode.typeLine, funcDeclarationNode.typeCol)
+                funcDeclarationNode.type, (funcDeclarationNode.typeLine, funcDeclarationNode.typeCol))
         except SemanticError:
             errorText = f'Undefined return type {funcDeclarationNode.type} in method {funcDeclarationNode.id}.'
             self.errors.append(TypexError(
