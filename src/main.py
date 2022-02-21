@@ -4,7 +4,7 @@ import sys
 from lexer import CoolLexer
 from cparser import CoolParser
 from semantic.visitors.typeBuilder import TypeBuilder
-# from semantic.visitors.typeChecker import TypeChecker
+from semantic.visitors.typeChecker import TypeChecker
 from semantic.visitors.typeCollector import TypeCollector
 from semantic.visitors.varCollector import VarCollector
 
@@ -34,8 +34,8 @@ def main(_input, _output):
     typeBuilder.visit(ast)
     typeInferer = VarCollector(context, semanticErrors)
     scope = typeInferer.visit(ast)
-    # typeChecker = TypeChecker(context, semanticErrors)
-    # typeChecker.visit(ast, scope)
+    typeChecker = TypeChecker(context, semanticErrors)
+    typeChecker.visit(ast, scope)
     if semanticErrors:
         for error in semanticErrors:
             print(semanticErrors)

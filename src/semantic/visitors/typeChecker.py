@@ -1,7 +1,9 @@
+from ast import Div
 from distutils.log import error
+import re
 
 from click import option
-from semantic.semantic import AutoType, ErrorType, MethodError, ObjectType
+from semantic.semantic import AutoType, BoolType, ErrorType, IntType, MethodError, ObjectType, StringType
 from utils.errors import AttributexError, SemanticError, TypexError
 from utils import visitor
 from utils.utils import get_type, get_common_basetype
@@ -229,14 +231,13 @@ class TypeChecker:
         self.visit(whileNode.expr, scope)
         return ObjectType()
 
-
     @visitor.when(BlockNode)
     def visit(self, blockNode, scope):
         typex = None
         for expr in blockNode.exprs:
             typex = self.visit(expr, scope)
         return typex
-    
+
     @visitor.when(LetInNode)
     def visit(self, letInNode, scope):
         childScope = scope.expr_dict[letInNode]
@@ -255,7 +256,8 @@ class TypeChecker:
             types.append(optionType)
             if option.type in checkDuplicate:
                 errorText = f'Duplicate branch {option.type} in case statement.'
-                self.errors.append(SemanticError(errorText, option.typeLine, option.typeCol))
+                self.errors.append(SemanticError(
+                    errorText, option.typeLine, option.typeCol))
             checkDuplicate.append(option.type)
         return get_common_basetype(types)
 
@@ -264,9 +266,135 @@ class TypeChecker:
         optionType = self.visit(caseOptionNode.expr, scope)
         return optionType
 
+    @visitor.when(PlusNode)
+    def visit(self, plusNode, scope):
+        leftType = self.visit(plusNode.lvalue, scope)
+        rightType = self.visit(plusNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} + {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, plusNode.line, plusNode.col))
+            return ErrorType()
+        return IntType()
 
+    @visitor.when(MinusNode)
+    def visit(self, minusNode, scope):
+        leftType = self.visit(minusNode.lvalue, scope)
+        rightType = self.visit(minusNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} - {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, minusNode.line, minusNode.col))
+            return ErrorType()
+        return IntType()
 
+    @visitor.when(StarNode)
+    def visit(self, starNode, scope):
+        leftType = self.visit(starNode.lvalue, scope)
+        rightType = self.visit(starNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} * {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, starNode.line, starNode.col))
+            return ErrorType()
+        return IntType()
 
+    @visitor.when(DivNode)
+    def visit(self, divNode, scope):
+        leftType = self.visit(divNode.lvalue, scope)
+        rightType = self.visit(divNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} / {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, divNode.line, divNode.col))
+            return ErrorType()
+        return IntType()
+
+    @visitor.when(LessNode)
+    def visit(self, lessNode, scope):
+        leftType = self.visit(lessNode.lvalue, scope)
+        rightType = self.visit(lessNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} < {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, lessNode.line, lessNode.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(LessEqNode)
+    def visit(self, lessEq, scope):
+        leftType = self.visit(lessEq.lvalue, scope)
+        rightType = self.visit(lessEq.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} <= {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, lessEq.line, lessEq.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(EqualNode)
+    def visit(self, lessEq, scope):
+        leftType = self.visit(lessEq.lvalue, scope)
+        rightType = self.visit(lessEq.rvalue, scope)
+        if (leftType != rightType) and (leftType in [IntType(), StringType(), BoolType()] or rightType in [IntType(), StringType(), BoolType()]):
+            errorText = 'Illegal comparison with a basic type.'
+            self.errors.append(TypexError(errorText, lessEq.line, lessEq.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(NegationNode)
+    def visit(self, negationNode, scope):
+        exprType = self.visit(negationNode.expr, scope)
+        if exprType != IntType():
+            errorText = f'Argument of \'~\' has type {exprType.name} instead of {IntType().name}.'
+            self.errors.append(TypexError(
+                errorText, negationNode.line, negationNode.col))
+            return ErrorType()
+        return IntType()
+
+    @visitor.when(LogicNegationNode)
+    def visit(self, logicNegationNode, scope):
+        exprType = self.visit(logicNegationNode.expr, scope)
+        if exprType != BoolType():
+            errorText = f'Argument of \'not\' has type {exprType.name} instead of {BoolType().name}.'
+            self.errors.append(TypexError(
+                errorText, logicNegationNode.line, logicNegationNode.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(IsVoidNode)
+    def visit(self, isVoidNode, scope):
+        self.visit(isVoidNode.expr, scope)
+        return BoolType()
+
+    @visitor.when(NewNode)
+    def visit(self, newNode, scope):
+        try:
+            typex = self.context.get_type(
+                newNode.id, (newNode.line, newNode.col))
+        except:
+            typex = ErrorType()
+            errorText = f'\'new\' used with undefined class {newNode.id}.'
+            self.errors.append(TypexError(
+                errorText, newNode.line, newNode.col))
+        return get_type(typex, self.currentType)
+
+    @visitor.when(IdNode)
+    def visit(self, idNode, scope):
+        varType = self.find_variable(scope, idNode.id).type
+        return get_type(varType, self.currentType)
+
+    @visitor.when(IntNode)
+    def visit(self, intNode, scope):
+        return IntType((intNode.line, intNode.col))
+
+    @visitor.when(BoolNode)
+    def visit(self, boolNode, scope):
+        return BoolType((boolNode.line, boolNode.col))
+
+    @visitor.when(StringNode)
+    def visit(self, stringNode, scope):
+        return StringType((stringNode.line, stringNode.col))
 
     def _get_type(self, ntype, pos):
         try:
@@ -283,19 +411,3 @@ class TypeChecker:
                 errorText = f'Dispatch to undefined method {name}.'
                 self.errors.append(AttributexError(errorText, *pos))
             return MethodError(name, [], [], ErrorType())
-
-    def _check_args(self, method, scope, args, pos):
-        argTypes = [self.visit(arg, scope) for arg in args]
-
-        if len(argTypes) > len(method.param_types):
-            errorText = f'Method {method.name} called with wrong number of arguments.'
-            self.errors.append(SemanticError(errorText, *pos))
-        elif len(argTypes) < len(method.param_types):
-            for arg, argInfo in zip(method.param_names[len(argTypes):], args[len(argTypes):]):
-                errorText = f'Method {method.name} called with wrong number of arguments.'
-                self.errors.append(SemanticError(errorText, *argInfo.pos))
-
-        for argType, paramType, paramName in zip(argTypes, method.param_types, method.param_names):
-            if not argType.conforms_to(paramType):
-                errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
-                self.errors.append(TypexError(errorText, *pos))
