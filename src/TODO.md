@@ -39,7 +39,7 @@
   - [x] TypeName
   - [ ] Copy especifico String, Int
 - [x] At @
-- [ ] Llamado dinamico self type
+- [x] Llamado dinamico self type
 - [ ] Llamar al __init del padre en el __init de los hijos.
 - [ ] case of
 - [ ] Atributos con igual nombre en clases heredadas, tienen que diferenciarse, o no, ver bien esto
