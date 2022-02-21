@@ -12,9 +12,10 @@ class ProgramNode(Node):
         self.dotcode = dotcode
 
 class TypeNode(Node):
-    def __init__(self, name, parent):
+    def __init__(self, name, parent, name_data):
         self.name = name
         self.parent = parent
+        self.name_data = name_data
         self.attributes = []
         self.methods = []
     
@@ -116,6 +117,11 @@ class TypeOfNode(InstructionNode):
         self.obj = obj
         self.dest = dest
 
+class TypeNameNode(InstructionNode):
+    def __init__(self, typex, dest) -> None:
+        self.type = typex
+        self.dest = dest
+
 class LabelNode(InstructionNode):
     def __init__(self, label) -> None:
         self.label = label
@@ -155,9 +161,9 @@ class LoadNode(InstructionNode):
         self.msg = msg
 
 class LengthNode(InstructionNode):
-    def __init__(self, dest, string) -> None:
+    def __init__(self, dest, string_var) -> None:
         self.dest = dest
-        self.string = string
+        self.string_var = string_var
 
 class ConcatNode(InstructionNode):
     def __init__(self, dest, string1, string2) -> None:

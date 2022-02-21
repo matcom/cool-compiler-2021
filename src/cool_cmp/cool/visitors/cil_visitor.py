@@ -74,6 +74,10 @@ class CILPrintVisitor():
     def visit(self, node):
         return f'{node.dest} = TYPEOF {node.obj}'
 
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node):
+        return f'{node.dest} = TYPENAME {node.type}'
+
     @visitor.when(cil.StaticCallNode)
     def visit(self, node):
         return f'{node.dest} = CALL {node.function}'
@@ -108,7 +112,7 @@ class CILPrintVisitor():
     
     @visitor.when(cil.LengthNode)
     def visit(self, node):
-        return f'{node.dest} = LENGTH {node.string}'
+        return f'{node.dest} = LENGTH {node.string_var}'
     
     @visitor.when(cil.ConcatNode)
     def visit(self, node):
@@ -311,7 +315,7 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node:cil.ProgramNode):
-        for t in node.dottypes + [cil.TypeNode("__Array", None)]:
+        for t in node.dottypes + [cil.TypeNode("__Array", None, "__Array")]:
             self.visit(t)
         for t in node.dotdata:
             self.visit(t)
@@ -335,6 +339,15 @@ class CILRunnerVisitor():
         if node.name in self.types:
             self.raise_error("Type {0} already defined", node.name)
         self.types[node.name] = node
+
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node:cil.TypeNameNode, args: list, caller_fun_scope: dict):
+        typex = self.get_dynamic_type(node.type, caller_fun_scope)
+        if typex.name_data not in self.data:
+            self.raise_error(f"Data {typex.name_data} not defined")
+        value = self.data[typex.name_data]
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node):
@@ -541,7 +554,8 @@ class CILRunnerVisitor():
     @visitor.when(cil.CopyNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         value = self.get_value(node.instance, caller_fun_scope)
-        value = value.copy()
+        if not isinstance(value, (str, int)):
+            value = value.copy()
         self.set_value(node.result, value, caller_fun_scope)
         return self.next_instruction()
     
@@ -565,8 +579,14 @@ class CILRunnerVisitor():
         error2 = "SUBSTRING operation undefined with non Int index"
         error3 = "SUBSTRING operation undefined with non Int length"
         value1 = self.get_value_str(node.string, caller_fun_scope, error1)
-        value2 = self.get_value_str(node.index, caller_fun_scope, error2)
-        value3 = self.get_value_str(node.length, caller_fun_scope, error3)
+        value2 = self.get_value_int(node.index, caller_fun_scope, error2)
+        value3 = self.get_value_int(node.length, caller_fun_scope, error3)
+        if value2 > len(value1):
+            self.raise_error("SUBSTRING Out of range index")
+        if value3 < 0:
+            self.raise_error("SUBSTRING Negative length")
+        if value2 + value3 > len(value1):
+            self.raise_error("SUBSTRING Length too long for operation")
         self.set_value(node.dest, value1[value2:value2+value3], caller_fun_scope)
         return self.next_instruction()
 
@@ -751,7 +771,8 @@ class COOLToCILVisitor():
             parent = parent.name
 
         if len([x for x in self.dottypes if x.name == name]) == 0:
-            type_node = cil.TypeNode(name, parent)
+            type_name_data_node = self.register_data('"'+name+'"')
+            type_node = cil.TypeNode(name, parent, type_name_data_node.name)
             self.dottypes.append(type_node)
             return type_node
 
@@ -1412,6 +1433,7 @@ class COOLToCILVisitor():
         instance = self.params[0]
         result = self.define_internal_local()
         self.register_instruction(cil.TypeOfNode(instance.name, result))
+        self.register_instruction(cil.TypeNameNode(result, result))
         return result
 
     @visitor.when(cil.StringConcatNode)
