@@ -1,4 +1,4 @@
-class CoolpylerError(object):
+class CoolpylerError(Exception):
     """
     Errors reported by the compiler
     """

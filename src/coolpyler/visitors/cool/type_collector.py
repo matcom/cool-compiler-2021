@@ -106,7 +106,7 @@ class TypeCollectorVisitor(object):
     def visit(self, node: parsed.CoolDispatchNode):    # noqa: F811
         expr = self.visit(node.expr)
         args = [self.visit(arg) for arg in node.args]
-        return type_collected.CoolStaticDispatchNode(
+        return type_collected.CoolDispatchNode(
             node.lineno, node.columnno, node.id, args, expr
         )
 
@@ -177,24 +177,24 @@ class TypeCollectorVisitor(object):
             node.lineno, node.columnno, expr
         )
 
-    @visitor.when(parsed.CoolTildeExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolTildeExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolTildeNode)  # noqa: F811
+    def visit(self, node: parsed.CoolTildeNode):    # noqa: F811
         expr = self.visit(node.expr)
-        return type_collected.CoolTildeExprNode(
+        return type_collected.CoolTildeNode(
             node.lineno, node.columnno, expr
         )
 
-    @visitor.when(parsed.CoolNotExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolNotExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolNotNode)  # noqa: F811
+    def visit(self, node: parsed.CoolNotNode):    # noqa: F811
         expr = self.visit(node.expr)
-        return type_collected.CoolNotExprNode(
+        return type_collected.CoolNotNode(
             node.lineno, node.columnno, expr
         )
 
-    @visitor.when(parsed.CoolIsVoidExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolIsVoidExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolIsVoidNode)  # noqa: F811
+    def visit(self, node: parsed.CoolIsVoidNode):    # noqa: F811
         expr = self.visit(node.expr)
-        return type_collected.CoolIsVoidExprNode(
+        return type_collected.CoolIsVoidNode(
             node.lineno, node.columnno, expr
         )
 
@@ -206,51 +206,51 @@ class TypeCollectorVisitor(object):
             node.lineno, node.columnno, left_expr, right_expr
         )
     
-    @visitor.when(parsed.CoolEqExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolEqExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolEqNode)  # noqa: F811
+    def visit(self, node: parsed.CoolEqNode):    # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_collected.CoolEqExprNode(
+        return type_collected.CoolEqNode(
             node.lineno, node.columnno, left_expr, right_expr
         )
     
-    @visitor.when(parsed.CoolLeExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolLeExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolLeNode)  # noqa: F811
+    def visit(self, node: parsed.CoolLeNode):    # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_collected.CoolLeExprNode(
+        return type_collected.CoolLeNode(
             node.lineno, node.columnno, left_expr, right_expr
         )
     
-    @visitor.when(parsed.CoolPlusExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolPlusExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolPlusNode)  # noqa: F811
+    def visit(self, node: parsed.CoolPlusNode):    # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_collected.CoolPlusExprNode(
+        return type_collected.CoolPlusNode(
             node.lineno, node.columnno, left_expr, right_expr
         )
 
-    @visitor.when(parsed.CoolMinusExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolMinusExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolMinusNode)  # noqa: F811
+    def visit(self, node: parsed.CoolMinusNode):    # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_collected.CoolMinusExprNode(
+        return type_collected.CoolMinusNode(
             node.lineno, node.columnno, left_expr, right_expr
         )
 
-    @visitor.when(parsed.CoolMultExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolMultExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolMultNode)  # noqa: F811
+    def visit(self, node: parsed.CoolMultNode):    # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_collected.CoolMultExprNode(
+        return type_collected.CoolMultNode(
             node.lineno, node.columnno, left_expr, right_expr
         )
 
-    @visitor.when(parsed.CoolDivExprNode)  # noqa: F811
-    def visit(self, node: parsed.CoolDivExprNode):    # noqa: F811
+    @visitor.when(parsed.CoolDivNode)  # noqa: F811
+    def visit(self, node: parsed.CoolDivNode):    # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_collected.CoolDivExprNode(
+        return type_collected.CoolDivNode(
             node.lineno, node.columnno, left_expr, right_expr
         )
 
@@ -277,3 +277,4 @@ class TypeCollectorVisitor(object):
         return type_collected.CoolVarNode(
             node.lineno, node.columnno, node.value
         )
+    

@@ -15,10 +15,10 @@ class CoolProgramNode(base.CoolProgramNode):
 
 
 class CoolClassNode(base.CoolClassNode):
-    def __init__(self, lineno, columnno, _type, features, parent=None):
+    def __init__(self, lineno, columnno, type, features, parent=None):
         super().__init__(lineno, columnno)
 
-        self.type = _type
+        self.type = type
         self.parent = parent
         self.features = features
 
@@ -161,5 +161,4 @@ class CoolBoolNode(parsed.CoolBoolNode):
 
 class CoolVarNode(parsed.CoolVarNode):
     pass
-
 

@@ -56,7 +56,7 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):  # noqa: F811
-        self.current_type = self.types[node.id]
+        self.current_type = self.types[node.type.name]
         scope.define_variable("self", self.current_type)
         for attr in self.current_type.attributes:
             scope.define_variable(attr.name, attr.type)
@@ -66,7 +66,8 @@ class TypeCheckerVisitor:
         self.current_type = None
 
         return type_checked.CoolClassNode(node.lineno, node.columnno,
-                                          self.types[node.id], features, node.parent)
+                                          self.types[node.type.name],
+                                          features, node.parent)
 
     @visitor.when(type_built.CoolAttrDeclNode)
     def visit(self, node, scope):  # noqa: F811
@@ -93,7 +94,7 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolMethodDeclNode)
     def visit(self, node, scope):  # noqa: F811
-        self.current_method = self.current_type.get_method(node.method_info.id)
+        self.current_method = self.current_type.get_method(node.method_info.name)
         method_scope = scope.create_child()
 
         for pname, ptype in zip(
@@ -350,7 +351,7 @@ class TypeCheckerVisitor:
 
         return type_checked.CoolNotNode(node.lineno, node.columnno, exp, bool_type)
 
-    @visitor.when(type_built.CoolTildeType)
+    @visitor.when(type_built.CoolTildeNode)
     def visit(self, node, scope):  # noqa: F811
         exp = self.visit(node.exp, scope)
         int_type = self.context.get_type("Int")
@@ -367,12 +368,12 @@ class TypeCheckerVisitor:
                                            exp,
                                            self.context.get_type("Bool"))
 
-    @visitor.when(type_built.CoolParenthExpNode)
+    @visitor.when(type_built.CoolParenthNode)
     def visit(self, node, scope):  # noqa: F811
         exp = self.visit(node.exp, scope)
-        return type_checked.CoolParenthExpNode(node.lineno, node.columnno,
-                                               exp,
-                                               exp.type)
+        return type_checked.CoolParenthNode(node.lineno, node.columnno,
+                                            exp,
+                                            exp.type)
 
     @visitor.when(type_built.CoolPlusNode)
     def visit(self, node, scope):  # noqa: F811
@@ -516,20 +517,20 @@ class TypeCheckerVisitor:
                                                else_expr,
                                                lca)
 
-    @visitor.when(type_built.CoolStringExpNode)
+    @visitor.when(type_built.CoolStringNode)
     def visit(self, node, scope):  # noqa: F811
-        return type_checked.CoolStringExpNode(node.lineno, node.columnno,
-                                              self.context.get_type("String"))
+        return type_checked.CoolStringNode(node.lineno, node.columnno,
+                                           self.context.get_type("String"))
 
-    @visitor.when(type_built.CoolBoolExpNode)
+    @visitor.when(type_built.CoolBoolNode)
     def visit(self, node, scope):  # noqa: F811
-        return type_checked.CoolBoolExpNode(node.lineno, node.columnno,
-                                            self.context.get_type("Bool"))
+        return type_checked.CoolBoolNode(node.lineno, node.columnno,
+                                         self.context.get_type("Bool"))
 
-    @visitor.when(type_built.CoolIntExpNode)
+    @visitor.when(type_built.CoolIntNode)
     def visit(self, node, scope):  # noqa: F811
-        return type_checked.CoolIntExpNode(node.lineno, node.columnno,
-                                           self.context.get_type("Int"))
+        return type_checked.CoolIntNode(node.lineno, node.columnno,
+                                        self.context.get_type("Int"))
 
     @visitor.when(type_built.CoolVarNode)
     def visit(self, node, scope):  # noqa: F811
@@ -546,13 +547,13 @@ class TypeCheckerVisitor:
                                         node.value,
                                         var.type)
 
-    @visitor.when(type_built.CoolNewTypeNode)
+    @visitor.when(type_built.CoolNewNode)
     def visit(self, node, scope):  # noqa: F811
         if node.type == "SELF_TYPE":
-            type_checked.CoolNewTypeNode(node.lineno, node.columnno,
-                                         node.type,
-                                         self.current_type)
+            type_checked.CoolNewNode(node.lineno, node.columnno,
+                                     node.type,
+                                     self.current_type)
 
-        return type_checked.CoolNewTypeNode(node.lineno, node.columnno,
-                                            node.type,
-                                            node.type)
+        return type_checked.CoolNewNode(node.lineno, node.columnno,
+                                        node.type,
+                                        node.type)
