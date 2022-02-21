@@ -13,7 +13,7 @@ from utils.code_generation.cil.COOL_to_CIL import COOLtoCIL
 from utils.code_generation.cil.print_CIL_AST import get_formatter
 
 if __name__ == "__main__":
-    add = "codegen/arith.cl"
+    add = "codegen/graph.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"

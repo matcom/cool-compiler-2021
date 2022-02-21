@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from cmp.semantic import VariableInfo
+from cmp.semantic import SemanticError, VariableInfo
 from utils.ast.AST_Nodes import ast_nodes as nodes
 from utils.code_generation.cil.AST_CIL import cil_ast as nodes_cil
 from utils.code_generation.cil.Base_COOL_to_CIL import BaseCOOLToCIL
@@ -109,19 +109,19 @@ class COOLtoCIL(BaseCOOLToCIL):
         self.visit(node.expr, scope)
 
         try:
-            self.current_type.get_attribute(node.id)
+            self.current_type.get_attribute(node.id, None)
             self.register_instruction(nodes_cil.SetAttrNode(self.vself.name, node.id, scope._return, self.current_type.name))
         
-        except AttributeError:
+        except SemanticError:
             vname = None
-            param_names = [pn.name for pn in self.current_function.params]
+            param_names = [pn.id for pn in self.current_function.params]
             if node.id in param_names:
                 for n in param_names:
                     if node.id in n.split("_"):
                         vname = n
                         break
             else:
-                for n in [lv.name for lv in self.current_function.localvars]:
+                for n in [lv.id for lv in self.current_function.localvars]:
                     if node.id in n.split("_"):
                         vname = n
                         break
@@ -149,7 +149,40 @@ class COOLtoCIL(BaseCOOLToCIL):
             scope._return = result
 
         else:
-            pass
+            args = []
+            for arg in node.args:
+                vname = self.register_local(VariableInfo(f'{node.id}_arg', None), id=True)
+                self.visit(arg, scope)
+                self.register_instruction(nodes_cil.AssignNode(vname, scope._return))
+                args.append(nodes_cil.ArgNode(vname))
+
+            result = self.register_local(VariableInfo(f'return_value_of_{node.id}', None), id=True)
+            
+            vobj = self.define_internal_local()
+            self.visit(node.obj, scope)
+            self.register_instruction(nodes_cil.AssignNode(vobj, scope._return))
+
+            void = nodes_cil.VoidNode()
+            equal_result = self.define_internal_local()
+            self.register_instruction(nodes_cil.EqualNode(equal_result, vobj, void))
+
+            self.register_runtime_error(equal_result, f'({node.line},{node.column}) - RuntimeError: Dispatch on void\n')
+            
+            self.register_instruction(nodes_cil.ArgNode(vobj))
+            for arg in args:
+                self.register_instruction(arg)
+
+            if node.type:
+                self.register_instruction(nodes_cil.StaticCallNode(self.to_function_name(node.id, node.type), result))
+            else:
+                type_of_node = self.register_local(VariableInfo(f'{node.id}_type', None), id=True)
+                self.register_instruction(nodes_cil.TypeOfNode(vobj, type_of_node))
+                typex = node.obj.computed_type
+                if typex.name == 'SELF_TYPE':
+                    typex = self.current_type
+                self.register_instruction(nodes_cil.DynamicCallNode(type_of_node, node.id, result, typex.name))
+
+            scope._return = result
 
 
     @visitor.when(nodes.IfThenElseNode)
@@ -204,8 +237,8 @@ class COOLtoCIL(BaseCOOLToCIL):
 
     @visitor.when(nodes.BlockNode)
     def visit(self, node, scope):
-        for expr in node.exprs:
-            self.visit(node.expr_list, scope)
+        for expr in node.expr_list:
+            self.visit(expr, scope)
 
     
     @visitor.when(nodes.LetNode)
@@ -221,7 +254,7 @@ class COOLtoCIL(BaseCOOLToCIL):
             if id_expr:
                 self.visit(id_expr, scope)
                 self.register_instruction(nodes_cil.AssignNode(vname, scope._return))
-            elif typex in self.value_types:
+            elif typex in ['String','Int','Bool']:
                 self.register_instruction(nodes_cil.AllocateNode(typex, vname))
 
         self.visit(node.in_expr, scope)
@@ -231,7 +264,70 @@ class COOLtoCIL(BaseCOOLToCIL):
 
     @visitor.when(nodes.CaseNode)
     def visit(self, node, scope):
-        pass
+        _condition  = self.register_local(VariableInfo('equal_value', None))
+        _type  = self.register_local(VariableInfo('typeName_value', None))
+        _expr  = self.register_local(VariableInfo('case_expr_value', None))
+        vresult   = self.register_local(VariableInfo('case_value', None))
+
+        self.visit(node.predicate, scope)
+        self.register_instruction(nodes_cil.AssignNode(_expr, scope._return))
+        self.register_instruction(nodes_cil.TypeNameNode(_type, scope._return))
+
+        void = nodes_cil.VoidNode()
+        equal_result = self.define_internal_local()
+        self.register_instruction(nodes_cil.EqualNode(equal_result, _expr, void))
+
+        self.register_runtime_error(equal_result,  f'({node.line},{node.column}) - RuntimeError: Case on void\n')
+
+        end_label = self.register_label('end_label')
+        labels = []
+
+        order = []
+        for branch in node.branches:
+            (_,typex,_) = branch
+            count = 0
+            t1 = self.context.get_type(typex)
+
+            for other_branch in node.branches:
+                (_,other_typex,_) = other_branch
+                t2 = self.context.get_type(other_typex)
+                count += t2.conforms_to(t1)
+
+            order.append((count, branch))
+        order.sort(key=lambda x: x[0])
+
+        for i, (_, branch) in enumerate(order):
+            (_,typex,_) = branch
+            labels.append(self.register_label(f'{i}_label'))
+            h = {x.name for x in self.context.types.values() if x.name != 'AUTO_TYPE' and 
+                            x.conforms_to(self.context.get_type(typex))} if typex != 'Object' else None
+            if not h:
+                self.register_instruction(nodes_cil.GotoNode(labels[-1].label))
+                break
+            h.add(typex)
+            for t in h:
+                vbranch_type_name = self.register_local(VariableInfo('branch_type_name', None))
+                self.register_instruction(nodes_cil.NameNode(vbranch_type_name, t))
+                self.register_instruction(nodes_cil.EqualNode(_condition, _type, vbranch_type_name))
+                self.register_instruction(nodes_cil.IfGotoNode(_condition, labels[-1].label))
+
+        (line,column) = node.branchesPos[i]
+        data_node = self.register_data(f'({line},{column}) - RuntimeError: Execution of a case statement without a matching branch\n')
+        self.register_instruction(nodes_cil.ErrorNode(data_node))
+
+        for i, l in enumerate(labels):
+            self.register_instruction(l)
+
+            (idx, typex, expr) = order[i][1]
+            vid = self.register_local(VariableInfo(idx, None), id=True)
+            self.register_instruction(nodes_cil.AssignNode(vid, _expr))
+
+            self.visit(expr, scope)
+            self.register_instruction(nodes_cil.AssignNode(vresult, scope._return))
+            self.register_instruction(nodes_cil.GotoNode(end_label.label))
+
+        scope._return = vresult
+        self.register_instruction(end_label)
 
     
     @visitor.when(nodes.NotNode)
@@ -290,13 +386,13 @@ class COOLtoCIL(BaseCOOLToCIL):
     @visitor.when(nodes.VariableNode)
     def visit(self, node, scope):
         try:
-            self.current_type.get_attribute(node.lex)
+            self.current_type.get_attribute(node.lex, None)
             attr = self.register_local(VariableInfo(node.lex, None), id=True)
             self.register_instruction(nodes_cil.GetAttrNode(attr, self.vself.name, node.lex, self.current_type.name))
             scope._return = attr
 
-        except AttributeError:
-            param_names = [pn.name for pn in self.current_function.params]
+        except SemanticError:
+            param_names = [pn.id for pn in self.current_function.params]
             if node.lex in param_names:
                 for n in param_names:
                     if node.lex == n:

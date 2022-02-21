@@ -198,6 +198,7 @@ class TypeChecker:
             obj_type = self.current_type
         else:
             obj_type = self.visit(node.obj, scope)
+            node.obj.computed_type = obj_type
 
         if node.type is not None:
             if node.type == 'SELF_TYPE':
