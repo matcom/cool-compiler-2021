@@ -94,13 +94,13 @@ class ReturnOpNode(OperationNode):
         super().__init__(node)
 
 
-class CallOpNode(OperationNode):
+class CallOpNode(ReturnOpNode):
     def __init__(self, node, idx: str) -> None:
         super().__init__(node)
         self.id = idx
 
 
-class VCallOpNode(CallOpNode):
+class VCallOpNode(ReturnOpNode):
     def __init__(self, node, idx: str, type_idx: str) -> None:
         super().__init__(node, idx)
         self.type = type_idx
