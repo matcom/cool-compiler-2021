@@ -4,11 +4,6 @@
 # Return:
 # $v0 address of allocated block
 
-
-# v1 address of empty memory
-# a0 size to alloc
-# v0 return memory address
-
 malloc:
     addiu $sp $sp -12                                # Save content of registers in sp
     sw $a0 0($sp)
@@ -225,90 +220,110 @@ concat_end:
 
     jr $ra
 
-# TODO: Change this procedure to use the new malloc
+# TODO: Change this procedure to use the new malloc,
+# And remove the use of the $v1 register at the end
+# of the main function
 read_string:
-    addiu $sp $sp -4
+    addiu $sp $sp -28
     sw $ra 0($sp)
+    sw $t0 4($sp)
+    sw $t1 8($sp)
+    sw $a0 12($sp)
+    sw $a1 16($sp)
+    sw $a2 20($sp)
+    sw $t2 24($sp)
 
-    move $t0 $v1
-    move $t1 $zero
-    move $t2 $t0
-    li $t3 10
+    li $t0 8
 
-    read_loop:
+    addi $a0 $t0 4
+    jal malloc
+    move $t1 $v0
+    move $t2 $zero
 
-    li $v0 8
-    move $a0 $t0
-    li $a1 5
-    syscall
-    addiu $t2 $t2 4
+    read_string_loop:
 
-    check_newline_loop:
+    addu $a0 $t1 $t2
+    subu $a1 $t0 $t2
+    addu $t2 $t2 $a1
+    jal read_string_up_to
 
-    lb $t1 0($t0)
+    beq $v0 $zero read_string_not_finished
+    move $v0 $t1
+    j read_string_finished
 
-    beq $t1 $t3 read_loop_continue
-    addiu $t0 $t0 1
+    read_string_not_finished:
+    sll $t0 $t0 1
 
-    beq $t0 $t2 check_newline_loop_continue
-    j check_newline_loop
-    check_newline_loop_continue:
-    j read_loop
+    addi $a0 $t0 4
+    jal malloc
 
-    read_loop_continue:
-    sb $zero 0($t0)
+    move $a0 $t1
+    move $t1 $v0
+    move $a1 $v0
+    move $a2 $t2
+    jal copy
 
-    bne $t0 $t2 null_terminated
-    addiu $t2 $t2 4
-    null_terminated:
+    j read_string_loop
 
-    move $v0 $v1
-    move $v1 $t2
+    read_string_finished:
 
     lw $ra 0($sp)
-    addiu $sp $sp 4
+    lw $t0 4($sp)
+    lw $t1 8($sp)
+    lw $a0 12($sp)
+    lw $a1 16($sp)
+    lw $a2 20($sp)
+    lw $t2 24($sp)
+    addiu $sp $sp 28
     jr $ra
 
 # Lee a lo sumo $a1 caracteres y los guarda en la direccion
 # a la que apunta $a0, $a1 debe ser divisible por 4
 # retorna en $v0 1 si se leyo un \n
 read_string_up_to:
+    addiu $sp $sp -28
+    sw $ra 0($sp)
+    sw $t0 4($sp)
+    sw $t1 8($sp)
+    sw $t2 12($sp)
+    sw $t3 16($sp)
+    sw $t4 20($sp)
+    sw $t5 24($sp)
+
     move $t0 $a0
     move $t1 $zero
-    move $t2 $t0
-    li $t3 10
-    move $t4 $zero
-    move $t5 $a1
-
-    read_loop:
+    li $t2 10
+    addu $t3 $t0 $a1
+    addiu $a1 $a1 1
 
     li $v0 8
-    move $a0 $t0
-    li $a1 5
     syscall
-    addiu $t2 $t2 4
 
-    check_newline_loop:
+    li $v0 0
+
+    eol_check:
+    beq $t0 $t3 read_loop_continue
 
     lb $t1 0($t0)
+    beq $t1 $t2 eol_terminated
 
-    beq $t1 $t3 read_loop_continue
     addiu $t0 $t0 1
+    j eol_check
 
-    beq $t0 $t2 check_newline_loop_continue
-    j check_newline_loop
-    check_newline_loop_continue:
-    j read_loop
-
+    eol_terminated:
+    sb $zero 0($t0)                                  # put null character at the end of string
+    li $v0 1
     read_loop_continue:
-    sb $zero 0($t0)
 
-    bne $t0 $t2 null_terminated
-    addiu $t2 $t2 4
-    null_terminated:
-
-
-
+    lw $ra 0($sp)
+    lw $t0 4($sp)
+    lw $t1 8($sp)
+    lw $t2 12($sp)
+    lw $t3 16($sp)
+    lw $t4 20($sp)
+    lw $t5 24($sp)
+    addiu $sp $sp 28
+    jr $ra
 
 
 # EQUAL STRING
