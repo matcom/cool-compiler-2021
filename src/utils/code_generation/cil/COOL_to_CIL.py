@@ -299,8 +299,7 @@ class COOLtoCIL(BaseCOOLToCIL):
         for i, (_, branch) in enumerate(order):
             (_,typex,_) = branch
             labels.append(self.register_label(f'{i}_label'))
-            h = {x.name for x in self.context.types.values() if x.name != 'AUTO_TYPE' and 
-                            x.conforms_to(self.context.get_type(typex))} if typex != 'Object' else None
+            h = {x.name for x in self.context.types.values() if x.conforms_to(self.context.get_type(typex))} if typex != 'Object' else None
             if not h:
                 self.register_instruction(nodes_cil.GotoNode(labels[-1].label))
                 break
