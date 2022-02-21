@@ -22,6 +22,7 @@ from asts.parser_ast import (
     MethodDeclarationNode,
     MinusNode,
     NotNode,
+    ParamNode,
     PlusNode,
     ProgramNode,
     StarNode,
@@ -118,7 +119,7 @@ class Parser:
 
     def p_param(self, p):
         """param : ID ':' TYPE"""
-        p[0] = VarDeclarationNode(p[1], p[3])
+        p[0] = ParamNode(p[1], p[3])
         p[0].set_position(p.slice[1].line, p.slice[1].col)
 
     def p_expression_list(self, p):
@@ -319,7 +320,7 @@ class Parser:
         p[0].set_position(p.slice[1].line, p.slice[1].col)
 
     def p_empty(self, p):
-        """empty : """
+        """empty :"""
         p[0] = []
 
     def p_error(self, t):

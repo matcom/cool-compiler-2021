@@ -48,6 +48,13 @@ class MethodDeclarationNode(DeclarationNode):
         self.body = body
 
 
+class ParamNode(DeclarationNode):
+    def __init__(self, node, idx: str, typex) -> None:
+        super().__init__(node)
+        self.id = idx
+        self.type = typex
+
+
 class ExpressionNode(Node):
     pass
 

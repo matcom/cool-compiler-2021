@@ -44,9 +44,16 @@ class MethodDeclarationNode(DeclarationNode):
     def __init__(self, idx, params, return_type, body):
         Node.__init__(self)
         self.id = idx
-        self.params: List[VarDeclarationNode] = params
+        self.params: List[ParamNode] = params
         self.type = return_type
         self.body = body
+
+
+class ParamNode(DeclarationNode):
+    def __init__(self, idx: str, typex: str) -> None:
+        Node.__init__(self)
+        self.id = idx
+        self.type = typex
 
 
 class ExpressionNode(Node):

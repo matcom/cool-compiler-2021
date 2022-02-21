@@ -17,6 +17,7 @@ from asts.inferencer_ast import (
     LessOrEqualNode,
     MinusNode,
     NotNode,
+    ParamNode,
     PlusNode,
     ProgramNode,
     ClassDeclarationNode,
@@ -85,11 +86,11 @@ class TypesInferencer:
     ) -> types_ast.MethodDeclarationNode:
         scope = scope.create_child()
 
+        params = []
         for param in node.params:
-            param_type = self._reduce_to_type(param.inferenced_type, node, general=True)
+            param_type = self._reduce_to_type(param.type, node, general=True)
             scope.define_variable(param.id, param_type)
-
-        params = [self.visit(param, scope) for param in node.params]
+            params.append(types_ast.ParamNode(param, param.id, param_type))
 
         body = self.visit(node.body, scope)
 

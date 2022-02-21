@@ -25,6 +25,7 @@ from asts.inferencer_ast import (
     MinusNode,
     Node,
     NotNode,
+    ParamNode,
     PlusNode,
     ProgramNode,
     StarNode,
@@ -114,12 +115,11 @@ class HardInferencer:
         scope: Scope = scopex.next_child()
         current_method = self.current_type.get_method(node.id)
 
-        for idx, typex in zip(current_method.param_names, current_method.param_types):
-            scope.define_variable(idx, typex)
-
         new_params = []
-        for param in node.params:
-            new_params.append(self.visit(param, scope))
+        for idx, typex, param in zip(
+            current_method.param_names, current_method.param_types, node.params
+        ):
+            new_params.append(ParamNode(param, idx, typex))
 
         body_node = self.visit(node.body, scope)
         body_type = body_node.inferenced_type

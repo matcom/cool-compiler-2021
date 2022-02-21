@@ -6,6 +6,7 @@ from semantics.tools.type import Method, SelfType, Type
 from semantics.tools import Context, Scope, TypeBag, join, join_list, unify
 from utils import visitor
 from asts.inferencer_ast import (
+    ParamNode,
     ProgramNode,
     ClassDeclarationNode,
     MethodDeclarationNode,
@@ -37,7 +38,7 @@ class BackInferencer:
     def __init__(self, context: Context) -> None:
         self.context = context
         self.errors = []
-        self.current_type = None
+        self.current_type: Type
         self.changed = False
 
     @visitor.on("node")
@@ -94,11 +95,14 @@ class BackInferencer:
         current_method: Method = self.current_type.get_method(node.id)
 
         new_params = []
-        for param in node.params:
-            new_params.append(self.visit(param, scope))
+        for idx, typex, param in zip(
+            current_method.param_names, current_method.param_types, node.params
+        ):
+            scope.define_variable(idx, typex)
+            new_params.append(ParamNode(param, idx, typex))
 
         param_types = [
-            unify(typex, new_param.inferenced_type)
+            unify(typex, new_param.type)
             for new_param, typex in zip(new_params, current_method.param_types)
         ]
         current_method.param_types = [i[0] for i in param_types]

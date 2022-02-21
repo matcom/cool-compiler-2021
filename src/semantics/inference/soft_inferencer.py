@@ -119,17 +119,16 @@ class SoftInferencer:
         return attr_node
 
     @visitor.when(MethodDeclarationNode)
-    def visit(self, node, scopex: Scope):
+    def visit(self, node: MethodDeclarationNode, scopex: Scope):
         scope = scopex.create_child()
         current_method = self.current_type.get_method(node.id)
 
-        for idx, typex in zip(current_method.param_names, current_method.param_types):
-            scope.define_variable(idx, typex)
-
         new_params = []
-        for param in node.params:
-            continue
-            new_params.append(self.visit(param, scope))
+        for idx, typex, param in zip(
+            current_method.param_names, current_method.param_types, node.params
+        ):
+            scope.define_variable(idx, typex)
+            new_params.append(inf_ast.ParamNode(param, idx, typex))
 
         ret_type_decl: TypeBag = current_method.return_type
 
