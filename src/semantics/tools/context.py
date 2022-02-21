@@ -1,11 +1,12 @@
 from semantics.tools.errors import *
 from semantics.tools.type import TypeBag, Type, SelfType
+from typing import Dict
 
 
 class Context:
     def __init__(self) -> None:
         self.types = {}
-        self.type_graph = None
+        self.type_graph: Dict = None
 
     def create_type(self, name: str) -> Type:
         if name in self.types:
@@ -13,7 +14,13 @@ class Context:
         typex = self.types[name] = Type(name)
         return typex
 
-    def get_type(self, name: str, selftype=True, autotype=True, unpacked=False) -> Type:
+    def get_type(
+        self,
+        name: str,
+        selftype=True,
+        autotype=True,
+        unpacked=False,
+    ) -> Type | TypeBag:
         if selftype and name == "SELF_TYPE":
             return TypeBag({SelfType()})  # raise TypeError(f"Cannot use SELF_TYPE.")
         if autotype and name == "AUTO_TYPE":
@@ -51,3 +58,4 @@ class Context:
 
     def __repr__(self):
         return str(self)
+

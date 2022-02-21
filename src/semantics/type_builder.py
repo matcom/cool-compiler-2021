@@ -1,3 +1,4 @@
+from semantics.tools.type import Type
 from utils import visitor
 from asts.parser_ast import (
     Node,
@@ -13,7 +14,7 @@ from semantics.tools import SelfType, TypeBag, Context
 class TypeBuilder:
     def __init__(self, context: Context):
         self.context = context
-        self.current_type = None
+        self.current_type: Type
         self.errors: list = []
 
     @visitor.on("node")

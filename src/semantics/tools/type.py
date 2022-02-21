@@ -209,16 +209,19 @@ class Type:
         return False
 
     def least_common_ancestor(self, other):
-        this = self
+        this: Type = self
         if isinstance(this, ErrorType) or isinstance(other, ErrorType):
             return ErrorType()
 
         while this.index < other.index:
             other = other.parent
+
         while other.index < this.index:
             this = this.parent
+
         if not (this and other):
             return None
+
         while this.name != other.name:
             this = this.parent
             other = other.parent
@@ -285,13 +288,13 @@ class TypeBag:
         # new_heads = []
         # visited = set()
         # for head in self.heads:
-            # if head in self.type_set:
-                # new_heads.append(head)
-                # continue
+        # if head in self.type_set:
+        # new_heads.append(head)
+        # continue
         pos_new_head = []
         lower_index = 2 ** 32
         for typex in self.type_set:
-            #if typex in visited:
+            # if typex in visited:
             #    continue
 
             if typex.index < lower_index:
@@ -299,8 +302,8 @@ class TypeBag:
                 lower_index = typex.index
             elif typex.index == lower_index:
                 pos_new_head.append(typex)
-        #new_heads += pos_new_head
-        self.heads = pos_new_head#new_heads
+        # new_heads += pos_new_head
+        self.heads = pos_new_head  # new_heads
 
     def swap_self_type(self, swap_type, back=False):
         if self.error_type:

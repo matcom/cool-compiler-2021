@@ -53,7 +53,7 @@ class SoftInferencer:
     def __init__(self, context: Context) -> None:
         self.context = context
         self.errors = []
-        self.current_type = None
+        self.current_type: Type = None
 
     @visitor.on("node")
     def visit(self, node, scope):
@@ -203,7 +203,7 @@ class SoftInferencer:
             child = scope.create_child()
             new_options.append(self.visit(option, child))
             type_list.append(new_options[-1].inferenced_type)
-            var_type = child.find_variable(option.id).get_type()
+            var_type = child.get_variable(option.id).get_type()
             var_type = var_type.heads[0] if not var_type.error_type else var_type
             if var_type in types_visited:
                 self.add_error(
@@ -316,7 +316,7 @@ class SoftInferencer:
         assign_node = inf_ast.AssignNode(expr_node, node)
 
         var = scope.find_variable(node.id)
-        if not var:
+        if var is None:
             self.add_error(
                 node,
                 f"SemanticError: Cannot assign new value to"
@@ -325,8 +325,6 @@ class SoftInferencer:
         else:
             decl_type = var.get_type()
             assign_node.defined = True
-
-        if var is not None:
             if var.name == "self":
                 self.add_error(
                     node,
@@ -352,6 +350,7 @@ class SoftInferencer:
 
     @visitor.when(MethodCallNode)
     def visit(self, node, scope):
+        caller_type: TypeBag
         if node.expr is None:
             expr_node = None
             caller_type = TypeBag({self.current_type})
@@ -364,6 +363,7 @@ class SoftInferencer:
                     node.type, selftype=False, autotype=False
                 )
             except SemanticError as err:
+                caller_type = TypeBag(set())
                 self.add_error(node, err + " While setting dispatch caller.")
 
             expr_node = self.visit(node.expr, scope)
@@ -440,6 +440,9 @@ class SoftInferencer:
             arith_node = inf_ast.StarNode(left_node, right_node, node)
         elif isinstance(node, DivNode):
             arith_node = inf_ast.DivNode(left_node, right_node, node)
+        else:
+            raise Exception("Unknown arithmetic node detected")
+
         arith_node.inferenced_type = self.context.get_type("Int")
         return arith_node
 

@@ -32,6 +32,7 @@ from asts.inferencer_ast import (
     VarDeclarationNode,
     VariableNode,
 )
+from semantics.tools.type import Type
 from utils import visitor
 from semantics.tools import (
     Context,
@@ -51,7 +52,7 @@ class HardInferencer:
         self.context = context
         self.errors = []
         self.pos = set()
-        self.current_type = None
+        self.current_type: Type
 
     @visitor.on("node")
     def visit(self, node, scope):
@@ -279,7 +280,7 @@ class HardInferencer:
 
         assign_node.defined = True
 
-        decl_type = scope.find_variable(node.id).get_type()
+        decl_type = scope.get_variable(node.id).get_type()
         expr_type = expr_node.inferenced_type
         if not equal(expr_type, node.expr.inferenced_type):
             expr_clone = expr_type.clone()
@@ -296,7 +297,7 @@ class HardInferencer:
 
     @visitor.when(MethodCallNode)
     def visit(self, node, scope):
-        caller_type = node.caller_type
+        caller_type: TypeBag = node.caller_type
         expr_node = None
         if node.type is not None and node.expr is not None:
             expr_node = self.visit(node.expr, scope)
@@ -393,6 +394,9 @@ class HardInferencer:
             arith_node = StarNode(left_node, right_node, node)
         elif isinstance(node, DivNode):
             arith_node = DivNode(left_node, right_node, node)
+        else:
+            raise InternalError("This should never happen")
+
         arith_node.inferenced_type = self.context.get_type("Int")
         return arith_node
 
@@ -429,7 +433,7 @@ class HardInferencer:
             return var_node
 
         var_node.defined = True
-        var = scope.find_variable(node.value)
+        var = scope.get_variable(node.value)
         var_node.inferenced_type = var.get_type()
         return var_node
 

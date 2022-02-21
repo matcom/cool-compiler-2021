@@ -37,7 +37,7 @@ class Scope:
         self.locals.append(info)
         return info
 
-    def find_variable(self, vname, index=None):
+    def find_variable(self, vname, index=None) -> VariableInfo | None:
         locals = self.locals if index is None else itt.islice(self.locals, index)
         try:
             return next(x for x in locals if x.name == vname)
@@ -50,6 +50,13 @@ class Scope:
                 )
             except AttributeError:
                 return None
+
+    def get_variable(self, vname, index=None) -> VariableInfo:
+        var = self.find_variable(vname, index)
+        if var is None:
+            raise Exception(f"Could not get variable {vname}.")
+
+        return var
 
     def get_local_by_index(self, index):
         return self.locals[index]
@@ -81,3 +88,4 @@ class Scope:
         for child in self.children:
             s = child.get_all_names(s, level + 1)
         return s
+

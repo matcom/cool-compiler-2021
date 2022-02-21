@@ -1,4 +1,5 @@
 from typing import List
+from semantics.tools.errors import InternalError
 from semantics.tools.type import Type, join_list
 from utils import visitor
 
@@ -229,6 +230,8 @@ class TypesInferencer:
             new_node = types_ast.LessOrEqualNode(left, right, node)
         elif isinstance(node, EqualsNode):
             new_node = types_ast.EqualsNode(left, right, node)
+        else:
+            raise InternalError("This should never happen")
 
         new_node.type = self._reduce_to_type(node.inferenced_type, node)
         return new_node
