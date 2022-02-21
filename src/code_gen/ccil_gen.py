@@ -7,6 +7,7 @@ from code_gen.tools import *
 
 # All operations that define an expression and where it is stored
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
+CLASS_VISITOR_RESULT = Tuple[ClassNode, List[MethodNode]]
 
 USER = "user"
 
@@ -18,7 +19,6 @@ class CCILGenerator:
 
     def __init__(self) -> None:
         self.types: List[Class] = list()
-        self.code: List[MethodNode] = list()
         self.time_record: Dict[str, int] = dict()
 
     @visitor.on("node")
@@ -27,14 +27,20 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ProgramNode)
     def visit(self, node: sem_ast.ProgramNode) -> None:
-        pass
+        program_types: List[ClassNode] = list()
+        program_codes: List[MethodNode] = list()
+        for type in node.declarations:
+            classx, class_code = self.visit(type)
+            program_types.append(classx)
+            program_codes.append(class_code)
 
     @visitor.when(sem_ast.ClassDeclarationNode)
-    def visit(self, node: sem_ast.ClassDeclarationNode) -> Class:
+    def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
         attributes: List[Attribute] = list()
         methods: List[Method] = list()
 
-        init_attr_ops: List[OperationNode] = []
+        class_code: List[MethodNode] = list()
+        init_attr_ops: List[OperationNode] = list()
 
         for feature in node.features:
             if isinstance(feature, sem_ast.AttrDeclarationNode):
@@ -44,9 +50,9 @@ class CCILGenerator:
             else:
                 methods.append(feature.id)
                 method_node = self.visit(feature)
-                self.code.append(method_node)
+                class_code.append(method_node)
 
-        return Class(attributes, methods)
+        return ClassNode(attributes, methods, init_attr_ops), class_code
 
     @visitor.when(sem_ast.AttrDeclarationNode)
     def visis(self, node: sem_ast.AttrDeclarationNode):
