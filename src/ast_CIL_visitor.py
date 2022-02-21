@@ -1,3 +1,4 @@
+from inspect import currentframe
 from .utils import visitor
 from .ast_hierarchy import *
 from .ast_CIL import *
@@ -8,7 +9,7 @@ class CILVisitor:
         self.attr_counter=1
         self.labels_counter=1
 
-    #Chack local |LOCAL
+    #Check local |LOCAL
     def locals_creator(self):
         current_local=f"local {self.locals_counter}"
         self.locals_counter+=1
@@ -30,10 +31,10 @@ class CILVisitor:
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self,node:ProgramNode,func:CILNode):NotImplemented
+    def visit(self,node:ProgramNode,func:Node):NotImplemented
 
     @visitor.when(ClassDeclarationNode)
-    def visitor(self,node:ClassDeclarationNode,func:CILNode):NotImplemented
+    def visitor(self,node:ClassDeclarationNode,func:Node):NotImplemented
 
     @visitor.when(FuncDeclarationNode)
     def visit(self,node:FuncDeclarationNode,func:CILProgram):NotImplemented
@@ -121,26 +122,72 @@ class CILVisitor:
     @visitor.when(AssignNode)
     def visit(self,node:AssignNode,func:CILFuncDeclaration):NotImplemented
 
+    #Check 
     @visitor.when(IntCompNode)
-    def visit(self,node:IntCompNode,func:CILFuncDeclaration):NotImplemented
+    def visit(self,node:IntCompNode,func:CILFuncDeclaration):
+        current_local = self.locals_creator()
+        func.add_locals([current_local])
+        func.add_instruction([CILALLOCATEInst(current_local,"INT")],0)
+        val=self.visit(node.expr,func)
+        comp_val=0
+        if val>0: comp_val=-val
+        else: comp_val=abs(val)
+        func.add_instruction([CILSimpleAssignInstruction(current_local,comp_val)])
+        return current_local
     
     @visitor.when(CallNode)
     def visit(self,node:CallNode,func:CILFuncDeclaration):NotImplemented
     
     @visitor.when(CaseNode)
     def visit(self,node:CaseNode,func:CILFuncDeclaration):NotImplemented
-    
+
+    #function f {
+    #...
+    #<init.locals>
+    #LOCAL <var> ;
+    #<body.locals>
+    #LOCAL <value> ;
+    #...
+    #<init.code>
+    #<var> = <init.value> ;
+    #<body.code>
+    #<value> = <body.value> ;
+    #}
     @visitor.when(LetNode)
-    def visit(self,node:LetNode,func:CILFuncDeclaration):NotImplemented
+    def visit(self,node:LetNode,func:CILFuncDeclaration):
+        for var in node.var_list:
+            self.visit(var, func)
+            func.add_locals([var])
+        out = self.visit(node.body, func)
+        return out
     
     @visitor.when(BlockNode)
-    def visit(self,node:BlockNode,func:CILFuncDeclaration):NotImplemented
+    def visit(self,node:BlockNode,func:CILFuncDeclaration):
+        for x in node.expr_list:
+            current_expr=self.visit(x,func)
+        return current_expr
     
     @visitor.when(LoopNode)
-    def visit(self,node:LoopNode,func:CILFuncDeclaration):NotImplemented
+    def visit(self,node:LoopNode,func:CILFuncDeclaration):
+        l1 = 'LOOP_' + self.labels_creator()
+        l2 = 'DO_' + self.labels_creator()
+        l3 = 'END_' + self.labels_creator()
+
+        func.add_instruction([CILLABELInst(l1)])
+        cond=self.visit(node.condition,func)
+        func.add_instruction([CILIFGOTOInst(cond,l2),CILGOTOInst(l3),CILLABELInst(l2)])
+        body_out=self.visit(node.body,func)
+        return body_out
 
     @visitor.when(ConditionalNode)
-    def visit(self,node:ConditionalNode,func:CILFuncDeclaration):NotImplemented
-    
-    @visitor.when(AttrDeclarationNode)
-    def visit(self,node:BlockNode,func:CILNode):NotImplemented
+    def visit(self,node:ConditionalNode,func:CILFuncDeclaration):
+        current_local=self.locals_creator()
+        func.add_instruction([current_local])
+        then_label=self.labels_creator()
+        else_label=self.labels_creator()
+        func.add_instruction([CILLABELInst(then_label),CILLABELInst(else_label)])
+        out_if_expr = self.visit(node.if_expr,func)
+        out_then_expr=self.visit(node.then_expr,func)
+        out_else_expr=self.visit(node.then_expr,func)
+        func.add_instruction([CILIFGOTOInst(out_if_expr,then_label),CILGOTOInst(out_else_expr)]) #WHEN COND IS TRUE
+        return current_local
