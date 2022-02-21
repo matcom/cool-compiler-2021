@@ -30,25 +30,28 @@ def main(_input, _output):
     semanticErrors = []
     typeCollector = TypeCollector(semanticErrors)
     typeCollector.visit(ast)
-    print("TYPE COLLECTOR")
-    if semanticErrors:
-        for error in semanticErrors:
-            print(error)
+    # print("TYPE COLLECTOR")
+    # if semanticErrors:
+    #     for error in semanticErrors:
+    #         print(error)
 
     context = typeCollector.context
     typeBuilder = TypeBuilder(context, semanticErrors)
     typeBuilder.visit(ast)
-    print("TYPE Builder")
-    if semanticErrors:
-        for error in semanticErrors:
-            print(error)
+
+    # print("CONTEXT")
+    # print(context)
+    # print("TYPE Builder")
+    # if semanticErrors:
+    #     for error in semanticErrors:
+    #         print(error)
 
     varCollector = VarCollector(context, semanticErrors)
     scope = varCollector.visit(ast)
-    print("Var Collector")
-    if semanticErrors:
-        for error in semanticErrors:
-            print(error)
+    # print("Var Collector")
+    # if semanticErrors:
+    #     for error in semanticErrors:
+    #         print(error)
     
     typeChecker = TypeChecker(context, semanticErrors)
     typeChecker.visit(ast, scope)

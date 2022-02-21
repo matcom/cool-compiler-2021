@@ -90,7 +90,7 @@ class VarCollector:
 
         try:
             vType = self.context.get_type(
-                varDeclarationNode.type, varDeclarationNode.line, varDeclarationNode.col)
+                varDeclarationNode.type, (varDeclarationNode.line, varDeclarationNode.col))
         except:
             errorText = f'Class {varDeclarationNode.type} of let-bound identifier {varDeclarationNode.id} is undefined.'
             self.errors.append(TypexError(
