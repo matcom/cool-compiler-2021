@@ -74,6 +74,10 @@ class CILPrintVisitor():
     def visit(self, node):
         return f'{node.dest} = TYPEOF {node.obj}'
 
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node):
+        return f'{node.dest} = TYPENAME {node.type}'
+
     @visitor.when(cil.StaticCallNode)
     def visit(self, node):
         return f'{node.dest} = CALL {node.function}'
@@ -288,7 +292,7 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node:cil.ProgramNode):
-        for t in node.dottypes + [cil.TypeNode("__Array", None)]:
+        for t in node.dottypes + [cil.TypeNode("__Array", None, "__Array")]:
             self.visit(t)
         for t in node.dotdata:
             self.visit(t)
@@ -312,6 +316,15 @@ class CILRunnerVisitor():
         if node.name in self.types:
             self.raise_error("Type {0} already defined", node.name)
         self.types[node.name] = node
+
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node:cil.TypeNameNode, args: list, caller_fun_scope: dict):
+        typex = self.get_dynamic_type(node.type, caller_fun_scope)
+        if typex.name_data not in self.data:
+            self.raise_error(f"Data {typex.name_data} not defined")
+        value = self.data[typex.name_data]
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node):
@@ -738,7 +751,8 @@ class COOLToCILVisitor():
             parent = parent.name
 
         if len([x for x in self.dottypes if x.name == name]) == 0:
-            type_node = cil.TypeNode(name, parent)
+            type_name_data_node = self.register_data('"'+name+'"')
+            type_node = cil.TypeNode(name, parent, type_name_data_node.name)
             self.dottypes.append(type_node)
             return type_node
 
@@ -1400,6 +1414,7 @@ class COOLToCILVisitor():
         instance = self.params[0]
         result = self.define_internal_local()
         self.register_instruction(cil.TypeOfNode(instance.name, result, node.row, node.column, "type of node"))
+        self.register_instruction(cil.TypeNameNode(result, result))
         return result
 
     @visitor.when(cil.StringConcatNode)

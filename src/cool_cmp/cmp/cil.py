@@ -16,10 +16,11 @@ class ProgramNode(Node):
         self.dotcode = dotcode
 
 class TypeNode(Node):
-    def __init__(self, name, parent, row, column, comment=None) -> None:
+    def __init__(self, name, parent, name_data, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
         self.name = name
         self.parent = parent
+        self.name_data = name_data
         self.attributes = []
         self.methods = []
     
@@ -137,6 +138,11 @@ class TypeOfNode(InstructionNode):
     def __init__(self, obj, dest, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
         self.obj = obj
+        self.dest = dest
+
+class TypeNameNode(InstructionNode):
+    def __init__(self, typex, dest) -> None:
+        self.type = typex
         self.dest = dest
 
 class LabelNode(InstructionNode):
