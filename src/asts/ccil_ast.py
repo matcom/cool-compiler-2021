@@ -94,6 +94,18 @@ class ReturnOpNode(OperationNode):
         super().__init__(node)
 
 
+class CallOpNode(OperationNode):
+    def __init__(self, node, idx: str) -> None:
+        super().__init__(node)
+        self.id = idx
+
+
+class VCallOpNode(CallOpNode):
+    def __init__(self, node, idx: str, type_idx: str) -> None:
+        super().__init__(node, idx)
+        self.type = type_idx
+
+
 class VoidNode(ReturnOpNode):
     """Operation that indicate that the Storage Node is not initialized"""
 
@@ -217,6 +229,14 @@ class LabelNode(FlowControlNode):
     def __init__(self, node, idx: str) -> None:
         super().__init__(node)
         self.id = idx
+
+
+def create_call(node, storage_idx: str, method_idx: str):
+    return StorageNode(node, storage_idx, CallOpNode(node, method_idx))
+
+
+def create_vcall(node, storage_idx: str, method_idx: str, type_idx: str):
+    return StorageNode(node, storage_idx, VCallOpNode(node, method_idx, type_idx))
 
 
 def create_assignation(node, idx: str, target: str):
