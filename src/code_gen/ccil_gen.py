@@ -72,7 +72,6 @@ class CCILGenerator:
 
         return (expr_op, expr_fval)
 
-
     @visitor.when(sem_ast.MethodDeclarationNode)
     def visit(self, node: sem_ast.MethodDeclarationNode):
         operations: List[OperationNode] = []
@@ -330,18 +329,29 @@ class CCILGenerator:
         times = self.times(node)
 
         # Translate all call arguments to ccil
+        # Name all fvalues as ARG <result>
         args_ops: List[OperationNode] = []
-        args_fvals: List[StorageNode] = []
+        args: List[ArgNode] = []
         for arg_expr in node.args:
             (arg_op, arg_fval) = self.visit(arg_expr)
             args_ops += arg_op
-            args_fvals += [arg_fval]
+            args += [ArgNode(arg_expr, arg_fval.id)]
 
-        # it can have an @ or not
-        if node.at_type is None:
-            pass
+        if node.expr is None:
+            fval_id = f"call_{times}"
+            call = create_call(node, fval_id, node.id)
+            return [*args_ops, *args, call], call
 
-        # It has also an at type
+        (expr_ops, expr_fval) = self.visit(node.expr)
+
+        type_idx: str = (
+            node.expr.type.name if node.at_type is None else node.at_type.name
+        )
+
+        fval_id = f"fvcall_{times}"
+        call = create_vcall(node, fval_id, node.id, type_idx)
+
+        return [*args_ops, *expr_ops, *args, call]
 
     def times(self, node):
         key: str = type(node).__name__
