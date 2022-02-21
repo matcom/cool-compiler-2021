@@ -10,3 +10,5 @@ clean:
 test:
 	pytest ../tests -v --tb=short -m=${TAG}
 
+style:
+	for f in **/*.py; do [ -f $$f ] && black $$f && isort --profile black $$f; done
