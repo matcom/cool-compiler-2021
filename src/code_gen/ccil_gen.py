@@ -2,6 +2,7 @@ from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
 from typing import Tuple, List
+from code_gen.tools import *
 
 
 # All operations that define an expression and where it is stored
@@ -16,11 +17,44 @@ class CCILGenerator:
     """
 
     def __init__(self) -> None:
-        pass
+        self.types: List[Class] = list()
+        self.code: List[MethodNode] = list()
+        self.time_record: Dict[str, int] = dict()
 
     @visitor.on("node")
     def visit(self, _):
-        self.time_record: Dict[str, int] = Dict()
+        pass
+
+    @visitor.when(sem_ast.ProgramNode)
+    def visit(self, node: sem_ast.ProgramNode) -> None:
+        pass
+
+    @visitor.when(sem_ast.ClassDeclarationNode)
+    def visit(self, node: sem_ast.ClassDeclarationNode) -> Class:
+        attributes: List[Attribute] = list()
+        methods: List[Method] = list()
+
+        init_attr_ops: List[OperationNode] = []
+
+        for feature in node.features:
+            if isinstance(feature, sem_ast.AttrDeclarationNode):
+                attributes.append(Attribute(feature.id, feature.type.name))
+                (attr_ops, _) = self.visit(feature)
+                init_attr_ops += attr_ops
+            else:
+                methods.append(feature.id)
+                method_node = self.visit(feature)
+                self.code.append(method_node)
+
+        return Class(attributes, methods)
+
+    @visitor.when(sem_ast.AttrDeclarationNode)
+    def visis(self, node: sem_ast.AttrDeclarationNode):
+        pass
+
+    @visitor.when(sem_ast.MethodDeclarationNode)
+    def visit(self, node: sem_ast.MethodDeclarationNode):
+        pass
 
     @visitor.when(sem_ast.BlocksNode)
     def visit(self, node: sem_ast.BlocksNode) -> VISITOR_RESULT:
@@ -275,7 +309,11 @@ class CCILGenerator:
             args_ops += arg_op
             args_fvals += [arg_fval]
 
-        
+        # it can have an @ or not
+        if node.at_type is None:
+            pass
+
+        # It has also an at type
 
     def times(self, node):
         key: str = type(node).__name__
