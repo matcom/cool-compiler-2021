@@ -70,7 +70,7 @@ class TypeBuilder:
             argsNames.append(name)
 
             try:
-                argsTypes = self.context.get_type(typex, line, col)
+                argType = self.context.get_type(typex, (line, col))
             except SemanticError:
                 errorText = f'Class {typex} of formal parameter {typex} is undefined.'
                 self.errors.append(TypexError(errorText, line, col))

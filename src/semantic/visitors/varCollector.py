@@ -130,18 +130,18 @@ class VarCollector:
     def visit(self, arrobaCallNode, scope):
         self.visit(arrobaCallNode.obj, scope)
         for arg in arrobaCallNode.args:
-            self.visit(arg)
+            self.visit(arg, scope)
 
     @visitor.when(DotCallNode)
     def visit(self, dotCallNode, scope):
         self.visit(dotCallNode.obj, scope)
         for arg in dotCallNode.args:
-            self.visit(arg)
+            self.visit(arg, scope)
 
     @visitor.when(MemberCallNode)
     def visit(self, memberCallNode, scope):
         for arg in memberCallNode.args:
-            self.visit(arg)
+            self.visit(arg, scope)
 
     @visitor.when(IfThenElseNode)
     def visit(self, ifThenElseNode, scope):

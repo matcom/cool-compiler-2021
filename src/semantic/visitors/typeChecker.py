@@ -212,7 +212,7 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, ifThenElseNode.line, ifThenElseNode.col))
 
-        ifBodyType = self.visit(ifThenElseNode.idBody, scope)
+        ifBodyType = self.visit(ifThenElseNode.ifBody, scope)
         elseBodyType = self.visit(ifThenElseNode.elseBody, scope)
         return get_common_basetype([ifBodyType, elseBodyType])
 
