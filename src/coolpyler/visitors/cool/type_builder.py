@@ -1,8 +1,8 @@
-import coolpyler.errors as errors
-import coolpyler.utils.visitor as visitor
-import coolpyler.ast.cool.type_collected as type_collected
 import coolpyler.ast.cool.type_built as type_built
+import coolpyler.ast.cool.type_collected as type_collected
+import coolpyler.errors as errors
 import coolpyler.semantic as semantic
+import coolpyler.utils.visitor as visitor
 from coolpyler.semantic import ErrorType
 
 
@@ -33,7 +33,7 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolClassNode)
-    def visit(self, node: type_collected.CoolClassNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolClassNode):  # noqa: F811
         self.current_type = node.type
 
         parent_type = self.types["Object"]
@@ -48,10 +48,15 @@ class TypeBuilderVisitor:
         except semantic.SemanticError as e:
             self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
 
-        features = [self.visit(feat) for feat in node.features]
+        attr_info = self.current_type.define_attribute("self", self.current_type)
+        self_attr = type_built.CoolAttrDeclNode(
+            node.lineno, node.columnno, attr_info, None
+        )
+        features = [self_attr] + [self.visit(feat) for feat in node.features]
 
-        return type_built.CoolClassNode(node.lineno, node.columnno,
-                                        node.type, features, node.parent)
+        return type_built.CoolClassNode(
+            node.lineno, node.columnno, node.type, features, node.parent
+        )
 
     @visitor.when(type_collected.CoolAttrDeclNode)
     def visit(self, node: type_collected.CoolAttrDeclNode):  # noqa: F811
@@ -73,7 +78,7 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolMethodDeclNode)
-    def visit(self, node: type_collected.CoolMethodDeclNode):   # noqa: F811
+    def visit(self, node: type_collected.CoolMethodDeclNode):  # noqa: F811
         param_types = []
         for ptype_name in node.param_types:
             try:
@@ -93,10 +98,7 @@ class TypeBuilderVisitor:
 
         try:
             method_info = self.current_type.define_method(
-                node.id,
-                node.param_names,
-                param_types,
-                return_type,
+                node.id, node.param_names, param_types, return_type,
             )
         except semantic.SemanticError as error:
             self.errors.append(
@@ -111,14 +113,12 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolAssignNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolAssignNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolAssignNode):  # noqa: F811
         expr = self.visit(node.expr)
-        return type_built.CoolAssignNode(
-            node.lineno, node.columnno, node.id, expr
-        )
+        return type_built.CoolAssignNode(node.lineno, node.columnno, node.id, expr)
 
     @visitor.when(type_collected.CoolStaticDispatchNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolStaticDispatchNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolStaticDispatchNode):  # noqa: F811
         expr = self.visit(node.expr)
         args = [self.visit(arg) for arg in node.args]
         return type_built.CoolStaticDispatchNode(
@@ -126,7 +126,7 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolDispatchNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolDispatchNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolDispatchNode):  # noqa: F811
         expr = self.visit(node.expr)
         args = [self.visit(arg) for arg in node.args]
         return type_built.CoolDispatchNode(
@@ -134,7 +134,7 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolIfThenElseNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolIfThenElseNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolIfThenElseNode):  # noqa: F811
         cond = self.visit(node.cond)
         then_expr = self.visit(node.then_expr)
         else_expr = self.visit(node.else_expr)
@@ -143,110 +143,86 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolWhileNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolWhileNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolWhileNode):  # noqa: F811
         cond = self.visit(node.cond)
         body = self.visit(node.body)
-        return type_built.CoolWhileNode(
-            node.lineno, node.columnno, cond, body
-        )
+        return type_built.CoolWhileNode(node.lineno, node.columnno, cond, body)
 
     @visitor.when(type_collected.CoolBlockNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolBlockNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolBlockNode):  # noqa: F811
         expr_list = [self.visit(expr) for expr in node.expr_list]
-        return type_built.CoolBlockNode(
-            node.lineno, node.columnno, expr_list
-        )
+        return type_built.CoolBlockNode(node.lineno, node.columnno, expr_list)
 
     @visitor.when(type_collected.CoolLetInNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolLetInNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolLetInNode):  # noqa: F811
         decl_list = [self.visit(decl) for decl in node.decl_list]
         expr = self.visit(node.expr)
-        return type_built.CoolLetInNode(
-            node.lineno, node.columnno, decl_list, expr
-        )
+        return type_built.CoolLetInNode(node.lineno, node.columnno, decl_list, expr)
 
     @visitor.when(type_collected.CoolLetDeclNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolLetDeclNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolLetDeclNode):  # noqa: F811
         expr = self.visit(node.expr)
         return type_built.CoolLetDeclNode(
             node.lineno, node.columnno, node.id, node.type, expr
         )
 
     @visitor.when(type_collected.CoolCaseNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolCaseNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolCaseNode):  # noqa: F811
         case_branches = [self.visit(branch) for branch in node.case_branches]
         expr = self.visit(node.expr)
-        return type_built.CoolCaseNode(
-            node.lineno, node.columnno, expr, case_branches
-        )
+        return type_built.CoolCaseNode(node.lineno, node.columnno, expr, case_branches)
 
     @visitor.when(type_collected.CoolCaseBranchNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolCaseBranchNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolCaseBranchNode):  # noqa: F811
         expr = self.visit(node.expr)
         return type_built.CoolCaseBranchNode(
             node.lineno, node.columnno, node.id, node.type, expr
         )
 
     @visitor.when(type_collected.CoolNewNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolNewNode):    # noqa: F811
-        return type_built.CoolNewNode(
-            node.lineno, node.columnno, node.type
-        )
+    def visit(self, node: type_collected.CoolNewNode):  # noqa: F811
+        return type_built.CoolNewNode(node.lineno, node.columnno, node.type)
 
     @visitor.when(type_collected.CoolParenthNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolParenthNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolParenthNode):  # noqa: F811
         expr = self.visit(node.expr)
-        return type_built.CoolParenthNode(
-            node.lineno, node.columnno, expr
-        )
+        return type_built.CoolParenthNode(node.lineno, node.columnno, expr)
 
     @visitor.when(type_collected.CoolTildeNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolTildeNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolTildeNode):  # noqa: F811
         expr = self.visit(node.expr)
-        return type_built.CoolTildeNode(
-            node.lineno, node.columnno, expr
-        )
+        return type_built.CoolTildeNode(node.lineno, node.columnno, expr)
 
     @visitor.when(type_collected.CoolNotNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolNotNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolNotNode):  # noqa: F811
         expr = self.visit(node.expr)
-        return type_built.CoolNotNode(
-            node.lineno, node.columnno, expr
-        )
+        return type_built.CoolNotNode(node.lineno, node.columnno, expr)
 
     @visitor.when(type_collected.CoolIsVoidNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolIsVoidNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolIsVoidNode):  # noqa: F811
         expr = self.visit(node.expr)
-        return type_built.CoolIsVoidNode(
-            node.lineno, node.columnno, expr
-        )
+        return type_built.CoolIsVoidNode(node.lineno, node.columnno, expr)
 
     @visitor.when(type_collected.CoolLeqNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolLeqNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolLeqNode):  # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_built.CoolLeqNode(
-            node.lineno, node.columnno, left_expr, right_expr
-        )
+        return type_built.CoolLeqNode(node.lineno, node.columnno, left_expr, right_expr)
 
     @visitor.when(type_collected.CoolEqNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolEqNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolEqNode):  # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_built.CoolEqNode(
-            node.lineno, node.columnno, left_expr, right_expr
-        )
+        return type_built.CoolEqNode(node.lineno, node.columnno, left_expr, right_expr)
 
     @visitor.when(type_collected.CoolLeNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolLeNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolLeNode):  # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_built.CoolLeNode(
-            node.lineno, node.columnno, left_expr, right_expr
-        )
+        return type_built.CoolLeNode(node.lineno, node.columnno, left_expr, right_expr)
 
     @visitor.when(type_collected.CoolPlusNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolPlusNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolPlusNode):  # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_built.CoolPlusNode(
@@ -254,7 +230,7 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolMinusNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolMinusNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolMinusNode):  # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_built.CoolMinusNode(
@@ -262,7 +238,7 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolMultNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolMultNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolMultNode):  # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_built.CoolMultNode(
@@ -270,33 +246,24 @@ class TypeBuilderVisitor:
         )
 
     @visitor.when(type_collected.CoolDivNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolDivNode):    # noqa: F811
+    def visit(self, node: type_collected.CoolDivNode):  # noqa: F811
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
-        return type_built.CoolDivNode(
-            node.lineno, node.columnno, left_expr, right_expr
-        )
+        return type_built.CoolDivNode(node.lineno, node.columnno, left_expr, right_expr)
 
     @visitor.when(type_collected.CoolIntNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolIntNode):    # noqa: F811
-        return type_built.CoolIntNode(
-            node.lineno, node.columnno, node.value
-        )
+    def visit(self, node: type_collected.CoolIntNode):  # noqa: F811
+        return type_built.CoolIntNode(node.lineno, node.columnno, node.value)
 
     @visitor.when(type_collected.CoolBoolNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolBoolNode):    # noqa: F811
-        return type_built.CoolBoolNode(
-            node.lineno, node.columnno, node.value
-        )
+    def visit(self, node: type_collected.CoolBoolNode):  # noqa: F811
+        return type_built.CoolBoolNode(node.lineno, node.columnno, node.value)
 
     @visitor.when(type_collected.CoolStringNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolStringNode):    # noqa: F811
-        return type_built.CoolStringNode(
-            node.lineno, node.columnno, node.value
-        )
+    def visit(self, node: type_collected.CoolStringNode):  # noqa: F811
+        return type_built.CoolStringNode(node.lineno, node.columnno, node.value)
 
     @visitor.when(type_collected.CoolVarNode)  # noqa: F811
-    def visit(self, node: type_collected.CoolVarNode):    # noqa: F811
-        return type_built.CoolVarNode(
-            node.lineno, node.columnno, node.value
-        )
+    def visit(self, node: type_collected.CoolVarNode):  # noqa: F811
+        return type_built.CoolVarNode(node.lineno, node.columnno, node.value)
+

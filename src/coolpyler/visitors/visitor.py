@@ -6,7 +6,8 @@ from coolpyler.visitors.cool.type_checker import TypeCheckerVisitor
 class Visitor:
     def __init__(self, errors=None):
         self.visitors = [TypeCollectorVisitor(errors),
-                         TypeBuilderVisitor(errors)]
+                         TypeBuilderVisitor(errors),
+                         TypeCheckerVisitor(errors)]
 
     def visit(self, ast):
         for visitor in self.visitors:
