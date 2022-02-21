@@ -1,12 +1,12 @@
 from typing import Dict, List
 
 
-class CILNode:
+class Node:
     pass
 
 class CILProgram:NotImplemented
 
-class CILDeclaration(CILNode):
+class CILDeclaration(Node):
     pass
 
 
@@ -54,7 +54,7 @@ class CILFuncDeclaration(CILDeclaration):
 
 
 
-class CILInstruction(CILNode):
+class CILInstruction(Node):
     pass
 
 ### Asignación simple
@@ -136,22 +136,22 @@ class CILNoEqualInstruction(CILBooleanBinaryInstruction):
 #x = GETATTR y b ;
 #Es equivalente a `x = y.b`.
 class CILGETATTRInst(CILInstruction):
-    def __init__(self, id,class,attr):
+    def __init__(self, id,y,attr):
         self.id = id
-        self.class=class
+        self.y=y
         self.attr=attr
     def __str__(self):
-        return f"{self.id} = GETATTR {self.class} {self.attr}"
+        return f"{self.id} = GETATTR {self.y} {self.attr}"
 
 #SETATTR y b x ;
 #Es equivalente a `y.b = x`.
 class CILSETATTRInst(CILInstruction):
-    def __init__(self, class,attr,value):
-        self.class=class
+    def __init__(self,y,attr,value):
+        self.y=y
         self.attr=attr
         self.value = value
     def __str__(self):
-        return f"SETATTR {self.class} {self.attr} {self.value}"
+        return f"SETATTR {self.y} {self.attr} {self.value}"
 
 ### Acceso a arrays
 
@@ -357,5 +357,4 @@ class CILVoidInstruction(CILInstruction):
         self.expr=expr
 
     def __str__(self):
-        return f"Is Void? {self.expr}"    
-    
+        return f"Is Void? {self.expr}"
