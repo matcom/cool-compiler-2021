@@ -14,6 +14,8 @@
 
 - **Probar que corran todos los programas del codegen con el interprete de CIL**.
 - Separar CIL en un paquete aparte como está MIPS
+- Separar COOL en un paquete aparte
+- Separar paquete de integración de COOL, CIL, MIPS
 
 - Hacer algo inteligente para eliminar generacion de variables innecesarias
 - Hacer mecanismo para reducir codigo generado eliminando el codigo que no se usa o no alcanzable
@@ -34,7 +36,7 @@
   - [x] Length
   - [x] Substring
   - [ ] Concat
-  - [ ] TypeName
+  - [x] TypeName
   - [ ] Copy especifico String, Int
 - [ ] At @
 - [ ] Llamado dinamico self type
