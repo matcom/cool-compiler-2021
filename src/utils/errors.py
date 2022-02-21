@@ -35,3 +35,8 @@ class TypexError(SemanticError):
 class NamexError(SemanticError):
     def __init__(self, text, line, column):
         super().__init__('NameError', text, line, column)
+
+
+class AttributexError(SemanticError):
+    def __init__(self, text, line, column):
+        super().__init__('AttributeError', text, line, column)

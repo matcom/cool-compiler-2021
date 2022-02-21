@@ -36,6 +36,14 @@ class Method:
             other.param_types == self.param_types
 
 
+class MethodError(Method):
+    def __init__(self, name, param_names, param_types, return_types):
+        super().__init__(name, param_names, param_types, return_types)
+
+    def __str__(self):
+        return f'[method] {self.name} ERROR'
+
+
 class Type:
     def __init__(self, name: str, pos, parent=True):
         if name == 'ObjectType':
