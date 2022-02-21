@@ -126,6 +126,11 @@ class COOLtoCIL(BaseCOOLToCIL):
                         vname = n
                         break
             self.register_instruction(nodes_cil.AssignNode(vname, scope._return))
+    
+
+    @visitor.when(nodes.CallNode)
+    def visit(self, node, scope):
+        pass
 
 
     @visitor.when(nodes.IfThenElseNode)
@@ -227,36 +232,110 @@ class COOLtoCIL(BaseCOOLToCIL):
     
     @visitor.when(nodes.ConstantNumNode)
     def visit(self, node, scope):
-        pass
+        instance = self.define_internal_local()
+        self.register_instruction(nodes_cil.ArgNode(int(node.lex)))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Int'), instance))
+        scope._return = instance
 
     
     @visitor.when(nodes.ConstantBoolNode)
     def visit(self, node, scope):
-       pass
+        if node.lex == 'true':
+            value = 1
+
+        else:
+            value = 0
+
+        instance = self.define_internal_local()
+        self.register_instruction(nodes_cil.ArgNode(value))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Bool'), instance))
+        scope._return = instance
 
 
     @visitor.when(nodes.ConstantStringNode)
     def visit(self, node, scope):
-        pass
+        try:
+            data_node = [dn for dn in self.dotdata if dn.value == node.lex][0]
+
+        except IndexError:
+            data_node = self.register_data(node.lex)
+        vmsg = self.register_local(VariableInfo('msg', None))
+        instance = self.define_internal_local()
+
+        self.register_instruction(nodes_cil.LoadNode(vmsg, data_node))
+        self.register_instruction(nodes_cil.ArgNode(vmsg))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('String'), instance))
+        scope._return = instance
 
 
     @visitor.when(nodes.VariableNode)
     def visit(self, node, scope):
-        pass
+        try:
+            self.current_type.get_attribute(node.lex)
+            attr = self.register_local(VariableInfo(node.lex, None), id=True)
+            self.register_instruction(nodes_cil.GetAttrNode(attr, self.vself.name, node.lex, self.current_type.name))
+            scope._return = attr
+
+        except AttributeError:
+            param_names = [pn.name for pn in self.current_function.params]
+            if node.lex in param_names:
+                for n in param_names:
+                    if node.lex == n:
+                        scope._return = n
+                        break
+            else:
+                scope._return = self.ids[node.lex]
 
     
     @visitor.when(nodes.InstantiateNode)
     def visit(self, node, scope):
-        pass
+        instance = self.define_internal_local()
+        
+        if node.lex == 'SELF_TYPE':
+            vtype = self.define_internal_local()
+            self.register_instruction(nodes_cil.TypeOfNode(self.vself.name, vtype))
+            self.register_instruction(nodes_cil.AllocateNode(vtype, instance))
+
+        elif node.lex == 'Int' or node.lex == 'Bool':
+            self.register_instruction(nodes_cil.ArgNode(0))
+
+        elif node.lex == 'String':
+            data_node = [dn for dn in self.dotdata if dn.value == ''][0]
+            vmsg = self.register_local(VariableInfo('msg', None))
+            self.register_instruction(nodes_cil.LoadNode(vmsg, data_node))
+            self.register_instruction(nodes_cil.ArgNode(vmsg))
+
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name(node.lex), instance))
+        scope._return = instance
 
     
     @visitor.when(nodes.IsVoidNode)
     def visit(self, node, scope):
-        pass
+        void = nodes_cil.VoidNode()
+        value = self.define_internal_local()
+
+        self.visit(node.lex, scope)
+        self.register_instruction(nodes_cil.AssignNode(value, scope._return))
+        vresult = self.define_internal_local()
+
+        self.register_instruction(nodes_cil.EqualNode(vresult, value, void))
+        self.register_instruction(nodes_cil.ArgNode(vresult))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name("Bool"), vresult))
+        scope._return = vresult
+
 
     @visitor.when(nodes.ComplementNode)
     def visit(self, node, scope):
-        pass
+        vname = self.define_internal_local()
+        value = self.define_internal_local()
+        instance = self.define_internal_local()
+
+        self.visit(node.lex, scope)
+        self.register_instruction(nodes_cil.GetAttrNode(value, scope._return, 'value', 'Int'))
+        self.register_instruction(nodes_cil.ComplementNode(vname, value))
+        self.register_instruction(nodes_cil.ArgNode(vname))
+        self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Int'), instance))
+        scope._return = instance
 
 
     @visitor.when(nodes.PlusNode)
@@ -333,7 +412,7 @@ class COOLtoCIL(BaseCOOLToCIL):
 
         self.register_instruction(nodes_cil.DivNode(vname, left_value, right_value))
         instance = self.define_internal_local()
-        
+
         self.register_instruction(nodes_cil.ArgNode(vname))
         self.register_instruction(nodes_cil.StaticCallNode(self.init_name('Int'), instance))
         scope._return = instance
