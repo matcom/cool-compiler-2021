@@ -59,6 +59,7 @@ class CoolLetInNode(CoolExprNode):
 class CoolLetDeclNode(CoolAstNode):
     pass
 
+
 class CoolCaseNode(CoolExprNode):
     pass
 

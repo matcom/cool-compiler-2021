@@ -148,6 +148,41 @@ class IncompatibleTypesError(SemanticError):
         )
 
 
+class InvalidOperationError(SemanticError):
+    def __init__(self, line, column, type_a, type_b) -> None:
+        SemanticError.__init__(
+            self, line, column, f"invalid operation {type_a} between {type_b}."
+        )
+
+
+class InvalidComparissonError(SemanticError):
+    def __init__(self, line, column, type_a, type_b) -> None:
+        SemanticError.__init__(
+            self, line, column, f"invalid comparisson {type_a} between {type_b}."
+        )
+
+
+class IsReadOnlyError(SemanticError):
+    def __init__(self, line, column, name) -> None:
+        SemanticError.__init__(
+            self, line, column, f"{name} is read only."
+        )
+
+
+class NotConformsError(SemanticError):
+    def __init__(self, line, column, type_a, type_b) -> None:
+        SemanticError.__init__(
+            self, line, column, f"type {type_a} does not conforms {type_b}."
+        )
+
+
+class WrongArgsCountError(SemanticError):
+    def __init__(self, line, column, method, n1, n2) -> None:
+        SemanticError.__init__(
+            self, line, column, f"Method {method} takes {n1} but {n2} were given."
+        )
+
+
 class WrongSignatureError(SemanticError):
     def __init__(self, line, column, method) -> None:
         SemanticError.__init__(
@@ -155,6 +190,16 @@ class WrongSignatureError(SemanticError):
             line,
             column,
             f"Method {method} already defined with a different signature.",
+        )
+
+
+class VariableNotDefinedError(SemanticError):
+    def __init__(self, line, column, variable) -> None:
+        SemanticError.__init__(
+            self,
+            line,
+            column,
+            f"Variable {variable} not defined.",
         )
 
 

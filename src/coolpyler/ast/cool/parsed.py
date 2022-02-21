@@ -1,5 +1,14 @@
 import coolpyler.ast.cool.base as base
 
+
+class CoolAstNode(base.CoolAstNode):
+    pass
+
+
+class CoolFeatureNode(base.CoolFeatureNode):
+    pass
+
+
 class CoolProgramNode(base.CoolProgramNode):
     def __init__(self, lineno, columnno, classes):
         super().__init__(lineno, columnno)
@@ -34,6 +43,11 @@ class CoolMethodDeclNode(base.CoolMethodDeclNode):
         self.param_types = param_types
         self.type = type
         self.body = body
+
+
+class CoolExprNode(base.CoolExprNode):
+    pass
+
 
 class CoolAssignNode(base.CoolAssignNode):
     def __init__(self, lineno, columnno, id, expr):
@@ -149,9 +163,72 @@ class CoolBinaryExprNode(base.CoolBinaryExprNode):
         self.right_expr = right_expr
 
 
-
 class CoolAtomNode(base.CoolAtomNode):
     def __init__(self, lineno, columnno, value):
         super().__init__(lineno, columnno)
 
         self.value = value
+
+
+class CoolComparisonNode(CoolBinaryExprNode):
+    pass
+
+
+class CoolLeqNode(CoolComparisonNode):
+    pass
+
+
+class CoolEqNode(CoolComparisonNode):
+    pass
+
+
+class CoolLeNode(CoolComparisonNode):
+    pass
+
+
+class CoolArithmeticNode(CoolBinaryExprNode):
+    pass
+
+
+class CoolPlusNode(CoolArithmeticNode):
+    pass
+
+
+class CoolMinusNode(CoolArithmeticNode):
+    pass
+
+
+class CoolMultNode(CoolArithmeticNode):
+    pass
+
+
+class CoolDivNode(CoolArithmeticNode):
+    pass
+
+
+class CoolIntNode(CoolAtomNode):
+    pass
+
+
+class CoolStringNode(CoolAtomNode):
+    pass
+
+
+class CoolBoolNode(CoolAtomNode):
+    pass
+
+
+class CoolVarNode(CoolAtomNode):
+    pass
+
+
+class CoolIsVoidNode(CoolUnaryExprNode):
+    pass
+
+
+class CoolNotNode(CoolUnaryExprNode):
+    pass
+
+
+class CoolTildeNode(CoolUnaryExprNode):
+    pass
