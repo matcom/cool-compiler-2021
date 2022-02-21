@@ -448,6 +448,53 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         
         self.add_instruction(JumpRegisterNode(Reg.ra())) # Return the address of the String
 
+    def _add_concat_function(self):
+        """
+        Returns in $v0 the concatenation of the strings given in $a0 and $a1
+        """
+
+        self.add_instruction(LabelNode("__concat"))
+
+        saved_register = [Reg.a(0), Reg.a(1), Reg.ra()]
+        self._push(saved_register) # Save arguments
+        self.add_instruction(JumpAndLinkNode("__string_length"))
+        # $v0 = length of string1
+        self._pop(saved_register) # Restore arguments
+        
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = string1
+        self.add_instruction(MoveNode(Reg.a(0), Reg.a(1))) # Passing arguments to __string_length
+        self.add_instruction(MoveNode(Reg.a(1), Reg.t(1))) # Swap ended a0,a1 = a1,a0
+
+        self.add_instruction(MoveNode(Reg.t(0), Reg.v(0))) # t0 = length of string1
+
+        saved_register = [Reg.a(0), Reg.a(1), Reg.t(0), Reg.ra()]
+        self._push(saved_register) # Save arguments
+        self.add_instruction(JumpAndLinkNode("__string_length"))
+        # $v0 = length of string2
+        self._pop(saved_register) # Restore arguments
+
+        # Returning the arguments to the correct order
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = string2
+        self.add_instruction(MoveNode(Reg.a(0), Reg.a(1)))
+        self.add_instruction(MoveNode(Reg.a(1), Reg.t(1))) # Swap ended a1,a0 = a1,a0
+        
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = string1, saving arg
+
+        self.add_instruction(AddNode(Reg.t(2), Reg.v(0), Reg.t(0))) # t2 = length of the concatenated string without null
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.t(2), 1)) # a0 = length of the concatenated string with null
+        self.add_instruction(MoveNode(Reg.t(2), Reg.v(0))) # t2 = length of string2
+
+        self._allocate_heap_space(Reg.a(0)) # Allocates the necessary space
+        # New string address in $v0
+
+        self.add_instruction(MoveNode(Reg.v(1), Reg.v(0))) # Save string address
+
+        # Copy the string1 from a0 to v0 without the null character. Also increments the v0 address
+        # up to the next character.
+        self._add_copy_string_cycle("__concat_string1_copy", Reg.t(0), Reg.t(1), Reg.v(1), Reg.t(3), add_null=False)
+        self._add_copy_string_cycle("__concat_string2_copy", Reg.t(2), Reg.a(1), Reg.v(1), Reg.t(3), add_null=True)
+
+        self.add_instruction(JumpRegisterNode(Reg.ra()))
 
     def _add_get_ra_function(self):
         """
@@ -533,6 +580,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._add_length_function()
         self._add_substring_function()
         self._add_type_name_function()
+        self._add_concat_function()
 
         for function in node.dotcode:
             self.current_function = function
@@ -759,6 +807,15 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(JumpAndLinkNode("__type_name"))
         self._store_local_variable(Reg.v(0), node.dest)
 
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node:cil.ConcatNode):
+        self._load_local_variable(Reg.a(0), node.string1)
+        self._load_local_variable(Reg.a(1), node.string2)
+
+        self.add_instruction(JumpAndLinkNode("__concat"))
+
+        self._store_local_variable(Reg.v(0), node.dest)
+
     @visitor.when(cil.VoidNode)
     def visit(self, node:cil.VoidNode):
         self._store_local_variable(Reg.zero(), node.dest)
@@ -876,14 +933,3 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def visit(self, node:cil.GotoIfNode):
         self._load_value(Reg.t(0), node.condition_value) # Load condition value
         self.add_instruction(BranchNotEqualNode(Reg.t(0), Reg.zero(), node.label)) # Not 0 is True. If not zero jump to label
-    
-    # TODO
-
-
-    @visitor.when(cil.ConcatNode)
-    def visit(self, node:cil.ConcatNode):
-        pass
-
-    @visitor.when(cil.TypeNameNode)
-    def visit(self, node:cil.TypeNameNode):
-        pass
