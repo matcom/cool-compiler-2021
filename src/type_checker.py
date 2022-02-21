@@ -1,7 +1,7 @@
 import utils.visitor as visitor
 from utils.semantic import Scope, BasicTypes
 from utils.semantic import SemanticError
-from ast_hierarchy import *
+from ast_cool_hierarchy import *
 
 
 WRONG_SIGNATURE = '(Line %s) Method "%s" already defined in "%s" with a different signature.'

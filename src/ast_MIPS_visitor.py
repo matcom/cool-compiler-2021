@@ -1,6 +1,6 @@
 from .utils import visitor
 from .utils.mips_utils import *
-from .ast_CIL import *
+from .ast_cil_hierarchy import *
 
 
 class Mips:

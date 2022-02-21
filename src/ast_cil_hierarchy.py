@@ -1,29 +1,15 @@
-from typing import Dict, List
-
-
 class Node:
     pass
 
-class CILProgram:NotImplemented
+
+class CILProgram:
+    pass
+
 
 class CILDeclaration(Node):
     pass
 
 
-#function entry {
-#    LOCAL lmsg ;
-#    LOCAL instance ;
-#    LOCAL result ;
-#
-#    lmsg = LOAD s1 ;
-#    instance = ALLOCATE Main ;
-#    SETATTR instance Main_msg lmsg ;
-#
-#    ARG instance ;
-#    result = VCALL Main Main_main ;
-#
-#    RETURN 0 ;
-#}
 class CILFuncDeclaration(CILDeclaration):
     def __init__(self, id:str):
         self.id:str = id

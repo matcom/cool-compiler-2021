@@ -1,5 +1,5 @@
 import utils.visitor as visitor
-from ast_hierarchy import *
+from ast_cool_hierarchy import *
 
 
 class FormatVisitor(object):

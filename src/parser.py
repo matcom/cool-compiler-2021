@@ -1,4 +1,4 @@
-import ast_hierarchy as ast
+import ast_cool_hierarchy as ast
 import lexer
 import ply.yacc as yacc
 

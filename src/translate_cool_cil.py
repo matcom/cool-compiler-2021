@@ -1,7 +1,7 @@
 from inspect import currentframe
 from .utils import visitor
-from .ast_hierarchy import *
-from .ast_CIL import *
+from .ast_cool_hierarchy import *
+from .ast_cil_hierarchy import *
 
 class CILVisitor:
     def __init__(self):
