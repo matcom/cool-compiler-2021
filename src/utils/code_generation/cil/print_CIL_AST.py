@@ -176,6 +176,10 @@ def get_formatter():
         def visit(self, node):
             return 'VOID'
         
+        @visitor.when(nodes.ComplementNode)
+        def visit(self, node):
+            return f'{node.dest} = COMPLEMENT {node.id}'
+        
     printer = PrintCIL()
     return (lambda ast: printer.visit(ast))
     

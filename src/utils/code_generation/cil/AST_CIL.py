@@ -197,3 +197,8 @@ class cil_ast:
     
     class VoidNode(InstructionNode):
         pass
+
+    class ComplementNode(InstructionNode):
+        def __init__(self, dest, idx):
+            self.dest = dest
+            self.id = idx
