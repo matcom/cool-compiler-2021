@@ -94,5 +94,5 @@ def get_common_basetype(types):
     return paths[0][-1]
 
 
-def get_type(typex: Type, current_type: Type) -> Type:
+def get_type(typex, current_type):
     return current_type if typex == SelfType() else typex
