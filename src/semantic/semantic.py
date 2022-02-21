@@ -309,6 +309,17 @@ class IOType(Type):
         return other.name != self.name and not isinstance(other, IOType)
 
 
+class AutoType(Type):
+    def __init__(self):
+        Type.__init__(self, 'AUTO_TYPE')
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, AutoType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, AutoType)
+
+
 class Context:
     def __init__(self):
         self.types = {}
