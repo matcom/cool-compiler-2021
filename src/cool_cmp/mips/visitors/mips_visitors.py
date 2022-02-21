@@ -836,3 +836,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.ConcatNode)
     def visit(self, node:cil.ConcatNode):
         pass
+
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node:cil.TypeNameNode):
+        pass
