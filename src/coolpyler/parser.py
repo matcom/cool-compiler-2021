@@ -1,7 +1,7 @@
 import os
+
 from sly import Parser
-from coolpyler.lexer import CoolLexer
-from coolpyler.errors import UnexpectedEOFError, UnexpectedTokenError
+
 from coolpyler.ast.cool.parsed import (
     CoolAssignNode,
     CoolAttrDeclNode,
@@ -13,7 +13,6 @@ from coolpyler.ast.cool.parsed import (
     CoolDispatchNode,
     CoolDivNode,
     CoolEqNode,
-    CoolMethodDeclNode,
     CoolIfThenElseNode,
     CoolIntNode,
     CoolIsVoidNode,
@@ -21,6 +20,7 @@ from coolpyler.ast.cool.parsed import (
     CoolLeqNode,
     CoolLetDeclNode,
     CoolLetInNode,
+    CoolMethodDeclNode,
     CoolMinusNode,
     CoolMultNode,
     CoolNewNode,
@@ -34,6 +34,8 @@ from coolpyler.ast.cool.parsed import (
     CoolVarNode,
     CoolWhileNode,
 )
+from coolpyler.errors import UnexpectedEOFError, UnexpectedTokenError
+from coolpyler.lexer import CoolLexer
 
 # pyright: reportUndefinedVariable=false
 # flake8: noqa

@@ -80,10 +80,7 @@ class UnexpectedTokenError(SyntacticError):
 
     def __init__(self, line: int, column: int, token: str) -> None:
         SyntacticError.__init__(
-            self,
-            line,
-            column,
-            f"Unexpected token `{token}`.",
+            self, line, column, f"Unexpected token `{token}`.",
         )
 
 
@@ -164,9 +161,7 @@ class InvalidComparissonError(SemanticError):
 
 class IsReadOnlyError(SemanticError):
     def __init__(self, line, column, name) -> None:
-        SemanticError.__init__(
-            self, line, column, f"{name} is read only."
-        )
+        SemanticError.__init__(self, line, column, f"{name} is read only.")
 
 
 class NotConformsError(SemanticError):
@@ -196,10 +191,7 @@ class WrongSignatureError(SemanticError):
 class VariableNotDefinedError(SemanticError):
     def __init__(self, line, column, variable) -> None:
         SemanticError.__init__(
-            self,
-            line,
-            column,
-            f"Variable {variable} not defined.",
+            self, line, column, f"Variable {variable} not defined.",
         )
 
 
@@ -213,6 +205,7 @@ class InternalError(object):
     """
     Internal compiler errors
     """
+
     def __init__(self, message, context):
         self.message = message
         self.context = context

@@ -1,5 +1,7 @@
-import typer
 from pathlib import Path
+
+import typer
+
 from coolpyler.errors import InvalidInputFileError
 from coolpyler.lexer import CoolLexer
 from coolpyler.parser import CoolParser
