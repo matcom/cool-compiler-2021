@@ -14,12 +14,12 @@ class TypeBuilder:
     def visit(self, node):
         pass
 
-    @visit.when(ProgramNode)
+    @visitor.when(ProgramNode)
     def visit(self, programNode):
         for declaration in programNode.declarations:
             self.visit(declaration)
 
-    @visit.when(ClassDeclarationNode)
+    @visitor.when(ClassDeclarationNode)
     def visit(self, classDeclarationNode):
         try:
             self.currentType = self.context.get_type(
@@ -58,7 +58,7 @@ class TypeBuilder:
         for feature in classDeclarationNode.features:
             self.visit(feature)
 
-    @visit.when(FuncDeclarationNode)
+    @visitor.when(FuncDeclarationNode)
     def visit(self, funcDeclarationNode):
         argsNames = []
         argsTypes = []
@@ -94,7 +94,7 @@ class TypeBuilder:
         except SemanticError as error:
             self.errors.append(error)
 
-    @visit.when(AttrDeclarationNode)
+    @visitor.when(AttrDeclarationNode)
     def visit(self, attrDeclarationNode):
         try:
             attrType = self.context.get_type(
