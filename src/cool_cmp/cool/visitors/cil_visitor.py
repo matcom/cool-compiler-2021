@@ -534,7 +534,7 @@ class CILRunnerVisitor():
     
     @visitor.when(cil.LengthNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        value = self.get_value_str(node.string, caller_fun_scope, "LENGTH operation undefined with non String type")
+        value = self.get_value_str(node.string_var, caller_fun_scope, "LENGTH operation undefined with non String type")
         self.set_value(node.dest, len(value), caller_fun_scope)
         return self.next_instruction()
     
