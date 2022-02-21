@@ -527,7 +527,8 @@ class CILRunnerVisitor():
     @visitor.when(cil.CopyNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         value = self.get_value(node.instance, caller_fun_scope)
-        value = value.copy()
+        if not isinstance(value, (str, int)):
+            value = value.copy()
         self.set_value(node.result, value, caller_fun_scope)
         return self.next_instruction()
     

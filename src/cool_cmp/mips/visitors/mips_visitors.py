@@ -651,13 +651,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         type_name = None
         if node.type[0].isupper(): # Is a Type name
             type_name = node.type
-            self.add_instruction(LoadAddressNode(Reg.t(0), type_name)) # t0 = Class Definition Address
         else: # Is a variable name
             type_name = node.base_type.name
-            self._load_local_variable(Reg.t(0), node.type) # t0 = Class Instance
-            self.add_instruction(StoreWordNode(Reg.t(0), 0, Reg.t(0))) # t0 = Class Definition Address
+
+        self._load_type_variable(Reg.t(0), node.type) # t0 = TypeAddress
         offset = next(offset * self.WORD_SIZE + self.TO_METHODS_OFFSET for offset, (cool_method,cil_method) in enumerate(self.type_method_dict_list[type_name]) if cool_method == node.method)
-        self.add_instruction(StoreWordNode(Reg.t(0), offset, Reg.t(0))) # t0 = method direction
+        self.add_instruction(LoadWordNode(Reg.t(0), offset, Reg.t(0))) # t0 = method direction
         self.add_instruction(JumpAndLinkNode("__get_ra"))
         self.add_instruction(MoveNode(Reg.ra(), Reg.v(0)))
         self.add_instruction(JumpRegisterNode(Reg.t(0)))
