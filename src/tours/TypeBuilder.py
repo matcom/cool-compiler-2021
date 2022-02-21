@@ -1,6 +1,6 @@
 from parsing.ast import *
 from cmp.semantic import SemanticError
-from cmp.semantic import ErrorType, StringType, IntType, AutoType, BoolType, ObjectType, SelfType 
+from cmp.semantic import ErrorType, StringType, IntType, BoolType, ObjectType, SelfType 
 import cmp.visitor as visitor 
 
 
@@ -53,7 +53,7 @@ class TypeBuilder:
         if node.parent is not None: 
             try:
                 parent = self.context.get_type(node.parent)
-                if parent == BoolType() or parent == IntType() or parent == StringType() or parent == SelfType() or parent == AutoType():
+                if parent == BoolType() or parent == IntType() or parent == StringType() or parent == SelfType():
                     self.errors.append(CANNOT_INHERIT.replace('%s', node.id, 1).replace('%s', parent.name, 1))
                     parent = ErrorType()
                 else:

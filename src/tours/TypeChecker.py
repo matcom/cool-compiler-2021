@@ -1,7 +1,7 @@
 from parsing.ast import *
-from .utils import find_parent_type, InferType, is_base_class
+from .utils import find_parent_type, is_base_class
 from cmp.semantic import Scope, SemanticError
-from cmp.semantic import Type, ObjectType, IntType, StringType, BoolType, AutoType, ErrorType, SelfType, IOType
+from cmp.semantic import ObjectType, IntType, StringType, BoolType, ErrorType, SelfType
 import cmp.visitor as visitor
 
 
@@ -90,12 +90,8 @@ class TypeChecker:
             if expr_type == SelfType():
                 expr_type = self.current_type
         
-            if node_type != AutoType() and expr_type != AutoType() and not expr_type.conforms_to(node_type):
+            if not expr_type.conforms_to(node_type):
                 self.errors.append(INCOMPATIBLE_ATTRIBUTE_TYPE.replace('%s', expr_type.name, 1).replace('%s', node.id, 1).replace('%s', node_type.name, 1))
-            elif node_type == AutoType() and expr_type != AutoType():
-                InferType(self.current_type, node_type, expr_type)
-            elif node_type != AutoType() and expr_type == AutoType():
-                InferType(self.current_type, expr_type, node_type)
              
     @visitor.when(FuncDeclarationNode) 
     def visit(self, node, scope):
@@ -130,13 +126,8 @@ class TypeChecker:
         return_type_exp = node.expr.computed_type if node.expr.computed_type != SelfType() else self.current_type
         return_type_met = self.current_method.return_type if self.current_method.return_type != SelfType() else self.current_type
 
-        if return_type_met != AutoType() and return_type_exp != AutoType():
-            if not return_type_exp.conforms_to(return_type_met):
-                self.errors.append(INCOMPATIBLE_RET_FUNC_TYPE.replace('%s', return_type_exp.name, 1).replace('%s',node.id , 1).replace('%s',return_type_met.name , 1))       
-        elif return_type_met == AutoType() and return_type_exp != AutoType():
-            InferType(self.current_type, return_type_met, return_type_exp)
-        elif return_type_met != AutoType() and return_type_exp == AutoType():
-            InferType(self.current_type, return_type_exp, return_type_met)
+        if not return_type_exp.conforms_to(return_type_met):
+            self.errors.append(INCOMPATIBLE_RET_FUNC_TYPE.replace('%s', return_type_exp.name, 1).replace('%s',node.id , 1).replace('%s',return_type_met.name , 1))       
            
     @visitor.when(BlockNode)
     def visit(self, node, scope):
@@ -172,14 +163,9 @@ class TypeChecker:
                         self.visit(arg, scope)
                         arg_type = arg.computed_type if arg.computed_type != SelfType() else self.current_type 
                     
-                        if param_type != AutoType() and arg_type != AutoType() and not arg_type.conforms_to(param_type):
+                        if not arg_type.conforms_to(param_type):
                             self.errors.append(INCOMPATIBLE_DISPATCH_TYPE.replace('%s', node.id, 1).replace('%s', arg_type.name, 1).replace('%s', param_name, 1).replace('%s', param_type.name, 1))
                             typee = ErrorType()
-                        elif param_type == AutoType() and arg_type != AutoType():
-                            InferType(self.current_type, param_type, arg_type)
-
-                        elif param_type != AutoType() and arg_type == AutoType():
-                            InferType(self.current_type, arg_type, param_type)
             else:
                 self.errors.append(WRONG_NUMBER_ARGUMENTS.replace('%s', method.name, 1))           
 
@@ -202,13 +188,11 @@ class TypeChecker:
         self.visit(node.then, scope)
         self.visit(node.elsex, scope)
 
-        if predicate_type != AutoType() and predicate_type.conforms_to(BoolType()):
+        if predicate_type.conforms_to(BoolType()):
             node.computed_type = find_parent_type(self.current_type, node.then.computed_type, node.elsex.computed_type)
-        elif predicate_type != AutoType(): 
+        else: 
             self.errors.append(PREDICATE_OPERATIONS.replace('%s', "If", 1))
             node.computed_type = ErrorType()
-        else:
-            InferType(self.current_type, predicate_type, BoolType())
             
     @visitor.when(LetNode)
     def visit(self, node, scope):
@@ -234,12 +218,8 @@ class TypeChecker:
             self.visit(node.expr, scope)
             expresion_type = node.expr.computed_type if node.expr.computed_type != SelfType() else self.current_type 
             
-            if expresion_type != AutoType() and var_type != AutoType() and not expresion_type.conforms_to(var_type):
+            if not expresion_type.conforms_to(var_type):
                 self.errors.append(INCOMPATIBLE_VARIABLE_TYPE.replace('%s', expresion_type.name, 1).replace('%s', node.id, 1).replace('%s', var_type.name, 1))
-            elif var_type == AutoType() and expresion_type != AutoType():
-                InferType(self.current_type, var_type, expresion_type)
-            elif var_type != AutoType() and expresion_type == AutoType():
-                InferType(self.current_type, expresion_type, var_type)
 
         if scope.is_local(node.id):
             scope.remove_variable(node.id)
@@ -254,14 +234,11 @@ class TypeChecker:
         predicate_type = node.predicate.computed_type
         self.visit(node.body, scope)
         
-        if predicate_type != AutoType() and predicate_type.conforms_to(BoolType()):            
+        if predicate_type.conforms_to(BoolType()):            
             node.computed_type = ObjectType()
-        elif predicate_type != AutoType():    
+        else:    
             self.errors.append(PREDICATE_OPERATIONS.replace('%s',"Loop", 1))
             node.computed_type = ErrorType()
-        else:
-            InferType(self.current_type, predicate_type, BoolType())
-            node.computed_type = ObjectType()
           
     @visitor.when(CaseNode)
     def visit(self, node, scope):
@@ -286,9 +263,6 @@ class TypeChecker:
     def visit(self, node, scope):  
         try:
             typex = self.context.get_type(node.type)
-            if typex == AutoType():
-                self.errors.append("The type of a case attribute can not be AUTO_TYPE.")
-                typex = ErrorType()
         except SemanticError as error:
             self.errors.append(CASE_TYPE_UNDEFINED.replace('%s', node.type, 1))
             typex = ErrorType()
@@ -312,13 +286,9 @@ class TypeChecker:
         if node.id.lex == 'self':
             self.errors.append(SELF_IS_READONLY)
             node.computed_type = ErrorType() 
-        elif var_type != AutoType() and expresion_type != AutoType() and not expresion_type.conforms_to(var_type):
+        elif not expresion_type.conforms_to(var_type):
             self.errors.append(INCOMPATIBLE_VARIABLE_TYPE.replace('%s', expresion_type.name, 1).replace('%s', node.id.lex).replace('%s', var_type.name, 1))
             node.computed_type = ErrorType() 
-        elif var_type == AutoType() and expresion_type != AutoType():
-            InferType(self.current_type, var_type, expresion_type)
-        elif var_type != AutoType() and expresion_type == AutoType():
-            InferType(self.current_type, expresion_type, var_type)
                                      
     @visitor.when(BinaryNode)
     def visit(self, node, scope):
@@ -339,82 +309,40 @@ class TypeChecker:
             operation = "<="
         elif isinstance(node, LessNode):
             operation = "<"           
-        
-        if left_type != AutoType() and right_type != AutoType():
-            if not isinstance(node, EqualsNode):
-                if left_type == IntType() and right_type == IntType(): 
-                    if isinstance(node, ElessNode) or isinstance(node, LessNode):
-                        node.computed_type = BoolType()
-                    else:
-                        node.computed_type = IntType()  
-                else:
-                    if(left_type == right_type):
-                        self.errors.append(OPERATION_NOT_DEFINED.replace('%s', operation, 1).replace('%s', left_type.name, 1))
-                    else:
-                        self.errors.append(INVALID_OPERATION.replace('%s', left_type.name, 1).replace('%s', operation, 1).replace('%s', right_type.name, 1))
-                    node.computed_type = ErrorType()
-            else:
-                if left_type == right_type:
-                    if left_type == StringType() or left_type == IntType() or left_type == BoolType():
-                        node.computed_type = BoolType()
-                    else:
-                        self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', left_type.name, 1))
-                        node.computed_type = ErrorType() 
-                else:
-                    if is_base_class(left_type.name) or is_base_class(right_type.name):
-                        self.errors.append(INVALID_BASIC_COMPARISON)
-                        node.computed_type = ErrorType()
-                    else:
-                        node.computed_type = BoolType()    
-        
-        else:
-            if left_type == AutoType() and right_type == AutoType():
-                if isinstance(node, ElessNode) or isinstance(node, LessNode) or isinstance(node, EqualsNode):
+       
+        if not isinstance(node, EqualsNode):
+            if left_type == IntType() and right_type == IntType(): 
+                if isinstance(node, ElessNode) or isinstance(node, LessNode):
                     node.computed_type = BoolType()
                 else:
-                    node.computed_type = IntType()
-
-                if not isinstance(node, EqualsNode):
-                    InferType(self.current_type, left_type, IntType())
-                    InferType(self.current_type, right_type, IntType())
-            
+                    node.computed_type = IntType()  
             else:
-                if left_type == AutoType():
-                    auto_node = node.left
-                    auto_var = left_type
-                    not_auto_var = right_type
+                if(left_type == right_type):
+                    self.errors.append(OPERATION_NOT_DEFINED.replace('%s', operation, 1).replace('%s', left_type.name, 1))
                 else:
-                    auto_node = node.right
-                    auto_var = right_type
-                    not_auto_var = left_type
-
-                if not isinstance(node, EqualsNode):
-                    if not_auto_var == IntType():
-                        if isinstance(node, ElessNode) or isinstance(node, LessNode):
-                            node.computed_type = BoolType()
-                        else:
-                            node.computed_type = IntType()
-                    else:
-                        self.errors.append(OPERATION_NOT_DEFINED.replace('%s', operation, 1).replace('%s', not_auto_var.name, 1))
-                        node.computed_type = ErrorType()
-                    InferType(self.current_type, auto_var, IntType())                      
+                    self.errors.append(INVALID_OPERATION.replace('%s', left_type.name, 1).replace('%s', operation, 1).replace('%s', right_type.name, 1))
+                node.computed_type = ErrorType()
+        else:
+            if left_type == right_type:
+                if left_type == StringType() or left_type == IntType() or left_type == BoolType():
+                    node.computed_type = BoolType()
                 else:
-                    if not_auto_var == StringType() or not_auto_var == IntType() or not_auto_var == BoolType():
-                        node.computed_type = BoolType()
-                        InferType(self.current_type, auto_var, not_auto_var)                       
-                    else:
-                        self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', not_auto_var.name, 1))
-                        node.computed_type = ErrorType() 
-
+                    self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', left_type.name, 1))
+                    node.computed_type = ErrorType() 
+            else:
+                if is_base_class(left_type.name) or is_base_class(right_type.name):
+                    self.errors.append(INVALID_BASIC_COMPARISON)
+                    node.computed_type = ErrorType()
+                else:
+                    node.computed_type = BoolType()    
+                
     @visitor.when(PrimeNode)
     def visit(self, node, scope):
         self.visit(node.expr, scope)
         type_expr = node.expr.computed_type
         
-        if type_expr == IntType() or type_expr == AutoType():
+        if type_expr == IntType():
             node.computed_type = IntType()
-            if type_expr == AutoType():
-                InferType(self.current_type, type_expr, IntType())
         else:     
             self.errors.append(UNARY_OPERATION_NOT_DEFINED.replace('%s', "~", 1).replace('%s', type_expr.name, 1).replace('%s', "Int", 1))
             node.computed_type = ErrorType()
@@ -424,10 +352,8 @@ class TypeChecker:
         self.visit(node.expr, scope)
         type_expr = node.expr.computed_type
         
-        if type_expr == BoolType() or type_expr == AutoType():
+        if type_expr == BoolType():
             node.computed_type = BoolType()
-            if type_expr == AutoType():
-                InferType(self.current_type, type_expr, BoolType())
         else:     
             self.errors.append(UNARY_OPERATION_NOT_DEFINED.replace('%s', "not", 1).replace('%s', type_expr.name, 1).replace('%s', "Bool", 1))
             node.computed_type = ErrorType()
@@ -466,9 +392,6 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             var_type = self.context.get_type(node.lex)
-            if var_type == AutoType():
-                self.errors.append('Class AUTO_TYPE can not be instantiated.')
-                var_type = ErrorType() 
         except SemanticError as error:
             self.errors.append(UNDEFINED_NEW_TYPE.replace('%s', node.lex, 1))
             var_type = ErrorType()  

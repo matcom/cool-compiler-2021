@@ -1,6 +1,6 @@
 from parsing.ast import *
 from cmp.semantic import SemanticError, Context
-from cmp.semantic import ObjectType, StringType, IntType, AutoType, BoolType, IOType, SelfType
+from cmp.semantic import ObjectType, StringType, IntType, BoolType, IOType, SelfType
 import cmp.visitor as visitor 
 from .utils import is_base_class
 
@@ -53,7 +53,6 @@ def define_base_classes(context):
     int_type = context.types['Int'] = IntType()
     string_type = context.types['String'] = StringType()
     bool_type = context.types['Bool'] = BoolType()
-    auto_type = context.types['AUTO_TYPE'] = AutoType()
     self_type = context.types['SELF_TYPE'] = SelfType()
     
     object_type.define_method('abort', [], [], object_type)

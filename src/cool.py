@@ -4,8 +4,7 @@ from parsing.lexer import COOL_Lexer
 from tours.TypeCollector import TypeCollector
 from tours.TypeBuilder import TypeBuilder
 from tours.TypeChecker import TypeChecker
-from tours.TypeInferencer import TypeInferencer
-from tours.utils import AnalizeScopeAutoTypes, AnalizeClassAutoTypes
+
 
 input_file = sys.argv[1]
 with open(input_file, 'r') as f:
@@ -39,24 +38,6 @@ builder.visit(ast)
 # Checking Types
 checker = TypeChecker(context, errors)
 scope = checker.visit(ast)
-
-# # Infering Types
-# while True:
-#     inferencer = TypeInferencer(context, errors)
-#     if not inferencer.visit(ast):
-#         break
-
-# inferences = []
-# for declaration in ast.declarations:
-#     AnalizeClassAutoTypes(context.get_type(declaration.id), errors, inferences)
-# AnalizeScopeAutoTypes(scope, errors, inferences)
-
-# print("Infered Types:")
-# if inferences:
-#     for inf in inferences:
-#         print(inf)
-# else:
-#     print("There wasn't any variable type infered.")
 
 if errors:
     for e in errors:
