@@ -1,6 +1,8 @@
 from typing import Dict, List, Tuple
 from __future__ import annotations
 
+from semantics.tools.type import Type
+
 
 class Node:
     def __init__(self, node) -> None:
@@ -11,6 +13,11 @@ class Node:
         return (self.line, self.col)
 
 
+class ClassNode(Node):
+    def __init__(self, node) -> None:
+        super().__init__(node)
+
+
 class OperationNode(Node):
     """
     Base Class for all operation Nodes
@@ -18,6 +25,30 @@ class OperationNode(Node):
 
     def __init__(self, node) -> None:
         super().__init__(node)
+
+
+class LocalNode(OperationNode):
+    def __init__(self, node, idx: str, typex: Type) -> None:
+        """
+        Node represent initalization instruction"
+        Parameter:
+            idx <- node name
+            type <- node type
+        """
+        super().__init__(node)
+        self.id: str = idx
+        self.type: str = typex.name
+
+
+class ParamNode(LocalNode):
+    def __init__(self, node, idx: str, typex: Type) -> None:
+        """
+        Node represent function parameter initalization instruction"
+        Parameter:
+            idx <- node name
+            type <- node type
+        """
+        super().__init__(node, idx, typex)
 
 
 class StorageNode(OperationNode):
