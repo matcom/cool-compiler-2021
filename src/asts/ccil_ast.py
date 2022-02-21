@@ -66,6 +66,12 @@ class ParamNode(LocalNode):
         super().__init__(node, idx, typex)
 
 
+class ArgNode(OperationNode):
+    def __init__(self, node, idx: str) -> None:
+        super().__init__(node)
+        self.id = idx
+
+
 class StorageNode(OperationNode):
     def __init__(self, node, idx: str, operation: ReturnOpNode) -> None:
         """
