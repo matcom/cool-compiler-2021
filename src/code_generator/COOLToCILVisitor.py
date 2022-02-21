@@ -1,5 +1,5 @@
 import cil_ast as cil
-from BaseCOOLToCILVisitor import *
+from BaseCoolToCilVisitor import BaseCOOLToCILVisitor
 from utils import visitor
 from utils.ast import *
 
@@ -22,7 +22,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ReturnNode(0))
         self.current_function = None
 
-       # self.create_built_in()
+        self.define_built_in()
 
         for declaration, child_scope in zip(node.declarations, scope.children):
             self.visit(declaration, child_scope)
@@ -52,7 +52,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if cil_type_node.attributes:
             constructor.body.expr_list.append(SelfNode())
 
-        for method, mtype in self.current_type.all_methods():
+        for method, mtype in self.current_type.get_all_methods():
             cil_type_node.methods.append((method.name, self.to_function_name(method.name, mtype.name)))
 
         func_declarations += [f for f in node.features if isinstance(f, FuncDeclarationNode)] 
@@ -61,6 +61,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.current_type = None
 
+#this get_method is from semantic types
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):        
         self.current_method = self.current_type.get_method(node.id)
@@ -91,6 +92,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.AllocateNode(node.type, local_value))
             self.register_instruction(cil.SetAttrNode(self.vself.name, node.id, local_value, self.current_type))
 
+#this find_local, find_attribute is from scope
     @visitor.when(AssignNode)
     def visit(self, node, scope):
         var_info = scope.find_local(node.id)
@@ -106,34 +108,36 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(FuncCallNode)
     def visit(self, node, scope):
-        obj, otype = self.visit(node.obj, scope)
+        result_local = self.define_internal_local(scope = scope, name = "result")
+        expr_value = self.visit(node.instance, scope)
+
+        func_call_args = []
+        for arg in node.args:
+            param_local = self.visit(arg, scope)
+            func_call_args.append(cil.ArgNode(param_local))
+        func_call_args.append(cil.ArgNode(expr_value))
+
+        static_instance = self.define_internal_local(scope=scope, name='static_instance')
+        self.register_instruction(cil.AllocateNode(node.static_type,self.context.get_type(node.static_type).tag ,static_instance))
         
-        meth = otype.get_method(node.id)
-        args_node = [cil.ArgNode(obj)] + self.handle_arguments(node.args, scope, meth.param_types)
+        self.register_instruction(cil.VCallNode(result_local, node.method, func_call_args, node.static_type, static_instance))
+        return result_local
 
-        rtype = meth.return_type
-        result = None if isinstance(rtype, VoidType) else self.define_internal_local()
+    @visitor.when(MemberCallNode)
+    def visit(self, node, scope):
+        result_local = self.define_internal_local(scope = scope, name = "result")
+        expr_value = self.visit(node.instance, scope)
 
-        continue_label = cil.LabelNode(f'continue__{self.index}') 
-        isvoid = self.check_void(obj)
-        self.register_instruction(cil.IfGoToNode(isvoid, continue_label.label))
-        self.register_instruction(cil.ErrorNode('dispatch_error'))
-        self.register_instruction(continue_label)
+        member_call_args = []
+        for arg in node.args:
+            param_local = self.visit(arg, scope)
+            member_call_args.append(cil.ArgNode(param_local))
+        member_call_args.append(cil.ArgNode(expr_value))
 
-        #desambiguar segun sea el llamado, dinamico o estatico
-        # self.register_instruction(cil.StaticCallNode(node.type, node.id, result, args_node, rtype.name))
-        # return result, self._return_type(otype, node)
-
-        # self.register_instruction(cil.DynamicCallNode(self.current_type.name, 'self', node.id, result, args_node, rtype.name))
-        # return result, self._return_type(self.current_type, node)
-
-        # if otype in [StringType(), IntType(), BoolType()]:
-        #     self.register_instruction(cil.StaticCallNode(otype.name, node.id, result, args_node, rtype.name))
-        # else:
-        #     self.register_instruction(cil.DynamicCallNode(otype.name, obj, node.id, result, args_node, rtype.name))
-        # return result, self._return_type(otype, node)
-
-        return
+        dynamic_type = node.instance.computed_type.name
+        self.register_instruction(cil.VCallNode(result_local, node.method, member_call_args, dynamic_type, expr_value))
+        
+        return result_local
 
     @visitor.when(IfNode)
     def visit(self, node, scope):
@@ -178,6 +182,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.AssignNode(result, expr))
         self.register_instruction(cil.GoToNode(start_label.label))
         self.register_instruction(end_label)
+
+        return result, ObjectType()
         
     @visitor.when(BlockNode)
     def visit(self, node, scope):
@@ -220,11 +226,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(end_label)
         return result, typex
 
+#this find_local, find_attribute is from scope, this get_type is separate, need to do it well
     visitor.when(VarNode)
     def visit(self, node, scope):
         try:
             typex = scope.find_local(node.lex).type
-            name = self.to_var_name(node.lex)
+            name = self.to_variable_name(node.lex)
             return name, get_type(typex, self.current_type)
         except:
             var_info = scope.find_attribute(node.lex)
@@ -243,6 +250,16 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.CallNode(typex.name, typex.name, instance, [cil.ArgNode(instance)], typex.name))
         
         return instance, typex
+
+    @visitor.when(NegationNode)
+    def visit(self, node, scope):
+        return self._define_unary_node(node, scope, cil.NotNode)
+
+    @visitor.when(IsVoidNode)
+    def visit(self, node, scope):
+        expr, _ = self.visit(node.expr, scope)
+        result = self.check_void(expr)
+        return result, BoolType()
 
     @visitor.when(PlusNode)
     def visit(self, node, scope):
@@ -271,6 +288,4 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(EqualNode)
     def visit(self, node, scope):
         return self._define_binary_node(node, scope, cil.EqualNode)
-
-#nuevo cambio
 
