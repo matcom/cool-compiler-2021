@@ -255,7 +255,8 @@ class ErrorNode(InstructionNode):
         self.data = data
 
 class VoidNode(InstructionNode):
-    pass
+    def __str__(self):
+        return 'VOID'
 
 class NameNode(InstructionNode):
     def __init__(self, dest, value, line, column):
@@ -280,14 +281,23 @@ class VarNode(InstructionNode):
         super().__init__(line, column)
         self.name = name
 
+    def __str__(self):
+        return f'{self.name}'
+
 class AttributeNode(VarNode):
     def __init__(self, name, type, line, column):
         super().__init__(name, line, column)
         self.type = type
 
+    def __str__(self):
+        return f'{self.type}.{self.name}'
+
 class ParamNode(VarNode):
     def __init__(self, name, line, column):
         super().__init__(name, line, column)
+
+    def __str__(self):
+        return f'PARAM {self.name}'
 
 def get_formatter():
 
@@ -330,10 +340,6 @@ def get_formatter():
         @visitor.when(LocalNode)
         def visit(self, node):
             return f'LOCAL {node.name}'
-
-        @visitor.when(AttributeNode)
-        def visit(self, node):
-            return f'ATTRIBUTE {node.name}'
 
         @visitor.when(AssignNode)
         def visit(self, node):
@@ -482,6 +488,19 @@ def get_formatter():
         @visitor.when(NotNode)
         def visit(self, node: NotNode):
             return f'{node.dest} = NOT {node.value}'
+
+        @visitor.when(VarNode)
+        def visit(self, node: VarNode):
+            return f'{node.name}'
+
+        @visitor.when(AttributeNode)
+        def visit(self, node: AttributeNode):
+            return f'ATTRIBUTE {node.type}.{node.name}'
+
+        @visitor.when(ParamNode)
+        def visit(self, node: ParamNode):
+            return f'{node.name}'
+
 
     printer = PrintVisitor()
     return (lambda ast: printer.visit(ast))

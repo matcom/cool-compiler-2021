@@ -114,8 +114,22 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.visit(node.expression, scope.childs[0])
             self.register_instruction(cil.AssignNode(variable, node.expression.ret_expr,
                                                      line=node.expression.line, column=node.expression.column))
-        else:
-            self.register_instruction(cil.AllocateNode(node.type.lex, variable, line=node.line, column=node.column))
+        elif node.type.lex in self.value_types:
+            if node.type.lex == 'SELF_TYPE':
+                stype = self.current_type.name
+            else:
+                stype = node.type.lex
+
+            if stype == 'Int':
+                self.register_instruction(cil.ArgNode(0, line=node.type.line, column=node.type.column))
+            elif stype == 'Bool':
+                self.register_instruction(cil.ArgNode(0, line=node.type.line, column=node.type.column))
+            elif stype == 'String':
+                data = self.emptystring_data
+                self.register_instruction(cil.LoadNode(variable, data, line=node.line, column=node.column))
+                self.register_instruction(cil.ArgNode(variable, line=node.line, column=node.column))
+            self.register_instruction(cil.StaticCallNode(self.init_name(stype), variable,
+                                                         line=node.line, column=node.column))
         node.ret_expr = variable
 
     @visitor.when(cool.FuncDeclarationNode)
@@ -209,7 +223,20 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 self.visit(expr, child)
                 self.register_instruction(cil.AssignNode(variable, expr.ret_expr, line=expr.line, column=expr.column))
             elif type.lex in self.value_types:
-                self.register_instruction(cil.AllocateNode(type.lex, variable, line=type.line, column=type.column))
+                if type.lex == 'SELF_TYPE':
+                    stype = self.current_type.name
+                else:
+                    stype = type.lex
+                if stype == 'Int':
+                    self.register_instruction(cil.ArgNode(0, line=node.line, column=node.column))
+                elif stype == 'Bool':
+                    self.register_instruction(cil.ArgNode(0, line=node.line, column=node.column))
+                elif stype == 'String':
+                    data = self.emptystring_data
+                    self.register_instruction(cil.LoadNode(variable, data, line=node.line, column=node.column))
+                    self.register_instruction(cil.ArgNode(variable, line=node.line, column=node.column))
+                self.register_instruction(cil.StaticCallNode(self.init_name(stype), variable,
+                                                             line=node.line, column=node.column))
 
         self.visit(node.in_body, scope.childs[-1])
         node.ret_expr = node.in_body.ret_expr
@@ -560,35 +587,32 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # TODO: Creo que deberia annadir los parametros al reves para luego sacarlos en el orden correcto
         self.register_instruction(cil.ArgNode(self.vself.name, line=node.line, column=node.column))
         for arg in args: self.register_instruction(arg)
+        self.register_instruction(cil.ArgNode(self.vself.name, line=node.line, column=node.column))
 
         stype = self.current_type.name
-        self.register_instruction(cil.StaticCallNode(self.types_map[stype].methods[node.id.lex], ret, line=node.id.line, column=node.id.column))
+        self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.id.lex], ret, line=node.id.line, column=node.id.column))
         node.ret_expr = ret
 
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope: Scope):
         ret = self.define_internal_local(line=node.line, column=node.column)
 
-        if node.type == 'SELF_TYPE':
-            variable = self.define_internal_local(line=node.line, column=node.column)
-            self.register_instruction(cil.TypeOfNode(ret, self.vself.name, line=node.line, column=node.column))
-            # TODO: ALLOCATE a veces recibe el nombre de la clase como string, necesito cambiar este ya
-            #  que el nombre de la clase se encuentra dentro de la variable, o cambiar los demas para
-            #  que funcionen con self.register_instruction(cil.LoadNode(variable, data))
-            self.register_instruction(cil.AllocateNode(variable, ret, line=node.line, column=node.column))
+        if node.type.lex == 'SELF_TYPE':
+            stype = self.current_type.name
         else:
-            if node.type == 'Int':
-                self.register_instruction(cil.ArgNode(0, line=node.type.line, column=node.type.column))
-            elif node.type == 'Bool':
-                self.register_instruction(cil.ArgNode(False, line=node.type.line, column=node.type.column))
-            elif node.type == 'String':
-                data = self.emptystring_data
-                variable = self.define_internal_local(line=node.line, column=node.column)
-                self.register_instruction(cil.LoadNode(variable, data, line=node.line, column=node.column))
-                self.register_instruction(cil.ArgNode(variable, line=node.line, column=node.column))
+            stype = node.type.lex
 
-            self.register_instruction(cil.StaticCallNode(self.init_name(node.type.lex), ret,
-                                                         line=node.type.line, column=node.type.column))
+        if stype == 'Int':
+            self.register_instruction(cil.ArgNode(0, line=node.type.line, column=node.type.column))
+        elif stype == 'Bool':
+            self.register_instruction(cil.ArgNode(0, line=node.type.line, column=node.type.column))
+        elif stype == 'String':
+            data = self.emptystring_data
+            variable = self.define_internal_local(line=node.line, column=node.column)
+            self.register_instruction(cil.LoadNode(variable, data, line=node.line, column=node.column))
+            self.register_instruction(cil.ArgNode(variable, line=node.line, column=node.column))
+        self.register_instruction(cil.StaticCallNode(self.init_name(stype), ret,
+                                                     line=node.type.line, column=node.type.column))
         node.ret_expr = ret
 
     @visitor.when(cool.IdNode)
