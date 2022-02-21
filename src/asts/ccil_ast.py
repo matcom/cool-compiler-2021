@@ -14,25 +14,71 @@ class Node:
         return (self.line, self.col)
 
 
+class CCILProgram:
+    """Top level class that represents a CCIL program"""
+
+    def __init__(
+        self,
+        types_section: List[ClassNode],
+        code_section: List[FunctionNode],
+        data_section,  # no idea what will be this the node,
+    ) -> None:
+        self.types_section = types_section  # class/types declaration with  methods ( method signature is optional ) and attributes
+        self.code_section = code_section  # functions
+        self.data_section = data_section  # static data like strings or literal numbers
+
+
 class ClassNode(Node):
+    """
+    This node represents the .types section in CCIL
+    """
+
     def __init__(
         self,
         node,
+        idx: str,
         attributes: List[Attribute],
-        methods: List[Method],
-        init_operations: List[OperationNode],
+        methods: List[MethodNode],
+        init_operations: FunctionNode,
     ) -> None:
         super().__init__(node)
+        self.id = idx
         self.attributes = attributes
         self.methods = methods
         self.init_operations = init_operations
 
 
 class MethodNode(Node):
-    def __init__(self, node, idx: str, operations: List[OperationNode]) -> None:
+    """
+    This node represents a method of a class
+    """
+
+    def __init__(
+        self, node, idx: str, function: str, operations: List[OperationNode]
+    ) -> None:
         super().__init__(node)
-        self.id = idx
+        self.id = idx  # name of method
+        self.function = function  # function that implement this method
+
+
+class FunctionNode(Node):
+    """
+    This class represents funtions in the .code section. This functions are the real implementetion of every class method
+    """
+
+    def __init__(
+        self,
+        node,
+        idx: str,
+        params: List[ParamNode],
+        operations: List[OperationNode],
+        ret,
+    ) -> None:
+        super().__init__(node)
+        self.id = idx  # identifier for the function ( not the same as the methods it represents )
+        self.params = params
         self.operations = operations
+        self.ret = ret  # not sure if useful yet
 
 
 class OperationNode(Node):
