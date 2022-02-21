@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple
 from __future__ import annotations
+from code_gen.tools import Attribute, Method
 
 from semantics.tools.type import Type
 
@@ -14,7 +15,21 @@ class Node:
 
 
 class ClassNode(Node):
-    def __init__(self, node) -> None:
+    def __init__(
+        self,
+        node,
+        attributes: List[Attribute],
+        methods: List[Method],
+        init_operations: List[OperationNode],
+    ) -> None:
+        super().__init__(node)
+        self.attributes = attributes
+        self.methods = methods
+        self.init_operations = init_operations
+
+
+class MethodNode(Node):
+    def __init__(self, node, idx: str, operations: List[OperationNode]) -> None:
         super().__init__(node)
 
 
