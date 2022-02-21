@@ -118,6 +118,93 @@ class TypeChecker:
                 errorText, assignNode.line, assignNode.col))
         return typex
 
+    @visitor.when(ArrobaCallNode)
+    def visit(self, arrobaCallNode, scope):
+        objType = self.visit(arrobaCallNode.obj, scope)
+        typex = self._get_type(
+            arrobaCallNode.type, (arrobaCallNode.typeLine, arrobaCallNode.typeCol))
+
+        if not objType.conforms_to(typex):
+            errorText = f'Expression type {typex.name} does not conform to declared static dispatch type {objType.name}.'
+            self.errors.append(TypexError(
+                errorText, arrobaCallNode.typeLine, arrobaCallNode.typeCol))
+            return ErrorType()
+
+        method = self._get_method(
+            typex, arrobaCallNode.id, (arrobaCallNode.line, arrobaCallNode.col))
+        if not isinstance(method, MethodError):
+            # check the args
+            argTypes = [self.visit(arg, scope) for arg in arrobaCallNode.args]
+
+            if len(argTypes) > len(method.param_types):
+                errorText = f'Method {method.name} called with wrong number of arguments.'
+                self.errors.append(SemanticError(
+                    errorText, arrobaCallNode.line, arrobaCallNode.col))
+            elif len(argTypes) < len(method.param_types):
+                for arg, argInfo in zip(method.param_names[len(argTypes):], arrobaCallNode.args[len(argTypes):]):
+                    errorText = f'Method {method.name} called with wrong number of arguments.'
+                    self.errors.append(SemanticError(errorText, *argInfo.pos))
+
+            for argType, paramType, paramName in zip(argTypes, method.param_types, method.param_names):
+                if not argType.conforms_to(paramType):
+                    errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
+                    self.errors.append(TypexError(
+                        errorText, arrobaCallNode.line, arrobaCallNode.col))
+
+        return get_type(method.return_type, typex)
+
+    @visitor.when(DotCallNode)
+    def visit(self, dotCallNode, scope):
+        objType = self.visit(dotCallNode.obj, scope)
+        method = self._get_method(
+            objType, dotCallNode.id, (dotCallNode.line, dotCallNode.col))
+        if not isinstance(method, MethodError):
+            # check the args
+            argTypes = [self.visit(arg, scope) for arg in dotCallNode.args]
+
+            if len(argTypes) > len(method.param_types):
+                errorText = f'Method {method.name} called with wrong number of arguments.'
+                self.errors.append(SemanticError(
+                    errorText, dotCallNode.line, dotCallNode.col))
+            elif len(argTypes) < len(method.param_types):
+                for arg, argInfo in zip(method.param_names[len(argTypes):], dotCallNode.args[len(argTypes):]):
+                    errorText = f'Method {method.name} called with wrong number of arguments.'
+                    self.errors.append(SemanticError(errorText, *argInfo.pos))
+
+            for argType, paramType, paramName in zip(argTypes, method.param_types, method.param_names):
+                if not argType.conforms_to(paramType):
+                    errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
+                    self.errors.append(TypexError(
+                        errorText, dotCallNode.line, dotCallNode.col))
+
+        return get_type(method.return_type, objType)
+
+    @visitor.when(MemberCallNode)
+    def visit(self, memberCallNode, scope):
+        typex = self.currentType
+        method = self._get_method(
+            typex, memberCallNode.id, (memberCallNode.line, memberCallNode.col))
+        if not isinstance(method, MethodError):
+            # check the args
+            argTypes = [self.visit(arg, scope) for arg in memberCallNode.args]
+
+            if len(argTypes) > len(method.param_types):
+                errorText = f'Method {method.name} called with wrong number of arguments.'
+                self.errors.append(SemanticError(
+                    errorText, memberCallNode.line, memberCallNode.col))
+            elif len(argTypes) < len(method.param_types):
+                for arg, argInfo in zip(method.param_names[len(argTypes):], memberCallNode.args[len(argTypes):]):
+                    errorText = f'Method {method.name} called with wrong number of arguments.'
+                    self.errors.append(SemanticError(errorText, *argInfo.pos))
+
+            for argType, paramType, paramName in zip(argTypes, method.param_types, method.param_names):
+                if not argType.conforms_to(paramType):
+                    errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
+                    self.errors.append(TypexError(
+                        errorText, memberCallNode.line, memberCallNode.col))
+
+        return get_type(method.return_type, typex)
+
     def _get_type(self, ntype, pos):
         try:
             return self.context.get_type(ntype, pos)
