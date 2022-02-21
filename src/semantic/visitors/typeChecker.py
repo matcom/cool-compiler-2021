@@ -1,5 +1,7 @@
 from distutils.log import error
-from semantic.semantic import AutoType, ErrorType, MethodError
+
+from click import option
+from semantic.semantic import AutoType, ErrorType, MethodError, ObjectType
 from utils.errors import AttributexError, SemanticError, TypexError
 from utils import visitor
 from utils.utils import get_type, get_common_basetype
@@ -204,6 +206,67 @@ class TypeChecker:
                         errorText, memberCallNode.line, memberCallNode.col))
 
         return get_type(method.return_type, typex)
+
+    @visitor.when(IfThenElseNode)
+    def visit(self, ifThenElseNode, scope):
+        conditionType = self.visit(ifThenElseNode.condition, scope)
+        if conditionType.name != 'Bool':
+            errorText = f'Predicate of \'if\' does not have type Bool.'
+            self.errors.append(TypexError(
+                errorText, ifThenElseNode.line, ifThenElseNode.col))
+
+        ifBodyType = self.visit(ifThenElseNode.idBody, scope)
+        elseBodyType = self.visit(ifThenElseNode.elseBody, scope)
+        return get_common_basetype([ifBodyType, elseBodyType])
+
+    @visitor.when(WhileNode)
+    def visit(self, whileNode, scope):
+        conditionType = self.visit(whileNode.condition, scope)
+        if conditionType.name != 'Bool':
+            errorText = 'Loop condition does not have type Bool.'
+            self.errors.append(TypexError(
+                errorText, whileNode.line, whileNode.col))
+        self.visit(whileNode.expr, scope)
+        return ObjectType()
+
+
+    @visitor.when(BlockNode)
+    def visit(self, blockNode, scope):
+        typex = None
+        for expr in blockNode.exprs:
+            typex = self.visit(expr, scope)
+        return typex
+    
+    @visitor.when(LetInNode)
+    def visit(self, letInNode, scope):
+        childScope = scope.expr_dict[letInNode]
+        for letDeclaration in letInNode.letBody:
+            self.visit(letDeclaration, childScope)
+        return self.visit(letInNode.inBody, childScope)
+
+    @visitor.when(CaseNode)
+    def visit(self, caseNode, scope):
+        exprType = self.visit(caseNode.expr, scope)
+        newScope = scope.expr_dict[caseNode]
+        types = []
+        checkDuplicate = []
+        for option, optionScope in zip(caseNode.optionList, newScope.children):
+            optionType = self.visit(option, optionScope)
+            types.append(optionType)
+            if option.type in checkDuplicate:
+                errorText = f'Duplicate branch {option.type} in case statement.'
+                self.errors.append(SemanticError(errorText, option.typeLine, option.typeCol))
+            checkDuplicate.append(option.type)
+        return get_common_basetype(types)
+
+    @visitor.when(CaseOptionNode)
+    def visit(self, caseOptionNode, scope):
+        optionType = self.visit(caseOptionNode.expr, scope)
+        return optionType
+
+
+
+
 
     def _get_type(self, ntype, pos):
         try:
