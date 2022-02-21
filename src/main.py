@@ -47,7 +47,7 @@ def main(_input, _output):
     # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":
 
-    path = '/home/cwjki/Projects/cool-compiler-2021/tests/parser/case2.cl'
+    path = '/home/cwjki/Projects/cool-compiler-2021/tests/lexer/comment1.cl'
     _input = sys.argv[1] if len(sys.argv) > 1 else path
     _output = sys.argv[2] if len(sys.argv) > 2 else None
 
