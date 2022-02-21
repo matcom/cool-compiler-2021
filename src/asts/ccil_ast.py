@@ -31,6 +31,8 @@ class ClassNode(Node):
 class MethodNode(Node):
     def __init__(self, node, idx: str, operations: List[OperationNode]) -> None:
         super().__init__(node)
+        self.id = idx
+        self.operations = operations
 
 
 class OperationNode(Node):
