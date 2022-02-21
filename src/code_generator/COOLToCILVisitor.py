@@ -106,7 +106,24 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.AssignNode(local_name, value))
         return value, typex
 
-    @visitor.when(FuncCallNode)
+    @visitor.when(ArrobaCallNode)
+    def visit(self, node, scope):
+        result_local = self.define_internal_local(scope = scope, name = "result")
+        expr_value = self.visit(node.instance, scope)
+
+        func_call_args = []
+        for arg in node.args:
+            param_local = self.visit(arg, scope)
+            func_call_args.append(cil.ArgNode(param_local))
+        func_call_args.append(cil.ArgNode(expr_value))
+
+        static_instance = self.define_internal_local(scope=scope, name='static_instance')
+        self.register_instruction(cil.AllocateNode(node.static_type,self.context.get_type(node.static_type).tag ,static_instance))
+        
+        self.register_instruction(cil.VCallNode(result_local, node.method, func_call_args, node.static_type, static_instance))
+        return result_local
+
+    @visitor.when(DotCallNode)
     def visit(self, node, scope):
         result_local = self.define_internal_local(scope = scope, name = "result")
         expr_value = self.visit(node.instance, scope)
