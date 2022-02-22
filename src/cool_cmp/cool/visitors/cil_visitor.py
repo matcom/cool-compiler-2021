@@ -897,7 +897,7 @@ class COOLToCILVisitor():
         for declaration, child_scope in zip(node.declarations, scope.children):
             self.visit(declaration, child_scope)
 
-        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode, node.row, node.column, "Program Start")
+        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode, node.row, node.column)
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
@@ -1442,9 +1442,12 @@ class COOLToCILVisitor():
     def visit(self, node, scope=None):
         return self.visit(node.cil_node_type(row=node.row, column=node.column), scope)
 
+
+
     # META INSTRUCTIONS ONLY USED IN CODE
     # TRANSLATION THAT DOESN'T BELONG TO CIL'S
     # INSTRUCTION SET
+
     @visitor.when(cil.ObjectCopyNode)
     def visit(self, node, scope=None):
         instance = self.params[0]
@@ -1480,7 +1483,6 @@ class COOLToCILVisitor():
         self.register_instruction(cil.LengthNode(result, string.name, node.row, node.column, "String Length Node"))
         return result
         
-    
     @visitor.when(cil.StringSubstringNode)
     def visit(self, node, scope=None):
         string = self.params[0]

@@ -28,12 +28,12 @@ class MIPSPrintVisitor():
     @visitor.when(ProgramNode)
     def visit(self, node:ProgramNode):
         self.add_comments(node)
-        self.add_line(".text")
+        self.add_line(".text ")
         for n in node.instructions:
             self.add_comments(n)
             instr = self.visit(n)
             self.add_line(instr)
-        self.add_line(".data")
+        self.add_line(".data ")
         for n in node.data:
             self.add_comments(n)
             instr = self.visit(n)
@@ -252,32 +252,33 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.local_variable_offset = {} # Maps CIL local variable frame pointer offset 
         self.type_method_dict_list = {} # Maps Type name to list of tuple(COOL Name, CIL Name)
  
-    def _push(self, registers: List[str]):
+    def _push(self, registers: List[str],row=None,column = None, comment= None):
         """
         Push the registers in order into the stack
         """
-        self._allocate_stack_space(4*len(registers))
+        self._allocate_stack_space(4*len(registers), row, column, comment)
         for i,reg in enumerate(registers):
-            self.add_instruction(StoreWordNode(reg, i*4, Reg.sp()))
+            self.add_instruction(StoreWordNode(reg, i*4, Reg.sp(), row=row, column=column, comment=comment))
 
-    def _pop(self, registers: List[str]):
+    def _pop(self, registers: List[str],row=None,column = None, comment= None):
         """
         Pop the registers in order from the stack
         """
         for i,reg in enumerate(registers):
-            self.add_instruction(LoadWordNode(reg, i*4, Reg.sp()))
-        self._deallocate_stack_space(4*len(registers))
+            self.add_instruction(LoadWordNode(
+                reg, i*4, Reg.sp(), row, column, comment))
+        self._deallocate_stack_space(4*len(registers), row, column, comment)
     
-    def _allocate_stack_space(self, bytes_amount: int):
-        self.add_instruction(AddImmediateNode(Reg.sp(), Reg.sp(), -bytes_amount))
+    def _allocate_stack_space(self, bytes_amount: int, row=None, column=None, comment=None):
+        self.add_instruction(AddImmediateNode(Reg.sp(), Reg.sp(), -bytes_amount, row, column, comment))
 
-    def _deallocate_stack_space(self, bytes_amount: int):
-        self.add_instruction(AddImmediateNode(Reg.sp(), Reg.sp(), bytes_amount))
+    def _deallocate_stack_space(self, bytes_amount: int, row=None, column=None, comment=None):
+        self.add_instruction(AddImmediateNode(Reg.sp(), Reg.sp(), bytes_amount, row, column, comment))
 
-    def _load_local_variable(self, dest, name):
-        self.add_instruction(LoadWordNode(dest, self.local_variable_offset[name], Reg.fp())) # Stack address for local variable
+    def _load_local_variable(self, dest, name, row=None, column=None, comment=None):
+        self.add_instruction(LoadWordNode(dest, self.local_variable_offset[name], Reg.fp(),row,column,comment)) # Stack address for local variable
 
-    def _load_type_variable(self, dest, name):
+    def _load_type_variable(self, dest, name, row=None, column=None, comment=None):
         """
         Store into dest the type address of name.
 
@@ -291,30 +292,30 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         if isinstance(name, cil.TypeNode):
             name = name.name
         if name[0].isupper():
-            self.add_instruction(LoadAddressNode(dest, name))
+            self.add_instruction(LoadAddressNode(dest, name,row,column,comment))
         else:
-            self._load_local_variable(dest, name)
+            self._load_local_variable(dest, name, row, column, comment)
 
-    def _store_local_variable(self, source, name_or_value):
+    def _store_local_variable(self, source, name_or_value, row=None, column=None, comment=None):
         try:
             # Int literal
             int_value = int(name_or_value)
-            self.add_instruction(AddImmediateNode(source, Reg.zero(), int_value))
+            self.add_instruction(AddImmediateNode(source, Reg.zero(), int_value, row, column, comment))
         except ValueError:
             # Variable
-            self.add_instruction(StoreWordNode(source, self.local_variable_offset[name_or_value], Reg.fp())) # Stores allocated memory address in destination variable
+            self.add_instruction(StoreWordNode(source, self.local_variable_offset[name_or_value], Reg.fp(),row,column,comment)) # Stores allocated memory address in destination variable
 
-    def _call_with_register(self, register):
-        self.add_instruction(JumpRegisterNode(register))
+    def _call_with_register(self, register, row=None, column=None, comment=None):
+        self.add_instruction(JumpRegisterNode(register, row, column, comment))
     
-    def _add_abort_instructions(self):
+    def _add_abort_instructions(self, row=None, column=None, comment=None):
         """
         Add the abort instructions 
         """
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 10)) # 10 System call code for abort
-        self.add_instruction(SyscallNode())
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 10,row,column,comment)) # 10 System call code for abort
+        self.add_instruction(SyscallNode(row, column, comment))
 
-    def _add_copy_string_cycle(self, label_prefix, length_reg, string_source, string_dest, temp_reg, add_null=True):
+    def _add_copy_string_cycle(self, label_prefix, length_reg, string_source, string_dest, temp_reg, add_null=True, row=None, column=None, comment=None):
         """
         Adds the instructions required to copy the string in string_source to string_dest
         using temp_reg to store the individual char values. The length to copy is stored in length_reg.
@@ -322,243 +323,266 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         
         start_loop = label_prefix + "_start_copy"
         end_loop = label_prefix + "_end_copy"
-        self.add_instruction(LabelNode(start_loop))
-        self.add_instruction(BranchLessEqualNode(length_reg, Reg.zero(), end_loop)) # if length <= 0 then end loop, missing null
+        self.add_instruction(LabelNode(start_loop, row, column, comment))
+        self.add_instruction(BranchLessEqualNode(length_reg, Reg.zero(), end_loop,row,column,comment)) # if length <= 0 then end loop, missing null
         
-        self.add_instruction(LoadByteNode(temp_reg, 0, string_source)) # t3 = char to copy
-        self.add_instruction(StoreByteNode(temp_reg, 0, string_dest)) # copy char to corresponding address position 
-        self.add_instruction(AddImmediateNode(string_source, string_source, 1)) # Next original string address 
-        self.add_instruction(AddImmediateNode(string_dest, string_dest, 1)) # Next copy string address
+        self.add_instruction(LoadByteNode(temp_reg, 0, string_source,row,column,comment)) # t3 = char to copy
+        self.add_instruction(StoreByteNode(temp_reg, 0, string_dest,row,column,comment)) # copy char to corresponding address position 
+        self.add_instruction(AddImmediateNode(string_source, string_source, 1,row,column,comment)) # Next original string address 
+        self.add_instruction(AddImmediateNode(string_dest, string_dest, 1,row,column,comment)) # Next copy string address
 
-        self.add_instruction(AddImmediateNode(length_reg, length_reg, -1)) # Decrease amount
-        self.add_instruction(JumpNode(start_loop))
+        self.add_instruction(AddImmediateNode(
+            length_reg, length_reg, -1, row, column, comment))  # Decrease amount
+        self.add_instruction(JumpNode(start_loop, row, column, comment))
 
-        self.add_instruction(LabelNode(end_loop))
+        self.add_instruction(LabelNode(end_loop, row, column, comment))
         
         if add_null:
-            self.add_instruction(StoreByteNode(Reg.zero(), 0, string_dest)) # Final null character
+            self.add_instruction(StoreByteNode(
+                Reg.zero(), 0, string_dest, row, column, comment))  # Final null character
 
-    def _add_create_string_instance(self, temp_reg, string_address):
+    def _add_create_string_instance(self, temp_reg, string_address, row=None, column=None, comment=None):
         """
         Returns in $v0 the new instance of String,Address.
         Uses $a0, $v0
         """
-        self.add_instruction(LoadAddressNode(temp_reg, "String")) # Type address into $a0
-        self.add_instruction(LoadImmediateNode(Reg.a(0), self.WORD_SIZE * 2)) # If String the is type and address
-        self._allocate_heap_space(Reg.a(0))
+        self.add_instruction(LoadAddressNode(temp_reg, "String", row, column, "Type address into $a0")) # Type address into $a0
+        self.add_instruction(LoadImmediateNode(Reg.a(0), self.WORD_SIZE * 2, row, column, "If String the is type and address")) # If String the is type and address
+        self._allocate_heap_space(Reg.a(0), row, column)
 
-        self.add_instruction(StoreWordNode(temp_reg, 0, Reg.v(0))) # Store String Type
-        self.add_instruction(StoreWordNode(string_address, self.WORD_SIZE, Reg.v(0))) # Store String Address
+        self.add_instruction(StoreWordNode(temp_reg, 0, Reg.v(0), row, column, "Store String Type")) # Store String Type
+        self.add_instruction(StoreWordNode(string_address, self.WORD_SIZE, Reg.v(0), row, column, "Store String Address")) # Store String Address
         
 
-    def _add_copy_function(self):
+    def _add_copy_function(self,row=None, column = None, comment=None):
         """
         Function that copies the instance passed in $a0 and returns the copy address
         in $v0 
         """
         
-        self.add_instruction(LabelNode("__copy"))
+        self.add_instruction(
+            LabelNode("__copy", row, column, comment))
         
-        self.add_instruction(MoveNode(Reg.t(0), Reg.a(0))) # t0 = object address
-        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(0))) # t1 = instance type dir
-        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.t(1))) # a0 = instance size
-        self._allocate_heap_space(Reg.a(0)) # v0 = allocated space
+        self.add_instruction(MoveNode(Reg.t(0), Reg.a(0),row,column,comment)) # t0 = object address
+        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(0),row,column,comment)) # t1 = instance type dir
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.t(1),row,column,comment)) # a0 = instance size
+        self._allocate_heap_space(Reg.a(0),row,column,comment) # v0 = allocated space
         
         start_label_name = "__start_copy_loop"
         end_label_name = "__end_copy_loop"
         
-        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = instance size
-        self.add_instruction(ShiftRightNode(Reg.t(1), Reg.t(1), 2)) # t1 = bytes amount = instance size / 4
-        self.add_instruction(MoveNode(Reg.t(3), Reg.v(0))) # t3 = new object memory address
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0),row,column,comment)) # t1 = instance size
+        # t1 = bytes amount = instance size / 4
+        self.add_instruction(ShiftRightNode(
+            Reg.t(1), Reg.t(1), 2, row, column, comment))
+        # t3 = new object memory address
+        self.add_instruction(
+            MoveNode(Reg.t(3), Reg.v(0), row, column, comment))
         
-        self.add_instruction(LabelNode(start_label_name))
-        self.add_instruction(BranchLessEqualNode(Reg.t(1), Reg.zero(), end_label_name)) # End cycle condition
+        self.add_instruction(LabelNode(start_label_name,row,column,comment))
+        self.add_instruction(BranchLessEqualNode(Reg.t(1), Reg.zero(), end_label_name,row,column,comment)) # End cycle condition
         
-        self.add_instruction(LoadWordNode(Reg.t(2), 0, Reg.t(0))) # Get value from original object
-        self.add_instruction(StoreWordNode(Reg.t(2), 0, Reg.t(3))) # Set value copied value into the new object
-        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), 4)) # Next position old object
-        self.add_instruction(AddImmediateNode(Reg.t(3), Reg.t(3), 4)) # Next position new object
-        self.add_instruction(AddImmediateNode(Reg.t(1), Reg.t(1), -1)) # Copy amount -= 1
+        # Get value from original object
+        self.add_instruction(LoadWordNode(
+            Reg.t(2), 0, Reg.t(0), row, column, comment))
+        self.add_instruction(StoreWordNode(Reg.t(2), 0, Reg.t(3),row,column,comment)) # Set value copied value into the new object
+        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), 4,row,column,comment)) # Next position old object
+        self.add_instruction(AddImmediateNode(Reg.t(3), Reg.t(3), 4,row,column,comment)) # Next position new object
+        self.add_instruction(AddImmediateNode(Reg.t(1), Reg.t(1), -1,row,column,comment)) # Copy amount -= 1
         
-        self.add_instruction(JumpNode(start_label_name))
-        self.add_instruction(LabelNode(end_label_name))
+        self.add_instruction(JumpNode(start_label_name,row,column,comment))
+        self.add_instruction(LabelNode(end_label_name, row, column, comment))
         
-        self.add_instruction(JumpRegisterNode(Reg.ra())) # In v0 is the new object address
+        # In v0 is the new object address
+        self.add_instruction(JumpRegisterNode(Reg.ra(), row, column, comment))
     
-    def _add_length_function(self):
+    def _add_length_function(self,row=None, column = None, comment=None):
         """
         Function that returns in $v0 the length of the string passed in $a0
         """
-        self.add_instruction(LabelNode("__string_length"))
+        self.add_instruction(LabelNode("__string_length",row,column,comment))
 
-        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Actual String address
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
 
-        self.add_instruction(LoadImmediateNode(Reg.v(0), 0)) # v0 = current length
+        self.add_instruction(LoadImmediateNode(Reg.v(0), 0, row, column, "v0 = current length")) # v0 = current length
         start_loop = "__string_length_start_loop"
         end_loop = "__string_length_end_loop"
-        self.add_instruction(LabelNode(start_loop))
-        self.add_instruction(LoadByteNode(Reg.t(0), 0, Reg.a(0))) # Load current char
+        self.add_instruction(LabelNode(start_loop, row, column, comment))
+        self.add_instruction(LoadByteNode(Reg.t(0), 0, Reg.a(0),row,column,comment)) # Load current char
         
-        self.add_instruction(BranchEqualNode(Reg.t(0), Reg.zero(), end_loop)) # Is null char? end
+        self.add_instruction(BranchEqualNode(Reg.t(0), Reg.zero(), end_loop,row,column,comment)) # Is null char? end
 
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.v(0), 1)) # Increment length
-        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(0), 1)) # Next char
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.v(0), 1,row,column,comment)) # Increment length
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(0), 1,row,column,comment)) # Next char
 
-        self.add_instruction(JumpNode(start_loop))
-        self.add_instruction(LabelNode(end_loop))
+        self.add_instruction(JumpNode(start_loop,row,column,comment))
+        self.add_instruction(LabelNode(end_loop,row,column,comment))
 
-        self.add_instruction(JumpRegisterNode(Reg.ra())) # In v0 is the string length
+        # In v0 is the string length
+        self.add_instruction(JumpRegisterNode(Reg.ra(), row, column, comment))
 
-    def _add_substring_function(self):
+    def _add_substring_function(self, row=None, column = None, comment=None):
         """
         Returns in $v0 the result of the substring of $a0 starting in index $a1 with length $a2
         """
 
-        self.add_instruction(LabelNode("__string_substring"))
-
-        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Actual String address
+        self.add_instruction(LabelNode("__string_substring",row,column,comment))
 
         saved_register = [Reg.a(0), Reg.a(1), Reg.a(2), Reg.ra()]
-        self._push(saved_register) # Save arguments
-        self.add_instruction(JumpAndLinkNode("__string_length"))
+        self._push(saved_register, row, column, "Save arguments")  # Save arguments
+        self.add_instruction(JumpAndLinkNode("__string_length",row,column,"$v0 = length of string"))
         # $v0 = length of string
-        self._pop(saved_register) # Restore arguments
+        self._pop(saved_register,row,column,"Restore arguments") # Restore arguments
+
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
 
         abort_label = "__string_substring_abort"
 
         # If index >= length(string) then abort
-        self.add_instruction(BranchGreaterEqualNode(Reg.a(1), Reg.v(0), abort_label))
+        self.add_instruction(BranchGreaterEqualNode(Reg.a(1), Reg.v(0), abort_label,row,column, "If index >= length(string) then abort"))
 
-        self.add_instruction(AddNode(Reg.t(0), Reg.a(1), Reg.a(2))) # t0 = index + length
+        self.add_instruction(AddNode(Reg.t(0), Reg.a(1), Reg.a(2),row,column, "t0 = index + length")) # t0 = index + length
         # If index + length >= length(string) then abort
-        self.add_instruction(BranchGreaterNode(Reg.t(0), Reg.v(0), abort_label))
+        self.add_instruction(BranchGreaterNode(Reg.t(0), Reg.v(0), abort_label,row,column, "If index + length >= length(string) then abort"))
         
         # If 0 < 0 then abort
-        self.add_instruction(BranchLessNode(Reg.a(2), Reg.zero(), abort_label))
+        self.add_instruction(BranchLessNode(Reg.a(2), Reg.zero(), abort_label,row,column, "If 0 < 0 then abort"))
 
         # Here the operation can be safetly made
-        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # Saving the string address
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0),row,column, "Saving the string address")) # Saving the string address
 
-        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(2), 1)) # a0 = length + 1. Extra space for null character
-        self._allocate_heap_space(Reg.a(0))
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(2), 1,row,column, "a0 = length + 1. Extra space for null character")) # a0 = length + 1. Extra space for null character
+        self._allocate_heap_space(Reg.a(0),row,column,comment)
         # v0 = new String address
 
-        self.add_instruction(MoveNode(Reg.t(2), Reg.v(0))) # Saving the new string address
-        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(0), -1)) # Removing the last null space from copy
+        self.add_instruction(MoveNode(Reg.t(2), Reg.v(0),row,column, "Saving the new string address")) # Saving the new string address
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.a(0), -1,row,column, "Removing the last null space from copy")) # Removing the last null space from copy
 
-        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.a(1))) # Advance index positions in original string
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.a(1),row,column, "Advance index positions in original string")) # Advance index positions in original string
 
-        self._add_copy_string_cycle("__string_substring", Reg.a(0), Reg.t(1), Reg.t(2), Reg.t(3))
+        self._add_copy_string_cycle("__string_substring", Reg.a(0), Reg.t(1), Reg.t(2), Reg.t(3),row,column,comment)
 
-        self._add_create_string_instance(Reg.t(0), Reg.v(0))
+        self.add_instruction(MoveNode(Reg.v(1), Reg.v(0), comment="Saving String Address"))
+        self._add_create_string_instance(Reg.t(0), Reg.v(1))
 
-        self.add_instruction(JumpRegisterNode(Reg.ra())) # Return the address of the new String
+        self.add_instruction(JumpRegisterNode(Reg.ra(),row,column, "Return the address of the new String"))
 
-        self.add_instruction(LabelNode(abort_label))
-        self._add_abort_instructions()
+        self.add_instruction(LabelNode(abort_label,row,column,comment))
+        self._add_abort_instructions( row, column, comment)
 
-    def _add_type_name_function(self):
+    def _add_type_name_function(self,row=None, column = None, comment=None):
         """
         Returns in $v0 the string address of the type given in $a0
         """
-        self.add_instruction(LabelNode("__type_name"))
+
+        self.add_instruction(LabelNode("__type_name",row,column,comment))
         # $t0 = type name address
-        self.add_instruction(LoadWordNode(Reg.t(0), self.TYPE_NAME_OFFSET, Reg.a(0)))
+        self.add_instruction(LoadWordNode(Reg.t(0), self.TYPE_NAME_OFFSET, Reg.a(0), row, column, "$t0 = type name address"))
         
         self._add_create_string_instance(Reg.t(1), Reg.t(0))
         
-        self.add_instruction(JumpRegisterNode(Reg.ra())) # Return the address of the String
+        # Return the address of the String
+        self.add_instruction(JumpRegisterNode(Reg.ra(), row, column, "Return the address of the String"))
 
-    def _add_concat_function(self):
+    def _add_concat_function(self,row=None, column = None, comment=None):
         """
         Returns in $v0 the concatenation of the strings given in $a0 and $a1
         """
 
-        self.add_instruction(LabelNode("__concat"))
+        self.add_instruction(LabelNode("__concat", row, column, comment))
+        saved_register = [Reg.a(0), Reg.a(1), Reg.ra()]
+        self._push(saved_register,row,column,comment) # Save arguments
+        self.add_instruction(JumpAndLinkNode("__string_length",row,column,comment))
+        # $v0 = length of string1
+        self._pop(saved_register,row,column,comment) # Restore arguments
+        
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0),row,column,comment)) # t1 = string1
+        self.add_instruction(MoveNode(Reg.a(0), Reg.a(1),row,column,comment)) # Passing arguments to __string_length
+        # Swap ended a0,a1 = a1,a0
+        self.add_instruction(
+            MoveNode(Reg.a(1), Reg.t(1), row, column, comment))
 
+        # t0 = length of string1
+        self.add_instruction(
+            MoveNode(Reg.t(0), Reg.v(0), row, column, comment))
+
+        saved_register = [Reg.a(0), Reg.a(1), Reg.t(0), Reg.ra()]
+        self._push(saved_register,row,column,comment) # Save arguments
+        self.add_instruction(JumpAndLinkNode("__string_length",row,column,comment))
+        # $v0 = length of string2
+        self._pop(saved_register, row, column, comment )  # Restore arguments
+
+        # Returning the arguments to the correct order
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0),row,column,comment)) # t1 = string2
+        self.add_instruction(MoveNode(Reg.a(0), Reg.a(1),row,column,comment))
+        self.add_instruction(MoveNode(Reg.a(1), Reg.t(1),row,column,comment)) # Swap ended a1,a0 = a1,a0
+        
         self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Actual String address
         self.add_instruction(LoadWordNode(Reg.a(1), self.WORD_SIZE, Reg.a(1))) # Actual String address
      
-        saved_register = [Reg.a(0), Reg.a(1), Reg.ra()]
-        self._push(saved_register) # Save arguments
-        self.add_instruction(JumpAndLinkNode("__string_length"))
-        # $v0 = length of string1
-        self._pop(saved_register) # Restore arguments
-        
-        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = string1
-        self.add_instruction(MoveNode(Reg.a(0), Reg.a(1))) # Passing arguments to __string_length
-        self.add_instruction(MoveNode(Reg.a(1), Reg.t(1))) # Swap ended a0,a1 = a1,a0
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0),row,column,comment)) # t1 = string1, saving arg
 
-        self.add_instruction(MoveNode(Reg.t(0), Reg.v(0))) # t0 = length of string1
+        self.add_instruction(AddNode(Reg.t(2), Reg.v(0), Reg.t(0),row,column,comment)) # t2 = length of the concatenated string without null
+        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.t(2), 1,row,column,comment)) # a0 = length of the concatenated string with null
+        self.add_instruction(MoveNode(Reg.t(2), Reg.v(0),row,column,comment)) # t2 = length of string2
 
-        saved_register = [Reg.a(0), Reg.a(1), Reg.t(0), Reg.ra()]
-        self._push(saved_register) # Save arguments
-        self.add_instruction(JumpAndLinkNode("__string_length"))
-        # $v0 = length of string2
-        self._pop(saved_register) # Restore arguments
-
-        # Returning the arguments to the correct order
-        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = string2
-        self.add_instruction(MoveNode(Reg.a(0), Reg.a(1)))
-        self.add_instruction(MoveNode(Reg.a(1), Reg.t(1))) # Swap ended a1,a0 = a1,a0
-        
-        self.add_instruction(MoveNode(Reg.t(1), Reg.a(0))) # t1 = string1, saving arg
-
-        self.add_instruction(AddNode(Reg.t(2), Reg.v(0), Reg.t(0))) # t2 = length of the concatenated string without null
-        self.add_instruction(AddImmediateNode(Reg.a(0), Reg.t(2), 1)) # a0 = length of the concatenated string with null
-        self.add_instruction(MoveNode(Reg.t(2), Reg.v(0))) # t2 = length of string2
-
-        self._allocate_heap_space(Reg.a(0)) # Allocates the necessary space
+        # Allocates the necessary space
+        self._allocate_heap_space(Reg.a(0), row, column, comment)
         # New string address in $v0
 
-        self.add_instruction(MoveNode(Reg.v(1), Reg.v(0))) # Save string address
+        self.add_instruction(MoveNode(Reg.v(1), Reg.v(
+            0), row, column, "Save string address"))  # Save string address
 
         # Copy the string1 from a0 to v0 without the null character. Also increments the v0 address
         # up to the next character.
-        self._add_copy_string_cycle("__concat_string1_copy", Reg.t(0), Reg.t(1), Reg.v(1), Reg.t(3), add_null=False)
-        self._add_copy_string_cycle("__concat_string2_copy", Reg.t(2), Reg.a(1), Reg.v(1), Reg.t(3), add_null=True)
+        self._add_copy_string_cycle("__concat_string1_copy", Reg.t(0), Reg.t(1), Reg.v(1), Reg.t(3), add_null=False,row=row,column=column,comment=comment)
+        self._add_copy_string_cycle("__concat_string2_copy", Reg.t(2), Reg.a(1), Reg.v(1), Reg.t(3), add_null=True, row=row,column= column,comment= comment)
 
-        self._add_create_string_instance(Reg.t(0), Reg.v(0))
+        self.add_instruction(MoveNode(Reg.v(1), Reg.v(
+            0), row, column, "Save string address"))  # Save string address
 
-        self.add_instruction(JumpRegisterNode(Reg.ra()))
+        self._add_create_string_instance(Reg.t(0), Reg.v(1))
 
-    def _add_get_ra_function(self):
+        self.add_instruction(JumpRegisterNode(Reg.ra(), row, column, "Returns the concatenated string instance in v0"))
+
+    def _add_get_ra_function(self,row=None,column=None,comment=None):
         """
         Adds a function that returns in $v0 2 instructions after the caller instruction
         """
-        self.add_instruction(LabelNode("__get_ra"))
-        self.add_instruction(MoveNode(Reg.v(0), Reg.ra()))
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.v(0), 2*self.WORD_SIZE))
-        self.add_instruction(JumpRegisterNode(Reg.ra()))
+        self.add_instruction(LabelNode("__get_ra",row,column,comment))
+        self.add_instruction(MoveNode(Reg.v(0), Reg.ra(),row,column,comment))
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.v(0), 2*self.WORD_SIZE,row,column,comment))
+        self.add_instruction(JumpRegisterNode(Reg.ra(),row,column,comment))
     
-    def _load_value(self, dest1, value1):
+    def _load_value(self, dest1, value1,row=None,column=None,comment=None):
         """
         Returns in register `dest1` the value of `value1`
         """
         try:
             value = int(value1)
-            self.add_instruction(LoadImmediateNode(dest1, value))
+            self.add_instruction(LoadImmediateNode(
+                dest1, value, row, column, comment))
         except ValueError:
             try:
-                self._load_local_variable(dest1, value1)
+                self._load_local_variable(dest1, value1,row,column,comment)
             except KeyError:
-                self._load_type_variable(dest1, value1)
+                self._load_type_variable(dest1, value1, row, column, comment)
     
-    def _binary_operation(self, node: cil.ArithmeticNode, instruction_type, reg1, reg2, temp_reg):        
-        self._load_value(reg1, node.left)
-        self._load_value(reg2, node.right)
+    def _binary_operation(self, node: cil.ArithmeticNode, instruction_type, reg1, reg2, temp_reg, row=None, column=None, comment=None):        
+        self._load_value(reg1, node.left,row,column,comment)
+        self._load_value(reg2, node.right,row,column,comment)
         self.add_instruction(instruction_type(temp_reg, reg1, reg2))
-        self._store_local_variable(temp_reg, node.dest)
+        self._store_local_variable(temp_reg, node.dest,row,column,comment)
     
-    def _allocate_heap_space(self, reg_with_amount):
+    def _allocate_heap_space(self, reg_with_amount,row=None,column=None,comment=None):
         """
         Stores in `a0` the `reg_with_amount` and makes a system call
         to reserve space. The reserve space address will be in `v0`
         """
         if reg_with_amount != Reg.a(0):
-            self.add_instruction(MoveNode(Reg.a(0), reg_with_amount)) # Saves in $a0 the bytes size for current type
-        self.add_instruction(LoadImmediateNode(Reg.v(0), 9)) # Reserve space arg
-        self.add_instruction(SyscallNode()) # Returns in $v0 the allocated memory
+            self.add_instruction(MoveNode(Reg.a(0), reg_with_amount,row,column,comment)) # Saves in $a0 the bytes size for current type
+        self.add_instruction(LoadImmediateNode(Reg.v(0), 9,row,column,comment)) # Reserve space arg
+        self.add_instruction(SyscallNode(row,column,comment)) # Returns in $v0 the allocated memory
 
     def _attribute_index_to_offset(self, index):
         """
@@ -566,18 +590,19 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         return self.WORD_SIZE + index * self.WORD_SIZE # Object Type address first and then the attributes
 
-    def _get_array_index(self, dest_reg, aux_reg, index):
+    def _get_array_index(self, dest_reg, aux_reg, index, row=None, column=None, comment=None):
         """
         Returns in `dest_reg` the actual offset for `index` in an array, `aux_reg` is used
         for computing this value.
         """
         try:
             offset = int(index) * self.WORD_SIZE
-            self._load_value(dest_reg, offset) # Offset in dest_reg
+            self._load_value(dest_reg, offset, row, column,
+                             comment)  # Offset in dest_reg
         except ValueError:
-            self._load_value(aux_reg, index)
-            self.add_instruction(LoadImmediateNode(dest_reg, self.WORD_SIZE))
-            self.add_instruction(MultiplyNoOverflowNode(dest_reg, dest_reg, aux_reg)) # Offset in dest_reg
+            self._load_value(aux_reg, index, row, column, comment)
+            self.add_instruction(LoadImmediateNode(dest_reg, self.WORD_SIZE,row,column,comment))
+            self.add_instruction(MultiplyNoOverflowNode(dest_reg, dest_reg, aux_reg,row,column,comment)) # Offset in dest_reg
 
 
     def add_instruction(self, instr:Node):
@@ -603,15 +628,15 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
         for data in node.dotdata: # Register data nodes
             self.visit(data)
-        self.visit(cil.DataNode("__empty_string", '""')) # Register empty string data
+        self.visit(cil.DataNode("__empty_string", '""', 0, 0, "Register empty string data")) # Register empty string data
         self.STRING_EMPTY = self.program_node.data[-1].name
 
-        self._add_get_ra_function()
-        self._add_copy_function()
-        self._add_length_function()
-        self._add_substring_function()
-        self._add_type_name_function()
-        self._add_concat_function()
+        self._add_get_ra_function(node.row,node.column,node.comment)
+        self._add_copy_function(node.row,node.column,node.comment)
+        self._add_length_function( node.row,node.column,node.comment)
+        self._add_substring_function( node.row,node.column,node.comment)
+        self._add_type_name_function( node.row,node.column,node.comment)
+        self._add_concat_function( node.row,node.column,node.comment)
 
         for function in node.dotcode:
             self.current_function = function
@@ -629,57 +654,66 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         
         self.local_variable_offset = {}
         
-        self.add_instruction(LabelNode(node.name))
+        self.add_instruction(LabelNode(node.name, node.row, node.column, node.comment))
         allocated_space = len(node.localvars) * self.WORD_SIZE # When a function is called the stack already contains all the params 
-        self._allocate_stack_space(allocated_space)
+        self._allocate_stack_space(
+            allocated_space,node.row, node.column, node.comment)
         offset = 0
         
         for local in node.localvars + node.params[::-1]: # Params in reverse order
             self.local_variable_offset[local.name] = offset
             offset += self.WORD_SIZE
             
-        self.add_instruction(MoveNode(Reg.t(0), Reg.sp())) # Temporary save fp
+        self.add_instruction(MoveNode(Reg.t(0), Reg.sp(),node.row, node.column,node.comment)) # Temporary save fp
         saved_registers = [Reg.ra(), Reg.fp()] # + [Reg.s(i) for i in range(8)]
-        self._push(saved_registers)
-        self.add_instruction(MoveNode(Reg.fp(), Reg.t(0))) # Set fp to value that matches with the offsets
+        self._push(saved_registers, node.row, node.column, node.comment)
+        # Set fp to value that matches with the offsets
+        self.add_instruction(MoveNode(Reg.fp(), Reg.t(
+            0), node.row, node.column, node.comment))
 
         for instr in node.instructions:
             self.visit(instr)
         
-        self._pop(saved_registers)
-        self._deallocate_stack_space(allocated_space + len(node.params) * self.WORD_SIZE) # Deallocate also the params
-        self.add_instruction(JumpRegisterNode(Reg.ra()))
+        self._pop(saved_registers, node.row, node.column, node.comment)
+        self._deallocate_stack_space(allocated_space + len(node.params) * self.WORD_SIZE,
+                                     node.row, node.column, node.comment)  # Deallocate also the params
+        self.add_instruction(JumpRegisterNode(
+            Reg.ra(), node.row, node.column, node.comment))
     
     @visitor.when(cil.ReturnNode)
     def visit(self, node:cil.ReturnNode):
         if node.value:
-            self._load_value(Reg.v(0), node.value)
+            self._load_value(Reg.v(0), node.value, node.row,
+                             node.column, node.comment)
     
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):
         if node.type == "Int":
-            self._store_local_variable(Reg.zero(), node.dest) # Default value for Int is 0
+            
+            self._store_local_variable(Reg.zero(), node.dest, node.row, node.column, node.comment) # Default value for Int is 0
             return
 
         if node.type[0].isupper(): # Is a Type name
-            self.add_instruction(LoadAddressNode(Reg.a(0), node.type)) # Type address into $a0
+            self.add_instruction(LoadAddressNode(Reg.a(
+                0), node.type, node.row, node.column, node.comment))  # Type address into $a0
         else:
-            self._load_local_variable(Reg.a(0), node.type)
+            self._load_local_variable(Reg.a(0), node.type, node.row, node.column, node.comment)
         if node.type == "String":
-            self.add_instruction(LoadImmediateNode(Reg.a(0), self.WORD_SIZE * 2)) # If String the is type and address
+            self.add_instruction(LoadImmediateNode(Reg.a(0), self.WORD_SIZE * 2, node.row, node.column, node.comment)) # If String the is type and address
         else:
-            self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Saves in $a0 the bytes size for current type
-        self._allocate_heap_space(Reg.a(0))
-        self._store_local_variable(Reg.v(0), node.dest)
+            self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0), node.row, node.column, node.comment)) # Saves in $a0 the bytes size for current type
+        self._allocate_heap_space(Reg.a(0), node.row, node.column)
+        self._store_local_variable(Reg.v(0), node.dest, node.row, node.column)
 
     @visitor.when(cil.AbortNode)
     def visit(self, node:cil.AbortNode):
-        self._add_abort_instructions()
+        self._add_abort_instructions( node.row, node.column, node.comment)
     
     @visitor.when(cil.StaticCallNode)
     def visit(self, node:cil.StaticCallNode):
-        self.add_instruction(JumpAndLinkNode(node.function)) # Jumps to label
-        self._store_local_variable(Reg.v(0), node.dest)
+        self.add_instruction(JumpAndLinkNode(node.function,node.row, node.column, node.comment)) # Jumps to label
+        self._store_local_variable(
+            Reg.v(0), node.dest, node.row, node.column, node.comment)
         
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node:cil.DynamicCallNode):
@@ -689,14 +723,15 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         elif node.base_type: # Is a variable name or SELF_TYPE
             type_name = node.base_type.name
 
-        self._load_type_variable(Reg.t(0), node.type) # t0 = TypeAddress
+        self._load_type_variable(
+            Reg.t(0), node.type, node.row, node.column, node.comment)  # t0 = TypeAddress
         # Override of methods leave the new method in the same position as the overriden method 
         offset = next(offset * self.WORD_SIZE + self.TO_METHODS_OFFSET for offset, (cool_method,cil_method) in enumerate(self.type_method_dict_list[type_name]) if cool_method == node.method)
-        self.add_instruction(LoadWordNode(Reg.t(0), offset, Reg.t(0))) # t0 = method direction
-        self.add_instruction(JumpAndLinkNode("__get_ra"))
-        self.add_instruction(MoveNode(Reg.ra(), Reg.v(0)))
-        self.add_instruction(JumpRegisterNode(Reg.t(0)))
-        self._store_local_variable(Reg.v(0), node.dest)
+        self.add_instruction(LoadWordNode(Reg.t(0), offset, Reg.t(0),node.row, node.column, node.comment)) # t0 = method direction
+        self.add_instruction(JumpAndLinkNode("__get_ra",node.row, node.column, node.comment))
+        self.add_instruction(MoveNode(Reg.ra(), Reg.v(0),node.row, node.column, node.comment))
+        self.add_instruction(JumpRegisterNode(Reg.t(0),node.row, node.column, node.comment))
+        self._store_local_variable(Reg.v(0), node.dest,node.row, node.column, node.comment)
         
     @visitor.when(cil.DataNode)
     def visit(self, node:cil.DataNode):
@@ -719,7 +754,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         # Methods
         values.extend([x[1] for x in node.methods])
         
-        data_node = DataNode(name, data_type, values)
+        data_node = DataNode(name, data_type, values,
+                             node.row, node.column, node.comment)
         
         self.add_data(data_node)
         
@@ -727,56 +763,63 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.ArgNode)
     def visit(self, node:cil.ArgNode):
-        self._load_value(Reg.t(0), node.name)
-        self._push([Reg.t(0)])
+        self._load_value(Reg.t(0), node.name, node.row,
+                         node.column, node.comment)
+        self._push([Reg.t(0)], node.row, node.column, node.comment)
         
     @visitor.when(cil.AssignNode)
     def visit(self, node:cil.AssignNode):
-        self._load_value(Reg.t(0), node.source)
-        self._store_local_variable(Reg.t(0), node.dest)
+        self._load_value(Reg.t(0), node.source,node.row, node.column, node.comment)
+        self._store_local_variable(
+            Reg.t(0), node.dest, node.row, node.column, node.comment)
     
     @visitor.when(cil.DivNode)
     def visit(self, node:cil.DivNode):
-        self._load_value(Reg.t(0), node.left)
-        self._load_value(Reg.t(1), node.right)
-        self.add_instruction(DivideOverflowNode(Reg.t(0), Reg.t(1)))
-        self._store_local_variable(Reg.low(), node.dest) # Stores the quotient
+        self._load_value(Reg.t(0), node.left,node.row, node.column, node.comment)
+        self._load_value(Reg.t(1), node.right,node.row, node.column, node.comment)
+        self.add_instruction(DivideOverflowNode(
+            Reg.t(0), Reg.t(1), node.row, node.column, node.comment))
+        self._store_local_variable(
+            Reg.low(), node.dest, node.row, node.column, node.comment)  # Stores the quotient
     
     @visitor.when(cil.StarNode)
     def visit(self, node:cil.StarNode):
-        self._binary_operation(node, MultiplyNoOverflowNode, Reg.t(0), Reg.t(1), Reg.t(2))
+        self._binary_operation(node, MultiplyNoOverflowNode, Reg.t(
+            0), Reg.t(1), Reg.t(2), node.row, node.column, node.comment)
 
     @visitor.when(cil.MinusNode)
     def visit(self, node:cil.MinusNode):
-        self._binary_operation(node, SubstractNode, Reg.t(0), Reg.t(1), Reg.t(2))
+        self._binary_operation(node, SubstractNode, Reg.t(0), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)
 
     @visitor.when(cil.PlusNode)
     def visit(self, node:cil.PlusNode):
-        self._binary_operation(node, AddNode, Reg.t(0), Reg.t(1), Reg.t(2))
+        self._binary_operation(node, AddNode, Reg.t(0), Reg.t(
+            1), Reg.t(2), node.row, node.column, node.comment)
 
     @visitor.when(cil.EqualNode)
     def visit(self, node:cil.EqualNode):
-        self._binary_operation(node, SetEqualToNode, Reg.t(0), Reg.t(1), Reg.t(2))
+        self._binary_operation(node, SetEqualToNode, Reg.t(0), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)
 
     @visitor.when(cil.GreaterNode)
     def visit(self, node:cil.GreaterNode):
-        self._binary_operation(node, SetGreaterThanNode, Reg.t(0), Reg.t(1), Reg.t(2))
+        self._binary_operation(node, SetGreaterThanNode, Reg.t(0), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)
 
     @visitor.when(cil.LesserNode)
     def visit(self, node:cil.LesserNode):
-        self._binary_operation(node, SetLessThanNode, Reg.t(0), Reg.t(1), Reg.t(2))
+        self._binary_operation(node, SetLessThanNode, Reg.t(0), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)
 
     @visitor.when(cil.NotNode)
     def visit(self, node:cil.NotNode):
-        self._load_value(Reg.t(0), node.value)
-        self.add_instruction(NorNode(Reg.t(0), Reg.t(0), Reg.t(0))) # Not equivalent
-        self._store_local_variable(Reg.t(0), node.dest)
+        self._load_value(Reg.t(0), node.value,node.row, node.column, node.comment)
+        self.add_instruction(NorNode(Reg.t(0), Reg.t(0), Reg.t(0),node.row, node.column, node.comment)) # Not equivalent
+        self._store_local_variable(Reg.t(0), node.dest,node.row, node.column, node.comment)
 
     @visitor.when(cil.TypeOfNode)
     def visit(self, node:cil.TypeOfNode):
-        self._load_local_variable(Reg.t(0), node.obj)
-        self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0))) # First word in instance is type address
-        self._store_local_variable(Reg.t(0), node.dest)
+        self._load_local_variable(Reg.t(0), node.obj,node.row, node.column, node.comment)
+        self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0),node.row, node.column, node.comment)) # First word in instance is type address
+        self._store_local_variable(
+            Reg.t(0), node.dest, node.row, node.column, node.comment)
 
     @visitor.when(cil.ParamNode)
     def visit(self, node:cil.ParamNode):
@@ -785,122 +828,132 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.ArrayNode)
     def visit(self, node:cil.ArrayNode):
         # Calculating Length
-        self._get_array_index(Reg.a(0), Reg.t(0), node.length)
+        self._get_array_index(Reg.a(0), Reg.t(
+            0), node.length, node.row, node.column, node.comment)
         # $a0 = Array Length
         
-        self._allocate_heap_space(Reg.a(0)) # Allocated address in $v0
-        self._store_local_variable(Reg.v(0), node.dest)
+        self._allocate_heap_space(Reg.a(0),node.row, node.column, node.comment) # Allocated address in $v0
+        self._store_local_variable(
+            Reg.v(0), node.dest, node.row, node.column, node.comment)
     
     @visitor.when(cil.GetIndexNode)
     def visit(self, node:cil.GetIndexNode):
         # Calculating Offset
-        self._get_array_index(Reg.t(2), Reg.t(0), node.index) # Offset in t2
+        self._get_array_index(Reg.t(2), Reg.t(0), node.index,node.row, node.column, node.comment) # Offset in t2
 
-        self._load_value(Reg.t(1), node.source) # Load array direction into t1
+        self._load_value(Reg.t(1), node.source,node.row, node.column, node.comment) # Load array direction into t1
         
-        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.t(2))) # t1 is at the index position
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)) # t1 is at the index position
         
-        self.add_instruction(LoadWordNode(Reg.t(2), 0, Reg.t(1)))
-        self._store_local_variable(Reg.t(2), node.dest)
+        self.add_instruction(LoadWordNode(Reg.t(2), 0, Reg.t(1),node.row, node.column, node.comment))
+        self._store_local_variable(
+            Reg.t(2), node.dest, node.row, node.column, node.comment)
         
     @visitor.when(cil.SetIndexNode)
     def visit(self, node:cil.SetIndexNode):
         # Calculating Offset
-        self._get_array_index(Reg.t(2), Reg.t(0), node.index) # Offset in t2
+        self._get_array_index(Reg.t(2), Reg.t(0), node.index,node.row, node.column, node.comment) # Offset in t2
 
-        self._load_value(Reg.t(3), node.value) # Set value in t3
+        self._load_value(Reg.t(3), node.value,node.row, node.column, node.comment) # Set value in t3
 
-        self._load_value(Reg.t(1), node.source) # Array address in t1
+        self._load_value(Reg.t(1), node.source,node.row, node.column, node.comment) # Array address in t1
         
-        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.t(2))) # t1 is at the index position
+        self.add_instruction(AddNode(Reg.t(1), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)) # t1 is at the index position
         
-        self.add_instruction(StoreWordNode(Reg.t(3), 0, Reg.t(1)))
+        self.add_instruction(StoreWordNode(
+            Reg.t(3), 0, Reg.t(1), node.row, node.column, node.comment))
 
     @visitor.when(cil.CopyNode)
     def visit(self, node:cil.CopyNode):
-        self._load_value(Reg.a(0), node.instance) # t0 = instance
-        self.add_instruction(JumpAndLinkNode("__copy"))
-        self._store_local_variable(Reg.v(0), node.result)
+        self._load_value(Reg.a(0), node.instance,node.row, node.column, node.comment) # t0 = instance
+        self.add_instruction(JumpAndLinkNode("__copy",node.row, node.column, node.comment))
+        self._store_local_variable(
+            Reg.v(0), node.result, node.row, node.column, node.comment)
     
     @visitor.when(cil.LengthNode)
     def visit(self, node:cil.LengthNode):
-        self._load_value(Reg.a(0), node.string_var) # a0 = instance
-        self.add_instruction(JumpAndLinkNode("__string_length"))
-        self._store_local_variable(Reg.v(0), node.dest)
+        self._load_value(Reg.a(0), node.string_var,node.row, node.column, node.comment) # a0 = instance
+        self.add_instruction(JumpAndLinkNode("__string_length",node.row, node.column, node.comment))
+        self._store_local_variable(Reg.v(0), node.dest,node.row, node.column, node.comment)
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node:cil.SubstringNode):
-        self._load_value(Reg.a(0), node.string)
-        self._load_value(Reg.a(1), node.index)
-        self._load_value(Reg.a(2), node.length)
-        self.add_instruction(JumpAndLinkNode("__string_substring"))
-        self._store_local_variable(Reg.v(0), node.dest)
+        self._load_value(Reg.a(0), node.string,node.row, node.column, node.comment)
+        self._load_value(Reg.a(1), node.index,node.row, node.column, node.comment)
+        self._load_value(Reg.a(2), node.length,node.row, node.column, node.comment)
+        self.add_instruction(JumpAndLinkNode("__string_substring",node.row, node.column, node.comment))
+        self._store_local_variable(
+            Reg.v(0), node.dest, node.row, node.column, node.comment)
 
     @visitor.when(cil.TypeNameNode)
     def visit(self, node:cil.TypeNameNode):
-        self._load_type_variable(Reg.a(0), node.type)
-        self.add_instruction(JumpAndLinkNode("__type_name"))
-        self._store_local_variable(Reg.v(0), node.dest)
+        self._load_type_variable(Reg.a(0), node.type,node.row, node.column, node.comment)
+        self.add_instruction(JumpAndLinkNode("__type_name",node.row, node.column, node.comment))
+        self._store_local_variable(Reg.v(0), node.dest,node.row, node.column, node.comment)
 
     @visitor.when(cil.ConcatNode)
     def visit(self, node:cil.ConcatNode):
-        self._load_local_variable(Reg.a(0), node.string1)
-        self._load_local_variable(Reg.a(1), node.string2)
+        self._load_local_variable(Reg.a(0), node.string1,node.row, node.column, node.comment)
+        self._load_local_variable(Reg.a(1), node.string2,node.row, node.column, node.comment)
 
-        self.add_instruction(JumpAndLinkNode("__concat"))
+        self.add_instruction(JumpAndLinkNode("__concat",node.row, node.column, node.comment))
 
-        self._store_local_variable(Reg.v(0), node.dest)
+        self._store_local_variable(
+            Reg.v(0), node.dest, node.row, node.column, node.comment)
 
     @visitor.when(cil.VoidNode)
     def visit(self, node:cil.VoidNode):
-        self._store_local_variable(Reg.zero(), node.dest)
+        self._store_local_variable(Reg.zero(), node.dest,node.row, node.column, node.comment)
 
     @visitor.when(cil.GotoNode)
     def visit(self, node:cil.GotoNode):
-        self.add_instruction(JumpNode(node.label))
+        self.add_instruction(
+            JumpNode(node.label, node.row, node.column, node.comment))
     
     @visitor.when(cil.LabelNode)
     def visit(self, node:cil.LabelNode):
-        self.add_instruction(LabelNode(node.label))
+        self.add_instruction(
+            LabelNode(node.label, node.row, node.column, node.comment))
     
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode):
-        self._load_type_variable(Reg.t(0), node.variable) # t0 = Type Address
-        self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0))) # t0 = t0[0] -> FatherAddress
-        self._store_local_variable(Reg.t(0), node.dest)
+        self._load_type_variable(Reg.t(0), node.variable,node.row, node.column, node.comment) # t0 = Type Address
+        self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0),node.row, node.column, node.comment)) # t0 = t0[0] -> FatherAddress
+        self._store_local_variable(
+            Reg.t(0), node.dest, node.row, node.column, node.comment)
     
     @visitor.when(cil.PrintNode)
     def visit(self, node:cil.PrintNode):
-        self._load_value(Reg.a(0), node.str_addr)
-        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Getting the String address
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 4)) # 4 System call code for print string
+        self._load_value(Reg.a(0), node.str_addr, node.row, node.column, node.comment)
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0), node.row, node.column, "Getting the String address")) # Getting the String address
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 4, node.row, node.column, "4 System call code for print string")) # 4 System call code for print string
         self.add_instruction(SyscallNode())
         
     
     @visitor.when(cil.PrintIntNode)
     def visit(self, node:cil.PrintIntNode):
-        self._load_value(Reg.a(0), node.int_addr)
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 1)) # 1 System call code for print int
-        self.add_instruction(SyscallNode())
+        self._load_value(Reg.a(0), node.int_addr,node.row, node.column, node.comment)
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 1,node.row, node.column, node.comment)) # 1 System call code for print int
+        self.add_instruction(SyscallNode(node.row, node.column, node.comment))
         
       
     
     @visitor.when(cil.ReadNode)
     def visit(self, node:cil.ReadNode):
-        self.add_instruction(LoadImmediateNode(Reg.a(1), self.MAX_STRING_LENGTH)) # a1 = Allocated length Save the length in a1
-        self._allocate_heap_space(Reg.a(1)) # Allocates 1024 bytes and return the address un v0
-        self.add_instruction(MoveNode(Reg.a(0), Reg.v(0))) # a0 = v0 Save the address in a0
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 8)) # 8 System call code for read string
-        self.add_instruction(SyscallNode()) # Fills the address in a0 with the string
-        self.add_instruction(MoveNode(Reg.a(1), Reg.a(0))) # a1 = a0 Save the address in a1
+        self.add_instruction(LoadImmediateNode(Reg.a(1), self.MAX_STRING_LENGTH, node.row, node.column, "a1 = Allocated length Save the length in a1")) # a1 = Allocated length Save the length in a1
+        self._allocate_heap_space(Reg.a(1), node.row, node.column, "Allocates 1024 bytes and return the address un v0") # Allocates 1024 bytes and return the address un v0
+        self.add_instruction(MoveNode(Reg.a(0), Reg.v(0), node.row, node.column, "a0 = v0 Save the address in a0")) # a0 = v0 Save the address in a0
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 8, node.row, node.column, "8 System call code for read string")) # 8 System call code for read string
+        self.add_instruction(SyscallNode(node.row, node.column, "Fills the address in a0 with the string")) # Fills the address in a0 with the string
+        self.add_instruction(MoveNode(Reg.a(1), Reg.a(0), node.row, node.column, "a1 = a0 Save the address in a1")) # a1 = a0 Save the address in a1
         self._add_create_string_instance(Reg.t(0), Reg.a(1)) # Create String, Address instance 
-        self._store_local_variable(Reg.v(0), node.dest) # Save the address in the final destination
+        self._store_local_variable(Reg.v(0), node.dest, node.row, node.column, "Save the address in the final destination") # Save the address in the final destination
     
     @visitor.when(cil.ReadIntNode)
     def visit(self, node:cil.ReadIntNode):
-        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 5)) # 5 System call code for read int
-        self.add_instruction(SyscallNode()) # Returns the read integer in v0
-        self._store_local_variable(Reg.v(0), node.dest) 
+        self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 5,node.row, node.column, node.comment)) # 5 System call code for read int
+        self.add_instruction(SyscallNode(node.row, node.column, node.comment)) # Returns the read integer in v0
+        self._store_local_variable(Reg.v(0), node.dest,node.row, node.column, node.comment) 
 
     @visitor.when(cil.InitInstance)
     def visit(self, node:cil.InitInstance):
@@ -914,11 +967,11 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode):
-        self.add_instruction(LoadAddressNode(Reg.t(0), node.msg))
+        self.add_instruction(LoadAddressNode(Reg.t(0), node.msg, node.row, node.column, node.comment))
 
-        self._add_create_string_instance(Reg.t(1), Reg.t(0))
+        self._add_create_string_instance(Reg.t(1), Reg.t(0)) # Create String instance
 
-        self._store_local_variable(Reg.v(0), node.dest)        
+        self._store_local_variable(Reg.v(0), node.dest, node.row, node.column, "Save string instance")
     
     @visitor.when(cil.ObjectCopyNode)
     def visit(self, node:cil.ObjectCopyNode):
@@ -963,26 +1016,27 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.GetAttribNode)
     def visit(self, node:cil.GetAttribNode):
-        self._load_value(Reg.t(0), node.source)  # Load the object address
+        self._load_value(Reg.t(0), node.source,node.row, node.column, node.comment)  # Load the object address
         # Get the attribute offset
         attr_offset = self._attribute_index_to_offset(node.attribute_index)
         # Fetch the attribute value
-        self.add_instruction(LoadWordNode(Reg.t(0), attr_offset, Reg.t(0)))
+        self.add_instruction(LoadWordNode(Reg.t(0), attr_offset, Reg.t(0),node.row, node.column, node.comment))
         # Assign attribute value
-        self._store_local_variable(Reg.t(0), node.dest)
+        self._store_local_variable(Reg.t(0), node.dest,node.row, node.column, node.comment)
     
     @visitor.when(cil.SetAttribNode)
     def visit(self, node:cil.SetAttribNode):
-        self._load_value(Reg.t(0), node.source)  # Load the object address
+        self._load_value(Reg.t(0), node.source,node.row, node.column, node.comment)  # Load the object address
         # Get the attribute offset
         attr_offset = self._attribute_index_to_offset(node.attribute_index)
         # Load the value to be setted into t1
-        self._load_value(Reg.t(1), node.value)
+        self._load_value(Reg.t(1), node.value,node.row, node.column, node.comment)
         # Save the attribute value
-        self.add_instruction(StoreWordNode(Reg.t(1), attr_offset, Reg.t(0)))
+        self.add_instruction(StoreWordNode(Reg.t(1), attr_offset, Reg.t(0),node.row, node.column, node.comment))
 
     
     @visitor.when(cil.GotoIfNode)
     def visit(self, node:cil.GotoIfNode):
-        self._load_value(Reg.t(0), node.condition_value) # Load condition value
-        self.add_instruction(BranchNotEqualNode(Reg.t(0), Reg.zero(), node.label)) # Not 0 is True. If not zero jump to label
+        self._load_value(Reg.t(0), node.condition_value,node.row, node.column, node.comment) # Load condition value
+        self.add_instruction(BranchNotEqualNode(Reg.t(0), Reg.zero(
+        ), node.label, node.row, node.column, node.comment))  # Not 0 is True. If not zero jump to label

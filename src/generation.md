@@ -13,6 +13,20 @@ Las words son 4 bytes
 
 nombre: .word DIR_TIPO_PADRE, TAMANO_DE_INSTANCIA_BYTES [, LABEL_AL_METODO_i]
 
+### String
+
+Los tipos String se guardan en una tupla en memoria (TipoString, Dirección al String). Con esta distribución se puede usar los llamados dinámicos sobre los tipos String.
+
+Cada vez que se hace una operación sobre String estos se copian para crear una instancia nueva.
+
+### Bool, Int
+
+Estos tipos son representados tal cual en MIPS, por lo que actualmente no soportan llamados dinámicos.
+
+## Heap
+
+El direccionamiento de memoria en el Heap es creciente.
+
 ## Llamados
 
 Los llamados dinámicos solo se usan en caso de que se utilice un SELF_TYPE, en otro caso se utilizan los estáticos. Cuando se va a crear un nodo de llamado dinámico se anota en él el tipo en donde fue definido el SELF_TYPE para luego poder resolver correctamente la dirección del método ya que bajo un mismo árbol de herencia el offset de los métodos no cambia.

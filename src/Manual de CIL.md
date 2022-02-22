@@ -2,6 +2,9 @@
 
 ## RESTRICCIONES
 
+- Los tipos son identificadores que comienzan con mayúscula
+- Las variables son todas minúsculas
+
 ## INSTRUCCIONES
 
 ### Tipos
