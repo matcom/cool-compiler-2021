@@ -11,14 +11,25 @@ class CoolParser:
         self.parser = yacc.yacc(start='program', module=self)
         self.errors = []
 
-    procedence = (
-        ('left, AT'),
-        ('left, NOT'),
-        ('left, ISVOID'),
-        ('left, EQUAL, LESS, LESSEQ'),
-        ('left, PLUS, MINUS'),
-        ('left, STAR, DIV'),
-        ('left, DOT')
+    # precedence = (
+    #     ('left, AT'),
+    #     ('left, NOT'),
+    #     ('left, ISVOID'),
+    #     ('left, EQUAL, LESS, LESSEQ'),
+    #     ('left, PLUS, MINUS'),
+    #     ('left, STAR, DIV'),
+    #     ('left, DOT')
+    # )
+
+    precedence = (
+        ('right', 'ASSIGN'),
+        ('right', 'NOT'),
+        ('nonassoc', 'LESSEQ', 'LESS', 'EQUAL'),
+        ('left', 'PLUS', 'MINUS'),
+        ('left', 'STAR', 'DIV'),
+        ('right', 'ISVOID'),
+        ('left', 'AT'),
+        ('left', 'DOT')
     )
 
     def parse(self, program):
