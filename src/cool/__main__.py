@@ -153,13 +153,11 @@ def compile(
 
     if verbose or True:
         if cil:
-            with open(f"{input_file.name[:-2]}.cil", "w+") as cil_file:
+            with open(f"{input_file.name[:-2]}cil", "w+") as cil_file:
                 cil_program = CilFormatter().visit(cil_ast)
-                output_file.name = f"{input_file.name[:-2]}.cil"
                 cil_file.write(cil_program)
     
         mips_program = MipsFormatter().visit(mips_ast)
-        output_file.name = f"{input_file.name[:-2]}.asm"
         output_file.write(mips_program)
         output_file.close()
         
