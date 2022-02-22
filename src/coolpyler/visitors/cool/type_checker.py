@@ -408,7 +408,7 @@ class TypeCheckerVisitor:
             )
 
         return type_checked.CoolAssignNode(
-            node.lineno, node.columnno, node.id, exp, var_type
+            node.lineno, node.columnno, node.id, exp, exp.type
         )
 
     @visitor.when(type_built.CoolNotNode)
