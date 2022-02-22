@@ -193,24 +193,6 @@ def t_string(t):
                 t.lexer.lineno +=1
                 t.lexer.last_new_line_pos = index + 2# saving last \n
                 string_list.append('\n')
-            elif text[index + 1] == '0':  # null character \0 is not allowed SACAR Y PONER EN UNA IDENTACION MAS AFUERA
-                # print("Illegal character \\0 inside string")  # do something about it
-                # t.lexer.errors.append(
-                #     LexicographicError(
-                #         t.lexer.lineno + text[initial : index + 1].count("\n"),
-                #         index - t.lexer.last_new_line_pos + 2,
-                #         "Illegal character \\0 inside string",
-                #     )
-                # )
-                t.lexer.errors.append(
-                    LexicographicError(
-                        t.lexer.lineno,
-                        index - t.lexer.last_new_line_pos + 2,
-                        "Illegal character \\0 inside string",
-                    )
-                )
-                t.lexer.lexpos = index+2
-                return t
             else:
                 string_list.append(#CHEQUEAR PQ ESTO SE AHCE DOS VECES< COMO TRATAR DIFERENTE EL \n
                     text[index : index + 2]
@@ -239,7 +221,24 @@ def t_string(t):
             # index += 1
             t.lexer.lexpos = index + 1#new
             return t
-
+        elif text[index] == '\0':  # null character \0 is not allowed SACAR Y PONER EN UNA IDENTACION MAS AFUERA
+            # print("Illegal character \\0 inside string")  # do something about it
+            # t.lexer.errors.append(
+            #     LexicographicError(
+            #         t.lexer.lineno + text[initial : index + 1].count("\n"),
+            #         index - t.lexer.last_new_line_pos + 2,
+            #         "Illegal character \\0 inside string",
+            #     )
+            # )
+            t.lexer.errors.append(
+                LexicographicError(
+                    t.lexer.lineno,
+                    index - t.lexer.last_new_line_pos + 1,
+                    "Illegal character \\0 inside string",
+                )
+            )
+            t.lexer.lexpos = index+1
+            return t
         else:
             string_list.append(text[index])
             # string_to_append += text[index + 1]
