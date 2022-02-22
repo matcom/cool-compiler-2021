@@ -227,10 +227,10 @@ class CILRunnerVisitor():
             self.raise_error("Type {0} isn't defined", typex)
     
     def get_dynamic_type(self, type_name, caller_fun_scope):
-        if type_name in caller_fun_scope: # TODO Remove duality between Value and ReferencedValue
-            typex = self.get_type(caller_fun_scope[type_name])
-        else:
+        if type_name[0].isupper(): # Type Name
             typex = self.get_type(type_name)
+        else: # Type variable
+            typex = self.get_type(caller_fun_scope[type_name])
         return typex
     
     def raise_error(self, message, *args):
@@ -398,6 +398,7 @@ class CILRunnerVisitor():
                     
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
+        # typex = args[0]['__type']
         typex = self.get_dynamic_type(node.type, caller_fun_scope)
         try:
             func_name = next(static_name for name, static_name in typex.methods if name == node.method)
@@ -902,7 +903,7 @@ class COOLToCILVisitor():
         type_node = self.register_type(self.current_type.name, self.current_type.parent)
         
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
-        type_node.methods.append(("__init", init_function.name))
+        type_node.methods.insert(0, ("__init", init_function.name))
         self.params.append(cil.ParamNode('self'))
         self.register_instruction(cil.InitInstance('self', type_node.name))
         
@@ -1045,14 +1046,25 @@ class COOLToCILVisitor():
                 cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
                 self.register_instruction(cil.StaticCallNode(cil_name, result))
         else:
+            # if isinstance(node.obj.type, SelfType):
+            #     defining_type = node.obj.type.defining_type
+            #     self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result, defining_type))
+            # else:
+            #     type_node = next(x for x in self.dottypes if x.name == node.obj.type.name)
+            #     cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
+            #     self.register_instruction(cil.StaticCallNode(cil_name, result))
+
             if isinstance(node.obj.type, SelfType):
                 defining_type = node.obj.type.defining_type
-                self.register_instruction(cil.DynamicCallNode(node.obj.type.name,node.id,result, defining_type))
             else:
-                type_node = next(x for x in self.dottypes if x.name == node.obj.type.name)
-                cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
-                self.register_instruction(cil.StaticCallNode(cil_name, result))
-        
+                defining_type = node.obj.type
+
+            type_var = self.define_internal_local()
+
+            self.register_instruction(cil.TypeOfNode(obj_value, type_var))
+            
+            self.register_instruction(cil.DynamicCallNode(type_var, node.id, result, defining_type))
+
         return result
     
     @visitor.when(LetNode)
@@ -1485,12 +1497,12 @@ class COOLToCILVisitor():
     def visit(self, node, scope=None):
         integer = self.params[1]
         self.register_instruction(cil.PrintIntNode(integer.name))
-        return "0"
+        return self.params[0].name
     
     @visitor.when(cil.IOOutStringNode)
     def visit(self, node, scope=None):
         string = self.params[1]
         self.register_instruction(cil.PrintNode(string.name))
-        return "0"
+        return self.params[0].name
 
     # ======================================================================
