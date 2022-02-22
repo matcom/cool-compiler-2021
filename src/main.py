@@ -3,8 +3,8 @@ import sys
 from pathlib import Path
 from utils.COOL_Grammar import build_COOL_Grammar
 from utils.COOL_Lexer import COOL_Lexer
-from utils.code_generation.mips.CIL_to_MIPS import CILToMIPS
-from utils.code_generation.mips.print_MIPS_AST import PrintMIPS
+# from utils.code_generation.mips.CIL_to_MIPS import CILToMIPS
+# from utils.code_generation.mips.print_MIPS_AST import PrintMIPS
 from utils.parser.COOL_parser import COOL_Parser
 from cmp.evaluation import evaluate_reverse_parse
 from cmp.semantic import Context
@@ -72,9 +72,9 @@ cil_ast = cil_visitor.visit(ast, scope)
 
 print(get_formatter()(cil_ast))
 
-mips_visitor = CILToMIPS()
-mips_ast = mips_visitor.visit(cil_ast)
+# mips_visitor = CILToMIPS()
+# mips_ast = mips_visitor.visit(cil_ast)
 
-print_mips = PrintMIPS()
-mips = print_mips.visit(mips_ast)
-print(mips)
+# print_mips = PrintMIPS()
+# mips = print_mips.visit(mips_ast)
+# print(mips)
