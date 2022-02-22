@@ -38,7 +38,9 @@ reserved = {
     'esac': 'ESAC',
     'new': 'NEW',
     'of': 'OF',
-    'not': 'LNOT'
+    'not': 'LNOT',
+    'true': 'TRUE',
+    'false': 'FALSE'
 }
 
 tokens = [
@@ -64,8 +66,7 @@ tokens = [
     'ARROW',
     'INT',
     'STRING',
-    'NOT',
-    'BOOL'
+    'NOT'
 ] + list(reserved.values())
 
 

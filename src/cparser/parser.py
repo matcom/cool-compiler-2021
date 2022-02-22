@@ -206,7 +206,8 @@ class CoolParser:
         p[0] = IdNode(p.slice[1])
 
     def p_atom_bool(self, p):
-        '''atom : BOOL'''
+        '''atom : TRUE
+                | FALSE'''
         p[0] = BoolNode(p.slice[1])
 
     def p_atom_string(self, p):
