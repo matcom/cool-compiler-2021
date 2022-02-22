@@ -420,8 +420,8 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolPlusNode)
     def visit(self, node, scope):  # noqa: F811
         int_type = self.get_type("Int")
-        left = self.visit(node.left, scope)
-        right = self.visit(node.right, scope)
+        left = self.visit(node.left_expr, scope)
+        right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
             self.errors.append(
                 errors.InvalidOperationError(
@@ -435,8 +435,8 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolMinusNode)
     def visit(self, node, scope):  # noqa: F811
         int_type = self.get_type("Int")
-        left = self.visit(node.left, scope)
-        right = self.visit(node.right, scope)
+        left = self.visit(node.left_expr, scope)
+        right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
             self.errors.append(
                 errors.InvalidOperationError(
@@ -450,8 +450,8 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolDivNode)
     def visit(self, node, scope):  # noqa: F811
         int_type = self.get_type("Int")
-        left = self.visit(node.left, scope)
-        right = self.visit(node.right, scope)
+        left = self.visit(node.left_expr, scope)
+        right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
             self.errors.append(
                 errors.InvalidOperationError(
@@ -465,8 +465,8 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolMultNode)
     def visit(self, node, scope):  # noqa: F811
         int_type = self.get_type("Int")
-        left = self.visit(node.left, scope)
-        right = self.visit(node.right, scope)
+        left = self.visit(node.left_expr, scope)
+        right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
             self.errors.append(
                 errors.InvalidOperationError(
@@ -479,8 +479,8 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolLeqNode)
     def visit(self, node, scope):  # noqa: F811
-        left = self.visit(node.left, scope)
-        right = self.visit(node.right, scope)
+        left = self.visit(node.left_expr, scope)
+        right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(right.type) and not right.type.conforms_to(
             left.type
         ):
@@ -495,8 +495,8 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolEqNode)
     def visit(self, node, scope):  # noqa: F811
-        left = self.visit(node.left, scope)
-        right = self.visit(node.right, scope)
+        left = self.visit(node.left_expr, scope)
+        right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(right.type) and not right.type.conforms_to(
             left.type
         ):
@@ -511,8 +511,8 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolLeNode)
     def visit(self, node, scope):  # noqa: F811
-        left = self.visit(node.left, scope)
-        right = self.visit(node.right, scope)
+        left = self.visit(node.left_expr, scope)
+        right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(right.type) and not right.type.conforms_to(
             left.type
         ):
@@ -596,11 +596,8 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolNewNode)
     def visit(self, node, scope):  # noqa: F811
         if node.type_name == "SELF_TYPE":
-            type_checked.CoolNewNode(
-                node.lineno, node.columnno, self.current_type
-            )
+            type_checked.CoolNewNode(node.lineno, node.columnno, self.current_type)
 
         type = self.get_type(node.type_name)
-        return type_checked.CoolNewNode(
-            node.lineno, node.columnno, type
-        )
+        return type_checked.CoolNewNode(node.lineno, node.columnno, type)
+
