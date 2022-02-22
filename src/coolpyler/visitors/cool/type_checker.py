@@ -156,7 +156,6 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolDispatchNode)
     def visit(self, node, scope):  # noqa: F811
-        print(node.id.value)
 
         exp = self.visit(node.expr, scope)
 
@@ -168,7 +167,6 @@ class TypeCheckerVisitor:
             )
 
         try:
-            # print(node.id.value)
             method = exp.type.get_method(node.id)
         except semantic.SemanticError as e:
             self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
