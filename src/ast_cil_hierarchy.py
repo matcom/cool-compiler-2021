@@ -2,345 +2,308 @@ class Node:
     pass
 
 
-class CILProgram:
-    pass
+class Program(Node):
+    def __init__(self):
+        self.type_section = []
+        self.data_section = {}  # data[string] = tag
+        self.code_section = []
 
 
-class CILDeclaration(Node):
-    pass
+class Type(Node):
+    def __init__(self, name):
+        self.name = name
+        self.attributes = []
+        self.methods = {}
 
 
-class CILFuncDeclaration(CILDeclaration):
-    def __init__(self, id:str):
-        self.id:str = id
-        self.params:List(str) = []
-        self.locals:List(str)=[]
-        self.instructions:List(CILInstruction) = []
-    
-    def add_params(self,params:List(str),pos=None):
-        if pos:
-            for x in reversed(params):
-                self.params.insert(pos,x)
-        else:        
-            for x in params:self.params.append(x)
-
-    def add_locals(self,locals:List(str),pos=None):
-        if pos:
-            for x in reversed(locals):
-                self.locals.insert(pos,x)
-        else:        
-            for x in locals:self.locals.append(x)
-
-    def add_instruction(self,instructions:List(str),pos=None):
-        if pos:
-            for x in reversed(instructions):
-                self.instructions.insert(pos,x)
-        else:        
-            for x in instructions:self.instructions.append(x)
-
-
-
-class CILInstruction(Node):
-    pass
-
-### Asignación simple
-#x = y ;
-class CILSimpleAssignInstruction(CILInstruction):
-    def __init__(self, id,expr):
-        self.id = id
-        self.expr=expr
-    def __str__(self):
-        return f"{self.id} = {self.expr}"
-
-
-class CILBinaryInstruction(CILInstruction):
-    def __init__(self,id,left,right):
-        super().__init__()
-        self.id=id
-        self.left=left
-        self.right=right
-
-### Operaciones aritméticas
-class CILArithBinaryInstruction(CILBinaryInstruction):pass
-
-#x = y + z ;
-class CILPlusInstruction(CILArithBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} + {self.right}"
-
-#x = y - z ;
-class CILMinusInstruction(CILArithBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} - {self.right}"
-
-#x = y * z ;
-class CILStarInstruction(CILArithBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} * {self.right}"
-
-#x = y / z ;
-class CILDivInstruction(CILArithBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} / {self.right}"
-
-class CILBooleanBinaryInstruction(CILBinaryInstruction):pass
-
-class CILLessInstruction(CILBooleanBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} < {self.right}"    
-
-class CILLessEqualInstruction(CILBooleanBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} <= {self.right}"    
-
-class CILEqualInstruction(CILBooleanBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} == {self.right}"    
-
-class CILNoEqualInstruction(CILBooleanBinaryInstruction):
-    def __init__(self, id, left, right):
-        super().__init__(id, left, right)
-    def __str__(self):
-        return f"{self.id} = {self.left} != {self.right}"    
-
-### Acceso a atributos
-
-#x = GETATTR y b ;
-#Es equivalente a `x = y.b`.
-class CILGETATTRInst(CILInstruction):
-    def __init__(self, id,y,attr):
-        self.id = id
-        self.y=y
-        self.attr=attr
-    def __str__(self):
-        return f"{self.id} = GETATTR {self.y} {self.attr}"
-
-#SETATTR y b x ;
-#Es equivalente a `y.b = x`.
-class CILSETATTRInst(CILInstruction):
-    def __init__(self,y,attr,value):
-        self.y=y
-        self.attr=attr
+class Data(Node):
+    def __init__(self, var_name, value):
+        self.var_name = var_name
         self.value = value
-    def __str__(self):
-        return f"SETATTR {self.y} {self.attr} {self.value}"
-
-### Acceso a arrays
-
-#Acceder al iésimo elemento:
-#x = GETINDEX a i ;
-class CILGETINDEXInst(CILInstruction):
-    def __init__(self,id,array,index):
-        self.id=id
-        self.array=array
-        self.index=index
-    def __str__(self):
-        return f"{self.id} = GETINDEX {self.array} {self.index}"
-
-#Asignar un valor
-#SETINDEX a i x ;
-class CILSETINDEXInst(CILInstruction):
-    def __init__(self,array,index,value):
-        self.array=array
-        self.index=index
-        self.value=value
-    def __str__(self):
-        return f"SETINDEX {self.array} {self.index} {self.value}"
-
-### Manipulación de memoria
 
 
-#Instrucción de alocación de memoria:
-#x = ALLOCATE T ;
-#Esta instrucción crea en memoria espacio suficiente para alojar un tipo `T`
-#devuelve en `x` la dirección de memoria de inicio del tipo.
-class CILALLOCATEInst(CILInstruction):
-    def __init__(self,id,type):
-        self.id=id
-        self.type=type
-    def __str__(self):
-        return f"{self.id} = ALLOCATE {self.type}"
-
-#Obtener el tipo dinámico de una variable
-#t = TYPEOF x ;
-class CILTYPEOFInst(CILInstruction):
-    def __init__(self,type,var):
-        self.type=type
-        self.var=var
-    def __str__(self):
-        return f"{self.type} = TYPEOF {self.var}"
-
-#Para crear arrays se utiliza una sintaxis similar
-#x = ARRAY y ;
-#Donde `y` es una variable de tipo numérico (como todas) que define el tamaño del array.
-class CILARRAYInst(CILInstruction):
-    def __init__(self,id,size):
-        self.id=id
-        self.size=size
-    def __str__(self):
-        return f"{self.id} = ARRAY {self.size}"
-
-### Invocación de métodos
-#Para invocar un método se debe indicar el tipo donde se encuentra el método,
-#además del método en concreto que se desea ejecutar.
-#Este llamado es una invocación estática, es decir, se llama exactamente al método `f`.
-#x = CALL f ;
-class CILCALLInst(CILInstruction):
-    def __init__(self,id,meth):
-        self.id=id
-        self.meth=meth
-    def __str__(self):
-        return f"{self.id} = CALL {self.meth}"
+class Function(Node):
+    def __init__(self, fun_name):
+        self.fun_name = fun_name
+        self.params = []
+        self.local_vars = []
+        self.instructions = []
 
 
-#Llamado dinámico, donde el método `f` se buscan en el tipo `T` y se resuelve 
-#la dirección del método real al que invocar:
-#x = VCALL T f ;
-class CILVCALLInst(CILInstruction):
-    def __init__(self,id,meth,type):
-        self.id=id
-        self.meth=meth
-        self.type=type
-    def __str__(self):
-        return f"{self.id} = VCALL {self.type} {self.meth}"
-
-#Todos los parámetros deben ser pasados de antemano, con la siguiente instrucción:
-#ARG a ;
-class CILARGInst(CILInstruction):
-    def __init__(self,params):
-        self.params=params
-    def __str__(self):
-        return f"ARG {self.params}"
-
-### Saltos
-#Donde `label` tiene que ser una etiqueta declarada en algún lugar de la propia función.
-# La etiqueta puede estar declarada después de su uso. 
-#LABEL label ;
-class CILLABELInst(CILInstruction):
-    def __init__(self,id):
-        self.id=id
-    def __str__(self):
-        return f"LABEL {self.id}"
-
-#Los saltos incondicionales simplemente se ejecutan con:
-#GOTO label ;
-class CILGOTOInst(CILInstruction):
-    def __init__(self,label):
-        self.label=label
-    def __str__(self):
-        return f"GOTO {self.label}"
-
-#IF x GOTO label ;
-class CILIFGOTOInst(CILInstruction):
-    def __init__(self,condition,label):
-        self.condition=condition
-        self.label=label
-    def __str__(self):
-        return f"IF {self.condition} GOTO {self.label}"
-
-### Retorno de Función
-#Esta instrucción pone el valor de `x` en la dirección de retorno de `f` y
-#termina la ejecución de la función.
-#RETURN x ;
-#RETURN ;
-class CILRETURNInst(CILInstruction):
-    def __init__(self,value=None):
-        self.value=value
-    def __str__(self):
-        if self.value is None:
-            return f"RETURN "
-        return f"RETURN {self.value}"    
+class Instruction(Node):
+    pass
 
 
-### Funciones de cadena
+class Assign(Instruction):
+    def __init__(self, dest, _type, source):
+        self.dest = dest
+        self.type = _type
+        self.source = source
 
-#Las cadenas de texto se pueden manipular con funciones especiales.
-#x = LOAD msg ;
-class CILLOADInst(CILInstruction):
-    def __init__(self,id,msg):
-        self.id=id
-        self.msg=msg
-    def __str__(self):
-        return f"{self.id} = LOAD {self.msg}"    
 
-#y = LENGTH x ;
-class CILLENGTHInst(CILInstruction):
-    def __init__(self,id,chain):
-        self.id=id
-        self.chain=chain
-    def __str__(self):
-        return f"{self.id} = LENGTH {self.chain}"    
+class Arithmetic(Instruction):
+    def __init__(self, dest, left, right):
+        self.dest = dest
+        self.left = left
+        self.right = right
 
-#y = CONCAT x z ;
-class CILCONCATInst(CILInstruction):
-    def __init__(self, id, chain1, chain2):
-        self.id=id
-        self.chain1=chain1
-        self.chain2=chain2
 
-    def __str__(self):
-        return f"{self.id} = CONCAT {self.chain1} {self.chain2}"    
+class Plus(Arithmetic):
+    pass
 
-#y = SUBSTRING chain chain ;
-class CILSUBSTRINGInst(CILInstruction):
-    def __init__(self, id, chain1, chain2):
-        self.id=id
-        self.chain1=chain1
-        self.chain2=chain2
 
-    def __str__(self):
-        return f"{self.id} = SUBSTRING {self.chain1} {self.chain2}"    
+class Minus(Arithmetic):
+    pass
 
-#Computa la representación textual de un valor numérico y devuelve la dirección en memoria:
-#z = STR y ;
-class CILSTRInst(CILInstruction):
-    def __init__(self,id,chain):
-        self.id=id
-        self.chain=chain
-    def __str__(self):
-        return f"{self.id} = STR {self.chain}"    
 
-### Operaciones IO
+class Star(Arithmetic):
+    pass
 
-#READ lee de la entrada estándar hasta el siguiente cambio de línea (incluído)
-#x = READ ;
-class CILREADIntInst(CILInstruction):
-    def __init__(self,id:str):
-        self.id:str=id
-    def __str__(self):
-        return f"{self.id} = READ"    
 
-class CILREADStringInst(CILInstruction):
-    def __init__(self,id:str):
-        self.id:str=id
-    def __str__(self):
-        return f"{self.id} = READ"    
+class Div(Arithmetic):
+    pass
 
-#PRINT imprime en la salida estándar, sin incluir el cambio de línea
-#PRINT z ;
-class CILPRINTInst(CILInstruction):
-    def __init__(self,id:str):
-        self.id:str=id
-    def __str__(self):
-        return f"PRINT {self.id}"    
 
-class CILVoidInstruction(CILInstruction):
-    def __init__(self,expr):
-        self.expr=expr
+class GetAttr(Instruction):
+    def __init__(self, dest, instance, attribute):
+        self.dest = dest
+        self.instance = instance  # local con la direccion en memoria
+        self.attribute = attribute  # indice del atributo(contando los heredados)
 
-    def __str__(self):
-        return f"Is Void? {self.expr}"
+
+class SetAttr(Instruction):
+    def __init__(self, instance, attribute, src):
+        self.instance = instance  # local con la direccion en memoria
+        self.attribute = attribute  # indice del atributo
+        self.value = src
+
+
+class GetIndex(Instruction):
+    def __init__(self, destiny, direction, index):
+        self.destiny = destiny
+        self.direction = direction
+        self.index = index
+
+
+class SetIndex(Instruction):
+    def __init__(self, value, direction, index):
+        self.value = value
+        self.direction = direction
+        self.index = index
+
+
+class Allocate(Instruction):
+    def __init__(self, destiny, _type):
+        self.destiny = destiny
+        self.type = _type
+
+
+class TypeOf(Instruction):
+    def __init__(self, destiny, var):
+        self.destiny = destiny
+        self.var = var
+
+
+class Array(Instruction):
+    def __init__(self, name, size):
+        self.name = name
+        self.size = size
+
+
+class Call(Instruction):
+    def __init__(self, destiny, function_name):
+        self.destiny = destiny
+        self.function_name = function_name
+
+
+class DynamicCall(Instruction):
+    def __init__(self, destiny, type_name, function_name):
+        self.destiny = destiny
+        self.type_name = type_name
+        self.func_name = function_name
+
+
+class Arg(Instruction):
+    def __init__(self, arg_info):
+        self.arg_info = arg_info
+
+
+class IfGoto(Instruction):
+    def __init__(self, condition, label):
+        self.condition = condition
+        self.label = label
+
+
+class Label(Instruction):
+    def __init__(self, name):
+        self.name = name
+
+
+class Goto(Instruction):
+    def __init__(self, label_name):
+        self.label_name = label_name
+
+
+class Return(Instruction):
+    def __init__(self, value=None):
+        self.value = value
+
+
+class Load(Instruction):
+    def __init__(self, dest, msg):
+        self.dest = dest
+        self.msg = msg
+
+
+class Length(Instruction):
+    def __init__(self, dest, str_address):
+        self.dest = dest
+        self.str_address = str_address
+
+
+class Concat(Instruction):
+    def __init__(self, dest, head1, head2):
+        self.dest = dest
+        self.head1 = head1
+        self.head2 = head2
+
+
+class Substring(Instruction):
+    def __init__(self, dest, str_addr, pos, length):
+        self.dest = dest
+        self.str_addr = str_addr
+        self.pos = pos
+        self.length = length
+
+
+class ToStr(Instruction):
+    def __init__(self, dest, ivalue):
+        self.dest = dest
+        self.ivalue = ivalue
+
+
+
+
+
+
+
+
+
+
+class Copy(Instruction):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+
+class GetParent(Instruction):
+    def __init__(self, dest, instance, array, length):
+        self.dest = dest
+        self.instance = instance  # local con la direccion en memoria
+        self.array_name = array  # indice del atributo(contando los heredados)
+        self.length = length
+
+    def to_string(self):
+        return "{} = GETPARENT {} {}".format(self.dest, self.instance, self.array_name)
+
+
+
+
+
+
+
+
+
+
+class ReadStr(Instruction):
+    def __init__(self, dest):
+        self.dest = dest
+
+    def to_string(self):
+        return "{} = READ".format(self.dest)
+
+
+class ReadInt(Instruction):
+    def __init__(self, dest):
+        self.dest = dest
+
+    def to_string(self):
+        return "{} = READ".format(self.dest)
+
+
+class PrintStr(Instruction):
+    def __init__(self, str_addr):
+        self.str_addr = str_addr
+
+    def to_string(self):
+        return "PRINT {}".format(self.str_addr)
+
+
+class PrintInt(Instruction):
+    def __init__(self, value):
+        self.value = value
+
+    def to_string(self):
+        return "PRINT {}".format(self.value)
+
+
+class EndProgram(Instruction):
+    def __init__(self):
+        pass
+
+    def to_string(self):
+        return "PROGRAM END WITH ERROR"
+
+
+class IsVoid(Instruction):
+    def __init__(self, dest, obj):
+        self.dest = dest
+        self.obj = obj
+
+
+class LowerThan(Instruction):
+    def __init__(self, dest, left_expr, right_expr):
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+
+    def to_string(self):
+        return "{} <- {} < {}".format(self.dest, self.left, self.right)
+
+
+class LowerEqualThan(Instruction):
+    def __init__(self, dest, left_expr, right_expr):
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+
+    def to_string(self):
+        return "{} <- {} <= {}".format(self.dest, self.left, self.right)
+
+
+class EqualThan(Instruction):
+    def __init__(self, dest, left_expr, right_expr):
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+
+    def to_string(self):
+        return "{} <- {} == {}".format(self.dest, self.left, self.right)
+
+
+class Exit(Instruction):
+    def __init__(self):
+        pass
+
+    def to_string(self):
+        return 'Exit'
+
+
+class EqualStrThanStr(Instruction):
+    def __init__(self, dest, left_expr, right_expr):
+        self.dest = dest
+        self.left = left_expr
+        self.right = right_expr
+
+    def to_string(self):
+        return "{} <- {} == {}".format(self.dest, self.left, self.right)
