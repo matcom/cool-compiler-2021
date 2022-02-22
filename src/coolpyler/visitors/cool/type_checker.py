@@ -346,11 +346,12 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolBlockNode)
     def visit(self, node, scope):  # noqa: F811
+        exp = None
         expr_list = []
         for exp in node.expr_list:
             exp = self.visit(exp, scope)
             expr_list.append(exp)
-        return type_checked.CoolBlockNode(expr_list, exp.type)
+        return type_checked.CoolBlockNode(node.lineno, node.columnno, expr_list, exp.type if exp is not None else ErrorType())
 
     @visitor.when(type_built.CoolAssignNode)
     def visit(self, node, scope):  # noqa: F811
@@ -371,7 +372,7 @@ class TypeCheckerVisitor:
         exp = self.visit(node.expr, scope)
         if not exp.type.conforms_to(var_type):
             self.errors.append(
-                errors.IncompatibleTypeError(
+                errors.IncompatibleTypesError(
                     node.lineno, node.columnno, exp.type.name, var_type.name
                 )
             )
@@ -532,7 +533,7 @@ class TypeCheckerVisitor:
 
         if conditional.type != self.get_type("Bool"):
             self.errors.append(
-                errors.IncompatibleTypeError(
+                errors.IncompatibleTypesError(
                     node.lineno, node.columnno, conditional.type.name, "Bool"
                 )
             )
@@ -550,7 +551,7 @@ class TypeCheckerVisitor:
 
         if not conditional.type.conforms_to(bool_type):
             self.errors.append(
-                errors.IncompatibleTypeError(
+                errors.IncompatibleTypesError(
                     node.lineno, node.columnno, conditional.type.name, "Bool"
                 )
             )
