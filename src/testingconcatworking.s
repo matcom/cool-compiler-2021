@@ -24,7 +24,6 @@ j __start_copy_loop
 __end_copy_loop:
 jr $ra
 __string_length:
-lw $a0, 4($a0)
 li $v0, 0
 __string_length_start_loop:
 lb $t0, 0($a0)
@@ -35,7 +34,6 @@ j __string_length_start_loop
 __string_length_end_loop:
 jr $ra
 __string_substring:
-lw $a0, 4($a0)
 addi $sp, $sp, -16
 sw $a0, 0($sp)
 sw $a1, 4($sp)
@@ -68,28 +66,14 @@ addi $a0, $a0, -1
 j __string_substring_start_copy
 __string_substring_end_copy:
 sb $zero, 0($t2)
-la $t0, String
-li $a0, 8
-li $v0, 9
-syscall
-sw $t0, 0($v0)
-sw $v0, 4($v0)
 jr $ra
 __string_substring_abort:
 addi $v0, $zero, 10
 syscall
 __type_name:
-lw $t0, 8($a0)
-la $t1, String
-li $a0, 8
-li $v0, 9
-syscall
-sw $t1, 0($v0)
-sw $t0, 4($v0)
+lw $v0, 8($a0)
 jr $ra
 __concat:
-lw $a0, 4($a0)
-lw $a1, 4($a1)
 addi $sp, $sp, -12
 sw $a0, 0($sp)
 sw $a1, 4($sp)
@@ -143,12 +127,6 @@ addi $t2, $t2, -1
 j __concat_string2_copy_start_copy
 __concat_string2_copy_end_copy:
 sb $zero, 0($v1)
-la $t0, String
-li $a0, 8
-li $v0, 9
-syscall
-sw $t0, 0($v0)
-sw $v0, 4($v0)
 jr $ra
 main:
 addi $sp, $sp, -12
@@ -295,8 +273,6 @@ move $fp, $t0
 lw $t0, 0($fp)
 la $t1, String
 sw $t1, 0($t0)
-la $t1, __empty_string
-sw $t1, 4($t0)
 lw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
@@ -410,10 +386,9 @@ sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
 lw $a0, 0($fp)
-lw $a0, 4($a0)
 addi $v0, $zero, 4
 syscall
-lw $v0, 4($fp)
+li $v0, 0
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addi $sp, $sp, 8
@@ -429,7 +404,7 @@ move $fp, $t0
 lw $a0, 0($fp)
 addi $v0, $zero, 1
 syscall
-lw $v0, 4($fp)
+li $v0, 0
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addi $sp, $sp, 8
@@ -446,17 +421,11 @@ li $a1, 1024
 move $a0, $a1
 li $v0, 9
 syscall
+# HERE
 move $a0, $v0
 addi $v0, $zero, 8
 syscall
-move $a1, $a0
-la $t0, String
-li $a0, 8
-li $v0, 9
-syscall
-sw $t0, 0($v0)
-sw $a1, 4($v0)
-sw $v0, 0($fp)
+sw $a0, 0($fp)
 lw $v0, 0($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
@@ -496,65 +465,45 @@ addi $sp, $sp, 8
 addi $sp, $sp, 4
 jr $ra
 function_main_at_Main:
-addi $sp, $sp, -24
+addi $sp, $sp, -16
 move $t0, $sp
 addi $sp, $sp, -8
 sw $ra, 0($sp)
 sw $fp, 4($sp)
 move $fp, $t0
 la $t0, data_6
-la $t1, String
-li $a0, 8
-li $v0, 9
-syscall
-sw $t1, 0($v0)
-sw $t0, 4($v0)
-sw $v0, 0($fp)
+sw $t0, 0($fp)
 la $t0, data_7
-la $t1, String
-li $a0, 8
-li $v0, 9
-syscall
-sw $t1, 0($v0)
-sw $t0, 4($v0)
-sw $v0, 4($fp)
+sw $t0, 4($fp)
 lw $t0, 0($fp)
 addi $sp, $sp, -4
 sw $t0, 0($sp)
 lw $t0, 4($fp)
 addi $sp, $sp, -4
 sw $t0, 0($sp)
-lw $t0, 0($fp)
-lw $t0, 0($t0)
-sw $t0, 12($fp)
-lw $t0, 12($fp)
-lw $t0, 32($t0)
-jal __get_ra
-move $ra, $v0
-jr $t0
+jal function_concat_at_String
 sw $v0, 8($fp)
-lw $t0, 24($fp)
+lw $t0, 16($fp)
 addi $sp, $sp, -4
 sw $t0, 0($sp)
 lw $t0, 8($fp)
 addi $sp, $sp, -4
 sw $t0, 0($sp)
-lw $t0, 24($fp)
-lw $t0, 0($t0)
-sw $t0, 20($fp)
-lw $t0, 20($fp)
-lw $t0, 28($t0)
-jal __get_ra
-move $ra, $v0
-jr $t0
-sw $v0, 16($fp)
-lw $v0, 16($fp)
+jal function_out_string_at_IO
+sw $v0, 12($fp)
+lw $v0, 12($fp)
 lw $ra, 0($sp)
 lw $fp, 4($sp)
 addi $sp, $sp, 8
-addi $sp, $sp, 28
+addi $sp, $sp, 20
 jr $ra
 .data
+Object: .word 0, 4, data_0, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, __init_Object_type
+String: .word Object, 4, data_1, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_length_at_String, function_concat_at_String, function_substr_at_String, __init_String_type
+Bool: .word Object, 4, data_2, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, __init_Bool_type
+Int: .word Object, 4, data_3, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, __init_Int_type
+IO: .word Object, 4, data_4, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, __init_IO_type
+Main: .word IO, 4, data_5, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, function_main_at_Main, __init_Main_type
 data_0: .asciiz "Object"
 data_1: .asciiz "String"
 data_2: .asciiz "Bool"
@@ -563,10 +512,3 @@ data_4: .asciiz "IO"
 data_5: .asciiz "Main"
 data_6: .asciiz "Hello "
 data_7: .asciiz "World!"
-__empty_string: .asciiz ""
-Object: .word 0, 4, data_0, __init_Object_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
-String: .word Object, 4, data_1, __init_String_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_length_at_String, function_concat_at_String, function_substr_at_String
-Bool: .word Object, 4, data_2, __init_Bool_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
-Int: .word Object, 4, data_3, __init_Int_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
-IO: .word Object, 4, data_4, __init_IO_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO
-Main: .word IO, 4, data_5, __init_Main_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, function_main_at_Main

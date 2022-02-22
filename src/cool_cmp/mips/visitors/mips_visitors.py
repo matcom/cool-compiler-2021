@@ -242,6 +242,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     TO_METHODS_OFFSET = 12 # 4 Father, 4 Instance Size, 4 Type Name address, METHODS
     TYPE_NAME_OFFSET = 8 # 4 Father, 4 Instance Size, Type Name address
     MAX_STRING_LENGTH = 1024 # Max amount reserved when a read system call is made
+    STRING_EMPTY = None # Stores the data address for the "" string
     
     def __init__(self, errors=[]) -> None:
         self.errors = errors
@@ -337,6 +338,18 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         if add_null:
             self.add_instruction(StoreByteNode(Reg.zero(), 0, string_dest)) # Final null character
 
+    def _add_create_string_instance(self, temp_reg, string_address):
+        """
+        Returns in $v0 the new instance of String,Address.
+        Uses $a0, $v0
+        """
+        self.add_instruction(LoadAddressNode(temp_reg, "String")) # Type address into $a0
+        self.add_instruction(LoadImmediateNode(Reg.a(0), self.WORD_SIZE * 2)) # If String the is type and address
+        self._allocate_heap_space(Reg.a(0))
+
+        self.add_instruction(StoreWordNode(temp_reg, 0, Reg.v(0))) # Store String Type
+        self.add_instruction(StoreWordNode(string_address, self.WORD_SIZE, Reg.v(0))) # Store String Address
+        
 
     def _add_copy_function(self):
         """
@@ -378,6 +391,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         self.add_instruction(LabelNode("__string_length"))
 
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Actual String address
+
         self.add_instruction(LoadImmediateNode(Reg.v(0), 0)) # v0 = current length
         start_loop = "__string_length_start_loop"
         end_loop = "__string_length_end_loop"
@@ -396,10 +411,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
     def _add_substring_function(self):
         """
-        Returns in $v0 the result of the substring in $a0 starting in index $a1 with length $a2
+        Returns in $v0 the result of the substring of $a0 starting in index $a1 with length $a2
         """
 
         self.add_instruction(LabelNode("__string_substring"))
+
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Actual String address
 
         saved_register = [Reg.a(0), Reg.a(1), Reg.a(2), Reg.ra()]
         self._push(saved_register) # Save arguments
@@ -433,6 +450,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
         self._add_copy_string_cycle("__string_substring", Reg.a(0), Reg.t(1), Reg.t(2), Reg.t(3))
 
+        self._add_create_string_instance(Reg.t(0), Reg.v(0))
+
         self.add_instruction(JumpRegisterNode(Reg.ra())) # Return the address of the new String
 
         self.add_instruction(LabelNode(abort_label))
@@ -443,8 +462,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         Returns in $v0 the string address of the type given in $a0
         """
         self.add_instruction(LabelNode("__type_name"))
-        # $v0 = type name address
-        self.add_instruction(LoadWordNode(Reg.v(0), self.TYPE_NAME_OFFSET, Reg.a(0)))
+        # $t0 = type name address
+        self.add_instruction(LoadWordNode(Reg.t(0), self.TYPE_NAME_OFFSET, Reg.a(0)))
+        
+        self._add_create_string_instance(Reg.t(1), Reg.t(0))
         
         self.add_instruction(JumpRegisterNode(Reg.ra())) # Return the address of the String
 
@@ -455,6 +476,9 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
         self.add_instruction(LabelNode("__concat"))
 
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Actual String address
+        self.add_instruction(LoadWordNode(Reg.a(1), self.WORD_SIZE, Reg.a(1))) # Actual String address
+     
         saved_register = [Reg.a(0), Reg.a(1), Reg.ra()]
         self._push(saved_register) # Save arguments
         self.add_instruction(JumpAndLinkNode("__string_length"))
@@ -493,6 +517,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         # up to the next character.
         self._add_copy_string_cycle("__concat_string1_copy", Reg.t(0), Reg.t(1), Reg.v(1), Reg.t(3), add_null=False)
         self._add_copy_string_cycle("__concat_string2_copy", Reg.t(2), Reg.a(1), Reg.v(1), Reg.t(3), add_null=True)
+
+        self._add_create_string_instance(Reg.t(0), Reg.v(0))
 
         self.add_instruction(JumpRegisterNode(Reg.ra()))
 
@@ -571,9 +597,14 @@ class CILToMIPSVisitor(): # TODO Complete the transition
             self.type_method_dict_list[type_node.name] = type_node.methods.copy()
             for method,static_method in type_node.methods:
                 self.method_dict_name[type_node.name, method] = static_method
-        
+
         program = ProgramNode("Genereted MIPS")
         self.program_node = program
+
+        for data in node.dotdata: # Register data nodes
+            self.visit(data)
+        self.visit(cil.DataNode("__empty_string", '""')) # Register empty string data
+        self.STRING_EMPTY = self.program_node.data[-1].name
 
         self._add_get_ra_function()
         self._add_copy_function()
@@ -590,9 +621,6 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         
         for typex in node.dottypes:
             self.visit(typex)
-
-        for data in node.dotdata:
-            self.visit(data)
 
         return program
 
@@ -629,11 +657,18 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):
+        if node.type == "Int":
+            self._store_local_variable(Reg.zero(), node.dest) # Default value for Int is 0
+            return
+
         if node.type[0].isupper(): # Is a Type name
             self.add_instruction(LoadAddressNode(Reg.a(0), node.type)) # Type address into $a0
         else:
             self._load_local_variable(Reg.a(0), node.type)
-        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Saves in $a0 the bytes size for current type
+        if node.type == "String":
+            self.add_instruction(LoadImmediateNode(Reg.a(0), self.WORD_SIZE * 2)) # If String the is type and address
+        else:
+            self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Saves in $a0 the bytes size for current type
         self._allocate_heap_space(Reg.a(0))
         self._store_local_variable(Reg.v(0), node.dest)
 
@@ -837,6 +872,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.PrintNode)
     def visit(self, node:cil.PrintNode):
         self._load_value(Reg.a(0), node.str_addr)
+        self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0))) # Getting the String address
         self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 4)) # 4 System call code for print string
         self.add_instruction(SyscallNode())
     
@@ -851,10 +887,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def visit(self, node:cil.ReadNode):
         self.add_instruction(LoadImmediateNode(Reg.a(1), self.MAX_STRING_LENGTH)) # a1 = Allocated length Save the length in a1
         self._allocate_heap_space(Reg.a(1)) # Allocates 1024 bytes and return the address un v0
-        self.add_instruction(MoveNode(Reg.a(0), Reg.v(0), comment="HERE")) # a0 = v0 Save the address in a0
+        self.add_instruction(MoveNode(Reg.a(0), Reg.v(0))) # a0 = v0 Save the address in a0
         self.add_instruction(AddImmediateNode(Reg.v(0), Reg.zero(), 8)) # 8 System call code for read string
         self.add_instruction(SyscallNode()) # Fills the address in a0 with the string
-        self._store_local_variable(Reg.a(0), node.dest) # Save the address in the final destination
+        self.add_instruction(MoveNode(Reg.a(1), Reg.a(0))) # a1 = a0 Save the address in a1
+        self._add_create_string_instance(Reg.t(0), Reg.a(1)) # Create String, Address instance 
+        self._store_local_variable(Reg.v(0), node.dest) # Save the address in the final destination
     
     @visitor.when(cil.ReadIntNode)
     def visit(self, node:cil.ReadIntNode):
@@ -867,11 +905,18 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._load_local_variable(Reg.t(0), node.source) # Load object address in t0
         self._load_type_variable(Reg.t(1), node.instance_type) # Load type in t1
         self.add_instruction(StoreWordNode(Reg.t(1), 0, Reg.t(0))) # Assing type to first position in object address
+        if node.instance_type == "String":
+            self.add_instruction(LoadAddressNode(Reg.t(1), self.STRING_EMPTY)) # Init String with empty value
+            self.add_instruction(StoreWordNode(Reg.t(1), self.WORD_SIZE, Reg.t(0))) # Save empty string address in value slot for String
+
 
     @visitor.when(cil.LoadNode)
     def visit(self, node:cil.LoadNode):
         self.add_instruction(LoadAddressNode(Reg.t(0), node.msg))
-        self._store_local_variable(Reg.t(0), node.dest)        
+
+        self._add_create_string_instance(Reg.t(1), Reg.t(0))
+
+        self._store_local_variable(Reg.v(0), node.dest)        
     
     @visitor.when(cil.ObjectCopyNode)
     def visit(self, node:cil.ObjectCopyNode):
