@@ -12,3 +12,6 @@ tests = [(file) for file in os.listdir(tests_dir) if file.endswith('.cl')]
 def test_semantic_errors(compiler_path, cool_file):
     compare_errors(compiler_path, tests_dir + cool_file, tests_dir + cool_file[:-3] + '_error.txt', \
         cmp=first_error_only_line)
+    
+# if __name__ == "__main__":
+#     pytest.main(["-m", "semantic"])
