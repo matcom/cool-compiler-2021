@@ -48,11 +48,12 @@ class TypeBuilderVisitor:
         except semantic.SemanticError as e:
             self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
 
-        attr_info = self.current_type.define_attribute("self", self.current_type)
-        self_attr = type_built.CoolAttrDeclNode(
-            node.lineno, node.columnno, attr_info, None
-        )
-        features = [self_attr] + [self.visit(feat) for feat in node.features]
+        # attr_info = self.current_type.define_attribute("self", self.current_type)
+        # self_attr = type_built.CoolAttrDeclNode(
+        #     node.lineno, node.columnno, attr_info, None
+        # )
+        # features = [self_attr] + [self.visit(feat) for feat in node.features]
+        features = [self.visit(feat) for feat in node.features]
 
         return type_built.CoolClassNode(
             node.lineno, node.columnno, node.type, features, node.parent

@@ -170,6 +170,7 @@ class ErrorType(Type):
 class ObjectType(Type):
     def __init__(self):
         Type.__init__(self, "Object")
+        self.define_attribute("self", self)
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, ObjectType)
