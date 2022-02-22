@@ -23,11 +23,12 @@ class DataNode(Node):
         self.value = value
 
 class FunctionNode(Node):
-    def __init__(self, fname, params, localvars, instructions):
+    def __init__(self, fname, params, localvars, instructions, ctor= False):
         self.name = fname
         self.params = params
         self.localvars = localvars
         self.instructions = instructions
+        self.ctor = ctor
 
 class ParamNode(Node):
     def __init__(self, name):

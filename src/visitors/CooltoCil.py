@@ -72,17 +72,35 @@ class BaseCOOLToCILVisitor:
         return data_node
 
 
-class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
+class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
     def visit(self, node):
         pass
     
+    def class_node_from_context(self, type):
+        idx = type.name
+        features = self.features_from_context(type)
+        parent = 'Object' if idx not in ['Object', 'Void'] else None
+        return ClassDeclarationNode(idx, features, parent)
+
+    def features_from_context(self, type):
+        feats = [AttrDeclarationNode(feat.name, feat.type) for feat in type.attributes]
+        for func in type.methods:
+            feats.append(FuncDeclarationNode(func.name, func.param_names, func.return_type, None))
+        
+        return feats
+
     @visitor.when(ProgramNode)
     def visit(self, node, scope):
         ######################################################
         # node.declarations -> [ ClassDeclarationNode ... ]
         ######################################################
         
+        # class_nodes = [self.class_node_from_context(c) for c in self.context.types]
+        built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types]
+
+
+
         self.current_function = self.register_function('entry')
         instance = self.define_internal_local()
         self.instances.append(instance)
@@ -190,7 +208,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         self.parameters.clear()
         self.params.append(cil.ParamNode('self'))
         for arg_name, _ in node.params:
-            self.params.add(arg_name)
+            self.parameters.add(arg_name)
             self.params.append(cil.ParamNode(arg_name))
         
         self.locals.clear()
@@ -538,13 +556,14 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node, scope):
         value = self.define_internal_local()
         self.register_instruction(cil.AllocateNode('Bool', value))
-        #setear atributo 0 a True
-
+        # setear atributo 0 a True
+        return value
 
     @visitor.when(FalseNode)
     def visit(self, node, scope):
-        return '0'
-
+        value = self.define_internal_local()
+        self.register_instruction(cil.AllocateNode('Bool', value))
+        return value
 
     @visitor.when(StringNode)
     def visit(self, node, scope):

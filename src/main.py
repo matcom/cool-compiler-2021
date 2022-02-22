@@ -5,7 +5,7 @@ from pipeline import Pipeline
 
 
 # with open('/home/yumenio/Documents/cmp/cool-compiler-2021/cool-compiler-2021/tests/semantic/self4.cl') as f:
-with open('./tests/boku/test1.cl') as f:
+with open('./tests/codegen/hello_world.cl') as f:
     program =  f.read()
 
 coolLexer = lexer.CoolLexer()

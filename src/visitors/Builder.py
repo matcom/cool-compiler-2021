@@ -42,6 +42,9 @@ class TypeBuilder:
         _string.define_method('substr', ['index', 'length'], [_int, _int], _string)
         _string.define_method('concat', ['str'], [_string], _string)
 
+        _int.define_attribute('value', _int)
+        _bool.define_attribute('value', _int)
+        _string.define_attribute('value', _string)
 
         for declaration in node.declarations:
             self.visit(declaration)
