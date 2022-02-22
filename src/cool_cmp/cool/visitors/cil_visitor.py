@@ -842,9 +842,13 @@ class COOLToCILVisitor():
         for m in typex.methods:
             name = self.to_function_name(m.name, typex.name)
             self.register_function(name)
-            if len([x for (_, x) in dottype.methods if x == name]) == 0:
-                dottype.methods.append((m.name, name))
+            temp = [(x, y) for (x, y) in dottype.methods if x == m.name]
+            if len(temp) > 0:
+                dottype.methods[dottype.methods.index(temp[0])] = (m.name, name)
 
+            elif len([x for (_, x) in dottype.methods if x == name]) == 0:
+                dottype.methods.append((m.name, name))
+            
     # def create_empty_attrs(self, typex, dottype):
     #     if typex.parent:
     #         self.create_empty_attrs(typex.parent, dottype)
@@ -906,7 +910,7 @@ class COOLToCILVisitor():
             # Defining attribute's init functions
             type_node.attributes.append(attr.name)
             new_function = self.register_function(self.to_init_attr_function_name(attr.name, self.current_type.name))
-            type_node.methods.append((new_function.name, new_function.name)) 
+            # type_node.methods.append((new_function.name, new_function.name)) 
             self.current_function = new_function
             self.visit(attr.node, attr.node.scope)
             
@@ -925,7 +929,7 @@ class COOLToCILVisitor():
                     new_function = self.register_function(method_name)
                 else:
                     new_function = next(x for x in self.dotcode if x.name == method_name)
-                type_node.methods.append((method.name,new_function.name))
+                # type_node.methods.append((method.name,new_function.name))
 
 
 
@@ -933,7 +937,7 @@ class COOLToCILVisitor():
         func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
         for feature in func_declarations:
             self.current_function = self.register_function(self.to_function_name(feature.id,self.current_type.name))
-            type_node.methods.append((feature.id,self.current_function.name))
+            # type_node.methods.append((feature.id,self.current_function.name))
             self.visit(feature, feature.scope)
                 
         self.current_type = None
