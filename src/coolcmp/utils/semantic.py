@@ -167,7 +167,8 @@ class VoidType(Type):
         Type.__init__(self, '<void>')
 
     def conforms_to(self, other) -> bool:
-        raise Exception('Invalid type: void type.')
+        # raise Exception('Invalid type: void type.')
+        return True
 
     def bypass(self) -> bool:
         return True
@@ -178,7 +179,7 @@ class VoidType(Type):
 
 class IntType(Type):
     def __init__(self):
-        Type.__init__(self, 'int')
+        Type.__init__(self, 'Int')
 
     def __eq__(self, other) -> bool:
         return other.name == self.name or isinstance(other, IntType)

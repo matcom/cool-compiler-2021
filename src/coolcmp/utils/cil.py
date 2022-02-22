@@ -87,7 +87,7 @@ class AssignNode(InstructionNode):
 
 
 class ArithmeticNode(InstructionNode):
-    def __init__(self, dest, left, right):
+    def __init__(self, dest: str, left: str, right: str):
         self.dest = dest
         self.left = left
         self.right = right
@@ -149,15 +149,19 @@ class TypeOfNode(InstructionNode):
 
 
 class LabelNode(InstructionNode):
-    pass
+    def __init__(self, name: str):
+        self.name = name
 
 
 class GotoNode(InstructionNode):
-    pass
+    def __init__(self, label: str):
+        self.label = label
 
 
 class GotoIfNode(InstructionNode):
-    pass
+    def __init__(self, condition: str, label: str):
+        self.condition = condition
+        self.label = label
 
 
 class StaticCallNode(InstructionNode):
@@ -217,5 +221,32 @@ class ReadNode(InstructionNode):
 
 
 class PrintNode(InstructionNode):
-    def __init__(self, str_addr):
-        self.str_addr = str_addr
+    def __init__(self, addr: str):
+        self.addr = addr
+
+
+class PrintIntNode(PrintNode):
+    pass
+
+
+class PrintStringNode(PrintNode):
+    pass
+
+
+class NegationNode(InstructionNode):
+    def __init__(self, dest: str, src: str):
+        self.dest = dest
+        self.src = src
+
+
+class ComplementNode(InstructionNode):
+    def __init__(self, dest: str, src: str):
+        self.dest = dest
+        self.src = src
+
+
+class CompareNode(InstructionNode):
+    def __init__(self, dest: str, left: str, right: str):
+        self.dest = dest
+        self.left = left
+        self.right = right

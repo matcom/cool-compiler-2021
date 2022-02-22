@@ -24,6 +24,9 @@ class TypeChecker:
     def visit(self, node: ProgramNode, scope: Scope = None):
         scope = Scope('Object')
 
+        for attr in self.context.get_type('Object').attributes:
+            scope.define_variable(attr.name, attr.type, is_attr=True)
+
         pending = [(class_node.id, class_node) for class_node in node.declarations]
         scopes = {'Object': scope, 'IO': scope.create_child('IO')}
 
@@ -137,12 +140,11 @@ class TypeChecker:
 
     @visitor.when(LetNode)
     def visit(self, node: LetNode, scope: Scope):
-        new_scope = scope
+        child_scope = scope.create_child()
         for declaration in node.declarations:
-            new_scope = new_scope.create_child()
-            self.visit(declaration, new_scope)
+            self.visit(declaration, child_scope)
 
-        return self.visit(node.expr, new_scope.create_child())
+        return self.visit(node.expr, child_scope)
 
     @visitor.when(LetDeclarationNode)
     def visit(self, node: LetDeclarationNode, scope: Scope):
@@ -157,7 +159,7 @@ class TypeChecker:
         else:
             scope.define_variable(node.id, type_)
 
-        expr_type: Type = self.visit(node.expr, scope.create_child()) if node.expr is not None else None
+        expr_type: Type = self.visit(node.expr, scope) if node.expr is not None else None
         if expr_type is not None and not expr_type.conforms_to(type_):
             self.errors.append(err.INCOMPATIBLE_TYPES % (node.expr_pos, expr_type.name, type_.name))
 
@@ -165,7 +167,8 @@ class TypeChecker:
 
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode, scope: Scope):
-        self.visit(node.expr, scope.create_child())
+        child_scope = scope.create_child()
+        self.visit(node.expr, child_scope)
 
         case_types = []
         reported_types = []
@@ -179,7 +182,7 @@ class TypeChecker:
                 case_types.append(type_)
 
         types = [
-            self.visit(case, scope.create_child())
+            self.visit(case, child_scope)
             for case in node.cases
         ]
 
@@ -210,7 +213,7 @@ class TypeChecker:
             self.errors.append(err.SELF_IS_READONLY % (node.pos, ))
 
         var = scope.find_variable(node.id)
-        expr_type = self.visit(node.expr, scope.create_child())
+        expr_type = self.visit(node.expr, scope)
         if var is None:
             self.errors.append(err.VARIABLE_NOT_DEFINED % (node.pos, node.id, self.current_method.name))
         else:
@@ -221,13 +224,13 @@ class TypeChecker:
     @visitor.when(ConditionalNode)
     def visit(self, node: ConditionalNode, scope: Scope):
         if_type = self.visit(node.if_expr, scope)
-        then_type = self.visit(node.then_expr, scope)
-        esle_type = self.visit(node.else_expr, scope)
+        then_type = self.visit(node.then_expr, scope.create_child())
+        else_type = self.visit(node.else_expr, scope.create_child())
 
         if if_type != self.context.get_type('Bool'):
             self.errors.append(err.INCOMPATIBLE_TYPES % (node.pos, if_type.name, 'Bool'))
 
-        return then_type.join(esle_type)
+        return then_type.join(else_type)
 
     @visitor.when(WhileNode)
     def visit(self, node: WhileNode, scope: Scope):
@@ -235,7 +238,7 @@ class TypeChecker:
         if cond_type != self.context.get_type('Bool'):
             self.errors.append(err.INCOMPATIBLE_TYPES % (node.pos, cond_type.name, 'Bool'))
 
-        self.visit(node.body, scope.create_child())
+        self.visit(node.body, scope)
 
         return self.context.get_type('Object')
 

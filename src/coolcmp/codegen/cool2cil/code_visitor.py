@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 
 from coolcmp.codegen.cool2cil import CILVisitor
 from coolcmp.utils import ast, cil, visitor
@@ -15,6 +16,12 @@ class DotCodeVisitor(CILVisitor):
         self.code = cil_root.dot_code
         self.current_function: cil.FunctionNode | None = None
         self.current_type: str | None = None
+        self.label_count = -1
+
+    def new_label(self, name: str) -> cil.LabelNode:
+        self.label_count += 1
+        name = f'_{name}_{self.label_count}'
+        return cil.LabelNode(name)
 
     def add_function(self, name: str = None):
         if name is None:
@@ -50,13 +57,12 @@ class DotCodeVisitor(CILVisitor):
                 for feature in class_.features:
                     if isinstance(feature, ast.FuncDeclarationNode) and feature.id == 'main':
                         self.add_function('entry')
-                        main_scope = scope.get_tagged_scope('Main')
+                        main_scope = deepcopy(scope.get_tagged_scope('Main'))
                         instance = self.add_local('instance')
                         self.add_inst(cil.AllocateNode('Main', instance))
                         for attr in (f for f in class_.features if isinstance(f, ast.AttrDeclarationNode)):
-                            if attr.expr is not None:
-                                expr_dest = self.visit(attr.expr, main_scope)
-                                self.add_inst(cil.SetAttrNode(instance, f'Main_{attr.id}', expr_dest))
+                            expr_dest = self.visit(attr.expr, main_scope)
+                            self.add_inst(cil.SetAttrNode(instance, f'Main_{attr.id}', expr_dest))
                         result = self.add_local('result')
                         self.add_inst(cil.ArgNode(instance))
                         self.add_inst(cil.DynamicCallNode('Main', 'Main_main', result))
@@ -73,24 +79,48 @@ class DotCodeVisitor(CILVisitor):
             # cil.FunctionNode('abort', [], [], []),
             # cil.FunctionNode('type_name', [], [], []),
             # cil.FunctionNode('copy', [], [], []),
-            # cil.FunctionNode('out_string', [], [], []),
+            cil.FunctionNode(
+                name='get_void',
+                params=[],
+                local_vars=[],
+                instructions=[
+                    cil.LocalNode('void_inst'),
+                    cil.AllocateNode('<void>', 'void_inst'),
+                    cil.ReturnNode('void_inst'),
+                ]
+            ),
             cil.FunctionNode(
                 name='out_string',
                 params=[
-                    cil.ParamNode('str_addr')
+                    cil.ParamNode('self'),
+                    cil.ParamNode('str_addr'),
                 ],
                 local_vars=[],
                 instructions=[
-                    cil.PrintNode('str_addr'),
-                    cil.ReturnNode(0),
+                    cil.PrintStringNode('str_addr'),
+                    cil.ReturnNode(),
                 ]
             ),
-            # cil.FunctionNode('out_int', [], [], []),
+            cil.FunctionNode(
+                name='out_int',
+                params=[
+                    cil.ParamNode('self'),
+                    cil.ParamNode('int_addr'),
+                ],
+                local_vars=[],
+                instructions=[
+                    cil.PrintIntNode('int_addr'),
+                    cil.ReturnNode(),
+                ]
+            ),
             # cil.FunctionNode('in_int', [], [], []),
         ]
 
     @visitor.when(ast.ClassDeclarationNode)
     def visit(self, node: ast.ClassDeclarationNode, scope: Scope):
+        print('>>> class', node.id)
+        print(scope)
+
         self.current_type = node.id
         methods = (f for f in node.features if isinstance(f, ast.FuncDeclarationNode))
         for method in methods:
@@ -98,6 +128,8 @@ class DotCodeVisitor(CILVisitor):
 
     @visitor.when(ast.FuncDeclarationNode)
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
+        print('>>> method', node.id)
+        print(scope)
         self.add_function()
 
         for local in scope.all_locals():
@@ -112,17 +144,123 @@ class DotCodeVisitor(CILVisitor):
         result = self.visit(node.body, scope)
         self.add_inst(cil.ReturnNode(result))
 
+    @visitor.when(ast.LetDeclarationNode)
+    def visit(self, node: ast.LetDeclarationNode, scope: Scope):
+        local = self.add_local(node.id, internal=False)
+        if node.expr is not None:
+            expr_dest = self.visit(node.expr, scope)
+            self.add_inst(cil.AssignNode(local, expr_dest))
+
+    @visitor.when(ast.LetNode)
+    def visit(self, node: ast.LetNode, scope: Scope):
+        scope = scope.children.pop(0)
+        for let_declaration in node.declarations:
+            self.visit(let_declaration, scope)
+
+        return self.visit(node.expr, scope)
+
+    @visitor.when(ast.ParenthesisExpr)
+    def visit(self, node: ast.ParenthesisExpr, scope: Scope):
+        return self.visit(node, scope)
+
+    @visitor.when(ast.BlockNode)
+    def visit(self, node: ast.BlockNode, scope: Scope):
+        scope = scope.children.pop(0)
+        last_expr = None
+        for expr in node.expressions:
+            last_expr = self.visit(expr, scope)
+
+        return last_expr
+
+    @visitor.when(ast.CaseBranchNode)
+    def visit(self, node: ast.CaseBranchNode, scope: Scope):
+        pass
+
+    @visitor.when(ast.CaseNode)
+    def visit(self, node: ast.CaseNode, scope: Scope):
+        pass
+
+    @visitor.when(ast.AssignNode)
+    def visit(self, node: ast.AssignNode, scope: Scope):
+        expr_dest = self.visit(node.expr, scope)
+        self.add_inst(cil.AssignNode(node.id, expr_dest))
+        return expr_dest
+
+    @visitor.when(ast.ConditionalNode)
+    def visit(self, node: ast.ConditionalNode, scope: Scope):
+        """
+        Note that the 'else' branch comes before the 'then' branch.
+
+        <local vars>
+        if_dest = <if_expr>
+        IF if_dest GOTO then
+        else_dest = <else_expr>
+        cond_res = else_dest
+        GOTO endif
+        LABEL then
+        then_dest = <then_expr>
+        cond_res = then_dest
+        LABEL endif
+        """
+        then_label = self.new_label('then')
+        endif_label = self.new_label('endif')
+
+        cond_res = self.add_local('cond_res')
+        if_dest = self.visit(node.if_expr, scope)
+        self.add_inst(cil.GotoIfNode(if_dest, then_label.name))
+        else_dest = self.visit(node.else_expr, scope.children[1])
+        self.add_inst(cil.AssignNode(cond_res, else_dest))
+        self.add_inst(cil.GotoNode(endif_label.name))
+        self.add_inst(then_label)
+        then_dest = self.visit(node.then_expr, scope.children[0])
+        self.add_inst(cil.AssignNode(cond_res, then_dest))
+        self.add_inst(endif_label)
+        return cond_res
+
+    @visitor.when(ast.WhileNode)
+    def visit(self, node: ast.WhileNode, scope: Scope):
+        """
+        <local vars>
+        LABEL while_cond
+        cond_dest = <cond_expr>
+        IF cond_dest GOTO while_body
+        GOTO end_while
+        LABEL while_body
+        <body_expr>     <----- the body return is not used, just side effects
+        GOTO while_cond
+        LABEL end_while
+
+        void_res = VCALL Object get_void
+        """
+        cond_label = self.new_label('while_cond')
+        body_label = self.new_label('while_body')
+        end_while_label = self.new_label('end_while')
+
+        self.add_inst(cond_label)
+        cond_dest = self.visit(node.condition, scope)
+        self.add_inst(cil.GotoIfNode(cond_dest, body_label.name))
+        self.add_inst(cil.GotoNode(end_while_label.name))
+        self.add_inst(body_label)
+        self.visit(node.body, scope)
+        self.add_inst(cil.GotoNode(cond_label.name))
+        self.add_inst(end_while_label)
+
+        # return void
+        void_res = self.add_local('void_res')
+        self.add_inst(cil.StaticCallNode('get_void', void_res))
+        return void_res
+
     @visitor.when(ast.CallNode)
     def visit(self, node: ast.CallNode, scope: Scope):
-        # allocate and push the object type
+        # allocate and push the object
         if node.obj is None:
             obj = ast.VariableNode('self')
         else:
             obj = node.obj
         obj_dest = self.visit(obj, scope)
-        internal = self.add_local('internal')
-        self.add_inst(cil.TypeOfNode(obj_dest, internal))
-        self.add_inst(cil.ArgNode(internal))
+        inst_type = self.add_local('inst_type')
+        self.add_inst(cil.TypeOfNode(obj_dest, inst_type))
+        self.add_inst(cil.ArgNode(obj_dest))
 
         # allocate and push the args
         for arg in node.args:
@@ -130,20 +268,10 @@ class DotCodeVisitor(CILVisitor):
             self.add_inst(cil.ArgNode(arg_dest))
 
         # call the function
-        result = self.add_local('result')
-        self.add_inst(cil.DynamicCallNode(internal, node.id, result))
+        call_res = self.add_local('call_res')
+        self.add_inst(cil.DynamicCallNode(inst_type, node.id, call_res))
 
-        return result
-
-    @visitor.when(ast.VariableNode)
-    def visit(self, node: ast.VariableNode, scope: Scope):
-        return node.lex
-
-    @visitor.when(ast.StringNode)
-    def visit(self, node: ast.StringNode, scope: Scope):
-        dest = self.add_local('internal')
-        self.add_inst(cil.LoadNode(dest, self.root.get_data_name(node.lex)))
-        return dest
+        return call_res
 
     @visitor.when(ast.InstantiateNode)
     def visit(self, node: ast.StringNode, scope: Scope):
@@ -156,3 +284,82 @@ class DotCodeVisitor(CILVisitor):
                 attr_dest = self.visit(attr_expr, scope)
                 self.add_inst(cil.SetAttrNode(instance, attr, attr_dest))
         return instance
+
+    @visitor.when(ast.StringNode)
+    def visit(self, node: ast.StringNode, _):
+        dest = self.add_local('string')
+        self.add_inst(cil.LoadNode(dest, self.root.get_data_name(node.lex)))
+        return dest
+
+    @visitor.when(ast.AtomicNode)
+    def visit(self, node: ast.AtomicNode, _):
+        return node.lex
+
+    @visitor.when(ast.PlusNode)
+    def visit(self, node: ast.PlusNode, scope: Scope):
+        return self.build_arithmetic_node(cil.PlusNode, node, scope)
+
+    @visitor.when(ast.MinusNode)
+    def visit(self, node: ast.MinusNode, scope: Scope):
+        return self.build_arithmetic_node(cil.MinusNode, node, scope)
+
+    @visitor.when(ast.StarNode)
+    def visit(self, node: ast.PlusNode, scope: Scope):
+        return self.build_arithmetic_node(cil.StarNode, node, scope)
+
+    @visitor.when(ast.DivNode)
+    def visit(self, node: ast.DivNode, scope: Scope):
+        return self.build_arithmetic_node(cil.DivNode, node, scope)
+
+    @visitor.when(ast.LessThanNode)
+    def visit(self, node: ast.LessThanNode, scope: Scope):
+        return self.build_arithmetic_node(cil.MinusNode, node, scope)
+
+    @visitor.when(ast.LessEqualNode)
+    def visit(self, node: ast.LessEqualNode, scope: Scope):
+        return self.build_arithmetic_node(cil.MinusNode, node, scope)
+
+    @visitor.when(ast.EqualNode)
+    def visit(self, node: ast.EqualNode, scope: Scope):
+        if isinstance(node.left, ast.IntegerNode) and isinstance(node.right, ast.IntegerNode):
+            return self.build_arithmetic_node(cil.MinusNode, node, scope)
+        else:
+            left_dest = self.visit(node.left, scope)
+            right_dest = self.visit(node.right, scope)
+            left_type = self.add_local('left_type')
+            right_type = self.add_local('right_type')
+            self.add_inst(cil.TypeOfNode(left_dest, left_type))
+            self.add_inst(cil.TypeOfNode(right_dest, right_type))
+            comp_res = self.add_local('comp_res')
+            self.add_inst(cil.CompareNode(comp_res, left_type, right_type))
+            return comp_res
+
+    @visitor.when(ast.IsVoidNode)
+    def visit(self, node: ast.IsVoidNode, scope: Scope):
+        expr_dest = self.visit(node.expr, scope)
+        type_expr = self.add_local('expr_type')
+        self.add_inst(cil.TypeOfNode(expr_dest, type_expr))
+        comp_res = self.add_local('comp_res')
+        self.add_inst(cil.CompareNode(comp_res, type_expr, '<void>'))
+        return comp_res
+
+    @visitor.when(ast.NegationNode)
+    def visit(self, node: ast.NegationNode, scope: Scope):
+        neg_res = self.add_local('neg_res')
+        expr_res = self.visit(node.expr, scope)
+        self.add_inst(cil.NegationNode(neg_res, expr_res))
+        return neg_res
+
+    @visitor.when(ast.ComplementNode)
+    def visit(self, node: ast.ComplementNode, scope: Scope):
+        com_res = self.add_local('com_res')
+        expr_res = self.visit(node.expr, scope)
+        self.add_inst(cil.ComplementNode(com_res, expr_res))
+        return com_res
+
+    def build_arithmetic_node(self, new_node_cls, node: ast.BinaryNode, scope: Scope):
+        left_dest = self.visit(node.left, scope)
+        right_dest = self.visit(node.right, scope)
+        oper_dest = self.add_local('oper_dest')
+        self.add_inst(new_node_cls(oper_dest, left_dest, right_dest))
+        return oper_dest

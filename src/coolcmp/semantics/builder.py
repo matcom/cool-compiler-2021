@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from coolcmp import errors as err
-from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
+from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode, \
+    IntegerNode, StringNode, BooleanNode, VariableNode
 from coolcmp.utils.semantic import SemanticError, Context, ErrorType, Type
 from coolcmp.utils import visitor
 
@@ -83,6 +84,17 @@ class TypeBuilder:
         except SemanticError:
             attr_type = ErrorType()
             self.errors.append(err.UNDEFINED_TYPE % (node.pos, node.type))
+
+        # add a default initialization expr to the node if it doesn't have one
+        if node.expr is None:
+            if attr_type == self.context.get_type('Int'):
+                node.expr = IntegerNode('0')
+            elif attr_type == self.context.get_type('String'):
+                node.expr = StringNode('')
+            elif attr_type == self.context.get_type('Bool'):
+                node.expr = BooleanNode('false')
+            else:
+                node.expr = VariableNode('void')
 
         try:
             self.current_type.define_attribute(node.id, attr_type, self.current_type.name)

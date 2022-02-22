@@ -1,7 +1,7 @@
 class CILVisitor:
 
     def __init__(self):
-        self.function_id: int = 0
+        self.function_id: int = -1
 
     @property
     def next_function_id(self) -> int:

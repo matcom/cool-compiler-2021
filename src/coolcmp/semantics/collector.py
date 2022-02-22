@@ -3,7 +3,7 @@ from __future__ import annotations
 from coolcmp import errors as err
 from coolcmp.utils import visitor
 from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode
-from coolcmp.utils.semantic import Context, SemanticError
+from coolcmp.utils.semantic import Context, SemanticError, IntType, VoidType, ErrorType
 
 
 class TypeCollector(object):
@@ -20,19 +20,24 @@ class TypeCollector(object):
         self.context = Context()
 
         # Default types definition
-        self.context.create_type('<error>')
+        self.context.types['<error>'] = ErrorType()
+        void = self.context.types['<void>'] = VoidType()
         self_ = self.context.create_type('SELF_TYPE')
         object_ = self.context.create_type('Object')
         io = self.context.create_type('IO')
         string = self.context.create_type('String')
-        int_ = self.context.create_type('Int')
+        int_ = self.context.types['Int'] = IntType()
         bool_ = self.context.create_type('Bool')
 
         # Default types inheritance
+        void.set_parent(object_)
         io.set_parent(object_)
         string.set_parent(object_)
         int_.set_parent(object_)
         bool_.set_parent(object_)
+
+        # Default types attributes
+        object_.define_attribute('void', void)
 
         # Default types methods
         object_.define_method('abort', [], [], object_)
