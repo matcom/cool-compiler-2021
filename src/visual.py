@@ -1,4 +1,3 @@
-import os
 import sys
 import webbrowser
 
@@ -33,12 +32,11 @@ class MainWindow(QMainWindow):
         self.ui.actionParser.triggered.connect(self.save_parser)
         self.ui.actionContext.triggered.connect(self.save_context)
         self.ui.actionScope.triggered.connect(self.save_scope)
-        self.ui.actionCIL.triggered.connect(self.save_cil)
         self.ui.actionMIPS.triggered.connect(self.save_mips)
         self.ui.actionErrors.triggered.connect(self.save_errors)
         self.ui.actionRun.triggered.connect(self.run)
         self.ui.actionExit.triggered.connect(self.exit)
-        self.ui.actionHelp.triggered.connect(self.help)
+        self.ui.actionHelp_2.triggered.connect(self.help)
         self.ui.actionOrientation.triggered.connect(self.orientation)
         self.ui.actionReport.triggered.connect(self.report)
         self.ui.actionAboutAuthors.triggered.connect(self.about_authors)
@@ -50,12 +48,23 @@ class MainWindow(QMainWindow):
         self.ui.textParser.setPlainText('')
         self.ui.textContext.setPlainText('')
         self.ui.textScope.setPlainText('')
-        self.ui.textCIL.setPlainText('')
         self.ui.textMIPS.setPlainText('')
         self.ui.textErrors.setPlainText('')
     
     def update_status(self):
         self.ui.tabCode.setStatusTip(self.path if self.path else '* New code')
+
+    def set_enable(self, boolean):
+        self.ui.actionCode.setEnabled(boolean)
+        self.ui.actionLexer.setEnabled(boolean)
+        self.ui.actionParser.setEnabled(boolean)
+        self.ui.actionContext.setEnabled(boolean)
+        self.ui.actionScope.setEnabled(boolean)
+        self.ui.actionMIPS.setEnabled(boolean)
+        self.ui.actionErrors.setEnabled(boolean)
+        self.ui.actionRun.setEnabled(boolean)
+        self.ui.actionAnalyse.setEnabled(boolean)
+        self.ui.actionQuickAnalyse_2.setEnabled(boolean)
 
     def new_code(self):
         self.path = None
@@ -64,6 +73,7 @@ class MainWindow(QMainWindow):
         self.ui.tabCOOLMenu.setTabEnabled(0, True)
         self.ui.tabCOOLMenu.setCurrentIndex(0)
         self.clear_windows()
+        self.set_enable(False)
 
     def dialog_critical(self, s):
         dlg = QMessageBox(self)
@@ -88,6 +98,7 @@ class MainWindow(QMainWindow):
             self.update_status()
             self.clear_windows()
             self.go_dialog(0)
+        self.set_enable(True)
     
     def save(self, path, text):
         try:
@@ -153,17 +164,6 @@ class MainWindow(QMainWindow):
             path += '.scope'
         
         self.save(path, scope)
-
-    def save_cil(self):
-        path, _ = QFileDialog.getSaveFileName(self, 'Save cil', '../examples/', '*.cil')
-        cil = self.ui.textCIL.toPlainText()
-
-        if not path:
-            return
-        elif not path.endswith('.cil'):
-            path += '.cil'
-        
-        self.save(path, cil)
 
     def save_mips(self):
         path, _ = QFileDialog.getSaveFileName(self, 'Save mips', '../examples/', '*.mips')
@@ -235,7 +235,6 @@ class MainWindow(QMainWindow):
         # code_generation = CodeGeneration(ast, context, scope, '', debug=False)
         # mips_code, cil_ast = code_generation.code_generation()
         
-        # self.ui.textCIL.setPlainText(f'{self.ui.textCIL.toPlainText()}{cil_ast}')
         # self.ui.textMIPS.setPlainText(f'{self.ui.textMIPS.toPlainText()}{mips_code}')
 
         NotificationWindow.success('Listo', 
