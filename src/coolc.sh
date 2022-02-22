@@ -5,4 +5,4 @@ echo "Coolpyler 0.1"
 echo "Copyright (c) 2019: Jorge Mederos Alvarado, Rodrigo García Gómez"
 
 # Llamar al compilador
-python -m coolpyler $@
+PYTHONPATH="$(dirname $0)" python -m coolpyler $@
