@@ -1,6 +1,6 @@
 from coolpyler.visitors.cool.type_builder import TypeBuilderVisitor
-from coolpyler.visitors.cool.type_collector import TypeCollectorVisitor
 from coolpyler.visitors.cool.type_checker import TypeCheckerVisitor
+from coolpyler.visitors.cool.type_collector import TypeCollectorVisitor
 
 
 class Visitor:

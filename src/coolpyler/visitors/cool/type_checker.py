@@ -167,7 +167,7 @@ class TypeCheckerVisitor:
 
         if exp.type.name == "AUTO_TYPE":
             return type_checked.CoolDispatchNode(
-                node.lineno, node.columnno, node.id, args, exp.type, exp
+                node.lineno, node.columnno, exp, node.id, args, exp.type
             )
 
         try:
@@ -176,7 +176,7 @@ class TypeCheckerVisitor:
         except semantic.SemanticError as e:
             self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
             return type_checked.CoolDispatchNode(
-                node.lineno, node.columnno, node.id, args, ErrorType(), exp
+                node.lineno, node.columnno, exp, node.id, args, ErrorType()
             )
 
         if len(args) != len(method.param_names):
@@ -201,11 +201,11 @@ class TypeCheckerVisitor:
 
         if method.return_type == "SELF_TYPE":
             return type_checked.CoolDispatchNode(
-                node.lineno, node.columnno, node.id, args, exp.type, exp
+                node.lineno, node.columnno, exp, node.id, args, exp.type
             )
 
         return type_checked.CoolDispatchNode(
-            node.lineno, node.columnno, node.id, args, method.type, exp
+            node.lineno, node.columnno, exp, node.id, args, method.type
         )
 
     @visitor.when(type_built.CoolStaticDispatchNode)
@@ -608,4 +608,3 @@ class TypeCheckerVisitor:
         return type_checked.CoolNewNode(
             node.lineno, node.columnno, node.type, node.type
         )
-
