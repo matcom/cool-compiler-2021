@@ -91,7 +91,7 @@ class cil_ast:
             self.computed_type = computed_type
 
     class AllocateNode(InstructionNode):
-        def __init__(self, dest, typex):
+        def __init__(self, typex, dest):
             self.dest = dest
             self.type = typex
 

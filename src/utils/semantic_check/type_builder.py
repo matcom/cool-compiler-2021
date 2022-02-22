@@ -51,6 +51,7 @@ class TypeBuilder:
 
         elif not self.current_type.parent:
             self.current_type.set_parent(self.context.get_type('Object'))
+            node.parent = 'Object'
         
         for feat in node.features:
             self.visit(feat)

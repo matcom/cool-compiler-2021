@@ -58,7 +58,7 @@ class ast_nodes:
     class CallNode(ExpressionNode):
         def __init__(self, token, args, obj = None, typex = None):
             self.obj = obj.lex if isinstance(obj, Token) else obj
-            self.type = typex
+            self.type = typex.lex if typex else typex
             self.id = token.lex
             self.line = obj.line if obj else token.line
             self.column = obj.column if obj else token.column

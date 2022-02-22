@@ -207,7 +207,7 @@ class TypeChecker:
 
             else:
                 try:
-                    typex = self.context.get_type(node.type.lex)
+                    typex = self.context.get_type(node.type)
                 except SemanticError as se:
                     self.errors.append(se.text)
                     typex = ErrorType()

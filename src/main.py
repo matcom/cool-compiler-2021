@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 from utils.COOL_Grammar import build_COOL_Grammar
 from utils.COOL_Lexer import COOL_Lexer
+from utils.code_generation.mips.CIL_to_MIPS import CILToMIPS
+from utils.code_generation.mips.print_MIPS_AST import PrintMIPS
 from utils.parser.COOL_parser import COOL_Parser
 from cmp.evaluation import evaluate_reverse_parse
 from cmp.semantic import Context
@@ -13,7 +15,7 @@ from utils.code_generation.cil.COOL_to_CIL import COOLtoCIL
 from utils.code_generation.cil.print_CIL_AST import get_formatter
 
 if __name__ == "__main__":
-    add = "codegen/graph.cl"
+    add = "lexer/mixed1.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
@@ -69,3 +71,10 @@ cil_visitor = COOLtoCIL(context)
 cil_ast = cil_visitor.visit(ast, scope)
 
 print(get_formatter()(cil_ast))
+
+mips_visitor = CILToMIPS()
+mips_ast = mips_visitor.visit(cil_ast)
+
+print_mips = PrintMIPS()
+mips = print_mips.visit(mips_ast)
+print(mips)
