@@ -126,8 +126,8 @@ def t_comments_any(t):
     r'[^\s\{\}\'\"]+'
     # r'^[^ \n]+$'
     # r"\.*"
-    print("ANY")
-    print(t.lexer.lexdata[t.lexer.lexpos -1])
+    # print("ANY")
+    # print(t.lexer.lexdata[t.lexer.lexpos -1])
     # t.lexer.skip(1)
 
 # For bad characters. In this case we just skip over everything but (* or *)
@@ -140,7 +140,7 @@ def t_comments_error(t):
     #     )
     # )
     # print("character skipped")
-    print(t.lexer.lexdata[t.lexer.lexpos -1])
+    # print(t.lexer.lexdata[t.lexer.lexpos -1])
     t.lexer.skip(1)
 
 
@@ -292,11 +292,21 @@ t_ignore = " \t"
 
 
 # Error handling rule
-def t_error(t):
+def t_error(t):#for some reason here lexpos is the current character, maybe because it could not be matched
+    print("ERROR")
+    print(t.lexer.lexpos)
+    print(t.lexer.last_new_line_pos)
+    print("In lex pos")
+    print(t.lexer.lexdata[t.lexer.lexpos])
+    print("In last new line pos")
+    print(t.lexer.lexdata[t.lexer.last_new_line_pos])
+    print(t.lexer.lexdata[t.lexer.last_new_line_pos-1])
+
+
     t.lexer.errors.append(
         LexicographicError(
             t.lexer.lineno,
-            t.lexer.lexpos - t.lexer.last_new_line_pos,
+            t.lexer.lexpos - t.lexer.last_new_line_pos + 1,
             f"ERROR {t.value[0]}",
         )
     )
