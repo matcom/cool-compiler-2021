@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../imgs/Qt.ico</normaloff>../../imgs/Qt.ico</iconset>
+    <normaloff>../../img/icons/python.ico</normaloff>../../img/icons/python.ico</iconset>
   </property>
   <property name="tabShape">
    <enum>QTabWidget::Rounded</enum>
@@ -36,7 +36,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabCode">
        <attribute name="title">
@@ -158,35 +158,6 @@
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tabCIL">
-       <attribute name="title">
-        <string>CIL</string>
-       </attribute>
-       <widget class="QPlainTextEdit" name="textCIL">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>1261</width>
-          <height>591</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>18</pointsize>
-         </font>
-        </property>
-        <property name="lineWrapMode">
-         <enum>QPlainTextEdit::NoWrap</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </widget>
       <widget class="QWidget" name="tabMIPS">
        <attribute name="title">
         <string>MIPS</string>
@@ -262,19 +233,21 @@
      <string>Fi&amp;le</string>
     </property>
     <widget class="QMenu" name="menuSave">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="title">
       <string>&amp;Save ...</string>
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>../../imgs/arrow-000.png</normaloff>../../imgs/arrow-000.png</iconset>
+       <normaloff>../../img/icons/arrow-000.png</normaloff>../../img/icons/arrow-000.png</iconset>
      </property>
      <addaction name="actionCode"/>
      <addaction name="actionLexer"/>
      <addaction name="actionParser"/>
      <addaction name="actionContext"/>
      <addaction name="actionScope"/>
-     <addaction name="actionCIL"/>
      <addaction name="actionMIPS"/>
      <addaction name="actionErrors"/>
     </widget>
@@ -319,7 +292,7 @@
   <action name="actionNewCode">
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/selection-input.png</normaloff>../../imgs/selection-input.png</iconset>
+     <normaloff>../../img/icons/selection-input.png</normaloff>../../img/icons/selection-input.png</iconset>
    </property>
    <property name="text">
     <string>&amp;New code</string>
@@ -349,7 +322,7 @@
   <action name="actionLoadCode">
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/blue-folder-horizontal-open.png</normaloff>../../imgs/blue-folder-horizontal-open.png</iconset>
+     <normaloff>../../img/icons/blue-folder-horizontal-open.png</normaloff>../../img/icons/blue-folder-horizontal-open.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Load code</string>
@@ -358,13 +331,13 @@
     <string>Load code</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+O</string>
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="actionExit">
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/cross-circle.png</normaloff>../../imgs/cross-circle.png</iconset>
+     <normaloff>../../img/icons/cross-circle.png</normaloff>../../img/icons/cross-circle.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Exit</string>
@@ -394,7 +367,7 @@
   <action name="actionHelp_2">
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/question.png</normaloff>../../imgs/question.png</iconset>
+     <normaloff>../../img/icons/question.png</normaloff>../../img/icons/question.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Help</string>
@@ -472,9 +445,12 @@
    </property>
   </action>
   <action name="actionRun">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/control.png</normaloff>../../imgs/control.png</iconset>
+     <normaloff>../../img/icons/control.png</normaloff>../../img/icons/control.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Run</string>
@@ -501,7 +477,7 @@
   <action name="actionAboutAuthors">
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/home.png</normaloff>../../imgs/home.png</iconset>
+     <normaloff>../../img/icons/if_hire-me_48687.png</normaloff>../../img/icons/if_hire-me_48687.png</iconset>
    </property>
    <property name="text">
     <string>&amp;About authors</string>
@@ -510,13 +486,13 @@
     <string>About authors</string>
    </property>
    <property name="shortcut">
-    <string>F6</string>
+    <string>F11</string>
    </property>
   </action>
   <action name="actionOrientation">
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/lifebuoy.png</normaloff>../../imgs/lifebuoy.png</iconset>
+     <normaloff>../../img/icons/clipboard-paste-document-text.png</normaloff>../../img/icons/clipboard-paste-document-text.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Orientation</string>
@@ -524,17 +500,23 @@
    <property name="statusTip">
     <string>Orientation</string>
    </property>
+   <property name="shortcut">
+    <string>F7</string>
+   </property>
   </action>
   <action name="actionReport">
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/lifebuoy.png</normaloff>../../imgs/lifebuoy.png</iconset>
+     <normaloff>../../img/icons/printer.png</normaloff>../../img/icons/printer.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Report</string>
    </property>
    <property name="statusTip">
     <string>Report</string>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
    </property>
   </action>
   <action name="actionasdasd">
@@ -543,9 +525,12 @@
    </property>
   </action>
   <action name="actionCode">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+     <normaloff>../../img/icons/disk.png</normaloff>../../img/icons/disk.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Code</string>
@@ -555,9 +540,12 @@
    </property>
   </action>
   <action name="actionLexer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/disk--pencil.png</normaloff>../../imgs/disk--pencil.png</iconset>
+     <normaloff>../../img/icons/disk--pencil.png</normaloff>../../img/icons/disk--pencil.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Lexer</string>
@@ -567,9 +555,12 @@
    </property>
   </action>
   <action name="actionParser">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+     <normaloff>../../img/icons/disk.png</normaloff>../../img/icons/disk.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Parser</string>
@@ -579,9 +570,12 @@
    </property>
   </action>
   <action name="actionContext">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/disk--pencil.png</normaloff>../../imgs/disk--pencil.png</iconset>
+     <normaloff>../../img/icons/disk--pencil.png</normaloff>../../img/icons/disk--pencil.png</iconset>
    </property>
    <property name="text">
     <string>C&amp;ontext</string>
@@ -591,9 +585,12 @@
    </property>
   </action>
   <action name="actionScope">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+     <normaloff>../../img/icons/disk.png</normaloff>../../img/icons/disk.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Scope</string>
@@ -615,27 +612,33 @@
    </property>
   </action>
   <action name="actionMIPS">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/disk.png</normaloff>../../imgs/disk.png</iconset>
+     <normaloff>../../img/icons/disk--pencil.png</normaloff>../../img/icons/disk--pencil.png</iconset>
    </property>
    <property name="text">
     <string>&amp;MIPS</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+7</string>
+    <string>Ctrl+6</string>
    </property>
   </action>
   <action name="actionErrors">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../imgs/disk--pencil.png</normaloff>../../imgs/disk--pencil.png</iconset>
+     <normaloff>../../img/icons/disk.png</normaloff>../../img/icons/disk.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Errors</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+8</string>
+    <string>Ctrl+7</string>
    </property>
   </action>
  </widget>
