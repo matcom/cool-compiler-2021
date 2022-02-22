@@ -1,4 +1,5 @@
 from cProfile import label
+from webbrowser import Opera
 
 
 class Program:
@@ -78,11 +79,77 @@ class CmpNotJump:
     def __str__(self) -> str:
         return f'{self.cmd} {self.r_assign}, {self.r_op_1}, {self.r_op_2}'
 
-# Commands
+class JumpInconditional:
+    def __init__(self,cmd,dest) -> None:
+        self.cmd=cmd
+        self.dest = dest 
+
+    
+    def __str__(self) -> str:
+        return f'{self.cmd} {self.dest}'
+    
+
+
+
+class SysCall :
+    def __init__(self) -> None:
+        pass
+
+    def __str__(self) -> str:
+        return f'{"syscall"}'
+
+class Operation:
+     def __init__(self,cmd,dest,op1,op2) -> None:
+        self.cmd=cmd
+        self.dest = dest 
+        self.op_1 = op1
+        self.op_2 = op2
+
+     def __str__(self) -> str:
+        return f'{self.cmd} {self.dest}, {self.op_1}, {self.op_2}'
+
+
+class Out_String:
+    def __init__(self) -> None:
+        pass      
+
+    def __str__(self) -> str:
+       s= "li $v0 , 4\n" + "lw $a0 , 4($sp)\n" + "syscall\n" + "lw $a0 , 8($sp)\n" + "jr $ra"
+
+
 ############################  Loads   ##################################################
 class LW(Load):
     def __init__(self, registry, memory_dir) -> None:
         super().__init__('lw', registry, memory_dir)
 
+class LI(Load):
+    def __init__(self, registry, memory_dir) -> None:
+        super().__init__('li', registry, memory_dir)
+
+        
+
 ############################  Store   ##################################################
+class SW(Store):
+     def __init__(self, registry, memory_dir) -> None:
+            super().__init__('sw', registry, memory_dir)
+
+
+
 ############################  Cmp   ##################################################
+
+###########################  Jump #####################################################
+class JAL(JumpInconditional):
+    def __init__(self,dest) -> None:
+            super().__init__('jal',dest)
+
+class JR(JumpInconditional):
+    def __init__(self,dest) -> None:
+            super().__init__('jr',dest)
+
+
+################################# Operator ##############################################
+
+class AddI(Operation):
+    def __init__(self,dest,op1,op2) -> None:
+            super().__init__('addi',dest,op1,op2)
+

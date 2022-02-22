@@ -41,7 +41,7 @@ class MipsGenerate:
         for _local in node.local:
             new_func.cmd += self.visit(_local)
 
-        new_func.cmd += self.visit(AST.Local('$ra')) + [AST.SW('$ra', "4($sp)")]
+        new_func.cmd += self.visit(AST.Local('$ra')) + [ASTR.SW('$ra', "4($sp)")]
 
         for param in node.param:
             new_func.cmd += self.visit(param)
