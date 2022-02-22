@@ -35,6 +35,11 @@ class Program(Node):
             result += str(self.functions[func]) + '\n'
 
         return result
+    def try_add_data(self, name, value):
+        try: 
+            _ = self.data[name]
+        except KeyError: 
+            self.data[name] = value
 
     def add_data(self, name, value):
         index = 0
@@ -100,20 +105,41 @@ class Bool(Data):
 class Function(Node):
     def __init__(self, name) -> None:
         self.name = name
+        self.var_dir = {}
         self.param = []
         self.local = []
         self.expr = []
     
-    def param_push(self, name, save = False):
+    def get_name(self, name):
         index = 0
-        while f'{name}@{index}' in self.param:
-            index += 1
-        if save: self.param.append(f'{name}@{index}')
-        return f'{name}@{index}'
-    
-    def local_push(self, name):
+        while True:
+            try: 
+                _ = self.var_dir[f'{name}@{index}']
+                index += 1
+            except KeyError:
+                return f'{name}@{index}'
+
+    def force_local(self,name):
+        self.var_dir[name] = name
         self.local.append(name)
         return name
+
+    def force_parma(self,name):
+        self.var_dir[name] = name
+        self.param.append(name)
+        return name
+
+    def param_push(self, name):
+        new_name = self.get_name(name)
+        self.var_dir[name] = new_name
+        self.param.append(new_name)
+        return new_name
+    
+    def local_push(self, name):
+        new_name = self.get_name(name)
+        self.var_dir[name] = new_name
+        self.local.append(new_name)
+        return new_name
     
     def expr_push(self, expr):
         self.expr.append(expr)
@@ -184,6 +210,24 @@ class Div(Expression):
 class Mult(Expression):
     pass
 
+class Less(Expression):
+    pass
+
+class LessOrEqual(Expression):
+    pass
+
+class CmpInt(Expression):
+    pass
+
+class CmpStr(Expression):
+    pass
+
+class CmpRef(Expression):
+    pass
+
+class CheckType(Expression):
+    pass
+
 class Return(Expression):
     pass
 
@@ -204,3 +248,27 @@ class ALLOCATE(Expression):
 
 class Local(Expression):
     pass
+class NegAssing(Expression):
+    pass
+
+class IfGoTo(Exception):
+    pass
+
+class GoTo(Expression):
+    pass
+
+class Label(Expression):
+    pass
+
+class TypeOf(Expression):
+    pass
+
+class New(Expression):
+    pass
+
+class Neg(Expression):
+    pass
+
+class Complemnet(Expression):
+    pass
+
