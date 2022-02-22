@@ -1,6 +1,6 @@
 from utils import visitor
 from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, BoolNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, StringNode, VarDeclarationNode, VoidNode, WhileNode
-from semantic.semantic import BoolType, ErrorType, IntType, Scope, StringType, define_default_value
+from semantic.semantic import BoolType, ErrorType, IntType, Scope, StringType
 from utils.errors import NamexError, SemanticError, TypexError
 
 
@@ -67,7 +67,7 @@ class VarCollector:
         attr = self.currentType.get_attribute(
             attrDeclarationNode.id, (attrDeclarationNode.line, attrDeclarationNode.col))
         if attrDeclarationNode.expr is None:
-            define_default_value(attr.type, attrDeclarationNode)
+            self.define_default_value(attr.type, attrDeclarationNode)
         else:
             self.visit(attrDeclarationNode.expr, scope)
         attr.expr = attrDeclarationNode.expr
@@ -104,7 +104,7 @@ class VarCollector:
         if varDeclarationNode.expr is not None:
             self.visit(varDeclarationNode.expr, scope)
         else:
-            define_default_value(vType, varDeclarationNode)
+            self.define_default_value(vType, varDeclarationNode)
 
     @visitor.when(AssignNode)
     def visit(self, assignNode, scope):
@@ -211,4 +211,12 @@ class VarCollector:
 
             return vInfo.type
 
-    
+    def define_default_value(self, typex, node):
+        if typex == IntType():
+            node.expr = IntNode(0)
+        elif typex == StringType():
+            node.expr = StringNode("")
+        elif typex == BoolType():
+            node.expr = BoolNode('false')
+        else:
+            node.expr = VoidNode(node.id)
