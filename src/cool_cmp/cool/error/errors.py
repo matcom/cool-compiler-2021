@@ -162,3 +162,11 @@ class InferError(SemanticError):
 
 class RunError(CoolError):
     ERROR_TYPE = "RunError"
+
+class AbortError(RunError):
+    ERROR_TYPE = "AbortError"
+    def __init__(self, type_name):
+        self.typex = type_name
+
+    def __str__(self):
+        return f"Abort called from class {self.typex}"

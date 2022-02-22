@@ -3,7 +3,7 @@ from cool.ast.cool_ast import *
 import cmp.visitor as visitor
 from cmp.semantic import VariableInfo
 from cool.semantic.context import Context
-from cool.error.errors import RunError, ZERO_DIVISION
+from cool.error.errors import RunError, ZERO_DIVISION, AbortError
 from cool.semantic.type import SelfType
 from math import floor
 
@@ -330,6 +330,7 @@ class CILRunnerVisitor():
             result = self.visit(cil.StaticCallNode("main", "result", row=-1, column=-1), [], {"result":None})
             return result
         except RunError as er:
+            # er.text = er.text[10:]
             self.errors.append(er)
             return None
 
@@ -563,7 +564,18 @@ class CILRunnerVisitor():
     
     @visitor.when(cil.AbortNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        self.raise_error("Execution aborted")
+        try:
+            typex = caller_fun_scope['self']['__type'].name
+        except:
+            analisis = caller_fun_scope['self']
+            if isinstance(analisis, str):
+                typex = 'String'
+            elif isinstance(analisis, bool): # TODO Fix bool's conversion to int in Cil
+                typex = 'Bool'
+            elif isinstance(analisis, int):
+                typex = 'Int'
+
+        raise AbortError(typex)
     
     @visitor.when(cil.CopyNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
@@ -673,9 +685,8 @@ class CILRunnerVisitor():
             if isinstance(x, int) and isinstance(y, int):
                 return x == y
             if isinstance(x, str) and isinstance(y, str):
-                if len(x) == 1 and len(y) == 1:
-                    return x == y
-                self.raise_error("Only character comparation available")
+                return x == y
+                # self.raise_error("Only character comparation available")
                 
             if all(not isinstance(z, (int,str)) for z in [x,y]):
                 cmp1 = None
