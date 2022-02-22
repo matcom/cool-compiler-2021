@@ -325,7 +325,7 @@ class TypeCheckerVisitor:
 
         for idx, _type, case_exp in node.case_branches:
             try:
-                typex = self.context.get_type(_type)
+                typex = self.get_type(_type)
             except semantic.SemanticError as e:
                 typex = ErrorType()
                 self.errors.append(
@@ -388,7 +388,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolNotNode)
     def visit(self, node, scope):  # noqa: F811
         exp = self.visit(node.exp, scope)
-        bool_type = self.context.get_type("Bool")
+        bool_type = self.get_type("Bool")
         if exp.type != bool_type:
             self.errors.append(
                 errors.IncompatibleTypesError(
@@ -401,7 +401,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolTildeNode)
     def visit(self, node, scope):  # noqa: F811
         exp = self.visit(node.exp, scope)
-        int_type = self.context.get_type("Int")
+        int_type = self.get_type("Int")
         if not exp.type.conforms_to(int_type):
             self.errors.append(
                 errors.IncompatibleTypesError(
@@ -414,7 +414,7 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):  # noqa: F811
         exp = self.visit(node.exp, scope)
         return type_checked.CoolIsVoidNode(
-            node.lineno, node.columnno, exp, self.context.get_type("Bool")
+            node.lineno, node.columnno, exp, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolParenthNode)
@@ -495,7 +495,7 @@ class TypeCheckerVisitor:
                 )
             )
         return type_checked.CoolLeqNode(
-            node.lineno, node.columnno, left, right, self.context.get_type("Bool")
+            node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolEqNode)
@@ -511,7 +511,7 @@ class TypeCheckerVisitor:
                 )
             )
         return type_checked.CoolEqNode(
-            node.lineno, node.columnno, left, right, self.context.get_type("Bool")
+            node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolLeNode)
@@ -527,7 +527,7 @@ class TypeCheckerVisitor:
                 )
             )
         return type_checked.CoolLeNode(
-            node.lineno, node.columnno, left, right, self.context.get_type("Bool")
+            node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolWhileNode)
@@ -535,7 +535,7 @@ class TypeCheckerVisitor:
         conditional = self.visit(node.cond, scope)
         body = self.visit(node.body, scope)
 
-        if conditional.type != self.context.get_type("Bool"):
+        if conditional.type != self.get_type("Bool"):
             self.errors.append(
                 errors.IncompatibleTypeError(
                     node.lineno, node.columnno, conditional.type.name, "Bool"
@@ -551,7 +551,7 @@ class TypeCheckerVisitor:
         conditional = self.visit(node.cond, scope)
         then_expr = self.visit(node.then_expr, scope)
         else_expr = self.visit(node.else_expr, scope)
-        bool_type = self.context.get_type("Bool")
+        bool_type = self.get_type("Bool")
 
         if not conditional.type.conforms_to(bool_type):
             self.errors.append(
@@ -560,7 +560,7 @@ class TypeCheckerVisitor:
                 )
             )
 
-        lca = self.lowest_common_ancestor(then_expr.type, else_expr.type, self.context)
+        lca = self.lowest_common_ancestor(then_expr.type, else_expr.type)
         return type_checked.CoolIfThenElseNode(
             node.lineno, node.columnno, conditional, then_expr, else_expr, lca
         )
@@ -568,19 +568,19 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolStringNode)
     def visit(self, node, scope):  # noqa: F811
         return type_checked.CoolStringNode(
-            node.lineno, node.columnno, self.context.get_type("String")
+            node.lineno, node.columnno, self.get_type("String")
         )
 
     @visitor.when(type_built.CoolBoolNode)
     def visit(self, node, scope):  # noqa: F811
         return type_checked.CoolBoolNode(
-            node.lineno, node.columnno, self.context.get_type("Bool")
+            node.lineno, node.columnno, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolIntNode)
     def visit(self, node, scope):  # noqa: F811
         return type_checked.CoolIntNode(
-            node.lineno, node.columnno, self.context.get_type("Int")
+            node.lineno, node.columnno, self.get_type("Int")
         )
 
     @visitor.when(type_built.CoolVarNode)
