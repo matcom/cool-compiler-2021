@@ -104,6 +104,8 @@ class Type:
                 )
 
     def define_attribute(self, name: str, typex):
+        if name == "self":
+            raise SemanticError("`self` cannot be the name of an attribute.")
         try:
             self.get_attribute(name)
         except AttributeError:
@@ -135,6 +137,9 @@ class Type:
     ):
         if name in (method.name for method in self.methods):
             raise AttributeError(f"Method `{name}` already defined in `{self.name}`")
+
+        if "self" in param_names:
+            raise SemanticError("`self` cannot be the name of a formal parameter.")
 
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)

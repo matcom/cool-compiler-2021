@@ -107,8 +107,7 @@ class CoolParser(Parser):
     def feature(self, p):
         id = p.OBJECT_ID
         param_names, param_types = (
-            p.formal_list if p.formal_list is not None else [],
-            [],
+            p.formal_list if p.formal_list is not None else ([], [])
         )
         type, body = p.TYPE_ID, p.expr
         return CoolMethodDeclNode(p.lineno, 0, id, param_names, param_types, type, body)

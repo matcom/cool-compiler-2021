@@ -57,16 +57,14 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):  # noqa: F811
-        self.current_type = self.types[node.type.name]
+        self.current_type = node.type
         scope.define_variable("self", self.current_type, force=True)
-        # print(self.current_type.attributes)
-        for attr in self.current_type.attributes:
-            try:
-                # print(attr.attr_info)
-                scope.define_variable(attr.name, attr.type)
-            except semantic.BaseSemanticError as e:
+        # for attr in self.current_type.attributes:
+        #     try:
+        #         scope.define_variable(attr.name, attr.type)
+        #     except semantic.BaseSemanticError as e:
 
-                self.errors.append(e.with_pos(attr.linino, attr.columnno))
+        #         self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         features = [self.visit(feat, scope) for feat in node.features]
 
@@ -83,12 +81,11 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolAttrDeclNode)
     def visit(self, node, scope):  # noqa: F811
         if node.body != [] and node.attr_info is not None:
-            # print(node.attr_info)
             exp = self.visit(node.body, scope)
             node_type = node.attr_info.type
 
-            if exp.type.name == "SELF_TYPE" and not node_type.conforms_to(
-                self.exp_type
+            if exp.type.name == "SELF_TYPE" and not self.exp_type.conforms_to(
+                node_type
             ):
                 self.errors.append(
                     errors.IncompatibleTypesError(
@@ -96,7 +93,7 @@ class TypeCheckerVisitor:
                     )
                 )
 
-            elif exp.type.name != "SELF_TYPE" and not node_type.conforms_to(exp.type):
+            elif exp.type.name != "SELF_TYPE" and not exp.type.conforms_to(node_type):
                 self.errors.append(
                     errors.IncompatibleTypesError(
                         node.lineno, node.columnno, node_type.name, exp.type.name
@@ -303,7 +300,6 @@ class TypeCheckerVisitor:
             right_exp = None
             # decl_list.append(idx, _type, None)
         else:
-            # print(node.expr)
             right_exp = self.visit(node.expr, scope)
             right_type = right_exp.type
             # decl_list.append(idx, _type, right_exp)

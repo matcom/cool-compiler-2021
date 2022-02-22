@@ -110,6 +110,7 @@ class TypeBuilderVisitor:
 
     @visitor.when(type_collected.CoolMethodDeclNode)
     def visit(self, node: type_collected.CoolMethodDeclNode):  # noqa: F811
+        # print(node.param_names)
         param_types = []
         for ptype_name in node.param_types:
             try:
