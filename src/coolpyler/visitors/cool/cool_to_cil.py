@@ -1,9 +1,6 @@
 import coolpyler.ast.cil.base as cil
 import coolpyler.ast.cool.type_checked as type_checked
 import coolpyler.utils.visitor as visitor
-from attr import attributes
-from coolpyler.errors import SemanticError
-from coolpyler.semantic import BoolType, IntType, IOType, ObjectType, StringType, Type
 
 
 class CoolToCilVisitor(object):
