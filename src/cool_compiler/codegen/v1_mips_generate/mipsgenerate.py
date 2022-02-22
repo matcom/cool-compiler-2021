@@ -24,15 +24,15 @@ class MipsGenerate:
         self.new_program = ASTR.Program()
 
         for func in self.func_list:
-            self.visit(self.cil_func[func])
+            if func in self.native_fun: 
+                self.new_program.func[func]  = self.native_fun[func]()
+            else:
+                self.visit(self.cil_func[func])
         
         return self.new_program
 
     @visitor.when(AST.Function)
     def visit(self, node: AST.Function):
-        if node.name in self.native_fun: 
-            self.new_program[node.name]  = self.native_fun[node.name]()
-
         new_func = ASTR.Func(node.name if not node.name == 'new_ctr_Main' else 'main')
         self.stack_dir = {}
         self.stack_pointer = 0
@@ -50,6 +50,8 @@ class MipsGenerate:
             new_func.cmd += self.visit(expr)
 
         self.new_program.func[new_func.name] = new_func
+
+        # print(new_func)
 
     @visitor.when(AST.Param)
     def visit(self, node: AST.Param):
@@ -96,8 +98,8 @@ class MipsGenerate:
             ASTR.AddI('$sp', '$sp', -4)
         ]        
 
-    @visitor.when(AST.Call)
-    def visit(self, node: AST.Call):
+    @visitor.when(AST.VCall)
+    def visit(self, node: AST.VCall):
         memory_dest = node.x
         _type = node.y
         func = node.z

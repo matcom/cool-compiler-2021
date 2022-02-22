@@ -29,13 +29,12 @@ class Data:
         return f'{self.name}: .{self.type} \"{str(self.value)}\"'
 
 class Func:
-    def __init__(self, name, list_cmd= []) -> None:
+    def __init__(self, name) -> None:
         self.name = name
-        self.cmd  = list_cmd
+        self.cmd  = []
 
     def __str__(self) -> str:
         result = f'{self.name}:\n'
-
         for cmd in self.cmd:
             result += str(cmd) + '\n'
 
@@ -107,11 +106,8 @@ class Operation:
 
 
 class Out_String:
-    def __init__(self) -> None:
-        pass      
-
     def __str__(self) -> str:
-       s= "li $v0 , 4\n" + "lw $a0 , 4($sp)\n" + "syscall\n" + "lw $a0 , 8($sp)\n" + "jr $ra"
+       return  "IO_out_string:\nli $v0, 4\nlw $a0, 4($sp)\nsyscall\nlw $a0, 8($sp)\njr $ra"
 
 
 ############################  Loads   ##################################################
