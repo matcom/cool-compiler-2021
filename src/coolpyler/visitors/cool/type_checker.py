@@ -76,7 +76,8 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolAttrDeclNode)
     def visit(self, node, scope):  # noqa: F811
-        if node.body is not None:
+        if node.body is not None and node.attr_info is not None:
+            # print(node.attr_info)
             exp = self.visit(node.body, scope)
             node_type = node.attr_info.type
 
