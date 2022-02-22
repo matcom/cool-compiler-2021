@@ -320,14 +320,14 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node:cil.ProgramNode):
-        for t in node.dottypes + [cil.TypeNode("__Array", None, "__Array")]:
+        for t in node.dottypes + [cil.TypeNode("__Array", None, "__Array", row = -1, column=-1, comment="Array type generated in for running")]:
             self.visit(t)
         for t in node.dotdata:
             self.visit(t)
         for t in node.dotcode:
             self.visit(t)
         try:
-            result = self.visit(cil.StaticCallNode("main", "result"), [], {"result":None})
+            result = self.visit(cil.StaticCallNode("main", "result", row=-1, column=-1), [], {"result":None})
             return result
         except RunError as er:
             self.errors.append(er)
@@ -408,7 +408,7 @@ class CILRunnerVisitor():
             func_name = next(static_name for name, static_name in typex.methods if name == node.method)
         except StopIteration:
             self.raise_error("Type {0} doesn't contains method {1}", node.type, node.method)
-        return self.visit(cil.StaticCallNode(func_name, node.dest), args, caller_fun_scope)
+        return self.visit(cil.StaticCallNode(func_name, node.dest, row=node.row, column=node.column, comment=node.comment), args, caller_fun_scope)
 
     @visitor.when(cil.ParamNode)
     def visit(self, node:cil.ParamNode, args: list, caller_fun_scope: dict):
