@@ -59,11 +59,10 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):  # noqa: F811
         self.current_type = node.type
         scope.define_variable("self", self.current_type, first_self=True)
-        for attr in self.current_type.attributes:
+        for attr, _ in self.current_type.all_attributes():
             try:
                 scope.define_variable(attr.name, attr.type)
             except semantic.BaseSemanticError as e:
-
                 self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         features = [self.visit(feat, scope) for feat in node.features]
@@ -460,17 +459,22 @@ class TypeCheckerVisitor:
         exp = self.visit(node.expr, scope)
         return type_checked.CoolParenthNode(node.lineno, node.columnno, exp, exp.type)
 
-    @visitor.when(type_built.CoolPlusNode)
-    def visit(self, node, scope):  # noqa: F811
-        int_type = self.get_type("Int")
+    def visit_arithmetic_operands(self, node, scope, type):
         left = self.visit(node.left_expr, scope)
         right = self.visit(node.right_expr, scope)
-        if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
+        if not left.type.conforms_to(type) or not right.type.conforms_to(type):
             self.errors.append(
                 errors.InvalidOperationError(
                     node.lineno, node.columnno, left.type.name, right.type.name
                 )
             )
+        return left, right
+
+
+    @visitor.when(type_built.CoolPlusNode)
+    def visit(self, node, scope):  # noqa: F811
+        int_type = self.get_type("Int")
+        left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolPlusNode(
             node.lineno, node.columnno, left, right, int_type
         )
@@ -478,14 +482,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolMinusNode)
     def visit(self, node, scope):  # noqa: F811
         int_type = self.get_type("Int")
-        left = self.visit(node.left_expr, scope)
-        right = self.visit(node.right_expr, scope)
-        if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
-            self.errors.append(
-                errors.InvalidOperationError(
-                    node.lineno, node.columnno, left.type.name, right.type.name
-                )
-            )
+        left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolMinusNode(
             node.lineno, node.columnno, left, right, int_type
         )
@@ -493,14 +490,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolDivNode)
     def visit(self, node, scope):  # noqa: F811
         int_type = self.get_type("Int")
-        left = self.visit(node.left_expr, scope)
-        right = self.visit(node.right_expr, scope)
-        if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
-            self.errors.append(
-                errors.InvalidOperationError(
-                    node.lineno, node.columnno, left.type.name, right.type.name
-                )
-            )
+        left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolDivNode(
             node.lineno, node.columnno, left, right, int_type
         )
@@ -508,62 +498,46 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolMultNode)
     def visit(self, node, scope):  # noqa: F811
         int_type = self.get_type("Int")
-        left = self.visit(node.left_expr, scope)
-        right = self.visit(node.right_expr, scope)
-        if not left.type.conforms_to(int_type) or not right.type.conforms_to(int_type):
-            self.errors.append(
-                errors.InvalidOperationError(
-                    node.lineno, node.columnno, left.type.name, right.type.name
-                )
-            )
+        left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolMultNode(
             node.lineno, node.columnno, left, right, int_type
         )
 
-    @visitor.when(type_built.CoolLeqNode)
-    def visit(self, node, scope):  # noqa: F811
+    def visit_comparison_operands(self, node, scope):
         left = self.visit(node.left_expr, scope)
         right = self.visit(node.right_expr, scope)
-        if not left.type.conforms_to(right.type) and not right.type.conforms_to(
-            left.type
-        ):
-            self.errors.append(
-                errors.InvalidComparissonError(
-                    node.lineno, node.columnno, left.type.name, right.type.name
+
+        static_types = self.get_type("Bool"), self.get_type("Int"), self.get_type("String")
+        for type in static_types:
+            left_conforms = left.type.conforms_to(type)
+            right_conforms = right.type.conforms_to(type)
+            if left_conforms and not right_conforms or right_conforms and not left_conforms:
+                self.errors.append(
+                    errors.InvalidComparissonError(
+                        node.lineno, node.columnno, left.type.name, right.type.name
+                    )
                 )
-            )
+
+        return left,right
+
+
+    @visitor.when(type_built.CoolLeqNode)
+    def visit(self, node, scope):  # noqa: F811
+        left, right = self.visit_comparison_operands(node, scope)
         return type_checked.CoolLeqNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolEqNode)
     def visit(self, node, scope):  # noqa: F811
-        left = self.visit(node.left_expr, scope)
-        right = self.visit(node.right_expr, scope)
-        if not left.type.conforms_to(right.type) and not right.type.conforms_to(
-            left.type
-        ):
-            self.errors.append(
-                errors.InvalidComparissonError(
-                    node.lineno, node.columnno, left.type.name, right.type.name
-                )
-            )
+        left, right = self.visit_comparison_operands(node, scope)
         return type_checked.CoolEqNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolLeNode)
     def visit(self, node, scope):  # noqa: F811
-        left = self.visit(node.left_expr, scope)
-        right = self.visit(node.right_expr, scope)
-        if not left.type.conforms_to(right.type) and not right.type.conforms_to(
-            left.type
-        ):
-            self.errors.append(
-                errors.InvalidComparissonError(
-                    node.lineno, node.columnno, left.type.name, right.type.name
-                )
-            )
+        left, right = self.visit_comparison_operands(node, scope)
         return type_checked.CoolLeNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
@@ -647,4 +621,3 @@ class TypeCheckerVisitor:
             return type_checked.CoolNewNode(node.lineno, node.columnno, ErrorType())
 
         return type_checked.CoolNewNode(node.lineno, node.columnno, type)
-
