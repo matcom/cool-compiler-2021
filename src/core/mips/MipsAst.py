@@ -49,7 +49,6 @@ class FunctionNode(Node):
         self.instructions.append(instruction)
 
     def get_param_stack_location(self, name):
-        # TODO Tener en cuenta que los primeros argumentos se guardan en los registros para argumentos
         index = self.params.index(name)
         offset = ((len(self.params) - 1) - index) * DOUBLE_WORD
         return RegisterRelativeLocation(FP_REG, offset)

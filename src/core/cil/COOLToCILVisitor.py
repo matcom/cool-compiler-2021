@@ -205,7 +205,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             cil.GotoNode(while_label.label, line=node.condition.line, column=node.condition.column))
 
         self.register_instruction(pool_label)
-        # TODO: No estoy seguro de si deberia retornar el nodo directamente o guardarlo antes en una variable
         node.ret_expr = cil.VoidNode()
 
     @visitor.when(cool.BlockNode)
@@ -217,7 +216,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.LetInNode)
     def visit(self, node: cool.LetInNode, scope: Scope):
         for (id, type, expr), child in zip(node.let_body, scope.childs[:-1]):
-            # TODO TYPE OF ID
             variable = self.register_local(VariableInfo(id.lex, type.lex), line=id.line, column=id.column)
             if expr:
                 self.visit(expr, child)
@@ -265,7 +263,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         labels = []
         branches = sorted(node.branches, key=lambda x: self.context.get_type(x[1].lex).depth, reverse=True)
         for p, (id, type, expr) in enumerate(branches):
-            # TODO Revisar tipo de id para la linea y columna
             labels.append(self.register_label(f'case_label_{p}', line=id.line, column=id.column))
 
             for t in self.context.subtree(type.lex):
@@ -584,7 +581,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.visit(arg, child)
             args.append(cil.ArgNode(arg.ret_expr, line=arg.line, column=arg.column))
 
-        # TODO: Creo que deberia annadir los parametros al reves para luego sacarlos en el orden correcto
         self.register_instruction(cil.ArgNode(self.vself.name, line=node.line, column=node.column))
         for arg in args: self.register_instruction(arg)
         self.register_instruction(cil.ArgNode(self.vself.name, line=node.line, column=node.column))
@@ -642,7 +638,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.IntegerNode, scope: Scope):
         ret = self.define_internal_local(line=node.line, column=node.column)
 
-        # TODO: Hay algunos ArgNode que reciben variables y otros valores especificos
         self.register_instruction(cil.ArgNode(node.token.lex, line=node.token.line, column=node.token.column))
         self.register_instruction(cil.StaticCallNode(self.init_name('Int'), ret, line=node.line, column=node.column))
         node.ret_expr = ret
@@ -651,7 +646,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.BoolNode, scope: Scope):
         ret = self.define_internal_local(line=node.line, column=node.column)
 
-        # TODO: Hay algunos ArgNode que reciben variables y otros valores especificos
         self.register_instruction(cil.ArgNode(1 if node.token.lex else 0, line=node.token.line, column=node.token.column))
         self.register_instruction(cil.StaticCallNode(self.init_name('Bool'), ret, line=node.line, column=node.column))
         node.ret_expr = ret

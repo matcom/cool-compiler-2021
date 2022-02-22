@@ -878,7 +878,6 @@ class CILToMIPSVisitor:
         if isinstance(node.left, cil.AttributeNode):
             instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
                                                            node.line, node.column))
-        # TODO: Ver si se hace usando los registros de parametros
         instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg1, line=node.line, column=node.column))
 
         instructions.extend(self.visit(node.right))
