@@ -43,7 +43,7 @@ class TypeBuilder:
                 parent = None
             try:
                 current = parent
-                while current is None:
+                while current is not None:
                     if current.name == self.currentType.name:
                         errorText = f'Class {self.currentType.name}, or an ancestor of {self.currentType.name}, is involved in an inheritance cycle.'
                         raise SemanticError(
@@ -70,7 +70,7 @@ class TypeBuilder:
             argsNames.append(name)
 
             try:
-                argsTypes = self.context.get_type(typex, line, col)
+                argType = self.context.get_type(typex, (line, col))
             except SemanticError:
                 errorText = f'Class {typex} of formal parameter {typex} is undefined.'
                 self.errors.append(TypexError(errorText, line, col))
@@ -80,7 +80,7 @@ class TypeBuilder:
 
         try:
             returnType = self.context.get_type(
-                funcDeclarationNode.type, funcDeclarationNode.typeLine, funcDeclarationNode.typeCol)
+                funcDeclarationNode.type, (funcDeclarationNode.typeLine, funcDeclarationNode.typeCol))
         except SemanticError:
             errorText = f'Undefined return type {funcDeclarationNode.type} in method {funcDeclarationNode.id}.'
             self.errors.append(TypexError(

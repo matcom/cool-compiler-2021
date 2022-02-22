@@ -24,7 +24,7 @@ class TypeCollector(object):
         self.context.types['IO'] = IOType()
 
         for classDeclarationNode in programNode.declarations:
-            self.visit(self, classDeclarationNode)
+            self.visit(classDeclarationNode)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, classDeclarationNode):

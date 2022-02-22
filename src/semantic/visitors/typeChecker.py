@@ -1,377 +1,420 @@
-# from utils import visitor
-# from semantic.semantic import *
-# from utils.ast import *
-# from utils.errors import SemanticError, AttributesError, TypesError, NamesError
-# from utils import get_type, get_common_basetype
-
-
-# class TypeChecker:
-#     def __init__(self, context: Context, errors=[]):
-#         self.context: Context = context
-#         self.current_type: Type = None
-#         self.current_method: Method = None
-#         self.errors = errors
-#         self.current_index = None  # Lleva el índice del scope en el que se está
-
-#     @visitor.on('node')
-#     def visit(self, node, scope):
-#         pass
-
-#     @visitor.when(ProgramNode)
-#     def visit(self, node: ProgramNode, scope: Scope):
-#         for declaration, new_scope in zip(node.declarations, scope.children):
-#             self.visit(declaration, new_scope)
-
-#     def _get_type(self, ntype: str, pos):
-#         try:
-#             return self.context.get_type(ntype, pos)
-#         except SemanticError as e:
-#             self.errors.append(e)
-#             return ErrorType()
-
-#     def _get_method(self, typex: Type, name: str, pos) -> Method:
-#         try:
-#             return typex.get_method(name, pos)
-#         except SemanticError as e:
-#             if type(typex) != ErrorType and type(typex) != AutoType:
-#                 error_text = AttributesError.DISPATCH_UNDEFINED % name
-#                 self.errors.append(AttributesError(error_text, *pos))
-#             return MethodError(name, [], [], ErrorType())
-
-#     @visitor.when(ClassDeclarationNode)
-#     def visit(self, node: ClassDeclarationNode, scope: Scope):
-#         self.current_type = self.context.get_type(node.id, node.pos)
-
-#         fd = [feat for feat in node.features if isinstance(
-#             feat, FuncDeclarationNode)]
-
-#         for feat in node.features:
-#             if isinstance(feat, AttrDeclarationNode):
-#                 self.visit(feat, scope)
-
-#         for feat, child_scope in zip(fd, scope.functions.values()):
-#             self.visit(feat, child_scope)
-
-#     @visitor.when(AttrDeclarationNode)
-#     def visit(self, node: AttrDeclarationNode, scope: Scope):
-#         attr = self.current_type.get_attribute(node.id, node.pos)
-#         vartype = get_type(attr.type, self.current_type)
-
-#         self.current_index = attr.index
-#         typex = self.visit(node.expr, scope)
-#         self.current_index = None
-
-#         if not typex.conforms_to(vartype):
-#             error_text = TypesError.ATTR_TYPE_ERROR % (
-#                 typex.name, attr.name, vartype.name)
-#             self.errors.append(TypesError(error_text, *node.pos))
-#             return ErrorType()
-#         return typex
-
-#     @visitor.when(FuncDeclarationNode)
-#     def visit(self, node: FuncDeclarationNode, scope: Scope):
-#         parent = self.current_type.parent
-
-#         self.current_method = method = self.current_type.get_method(
-#             node.id, node.pos)
-#         if parent is not None:
-#             try:
-#                 old_meth = parent.get_method(node.id, node.pos)
-#                 if old_meth.return_type.name != method.return_type.name:
-#                     error_text = SemanticError.WRONG_SIGNATURE_RETURN % (
-#                         node.id, method.return_type.name, old_meth.return_type.name)
-#                     self.errors.append(SemanticError(
-#                         error_text, *node.type_pos))
-#                 if len(method.param_names) != len(old_meth.param_names):
-#                     error_text = SemanticError.WRONG_NUMBER_PARAM % node.id
-#                     self.errors.append(SemanticError(error_text, *node.pos))
-#                 for (name, param), type1, type2 in zip(node.params, method.param_types, old_meth.param_types):
-#                     if type1.name != type2.name:
-#                         error_text = SemanticError.WRONG_SIGNATURE_PARAMETER % (
-#                             name, type1.name, type2.name)
-#                         self.errors.append(
-#                             SemanticError(error_text, *param.pos))
-#             except SemanticError:
-#                 pass
-
-#         result = self.visit(node.body, scope)
-
-#         return_type = get_type(method.return_type, self.current_type)
-
-#         if not result.conforms_to(return_type):
-#             error_text = TypesError.RETURN_TYPE_ERROR % (
-#                 result.name, return_type.name)
-#             self.errors.append(TypesError(error_text, *node.type_pos))
-
-#     @visitor.when(VarDeclarationNode)
-#     def visit(self, node: VarDeclarationNode, scope: Scope):
-
-#         vtype = self._get_type(node.type, node.type_pos)
-#         vtype = get_type(vtype, self.current_type)
-
-#         if node.expr != None:
-#             typex = self.visit(node.expr, scope)
-#             if not typex.conforms_to(vtype):
-#                 error_text = TypesError.UNCONFORMS_TYPE % (
-#                     typex.name, node.id, vtype.name)
-#                 self.errors.append(TypesError(error_text, *node.type_pos))
-#             return typex
-#         return vtype
-
-#     @visitor.when(AssignNode)
-#     def visit(self, node: AssignNode, scope: Scope):
-#         vinfo = self.find_variable(scope, node.id)
-#         vtype = get_type(vinfo.type, self.current_type)
-
-#         typex = self.visit(node.expr, scope)
-
-#         if not typex.conforms_to(vtype):
-#             error_text = TypesError.UNCONFORMS_TYPE % (
-#                 typex.name, node.id, vtype.name)
-#             self.errors.append(TypesError(error_text, *node.pos))
-#         return typex
-
-#     def _check_args(self, meth: Method, scope: Scope, args, pos):
-#         arg_types = [self.visit(arg, scope) for arg in args]
-
-#         if len(arg_types) > len(meth.param_types):
-#             error_text = SemanticError.ARGUMENT_ERROR % meth.name
-#             self.errors.append(SemanticError(error_text, *pos))
-#         elif len(arg_types) < len(meth.param_types):
-#             for arg, arg_info in zip(meth.param_names[len(arg_types):], args[len(arg_types):]):
-#                 error_text = SemanticError.ARGUMENT_ERROR % (meth.name)
-#                 self.errors.append(SemanticError(error_text, *arg_info.pos))
-
-#         for atype, ptype, param_name in zip(arg_types, meth.param_types, meth.param_names):
-#             if not atype.conforms_to(ptype):
-#                 error_text = TypesError.INCOSISTENT_ARG_TYPE % (
-#                     meth.name, atype.name, param_name, ptype.name)
-#                 self.errors.append(TypesError(error_text, *pos))
-
-#     @visitor.when(CallNode)
-#     def visit(self, node: CallNode, scope: Scope):
-#         stype = self.visit(node.obj, scope)
-
-#         meth = self._get_method(stype, node.id, node.pos)
-#         if not isinstance(meth, MethodError):
-#             self._check_args(meth, scope, node.args, node.pos)
-
-#         return get_type(meth.return_type, stype)
-
-#     @visitor.when(BaseCallNode)
-#     def visit(self, node: BaseCallNode, scope: Scope):
-#         obj = self.visit(node.obj, scope)
-#         typex = self._get_type(node.type, node.type_pos)
-
-#         if not obj.conforms_to(typex):
-#             error_text = TypesError.INCOMPATIBLE_TYPES_DISPATCH % (
-#                 typex.name, obj.name)
-#             self.errors.append(TypesError(error_text, *node.type_pos))
-#             return ErrorType()
-
-#         meth = self._get_method(typex, node.id, node.pos)
-#         if not isinstance(meth, MethodError):
-#             self._check_args(meth, scope, node.args, node.pos)
-
-#         return get_type(meth.return_type, typex)
-
-#     @visitor.when(StaticCallNode)
-#     def visit(self, node: StaticCallNode, scope: Scope):
-#         typex = self.current_type
-
-#         meth = self._get_method(typex, node.id, node.pos)
-#         if not isinstance(meth, MethodError):
-#             self._check_args(meth, scope, node.args, node.pos)
-
-#         return get_type(meth.return_type, typex)
-
-#     @visitor.when(ConstantNumNode)
-#     def visit(self, node: ConstantNumNode, scope: Scope):
-#         return IntType(node.pos)
-
-#     @visitor.when(ConstantBoolNode)
-#     def visit(self, node: ConstantBoolNode, scope: Scope):
-#         return BoolType(node.pos)
-
-#     @visitor.when(ConstantStrNode)
-#     def visit(self, node: ConstantStrNode, scope: Scope):
-#         return StringType(node.pos)
-
-#     @visitor.when(ConstantVoidNode)
-#     def visit(self, node: ConstantVoidNode, scope: Scope):
-#         return VoidType(node.pos)
-
-#     def find_variable(self, scope, lex):
-#         var_info = scope.find_local(lex)
-#         if var_info is None:
-#             var_info = scope.find_attribute(lex)
-#         if lex in self.current_type.attributes and var_info is None:
-#             return VariableInfo(lex, VoidType())
-#         return var_info
-
-#     @visitor.when(VariableNode)
-#     def visit(self, node: VariableNode, scope: Scope):
-#         typex = self.find_variable(scope, node.lex).type
-#         return get_type(typex, self.current_type)
-
-#     @visitor.when(InstantiateNode)
-#     def visit(self, node: InstantiateNode, scope: Scope):
-#         try:
-#             type_ = self.context.get_type(node.lex, node.pos)
-#         except SemanticError:
-#             type_ = ErrorType()
-#             error_text = TypesError.NEW_UNDEFINED_CLASS % node.lex
-#             self.errors.append(TypesError(error_text, *node.pos))
-
-#         return get_type(type_, self.current_type)
-
-#     @visitor.when(WhileNode)
-#     def visit(self, node: WhileNode, scope: Scope):
-#         cond = self.visit(node.cond, scope)
-
-#         if cond.name != 'Bool':
-#             self.errors.append(TypesError(
-#                 TypesError.LOOP_CONDITION_ERROR, *node.pos))
-
-#         self.visit(node.expr, scope)
-#         return ObjectType()
-
-#     @visitor.when(IsVoidNode)
-#     def visit(self, node: IsVoidNode, scope: Scope):
-#         self.visit(node.expr, scope)
-#         return BoolType()
-
-#     @visitor.when(ConditionalNode)
-#     def visit(self, node: ConditionalNode, scope: Scope):
-#         cond = self.visit(node.cond, scope)
-
-#         if cond.name != 'Bool':
-#             error_text = TypesError.PREDICATE_ERROR % ('if', 'Bool')
-#             self.errors.append(TypesError(error_text, *node.pos))
-
-#         true_type = self.visit(node.stm, scope)
-#         false_type = self.visit(node.else_stm, scope)
-
-#         return get_common_basetype([false_type, true_type])
-#         # if true_type.conforms_to(false_type):
-#         #     return false_type
-#         # elif false_type.conforms_to(true_type):
-#         #     return true_type
-#         # else:
-#         #     error_text = TypesError.INCOMPATIBLE_TYPES % (false_type.name, true_type.name)
-#         #     self.errors.append(TypesError(error_text, *node.pos))
-#         #     return ErrorType()
-
-#     @visitor.when(BlockNode)
-#     def visit(self, node: BlockNode, scope: Scope):
-#         value = None
-#         for exp in node.expr_list:
-#             value = self.visit(exp, scope)
-#         return value
-
-#     @visitor.when(LetNode)
-#     def visit(self, node: LetNode, scope: Scope):
-#         child_scope = scope.expr_dict[node]
-#         for init in node.init_list:
-#             self.visit(init, child_scope)
-#         return self.visit(node.expr, child_scope)
-
-#     @visitor.when(CaseNode)
-#     def visit(self, node: CaseNode, scope: Scope):
-#         type_expr = self.visit(node.expr, scope)
-
-#         new_scope = scope.expr_dict[node]
-#         types = []
-#         var_types = []
-#         for case, c_scope in zip(node.case_list, new_scope.children):
-#             case: OptionNode
-#             t, vt = self.visit(case, c_scope)
-#             types.append(t)
-#             if case.typex in var_types:
-#                 error_text = SemanticError.DUPLICATE_CASE_BRANCH % case.typex
-#                 self.errors.append(SemanticError(error_text, *case.type_pos))
-#             var_types.append(case.typex)
-
-#         # for t in var_types:
-#         #     if not type_expr.conforms_to(t):
-#         #         error_text = TypesError.INCOMPATIBLE_TYPES % (t.name, type_expr.name)
-#         #         self.errors.append(TypesError(error_text, *node.pos))
-#         #         return ErrorType()
-
-#         return get_common_basetype(types)
-
-#     @visitor.when(OptionNode)
-#     def visit(self, node: OptionNode, scope: Scope):
-#         var_info = self.find_variable(scope, node.id)
-#         typex = self.visit(node.expr, scope)
-#         return typex, var_info.type
-
-#     def binary_operation(self, node, scope, operator):
-#         ltype = self.visit(node.left, scope)
-#         rtype = self.visit(node.right, scope)
-#         int_type = IntType()
-#         if ltype != int_type or rtype != int_type:
-#             error_text = TypesError.BOPERATION_NOT_DEFINED % (
-#                 ltype.name, operator, rtype.name)
-#             self.errors.append(TypesError(error_text, *node.pos))
-#             return ErrorType()
-#         if operator == '<' or operator == '<=':
-#             return BoolType()
-#         return int_type
-
-#     @visitor.when(PlusNode)
-#     def visit(self, node: PlusNode, scope: Scope):
-#         return self.binary_operation(node, scope, '+')
-
-#     @visitor.when(MinusNode)
-#     def visit(self, node: MinusNode, scope: Scope):
-#         return self.binary_operation(node, scope, '-')
-
-#     @visitor.when(StarNode)
-#     def visit(self, node: StarNode, scope: Scope):
-#         return self.binary_operation(node, scope, '*')
-
-#     @visitor.when(DivNode)
-#     def visit(self, node: DivNode, scope: Scope):
-#         return self.binary_operation(node, scope, '/')
-
-#     @visitor.when(LessEqNode)
-#     def visit(self, node: DivNode, scope: Scope):
-#         return self.binary_operation(node, scope, '<=')
-
-#     @visitor.when(LessNode)
-#     def visit(self, node: DivNode, scope: Scope):
-#         return self.binary_operation(node, scope, '<')
-
-#     @visitor.when(EqualNode)
-#     def visit(self, node: EqualNode, scope: Scope):
-#         ltype = self.visit(node.left, scope)
-#         rtype = self.visit(node.right, scope)
-#         if (ltype == IntType() or rtype == IntType() or ltype == StringType() or rtype == StringType() or ltype == BoolType() or rtype == BoolType()) and ltype != rtype:
-#             error_text = TypesError.COMPARISON_ERROR
-#             self.errors.append(TypesError(error_text, *node.pos))
-#             return ErrorType()
-#         else:
-#             return BoolType()
-
-#     @visitor.when(NotNode)
-#     def visit(self, node: NotNode, scope: Scope):
-#         ltype = self.visit(node.expr, scope)
-#         typex = BoolType()
-#         if ltype != typex:
-#             error_text = TypesError.UOPERATION_NOT_DEFINED % (
-#                 'not', ltype.name, typex.name)
-#             self.errors.append(TypesError(error_text, *node.pos))
-#             return ErrorType()
-#         return typex
-
-#     @visitor.when(BinaryNotNode)
-#     def visit(self, node: BinaryNotNode, scope: Scope):
-#         ltype = self.visit(node.expr, scope)
-#         int_type = IntType()
-#         if ltype != int_type:
-#             error_text = TypesError.UOPERATION_NOT_DEFINED % (
-#                 '~', ltype.name, int_type.name)
-#             self.errors.append(TypesError(error_text, *node.pos))
-#             return ErrorType()
-#         return int_type
+from semantic.semantic import AutoType, BoolType, ErrorType, IntType, MethodError, ObjectType, StringType, VariableInfo, VoidType
+from utils.errors import AttributexError, SemanticError, TypexError
+from utils import visitor
+from utils.utils import get_type, get_common_basetype
+from utils.ast import *
+
+
+class TypeChecker:
+    def __init__(self, context, errors):
+        self.context = context
+        self.currentType = None
+        self.currentMethod = None
+        self.currentIndex = None
+        self.errors = errors
+
+    @visitor.on('node')
+    def visit(self, node, scope):
+        pass
+
+    @visitor.when(ProgramNode)
+    def visit(self, programNode, scope):
+        for i in range(0, len(programNode.declarations)):
+            self.visit(programNode.declarations[i], scope.children[i])
+
+    @visitor.when(ClassDeclarationNode)
+    def visit(self, classDeclarationNode, scope):
+        self.currentType = self.context.get_type(
+            classDeclarationNode.id, (classDeclarationNode.line, classDeclarationNode.col))
+
+        funcDeclarations = []
+        for feature in classDeclarationNode.features:
+            if isinstance(feature, AttrDeclarationNode):
+                self.visit(feature, scope)
+            else:
+                funcDeclarations.append(feature)
+
+        for funcDeclaration in funcDeclarations:
+            self.visit(funcDeclaration, scope.functions[funcDeclaration.id])
+
+    @visitor.when(FuncDeclarationNode)
+    def visit(self, funcDeclarationNode, scope):
+        parent = self.currentType.parent
+        self.currentMethod = self.currentType.get_method(
+            funcDeclarationNode.id, (funcDeclarationNode.line, funcDeclarationNode.col))
+
+        method = self.currentMethod
+        if parent is not None:
+            try:
+                oldMethod = parent.get_method(
+                    funcDeclarationNode.id, (funcDeclarationNode.line, funcDeclarationNode.col))
+                if oldMethod.return_type.name != method.return_type.name:
+                    errorText = f'In redefined method {funcDeclarationNode.id}, return type {method.return_type.name} is different from original return type {oldMethod.return_type.name}.'
+                    self.errors.append(SemanticError(
+                        errorText, funcDeclarationNode.typeLine, funcDeclarationNode.typeCol))
+                if len(method.param_names) != len(oldMethod.param_names):
+                    errorText = f'Incompatible number of formal parameters in redefined method {funcDeclarationNode.id}.'
+                    self.errors.append(SemanticError(
+                        errorText, funcDeclarationNode.line, funcDeclarationNode.col))
+                for (name, ptype, pline, pcol), type1, type2 in zip(funcDeclarationNode.params, method.param_types, oldMethod.param_types):
+                    if type1.name != type2.name:
+                        errorText = f'In redefined method {name}, parameter type {type1.name} is different from original type {type2.name}.'
+                        self.errors.append(
+                            SemanticError(errorText, pline, pcol))
+            except:
+                pass
+
+        result = self.visit(funcDeclarationNode.body, scope)
+        returnType = get_type(method.return_type, self.currentType)
+
+        if not result.conforms_to(returnType):
+            errorText = f'Inferred return type {result.name} of method test does not conform to declared return type {returnType.name}.'
+            self.errors.append(TypexError(
+                errorText, funcDeclarationNode.typeLine, funcDeclarationNode.typeCol))
+
+    @visitor.when(AttrDeclarationNode)
+    def visit(self, attrDeclarationNode, scope):
+        attr = self.currentType.get_attribute(
+            attrDeclarationNode.id, (attrDeclarationNode.line, attrDeclarationNode.col))
+        attrType = get_type(attr.type, self.currentType)
+        self.currentIndex = attr.index
+        typex = self.visit(attrDeclarationNode.expr, scope)
+        self.currentIndex = None
+
+        if not typex.conforms_to(attrType):
+            errorText = f'Inferred type {typex.name} of initialization of attribute {attr.name} does not conform to declared type {attrType.name}.'
+            self.errors.append(TypexError(
+                errorText, attrDeclarationNode.line, attrDeclarationNode.col))
+            return ErrorType()
+
+        return typex
+
+    @visitor.when(VarDeclarationNode)
+    def visit(self, varDeclarationNode, scope):
+        varType = self._get_type(
+            varDeclarationNode.type, (varDeclarationNode.line, varDeclarationNode.col))
+        varType = get_type(varType, self.currentType)
+
+        if varDeclarationNode.expr == None:
+            return varType
+        else:
+            typex = self.visit(varDeclarationNode.expr, scope)
+            if not typex.conforms_to(varType):
+                errorText = f'Inferred type {typex.name} of initialization of {varDeclarationNode.id} does not conform to identifier\'s declared type {varType.name}.'
+                self.errors.append(TypexError(
+                    errorText, varDeclarationNode.typeLine, varDeclarationNode.typeCol))
+            return typex
+
+    @visitor.when(AssignNode)
+    def visit(self, assignNode, scope):
+        varInfo = self.find_variable(scope, assignNode.id)
+        varType = get_type(varInfo.type, self.currentType)
+        typex = self.visit(assignNode.expr, scope)
+
+        if not typex.conforms_to(varType):
+            errorText = f'Inferred type {typex.name} of initialization of {assignNode.id} does not conform to identifier\'s declared type {varType.name}.'
+            self.errors.append(TypexError(
+                errorText, assignNode.line, assignNode.col))
+        return typex
+
+    @visitor.when(ArrobaCallNode)
+    def visit(self, arrobaCallNode, scope):
+        objType = self.visit(arrobaCallNode.obj, scope)
+        typex = self._get_type(
+            arrobaCallNode.type, (arrobaCallNode.typeLine, arrobaCallNode.typeCol))
+
+        if not objType.conforms_to(typex):
+            errorText = f'Expression type {typex.name} does not conform to declared static dispatch type {objType.name}.'
+            self.errors.append(TypexError(
+                errorText, arrobaCallNode.typeLine, arrobaCallNode.typeCol))
+            return ErrorType()
+
+        method = self._get_method(
+            typex, arrobaCallNode.id, (arrobaCallNode.line, arrobaCallNode.col))
+        if not isinstance(method, MethodError):
+            # check the args
+            argTypes = [self.visit(arg, scope) for arg in arrobaCallNode.args]
+
+            if len(argTypes) > len(method.param_types):
+                errorText = f'Method {method.name} called with wrong number of arguments.'
+                self.errors.append(SemanticError(
+                    errorText, arrobaCallNode.line, arrobaCallNode.col))
+            elif len(argTypes) < len(method.param_types):
+                for arg, argInfo in zip(method.param_names[len(argTypes):], arrobaCallNode.args[len(argTypes):]):
+                    errorText = f'Method {method.name} called with wrong number of arguments.'
+                    self.errors.append(SemanticError(errorText, *argInfo.pos))
+
+            for argType, paramType, paramName in zip(argTypes, method.param_types, method.param_names):
+                if not argType.conforms_to(paramType):
+                    errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
+                    self.errors.append(TypexError(
+                        errorText, arrobaCallNode.line, arrobaCallNode.col))
+
+        return get_type(method.return_type, typex)
+
+    @visitor.when(DotCallNode)
+    def visit(self, dotCallNode, scope):
+        objType = self.visit(dotCallNode.obj, scope)
+        method = self._get_method(
+            objType, dotCallNode.id, (dotCallNode.line, dotCallNode.col))
+        if not isinstance(method, MethodError):
+            # check the args
+            argTypes = [self.visit(arg, scope) for arg in dotCallNode.args]
+
+            if len(argTypes) > len(method.param_types):
+                errorText = f'Method {method.name} called with wrong number of arguments.'
+                self.errors.append(SemanticError(
+                    errorText, dotCallNode.line, dotCallNode.col))
+            elif len(argTypes) < len(method.param_types):
+                for arg, argInfo in zip(method.param_names[len(argTypes):], dotCallNode.args[len(argTypes):]):
+                    errorText = f'Method {method.name} called with wrong number of arguments.'
+                    self.errors.append(SemanticError(errorText, *argInfo.pos))
+
+            for argType, paramType, paramName in zip(argTypes, method.param_types, method.param_names):
+                if not argType.conforms_to(paramType):
+                    errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
+                    self.errors.append(TypexError(
+                        errorText, dotCallNode.line, dotCallNode.col))
+
+        return get_type(method.return_type, objType)
+
+    @visitor.when(MemberCallNode)
+    def visit(self, memberCallNode, scope):
+        typex = self.currentType
+        method = self._get_method(
+            typex, memberCallNode.id, (memberCallNode.line, memberCallNode.col))
+        if not isinstance(method, MethodError):
+            # check the args
+            argTypes = [self.visit(arg, scope) for arg in memberCallNode.args]
+
+            if len(argTypes) > len(method.param_types):
+                errorText = f'Method {method.name} called with wrong number of arguments.'
+                self.errors.append(SemanticError(
+                    errorText, memberCallNode.line, memberCallNode.col))
+            elif len(argTypes) < len(method.param_types):
+                for arg, argInfo in zip(method.param_names[len(argTypes):], memberCallNode.args[len(argTypes):]):
+                    errorText = f'Method {method.name} called with wrong number of arguments.'
+                    self.errors.append(SemanticError(errorText, *argInfo.pos))
+
+            for argType, paramType, paramName in zip(argTypes, method.param_types, method.param_names):
+                if not argType.conforms_to(paramType):
+                    errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
+                    self.errors.append(TypexError(
+                        errorText, memberCallNode.line, memberCallNode.col))
+
+        return get_type(method.return_type, typex)
+
+    @visitor.when(IfThenElseNode)
+    def visit(self, ifThenElseNode, scope):
+        conditionType = self.visit(ifThenElseNode.condition, scope)
+        if conditionType.name != 'Bool':
+            errorText = f'Predicate of \'if\' does not have type Bool.'
+            self.errors.append(TypexError(
+                errorText, ifThenElseNode.line, ifThenElseNode.col))
+
+        ifBodyType = self.visit(ifThenElseNode.ifBody, scope)
+        elseBodyType = self.visit(ifThenElseNode.elseBody, scope)
+        return get_common_basetype([ifBodyType, elseBodyType])
+
+    @visitor.when(WhileNode)
+    def visit(self, whileNode, scope):
+        conditionType = self.visit(whileNode.condition, scope)
+        if conditionType.name != 'Bool':
+            errorText = 'Loop condition does not have type Bool.'
+            self.errors.append(TypexError(
+                errorText, whileNode.line, whileNode.col))
+        self.visit(whileNode.body, scope)
+        return ObjectType()
+
+    @visitor.when(BlockNode)
+    def visit(self, blockNode, scope):
+        typex = None
+        for expr in blockNode.exprs:
+            typex = self.visit(expr, scope)
+        return typex
+
+    @visitor.when(LetInNode)
+    def visit(self, letInNode, scope):
+        childScope = scope.expr_dict[letInNode]
+        for letDeclaration in letInNode.letBody:
+            self.visit(letDeclaration, childScope)
+        return self.visit(letInNode.inBody, childScope)
+
+    @visitor.when(CaseNode)
+    def visit(self, caseNode, scope):
+        exprType = self.visit(caseNode.expr, scope)
+        newScope = scope.expr_dict[caseNode]
+        types = []
+        checkDuplicate = []
+        for option, optionScope in zip(caseNode.optionList, newScope.children):
+            optionType = self.visit(option, optionScope)
+            types.append(optionType)
+            if option.type in checkDuplicate:
+                errorText = f'Duplicate branch {option.type} in case statement.'
+                self.errors.append(SemanticError(
+                    errorText, option.typeLine, option.typeCol))
+            checkDuplicate.append(option.type)
+        return get_common_basetype(types)
+
+    @visitor.when(CaseOptionNode)
+    def visit(self, caseOptionNode, scope):
+        optionType = self.visit(caseOptionNode.expr, scope)
+        return optionType
+
+    @visitor.when(PlusNode)
+    def visit(self, plusNode, scope):
+        leftType = self.visit(plusNode.lvalue, scope)
+        rightType = self.visit(plusNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} + {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, plusNode.line, plusNode.col))
+            return ErrorType()
+        return IntType()
+
+    @visitor.when(MinusNode)
+    def visit(self, minusNode, scope):
+        leftType = self.visit(minusNode.lvalue, scope)
+        rightType = self.visit(minusNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} - {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, minusNode.line, minusNode.col))
+            return ErrorType()
+        return IntType()
+
+    @visitor.when(StarNode)
+    def visit(self, starNode, scope):
+        leftType = self.visit(starNode.lvalue, scope)
+        rightType = self.visit(starNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} * {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, starNode.line, starNode.col))
+            return ErrorType()
+        return IntType()
+
+    @visitor.when(DivNode)
+    def visit(self, divNode, scope):
+        leftType = self.visit(divNode.lvalue, scope)
+        rightType = self.visit(divNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} / {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, divNode.line, divNode.col))
+            return ErrorType()
+        return IntType()
+
+    @visitor.when(LessNode)
+    def visit(self, lessNode, scope):
+        leftType = self.visit(lessNode.lvalue, scope)
+        rightType = self.visit(lessNode.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} < {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, lessNode.line, lessNode.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(LessEqNode)
+    def visit(self, lessEq, scope):
+        leftType = self.visit(lessEq.lvalue, scope)
+        rightType = self.visit(lessEq.rvalue, scope)
+        if leftType != IntType() or rightType != IntType():
+            errorText = f'non-Int arguments: {leftType.name} <= {rightType.name} .'
+            self.errors.append(TypexError(
+                errorText, lessEq.line, lessEq.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(EqualNode)
+    def visit(self, lessEq, scope):
+        leftType = self.visit(lessEq.lvalue, scope)
+        rightType = self.visit(lessEq.rvalue, scope)
+        if (leftType != rightType) and (leftType in [IntType(), StringType(), BoolType()] or rightType in [IntType(), StringType(), BoolType()]):
+            errorText = 'Illegal comparison with a basic type.'
+            self.errors.append(TypexError(errorText, lessEq.line, lessEq.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(NegationNode)
+    def visit(self, negationNode, scope):
+        exprType = self.visit(negationNode.expr, scope)
+        if exprType != IntType():
+            errorText = f'Argument of \'~\' has type {exprType.name} instead of {IntType().name}.'
+            self.errors.append(TypexError(
+                errorText, negationNode.line, negationNode.col))
+            return ErrorType()
+        return IntType()
+
+    @visitor.when(LogicNegationNode)
+    def visit(self, logicNegationNode, scope):
+        exprType = self.visit(logicNegationNode.expr, scope)
+        if exprType != BoolType():
+            errorText = f'Argument of \'not\' has type {exprType.name} instead of {BoolType().name}.'
+            self.errors.append(TypexError(
+                errorText, logicNegationNode.line, logicNegationNode.col))
+            return ErrorType()
+        return BoolType()
+
+    @visitor.when(IsVoidNode)
+    def visit(self, isVoidNode, scope):
+        self.visit(isVoidNode.expr, scope)
+        return BoolType()
+
+    @visitor.when(NewNode)
+    def visit(self, newNode, scope):
+        try:
+            typex = self.context.get_type(
+                newNode.id, (newNode.line, newNode.col))
+        except:
+            typex = ErrorType()
+            errorText = f'\'new\' used with undefined class {newNode.id}.'
+            self.errors.append(TypexError(
+                errorText, newNode.line, newNode.col))
+        return get_type(typex, self.currentType)
+
+    @visitor.when(IdNode)
+    def visit(self, idNode, scope):
+        varType = self.find_variable(scope, idNode.id).type
+        return get_type(varType, self.currentType)
+
+    @visitor.when(IntNode)
+    def visit(self, intNode, scope):
+        return IntType((intNode.line, intNode.col))
+
+    @visitor.when(BoolNode)
+    def visit(self, boolNode, scope):
+        return BoolType((boolNode.line, boolNode.col))
+
+    @visitor.when(StringNode)
+    def visit(self, stringNode, scope):
+        return StringType((stringNode.line, stringNode.col))
+
+    @visitor.when(VoidNode)
+    def visit(self, voidNode, scope):
+        return VoidType((voidNode.line, voidNode.col))
+
+    def _get_type(self, ntype, pos):
+        try:
+            return self.context.get_type(ntype, pos)
+        except SemanticError as e:
+            self.errors.append(e)
+            return ErrorType()
+
+    def _get_method(self, typex, name, pos):
+        try:
+            return typex.get_method(name, pos)
+        except SemanticError:
+            if type(typex) != ErrorType and type(typex) != AutoType:
+                errorText = f'Dispatch to undefined method {name}.'
+                self.errors.append(AttributexError(errorText, *pos))
+            return MethodError(name, [], [], ErrorType())
+
+    def find_variable(self, scope, lex):
+        var_info = scope.find_local(lex)
+        if var_info is None:
+            var_info = scope.find_attribute(lex)
+        if lex in self.currentType.attributes and var_info is None:
+            return VariableInfo(lex, VoidType())
+        return var_info

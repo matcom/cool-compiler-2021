@@ -202,7 +202,7 @@ class UnaryNode(ExpressionNode):
     def __init__(self, expr, token):
         self.expr = expr
         self.line = token.lineno
-        self.column = token.column
+        self.col = token.column
 
 
 class NegationNode(UnaryNode):
@@ -248,4 +248,7 @@ class BoolNode(AtomicNode):
 
 
 class StringNode(AtomicNode):
+    pass
+
+class VoidNode(AtomicNode):
     pass

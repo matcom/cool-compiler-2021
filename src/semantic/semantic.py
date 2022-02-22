@@ -1,4 +1,3 @@
-from utils.ast import BoolNode, IntNode, IsVoidNode, StringNode
 from utils.errors import SemanticError
 from collections import OrderedDict
 import itertools as itt
@@ -34,6 +33,14 @@ class Method:
         return other.name == self.name and \
             other.return_type == self.return_type and \
             other.param_types == self.param_types
+
+
+class MethodError(Method):
+    def __init__(self, name, param_names, param_types, return_types):
+        super().__init__(name, param_names, param_types, return_types)
+
+    def __str__(self):
+        return f'[method] {self.name} ERROR'
 
 
 class Type:
@@ -309,6 +316,17 @@ class IOType(Type):
         return other.name != self.name and not isinstance(other, IOType)
 
 
+class AutoType(Type):
+    def __init__(self):
+        Type.__init__(self, 'AUTO_TYPE')
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, AutoType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, AutoType)
+
+
 class Context:
     def __init__(self):
         self.types = {}
@@ -355,7 +373,7 @@ class VariableInfo:
     def __init__(self, name, vtype, index=None):
         self.name = name
         self.type = vtype
-        self.index = index  # saves the index in the scope of the variable
+        self.index = index
 
     def __str__(self):
         return f'{self.name} : {self.type.name}'
@@ -451,12 +469,3 @@ class Scope:
 
     def define_attribute(self, attr):
         self.attributes.append(attr)
-
-
-def define_default_value(typex, node):
-    if typex == IntType():
-        node.expr = IntNode(0)
-    elif typex == StringType():
-        node.expr = StringNode("")
-    else:
-        node.expr = BoolNode('false')

@@ -27,11 +27,16 @@ class SemanticError(CoolError):
         super().__init__('SemanticError', text, line, column)
 
 
-class TypexError(SemanticError):
+class TypexError(CoolError):
     def __init__(self, text, line, column):
         super().__init__('TypeError', text, line, column)
 
 
-class NamexError(SemanticError):
+class NamexError(CoolError):
     def __init__(self, text, line, column):
         super().__init__('NameError', text, line, column)
+
+
+class AttributexError(CoolError):
+    def __init__(self, text, line, column):
+        super().__init__('AttributeError', text, line, column)

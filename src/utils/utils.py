@@ -1,3 +1,7 @@
+import itertools
+from semantic.semantic import SelfType
+
+
 def find_column(text, pos):
     line_start = text.rfind('\n', 0, pos) + 1
     return (pos - line_start) + 1
@@ -34,7 +38,9 @@ reserved = {
     'esac': 'ESAC',
     'new': 'NEW',
     'of': 'OF',
-    'not': 'LNOT'
+    'not': 'LNOT',
+    'true': 'TRUE',
+    'false': 'FALSE'
 }
 
 tokens = [
@@ -60,6 +66,34 @@ tokens = [
     'ARROW',
     'INT',
     'STRING',
-    'NOT',
-    'BOOL'
+    'NOT'
 ] + list(reserved.values())
+
+
+def path_to_objet(typex):
+    path = []
+    c_type = typex
+
+    while c_type:
+        path.append(c_type)
+
+        c_type = c_type.parent
+
+    path.reverse()
+    return path
+
+
+def get_common_basetype(types):
+    paths = [path_to_objet(typex) for typex in types]
+    tuples = zip(*paths)
+
+    for i, t in enumerate(tuples):
+        gr = itertools.groupby(t)
+        if len(list(gr)) > 1:
+            return paths[0][i-1]
+
+    return paths[0][-1]
+
+
+def get_type(typex, current_type):
+    return current_type if typex == SelfType() else typex

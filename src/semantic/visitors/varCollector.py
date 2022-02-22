@@ -1,6 +1,6 @@
 from utils import visitor
-from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, VarDeclarationNode, WhileNode
-from semantic.semantic import ErrorType, IntType, Scope, define_default_value
+from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, BoolNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, StringNode, VarDeclarationNode, VoidNode, WhileNode
+from semantic.semantic import BoolType, ErrorType, IntType, Scope, StringType
 from utils.errors import NamexError, SemanticError, TypexError
 
 
@@ -17,7 +17,7 @@ class VarCollector:
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self, programNode, scope):
+    def visit(self, programNode, scope=None):
         scope = Scope()
         for declaration in programNode.declarations:
             self.visit(declaration, scope.create_child())
@@ -67,7 +67,7 @@ class VarCollector:
         attr = self.currentType.get_attribute(
             attrDeclarationNode.id, (attrDeclarationNode.line, attrDeclarationNode.col))
         if attrDeclarationNode.expr is None:
-            define_default_value(attr.type, attrDeclarationNode)
+            self.define_default_value(attr.type, attrDeclarationNode)
         else:
             self.visit(attrDeclarationNode.expr, scope)
         attr.expr = attrDeclarationNode.expr
@@ -90,7 +90,7 @@ class VarCollector:
 
         try:
             vType = self.context.get_type(
-                varDeclarationNode.type, varDeclarationNode.line, varDeclarationNode.col)
+                varDeclarationNode.type, (varDeclarationNode.line, varDeclarationNode.col))
         except:
             errorText = f'Class {varDeclarationNode.type} of let-bound identifier {varDeclarationNode.id} is undefined.'
             self.errors.append(TypexError(
@@ -104,7 +104,7 @@ class VarCollector:
         if varDeclarationNode.expr is not None:
             self.visit(varDeclarationNode.expr, scope)
         else:
-            define_default_value(vType, varDeclarationNode)
+            self.define_default_value(vType, varDeclarationNode)
 
     @visitor.when(AssignNode)
     def visit(self, assignNode, scope):
@@ -130,18 +130,18 @@ class VarCollector:
     def visit(self, arrobaCallNode, scope):
         self.visit(arrobaCallNode.obj, scope)
         for arg in arrobaCallNode.args:
-            self.visit(arg)
+            self.visit(arg, scope)
 
     @visitor.when(DotCallNode)
     def visit(self, dotCallNode, scope):
         self.visit(dotCallNode.obj, scope)
         for arg in dotCallNode.args:
-            self.visit(arg)
+            self.visit(arg, scope)
 
     @visitor.when(MemberCallNode)
     def visit(self, memberCallNode, scope):
         for arg in memberCallNode.args:
-            self.visit(arg)
+            self.visit(arg, scope)
 
     @visitor.when(IfThenElseNode)
     def visit(self, ifThenElseNode, scope):
@@ -210,3 +210,13 @@ class VarCollector:
                 vInfo = scope.find_variable(idNode.id)
 
             return vInfo.type
+
+    def define_default_value(self, typex, node):
+        if typex == IntType():
+            node.expr = IntNode(0)
+        elif typex == StringType():
+            node.expr = StringNode("")
+        elif typex == BoolType():
+            node.expr = BoolNode('false')
+        else:
+            node.expr = VoidNode(node.id)
