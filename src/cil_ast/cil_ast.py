@@ -10,8 +10,12 @@ class ProgramNode(Node):
 class TypeNode(Node):
     def __init__(self, name):
         self.name = name
-        self.attributes = []
+        self.attrs = {}
         self.methods = []
+    
+    @property
+    def attributes(self):
+        return self.attrs.keys()
 
 class DataNode(Node):
     def __init__(self, vname, value):
@@ -45,25 +49,25 @@ class AssignNode(InstructionNode):
         self.dest = dest
         self.source = source
 
-class ArithmeticNode(InstructionNode):
+class BinaryOperatorNode(InstructionNode):
     def __init__(self, dest, left, right):
         self.dest = dest
         self.left = left
         self.right = right
 
-class PlusNode(ArithmeticNode):
+class PlusNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
-class MinusNode(ArithmeticNode):
+class MinusNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
-class StarNode(ArithmeticNode):
+class StarNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
-class DivNode(ArithmeticNode):
+class DivNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
@@ -105,6 +109,17 @@ class TypeOfNode(InstructionNode):
     def __init__(self, obj, dest):
         self.obj = obj
         self.dest = dest
+        
+class IsTypeNode(InstructionNode):
+    def __init__(self, dest, type_obj, type_name):
+        self.dest = dest
+        self.type_obj = type_obj
+        self.type_name = type_name
+
+class ParentTypeNode(Node):
+    def __init__(self, dest, type_obj):
+        self.dest = dest
+        self.type_obj = type_obj
 
 class LabelNode(InstructionNode):
     def __init__(self, name):
@@ -190,11 +205,6 @@ class ReadNode(InstructionNode):
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
-
-class StringNode(InstructionNode):
-    def __init__(self, value, data):
-        self.value = value
-        self.data = data
 
 class IntNode(InstructionNode):
     def __init_(self, value):
