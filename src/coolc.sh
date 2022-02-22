@@ -9,4 +9,4 @@ echo "Copyright (c) 2022: Amalia_Ibarra, Sandra_Martos, Gabriela_Martinez"
 
 # Llamar al compilador
 echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
-python -m main $@
+python3 -m main $@
