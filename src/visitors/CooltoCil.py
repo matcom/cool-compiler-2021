@@ -529,7 +529,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         
         self.register_instruction(cil.LabelNode(error_label))
         self.register_instruction(cil.ParamNode(self.instances[-1]))
-        self.register_instruction(cil.DynamicCallNode())
+        self.register_instruction(cil.DynamicCallNode(var, self.to_function_name('abort', self.current_type.name, result)))
 
         self.register_instruction(cil.GotoNode(end_case_label))
         return result

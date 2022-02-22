@@ -49,25 +49,37 @@ class AssignNode(InstructionNode):
         self.dest = dest
         self.source = source
 
-class ArithmeticNode(InstructionNode):
+class BinaryOperatorNode(InstructionNode):
     def __init__(self, dest, left, right):
         self.dest = dest
         self.left = left
         self.right = right
 
-class PlusNode(ArithmeticNode):
+class PlusNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
-class MinusNode(ArithmeticNode):
+class MinusNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
-class StarNode(ArithmeticNode):
+class StarNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
-class DivNode(ArithmeticNode):
+class DivNode(BinaryOperatorNode):
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
+
+class EqualNode(BinaryOperatorNode):
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
+
+class LessNode(BinaryOperatorNode):
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
+
+class LeqNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
@@ -214,6 +226,3 @@ class StringNode(InstructionNode):
 class IntNode(InstructionNode):
     def __init_(self, value):
         self.value = value
-
-# ParentTypeNode
-# TypeFunctionNode
