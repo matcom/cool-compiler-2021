@@ -138,42 +138,42 @@ class SemanticError(CoolpylerError):
         CoolpylerError.__init__(self, line, column, "SemanticError", msg)
 
 
-class IncompatibleTypesError(SemanticError):
+class IncompatibleTypesError(TypeError):
     def __init__(self, line, column, type_a, type_b) -> None:
-        SemanticError.__init__(
+        TypeError.__init__(
             self, line, column, f"Cannot convert {type_a} into {type_b}."
         )
 
 
-class InvalidOperationError(SemanticError):
+class InvalidOperationError(TypeError):
     def __init__(self, line, column, type_a, type_b) -> None:
-        SemanticError.__init__(
+        TypeError.__init__(
             self, line, column, f"invalid operation {type_a} between {type_b}."
         )
 
 
-class InvalidComparissonError(SemanticError):
+class InvalidComparissonError(TypeError):
     def __init__(self, line, column, type_a, type_b) -> None:
-        SemanticError.__init__(
+        TypeError.__init__(
             self, line, column, f"invalid comparisson {type_a} between {type_b}."
         )
 
 
-class IsReadOnlyError(SemanticError):
+class IsReadOnlyError(TypeError):
     def __init__(self, line, column, name) -> None:
-        SemanticError.__init__(self, line, column, f"{name} is read only.")
+        TypeError.__init__(self, line, column, f"{name} is read only.")
 
 
-class NotConformsError(SemanticError):
+class NotConformsError(TypeError):
     def __init__(self, line, column, type_a, type_b) -> None:
-        SemanticError.__init__(
+        TypeError.__init__(
             self, line, column, f"type {type_a} does not conforms {type_b}."
         )
 
 
-class WrongArgsCountError(SemanticError):
+class WrongArgsCountError(TypeError):
     def __init__(self, line, column, method, n1, n2) -> None:
-        SemanticError.__init__(
+        TypeError.__init__(
             self, line, column, f"Method {method} takes {n1} but {n2} were given."
         )
 
