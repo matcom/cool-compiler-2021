@@ -600,7 +600,14 @@ class TypeCheckerVisitor:
                 node.lineno, node.columnno, self.current_type
             )
 
-        type = self.get_type(node.type_name)
+        try:
+            type = self.get_type(node.type_name)
+        except semantic.SemanticError as e:
+            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e))
+            return type_checked.CoolNewNode(
+                node.lineno, node.columnno, ErrorType()
+            )
+
         return type_checked.CoolNewNode(
             node.lineno, node.columnno, type
         )
