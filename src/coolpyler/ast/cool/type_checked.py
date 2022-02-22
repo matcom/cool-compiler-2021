@@ -7,12 +7,9 @@ class CoolAstNode(type_built.CoolAstNode):
 
 
 class CoolProgramNode(base.CoolProgramNode):
-    def __init__(self, lineno, columnno, classes, types, scope):
+    def __init__(self, lineno, columnno, classes):
         super().__init__(lineno, columnno)
-
         self.classes = classes
-        self.types = types
-        self.scope = scope
 
 
 class CoolClassNode(type_built.CoolClassNode):

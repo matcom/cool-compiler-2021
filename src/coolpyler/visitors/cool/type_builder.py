@@ -1,6 +1,5 @@
 import coolpyler.ast.cool.type_built as type_built
 import coolpyler.ast.cool.type_collected as type_collected
-import coolpyler.errors as es
 import coolpyler.semantic as semantic
 import coolpyler.utils.visitor as visitor
 from coolpyler.semantic import ErrorType
