@@ -5,6 +5,7 @@ from cmp.semantic import VariableInfo
 from cool.semantic.context import Context
 from cool.error.errors import RunError, ZERO_DIVISION
 from cool.semantic.type import SelfType
+from math import floor
 
 class CILPrintVisitor():
     @visitor.on('node')
@@ -440,7 +441,7 @@ class CILRunnerVisitor():
     @visitor.when(cil.DivNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         try:
-            return self.binary_node(node, caller_fun_scope, lambda x,y: x/y)
+            return self.binary_node(node, caller_fun_scope, lambda x,y: floor(x/y))
         except ZeroDivisionError:
             self.raise_error(ZERO_DIVISION)
         
@@ -518,6 +519,8 @@ class CILRunnerVisitor():
     @visitor.when(cil.GetAttribNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         obj_value = self.get_value(node.source, caller_fun_scope)
+        if not obj_value:
+            obj_value = self.get_value(node.source, caller_fun_scope)
         try:
             value = obj_value[node.attr]
         except KeyError:
