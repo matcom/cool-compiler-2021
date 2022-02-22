@@ -117,9 +117,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         methods = []
         self.attrs.clear()
         
-        #esto para cuando llega a object i guess
         current_type = self.current_type
-        while current_type.parent is not None:
+        while True:
             attr_temp = []
             method_temp = []
             for attr in current_type.attributes:
@@ -132,8 +131,11 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             attributes = attr_temp + attributes
             methods = method_temp + methods
             
+            if current_type.parent is None:
+                break
+            
             current_type = current_type.parent
-        
+
         self.transform_keys(type_node, attributes) # type_node.attributes = attributes
         type_node.methods = methods
         
@@ -484,6 +486,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         start_case_label = self.define_internal_local()
         end_case_label = self.define_internal_local()
+        error_label = self.define_internal_local()
         
         obj = self.visit(node.expr, scope)
         obj_type = self.define_internal_local()
@@ -491,13 +494,18 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         
         result = self.define_internal_local()
         self.register_instruction(cil.LabelNode(start_case_label))
+        
+        condition = self.define_internal_local()
+        self.register_instruction(cil.IsTypeNode, condition, obj_type, 'Void')
+        self.register_instruction(cil.GotoIfNode, error_label, condition)
+
         for case in node.case_list:
             case_id, case_type, case_expr = case 
             current_label = self.define_internal_local()
             next_label = self.define_internal_local()
             
             condition = self.define_internal_local()
-            # poner el istype node 
+            self.register_instruction(cil.IsTypeNode(condition, obj_type, case_type))
             self.register_instruction(cil.GotoIfNode(current_label, condition))
             
             self.register_instruction(cil.GotoNode(next_label))
@@ -513,9 +521,16 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             
             self.register_instruction(next_label)
         
+        var = self.define_internal_local()
+        self.register_instruction(cil.ParentTypeNode(var, obj_type))
+        self.register_instruction(cil.AssignNode(obj_type, var))
+
+        self.register_instruction(cil.GotoNode(start_case_label))
         
-        # self.register_instruction(cil.GotoNode(start_case_label))
-        
+        self.register_instruction(cil.LabelNode(error_label))
+        self.register_instruction(cil.ParamNode(self.instances[-1]))
+        self.register_instruction(cil.DynamicCallNode())
+
         self.register_instruction(cil.GotoNode(end_case_label))
         return result
 

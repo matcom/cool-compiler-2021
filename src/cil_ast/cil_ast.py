@@ -110,6 +110,17 @@ class TypeOfNode(InstructionNode):
         self.obj = obj
         self.dest = dest
 
+class IsTypeNode(InstructionNode):
+    def __init(self, dest, type_obj, type_name):
+        self.dest = dest
+        self.type_obj = type_obj
+        self.type_name = type_name
+
+class ParentTypeNode(InstructionNode):
+    def __init__(self, dest, type_obj):
+        self.dest = dest
+        self.type_obj = type_obj
+
 class LabelNode(InstructionNode):
     def __init__(self, name):
         self.name = name
