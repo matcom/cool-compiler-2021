@@ -13,6 +13,9 @@ METHOD_VISITOR_RESULT = FunctionNode
 USER = "user"
 ATTR = "attr"
 
+BOOL = "Bool"
+VOID = "Void"
+
 # CCIL stands for Cool Cows Intermediate Language ;)
 class CCILGenerator:
     """
@@ -21,7 +24,7 @@ class CCILGenerator:
 
     def __init__(self) -> None:
         self.time_record: Dict[str, int] = dict()
-        self.locals: Set[Local]
+        self.locals: Dict[str, str]
 
     @visitor.on("node")
     def visit(self, _):
@@ -55,7 +58,7 @@ class CCILGenerator:
                 func_nodes.append(feature)
 
         # Explore all attributes and join their operations in an initializer function
-        self.locals = set()
+        self.locals = dict()
         operations = []
         for attr in attr_nodes:
             attributes.append(Attribute(ATTR + attr.id, attr.type.name))
@@ -63,7 +66,7 @@ class CCILGenerator:
             operations += attr_ops
         # Return type is set as itself? Use selftype maybe?
         init_func = FunctionNode(
-            node, f"init_{node.id}", [], [*self.locals], operations, node.id
+            node, f"init_{node.id}", [], [*self.locals.items()], operations, node.id
         )
 
         # Explore all methods
@@ -79,7 +82,7 @@ class CCILGenerator:
     @visitor.when(sem_ast.AttrDeclarationNode)
     def visit(self, node: sem_ast.AttrDeclarationNode) -> VISITOR_RESULT:
         fval_id = ATTR + node.id
-        self.locals.add(Local(fval_id, node.type.name))
+        self.locals[fval_id] = node.type.name
 
         if node.expr is None:
             return []
@@ -94,10 +97,12 @@ class CCILGenerator:
         for param in node.params:
             params.append(Parameter(param.id, param.type.name))
 
-        self.locals = set()
+        self.locals = dict()
         (operations, fval_id) = self.visit(node.body)
 
-        return FunctionNode(node, node.id, params, [*self.locals], operations, fval_id)
+        return FunctionNode(
+            node, node.id, params, [*self.locals.items()], operations, fval_id
+        )
 
     @visitor.when(sem_ast.BlocksNode)
     def visit(self, node: sem_ast.BlocksNode) -> VISITOR_RESULT:
@@ -110,8 +115,11 @@ class CCILGenerator:
             operations += expr_ops
             fvalues += expr_fval
 
-        fval = fvalues[-1]
-        fval.id = f"block_{times}"
+        block_val = fvalues[-1]
+        fval_id = f"block_{times}"
+
+        fval = self.create_assignation(node, fval_id, node.type.name, block_val.id)
+        operations.append(fval)
 
         return (operations, fval)
 
@@ -135,9 +143,12 @@ class CCILGenerator:
         fvalue_id: str = USER + node.id
 
         if node.expr is None:
-            return ([], create_uninitialized_storage(node, fvalue_id))
+            self.add_local(fvalue_id, node.type.name)
+            self.locals[fvalue_id] = node.type.name
 
         (expr_ops, expr_fv) = self.visit(node.expr)
+
+        self.update_locals(expr_fv.id, fvalue_id)
         expr_fv.id = fvalue_id
 
         return (expr_ops, expr_fv)
@@ -145,7 +156,10 @@ class CCILGenerator:
     @visitor.when(sem_ast.AssignNode)
     def visit(self, node: sem_ast.AssignNode) -> VISITOR_RESULT:
         (expr_ops, expr_fval) = self.visit(node.expr)
-        expr_fval.id = USER + node.id
+
+        fval_id = USER + node.id
+        self.update_locals(expr_fval.id, fval_id)
+        expr_fval.id = fval_id
 
         return (expr_ops, expr_fval)
 
@@ -164,12 +178,15 @@ class CCILGenerator:
 
         # Setting the final operation which will simbolize the return value of this expr
         pre_fvalue_id = f"if_{times}_pre_fv"
+        self.update_locals(then_fval.id, pre_fvalue_id)
+        self.update_locals(else_fval.id, pre_fvalue_id)
         then_fval.id = else_fval.id = pre_fvalue_id
+
         fvalue_id = f"if_{times}_fv"
-        fvalue = create_assignation(node, fvalue_id, pre_fvalue_id)
+        fvalue = self.create_assignation(node, fvalue_id, node.type.name, pre_fvalue_id)
 
         return (
-            [fvalue_local, *if_ops, if_false, *then_ops, else_label, *else_ops, fvalue],
+            [*if_ops, if_false, *then_ops, else_label, *else_ops, fvalue],
             fvalue,
         )
 
@@ -181,8 +198,8 @@ class CCILGenerator:
         (case_expr_ops, case_expr_fv) = self.visit(node.case_expr)
 
         # Storing the type of the resulting case expression
-        type_of = create_type_of(
-            node, f"case_{times}_typeOf", extract_id(node, case_expr_fv)
+        type_of = self.create_type_of(
+            node, f"case_{times}_typeOf", "not set", extract_id(node, case_expr_fv)
         )
 
         # Final label where all branch must jump to
@@ -211,9 +228,10 @@ class CCILGenerator:
             # Initializng var which holds the comparison result between
             # the case expression type of and branch var type of
             select_branch_id = f"case_{times}_optionSelect_{i}"
-            select_branch = create_equality(
+            select_branch = self.create_equality(
                 option,
                 select_branch_id,
+                BOOL,
                 extract_id(node, type_of),
                 extract_id(node, branch_var_type_of),
             )
@@ -224,24 +242,20 @@ class CCILGenerator:
 
             # Conditional jump to the right branch label
             if_op = IfNode(option, extract_id(option, branch_var_type_of), branch_label)
+            # Storing logic to jump to branch logic if this branch is selected
             pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
 
             # Visiting the branch logic
             (expr_ops, expr_fval) = self.visit(option.expr)
-
             # Renaming the last stored value of the expression accordingly
             expr_fval.id = pre_fvalue_id
-
-            # Storing logic to jump to branch logic if this branch is selected
-            pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
-
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
 
         # Merging all expression operations in correct order
-        # and saving to expression final value
+        # and saving all to final value
         fval_id = f"case_{times}_fv"
-        fval = create_assignation(node, fval_id, pre_fvalue_id)
+        fval = self.create_assignation(node, fval_id, node.type.name, pre_fvalue_id)
         operations = [
             *case_expr_ops,
             type_of,
@@ -269,7 +283,7 @@ class CCILGenerator:
         if_false = IfFalseNode(node, cond_fval, end_loop_label)
         go_to = GoToNode(node, loop_label)
 
-        fval = (create_uninitialized_storage(node, f"loop_{times}_fv"),)
+        fval = self.create_uninitialized_storage(node, f"loop_{times}_fv")
         # Loop Nodes have void return type, how to express it??
         return (
             [*cond_ops, loop_label, if_false, *body_ops, go_to, end_loop_label, fval],
@@ -315,7 +329,7 @@ class CCILGenerator:
             case _:
                 raise Exception("Pattern match failure visiting binary expression")
 
-        fval = StorageNode(node, fval_id, op)
+        fval = self.create_storage(node, fval_id, node.type.id, op)
         return ([*left_ops, *right_ops, fval], fval)
 
     @visitor.when(sem_ast.UnaryNode)
@@ -340,7 +354,7 @@ class CCILGenerator:
             case _:
                 raise Exception("Pattern match failure while visiting unary expression")
 
-        fval = StorageNode(node, fval_id, op)
+        fval = self.create_storage(node, fval_id, node.type.id, op)
         return [*expr_op, fval], fval
 
     @visitor.when(sem_ast.MethodCallNode)
@@ -359,7 +373,7 @@ class CCILGenerator:
         # id(arg1, arg2, ..., argn)
         if node.expr is None:
             fval_id = f"call_{times}"
-            call = create_call(node, fval_id, node.id)
+            call = self.create_call(node, fval_id, node.type.id, node.id )
             return [*args_ops, *args, call], call
 
         # <expr>.id(arg1, arg2, ..., argn)
@@ -371,7 +385,7 @@ class CCILGenerator:
         )
 
         fval_id = f"fvcall_{times}"
-        call = create_vcall(node, fval_id, node.id, type_idx)
+        call = self.create_vcall(node, fval_id, node.type.id, node.id,  type_idx)
 
         return [*args_ops, *expr_ops, *args, call]
 
@@ -382,3 +396,59 @@ class CCILGenerator:
         except KeyError:
             self.time_record[key] = 0
         return self.time_record[key]
+
+    def create_call(self, node, storage_idx: str, type_idx: str, method_idx: str):
+        self.add_local(storage_idx, type_idx)
+        return StorageNode(node, storage_idx, CallOpNode(node, method_idx))
+
+    def create_vcall(
+        self,
+        node,
+        storage_idx: str,
+        type_idx: str,
+        method_idx: str,
+        method_type_idx: str,
+    ):
+        self.add_local(storage_idx, type_idx)
+        return StorageNode(
+            node, storage_idx, VCallOpNode(node, method_idx, method_type_idx)
+        )
+
+    def create_assignation(self, node, idx: str, type_idx: str, target: str):
+        self.add_local(idx, type_idx)
+        return StorageNode(node, idx, IdNode(node, target))
+
+    def create_uninitialized_storage(
+        self,
+        node,
+        idx: str
+    ):
+        self.add_local(idx, VOID)
+        return StorageNode(node, idx, VoidNode(node))
+
+    def create_storage(self, node, idx:str, type_idx:str, op:ReturnOpNode):
+        self.add_local(idx, type_idx)
+        return StorageNode(node, idx, op)
+
+
+    def create_type_of(self, node, idx: str, type_idx: str, target: AtomOpNode):
+        self.add_local(idx, type_idx)
+        return StorageNode(node, idx, GetTypeOpNode(node, target))
+
+    def create_equality(
+        self, node, idx, type_idx: str, left: AtomOpNode, right: AtomOpNode
+    ):
+        self.add_local(idx, type_idx)
+        return StorageNode(node, idx, EqualOpNode(node, left, right))
+
+    def extract_id(self, node, storage_node: StorageNode) -> IdNode:
+        return IdNode(node, storage_node.id)
+
+    def update_locals(self, old_id: str, new_id: str):
+        self.locals[new_id] = self.locals[old_id]
+        del self.locals[old_id]
+
+    def add_local(self, idx: str, typex: str):
+        if idx in self.locals:
+            raise Exception(f"Trying to insert {idx} again as local")
+        self.locals[idx] = typex
