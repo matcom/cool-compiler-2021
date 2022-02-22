@@ -21,6 +21,9 @@ class Method:
         self.param_types = params_types
         self.return_type = return_type
 
+    def __eq__(self, other):
+        return other.name == self.name and other.return_type == self.return_type and other.param_types == self.param_types
+
 class Type:
     def __init__(self, name:str,line=-1):
         self.name = name
@@ -39,7 +42,7 @@ class Type:
     def get_attribute(self, name:str,pos=0):
         try:
             return next(attr for attr in self.attributes if attr.name == name)
-        except:
+        except StopIteration:
             if self.parent is None:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}',pos)
             try:
@@ -51,9 +54,9 @@ class Type:
         try:
             self.get_attribute(name)
         except SemanticError:
-            attribute = Attribute(name, typex)
-            self.attributes.append(attribute)
-            return attribute
+            a = Attribute(name, typex)
+            self.attributes.append(a)
+            return a
         else:
             raise SemanticError(f'Attribute "{name}" is already defined in {self.name}',pos)
 
@@ -71,17 +74,14 @@ class Type:
     def define_method(self, name:str, param_names:list, param_types:list,  return_type, pos):
         try:
             method = self.get_method(name, pos)
-        except SemanticError:
-            pass
-        else:
             if method.return_type != return_type or method.param_types != param_types:
                 raise SemanticError(f'Method "{name}" already defined in {self.name} with a different signature.', pos)
-        for method in self.methods :
-            if method.name == name:
+            else:
                 raise SemanticError(f'Method "{name}" already defined in {self.name} ', pos)
-
-        method = Method(name, param_names, param_types, return_type)
-        self.methods.append(method)
+            
+            except SemanticError:
+            method = Method(name, param_names, param_types, return_type)
+            self.methods.append(method)
 
     def all_attributes(self, clean=True):
         plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
