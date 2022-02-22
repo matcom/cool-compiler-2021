@@ -182,14 +182,6 @@ class ToStr(Instruction):
         self.ivalue = ivalue
 
 
-
-
-
-
-
-
-
-
 class Copy(Instruction):
     def __init__(self, dest, source):
         self.dest = dest
@@ -205,14 +197,6 @@ class GetParent(Instruction):
 
     def to_string(self):
         return "{} = GETPARENT {} {}".format(self.dest, self.instance, self.array_name)
-
-
-
-
-
-
-
-
 
 
 class ReadStr(Instruction):
@@ -296,7 +280,7 @@ class Exit(Instruction):
         pass
 
     def to_string(self):
-        return 'Exit'
+        return "Exit"
 
 
 class EqualStrThanStr(Instruction):
