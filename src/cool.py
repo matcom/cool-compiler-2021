@@ -11,8 +11,8 @@ with open(input_file, 'r') as f:
     s = f.read()
 
 lexer = COOL_Lexer()
-lexer.build()
-tokens = list(lexer.tokenize(s))
+lexer.input(s)
+a = list(lexer.output)
 if lexer.errors:
     for e in lexer.errors:
         print(e)
