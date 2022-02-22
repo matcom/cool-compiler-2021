@@ -1,11 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file './uis/help.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.2
+#
+# WARNING! All changes made in this file will be lost!
+
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Help(object):
     def setupUi(self, Help):
         Help.setObjectName("Help")
         Help.resize(733, 527)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../img/icons/Qt.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./uis/../../img/icons/python.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Help.setWindowIcon(icon)
         self.gridLayout = QtWidgets.QGridLayout(Help)
         self.gridLayout.setObjectName("gridLayout")
@@ -44,18 +54,28 @@ class Ui_Help(object):
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt;\"> </span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">class  Main  inherits  IO  {</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">    main()  :  SELF_TYPE  {</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">        out_string(&quot;Hello World!!!\\n&quot;)</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">        out_string(quot;Hello World!!!\\nquot;)</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">    };</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">};</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\"> </span></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">2. </span><span style=\" font-size:14pt;\">To carry out the compilation process, continue with &quot;Analyze/Run (F5)&quot;</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">.</span></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">2. </span><span style=\" font-size:14pt;\">To carry out the compilation process, continue with \'Analyze/Run (F5)\'</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:18pt; color:#000000;\">•</span><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:14pt; color:#000000;\"> </span><span style=\" font-size:14pt;\">You will see the results in the respective tabs</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:10pt;\"> </span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">3. Y</span><span style=\" font-size:14pt;\">ou can load (Ctrl+O) the COOL programs and save the results in different formats for future use</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:10pt;\"> </span></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">4. T</span><span style=\" font-size:14pt;\">he options &quot;Help (F1)&quot;, &quot;Orientation&quot;, &quot;Report&quot; and &quot;About authors (F6)&quot; are also offered.</span></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">4. T</span><span style=\" font-size:14pt;\">he options \'Help (F1)\', \'Orientation\'(F7), \'Report\'(F8) and \'About authors (F11)\' are also offered.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:18pt; color:#000000;\">•</span><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:8pt; color:#e6db74;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">Orientation: Show the orientation of the compiler.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:18pt; color:#000000;\">•</span><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:8pt; color:#e6db74;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">Report: </span><span style=\" font-size:14pt;\">Shows the report proposed by the developers</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">.</span></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:18pt; color:#000000;\">•</span><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:8pt; color:#e6db74;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">About authors (F6): S</span><span style=\" font-size:14pt;\">how basic developer information</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">.</span></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:18pt; color:#000000;\">•</span><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:8pt; color:#e6db74;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">About authors (F11): S</span><span style=\" font-size:14pt;\">how basic developer information</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">.</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:18pt; color:#000000;\">•</span><span style=\" font-family:\'Consolas,Courier New,monospace\'; font-size:8pt; color:#e6db74;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">Help (F1): Show this help.</span></p></body></html>"))
         self.label.setText(_translate("Help", "<html><head/><body><p align=\"center\">Help</p></body></html>"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Help = QtWidgets.QDialog()
+    ui = Ui_Help()
+    ui.setupUi(Help)
+    Help.show()
+    sys.exit(app.exec_())
