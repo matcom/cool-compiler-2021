@@ -10,8 +10,12 @@ class ProgramNode(Node):
 class TypeNode(Node):
     def __init__(self, name):
         self.name = name
-        self.attributes = []
+        self.attrs = {}
         self.methods = []
+
+    @property
+    def attributes(self):
+        return self.attrs.keys()
 
 class DataNode(Node):
     def __init__(self, vname, value):

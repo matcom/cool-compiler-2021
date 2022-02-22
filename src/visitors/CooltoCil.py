@@ -18,6 +18,10 @@ class BaseCOOLToCILVisitor:
         self.attrs = set()
         self.parameters = set()
         self.instances = []
+    
+    def transform_keys(self, xtype, keys):
+        for i,key in enumerate(keys):
+            xtype.attrs[key] = i
 
     def instanciate_builtin(self):
         a = 0
@@ -129,11 +133,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             methods = method_temp + methods
             
             current_type = current_type.parent
-            
-        # comentar con andy si generar el parent antes de ser posible si no esta genereado
-        # aqui para evitar generarlo 2 veces seria preguntar si ya esta generado al principio
         
-        type_node.attributes = attributes
+        self.transform_keys(type_node, attributes) # type_node.attributes = attributes
         type_node.methods = methods
         
         # attributes
