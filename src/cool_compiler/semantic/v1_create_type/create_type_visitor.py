@@ -291,14 +291,14 @@ class CoolCreateType(VisitBase):
     @visitor.when(AST.Int)
     @visitor.result(ASTR.Int)
     def visit(self, node: AST.Int):
-        return Int(),
+        return node.item,
 
     @visitor.when(AST.Bool)
     @visitor.result(ASTR.Bool)
     def visit(self, node: AST.Bool):
-        return Bool(), 
+        return node.item, 
 
     @visitor.when(AST.Str)
     @visitor.result(ASTR.Str)
     def visit(self, node: AST.Str):
-        return Str(), 
+        return node.item, 
