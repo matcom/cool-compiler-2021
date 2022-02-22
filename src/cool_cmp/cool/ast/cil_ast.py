@@ -74,20 +74,19 @@ class UnaryArithmeticNode(InstructionNode):
         self.value = value
 
 class NotNode(UnaryArithmeticNode):
-    def __init__(self, row, column, comment=None)-> None:
-        super().__init__(row, column, comment)
+    pass
 
 class EqualNode(ArithmeticNode):
-    def __init__(self, row, column, comment=None)-> None:
-        super().__init__(row, column, comment)
+    pass
+
 
 class GreaterNode(ArithmeticNode):
-    def __init__(self, row, column, comment=None)-> None:
-        super().__init__(row, column, comment)
+    pass
+
 
 class LesserNode(ArithmeticNode):
-    def __init__(self, row, column, comment=None)-> None:
-        super().__init__(row, column, comment)
+    pass
+
 
 ################################################################################
 

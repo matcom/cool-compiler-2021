@@ -880,9 +880,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode):
-        self._load_value(Reg.t(0), node.type,node.row, node.column, node.comment) # t0 = Type Address
+        self._load_type_variable(Reg.t(0), node.variable,node.row, node.column, node.comment) # t0 = Type Address
         self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0),node.row, node.column, node.comment)) # t0 = t0[0] -> FatherAddress
-        self._store_local_variable(Reg.t(0), node.dest,node.row, node.column, node.comment)
+        self._store_local_variable(
+            Reg.t(0), node.dest, node.row, node.column, node.comment)
     
     @visitor.when(cil.PrintNode)
     def visit(self, node:cil.PrintNode):
