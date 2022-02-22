@@ -53,19 +53,21 @@ class COOL_Lexer:
     }
 
     tokens += list(keywords.values())
-
-    def __init__(self):
+   
+    def input(self, string):
         self.errors = []
         self.prev_last_newline = 0
         self.current_last_newline = 0
+        self.output = self.tokenize(string)
     
-    def build(self):
-        self.lexer = lex.lex(module=self)
+
+    def token(self):
+        return next(self.output, None) 
 
     def tokenize(self, text):
-        self.last_newline = 0
-        self.lexer.input(text)
-        for t in self.lexer:
+        lexer = lex.lex(module=self)
+        lexer.input(text)
+        for t in lexer:
             t.lexpos = t.lexpos - self.prev_last_newline + 1
             self.prev_last_newline = self.current_last_newline
             yield t
@@ -153,6 +155,7 @@ class COOL_Lexer:
                 t.lexer.lineno += 1
                 value += text[pos]
                 pos+=1
+                self.prev_last_newline = pos
                 self.current_last_newline = pos
                 break
             value += text[pos]
@@ -222,6 +225,7 @@ class COOL_Lexer:
         self.prev_last_newline = t.lexer.lexpos
         self.current_last_newline = t.lexer.lexpos
 
+
     t_ignore = ' \t\r'
 
     ########################################################################
@@ -234,3 +238,5 @@ class COOL_Lexer:
 
     def register_error(self, line, column, text):
         self.errors.append(f'{line,column} - {text}')
+
+
