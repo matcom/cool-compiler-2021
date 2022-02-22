@@ -38,7 +38,8 @@ class FormatVisitor(object):
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, tabs=0):
         ans = (
-            "\t" * tabs + f"\\__AttrDeclarationNode {node.lineno}: {node.id} : {node.type} <- <value>"
+            "\t" * tabs
+            + f"\\__AttrDeclarationNode {node.lineno}: {node.id} : {node.type} <- <value>"
         )
         if node.val is None:
             return f"{ans}"
@@ -47,7 +48,10 @@ class FormatVisitor(object):
 
     @visitor.when(ConditionalNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__ConditionalNode {node.lineno}: if <expr> then <expr> else <expr>"
+        ans = (
+            "\t" * tabs
+            + f"\\__ConditionalNode {node.lineno}: if <expr> then <expr> else <expr>"
+        )
         if_expr = self.visit(node.if_expr, tabs + 1)
         then_expr = self.visit(node.then_expr, tabs + 1)
         else_expr = self.visit(node.else_expr, tabs + 1)
@@ -84,7 +88,10 @@ class FormatVisitor(object):
 
     @visitor.when(CaseNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__CaseNode {node.lineno}: case <expr> of <branch_list> esac"
+        ans = (
+            "\t" * tabs
+            + f"\\__CaseNode {node.lineno}: case <expr> of <branch_list> esac"
+        )
         expr = self.visit(node.expr, tabs + 1)
         branches = ""
         for branch in node.branch_list:

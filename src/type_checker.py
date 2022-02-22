@@ -4,7 +4,9 @@ from utils.semantic import SemanticError
 from ast_hierarchy import *
 
 
-WRONG_SIGNATURE = '(Line %s) Method "%s" already defined in "%s" with a different signature.'
+WRONG_SIGNATURE = (
+    '(Line %s) Method "%s" already defined in "%s" with a different signature.'
+)
 SELF_IS_READONLY = '(Line %s) Variable "self" is read-only.'
 LOCAL_ALREADY_DEFINED = '(Line %s) Variable "%s" is already defined in method "%s".'
 ATTR_ALREADY_DEFINED = '(Line %s) Attribute "%s" is already defined in ancestor class.'
@@ -90,7 +92,9 @@ class TypeChecker:
         if return_type.name == BasicTypes.SELF.value:
             return_type = self.current_type
         if not return_type.conforms_to(attr_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, return_type.name, attr_type.name))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (node.lineno, return_type.name, attr_type.name)
+            )
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope, set_type=None):
@@ -99,14 +103,20 @@ class TypeChecker:
         self.current_method = method
 
         try:
-            ancestor_method, ancestor_type = self.current_type.parent.get_method(node.id)
+            ancestor_method, ancestor_type = self.current_type.parent.get_method(
+                node.id
+            )
 
             old_return_type = ancestor_method.return_type
             current_return_type = method.return_type
             if old_return_type.name != current_return_type.name:
-                self.errors.append(WRONG_SIGNATURE % (node.lineno, node.id, ancestor_type.name))
+                self.errors.append(
+                    WRONG_SIGNATURE % (node.lineno, node.id, ancestor_type.name)
+                )
             elif len(ancestor_method.param_types) != len(method.param_types):
-                self.errors.append(WRONG_SIGNATURE % (node.lineno, node.id, ancestor_type.name))
+                self.errors.append(
+                    WRONG_SIGNATURE % (node.lineno, node.id, ancestor_type.name)
+                )
             else:
                 for i in range(len(method.param_types)):
                     old_param_type = ancestor_method.param_types[i]
@@ -140,7 +150,9 @@ class TypeChecker:
         else:
             to_conform = return_type
         if not expr_type.conforms_to(to_conform):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, to_conform.name))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, to_conform.name)
+            )
 
     @visitor.when(ConditionalNode)
     def visit(self, node, scope, set_type=None):
@@ -148,7 +160,10 @@ class TypeChecker:
         cond_type = self.visit(node.if_expr, scope)
         bool_type = self.context.get_type(BasicTypes.BOOL.value)
         if not cond_type.conforms_to(bool_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, cond_type.name, BasicTypes.BOOL.value))
+            self.errors.append(
+                INCOMPATIBLE_TYPES
+                % (node.lineno, cond_type.name, BasicTypes.BOOL.value)
+            )
 
         then_expr_type = self.visit(node.then_expr, scope)
         else_expr_type = self.visit(node.else_expr, scope)
@@ -164,7 +179,9 @@ class TypeChecker:
         cond_type = self.visit(node.condition, scope)
         bool_type = self.context.get_type(BasicTypes.BOOL.value)
         if not cond_type.conforms_to(bool_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (cond_type.name, BasicTypes.BOOL.value))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (cond_type.name, BasicTypes.BOOL.value)
+            )
 
         self.visit(node.body, scope)
         obj_type = self.context.get_type(BasicTypes.OBJECT.value)
@@ -189,7 +206,9 @@ class TypeChecker:
             child_scope = child_scope.create_child(self.scope_id)
             self.scope_id += 1
             if var == "self":
-                self.errors.append(f'(Line {node.lineno}) "self" is used as let variable.')
+                self.errors.append(
+                    f'(Line {node.lineno}) "self" is used as let variable.'
+                )
                 self.visit(expr, child_scope)
                 continue
             try:
@@ -209,7 +228,9 @@ class TypeChecker:
             if expr_type.name == BasicTypes.SELF.value:
                 expr_type = self.current_type
             if not expr_type.conforms_to(var_type):
-                self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, var_type.name))
+                self.errors.append(
+                    INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, var_type.name)
+                )
             child_scope.define_variable(var, var_type)
         return self.visit(node.body, child_scope)
 
@@ -273,7 +294,9 @@ class TypeChecker:
             var_type = var.type
         expr_type = self.visit(node.expr, scope)
         if not expr_type.conforms_to(var_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, var_type.name))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, var_type.name)
+            )
         return expr_type
 
     @visitor.when(CallNode)
@@ -309,7 +332,8 @@ class TypeChecker:
                 method_param_type = method.param_types[i]
                 if not arg_type.conforms_to(method_param_type):
                     self.errors.append(
-                        INCOMPATIBLE_TYPES % (node.lineno, arg_type.name, method.param_types[i].name)
+                        INCOMPATIBLE_TYPES
+                        % (node.lineno, arg_type.name, method.param_types[i].name)
                     )
         return_type = method.return_type
 
@@ -327,7 +351,9 @@ class TypeChecker:
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
         if not left_type.conforms_to(int_type) or not right_type.conforms_to(int_type):
-            self.errors.append(INVALID_OPERATION % (node.lineno, left_type.name, right_type.name))
+            self.errors.append(
+                INVALID_OPERATION % (node.lineno, left_type.name, right_type.name)
+            )
         return int_type
 
     @visitor.when(BooleanBinaryNode)
@@ -342,13 +368,17 @@ class TypeChecker:
                 left_type.name in {"Int", "String", "Bool"}
                 or right_type.name in {"Int", "String", "Bool"}
             ) and left_type != right_type:
-                self.errors.append(INVALID_OPERATION % (node.lineno, left_type.name, right_type.name))
+                self.errors.append(
+                    INVALID_OPERATION % (node.lineno, left_type.name, right_type.name)
+                )
             return bool_type
 
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
         if not left_type.conforms_to(int_type) or not right_type.conforms_to(int_type):
-            self.errors.append(INVALID_OPERATION % (node.lineno, left_type.name, right_type.name))
+            self.errors.append(
+                INVALID_OPERATION % (node.lineno, left_type.name, right_type.name)
+            )
         return bool_type
 
     @visitor.when(ConstantNumNode)
@@ -399,7 +429,10 @@ class TypeChecker:
         bool_type = self.context.get_type(BasicTypes.BOOL.value)
         expr_type = self.visit(node.expr, scope)
         if not expr_type.conforms_to(bool_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, BasicTypes.BOOL.value))
+            self.errors.append(
+                INCOMPATIBLE_TYPES
+                % (node.lineno, expr_type.name, BasicTypes.BOOL.value)
+            )
         return bool_type
 
     @visitor.when(IsVoidNode)
@@ -415,5 +448,7 @@ class TypeChecker:
         int_type = self.context.get_type(BasicTypes.INT.value)
         expr_type = self.visit(node.expr, scope, set_type)
         if not expr_type.conforms_to(int_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, int_type.name))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, int_type.name)
+            )
         return int_type

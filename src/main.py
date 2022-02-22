@@ -26,34 +26,36 @@ module_to_execute = sys.argv[2]
 program_directory = sys.argv[3]
 
 # TEST
-if execute_mode == 'test':
-    if module_to_execute == 'parser':
+if execute_mode == "test":
+    if module_to_execute == "parser":
         test_parser(program_directory)
     else:
-        raise Exception('Not implemented Test Mode for %s' % module_to_execute)
+        raise Exception("Not implemented Test Mode for %s" % module_to_execute)
 
 # RUN
-programs_files = [file for file in os.listdir(program_directory) if file.endswith('.cl')]
+programs_files = [
+    file for file in os.listdir(program_directory) if file.endswith(".cl")
+]
 for program_file in programs_files:
-    input('Press enter to analyze ' + program_file)
-    program_route = program_directory + '/' + program_file
+    input("Press enter to analyze " + program_file)
+    program_route = program_directory + "/" + program_file
 
     # To run lexer
-    if module_to_execute == 'lexer':
-        with open(program_route, 'r', encoding='UTF-8') as f:
+    if module_to_execute == "lexer":
+        with open(program_route, "r", encoding="UTF-8") as f:
             tokens, errors = tokenize(f.read())
 
         for token in tokens:
             print(token)
         print()
         if len(errors):
-            print('ERRORS:')
+            print("ERRORS:")
             for error in errors:
                 print(error)
 
     # To run parser
-    elif module_to_execute == 'parser':
-        with open(program_route, 'r', encoding='UTF-8') as f:
+    elif module_to_execute == "parser":
+        with open(program_route, "r", encoding="UTF-8") as f:
             ast, errors = parse(f.read())
             if len(errors):
                 print(errors)
@@ -64,10 +66,10 @@ for program_file in programs_files:
                 print(str(tree))
 
     # To run semantic
-    elif module_to_execute == 'semantic':
-        with open(program_route, 'r', encoding='UTF-8') as f:
-            program_route = program_route[:len(program_route)-3] + '_error.txt'
-            with open(program_route, 'r', encoding='UTF-8') as f1:
+    elif module_to_execute == "semantic":
+        with open(program_route, "r", encoding="UTF-8") as f:
+            program_route = program_route[: len(program_route) - 3] + "_error.txt"
+            with open(program_route, "r", encoding="UTF-8") as f1:
                 print(f1.read())
             ast, errors = parse(f.read())
             if len(errors):
@@ -90,4 +92,4 @@ for program_file in programs_files:
                 continue
 
     else:
-        print('Invalid section to execute: ' + module_to_execute)
+        print("Invalid section to execute: " + module_to_execute)
