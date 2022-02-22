@@ -241,11 +241,11 @@ class TypeCheckerVisitor:
                 )
 
         try:
-            specific_type = self.get_type(node.specific_type)
-            if not exp.type.conforms_to(specific_type):
+            static_type = self.get_type(node.static_type)
+            if not exp.type.conforms_to(static_type):
                 self.errors.append(
                     errors.NotConformsError(
-                        node.lineno, node.columnno, exp.type, specific_type
+                        node.lineno, node.columnno, exp.type, static_type
                     )
                 )
         except semantic.SemanticError as e:
@@ -283,11 +283,12 @@ class TypeCheckerVisitor:
             typex = ErrorType()
             self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
 
-        if node.expr is None:
+        if node.expr == []:
             right_type = typex
             right_exp = None
             # decl_list.append(idx, _type, None)
         else:
+            # print(node.expr)
             right_exp = self.visit(node.expr, scope)
             right_type = right_exp.type
             # decl_list.append(idx, _type, right_exp)
@@ -353,7 +354,12 @@ class TypeCheckerVisitor:
         for exp in node.expr_list:
             exp = self.visit(exp, scope)
             expr_list.append(exp)
-        return type_checked.CoolBlockNode(node.lineno, node.columnno, expr_list, exp.type if exp is not None else ErrorType())
+        return type_checked.CoolBlockNode(
+            node.lineno,
+            node.columnno,
+            expr_list,
+            exp.type if exp is not None else ErrorType(),
+        )
 
     @visitor.when(type_built.CoolAssignNode)
     def visit(self, node, scope):  # noqa: F811
