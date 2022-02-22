@@ -583,7 +583,7 @@ class TypeCheckerVisitor:
         var = scope.find_variable(node.value)
         if var is None:
             self.errors.append(
-                errors.VariableNotDefined(node.lineno, node.columnno, node.value)
+                errors.VariableNotDefinedError(node.lineno, node.columnno, node.value)
             )
             return type_checked.CoolVarNode(
                 node.lineno, node.columnno, node.value, ErrorType()
