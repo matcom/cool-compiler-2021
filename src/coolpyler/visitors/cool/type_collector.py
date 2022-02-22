@@ -60,14 +60,14 @@ class TypeCollectorVisitor(object):
 
     @visitor.when(parsed.CoolClassNode)  # noqa: F811
     def visit(self, node: parsed.CoolClassNode):  # noqa: F811
-        if node.id in self.types:
+        try:
+            type = self.types[node.id]
             self.errors.append(
                 SemanticError(
                     node.lineno, 0, f"Type with name `{node.id}` already defined."
                 )
             )
-            type = ErrorType()
-        else:
+        except KeyError:
             type = self.types[node.id] = Type(node.id)
 
         features = [self.visit(feat) for feat in node.features]

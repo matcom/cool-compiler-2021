@@ -61,7 +61,7 @@ class Type:
         if parent in self.reachable:
             raise SemanticError(f"Cycle in hierarchy involving `{self.name}`.")
         self.parent = parent
-        self.parent.reachable.extend(self.reachable)
+        self.reachable.extend(self.parent.reachable) # TODO
 
     def get_attribute(self, name: str):
         try:
