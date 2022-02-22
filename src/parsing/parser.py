@@ -9,13 +9,13 @@ class COOL_Parser:
         self.tokens = COOL_Lexer.tokens
 
     def parse(self, input_string):
-        l = COOL_Lexer()
-        l.build()
-        self.lex = l
+        #l = COOL_Lexer()
+        #l.build()
+        self.lex = COOL_Lexer()
         self.errors = []
         self.parser = yacc.yacc(module=self)
         self.input = input_string
-        result =  self.parser.parse(input_string, lexer=self.lex.lexer)
+        result =  self.parser.parse(input_string, lexer=self.lex)
         return result, self.errors
 
     ######################################################################
@@ -25,7 +25,7 @@ class COOL_Parser:
     @staticmethod
     def p_program(p):
         'program : class_list'
-        p[0] = ProgramNode(p[1])
+        p[0] = ProgramNode(None,p[1]) # location of this is 
     
     @staticmethod
     def p_class_list_single(p):
@@ -40,12 +40,18 @@ class COOL_Parser:
     @staticmethod
     def p_def_class(p):
         'def_class : CLASS TYPEID OCUR feature_list CCUR SEMICOLON'
-        p[0] = ClassDeclarationNode(p[2],p[4])
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(2), p.lexpos(2))
+        p[0] = ClassDeclarationNode(location,(p[2], type_location),p[4])
 
     @staticmethod
     def p_def_class_parent(p):
         'def_class : CLASS TYPEID INHERITS TYPEID OCUR feature_list CCUR SEMICOLON'
-        p[0] = ClassDeclarationNode(p[2],p[6],p[4])
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(2), p.lexpos(2))
+        parent_location = (p.lineno(4), p.lexpos(4))
+        p[0] = ClassDeclarationNode(location,(p[2], type_location),p[6],p[4], parent_location)
+        
 
     @staticmethod
     def p_feature_list_empty(p):
@@ -66,22 +72,31 @@ class COOL_Parser:
     @staticmethod
     def p_attr(p):
         'def_attr : OBJECTID COLON TYPEID SEMICOLON'
-        p[0] = AttrDeclarationNode(p[1],p[3])
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(3), p.lexpos(3))
+        p[0] = AttrDeclarationNode(location,p[1],(p[3], type_location))
+
 
     @staticmethod
     def p_attr_exp(p):
         'def_attr : OBJECTID COLON TYPEID ASSIGN exp SEMICOLON'
-        p[0] = AttrDeclarationNode(p[1],p[3],p[5])
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(3), p.lexpos(3))
+        p[0] = AttrDeclarationNode(location,p[1],(p[3], type_location),p[5])
 
     @staticmethod
     def p_func(p):
         'def_func : OBJECTID OPAR CPAR COLON TYPEID OCUR exp CCUR SEMICOLON'
-        p[0] = FuncDeclarationNode(p[1],[],p[5],p[7])
+        location = (p.lineno(1), p.lexpos(1))
+        return_location = (p.lineno(5), p.lexpos(5))
+        p[0] = FuncDeclarationNode(location,p[1],[],(p[5], return_location),p[7])
 
     @staticmethod
     def p_func_param(p):
         'def_func : OBJECTID OPAR param_list CPAR COLON TYPEID OCUR exp CCUR SEMICOLON'
-        p[0] = FuncDeclarationNode(p[1],p[3],p[6],p[8])
+        location = (p.lineno(1), p.lexpos(1))
+        return_location = (p.lineno(6), p.lexpos(6))
+        p[0] = FuncDeclarationNode(location,p[1],p[3],(p[6], return_location),p[8])
 
     @staticmethod
     def p_param_list_single(p):
@@ -96,17 +111,22 @@ class COOL_Parser:
     @staticmethod
     def p_param(p):
         'param : OBJECTID COLON TYPEID'
-        p[0] = VarDeclarationNode(p[1],p[3])
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(3), p.lexpos(3))
+        p[0] = VarDeclarationNode(location,p[1],(p[3], type_location))
 
     @staticmethod
     def p_exp_assign(p):
         'exp : OBJECTID ASSIGN exp'
-        p[0] = AssignNode(VariableNode(p[1]),p[3])
+        location = (p.lineno(1), p.lexpos(1))
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = AssignNode(location, symbol_location, VariableNode(location,p[1]),p[3])
 
     @staticmethod
     def p_exp_let(p):
         'exp : LET ident_list IN exp'
-        p[0] = LetNode(p[2],p[4])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = LetNode(location,p[2],p[4])
     
     @staticmethod
     def p_ident_list_single(p):
@@ -121,12 +141,17 @@ class COOL_Parser:
     @staticmethod
     def p_iden(p):
         'iden : OBJECTID COLON TYPEID'
-        p[0] = VarDeclarationNode(p[1],p[3],None)
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(3), p.lexpos(3))
+        p[0] = VarDeclarationNode(location,p[1],(p[3], type_location),None)
 
     @staticmethod
     def p_iden_init(p):
         'iden : OBJECTID COLON TYPEID ASSIGN exp'
-        p[0] = VarDeclarationNode(p[1],p[3],p[5])
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(3), p.lexpos(3))
+        p[0] = VarDeclarationNode(location,p[1],(p[3], type_location),p[5])
+        
         
     @staticmethod
     def p_case_list_single(p):
@@ -141,12 +166,15 @@ class COOL_Parser:
     @staticmethod
     def p_branch(p):
         'branch : OBJECTID COLON TYPEID CASSIGN exp SEMICOLON'
-        p[0] = CaseAttrNode(p[1],p[3],p[5])
+        location = (p.lineno(1), p.lexpos(1))
+        type_location = (p.lineno(3), p.lexpos(3))
+        p[0] = CaseAttrNode(location,p[1],(p[3], type_location),p[5])
 
     @staticmethod
     def p_exp_not(p):
         'exp : NOT exp'
-        p[0] = NotNode(p[2])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = NotNode(location,p[2])
 
     @staticmethod
     def p_exp_comp(p):
@@ -161,22 +189,26 @@ class COOL_Parser:
     @staticmethod
     def p_comp_lower(p):
         'comp : arith LOWER arith'
-        p[0] = LessNode(p[1],p[3])
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = LessNode(p[1].location, symbol_location, p[1],p[3])
 
     @staticmethod
     def p_comp_leq(p):
         'comp : arith LEQ arith'
-        p[0] = ElessNode(p[1],p[3])
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = ElessNode(p[1].location,symbol_location,p[1],p[3])
 
     @staticmethod
     def p_comp_equal(p):
         'comp : arith EQUAL arith'
-        p[0] = EqualsNode(p[1],p[3])
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = EqualsNode(p[1].location,symbol_location,p[1],p[3])
     
     @staticmethod
     def p_comp_equal_not(p):
         'comp : arith EQUAL NOT exp'
-        p[0] = EqualsNode(p[1],p[4])
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = EqualsNode(p[1].location,symbol_location,p[1],p[4])
 
     @staticmethod
     def p_arith_term(p):
@@ -186,12 +218,15 @@ class COOL_Parser:
     @staticmethod
     def p_arith_plus(p):
         'arith : arith PLUS term'
-        p[0] = PlusNode(p[1],p[3])
+        location = (p.lineno(2), p.lexpos(2))
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = PlusNode(location,symbol_location,p[1],p[3])
 
     @staticmethod
     def p_arith_minus(p):
         'arith : arith MINUS term'
-        p[0] = MinusNode(p[1],p[3])
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = MinusNode(p[1].location,symbol_location,p[1],p[3])
 
     @staticmethod
     def p_term_fac(p):
@@ -201,12 +236,14 @@ class COOL_Parser:
     @staticmethod
     def p_term_star(p):
         'term : term STAR factor'
-        p[0] = StarNode(p[1],p[3])
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = StarNode(p[1].location,symbol_location,p[1],p[3])
 
     @staticmethod
     def p_term_div(p):
         'term : term DIV factor'
-        p[0] = DivNode(p[1],p[3])
+        symbol_location = (p.lineno(2), p.lexpos(2))
+        p[0] = DivNode(p[1].location,symbol_location,p[1],p[3])
 
     @staticmethod
     def p_factor_atom(p):
@@ -216,22 +253,26 @@ class COOL_Parser:
     @staticmethod
     def p_factor_neg(p):
         'factor : TILDE factor'
-        p[0] = PrimeNode(p[2])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = PrimeNode(location,p[2])
     
     @staticmethod
     def p_factor_case(p):
         'factor : CASE exp OF case_list ESAC'
-        p[0] = CaseNode(p[2],p[4])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = CaseNode(location,p[2],p[4])
     
     @staticmethod
     def p_factor_while(p):
         'factor : WHILE exp LOOP exp POOL'
-        p[0] = LoopNode(p[2],p[4])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = LoopNode(location,p[2],p[4])
     
     @staticmethod
     def p_factor_block(p):
         'factor : OCUR exp_list CCUR'
-        p[0] = BlockNode(p[2])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = BlockNode(location,p[2])
 
     @staticmethod
     def p_exp_list_single(p):
@@ -246,42 +287,50 @@ class COOL_Parser:
     @staticmethod
     def p_factor_cond(p):
         'factor : IF exp THEN exp ELSE exp FI'
-        p[0] = ConditionalNode(p[2],p[4],p[6])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = ConditionalNode(location,p[2],p[4],p[6])
 
     @staticmethod
     def p_factor_void(p):
         'factor : ISVOID factor'
-        p[0] = IsVoidNode(p[2])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = IsVoidNode(location,p[2])
 
     @staticmethod
     def p_atom_num(p):
         'atom : INT_CONST'
-        p[0] = ConstantNumNode(p[1])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = ConstantNumNode(location,p[1])
 
     @staticmethod
     def p_atom_string(p):
         'atom : STRING_CONST'
-        p[0] = StringNode(p[1])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = StringNode(location,p[1])
 
     @staticmethod
     def p_atom_true(p):
         'atom : TRUE'
-        p[0] = TrueNode(p[1])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = TrueNode(location,p[1])
 
     @staticmethod
     def p_atom_false(p):
         'atom : FALSE'
-        p[0] = FalseNode(p[1])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = FalseNode(location,p[1])
 
     @staticmethod
     def p_atom_var(p):
         'atom : OBJECTID'
-        p[0] = VariableNode(p[1])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = VariableNode(location,p[1])
 
     @staticmethod
     def p_atom_new(p):
         'atom : NEW TYPEID'
-        p[0] = InstantiateNode(p[2])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = InstantiateNode(location,p[2])
 
     @staticmethod
     def p_atom_func_call(p):
@@ -292,21 +341,23 @@ class COOL_Parser:
     def p_atom_exp(p):
         'atom : OPAR exp CPAR'
         p[0] = p[2]
+        p[0].location = (p.lineno(1), p.lexpos(1))
 
     @staticmethod
     def p_func_call_self(p):
         'func_call : OBJECTID OPAR arg_list CPAR'
-        p[0] = DispatchNode(VariableNode('self'),p[1],p[3])
+        location = (p.lineno(1), p.lexpos(1))
+        p[0] = DispatchNode(location,VariableNode(None,'self'),p[1],p[3])
 
     @staticmethod
     def p_func_call(p):
         'func_call : atom DOT OBJECTID OPAR arg_list CPAR'
-        p[0] = DispatchNode(p[1],p[3],p[5])
+        p[0] = DispatchNode(p[1].location,p[1],p[3],p[5])
 
     @staticmethod
     def p_func_call_at(p):
         'func_call : atom AT TYPEID DOT OBJECTID OPAR arg_list CPAR'
-        p[0] = DispatchNode(p[1],p[5],p[7],p[3])
+        p[0] = DispatchNode(p[1].location,p[1],p[5],p[7],p[3])
 
     @staticmethod
     def p_arg_list_empty(p):
@@ -332,18 +383,10 @@ class COOL_Parser:
     #Error rule for syntax errors
     def p_error(self, p):
         if not p:
-            l = COOL_Lexer()
-            l.build()
-            for t in l.tokenize(self.input):
-                if t.value != 'class': #Error at the beginning
-                    p = t
-                break
-            
-            if not p: # Error at the end
-                 self.errors.append('(0, 0) - SyntacticError: ERROR at or near EOF')
-                 return
+            self.errors.append('(0, 0) - SyntacticError: ERROR at or near EOF')
+            return
         
-        col = self.__find_column(p)
+        col = p.lexpos
         line = p.lineno
         val = p.value
         #(29, 9) - SyntacticError: ERROR at or near "Test1"
