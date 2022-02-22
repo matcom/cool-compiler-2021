@@ -27,6 +27,10 @@ class BaseCilToMipsVisitor:
         self.dottext.append(instruction)
         return instruction
     
+    def register_empty_instruction(self) -> mips.EmptyInstructionNode:
+        self.dottext.append(mips.EmptyInstructionNode())
+        return self.dottext[-1]
+    
     def register_empty_data(self):
         self.dotdata.append(mips.EmptyDataNode())
 
@@ -67,6 +71,7 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
         self.register_instruction(mips.LabelNode(node.name))
+        self.register_empty_instruction()
 
 
     #     for instruction in node.instructions:

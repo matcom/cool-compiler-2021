@@ -236,3 +236,7 @@ class JumpRegisterNode(OneAddressInstructionNode):
 class LabelNode(InstructionNode):
     def __init__(self, name: str):
         self.name: str = name
+
+
+class EmptyInstructionNode(InstructionNode):
+    pass

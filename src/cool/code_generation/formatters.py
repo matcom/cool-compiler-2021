@@ -381,6 +381,10 @@ class MipsFormatter:
     def visit(self, node: mips.LabelNode):
         return f"{node.name}:"
 
+    @visitor.when(mips.EmptyInstructionNode)
+    def visit(self, node: mips.EmptyInstructionNode):
+        return ""
+
     @visitor.when(mips.EmptyDataNode)
     def visit(self, node: mips.EmptyDataNode):
         return ""
