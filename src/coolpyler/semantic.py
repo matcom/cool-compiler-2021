@@ -226,7 +226,7 @@ class SelfType(Type):
     def conforms_to(self, other):
         return (
             isinstance(other, SelfType) and self.type == other.type
-        ) or self.type.conforms_to(other.type)
+        ) or self.type.conforms_to(other)
 
 
 class VariableInfo:
