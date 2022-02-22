@@ -201,3 +201,6 @@ class Load(Expression):
 
 class ALLOCATE(Expression):
     pass
+
+class Local(Expression):
+    pass

@@ -1,4 +1,4 @@
-from cool_compiler.types.build_in_types import self
+from  cool_compiler.types.build_in_types import self
 
 
 class CoolError:
