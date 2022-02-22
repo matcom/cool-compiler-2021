@@ -1,11 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file './uis/orientation.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.2
+#
+# WARNING! All changes made in this file will be lost!
+
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Orientation(object):
     def setupUi(self, Orientation):
         Orientation.setObjectName("Orientation")
-        Orientation.resize(666, 380)
+        Orientation.resize(670, 336)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../img/icons/Qt.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./uis/../../img/icons/python.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Orientation.setWindowIcon(icon)
         self.gridLayout = QtWidgets.QGridLayout(Orientation)
         self.gridLayout.setObjectName("gridLayout")
@@ -38,6 +48,16 @@ class Ui_Orientation(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">La evaluación de la asignatura Complementos de Compilación, inscrita en el programa del 4to año de la Licenciatura en Ciencia de la Computación de la Facultad de Matemática y Computación de la Universidad de La Habana, consiste este curso en la implementación de un compilador completamente funcional para el lenguaje COOL.</span></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">COOL (</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; text-decoration: underline;\">C</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">lassroom </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; text-decoration: underline;\">O</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">bject-</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; text-decoration: underline;\">O</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">riented </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; text-decoration: underline;\">L</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt;\">anguage) es un pequeño lenguaje que puede ser implementado con un esfuerzo razonable en un semestre del curso. Aun así, COOL mantiene muchas de las características de los lenguajes de programación modernos, incluyendo orientación a objetos, tipado estático y manejo automático de memoria.</span></p></body></html>"))
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt;\">The evaluation of the subject Compilation Complements, enrolled in the program of the 4th year of the Computer Science of the Faculty of Mathematics and Computing of the University of Havana, this course consists of the implementation of a fully functional compiler for COOL language.</span></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt;\">COOL (</span><span style=\" font-size:16pt; text-decoration: underline;\">C</span><span style=\" font-size:16pt;\">lassroom </span><span style=\" font-size:16pt; text-decoration: underline;\">O</span><span style=\" font-size:16pt;\">bject-</span><span style=\" font-size:16pt; text-decoration: underline;\">O</span><span style=\" font-size:16pt;\">riented </span><span style=\" font-size:16pt; text-decoration: underline;\">L</span><span style=\" font-size:16pt;\">anguage) is a small language that can be implemented with reasonable effort in one semester of the course. Still, COOL maintains many of the features of modern programming languages, including object orientation, static typing, and automatic memory management.</span></p></body></html>"))
         self.label.setText(_translate("Orientation", "<html><head/><body><p align=\"center\">Orientation</p></body></html>"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Orientation = QtWidgets.QDialog()
+    ui = Ui_Orientation()
+    ui.setupUi(Orientation)
+    Orientation.show()
+    sys.exit(app.exec_())
