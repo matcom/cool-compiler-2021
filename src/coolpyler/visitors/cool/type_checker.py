@@ -59,11 +59,13 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):  # noqa: F811
         self.current_type = self.types[node.type.name]
         scope.define_variable("self", self.current_type, force=True)
-
+        # print(self.current_type.attributes)
         for attr in self.current_type.attributes:
             try:
+                # print(attr.attr_info)
                 scope.define_variable(attr.name, attr.type)
             except semantic.BaseSemanticError as e:
+
                 self.errors.append(e.with_pos(attr.linino, attr.columnno))
 
         features = [self.visit(feat, scope) for feat in node.features]
@@ -148,13 +150,12 @@ class TypeCheckerVisitor:
                 )
 
             if self.current_type.parent is not None:
-                parent_method = None
                 try:
                     parent_method = self.current_type.parent.get_method(
                         self.current_method.name
                     )
                 except semantic.BaseSemanticError as e:
-                    self.errors.append(e.with_pos(node.lineno, node.columnno))
+                    parent_method = None
 
                 if parent_method is not None and parent_method != self.current_method:
                     self.errors.append(

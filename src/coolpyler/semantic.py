@@ -19,13 +19,16 @@ class NameError(BaseSemanticError):
     def with_pos(self, lineno, columnno):
         return errors.NameError(lineno, columnno, self.text)
 
+
 class TypeError(BaseSemanticError):
     def with_pos(self, lineno, columnno):
         return errors.TypeError(lineno, columnno, self.text)
 
+
 class AttributeError(BaseSemanticError):
     def with_pos(self, lineno, columnno):
         return errors.AttributeError(lineno, columnno, self.text)
+
 
 class SemanticError(BaseSemanticError):
     def with_pos(self, lineno, columnno):
@@ -83,7 +86,7 @@ class Type:
         if parent in self.reachable:
             raise TypeError(f"Cycle in hierarchy involving `{self.name}`.")
         self.parent = parent
-        self.parent.reachable.extend(self.reachable) # TODO
+        self.parent.reachable.extend(self.reachable)  # TODO
 
     def get_attribute(self, name: str):
         try:
@@ -96,7 +99,7 @@ class Type:
             try:
                 return self.parent.get_attribute(name)
             except AttributeError:
-                raise SemanticError(
+                raise AttributeError(
                     f"Attribute `{name}` is not defined in `{self.name}`."
                 )
 
@@ -117,11 +120,15 @@ class Type:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise AttributeError(f"Method `{name}` is not defined in `{self.name}`.")
+                raise AttributeError(
+                    f"Method `{name}` is not defined in `{self.name}`."
+                )
             try:
                 return self.parent.get_method(name)
             except AttributeError:
-                raise AttributeError(f"Method `{name}` is not defined in `{self.name}`.")
+                raise AttributeError(
+                    f"Method `{name}` is not defined in `{self.name}`."
+                )
 
     def define_method(
         self, name: str, param_names: list, param_types: list, return_type
@@ -286,15 +293,11 @@ class Scope:
             return next(x for x in locals if x.name == vname)
         except StopIteration:
             if self.parent is None:
-                raise NameError(
-                    f"Variable `{vname}` is not defined in current scope."
-                )
+                raise NameError(f"Variable `{vname}` is not defined in current scope.")
             try:
                 return self.parent.find_variable(vname, self.index)
             except SemanticError:
-                raise NameError(
-                    f"Variable `{vname}` is not defined in current scope."
-                )
+                raise NameError(f"Variable `{vname}` is not defined in current scope.")
 
     def is_defined(self, vname):
         return self.find_variable(vname) is not None
