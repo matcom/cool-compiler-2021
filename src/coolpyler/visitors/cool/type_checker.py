@@ -563,19 +563,19 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolStringNode)
     def visit(self, node, scope):  # noqa: F811
         return type_checked.CoolStringNode(
-            node.lineno, node.columnno, self.get_type("String")
+            node.lineno, node.columnno, node.value, self.get_type("String")
         )
 
     @visitor.when(type_built.CoolBoolNode)
     def visit(self, node, scope):  # noqa: F811
         return type_checked.CoolBoolNode(
-            node.lineno, node.columnno, self.get_type("Bool")
+            node.lineno, node.columnno, node.value, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolIntNode)
     def visit(self, node, scope):  # noqa: F811
         return type_checked.CoolIntNode(
-            node.lineno, node.columnno, self.get_type("Int")
+            node.lineno, node.columnno, node.value, self.get_type("Int")
         )
 
     @visitor.when(type_built.CoolVarNode)
