@@ -12,6 +12,10 @@ class TypeNode(Node):
         self.name = name
         self.attrs = {}
         self.methods = []
+    
+    @property
+    def attributes(self):
+        return self.attrs.keys()
 
     @property
     def attributes(self):
@@ -122,6 +126,17 @@ class TypeOfNode(InstructionNode):
     def __init__(self, obj, dest):
         self.obj = obj
         self.dest = dest
+        
+class IsTypeNode(InstructionNode):
+    def __init__(self, dest, type_obj, type_name):
+        self.dest = dest
+        self.type_obj = type_obj
+        self.type_name = type_name
+
+class ParentTypeNode(Node):
+    def __init__(self, dest, type_obj):
+        self.dest = dest
+        self.type_obj = type_obj
 
 class IsTypeNode(InstructionNode):
     def __init(self, dest, type_obj, type_name):
