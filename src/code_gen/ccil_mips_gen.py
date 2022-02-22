@@ -62,13 +62,19 @@ class CCILToMIPSGenerator:
     def visit(self, node: CallOpNode):
         return JumpAndLink(node, node.id)
 
+    def get_init_function(self, typex: str):
+        for _type in self.types_table:
+            if _type.id == typex:
+                return _type.init_operations
+        raise Exception("Method inicialization not found")
+
     def get_method_index(self, typex: str, method: str) -> int:
         for _type in self.types_table:
             if _type.id == typex:
                 for index, _method in enumerate(_type.methods):
                     if _method.id == method:
                         return index
-        return -1
+        raise Exception("Method implementetion not found")
 
     def get_class_method(self, typex: str, method: str) -> str:
         for _type in self.types_table:
@@ -76,4 +82,4 @@ class CCILToMIPSGenerator:
                 for index, _method in enumerate(_type.methods):
                     if _method.id == method:
                         return _method.function
-        return ""
+        raise Exception("Method implementetion not found")
