@@ -8,7 +8,8 @@ from compiler.visitors.type_collector import TypeCollector
 from compiler.visitors.type_builder import TypeBuilder
 from compiler.visitors.type_checker import TypeChecker
 from compiler.visitors.type_inferencer import TypeInferencer
-
+from compiler.visitors.cool2cil import COOLToCILVisitor
+from compiler.visitors.cil_formatter import PrintCILVisitor
 
 def run_pipeline(G, text):
     print('=================== TEXT ======================')

@@ -1,6 +1,6 @@
 import compiler.visitors.visitor as visitor
 from ..cmp import cil_ast as cil
-from ..cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType, LCA
+from ..cmp.semantic import Scope, SemanticError, ErrorType, IntType, BoolType, SelfType, AutoType, LCA, VariableInfo
 from ..cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
 from ..cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
 from ..cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
@@ -37,7 +37,7 @@ class BaseCOOLToCILVisitor:
         return vinfo.name
 
     def define_internal_local(self):
-        vinfo = VariableInfo('internal', None)
+        vinfo = VariableInfo('internal', None, None)
         return self.register_local(vinfo)
 
     def register_instruction(self, instruction):
@@ -66,7 +66,7 @@ class BaseCOOLToCILVisitor:
 
 
 
-class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
+class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -141,14 +141,10 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_vars = {}
         self.params.append(cil.ParamNode('self'))
         self.params.extend([cil.ParamNode(p) for p in self.current_method.param_names]) 
-        
-        value = None
-        for instruction in node.body:
-            value = self.visit(instruction, scope)
+
+        value = self.visit(node.body,scope)
         
         # Your code here!!! (Handle RETURN)
-        if isinstance(self.current_method.return_type, VoidType):
-            value = None
         self.register_instruction(cil.ReturnNode(value))
         self.current_function = None
         
@@ -162,11 +158,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         
         # Your code here!!!
-        
-        #TODO!!!!
-        
-        pass
-        
+        value = self.visit(node.expr, scope)    
+        self.register_instruction(cil.AssignNode(node.id, value)) 
 
     @visitor.when(CallNode)
     def visit(self, node, scope):
@@ -174,11 +167,33 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.obj -> AtomicNode
         # node.id -> str
         # node.args -> [ ExpressionNode ... ]
+        # node.type -> str 
         ###############################
-        
+
         # Your code here!!!
-        pass
-        
+        values = [self.visit(node.obj,scope)]
+        values.extend([self.visit(arg, scope) for arg in node.args])  
+        local_vars = [self.define_internal_local() for v in values]
+        for (var,val) in zip( local_vars,values):
+            self.register_instruction(cil.AssignNode(var,val))
+
+        for var in local_vars:
+            self.register_instruction(cil.ArgNode(var))
+
+        return_var = self.define_internal_local()
+        if node.type: # Dynamic Call
+            self.register_instruction(cil.DynamicCallNode(node.type,node.id,return_var))
+        elif values[0] == 'self':#Static call
+            function = self.to_function_name(node.id,self.current_type.name)
+            self.register_instruction(cil.StaticCallNode(function,return_var))
+        else: #Dynamic Call with type of obj
+            type_var = self.define_internal_local()
+            self.register_instruction(cil.TypeOfNode(local_vars[0], type_var))
+            self.register_instruction(cil.DynamicCallNode(type_var,node.id,return_var))
+
+        return return_var
+            
+
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
@@ -207,7 +222,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         
         # Your code here!!!
-        pass
+        var = self.define_internal_local()
+        self.register_instruction(cil.AllocateNode(node.lex, var))
+        return var
 
     @visitor.when(PlusNode)
     def visit(self, node, scope):

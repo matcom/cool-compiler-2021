@@ -64,7 +64,7 @@ class PrintCILVisitor(object):
 
     @visitor.when(TypeOfNode)
     def visit(self, node):
-        return f'{node.dest} = TYPEOF {node.type}'
+        return f'{node.dest} = TYPEOF {node.obj}'
 
     @visitor.when(StaticCallNode)
     def visit(self, node):
