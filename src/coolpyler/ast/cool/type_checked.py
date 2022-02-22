@@ -35,14 +35,19 @@ class CoolLetDeclNode(type_built.CoolLetDeclNode):
     pass
 
 
-class CoolCaseBranchNode(type_built.CoolCaseBranchNode):
-    pass
-
-
 class CoolExprNode(base.CoolExprNode):
     def __init__(self, lineno, columnno, type):
         super().__init__(lineno, columnno)
         self.type = type
+
+
+class CoolCaseBranchNode(CoolExprNode):
+    def __init__(self, lineno, columnno, id, branch_type, expr, type):
+        super().__init__(lineno, columnno, type)
+
+        self.id = id
+        self.branch_type = branch_type
+        self.expr = expr
 
 
 class CoolAssignNode(CoolExprNode):

@@ -338,8 +338,20 @@ class TypeCheckerVisitor:
         return_type = None
         first = True
         case_branches = [self.visit(branch, scope) for branch in node.case_branches]
+        branch_types = []
 
         for branch in case_branches:
+            if branch.branch_type in branch_types:
+                self.errors.append(
+                    errors.SemanticError(
+                        branch.lineno,
+                        branch.columnno,
+                        f"duplicate branch {branch.branch_type.name} in case statement",
+                    )
+                )
+            else:
+                branch_types.append(branch.branch_type)
+
             static_type = branch.type
 
             if first:
@@ -368,7 +380,7 @@ class TypeCheckerVisitor:
 
         _case_exp = self.visit(node.expr, new_scope)
         return type_checked.CoolCaseBranchNode(
-            node.lineno, node.columnno, node.id, typex, _case_exp
+            node.lineno, node.columnno, node.id, typex, _case_exp, _case_exp.type
         )
 
     @visitor.when(type_built.CoolBlockNode)
