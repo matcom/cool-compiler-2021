@@ -123,7 +123,8 @@ def t_comments_ccom(t):
         
 def t_comments_any(t):
 # def t_ccode_nonspace(t):
-    r'[^\s\{\}\'\"]+'
+    # r'[^\s\{\}\'\"]+'
+    r'[^\s\'\"]+'
     # r'^[^ \n]+$'
     # r"\.*"
     # print("ANY")
