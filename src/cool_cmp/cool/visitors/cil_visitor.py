@@ -98,6 +98,10 @@ class CILPrintVisitor():
     @visitor.when(cil.ArgNode)
     def visit(self, node):
         return f'ARG {node.name}'
+    
+    @visitor.when(cil.CommentNode)
+    def visit(self, node):
+        return f'# {node.string}'
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node):
@@ -177,7 +181,7 @@ class CILPrintVisitor():
     
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode):
-        return f'{node.dest} = FATHER {node.type}'
+        return f'{node.dest} = FATHER {node.variable}'
     
     @visitor.when(cil.ArrayNode)
     def visit(self, node:cil.ArrayNode):
@@ -460,7 +464,7 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode, args: list, caller_fun_scope: dict):
-        typex = self.get_dynamic_type(node.type, caller_fun_scope)
+        typex = self.get_dynamic_type(node.variable, caller_fun_scope)
         if typex.parent == None:
             value = None
         else:
@@ -541,6 +545,10 @@ class CILRunnerVisitor():
     def visit(self, node, args: list, caller_fun_scope: dict):
         value = self.get_value(node.name, caller_fun_scope)
         args.append(value)
+        return self.next_instruction()
+
+    @visitor.when(cil.CommentNode)
+    def visit(self, node, args: list, caller_fun_scope: dict):
         return self.next_instruction()
 
     @visitor.when(cil.ReturnNode)
@@ -725,21 +733,21 @@ class COOLToCILVisitor():
     def instructions(self):
         return self.current_function.instructions
     
-    def register_local(self, vinfo):
+    def register_local(self, vinfo, row, column, comment=None):
         m = min([i+1 for i,s in enumerate(self.current_function.name) if s == "_"],default=len(self.current_function.name)-1)
         vinfo.cil_name = f'local_{self.current_function.name[m:]}_{vinfo.name}_{len(self.localvars)}'
-        local_node = cil.LocalNode(vinfo.cil_name)
+        local_node = cil.LocalNode(vinfo.cil_name, row, column, comment)
         self.localvars.append(local_node)
         return vinfo.cil_name
 
-    def define_internal_local(self):
+    def define_internal_local(self, row, column, comment=None):
         vinfo = VariableInfo('internal', None)
         return self.register_local(vinfo)
 
-    def define_label(self):
+    def define_label(self, row, column, comment=None):
         m = min([i+1 for i,s in enumerate(self.current_function.name) if s == "_"],default=len(self.current_function.name)-1)
         name = f'{self.current_function.name[m:]}_label_{len(self.labels)}'
-        label_node = cil.LabelNode(name)
+        label_node = cil.LabelNode(name, row, column, comment)
         self.labels.append(label_node)
         return label_node
         
@@ -756,16 +764,16 @@ class COOLToCILVisitor():
     def to_function_name(self, method_name, type_name):
         return f'function_{method_name}_at_{type_name}'
     
-    def register_function(self, function_name):
+    def register_function(self, function_name, row, column, comment=None):
         funcs = [x for x in self.dotcode if isinstance(x, cil.FunctionNode) and x.name == function_name]
         if len(funcs) > 0:
             self.dotcode.remove(funcs[0])
 
-        function_node = cil.FunctionNode(function_name, [], [], [], [])
+        function_node = cil.FunctionNode(function_name, [], [], [], [],row,column,comment)
         self.dotcode.append(function_node)
         return function_node
     
-    def register_type(self, name, parent=None):
+    def register_type(self, name, parent=None, row=None, column=None, comment=None):
         if parent:
             for t in self.dottypes:
                 if t.name == name and ((t.parent and parent.name != t.parent.name) or not t.parent):
@@ -775,74 +783,74 @@ class COOLToCILVisitor():
             parent = parent.name
 
         if len([x for x in self.dottypes if x.name == name]) == 0:
-            type_name_data_node = self.register_data('"'+name+'"')
-            type_node = cil.TypeNode(name, parent, type_name_data_node.name)
+            type_name_data_node = self.register_data('"'+name+'"', row, column, comment)
+            type_node = cil.TypeNode(name, parent, type_name_data_node.name, row, column, comment)
             self.dottypes.append(type_node)
             return type_node
 
         else:
             return [x for x in self.dottypes if x.name == name][0]
 
-    def register_data(self, value):
+    def register_data(self, value, row, column, comment=None):
         vname = f'data_{len(self.dotdata)}'
-        data_node = cil.DataNode(vname, value)
+        data_node = cil.DataNode(vname, value, row, column, comment)
         self.dotdata.append(data_node)
         return data_node
     
-    def create_entry_function(self):
-        self.current_function = self.register_function('main')
-        instance = self.define_internal_local()
-        result = self.define_internal_local()
+    def create_entry_function(self, row, column, comment=None):
+        self.current_function = self.register_function('main', row, column, comment)
+        instance = self.define_internal_local(row, column, comment)
+        result = self.define_internal_local(row, column, comment)
         main_method_name = self.to_function_name('main', 'Main')
         main_type = self.context.get_type("Main")
         main_node = InstantiateNode(("Main",0,0),0,0)
         instance = self.visit(main_node, main_type.class_node.scope)
-        self.register_instruction(cil.ArgNode(instance))
-        self.register_instruction(cil.StaticCallNode(main_method_name, result))
-        self.register_instruction(cil.ReturnNode("0"))
+        self.register_instruction(cil.ArgNode(instance, row, column))
+        self.register_instruction(cil.StaticCallNode(main_method_name, result, row, column, comment))
+        self.register_instruction(cil.ReturnNode("0", row, column, comment))
         self.current_function = None
     
-    def create_type_distance_function(self):
-        self.current_function = self.register_function('type_distance')
+    def create_type_distance_function(self, row, column, comment=None):
+        self.current_function = self.register_function('type_distance', row, column, comment)
         type1 = "type1"
         type2 = "type2"
-        self.params.append(cil.ParamNode(type1))
-        self.params.append(cil.ParamNode(type2))
+        self.params.append(cil.ParamNode(type1, row, column, comment))
+        self.params.append(cil.ParamNode(type2, row, column, comment))
         
-        start_label = self.define_label()
-        end_label = self.define_label()
-        fail_label = self.define_label()
+        start_label = self.define_label(row, column, comment)
+        end_label = self.define_label(row, column, comment)
+        fail_label = self.define_label(row, column, comment)
         
-        index = self.define_internal_local()
-        equal = self.define_internal_local()
-        equal_void = self.define_internal_local()
-        void = self.define_internal_local()
-        self.register_instruction(cil.VoidNode(void))
-        self.register_instruction(cil.AssignNode(index, "0"))
+        index = self.define_internal_local(row, column, comment)
+        equal = self.define_internal_local(row, column, comment)
+        equal_void = self.define_internal_local(row, column, comment)
+        void = self.define_internal_local(row, column, comment)
+        self.register_instruction(cil.VoidNode(void, row, column, comment))
+        self.register_instruction(cil.AssignNode(index, "0", row, column, comment))
         
         self.register_instruction(start_label)
-        self.register_instruction(cil.EqualNode(equal, type1, type2))
-        self.register_instruction(cil.GotoIfNode(equal, end_label.label))
-        self.register_instruction(cil.GetFatherNode(type1, type1))
-        self.register_instruction(cil.EqualNode(equal_void, type1, void))
-        self.register_instruction(cil.GotoIfNode(equal_void, fail_label.label))
-        self.register_instruction(cil.PlusNode(index, index, "1"))
-        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(cil.EqualNode(equal, type1, type2, row, column, comment))
+        self.register_instruction(cil.GotoIfNode(equal, end_label.label, row, column, comment))
+        self.register_instruction(cil.GetFatherNode(type1, type1, row, column, comment))
+        self.register_instruction(cil.EqualNode(equal_void, type1, void, row, column, comment))
+        self.register_instruction(cil.GotoIfNode(equal_void, fail_label.label, row, column, comment))
+        self.register_instruction(cil.PlusNode(index, index, "1", row, column, comment))
+        self.register_instruction(cil.GotoNode(start_label.label, row, column, comment))
         
         self.register_instruction(fail_label)
-        self.register_instruction(cil.AssignNode(index, "-1"))
+        self.register_instruction(cil.AssignNode(index, "-1", row, column, comment))
         self.register_instruction(end_label)
-        self.register_instruction(cil.ReturnNode(index))
+        self.register_instruction(cil.ReturnNode(index, row, column, comment))
         
         self.current_function = None
 
-    def create_empty_methods(self, typex, dottype):
+    def create_empty_methods(self, typex, dottype, row, column, comment=None):
         if typex.parent:
             self.create_empty_methods(typex.parent, dottype)
         
         for m in typex.methods:
             name = self.to_function_name(m.name, typex.name)
-            self.register_function(name)
+            self.register_function(name, row, column, comment)
             temp = [(x, y) for (x, y) in dottype.methods if x == m.name]
             if len(temp) > 0:
                 dottype.methods[dottype.methods.index(temp[0])] = (m.name, name)
@@ -867,18 +875,19 @@ class COOLToCILVisitor():
         # node.declarations -> [ ClassDeclarationNode ... ]
         ######################################################
         
-        self.create_entry_function()
-        self.create_type_distance_function()
+        self.create_entry_function(node.row,node.column,"Program Node")
+        self.create_type_distance_function(node.row,node.column,"Program Node")
         
         for type_name, typex in self.context.types.items():
             if type_name not in ["Error", "Void"]:
-                self.register_type(type_name)
-                self.register_type(type_name, typex.parent)
+                self.register_type(type_name,parent=None ,row=node.row, column=node.column, comment="Program Node")
+                self.register_type(type_name, typex.parent,
+                                   node.row, node.column, "Program Node")
 
         for type_name, typex in self.context.types.items():
             if type_name not in ["Error", "Void"]:
                 this_type = next(x for x in self.dottypes if x.name == type_name)
-                self.create_empty_methods(typex, this_type)
+                self.create_empty_methods(typex, this_type, node.row, node.column, "Program Node")
                 # self.create_empty_attrs(typex, this_type)
 
         for type_name, typex in self.context.types.items():
@@ -888,7 +897,7 @@ class COOLToCILVisitor():
         for declaration, child_scope in zip(node.declarations, scope.children):
             self.visit(declaration, child_scope)
 
-        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
+        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode, node.row, node.column, "Program Start")
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
@@ -900,17 +909,17 @@ class COOLToCILVisitor():
         
         self.current_type = self.context.get_type(node.id)
         
-        type_node = self.register_type(self.current_type.name, self.current_type.parent)
+        type_node = self.register_type(self.current_type.name, self.current_type.parent, node.row, node.column, "Class Declaration Node")
         
-        self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name))
+        self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name), node.row, node.column, "Class Declaration Node")
         type_node.methods.insert(0, ("__init", init_function.name))
-        self.params.append(cil.ParamNode('self'))
-        self.register_instruction(cil.InitInstance('self', type_node.name))
+        self.params.append(cil.ParamNode('self', node.row, node.column, "Class Declaration Node"))
+        self.register_instruction(cil.InitInstance('self', type_node.name, node.row, node.column, "Class Declaration Node"))
         
         for attr,typex in self.current_type.all_attributes():
             # Defining attribute's init functions
             type_node.attributes.append(attr.name)
-            new_function = self.register_function(self.to_init_attr_function_name(attr.name, self.current_type.name))
+            new_function = self.register_function(self.to_init_attr_function_name(attr.name, self.current_type.name), node.row, node.column, "Class Declaration Node")
             # type_node.methods.append((new_function.name, new_function.name)) 
             self.current_function = new_function
             self.visit(attr.node, attr.node.scope)
@@ -918,16 +927,16 @@ class COOLToCILVisitor():
             # Calling function in type init function
             self.current_function = init_function
             dest = self.define_internal_local()
-            self.register_instruction(cil.ArgNode('self'))
-            self.register_instruction(cil.StaticCallNode(new_function.name, dest))
+            self.register_instruction(cil.ArgNode('self',node.row, node.column, "arg node"))
+            self.register_instruction(cil.StaticCallNode(new_function.name, dest, node.row, node.column, "static call node"))
 
-        self.register_instruction(cil.ReturnNode('self')) # Returning created instance
+        self.register_instruction(cil.ReturnNode('self',node.row, node.column, "return node")) # Returning created instance
 
         for method,typex in self.current_type.all_methods(): # Register methods  
             if typex != self.current_type:
                 method_name = self.to_function_name(method.name, typex.name)
                 if all(x.name != method_name for x in self.dotcode):
-                    new_function = self.register_function(method_name)
+                    new_function = self.register_function(method_name,node.row, node.column, "Class Declaration Node")
                 else:
                     new_function = next(x for x in self.dotcode if x.name == method_name)
                 # type_node.methods.append((method.name,new_function.name))
@@ -937,7 +946,7 @@ class COOLToCILVisitor():
         
         func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
         for feature in func_declarations:
-            self.current_function = self.register_function(self.to_function_name(feature.id,self.current_type.name))
+            self.current_function = self.register_function(self.to_function_name(feature.id,self.current_type.name), node.row, node.column, "Class Declaration Node")
             # type_node.methods.append((feature.id,self.current_function.name))
             self.visit(feature, feature.scope)
                 
@@ -955,23 +964,23 @@ class COOLToCILVisitor():
         self.current_method = self.current_type.get_method(node.id, len(node.params))
         
         # Your code here!!! (Handle PARAMS)
-        self.params.append(cil.ParamNode('self'))
+        self.params.append(cil.ParamNode('self', node.row, node.column, "Func Declaration Node"))
         for param in self.current_method.param_names:
-            self.params.append(cil.ParamNode(param))
+            self.params.append(cil.ParamNode(param, node.row, node.column, "Func Declaration Node"))
 
         value = self.visit(node.body, scope)
         
         # Your code here!!! (Handle RETURN)
-        self.register_instruction(cil.ReturnNode(value))
+        self.register_instruction(cil.ReturnNode(value, node.row, node.column, "Func Declaration Node"))
         self.current_method = None
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
-        self.params.append(cil.ParamNode('self'))
+        self.params.append(cil.ParamNode('self', node.row, node.column, "Attr Declaration Node"))
         result = self.visit(node.expr, scope)
         attr_offset = self.current_type.get_attribute_index(node.id, self.current_type)
-        self.register_instruction(cil.SetAttribNode("self", node.id, result, attr_offset))
-        self.register_instruction(cil.ReturnNode())
+        self.register_instruction(cil.SetAttribNode("self", node.id, result, attr_offset, node.row, node.column, "Attr Declaration Node"))
+        self.register_instruction(cil.ReturnNode(value= None, row= node.row, column= node.column, comment="Attr Declaration Node"))
         return result
     
     @visitor.when(VarDeclarationNode)
@@ -983,9 +992,9 @@ class COOLToCILVisitor():
         ###############################
         # Your code here!!!
         local = scope.find_variable(node.id)
-        cil_local = self.register_local(local) 
+        cil_local = self.register_local(local, node.row, node.column, "Var Declaration Node")
         value = self.visit(node.expr,scope)
-        self.register_instruction(cil.AssignNode(cil_local,value))
+        self.register_instruction(cil.AssignNode(cil_local,value,node.row,node.column,"Var Declaration Node"))
         return cil_local
 
     @visitor.when(AssignNode)
@@ -997,15 +1006,15 @@ class COOLToCILVisitor():
         local = scope.find_variable(node.id)
         value = self.visit(node.expr,scope)
         if hasattr(local,'cil_name'):
-            self.register_instruction(cil.AssignNode(local.cil_name,value))
+            self.register_instruction(cil.AssignNode(local.cil_name,value,node.row,node.column, "Assign Node"))
             return local.cil_name
         else:
             if any(x for x in self.params if x.name == local.name):
-                self.register_instruction(cil.AssignNode(local.name,value)) # Param
+                self.register_instruction(cil.AssignNode(local.name, value, node.row,node.column, "Assign Node")) # Param
                 return local.name
             else:
                 attr_offset = self.current_type.get_attribute_index(local.name, self.current_type)
-                self.register_instruction(cil.SetAttribNode('self',local.name, value, attr_offset))
+                self.register_instruction(cil.SetAttribNode('self',local.name, value, attr_offset, node.row, node.column, "Assign Node"))
                 # value = self.define_internal_local() # Attr
                 # self.register_instruction(cil.GetAttribNode('self',local.name,value))
                 return value # or self ?
@@ -1032,19 +1041,19 @@ class COOLToCILVisitor():
             
         result = self.define_internal_local()
         
-        self.register_instruction(cil.ArgNode(obj_value)) # self
+        self.register_instruction(cil.ArgNode(obj_value, node.row, node.column, "Call Node")) # self
         for arg,value in zip(method.param_names,args):
-            self.register_instruction(cil.ArgNode(value))
+            self.register_instruction(cil.ArgNode(value, node.row, node.column, "Call Node"))   
 
         defining_type = None
         if node.at:
             if isinstance(node.at, SelfType):
                 defining_type = node.at.defining_type
-                self.register_instruction(cil.DynamicCallNode(node.at.name, node.id, result, defining_type))
+                self.register_instruction(cil.DynamicCallNode(node.at.name, node.id, result, defining_type, node.row, node.column, "Call Node"))
             else:
                 type_node = next(x for x in self.dottypes if x.name == node.at.name)
                 cil_name = next(cil_name for cool_name, cil_name in type_node.methods if cool_name == node.id)
-                self.register_instruction(cil.StaticCallNode(cil_name, result))
+                self.register_instruction(cil.StaticCallNode(cil_name, result, node.row, node.column, "Call Node"))
         else:
             # if isinstance(node.obj.type, SelfType):
             #     defining_type = node.obj.type.defining_type
@@ -1059,11 +1068,11 @@ class COOLToCILVisitor():
             else:
                 defining_type = node.obj.type
 
-            type_var = self.define_internal_local()
+            type_var = self.define_internal_local(node.row, node.column, "Call Node")
 
-            self.register_instruction(cil.TypeOfNode(obj_value, type_var))
+            self.register_instruction(cil.TypeOfNode(obj_value, type_var, node.row, node.column, "Call Node"))
             
-            self.register_instruction(cil.DynamicCallNode(type_var, node.id, result, defining_type))
+            self.register_instruction(cil.DynamicCallNode(type_var, node.id, result, defining_type, node.row, node.column, "Call Node"))
 
         return result
     
@@ -1081,8 +1090,8 @@ class COOLToCILVisitor():
     def visit(self, node:CheckNode, scope, check_value):
         scope = node.scope
         local = scope.find_variable(node.id)
-        cil_local = self.register_local(local) 
-        self.register_instruction(cil.AssignNode(cil_local, check_value))
+        cil_local = self.register_local(local, node.row, node.column, "Check Node")) 
+        self.register_instruction(cil.AssignNode(cil_local, check_value, node.row, node.column, "Check Node"))
         result = self.visit(node.expr, scope)
         return result
     
@@ -1091,111 +1100,111 @@ class COOLToCILVisitor():
         
         value = self.visit(node.expr, scope)
         
-        type_value = self.define_internal_local()
-        self.register_instruction(cil.TypeOfNode(value, type_value))
+        type_value = self.define_internal_local(node.row, node.column, "Case Node")
+        self.register_instruction(cil.TypeOfNode(value, type_value, node.row, node.column, "Case Node"))
         checks = len(node.params)
         
-        array_types = self.define_internal_local()
-        self.register_instruction(cil.ArrayNode(array_types, "Object", checks)) # Type Object because at the end all are Objects
+        array_types = self.define_internal_local(node.row, node.column, "Case Node")
+        self.register_instruction(cil.ArrayNode(array_types, "Object", checks, node.row, node.column, "Case Node")) # Type Object because at the end all are Objects
         
         for i,param in enumerate(node.params):
-            self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name))
+            self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name, node.row, node.column, "Case Node"))
         
-        index = self.define_internal_local()
-        minim_index = self.define_internal_local()
-        minim = self.define_internal_local()
-        distance = self.define_internal_local()
-        current_type = self.define_internal_local()
-        self.register_instruction(cil.AssignNode(index, "-1"))
-        self.register_instruction(cil.AssignNode(minim, "-2"))
+        index = self.define_internal_local( node.row, node.column, "Case Node")
+        minim_index = self.define_internal_local( node.row, node.column, "Case Node")
+        minim = self.define_internal_local(node.row, node.column, "Case Node")
+        distance = self.define_internal_local( node.row, node.column, "Case Node")
+        current_type = self.define_internal_local( node.row, node.column, "Case Node")
+        self.register_instruction(cil.AssignNode(index, "-1", node.row, node.column, "Case Node"))
+        self.register_instruction(cil.AssignNode(minim, "-2", node.row, node.column, "Case Node"))
         
-        start_label = self.define_label()
-        minim_label = self.define_label()
-        end_label = self.define_label()
-        abort_label = self.define_label()
-        stop_for = self.define_internal_local()
-        not_valid_distance = self.define_internal_local()
-        minim_cond = self.define_internal_local()
+        start_label = self.define_label(node.row, node.column, "Case Node")
+        minim_label = self.define_label( node.row, node.column, "Case Node")
+        end_label = self.define_label( node.row, node.column, "Case Node")
+        abort_label = self.define_label( node.row, node.column, "Case Node")
+        stop_for = self.define_internal_local( node.row, node.column, "Case Node")
+        not_valid_distance = self.define_internal_local( node.row, node.column, "Case Node")
+        minim_cond = self.define_internal_local( node.row, node.column, "Case Node")
         
         self.register_instruction(start_label)
-        self.register_instruction(cil.PlusNode(index, index, "1"))
-        self.register_instruction(cil.EqualNode(stop_for, index, str(checks)))
-        self.register_instruction(cil.GotoIfNode(stop_for, end_label.label))
+        self.register_instruction(cil.PlusNode(index, index, "1", node.row, node.column, "Case Node"))
+        self.register_instruction(cil.EqualNode(stop_for, index, str(checks), node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GotoIfNode(stop_for, end_label.label, node.row, node.column, "Case Node"))
         
         
-        self.register_instruction(cil.GetIndexNode(array_types, index, current_type))
+        self.register_instruction(cil.GetIndexNode(array_types, index, current_type, node.row, node.column, "Case Node"))
         
-        self.register_instruction(cil.ArgNode(type_value))
-        self.register_instruction(cil.ArgNode(current_type))
-        self.register_instruction(cil.StaticCallNode("type_distance", distance))
+        self.register_instruction(cil.ArgNode(type_value, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.ArgNode(current_type, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.StaticCallNode("type_distance", distance, node.row, node.column, "Case Node"))
         
-        self.register_instruction(cil.EqualNode(not_valid_distance, distance, "-1"))
-        self.register_instruction(cil.GotoIfNode(not_valid_distance, start_label.label))
+        self.register_instruction(cil.EqualNode(not_valid_distance, distance, "-1", node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GotoIfNode(not_valid_distance, start_label.label, node.row, node.column, "Case Node"))
         
-        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2"))
-        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label))
-        self.register_instruction(cil.GreaterNode(minim_cond, minim, distance))
-        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label))
-        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GreaterNode(minim_cond, minim, distance, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "Case Node"))
         
         self.register_instruction(minim_label)
-        self.register_instruction(cil.AssignNode(minim, distance))
-        self.register_instruction(cil.AssignNode(minim_index, index))
+        self.register_instruction(cil.AssignNode(minim, distance, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.AssignNode(minim_index, index, node.row, node.column, "Case Node"))
         
-        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "Case Node"))
         self.register_instruction(end_label)
         
-        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2"))
-        self.register_instruction(cil.GotoIfNode(minim_cond, abort_label.label))
+        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, abort_label.label, node.row, node.column, "Case Node"))
         
-        self.register_instruction(cil.GetIndexNode(array_types, minim_index, current_type))
+        self.register_instruction(cil.GetIndexNode(array_types, minim_index, current_type, node.row, node.column, "Case Node"))
         
-        final_label = self.define_label()
-        not_equal_types = self.define_internal_local()
-        end_labels = [self.define_label() for _ in node.params]
+        final_label = self.define_label( node.row, node.column, "Case Node")
+        not_equal_types = self.define_internal_local( node.row, node.column, "Case Node")
+        end_labels = [self.define_label(node.row, node.column,"Case Node") for _ in node.params]
         for lbl, param, child_scope in zip(end_labels, node.params, node.scope.children):
-            self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type))
-            self.register_instruction(cil.NotNode(not_equal_types, not_equal_types))
-            self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label))
+            self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type, node.row, node.column, "Case Node"))
+            self.register_instruction(cil.NotNode(not_equal_types, not_equal_types, node.row, node.column, "Case Node"))
+            self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label, node.row, node.column, "Case Node"))
             
             result = self.visit(param, child_scope, value)
-            self.register_instruction(cil.AssignNode(value, result))
+            self.register_instruction(cil.AssignNode(value, result, node.row, node.column, "Case Node"))
             
-            self.register_instruction(cil.GotoNode(final_label.label))
+            self.register_instruction(cil.GotoNode(final_label.label, node.row, node.column, "Case Node"))
             self.register_instruction(lbl)
         
         self.register_instruction(abort_label)
-        self.register_instruction(cil.AbortNode())
+        self.register_instruction(cil.AbortNode(node.row, node.column, "Case Node"))
         self.register_instruction(final_label)
                 
         return value
     
     @visitor.when(IsVoidNode)
     def visit(self, node:IsVoidNode, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Is Void Node")
         value = self.visit(node.member, scope)
-        void_value = self.define_internal_local()
-        self.register_instruction(cil.VoidNode(void_value))
-        self.register_instruction(cil.EqualNode(result, value, void_value))
+        void_value = self.define_internal_local( node.row, node.column, "Is Void Node")
+        self.register_instruction(cil.VoidNode(void_value, node.row, node.column, "Is Void Node"))
+        self.register_instruction(cil.EqualNode(result, value, void_value, node.row, node.column, "Is Void Node"))
         return result 
     
     @visitor.when(ConditionalNode)
     def visit(self, node:ConditionalNode, scope):
         
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Conditional Node")
         condition_value = self.visit(node.condition, scope)
-        then_label = self.define_label()
-        end_label = self.define_label()
+        then_label = self.define_label( node.row, node.column, "Conditional Node")
+        end_label = self.define_label(  node.row, node.column, "Conditional Node")
         
-        self.register_instruction(cil.GotoIfNode(condition_value, then_label.label))
+        self.register_instruction(cil.GotoIfNode(condition_value, then_label.label, node.row, node.column, "Conditional Node"))
         
         else_value = self.visit(node.else_expr, scope)
-        self.register_instruction(cil.AssignNode(result, else_value))
-        self.register_instruction(cil.GotoNode(end_label.label))
+        self.register_instruction(cil.AssignNode(result, else_value, node.row, node.column, "Conditional Node"))
+        self.register_instruction(cil.GotoNode(end_label.label, node.row, node.column, "Conditional Node"))
         
         self.register_instruction(then_label)
         then_value = self.visit(node.then_expr,scope)
-        self.register_instruction(cil.AssignNode(result, then_value))
+        self.register_instruction(cil.AssignNode(result, then_value, node.row, node.column, "Conditional Node"))
         
         self.register_instruction(end_label)
         return result
@@ -1203,7 +1212,7 @@ class COOLToCILVisitor():
     @visitor.when(BlockNode)
     def visit(self, node:BlockNode, scope):
         scope = node.scope
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Block Node")
         for expr in node.expr_list:
             result = self.visit(expr, scope)
         return result
@@ -1211,99 +1220,99 @@ class COOLToCILVisitor():
     @visitor.when(WhileNode)
     def visit(self, node:WhileNode, scope):
         result = self.visit(VoidNode(None), scope)
-        start_label = self.define_label()
-        loop_label = self.define_label()
-        end_label = self.define_label()
+        start_label = self.define_label( node.row, node.column, "While Node")
+        loop_label = self.define_label( node.row, node.column, "While Node")
+        end_label = self.define_label( node.row, node.column, "While Node")
         
         self.register_instruction(start_label)
         condition_result = self.visit(node.condition, scope)
         
-        self.register_instruction(cil.GotoIfNode(condition_result, loop_label.label))
-        self.register_instruction(cil.GotoNode(end_label.label))
+        self.register_instruction(cil.GotoIfNode(condition_result, loop_label.label, node.row, node.column, "While Node"))
+        self.register_instruction(cil.GotoNode(end_label.label, node.row, node.column, "While Node"))
         
         self.register_instruction(loop_label)
         self.visit(node.expr, scope)
         
-        self.register_instruction(cil.GotoNode(start_label.label))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "While Node"))
         self.register_instruction(end_label)
         
         return result
     
     @visitor.when(NotNode)
     def visit(self, node, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Not Node")
         value = self.visit(node.member, scope)
-        self.register_instruction(cil.NotNode(result, value))
+        self.register_instruction(cil.NotNode(result, value, node.row, node.column, "Not Node"))
         return result
     
     @visitor.when(RoofNode)
     def visit(self, node:RoofNode, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Roof Node")
         value = self.visit(node.member, scope)
-        self.register_instruction(cil.MinusNode(result, "0", value))
+        self.register_instruction(cil.MinusNode(result, "0", value, node.row, node.column, "Roof Node"))
         return result
     
     @visitor.when(EqualNode)
     def visit(self, node:EqualNode, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Equal Node")
         
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.EqualNode(result, value1, value2))
+        self.register_instruction(cil.EqualNode(result, value1, value2, node.row, node.column, "Equal Node"))
         
         return result
     
     @visitor.when(GreaterNode)
     def visit(self, node:GreaterNode, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Greater Node")
         
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.GreaterNode(result, value1, value2))
+        self.register_instruction(cil.GreaterNode(result, value1, value2, node.row, node.column, "Greater Node"))
         
         return result
     
     @visitor.when(GreaterEqualNode)
     def visit(self, node, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "GreaterEqual Node")
         
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.LesserNode(result, value1, value2))
-        self.register_instruction(cil.NotNode(result, result))
+        self.register_instruction(cil.LesserNode(result, value1, value2, node.row, node.column, "GreaterEqual Node"))
+        self.register_instruction(cil.NotNode(result, result, node.row, node.column, "GreaterEqual Node"))
         
         return result
     
     @visitor.when(LesserNode)
     def visit(self, node, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "Lesser Node")
         
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.LesserNode(result, value1, value2))
+        self.register_instruction(cil.LesserNode(result, value1, value2, node.row, node.column, "Lesser Node"))
         
         return result
 
     @visitor.when(LesserEqualNode)
     def visit(self, node, scope):
-        result = self.define_internal_local()
+        result = self.define_internal_local( node.row, node.column, "LesserEqual Node")
         
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.GreaterNode(result, value1, value2))
-        self.register_instruction(cil.NotNode(result, result))
+        self.register_instruction(cil.GreaterNode(result, value1, value2, node.row, node.column, "LesserEqual Node"))
+        self.register_instruction(cil.NotNode(result, result, node.row, node.column, "LesserEqual Node"))
         
         return result
     
     @visitor.when(VoidNode)
     def visit(self, node, scope):
-        result = self.define_internal_local()
-        self.register_instruction(cil.VoidNode(result))
+        result = self.define_internal_local( node.row, node.column, "Void Node")
+        self.register_instruction(cil.VoidNode(result, node.row, node.column, "Void Node"))
         return result
 
     @visitor.when(BoolNode)
@@ -1335,8 +1344,8 @@ class COOLToCILVisitor():
                 return node.lex # Param
             else:
                 attr_offset = self.current_type.get_attribute_index(node.lex, self.current_type)
-                value = self.define_internal_local() # Attr
-                self.register_instruction(cil.GetAttribNode('self',node.lex, value, attr_offset))
+                value = self.define_internal_local( node.row,node.column,"Variable Node") # Attr
+                self.register_instruction(cil.GetAttribNode('self',node.lex, value, attr_offset, node.row, node.column, "Variable Node"))
                 return value
         
     @visitor.when(InstantiateNode)
@@ -1346,20 +1355,20 @@ class COOLToCILVisitor():
         ###############################
         
         # Your code here!!!
-        instance = self.define_internal_local()
+        instance = self.define_internal_local( node.row, node.column, "Instantiate Node")
         instance_typex = self.context.get_type(node.lex, current_type = self.current_type)
         if instance_typex.name == "Void":
-            self.register_instruction(cil.VoidNode(instance))
+            self.register_instruction(cil.VoidNode(instance, node.row, node.column, "Instantiate Node"))
         elif instance_typex.name == "SELF_TYPE":
-            dynamic_type = self.define_internal_local()
-            self.register_instruction(cil.TypeOfNode("self", dynamic_type))
-            self.register_instruction(cil.AllocateNode(dynamic_type, instance))
-            self.register_instruction(cil.ArgNode(instance))
-            self.register_instruction(cil.DynamicCallNode(dynamic_type, "__init", instance, instance_typex.defining_type))
+            dynamic_type = self.define_internal_local( node.row, node.column, "Instantiate Node")
+            self.register_instruction(cil.TypeOfNode("self", dynamic_type, node.row, node.column, "Instantiate Node"))
+            self.register_instruction(cil.AllocateNode(dynamic_type, instance, node.row, node.column, "Instantiate Node"))
+            self.register_instruction(cil.ArgNode(instance, node.row, node.column, "Instantiate Node"))
+            self.register_instruction(cil.DynamicCallNode(dynamic_type, "__init", instance, instance_typex.defining_type, node.row, node.column, "Instantiate Node"))
         else:
-            self.register_instruction(cil.AllocateNode(instance_typex.name, instance))
-            self.register_instruction(cil.ArgNode(instance))
-            self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(instance_typex.name), instance))
+            self.register_instruction(cil.AllocateNode(instance_typex.name, instance, node.row, node.column, "Instantiate Node"))
+            self.register_instruction(cil.ArgNode(instance, node.row, node.column, "Instantiate Node"))
+            self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(instance_typex.name), instance, node.row, node.column, "Instantiate Node"))
         return instance
         
     @visitor.when(PlusNode)
@@ -1373,8 +1382,8 @@ class COOLToCILVisitor():
         left = self.visit(node.left,scope)
         right = self.visit(node.right,scope)
         
-        value = self.define_internal_local()
-        self.register_instruction(cil.PlusNode(value,left,right))
+        value = self.define_internal_local( node.row, node.column, "Plus Node")
+        self.register_instruction(cil.PlusNode(value,left,right,node.row,node.column,"Plus Node"))
         return value
 
     @visitor.when(MinusNode)
@@ -1388,8 +1397,8 @@ class COOLToCILVisitor():
         left = self.visit(node.left,scope)
         right = self.visit(node.right,scope)
         
-        value = self.define_internal_local()
-        self.register_instruction(cil.MinusNode(value,left,right))
+        value = self.define_internal_local( node.row, node.column, "Minus Node")
+        self.register_instruction(cil.MinusNode(value,left,right,node.row,node.column,"Minus Node"))
         return value
 
     @visitor.when(StarNode)
@@ -1403,8 +1412,8 @@ class COOLToCILVisitor():
         left = self.visit(node.left,scope)
         right = self.visit(node.right,scope)
         
-        value = self.define_internal_local()
-        self.register_instruction(cil.StarNode(value,left,right))
+        value = self.define_internal_local( node.row, node.column, "Star Node")
+        self.register_instruction(cil.StarNode(value,left,right,node.row,node.column,"Star Node"))
         return value
 
     @visitor.when(DivNode)
@@ -1418,15 +1427,15 @@ class COOLToCILVisitor():
         left = self.visit(node.left,scope)
         right = self.visit(node.right,scope)
         
-        value = self.define_internal_local()
-        self.register_instruction(cil.DivNode(value,left,right))
+        value = self.define_internal_local( node.row, node.column, "Div Node")
+        self.register_instruction(cil.DivNode(value,left,right,node.row,node.column,"Div Node"))
         return value
         
     @visitor.when(StringNode)
     def visit(self, node, scope):
-        value = self.register_data(node.lex)
-        result = self.define_internal_local()
-        self.register_instruction(cil.LoadNode(result, value.name))
+        value = self.register_data(node.lex, node.row, node.column, "String Node")
+        result = self.define_internal_local( node.row, node.column, "String Node")
+        self.register_instruction(cil.LoadNode(result, value.name, node.row, node.column, "String Node"))
         return result
         
     @visitor.when(SpecialNode)
@@ -1439,36 +1448,36 @@ class COOLToCILVisitor():
     @visitor.when(cil.ObjectCopyNode)
     def visit(self, node, scope=None):
         instance = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.CopyNode(instance.name, result))
+        result = self.define_internal_local( node.row, node.column, "Object Copy Node")
+        self.register_instruction(cil.CopyNode(instance.name, result, node.row, node.column, "Object Copy Node"))
         return result
     
     @visitor.when(cil.ObjectAbortNode)
     def visit(self, node, scope=None):
-        self.register_instruction(cil.AbortNode())
+        self.register_instruction(cil.AbortNode(node.row, node.column, "Object Abort Node"))
         return "0"
     
     @visitor.when(cil.ObjectTypeNameNode)
     def visit(self, node, scope=None):
         instance = self.params[0]
         result = self.define_internal_local()
-        self.register_instruction(cil.TypeOfNode(instance.name, result))
-        self.register_instruction(cil.TypeNameNode(result, result))
+        self.register_instruction(cil.TypeOfNode(instance.name, result, node.row, node.column, "Object Type Name Node"))
+        self.register_instruction(cil.TypeNameNode(result, result, node.row, node.column, "Object Type Name Node"))
         return result
 
     @visitor.when(cil.StringConcatNode)
     def visit(self, node, scope=None):
         string1 = self.params[0]
         string2 = self.params[1]
-        result = self.define_internal_local()
-        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name))
+        result = self.define_internal_local( node.row, node.column, "String Concat Node")
+        self.register_instruction(cil.ConcatNode(result, string1.name, string2.name, node.row, node.column, "String Concat Node"))
         return result
     
     @visitor.when(cil.StringLengthNode)
     def visit(self, node, scope=None):
         string = self.params[0]
-        result = self.define_internal_local()
-        self.register_instruction(cil.LengthNode(result, string.name))
+        result = self.define_internal_local( node.row, node.column, "String Length Node")
+        self.register_instruction(cil.LengthNode(result, string.name, node.row, node.column, "String Length Node"))
         return result
         
     
@@ -1477,32 +1486,32 @@ class COOLToCILVisitor():
         string = self.params[0]
         index = self.params[1]
         length = self.params[2]
-        result = self.define_internal_local()
-        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name))
+        result = self.define_internal_local( node.row, node.column, "String Substring Node")
+        self.register_instruction(cil.SubstringNode(result, string.name, index.name, length.name, node.row, node.column,"String Substring Node"))
         return result
     
     @visitor.when(cil.IOInStringNode)
     def visit(self, node, scope=None):
-        result = self.define_internal_local()
-        self.register_instruction(cil.ReadNode(result))
+        result = self.define_internal_local( node.row, node.column, "IO In String Node")
+        self.register_instruction(cil.ReadNode(result, node.row, node.column, "IO In String Node"))
         return result
 
     @visitor.when(cil.IOInIntNode)
     def visit(self, node, scope=None):
-        result = self.define_internal_local()
-        self.register_instruction(cil.ReadIntNode(result))
+        result = self.define_internal_local( node.row, node.column, "IO In Int Node")
+        self.register_instruction(cil.ReadIntNode(result, node.row, node.column, "IO In Int Node"))
         return result
     
     @visitor.when(cil.IOOutIntNode)
     def visit(self, node, scope=None):
         integer = self.params[1]
-        self.register_instruction(cil.PrintIntNode(integer.name))
+        self.register_instruction(cil.PrintIntNode(integer.name, node.row, node.column, "IO Out Int Node"))
         return self.params[0].name
     
     @visitor.when(cil.IOOutStringNode)
     def visit(self, node, scope=None):
         string = self.params[1]
-        self.register_instruction(cil.PrintNode(string.name))
+        self.register_instruction(cil.PrintNode(string.name, node.row, node.column, "IO Out String Node"))
         return self.params[0].name
 
     # ======================================================================
