@@ -61,7 +61,7 @@ for program_file in programs_files:
                 print(errors)
             else:
                 # print ast
-                formatter = ast_print.FormatVisitor()
+                formatter = ast_cool_print.FormatVisitor()
                 tree = formatter.visit(ast)
                 print(str(tree))
 
