@@ -63,6 +63,7 @@ class CILGenerate:
         self.program.add_type(self.currentType)
 
         for parent in parent_list(node):
+            self.currentType.attr_push('type', self.currentType.name)
             for attr in parent.attributes:
                 self.currentType.attr_push(attr.name, f'{parent.name}_{attr.name}')
             for func in parent.methods:

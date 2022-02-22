@@ -93,7 +93,7 @@ class Type(Node):
         result = f'type {self.name}: ' + '{\n'
 
         for  att in self.attributes:
-            result += '\tattribute ' + str(att) + ' '*(15 - len(str(att))) +  '->  ' + str(self.attr[func]) + '\n'
+            result += '\tattribute ' + str(att) + ' '*(14 - len(str(att))) +  '->  ' + str(self.attr[att]) + '\n'
         
         for  func in self.method_list:
             result += '\tfunction ' + str(func) + ' '*(15 - len(str(func))) +  '->  ' + str(self.methods[func]) + '\n'
