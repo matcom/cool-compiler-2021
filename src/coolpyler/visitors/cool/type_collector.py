@@ -28,21 +28,10 @@ class TypeCollectorVisitor(object):
     @visitor.when(parsed.CoolProgramNode)  # noqa: F811
     def visit(self, node: parsed.CoolProgramNode):  # noqa: F811
         object_type = ObjectType()
-
         int_type = IntType()
-        int_type.set_parent(object_type)
-
         bool_type = BoolType()
-        bool_type.set_parent(object_type)
-
         string_type = StringType()
-        string_type.set_parent(object_type)
-
         io_type = IOType()
-        io_type.set_parent(object_type)
-
-        # self_type = SelfType()
-        # self_type.set_parent(object_type)
 
         self.types = {
             object_type.name: object_type,

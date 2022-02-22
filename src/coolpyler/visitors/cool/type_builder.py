@@ -27,7 +27,37 @@ class TypeBuilderVisitor:
     @visitor.when(type_collected.CoolProgramNode)
     def visit(self, node: type_collected.CoolProgramNode):  # noqa: F811
         self.types = node.types
+
+        object_type = self.get_type("Object")
+        int_type = self.get_type("Int")
+        bool_type = self.get_type("Bool")
+        string_type = self.get_type("String")
+        io_type = self.get_type("IO")
+
+        object_type.define_method("abort", [], [], object_type)
+        object_type.define_method("type_name", [], [], string_type)
+        object_type.define_method("copy", [], [], semantic.SelfType(object_type))
+
+        io_type.define_method(
+            "out_string", ["x"], [string_type], semantic.SelfType(io_type)
+        )
+        io_type.define_method("out_int", ["x"], [int_type], semantic.SelfType(io_type))
+        io_type.define_method("in_string", [], [], string_type)
+        io_type.define_method("in_int", [], [], int_type)
+
+        string_type.define_method("length", [], [], int_type)
+        string_type.define_method("concat", ["s"], [string_type], string_type)
+        string_type.define_method(
+            "substr", ["i", "l"], [int_type, int_type], string_type
+        )
+
+        int_type.set_parent(object_type)
+        bool_type.set_parent(object_type)
+        string_type.set_parent(object_type)
+        io_type.set_parent(object_type)
+
         classes = [self.visit(c) for c in node.classes]
+
         return type_built.CoolProgramNode(
             node.lineno, node.columnno, classes, self.types
         )
