@@ -54,7 +54,9 @@ class TypeBuilder:
             try:
                 parent = self.context.get_type(node.parent)
                 if parent == BoolType() or parent == IntType() or parent == StringType() or parent == SelfType():
-                    self.errors.append(CANNOT_INHERIT.replace('%s', node.id, 1).replace('%s', parent.name, 1))
+                    e = CANNOT_INHERIT.replace('%s', node.id, 1).replace('%s', parent.name, 1)
+                    location = node.parent_location
+                    self.errors.append(f'{location} - {e}')
                     parent = ErrorType()
                 else:
                     try:
@@ -65,11 +67,15 @@ class TypeBuilder:
                     except SemanticError:
                         pass
             except SemanticError as error:
-                self.errors.append(PARENT_NOT_DEFINED.replace('%s', node.id, 1).replace('%s', node.parent, 1))
+                e = PARENT_NOT_DEFINED.replace('%s', node.id, 1).replace('%s', node.parent, 1)
+                location = node.parent_location
+                self.errors.append(f'{location} - {e}')
                 parent = ErrorType()      
 
             if parent.conforms_to(self.current_type):
-                self.errors.append(CYCLES_IN_CLASES.replace('%s', node.id, 2))
+                e = CYCLES_IN_CLASES.replace('%s', node.id, 2)
+                location = node.parent_location
+                self.errors.append(f'{location} - {e}')
                 parent = ErrorType() 
         
         if self.current_type != ObjectType():                            
@@ -83,7 +89,9 @@ class TypeBuilder:
         try:
             att_type = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(UNDEFINED_ATTRIBUTE_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1))
+            e = UNDEFINED_ATTRIBUTE_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1)
+            location = node.type_location
+            self.errors.append(f'{location} - {e}')
             att_type = ErrorType()
         
         try:
@@ -91,16 +99,20 @@ class TypeBuilder:
         except SemanticError as error:
                 x = self.current_type.get_attribute_parent(node.id)
                 if x == self.current_type:
-                    self.errors.append(ATTRIBUTE_REDEFINED.replace('%s', node.id, 1))
+                    e = ATTRIBUTE_REDEFINED.replace('%s', node.id, 1)
+                    self.errors.append(f'{node.location} - {e}')
                 else:
-                    self.errors.append(PARENT_ATTRIBUTE_REDEFINED.replace('%s', node.id, 1))
+                    e = PARENT_ATTRIBUTE_REDEFINED.replace('%s', node.id, 1)
+                    self.errors.append(f'{node.location} - {e}')
                     
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):  
         try:
             return_type = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(UNDEFINED_RETURN_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1))
+            e = UNDEFINED_RETURN_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1)
+            location = node.type_location
+            self.errors.append(f'{location} - {e}')
             return_type = ErrorType() 
         
         params = []
@@ -109,14 +121,19 @@ class TypeBuilder:
             try:
                 param_type = self.context.get_type(var.type)
                 if param_type == SelfType():
-                    self.errors.append(NOT_SELF_TYPE.replace('%s', var.id, 1).replace('%s', node.id, 1).replace('%s', self.current_type.name, 1))
+                    e = NOT_SELF_TYPE.replace('%s', var.id, 1).replace('%s', node.id, 1).replace('%s', self.current_type.name, 1)
+                    location = var.type_location
+                    self.errors.append(f'{location} - {e}')
                     param_type = ErrorType() 
             except SemanticError as error:
-                self.errors.append(UNDEFINED_PARAM_TYPE.replace('%s', var.type, 1).replace('%s', var.id, 1))
+                e = UNDEFINED_PARAM_TYPE.replace('%s', var.type, 1).replace('%s', var.id, 1)
+                location = var.type_location
+                self.errors.append(f'{location} - {e}')
                 param_type = ErrorType()
             
             if var.id in params:
-                self.errors.append(IDENTIFIER_USED.replace('%s', var.id, 1))
+                e = IDENTIFIER_USED.replace('%s', var.id, 1)
+                self.errors.append(f'{var.location} - {e}')
             
             params.append(var.id)
             types.append(param_type)    
@@ -124,4 +141,5 @@ class TypeBuilder:
         try:
             self.current_type.define_method(node.id, params, types, return_type)
         except SemanticError as error:
-            self.errors.append(METHOD_REDEFINED.replace('%s', node.id, 1))
+            e = (METHOD_REDEFINED.replace('%s', node.id, 1))
+            self.errors.append(f'{node.location} - {e}')

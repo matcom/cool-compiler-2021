@@ -40,9 +40,10 @@ class TypeCollector(object):
         try:
             self.context.get_type(node.id)
             if is_base_class(node.id):
-                self.errors.append(BASIC_CLASS_REDEFINED.replace('%s', node.id, 1))
+                e = BASIC_CLASS_REDEFINED.replace('%s', node.id, 1)
+                self.errors.append(f"{node.location} - {e}")
             else:
-                self.errors.append(CLASS_REDEFINED)
+                self.errors.append(f'{node.id_location} - {CLASS_REDEFINED}')
         except SemanticError:
             self.context.create_type(node.id)
 

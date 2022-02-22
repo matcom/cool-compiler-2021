@@ -73,12 +73,14 @@ class TypeChecker:
         if parent is not None:
             try:
                 parent.get_attribute(node.id)
-                self.errors.append(PARENT_ATTRIBUTE_REDEFINED.replace('%s', node.id, 1))
+                e = PARENT_ATTRIBUTE_REDEFINED.replace('%s', node.id, 1)
+                self.errors.append(f'{node.location} - {e}')
             except SemanticError:
                 pass
         
         if node.id == "self":
-            self.errors.append(SELF_IS_READONLY_ATTRIBUTE)
+            e = SELF_IS_READONLY_ATTRIBUTE
+            self.errors.append(f"{node.location} - {e}")
          
         node_type = self.current_type.get_attribute(node.id).type
         if node_type == SelfType():
@@ -91,7 +93,9 @@ class TypeChecker:
                 expr_type = self.current_type
         
             if not expr_type.conforms_to(node_type):
-                self.errors.append(INCOMPATIBLE_ATTRIBUTE_TYPE.replace('%s', expr_type.name, 1).replace('%s', node.id, 1).replace('%s', node_type.name, 1))
+                e = INCOMPATIBLE_ATTRIBUTE_TYPE.replace('%s', expr_type.name, 1).replace('%s', node.id, 1).replace('%s', node_type.name, 1)
+                location = node.expr.location
+                self.errors.append(f"{location} - {e}")
              
     @visitor.when(FuncDeclarationNode) 
     def visit(self, node, scope):
@@ -104,22 +108,33 @@ class TypeChecker:
             try:
                 method = parent.get_method(node.id)
                 if method.return_type != self.current_method.return_type:
-                    self.errors.append(METHOD_REDEFINED_RETURN.replace('%s', node.id, 1).replace('%s', self.current_method.return_type.name, 1).replace('%s', method.return_type.name, 1))
+                    e = METHOD_REDEFINED_RETURN.replace('%s', node.id, 1).replace('%s', self.current_method.return_type.name, 1).replace('%s', method.return_type.name, 1)
+                    location = node.type_location
+                    self.errors.append(f'{location} - {e}')
                 if len(self.current_method.param_types) != len(method.param_types):
-                    self.errors.append(METHOD_REDEFINED_NPARAM.replace('%s', node.id, 1))
+                    e = METHOD_REDEFINED_NPARAM.replace('%s', node.id, 1)
+                    self.errors.append(f'{node.location} - {e}')
                 else:
+                    index = 0
                     for type_child, type_parent in zip(self.current_method.param_types, method.param_types):
                         if type_child != type_parent:
-                            self.errors.append(METHOD_REDEFINED_PARAM.replace('%s', node.id, 1).replace('%s', type_child.name, 1).replace('%s', type_parent.name, 1))
+                            e = METHOD_REDEFINED_PARAM.replace('%s', node.id, 1).replace('%s', type_child.name, 1).replace('%s', type_parent.name, 1)
+                            location = node.params[index].location
+                            self.errors.append(f'{location} - {e}')
+                        index += 1
 
             except SemanticError:
                 pass
-                
+               
+        index = 0
         for name, typex in zip(self.current_method.param_names, self.current_method.param_types):
             if name != "self":
                 child.define_variable(name, typex)
             else:
-                 self.errors.append(SELF_IS_READONLY_PARAM)
+                 e = SELF_IS_READONLY_PARAM
+                 location = node.params[index].location
+                 self.errors.append(f'{location} - {e}')
+            index += 1
         
         self.visit(node.expr, child)
 
@@ -127,7 +142,9 @@ class TypeChecker:
         return_type_met = self.current_method.return_type if self.current_method.return_type != SelfType() else self.current_type
 
         if not return_type_exp.conforms_to(return_type_met):
-            self.errors.append(INCOMPATIBLE_RET_FUNC_TYPE.replace('%s', return_type_exp.name, 1).replace('%s',node.id , 1).replace('%s',return_type_met.name , 1))       
+            e = INCOMPATIBLE_RET_FUNC_TYPE.replace('%s', return_type_exp.name, 1).replace('%s',node.id , 1).replace('%s',return_type_met.name , 1)
+            location = node.expr.location
+            self.errors.append(f'{location} - {e}')
            
     @visitor.when(BlockNode)
     def visit(self, node, scope):
@@ -146,7 +163,8 @@ class TypeChecker:
                 try:
                     typex = self.context.get_type(node.type)
                     if not obj_type.conforms_to(typex):
-                        self.errors.append(INCOMPATIBLE_DISPATCH_DEC_TYPE.replace('%s', obj_type.name, 1).replace('%s', typex.name, 1))
+                        e = INCOMPATIBLE_DISPATCH_DEC_TYPE.replace('%s', obj_type.name, 1).replace('%s', typex.name, 1)
+                        self.errors.append(f'{node.location} - {e}')
                         typex = ErrorType()
                     obj_type = typex    
                 except SemanticError as error:
@@ -164,10 +182,13 @@ class TypeChecker:
                         arg_type = arg.computed_type if arg.computed_type != SelfType() else self.current_type 
                     
                         if not arg_type.conforms_to(param_type):
-                            self.errors.append(INCOMPATIBLE_DISPATCH_TYPE.replace('%s', node.id, 1).replace('%s', arg_type.name, 1).replace('%s', param_name, 1).replace('%s', param_type.name, 1))
+                            e = INCOMPATIBLE_DISPATCH_TYPE.replace('%s', node.id, 1).replace('%s', arg_type.name, 1).replace('%s', param_name, 1).replace('%s', param_type.name, 1)
+                            location = arg.location
+                            self.errors.append(f'{location} - {e}')
                             typee = ErrorType()
             else:
-                self.errors.append(WRONG_NUMBER_ARGUMENTS.replace('%s', method.name, 1))           
+                e = WRONG_NUMBER_ARGUMENTS.replace('%s', method.name, 1)
+                self.errors.append(f'{node.location} - {e}')
 
             if typee is None:
                 ret_type = method.return_type if method.return_type != SelfType() else obj_type 
@@ -175,7 +196,8 @@ class TypeChecker:
                 ret_type = typee
         
         except SemanticError as error:
-           self.errors.append(UNDEFINED_METHOD.replace('%s',node.id))
+           e = UNDEFINED_METHOD.replace('%s',node.id)
+           self.errors.append(f'{node.location} - {e}')
            ret_type = ErrorType()   
         
         node.computed_type = ret_type 
@@ -191,7 +213,8 @@ class TypeChecker:
         if predicate_type.conforms_to(BoolType()):
             node.computed_type = find_parent_type(self.current_type, node.then.computed_type, node.elsex.computed_type)
         else: 
-            self.errors.append(PREDICATE_OPERATIONS.replace('%s', "If", 1))
+            e = PREDICATE_OPERATIONS.replace('%s', "If", 1)
+            self.errors.append(f'{node.location} - {e}')
             node.computed_type = ErrorType()
             
     @visitor.when(LetNode)
@@ -206,12 +229,14 @@ class TypeChecker:
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
         if node.id == 'self':
-            self.errors.append(SELF_IS_READONLY_LET) 
+            self.errors.append(f'{node.location} - {SELF_IS_READONLY_LET}')
         
         try:
             var_type = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(UNDEFINED_VARIABLE_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1))
+            e = UNDEFINED_VARIABLE_TYPE.replace('%s', node.type, 1).replace('%s', node.id, 1)
+            location = node.type_location
+            self.errors.append(f'{location} - {e}')
             var_type = ErrorType()
         
         if node.expr is not None:    
@@ -219,7 +244,9 @@ class TypeChecker:
             expresion_type = node.expr.computed_type if node.expr.computed_type != SelfType() else self.current_type 
             
             if not expresion_type.conforms_to(var_type):
-                self.errors.append(INCOMPATIBLE_VARIABLE_TYPE.replace('%s', expresion_type.name, 1).replace('%s', node.id, 1).replace('%s', var_type.name, 1))
+                e = INCOMPATIBLE_VARIABLE_TYPE.replace('%s', expresion_type.name, 1).replace('%s', node.id, 1).replace('%s', var_type.name, 1)
+                location = node.expr.location
+                self.errors.append(f'{location} - {e}')
 
         if scope.is_local(node.id):
             scope.remove_variable(node.id)
@@ -237,7 +264,8 @@ class TypeChecker:
         if predicate_type.conforms_to(BoolType()):            
             node.computed_type = ObjectType()
         else:    
-            self.errors.append(PREDICATE_OPERATIONS.replace('%s',"Loop", 1))
+            e = PREDICATE_OPERATIONS.replace('%s',"Loop", 1)
+            self.errors.append(f'{node.location} - {e}')
             node.computed_type = ErrorType()
           
     @visitor.when(CaseNode)
@@ -250,7 +278,9 @@ class TypeChecker:
             self.visit(attr, scope)
             types_computed.append(attr.computed_type)
             if attr.type in types:
-                self.errors.append(DUPLICATE_BRANCH.replace('%s', attr.type, 1))
+                e = DUPLICATE_BRANCH.replace('%s', attr.type, 1)
+                location = attr.type_location 
+                self.errors.append(f'{location} - {e}')
             else:
                 types.append(attr.type)
     
@@ -264,7 +294,9 @@ class TypeChecker:
         try:
             typex = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(CASE_TYPE_UNDEFINED.replace('%s', node.type, 1))
+            e = (CASE_TYPE_UNDEFINED.replace('%s', node.type, 1))
+            location = node.type_location
+            self.errors.append(f'{location} - {e}')
             typex = ErrorType()
 
         child_scope = scope.create_child(scope.class_name, scope.method_name)
@@ -284,7 +316,7 @@ class TypeChecker:
         node.computed_type = expresion_type
 
         if node.id.lex == 'self':
-            self.errors.append(SELF_IS_READONLY)
+            self.errors.append(f'{node.symbol_location} - {SELF_IS_READONLY}')
             node.computed_type = ErrorType() 
         elif not expresion_type.conforms_to(var_type):
             self.errors.append(INCOMPATIBLE_VARIABLE_TYPE.replace('%s', expresion_type.name, 1).replace('%s', node.id.lex).replace('%s', var_type.name, 1))
@@ -318,20 +350,28 @@ class TypeChecker:
                     node.computed_type = IntType()  
             else:
                 if(left_type == right_type):
-                    self.errors.append(OPERATION_NOT_DEFINED.replace('%s', operation, 1).replace('%s', left_type.name, 1))
+                    e = OPERATION_NOT_DEFINED.replace('%s', operation, 1).replace('%s', left_type.name, 1)
                 else:
-                    self.errors.append(INVALID_OPERATION.replace('%s', left_type.name, 1).replace('%s', operation, 1).replace('%s', right_type.name, 1))
+                    e = INVALID_OPERATION.replace('%s', left_type.name, 1).replace('%s', operation, 1).replace('%s', right_type.name, 1)
+                if left_type != IntType():
+                    location = node.left.location
+                else:
+                    location = node.left.location
+                
+                self.errors.append(f'{location} - {e}')
                 node.computed_type = ErrorType()
         else:
             if left_type == right_type:
                 if left_type == StringType() or left_type == IntType() or left_type == BoolType():
                     node.computed_type = BoolType()
                 else:
-                    self.errors.append(OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', left_type.name, 1))
+                    e = OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', left_type.name, 1)
+                    location = node.left.location
+                    self.errors.append(f'{location} - {e}')
                     node.computed_type = ErrorType() 
             else:
                 if is_base_class(left_type.name) or is_base_class(right_type.name):
-                    self.errors.append(INVALID_BASIC_COMPARISON)
+                    self.errors.append(f'{node.symbol_location} - {INVALID_BASIC_COMPARISON}')
                     node.computed_type = ErrorType()
                 else:
                     node.computed_type = BoolType()    
@@ -344,7 +384,9 @@ class TypeChecker:
         if type_expr == IntType():
             node.computed_type = IntType()
         else:     
-            self.errors.append(UNARY_OPERATION_NOT_DEFINED.replace('%s', "~", 1).replace('%s', type_expr.name, 1).replace('%s', "Int", 1))
+            e = UNARY_OPERATION_NOT_DEFINED.replace('%s', "~", 1).replace('%s', type_expr.name, 1).replace('%s', "Int", 1)
+            location = node.expr.location
+            self.errors.append(f'{location} - {e}')
             node.computed_type = ErrorType()
    
     @visitor.when(NotNode)
@@ -355,7 +397,9 @@ class TypeChecker:
         if type_expr == BoolType():
             node.computed_type = BoolType()
         else:     
-            self.errors.append(UNARY_OPERATION_NOT_DEFINED.replace('%s', "not", 1).replace('%s', type_expr.name, 1).replace('%s', "Bool", 1))
+            e = UNARY_OPERATION_NOT_DEFINED.replace('%s', "not", 1).replace('%s', type_expr.name, 1).replace('%s', "Bool", 1)
+            location = node.expr.location
+            self.errors.append(f'{location} - {e}')
             node.computed_type = ErrorType()
 
     @visitor.when(StringNode)
@@ -376,7 +420,8 @@ class TypeChecker:
         if scope.is_defined(node.lex, self.current_type):
             var_type = scope.find_variable_or_attribute(node.lex, self.current_type).type
         else:
-            self.errors.append(VARIABLE_NOT_DEFINED.replace('%s', node.lex, 1))
+            e = VARIABLE_NOT_DEFINED.replace('%s', node.lex, 1)
+            self.errors.append(f'{node.location} - {e}')
             var_type = ErrorType()
         node.computed_type = var_type    
    
@@ -393,7 +438,8 @@ class TypeChecker:
         try:
             var_type = self.context.get_type(node.lex)
         except SemanticError as error:
-            self.errors.append(UNDEFINED_NEW_TYPE.replace('%s', node.lex, 1))
+            e = UNDEFINED_NEW_TYPE.replace('%s', node.lex, 1)
+            self.errors.append(f'{node.location} - {e}')
             var_type = ErrorType()  
         
         node.computed_type =  var_type     
