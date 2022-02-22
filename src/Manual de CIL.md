@@ -28,7 +28,7 @@ type <name> {
     ...
     
     # METHODS
-    method <method_name>: <function>
+    method <method_name>: <static_cil_function>
     ...
     ...
     ...
@@ -126,7 +126,7 @@ y se agrega una nueva definición de código según sea necesario de la siguient
     }
 ```
 
-Aqui vemos el ejemplo de la funcion main:
+Aquí vemos el ejemplo de la función main:
 
 ``` python
 
@@ -149,7 +149,7 @@ function function_main_at_Main {
 ### KeyWords
 
 * ABORT
-    >Indica que se debe abortar la ejecucion del programa
+    >Indica que se debe abortar la ejecución del programa
 
     ```python
     # Ejemplo
@@ -157,7 +157,7 @@ function function_main_at_Main {
     ```
 
 * ALLOCATE
-    > Reserva memoria para un objeto
+    > Reserva memoria para un objeto de tipo b y devuelve la dirección en a
 
     ```python
     # Ejemplo
@@ -165,7 +165,7 @@ function function_main_at_Main {
     ```
 
 * ARG
-    > Indica que el proximo llamado a **CALL** acepta el argumento siguiente al comando
+    > Indica que el próximo llamado a **CALL** acepta el argumento siguiente al comando
 
     ```python
     # Ejemplo
@@ -174,11 +174,11 @@ function function_main_at_Main {
     ```
 
 * ARRAY
-    > Crea un arreglo de objetos
+    > Crea un arreglo de objetos de tipo b de tamaño length devolviendo la dirección de este en a
 
     ```python
     # Ejemplo
-    a = ARRAY b lenght
+    a = ARRAY b length
     ```
 
 * CALL
@@ -191,7 +191,7 @@ function function_main_at_Main {
     ```
 
 * CONCAT
-    > Devuelve la concatenacion de dos objetos
+    > Devuelve la concatenación de los strings b y c en a
 
     ```python
     # Ejemplo
@@ -199,31 +199,31 @@ function function_main_at_Main {
     ```
 
 * COPY
-    >Copia el valor de un objeto a otro objeto
+    >Copia superficialmente el objeto b en a
 
     ```python
     # Ejemplo
-    a = COPY local_distance_internal_3
+    a = COPY b
     ```
 
 * EQUAL
-    >Indica si dos expresiones son iguales
+    >Indica si a y b son iguales
 
     ```python
     # Ejemplo
-    EQUAL local_distance_internal_3 VOID
+    EQUAL a b
     ```
 
 * FATHER
-    >Devuelve el padre del tipo del siguente objeto
+    >Devuelve el padre del tipo del siguente objeto a
 
     ```python
     # Ejemplo
-    father = FATHER local_distance_internal_3
+    father = FATHER a
     ```
 
 * GETATTR
-    > Obtiene un atributo de un objeto
+    > Obtiene el valor del atributo c del objeto b en a 
 
     ```python
     # Ejemplo
@@ -231,7 +231,7 @@ function function_main_at_Main {
     ```
 
 * GETINDEX
-    > Obtiene un objeto de un indice de un arreglo
+    > Obtiene el valor objeto del índice c del arreglo b en a
 
     ```python
     # Ejemplo
@@ -239,23 +239,23 @@ function function_main_at_Main {
     ```
 
 * GOTO
-    >Indica que se debe ir a la etiqueta siguiente al comando
+    > Salto incondicional a label
 
     ```python
     # Ejemplo
-    GOTO label_1
+    GOTO label
     ```
 
 * IFGOTO
-    >Indica que la siguiente expresion es una condicion y que se debe ir a la etiqueta siguiente al comando GOTO en caso de cumplirse la condicion
+    > Si a es verdadero realiza un salto a label
 
     ```python
     # Ejemplo
-    IF local_distance_internal_3 == VOID GOTO label_1
+    IF a GOTO label
     ```
 
 * LABEL
-    >Indica que la siguiente expresion es una etiqueta
+    >Define una etiqueta en el programa
 
     ```python
     # Ejemplo
@@ -265,31 +265,31 @@ function function_main_at_Main {
     >Etiquetas son utilizadas para definir un punto de entrada a una parte del código tanto para ciclos como para anotaciones.
 
 * LENGTH
-    >Devuelve la longitud de un objeto
+    >Devuelve la longitud del string b en a
 
     ```python
     # Ejemplo
-    a = LENGTH local_distance_internal_3
+    a = LENGTH b
     ```
 
 * LOAD
-    >Indica que la siguiente expresion es una carga de un dato
+    >Carga el dato de la sección .DATA data_0 en a
 
     ```python
     # Ejemplo
-    LOAD data_0
+    a = LOAD data_0
     ```
 
 * LOCAL
-    > Indica que la función acepta la variable local siguiente al comando
+    > Define una variable local llamada a
 
     ```python
     # Ejemplo
-    LOCAL local_main_at_Main_internal_0
+    LOCAL a
     ```
 
 * NOT
-    > Devuelve la negación de la expresion siguente al comando
+    > Devuelve la negación de b en a
 
     ```python
     # Ejemplo
@@ -297,7 +297,7 @@ function function_main_at_Main {
     ```
 
 * PARAM
-    > Indica que la función acepta el parametro siguiente al comando
+    > Indica que la función acepta el parámetro self, vinculando el valor pasado en los argumentos con dicho nombre
 
     ```python
     # Ejemplo
@@ -305,15 +305,22 @@ function function_main_at_Main {
     ```
 
 * PRINT
-    > Imprime un objeto
+    > Imprime el string a
 
     ```python
     # Ejemplo
     PRINT a
     ```
+* PRINTINT
+    > Imprime el entero a
+
+    ```python
+    # Ejemplo
+    PRINTINT a
+    ```
 
 * READ
-    > Lee de consola un input
+    > Lee de consola un string guardándolo en a
 
     ```python
     # Ejemplo
@@ -321,7 +328,7 @@ function function_main_at_Main {
     ```
 
 * READINT
-    > Lee un entero de consola
+    > Lee un entero de consola guardándolo en a
 
     ```python
     # Ejemplo
@@ -329,15 +336,15 @@ function function_main_at_Main {
     ```
 
 * RETURN
-    > Indica que la función retorna la siguiente expresion
+    > Indica que la función retorna a
 
     ```python
     # Ejemplo
-    RETURN local_main_at_Main_internal_1
+    RETURN a
     ```
 
 * SETATTR
-    > Asigna un atributo a un objeto
+    > Asigna a al atributo c del objeto b
 
     ```python
     # Ejemplo
@@ -345,7 +352,7 @@ function function_main_at_Main {
     ```
 
 * SETINDEX
-    > Asigna un objeto a un indice de un arreglo
+    > Asigna el objeto c al índice b del arreglo a
 
     ```python
     # Ejemplo
@@ -353,23 +360,25 @@ function function_main_at_Main {
     ```
 
 * SUBSTRING
-    > Devuelve una subcadena de un objeto
+    > Devuelve la subcadena de de b a partir del índice c de tamaño length en a
 
     ```python
     # Ejemplo
-    a = SUBSTRING b c lenght
+    a = SUBSTRING b c length
     ```
 
+    En caso de ser inválida la operación el programa se detiene
+
 * TYPEOF
-    >Devuelve el tipo del siguente objeto
+    >Devuelve el tipo dinámico de b en a
 
     ```python
     # Ejemplo
-    a = TYPEOF local_distance_internal_3
+    a = TYPEOF b
     ```
 
 * VCALL
-    > Llamada a una funcion virtual
+    > Devuelve en a el resultado de llamar el método c en el tipo b
 
     ```python
     # Ejemplo
@@ -377,11 +386,11 @@ function function_main_at_Main {
     ```
 
 * VOID
-    >Hace funcion de null
+    >Devuelve null en a 
 
     ```python
     # Ejemplo
-    local_distance_internal_3 = VOID
+    a = VOID
     ```
 
     >Para indicar que una variable no tiene un valor.
@@ -389,7 +398,7 @@ function function_main_at_Main {
 ### Operadores
 
 * **\+**
-    >Suma de dos objetos
+    >Suma de dos variables
 
     ```python
     # Ejemplo
@@ -397,7 +406,7 @@ function function_main_at_Main {
     ```
 
 * **\-**
-    >Resta de dos objetos
+    >Resta de dos variables
 
     ```python
     # Ejemplo
@@ -405,7 +414,7 @@ function function_main_at_Main {
     ```
 
 * **\***
-    >Multiplicacion de dos objetos
+    >Multiplicación de dos variables
 
     ```python
     # Ejemplo
@@ -413,7 +422,7 @@ function function_main_at_Main {
     ```
 
 * **/**
-    >Division de dos objetos
+    >División de dos variables
 
     ```python
     # Ejemplo
@@ -421,7 +430,7 @@ function function_main_at_Main {
     ```
 
 * **<**
-    >Menor que de dos objetos
+    >En a si b es menor que c
 
     ```python
     # Ejemplo
@@ -429,7 +438,7 @@ function function_main_at_Main {
     ```
 
 * **\>**
-    >Mayor que de dos objetos
+    >En a si b es mayor que c
 
     ```python
     # Ejemplo
@@ -439,7 +448,7 @@ function function_main_at_Main {
 ### Asignaciones
 
 * **=**
-    >Asignacion de un objeto a otro objeto
+    >Asignación de un variable a otra variable
 
     ```python
     # Ejemplo
@@ -449,7 +458,7 @@ function function_main_at_Main {
 ### Funciones
 
 * function
-    >Definicion de una funcion
+    >Definición de una función
 
     ```python
     # Ejemplo
@@ -464,8 +473,8 @@ function function_main_at_Main {
         }
     ```
 
-    >Para definir una funcion se utiliza la palabra reservada function y se le asigna un nombre.
+    >Para definir una función se utiliza la palabra reservada function y se le asigna un nombre.
     >
-    >Seguido se define una lista de parametros y una lista de variables locales.
+    >Seguido se define una lista de parámetros y una lista de variables locales.
     >
-    >Finalmente se define el cuerpo de la funcion.
+    >Finalmente se define el cuerpo de la función.
