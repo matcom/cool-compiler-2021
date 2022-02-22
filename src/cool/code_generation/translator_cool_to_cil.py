@@ -1,12 +1,10 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-import cool.code_generation.cil as cil
-import cool.code_generation.extended_cool as extended_cool
+import cool.code_generation.ast_cil as cil
+import cool.code_generation.ast_ecool as ecool
 import cool.semantics.utils.astnodes as cool
 import cool.semantics.utils.errors as err
-import cool.visitor as visitor
 import cool.visitor.visitor as visitor
-from cool.code_generation.base import BaseCOOLToCILVisitor
 from cool.semantics.utils.scope import (
     Attribute,
     Context,
@@ -108,7 +106,7 @@ class ExtendedCoolTranslator:
                 expr = cool.StringNode('""')
             else:
                 expr = (
-                    extended_cool.NullNode()
+                    ecool.NullNode()
                 )  # cool.WhileNode(cool.BooleanNode("false"), cool.IntegerNode("0"))
 
             return cool.AssignNode(node.id, expr)
@@ -444,9 +442,9 @@ class ExtendedCoolTypeChecker:
     def visit(self, node: cool.BooleanNode, scope: Scope):
         return self.context.get_type("Bool")
 
-    @visitor.when(extended_cool.NullNode)
-    def visit(self, node: extended_cool.NullNode, scope: Scope):
-        return extended_cool.NullType()
+    @visitor.when(ecool.NullNode)
+    def visit(self, node: ecool.NullNode, scope: Scope):
+        return ecool.NullType()
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
@@ -570,7 +568,79 @@ class ExtendedCoolTypeChecker:
         return ErrorType()
 
 
-class CoolToCilTranslator(BaseCOOLToCILVisitor):
+class BaseCoolToCilVisitor:
+    def __init__(self, context: Context):
+        self.dottypes: List[cil.TypeNode] = []
+        self.dotdata: List[cil.DataNode] = []
+        self.dotcode: List[cil.FunctionNode] = []
+
+        self.current_type: Optional[Type] = None
+        self.current_method: Optional[Method] = None
+        self.current_function: Optional[cil.FunctionNode] = None
+
+        self.context: Context = context
+
+        self.locals_dict = {}
+        self.param_set = set()
+        self.attr_set = set()
+
+    @property
+    def params(self) -> List[cil.ParamNode]:
+        return self.current_function.params
+
+    @property
+    def localvars(self) -> List[cil.LocalNode]:
+        return self.current_function.local_vars
+
+    @property
+    def instructions(self) -> List[cil.InstructionNode]:
+        return self.current_function.instructions
+
+    def register_local(self, var_name: str, comment: str = "") -> str:
+        local_name = (
+            f"local_{self.current_function.name[9:]}_{var_name}_{len(self.localvars)}"
+        )
+        local_name = var_name
+        local_node = cil.LocalNode(local_name).set_comment(comment)
+        self.localvars.append(local_node)
+        return local_name
+
+    def define_internal_local(self, comment: str = "") -> str:
+        return self.register_local(f"internal_{len(self.localvars)}", comment)
+
+    def register_instruction(
+        self, instruction: cil.InstructionNode
+    ) -> cil.InstructionNode:
+        self.instructions.append(instruction)
+        return instruction
+
+    def to_function_name(self, method_name: str, type_name: str) -> str:
+        return f"function_{method_name}_at_{type_name}"
+
+    def register_function(self, function_name: str) -> cil.FunctionNode:
+        function_node = cil.FunctionNode(function_name, [], [], [])
+        self.dotcode.append(function_node)
+        return function_node
+
+    def register_type(self, name: str, parent_name: Optional[str] = None) -> cil.TypeNode:
+        type_node = cil.TypeNode(name, parent_name)
+        self.dottypes.append(type_node)
+        return type_node
+
+    def register_data(self, value: Any) -> cil.DataNode:
+        data_name = f"data_{len(self.dotdata)}"
+        data_node = cil.DataNode(data_name, value)
+        self.dotdata.append(data_node)
+        return data_node
+
+    def register_comment(self, comment: str) -> cil.CommentNode:
+        self.register_instruction(cil.CommentNode(comment))
+    
+    def register_empty_instruction(self):
+        self.register_instruction(cil.EmptyInstruction())
+
+
+class CoolToCilTranslator(BaseCoolToCilVisitor):
     # Notes:
     # 1 - All the expression nodes are going to return a tuple [str, Type]
     
@@ -580,6 +650,92 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.ProgramNode)
     def visit(self, node: cool.ProgramNode, scope: Scope):
+        default_class_names = ["Object", "IO", "Int", "String", "Bool"]
+        for name in default_class_names:
+            t = self.context.get_type(name)
+            self.current_type = t
+            cil_type_node = self.register_type(t.name, t.parent.name if t.parent is not None else None)
+            for method, owner in t.all_methods():
+                cil_type_node.methods.append((method.name, self.to_function_name(method.name, owner.name)))
+            cil_type_node.methods.append(("__init__", self.to_function_name("__init__", t.name)))
+
+
+        self.current_function = self.register_function(self.to_function_name("__init__", "Object"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.register_instruction(cil.ReturnNode("self"))
+
+        self.current_function = self.register_function(self.to_function_name("abort", "Object"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.register_instruction(cil.HaltNode())
+        self.register_instruction(cil.ReturnNode())
+        
+        self.current_function = self.register_function(self.to_function_name("type_name", "Object"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        type_name = self.register_local("type_name")
+        self.register_instruction(cil.TypeNameNode(type_name, "self"))
+        self.register_instruction(cil.ReturnNode(type_name))
+
+        self.current_function = self.register_function(self.to_function_name("copy", "Object"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        local_copy = self.define_internal_local()
+        self.register_instruction(cil.CopyNode(local_copy, "self"))
+        self.register_instruction(cil.ReturnNode(local_copy))
+
+        self.current_function = self.register_function(self.to_function_name("__init__", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.register_instruction(cil.ReturnNode("self"))
+
+        self.current_function = self.register_function(self.to_function_name("out_string", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("x"))
+        self.register_instruction(cil.PrintIntNode("x"))
+        self.register_instruction(cil.ReturnNode("self"))
+
+        self.current_function = self.register_function(self.to_function_name("out_int", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("x"))
+        self.register_instruction(cil.PrintIntNode("x"))
+        self.register_instruction(cil.ReturnNode("self"))
+        
+        self.current_function = self.register_function(self.to_function_name("in_string", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        local_int = self.define_internal_local()
+        self.register_instruction(cil.ReadIntNode(local_int))
+        self.register_instruction(cil.ReturnNode(local_int))
+
+        self.current_function = self.register_function(self.to_function_name("in_int", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        local_int = self.define_internal_local()
+        self.register_instruction(cil.ReadIntNode(local_int))
+        self.register_instruction(cil.ReturnNode(local_int))
+
+        self.current_function = self.register_function(self.to_function_name("__init__", "S"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.register_instruction(cil.ReturnNode("self"))
+
+        self.current_function = self.register_function(self.to_function_name("length", "String"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        len_local =  self.define_internal_local()
+        self.register_instruction(cil.LengthNode(len_local, "self"))
+        self.register_instruction(cil.ReturnNode(len_local))
+
+        self.current_function = self.register_function(self.to_function_name("concat", "String"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("s"))
+        new_str =  self.define_internal_local()
+        self.register_instruction(cil.ConcatNode(new_str, "self", "s"))
+        self.register_instruction(cil.ReturnNode(new_str))
+
+        self.current_function = self.register_function(self.to_function_name("substr", "String"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("i"))
+        self.current_function.params.append(cil.ParamNode("l"))
+        substr =  self.define_internal_local()
+        self.register_instruction(cil.SubstringNode(substr, "self", "i", "l"))
+        self.register_instruction(cil.ReturnNode(substr))
+        
+        
+        
         for i, declaration in enumerate(node.declarations):
             self.visit(declaration, scope.children[i])
 
@@ -589,7 +745,7 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
         self.current_type = self.context.get_type(node.id)
 
-        type_node = self.register_type(self.current_type.name)
+        type_node = self.register_type(self.current_type.name, self.current_type.parent.name)
 
         attrs = [
             feature
@@ -957,10 +1113,10 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
             self.register_instruction(cil.ArgNode(arg_source))
 
         call_dest = self.define_internal_local()
-        method = obj_type.get_method(node.id)
+        method, owner = obj_type.get_method(node.id, get_owner=True)
         self.register_instruction(
             cil.DynamicCallNode(
-                obj_type.name, self.to_function_name(node.id, obj_type.name), call_dest
+                obj_type.name, self.to_function_name(node.id, owner.name), call_dest
             )
         )
         return call_dest, method.return_type
@@ -977,9 +1133,9 @@ class CoolToCilTranslator(BaseCOOLToCILVisitor):
     def visit(self, node: cool.BooleanNode, scope: Scope):
         return ("1" if node.lex == "true" else "0"), self.context.get_type("Bool")
 
-    @visitor.when(extended_cool.NullNode)
-    def visit(self, node: extended_cool.NullNode, scope: Scope):
-        return node.lex, extended_cool.NullType
+    @visitor.when(ecool.NullNode)
+    def visit(self, node: ecool.NullNode, scope: Scope):
+        return node.lex, ecool.NullType
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):

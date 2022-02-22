@@ -52,23 +52,10 @@ class Point3D inherits Point {
 };
 *)
 
-class Main {
+class Main inherits IO{
     number: Int <- 0;
 
     main() : Object {
-        {   
-            -- if true then "Hello" else "World" fi;
-            
-            -- while true loop
-            --     number <- number + 1
-            -- pool;
-
-            case 1 of
-                a: Int => 0;
-                b: Bool => not true;
-                c: String => new IO;
-                d: Object => ~25;
-            esac;
-        }
+        out_string("Hello, World!\n")
     };
 };

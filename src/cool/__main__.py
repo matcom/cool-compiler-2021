@@ -8,10 +8,12 @@ import typer
 sys.path.append(os.getcwd())
 
 from cool.code_generation import (
-    CILFormatter,
+    CilFormatter,
+    MipsFormatter,
     ExtendedCoolTranslator,
     ExtendedCoolTypeChecker,
     CoolToCilTranslator,
+    CilToMipsTranslator
 )
 from cool.grammar import Token, serialize_parser_and_lexer
 from cool.lexertab import CoolLexer
@@ -105,13 +107,14 @@ def compile(
     input_file: typer.FileText = typer.Argument(..., help="Cool file"),
     output_file: typer.FileTextWrite = typer.Argument("a.mips", help="Mips file"),
     verbose: bool = typer.Option(False, help="Run in verbose mode."),
+    cil: bool = typer.Option(False, help="Output CIL code instead of MIPS code."),
 ):
     # In case of encoding conflict
     if input_file.encoding.lower != "utf-8":
         input_file = open(input_file.name, encoding="utf-8")
 
-    program = input_file.read()
-    tokens, lexer = tokenize(program, verbose)
+    cil_program = input_file.read()
+    tokens, lexer = tokenize(cil_program, verbose)
 
     if lexer is None or lexer.contain_errors:
         exit(1)
@@ -146,9 +149,20 @@ def compile(
     #     log_success(CodeBuilder().visit(icool_ast))
 
     cil_ast = CoolToCilTranslator(context).visit(icool_ast, scope)
+    mips_ast = CilToMipsTranslator(context).visit(cil_ast)
 
     if verbose or True:
-        log_success(CILFormatter().visit(cil_ast))
+        if cil:
+            with open(f"{input_file.name[:-2]}.cil", "w+") as cil_file:
+                cil_program = CilFormatter().visit(cil_ast)
+                output_file.name = f"{input_file.name[:-2]}.cil"
+                cil_file.write(cil_program)
+    
+        mips_program = MipsFormatter().visit(mips_ast)
+        output_file.name = f"{input_file.name[:-2]}.asm"
+        output_file.write(mips_program)
+        output_file.close()
+        
     #######
     # End #
     #######

@@ -1,0 +1,190 @@
+.TYPES
+type Object {
+	inherits from null
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Object
+}
+type IO {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init__: function___init___at_IO
+}
+type Int {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Int
+}
+type String {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method length: function_length_at_String
+	method concat: function_concat_at_String
+	method substr: function_substr_at_String
+	method __init__: function___init___at_String
+}
+type Bool {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Bool
+}
+type Main {
+	inherits from IO
+
+	attribute number
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method main: function_main_at_Main
+	method __init__: function___init___at_Main
+}
+
+.DATA
+
+
+.CODE
+function function___init___at_Object{
+	PARAM self
+	
+	RETURN self
+}
+function function_abort_at_Object{
+	PARAM self
+
+	HALT
+	
+	RETURN 0
+}
+function function_type_name_at_Object{
+	PARAM self
+
+	LOCAL type_name
+
+	type_name = TYPENAME self
+	
+	RETURN type_name
+}
+function function_copy_at_Object{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = COPY self
+	
+	RETURN internal_0
+}
+function function___init___at_IO{
+	PARAM self
+	
+	RETURN self
+}
+function function_out_string_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTINT x
+	
+	RETURN self
+}
+function function_out_int_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTINT x
+	
+	RETURN self
+}
+function function_in_string_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	READINT internal_0
+	
+	RETURN internal_0
+}
+function function_in_int_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	READINT internal_0
+	
+	RETURN internal_0
+}
+function function___init___at_S{
+	PARAM self
+	
+	RETURN self
+}
+function function_length_at_String{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = LENGTH self
+	
+	RETURN internal_0
+}
+function function_concat_at_String{
+	PARAM self
+	PARAM s
+
+	LOCAL internal_0
+
+	internal_0 = CONCAT self s
+	
+	RETURN internal_0
+}
+function function_substr_at_String{
+	PARAM self
+	PARAM i
+	PARAM l
+
+	LOCAL internal_0
+
+	internal_0 = SUBSTRING self i l
+	
+	RETURN internal_0
+}
+function function___init___at_Main{
+	PARAM self
+
+	SETATTR self number 0
+	
+	RETURN self
+}
+function function_main_at_Main{
+	PARAM self
+
+	LOCAL internal_0
+
+	ARG self
+	ARG "Hello, World!\n"
+	internal_0 = VCALL Main function_out_string_at_IO
+	
+	RETURN internal_0
+}
