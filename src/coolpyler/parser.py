@@ -70,15 +70,16 @@ class CoolParser(Parser):
     tokens = CoolLexer.tokens - {"INLINE_COMMENT", "OCOMMENT"}
 
     precedence = (
-        ("left", "DOT"),
-        ("left", "AT"),
-        ("right", "TILDE"),
-        ("right", "ISVOID"),
-        ("left", "STAR", "SLASH"),
-        ("left", "PLUS", "MINUS"),
-        ("nonassoc", "LEQ", "LE", "EQ"),
-        ("right", "NOT"),
         ("right", "LEFT_ARROW"),
+        ("right", "NOT"),
+        ("nonassoc", "LEQ", "LE", "EQ"),
+        ("left", "PLUS", "MINUS"),
+        ("left", "STAR", "SLASH"),
+        ("right", "ISVOID"),
+        ("right", "TILDE"),
+        ("left", "NEW"),
+        ("left", "AT"),
+        ("left", "DOT"),
         # ("right", "IN"),
     )
 
