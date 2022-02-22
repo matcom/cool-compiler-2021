@@ -91,7 +91,7 @@ class OperationNode(Node):
 
 
 class LocalNode(OperationNode):
-    def __init__(self, node, idx: str, typex: Type) -> None:
+    def __init__(self, node, idx: str, typex: str) -> None:
         """
         Node represent initalization instruction"
         Parameter:
@@ -99,12 +99,14 @@ class LocalNode(OperationNode):
             type <- node type
         """
         super().__init__(node)
+        assert isinstance(typex, str), "Typex is not string"
+
         self.id: str = idx
         self.type: str = typex.name
 
 
 class ParamNode(LocalNode):
-    def __init__(self, node, idx: str, typex: Type) -> None:
+    def __init__(self, node, idx: str, typex: str) -> None:
         """
         Node represent function parameter initalization instruction"
         Parameter:

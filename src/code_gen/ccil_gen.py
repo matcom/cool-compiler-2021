@@ -150,9 +150,10 @@ class CCILGenerator:
         pre_fvalue_id = f"if_{times}_pre_fv"
         then_fval.id = else_fval.id = pre_fvalue_id
         fvalue_id = f"if_{times}_fv"
+        fvalue_local = LocalNode(node, fvalue_id, node.type.id)
         fvalue = create_assignation(node, fvalue_id, pre_fvalue_id)
 
-        return ([*if_ops, if_false, *then_ops, else_label, *else_ops, fvalue], fvalue)
+        return ([fvalue_local, *if_ops, if_false, *then_ops, else_label, *else_ops, fvalue], fvalue)
 
     @visitor.when(sem_ast.CaseNode)
     def visit(self, node: sem_ast.CaseNode) -> VISITOR_RESULT:
