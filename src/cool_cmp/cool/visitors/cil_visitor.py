@@ -5,6 +5,7 @@ from cmp.semantic import VariableInfo
 from cool.semantic.context import Context
 from cool.error.errors import RunError, ZERO_DIVISION
 from cool.semantic.type import SelfType
+from math import floor
 
 class CILPrintVisitor():
     @visitor.on('node')
@@ -73,6 +74,10 @@ class CILPrintVisitor():
     @visitor.when(cil.TypeOfNode)
     def visit(self, node):
         return f'{node.dest} = TYPEOF {node.obj}'
+
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node):
+        return f'{node.dest} = TYPENAME {node.type}'
 
     @visitor.when(cil.StaticCallNode)
     def visit(self, node):
@@ -281,6 +286,33 @@ class CILRunnerVisitor():
         value = func(left, right)
         self.set_value(node.dest, value, function_scope)
         return self.next_instruction()
+
+    def string_cleaner(self, string):
+        semi = string[1:-1]
+        temp = []
+        escape = False
+        for ch in semi:
+            if ch == '\\' and not escape:
+                escape = True
+            elif ch == 'n' and escape:
+                temp.append('\n')
+                escape = False
+            elif ch == 't' and escape:
+                temp.append('\t')
+                escape = False
+            elif ch == 'b' and escape:
+                temp.append('\b')
+                escape = False
+            elif ch == 'f' and escape:
+                temp.append('\f')
+                escape = False
+            elif escape:
+                temp.append(ch)
+                escape = False
+            else:
+                temp.append(ch)
+
+        return ''.join(temp)
     
     @visitor.on('node')
     def visit(self, node):
@@ -288,7 +320,7 @@ class CILRunnerVisitor():
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node:cil.ProgramNode):
-        for t in node.dottypes + [cil.TypeNode("__Array", None)]:
+        for t in node.dottypes + [cil.TypeNode("__Array", None, "__Array")]:
             self.visit(t)
         for t in node.dotdata:
             self.visit(t)
@@ -305,13 +337,22 @@ class CILRunnerVisitor():
     def visit(self, node:cil.DataNode):
         if node.name in self.data:
             self.raise_error("Data {0} already defined")
-        self.data[node.name] = node.value
+        self.data[node.name] = self.string_cleaner(node.value)
 
     @visitor.when(cil.TypeNode)
     def visit(self, node:cil.TypeNode):
         if node.name in self.types:
             self.raise_error("Type {0} already defined", node.name)
         self.types[node.name] = node
+
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node:cil.TypeNameNode, args: list, caller_fun_scope: dict):
+        typex = self.get_dynamic_type(node.type, caller_fun_scope)
+        if typex.name_data not in self.data:
+            self.raise_error(f"Data {typex.name_data} not defined")
+        value = self.data[typex.name_data]
+        self.set_value(node.dest, value, caller_fun_scope)
+        return self.next_instruction()
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node):
@@ -404,7 +445,7 @@ class CILRunnerVisitor():
     @visitor.when(cil.DivNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         try:
-            return self.binary_node(node, caller_fun_scope, lambda x,y: x/y)
+            return self.binary_node(node, caller_fun_scope, lambda x,y: floor(x/y))
         except ZeroDivisionError:
             self.raise_error(ZERO_DIVISION)
         
@@ -482,6 +523,8 @@ class CILRunnerVisitor():
     @visitor.when(cil.GetAttribNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         obj_value = self.get_value(node.source, caller_fun_scope)
+        if not obj_value:
+            obj_value = self.get_value(node.source, caller_fun_scope)
         try:
             value = obj_value[node.attr]
         except KeyError:
@@ -522,13 +565,14 @@ class CILRunnerVisitor():
     @visitor.when(cil.CopyNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
         value = self.get_value(node.instance, caller_fun_scope)
-        value = value.copy()
+        if not isinstance(value, (str, int)):
+            value = value.copy()
         self.set_value(node.result, value, caller_fun_scope)
         return self.next_instruction()
     
     @visitor.when(cil.LengthNode)
     def visit(self, node, args: list, caller_fun_scope: dict):
-        value = self.get_value_str(node.string, caller_fun_scope, "LENGTH operation undefined with non String type")
+        value = self.get_value_str(node.string_var, caller_fun_scope, "LENGTH operation undefined with non String type")
         self.set_value(node.dest, len(value), caller_fun_scope)
         return self.next_instruction()
     
@@ -738,7 +782,8 @@ class COOLToCILVisitor():
             parent = parent.name
 
         if len([x for x in self.dottypes if x.name == name]) == 0:
-            type_node = cil.TypeNode(name, parent, row, column, comment)
+            type_name_data_node = self.register_data('"'+name+'"', row, column, comment)
+            type_node = cil.TypeNode(name, parent, type_name_data_node.name, row, column, comment)
             self.dottypes.append(type_node)
             return type_node
 
@@ -808,12 +853,12 @@ class COOLToCILVisitor():
             if len([x for (_, x) in dottype.methods if x == name]) == 0:
                 dottype.methods.append((m.name, name))
 
-    def create_empty_attrs(self, typex, dottype):
-        if typex.parent:
-            self.create_empty_attrs(typex.parent, dottype)
+    # def create_empty_attrs(self, typex, dottype):
+    #     if typex.parent:
+    #         self.create_empty_attrs(typex.parent, dottype)
 
-        for m in typex.attributes:
-            name = dottype.attributes.append(m.name)
+    #     for m in typex.attributes:
+    #         name = dottype.attributes.append(m.name)
 
     @visitor.on('node')
     def visit(self, node):
@@ -838,7 +883,7 @@ class COOLToCILVisitor():
             if type_name not in ["Error", "Void"]:
                 this_type = next(x for x in self.dottypes if x.name == type_name)
                 self.create_empty_methods(typex, this_type, node.row, node.column, "Program Node")
-                self.create_empty_attrs(typex, this_type)
+                # self.create_empty_attrs(typex, this_type)
 
         for type_name, typex in self.context.types.items():
             if type_name in self.context.special_types and type_name not in ["Error", "Void"]:
@@ -1027,10 +1072,11 @@ class COOLToCILVisitor():
         return result            
     
     @visitor.when(CheckNode)
-    def visit(self, node:CheckNode, scope):
+    def visit(self, node:CheckNode, scope, check_value):
         scope = node.scope
         local = scope.find_variable(node.id)
         cil_local = self.register_local(local, node.row, node.column, "Check Node")) 
+        self.register_instruction(cil.AssignNode(cil_local, check_value, node.row, node.column, "Check Node"))
         result = self.visit(node.expr, scope)
         return result
     
@@ -1106,7 +1152,7 @@ class COOLToCILVisitor():
             self.register_instruction(cil.NotNode(not_equal_types, not_equal_types, node.row, node.column, "Case Node"))
             self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label, node.row, node.column, "Case Node"))
             
-            result = self.visit(param, child_scope)
+            result = self.visit(param, child_scope, value)
             self.register_instruction(cil.AssignNode(value, result, node.row, node.column, "Case Node"))
             
             self.register_instruction(cil.GotoNode(final_label.label, node.row, node.column, "Case Node"))
@@ -1399,8 +1445,9 @@ class COOLToCILVisitor():
     @visitor.when(cil.ObjectTypeNameNode)
     def visit(self, node, scope=None):
         instance = self.params[0]
-        result = self.define_internal_local( node.row, node.column, "Object Type Name Node")
+        result = self.define_internal_local()
         self.register_instruction(cil.TypeOfNode(instance.name, result, node.row, node.column, "Object Type Name Node"))
+        self.register_instruction(cil.TypeNameNode(result, result, node.row, node.column, "Object Type Name Node"))
         return result
 
     @visitor.when(cil.StringConcatNode)

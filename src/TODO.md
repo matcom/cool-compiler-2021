@@ -14,6 +14,8 @@
 
 - **Probar que corran todos los programas del codegen con el interprete de CIL**.
 - Separar CIL en un paquete aparte como está MIPS
+- Separar COOL en un paquete aparte
+- Separar paquete de integración de COOL, CIL, MIPS
 
 - Hacer algo inteligente para eliminar generacion de variables innecesarias
 - Hacer mecanismo para reducir codigo generado eliminando el codigo que no se usa o no alcanzable
@@ -33,11 +35,13 @@
   - [x] Copy
   - [x] Length
   - [x] Substring
-  - [ ] Concat
-  - [ ] TypeName
+  - [x] Concat
+  - [x] TypeName
   - [ ] Copy especifico String, Int
-- [ ] At @
-- [ ] Llamado dinamico self type
+- [x] At @
+- [x] Llamado dinamico self type
+- [ ] Llamar al __init del padre en el __init de los hijos.
 - [ ] case of
+- [ ] Atributos con igual nombre en clases heredadas, tienen que diferenciarse, o no, ver bien esto
 - [ ] Verificar que los atributos se inicialicen correctamente en caso de que uno dependa de otro y a la hora de asiganrle valor uno no este inicializado.
 - [ ] Verificar que se aborte cuando ocurre una excepcion en ejecucion. Los casos se especifican en el manual de Cool pagina 29
