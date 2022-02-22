@@ -1,33 +1,98 @@
-# Documentación
+# Informe de Complementos de Compilacion
+## Compilador de Cool
+***
 
-## Readme
 
-Modifique el contenido de este documento para documentar de forma clara y concisa los siguientes aspectos:
+## Autores 
+- Claudia Olavarrieta Martinez 
+- Marcos Adrian Valdivie Rodriguez
+- Adrian Hernandez Perez
 
-- Cómo ejecutar (y compilar si es necesario) su compilador.
-- Requisitos adicionales, dependencias, configuración, etc.
-- Opciones adicionales que tenga su compilador.
+## Uso del compilador
 
-## Sobre los Equipos de Desarrollo
+## Arquitectura del compilador 
+ 
+### Fases (_Pipeline_)
 
-Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o 3 integrantes. El proyecto de Compilación será recogido y evaluado únicamente a través de Github. Es imprescindible tener una cuenta de Github para cada participante, y que su proyecto esté correctamente hosteado en esta plataforma. 
+El fichero _Main.py_ contiene los llamados en orden de los metodos que 
+componen el pipeline de ejecucion del compilador
+1. Lexer       
+2. Parser     
+3. Recoleccion de Tipos         
+4. Construccion de Tipos        
+5. Chequeo de Tipos
+6. COOL a CIL
+7. CIL a Mips
 
-**⚠️ NOTA**: Debe completar el archivo `team.yml` con los datos correctos de cada miembro de su equipo.
+#### Lexer 
 
-## Sobre los Materiales a Entregar
+El Lexer es el encargado de dado un string con el código del programa COOL separar el mismo en tokens
+para luego ser usado por el parser. En esta fase se utilizo el paquete _ply_ el cual permite ...breve descripcion de ply... . Se definieron
+las expresiones regulares y simbolos que correspondian a los tokens de la 
+gramatica. Ademas se almacena por cada Token la linea y la columna correspondiente
+en el codigo, lo que permite tener mayor informacion en los mensajes de error
+y para nuestro uso en la depuracion.
 
-Para la evaluación del proyecto Ud. debe entregar un informe en formato PDF (`report.pdf`) en esta carpeta, que resuma de manera organizada y comprensible la arquitectura e implementación de su compilador.
-El documento no tiene límite de extensión.
-En él explicará en más detalle su solución a los problemas que, durante la implementación de cada una de las fases del proceso de compilación, hayan requerido de Ud. especial atención.
 
-## Estructura del reporte
+#### Parser
 
-Usted es libre de estructurar su reporte escrito como más conveniente le parezca. A continuación le sugerimos algunas secciones que no deberían faltar, aunque puede mezclar, renombrar y organizarlas de la manera que mejor le parezca:
+#### Recoleccion de tipos
 
-- **Uso del compilador**: detalles sobre las opciones de líneas de comando, si tiene opciones adicionales (e.j., `--ast` genera un AST en JSON, etc.). Básicamente lo mismo que pondrá en este Readme.
-- **Arquitectura del compilador**: una explicación general de la arquitectura, en cuántos módulos se divide el proyecto, cuantas fases tiene, qué tipo de gramática se utiliza, y en general, como se organiza el proyecto. Una buena imagen siempre ayuda.
-- **Problemas técnicos**: detalles sobre cualquier problema teórico o técnico interesante que haya necesitado resolver de forma particular.
+En esta fase se recorren todas las declaraciones de clases, se crean los tipos asociados
+y se valida que no se este redefiniendo una clase. 
 
-## Sobre la Fecha de Entrega
 
-Se realizarán recogidas parciales del proyecto a lo largo del curso. En el Canal de Telegram se anunciará la fecha y requisitos de cada entrega.
+### Modulos
+
+### Gramatica
+
+### Organizacion
+
+La estructura de archivos del proyecto es la siguiente:
+
+           
+       
+```
+cool-compiler-2021
+|___doc 
+    img            
+    src
+     |__Main.py
+        core
+            |__cil
+                   |__BaseCOOLToCilVisitor.py
+                     CILAst.py
+                     COOLToCILVisitor.py
+            |__lexer
+                   |__lexer.py
+            |__mips
+                   |__CilToMipsVisitor.py
+                      mips_basic.asm
+                      MipsAst.py
+                      MIPSAstFormatter.py
+            |__parser
+                   |__Parser.py
+            |__semantic
+                   |__Type_Builder.py
+                      Type_Checker.py
+                      Type_Collector.py
+            |__tools
+                   |__automata.py
+                      COOLAst.py
+                      Errors.py
+                      evaluation.py
+                      First_and_Follow.py
+                      Parser_LR1.py
+                      parsing.py
+                      pycompiler.py
+                      Semantic.py
+                      utils.py
+                      visitor.py
+        
+
+```
+
+Se omitieron algunos archivos pues no son relevantes en la implementacion del compilador.
+
+## Principales Problemas
+
