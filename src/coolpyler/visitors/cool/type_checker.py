@@ -58,7 +58,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):  # noqa: F811
         self.current_type = node.type
-        scope.define_variable("self", self.current_type, force=True)
+        scope.define_variable("self", self.current_type, first_self=True)
         for attr in self.current_type.attributes:
             try:
                 scope.define_variable(attr.name, attr.type)
@@ -220,14 +220,19 @@ class TypeCheckerVisitor:
         exp = self.visit(node.expr, scope)
         args = [self.visit(arg, scope) for arg in node.args]
         try:
-            method = exp.type.get_method(node.id)
+            static_type = self.get_type(node.static_type)
+            method = static_type.get_method(node.id)
+            if not exp.type.conforms_to(static_type):
+                raise semantic.TypeError(
+                    f"Expression type {exp.type.name} does not conform to declared static dispatch type {static_type.name}."
+                )
         except semantic.BaseSemanticError as e:
             self.errors.append(e.with_pos(node.lineno, node.columnno))
             return type_checked.CoolStaticDispatchNode(
                 node.lineno,
                 node.columnno,
                 exp,
-                node.static_type,
+                ErrorType(),
                 node.id,
                 args,
                 ErrorType(),
@@ -252,22 +257,22 @@ class TypeCheckerVisitor:
                     )
                 )
 
-        try:
-            static_type = self.get_type(node.static_type)
-            if not exp.type.conforms_to(static_type):
-                self.errors.append(
-                    errors.NotConformsError(
-                        node.lineno, node.columnno, exp.type, static_type
-                    )
-                )
-        except semantic.BaseSemanticError as e:
-            self.errors.append(e.with_pos(node.lineno, node.columnno))
+        # try:
+        #     static_type = self.get_type(node.static_type)
+        #     if not exp.type.conforms_to(static_type):
+        #         self.errors.append(
+        #             errors.NotConformsError(
+        #                 node.lineno, node.columnno, exp.type, static_type
+        #             )
+        #         )
+        # except semantic.BaseSemanticError as e:
+        #     self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         return type_checked.CoolStaticDispatchNode(
             node.lineno,
             node.columnno,
             exp,
-            node.static_type,
+            static_type,
             node.id,
             args,
             method.return_type,
@@ -319,7 +324,7 @@ class TypeCheckerVisitor:
             )
 
         try:
-            scope.define_variable(node.id, typex)
+            scope.define_variable(node.id, typex, force=True)
         except semantic.BaseSemanticError as e:
             self.errors.append(e.with_pos(node.lineno, node.columnno))
 

@@ -171,9 +171,9 @@ class NotConformsError(TypeError):
         )
 
 
-class WrongArgsCountError(TypeError):
+class WrongArgsCountError(SemanticError):
     def __init__(self, line, column, method, n1, n2) -> None:
-        TypeError.__init__(
+        SemanticError.__init__(
             self, line, column, f"Method {method} takes {n1} but {n2} were given."
         )
 

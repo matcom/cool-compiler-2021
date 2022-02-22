@@ -82,9 +82,9 @@ class Type:
         if self.parent is not None:
             raise TypeError(f"Parent type is already set for `{self.name}`.")
         if parent.sealed:
-            raise TypeError(f"Cannot inherit from `{parent.name}`.")
+            raise SemanticError(f"Cannot inherit from `{parent.name}`.")
         if parent in self.reachable:
-            raise TypeError(f"Cycle in hierarchy involving `{self.name}`.")
+            raise SemanticError(f"Cycle in hierarchy involving `{self.name}`.")
         self.parent = parent
         self.parent.reachable.extend(self.reachable)  # TODO
 
@@ -98,7 +98,7 @@ class Type:
                 )
             try:
                 return self.parent.get_attribute(name)
-            except AttributeError:
+            except BaseSemanticError:
                 raise AttributeError(
                     f"Attribute `{name}` is not defined in `{self.name}`."
                 )
@@ -108,12 +108,12 @@ class Type:
             raise SemanticError("`self` cannot be the name of an attribute.")
         try:
             self.get_attribute(name)
-        except AttributeError:
+        except BaseSemanticError:
             attribute = Attribute(name, typex)
             self.attributes.append(attribute)
             return attribute
         else:
-            raise AttributeError(
+            raise SemanticError(
                 f"Attribute `{name}` is already defined in `{self.name}`."
             )
 
@@ -127,7 +127,7 @@ class Type:
                 )
             try:
                 return self.parent.get_method(name)
-            except AttributeError:
+            except BaseSemanticError:
                 raise AttributeError(
                     f"Method `{name}` is not defined in `{self.name}`."
                 )
@@ -136,7 +136,7 @@ class Type:
         self, name: str, param_names: list, param_types: list, return_type
     ):
         if name in (method.name for method in self.methods):
-            raise AttributeError(f"Method `{name}` already defined in `{self.name}`")
+            raise SemanticError(f"Method `{name}` already defined in `{self.name}`")
 
         if "self" in param_names:
             raise SemanticError("`self` cannot be the name of a formal parameter.")
@@ -279,8 +279,8 @@ class Scope:
         self.children.append(child)
         return child
 
-    def define_variable(self, vname, vtype, force=False):
-        if (vname == "self" or self.is_local(vname)) and not force:
+    def define_variable(self, vname, vtype, first_self=False, force=False):
+        if (vname == "self" and not first_self) or (self.is_local(vname) and not force):
             raise SemanticError("Variable already exists in the current scope")
 
         info = VariableInfo(vname, vtype)
@@ -296,7 +296,7 @@ class Scope:
                 raise NameError(f"Variable `{vname}` is not defined in current scope.")
             try:
                 return self.parent.find_variable(vname, self.index)
-            except SemanticError:
+            except BaseSemanticError:
                 raise NameError(f"Variable `{vname}` is not defined in current scope.")
 
     def is_defined(self, vname):
