@@ -194,7 +194,7 @@ class TypeCheckerVisitor:
                     )
                 )
 
-        if method.return_type == self.get_type("SELF_TYPE"):
+        if method.return_type.name == "SELF_TYPE":
             return type_checked.CoolDispatchNode(
                 node.lineno, node.columnno, exp, node.id, args, exp.type
             )
@@ -595,7 +595,7 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolNewNode)
     def visit(self, node, scope):  # noqa: F811
-        if node.type == "SELF_TYPE":
+        if node.type.name == "SELF_TYPE":
             type_checked.CoolNewNode(
                 node.lineno, node.columnno, node.type, self.current_type
             )
