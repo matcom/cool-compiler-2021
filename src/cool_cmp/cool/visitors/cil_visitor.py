@@ -513,7 +513,9 @@ class CILRunnerVisitor():
         # value = node.obj
         # while isinstance(value, str):
         value = self.get_value(node.obj, caller_fun_scope)
-        if isinstance(value, int):
+        if isinstance(value, bool):
+            self.set_value(node.dest, self.create_type_instance("Bool"), caller_fun_scope)
+        elif isinstance(value, int):
             self.set_value(node.dest, self.create_type_instance("Int"), caller_fun_scope)
         elif isinstance(value, str):
             self.set_value(node.dest, self.create_type_instance("String"), caller_fun_scope)
