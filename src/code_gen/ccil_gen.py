@@ -1,7 +1,7 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import Tuple, List, Dict
+from typing import Set, Tuple, List, Dict
 from code_gen.tools import *
 
 
@@ -21,7 +21,7 @@ class CCILGenerator:
 
     def __init__(self) -> None:
         self.time_record: Dict[str, int] = dict()
-        self.locals: Dict[str, str]
+        self.locals: Set[Local]
 
     @visitor.on("node")
     def visit(self, _):
@@ -55,14 +55,16 @@ class CCILGenerator:
                 func_nodes.append(feature)
 
         # Explore all attributes and join their operations in an initializer function
-        self.locals = dict()
+        self.locals = set()
         operations = []
         for attr in attr_nodes:
             attributes.append(Attribute(ATTR + attr.id, attr.type.name))
             (attr_ops, attr_fval) = self.visit(attr)
             operations += attr_ops
         # Return type is set as itself? Use selftype maybe?
-        init_func = FunctionNode(node, f"init_{node.id}", [], self.locals, operations, node.id)
+        init_func = FunctionNode(
+            node, f"init_{node.id}", [], [*self.locals], operations, node.id
+        )
 
         # Explore all methods
         for func in func_nodes:
@@ -77,27 +79,25 @@ class CCILGenerator:
     @visitor.when(sem_ast.AttrDeclarationNode)
     def visit(self, node: sem_ast.AttrDeclarationNode) -> VISITOR_RESULT:
         fval_id = ATTR + node.id
+        self.locals.add(Local(fval_id, node.type.name))
 
         if node.expr is None:
-            op = LocalNode(node, fval_id, node.type.name)
-            return [op], op
+            return []
 
         (expr_op, expr_fval) = self.visit(node.expr)
         expr_fval.id = fval_id
-
         return (expr_op, expr_fval)
 
     @visitor.when(sem_ast.MethodDeclarationNode)
-    def visit(self, node: sem_ast.MethodDeclarationNode):
-        operations: List[OperationNode] = []
+    def visit(self, node: sem_ast.MethodDeclarationNode) -> METHOD_VISITOR_RESULT:
+        params: List[Parameter] = []
         for param in node.params:
-            operations.append(ParamNode(param.id, param.type.name))
+            params.append(Parameter(param.id, param.type.name))
 
-        (expr_op, _) = self.visit(node.body)
+        self.locals = set()
+        (operations, fval_id) = self.visit(node.body)
 
-        operations += expr_op
-        func_node = FunctionNode()
-        return MethodNode(node, node.id, expr_op)
+        return FunctionNode(node, node.id, params, [*self.locals], operations, fval_id)
 
     @visitor.when(sem_ast.BlocksNode)
     def visit(self, node: sem_ast.BlocksNode) -> VISITOR_RESULT:
