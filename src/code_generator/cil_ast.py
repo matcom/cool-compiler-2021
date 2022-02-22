@@ -15,7 +15,7 @@ class TypeNode(Node):
     def __init__(self, name):
         self.name = name
         self.attributes = []
-        self.methods = []
+        self.methods = {}
 
 # .DATA
 
@@ -53,9 +53,9 @@ class LocalNode(InstructionNode):
 
 
 class AssignNode(InstructionNode):
-    def __init__(self, dest, source):
-        self.dest = dest
-        self.source = source
+    def __init__(self, local_dest, expr):
+        self.local_dest = local_dest
+        self.expr = expr
 
 
 class ArithExpressionNode(InstructionNode):
@@ -137,8 +137,9 @@ class SetIndexNode(InstructionNode):
 
 
 class AllocateNode(InstructionNode):
-    def __init__(self, typex, dest):
+    def __init__(self, typex, tag, dest):
         self.type = typex
+        self.tag = tag
         self.local_dest = dest
 
 
@@ -204,23 +205,36 @@ class ReturnNode(InstructionNode):
 
 
 # IO
-class LoadNode(InstructionNode):
-    def __init__(self, dest, msg):
+class LoadInt(InstructionNode):
+    def __init__(self, value, dest):
+        self.value = value
         self.local_dest = dest
+
+
+class LoadString(InstructionNode):
+    def __init__(self, msg, dest):
         self.msg = msg
+        self.local_dest = dest
+
+
+class LoadVoid(InstructionNode):
+    def __init__(self, dest):
+        self.local_dest = dest
 
 
 class LengthNode(InstructionNode):
-    def __init__(self, dest, arg):
-        self.local_dest = dest
-        self.arg = arg
+    def __init__(self, variable, result):
+        self.variable = variable
+        self.result = result
 
 
 class ConcatNode(InstructionNode):
-    def __init__(self, dest, head, tail):
-        self.local_dest = dest
-        self.head = head
-        self.tail = tail
+    def __init__(self, str1, len1, str2, len2, result):
+        self.str1 = str1
+        self.len1 = len1
+        self.str2 = str2
+        self.len2 = len2
+        self.result = result
 
 
 class PrefixNode(InstructionNode):
@@ -262,3 +276,15 @@ class PrintStringNode(InstructionNode):
 class PrintIntNode(InstructionNode):
     def __init__(self, value):
         self.value = value
+
+
+class IsVoidNode(InstructionNode):
+    def __init__(self, result_local, expr):
+        self.result_local = result_local
+        self.expr = expr
+
+
+class CopyNode(InstructionNode):
+    def __init__(self, typex, local_dest):
+        self.type = typex
+        self.local_dest = local_dest
