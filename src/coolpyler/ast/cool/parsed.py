@@ -135,10 +135,10 @@ class CoolCaseBranchNode(base.CoolCaseBranchNode):
 
 
 class CoolNewNode(base.CoolNewNode):
-    def __init__(self, lineno, columnno, type):
+    def __init__(self, lineno, columnno, type_name):
         super().__init__(lineno, columnno)
 
-        self.type = type
+        self.type_name = type_name
 
 
 class CoolParenthNode(base.CoolParenthNode):

@@ -113,10 +113,8 @@ class CoolCaseNode(CoolExprNode):
 
 
 class CoolNewNode(CoolExprNode):
-    def __init__(self, lineno, columnno, _type, type):
-        super().__init__(lineno, columnno, type)
-
-        self.type = _type
+    def __init__(self, lineno, columnno, type_name):
+        super().__init__(lineno, columnno, type_name)
 
 
 class CoolParenthNode(CoolExprNode):

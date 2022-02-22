@@ -595,11 +595,12 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolNewNode)
     def visit(self, node, scope):  # noqa: F811
-        if node.type.name == "SELF_TYPE":
+        if node.type_name == "SELF_TYPE":
             type_checked.CoolNewNode(
-                node.lineno, node.columnno, node.type, self.current_type
+                node.lineno, node.columnno, self.current_type
             )
 
+        type = self.get_type(node.type_name)
         return type_checked.CoolNewNode(
-            node.lineno, node.columnno, node.type, node.type
+            node.lineno, node.columnno, type
         )

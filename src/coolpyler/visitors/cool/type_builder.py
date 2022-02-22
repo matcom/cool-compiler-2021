@@ -182,7 +182,7 @@ class TypeBuilderVisitor:
 
     @visitor.when(type_collected.CoolNewNode)  # noqa: F811
     def visit(self, node: type_collected.CoolNewNode):  # noqa: F811
-        return type_built.CoolNewNode(node.lineno, node.columnno, node.type)
+        return type_built.CoolNewNode(node.lineno, node.columnno, node.type_name)
 
     @visitor.when(type_collected.CoolParenthNode)  # noqa: F811
     def visit(self, node: type_collected.CoolParenthNode):  # noqa: F811
