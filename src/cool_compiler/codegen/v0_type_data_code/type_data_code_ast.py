@@ -253,8 +253,7 @@ class Load(Expression):
 class ALLOCATE(Expression):
     pass
 
-class Local(Expression):
-    pass
+
 class NegAssing(Expression):
     pass
 
@@ -279,3 +278,9 @@ class Neg(Expression):
 class Complemnet(Expression):
     pass
 
+
+class Local(Expression):
+    pass
+
+class Param(Expression):
+    pass

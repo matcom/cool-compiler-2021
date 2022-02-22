@@ -1,4 +1,6 @@
 import sys
+
+from cool_compiler.codegen.v1_mips_generate.mipsgenerate import MipsGenerate
 from .error import CoolError
 from .lexer import CoolLexer
 from .parser import CoolParser
@@ -7,8 +9,6 @@ from .types import CoolTypeBuildInManager
 from .codegen import CILGenerate
 
 path = "test.cl"
-
-
 
 with open(path, 'r') as _file:
     text = _file.read()
@@ -25,7 +25,7 @@ with open(path, 'r') as _file:
     ast = parser.parse(iter(tokens))
     if errors.any(): sys.exit(1)
 
-    visitorList = [ CreateType, SemanticChecking, CILGenerate ]
+    visitorList = [ CreateType, SemanticChecking, CILGenerate, MipsGenerate ]
  
     for visitorClass in visitorList:
         ast  = visitorClass(errors).visit(ast)
