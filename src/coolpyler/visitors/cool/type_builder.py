@@ -131,7 +131,7 @@ class TypeBuilderVisitor:
         expr = self.visit(node.expr)
         args = [self.visit(arg) for arg in node.args]
         return type_built.CoolDispatchNode(
-            node.lineno, node.columnno, node.id, args, expr
+            node.lineno, node.columnno, expr, node.id, args
         )
 
     @visitor.when(type_collected.CoolIfThenElseNode)  # noqa: F811
@@ -267,4 +267,3 @@ class TypeBuilderVisitor:
     @visitor.when(type_collected.CoolVarNode)  # noqa: F811
     def visit(self, node: type_collected.CoolVarNode):  # noqa: F811
         return type_built.CoolVarNode(node.lineno, node.columnno, node.value)
-

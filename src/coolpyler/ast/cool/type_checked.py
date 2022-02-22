@@ -64,7 +64,7 @@ class CoolStaticDispatchNode(CoolExprNode):
 
 
 class CoolDispatchNode(CoolExprNode):
-    def __init__(self, lineno, columnno, id, args, type, expr=None):
+    def __init__(self, lineno, columnno, expr, id, args, type):
         super().__init__(lineno, columnno, type)
 
         self.expr = expr
