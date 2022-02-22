@@ -76,7 +76,7 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolAttrDeclNode)
     def visit(self, node, scope):  # noqa: F811
-        if node.body is not None and node.attr_info is not None:
+        if node.body != [] and node.attr_info is not None:
             # print(node.attr_info)
             exp = self.visit(node.body, scope)
             node_type = node.attr_info.type
@@ -103,57 +103,63 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolMethodDeclNode)
     def visit(self, node, scope):  # noqa: F811
-        self.current_method = self.current_type.get_method(node.method_info.name)
-        method_scope = scope.create_child()
+        if node.method_info is not None:
+            self.current_method = self.current_type.get_method(node.method_info.name)
+            method_scope = scope.create_child()
 
-        for pname, ptype in zip(
-            self.current_method.param_names, self.current_method.param_types
-        ):
-            method_scope.define_variable(pname, ptype)
+            for pname, ptype in zip(
+                self.current_method.param_names, self.current_method.param_types
+            ):
+                method_scope.define_variable(pname, ptype)
 
-        body = self.visit(node.body, method_scope)
+            body = self.visit(node.body, method_scope)
 
-        if (
-            self.current_method.return_type.name == "SELF_TYPE"
-            and not body.type.conforms_to(self.current_type)
-        ):
-            self.errors.append(
-                errors.IncompatibleTypesError(
-                    node.lineno, node.columnno, body.type.name, self.current_type.name
-                )
-            )
-
-        elif (
-            self.current_method.return_type.name != "SELF_TYPE"
-            and not body.type.conforms_to(self.current_method.return_type)
-        ):
-            self.errors.append(
-                errors.IncompatibleTypesError(
-                    node.lineno,
-                    node.columnno,
-                    body.type.name,
-                    self.current_method.return_type.name,
-                )
-            )
-
-        if self.current_type.parent is not None:
-            try:
-                parent_method = self.current_type.parent.get_method(
-                    self.current_method.name
-                )
-                if parent_method != self.current_method:
-                    self.errors.append(
-                        errors.WrongSignatureError(
-                            node.lineno, node.columnno, parent_method.name
-                        )
+            if (
+                self.current_method.return_type.name == "SELF_TYPE"
+                and not body.type.conforms_to(self.current_type)
+            ):
+                self.errors.append(
+                    errors.IncompatibleTypesError(
+                        node.lineno,
+                        node.columnno,
+                        body.type.name,
+                        self.current_type.name,
                     )
-            except semantic.SemanticError as e:
-                self.errors.append(errors.SemanticError(node.lineno, node.columnno, e))
+                )
 
-        self.current_method = None
-        return type_checked.CoolMethodDeclNode(
-            node.lineno, node.columnno, node.method_info, body
-        )
+            elif (
+                self.current_method.return_type.name != "SELF_TYPE"
+                and not body.type.conforms_to(self.current_method.return_type)
+            ):
+                self.errors.append(
+                    errors.IncompatibleTypesError(
+                        node.lineno,
+                        node.columnno,
+                        body.type.name,
+                        self.current_method.return_type.name,
+                    )
+                )
+
+            if self.current_type.parent is not None:
+                try:
+                    parent_method = self.current_type.parent.get_method(
+                        self.current_method.name
+                    )
+                    if parent_method != self.current_method:
+                        self.errors.append(
+                            errors.WrongSignatureError(
+                                node.lineno, node.columnno, parent_method.name
+                            )
+                        )
+                except semantic.SemanticError as e:
+                    self.errors.append(
+                        errors.SemanticError(node.lineno, node.columnno, e)
+                    )
+
+            self.current_method = None
+            return type_checked.CoolMethodDeclNode(
+                node.lineno, node.columnno, node.method_info, body
+            )
 
     @visitor.when(type_built.CoolDispatchNode)
     def visit(self, node, scope):  # noqa: F811
@@ -320,7 +326,7 @@ class TypeCheckerVisitor:
         first = True
         case_branches = [self.visit(branch, scope) for branch in node.case_branches]
 
-        for branch in node.case_branches:
+        for branch in case_branches:
             static_type = branch.type
 
             if first:
@@ -345,7 +351,7 @@ class TypeCheckerVisitor:
         new_scope.define_variable(node.id, typex)
         _case_exp = self.visit(node.expr, new_scope)
         return type_checked.CoolCaseBranchNode(
-            node.lineno, node.columnno, node.id, node.type, _case_exp
+            node.lineno, node.columnno, node.id, typex, _case_exp
         )
 
     @visitor.when(type_built.CoolBlockNode)
