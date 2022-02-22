@@ -1,6 +1,6 @@
 import sys
 import os
-import ast_print
+import ast_cool_print
 import type_collector
 import type_builder
 import type_checker

@@ -1,5 +1,5 @@
 import utils.visitor as visitor
-from ast_hierarchy import *
+from ast_cool_hierarchy import *
 from utils.semantic import SemanticError, Context, BasicTypes
 from utils.semantic import (
     ObjType,
