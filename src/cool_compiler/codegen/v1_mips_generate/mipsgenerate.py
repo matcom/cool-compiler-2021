@@ -49,13 +49,14 @@ class MipsGenerate:
         for expr in node.expr:
             new_func.cmd += self.visit(expr)
 
-        self.new_program.func[node.name] = new_func
+        self.new_program.func[new_func.name] = new_func
 
     @visitor.when(AST.Param)
     def visit(self, node: AST.Param):
         self.stack_pointer += 4
         self.local_stack_pointer += 4
         self.stack_dir[node.x] = self.stack_pointer
+        return []
 
     @visitor.when(AST.Local)
     def visit(self, node: AST.Local):
@@ -130,6 +131,7 @@ class MipsGenerate:
         memory_dest = node.x
         data_label = node.y
         
+        self.new_program.data[data_label] = ASTR.Data('word', data_label, self.cil_data[data_label].value)
         stack_plus = self.stack_dir[memory_dest]
 
         return [

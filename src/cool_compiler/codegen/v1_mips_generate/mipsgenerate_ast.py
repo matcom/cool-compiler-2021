@@ -1,17 +1,13 @@
-from cProfile import label
-from webbrowser import Opera
-
-
 class Program:
     def __init__(self) -> None:
         self.data = {}
         self.func = {}
     
     def __str__(self) -> str:
-        result = ".data"
+        result = ".data\n"
 
         for key in self.data.keys():
-            result += str(self.data[key]) + '\n'
+            result += str(self.data[key]) + '\n\n'
         
         result += '.text\n.globl main\n'
         result += str(self.func['main']) + '\n'
@@ -29,7 +25,8 @@ class Data:
         self.value = value
     
     def __str__(self) -> str:
-        return f'{self.name}: .{self.type} {self.value}'
+        if self.value[-1] == '\n': self.value = self.value[0:-1]
+        return f'{self.name}: .{self.type} \"{str(self.value)}\"'
 
 class Func:
     def __init__(self, name, list_cmd= []) -> None:
