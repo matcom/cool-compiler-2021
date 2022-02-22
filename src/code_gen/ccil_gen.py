@@ -1,14 +1,14 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from code_gen.tools import *
 
 
 # All operations that define an expression and where it is stored
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
-CLASS_VISITOR_RESULT = Tuple[ClassNode, List[MethodNode]]
-METHOD_VISITOR_RESULT = MethodNode
+CLASS_VISITOR_RESULT = Tuple[Class, List[FunctionNode]]
+METHOD_VISITOR_RESULT = FunctionNode
 
 USER = "user"
 ATTR = "attr"
@@ -20,8 +20,8 @@ class CCILGenerator:
     """
 
     def __init__(self) -> None:
-        self.types: List[Class] = list()
         self.time_record: Dict[str, int] = dict()
+        self.locals: Dict[str, str]
 
     @visitor.on("node")
     def visit(self, _):
@@ -29,8 +29,8 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ProgramNode)
     def visit(self, node: sem_ast.ProgramNode) -> None:
-        program_types: List[ClassNode] = list()
-        program_codes: List[MethodNode] = list()
+        program_types: List[Class] = list()
+        program_codes: List[Method] = list()
         for type in node.declarations:
             classx, class_code = self.visit(type)
             program_types.append(classx)
@@ -38,24 +38,39 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
+        # Class Properties
         attributes: List[Attribute] = list()
         methods: List[Method] = list()
-
-        class_code: List[MethodNode] = list()
         init_attr_ops: List[OperationNode] = list()
 
+        # Code in this class
+        class_code: List[FunctionNode] = list()
+
+        attr_nodes = []
+        func_nodes = []
         for feature in node.features:
             if isinstance(feature, sem_ast.AttrDeclarationNode):
-                attributes.append(Attribute(ATTR + feature.id, feature.type.name))
-                (attr_ops, _) = self.visit(feature)
-                init_attr_ops += attr_ops
+                attr_nodes.append(feature)
             else:
-                methods.append(feature.id)
-                method_node = self.visit(feature)
-                class_code.append(method_node)
+                func_nodes.append(feature)
+
+        # Explore all attributes and join their operations in an initializer function
+        self.locals = dict()
+        operations = []
+        for attr in attr_nodes:
+            attributes.append(Attribute(ATTR + attr.id, attr.type.name))
+            (attr_ops, attr_fval) = self.visit(attr)
+            operations += attr_ops
+        # Return type is set as itself? Use selftype maybe?
+        init_func = FunctionNode(node, f"init_{node.id}", [], self.locals, operations, node.id)
+
+        # Explore all methods
+        for func in func_nodes:
+            ccil_func = self.visit(func)
+            methods.append(Method("some id", ccil_func))
 
         return (
-            ClassNode(attributes, methods, init_attr_ops),
+            Class(attributes, methods, init_func),
             class_code,
         )
 
@@ -81,7 +96,8 @@ class CCILGenerator:
         (expr_op, _) = self.visit(node.body)
 
         operations += expr_op
-        return MethodNode(node, node.id, operations)
+        func_node = FunctionNode()
+        return MethodNode(node, node.id, expr_op)
 
     @visitor.when(sem_ast.BlocksNode)
     def visit(self, node: sem_ast.BlocksNode) -> VISITOR_RESULT:
@@ -150,10 +166,12 @@ class CCILGenerator:
         pre_fvalue_id = f"if_{times}_pre_fv"
         then_fval.id = else_fval.id = pre_fvalue_id
         fvalue_id = f"if_{times}_fv"
-        fvalue_local = LocalNode(node, fvalue_id, node.type.id)
         fvalue = create_assignation(node, fvalue_id, pre_fvalue_id)
 
-        return ([fvalue_local, *if_ops, if_false, *then_ops, else_label, *else_ops, fvalue], fvalue)
+        return (
+            [fvalue_local, *if_ops, if_false, *then_ops, else_label, *else_ops, fvalue],
+            fvalue,
+        )
 
     @visitor.when(sem_ast.CaseNode)
     def visit(self, node: sem_ast.CaseNode) -> VISITOR_RESULT:
@@ -332,19 +350,22 @@ class CCILGenerator:
         # Translate all call arguments to ccil
         # Name all fvalues as ARG <result>
         args_ops: List[OperationNode] = []
-        args: List[ArgNode] = []
+        args: List[StorageNode] = []
         for arg_expr in node.args:
             (arg_op, arg_fval) = self.visit(arg_expr)
             args_ops += arg_op
-            args += [ArgNode(arg_expr, arg_fval.id)]
+            args += [arg_fval]
 
+        # id(arg1, arg2, ..., argn)
         if node.expr is None:
             fval_id = f"call_{times}"
             call = create_call(node, fval_id, node.id)
             return [*args_ops, *args, call], call
 
+        # <expr>.id(arg1, arg2, ..., argn)
         (expr_ops, expr_fval) = self.visit(node.expr)
 
+        # <expr>@type.id(arg1, arg2, ..., argn)
         type_idx: str = (
             node.expr.type.name if node.at_type is None else node.at_type.name
         )
