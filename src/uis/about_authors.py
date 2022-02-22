@@ -1,11 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file './uis/about_authors.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.2
+#
+# WARNING! All changes made in this file will be lost!
+
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_AboutAuthors(object):
     def setupUi(self, AboutAuthors):
         AboutAuthors.setObjectName("AboutAuthors")
         AboutAuthors.resize(871, 709)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../imgs/Qt.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./uis/../../img/icons/python.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         AboutAuthors.setWindowIcon(icon)
         self.gridLayout = QtWidgets.QGridLayout(AboutAuthors)
         self.gridLayout.setObjectName("gridLayout")
@@ -62,3 +72,13 @@ class Ui_AboutAuthors(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:6pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; color:#005500;\"> </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; font-weight:600; color:#000000;\">Date :</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">2021</span></p></body></html>"))
         self.label.setText(_translate("AboutAuthors", "<html><head/><body><p align=\"center\">About Authors</p></body></html>"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    AboutAuthors = QtWidgets.QDialog()
+    ui = Ui_AboutAuthors()
+    ui.setupUi(AboutAuthors)
+    AboutAuthors.show()
+    sys.exit(app.exec_())
