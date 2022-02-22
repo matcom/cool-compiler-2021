@@ -41,6 +41,7 @@
 - [x] At @
 - [x] Llamado dinamico self type
 - [ ] Llamar al __init del padre en el __init de los hijos.
+- [ ] Cuando se hace abort se tiene que escribir un mensaje desde donde se hizo abort. Mirar is_prime en los ejemplos
 - [ ] case of
 - [ ] Implementar igual para Strings en MIPS
 - [ ] Atributos con igual nombre en clases heredadas, tienen que diferenciarse, o no, ver bien esto
