@@ -100,3 +100,36 @@ class Type:
 
     def bypass(self):
         return False
+
+class ErrorType(Type):
+    def __init__(self):
+        Type.__init__(self, '<error>')
+
+    def conforms_to(self, other):
+        return True
+
+    def bypass(self):
+        return True
+
+    def __eq__(self, other):
+        return isinstance(other, Type)
+
+class VoidType(Type):
+    def __init__(self):
+        Type.__init__(self, '<void>')
+
+    def conforms_to(self, other):
+        raise Exception('Invalid type: void type.')
+
+    def bypass(self):
+        return True
+
+    def __eq__(self, other):
+        return isinstance(other, VoidType)
+
+class SELF_TYPE(Type):
+    def __init__(self):
+        Type.__init__(self, "SELF_TYPE")
+
+    def __eq__(self, other):
+        return isinstance(other, SELF_TYPE)
