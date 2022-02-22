@@ -5,6 +5,18 @@ result = '@result'
 self_name = 'self'
 super_value = '<value>'
 
+class StackData:
+    def __init__(self, x = None) -> None:
+        self.x = x
+
+    def __str__(self) -> str:
+        return self.x
+
+class Local(StackData):
+    pass
+
+class Param(StackData):
+    pass
 
 class Node:
     def get_pos_to_error(self, lineno, index):
@@ -43,8 +55,8 @@ class Program(Node):
 
     def add_data(self, name, value):
         index = 0
-        while f'{name}@{index}' in self.data_list: index += 1 
-        self.data_list.append(f'{name}@{index}')
+        while f'{name}_{index}' in self.data_list: index += 1 
+        self.data_list.append(f'{name}_{index}')
         self.data[self.data_list[-1]] = Data(self.data_list[-1], value)
         return self.data_list[-1]
         
@@ -125,27 +137,27 @@ class Function(Node):
     def force_local(self,name, scope):
         scope.define_variable(name, name)
         self.var_dir[name] = 1
-        self.local.append(name)
+        self.local.append(Local(name))
         return name
 
     def force_parma(self,name, scope):
         self.var_dir[name] = 1
         scope.define_variable(name, name)
-        self.param.append(name)
+        self.param.append(Param(name))
         return name
 
     def param_push(self, name, scope):
         new_name = self.get_name(name)
         scope.define_variable(name, new_name)
         self.var_dir[new_name] = 1
-        self.param.append(new_name)
+        self.param.append(Param(new_name))
         return new_name
     
     def local_push(self, name, scope):
         new_name = self.get_name(name)
         scope.define_variable(name, new_name)
         self.var_dir[new_name] = 1
-        self.local.append(new_name)
+        self.local.append(Local(new_name))
         return new_name
     
     def expr_push(self, expr):
@@ -257,7 +269,7 @@ class ALLOCATE(Expression):
 class NegAssing(Expression):
     pass
 
-class IfGoTo(Exception):
+class IfGoTo(Expression):
     pass
 
 class GoTo(Expression):
@@ -279,8 +291,3 @@ class Complemnet(Expression):
     pass
 
 
-class Local(Expression):
-    pass
-
-class Param(Expression):
-    pass
