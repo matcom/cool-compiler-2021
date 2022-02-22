@@ -141,19 +141,19 @@ class TypeCheckerVisitor:
                 )
 
             if self.current_type.parent is not None:
+                parent_method = None
                 try:
                     parent_method = self.current_type.parent.get_method(
                         self.current_method.name
                     )
-                    if parent_method != self.current_method:
-                        self.errors.append(
-                            errors.WrongSignatureError(
-                                node.lineno, node.columnno, parent_method.name
-                            )
-                        )
                 except semantic.SemanticError as e:
+                    pass
+
+                if parent_method is not None and parent_method != self.current_method:
                     self.errors.append(
-                        errors.SemanticError(node.lineno, node.columnno, e)
+                        errors.WrongSignatureError(
+                            node.lineno, node.columnno, self.current_method.name
+                        )
                     )
 
             self.current_method = None
