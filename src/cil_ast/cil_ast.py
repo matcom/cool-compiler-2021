@@ -17,6 +17,10 @@ class TypeNode(Node):
     def attributes(self):
         return self.attrs.keys()
 
+    @property
+    def attributes(self):
+        return self.attrs.keys()
+
 class DataNode(Node):
     def __init__(self, vname, value):
         self.name = vname
@@ -71,6 +75,18 @@ class DivNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
+class EqualNode(BinaryOperatorNode):
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
+
+class LessNode(BinaryOperatorNode):
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
+
+class LeqNode(BinaryOperatorNode):
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
+
 class GetAttribNode(InstructionNode):
     def __init__(self, dest, inst, attr):
         self. dest = dest
@@ -117,6 +133,17 @@ class IsTypeNode(InstructionNode):
         self.type_name = type_name
 
 class ParentTypeNode(Node):
+    def __init__(self, dest, type_obj):
+        self.dest = dest
+        self.type_obj = type_obj
+
+class IsTypeNode(InstructionNode):
+    def __init(self, dest, type_obj, type_name):
+        self.dest = dest
+        self.type_obj = type_obj
+        self.type_name = type_name
+
+class ParentTypeNode(InstructionNode):
     def __init__(self, dest, type_obj):
         self.dest = dest
         self.type_obj = type_obj
@@ -209,6 +236,3 @@ class PrintNode(InstructionNode):
 class IntNode(InstructionNode):
     def __init_(self, value):
         self.value = value
-
-# ParentTypeNode
-# TypeFunctionNode

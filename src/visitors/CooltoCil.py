@@ -19,6 +19,10 @@ class BaseCOOLToCILVisitor:
         self.attrs = {}#set()
         self.parameters = set()
         self.instances = []
+    
+    def transform_keys(self, xtype, keys):
+        for i,key in enumerate(keys):
+            xtype.attrs[key] = i
 
     def transform_to_keys(self, xtype, keys):
         for i, key in enumerate(keys):
@@ -535,7 +539,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             next_label = self.define_internal_local()
             
             condition = self.define_internal_local()
-            self.register_instruction(cil.IsTypeNode( condition, obj_type, case_type))
+            self.register_instruction(cil.IsTypeNode(condition, obj_type, case_type))
             self.register_instruction(cil.GotoIfNode(current_label, condition))
             
             self.register_instruction(cil.GotoNode(next_label))
@@ -552,8 +556,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(next_label)
         
         var = self.define_internal_local()
-        self.register_instruction(cil.ParentTypeNode( var, obj_type))
-        self.register_instruction(cil.AssignNode( obj_type, var))
+        self.register_instruction(cil.ParentTypeNode(var, obj_type))
+        self.register_instruction(cil.AssignNode(obj_type, var))
 
         self.register_instruction(cil.GotoNode(start_case_label))
         
