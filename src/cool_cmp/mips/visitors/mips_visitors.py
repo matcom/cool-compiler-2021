@@ -651,10 +651,11 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         type_name = None
         if node.type[0].isupper(): # Is a Type name
             type_name = node.type
-        else: # Is a variable name
+        elif node.base_type: # Is a variable name or SELF_TYPE
             type_name = node.base_type.name
 
         self._load_type_variable(Reg.t(0), node.type) # t0 = TypeAddress
+        # Override of methods leave the new method in the same position as the overriden method 
         offset = next(offset * self.WORD_SIZE + self.TO_METHODS_OFFSET for offset, (cool_method,cil_method) in enumerate(self.type_method_dict_list[type_name]) if cool_method == node.method)
         self.add_instruction(LoadWordNode(Reg.t(0), offset, Reg.t(0))) # t0 = method direction
         self.add_instruction(JumpAndLinkNode("__get_ra"))
