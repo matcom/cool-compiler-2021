@@ -76,20 +76,20 @@ class ArithmeticNode(InstructionNode):
         self.right = right
 
 class PlusNode(ArithmeticNode):
-    def __init__(self, dest, left, right, row, column, comment=None) -> None:
-        super().__init__(dest,left,right,row,column,comment=None)
+    pass
+
 
 class MinusNode(ArithmeticNode):
-    def __init__(self, dest, left, right, row, column, comment=None) -> None:
-        super().__init__(dest,left,right,row,column,comment=None)
+    pass
+
 
 class StarNode(ArithmeticNode):
-    def __init__(self, dest, left, right, row, column, comment=None) -> None:
-        super().__init__(dest,left,right,row,column,comment=None)
+    pass
+
 
 class DivNode(ArithmeticNode):
-    def __init__(self, dest, left, right, row, column, comment=None) -> None:
-        super().__init__(dest,left,right,row,column,comment=None)
+    pass
+
 
 class GetAttribNode(InstructionNode):
     def __init__(self, source, attr, dest, attribute_index, row, column, comment=None) -> None:
@@ -141,7 +141,8 @@ class TypeOfNode(InstructionNode):
         self.dest = dest
 
 class TypeNameNode(InstructionNode):
-    def __init__(self, typex, dest) -> None:
+    def __init__(self, typex, dest, row, column, comment=None) -> None:
+        super().__init__(row,column,comment)
         self.type = typex
         self.dest = dest
 

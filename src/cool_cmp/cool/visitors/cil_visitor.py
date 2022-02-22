@@ -742,7 +742,7 @@ class COOLToCILVisitor():
 
     def define_internal_local(self, row, column, comment=None):
         vinfo = VariableInfo('internal', None)
-        return self.register_local(vinfo)
+        return self.register_local(vinfo, row, column, comment)
 
     def define_label(self, row, column, comment=None):
         m = min([i+1 for i,s in enumerate(self.current_function.name) if s == "_"],default=len(self.current_function.name)-1)
@@ -846,7 +846,7 @@ class COOLToCILVisitor():
 
     def create_empty_methods(self, typex, dottype, row, column, comment=None):
         if typex.parent:
-            self.create_empty_methods(typex.parent, dottype)
+            self.create_empty_methods(typex.parent, dottype, row, column, comment)
         
         for m in typex.methods:
             name = self.to_function_name(m.name, typex.name)
@@ -926,9 +926,9 @@ class COOLToCILVisitor():
             
             # Calling function in type init function
             self.current_function = init_function
-            dest = self.define_internal_local()
+            dest = self.define_internal_local(row=attr.node.row, column=attr.node.column, comment="Attribute value destination")
             self.register_instruction(cil.ArgNode('self',node.row, node.column, "arg node"))
-            self.register_instruction(cil.StaticCallNode(new_function.name, dest, node.row, node.column, "static call node"))
+            self.register_instruction(cil.StaticCallNode(new_function.name, dest, node.row, node.column, "Initialize arg function"))
 
         self.register_instruction(cil.ReturnNode('self',node.row, node.column, "return node")) # Returning created instance
 
@@ -1039,7 +1039,7 @@ class COOLToCILVisitor():
             value = self.visit(arg_node,scope)
             args.append(value)
             
-        result = self.define_internal_local()
+        result = self.define_internal_local(node.row, node.column, comment=f"Result value of function {node.id}")
         
         self.register_instruction(cil.ArgNode(obj_value, node.row, node.column, "Call Node")) # self
         for arg,value in zip(method.param_names,args):
@@ -1090,7 +1090,7 @@ class COOLToCILVisitor():
     def visit(self, node:CheckNode, scope, check_value):
         scope = node.scope
         local = scope.find_variable(node.id)
-        cil_local = self.register_local(local, node.row, node.column, "Check Node")) 
+        cil_local = self.register_local(local, node.row, node.column, "Check Node") 
         self.register_instruction(cil.AssignNode(cil_local, check_value, node.row, node.column, "Check Node"))
         result = self.visit(node.expr, scope)
         return result
@@ -1440,7 +1440,7 @@ class COOLToCILVisitor():
         
     @visitor.when(SpecialNode)
     def visit(self, node, scope=None):
-        return self.visit(node.cil_node_type(), scope)
+        return self.visit(node.cil_node_type(row=node.row, column=node.column), scope)
 
     # META INSTRUCTIONS ONLY USED IN CODE
     # TRANSLATION THAT DOESN'T BELONG TO CIL'S
@@ -1460,7 +1460,7 @@ class COOLToCILVisitor():
     @visitor.when(cil.ObjectTypeNameNode)
     def visit(self, node, scope=None):
         instance = self.params[0]
-        result = self.define_internal_local()
+        result = self.define_internal_local(row=node.row, column=node.column, comment=node.comment)
         self.register_instruction(cil.TypeOfNode(instance.name, result, node.row, node.column, "Object Type Name Node"))
         self.register_instruction(cil.TypeNameNode(result, result, node.row, node.column, "Object Type Name Node"))
         return result
