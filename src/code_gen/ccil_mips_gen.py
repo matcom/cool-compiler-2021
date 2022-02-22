@@ -51,7 +51,7 @@ class CCILToMIPSGenerator:
         reg_number = 4
         for param in node.params[:4]:
             register = RegisterNode(node, reg_number)
-            self.location[param] = register
+            self.location[param.id] = register
             reg_number += 1
         # TODO: params via stack (more than 4 parameters)
 
@@ -62,11 +62,15 @@ class CCILToMIPSGenerator:
     def visit(self, node: CallOpNode):
         return JumpAndLink(node, node.id)
 
+    @visit.when(VCallOpNode)
+    def visit(self, node: VCallOpNode)
+        pass
+
     def get_init_function(self, typex: str):
         for _type in self.types_table:
             if _type.id == typex:
                 return _type.init_operations
-        raise Exception("Method inicialization not found")
+        raise Exception("Type's function for inicialization not found")
 
     def get_method_index(self, typex: str, method: str) -> int:
         for _type in self.types_table:
