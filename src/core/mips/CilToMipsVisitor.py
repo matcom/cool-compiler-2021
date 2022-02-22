@@ -136,8 +136,6 @@ class CILToMIPSVisitor:
                 self.register_label(instruction.label, mips_label)
 
         instructions = []
-        if node.name == 'entry':
-            instructions.append(mips.MoveNode(mips.V1_REG, mips.GP_REG, 0, 0))
         instructions.extend(mips.push_register(mips.RA_REG, node.line, node.column))
         instructions.extend(mips.push_register(mips.FP_REG, line=node.line, column=node.column))
         instructions.append(mips.AdditionInmediateNode(mips.FP_REG, mips.SP_REG, 8, line=node.line, column=node.column))
