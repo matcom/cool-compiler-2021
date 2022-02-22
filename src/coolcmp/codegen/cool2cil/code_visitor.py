@@ -57,12 +57,10 @@ class DotCodeVisitor(CILVisitor):
                 for feature in class_.features:
                     if isinstance(feature, ast.FuncDeclarationNode) and feature.id == 'main':
                         self.add_function('entry')
+                        void = self.add_local('void', internal=False)
+                        self.add_inst(cil.AllocateNode('<void>', void))
                         main_scope = deepcopy(scope.get_tagged_scope('Main'))
-                        instance = self.add_local('instance')
-                        self.add_inst(cil.AllocateNode('Main', instance))
-                        for attr in (f for f in class_.features if isinstance(f, ast.AttrDeclarationNode)):
-                            expr_dest = self.visit(attr.expr, main_scope)
-                            self.add_inst(cil.SetAttrNode(instance, f'Main_{attr.id}', expr_dest))
+                        instance = self.visit(ast.InstantiateNode('Main'), main_scope)
                         result = self.add_local('result')
                         self.add_inst(cil.ArgNode(instance))
                         self.add_inst(cil.DynamicCallNode('Main', 'Main_main', result))
@@ -119,7 +117,6 @@ class DotCodeVisitor(CILVisitor):
     @visitor.when(ast.ClassDeclarationNode)
     def visit(self, node: ast.ClassDeclarationNode, scope: Scope):
         print('>>> class', node.id)
-        print(scope)
 
         self.current_type = node.id
         methods = (f for f in node.features if isinstance(f, ast.FuncDeclarationNode))
@@ -129,7 +126,6 @@ class DotCodeVisitor(CILVisitor):
     @visitor.when(ast.FuncDeclarationNode)
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
         print('>>> method', node.id)
-        print(scope)
         self.add_function()
 
         for local in scope.all_locals():
@@ -280,9 +276,8 @@ class DotCodeVisitor(CILVisitor):
         type_node = self.root.get_type(node.lex)
         for attr in type_node.attributes:
             attr_expr = type_node.get_attr_node(attr)
-            if attr_expr is not None:
-                attr_dest = self.visit(attr_expr, scope)
-                self.add_inst(cil.SetAttrNode(instance, attr, attr_dest))
+            attr_dest = self.visit(attr_expr, scope)
+            self.add_inst(cil.SetAttrNode(instance, attr, attr_dest))
         return instance
 
     @visitor.when(ast.StringNode)

@@ -27,6 +27,11 @@ class DotTypesDataVisitor(CILVisitor):
         for class_ in node.declarations:
             self.visit(class_)
 
+        # add default types
+        self.root.dot_types = [
+            cil.TypeNode('<void>', [], {}),
+        ] + self.types
+
         return self.root
 
     @visitor.when(ast.ClassDeclarationNode)
@@ -34,9 +39,11 @@ class DotTypesDataVisitor(CILVisitor):
         type_ = self.context.get_type(node.id)
         type_attributes: list[str] = []
         type_methods: dict[str, str] = {}
+        type_node = cil.TypeNode(type_.name, type_attributes, type_methods)
 
         for attr, _ in type_.all_attributes():
             type_attributes.append(f'{type_.name}_{attr.name}')
+            type_node.add_attr_node(f'{node.id}_{attr.name}', attr.node)
 
         for meth, owner in type_.all_methods():
             if owner.name in ('Object', 'IO', 'String', ):
@@ -45,12 +52,9 @@ class DotTypesDataVisitor(CILVisitor):
                 func_target = f'f{self.next_function_id}'
             type_methods[f'{node.id}_{meth.name}'] = func_target
 
-        type_node = cil.TypeNode(type_.name, type_attributes, type_methods)
         self.types.append(type_node)
 
         for feature in node.features:
-            if isinstance(feature, ast.AttrDeclarationNode):
-                type_node.add_attr_node(f'{node.id}_{feature.id}', feature.expr)
             self.visit(feature)
 
     @visitor.when(ast.AttrDeclarationNode)

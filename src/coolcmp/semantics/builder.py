@@ -3,7 +3,7 @@ from __future__ import annotations
 from coolcmp import errors as err
 from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode, \
     IntegerNode, StringNode, BooleanNode, VariableNode
-from coolcmp.utils.semantic import SemanticError, Context, ErrorType, Type
+from coolcmp.utils.semantic import SemanticError, Context, ErrorType, Type, VoidType
 from coolcmp.utils import visitor
 
 
@@ -25,6 +25,11 @@ class TypeBuilder:
     def visit(self, node: ProgramNode):
         for declaration in node.declarations:
             self.visit(declaration)
+
+        # self.context.get_type('Object').define_attribute('void', VoidType)
+        # void_attr = AttrDeclarationNode('void', '<void>', VariableNode('void'))
+        # object_class = ClassDeclarationNode('Object', [void_attr])
+        # node.declarations.append(object_class)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode):
@@ -97,6 +102,7 @@ class TypeBuilder:
                 node.expr = VariableNode('void')
 
         try:
-            self.current_type.define_attribute(node.id, attr_type, self.current_type.name)
+            self.current_type.define_attribute(
+                node.id, attr_type, node.expr or VariableNode('void'), self.current_type.name)
         except SemanticError:
             self.errors.append(err.ATTRIBUTE_ALREADY_DEFINED % (node.pos, node.id, self.current_type.name))

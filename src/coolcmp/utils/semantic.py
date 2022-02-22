@@ -2,6 +2,8 @@ from __future__ import annotations
 import itertools as itt
 from collections import OrderedDict
 
+from . import ast
+
 
 class SemanticError(Exception):
     @property
@@ -10,9 +12,10 @@ class SemanticError(Exception):
 
 
 class Attribute:
-    def __init__(self, name: str, typex: Type):
+    def __init__(self, name: str, typex: Type, node: ast.ExpressionNode):
         self.name = name
         self.type = typex
+        self.node = node
 
     def __str__(self) -> str:
         return f'[attrib] {self.name} : {self.type.name};'
@@ -63,11 +66,11 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
 
-    def define_attribute(self, name: str, typex: Type, from_class: str = None) -> Attribute:
+    def define_attribute(self, name: str, typex: Type, attr_node: ast.ExpressionNode, from_class: str = None) -> Attribute:
         try:
             self.get_attribute(name, from_class)
         except SemanticError:
-            attribute = Attribute(name, typex)
+            attribute = Attribute(name, typex, attr_node)
             self.attributes.append(attribute)
             return attribute
         else:

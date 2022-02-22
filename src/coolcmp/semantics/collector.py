@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from coolcmp import errors as err
-from coolcmp.utils import visitor
-from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode
+from coolcmp.utils import visitor, ast
 from coolcmp.utils.semantic import Context, SemanticError, IntType, VoidType, ErrorType
 
 
@@ -15,8 +14,8 @@ class TypeCollector(object):
     def visit(self, node):
         pass
 
-    @visitor.when(ProgramNode)
-    def visit(self, node: ProgramNode):
+    @visitor.when(ast.ProgramNode)
+    def visit(self, node: ast.ProgramNode):
         self.context = Context()
 
         # Default types definition
@@ -37,7 +36,7 @@ class TypeCollector(object):
         bool_.set_parent(object_)
 
         # Default types attributes
-        object_.define_attribute('void', void)
+        object_.define_attribute('void', void, ast.VariableNode('void'))
 
         # Default types methods
         object_.define_method('abort', [], [], object_)
@@ -56,8 +55,8 @@ class TypeCollector(object):
         for declaration in node.declarations:
             self.visit(declaration)
 
-    @visitor.when(ClassDeclarationNode)
-    def visit(self, node: ClassDeclarationNode):
+    @visitor.when(ast.ClassDeclarationNode)
+    def visit(self, node: ast.ClassDeclarationNode):
         try:
             self.context.create_type(node.id)
         except SemanticError:

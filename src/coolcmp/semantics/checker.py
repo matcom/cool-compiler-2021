@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from coolcmp import errors as err
 from coolcmp.utils import visitor
-from coolcmp.utils.semantic import Context, Method, Type, SemanticError, ErrorType, Scope
+from coolcmp.utils.semantic import Context, Method, Type, SemanticError, ErrorType, VoidType, Scope
 from coolcmp.utils.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode, BlockNode, \
     LetNode, CaseNode, AssignNode, ConditionalNode, WhileNode, CallNode, VariableNode, InstantiateNode, IntegerNode, \
     StringNode, BooleanNode, PlusNode, MinusNode, StarNode, DivNode, LessThanNode, LessEqualNode, EqualNode, \
@@ -23,6 +23,7 @@ class TypeChecker:
     @visitor.when(ProgramNode)
     def visit(self, node: ProgramNode, scope: Scope = None):
         scope = Scope('Object')
+        scope.define_variable('void', VoidType())
 
         for attr in self.context.get_type('Object').attributes:
             scope.define_variable(attr.name, attr.type, is_attr=True)
