@@ -1,44 +1,77 @@
 from cmp.cil import *
 
+################################################################################
+# META INSTRUCTIONS
+
 class ObjectAbortNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
 
 class ObjectCopyNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
         
 class ObjectTypeNameNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
 
 class StringLengthNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
         
 class StringConcatNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
 
 class StringSubstringNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
 
 class IOOutStringNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
         
 class IOOutIntNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
         
 class IOInStringNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
         
 class IOInIntNode(InstructionNode):
-    pass
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
 
-class UnaryArithmeticNode(InstructionNode):
-    def __init__(self, dest, value) -> None:
-        self.dest = dest
-        self.value = value
+################################################################################
+
+
+################################################################################
+# OTHER INSTRUCTIONS
 
 class GetFatherNode(InstructionNode):
-    def __init__(self, dest, type) -> None:
+    def __init__(self, dest, variable,row, column, comment=None)-> None:
+        super().__init__(row, column, comment)
         self.dest = dest
-        self.type = type
+        self.variable = variable
+
+
+class VoidNode(InstructionNode):
+    def __init__(self, dest, row, column, comment=None)-> None:
+        super().__init__(row, column, comment)
+        self.dest = dest
+
+################################################################################
+
+
+################################################################################
+# ARITHMETIC INSTRUCTIONS
+
+class UnaryArithmeticNode(InstructionNode):
+    def __init__(self, dest, value, row, column, comment=None)-> None:
+        super().__init__(row, column, comment)
+        self.dest = dest
+        self.value = value
 
 class NotNode(UnaryArithmeticNode):
     pass
@@ -46,17 +79,20 @@ class NotNode(UnaryArithmeticNode):
 class EqualNode(ArithmeticNode):
     pass
 
+
 class GreaterNode(ArithmeticNode):
     pass
+
 
 class LesserNode(ArithmeticNode):
     pass
 
-class VoidNode(InstructionNode):
-    def __init__(self, dest) -> None:
-        self.dest = dest
+
+################################################################################
+
 
 class InitInstance(InstructionNode): # TODO Add to META MIPS Section
-    def __init__(self, source, instance_type) -> None:
+    def __init__(self, source, instance_type, row, column, comment=None)-> None:
+        super().__init__(row, column, comment)
         self.source = source
         self.instance_type = instance_type

@@ -4,4 +4,5 @@ class Main inherits IO
     {
         out_string("Hello ".concat("World!"))
     };
+
 };
