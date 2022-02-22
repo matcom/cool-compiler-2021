@@ -31,11 +31,11 @@ class CoolMethodDeclNode(type_built.CoolMethodDeclNode):
     pass
 
 
-class CoolLetDeclNode(base.CoolLetDeclNode):
+class CoolLetDeclNode(type_built.CoolLetDeclNode):
     pass
 
 
-class CoolCaseBranchNode(base.CoolCaseBranchNode):
+class CoolCaseBranchNode(type_built.CoolCaseBranchNode):
     pass
 
 

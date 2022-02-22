@@ -265,45 +265,9 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):  # noqa: F811
         let_scope = scope.create_child()
 
-        decl_list = []
+        decl_list = [self.visit(decl, let_scope) for decl in node.decl_list]
 
-        for idx, _type, expx in node.decl_list:
-            try:
-                typex = self.get_type(_type)
-            except semantic.SemanticError as e:
-                typex = ErrorType()
-                self.errors.append(
-                    errors.SemanticError(node.lineno, node.columnno, e.text)
-                )
-
-            if expx is None:
-                right_type = typex
-                decl_list.append(idx, _type, None)
-            else:
-                right_exp = self.visit(expx, scope)
-                right_type = right_exp.type
-                decl_list.append(idx, _type, right_exp)
-
-            if typex.name == "SELF_TYPE" and not right_type.conforms_to(
-                self.current_type
-            ):
-                self.errors.append(
-                    errors.IncompatibleTypesError(
-                        node.lineno,
-                        node.columnno,
-                        right_type.name,
-                        self.current_type.name,
-                    )
-                )
-
-            elif typex.name != "SELF_TYPE" and not right_type.conforms_to(typex):
-                self.errors.append(
-                    errors.IncompatibleTypesError(
-                        node.lineno, node.columnno, right_type.name, typex.name
-                    )
-                )
-
-            let_scope.define_variable(idx, typex)
+        # for idx, _type, expx in node.decl_list:
 
         exp = self.visit(node.expr, let_scope)
 
@@ -311,28 +275,51 @@ class TypeCheckerVisitor:
             node.lineno, node.columnno, decl_list, exp, exp.type
         )
 
+    @visitor.when(type_built.CoolLetDeclNode)
+    def visit(self, node, scope):  # noqa: F811
+        try:
+            typex = self.get_type(node.type)
+        except semantic.SemanticError as e:
+            typex = ErrorType()
+            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+
+        if node.expr is None:
+            right_type = typex
+            right_exp = None
+            # decl_list.append(idx, _type, None)
+        else:
+            right_exp = self.visit(node.expr, scope)
+            right_type = right_exp.type
+            # decl_list.append(idx, _type, right_exp)
+
+        if typex.name == "SELF_TYPE" and not right_type.conforms_to(self.current_type):
+            self.errors.append(
+                errors.IncompatibleTypesError(
+                    node.lineno, node.columnno, right_type.name, self.current_type.name,
+                )
+            )
+
+        elif typex.name != "SELF_TYPE" and not right_type.conforms_to(typex):
+            self.errors.append(
+                errors.IncompatibleTypesError(
+                    node.lineno, node.columnno, right_type.name, typex.name
+                )
+            )
+
+        scope.define_variable(node.id, typex)
+        return type_checked.CoolLetDeclNode(
+            node.lineno, node.columnno, node.id, right_type, right_exp
+        )
+
     @visitor.when(type_built.CoolCaseNode)
     def visit(self, node, scope):  # noqa: F811
         exp = self.visit(node.expr, scope)
         return_type = None
         first = True
-        case_branches = []
+        case_branches = [self.visit(branch, scope) for branch in node.case_branches]
 
-        for idx, _type, case_exp in node.case_branches:
-            try:
-                typex = self.get_type(_type)
-            except semantic.SemanticError as e:
-                typex = ErrorType()
-                self.errors.append(
-                    errors.SemanticError(node.lineno, node.columnno, e.text)
-                )
-
-            new_scope = scope.create_child()
-            new_scope.define_variable(idx, typex)
-            _case_exp = self.visit(case_exp, new_scope)
-            case_branches.append(idx, _type, _case_exp)
-
-            static_type = _case_exp.type
+        for branch in node.case_branches:
+            static_type = branch.type
 
             if first:
                 return_type = static_type
@@ -342,6 +329,21 @@ class TypeCheckerVisitor:
 
         return type_checked.CoolCaseNode(
             node.lineno, node.columnno, exp, case_branches, return_type
+        )
+
+    @visitor.when(type_built.CoolCaseBranchNode)
+    def visit(self, node, scope):  # noqa: F811
+        try:
+            typex = self.get_type(node.type)
+        except semantic.SemanticError as e:
+            typex = ErrorType()
+            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+
+        new_scope = scope.create_child()
+        new_scope.define_variable(node.id, typex)
+        _case_exp = self.visit(node.expr, new_scope)
+        return type_checked.CoolCaseBranchNode(
+            node.lineno, node.columnno, node.id, node.type, _case_exp
         )
 
     @visitor.when(type_built.CoolBlockNode)
@@ -383,7 +385,7 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolNotNode)
     def visit(self, node, scope):  # noqa: F811
-        exp = self.visit(node.exp, scope)
+        exp = self.visit(node.expr, scope)
         bool_type = self.get_type("Bool")
         if exp.type != bool_type:
             self.errors.append(
@@ -396,7 +398,7 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolTildeNode)
     def visit(self, node, scope):  # noqa: F811
-        exp = self.visit(node.exp, scope)
+        exp = self.visit(node.expr, scope)
         int_type = self.get_type("Int")
         if not exp.type.conforms_to(int_type):
             self.errors.append(
@@ -408,14 +410,14 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolIsVoidNode)
     def visit(self, node, scope):  # noqa: F811
-        exp = self.visit(node.exp, scope)
+        exp = self.visit(node.expr, scope)
         return type_checked.CoolIsVoidNode(
             node.lineno, node.columnno, exp, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolParenthNode)
     def visit(self, node, scope):  # noqa: F811
-        exp = self.visit(node.exp, scope)
+        exp = self.visit(node.expr, scope)
         return type_checked.CoolParenthNode(node.lineno, node.columnno, exp, exp.type)
 
     @visitor.when(type_built.CoolPlusNode)
