@@ -148,14 +148,14 @@ class IncompatibleTypesError(TypeError):
 class InvalidOperationError(TypeError):
     def __init__(self, line, column, type_a, type_b) -> None:
         TypeError.__init__(
-            self, line, column, f"invalid operation {type_a} between {type_b}."
+            self, line, column, f"invalid operation between {type_a} and {type_b}."
         )
 
 
 class InvalidComparissonError(TypeError):
     def __init__(self, line, column, type_a, type_b) -> None:
         TypeError.__init__(
-            self, line, column, f"invalid comparisson {type_a} between {type_b}."
+            self, line, column, f"invalid comparisson between {type_a} and {type_b}."
         )
 
 

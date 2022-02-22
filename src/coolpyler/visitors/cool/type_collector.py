@@ -67,6 +67,7 @@ class TypeCollectorVisitor(object):
                     node.lineno, 0, f"Type with name `{node.id}` already defined."
                 )
             )
+            return None
         except KeyError:
             type = self.types[node.id] = Type(node.id)
 

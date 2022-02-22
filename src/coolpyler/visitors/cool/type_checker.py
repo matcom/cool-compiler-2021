@@ -20,7 +20,7 @@ class TypeCheckerVisitor:
         try:
             return self.types[name]
         except KeyError:
-            raise semantic.SemanticError(f"Type `{name}` is not defined.")
+            raise semantic.TypeError(f"Type `{name}` is not defined.")
 
     def lowest_common_ancestor(self, type_1, type_2):
         object_type = self.get_type("Object")
@@ -58,8 +58,13 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):  # noqa: F811
         self.current_type = self.types[node.type.name]
+        scope.define_variable("self", self.current_type, force=True)
+
         for attr in self.current_type.attributes:
-            scope.define_variable(attr.name, attr.type)
+            try:
+                scope.define_variable(attr.name, attr.type)
+            except semantic.BaseSemanticError as e:
+                self.errors.append(e.with_pos(attr.linino, attr.columnno))
 
         features = [self.visit(feat, scope) for feat in node.features]
 
@@ -105,12 +110,14 @@ class TypeCheckerVisitor:
         if node.method_info is not None:
             self.current_method = self.current_type.get_method(node.method_info.name)
             method_scope = scope.create_child()
-            method_scope.define_variable("self", self.current_type)
 
             for pname, ptype in zip(
                 self.current_method.param_names, self.current_method.param_types
             ):
-                method_scope.define_variable(pname, ptype)
+                try:
+                    method_scope.define_variable(pname, ptype)
+                except semantic.BaseSemanticError as e:
+                    self.errors.append(e.with_pos(node.lineno, node.columnno))
 
             body = self.visit(node.body, method_scope)
 
@@ -146,8 +153,8 @@ class TypeCheckerVisitor:
                     parent_method = self.current_type.parent.get_method(
                         self.current_method.name
                     )
-                except semantic.SemanticError as e:
-                    pass
+                except semantic.BaseSemanticError as e:
+                    self.errors.append(e.with_pos(node.lineno, node.columnno))
 
                 if parent_method is not None and parent_method != self.current_method:
                     self.errors.append(
@@ -175,8 +182,8 @@ class TypeCheckerVisitor:
 
         try:
             method = exp.type.get_method(node.id)
-        except semantic.SemanticError as e:
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             return type_checked.CoolDispatchNode(
                 node.lineno, node.columnno, exp, node.id, args, ErrorType()
             )
@@ -216,8 +223,8 @@ class TypeCheckerVisitor:
         args = [self.visit(arg, scope) for arg in node.args]
         try:
             method = exp.type.get_method(node.id)
-        except semantic.SemanticError as e:
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             return type_checked.CoolStaticDispatchNode(
                 node.lineno,
                 node.columnno,
@@ -255,8 +262,8 @@ class TypeCheckerVisitor:
                         node.lineno, node.columnno, exp.type, static_type
                     )
                 )
-        except semantic.SemanticError as e:
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         return type_checked.CoolStaticDispatchNode(
             node.lineno,
@@ -286,9 +293,9 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):  # noqa: F811
         try:
             typex = self.get_type(node.type)
-        except semantic.SemanticError as e:
+        except semantic.BaseSemanticError as e:
             typex = ErrorType()
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         if node.expr == []:
             right_type = typex
@@ -314,7 +321,11 @@ class TypeCheckerVisitor:
                 )
             )
 
-        scope.define_variable(node.id, typex)
+        try:
+            scope.define_variable(node.id, typex)
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
+
         return type_checked.CoolLetDeclNode(
             node.lineno, node.columnno, node.id, right_type, right_exp
         )
@@ -343,12 +354,16 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):  # noqa: F811
         try:
             typex = self.get_type(node.type)
-        except semantic.SemanticError as e:
+        except semantic.BaseSemanticError as e:
             typex = ErrorType()
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         new_scope = scope.create_child()
-        new_scope.define_variable(node.id, typex)
+        try:
+            new_scope.define_variable(node.id, typex)
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
+
         _case_exp = self.visit(node.expr, new_scope)
         return type_checked.CoolCaseBranchNode(
             node.lineno, node.columnno, node.id, typex, _case_exp
@@ -375,14 +390,12 @@ class TypeCheckerVisitor:
                 errors.IsReadOnlyError(node.lineno, node.columnno, "self")
             )
 
-        var = scope.find_variable(node.id)
-        if var is None:
-            self.errors.append(
-                errors.VariableNotDefinedError(node.lineno, node.columnno, node.id)
-            )
-            var_type = ErrorType()
-        else:
+        try:
+            var = scope.find_variable(node.id)
             var_type = var.type
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
+            var_type = ErrorType()
 
         exp = self.visit(node.expr, scope)
         if not exp.type.conforms_to(var_type):
@@ -596,11 +609,10 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolVarNode)
     def visit(self, node, scope):  # noqa: F811
-        var = scope.find_variable(node.value)
-        if var is None:
-            self.errors.append(
-                errors.VariableNotDefinedError(node.lineno, node.columnno, node.value)
-            )
+        try:
+            var = scope.find_variable(node.value)
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             return type_checked.CoolVarNode(
                 node.lineno, node.columnno, node.value, ErrorType()
             )
@@ -616,8 +628,9 @@ class TypeCheckerVisitor:
 
         try:
             type = self.get_type(node.type_name)
-        except semantic.SemanticError as e:
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             return type_checked.CoolNewNode(node.lineno, node.columnno, ErrorType())
 
         return type_checked.CoolNewNode(node.lineno, node.columnno, type)
+

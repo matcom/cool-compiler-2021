@@ -1,6 +1,6 @@
 import coolpyler.ast.cool.type_built as type_built
 import coolpyler.ast.cool.type_collected as type_collected
-import coolpyler.errors as errors
+import coolpyler.errors as es
 import coolpyler.semantic as semantic
 import coolpyler.utils.visitor as visitor
 from coolpyler.semantic import ErrorType
@@ -18,7 +18,7 @@ class TypeBuilderVisitor:
         try:
             return self.types[name]
         except KeyError:
-            raise semantic.SemanticError(f"Type `{name}` is not defined.")
+            raise semantic.TypeError(f"Type `{name}` is not defined.")
 
     @visitor.on("node")
     def visit(self, node):
@@ -40,13 +40,13 @@ class TypeBuilderVisitor:
         if node.parent is not None:
             try:
                 parent_type = self.get_type(node.parent)
-            except semantic.SemanticError as e:
-                self.errors.append(errors.TypeError(node.lineno, node.columnno, e.text))
+            except semantic.BaseSemanticError as e:
+                self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         try:
             self.current_type.set_parent(parent_type)
-        except semantic.SemanticError as e:
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         # attr_info = self.current_type.define_attribute("self", self.current_type)
         # self_attr = type_built.CoolAttrDeclNode(
@@ -63,14 +63,14 @@ class TypeBuilderVisitor:
     def visit(self, node: type_collected.CoolAttrDeclNode):  # noqa: F811
         try:
             type = self.get_type(node.type)
-        except semantic.SemanticError as e:
-            self.errors.append(errors.TypeError(node.lineno, node.columnno, e.text))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             type = ErrorType()
 
         try:
             attr_info = self.current_type.define_attribute(node.id, type)
-        except semantic.SemanticError as e:
-            self.errors.append(errors.SemanticError(node.lineno, node.columnno, e.text))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             attr_info = None  # TODO: check
 
         body = self.visit(node.body) if node.body is not None else None
@@ -84,27 +84,23 @@ class TypeBuilderVisitor:
         for ptype_name in node.param_types:
             try:
                 ptype = self.get_type(ptype_name)
-            except semantic.SemanticError as error:
-                self.errors.append(
-                    errors.TypeError(node.lineno, node.columnno, error.text)
-                )
+            except semantic.BaseSemanticError as e:
+                self.errors.append(e.with_pos(node.lineno, node.columnno))
                 ptype = ErrorType()
             param_types.append(ptype)
 
         try:
             return_type = self.get_type(node.type)
-        except semantic.SemanticError as error:
-            self.errors.append(errors.TypeError(node.lineno, node.columnno, error.text))
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             return_type = ErrorType()
 
         try:
             method_info = self.current_type.define_method(
                 node.id, node.param_names, param_types, return_type,
             )
-        except semantic.SemanticError as error:
-            self.errors.append(
-                errors.SemanticError(node.lineno, node.columnno, error.text)
-            )
+        except semantic.BaseSemanticError as e:
+            self.errors.append(e.with_pos(node.lineno, node.columnno))
             method_info = None  # TODO: check
 
         body = self.visit(node.body)
