@@ -1,6 +1,6 @@
 from cool_compiler.cmp.visitor import result
 from .__dependency import CoolTypeBuildInManager, SemanticError, ErrorType, Type, Object, CoolError
-from .v2_semantic_checking.scope import Scope
+from ..cmp.scope import Scope
 
 class VisitBase:
     def __init__(self, error) -> None:

@@ -60,12 +60,15 @@ class Type(Node):
     def __init__(self, name) -> None:
         self.name = name 
         self.attributes = []
+        self.attr = {}
         self.method_list = []
         self.methods = {}
 
-    def attr_push(self, name):
+    def attr_push(self, name, _name):
         if not name in self.attributes:
             self.attributes.append(name)
+
+        self.attr[name] = _name
 
     def method_push(self, name, f):
         try: 
@@ -78,7 +81,7 @@ class Type(Node):
         result = f'type {self.name}: ' + '{\n'
 
         for  att in self.attributes:
-            result += '\tattribute ' + str(att) + '\n'
+            result += '\tattribute ' + str(att) + ' '*(15 - len(str(att))) +  '->  ' + str(self.attr[func]) + '\n'
         
         for  func in self.method_list:
             result += '\tfunction ' + str(func) + ' '*(15 - len(str(func))) +  '->  ' + str(self.methods[func]) + '\n'
@@ -119,25 +122,29 @@ class Function(Node):
             except KeyError:
                 return f'{name}@{index}'
 
-    def force_local(self,name):
-        self.var_dir[name] = name
+    def force_local(self,name, scope):
+        scope.define_variable(name, name)
+        self.var_dir[name] = 1
         self.local.append(name)
         return name
 
-    def force_parma(self,name):
-        self.var_dir[name] = name
+    def force_parma(self,name, scope):
+        self.var_dir[name] = 1
+        scope.define_variable(name, name)
         self.param.append(name)
         return name
 
-    def param_push(self, name):
+    def param_push(self, name, scope):
         new_name = self.get_name(name)
-        self.var_dir[name] = new_name
+        scope.define_variable(name, new_name)
+        self.var_dir[new_name] = 1
         self.param.append(new_name)
         return new_name
     
-    def local_push(self, name):
+    def local_push(self, name, scope):
         new_name = self.get_name(name)
-        self.var_dir[name] = new_name
+        scope.define_variable(name, new_name)
+        self.var_dir[new_name] = 1
         self.local.append(new_name)
         return new_name
     

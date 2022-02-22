@@ -5,7 +5,7 @@ from ...cmp import visitor
 from ..__dependency import SemanticError, Object, ErrorType, Int, Bool, Str
 from ..v1_create_type import create_type_ast as AST
 from . import semantic_checking_ast as ASTR
-from .scope import Scope
+from ...cmp.scope import Scope
 
 
 CoolInt = CoolTypeBuildInManager().find("Int")
