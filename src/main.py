@@ -6,6 +6,7 @@ from semantic.visitors.typeBuilder import TypeBuilder
 from semantic.visitors.typeChecker import TypeChecker
 from semantic.visitors.typeCollector import TypeCollector
 from semantic.visitors.varCollector import VarCollector
+from code_generator.COOLToCILVisitor import COOLToCILVisitor
 from utils.errors import SemanticError
 
 
@@ -17,6 +18,7 @@ def main(_input, _output):
     # Lexer
     lexer = CoolLexer()
     tokens = lexer.run(text)
+    
 
     # Parser
     parser = CoolParser(lexer)
@@ -61,11 +63,14 @@ def main(_input, _output):
 
     # Code Generation
 
+    coolToCIL = COOLToCILVisitor(context)
+    cilAST = coolToCIL.visit(ast, scope)
+
 
     # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":
 
-    path = '/home/cwjki/Projects/cool-compiler-2021/tests/semantic/arithmetic9.cl'
+    path = '/mnt/c/Users/Liviton/Desktop/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/semantic/arithmetic1.cl'
     _input = sys.argv[1] if len(sys.argv) > 1 else path
     _output = sys.argv[2] if len(sys.argv) > 2 else None
 
