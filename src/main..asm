@@ -32,33 +32,48 @@
 
 .text
 	function___init___at_Object:
-	
+		jr $ra
+		
 	function_abort_at_Object:
-	
+		jr $ra
+		
 	function_type_name_at_Object:
-	
+		jr $ra
+		
 	function_copy_at_Object:
-	
+		jr $ra
+		
 	function___init___at_IO:
-	
+		jr $ra
+		
 	function_out_string_at_IO:
-	
+		jr $ra
+		
 	function_out_int_at_IO:
-	
+		jr $ra
+		
 	function_in_string_at_IO:
-	
+		jr $ra
+		
 	function_in_int_at_IO:
-	
+		jr $ra
+		
 	function___init___at_S:
-	
+		jr $ra
+		
 	function_length_at_String:
-	
+		jr $ra
+		
 	function_concat_at_String:
-	
+		jr $ra
+		
 	function_substr_at_String:
-	
+		jr $ra
+		
 	function___init___at_Main:
-	
+		jr $ra
+		
 	function_main_at_Main:
-	
+		jr $ra
+		
 	main:

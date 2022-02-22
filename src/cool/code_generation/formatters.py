@@ -356,8 +356,23 @@ class MipsFormatter:
 
     @visitor.when(mips.ProgramNode)
     def visit(self, node: mips.ProgramNode):
+        def is_function_label(node: mips.InstructionNode):
+            return isinstance(node, mips.LabelNode) and (
+                node.name.startswith("function_") or node.name == "main"
+            )
+
         dotdata = "\n\t".join([self.visit(data) for data in node.dotdata])
-        dottext = "\n\t".join([self.visit(data) for data in node.dottext])
+
+        instructions = [
+            (
+                f"{self.visit(inst)}"
+                if is_function_label(inst)
+                else f"\t{self.visit(inst)}"
+            )
+            for inst in node.dottext
+        ]
+
+        dottext = "\n\t".join(instructions)
 
         return f".data\n\t{dotdata}\n\n.text\n\t{dottext}"
 

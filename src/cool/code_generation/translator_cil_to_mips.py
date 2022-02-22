@@ -71,6 +71,7 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
         self.register_instruction(mips.LabelNode(node.name))
+        self.register_instruction(mips.JumpRegisterNode("$ra"))
         self.register_empty_instruction()
 
 
