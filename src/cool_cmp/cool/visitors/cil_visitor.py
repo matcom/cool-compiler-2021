@@ -897,7 +897,7 @@ class COOLToCILVisitor():
         for declaration, child_scope in zip(node.declarations, scope.children):
             self.visit(declaration, child_scope)
 
-        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode, node.row, node.column, "Program Start")
+        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode, node.row, node.column)
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):

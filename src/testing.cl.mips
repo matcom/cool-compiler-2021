@@ -1,18413 +1,9089 @@
 # Generated MIPS
-
 .text 
-
-# Program Start
-
 __get_ra:
-
-# Program Start
-
 move $v0, $ra
-
-# Program Start
-
 addi $v0, $v0, 8
-
-# Program Start
-
 jr $ra
-
-# Program Start
-
 __copy:
-
-# Program Start
-
 move $t0, $a0
-
-# Program Start
-
 lw $t1, 0($t0)
-
-# Program Start
-
 lw $a0, 4($t1)
-
-# Program Start
-
 li $v0, 9
-
-# Program Start
-
 syscall
-
-# Program Start
-
 move $t1, $a0
-
-# Program Start
-
 srl $t1, $t1, 2
-
-# Program Start
-
 move $t3, $v0
-
-# Program Start
-
 __start_copy_loop:
-
-# Program Start
-
 ble $t1, $zero, __end_copy_loop
-
-# Program Start
-
 lw $t2, 0($t0)
-
-# Program Start
-
 sw $t2, 0($t3)
-
-# Program Start
-
 addi $t0, $t0, 4
-
-# Program Start
-
 addi $t3, $t3, 4
-
-# Program Start
-
 addi $t1, $t1, -1
-
-# Program Start
-
 j __start_copy_loop
-
-# Program Start
-
 __end_copy_loop:
-
-# Program Start
-
 jr $ra
-
-# Program Start
-
 __string_length:
-
-# Program Start
-
 li $v0, 0
-
-# Program Start
-
 __string_length_start_loop:
-
-# Program Start
-
 lb $t0, 0($a0)
-
-# Program Start
-
 beq $t0, $zero, __string_length_end_loop
-
-# Program Start
-
 addi $v0, $v0, 1
-
-# Program Start
-
 addi $a0, $a0, 1
-
-# Program Start
-
 j __string_length_start_loop
-
-# Program Start
-
 __string_length_end_loop:
-
-# Program Start
-
 jr $ra
-
-# Program Start
-
 __string_substring:
-
-# Program Start
-
 addi $sp, $sp, -16
-
-# Program Start
-
 sw $a0, 0($sp)
-
-# Program Start
-
 sw $a1, 4($sp)
-
-# Program Start
-
 sw $a2, 8($sp)
-
-# Program Start
-
 sw $ra, 12($sp)
-
-# Program Start
-
 jal __string_length
-
-# Program Start
-
 lw $a0, 0($sp)
-
-# Program Start
-
 lw $a1, 4($sp)
-
-# Program Start
-
 lw $a2, 8($sp)
-
-# Program Start
-
 lw $ra, 12($sp)
-
-# Program Start
-
 addi $sp, $sp, 16
-
-# Program Start
-
 bge $a1, $v0, __string_substring_abort
-
-# Program Start
-
 add $t0, $a1, $a2
-
-# Program Start
-
 bgt $t0, $v0, __string_substring_abort
-
-# Program Start
-
 blt $a2, $zero, __string_substring_abort
-
-# Program Start
-
 move $t1, $a0
-
-# Program Start
-
 addi $a0, $a2, 1
-
-# Program Start
-
 li $v0, 9
-
-# Program Start
-
 syscall
-
-# Program Start
-
 move $t2, $v0
-
-# Program Start
-
 addi $a0, $a0, -1
-
-# Program Start
-
 add $t1, $t1, $a1
-
 __string_substring_start_copy:
-
 ble $a0, $zero, __string_substring_end_copy
-
 lb $t3, 0($t1)
-
 sb $t3, 0($t2)
-
 addi $t1, $t1, 1
-
 addi $t2, $t2, 1
-
 addi $a0, $a0, -1
-
 j __string_substring_start_copy
-
 __string_substring_end_copy:
-
-# Program Start
-
 jr $ra
-
-# Program Start
-
 __string_substring_abort:
-
-# Program Start
-
 addi $v0, $zero, 10
-
-# Program Start
-
 syscall
-
-# Program Start
-
 __type_name:
-
-# Program Start
-
 lw $v0, 8($a0)
-
-# Program Start
-
 jr $ra
-
-# Program Start
-
 __concat:
-
-# Program Start
-
 addi $sp, $sp, -12
-
-# Program Start
-
 sw $a0, 0($sp)
-
-# Program Start
-
 sw $a1, 4($sp)
-
-# Program Start
-
 sw $ra, 8($sp)
-
-# Program Start
-
 jal __string_length
-
-# Program Start
-
 lw $a0, 0($sp)
-
-# Program Start
-
 lw $a1, 4($sp)
-
-# Program Start
-
 lw $ra, 8($sp)
-
-# Program Start
-
 addi $sp, $sp, 12
-
-# Program Start
-
 move $t1, $a0
-
-# Program Start
-
 move $a0, $a1
-
-# Program Start
-
 move $a1, $t1
-
-# Program Start
-
 move $t0, $v0
-
-# Program Start
-
 addi $sp, $sp, -16
-
-# Program Start
-
 sw $a0, 0($sp)
-
-# Program Start
-
 sw $a1, 4($sp)
-
-# Program Start
-
 sw $t0, 8($sp)
-
-# Program Start
-
 sw $ra, 12($sp)
-
-# Program Start
-
 jal __string_length
-
-# Program Start
-
 lw $a0, 0($sp)
-
-# Program Start
-
 lw $a1, 4($sp)
-
-# Program Start
-
 lw $t0, 8($sp)
-
-# Program Start
-
 lw $ra, 12($sp)
-
-# Program Start
-
 addi $sp, $sp, 16
-
-# Program Start
-
 move $t1, $a0
-
-# Program Start
-
 move $a0, $a1
-
-# Program Start
-
 move $a1, $t1
-
-# Program Start
-
 move $t1, $a0
-
-# Program Start
-
 add $t2, $v0, $t0
-
-# Program Start
-
 addi $a0, $t2, 1
-
-# Program Start
-
 move $t2, $v0
-
-# Program Start
-
 li $v0, 9
-
-# Program Start
-
 syscall
-
-# Program Start
-
 move $v1, $v0
-
-# Program Start
-
 __concat_string1_copy_start_copy:
-
-# Program Start
-
 ble $t0, $zero, __concat_string1_copy_end_copy
-
-# Program Start
-
 lb $t3, 0($t1)
-
-# Program Start
-
 sb $t3, 0($v1)
-
-# Program Start
-
 addi $t1, $t1, 1
-
-# Program Start
-
 addi $v1, $v1, 1
-
-# Program Start
-
 addi $t0, $t0, -1
-
-# Program Start
-
 j __concat_string1_copy_start_copy
-
-# Program Start
-
 __concat_string1_copy_end_copy:
-
-# Program Start
-
 __concat_string2_copy_start_copy:
-
-# Program Start
-
 ble $t2, $zero, __concat_string2_copy_end_copy
-
-# Program Start
-
 lb $t3, 0($a1)
-
-# Program Start
-
 sb $t3, 0($v1)
-
-# Program Start
-
 addi $a1, $a1, 1
-
-# Program Start
-
 addi $v1, $v1, 1
-
-# Program Start
-
 addi $t2, $t2, -1
-
-# Program Start
-
 j __concat_string2_copy_start_copy
-
-# Program Start
-
 __concat_string2_copy_end_copy:
-
-# Program Start
-
 sb $zero, 0($v1)
-
-# Program Start
-
 jr $ra
-
 # Program Node
-
 main:
-
 # Program Node
-
 addi $sp, $sp, -12
-
 # Program Node
-
 move $t0, $sp
-
 # Program Node
-
 addi $sp, $sp, -8
-
 # Program Node
-
 sw $ra, 0($sp)
-
 # Program Node
-
 sw $fp, 4($sp)
-
 # Program Node
-
 move $fp, $t0
-
 # Instantiate Node
-
 la $a0, Main
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 8($fp)
-
 # Instantiate Node
-
 lw $t0, 8($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_Main_type
-
 # Instantiate Node
-
 sw $v0, 8($fp)
-
 lw $t0, 8($fp)
-
 addi $sp, $sp, -4
-
 sw $t0, 0($sp)
-
 # Program Node
-
 jal function_main_at_Main
-
 # Program Node
-
 sw $v0, 4($fp)
-
 # Program Node
-
 li $v0, 0
-
 # Program Node
-
 lw $ra, 0($sp)
-
 # Program Node
-
 lw $fp, 4($sp)
-
 # Program Node
-
 addi $sp, $sp, 8
-
 # Program Node
-
 addi $sp, $sp, 12
-
 # Program Node
-
 jr $ra
-
 # Program Node
-
 type_distance:
-
 # Program Node
-
 addi $sp, $sp, -16
-
 # Program Node
-
 move $t0, $sp
-
 # Program Node
-
 addi $sp, $sp, -8
-
 # Program Node
-
 sw $ra, 0($sp)
-
 # Program Node
-
 sw $fp, 4($sp)
-
 # Program Node
-
 move $fp, $t0
-
 # Program Node
-
 sw $zero, 12($fp)
-
 # Program Node
-
 li $t0, 0
-
 # Program Node
-
 sw $t0, 0($fp)
-
 # Program Node
-
 distance_label_0:
-
 # Program Node
-
 lw $t0, 20($fp)
-
 # Program Node
-
 lw $t1, 16($fp)
-
 seq $t2, $t0, $t1
-
 # Program Node
-
 sw $t2, 4($fp)
-
 # Program Node
-
 lw $t0, 4($fp)
-
 # Program Node
-
 bne $t0, $zero, distance_label_1
-
 # Program Node
-
 lw $t0, 20($fp)
-
 # Program Node
-
 lw $t0, 0($t0)
-
 # Program Node
-
 sw $t0, 20($fp)
-
 # Program Node
-
 lw $t0, 20($fp)
-
 # Program Node
-
 lw $t1, 12($fp)
-
 seq $t2, $t0, $t1
-
 # Program Node
-
 sw $t2, 8($fp)
-
 # Program Node
-
 lw $t0, 8($fp)
-
 # Program Node
-
 bne $t0, $zero, distance_label_2
-
 # Program Node
-
 lw $t0, 0($fp)
-
 # Program Node
-
 li $t1, 1
-
 add $t2, $t0, $t1
-
 # Program Node
-
 sw $t2, 0($fp)
-
 # Program Node
-
 j distance_label_0
-
 # Program Node
-
 distance_label_2:
-
 # Program Node
-
 li $t0, -1
-
 # Program Node
-
 sw $t0, 0($fp)
-
 # Program Node
-
 distance_label_1:
-
 # Program Node
-
 lw $v0, 0($fp)
-
 # Program Node
-
 lw $ra, 0($sp)
-
 # Program Node
-
 lw $fp, 4($sp)
-
 # Program Node
-
 addi $sp, $sp, 8
-
 # Program Node
-
 addi $sp, $sp, 24
-
 # Program Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_Object_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 0($fp)
-
 # Class Declaration Node
-
 la $t1, Object
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # return node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_abort_at_Object:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Object Abort Node
-
 addi $v0, $zero, 10
-
 # Object Abort Node
-
 syscall
-
 # Func Declaration Node
-
 li $v0, 0
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_type_name_at_Object:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Object Type Name Node
-
 lw $t0, 4($fp)
-
 # Object Type Name Node
-
 lw $t0, 0($t0)
-
 # Object Type Name Node
-
 sw $t0, 0($fp)
-
 # Object Type Name Node
-
 lw $a0, 0($fp)
-
 # Object Type Name Node
-
 jal __type_name
-
 # Object Type Name Node
-
 sw $v0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_copy_at_Object:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Object Copy Node
-
 lw $a0, 4($fp)
-
 # Object Copy Node
-
 jal __copy
-
 # Object Copy Node
-
 sw $v0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_String_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 0($fp)
-
 # Class Declaration Node
-
 la $t1, String
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # return node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_length_at_String:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # String Length Node
-
 lw $a0, 4($fp)
-
 # String Length Node
-
 jal __string_length
-
 # String Length Node
-
 sw $v0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_concat_at_String:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # String Concat Node
-
 lw $a0, 8($fp)
-
 # String Concat Node
-
 lw $a1, 4($fp)
-
 # String Concat Node
-
 jal __concat
-
 # String Concat Node
-
 sw $v0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 12
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_substr_at_String:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # String Substring Node
-
 lw $a0, 12($fp)
-
 # String Substring Node
-
 lw $a1, 8($fp)
-
 # String Substring Node
-
 lw $a2, 4($fp)
-
 # String Substring Node
-
 jal __string_substring
-
 # String Substring Node
-
 sw $v0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 16
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_Bool_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 0($fp)
-
 # Class Declaration Node
-
 la $t1, Bool
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # return node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_Int_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 0($fp)
-
 # Class Declaration Node
-
 la $t1, Int
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # return node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_IO_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 0($fp)
-
 # Class Declaration Node
-
 la $t1, IO
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # return node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_out_string_at_IO:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # IO Out String Node
-
 lw $a0, 0($fp)
-
 # IO Out String Node
-
 addi $v0, $zero, 4
-
 # IO Out String Node
-
 syscall
-
 # Func Declaration Node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_out_int_at_IO:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # IO Out Int Node
-
 lw $a0, 0($fp)
-
 # IO Out Int Node
-
 addi $v0, $zero, 1
-
 # IO Out Int Node
-
 syscall
-
 # Func Declaration Node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_in_string_at_IO:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # IO In String Node
-
 li $a1, 1024
-
 # IO In String Node
-
 move $a0, $a1
-
 # IO In String Node
-
 li $v0, 9
-
 # IO In String Node
-
 syscall
-
 # HERE
-
 move $a0, $v0
-
 # IO In String Node
-
 addi $v0, $zero, 8
-
 # IO In String Node
-
 syscall
-
 # IO In String Node
-
 sw $a0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_in_int_at_IO:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # IO In Int Node
-
 addi $v0, $zero, 5
-
 # IO In Int Node
-
 syscall
-
 # IO In Int Node
-
 sw $v0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_A_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 4($fp)
-
 # Class Declaration Node
-
 la $t1, A
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # arg node
-
 lw $t0, 4($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_var_at_A
-
 # Initialize arg function
-
 sw $v0, 0($fp)
-
 # return node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_var_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Attr Declaration Node
-
 lw $t0, 0($fp)
-
 # Attr Declaration Node
-
 li $t1, 0
-
 # Attr Declaration Node
-
 sw $t1, 4($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_value_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Variable Node
-
 lw $t0, 4($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 0($fp)
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_set_var_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Assign Node
-
 lw $t0, 8($fp)
-
 # Assign Node
-
 lw $t1, 4($fp)
-
 # Assign Node
-
 sw $t1, 4($t0)
-
 # Func Declaration Node
-
 lw $v0, 8($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 12
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method1_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Func Declaration Node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method2_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, -24
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Plus Node
-
 lw $t0, 28($fp)
-
 # Plus Node
-
 lw $t1, 24($fp)
-
 add $t2, $t0, $t1
-
 # Plus Node
-
 sw $t2, 8($fp)
-
 # Assign Node
-
 lw $t0, 8($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Instantiate Node
-
 la $a0, B
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Instantiate Node
-
 lw $t0, 12($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_B_type
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 16($fp)
-
 # Func Declaration Node
-
 lw $v0, 16($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 36
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method3_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, -24
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Roof Node
-
 li $t0, 0
-
 # Roof Node
-
 lw $t1, 24($fp)
-
 sub $t2, $t0, $t1
-
 # Roof Node
-
 sw $t2, 8($fp)
-
 # Assign Node
-
 lw $t0, 8($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Instantiate Node
-
 la $a0, C
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Instantiate Node
-
 lw $t0, 12($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_C_type
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 16($fp)
-
 # Func Declaration Node
-
 lw $v0, 16($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 32
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method4_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, -56
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Lesser Node
-
 lw $t0, 56($fp)
-
 # Lesser Node
-
 lw $t1, 60($fp)
-
 slt $t2, $t0, $t1
-
 # Lesser Node
-
 sw $t2, 4($fp)
-
 # Conditional Node
-
 lw $t0, 4($fp)
-
 # Conditional Node
-
 bne $t0, $zero, method4_at_A_label_0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 8($fp)
-
 # Minus Node
-
 lw $t0, 56($fp)
-
 # Minus Node
-
 lw $t1, 60($fp)
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 16($fp)
-
 # Assign Node
-
 lw $t0, 16($fp)
-
 # Assign Node
-
 sw $t0, 8($fp)
-
 # Instantiate Node
-
 la $a0, D
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 20($fp)
-
 # Instantiate Node
-
 lw $t0, 20($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_D_type
-
 # Instantiate Node
-
 sw $v0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 8($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 24($fp)
-
 # Conditional Node
-
 lw $t0, 24($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 j method4_at_A_label_1
-
 # Conditional Node
-
 method4_at_A_label_0:
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 32($fp)
-
 # Minus Node
-
 lw $t0, 60($fp)
-
 # Minus Node
-
 lw $t1, 56($fp)
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 40($fp)
-
 # Assign Node
-
 lw $t0, 40($fp)
-
 # Assign Node
-
 sw $t0, 32($fp)
-
 # Instantiate Node
-
 la $a0, D
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 44($fp)
-
 # Instantiate Node
-
 lw $t0, 44($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_D_type
-
 # Instantiate Node
-
 sw $v0, 44($fp)
-
 # Call Node
-
 lw $t0, 44($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 52($fp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 48($fp)
-
 # Conditional Node
-
 lw $t0, 48($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 method4_at_A_label_1:
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 68
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method5_at_A:
-
 # Class Declaration Node
-
 addi $sp, $sp, -44
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 1
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Var Declaration Node
-
 li $t0, 1
-
 # Var Declaration Node
-
 sw $t0, 8($fp)
-
 # Void Node
-
 sw $zero, 12($fp)
-
 # While Node
-
 method5_at_A_label_0:
-
 # LesserEqual Node
-
 lw $t0, 8($fp)
-
 # LesserEqual Node
-
 lw $t1, 44($fp)
-
 sgt $t2, $t0, $t1
-
 # LesserEqual Node
-
 sw $t2, 16($fp)
-
 # LesserEqual Node
-
 lw $t0, 16($fp)
-
 # LesserEqual Node
-
 nor $t0, $t0, $t0
-
 # LesserEqual Node
-
 sw $t0, 16($fp)
-
 # While Node
-
 lw $t0, 16($fp)
-
 # While Node
-
 bne $t0, $zero, method5_at_A_label_1
-
 # While Node
-
 j method5_at_A_label_2
-
 # While Node
-
 method5_at_A_label_1:
-
 # Star Node
-
 lw $t0, 0($fp)
-
 # Star Node
-
 lw $t1, 8($fp)
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 24($fp)
-
 # Assign Node
-
 lw $t0, 24($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Plus Node
-
 lw $t0, 8($fp)
-
 # Plus Node
-
 li $t1, 1
-
 add $t2, $t0, $t1
-
 # Plus Node
-
 sw $t2, 28($fp)
-
 # Assign Node
-
 lw $t0, 28($fp)
-
 # Assign Node
-
 sw $t0, 8($fp)
-
 # While Node
-
 j method5_at_A_label_0
-
 # While Node
-
 method5_at_A_label_2:
-
 # Instantiate Node
-
 la $a0, E
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 32($fp)
-
 # Instantiate Node
-
 lw $t0, 32($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_E_type
-
 # Instantiate Node
-
 sw $v0, 32($fp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 40($fp)
-
 # Call Node
-
 lw $t0, 40($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 36($fp)
-
 # Func Declaration Node
-
 lw $v0, 36($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 52
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_B_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 4($fp)
-
 # Class Declaration Node
-
 la $t1, B
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # arg node
-
 lw $t0, 4($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_var_at_B
-
 # Initialize arg function
-
 sw $v0, 0($fp)
-
 # return node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_var_at_B:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Attr Declaration Node
-
 lw $t0, 0($fp)
-
 # Attr Declaration Node
-
 li $t1, 0
-
 # Attr Declaration Node
-
 sw $t1, 4($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method5_at_B:
-
 # Class Declaration Node
-
 addi $sp, $sp, -24
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Star Node
-
 lw $t0, 24($fp)
-
 # Star Node
-
 lw $t1, 24($fp)
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 8($fp)
-
 # Assign Node
-
 lw $t0, 8($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Instantiate Node
-
 la $a0, E
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Instantiate Node
-
 lw $t0, 12($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_E_type
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 16($fp)
-
 # Func Declaration Node
-
 lw $v0, 16($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 32
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_C_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 4($fp)
-
 # Class Declaration Node
-
 la $t1, C
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # arg node
-
 lw $t0, 4($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_var_at_C
-
 # Initialize arg function
-
 sw $v0, 0($fp)
-
 # return node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_var_at_C:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Attr Declaration Node
-
 lw $t0, 0($fp)
-
 # Attr Declaration Node
-
 li $t1, 0
-
 # Attr Declaration Node
-
 sw $t1, 4($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method6_at_C:
-
 # Class Declaration Node
-
 addi $sp, $sp, -24
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Roof Node
-
 li $t0, 0
-
 # Roof Node
-
 lw $t1, 24($fp)
-
 sub $t2, $t0, $t1
-
 # Roof Node
-
 sw $t2, 8($fp)
-
 # Assign Node
-
 lw $t0, 8($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Instantiate Node
-
 la $a0, A
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Instantiate Node
-
 lw $t0, 12($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A_type
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 16($fp)
-
 # Func Declaration Node
-
 lw $v0, 16($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 32
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method5_at_C:
-
 # Class Declaration Node
-
 addi $sp, $sp, -28
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Star Node
-
 lw $t0, 28($fp)
-
 # Star Node
-
 lw $t1, 28($fp)
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 8($fp)
-
 # Star Node
-
 lw $t0, 8($fp)
-
 # Star Node
-
 lw $t1, 28($fp)
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 12($fp)
-
 # Assign Node
-
 lw $t0, 12($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Instantiate Node
-
 la $a0, E
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 16($fp)
-
 # Instantiate Node
-
 lw $t0, 16($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_E_type
-
 # Instantiate Node
-
 sw $v0, 16($fp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 20($fp)
-
 # Func Declaration Node
-
 lw $v0, 20($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 36
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_D_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 4($fp)
-
 # Class Declaration Node
-
 la $t1, D
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # arg node
-
 lw $t0, 4($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_var_at_D
-
 # Initialize arg function
-
 sw $v0, 0($fp)
-
 # return node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_var_at_D:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Attr Declaration Node
-
 lw $t0, 0($fp)
-
 # Attr Declaration Node
-
 li $t1, 0
-
 # Attr Declaration Node
-
 sw $t1, 4($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method7_at_D:
-
 # Class Declaration Node
-
 addi $sp, $sp, -60
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 lw $t0, 60($fp)
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Lesser Node
-
 lw $t0, 0($fp)
-
 # Lesser Node
-
 li $t1, 0
-
 slt $t2, $t0, $t1
-
 # Lesser Node
-
 sw $t2, 8($fp)
-
 # Conditional Node
-
 lw $t0, 8($fp)
-
 # Conditional Node
-
 bne $t0, $zero, method7_at_D_label_0
-
 # Equal Node
-
 li $t0, 0
-
 # Equal Node
-
 lw $t1, 0($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 16($fp)
-
 # Conditional Node
-
 lw $t0, 16($fp)
-
 # Conditional Node
-
 bne $t0, $zero, method7_at_D_label_2
-
 # Equal Node
-
 li $t0, 1
-
 # Equal Node
-
 lw $t1, 0($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 24($fp)
-
 # Conditional Node
-
 lw $t0, 24($fp)
-
 # Conditional Node
-
 bne $t0, $zero, method7_at_D_label_4
-
 # Equal Node
-
 li $t0, 2
-
 # Equal Node
-
 lw $t1, 0($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 32($fp)
-
 # Conditional Node
-
 lw $t0, 32($fp)
-
 # Conditional Node
-
 bne $t0, $zero, method7_at_D_label_6
-
 # Minus Node
-
 lw $t0, 0($fp)
-
 # Minus Node
-
 li $t1, 3
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 36($fp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 56($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 40($fp)
-
 # Conditional Node
-
 lw $t0, 40($fp)
-
 # Conditional Node
-
 sw $t0, 28($fp)
-
 # Conditional Node
-
 j method7_at_D_label_7
-
 # Conditional Node
-
 method7_at_D_label_6:
-
 # Conditional Node
-
 li $t0, 0
-
 # Conditional Node
-
 sw $t0, 28($fp)
-
 # Conditional Node
-
 method7_at_D_label_7:
-
 # Conditional Node
-
 lw $t0, 28($fp)
-
 # Conditional Node
-
 sw $t0, 20($fp)
-
 # Conditional Node
-
 j method7_at_D_label_5
-
 # Conditional Node
-
 method7_at_D_label_4:
-
 # Conditional Node
-
 li $t0, 0
-
 # Conditional Node
-
 sw $t0, 20($fp)
-
 # Conditional Node
-
 method7_at_D_label_5:
-
 # Conditional Node
-
 lw $t0, 20($fp)
-
 # Conditional Node
-
 sw $t0, 12($fp)
-
 # Conditional Node
-
 j method7_at_D_label_3
-
 # Conditional Node
-
 method7_at_D_label_2:
-
 # Conditional Node
-
 li $t0, 1
-
 # Conditional Node
-
 sw $t0, 12($fp)
-
 # Conditional Node
-
 method7_at_D_label_3:
-
 # Conditional Node
-
 lw $t0, 12($fp)
-
 # Conditional Node
-
 sw $t0, 4($fp)
-
 # Conditional Node
-
 j method7_at_D_label_1
-
 # Conditional Node
-
 method7_at_D_label_0:
-
 # Roof Node
-
 li $t0, 0
-
 # Roof Node
-
 lw $t1, 0($fp)
-
 sub $t2, $t0, $t1
-
 # Roof Node
-
 sw $t2, 48($fp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 56($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 52($fp)
-
 # Conditional Node
-
 lw $t0, 52($fp)
-
 # Conditional Node
-
 sw $t0, 4($fp)
-
 # Conditional Node
-
 method7_at_D_label_1:
-
 # Func Declaration Node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 68
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_E_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 4($fp)
-
 # Class Declaration Node
-
 la $t1, E
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # arg node
-
 lw $t0, 4($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_var_at_E
-
 # Initialize arg function
-
 sw $v0, 0($fp)
-
 # return node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_var_at_E:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Attr Declaration Node
-
 lw $t0, 0($fp)
-
 # Attr Declaration Node
-
 li $t1, 0
-
 # Attr Declaration Node
-
 sw $t1, 4($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_method6_at_E:
-
 # Class Declaration Node
-
 addi $sp, $sp, -24
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Div Node
-
 lw $t0, 24($fp)
-
 # Div Node
-
 li $t1, 8
-
 # Div Node
-
 div $t0, $t1
-
 # Div Node
-
 sw $low, 8($fp)
-
 # Assign Node
-
 lw $t0, 8($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Instantiate Node
-
 la $a0, A
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Instantiate Node
-
 lw $t0, 12($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A_type
-
 # Instantiate Node
-
 sw $v0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 16($fp)
-
 # Func Declaration Node
-
 lw $v0, 16($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 32
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_A2I_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 0($fp)
-
 # Class Declaration Node
-
 la $t1, A2I
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # return node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_c2i_at_A2I:
-
 # Class Declaration Node
-
 addi $sp, $sp, -132
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # String Node
-
 la $t0, data_12
-
 # String Node
-
 sw $t0, 8($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 8($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 4($fp)
-
 # Conditional Node
-
 lw $t0, 4($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_0
-
 # String Node
-
 la $t0, data_13
-
 # String Node
-
 sw $t0, 20($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 20($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 16($fp)
-
 # Conditional Node
-
 lw $t0, 16($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_2
-
 # String Node
-
 la $t0, data_14
-
 # String Node
-
 sw $t0, 32($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 32($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 28($fp)
-
 # Conditional Node
-
 lw $t0, 28($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_4
-
 # String Node
-
 la $t0, data_15
-
 # String Node
-
 sw $t0, 44($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 44($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 40($fp)
-
 # Conditional Node
-
 lw $t0, 40($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_6
-
 # String Node
-
 la $t0, data_16
-
 # String Node
-
 sw $t0, 56($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 56($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 52($fp)
-
 # Conditional Node
-
 lw $t0, 52($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_8
-
 # String Node
-
 la $t0, data_17
-
 # String Node
-
 sw $t0, 68($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 68($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 64($fp)
-
 # Conditional Node
-
 lw $t0, 64($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_10
-
 # String Node
-
 la $t0, data_18
-
 # String Node
-
 sw $t0, 80($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 80($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 76($fp)
-
 # Conditional Node
-
 lw $t0, 76($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_12
-
 # String Node
-
 la $t0, data_19
-
 # String Node
-
 sw $t0, 92($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 92($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 88($fp)
-
 # Conditional Node
-
 lw $t0, 88($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_14
-
 # String Node
-
 la $t0, data_20
-
 # String Node
-
 sw $t0, 104($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 104($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 100($fp)
-
 # Conditional Node
-
 lw $t0, 100($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_16
-
 # String Node
-
 la $t0, data_21
-
 # String Node
-
 sw $t0, 116($fp)
-
 # Equal Node
-
 lw $t0, 132($fp)
-
 # Equal Node
-
 lw $t1, 116($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 112($fp)
-
 # Conditional Node
-
 lw $t0, 112($fp)
-
 # Conditional Node
-
 bne $t0, $zero, c2i_at_A2I_label_18
-
 # Call Node
-
 lw $t0, 136($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 136($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 128($fp)
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 lw $t0, 16($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 124($fp)
-
 # Conditional Node
-
 li $t0, 0
-
 # Conditional Node
-
 sw $t0, 108($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_19
-
 # Conditional Node
-
 c2i_at_A2I_label_18:
-
 # Conditional Node
-
 li $t0, 9
-
 # Conditional Node
-
 sw $t0, 108($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_19:
-
 # Conditional Node
-
 lw $t0, 108($fp)
-
 # Conditional Node
-
 sw $t0, 96($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_17
-
 # Conditional Node
-
 c2i_at_A2I_label_16:
-
 # Conditional Node
-
 li $t0, 8
-
 # Conditional Node
-
 sw $t0, 96($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_17:
-
 # Conditional Node
-
 lw $t0, 96($fp)
-
 # Conditional Node
-
 sw $t0, 84($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_15
-
 # Conditional Node
-
 c2i_at_A2I_label_14:
-
 # Conditional Node
-
 li $t0, 7
-
 # Conditional Node
-
 sw $t0, 84($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_15:
-
 # Conditional Node
-
 lw $t0, 84($fp)
-
 # Conditional Node
-
 sw $t0, 72($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_13
-
 # Conditional Node
-
 c2i_at_A2I_label_12:
-
 # Conditional Node
-
 li $t0, 6
-
 # Conditional Node
-
 sw $t0, 72($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_13:
-
 # Conditional Node
-
 lw $t0, 72($fp)
-
 # Conditional Node
-
 sw $t0, 60($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_11
-
 # Conditional Node
-
 c2i_at_A2I_label_10:
-
 # Conditional Node
-
 li $t0, 5
-
 # Conditional Node
-
 sw $t0, 60($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_11:
-
 # Conditional Node
-
 lw $t0, 60($fp)
-
 # Conditional Node
-
 sw $t0, 48($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_9
-
 # Conditional Node
-
 c2i_at_A2I_label_8:
-
 # Conditional Node
-
 li $t0, 4
-
 # Conditional Node
-
 sw $t0, 48($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_9:
-
 # Conditional Node
-
 lw $t0, 48($fp)
-
 # Conditional Node
-
 sw $t0, 36($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_7
-
 # Conditional Node
-
 c2i_at_A2I_label_6:
-
 # Conditional Node
-
 li $t0, 3
-
 # Conditional Node
-
 sw $t0, 36($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_7:
-
 # Conditional Node
-
 lw $t0, 36($fp)
-
 # Conditional Node
-
 sw $t0, 24($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_5
-
 # Conditional Node
-
 c2i_at_A2I_label_4:
-
 # Conditional Node
-
 li $t0, 2
-
 # Conditional Node
-
 sw $t0, 24($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_5:
-
 # Conditional Node
-
 lw $t0, 24($fp)
-
 # Conditional Node
-
 sw $t0, 12($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_3
-
 # Conditional Node
-
 c2i_at_A2I_label_2:
-
 # Conditional Node
-
 li $t0, 1
-
 # Conditional Node
-
 sw $t0, 12($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_3:
-
 # Conditional Node
-
 lw $t0, 12($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 j c2i_at_A2I_label_1
-
 # Conditional Node
-
 c2i_at_A2I_label_0:
-
 # Conditional Node
-
 li $t0, 0
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 c2i_at_A2I_label_1:
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 140
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_i2c_at_A2I:
-
 # Class Declaration Node
-
 addi $sp, $sp, -136
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 0
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 4($fp)
-
 # Conditional Node
-
 lw $t0, 4($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_0
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 1
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 12($fp)
-
 # Conditional Node
-
 lw $t0, 12($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_2
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 2
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 20($fp)
-
 # Conditional Node
-
 lw $t0, 20($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_4
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 3
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 28($fp)
-
 # Conditional Node
-
 lw $t0, 28($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_6
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 4
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 36($fp)
-
 # Conditional Node
-
 lw $t0, 36($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_8
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 5
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 44($fp)
-
 # Conditional Node
-
 lw $t0, 44($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_10
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 6
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 52($fp)
-
 # Conditional Node
-
 lw $t0, 52($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_12
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 7
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 60($fp)
-
 # Conditional Node
-
 lw $t0, 60($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_14
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 8
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 68($fp)
-
 # Conditional Node
-
 lw $t0, 68($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_16
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 li $t1, 9
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 76($fp)
-
 # Conditional Node
-
 lw $t0, 76($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2c_at_A2I_label_18
-
 # Call Node
-
 lw $t0, 140($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 140($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 16($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 84($fp)
-
 # String Node
-
 la $t0, data_22
-
 # String Node
-
 sw $t0, 92($fp)
-
 # Conditional Node
-
 lw $t0, 92($fp)
-
 # Conditional Node
-
 sw $t0, 72($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_19
-
 # Conditional Node
-
 i2c_at_A2I_label_18:
-
 # String Node
-
 la $t0, data_23
-
 # String Node
-
 sw $t0, 96($fp)
-
 # Conditional Node
-
 lw $t0, 96($fp)
-
 # Conditional Node
-
 sw $t0, 72($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_19:
-
 # Conditional Node
-
 lw $t0, 72($fp)
-
 # Conditional Node
-
 sw $t0, 64($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_17
-
 # Conditional Node
-
 i2c_at_A2I_label_16:
-
 # String Node
-
 la $t0, data_24
-
 # String Node
-
 sw $t0, 100($fp)
-
 # Conditional Node
-
 lw $t0, 100($fp)
-
 # Conditional Node
-
 sw $t0, 64($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_17:
-
 # Conditional Node
-
 lw $t0, 64($fp)
-
 # Conditional Node
-
 sw $t0, 56($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_15
-
 # Conditional Node
-
 i2c_at_A2I_label_14:
-
 # String Node
-
 la $t0, data_25
-
 # String Node
-
 sw $t0, 104($fp)
-
 # Conditional Node
-
 lw $t0, 104($fp)
-
 # Conditional Node
-
 sw $t0, 56($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_15:
-
 # Conditional Node
-
 lw $t0, 56($fp)
-
 # Conditional Node
-
 sw $t0, 48($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_13
-
 # Conditional Node
-
 i2c_at_A2I_label_12:
-
 # String Node
-
 la $t0, data_26
-
 # String Node
-
 sw $t0, 108($fp)
-
 # Conditional Node
-
 lw $t0, 108($fp)
-
 # Conditional Node
-
 sw $t0, 48($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_13:
-
 # Conditional Node
-
 lw $t0, 48($fp)
-
 # Conditional Node
-
 sw $t0, 40($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_11
-
 # Conditional Node
-
 i2c_at_A2I_label_10:
-
 # String Node
-
 la $t0, data_27
-
 # String Node
-
 sw $t0, 112($fp)
-
 # Conditional Node
-
 lw $t0, 112($fp)
-
 # Conditional Node
-
 sw $t0, 40($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_11:
-
 # Conditional Node
-
 lw $t0, 40($fp)
-
 # Conditional Node
-
 sw $t0, 32($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_9
-
 # Conditional Node
-
 i2c_at_A2I_label_8:
-
 # String Node
-
 la $t0, data_28
-
 # String Node
-
 sw $t0, 116($fp)
-
 # Conditional Node
-
 lw $t0, 116($fp)
-
 # Conditional Node
-
 sw $t0, 32($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_9:
-
 # Conditional Node
-
 lw $t0, 32($fp)
-
 # Conditional Node
-
 sw $t0, 24($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_7
-
 # Conditional Node
-
 i2c_at_A2I_label_6:
-
 # String Node
-
 la $t0, data_29
-
 # String Node
-
 sw $t0, 120($fp)
-
 # Conditional Node
-
 lw $t0, 120($fp)
-
 # Conditional Node
-
 sw $t0, 24($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_7:
-
 # Conditional Node
-
 lw $t0, 24($fp)
-
 # Conditional Node
-
 sw $t0, 16($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_5
-
 # Conditional Node
-
 i2c_at_A2I_label_4:
-
 # String Node
-
 la $t0, data_30
-
 # String Node
-
 sw $t0, 124($fp)
-
 # Conditional Node
-
 lw $t0, 124($fp)
-
 # Conditional Node
-
 sw $t0, 16($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_5:
-
 # Conditional Node
-
 lw $t0, 16($fp)
-
 # Conditional Node
-
 sw $t0, 8($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_3
-
 # Conditional Node
-
 i2c_at_A2I_label_2:
-
 # String Node
-
 la $t0, data_31
-
 # String Node
-
 sw $t0, 128($fp)
-
 # Conditional Node
-
 lw $t0, 128($fp)
-
 # Conditional Node
-
 sw $t0, 8($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_3:
-
 # Conditional Node
-
 lw $t0, 8($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 j i2c_at_A2I_label_1
-
 # Conditional Node
-
 i2c_at_A2I_label_0:
-
 # String Node
-
 la $t0, data_32
-
 # String Node
-
 sw $t0, 132($fp)
-
 # Conditional Node
-
 lw $t0, 132($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 i2c_at_A2I_label_1:
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 144
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_a2i_at_A2I:
-
 # Class Declaration Node
-
 addi $sp, $sp, -124
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 8($fp)
-
 # Equal Node
-
 lw $t0, 8($fp)
-
 # Equal Node
-
 li $t1, 0
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 4($fp)
-
 # Conditional Node
-
 lw $t0, 4($fp)
-
 # Conditional Node
-
 bne $t0, $zero, a2i_at_A2I_label_0
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 li $t0, 0
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 li $t0, 1
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 24($fp)
-
 # String Node
-
 la $t0, data_33
-
 # String Node
-
 sw $t0, 32($fp)
-
 # Equal Node
-
 lw $t0, 24($fp)
-
 # Equal Node
-
 lw $t1, 32($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 20($fp)
-
 # Conditional Node
-
 lw $t0, 20($fp)
-
 # Conditional Node
-
 bne $t0, $zero, a2i_at_A2I_label_2
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 li $t0, 0
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 li $t0, 1
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 44($fp)
-
 # String Node
-
 la $t0, data_34
-
 # String Node
-
 sw $t0, 52($fp)
-
 # Equal Node
-
 lw $t0, 44($fp)
-
 # Equal Node
-
 lw $t1, 52($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 40($fp)
-
 # Conditional Node
-
 lw $t0, 40($fp)
-
 # Conditional Node
-
 bne $t0, $zero, a2i_at_A2I_label_4
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 60($fp)
-
 # Call Node
-
 lw $t0, 60($fp)
-
 # Call Node
-
 lw $t0, 40($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 56($fp)
-
 # Conditional Node
-
 lw $t0, 56($fp)
-
 # Conditional Node
-
 sw $t0, 36($fp)
-
 # Conditional Node
-
 j a2i_at_A2I_label_5
-
 # Conditional Node
-
 a2i_at_A2I_label_4:
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 68($fp)
-
 # Call Node
-
 lw $t0, 68($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 64($fp)
-
 # Minus Node
-
 lw $t0, 64($fp)
-
 # Minus Node
-
 li $t1, 1
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 72($fp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 li $t0, 1
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 72($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 80($fp)
-
 # Call Node
-
 lw $t0, 80($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 76($fp)
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 76($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 40($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 84($fp)
-
 # Conditional Node
-
 lw $t0, 84($fp)
-
 # Conditional Node
-
 sw $t0, 36($fp)
-
 # Conditional Node
-
 a2i_at_A2I_label_5:
-
 # Conditional Node
-
 lw $t0, 36($fp)
-
 # Conditional Node
-
 sw $t0, 16($fp)
-
 # Conditional Node
-
 j a2i_at_A2I_label_3
-
 # Conditional Node
-
 a2i_at_A2I_label_2:
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 100($fp)
-
 # Call Node
-
 lw $t0, 100($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 96($fp)
-
 # Minus Node
-
 lw $t0, 96($fp)
-
 # Minus Node
-
 li $t1, 1
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 104($fp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 li $t0, 1
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 104($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 112($fp)
-
 # Call Node
-
 lw $t0, 112($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 108($fp)
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 108($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 120($fp)
-
 # Call Node
-
 lw $t0, 120($fp)
-
 # Call Node
-
 lw $t0, 40($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 116($fp)
-
 # Roof Node
-
 li $t0, 0
-
 # Roof Node
-
 lw $t1, 116($fp)
-
 sub $t2, $t0, $t1
-
 # Roof Node
-
 sw $t2, 92($fp)
-
 # Conditional Node
-
 lw $t0, 92($fp)
-
 # Conditional Node
-
 sw $t0, 16($fp)
-
 # Conditional Node
-
 a2i_at_A2I_label_3:
-
 # Conditional Node
-
 lw $t0, 16($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 j a2i_at_A2I_label_1
-
 # Conditional Node
-
 a2i_at_A2I_label_0:
-
 # Conditional Node
-
 li $t0, 0
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 a2i_at_A2I_label_1:
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 132
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_a2i_aux_at_A2I:
-
 # Class Declaration Node
-
 addi $sp, $sp, -64
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 12($fp)
-
 # Var Declaration Node
-
 lw $t0, 12($fp)
-
 # Var Declaration Node
-
 sw $t0, 8($fp)
-
 # Var Declaration Node
-
 li $t0, 0
-
 # Var Declaration Node
-
 sw $t0, 20($fp)
-
 # Void Node
-
 sw $zero, 24($fp)
-
 # While Node
-
 a2i_aux_at_A2I_label_0:
-
 # Lesser Node
-
 lw $t0, 20($fp)
-
 # Lesser Node
-
 lw $t1, 8($fp)
-
 slt $t2, $t0, $t1
-
 # Lesser Node
-
 sw $t2, 28($fp)
-
 # While Node
-
 lw $t0, 28($fp)
-
 # While Node
-
 bne $t0, $zero, a2i_aux_at_A2I_label_1
-
 # While Node
-
 j a2i_aux_at_A2I_label_2
-
 # While Node
-
 a2i_aux_at_A2I_label_1:
-
 # Star Node
-
 lw $t0, 0($fp)
-
 # Star Node
-
 li $t1, 10
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 36($fp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 li $t0, 1
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 40($fp)
-
 # Call Node
-
 lw $t0, 68($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 40($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 68($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 52($fp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 48($fp)
-
 # Plus Node
-
 lw $t0, 36($fp)
-
 # Plus Node
-
 lw $t1, 48($fp)
-
 add $t2, $t0, $t1
-
 # Plus Node
-
 sw $t2, 56($fp)
-
 # Assign Node
-
 lw $t0, 56($fp)
-
 # Assign Node
-
 sw $t0, 0($fp)
-
 # Plus Node
-
 lw $t0, 20($fp)
-
 # Plus Node
-
 li $t1, 1
-
 add $t2, $t0, $t1
-
 # Plus Node
-
 sw $t2, 60($fp)
-
 # Assign Node
-
 lw $t0, 60($fp)
-
 # Assign Node
-
 sw $t0, 20($fp)
-
 # While Node
-
 j a2i_aux_at_A2I_label_0
-
 # While Node
-
 a2i_aux_at_A2I_label_2:
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 72
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_i2a_at_A2I:
-
 # Class Declaration Node
-
 addi $sp, $sp, -56
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Equal Node
-
 lw $t0, 56($fp)
-
 # Equal Node
-
 li $t1, 0
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 4($fp)
-
 # Conditional Node
-
 lw $t0, 4($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2a_at_A2I_label_0
-
 # Lesser Node
-
 li $t0, 0
-
 # Lesser Node
-
 lw $t1, 56($fp)
-
 slt $t2, $t0, $t1
-
 # Lesser Node
-
 sw $t2, 12($fp)
-
 # Conditional Node
-
 lw $t0, 12($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2a_at_A2I_label_2
-
 # String Node
-
 la $t0, data_35
-
 # String Node
-
 sw $t0, 16($fp)
-
 # Roof Node
-
 li $t0, 0
-
 # Roof Node
-
 li $t1, 1
-
 sub $t2, $t0, $t1
-
 # Roof Node
-
 sw $t2, 20($fp)
-
 # Star Node
-
 lw $t0, 56($fp)
-
 # Star Node
-
 lw $t1, 20($fp)
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 24($fp)
-
 # Call Node
-
 lw $t0, 60($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 24($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 60($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 48($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 28($fp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 40($fp)
-
 # Call Node
-
 lw $t0, 40($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 36($fp)
-
 # Conditional Node
-
 lw $t0, 36($fp)
-
 # Conditional Node
-
 sw $t0, 8($fp)
-
 # Conditional Node
-
 j i2a_at_A2I_label_3
-
 # Conditional Node
-
 i2a_at_A2I_label_2:
-
 # Call Node
-
 lw $t0, 60($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 60($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 48($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 44($fp)
-
 # Conditional Node
-
 lw $t0, 44($fp)
-
 # Conditional Node
-
 sw $t0, 8($fp)
-
 # Conditional Node
-
 i2a_at_A2I_label_3:
-
 # Conditional Node
-
 lw $t0, 8($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 j i2a_at_A2I_label_1
-
 # Conditional Node
-
 i2a_at_A2I_label_0:
-
 # String Node
-
 la $t0, data_36
-
 # String Node
-
 sw $t0, 52($fp)
-
 # Conditional Node
-
 lw $t0, 52($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 i2a_at_A2I_label_1:
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 64
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_i2a_aux_at_A2I:
-
 # Class Declaration Node
-
 addi $sp, $sp, -52
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Equal Node
-
 lw $t0, 52($fp)
-
 # Equal Node
-
 li $t1, 0
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 4($fp)
-
 # Conditional Node
-
 lw $t0, 4($fp)
-
 # Conditional Node
-
 bne $t0, $zero, i2a_aux_at_A2I_label_0
-
 # Div Node
-
 lw $t0, 52($fp)
-
 # Div Node
-
 li $t1, 10
-
 # Div Node
-
 div $t0, $t1
-
 # Div Node
-
 sw $low, 12($fp)
-
 # Var Declaration Node
-
 lw $t0, 12($fp)
-
 # Var Declaration Node
-
 sw $t0, 8($fp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 8($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 48($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 16($fp)
-
 # Star Node
-
 lw $t0, 8($fp)
-
 # Star Node
-
 li $t1, 10
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 24($fp)
-
 # Minus Node
-
 lw $t0, 52($fp)
-
 # Minus Node
-
 lw $t1, 24($fp)
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 28($fp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 32($fp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 40($fp)
-
 # Conditional Node
-
 lw $t0, 40($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 j i2a_aux_at_A2I_label_1
-
 # Conditional Node
-
 i2a_aux_at_A2I_label_0:
-
 # String Node
-
 la $t0, data_37
-
 # String Node
-
 sw $t0, 48($fp)
-
 # Conditional Node
-
 lw $t0, 48($fp)
-
 # Conditional Node
-
 sw $t0, 0($fp)
-
 # Conditional Node
-
 i2a_aux_at_A2I_label_1:
-
 # Func Declaration Node
-
 lw $v0, 0($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 60
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_Main_type:
-
 # Class Declaration Node
-
 addi $sp, $sp, -16
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Class Declaration Node
-
 lw $t0, 16($fp)
-
 # Class Declaration Node
-
 la $t1, Main
-
 # Class Declaration Node
-
 sw $t1, 0($t0)
-
 # arg node
-
 lw $t0, 16($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_char_at_Main
-
 # Initialize arg function
-
 sw $v0, 0($fp)
-
 # arg node
-
 lw $t0, 16($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_avar_at_Main
-
 # Initialize arg function
-
 sw $v0, 4($fp)
-
 # arg node
-
 lw $t0, 16($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_a_var_at_Main
-
 # Initialize arg function
-
 sw $v0, 8($fp)
-
 # arg node
-
 lw $t0, 16($fp)
-
 # arg node
-
 addi $sp, $sp, -4
-
 # arg node
-
 sw $t0, 0($sp)
-
 # Initialize arg function
-
 jal __init_flag_at_Main
-
 # Initialize arg function
-
 sw $v0, 12($fp)
-
 # return node
-
 lw $v0, 16($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 20
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_char_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # String Node
-
 la $t0, data_38
-
 # String Node
-
 sw $t0, 0($fp)
-
 # Attr Declaration Node
-
 lw $t0, 4($fp)
-
 # Attr Declaration Node
-
 lw $t1, 0($fp)
-
 # Attr Declaration Node
-
 sw $t1, 4($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_avar_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Instantiate Node
-
 sw $zero, 0($fp)
-
 # Attr Declaration Node
-
 lw $t0, 4($fp)
-
 # Attr Declaration Node
-
 lw $t1, 0($fp)
-
 # Attr Declaration Node
-
 sw $t1, 8($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_a_var_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -4
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Instantiate Node
-
 sw $zero, 0($fp)
-
 # Attr Declaration Node
-
 lw $t0, 4($fp)
-
 # Attr Declaration Node
-
 lw $t1, 0($fp)
-
 # Attr Declaration Node
-
 sw $t1, 12($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 __init_flag_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, 0
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Attr Declaration Node
-
 lw $t0, 0($fp)
-
 # Attr Declaration Node
-
 li $t1, 1
-
 # Attr Declaration Node
-
 sw $t1, 16($t0)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 4
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_menu_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -324
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # String Node
-
 la $t0, data_39
-
 # String Node
-
 sw $t0, 4($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 4($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 8($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 20($fp)
-
 # String Node
-
 la $t0, data_40
-
 # String Node
-
 sw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 32($fp)
-
 # String Node
-
 la $t0, data_41
-
 # String Node
-
 sw $t0, 40($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 40($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 44($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 52($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 60($fp)
-
 # Call Node
-
 lw $t0, 60($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 56($fp)
-
 # String Node
-
 la $t0, data_42
-
 # String Node
-
 sw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 72($fp)
-
 # Call Node
-
 lw $t0, 72($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 68($fp)
-
 # String Node
-
 la $t0, data_43
-
 # String Node
-
 sw $t0, 76($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 76($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 84($fp)
-
 # Call Node
-
 lw $t0, 84($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 80($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 88($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 96($fp)
-
 # Call Node
-
 lw $t0, 96($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 92($fp)
-
 # String Node
-
 la $t0, data_44
-
 # String Node
-
 sw $t0, 100($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 100($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 108($fp)
-
 # Call Node
-
 lw $t0, 108($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 104($fp)
-
 # String Node
-
 la $t0, data_45
-
 # String Node
-
 sw $t0, 112($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 112($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 120($fp)
-
 # Call Node
-
 lw $t0, 120($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 116($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 124($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 124($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 132($fp)
-
 # Call Node
-
 lw $t0, 132($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 128($fp)
-
 # String Node
-
 la $t0, data_46
-
 # String Node
-
 sw $t0, 136($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 136($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 140($fp)
-
 # String Node
-
 la $t0, data_47
-
 # String Node
-
 sw $t0, 148($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 148($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 156($fp)
-
 # Call Node
-
 lw $t0, 156($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 152($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 160($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 160($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 168($fp)
-
 # Call Node
-
 lw $t0, 168($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 164($fp)
-
 # String Node
-
 la $t0, data_48
-
 # String Node
-
 sw $t0, 172($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 172($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 180($fp)
-
 # Call Node
-
 lw $t0, 180($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 176($fp)
-
 # String Node
-
 la $t0, data_49
-
 # String Node
-
 sw $t0, 184($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 184($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 192($fp)
-
 # Call Node
-
 lw $t0, 192($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 188($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 196($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 196($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 204($fp)
-
 # Call Node
-
 lw $t0, 204($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 200($fp)
-
 # String Node
-
 la $t0, data_50
-
 # String Node
-
 sw $t0, 208($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 208($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 216($fp)
-
 # Call Node
-
 lw $t0, 216($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 212($fp)
-
 # String Node
-
 la $t0, data_51
-
 # String Node
-
 sw $t0, 220($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 220($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 228($fp)
-
 # Call Node
-
 lw $t0, 228($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 224($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 232($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 232($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 240($fp)
-
 # Call Node
-
 lw $t0, 240($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 236($fp)
-
 # String Node
-
 la $t0, data_52
-
 # String Node
-
 sw $t0, 244($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 244($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 252($fp)
-
 # Call Node
-
 lw $t0, 252($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 248($fp)
-
 # String Node
-
 la $t0, data_53
-
 # String Node
-
 sw $t0, 256($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 256($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 264($fp)
-
 # Call Node
-
 lw $t0, 264($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 260($fp)
-
 # Variable Node
-
 lw $t0, 324($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 268($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 268($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 276($fp)
-
 # Call Node
-
 lw $t0, 276($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 272($fp)
-
 # String Node
-
 la $t0, data_54
-
 # String Node
-
 sw $t0, 280($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 280($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 288($fp)
-
 # Call Node
-
 lw $t0, 288($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 284($fp)
-
 # String Node
-
 la $t0, data_55
-
 # String Node
-
 sw $t0, 292($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 292($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 300($fp)
-
 # Call Node
-
 lw $t0, 300($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 296($fp)
-
 # String Node
-
 la $t0, data_56
-
 # String Node
-
 sw $t0, 304($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 304($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 312($fp)
-
 # Call Node
-
 lw $t0, 312($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 308($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 320($fp)
-
 # Call Node
-
 lw $t0, 320($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 316($fp)
-
 # Func Declaration Node
-
 lw $v0, 316($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 328
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_prompt_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -36
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # String Node
-
 la $t0, data_57
-
 # String Node
-
 sw $t0, 4($fp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 4($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 8($fp)
-
 # String Node
-
 la $t0, data_58
-
 # String Node
-
 sw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 20($fp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 28($fp)
-
 # Func Declaration Node
-
 lw $v0, 28($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 40
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_get_int_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -32
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Instantiate Node
-
 la $a0, A2I
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 8($fp)
-
 # Instantiate Node
-
 lw $t0, 8($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A2I_type
-
 # Instantiate Node
-
 sw $v0, 8($fp)
-
 # Var Declaration Node
-
 lw $t0, 8($fp)
-
 # Var Declaration Node
-
 sw $t0, 4($fp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 48($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 16($fp)
-
 # Var Declaration Node
-
 lw $t0, 16($fp)
-
 # Var Declaration Node
-
 sw $t0, 12($fp)
-
 # Call Node
-
 lw $t0, 4($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 4($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 24($fp)
-
 # Func Declaration Node
-
 lw $v0, 24($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 36
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_is_even_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -52
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Var Declaration Node
-
 lw $t0, 52($fp)
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Lesser Node
-
 lw $t0, 0($fp)
-
 # Lesser Node
-
 li $t1, 0
-
 slt $t2, $t0, $t1
-
 # Lesser Node
-
 sw $t2, 8($fp)
-
 # Conditional Node
-
 lw $t0, 8($fp)
-
 # Conditional Node
-
 bne $t0, $zero, is_even_at_Main_label_0
-
 # Equal Node
-
 li $t0, 0
-
 # Equal Node
-
 lw $t1, 0($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 16($fp)
-
 # Conditional Node
-
 lw $t0, 16($fp)
-
 # Conditional Node
-
 bne $t0, $zero, is_even_at_Main_label_2
-
 # Equal Node
-
 li $t0, 1
-
 # Equal Node
-
 lw $t1, 0($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 24($fp)
-
 # Conditional Node
-
 lw $t0, 24($fp)
-
 # Conditional Node
-
 bne $t0, $zero, is_even_at_Main_label_4
-
 # Minus Node
-
 lw $t0, 0($fp)
-
 # Minus Node
-
 li $t1, 2
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 28($fp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 56($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 32($fp)
-
 # Conditional Node
-
 lw $t0, 32($fp)
-
 # Conditional Node
-
 sw $t0, 20($fp)
-
 # Conditional Node
-
 j is_even_at_Main_label_5
-
 # Conditional Node
-
 is_even_at_Main_label_4:
-
 # Conditional Node
-
 li $t0, 0
-
 # Conditional Node
-
 sw $t0, 20($fp)
-
 # Conditional Node
-
 is_even_at_Main_label_5:
-
 # Conditional Node
-
 lw $t0, 20($fp)
-
 # Conditional Node
-
 sw $t0, 12($fp)
-
 # Conditional Node
-
 j is_even_at_Main_label_3
-
 # Conditional Node
-
 is_even_at_Main_label_2:
-
 # Conditional Node
-
 li $t0, 1
-
 # Conditional Node
-
 sw $t0, 12($fp)
-
 # Conditional Node
-
 is_even_at_Main_label_3:
-
 # Conditional Node
-
 lw $t0, 12($fp)
-
 # Conditional Node
-
 sw $t0, 4($fp)
-
 # Conditional Node
-
 j is_even_at_Main_label_1
-
 # Conditional Node
-
 is_even_at_Main_label_0:
-
 # Roof Node
-
 li $t0, 0
-
 # Roof Node
-
 lw $t1, 0($fp)
-
 sub $t2, $t0, $t1
-
 # Roof Node
-
 sw $t2, 40($fp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 40($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 56($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 44($fp)
-
 # Conditional Node
-
 lw $t0, 44($fp)
-
 # Conditional Node
-
 sw $t0, 4($fp)
-
 # Conditional Node
-
 is_even_at_Main_label_1:
-
 # Func Declaration Node
-
 lw $v0, 4($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 60
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_class_type_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -140
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Case Node
-
 lw $t0, 140($fp)
-
 # Case Node
-
 lw $t0, 0($t0)
-
 # Case Node
-
 sw $t0, 0($fp)
-
 # Case Node
-
 li $a0, 24
-
 # Case Node
-
 li $v0, 9
-
 # Case Node
-
 syscall
-
 # Case Node
-
 sw $v0, 4($fp)
-
 # Case Node
-
 li $t2, 0
-
 # Case Node
-
 la $t3, A
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t2, 4
-
 # Case Node
-
 la $t3, B
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t2, 8
-
 # Case Node
-
 la $t3, C
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t2, 12
-
 # Case Node
-
 la $t3, D
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t2, 16
-
 # Case Node
-
 la $t3, E
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t2, 20
-
 # Case Node
-
 la $t3, Object
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t0, -1
-
 # Case Node
-
 sw $t0, 8($fp)
-
 # Case Node
-
 li $t0, -2
-
 # Case Node
-
 sw $t0, 16($fp)
-
 # Case Node
-
 class_type_at_Main_label_0:
-
 # Case Node
-
 lw $t0, 8($fp)
-
 # Case Node
-
 li $t1, 1
-
 add $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 8($fp)
-
 # Case Node
-
 lw $t0, 8($fp)
-
 # Case Node
-
 li $t1, 6
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 28($fp)
-
 # Case Node
-
 lw $t0, 28($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_2
-
 # Case Node
-
 lw $t0, 8($fp)
-
 # Case Node
-
 li $t2, 4
-
 # Case Node
-
 mul $t2, $t2, $t0
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 lw $t2, 0($t1)
-
 # Case Node
-
 sw $t2, 24($fp)
-
 # Case Node
-
 lw $t0, 0($fp)
-
 # Case Node
-
 addi $sp, $sp, -4
-
 # Case Node
-
 sw $t0, 0($sp)
-
 # Case Node
-
 lw $t0, 24($fp)
-
 # Case Node
-
 addi $sp, $sp, -4
-
 # Case Node
-
 sw $t0, 0($sp)
-
 # Case Node
-
 jal type_distance
-
 # Case Node
-
 sw $v0, 20($fp)
-
 # Case Node
-
 lw $t0, 20($fp)
-
 # Case Node
-
 li $t1, -1
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 32($fp)
-
 # Case Node
-
 lw $t0, 32($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_0
-
 # Case Node
-
 lw $t0, 16($fp)
-
 # Case Node
-
 li $t1, -2
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 36($fp)
-
 # Case Node
-
 lw $t0, 36($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_1
-
 # Case Node
-
 lw $t0, 16($fp)
-
 # Case Node
-
 lw $t1, 20($fp)
-
 sgt $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 36($fp)
-
 # Case Node
-
 lw $t0, 36($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_1
-
 # Case Node
-
 j class_type_at_Main_label_0
-
 # Case Node
-
 class_type_at_Main_label_1:
-
 # Case Node
-
 lw $t0, 20($fp)
-
 # Case Node
-
 sw $t0, 16($fp)
-
 # Case Node
-
 lw $t0, 8($fp)
-
 # Case Node
-
 sw $t0, 12($fp)
-
 # Case Node
-
 j class_type_at_Main_label_0
-
 # Case Node
-
 class_type_at_Main_label_2:
-
 # Case Node
-
 lw $t0, 16($fp)
-
 # Case Node
-
 li $t1, -2
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 36($fp)
-
 # Case Node
-
 lw $t0, 36($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_3
-
 # Case Node
-
 lw $t0, 12($fp)
-
 # Case Node
-
 li $t2, 4
-
 # Case Node
-
 mul $t2, $t2, $t0
-
 # Case Node
-
 lw $t1, 4($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 lw $t2, 0($t1)
-
 # Case Node
-
 sw $t2, 24($fp)
-
 # Case Node
-
 la $t0, A
-
 # Case Node
-
 lw $t1, 24($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_5
-
 # Check Node
-
 lw $t0, 140($fp)
-
 # Check Node
-
 sw $t0, 44($fp)
-
 # String Node
-
 la $t0, data_59
-
 # String Node
-
 sw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 52($fp)
-
 # Case Node
-
 lw $t0, 52($fp)
-
 # Case Node
-
 sw $t0, 140($fp)
-
 # Case Node
-
 j class_type_at_Main_label_4
-
 # Case Node
-
 class_type_at_Main_label_5:
-
 # Case Node
-
 la $t0, B
-
 # Case Node
-
 lw $t1, 24($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_6
-
 # Check Node
-
 lw $t0, 140($fp)
-
 # Check Node
-
 sw $t0, 60($fp)
-
 # String Node
-
 la $t0, data_60
-
 # String Node
-
 sw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 72($fp)
-
 # Call Node
-
 lw $t0, 72($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 68($fp)
-
 # Case Node
-
 lw $t0, 68($fp)
-
 # Case Node
-
 sw $t0, 140($fp)
-
 # Case Node
-
 j class_type_at_Main_label_4
-
 # Case Node
-
 class_type_at_Main_label_6:
-
 # Case Node
-
 la $t0, C
-
 # Case Node
-
 lw $t1, 24($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_7
-
 # Check Node
-
 lw $t0, 140($fp)
-
 # Check Node
-
 sw $t0, 76($fp)
-
 # String Node
-
 la $t0, data_61
-
 # String Node
-
 sw $t0, 80($fp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 80($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 84($fp)
-
 # Case Node
-
 lw $t0, 84($fp)
-
 # Case Node
-
 sw $t0, 140($fp)
-
 # Case Node
-
 j class_type_at_Main_label_4
-
 # Case Node
-
 class_type_at_Main_label_7:
-
 # Case Node
-
 la $t0, D
-
 # Case Node
-
 lw $t1, 24($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_8
-
 # Check Node
-
 lw $t0, 140($fp)
-
 # Check Node
-
 sw $t0, 92($fp)
-
 # String Node
-
 la $t0, data_62
-
 # String Node
-
 sw $t0, 96($fp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 96($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 104($fp)
-
 # Call Node
-
 lw $t0, 104($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 100($fp)
-
 # Case Node
-
 lw $t0, 100($fp)
-
 # Case Node
-
 sw $t0, 140($fp)
-
 # Case Node
-
 j class_type_at_Main_label_4
-
 # Case Node
-
 class_type_at_Main_label_8:
-
 # Case Node
-
 la $t0, E
-
 # Case Node
-
 lw $t1, 24($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_9
-
 # Check Node
-
 lw $t0, 140($fp)
-
 # Check Node
-
 sw $t0, 108($fp)
-
 # String Node
-
 la $t0, data_63
-
 # String Node
-
 sw $t0, 112($fp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 112($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 120($fp)
-
 # Call Node
-
 lw $t0, 120($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 116($fp)
-
 # Case Node
-
 lw $t0, 116($fp)
-
 # Case Node
-
 sw $t0, 140($fp)
-
 # Case Node
-
 j class_type_at_Main_label_4
-
 # Case Node
-
 class_type_at_Main_label_9:
-
 # Case Node
-
 la $t0, Object
-
 # Case Node
-
 lw $t1, 24($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 40($fp)
-
 # Case Node
-
 lw $t0, 40($fp)
-
 # Case Node
-
 bne $t0, $zero, class_type_at_Main_label_10
-
 # Check Node
-
 lw $t0, 140($fp)
-
 # Check Node
-
 sw $t0, 124($fp)
-
 # String Node
-
 la $t0, data_64
-
 # String Node
-
 sw $t0, 128($fp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 128($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 144($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 136($fp)
-
 # Call Node
-
 lw $t0, 136($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 132($fp)
-
 # Case Node
-
 lw $t0, 132($fp)
-
 # Case Node
-
 sw $t0, 140($fp)
-
 # Case Node
-
 j class_type_at_Main_label_4
-
 # Case Node
-
 class_type_at_Main_label_10:
-
 # Case Node
-
 class_type_at_Main_label_3:
-
 # Case Node
-
 addi $v0, $zero, 10
-
 # Case Node
-
 syscall
-
 # Case Node
-
 class_type_at_Main_label_4:
-
 # Func Declaration Node
-
 lw $v0, 140($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 148
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_print_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -48
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Instantiate Node
-
 la $a0, A2I
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 4($fp)
-
 # Instantiate Node
-
 lw $t0, 4($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A2I_type
-
 # Instantiate Node
-
 sw $v0, 4($fp)
-
 # Var Declaration Node
-
 lw $t0, 4($fp)
-
 # Var Declaration Node
-
 sw $t0, 0($fp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 16($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 12($fp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 12($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 0($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 24($fp)
-
 # Call Node
-
 lw $t0, 44($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 20($fp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 28($fp)
-
 # String Node
-
 la $t0, data_65
-
 # String Node
-
 sw $t0, 36($fp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 36($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 44($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 40($fp)
-
 # Func Declaration Node
-
 lw $v0, 40($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 56
-
 # Class Declaration Node
-
 jr $ra
-
 # Class Declaration Node
-
 function_main_at_Main:
-
 # Class Declaration Node
-
 addi $sp, $sp, -872
-
 # Class Declaration Node
-
 move $t0, $sp
-
 # Class Declaration Node
-
 addi $sp, $sp, -8
-
 # Class Declaration Node
-
 sw $ra, 0($sp)
-
 # Class Declaration Node
-
 sw $fp, 4($sp)
-
 # Class Declaration Node
-
 move $fp, $t0
-
 # Instantiate Node
-
 la $a0, A
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 4($fp)
-
 # Instantiate Node
-
 lw $t0, 4($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A_type
-
 # Instantiate Node
-
 sw $v0, 4($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 4($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Void Node
-
 sw $zero, 8($fp)
-
 # While Node
-
 main_at_Main_label_0:
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 16($t0)
-
 # Variable Node
-
 sw $t0, 12($fp)
-
 # While Node
-
 lw $t0, 12($fp)
-
 # While Node
-
 bne $t0, $zero, main_at_Main_label_1
-
 # While Node
-
 j main_at_Main_label_2
-
 # While Node
-
 main_at_Main_label_1:
-
 # String Node
-
 la $t0, data_66
-
 # String Node
-
 sw $t0, 20($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 20($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 28($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 24($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 32($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 32($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 40($fp)
-
 # Call Node
-
 lw $t0, 40($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 36($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 48($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 56($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 52($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 52($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 64($fp)
-
 # Call Node
-
 lw $t0, 56($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 60($fp)
-
 # Conditional Node
-
 lw $t0, 60($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_3
-
 # String Node
-
 la $t0, data_67
-
 # String Node
-
 sw $t0, 68($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 68($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 76($fp)
-
 # Call Node
-
 lw $t0, 76($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 72($fp)
-
 # Conditional Node
-
 lw $t0, 72($fp)
-
 # Conditional Node
-
 sw $t0, 44($fp)
-
 # Conditional Node
-
 j main_at_Main_label_4
-
 # Conditional Node
-
 main_at_Main_label_3:
-
 # String Node
-
 la $t0, data_68
-
 # String Node
-
 sw $t0, 80($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 80($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 88($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 84($fp)
-
 # Conditional Node
-
 lw $t0, 84($fp)
-
 # Conditional Node
-
 sw $t0, 44($fp)
-
 # Conditional Node
-
 main_at_Main_label_4:
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 92($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 92($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 100($fp)
-
 # Call Node
-
 lw $t0, 100($fp)
-
 # Call Node
-
 lw $t0, 60($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 96($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 108($fp)
-
 # Call Node
-
 lw $t0, 108($fp)
-
 # Call Node
-
 lw $t0, 44($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 104($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 104($fp)
-
 # Assign Node
-
 sw $t1, 4($t0)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 120($fp)
-
 # String Node
-
 la $t0, data_69
-
 # String Node
-
 sw $t0, 124($fp)
-
 # Equal Node
-
 lw $t0, 120($fp)
-
 # Equal Node
-
 lw $t1, 124($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 116($fp)
-
 # Conditional Node
-
 lw $t0, 116($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_5
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 136($fp)
-
 # String Node
-
 la $t0, data_70
-
 # String Node
-
 sw $t0, 140($fp)
-
 # Equal Node
-
 lw $t0, 136($fp)
-
 # Equal Node
-
 lw $t1, 140($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 132($fp)
-
 # Conditional Node
-
 lw $t0, 132($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_7
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 152($fp)
-
 # String Node
-
 la $t0, data_71
-
 # String Node
-
 sw $t0, 156($fp)
-
 # Equal Node
-
 lw $t0, 152($fp)
-
 # Equal Node
-
 lw $t1, 156($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 148($fp)
-
 # Conditional Node
-
 lw $t0, 148($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_9
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 168($fp)
-
 # String Node
-
 la $t0, data_72
-
 # String Node
-
 sw $t0, 172($fp)
-
 # Equal Node
-
 lw $t0, 168($fp)
-
 # Equal Node
-
 lw $t1, 172($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 164($fp)
-
 # Conditional Node
-
 lw $t0, 164($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_11
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 184($fp)
-
 # String Node
-
 la $t0, data_73
-
 # String Node
-
 sw $t0, 188($fp)
-
 # Equal Node
-
 lw $t0, 184($fp)
-
 # Equal Node
-
 lw $t1, 188($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 180($fp)
-
 # Conditional Node
-
 lw $t0, 180($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_13
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 200($fp)
-
 # String Node
-
 la $t0, data_74
-
 # String Node
-
 sw $t0, 204($fp)
-
 # Equal Node
-
 lw $t0, 200($fp)
-
 # Equal Node
-
 lw $t1, 204($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 196($fp)
-
 # Conditional Node
-
 lw $t0, 196($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_15
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 216($fp)
-
 # String Node
-
 la $t0, data_75
-
 # String Node
-
 sw $t0, 220($fp)
-
 # Equal Node
-
 lw $t0, 216($fp)
-
 # Equal Node
-
 lw $t1, 220($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 212($fp)
-
 # Conditional Node
-
 lw $t0, 212($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_17
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 232($fp)
-
 # String Node
-
 la $t0, data_76
-
 # String Node
-
 sw $t0, 236($fp)
-
 # Equal Node
-
 lw $t0, 232($fp)
-
 # Equal Node
-
 lw $t1, 236($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 228($fp)
-
 # Conditional Node
-
 lw $t0, 228($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_19
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 248($fp)
-
 # String Node
-
 la $t0, data_77
-
 # String Node
-
 sw $t0, 252($fp)
-
 # Equal Node
-
 lw $t0, 248($fp)
-
 # Equal Node
-
 lw $t1, 252($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 244($fp)
-
 # Conditional Node
-
 lw $t0, 244($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_21
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 4($t0)
-
 # Variable Node
-
 sw $t0, 264($fp)
-
 # String Node
-
 la $t0, data_78
-
 # String Node
-
 sw $t0, 268($fp)
-
 # Equal Node
-
 lw $t0, 264($fp)
-
 # Equal Node
-
 lw $t1, 268($fp)
-
 seq $t2, $t0, $t1
-
 # Equal Node
-
 sw $t2, 260($fp)
-
 # Conditional Node
-
 lw $t0, 260($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_23
-
 # Instantiate Node
-
 la $a0, A
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 272($fp)
-
 # Instantiate Node
-
 lw $t0, 272($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A_type
-
 # Instantiate Node
-
 sw $v0, 272($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 276($fp)
-
 # Call Node
-
 lw $t0, 276($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 276($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 284($fp)
-
 # Call Node
-
 lw $t0, 284($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 280($fp)
-
 # Call Node
-
 lw $t0, 272($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 280($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 272($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 292($fp)
-
 # Call Node
-
 lw $t0, 292($fp)
-
 # Call Node
-
 lw $t0, 36($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 288($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 288($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 288($fp)
-
 # Conditional Node
-
 sw $t0, 256($fp)
-
 # Conditional Node
-
 j main_at_Main_label_24
-
 # Conditional Node
-
 main_at_Main_label_23:
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 li $t1, 0
-
 # Assign Node
-
 sw $t1, 16($t0)
-
 # Conditional Node
-
 li $t0, 0
-
 # Conditional Node
-
 sw $t0, 256($fp)
-
 # Conditional Node
-
 main_at_Main_label_24:
-
 # Conditional Node
-
 lw $t0, 256($fp)
-
 # Conditional Node
-
 sw $t0, 240($fp)
-
 # Conditional Node
-
 j main_at_Main_label_22
-
 # Conditional Node
-
 main_at_Main_label_21:
-
 # Instantiate Node
-
 la $a0, A
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 296($fp)
-
 # Instantiate Node
-
 lw $t0, 296($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A_type
-
 # Instantiate Node
-
 sw $v0, 296($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 296($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 296($fp)
-
 # Conditional Node
-
 sw $t0, 240($fp)
-
 # Conditional Node
-
 main_at_Main_label_22:
-
 # Conditional Node
-
 lw $t0, 240($fp)
-
 # Conditional Node
-
 sw $t0, 224($fp)
-
 # Conditional Node
-
 j main_at_Main_label_20
-
 # Conditional Node
-
 main_at_Main_label_19:
-
 # Instantiate Node
-
 sw $zero, 304($fp)
-
 # Var Declaration Node
-
 lw $t0, 304($fp)
-
 # Var Declaration Node
-
 sw $t0, 300($fp)
-
 # Instantiate Node
-
 la $a0, E
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 312($fp)
-
 # Instantiate Node
-
 lw $t0, 312($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_E_type
-
 # Instantiate Node
-
 sw $v0, 312($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 316($fp)
-
 # Call Node
-
 lw $t0, 316($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 316($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 324($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 320($fp)
-
 # Call Node
-
 lw $t0, 312($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 320($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 312($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 332($fp)
-
 # Call Node
-
 lw $t0, 332($fp)
-
 # Call Node
-
 lw $t0, 60($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 328($fp)
-
 # Assign Node
-
 lw $t0, 328($fp)
-
 # Assign Node
-
 sw $t0, 300($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 340($fp)
-
 # Call Node
-
 lw $t0, 340($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 340($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 348($fp)
-
 # Call Node
-
 lw $t0, 348($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 344($fp)
-
 # Call Node
-
 lw $t0, 300($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 300($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 356($fp)
-
 # Call Node
-
 lw $t0, 356($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 352($fp)
-
 # Star Node
-
 lw $t0, 352($fp)
-
 # Star Node
-
 li $t1, 8
-
 mul $t2, $t0, $t1
-
 # Star Node
-
 sw $t2, 360($fp)
-
 # Minus Node
-
 lw $t0, 344($fp)
-
 # Minus Node
-
 lw $t1, 360($fp)
-
 sub $t2, $t0, $t1
-
 # Minus Node
-
 sw $t2, 364($fp)
-
 # Var Declaration Node
-
 lw $t0, 364($fp)
-
 # Var Declaration Node
-
 sw $t0, 336($fp)
-
 # String Node
-
 la $t0, data_79
-
 # String Node
-
 sw $t0, 372($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 372($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 380($fp)
-
 # Call Node
-
 lw $t0, 380($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 376($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 384($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 384($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 392($fp)
-
 # Call Node
-
 lw $t0, 392($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 388($fp)
-
 # String Node
-
 la $t0, data_80
-
 # String Node
-
 sw $t0, 396($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 396($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 404($fp)
-
 # Call Node
-
 lw $t0, 404($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 400($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 300($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 412($fp)
-
 # Call Node
-
 lw $t0, 412($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 408($fp)
-
 # String Node
-
 la $t0, data_81
-
 # String Node
-
 sw $t0, 416($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 416($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 424($fp)
-
 # Call Node
-
 lw $t0, 424($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 420($fp)
-
 # Instantiate Node
-
 la $a0, A2I
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 432($fp)
-
 # Instantiate Node
-
 lw $t0, 432($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A2I_type
-
 # Instantiate Node
-
 sw $v0, 432($fp)
-
 # Var Declaration Node
-
 lw $t0, 432($fp)
-
 # Var Declaration Node
-
 sw $t0, 428($fp)
-
 # Call Node
-
 lw $t0, 428($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 336($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 428($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 444($fp)
-
 # Call Node
-
 lw $t0, 444($fp)
-
 # Call Node
-
 lw $t0, 44($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 440($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 440($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 452($fp)
-
 # Call Node
-
 lw $t0, 452($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 448($fp)
-
 # String Node
-
 la $t0, data_82
-
 # String Node
-
 sw $t0, 456($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 456($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 464($fp)
-
 # Call Node
-
 lw $t0, 464($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 460($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 300($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 300($fp)
-
 # Conditional Node
-
 sw $t0, 224($fp)
-
 # Conditional Node
-
 main_at_Main_label_20:
-
 # Conditional Node
-
 lw $t0, 224($fp)
-
 # Conditional Node
-
 sw $t0, 208($fp)
-
 # Conditional Node
-
 j main_at_Main_label_18
-
 # Conditional Node
-
 main_at_Main_label_17:
-
 # Instantiate Node
-
 la $a0, D
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 472($fp)
-
 # Instantiate Node
-
 lw $t0, 472($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_D_type
-
 # Instantiate Node
-
 sw $v0, 472($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 476($fp)
-
 # Call Node
-
 lw $t0, 476($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 476($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 484($fp)
-
 # Call Node
-
 lw $t0, 484($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 480($fp)
-
 # Call Node
-
 lw $t0, 472($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 480($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 472($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 492($fp)
-
 # Call Node
-
 lw $t0, 492($fp)
-
 # Call Node
-
 lw $t0, 56($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 488($fp)
-
 # Conditional Node
-
 lw $t0, 488($fp)
-
 # Conditional Node
-
 bne $t0, $zero, main_at_Main_label_25
-
 # String Node
-
 la $t0, data_83
-
 # String Node
-
 sw $t0, 500($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 500($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 508($fp)
-
 # Call Node
-
 lw $t0, 508($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 504($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 512($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 512($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 520($fp)
-
 # Call Node
-
 lw $t0, 520($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 516($fp)
-
 # String Node
-
 la $t0, data_84
-
 # String Node
-
 sw $t0, 524($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 524($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 532($fp)
-
 # Call Node
-
 lw $t0, 532($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 528($fp)
-
 # Conditional Node
-
 lw $t0, 528($fp)
-
 # Conditional Node
-
 sw $t0, 468($fp)
-
 # Conditional Node
-
 j main_at_Main_label_26
-
 # Conditional Node
-
 main_at_Main_label_25:
-
 # String Node
-
 la $t0, data_85
-
 # String Node
-
 sw $t0, 540($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 540($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 548($fp)
-
 # Call Node
-
 lw $t0, 548($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 544($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 552($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 552($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 560($fp)
-
 # Call Node
-
 lw $t0, 560($fp)
-
 # Call Node
-
 lw $t0, 64($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 556($fp)
-
 # String Node
-
 la $t0, data_86
-
 # String Node
-
 sw $t0, 564($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 564($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 572($fp)
-
 # Call Node
-
 lw $t0, 572($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 568($fp)
-
 # Conditional Node
-
 lw $t0, 568($fp)
-
 # Conditional Node
-
 sw $t0, 468($fp)
-
 # Conditional Node
-
 main_at_Main_label_26:
-
 # Conditional Node
-
 lw $t0, 468($fp)
-
 # Conditional Node
-
 sw $t0, 208($fp)
-
 # Conditional Node
-
 main_at_Main_label_18:
-
 # Conditional Node
-
 lw $t0, 208($fp)
-
 # Conditional Node
-
 sw $t0, 192($fp)
-
 # Conditional Node
-
 j main_at_Main_label_16
-
 # Conditional Node
-
 main_at_Main_label_15:
-
 # Instantiate Node
-
 la $a0, C
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 576($fp)
-
 # Instantiate Node
-
 lw $t0, 576($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_C_type
-
 # Instantiate Node
-
 sw $v0, 576($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 580($fp)
-
 # Call Node
-
 lw $t0, 580($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 580($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 588($fp)
-
 # Call Node
-
 lw $t0, 588($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 584($fp)
-
 # Call Node
-
 lw $t0, 576($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 584($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 jal function_method5_at_C
-
 # Call Node
-
 sw $v0, 592($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 592($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 592($fp)
-
 # Conditional Node
-
 sw $t0, 192($fp)
-
 # Conditional Node
-
 main_at_Main_label_16:
-
 # Conditional Node
-
 lw $t0, 192($fp)
-
 # Conditional Node
-
 sw $t0, 176($fp)
-
 # Conditional Node
-
 j main_at_Main_label_14
-
 # Conditional Node
-
 main_at_Main_label_13:
-
 # Instantiate Node
-
 la $a0, C
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 596($fp)
-
 # Instantiate Node
-
 lw $t0, 596($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_C_type
-
 # Instantiate Node
-
 sw $v0, 596($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 600($fp)
-
 # Call Node
-
 lw $t0, 600($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 600($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 608($fp)
-
 # Call Node
-
 lw $t0, 608($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 604($fp)
-
 # Call Node
-
 lw $t0, 596($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 604($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 jal function_method5_at_B
-
 # Call Node
-
 sw $v0, 612($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 612($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 612($fp)
-
 # Conditional Node
-
 sw $t0, 176($fp)
-
 # Conditional Node
-
 main_at_Main_label_14:
-
 # Conditional Node
-
 lw $t0, 176($fp)
-
 # Conditional Node
-
 sw $t0, 160($fp)
-
 # Conditional Node
-
 j main_at_Main_label_12
-
 # Conditional Node
-
 main_at_Main_label_11:
-
 # Instantiate Node
-
 la $a0, C
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 616($fp)
-
 # Instantiate Node
-
 lw $t0, 616($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_C_type
-
 # Instantiate Node
-
 sw $v0, 616($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 620($fp)
-
 # Call Node
-
 lw $t0, 620($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 620($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 628($fp)
-
 # Call Node
-
 lw $t0, 628($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 624($fp)
-
 # Call Node
-
 lw $t0, 616($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 624($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 jal function_method5_at_A
-
 # Call Node
-
 sw $v0, 632($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 632($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 632($fp)
-
 # Conditional Node
-
 sw $t0, 160($fp)
-
 # Conditional Node
-
 main_at_Main_label_12:
-
 # Conditional Node
-
 lw $t0, 160($fp)
-
 # Conditional Node
-
 sw $t0, 144($fp)
-
 # Conditional Node
-
 j main_at_Main_label_10
-
 # Conditional Node
-
 main_at_Main_label_9:
-
 # Instantiate Node
-
 la $a0, A
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 640($fp)
-
 # Instantiate Node
-
 lw $t0, 640($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A_type
-
 # Instantiate Node
-
 sw $v0, 640($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 648($fp)
-
 # Call Node
-
 lw $t0, 648($fp)
-
 # Call Node
-
 lw $t0, 52($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 644($fp)
-
 # Call Node
-
 lw $t0, 640($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 644($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 640($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 656($fp)
-
 # Call Node
-
 lw $t0, 656($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 652($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 652($fp)
-
 # Assign Node
-
 sw $t1, 12($t0)
-
 # Instantiate Node
-
 la $a0, D
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 660($fp)
-
 # Instantiate Node
-
 lw $t0, 660($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_D_type
-
 # Instantiate Node
-
 sw $v0, 660($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 664($fp)
-
 # Call Node
-
 lw $t0, 664($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 664($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 672($fp)
-
 # Call Node
-
 lw $t0, 672($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 668($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 12($t0)
-
 # Variable Node
-
 sw $t0, 676($fp)
-
 # Call Node
-
 lw $t0, 676($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 676($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 684($fp)
-
 # Call Node
-
 lw $t0, 684($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 680($fp)
-
 # Call Node
-
 lw $t0, 660($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 668($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 680($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 660($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 692($fp)
-
 # Call Node
-
 lw $t0, 692($fp)
-
 # Call Node
-
 lw $t0, 48($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 688($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 688($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 688($fp)
-
 # Conditional Node
-
 sw $t0, 144($fp)
-
 # Conditional Node
-
 main_at_Main_label_10:
-
 # Conditional Node
-
 lw $t0, 144($fp)
-
 # Conditional Node
-
 sw $t0, 128($fp)
-
 # Conditional Node
-
 j main_at_Main_label_8
-
 # Conditional Node
-
 main_at_Main_label_7:
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 696($fp)
-
 # Case Node
-
 lw $t0, 696($fp)
-
 # Case Node
-
 lw $t0, 0($t0)
-
 # Case Node
-
 sw $t0, 700($fp)
-
 # Case Node
-
 li $a0, 12
-
 # Case Node
-
 li $v0, 9
-
 # Case Node
-
 syscall
-
 # Case Node
-
 sw $v0, 704($fp)
-
 # Case Node
-
 li $t2, 0
-
 # Case Node
-
 la $t3, C
-
 # Case Node
-
 lw $t1, 704($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t2, 4
-
 # Case Node
-
 la $t3, A
-
 # Case Node
-
 lw $t1, 704($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t2, 8
-
 # Case Node
-
 la $t3, Object
-
 # Case Node
-
 lw $t1, 704($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 sw $t3, 0($t1)
-
 # Case Node
-
 li $t0, -1
-
 # Case Node
-
 sw $t0, 708($fp)
-
 # Case Node
-
 li $t0, -2
-
 # Case Node
-
 sw $t0, 716($fp)
-
 # Case Node
-
 main_at_Main_label_27:
-
 # Case Node
-
 lw $t0, 708($fp)
-
 # Case Node
-
 li $t1, 1
-
 add $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 708($fp)
-
 # Case Node
-
 lw $t0, 708($fp)
-
 # Case Node
-
 li $t1, 3
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 728($fp)
-
 # Case Node
-
 lw $t0, 728($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_29
-
 # Case Node
-
 lw $t0, 708($fp)
-
 # Case Node
-
 li $t2, 4
-
 # Case Node
-
 mul $t2, $t2, $t0
-
 # Case Node
-
 lw $t1, 704($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 lw $t2, 0($t1)
-
 # Case Node
-
 sw $t2, 724($fp)
-
 # Case Node
-
 lw $t0, 700($fp)
-
 # Case Node
-
 addi $sp, $sp, -4
-
 # Case Node
-
 sw $t0, 0($sp)
-
 # Case Node
-
 lw $t0, 724($fp)
-
 # Case Node
-
 addi $sp, $sp, -4
-
 # Case Node
-
 sw $t0, 0($sp)
-
 # Case Node
-
 jal type_distance
-
 # Case Node
-
 sw $v0, 720($fp)
-
 # Case Node
-
 lw $t0, 720($fp)
-
 # Case Node
-
 li $t1, -1
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 732($fp)
-
 # Case Node
-
 lw $t0, 732($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_27
-
 # Case Node
-
 lw $t0, 716($fp)
-
 # Case Node
-
 li $t1, -2
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 736($fp)
-
 # Case Node
-
 lw $t0, 736($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_28
-
 # Case Node
-
 lw $t0, 716($fp)
-
 # Case Node
-
 lw $t1, 720($fp)
-
 sgt $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 736($fp)
-
 # Case Node
-
 lw $t0, 736($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_28
-
 # Case Node
-
 j main_at_Main_label_27
-
 # Case Node
-
 main_at_Main_label_28:
-
 # Case Node
-
 lw $t0, 720($fp)
-
 # Case Node
-
 sw $t0, 716($fp)
-
 # Case Node
-
 lw $t0, 708($fp)
-
 # Case Node
-
 sw $t0, 712($fp)
-
 # Case Node
-
 j main_at_Main_label_27
-
 # Case Node
-
 main_at_Main_label_29:
-
 # Case Node
-
 lw $t0, 716($fp)
-
 # Case Node
-
 li $t1, -2
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 736($fp)
-
 # Case Node
-
 lw $t0, 736($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_30
-
 # Case Node
-
 lw $t0, 712($fp)
-
 # Case Node
-
 li $t2, 4
-
 # Case Node
-
 mul $t2, $t2, $t0
-
 # Case Node
-
 lw $t1, 704($fp)
-
 # Case Node
-
 add $t1, $t1, $t2
-
 # Case Node
-
 lw $t2, 0($t1)
-
 # Case Node
-
 sw $t2, 724($fp)
-
 # Case Node
-
 la $t0, C
-
 # Case Node
-
 lw $t1, 724($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 740($fp)
-
 # Case Node
-
 lw $t0, 740($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 740($fp)
-
 # Case Node
-
 lw $t0, 740($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_32
-
 # Check Node
-
 lw $t0, 696($fp)
-
 # Check Node
-
 sw $t0, 744($fp)
-
 # Call Node
-
 lw $t0, 744($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 744($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 752($fp)
-
 # Call Node
-
 lw $t0, 752($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 748($fp)
-
 # Call Node
-
 lw $t0, 744($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 748($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 744($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 760($fp)
-
 # Call Node
-
 lw $t0, 760($fp)
-
 # Call Node
-
 lw $t0, 56($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 756($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 756($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Case Node
-
 lw $t0, 756($fp)
-
 # Case Node
-
 sw $t0, 696($fp)
-
 # Case Node
-
 j main_at_Main_label_31
-
 # Case Node
-
 main_at_Main_label_32:
-
 # Case Node
-
 la $t0, A
-
 # Case Node
-
 lw $t1, 724($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 740($fp)
-
 # Case Node
-
 lw $t0, 740($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 740($fp)
-
 # Case Node
-
 lw $t0, 740($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_33
-
 # Check Node
-
 lw $t0, 696($fp)
-
 # Check Node
-
 sw $t0, 764($fp)
-
 # Call Node
-
 lw $t0, 764($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 764($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 772($fp)
-
 # Call Node
-
 lw $t0, 772($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 768($fp)
-
 # Call Node
-
 lw $t0, 764($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 768($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 764($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 780($fp)
-
 # Call Node
-
 lw $t0, 780($fp)
-
 # Call Node
-
 lw $t0, 44($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 776($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 776($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Case Node
-
 lw $t0, 776($fp)
-
 # Case Node
-
 sw $t0, 696($fp)
-
 # Case Node
-
 j main_at_Main_label_31
-
 # Case Node
-
 main_at_Main_label_33:
-
 # Case Node
-
 la $t0, Object
-
 # Case Node
-
 lw $t1, 724($fp)
-
 seq $t2, $t0, $t1
-
 # Case Node
-
 sw $t2, 740($fp)
-
 # Case Node
-
 lw $t0, 740($fp)
-
 # Case Node
-
 nor $t0, $t0, $t0
-
 # Case Node
-
 sw $t0, 740($fp)
-
 # Case Node
-
 lw $t0, 740($fp)
-
 # Case Node
-
 bne $t0, $zero, main_at_Main_label_34
-
 # Check Node
-
 lw $t0, 696($fp)
-
 # Check Node
-
 sw $t0, 784($fp)
-
 # String Node
-
 la $t0, data_87
-
 # String Node
-
 sw $t0, 792($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 792($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 800($fp)
-
 # Call Node
-
 lw $t0, 800($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 796($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 808($fp)
-
 # Call Node
-
 lw $t0, 808($fp)
-
 # Call Node
-
 lw $t0, 16($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 804($fp)
-
 # Case Node
-
 li $t0, 0
-
 # Case Node
-
 sw $t0, 696($fp)
-
 # Case Node
-
 j main_at_Main_label_31
-
 # Case Node
-
 main_at_Main_label_34:
-
 # Case Node
-
 main_at_Main_label_30:
-
 # Case Node
-
 addi $v0, $zero, 10
-
 # Case Node
-
 syscall
-
 # Case Node
-
 main_at_Main_label_31:
-
 # Conditional Node
-
 lw $t0, 696($fp)
-
 # Conditional Node
-
 sw $t0, 128($fp)
-
 # Conditional Node
-
 main_at_Main_label_8:
-
 # Conditional Node
-
 lw $t0, 128($fp)
-
 # Conditional Node
-
 sw $t0, 112($fp)
-
 # Conditional Node
-
 j main_at_Main_label_6
-
 # Conditional Node
-
 main_at_Main_label_5:
-
 # Instantiate Node
-
 la $a0, A
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 816($fp)
-
 # Instantiate Node
-
 lw $t0, 816($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_A_type
-
 # Instantiate Node
-
 sw $v0, 816($fp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 872($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 824($fp)
-
 # Call Node
-
 lw $t0, 824($fp)
-
 # Call Node
-
 lw $t0, 52($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 820($fp)
-
 # Call Node
-
 lw $t0, 816($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 820($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 816($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 832($fp)
-
 # Call Node
-
 lw $t0, 832($fp)
-
 # Call Node
-
 lw $t0, 32($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 828($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 828($fp)
-
 # Assign Node
-
 sw $t1, 12($t0)
-
 # Instantiate Node
-
 la $a0, B
-
 # Instantiate Node
-
 lw $a0, 4($a0)
-
 # Instantiate Node
-
 li $v0, 9
-
 # Instantiate Node
-
 syscall
-
 # Instantiate Node
-
 sw $v0, 836($fp)
-
 # Instantiate Node
-
 lw $t0, 836($fp)
-
 # Instantiate Node
-
 addi $sp, $sp, -4
-
 # Instantiate Node
-
 sw $t0, 0($sp)
-
 # Instantiate Node
-
 jal __init_B_type
-
 # Instantiate Node
-
 sw $v0, 836($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 8($t0)
-
 # Variable Node
-
 sw $t0, 840($fp)
-
 # Call Node
-
 lw $t0, 840($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 840($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 848($fp)
-
 # Call Node
-
 lw $t0, 848($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 844($fp)
-
 # Variable Node
-
 lw $t0, 872($fp)
-
 # Variable Node
-
 lw $t0, 12($t0)
-
 # Variable Node
-
 sw $t0, 852($fp)
-
 # Call Node
-
 lw $t0, 852($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 852($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 860($fp)
-
 # Call Node
-
 lw $t0, 860($fp)
-
 # Call Node
-
 lw $t0, 28($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 856($fp)
-
 # Call Node
-
 lw $t0, 836($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 844($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 856($fp)
-
 # Call Node
-
 addi $sp, $sp, -4
-
 # Call Node
-
 sw $t0, 0($sp)
-
 # Call Node
-
 lw $t0, 836($fp)
-
 # Call Node
-
 lw $t0, 0($t0)
-
 # Call Node
-
 sw $t0, 868($fp)
-
 # Call Node
-
 lw $t0, 868($fp)
-
 # Call Node
-
 lw $t0, 40($t0)
-
 # Call Node
-
 jal __get_ra
-
 # Call Node
-
 move $ra, $v0
-
 # Call Node
-
 jr $t0
-
 # Call Node
-
 sw $v0, 864($fp)
-
 # Assign Node
-
 lw $t0, 872($fp)
-
 # Assign Node
-
 lw $t1, 864($fp)
-
 # Assign Node
-
 sw $t1, 8($t0)
-
 # Conditional Node
-
 lw $t0, 864($fp)
-
 # Conditional Node
-
 sw $t0, 112($fp)
-
 # Conditional Node
-
 main_at_Main_label_6:
-
 # While Node
-
 j main_at_Main_label_0
-
 # While Node
-
 main_at_Main_label_2:
-
 # Func Declaration Node
-
 lw $v0, 8($fp)
-
 # Class Declaration Node
-
 lw $ra, 0($sp)
-
 # Class Declaration Node
-
 lw $fp, 4($sp)
-
 # Class Declaration Node
-
 addi $sp, $sp, 8
-
 # Class Declaration Node
-
 addi $sp, $sp, 876
-
 # Class Declaration Node
-
 jr $ra
-
 .data 
-
 # Program Node
-
 Object: .word 0, 4, data_0, __init_Object_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
-
 # Program Node
-
 String: .word Object, 4, data_1, __init_String_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_length_at_String, function_concat_at_String, function_substr_at_String
-
 # Program Node
-
 Bool: .word Object, 4, data_2, __init_Bool_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
-
 # Program Node
-
 Int: .word Object, 4, data_3, __init_Int_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
-
 # Program Node
-
 IO: .word Object, 4, data_4, __init_IO_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO
-
 # Program Node
-
 A: .word Object, 8, data_5, __init_A_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_value_at_A, function_set_var_at_A, function_method1_at_A, function_method2_at_A, function_method3_at_A, function_method4_at_A, function_method5_at_A
-
 # Program Node
-
 B: .word A, 8, data_6, __init_B_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_value_at_A, function_set_var_at_A, function_method1_at_A, function_method2_at_A, function_method3_at_A, function_method4_at_A, function_method5_at_B
-
 # Program Node
-
 C: .word B, 8, data_7, __init_C_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_value_at_A, function_set_var_at_A, function_method1_at_A, function_method2_at_A, function_method3_at_A, function_method4_at_A, function_method5_at_C, function_method6_at_C
-
 # Program Node
-
 D: .word B, 8, data_8, __init_D_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_value_at_A, function_set_var_at_A, function_method1_at_A, function_method2_at_A, function_method3_at_A, function_method4_at_A, function_method5_at_B, function_method7_at_D
-
 # Program Node
-
 E: .word D, 8, data_9, __init_E_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_value_at_A, function_set_var_at_A, function_method1_at_A, function_method2_at_A, function_method3_at_A, function_method4_at_A, function_method5_at_B, function_method7_at_D, function_method6_at_E
-
 # Program Node
-
 A2I: .word Object, 4, data_10, __init_A2I_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_c2i_at_A2I, function_i2c_at_A2I, function_a2i_at_A2I, function_a2i_aux_at_A2I, function_i2a_at_A2I, function_i2a_aux_at_A2I
-
 # Program Node
-
 Main: .word IO, 20, data_11, __init_Main_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, function_menu_at_Main, function_prompt_at_Main, function_get_int_at_Main, function_is_even_at_Main, function_class_type_at_Main, function_print_at_Main, function_main_at_Main
-
 data_0: .asciiz "Object"
-
 data_1: .asciiz "String"
-
 data_2: .asciiz "Bool"
-
 data_3: .asciiz "Int"
-
 data_4: .asciiz "IO"
-
 data_5: .asciiz "A"
-
 data_6: .asciiz "B"
-
 data_7: .asciiz "C"
-
 data_8: .asciiz "D"
-
 data_9: .asciiz "E"
-
 data_10: .asciiz "A2I"
-
 data_11: .asciiz "Main"
-
 data_12: .asciiz "0"
-
 data_13: .asciiz "1"
-
 data_14: .asciiz "2"
-
 data_15: .asciiz "3"
-
 data_16: .asciiz "4"
-
 data_17: .asciiz "5"
-
 data_18: .asciiz "6"
-
 data_19: .asciiz "7"
-
 data_20: .asciiz "8"
-
 data_21: .asciiz "9"
-
 data_22: .asciiz ""
-
 data_23: .asciiz "9"
-
 data_24: .asciiz "8"
-
 data_25: .asciiz "7"
-
 data_26: .asciiz "6"
-
 data_27: .asciiz "5"
-
 data_28: .asciiz "4"
-
 data_29: .asciiz "3"
-
 data_30: .asciiz "2"
-
 data_31: .asciiz "1"
-
 data_32: .asciiz "0"
-
 data_33: .asciiz "-"
-
 data_34: .asciiz "+"
-
 data_35: .asciiz "-"
-
 data_36: .asciiz "0"
-
 data_37: .asciiz ""
-
 data_38: .asciiz ""
-
 data_39: .asciiz "\n\tTo add a number to "
-
 data_40: .asciiz "...enter a:\n"
-
 data_41: .asciiz "\tTo negate "
-
 data_42: .asciiz "...enter b:\n"
-
 data_43: .asciiz "\tTo find the difference between "
-
 data_44: .asciiz "and another number...enter c:\n"
-
 data_45: .asciiz "\tTo find the factorial of "
-
 data_46: .asciiz "...enter d:\n"
-
 data_47: .asciiz "\tTo square "
-
 data_48: .asciiz "...enter e:\n"
-
 data_49: .asciiz "\tTo cube "
-
 data_50: .asciiz "...enter f:\n"
-
 data_51: .asciiz "\tTo find out if "
-
 data_52: .asciiz "is a multiple of 3...enter g:\n"
-
 data_53: .asciiz "\tTo divide "
-
 data_54: .asciiz "by 8...enter h:\n"
-
 data_55: .asciiz "\tTo get a new number...enter j:\n"
-
 data_56: .asciiz "\tTo quit...enter q:\n\n"
-
 data_57: .asciiz "\n"
-
 data_58: .asciiz "Please enter a number...  "
-
 data_59: .asciiz "Class type is now A\n"
-
 data_60: .asciiz "Class type is now B\n"
-
 data_61: .asciiz "Class type is now C\n"
-
 data_62: .asciiz "Class type is now D\n"
-
 data_63: .asciiz "Class type is now E\n"
-
 data_64: .asciiz "Oooops\n"
-
 data_65: .asciiz " "
-
 data_66: .asciiz "number "
-
 data_67: .asciiz "is odd!\n"
-
 data_68: .asciiz "is even!\n"
-
 data_69: .asciiz "a"
-
 data_70: .asciiz "b"
-
 data_71: .asciiz "c"
-
 data_72: .asciiz "d"
-
 data_73: .asciiz "e"
-
 data_74: .asciiz "f"
-
 data_75: .asciiz "g"
-
 data_76: .asciiz "h"
-
 data_77: .asciiz "j"
-
 data_78: .asciiz "q"
-
 data_79: .asciiz "number "
-
 data_80: .asciiz "is equal to "
-
 data_81: .asciiz "times 8 with a remainder of "
-
 data_82: .asciiz "\n"
-
 data_83: .asciiz "number "
-
 data_84: .asciiz "is not divisible by 3.\n"
-
 data_85: .asciiz "number "
-
 data_86: .asciiz "is divisible by 3.\n"
-
 data_87: .asciiz "Oooops\n"
