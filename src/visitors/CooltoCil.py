@@ -216,13 +216,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.parameters.clear()
         self.params.append(cil.ParamNode('self'))
-<<<<<<< HEAD
-        for arg_name, _ in node.params:
-            self.parameters.add(arg_name)
-=======
         for arg_name, ptype in node.params:
             self.parameters.add((arg_name, ptype))
->>>>>>> 36db263c1528b1af4d5f1ef8a5b156973dd4c179
             self.params.append(cil.ParamNode(arg_name))
             self.register_instruction(cil.ParamNode(arg_name))
         
@@ -593,18 +588,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(TrueNode)
     def visit(self, node, scope):
-<<<<<<< HEAD
-        value = self.define_internal_local()
-        self.register_instruction(cil.AllocateNode('Bool', value))
-        # setear atributo 0 a True
-        return value
-
-    @visitor.when(FalseNode)
-    def visit(self, node, scope):
-        value = self.define_internal_local()
-        self.register_instruction(cil.AllocateNode('Bool', value))
-        return value
-=======
         var = self.define_internal_local()
         self.register_instruction(cil.AllocateNode("Bool", var))
         self.register_instruction(cil.SetAttribNode(var, 0, 1))
@@ -615,7 +598,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         var = self.define_internal_local()
         self.register_instruction(cil.AllocateNode("Bool", var))
         return var
->>>>>>> 36db263c1528b1af4d5f1ef8a5b156973dd4c179
 
     @visitor.when(StringNode)
     def visit(self, node, scope):
