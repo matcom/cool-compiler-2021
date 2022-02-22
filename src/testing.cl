@@ -16,7 +16,6 @@ class A {
          self;
       }
    };
-
    method1(num : Int) : A {  -- same
       self
    };
