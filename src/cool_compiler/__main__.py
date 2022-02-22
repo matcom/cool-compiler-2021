@@ -8,6 +8,10 @@ from .semantic import *
 from .types import CoolTypeBuildInManager
 from .codegen import CILGenerate
 
+path = ""
+if len(sys.argv) > 1:
+    path = sys.argv[1]
+
 path = "test.cl"
 
 with open(path, 'r') as _file:
@@ -25,14 +29,12 @@ with open(path, 'r') as _file:
     ast = parser.parse(iter(tokens))
     if errors.any(): sys.exit(1)
 
-    visitorList = [ CreateType, SemanticChecking, CILGenerate, MipsGenerate ]
+    visitorList = [ CreateType, SemanticChecking, CILGenerate ]
  
     for visitorClass in visitorList:
         ast  = visitorClass(errors).visit(ast)
         if errors.any(): sys.exit(1)
         
     print(ast)
-    print(type(ast))
-    print((ast.types['Main'].method_list))
     #print(ast)
     

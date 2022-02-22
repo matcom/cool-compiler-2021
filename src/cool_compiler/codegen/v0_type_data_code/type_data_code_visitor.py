@@ -40,7 +40,7 @@ class CILGenerate:
 
     @visitor.on('node')
     def visit(node, scope: Scope):
-        return [ASTR.Sum(super_value, 'a', 'b')]
+        pass
 
     @visitor.when(AST.Program)
     def visit(self, node: AST.Program, scope: Scope = None):
@@ -58,15 +58,16 @@ class CILGenerate:
 
         self.currentType = ASTR.Type(node.type.name)
         self.currentClass = node.type
-        self.new_type_func = ASTR.Function(f'new@ctr@{node.type.name}')
+        self.new_type_func = ASTR.Function(f'new_ctr_{node.type.name}')
         
         self.program.add_type(self.currentType)
 
         for parent in parent_list(node):
+            self.currentType.attr_push('type', self.currentType.name)
             for attr in parent.attributes:
-                self.currentType.attr_push(attr.name, f'{parent.name}@{attr.name}')
+                self.currentType.attr_push(attr.name, f'{parent.name}_{attr.name}')
             for func in parent.methods:
-                self.currentType.method_push(func.name, f'{parent.name}@{func.name}')
+                self.currentType.method_push(func.name, f'{parent.name}_{func.name}')
         
         self.new_type_func.force_local('instance', self.new_class_scope)
         self.new_type_func.expr_push(ASTR.ALLOCATE('instance', node.type.name))
@@ -77,7 +78,7 @@ class CILGenerate:
         if node.type.name == 'Main':
             self.new_type_func.force_local(result, self.new_class_scope)
             self.new_type_func.expr_push(ASTR.Arg('instance'))
-            self.new_type_func.expr_push(ASTR.Call(result, 'Main', 'main@Main'))
+            self.new_type_func.expr_push(ASTR.Call(result, 'Main', 'main_Main'))
             self.new_type_func.expr_push(ASTR.Return(0))
         else:
             self.new_type_func.expr_push(ASTR.Return('instance'))
@@ -100,7 +101,7 @@ class CILGenerate:
     @visitor.when(AST.FuncDef)
     def visit(self, node: AST.FuncDef, scope: Scope):
         func_scope = scope.create_child(node.name)
-        self.currentFunc = ASTR.Function(f'{self.currentType.name}@{node.name}')
+        self.currentFunc = ASTR.Function(f'{self.currentType.name}_{node.name}')
         self.program.add_func(self.currentFunc)
 
         self.currentFunc.force_parma('self', func_scope)
@@ -131,7 +132,7 @@ class CILGenerate:
         for arg in arg_list:
             instance_expr_list.append(ASTR.Arg(arg))
         
-        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, node.id))
+        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, self.currentType.methods[node.id]))
         return instance_expr_list
     
     @visitor.when(AST.Dispatch)
@@ -151,7 +152,7 @@ class CILGenerate:
         for arg in arg_list:
             instance_expr_list.append(ASTR.Arg(arg))
         
-        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, node.id))
+        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, self.currentType.methods[node.id]))
         return instance_expr_list
     
     @visitor.when(AST.StaticDispatch)
@@ -167,7 +168,7 @@ class CILGenerate:
         for arg in arg_list:
             param_expr_list.append(ASTR.Arg(arg))
         
-        param_expr_list.append(ASTR.VCall(super_value, self.currentClass.name, node.id))
+        param_expr_list.append(ASTR.VCall(super_value, self.currentClass.name, self.currentType.methods[node.id]))
         return param_expr_list
     
 
