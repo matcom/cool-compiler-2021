@@ -1,0 +1,1 @@
+from cool_compiler import __main__
