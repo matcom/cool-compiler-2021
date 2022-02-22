@@ -1,4 +1,4 @@
-from utils.ast import BoolNode, IntNode, IsVoidNode, StringNode
+from utils.ast import BoolNode, IntNode, IsVoidNode, StringNode, VoidNode
 from utils.errors import SemanticError
 from collections import OrderedDict
 import itertools as itt
@@ -471,11 +471,12 @@ class Scope:
     def define_attribute(self, attr):
         self.attributes.append(attr)
 
-
-def define_default_value(typex, node):
+def define_default_value(self, typex, node):
     if typex == IntType():
         node.expr = IntNode(0)
     elif typex == StringType():
         node.expr = StringNode("")
-    else:
+    elif typex == BoolType():
         node.expr = BoolNode('false')
+    else:
+        node.expr = VoidNode(node.id)
