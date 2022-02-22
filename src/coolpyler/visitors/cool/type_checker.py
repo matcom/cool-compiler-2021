@@ -58,7 +58,6 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):  # noqa: F811
         self.current_type = self.types[node.type.name]
-        scope.define_variable("self", self.current_type)
         for attr in self.current_type.attributes:
             scope.define_variable(attr.name, attr.type)
 
@@ -106,6 +105,7 @@ class TypeCheckerVisitor:
         if node.method_info is not None:
             self.current_method = self.current_type.get_method(node.method_info.name)
             method_scope = scope.create_child()
+            method_scope.define_variable("self", self.current_type)
 
             for pname, ptype in zip(
                 self.current_method.param_names, self.current_method.param_types
@@ -621,4 +621,3 @@ class TypeCheckerVisitor:
             return type_checked.CoolNewNode(node.lineno, node.columnno, ErrorType())
 
         return type_checked.CoolNewNode(node.lineno, node.columnno, type)
-
