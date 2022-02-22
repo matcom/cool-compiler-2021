@@ -3,11 +3,30 @@
 import itertools as itt
 from collections import OrderedDict
 
+import errors
 
-class SemanticError(Exception):
+
+class BaseSemanticError(Exception):
     @property
     def text(self):
         return self.args[0]
+
+
+class NameError(BaseSemanticError):
+    def with_pos(self, lineno, columnno):
+        return errors.NameError(lineno, columnno, self.text)
+
+class TypeError(BaseSemanticError):
+    def with_pos(self, lineno, columnno):
+        return errors.TypeError(lineno, columnno, self.text)
+
+class AttributeError(BaseSemanticError):
+    def with_pos(self, lineno, columnno):
+        return errors.AttributeError(lineno, columnno, self.text)
+
+class SemanticError(BaseSemanticError):
+    def with_pos(self, lineno, columnno):
+        return errors.SemanticError(lineno, columnno, self.text)
 
 
 class Attribute:
@@ -55,11 +74,11 @@ class Type:
 
     def set_parent(self, parent):
         if self.parent is not None:
-            raise SemanticError(f"Parent type is already set for `{self.name}`.")
+            raise TypeError(f"Parent type is already set for `{self.name}`.")
         if parent.sealed:
-            raise SemanticError(f"Cannot inherit from `{parent.name}`.")
+            raise TypeError(f"Cannot inherit from `{parent.name}`.")
         if parent in self.reachable:
-            raise SemanticError(f"Cycle in hierarchy involving `{self.name}`.")
+            raise TypeError(f"Cycle in hierarchy involving `{self.name}`.")
         self.parent = parent
         self.parent.reachable.extend(self.reachable) # TODO
 
@@ -68,12 +87,12 @@ class Type:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
             if self.parent is None:
-                raise SemanticError(
+                raise AttributeError(
                     f"Attribute `{name}` is not defined in `{self.name}`."
                 )
             try:
                 return self.parent.get_attribute(name)
-            except SemanticError:
+            except AttributeError:
                 raise SemanticError(
                     f"Attribute `{name}` is not defined in `{self.name}`."
                 )
@@ -81,12 +100,12 @@ class Type:
     def define_attribute(self, name: str, typex):
         try:
             self.get_attribute(name)
-        except SemanticError:
+        except AttributeError:
             attribute = Attribute(name, typex)
             self.attributes.append(attribute)
             return attribute
         else:
-            raise SemanticError(
+            raise AttributeError(
                 f"Attribute `{name}` is already defined in `{self.name}`."
             )
 
@@ -95,17 +114,17 @@ class Type:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise SemanticError(f"Method `{name}` is not defined in `{self.name}`.")
+                raise AttributeError(f"Method `{name}` is not defined in `{self.name}`.")
             try:
                 return self.parent.get_method(name)
-            except SemanticError:
-                raise SemanticError(f"Method `{name}` is not defined in `{self.name}`.")
+            except AttributeError:
+                raise AttributeError(f"Method `{name}` is not defined in `{self.name}`.")
 
     def define_method(
         self, name: str, param_names: list, param_types: list, return_type
     ):
         if name in (method.name for method in self.methods):
-            raise SemanticError(f"Method `{name}` already defined in `{self.name}`")
+            raise AttributeError(f"Method `{name}` already defined in `{self.name}`")
 
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
@@ -250,7 +269,10 @@ class Scope:
         self.children.append(child)
         return child
 
-    def define_variable(self, vname, vtype):
+    def define_variable(self, vname, vtype, force=False):
+        if (vname == "self" or self.is_local(vname)) and not force:
+            raise SemanticError("Variable already exists in the current scope")
+
         info = VariableInfo(vname, vtype)
         self.locals.append(info)
         return info
@@ -260,11 +282,16 @@ class Scope:
         try:
             return next(x for x in locals if x.name == vname)
         except StopIteration:
-            return (
-                self.parent.find_variable(vname, self.index)
-                if self.parent is not None
-                else None
-            )
+            if self.parent is None:
+                raise NameError(
+                    f"Variable `{vname}` is not defined in current scope."
+                )
+            try:
+                return self.parent.find_variable(vname, self.index)
+            except SemanticError:
+                raise NameError(
+                    f"Variable `{vname}` is not defined in current scope."
+                )
 
     def is_defined(self, vname):
         return self.find_variable(vname) is not None
