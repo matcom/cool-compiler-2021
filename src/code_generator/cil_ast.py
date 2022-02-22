@@ -42,8 +42,7 @@ class InstructionNode(Node):
 
 
 class ParamNode(InstructionNode):
-    def __init__(self, name, typex):
-        self.type = typex
+    def __init__(self, name):
         self.name = name
 
 
@@ -205,19 +204,19 @@ class ReturnNode(InstructionNode):
 
 
 # IO
-class LoadInt(InstructionNode):
+class LoadIntNode(InstructionNode):
     def __init__(self, value, dest):
         self.value = value
         self.local_dest = dest
 
 
-class LoadString(InstructionNode):
+class LoadStringNode(InstructionNode):
     def __init__(self, msg, dest):
         self.msg = msg
         self.local_dest = dest
 
 
-class LoadVoid(InstructionNode):
+class LoadVoidNode(InstructionNode):
     def __init__(self, dest):
         self.local_dest = dest
 
@@ -284,7 +283,19 @@ class IsVoidNode(InstructionNode):
         self.expr = expr
 
 
+class HaltNode(InstructionNode):
+    def __init__(self):
+        pass
+
+
 class CopyNode(InstructionNode):
     def __init__(self, typex, local_dest):
         self.type = typex
         self.local_dest = local_dest
+
+
+class StringEqualsNode(InstructionNode):
+    def __init__(self, s1, s2, result):
+        self.s1 = s1
+        self.s2 = s2
+        self.result = result
