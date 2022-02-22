@@ -3,13 +3,16 @@
 import itertools as itt
 from collections import OrderedDict
 
-import errors
+import coolpyler.errors as errors
 
 
 class BaseSemanticError(Exception):
     @property
     def text(self):
         return self.args[0]
+
+    def with_pos(self, line, column):
+        raise NotImplementedError()
 
 
 class NameError(BaseSemanticError):
