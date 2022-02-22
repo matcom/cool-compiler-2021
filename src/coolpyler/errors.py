@@ -159,9 +159,9 @@ class InvalidComparissonError(TypeError):
         )
 
 
-class IsReadOnlyError(TypeError):
+class IsReadOnlyError(SemanticError):
     def __init__(self, line, column, name) -> None:
-        TypeError.__init__(self, line, column, f"{name} is read only.")
+        SemanticError.__init__(self, line, column, f"{name} is read only.")
 
 
 class NotConformsError(TypeError):

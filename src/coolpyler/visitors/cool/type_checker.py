@@ -59,12 +59,12 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):  # noqa: F811
         self.current_type = node.type
         scope.define_variable("self", self.current_type, force=True)
-        # for attr in self.current_type.attributes:
-        #     try:
-        #         scope.define_variable(attr.name, attr.type)
-        #     except semantic.BaseSemanticError as e:
+        for attr in self.current_type.attributes:
+            try:
+                scope.define_variable(attr.name, attr.type)
+            except semantic.BaseSemanticError as e:
 
-        #         self.errors.append(e.with_pos(node.lineno, node.columnno))
+                self.errors.append(e.with_pos(node.lineno, node.columnno))
 
         features = [self.visit(feat, scope) for feat in node.features]
 
