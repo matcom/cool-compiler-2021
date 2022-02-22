@@ -1,3 +1,4 @@
+from distutils.log import error
 from cool_ast.cool_ast import *
 import cil_ast.cil_ast as cil
 from utils.semantic import Context, SemanticError, Type, Method, Scope, ErrorType, VariableInfo
@@ -15,13 +16,14 @@ class BaseCOOLToCILVisitor:
         self.context = context
 
         self.locals = {}
-        self.attrs = set()
+        self.attrs = {}#set()
         self.parameters = set()
         self.instances = []
 
     def transform_to_keys(self, xtype, keys):
         for i, key in enumerate(keys):
             xtype.attrs[key] = i
+        return xtype.attrs
     
     def instanciate_builtin(self):
         a = 0
@@ -115,14 +117,16 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
         attributes = []
         methods = []
-        self.attrs.clear()
-        
+        # self.attrs.clear()
+        self.attrs = {}
+            
         current_type = self.current_type
         while True:
             attr_temp = []
             method_temp = []
             for attr in current_type.attributes:
-                self.attrs.add(attr.name)
+                # self.attrs.add(attr.name)
+                # self.attrs[attr.name] = []
                 attr_temp.append(attr.name)
             
             for method in current_type.methods:
@@ -136,7 +140,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             
             current_type = current_type.parent
             
-        self.transform_to_keys(type_node, attributes)# type_node.attributes = attributes
+        self.attrs = self.transform_to_keys(type_node, attributes)# type_node.attributes = attributes
         type_node.methods = methods
         
         # attributes
@@ -170,8 +174,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             value = self.define_internal_local()
             self.register_instruction(cil.AllocateNode("Void", value))
         #revisar que poner como el attr del SettAttribnode
-        self.register_instruction(cil.SetAttribNode(self.instances[-1], node.id, value))
-
+        
+        attr = self.attrs[node.id]
+        self.register_instruction(cil.SetAttribNode(self.instances[-1], attr, value))
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -189,20 +194,20 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.parameters.clear()
         self.params.append(cil.ParamNode('self'))
-        for arg_name, _ in node.params:
-            self.params.add(arg_name)
+        for arg_name, ptype in node.params:
+            self.parameters.add((arg_name, ptype))
             self.params.append(cil.ParamNode(arg_name))
+            self.register_instruction(cil.ParamNode(arg_name))
         
         self.locals.clear()
         return_value = self.visit(node.body, scope)
-        # for instruction, child_scope in zip(node.body, scope.children):
-        #     value = self.visit(instruction, child_scope)
-
-        # Your code here!!! (Handle RETURN)
+        
         if node.body and 'Void' != node.type: 
             self.register_instruction(cil.ReturnNode(return_value))
         else:
-            self.register_instruction(cil.ReturnNode())
+            result = self.define_internal_local()
+            self.register_instruction(cil.AllocateNode("Void", result))
+            self.register_instruction(cil.ReturnNode(result))
             
         self.current_method = None
 
@@ -213,8 +218,6 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.expr -> ExpressionNode
         ###############################
-        
-        # Your code here!!!
         var = scope.find_variable(node.id)
         dest = self.locals[var.name] = self.register_local(var)
         
@@ -239,17 +242,24 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.id -> str
         # node.expr -> ExpressionNode
         ###############################
-        # TODO: arreglar aqui el setattribute
         source = self.visit(node.expr, scope)
         
-        if node.id in self.parameters:
-            dest = node.id
-            self.register_instruction(cil.AssignNode(dest, source))
-        elif node.id in self.locals:
+        if node.id in self.locals:
             dest = self.locals[node.id]
             self.register_instruction(cil.AssignNode(dest, source))
-        elif node.id in self.attrs:
-            self.register_instruction(cil.SetAttribNode(self.instances[-1], node.id, source))
+            return dest
+        elif node.id in self.attrs.keys():
+            attr = self.attrs[node.id]
+            var = self.define_internal_local()
+            self.register_instruction(cil.SetAttribNode(self.instances[-1], attr, source))
+            self.register_instruction(cil.GetAttribNode(var, self.instances[-1], attr))
+            return var
+        else:
+            for (p_name, p_type) in self.parameters:
+                if node.id == p_name:
+                    dest = VariableInfo(p_name, p_type)
+                    self.register_instruction(cil.AssignNode(dest, source))
+                    return dest
 
     @visitor.when(CallNode)
     def visit(self, node, scope):
@@ -258,8 +268,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.method -> str
         # node.args -> [ ExpressionNode ... ]
         ###############################
-        
-        # Your code here!!!
+        error_label = self.define_internal_local()
+        dest = self.define_internal_local()
         if node.obj is not None: # dynamic
             obj = self.visit(node.obj, scope)
             self.instances.append(obj)
@@ -271,11 +281,14 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             local = self.define_internal_local()
             self.register_instruction(cil.TypeOfNode(obj, local))
             
+            condition = self.define_internal_local()
+            self.register_instruction(cil.IsTypeNode(condition, local, "Void"))
+            self.register_instruction(cil.GotoIfNode(error_label, condition))
+            
             self.register_instruction(cil.ArgNode(obj))
             for arg in node.args:
                 self.register_instruction(cil.ArgNode(self.visit(arg, scope)))
             
-            dest = self.define_internal_local()
             obj_type = obj_type if node.parent == None else node.parent
             self.register_instruction(cil.DynamicCallNode(local, self.to_function_name(node.method, obj_type), dest))
         else: # static
@@ -283,8 +296,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             for arg in node.args:
                 self.register_instruction(cil.ArgNode(self.visit(arg, scope)))
                 
-            dest = self.define_internal_local()
             self.register_instruction(cil.StaticCallNode(self.to_function_name(node.method, self.current_type.type.name), dest))
+        
+        self.register_instruction(cil.LabelNode(error_label))
         self.instances.pop()
         return dest
 
@@ -303,11 +317,13 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         # node.lex -> str
         ###############################
+        var = self.define_internal_local()
         if node.lex in self.locals:
-            return self.locals[node.lex]
-        elif node.lex in self.attrs:
-            self.register_instruction(cil.GetAttribNode(self.instances[-1], node.lex))
-        return node.lex
+            var_aux = self.locals[node.lex].name
+            self.register_instruction(cil.AssignNode(var, var_aux))
+        elif node.lex in self.attrs.keys():
+            self.register_instruction(cil.GetAttribNode(var, self.instances[-1], self.attrs[node.lex]))
+        return var
 
     @visitor.when(InstantiateNode)
     def visit(self, node, scope):
@@ -437,7 +453,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.GotoNode(while_label))
         
         self.register_instruction(cil.LabelNode(end_label))
-        # TODO: chequear 
+        
         result = self.define_internal_local()
         self.register_instruction(cil.AllocateNode("Void", result))
         return result
@@ -489,7 +505,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         zero = self.define_internal_local()
         self.register_instruction(cil.AllocateNode("Int", zero))
         self.register_instruction(cil.MinusNode(var, zero, value))
-        return var
+        self.regster_instruction(cil.SetAttribNode(value, 0, var))
+        return value
 
     @visitor.when(SwitchCaseNode)
     def visit(self, node, scope):
