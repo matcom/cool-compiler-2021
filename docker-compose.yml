@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  compiler:
+    build: .
+    working_dir: /cool-compiler-2021/src
+    volumes:
+      - .//:/cool-compiler-2021
+
