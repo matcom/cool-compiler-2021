@@ -348,7 +348,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         
         self.add_instruction(
-            LabelNode("__copy", row, column, comment, row, column, comment))
+            LabelNode("__copy", row, column, comment))
         
         self.add_instruction(MoveNode(Reg.t(0), Reg.a(0),row,column,comment)) # t0 = object address
         self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(0),row,column,comment)) # t1 = instance type dir
@@ -489,7 +489,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._push(saved_register,row,column,comment) # Save arguments
         self.add_instruction(JumpAndLinkNode("__string_length",row,column,comment))
         # $v0 = length of string2
-        self._pop(saved_register, row, column, comment,row,column,comment)  # Restore arguments
+        self._pop(saved_register, row, column, comment )  # Restore arguments
 
         # Returning the arguments to the correct order
         self.add_instruction(MoveNode(Reg.t(1), Reg.a(0),row,column,comment)) # t1 = string2
@@ -973,7 +973,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def visit(self, node:cil.GetAttribNode):
         self._load_value(Reg.t(0), node.source,node.row, node.column, node.comment)  # Load the object address
         # Get the attribute offset
-        attr_offset = self._attribute_index_to_offset(node.attribute_index,node.row, node.column, node.comment)
+        attr_offset = self._attribute_index_to_offset(node.attribute_index)
         # Fetch the attribute value
         self.add_instruction(LoadWordNode(Reg.t(0), attr_offset, Reg.t(0),node.row, node.column, node.comment))
         # Assign attribute value
@@ -983,7 +983,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def visit(self, node:cil.SetAttribNode):
         self._load_value(Reg.t(0), node.source,node.row, node.column, node.comment)  # Load the object address
         # Get the attribute offset
-        attr_offset = self._attribute_index_to_offset(node.attribute_index,node.row, node.column, node.comment)
+        attr_offset = self._attribute_index_to_offset(node.attribute_index)
         # Load the value to be setted into t1
         self._load_value(Reg.t(1), node.value,node.row, node.column, node.comment)
         # Save the attribute value
