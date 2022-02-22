@@ -7,10 +7,26 @@ class BaseCOOLToCILVisitor:
         self.current_type = None
         self.current_method = None
         self.current_function = None
-        self.constructors = []
         self.context = context
-        self.inherit_graph = {}
     
+
+    def set_type_tags(self, node='Object', tag=0):
+        self.types[node].tag = tag
+        for i,t in enumerate(self.graph[node]):
+            self.set_type_tags(t, tag + i + 1)
+            
+    def set_type_max_tags(self, node='Object'):
+        if not self.graph[node]:
+            self.types[node].max_tag = self.types[node].tag
+        else:
+            for t in self.graph[node]:
+                self.set_type_max_tags(t)
+            maximum = 0
+            for t in self.graph[node]:
+                maximum = max(maximum, self.types[t].max_tag)
+            self.types[node].max_tag = maximum
+
+
     @property
     def params(self):
         return self.current_function.params

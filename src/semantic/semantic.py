@@ -330,37 +330,54 @@ class AutoType(Type):
 class Context:
     def __init__(self):
         self.types = {}
+        self.graph = {}
+        self.create_graph()
 
-    def get_depth(self, class_name):
-        typex = self.types[class_name]
-        if typex.parent is None:
-            return 0
-        return 1 + self.get_depth(typex.parent.name)
+    def create_graph(self):
+        self.graph['Object'] = ['IO', 'String', 'Bool', 'Int']
+        self.graph['IO'] = []
+        self.graph['String'] = []
+        self.graph['Int'] = []
+        self.graph['Bool'] = []
 
-    def build_inheritance_graph(self):
-        graph = {}
-        for type_name, typex in self.types.items():
-            if typex.parent is not None:
-                graph[type_name] = typex.parent.name
-            else:
-                if type_name == 'SELF_TYPE':
-                    continue
-                graph[type_name] = None
-        return graph
-
-    def create_type(self, name: str, pos) -> Type:
+    def create_type(self, name, pos):
         if name in self.types:
             error_text = 'Classes may not be redefined.'
             raise SemanticError(error_text, *pos)
         typex = self.types[name] = Type(name, pos)
+
+        parentName = self.types[name].parent.name
+
+        if not self.graph.__contains__(name):
+            self.graph[name] = []
+        if self.graph.__contains__(parentName):
+            self.graph[parentName].append(name)
+        else:
+            self.graph[parentName] = [name]
         return typex
 
-    def get_type(self, name: str, pos) -> Type:
+    def get_type(self, name: str, pos):
         try:
             return self.types[name]
         except KeyError:
             error_text = f'Type {name} is not defined.'
             raise SemanticError(error_text, *pos)
+
+    def set_type_tags(self, node='Object', tag=0):
+        self.types[node].tag = tag
+        for i,t in enumerate(self.graph[node]):
+            self.set_type_tags(t, tag + i + 1)
+            
+    def set_type_max_tags(self, node='Object'):
+        if not self.graph[node]:
+            self.types[node].max_tag = self.types[node].tag
+        else:
+            for t in self.graph[node]:
+                self.set_type_max_tags(t)
+            maximum = 0
+            for t in self.graph[node]:
+                maximum = max(maximum, self.types[t].max_tag)
+            self.types[node].max_tag = maximum
 
     def __str__(self):
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
