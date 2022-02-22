@@ -249,3 +249,6 @@ class BoolNode(AtomicNode):
 
 class StringNode(AtomicNode):
     pass
+
+class VoidNode(AtomicNode):
+    pass

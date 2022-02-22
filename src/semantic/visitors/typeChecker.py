@@ -391,6 +391,10 @@ class TypeChecker:
     def visit(self, stringNode, scope):
         return StringType((stringNode.line, stringNode.col))
 
+    @visitor.when(VoidNode)
+    def visit(self, voidNode, scope):
+        return VoidType((voidNode.line, voidNode.col))
+
     def _get_type(self, ntype, pos):
         try:
             return self.context.get_type(ntype, pos)

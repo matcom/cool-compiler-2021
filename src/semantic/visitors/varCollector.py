@@ -1,6 +1,6 @@
 from utils import visitor
-from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, BoolNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, StringNode, VarDeclarationNode, WhileNode
-from semantic.semantic import ErrorType, IntType, Scope, StringType
+from utils.ast import ArrobaCallNode, AssignNode, AttrDeclarationNode, BlockNode, BoolNode, CaseNode, CaseOptionNode, ClassDeclarationNode, DotCallNode, FuncDeclarationNode, IdNode, IfThenElseNode, IntNode, IsVoidNode, LetInNode, MemberCallNode, ProgramNode, StringNode, VarDeclarationNode, VoidNode, WhileNode
+from semantic.semantic import BoolType, ErrorType, IntType, Scope, StringType
 from utils.errors import NamexError, SemanticError, TypexError
 
 
@@ -216,5 +216,7 @@ class VarCollector:
             node.expr = IntNode(0)
         elif typex == StringType():
             node.expr = StringNode("")
-        else:
+        elif typex == BoolType():
             node.expr = BoolNode('false')
+        else:
+            node.expr = VoidNode(node.id)
