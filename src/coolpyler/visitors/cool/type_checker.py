@@ -200,7 +200,7 @@ class TypeCheckerVisitor:
             )
 
         return type_checked.CoolDispatchNode(
-            node.lineno, node.columnno, exp, node.id, args, method.type
+            node.lineno, node.columnno, exp, node.id, args, method.return_type
         )
 
     @visitor.when(type_built.CoolStaticDispatchNode)
@@ -258,7 +258,7 @@ class TypeCheckerVisitor:
             node.static_type,
             node.id,
             args,
-            method.type,
+            method.return_type,
         )
 
     @visitor.when(type_built.CoolLetInNode)
