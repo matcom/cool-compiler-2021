@@ -19,6 +19,9 @@ class BaseCOOLToCILVisitor:
         self.parameters = set()
         self.instances = []
 
+    def instanciate_builtin(self):
+        a = 0
+    
     @property
     def params(self):
         return self.current_function.params
@@ -109,6 +112,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         methods = []
         self.attrs.clear()
         
+        #esto para cuando llega a object i guess
         current_type = self.current_type
         while current_type.parent is not None:
             attr_temp = []
@@ -125,9 +129,17 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             
             current_type = current_type.parent
             
+        # comentar con andy si generar el parent antes de ser posible si no esta genereado
+        # aqui para evitar generarlo 2 veces seria preguntar si ya esta generado al principio
         
         type_node.attributes = attributes
         type_node.methods = methods
+        
+        # attributes
+        for feature, child_scope in zip(node.features, scope.children):
+            if isinstance(feature, FuncDeclarationNode):
+                continue
+            self.visit(feature, child_scope)
         
         # func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
         for feature, child_scope in zip(node.features, scope.children):
@@ -137,6 +149,25 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         #falta visitar los atributos
         
         self.current_type = None
+
+    @visitor.when(AttrDeclarationNode)
+    def visit(self, node, scope):
+        ###############################
+        # node.id -> str
+        # node.type -> str
+        # node.value = ExpressionNode
+        ###############################
+        if node.value:
+            value = self.visit(node.value)
+        elif node.type in ["Int", "String", "Object", "IO", "Bool"]:
+            value = self.define_internal_local()
+            self.register_instruction(cil.AllocateNode(self.type, value))
+        else:
+            value = self.define_internal_local()
+            self.register_instruction(cil.AllocateNode("Void", value))
+        #revisar que poner como el attr del SettAttribnode
+        self.register_instruction(cil.SetAttribNode(self.instances[-1], node.id, value))
+
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -343,7 +374,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         # node.chunk -> [ ExpressionNode... ]
         ###############################
-
+        value = None
         for expression in node.chunk:
             value = self.visit(expression, scope.children[0])
         return value
@@ -386,7 +417,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
 
         for decl in node.decl_list:
-            var = self.visit(decl, scope)
+            # var = self.visit(decl, scope)
+            self.visit(decl, scope)
 
         value = self.visit(node.expression, scope)
         
@@ -394,29 +426,84 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
+        ###############################
+        # node.decl_list -> [ DeclarationNode... ]
+        # node.expression -> ExpressionNode
+        ###############################
         pass
 
 
     @visitor.when(NotNode)
     def visit(self, node, scope):
+        ###############################
+        # node.decl_list -> [ DeclarationNode... ]
+        # node.expression -> ExpressionNode
+        ###############################
         pass
 
 
     @visitor.when(IsVoidNode)
     def visit(self, node, scope):
+        ###############################
+        # node.method -> ExpressionNode
+        ###############################
+        method_value = self.visit(node.method, scope)
+        # revisar que hacer 
         pass
 
 
     @visitor.when(ComplementNode)
     def visit(self, node, scope):
+        ###############################
+        # node.expr -> ExpressionNode
+        ###############################
+        value = self.visit(node.expr, scope)
         pass
 
 
 
     @visitor.when(SwitchCaseNode)
     def visit(self, node, scope):
-        pass
-
+        ###############################
+        # node.expr -> ExpressionNode
+        # node.case_list = [ (id, type, expr)... ]
+        ###############################
+        start_case_label = self.define_internal_local()
+        end_case_label = self.define_internal_local()
+        
+        obj = self.visit(node.expr, scope)
+        obj_type = self.define_internal_local()
+        self.register_instruction(cil.TypeOfNode(obj, obj_type))
+        
+        result = self.define_internal_local()
+        self.register_instruction(cil.LabelNode(start_case_label))
+        for case in node.case_list:
+            case_id, case_type, case_expr = case 
+            current_label = self.define_internal_local()
+            next_label = self.define_internal_local()
+            
+            condition = self.define_internal_local()
+            # poner el istype node 
+            self.register_instruction(cil.GotoIfNode(current_label, condition))
+            
+            self.register_instruction(cil.GotoNode(next_label))
+            self.register_instruction(cil.LabelNode(current_label))
+            
+            info = VariableInfo(case_id, case_type)
+            var = self.locals[case_id] = self.register_local(info)
+            self.register_instruction(cil.AssignNode(var, obj))
+            
+            result_expr = self.visit(case_expr, scope)
+            self.register_instruction(cil.AssignNode( result, result_expr))
+            self.register_instruction(cil.GotoNode(end_case_label))
+            
+            self.register_instruction(next_label)
+        
+        
+        # self.register_instruction(cil.GotoNode(start_case_label))
+        
+        self.register_instruction(cil.GotoNode(end_case_label))
+        return result
 
     @visitor.when(TrueNode)
     def visit(self, node, scope):
@@ -435,13 +522,37 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(LessNode)
     def visit(self, node, scope):
-        pass
+        ###############################
+        # node.left -> ExpressionNode
+        # node.right -> ExpressionNode
+        ###############################
+        dest = self.define_internal_local()
+        left = self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        self.register_instruction(cil.LessNode(dest, left, right))
+        return dest
     
     @visitor.when(LeqNode)
     def visit(self, node, scope):
-        pass
+        ###############################
+        # node.left -> ExpressionNode
+        # node.right -> ExpressionNode
+        ###############################
+        dest = self.define_internal_local()
+        left = self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        self.register_instruction(cil.LeqNode(dest, left, right))
+        return dest
 
 
     @visitor.when(EqualNode)
     def visit(self, node, scope):
-        pass
+        ###############################
+        # node.left -> ExpressionNode
+        # node.right -> ExpressionNode
+        ###############################
+        dest = self.define_internal_local()
+        left = self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        self.register_instruction(cil.EqualNode(dest, left, right))
+        return dest
