@@ -1,7 +1,10 @@
 import ply.lex as lex
 import utils.ast_nodes as ast
 
+lexer_errors = []
+
 tokens = ('NUMBER', # otros
+          'USTRING',  
           'STRING',
           'ID',
           'TYPE',
@@ -27,45 +30,57 @@ tokens = ('NUMBER', # otros
           'ASSIGN',
           'ARROW',
           'SINGLE_LINE_COMMENT', # comentarios
-          'USTRING',          
           )
 
 # palabras reservadas
 reserved = {
-    'if' : 'IF',
-    'then': 'THEN',
-    'else': 'ELSE',
-    'fi': 'FI',
+    'if'      : 'IF',
+    'then'    : 'THEN',
+    'else'    : 'ELSE',
+    'fi'      : 'FI',
     'inherits': 'INHERITS',
-    'class': 'CLASS',
-    'while': 'WHILE',
-    'loop': 'LOOP',
-    'pool': 'POOL',
-    'let': 'LET',
-    'in': 'IN',
-    'case': 'CASE',
-    'of': 'OF',
-    'esac': 'ESAC',
-    'new': 'NEW',
-    'isvoid': 'ISVOID',
-    'not': 'NOT',
+    'class'   : 'CLASS',
+    'while'   : 'WHILE',
+    'loop'    : 'LOOP',
+    'pool'    : 'POOL',
+    'let'     : 'LET',
+    'in'      : 'IN',
+    'case'    : 'CASE',
+    'of'      : 'OF',
+    'esac'    : 'ESAC',
+    'new'     : 'NEW',
+    'isvoid'  : 'ISVOID',
+    'not'     : 'NOT',
 }
+
+booleans = ['true', 'false']
 
 tokens = list(tokens) + list(reserved.values())
 
 t_SINGLE_LINE_COMMENT = r'--.*'
 
 
+###############  Bloque turistico  #################
 def t_TYPE(t):
     r'[A-Z][a-zA-Z_0-9]*'
-    t.type = 'TYPE'
+    if t.value.lower() in reserved.keys(): # Check for reserved words
+        t.type = reserved.get(t.value, reserved[t.value.lower()])
+    elif t.value.lower() in booleans: # Generating booleans 
+        t.type = reserved.get(t.value.lower == "true", t.value.upper())
+    else:
+        t.type = reserved.get(t.value,'TYPE')
     return t
 
-def t_ID(t):
+def t_ID(t): 
     r'[a-z][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value,'ID')    # Check for reserved words
+    if t.value.lower() in reserved.keys(): # Check for reserved words
+        t.type = reserved.get(t.value, reserved[t.value.lower()])
+    elif t.value.lower() in booleans: # Generating booleans
+        t.type = reserved.get(t.value.lower == "true", t.value.upper())
+    else:
+        t.type = reserved.get(t.value,'ID') 
     return t
-
+#####################################################W
 
 def t_STRING(t):
     # r'\"(.|\\\n)*\"'
@@ -83,102 +98,11 @@ def t_USTRING(t):
     t.type = reserved.get(t.value,'USTRING') 
     return t
 
-
-def t_IF(t):
-    r'(i|I)(f|F)'
-    t.type = reserved.get(t.value,'IF') 
-    return t
-
-def t_FI(t):
-    r'(f|F)(i|I)'
-    t.type = reserved.get(t.value,'FI') 
-    return t
-
-def t_THEN(t):
-    r'(t|T)(h|H)(e|E)(n|N)'
-    t.type = reserved.get(t.value,'THEN') 
-    return t
-
-def t_ELSE(t):
-    r'(e|E)(l|L)(s|S)(e|E)'
-    t.type = reserved.get(t.value,'ELSE') 
-    return t
-
-def t_INHERITS(t):
-    r'(I|i)(N|n)(H|h)(E|e)(R|r)(I|i)(T|t)(S|s)'
-    t.type = reserved.get(t.value,'INHERITS') 
-    return t
-
-def t_CLASS(t):
-    r'(C|c)(L|l)(A|a)(S|s)(S|s)'
-    t.type = reserved.get(t.value,'CLASS') 
-    return t
-
-def t_WHILE(t):
-    r'(W|w)(H|h)(I|i)(L|l)(E|e)'
-    t.type = reserved.get(t.value,'WHILE') 
-    return t
-
-def t_LOOP(t):
-    r'(L|l)(O|o)(O|o)(P|p)'
-    t.type = reserved.get(t.value,'LOOP') 
-    return t
-
-def t_LET(t):
-    r'(l|L)(e|E)(t|T)'
-    t.type = reserved.get(t.value,'LET') 
-    return t
-
-def t_IN(t):
-    r'(i|I)(n|N)'
-    t.type = reserved.get(t.value,'IN') 
-    return t
-
-def t_CASE(t):
-    r'(C|c)(A|a)(S|s)(E|e)'
-    t.type = reserved.get(t.value,'CASE') 
-    return t
-
-def t_OF(t):
-    r'(o|O)(f|F)'
-    t.type = reserved.get(t.value,'OF') 
-    return t
-
-def t_ESAC(t):
-    r'(e|E)(s|S)(a|A)(c|C)'
-    t.type = reserved.get(t.value,'ESAC') 
-    return t
-
-def t_NEW(t):
-    r'(N|n)(E|e)(W|w)'
-    t.type = reserved.get(t.value,'NEW') 
-    return t
-
-def t_ISVOID(t):
-    r'(I|i)(S|s)(V|v)(O|o)(I|i)(d|D)'
-    t.type = reserved.get(t.value,'ISVOID') 
-    return t
-    
-def t_NOT(t):
-    r'(N|n)(O|o)(t|T)'
-    t.type = reserved.get(t.value,'NOT') 
-    return t
-
 ##########################################################
 
 def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)
-    return t
-
-def t_TRUE(t):
-    r'(T|t)(R|r)(U|u)(E|e)'
-    t.value = True
-    return t
-
-def t_FALSE(t):
-    r'(F|f)(A|a)(l|L)(s|S)(e|E)'
-    t.value = False
     return t
 
 
@@ -204,6 +128,7 @@ t_ARROW = r'=>'
 t_COMA = r'\,'
 
 
+
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
@@ -212,7 +137,7 @@ t_ignore  = ' \t'
 
 def t_error(t):
     t.lexer.skip(1)
-    return ('error', t.lineno, t.lexpos, t.value[0])
+    lexer_errors.append(('error', t.lineno, t.lexpos, t.value[0]))
    
 
 lexer = lex.lex()

@@ -19,14 +19,21 @@ def p_class_list(p):
     elif len(p) == 3:
         p[0] = [p[1]] + p[2]
 
-
 def p_class_def(p):
-    '''class_def : CLASS TYPE OBRACE feature_list CBRACE SEMI
+    '''class_def : CLASS TYPE OBRACE feature_list CBRACE SEMI 
                  | CLASS TYPE INHERITS TYPE OBRACE feature_list CBRACE SEMI'''
     if len(p) == 7:
         p[0] = ast.ClassDecNode(p[2], p[4])
     elif len(p) == 9:
         p[0] = ast.ClassDecNode(p[2], p[6], p[4])
+
+# def p_class_def_error(p):
+#     '''class_def : CLASS TYPE OBRACE error CBRACE 
+#                  | CLASS TYPE INHERITS TYPE OBRACE error CBRACE'''
+#     if len(p) == 6:
+#         errors.append((p[5].lineno, p[5].lexpos, 'EOC not found', 'SEMI'))
+#     else:
+#         errors.append((p[7].lineno, p[7].lexpos, 'EOC not found', 'SEMI'))
 
 
 def p_feature_list(p):
@@ -261,7 +268,7 @@ def p_empty(p):
 
 def p_error(p):
     if p:
-        errors.append((p.lineno, p.lexpos, p.value))
+        errors.append((p.lineno, p.lexpos, p.value, p.type))
 
 
 parser = yacc.yacc()

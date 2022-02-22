@@ -3,8 +3,8 @@ from os import error
 from typing import Counter
 import typer
 
-from cool_grammar import parser, errors as errrroooo
-from cool_lexer import lexer
+from cool_grammar import parser, errors as parser_errors
+from cool_lexer import lexer, lexer_errors
 from utils.cyclic_dependency import CyclicDependency
 from utils.formatter import Formatter, CodeBuilder
 from utils.semantic import Context, Scope
@@ -21,13 +21,12 @@ def read_file(file_name: str):
         s = f.read()
     return s
     
-
 def log_error(s: str):
     styled_e = typer.style(s, fg=typer.colors.RED, bold=True)
     typer.echo(styled_e)
 
-def parse(program: str, debug: bool = False):
-    return parser.parse(program, debug=debug)
+def parse(program: str, lexer=None, debug: bool = False):
+    return parser.parse(program, lexer=lexer, debug=debug)
 
 def check_semantics(program: str, debug: bool = False):
     context = Context()
@@ -122,14 +121,15 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
         if verbose:
             print(t)
 
-    return errors, program
+    return errors, program, lexer
 
 def erase_single_line_comment(program: str):
     temp = ''
     pos = 0
     while pos < len(program):
         if program[pos] == '-' and (pos + 1) < len(program):
-            if program[pos + 1] == '-':
+            if program[pos + 1] == '-' and \
+                (pos - 1 < 0 or program[pos - 1] not in ['<', '-']):#in [' ', '\n', '\t']):
                 while pos < len(program) and program[pos] != '\n':
                     pos += 1
                 # temp += program[pos]
@@ -227,20 +227,26 @@ def print_list(list):
 def final_execution(program_file, program_file_out, debug: bool = False, verbose=False):
     context = Context()
     
-    errors, program = tokenize(program_file, debug, verbose)
+    errors, program, lexer = tokenize(program_file, debug, verbose)
 
-    if errors:
+    if errors or lexer_errors:
+        for (_, line, lexpos, value) in lexer_errors:
+            totallines = program.count('\n')
+            col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
+            log_error(f'({line}, {col - 1}) - LexicographicError: ERROR \"{value}\"')
         for e in errors:
             log_error(e)
         exit(1)
-	
-    ast = parse(program, debug)
 
+    # ast = parse(None, lexer=lexer, debug=debug)
+    ast = parse(program, debug=debug)
+    a = lexer_errors
     # if ast == None:
-    if errrroooo:
-        for (line, lexpos, value) in errrroooo:
+    if parser_errors:
+        for (line, lexpos, value, _) in parser_errors:
             totallines = program.count('\n')
-            col = get_tokencolumn(program, lexpos)
+            col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
+            
             log_error(f'({line - totallines}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
         exit(1)
     # else:
