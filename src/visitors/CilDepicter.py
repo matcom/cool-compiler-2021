@@ -64,7 +64,7 @@ def get_formatter(ast):
 
         @visitor.when(TypeOfNode)
         def visit(self, node):
-            return f'{node.dest} = TYPEOF {node.type}'
+            return f'{node.dest} = TYPEOF {node.obj}'
 
         @visitor.when(StaticCallNode)
         def visit(self, node):
@@ -101,6 +101,10 @@ def get_formatter(ast):
         @visitor.when(ReturnNode)
         def visit(self, node):
             return f'RETURN {node.value if node.value is not None else ""}'
+
+        @visitor.when(DataNode)
+        def visit(self, node):
+            return f'{node.name} = {node.value};'
 
     printer = PrintVisitor()
     return (printer.visit(ast))

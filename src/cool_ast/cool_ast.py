@@ -22,6 +22,7 @@ class FuncDeclarationNode(DeclarationNode):
         self.params = params
         self.type = return_type
         self.body = body
+        
 
 class AttrDeclarationNode(DeclarationNode):
     def __init__(self, idx, typex, value = None):

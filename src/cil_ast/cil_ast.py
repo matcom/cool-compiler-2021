@@ -34,7 +34,11 @@ class LocalNode(Node):
         self.name = name
 
 class InstructionNode(Node):
-    pass
+    def __init__(self, dest, op, second_op):
+        self.dest = dest
+        self.op = op
+        self.second_op = second_op
+
 
 class AssignNode(InstructionNode):
     def __init__(self, dest, source):
@@ -48,19 +52,24 @@ class ArithmeticNode(InstructionNode):
         self.right = right
 
 class PlusNode(ArithmeticNode):
-    pass
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
 
 class MinusNode(ArithmeticNode):
-    pass
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
 
 class StarNode(ArithmeticNode):
-    pass
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
 
 class DivNode(ArithmeticNode):
-    pass
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, inst, attr):
+    def __init__(self, dest, inst, attr):
+        self. dest = dest
         self.inst = inst
         self.attr = attr
 
@@ -71,7 +80,8 @@ class SetAttribNode(InstructionNode):
         self.source = source
 
 class GetIndexNode(InstructionNode):
-    def __init__(self, array, index):
+    def __init__(self, dest, array, index):
+        self.dest = dest
         self.array = array
         self.index = index
 
@@ -87,9 +97,10 @@ class AllocateNode(InstructionNode):
         self.dest = dest
 
 class ArrayNode(InstructionNode):
-    def __init__(self, length):
-        #preguntar a jp
-        pass
+    def __init__(self, dest, length):
+        self.dest = dest
+        self.length = length
+
 class TypeOfNode(InstructionNode):
     def __init__(self, obj, dest):
         self.obj = obj
@@ -156,6 +167,17 @@ class SubstringNode(InstructionNode):
         self.i = i
         self.n = n
 
+class ToStr(InstructionNode):
+    def __init__(self, dest, evalue):
+        self.dest = dest
+        self.value = evalue
+
+class EqualString(InstructionNode):
+    def __init__(self, dest, string1, string2):
+        self.dest = dest
+        self.string1 = string1
+        self.string2 = string2
+
 class ToStrNode(InstructionNode):
     def __init__(self, dest, ivalue):
         self.dest = dest
@@ -168,3 +190,15 @@ class ReadNode(InstructionNode):
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+class StringNode(InstructionNode):
+    def __init__(self, value, data):
+        self.value = value
+        self.data = data
+
+class IntNode(InstructionNode):
+    def __init_(self, value):
+        self.value = value
+
+# ParentTypeNode
+# TypeFunctionNode

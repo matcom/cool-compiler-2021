@@ -65,6 +65,7 @@ class BaseCOOLToCILVisitor:
         vname = f'data_{len(self.dotdata)}'
         data_node = cil.DataNode(vname, value)
         self.dotdata.append(data_node)
+        return data_node
 
 
 class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
@@ -426,11 +427,23 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
-        ###############################
-        # node.decl_list -> [ DeclarationNode... ]
-        # node.expression -> ExpressionNode
-        ###############################
-        pass
+        while_label = self.define_internal_local()
+        loop_label = self.define_internal_local()
+        end_label = self.define_internal_local()
+
+        self.register_instruction(cil.LabelNode(while_label))
+
+        while_expr = self.visit(node.condition, scope)
+        self.register_instruction(cil.GotoIfNode(loop_label, while_expr))
+
+
+        self.register_instruction(cil.GotoNode(end_label))
+        self.register_instruction(cil.LabelNode(loop_label))
+
+        chunk_expr = self.visit(node.loopChunk, scope)
+        self.register_instruction(cil.GotoNode(while_label))
+        self.register_instruction(cil.LabelNode(end_label))
+
 
 
     @visitor.when(NotNode)
@@ -517,7 +530,8 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(StringNode)
     def visit(self, node, scope):
-        pass
+        data_node = self.register_data(node.lex)
+        return data_node.name
 
 
     @visitor.when(LessNode)
