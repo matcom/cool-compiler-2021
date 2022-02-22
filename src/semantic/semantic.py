@@ -470,13 +470,3 @@ class Scope:
 
     def define_attribute(self, attr):
         self.attributes.append(attr)
-
-def define_default_value(self, typex, node):
-    if typex == IntType():
-        node.expr = IntNode(0)
-    elif typex == StringType():
-        node.expr = StringNode("")
-    elif typex == BoolType():
-        node.expr = BoolNode('false')
-    else:
-        node.expr = VoidNode(node.id)
