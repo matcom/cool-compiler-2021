@@ -86,7 +86,10 @@ def main(
             file.write(cil_text)
             
     if mips_text and out_mips:
-        with open(program_dir + ".mips", "w") as file:
+        out_dir = program_dir + ".mips"
+        if output_dir:
+            out_dir = output_dir
+        with open(out_dir, "w") as file:
             file.write(mips_text)
     
     if g_errors:
