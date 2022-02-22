@@ -165,7 +165,7 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
             value = self.visit(node.value)
         elif node.type in ["Int", "String", "Object", "IO", "Bool"]:
             value = self.define_internal_local()
-            self.register_instruction(cil.AllocateNode(self.type, value))
+            self.register_instruction(cil.AllocateNode(node.type, value))
         else:
             value = self.define_internal_local()
             self.register_instruction(cil.AllocateNode("Void", value))
@@ -536,7 +536,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(TrueNode)
     def visit(self, node, scope):
-        return '1'
+        value = self.define_internal_local()
+        self.register_instruction(cil.AllocateNode('Bool', value))
+        #setear atributo 0 a True
 
 
     @visitor.when(FalseNode)
@@ -547,7 +549,9 @@ class MiniCOOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(StringNode)
     def visit(self, node, scope):
         data_node = self.register_data(node.lex)
-        return data_node.name
+        var = self.define_internal_local()
+        self.register_instruction(cil.Load(var, data_node))
+        return var
 
 
     @visitor.when(LessNode)

@@ -218,11 +218,6 @@ class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
 
-class StringNode(InstructionNode):
-    def __init__(self, value, data):
-        self.value = value
-        self.data = data
-
 class IntNode(InstructionNode):
     def __init_(self, value):
         self.value = value
