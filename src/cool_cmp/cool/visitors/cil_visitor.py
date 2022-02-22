@@ -1062,10 +1062,11 @@ class COOLToCILVisitor():
         return result            
     
     @visitor.when(CheckNode)
-    def visit(self, node:CheckNode, scope):
+    def visit(self, node:CheckNode, scope, check_value):
         scope = node.scope
         local = scope.find_variable(node.id)
         cil_local = self.register_local(local) 
+        self.register_instruction(cil.AssignNode(cil_local, check_value))
         result = self.visit(node.expr, scope)
         return result
     
@@ -1141,7 +1142,7 @@ class COOLToCILVisitor():
             self.register_instruction(cil.NotNode(not_equal_types, not_equal_types))
             self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label))
             
-            result = self.visit(param, child_scope)
+            result = self.visit(param, child_scope, value)
             self.register_instruction(cil.AssignNode(value, result))
             
             self.register_instruction(cil.GotoNode(final_label.label))
