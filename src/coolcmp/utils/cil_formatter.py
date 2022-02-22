@@ -126,3 +126,14 @@ class CILFormatter(object):
     def visit(self, node: cil.PrintNode):
         return f'PRINT {node.addr}'
 
+    @visitor.when(cil.NegationNode)
+    def visit(self, node: cil.NegationNode):
+        return f'{node.dest} = NOT {node.src}'
+
+    @visitor.when(cil.ComplementNode)
+    def visit(self, node: cil.ComplementNode):
+        return f'{node.dest} = COMPLEMENT {node.src}'
+
+    @visitor.when(cil.CompareNode)
+    def visit(self, node: cil.CompareNode):
+        return f'{node.dest} = {node.left} == {node.right}'
