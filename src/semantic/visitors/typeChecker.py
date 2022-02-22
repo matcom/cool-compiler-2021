@@ -223,7 +223,7 @@ class TypeChecker:
             errorText = 'Loop condition does not have type Bool.'
             self.errors.append(TypexError(
                 errorText, whileNode.line, whileNode.col))
-        self.visit(whileNode.expr, scope)
+        self.visit(whileNode.body, scope)
         return ObjectType()
 
     @visitor.when(BlockNode)
