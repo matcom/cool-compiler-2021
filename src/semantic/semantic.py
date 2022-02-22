@@ -1,4 +1,3 @@
-from utils.ast import BoolNode, IntNode, IsVoidNode, StringNode, VoidNode
 from utils.errors import SemanticError
 from collections import OrderedDict
 import itertools as itt
@@ -374,7 +373,7 @@ class VariableInfo:
     def __init__(self, name, vtype, index=None):
         self.name = name
         self.type = vtype
-        self.index = index  # saves the index in the scope of the variable
+        self.index = index
 
     def __str__(self):
         return f'{self.name} : {self.type.name}'
