@@ -5,7 +5,7 @@ class Node:
 class Program(Node):
     def __init__(self):
         self.type_section = []
-        self.data_section = {}  # data[string] = tag
+        self.data_section = {}
         self.code_section = []
 
 
@@ -13,7 +13,7 @@ class Type(Node):
     def __init__(self, name):
         self.name = name
         self.attributes = []
-        self.methods = {}
+        self.methods = []
 
 
 class Data(Node):
@@ -35,10 +35,9 @@ class Instruction(Node):
 
 
 class Assign(Instruction):
-    def __init__(self, dest, _type, source):
+    def __init__(self, dest, value):
         self.dest = dest
-        self.type = _type
-        self.source = source
+        self.value = value
 
 
 class Arithmetic(Instruction):
@@ -64,23 +63,25 @@ class Div(Arithmetic):
     pass
 
 
+# Attribute Access
 class GetAttr(Instruction):
-    def __init__(self, dest, instance, attribute):
+    def __init__(self, dest, type_instance_address, attribute_position):
         self.dest = dest
-        self.instance = instance  # local con la direccion en memoria
-        self.attribute = attribute  # indice del atributo(contando los heredados)
+        self.type_instance_address = type_instance_address
+        self.attribute_position = attribute_position
 
 
 class SetAttr(Instruction):
-    def __init__(self, instance, attribute, src):
-        self.instance = instance  # local con la direccion en memoria
-        self.attribute = attribute  # indice del atributo
-        self.value = src
+    def __init__(self, value, type_instance_address, attribute_position):
+        self.value = value
+        self.type_instance_address = type_instance_address
+        self.attribute_position = attribute_position
 
 
+# Array Access
 class GetIndex(Instruction):
-    def __init__(self, destiny, direction, index):
-        self.destiny = destiny
+    def __init__(self, dest, direction, index):
+        self.dest = dest
         self.direction = direction
         self.index = index
 
@@ -92,6 +93,7 @@ class SetIndex(Instruction):
         self.index = index
 
 
+# Memory Manipulation
 class Allocate(Instruction):
     def __init__(self, destiny, _type):
         self.destiny = destiny
@@ -110,6 +112,7 @@ class Array(Instruction):
         self.size = size
 
 
+# Method Invocation
 class Call(Instruction):
     def __init__(self, destiny, function_name):
         self.destiny = destiny
@@ -128,6 +131,7 @@ class Arg(Instruction):
         self.arg_info = arg_info
 
 
+# Jumps
 class IfGoto(Instruction):
     def __init__(self, condition, label):
         self.condition = condition
@@ -144,11 +148,13 @@ class Goto(Instruction):
         self.label_name = label_name
 
 
+# Function Return
 class Return(Instruction):
     def __init__(self, value=None):
         self.value = value
 
 
+# String Functions
 class Load(Instruction):
     def __init__(self, dest, msg):
         self.dest = dest
@@ -176,118 +182,18 @@ class Substring(Instruction):
         self.length = length
 
 
-class ToStr(Instruction):
-    def __init__(self, dest, ivalue):
+class Str(Instruction):
+    def __init__(self, dest, numeric_value):
         self.dest = dest
-        self.ivalue = ivalue
+        self.numeric_value = numeric_value
 
 
-class Copy(Instruction):
-    def __init__(self, dest, source):
-        self.dest = dest
-        self.source = source
-
-
-class GetParent(Instruction):
-    def __init__(self, dest, instance, array, length):
-        self.dest = dest
-        self.instance = instance  # local con la direccion en memoria
-        self.array_name = array  # indice del atributo(contando los heredados)
-        self.length = length
-
-    def to_string(self):
-        return "{} = GETPARENT {} {}".format(self.dest, self.instance, self.array_name)
-
-
-class ReadStr(Instruction):
+# IO Operations
+class Read(Instruction):
     def __init__(self, dest):
         self.dest = dest
 
-    def to_string(self):
-        return "{} = READ".format(self.dest)
 
-
-class ReadInt(Instruction):
-    def __init__(self, dest):
-        self.dest = dest
-
-    def to_string(self):
-        return "{} = READ".format(self.dest)
-
-
-class PrintStr(Instruction):
-    def __init__(self, str_addr):
-        self.str_addr = str_addr
-
-    def to_string(self):
-        return "PRINT {}".format(self.str_addr)
-
-
-class PrintInt(Instruction):
-    def __init__(self, value):
-        self.value = value
-
-    def to_string(self):
-        return "PRINT {}".format(self.value)
-
-
-class EndProgram(Instruction):
-    def __init__(self):
-        pass
-
-    def to_string(self):
-        return "PROGRAM END WITH ERROR"
-
-
-class IsVoid(Instruction):
-    def __init__(self, dest, obj):
-        self.dest = dest
-        self.obj = obj
-
-
-class LowerThan(Instruction):
-    def __init__(self, dest, left_expr, right_expr):
-        self.dest = dest
-        self.left = left_expr
-        self.right = right_expr
-
-    def to_string(self):
-        return "{} <- {} < {}".format(self.dest, self.left, self.right)
-
-
-class LowerEqualThan(Instruction):
-    def __init__(self, dest, left_expr, right_expr):
-        self.dest = dest
-        self.left = left_expr
-        self.right = right_expr
-
-    def to_string(self):
-        return "{} <- {} <= {}".format(self.dest, self.left, self.right)
-
-
-class EqualThan(Instruction):
-    def __init__(self, dest, left_expr, right_expr):
-        self.dest = dest
-        self.left = left_expr
-        self.right = right_expr
-
-    def to_string(self):
-        return "{} <- {} == {}".format(self.dest, self.left, self.right)
-
-
-class Exit(Instruction):
-    def __init__(self):
-        pass
-
-    def to_string(self):
-        return "Exit"
-
-
-class EqualStrThanStr(Instruction):
-    def __init__(self, dest, left_expr, right_expr):
-        self.dest = dest
-        self.left = left_expr
-        self.right = right_expr
-
-    def to_string(self):
-        return "{} <- {} == {}".format(self.dest, self.left, self.right)
+class Print(Instruction):
+    def __init__(self, str_address):
+        self.str_address = str_address
