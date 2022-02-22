@@ -194,7 +194,7 @@ class TypeCheckerVisitor:
                     )
                 )
 
-        if method.return_type == "SELF_TYPE":
+        if method.return_type == self.get_type("SELF_TYPE"):
             return type_checked.CoolDispatchNode(
                 node.lineno, node.columnno, exp, node.id, args, exp.type
             )
