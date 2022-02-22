@@ -22,6 +22,8 @@ class DotTypesDataVisitor(CILVisitor):
 
     @visitor.when(ast.ProgramNode)
     def visit(self, node: ast.ProgramNode):
+        self.root.set_data('""')
+
         for class_ in node.declarations:
             self.visit(class_)
 

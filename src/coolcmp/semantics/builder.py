@@ -90,7 +90,7 @@ class TypeBuilder:
             if attr_type == self.context.get_type('Int'):
                 node.expr = IntegerNode('0')
             elif attr_type == self.context.get_type('String'):
-                node.expr = StringNode('')
+                node.expr = StringNode('""')
             elif attr_type == self.context.get_type('Bool'):
                 node.expr = BooleanNode('false')
             else:
