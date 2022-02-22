@@ -8,6 +8,10 @@ from .semantic import *
 from .types import CoolTypeBuildInManager
 from .codegen import CILGenerate
 
+path = ""
+if len(sys.argv) > 1:
+    path = sys.argv[1]
+
 path = "test.cl"
 
 with open(path, 'r') as _file:

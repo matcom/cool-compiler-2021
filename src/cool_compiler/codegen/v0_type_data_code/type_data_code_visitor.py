@@ -131,7 +131,7 @@ class CILGenerate:
         for arg in arg_list:
             instance_expr_list.append(ASTR.Arg(arg))
         
-        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, node.id))
+        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, self.currentType.methods[node.id]))
         return instance_expr_list
     
     @visitor.when(AST.Dispatch)
@@ -151,7 +151,7 @@ class CILGenerate:
         for arg in arg_list:
             instance_expr_list.append(ASTR.Arg(arg))
         
-        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, node.id))
+        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, self.currentType.methods[node.id]))
         return instance_expr_list
     
     @visitor.when(AST.StaticDispatch)
@@ -167,7 +167,7 @@ class CILGenerate:
         for arg in arg_list:
             param_expr_list.append(ASTR.Arg(arg))
         
-        param_expr_list.append(ASTR.VCall(super_value, self.currentClass.name, node.id))
+        param_expr_list.append(ASTR.VCall(super_value, self.currentClass.name, self.currentType.methods[node.id]))
         return param_expr_list
     
 
