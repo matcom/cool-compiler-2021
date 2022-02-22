@@ -1,293 +1,2975 @@
-		.data
-string_const0:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const0
-		.ascii	""
-		.word	-1
-string_const1:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const1
-		.ascii	"Object"
-		.word	-1
-string_const2:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const2
-		.ascii	"IO"
-		.word	-1
-string_const3:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const3
-		.ascii	"Int"
-		.word	-1
-string_const4:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const4
-		.ascii	"Bool"
-		.word	-1
-string_const5:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const1
-		.ascii	"String"
-		.word	-1
-string_const6:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const3
-		.ascii	"A2I"
-		.word	-1
-string_const7:
-		.word	4
-		.word	6
-		.word	String_disp
-		.word	int_const4
-		.ascii	"Main"
-		.word	-1
-int_const0:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	0
-		.word	-1
-int_const1:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	6
-		.word	-1
-int_const2:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	2
-		.word	-1
-int_const3:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	3
-		.word	-1
-int_const4:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	4
-		.word	-1
-bool_const_0:
-		.word	3
-		.word	4
-		.word	Bool_disp
-		.word	0
-		.word	-1
-bool_const_1:
-		.word	3
-		.word	4
-		.word	Bool_disp
-		.word	1
-		.word	-1
-names_tab:
-		.word	string_const1
-		.word	string_const2
-		.word	string_const3
-		.word	string_const4
-		.word	string_const5
-		.word	string_const6
-		.word	string_const7
-Object_disp:
-		.word	Object.init
-		.word	Object.copy
-		.word	Object.abort
-		.word	Object.type_name
-IO_disp:
-		.word	Object.init
-		.word	Object.copy
-		.word	Object.abort
-		.word	Object.type_name
-		.word	IO.init
-		.word	IO.out_string
-		.word	IO.out_int
-		.word	IO.in_string
-		.word	IO.in_int
-Int_disp:
-		.word	Object.init
-		.word	Object.copy
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Int.init
-Bool_disp:
-		.word	Object.init
-		.word	Object.copy
-		.word	Object.abort
-		.word	Object.type_name
-		.word	Bool.init
-String_disp:
-		.word	Object.init
-		.word	Object.copy
-		.word	Object.abort
-		.word	Object.type_name
-		.word	String.init
-		.word	String.length
-		.word	String.concat
-		.word	String.substr
-A2I_disp:
-		.word	Object.init
-		.word	Object.copy
-		.word	Object.abort
-		.word	Object.type_name
-		.word	A2I.c2i
-		.word	A2I.i2c
-		.word	A2I.a2i
-		.word	A2I.a2i_aux
-		.word	A2I.i2a
-		.word	A2I.i2a_aux
-Main_disp:
-		.word	Object.init
-		.word	Object.copy
-		.word	Object.abort
-		.word	Object.type_name
-		.word	IO.init
-		.word	IO.out_string
-		.word	IO.out_int
-		.word	IO.in_string
-		.word	IO.in_int
-		.word	Main.main
-Object_proto:
-		.word	0
-		.word	3
-		.word	Object_disp
-		.word	-1
-IO_proto:
-		.word	1
-		.word	3
-		.word	IO_disp
-		.word	-1
-Int_proto:
-		.word	2
-		.word	4
-		.word	Int_disp
-		.word	0
-		.word	-1
-Bool_proto:
-		.word	3
-		.word	4
-		.word	Bool_disp
-		.word	0
-		.word	-1
-String_proto:
-		.word	4
-		.word	5
-		.word	String_disp
-		.word	int_const_0
-		.word	0
-		.word	-1
-A2I_proto:
-		.word	5
-		.word	3
-		.word	A2I_disp
-		.word	-1
-Main_proto:
-		.word	6
-		.word	3
-		.word	Main_disp
-		.word	-1
-heap:
-		.word	0
-		.text
+	.data
+abort_msg: .asciiz "Abort called from class "
+new_line: .asciiz "\n"
+string_abort: .asciiz "Abort called from class String\n"
+int_abort: .asciiz "Abort called from class Int\n"
+bool_abort: .asciiz "Abort called from class Bool\n"
+type_Object: .asciiz "Object"
+type_IO: .asciiz "IO"
+type_String: .asciiz "String"
+type_Int: .asciiz "Int"
+type_Bool: .asciiz "Bool"
+type_A2I: .asciiz "A2I"
+type_Main: .asciiz "Main"
+methods: .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+type_Void: .asciiz "Void"
+types: .word 0, 0, 0, 0, 0, 0, 0
+data_0: .asciiz "Void"
+data_1: .asciiz "0"
+data_2: .asciiz "1"
+data_3: .asciiz "2"
+data_4: .asciiz "3"
+data_5: .asciiz "4"
+data_6: .asciiz "5"
+data_7: .asciiz "6"
+data_8: .asciiz "7"
+data_9: .asciiz "8"
+data_10: .asciiz "9"
+data_11: .asciiz ""
+data_12: .asciiz "9"
+data_13: .asciiz "8"
+data_14: .asciiz "7"
+data_15: .asciiz "6"
+data_16: .asciiz "5"
+data_17: .asciiz "4"
+data_18: .asciiz "3"
+data_19: .asciiz "2"
+data_20: .asciiz "1"
+data_21: .asciiz "0"
+data_22: .asciiz "-"
+data_23: .asciiz "+"
+data_24: .asciiz "-"
+data_25: .asciiz "0"
+data_26: .asciiz ""
+data_27: .asciiz "678987"
+data_28: .asciiz " == "
+data_29: .asciiz "
+"
+zero_error: .asciiz "Division by zero error\n"
+case_void_error: .asciiz "Case on void error\n"
+dispatch_error: .asciiz "Dispatch on void error\n"
+case_error: .asciiz "Case statement without a matching branch error\n"
+index_error: .asciiz "Substring out of range error\n"
+heap_error: .asciiz "Heap overflow error
+"
+	.text
+	.globl main
 main:
-		la   	 $a0 Main_proto
-		jal  	 Object_copy
-		move 	 $a0 $v0		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
-Object.init:
-		addiu 	 $sp $sp -12
-		sw    	 $fp 12($sp)
-		sw    	 $ra 8($sp)
-		sw    	 $s0 4($sp)
-		addiu 	 $fp $fp 4
-		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
-IO.init:
-		addiu 	 $sp $sp -12
-		sw    	 $fp 12($sp)
-		sw    	 $ra 8($sp)
-		sw    	 $s0 4($sp)
-		addiu 	 $fp $fp 4
-		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
-Int.init:
-		addiu 	 $sp $sp -12
-		sw    	 $fp 12($sp)
-		sw    	 $ra 8($sp)
-		sw    	 $s0 4($sp)
-		addiu 	 $fp $fp 4
-		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
-Bool.init:
-		addiu 	 $sp $sp -12
-		sw    	 $fp 12($sp)
-		sw    	 $ra 8($sp)
-		sw    	 $s0 4($sp)
-		addiu 	 $fp $fp 4
-		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
-String.init:
-		addiu 	 $sp $sp -12
-		sw    	 $fp 12($sp)
-		sw    	 $ra 8($sp)
-		sw    	 $s0 4($sp)
-		addiu 	 $fp $fp 4
-		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
-A2I.init:
-		addiu 	 $sp $sp -12
-		sw    	 $fp 12($sp)
-		sw    	 $ra 8($sp)
-		sw    	 $s0 4($sp)
-		addiu 	 $fp $fp 4
-		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
-Main.init:
-		addiu 	 $sp $sp -12
-		sw    	 $fp 12($sp)
-		sw    	 $ra 8($sp)
-		sw    	 $s0 4($sp)
-		addiu 	 $fp $fp 4
-		lw    	 $fp 12($sp)
-		lw    	 $ra 8($sp)
-		lw    	 $s0 2($sp)
-		addiu 	 $sp $sp 12
-		jr    	 $ra
+	la $v0, methods
+	la $t9, entry
+	sw $t9, 0($v0)
+	la $t9, function_abort_Object
+	sw $t9, 4($v0)
+	la $t9, function_type_name_Object
+	sw $t9, 8($v0)
+	la $t9, function_copy_Object
+	sw $t9, 12($v0)
+	la $t9, function_out_string_IO
+	sw $t9, 16($v0)
+	la $t9, function_out_int_IO
+	sw $t9, 20($v0)
+	la $t9, function_in_int_IO
+	sw $t9, 24($v0)
+	la $t9, function_in_string_IO
+	sw $t9, 28($v0)
+	la $t9, function_length_String
+	sw $t9, 32($v0)
+	la $t9, function_concat_String
+	sw $t9, 36($v0)
+	la $t9, function_substr_String
+	sw $t9, 40($v0)
+	la $t9, function_type_name_String
+	sw $t9, 44($v0)
+	la $t9, function_copy_String
+	sw $t9, 48($v0)
+	la $t9, function_type_name_Int
+	sw $t9, 52($v0)
+	la $t9, function_copy_Int
+	sw $t9, 56($v0)
+	la $t9, function_type_name_Bool
+	sw $t9, 60($v0)
+	la $t9, function_copy_Bool
+	sw $t9, 64($v0)
+	la $t9, function_abort_String
+	sw $t9, 68($v0)
+	la $t9, function_abort_Int
+	sw $t9, 72($v0)
+	la $t9, function_abort_Bool
+	sw $t9, 76($v0)
+	la $t9, function_c2i_A2I
+	sw $t9, 80($v0)
+	la $t9, function_i2c_A2I
+	sw $t9, 84($v0)
+	la $t9, function_a2i_A2I
+	sw $t9, 88($v0)
+	la $t9, function_a2i_aux_A2I
+	sw $t9, 92($v0)
+	la $t9, function_i2a_A2I
+	sw $t9, 96($v0)
+	la $t9, function_i2a_aux_A2I
+	sw $t9, 100($v0)
+	la $t9, function_main_Main
+	sw $t9, 104($v0)
+	la $t9, types
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t8, type_String
+	sw $t8, 0($v0)
+	sw $v0, 0($t9)
+	move $t8, $v0
+	li $v0, 9
+	li $a0, 28
+	syscall
+	la $v1, methods
+	lw $a0, 32($v1)
+	sw $a0, 4($v0)
+	lw $a0, 36($v1)
+	sw $a0, 8($v0)
+	lw $a0, 40($v1)
+	sw $a0, 12($v0)
+	lw $a0, 68($v1)
+	sw $a0, 16($v0)
+	lw $a0, 44($v1)
+	sw $a0, 20($v0)
+	lw $a0, 48($v1)
+	sw $a0, 24($v0)
+	sw $v0, 8($t8)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t8, type_Int
+	sw $t8, 0($v0)
+	sw $v0, 4($t9)
+	move $t8, $v0
+	li $v0, 9
+	li $a0, 16
+	syscall
+	la $v1, methods
+	lw $a0, 72($v1)
+	sw $a0, 4($v0)
+	lw $a0, 52($v1)
+	sw $a0, 8($v0)
+	lw $a0, 56($v1)
+	sw $a0, 12($v0)
+	sw $v0, 8($t8)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t8, type_Bool
+	sw $t8, 0($v0)
+	sw $v0, 8($t9)
+	move $t8, $v0
+	li $v0, 9
+	li $a0, 16
+	syscall
+	la $v1, methods
+	lw $a0, 76($v1)
+	sw $a0, 4($v0)
+	lw $a0, 60($v1)
+	sw $a0, 8($v0)
+	lw $a0, 64($v1)
+	sw $a0, 12($v0)
+	sw $v0, 8($t8)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t8, type_Object
+	sw $t8, 0($v0)
+	sw $v0, 12($t9)
+	move $t8, $v0
+	li $v0, 9
+	li $a0, 16
+	syscall
+	la $v1, methods
+	lw $a0, 4($v1)
+	sw $a0, 4($v0)
+	lw $a0, 8($v1)
+	sw $a0, 8($v0)
+	lw $a0, 12($v1)
+	sw $a0, 12($v0)
+	sw $v0, 8($t8)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t8, type_IO
+	sw $t8, 0($v0)
+	sw $v0, 16($t9)
+	move $t8, $v0
+	li $v0, 9
+	li $a0, 32
+	syscall
+	la $v1, methods
+	lw $a0, 4($v1)
+	sw $a0, 4($v0)
+	lw $a0, 8($v1)
+	sw $a0, 8($v0)
+	lw $a0, 12($v1)
+	sw $a0, 12($v0)
+	lw $a0, 16($v1)
+	sw $a0, 16($v0)
+	lw $a0, 20($v1)
+	sw $a0, 20($v0)
+	lw $a0, 24($v1)
+	sw $a0, 24($v0)
+	lw $a0, 28($v1)
+	sw $a0, 28($v0)
+	sw $v0, 8($t8)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t8, type_A2I
+	sw $t8, 0($v0)
+	sw $v0, 20($t9)
+	move $t8, $v0
+	li $v0, 9
+	li $a0, 40
+	syscall
+	la $v1, methods
+	lw $a0, 4($v1)
+	sw $a0, 4($v0)
+	lw $a0, 8($v1)
+	sw $a0, 8($v0)
+	lw $a0, 12($v1)
+	sw $a0, 12($v0)
+	lw $a0, 80($v1)
+	sw $a0, 16($v0)
+	lw $a0, 84($v1)
+	sw $a0, 20($v0)
+	lw $a0, 88($v1)
+	sw $a0, 24($v0)
+	lw $a0, 92($v1)
+	sw $a0, 28($v0)
+	lw $a0, 96($v1)
+	sw $a0, 32($v0)
+	lw $a0, 100($v1)
+	sw $a0, 36($v0)
+	sw $v0, 8($t8)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t8, type_Main
+	sw $t8, 0($v0)
+	sw $v0, 24($t9)
+	move $t8, $v0
+	li $v0, 9
+	li $a0, 36
+	syscall
+	la $v1, methods
+	lw $a0, 4($v1)
+	sw $a0, 4($v0)
+	lw $a0, 8($v1)
+	sw $a0, 8($v0)
+	lw $a0, 12($v1)
+	sw $a0, 12($v0)
+	lw $a0, 16($v1)
+	sw $a0, 16($v0)
+	lw $a0, 20($v1)
+	sw $a0, 20($v0)
+	lw $a0, 28($v1)
+	sw $a0, 24($v0)
+	lw $a0, 24($v1)
+	sw $a0, 28($v0)
+	lw $a0, 104($v1)
+	sw $a0, 32($v0)
+	sw $v0, 8($t8)
+	lw $v0, 0($t9)
+	li $t8, 0
+	sw $t8, 4($v0)
+	lw $v0, 4($t9)
+	li $t8, 0
+	sw $t8, 4($v0)
+	lw $v0, 8($t9)
+	li $t8, 0
+	sw $t8, 4($v0)
+	lw $v0, 12($t9)
+	li $t8, 0
+	sw $t8, 4($v0)
+	lw $v0, 16($t9)
+	lw $t8, 12($t9)
+	sw $t8, 4($v0)
+	lw $v0, 20($t9)
+	lw $t8, 12($t9)
+	sw $t8, 4($v0)
+	lw $v0, 24($t9)
+	lw $t8, 16($t9)
+	sw $t8, 4($v0)
 
+entry:
+	move $fp, $sp
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t9, type_Main
+	sw $t9, 0($v0)
+	li $t9, 12
+	sw $t9, 4($v0)
+	move $t0, $v0
+	la $t8, types
+	lw $v0, 24($t8)
+	sw $v0, 8($t0)
+	lw $t1, -4($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+	jal function_main_Main
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -4($fp)
+	move $t0, $v0
+	li $v0, 0
+	sw $t0, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_abort_Object:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -4($fp)
+	move $t1, $t0
+	sw $t1, -4($fp)
+	li $t8, 0
+	li $v0, 4
+	la $a0, abort_msg
+	syscall
+	li $v0, 4
+	lw $a0, 0($t0)
+	syscall
+	li $v0, 4
+	la $a0, new_line
+	syscall
+	li $v0, 17
+	move $a0, $t8
+	syscall
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+
+function_type_name_Object:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -4($fp)
+	lw $t1, 0($t0)
+	move $v0, $t1
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_copy_Object:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -4($fp)
+	lw $t9, 4($t0)
+	li $v0, 9
+	move $a0, $t9
+	syscall
+	move $t1, $v0
+	li $t8, 0
+loop_0:
+	bge $t8, $t9, exit_0
+	lw $a0, ($t0)
+	sw $a0, ($v0)
+	addi $v0, $v0, 4
+	addi $t0, $t0, 4
+	addi $t8, $t8, 4
+	j loop_0
+exit_0:
+	move $v0, $t1
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_out_string_IO:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	lw $t1, -8($fp)
+	move $t1, $t0
+	sw $t1, -8($fp)
+	lw $t2, -0($fp)
+	li $v0, 4
+	move $a0, $t2
+	syscall
+	move $v0, $t1
+	sw $t0, -4($fp)
+	sw $t1, -8($fp)
+	sw $t2, -0($fp)
+	addiu $sp, $sp, 12
+	jr $ra
+
+
+function_out_int_IO:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	lw $t1, -8($fp)
+	move $t1, $t0
+	sw $t1, -8($fp)
+	lw $t2, -0($fp)
+	li $v0, 1
+	move $a0, $t2
+	syscall
+	move $v0, $t1
+	sw $t0, -4($fp)
+	sw $t1, -8($fp)
+	sw $t2, -0($fp)
+	addiu $sp, $sp, 12
+	jr $ra
+
+
+function_in_int_IO:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	li $v0, 5
+	syscall
+	move $t0, $v0
+	move $v0, $t0
+	sw $t0, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_in_string_IO:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	li $a0, 356
+	li $v0, 9
+	syscall
+	move $t0, $v0
+	move $a0, $t0
+	li $a1, 356
+	li $v0, 8
+	syscall
+	move $t9, $t0
+start_1:
+	lb $t8, 0($t9)
+	beqz $t8, end_1
+	add $t9, $t9, 1
+	j start_1
+end_1:
+	addiu $t9, $t9, -1
+	sb $0, ($t9)
+	move $v0, $t0
+	sw $t0, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_length_String:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -4($fp)
+	move $t8, $t0
+loop_2:
+	lb $t9, 0($t8)
+	beq $t9, $zero, end_2
+	addi $t8, $t8, 1
+	j loop_2
+end_2:
+	sub $t1, $t8, $t0
+	move $v0, $t1
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_concat_String:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	lw $t1, -0($fp)
+	lw $t2, -8($fp)
+	li $a0, 356
+	li $v0, 9
+	syscall
+	move $t2, $v0
+	move $a0, $t0
+	move $a1, $t2
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	jal strcopier
+	move $a0, $t1
+	move $a1, $v0
+	jal strcopier
+	sb $0, 0($v0)
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	j finish_3
+strcopier:
+loop_3:
+	lb $t8, ($a0)
+	beq $t8, $zero, end_3
+	addiu $a0, $a0, 1
+	sb $t8, ($a1)
+	addiu $a1, $a1, 1
+	b loop_3
+end_3:
+	move $v0, $a1
+	jr $ra
+finish_3:
+	move $v0, $t2
+	sw $t0, -4($fp)
+	sw $t1, -0($fp)
+	sw $t2, -8($fp)
+	addiu $sp, $sp, 12
+	jr $ra
+
+
+function_substr_String:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	lw $t1, -0($fp)
+	lw $t2, -12($fp)
+	li $a0, 356
+	li $v0, 9
+	syscall
+	move $t2, $v0
+	lw $t3, -8($fp)
+	li $v0, 0
+	move $t8, $t3
+start_4:
+	lb $t9, 0($t8)
+	beqz $t9, error_4
+	addi $v0, 1
+	bgt $v0, $t0, end_len_4
+	addi $t8, 1
+	j start_4
+end_len_4:
+	move $v0, $t2
+loop_4:
+	sub $t9, $v0, $t2
+	beq $t9, $t1, end_4
+	lb $t9, 0($t8)
+	beqz $t9, error_4
+	sb $t9, 0($v0)
+	addi $t8, $t8, 1
+	addi $v0, $v0, 1
+	j loop_4
+error_4:
+	la $a0, index_error
+	li $v0, 4
+	move $a0, $t3
+	syscall
+	li $v0, 1
+	move $a0, $t0
+	syscall
+	li $v0, 1
+	move $a0, $t1
+	syscall
+	j .raise
+end_4:
+	sb $0, 0($v0)
+	move $v0, $t2
+	sw $t0, -4($fp)
+	sw $t1, -0($fp)
+	sw $t2, -12($fp)
+	sw $t3, -8($fp)
+	addiu $sp, $sp, 16
+	jr $ra
+
+
+function_type_name_String:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	la $t0, type_String
+	move $v0, $t0
+	sw $t0, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_copy_String:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -4($fp)
+	li $a0, 356
+	li $v0, 9
+	syscall
+	move $t1, $v0
+	move $a0, $t0
+	move $a1, $t1
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	jal strcopier
+	sb $0, 0($v0)
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	j finish_5
+finish_5:
+	move $v0, $t1
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_type_name_Int:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	la $t0, type_Int
+	move $v0, $t0
+	sw $t0, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_copy_Int:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -4($fp)
+	move $t1, $t0
+	sw $t1, -4($fp)
+	move $v0, $t1
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_type_name_Bool:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -4($fp)
+	la $t0, type_Bool
+	move $v0, $t0
+	sw $t0, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_copy_Bool:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -4($fp)
+	move $t1, $t0
+	sw $t1, -4($fp)
+	move $v0, $t1
+	sw $t0, -0($fp)
+	sw $t1, -4($fp)
+	addiu $sp, $sp, 8
+	jr $ra
+
+
+function_abort_String:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	la $t0, string_abort
+	li $v0, 4
+	move $a0, $t0
+	syscall
+	li $t8, 0
+	li $v0, 17
+	move $a0, $t8
+	syscall
+	sw $t0, -0($fp)
+
+function_abort_Int:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	la $t0, int_abort
+	li $v0, 4
+	move $a0, $t0
+	syscall
+	li $t8, 0
+	li $v0, 17
+	move $a0, $t8
+	syscall
+	sw $t0, -0($fp)
+
+function_abort_Bool:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	la $t0, bool_abort
+	li $v0, 4
+	move $a0, $t0
+	syscall
+	li $t8, 0
+	li $v0, 17
+	move $a0, $t8
+	syscall
+	sw $t0, -0($fp)
+
+function_c2i_A2I:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -12($fp)
+	la $t0, data_1
+	lw $t1, -0($fp)
+	lw $t2, -8($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_6:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_6
+	beqz $a1, mismatch_6
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_6
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_6
+mismatch_6:
+	li $v0, 0
+	j end_6
+check_6:
+	bnez $a1, mismatch_6
+	li $v0, 1
+end_6:
+	move $t2, $v0
+	sw $t0, -12($fp)
+	sw $t1, -0($fp)
+	sw $t2, -8($fp)
+	bnez $t2, true__54
+	lw $t0, -24($fp)
+	la $t0, data_2
+	lw $t1, -0($fp)
+	lw $t2, -20($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_7:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_7
+	beqz $a1, mismatch_7
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_7
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_7
+mismatch_7:
+	li $v0, 0
+	j end_7
+check_7:
+	bnez $a1, mismatch_7
+	li $v0, 1
+end_7:
+	move $t2, $v0
+	sw $t0, -24($fp)
+	sw $t1, -0($fp)
+	sw $t2, -20($fp)
+	bnez $t2, true__61
+	lw $t0, -36($fp)
+	la $t0, data_3
+	lw $t1, -0($fp)
+	lw $t2, -32($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_8:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_8
+	beqz $a1, mismatch_8
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_8
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_8
+mismatch_8:
+	li $v0, 0
+	j end_8
+check_8:
+	bnez $a1, mismatch_8
+	li $v0, 1
+end_8:
+	move $t2, $v0
+	sw $t0, -36($fp)
+	sw $t1, -0($fp)
+	sw $t2, -32($fp)
+	bnez $t2, true__68
+	lw $t0, -48($fp)
+	la $t0, data_4
+	lw $t1, -0($fp)
+	lw $t2, -44($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_9:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_9
+	beqz $a1, mismatch_9
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_9
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_9
+mismatch_9:
+	li $v0, 0
+	j end_9
+check_9:
+	bnez $a1, mismatch_9
+	li $v0, 1
+end_9:
+	move $t2, $v0
+	sw $t0, -48($fp)
+	sw $t1, -0($fp)
+	sw $t2, -44($fp)
+	bnez $t2, true__75
+	lw $t0, -60($fp)
+	la $t0, data_5
+	lw $t1, -0($fp)
+	lw $t2, -56($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_10:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_10
+	beqz $a1, mismatch_10
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_10
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_10
+mismatch_10:
+	li $v0, 0
+	j end_10
+check_10:
+	bnez $a1, mismatch_10
+	li $v0, 1
+end_10:
+	move $t2, $v0
+	sw $t0, -60($fp)
+	sw $t1, -0($fp)
+	sw $t2, -56($fp)
+	bnez $t2, true__82
+	lw $t0, -72($fp)
+	la $t0, data_6
+	lw $t1, -0($fp)
+	lw $t2, -68($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_11:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_11
+	beqz $a1, mismatch_11
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_11
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_11
+mismatch_11:
+	li $v0, 0
+	j end_11
+check_11:
+	bnez $a1, mismatch_11
+	li $v0, 1
+end_11:
+	move $t2, $v0
+	sw $t0, -72($fp)
+	sw $t1, -0($fp)
+	sw $t2, -68($fp)
+	bnez $t2, true__89
+	lw $t0, -84($fp)
+	la $t0, data_7
+	lw $t1, -0($fp)
+	lw $t2, -80($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_12:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_12
+	beqz $a1, mismatch_12
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_12
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_12
+mismatch_12:
+	li $v0, 0
+	j end_12
+check_12:
+	bnez $a1, mismatch_12
+	li $v0, 1
+end_12:
+	move $t2, $v0
+	sw $t0, -84($fp)
+	sw $t1, -0($fp)
+	sw $t2, -80($fp)
+	bnez $t2, true__96
+	lw $t0, -96($fp)
+	la $t0, data_8
+	lw $t1, -0($fp)
+	lw $t2, -92($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_13:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_13
+	beqz $a1, mismatch_13
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_13
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_13
+mismatch_13:
+	li $v0, 0
+	j end_13
+check_13:
+	bnez $a1, mismatch_13
+	li $v0, 1
+end_13:
+	move $t2, $v0
+	sw $t0, -96($fp)
+	sw $t1, -0($fp)
+	sw $t2, -92($fp)
+	bnez $t2, true__103
+	lw $t0, -108($fp)
+	la $t0, data_9
+	lw $t1, -0($fp)
+	lw $t2, -104($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_14:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_14
+	beqz $a1, mismatch_14
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_14
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_14
+mismatch_14:
+	li $v0, 0
+	j end_14
+check_14:
+	bnez $a1, mismatch_14
+	li $v0, 1
+end_14:
+	move $t2, $v0
+	sw $t0, -108($fp)
+	sw $t1, -0($fp)
+	sw $t2, -104($fp)
+	bnez $t2, true__110
+	lw $t0, -120($fp)
+	la $t0, data_10
+	lw $t1, -0($fp)
+	lw $t2, -116($fp)
+	move $t8, $t1
+	move $t9, $t0
+loop_15:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_15
+	beqz $a1, mismatch_15
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_15
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_15
+mismatch_15:
+	li $v0, 0
+	j end_15
+check_15:
+	bnez $a1, mismatch_15
+	li $v0, 1
+end_15:
+	move $t2, $v0
+	sw $t0, -120($fp)
+	sw $t1, -0($fp)
+	sw $t2, -116($fp)
+	bnez $t2, true__117
+	lw $t0, -4($fp)
+	lw $t1, -128($fp)
+	lw $t9, 8($t0)
+	lw $a0, 8($t9)
+	lw $t8, 4($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -4($fp)
+	sw $t1, -128($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -128($fp)
+	move $t0, $v0
+	lw $t1, -132($fp)
+	li $t1, 0
+	sw $t1, -132($fp)
+	lw $t2, -124($fp)
+	move $t2, $t1
+	sw $t2, -124($fp)
+	sw $t0, -128($fp)
+	sw $t1, -132($fp)
+	sw $t2, -124($fp)
+	j end__117
+true__117:
+	lw $t0, -124($fp)
+	li $t0, 9
+	sw $t0, -124($fp)
+	sw $t0, -124($fp)
+end__117:
+	lw $t0, -124($fp)
+	lw $t1, -112($fp)
+	move $t1, $t0
+	sw $t1, -112($fp)
+	sw $t0, -124($fp)
+	sw $t1, -112($fp)
+	j end__110
+true__110:
+	lw $t0, -112($fp)
+	li $t0, 8
+	sw $t0, -112($fp)
+	sw $t0, -112($fp)
+end__110:
+	lw $t0, -112($fp)
+	lw $t1, -100($fp)
+	move $t1, $t0
+	sw $t1, -100($fp)
+	sw $t0, -112($fp)
+	sw $t1, -100($fp)
+	j end__103
+true__103:
+	lw $t0, -100($fp)
+	li $t0, 7
+	sw $t0, -100($fp)
+	sw $t0, -100($fp)
+end__103:
+	lw $t0, -100($fp)
+	lw $t1, -88($fp)
+	move $t1, $t0
+	sw $t1, -88($fp)
+	sw $t0, -100($fp)
+	sw $t1, -88($fp)
+	j end__96
+true__96:
+	lw $t0, -88($fp)
+	li $t0, 6
+	sw $t0, -88($fp)
+	sw $t0, -88($fp)
+end__96:
+	lw $t0, -88($fp)
+	lw $t1, -76($fp)
+	move $t1, $t0
+	sw $t1, -76($fp)
+	sw $t0, -88($fp)
+	sw $t1, -76($fp)
+	j end__89
+true__89:
+	lw $t0, -76($fp)
+	li $t0, 5
+	sw $t0, -76($fp)
+	sw $t0, -76($fp)
+end__89:
+	lw $t0, -76($fp)
+	lw $t1, -64($fp)
+	move $t1, $t0
+	sw $t1, -64($fp)
+	sw $t0, -76($fp)
+	sw $t1, -64($fp)
+	j end__82
+true__82:
+	lw $t0, -64($fp)
+	li $t0, 4
+	sw $t0, -64($fp)
+	sw $t0, -64($fp)
+end__82:
+	lw $t0, -64($fp)
+	lw $t1, -52($fp)
+	move $t1, $t0
+	sw $t1, -52($fp)
+	sw $t0, -64($fp)
+	sw $t1, -52($fp)
+	j end__75
+true__75:
+	lw $t0, -52($fp)
+	li $t0, 3
+	sw $t0, -52($fp)
+	sw $t0, -52($fp)
+end__75:
+	lw $t0, -52($fp)
+	lw $t1, -40($fp)
+	move $t1, $t0
+	sw $t1, -40($fp)
+	sw $t0, -52($fp)
+	sw $t1, -40($fp)
+	j end__68
+true__68:
+	lw $t0, -40($fp)
+	li $t0, 2
+	sw $t0, -40($fp)
+	sw $t0, -40($fp)
+end__68:
+	lw $t0, -40($fp)
+	lw $t1, -28($fp)
+	move $t1, $t0
+	sw $t1, -28($fp)
+	sw $t0, -40($fp)
+	sw $t1, -28($fp)
+	j end__61
+true__61:
+	lw $t0, -28($fp)
+	li $t0, 1
+	sw $t0, -28($fp)
+	sw $t0, -28($fp)
+end__61:
+	lw $t0, -28($fp)
+	lw $t1, -16($fp)
+	move $t1, $t0
+	sw $t1, -16($fp)
+	sw $t0, -28($fp)
+	sw $t1, -16($fp)
+	j end__54
+true__54:
+	lw $t0, -16($fp)
+	li $t0, 0
+	sw $t0, -16($fp)
+	sw $t0, -16($fp)
+end__54:
+	lw $t0, -16($fp)
+	move $v0, $t0
+	sw $t0, -16($fp)
+	addiu $sp, $sp, 136
+	jr $ra
+
+
+function_i2c_A2I:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -8($fp)
+	li $t9, 0
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -8($fp)
+	bnez $t1, true__180
+	lw $t0, -0($fp)
+	lw $t1, -16($fp)
+	li $t9, 1
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -16($fp)
+	bnez $t1, true__184
+	lw $t0, -0($fp)
+	lw $t1, -24($fp)
+	li $t9, 2
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -24($fp)
+	bnez $t1, true__188
+	lw $t0, -0($fp)
+	lw $t1, -32($fp)
+	li $t9, 3
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -32($fp)
+	bnez $t1, true__192
+	lw $t0, -0($fp)
+	lw $t1, -40($fp)
+	li $t9, 4
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -40($fp)
+	bnez $t1, true__196
+	lw $t0, -0($fp)
+	lw $t1, -48($fp)
+	li $t9, 5
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -48($fp)
+	bnez $t1, true__200
+	lw $t0, -0($fp)
+	lw $t1, -56($fp)
+	li $t9, 6
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -56($fp)
+	bnez $t1, true__204
+	lw $t0, -0($fp)
+	lw $t1, -64($fp)
+	li $t9, 7
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -64($fp)
+	bnez $t1, true__208
+	lw $t0, -0($fp)
+	lw $t1, -72($fp)
+	li $t9, 8
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -72($fp)
+	bnez $t1, true__212
+	lw $t0, -0($fp)
+	lw $t1, -80($fp)
+	li $t9, 9
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -80($fp)
+	bnez $t1, true__216
+	lw $t0, -4($fp)
+	lw $t1, -88($fp)
+	lw $t9, 8($t0)
+	lw $a0, 8($t9)
+	lw $t8, 4($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -4($fp)
+	sw $t1, -88($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -88($fp)
+	move $t0, $v0
+	lw $t1, -92($fp)
+	la $t1, data_11
+	lw $t2, -96($fp)
+	move $t2, $t1
+	sw $t2, -96($fp)
+	lw $t3, -84($fp)
+	move $t3, $t2
+	sw $t3, -84($fp)
+	sw $t0, -88($fp)
+	sw $t1, -92($fp)
+	sw $t2, -96($fp)
+	sw $t3, -84($fp)
+	j end__216
+true__216:
+	lw $t0, -100($fp)
+	la $t0, data_12
+	lw $t1, -84($fp)
+	move $t1, $t0
+	sw $t1, -84($fp)
+	sw $t0, -100($fp)
+	sw $t1, -84($fp)
+end__216:
+	lw $t0, -84($fp)
+	lw $t1, -76($fp)
+	move $t1, $t0
+	sw $t1, -76($fp)
+	sw $t0, -84($fp)
+	sw $t1, -76($fp)
+	j end__212
+true__212:
+	lw $t0, -104($fp)
+	la $t0, data_13
+	lw $t1, -76($fp)
+	move $t1, $t0
+	sw $t1, -76($fp)
+	sw $t0, -104($fp)
+	sw $t1, -76($fp)
+end__212:
+	lw $t0, -76($fp)
+	lw $t1, -68($fp)
+	move $t1, $t0
+	sw $t1, -68($fp)
+	sw $t0, -76($fp)
+	sw $t1, -68($fp)
+	j end__208
+true__208:
+	lw $t0, -108($fp)
+	la $t0, data_14
+	lw $t1, -68($fp)
+	move $t1, $t0
+	sw $t1, -68($fp)
+	sw $t0, -108($fp)
+	sw $t1, -68($fp)
+end__208:
+	lw $t0, -68($fp)
+	lw $t1, -60($fp)
+	move $t1, $t0
+	sw $t1, -60($fp)
+	sw $t0, -68($fp)
+	sw $t1, -60($fp)
+	j end__204
+true__204:
+	lw $t0, -112($fp)
+	la $t0, data_15
+	lw $t1, -60($fp)
+	move $t1, $t0
+	sw $t1, -60($fp)
+	sw $t0, -112($fp)
+	sw $t1, -60($fp)
+end__204:
+	lw $t0, -60($fp)
+	lw $t1, -52($fp)
+	move $t1, $t0
+	sw $t1, -52($fp)
+	sw $t0, -60($fp)
+	sw $t1, -52($fp)
+	j end__200
+true__200:
+	lw $t0, -116($fp)
+	la $t0, data_16
+	lw $t1, -52($fp)
+	move $t1, $t0
+	sw $t1, -52($fp)
+	sw $t0, -116($fp)
+	sw $t1, -52($fp)
+end__200:
+	lw $t0, -52($fp)
+	lw $t1, -44($fp)
+	move $t1, $t0
+	sw $t1, -44($fp)
+	sw $t0, -52($fp)
+	sw $t1, -44($fp)
+	j end__196
+true__196:
+	lw $t0, -120($fp)
+	la $t0, data_17
+	lw $t1, -44($fp)
+	move $t1, $t0
+	sw $t1, -44($fp)
+	sw $t0, -120($fp)
+	sw $t1, -44($fp)
+end__196:
+	lw $t0, -44($fp)
+	lw $t1, -36($fp)
+	move $t1, $t0
+	sw $t1, -36($fp)
+	sw $t0, -44($fp)
+	sw $t1, -36($fp)
+	j end__192
+true__192:
+	lw $t0, -124($fp)
+	la $t0, data_18
+	lw $t1, -36($fp)
+	move $t1, $t0
+	sw $t1, -36($fp)
+	sw $t0, -124($fp)
+	sw $t1, -36($fp)
+end__192:
+	lw $t0, -36($fp)
+	lw $t1, -28($fp)
+	move $t1, $t0
+	sw $t1, -28($fp)
+	sw $t0, -36($fp)
+	sw $t1, -28($fp)
+	j end__188
+true__188:
+	lw $t0, -128($fp)
+	la $t0, data_19
+	lw $t1, -28($fp)
+	move $t1, $t0
+	sw $t1, -28($fp)
+	sw $t0, -128($fp)
+	sw $t1, -28($fp)
+end__188:
+	lw $t0, -28($fp)
+	lw $t1, -20($fp)
+	move $t1, $t0
+	sw $t1, -20($fp)
+	sw $t0, -28($fp)
+	sw $t1, -20($fp)
+	j end__184
+true__184:
+	lw $t0, -132($fp)
+	la $t0, data_20
+	lw $t1, -20($fp)
+	move $t1, $t0
+	sw $t1, -20($fp)
+	sw $t0, -132($fp)
+	sw $t1, -20($fp)
+end__184:
+	lw $t0, -20($fp)
+	lw $t1, -12($fp)
+	move $t1, $t0
+	sw $t1, -12($fp)
+	sw $t0, -20($fp)
+	sw $t1, -12($fp)
+	j end__180
+true__180:
+	lw $t0, -136($fp)
+	la $t0, data_21
+	lw $t1, -12($fp)
+	move $t1, $t0
+	sw $t1, -12($fp)
+	sw $t0, -136($fp)
+	sw $t1, -12($fp)
+end__180:
+	lw $t0, -12($fp)
+	move $v0, $t0
+	sw $t0, -12($fp)
+	addiu $sp, $sp, 140
+	jr $ra
+
+
+function_a2i_A2I:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -16($fp)
+	la $t1, type_String
+	lw $t2, -20($fp)
+	la $t2, data_0
+	move $t8, $t1
+	move $t9, $t2
+loop_16:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_16
+	beqz $a1, mismatch_16
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_16
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_16
+mismatch_16:
+	li $v0, 0
+	j end_16
+check_16:
+	bnez $a1, mismatch_16
+	li $v0, 1
+end_16:
+	move $t1, $v0
+	sw $t0, -0($fp)
+	sw $t1, -16($fp)
+	sw $t2, -20($fp)
+	beqz $t1, continue__313
+	la $a0, dispatch_error
+	j .raise
+continue__313:
+	lw $t0, -12($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -0($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -12($fp)
+	sw $t1, -0($fp)
+	jal function_length_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -12($fp)
+	move $t0, $v0
+	lw $t1, -8($fp)
+	li $t9, 0
+	seq $t1, $t0, $t9
+	sw $t0, -12($fp)
+	sw $t1, -8($fp)
+	bnez $t1, true__324
+	lw $t0, -0($fp)
+	lw $t1, -36($fp)
+	la $t1, type_String
+	lw $t2, -40($fp)
+	la $t2, data_0
+	move $t8, $t1
+	move $t9, $t2
+loop_17:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_17
+	beqz $a1, mismatch_17
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_17
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_17
+mismatch_17:
+	li $v0, 0
+	j end_17
+check_17:
+	bnez $a1, mismatch_17
+	li $v0, 1
+end_17:
+	move $t1, $v0
+	sw $t0, -0($fp)
+	sw $t1, -36($fp)
+	sw $t2, -40($fp)
+	beqz $t1, continue__331
+	la $a0, dispatch_error
+	j .raise
+continue__331:
+	lw $t0, -32($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 1
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 0
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -0($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -32($fp)
+	sw $t1, -0($fp)
+	jal function_substr_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -32($fp)
+	move $t0, $v0
+	lw $t1, -44($fp)
+	la $t1, data_22
+	lw $t2, -28($fp)
+	move $t8, $t0
+	move $t9, $t1
+loop_18:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_18
+	beqz $a1, mismatch_18
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_18
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_18
+mismatch_18:
+	li $v0, 0
+	j end_18
+check_18:
+	bnez $a1, mismatch_18
+	li $v0, 1
+end_18:
+	move $t2, $v0
+	sw $t0, -32($fp)
+	sw $t1, -44($fp)
+	sw $t2, -28($fp)
+	bnez $t2, true__345
+	lw $t0, -0($fp)
+	lw $t1, -60($fp)
+	la $t1, type_String
+	lw $t2, -64($fp)
+	la $t2, data_0
+	move $t8, $t1
+	move $t9, $t2
+loop_19:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_19
+	beqz $a1, mismatch_19
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_19
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_19
+mismatch_19:
+	li $v0, 0
+	j end_19
+check_19:
+	bnez $a1, mismatch_19
+	li $v0, 1
+end_19:
+	move $t1, $v0
+	sw $t0, -0($fp)
+	sw $t1, -60($fp)
+	sw $t2, -64($fp)
+	beqz $t1, continue__352
+	la $a0, dispatch_error
+	j .raise
+continue__352:
+	lw $t0, -56($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 1
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 0
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -0($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -56($fp)
+	sw $t1, -0($fp)
+	jal function_substr_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -56($fp)
+	move $t0, $v0
+	lw $t1, -68($fp)
+	la $t1, data_23
+	lw $t2, -52($fp)
+	move $t8, $t0
+	move $t9, $t1
+loop_20:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_20
+	beqz $a1, mismatch_20
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_20
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_20
+mismatch_20:
+	li $v0, 0
+	j end_20
+check_20:
+	bnez $a1, mismatch_20
+	li $v0, 1
+end_20:
+	move $t2, $v0
+	sw $t0, -56($fp)
+	sw $t1, -68($fp)
+	sw $t2, -52($fp)
+	bnez $t2, true__366
+	lw $t0, -4($fp)
+	lw $t1, -76($fp)
+	lw $t9, 8($t0)
+	lw $a0, 8($t9)
+	lw $t8, 28($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -0($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -4($fp)
+	sw $t1, -76($fp)
+	sw $t2, -0($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -76($fp)
+	move $t0, $v0
+	lw $t1, -72($fp)
+	move $t1, $t0
+	sw $t1, -72($fp)
+	sw $t0, -76($fp)
+	sw $t1, -72($fp)
+	j end__366
+true__366:
+	lw $t0, -0($fp)
+	lw $t1, -88($fp)
+	la $t1, type_String
+	lw $t2, -92($fp)
+	la $t2, data_0
+	move $t8, $t1
+	move $t9, $t2
+loop_21:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_21
+	beqz $a1, mismatch_21
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_21
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_21
+mismatch_21:
+	li $v0, 0
+	j end_21
+check_21:
+	bnez $a1, mismatch_21
+	li $v0, 1
+end_21:
+	move $t1, $v0
+	sw $t0, -0($fp)
+	sw $t1, -88($fp)
+	sw $t2, -92($fp)
+	beqz $t1, continue__380
+	la $a0, dispatch_error
+	j .raise
+continue__380:
+	lw $t0, -84($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -0($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -84($fp)
+	sw $t1, -0($fp)
+	jal function_length_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -84($fp)
+	move $t0, $v0
+	lw $t1, -80($fp)
+	addi $t1, $t0, -1
+	lw $t2, -0($fp)
+	lw $t3, -100($fp)
+	la $t3, type_String
+	lw $t4, -104($fp)
+	la $t4, data_0
+	move $t8, $t3
+	move $t9, $t4
+loop_22:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_22
+	beqz $a1, mismatch_22
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_22
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_22
+mismatch_22:
+	li $v0, 0
+	j end_22
+check_22:
+	bnez $a1, mismatch_22
+	li $v0, 1
+end_22:
+	move $t3, $v0
+	sw $t0, -84($fp)
+	sw $t1, -80($fp)
+	sw $t2, -0($fp)
+	sw $t3, -100($fp)
+	sw $t4, -104($fp)
+	beqz $t3, continue__394
+	la $a0, dispatch_error
+	j .raise
+continue__394:
+	lw $t0, -96($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -80($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 1
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -0($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -96($fp)
+	sw $t1, -80($fp)
+	sw $t2, -0($fp)
+	jal function_substr_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -96($fp)
+	move $t0, $v0
+	lw $t1, -4($fp)
+	lw $t2, -108($fp)
+	lw $t9, 8($t1)
+	lw $a0, 8($t9)
+	lw $t8, 28($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -96($fp)
+	sw $t1, -4($fp)
+	sw $t2, -108($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -108($fp)
+	move $t0, $v0
+	lw $t1, -72($fp)
+	move $t1, $t0
+	sw $t1, -72($fp)
+	sw $t0, -108($fp)
+	sw $t1, -72($fp)
+end__366:
+	lw $t0, -72($fp)
+	lw $t1, -48($fp)
+	move $t1, $t0
+	sw $t1, -48($fp)
+	sw $t0, -72($fp)
+	sw $t1, -48($fp)
+	j end__345
+true__345:
+	lw $t0, -0($fp)
+	lw $t1, -124($fp)
+	la $t1, type_String
+	lw $t2, -128($fp)
+	la $t2, data_0
+	move $t8, $t1
+	move $t9, $t2
+loop_23:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_23
+	beqz $a1, mismatch_23
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_23
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_23
+mismatch_23:
+	li $v0, 0
+	j end_23
+check_23:
+	bnez $a1, mismatch_23
+	li $v0, 1
+end_23:
+	move $t1, $v0
+	sw $t0, -0($fp)
+	sw $t1, -124($fp)
+	sw $t2, -128($fp)
+	beqz $t1, continue__418
+	la $a0, dispatch_error
+	j .raise
+continue__418:
+	lw $t0, -120($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -0($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -120($fp)
+	sw $t1, -0($fp)
+	jal function_length_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -120($fp)
+	move $t0, $v0
+	lw $t1, -116($fp)
+	addi $t1, $t0, -1
+	lw $t2, -0($fp)
+	lw $t3, -136($fp)
+	la $t3, type_String
+	lw $t4, -140($fp)
+	la $t4, data_0
+	move $t8, $t3
+	move $t9, $t4
+loop_24:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_24
+	beqz $a1, mismatch_24
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_24
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_24
+mismatch_24:
+	li $v0, 0
+	j end_24
+check_24:
+	bnez $a1, mismatch_24
+	li $v0, 1
+end_24:
+	move $t3, $v0
+	sw $t0, -120($fp)
+	sw $t1, -116($fp)
+	sw $t2, -0($fp)
+	sw $t3, -136($fp)
+	sw $t4, -140($fp)
+	beqz $t3, continue__432
+	la $a0, dispatch_error
+	j .raise
+continue__432:
+	lw $t0, -132($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -116($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 1
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -0($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -132($fp)
+	sw $t1, -116($fp)
+	sw $t2, -0($fp)
+	jal function_substr_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -132($fp)
+	move $t0, $v0
+	lw $t1, -4($fp)
+	lw $t2, -144($fp)
+	lw $t9, 8($t1)
+	lw $a0, 8($t9)
+	lw $t8, 28($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -132($fp)
+	sw $t1, -4($fp)
+	sw $t2, -144($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -144($fp)
+	move $t0, $v0
+	lw $t1, -112($fp)
+	not $t1, $t0
+	addi $t1, $t1, 1
+	lw $t2, -48($fp)
+	move $t2, $t1
+	sw $t2, -48($fp)
+	sw $t0, -144($fp)
+	sw $t1, -112($fp)
+	sw $t2, -48($fp)
+end__345:
+	lw $t0, -48($fp)
+	lw $t1, -24($fp)
+	move $t1, $t0
+	sw $t1, -24($fp)
+	sw $t0, -48($fp)
+	sw $t1, -24($fp)
+	j end__324
+true__324:
+	lw $t0, -24($fp)
+	li $t0, 0
+	sw $t0, -24($fp)
+	sw $t0, -24($fp)
+end__324:
+	lw $t0, -24($fp)
+	move $v0, $t0
+	sw $t0, -24($fp)
+	addiu $sp, $sp, 148
+	jr $ra
+
+
+function_a2i_aux_A2I:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -8($fp)
+	li $t0, 0
+	sw $t0, -8($fp)
+	lw $t1, -0($fp)
+	lw $t2, -20($fp)
+	la $t2, type_String
+	lw $t3, -24($fp)
+	la $t3, data_0
+	move $t8, $t2
+	move $t9, $t3
+loop_25:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_25
+	beqz $a1, mismatch_25
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_25
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_25
+mismatch_25:
+	li $v0, 0
+	j end_25
+check_25:
+	bnez $a1, mismatch_25
+	li $v0, 1
+end_25:
+	move $t2, $v0
+	sw $t0, -8($fp)
+	sw $t1, -0($fp)
+	sw $t2, -20($fp)
+	sw $t3, -24($fp)
+	beqz $t2, continue__462
+	la $a0, dispatch_error
+	j .raise
+continue__462:
+	lw $t0, -16($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -0($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -16($fp)
+	sw $t1, -0($fp)
+	jal function_length_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -16($fp)
+	move $t0, $v0
+	lw $t1, -12($fp)
+	move $t1, $t0
+	sw $t1, -12($fp)
+	lw $t2, -28($fp)
+	li $t2, 0
+	sw $t2, -28($fp)
+	lw $t3, -32($fp)
+	li $a0, 4
+	li $v0, 9
+	syscall
+	la $t9, type_Void
+	sw $t9, 0($v0)
+	move $t3, $v0
+	sw $t0, -16($fp)
+	sw $t1, -12($fp)
+	sw $t2, -28($fp)
+	sw $t3, -32($fp)
+start__475:
+	lw $t0, -28($fp)
+	lw $t1, -12($fp)
+	lw $t2, -36($fp)
+	slt $t2, $t0, $t1
+	sw $t0, -28($fp)
+	sw $t1, -12($fp)
+	sw $t2, -36($fp)
+	beqz $t2, end__475
+	lw $t0, -8($fp)
+	lw $t1, -44($fp)
+	li $t9, 10
+	mult $t0, $t9
+	mflo $t1
+	lw $t2, -0($fp)
+	lw $t3, -52($fp)
+	la $t3, type_String
+	lw $t4, -56($fp)
+	la $t4, data_0
+	move $t8, $t3
+	move $t9, $t4
+loop_26:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_26
+	beqz $a1, mismatch_26
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_26
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_26
+mismatch_26:
+	li $v0, 0
+	j end_26
+check_26:
+	bnez $a1, mismatch_26
+	li $v0, 1
+end_26:
+	move $t3, $v0
+	sw $t0, -8($fp)
+	sw $t1, -44($fp)
+	sw $t2, -0($fp)
+	sw $t3, -52($fp)
+	sw $t4, -56($fp)
+	beqz $t3, continue__489
+	la $a0, dispatch_error
+	j .raise
+continue__489:
+	lw $t0, -48($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 1
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -28($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -0($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -48($fp)
+	sw $t1, -28($fp)
+	sw $t2, -0($fp)
+	jal function_substr_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -48($fp)
+	move $t0, $v0
+	lw $t1, -4($fp)
+	lw $t2, -60($fp)
+	lw $t9, 8($t1)
+	lw $a0, 8($t9)
+	lw $t8, 16($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -48($fp)
+	sw $t1, -4($fp)
+	sw $t2, -60($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -60($fp)
+	move $t0, $v0
+	lw $t1, -44($fp)
+	lw $t2, -40($fp)
+	add $t2, $t1, $t0
+	lw $t3, -8($fp)
+	move $t3, $t2
+	sw $t3, -8($fp)
+	lw $t4, -28($fp)
+	lw $t5, -64($fp)
+	addi $t5, $t4, 1
+	move $t4, $t5
+	sw $t4, -28($fp)
+	lw $t6, -68($fp)
+	move $t6, $t5
+	sw $t6, -68($fp)
+	lw $t7, -32($fp)
+	move $t7, $t6
+	sw $t7, -32($fp)
+	sw $t0, -60($fp)
+	sw $t1, -44($fp)
+	sw $t2, -40($fp)
+	sw $t3, -8($fp)
+	sw $t4, -28($fp)
+	sw $t5, -64($fp)
+	sw $t6, -68($fp)
+	sw $t7, -32($fp)
+	j start__475
+end__475:
+	lw $t0, -8($fp)
+	lw $t1, -72($fp)
+	move $t1, $t0
+	sw $t1, -72($fp)
+	move $v0, $t1
+	sw $t0, -8($fp)
+	sw $t1, -72($fp)
+	addiu $sp, $sp, 76
+	jr $ra
+
+
+function_i2a_A2I:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -8($fp)
+	li $t9, 0
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -8($fp)
+	bnez $t1, true__520
+	lw $t0, -0($fp)
+	lw $t1, -16($fp)
+	li $t9, 0
+	slt $t1, $t9, $t0
+	sw $t0, -0($fp)
+	sw $t1, -16($fp)
+	bnez $t1, true__524
+	lw $t0, -24($fp)
+	la $t0, data_24
+	lw $t1, -32($fp)
+	li $t9, 1
+	not $t1, $t9
+	addi $t1, $t1, 1
+	lw $t2, -0($fp)
+	lw $t3, -28($fp)
+	mult $t2, $t1
+	mflo $t3
+	lw $t4, -4($fp)
+	lw $t5, -36($fp)
+	lw $t9, 8($t4)
+	lw $a0, 8($t9)
+	lw $t8, 36($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t3, ($sp)
+	addiu $sp, $sp, -4
+	sw $t4, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -24($fp)
+	sw $t1, -32($fp)
+	sw $t2, -0($fp)
+	sw $t3, -28($fp)
+	sw $t4, -4($fp)
+	sw $t5, -36($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -36($fp)
+	move $t0, $v0
+	lw $t1, -24($fp)
+	lw $t2, -44($fp)
+	la $t2, type_String
+	lw $t3, -48($fp)
+	la $t3, data_0
+	move $t8, $t2
+	move $t9, $t3
+loop_27:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_27
+	beqz $a1, mismatch_27
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_27
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_27
+mismatch_27:
+	li $v0, 0
+	j end_27
+check_27:
+	bnez $a1, mismatch_27
+	li $v0, 1
+end_27:
+	move $t2, $v0
+	sw $t0, -36($fp)
+	sw $t1, -24($fp)
+	sw $t2, -44($fp)
+	sw $t3, -48($fp)
+	beqz $t2, continue__540
+	la $a0, dispatch_error
+	j .raise
+continue__540:
+	lw $t0, -40($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -36($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -24($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -40($fp)
+	sw $t1, -36($fp)
+	sw $t2, -24($fp)
+	jal function_concat_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -40($fp)
+	move $t0, $v0
+	lw $t1, -20($fp)
+	move $t1, $t0
+	sw $t1, -20($fp)
+	sw $t0, -40($fp)
+	sw $t1, -20($fp)
+	j end__524
+true__524:
+	lw $t0, -4($fp)
+	lw $t1, -52($fp)
+	lw $t9, 8($t0)
+	lw $a0, 8($t9)
+	lw $t8, 36($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -0($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -4($fp)
+	sw $t1, -52($fp)
+	sw $t2, -0($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -52($fp)
+	move $t0, $v0
+	lw $t1, -20($fp)
+	move $t1, $t0
+	sw $t1, -20($fp)
+	sw $t0, -52($fp)
+	sw $t1, -20($fp)
+end__524:
+	lw $t0, -20($fp)
+	lw $t1, -12($fp)
+	move $t1, $t0
+	sw $t1, -12($fp)
+	sw $t0, -20($fp)
+	sw $t1, -12($fp)
+	j end__520
+true__520:
+	lw $t0, -56($fp)
+	la $t0, data_25
+	lw $t1, -12($fp)
+	move $t1, $t0
+	sw $t1, -12($fp)
+	sw $t0, -56($fp)
+	sw $t1, -12($fp)
+end__520:
+	lw $t0, -12($fp)
+	move $v0, $t0
+	sw $t0, -12($fp)
+	addiu $sp, $sp, 60
+	jr $ra
+
+
+function_i2a_aux_A2I:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -0($fp)
+	lw $t1, -8($fp)
+	li $t9, 0
+	seq $t1, $t0, $t9
+	sw $t0, -0($fp)
+	sw $t1, -8($fp)
+	bnez $t1, true__573
+	lw $t0, -0($fp)
+	lw $t1, -20($fp)
+	li $t9, 10
+	la $a0, zero_error
+	beqz $t9, .raise
+	div $t0, $t9
+	mflo $t1
+	lw $t2, -16($fp)
+	move $t2, $t1
+	sw $t2, -16($fp)
+	lw $t3, -4($fp)
+	lw $t4, -24($fp)
+	lw $t9, 8($t3)
+	lw $a0, 8($t9)
+	lw $t8, 36($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t3, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -0($fp)
+	sw $t1, -20($fp)
+	sw $t2, -16($fp)
+	sw $t3, -4($fp)
+	sw $t4, -24($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -24($fp)
+	move $t0, $v0
+	lw $t1, -16($fp)
+	lw $t2, -32($fp)
+	li $t9, 10
+	mult $t1, $t9
+	mflo $t2
+	lw $t3, -0($fp)
+	lw $t4, -28($fp)
+	sub $t4, $t3, $t2
+	lw $t5, -4($fp)
+	lw $t6, -36($fp)
+	lw $t9, 8($t5)
+	lw $a0, 8($t9)
+	lw $t8, 20($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t4, ($sp)
+	addiu $sp, $sp, -4
+	sw $t5, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -24($fp)
+	sw $t1, -16($fp)
+	sw $t2, -32($fp)
+	sw $t3, -0($fp)
+	sw $t4, -28($fp)
+	sw $t5, -4($fp)
+	sw $t6, -36($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -36($fp)
+	move $t0, $v0
+	lw $t1, -24($fp)
+	lw $t2, -44($fp)
+	la $t2, type_String
+	lw $t3, -48($fp)
+	la $t3, data_0
+	move $t8, $t2
+	move $t9, $t3
+loop_28:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_28
+	beqz $a1, mismatch_28
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_28
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_28
+mismatch_28:
+	li $v0, 0
+	j end_28
+check_28:
+	bnez $a1, mismatch_28
+	li $v0, 1
+end_28:
+	move $t2, $v0
+	sw $t0, -36($fp)
+	sw $t1, -24($fp)
+	sw $t2, -44($fp)
+	sw $t3, -48($fp)
+	beqz $t2, continue__594
+	la $a0, dispatch_error
+	j .raise
+continue__594:
+	lw $t0, -40($fp)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t1, -36($fp)
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -24($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -40($fp)
+	sw $t1, -36($fp)
+	sw $t2, -24($fp)
+	jal function_concat_String
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -40($fp)
+	move $t0, $v0
+	lw $t1, -12($fp)
+	move $t1, $t0
+	sw $t1, -12($fp)
+	sw $t0, -40($fp)
+	sw $t1, -12($fp)
+	j end__573
+true__573:
+	lw $t0, -52($fp)
+	la $t0, data_26
+	lw $t1, -12($fp)
+	move $t1, $t0
+	sw $t1, -12($fp)
+	sw $t0, -52($fp)
+	sw $t1, -12($fp)
+end__573:
+	lw $t0, -12($fp)
+	move $v0, $t0
+	sw $t0, -12($fp)
+	addiu $sp, $sp, 56
+	jr $ra
+
+
+function_main_Main:
+	move $fp, $sp
+	addiu $fp, $fp, 4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	addiu $sp, $sp, -4
+	lw $t0, -8($fp)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t9, type_A2I
+	sw $t9, 0($v0)
+	li $t9, 12
+	sw $t9, 4($v0)
+	move $t0, $v0
+	la $t8, types
+	lw $v0, 20($t8)
+	sw $v0, 8($t0)
+	lw $t1, -12($fp)
+	la $t1, data_27
+	lw $t2, -20($fp)
+	lw $t2, 0($t0)
+	lw $t3, -24($fp)
+	la $t3, data_0
+	move $t8, $t2
+	move $t9, $t3
+loop_29:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_29
+	beqz $a1, mismatch_29
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_29
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_29
+mismatch_29:
+	li $v0, 0
+	j end_29
+check_29:
+	bnez $a1, mismatch_29
+	li $v0, 1
+end_29:
+	move $t2, $v0
+	sw $t0, -8($fp)
+	sw $t1, -12($fp)
+	sw $t2, -20($fp)
+	sw $t3, -24($fp)
+	beqz $t2, continue__624
+	la $a0, dispatch_error
+	j .raise
+continue__624:
+	lw $t0, -8($fp)
+	lw $t1, -16($fp)
+	lw $t9, 8($t0)
+	lw $a0, 8($t9)
+	lw $t8, 24($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t2, -12($fp)
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -8($fp)
+	sw $t1, -16($fp)
+	sw $t2, -12($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -16($fp)
+	move $t0, $v0
+	lw $t1, -4($fp)
+	move $t1, $t0
+	sw $t1, -4($fp)
+	lw $t2, -32($fp)
+	li $v0, 9
+	li $a0, 12
+	syscall
+	la $t9, type_A2I
+	sw $t9, 0($v0)
+	li $t9, 12
+	sw $t9, 4($v0)
+	move $t2, $v0
+	la $t8, types
+	lw $v0, 20($t8)
+	sw $v0, 8($t2)
+	lw $t3, -40($fp)
+	lw $t3, 0($t2)
+	lw $t4, -44($fp)
+	la $t4, data_0
+	move $t8, $t3
+	move $t9, $t4
+loop_30:
+	lb $a0, ($t8)
+	lb $a1, ($t9)
+	beqz $a0, check_30
+	beqz $a1, mismatch_30
+	seq $v0, $a0, $a1
+	beqz $v0, mismatch_30
+	addi $t8, $t8, 1
+	addi $t9, $t9, 1
+	j loop_30
+mismatch_30:
+	li $v0, 0
+	j end_30
+check_30:
+	bnez $a1, mismatch_30
+	li $v0, 1
+end_30:
+	move $t3, $v0
+	sw $t0, -16($fp)
+	sw $t1, -4($fp)
+	sw $t2, -32($fp)
+	sw $t3, -40($fp)
+	sw $t4, -44($fp)
+	beqz $t3, continue__641
+	la $a0, dispatch_error
+	j .raise
+continue__641:
+	lw $t0, -32($fp)
+	lw $t1, -36($fp)
+	lw $t9, 8($t0)
+	lw $a0, 8($t9)
+	lw $t8, 32($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	li $t9, 678987
+	sw $t9, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -32($fp)
+	sw $t1, -36($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -36($fp)
+	move $t0, $v0
+	lw $t1, -28($fp)
+	move $t1, $t0
+	sw $t1, -28($fp)
+	lw $t2, -0($fp)
+	lw $t3, -48($fp)
+	lw $t9, 8($t2)
+	lw $a0, 8($t9)
+	lw $t8, 20($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t4, -4($fp)
+	sw $t4, ($sp)
+	addiu $sp, $sp, -4
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -36($fp)
+	sw $t1, -28($fp)
+	sw $t2, -0($fp)
+	sw $t3, -48($fp)
+	sw $t4, -4($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -48($fp)
+	move $t0, $v0
+	lw $t1, -52($fp)
+	la $t1, data_28
+	lw $t2, -0($fp)
+	lw $t3, -56($fp)
+	lw $t9, 8($t2)
+	lw $a0, 8($t9)
+	lw $t8, 16($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -48($fp)
+	sw $t1, -52($fp)
+	sw $t2, -0($fp)
+	sw $t3, -56($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -56($fp)
+	move $t0, $v0
+	lw $t1, -0($fp)
+	lw $t2, -60($fp)
+	lw $t9, 8($t1)
+	lw $a0, 8($t9)
+	lw $t8, 16($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	lw $t3, -28($fp)
+	sw $t3, ($sp)
+	addiu $sp, $sp, -4
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -56($fp)
+	sw $t1, -0($fp)
+	sw $t2, -60($fp)
+	sw $t3, -28($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -60($fp)
+	move $t0, $v0
+	lw $t1, -64($fp)
+	la $t1, data_29
+	lw $t2, -0($fp)
+	lw $t3, -68($fp)
+	lw $t9, 8($t2)
+	lw $a0, 8($t9)
+	lw $t8, 16($a0)
+	sw $fp, ($sp)
+	addiu $sp, $sp, -4
+	sw $ra, ($sp)
+	addiu $sp, $sp, -4
+	sw $t1, ($sp)
+	addiu $sp, $sp, -4
+	sw $t2, ($sp)
+	addiu $sp, $sp, -4
+	sw $t0, -60($fp)
+	sw $t1, -64($fp)
+	sw $t2, -0($fp)
+	sw $t3, -68($fp)
+	jal $t8
+	addiu $sp, $sp, 4
+	lw $ra, ($sp)
+	addiu $sp, $sp, 4
+	lw $fp, ($sp)
+	lw $t0, -68($fp)
+	move $t0, $v0
+	lw $t1, -72($fp)
+	move $t1, $t0
+	sw $t1, -72($fp)
+	move $v0, $t1
+	sw $t0, -68($fp)
+	sw $t1, -72($fp)
+	addiu $sp, $sp, 76
+	jr $ra
+
+.raise:
+	li $v0, 4
+	syscall
+	li $v0, 17
+	li $a0, 1
+	syscall

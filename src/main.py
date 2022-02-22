@@ -1,51 +1,70 @@
 import sys
+from tabnanny import check
+from traceback import print_exception
 
-from Parser import Parser
-from Semantic import *
-from CIL import CIL, cil
-from MIPS import MIPS
+from Tools.errors import CompilerError
+from Tools.messages import UNKNOWN_FILE
+from Tools.utils import get_code
 
-def check_errors(errors):
-    if errors: 
-        for error in errors: 
-            print(error)
-        exit(1)
+from Parser.lexer import Lexer
+from Parser.parser import Parser
 
-def main():
-    #Input and Output files
-    cool_file = sys.argv[1]
-    cil_file = sys.argv[2]
-    mips_file = sys.argv[3]
+from Semantic.collector import TypeCollector, VariableCollector
+from Semantic.builder import TypeBuilder
+from Semantic.checker import TypeChecker
 
-    # List of the errors
-    errors = list()
+from CIL.cil import CIL
+
+from MIPS.mips import MIPS
+
+def print_error(errors):
+    for x in errors:
+        print(x)
+    if errors: exit(1)
+
+def main(input_file, cil_file, output_file):
+    try:
+        text = open(input_file, 'r').read()
+    except FileNotFoundError:
+        print(CompilerError(UNKNOWN_FILE % input_file, 0, 0))
     
-    # Read a cool file
-    code = open(cool_file, 'r').read()
+    lexer = Lexer()
+    tokens = lexer.tokenize(text)
+    print_error(lexer.errors)
+    
+    parser = Parser(lexer)
+    ast = parser(text)
+    print_error(parser.errors)
 
-    # Lexer and Parser
-    parser = Parser(errors)
-    ast = parser(code)
-    check_errors(errors)
+    collector = TypeCollector()
+    collector.visit(ast)
+    context = collector.context
+    print_error(collector.errors)
 
-    # Semantic
-    context = TypeCollector(errors).visit(ast)
-    check_errors(errors)
-    TypeBuilder(context, errors).visit(ast)
-    check_errors(errors)
-    TypeCheck(context, errors).visit(ast)
-    check_errors(errors)
+    builder = TypeBuilder(context)
+    builder.visit(ast)
+    print_error(builder.errors)
 
-    # Generate code
-    cil = CIL(context).visit(ast)
-    open(cil_file, 'w').write(str(cil))
+    variable = VariableCollector(context)
+    scope = variable.visit(ast)
+    print_error(variable.errors)
 
-    mips = MIPS()
-    mips.visit(cil)
-    open(mips_file, 'w').write(str(mips))
+    checker = TypeChecker(context)
+    checker.visit(ast, scope)
+    print_error(checker.errors)
 
-    # Check of errors and exit program
+    cil = CIL(context)
+    cil_ast = cil.visit(ast, scope)
+    #open(cil_file, 'w').write(str(cil_ast))
+
+    mips = MIPS(context.build_inheritance_graph())
+    data_code, text_code = mips.visit(cil_ast)
+    open(output_file, 'w').write(get_code(text_code, data_code))
+
     exit(0)
 
 if __name__=='__main__':
-    main()
+    cil_file = sys.argv[2]
+    input_file = sys.argv[1]
+    output_file = sys.argv[3]
+    main(input_file, cil_file, output_file)

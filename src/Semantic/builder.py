@@ -1,109 +1,86 @@
-from Tools import *
+import Tools.visitor as visitor
+
 from Parser.ast import *
+from Tools.messages import *
+from Tools.context import ErrorType
+from Tools.errors import SemanticError, TypesError
 
 class TypeBuilder:
-    def __init__(self, context, errors):
-        self.errors = errors
-        self.context = context
-
+    def __init__(self, contex):
+        self.context = contex
+        self.errors = []
+    
     @visitor.on('node')
     def visit(self, node):
         pass
-
+    
     @visitor.when(ProgramNode)
     def visit(self, node):
-        self.object_type = self.context.types['Object']
-        
-        for def_class in node.class_list:
-            self.visit(def_class)
-
-    @visitor.when(ClassNode)
+        for dec in node.declarations:
+            self.visit(dec)
+    
+    @visitor.when(ClassDeclarationNode)
     def visit(self, node):
-        self.current_type = self.context.types[node.type.value]
-
-        if node.parent:
-            try: 
-                self.current_type.set_parent(self.context.get_type(node.parent.value))
-            except SemanticException as error:
-                self.errors.append(SemanticErrors(node.parent.line, node.parent.column, error))
-            except KeyError:
-                self.errors.append(TypeErrors(node.parent.line, node.parent.column, f'Class {node.type.value} inherits from an undefined class {node.parent.value}.'))
-        else:
-            self.current_type.set_parent(self.object_type)
-
-        for feature in node.feature_list:
+        try:
+            self.current_type = self.context.get_type(node.id, node.pos)
+        except SemanticError as error:
+            self.current_type = ErrorType()
+            self.errors.append(error)    
+        if node.parent is not None:
+            if node.parent in ['Int', 'String', 'Bool']:
+                self.errors.append(SemanticError(INHERIT_ERROR % (node.id, node.parent), *node.parent_pos))
+            try:
+                parent = self.context.get_type(node.parent, node.parent_pos)
+            except SemanticError:
+                self.errors.append(TypesError(INHERIT_UNDEFINED % (node.id, node.parent), *node.parent_pos))
+                parent = None
+            try:
+                current = parent
+                while current is not None:
+                    if current.name == self.current_type.name:
+                        raise SemanticError(CIRCULAR_DEPENDENCY %(self.current_type.name, self.current_type.name) , *node.pos)
+                    current = current.parent
+            except SemanticError as e:
+                parent = ErrorType()
+                self.errors.append(e)
+            self.current_type.set_parent(parent)    
+        for feature in node.features:
             self.visit(feature)
 
-        if self.current_type.name == 'Main':
+    @visitor.when(FuncDeclarationNode)
+    def visit(self, node:FuncDeclarationNode):
+        args_names = []
+        args_types = []
+        for name, type_ in node.params:
+            if name in args_names:
+                self.errors.append(SemanticError(PARAMETER_MULTY_DEFINED % name, *type_.pos))
+            args_names.append(name)      
             try:
-                self.current_type.get_method('main')
-            except MethodException:
-                self.errors.append(SemanticErrors(node.type.line, node.type.column, 'No "main" method in class Main.'))
-
-
-    @visitor.when(AttributeNode)
-    def visit(self, node):
+                arg_type = self.context.get_type(type_.value, type_.pos)
+            except SemanticError:
+                self.errors.append(TypesError(PARAMETER_UNDEFINED % (type_.value, type_.value), *type_.pos))
+                arg_type = ErrorType()
+            args_types.append(arg_type)      
         try:
-            attr_type = self.context.get_type(node.type.value)
-        except KeyError:
-            self.errors.append(TypeErrors(node.type.line, node.type.column, f'Class {node.type.value} of attribute {node.id.value} is undefined.'))
-            attr_type = ErrorType()
+            return_type = self.context.get_type(node.type, node.type_pos)
+        except SemanticError as error:
+            self.errors.append(TypesError(RETURN_TYPE_UNDEFINED % (node.type, node.id), *node.type_pos))
+            return_type = ErrorType(node.type_pos) 
         try:
-            self.current_type.define_attribute(node.id.value, attr_type, node.expr)
-        except AttributeException as error:
-            self.errors.append(SemanticErrors(node.id.line, node.id.column, error))
-
-    @visitor.when(MethodNode)
-    def visit(self, node):
-        param_names = [] 
-        param_types = []
-        for id, type in node.params:
-            try:
-                if id.value == 'self':
-                    self.errors.append(SemanticErrors(id.line, id.column, f'\'self\' cannot be the name of a formal parameter.'))
-                    param_type = ErrorType()
-                if type.value == 'SELF_TYPE':
-                    param_type = self.current_type
-                else:
-                    param_type = self.context.get_type(type.value)
-            except KeyError:
-                self.errors.append(TypeErrors(type.line, type.column, f'Class {type.value} of formal parameter {id.value} is undefined.'))
-                param_type = ErrorType()         
-            
-            if id.value in param_names:
-                self.errors.append(SemanticErrors(id.line, id.column, f'Formal parameter {id.value} is multiply defined.'))
-            else:
-                param_names.append(id.value)
-                param_types.append(param_type)
-        
+            self.current_type.define_method(node.id, args_names, args_types, return_type, node.pos)
+        except SemanticError as error:
+            self.errors.append(error)
+    
+    @visitor.when(AttrDeclarationNode)
+    def visit(self, node:AttrDeclarationNode):
         try:
-            method = self.current_type.parent.get_method(node.id.value)
-            param_parent_names = method.param_names
-            param_paren_types = method.param_types
-
-            if len(param_names) != len(param_parent_names):
-                self.errors.append(SemanticErrors(node.id.line, node.id.column, f'Incompatible number of formal parameters in redefined method {node.id.value}'))
-            else:    
-                for (cid, ctype), pid, ptype in zip(node.params, param_parent_names, param_paren_types):
-                    if cid.value == pid:
-                        if not self.context.get_type(ctype.value).conforms_to(ptype):
-                            self.errors.append(SemanticErrors(cid.line, cid.column, f'In redefined method {node.id.value}, parameter type {ctype.value} is different from original type {ptype.name}.'))
-                    
-                if not self.context.get_type(node.type.value).conforms_to(method.return_type):
-                    self.errors.append(SemanticErrors(node.type.line, node.type.column, f'In redefined method {node.id.value}, return type {node.type.value} is different from original return type {method.return_type.name}.'))
-        except:
-            pass
-
+            attr_type = self.context.get_type(node.type, node.pos)
+        except SemanticError as error:
+            attr_type = ErrorType(node.type_pos)
+            self.errors.append(TypesError(ATTR_TYPE_UNDEFINED %(node.type, node.id), *node.type_pos))      
+        if node.id == 'self':
+            self.errors.append(SemanticError(SELF_ATTR, *node.pos)) 
         try:
-            if node.type.value == 'SELF_TYPE':
-                ret_type = self.current_type
-            else:
-                ret_type = self.context.get_type(node.type.value)
-        except KeyError:
-            self.errors.append(TypeErrors(node.type.line, node.type.column, f'Undefined return type {node.type.value} in method {node.id.value}.'))
-            ret_type = ErrorType()
-
-        try:
-            self.current_type.define_method(node.id.value, param_names, param_types, ret_type)
-        except MethodException as error:
-            self.errors.append(SemanticErrors(node.id.line, node.id.column, error))
+            self.current_type.define_attribute(node.id, attr_type, node.pos)
+        except SemanticError as error:
+            self.errors.append(error)  

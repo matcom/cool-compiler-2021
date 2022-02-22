@@ -2,228 +2,509 @@ class Node:
     pass
 
 class ProgramNode(Node):
-    def __init__(self, types, data, code):
-        self.types = types
-        self.data = data
-        self.code = code
+    def __init__(self, dottypes, dotdata, dotcode, idx=None):
+        self.dottypes = dottypes
+        self.dotdata = dotdata
+        self.dotcode = dotcode
+        self.index = idx
 
     def __str__(self):
-        type_text = ''
-        for type in self.types:
-            type_text += f'{type}\n'
+        text = '.TYPE\n\n'
+        for t in self.dottypes:
+            text += str(t)
+
+        text += '\n.DATA\n\n'
+        for d in self.dotdata:
+            text += str(d)
+
+        text += '\n.CODE\n\n'
+        for c in self.dotcode:
+            text += str(c)
         
-        data_text = ''
-        for data in self.data:
-            data_text += f'{data}\n'
-
-        code_text = ''
-        for code in self.code:
-            code_text += f'{code}\n'
-
-        return f'.TYPE\n\n{type_text}\n.DATA\n\n{data_text}\n.CODE\n\n{code_text}'
+        return text
 
 class TypeNode(Node):
-    def __init__(self, name, attrs, meths):
+    def __init__(self, name, atributes=None, methods=None, idx=None):
         self.name = name
-        self.attrs = attrs
-        self.meths = meths
+        self.index = idx
+        self.methods = methods if methods is not None else []
+        self.attributes = atributes if atributes is not None else []
 
     def __str__(self):
-        attr_text = ''
-        for attr in self.attrs:
-            attr_text += str(attr)
+        text = f'type {self.name}{{\n'
+
+        for attr in self.attributes:
+            text += f'\tattrubte {str(attr[0])} : {str(attr[1])} ;\n'
         
-        meth_text = ''
-        for meth in self.meths:
-            meth_text += f'\tmethod {str(meth)} ;\n'
+        text += '\n'
+        
+        for meth in self.methods:
+            text += f'\tmethod {str(meth[0])} : {str(meth[1])} ;\n'
 
-        return f'type {self.name}{{\n{attr_text}{meth_text}}}'
-
-class MethodNode(Node):
-    def __init__(self, name, type=None):
-        self.name = name
-        self.type = type
-
-    def __str__(self):
-        return f'{self.type}.{self.name}' if self.type else self.name
-
-class AttributeNode(Node):
-    def __init__(self, name, type):
-        self.name = name 
-        self.type = type
-
-    def __str__(self):
-        return f'\tattribute {self.name} ;\n'
+        text += '} ;\n'
+        return text
 
 class DataNode(Node):
-    def __init__(self, id, value):
-        self.id = id
+    def __init__(self, vname, value, idx=None):
+        self.name = vname
         self.value = value
+        self.index = idx
 
     def __str__(self):
-        return f'{self.id} = "{self.value}" ;\n'
+        return f'{self.name} = "{self.value}" ;\n'
 
-class CodeNode(Node):
-    def __init__(self, meth, params, locals, instrs):
-        self.meth = meth
+class FunctionNode(Node):
+    def __init__(self, fname, params, localvars, instructions, idx=None):
+        self.name = fname
         self.params = params
-        self.locals = locals
-        self.instrs = instrs
+        self.localvars = localvars
+        self.instructions = instructions
+        self.index = idx
 
     def __str__(self):
-        params_text = ''
+        text = f'function {self.name}{{\n'
+
         for param in self.params:
-            params_text += f'\tPARAM {param} ;\n'
+            text += str(param)
         
-        local_text = ''
-        for local in self.locals:
-            local_text += f'\tLOCAL {local} ;\n'
+        text += '\n'
 
-        instr_text = ''
-        for instr in self.instrs:
-            instr_text += f'\t{instr}\n'
+        for local in self.localvars:
+            text += str(local)
         
-        return f'function {self.meth} {{\n{params_text}{local_text}{instr_text}}}'
+        text += '\n'
 
-class LocalNode(Node):
-    def __init__(self, id):
-        self.id = id
+        for inst in self.instructions:
+            text += str(inst)
 
-    def __str__(self):
-        return f'{self.id}'
+        text += '}\n'
+        return text
 
 class ParamNode(Node):
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, name, typex, idx=None):
+        self.name = name
+        self.type = typex
+        self.index = idx
     
     def __str__(self):
-        return f'{self.id}'
+        return f'\tPARAM {self.name} ;\n'
 
-class AbortNode(Node):
+class LocalNode(Node):
+    def __init__(self, name, idx=None):
+        self.name = name
+        self.index = idx
+
     def __str__(self):
-        return f'ABORT'
+        return f'\tLOCAL {self.name} ;\n'
 
-class InstructionNode (Node):  
-    def __init__(self, value_1, value_2=None, value_3=None):
-        self.value_1 = value_1
-        self.value_2 = value_2
-        self.value_3 = value_3
+class InstructionNode(Node):
+    def __init__(self, idx=None):
+        self.in1 = None
+        self.in2 = None
+        self.out = None
+        self.index = idx
 
-class AssignmentNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = {self.value_2} ;'
+class AssignNode(InstructionNode):
+    def __init__(self, dest, source, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.source = source 
+        
+        self.in1 = source
+        self.out = dest
 
-class GetAttributeNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = GETATTR {self.value_2} {self.value_3} ;'
-
-class SetAttributeNode (InstructionNode): 
-    def __str__(self): 
-        return f'SETATTR {self.value_1} {self.value_2} {self.value_3} ;'
-
-class GetIndexNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = GETINDEX {self.value_2} {self.value_3} ;'
-
-class SetIndexNode (InstructionNode): 
-    def __str__(self): 
-        return f'SETINDEX {self.value_1} {self.value_2} {self.value_3} ;'
-
-class AllocateNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = ALLOCATE {self.value_2} ;'
-
-class ArrayNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = ARRAY {self.value_2} ;'
-
-class TypeOfNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = TYPEOF {self.value_2}'
-
-class LabelNode (InstructionNode): 
-    def __str__(self): 
-        return f'LABEL {self.value_1} ;'
-
-class GotoNode (InstructionNode): 
-    def __str__(self): 
-        return f'GOTO {self.value_1} ;'
-
-class ConditionalNode (InstructionNode): 
     def __str__(self):
-        return f'IF {self.value_1} GOTO {self.value_2} ;'
+        return f'\t{self.dest} = {self.source} ;\n'
 
-class StaticCallNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = CALL {self.value_2} ;'
+class UnaryNode(InstructionNode):
+    def __init__(self, dest, expr, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.expr = expr
 
-class DynamicCallNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = VCALL {self.value_2} {self.value_3} ;'
+        self.in1 = expr
+        self.out = dest
 
-class ArgumentNode (InstructionNode): 
-    def __str__(self): 
-        return f'ARG {self.value_1} ;'
+class NotNode(UnaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = NOT {self.expr} ;\n'
 
-class ReturnNode (InstructionNode): 
-    def __str__(self): 
-        return f'RETURN {self.value_1} ;' if self.value_1 is not None else f'RETURN ;'
+class LogicalNotNode(UnaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = ! {self.expr} ;\n'
 
-class LoadAddressNode (InstructionNode): 
+class BinaryNode(InstructionNode):
+    def __init__(self, dest, left, right, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.left = left
+        self.right = right 
+
+        self.in1 = left
+        self.in2 = right
+        self.out = dest
+
+class PlusNode(BinaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = {self.left} + {self.right} ;\n'
+
+class MinusNode(BinaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = {self.left} - {self.right} ;\n'
+
+class StarNode(BinaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = {self.left} * {self.right} ;\n'
+
+class DivNode(BinaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = {self.left} / {self.right} ;\n'
+
+class LessNode(BinaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = {self.left} < {self.right} ;\n'
+
+class LessEqNode(BinaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = {self.left} <= {self.right} ;\n'
+
+class EqualNode(BinaryNode):
+    def __str__(self) :
+        return f'\t{self.dest} = {self.left} == {self.right} ;\n'
+
+class GetAttribNode(InstructionNode):
+    def __init__(self, obj, attr, typex, dest, attr_type, idx=None):
+        super().__init__(idx)
+        self.obj = obj
+        self.attr = attr
+        self.type_name = typex
+        # self.attr_offset = offset
+        self.dest = dest
+        self.attr_type = attr_type
+
+        self.out = dest
+        self.in1 = obj
+
+    def __str__(self) :
+        return f'\t{self.dest} = GETATTR {self.obj} {self.attr} ;\n'
+
+class SetAttribNode(InstructionNode):
+    def __init__(self, obj, attr, typex, value, idx=None):
+        super().__init__(idx)
+        self.obj = obj
+        self.attr = attr
+        # self.attr_offset = offset
+        self.value = value
+        self.type_name = typex
+
+        self.out = obj
+        self.in1 = value
+
     def __str__(self):
-        return f'{self.value_1} = LOAD {self.value_2} ;'
+        return f'\tSETATTR {self.obj} {self.attr} {self.value} ;\n'
 
-class LengthNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = LENGTH {self.value_2} ;'
-
-class ConcatNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = CONCAT {self.value_2} {self.value_3} ;'
-
-class PrefixNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = PREFIX {self.value_2} {self.value_3} ;'
-
-class SubStringNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = SUBSTRING {self.value_2} {self.value_3} ;'
-
-class CastStringNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = STR {self.value_2} ;'
-
-class ReadNode (InstructionNode): 
-    def __str__(self): 
-        return f'{self.value_1} = READ ;'
-
-class PrintNode (InstructionNode): 
-    def __str__(self): 
-        return f'PRINT {self.value_1} ;'
-
-class BinaryNode (InstructionNode): 
+class GetIndexNode(InstructionNode):
     pass
 
-class PlusNode (BinaryNode): 
-    def __str__(self): 
-        return f'{self.value_1} = {self.value_2} + {self.value_3} ;'
+class SetIndexNode(InstructionNode):
+    pass
 
-class MinusNode (BinaryNode): 
-    def __str__(self): 
-        return f'{self.value_1} = {self.value_2} - {self.value_3} ;'
+class AllocateNode(InstructionNode):
+    def __init__(self, itype, dest, idx=None):
+        super().__init__(idx)
+        self.type = itype
+        self.dest = dest
 
-class StarNode (BinaryNode): 
-    def __str__(self): 
-        return f'{self.value_1} = {self.value_2} * {self.value_3} ;'
+        self.out = dest
 
-class DivideNode (BinaryNode): 
-    def __str__(self): 
-        return f'{self.value_1} = {self.value_2} / {self.value_3} ;'
+    def __str__(self):
+        return f'\t{self.dest} = ALLOCATE {self.dest} ;\n'
 
-class LessEqual (BinaryNode): 
-    def __str__(self): 
-        return f'{self.value_1} = {self.value_2} <= {self.value_3} ;'
+class ArrayNode(InstructionNode):
+    pass
 
-class LessNode (BinaryNode): 
-    def __str__(self): 
-        return f'{self.value_1} = {self.value_2} < {self.value_3} ;'
+class TypeOfNode(InstructionNode):
+    def __init__(self, obj, dest, idx=None):
+        super().__init__(idx)
+        self.obj = obj
+        self.dest = dest
+
+        self.out = dest
+        self.in1 = obj
+
+    def __str__(self):
+        return f'\t{self.dest} = TYPEOF {self.obj}'
+
+class LabelNode(InstructionNode):
+    def __init__(self, label, idx=None):
+        super().__init__(idx)
+        self.label = label
+
+    def __str__(self):
+        return f'\tLABEL {self.label} ;\n'
+
+class GotoNode(InstructionNode):
+    def __init__(self, label, idx=None):
+        super().__init__(idx)
+        self.label = label
+    
+    def __str__(self):
+        return f'\tGOTO {self.label} ;\n'
+
+class GotoIfNode(InstructionNode):
+    def __init__(self, cond, label, idx=None):
+        super().__init__(idx)
+        self.cond = cond
+        self.label = label
+
+        self.in1 = cond
+
+    def __str__(self):
+        return f'\tIF {self.cond} GOTO {self.label} ;\n'
+
+class GotoIfFalseNode(InstructionNode):
+    def __init__(self, cond, label, idx=None):
+        super().__init__(idx)
+        self.cond = cond
+        self.label = label
+
+        self.in1 = cond
+
+    def __str__(self):
+        return f'\tIF {self.cond} GOTO {self.label} ;\n'
+
+class StaticCallNode(InstructionNode):
+    def __init__(self, xtype, function, dest, args, return_type, idx=None):
+        super().__init__(idx)
+        self.type = xtype
+        self.function = function
+        self.dest = dest
+        self.args = args
+        self.return_type = return_type
+        
+        self.out = dest
+
+    def __str__(self):
+        return f'\t{self.dest} = CALL {self.function} ;\n'
+
+class DynamicCallNode(InstructionNode):
+    def __init__(self, xtype, obj, method, dest, args, return_type, idx=None):
+        super().__init__(idx)
+        self.type = xtype
+        self.method = method
+        self.dest = dest
+        self.args = args
+        self.return_type = return_type
+        self.obj = obj
+
+        self.out = dest
+        self.in1 = obj
+    
+    def __str__(self):
+        return f'\t{self.dest} = VCALL {self.obj} {self.method} ;\n'
+
+class ArgNode(InstructionNode):
+    def __init__(self, name, idx=None):
+        super().__init__(idx)
+        self.dest = name
+
+        self.out = name
+
+    def __str__(self):
+        return f'\tARG {self.dest} ;\n'
+
+class ReturnNode(InstructionNode):
+    def __init__(self, value, idx=None):
+        super().__init__(idx)
+        self.value = value
+
+        self.out = value
+    
+    def __str__(self):
+        return f'\tRETURN {self.value} ;\n'
+
+class LoadNode(InstructionNode):
+    def __init__(self, dest, msg, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.msg = msg
+
+        self.out = dest
+
+    def __str__(self):
+        return f'\t{self.dest} = LOAD {self.msg} ;\n'
+
+class LengthNode(InstructionNode):
+    def __init__(self, dest, arg, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.arg = arg
+
+        self.out = dest
+        self.in1 = arg
+
+    def __str__(self):
+        return f'\t{self.dest} = LENGTH {self.arg} ;\n'
+
+class ConcatNode(InstructionNode):
+    def __init__(self, dest, arg1, arg2, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.arg1 = arg1
+        self.arg2 = arg2
+
+        self.out = dest
+        self.in1 = arg1
+        self.in2 = arg2
+
+    def __str__(self):
+        return f'\t{self.dest} = CONCAT {self.arg1} {self.arg2} ;\n'
+
+class PrefixNode(InstructionNode):
+    def __init__(self, dest, word, n, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.word = word
+        self.n = n
+
+        self.out = dest
+        self.in1 = word
+        self.in2 = n
+    
+    def __str__(self):
+        return f'\t{self.dest} = PREFIX {self.word} {self.n} ;\n'
+
+class SubstringNode(InstructionNode):
+    def __init__(self, dest, word, begin, end, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.begin = begin
+        self.word = word
+        self.end = end
+
+        self.out = dest
+        self.in1 = begin
+        self.in2 = end
+
+    def __str__(self):
+        return f'\t{self.dest} = SUBSTR {self.word} {self.begin} {self.end} ;\n'
+
+class ToStrNode(InstructionNode):
+    def __init__(self, dest, ivalue, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.ivalue = ivalue
+
+        self.out = dest
+        self.in1 = ivalue
+
+    def __str__(self):
+        return f'\t{self.dest} = TOSTR {self.ivalue} ;\n'
+
+class OutStringNode(InstructionNode):
+    def __init__(self, value, idx=None):
+        super().__init__(idx)
+        self.value = value
+
+        self.in1 = value
+
+    def __str__(self):
+        return f'\tOUT String {self.value} ;\n'
+
+class OutIntNode(InstructionNode):
+    def __init__(self, value, idx=None):
+        super().__init__(idx)
+        self.value = value
+
+        self.in1 = value
+
+    def __str__(self):
+        return f'\tOUT Int {self.value} ;\n'
+
+class ReadStringNode(InstructionNode):
+    def __init__(self, dest, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+
+        self.out = dest
+
+    def __str__(self):
+        return f'\t{self.dest} = READ String ;\n'
+
+class ReadIntNode(InstructionNode):
+    def __init__(self, dest, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+
+        self.out = dest
+    
+    def __str__(self):
+        return f'\t{self.dest} = READ Int ;\n'
+
+class ExitNode(InstructionNode):
+    def __init__(self, classx, value=0, idx=None):
+        super().__init__(idx)
+        self.classx = classx        # instance of the method that called the class
+        self.value = value
+
+        self.in1 = value
+        self.in2 = classx
+
+    def __str__(self):
+        return f'\tEXIT {self.classx} {self.value} ;\n'
+
+class CopyNode(InstructionNode):
+    def __init__(self, dest, source, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.source = source
+
+        self.out = dest
+        self.in1 = source
+    
+    def __str__(self):
+        return f'\t{self.dest} = COPY {self.source} ;\n'
+
+class ConformsNode(InstructionNode):
+    "Checks if the type of expr conforms to type2"
+    def __init__(self, dest, expr, type2, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.expr = expr
+        self.type = type2
+
+        self.out = dest
+        self.in1 = expr    # is a string, so is always a variable
+
+    def __str__(self):
+        return f'\t{self.dest} = CONFORMTO {self.expr} {self.type} ;\n'
+        
+class VoidConstantNode(InstructionNode):
+    def __init__(self, obj, idx=None):
+        super().__init__(idx)
+        self.obj = obj
+
+        self.out = obj
+
+    def __str__(self):
+        return f'\t{self.obj}'
+
+class ErrorNode(InstructionNode):
+    "Generic class to report errors in mips"
+    def __init__(self, typex, idx=None):
+        super().__init__(idx)
+        self.type = typex
+
+    def __str__(self):
+        return f'\tERROR {self.type} ;\n'
+
+class BoxingNode(InstructionNode):
+    def __init__(self, dest, type_name, idx=None):
+        super().__init__(idx)
+        self.dest = dest
+        self.type = type_name
+
+        self.out = dest
+
+    def __str__(self):
+        return f'\t{self.dest} = BOX {self.type} ;\n'

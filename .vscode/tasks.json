@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "excecute",
+            "label": "compiler",
             "type": "shell",
-            "command": "cd src; bash coolc.sh code.cl; xspim code.mips",
+            "command": "cd src; bash coolc.sh code.cl; spim -file code.mips",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
