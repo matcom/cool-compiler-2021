@@ -2,20 +2,25 @@ class Node:
     def visit(self, tabs = 0):
         pass
 
+
 class ProgramNode(Node):
     def __init__(self, declarations):
         self.declarations = declarations
+
     def visit(self, tabs = 0):
         node = self
         ans = '\t' * tabs + f'\\__ProgramNode [<class> ... <class>]'
         statements = '\n'.join(child.visit( tabs + 1) for child in node.declarations)
         return f'{ans}\n{statements}'
 
+
 class DeclarationNode(Node):
     pass
 
+
 class ExpressionNode(Node):
     pass
+
 
 class AtomicNode(ExpressionNode):
     def __init__(self, lex):
@@ -24,6 +29,7 @@ class AtomicNode(ExpressionNode):
     def visit(self, tabs = 0):
         node = self
         return '\t' * tabs + f'\\__ {node.__class__.__name__}: {node.lex}'
+
 
 class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None):
@@ -53,6 +59,7 @@ class FuncDeclarationNode(DeclarationNode):
         body = node.body.visit( tabs + 1)
         return f'{ans}\n{body}'
 
+
 class AttrDeclarationNode(DeclarationNode):
     def __init__(self, idx, typex, expr = None):
         self.id = idx
@@ -66,6 +73,7 @@ class AttrDeclarationNode(DeclarationNode):
             ans += "\n" + self.expr.visit(tabs+1)
         return f'{ans}'
 
+
 class VarDeclarationNode(ExpressionNode):
     def __init__(self, idx, typex, expr):
         self.id = idx
@@ -78,6 +86,7 @@ class VarDeclarationNode(ExpressionNode):
         expr = node.expr.visit( tabs + 1)
         return f'{ans}\n{expr}'
 
+
 class AssignNode(AtomicNode):
     def __init__(self, idx, expr):
         self.id = idx
@@ -89,6 +98,7 @@ class AssignNode(AtomicNode):
         expr = node.expr.visit( tabs + 1)
         return f'{ans}\n{expr}'
 
+
 class IsVoidNode(AtomicNode):
     def __init__(self, expr):
         self.expr = expr
@@ -97,6 +107,7 @@ class IsVoidNode(AtomicNode):
         ans = '\t'*tabs + "\\__IsVoid <expr>"
         return ans + '\n' + '\t'*(tabs+1) + self.expr.visit()
 
+
 class NotNode(AtomicNode):
     def __init__(self, expr):
         self.expr = expr
@@ -104,6 +115,7 @@ class NotNode(AtomicNode):
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__NOT <expr>"
         return ans + '\n' + '\t'*(tabs+1) + self.expr.visit()
+
 
 class NhanharaNode(AtomicNode):
     def __init__(self, expr):
@@ -142,7 +154,8 @@ class CallNode(AtomicNode):
             args = ""
         
         return f'{ans}\n{obj}\n{args}'
-        
+
+
 class IfNode(AtomicNode):
     def __init__(self, if_c, then_c, else_c):
         self.if_c = if_c
@@ -157,6 +170,7 @@ class IfNode(AtomicNode):
         ans += "\n" + '\t'*(tabs +1) + "else: " + self.else_c.visit()
         return ans
 
+
 class WhileNode(AtomicNode):
     def __init__(self, condition, body):
         self.condition = condition
@@ -170,6 +184,7 @@ class WhileNode(AtomicNode):
         
         return ans
 
+
 class BlockNode(AtomicNode):
     def __init__(self, expr_list):
         self.expr_list = expr_list
@@ -178,6 +193,7 @@ class BlockNode(AtomicNode):
         ans = '\t'*tabs + " {<expr>; .... <expr>;}\n"
         exprs = '\n'.join(param.visit( tabs + 1) for param in self.expr_list)
         return ans+exprs
+
 
 class LetNode(AtomicNode):
     def __init__(self, list_decl, expr):
@@ -189,6 +205,7 @@ class LetNode(AtomicNode):
         decl = '\n'.join('\t'*(tabs+1) + "decl: " + param.visit()  for param in self.list_decl)
         expr = "\n" + "IN" + self.expr.visit(tabs+1)
         return ans+decl+expr
+
 
 class CaseNode(AtomicNode):
     def __init__(self, expr, list_case):
@@ -202,8 +219,6 @@ class CaseNode(AtomicNode):
         return ans+"\n"+expr+"\n" +l
         
 
-
-
 class BinaryNode(ExpressionNode):
     def __init__(self, left, right):
         self.left = left
@@ -216,17 +231,22 @@ class BinaryNode(ExpressionNode):
         right = node.right.visit( tabs + 1)
         return f'{ans}\n{left}\n{right}'
 
+
 class ConstantNumNode(AtomicNode):
     pass
+
 
 class ConstantStringNode(AtomicNode):
     pass
 
+
 class ConstantBooleanNode(AtomicNode):
     pass
 
+
 class SelfNode(AtomicNode):
     pass
+
 
 class DispatchNode(ExpressionNode):
     def __init__(self, expr, f, params, type = None):
@@ -246,24 +266,40 @@ class DispatchNode(ExpressionNode):
         params = '\n'.join(param.visit( tabs + 1) for param in node.params)
         return f'{ans}\n{expr}\n{params}'
 
+
 class VariableNode(AtomicNode):
     pass
+
+
 class InstantiateNode(AtomicNode):
     def visit(self, tabs):
         node = self
         return '\t' * tabs + f'\\__ InstantiateNode: new {node.lex}()'
+
+
 class PlusNode(BinaryNode):
     pass
+
+
 class MinusNode(BinaryNode):
     pass
+
+
 class StarNode(BinaryNode):
     pass
+
+
 class DivNode(BinaryNode):
     pass
 
+
 class MinorNode(BinaryNode):
     pass
+
+
 class MinorEqualsNode(BinaryNode):
     pass
+
+
 class EqualsNode(BinaryNode):
     pass

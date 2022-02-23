@@ -16,7 +16,7 @@ def execute_compiler(cool_program : str):
     code_generator = CodeGenerator(semantic_checker)
 
     # Execute compiler components
-    compiler_components : List[CompilerComponent] = [lexer, cool_parser, semantic_checker, code_generator]
+    compiler_components: List[CompilerComponent] = [lexer, cool_parser, semantic_checker, code_generator]
     for component in compiler_components:
         component.execute()
 
