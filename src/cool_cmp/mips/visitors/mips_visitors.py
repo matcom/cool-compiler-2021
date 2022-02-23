@@ -276,7 +276,11 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(AddImmediateNode(Reg.sp(), Reg.sp(), bytes_amount, row, column, comment))
 
     def _load_local_variable(self, dest, name, row=None, column=None, comment=None):
-        self.add_instruction(LoadWordNode(dest, self.local_variable_offset[name], Reg.fp(),row,column,comment)) # Stack address for local variable
+        try:
+            value = int(name)
+            self.add_instruction(LoadImmediateNode(dest, name, row, column, comment))
+        except ValueError:
+            self.add_instruction(LoadWordNode(dest, self.local_variable_offset[name], Reg.fp(),row,column,comment)) # Stack address for local variable
 
     def _load_type_variable(self, dest, name, row=None, column=None, comment=None):
         """
@@ -546,6 +550,80 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
         self.add_instruction(JumpRegisterNode(Reg.ra(), row, column, "Returns the concatenated string instance in v0"))
 
+    def _add_string_equal_function(self, row=None, column=None, comment=None):
+        """
+        Returns in v0 if the strings given in a0 and a1 are equal
+        """
+        # TODO 
+        self.add_instruction(LabelNode("__string_equal"))
+ 
+        start_compare_loop = "__string_equal_start_loop"
+        end_compare_loop = "__string_equal_end_loop"
+        
+        self.add_instruction(LoadWordNode(Reg.t(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
+        self.add_instruction(LoadWordNode(Reg.t(1), self.WORD_SIZE, Reg.a(1), row, column, "Actual String address")) # Actual String address
+        
+        self.add_instruction(LabelNode(start_compare_loop))
+        self.add_instruction(LoadByteNode(Reg.t(2), 0, Reg.t(0), comment="Load string1 char"))
+        self.add_instruction(LoadByteNode(Reg.t(3), 0, Reg.t(1), comment="Load string2 char"))
+        self.add_instruction(SetEqualToNode(Reg.t(4), Reg.t(2), Reg.t(3), comment="Equal chars?"))
+        self.add_instruction(BranchEqualNode(Reg.t(4), Reg.zero(), end_compare_loop, comment="If not equal then")) # If not equal then  
+
+        # Chars are equal to null? => End
+        self.add_instruction(BranchEqualNode(Reg.t(2), Reg.zero(), end_compare_loop, comment="Both strings ended"))
+        
+        # Next char
+        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), 1, comment="Next char"))
+        self.add_instruction(AddImmediateNode(Reg.t(1), Reg.t(1), 1, comment="Next char"))
+        
+        self.add_instruction(JumpNode(start_compare_loop))
+        
+        self.add_instruction(LabelNode(end_compare_loop))
+        self.add_instruction(MoveNode(Reg.v(0), Reg.t(4), comment="Assign return value"))
+        self.add_instruction(JumpRegisterNode(Reg.ra()))
+    
+    def _add_obj_equal_function(self, row=None, column=None, comment=None):
+        """
+        Returns in v0 if the objects given in a0 and a1 are equal
+        """
+        self.add_instruction(LabelNode("__object_equal"))
+        
+        obj_cmp_label = "__object_equal_label"
+        obj_end_cmp_label = "__object_equal_end"
+        
+        self.add_instruction(SetEqualToNode(Reg.v(0), Reg.a(0), Reg.a(1), comment="Compare obj by address"))
+        self.add_instruction(BranchNotEqualNode(Reg.v(0), Reg.zero(), obj_end_cmp_label, comment="Equal Address or Value obj are equal"))
+                
+        self.add_instruction(MoveNode(Reg.t(0), Reg.a(0), comment="t0 = left object"))
+        self.add_instruction(MoveNode(Reg.t(1), Reg.a(1), comment="t1 = right object"))
+
+        
+        
+        self.add_instruction(LoadWordNode(Reg.t(0), 0, Reg.t(0), comment="t0=left objType"))
+        self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(1), comment="t1=right objType"))
+        
+        self._load_type_variable(Reg.t(2), "String", comment="Loading String type address for comparison")
+        
+        self.add_instruction(SetEqualToNode(Reg.t(0), Reg.t(0), Reg.t(2), comment="t0 = left type == String"))
+        self.add_instruction(SetEqualToNode(Reg.t(1), Reg.t(1), Reg.t(2), comment="t1 = right type == String"))
+        self.add_instruction(AndNode(Reg.t(0), Reg.t(0), Reg.t(1), comment="Both types are equal to String"))
+        
+        self.add_instruction(BranchEqualNode(Reg.t(0), Reg.zero(), obj_cmp_label, comment="If not equal return 0"))
+        
+        self._push([Reg.ra(), Reg.a(0), Reg.a(1)])
+        self.add_instruction(JumpAndLinkNode("__string_equal"))
+        # In $v0 if equal or not
+        self._pop([Reg.ra(), Reg.a(0), Reg.a(1)])
+        
+        self.add_instruction(JumpNode(obj_end_cmp_label))
+        self.add_instruction(LabelNode(obj_cmp_label, comment="Do Obj cmp"))
+
+        self.add_instruction(MoveNode(Reg.v(0), Reg.zero(), comment="Not equal objects"))            
+                
+        self.add_instruction(LabelNode(obj_end_cmp_label, comment="End cmp"))   
+        
+        self.add_instruction(JumpRegisterNode(Reg.ra()))
+
     def _add_get_ra_function(self,row=None,column=None,comment=None):
         """
         Adds a function that returns in $v0 2 instructions after the caller instruction
@@ -572,7 +650,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     def _binary_operation(self, node: cil.ArithmeticNode, instruction_type, reg1, reg2, temp_reg, row=None, column=None, comment=None):        
         self._load_value(reg1, node.left,row,column,comment)
         self._load_value(reg2, node.right,row,column,comment)
-        self.add_instruction(instruction_type(temp_reg, reg1, reg2))
+        self.add_instruction(instruction_type(temp_reg, reg1, reg2, row, column, comment))
         self._store_local_variable(temp_reg, node.dest,row,column,comment)
     
     def _allocate_heap_space(self, reg_with_amount,row=None,column=None,comment=None):
@@ -638,6 +716,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._add_substring_function( node.row,node.column,node.comment)
         self._add_type_name_function( node.row,node.column,node.comment)
         self._add_concat_function( node.row,node.column,node.comment)
+        self._add_string_equal_function(node.row,node.column, "String Equal Function")
+        self._add_obj_equal_function(node.row,node.column, "Object Equal Function")
 
         for function in node.dotcode:
             self.current_function = function
@@ -799,7 +879,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
     @visitor.when(cil.EqualNode)
     def visit(self, node:cil.EqualNode):
-        self._binary_operation(node, SetEqualToNode, Reg.t(0), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)
+        self._load_local_variable(Reg.a(0), node.left, node.row, node.column, "a0 = left String")
+        self._load_local_variable(Reg.a(1), node.right, node.row, node.column, "a1 = right String")
+        self._push([Reg.ra()])
+        self.add_instruction(JumpAndLinkNode("__object_equal"))
+        self._pop([Reg.ra()])
+        self._store_local_variable(Reg.v(0), node.dest, comment="Saving equal result")
 
     @visitor.when(cil.GreaterNode)
     def visit(self, node:cil.GreaterNode):
@@ -867,6 +952,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.CopyNode)
     def visit(self, node:cil.CopyNode):
         self._load_value(Reg.a(0), node.instance,node.row, node.column, node.comment) # t0 = instance
+        # Function Node already saves all register information
         self.add_instruction(JumpAndLinkNode("__copy",node.row, node.column, node.comment))
         self._store_local_variable(
             Reg.v(0), node.result, node.row, node.column, node.comment)
@@ -874,6 +960,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.LengthNode)
     def visit(self, node:cil.LengthNode):
         self._load_value(Reg.a(0), node.string_var,node.row, node.column, node.comment) # a0 = instance
+        # Function Node already saves all register information
         self.add_instruction(JumpAndLinkNode("__string_length",node.row, node.column, node.comment))
         self._store_local_variable(Reg.v(0), node.dest,node.row, node.column, node.comment)
 
@@ -882,6 +969,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._load_value(Reg.a(0), node.string,node.row, node.column, node.comment)
         self._load_value(Reg.a(1), node.index,node.row, node.column, node.comment)
         self._load_value(Reg.a(2), node.length,node.row, node.column, node.comment)
+        # Function Node already saves all register information
         self.add_instruction(JumpAndLinkNode("__string_substring",node.row, node.column, node.comment))
         self._store_local_variable(
             Reg.v(0), node.dest, node.row, node.column, node.comment)
@@ -889,6 +977,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.TypeNameNode)
     def visit(self, node:cil.TypeNameNode):
         self._load_type_variable(Reg.a(0), node.type,node.row, node.column, node.comment)
+        # Function Node already saves all register information
         self.add_instruction(JumpAndLinkNode("__type_name",node.row, node.column, node.comment))
         self._store_local_variable(Reg.v(0), node.dest,node.row, node.column, node.comment)
 
@@ -897,6 +986,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._load_local_variable(Reg.a(0), node.string1,node.row, node.column, node.comment)
         self._load_local_variable(Reg.a(1), node.string2,node.row, node.column, node.comment)
 
+        # Function Node already saves all register information
         self.add_instruction(JumpAndLinkNode("__concat",node.row, node.column, node.comment))
 
         self._store_local_variable(

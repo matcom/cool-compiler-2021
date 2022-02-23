@@ -40,10 +40,10 @@
   - [ ] Copy especifico String, Int
 - [x] At @
 - [x] Llamado dinamico self type
-- [ ] Llamar al __init del padre en el __init de los hijos.
+- [x] Llamar al __init del padre en el __init de los hijos.
 - [ ] Cuando se hace abort se tiene que escribir un mensaje desde donde se hizo abort. Mirar is_prime en los ejemplos
 - [ ] case of
 - [ ] Implementar igual para Strings en MIPS
 - [ ] Atributos con igual nombre en clases heredadas, tienen que diferenciarse, o no, ver bien esto
-- [ ] Verificar que los atributos se inicialicen correctamente en caso de que uno dependa de otro y a la hora de asiganrle valor uno no este inicializado.
+- [x] Verificar que los atributos se inicialicen correctamente en caso de que uno dependa de otro y a la hora de asiganrle valor uno no este inicializado. Pero tienen que estar bien en orden de definicion, si estan regados se parte, casi seguro, el test de eso ya se paso en CIL
 - [ ] Verificar que se aborte cuando ocurre una excepcion en ejecucion. Los casos se especifican en el manual de Cool pagina 29

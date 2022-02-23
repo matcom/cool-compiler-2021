@@ -244,6 +244,7 @@ class CILRunnerVisitor():
         typex = self.get_type(name)
         return {
             "__type": typex,
+            "__is_type": True,
         }
     
     def get_value(self, source, function_scope):
@@ -456,7 +457,7 @@ class CILRunnerVisitor():
         typex = self.get_dynamic_type(node.type, caller_fun_scope)
         
         value = self.create_type_instance(typex.name)
-        
+        value["__is_type"] = False
         for attr in typex.attributes:
             value[attr] = None
             
@@ -692,9 +693,15 @@ class CILRunnerVisitor():
                 cmp1 = None
                 cmp2 = None
                 if x is not None:
-                    cmp1 = x["__type"].name
+                    if x["__is_type"]:
+                        cmp1 = x["__type"].name
+                    else:
+                        cmp1 = id(x) # Compare by ref
                 if y is not None:
-                    cmp2 = y["__type"].name
+                    if y["__is_type"]:
+                        cmp2 = y["__type"].name
+                    else:
+                        cmp2 = id(y) # Compare by ref
                 return cmp1 == cmp2
             else:
                 self.raise_error("OPERATION must have both argument ")

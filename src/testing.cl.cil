@@ -51,28 +51,6 @@ type IO {
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
 }
-type A {
-	parent: Object
-	
-
-	method __init: __init_A_type
-	method abort: function_abort_at_Object
-	method type_name: function_type_name_at_Object
-	method copy: function_copy_at_Object
-	method get: function_get_at_A
-	method get2: function_get2_at_A
-}
-type B {
-	parent: A
-	
-
-	method __init: __init_B_type
-	method abort: function_abort_at_Object
-	method type_name: function_type_name_at_Object
-	method copy: function_copy_at_Object
-	method get: function_get_at_A
-	method get2: function_get2_at_A
-}
 type Main {
 	parent: IO
 	
@@ -94,9 +72,16 @@ data_1 = "String"
 data_2 = "Bool"
 data_3 = "Int"
 data_4 = "IO"
-data_5 = "A"
-data_6 = "B"
-data_7 = "Main"
+data_5 = "Main"
+data_6 = "Hello"
+data_7 = "Hello"
+data_8 = "Mal4"
+data_9 = "0"
+data_10 = "1"
+data_11 = "Mal3"
+data_12 = "Bien"
+data_13 = "Mal2"
+data_14 = "Mal1"
 
 .CODE
 function main {
@@ -137,47 +122,6 @@ function type_distance {
 	LABEL distance_label_1
 	RETURN local_distance_internal_0
 }
-function __init_Object_type {
-	PARAM self
-
-	
-
-	
-	RETURN self
-}
-function function_abort_at_Object {
-	PARAM self
-
-	
-
-	ABORT
-	RETURN 0
-}
-function function_type_name_at_Object {
-	PARAM self
-
-	LOCAL local_type_name_at_Object_internal_0
-
-	local_type_name_at_Object_internal_0 = TYPEOF self
-	local_type_name_at_Object_internal_0 = TYPENAME local_type_name_at_Object_internal_0
-	RETURN local_type_name_at_Object_internal_0
-}
-function function_copy_at_Object {
-	PARAM self
-
-	LOCAL local_copy_at_Object_internal_0
-
-	local_copy_at_Object_internal_0 = COPY self
-	RETURN local_copy_at_Object_internal_0
-}
-function __init_String_type {
-	PARAM self
-
-	
-
-	
-	RETURN self
-}
 function function_length_at_String {
 	PARAM self
 
@@ -205,29 +149,30 @@ function function_substr_at_String {
 	local_substr_at_String_internal_0 = SUBSTRING self i l
 	RETURN local_substr_at_String_internal_0
 }
-function __init_Bool_type {
+function function_abort_at_Object {
 	PARAM self
 
 	
 
-	
-	RETURN self
+	ABORT
+	RETURN 0
 }
-function __init_Int_type {
+function function_type_name_at_Object {
 	PARAM self
 
-	
+	LOCAL local_type_name_at_Object_internal_0
 
-	
-	RETURN self
+	local_type_name_at_Object_internal_0 = TYPEOF self
+	local_type_name_at_Object_internal_0 = TYPENAME local_type_name_at_Object_internal_0
+	RETURN local_type_name_at_Object_internal_0
 }
-function __init_IO_type {
+function function_copy_at_Object {
 	PARAM self
 
-	
+	LOCAL local_copy_at_Object_internal_0
 
-	
-	RETURN self
+	local_copy_at_Object_internal_0 = COPY self
+	RETURN local_copy_at_Object_internal_0
 }
 function function_out_string_at_IO {
 	PARAM self
@@ -263,54 +208,11 @@ function function_in_int_at_IO {
 	local_in_int_at_IO_internal_0 = READINT
 	RETURN local_in_int_at_IO_internal_0
 }
-function __init_A_type {
-	PARAM self
-
-	
-
-	
-	RETURN self
-}
-function function_get_at_A {
-	PARAM self
-
-	
-
-	RETURN self
-}
-function function_get2_at_A {
-	PARAM self
-
-	LOCAL local_get2_at_A_internal_0
-	LOCAL local_get2_at_A_internal_1
-
-	local_get2_at_A_internal_1 = TYPEOF self
-	local_get2_at_A_internal_0 = ALLOCATE local_get2_at_A_internal_1
-	ARG local_get2_at_A_internal_0
-	local_get2_at_A_internal_0 = VCALL local_get2_at_A_internal_1 __init
-	RETURN local_get2_at_A_internal_0
-}
-function __init_B_type {
-	PARAM self
-
-	
-
-	
-	RETURN self
-}
-function __init_Main_type {
-	PARAM self
-
-	
-
-	
-	RETURN self
-}
 function function_main_at_Main {
 	PARAM self
 
 	LOCAL local_main_at_Main_internal_0
-	LOCAL local_main_at_Main_b_1
+	LOCAL local_main_at_Main_internal_1
 	LOCAL local_main_at_Main_internal_2
 	LOCAL local_main_at_Main_internal_3
 	LOCAL local_main_at_Main_internal_4
@@ -328,37 +230,137 @@ function function_main_at_Main {
 	LOCAL local_main_at_Main_internal_16
 	LOCAL local_main_at_Main_internal_17
 	LOCAL local_main_at_Main_internal_18
+	LOCAL local_main_at_Main_internal_19
+	LOCAL local_main_at_Main_internal_20
+	LOCAL local_main_at_Main_internal_21
+	LOCAL local_main_at_Main_internal_22
+	LOCAL local_main_at_Main_internal_23
+	LOCAL local_main_at_Main_internal_24
+	LOCAL local_main_at_Main_internal_25
+	LOCAL local_main_at_Main_internal_26
+	LOCAL local_main_at_Main_internal_27
+	LOCAL local_main_at_Main_internal_28
 
-	local_main_at_Main_internal_2 = ALLOCATE B
-	ARG local_main_at_Main_internal_2
-	local_main_at_Main_internal_2 = CALL __init_B_type
-	local_main_at_Main_b_1 = local_main_at_Main_internal_2
-	ARG local_main_at_Main_b_1
-	local_main_at_Main_internal_4 = TYPEOF local_main_at_Main_b_1
-	local_main_at_Main_internal_3 = VCALL local_main_at_Main_internal_4 get
-	ARG local_main_at_Main_internal_3
-	local_main_at_Main_internal_6 = TYPEOF local_main_at_Main_internal_3
-	local_main_at_Main_internal_5 = VCALL local_main_at_Main_internal_6 type_name
-	ARG local_main_at_Main_b_1
-	local_main_at_Main_internal_8 = TYPEOF local_main_at_Main_b_1
-	local_main_at_Main_internal_7 = VCALL local_main_at_Main_internal_8 get2
-	ARG local_main_at_Main_internal_7
-	local_main_at_Main_internal_10 = TYPEOF local_main_at_Main_internal_7
-	local_main_at_Main_internal_9 = VCALL local_main_at_Main_internal_10 type_name
-	ARG local_main_at_Main_b_1
-	local_main_at_Main_internal_12 = TYPEOF local_main_at_Main_b_1
-	local_main_at_Main_internal_11 = VCALL local_main_at_Main_internal_12 type_name
-	ARG local_main_at_Main_internal_9
-	ARG local_main_at_Main_internal_11
-	local_main_at_Main_internal_14 = TYPEOF local_main_at_Main_internal_9
-	local_main_at_Main_internal_13 = VCALL local_main_at_Main_internal_14 concat
-	ARG local_main_at_Main_internal_5
-	ARG local_main_at_Main_internal_13
-	local_main_at_Main_internal_16 = TYPEOF local_main_at_Main_internal_5
-	local_main_at_Main_internal_15 = VCALL local_main_at_Main_internal_16 concat
+	local_main_at_Main_internal_2 = LOAD data_6
+	local_main_at_Main_internal_3 = LOAD data_7
+	local_main_at_Main_internal_1 = EQUAL local_main_at_Main_internal_2 local_main_at_Main_internal_3
+	IF local_main_at_Main_internal_1 GOTO main_at_Main_label_0
+	local_main_at_Main_internal_4 = LOAD data_8
 	ARG self
-	ARG local_main_at_Main_internal_15
-	local_main_at_Main_internal_18 = TYPEOF self
-	local_main_at_Main_internal_17 = VCALL local_main_at_Main_internal_18 out_string
-	RETURN local_main_at_Main_internal_17
+	ARG local_main_at_Main_internal_4
+	local_main_at_Main_internal_6 = TYPEOF self
+	local_main_at_Main_internal_5 = VCALL local_main_at_Main_internal_6 out_string
+	local_main_at_Main_internal_0 = local_main_at_Main_internal_5
+	GOTO main_at_Main_label_1
+	LABEL main_at_Main_label_0
+	local_main_at_Main_internal_9 = LOAD data_9
+	local_main_at_Main_internal_10 = LOAD data_10
+	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_9 local_main_at_Main_internal_10
+	IF local_main_at_Main_internal_8 GOTO main_at_Main_label_2
+	local_main_at_Main_internal_13 = ALLOCATE Object
+	ARG local_main_at_Main_internal_13
+	local_main_at_Main_internal_13 = CALL __init_Object_type
+	local_main_at_Main_internal_14 = ALLOCATE Object
+	ARG local_main_at_Main_internal_14
+	local_main_at_Main_internal_14 = CALL __init_Object_type
+	local_main_at_Main_internal_12 = EQUAL local_main_at_Main_internal_13 local_main_at_Main_internal_14
+	IF local_main_at_Main_internal_12 GOTO main_at_Main_label_4
+	local_main_at_Main_internal_16 = EQUAL self self
+	IF local_main_at_Main_internal_16 GOTO main_at_Main_label_6
+	local_main_at_Main_internal_17 = LOAD data_11
+	ARG self
+	ARG local_main_at_Main_internal_17
+	local_main_at_Main_internal_19 = TYPEOF self
+	local_main_at_Main_internal_18 = VCALL local_main_at_Main_internal_19 out_string
+	local_main_at_Main_internal_15 = local_main_at_Main_internal_18
+	GOTO main_at_Main_label_7
+	LABEL main_at_Main_label_6
+	local_main_at_Main_internal_20 = LOAD data_12
+	ARG self
+	ARG local_main_at_Main_internal_20
+	local_main_at_Main_internal_22 = TYPEOF self
+	local_main_at_Main_internal_21 = VCALL local_main_at_Main_internal_22 out_string
+	local_main_at_Main_internal_15 = local_main_at_Main_internal_21
+	LABEL main_at_Main_label_7
+	local_main_at_Main_internal_11 = local_main_at_Main_internal_15
+	GOTO main_at_Main_label_5
+	LABEL main_at_Main_label_4
+	local_main_at_Main_internal_23 = LOAD data_13
+	ARG self
+	ARG local_main_at_Main_internal_23
+	local_main_at_Main_internal_25 = TYPEOF self
+	local_main_at_Main_internal_24 = VCALL local_main_at_Main_internal_25 out_string
+	local_main_at_Main_internal_11 = local_main_at_Main_internal_24
+	LABEL main_at_Main_label_5
+	local_main_at_Main_internal_7 = local_main_at_Main_internal_11
+	GOTO main_at_Main_label_3
+	LABEL main_at_Main_label_2
+	local_main_at_Main_internal_26 = LOAD data_14
+	ARG self
+	ARG local_main_at_Main_internal_26
+	local_main_at_Main_internal_28 = TYPEOF self
+	local_main_at_Main_internal_27 = VCALL local_main_at_Main_internal_28 out_string
+	local_main_at_Main_internal_7 = local_main_at_Main_internal_27
+	LABEL main_at_Main_label_3
+	local_main_at_Main_internal_0 = local_main_at_Main_internal_7
+	LABEL main_at_Main_label_1
+	RETURN local_main_at_Main_internal_0
+}
+function __init_Object_type {
+	PARAM self
+
+	
+
+	
+	RETURN self
+}
+function __init_String_type {
+	PARAM self
+
+	
+
+	ARG self
+	self = CALL __init_Object_type
+	
+	RETURN self
+}
+function __init_Bool_type {
+	PARAM self
+
+	
+
+	ARG self
+	self = CALL __init_Object_type
+	
+	RETURN self
+}
+function __init_Int_type {
+	PARAM self
+
+	
+
+	ARG self
+	self = CALL __init_Object_type
+	
+	RETURN self
+}
+function __init_IO_type {
+	PARAM self
+
+	
+
+	ARG self
+	self = CALL __init_Object_type
+	
+	RETURN self
+}
+function __init_Main_type {
+	PARAM self
+
+	
+
+	ARG self
+	self = CALL __init_IO_type
+	
+	RETURN self
 }
