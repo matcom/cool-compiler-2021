@@ -166,7 +166,7 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
                 LexicographicError(
                     t.lexer.lineno,
                     index - t.lexer.last_new_line_pos + 1,
-                    "Illegal character \\n inside string",
+                    "Unterminated string constant",
                 )
             )
             t.lexer.lineno +=1
@@ -178,7 +178,7 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
                 LexicographicError(
                     t.lexer.lineno,
                     index - t.lexer.last_new_line_pos + 1,
-                    "Illegal character \\0 inside string",
+                    "String contains null character",
                 )
             )
             index += 1
@@ -187,12 +187,12 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
             string_list.append(text[index])
             index += 1
 
-    if index == final:
+    if index == final: # String may not cross file boundaries 
         t.lexer.errors.append(
             LexicographicError(
                 t.lexer.lineno,
                 index - t.lexer.last_new_line_pos + 1,
-                "String may not cross file boundaries",
+                "EOF in string constant",
             )
         )
         t.lexer.lexpos = index
