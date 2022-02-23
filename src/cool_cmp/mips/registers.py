@@ -56,11 +56,3 @@ class Reg:
     def sp():
         return Reg.__register("sp")
     
-    @staticmethod
-    def low():
-        return Reg.__register("low")
-    
-    @staticmethod
-    def hi():
-        return Reg.__register("hi")
-    

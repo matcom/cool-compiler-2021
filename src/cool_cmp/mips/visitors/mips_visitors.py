@@ -860,8 +860,9 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._load_value(Reg.t(1), node.right,node.row, node.column, node.comment)
         self.add_instruction(DivideOverflowNode(
             Reg.t(0), Reg.t(1), node.row, node.column, node.comment))
+        self.add_instruction(MoveFromLoNode(Reg.t(0), node.row, node.column, "Getting quotient"))
         self._store_local_variable(
-            Reg.low(), node.dest, node.row, node.column, node.comment)  # Stores the quotient
+            Reg.t(0), node.dest, node.row, node.column, "Stores the quotient")  # Stores the quotient
     
     @visitor.when(cil.StarNode)
     def visit(self, node:cil.StarNode):
