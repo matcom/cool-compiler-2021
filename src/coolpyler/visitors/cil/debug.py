@@ -17,6 +17,8 @@ class CILDebug:
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node: cil.ProgramNode, indent=0, inline=False): # type: ignore
+        self.print(indent, inline, "=" * 10 + " CIL " + "="*10)
+
         self.print(indent, inline, ".types\n")
         for type in node.dottypes:
             self.visit(type, indent + 2)
@@ -31,6 +33,10 @@ class CILDebug:
         for type in node.dotcode:
             self.visit(type, indent + 2)
             print()
+
+        self.print(indent, inline, "=" * 10 + "=====" + "="*10)
+
+        return node
 
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode, indent=0, inline=False): # type: ignore

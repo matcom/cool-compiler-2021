@@ -296,11 +296,7 @@ class CoolToCilVisitor(object):
 
     @visitor.when(type_checked.CoolNewNode)
     def visit(self, node: type_checked.CoolNewNode) -> str:  # type: ignore
-        return_local = self.register_local()
-        self.instructions.append(
-            cil.StaticCallNode(contructor_for(node.type.name), return_local)
-        )
-        return return_local
+        return self.register_new(node.type.name)
 
     @visitor.when(type_checked.CoolParenthNode)
     def visit(self, node: type_checked.CoolParenthNode) -> str:  # type: ignore
@@ -438,12 +434,13 @@ class CoolToCilVisitor(object):
         try:
             return self.named_locals[node.value]
         except KeyError:
-            local_sid = self.register_local(node.value)
+            pass
 
         param_sid = self.get_param(node.value)
         if param_sid in self.params:
             return param_sid
 
+        local_sid = self.register_local(node.value)
         self.instructions.append(
             cil.GetAttrNode(self.get_param("self"), node.value, local_sid)
         )
