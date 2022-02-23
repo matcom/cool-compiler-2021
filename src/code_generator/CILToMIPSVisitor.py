@@ -2,6 +2,7 @@ from BaseCILToMIPSVisitor import *
 from utils import visitor
 import cil_ast as cil
 
+
 class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     @visitor.on('node')
     def visit(self, node):
@@ -9,216 +10,99 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node):
-        #.TYPE
-        for type_ in node.dottypes:
-            self.visit(type_)
-        self.save_meth_addr(node.dotcode)
-        self.data_code.append(f"type_Void: .asciiz \"Void\"")
-        self.save_types_addr(node.dottypes)
-        #.DATA
-        for data in node.dotdata:
-            self.visit(data)
-        #.CODE
-        for code in node.dotcode:
-            self.visit(code)
-        self.initialize_runtime_errors()
-        return self.data_code, self.code
+        self.types = node.dottypes
+        self.data += 'temp_string: .space 2048\n'
+        self.data += 'void: .word 0\n'
+
+        for node_type in node.dottypes.values():
+            self.visit(node_type)
+
+        for node_data in node.dotdata.keys():
+            self.data += f'{node_data}: .asciiz "{node.dotdata[node_data]}"\n'
+
+        for node_function in node.dotcode:
+            self.visit(node_function)
+
+        self.mips_code = '.data\n' + self.data + '.text\n' + self.text
+        return self.mips_code.strip()
 
     @visitor.when(cil.TypeNode)
     def visit(self, node):
-        self.obj_table.add_entry(node.name, node.methods, node.attributes)
-        self.data_code.append(f"type_{node.name}: .asciiz \"{node.name}\"")
+        self.data += f'{node.name}_name: .asciiz "{node.name}"\n'
+        self.data += f'{node.name}_methods:\n'
+        for method in node.methods.values():
+            self.data += f'.word {method}\n'
 
-    @visitor.when(cil.DataNode)
-    def visit(self, node):
-        self.data_code.append(f"{node.name}: .asciiz \"{node.value}\"")
+        idx = 0
+        self.attr_offset.__setitem__(node.name, {})
+        for attr in node.attributes:
+            self.attr_offset[node.name][attr] = 4*idx + 16
+            idx = idx + 1
+
+        idx = 0
+        self.method_offset.__setitem__(node.name, {})
+        for met in node.methods:
+            self.method_offset[node.name][met] = 4*idx
+            idx = idx + 1
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node):
-        self.code.append('')
-        self.code.append(f'{node.name}:')
-        self.locals = 0
-        self.code.append('# Gets the params from the stack')
-        self.code.append(f'move $fp, $sp')
-        n = len(node.params)
-        for i, param in enumerate(node.params, 1):
-            self.visit(param, i, n)
-        self.code.append('# Gets the frame pointer from the stack')
-        for i, var in enumerate(node.localvars, len(node.params)):
-            self.visit(var, i)
-        self.locals = len(node.params) + len(node.localvars)
-        leaders = self.find_leaders(node.instructions)
-        blocks = [node.instructions[leaders[i-1]:leaders[i]] for i in range(1, len(leaders))]
-        self.next_use = self.construct_next_use(blocks)
-        for block in blocks:
-            self.block = block
-            for inst in block:
-                self.inst = inst
-                self.get_reg(inst)
-                self.visit(inst)
-            inst = block[-1]
-            if not (isinstance(inst, cil.GoToNode) or isinstance(inst, cil.IfGoToNode) or isinstance(inst, cil.ReturnNode) \
-                or isinstance(inst, cil.CallNode) or isinstance(inst, cil.VCallNode)):
-                self.empty_registers()
+        self.current_function = node
+        self.var_offset.__setitem__(self.current_function.name, {})
+
+        for idx, var in enumerate(self.current_function.localvars + self.current_function.params):
+            self.var_offset[self.current_function.name][var.name] = (idx + 1)*4
+
+        self.text += f'{node.name}:\n'
+        # save space for locals
+        self.text += f'addi $sp, $sp, {-4 * len(node.localvars)}\n'
+        self.text += 'addi $sp, $sp, -4\n'  # save return address
+        self.text += 'sw $ra, 0($sp)\n'
+
+        for instruction in node.instructions:
+            self.visit(instruction)
+
+        self.text += 'lw $ra, 0($sp)\n'  # recover return address
+        total = 4 * len(node.localvars) + 4 * len(node.params) + 4
+        # pop locals,parameters,return address from the stack
+        self.text += f'addi $sp, $sp, {total}\n'
+        self.text += 'jr $ra\n'
 
     @visitor.when(cil.ParamNode)
-    def visit(self, node, idx, length):        
-        self.symbol_table.insert_name(node.name)
-        self.var_address[node.name] = self.get_type(node.type)
-        self.code.append(f'# Pops the register with the param value {node.name}')
-        self.code.append('addiu $fp, $fp, 4') 
-        self.addr_desc.insert_var(node.name, length-idx)            
+    def visit(self, node):
+        pass
 
     @visitor.when(cil.LocalNode)
     def visit(self, node, idx):
-        self.symbol_table.insert_name(node.name)
-        self.addr_desc.insert_var(node.name, idx)
-        self.code.append(f'# Updates stack pointer pushing {node.name} to the stack')
-        self.code.append(f'addiu $sp, $sp, -4')
+        pass
 
     @visitor.when(cil.AssignNode)
     def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.code.append(f'# Moving {node.source} to {node.dest}')
-        if self.is_variable(node.source):
-            rsrc = self.addr_desc.get_var_reg(node.source)
-            self.code.append(f'move ${rdest}, ${rsrc}') 
-            self.var_address[node.dest] = self.var_address[node.source]
-        elif self.is_int(node.source):
-            self.code.append(f'li ${rdest}, {node.source}')
-            self.var_address[node.dest] = AddrType.INT
-        self.save_var_code(node.dest)
-
-    @visitor.when(cil.PlusNode)
-    def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.code.append(f'# {node.dest} <- {node.left} + {node.right}')
-        if self.is_variable(node.left):
-            rleft = self.addr_desc.get_var_reg(node.left)
-            if self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"add ${rdest}, ${rleft}, ${rright}")
-            elif self.is_int(node.right):
-                self.code.append(f"addi ${rdest}, ${rleft}, {node.right}")
-        elif self.is_int(node.left):
-            if self.is_int(node.right):
-                self.code.append(f"li ${rdest}, {node.left + node.right}")
-            elif self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"addi ${rdest}, ${rright}, {node.left}")
-        self.var_address[node.dest] = AddrType.INT
-
-    @visitor.when(cil.MinusNode)
-    def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.code.append(f'# {node.dest} <- {node.left} - {node.right}')
-        if self.is_variable(node.left):
-            rleft = self.addr_desc.get_var_reg(node.left)
-            if self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"sub ${rdest}, ${rleft}, ${rright}")
-            elif self.is_int(node.right):
-                self.code.append(f"addi ${rdest}, ${rleft}, -{node.right}")
-        elif self.is_int(node.left):
-            if self.is_int(node.right):
-                self.code.append(f"li ${rdest}, {node.left-node.right}")
-            elif self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"sub $t9, $zero, {rright}")
-                self.code.append(f"addi ${rdest}, {node.left}, $t9")
-        self.var_address[node.dest] = AddrType.INT
-
-    @visitor.when(cil.StarNode)
-    def visit(self, node):
-        self.code.append(f'# {node.dest} <- {node.left} * {node.right}')
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        if self.is_int(node.left) and self.is_int(node.right):
-            self.code.append(f"li ${rdest}, {node.left*node.right}")
+        offset = self.var_offset[self.current_function.name][node.local_dest]
+        if node.expr:
+            if isinstance(node.expr, int):
+                self.text += f'li $t1, {node.expr}\n'
+            else:
+                right_offset = self.var_offset[self.current_function.name][node.expr]
+                self.text += f'lw $t1, {right_offset}($sp)\n'
         else:
-            if self.is_variable(node.left):
-                rleft = self.addr_desc.get_var_reg(node.left)
-                if self.is_variable(node.right):
-                    rright = self.addr_desc.get_var_reg(node.right)
-                elif self.is_int(node.right):
-                    self.code.append(f"li $t9, {node.right}")
-                    rright = 't9'
-            elif self.is_int(node.left):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"li $t9, {node.left}")
-                rleft = 't9'
-            self.code.append(f"mult ${rleft}, ${rright}")
-            self.code.append(f"mflo ${rdest}")
-        self.var_address[node.dest] = AddrType.INT
-        
-    @visitor.when(cil.DivNode)
-    def visit(self, node):
-        self.code.append(f'# {node.dest} <- {node.left} / {node.right}')
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        if self.is_int(node.left) and self.is_int(node.right):
-            try:
-                self.code.append(f"li ${rdest}, {node.left/node.right}")
-            except ZeroDivisionError:
-                self.code.append('la $a0, zero_error')
-                self.code.append('j .raise')
-        else:
-            if self.is_variable(node.left):
-                rleft = self.addr_desc.get_var_reg(node.left)
-                if self.is_variable(node.right):
-                    rright = self.addr_desc.get_var_reg(node.right)
-                elif self.is_int(node.right):
-                    self.code.append(f"li $t9, {node.right}")
-                    rright = 't9'
-            elif self.is_int(node.left):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"li $t9, {node.left}")
-                rleft = 't9'
-            self.code.append('la $a0, zero_error')
-            self.code.append(f'beqz ${rright}, .raise')
-            self.code.append(f"div ${rleft}, ${rright}")
-            self.code.append(f"mflo ${rdest}")
-        self.var_address[node.dest] = AddrType.INT
+            self.text += f'la $t1, void\n'
 
-    @visitor.when(cil.LessNode)
-    def visit(self, node):
-        self.code.append(f'# {node.dest} <- {node.left} < {node.right}')
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        if self.is_variable(node.left):
-            rleft = self.addr_desc.get_var_reg(node.left)
-            if self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"slt ${rdest}, ${rleft}, ${rright}")
-            elif self.is_int(node.right):
-                self.code.append(f"li $t9, {node.right}")
-                self.code.append(f"slt ${rdest}, ${rleft}, $t9")
-        elif self.is_int(node.left):
-            if self.is_int(node.right):
-                self.code.append(f"li ${rdest}, {int(node.left < node.right)}")
-            elif self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"li $t9, {node.left}")
-                self.code.append(f"slt ${rdest}, $t9, ${rright}")
-        self.var_address[node.dest] = AddrType.BOOL
+        self.text += f'sw $t1, {offset}($sp)\n'
 
-    @visitor.when(cil.LessEqualNode)
+    @visitor.when(cil.BinaryOperationNode)
     def visit(self, node):
-        self.code.append(f'# {node.dest} <- {node.left} <= {node.right}')
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        if self.is_variable(node.left):
-            rleft = self.addr_desc.get_var_reg(node.left)
-            if self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"sle ${rdest}, ${rleft}, ${rright}")
-            elif self.is_int(node.right):
-                self.code.append(f"li $t9, {node.right}")
-                self.code.append(f"sle ${rdest}, ${rleft}, $t9")
-        elif self.is_int(node.left):
-            if self.is_int(node.right):
-                self.code.append(f"li ${rdest}, {int(node.left <= node.right)}")
-            elif self.is_variable(node.right):
-                rright = self.addr_desc.get_var_reg(node.right)
-                self.code.append(f"li $t9, {node.left}")
-                self.code.append(f"sle ${rdest}, $t9, ${rright}")
-        self.var_address[node.dest] = AddrType.BOOL
+        mips_comm = self.mips_operators[node.op]
+        left_offset = self.var_offset[self.current_function.name][node.lvalue]
+        right_offset = self.var_offset[self.current_function.name][node.rvalue]
+        self.text += f'lw $a0, {left_offset}($sp)\n'
+        self.text += f'lw $t1, {right_offset}($sp)\n'
+        if node.op == '/':
+            self.text += 'beq $t1, 0, div_zero_error\n'
+        self.text += f'{mips_comm} $a0, $a0, $t1\n'
+        result_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $a0, {result_offset}($sp)\n'
+
 
     @visitor.when(cil.EqualNode)
     def visit(self, node):
@@ -237,7 +121,8 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
                     self.code.append(f"seq ${rdest}, ${rleft}, $t9")
             elif self.is_int(node.left):
                 if self.is_int(node.right):
-                    self.code.append(f"li ${rdest}, {int(node.left == node.right)}")
+                    self.code.append(
+                        f"li ${rdest}, {int(node.left == node.right)}")
                 elif self.is_variable(node.right):
                     rright = self.addr_desc.get_var_reg(node.right)
                     self.code.append(f"li $t9, {node.left}")
@@ -286,19 +171,21 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node):
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.var_address[node.dest] = AddrType.REF
-        self.code.append('# Syscall to allocate memory of the object entry in heap')
+        self.code.append(
+            '# Syscall to allocate memory of the object entry in heap')
         self.code.append('li $v0, 9')
         size = 4*self.obj_table.size_of_entry(node.type)
         self.code.append(f'li $a0, {size}')
         self.code.append('syscall')
         addrs_stack = self.addr_desc.get_addr(node.dest)
-        self.code.append('# Loads the name of the variable and saves the name like the first field')
+        self.code.append(
+            '# Loads the name of the variable and saves the name like the first field')
         self.code.append(f'la $t9, type_{node.type}')
         self.code.append(f'sw $t9, 0($v0)')
         self.code.append(f'# Saves the size of the node')
         self.code.append(f'li $t9, {size}')
         self.code.append(f'sw $t9, 4($v0)')
-        self.code.append(f'move ${rdest}, $v0')   
+        self.code.append(f'move ${rdest}, $v0')
         idx = self.types.index(node.type)
         self.code.append('# Adding Type Info addr')
         self.code.append('la $t8, types')
@@ -367,10 +254,11 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node):
         self.code.append('# Find the actual name in the dispatch table')
         reg = self.addr_desc.get_var_reg(node.obj)
-        self.code.append('# Gets in a0 the actual direction of the dispatch table')
+        self.code.append(
+            '# Gets in a0 the actual direction of the dispatch table')
         self.code.append(f'lw $t9, 8(${reg})')
         self.code.append('lw $a0, 8($t9)')
-        function = self.dispatch_table.find_full_name(node.type, node.method)       
+        function = self.dispatch_table.find_full_name(node.type, node.method)
         index = 4*self.dispatch_table.get_offset(node.type, function) + 4
         self.code.append(f'# Saves in t8 the direction of {function}')
         self.code.append(f'lw $t8, {index}($a0)')
@@ -405,10 +293,10 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
             self.code.append(f'li $t9, {node.dest}')
             self.code.append(f'sw $t9, ($sp)')
         self.code.append('addiu $sp, $sp, -4')
-       
+
     @visitor.when(cil.ReturnNode)
     def visit(self, node):
-        if self.is_variable(node.value): 
+        if self.is_variable(node.value):
             rdest = self.addr_desc.get_var_reg(node.value)
             self.code.append(f'move $v0, ${rdest}')
         elif self.is_int(node.value):
@@ -426,7 +314,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.code.append(f'# Saves in {node.dest} {node.msg}')
         self.var_address[node.dest] = AddrType.STR
         self.code.append(f'la ${rdest}, {node.msg}')
-    
+
     @visitor.when(cil.LengthNode)
     def visit(self, node):
         rdest = self.addr_desc.get_var_reg(node.dest)
@@ -530,10 +418,10 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         loop = f'loop_{self.loop_idx}'
         end = f'end_{self.loop_idx}'
         self.code.append(f'{loop}:')
-        self.code.append(f'sub $t9, $v0, ${rdest}') 
+        self.code.append(f'sub $t9, $v0, ${rdest}')
         self.code.append(f'beq $t9, ${rend}, {end}')
         self.code.append(f'lb $t9, 0($t8)')
-        self.code.append(f'beqz $t9, {error}')     
+        self.code.append(f'beqz $t9, {error}')
         self.code.append(f'sb $t9, 0($v0)')
         self.code.append('addi $t8, $t8, 1')
         self.code.append(f'addi $v0, $v0, 1')

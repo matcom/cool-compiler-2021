@@ -20,10 +20,10 @@ class TypeNode(Node):
 # .DATA
 
 
-class DataNode(Node):
-    def __init__(self, vname, value):
-        self.name = vname
-        self.value = value
+# class DataNode(Node):
+#     def __init__(self, vname, value):
+#         self.name = vname
+#         self.value = value
 
 # .CODE
 
@@ -62,7 +62,7 @@ class BinaryOperationNode(InstructionNode):
         self.local_dest = local_dest
         self.lvalue = lvalue
         self.rvalue = rvalue
-        self.operator = op
+        self.op = op
 
 
 class UnaryOperationNode(InstructionNode):

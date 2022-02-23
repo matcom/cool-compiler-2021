@@ -6,7 +6,7 @@ from semantic.visitors.typeBuilder import TypeBuilder
 from semantic.visitors.typeChecker import TypeChecker
 from semantic.visitors.typeCollector import TypeCollector
 from semantic.visitors.varCollector import VarCollector
-# from code_generator.COOLToCILVisitor import COOLToCILVisitor
+from code_generator.COOLToCILVisitor import COOLToCILVisitor
 from utils.errors import SemanticError
 
 
@@ -63,10 +63,10 @@ def main(_input, _output):
             raise Exception()
 
     # Code Generation
+    coolToCIL = COOLToCILVisitor(context)
+    cilAST = coolToCIL.visit(ast, scope)
 
-    # coolToCIL = COOLToCILVisitor(context)
-    # cilAST = coolToCIL.visit(ast, scope)
-
+    
 
     # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":
