@@ -554,6 +554,31 @@ class CILToMIPSVisitor(): # TODO Complete the transition
 
         self.add_instruction(JumpRegisterNode(Reg.ra(), row, column, "Returns the concatenated string instance in v0"))
 
+    def _add_remove_final_char(self, row=None, column=None, comment=None):
+        """
+        Updates the string passed in $a0 by removing the last char of the string.
+        String must be non empty, else undefined behavior. Uses t0 and t1
+        """
+
+        self.add_instruction(LabelNode("__remove_last_char", row, column, comment))
+
+        #t0 = string addr
+        self.add_instruction(LoadWordNode(Reg.t(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
+        start_loop = "__remove_last_char_start"
+        end_loop = "__remove_last_char_end"
+
+        self.add_instruction(LabelNode(start_loop, comment="Initial loop"))
+        self.add_instruction(LoadByteNode(Reg.t(1), 0, Reg.t(0), comment="Get current char"))
+        self.add_instruction(BranchEqualNode(Reg.t(1), Reg.zero(), end_loop, comment="if char is null then break"))
+        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), 1, comment="Increment address"))
+        self.add_instruction(JumpNode(start_loop))
+
+        self.add_instruction(LabelNode(end_loop, comment="End loop, removing last char"))
+        self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), -1, comment="Back one char to last one"))
+        self.add_instruction(StoreByteNode(Reg.zero(), 0, Reg.t(0), comment="Store null character"))
+
+        self.add_instruction(JumpRegisterNode(Reg.ra()))
+
     def _add_string_equal_function(self, row=None, column=None, comment=None):
         """
         Returns in v0 if the strings given in a0 and a1 are equal
@@ -722,6 +747,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._add_concat_function( node.row,node.column,node.comment)
         self._add_string_equal_function(node.row,node.column, "String Equal Function")
         self._add_obj_equal_function(node.row,node.column, "Object Equal Function")
+        self._add_remove_final_char(node.row, node.column, "Remove Final Char")
 
         for function in node.dotcode:
             self.current_function = function
@@ -1051,6 +1077,12 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(SyscallNode(node.row, node.column, "Fills the address in a0 with the string")) # Fills the address in a0 with the string
         self.add_instruction(MoveNode(Reg.a(1), Reg.a(0), node.row, node.column, "a1 = a0 Save the address in a1")) # a1 = a0 Save the address in a1
         self._add_create_string_instance(Reg.t(0), Reg.a(1)) # Create String, Address instance 
+
+        self.add_instruction(MoveNode(Reg.a(0), Reg.v(0), node.row, node.column, "a0 = v0 Get the string instance address")) # a0 = v0 Get the string instance address
+        self._push([Reg.ra()])
+        self.add_instruction(JumpAndLinkNode("__remove_last_char", comment="Remove last char"))
+        self._pop([Reg.ra()])
+        
         self._store_local_variable(Reg.v(0), node.dest, node.row, node.column, "Save the address in the final destination") # Save the address in the final destination
     
     @visitor.when(cil.ReadIntNode)
