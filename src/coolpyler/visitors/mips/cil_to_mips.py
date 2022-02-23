@@ -335,7 +335,24 @@ class CilToMIPS:
 
     @visit.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
-        pass
+        instructions = []
+        local_index = self.locals[node.name].index()
+        self.memory_manager.save()
+        reg1 = self.memory_manager.get_unused_register()
+
+        instructions.append(
+            mips.LoadWordNode(
+                reg1,
+                mips.MemoryAddressRegisterNode(
+                    FP_REG, len(self.params) * 4 + local_index * 4
+                ),
+            )
+        )
+
+        instructions.append(mips.LoadAddressNode(reg1, node.msg))
+
+        self.memory_manager.clean()
+        return instructions
 
     @visit.when(cil.LengthNode)
     def visit(self, node: cil.LengthNode):
