@@ -256,6 +256,9 @@ class Arg(Expression):
 class VCall(Expression):
     pass
 
+class Call(Expression):
+    pass
+
 class Load(Expression):
     pass
 

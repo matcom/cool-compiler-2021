@@ -6,7 +6,6 @@ from ...semantic.v2_semantic_checking import semantic_checking_ast as AST
 from . import type_data_code_ast as ASTR
 from .type_data_code_ast import result, super_value
 
-
 CoolInt = CoolTypeBuildInManager().find("Int")
 CoolBool = CoolTypeBuildInManager().find("Bool")
 CoolStr = CoolTypeBuildInManager().find("String")
@@ -71,27 +70,27 @@ class CILGenerate:
         
         self.program.add_type(self.currentType)
 
-        type_list = [self.map_type(node.type.name)]
+        type_list = []
         for parent in parent_list(node):
             type_list.append(self.map_type(parent.name))
             self.currentType.attr_push('type', self.currentType.name)
             for attr in parent.attributes:
-                self.currentType.attr_push(attr.name, f'{parent.name}_{attr.name}')
+                self.currentType.attr_push(attr.name, f'{parent.name}@{attr.name}')
             for func in parent.methods:
                 self.currentType.method_push(func.name, f'{parent.name}_{func.name}')
         
         self.program.data[f'{node.type.name}_parents'] = ASTR.Data(f'{node.type.name}_parents', type_list)
-        self.program.data[f'{node.type.name}_name'] = ASTR.Data(f'{node.type.name}_name', node.type.name)
+        self.program.data_list += [f'{node.type.name}_parents']
 
+        self.new_type_func.force_parma('self', self.new_class_scope)
         self.new_type_func.force_local('instance', self.new_class_scope)
         tn = self.new_type_func.local_push('type_name', self.new_class_scope)
         self.new_type_func.expr_push(ASTR.ALLOCATE('instance', node.type.name))
         self.new_type_func.expr_push(ASTR.Comment(f'Reservando memoria para una instancia de tipo {node.type.name}'))
-        self.new_type_func.expr_push(ASTR.Load(tn, f'{node.type.name}_name'))
+        self.new_type_func.expr_push(ASTR.Load(tn, f'{node.type.name}_parents'))
         self.new_type_func.expr_push(ASTR.Comment(f'Cargando el nombre del tipo desde el data'))
         self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type', tn))
         self.new_type_func.expr_push(ASTR.Comment(f'Assignando el nombre del tipo en el campo type'))
-
 
         for feat in node.feature_list:
             self.visit(feat, self.class_scope)
@@ -99,7 +98,7 @@ class CILGenerate:
         if node.type.name == 'Main':
             self.new_type_func.force_local(result, self.new_class_scope)
             self.new_type_func.expr_push(ASTR.Arg('instance'))
-            self.new_type_func.expr_push(ASTR.VCall(result, 'Main', 'Main_main'))
+            self.new_type_func.expr_push(ASTR.VCall(result, 'Main', 'main'))
             self.new_type_func.expr_push(ASTR.Return(0))
         else:
             self.new_type_func.expr_push(ASTR.Return('instance'))
@@ -108,8 +107,11 @@ class CILGenerate:
     
     @visitor.when(AST.AtrDef)
     def visit(self, node: AST.AtrDef, scope: Scope):
-        if not node.expr is None:
-            save_current_func = self.currentFunc
+        if not node.expr in [None, []]:
+            try: 
+                save_current_func = self.currentFunc
+            except AttributeError:
+                save_current_func = None
             self.currentFunc = self.new_type_func
             attr_name = self.new_type_func.local_push(node.name, self.new_class_scope)
             exp_list = self.visit(node.expr, self.new_class_scope)
@@ -158,7 +160,7 @@ class CILGenerate:
             instance_expr_list.append(ASTR.Arg(arg))
             instance_expr_list.append(f'Agrega a la pila el paramentro {i} al CastingDispatch {node.id}')
 
-        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, self.currentType.methods[node.id]))
+        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, node.id))
         return instance_expr_list
     
     @visitor.when(AST.Dispatch)
@@ -181,7 +183,7 @@ class CILGenerate:
             instance_expr_list.append(ASTR.Arg(arg))
             instance_expr_list.append(f'Agrega a la pila el paramentro {i} al Dispatch {node.id}')
         
-        instance_expr_list.append(ASTR.VCall(super_value, node.type.name, self.currentType.methods[node.id]))
+        instance_expr_list.append(ASTR.Call(super_value, node.id))
         return instance_expr_list
     
     @visitor.when(AST.StaticDispatch)
@@ -199,7 +201,7 @@ class CILGenerate:
             param_expr_list.append(ASTR.Arg(arg))
             param_expr_list.append(ASTR.Comment(f'Agrega a la pila el paramentro {i} al StaticDispatch {node.id}'))
         
-        param_expr_list.append(ASTR.VCall(super_value, self.currentClass.name, self.currentType.methods[node.id]))
+        param_expr_list.append(ASTR.VCall(super_value, self.currentClass.name, node.id))
         return param_expr_list
     
 
@@ -239,8 +241,8 @@ class CILGenerate:
         expr_list += else_list + [ASTR.GoTo(label_fin), ASTR.Label(label_then)]
         
         expr_list.append(ASTR.Comment(f'Then case'))
-        then_list = self.visit(node.then_expr) 
-        then_list[-1].set_value(result_if, scope)
+        then_list = self.visit(node.then_expr, scope) 
+        then_list[-1].set_value(result_if)
         
         expr_list += then_list + [ASTR.Label(label_fin)]
         expr_list.append(ASTR.Comment(f'Fin de un If'))
@@ -332,7 +334,7 @@ class CILGenerate:
         step_case = self.currentFunc.local_push('step@case', scope)
         for name, atype , expr in node.case_list:
             step_label = new_name(f'{atype.name}_step_case', self.label_list)
-            expr_cond_list.append(ASTR.CheckType(step_case, type_result, atype.name))
+            expr_cond_list.append(ASTR.CheckType(step_case, type_result, self.map_type(atype.name)))
             expr_cond_list.append(ASTR.Comment(f'Check case tipo {atype.name} en un case'))
             expr_cond_list.append(ASTR.IfGoTo(step_case, step_label))
             
@@ -353,7 +355,7 @@ class CILGenerate:
 
     @visitor.when(AST.Case)
     def visit(self, node: AST.Case, scope: Scope):
-        expr_cond_list = self.visit(node.expr)
+        expr_cond_list = self.visit(node.expr, scope)
 
         result = self.basic_cond_case(node, scope, expr_cond_list)
         if any(result): return result
@@ -447,6 +449,7 @@ class CILGenerate:
         var = scope.find_variable(node.item)
         if not var is None:
             return [ASTR.Assign(super_value, var.type)]
+        
         else:
             return [ASTR.GetAttr(super_value, 'self', self.currentType.attr[node.item])]
 

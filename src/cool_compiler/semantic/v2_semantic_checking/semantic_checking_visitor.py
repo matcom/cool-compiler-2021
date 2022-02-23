@@ -54,11 +54,11 @@ class CoolSemanticChecking(VisitBase):
                 error_handler().add_semantic_error(f"the {node.name} attribute breaks the polymorphism rule")  
         except SemanticError as se:
             pass 
-
+ 
         expr = self.visit(node.expr, scope)
         if expr and not self.type_checking(node.type, expr.static_type):
             error_handler().add_type_error(f"can't save {expr.static_type.name} into {node.type.name}")  
-
+        
         return node.name, node.type, expr
    
     @visitor.when(AST.FuncDef)

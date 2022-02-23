@@ -31,7 +31,7 @@ with open(path, 'r') as _file:
     ast = parser.parse(iter(tokens))
     if errors.any(): sys.exit(1)
 
-    visitorList = [ CreateType, SemanticChecking, CILGenerate]#, MipsGenerate ]
+    visitorList = [ CreateType, SemanticChecking, CILGenerate, MipsGenerate ]
  
     for visitorClass in visitorList:
         ast  = visitorClass(errors).visit(ast)

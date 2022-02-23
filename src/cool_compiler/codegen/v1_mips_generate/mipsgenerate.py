@@ -1,8 +1,6 @@
-from cool_compiler.types.type import Type
 from ...cmp import visitor
 from ..v0_type_data_code import type_data_code_ast as AST
 from . import mipsgenerate_ast as ASTR
-from ..v0_type_data_code.type_data_code_ast import GoTo, Label, result, super_value
 
 class MipsGenerate: 
     def __init__(self, errors) -> None:
@@ -62,7 +60,6 @@ class MipsGenerate:
     def visit(self, node: AST.Param):
         self.stack.append(node.x)
         return [ASTR.Header_Comment(f'Parametro {node.x} en stackpoiner + {(self.final_len_stack - len(self.stack)) * 4}')]  
-   
 
     @visitor.when(AST.Local)
     def visit(self, node: AST.Local):
@@ -78,14 +75,69 @@ class MipsGenerate:
         memory_dir = node.x
         _type = node.y
 
-        stack_plus = self.stack_index(memory_dir) 
-        _len = len(self.cil_type[_type].attributes)
+        stack_plus = self.stack_index(memory_dir)
+        attr_list = self.cil_type[_type].attributes 
+        _len = len(attr_list) * 4 + 4
 
-        return [
+        result = [
+            ASTR.Header_Comment(f"Allocate a una class {_type} puntero en sp + {stack_plus}"),
+            ASTR.Header_Comment(f"atributo type en puntero + 0"),
+        ]
+
+        for i, attr in enumerate(attr_list):
+            result.append(ASTR.Header_Comment(f'atributo {attr} en puntero + {i + 1 * 4}'))
+
+        return result + [
             ASTR.LI('$a0', _len),
             ASTR.LI('$v0', 9),
             ASTR.SysCall(),
             ASTR.SW('$v0', f'{stack_plus}($sp)')
+        ]
+
+    @visitor.when(AST.GetAttr)
+    def visit(self, node: AST.GetAttr):
+        memory_dest = node.x
+        memory_dir_instance = node.y
+        attr_name = node.z.split('@')
+        _type = attr_name[0]
+        attr = attr_name[1]
+
+        stack_plus_dest = self.stack_index(memory_dest)
+        stack_plus_instance = self.stack_index(memory_dir_instance)
+        attr_plus = self.cil_type[_type].attributes.index(attr) * 4 + 4
+
+        return [
+            ASTR.LW('$t0', f'{stack_plus_instance}($sp)'),
+            ASTR.Comment(f'Buscando la instancia de la clase {_type} en la pila'),
+            ASTR.LW('$t1', f'{attr_plus}($t0)'),
+            ASTR.Comment(f'Buscando el valor de la propiedad {attr}'),
+            ASTR.SW('$t1', f'{stack_plus_dest}($sp)'),
+            ASTR.Comment(f'Salvando el valor de la propiedad {attr} en la pila en el valor local {memory_dest}'),
+        ]
+    
+    @visitor.when(AST.SetAttr)
+    def visit(self, node: AST.SetAttr):
+        if node.y == 'type': 
+            attr_plus = 0
+        else: 
+            attr_name = node.z.split('@')
+            _type = attr_name[0]
+            attr = attr_name[1]
+            attr_plus = self.cil_type[_type].attributes.index(attr) * 4 + 4
+
+        memory_dir_instance = node.x
+        memory_dir_value = node.z
+
+        stack_plus_dir_value = self.stack_index(memory_dir_value)
+        stack_plus_instance = self.stack_index(memory_dir_instance)
+
+        return [
+            ASTR.LW('$t0', f'{stack_plus_instance}($sp)'),
+            ASTR.Comment(f'Buscando la instancia en la pila {node.x}'),
+            ASTR.LW('$t1', f'{stack_plus_dir_value}($sp)'),
+            ASTR.Comment(f'Buscando el valor que se va a guardar en la propiedad'),
+            ASTR.SW('$t1', f'{attr_plus}($t0)'),
+            ASTR.Comment(f'Seteando el valor en la direccion de la memoria del objeto'),
         ]
 
     @visitor.when(AST.Arg)
@@ -108,7 +160,7 @@ class MipsGenerate:
     def visit(self, node: AST.VCall):
         memory_dest = node.x
         _type = node.y
-        func = node.z
+        func = self.cil_type[_type].methods[node.z]
 
         self.func_list.append(func)
         self.stack = self.stack[0: len(self.stack) - self.local_push]
@@ -143,15 +195,15 @@ class MipsGenerate:
     def visit(self, node: AST.Load):
         memory_dest = node.x
         data_label = node.y
-        
-        self.new_program.data[data_label] = ASTR.Data('word', data_label, self.cil_data[data_label].value)
+                
+        self.new_program.data[data_label] = ASTR.Data(data_label, self.cil_data[data_label].value)
         stack_plus = self.stack_index(memory_dest)
 
         return [
             ASTR.LA('$t0', data_label),
             ASTR.SW('$t0', f'{stack_plus}($sp)')
         ]
-    
+
     @visitor.when(AST.Comment)
     def visit(self, node: AST.Comment):
         return [ASTR.Comment(node.x)]
@@ -290,7 +342,7 @@ class MipsGenerate:
 
 
     @ visitor.when(AST.GoTo)
-    def visitor(self,node:GoTo):
+    def visitor(self,node:AST.GoTo):
         label = node.x
         return [ASTR.Jump (label),
                 ASTR.Comment("Salta para f{label} ")
