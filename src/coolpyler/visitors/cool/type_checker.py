@@ -197,7 +197,6 @@ class TypeCheckerVisitor:
             )
 
         for arg, ptype in zip(args, method.param_types):
-            args.append(arg)
             if not arg.type.conforms_to(ptype):
                 self.errors.append(
                     errors.IncompatibleTypesError(

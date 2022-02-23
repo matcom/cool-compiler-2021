@@ -52,30 +52,34 @@ class CoolToCilVisitor(object):
         # TODO
         methods = node.type.all_methods()
         attributes = node.type.all_attributes()
-        dottype = cil.TypeNode(node.type, attributes, methods)
+        dottype = cil.TypeNode(node.type.name, attributes, methods)
 
         constructor_locals, constructor_instructions = [], []
         for feat in node.features:
-            self.locals, self.named_locals = [], {}
-            self.visit(feat)
+            self.instructions, self.locals, self.named_locals = [], [], {}
             if isinstance(feat, type_checked.CoolAttrDeclNode):
+                self.visit(feat) # type: ignore
                 constructor_locals.extend(self.locals)
                 constructor_instructions.extend(self.instructions)
             if isinstance(feat, type_checked.CoolMethodDeclNode):
-                params = [cil.ParamNode(self.get_param("self"))] + [
-                    cil.ParamNode(self.get_param(name))
-                    for name in feat.method_info.param_names
+                param_list = [self.get_param("self")] + [
+                    self.get_param(name) for name in feat.method_info.param_names
                 ]
+                self.params = set(param_list)
+                self.visit(feat) # type: ignore
                 self.dotcode.append(
                     cil.FunctionNode(
-                        feat.method_info.name, params, self.locals, self.instructions
+                        feat.method_info.name,
+                        [cil.ParamNode(name) for name in param_list],
+                        self.locals,
+                        self.instructions,
                     )
                 )
 
         self.dotcode.append(
             cil.FunctionNode(
                 contructor_for(node.type.name),
-                cil.ParamNode(self.get_param("self")),
+                [cil.ParamNode(self.get_param("self"))],
                 constructor_locals,
                 constructor_instructions,
             )
@@ -85,7 +89,9 @@ class CoolToCilVisitor(object):
     @visitor.when(type_checked.CoolAttrDeclNode)
     def visit(self, node: type_checked.CoolAttrDeclNode) -> str:  # type: ignore
         sid = self.visit(node.body)
-        self.instructions.append(cil.SetAttrNode(self.get_param("self"), node.attr_info.name, sid))
+        self.instructions.append(
+            cil.SetAttrNode(self.get_param("self"), node.attr_info.name, sid)
+        )
         return sid
 
     @visitor.when(type_checked.CoolMethodDeclNode)
@@ -112,7 +118,8 @@ class CoolToCilVisitor(object):
             arg_sid = self.visit(arg_expr)
             args.append(cil.ArgNode(arg_sid))
 
-        self.instructions.append(cil.DynamicCallNode(node.expr.type, node.id, sid))
+        self.instructions.extend(args)
+        self.instructions.append(cil.DynamicCallNode(node.expr.type.name, node.id, return_local))
         return return_local
 
     @visitor.when(type_checked.CoolIfThenElseNode)
@@ -205,7 +212,7 @@ class CoolToCilVisitor(object):
         data_id = self.get_data()
         return_sid = self.get_local()
 
-        self.dotdata.append(cil.DataNode(data_id, node.value))
+        self.dotdata.append(cil.DataNode(data_id, repr(node.value)))
         self.locals.append(cil.LocalNode(return_sid))
 
         self.instructions.append(cil.LoadNode(return_sid, data_id))

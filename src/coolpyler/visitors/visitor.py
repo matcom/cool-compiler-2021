@@ -1,3 +1,4 @@
+from coolpyler.visitors.cil.debug import CILDebug
 from coolpyler.visitors.cool.cool_to_cil import CoolToCilVisitor
 from coolpyler.visitors.cool.type_builder import TypeBuilderVisitor
 from coolpyler.visitors.cool.type_checker import TypeCheckerVisitor
@@ -12,7 +13,7 @@ class Visitor:
             TypeBuilderVisitor(errors),
             TypeCheckerVisitor(errors),
         ]
-        self.visitors_down = [CoolToCilVisitor(errors)]
+        self.visitors_down = [CoolToCilVisitor(errors), CILDebug()]
 
     def visit_up(self, ast):
         for visitor in self.visitors_up:
