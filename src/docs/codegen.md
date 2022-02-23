@@ -41,6 +41,8 @@ $$
 &|& \text{Atom / Atom}\\
 &|& \text{not Atom}\\
 &|& \text{neg Atom}\\
+&|& \text{typeOf id}\\
+&|& \text{allocate typeId}\\
 &|& \text{Atom < Atom}\\
 &|& \text{Atom <= Atom}\\
 &|& \text{Atom = Atom}\\
@@ -251,11 +253,13 @@ esac
 
 <do_case_expr>
 x = <case_expr_result>
+
+# Pattern Match Logic!
 t = typeof x
 label init_case # This is not really needed
 t1 = typeof <id1>
 b1 = t1 == t # Comparing types, they must be all equal
-if b1 goto branch1
+if b1 goto branch1:
 
 t2 = typeof <id2>
 b2 = t2 == t
@@ -268,6 +272,7 @@ bn = tn == t
 if bn goto brannch
 # It is not possible to avoid pattern matching
 
+# Branch Logic
 label branch1
 <do_expr1>
 goto end_case
@@ -430,7 +435,8 @@ t1 = 3 + t1
 ```
 
 ```assembly
-t1 = 
+t = 3 - 5
+t = t - 7 
 ```
 
 ----
@@ -444,6 +450,9 @@ t1 =
 **CCIL Output**
 
 ```
+t = 100 / 20
+t = t / 5
+t = t / 2
 ```
 
 
