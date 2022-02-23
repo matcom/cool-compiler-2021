@@ -11,17 +11,13 @@ class BaseCiltoMipsVisitor:
         
         
 
-
-    # ======================================================================
-    # =[ VISIT ]============================================================
-    # ======================================================================
-
     @visitor.on('node')
     def visit(self, node):
         pass
 
     @visitor.when(ProgramNode)
     def visit(self, node):
+
         pass
 
     @visitor.when(TypeNode)

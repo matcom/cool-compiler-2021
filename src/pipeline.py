@@ -50,7 +50,7 @@ class Pipeline():
                 self.typeChecker.visit( self.ast, scope)
             self.coolToCil = COOLToCILVisitor(self.context)
             cil_ast = self.coolToCil.visit(self.ast, scope)
-            print(get_formatter(cil_ast))
+            # print(get_formatter(cil_ast))
 
         if verbose:
             print('This is after infering types:')

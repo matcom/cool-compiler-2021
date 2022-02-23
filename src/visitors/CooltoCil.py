@@ -29,9 +29,6 @@ class BaseCOOLToCILVisitor:
             xtype.attrs[key] = i
         return xtype.attrs
     
-    def instanciate_builtin(self):
-        a = 0
-    
     @property
     def params(self):
         return self.current_function.params
@@ -77,7 +74,10 @@ class BaseCOOLToCILVisitor:
         self.dotdata.append(data_node)
         return data_node
 
-
+    def create_ctr(self, type):
+        self.current_function = self.register_function(self.to_function_name('ctor', self.current_type.name))
+        self.register_instruction(cil.ParamNode('self'))
+        
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
     def visit(self, node):
