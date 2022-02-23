@@ -116,6 +116,8 @@ class FalseNode(AtomicNode):
     pass
 class StringNode(AtomicNode):
     pass
+class VoidNode(AtomicNode):
+    pass
 class AutoTypeNode(AtomicNode):
     pass
 

@@ -25,9 +25,6 @@ class BaseCOOLToCILVisitor:
             xtype.attrs[key] = i
         return xtype.attrs
     
-    def instanciate_builtin(self):
-        a = 0
-    
     @property
     def params(self):
         return self.current_function.params
@@ -73,7 +70,20 @@ class BaseCOOLToCILVisitor:
         self.dotdata.append(data_node)
         return data_node
 
+    def create_ctr(self, class_node, scope):
+        attrs = [att for att in class_node.features if isinstance(att, AttrDeclarationNode)]
+        while True:
+            break
+        self.current_function = self.register_function(self.to_function_name('ctor', self.current_type.name))
+        self.register_instruction(cil.ParamNode('self'))
 
+        for i, attr in enumerate(attrs):
+            set_attr_node = self.visit(attr, scope)
+            set_attr_node.index = i
+            self.register_instruction(set_attr_node)
+        self.register_instruction(cil.ReturnNode(VariableInfo('self', self.current_type)))
+        
+        
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
     def visit(self, node):
@@ -160,12 +170,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             
         self.attrs = self.transform_to_keys(type_node, attributes)# type_node.attributes = attributes
         type_node.methods = methods
+        self.create_ctr(node, scope)
         
         # attributes
-        for feature, child_scope in zip(node.features, scope.children):
-            if isinstance(feature, FuncDeclarationNode):
-                continue
-            self.visit(feature, child_scope)
+        # for feature, child_scope in zip(node.features, scope.children):
+        #     if isinstance(feature, FuncDeclarationNode):
+        #         continue
+        #     self.visit(feature, child_scope)
         
         # func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
         for feature, child_scope in zip(node.features, scope.children):
@@ -183,18 +194,40 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.value = ExpressionNode
         ###############################
+        # local function to determine the default value of an attribute given its type
+        def default_value_init(type):
+            if type == 'Int':
+                return ConstantNumNode(0)
+            elif type == 'Bool':
+                return FalseNode()
+            elif type == 'String':
+                return StringNode("")
+            else:
+                return VoidNode()
         if node.value:
-            value = self.visit(node.value)
-        elif node.type in ["Int", "String", "Object", "IO", "Bool"]:
-            value = self.define_internal_local()
-            self.register_instruction(cil.AllocateNode(node.type, value))
+            value = self.visit(node.value, scope)
+
         else:
-            value = self.define_internal_local()
-            self.register_instruction(cil.AllocateNode("Void", value))
-        #revisar que poner como el attr del SettAttribnode
+            default_value = default_value_init(node.type)
+            if isinstance(default_value, VoidNode):
+                value = 'void'
+            else:
+                value = self.visit(default_value, scope)
+            self_ref = VariableInfo('self', self.current_type)
+            self_ref.index = 0
+            return cil.SetAttribNode(self_ref, node.id, value)
         
-        attr = self.attrs[node.id]
-        self.register_instruction(cil.SetAttribNode(self.instances[-1], attr, value))
+        ## old code
+        # elif node.type in ["Int", "String", "Object", "IO", "Bool"]:
+        #     value = self.define_internal_local()
+        #     self.register_instruction(cil.AllocateNode(node.type, value))
+        # else:
+        #     value = self.define_internal_local()
+        #     self.register_instruction(cil.AllocateNode("Void", value))
+        # #revisar que poner como el attr del SettAttribnode
+        
+        # attr = self.attrs[node.id]
+        # self.register_instruction(cil.SetAttribNode(self.instances[-1], attr, value))
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
