@@ -288,6 +288,7 @@ class Complemnet(Expression):
     pass
 
 class Comment(Expression):
-    pass
+    def __str__(self) -> str:
+        return ""
 
 

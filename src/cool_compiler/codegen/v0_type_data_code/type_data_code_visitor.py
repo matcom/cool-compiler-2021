@@ -27,11 +27,11 @@ def new_name(name, _dict):
     index = 0
     while True:
         try: 
-            _ = _dict[f'{name}@{index}']
+            _ = _dict[f'{name}_{index}']
             index += 1
         except KeyError:
-            _dict[f'{name}@{index}'] = 1
-            return f'{name}@{index}'
+            _dict[f'{name}_{index}'] = 1
+            return f'{name}_{index}'
 
 class CILGenerate: 
     def __init__(self, errors) -> None:
@@ -229,8 +229,8 @@ class CILGenerate:
         expr_list.append(ASTR.Comment(f'Fin de la evaluacion de la condicion de un IF'))
         result_if = self.currentFunc.local_push('result@if', scope)
 
-        label_then = new_name(f'then@{self.currentFunc.name}')
-        label_fin = new_name(f'fin@{self.currentFunc.name}')
+        label_then = new_name(f'then_{self.currentFunc.name}', self.label_list)
+        label_fin = new_name(f'fin_{self.currentFunc.name}', self.label_list)
         expr_list.append(ASTR.IfGoTo(cond_result, label_then))
         
         expr_list.append(ASTR.Comment(f'Else case'))
@@ -249,12 +249,14 @@ class CILGenerate:
     
     @visitor.when(AST.While)
     def visit(self, node: AST.While, scope: Scope):
-        while_cond = new_name('while@cond', self.label_list)
-        while_back = new_name('while@back', self.label_list)
+        while_cond = new_name('while_cond', self.label_list)
+        while_back = new_name('while_back', self.label_list)
 
-        result_list.append(ASTR.Comment(f'Inicio de un While'))
-        result_list = [ASTR.GoTo(while_cond), ASTR.Label(while_back)]
+        result_local = self.currentFunc.local_push('result@while', scope)
+
+        result_list = [ASTR.Comment(f'Inicio de un While'), ASTR.GoTo(while_cond), ASTR.Label(while_back)]
         result_list += self.visit(node.loop_expr, scope)
+        result_list[-1].set_value(result_local)
         result_list += [ASTR.Label(while_cond)]
         result_list.append(ASTR.Comment(f'Fin del cuerpo e inicio de la condicion de un While'))
 
@@ -449,12 +451,10 @@ class CILGenerate:
             return [ASTR.GetAttr(super_value, 'self', self.currentType.attr[node.item])]
 
     @visitor.when(AST.Int)
-    @visitor.result(ASTR.Int)
     def visit(self, node: AST.Int, scope: Scope) -> ASTR.Node:
         return [ASTR.Assign(super_value, node.item)]
 
     @visitor.when(AST.Bool)
-    @visitor.result(ASTR.Bool)
     def visit(self, node: AST.Bool, scope: Scope) -> ASTR.Node:
         if node.item == 'True': value = 1
         else: value = 0

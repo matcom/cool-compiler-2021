@@ -13,7 +13,7 @@ path = ""
 if len(sys.argv) > 1:
     path = sys.argv[1]
 
-path = "test.cl"
+# path = "test.cl"
 
 with open(path, 'r') as _file:
     text = _file.read()
@@ -31,13 +31,13 @@ with open(path, 'r') as _file:
     ast = parser.parse(iter(tokens))
     if errors.any(): sys.exit(1)
 
-    visitorList = [ CreateType, SemanticChecking, CILGenerate, MipsGenerate ]
+    visitorList = [ CreateType, SemanticChecking, CILGenerate]#, MipsGenerate ]
  
     for visitorClass in visitorList:
         ast  = visitorClass(errors).visit(ast)
         if errors.any(): sys.exit(1)
         
 
-with open(path.replace('.cl', '.s'), '+w') as _file:    
+with open(path.replace('.cl', '.mips'), '+w') as _file:    
     _file.write(str(ast))
     _file.close()

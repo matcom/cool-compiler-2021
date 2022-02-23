@@ -25,7 +25,7 @@ class Data:
         self.value = value
     
     def __str__(self) -> str:
-        if self.value[-1] == '\n': self.value = self.value[0:-1]
+        if self.value[-1] == '\n': self.value = self.value[0:-1] + '\\n'
         if(type(self.value==type("string"))):
             return f'{self.name}: .asciiz \"{str(self.value)}\"'
 
