@@ -17,6 +17,7 @@ path = "test.cl"
 
 with open(path, 'r') as _file:
     text = _file.read()
+    _file.close()
     errors = CoolError(text)
     lexer = CoolLexer(errors)
     type_manager = CoolTypeBuildInManager()
@@ -37,8 +38,6 @@ with open(path, 'r') as _file:
         if errors.any(): sys.exit(1)
         
 
-
-   
-    print(ast)
-    #print(ast)
-    
+with open(path.replace('.cl', '.s'), '+w') as _file:    
+    _file.write(str(ast))
+    _file.close()
