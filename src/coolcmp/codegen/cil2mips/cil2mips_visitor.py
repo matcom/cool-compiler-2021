@@ -44,13 +44,11 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ProgramNode)
     def collect_function_names(self, node: cil.ProgramNode):
-        print("function_name: ProgramNode")
         for f in node.dot_code:
             self.collect_function_names(f)
 
     @visitor.when(cil.FunctionNode)
     def collect_function_names(self, node: cil.FunctionNode):
-        print("function_name: FunctionNode")
         self.function_names[node.name] = "main" if node.name == "entry" else node.name
 
     @visitor.when(cil.ProgramNode)
@@ -84,23 +82,17 @@ class CILToMipsVisitor:
             if self.function_names.get(i)
         ]
 
-        defaults = (
-            []
-            if node.name == "String"
-            else [("value", "default_str"), ("len", "type_4_proto")]
-        )
-        print(methods, defaults)
-
         type_ = mips.Type(
             type_label,
             new_label,
             list(node.attributes),
             methods,
             len(self.types),
-            defaults,
+            [],
         )
 
         self.types[node.name] = type_
+        print("TYPES", [(i, str(j)) for i, j in self.types.items()])
 
     @visitor.when(cil.DataNode)
     def visit(self, node: cil.DataNode):
@@ -110,9 +102,7 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
-        print(
-            f"FunctionNode {node.name} {node.params} {node.local_vars} {node.instructions}"
-        )
+        print(f"FunctionNode {node.name}")
         function_label = self.function_names[node.name]
         params = [x.name for x in node.params]
         local_vars = [x.name for x in node.local_vars]
@@ -124,13 +114,20 @@ class CILToMipsVisitor:
         self.cur_function = function_node
         self.labels = {}
 
-        instructions = [f"# code for function {self.function_names[node.name]}..."]
+        instructions = [f"# start of function {self.function_names[node.name]}"]
+        # Push local vars
+        instructions.extend(registers.push_register_instructions(registers.RA))
+        instructions.extend(registers.push_register_instructions(registers.FP))
+        instructions.append(mips.ADDINode(registers.FP, registers.SP, 4))
+        instructions.append(mips.ADDINode(registers.SP, registers.SP, -local_vars_size))
 
         for instruction in node.instructions:
             instructions.extend(self.visit(instruction))
 
         function_node.instructions = instructions
         self.cur_function = None
+
+        instructions.extend([f"# end of function {self.function_names[node.name]}"])
         return instructions
 
     @visitor.when(cil.AllocateNode)
@@ -138,14 +135,13 @@ class CILToMipsVisitor:
         print(f"AllocateNode {node.type} {node.dest}")
 
         # TODO: Finish this
-        print(self.types)
-        # type_ = node.type if isinstance(node.type, int) else self.types[node.type].index
+        type_ = node.type if isinstance(node.type, int) else self.types[node.type].index
 
         reg_t0 = registers.T[0]
         reg_t1 = registers.T[1]
         v0 = registers.V0
 
-        # li = mips.LINode(reg_t0, type_)
+        li = mips.LINode(reg_t0, type_)
         # sw = mips.SWNode(
         #     v0,
         # )
@@ -158,7 +154,17 @@ class CILToMipsVisitor:
     def visit(self, node: cil.ReturnNode):
         value = 0 if node.value is None else node.value
 
-        return [mips.LINode(registers.V0, value)]
+        if node.value is None:
+            value = 0
+        elif isinstance(node.value, int):
+            value = node.value
+        else:
+            pass
+        # TODO: Handle returns
+
+        jr = mips.JRNode()
+
+        return [jr]
 
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
@@ -168,8 +174,17 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.PrintStringNode)
     def visit(self, node: cil.PrintStringNode):
-        print(f"PrintStringNode {node.addr}")
-        return ["# print string instructions"]
+        """
+        li $v0, 4
+        la $a0, str
+        syscall
+        """
+        print("FUNCTIONS: ", self.data)
+        li = mips.LINode(registers.V0, 4)
+        la = mips.LANode(registers.A0, node.addr)
+        syscall = mips.SysCallNode()
+
+        return [li, la, syscall]
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):

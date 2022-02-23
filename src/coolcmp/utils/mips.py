@@ -21,11 +21,6 @@ class FunctionNode(Node):
         self.local_vars = local_vars
         self.instructions = []
 
-    def parameter_address(self, name):
-        """
-        Get the
-        """
-
 
 class InstructionNode(Node):
     pass
@@ -43,15 +38,56 @@ class StringNode(DataNode):
 
 
 class SWNode(Node):
-    def __init__(self, reg, address):
-        self.reg = reg
-        self.address = address
+    def __init__(self, dest: str, offset: int, src: str):
+        self.dest = dest
+        self.offset = offset
+        self.src = src
+
+
+class LWNode(Node):
+    def __init__(self, dest: str, offset: int, src: str):
+        self.dest = dest
+        self.offset = offset
+        self.src = src
 
 
 class LINode(Node):
     def __init__(self, reg, value):
         self.reg = reg
         self.value = value
+
+
+class JALNode(Node):
+    def __init__(self, dest):
+        self.dest = dest
+
+
+class LANode(Node):
+    def __init__(self, reg, value):
+        self.reg = reg
+        self.value = value
+
+
+class ADDNode(Node):
+    def __init__(self, dest, src1, src2):
+        self.dest = dest
+        self.src1 = src1
+        self.src2 = src2
+
+
+class ADDINode(Node):
+    def __init__(self, dest, src, isrc):
+        self.dest = dest
+        self.src = src
+        self.isrc = isrc
+
+
+class JRNode(Node):
+    pass
+
+
+class SysCallNode(Node):
+    pass
 
 
 class Type:

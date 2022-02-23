@@ -8,10 +8,12 @@ class Node:
 
 
 class ProgramNode(Node):
-    def __init__(self,
-                 dot_types: list[TypeNode],
-                 dot_data: list[DataNode],
-                 dot_code: list[FunctionNode]):
+    def __init__(
+        self,
+        dot_types: list[TypeNode],
+        dot_data: list[DataNode],
+        dot_code: list[FunctionNode],
+    ):
         self.dot_types = dot_types
         self.dot_data = dot_data
         self.dot_code = dot_code
@@ -25,11 +27,11 @@ class ProgramNode(Node):
         for data in self.dot_data:
             if data.value == value:
                 return data.name
-        raise ValueError(f'No data defined for value {value}')
+        raise ValueError(f"No data defined for value {value}")
 
     def set_data(self, value: str):
         if value not in [data.value for data in self.dot_data]:
-            self.dot_data.append(DataNode(f's{len(self.dot_data) + 1}', value))
+            self.dot_data.append(DataNode(f"s{len(self.dot_data) + 1}", value))
 
 
 class TypeNode(Node):
@@ -55,11 +57,13 @@ class DataNode(Node):
 
 
 class FunctionNode(Node):
-    def __init__(self,
-                 name: str,
-                 params: list[ParamNode],
-                 local_vars: list[LocalNode],
-                 instructions: list[InstructionNode]):
+    def __init__(
+        self,
+        name: str,
+        params: list[ParamNode],
+        local_vars: list[LocalNode],
+        instructions: list[InstructionNode],
+    ):
         self.name = name
         self.params = params
         self.local_vars = local_vars
