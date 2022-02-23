@@ -1,6 +1,8 @@
 from __future__ import annotations
+from typing import Dict, List
 
-from coolcmp.utils import ast
+from coolcmp.utils import mips
+from coolcmp.utils.registers import Register
 
 
 class Node:
@@ -8,14 +10,19 @@ class Node:
 
 
 class ProgramNode(Node):
-    def __init__(self, data, types, functions):
+    def __init__(
+        self,
+        data: Dict[str, mips.Node],
+        types: Dict[str, mips.Type],
+        functions: Dict[str, mips.FunctionNode],
+    ):
         self.data = data
         self.types = types
         self.functions = functions
 
 
 class FunctionNode(Node):
-    def __init__(self, name, params, local_vars):
+    def __init__(self, name: str, params: List[str], local_vars: List[str]):
         self.name = name
         self.params = params
         self.local_vars = local_vars
@@ -27,7 +34,7 @@ class InstructionNode(Node):
 
 
 class DataNode(Node):
-    def __init__(self, label):
+    def __init__(self, label: str):
         self.label = label
 
 
@@ -38,45 +45,50 @@ class StringNode(DataNode):
 
 
 class SWNode(Node):
-    def __init__(self, dest: str, offset: int, src: str):
+    def __init__(self, dest: Register, offset: int, src: Register):
         self.dest = dest
         self.offset = offset
         self.src = src
 
 
 class LWNode(Node):
-    def __init__(self, dest: str, offset: int, src: str):
+    def __init__(self, dest: Register, offset: int, src: Register):
         self.dest = dest
         self.offset = offset
         self.src = src
 
 
 class LINode(Node):
-    def __init__(self, reg, value):
+    def __init__(self, reg: Register, value: int):
         self.reg = reg
         self.value = value
 
 
 class JALNode(Node):
-    def __init__(self, dest):
+    def __init__(self, dest: str):
         self.dest = dest
 
 
 class LANode(Node):
-    def __init__(self, reg, value):
+    def __init__(self, reg: Register, value: int):
         self.reg = reg
         self.value = value
 
 
 class ADDNode(Node):
-    def __init__(self, dest, src1, src2):
+    def __init__(
+        self,
+        dest: Register,
+        src1: Register,
+        src2: Register,
+    ):
         self.dest = dest
         self.src1 = src1
         self.src2 = src2
 
 
 class ADDINode(Node):
-    def __init__(self, dest, src, isrc):
+    def __init__(self, dest: Register, src: Register, isrc: Register):
         self.dest = dest
         self.src = src
         self.isrc = isrc

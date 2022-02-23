@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Dict
 
 from coolcmp.utils import cil, visitor
 from coolcmp.utils import mips, registers
@@ -21,12 +22,12 @@ class LabelUUID:
 
 class CILToMipsVisitor:
     def __init__(self):
-        self.data = {}
-        self.types = {}
-        self.functions = {}
-        self.cur_function = None
+        self.data: Dict[str, mips.Node] = {}
+        self.types: Dict[str, mips.Type] = {}
+        self.functions: Dict[str, mips.FunctionNode] = {}
+        self.cur_function: mips.FunctionNode = None
 
-        self.function_names = {}
+        self.function_names: Dict[str, str] = {}
 
         self.data_label_gen = LabelUUID("data")
         self.types_label_gen = LabelUUID("type")
@@ -92,7 +93,6 @@ class CILToMipsVisitor:
         )
 
         self.types[node.name] = type_
-        print("TYPES", [(i, str(j)) for i, j in self.types.items()])
 
     @visitor.when(cil.DataNode)
     def visit(self, node: cil.DataNode):
@@ -179,7 +179,6 @@ class CILToMipsVisitor:
         la $a0, str
         syscall
         """
-        print("FUNCTIONS: ", self.data)
         li = mips.LINode(registers.V0, 4)
         la = mips.LANode(registers.A0, node.addr)
         syscall = mips.SysCallNode()
