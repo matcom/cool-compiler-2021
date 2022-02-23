@@ -124,7 +124,7 @@ class TypeBuilder:
         p_Object = self.context.get_type("Object")
         p_String = self.context.get_type("String")
         p_Int = self.context.get_type("Int")
-        p_Self = TypeBag({SelfType()})
+        p_Self = self.context.get_type("SELF_TYPE")  # TypeBag({SelfType()})
 
         Object.define_method("abort", [], [], p_Object)
         Object.define_method("type_name", [], [], p_String)

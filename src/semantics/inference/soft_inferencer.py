@@ -72,10 +72,12 @@ class SoftInferencer:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode, scope: Scope) -> ClassDeclarationNode:
         self.current_type = self.context.get_type(node.id, unpacked=True)
-        scope.define_variable("self", TypeBag({SelfType()}))
+        scope.define_variable("self", self.context.get_type("SELF_TYPE"))
 
         for attr in self.current_type.attributes:
             if attr.name != "self":
+                # Is not define, error is given later when visiting
+                # the attribute
                 scope.define_variable(attr.name, attr.type)
 
         new_features = []
