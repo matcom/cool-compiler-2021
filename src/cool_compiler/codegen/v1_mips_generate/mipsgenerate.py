@@ -140,7 +140,7 @@ class MipsGenerate:
         stack_plus = self.stack_dir[memory_dest]
 
         return [
-            ASTR.LW('$t0', data_label),
+            ASTR.LA('$t0', data_label),
             ASTR.SW('$t0', f'{stack_plus}($sp)')
         ]
     

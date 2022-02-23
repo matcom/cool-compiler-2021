@@ -1,4 +1,5 @@
 import sys
+from cool_compiler.codegen.v0_type_data_code.type_data_code_ast import Type
 
 from cool_compiler.codegen.v1_mips_generate.mipsgenerate import MipsGenerate
 from .error import CoolError
