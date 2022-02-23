@@ -27,8 +27,6 @@ ADDRESS = INT
 # How to handle void nodes
 # Diference between method id and function id
 # Handdle all remaining operations:
-#   * Saving string to memory
-#   * Getting and setting attributes
 #   * IO operations
 #   * Handle constants and IDs
 
@@ -457,6 +455,22 @@ class CCILGenerator:
 
         return [fvalue], fvalue
 
+    @visitor.when(sem_ast.VariableNode)
+    def visit(self, node: sem_ast.VariableNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        id_id = f"id_{times}"
+        ccil_id, is_attr = self.ccil_cool_names.get_value_position(node.value)
+
+        if is_attr:
+            get_attr = self.create_attr_extraction(
+                node, id_id, node.type.name, "self", ccil_id
+            )
+            return [get_attr], get_attr
+
+        fval = self.create_assignation(node, id_id, node.type.name, ccil_id)
+        return [fval], fval
+
     @visitor.when(sem_ast.StringNode)
     def visit(self, node: sem_ast.StringNode) -> VISITOR_RESULT:
         times = self.times(node)
@@ -486,7 +500,6 @@ class CCILGenerator:
 
         bool_node = self.create_int(node, bool_id, value)
         return [bool_node], bool_node
-
 
     def times(self, node: sem_ast.Node, extra: str = ""):
         key: str = type(node).__name__ + extra
@@ -533,9 +546,11 @@ class CCILGenerator:
         self.add_local(idx, type_idx)
         return StorageNode(node, idx, op)
 
-    def create_attr_extraction(self, node, idx: str, type_idx: str, attr_idx: str):
+    def create_attr_extraction(
+        self, node, idx: str, type_idx: str, from_idx: str, attr_idx: str
+    ):
         self.add_local(idx, type_idx)
-        return StorageNode(node, idx, GetAttrOpNode(node, type_idx, attr_idx))
+        return StorageNode(node, idx, GetAttrOpNode(node, from_idx, attr_idx))
 
     def create_new_type(self, node, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
