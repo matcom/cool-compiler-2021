@@ -25,7 +25,7 @@ class CILToMipsVisitor:
         self.data: Dict[str, mips.Node] = {}
         self.types: Dict[str, mips.Type] = {}
         self.functions: Dict[str, mips.FunctionNode] = {}
-        self.cur_function: mips.FunctionNode | None = None
+        self.cur_function: mips.FunctionNode = None
 
         self.function_names: Dict[str, str] = {}
 
@@ -177,13 +177,13 @@ class CILToMipsVisitor:
         """
         li $v0, 4
         la $a0, str
-        print_string
+        syscall
         """
         li = mips.LINode(registers.V0, 4)
         la = mips.LANode(registers.A0, node.addr)
-        print_string = mips.PrintStringNode()
+        syscall = mips.SysCallNode()
 
-        return [li, la, print_string]
+        return [li, la, syscall]
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):

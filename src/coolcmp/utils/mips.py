@@ -175,7 +175,7 @@ def push_register_instructions(reg_name: str) -> List[InstructionNode]:
 
 def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
     """
-    lw <reg_name>, $sp, 0
+    lw <reg_name>, 0($sp)
     addi $sp, $sp, 4
     """
     lw = LWNode(reg_name, 0, SP)
