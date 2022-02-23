@@ -25,7 +25,7 @@ class CILToMipsVisitor:
         self.data: Dict[str, mips.Node] = {}
         self.types: Dict[str, mips.Type] = {}
         self.functions: Dict[str, mips.FunctionNode] = {}
-        self.cur_function: mips.FunctionNode | None = None
+        self.cur_function: mips.FunctionNode = None
 
         self.function_names: Dict[str, str] = {}
 
@@ -114,20 +114,39 @@ class CILToMipsVisitor:
         self.cur_function = function_node
         self.labels = {}
 
-        instructions = [f"# start of function {self.function_names[node.name]}"]
+        instructions = [f"# <function:{self.function_names[node.name]}>"]
+
         # Push local vars
-        instructions.extend(registers.push_register_instructions(registers.RA))
-        instructions.extend(registers.push_register_instructions(registers.FP))
-        instructions.append(mips.ADDINode(registers.FP, registers.SP, 4))
-        instructions.append(mips.ADDINode(registers.SP, registers.SP, -local_vars_size))
+        push_instructions = (
+            mips.push_register_instructions(registers.RA)
+            + mips.push_register_instructions(registers.FP)
+            + [mips.ADDINode(registers.FP, registers.SP, 8)]
+            + [mips.ADDINode(registers.SP, registers.SP, -local_vars_size)]
+        )
+        instructions.extend(push_instructions)
 
         for instruction in node.instructions:
             instructions.extend(self.visit(instruction))
 
+        # Pop local vars
+        pop_instructions = (
+            [mips.ADDINode(registers.SP, registers.SP, local_vars_size)]
+            + mips.pop_register_instructions(registers.FP)
+            + mips.pop_register_instructions(registers.RA)
+        )
+        instructions.extend(pop_instructions)
+
+        return_instructions = (
+            [mips.LINode(registers.V0, 10), mips.SysCallNode()]
+            if self.cur_function.name == "main"
+            else [mips.JRNode(registers.RA)]
+        )
+        instructions.extend(return_instructions)
+
         function_node.instructions = instructions
         self.cur_function = None
 
-        instructions.extend([f"# end of function {self.function_names[node.name]}"])
+        instructions.extend([f"# </function:{self.function_names[node.name]}>"])
         return instructions
 
     @visitor.when(cil.AllocateNode)
@@ -146,7 +165,7 @@ class CILToMipsVisitor:
         #     v0,
         # )
 
-        instructions = ["# allocate instructions..."]
+        instructions = ["# <allocate>", "# </allocate>"]
 
         return instructions
 
@@ -162,30 +181,53 @@ class CILToMipsVisitor:
             pass
         # TODO: Handle returns
 
-        jr = mips.JRNode()
-
-        return [jr]
+        return ["# <return>", "# </return>"]
 
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
         print(f"PrintIntNode {node.addr}")
 
-        return ["# print int instructions"]
+        return [f"# <printint:{node.addr}>", f"# <printint:{node.addr}"]
 
     @visitor.when(cil.PrintStringNode)
     def visit(self, node: cil.PrintStringNode):
         """
         li $v0, 4
         la $a0, str
-        print_string
+        syscall
         """
         li = mips.LINode(registers.V0, 4)
         la = mips.LANode(registers.A0, node.addr)
-        print_string = mips.PrintStringNode()
+        syscall = mips.SysCallNode()
 
-        return [li, la, print_string]
+        return [
+            f"# <printstring:{node.addr}>",
+            li,
+            la,
+            syscall,
+            f"# </printstring:{node.addr}>",
+        ]
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
         print(f"DynamicCallNode {node.method} {node.type} {node.dest}")
-        return ["# dynamic call instructions"]
+        instructions = []
+
+        # print(self.types)
+        # type_ = self.types[node.type]
+
+        return [
+            f"# <dynamiccall:{node.type}>",
+            # f"{type_}",
+            f"# </dynamiccall:{node.type}>",
+        ]
+
+    @visitor.when(cil.TypeOfNode)
+    def visit(self, node: cil.TypeOfNode):
+        return [f"# <typeof:{node.obj}>", f"# </typeof:{node.obj}>"]
+        instructions = []
+
+        r1, r2 = registers.T[0], registers.T[1]
+
+        # instructions.extend(self.visit(node.obj))
+        # instruc
