@@ -5,7 +5,7 @@ from coolcmp.utils import CILFormatter
 test_cil = cil.ProgramNode(
     dot_types=[],
     dot_data=[
-        cil.DataNode('msg', 'Hello World!\n'),
+        cil.DataNode('msg', '"Hello World!\n"'),
     ],
     dot_code=[
         cil.FunctionNode(

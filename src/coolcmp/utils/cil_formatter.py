@@ -31,7 +31,7 @@ class CILFormatter(object):
 
     @visitor.when(cil.DataNode)
     def visit(self, node: cil.DataNode):
-        return f'{node.name} = {repr(node.value)}'
+        return f'{node.name} = {repr(node.value)[1:-1]}'
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
