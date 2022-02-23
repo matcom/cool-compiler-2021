@@ -193,9 +193,7 @@ class CoolLexer(CoolLexerBase, Lexer):
         self.index += 1
         self.errors.append(
             UnexpectedCharError(
-                t.lineno,
-                self.compute_column(t.index),
-                repr(t.value[0])[1:-1],
+                t.lineno, self.compute_column(t.index), repr(t.value[0])[1:-1],
             )
         )
         return t
@@ -255,9 +253,7 @@ class CoolStringLexer(CoolLexerBase, Lexer):
     def EOL(self, t):
         self.errors.append(
             UnexpectedCharError(
-                t.lineno,
-                self.compute_column(t.index),
-                repr(t.value[0])[1:-1],
+                t.lineno, self.compute_column(t.index), repr(t.value[0])[1:-1],
             )
         )
         self.lineno += 1
@@ -278,8 +274,6 @@ class CoolStringLexer(CoolLexerBase, Lexer):
         self.index += 1
         self.errors.append(
             UnexpectedCharError(
-                t.lineno,
-                self.compute_column(t.index),
-                repr(t.value[0])[1:-1],
+                t.lineno, self.compute_column(t.index), repr(t.value[0])[1:-1],
             )
         )
