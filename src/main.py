@@ -64,14 +64,14 @@ def main(_input, _output):
             raise Exception()
 
     # Code Generation
-    # coolToCIL = COOLToCILVisitor(context)
-    # cilAST = coolToCIL.visit(ast, scope)
+    coolToCIL = COOLToCILVisitor(context)
+    cilAST = coolToCIL.visit(ast, scope)
 
-    # cilToMIPS = CILToMIPSVisitor()
-    # mips_code = cilToMIPS(cilAST)
+    cilToMIPS = CILToMIPSVisitor()
+    mips_code = cilToMIPS(cilAST)
 
-    # with open(f'{sys.argv[1][:-3]}.mips', 'w') as f:
-    #     f.write(mips_code)
+    with open(f'{sys.argv[1][:-3]}.mips', 'w') as f:
+        f.write(mips_code)
     
 
     # ast, errors, context, scope = SemanticAn
