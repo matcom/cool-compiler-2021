@@ -63,8 +63,8 @@ def main(_input, _output):
             raise Exception()
 
     # Code Generation
-    coolToCIL = COOLToCILVisitor(context)
-    cilAST = coolToCIL.visit(ast, scope)
+    # coolToCIL = COOLToCILVisitor(context)
+    # cilAST = coolToCIL.visit(ast, scope)
 
     
 
