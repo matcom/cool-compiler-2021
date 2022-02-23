@@ -16,6 +16,17 @@ ATTR = "attr"
 BOOL = "Bool"
 VOID = "Void"
 
+# TODO:
+# The result of type of what it is
+# How to handle void nodes
+# Diference between method id and function id
+# Handdle all remaining operations:
+#   * Saving string to memory
+#   * Getting and setting attributes
+#   * IO operations
+#   * Handle constants and IDs
+
+
 # CCIL stands for Cool Cows Intermediate Language ;)
 class CCILGenerator:
     """
@@ -216,13 +227,13 @@ class CCILGenerator:
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
             branch_var_id = f"case_{times}_option_{i}"
-            branch_var = create_uninitialized_storage(option, branch_var_id)
+            branch_var = self.create_uninitialized_storage(option, branch_var_id)
             branch_var.decl_type = option.branch_type
 
             # Initializing var which holds the branch var type
             branch_var_type_id = f"case_{times}_optionTypeOf_{i}"
-            branch_var_type_of = create_type_of(
-                option, branch_var_type_id, extract_id(node, branch_var)
+            branch_var_type_of = self.create_type_of(
+                option, branch_var_type_id, option.type.id, extract_id(node, branch_var)
             )
 
             # Initializng var which holds the comparison result between
@@ -245,9 +256,9 @@ class CCILGenerator:
             # Storing logic to jump to branch logic if this branch is selected
             pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
 
-            # Visiting the branch logic
+            # Translating the branch logic
             (expr_ops, expr_fval) = self.visit(option.expr)
-            # Renaming the last stored value of the expression accordingly
+            # Renaming the last stored value of the expression
             expr_fval.id = pre_fvalue_id
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
@@ -373,7 +384,7 @@ class CCILGenerator:
         # id(arg1, arg2, ..., argn)
         if node.expr is None:
             fval_id = f"call_{times}"
-            call = self.create_call(node, fval_id, node.type.id, node.id )
+            call = self.create_call(node, fval_id, node.type.id, node.id)
             return [*args_ops, *args, call], call
 
         # <expr>.id(arg1, arg2, ..., argn)
@@ -385,7 +396,7 @@ class CCILGenerator:
         )
 
         fval_id = f"fvcall_{times}"
-        call = self.create_vcall(node, fval_id, node.type.id, node.id,  type_idx)
+        call = self.create_vcall(node, fval_id, node.type.id, node.id, type_idx)
 
         return [*args_ops, *expr_ops, *args, call]
 
@@ -418,18 +429,13 @@ class CCILGenerator:
         self.add_local(idx, type_idx)
         return StorageNode(node, idx, IdNode(node, target))
 
-    def create_uninitialized_storage(
-        self,
-        node,
-        idx: str
-    ):
+    def create_uninitialized_storage(self, node, idx: str):
         self.add_local(idx, VOID)
         return StorageNode(node, idx, VoidNode(node))
 
-    def create_storage(self, node, idx:str, type_idx:str, op:ReturnOpNode):
+    def create_storage(self, node, idx: str, type_idx: str, op: ReturnOpNode):
         self.add_local(idx, type_idx)
         return StorageNode(node, idx, op)
-
 
     def create_type_of(self, node, idx: str, type_idx: str, target: AtomOpNode):
         self.add_local(idx, type_idx)
