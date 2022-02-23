@@ -1,6 +1,5 @@
 from ast import Compare
 
-
 class Program:
     def __init__(self) -> None:
         self.data = {}

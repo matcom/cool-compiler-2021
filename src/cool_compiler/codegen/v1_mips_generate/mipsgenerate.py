@@ -177,6 +177,10 @@ class MipsGenerate:
 
         return self.call(func, memory_dest)
 
+    @visitor.when(AST.New)
+    def visit(self, node: AST.New):
+        return self.call(f'new_ctr_{node.y}', node.x)
+
     @visitor.when(AST.Return)
     def visit(self, node: AST.Return):
         if node.x == 0: 
@@ -232,8 +236,6 @@ class MipsGenerate:
                  ASTR.SW ('$t3',f'{stack_plus_opr_1}($sp)'),
                  ASTR.Comment("Pon en la posicion f'{stack_plus_opr_1} el valor de $t3")
         ]
-
-
 
     @visitor.when(AST.Assign)
     def visit(self,node:AST.Assign):
@@ -319,7 +321,6 @@ class MipsGenerate:
 
                 ]
 
-
     @ visitor.when(AST.IfGoTo)
     def visit(self,node:AST.IfGoTo):
         memory_cmp = node.x
@@ -336,14 +337,11 @@ class MipsGenerate:
                 ASTR.Comment("if $t1==$t0 then jump f'{label_memory}")
                 ]
 
-
-
     @ visitor.when(AST.Label) 
     def visitor(self,node:AST.Label):
         return [ASTR.Label(node.x),
                 ASTR.Comment("Crea el label f'{node.x} ")
                 ]  
-
 
     @ visitor.when(AST.GoTo)
     def visitor(self,node:AST.GoTo):

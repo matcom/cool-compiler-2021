@@ -24,3 +24,6 @@ parser:
 
 semantic:
 	python3.8  cool_compiler/semantic/__main__.py
+
+exec:
+	spim -file test.mips
