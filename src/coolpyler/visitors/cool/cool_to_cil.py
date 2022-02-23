@@ -35,7 +35,7 @@ class CoolToCilVisitor(object):
         return f"local_{len(self.locals) if name is None else name}"
 
     @visitor.on("node")
-    def visit(self, node: type_checked.CoolAstNode) -> cil.CILAstNode:  # type: ignore
+    def visit(self, node):  # type: ignore
         pass
 
     @visitor.when(type_checked.CoolProgramNode)
@@ -94,11 +94,11 @@ class CoolToCilVisitor(object):
 
     @visitor.when(type_checked.CoolAssignNode)
     def visit(self, node: type_checked.CoolAssignNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolStaticDispatchNode)
     def visit(self, node: type_checked.CoolStaticDispatchNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolDispatchNode)
     def visit(self, node: type_checked.CoolDispatchNode) -> str:  # type: ignore
@@ -117,88 +117,88 @@ class CoolToCilVisitor(object):
 
     @visitor.when(type_checked.CoolIfThenElseNode)
     def visit(self, node: type_checked.CoolIfThenElseNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolWhileNode)
     def visit(self, node: type_checked.CoolWhileNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolBlockNode)
     def visit(self, node: type_checked.CoolBlockNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolLetInNode)
     def visit(self, node: type_checked.CoolLetInNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolLetDeclNode)
     def visit(self, node: type_checked.CoolLetDeclNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolCaseNode)
     def visit(self, node: type_checked.CoolCaseNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolCaseBranchNode)
     def visit(self, node: type_checked.CoolCaseBranchNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolNewNode)
     def visit(self, node: type_checked.CoolNewNode) -> str:  # type: ignore
         # TODO
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolParenthNode)
     def visit(self, node: type_checked.CoolParenthNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolTildeNode)
     def visit(self, node: type_checked.CoolTildeNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolNotNode)
     def visit(self, node: type_checked.CoolNotNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolIsVoidNode)
     def visit(self, node: type_checked.CoolIsVoidNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolLeqNode)
     def visit(self, node: type_checked.CoolLeqNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolEqNode)
     def visit(self, node: type_checked.CoolEqNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolLeNode)
     def visit(self, node: type_checked.CoolLeNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolPlusNode)
     def visit(self, node: type_checked.CoolPlusNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolMinusNode)
     def visit(self, node: type_checked.CoolMinusNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolMultNode)
     def visit(self, node: type_checked.CoolMultNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolDivNode)
     def visit(self, node: type_checked.CoolDivNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolIntNode)
     def visit(self, node: type_checked.CoolIntNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolBoolNode)
     def visit(self, node: type_checked.CoolBoolNode) -> str:  # type: ignore
-        pass
+        raise NotImplementedError("This is not implemented yet")
 
     @visitor.when(type_checked.CoolStringNode)
     def visit(self, node: type_checked.CoolStringNode) -> str:  # type: ignore
