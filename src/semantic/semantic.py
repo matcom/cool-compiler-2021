@@ -62,7 +62,7 @@ class Type:
             raise SemanticError(error_msg, *self.pos)
         self.parent = parent
 
-    def get_attribute(self, name: str, pos) -> Attribute:
+    def get_attribute(self, name: str, pos):
         try:
             return self.attributes[name]
         except KeyError:
@@ -92,7 +92,7 @@ class Type:
             error_msg = f'Attribute {name} is multiply defined in class.'
             raise SemanticError(error_msg, *pos)
 
-    def get_method(self, name: str, pos) -> Method:
+    def get_method(self, name: str, pos=None):
         try:
             return self.methods[name]
         except KeyError:

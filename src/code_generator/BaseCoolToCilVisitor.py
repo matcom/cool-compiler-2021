@@ -267,7 +267,7 @@ class BaseCOOLToCILVisitor:
             cil.GetAttrNode(l_value, 'l', 'value', 'Int'))
         subs_result = self.define_internal_local(
             scope=scope, name="subs_result")
-        self.register_instruction(cil.SubstringNode(
+        self.register_instruction(cil.SubStringNode(
             i_value, l_value, 'self', subs_result))
         instance = self.define_internal_local(scope=scope, name="instance")
         self.register_instruction(cil.AllocateNode(

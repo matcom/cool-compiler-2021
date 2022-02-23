@@ -30,7 +30,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.dotdata['empty_str'] = ''
 
         # Add built-in types in .TYPES section
-        self.register_builtin_types(scope)
+        self.define_built_in(scope)
 
         # Add string equals function
         self.build_string_equals_function(scope)
@@ -182,7 +182,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         dynamic_type = node.obj.computed_type.name
         self.register_instruction(cil.VCallNode(
-            result_local, node.method, call_args, dynamic_type, expr_value))
+            result_local, node.id, call_args, dynamic_type, expr_value))
 
         return result_local
 
@@ -196,7 +196,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             call_args.append(cil.ArgNode(param_local))
 
         self.register_instruction(cil.VCallNode(
-            result_local, node.method, call_args, 'self', 'memberCallGuayaba'))
+            result_local, node.id, call_args, 'IO', 'self'))
 
         return result_local
 

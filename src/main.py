@@ -68,9 +68,10 @@ def main(_input, _output):
     cilAST = coolToCIL.visit(ast, scope)
 
     cilToMIPS = CILToMIPSVisitor()
-    mips_code = cilToMIPS(cilAST)
+    mips_code = cilToMIPS.visit(cilAST)
 
-    with open(f'{sys.argv[1][:-3]}.mips', 'w') as f:
+    # print(mips_code)
+    with open(_output, 'w+') as f:
         f.write(mips_code)
     
 
