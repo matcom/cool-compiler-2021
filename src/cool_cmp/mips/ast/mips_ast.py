@@ -66,6 +66,9 @@ class OrNode(BinaryArithmeticNode):
 class NorNode(BinaryArithmeticNode):
     pass
 
+class XorNode(BinaryArithmeticNode):
+    pass
+
 class AndImmediateNode(BinaryArithmeticNode):
     pass
 
