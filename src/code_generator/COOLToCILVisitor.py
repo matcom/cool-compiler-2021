@@ -194,6 +194,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         for arg in reversed(node.args):
             param_local = self.visit(arg, scope)
             call_args.append(cil.ArgNode(param_local))
+        call_args.append(cil.ArgNode("self"))
 
         self.register_instruction(cil.VCallNode(
             result_local, node.id, call_args, node.static_type.name, "self"))
