@@ -59,8 +59,6 @@ type A {
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
-	method get: function_get_at_A
-	method get2: function_get2_at_A
 }
 type B {
 	parent: A
@@ -70,8 +68,6 @@ type B {
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
-	method get: function_get_at_A
-	method get2: function_get2_at_A
 }
 type Main {
 	parent: IO
@@ -271,25 +267,6 @@ function __init_A_type {
 	
 	RETURN self
 }
-function function_get_at_A {
-	PARAM self
-
-	
-
-	RETURN self
-}
-function function_get2_at_A {
-	PARAM self
-
-	LOCAL local_get2_at_A_internal_0
-	LOCAL local_get2_at_A_internal_1
-
-	local_get2_at_A_internal_1 = TYPEOF self
-	local_get2_at_A_internal_0 = ALLOCATE local_get2_at_A_internal_1
-	ARG local_get2_at_A_internal_0
-	local_get2_at_A_internal_0 = VCALL local_get2_at_A_internal_1 __init
-	RETURN local_get2_at_A_internal_0
-}
 function __init_B_type {
 	PARAM self
 
@@ -310,7 +287,7 @@ function function_main_at_Main {
 	PARAM self
 
 	LOCAL local_main_at_Main_internal_0
-	LOCAL local_main_at_Main_b_1
+	LOCAL local_main_at_Main_internal_1
 	LOCAL local_main_at_Main_internal_2
 	LOCAL local_main_at_Main_internal_3
 	LOCAL local_main_at_Main_internal_4
@@ -321,44 +298,63 @@ function function_main_at_Main {
 	LOCAL local_main_at_Main_internal_9
 	LOCAL local_main_at_Main_internal_10
 	LOCAL local_main_at_Main_internal_11
-	LOCAL local_main_at_Main_internal_12
-	LOCAL local_main_at_Main_internal_13
+	LOCAL local_main_at_Main_a_12
+	LOCAL local_main_at_Main_b_13
 	LOCAL local_main_at_Main_internal_14
 	LOCAL local_main_at_Main_internal_15
-	LOCAL local_main_at_Main_internal_16
-	LOCAL local_main_at_Main_internal_17
-	LOCAL local_main_at_Main_internal_18
 
-	local_main_at_Main_internal_2 = ALLOCATE B
-	ARG local_main_at_Main_internal_2
-	local_main_at_Main_internal_2 = CALL __init_B_type
-	local_main_at_Main_b_1 = local_main_at_Main_internal_2
-	ARG local_main_at_Main_b_1
-	local_main_at_Main_internal_4 = TYPEOF local_main_at_Main_b_1
-	local_main_at_Main_internal_3 = VCALL local_main_at_Main_internal_4 get
-	ARG local_main_at_Main_internal_3
-	local_main_at_Main_internal_6 = TYPEOF local_main_at_Main_internal_3
-	local_main_at_Main_internal_5 = VCALL local_main_at_Main_internal_6 type_name
-	ARG local_main_at_Main_b_1
-	local_main_at_Main_internal_8 = TYPEOF local_main_at_Main_b_1
-	local_main_at_Main_internal_7 = VCALL local_main_at_Main_internal_8 get2
+	local_main_at_Main_internal_0 = ALLOCATE B
+	ARG local_main_at_Main_internal_0
+	local_main_at_Main_internal_0 = CALL __init_B_type
+	local_main_at_Main_internal_1 = TYPEOF local_main_at_Main_internal_0
+	local_main_at_Main_internal_2 = ARRAY Object 2
+	SETINDEX local_main_at_Main_internal_2 0 A
+	SETINDEX local_main_at_Main_internal_2 1 B
+	local_main_at_Main_internal_3 = -1
+	local_main_at_Main_internal_5 = -2
+	LABEL main_at_Main_label_0
+	local_main_at_Main_internal_3 = local_main_at_Main_internal_3 + 1
+	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_3 2
+	IF local_main_at_Main_internal_8 GOTO main_at_Main_label_2
+	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_3
+	ARG local_main_at_Main_internal_1
 	ARG local_main_at_Main_internal_7
-	local_main_at_Main_internal_10 = TYPEOF local_main_at_Main_internal_7
-	local_main_at_Main_internal_9 = VCALL local_main_at_Main_internal_10 type_name
-	ARG local_main_at_Main_b_1
-	local_main_at_Main_internal_12 = TYPEOF local_main_at_Main_b_1
-	local_main_at_Main_internal_11 = VCALL local_main_at_Main_internal_12 type_name
-	ARG local_main_at_Main_internal_9
-	ARG local_main_at_Main_internal_11
-	local_main_at_Main_internal_14 = TYPEOF local_main_at_Main_internal_9
-	local_main_at_Main_internal_13 = VCALL local_main_at_Main_internal_14 concat
-	ARG local_main_at_Main_internal_5
-	ARG local_main_at_Main_internal_13
-	local_main_at_Main_internal_16 = TYPEOF local_main_at_Main_internal_5
-	local_main_at_Main_internal_15 = VCALL local_main_at_Main_internal_16 concat
+	local_main_at_Main_internal_6 = CALL type_distance
+	local_main_at_Main_internal_9 = EQUAL local_main_at_Main_internal_6 -1
+	IF local_main_at_Main_internal_9 GOTO main_at_Main_label_0
+	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_1
+	local_main_at_Main_internal_10 = local_main_at_Main_internal_5 > local_main_at_Main_internal_6
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_1
+	GOTO main_at_Main_label_0
+	LABEL main_at_Main_label_1
+	local_main_at_Main_internal_5 = local_main_at_Main_internal_6
+	local_main_at_Main_internal_4 = local_main_at_Main_internal_3
+	GOTO main_at_Main_label_0
+	LABEL main_at_Main_label_2
+	local_main_at_Main_internal_10 = EQUAL local_main_at_Main_internal_5 -2
+	IF local_main_at_Main_internal_10 GOTO main_at_Main_label_3
+	local_main_at_Main_internal_7 = GETINDEX local_main_at_Main_internal_2 local_main_at_Main_internal_4
+	local_main_at_Main_internal_11 = EQUAL A local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_5
+	local_main_at_Main_a_12 = local_main_at_Main_internal_0
+	local_main_at_Main_internal_0 = 1
+	GOTO main_at_Main_label_4
+	LABEL main_at_Main_label_5
+	local_main_at_Main_internal_11 = EQUAL B local_main_at_Main_internal_7
+	local_main_at_Main_internal_11 = NOT local_main_at_Main_internal_11
+	IF local_main_at_Main_internal_11 GOTO main_at_Main_label_6
+	local_main_at_Main_b_13 = local_main_at_Main_internal_0
+	local_main_at_Main_internal_0 = 2
+	GOTO main_at_Main_label_4
+	LABEL main_at_Main_label_6
+	LABEL main_at_Main_label_3
+	ABORT
+	LABEL main_at_Main_label_4
 	ARG self
-	ARG local_main_at_Main_internal_15
-	local_main_at_Main_internal_18 = TYPEOF self
-	local_main_at_Main_internal_17 = VCALL local_main_at_Main_internal_18 out_string
-	RETURN local_main_at_Main_internal_17
+	ARG local_main_at_Main_internal_0
+	local_main_at_Main_internal_15 = TYPEOF self
+	local_main_at_Main_internal_14 = VCALL local_main_at_Main_internal_15 out_int
+	RETURN local_main_at_Main_internal_14
 }

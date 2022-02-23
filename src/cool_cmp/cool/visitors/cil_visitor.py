@@ -1102,81 +1102,81 @@ class COOLToCILVisitor():
         
         value = self.visit(node.expr, scope)
         
-        type_value = self.define_internal_local(node.row, node.column, "Case Node")
-        self.register_instruction(cil.TypeOfNode(value, type_value, node.row, node.column, "Case Node"))
+        type_value = self.define_internal_local(node.row, node.column, "Case Node local")
+        self.register_instruction(cil.TypeOfNode(value, type_value, node.row, node.column, "Case Node typeof"))
         checks = len(node.params)
         
-        array_types = self.define_internal_local(node.row, node.column, "Case Node")
-        self.register_instruction(cil.ArrayNode(array_types, "Object", checks, node.row, node.column, "Case Node")) # Type Object because at the end all are Objects
+        array_types = self.define_internal_local(node.row, node.column, "Case Node array types")
+        self.register_instruction(cil.ArrayNode(array_types, "Object", checks, node.row, node.column, "Case Node array declaration")) # Type Object because at the end all are Objects
         
         for i,param in enumerate(node.params):
-            self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name, node.row, node.column, "Case Node"))
+            self.register_instruction(cil.SetIndexNode(array_types, str(i), param.type.name, node.row, node.column, "Case Node array setindex"))
         
-        index = self.define_internal_local( node.row, node.column, "Case Node")
-        minim_index = self.define_internal_local( node.row, node.column, "Case Node")
-        minim = self.define_internal_local(node.row, node.column, "Case Node")
-        distance = self.define_internal_local( node.row, node.column, "Case Node")
-        current_type = self.define_internal_local( node.row, node.column, "Case Node")
-        self.register_instruction(cil.AssignNode(index, "-1", node.row, node.column, "Case Node"))
-        self.register_instruction(cil.AssignNode(minim, "-2", node.row, node.column, "Case Node"))
+        index = self.define_internal_local( node.row, node.column, "Case Node index")
+        minim_index = self.define_internal_local( node.row, node.column, "Case Node minim index")
+        minim = self.define_internal_local(node.row, node.column, "Case Node minim")
+        distance = self.define_internal_local( node.row, node.column, "Case Node distance")
+        current_type = self.define_internal_local( node.row, node.column, "Case Node current type")
+        self.register_instruction(cil.AssignNode(index, "-1", node.row, node.column, "Case Node assign index"))
+        self.register_instruction(cil.AssignNode(minim, "-2", node.row, node.column, "Case Node assign minim"))
         
-        start_label = self.define_label(node.row, node.column, "Case Node")
-        minim_label = self.define_label( node.row, node.column, "Case Node")
-        end_label = self.define_label( node.row, node.column, "Case Node")
-        abort_label = self.define_label( node.row, node.column, "Case Node")
-        stop_for = self.define_internal_local( node.row, node.column, "Case Node")
-        not_valid_distance = self.define_internal_local( node.row, node.column, "Case Node")
-        minim_cond = self.define_internal_local( node.row, node.column, "Case Node")
+        start_label = self.define_label(node.row, node.column, "Case Node start label")
+        minim_label = self.define_label( node.row, node.column, "Case Node minim label")
+        end_label = self.define_label( node.row, node.column, "Case Node end label")
+        abort_label = self.define_label( node.row, node.column, "Case Node abort label")
+        stop_for = self.define_internal_local( node.row, node.column, "Case Node stop for local")
+        not_valid_distance = self.define_internal_local( node.row, node.column, "Case Node not valid distance local")
+        minim_cond = self.define_internal_local( node.row, node.column, "Case Node minim cond local")
         
         self.register_instruction(start_label)
-        self.register_instruction(cil.PlusNode(index, index, "1", node.row, node.column, "Case Node"))
-        self.register_instruction(cil.EqualNode(stop_for, index, str(checks), node.row, node.column, "Case Node"))
-        self.register_instruction(cil.GotoIfNode(stop_for, end_label.label, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.PlusNode(index, index, "1", node.row, node.column, "Case Node plus index"))
+        self.register_instruction(cil.EqualNode(stop_for, index, str(checks), node.row, node.column, "Case Node equal stop for"))
+        self.register_instruction(cil.GotoIfNode(stop_for, end_label.label, node.row, node.column, "Case Node goto if stop for"))
         
         
-        self.register_instruction(cil.GetIndexNode(array_types, index, current_type, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GetIndexNode(array_types, index, current_type, node.row, node.column, "Case Node get index"))
         
-        self.register_instruction(cil.ArgNode(type_value, node.row, node.column, "Case Node"))
-        self.register_instruction(cil.ArgNode(current_type, node.row, node.column, "Case Node"))
-        self.register_instruction(cil.StaticCallNode("type_distance", distance, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.ArgNode(type_value, node.row, node.column, "Case Node arg type value"))
+        self.register_instruction(cil.ArgNode(current_type, node.row, node.column, "Case Node arg current type"))
+        self.register_instruction(cil.StaticCallNode("type_distance", distance, node.row, node.column, "Case Node static call type distance"))
         
-        self.register_instruction(cil.EqualNode(not_valid_distance, distance, "-1", node.row, node.column, "Case Node"))
-        self.register_instruction(cil.GotoIfNode(not_valid_distance, start_label.label, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.EqualNode(not_valid_distance, distance, "-1", node.row, node.column, "Case Node equal not valid distance"))
+        self.register_instruction(cil.GotoIfNode(not_valid_distance, start_label.label, node.row, node.column, "Case Node goto if not valid distance"))
         
-        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "Case Node"))
-        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "Case Node"))
-        self.register_instruction(cil.GreaterNode(minim_cond, minim, distance, node.row, node.column, "Case Node"))
-        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "Case Node"))
-        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "Case Node equal minim cond"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "Case Node goto if minim cond"))
+        self.register_instruction(cil.GreaterNode(minim_cond, minim, distance, node.row, node.column, "Case Node greater minim cond"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, minim_label.label, node.row, node.column, "Case Node goto if minim cond"))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "Case Node goto start label"))
         
         self.register_instruction(minim_label)
-        self.register_instruction(cil.AssignNode(minim, distance, node.row, node.column, "Case Node"))
-        self.register_instruction(cil.AssignNode(minim_index, index, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.AssignNode(minim, distance, node.row, node.column, "Case Node assign minim"))
+        self.register_instruction(cil.AssignNode(minim_index, index, node.row, node.column, "Case Node assign minim index"))
         
-        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GotoNode(start_label.label, node.row, node.column, "Case Node goto start label"))
         self.register_instruction(end_label)
         
-        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "Case Node"))
-        self.register_instruction(cil.GotoIfNode(minim_cond, abort_label.label, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.EqualNode(minim_cond, minim, "-2", node.row, node.column, "Case Node equal minim cond"))
+        self.register_instruction(cil.GotoIfNode(minim_cond, abort_label.label, node.row, node.column, "Case Node goto if minim cond"))
         
-        self.register_instruction(cil.GetIndexNode(array_types, minim_index, current_type, node.row, node.column, "Case Node"))
+        self.register_instruction(cil.GetIndexNode(array_types, minim_index, current_type, node.row, node.column, "Case Node get index"))
         
-        final_label = self.define_label( node.row, node.column, "Case Node")
-        not_equal_types = self.define_internal_local( node.row, node.column, "Case Node")
+        final_label = self.define_label( node.row, node.column, "Case Node final label")
+        not_equal_types = self.define_internal_local( node.row, node.column, "Case Node not equal types local")
         end_labels = [self.define_label(node.row, node.column,"Case Node") for _ in node.params]
         for lbl, param, child_scope in zip(end_labels, node.params, node.scope.children):
-            self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type, node.row, node.column, "Case Node"))
-            self.register_instruction(cil.NotNode(not_equal_types, not_equal_types, node.row, node.column, "Case Node"))
-            self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label, node.row, node.column, "Case Node"))
+            self.register_instruction(cil.EqualNode(not_equal_types, param.type.name, current_type, node.row, node.column, "Case Node equal not equal types"))
+            self.register_instruction(cil.NotNode(not_equal_types, not_equal_types, node.row, node.column, "Case Node not not equal types"))
+            self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label, node.row, node.column, "Case Node goto if not equal types"))
             
             result = self.visit(param, child_scope, value)
-            self.register_instruction(cil.AssignNode(value, result, node.row, node.column, "Case Node"))
+            self.register_instruction(cil.AssignNode(value, result, node.row, node.column, "Case Node assign value"))
             
-            self.register_instruction(cil.GotoNode(final_label.label, node.row, node.column, "Case Node"))
+            self.register_instruction(cil.GotoNode(final_label.label, node.row, node.column, "Case Node goto final label"))
             self.register_instruction(lbl)
         
         self.register_instruction(abort_label)
-        self.register_instruction(cil.AbortNode(node.row, node.column, "Case Node"))
+        self.register_instruction(cil.AbortNode(node.row, node.column, "Case Node abort"))
         self.register_instruction(final_label)
                 
         return value
