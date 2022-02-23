@@ -19,8 +19,7 @@ class Program:
         return result
 
 class Data:
-    def __init__(self, _type, name, value) -> None:
-        self.type = _type
+    def __init__(self, name, value) -> None:
         self.name = name
         self.value = value
     
@@ -29,7 +28,7 @@ class Data:
         if(type(self.value==type("string"))):
             return f'{self.name}: .asciiz \"{str(self.value)}\"'
 
-        return f'{self.name}: .{self.type} \"{str(self.value)}\"'
+        return f'{self.name}: .word \"{str(self.value)}\"'
 
 class Func:
     def __init__(self, name) -> None:
