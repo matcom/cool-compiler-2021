@@ -103,128 +103,87 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         result_offset = self.var_offset[self.current_function.name][node.local_dest]
         self.text += f'sw $a0, {result_offset}($sp)\n'
 
-
-    @visitor.when(cil.EqualNode)
+    @visitor.when(cil.UnaryOperationNode)
     def visit(self, node):
-        self.code.append(f'# {node.dest} <- {node.left} = {node.right}')
-        if self.is_variable(node.left) and self.is_variable(node.right) and self.var_address[node.left] == AddrType.STR and self.var_address[node.right] == AddrType.STR:
-            self.compare_strings(node)
+        expr_offset = self.var_offset[self.current_function.name][node.expr]
+        self.text += f'lw $t1, {expr_offset}($sp)\n'
+        if node.op == '~':
+            self.text += f'xor $a0, $t1, 1\n'
         else:
-            rdest = self.addr_desc.get_var_reg(node.dest)
-            if self.is_variable(node.left):
-                rleft = self.addr_desc.get_var_reg(node.left)
-                if self.is_variable(node.right):
-                    rright = self.addr_desc.get_var_reg(node.right)
-                    self.code.append(f"seq ${rdest}, ${rleft}, ${rright}")
-                elif self.is_int(node.right):
-                    self.code.append(f"li $t9, {node.right}")
-                    self.code.append(f"seq ${rdest}, ${rleft}, $t9")
-            elif self.is_int(node.left):
-                if self.is_int(node.right):
-                    self.code.append(
-                        f"li ${rdest}, {int(node.left == node.right)}")
-                elif self.is_variable(node.right):
-                    rright = self.addr_desc.get_var_reg(node.right)
-                    self.code.append(f"li $t9, {node.left}")
-                    self.code.append(f"seq ${rdest}, $t9, ${rright}")
-            self.var_address[node.dest] = AddrType.BOOL
+            self.text += f'neg $a0, $t1 \n'
 
-    @visitor.when(cil.NotNode)
-    def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        rsrc = self.save_to_register(node.expr)
-        self.code.append(f'# {node.dest} <- not {node.expr}')
-        self.code.append(f'beqz ${rsrc}, false_{self.loop_idx}')
-        self.code.append(f'li ${rdest}, 0')
-        self.code.append(f'j end_{self.loop_idx}')
-        self.code.append(f'false_{self.loop_idx}:')
-        self.code.append(f'li ${rdest}, 1')
-        self.code.append(f'end_{self.loop_idx}:')
-        self.loop_idx += 1
-        self.var_address[node.dest] = AddrType.BOOL
+        result_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $a0, {result_offset}($sp)\n'
 
     @visitor.when(cil.GetAttrNode)
     def visit(self, node):
-        self.code.append(f'# {node.dest} <- GET {node.obj} . {node.attr}')
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.var_address[node.dest] = self.get_type(node.attr_type)
-        rsrc = self.addr_desc.get_var_reg(node.obj)
-        attr_offset = 4*self.get_attr_offset(node.attr, node.type_name)
-        self.code.append(f'lw ${rdest}, {attr_offset}(${rsrc})')
+        self_offset = self.var_offset[self.current_function.name][node.instance]
+        self.text += f'lw $t0, {self_offset}($sp)\n'
+
+        attr_offset = self.attr_offset[node.static_type][node.attr]
+        self.text += f'lw $t1, {attr_offset}($t0)\n'
+
+        result_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $t1, {result_offset}($sp)\n'
 
     @visitor.when(cil.SetAttrNode)
     def visit(self, node):
-        self.code.append(f'# {node.obj} . {node.attr} <- SET {node.value}')
-        rdest = self.addr_desc.get_var_reg(node.obj)
-        attr_offset = 4*self.get_attr_offset(node.attr, node.type_name)
-        if self.is_variable(node.value):
-            rsrc = self.addr_desc.get_var_reg(node.value)
-        elif self.is_int(node.value):
-            self.code.append(f'li $t9, {node.value}')
-            rsrc = 't9'
-        elif self.is_void(node.value):
-            self.code.append(f'la $t9, type_{VOID_NAME}')
-            rsrc = 't9'
-        self.code.append(f'sw ${rsrc}, {attr_offset}(${rdest})')
+        self_offset = self.var_offset[self.current_function.name][node.instance]
+        self.text += f'lw $t0, {self_offset}($sp)\n'
+
+        if node.value:
+            value_offset = self.var_offset[self.current_function.name][node.value]
+            self.text += f'lw $t1, {value_offset}($sp)\n'
+        else:
+            self.text += f'la $t1, void\n'
+
+        attr_offset = self.attr_offset[node.static_type][node.attr]
+        self.text += f'sw $t1, {attr_offset}($t0)\n'
 
     @visitor.when(cil.AllocateNode)
     def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.var_address[node.dest] = AddrType.REF
-        self.code.append(
-            '# Syscall to allocate memory of the object entry in heap')
-        self.code.append('li $v0, 9')
-        size = 4*self.obj_table.size_of_entry(node.type)
-        self.code.append(f'li $a0, {size}')
-        self.code.append('syscall')
-        addrs_stack = self.addr_desc.get_addr(node.dest)
-        self.code.append(
-            '# Loads the name of the variable and saves the name like the first field')
-        self.code.append(f'la $t9, type_{node.type}')
-        self.code.append(f'sw $t9, 0($v0)')
-        self.code.append(f'# Saves the size of the node')
-        self.code.append(f'li $t9, {size}')
-        self.code.append(f'sw $t9, 4($v0)')
-        self.code.append(f'move ${rdest}, $v0')
-        idx = self.types.index(node.type)
-        self.code.append('# Adding Type Info addr')
-        self.code.append('la $t8, types')
-        self.code.append(f'lw $v0, {4*idx}($t8)')
-        self.code.append(f'sw $v0, 8(${rdest})')
+        amount = len(self.types[node.type].attributes) + 4
+        self.text += f'li $a0, {amount * 4}\n'
+        self.text += f'li $v0, 9\n'
+        self.text += f'syscall\n'
+        self.text += 'bge $v0, $sp heap_error\n'
+        self.text += f'move $t0, $v0\n'
+
+        # Initialize Object
+        self.text += f'li $t1, {node.tag}\n'
+        self.text += f'sw $t1, 0($t0)\n'
+        self.text += f'la $t1, {node.type}_name\n'
+        self.text += f'sw $t1, 4($t0)\n'
+        self.text += f'li $t1, {amount}\n'
+        self.text += f'sw $t1, 8($t0)\n'
+        self.text += f'la $t1, {node.type}_methods\n'
+        self.text += f'sw $t1, 12($t0)\n'
+
+        offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $t0, {offset}($sp)\n'
 
     @visitor.when(cil.TypeOfNode)
     def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.code.append(f'# {node.dest} <- Type of {node.obj}')
-        if self.is_variable(node.obj):
-            rsrc = self.addr_desc.get_var_reg(node.obj)
-            if self.var_address[node.obj] == AddrType.REF:
-                self.code.append(f'lw ${rdest}, 0(${rsrc})')
-            elif self.var_address[node.obj] == AddrType.STR:
-                self.code.append(f'la ${rdest}, type_String')
-            elif self.var_address[node.obj] == AddrType.INT:
-                self.code.append(f'la ${rdest}, type_Int')
-            elif self.var_address[node.obj] == AddrType.BOOL:
-                self.code.append(f'la ${rdest}, type_Bool')
-        elif self.is_int(node.obj):
-            self.code.append(f'la ${rdest}, type_Int')
-        self.var_address[node.dest] = AddrType.STR
+        obj_offset = self.var_offset[self.current_function.name][node.instance]
+        self.text += f'lw $t0, {obj_offset}($sp)\n'
+        self.text += 'lw $t1, 4($t0)\n'
+        res_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $t1, {res_offset}($sp)\n'
 
     @visitor.when(cil.LabelNode)
     def visit(self, node):
-        self.code.append(f'{node.label}:')
+        self.text += f'{node.label}:\n'
 
     @visitor.when(cil.GoToNode)
     def visit(self, node):
-        self.empty_registers()
-        self.code.append(f'j {node.label}')
+        self.text += f'b {node.label}\n'
 
     @visitor.when(cil.IfGoToNode)
     def visit(self, node):
-        reg = self.save_to_register(node.cond)
-        self.code.append(f'# If {node.cond} goto {node.label}')
-        self.empty_registers()
-        self.code.append(f'bnez ${reg}, {node.label}')
+        predicate_offset = self.var_offset[self.current_function.name][node.condition]
+        self.text += f'lw $t0, {predicate_offset}($sp)\n'
+        self.text += f'lw $a0, 16($t0)\n'
+        self.text += f'bnez $a0, {node.label}\n'
 
     @visitor.when(cil.CallNode)
     def visit(self, node):
