@@ -5,7 +5,7 @@ from visitors.Builder import TypeBuilder
 from visitors.Checker import TypeChecker
 from visitors.Inferencer import Inferencer
 from visitors.Executor import Executor, RuntimeException
-from visitors.CooltoCil import MiniCOOLToCILVisitor
+from visitors.CooltoCil import COOLToCILVisitor
 from visitors.CilDepicter import get_formatter
 
 class Pipeline():
@@ -48,7 +48,7 @@ class Pipeline():
             if len(self.errors) == 0:
                 self.typeChecker = TypeChecker(self.context, self.errors)
                 self.typeChecker.visit( self.ast, scope)
-            self.coolToCil = MiniCOOLToCILVisitor(self.context)
+            self.coolToCil = COOLToCILVisitor(self.context)
             cil_ast = self.coolToCil.visit(self.ast, scope)
             print(get_formatter(cil_ast))
 
