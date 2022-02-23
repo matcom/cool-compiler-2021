@@ -181,7 +181,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         call_args.append(cil.ArgNode(expr_value))
 
         dynamic_type = node.obj.computed_type.name
-        self.register_instruction(CIL_AST.VCall(
+        self.register_instruction(cil.VCallNode(
             result_local, node.method, call_args, dynamic_type, expr_value))
 
         return result_local
@@ -189,67 +189,58 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(MemberCallNode)
     def visit(self, node, scope):
         result_local = self.define_internal_local(scope=scope, name="result")
-        expr_value = self.visit(node.instance, scope)
 
-        member_call_args = []
-        for arg in node.args:
+        call_args = []
+        for arg in reversed(node.args):
             param_local = self.visit(arg, scope)
-            member_call_args.append(cil.ArgNode(param_local))
-        member_call_args.append(cil.ArgNode(expr_value))
+            call_args.append(cil.ArgNode(param_local))
 
-        dynamic_type = node.instance.computed_type.name
         self.register_instruction(cil.VCallNode(
-            result_local, node.method, member_call_args, dynamic_type, expr_value))
+            result_local, node.method, call_args, 'self', 'memberCallGuayaba'))
 
         return result_local
 
-    @visitor.when(IfNode)
+    @visitor.when(IfThenElseNode)
     def visit(self, node, scope):
-        vcondition = self.define_internal_local()
-        value = self.visit(node.condition, scope)
+        result_local = self.define_internal_local(scope=scope, name="result")
 
-        then_label_node = self.register_label('then_label')
-        else_label_node = self.register_label('else_label')
-        continue_label_node = self.register_label('continue_label')
+        cond_value = self.visit(node.condition, scope)
 
-        # If condition GOTO then_label
-        self.visit(node.condition)
-        self.register_instruction(cil.GetAttrNode(
-            vcondition, scope.ret_expr, 'value', 'Bool'))
-        self.register_instruction(cil.IfGoToNode(
-            vcondition, then_label_node.label))
-        # GOTO else_label
-        self.register_instruction(cil.GoToNode(else_label_node.label))
-        # Label then_label
-        self.register_instruction(then_label_node)
-        self.visit(node.then_expr, scope)
-        self.register_instruction(cil.AssignNode(vcondition, scope.ret_expr))
-        self.register_instruction(cil.GoToNode(continue_label_node.label))
-        # Label else_label
-        self.register_instruction(else_label_node)
-        self.visit(node.else_expr, scope)
-        self.register_instruction(cil.AssignNode(vcondition, scope.ret_expr))
+        if_then_label = self.get_label()
+        self.register_instruction(cil.IfGoToNode(cond_value, if_then_label))
 
-        self.register_instruction(continue_label_node)
-        scope.ret_expr = vcondition
+        else_value = self.visit(node.elseBody, scope)
+        self.register_instruction(cil.AssignNode(result_local, else_value))
+
+        end_if_label = self.get_label()
+        self.register_instruction(cil.GoToNode(end_if_label))
+
+        self.register_instruction(cil.LabelNode(if_then_label))
+        then_value = self.visit(node.ifBody, scope)
+        self.register_instruction(cil.AssignNode(result_local, then_value))
+        self.register_instruction(cil.LabelNode(end_if_label))
+
+        return result_local
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
-        start_label = cil.LabelNode(f'start__{self.idx}')
-        end_label = cil.LabelNode(f'end__{self.idx}')
+        result_local = self.define_internal_local(scope=scope, name="result")
 
-        result = self.define_internal_local()
-        self.register_instruction(cil.VoidConstantNode(result))
-        self.register_instruction(start_label)
+        loop_init_label = self.get_label()
+        loop_body_label = self.get_label()
+        loop_end_label = self.get_label()
+        self.register_instruction(cil.LabelNode(loop_init_label))
+        pred_value = self.visit(node.condition, scope)
+        self.register_instruction(cil.IfGoToNode(pred_value, loop_body_label))
+        self.register_instruction(cil.GoToNode(loop_end_label))
 
-        cond, _ = self.visit(node.cond, scope)
-        self.register_instruction(cil.IfGoToNode(cond, end_label.label))
-        expr, typex = self.visit(node.expr, scope)
-        self.register_instruction(cil.AssignNode(result, expr))
-        self.register_instruction(cil.GoToNode(start_label.label))
-        self.register_instruction(end_label)
+        self.register_instruction(cil.LabelNode(loop_body_label))
+        body_value = self.visit(node.body, scope)
+        self.register_instruction(cil.GoToNode(loop_init_label))
+        self.register_instruction(cil.LabelNode(loop_end_label))
 
-        return result, ObjectType()
+        self.register_instruction(cil.LoadVoidNode(result_local))
+        return result_local
 
     @visitor.when(BlockNode)
     def visit(self, node, scope):
