@@ -1,10 +1,11 @@
 class Node:
     def visit(self, tabs = 0):
-        pass
+        self.line = -1
 
 class ProgramNode(Node):
     def __init__(self, declarations):
         self.declarations = declarations
+        self.line = -1
     def visit(self, tabs = 0):
         node = self
         ans = '\t' * tabs + f'\\__ProgramNode [<class> ... <class>]'
@@ -20,6 +21,7 @@ class ExpressionNode(Node):
 class AtomicNode(ExpressionNode):
     def __init__(self, lex):
         self.lex = lex
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
@@ -30,6 +32,7 @@ class ClassDeclarationNode(DeclarationNode):
         self.id = idx
         self.parent = parent
         self.features = features
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
@@ -45,12 +48,14 @@ class FuncDeclarationNode(DeclarationNode):
         self.params = params
         self.type = return_type
         self.body = body
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
         params = ', '.join(':'.join(param) for param in node.params)
         ans = '\t' * tabs + f'\\__FuncDeclarationNode: def {node.id}({params}) : {node.type} -> <body>'
         body = node.body.visit( tabs + 1)
+        self.line = -1
         return f'{ans}\n{body}'
 
 class AttrDeclarationNode(DeclarationNode):
@@ -58,6 +63,7 @@ class AttrDeclarationNode(DeclarationNode):
         self.id = idx
         self.type = typex
         self.expr = expr
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
@@ -71,6 +77,7 @@ class VarDeclarationNode(ExpressionNode):
         self.id = idx
         self.type = typex
         self.expr = expr
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
@@ -82,6 +89,7 @@ class AssignNode(AtomicNode):
     def __init__(self, idx, expr):
         self.id = idx
         self.expr = expr
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
@@ -92,6 +100,7 @@ class AssignNode(AtomicNode):
 class IsVoidNode(AtomicNode):
     def __init__(self, expr):
         self.expr = expr
+        self.line = -1
     
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__IsVoid <expr>"
@@ -100,6 +109,7 @@ class IsVoidNode(AtomicNode):
 class NotNode(AtomicNode):
     def __init__(self, expr):
         self.expr = expr
+        self.line = -1
     
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__NOT <expr>"
@@ -108,6 +118,7 @@ class NotNode(AtomicNode):
 class NhanharaNode(AtomicNode):
     def __init__(self, expr):
         self.expr = expr
+        self.line = -1
     
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__~ <expr>"
@@ -118,8 +129,12 @@ class CallNode(AtomicNode):
     def __init__(self, obj, idx, args = None, type = None):
         self.obj = obj
         self.id = idx
-        self.args = args
+        if args is None:
+            self.args = []
+        else:
+            self.args = args
         self.type = type
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
@@ -148,6 +163,7 @@ class IfNode(AtomicNode):
         self.if_c = if_c
         self.then_c = then_c
         self.else_c = else_c
+        self.line = -1
         
     def visit(self, tabs = 0):
         node = self
@@ -161,6 +177,7 @@ class WhileNode(AtomicNode):
     def __init__(self, condition, body):
         self.condition = condition
         self.body = body
+        self.line = -1
         
     def visit(self, tabs = 0):
         node = self
@@ -173,6 +190,7 @@ class WhileNode(AtomicNode):
 class BlockNode(AtomicNode):
     def __init__(self, expr_list):
         self.expr_list = expr_list
+        self.line = -1
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + " {<expr>; .... <expr>;}\n"
@@ -183,6 +201,7 @@ class LetNode(AtomicNode):
     def __init__(self, list_decl, expr):
         self.list_decl = list_decl
         self.expr = expr
+        self.line = -1
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + " LET <decl>, <decl> ... <decl> in <expr>\n "
@@ -194,6 +213,7 @@ class CaseNode(AtomicNode):
     def __init__(self, expr, list_case):
         self.list_case = list_case
         self.expr = expr
+        self.line = -1
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__Case <expre> in <list-assign> esac"
@@ -208,6 +228,7 @@ class BinaryNode(ExpressionNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
+        self.line = -1
 
     def visit(self, tabs = 0):
         node = self
@@ -215,6 +236,9 @@ class BinaryNode(ExpressionNode):
         left = node.left.visit( tabs + 1)
         right = node.right.visit( tabs + 1)
         return f'{ans}\n{left}\n{right}'
+
+class ArithmeticNode(BinaryNode):
+    pass
 
 class ConstantNumNode(AtomicNode):
     pass
@@ -229,19 +253,23 @@ class SelfNode(AtomicNode):
     pass
 
 class DispatchNode(ExpressionNode):
-    def __init__(self, expr, f, params, type = None):
-        super().__init__(None)
-        self.id = id
+    def __init__(self, expr, f, params, typex = None):
+        self.id = f
+        self.expr = expr
         self.f = f
-        self.params = params
-        self.type = type
+        if params is None:
+            self.params = []
+        else:
+            self.params = params
+        self.typex = typex
+        self.line = -1
     
     def visit(self, tabs = 0):
         node = self
-        if not self.type:
+        if not self.typex:
             ans = '\t' * tabs + f'\\__<expr>.{self.f} <params>'
         else:
-            ans = '\t' * tabs + f'\\__<expr>@{self.type}.{self.f} <params>'
+            ans = '\t' * tabs + f'\\__<expr>@{self.typex}.{self.f} <params>'
         expr = node.expr.visit( tabs + 1)
         params = '\n'.join(param.visit( tabs + 1) for param in node.params)
         return f'{ans}\n{expr}\n{params}'
@@ -252,16 +280,16 @@ class InstantiateNode(AtomicNode):
     def visit(self, tabs):
         node = self
         return '\t' * tabs + f'\\__ InstantiateNode: new {node.lex}()'
-class PlusNode(BinaryNode):
+class PlusNode(ArithmeticNode):
     pass
-class MinusNode(BinaryNode):
+class MinusNode(ArithmeticNode):
     pass
-class StarNode(BinaryNode):
+class StarNode(ArithmeticNode):
     pass
-class DivNode(BinaryNode):
+class DivNode(ArithmeticNode):
     pass
 
-class MinorNode(BinaryNode):
+class MinorNode(ArithmeticNode):
     pass
 class MinorEqualsNode(BinaryNode):
     pass

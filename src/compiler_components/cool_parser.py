@@ -1,6 +1,6 @@
-from compiler_component import CompilerComponent
-from lexer import Tokenizer, Lexer
-from ast import *
+from .compiler_component import CompilerComponent
+from .lexer import Tokenizer, Lexer
+from .ast import *
 import ply.yacc as yacc
 import ply.lex as lex
 
@@ -98,12 +98,16 @@ def p_expr(p):
     p[0] = p[1]
 
 def p_bool(p):
-    '''bool : arith MINOR arith
+    '''bool : NOT bool
+            | arith MINOR arith
             | arith MINOR_EQUALS arith
             | arith EQUALS arith
             | arith
     '''
-    if len(p) == 2:
+    if len(p) == 3:
+        p[0] = NotNode(p[2])
+
+    elif len(p) == 2:
         p[0] = p[1]
     else:
         if p[2] == '<':
@@ -230,9 +234,11 @@ def p_atomIsVoid(p):
     'atom : ISVOID factor'
     p[0] = IsVoidNode(p[2])
 
+'''
 def p_atomNot(p):
     'atom : NOT factor'
     p[0] = NotNode(p[2])
+'''
 
 def p_atomNhanhara(p):
     'atom : NHANHARA factor'
@@ -241,17 +247,17 @@ def p_atomNhanhara(p):
 def p_func_call(p):
     '''func_call : factor DOT ID LPAREN arg_list RPAREN
     '''
-    p[0] = CallNode(p[1], p[3], p[5])
+    p[0] = DispatchNode(p[1], p[3], p[5])
 
 def p_func_call2(p):
     'func_call : ID LPAREN arg_list RPAREN'
 
-    p[0] = CallNode(None, p[1])
+    p[0] = CallNode(None, p[1], p[3])
 
 def p_func_call3(p):
     'func_call : factor ARROBA TYPE_ID DOT ID LPAREN arg_list RPAREN'
     
-    p[0] = CallNode(p[1], p[5], args = p[7], type = p[3])
+    p[0] = DispatchNode(p[1], p[5], args = p[7], typex = p[3])
 
 
 
@@ -295,21 +301,9 @@ class Parser(CompilerComponent):
        self.ast = parser.parse(self.lexer.cool_program)
 
     def has_errors(self):
-        return len(errors) == 0
+        return len(errors) > 0
 
     def print_errors(self):
         for e in errors:
             print(e)
         print()
-
-
-################ TEsting zone ###########################
-data = ''''''  
-parser = yacc.yacc()
-result = parser.parse(data)
-if len(errors) == 0:
-    print(result.visit())
-else:
-    print(errors)
-
-########################################################

@@ -1,4 +1,4 @@
-from compiler_component import CompilerComponent
+from .compiler_component import CompilerComponent
 import ply.lex as lex
 
 # funcion que retorna el texto de la linea donde hubo un error lexico
@@ -200,20 +200,10 @@ class Lexer(CompilerComponent):
         tokenizer = Tokenizer()
         lexer = lex.lex(tokenizer)
         tokens, self.errors = tokenizer.tokenize(self.cool_program, lexer)
-        for t in tokens:
-            print(t)
 
     def has_errors(self):
-        return len(self.errors) == 0
+        return len(self.errors) > 0
 
     def print_errors(self):
         for e in self.errors:
             print(e)
-
-########################### Testing ##############################
-data = '''''' 
-
-lexer = Lexer(data)
-lexer.execute()
-lexer.print_errors()
-##### borrar luego ########################################
