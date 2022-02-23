@@ -259,30 +259,5 @@ class LabelNode(FlowControlNode):
         super().__init__(node)
         self.id = idx
 
-
-def create_call(node, storage_idx: str, method_idx: str):
-    return StorageNode(node, storage_idx, CallOpNode(node, method_idx))
-
-
-def create_vcall(node, storage_idx: str, method_idx: str, type_idx: str):
-    return StorageNode(node, storage_idx, VCallOpNode(node, method_idx, type_idx))
-
-
-def create_assignation(node, idx: str, target: str):
-    return StorageNode(node, idx, IdNode(node, target))
-
-
-def create_uninitialized_storage(node, idx: str):
-    return StorageNode(node, idx, VoidNode(node))
-
-
-def create_type_of(node, idx: str, target: AtomOpNode):
-    return StorageNode(node, idx, GetTypeOpNode(node, target))
-
-
-def create_equality(node, idx, left: AtomOpNode, right: AtomOpNode):
-    return StorageNode(node, idx, EqualOpNode(node, left, right))
-
-
 def extract_id(node, storage_node: StorageNode) -> IdNode:
     return IdNode(node, storage_node.id)
