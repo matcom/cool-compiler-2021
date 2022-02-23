@@ -77,7 +77,7 @@ def main(_input, _output):
     # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":
 
-    in_path = '/mnt/c/Users/Liviton/Desktop/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/codegen/hello_world.cl'
+    in_path = '/mnt/c/Users/Liviton/Desktop/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/codegen/print-cool.cl'
     out_path = '/mnt/c/Users/Liviton/Desktop/Complementos de Compilacion/cool-compiler/cool-compiler-2021/src/codeMips.mips'
     _input = sys.argv[1] if len(sys.argv) > 1 else in_path
     _output = sys.argv[2] if len(sys.argv) > 2 else out_path
