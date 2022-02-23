@@ -1,8 +1,62 @@
-from typing import Dict, List, Tuple
 from __future__ import annotations
-from code_gen.tools import Attribute, Method
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
 
+from code_gen.tools import Attribute, Method
 from semantics.tools.type import Type
+
+
+@dataclass(frozen=True)
+class CCILProgram:
+    """Top level class that represents a CCIL program"""
+
+    types_section: List[Class]
+    code_section: List[FunctionNode]
+    data_section: List[str]  # no idea what will be this the node,
+
+
+@dataclass(frozen=True)
+class Class:
+    """
+    This item represent the .type section in ccil
+    """
+
+    id: str
+    attributes: List[Attribute]
+    methods: List[Method]
+    init_operations: FunctionNode
+
+
+@dataclass(frozen=True)
+class BaseVar:
+    """
+    This item represents the <id, type> pair common in attributes, parameters and local vars
+    """
+
+    id: str
+    type: str
+
+
+class Attribute(BaseVar):
+    pass
+
+
+class Parameter(BaseVar):
+    pass
+
+
+class Local(BaseVar):
+    pass
+
+
+@dataclass(frozen=True)
+class Method:
+    """
+    This item represent the method of every class
+    """
+
+    id: str
+    function: FunctionNode
 
 
 class Node:
@@ -14,71 +68,29 @@ class Node:
         return (self.line, self.col)
 
 
-class CCILProgram:
-    """Top level class that represents a CCIL program"""
-
-    def __init__(
-        self,
-        types_section: List[ClassNode],
-        code_section: List[FunctionNode],
-        data_section,  # no idea what will be this the node,
-    ) -> None:
-        self.types_section = types_section  # class/types declaration with  methods ( method signature is optional ) and attributes
-        self.code_section = code_section  # functions
-        self.data_section = data_section  # static data like strings or literal numbers
-
-
-class ClassNode(Node):
-    """
-    This node represents the .types section in CCIL
-    """
-
-    def __init__(
-        self,
-        node,
-        idx: str,
-        attributes: List[Attribute],
-        methods: List[MethodNode],
-        init_operations: FunctionNode,
-    ) -> None:
-        super().__init__(node)
-        self.id = idx
-        self.attributes = attributes
-        self.methods = methods
-        self.init_operations = init_operations
-
-
-class MethodNode(Node):
-    """
-    This node represents a method of a class
-    """
-
-    def __init__(
-        self, node, idx: str, function: str, operations: List[OperationNode]
-    ) -> None:
-        super().__init__(node)
-        self.id = idx  # name of method
-        self.function = function  # function that implement this method
-
-
 class FunctionNode(Node):
     """
-    This class represents funtions in the .code section. This functions are the real implementetion of every class method
+    This class represents funtions in the .code section. Most of a Cool program is split along this nodes.
     """
 
     def __init__(
         self,
         node,
         idx: str,
-        params: List[ParamNode],
+        params: List[Parameter],
+        locals: List[Local],
         operations: List[OperationNode],
-        ret,
+        ret: str,
     ) -> None:
         super().__init__(node)
-        self.id = idx  # identifier for the function ( not the same as the methods it represents )
+        # Function identifier, different than Method identifier
+        self.id = idx
+        # Variable that holds the return value
+        self.ret = ret
+        # Function operations
         self.params = params
+        self.locals = locals
         self.operations = operations
-        self.ret = ret  # not sure if useful yet
 
 
 class OperationNode(Node):
@@ -88,38 +100,6 @@ class OperationNode(Node):
 
     def __init__(self, node) -> None:
         super().__init__(node)
-
-
-class LocalNode(OperationNode):
-    def __init__(self, node, idx: str, typex: str) -> None:
-        """
-        Node represent initalization instruction"
-        Parameter:
-            idx <- node name
-            type <- node type
-        """
-        super().__init__(node)
-        assert isinstance(typex, str), "Typex is not string"
-
-        self.id: str = idx
-        self.type: str = typex.name
-
-
-class ParamNode(LocalNode):
-    def __init__(self, node, idx: str, typex: str) -> None:
-        """
-        Node represent function parameter initalization instruction"
-        Parameter:
-            idx <- node name
-            type <- node type
-        """
-        super().__init__(node, idx, typex)
-
-
-class ArgNode(OperationNode):
-    def __init__(self, node, idx: str) -> None:
-        super().__init__(node)
-        self.id = idx
 
 
 class StorageNode(OperationNode):
@@ -143,14 +123,15 @@ class ReturnOpNode(OperationNode):
 
 
 class CallOpNode(ReturnOpNode):
-    def __init__(self, node, idx: str) -> None:
+    def __init__(self, node, idx: str, args: List[str]) -> None:
         super().__init__(node)
         self.id = idx
+        self.args = args
 
 
 class VCallOpNode(ReturnOpNode):
-    def __init__(self, node, idx: str, type_idx: str) -> None:
-        super().__init__(node, idx)
+    def __init__(self, node, idx: str, type_idx: str, args: List[str]) -> None:
+        super().__init__(node, idx, args)
         self.type = type_idx
 
 
@@ -277,31 +258,6 @@ class LabelNode(FlowControlNode):
     def __init__(self, node, idx: str) -> None:
         super().__init__(node)
         self.id = idx
-
-
-def create_call(node, storage_idx: str, method_idx: str):
-    return StorageNode(node, storage_idx, CallOpNode(node, method_idx))
-
-
-def create_vcall(node, storage_idx: str, method_idx: str, type_idx: str):
-    return StorageNode(node, storage_idx, VCallOpNode(node, method_idx, type_idx))
-
-
-def create_assignation(node, idx: str, target: str):
-    return StorageNode(node, idx, IdNode(node, target))
-
-
-def create_uninitialized_storage(node, idx: str):
-    return StorageNode(node, idx, VoidNode(node))
-
-
-def create_type_of(node, idx: str, target: AtomOpNode):
-    return StorageNode(node, idx, GetTypeOpNode(node, target))
-
-
-def create_equality(node, idx, left: AtomOpNode, right: AtomOpNode):
-    return StorageNode(node, idx, EqualOpNode(node, left, right))
-
 
 def extract_id(node, storage_node: StorageNode) -> IdNode:
     return IdNode(node, storage_node.id)
