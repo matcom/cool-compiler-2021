@@ -10,5 +10,5 @@ class Main inherits IO {
 
 	a: A;
 	b: B <- a <- new C;
-	d: D <- a <- new C;
+	d: D <- b <- new C;
 }; 

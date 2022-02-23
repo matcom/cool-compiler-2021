@@ -301,11 +301,18 @@ class Scope:
         return v
 
     def find_variable(self, vname, index=None):
+        print("Buscando variable", vname)
         locals = self.locals if index is None else itt.islice(self.locals, index)
-        try:
-            return next(x for x in locals if x.name == vname)
-        except StopIteration:
-            if not self.parent is None:
-                return self.parent.find_variable(vname, self.index)  
-            else:
-                return None
+        
+        for l in locals:
+            if l.name == vname:
+                print("encontreeeeee", vname)
+                return l
+        
+        print("no encontre", vname)
+        if not self.parent is None:
+            print("buscando ", vname, "en el padre")
+            return self.parent.find_variable(vname, self.index)  
+        else:
+            print("no aparece", vname)
+            return None

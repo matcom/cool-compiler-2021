@@ -40,10 +40,12 @@ class TypeChecker:
             if isinstance(feat, FuncDeclarationNode):
                 self.visit(feat,mscope.create_child())
             else:
-                self.visit(feat, ascope.create_child())
+                self.visit(feat, ascope)
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node:AttrDeclarationNode,scope:Scope):
+        scope.define_variable(node.id, node.type)
+        print("define",scope.locals[0].name)
         self.visit(node.expr, scope.create_child())
         if not node.expr is None:
             try:
@@ -194,7 +196,8 @@ class TypeChecker:
         try:
             if node.id == "self":
                 raise SemanticError('Trying to assign value to self' ,node.line)
-                
+
+            print('find variable', node.id)    
             var = scope.find_variable(node.id)
             
             if var is None:
