@@ -61,8 +61,9 @@ class Method:
 
 class Node:
     def __init__(self, node) -> None:
-        self.line: int = node.line
-        self.col: int = node.col
+        if node is not None:
+            self.line: int = node.line
+            self.col: int = node.col
 
     def get_position(self) -> Tuple[int, int]:
         return (self.line, self.col)
@@ -131,8 +132,10 @@ class CallOpNode(ReturnOpNode):
 
 class VCallOpNode(ReturnOpNode):
     def __init__(self, node, idx: str, type_idx: str, args: List[str]) -> None:
-        super().__init__(node, idx, args)
+        super().__init__(node)
+        self.id = idx
         self.type = type_idx
+        self.args = args
 
 
 class VoidNode(ReturnOpNode):
@@ -258,6 +261,7 @@ class LabelNode(FlowControlNode):
     def __init__(self, node, idx: str) -> None:
         super().__init__(node)
         self.id = idx
+
 
 def extract_id(node, storage_node: StorageNode) -> IdNode:
     return IdNode(node, storage_node.id)
