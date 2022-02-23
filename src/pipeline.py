@@ -6,6 +6,7 @@ from visitors.Checker import TypeChecker
 from visitors.Inferencer import Inferencer
 from visitors.Executor import Executor, RuntimeException
 from visitors.CooltoCil import COOLToCILVisitor
+from visitors.CiltoMips import CiltoMipsVisitor
 from visitors.CilDepicter import get_formatter
 
 class Pipeline():
@@ -51,6 +52,8 @@ class Pipeline():
             self.coolToCil = COOLToCILVisitor(self.context)
             cil_ast = self.coolToCil.visit(self.ast, scope)
             # print(get_formatter(cil_ast))
+            self.cilToMips = CiltoMipsVisitor(self.context)
+            mips_code = self.cilToMips.visit(cil_ast)
 
         if verbose:
             print('This is after infering types:')

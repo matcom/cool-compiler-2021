@@ -25,8 +25,8 @@ from sys import argv
 # a = 0
 
 if __name__ == '__main__':
-    # with open('examles/hello_world.cl', 'r') as fd:
-    with open(f'{argv[1]}', 'r') as fd:
+    with open('tests/codegen/hello_world.cl', 'r') as fd:
+    # with open(f'{argv[1]}', 'r') as fd:
         program = ''
         temp = fd.read()
         while temp:
