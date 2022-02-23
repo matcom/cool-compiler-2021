@@ -115,6 +115,8 @@ class TypeChecker:
             errorText = f'Inferred type {typex.name} of initialization of {assignNode.id} does not conform to identifier\'s declared type {varType.name}.'
             self.errors.append(TypexError(
                 errorText, assignNode.line, assignNode.col))
+
+        assignNode.computed_type = typex
         return typex
 
     @visitor.when(ArrobaCallNode)
@@ -176,7 +178,8 @@ class TypeChecker:
                     self.errors.append(TypexError(
                         errorText, dotCallNode.line, dotCallNode.col))
 
-        return get_type(method.return_type, objType)
+        dotCallNode.computed_type = get_type(method.return_type, objType)
+        return dotCallNode.computed_type
 
     @visitor.when(MemberCallNode)
     def visit(self, memberCallNode, scope):
@@ -202,7 +205,8 @@ class TypeChecker:
                     self.errors.append(TypexError(
                         errorText, memberCallNode.line, memberCallNode.col))
 
-        return get_type(method.return_type, typex)
+        memberCallNode.computed_type = get_type(method.return_type, typex)
+        return memberCallNode.computed_type
 
     @visitor.when(IfThenElseNode)
     def visit(self, ifThenElseNode, scope):
@@ -214,7 +218,10 @@ class TypeChecker:
 
         ifBodyType = self.visit(ifThenElseNode.ifBody, scope)
         elseBodyType = self.visit(ifThenElseNode.elseBody, scope)
-        return get_common_basetype([ifBodyType, elseBodyType])
+
+        ifThenElseNode.computed_type = get_common_basetype(
+            [ifBodyType, elseBodyType])
+        return ifThenElseNode.computed_type
 
     @visitor.when(WhileNode)
     def visit(self, whileNode, scope):
@@ -224,6 +231,8 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, whileNode.line, whileNode.col))
         self.visit(whileNode.body, scope)
+
+        whileNode.computed_type = ObjectType()
         return ObjectType()
 
     @visitor.when(BlockNode)
@@ -231,6 +240,8 @@ class TypeChecker:
         typex = None
         for expr in blockNode.exprs:
             typex = self.visit(expr, scope)
+
+        blockNode.computed_type = typex
         return typex
 
     @visitor.when(LetInNode)
@@ -238,7 +249,10 @@ class TypeChecker:
         childScope = scope.expr_dict[letInNode]
         for letDeclaration in letInNode.letBody:
             self.visit(letDeclaration, childScope)
-        return self.visit(letInNode.inBody, childScope)
+
+        typex = self.visit(letInNode.inBody, childScope)
+        letInNode.computed_type = typex
+        return typex
 
     @visitor.when(CaseNode)
     def visit(self, caseNode, scope):
@@ -254,11 +268,14 @@ class TypeChecker:
                 self.errors.append(SemanticError(
                     errorText, option.typeLine, option.typeCol))
             checkDuplicate.append(option.type)
-        return get_common_basetype(types)
+
+        caseNode.computed_type = get_common_basetype(types)
+        return caseNode.computed_type
 
     @visitor.when(CaseOptionNode)
     def visit(self, caseOptionNode, scope):
         optionType = self.visit(caseOptionNode.expr, scope)
+        caseOptionNode.computed_type = optionType
         return optionType
 
     @visitor.when(PlusNode)
@@ -270,6 +287,8 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, plusNode.line, plusNode.col))
             return ErrorType()
+
+        plusNode.computed_type = IntType()
         return IntType()
 
     @visitor.when(MinusNode)
@@ -281,6 +300,8 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, minusNode.line, minusNode.col))
             return ErrorType()
+
+        minusNode.computed_type = IntType()
         return IntType()
 
     @visitor.when(StarNode)
@@ -292,6 +313,8 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, starNode.line, starNode.col))
             return ErrorType()
+
+        starNode.computed_type = IntType()
         return IntType()
 
     @visitor.when(DivNode)
@@ -303,6 +326,8 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, divNode.line, divNode.col))
             return ErrorType()
+
+        divNode.computed_type = IntType()
         return IntType()
 
     @visitor.when(LessNode)
@@ -314,6 +339,8 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, lessNode.line, lessNode.col))
             return ErrorType()
+
+        lessNode.computed_type = BoolType()
         return BoolType()
 
     @visitor.when(LessEqNode)
@@ -325,16 +352,21 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, lessEq.line, lessEq.col))
             return ErrorType()
+
+        lessEq.computed_type = BoolType()
         return BoolType()
 
     @visitor.when(EqualNode)
-    def visit(self, lessEq, scope):
-        leftType = self.visit(lessEq.lvalue, scope)
-        rightType = self.visit(lessEq.rvalue, scope)
+    def visit(self, equalNode, scope):
+        leftType = self.visit(equalNode.lvalue, scope)
+        rightType = self.visit(equalNode.rvalue, scope)
         if (leftType != rightType) and (leftType in [IntType(), StringType(), BoolType()] or rightType in [IntType(), StringType(), BoolType()]):
             errorText = 'Illegal comparison with a basic type.'
-            self.errors.append(TypexError(errorText, lessEq.line, lessEq.col))
+            self.errors.append(TypexError(
+                errorText, equalNode.line, equalNode.col))
             return ErrorType()
+
+        equalNode.computed_type = BoolType()
         return BoolType()
 
     @visitor.when(NegationNode)
@@ -345,6 +377,8 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, negationNode.line, negationNode.col))
             return ErrorType()
+
+        negationNode.computed_type = IntType()
         return IntType()
 
     @visitor.when(LogicNegationNode)
@@ -355,11 +389,14 @@ class TypeChecker:
             self.errors.append(TypexError(
                 errorText, logicNegationNode.line, logicNegationNode.col))
             return ErrorType()
+
+        logicNegationNode.computed_type = BoolType()
         return BoolType()
 
     @visitor.when(IsVoidNode)
     def visit(self, isVoidNode, scope):
         self.visit(isVoidNode.expr, scope)
+        isVoidNode.computed_type = BoolType()
         return BoolType()
 
     @visitor.when(NewNode)
@@ -372,28 +409,38 @@ class TypeChecker:
             errorText = f'\'new\' used with undefined class {newNode.id}.'
             self.errors.append(TypexError(
                 errorText, newNode.line, newNode.col))
-        return get_type(typex, self.currentType)
+
+        typex = get_type(typex, self.currentType)
+        newNode.computed_type = typex
+        return typex
 
     @visitor.when(IdNode)
     def visit(self, idNode, scope):
         varType = self.find_variable(scope, idNode.id).type
-        return get_type(varType, self.currentType)
+        typex = get_type(varType, self.currentType)
+        idNode.computed_type = typex
+        return typex
 
     @visitor.when(IntNode)
     def visit(self, intNode, scope):
-        return IntType((intNode.line, intNode.col))
+        intNode.computed_type = IntType((intNode.line, intNode.col))
+        return intNode.computed_type
 
     @visitor.when(BoolNode)
     def visit(self, boolNode, scope):
-        return BoolType((boolNode.line, boolNode.col))
+        boolNode.computed_type = BoolType((boolNode.line, boolNode.col))
+        return boolNode.computed_type
 
     @visitor.when(StringNode)
     def visit(self, stringNode, scope):
-        return StringType((stringNode.line, stringNode.col))
+        stringNode.computed_type = StringType(
+            (stringNode.line, stringNode.col))
+        return stringNode.computed_typestringNode
 
     @visitor.when(VoidNode)
     def visit(self, voidNode, scope):
-        return VoidType((voidNode.line, voidNode.col))
+        voidNode.computed_type = VoidType((voidNode.line, voidNode.col))
+        return voidNode.computed_type
 
     def _get_type(self, ntype, pos):
         try:

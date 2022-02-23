@@ -170,25 +170,23 @@ class IfGoToNode(InstructionNode):
         self.label = label
 
 
-# Static Invocation
-class CallNode(InstructionNode):
-    def __init__(self, dest, func, args, static_type, ret_type):
-        self.local_dest = dest
-        self.function = func
-        self.args = args
-        self.static_type = static_type
-        self.ret_type = ret_type
-
-
 # Dynamic Invocation
+class CallNode(InstructionNode):
+    def __init__(self, local_dest, function, params, static_type):
+        self.function = function
+        self.params = params
+        self.static_type = static_type
+        self.local_dest = local_dest
+
+
+# Static Invocation
 class VCallNode(InstructionNode):
-    def __init__(self, instance, dest, func, args, dynamic_type, ret_type):
-        self.instance = instance
-        self.local_dest = dest
-        self.function = func
-        self.args = args
+    def __init__(self, local_dest, function, params, dynamic_type, instance):
+        self.function = function
+        self.params = params
         self.dynamic_type = dynamic_type
-        self.ret_type = ret_type
+        self.local_dest = local_dest
+        self.instance = instance
 
 
 # Args
