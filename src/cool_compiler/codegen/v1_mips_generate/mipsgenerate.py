@@ -156,14 +156,10 @@ class MipsGenerate:
             ASTR.Comment(f'Mete para la pila {node.x}'),
         ]        
 
-    @visitor.when(AST.VCall)
-    def visit(self, node: AST.VCall):
-        memory_dest = node.x
-        _type = node.y
-        func = self.cil_type[_type].methods[node.z]
-
+    def call(self, func, memory_dest):
         self.func_list.append(func)
         self.stack = self.stack[0: len(self.stack) - self.local_push]
+        self.local_push = 0
         stack_plus = self.stack_index(memory_dest)
 
         return [
@@ -172,6 +168,14 @@ class MipsGenerate:
             ASTR.SW('$s0', f'{stack_plus}($sp)' ),
             ASTR.Comment(f'Save el resultado de la funcion que esta en $s0 pa la pila'),
         ]
+
+    @visitor.when(AST.VCall)
+    def visit(self, node: AST.VCall):
+        memory_dest = node.x
+        _type = node.y
+        func = self.cil_type[_type].methods[node.z]
+
+        return self.call(func, memory_dest)
 
     @visitor.when(AST.Return)
     def visit(self, node: AST.Return):

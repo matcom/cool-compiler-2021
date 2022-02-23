@@ -115,11 +115,6 @@ class Operation:
         return f'{self.cmd} {self.dest}, {self.op_1}, {self.op_2}'
 
 
-class Out_String:
-    def __str__(self) -> str:
-       return  "IO_out_string:\nli $v0, 4\nlw $a0, 0($sp)\nsyscall\nlw $a0, 4($sp)\naddi $sp, $sp, 8\njr $ra"
-
-
 ############################  Loads   ##################################################
 class LW(Load):
     def __init__(self, registry, memory_dir) -> None:
@@ -160,3 +155,68 @@ class AddI(Operation):
     def __init__(self,dest,op1,op2) -> None:
             super().__init__('addi',dest,op1,op2)
 
+
+
+
+################################# Native Func IO ################################################
+class Out_String:
+    def __str__(self) -> str:
+       return  """
+IO_out_string:
+li $v0, 4
+lw $a0, 0($sp)
+syscall
+lw $a0, 4($sp)
+addi $sp, $sp, 8
+jr $ra"""
+
+class Out_Int:
+    def __str__(self) -> str:
+       return """
+IO_out_int:
+li $v0, 1
+lw $a0, 0($sp)
+syscall
+lw $a0, 4($sp)
+addi $sp, $sp, 8
+jr $ra"""
+
+class In_String:
+    def __str__(self) -> str:
+       return """
+"""
+
+class In_Int:
+    def __str__(self) -> str:
+       return """
+"""
+################################# Native Func Str ################################################
+class Length:
+    def __str__(self) -> str:
+       return """
+"""
+
+class Concat:
+    def __str__(self) -> str:
+       return """
+"""
+
+class SubStr:
+    def __str__(self) -> str:
+       return """
+"""
+################################# Native Func Obj ################################################
+class Copy:
+    def __str__(self) -> str:
+       return """
+"""
+
+class Abort:
+    def __str__(self) -> str:
+       return """
+"""
+
+class Type_Name:
+    def __str__(self) -> str:
+       return """
+"""

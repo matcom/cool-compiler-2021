@@ -265,10 +265,6 @@ class Load(Expression):
 class ALLOCATE(Expression):
     pass
 
-
-class NegAssing(Expression):
-    pass
-
 class IfGoTo(Expression):
     pass
 
