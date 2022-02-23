@@ -63,13 +63,23 @@ o metodos hayan sido definidos previamente, correctitud de la herencia (que no e
  
 #### COOL a CIL
 
-   
+Durante esta fase se realiza la conversion del lenguaje COOL al lenguaje intermedio
+CIL.      
+En el fichero BaseCOOLtoCILVisitor se definen los metodos basicos para registrar
+una variable, parametro, funcion, atributo, entre otros. Ademas es aqui donde se 
+registran los tipos builtin, es decir se escriben en codigo CIL las instrucciones
+para registrar los tipos Object, IO, String, Int y Bool.
+El fichero COOLToCILVisitor .... ????????
+
+#### CIL a MIPS
+
+Esta es la fase final donde se traduce del lenguaje intermedio al lenguaje MIPS que 
+es el que va a ser ejecutado.   
+Dentro del fichero mips_basics.asm 
 
 ### Organizacion
 
-La estructura de archivos del proyecto es la siguiente:
-
-           
+La estructura de archivos del proyecto es la siguiente:           
        
 ```
 cool-compiler-2021
