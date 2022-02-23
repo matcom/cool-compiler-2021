@@ -61,7 +61,7 @@ def define_cool_grammar(print_grammar=False):
     equal, plus, minus, star, div, less, equal, lesseq, neg = G.Terminals(
         "= + - * / < = <= ~"
     )
-    idx, num, new, string, true, false = G.Terminals("id int new string true false")
+    idx, type_id, num, new, string, true, false = G.Terminals("id type_id int new string true false")
 
     # productions
     program %= class_list, lambda h, s: ProgramNode(s[1])
@@ -70,11 +70,11 @@ def define_cool_grammar(print_grammar=False):
     class_list %= def_class, lambda h, s: [s[1]]
 
     def_class %= (
-        classx + idx + ocur + feature_list + ccur + semi,
+        classx + type_id + ocur + feature_list + ccur + semi,
         lambda h, s: ClassDeclarationNode(s[2], s[4]),
     )
     def_class %= (
-        classx + idx + inherits + idx + ocur + feature_list + ccur + semi,
+        classx + type_id + inherits + type_id + ocur + feature_list + ccur + semi,
         lambda h, s: ClassDeclarationNode(s[2], s[6], s[4]),
     )
 
@@ -83,13 +83,13 @@ def define_cool_grammar(print_grammar=False):
     feature_list %= G.Epsilon, lambda h, s: []
 
     def_attr %= (
-        idx + colon + idx + larrow + expr,
+        idx + colon + type_id + larrow + expr,
         lambda h, s: AttrDeclarationNode(s[1], s[3], s[5]),
     )
-    def_attr %= idx + colon + idx, lambda h, s: AttrDeclarationNode(s[1], s[3])
+    def_attr %= idx + colon + type_id, lambda h, s: AttrDeclarationNode(s[1], s[3])
 
     def_func %= (
-        idx + opar + param_list + cpar + colon + idx + ocur + expr + ccur,
+        idx + opar + param_list + cpar + colon + type_id + ocur + expr + ccur,
         lambda h, s: FuncDeclarationNode(s[1], s[3], s[6], s[8]),
     )
 
@@ -97,7 +97,7 @@ def define_cool_grammar(print_grammar=False):
     param_list %= param, lambda h, s: [s[1]]
     param_list %= G.Epsilon, lambda h, s: []
 
-    param %= idx + colon + idx, lambda h, s: (s[1], s[3])
+    param %= idx + colon + type_id, lambda h, s: (s[1], s[3])
 
     expr %= idx + larrow + expr, lambda h, s: AssignNode(s[1], s[3])
     expr %= let + identifiers_list + inx + expr, lambda h, s: LetNode(s[2], s[4])
@@ -117,15 +117,15 @@ def define_cool_grammar(print_grammar=False):
     identifiers_list %= identifier_init, lambda h, s: [s[1]]
 
     identifier_init %= (
-        idx + colon + idx + larrow + expr,
+        idx + colon + type_id + larrow + expr,
         lambda h, s: VarDeclarationNode(s[1], s[3], s[5]),
     )
-    identifier_init %= idx + colon + idx, lambda h, s: VarDeclarationNode(s[1], s[3])
+    identifier_init %= idx + colon + type_id, lambda h, s: VarDeclarationNode(s[1], s[3])
 
     case_block %= case_item + case_block, lambda h, s: [s[1]] + s[2]
     case_block %= case_item, lambda h, s: [s[1]]
     case_item %= (
-        idx + colon + idx + rarrow + expr + semi,
+        idx + colon + type_id + rarrow + expr + semi,
         lambda h, s: CaseItemNode(s[1], s[3], s[5]),
     )
 
@@ -144,14 +144,14 @@ def define_cool_grammar(print_grammar=False):
 
     factor %= isvoid + element, lambda h, s: IsvoidNode(s[2])
     factor %= neg + element, lambda h, s: NegNode(s[2])
-    factor %= new + idx, lambda h, s: InstantiateNode(s[2])
+    factor %= new + type_id, lambda h, s: InstantiateNode(s[2])
     factor %= element, lambda h, s: s[1]
 
     element %= opar + expr + cpar, lambda h, s: s[2]
     element %= ocur + block + ccur, lambda h, s: BlockNode(s[2])
     element %= (element + dot + func_call, lambda h, s: CallNode(*s[3], obj=s[1]))
     element %= (
-        element + at + idx + dot + func_call,
+        element + at + type_id + dot + func_call,
         lambda h, s: CallNode(*s[5], obj=s[1], at_type=s[3]),
     )
     element %= func_call, lambda h, s: CallNode(*s[1])
@@ -177,4 +177,4 @@ def define_cool_grammar(print_grammar=False):
 
     if print_grammar:
         print(G)
-    return (G, idx, string, num)
+    return (G, idx, type_id, string, num)

@@ -20,6 +20,7 @@ first_tokens = [
     "rarrow",
     "lessequal",
     "id",
+    "type_id",
     "int",
     "string",
 ]
@@ -118,10 +119,20 @@ def t_comments_eof(t):
 
 
 # Rules for initial state (default state)
+
+#Object identifiers
 def t_id(t):
-    r"[a-zA-Z][a-zA-Z_0-9]*"
+    r"[a-z][a-zA-Z_0-9]*"
     t.type = reserved.get(
         t.value, "id"
+    )  # Check for reserved words. If it isn't a reserved word is categorized as identifier
+    return t
+
+#Type identifiers
+def t_type_id(t):
+    r"[A-Z][a-zA-Z_0-9]*"
+    t.type = reserved.get(
+        t.value, "type_id"
     )  # Check for reserved words. If it isn't a reserved word is categorized as identifier
     return t
 
