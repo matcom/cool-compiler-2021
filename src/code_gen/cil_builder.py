@@ -94,6 +94,11 @@ class CILBuilder:
         self._count += 1
         return str(self._count)
 
+    def to_function_name(self, method_name, type_name):
+        return f'function_{method_name}_at_{type_name}'
+
+    def register_instruction(self, instruction):
+        self.register_instruction(instruction)
 
     @visitor.on("node")
     def visit(self, node=None):
@@ -103,11 +108,39 @@ class CILBuilder:
     def visit(self, node):
         self.context = node.context
 
+        #Add entry function and call Main.main()
+        self.current_function =  FunctionNode("entry", [],[],[])
+        self.code.append(self.current_function)
+
+        instance = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(instance))
+
+        result = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(result))
+
+        main_method_name = self.to_function_name("Main", "main")
+        self.register_instruction(AllocateNode("Main",instance))
+        self.register_instruction(ArgNode(instance))
+        self.register_instruction(StaticCallNode(main_method_name, result))
+        self.register_instruction(ReturnNode(0))
+
+        self.current_function = None
+
         for declaration in node.declarations:
             self.visit(declaration)
 
+        #Reset state
+        self.types = []
+        self.code = []
+        self.data = []
         self.current_type = None
-        self.current_method = None
+        self.current_function = None
+        self.errors = errors
+        self.method_count = 0
+        self.string_count = 0
+        self.temp_vars_count = 0
+        self._count = 0
+        self.context = None
 
         return ProgramNode(self.types, self.data, self.code)
 
@@ -264,8 +297,8 @@ class CILBuilder:
         right = self.visit(node.right)
 
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(
             PlusNode(local, left, right)
         )
 
@@ -275,8 +308,8 @@ class CILBuilder:
         right = self.visit(node.right)
 
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(
             MinusNode(local, left, right)
         )
 
@@ -286,8 +319,8 @@ class CILBuilder:
         right = self.visit(node.right)
 
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(
             StarNode(local, left, right)
         )
 
@@ -297,8 +330,8 @@ class CILBuilder:
         right = self.visit(node.right)
 
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(
             DivNode(local, left, right)
         )
     @visitor.when(cool.LessEqualNode)
@@ -307,8 +340,8 @@ class CILBuilder:
         right = self.visit(node.right)
 
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(
             LessEqualNode(local, left, right)
         )
 
@@ -318,8 +351,8 @@ class CILBuilder:
         right = self.visit(node.right)
 
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(
             LessNode(local, left, right)
         )
     @visitor.when(cool.EqualNode)
@@ -328,16 +361,16 @@ class CILBuilder:
         right = self.visit(node.right)
 
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(
             EqualNode(local, left, right)
         )
     #Unary operators
     @visitor.when(cool.InstantiateNode)  # NewNode
     def visit(self, node):
         new_local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(new_local))
-        self.current_function.instructions.append(AllocateNode(node.lex, new_local))
+        self.register_instruction(LocalNode(new_local))
+        self.register_instruction(AllocateNode(node.lex, new_local))
 
     @visitor.when(cool.IsvoidNode)
     def visit(self, node):
@@ -348,16 +381,16 @@ class CILBuilder:
     def visit(self, node):
         value = self.visit(node.expr)
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(NotNode(local, value))
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(NotNode(local, value))
 
 
     @visitor.when(cool.NegNode)
     def visit(self, node):
         value = self.visit(node.expr)
         local = self.generate_next_tvar_id()
-        self.current_function.instructions.append(LocalNode(local))
-        self.current_function.instructions.append(IntComplementNode(local, value))
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(IntComplementNode(local, value))
 
 
     @visitor.when(cool.ConstantNumNode)
