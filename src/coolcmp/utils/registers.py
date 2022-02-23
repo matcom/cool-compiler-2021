@@ -1,6 +1,4 @@
 DW = 4
-from coolcmp.utils import mips
-from typing import List
 
 
 class Register:
@@ -27,25 +25,3 @@ class RegisterLocation:
     def __init__(self, name, offset):
         self.name = name
         self.offset = offset
-
-
-def push_register_instructions(reg_name: str) -> List[mips.InstructionNode]:
-    """
-    addi $sp, $sp, -4
-    sw <reg_name>, 0($sp)
-    """
-    addi = mips.ADDINode(SP, SP, -DW)
-    sw = mips.SWNode(reg_name, 0, SP)
-
-    return [addi, sw]
-
-
-def pop_register_instructions(reg_name: str) -> List[mips.InstructionNode]:
-    """
-    lw <reg_name>, $sp, 0
-    addi $sp, $sp, 4
-    """
-    lw = mips.LWNode(reg_name, 0, SP)
-    addi = mips.ADDINode(SP, SP, DW)
-
-    return [lw, addi]

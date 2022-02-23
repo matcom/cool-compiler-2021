@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import Dict, List
 
-from coolcmp.utils import mips
-from coolcmp.utils.registers import Register
+from coolcmp.utils.registers import Register, SP, DW
 
 
 class Node:
@@ -12,9 +11,9 @@ class Node:
 class ProgramNode(Node):
     def __init__(
         self,
-        data: Dict[str, mips.Node],
-        types: Dict[str, mips.Type],
-        functions: Dict[str, mips.FunctionNode],
+        data: Dict[str, Node],
+        types: Dict[str, Type],
+        functions: Dict[str, FunctionNode],
     ):
         self.data = data
         self.types = types
@@ -116,3 +115,25 @@ class Type:
 
     def __str__(self):
         return f"{self.label}-{self.address}-{self.attrs}-{self.default_attrs}-{self.methods}-{self.index}"
+
+
+def push_register_instructions(reg_name: str) -> List[InstructionNode]:
+    """
+    addi $sp, $sp, -4
+    sw <reg_name>, 0($sp)
+    """
+    addi = ADDINode(SP, SP, -DW)
+    sw = SWNode(reg_name, 0, SP)
+
+    return [addi, sw]
+
+
+def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
+    """
+    lw <reg_name>, $sp, 0
+    addi $sp, $sp, 4
+    """
+    lw = LWNode(reg_name, 0, SP)
+    addi = ADDINode(SP, SP, DW)
+
+    return [lw, addi]
