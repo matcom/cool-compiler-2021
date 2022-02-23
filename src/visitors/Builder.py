@@ -34,13 +34,13 @@ class TypeBuilder:
         _bool.set_parent(_object)
 
         _io.define_method('in_string', [], [], _string)
-        _io.define_method('out_string', ['x'], [_string], _self)
-        _io.define_method('in_int', [], [], _int)
-        _io.define_method('out_int', ['x'], [_int], _self)
+        _io.define_method('out_string', [('x', 'String')], [_string], _self)
+        _io.define_method('in_int', [], [], 'Int')
+        _io.define_method('out_int', [('x', 'Int')], [_int], _self)
 
         _string.define_method('length', [], [], _int)
-        _string.define_method('substr', ['index', 'length'], [_int, _int], _string)
-        _string.define_method('concat', ['str'], [_string], _string)
+        _string.define_method('substr', [('index', 'Int'), ('length', 'Int')], [_int, _int], _string)
+        _string.define_method('concat', [('str', 'String')], [_string], _string)
 
         _int.define_attribute('value', _int)
         _bool.define_attribute('value', _int)

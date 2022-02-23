@@ -1,19 +1,20 @@
 class Main inherits IO {
-   main(): IO {
-	out_string("Hello, World.\n")
+   b : B <- new B;
+   main(x: Int): IO {
+	out_int(b.a())
    };
 };
 
 class A {
    aa : Int;
    a(): Int {
-      1
+      aa
    };
 };
 
 class B inherits A{
    bb : Int;
    b(): Int {
-      2
+      bb
    };
 };
