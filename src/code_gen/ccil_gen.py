@@ -52,13 +52,6 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
-        # Class Properties
-        attributes: List[Attribute] = list()
-        methods: List[Method] = list()
-        init_attr_ops: List[OperationNode] = list()
-
-        # Code in this class
-        class_code: List[FunctionNode] = list()
 
         attr_nodes = []
         func_nodes = []
@@ -70,25 +63,29 @@ class CCILGenerator:
 
         # Explore all attributes and join their operations in an initializer function
         self.locals = dict()
-        operations = []
+        attributes: List[Attribute] = list()
+        init_attr_ops: List[OperationNode] = []
         for attr in attr_nodes:
             attributes.append(Attribute(ATTR + attr.id, attr.type.name))
-            (attr_ops, attr_fval) = self.visit(attr)
-            operations += attr_ops
+            (attr_ops, _) = self.visit(attr)
+            init_attr_ops += attr_ops
+
         # Return type is set as itself? Use selftype maybe?
         init_func = FunctionNode(
-            node, f"init_{node.id}", [], [*self.locals.items()], operations, node.id
+            node,
+            f"init_{node.id}",
+            [],
+            to_vars(self.locals, Parameter),
+            init_attr_ops,
+            node.id,
         )
 
-        # Explore all methods
-        for func in func_nodes:
-            ccil_func = self.visit(func)
-            methods.append(Method("some id", ccil_func))
+        # Explore all functions
+        class_code: List[FunctionNode] = [self.visit(x) for x in func_nodes]
+        # Store the functions inside the class
+        methods: List[Method] = [Method("some id", x) for x in class_code]
 
-        return (
-            Class(attributes, methods, init_func),
-            class_code,
-        )
+        return (Class(attributes, methods, init_func), class_code)
 
     @visitor.when(sem_ast.AttrDeclarationNode)
     def visit(self, node: sem_ast.AttrDeclarationNode) -> VISITOR_RESULT:
@@ -104,9 +101,9 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.MethodDeclarationNode)
     def visit(self, node: sem_ast.MethodDeclarationNode) -> METHOD_VISITOR_RESULT:
-        params: List[Parameter] = []
-        for param in node.params:
-            params.append(Parameter(param.id, param.type.name))
+        params: List[Parameter] = [
+            Parameter(param.id, param.type.name) for param in node.params
+        ]
 
         self.locals = dict()
         (operations, fval_id) = self.visit(node.body)
@@ -282,7 +279,7 @@ class CCILGenerator:
         times = self.times(node)
 
         (cond_ops, cond_fval) = self.visit(node.condition)
-        (body_ops, body_fval) = self.visit(node.body)
+        (body_ops, _) = self.visit(node.body)
 
         # Setting control flow labels
         loop_label_id = f"loop_{times}"
@@ -458,3 +455,7 @@ class CCILGenerator:
         if idx in self.locals:
             raise Exception(f"Trying to insert {idx} again as local")
         self.locals[idx] = typex
+
+
+def to_vars(dict: Dict[str, str], const=BaseVar):
+    return map(lambda x: const(*x), dict.items().mapping())
