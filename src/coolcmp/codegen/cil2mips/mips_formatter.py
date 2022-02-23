@@ -48,7 +48,7 @@ class MIPSFormatter:
 
     @visitor.when(mips.LANode)
     def visit(self, node: mips.LANode):
-        return f"la {self.visit(node.reg)}, {node.value}"
+        return f"la {self.visit(node.reg)}, {node.label}"
 
     @visitor.when(mips.SysCallNode)
     def visit(self, node: mips.SysCallNode):
@@ -56,7 +56,7 @@ class MIPSFormatter:
 
     @visitor.when(mips.JRNode)
     def visit(self, node: mips.JRNode):
-        return "jr $ra"
+        return f"jr {self.visit(node.dest)}"
 
     @visitor.when(mips.LWNode)
     def visit(self, node: mips.LWNode):
