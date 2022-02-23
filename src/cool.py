@@ -4,6 +4,7 @@ from parsing.lexer import COOL_Lexer
 from tours.TypeCollector import TypeCollector
 from tours.TypeBuilder import TypeBuilder
 from tours.TypeChecker import TypeChecker
+from code_generator.generate_ast import CIL
 
 
 input_file = sys.argv[1]
@@ -37,11 +38,15 @@ builder.visit(ast)
 
 # Checking Types
 checker = TypeChecker(context, errors)
-scope = checker.visit(ast)
+checker.visit(ast)
 
 if errors:
     for e in errors:
         print(e)
         exit(1)
+        
+cil_generator = CIL()
+cil = cil_generator.visit(ast)
+print(cil)
 
 exit(0)

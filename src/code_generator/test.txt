@@ -1,0 +1,6 @@
+
+class Main {
+    main(a : Int) : Int { 
+        let y : Int <- 3 in (a + y) + 3
+    };
+};
