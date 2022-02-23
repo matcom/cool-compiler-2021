@@ -369,7 +369,7 @@ class Context:
             self.graph[parentName] = [name]
         return typex
 
-    def get_type(self, name: str, pos):
+    def get_type(self, name: str, pos = None):
         try:
             return self.types[name]
         except KeyError:
