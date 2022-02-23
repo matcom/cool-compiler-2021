@@ -75,7 +75,11 @@ El fichero COOLToCILVisitor .... ????????
 
 Esta es la fase final donde se traduce del lenguaje intermedio al lenguaje MIPS que 
 es el que va a ser ejecutado.   
-Dentro del fichero mips_basics.asm 
+Dentro del fichero mips_basics.asm se encuentran funciones predefinidas en mips:
+Malloc, Copy, Read String, Equal String, Length, Substring y Concat.         
+En CILToMipsVisitor se visita cada nodo del arbol de CIL y se traduce la instruccion
+a las correspondientes instrucciones en codigo Mips. .............?????????/??
+
 
 ### Organizacion
 
@@ -125,3 +129,39 @@ Se omitieron algunos archivos pues no son relevantes en la implementacion del co
 
 ## Principales Problemas
 
+
+
+
+
+# Gramatica
+
+### Terminales
+A continuacion se muestran los terminales de la gramatica, donde entre parentesis se muestran
+los simbolos que corresponden a COOL en los casos en que era requerido:
+
+- *class, inherits, function*
+- *ifx (if), then, elsex (else), fi*
+- *whilex (while), loop, pool*
+- *let, inx (in)*
+- *case, of, esac*
+- *semi (;), colon (:), comma (,), dot(.), at (@), opar((), cpar ())*
+- *ocur ({), ccur (}), larrow (<-), rarrow (=>)*
+- *plus (+), minus (-), star (\*), div (/), isvoid, compl (~)*
+- *notx (not), less (<), leq (<=), equal (=)*
+- *new, idx (id), typex (type), integer, string, boolx (bool)*
+ 
+ 
+### No Terminales
+
+A continuacion se muestran los no terminales de la gramatica definida: 
+- __program__ 
+- __class_list, def_class__
+- __feature_list, feature__
+- __param_list, param__
+- __expr_1, expr_2, member_call, expr_list, let_list, case_list__
+- __comp_expr, arith, arith_2, term, factor, factor_2__
+- __atom, func_call, arg_list__
+
+### Producciones de la Gramatica 
+
+__program__ &#8549;  
