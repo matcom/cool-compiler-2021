@@ -89,7 +89,7 @@ class MipsGenerate:
     def visit(self, node: AST.Arg):
         memory_dir = node.x
 
-        stack_plus = self.stack_dir[memory_dir] + (self.stack_pointer + self.local_stack_pointer)
+        stack_plus = self.stack_dir[memory_dir] + (self.stack_pointer - self.local_stack_pointer)
         self.local_stack_pointer += 4
 
         return [
@@ -105,7 +105,7 @@ class MipsGenerate:
         func = node.z
 
         self.func_list.append(func)
-        stack_plus = self.stack_dir[memory_dest] + (self.stack_pointer + self.local_stack_pointer)
+        stack_plus = self.stack_dir[memory_dest] + (self.stack_pointer - self.local_stack_pointer)
         self.local_stack_pointer = self.stack_pointer
     
         return [
@@ -137,6 +137,6 @@ class MipsGenerate:
         stack_plus = self.stack_dir[memory_dest]
 
         return [
-            ASTR.LW('$t0', data_label),
+            ASTR.LA('$t0', data_label),
             ASTR.SW('$t0', f'{stack_plus}($sp)')
         ]

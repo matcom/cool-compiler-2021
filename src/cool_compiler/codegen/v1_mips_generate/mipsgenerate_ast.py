@@ -26,6 +26,9 @@ class Data:
     
     def __str__(self) -> str:
         if self.value[-1] == '\n': self.value = self.value[0:-1]
+        if(type(self.value==type("string"))):
+            return f'{self.name}: .asciiz \"{str(self.value)}\"'
+
         return f'{self.name}: .{self.type} \"{str(self.value)}\"'
 
 class Func:
@@ -107,7 +110,7 @@ class Operation:
 
 class Out_String:
     def __str__(self) -> str:
-       return  "IO_out_string:\nli $v0, 4\nlw $a0, 4($sp)\nsyscall\nlw $a0, 8($sp)\njr $ra"
+       return  "IO_out_string:\nli $v0, 4\nlw $a0, 20($sp)\nsyscall\nlw $a0, 8($sp)\njr $ra"
 
 
 ############################  Loads   ##################################################
@@ -119,7 +122,11 @@ class LI(Load):
     def __init__(self, registry, memory_dir) -> None:
         super().__init__('li', registry, memory_dir)
 
-        
+class LA(Load):
+    def __init__(self, registry, memory_dir) -> None:
+        super().__init__('la', registry, memory_dir)
+
+
 
 ############################  Store   ##################################################
 class SW(Store):
