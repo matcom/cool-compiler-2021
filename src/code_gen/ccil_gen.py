@@ -1,7 +1,7 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import Set, Tuple, List, Dict
+from typing import  Tuple, List, Dict, Unknown
 from code_gen.tools import *
 
 
@@ -17,7 +17,8 @@ BOOL = "Bool"
 VOID = "Void"
 
 # TODO:
-# The result of type of what it is
+# Define cool built in methods
+# The result of (type of) what is it
 # How to handle void nodes
 # Diference between method id and function id
 # Handdle all remaining operations:
@@ -36,6 +37,7 @@ class CCILGenerator:
     def __init__(self) -> None:
         self.time_record: Dict[str, int] = dict()
         self.locals: Dict[str, str]
+        self.data: Unknown
 
     @visitor.on("node")
     def visit(self, _):
@@ -49,6 +51,8 @@ class CCILGenerator:
             classx, class_code = self.visit(type)
             program_types.append(classx)
             program_codes.append(class_code)
+
+        return CCILProgram(program_types, program_codes, self.data)
 
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
@@ -397,6 +401,27 @@ class CCILGenerator:
 
         return [*args_ops, *expr_ops, *args, call]
 
+    @visitor.when(sem_ast.InstantiateNode)
+    def visit(self, node:sem_ast.InstantiateNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        fvalue_id = f"newType_{times}"
+        fvalue = self.create_new_type(node, fvalue_id, node.type.name) 
+
+        return [fvalue], fvalue
+
+    @visitor.when(sem_ast.StringNode)
+    def visit(self, node:sem_ast.StringNode) -> VISITOR_RESULT:
+        pass
+
+    @visitor.when(sem_ast.IntNode)
+    def visit(self, node:sem_ast.IntNode) -> VISITOR_RESULT:
+        pass
+
+    @visitor.when(sem_ast.BooleanNode)
+    def visit (self, node:sem_ast.BooleanNode) -> VISITOR_RESULT:
+        pass
+
     def times(self, node):
         key: str = type(node).__name__
         try:
@@ -433,6 +458,10 @@ class CCILGenerator:
     def create_storage(self, node, idx: str, type_idx: str, op: ReturnOpNode):
         self.add_local(idx, type_idx)
         return StorageNode(node, idx, op)
+
+    def create_new_type(self, node, idx:str, type_idx:str):
+        self.add_local(idx, type_idx)
+        return StorageNode(node, idx, NewOpNode(node, type_idx))
 
     def create_type_of(self, node, idx: str, type_idx: str, target: AtomOpNode):
         self.add_local(idx, type_idx)
