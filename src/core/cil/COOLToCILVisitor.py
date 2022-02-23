@@ -421,13 +421,25 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         left = self.define_internal_local(line=node.line, column=node.column)
         right = self.define_internal_local(line=node.line, column=node.column)
         value = self.define_internal_local(line=node.line, column=node.column)
+        zero = self.define_internal_local(line=node.line, column=node.column)
 
         self.visit(node.left, scope.childs[0])
         self.register_instruction(cil.GetAttribNode(left, node.left.ret_expr, 'value', 'Int',
                                                     line=node.left.line, column=node.left.line))
         self.visit(node.right, scope.childs[1])
+
+        self.register_instruction(cil.ArgNode(0, line=node.line, column=node.column))
+        self.register_instruction(cil.StaticCallNode(self.init_name('Int'), zero, line=node.line, column=node.column))
+        self.register_instruction(cil.GetAttribNode(zero, zero, 'value', 'Int',
+                                                    line=node.right.line, column=node.right.line))
         self.register_instruction(cil.GetAttribNode(right, node.right.ret_expr, 'value', 'Int',
                                                     line=node.right.line, column=node.right.line))
+        self.register_instruction(cil.EqualNode(zero, zero, right,
+                                                line=node.line, column=node.column))
+        self.register_runtime_error(zero, f'{node.right.line, node.right.column} - '
+                                          f'RuntimeError: Division by zero',
+                                    line=node.right.line, column=node.right.column)
+
         self.register_instruction(cil.DivNode(value, left, right, line=node.line, column=node.column))
 
         self.register_instruction(cil.ArgNode(value, line=node.line, column=node.column))
