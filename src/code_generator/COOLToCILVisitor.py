@@ -253,9 +253,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         let_scope = scope.create_child()
         for var in node.letBody:
             self.visit(var, let_scope)
-        
+
         body_value = self.visit(node.inBody, let_scope)
-        result_local = self.define_internal_local(scope = scope, name = "let_result")
+        result_local = self.define_internal_local(
+            scope=scope, name="let_result")
         self.register_instruction(cil.AssignNode(result_local, body_value))
         return result_local
 
@@ -265,57 +266,78 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         if node.type in ['Int', 'Bool']:
             instance = self.define_internal_local(scope=scope, name="instance")
-            self.register_instruction(cil.AllocateNode(node.type,self.context.get_type(node.type).tag, instance))
+            self.register_instruction(cil.AllocateNode(
+                node.type, self.context.get_type(node.type).tag, instance))
             value = self.define_internal_local(scope=scope, name="value")
-            self.register_instruction(cil.LoadIntNode(0,value))
-            result_init = self.define_internal_local(scope=scope, name="result_init")
-            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [ cil.ArgNode(value), cil.ArgNode(instance)], node.type))
+            self.register_instruction(cil.LoadIntNode(0, value))
+            result_init = self.define_internal_local(
+                scope=scope, name="result_init")
+            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [
+                                      cil.ArgNode(value), cil.ArgNode(instance)], node.type))
         elif node.type == 'String':
             instance = self.define_internal_local(scope=scope, name="instance")
-            self.register_instruction(cil.AllocateNode(node.type,self.context.get_type(node.type).tag ,instance))
+            self.register_instruction(cil.AllocateNode(
+                node.type, self.context.get_type(node.type).tag, instance))
             value = self.define_internal_local(scope=scope, name="value")
-            self.register_instruction(cil.LoadStringNode('empty_str',value))
-            result_init = self.define_internal_local(scope=scope, name="result_init")
-            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [cil.ArgNode(value), cil.ArgNode(instance)], node.type))
+            self.register_instruction(cil.LoadStringNode('empty_str', value))
+            result_init = self.define_internal_local(
+                scope=scope, name="result_init")
+            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [
+                                      cil.ArgNode(value), cil.ArgNode(instance)], node.type))
 
         if not node.expr is None:
             expr_value = self.visit(node.expr, scope)
-            let_var = self.define_internal_local(scope = scope, name = node.name, cool_var_name= node.name)
+            let_var = self.define_internal_local(
+                scope=scope, name=node.name, cool_var_name=node.name)
             self.register_instruction(cil.AssignNode(let_var, expr_value))
         else:
-            let_var = self.define_internal_local(scope = scope, name = node.name, cool_var_name=node.name)
+            let_var = self.define_internal_local(
+                scope=scope, name=node.name, cool_var_name=node.name)
             self.register_instruction(cil.AssignNode(let_var, instance))
 
         return let_var
 
-
-
-
     @visitor.when(CaseNode)
-
     def visit(self, node, scope):
-        expr, typex = self.visit(node.expr, scope)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        case_expr = self.visit(node.expr, scope)
 
-        result = self.define_internal_local()
-        end_label = cil.LabelNode(f'end__{self.idx}')
-        error_label = cil.LabelNode(f'error__{self.idx}')
+        exit_label = self.get_label()
+        label = self.get_label()
 
-        isvoid = self.check_void(expr)
-        self.register_instruction(cil.IfGoToNode(isvoid, error_label.label))
-        try:
-            new_scope = scope.expr_dict[node]
-        except:
-            new_scope = scope
-        sorted_case_list = self.sort_option_nodes_by_type(node.case_list)
-        for i, case in enumerate(sorted_case_list):
-            next_label = cil.LabelNode(f'next__{self.idx}_{i}')
-            expr_i = self.visit(
-                case, new_scope.create_child(), expr, next_label, typex)
-            self.register_instruction(cil.AssignNode(result, expr_i))
-            self.register_instruction(cil.GoToNode(end_label.label))
-            self.register_instruction(next_label)
-        self.register_instruction(end_label)
-        return result, typex
+        self.register_instruction(cil.CaseNode(case_expr, label))
+
+        tag_lst = []
+        option_dict = {}
+        for option in node.optionList:
+            tag = self.context.get_type(option.type).tag
+            tag_lst.append(tag)
+            option_dict[tag] = option
+        tag_lst.sort()
+
+        for t in reversed(tag_lst):
+            option = option_dict[t]
+            self.register_instruction(cil.LabelNode(label))
+            label = self.get_label()
+
+            option_type = self.context.get_type(option.type)
+            self.register_instruction(cil.CaseOptionNode(
+                case_expr, option_type.tag, option_type.max_tag, label))
+
+            option_scope = scope.create_child()
+            option_id = self.define_internal_local(
+                scope=option_scope, name=option.id, cool_var=option.id)
+            self.register_instruction(cil.AssignNode(option_id, case_expr))
+            expr_result = self.visit(option.expr, option_scope)
+
+            self.register_instruction(
+                cil.AssignNode(result_local, expr_result))
+            self.register_instruction(cil.GoToNode(exit_label))
+
+        self.register_instruction(cil.LabelNode(label))
+        self.register_instruction(cil.GoToNode('case_no_match_error'))
+        self.register_instruction(cil.LabelNode(exit_label))
+        return result_local
 
     @visitor.when(PlusNode)
     def visit(self, node, scope):

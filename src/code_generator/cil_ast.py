@@ -72,8 +72,6 @@ class UnaryOperationNode(InstructionNode):
         self.op = op
 
 
-
-
 # Attr
 
 
@@ -266,3 +264,17 @@ class StringEqualsNode(InstructionNode):
         self.s1 = s1
         self.s2 = s2
         self.result = result
+
+
+class CaseNode(InstructionNode):
+    def __init__(self, expr, first_label):
+        self.expr = expr
+        self.first_label = first_label
+
+
+class CaseOptionNode(InstructionNode):
+    def __init__(self, expr, tag, max_tag, next_label):
+        self.expr = expr
+        self.tag = tag
+        self.max_tag = max_tag
+        self.next_label = next_label
