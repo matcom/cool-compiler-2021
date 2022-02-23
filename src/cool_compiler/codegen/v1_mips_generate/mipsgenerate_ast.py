@@ -1,3 +1,6 @@
+from ast import Compare
+
+
 class Program:
     def __init__(self) -> None:
         self.data = {}
@@ -25,7 +28,7 @@ class Data:
         self.value = value
     
     def __str__(self) -> str:
-        if self.value[-1] == '\n': self.value = self.value[0:-1]
+        if self.value[-1] == '\n': self.value = self.value[0:-1] + '\\n'
         if(type(self.value==type("string"))):
             return f'{self.name}: .asciiz \"{str(self.value)}\"'
 
@@ -145,6 +148,26 @@ class SW(Store):
 
 ############################  Cmp   ##################################################
 
+class SEQ(CmpNotJump):  #comparacion igualdad
+    def __init__(self, cmd ,r_dest, r_src_1, r_src_2) -> None:
+            super().__init__( 'seq' ,r_dest, r_src_1, r_src_2)
+
+class SGE(CmpNotJump):
+    def __init__(self, cmd ,r_dest, r_src_1, r_src_2) -> None:
+            super().__init__( 'sge' ,r_dest, r_src_1, r_src_2)
+
+class SLT (CmpNotJump):
+    def __init__(self, cmd ,r_dest, r_src_1, r_src_2) -> None:
+        super().__init__( 'slt' ,r_dest, r_src_1, r_src_2)
+
+
+class SLE(CmpNotJump):
+    def __init__(self, cmd ,r_dest, r_src_1, r_src_2) -> None:
+            super().__init__( 'sle' ,r_dest, r_src_1, r_src_2)
+
+
+
+
 ###########################  Jump #####################################################
 class JAL(JumpInconditional):
     def __init__(self,dest) -> None:
@@ -160,4 +183,10 @@ class JR(JumpInconditional):
 class AddI(Operation):
     def __init__(self,dest,op1,op2) -> None:
             super().__init__('addi',dest,op1,op2)
+
+
+class Add(Operation):
+    def __init__(self,dest,op1,op2) -> None:
+            super().__init__('addi',dest,op1,op2)
+
 
