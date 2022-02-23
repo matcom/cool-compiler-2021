@@ -50,6 +50,16 @@ class Local(BaseVar):
 
 
 @dataclass(frozen=True)
+class Data:
+    """
+    This class hold constant values
+    """
+
+    id: str
+    value: str
+
+
+@dataclass(frozen=True)
 class Method:
     """
     This item represent the method of every class
@@ -117,9 +127,24 @@ class StorageNode(OperationNode):
         self.decl_type = node.decl_type
 
 
+class SetAttrOpNode(OperationNode):
+    def __init__(self, node, type_id: str, attr_id: str, source_id: AtomOpNode) -> None:
+        super().__init__(node)
+        self.type = type_id
+        self.attr = attr_id
+        self.source_id = source_id
+
+
 class ReturnOpNode(OperationNode):
     def __init__(self, node) -> None:
         super().__init__(node)
+
+
+class GetAttrOpNode(ReturnOpNode):
+    def __init__(self, node, type_id: str, attr_id: str) -> None:
+        super().__init__(node)
+        self.type = type_id
+        self.attr = attr_id
 
 
 class CallOpNode(ReturnOpNode):
@@ -212,6 +237,12 @@ class NotOpNode(UnaryOpNode):
 
 class NegOpNode(UnaryOpNode):
     pass
+
+
+class LoadOpNod(ReturnOpNode):
+    def __init__(self, node, target: str) -> None:
+        super().__init__(node)
+        self.target = target
 
 
 class AtomOpNode(ReturnOpNode):
