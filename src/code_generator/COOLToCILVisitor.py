@@ -248,16 +248,50 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             result_local = self.visit(expr, scope)
         return result_local
 
-    @visitor.when(LetNode)
+    @visitor.when(LetInNode)
     def visit(self, node, scope):
-        child_scope = scope.expr_dict[node]
-        for init in node.let_attrs:
-            self.visit(init, child_scope)
+        let_scope = scope.create_child()
+        for var in node.letBody:
+            self.visit(var, let_scope)
+        
+        body_value = self.visit(node.inBody, let_scope)
+        result_local = self.define_internal_local(scope = scope, name = "let_result")
+        self.register_instruction(cil.AssignNode(result_local, body_value))
+        return result_local
 
-        expr, typex = self.visit(node.expr, child_scope)
-        return expr, typex
+    @visitor.when(VarDeclarationNode)
+    def visit(self, node, scope):
+        instance = None
 
-    visitor.when(CaseNode)
+        if node.type in ['Int', 'Bool']:
+            instance = self.define_internal_local(scope=scope, name="instance")
+            self.register_instruction(cil.AllocateNode(node.type,self.context.get_type(node.type).tag, instance))
+            value = self.define_internal_local(scope=scope, name="value")
+            self.register_instruction(cil.LoadIntNode(0,value))
+            result_init = self.define_internal_local(scope=scope, name="result_init")
+            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [ cil.ArgNode(value), cil.ArgNode(instance)], node.type))
+        elif node.type == 'String':
+            instance = self.define_internal_local(scope=scope, name="instance")
+            self.register_instruction(cil.AllocateNode(node.type,self.context.get_type(node.type).tag ,instance))
+            value = self.define_internal_local(scope=scope, name="value")
+            self.register_instruction(cil.LoadStringNode('empty_str',value))
+            result_init = self.define_internal_local(scope=scope, name="result_init")
+            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [cil.ArgNode(value), cil.ArgNode(instance)], node.type))
+
+        if not node.expr is None:
+            expr_value = self.visit(node.expr, scope)
+            let_var = self.define_internal_local(scope = scope, name = node.name, cool_var_name= node.name)
+            self.register_instruction(cil.AssignNode(let_var, expr_value))
+        else:
+            let_var = self.define_internal_local(scope = scope, name = node.name, cool_var_name=node.name)
+            self.register_instruction(cil.AssignNode(let_var, instance))
+
+        return let_var
+
+
+
+
+    @visitor.when(CaseNode)
 
     def visit(self, node, scope):
         expr, typex = self.visit(node.expr, scope)
@@ -282,54 +316,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(next_label)
         self.register_instruction(end_label)
         return result, typex
-
-# this find_local, find_attribute is from scope, this get_type is separate, need to do it well
-    visitor.when(VarNode)
-
-    def visit(self, node, scope):
-        try:
-            typex = scope.find_local(node.lex).type
-            name = self.to_variable_name(node.lex)
-            return name, get_type(typex, self.current_type)
-        except:
-            var_info = scope.find_attribute(node.lex)
-            local_var = self.register_local(var_info.name)
-            self.register_instruction(cil.GetAttrNode(
-                'self', var_info.name, self.current_type.name, local_var, var_info.type.name))
-            return local_var, get_type(var_info.type, self.current_type)
-
-    visitor.when(NewNode)
-
-    def visit(self, node, scope):
-        instance = self.define_internal_local()
-        typex = self.context.get_type(node.lex)
-        typex = get_type(typex, self.current_type)
-        self.register_instruction(cil.AllocateNode(typex.name, instance))
-
-        if typex.get_all_attributes():
-            self.register_instruction(cil.CallNode(typex.name, typex.name, instance, [
-                                      cil.ArgNode(instance)], typex.name))
-
-        return instance, typex
-
-    @visitor.when(NegationNode)
-    def visit(self, node, scope):
-        return self._define_unary_node(node, scope, cil.NotNode)
-
-    @visitor.when(IsVoidNode)
-    def visit(self, node, scope):
-        expr_value = self.visit(node.expr, scope)
-        result_local = self.define_internal_local(
-            scope=scope, name="isvoid_result")
-        self.register_instruction(cil.IsVoidNode(result_local, expr_value))
-        instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(cil.AllocateNode(
-            'Bool', self.context.get_type('Bool').tag, instance))
-        result_init = self.define_internal_local(
-            scope=scope, name="result_init")
-        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
-                                  cil.ArgNode(result_local), cil.ArgNode(instance)], "Bool"))
-        return instance
 
     @visitor.when(PlusNode)
     def visit(self, node, scope):
@@ -544,3 +530,158 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                   cil.ArgNode(op_local), cil.ArgNode(result_local)], "Bool"))
 
         return result_local
+
+    @visitor.when(NegationNode)
+    def visit(self, node, scope):
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        expr_local = self.define_internal_local(scope=scope)
+
+        expr_value = self.visit(node.expr, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            expr_local, expr_value, "value", node.expr.computed_type.name))
+        self.register_instruction(
+            cil.UnaryOperationNode(op_local, expr_local, "~"))
+
+        # Allocate Bool result
+        self.register_instruction(cil.AllocateNode(
+            'Int', self.context.get_type('Int').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Int_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Int"))
+
+        return result_local
+
+    @visitor.when(LogicNegationNode)
+    def visit(self, node, scope):
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        expr_local = self.define_internal_local(scope=scope)
+
+        expr_value = self.visit(node.expr, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            expr_local, expr_value, "value", node.expr.computed_type.name))
+        self.register_instruction(
+            cil.UnaryOperationNode(op_local, expr_local, "not"))
+
+        # Allocate Bool result
+        self.register_instruction(cil.AllocateNode(
+            'Bool', self.context.get_type('Bool').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Bool"))
+
+        return result_local
+
+    @visitor.when(IsVoidNode)
+    def visit(self, node, scope):
+        expr_value = self.visit(node.expr, scope)
+        result_local = self.define_internal_local(
+            scope=scope, name="isvoid_result")
+        self.register_instruction(cil.IsVoidNode(result_local, expr_value))
+        instance = self.define_internal_local(scope=scope, name="instance")
+        self.register_instruction(cil.AllocateNode(
+            'Bool', self.context.get_type('Bool').tag, instance))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                  cil.ArgNode(result_local), cil.ArgNode(instance)], "Bool"))
+        return instance
+
+    @visitor.when(IdNode)
+    def visit(self, node, scope):
+        if self.is_defined_param(node.id):
+            return node.id
+        elif self.current_type.has_attr(node.id):
+            result_local = self.define_internal_local(
+                scope=scope, name=node.id, class_type=self.current_type.name)
+            self.register_instruction(cil.GetAttrNode(
+                result_local, 'self', node.id, self.current_type.name))
+            return result_local
+        else:
+            return scope.find_cil_local(node.id)
+
+    @visitor.when(NewNode)
+    def visit(self, node, scope):
+        result_local = self.define_internal_local(scope=scope, name="result")
+        result_init = self.define_internal_local(scope=scope, name="init")
+
+        if node.id == "SELF_TYPE":
+            self.register_instruction(cil.AllocateNode(
+                self.current_type.name, self.current_type.tag, result_local))
+            self.register_instruction(cil.CallNode(result_init, f'{self.current_type.name}_init', [
+                                      result_local], self.current_type.name))
+        else:
+            self.register_instruction(cil.AllocateNode(
+                node.id, self.context.get_type(node.id).tag, result_local))
+            self.register_instruction(cil.CallNode(result_init, f'{node.id}_init', [
+                                      cil.ArgNode(result_local)], self.current_type.name))
+
+        return result_local
+
+    @visitor.when(IntNode)
+    def visit(self, node, scope):
+        instance = self.define_internal_local(scope=scope, name="instance")
+        self.register_instruction(cil.AllocateNode(
+            'Int', self.context.get_type('Int').tag, instance))
+        value = self.define_internal_local(scope=scope, name="value")
+        self.register_instruction(cil.LoadIntNode(node.id, value))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Int_init', [
+                                  cil.ArgNode(value), cil.ArgNode(instance)], "Int"))
+        return instance
+
+    @visitor.when(StringNode)
+    def visit(self, node, scope):
+        str_name = ""
+        for s in self.dotdata.keys():
+            if self.dotdata[s] == node.id:
+                str_name = s
+                break
+        if str_name == "":
+            str_name = self.register_data(node.id)
+
+        result_local = self.define_internal_local(scope=scope)
+        self.register_instruction(cil.LoadStringNode(str_name, result_local))
+        instance = self.define_internal_local(scope=scope, name="instance")
+        self.register_instruction(cil.AllocateNode(
+            'String', self.context.get_type('String').tag, instance))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'String_init', [
+                                  cil.ArgNode(result_local), cil.ArgNode(instance)], "String"))
+        return instance
+
+    @visitor.when(BoolNode)
+    def visit(self, node, scope):
+        boolean = 0
+        if str(node.id) == "true":
+            boolean = 1
+        instance = self.define_internal_local(scope=scope, name="instance")
+        self.register_instruction(cil.AllocateNode(
+            'Bool', self.context.get_type('Bool').tag, instance))
+        value = self.define_internal_local(scope=scope, name="value")
+        self.register_instruction(cil.LoadIntNode(boolean, value))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                  cil.ArgNode(value), cil.ArgNode(instance)], "Bool"))
+        return instance
+
+    @visitor.when(VoidNode)
+    def visit(self, node, scope):
+        result_local = self.define_internal_local(scope=scope)
+        self.register_instruction(cil.LoadStringNode(node.id, result_local))
+        instance = self.define_internal_local(scope=scope, name="instance")
+        self.register_instruction(cil.AllocateNode(
+            'String', self.context.get_type('String').tag, instance))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Void_init', [
+                                  cil.ArgNode(result_local), cil.ArgNode(instance)], "String"))
+        return instance

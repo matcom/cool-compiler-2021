@@ -65,53 +65,14 @@ class BinaryOperationNode(InstructionNode):
         self.operator = op
 
 
-class ArithExpressionNode(InstructionNode):
-    def __init__(self, dest, left, right):
-        self.dest = dest
-        self.left = left
-        self.right = right
-
-# Arith
-
-
-class PlusNode(ArithExpressionNode):
-    pass
-
-
-class MinusNode(ArithExpressionNode):
-    pass
-
-
-class StarNode(ArithExpressionNode):
-    pass
-
-
-class DivNode(ArithExpressionNode):
-    pass
-
-
-class LessNode(ArithExpressionNode):
-    pass
-
-
-class LessEqualNode(ArithExpressionNode):
-    pass
-
-
-class EqualNode(ArithExpressionNode):
-    pass
-
-
-class NotNode(Node):
-    def __init__(self, dest, expr):
-        self.dest = dest
+class UnaryOperationNode(InstructionNode):
+    def __init__(self, local_dest, expr, op):
+        self.local_dest = local_dest
         self.expr = expr
+        self.op = op
 
 
-class LogicNotNode(Node):
-    def __init__(self, dest, expr):
-        self.dest = dest
-        self.expr = expr
+
 
 # Attr
 
