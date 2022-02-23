@@ -245,13 +245,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(BlockNode)
     def visit(self, node, scope):
         for expr in node.exprs:
-            value, typex = self.visit(expr, scope)
-        result = self.define_internal_local()
-        self.register_instruction(cil.AssignNode(result, value))
-        return result, typex
+            result_local = self.visit(expr, scope)
+        return result_local
 
-    visitor.when(LetNode)
-
+    @visitor.when(LetNode)
     def visit(self, node, scope):
         child_scope = scope.expr_dict[node]
         for init in node.let_attrs:
@@ -321,34 +318,229 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(IsVoidNode)
     def visit(self, node, scope):
-        expr, _ = self.visit(node.expr, scope)
-        result = self.check_void(expr)
-        return result, BoolType()
+        expr_value = self.visit(node.expr, scope)
+        result_local = self.define_internal_local(
+            scope=scope, name="isvoid_result")
+        self.register_instruction(cil.IsVoidNode(result_local, expr_value))
+        instance = self.define_internal_local(scope=scope, name="instance")
+        self.register_instruction(cil.AllocateNode(
+            'Bool', self.context.get_type('Bool').tag, instance))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                  cil.ArgNode(result_local), cil.ArgNode(instance)], "Bool"))
+        return instance
 
     @visitor.when(PlusNode)
     def visit(self, node, scope):
-        return self._define_binary_node(node, scope, cil.PlusNode)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        left_local = self.define_internal_local(scope=scope, name="left")
+        right_local = self.define_internal_local(scope=scope, name="right")
+
+        left_value = self.visit(node.lvalue, scope)
+        right_value = self.visit(node.rvalue, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            left_local, left_value, "value", node.lvalue.computed_type.name))
+        self.register_instruction(cil.GetAttrNode(
+            right_local, right_value, "value", node.rvalue.computed_type.name))
+
+        self.register_instruction(cil.BinaryOperationNode(
+            op_local, left_local, right_local, "+"))
+
+        # Allocate Int result
+        self.register_instruction(cil.AllocateNode(
+            'Int', self.context.get_type('Int').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Int_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Int"))
+
+        return result_local
 
     @visitor.when(MinusNode)
     def visit(self, node, scope):
-        return self._define_binary_node(node, scope, cil.MinusNode)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        left_local = self.define_internal_local(scope=scope, name="left")
+        right_local = self.define_internal_local(scope=scope, name="right")
+
+        left_value = self.visit(node.lvalue, scope)
+        right_value = self.visit(node.rvalue, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            left_local, left_value, "value", node.lvalue.computed_type.name))
+        self.register_instruction(cil.GetAttrNode(
+            right_local, right_value, "value", node.rvalue.computed_type.name))
+
+        self.register_instruction(cil.BinaryOperator(
+            op_local, left_local, right_local, "-"))
+
+        # Allocate Int result
+        self.register_instruction(cil.AllocateNode(
+            'Int', self.context.get_type('Int').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Int_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Int"))
+
+        return result_local
 
     @visitor.when(StarNode)
     def visit(self, node, scope):
-        return self._define_binary_node(node, scope, cil.StarNode)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        left_local = self.define_internal_local(scope=scope, name="left")
+        right_local = self.define_internal_local(scope=scope, name="right")
+
+        left_value = self.visit(node.lvalue, scope)
+        right_value = self.visit(node.rvalue, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            left_local, left_value, "value", node.lvalue.computed_type.name))
+        self.register_instruction(cil.GetAttrNode(
+            right_local, right_value, "value", node.rvalue.computed_type.name))
+
+        self.register_instruction(cil.BinaryOperator(
+            op_local, left_local, right_local, "*"))
+
+        # Allocate Int result
+        self.register_instruction(cil.AllocateNode(
+            'Int', self.context.get_type('Int').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Int_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Int"))
+
+        return result_local
 
     @visitor.when(DivNode)
     def visit(self, node, scope):
-        return self._define_binary_node(node, scope, cil.DivNode)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        left_local = self.define_internal_local(scope=scope, name="left")
+        right_local = self.define_internal_local(scope=scope, name="right")
+
+        left_value = self.visit(node.lvalue, scope)
+        right_value = self.visit(node.rvalue, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            left_local, left_value, "value", node.lvalue.computed_type.name))
+        self.register_instruction(cil.GetAttrNode(
+            right_local, right_value, "value", node.rvalue.computed_type.name))
+
+        self.register_instruction(cil.BinaryOperator(
+            op_local, left_local, right_local, "/"))
+
+        # Allocate Int result
+        self.register_instruction(cil.AllocateNode(
+            'Int', self.context.get_type('Int').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Int_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Int"))
+
+        return result_local
 
     @visitor.when(LessNode)
     def visit(self, node, scope):
-        return self._define_binary_node(node, scope, cil.LessNode)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        left_local = self.define_internal_local(scope=scope, name="left")
+        right_local = self.define_internal_local(scope=scope, name="right")
+
+        left_value = self.visit(node.lvalue, scope)
+        right_value = self.visit(node.rvalue, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            left_local, left_value, "value", node.lvalue.computed_type.name))
+        self.register_instruction(cil.GetAttrNode(
+            right_local, right_value, "value", node.rvalue.computed_type.name))
+
+        self.register_instruction(cil.BinaryOperationNode(
+            op_local, left_local, right_local, "<"))
+
+        # Allocate Bool result
+        self.register_instruction(cil.AllocateNode(
+            'Bool', self.context.get_type('Bool').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Bool"))
+
+        return result_local
 
     @visitor.when(LessEqNode)
     def visit(self, node, scope):
-        return self._define_binary_node(node, scope, cil.LessEqualNode)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        left_local = self.define_internal_local(scope=scope, name="left")
+        right_local = self.define_internal_local(scope=scope, name="right")
+
+        left_value = self.visit(node.lvalue, scope)
+        right_value = self.visit(node.rvalue, scope)
+
+        self.register_instruction(cil.GetAttrNode(
+            left_local, left_value, "value", node.lvalue.computed_type.name))
+        self.register_instruction(cil.GetAttrNode(
+            right_local, right_value, "value", node.rvalue.computed_type.name))
+
+        self.register_instruction(cil.BinaryOperationNode(
+            op_local, left_local, right_local, "<="))
+
+        # Allocate Bool result
+        self.register_instruction(cil.AllocateNode(
+            'Bool', self.context.get_type('Bool').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Bool"))
+
+        return result_local
 
     @visitor.when(EqualNode)
     def visit(self, node, scope):
-        return self._define_binary_node(node, scope, cil.EqualNode)
+        result_local = self.define_internal_local(scope=scope, name="result")
+        op_local = self.define_internal_local(scope=scope, name="op")
+        left_local = self.define_internal_local(scope=scope, name="left")
+        right_local = self.define_internal_local(scope=scope, name="right")
+
+        left_value = self.visit(node.lvalue, scope)
+        right_value = self.visit(node.rvalue, scope)
+
+        if node.lvalue.computed_type.name == 'String':
+            self.register_instruction(cil.CallNode(op_local, 'String_equals', [
+                                      cil.ArgNode(right_value), cil.ArgNode(left_value)], 'String'))
+
+            # Allocate Bool result
+            self.register_instruction(cil.AllocateNode(
+                'Bool', self.context.get_type('Bool').tag, result_local))
+            result_init = self.define_internal_local(
+                scope=scope, name="result_init")
+            self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                      cil.ArgNode(op_local), cil.ArgNode(result_local)], "Bool"))
+
+            return result_local
+
+        elif node.lvalue.computed_type.name in ['Int', 'Bool']:
+            self.register_instruction(cil.GetAttrNode(
+                left_local, left_value, "value", node.lvalue.computed_type.name))
+            self.register_instruction(cil.GetAttrNode(
+                right_local, right_value, "value", node.rvalue.computed_type.name))
+        else:
+            self.register_instruction(cil.AssignNode(left_local, left_value))
+            self.register_instruction(cil.AssignNode(right_local, right_value))
+
+        self.register_instruction(cil.BinaryOperationNode(
+            op_local, left_local, right_local, "="))
+
+        # Allocate Bool result
+        self.register_instruction(cil.AllocateNode(
+            'Bool', self.context.get_type('Bool').tag, result_local))
+        result_init = self.define_internal_local(
+            scope=scope, name="result_init")
+        self.register_instruction(cil.CallNode(result_init, 'Bool_init', [
+                                  cil.ArgNode(op_local), cil.ArgNode(result_local)], "Bool"))
+
+        return result_local

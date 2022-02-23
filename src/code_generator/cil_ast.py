@@ -57,6 +57,14 @@ class AssignNode(InstructionNode):
         self.expr = expr
 
 
+class BinaryOperationNode(InstructionNode):
+    def __init__(self, local_dest, lvalue, rvalue, op):
+        self.local_dest = local_dest
+        self.lvalue = lvalue
+        self.rvalue = rvalue
+        self.operator = op
+
+
 class ArithExpressionNode(InstructionNode):
     def __init__(self, dest, left, right):
         self.dest = dest
