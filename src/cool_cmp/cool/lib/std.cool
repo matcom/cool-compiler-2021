@@ -28,8 +28,30 @@ class IO inherits Object {
     in_int() : Int { 0 };
 };
 
-class Int inherits Object { };
+class Int inherits Object { 
+    abort() : Object{
+        let io:IO <- new IO in {
+            io.out_string("Abort called from class Int")
+            @Object.abort();
+        }
+    };
+    
+    type_name() : String {
+        "Int"
+    };
+};
 
-class Bool inherits Object { };
+class Bool inherits Object {
+    abort() : Object{
+        let io:IO <- new IO in {
+            io.out_string("Abort called from class Bool")
+            @Object.abort();
+        }
+    };
+    
+    type_name() : String {
+        "Bool"
+    };
+ };
 
 class Void { };

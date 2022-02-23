@@ -482,7 +482,7 @@ class TypeChecker:
         self.operator = Operator(context,errors)
 
     def complete_initial_types(self):
-        complete_types = ['Object','String','IO']
+        complete_types = ['Object','String','IO', 'Int', 'Bool']
         for cmp_type in complete_types:
             self.context.get_type(cmp_type).complete()
 

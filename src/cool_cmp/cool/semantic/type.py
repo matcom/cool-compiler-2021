@@ -180,6 +180,22 @@ class IntType(Type):
     def __init__(self):
         Type.__init__(self, 'Int')
 
+    def complete(self):
+        self.add_special_method(self.abort,'abort',0, cil.IntAbortNode)
+        self.add_special_method(self.type_name,'type_name',0, cil.IntTypeNameNode)
+        
+    def set_parent(self,parent):
+        pass
+    
+    @staticmethod
+    def abort(scope,context,operator,errors,**kwargs):
+        raise RunError('Cool Program Aborted from Int')
+
+    @staticmethod
+    def type_name(scope,context,operator,errors,**kwargs):
+        string = context.get_type('String')
+        return ClassInstance(string,context,operator,errors,value="Int")
+
     @property
     def can_have_children(self):
         return False
@@ -191,6 +207,23 @@ class IntType(Type):
 class BoolType(Type):
     def __init__(self):
         Type.__init__(self, 'Bool')
+
+    def complete(self):
+        self.add_special_method(self.abort,'abort',0, cil.BoolAbortNode)
+        self.add_special_method(self.type_name,'type_name',0, cil.BoolTypeNameNode)
+        
+    def set_parent(self,parent):
+        pass
+    
+    @staticmethod
+    def abort(scope,context,operator,errors,**kwargs):
+        raise RunError('Cool Program Aborted from Bool')
+
+    @staticmethod
+    def type_name(scope,context,operator,errors,**kwargs):
+        string = context.get_type('String')
+        return ClassInstance(string,context,operator,errors,value="Bool")
+
 
     @property
     def can_have_children(self):

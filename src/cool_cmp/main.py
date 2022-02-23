@@ -2,6 +2,7 @@
 # base_dir = os.path.dirname(__file__)
 # sys.path.append(os.path.join(base_dir, ".."))
 
+from cool.error.errors import AbortError
 from cool.pipeline import cool_pipeline, generate_cool_pipeline, interprete_cil_pipeline,\
                           interprete_cool_pipeline, generate_cil_pipeline, generate_mips_pipeline
 from cool.grammar.cool_grammar import G
@@ -92,7 +93,7 @@ def main(
         with open(out_dir, "w") as file:
             file.write(mips_text)
     
-    if g_errors:
+    if [x for x in g_errors if not isinstance(x, AbortError)]:
         for err in g_errors:
             print(err)
         exit(1)

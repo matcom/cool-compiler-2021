@@ -769,9 +769,9 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):
-        if node.type == "Int":
+        if node.type in ["Int", "Bool"]:
             
-            self._store_local_variable(Reg.zero(), node.dest, node.row, node.column, node.comment) # Default value for Int is 0
+            self._store_local_variable(Reg.zero(), node.dest, node.row, node.column, node.comment) # Default value for Int and Bool is 0
             return
 
         if node.type[0].isupper(): # Is a Type name
@@ -877,14 +877,21 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self._binary_operation(node, AddNode, Reg.t(0), Reg.t(
             1), Reg.t(2), node.row, node.column, node.comment)
 
+    @visitor.when(cil.ObjEqualNode)
+    def visit(self, node:cil.ObjEqualNode):
+        if node.value_compare:
+            self._binary_operation(node, SetEqualToNode, Reg.t(0), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)
+        else:
+            self._load_local_variable(Reg.a(0), node.left, node.row, node.column, "a0 = left object")
+            self._load_local_variable(Reg.a(1), node.right, node.row, node.column, "a1 = right object")
+            self._push([Reg.ra()])
+            self.add_instruction(JumpAndLinkNode("__object_equal"))
+            self._pop([Reg.ra()])
+            self._store_local_variable(Reg.v(0), node.dest, comment="Saving equal result")
+
     @visitor.when(cil.EqualNode)
     def visit(self, node:cil.EqualNode):
-        self._load_local_variable(Reg.a(0), node.left, node.row, node.column, "a0 = left String")
-        self._load_local_variable(Reg.a(1), node.right, node.row, node.column, "a1 = right String")
-        self._push([Reg.ra()])
-        self.add_instruction(JumpAndLinkNode("__object_equal"))
-        self._pop([Reg.ra()])
-        self._store_local_variable(Reg.v(0), node.dest, comment="Saving equal result")
+        self._binary_operation(node, SetEqualToNode, Reg.t(0), Reg.t(1), Reg.t(2),node.row, node.column, node.comment)
 
     @visitor.when(cil.GreaterNode)
     def visit(self, node:cil.GreaterNode):
