@@ -2,9 +2,9 @@
 class Test {
 
     testing8(): Bool {
-        z: Int <- (((if tRue = not faLSe then ~z else 3 <= 4 + "hey".length() fi + a)/(0)*(((4 * 4)))))
+        z: Int <- 3
     };
-}-- Mising ";"
+}      -- ;
 
 class Test2 {
     test1: Test <- new Test;

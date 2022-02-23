@@ -1,1 +1,1 @@
-(7, 1) - SyntacticError: ERROR at or near CLASS
+(9, 1) - SyntacticError: ERROR at or near CLASS

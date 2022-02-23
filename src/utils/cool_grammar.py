@@ -1,3 +1,4 @@
+from fileinput import lineno
 import ply.yacc as yacc
 import cool_lexer as lex
 import utils.ast_nodes as ast
@@ -23,17 +24,17 @@ def p_class_def(p):
     '''class_def : CLASS TYPE OBRACE feature_list CBRACE SEMI 
                  | CLASS TYPE INHERITS TYPE OBRACE feature_list CBRACE SEMI'''
     if len(p) == 7:
-        p[0] = ast.ClassDecNode(p[2], p[4])
+        p[0] = ast.ClassDecNode(p[2], p[4], p.lineno(1), p.lexpos(1))
     elif len(p) == 9:
-        p[0] = ast.ClassDecNode(p[2], p[6], p[4])
+        p[0] = ast.ClassDecNode(p[2], p[6], p.lineno(1), p.lexpos(1), p[4])
 
 # def p_class_def_error(p):
-#     '''class_def : CLASS TYPE OBRACE error CBRACE 
-#                  | CLASS TYPE INHERITS TYPE OBRACE error CBRACE'''
-#     if len(p) == 6:
-#         errors.append((p[5].lineno, p[5].lexpos, 'EOC not found', 'SEMI'))
+#     '''class_def : CLASS TYPE OBRACE error CBRACE SEMI
+#                  | CLASS TYPE INHERITS TYPE OBRACE error CBRACE SEMI'''
+#     if len(p) == 7:
+#         errors.append((p.lineno(5), p.lexpos(5), 'EOC not found', 'CBRACE'))
 #     else:
-#         errors.append((p[7].lineno, p[7].lexpos, 'EOC not found', 'SEMI'))
+#         errors.append((p.lineno(7), p.lexpos(7), 'EOC not found', 'CBRACE'))
 
 
 def p_feature_list(p):
@@ -62,6 +63,16 @@ def p_method(p):
         p[0] = ast.MethodDecNode(p[1], p[5], p[7], [])
     elif len(p) == 10:
         p[0] = ast.MethodDecNode(p[1], p[6], p[8], p[3])
+
+def p_method_error(p):
+    '''method : ID OPAR CPAR COLON TYPE OBRACE error CBRACE
+              | ID OPAR param_list CPAR COLON TYPE OBRACE error CBRACE'''
+    if len(p) == 9:
+        errors.append((p.lineno(7), p.lexpos(7), '', 'CBRACE'))
+    elif len(p) == 10:
+        errors.append((p.lineno(8), p.lexpos(8), '', 'CBRACE'))
+    
+    
 
 
 def p_param_list(p):
