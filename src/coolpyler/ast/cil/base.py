@@ -86,7 +86,7 @@ class SetAttrNode(InstructionNode):
         super().__init__()
         self.instance = instance
         self.attr = attr
-        self.dest = source
+        self.source = source
 
 
 class GetIndexNode(InstructionNode):
