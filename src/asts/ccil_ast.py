@@ -50,6 +50,16 @@ class Local(BaseVar):
 
 
 @dataclass(frozen=True)
+class Data:
+    """
+    This class hold constant values
+    """
+
+    id: str
+    value: str
+
+
+@dataclass(frozen=True)
 class Method:
     """
     This item represent the method of every class
@@ -118,15 +128,31 @@ class StorageNode(OperationNode):
         self.decl_type = node.decl_type
 
 
+class SetAttrOpNode(OperationNode):
+    def __init__(self, node, type_id: str, attr_id: str, source_id: AtomOpNode) -> None:
+        super().__init__(node)
+        self.type = type_id
+        self.attr = attr_id
+        self.source_id = source_id
+
+
 class ReturnOpNode(OperationNode):
     def __init__(self, node) -> None:
         super().__init__(node)
 
 
+class GetAttrOpNode(ReturnOpNode):
+    def __init__(self, node, type_id: str, attr_id: str) -> None:
+        super().__init__(node)
+        self.type = type_id
+        self.attr = attr_id
+
+
 class CallOpNode(ReturnOpNode):
-    def __init__(self, node, idx: str, args: List[str]) -> None:
+    def __init__(self, node, idx: str, type_idx: str, args: List[str]) -> None:
         super().__init__(node)
         self.id = idx
+        self.type = type_idx
         self.args = args
 
 
@@ -142,6 +168,12 @@ class VoidNode(ReturnOpNode):
     """Operation that indicate that the Storage Node is not initialized"""
 
     pass
+
+
+class NewOpNode(ReturnOpNode):
+    def __init__(self, node, type_idx: str) -> None:
+        super().__init__(node)
+        self.type_idx: str = type_idx
 
 
 class BinaryOpNode(ReturnOpNode):
@@ -211,23 +243,34 @@ class NegOpNode(UnaryOpNode):
     pass
 
 
+class LoadOpNod(ReturnOpNode):
+    def __init__(self, node, target: str) -> None:
+        super().__init__(node)
+        self.target = target
+
+
 class AtomOpNode(ReturnOpNode):
-    def __init__(self, node) -> None:
+    def __init__(self, node, value: str) -> None:
         """
         AtomNode represents all single value nodes, like ids and constants
         """
         super().__init__(node)
+        self.value = value
 
 
 class IdNode(AtomOpNode):
-    def __init__(self, node, idx: str) -> None:
-        super().__init__(node)
-        self.id = idx
+    def __init__(self, node, value: str) -> None:
+        super().__init__(node, value)
 
 
 class ConstantNode(AtomOpNode):
-    def __init__(self, node) -> None:
-        super().__init__(node)
+    def __init__(self, node, value: str) -> None:
+        super().__init__(node, value)
+
+
+class IntNode(ConstantNode):
+    def __init__(self, node, value: str) -> None:
+        super().__init__(node, value)
 
 
 class FlowControlNode(OperationNode):
