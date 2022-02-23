@@ -123,16 +123,16 @@ class ReturnOpNode(OperationNode):
 
 
 class CallOpNode(ReturnOpNode):
-    def __init__(self, node, idx: str, args: List[str]) -> None:
+    def __init__(self, node, idx: str, type_idx: str, args: List[str]) -> None:
         super().__init__(node)
         self.id = idx
+        self.type = type_idx
         self.args = args
 
 
 class VCallOpNode(ReturnOpNode):
     def __init__(self, node, idx: str, type_idx: str, args: List[str]) -> None:
-        super().__init__(node, idx, args)
-        self.type = type_idx
+        super().__init__(node, idx, type_idx, args)
 
 
 class VoidNode(ReturnOpNode):

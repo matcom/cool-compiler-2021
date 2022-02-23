@@ -1,7 +1,7 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import  Tuple, List, Dict, Unknown
+from typing import Tuple, List, Dict, Unknown
 from code_gen.tools import *
 
 
@@ -35,6 +35,7 @@ class CCILGenerator:
     """
 
     def __init__(self) -> None:
+        self.current_type: str
         self.time_record: Dict[str, int] = dict()
         self.locals: Dict[str, str]
         self.data: Unknown
@@ -56,6 +57,7 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
+        self.current_type = node.id
 
         attr_nodes = []
         func_nodes = []
@@ -384,42 +386,48 @@ class CCILGenerator:
 
         # id(arg1, arg2, ..., argn)
         if node.expr is None:
-            fval_id = f"call_{times}"
-            call = self.create_call(node, fval_id, node.type.id, node.id)
-            return [*args_ops, *args, call], call
+            fval_id = f"vcall_{times}"
+            call = self.create_vcall(
+                node, fval_id, node.type.id, node.id, node.caller_type.name
+            )
+            return [*args_ops, call], call
 
-        # <expr>.id(arg1, arg2, ..., argn)
-        (expr_ops, expr_fval) = self.visit(node.expr)
+
+        (expr_ops, _) = self.visit(node.expr)
 
         # <expr>@type.id(arg1, arg2, ..., argn)
-        type_idx: str = (
-            node.expr.type.name if node.at_type is None else node.at_type.name
-        )
+        if node.at_type is not None:
+            fval_id = f"call_{times}"
+            call = self.create_call(
+                node, fval_id, node.type.name, node.id, node.caller_type.name
+            )
+            return [*args_ops, *expr_ops, call]
+    
+        # <expr>.id(arg1, arg2, ..., argn)
+        fval_id = f"vcall_{times}"
+        call = self.create_vcall(node, fval_id, node.type.id, node.id, node.caller_type)
 
-        fval_id = f"fvcall_{times}"
-        call = self.create_vcall(node, fval_id, node.type.id, node.id, type_idx)
-
-        return [*args_ops, *expr_ops, *args, call]
+        return [*args_ops, *expr_ops,  call]
 
     @visitor.when(sem_ast.InstantiateNode)
-    def visit(self, node:sem_ast.InstantiateNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.InstantiateNode) -> VISITOR_RESULT:
         times = self.times(node)
 
         fvalue_id = f"newType_{times}"
-        fvalue = self.create_new_type(node, fvalue_id, node.type.name) 
+        fvalue = self.create_new_type(node, fvalue_id, node.type.name)
 
         return [fvalue], fvalue
 
     @visitor.when(sem_ast.StringNode)
-    def visit(self, node:sem_ast.StringNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.StringNode) -> VISITOR_RESULT:
         pass
 
     @visitor.when(sem_ast.IntNode)
-    def visit(self, node:sem_ast.IntNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.IntNode) -> VISITOR_RESULT:
         pass
 
     @visitor.when(sem_ast.BooleanNode)
-    def visit (self, node:sem_ast.BooleanNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.BooleanNode) -> VISITOR_RESULT:
         pass
 
     def times(self, node):
@@ -430,9 +438,16 @@ class CCILGenerator:
             self.time_record[key] = 0
         return self.time_record[key]
 
-    def create_call(self, node, storage_idx: str, type_idx: str, method_idx: str):
+    def create_call(
+        self,
+        node,
+        storage_idx: str,
+        type_idx: str,
+        method_idx: str,
+        args: List[StorageNode],
+    ):
         self.add_local(storage_idx, type_idx)
-        return StorageNode(node, storage_idx, CallOpNode(node, method_idx))
+        return StorageNode(node, storage_idx, CallOpNode(node, method_idx, args))
 
     def create_vcall(
         self,
@@ -441,10 +456,11 @@ class CCILGenerator:
         type_idx: str,
         method_idx: str,
         method_type_idx: str,
+        args: List[StorageNode],
     ):
         self.add_local(storage_idx, type_idx)
         return StorageNode(
-            node, storage_idx, VCallOpNode(node, method_idx, method_type_idx)
+            node, storage_idx, VCallOpNode(node, method_idx, method_type_idx, args)
         )
 
     def create_assignation(self, node, idx: str, type_idx: str, target: str):
@@ -459,7 +475,7 @@ class CCILGenerator:
         self.add_local(idx, type_idx)
         return StorageNode(node, idx, op)
 
-    def create_new_type(self, node, idx:str, type_idx:str):
+    def create_new_type(self, node, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
         return StorageNode(node, idx, NewOpNode(node, type_idx))
 
