@@ -5,21 +5,6 @@ from coolcmp.utils import cil, visitor
 from coolcmp.utils import mips, registers
 
 
-class LabelUUID:
-    """
-    Class for generating unique labels
-    """
-
-    def __init__(self, name: str):
-        self.name = name
-        self.counter = 0
-
-    def next(self):
-        label = f"{self.name}_{self.counter}"
-        self.counter += 1
-        return label
-
-
 class CILToMipsVisitor:
     def __init__(self):
         self.data: Dict[str, mips.Node] = {}
@@ -28,10 +13,6 @@ class CILToMipsVisitor:
         self.cur_function: mips.FunctionNode = None
 
         self.function_names: Dict[str, str] = {}
-
-        self.data_label_gen = LabelUUID("data")
-        self.types_label_gen = LabelUUID("type")
-        self.code_label_gen = LabelUUID("code")
 
         self.labels = {}
 
@@ -73,10 +54,8 @@ class CILToMipsVisitor:
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
         print(f"TypeNode {node.name} {node.methods}")
-        new_label = self.data_label_gen.next()
-        self.data[node.name] = mips.StringNode(new_label, f'"{node.name}"')
+        self.data[node.name] = mips.StringNode(node.name, f'"{node.value}"')
 
-        type_label = self.types_label_gen.next()
         methods = [
             self.function_names[i]
             for i in node.methods.values()
@@ -84,8 +63,8 @@ class CILToMipsVisitor:
         ]
 
         type_ = mips.Type(
-            type_label,
-            new_label,
+            node.name,
+            node.name,
             list(node.attributes),
             methods,
             len(self.types),
@@ -97,8 +76,7 @@ class CILToMipsVisitor:
     @visitor.when(cil.DataNode)
     def visit(self, node: cil.DataNode):
         print(f"DataNode {node.name} {node.value}")
-        data_label = self.data_label_gen.next()
-        self.data[node.name] = mips.StringNode(data_label, node.value)
+        self.data[node.name] = mips.StringNode(node.name, f"{node.value}")
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
