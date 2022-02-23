@@ -526,7 +526,7 @@ class CoolParser:
             return (token.lexpos - line_start) + 1  #parentesis?
 
         if not p:
-            errors.append(SyntacticError % (0,0,'EOF'))
+            errors.append(_SyntacticError % (0,0,'EOF'))
             return
 
         token_column = find_column(p.lexer.lexdata, p)
