@@ -176,8 +176,8 @@ def t_comment1(t):
     # No return value. Token discarded
 
 
-def t_string(t):
-    r"\" "
+def t_string(t):# se va a develve el string vacio cada vez que no se puede matchear el string completo
+    r"\" "#xq habria que seguir analizando el string cuando se ha encontrado un caracter null y se ha de parar en otros casos?
     string_list = []
     text = t.lexer.lexdata
     initial = t.lexer.lexpos
@@ -237,8 +237,9 @@ def t_string(t):
                     "Illegal character \\0 inside string",
                 )
             )
-            t.lexer.lexpos = index+1
-            return t
+            index += 1
+            # t.lexer.lexpos = index+1
+            # return t
         else:
             string_list.append(text[index])
             # string_to_append += text[index + 1]
