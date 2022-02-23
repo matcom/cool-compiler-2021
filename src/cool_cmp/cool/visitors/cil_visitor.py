@@ -1186,22 +1186,19 @@ class COOLToCILVisitor():
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode, scope):
         
-        # Dalmau Void Fix Added Start
-        # abort_label = self.define_label( node.row, node.column, "Case Node abort label")
-        # Dalmau Void Fix Added End
+        abort_label = self.define_label( node.row, node.column, "Case Node abort label")
 
         value = self.visit(node.expr, scope)
         final_result = self.define_internal_local(node.row, node.column, "Case Node local final result")
         
         type_value = self.define_internal_local(node.row, node.column, "Case Node local type_value")
         
-        # Dalmau Void Fix Added Start
-        # isVoid  = self.define_internal_local(node.row, node.column, "Case Node local isVoid")
-        # self.register_instruction(cil.VoidNode(isVoid, node.row, node.column, "Case Node void isVoid"))
-        # # Luiso Change: type_value -> value
-        # self.register_instruction(cil.EqualNode(isVoid,value,isVoid, node.row, node.column, "Case Node equal isVoid value isVoid"))
-        # self.register_instruction(cil.GotoIfNode(isVoid, abort_label.label, node.row, node.column, "Case Node gotoif isVoid abort_label"))
-        # Dalmau Void Fix Added End
+        
+        isVoid  = self.define_internal_local(node.row, node.column, "Case Node local isVoid")
+        self.register_instruction(cil.VoidNode(isVoid, node.row, node.column, "Case Node void isVoid"))
+        self.register_instruction(cil.EqualNode(isVoid,value,isVoid, node.row, node.column, "Case Node equal isVoid value isVoid"))
+        self.register_instruction(cil.GotoIfNode(isVoid, abort_label.label, node.row, node.column, "Case Node gotoif isVoid abort_label"))
+        
         
         self.register_instruction(cil.TypeOfNode(value, type_value, node.row, node.column, "Case Node typeof value"))
         checks = len(node.params)
@@ -1223,9 +1220,7 @@ class COOLToCILVisitor():
         start_label = self.define_label(node.row, node.column, "Case Node start label")
         minim_label = self.define_label( node.row, node.column, "Case Node minim label")
         end_label = self.define_label( node.row, node.column, "Case Node end label")
-        # Dalmau Void Fix Removed Start
-        abort_label = self.define_label( node.row, node.column, "Case Node abort label")
-        # Dalmau Void Fix Removed End
+
         stop_for = self.define_internal_local( node.row, node.column, "Case Node local stop_for")
         not_valid_distance = self.define_internal_local( node.row, node.column, "Case Node local not_valid_distance")
         minim_cond = self.define_internal_local( node.row, node.column, "Case Node local minim_cond")

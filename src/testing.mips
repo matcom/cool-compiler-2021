@@ -1652,13 +1652,13 @@ jr $t0
 sw $v0, 8($fp)
 # Case Node void isVoid
 sw $zero, 24($fp)
-# Case Node equal isVoid type_value isVoid
-lw $t0, 20($fp)
-# Case Node equal isVoid type_value isVoid
+# Case Node equal isVoid value isVoid
+lw $t0, 8($fp)
+# Case Node equal isVoid value isVoid
 lw $t1, 24($fp)
-# Case Node equal isVoid type_value isVoid
+# Case Node equal isVoid value isVoid
 seq $t2, $t0, $t1
-# Case Node equal isVoid type_value isVoid
+# Case Node equal isVoid value isVoid
 sw $t2, 24($fp)
 # Case Node gotoif isVoid abort_label
 lw $t0, 24($fp)
@@ -1908,7 +1908,7 @@ lw $t0, 76($fp)
 sw $t0, 16($fp)
 # Case Node goto final_label
 j print_list_at_Cons_label_4
-# Case Node end_label <cool.ast.cool_ast.CheckNode object at 0x7f76643fc7f0>
+# Case Node end_label <cool.ast.cool_ast.CheckNode object at 0x7fb44d417af0>
 print_list_at_Cons_label_5:
 # Case Node equal not_equal_types param.type.name current_type
 la $t0, Article
@@ -1982,7 +1982,7 @@ lw $t0, 92($fp)
 sw $t0, 16($fp)
 # Case Node goto final_label
 j print_list_at_Cons_label_4
-# Case Node end_label <cool.ast.cool_ast.CheckNode object at 0x7f76643fc7b8>
+# Case Node end_label <cool.ast.cool_ast.CheckNode object at 0x7fb44d417ca0>
 print_list_at_Cons_label_6:
 # Case Node abort label
 print_list_at_Cons_label_0:
