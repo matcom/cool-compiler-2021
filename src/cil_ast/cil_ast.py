@@ -194,25 +194,8 @@ class SubstringNode(InstructionNode):
         self.string = string
         self.i = i
         self.n = n
-class EqualString(InstructionNode):
-    def __init__(self, dest, string1, string2):
-        self.dest = dest
-        self.string1 = string1
-        self.string2 = string2
 
 class ToStrNode(InstructionNode):
     def __init__(self, dest, ivalue):
         self.dest = dest
         self.ivalue = ivalue
-
-class ReadNode(InstructionNode):
-    def __init__(self, dest):
-        self.dest = dest
-
-class PrintNode(InstructionNode):
-    def __init__(self, str_addr):
-        self.str_addr = str_addr
-
-class IntNode(InstructionNode):
-    def __init_(self, value):
-        self.value = value

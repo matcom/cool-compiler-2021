@@ -19,10 +19,6 @@ class BaseCOOLToCILVisitor:
         self.attrs = {}#set()
         self.parameters = set()
         self.instances = []
-    
-    def transform_keys(self, xtype, keys):
-        for i,key in enumerate(keys):
-            xtype.attrs[key] = i
 
     def transform_to_keys(self, xtype, keys):
         for i, key in enumerate(keys):
