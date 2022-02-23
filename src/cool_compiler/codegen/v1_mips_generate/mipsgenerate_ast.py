@@ -52,7 +52,14 @@ class Comment:
         self.is_comment = True
 
     def __str__(self) -> str:
-        return f'//{self.msg}'
+        return f'#{self.msg}'
+
+class Header_Comment:
+    def __init__(self, msg) -> None:
+        self.msg = msg
+
+    def __str__(self) -> str:
+        return f'#{self.msg}'
 
 class Load:
     def __init__(self, cmd ,registry, memory_dir) -> None:
@@ -111,7 +118,7 @@ class Operation:
 
 class Out_String:
     def __str__(self) -> str:
-       return  "IO_out_string:\nli $v0, 4\nlw $a0, 20($sp)\nsyscall\nlw $a0, 8($sp)\njr $ra"
+       return  "IO_out_string:\nli $v0, 4\nlw $a0, 0($sp)\nsyscall\nlw $a0, 4($sp)\naddi $sp, $sp, 8\njr $ra"
 
 
 ############################  Loads   ##################################################

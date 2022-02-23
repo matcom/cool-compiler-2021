@@ -34,51 +34,51 @@ class MipsGenerate:
     @visitor.when(AST.Function)
     def visit(self, node: AST.Function):
         new_func = ASTR.Func(node.name if not node.name == 'new_ctr_Main' else 'main')
-        self.stack_dir = {}
-        self.stack_pointer = 0
-        self.local_stack_pointer = 0
+        self.stack = []
+        self.final_len_stack = len(node.param) + len(node.local) + 2
+        self.local_push = 0
+        
+        for param in [AST.Param('Return $ra')] + node.param:
+            new_func.cmd += self.visit(param)
 
-        for _local in node.local:
+        for _local in node.local + [AST.Local('$ra')]:
             new_func.cmd += self.visit(_local)
 
         new_func.cmd += (
-            self.visit(AST.Local('$ra')) + 
-            [ASTR.SW('$ra', "4($sp)")] + 
+            [ASTR.SW('$ra', "0($sp)")] + 
             [ASTR.Comment(f"Agrega $ra a la pila para salvar el punto de retorno de la funcion {node.name}")])
-
-        for param in node.param:
-            new_func.cmd += self.visit(param)
 
         for expr in node.expr:
             new_func.cmd += self.visit(expr)
 
         self.new_program.func[new_func.name] = new_func
 
-        # print(new_func)
+    #stack_pointer = 0
+    #bsp = self.base_stack_pointer
+    def stack_index(self, name):
+        return (len(self.stack) - self.stack.index(name) - 1) * 4
 
     @visitor.when(AST.Param)
     def visit(self, node: AST.Param):
-        self.stack_pointer += 4
-        self.local_stack_pointer += 4
-        self.stack_dir[node.x] = self.stack_pointer
-        return []
+        self.stack.append(node.x)
+        return [ASTR.Header_Comment(f'Parametro {node.x} en stackpoiner + {(self.final_len_stack - len(self.stack)) * 4}')]  
+   
 
     @visitor.when(AST.Local)
     def visit(self, node: AST.Local):
-        self.stack_pointer += 4
-        self.local_stack_pointer += 4
-        self.stack_dir[node.x] = 0
-        for key in self.stack_dir.keys():
-            self.stack_dir[key] += 4
-
-        return [ASTR.AddI('$sp', '$sp', -4), ASTR.Comment(f'Push local var {node.x}')]
+        self.stack.append(node.x)
+        return [
+            ASTR.AddI('$sp', '$sp', -4), 
+            ASTR.Comment(
+            f'Push local var {node.x} stackpointer {(self.final_len_stack - len(self.stack)) * 4}')
+        ]
 
     @visitor.when(AST.ALLOCATE)
     def visit(self, node: AST.ALLOCATE):
         memory_dir = node.x
         _type = node.y
 
-        stack_plus = self.stack_dir[memory_dir] 
+        stack_plus = self.stack_index(memory_dir) 
         _len = len(self.cil_type[_type].attributes)
 
         return [
@@ -91,14 +91,17 @@ class MipsGenerate:
     @visitor.when(AST.Arg)
     def visit(self, node: AST.Arg):
         memory_dir = node.x
-
-        stack_plus = self.stack_dir[memory_dir] + (self.stack_pointer - self.local_stack_pointer)
-        self.local_stack_pointer += 4
+        
+        stack_plus = self.stack_index(memory_dir)
+        self.local_push += 1
+        self.stack.append(memory_dir)
 
         return [
             ASTR.LW('$t0', f'{stack_plus}($sp)'),
+            ASTR.Comment(f'Saca de la pila {node.x}'),
+            ASTR.AddI('$sp', '$sp', -4),
             ASTR.SW('$t0', '0($sp)'),
-            ASTR.AddI('$sp', '$sp', -4)
+            ASTR.Comment(f'Mete para la pila {node.x}'),
         ]        
 
     @visitor.when(AST.VCall)
@@ -108,12 +111,14 @@ class MipsGenerate:
         func = node.z
 
         self.func_list.append(func)
-        stack_plus = self.stack_dir[memory_dest] + (self.stack_pointer - self.local_stack_pointer)
-        self.local_stack_pointer = self.stack_pointer
-    
+        self.stack = self.stack[0: len(self.stack) - self.local_push]
+        stack_plus = self.stack_index(memory_dest)
+
         return [
             ASTR.JAL(func),
-            ASTR.SW('$s0', f'{stack_plus}($sp)' )
+            ASTR.Comment(f'Call a la function {func}'),
+            ASTR.SW('$s0', f'{stack_plus}($sp)' ),
+            ASTR.Comment(f'Save el resultado de la funcion que esta en $s0 pa la pila'),
         ]
 
     @visitor.when(AST.Return)
@@ -122,12 +127,15 @@ class MipsGenerate:
             return [ASTR.LI('$v0', 10), ASTR.SysCall()]
         
         memory_dest = node.x
-        stack_plus = self.stack_dir[memory_dest]
+        stack_plus = self.stack_index(memory_dest)
 
         return [
             ASTR.LW('$s0', f'{stack_plus}($sp)'),
-            ASTR.LW('$ra', f'4($sp)'),
-            ASTR.AddI('$sp', '$sp', stack_plus),
+            ASTR.Comment("Envia el resultado de la funcion en $s0"),
+            ASTR.LW('$ra', f'{(len(self.stack) - 1)* 4}($sp)'),
+            ASTR.Comment("Lee el $ra mas profundo de la pila para retornar a la funcion anterior"),
+            ASTR.AddI('$sp', '$sp', len(self.stack) * 4),
+            ASTR.Comment("Limpia la pila"),
             ASTR.JR('$ra')
         ]
 
@@ -137,7 +145,7 @@ class MipsGenerate:
         data_label = node.y
         
         self.new_program.data[data_label] = ASTR.Data('word', data_label, self.cil_data[data_label].value)
-        stack_plus = self.stack_dir[memory_dest]
+        stack_plus = self.stack_index(memory_dest)
 
         return [
             ASTR.LA('$t0', data_label),

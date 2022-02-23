@@ -100,7 +100,6 @@ class CILGenerate:
             self.new_type_func.force_local(result, self.new_class_scope)
             self.new_type_func.expr_push(ASTR.Arg('instance'))
             self.new_type_func.expr_push(ASTR.VCall(result, 'Main', 'Main_main'))
-            self.new_type_func.expr_push(ASTR.Comment(f'Llamando al mentodo inicial del programa'))
             self.new_type_func.expr_push(ASTR.Return(0))
         else:
             self.new_type_func.expr_push(ASTR.Return('instance'))
