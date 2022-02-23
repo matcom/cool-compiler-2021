@@ -293,7 +293,7 @@ class CilToMIPS:
         )
 
         instructions.append(
-            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(reg1, node.method),)
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(reg1, node.method))
         )
 
         instructions.append(mips.JumpRegisterLinkNode(reg2))
@@ -306,7 +306,28 @@ class CilToMIPS:
 
     @visit.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
-        pass
+        instructions = []
+        local_index = self.locals[node.name].index()
+        self.memory_manager.save()
+        reg1 = self.memory_manager.get_unused_register()
+
+        instructions.append(
+            mips.LoadWordNode(
+                reg1,
+                mips.MemoryAddressRegisterNode(
+                    FP_REG, len(self.params) * 4 + local_index * 4
+                ),
+            )
+        )
+
+        instructions.append(
+            mips.StoreWordNode(
+                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(SP_REG, 0),
+            )
+        )
+
+        self.memory_manager.clean()
+        return instructions
 
     @visit.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
