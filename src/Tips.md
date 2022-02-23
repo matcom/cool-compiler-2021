@@ -12,3 +12,7 @@
 
 - Para correr un codigo mips:
   - spim -file \<Archivo\>
+
+- Para pasarle input al spim y para guardar la salida:
+  - spim -file \<Archivo\> \< input.txt
+  - spim -file \<Archivo\> \< input.txt \> output.txt
