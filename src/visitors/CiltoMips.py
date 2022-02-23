@@ -174,7 +174,7 @@ class BaseCiltoMipsVisitor:
     def visit(self, node):
         pass
 
-    @visitor.when(EqualString)
+    @visitor.when(SubstringNode)
     def visit(self, node):
         pass
 
