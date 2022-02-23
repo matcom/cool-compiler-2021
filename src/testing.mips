@@ -804,7 +804,7 @@ move $fp, $t0
 lw $t0, 8($fp)
 # Call Node
 addi $sp, $sp, -4
-# Call Node
+# Case Node arg current_type
 sw $t0, 0($sp)
 # Call Node
 lw $t0, 8($fp)
@@ -2994,7 +2994,7 @@ sw $t0, 4($v0)
 # Save string instance
 sw $v0, 0($fp)
 # Func Declaration Node
-lw $v0, 0($fp)
+lw $v0, 68($fp)
 # Program Node
 lw $ra, 0($sp)
 # Program Node
@@ -3497,6 +3497,53 @@ lw $fp, 4($sp)
 addi $sp, $sp, 8
 # Class Declaration Node
 addi $sp, $sp, 20
+# Class Declaration Node
+jr $ra
+# Class Declaration Node
+__init_Main_type:
+# Class Declaration Node
+addi $sp, $sp, -4
+# Class Declaration Node
+move $t0, $sp
+# Class Declaration Node
+addi $sp, $sp, -8
+# Class Declaration Node
+sw $ra, 0($sp)
+# Class Declaration Node
+sw $fp, 4($sp)
+# Class Declaration Node
+move $fp, $t0
+# Calling father init function
+lw $t0, 4($fp)
+# Calling father init function
+addi $sp, $sp, -4
+# Calling father init function
+sw $t0, 0($sp)
+jal __init_IO_type
+sw $v0, 4($fp)
+lw $t0, 4($fp)
+la $t1, Main
+sw $t1, 0($t0)
+# arg node
+lw $t0, 4($fp)
+# arg node
+addi $sp, $sp, -4
+# arg node
+sw $t0, 0($sp)
+# Initialize arg function
+jal __init_a_at_Main
+# Initialize arg function
+sw $v0, 0($fp)
+# return node
+lw $v0, 4($fp)
+# Class Declaration Node
+lw $ra, 0($sp)
+# Class Declaration Node
+lw $fp, 4($sp)
+# Class Declaration Node
+addi $sp, $sp, 8
+# Class Declaration Node
+addi $sp, $sp, 8
 # Class Declaration Node
 jr $ra
 .data 
