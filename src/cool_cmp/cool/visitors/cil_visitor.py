@@ -1115,14 +1115,22 @@ class COOLToCILVisitor():
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode, scope):
         
+        abort_label = self.define_label( node.row, node.column, "Case Node abort label")
+
         value = self.visit(node.expr, scope)
         final_result = self.define_internal_local(node.row, node.column, "Case Node local final result")
         
-        type_value = self.define_internal_local(node.row, node.column, "Case Node local type value")
+        type_value = self.define_internal_local(node.row, node.column, "Case Node local type_value")
+        
+        isVoid  = self.define_internal_local(node.row, node.column, "Case Node local isVoid")
+        self.register_instruction(cil.VoidNode(isVoid, node.row, node.column, "Case Node void isVoid"))
+        self.register_instruction(cil.EqualNode(isVoid,type_value,isVoid, node.row, node.column, "Case Node equal isVoid type_value isVoid"))
+        self.register_instruction(cil.GotoIfNode(isVoid, abort_label.label, node.row, node.column, "Case Node gotoif isVoid abort_label"))
+        
         self.register_instruction(cil.TypeOfNode(value, type_value, node.row, node.column, "Case Node typeof value"))
         checks = len(node.params)
         
-        array_types = self.define_internal_local(node.row, node.column, "Case Node array types")
+        array_types = self.define_internal_local(node.row, node.column , "Case Node array types")
         self.register_instruction(cil.ArrayNode(array_types, "Object", checks, node.row, node.column, "Case Node array declaration")) # Type Object because at the end all are Objects
         
         for i,param in enumerate(node.params):
@@ -1139,7 +1147,6 @@ class COOLToCILVisitor():
         start_label = self.define_label(node.row, node.column, "Case Node start label")
         minim_label = self.define_label( node.row, node.column, "Case Node minim label")
         end_label = self.define_label( node.row, node.column, "Case Node end label")
-        abort_label = self.define_label( node.row, node.column, "Case Node abort label")
         stop_for = self.define_internal_local( node.row, node.column, "Case Node local stop_for")
         not_valid_distance = self.define_internal_local( node.row, node.column, "Case Node local not_valid_distance")
         minim_cond = self.define_internal_local( node.row, node.column, "Case Node local minim_cond")
