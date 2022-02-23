@@ -27,7 +27,8 @@ componen el pipeline de ejecucion del compilador
 #### Lexer 
 
 El Lexer es el encargado de dado un string con el código del programa COOL separar el mismo en tokens
-para luego ser usado por el parser. En esta fase se utilizo el paquete _ply_ el cual permite ...breve descripcion de ply... . Se definieron
+para luego ser usado por el parser. En esta fase se utilizo el paquete _ply_ el cual contiene 
+herramientas de parser en Python . Se definieron
 las expresiones regulares y simbolos que correspondian a los tokens de la 
 gramatica. Ademas se almacena por cada Token la linea y la columna correspondiente
 en el codigo, lo que permite tener mayor informacion en los mensajes de error
@@ -36,15 +37,33 @@ y para nuestro uso en la depuracion.
 
 #### Parser
 
+El Parser define la estructura que tendrá el Árbol de Sintaxis Abstracta (AST) de la aplicación, además
+de la gramática que se usará para parsear el código COOL dado.        
+El archivo donde se definen los simbolos y producciones de la gramatica puede verse en 
+[Gramatica COOL](https://github.com/NinjaProgrammers/cool-compiler-2021/blob/Proyecto-CMP/src/core/parser/Parser.py)
+
 #### Recoleccion de tipos
 
 En esta fase se recorren todas las declaraciones de clases, se crean los tipos asociados
-y se valida que no se este redefiniendo una clase. 
+y se valida que no se este redefiniendo una clase. Primeramente se annaden los tipos builtin
+(Object, IO, Bool, String, Int) y luego se anaden los tipos definidos por el usuario, revisando 
+que no existan nombres de clases repetidos.
 
+#### Construccion de Tipos
 
-### Modulos
+En esta fase se recorren nuevamente las declaraciones de clases annadiendo los metodos y 
+atributos de cada clase. Se encarga de definir la herencia, en caso que no exista se hereda de la 
+clase Object. Ademas se revisa que exista una clase Main con un metodo main que indica el inicio 
+de la ejecucion del programa COOL.
 
-### Gramatica
+#### Chequeo de tipos
+
+En esta fase se revisa la compatibilidad de tipos (Ej: que no se sume int y string), que variables
+o metodos hayan sido definidos previamente, correctitud de la herencia (que no exista herencia ciclica)
+ 
+#### COOL a CIL
+
+   
 
 ### Organizacion
 
