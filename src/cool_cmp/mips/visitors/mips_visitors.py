@@ -84,6 +84,10 @@ class MIPSPrintVisitor():
     def visit(self, node:NorNode):
         return f"nor {node.result}, {node.first_arg}, {node.second_arg}"
     
+    @visitor.when(XorNode)
+    def visit(self, node: XorNode):
+        return f"xor {node.result}, {node.first_arg}, {node.second_arg}"
+    
     @visitor.when(AndImmediateNode)
     def visit(self, node:AndImmediateNode):
         return f"andi {node.result}, {node.first_arg}, {node.second_arg}"
@@ -905,7 +909,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.NotNode)
     def visit(self, node:cil.NotNode):
         self._load_value(Reg.t(0), node.value,node.row, node.column, node.comment)
-        self.add_instruction(NorNode(Reg.t(0), Reg.t(0), Reg.t(0),node.row, node.column, node.comment)) # Not equivalent
+        self.add_instruction(SetEqualToNode(Reg.t(0),Reg.t(0),Reg.zero(),node.row, node.column, node.comment))
+        #self.add_instruction(XorNode(Reg.t(0), Reg.t(0),1,node.row, node.column, node.comment)) # Not equivalent for 0 and 1
         self._store_local_variable(Reg.t(0), node.dest,node.row, node.column, node.comment)
 
     @visitor.when(cil.TypeOfNode)
