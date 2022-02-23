@@ -8,6 +8,4 @@ echo "EL_COMPI 1.0"
 echo "Copyright (c) 2022: Amalia_Ibarra, Sandra_Martos, Gabriela_Martinez"
 
 # Llamar al compilador
-# echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
-# python3 -m main $@
 exec python3 main.py $INPUT_FILE

@@ -9,28 +9,12 @@ from errors import (
     UnexpectedTokenError,
 )
 
-
-# def find_column(input, lexpos):
-#     # line_start = input.rfind("\n", 0, lexpos) + 1
-#     # return (lexpos - line_start) + 1
-#     line_numbers = input.rfind("\n", 0, lexpos) + 1
-#     return (lexpos // line_numbers) + (lexpos % line_numbers)
-
-
 # Declare the states
 states = (("comments", "exclusive"),)
 
 
 # All lexers must provide a list tokens that defines all of the possible token names
 # that can be produced by the lexer.
-# first_tokens = [
-#     "larrow",
-#     "rarrow",
-#     "lessequal",
-#     "id",
-#     "int",
-#     "string",
-# ]
 first_tokens = [
     "larrow",
     "rarrow",
@@ -38,8 +22,8 @@ first_tokens = [
     "id",
     "int",
     "string",
-    "ccom"
 ]
+# Add "ccom" to test comments
  
 reserved = {
     "class": "class",
@@ -101,56 +85,36 @@ def t_comments_opsymb(t):
 # Define a rule so we can track line numbers
 def t_comments_newline(t):
     r"\n"
-    # t.lexer.lineno += len(t.value)
     t.lexer.last_new_line_pos = t.lexer.lexpos
     t.lexer.lineno += 1
 
-# t_foo_end(t)
-# Comments closing symbol
-# def t_comments_clsymb(t):
+# end comments
 def t_comments_ccom(t):
     r"\*\)"
     t.lexer.level -= 1
 
     if t.lexer.level == 0:
-        # t.value = t.lexer.lexdata[t.lexer.code_start : t.lexer.lexpos + 1]
-        t.value = t.lexer.lexdata[t.lexer.code_start : t.lexer.lexpos -2] # comments should not be returned, just skipped
-        t.type = "ccom"
-        # t.lexer.lineno += t.value.count("\n")
-        # t.lexer.lineno +=1#after the last closing symbol add new line 
+        # t.value = t.lexer.lexdata[t.lexer.code_start : t.lexer.lexpos -2] # comments should not be returned, just skipped
+        # t.type = "ccom"
+        # return t
         t.lexer.begin("INITIAL")
-        return t
         
 def t_comments_any(t):
-# def t_ccode_nonspace(t):
     # r'[^\s\{\}\'\"]+'
     r'[^\s\'\"]+'
-    # r'^[^ \n]+$'
-    # r"\.*"
-    # print("ANY")
-    # print(t.lexer.lexdata[t.lexer.lexpos -1])
     # t.lexer.skip(1)
 
 # For bad characters. In this case we just skip over everything but (* or *)
 def t_comments_error(t):
-    # t.lexer.errors.append(
-    #     LexicographicError(
-    #         t.lexer.lineno,
-    #         0,
-    #         "Illegal character inside comment",
-    #     )
-    # )
-    # print("character skipped")
-    # print(t.lexer.lexdata[t.lexer.lexpos -1])
     t.lexer.skip(1)
 
 
 # EOF handling rule
 def t_comments_eof(t):
     if t.lexer.level > 0:  # guardar este error y actuar acorde
-        # print(f"code_start{t.lexer.code_start}")
         t.lexer.errors.append(LexicographicError(t.lexer.lineno, t.lexer.lexpos - t.lexer.last_new_line_pos + 1, "EOF in comment"))
     return None
+    # t.lexer.skip(1)
 
 
 # Rules for initial state (default state)
@@ -186,29 +150,18 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
     while index < final and text[index] != '\"':
         if text[index] == '\\':
             if text[index + 1] in ["t", "b", "f", "n"]:
-                # string_to_append+=f'\\{text[index + 1]}'
                 string_list.append(text[index : index + 2])  # \t,\b,\f, \n
             elif text[index + 1] == '\n':  # \n whith \ before
-                # string_to_append+='\n'
                 t.lexer.lineno +=1
                 t.lexer.last_new_line_pos = index + 2# saving last \n
                 string_list.append('\n')
             else:
-                string_list.append(#CHEQUEAR PQ ESTO SE AHCE DOS VECES< COMO TRATAR DIFERENTE EL \n
+                string_list.append(# ESTO SE AHCE DOS VECES< COMO TRATAR DIFERENTE EL \t por ejempli
                     text[index : index + 2]
                 )  # ]character c: take the character in \c
-                # string_to_append += text[index + 1]
             index += 2
 
         elif text[index] == '\n':  # non scape \n (whithout and extra \) is not allowed
-            # print("Illegal character \\n inside string")  # do something about it
-            # t.lexer.errors.append(
-            #     LexicographicError(
-            #         t.lexer.lineno + text[initial : index + 1].count("\n"),
-            #         index - t.lexer.last_new_line_pos + 1,
-            #         "Illegal character \\n inside string",
-            #     )
-            # )
             t.lexer.errors.append(
                 LexicographicError(
                     t.lexer.lineno,
@@ -217,19 +170,10 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
                 )
             )
             t.lexer.lineno +=1
-            t.lexer.last_new_line_pos = index + 1# sabing last \n
-            # index += 1
-            t.lexer.lexpos = index + 1#new
+            t.lexer.last_new_line_pos = index + 1# saving last \n
+            t.lexer.lexpos = index + 1
             return t
-        elif text[index] == '\0':  # null character \0 is not allowed SACAR Y PONER EN UNA IDENTACION MAS AFUERA
-            # print("Illegal character \\0 inside string")  # do something about it
-            # t.lexer.errors.append(
-            #     LexicographicError(
-            #         t.lexer.lineno + text[initial : index + 1].count("\n"),
-            #         index - t.lexer.last_new_line_pos + 2,
-            #         "Illegal character \\0 inside string",
-            #     )
-            # )
+        elif text[index] == '\0':  # null character \0 is not allowed 
             t.lexer.errors.append(
                 LexicographicError(
                     t.lexer.lineno,
@@ -238,22 +182,12 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
                 )
             )
             index += 1
-            # t.lexer.lexpos = index+1
             # return t
         else:
             string_list.append(text[index])
-            # string_to_append += text[index + 1]
             index += 1
 
     if index == final:
-        # print("String may not cross file boundaries")  # do something about it
-        # t.lexer.errors.append(
-        #     LexicographicError(
-        #         t.lexer.lineno + text[initial : index + 1].count("\n"),
-        #         t.lexer.lexpos - t.lexer.last_new_line_pos + 1,
-        #         "String may not cross file boundaries",
-        #     )
-        # )
         t.lexer.errors.append(
             LexicographicError(
                 t.lexer.lineno,
@@ -261,26 +195,20 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
                 "String may not cross file boundaries",
             )
         )
-        #AQUI NO HACE FALTA ACTUALIZAR index antes?
         t.lexer.lexpos = index
         return t
     else:
-        index += 1#jumping '\"' character
+        index += 1#jumping '\"' character (character for closing coments)
 
         t.value = "".join(string_list)
         t.type = "string"
-        # t.lexer.lexpos += index - initial #RECIEND BORRADO
-        t.lexer.lexpos = index# en index se supone este el " de cerrar los comentarios
-        # t.lexer.lineno += text[initial : index + 1].count("\n")
-        # print(t.value)
-        # print(string_to_append)
+        t.lexer.lexpos = index
         return t
 
 
 # Define a rule so we can track line numbers
 def t_newline(t):
     r'\n'
-    # t.lexer.lineno += len(t.value)
     t.lexer.last_new_line_pos = t.lexer.lexpos
     t.lexer.lineno += 1
 
@@ -293,7 +221,7 @@ t_ignore = " \t"
 
 
 # Error handling rule
-def t_error(t):#for some reason here lexpos is the current character, maybe because it could not be matched
+def t_error(t):#At the moment of entering this method lexpos is the current character (instead of the last matched character) because nothing could've been matched
     t.lexer.errors.append(
         LexicographicError(
             t.lexer.lineno,
