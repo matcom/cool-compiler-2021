@@ -1,2 +1,6 @@
 pytest
 pytest-ordering
+typer
+ply
+ipython
+nbformat
