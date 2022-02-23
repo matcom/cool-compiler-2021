@@ -54,7 +54,12 @@ class AssignNode(InstructionNode):
 
 
 class ArithmeticNode(InstructionNode):
-    def __init__(self, dest, left, right):
+    def __init__(
+        self,
+        dest,
+        left,
+        right,
+    ):
         self.dest = dest
         self.left = left
         self.right = right
@@ -73,6 +78,32 @@ class StarNode(ArithmeticNode):
 
 
 class DivNode(ArithmeticNode):
+    pass
+
+
+class LessNode(ArithmeticNode):
+    pass
+
+
+class LessEqualNode(ArithmeticNode):
+    pass
+
+
+class EqualNode(ArithmeticNode):
+    pass
+
+
+class UnaryNode(InstructionNode):
+    def __init__(self, dest, expr):
+        self.dest = dest
+        self.expr = expr
+
+
+class NotNode(UnaryNode):
+    pass
+
+
+class IntComplementNode(UnaryNode):
     pass
 
 
@@ -113,11 +144,14 @@ class LabelNode(InstructionNode):
 
 
 class GotoNode(InstructionNode):
-    pass
+    def __init__(self, label):
+        self.label = label
 
 
 class GotoIfNode(InstructionNode):
-    pass
+    def __init__(self, condition, label):
+        self.condition = condition
+        self.label = label
 
 
 class StaticCallNode(InstructionNode):
