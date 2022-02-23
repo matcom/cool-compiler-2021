@@ -1,5 +1,6 @@
 DW = 4
 from coolcmp.utils import mips
+from typing import List
 
 
 class Register:
@@ -28,7 +29,7 @@ class RegisterLocation:
         self.offset = offset
 
 
-def push_register_instructions(reg_name):
+def push_register_instructions(reg_name: str) -> List[mips.InstructionNode]:
     """
     addi $sp, $sp, -4
     sw <reg_name>, 0($sp)
@@ -39,7 +40,7 @@ def push_register_instructions(reg_name):
     return [addi, sw]
 
 
-def pop_register_instructions(reg_name):
+def pop_register_instructions(reg_name: str) -> List[mips.InstructionNode]:
     """
     lw <reg_name>, $sp, 0
     addi $sp, $sp, 4
