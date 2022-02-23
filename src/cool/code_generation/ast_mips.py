@@ -2,7 +2,11 @@ from typing import List
 
 
 class Node:
-    pass
+    comment: str = ""
+
+    def set_comment(self, comment: str) -> "Node":
+        self.comment = comment
+        return self
 
 
 class ProgramNode(Node):
@@ -233,10 +237,38 @@ class JumpRegisterNode(OneAddressInstructionNode):
 ####################################
 
 
+#######################################
+# Memory Access and Load Instructions #
+#######################################
+
+class LoadWordNode(TwoAddressIntructionNode):
+    code = "lw"
+
+
+class StoreWordNode(TwoAddressIntructionNode):
+    code = "sw"
+
+
+class MoveFromLowNode(OneAddressInstructionNode):
+    code = "mflo"
+
+
+class MoveFromHighNode(OneAddressInstructionNode):
+    code = "mfhi"
+
+
+###########################################
+# End Memory Access and Load Instructions #
+###########################################
+
 class LabelNode(InstructionNode):
     def __init__(self, name: str):
         self.name: str = name
 
+
+class CommentNode(InstructionNode):
+    def __init__(self, comment: str):
+        self.comment: str = comment
 
 class EmptyInstructionNode(InstructionNode):
     pass

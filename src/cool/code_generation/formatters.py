@@ -378,23 +378,45 @@ class MipsFormatter:
 
     @visitor.when(mips.DataNode)
     def visit(self, node: mips.DataNode):
-        return f"{node.name}: {node.data_type} {node.value}"
+        return (
+            f"{node.name}: {node.data_type} {node.value}"
+            if node.comment == ""
+            else f"{node.name}: {node.data_type} {node.value} # {node.comment}"
+        )
 
     @visitor.when(mips.OneAddressInstructionNode)
     def visit(self, node: mips.OneAddressInstructionNode):
-        return f"{node.code} {node.dest}"
+        return (
+            f"{node.code} {node.dest}"
+            if node.comment == ""
+            else f"{node.code} {node.dest} # {node.comment}"
+        )
 
     @visitor.when(mips.TwoAddressIntructionNode)
     def visit(self, node: mips.TwoAddressIntructionNode):
-        return f"{node.code} {node.dest} {node.source}"
+        return (
+            f"{node.code} {node.dest}, {node.source}"
+            if node.comment == ""
+            else f"{node.code} {node.dest}, {node.source} # {node.comment}"
+        )
 
     @visitor.when(mips.ThreeAddressIntructionNode)
     def visit(self, node: mips.ThreeAddressIntructionNode):
-        return f"{node.code} {node.dest}, {node.source1}, {node.source2}"
+        return (
+            f"{node.code} {node.dest}, {node.source1}, {node.source2}"
+            if node.comment == ""
+            else f"{node.code} {node.dest}, {node.source1}, {node.source2} # {node.comment}"
+        )
 
     @visitor.when(mips.LabelNode)
     def visit(self, node: mips.LabelNode):
-        return f"{node.name}:"
+        return (
+            f"{node.name}:" if node.comment == "" else f"{node.name}: # {node.comment}"
+        )
+
+    @visitor.when(mips.CommentNode)
+    def visit(self, node: mips.CommentNode):
+        return f"# {node.comment}"
 
     @visitor.when(mips.EmptyInstructionNode)
     def visit(self, node: mips.EmptyInstructionNode):

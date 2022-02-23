@@ -59,6 +59,10 @@ type Main {
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
 	method main: function_main_at_Main
+	method plus: function_plus_at_Main
+	method minus: function_minus_at_Main
+	method mult: function_mult_at_Main
+	method div: function_div_at_Main
 	method __init__: function___init___at_Main
 }
 
@@ -135,7 +139,7 @@ function function_in_int_at_IO{
 	
 	RETURN internal_0
 }
-function function___init___at_S{
+function function___init___at_String{
 	PARAM self
 	
 	RETURN self
@@ -179,12 +183,50 @@ function function___init___at_Main{
 }
 function function_main_at_Main{
 	PARAM self
+	
+	RETURN 0
+}
+function function_plus_at_Main{
+	PARAM self
+	PARAM a
+	PARAM b
 
 	LOCAL internal_0
 
-	ARG self
-	ARG "Hello, World!\n"
-	internal_0 = VCALL Main function_out_string_at_IO
+	internal_0 = a + b
+	
+	RETURN internal_0
+}
+function function_minus_at_Main{
+	PARAM self
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0
+
+	internal_0 = a - b
+	
+	RETURN internal_0
+}
+function function_mult_at_Main{
+	PARAM self
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0
+
+	internal_0 = a * b
+	
+	RETURN internal_0
+}
+function function_div_at_Main{
+	PARAM self
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0
+
+	internal_0 = a / b
 	
 	RETURN internal_0
 }

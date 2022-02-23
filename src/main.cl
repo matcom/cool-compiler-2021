@@ -56,6 +56,23 @@ class Main inherits IO{
     number: Int <- 0;
 
     main() : Object {
-        out_string("Hello, World!\n")
+        -- out_string("Hello, World!\n")
+        0
+    };
+
+    plus(a: Int, b: Int) : Int {
+        a + b
+    };
+
+    minus(a: Int, b: Int) : Int {
+        a - b
+    };
+
+    mult(a: Int, b: Int) : Int {
+        a * b
+    };
+
+    div(a: Int, b: Int) : Int {
+        a / b
     };
 };

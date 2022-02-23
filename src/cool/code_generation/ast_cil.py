@@ -205,8 +205,8 @@ class ArgNode(InstructionNode):
 
 
 class ReturnNode(InstructionNode):
-    def __init__(self, value=None):
-        self.value = value
+    def __init__(self, value: str = None):
+        self.value: str = value
 
 
 class LoadNode(InstructionNode):

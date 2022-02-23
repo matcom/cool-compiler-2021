@@ -709,7 +709,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.register_instruction(cil.ReadIntNode(local_int))
         self.register_instruction(cil.ReturnNode(local_int))
 
-        self.current_function = self.register_function(self.to_function_name("__init__", "S"))
+        self.current_function = self.register_function(self.to_function_name("__init__", "String"))
         self.current_function.params.append(cil.ParamNode("self"))
         self.register_instruction(cil.ReturnNode("self"))
 
@@ -733,8 +733,6 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         substr =  self.define_internal_local()
         self.register_instruction(cil.SubstringNode(substr, "self", "i", "l"))
         self.register_instruction(cil.ReturnNode(substr))
-        
-        
         
         for i, declaration in enumerate(node.declarations):
             self.visit(declaration, scope.children[i])
