@@ -44,7 +44,7 @@ class CilToMIPS:
     def __init__(self):
         self.data_section = dict()
         self.types = dict()
-        self.memory_manager = MemoryManager(REGISTERS)
+        self.memory_manager = MemoryManager()
         self.pushed_args = 0
         self.locals = []
         self.params = []
@@ -87,7 +87,7 @@ class CilToMIPS:
             node.name, ".word", [mips.LabelNode(method.name) for method in node.methods]
         )
 
-    @visit.when(cil.FunctionNode)
+    @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
         instructions = []
 
@@ -136,17 +136,17 @@ class CilToMIPS:
         self.locals = locals_save
         return instructions
 
-    @visit.when(cil.DataNode)
+    @visitor.when(cil.DataNode)
     def visit(self, node: cil.DataNode):
         self.data_section[node.name] = mips.DataNode(
             mips.LabelNode(node.name), ".asciiz", [node.value]
         )
 
-    @visit.when(cil.ParamNode)
+    @visitor.when(cil.ParamNode)
     def visit(self, node: cil.ParamNode):
         pass
 
-    @visit.when(cil.LocalNode)
+    @visitor.when(cil.LocalNode)
     def visit(self, node: cil.LocalNode):
         self.memory_manager.save()
         reg = self.memory_manager.get_unused_register()
@@ -161,40 +161,41 @@ class CilToMIPS:
         instructions.append(mips.AddiNode(SP_REG, SP_REG, -4))
 
         self.memory_manager.clean()
+        return instructions
 
-    @visit.when(cil.PlusNode)
+    @visitor.when(cil.PlusNode)
     def visit(self, node: cil.PlusNode):
         pass
 
-    @visit.when(cil.MinusNode)
+    @visitor.when(cil.MinusNode)
     def visit(self, node: cil.MinusNode):
         pass
 
-    @visit.when(cil.StarNode)
+    @visitor.when(cil.StarNode)
     def visit(self, node: cil.StarNode):
         pass
 
-    @visit.when(cil.DivNode)
+    @visitor.when(cil.DivNode)
     def visit(self, node: cil.DivNode):
         pass
 
-    @visit.when(cil.GetAttrNode)
+    @visitor.when(cil.GetAttrNode)
     def visit(self, node: cil.GetAttrNode):
         pass
 
-    @visit.when(cil.SetAttrNode)
+    @visitor.when(cil.SetAttrNode)
     def visit(self, node: cil.SetAttrNode):
         pass
 
-    @visit.when(cil.GetIndexNode)
+    @visitor.when(cil.GetIndexNode)
     def visit(self, node: cil.GetIndexNode):
         pass
 
-    @visit.when(cil.SetIndexNode)
+    @visitor.when(cil.SetIndexNode)
     def visit(self, node: cil.SetIndexNode):
         pass
 
-    @visit.when(cil.AllocateNode)
+    @visitor.when(cil.AllocateNode)
     def visit(self, node: cil.AllocateNode):
         instructions = []
         dest_index = self.locals[node.dest].index()
@@ -220,7 +221,7 @@ class CilToMIPS:
         self.memory_manager.clean()
         return instructions
 
-    @visit.when(cil.TypeOfNode)
+    @visitor.when(cil.TypeOfNode)
     def visit(self, node: cil.TypeOfNode):
         obj_index = self.locals[node.obj].index()
         dest_index = self.locals[node.dest].index()
@@ -249,32 +250,30 @@ class CilToMIPS:
 
         self.memory_manager.clean()
 
-    @visit.when(cil.LabelNode)
+    @visitor.when(cil.LabelNode)
     def visit(self, node: cil.LabelNode):
         pass
 
-    @visit.when(cil.GotoNode)
+    @visitor.when(cil.GotoNode)
     def visit(self, node: cil.GotoNode):
         pass
 
-    @visit.when(cil.GotoIfNode)
+    @visitor.when(cil.GotoIfNode)
     def visit(self, node: cil.GotoIfNode):
         pass
 
-    @visit.when(cil.StaticCallNode)
+    @visitor.when(cil.StaticCallNode)
     def visit(self, node: cil.StaticCallNode):
         instructions = []
 
-        typ = self.types[node.type]
-
-        instructions.append(mips.JumpAndLinkNode(typ.label))
+        instructions.append(mips.JumpAndLinkNode(node.function))
 
         instructions.append(mips.AddiNode(SP_REG, SP_REG, self.pushed_args * 4))
         self.clean_pushed_args()
 
         return instructions
 
-    @visit.when(cil.DynamicCallNode)
+    @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
         instructions = []
         local_index = self.locals[node.type].index()
@@ -304,7 +303,7 @@ class CilToMIPS:
         self.memory_manager.clean()
         return instructions
 
-    @visit.when(cil.ArgNode)
+    @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
         instructions = []
         local_index = self.locals[node.name].index()
@@ -329,11 +328,11 @@ class CilToMIPS:
         self.memory_manager.clean()
         return instructions
 
-    @visit.when(cil.ReturnNode)
+    @visitor.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
         pass
 
-    @visit.when(cil.LoadNode)
+    @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
         instructions = []
         local_index = self.locals[node.name].index()
@@ -354,31 +353,31 @@ class CilToMIPS:
         self.memory_manager.clean()
         return instructions
 
-    @visit.when(cil.LengthNode)
+    @visitor.when(cil.LengthNode)
     def visit(self, node: cil.LengthNode):
         pass
 
-    @visit.when(cil.ConcatNode)
+    @visitor.when(cil.ConcatNode)
     def visit(self, node: cil.ConcatNode):
         pass
 
-    @visit.when(cil.PrefixNode)
+    @visitor.when(cil.PrefixNode)
     def visit(self, node: cil.PrefixNode):
         pass
 
-    @visit.when(cil.SubstringNode)
+    @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
         pass
 
-    @visit.when(cil.ToStrNode)
+    @visitor.when(cil.ToStrNode)
     def visit(self, node: cil.ToStrNode):
         pass
 
-    @visit.when(cil.ReadNode)
+    @visitor.when(cil.ReadNode)
     def visit(self, node: cil.ReadNode):
         pass
 
-    @visit.when(cil.PrintNode)
+    @visitor.when(cil.PrintNode)
     def visit(self, node: cil.PrintNode):
         pass
 
@@ -387,4 +386,3 @@ class CilToMIPS:
         instructions.append(mips.LoadInmediateNode(V0_REG, 10))
         instructions.append(mips.SyscallNode())
         return instructions
-
