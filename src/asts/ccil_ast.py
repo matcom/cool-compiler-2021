@@ -141,6 +141,12 @@ class VoidNode(ReturnOpNode):
     pass
 
 
+class NewOpNode(ReturnOpNode):
+    def __init__(self, node, type_idx: str) -> None:
+        super().__init__(node)
+        self.type_idx: str = type_idx
+
+
 class BinaryOpNode(ReturnOpNode):
     def __init__(self, node, left: AtomOpNode, right: AtomOpNode) -> None:
         """
@@ -209,22 +215,27 @@ class NegOpNode(UnaryOpNode):
 
 
 class AtomOpNode(ReturnOpNode):
-    def __init__(self, node) -> None:
+    def __init__(self, node, value: str) -> None:
         """
         AtomNode represents all single value nodes, like ids and constants
         """
         super().__init__(node)
+        self.value = value
 
 
 class IdNode(AtomOpNode):
-    def __init__(self, node, idx: str) -> None:
-        super().__init__(node)
-        self.id = idx
+    def __init__(self, node, value: str) -> None:
+        super().__init__(node, value)
 
 
 class ConstantNode(AtomOpNode):
-    def __init__(self, node) -> None:
-        super().__init__(node)
+    def __init__(self, node, value: str) -> None:
+        super().__init__(node, value)
+
+
+class IntNode(ConstantNode):
+    def __init__(self, node, value: str) -> None:
+        super().__init__(node, value)
 
 
 class FlowControlNode(OperationNode):
@@ -258,6 +269,7 @@ class LabelNode(FlowControlNode):
     def __init__(self, node, idx: str) -> None:
         super().__init__(node)
         self.id = idx
+
 
 def extract_id(node, storage_node: StorageNode) -> IdNode:
     return IdNode(node, storage_node.id)
