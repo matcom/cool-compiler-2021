@@ -169,7 +169,7 @@ concat:
     sw $a1 16($sp)
     sw $ra 20($sp)
 
-    move $t0 $a0                                         # t0 pointer to string 1
+    move $t0 $a0                                     # t0 pointer to string 1
     move $t1 $a1                                     # t1 pointer to string 2
 
 
@@ -179,12 +179,12 @@ concat:
     mfhi $a0                                         # a0 remainder of division
     bne $a0 $zero concat_allign_size                 # Branch if size is multiple of 4
     addiu $a0 $a2 1                                  # Add 1 t size
+    j concat_size_alligned
 
 concat_allign_size:
     sub $t2 $t2 $a0                                  # Convert t1 to multiple of 4 to...
     add $a0 $a2 $t2                                  # reserve memory via malloc
     addiu $a0 $a0 1                                  # Add 1 t size
-    j concat_size_alligned
 
 concat_size_alligned:
     jal malloc                                       # a0 stores size to reserve
@@ -208,7 +208,7 @@ concat_copy_second_loop:
     j concat_copy_second_loop
 
 concat_end:
-    # Return original values to regiters
+    # Return original values to registers
     sb $zero 0($t2)
     lw $t0 0($sp)
     lw $t1 4($sp)
@@ -220,9 +220,6 @@ concat_end:
 
     jr $ra
 
-# TODO: Change this procedure to use the new malloc,
-# And remove the use of the $v1 register at the end
-# of the main function
 read_string:
     addiu $sp $sp -28
     sw $ra 0($sp)

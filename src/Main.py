@@ -53,7 +53,7 @@ def main(args):
 
     CILVisitor = COOLToCILVisitor(type_Checker.Context)
     CILast = CILVisitor.visit(COOLast, scope)
-    print(get_formatter()(CILast))
+    # print(get_formatter()(CILast))
 
     MIPSVisitor = CILToMIPSVisitor()
     MIPSAst = MIPSVisitor.visit(CILast)
@@ -68,25 +68,6 @@ def main(args):
 
     with open(out_file, 'w') as f:
         f.write(mipsCode)
-
-    # TODO: Comment this lines
-
-    #try:
-    #    fd = open(args.file, 'rb')
-    #    sp = subprocess.run(['spim', '-file', out_file], input=fd.read(), timeout=100)
-    #    fd.close()
-    #    SPIM_HEADER = r'''^SPIM Version .+ of .+
-    #    Copyright .+\, James R\. Larus\.
-    #    All Rights Reserved\.
-    #    See the file README for a full copyright notice\.
-    #    (?:Loaded: .+\n)*'''
-    #    mo = re.match(SPIM_HEADER, sp.stdout.decode())
-    #    if mo:
-    #        output = mo.string[mo.end():]
-    #        print(output)
-    #except subprocess.TimeoutExpired:
-    #    assert False, "Too Long"
-
 
 
 if __name__ == "__main__":

@@ -136,8 +136,6 @@ class CILToMIPSVisitor:
                 self.register_label(instruction.label, mips_label)
 
         instructions = []
-        if node.name == 'entry':
-            instructions.append(mips.MoveNode(mips.V1_REG, mips.GP_REG, 0, 0))
         instructions.extend(mips.push_register(mips.RA_REG, node.line, node.column))
         instructions.extend(mips.push_register(mips.FP_REG, line=node.line, column=node.column))
         instructions.append(mips.AdditionInmediateNode(mips.FP_REG, mips.SP_REG, 8, line=node.line, column=node.column))
@@ -880,7 +878,6 @@ class CILToMIPSVisitor:
         if isinstance(node.left, cil.AttributeNode):
             instructions.append(mips.AdditionInmediateNode(mips.SP_REG, mips.SP_REG, 4,
                                                            node.line, node.column))
-        # TODO: Ver si se hace usando los registros de parametros
         instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg1, line=node.line, column=node.column))
 
         instructions.extend(self.visit(node.right))

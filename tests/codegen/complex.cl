@@ -45,7 +45,7 @@ class Complex inherits IO {
 
     reflect_Y() : Complex {
 	{
-	    x <- ~x;
+	    x = ~x;
 	    self;
 	}
     };
