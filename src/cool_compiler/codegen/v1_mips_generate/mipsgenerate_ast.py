@@ -36,16 +36,20 @@ class Func:
     def __str__(self) -> str:
         result = f'{self.name}:\n'
         for cmd in self.cmd:
-            result += str(cmd) + '\n'
-
+            try: 
+                if cmd.is_comment:
+                    result = result[0:-1] + ' ' * 10 + str(cmd) + '\n' 
+            except AttributeError:
+                result += str(cmd) + '\n'
         return result
 
 class Comment:
     def __init__(self, msg) -> None:
         self.msg = msg
-    
+        self.is_comment = True
+
     def __str__(self) -> str:
-        return self.msg
+        return f'//{self.msg}'
 
 class Load:
     def __init__(self, cmd ,registry, memory_dir) -> None:
@@ -84,9 +88,6 @@ class JumpInconditional:
     def __str__(self) -> str:
         return f'{self.cmd} {self.dest}'
     
-
-
-
 class SysCall :
     def __init__(self) -> None:
         pass

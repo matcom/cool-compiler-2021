@@ -253,9 +253,6 @@ class Return(Expression):
 class Arg(Expression):
     pass
 
-class Call(Expression):
-    pass
-
 class VCall(Expression):
     pass
 
@@ -288,6 +285,9 @@ class Neg(Expression):
     pass
 
 class Complemnet(Expression):
+    pass
+
+class Comment(Expression):
     pass
 
 

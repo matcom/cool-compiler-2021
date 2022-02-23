@@ -41,7 +41,10 @@ class MipsGenerate:
         for _local in node.local:
             new_func.cmd += self.visit(_local)
 
-        new_func.cmd += self.visit(AST.Local('$ra')) + [ASTR.SW('$ra', "4($sp)")]
+        new_func.cmd += (
+            self.visit(AST.Local('$ra')) + 
+            [ASTR.SW('$ra', "4($sp)")] + 
+            [ASTR.Comment(f"Agrega $ra a la pila para salvar el punto de retorno de la funcion {node.name}")])
 
         for param in node.param:
             new_func.cmd += self.visit(param)
@@ -68,7 +71,7 @@ class MipsGenerate:
         for key in self.stack_dir.keys():
             self.stack_dir[key] += 4
 
-        return [ASTR.AddI('$sp', '$sp', -4)]
+        return [ASTR.AddI('$sp', '$sp', -4), ASTR.Comment(f'Push local var {node.x}')]
 
     @visitor.when(AST.ALLOCATE)
     def visit(self, node: AST.ALLOCATE):
@@ -140,3 +143,7 @@ class MipsGenerate:
             ASTR.LW('$t0', data_label),
             ASTR.SW('$t0', f'{stack_plus}($sp)')
         ]
+    
+    @visitor.when(AST.Comment)
+    def visit(self, node: AST.Comment):
+        return [ASTR.Comment(node.x)]
