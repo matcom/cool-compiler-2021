@@ -1,4 +1,4 @@
-import cil_ast as cil
+import code_generator.cil_ast as cil
 from semantic.semantic import VariableInfo
 
 

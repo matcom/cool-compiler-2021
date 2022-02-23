@@ -1,6 +1,6 @@
-from BaseCILToMIPSVisitor import *
+from code_generator.BaseCILToMIPSVisitor import BaseCILToMIPSVisitor
+import code_generator.cil_ast as cil
 from utils import visitor
-import cil_ast as cil
 
 
 class CILToMIPSVisitor(BaseCILToMIPSVisitor):
@@ -54,17 +54,16 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
             self.var_offset[self.current_function.name][var.name] = (idx + 1)*4
 
         self.text += f'{node.name}:\n'
-        # save space for locals
+
         self.text += f'addi $sp, $sp, {-4 * len(node.localvars)}\n'
-        self.text += 'addi $sp, $sp, -4\n'  # save return address
+        self.text += 'addi $sp, $sp, -4\n'
         self.text += 'sw $ra, 0($sp)\n'
 
         for instruction in node.instructions:
             self.visit(instruction)
 
-        self.text += 'lw $ra, 0($sp)\n'  # recover return address
+        self.text += 'lw $ra, 0($sp)\n'
         total = 4 * len(node.localvars) + 4 * len(node.params) + 4
-        # pop locals,parameters,return address from the stack
         self.text += f'addi $sp, $sp, {total}\n'
         self.text += 'jr $ra\n'
 
@@ -225,6 +224,20 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.text += 'addi $sp, $sp, -4\n'
         self.text += 'sw $t1, 0($sp)\n'
 
+    @visitor.when(cil.CaseNode)
+    def visit(self, node):
+        offset = self.var_offset[self.current_function.name][node.expr]
+        self.text += f'lw $t0, {offset}($sp)\n'
+        self.text += f'lw $t1, 0($t0)\n'
+        self.text += 'la $a0, void\n'
+        self.text += f'bne	$t1 $a0 {node.first_label}\n'
+        self.text += 'b case_void_error\n'
+
+    @visitor.when(cil.CaseOptionNode)
+    def visit(self, node):
+        self.text += f'blt	$t1 {node.tag} {node.next_label}\n'
+        self.text += f'bgt	$t1 {node.max_tag} {node.next_label}\n'
+
     @visitor.when(cil.ReturnNode)
     def visit(self, node):
         if node.value:
@@ -305,7 +318,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         offset = self.var_offset[self.current_function.name][node.result]
         self.text += f'sw $t3, {offset}($sp)\n'
 
-    @visitor.when(cil.SubstringNode)
+    @visitor.when(cil.SubStringNode)
     def visit(self, node):
         offset_idx = self.var_offset[self.current_function.name][node.i]
         offset_len = self.var_offset[self.current_function.name][node.length]
@@ -375,3 +388,98 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         offset = self.var_offset[self.current_function.name][node.result]
         self.text += f'sw $a0, {offset}($sp)\n'
+
+    @visitor.when(cil.CopyNode)
+    def visit(self, node):
+        self_offset = self.var_offset[self.current_function.name][node.type]
+        self.text += f'lw $t0, {self_offset}($sp)\n'
+        self.text += f'lw $a0, 8($t0)\n'
+        self.text += f'mul $a0, $a0, 4\n'
+        self.text += f'li $v0, 9\n'
+        self.text += f'syscall\n'
+        self.text += 'bge $v0, $sp heap_error\n'
+        self.text += f'move $t1, $v0\n'
+
+        self.text += 'li $a0, 0\n'
+        self.text += 'lw $t3, 8($t0)\n'
+        self.text += 'copy_object_word:\n'
+        self.text += 'lw $t2, 0($t0)\n'
+        self.text += 'sw $t2, 0($t1)\n'
+        self.text += 'addi $t0, $t0, 4\n'
+        self.text += 'addi $t1, $t1, 4\n'
+        self.text += 'addi $a0, $a0, 1\n'
+
+        self.text += 'blt $a0, $t3, copy_object_word\n'
+        offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $v0, {offset}($sp)\n'
+
+    @visitor.when(cil.IsVoidNode)
+    def visit(self, node):
+        self.text += 'la $t0, void\n'
+        offset = self.var_offset[self.current_function.name][node.expr]
+        self.text += f'lw $t1, {offset}($sp)\n'
+        self.text += 'seq $a0, $t0, $t1\n'
+        res_offset = self.var_offset[self.current_function.name][node.result_local]
+        self.text += f'sw $a0, {res_offset}($sp)\n'
+
+    @visitor.when(cil.HaltNode)
+    def visit(self, node):
+        self.text += 'li $v0, 10\n'
+        self.text += 'syscall\n'
+
+    @visitor.when(cil.PrintIntNode)
+    def visit(self, node):
+        if isinstance(node.value, int):
+            self.text += f'li $v0 , 1\n'
+            self.text += f'li $a0 , {node.value}\n'
+            self.text += f'syscall\n'
+        else:
+            var_offset = self.var_offset[self.current_function.name][node.value]
+            self.text += f'li $v0 , 1\n'
+            self.text += f'lw $a0 , {var_offset}($sp)\n'
+            self.text += f'syscall\n'
+
+    @visitor.when(cil.PrintStringNode)
+    def visit(self, node):
+        var_offset = self.var_offset[self.current_function.name][node.value]
+        self.text += f'lw $a0, {var_offset}($sp)\n'
+        self.text += f'li $v0, 4\n'
+        self.text += f'syscall\n'
+
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node):
+        read_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'li $v0, 5\n'
+        self.text += f'syscall\n'
+        self.text += f'sw $v0, {read_offset}($sp)\n'
+
+    @visitor.when(cil.ReadStringNode)
+    def visit(self, node):
+        read_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'la $a0, temp_string\n'
+        self.text += f'li $a1, 2048\n'
+        self.text += f'li $v0, 8\n'
+        self.text += f'syscall\n'
+
+        self.text += 'move $t0, $a0\n'
+        self.text += 'jump_read_str_char:\n'
+        self.text += 'li $t1, 0\n'
+        self.text += 'lb $t1, 0($t0)\n'
+        self.text += 'beqz $t1, analize_str_end\n'
+        self.text += 'addi $t0, $t0, 1\n'
+        self.text += 'j jump_read_str_char\n'
+
+        self.text += 'analize_str_end:\n'
+        self.text += 'addi $t0, $t0, -1\n'
+        self.text += 'li $t1, 0\n'
+        self.text += 'lb $t1, 0($t0)\n'
+        self.text += 'bne $t1, 10, finish_jump_read_str_char\n'
+        self.text += 'sb $0, 0($t0)\n'
+        self.text += 'addi $t0, $t0, -1\n'
+        self.text += 'lb $t1, 0($t0)\n'
+        self.text += 'bne $t1, 13, finish_jump_read_str_char\n'
+        self.text += 'sb $0, 0($t0)\n'
+        self.text += 'j analize_str_end\n'
+        self.text += 'finish_jump_read_str_char:\n'
+
+        self.text += f'sw $a0, {read_offset}($sp)\n'

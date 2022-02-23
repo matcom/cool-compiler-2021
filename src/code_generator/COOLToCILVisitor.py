@@ -1,5 +1,5 @@
-import cil_ast as cil
-from BaseCoolToCilVisitor import BaseCOOLToCILVisitor
+import code_generator.cil_ast as cil
+from code_generator.BaseCoolToCilVisitor import BaseCOOLToCILVisitor
 from semantic.semantic import Scope, VariableInfo
 from utils import visitor
 from utils.ast import *

@@ -6,7 +6,8 @@ from semantic.visitors.typeBuilder import TypeBuilder
 from semantic.visitors.typeChecker import TypeChecker
 from semantic.visitors.typeCollector import TypeCollector
 from semantic.visitors.varCollector import VarCollector
-# from code_generator.COOLToCILVisitor import COOLToCILVisitor
+from code_generator.COOLToCILVisitor import COOLToCILVisitor
+from code_generator.CILToMIPSVisitor import CILToMIPSVisitor
 from utils.errors import SemanticError
 
 
@@ -66,6 +67,11 @@ def main(_input, _output):
     # coolToCIL = COOLToCILVisitor(context)
     # cilAST = coolToCIL.visit(ast, scope)
 
+    # cilToMIPS = CILToMIPSVisitor()
+    # mips_code = cilToMIPS(cilAST)
+
+    # with open(f'{sys.argv[1][:-3]}.mips', 'w') as f:
+    #     f.write(mips_code)
     
 
     # ast, errors, context, scope = SemanticAn
@@ -77,5 +83,3 @@ if __name__ == "__main__":
 
     main(_input, _output)
 
-    # input_ = '/mnt/d/UH/4to Año/EVEA/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/lexer/iis4.cl'
-    # main(input_)
