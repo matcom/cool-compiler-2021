@@ -295,6 +295,8 @@ read_string_up_to:
 
     li $v0 8
     syscall
+    lw $a0 0($a0)
+    beq $a0 $zero eol_terminated
 
     li $v0 0
 
