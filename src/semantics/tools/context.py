@@ -1,6 +1,6 @@
 from semantics.tools.errors import *
 from semantics.tools.type import TypeBag, Type, SelfType
-from typing import Dict
+from typing import Dict, Union
 
 
 class Context:
@@ -20,7 +20,7 @@ class Context:
         selftype=True,
         autotype=True,
         unpacked=False,
-    ) -> Type | TypeBag:
+    ) -> Union[Type, TypeBag]:
         if selftype and name == "SELF_TYPE":
             return TypeBag({SelfType()})  # raise TypeError(f"Cannot use SELF_TYPE.")
         if autotype and name == "AUTO_TYPE":

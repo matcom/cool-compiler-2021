@@ -1,3 +1,4 @@
+from typing import Optional
 from semantics.tools.type import TypeBag, ErrorType
 import itertools as itt
 
@@ -37,7 +38,7 @@ class Scope:
         self.locals.append(info)
         return info
 
-    def find_variable(self, vname, index=None) -> VariableInfo | None:
+    def find_variable(self, vname, index=None) -> Optional[VariableInfo]:
         locals = self.locals if index is None else itt.islice(self.locals, index)
         try:
             return next(x for x in locals if x.name == vname)
