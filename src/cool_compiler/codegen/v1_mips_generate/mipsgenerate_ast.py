@@ -1,3 +1,6 @@
+from ast import Compare
+
+
 class Program:
     def __init__(self) -> None:
         self.data = {}
@@ -60,6 +63,14 @@ class Header_Comment:
     def __str__(self) -> str:
         return f'#{self.msg}'
 
+
+class Label:
+    def __init__(self,label) -> None:
+        self.label = label
+
+    def __str__(self) -> str:
+        return f'{self.label} : '    
+
 class Load:
     def __init__(self, cmd ,registry, memory_dir) -> None:
         self.registry = registry
@@ -96,6 +107,17 @@ class JumpInconditional:
     
     def __str__(self) -> str:
         return f'{self.cmd} {self.dest}'
+
+class JumpConditional:
+    def __init__(self,cmd,reg1,reg2,label) -> None:
+        self.cmd=cmd
+        self.reg1=reg1
+        self.reg2 = reg2
+        self.label = label
+
+    def __str__(self) -> str:
+        return f'{self.cmd} {self.reg1} {self.reg2} {self.label}'    
+
     
 class SysCall :
     def __init__(self) -> None:
@@ -139,6 +161,26 @@ class SW(Store):
 
 ############################  Cmp   ##################################################
 
+class SEQ(CmpNotJump):  #comparacion igualdad
+    def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
+            super().__init__( 'seq' ,r_dest, r_src_1, r_src_2)
+
+class SGE(CmpNotJump):
+    def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
+            super().__init__( 'sge' ,r_dest, r_src_1, r_src_2)
+
+class SLT (CmpNotJump):
+    def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
+        super().__init__( 'slt' ,r_dest, r_src_1, r_src_2)
+
+
+class SLE(CmpNotJump):
+    def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
+            super().__init__( 'sle' ,r_dest, r_src_1, r_src_2)
+
+
+
+
 ###########################  Jump #####################################################
 class JAL(JumpInconditional):
     def __init__(self,dest) -> None:
@@ -148,6 +190,17 @@ class JR(JumpInconditional):
     def __init__(self,dest) -> None:
             super().__init__('jr',dest)
 
+class Jump(JumpInconditional):
+    def __init__(self,dest) -> None:
+            super().__init__('j',dest)
+################################# JUMPConditional #######################################
+
+class BEQ (JumpConditional):
+     def __init__(self ,register1, register2, label) -> None:
+            super().__init__( 'beq' ,register1, register2,label)
+
+
+
 
 ################################# Operator ##############################################
 
@@ -155,7 +208,17 @@ class AddI(Operation):
     def __init__(self,dest,op1,op2) -> None:
             super().__init__('addi',dest,op1,op2)
 
+class Add(Operation):
+    def __init__(self,dest,op1,op2) -> None:
+            super().__init__('add',dest,op1,op2)
 
+class MUL (Operation):
+    def __init__(self,dest,op1,op2) -> None:
+            super().__init__('mult',dest,op1,op2)
+
+class SUB (Operation):
+     def __init__(self,dest,op1,op2) -> None:
+            super().__init__('sub',dest,op1,op2)
 
 
 ################################# Native Func IO ################################################
@@ -220,3 +283,5 @@ class Type_Name:
     def __str__(self) -> str:
        return """
 """
+
+
