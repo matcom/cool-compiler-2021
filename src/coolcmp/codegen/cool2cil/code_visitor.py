@@ -51,6 +51,12 @@ class DotCodeVisitor(CILVisitor):
 
     @visitor.when(ast.ProgramNode)
     def visit(self, node: ast.ProgramNode, scope: Scope):
+        # the root scope stores void to avoid semantic errors initializing
+        # the void attribute of classes to void. After that every function
+        # has access to void through that attribute in every class.
+        # So, pop it to avoid repeated locals.
+        scope.locals.pop(0)
+
         # build the entry function:
         for class_ in node.declarations:
             if class_.id == 'Main':
@@ -74,19 +80,6 @@ class DotCodeVisitor(CILVisitor):
         # add the default functions of COOL
         # TODO: add missing instructions
         self.code += [
-            # cil.FunctionNode('abort', [], [], []),
-            # cil.FunctionNode('type_name', [], [], []),
-            # cil.FunctionNode('copy', [], [], []),
-            cil.FunctionNode(
-                name='get_void',
-                params=[],
-                local_vars=[],
-                instructions=[
-                    cil.LocalNode('void_inst'),
-                    cil.AllocateNode('<void>', 'void_inst'),
-                    cil.ReturnNode('void_inst'),
-                ]
-            ),
             cil.FunctionNode(
                 name='out_string',
                 params=[
@@ -241,10 +234,7 @@ class DotCodeVisitor(CILVisitor):
         self.add_inst(cil.GotoNode(cond_label.name))
         self.add_inst(end_while_label)
 
-        # return void
-        void_res = self.add_local('void_res')
-        self.add_inst(cil.StaticCallNode('get_void', void_res))
-        return void_res
+        return 'void'
 
     @visitor.when(ast.CallNode)
     def visit(self, node: ast.CallNode, scope: Scope):
