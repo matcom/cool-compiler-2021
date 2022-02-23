@@ -41,7 +41,7 @@ def pipeline(input_file: Path, output_file: Path = None):
     # define grammar
     grammar, idx, type_id, string, num = define_cool_grammar()
 
-    tokens = tokenize_cool_text(grammar, idx, type_id, string, num, text, errors)
+    tokens, pos_data = tokenize_cool_text(grammar, idx, type_id, string, num, text, errors)
     # print(tokens)
     if len(errors) > 0:
         report_and_exit(errors)
@@ -50,7 +50,7 @@ def pipeline(input_file: Path, output_file: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    parse, operations = parser([t.token_type for t in tokens])
+    parse, operations = parser([t.token_type for t in tokens], [t.lex for t in tokens], pos_data, text)
 
     print("Parse")
     print(parse)

@@ -134,6 +134,7 @@ def t_type_id(t):
     t.type = reserved.get(
         t.value, "type_id"
     )  # Check for reserved words. If it isn't a reserved word is categorized as identifier
+    # t.lexpos = t.lexpos - t.lexer.last_new_line_pos + 1
     return t
 
 # matching int numbers
