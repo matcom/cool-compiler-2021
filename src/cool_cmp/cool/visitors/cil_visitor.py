@@ -786,6 +786,10 @@ class COOLToCILVisitor():
         self.dotcode.append(function_node)
         return function_node
     
+    def get_function(self, function_name):
+        funcs = [x for x in self.dotcode if isinstance(x, cil.FunctionNode) and x.name == function_name]
+        return funcs[0]
+
     def register_type(self, name, parent=None, row=None, column=None, comment=None):
         if parent:
             for t in self.dottypes:
@@ -802,7 +806,10 @@ class COOLToCILVisitor():
             return type_node
 
         else:
-            return [x for x in self.dottypes if x.name == name][0]
+            return self.get_dottype(name)
+
+    def get_dottype(self, name):
+        return [x for x in self.dottypes if x.name == name][0]
 
     def register_data(self, value, row, column, comment=None):
         vname = f'data_{len(self.dotdata)}'
@@ -858,8 +865,16 @@ class COOLToCILVisitor():
         self.current_function = None
 
     def create_empty_methods(self, typex, dottype, row, column, comment=None):
+        """
+        Creates all methods and init methods except the main init method
+        """
         if typex.parent:
             self.create_empty_methods(typex.parent, dottype, row, column, comment)
+        
+        for attr in typex.attributes:
+            dottype.attributes.append(attr.name)
+            new_function = self.register_function(self.to_init_attr_function_name(attr.name, typex.name), row, column, f"Init {attr.name} at {typex.name}")
+            dottype.methods.append((new_function.name, new_function.name))
         
         for m in typex.methods:
             name = self.to_function_name(m.name, typex.name)
@@ -871,13 +886,6 @@ class COOLToCILVisitor():
             elif len([x for (_, x) in dottype.methods if x == name]) == 0:
                 dottype.methods.append((m.name, name))
             
-    # def create_empty_attrs(self, typex, dottype):
-    #     if typex.parent:
-    #         self.create_empty_attrs(typex.parent, dottype)
-
-    #     for m in typex.attributes:
-    #         name = dottype.attributes.append(m.name)
-
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -891,17 +899,20 @@ class COOLToCILVisitor():
         self.create_entry_function(node.row,node.column,"Program Node")
         self.create_type_distance_function(node.row,node.column,"Program Node")
         
-        for type_name, typex in self.context.types.items():
+        for type_name, typex in self.context.types.items(): # Register all types
             if type_name not in ["Error", "Void"]:
                 self.register_type(type_name,parent=None ,row=node.row, column=node.column, comment="Program Node")
+
+        for type_name, typex in self.context.types.items(): # Assign parents to types
+            if type_name not in ["Error", "Void"]:
                 self.register_type(type_name, typex.parent,
                                    node.row, node.column, "Program Node")
 
-        for type_name, typex in self.context.types.items():
+
+        for type_name, typex in self.context.types.items(): # Create methods
             if type_name not in ["Error", "Void"]:
                 this_type = next(x for x in self.dottypes if x.name == type_name)
                 self.create_empty_methods(typex, this_type, node.row, node.column, "Program Node")
-                # self.create_empty_attrs(typex, this_type)
 
         for type_name, typex in self.context.types.items():
             if type_name in self.context.special_types and type_name not in ["Error", "Void"]:
@@ -922,45 +933,38 @@ class COOLToCILVisitor():
         
         self.current_type = self.context.get_type(node.id)
         
-        type_node = self.register_type(self.current_type.name, self.current_type.parent, node.row, node.column, "Class Declaration Node")
+        type_node = self.get_dottype(self.current_type.name)
         
+        # Register class init function
         self.current_function = init_function = self.register_function(self.to_init_type_function_name(self.current_type.name), node.row, node.column, "Class Declaration Node")
         type_node.methods.insert(0, ("__init", init_function.name))
         self.params.append(cil.ParamNode('self', node.row, node.column, "Class Declaration Node"))
+
+        if self.current_type.parent and self.current_type.parent.name not in ["String", "Int", "Bool"]:
+            self.register_instruction(cil.ArgNode('self', node.row, node.column, "Calling father init function"))
+            self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(self.current_type.parent.name), "self", node.row, node.column))
+        
         self.register_instruction(cil.InitInstance('self', type_node.name, node.row, node.column, "Class Declaration Node"))
         
-        for attr,typex in self.current_type.all_attributes():
-            # Defining attribute's init functions
-            type_node.attributes.append(attr.name)
-            new_function = self.register_function(self.to_init_attr_function_name(attr.name, self.current_type.name), node.row, node.column, "Class Declaration Node")
-            # type_node.methods.append((new_function.name, new_function.name)) 
-            self.current_function = new_function
+        for attr in self.current_type.attributes:
+            # Initializing attribute's init functions
+            init_attr_function = self.get_function(self.to_init_attr_function_name(attr.name, type_node.name))
+            self.current_function = init_attr_function
             self.visit(attr.node, attr.node.scope)
             
             # Calling function in type init function
             self.current_function = init_function
             dest = self.define_internal_local(row=attr.node.row, column=attr.node.column, comment="Attribute value destination")
             self.register_instruction(cil.ArgNode('self',node.row, node.column, "arg node"))
-            self.register_instruction(cil.StaticCallNode(new_function.name, dest, node.row, node.column, "Initialize arg function"))
+            self.register_instruction(cil.StaticCallNode(init_attr_function.name, dest, node.row, node.column, "Initialize arg function"))
 
         self.register_instruction(cil.ReturnNode('self',node.row, node.column, "return node")) # Returning created instance
 
-        for method,typex in self.current_type.all_methods(): # Register methods  
-            if typex != self.current_type:
-                method_name = self.to_function_name(method.name, typex.name)
-                if all(x.name != method_name for x in self.dotcode):
-                    new_function = self.register_function(method_name,node.row, node.column, "Class Declaration Node")
-                else:
-                    new_function = next(x for x in self.dotcode if x.name == method_name)
-                # type_node.methods.append((method.name,new_function.name))
-
-
-
         
+        # Initialize methods
         func_declarations = (f for f in node.features if isinstance(f, FuncDeclarationNode))
         for feature in func_declarations:
-            self.current_function = self.register_function(self.to_function_name(feature.id,self.current_type.name), node.row, node.column, "Class Declaration Node")
-            # type_node.methods.append((feature.id,self.current_function.name))
+            self.current_function = self.get_function(self.to_function_name(feature.id,self.current_type.name))
             self.visit(feature, feature.scope)
                 
         self.current_type = None
@@ -1112,6 +1116,7 @@ class COOLToCILVisitor():
     def visit(self, node: CaseNode, scope):
         
         value = self.visit(node.expr, scope)
+        final_result = self.define_internal_local(node.row, node.column, "Final Result")
         
         type_value = self.define_internal_local(node.row, node.column, "Case Node")
         self.register_instruction(cil.TypeOfNode(value, type_value, node.row, node.column, "Case Node"))
@@ -1181,7 +1186,7 @@ class COOLToCILVisitor():
             self.register_instruction(cil.GotoIfNode(not_equal_types, lbl.label, node.row, node.column, "Case Node"))
             
             result = self.visit(param, child_scope, value)
-            self.register_instruction(cil.AssignNode(value, result, node.row, node.column, "Case Node"))
+            self.register_instruction(cil.AssignNode(final_result, result, node.row, node.column, "Case Node"))
             
             self.register_instruction(cil.GotoNode(final_label.label, node.row, node.column, "Case Node"))
             self.register_instruction(lbl)
@@ -1190,7 +1195,7 @@ class COOLToCILVisitor():
         self.register_instruction(cil.AbortNode(node.row, node.column, "Case Node"))
         self.register_instruction(final_label)
                 
-        return value
+        return final_result
     
     @visitor.when(IsVoidNode)
     def visit(self, node:IsVoidNode, scope):
