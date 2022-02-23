@@ -201,7 +201,8 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         for arg in node.params:
             self.visit(arg)
-    
+
+        
         value_offset = self.var_offset[self.current_function.name][node.instance]
         self.text += f'lw $t1, {value_offset}($t0)\n'
         self.text += 'la $t0, void\n'

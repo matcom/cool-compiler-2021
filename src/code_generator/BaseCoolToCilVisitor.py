@@ -26,6 +26,12 @@ class BaseCOOLToCILVisitor:
     def instructions(self):
         return self.current_function.instructions
 
+    def is_defined_param(self, name):
+        for p in self.params:
+            if p.name == name:
+                return True
+        return False
+
     def register_param(self, vinfo):
         # 'param_{self.current_function.name[9:]}_{vinfo.name}_{len(self.params)}'
         param_node = cil.ParamNode(vinfo.name)

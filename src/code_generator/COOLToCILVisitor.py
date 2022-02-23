@@ -196,7 +196,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             call_args.append(cil.ArgNode(param_local))
 
         self.register_instruction(cil.VCallNode(
-            result_local, node.id, call_args, 'IO', 'self'))
+            result_local, node.id, call_args, node.static_type.name, "self"))
 
         return result_local
 

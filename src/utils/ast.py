@@ -1,6 +1,3 @@
-from cmath import exp
-from select import select
-
 
 class Node():
     pass
@@ -105,6 +102,7 @@ class MemberCallNode(ExpressionNode):
         self.line = idx.lineno
         self.col = idx.column
         self.args = args
+        self.instance = SelfNode('self', self.line, self.col)
 
 
 class IfThenElseNode(ExpressionNode):
@@ -250,5 +248,13 @@ class BoolNode(AtomicNode):
 class StringNode(AtomicNode):
     pass
 
+
 class VoidNode(AtomicNode):
     pass
+
+
+class SelfNode():
+    def __init__(self, name, line, col):
+        self.name = name
+        self.line = line
+        self.col = col

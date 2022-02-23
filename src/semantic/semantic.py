@@ -113,6 +113,14 @@ class Type:
             name, param_names, param_types, return_type)
         return method
 
+    def has_attr(self, name: str):
+        try: 
+            attr_name = self.get_attribute(name)
+        except:
+            return False
+        else:
+            return True
+
     def change_type(self, method, nparm, newtype):
         idx = method.param_names.index(nparm)
         method.param_types[idx] = newtype

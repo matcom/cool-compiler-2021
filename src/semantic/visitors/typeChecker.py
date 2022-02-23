@@ -205,6 +205,8 @@ class TypeChecker:
                     self.errors.append(TypexError(
                         errorText, memberCallNode.line, memberCallNode.col))
 
+
+        memberCallNode.static_type = typex
         memberCallNode.computed_type = get_type(method.return_type, typex)
         return memberCallNode.computed_type
 

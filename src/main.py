@@ -70,7 +70,7 @@ def main(_input, _output):
     cilToMIPS = CILToMIPSVisitor()
     mips_code = cilToMIPS.visit(cilAST)
 
-    # print(mips_code)
+    print(mips_code)
     with open(_output, 'w+') as f:
         f.write(mips_code)
     
