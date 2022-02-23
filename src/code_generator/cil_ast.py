@@ -208,12 +208,12 @@ class PrefixNode(InstructionNode):
         self.n = n
 
 
-class SubstringNode(InstructionNode):
-    def __init__(self, dest, string, begin, final):
-        self.local_dest = dest
-        self.begin = begin
+class SubStringNode(InstructionNode):
+    def __init__(self, i, length, string, result):
+        self.i = i
+        self.length = length
         self.string = string
-        self.final = final
+        self.result = result
 
 
 class StrNode(InstructionNode):

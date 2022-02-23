@@ -187,217 +187,191 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.CallNode)
     def visit(self, node):
-        function = self.dispatch_table.find_full_name(node.type, node.function)
-        self.code.append(f'# Static Dispatch of the method {node.function}')
-        self.push_register('fp')
-        self.push_register('ra')
-        self.code.append('# Push the arguments to the stack')
-        for arg in reversed(node.args):
+        self.text += 'move $t0, $sp\n'
+
+        for arg in node.params:
             self.visit(arg)
-        self.code.append('# Empty all used registers and saves them to memory')
-        self.empty_registers()
-        self.code.append('# This function will consume the arguments')
-        self.code.append(f'jal {function}')
-        self.code.append('# Pop ra register of return function of the stack')
-        self.pop_register('ra')
-        self.code.append('# Pop fp register from the stack')
-        self.pop_register('fp')
-        if node.dest is not None:
-            self.get_reg_var(node.dest)
-            rdest = self.addr_desc.get_var_reg(node.dest)
-            self.code.append('# saves the return value')
-            self.code.append(f'move ${rdest}, $v0')
-        self.var_address[node.dest] = self.get_type(node.return_type)
+
+        self.text += f'jal {node.function}\n'
+        result_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $a1, {result_offset}($sp)\n'
 
     @visitor.when(cil.VCallNode)
     def visit(self, node):
-        self.code.append('# Find the actual name in the dispatch table')
-        reg = self.addr_desc.get_var_reg(node.obj)
-        self.code.append(
-            '# Gets in a0 the actual direction of the dispatch table')
-        self.code.append(f'lw $t9, 8(${reg})')
-        self.code.append('lw $a0, 8($t9)')
-        function = self.dispatch_table.find_full_name(node.type, node.method)
-        index = 4*self.dispatch_table.get_offset(node.type, function) + 4
-        self.code.append(f'# Saves in t8 the direction of {function}')
-        self.code.append(f'lw $t8, {index}($a0)')
-        self.push_register('fp')
-        self.push_register('ra')
-        self.code.append('# Push the arguments to the stack')
-        for arg in reversed(node.args):
+        self.text += 'move $t0, $sp\n'
+
+        for arg in node.params:
             self.visit(arg)
-        self.code.append('# Empty all used registers and saves them to memory')
-        self.empty_registers()
-        self.code.append('# This function will consume the arguments')
-        self.code.append(f'jal $t8')
-        self.code.append('# Pop ra register of return function of the stack')
-        self.pop_register('ra')
-        self.code.append('# Pop fp register from the stack')
-        self.pop_register('fp')
-        if node.dest is not None:
-            self.get_reg_var(node.dest)
-            rdest = self.addr_desc.get_var_reg(node.dest)
-            self.code.append('# saves the return value')
-            self.code.append(f'move ${rdest}, $v0')
-        self.var_address[node.dest] = self.get_type(node.return_type)
+
+        value_offset = self.var_offset[self.current_function.name][node.instance]
+        self.text += f'lw $t1, {value_offset}($t0)\n'
+        self.text += 'la $t0, void\n'
+        self.text += 'beq $t1, $t0, dispatch_void_error\n'
+
+        self.text += f'lw $t2, 12($t1)\n'
+
+        method_offset = self.method_offset[node.dynamic_type][node.function]
+        self.text += f'lw $t3, {method_offset}($t2)\n'
+
+        self.text += 'jal $t3\n'
+
+        result_offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $a1, {result_offset}($sp)\n'
 
     @visitor.when(cil.ArgNode)
     def visit(self, node):
-        self.code.append('# The rest of the arguments are push into the stack')
-        if self.is_variable(node.dest):
-            self.get_reg_var(node.dest)
-            reg = self.addr_desc.get_var_reg(node.dest)
-            self.code.append(f'sw ${reg}, ($sp)')
-        elif self.is_int(node.dest):
-            self.code.append(f'li $t9, {node.dest}')
-            self.code.append(f'sw $t9, ($sp)')
-        self.code.append('addiu $sp, $sp, -4')
+        value_offset = self.var_offset[self.current_function.name][node.name]
+        self.text += f'lw $t1, {value_offset}($t0)\n'
+        self.text += 'addi $sp, $sp, -4\n'
+        self.text += 'sw $t1, 0($sp)\n'
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node):
-        if self.is_variable(node.value):
-            rdest = self.addr_desc.get_var_reg(node.value)
-            self.code.append(f'move $v0, ${rdest}')
-        elif self.is_int(node.value):
-            self.code.append(f'li $v0, {node.value}')
-        self.code.append('# Empty all used registers and saves them to memory')
-        self.empty_registers()
-        self.code.append('# Removing all locals from stack')
-        self.code.append(f'addiu $sp, $sp, {self.locals*4}')
-        self.code.append(f'jr $ra')
-        self.code.append('')
+        if node.value:
+            offset = self.var_offset[self.current_function.name][node.value]
+            self.text += f'lw $a1, {offset}($sp)\n'
+        else:
+            self.text += f'move $a1, $zero\n'
 
-    @visitor.when(cil.LoadNode)
+    @visitor.when(cil.LoadStringNode)
     def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.code.append(f'# Saves in {node.dest} {node.msg}')
-        self.var_address[node.dest] = AddrType.STR
-        self.code.append(f'la ${rdest}, {node.msg}')
+        self.text += f'la $t0, {node.msg}\n'
+        offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $t0, {offset}($sp)\n'
+
+    @visitor.when(cil.LoadIntNode)
+    def visit(self, node):
+        self.text += f'li $t0, {node.value}\n'
+        offset = self.var_offset[self.current_function.name][node.local_dest]
+        self.text += f'sw $t0, {offset}($sp)\n'
 
     @visitor.when(cil.LengthNode)
     def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        reg = self.addr_desc.get_var_reg(node.arg)
-        loop = f'loop_{self.loop_idx}'
-        end = f'end_{self.loop_idx}'
-        self.code.append(f'move $t8, ${reg}')
-        self.code.append('# Determining the length of a string')
-        self.code.append(f'{loop}:')
-        self.code.append(f'lb $t9, 0($t8)')
-        self.code.append(f'beq $t9, $zero, {end}')
-        self.code.append(f'addi $t8, $t8, 1')
-        self.code.append(f'j {loop}')
-        self.code.append(f'{end}:')
-        self.code.append(f'sub ${rdest}, $t8, ${reg}')
-        self.loop_idx += 1
+        offset = self.var_offset[self.current_function.name][node.variable]
+        self.text += f'lw $t0, {offset}($sp)\n'
+        self.text += f'lw $t0, 16($t0)\n'
+
+        self.text += 'li $a0, 0\n'
+        self.text += 'count_char:\n'
+        self.text += 'lb $t1, 0($t0)\n'
+        self.text += 'beqz $t1, finish_chars_count\n'
+        self.text += 'addi $t0, $t0, 1\n'
+        self.text += 'addi $a0, $a0, 1\n'
+        self.text += 'j count_char\n'
+        self.text += 'finish_chars_count:\n'
+
+        offset = self.var_offset[self.current_function.name][node.result]
+        self.text += f'sw $a0, {offset}($sp)\n'
 
     @visitor.when(cil.ConcatNode)
     def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.code.append('# Allocating memory for buffer')
-        self.code.append('li $a0, 356')
-        self.code.append('li $v0, 9')
-        self.code.append('syscall')
-        self.code.append(f'move ${rdest}, $v0')
-        rsrc1 = self.addr_desc.get_var_reg(node.arg1)
-        if node.arg2 is not None:
-            rsrc2 = self.addr_desc.get_var_reg(node.arg2)
-        self.code.append('# Copy the first string to dest')
-        var = self.save_reg_if_occupied('a1')
-        self.code.append(f'move $a0, ${rsrc1}')
-        self.code.append(f'move $a1, ${rdest}')
-        self.push_register('ra')
-        self.code.append('jal strcopier')
-        if node.arg2 is not None:
-            self.code.append('# Concat second string on buffers result')
-            self.code.append(f'move $a0, ${rsrc2}')
-            self.code.append(f'move $a1, $v0')
-            self.code.append('jal strcopier')
-        self.code.append('sb $0, 0($v0)')
-        self.pop_register('ra')
-        self.code.append(f'j finish_{self.loop_idx}')
-        if self.first_defined['strcopier']:
-            self.code.append('# Definition of strcopier')
-            self.code.append('strcopier:')
-            self.code.append('# In a0 is source and in a1 is dest')
-            self.code.append(f'loop_{self.loop_idx}:')
-            self.code.append('lb $t8, ($a0)')
-            self.code.append(f'beq $t8, $zero, end_{self.loop_idx}')
-            self.code.append('addiu $a0, $a0, 1')
-            self.code.append('sb $t8, ($a1)')
-            self.code.append('addiu $a1, $a1, 1')
-            self.code.append(f'b loop_{self.loop_idx}')
-            self.code.append(f'end_{self.loop_idx}:')
-            self.code.append('move $v0, $a1')
-            self.code.append('jr $ra')
-            self.first_defined['strcopier'] = False
-        self.code.append(f'finish_{self.loop_idx}:')
-        self.load_var_if_occupied(var)
-        self.loop_idx += 1
+        offset_str1 = self.var_offset[self.current_function.name][node.str1]
+        offset_len1 = self.var_offset[self.current_function.name][node.len1]
+
+        offset_str2 = self.var_offset[self.current_function.name][node.str2]
+        offset_len2 = self.var_offset[self.current_function.name][node.len2]
+
+        self.text += f'lw $a0, {offset_len1}($sp)\n'
+        self.text += f'lw $t0, {offset_len2}($sp)\n'
+
+        self.text += 'add $a0, $a0, $t0\n'
+        self.text += 'addi $a0, $a0, 1\n'
+        self.text += f'li $v0, 9\n'
+        self.text += f'syscall\n'
+        self.text += 'bge $v0, $sp heap_error\n'
+        self.text += 'move $t3, $v0\n'
+
+        self.text += f'lw $t0, {offset_str1}($sp)\n'
+        self.text += f'lw $t1, {offset_str2}($sp)\n'
+
+        self.text += 'copy_str1_char:\n'
+        self.text += 'lb $t2, 0($t0)\n'
+        self.text += 'sb $t2, 0($v0)\n'
+        self.text += 'beqz $t2, concat_str2_char\n'
+        self.text += 'addi $t0, $t0, 1\n'
+        self.text += 'addi $v0, $v0, 1\n'
+        self.text += 'j copy_str1_char\n'
+
+        self.text += 'concat_str2_char:\n'
+        self.text += 'lb $t2, 0($t1)\n'
+        self.text += 'sb $t2, 0($v0)\n'
+        self.text += 'beqz $t2, finish_str2_concat\n'
+        self.text += 'addi $t1, $t1, 1\n'
+        self.text += 'addi $v0, $v0, 1\n'
+        self.text += 'j concat_str2_char\n'
+        self.text += 'finish_str2_concat:\n'
+        self.text += 'sb $0, ($v0)\n'
+
+        offset = self.var_offset[self.current_function.name][node.result]
+        self.text += f'sw $t3, {offset}($sp)\n'
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node):
-        rdest = self.addr_desc.get_var_reg(node.dest)
-        self.code.append('# Allocating memory for buffer')
-        self.code.append('li $a0, 356')
-        self.code.append('li $v0, 9')
-        self.code.append('syscall')
-        self.code.append(f'move ${rdest}, $v0')
-        if self.is_variable(node.begin):
-            rstart = self.addr_desc.get_var_reg(node.begin)
-        elif self.is_int(node.begin):
-            rstart = 't8'
-            self.code.append(f'li $t8, {node.begin}')
-        if self.is_variable(node.end):
-            rend = self.addr_desc.get_var_reg(node.end)
-            var = None
-        elif self.is_int(node.end):
-            var = self.save_reg_if_occupied('a3')
-            rend = 'a3'
-            self.code.append(f'li $a3, {node.end}')
-        self.get_reg_var(node.word)
-        rself = self.addr_desc.get_var_reg(node.word)
-        self.code.append("# Getting substring")
-        start = f'start_{self.loop_idx}'
-        error = f'error_{self.loop_idx}'
-        end_lp = f'end_len_{self.loop_idx}'
-        self.code.append('# Move to the begining')
-        self.code.append('li $v0, 0')
-        self.code.append(f'move $t8, ${rself}')
-        self.code.append(f'{start}:')
-        self.code.append('lb $t9, 0($t8)')
-        self.code.append(f'beqz $t9, {error}')
-        self.code.append('addi $v0, 1')
-        self.code.append(f'bgt $v0, ${rstart}, {end_lp}')
-        self.code.append(f'addi $t8, 1')
-        self.code.append(f'j {start}')
-        self.code.append(f'{end_lp}:')
-        self.code.append('# Saving dest')
-        self.code.append(f'move $v0, ${rdest}')
-        loop = f'loop_{self.loop_idx}'
-        end = f'end_{self.loop_idx}'
-        self.code.append(f'{loop}:')
-        self.code.append(f'sub $t9, $v0, ${rdest}')
-        self.code.append(f'beq $t9, ${rend}, {end}')
-        self.code.append(f'lb $t9, 0($t8)')
-        self.code.append(f'beqz $t9, {error}')
-        self.code.append(f'sb $t9, 0($v0)')
-        self.code.append('addi $t8, $t8, 1')
-        self.code.append(f'addi $v0, $v0, 1')
-        self.code.append(f'j {loop}')
-        self.code.append(f'{error}:')
-        self.code.append('la $a0, index_error')
-        self.code.append('li $v0, 4')
-        self.code.append(f'move $a0, ${rself}')
-        self.code.append('syscall')
-        self.code.append('li $v0, 1')
-        self.code.append(f'move $a0, ${rstart}')
-        self.code.append('syscall')
-        self.code.append('li $v0, 1')
-        self.code.append(f'move $a0, ${rend}')
-        self.code.append('syscall')
-        self.code.append('j .raise')
-        self.code.append(f'{end}:')
-        self.code.append('sb $0, 0($v0)')
-        self.load_var_if_occupied(var)
-        self.loop_idx += 1
+        offset_idx = self.var_offset[self.current_function.name][node.i]
+        offset_len = self.var_offset[self.current_function.name][node.length]
+        offset_str = self.var_offset[self.current_function.name][node.string]
+
+        self.text += f'lw $a0, {offset_len}($sp)\n'
+        self.text += 'addi $a0, $a0, 1\n'
+        self.text += f'li $v0, 9\n'
+        self.text += f'syscall\n'
+        self.text += 'bge $v0, $sp heap_error\n'
+
+        self.text += f'lw $t0, {offset_idx}($sp)\n'
+        self.text += f'lw $t1, {offset_len}($sp)\n'
+        self.text += f'lw $t4, {offset_str}($sp)\n'
+        self.text += f'lw $t2, 16($t4)\n'
+
+        self.text += 'bltz $t0, substr_error\n'
+
+        self.text += 'li $a0, 0\n'
+        self.text += 'jump_str_char:\n'
+        self.text += f'beq $a0, $t0, finish_index_jump\n'
+        self.text += 'addi $a0, $a0, 1\n'
+        self.text += 'addi $t2, $t2, 1\n'
+        self.text += 'beq $t2, $zero, substr_error\n'
+        self.text += 'j jump_str_char\n'
+        self.text += 'finish_index_jump:\n'
+        self.text += 'li $a0, 0\n'
+        self.text += 'move $t3, $v0\n'
+
+        self.text += 'copy_substr_char:\n'
+        self.text += 'beq $a0, $t1 finish_substr_copy\n'
+        self.text += 'li $t0, 0\n'
+        self.text += 'lb $t0, 0($t2)\n'
+        self.text += 'sb $t0, 0($v0)\n'
+        self.text += 'addi $t2, $t2, 1\n'
+        self.text += 'beq $t2, $zero, substr_error\n'
+        self.text += 'addi $v0, $v0, 1\n'
+        self.text += 'addi $a0, $a0, 1\n'
+        self.text += 'j copy_substr_char\n'
+        self.text += 'finish_substr_copy:\n'
+        self.text += 'sb $0, ($v0)\n'
+
+        offset = self.var_offset[self.current_function.name][node.result]
+        self.text += f'sw $t3, {offset}($sp)\n'
+
+    @visitor.when(cil.StringEqualsNode)
+    def visit(self, node):
+        offset_str1 = self.var_offset[self.current_function.name][node.s1]
+        offset_str2 = self.var_offset[self.current_function.name][node.s2]
+
+        self.text += f'lw $t1, {offset_str1}($sp)\n'
+        self.text += f'lw $t2, {offset_str2}($sp)\n'
+
+        self.text += 'compare_str_char:\n'
+        self.text += 'li $t3, 0\n'
+        self.text += 'lb $t3, 0($t1)\n'
+        self.text += 'li $t4, 0\n'
+        self.text += 'lb $t4, 0($t2)\n'
+        self.text += 'seq $a0, $t3, $t4\n'
+        self.text += 'beqz $a0, finish_compare_str\n'
+        self.text += 'beqz $t3, finish_compare_str\n'
+        self.text += 'beqz $t4, finish_compare_str\n'
+        self.text += 'addi $t1, $t1, 1\n'
+        self.text += 'addi $t2, $t2, 1\n'
+        self.text += 'j compare_str_char\n'
+        self.text += 'finish_compare_str:\n'
+
+        offset = self.var_offset[self.current_function.name][node.result]
+        self.text += f'sw $a0, {offset}($sp)\n'
