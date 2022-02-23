@@ -435,7 +435,7 @@ class TypeChecker:
     def visit(self, stringNode, scope):
         stringNode.computed_type = StringType(
             (stringNode.line, stringNode.col))
-        return stringNode.computed_typestringNode
+        return stringNode.computed_type
 
     @visitor.when(VoidNode)
     def visit(self, voidNode, scope):
