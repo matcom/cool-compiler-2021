@@ -7,6 +7,7 @@ from visitors.Inferencer import Inferencer
 from visitors.Executor import Executor, RuntimeException
 from visitors.CooltoCil import COOLToCILVisitor
 from visitors.CilDepicter import get_formatter
+from visitors.CiltoMips import CiltoMipsVisitor
 
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
@@ -26,9 +27,9 @@ class Pipeline():
 
         # derivations, operations = self.parser.Parser(self.tokens, True)
 
-        self.ast = parser.parse(lexer, program)#= evaluate_reverse_parse(derivations, operations, self.tokens)
-        self.errors = self.lexer.errors
-        if len(parser.errors) != 0:
+        self.ast = self.parser.parse(lexer, program)#= evaluate_reverse_parse(derivations, operations, self.tokens)
+        self.errors = self.lexer.errors + self.parser.errors
+        if len(self.errors) != 0:
             return
         
         if self.ast is None:
@@ -49,8 +50,8 @@ class Pipeline():
                 self.typeChecker = TypeChecker(self.context, self.errors)
                 self.typeChecker.visit( self.ast, scope)
                 
-            # self.coolToCil = COOLToCILVisitor(self.context)
-            # cil_ast = self.coolToCil.visit(self.ast, scope)
+            self.coolToCil = COOLToCILVisitor(self.context)
+            cil_ast = self.coolToCil.visit(self.ast, scope)
             # print(get_formatter(cil_ast))
             self.cilToMips = CiltoMipsVisitor(self.context)
             self.cilToMips.visit(cil_ast)

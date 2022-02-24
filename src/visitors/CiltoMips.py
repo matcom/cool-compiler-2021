@@ -2,12 +2,12 @@ from utils.mip_utils import registers, operations, datatype
 import visitors.visitor as visitor
 from cil_ast.cil_ast import *
 
-class BaseCiltoMipsVisitor:
-    def __init__(self, programNode):
-        self.dotdata =programNode.dotdata
-        self.dotcode =programNode.dotcode
-        self.dottype =programNode.dottype
-        # self.context = context
+class CiltoMipsVisitor:
+    def __init__(self, context):
+        self.dottypes = []
+        self.dotdata =[]
+        self.dotcode =[]
+        self.context = context
         self.code = []
         self.data = []
     def write_data(self, instruction):
@@ -24,6 +24,10 @@ class BaseCiltoMipsVisitor:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
+        self.dottypes = node.dottypes
+        self.dotdata = node.dotdata
+        self.dotcode = node.dotcode
+
         self.write_data('.data')
         self.write_code('.text')
         

@@ -1,0 +1,22 @@
+.data
+_abort: .asciiz "Program Aborted"
+_zero: .asciiz "0 Division Error"
+_substr: .asciiz "Substr Length Error"
+_mem: .asciiz "Memory Error"
+
+buffer: .space 1024
+type_str0: .asciiz "Object"
+type_str1: .asciiz "Int"
+type_str2: .asciiz "Bool"
+type_str3: .asciiz "String"
+type_str4: .asciiz "IO"
+Object: .word 12, 42, type_str0, .function_abort_at_Object, .function_type_name_at_Object, .function_copy_at_Object
+Int: .word 12, 42, type_str1, .function_abort_at_Object, .function_type_name_at_Object, .function_copy_at_Object
+Bool: .word 12, 42, type_str2, .function_abort_at_Object, .function_type_name_at_Object, .function_copy_at_Object
+String: .word 12, 42, type_str3, .function_abort_at_Object, .function_type_name_at_Object, .function_copy_at_Object, .function_length_at_String, .function_substr_at_String, .function_concat_at_String
+IO: .word 12, 42, type_str4, .function_abort_at_Object, .function_type_name_at_Object, .function_copy_at_Object, .function_in_string_at_IO, .function_out_string_at_IO, .function_in_int_at_IO, .function_out_int_at_IO
+.text
+main:
+move $s7 $gp
+addi $s7 $s7 300000
+

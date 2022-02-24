@@ -75,7 +75,8 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "./tests/lexer/mixed2.cl"#"debbuging/tests/Auto/call1.cl"
+        input_file = "./tests/codegen/hello_world.cl"#"debbuging/tests/Auto/call1.cl"
+        input_file = "./tests/parser/assignment1.cl"#"debbuging/tests/Auto/call1.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
@@ -97,15 +98,15 @@ def main():
         exit(1)
     coolParser = parser.CoolParser()
 
-    ast = coolParser.parse(lexer.CoolLexer(), program)
-    if coolParser.lexer.errors:
-        for lexing_error in coolParser.lexer.errors:
-            print(lexing_error.__str__())
-        exit(1)
-    if coolParser.errors:
-        for parsing_error in coolParser.errors:
-            print(parsing_error)
-        exit(1)
+    # ast = coolParser.parse(lexer.CoolLexer(), program)
+    # if coolParser.lexer.errors:
+    #     for lexing_error in coolParser.lexer.errors:
+    #         print(lexing_error.__str__())
+    #     exit(1)
+    # if coolParser.errors:
+    #     for parsing_error in coolParser.errors:
+    #         print(parsing_error)
+    #     exit(1)
     # parser = Parser(Lexer())
     # ast = parser.parse(program)
     # if parser.errors:
