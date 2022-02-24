@@ -153,10 +153,13 @@ class StorageNode(OperationNode):
 
 
 class SetAttrOpNode(OperationNode):
-    def __init__(self, type_id: str, attr_id: str, source_id: AtomOpNode) -> None:
-        self.type = type_id
+    def __init__(
+        self, instance_id: str, attr_id: str, new_value: AtomOpNode, instance_type: str
+    ) -> None:
+        self.instance_type = instance_type
+        self.new_value = new_value
         self.attr = attr_id
-        self.source_id = source_id
+        self.instance = instance_id
 
 
 class Abort(OperationNode):
