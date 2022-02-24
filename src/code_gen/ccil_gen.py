@@ -4,7 +4,7 @@ from asts.ccil_ast import *  # CCIL generated ast
 from typing import IO, Tuple, List, Dict
 from code_gen.tools import *
 
-from constants import *
+from code_gen.constants import *
 
 # All operations that define an expression and where it is stored
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
@@ -48,7 +48,7 @@ class CCILGenerator:
         self.ccil_cool_names: Scope
 
     @visitor.on("node")
-    def visit(self, _):
+    def visit(self, node):
         pass
 
     @visitor.when(sem_ast.ProgramNode)
@@ -58,7 +58,7 @@ class CCILGenerator:
         for type in node.declarations:
             classx, class_code = self.visit(type)
             program_types.append(classx)
-            program_codes.append(class_code)
+            program_codes += class_code
 
         return CCILProgram(program_types, program_codes, self.data)
 
@@ -87,7 +87,6 @@ class CCILGenerator:
 
         # Return type is set as itself? Use selftype maybe?
         init_func = FunctionNode(
-            node,
             f"init_{node.id}",
             [],
             to_vars(self.locals, Parameter),
@@ -98,7 +97,7 @@ class CCILGenerator:
         # Explore all functions
         self.reset_scope()
         self.ccil_cool_names.add_new_names(
-            (n.id, a.id) for (n, a) in zip(attr_nodes, attributes)
+            *[(n.id, a.id) for (n, a) in zip(attr_nodes, attributes)]
         )
         class_code: List[FunctionNode] = []
         methods: List[Method] = []
@@ -107,7 +106,7 @@ class CCILGenerator:
             class_code.append(f)
             methods.append(Method(func.id, f))
 
-        return (Class(attributes, methods, init_func), class_code)
+        return (Class(node.id, attributes, methods, init_func), class_code)
 
     @visitor.when(sem_ast.AttrDeclarationNode)
     def visit(self, node: sem_ast.AttrDeclarationNode) -> VISITOR_RESULT:
@@ -145,7 +144,6 @@ class CCILGenerator:
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
-            node,
             f"f_{times}",
             params,
             to_vars(self.locals, Parameter),
@@ -775,8 +773,8 @@ class CCILGenerator:
         self.defined_vars = set()
 
     def reset_scope(self):
-        self.scope = Scope()
+        self.ccil_cool_names = Scope()
 
 
 def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
-    return list(map(lambda x: const(*x), dict.items().mapping()))
+    return list(map(lambda x: const(*x), dict.items()))
