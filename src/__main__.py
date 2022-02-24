@@ -78,25 +78,28 @@ def main():
         input_file = "./tests/codegen/hello_world.cl"#"debbuging/tests/Auto/call1.cl"
         input_file = "./tests/parser/assignment1.cl"#"debbuging/tests/Auto/call1.cl"
     #   raise Exception("Incorrect number of arguments")
+    try:
+        program_file = open(input_file)
+        program = program_file.read()
+        program_file.close()
 
-    program_file = open(input_file)
-    program = program_file.read()
-    program_file.close()
-    
-    # coolLexer = lexer.CoolLexer()
-    # coolLexer.build()
-    # tokens = coolLexer.input(program)
-    # if coolLexer.errors:
-    #     for error in coolLexer.errors:
-    #         print(error.__str__())
-    #     exit(1)
+        # coolLexer = lexer.CoolLexer()
+        # coolLexer.build()
+        # tokens = coolLexer.input(program)
+        # if coolLexer.errors:
+        #     for error in coolLexer.errors:
+        #         print(error.__str__())
+        #     exit(1)
 
-    pipe = Pipeline(program, lexer.CoolLexer(),parser.CoolParser(), False)
-    if pipe.errors:
-        for error in pipe.errors:
-            print(error)
+        pipe = Pipeline(program, lexer.CoolLexer(),parser.CoolParser(), False)
+        if pipe.errors:
+            for error in pipe.errors:
+                print(error)
+            exit(1)
+    except Exception as e:
+        print(e)
         exit(1)
-    coolParser = parser.CoolParser()
+    # coolParser = parser.CoolParser()
 
     # ast = coolParser.parse(lexer.CoolLexer(), program)
     # if coolParser.lexer.errors:
