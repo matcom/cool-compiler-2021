@@ -567,7 +567,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(
             cil.UnaryOperationNode(op_local, expr_local, "~"))
 
-        # Allocate Bool result
+        # Allocate Int result
         self.register_instruction(cil.AllocateNode(
             'Int', self.context.get_type('Int').tag, result_local))
         result_init = self.define_internal_local(
