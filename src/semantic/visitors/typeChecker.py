@@ -457,7 +457,6 @@ class TypeChecker:
             return typex.get_method(name, pos)
         except SemanticError:
             if type(typex) != ErrorType and type(typex) != AutoType:
-                print(typex.parent)
                 errorText = f'Dispatch to undefined method {name}.'
                 self.errors.append(AttributexError(errorText, *pos))
             return MethodError(name, [], [], ErrorType())
