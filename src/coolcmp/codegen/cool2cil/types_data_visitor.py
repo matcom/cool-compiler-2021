@@ -53,7 +53,7 @@ class DotTypesDataVisitor:
             cil.TypeNode(
                 name='String',
                 attrs=[
-                    'value',
+                    'String_value',
                 ],
                 methods=[
                     'String_length',
@@ -64,14 +64,14 @@ class DotTypesDataVisitor:
             cil.TypeNode(
                 name='Bool',
                 attrs=[
-                    'value',
+                    'Bool_value',
                 ],
                 methods=[]
             ),
             cil.TypeNode(
                 name='Int',
                 attrs=[
-                    'value',
+                    'Int_value',
                 ],
                 methods=[]
             ),
