@@ -109,9 +109,9 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         expr_offset = self.var_offset[self.current_function.name][node.expr]
         self.text += f'lw $t1, {expr_offset}($sp)\n'
         if node.op == '~':
-            self.text += f'xor $a0, $t1, 1\n'
+            self.text += f'neg $a0, $t1, 1\n'
         else:
-            self.text += f'neg $a0, $t1 \n'
+            self.text += f'xor $a0, $t1 \n'
 
         result_offset = self.var_offset[self.current_function.name][node.local_dest]
         self.text += f'sw $a0, {result_offset}($sp)\n'

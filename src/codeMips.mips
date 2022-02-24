@@ -963,7 +963,7 @@ lw $t0, 104($sp)
 lw $t1, 16($t0)
 sw $t1, 100($sp)
 lw $t1, 100($sp)
-neg $a0, $t1 
+xor $a0, $t1 
 sw $a0, 96($sp)
 li $a0, 20
 li $v0, 9
