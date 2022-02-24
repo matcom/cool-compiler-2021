@@ -4,7 +4,7 @@ from . import visitor, cil
 class CILFormatter(object):
     @visitor.on('node')
     def visit(self, node):
-        pass
+        raise NotImplementedError()
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node: cil.ProgramNode):
@@ -157,3 +157,11 @@ class CILFormatter(object):
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
         return f'{node.dest} = SUBSTR {node.src} {node.index} {node.length}'
+
+    @visitor.when(cil.IsVoidNode)
+    def visit(self, node: cil.IsVoidNode):
+        return f'{node.dest} = ISVOID {node.src}'
+
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node: cil.TypeNameNode):
+        return f'{node.dest} = TYPENAME {node.src}'

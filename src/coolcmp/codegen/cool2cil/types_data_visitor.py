@@ -33,79 +33,52 @@ class DotTypesDataVisitor:
         self.types += [
             cil.TypeNode(
                 name='Object',
-                attrs=[
-                    'Object__name',
-                ],
+                attrs=[],
                 methods=[
                     'Object_abort',
                     'Object_type_name',
                     'Object_copy',
-                ],
-                attr_expr_nodes={
-                    'Object__name': ast.StringNode('"Object"')
-                }
+                ]
             ),
             cil.TypeNode(
                 name='IO',
-                attrs=[
-                    'IO__name',
-                ],
+                attrs=[],
                 methods=[
                     'IO_out_string',
                     'Object_out_int',
                     'Object_in_string',
                     'IO_in_string',
-                ],
-                attr_expr_nodes={
-                    'IO__name': ast.StringNode('"IO"')
-                }
+                ]
             ),
             cil.TypeNode(
                 name='String',
                 attrs=[
-                    'String__name',
                     'value',
                 ],
                 methods=[
                     'String_length',
                     'String_concat',
                     'String_substr',
-                ],
-                attr_expr_nodes={
-                    'String__name': ast.StringNode('"String"')
-                }
+                ]
             ),
             cil.TypeNode(
                 name='Bool',
                 attrs=[
-                    'Bool__name',
                     'value',
                 ],
-                methods=[],
-                attr_expr_nodes={
-                    'Bool__name': ast.StringNode('"Bool"')
-                }
+                methods=[]
             ),
             cil.TypeNode(
                 name='Int',
                 attrs=[
-                    'Int__name',
                     'value',
                 ],
-                methods=[],
-                attr_expr_nodes={
-                    'Int__name': ast.StringNode('"Int"')
-                }
+                methods=[]
             ),
             cil.TypeNode(
                 name='Void',
-                attrs=[
-                    'Void__name',
-                ],
-                methods=[],
-                attr_expr_nodes={
-                    'Void__name': ast.StringNode('"<void>"')
-                }
+                attrs=[],
+                methods=[]
             ),
         ]
 
@@ -117,15 +90,12 @@ class DotTypesDataVisitor:
     @visitor.when(ast.ClassDeclarationNode)
     def visit(self, node: ast.ClassDeclarationNode):
         type_ = self.context.get_type(node.id)
-        type_attributes: list[str] = [f'{node.id}__name']
+        type_attributes: list[str] = []
         type_methods: list[str] = []
         type_node = cil.TypeNode(
             name=type_.name,
             attrs=type_attributes,
-            methods=type_methods,
-            attr_expr_nodes={
-                f'{node.id}__name': ast.StringNode(f'"{node.id}"')
-            }
+            methods=type_methods
         )
         self.root.set_data(f'"{node.id}"')
 

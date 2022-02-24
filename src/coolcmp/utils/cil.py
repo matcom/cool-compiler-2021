@@ -280,3 +280,29 @@ class CompareNode(InstructionNode):
         self.dest = dest
         self.left = left
         self.right = right
+
+
+class LessThanNode(CompareNode):
+    pass
+
+
+class LessEqualNode(CompareNode):
+    pass
+
+
+class EqualNode(CompareNode):
+    def __init__(self, dest: str, left: str, right: str, by_value: bool):
+        super().__init__(dest, left, right)
+        self.by_value = by_value
+
+
+class IsVoidNode(InstructionNode):
+    def __init__(self, dest: str, src: str):
+        self.dest = dest
+        self.src = src
+
+
+class TypeNameNode(InstructionNode):
+    def __init__(self, dest: str, src: str):
+        self.dest = dest
+        self.src = src
