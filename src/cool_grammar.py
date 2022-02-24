@@ -104,12 +104,6 @@ def define_cool_grammar(print_grammar=False):
 
     expr %= idx + larrow + expr, lambda h, s: AssignNode(s[1], s[3])
     expr %= let + identifiers_list + inx + expr, lambda h, s: LetNode(s[2], s[4])
-    expr %= (
-        ifx + expr + then + expr + elsex + expr + fi,
-        lambda h, s: IfNode(s[2], s[4], s[6]),
-    )
-    expr %= whilex + expr + loop + expr + pool, lambda h, s: WhileNode(s[2], s[4])
-    expr %= case + expr + of + case_block + esac, lambda h, s: CaseNode(s[2], s[4])
     expr %= comp, lambda h, s: s[1]
 
     identifiers_list %= (
@@ -123,13 +117,6 @@ def define_cool_grammar(print_grammar=False):
         lambda h, s: VarDeclarationNode(s[1], s[3], s[5]),
     )
     identifier_init %= idx + colon + type_id, lambda h, s: VarDeclarationNode(s[1], s[3])
-
-    case_block %= case_item + case_block, lambda h, s: [s[1]] + s[2]
-    case_block %= case_item, lambda h, s: [s[1]]
-    case_item %= (
-        idx + colon + type_id + rarrow + expr + semi,
-        lambda h, s: CaseItemNode(s[1], s[3], s[5]),
-    )
 
     comp %= comp + less + arith, lambda h, s: LessNode(s[1], s[3])
     comp %= comp + equal + arith, lambda h, s: EqualNode(s[1], s[3])
@@ -149,6 +136,12 @@ def define_cool_grammar(print_grammar=False):
     factor %= neg + element, lambda h, s: NegNode(s[2])
     factor %= element, lambda h, s: s[1]
 
+    element %= (
+        ifx + expr + then + expr + elsex + expr + fi,
+        lambda h, s: IfNode(s[2], s[4], s[6]),
+    )
+    element %= whilex + expr + loop + expr + pool, lambda h, s: WhileNode(s[2], s[4])
+    element %= case + expr + of + case_block + esac, lambda h, s: CaseNode(s[2], s[4])
     element %= new + type_id, lambda h, s: InstantiateNode(s[2])
     element %= opar + expr + cpar, lambda h, s: s[2]
     element %= ocur + block + ccur, lambda h, s: BlockNode(s[2])
@@ -159,6 +152,13 @@ def define_cool_grammar(print_grammar=False):
     )
     element %= func_call, lambda h, s: CallNode(*s[1])
     element %= atom, lambda h, s: s[1]
+
+    case_block %= case_item + case_block, lambda h, s: [s[1]] + s[2]
+    case_block %= case_item, lambda h, s: [s[1]]
+    case_item %= (
+        idx + colon + type_id + rarrow + expr + semi,
+        lambda h, s: CaseItemNode(s[1], s[3], s[5]),
+    )
 
     atom %= num, lambda h, s: ConstantNumNode(s[1])
     atom %= idx, lambda h, s: VariableNode(s[1])
