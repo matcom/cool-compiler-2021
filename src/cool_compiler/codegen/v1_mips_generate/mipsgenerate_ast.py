@@ -308,7 +308,8 @@ class In_Int:
 IO_in_int:
 li $v0,5
 syscall
-move $s0 , $a0
+move $s0 , $v0
+jr $ra
 """
 
 class In_Float:
@@ -345,17 +346,82 @@ jr $ra
 ################################# Native Func Str ################################################
 class Length:
     def __str__(self) -> str:
-       return """  yaaaa
+       return """ 
+       
+    legnht:
+    li $t0 , 0
+    lw $s2 , ($sp)
+        loop:
+        lb $s0 , ($s2)
+        beq $s0 , $zero, END
+        add $t0 , $t0 ,1
+        add $s2,$s2,4
+        j loop
+    
+
+    END:
+        move $s0 , $t0
+        jr $ra
+
 """
 
 class Concat:
     def __str__(self) -> str:
-       return """  yaaaa
+       return """ 
+    Concat:
+    lw $s2 , 4($sp) 
+    lw $s1 , 0($sp) 
+
+    li $v0 , 9
+    li $a0 , 100
+    syscall
+    move $s3 , $v0
+
+    loop_str1:
+        lb $t0 , ($s1)
+        beq  $t0 , $zero, loop_str2
+        add $s1 , $s1 ,1
+        sb $t0,($s3)
+        add $s3 , $s3 , 1
+        j loop_str1
+
+    loop_str2:
+        lb $t0 , ($s2)
+        beq  $t0 , $zero, ENDConcat
+        add $s2 , $s2 ,1
+        sb $t0,($s3)
+        add $s3 , $s3 , 1
+        j loop_str1
+
+    ENDConcat:
+        move $s0, $v0
+        jr $ra
 """
 
 class SubStr:
     def __str__(self) -> str:
-       return """ yaaaaa
+       return """ 
+       
+       Substring:
+    li $t0 ,0 
+    find_index:
+        beq			$t0, $s1, find_length	# if $t0 == $t1 then target
+        add			$s3, $s3, 1		#s2 = s2 + 1
+        add			$t0, $t0, 1	    # $t0 = $t0 + 1
+        j find_index
+
+    find_length:
+        lb			$t1, ($s3)			# 
+        sb		    $t1, ($s4)
+        beq			$t0, $s2, END_Substring	# if $t0 == $t1 then target
+        add			$s4, $s4, 1		# $S4 = s41 1t2
+        			# 
+        add			$s3, $s3, 1		#s2 = s2 + 1
+        add			$t0, $t0, 1	    # $t0 = $t0 + 1
+        j find_length
+        
+    END_Substring:
+        jr $ra  
 """
 ################################# Native Func Obj ################################################
 class Copy:
