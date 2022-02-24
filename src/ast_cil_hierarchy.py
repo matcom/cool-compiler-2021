@@ -127,8 +127,8 @@ class DynamicCall(Instruction):
 
 
 class Arg(Instruction):
-    def __init__(self, arg_info):
-        self.arg_info = arg_info
+    def __init__(self, arg):
+        self.arg = arg
 
 
 # Jumps
