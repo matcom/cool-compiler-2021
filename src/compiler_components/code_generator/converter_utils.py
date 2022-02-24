@@ -1,14 +1,13 @@
-from cil_nodes import *
-from converter import Converter
+from .cil_nodes import *
 import queue
 
 
-def define_internal_local(converter: Converter):
+def define_internal_local(converter):
     var_info = VariableInfo('internal', None)
     return register_local(converter, var_info)
 
 
-def get_preorder_types(converter: Converter, typex):
+def get_preorder_types(converter, typex):
     ret_lis = []
 
     for son in typex.sons:
@@ -18,7 +17,7 @@ def get_preorder_types(converter: Converter, typex):
     return ret_lis
 
 
-def get_attr(converter: Converter, function_name, attribute):
+def get_attr(converter, function_name, attribute):
     for dottype in converter.dottypes:
         if dottype.name == function_name:
             break
@@ -26,7 +25,7 @@ def get_attr(converter: Converter, function_name, attribute):
     return dottype.attributes.index(to_attribute_name(attribute))
 
 
-def get_method(converter: Converter, type_name, method_name):
+def get_method(converter, type_name, method_name):
     for typeContext in converter.context.types:
         if typeContext == type_name:
             break
@@ -40,7 +39,7 @@ def get_method(converter: Converter, type_name, method_name):
     return methods.index(m)
 
 
-def box(converter: Converter, typeName, value):
+def box(converter, typeName, value):
     obj_internal = define_internal_local(converter)
     converter.register_instruction(AllocateNode(typeName, obj_internal))
     converter.register_instruction(SetAttribNode(obj_internal, 0, value))
@@ -58,44 +57,44 @@ def to_attribute_name(attr_name):
     return f'attribute_{attr_name}'
 
 
-def register_param(converter: Converter, var_info):
+def register_param(converter, var_info):
     var_info.cilName = var_info.name
     param_node = cil.ParamNode(var_info.cilName)
     converter.params.append(param_node)
     return var_info.cilName
 
 
-def register_local(converter: Converter, var_info):
+def register_local(converter, var_info):
     var_info.cilName = f'local_{converter.current_function.name[9:]}_{var_info.name}_{len(converter.localvars)}'
     local_node = cil.LocalNode(var_info.cilName)
     converter.localvars.append(local_node)
     return var_info.cilName
 
 
-def register_label(converter: Converter):
+def register_label(converter):
     name = f'label_{converter.current_function.name[9:]}_{len(converter.labels)}'
     converter.labels.append(name)
     return name
 
 
-def register_instruction(converter: Converter, instruction):
+def register_instruction(converter, instruction):
     converter.instructions.append(instruction)
     return instruction
 
 
-def register_function(converter: Converter, function_name):
+def register_function(converter, function_name):
     function_node = FunctionNode(function_name, [], [], [], [])
     converter.dotcode.append(function_node)
     return function_node
 
 
-def register_type(converter: Converter, name):
+def register_type(converter, name):
     type_node = TypeNode(name)
     converter.dottypes.append(type_node)
     return type_node
 
 
-def register_data(converter: Converter, value):
+def register_data(converter, value):
     for dataNode in converter.dotdata:
         if dataNode.value == value:
             return dataNode
@@ -123,7 +122,7 @@ def sort_types(types):
     return lst
 
 
-def basic_types(converter: Converter):
+def basic_types(converter):
     for basicType in ['Int', 'String', 'Bool']:
         cil_type = register_type(converter, basicType)
         cil_type.attributes.append(to_attribute_name('value'))

@@ -1,6 +1,6 @@
-from code_generator import visitor
-from code_generator import cil_nodes
-from code_generator import mips_nodes
+from .code_generator import visitor
+from .code_generator.cil_nodes import *
+from .code_generator.mips_nodes import *
 
 
 class CilToMipsConverter:
@@ -30,7 +30,7 @@ class CilToMipsConverter:
         return MipsProgramNode(self.data, self.text)
 
     @visitor.when(CilTypeNode)
-    def visit(self, node: TypeNode):
+    def visit(self, node):
         self.data.append(MipsStringNode(f'{node.name}_name', node.name))
         self.data.append(MipsWordNode(f'{node.name}_size', 4 * (len(node.attributes) + 3)))
         self.data.append(MipsTableNode(node.name, [met[1] for met in node.methods]))
@@ -40,7 +40,7 @@ class CilToMipsConverter:
         self.data.append(MipsStringNode(node.name, node.value))
 
     @visitor.when(CilJumpNode)
-    def visit(self, node: DynamicCallNode):
+    def visit(self, node):
         self.register_instruction(MipsCommentNode('comienzo llamada al constructor'))
         self.register_instruction(MipsJumpAtAddressNode(node.method))
 
@@ -49,7 +49,7 @@ class CilToMipsConverter:
         self.register_instruction(MipsCommentNode('fin llamada dinamica'))
 
     @visitor.when(CilFunctionNode)
-    def visit(self, node: FunctionNode):
+    def visit(self, node):
         self.function = node
         self.register_instruction(MipsLabelNode(node.name))
 
@@ -88,7 +88,7 @@ class CilToMipsConverter:
         self.register_instruction(MipsCommentNode(' fin guardando los parametros'))
 
     @visitor.when(CilReturnNode)
-    def visit(self, node: ReturnNode):
+    def visit(self, node):
         self.register_instruction(MipsCommentNode('retornando el valor'))
         pos = self.request_pos(node.value)
 
@@ -98,7 +98,7 @@ class CilToMipsConverter:
             self.register_instruction(MipsLINode('$a0', node.value))
 
     @visitor.when(CilAllocateNode)
-    def visit(self, node: AllocateNode):
+    def visit(self, node):
         self.register_instruction(MipsCommentNode('init allocate'))
         self.register_instruction(MipsLINode('$v0', '9'))
         self.register_instruction(MipsLWNode('$a0', f'{node.type}_size'))
@@ -109,7 +109,7 @@ class CilToMipsConverter:
         self.register_instruction(MipsCommentNode('end allocate'))
 
     @visitor.when(CilStaticCallNode)
-    def visit(self, node: StaticCallNode):
+    def visit(self, node):
         self.register_instruction(MipsLWNode('$a0', '4($fp)'))
         self.register_instruction(MipsLWNode('$a0', '8($a0)'))
         self.register_instruction(MipsLWNode('$a0', f'{node.function * 4}($a0)'))
@@ -119,7 +119,7 @@ class CilToMipsConverter:
         self.register_instruction(MipsSWNode('$a0', f'-{(num + 1) * 4}($fp)'))
 
     @visitor.when(CilDynamicCallNode)
-    def visit(self, node: DynamicCallNode):
+    def visit(self, node):
         self.register_instruction(MipsCommentNode('comienzo llamada dinamica'))
 
         if node.type is None:
@@ -137,7 +137,7 @@ class CilToMipsConverter:
         self.register_instruction(MipsCommentNode('fin llamada dinamica'))
 
     @visitor.when(CilSetAttribNode)
-    def visit(self, node: SetAttribNode):
+    def visit(self, node):
         self.register_instruction(MipsCommentNode('init set attribute'))
 
         pos = self.request_pos(node.ins)
@@ -161,20 +161,12 @@ class CilToMipsConverter:
         self.register_instruction(MipsCommentNode('end set attribute'))
 
     @visitor.when(CilGetAttribNode)
-    def visit(self, node: GetAttribNode):
+    def visit(self, node):
         self.register_instruction(MipsCommentNode('init get attribute'))
 
         pos_result = self.request_pos(node.dest)
         pos = self.request_pos(node.ins)
         self.register_instruction(MipsLWNode('$a0', pos))
-
-        # nameType = node.att.split('_')[1]
-        # num = -1
-
-        # for typeAct in self.types:
-        #     if typeAct.name == nameType:
-        #         num = typeAct.attributes.index(node.att)
-        #         break
 
         self.register_instruction(MipsLWNode('$a0', f'{node.att * 4 + 12}($a0)'))
         self.register_instruction(MipsSWNode('$a0', pos_result))
@@ -202,7 +194,7 @@ class CilToMipsConverter:
         self.register_instruction(MipsSWNode('$t1', f"{node.desp}($t2)"))
 
     @visitor.when(CilAssignNode)
-    def visit(self, node: AssignNode):
+    def visit(self, node):
         pos_dest = self.request_pos(node.dest)
         pos_src = self.request_pos(node.source)
 
@@ -233,7 +225,7 @@ class CilToMipsConverter:
         self.register_instruction(MipsLabelNode(node.name))
 
     @visitor.when(CilPlusNode)
-    def visit(self, node: PlusNode):
+    def visit(self, node):
         pos_dest = self.request_pos(node.dest)
         pos_left = self.request_pos(node.left)
         pos_right = self.request_pos(node.right)

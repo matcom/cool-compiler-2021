@@ -1,4 +1,4 @@
-from converter_utils import *
+from .converter_utils import *
 
 
 class Converter:

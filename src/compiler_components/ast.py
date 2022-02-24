@@ -222,7 +222,7 @@ class LetNode(AtomicNode):
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + " LET <decl>, <decl> ... <decl> in <expr>\n "
-        decl = '\n'.join('\t'*(tabs+1) + "decl: " + param.visit()  for param in self.list_decl)
+        decl = '\n'.join('\t'*(tabs+1) + "decl: " + param.visit() for param in self.list_decl)
         expr = "\n" + "IN" + self.expr.visit(tabs+1)
         return ans+decl+expr
 

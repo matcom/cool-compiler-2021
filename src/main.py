@@ -1,4 +1,3 @@
-import parser
 import sys
 from typing import List
 
@@ -6,9 +5,10 @@ from compiler_components.compiler_component import CompilerComponent
 from compiler_components.lexer import Lexer
 from compiler_components.cool_parser import Parser
 from compiler_components.semantic_checker import SemanticChecker
-from compiler_components.code_generator import CodeGenerator
+from compiler_components.code_gen import CodeGenerator
 
-def execute_compiler(cool_program : str):
+
+def execute_compiler(cool_program : str, input_file):
     # Initialize compiler components
     lexer = Lexer(cool_program)
     cool_parser = Parser(lexer)
@@ -23,14 +23,16 @@ def execute_compiler(cool_program : str):
         if component.has_errors():
             component.print_errors()
             # with errors
-            print('with errors')
+            #print('with errors')
             return True
 
-    # TODO: write generated code to output file 
+    # TODO: write generated code to output file
+    open(input_file.split(".")[0] + ".mips", 'w').write(code_generator.mips_text)
 
     # without errors
-    print('false')
+    #print('false')
     return False
+
 
 if __name__ == '__main__':
     # read input file
@@ -38,6 +40,6 @@ if __name__ == '__main__':
     with open(inputfile, encoding="utf_8")as file:
         coolprogram =  file.read()
     
-    with_errors: bool = execute_compiler(cool_program = coolprogram)
+    with_errors: bool = execute_compiler(coolprogram, inputfile)
     if with_errors:
         exit(1)

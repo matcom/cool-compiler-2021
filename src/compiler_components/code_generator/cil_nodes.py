@@ -117,7 +117,7 @@ class CilGetIndexNode(CilInstructionNode):
     pass
 
 
-class CilSetIndexNode(InstructionNode):
+class CilSetIndexNode(CilInstructionNode):
     pass
 
 

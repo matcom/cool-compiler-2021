@@ -1,8 +1,8 @@
-from code_generator.converter import Converter
-from code_generator.converter_utils import *
-from code_generator.cil_nodes import *
-from code_generator import visitor
-from ast import *
+from .code_generator.converter import Converter
+from .code_generator.converter_utils import *
+from .code_generator.cil_nodes import *
+from .code_generator import visitor
+from .ast import *
 
 
 class CoolToCilConverter(Converter):
@@ -118,7 +118,7 @@ class CoolToCilConverter(Converter):
         attrib = get_attr(self, self.current_type.name, node.id)
         register_instruction(self, CilSetAttribNode('self', attrib, value))
 
-    @visitor.when(LetInNode)
+    @visitor.when(LetNode)
     def visit(self, node, scope):
         scope_open = scope.children[0]
 
@@ -148,7 +148,7 @@ class CoolToCilConverter(Converter):
 
         return self.visit(node.in_body, scope_open.children[0])
 
-    @visitor.when(CaseOfNode)
+    @visitor.when(CaseNode)
     def visit(self, node, scope):
         result = define_internal_local(self)
 
@@ -192,7 +192,7 @@ class CoolToCilConverter(Converter):
 
         return value
 
-    @visitor.when(IfThenElseNode)
+    @visitor.when(IfNode)
     def visit(self, node, scope):
         cond = self.visit(node.condition, scope.children[0])
 
@@ -211,7 +211,7 @@ class CoolToCilConverter(Converter):
 
         return result
 
-    @visitor.when(WhileLoopNode)
+    @visitor.when(WhileNode)
     def visit(self, node, scope):
         label_while_start = register_label(self)
         label_while_continue = register_label(self)
@@ -245,7 +245,7 @@ class CoolToCilConverter(Converter):
 
         return value
 
-    @visitor.when(FunctionCallNode)
+    @visitor.when(DispatchNode)
     def visit(self, node, scope):
         result = define_internal_local(self)
         obj = self.visit(node.obj, scope.children[0])
@@ -280,7 +280,7 @@ class CoolToCilConverter(Converter):
             register_instruction(self, CilDynamicCallNode(node.typexa, real_method, result, obj))
         return result
 
-    @visitor.when(MemberCallNode)
+    @visitor.when(CallNode)
     def visit(self, node, scope):
         result = define_internal_local(self)
 
@@ -304,25 +304,25 @@ class CoolToCilConverter(Converter):
         register_instruction(self, CilStaticCallNode(realMethod, result))
         return result
 
-    @visitor.when(IntegerNode)
+    @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
         return int(node.token)
 
-    @visitor.when(BoolNode)
+    @visitor.when(ConstantBooleanNode)
     def visit(self, node, scope):
         if node.token:
             return 1
         return 0
 
-    @visitor.when(StringNode)
+    @visitor.when(ConstantStringNode)
     def visit(self, node, scope):
         msg = register_data(self, node.token).name
         internal = define_internal_local(self)
         register_instruction(self, CilLoadAddressNode(internal, msg))
         return internal
 
-    @visitor.when(IdNode)
-    def visit(self, node: IdNode, scope):
+    @visitor.when(VariableNode)
+    def visit(self, node: VariableNode, scope):
         if node.token == 'self':
             return 'self'
 
@@ -337,8 +337,8 @@ class CoolToCilConverter(Converter):
 
         return vinfo.cilName
 
-    @visitor.when(NewNode)
-    def visit(self, node: NewNode, scope):
+    @visitor.when(InstantiateNode)
+    def visit(self, node, scope):
         if not node.type.name == "Int":
             instance = define_internal_local(self)
             result = define_internal_local(self)
@@ -381,7 +381,7 @@ class CoolToCilConverter(Converter):
         register_instruction(self, CilDivNode(result, left, right))
         return result
 
-    @visitor.when(EqualNode)
+    @visitor.when(EqualsNode)
     def visit(self, node, scope):
         result = define_internal_local(self)
         left = self.visit(node.left, scope.children[0])
@@ -405,7 +405,7 @@ class CoolToCilConverter(Converter):
 
         return result
 
-    @visitor.when(LessNode)
+    @visitor.when(MinusNode)
     def visit(self, node, scope):
         result = define_internal_local(self)
         left = self.visit(node.left, scope.children[0])
@@ -417,7 +417,7 @@ class CoolToCilConverter(Converter):
         register_instruction(self, CilLessNode(result, left, right, label_true, label_end))
         return result
 
-    @visitor.when(LessEqualNode)
+    @visitor.when(MinorEqualsNode)
     def visit(self, node, scope):
         result = define_internal_local(self)
         left = self.visit(node.left, scope.children[0])
@@ -446,7 +446,7 @@ class CoolToCilConverter(Converter):
 
         return result
 
-    @visitor.when(ComplementNode)
+    @visitor.when(NhanharaNode)
     def visit(self, node, scope):
         result = define_internal_local(self)
         expression = self.visit(node.expression, scope.children[0])
