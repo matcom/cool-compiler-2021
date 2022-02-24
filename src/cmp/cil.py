@@ -54,12 +54,7 @@ class AssignNode(InstructionNode):
 
 
 class ArithmeticNode(InstructionNode):
-    def __init__(
-        self,
-        dest,
-        left,
-        right,
-    ):
+    def __init__(self, dest, left, right):
         self.dest = dest
         self.left = left
         self.right = right
@@ -81,32 +76,6 @@ class DivNode(ArithmeticNode):
     pass
 
 
-class LessNode(ArithmeticNode):
-    pass
-
-
-class LessEqualNode(ArithmeticNode):
-    pass
-
-
-class EqualNode(ArithmeticNode):
-    pass
-
-
-class UnaryNode(InstructionNode):
-    def __init__(self, dest, expr):
-        self.dest = dest
-        self.expr = expr
-
-
-class NotNode(UnaryNode):
-    pass
-
-
-class IntComplementNode(UnaryNode):
-    pass
-
-
 class GetAttribNode(InstructionNode):
     pass
 
@@ -122,7 +91,7 @@ class GetIndexNode(InstructionNode):
 class SetIndexNode(InstructionNode):
     pass
 
-
+ 
 class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):
         self.type = itype
@@ -144,14 +113,11 @@ class LabelNode(InstructionNode):
 
 
 class GotoNode(InstructionNode):
-    def __init__(self, label):
-        self.label = label
+    pass
 
 
 class GotoIfNode(InstructionNode):
-    def __init__(self, condition, label):
-        self.condition = condition
-        self.label = label
+    pass
 
 
 class StaticCallNode(InstructionNode):
@@ -215,86 +181,86 @@ class PrintNode(InstructionNode):
         self.str_addr = str_addr
 
 
-class PrintVisitor(object):
-    @visitor.on("node")
-    def visit(self, node):
-        pass
+def get_formatter():
+    class PrintVisitor(object):
+        @visitor.on("node")
+        def visit(self, node):
+            pass
 
-    @visitor.when(ProgramNode)
-    def visit(self, node):
-        dottypes = "\n".join(self.visit(t) for t in node.dottypes)
-        dotdata = "\n".join(self.visit(t) for t in node.dotdata)
-        dotcode = "\n".join(self.visit(t) for t in node.dotcode)
+        @visitor.when(ProgramNode)
+        def visit(self, node):
+            dottypes = "\n".join(self.visit(t) for t in node.dottypes)
+            dotdata = "\n".join(self.visit(t) for t in node.dotdata)
+            dotcode = "\n".join(self.visit(t) for t in node.dotcode)
 
-        return f".TYPES\n{dottypes}\n\n.DATA\n{dotdata}\n\n.CODE\n{dotcode}"
+            return f".TYPES\n{dottypes}\n\n.DATA\n{dotdata}\n\n.CODE\n{dotcode}"
 
-    @visitor.when(TypeNode)
-    def visit(self, node):
-        attributes = "\n\t".join(f"attribute {x}" for x in node.attributes)
-        methods = "\n\t".join(f"method {x}: {y}" for x, y in node.methods)
+        @visitor.when(TypeNode)
+        def visit(self, node):
+            attributes = "\n\t".join(f"attribute {x}" for x in node.attributes)
+            methods = "\n\t".join(f"method {x}: {y}" for x, y in node.methods)
 
-        return f"type {node.name} {{\n\t{attributes}\n\n\t{methods}\n}}"
+            return f"type {node.name} {{\n\t{attributes}\n\n\t{methods}\n}}"
 
-    @visitor.when(FunctionNode)
-    def visit(self, node):
-        params = "\n\t".join(self.visit(x) for x in node.params)
-        localvars = "\n\t".join(self.visit(x) for x in node.localvars)
-        instructions = "\n\t".join(self.visit(x) for x in node.instructions)
+        @visitor.when(FunctionNode)
+        def visit(self, node):
+            params = "\n\t".join(self.visit(x) for x in node.params)
+            localvars = "\n\t".join(self.visit(x) for x in node.localvars)
+            instructions = "\n\t".join(self.visit(x) for x in node.instructions)
 
-        return f"function {node.name} {{\n\t{params}\n\n\t{localvars}\n\n\t{instructions}\n}}"
+            return f"function {node.name} {{\n\t{params}\n\n\t{localvars}\n\n\t{instructions}\n}}"
 
-    @visitor.when(ParamNode)
-    def visit(self, node):
-        return f"PARAM {node.name}"
+        @visitor.when(ParamNode)
+        def visit(self, node):
+            return f"PARAM {node.name}"
 
-    @visitor.when(LocalNode)
-    def visit(self, node):
-        return f"LOCAL {node.name}"
+        @visitor.when(LocalNode)
+        def visit(self, node):
+            return f"LOCAL {node.name}"
 
-    @visitor.when(AssignNode)
-    def visit(self, node):
-        return f"{node.dest} = {node.source}"
+        @visitor.when(AssignNode)
+        def visit(self, node):
+            return f"{node.dest} = {node.source}"
 
-    @visitor.when(PlusNode)
-    def visit(self, node):
-        return f"{node.dest} = {node.left} + {node.right}"
+        @visitor.when(PlusNode)
+        def visit(self, node):
+            return f"{node.dest} = {node.left} + {node.right}"
 
-    @visitor.when(MinusNode)
-    def visit(self, node):
-        return f"{node.dest} = {node.left} - {node.right}"
+        @visitor.when(MinusNode)
+        def visit(self, node):
+            return f"{node.dest} = {node.left} - {node.right}"
 
-    @visitor.when(StarNode)
-    def visit(self, node):
-        return f"{node.dest} = {node.left} * {node.right}"
+        @visitor.when(StarNode)
+        def visit(self, node):
+            return f"{node.dest} = {node.left} * {node.right}"
 
-    @visitor.when(DivNode)
-    def visit(self, node):
-        return f"{node.dest} = {node.left} / {node.right}"
+        @visitor.when(DivNode)
+        def visit(self, node):
+            return f"{node.dest} = {node.left} / {node.right}"
 
-    @visitor.when(AllocateNode)
-    def visit(self, node):
-        return f"{node.dest} = ALLOCATE {node.type}"
+        @visitor.when(AllocateNode)
+        def visit(self, node):
+            return f"{node.dest} = ALLOCATE {node.type}"
 
-    @visitor.when(TypeOfNode)
-    def visit(self, node):
-        return f"{node.dest} = TYPEOF {node.type}"
+        @visitor.when(TypeOfNode)
+        def visit(self, node):
+            return f"{node.dest} = TYPEOF {node.type}"
 
-    @visitor.when(StaticCallNode)
-    def visit(self, node):
-        return f"{node.dest} = CALL {node.function}"
+        @visitor.when(StaticCallNode)
+        def visit(self, node):
+            return f"{node.dest} = CALL {node.function}"
 
-    @visitor.when(DynamicCallNode)
-    def visit(self, node):
-        return f"{node.dest} = VCALL {node.type} {node.method}"
+        @visitor.when(DynamicCallNode)
+        def visit(self, node):
+            return f"{node.dest} = VCALL {node.type} {node.method}"
 
-    @visitor.when(ArgNode)
-    def visit(self, node):
-        return f"ARG {node.name}"
+        @visitor.when(ArgNode)
+        def visit(self, node):
+            return f"ARG {node.name}"
 
-    @visitor.when(ReturnNode)
-    def visit(self, node):
-        return f'RETURN {node.value if node.value is not None else ""}'
+        @visitor.when(ReturnNode)
+        def visit(self, node):
+            return f'RETURN {node.value if node.value is not None else ""}'
 
-
-# printer = PrintVisitor()
-# return lambda ast: printer.visit(ast)
+    printer = PrintVisitor()
+    return lambda ast: printer.visit(ast)

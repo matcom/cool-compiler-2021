@@ -1,4 +1,7 @@
+from re import L
 from soupsieve import select
+
+from src.cmp.cil import InstructionNode
 
 
 class MIPS_Node:
@@ -62,10 +65,6 @@ class MoveNode(DataTransferNode):
         return f"move {self.destination} {self.source}"
 
 
-
-        
-
-
 class DataTypeNode(MIPSDataNode):
     def __init__(self, name, datatype,vt_values):
         self.name = name
@@ -78,6 +77,95 @@ class DataTypeNode(MIPSDataNode):
             values += f", {value}"
         return f"{self.name} : {self.datatype}{values}"
     
+class ArithAnfLogicNode(MIPSInstructionNode):
+    def __init__(self, destination,left,right):
+        self.destination = destination
+        self.left = left
+        self.right = right
+class AddNode(ArithAnfLogicNode):
+    def __str__(self):
+        return f"add {self.destination}, {self.left}, {self.right}"        
+
+class AddiNode(ArithAnfLogicNode):
+    def __str__(self):
+        return f"addi {self.destination}, {self.left}, {self.right}"
+
+class SubNode(ArithAnfLogicNode):
+    def __str__(self):
+        return f"sub {self.destination}, {self.left}, {self.right}"
+    
+class ConditionalBranch(InstructionNode):
+    def __init__(self,c1,c2,jump):
+        self.c1 = c1
+        self.c2 = c2
+        self.jump = jump
+        
+class BranchOnEqualNode(ConditionalBranch):
+    def __str__(self):
+        return f"beq {self.c1}, {self.c2}, {self.jump}"
+        
+class BranchOnNotEqualNode(ConditionalBranch):
+    def __str__(self):
+        return f"bne {self.c1}, {self.c2}, {self.jump}"
+
+class BranchOnGreaterThanNode(ConditionalBranch):
+    def __str__(self):
+        return f"bgt {self.c1}, {self.c2}, {self.jump}"
+
+class BranchOnGreaterOrEqNode(ConditionalBranch):
+    def __str__(self):
+        return f"bge {self.c1}, {self.c2}, {self.jump}"
+
+class BranchOnLessThanNode(ConditionalBranch):
+    def __str__(self):
+        return f"blt {self.c1}, {self.c2}, {self.jump}"
+    
+class BranchOnLessOrEqNode(ConditionalBranch):
+    def __str__(self):
+        return f"ble {self.c1}, {self.c2}, {self.jump}"
+
+class ComparisonNode(InstructionNode):
+    def __init__(self,m1,m2,dest):
+        self.m1 = m1
+        self.m2 = m2
+        self.destination = dest
+        
+class SetOnLessThan(ComparisonNode):
+    def __str__(self):
+        return f"slt {self.dest}, {self.m1}, {self.m2}"
+        
+class SetOnLessThanInmediate(ComparisonNode):
+    def __str__(self):
+        return f"slt {self.dest}, {self.m1}, {self.m2}"
+        
+class UnconditionalJumpNode(InstructionNode):
+    def __init__(self,jump):
+        self.jump = jump
+        
+class Jump(UnconditionalJumpNode):
+    def __str__(self):
+        return f"j {self.jump}"        
+
+class JumpRegister(UnconditionalJumpNode):
+    def __str__(self):
+        return f"jr {self.jump}"   
+
+class JumpAndLink(UnconditionalJumpNode):
+    def __str__(self):
+        return f"jal {self.jump}"   
+
+class Label(InstructionNode):
+    def __init__(self,label):
+        self.label = label
+    
+    def __str__(self):
+        return f"{self.label}:"
+    
+class SyscallNode(InstructionNode):
+    def __str__(self):
+        return f"syscall"
+    
+
 class CommentNode(MIPS_Node):
     def __init__(self,text):
         self.text = text
