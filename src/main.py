@@ -56,8 +56,8 @@ def pipeline(input_file: Path, output_file: Path = None):
 
     parse, operations = parser([t.token_type for t in tokens], [t.lex for t in tokens], pos_data, text)
 
-    print("Parse")
-    print(parse)
+    # print("Parse")
+    # print(parse)
 
     if len(errors) > 0:
         report_and_exit(errors)

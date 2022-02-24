@@ -39,9 +39,15 @@ def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printin
     # Tokenize
     while True:
         tok = lexer.token()
-        if not tok:
+        if not tok:#append EOF
+            if len(pos_data) > 0:
+                last_lineno, last_col = pos_data[-1]
+                col = last_col + len(tokens[-1].lex)
+            else:#empty program
+                last_lineno = 0
+                col = -1
+            pos_data.append([last_lineno, col])
             tokens.append(Token("$", grammar.EOF))
-            pos_data.append([-1,-1])
             break  # No more input
         else:
             try:
