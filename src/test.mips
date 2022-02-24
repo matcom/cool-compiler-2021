@@ -1,7 +1,28 @@
 .data
-Main_parents: .asciiz "[0, 1, 2]"
-
-string_0: .asciiz "Hello, World.\n"
+Book_parents: .word 1, 2, 3, 0, 
+Book: .word Book_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Book_initBook, Book_print, 
+string_0: .asciiz "title:      "
+string_1: .asciiz "\n"
+string_2: .asciiz "author:     "
+string_3: .asciiz "\n"
+Article_parents: .word 1, 2, 3, 4, 0, 
+Article: .word Article_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Book_initBook, Book_print, Article_initArticle, 
+string_4: .asciiz "periodical:  "
+string_5: .asciiz "\n"
+BookList_parents: .word 1, 2, 5, 0, 
+BookList: .word BookList_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, BookList_isNil, BookList_cons, BookList_car, BookList_cdr, BookList_print_list, 
+Cons_parents: .word 1, 2, 5, 6, 0, 
+Cons: .word Cons_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, BookList_isNil, BookList_cons, BookList_car, BookList_cdr, BookList_print_list, Cons_init, 
+string_6: .asciiz "- dynamic type was Book -\n"
+Nil_parents: .word 1, 2, 5, 7, 0, 
+Nil: .word Nil_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, BookList_isNil, BookList_cons, BookList_car, BookList_cdr, BookList_print_list, 
+Main_parents: .word 1, 8, 0, 
+Main: .word Main_parents, Object_abort, Object_copy, Object_type_name, Main_main, 
+string_7: .asciiz "Compilers, Principles, Techniques, and Tools"
+string_8: .asciiz "Aho, Sethi, and Ullman"
+string_9: .asciiz "The Top 100 CD_ROMs"
+string_10: .asciiz "Ulanoff"
+string_11: .asciiz "PC Magazine"
 
 .text
 .globl main
@@ -14,13 +35,14 @@ addi $sp, $sp, -4          #Push local var @result stackpointer 4
 addi $sp, $sp, -4          #Push local var $ra stackpointer 0
 sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
 #Allocate a una class Main puntero en sp + 12
-#atributo type en puntero + 0
+#atributo @type en puntero + 0
 #atributo type en puntero + 4
-li $a0, 8
+#atributo books en puntero + 8
+li $a0, 12
 li $v0, 9
 syscall
 sw $v0, 12($sp)          #Reservando memoria para una instancia de tipo Main
-la $t0, Main_parents
+la $t0, Main
 sw $t0, 8($sp)          #Cargando el nombre del tipo desde el data
 lw $t0, 12($sp)          #Buscando la instancia en la pila instance
 lw $t1, 8($sp)          #Buscando el valor que se va a guardar en la propiedad
@@ -34,32 +56,196 @@ li $v0, 10
 syscall
 
 Main_main:
-#Parametro Return $ra en stackpoiner + 16
-#Parametro self en stackpoiner + 12
-addi $sp, $sp, -4          #Push local var param_0_to_out_string@0 stackpointer 8
+#Parametro Return $ra en stackpoiner + 76
+#Parametro self en stackpoiner + 72
+addi $sp, $sp, -4          #Push local var a_book stackpointer 68
+addi $sp, $sp, -4          #Push local var instance_to_call_initBook@0 stackpointer 64
+addi $sp, $sp, -4          #Push local var param_0_to_initBook@0 stackpointer 60
+addi $sp, $sp, -4          #Push local var param_1_to_initBook@0 stackpointer 56
+addi $sp, $sp, -4          #Push local var an_article stackpointer 52
+addi $sp, $sp, -4          #Push local var instance_to_call_initArticle@0 stackpointer 48
+addi $sp, $sp, -4          #Push local var param_0_to_initArticle@0 stackpointer 44
+addi $sp, $sp, -4          #Push local var param_1_to_initArticle@0 stackpointer 40
+addi $sp, $sp, -4          #Push local var param_2_to_initArticle@0 stackpointer 36
+addi $sp, $sp, -4          #Push local var step@block@0 stackpointer 32
+addi $sp, $sp, -4          #Push local var instance_to_call_cons@0 stackpointer 28
+addi $sp, $sp, -4          #Push local var param_0_to_cons@0 stackpointer 24
+addi $sp, $sp, -4          #Push local var instance_to_call_cons@1 stackpointer 20
+addi $sp, $sp, -4          #Push local var param_0_to_cons@1 stackpointer 16
+addi $sp, $sp, -4          #Push local var result@assing@books@0 stackpointer 12
+addi $sp, $sp, -4          #Push local var instance_to_call_print_list@0 stackpointer 8
 addi $sp, $sp, -4          #Push local var @result stackpointer 4
 addi $sp, $sp, -4          #Push local var $ra stackpointer 0
 sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main
-la $t0, string_0
-sw $t0, 8($sp)          #Fin del paramentro 0 al StaticDispatch out_string
-lw $t0, 12($sp)          #Saca de la pila self
+jal new_ctr_Book          #Call a la function new_ctr_Book
+sw $s0, 64($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la exprecion previa al Dispatch initBook
+la $t0, string_7
+sw $t0, 60($sp)          #Fin del paramentro 0 al Dispatch initBook
+la $t0, string_8
+sw $t0, 56($sp)          #Fin del paramentro 1 al Dispatch initBook
+lw $t0, 64($sp)          #Saca de la pila instance_to_call_initBook@0
 addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch out_string
-lw $t0, 12($sp)          #Saca de la pila param_0_to_out_string@0
+sw $t0, 0($sp)          #Mete para la pila instance_to_call_initBook@0
+lw $t0, 64($sp)          #Saca de la pila param_0_to_initBook@0
 addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_out_string@0          #Agrega a la pila el paramentro 1 al StaticDispatch out_string
-jal IO_out_string          #Call a la function IO_out_string
+sw $t0, 0($sp)          #Mete para la pila param_0_to_initBook@0
+lw $t0, 64($sp)          #Saca de la pila param_1_to_initBook@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila param_1_to_initBook@0
+lw $t0, 76($sp)          #Sacando la instancia de la pila (en 64) de una clase que hereda de Book
+lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de Book
+lw $t3, 32($t1)          #Buscando el metodo dinamico para la funcion initBook
+jal $t3          #Call a la function $t3
+sw $s0, 68($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la asignacion Let a_book
+jal new_ctr_Article          #Call a la function new_ctr_Article
+sw $s0, 48($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la exprecion previa al Dispatch initArticle
+la $t0, string_9
+sw $t0, 44($sp)          #Fin del paramentro 0 al Dispatch initArticle
+la $t0, string_10
+sw $t0, 40($sp)          #Fin del paramentro 1 al Dispatch initArticle
+la $t0, string_11
+sw $t0, 36($sp)          #Fin del paramentro 2 al Dispatch initArticle
+lw $t0, 48($sp)          #Saca de la pila instance_to_call_initArticle@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila instance_to_call_initArticle@0
+lw $t0, 48($sp)          #Saca de la pila param_0_to_initArticle@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila param_0_to_initArticle@0
+lw $t0, 48($sp)          #Saca de la pila param_1_to_initArticle@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila param_1_to_initArticle@0
+lw $t0, 48($sp)          #Saca de la pila param_2_to_initArticle@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila param_2_to_initArticle@0
+lw $t0, 64($sp)          #Sacando la instancia de la pila (en 48) de una clase que hereda de Article
+lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de Article
+lw $t3, 40($t1)          #Buscando el metodo dinamico para la funcion initArticle
+jal $t3          #Call a la function $t3
+sw $s0, 52($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la asignacion Let an_article          #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block
+jal new_ctr_Nil          #Call a la function new_ctr_Nil
+sw $s0, 28($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la exprecion previa al Dispatch cons
+lw $t0, 68($sp)          #pon en $t0  el contenido de la pos  f'{stack_plus_dir_value}  
+sw $t0, 24($sp)          #pon en la pos  f'{stack_plus_dir_value}  el valor de $t0          #Fin del paramentro 0 al Dispatch cons
+lw $t0, 28($sp)          #Saca de la pila instance_to_call_cons@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila instance_to_call_cons@0
+lw $t0, 28($sp)          #Saca de la pila param_0_to_cons@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila param_0_to_cons@0
+lw $t0, 36($sp)          #Sacando la instancia de la pila (en 28) de una clase que hereda de Nil
+lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de Nil
+lw $t3, 36($t1)          #Buscando el metodo dinamico para la funcion cons
+jal $t3          #Call a la function $t3
+sw $s0, 20($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la exprecion previa al Dispatch cons
+lw $t0, 52($sp)          #pon en $t0  el contenido de la pos  f'{stack_plus_dir_value}  
+sw $t0, 16($sp)          #pon en la pos  f'{stack_plus_dir_value}  el valor de $t0          #Fin del paramentro 0 al Dispatch cons
+lw $t0, 20($sp)          #Saca de la pila instance_to_call_cons@1
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila instance_to_call_cons@1
+lw $t0, 20($sp)          #Saca de la pila param_0_to_cons@1
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila param_0_to_cons@1
+lw $t0, 28($sp)          #Sacando la instancia de la pila (en 20) de una clase que hereda de Cons
+lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de Cons
+lw $t3, 36($t1)          #Buscando el metodo dinamico para la funcion cons
+jal $t3          #Call a la function $t3
+sw $s0, 12($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la expresion lista para ser asignada
+lw $t0, 72($sp)          #Buscando la instancia en la pila self
+lw $t1, 12($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 8($t0)          #Seteando el valor en la direccion de la memoria del objeto
+lw $t0, 72($sp)          #Buscando la instancia de la clase Main en la pila
+lw $t1, 8($t0)          #Buscando el valor de la propiedad books
+sw $t1, 32($sp)          #Salvando el valor de la propiedad books en la pila en el valor local step@block@0          #Inicio del paso 1 de una sequencia Block
+lw $t0, 72($sp)          #Buscando la instancia de la clase Main en la pila
+lw $t1, 8($t0)          #Buscando el valor de la propiedad books
+sw $t1, 8($sp)          #Salvando el valor de la propiedad books en la pila en el valor local instance_to_call_print_list@0          #Fin de la exprecion previa al Dispatch print_list
+lw $t0, 8($sp)          #Saca de la pila instance_to_call_print_list@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila instance_to_call_print_list@0
+lw $t0, 12($sp)          #Sacando la instancia de la pila (en 8) de una clase que hereda de BookList
+lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de BookList
+lw $t3, 48($t1)          #Buscando el metodo dinamico para la funcion print_list
+jal $t3          #Call a la function $t3
 sw $s0, 4($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
 lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 16($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 20          #Limpia la pila
+lw $ra, 76($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 80          #Limpia la pila
 jr $ra          #Final de la function main
 
-
-IO_out_string:
-li $v0, 4
-lw $a0, 0($sp)
+new_ctr_Book:
+#Parametro Return $ra en stackpoiner + 16
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4          #Push local var instance stackpointer 8
+addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Book
+#Allocate a una class Book puntero en sp + 8
+#atributo @type en puntero + 0
+#atributo type en puntero + 4
+#atributo title en puntero + 8
+#atributo author en puntero + 12
+li $a0, 16
+li $v0, 9
 syscall
-lw $a0, 4($sp)
-addi $sp, $sp, 8
+sw $v0, 8($sp)          #Reservando memoria para una instancia de tipo Book
+la $t0, Book
+sw $t0, 4($sp)          #Cargando el nombre del tipo desde el data
+lw $t0, 8($sp)          #Buscando la instancia en la pila instance
+lw $t1, 4($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor en la direccion de la memoria del objeto          #Assignando el nombre del tipo en el campo type
+lw $s0, 8($sp)          #Envia el resultado de la funcion en $s0
+lw $ra, 16($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 20          #Limpia la pila
 jr $ra
+
+new_ctr_Article:
+#Parametro Return $ra en stackpoiner + 16
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4          #Push local var instance stackpointer 8
+addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Article
+#Allocate a una class Article puntero en sp + 8
+#atributo @type en puntero + 0
+#atributo type en puntero + 4
+#atributo title en puntero + 8
+#atributo author en puntero + 12
+#atributo per_title en puntero + 16
+li $a0, 20
+li $v0, 9
+syscall
+sw $v0, 8($sp)          #Reservando memoria para una instancia de tipo Article
+la $t0, Article
+sw $t0, 4($sp)          #Cargando el nombre del tipo desde el data
+lw $t0, 8($sp)          #Buscando la instancia en la pila instance
+lw $t1, 4($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor en la direccion de la memoria del objeto          #Assignando el nombre del tipo en el campo type
+lw $s0, 8($sp)          #Envia el resultado de la funcion en $s0
+lw $ra, 16($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 20          #Limpia la pila
+jr $ra
+
+new_ctr_Nil:
+#Parametro Return $ra en stackpoiner + 16
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4          #Push local var instance stackpointer 8
+addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Nil
+#Allocate a una class Nil puntero en sp + 8
+#atributo @type en puntero + 0
+#atributo type en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 8($sp)          #Reservando memoria para una instancia de tipo Nil
+la $t0, Nil
+sw $t0, 4($sp)          #Cargando el nombre del tipo desde el data
+lw $t0, 8($sp)          #Buscando la instancia en la pila instance
+lw $t1, 4($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor en la direccion de la memoria del objeto          #Assignando el nombre del tipo en el campo type
+lw $s0, 8($sp)          #Envia el resultado de la funcion en $s0
+lw $ra, 16($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 20          #Limpia la pila
+jr $ra
+

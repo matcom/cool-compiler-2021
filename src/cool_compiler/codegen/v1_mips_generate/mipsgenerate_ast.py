@@ -9,9 +9,9 @@ class Program:
         result = ".data\n"
 
         for key in self.data.keys():
-            result += str(self.data[key]) + '\n\n'
+            result += str(self.data[key]) + '\n'
         
-        result += '.text\n.globl main\n'
+        result += '\n.text\n.globl main\n'
         result += str(self.func['main']) + '\n'
 
         for key in self.func.keys():
@@ -26,9 +26,15 @@ class Data:
         self.value = value
     
     def __str__(self) -> str:
-        if self.value[-1] == '\n': self.value = self.value[0:-1] + '\\n'
-        if(type(self.value==type("string"))):
-            return f'{self.name}: .asciiz \"{str(self.value)}\"'
+        if type(self.value) == type(str()) :
+            replace_ = self.value.replace('\n', '\\n')
+            return f"{self.name}: .asciiz \"{replace_}\""
+
+        if type(self.value) == type([]):
+            result = f'{self.name}: .word '
+            for item in self.value:
+                result += str(item) + ', '
+            return result
 
         return f'{self.name}: .word \"{str(self.value)}\"'
 

@@ -37,13 +37,13 @@ class CILGenerate:
         self.errors = errors
         self.label_list = {}
         self.type_dir = {
-            OBJECT_NAME: 0
+            OBJECT_NAME: 1
         }
 
     def map_type(self, name):
         try: return self.type_dir[name]
         except KeyError:
-            self.type_dir[name] = len(self.type_dir.keys())
+            self.type_dir[name] = len(self.type_dir.keys()) + 1
             return self.type_dir[name]
 
     @visitor.on('node')
@@ -62,11 +62,9 @@ class CILGenerate:
     @visitor.when(AST.CoolClass)
     def visit(self, node: AST.CoolClass, scope: Scope):
         self.class_scope = scope.create_child(node.type.name)
-        self.new_class_scope = scope.create_child(f'new_{node.type.name}')
 
         self.currentType = ASTR.Type(node.type.name)
         self.currentClass = node.type
-        self.new_type_func = ASTR.Function(f'new_ctr_{node.type.name}')
         
         self.program.add_type(self.currentType)
 
@@ -79,19 +77,12 @@ class CILGenerate:
             for func in parent.methods:
                 self.currentType.method_push(func.name, f'{parent.name}_{func.name}')
         
-        self.program.data[f'{node.type.name}_parents'] = ASTR.Data(f'{node.type.name}_parents', type_list)
-        self.program.data_list += [f'{node.type.name}_parents']
+        self.program.force_data(f'{node.type.name}_parents', type_list + [0])
+        self.program.force_data(node.type.name, 
+            [f'{node.type.name}_parents'] + 
+            [self.currentType.methods[key] for key in self.currentType.methods.keys()])
 
-        self.new_type_func.force_parma('self', self.new_class_scope)
-        self.new_type_func.force_local('instance', self.new_class_scope)
-        tn = self.new_type_func.local_push('type_name', self.new_class_scope)
-        self.new_type_func.expr_push(ASTR.ALLOCATE('instance', node.type.name))
-        self.new_type_func.expr_push(ASTR.Comment(f'Reservando memoria para una instancia de tipo {node.type.name}'))
-        self.new_type_func.expr_push(ASTR.Load(tn, f'{node.type.name}_parents'))
-        self.new_type_func.expr_push(ASTR.Comment(f'Cargando el nombre del tipo desde el data'))
-        self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type', tn))
-        self.new_type_func.expr_push(ASTR.Comment(f'Assignando el nombre del tipo en el campo type'))
-
+        self.create_new_func_by_type(node, scope)
         for feat in node.feature_list:
             self.visit(feat, self.class_scope)
 
@@ -105,6 +96,20 @@ class CILGenerate:
 
         self.program.add_func(self.new_type_func)
     
+    def create_new_func_by_type(self, node, scope):
+        self.new_class_scope = scope.create_child(f'new_{node.type.name}')
+        self.new_type_func = ASTR.Function(f'new_ctr_{node.type.name}')
+        
+        self.new_type_func.force_parma('self', self.new_class_scope)
+        self.new_type_func.force_local('instance', self.new_class_scope)
+        tn = self.new_type_func.local_push('type_name', self.new_class_scope)
+        self.new_type_func.expr_push(ASTR.ALLOCATE('instance', node.type.name))
+        self.new_type_func.expr_push(ASTR.Comment(f'Reservando memoria para una instancia de tipo {node.type.name}'))
+        self.new_type_func.expr_push(ASTR.Load(tn, node.type.name))
+        self.new_type_func.expr_push(ASTR.Comment(f'Cargando el nombre del tipo desde el data'))
+        self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type', tn))
+        self.new_type_func.expr_push(ASTR.Comment(f'Assignando el nombre del tipo en el campo type'))
+
     @visitor.when(AST.AtrDef)
     def visit(self, node: AST.AtrDef, scope: Scope):
         if not node.expr in [None, []]:
@@ -183,7 +188,7 @@ class CILGenerate:
             instance_expr_list.append(ASTR.Arg(arg))
             instance_expr_list.append(f'Agrega a la pila el paramentro {i} al Dispatch {node.id}')
         
-        instance_expr_list.append(ASTR.Call(super_value, node.id))
+        instance_expr_list.append(ASTR.Call(super_value, instance_name, f'{node.expr.static_type.name}@{node.id}'))
         return instance_expr_list
     
     @visitor.when(AST.StaticDispatch)
