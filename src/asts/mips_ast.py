@@ -51,6 +51,13 @@ class DataNode(Node):
             self.data = []
         self.data = data
 
+class Constant(Node):
+    """
+    This class represents a literal integer in MIPS 
+    """
+    def __init__(self, node, value : str) -> None:
+        super().__init__(node)
+        self.value = value
 
 class RegisterNode(Node):
     """
@@ -122,7 +129,34 @@ class Subu(TernaryOpNode):
         super().__init__(node, left, middle, right)
 
 
+class Sub(TernaryOpNode):
+    """
+    This node represents `sub` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
+class Addi(TernaryOpNode):
+    """
+    This node represents `addi` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
 class Addu(TernaryOpNode):
+    """
+    This node represents `addu` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
+class Add(TernaryOpNode):
     """
     This node represents `addu` instruction in MIPS
     """
@@ -139,6 +173,14 @@ class Move(BinaryOpNode):
     def __init__(self, node, left, right) -> None:
         super().__init__(node, left, right)
 
+
+class LoadImmediate(BinaryOpNode):
+    """
+    This node represents `li` instruction in MIPS
+    """
+
+    def __init__(self, node, left, right) -> None:
+        super().__init__(node, left, right)
 
 class LoadWord(BinaryOpNode):
     """
@@ -196,6 +238,19 @@ class JumpAndLink(InstructionNode):
         super().__init__(node)
         self.address = address
 
+class BranchOnEqual(TernaryOpNode):
+    """
+    This node represents `beq` instruction in MIPS
+    """
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+class BranchOnNotEqual(TernaryOpNode):
+    """
+    This node represents `bne` instruction in MIPS
+    """
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
 
 class AssemblerDirective(Node):
     def __init__(self, node, list) -> None:
@@ -221,3 +276,4 @@ class Syscall(InstructionNode):
 
     def __init__(self, node) -> None:
         super().__init__(node)
+

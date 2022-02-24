@@ -1,15 +1,22 @@
 from asts.mips_ast import (
+    Add,
+    Addi,
     Addu,
+    BranchOnEqual,
+    BranchOnNotEqual,
+    Constant,
     Jump,
     JumpAndLink,
     JumpRegister,
     Label,
     LabelDeclaration,
     LoadAddress,
+    LoadImmediate,
     MIPSProgram,
     MemoryIndexNode,
     Move,
     RegisterNode,
+    Sub,
     Subu,
     Syscall,
     TextNode,
@@ -53,6 +60,10 @@ class MIPSGenerator:
     def visit(self, node: RegisterNode) -> str:
         return f"${node.number}"
 
+    @visitor.when(Constant)
+    def visit(self, node: Constant) -> str:
+        return str(node.value)
+
     @visitor.when(LabelDeclaration)
     def visit(self, node: LabelDeclaration) -> str:
         return f"{node.idx}:"
@@ -89,6 +100,10 @@ class MIPSGenerator:
     def visit(self, node: Subu) -> str:
         return f"\tsubu {node.left}, {node.middle}, {node.right}"
 
+    @visitor.when(Sub)
+    def visit(self, node: Sub) -> str:
+        return f"\tsub {node.left}, {node.middle}, {node.right}"
+
     @visitor.when(Addu)
     def visit(self, node: Addu) -> str:
         return f"\taddu {node.left}, {node.middle}, {node.right}"
@@ -97,6 +112,26 @@ class MIPSGenerator:
     def visit(self, node: LoadAddress) -> str:
         return f"\tla {node.left},  {node.right}"
 
+    @visitor.when(LoadImmediate)
+    def visit(self, node: LoadImmediate) -> str:
+        return f"\tli {node.left},  {node.right}"
+
     @visitor.when(Syscall)
     def visit(self, node: Syscall) -> str:
         return f"\tsyscall"
+
+    @visitor.when(Add)
+    def visit(self, node: Add) -> str:
+        return f"\tadd {node.left}, {node.middle}, {node.right}"
+
+    @visitor.when(Addi)
+    def visit(self, node: Addi) -> str:
+        return f"\taddi {node.left}, {node.middle}, {node.right}"
+
+    @visitor.when(BranchOnEqual)
+    def visit(self, node: BranchOnEqual) -> str:
+        return f"\tbeq {node.left}, {node.middle}, {node.right}"
+    @visitor.when(BranchOnEqual)
+
+    def visit(self, node: BranchOnNotEqual) -> str:
+        return f"\tbne {node.left}, {node.middle}, {node.right}"
