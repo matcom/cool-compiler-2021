@@ -250,8 +250,8 @@ class TypeChecker:
 
         if scope.is_local(node.id):
             scope.remove_variable(node.id)
-        else:  
-            scope.define_variable(node.id, var_type)
+         
+        scope.define_variable(node.id, var_type)
 
         node.computed_type = var_type
         

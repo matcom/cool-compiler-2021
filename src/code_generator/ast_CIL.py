@@ -118,7 +118,7 @@ class CILLocalNode(CILNode):
         self.id = id 
         self.type = type   
         
-    def __str__(self):
+    def __repr__(self):
         text = "LocalNode:\n"
         text += f"id: {self.id}\n"
         text += f"type: {self.type}\n"
@@ -141,10 +141,19 @@ class CILAssignNode(CILInstructionNode):
 
 # id.attr = var
 class CILSetAttributeNode(CILInstructionNode): 
-    def __init__(self, type, attr , var):
+    def __init__(self, id, type, attr , var):
+        self.id = id
         self.type = type
         self.attr = attr
         self.var = var
+    
+    def __str__(self):
+        text = "SetAttrNode:\n"
+        text += f"id: {self.id}\n"
+        text += f"type: {self.type}\n"
+        text += f"att: {self.attr}\n"
+        text += f"var: {self.var}\n"
+        return text         
 
 class CILArgNode (CILInstructionNode):
     def __init__(self, var):
@@ -165,8 +174,13 @@ class CILLabelNode (CILInstructionNode):
         
 class CILReturnNode (CILInstructionNode):
     def __init__(self, var = None):
-        self.var = var              
-                              
+        self.var = var   
+    
+    def __str__(self):
+        text = "ReturnNode:\n"
+        if self.var is not None:
+            text += f"var: {self.var}\n"               
+        return text                      
 class CILPrint (CILInstructionNode):
     def __init__(self, var):
         self.var = var
@@ -187,9 +201,18 @@ class CILBinaryOperationNode (CILExpressionNode):
         return text     
     
 class CILGetAttribute(CILExpressionNode):
-    def __init__(self, var, attr):
+    def __init__(self, var, type, attr):
         self.var = var
+        self.type = type
         self.attr = attr
+    
+    def __str__(self):
+        text = "GetAttrNode:\n"
+        text += f"var: {self.var}\n"
+        text += f"type: {self.type}\n"
+        text += f"att: {self.attr}\n"
+        return text             
+        
 
 class CILAllocateNode (CILExpressionNode):
     def __init__(self, type):
@@ -233,7 +256,12 @@ class CILAtomicNode (CILExpressionNode):
         return text     
 
 class CILVariableNode (CILAtomicNode):
-    pass            
+    pass     
+
+class CILTypeConstantNode(CILAtomicNode):
+    pass         
+        
+           
 
 class CILStringNode (CILAtomicNode):
     pass

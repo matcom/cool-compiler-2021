@@ -1,64 +1,31 @@
+from ast import Expression, expr
+from math import exp
+from threading import local
 from parsing.ast import *
-from .ast_CIL import *
+from cmp.semantic import Scope
+from cmp.semantic import ObjectType, IntType, StringType, BoolType, ErrorType, SelfType
 import cmp.visitor as visitor
+from .ast_CIL import *
 
 
-
-class CILScope:
-    def __init__(self):
+class CILScope :
+    def __init__(self, context,scope):
         self.let_count = 0
         self.if_count = 0
         self.case_count = 0
         self.variables_count = 0
-        
         self.locals = []
-        self.all_locals = []
-        self.instructions = []
+        self.instructions= []
         self.data = []
         self.functions = []
-        
         self.current_class = ""
-
-    def add_local(self, id, type, is_param = False):
-        local_dict = self.locals[-1] 
-        if id in local_dict.keys():
-            nickname = local_dict[id].id
-            local_dict[id] = CILLocalNode(nickname, CILTypeConstantNode(type)) 
-        else:
-            nickname = f'{id}_{self.variables_count}'
-            self.variables_count += 1
-            node = CILLocalNode(nickname, CILTypeConstantNode(type))
-            local_dict[id] = node
-            
-            if not is_param:
-                self.all_locals.append(node)
-                
-        return nickname
-                
-    def add_new_local(self, type):
-        local_dict = self.locals[-1] 
-        name = f't_{self.variables_count}'
-        self.variables_count += 1
-        node = CILLocalNode(name, CILTypeConstantNode(type))
-        local_dict[name] = node
-        self.all_locals.append(node)
-        return name
-    
-    def find_local(self, id):
-        
-        for i in range (len(self.locals) - 1 , -1, -1):
-            d = self.locals[i]
-            try:
-                return d[id]
-            except:
-                pass
-        return None
+        self.context = context
+        self.scope = scope
 
 #pending 
 def create_init_class(attributes, expresions):
     for attr,expr in zip(attributes,expresions):
         assig = CILAssignNode (attr.id,expr)
-
 
 class CIL:
     def __init__(self):
@@ -71,71 +38,60 @@ class CIL:
     @visitor.when(ProgramNode)
     def visit(self, node):
         types = []
-        for d in node.declarations:  # TODO organizar de modo q quede el main de primero
-            type = self.visit(d)
+        self.scope.locals = []
+        self.scope.instuctions = []
+        for dec in node.declarations:# organizar de modo q quede el main de primero
+            (type,expressions) = self.visit( dec)
             types.append(type)
-          
+            #init_class = create_init_class (type.attributes,expressions)    
+            #self.scope.functions.append (init_class)
+            self.scope.locals = []
+        self.scope.instuctions = []
         return CILProgramNode(types, self.scope.data, self.scope.functions)
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         self.scope.current_class = node.id
-        
         attributes = []
         expressions = []
         methods = []
         for feature in node.features:
-            if isinstance (feature, AttrDeclarationNode):
+            if isinstance (feature,AttrDeclarationNode):
                 attr = self.visit(feature)
                 attributes.append(attr)
-                if feature.expr is not None:
-                    expr = self.visit(feature.expr)
-                    expressions.append(expr)
+                expression = self.visit(feature.expr)
+                expressions.append(expression)
             else:
                 function = self.visit(feature)
                 self.scope.functions.append(function) 
                 methods.append(CILMethodNode(feature.id, function.id))   
                 
-        methods.append(CILMethodNode('init', f'init_{node.id}'))         
-        # use expressions here
-        #init_class = create_init_class (type.attributes,expressions)    
-        #self.scope.functions.append (init_class)  
-        
-        # herencia          
-              
-        return CILTypeNode(node.id, attributes, methods)
+        methods.append(CILMethodNode('init', f'init_{node.id}'))               
+        return (CILTypeNode (node.id, attributes,methods),expressions)
             
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
-        return CILAttributeNode(node.id, CILTypeConstantNode(node.type))
+        return CILAttributeNode (node.id, node.type)
     
     @visitor.when(FuncDeclarationNode) 
     def visit(self, node):
-        self.scope.locals = [{}]
-        self.scope.instructions = []
-        
         params = []
-        param_node = CILParamNode(CILVariableNode(f'self_{self.scope.current_class}'), CILTypeConstantNode(self.scope.current_class))
-        params.append(param_node)
-        
+        self.scope.instructions = []
+        self.scope.locals = []
         for param in node.params:
-            param_node = CILParamNode(param.id, CILTypeConstantNode(param.type))
+            id = param.id
+            type =  param.type
+            param_node = CILParamNode(id, type)
             params.append(param_node)
-            self.scope.add_local(param.id, param.type, True)
-            
-        expr = self.visit(node.expr)  
-        new_var = self.scope.add_new_local(node.type)
-        self.scope.instructions.append(CILAssignNode(CILVariableNode (new_var), expr))
-        self.scope.instructions.append(CILReturnNode(CILVariableNode (new_var)))
-        return CILFuncNode(f'{node.id}_{self.scope.current_class}', params, self.scope.all_locals, self.scope.instructions)
+        self.visit(node.expr)    
+        return CILFuncNode(f'{node.id}_{self.scope.current_class}', params, self.scope.locals, self.scope.instructions)
                    
     @visitor.when(BlockNode)
     def visit(self, node): 
-        for i in range(0, len(node.expr_lis) - 1):
-            self.visit(node.expr_lis[i]) # Necesary instructions are added, but there is not sense to keep the expression
-        expr = node.expr_lis[len(node.expr_lis) - 1]
-        return self.visit(expr)
+        for expr in node.expr_lis:
+            self.visit(expr)
             
+
     @visitor.when(DispatchNode)
     def visit(self, node):
         pass        
@@ -146,21 +102,25 @@ class CIL:
             
     @visitor.when(LetNode)
     def visit(self, node):
-        self.scope.locals.append({})
         for variable in node.variables:
             self.visit(variable)
+        temp_name = f't{self.scope.variables_count}'
+        self.scope.variables_count += 1
         expr = self.visit(node.expr)
-        self.scope.locals.pop()
-        return expr
+        self.scope.instructions.append(CILAssignNode( temp_name, expr))
+        local = CILLocalNode(temp_name, CILTypeConstantNode(node.computed_type.name))
+        self.scope.locals.append(local)
         
     @visitor.when(VarDeclarationNode)
     def visit(self, node):
-        name = self.scope.add_local(node.id, node.type)
+        local = CILLocalNode(node.id,CILTypeConstantNode(node.type))
+        self.scope.locals.append(local)
         if node.expr is not None:
             expr = self.visit(node.expr)
-            instruction = CILAssignNode(CILVariableNode(name), expr)
+            instruction = CILAssignNode (node.id, expr)
             self.scope.instructions.append(instruction)
             
+        
     @visitor.when(LoopNode)
     def visit(self, node):
         pass
@@ -181,37 +141,43 @@ class CIL:
 
     @visitor.when(CaseAttrNode)
     def visit(self, node):  
-        #local = mself.scope.add_new_local(node.id)
+        case_label = f'c{self.scope.case_count}'
+        self.scope.case_count += 1 
         self.scope.instructions.append(CILLabelNode(case_label))
         expresion_branch = self.visit(node.expr)
-         
+        
+    
     @visitor.when(AssignNode)
     def visit(self, node):
-        var = self.visit(node.expr)
-        local = self.scope.find_local(node.id.lex)
-
-        if local is not None:
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(local.id), var))
-            return CILVariableNode(local.id)
-        else:
-            self.scope.instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.scope.current_class}'), CILTypeConstantNode(self.scope.current_class), CILVariableNode(node.id.lex), var))
-            return var
+        exp = self.visit(node.expr)
+        type_class = self.context.get_type(self.scope.current_class)
+        try:
+            type_var = type_class.get_attribute(node.id).type
+            type_node = CILTypeConstantNode(type_var)
+            return CILSetAttributeNode(type_node, node.id.id , exp)
+        except:    
+            return CILAssignNode(node.id.id, exp)
                                      
     @visitor.when(BinaryNode)
     def visit(self, node):
         if not isinstance(node.left, AtomicNode):
-            name = self.scope.add_new_local(node.left.computed_type.name)
+            name = "t" + str(self.scope.variables_count)
+            self.scope.variables_count += 1
+            type = node.left.computed_type.name
+            self.scope.locals.append(CILLocalNode(name, CILTypeConstantNode(type)))
             expr = self.visit(node.left)
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
+            self.scope.instructions.append(CILAssignNode(name, expr))
             left = CILVariableNode(name)
-            
         else:
             left = self.visit(node.left)  
 
         if not isinstance(node.right, AtomicNode):
-            name = self.scope.add_new_local(node.right.computed_type.name)
+            name = "t" + str(self.scope.variables_count)
+            self.scope.variables_count +=1
+            type = node.right.computed_type.name
+            self.scope.locals.append(CILLocalNode(name, CILTypeConstantNode(type)))
             expr = self.visit(node.right)
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
+            self.scope.instructions.append(CILAssignNode(name, expr))
             right = CILVariableNode(name)
         else:
             right = self.visit(node.right)
@@ -252,13 +218,11 @@ class CIL:
 
     @visitor.when(VariableNode)
     def visit(self, node):
-        local = self.scope.find_local(node.lex)
-        if local is not None:
-            return CILVariableNode(local.id)
-        else:
-            return CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), CILTypeConstantNode(self.scope.current_class), CILVariableNode(node.lex))
-        
-         
+        locals_variables =  [ var for var in self.scope.locals if var.id == node.lex ]
+        params_ = [var for var in self.scope.pa if var.id == node.lex ]
+        type_node = CILTypeConstantNode(type_var)
+        return CILGetAttribute(type_node,node.lex)
+        CILVariableNode(node.lex) 
    
     @visitor.when(TrueNode)
     def visit(self, node):
