@@ -211,7 +211,7 @@ class BoolType(Type):
         self.methods = {}
         self.parent = None
         self.pos = pos
-        self.init_methods()
+        # self.init_methods()
 
     def init_methods(self):
         self.define_method('abort', [], [], self)
@@ -250,7 +250,7 @@ class IntType(Type):
         self.methods = {}
         self.parent = None
         self.pos = pos
-        self.init_methods()
+        # self.init_methods()
 
     def init_methods(self):
         self.define_method('abort', [], [], self)
