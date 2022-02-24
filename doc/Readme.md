@@ -51,33 +51,35 @@ cool-compiler-2021
      |__Main.py
         core
             |__cil
-                   |__BaseCOOLToCilVisitor.py
-                     CILAst.py
-                     COOLToCILVisitor.py
+                   |__BaseCoolToCilVisitor.py
+                      CilAst.py
+                      CoolToCilVisitor.py
+            |__cool
+                   |__CoolAst.py
+                      CoolAstFormatter.py
             |__lexer
-                   |__lexer.py
+                   |__Lexer.py
             |__mips
                    |__CilToMipsVisitor.py
-                      mips_basic.asm
+                      MipsBasics.asm
                       MipsAst.py
-                      MIPSAstFormatter.py
+                      MipsAstFormatter.py
             |__parser
                    |__Parser.py
             |__semantic
-                   |__Type_Builder.py
-                      Type_Checker.py
-                      Type_Collector.py
+                   |__TypeBuilder.py
+                      TypeChecker.py
+                      TypeCollector.py
             |__tools
-                   |__automata.py
-                      COOLAst.py
+                   |__Automata.py
                       Errors.py
-                      evaluation.py
-                      First_and_Follow.py
-                      Parser_LR1.py
-                      parsing.py
-                      pycompiler.py
+                      Evaluation.py
+                      FirstAndFollows.py
+                      ParserLR1.py
+                      Parsing.py
+                      Pycompiler.py
                       Semantic.py
-                      utils.py
+                      Utils.py
                       visitor.py
         
 
@@ -258,11 +260,11 @@ Algunos de los errores que se chequean en esta fase son:
 
 Durante esta fase se realiza la conversión del lenguaje COOL a un lenguaje intermedio(CIL). 
 El fichero CilAst contiene la definición de las clases usadas para conformar el AST del lenguaje CIL. 
-En el fichero BaseCOOLtoCILVisitor se definen los métodos básicos para registrar
+En el fichero BaseCooltoCilVisitor se definen los métodos básicos para registrar
 una variable, parámetro, función y atributo, entre otros. Ademas se 
 registran los tipos builtin, es decir, se escriben en código CIL las instrucciones
 para registrar los tipos Object, IO, String, Int y Bool, así como las funciones y atributos de cada uno de estos..
-El fichero COOLToCILVisitor es el encargado de transformar el AST de COOL en un AST de CIL, para facilitar
+El fichero CoolToCilVisitor es el encargado de transformar el AST de COOL en un AST de CIL, para facilitar
 luego la traducción de este al lenguaje MIPS. Este fichero cuenta con un visitor que se encarga de transformar
 cada nodo del AST de un lenguaje a otro, algunos de los aspectos a destacar son:
 - En el visitor del ProgramNode se define la función entry, que es por donde se comenzará la ejecución del
@@ -291,7 +293,7 @@ Esta es la fase final donde se traduce de CIL al lenguaje MIPS que da la salida 
 Dentro del fichero mips_basics.asm se encuentran algunas funciones predefinidas en mips: malloc, copy, 
 read_string, equal_string, length, substring y concat.    
 El fichero MIPSAst contiene la definición de las clases necesarias para representar el código MIPS.     
-El fichero CILToMipsVisitor visita cada nodo del AST de CIL y lo traduce s su correspondientes 
+El fichero CilToMipsVisitor visita cada nodo del AST de CIL y lo traduce s su correspondientes 
 instrucciones en codigo Mips. Gran dificultad trajo en esta fase el uso correcto de las tablas de dispatch
 y los atributos de clase en combinación con la herencia, haciendo necesaria una especificación sobre la 
 representación en memoria que tendría cada objeto. Sobre esto útimo podemos explicar que se decidió representar
@@ -313,7 +315,7 @@ entero de 32 bits. El orden de las funciones en la tabla de dispatch inicia por 
 correctamente el llamado a una función redefinida en un objeto del tipo hijo cuando este es tratado como un
 objeto del tipo padre (polimorfismo).
 
-Finalmente, el fichero MIPSAstFormatter es el encargado de transformar el AST de MIPS a formato string para
+Finalmente, el fichero MipsAstFormatter es el encargado de transformar el AST de MIPS a formato string para
 luego escribir este en el archivo final.
 
 ## Licencia

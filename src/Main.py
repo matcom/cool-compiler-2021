@@ -5,10 +5,8 @@ from core.semantic.TypeCollector import Type_Collector
 from core.semantic.TypeBuilder import Type_Builder
 from core.semantic.TypeChecker import Type_Checker
 from core.cil.CoolToCilVisitor import COOLToCILVisitor
-from core.cil.CilAst import get_formatter
 from core.mips.CilToMipsVisitor import CILToMIPSVisitor
 from core.mips.MipsAstFormatter import MIPSAstFormatter
-import subprocess, re
 
 
 def main(args):
@@ -53,14 +51,11 @@ def main(args):
 
     CILVisitor = COOLToCILVisitor(type_Checker.Context)
     CILast = CILVisitor.visit(COOLast, scope)
-    # print(get_formatter()(CILast))
 
     MIPSVisitor = CILToMIPSVisitor()
     MIPSAst = MIPSVisitor.visit(CILast)
     MIPSFormatter = MIPSAstFormatter()
     mipsCode = MIPSFormatter.visit(MIPSAst)
-
-    # print(mipsCode)
 
     out_file = args.file.split(".")
     out_file[-1] = "mips"
