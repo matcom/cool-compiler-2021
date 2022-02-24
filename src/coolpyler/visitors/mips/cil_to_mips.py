@@ -301,7 +301,7 @@ class CilToMIPS:
         reg1 = self.memory_manager.get_unused_register()
 
         instance_dir = self.search_mem(node.instance)
-        instructions.append(mips.LoadWordNode(reg1, instance_dir * node.attr * 4))
+        instructions.append(mips.LoadWordNode(reg1, instance_dir * (node.attr + 1) * 4))
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(mips.StoreWordNode(reg1, dest_dir))
@@ -320,7 +320,9 @@ class CilToMIPS:
         instructions.append(mips.LoadWordNode(reg1, source_dir))
 
         instance_dir = self.search_mem(node.instance)
-        instructions.append(mips.StoreWordNode(reg1, instance_dir * node.attr * 4))
+        instructions.append(
+            mips.StoreWordNode(reg1, instance_dir * (node.attr + 1) * 4)
+        )
 
         self.memory_manager.clean()
         return instructions
@@ -514,11 +516,14 @@ class CilToMIPS:
         self.memory_manager.save()
         reg1 = self.memory_manager.get_unused_register()
 
-        instructions.append(mips.LoadAddressNode(reg1, node.msg))
+        if isinstance(node.msg, int):
+            instructions.append(mips.LoadInmediateNode(reg1, node.msg))
+        else:
+            instructions.append(mips.LoadAddressNode(reg1, node.msg))
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
-            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
         )
 
         self.memory_manager.clean()
