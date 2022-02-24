@@ -6,7 +6,6 @@ from visitors.Checker import TypeChecker
 from visitors.Inferencer import Inferencer
 from visitors.Executor import Executor, RuntimeException
 from visitors.CooltoCil import COOLToCILVisitor
-from visitors.CiltoMips import CiltoMipsVisitor
 from visitors.CilDepicter import get_formatter
 
 class Pipeline():
@@ -30,10 +29,10 @@ class Pipeline():
         self.ast = parser.parse(lexer, program)#= evaluate_reverse_parse(derivations, operations, self.tokens)
 
         if len(parser.errors) != 0:
-            return -1
+            return
         
         if self.ast is None:
-            return -1
+            return
                 
         self.depicter = Depicter()
         if verbose:
@@ -49,27 +48,26 @@ class Pipeline():
             if len(self.errors) == 0:
                 self.typeChecker = TypeChecker(self.context, self.errors)
                 self.typeChecker.visit( self.ast, scope)
-            self.coolToCil = COOLToCILVisitor(self.context)
-            cil_ast = self.coolToCil.visit(self.ast, scope)
+                
+            # self.coolToCil = COOLToCILVisitor(self.context)
+            # cil_ast = self.coolToCil.visit(self.ast, scope)
             # print(get_formatter(cil_ast))
-            self.cilToMips = CiltoMipsVisitor(self.context)
-            mips_code = self.cilToMips.visit(cil_ast)
-
+            # return self.lexer.errors + self.errors
         if verbose:
             print('This is after infering types:')
             print()
             print(self.depicter.visit(self.ast,0))
             print()
-        self.executor = Executor(self.context)
+        # self.executor = Executor(self.context)
         
-        if len(self.errors) == 0:
-            try:
-                executorScope = Scope()
-                self.executor.visit(self.ast,executorScope)
-                print()
-                print('Done!!')
-            except RuntimeException as e:
-                print(e)
-                print()
-        for error in self.errors:
-            print(error)
+        # if len(self.errors) == 0:
+        #     try:
+        #         executorScope = Scope()
+        #         self.executor.visit(self.ast,executorScope)
+        #         print()
+        #         print('Done!!')
+        #     except RuntimeException as e:
+        #         print(e)
+        #         print()
+        # for error in self.errors:
+        #     print(error)
