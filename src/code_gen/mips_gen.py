@@ -11,6 +11,7 @@ from asts.mips_ast import (
     Move,
     RegisterNode,
     Subu,
+    Syscall,
     TextNode,
     DataNode,
     WordDirective,
@@ -95,3 +96,7 @@ class MIPSGenerator:
     @visitor.when(LoadAddress)
     def visit(self, node: LoadAddress) -> str:
         return f"\tla {node.left},  {node.right}"
+
+    @visitor.when(Syscall)
+    def visit(self, node: Syscall) -> str:
+        return f"\tsyscall"

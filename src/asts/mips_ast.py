@@ -153,6 +153,7 @@ class LoadAddress(BinaryNode):
     """
     This node represents `la` instruction in MIPS
     """
+
     def __init__(self, left, right):
         super().__init__(left, right)
 
@@ -211,3 +212,12 @@ class WordDirective(AssemblerDirective):
 
     def __init__(self, node, list) -> None:
         super().__init__(node, list)
+
+
+class Syscall(InstructionNode):
+    """
+    This node represents `syscall` instruction in MIPS
+    """
+
+    def __init__(self, node) -> None:
+        super().__init__(node)
