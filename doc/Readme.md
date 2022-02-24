@@ -10,7 +10,34 @@
 
 ## Uso del compilador
 
+**Requerimientos**
+
+Para ejecutar el proyecto es necesario instalar Python y las dependencias que 
+se listan en requirements.txt
+
+Para instalar las dependencias puede ubicarse en la carpeta del proyecto y ejecutar
+
+```bash
+pip install -r requirements.txt
+```
+
+**Ejecucion**
+
+Para ejecutar el proyecto debe situarse en la carpeta *src* y utilizar algun de los
+ dos comandos que se muestran a continuacion
+```bash
+python Main.py -f path/to/file.cl 
+python Main.py --file path/to/file.cl
+```
+
+Como salida se guarda en un fichero del mismo nombre del introducido como parametro
+pero con extension *.mips* el codigo compilado y listo para ejecutarse. 
+
 ## Arquitectura del compilador 
+
+El compilador esta compuesto por distintos modulos que estan encargados de tomar 
+el codigo escrito inicialmente en COOL y obtener el resultado final en codigo MIPS que 
+permita su ejecucion. 
  
 ### Fases (_Pipeline_)
 
@@ -78,13 +105,18 @@ es el que va a ser ejecutado.
 Dentro del fichero mips_basics.asm se encuentran funciones predefinidas en mips:
 Malloc, Copy, Read String, Equal String, Length, Substring y Concat.         
 En CILToMipsVisitor se visita cada nodo del arbol de CIL y se traduce la instruccion
-a las correspondientes instrucciones en codigo Mips. .............?????????/??
+a las correspondientes instrucciones en codigo Mips.
 
 
-### Organizacion
+  
+## Principales Problemas
 
-La estructura de archivos del proyecto es la siguiente:           
-       
+
+
+## Organizacion
+
+La estructura de archivos del proyecto es la siguiente:         
+ 
 ```
 cool-compiler-2021
 |___doc 
@@ -127,19 +159,14 @@ cool-compiler-2021
 
 Se omitieron algunos archivos pues no son relevantes en la implementacion del compilador.
 
-## Principales Problemas
 
-
-
-
-
-# Gramatica
+## Gramatica
 
 ### Terminales
 A continuacion se muestran los terminales de la gramatica, donde entre parentesis se muestran
 los simbolos que corresponden a COOL en los casos en que era requerido:
 
-- *class, inherits, function*
+- *classx (class), inherits, function*
 - *ifx (if), then, elsex (else), fi*
 - *whilex (while), loop, pool*
 - *let, inx (in)*
@@ -154,6 +181,7 @@ los simbolos que corresponden a COOL en los casos en que era requerido:
 ### No Terminales
 
 A continuacion se muestran los no terminales de la gramatica definida: 
+
 - __program__ 
 - __class_list, def_class__
 - __feature_list, feature__
@@ -163,5 +191,90 @@ A continuacion se muestran los no terminales de la gramatica definida:
 - __atom, func_call, arg_list__
 
 ### Producciones de la Gramatica 
+A continuacion se muestran las producciones de la gramatica. En *cursiva* se muestran los terminales
+y en **negrita** los no terminales
 
-__program__ &#8549;  
+__program__ ⟶ __class_list__
+
+__class_list__  ⟶ __def_class  class_list__                 
+__class_list__  ⟶ __def_class__
+
+**def_class** ⟶ *class* *typex* { **feature_list** } ;       
+**def_class** ⟶ *class* *typex* *inherits* *typex* { **feature_list** } ;         
+
+**feature_list** ⟶ **feature feature_list**       
+**feature_list** ⟶ 𝜺      
+
+**feature** ⟶ *idx* : *typex* ;                      
+**feature** ⟶ *idx* : *typex* <- **expr_1**;           
+**feature** ⟶ *idx* (**param_list**) : *typex* { **expr_1** } ;            
+**feature** ⟶ *idx* () : *typex* { **expr_1** };              
+**feature** ⟶ **function** *idx* (**param_list**) : *typex* {**expr_1**};              
+**feature** ⟶ **function** *idx* () : *typex* {**expr_1**};      
+
+**param_list** ⟶ **param**              
+**param_list** ⟶ **param** , **param_list**      
+
+**param** ⟶ *idx* : *typex*
+
+**expr_1** ⟶ *idx* <- **expr_1**         
+**expr_1** ⟶ *not* **expr_1**          
+**expr_1** ⟶ **expr_2** = **expr_1**        
+**expr_1** ⟶ **expr_2**
+
+**expr_2** ⟶ **arith** < **arith**    
+**expr_2** ⟶ **arith** <= **arith**        
+**expr_2** ⟶ **arith**
+
+**arith** ⟶ **arith** + **factor**         
+**arith** ⟶ **arith** - **factor**      
+**arith** ⟶ **factor** 
+
+**factor** ⟶ **factor** \* **term**        
+**factor** ⟶ **factor** / **term**
+**factor** ⟶ **term**
+
+**term** ⟶ ~ **term**      
+**term** ⟶  *isvoid* **term**     
+**term** ⟶ **atom**
+
+**atom** ⟶ (**expr_1**)            
+**atom** ⟶ *string*        
+**atom** ⟶ *bool*       
+**atom** ⟶ *idx*     
+**atom** ⟶ *ifx* **expr_1** *then* **expr_1** *else* **expr_1** *fi*         
+**atom** ⟶ *whilex* **expr_1** *loop* **expr_1** *pool*           
+**atom** ⟶ *new* *typex*    
+      
+**atom** ⟶ { **expr_list** }           
+**expr_list** ⟶ **expr_1** ;          
+**expr_list** ⟶ **expr_1** ; **expr_list**          
+
+**atom** ⟶ *case* **expr_1** *of* **case_list** *esac*                      
+**case_list** ⟶ *idx* : *typex* => **expr_1** ;                        
+**case_list** ⟶ *idx* : *typex* => **expr_1** ; **case_list**          
+
+**atom** ⟶ **func_call**               
+**func_call** ⟶ **atom** @ *typex* . *idx* (**arg_list**)             
+**func_call** ⟶ **atom** @ *typex* . *idx* ()                   
+**func_call** ⟶ **atom** . *idx* (**arg_list**)        
+**func_call** ⟶ **atom** . *idx* ()
+
+**func_call** ⟶ *idx* (**arg_list**)       
+**func_call** ⟶ *idx* () 
+
+**arg_list** ⟶ **expr_list**
+**arg_list** ⟶ **expr_list** , **arg_list**
+
+## Licencia
+
+[MIT](https://github.com/NinjaProgrammers/cool-compiler-2021/blob/Proyecto-CMP/LICENSE)
+
+
+ 
+          
+
+
+
+
+
