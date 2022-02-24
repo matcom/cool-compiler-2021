@@ -289,7 +289,7 @@ def p_error(p):
         errors.append(f'({line},{column}) - SyntacticError: ERROR at or near "{p.value}"')
         
     else:
-        errors.append(f'(0, 0) - SyntacticError: ERROR at or near EOF')
+        errors.append(f'(0, 0) - SyntacticError: ERROR at or near EOF)')
 
 ############## End Grammar ############################
 
