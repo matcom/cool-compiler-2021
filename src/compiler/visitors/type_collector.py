@@ -1,5 +1,16 @@
 import compiler.visitors.visitor as visitor
-from ..cmp.semantic import SemanticError, Type, Context, ObjectType, IOType, StringType, IntType, BoolType, SelfType, AutoType
+from ..cmp.semantic import (
+    SemanticError,
+    Type,
+    Context,
+    ObjectType,
+    IOType,
+    StringType,
+    IntType,
+    BoolType,
+    SelfType,
+    AutoType,
+)
 from ..cmp.ast import ProgramNode, ClassDeclarationNode
 
 built_in_types = []
@@ -10,16 +21,16 @@ class TypeCollector(object):
         self.context = None
         self.errors = errors
         self.parent = {}
-    
-    @visitor.on('node')
+
+    @visitor.on("node")
     def visit(self, node):
         pass
-    
+
     @visitor.when(ProgramNode)
     def visit(self, node):
         self.context = Context()
         self.define_built_in_types()
-        
+
         # Adding built-in types to context
         for typex in built_in_types:
             self.context.types[typex.name] = typex
@@ -32,14 +43,14 @@ class TypeCollector(object):
 
         # Order class declarations according to their depth in the inheritance tree
         node.declarations = self.order_types(node)
-       
+
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         # flag will be True if the class is succesfully added to the context
-        flag = False 
+        flag = False
         try:
-            if node.id == 'AUTO_TYPE':
-                raise SemanticError('Name of class can\'t be autotype')
+            if node.id == "AUTO_TYPE":
+                raise SemanticError("Name of class can't be autotype")
             self.context.create_type(node.id)
             flag = True
             self.parent[node.id] = node.parent
@@ -48,14 +59,13 @@ class TypeCollector(object):
 
         # changing class id so it can be added to context
         while not flag:
-            node.id = f'1{node.id}'
+            node.id = f"1{node.id}"
             try:
                 self.context.create_type(node.id)
                 flag = True
                 self.parent[node.id] = node.parent
             except SemanticError:
                 pass
-    
 
     def define_built_in_types(self):
         objectx = ObjectType()
@@ -67,21 +77,21 @@ class TypeCollector(object):
         autotype = AutoType()
 
         # Object Methods
-        objectx.define_method('abort', [], [], objectx, [])
-        objectx.define_method('type_name', [], [], stringx, [])
-        objectx.define_method('copy', [], [], self_type, [])
+        objectx.define_method("abort", [], [], objectx, [])
+        objectx.define_method("type_name", [], [], stringx, [])
+        objectx.define_method("copy", [], [], self_type, [])
 
         # IO Methods
-        iox.define_method('out_string', ['x'], [stringx], self_type, [None])
-        iox.define_method('out_int', ['x'], [intx], self_type, [None])
-        iox.define_method('in_string', [], [], stringx, [])
-        iox.define_method('in_int', [], [], intx, [])
+        iox.define_method("out_string", ["x"], [stringx], self_type, [None])
+        iox.define_method("out_int", ["x"], [intx], self_type, [None])
+        iox.define_method("in_string", [], [], stringx, [])
+        iox.define_method("in_int", [], [], intx, [])
 
         # String Methods
-        stringx.define_method('length', [], [], intx, [])
-        stringx.define_method('concat', ['s'], [stringx], stringx, [None])
-        stringx.define_method('substr', ['i', 'l'], [intx, intx], stringx, [None])
-        
+        stringx.define_method("length", [], [], intx, [])
+        stringx.define_method("concat", ["s"], [stringx], stringx, [None])
+        stringx.define_method("substr", ["i", "l"], [intx, intx], stringx, [None])
+
         # Setting Object as parent
         iox.set_parent(objectx)
         stringx.set_parent(objectx)
@@ -89,7 +99,7 @@ class TypeCollector(object):
         boolx.set_parent(objectx)
 
         built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type, autotype])
-        
+
     def check_parents(self):
         for item in self.parent.keys():
             item_type = self.context.get_type(item)
@@ -100,16 +110,18 @@ class TypeCollector(object):
                 try:
                     typex = self.context.get_type(self.parent[item])
                     if not typex.can_be_inherited():
-                        self.errors.append(f'Class {item} can not inherit from {typex.name}')
+                        self.errors.append(
+                            f"Class {item} can not inherit from {typex.name}"
+                        )
                         typex = built_in_types[0]
                     item_type.set_parent(typex)
                 except SemanticError as ex:
                     self.errors.append(ex.text)
                     item_type.set_parent(built_in_types[0])
-    
+
     def check_cyclic_inheritance(self):
         flag = []
-        
+
         def find(item):
             for i, typex in enumerate(flag):
                 if typex.name == item.name:
@@ -125,7 +137,9 @@ class TypeCollector(object):
                 pos = find(parent)
                 if pos < len(flag):
                     if pos >= idx:
-                        self.errors.append(f'Class {item.name} can not inherit from {parent.name}')
+                        self.errors.append(
+                            f"Class {item.name} can not inherit from {parent.name}"
+                        )
                         item.parent = built_in_types[0]
                     break
                 item = parent
@@ -134,11 +148,11 @@ class TypeCollector(object):
             idx = find(item)
             if idx == len(flag):
                 check_path(idx, item)
-        
+
     def order_types(self, node):
         sorted_declarations = []
         flag = [False] * len(node.declarations)
-        
+
         change = True
         while change:
             change = False
@@ -147,11 +161,13 @@ class TypeCollector(object):
             for i, dec in enumerate(node.declarations):
                 if not flag[i]:
                     typex = self.context.get_type(dec.id)
-                    if typex.parent.name in [item.id for item in sorted_declarations] or any(typex.parent.name == bit.name for bit in built_in_types):
+                    if typex.parent.name in [
+                        item.id for item in sorted_declarations
+                    ] or any(typex.parent.name == bit.name for bit in built_in_types):
                         current.append(dec)
                         flag[i] = True
                         change = True
-            
+
             sorted_declarations.extend(current)
 
         return sorted_declarations

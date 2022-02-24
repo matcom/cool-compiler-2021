@@ -1,6 +1,7 @@
 from .pycompiler import EOF
 from .tools import ShiftReduceParser
 
+
 def evaluate_reverse_parse(right_parse, operations, tokens):
     if not right_parse or not operations or not tokens:
         return
@@ -16,17 +17,19 @@ def evaluate_reverse_parse(right_parse, operations, tokens):
             production = next(right_parse)
             head, body = production
             attributes = production.attributes
-            assert all(rule is None for rule in attributes[1:]), 'There must be only synteticed attributes.'
+            assert all(
+                rule is None for rule in attributes[1:]
+            ), "There must be only synteticed attributes."
             rule = attributes[0]
 
             if len(body):
-                synteticed = [None] + stack[-len(body):]
+                synteticed = [None] + stack[-len(body) :]
                 value = rule(None, synteticed)
-                stack[-len(body):] = [value]
+                stack[-len(body) :] = [value]
             else:
                 stack.append(rule(None, None))
         else:
-            raise Exception('Invalid action!!!')
+            raise Exception("Invalid action!!!")
 
     assert len(stack) == 1
     assert isinstance(next(tokens).token_type, EOF)
