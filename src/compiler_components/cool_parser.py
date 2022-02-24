@@ -285,11 +285,23 @@ def p_arg_list2(p):
 
 def p_error(p):
     if p:
-        errors.append("sintax error at line " + str(p.lineno) + " --> token: '" + str(p.value) + "'")
+        line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+        errors.append(f'({line},{column}) - SyntacticError: ERROR at or near "{p.value}"')
+        
     else:
-        errors.append("sintanx error at end of file")
+        errors.append(f'(0, 0) - SyntacticError: ERROR at or near EOF')
 
 ############## End Grammar ############################
+
+def calculate_position(data, pos):
+    data_array = data.split('\n')
+    count = 0
+    number_line = 0
+    for line in data_array:
+        number_line += 1
+        if count + len(line) >= pos:
+            return (number_line, pos - count + 1)
+        count += len(line) + 1
 
 
 class Parser(CompilerComponent):
