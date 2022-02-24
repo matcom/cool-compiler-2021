@@ -298,10 +298,8 @@ li $v0,8
 li $a1 , 10000
 syscall
 move $s0 , $a0
-addi $sp , $sp ,4
+addi $sp, $sp, 4
 jr $ra
-
-
 """
 
 class In_Int:
@@ -311,7 +309,7 @@ IO_in_int:
 li $v0,5
 syscall
 move $s0 , $v0
-addi $sp ,$sp ,4
+addi $sp, $sp, 4
 jr $ra
 """
 
@@ -336,7 +334,6 @@ loop:
     add $s2,$s2,4
     j loop
     
-
 Equal:
 li $s0 , 1
 adii $sp , $sp ,4
@@ -366,7 +363,7 @@ class Length:
 
     END:
         move $s0 , $t0
-        addi $sp , $sp ,4
+        addi $sp, $sp, 4
         jr $ra
 
 """
@@ -401,14 +398,14 @@ class Concat:
 
     ENDConcat:
         move $s0, $v0
+        addi $sp, $sp, 8
         jr $ra
 """
 
 class SubStr:
     def __str__(self) -> str:
-       return """ 
-       
-       Substring:
+       return """        
+Substring:
     li $t0 ,0 
     find_index:
         beq			$t0, $s1, find_length	# if $t0 == $t1 then target
@@ -427,7 +424,7 @@ class SubStr:
         j find_length
         
     END_Substring:
-        adii $sp , $sp ,12
+        addi $sp, $sp, 12
         jr $ra  
 """
 ################################# Native Func Obj ################################################
