@@ -71,6 +71,8 @@ class Method:
 
 class Node:
     def __init__(self, node) -> None:
+        self.line = 0
+        self.col = 0
         if node is not None:
             self.line: int = node.line
             self.col: int = node.col
@@ -136,15 +138,33 @@ class SetAttrOpNode(OperationNode):
         self.source_id = source_id
 
 
+class Abort(OperationNode):
+    pass
+
+
+class PrintOpNode(OperationNode):
+    def __init__(self, node, idx: str) -> None:
+        super().__init__(node)
+        self.idx = idx
+
+
 class ReturnOpNode(OperationNode):
     def __init__(self, node) -> None:
         super().__init__(node)
 
 
+class ReadOpNode(ReturnOpNode):
+    """
+    This nodes reads input from the standard input"
+    """
+
+    pass
+
+
 class GetAttrOpNode(ReturnOpNode):
-    def __init__(self, node, type_id: str, attr_id: str) -> None:
+    def __init__(self, node, instance_id: str, attr_id: str) -> None:
         super().__init__(node)
-        self.type = type_id
+        self.instance = instance_id
         self.attr = attr_id
 
 
@@ -243,10 +263,22 @@ class NegOpNode(UnaryOpNode):
     pass
 
 
-class LoadOpNod(ReturnOpNode):
+class ChainOpNode(ReturnOpNode):
     def __init__(self, node, target: str) -> None:
         super().__init__(node)
         self.target = target
+
+
+class LoadOpNode(ChainOpNode):
+    pass
+
+
+class LengthOpNode(ChainOpNode):
+    pass
+
+
+class StrOpNode(ChainOpNode):
+    pass
 
 
 class AtomOpNode(ReturnOpNode):
