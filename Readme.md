@@ -185,6 +185,6 @@ collected 168 items
 
 ```
 
-![]("img/Screenshot from 2022-02-24 04-36-02.png")
+![](img/Screenshot_from_2022-02-24_04-36-02.png)
 
-![](img/Screenshot from 2022-02-24 04-36-21.png)
+![](img/Screenshot_from_2022-02-24_04-36-21.png)
