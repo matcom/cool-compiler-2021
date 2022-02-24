@@ -1,3 +1,4 @@
+from cool_compiler.codegen.v1_mips_generate.stack import Stack
 from ...cmp import visitor
 from ..v0_type_data_code import type_data_code_ast as AST
 from . import mipsgenerate_ast as ASTR
@@ -38,9 +39,7 @@ class MipsGenerate:
     @visitor.when(AST.Function)
     def visit(self, node: AST.Function):
         new_func = ASTR.Func(node.name if not node.name == 'new_ctr_Main' else 'main')
-        self.stack = []
-        self.final_len_stack = len(node.param) + len(node.local) + 2
-        self.local_push = 0
+        self.stack = Stack(node)
         
         for param in node.param:
             new_func.cmd += self.visit(param)
@@ -59,21 +58,19 @@ class MipsGenerate:
 
     #stack_pointer = 0
     #bsp = self.base_stack_pointer
-    def stack_index(self, name):
-        return (len(self.stack) - self.stack.index(name) - 1) * 4
 
     @visitor.when(AST.Param)
     def visit(self, node: AST.Param):
-        self.stack.append(node.x)
-        return [ASTR.Header_Comment(f'Parametro {node.x} en stackpoiner + {(self.final_len_stack - len(self.stack)) * 4}')]  
+        self.stack.list.append(node.x)
+        return [ASTR.Header_Comment(f'Parametro {node.x} en stackpoiner + {self.stack.initial_index}')]  
 
     @visitor.when(AST.Local)
     def visit(self, node: AST.Local):
-        self.stack.append(node.x)
+        self.stack.list.append(node.x)
         return [
             ASTR.AddI('$sp', '$sp', -4), 
             ASTR.Comment(
-            f'Push local var {node.x} stackpointer {(self.final_len_stack - len(self.stack)) * 4}')
+            f'Push local var {node.x} stackpointer {self.stack.initial_index}')
         ]
 
     @visitor.when(AST.ALLOCATE)
@@ -81,7 +78,7 @@ class MipsGenerate:
         memory_dir = node.x
         _type = node.y
 
-        stack_plus = self.stack_index(memory_dir)
+        stack_plus = self.stack.index(memory_dir)
         attr_list = self.cil_type[_type].attributes 
         _len = len(attr_list) * 4
 
@@ -107,8 +104,8 @@ class MipsGenerate:
         _type = attr_name[0]
         attr = attr_name[1]
 
-        stack_plus_dest = self.stack_index(memory_dest)
-        stack_plus_instance = self.stack_index(memory_dir_instance)
+        stack_plus_dest = self.stack.index(memory_dest)
+        stack_plus_instance = self.stack.index(memory_dir_instance)
         attr_plus = self.cil_type[_type].attributes.index(attr) * 4 
 
         return [
@@ -133,8 +130,8 @@ class MipsGenerate:
         memory_dir_instance = node.x
         memory_dir_value = node.z
 
-        stack_plus_dir_value = self.stack_index(memory_dir_value)
-        stack_plus_instance = self.stack_index(memory_dir_instance)
+        stack_plus_dir_value = self.stack.index(memory_dir_value)
+        stack_plus_instance = self.stack.index(memory_dir_instance)
 
         return [
             ASTR.LW('$t0', f'{stack_plus_instance}($sp)'),
@@ -149,9 +146,8 @@ class MipsGenerate:
     def visit(self, node: AST.Arg):
         memory_dir = node.x
         
-        stack_plus = self.stack_index(memory_dir)
-        self.local_push += 1
-        self.stack.append(memory_dir)
+        stack_plus = self.stack.index(memory_dir)
+        self.stack.push(memory_dir)
 
         return [
             ASTR.LW('$t0', f'{stack_plus}($sp)'),
@@ -162,9 +158,8 @@ class MipsGenerate:
         ]        
 
     def call(self, func, memory_dest):
-        self.stack = self.stack[0: len(self.stack) - self.local_push]
-        self.local_push = 0
-        stack_plus = self.stack_index(memory_dest)
+        self.stack.clean()
+        stack_plus = self.stack.index(memory_dest)
 
         return [
             ASTR.JAL(func),
@@ -191,7 +186,7 @@ class MipsGenerate:
     @visitor.when(AST.Call)
     def visit(self, node: AST.Call):
         memory_dest = node.x
-        instance_stack = self.stack_index(node.y)
+        instance_stack = self.stack.index(node.y)
         _type, func_name = node.z.split('@')
 
         self.func_list += [func for func in self.cil_func.keys() 
@@ -200,7 +195,7 @@ class MipsGenerate:
         func_address = self.cil_type[_type].method_list.index(func_name) * 4 + 4
         result = [
             ASTR.LW('$t0', f'{instance_stack}($sp)'),
-            ASTR.Comment(f"Sacando la instancia de la pila (en {instance_stack - self.local_push * 4}) de una clase que hereda de {_type}"),
+            ASTR.Comment(f"Sacando la instancia de la pila (en {instance_stack - self.stack.local_push * 4}) de una clase que hereda de {_type}"),
             ASTR.LW('$t1', '0($t0)'),
             ASTR.Comment(f"Leyendo el tipo de la instancia que hereda de {_type}"),
             ASTR.LW('$t3', f'{func_address}($t1)'),
@@ -214,14 +209,14 @@ class MipsGenerate:
             return [ASTR.LI('$v0', 10), ASTR.SysCall()]
         
         memory_dest = node.x
-        stack_plus = self.stack_index(memory_dest)
+        stack_plus = self.stack.index(memory_dest)
 
         return [
             ASTR.LW('$s0', f'{stack_plus}($sp)'),
             ASTR.Comment("Envia el resultado de la funcion en $s0"),
             ASTR.LW('$ra', '0($sp)'),#f'{(len(self.stack) - 1)* 4}($sp)'),
             ASTR.Comment("Lee el $ra mas profundo de la pila para retornar a la funcion anterior"),
-            ASTR.AddI('$sp', '$sp', len(self.stack) * 4),
+            ASTR.AddI('$sp', '$sp', self.stack.close()),
             ASTR.Comment("Limpia la pila"),
             ASTR.JR('$ra')
         ]
@@ -231,7 +226,7 @@ class MipsGenerate:
         memory_dest = node.x
         data_label = node.y
                 
-        stack_plus = self.stack_index(memory_dest)
+        stack_plus = self.stack.index(memory_dest)
 
         return [
             ASTR.LA('$t0', data_label),
@@ -248,9 +243,9 @@ class MipsGenerate:
         dir_cmp1 = node.y
         dir_cmp2 = node.z
 
-        stack_plus_opr_1 = self.stack_index(dir_cmp1)
-        stack_plus_opr_2 = self.stack_index(dir_cmp2)
-        stack_plus_dest = self.stack_index(memory_dest)
+        stack_plus_opr_1 = self.stack.index(dir_cmp1)
+        stack_plus_opr_2 = self.stack.index(dir_cmp2)
+        stack_plus_dest = self.stack.index(memory_dest)
 
         return [ ASTR.LW('$t1', f'{stack_plus_opr_1}($sp)')  ,
                  ASTR.Comment(f"carga en $t1 lo que hay en {stack_plus_opr_1} "),
@@ -266,7 +261,7 @@ class MipsGenerate:
     def visit(self,node:AST.Assign):
         memory_dest = node.x
         dir_value = node.y
-        stack_plus = self.stack_index(memory_dest)
+        stack_plus = self.stack.index(memory_dest)
 
         if type(dir_value) in [type(int()), type(float())]:
             return [ 
@@ -276,7 +271,7 @@ class MipsGenerate:
                      ASTR.Comment(f"Escribe en la pila el numero que se le asigno a {memory_dest}")
                    ]
         else:
-            stack_plus_dir_value = self.stack_index(dir_value)
+            stack_plus_dir_value = self.stack.index(dir_value)
             return [ 
                      ASTR.LW ('$t0',f'{stack_plus_dir_value}($sp)'),
                      ASTR.Comment(f"Lee de la pila {dir_value} en {stack_plus_dir_value} para assignar"),
@@ -288,8 +283,8 @@ class MipsGenerate:
     def visit(self,node:AST.Neg):
         memory_dest = node.x
         memory_op1  = node.y
-        stack_plus_memory_dest = self.stack_index(memory_dest)
-        stack_plus_opr_1 = self.stack_index(memory_op1)
+        stack_plus_memory_dest = self.stack.index(memory_dest)
+        stack_plus_opr_1 = self.stack.index(memory_op1)
 
         return [
                 ASTR.LW ('$t0',f'{stack_plus_opr_1}($sp)'),
@@ -310,9 +305,9 @@ class MipsGenerate:
         memory_op1=node.y
         memory_op2=node.z
 
-        stack_plus_memory_dest = self.stack_index(memory_dest)
-        stack_plus_opr_1 = self.stack_index(memory_op1)
-        stack_plus_opr_2 = self.stack_index(memory_op2)
+        stack_plus_memory_dest = self.stack.index(memory_dest)
+        stack_plus_opr_1 = self.stack.index(memory_op1)
+        stack_plus_opr_2 = self.stack.index(memory_op2)
 
         return [ASTR.LW('$t0', f'{stack_plus_opr_1}($sp)'),
                 ASTR.Comment(f"poner en registro $t0 lo que hay en {stack_plus_opr_1}"),
@@ -330,9 +325,9 @@ class MipsGenerate:
         memory_op1=node.y
         memory_op2=node.z
 
-        stack_plus_memory_dest = self.stack_index(memory_dest)
-        stack_plus_opr_1 = self.stack_index(memory_op1)
-        stack_plus_opr_2 = self.stack_index(memory_op2)
+        stack_plus_memory_dest = self.stack.index(memory_dest)
+        stack_plus_opr_1 = self.stack.index(memory_op1)
+        stack_plus_opr_2 = self.stack.index(memory_op2)
 
         return [ASTR.LW('$t0', f'{stack_plus_opr_1}($sp)'),
                 ASTR.Comment(f"poner en registro $t0 lo que hay en {stack_plus_opr_1}"),
@@ -350,7 +345,7 @@ class MipsGenerate:
         memory_cmp = node.x
         label_memory = node.y
 
-        stack_plus_memory_cmp = self.stack_index(memory_cmp)
+        stack_plus_memory_cmp = self.stack.index(memory_cmp)
        
         return [ASTR.LI("$t0" ,1),
                 ASTR.Comment("Cargar 1 a $t0 pa comparar"),
@@ -372,8 +367,8 @@ class MipsGenerate:
         memory_instance = node.y
         type_name = node.z
 
-        stack_plus_memory_dir = self.stack_index(memory_dir)
-        stack_plus_memory_instance = self.stack_index(memory_instance)
+        stack_plus_memory_dir = self.stack.index(memory_dir)
+        stack_plus_memory_instance = self.stack.index(memory_instance)
         
         return [
                 ASTR.LW('$s2',f'{stack_plus_memory_instance}($sp)'),
