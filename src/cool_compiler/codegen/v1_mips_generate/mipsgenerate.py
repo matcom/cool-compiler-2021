@@ -173,14 +173,14 @@ class MipsGenerate:
         memory_dest = node.x
         _type = node.y
         func = self.cil_type[_type].methods[node.z]
-        self.func_list.append(func)
+        if not func in self.func_list: self.func_list.append(func)
 
         return self.call(func, memory_dest)
 
     @visitor.when(AST.New)
     def visit(self, node: AST.New):
         func = f'new_ctr_{node.y}'
-        self.func_list.append(func)
+        if not func in self.func_list: self.func_list.append(func)
         return self.call(f'new_ctr_{node.y}', node.x)
 
     @visitor.when(AST.Call)
