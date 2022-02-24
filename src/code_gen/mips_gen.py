@@ -94,4 +94,4 @@ class MIPSGenerator:
 
     @visitor.when(LoadAddress)
     def visit(self, node: LoadAddress) -> str:
-        return f"\tla {node.left}, {node.right}"
+        return f"\tla {node.left},  {node.right}"

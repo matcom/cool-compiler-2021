@@ -1,12 +1,15 @@
 from __future__ import annotations
 from typing import Dict, List, Tuple
 
+from asts.parser_ast import BinaryNode
+
 
 class Node:
     def __init__(self, node) -> None:
-        if node is not None:
-            self.line: int = node.line
-            self.col: int = node.col
+        # if node is not None:
+        #     self.line: int = node.line
+        #     self.col: int = node.col
+        pass
 
     def get_position(self) -> Tuple[int, int]:
         return (self.line, self.col)
@@ -110,6 +113,24 @@ class TernaryOpNode(InstructionNode):
         self.right = right
 
 
+class Subu(TernaryOpNode):
+    """
+    This node represents `subu` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
+class Addu(TernaryOpNode):
+    """
+    This node represents `addu` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
 class Move(BinaryOpNode):
     """
     This node represents `move` instruction in MIPS
@@ -128,6 +149,14 @@ class LoadWord(BinaryOpNode):
         super().__init__(node, left, right)
 
 
+class LoadAddress(BinaryNode):
+    """
+    This node represents `la` instruction in MIPS
+    """
+    def __init__(self, left, right):
+        super().__init__(left, right)
+
+
 class StoreWord(BinaryOpNode):
     """
     This node represents `sw` instruction in MIPS
@@ -137,7 +166,7 @@ class StoreWord(BinaryOpNode):
         super().__init__(node, left, right)
 
 
-class Jump(Node):
+class Jump(InstructionNode):
     """
     This node represents `j` instruction in MIPS
     """
@@ -147,7 +176,7 @@ class Jump(Node):
         self.address = address
 
 
-class JumpRegister(Node):
+class JumpRegister(InstructionNode):
     """
     This node represents `jr` instruction in MIPS
     """
@@ -157,7 +186,7 @@ class JumpRegister(Node):
         self.register = register
 
 
-class JumpAndLink(Node):
+class JumpAndLink(InstructionNode):
     """
     This node represents `jal` instruction in MIPS
     """
@@ -182,5 +211,3 @@ class WordDirective(AssemblerDirective):
 
     def __init__(self, node, list) -> None:
         super().__init__(node, list)
-
-
