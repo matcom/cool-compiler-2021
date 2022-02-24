@@ -48,7 +48,7 @@ class Tokenizer:
 
     tokens = ['STRING', 'LPAREN', 'RPAREN', 'LBRACE' , 'RBRACE', 'PLUS', 'MINUS',
     'TIMES', 'DIVIDE', 'SEMICOLON', 'COMMA', 'ID', 'MINOR', 'MINOR_EQUALS', "EQUALS", 
-    'LEFT_ARROW', 'RIGHT_ARROW', 'DOT', 'DOUBLE_DOT', "ARROBA", 'NUMBER', 'SELF', 'NHANHARA', 'TYPE_ID'] + list(reserved.values())
+    'LEFT_ARROW', 'RIGHT_ARROW', 'DOT', 'DOUBLE_DOT', "ARROBA", 'NUMBER', 'NHANHARA', 'TYPE_ID'] + list(reserved.values())
 
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -70,9 +70,9 @@ class Tokenizer:
     t_ARROBA = r'@'
     t_NHANHARA = r'~'
     
-    def t_SELF(self, t):
-        r'self'
-        return t
+    #def t_SELF(self, t):
+        #r'self'
+        #return t
 
     def t_NUMBER(self, t):
         r'\d+'

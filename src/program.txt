@@ -1,14 +1,10 @@
---The static type of an assignment is the static type of <expr>.
-
-class A { };
-class B inherits A { };
-class C inherits B { };
-class D inherits B { };
+(*
+But it is an error to assign to self or to bind self in a let, a
+case, or as a formal parameter. It is also illegal to have attributes named self.
+*)
 
 class Main inherits IO {
 	main(): IO { out_string("Hello World!")};
 
-	a: A;
-	b: B <- a <- new C;
-	d: D <- b <- new C;
-}; 
+	self: IO <- self;
+};

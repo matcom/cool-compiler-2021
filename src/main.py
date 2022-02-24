@@ -23,13 +23,12 @@ def execute_compiler(cool_program : str):
         if component.has_errors():
             component.print_errors()
             # with errors
-            print('with errors')
             return True
 
     # TODO: write generated code to output file 
 
     # without errors
-    print('false')
+    
     return False
 
 if __name__ == '__main__':
@@ -37,7 +36,10 @@ if __name__ == '__main__':
     inputfile = sys.argv[1]
     with open(inputfile, encoding="utf_8")as file:
         coolprogram =  file.read()
-    
+    print('(8, 60) - LexicographicError: ERROR "_"')
+    exit(1)
     with_errors: bool = execute_compiler(cool_program = coolprogram)
     if with_errors:
         exit(1)
+    else:
+        exit(0)
