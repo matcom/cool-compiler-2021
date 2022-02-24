@@ -74,7 +74,7 @@ class ShiftReduceParser:
                     SyntacticError(
                         pos[cursor][0],
                         find_column(text, pos[cursor][1]),
-                        "ERROR at or near"+ values[cursor]
+                        "ERROR at or near"+ str(values[cursor])
                     )
                 )
                 return output, operations
