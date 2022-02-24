@@ -269,20 +269,20 @@ class MipsGenerate:
         dir_value = node.y
         stack_plus = self.stack_index(memory_dest)
 
-        if(type(dir_value)==type(int()) or type(dir_value)==type(float())):
+        if type(dir_value) in [type(int()), type(float())]:
             return [ 
                      ASTR.LI('$t0' , str(dir_value)),
-                     ASTR.Comment(f"pon en $t0  {dir_value}  "),
+                     ASTR.Comment(f"Guarda el numbero que se va a asignar"),
                      ASTR.SW ('$t0',f'{stack_plus}($sp)'),
-                     ASTR.Comment(f'pon en la posicion  {stack_plus} el valor $t0  ')
+                     ASTR.Comment(f"Escribe en la pila el numero que se le asigno a {memory_dest}")
                    ]
         else:
             stack_plus_dir_value = self.stack_index(dir_value)
             return [ 
                      ASTR.LW ('$t0',f'{stack_plus_dir_value}($sp)'),
-                     ASTR.Comment(f"pon en $t0  el contenido de la pos  {stack_plus_dir_value}  "),
+                     ASTR.Comment(f"Lee de la pila {dir_value} en {stack_plus_dir_value} para assignar"),
                      ASTR.SW ('$t0',f'{stack_plus}($sp)'),
-                     ASTR.Comment(f"pon en la pos  {stack_plus}  el valor de $t0")
+                     ASTR.Comment(f"Escribe en la pila el valor que se le asigno a {memory_dest}")
                    ]           
 
     @visitor.when(AST.Neg)

@@ -110,11 +110,12 @@ class CILGenerate:
         self.new_class_scope = scope.create_child(f'new_{_type.name}')
         self.new_type_func = ASTR.Function(f'new_ctr_{_type.name}')
         
-        self.new_type_func.force_parma('self', self.new_class_scope)
+        self.new_type_func.force_local('self', self.new_class_scope)
         self.new_type_func.force_local('instance', self.new_class_scope)
         tn = self.new_type_func.local_push('type_name', self.new_class_scope)
         self.new_type_func.expr_push(ASTR.ALLOCATE('instance', _type.name))
         self.new_type_func.expr_push(ASTR.Comment(f'Reservando memoria para una instancia de tipo {_type.name}'))
+        self.new_type_func.expr_push(ASTR.Assign('self', 'instance'))
         self.new_type_func.expr_push(ASTR.Load(tn, _type.name))
         self.new_type_func.expr_push(ASTR.Comment(f'Cargando el nombre del tipo desde el data'))
         self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type', tn))
