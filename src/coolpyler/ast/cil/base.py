@@ -131,6 +131,7 @@ class GotoIfNode(InstructionNode):
         self.cond = cond
         self.label = label
 
+
 class StaticCallNode(InstructionNode):
     def __init__(self, function, dest):
         self.function = function
@@ -183,10 +184,12 @@ class ToStrNode(InstructionNode):
 
 
 class ReadNode(InstructionNode):
-    def __init__(self, dest):
+    def __init__(self, dest, is_string):
+        self.is_string = is_string
         self.dest = dest
 
 
 class PrintNode(InstructionNode):
-    def __init__(self, str_addr):
+    def __init__(self, str_addr, is_string):
+        self.is_string = is_string
         self.str_addr = str_addr
