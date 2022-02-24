@@ -45,6 +45,9 @@ class DotCodeVisitor(CILVisitor):
         self.current_function.instructions.append(inst)
         return inst
 
+    def add_comment(self, text: str):
+        self.add_inst(cil.CommentNode(text))
+
     @visitor.on('node')
     def visit(self, node: ast.Node, scope: Scope):
         pass
@@ -63,10 +66,14 @@ class DotCodeVisitor(CILVisitor):
                 for feature in class_.features:
                     if isinstance(feature, ast.FuncDeclarationNode) and feature.id == 'main':
                         self.add_function('main')
+                        # void = self.add_local('void', internal=False)
+                        # self.add_inst(cil.AllocateNode('<void>', void))
+                        void_dest = self.visit(ast.InstantiateNode('<void>'), scope)
                         void = self.add_local('void', internal=False)
-                        self.add_inst(cil.AllocateNode('<void>', void))
+                        self.add_inst(cil.AssignNode(void, void_dest))
                         main_scope = deepcopy(scope.get_tagged_scope('Main'))
                         instance = self.visit(ast.InstantiateNode('Main'), main_scope)
+                        self.add_comment('Calling main')
                         result = self.add_local('result')
                         self.add_inst(cil.ArgNode(instance))
                         self.add_inst(cil.DynamicCallNode('Main', 'Main_main', result))
@@ -81,7 +88,7 @@ class DotCodeVisitor(CILVisitor):
         # TODO: add missing instructions
         self.code += [
             cil.FunctionNode(
-                name='abort',
+                name='Object_abort',
                 params=[
                     cil.ParamNode('self'),
                 ],
@@ -104,7 +111,7 @@ class DotCodeVisitor(CILVisitor):
             #     ]
             # ),
             cil.FunctionNode(
-                name='out_string',
+                name='IO_out_string',
                 params=[
                     cil.ParamNode('self'),
                     cil.ParamNode('str_addr'),
@@ -116,7 +123,7 @@ class DotCodeVisitor(CILVisitor):
                 ]
             ),
             cil.FunctionNode(
-                name='out_int',
+                name='IO_out_int',
                 params=[
                     cil.ParamNode('self'),
                     cil.ParamNode('int_addr'),
@@ -132,8 +139,6 @@ class DotCodeVisitor(CILVisitor):
 
     @visitor.when(ast.ClassDeclarationNode)
     def visit(self, node: ast.ClassDeclarationNode, scope: Scope):
-        print('>>> class', node.id)
-
         self.current_type = node.id
         methods = (f for f in node.features if isinstance(f, ast.FuncDeclarationNode))
         for method in methods:
@@ -141,8 +146,7 @@ class DotCodeVisitor(CILVisitor):
 
     @visitor.when(ast.FuncDeclarationNode)
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
-        print('>>> method', node.id)
-        self.add_function(f'f{self.current_type}_{node.id}')
+        self.add_function(f'{self.current_type}_{node.id}')
 
         local_name = self.add_local(f'_name', internal=False)
         self.add_inst(cil.GetAttrNode(local_name, 'self', f'{self.current_type}__name'))
@@ -216,6 +220,8 @@ class DotCodeVisitor(CILVisitor):
         cond_res = then_dest
         LABEL endif
         """
+        self.add_comment('Conditional if-else')
+
         then_label = self.new_label('then')
         endif_label = self.new_label('endif')
 
@@ -246,6 +252,8 @@ class DotCodeVisitor(CILVisitor):
 
         void_res = VCALL Object get_void
         """
+        self.add_comment('While loop')
+
         cond_label = self.new_label('while_cond')
         body_label = self.new_label('while_body')
         end_while_label = self.new_label('end_while')
@@ -263,6 +271,7 @@ class DotCodeVisitor(CILVisitor):
 
     @visitor.when(ast.CallNode)
     def visit(self, node: ast.CallNode, scope: Scope):
+        self.add_comment(f'Calling function {node.id}')
         # allocate and push the object
         if node.obj is None:
             obj = ast.VariableNode('self')
@@ -286,38 +295,31 @@ class DotCodeVisitor(CILVisitor):
 
     @visitor.when(ast.InstantiateNode)
     def visit(self, node: ast.InstantiateNode, scope: Scope):
-        print('>>> instantiate node', node.lex)
+        self.add_comment(f'Instantiating type {node.lex}')
+
         instance = self.add_local('instance')
         self.add_inst(cil.AllocateNode(node.lex, instance))
         type_node = self.root.get_type(node.lex)
-        def f(a):
-            try:
-                return a.lex
-            except AttributeError:
-                return 'error'
-        print([a for a in type_node.attributes])
-        print([(x, f(y)) for (x, y) in type_node.attr_expr_nodes.items()])
-
         for attr in type_node.attributes:
             attr_expr = type_node.get_attr_node(attr)
             attr_dest = self.visit(attr_expr, scope)
             print('attr_dest =', attr_dest)
             self.add_inst(cil.SetAttrNode(instance, attr, attr_dest))
-        for method, function in type_node.methods.items():
-            self.add_inst(cil.SetAttrNode(instance, method, function))
         return instance
 
     @visitor.when(ast.StringNode)
     def visit(self, node: ast.StringNode, scope: Scope):
-        print('>>> string node', node.lex)
+        self.add_comment(
+            'Instantiating string: ' +
+            (node.lex if len(node.lex) < 20 else node.lex[:15] + '...')
+        )
+
         str_instance = self.add_local('str_instance')
         self.add_inst(cil.AllocateNode('String', str_instance))
         type_node = self.root.get_type('String')
         for attr in type_node.attributes:
             attr_dest = self.visit(node.lex, scope)
             self.add_inst(cil.SetAttrNode(str_instance, attr, attr_dest))
-        for method, function in type_node.methods.items():
-            self.add_inst(cil.SetAttrNode(str_instance, method, function))
         return str_instance
 
     @visitor.when(ast.IntegerNode)
@@ -328,8 +330,6 @@ class DotCodeVisitor(CILVisitor):
         for attr in type_node.attributes:
             attr_dest = self.visit(int(node.lex), scope)
             self.add_inst(cil.SetAttrNode(int_instance, attr, attr_dest))
-        for method, function in type_node.methods.items():
-            self.add_inst(cil.SetAttrNode(int_instance, method, function))
         return int_instance
 
     @visitor.when(ast.BooleanNode)
@@ -340,8 +340,6 @@ class DotCodeVisitor(CILVisitor):
         for attr in type_node.attributes:
             attr_dest = self.visit(node.lex == 'true', scope)
             self.add_inst(cil.SetAttrNode(bool_instance, attr, attr_dest))
-        for method, function in type_node.methods.items():
-            self.add_inst(cil.SetAttrNode(bool_instance, method, function))
         return bool_instance
 
     @visitor.when(ast.VariableNode)

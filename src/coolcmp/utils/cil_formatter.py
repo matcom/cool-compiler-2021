@@ -21,7 +21,7 @@ class CILFormatter(object):
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
         attributes = '\n    '.join(f'attribute {x}' for x in node.attributes)
-        methods = '\n    '.join(f'method {x}: {y}' for x, y in node.methods.items())
+        methods = '\n    '.join(f'method {m}' for m in node.methods)
 
         return (
             f'type {node.name} {{' +
@@ -137,3 +137,7 @@ class CILFormatter(object):
     @visitor.when(cil.CompareNode)
     def visit(self, node: cil.CompareNode):
         return f'{node.dest} = {node.left} == {node.right}'
+
+    @visitor.when(cil.CommentNode)
+    def visit(self, node: cil.CommentNode):
+        return f'\033[32m# {node.text}\033[0m'

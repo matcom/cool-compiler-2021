@@ -38,7 +38,7 @@ class TypeNode(Node):
     def __init__(self,
                  name: str,
                  attrs: list[str],
-                 methods: dict[str, str],
+                 methods: list[str],
                  attr_expr_nodes: dict[str, ast.ExpressionNode] = None):
         self.name = name
         self.attributes = attrs
@@ -86,6 +86,11 @@ class LocalNode(Node):
 
 class InstructionNode(Node):
     pass
+
+
+class CommentNode(InstructionNode):
+    def __init__(self, text: str):
+        self.text = text
 
 
 class AssignNode(InstructionNode):
