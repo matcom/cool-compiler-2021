@@ -107,7 +107,7 @@ class CoolLexer:
                 t.lexer.string += '\b'
             elif t.value == 't':
                 t.lexer.string += '\t'
-            if t.value == 'f':
+            elif t.value == 'f':
                 t.lexer.string += '\f'
             elif t.value == 'n':
                 t.lexer.string += '\n'

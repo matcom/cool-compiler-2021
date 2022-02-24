@@ -147,33 +147,33 @@ data_12: .asciiz "9"
 data_13: .asciiz "-"
 data_14: .asciiz "+"
 data_15: .asciiz "
-	tTo add a number to "
+	To add a number to "
 data_16: .asciiz "...enter a:
 "
-data_17: .asciiz "	tTo negate "
+data_17: .asciiz "	To negate "
 data_18: .asciiz "...enter b:
 "
-data_19: .asciiz "	tTo find the difference between "
+data_19: .asciiz "	To find the difference between "
 data_20: .asciiz "and another number...enter c:
 "
-data_21: .asciiz "	tTo find the factorial of "
+data_21: .asciiz "	To find the factorial of "
 data_22: .asciiz "...enter d:
 "
-data_23: .asciiz "	tTo square "
+data_23: .asciiz "	To square "
 data_24: .asciiz "...enter e:
 "
-data_25: .asciiz "	tTo cube "
+data_25: .asciiz "	To cube "
 data_26: .asciiz "...enter f:
 "
-data_27: .asciiz "	tTo find out if "
+data_27: .asciiz "	To find out if "
 data_28: .asciiz "is a multiple of 3...enter g:
 "
-data_29: .asciiz "	tTo divide "
+data_29: .asciiz "	To divide "
 data_30: .asciiz "by 8...enter h:
 "
-data_31: .asciiz "	tTo get a new number...enter j:
+data_31: .asciiz "	To get a new number...enter j:
 "
-data_32: .asciiz "	tTo quit...enter q:
+data_32: .asciiz "	To quit...enter q:
 
 "
 data_33: .asciiz "Please enter a number...  "
