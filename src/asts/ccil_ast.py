@@ -162,8 +162,11 @@ class ReadOpNode(ReturnOpNode):
 
 
 class GetAttrOpNode(ReturnOpNode):
-    def __init__(self, node, instance_id: str, attr_id: str) -> None:
+    def __init__(
+        self, node, instance_type_id: str, instance_id: str, attr_id: str
+    ) -> None:
         super().__init__(node)
+        self.instance_type_id = instance_type_id
         self.instance = instance_id
         self.attr = attr_id
 
