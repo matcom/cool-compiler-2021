@@ -19,9 +19,3 @@ A0 = Register("a0")
 FP = Register("fp")
 SP = Register("sp")
 RA = Register("ra")
-
-
-class RegisterLocation:
-    def __init__(self, name, offset):
-        self.name = name
-        self.offset = offset
