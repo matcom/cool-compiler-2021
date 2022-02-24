@@ -1,7 +1,7 @@
 .PHONY: clean
 
 main:
-	python -m cool_compiler test.cl
+	rm -rf test.mips && python -m cool_compiler test.cl
 
 clean:
 	rm -rf build/*

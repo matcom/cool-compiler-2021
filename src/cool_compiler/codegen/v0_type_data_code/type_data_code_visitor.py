@@ -13,7 +13,7 @@ CoolObject = CoolTypeBuildInManager().find(OBJECT_NAME)
 
 def parent_list(node: AST.CoolClass):
     parent_list = []
-    parent = node.type
+    parent = node
     while True:
         if parent is None: break
         parent_list.append(parent)
@@ -54,22 +54,26 @@ class CILGenerate:
     def visit(self, node: AST.Program, scope: Scope = None):
         self.program = ASTR.Program()
         scope = Scope()
+
+        _dictt = CoolTypeBuildInManager().dictt
+        for key in _dictt.keys():
+            self.create_type(_dictt[key], scope)
+            self.new_type_func.expr_push(ASTR.Return('instance'))
+            self.program.add_func(self.new_type_func)
+
         for cls in node.class_list:
             self.visit(cls, scope)
 
         return self.program
-    
-    @visitor.when(AST.CoolClass)
-    def visit(self, node: AST.CoolClass, scope: Scope):
-        self.class_scope = scope.create_child(node.type.name)
 
-        self.currentType = ASTR.Type(node.type.name)
-        self.currentClass = node.type
+    def create_type(self, _type, scope):
+        self.currentType = ASTR.Type(_type.name)
+        self.currentClass = _type
         
         self.program.add_type(self.currentType)
 
         type_list = []
-        for parent in parent_list(node):
+        for parent in parent_list(_type):
             type_list.append(self.map_type(parent.name))
             self.currentType.attr_push('type', self.currentType.name)
             for attr in parent.attributes:
@@ -77,12 +81,18 @@ class CILGenerate:
             for func in parent.methods:
                 self.currentType.method_push(func.name, f'{parent.name}_{func.name}')
         
-        self.program.force_data(f'{node.type.name}_parents', type_list + [0])
-        self.program.force_data(node.type.name, 
-            [f'{node.type.name}_parents'] + 
+        self.program.force_data(f'{_type.name}_parents', type_list + [0])
+        self.program.force_data(_type.name, 
+            [f'{_type.name}_parents'] + 
             [self.currentType.methods[key] for key in self.currentType.methods.keys()])
-
-        self.create_new_func_by_type(node, scope)
+        
+        self.create_new_func_by_type(_type, scope)
+    
+    @visitor.when(AST.CoolClass)
+    def visit(self, node: AST.CoolClass, scope: Scope):
+        self.class_scope = scope.create_child(node.type.name)
+        
+        self.create_type(node.type, scope)
         for feat in node.feature_list:
             self.visit(feat, self.class_scope)
 
@@ -96,16 +106,16 @@ class CILGenerate:
 
         self.program.add_func(self.new_type_func)
     
-    def create_new_func_by_type(self, node, scope):
-        self.new_class_scope = scope.create_child(f'new_{node.type.name}')
-        self.new_type_func = ASTR.Function(f'new_ctr_{node.type.name}')
+    def create_new_func_by_type(self, _type, scope):
+        self.new_class_scope = scope.create_child(f'new_{_type.name}')
+        self.new_type_func = ASTR.Function(f'new_ctr_{_type.name}')
         
         self.new_type_func.force_parma('self', self.new_class_scope)
         self.new_type_func.force_local('instance', self.new_class_scope)
         tn = self.new_type_func.local_push('type_name', self.new_class_scope)
-        self.new_type_func.expr_push(ASTR.ALLOCATE('instance', node.type.name))
-        self.new_type_func.expr_push(ASTR.Comment(f'Reservando memoria para una instancia de tipo {node.type.name}'))
-        self.new_type_func.expr_push(ASTR.Load(tn, node.type.name))
+        self.new_type_func.expr_push(ASTR.ALLOCATE('instance', _type.name))
+        self.new_type_func.expr_push(ASTR.Comment(f'Reservando memoria para una instancia de tipo {_type.name}'))
+        self.new_type_func.expr_push(ASTR.Load(tn, _type.name))
         self.new_type_func.expr_push(ASTR.Comment(f'Cargando el nombre del tipo desde el data'))
         self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type', tn))
         self.new_type_func.expr_push(ASTR.Comment(f'Assignando el nombre del tipo en el campo type'))
