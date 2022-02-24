@@ -298,6 +298,8 @@ li $v0,8
 li $a1 , 10000
 syscall
 move $s0 , $a0
+addi $sp , $sp ,4
+jr $ra
 
 
 """
@@ -309,6 +311,7 @@ IO_in_int:
 li $v0,5
 syscall
 move $s0 , $v0
+addi $sp ,$sp ,4
 jr $ra
 """
 
@@ -336,10 +339,12 @@ loop:
 
 Equal:
 li $s0 , 1
+adii $sp , $sp ,4
 jr $ra
 
 END:
 li $s0 , 0
+addi $sp , $sp , 4
 jr $ra
 """
 
@@ -361,6 +366,7 @@ class Length:
 
     END:
         move $s0 , $t0
+        addi $sp , $sp ,4
         jr $ra
 
 """
@@ -421,6 +427,7 @@ class SubStr:
         j find_length
         
     END_Substring:
+        adii $sp , $sp ,12
         jr $ra  
 """
 ################################# Native Func Obj ################################################
