@@ -68,7 +68,7 @@ class DotCodeVisitor(CILVisitor):
                         self.add_function('main')
                         # void = self.add_local('void', internal=False)
                         # self.add_inst(cil.AllocateNode('<void>', void))
-                        void_dest = self.visit(ast.InstantiateNode('<void>'), scope)
+                        void_dest = self.visit(ast.InstantiateNode('Void'), scope)
                         void = self.add_local('void', internal=False)
                         self.add_inst(cil.AssignNode(void, void_dest))
                         main_scope = deepcopy(scope.get_tagged_scope('Main'))
@@ -303,7 +303,6 @@ class DotCodeVisitor(CILVisitor):
         for attr in type_node.attributes:
             attr_expr = type_node.get_attr_node(attr)
             attr_dest = self.visit(attr_expr, scope)
-            print('attr_dest =', attr_dest)
             self.add_inst(cil.SetAttrNode(instance, attr, attr_dest))
         return instance
 
@@ -391,7 +390,7 @@ class DotCodeVisitor(CILVisitor):
         type_expr = self.add_local('expr_type')
         self.add_inst(cil.TypeOfNode(expr_dest, type_expr))
         comp_res = self.add_local('comp_res')
-        self.add_inst(cil.CompareNode(comp_res, type_expr, '<void>'))
+        self.add_inst(cil.CompareNode(comp_res, type_expr, 'Void'))
         return comp_res
 
     @visitor.when(ast.NegationNode)
