@@ -1,10 +1,16 @@
 from asts.mips_ast import (
+    Addu,
+    Jump,
+    JumpAndLink,
+    JumpRegister,
     Label,
     LabelDeclaration,
+    LoadAddress,
     MIPSProgram,
     MemoryIndexNode,
     Move,
     RegisterNode,
+    Subu,
     TextNode,
     DataNode,
     WordDirective,
@@ -37,7 +43,10 @@ class MIPSGenerator:
 
     @visitor.when(DataNode)
     def visit(self, node: DataNode) -> str:
-        return "\n".join(self.visit(instruction) for instruction in node.instructions)
+        data_section = ""
+        for label_decl, directive in node.data:
+            data_section += f"{self.visit(label_decl)} {self.visit(directive)}\n"
+        return data_section
 
     @visitor.when(RegisterNode)
     def visit(self, node: RegisterNode) -> str:
@@ -51,14 +60,38 @@ class MIPSGenerator:
     def visit(self, node: Label) -> str:
         return str(node.idx)
 
+    @visitor.when(JumpAndLink)
+    def visit(self, node: JumpAndLink) -> str:
+        return f"\tjal {node.address}"
+
+    @visitor.when(Jump)
+    def visit(self, node: Jump) -> str:
+        return f"\tj {node.address}"
+
+    @visitor.when(JumpRegister)
+    def visit(self, node: JumpRegister) -> str:
+        return f"\tj {node.register}"
+
     @visitor.when(MemoryIndexNode)
     def visit(self, node: MemoryIndexNode) -> str:
         return f"{self.visit(node.address)}({self.visit(node.index)})"
 
     @visitor.when(WordDirective)
     def visit(self, node: WordDirective) -> str:
-        return ".word " + " ".join(self.visit(i) for i in node.list)
+        return ".word " + (" ".join(self.visit(i) for i in node.list))
 
     @visitor.when(Move)
     def visit(self, node: Move) -> str:
         return f"\tmove {self.visit(node.left)}, {self.visit(node.right)}"
+
+    @visitor.when(Subu)
+    def visit(self, node: Subu) -> str:
+        return f"\tsubu {node.left}, {node.middle}, {node.right}"
+
+    @visitor.when(Addu)
+    def visit(self, node: Addu) -> str:
+        return f"\taddu {node.left}, {node.middle}, {node.right}"
+
+    @visitor.when(LoadAddress)
+    def visit(self, node: LoadAddress) -> str:
+        return f"\tla {node.left}, {node.right}"
