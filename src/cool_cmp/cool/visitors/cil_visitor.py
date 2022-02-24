@@ -167,6 +167,10 @@ class CILPrintVisitor():
     def visit(self, node:cil.EqualNode):
         return f'{node.dest} = EQUAL {node.left} {node.right}'
     
+    @visitor.when(cil.ObjEqualNode)
+    def visit(self, node:cil.ObjEqualNode):
+        return f'{node.dest} = OBJEQUAL {node.left} {node.right}'
+    
     @visitor.when(cil.GreaterNode)
     def visit(self, node:cil.GreaterNode):
         return f'{node.dest} = {node.left} > {node.right}'
@@ -244,6 +248,7 @@ class CILRunnerVisitor():
         typex = self.get_type(name)
         return {
             "__type": typex,
+            "__is_type": True,
         }
     
     def get_value(self, source, function_scope):
@@ -456,7 +461,7 @@ class CILRunnerVisitor():
         typex = self.get_dynamic_type(node.type, caller_fun_scope)
         
         value = self.create_type_instance(typex.name)
-        
+        value["__is_type"] = False
         for attr in typex.attributes:
             value[attr] = None
             
@@ -685,16 +690,51 @@ class CILRunnerVisitor():
             if isinstance(x, int) and isinstance(y, int):
                 return x == y
             if isinstance(x, str) and isinstance(y, str):
-                return x == y
-                # self.raise_error("Only character comparation available")
+                if len(x) == len(y) and len(x) == 0:
+                    return True
+                if len(x) == 1 and len(y) == 1:
+                    return x == y
+                self.raise_error("Only character comparation available")
                 
             if all(not isinstance(z, (int,str)) for z in [x,y]):
                 cmp1 = None
                 cmp2 = None
                 if x is not None:
-                    cmp1 = x["__type"].name
+                    if x["__is_type"]:
+                        cmp1 = x["__type"].name
+                    else:
+                        self.raise_error("Equal operation cant operate")
                 if y is not None:
-                    cmp2 = y["__type"].name
+                    if y["__is_type"]:
+                        cmp2 = y["__type"].name
+                    else:
+                        self.raise_error("Equal operation cant operate")
+                return cmp1 == cmp2
+            else:
+                self.raise_error("OPERATION must have both argument ")
+        return self.binary_node(node, caller_fun_scope, equal)
+    
+    @visitor.when(cil.ObjEqualNode)
+    def visit(self, node:cil.ObjEqualNode, args: list, caller_fun_scope: dict):
+        def equal(x,y):
+            if isinstance(x, int) and isinstance(y, int):
+                return x == y
+            if isinstance(x, str) and isinstance(y, str):
+                return x == y
+                
+            if all(not isinstance(z, (int,str)) for z in [x,y]):
+                cmp1 = None
+                cmp2 = None
+                if x is not None:
+                    if x["__is_type"]:
+                        cmp1 = x["__type"].name
+                    else:
+                        cmp1 = id(x) # Compare by ref
+                if y is not None:
+                    if y["__is_type"]:
+                        cmp2 = y["__type"].name
+                    else:
+                        cmp2 = id(y) # Compare by ref
                 return cmp1 == cmp2
             else:
                 self.raise_error("OPERATION must have both argument ")
@@ -728,6 +768,9 @@ class COOLToCILVisitor():
         self.current_type = None
         self.current_method = None
         self.current_function = None
+        self.abort_data = None
+        self.int_name_data = None
+        self.bool_name_data = None
         self.context = context
     
     @property
@@ -801,6 +844,10 @@ class COOLToCILVisitor():
 
         if len([x for x in self.dottypes if x.name == name]) == 0:
             type_name_data_node = self.register_data('"'+name+'"', row, column, comment)
+            if name == "Int": # Assign Type name node address for non reference type
+                self.int_name_data = type_name_data_node
+            elif name == "Bool":
+                self.bool_name_data = type_name_data_node
             type_node = cil.TypeNode(name, parent, type_name_data_node.name, row, column, comment)
             self.dottypes.append(type_node)
             return type_node
@@ -908,6 +955,7 @@ class COOLToCILVisitor():
                 self.register_type(type_name, typex.parent,
                                    node.row, node.column, "Program Node")
 
+        self.abort_data = self.register_data('"Abort called from class "', node.row, node.column, "Register abort message")
 
         for type_name, typex in self.context.types.items(): # Create methods
             if type_name not in ["Error", "Void"]:
@@ -1046,6 +1094,10 @@ class COOLToCILVisitor():
         
         obj_value = self.visit(node.obj,scope)
 
+        # Calling static method with no by reference type 
+        if node.obj.type.name in ["Int", "Bool"] and not node.at:
+            node.at = node.obj.type
+        
         args = []
         if node.at:
             method = node.at.get_method(node.id, len(node.args))
@@ -1208,9 +1260,12 @@ class COOLToCILVisitor():
     def visit(self, node:IsVoidNode, scope):
         result = self.define_internal_local( node.row, node.column, "Is Void Node")
         value = self.visit(node.member, scope)
-        void_value = self.define_internal_local( node.row, node.column, "Is Void Node")
-        self.register_instruction(cil.VoidNode(void_value, node.row, node.column, "Is Void Node"))
-        self.register_instruction(cil.EqualNode(result, value, void_value, node.row, node.column, "Is Void Node"))
+        if node.member.type.name in ["Int", "Bool"]:
+            self.register_instruction(cil.AssignNode(result, 0, node.row, node.col, comment="Non object always not void"))
+        else:
+            void_value = self.define_internal_local( node.row, node.column, "Is Void Node")
+            self.register_instruction(cil.VoidNode(void_value, node.row, node.column, "Is Void Node"))
+            self.register_instruction(cil.ObjEqualNode(result, value, void_value, node.row, node.column, "Is Void Node", value_compare=False))
         return result 
     
     @visitor.when(ConditionalNode)
@@ -1284,7 +1339,10 @@ class COOLToCILVisitor():
         value1 = self.visit(node.left, scope)
         value2 = self.visit(node.right, scope)
 
-        self.register_instruction(cil.EqualNode(result, value1, value2, node.row, node.column, "Equal Node"))
+        value_types = ["Int", "Bool"]
+        value_compare = node.left.type.name in value_types and node.right.type.name in value_types
+        
+        self.register_instruction(cil.ObjEqualNode(result, value1, value2, node.row, node.column, "Equal Node", value_compare=value_compare))
         
         return result
     
@@ -1481,7 +1539,21 @@ class COOLToCILVisitor():
         return result
     
     @visitor.when(cil.ObjectAbortNode)
-    def visit(self, node, scope=None):
+    def visit(self, node:cil.ObjectAbortNode, scope=None):
+        # Abort called from class {self.typex}
+        instance = self.params[0]
+        type_var = self.define_internal_local(node.row, node.column, "Dynamic type for abort dispatch")
+        type_name = self.define_internal_local(node.row, node.column, "Type name address")
+        abort_first_msg = self.define_internal_local(node.row, node.column, "First part of the abort message")
+        final_msg = self.define_internal_local(node.row, node.column, "Final abort message")
+
+        self.register_instruction(cil.TypeOfNode(instance.name, type_var, node.row, node.column, "Assign object type"))
+        self.register_instruction(cil.TypeNameNode(type_var, type_name, node.row, node.column, "Get type name"))
+        self.register_instruction(cil.LoadNode(abort_first_msg, self.abort_data.name, node.row, node.column))
+        self.register_instruction(cil.ConcatNode(final_msg, abort_first_msg, type_name, node.row, node.column, "Final abort message"))
+        
+        self.register_instruction(cil.PrintNode(final_msg, node.row, node.column, "Print abort info"))
+
         self.register_instruction(cil.AbortNode(node.row, node.column, "Object Abort Node"))
         return "0"
     
@@ -1492,6 +1564,48 @@ class COOLToCILVisitor():
         self.register_instruction(cil.TypeOfNode(instance.name, result, node.row, node.column, "Object Type Name Node"))
         self.register_instruction(cil.TypeNameNode(result, result, node.row, node.column, "Object Type Name Node"))
         return result
+    
+    @visitor.when(cil.IntAbortNode)
+    def visit(self, node:cil.IntAbortNode, scope=None):
+        type_name = self.define_internal_local(node.row, node.column, "Type name address")
+        abort_first_msg = self.define_internal_local(node.row, node.column, "First part of the abort message")
+        final_msg = self.define_internal_local(node.row, node.column, "Final abort message")
+
+        self.register_instruction(cil.LoadNode(type_name, self.int_name_data.name, node.row, node.column))
+        self.register_instruction(cil.LoadNode(abort_first_msg, self.abort_data.name, node.row, node.column))
+        self.register_instruction(cil.ConcatNode(final_msg, abort_first_msg, type_name, node.row, node.column, "Final abort message"))
+        
+        self.register_instruction(cil.PrintNode(final_msg, node.row, node.column, "Print abort info"))
+
+        self.register_instruction(cil.AbortNode(node.row, node.column, "Object Abort Node Int"))
+        return "0"
+    
+    @visitor.when(cil.IntTypeNameNode)
+    def visit(self, node:cil.IntTypeNameNode, scope=None):
+        type_name = self.define_internal_local(node.row, node.column, "Type name address")
+        self.register_instruction(cil.LoadNode(type_name, self.int_name_data.name, node.row, node.column))
+        return type_name
+    
+    @visitor.when(cil.BoolAbortNode)
+    def visit(self, node:cil.BoolAbortNode, scope=None):
+        type_name = self.define_internal_local(node.row, node.column, "Type name address")
+        abort_first_msg = self.define_internal_local(node.row, node.column, "First part of the abort message")
+        final_msg = self.define_internal_local(node.row, node.column, "Final abort message")
+
+        self.register_instruction(cil.LoadNode(type_name, self.bool_name_data.name, node.row, node.column))
+        self.register_instruction(cil.LoadNode(abort_first_msg, self.abort_data.name, node.row, node.column))
+        self.register_instruction(cil.ConcatNode(final_msg, abort_first_msg, type_name, node.row, node.column, "Final abort message"))
+        
+        self.register_instruction(cil.PrintNode(final_msg, node.row, node.column, "Print abort info"))
+
+        self.register_instruction(cil.AbortNode(node.row, node.column, "Object Abort Node Bool"))
+        return "0"
+    
+    @visitor.when(cil.BoolTypeNameNode)
+    def visit(self, node:cil.BoolTypeNameNode, scope=None):
+        type_name = self.define_internal_local(node.row, node.column, "Type name address")
+        self.register_instruction(cil.LoadNode(type_name, self.bool_name_data.name, node.row, node.column))
+        return type_name
 
     @visitor.when(cil.StringConcatNode)
     def visit(self, node, scope=None):

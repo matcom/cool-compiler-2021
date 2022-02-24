@@ -169,4 +169,4 @@ class AbortError(RunError):
         self.typex = type_name
 
     def __str__(self):
-        return f"Abort called from class {self.typex}"
+        return f""

@@ -1,6 +1,5 @@
 # Genereted MIPS
-.text
-j main 
+.text 
 __get_ra:
 move $v0, $ra
 addi $v0, $v0, 8
@@ -194,6 +193,71 @@ sw $t0, 0($v0)
 sw $v1, 4($v0)
 # Returns the concatenated string instance in v0
 jr $ra
+__string_equal:
+# Actual String address
+lw $t0, 4($a0)
+# Actual String address
+lw $t1, 4($a1)
+__string_equal_start_loop:
+# Load string1 char
+lb $t2, 0($t0)
+# Load string2 char
+lb $t3, 0($t1)
+# Equal chars?
+seq $t4, $t2, $t3
+# If not equal then
+beq $t4, $zero, __string_equal_end_loop
+# Both strings ended
+beq $t2, $zero, __string_equal_end_loop
+# Next char
+addi $t0, $t0, 1
+# Next char
+addi $t1, $t1, 1
+j __string_equal_start_loop
+__string_equal_end_loop:
+# Assign return value
+move $v0, $t4
+jr $ra
+__object_equal:
+# Compare obj by address
+seq $v0, $a0, $a1
+# Equal Address or Value obj are equal
+bne $v0, $zero, __object_equal_end
+# t0 = left object
+move $t0, $a0
+# t1 = right object
+move $t1, $a1
+# t0=left objType
+lw $t0, 0($t0)
+# t1=right objType
+lw $t1, 0($t1)
+# Loading String type address for comparison
+la $t2, String
+# t0 = left type == String
+seq $t0, $t0, $t2
+# t1 = right type == String
+seq $t1, $t1, $t2
+# Both types are equal to String
+and $t0, $t0, $t1
+# If not equal return 0
+beq $t0, $zero, __object_equal_label
+addi $sp, $sp, -12
+sw $ra, 0($sp)
+sw $a0, 4($sp)
+sw $a1, 8($sp)
+jal __string_equal
+lw $ra, 0($sp)
+lw $a0, 4($sp)
+lw $a1, 8($sp)
+addi $sp, $sp, 12
+j __object_equal_end
+# Do Obj cmp
+__object_equal_label:
+# Not equal objects
+move $v0, $zero
+# End cmp
+__object_equal_end:
+jr $ra
 # Program Node
 main:
 # Program Node
@@ -266,13 +330,17 @@ li $t0, 0
 sw $t0, 0($fp)
 # Program Node
 distance_label_0:
-# Program Node
-lw $t0, 20($fp)
-# Program Node
-lw $t1, 16($fp)
-seq $t2, $t0, $t1
-# Program Node
-sw $t2, 4($fp)
+# a0 = left String
+lw $a0, 20($fp)
+# a1 = right String
+lw $a1, 16($fp)
+addi $sp, $sp, -4
+sw $ra, 0($sp)
+jal __object_equal
+lw $ra, 0($sp)
+addi $sp, $sp, 4
+# Saving equal result
+sw $v0, 4($fp)
 # Program Node
 lw $t0, 4($fp)
 # Program Node
@@ -283,13 +351,17 @@ lw $t0, 20($fp)
 lw $t0, 0($t0)
 # Program Node
 sw $t0, 20($fp)
-# Program Node
-lw $t0, 20($fp)
-# Program Node
-lw $t1, 12($fp)
-seq $t2, $t0, $t1
-# Program Node
-sw $t2, 8($fp)
+# a0 = left String
+lw $a0, 20($fp)
+# a1 = right String
+lw $a1, 12($fp)
+addi $sp, $sp, -4
+sw $ra, 0($sp)
+jal __object_equal
+lw $ra, 0($sp)
+addi $sp, $sp, 4
+# Saving equal result
+sw $v0, 8($fp)
 # Program Node
 lw $t0, 8($fp)
 # Program Node
@@ -298,6 +370,7 @@ bne $t0, $zero, distance_label_2
 lw $t0, 0($fp)
 # Program Node
 li $t1, 1
+# Program Node
 add $t2, $t0, $t1
 # Program Node
 sw $t2, 0($fp)
@@ -751,7 +824,6 @@ sw $t0, 8($fp)
 li $a0, 12
 # Case Node array declaration
 li $v0, 9
-# Case Node array declaration
 syscall
 # Case Node array declaration
 sw $v0, 16($fp)
@@ -1020,6 +1092,24 @@ addi $sp, $sp, -4
 sw $t0, 0($sp)
 # Call Node
 lw $t0, 4($fp)
+# Conditional Node
+bne $t0, $zero, main_at_Main_label_0
+# String Node
+la $t0, data_8
+# Type address into $a0
+la $t1, String
+# If String the is type and address
+li $a0, 8
+li $v0, 9
+syscall
+# Store String Type
+sw $t1, 0($v0)
+# Store String Address
+sw $t0, 4($v0)
+# Save string instance
+sw $v0, 16($fp)
+# Call Node
+lw $t0, 108($fp)
 # Call Node
 addi $sp, $sp, -4
 # Call Node
@@ -1033,7 +1123,7 @@ sw $t0, 72($fp)
 # Call Node
 lw $t0, 72($fp)
 # Call Node
-lw $t0, 32($t0)
+lw $t0, 28($t0)
 # Call Node
 jal __get_ra
 # Call Node

@@ -3,6 +3,23 @@ from cmp.cil import *
 ################################################################################
 # META INSTRUCTIONS
 
+class IntAbortNode(InstructionNode):
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
+        
+class IntTypeNameNode(InstructionNode):
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
+
+class BoolAbortNode(InstructionNode):
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
+        
+class BoolTypeNameNode(InstructionNode):
+    def __init__(self,row,column,comment=None):
+        super().__init__(row,column,comment)
+
+
 class ObjectAbortNode(InstructionNode):
     def __init__(self,row,column,comment=None):
         super().__init__(row,column,comment)
@@ -42,6 +59,13 @@ class IOInStringNode(InstructionNode):
 class IOInIntNode(InstructionNode):
     def __init__(self,row,column,comment=None):
         super().__init__(row,column,comment)
+
+class InitInstance(InstructionNode): # TODO Add to META MIPS Section
+    def __init__(self, source, instance_type, row, column, comment=None)-> None:
+        super().__init__(row, column, comment)
+        self.source = source
+        self.instance_type = instance_type
+
 
 ################################################################################
 
@@ -87,12 +111,12 @@ class GreaterNode(ArithmeticNode):
 class LesserNode(ArithmeticNode):
     pass
 
+class ObjEqualNode(ArithmeticNode): # TODO Add to CIL Section
+    def __init__(self, dest, left, right, row=None, column=None, comment=None, value_compare=None) -> None:
+        super().__init__(dest, left, right, row, column, comment=comment)
+        if value_compare is None:
+            raise ValueError("value_compare must be initialized to True or False")
+        self.value_compare = value_compare
 
 ################################################################################
 
-
-class InitInstance(InstructionNode): # TODO Add to META MIPS Section
-    def __init__(self, source, instance_type, row, column, comment=None)-> None:
-        super().__init__(row, column, comment)
-        self.source = source
-        self.instance_type = instance_type
