@@ -122,6 +122,8 @@ class Type(DeprecatedType):
         for common in self_types:
             if common in other_types:
                 return common
+        if isinstance(self, ErrorType) or isinstance(other, ErrorType):
+            return ErrorType()
         raise TypeCoolError(NO_COMMON_TYPE, self.name, other.name)
         
     def get_attribute_index(self, attribute_name, current_type):
