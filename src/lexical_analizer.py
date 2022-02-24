@@ -19,8 +19,11 @@ def pprint_tokens(tokens):
 
 
 def tokenize_cool_text(grammar, idx, string, num, data, errors, printing=False):
-    lexer = lex.lex(module=tokens_rules)
-    lexer.errors = errors
+    # lexer starts with: lexpos = 0, lineno = 1, last_new_line = 0
+    # lexpos: Within token rule functions, this points to the first character after the matched text.
+    lexer = lex.lex(module = tokens_rules)
+    lexer.last_new_line_pos = 0
+    lexer.errors = errors 
 
     # Give the lexer some input
     lexer.input(data)
@@ -41,6 +44,7 @@ def tokenize_cool_text(grammar, idx, string, num, data, errors, printing=False):
         else:
             try:
                 tokens.append(fixed_tokens[tok.type])
+                # print(tok.type)
             except:
                 try:  # for <=, ->, <-
                     tokens.append(fixed_tokens[tok.value])

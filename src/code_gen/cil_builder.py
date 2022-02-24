@@ -1,67 +1,51 @@
 import cmp.nbpackage
 import cmp.visitor as visitor
 
-from ast_nodes import Node, ProgramNode, ExpressionNode
-from ast_nodes import ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
-from ast_nodes import VarDeclarationNode, AssignNode, CallNode
-from ast_nodes import (
-    AtomicNode,
-    BinaryNode,
-    ArithmeticOperation,
-    ComparisonOperation,
-    IfNode,
-    LetNode,
-    CaseNode,
-    CaseItemNode,
-    WhileNode,
-    BlockNode,
-    IsvoidNode,
-)
-from ast_nodes import (
-    ConstantNumNode,
-    VariableNode,
-    InstantiateNode,
+import ast_nodes as cool
+
+from cmp.cil import (
+    ProgramNode,
+    TypeNode,
+    DataNode,
+    FunctionNode,
+    ParamNode,
+    LocalNode,
+    AssignNode,
+    ArithmeticNode,
+    AllocateNode,
+    TypeOfNode,
+    LabelNode,
+    GotoIfNode,
+    GotoNode,
+    StaticCallNode,
+    DynamicCallNode,
+    ArgNode,
+    ReturnNode,
+    LoadNode,
+    LengthNode,
+    ConcatNode,
+    PrefixNode,
+    SubstringNode,
+    ToStrNode,
+    ReadNode,
+    PrintNode,
     PlusNode,
     MinusNode,
     StarNode,
     DivNode,
-    NegNode,
     NotNode,
+    IntComplementNode,
+    LessNode,
+    LessEqualNode,
     EqualNode,
-    BooleanNode,
-    StringNode,
-)
-
-from cil_nodes import (
-    StringCil,
-    TypeCil,
-    AttributeCil,
-    MethodCil,
-    ProgramCil,
-    FunctionCil,
-    ArgCil,
-    LocalCil,
-    AssignmentCil,
-    IfCil,
-    LabelCil,
-    GotoCil,
 )
 from cool_visitor import FormatVisitor
 
-from cmp.semantic import SemanticError
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import VoidType, ErrorType, IntType
 from cmp.semantic import Context
 
 from cmp.semantic import Scope
-from cmp.utils import find_least_type
-
-WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
-SELF_IS_READONLY = 'Variable "self" is read-only.'
-LOCAL_ALREADY_DEFINED = 'Variable "%s" is already defined in method "%s".'
-INCOMPATIBLE_TYPES = 'Cannot convert "%s" into "%s".'
-VARIABLE_NOT_DEFINED = 'Variable "%s" is not defined in "%s".'
-INVALID_OPERATION = 'Operation is not defined between "%s" and "%s".'
 
 
 class CILBuilder:
@@ -94,309 +78,328 @@ class CILBuilder:
         self._count += 1
         return str(self._count)
 
+    def to_function_name(self, method_name, type_name):
+        return f"function_{method_name}_at_{type_name}"
+
+    def register_instruction(self, instruction):
+        self.current_function.instructions.append(instruction)
+
+    def register_type(self, name):
+        type_node = TypeNode(name)
+        self.types.append(type_node)
+        return type_node
+
     @visitor.on("node")
     def visit(self, node=None):
         pass
 
-    @visitor.when(ProgramNode)
+    @visitor.when(cool.ProgramNode)
     def visit(self, node):
         self.context = node.context
+
+        # Add entry function and call Main.main()
+        self.current_function = FunctionNode("entry", [], [], [])
+        self.code.append(self.current_function)
+
+        instance = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(instance))
+
+        result = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(result))
+
+        main_method_name = self.to_function_name("Main", "main")
+        self.register_instruction(AllocateNode("Main", instance))
+        self.register_instruction(ArgNode(instance))
+        self.register_instruction(StaticCallNode(main_method_name, result))
+        self.register_instruction(ReturnNode(0))
+
+        self.current_function = None
 
         for declaration in node.declarations:
             self.visit(declaration)
 
+        # Reset state
+        self.types = []
+        self.code = []
+        self.data = []
         self.current_type = None
-        self.current_method = None
+        self.current_function = None
+        self.errors = []
+        self.method_count = 0
+        self.string_count = 0
+        self.temp_vars_count = 0
+        self._count = 0
+        self.context = None
 
-        return ProgramCil(self.types, self.data, self.code)
+        return ProgramNode(self.types, self.data, self.code)
 
-    @visitor.when(ClassDeclarationNode)
+    @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node):
-        self.current_type = TypeCil(node.id)
+        self.current_type = self.context.get_type(node.id)
         self.types.append(self.current_type)
+
+        type_node = self.register_type(self.current_type.name)
+
+        visited_func = []
+        current_type = self.current_type
+        while current_type is not None:
+            attributes = [attr.name for attr in current_type.attributes]
+            methods = [
+                func.name
+                for func in current_type.methods
+                if func.name not in visited_func
+            ]
+            visited_func.extend(methods)
+            type_node.attributes.extend(attributes[::-1])
+            type_node.methods.extend(
+                [
+                    (item, self.to_function_name(item, current_type.name))
+                    for item in methods[::-1]
+                ]
+            )
+            current_type = current_type.parent
+
+        type_node.attributes.reverse()
+        type_node.methods.reverse()
 
         for feature in node.features:
             self.visit(feature)
 
-    @visitor.when(AttrDeclarationNode)
-    def visit(self, node):
-        # Add attribute to current type's list of attributes (cool type of the attribute is ignored)
-        self.current_type.attributes.append(AttributeCil(node.id))
+        self.current_type = None
 
-        # Visit initial expression
-        self.visit(node.init_exp)
-
-    @visitor.when(FuncDeclarationNode)
+    @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node):
+        pass
+
+    @visitor.when(cool.FuncDeclarationNode)
+    def visit(self, node):
+        self.current_method = self.current_type.get_method(node.id)
+
+        # Generate ref
         ref = self.generate_next_method_id()
-        self.current_type.methods.append(MethodCil(node.id, ref))
+        self.current_type.methods.append((node.id, ref))
 
-        function = FunctionCil(ref)
+        # Add params
+        function = FunctionNode(ref, [], [], [])
         for pname, _ in node.params:
-            function.args.append(ArgCil(pname))
+            function.params.append(ParamNode(pname))
 
+        # Add function to .CODE
         self.current_function = function
         self.code.append(function)
 
-        self.visit(node.body)
+        # Body
+        value = self.visit(node.body)
 
-    @visitor.when(VarDeclarationNode)
+        # Handle return
+        if isinstance(self.current_method.return_type, VoidType):
+            value = None
+
+        self.register_instruction(ReturnNode(value))
+        self.current_method = None
+        self.current_function = None
+
+    @visitor.when(cool.VarDeclarationNode)
     def visit(self, node):
         # Add LOCAL variable
-        local = LocalCil(node.id)
-        self.current_function.locals.append(local)
+        local = LocalNode(node.id)
+        self.current_function.localvars.append(local)
 
         # Add Assignment Node
         if node.expr:
             expr = self.visit(node.expr)
-            self.current_function.body.append(AssignmentCil(local.id, expr))
+            self.register_instruction(AssignNode(local.id, expr))
 
-    @visitor.when(AssignNode)
+    @visitor.when(cool.AssignNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        self.current_function.body.append(AssignmentCil(node.id, expr))
+        self.register_instruction(AssignNode(node.id, expr))
 
-    @visitor.when(CallNode)
+    @visitor.when(cool.CallNode)
     def visit(self, node):
-        auto_type = self.context.get_type("AUTO_TYPE")
-        typex = None
-        if node.obj is not None:
-            typex = self.visit(node.obj)
-            if typex == auto_type:
-                return auto_type
+        pass
 
-        else:
-            typex = self.current_type
-
-        method = None
-        try:
-            if node.at_type is not None:
-                node_at_type = self.context.get_type(node.at_type)
-                method = node_at_type.get_method(node.id)
-                if not typex.conforms_to(node_at_type):
-                    self.errors.append(
-                        f"The static type to the left of @ ({typex.name}) must conform to the type specified to the right of @ ({node_at_type.name}) "
-                    )
-                    return ErrorType()
-            else:
-                method = typex.get_method(node.id)
-        except SemanticError as error:
-            self.errors.append(error.text)
-            return ErrorType()
-
-        if len(method.param_names) != len(node.args):
-            self.errors.append(
-                f"There is no definition of {method.name} that takes {len(node.args)} arguments "
-            )
-
-        for arg, ptype in zip(node.args, method.param_types):
-            arg_type = self.visit(arg)
-            if not arg_type.conforms_to(ptype):
-                self.errors.append(INCOMPATIBLE_TYPES % (arg_type.name, ptype.name))
-
-        if method.return_type == self.context.get_type("SELF_TYPE"):
-            return typex
-
-        return method.return_type
-
-    @visitor.when(IfNode)
+    @visitor.when(cool.IfNode)
     def visit(self, node):
-        # Temp variable to store value of if_expr
-        if_temp = self.generate_next_tvar_id()
-        self.current_function.locals.append(LocalCil(if_temp))
-
-        # Assign value
-        if_expr = self.visit(node.if_expr)
-        self.current_function.body.append(AssignmentCil(if_temp, if_expr))
-
-        # IF x GOTO label
+        # IF condition GOTO label
+        condition_value = self.visit(node.if_expr)
         then_label = "THEN_" + self.next_id()
-        self.current_function.body.append(IfCil(if_temp, then_label))
+        self.register_instruction(GotoIfNode(condition_value, then_label))
 
-        # Temp variable to store value of else_expr
+        # Else
         self.visit(node.else_expr)
 
         # GOTO end_label
         end_label = "END_IF_" + self.next_id()  # Example: END_IF_120
-        self.current_function.body.append(GotoCil(end_label))
+        self.register_instruction(GotoNode(end_label))
 
         # Then label
-        self.current_function.body.append(LabelCil(then_label))
+        self.register_instruction(LabelNode(then_label))
         self.visit(node.then_expr)
 
         # end_label
-        self.current_function.body.append(LabelCil(end_label))
+        self.register_instruction(LabelNode(end_label))
 
         # TODO: return something?
 
-    @visitor.when(WhileNode)
+    @visitor.when(cool.WhileNode)
     def visit(self, node):
-        condition_type = self.visit(node.condition)
-        bool_type = self.context.get_type("Bool")
+        # While label
+        while_label = "WHILE_" + self.next_id()
+        self.register_instruction(LabelNode(while_label))
 
-        if condition_type != bool_type and condition_type.name != "AUTO_TYPE":
-            self.errors.append(
-                f"Expression after 'while' must be bool, current is {condition_type.name}"
-            )
-            return ErrorType()
+        # Condition
+        c = self.visit(node.condition)  # TODO: pop from stack
 
-        return self.context.get_type("Object")
+        # If condition GOTO body_label
+        body_label = "BODY_" + self.next_id()
+        self.register_instruction(GotoIfNode(c, body_label))
 
-    @visitor.when(BlockNode)
+        # GOTO end_while label
+        end_while_label = "END_WHILE_" + self.next_id()
+        self.register_instruction(GotoNode(end_while_label))
+
+        # Body
+        self.register_instruction(LabelNode(body_label))
+        self.visit(node.body)
+
+        # GOTO while label
+        self.register_instruction(GotoNode(while_label))
+
+        # End while label
+        self.register_instruction(LabelNode(end_while_label))
+
+    @visitor.when(cool.BlockNode)
     def visit(self, node):
-        typex = None
+        value = None
         for expr in node.expression_list:
-            typex = self.visit(expr)
+            value = self.visit(expr)
 
-        return typex
+        return value
 
-    @visitor.when(LetNode)
+    @visitor.when(cool.LetNode)
     def visit(self, node):
-
-        child_scope = scope.create_child()
-
         for var_dec in node.identifiers:
-            self.visit(var_dec, child_scope)
+            self.visit(var_dec.expr)
+            self.current_function.localvars.append(LocalNode(var_dec.id))
 
-        return self.visit(node.body, child_scope)
+        self.visit(node.body)
 
-    @visitor.when(CaseNode)
+    @visitor.when(cool.CaseNode)
     def visit(self, node):
-        self.visit(node.expr)
+        pass  # TODO: Pending!!!
 
-        current_case_type = None
-        for item in node.case_items:
-            child_scope = scope.create_child()
-            case_item_type = self.visit(item, child_scope)
-            current_case_type = find_least_type(
-                current_case_type, case_item_type, self.context
-            )
-
-        return current_case_type
-
-    @visitor.when(CaseItemNode)
+    @visitor.when(cool.CaseItemNode)
     def visit(self, node):
-        try:
-            static_type = self.context.get_type(node.type)
-            scope.define_variable(node.id, static_type)
-        except SemanticError as e:
-            self.errors.append(e)
-            return ErrorType()
+        pass  # TODO: Pending!!!
 
-        typex = self.visit(node.expr)
-
-        return typex
-
-    @visitor.when(InstantiateNode)  # NewNode
+    # Arithmetic and comparison operators
+    @visitor.when(cool.PlusNode)
     def visit(self, node):
-        try:
-            typex = self.context.get_type(node.lex)
-            if typex.name == "SELF_TYPE":
-                return self.current_type
+        left = self.visit(node.left)
+        right = self.visit(node.right)
 
-            return typex
-        except SemanticError as error:
-            self.errors.append(error.text)
-            return ErrorType()
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(PlusNode(local, left, right))
 
-    @visitor.when(IsvoidNode)
+    @visitor.when(cool.MinusNode)
     def visit(self, node):
-        self.visit(node.expr)
-        return self.context.get_type("Bool")
+        left = self.visit(node.left)
+        right = self.visit(node.right)
 
-    @visitor.when(ArithmeticOperation)
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(MinusNode(local, left, right))
+
+    @visitor.when(cool.StarNode)
     def visit(self, node):
-        int_type = self.context.get_type("Int")
-        left_type = self.visit(node.left)
-        right_type = self.visit(node.right)
+        left = self.visit(node.left)
+        right = self.visit(node.right)
 
-        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
-            right_type != int_type and right_type.name != "AUTO_TYPE"
-        ):
-            self.errors.append(INVALID_OPERATION % (left_type.name, right_type.name))
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(StarNode(local, left, right))
 
-        return int_type
-
-    @visitor.when(ComparisonOperation)
+    @visitor.when(cool.DivNode)
     def visit(self, node):
-        int_type = self.context.get_type("Int")
-        left_type = self.visit(node.left)
-        right_type = self.visit(node.right)
+        left = self.visit(node.left)
+        right = self.visit(node.right)
 
-        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
-            right_type != int_type and right_type.name != "AUTO_TYPE"
-        ):
-            self.errors.append(INVALID_OPERATION % (left_type.name, right_type.name))
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(DivNode(local, left, right))
 
-        return self.context.get_type("Bool")
-
-    @visitor.when(EqualNode)
+    @visitor.when(cool.LessEqualNode)
     def visit(self, node):
-        int_type = self.context.get_type("Int")
-        string_type = self.context.get_type("String")
-        bool_type = self.context.get_type("Bool")
-        built_in_types = [int_type, string_type, bool_type]
+        left = self.visit(node.left)
+        right = self.visit(node.right)
 
-        left_type = self.visit(node.left)
-        right_type = self.visit(node.right)
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(LessEqualNode(local, left, right))
 
-        if left_type in built_in_types or right_type in built_in_types:
-            if (
-                left_type != right_type
-                and left_type.name != "AUTO_TYPE"
-                and right_type.name != "AUTO_TYPE"
-            ):
-                self.errors.append(
-                    f"One of the expressions of '=' operator is of type Int, String or Bool, the other must have the same static type. Left type: {left_type.name}.Right type: {right_type.name}"
-                )
-
-        return self.context.get_type("Bool")
-
-    @visitor.when(NotNode)
+    @visitor.when(cool.LessNode)
     def visit(self, node):
-        bool_type = self.context.get_type("Bool")
-        typex = self.visit(node.expr)
+        left = self.visit(node.left)
+        right = self.visit(node.right)
 
-        if typex != bool_type and not typex.name == "AUTO_TYPE":
-            self.errors.append(
-                f"Expression after 'not' must be Bool, current is {typex.name}"
-            )
-            return ErrorType()
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(LessNode(local, left, right))
 
-        return bool_type
-
-    @visitor.when(NegNode)
+    @visitor.when(cool.EqualNode)
     def visit(self, node):
-        int_type = self.context.get_type("Int")
-        typex = self.visit(node.expr)
+        left = self.visit(node.left)
+        right = self.visit(node.right)
 
-        if typex != int_type and not typex.name == "AUTO_TYPE":
-            self.errors.append(
-                f"Expression after '~' must be Int, current is {typex.name}"
-            )
-            return ErrorType()
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(EqualNode(local, left, right))
 
-        return int_type
-
-    @visitor.when(ConstantNumNode)
+    # Unary operators
+    @visitor.when(cool.InstantiateNode)  # NewNode
     def visit(self, node):
-        return self.context.get_type("Int")
+        new_local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(new_local))
+        self.register_instruction(AllocateNode(node.lex, new_local))
 
-    @visitor.when(VariableNode)
+    @visitor.when(cool.IsvoidNode)
     def visit(self, node):
-        var = scope.find_variable(node.lex)
-        if var is None:
-            self.errors.append(
-                VARIABLE_NOT_DEFINED % (node.lex, self.current_method.name)
-            )
-            return ErrorType()
-        return var.type
+        value = self.visit(node.expr)
+        return value
 
-    @visitor.when(StringNode)
+    @visitor.when(cool.NotNode)
     def visit(self, node):
-        idx = "str_" + self.generate_next_id()
-        self.data.append(StringCil(idx, node.lex))
+        value = self.visit(node.expr)
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(NotNode(local, value))
 
-    @visitor.when(BooleanNode)
+    @visitor.when(cool.NegNode)
     def visit(self, node):
-        return self.context.get_type("Bool")
+        value = self.visit(node.expr)
+        local = self.generate_next_tvar_id()
+        self.register_instruction(LocalNode(local))
+        self.register_instruction(IntComplementNode(local, value))
+
+    @visitor.when(cool.ConstantNumNode)
+    def visit(self, node):
+        return node.lex
+
+    @visitor.when(cool.VariableNode)
+    def visit(self, node):
+        return node.lex
+
+    @visitor.when(cool.StringNode)
+    def visit(self, node):
+        idx = self.generate_next_string_id()
+        self.data.append(DataNode(idx, node.lex))
+        return idx
+
+    @visitor.when(cool.BooleanNode)
+    def visit(self, node):
+        if node.lex == "true":
+            return 1
+        else:
+            return 0

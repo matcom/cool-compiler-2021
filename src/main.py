@@ -12,6 +12,9 @@ from errors import parsing_table_error, Error
 from cmp.evaluation import evaluate_reverse_parse
 from pathlib import Path
 from errors import InvalidInputFileError
+from cool_visitor import FormatVisitor
+from code_gen.cil_builder import CILBuilder
+from cmp.cil import PrintVisitor
 import typer
 
 
@@ -59,11 +62,22 @@ def pipeline(input_file: Path, output_file: Path = None):
     for visitor in visitors:
         ast = visitor.visit(ast)
 
+    formatter = FormatVisitor()
+    tree = formatter.visit(ast)
+    print(tree)
+
     if len(errors) > 0:
         report_and_exit(errors)
 
-    if output_file is None:
-        output_file = input.with_suffix(".mips")
+    cool_to_cil_visitor = CILBuilder(errors)
+    cil_ast = cool_to_cil_visitor.visit(ast)
+
+    formatter = PrintVisitor()
+    tree = formatter.visit(cil_ast)
+    print(tree)
+
+    # if output_file is None:
+    #     output_file = input.with_suffix(".mips")
 
 
 if __name__ == "__main__":

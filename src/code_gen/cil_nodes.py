@@ -71,3 +71,29 @@ class LabelCil(CIL_Node):
 class GotoCil(CIL_Node):
     def __init__(self, label):
         self.label = label
+
+
+class GetAttrCil(CIL_Node):
+    def __init__(self, typex, attr):
+        self.type = typex
+        self.attr = attr
+
+
+class SetAttr(CIL_Node):
+    def __init__(self, typex, attr, value):
+        self.type = typex
+        self.attr = attr
+        self.value = value
+
+
+class GetIndex(CIL_Node):
+    def __init__(self, array, index):
+        self.array = array
+        self.index = index
+
+
+class SetIndex(CIL_Node):
+    def __init__(self, array, index, value):
+        self.array = array
+        self.index = index
+        self.value = value
