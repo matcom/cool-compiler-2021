@@ -371,10 +371,10 @@ class Context:
 
         if not self.graph.__contains__(name):
             self.graph[name] = []
-        if self.graph.__contains__(parentName):
-            self.graph[parentName].append(name)
+        if self.graph.__contains__(typex.parent):
+            self.graph[typex.parent].append(name)
         else:
-            self.graph[parentName] = [name]
+            self.graph[typex.parent] = [name]
         return typex
 
     def get_type(self, name: str, pos=None):
