@@ -13,6 +13,12 @@ class BaseCOOLToCILVisitor:
         self.context = context
         self.context.set_type_tags()
         self.context.set_type_max_tags()
+
+        # print("Context")
+        # print(self.context)
+        # print("GRAPH")
+        # print(self.context.graph)
+
         self.label_count = 0
 
 
