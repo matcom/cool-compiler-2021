@@ -166,7 +166,7 @@ class GetAttrOpNode(ReturnOpNode):
         self, node, instance_type_id: str, instance_id: str, attr_id: str
     ) -> None:
         super().__init__(node)
-        self.instance_type_id = instance_type_id
+        self.instance_type = instance_type_id
         self.instance = instance_id
         self.attr = attr_id
 
