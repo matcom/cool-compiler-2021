@@ -172,15 +172,29 @@ class CilToMIPS:
 
     @visitor.when(cil.ParamNode)
     def visit(self, node: cil.ParamNode):
-        pass
+        self.memory_manager.save()
+        instructions = []
+        reg = self.memory_manager.get_unused_register()
+
+        self.params.append(node.name)
+
+        instructions.append(mips.LoadInmediateNode(reg, node.name))
+        instructions.append(
+            mips.StoreWordNode(
+                reg, mips.MemoryAddressRegisterNode(FP_REG, len(self.params) * 4)
+            )
+        )
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.LocalNode)
     def visit(self, node: cil.LocalNode):
         self.memory_manager.save()
+        instructions = []
         reg = self.memory_manager.get_unused_register()
 
         self.locals.append(node.name)
-        instructions = []
 
         instructions.append(mips.LoadInmediateNode(reg, node.name))
         instructions.append(
@@ -283,19 +297,50 @@ class CilToMIPS:
 
     @visitor.when(cil.GetAttrNode)
     def visit(self, node: cil.GetAttrNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+        reg1 = self.memory_manager.get_unused_register()
+
+        instance_dir = self.search_mem(node.instance)
+        instructions.append(mips.LoadWordNode(reg1, instance_dir * node.attr * 4))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(mips.StoreWordNode(reg1, dest_dir))
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.SetAttrNode)
     def visit(self, node: cil.SetAttrNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        reg1 = self.memory_manager.get_unused_register()
+
+        source_dir = self.search_mem(node.source)
+        instructions.append(mips.LoadWordNode(reg1, source_dir))
+
+        instance_dir = self.search_mem(node.instance)
+        instructions.append(mips.StoreWordNode(reg1, instance_dir * node.attr * 4))
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.GetIndexNode)
     def visit(self, node: cil.GetIndexNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.SetIndexNode)
     def visit(self, node: cil.SetIndexNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.AllocateNode)
     def visit(self, node: cil.AllocateNode):
@@ -341,15 +386,30 @@ class CilToMIPS:
 
     @visitor.when(cil.LabelNode)
     def visit(self, node: cil.LabelNode):
-        pass
+        return [mips.LabelInstructionNode(node.name)]
 
     @visitor.when(cil.GotoNode)
     def visit(self, node: cil.GotoNode):
-        pass
+
+        return [mips.JumpNode(node.label)]
 
     @visitor.when(cil.GotoIfNode)
     def visit(self, node: cil.GotoIfNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        cond_dir = self.search_mem(node.cond)
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+
+        instructions.append(mips.LoadInmediateNode(reg1, 0))
+        instructions.append(
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, cond_dir))
+        )
+        instructions.append(mips.BgtNode(reg1, reg2, node.label))
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.StaticCallNode)
     def visit(self, node: cil.StaticCallNode):
@@ -395,7 +455,7 @@ class CilToMIPS:
 
         local_dir = self.search_mem(node.name)
         instructions.append(
-            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, local_dir),)
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, local_dir))
         )
 
         instructions.append(
@@ -419,7 +479,7 @@ class CilToMIPS:
 
         local_dir = self.search_mem(node.dest)
         instructions.append(
-            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, local_dir),)
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, local_dir))
         )
 
         instructions.append(mips.LoadAddressNode(reg1, node.msg))
@@ -429,35 +489,98 @@ class CilToMIPS:
 
     @visitor.when(cil.LengthNode)
     def visit(self, node: cil.LengthNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.ConcatNode)
     def visit(self, node: cil.ConcatNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.PrefixNode)
     def visit(self, node: cil.PrefixNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.ToStrNode)
     def visit(self, node: cil.ToStrNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.ReadNode)
     def visit(self, node: cil.ReadNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        dest_dir = self.search_mem(node.dest)
+
+        instructions.append(mips.LoadInmediateNode(V0_REG, 8))
+        instructions.append(mips.SyscallNode())
+        instructions.append(
+            mips.StoreWordNode(
+                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, dest_dir)
+            )
+        )
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.PrintNode)
     def visit(self, node: cil.PrintNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        str_dir = self.search_mem(node.str_addr)
+
+        instructions.append(mips.LoadInmediateNode(V0_REG, 4))
+        instructions.append(
+            mips.LoadWordNode(
+                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, str_dir)
+            )
+        )
+        instructions.append(mips.SyscallNode())
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        reg1 = self.memory_manager.get_unused_register
+        source_dir = self.search_mem(node.source)
+        dest_dir = self.search_mem(node.dest)
+
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, source_dir))
+        )
+        instructions.append(
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
+
+        self.memory_manager.clean()
+        return instructions
 
     def exit_program(self):
         instructions = []

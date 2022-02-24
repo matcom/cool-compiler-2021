@@ -32,7 +32,12 @@ class MIPSGenerator:
     @visitor.when(mips.DataNode)
     def visit(self, node: mips.DataNode):
         def visit_value(value):
-            return str(value) if isinstance(value, int) or isinstance(value, str) else self.visit(value)
+            return (
+                str(value)
+                if isinstance(value, int) or isinstance(value, str)
+                else self.visit(value)
+            )
+
         data_value = ",".join(visit_value(value) for value in node.data)
         return f"{self.visit(node.label)}: {node.storage_type} {data_value}"
 
@@ -99,6 +104,10 @@ class MIPSGenerator:
     @visitor.when(mips.AddiNode)
     def visit(self, node: mips.AddiNode):
         return f"\taddi {self.visit(node.left)},  {self.visit(node.middle)}, {str(node.right)}"
+
+    @visitor.when(mips.BgtNode)
+    def visit(self, node: mips.BgtNode):
+        return f"\tbgt {self.visit(node.left)},  {self.visit(node.right)}, {str(node.label)}"
 
     @visitor.when(mips.JumpNode)
     def visit(self, node: mips.JumpNode):

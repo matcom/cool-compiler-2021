@@ -131,6 +131,10 @@ class AddiNode(TernaryOpNode):
     def __init__(self, register_dest, register_left, value):
         super().__init__(register_dest, register_left, value)
 
+class BgtNode(TernaryOpNode):
+    def __init__(self, register_left, register_right, target):
+        super().__init__(register_left, register_right, target)
+
 
 class JumpNode(MipsAstNode):
     def __init__(self, address):
