@@ -3,11 +3,27 @@ from .utils import Token
 from .tools import evaluate_parse
 from .tools import metodo_predictivo_no_recursivo
 from .tools import nfa_to_dfa
-from .tools import automata_union, automata_concatenation, automata_closure, automata_minimization
+from .tools import (
+    automata_union,
+    automata_concatenation,
+    automata_closure,
+    automata_minimization,
+)
 from .tools import get_printer
-from .tools import Node, AtomicNode, UnaryNode, BinaryNode, EpsilonNode, SymbolNode, ClosureNode, UnionNode, ConcatNode
+from .tools import (
+    Node,
+    AtomicNode,
+    UnaryNode,
+    BinaryNode,
+    EpsilonNode,
+    SymbolNode,
+    ClosureNode,
+    UnionNode,
+    ConcatNode,
+)
 from pprint import pprint as pp
 import pydot
+
 
 class Regex:
     def __init__(self, regular_exp):
@@ -25,14 +41,14 @@ class Regex:
         return self.mini.recognize(string)
 
     def __repr__(self):
-        return 'Regex: ' + self.regular_exp
+        return "Regex: " + self.regular_exp
 
 
 G = Grammar()
 
-E = G.NonTerminal('E', True)
-T, F, A, X, Y, Z = G.NonTerminals('T F A X Y Z')
-pipe, star, opar, cpar, symbol, epsilon = G.Terminals('| * ( ) symbol ε')
+E = G.NonTerminal("E", True)
+T, F, A, X, Y, Z = G.NonTerminals("T F A X Y Z")
+pipe, star, opar, cpar, symbol, epsilon = G.Terminals("| * ( ) symbol ε")
 
 # > PRODUCTIONS
 E %= T + X, lambda h, s: s[2], None, lambda h, s: s[1]
@@ -55,7 +71,6 @@ A %= opar + E + cpar, lambda h, s: s[2], None, None, None
 A %= epsilon, lambda h, s: EpsilonNode(s[1])
 
 
-
 def regex_tokenizer(text, G, skip_whitespaces=True):
     tokens = []
     jump = False
@@ -65,23 +80,23 @@ def regex_tokenizer(text, G, skip_whitespaces=True):
     for char in text:
         if skip_whitespaces and char.isspace():
             continue
-        elif(char == '\\' and not jump):
+        elif char == "\\" and not jump:
             jump = True
-        elif(char == '*' and not jump):
-            tokens.append(Token('*', star))
-        elif(char == '(' and not jump):
-            tokens.append(Token('(', opar))
-        elif(char == ')' and not jump):
-            tokens.append(Token(')', cpar))
-        elif(char == '|' and not jump):
-            tokens.append(Token('|', pipe))
-        elif(char == 'ε' and not jump):
-            tokens.append(Token('ε', epsilon))
+        elif char == "*" and not jump:
+            tokens.append(Token("*", star))
+        elif char == "(" and not jump:
+            tokens.append(Token("(", opar))
+        elif char == ")" and not jump:
+            tokens.append(Token(")", cpar))
+        elif char == "|" and not jump:
+            tokens.append(Token("|", pipe))
+        elif char == "ε" and not jump:
+            tokens.append(Token("ε", epsilon))
         else:
             tokens.append(Token(char, symbol))
             jump = False
 
-    tokens.append(Token('$', G.EOF))
+    tokens.append(Token("$", G.EOF))
     return tokens
 
 

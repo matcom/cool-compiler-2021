@@ -1,31 +1,51 @@
 import compiler.visitors.visitor as visitor
 from ..cmp.semantic import SemanticError, ErrorType, SelfType, AutoType, LCA
-from ..cmp.ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
-from ..cmp.ast import AssignNode, CallNode, CaseNode, BlockNode, LoopNode, ConditionalNode, LetNode
+from ..cmp.ast import (
+    ProgramNode,
+    ClassDeclarationNode,
+    AttrDeclarationNode,
+    FuncDeclarationNode,
+)
+from ..cmp.ast import (
+    AssignNode,
+    CallNode,
+    CaseNode,
+    BlockNode,
+    LoopNode,
+    ConditionalNode,
+    LetNode,
+)
 from ..cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
 from ..cmp.ast import VoidNode, NotNode, NegNode
-from ..cmp.ast import ConstantNumNode, ConstantStringNode, ConstantBoolNode, VariableNode, InstantiateNode
+from ..cmp.ast import (
+    ConstantNumNode,
+    ConstantStringNode,
+    ConstantBoolNode,
+    VariableNode,
+    InstantiateNode,
+)
 
 
-AUTOTYPE_ERROR = 'Incorrect use of AUTO_TYPE'
+AUTOTYPE_ERROR = "Incorrect use of AUTO_TYPE"
+
 
 class TypeInferencer:
     def __init__(self, context, manager, errors=[]):
         self.context = context
         self.errors = errors
         self.manager = manager
-        
+
         self.current_type = None
         self.current_method = None
         self.scope_children_id = 0
 
         # built-in types
-        self.obj_type = self.context.get_type('Object')
-        self.int_type = self.context.get_type('Int')
-        self.bool_type = self.context.get_type('Bool')
-        self.string_type = self.context.get_type('String')
+        self.obj_type = self.context.get_type("Object")
+        self.int_type = self.context.get_type("Int")
+        self.bool_type = self.context.get_type("Bool")
+        self.string_type = self.context.get_type("String")
 
-    @visitor.on('node')
+    @visitor.on("node")
     def visit(self, node, scope, types=None):
         pass
 
@@ -46,25 +66,25 @@ class TypeInferencer:
 
         self.manager.infer_object(self.obj_type)
         for declaration, child_scope in zip(node.declarations, scope.children):
-                self.scope_children_id = 0
-                self.visit(declaration, child_scope, types)
-            
+            self.scope_children_id = 0
+            self.visit(declaration, child_scope, types)
+
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope, types):
         self.current_type = self.context.get_type(node.id)
-            
+
         for feature, child_scope in zip(node.features, scope.children):
             self.scope_children_id = 0
             self.visit(feature, child_scope, types)
-     
+
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope, types):
         var_attr = scope.find_variable(node.id)
         attr_type = var_attr.type
         idx = var_attr.idx
-        
+
         if isinstance(attr_type, AutoType):
-            inf_type =  self.manager.infered_type[idx]
+            inf_type = self.manager.infered_type[idx]
             if inf_type is not None:
                 if isinstance(inf_type, ErrorType):
                     self.errors.append(AUTOTYPE_ERROR)
@@ -84,7 +104,7 @@ class TypeInferencer:
             _, computed_types = self.visit(node.expr, scope, conforms_to_types)
             if isinstance(attr_type, AutoType):
                 self.manager.upd_conformed_by(node.idx, computed_types)
-            
+
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope, types):
         self.current_method = self.current_type.get_method(node.id)
@@ -94,7 +114,7 @@ class TypeInferencer:
             idx = self.current_method.param_idx[i]
             name = self.current_method.param_names[i]
             if isinstance(t, AutoType):
-                inf_type =  self.manager.infered_type[idx]
+                inf_type = self.manager.infered_type[idx]
                 if inf_type is not None:
                     if isinstance(inf_type, ErrorType):
                         self.errors.append(AUTOTYPE_ERROR)
@@ -108,30 +128,40 @@ class TypeInferencer:
         rtype = self.current_method.return_type
         idx = self.current_method.ridx
         if isinstance(rtype, AutoType):
-            inf_type =  self.manager.infered_type[idx]
+            inf_type = self.manager.infered_type[idx]
             if inf_type is not None:
                 if isinstance(inf_type, ErrorType):
                     self.errors.append(AUTOTYPE_ERROR)
                 else:
                     node.type = inf_type.name
-                    self.current_type.update_method_rtype(self.current_method.name, inf_type)
+                    self.current_type.update_method_rtype(
+                        self.current_method.name, inf_type
+                    )
                 rtype = inf_type
 
         # checking overwriting
         try:
-            method = self.current_type.parent.get_method(node.id)    
-        
-            for i, t in enumerate(method_params):
-                if not isinstance(method.param_types[i], AutoType) and isinstance(t, AutoType):
-                    self.manager.auto_to_type(self.current_method.param_idx[i], method.param_types[i])
-                    self.manager.type_to_auto(self.current_method.param_idx[i], method.param_types[i])
+            method = self.current_type.parent.get_method(node.id)
 
-            if isinstance(rtype, AutoType) and not isinstance(method.return_type, AutoType):
+            for i, t in enumerate(method_params):
+                if not isinstance(method.param_types[i], AutoType) and isinstance(
+                    t, AutoType
+                ):
+                    self.manager.auto_to_type(
+                        self.current_method.param_idx[i], method.param_types[i]
+                    )
+                    self.manager.type_to_auto(
+                        self.current_method.param_idx[i], method.param_types[i]
+                    )
+
+            if isinstance(rtype, AutoType) and not isinstance(
+                method.return_type, AutoType
+            ):
                 self.manager.auto_to_type(idx, method.return_type)
                 self.manager.type_to_auto(idx, method.return_type)
         except SemanticError:
             pass
-        
+
         # checking return type in computed types of the expression
         conforms_to_types = []
         if isinstance(rtype, AutoType):
@@ -141,17 +171,17 @@ class TypeInferencer:
         _, computed_types = self.visit(node.body, scope, conforms_to_types)
         if isinstance(rtype, AutoType):
             self.manager.upd_conformed_by(self.current_method.ridx, computed_types)
-              
+
     @visitor.when(AssignNode)
     def visit(self, node, scope, types):
         var = scope.find_variable(node.id)
         # obtaining defined variable
         if isinstance(var.type, AutoType):
-            inf_type =  self.manager.infered_type[var.idx]
-            if inf_type is not None:    
+            inf_type = self.manager.infered_type[var.idx]
+            if inf_type is not None:
                 scope.update_variable(var.name, inf_type)
                 var.type = inf_type
-        
+
         conforms_to_types = []
         if isinstance(var.type, AutoType):
             conforms_to_types.extend(self.manager.conforms_to[var.idx])
@@ -161,14 +191,16 @@ class TypeInferencer:
 
         scope_index = self.scope_children_id
         self.scope_children_id = 0
-        
-        typex, computed_types = self.visit(node.expr, scope.children[scope_index], conforms_to_types)
+
+        typex, computed_types = self.visit(
+            node.expr, scope.children[scope_index], conforms_to_types
+        )
         if isinstance(var.type, AutoType):
             self.manager.upd_conformed_by(var.idx, computed_types)
 
         self.scope_children_id = scope_index + 1
         return typex, computed_types
-        
+
     @visitor.when(CallNode)
     def visit(self, node, scope, types):
         # Check cast type
@@ -182,7 +214,7 @@ class TypeInferencer:
                     cast_type = self.current_type
             except SemanticError:
                 pass
- 
+
         # Check object
         conforms_to_types = [] if cast_type is None else [cast_type]
         obj_type, computed_types = self.visit(node.obj, scope, conforms_to_types)
@@ -195,7 +227,7 @@ class TypeInferencer:
         # if the obj that is calling the function is autotype, let it pass
         if isinstance(cast_type, AutoType):
             return cast_type, []
-        
+
         # Check this function is defined for cast_type
         try:
             method = cast_type.get_method(node.id)
@@ -204,25 +236,27 @@ class TypeInferencer:
             for i, arg in enumerate(node.args):
                 arg_type = method.param_types[i]
                 if isinstance(arg_type, AutoType):
-                    inf_type =  self.manager.infered_type[method.param_idx[i]]
+                    inf_type = self.manager.infered_type[method.param_idx[i]]
                     if inf_type is not None:
                         arg_type = inf_type
 
                 conforms_to_types = []
                 if isinstance(arg_type, AutoType):
-                    conforms_to_types.extend(self.manager.conforms_to[method.param_idx[i]])
+                    conforms_to_types.extend(
+                        self.manager.conforms_to[method.param_idx[i]]
+                    )
                 else:
                     conforms_to_types.append(arg_type)
                 _, computed_types = self.visit(arg, scope, conforms_to_types)
                 if isinstance(arg_type, AutoType):
                     self.manager.upd_conformed_by(method.param_idx[i], computed_types)
-            
+
             # check return_type
             computed_types = []
             rtype = method.return_type
             if isinstance(rtype, SelfType):
                 rtype = obj_type
-            
+
             if isinstance(rtype, AutoType):
                 self.manager.upd_conforms_to(method.ridx, types)
                 computed_types.extend(self.manager.conformed_by[method.ridx])
@@ -233,7 +267,7 @@ class TypeInferencer:
 
         except SemanticError:
             return ErrorType(), []
-        
+
     @visitor.when(CaseNode)
     def visit(self, node, scope, types):
         # check expression
@@ -244,12 +278,14 @@ class TypeInferencer:
 
         # check branches
         expr_types = []
-        for i, (branch, child_scope) in enumerate(zip(node.branch_list, nscope.children)):
-            branch_name, branch_type, expr =  branch
+        for i, (branch, child_scope) in enumerate(
+            zip(node.branch_list, nscope.children)
+        ):
+            branch_name, branch_type, expr = branch
             var = child_scope.find_variable(branch_name)
             branch_type = var.type
             if isinstance(branch_type, AutoType):
-                inf_type =  self.manager.infered_type[node.branch_idx[i]]
+                inf_type = self.manager.infered_type[node.branch_idx[i]]
                 if inf_type is not None:
                     if isinstance(inf_type, ErrorType):
                         self.errors.append(AUTOTYPE_ERROR)
@@ -264,7 +300,7 @@ class TypeInferencer:
 
         self.scope_children_id = scope_index + 1
         return LCA(expr_types), expr_types
-    
+
     @visitor.when(BlockNode)
     def visit(self, node, scope, types):
         scope_index = self.scope_children_id
@@ -302,7 +338,7 @@ class TypeInferencer:
     def visit(self, node, scope, types):
         # check condition conforms to bool
         self.visit(node.condition, scope, [self.bool_type])
-        
+
         branch_types = []
 
         scope_index = self.scope_children_id
@@ -329,11 +365,11 @@ class TypeInferencer:
             new_scope = nscope.children[temp_scope_index]
             self.scope_children_id = 0
 
-            var_name, _, expr = item               
+            var_name, _, expr = item
             var = new_scope.find_variable(var_name)
 
             if isinstance(var.type, AutoType):
-                inf_type =  self.manager.infered_type[node.idx_list[i]]
+                inf_type = self.manager.infered_type[node.idx_list[i]]
                 if inf_type is not None:
                     if isinstance(inf_type, ErrorType):
                         self.errors.append(AUTOTYPE_ERROR)
@@ -341,13 +377,13 @@ class TypeInferencer:
                         node.id_list[i] = (var_name, inf_type.name, expr)
                     new_scope.update_variable(var_name, inf_type)
                     var.type = inf_type
-            
+
             conforms_to_types = []
             if isinstance(var.type, AutoType):
                 conforms_to_types.extend(self.manager.conforms_to[node.idx_list[i]])
             else:
                 conforms_to_types.append(var.type)
-            
+
             if expr is not None:
                 _, computed_types = self.visit(expr, new_scope, conforms_to_types)
                 if isinstance(var.type, AutoType):
@@ -375,6 +411,7 @@ class TypeInferencer:
         right, _ = self.visit(node.right, scope, [])
 
         fixed_types = [self.int_type, self.bool_type, self.string_type]
+
         def check_equal(typex):
             if not isinstance(typex, AutoType) and not isinstance(typex, ErrorType):
                 for t in fixed_types:
@@ -386,7 +423,7 @@ class TypeInferencer:
             self.visit(node.right, scope, [left])
         elif check_equal(right):
             self.visit(node.left, scope, [right])
-        
+
         return self.bool_type, [self.bool_type]
 
     @visitor.when(VoidNode)
@@ -420,11 +457,11 @@ class TypeInferencer:
     def visit(self, node, scope, types):
         var = scope.find_variable(node.lex)
         if isinstance(var.type, AutoType):
-            inf_type =  self.manager.infered_type[var.idx]
-            if inf_type is not None:  
+            inf_type = self.manager.infered_type[var.idx]
+            if inf_type is not None:
                 scope.update_variable(var.name, inf_type)
                 var.type = inf_type
-        
+
         conformed_by = []
         if isinstance(var.type, AutoType):
             self.manager.upd_conforms_to(var.idx, types)
@@ -433,7 +470,7 @@ class TypeInferencer:
             conformed_by.append(var.type)
 
         return var.type, conformed_by
- 
+
     @visitor.when(InstantiateNode)
     def visit(self, node, scope, types):
         try:
@@ -442,10 +479,9 @@ class TypeInferencer:
                 typex = SelfType(self.current_type)
         except SemanticError:
             typex = ErrorType()
-        
+
         return typex, [typex]
 
-  
     def check_expr(self, node, scope):
         self.visit(node.left, scope, [self.int_type])
         self.visit(node.right, scope, [self.int_type])
