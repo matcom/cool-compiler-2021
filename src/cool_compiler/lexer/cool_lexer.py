@@ -1,5 +1,4 @@
 from sly import Lexer
-from sly.lex import LexError
 from .comment_lexer import CoolComment
 from .string_lexer import CoolString
 import re
