@@ -77,6 +77,14 @@ class MIPSGenerator:
     def visit(self, node: mips.LoadWordNode):
         return f"\tlw {self.visit(node.left)}, {self.visit(node.right)}"
 
+    @visitor.when(mips.StoreByteNode)
+    def visit(self, node: mips.StoreByteNode):
+        return f"\tlb {self.visit(node.left)}, {self.visit(node.right)}"
+
+    @visitor.when(mips.LoadByteNode)
+    def visit(self, node: mips.LoadByteNode):
+        return f"\tlb {self.visit(node.left)}, {self.visit(node.right)}"
+
     @visitor.when(mips.LoadInmediateNode)
     def visit(self, node: mips.LoadInmediateNode):
         return f"\tli {self.visit(node.left)}, {str(node.right)}"
@@ -108,6 +116,10 @@ class MIPSGenerator:
     @visitor.when(mips.BgtNode)
     def visit(self, node: mips.BgtNode):
         return f"\tbgt {self.visit(node.left)},  {self.visit(node.right)}, {str(node.label)}"
+
+    @visitor.when(mips.BeqzNode)
+    def visit(self, node: mips.BeqzNode):
+        return f"\tbeqz {self.visit(node.left)}, {self.visit(node.right)}"
 
     @visitor.when(mips.JumpNode)
     def visit(self, node: mips.JumpNode):

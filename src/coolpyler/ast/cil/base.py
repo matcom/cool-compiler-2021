@@ -151,7 +151,7 @@ class ArgNode(InstructionNode):
 
 
 class ReturnNode(InstructionNode):
-    def __init__(self, value=None):
+    def __init__(self, value):
         self.value = value
 
 
@@ -168,10 +168,11 @@ class LengthNode(InstructionNode):
 
 
 class ConcatNode(InstructionNode):
-    def __init__(self, dest, string1, string2):
+    def __init__(self, dest, string1, string2, dest_lenght):
         self.dest = dest
         self.string1 = string1
         self.string2 = string2
+        self.dest_lenght = self.dest_lenght
 
 
 class PrefixNode(InstructionNode):

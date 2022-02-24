@@ -48,7 +48,19 @@ class CilToMIPS:
         self.memory_manager = MemoryManager()
         self.pushed_args = 0
         self.locals = []
+        self.locals_save = []
         self.params = []
+        self.fp_save = None
+        self.loop_count = 0
+        self.exit_count = 0
+
+    def get_loop_count(self):
+        self.loop_count += 1
+        return self.loop_count
+
+    def get_exit_count(self):
+        self.exit_count += 1
+        return self.exit_count
 
     def search_mem(self, id: str):
         try:
@@ -117,17 +129,15 @@ class CilToMIPS:
     def visit(self, node: cil.FunctionNode):
         instructions = []
 
-        locals_save = self.locals
+        self.locals_save = self.locals
         self.locals = []
 
         instructions.append(mips.LabelInstructionNode(node.name))
 
         self.memory_manager.save()
-        old_fp = self.memory_manager.get_unused_register()
-        instructions.append(mips.MoveNode(old_fp, FP_REG))
+        self.fp_save = self.memory_manager.get_unused_register()
+        instructions.append(mips.MoveNode(self.fp_save, FP_REG))
         instructions.append(mips.MoveNode(FP_REG, SP_REG))
-
-        self.memory_manager.clean()
 
         for i in range(len(node.params)):
             param = node.params[i]
@@ -142,8 +152,6 @@ class CilToMIPS:
 
             self.memory_manager.clean()
 
-        locals_size = len(node.localvars) * 4
-
         for local in node.localvars:
             instructions.extend(self.visit(local))
 
@@ -152,16 +160,7 @@ class CilToMIPS:
         for instruction in node.instructions:
             instructions.extend(self.visit(instruction))
 
-        instructions.append(mips.AddiNode(SP_REG, SP_REG, locals_size))
-
-        instructions.append(mips.MoveNode(FP_REG, old_fp))
-        self.locals = locals_save
-
-        if node.name == "main":
-            instructions.extend(self.exit_program())
-        else:
-            instructions.append(mips.JumpRegisterNode(RA_REG))
-
+        self.memory_manager.clean()
         return instructions
 
     @visitor.when(cil.DataNode)
@@ -354,6 +353,14 @@ class CilToMIPS:
         instructions.append(mips.LoadInmediateNode(ARG_REGISTERS[0], reserved_bytes))
         instructions.append(mips.SyscallNode())
 
+        reg1 = self.memory_manager.get_unused_register()
+        instructions.append(mips.LoadInmediateNode(reg1, node.type))
+        instructions.append(
+            mips.StoreWordNode(
+                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS_NAMES[0], 0)
+            )
+        )
+
         dest_dir = self.search_mem(node.dest)
         instructions.append(
             mips.StoreWordNode(
@@ -441,6 +448,14 @@ class CilToMIPS:
 
         instructions.append(mips.JumpRegisterLinkNode(reg2))
 
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(SP_REG, 0))
+        )
+        instructions.append(
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
+
         instructions.append(mips.AddiNode(SP_REG, SP_REG, self.pushed_args * 4))
         self.clean_pushed_args()
 
@@ -469,7 +484,33 @@ class CilToMIPS:
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
-        return []
+        instructions = []
+        self.memory_manager.save()
+
+        reg1 = self.memory_manager.get_unused_register()
+
+        value_dir = self.search_mem(node.value)
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, value_dir))
+        )
+
+        locals_size = len(node.localvars) * 4
+        instructions.append(mips.AddiNode(SP_REG, SP_REG, locals_size))
+
+        instructions.append(
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(SP_REG, 0))
+        )
+
+        instructions.append(mips.MoveNode(FP_REG, self.fp_save))
+        self.locals = self.locals_save
+
+        if node.name == "main":
+            instructions.extend(self.exit_program())
+        else:
+            instructions.append(mips.JumpRegisterNode(RA_REG))
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
@@ -492,6 +533,36 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
 
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+
+        loop = f"loop{self.get_loop_count}"
+        exit = f"exit{self.get_exit_count}"
+
+        string_dir = self.search_mem(node.string)
+        instructions.append(
+            mips.LoadAddressNode(
+                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, string_dir)
+            )
+        )
+
+        instructions.append(mips.LoadInmediateNode(reg1, 0))
+
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(loop)))
+        instructions.append(
+            mips.LoadByteNode(reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0))
+        )
+        instructions.append(mips.BeqzNode(reg2, mips.LabelNode(exit)))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(reg1, reg1, 1))
+        instructions.append(mips.JumpNode(mips.LabelNode(loop)))
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(exit)))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
+
         self.memory_manager.clean()
         return instructions
 
@@ -499,6 +570,29 @@ class CilToMIPS:
     def visit(self, node: cil.ConcatNode):
         instructions = []
         self.memory_manager.save()
+
+        string1_dir = self.search_mem(node.string)
+        instructions.append(
+            mips.LoadAddressNode(
+                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, string1_dir)
+            )
+        )
+        string2_dir = self.search_mem(node.string)
+        instructions.append(
+            mips.LoadAddressNode(
+                ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string2_dir)
+            )
+        )
+
+        reg1 = self.memory_manager.get_unused_register()
+
+        loop = f"loop{self.get_loop_count}"
+        exit = f"exit{self.get_exit_count}"
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
 
         self.memory_manager.clean()
         return instructions

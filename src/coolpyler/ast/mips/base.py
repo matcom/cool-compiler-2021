@@ -70,11 +70,16 @@ class BinaryOpNode(InstructionNode):
 
 
 class LoadAddressNode(BinaryOpNode):
-    def __init__(self, register, label):
-        super().__init__(register, label)
+    def __init__(self, register, address):
+        super().__init__(register, address)
 
 
 class LoadWordNode(BinaryOpNode):
+    def __init__(self, register, ram_dir):
+        super().__init__(register, ram_dir)
+
+
+class LoadByteNode(BinaryOpNode):
     def __init__(self, register, ram_dir):
         super().__init__(register, ram_dir)
 
@@ -108,6 +113,10 @@ class StoreWordNode(BinaryOpNode):
     def __init__(self, register, address):
         super().__init__(register, address)
 
+class StoreByteNode(BinaryOpNode):
+    def __init__(self, register, address):
+        super().__init__(register, address)
+
 
 class TernaryOpNode(InstructionNode):
     def __init__(self, left, middle, right):
@@ -131,9 +140,15 @@ class AddiNode(TernaryOpNode):
     def __init__(self, register_dest, register_left, value):
         super().__init__(register_dest, register_left, value)
 
+
 class BgtNode(TernaryOpNode):
     def __init__(self, register_left, register_right, target):
         super().__init__(register_left, register_right, target)
+
+
+class BeqzNode(BinaryOpNode):
+    def __init__(self, register, target):
+        super().__init__(register, target)
 
 
 class JumpNode(MipsAstNode):
