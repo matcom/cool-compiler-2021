@@ -1,4 +1,4 @@
-from utils.mip_utils import registers, operations, datatype
+from utils.mip_utils import registers as r, operations as o, datatype as dt
 import visitors.visitor as visitor
 from cil_ast.cil_ast import *
 
@@ -10,13 +10,17 @@ class CiltoMipsVisitor:
         self.context = context
         self.code = []
         self.data = []
+        self.current_function: FunctionNode = None
+
+    def stack_offset(self, name):
+        all_ = self.current_function.params + self.current_function.localvars
+        return -4*all_.index(name)
+    
     def write_data(self, instruction):
         self.data.append(instruction)
 
     def write_code(self, instruction):
         self.code.append(instruction)
-        
-        
 
     @visitor.on('node')
     def visit(self, node):
@@ -29,9 +33,9 @@ class CiltoMipsVisitor:
         self.dotcode = node.dotcode
 
         self.write_data('.data')  # initialize the .data segment
-        self.write_data(f'p_error: {datatype.asciiz} "Aborting from String"')
-        self.write_data(f'zero_error: {datatype.asciiz} "Division by zero"')
-        self.write_data(f'range_error: {datatype.asciiz} "Index out of range"')
+        self.write_data(f'p_error: {dt.asciiz} "Aborting from String"')
+        self.write_data(f'zero_error: {dt.asciiz} "Division by zero"')
+        self.write_data(f'range_error: {dt.asciiz} "Index out of range"')
 
     @visitor.when(TypeNode)
     def visit(self, node):
@@ -73,19 +77,68 @@ class CiltoMipsVisitor:
 
     @visitor.when(PlusNode)
     def visit(self, node):
-        pass
+        left_pos = self.stack_offset(node.left)
+        right_pos = self.stack_offset(node.right)
+        dest_pos = self.stack_offset(node.dest)
+        self.write_code('# Plus')
+        self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
+        self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
+        self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        self.write_code('{} {}, {}, {} # saving to $t1 the result'.format(o.add, r.t1, r.t1, r.t2))
+        self.write_code('{} {}, {}({}) # heap address of dest'.format(o.lw, r.t0, dest_pos, r.fp))
+        self.write_code('{} {}, 8({}) # store result'.format(o.sw, r.t1, r.t0))
         
     @visitor.when(MinusNode)
     def visit(self, node):
-        pass
+        left_pos = self.stack_offset(node.left)
+        right_pos = self.stack_offset(node.right)
+        dest_pos = self.stack_offset(node.dest)
+        self.write_code('# Plus')
+        self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
+        self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
+        self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        self.write_code('{} {}, {}, {} # saving to $t1 the result'.format(o.sub, r.t1, r.t1, r.t2))
+        self.write_code('{} {}, {}({}) # heap address of dest'.format(o.lw, r.t0, dest_pos, r.fp))
+        self.write_code('{} {}, 8({}) # store result'.format(o.sw, r.t1, r.t0))
 
     @visitor.when(StarNode)
     def visit(self, node):
-        pass
+        left_pos = self.stack_offset(node.left)
+        right_pos = self.stack_offset(node.right)
+        dest_pos = self.stack_offset(node.dest)
+        self.write_code('# Plus')
+        self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
+        self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
+        self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        self.write_code('{} {}, {} # multiply'.format(o.mul, r.t1, r.t2))
+        self.write_code('{} {} # get the result in lo'.format(o.mflo, r.t1, r.t2))
+        self.write_code('{} {}, {}({}) # heap address of dest'.format(o.lw, r.t0, dest_pos, r.fp))
+        self.write_code('{} {}, 8({}) # store result'.format(o.sw, r.t1, r.t0))
 
     @visitor.when(DivNode)
     def visit(self, node):
-        pass
+        left_pos = self.stack_offset(node.left)
+        right_pos = self.stack_offset(node.right)
+        dest_pos = self.stack_offset(node.dest)
+        self.write_code('# Plus')
+        self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
+        self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
+        self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        # zero exception
+        # self.write_code("la $t0, zero_error")
+        # self.write_code("sw $t0, ($sp)")
+        # self.write_code("subu $sp, $sp, 4")
+        self.write_code("beqz $t2, .raise")
+        # self.write_code("addu $sp, $sp, 4")
+        #
+        self.write_code('{} {}, {} # divide'.format(o.div, r.t1, r.t2))
+        self.write_code('{} {} # get the result in lo'.format(o.mflo, r.t1, r.t2))
+        self.write_code('{} {}, {}({}) # heap address of dest'.format(o.lw, r.t0, dest_pos, r.fp))
+        self.write_code('{} {}, 8({}) # store result'.format(o.sw, r.t1, r.t0))
 
     @visitor.when(EqualNode)
     def visit(self, node):
@@ -101,12 +154,17 @@ class CiltoMipsVisitor:
 
     @visitor.when(GotoNode)
     def visit(self, node):
-        pass
+        self.write_code('# goto ')
+        self.write_code('{} {} # jump unconditionally'.format(o.j, node.label))
 
     @visitor.when(GotoIfNode)
     def visit(self, node):
-        pass
-
+        pos = self.stack_offset(node.condition)
+        self.write_code('# goto if')
+        self.write_code( '{} {} {}({}) # heap address'.format(o.lw, r.t0, pos, r.fp))
+        self.write_code('{} {} 8({}) # value of condition'.format(o.lw, r.t1, r.t0))
+        self.write_code('{} {} {} # branch on not equal to 0'.format(o.bnez, r.t1, node.label))
+        
     @visitor.when(GetAttribNode)
     def visit(self, node):
         pass
@@ -125,7 +183,8 @@ class CiltoMipsVisitor:
 
     @visitor.when(LabelNode)
     def visit(self, node):
-        pass
+        self.write_code("# a label")
+        self.write_code("{}:".format(node.name))
 
     @visitor.when(IsTypeNode)
     def visit(self, node):
@@ -181,23 +240,23 @@ class CiltoMipsVisitor:
         self.write_code(f"# Declartation of the mem_alloc")
 
         self.write_code(f"mem_alloc:")
-        self.write_code(f"{operations.add} {registers.gp} {registers.gp} {registers.a0}")
-        self.write_code(f"{operations.blt} {registers.gp} {registers.s7} mem_alloc_end")# si se pasa del límite de memoria dar error
-        self.write_code(f"{operations.j} mem_error")
+        self.write_code(f"{o.add} {r.gp} {r.gp} {r.a0}")
+        self.write_code(f"{o.blt} {r.gp} {r.s7} mem_alloc_end")# si se pasa del límite de memoria dar error
+        self.write_code(f"{o.j} mem_error")
         self.write_code(f"mem_alloc_end:")
-        self.write_code(f"{operations.sub} {registers.a0} {registers.gp} {registers.a0}")    
-        self.write_code(f"{operations.jr} {registers.ra}")
+        self.write_code(f"{o.sub} {r.a0} {r.gp} {r.a0}")    
+        self.write_code(f"{o.jr} {r.ra}")
         self.write_code(f"")
 
 # en a0 tengo el la instancia
     def get_parent_prot(self):
         self.write_code(f"# get parent prototype") #
         self.write_code(f"get_parent_prot:")
-        self.write_code(f"{operations.lw} {registers.t0} ({registers.a0})")
-        self.write_code(f"{operations.sll} {registers.t0} {registers.t0} 2")# mult por 4 pa tener el offset
-        self.write_code(f"{operations.lw} {registers.t0} ({registers.s4})")
-        self.write_code(f"{operations.move} {registers.a0} {registers.t0}")
-        self.write_code(f"{operations.jr} {registers.ra}")
+        self.write_code(f"{o.lw} {r.t0} ({r.a0})")
+        self.write_code(f"{o.sll} {r.t0} {r.t0} 2")# mult por 4 pa tener el offset
+        self.write_code(f"{o.lw} {r.t0} ({r.s4})")
+        self.write_code(f"{o.move} {r.a0} {r.t0}")
+        self.write_code(f"{o.jr} {r.ra}")
         self.write_code(f"")
 
 # funciones para errores en runtime
@@ -205,38 +264,38 @@ class CiltoMipsVisitor:
         self.write_code(f"# Declartation of the zero-div runtime error")
 
         self.write_code(f"zero_error:")
-        self.write_code(f"{operations.la} {registers.a0} _zero")
+        self.write_code(f"{o.la} {r.a0} _zero")
         self.write_code(f"")
 
-        self.write_code(f"{operations.li} {registers.v0} 4")
-        self.write_code(f"{operations.syscall}")
-        self.write_code(f"{operations.li} {registers.v0} 10")
-        self.write_code(f"{operations.syscall}")
+        self.write_code(f"{o.li} {r.v0} 4")
+        self.write_code(f"{o.syscall}")
+        self.write_code(f"{o.li} {r.v0} 10")
+        self.write_code(f"{o.syscall}")
         self.write_code(f"")
 
     def substr_error(self):
         self.write_code(f"# Declartation of the substr-index.out.of.range runtime error")
 
         self.write_code(f"substr_error:")
-        self.write_code(f"{operations.la} {registers.a0} _substr")
+        self.write_code(f"{o.la} {r.a0} _substr")
         self.write_code(f"")
         
-        self.write_code(f"{operations.li} {registers.v0} 4")
-        self.write_code(f"{operations.syscall}")
-        self.write_code(f"{operations.li} {registers.v0} 10")
-        self.write_code(f"{operations.syscall}")
+        self.write_code(f"{o.li} {r.v0} 4")
+        self.write_code(f"{o.syscall}")
+        self.write_code(f"{o.li} {r.v0} 10")
+        self.write_code(f"{o.syscall}")
         self.write_code(f"")
     
     def mem_error(self):
         self.write_code(f"# Declartation of the memory-overflow runtime error")
         self.write_code(f"mem_error:")
-        self.write_code(f"{operations.la} {registers.a0} _mem")
+        self.write_code(f"{o.la} {r.a0} _mem")
         self.write_code(f"")
         
-        self.write_code(f"{operations.li} {registers.v0} 4")
-        self.write_code(f"{operations.syscall}")
-        self.write_code(f"{operations.li} {registers.v0} 10")
-        self.write_code(f"{operations.syscall}")
+        self.write_code(f"{o.li} {r.v0} 4")
+        self.write_code(f"{o.syscall}")
+        self.write_code(f"{o.li} {r.v0} 10")
+        self.write_code(f"{o.syscall}")
         self.write_code(f"")
 
 
