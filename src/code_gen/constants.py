@@ -1,5 +1,12 @@
-ATTR_NAME = "attr"
+PARAM = "param"
+LET = "let"
+ATTR = "attr"
 
-CASE_INIT = "init_case"
-CASE_END = "end_case"
-CASE_BRANCH = "case_branch"
+
+OBJECT = "Object"
+BOOL = "Bool"
+INT = "Int"
+STRING = "String"
+VOID = "Void"
+SELFTYPE = "SELF_TYPE"
+ADDRESS = INT
