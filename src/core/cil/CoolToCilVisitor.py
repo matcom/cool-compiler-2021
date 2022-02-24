@@ -1,5 +1,5 @@
-import core.tools.COOLAst as cool
-from .BaseCOOLToCILVisitor import *
+import core.cool.CoolAst as cool
+from .BaseCoolToCilVisitor import *
 from core.tools import visitor
 from ..tools.Semantic import Scope
 

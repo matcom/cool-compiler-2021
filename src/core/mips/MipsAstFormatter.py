@@ -19,7 +19,7 @@ class MIPSAstFormatter:
 
         mipsCode = f'{data}\n\n{names_table}\n\n{proto_table}\n\n{types}\n\n\n.text\n.globl main\n{code}\n\n'
 
-        with open('core/mips/mips_basics.asm', 'r') as f:
+        with open('core/mips/MipsBasics.asm', 'r') as f:
             mipsCode += "".join(f.readlines())
         return mipsCode
 

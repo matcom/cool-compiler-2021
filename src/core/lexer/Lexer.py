@@ -1,5 +1,5 @@
 import ply.lex as lex
-from core.tools.utils import Token
+from core.tools.Utils import Token
 from core.parser.Parser import CoolGrammar
 from core.tools.Errors import LexicographicError
 

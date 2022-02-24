@@ -1,8 +1,8 @@
-from Tools import visitor
-from Parser import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
-from Parser import IfThenElseNode, WhileLoopNode, BlockNode, LetInNode, CaseOfNode
-from Parser import AssignNode, UnaryNode, BinaryNode
-from Parser import FunctionCallNode, MemberCallNode, NewNode, AtomicNode
+from core.tools import visitor
+from core.cool.CoolAst import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
+from core.cool.CoolAst import IfThenElseNode, WhileLoopNode, BlockNode, LetInNode, CaseOfNode
+from core.cool.CoolAst import AssignNode, UnaryNode, BinaryNode
+from core.cool.CoolAst import FunctionCallNode, MemberCallNode, NewNode, AtomicNode
 
 # Visitor para imprimir el AST
 

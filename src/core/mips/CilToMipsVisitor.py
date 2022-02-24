@@ -1,4 +1,4 @@
-import core.cil.CILAst as cil
+import core.cil.CilAst as cil
 import core.mips.MipsAst as mips
 from ..tools import visitor
 

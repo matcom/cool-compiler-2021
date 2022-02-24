@@ -1,13 +1,13 @@
 from core.lexer.Lexer import Lexer
 from core.parser.Parser import CoolParser
-from core.tools.evaluation import evaluate_reverse_parse
-from core.semantic.Type_Collector import Type_Collector
-from core.semantic.Type_Builder import Type_Builder
-from core.semantic.Type_Checker import Type_Checker
-from core.cil.COOLToCILVisitor import COOLToCILVisitor
-from core.cil.CILAst import get_formatter
+from core.tools.Evaluation import evaluate_reverse_parse
+from core.semantic.TypeCollector import Type_Collector
+from core.semantic.TypeBuilder import Type_Builder
+from core.semantic.TypeChecker import Type_Checker
+from core.cil.CoolToCilVisitor import COOLToCILVisitor
+from core.cil.CilAst import get_formatter
 from core.mips.CilToMipsVisitor import CILToMIPSVisitor
-from core.mips.MIPSAstFormatter import MIPSAstFormatter
+from core.mips.MipsAstFormatter import MIPSAstFormatter
 import subprocess, re
 
 

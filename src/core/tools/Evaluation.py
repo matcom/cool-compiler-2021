@@ -1,4 +1,4 @@
-from .parsing import ShiftReduceParser
+from .Parsing import ShiftReduceParser
 
 '''
 Este metodo retorna el ast dado el conjunto de producciones,

@@ -1,4 +1,4 @@
-from ..cil import CILAst as cil
+from ..cil import CilAst as cil
 from ..tools.Semantic import VariableInfo
 
 

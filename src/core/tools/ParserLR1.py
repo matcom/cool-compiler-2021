@@ -1,8 +1,8 @@
-from .pycompiler import Item
-from .utils import ContainerSet
-from .Firsts_and_Follows import compute_firsts, compute_local_first
-from .automata import State
-from .parsing import ShiftReduceParser
+from .Pycompiler import Item
+from .Utils import ContainerSet
+from .FirstsAndFollows import compute_firsts, compute_local_first
+from .Automata import State
+from .Parsing import ShiftReduceParser
 
 '''
 Recibe un item LR(1) y devuelve el conjunto de items que 
