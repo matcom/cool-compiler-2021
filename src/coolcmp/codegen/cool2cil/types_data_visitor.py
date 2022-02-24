@@ -37,11 +37,11 @@ class DotTypesDataVisitor(CILVisitor):
                 attrs=[
                     'Object__name',
                 ],
-                methods={
-                    'Object_abort': 'abort',
-                    'Object_type_name': 'type_name',
-                    'Object_copy': 'copy',
-                },
+                methods=[
+                    'Object_abort',
+                    'Object_type_name',
+                    'Object_copy',
+                ],
                 attr_expr_nodes={
                     'Object__name': ast.StringNode('"Object"')
                 }
@@ -51,12 +51,12 @@ class DotTypesDataVisitor(CILVisitor):
                 attrs=[
                     'IO__name',
                 ],
-                methods={
-                    'IO_out_string': 'out_string',
-                    'Object_out_int': 'out_int',
-                    'Object_in_string': 'in_string',
-                    'IO_in_string': 'in_string',
-                },
+                methods=[
+                    'IO_out_string',
+                    'Object_out_int',
+                    'Object_in_string',
+                    'IO_in_string',
+                ],
                 attr_expr_nodes={
                     'IO__name': ast.StringNode('"IO"')
                 }
@@ -67,11 +67,11 @@ class DotTypesDataVisitor(CILVisitor):
                     'String__name',
                     'value',
                 ],
-                methods={
-                    'String_length': 'length',
-                    'String_concat': 'concat',
-                    'String_substr': 'substr',
-                },
+                methods=[
+                    'String_length',
+                    'String_concat',
+                    'String_substr',
+                ],
                 attr_expr_nodes={
                     'String__name': ast.StringNode('"String"')
                 }
@@ -82,7 +82,7 @@ class DotTypesDataVisitor(CILVisitor):
                     'Bool__name',
                     'value',
                 ],
-                methods={},
+                methods=[],
                 attr_expr_nodes={
                     'Bool__name': ast.StringNode('"Bool"')
                 }
@@ -93,7 +93,7 @@ class DotTypesDataVisitor(CILVisitor):
                     'Int__name',
                     'value',
                 ],
-                methods={},
+                methods=[],
                 attr_expr_nodes={
                     'Int__name': ast.StringNode('"Int"')
                 }
@@ -103,7 +103,7 @@ class DotTypesDataVisitor(CILVisitor):
                 attrs=[
                     '<void>__name',
                 ],
-                methods={},
+                methods=[],
                 attr_expr_nodes={
                     '<void>__name': ast.StringNode('"<void>"')
                 }
@@ -119,7 +119,7 @@ class DotTypesDataVisitor(CILVisitor):
     def visit(self, node: ast.ClassDeclarationNode):
         type_ = self.context.get_type(node.id)
         type_attributes: list[str] = [f'{node.id}__name']
-        type_methods: dict[str, str] = {}
+        type_methods: list[str] = []
         type_node = cil.TypeNode(
             name=type_.name,
             attrs=type_attributes,
@@ -135,11 +135,10 @@ class DotTypesDataVisitor(CILVisitor):
             type_node.add_attr_node(f'{node.id}_{attr.name}', attr.node)
 
         for meth, owner in type_.all_methods():
-            if owner.name in ('Object', 'IO', 'String', 'String', 'Bool', 'Int', ):
-                func_target = meth.name
-            else:
-                func_target = f'f{node.id}_{meth.name}'
-            type_methods[f'f{node.id}_{meth.name}'] = func_target
+            # if owner.name in ('Object', 'IO', 'String', 'String', 'Bool', 'Int', ):
+            #     func_target = meth.name
+            # else:
+            type_methods.append(f'{node.id}_{meth.name}')
 
         self.types.append(type_node)
 
