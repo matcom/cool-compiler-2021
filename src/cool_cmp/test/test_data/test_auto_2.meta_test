@@ -1,8 +1,0 @@
-"{\"name\": \"test_auto_2\", \"result\": 11, \"errors\": []}"
-
-class Main inherits IO {
-    main():AUTO_TYPE {
-        succ(10)
-    };
-    succ(n : Int) : AUTO_TYPE { n + 1 };
-};
