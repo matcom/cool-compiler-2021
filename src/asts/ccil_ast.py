@@ -70,15 +70,7 @@ class Method:
 
 
 class Node:
-    def __init__(self, node) -> None:
-        self.line = 0
-        self.col = 0
-        if node is not None:
-            self.line: int = node.line
-            self.col: int = node.col
-
-    def get_position(self) -> Tuple[int, int]:
-        return (self.line, self.col)
+    pass
 
 
 class FunctionNode(Node):
@@ -88,14 +80,13 @@ class FunctionNode(Node):
 
     def __init__(
         self,
-        node,
         idx: str,
         params: List[Parameter],
         locals: List[Local],
         operations: List[OperationNode],
         ret: str,
     ) -> None:
-        super().__init__(node)
+        super().__init__()
         # Function identifier, different than Method identifier
         self.id = idx
         # Variable that holds the return value
@@ -111,12 +102,12 @@ class OperationNode(Node):
     Base Class for all operation Nodes
     """
 
-    def __init__(self, node) -> None:
-        super().__init__(node)
+    def __init__(self) -> None:
+        super().__init__()
 
 
 class StorageNode(OperationNode):
-    def __init__(self, node, idx: str, operation: ReturnOpNode) -> None:
+    def __init__(self, idx: str, operation: ReturnOpNode) -> None:
         """
         Node used to store the value of operations done.
         Parameters:
@@ -124,15 +115,13 @@ class StorageNode(OperationNode):
         idx <- Id of this node.
         opeartion <- The operation this node is storing.
         """
-        super().__init__(node)
+        super().__init__()
         self.id = idx
         self.operation = operation
-        self.decl_type = node.decl_type
 
 
 class SetAttrOpNode(OperationNode):
-    def __init__(self, node, type_id: str, attr_id: str, source_id: AtomOpNode) -> None:
-        super().__init__(node)
+    def __init__(self, type_id: str, attr_id: str, source_id: AtomOpNode) -> None:
         self.type = type_id
         self.attr = attr_id
         self.source_id = source_id
@@ -143,14 +132,16 @@ class Abort(OperationNode):
 
 
 class PrintOpNode(OperationNode):
-    def __init__(self, node, idx: str) -> None:
-        super().__init__(node)
+    def __init__(self, idx: str) -> None:
+        super().__init__()
         self.idx = idx
 
 
 class ReturnOpNode(OperationNode):
-    def __init__(self, node) -> None:
-        super().__init__(node)
+    def __init__(
+        self,
+    ) -> None:
+        super().__init__()
 
 
 class ReadOpNode(ReturnOpNode):
@@ -162,26 +153,24 @@ class ReadOpNode(ReturnOpNode):
 
 
 class GetAttrOpNode(ReturnOpNode):
-    def __init__(
-        self, node, instance_type_id: str, instance_id: str, attr_id: str
-    ) -> None:
-        super().__init__(node)
+    def __init__(self, instance_type_id: str, instance_id: str, attr_id: str) -> None:
+        super().__init__()
         self.instance_type = instance_type_id
         self.instance = instance_id
         self.attr = attr_id
 
 
 class CallOpNode(ReturnOpNode):
-    def __init__(self, node, idx: str, type_idx: str, args: List[str]) -> None:
-        super().__init__(node)
+    def __init__(self, idx: str, type_idx: str, args: List[str]) -> None:
+        super().__init__()
         self.id = idx
         self.type = type_idx
         self.args = args
 
 
 class VCallOpNode(ReturnOpNode):
-    def __init__(self, node, idx: str, type_idx: str, args: List[str]) -> None:
-        super().__init__(node)
+    def __init__(self, idx: str, type_idx: str, args: List[str]) -> None:
+        super().__init__()
         self.id = idx
         self.type = type_idx
         self.args = args
@@ -194,20 +183,20 @@ class VoidNode(ReturnOpNode):
 
 
 class NewOpNode(ReturnOpNode):
-    def __init__(self, node, type_idx: str) -> None:
-        super().__init__(node)
+    def __init__(self, type_idx: str) -> None:
+        super().__init__()
         self.type_idx: str = type_idx
 
 
 class BinaryOpNode(ReturnOpNode):
-    def __init__(self, node, left: AtomOpNode, right: AtomOpNode) -> None:
+    def __init__(self, left: AtomOpNode, right: AtomOpNode) -> None:
         """
         Node that represents all binary operation
         Parameters:
         left <- Left atomic node.
         right <- Right atomic node.
         """
-        super().__init__(node)
+        super().__init__()
         self.left = left
         self.right = right
 
@@ -241,8 +230,8 @@ class LessOpNode(BinaryOpNode):
 
 
 class UnaryOpNode(ReturnOpNode):
-    def __init__(self, node, atom: AtomOpNode) -> None:
-        super().__init__(node)
+    def __init__(self, atom: AtomOpNode) -> None:
+        super().__init__()
         self.atom = atom
 
 
@@ -267,8 +256,8 @@ class NegOpNode(UnaryOpNode):
 
 
 class ChainOpNode(ReturnOpNode):
-    def __init__(self, node, target: str) -> None:
-        super().__init__(node)
+    def __init__(self, target: str) -> None:
+        super().__init__()
         self.target = target
 
 
@@ -285,11 +274,11 @@ class StrOpNode(ChainOpNode):
 
 
 class AtomOpNode(ReturnOpNode):
-    def __init__(self, node, value: str) -> None:
+    def __init__(self, value: str) -> None:
         """
         AtomNode represents all single value nodes, like ids and constants
         """
-        super().__init__(node)
+        super().__init__()
         self.value = value
 
 
@@ -318,28 +307,28 @@ class FlowControlNode(OperationNode):
 
 
 class IfNode(FlowControlNode):
-    def __init__(self, node, eval_value: AtomOpNode, target: LabelNode) -> None:
-        super().__init__(node)
+    def __init__(self, eval_value: AtomOpNode, target: LabelNode) -> None:
+        super().__init__()
         self.eval_value = eval_value
         self.target = target
 
 
 class IfFalseNode(IfNode):
-    def __init__(self, node, eval_value: AtomOpNode, target: LabelNode) -> None:
-        super().__init__(node, eval_value, target)
+    def __init__(self, eval_value: AtomOpNode, target: LabelNode) -> None:
+        super().__init__(eval_value, target)
 
 
 class GoToNode(FlowControlNode):
-    def __init__(self, node, target: LabelNode) -> None:
-        super().__init__(node)
+    def __init__(self, target: LabelNode) -> None:
+        super().__init__()
         self.target = target
 
 
 class LabelNode(FlowControlNode):
-    def __init__(self, node, idx: str) -> None:
-        super().__init__(node)
+    def __init__(self, idx: str) -> None:
+        super().__init__()
         self.id = idx
 
 
-def extract_id(node, storage_node: StorageNode) -> IdNode:
-    return IdNode(node, storage_node.id)
+def extract_id(storage_node: StorageNode) -> IdNode:
+    return IdNode(storage_node.id)

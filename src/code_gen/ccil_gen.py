@@ -16,7 +16,13 @@ METHOD_VISITOR_RESULT = FunctionNode
 # The result of (type of) what is it
 # How to handle void nodes
 
-# Define abort nodes with a text
+# Define abort nodes with a text:
+# * Dispacth on a void class
+# * No pattern match in case
+# * Division by zero
+# * Substring out of range
+# * Heap Overflow (don't know yet how to handle this)
+
 # Add text dynamically .data function, incluiding error messages
 
 # Test there are no runtimes errors
@@ -517,18 +523,16 @@ class CCILGenerator:
 
     def create_call(
         self,
-        node,
         storage_idx: str,
         type_idx: str,
         method_idx: str,
         args: List[StorageNode],
     ):
         self.add_local(storage_idx, type_idx)
-        return StorageNode(node, storage_idx, CallOpNode(node, method_idx, args))
+        return StorageNode( storage_idx, CallOpNode( method_idx, args))
 
     def create_vcall(
         self,
-        node,
         storage_idx: str,
         type_idx: str,
         method_idx: str,
@@ -537,46 +541,58 @@ class CCILGenerator:
     ):
         self.add_local(storage_idx, type_idx)
         return StorageNode(
-            node, storage_idx, VCallOpNode(node, method_idx, method_type_idx, args)
+             storage_idx, VCallOpNode( method_idx, method_type_idx, args)
         )
 
-    def create_assignation(self, node, idx: str, type_idx: str, target: str):
-        self.add_local(idx, type_idx)
-        return StorageNode(node, idx, IdNode(node, target))
+    def define_built_ins(self):
+        self.reset_scope()
+        self.reset_locals()
 
-    def create_uninitialized_storage(self, node, idx: str, type_idx: str):
-        self.add_local(idx, type_idx)
-        return StorageNode(node, idx, VoidNode(node))
+        params = self.init_func_params()
+        abort_msg = Data("abort_msg", "Execution aborted")
 
-    def create_storage(self, node, idx: str, type_idx: str, op: ReturnOpNode):
+        load = self.create_string_load_data()
+
+    def init_func_params(self, typex: str):
+        return [Parameter("self", typex)]
+
+    def create_assignation(self, idx: str, type_idx: str, target: str):
         self.add_local(idx, type_idx)
-        return StorageNode(node, idx, op)
+        return StorageNode( idx, IdNode( target))
+
+    def create_uninitialized_storage(self,  idx: str, type_idx: str):
+        self.add_local(idx, type_idx)
+        return StorageNode( idx, VoidNode())
+
+    def create_storage(self,  idx: str, type_idx: str, op: ReturnOpNode):
+        self.add_local(idx, type_idx)
+        return StorageNode( idx, op)
 
     def create_attr_extraction(
-        self, node, idx: str, type_idx: str, from_idx: str, attr_idx: str
+        self,  idx: str, type_idx: str, from_idx: str, attr_idx: str
     ):
         self.add_local(idx, type_idx)
-        return StorageNode(node, idx, GetAttrOpNode(node, from_idx, attr_idx))
+        return StorageNode( idx, GetAttrOpNode( from_idx, attr_idx))
 
-    def create_new_type(self, node, idx: str, type_idx: str):
+    def create_new_type(self,  idx: str, type_idx: str):
         self.add_local(idx, type_idx)
-        return StorageNode(node, idx, NewOpNode(node, type_idx))
+        return StorageNode( idx, NewOpNode( type_idx))
 
-    def create_type_of(self, node, idx: str, target: AtomOpNode):
+    def create_type_of(self,  idx: str, target: AtomOpNode):
         self.add_local(idx, ADDRESS)
-        return StorageNode(node, idx, GetTypeOpNode(node, target))
+        return StorageNode( idx, GetTypeOpNode( target))
 
-    def create_equality(self, node, idx, left: AtomOpNode, right: AtomOpNode):
+    def create_equality(self,  idx, left: AtomOpNode, right: AtomOpNode):
         self.add_local(idx, BOOL)
-        return StorageNode(node, idx, EqualOpNode(node, left, right))
+        return StorageNode( idx, EqualOpNode( left, right))
 
-    def create_string_load_data(self, node, idx: str, target: str):
+    def create_string_load_data(self,  idx: str, target: str):
         self.add_local(idx, STRING)
-        return StorageNode(node, idx, LoadOpNode(node, target))
+        return StorageNode( idx, LoadOpNode( target))
 
-    def create_int(self, node, idx: str, value: str):
+    def create_int(self,  idx: str, value: str):
         self.add_local(idx, INT)
-        return StorageNode(node, idx, IntNode(node, value))
+        return StorageNode( idx, IntNode( value))
 
     def update_locals(self, old_id: str, new_id: str):
         self.locals[new_id] = self.locals[old_id]
