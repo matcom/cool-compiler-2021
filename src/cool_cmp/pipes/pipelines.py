@@ -2,6 +2,7 @@ from pipes.pipes import *
 from pipes.pipeline import Pipeline, Pipe
 
 lexer_pipeline = Pipeline(start_pipe,
+                          sub_tab_for_spaces_pipe,
                             ply_lexer_pipe
                         #   change_escaped_lines,
                         #   remove_comments_pipe,

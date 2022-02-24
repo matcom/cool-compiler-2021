@@ -132,6 +132,17 @@ def tokenize_text_pipe(result:dict, language_grammar=G, language_lexer=cool_lexe
 
 tokenize_text_pipe = Pipe(tokenize_text_pipe)
 
+def sub_tab_for_spaces_pipe(result:dict):
+    """
+    Change the \\t for '    ' 
+    """
+    import re
+    text = re.sub("\t","    ", result['text'])
+    result['text'] = text
+    return result
+
+sub_tab_for_spaces_pipe = Pipe(sub_tab_for_spaces_pipe)
+
 def ply_lexer_pipe(result:dict, language_grammar=G, language_lexer=ply_lexer, language_parser=cool_parser):
     """
     Tokenize with ply
