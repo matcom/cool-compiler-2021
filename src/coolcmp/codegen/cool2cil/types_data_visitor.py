@@ -23,34 +23,123 @@ class DotTypesDataVisitor(CILVisitor):
     @visitor.when(ast.ProgramNode)
     def visit(self, node: ast.ProgramNode):
         self.root.set_data('""')
+        self.root.set_data('"Object"')
+        self.root.set_data('"IO"')
+        self.root.set_data('"String"')
+        self.root.set_data('"Bool"')
+        self.root.set_data('"Int"')
+        self.root.set_data('"<void>"')
+
+        # add Object, IO, String, Bool, Int and <void> to types
+        self.types += [
+            cil.TypeNode(
+                name='Object',
+                attrs=[
+                    'Object__name',
+                ],
+                methods={
+                    'Object_abort': 'abort',
+                    'Object_type_name': 'type_name',
+                    'Object_copy': 'copy',
+                },
+                attr_expr_nodes={
+                    'Object__name': ast.StringNode('"Object"')
+                }
+            ),
+            cil.TypeNode(
+                name='IO',
+                attrs=[
+                    'IO__name',
+                ],
+                methods={
+                    'IO_out_string': 'out_string',
+                    'Object_out_int': 'out_int',
+                    'Object_in_string': 'in_string',
+                    'IO_in_string': 'in_string',
+                },
+                attr_expr_nodes={
+                    'IO__name': ast.StringNode('"IO"')
+                }
+            ),
+            cil.TypeNode(
+                name='String',
+                attrs=[
+                    'String__name',
+                    'value',
+                ],
+                methods={
+                    'String_length': 'length',
+                    'String_concat': 'concat',
+                    'String_substr': 'substr',
+                },
+                attr_expr_nodes={
+                    'String__name': ast.StringNode('"String"')
+                }
+            ),
+            cil.TypeNode(
+                name='Bool',
+                attrs=[
+                    'Bool__name',
+                    'value',
+                ],
+                methods={},
+                attr_expr_nodes={
+                    'Bool__name': ast.StringNode('"Bool"')
+                }
+            ),
+            cil.TypeNode(
+                name='Int',
+                attrs=[
+                    'Int__name',
+                    'value',
+                ],
+                methods={},
+                attr_expr_nodes={
+                    'Int__name': ast.StringNode('"Int"')
+                }
+            ),
+            cil.TypeNode(
+                name='<void>',
+                attrs=[
+                    '<void>__name',
+                ],
+                methods={},
+                attr_expr_nodes={
+                    '<void>__name': ast.StringNode('"<void>"')
+                }
+            ),
+        ]
 
         for class_ in node.declarations:
             self.visit(class_)
-
-        # add default types
-        self.root.dot_types = [
-            cil.TypeNode('<void>', [], {}),
-        ] + self.types
 
         return self.root
 
     @visitor.when(ast.ClassDeclarationNode)
     def visit(self, node: ast.ClassDeclarationNode):
         type_ = self.context.get_type(node.id)
-        type_attributes: list[str] = []
+        type_attributes: list[str] = [f'{node.id}__name']
         type_methods: dict[str, str] = {}
-        type_node = cil.TypeNode(type_.name, type_attributes, type_methods)
+        type_node = cil.TypeNode(
+            name=type_.name,
+            attrs=type_attributes,
+            methods=type_methods,
+            attr_expr_nodes={
+                f'{node.id}__name': ast.StringNode(f'"{node.id}"')
+            }
+        )
+        self.root.set_data(f'"{node.id}"')
 
         for attr, _ in type_.all_attributes():
             type_attributes.append(f'{type_.name}_{attr.name}')
             type_node.add_attr_node(f'{node.id}_{attr.name}', attr.node)
 
         for meth, owner in type_.all_methods():
-            if owner.name in ('Object', 'IO', 'String', ):
+            if owner.name in ('Object', 'IO', 'String', 'String', 'Bool', 'Int', ):
                 func_target = meth.name
             else:
-                func_target = f'f{self.next_function_id}'
-            type_methods[f'{node.id}_{meth.name}'] = func_target
+                func_target = f'f{node.id}_{meth.name}'
+            type_methods[f'f{node.id}_{meth.name}'] = func_target
 
         self.types.append(type_node)
 
