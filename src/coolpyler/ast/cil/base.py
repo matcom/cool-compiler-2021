@@ -172,7 +172,7 @@ class ConcatNode(InstructionNode):
         self.dest = dest
         self.string1 = string1
         self.string2 = string2
-        self.dest_lenght = self.dest_lenght
+        self.dest_lenght = dest_lenght
 
 
 class PrefixNode(InstructionNode):
@@ -183,10 +183,11 @@ class PrefixNode(InstructionNode):
 
 
 class SubstringNode(InstructionNode):
-    def __init__(self, dest, string, n):
+    def __init__(self, dest, string, n, index):
         self.dest = dest
         self.string = string
         self.n = n
+        self.index = index
 
 
 class ToStrNode(InstructionNode):

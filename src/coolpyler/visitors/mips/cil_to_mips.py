@@ -65,7 +65,7 @@ class CilToMIPS:
     def search_mem(self, id: str):
         try:
             index = self.locals.index(id)
-            return len(self.params) * 4 + index * 4
+            return -index * 4
         except ValueError:
             index = self.params.index(id)
             return index * 4
@@ -474,10 +474,9 @@ class CilToMIPS:
         )
 
         instructions.append(
-            mips.StoreWordNode(
-                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(SP_REG, 0),
-            )
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(SP_REG, 0))
         )
+        instructions.append(mips.AddiNode(SP_REG, SP_REG, 4))
 
         self.memory_manager.clean()
         return instructions
@@ -504,10 +503,7 @@ class CilToMIPS:
         instructions.append(mips.MoveNode(FP_REG, self.fp_save))
         self.locals = self.locals_save
 
-        if node.name == "main":
-            instructions.extend(self.exit_program())
-        else:
-            instructions.append(mips.JumpRegisterNode(RA_REG))
+        instructions.append(mips.JumpRegisterNode(RA_REG))
 
         self.memory_manager.clean()
         return instructions
@@ -518,12 +514,12 @@ class CilToMIPS:
         self.memory_manager.save()
         reg1 = self.memory_manager.get_unused_register()
 
-        local_dir = self.search_mem(node.dest)
-        instructions.append(
-            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, local_dir))
-        )
-
         instructions.append(mips.LoadAddressNode(reg1, node.msg))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
 
         self.memory_manager.clean()
         return instructions
@@ -571,27 +567,74 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
 
-        string1_dir = self.search_mem(node.string)
-        instructions.append(
-            mips.LoadAddressNode(
-                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, string1_dir)
-            )
-        )
-        string2_dir = self.search_mem(node.string)
-        instructions.append(
-            mips.LoadAddressNode(
-                ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string2_dir)
-            )
-        )
+        loop1 = f"loop{self.get_loop_count}"
+        exit1 = f"exit{self.get_exit_count}"
+        loop2 = f"loop{self.get_loop_count}"
+        exit2 = f"exit{self.get_exit_count}"
 
         reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
 
-        loop = f"loop{self.get_loop_count}"
-        exit = f"exit{self.get_exit_count}"
+        lenght_dir = self.search_mem(node.dest_lenght)
+        instructions.append(
+            mips.LoadWordNode, mips.MemoryAddressRegisterNode(FP_REG, lenght_dir)
+        )
+        instructions.append(mips.LoadInmediateNode(V0_REG, 9))
+        instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
+        instructions.append(mips.SyscallNode())
+
+        instructions.append(
+            mips.LoadAddressNode(
+                reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
+            )
+        )
+
+        string1_dir = self.search_mem(node.string1)
+        instructions.append(
+            mips.LoadAddressNode(
+                ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string1_dir)
+            )
+        )
+        string2_dir = self.search_mem(node.string2)
+        instructions.append(
+            mips.LoadAddressNode(
+                ARG_REGISTERS[2], mips.MemoryAddressRegisterNode(FP_REG, string2_dir)
+            )
+        )
+
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(loop1)))
+        instructions.append(
+            mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
+        )
+        instructions.append(
+            mips.StoreByteNode(
+                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
+            )
+        )
+        instructions.append(mips.BeqzNode(ARG_REGISTERS[1], mips.LabelNode(exit1)))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
+        instructions.append(mips.JumpNode(mips.LabelNode(loop1)))
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(exit1)))
+
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(loop2)))
+        instructions.append(
+            mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[2], 0))
+        )
+        instructions.append(
+            mips.StoreByteNode(
+                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
+            )
+        )
+        instructions.append(mips.BeqzNode(ARG_REGISTERS[2], mips.LabelNode(exit2)))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[2], ARG_REGISTERS[2], 1))
+        instructions.append(mips.JumpNode(mips.LabelNode(loop2)))
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(exit2)))
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
-            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
         )
 
         self.memory_manager.clean()
@@ -602,6 +645,55 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
 
+        loop = f"loop{self.get_loop_count}"
+        exit = f"exit{self.get_exit_count}"
+
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+        reg3 = self.memory_manager.get_unused_register()
+
+        lenght_dir = self.search_mem(node.n)
+        instructions.append(
+            mips.LoadWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, lenght_dir))
+        )
+        instructions.append(mips.LoadInmediateNode(V0_REG, 9))
+        instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
+        instructions.append(mips.SyscallNode())
+
+        instructions.append(
+            mips.LoadAddressNode(
+                reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
+            )
+        )
+
+        string_dir = self.search_mem(node.string)
+        instructions.append(
+            mips.LoadAddressNode(
+                ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string_dir)
+            )
+        )
+
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(loop)))
+        instructions.append(
+            mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
+        )
+        instructions.append(
+            mips.StoreByteNode(
+                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
+            )
+        )
+        instructions.append(mips.BeqzNode(reg3, mips.LabelNode(exit)))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
+        instructions.append(mips.AddiNode(reg3, reg3, 1))
+        instructions.append(mips.JumpNode(mips.LabelNode(loop)))
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(exit)))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
+
         self.memory_manager.clean()
         return instructions
 
@@ -609,6 +701,65 @@ class CilToMIPS:
     def visit(self, node: cil.SubstringNode):
         instructions = []
         self.memory_manager.save()
+
+        loop = f"loop{self.get_loop_count}"
+        exit = f"exit{self.get_exit_count}"
+
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+        reg3 = self.memory_manager.get_unused_register()
+        reg4 = self.memory_manager.get_unused_register()
+
+        lenght_dir = self.search_mem(node.n)
+        instructions.append(
+            mips.LoadWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, lenght_dir))
+        )
+
+        lenght_index = self.search_mem(node.index)
+        instructions.append(
+            mips.LoadWordNode(
+                reg4, mips.MemoryAddressRegisterNode(FP_REG, lenght_index)
+            )
+        )
+
+        instructions.append(mips.LoadInmediateNode(V0_REG, 9))
+        instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
+        instructions.append(mips.SyscallNode())
+
+        instructions.append(
+            mips.LoadAddressNode(
+                reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
+            )
+        )
+
+        string_dir = self.search_mem(node.string)
+        instructions.append(
+            mips.LoadAddressNode(
+                ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string_dir)
+            )
+        )
+        instructions.append(mips.AddNode(ARG_REGISTERS[1], ARG_REGISTERS[1], reg3))
+
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(loop)))
+        instructions.append(
+            mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
+        )
+        instructions.append(
+            mips.StoreByteNode(
+                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
+            )
+        )
+        instructions.append(mips.BeqzNode(reg3, mips.LabelNode(exit)))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
+        instructions.append(mips.AddiNode(reg3, reg3, 1))
+        instructions.append(mips.JumpNode(mips.LabelNode(loop)))
+        instructions.append(mips.LabelInstructionNode(mips.LabelNode(exit)))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
 
         self.memory_manager.clean()
         return instructions
