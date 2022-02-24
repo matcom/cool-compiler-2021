@@ -13,11 +13,11 @@ class TypeCollectorVisitor(object):
         self.types = None
 
     @visitor.on("node")
-    def visit(self, node): # type: ignore
+    def visit(self, node):
         pass
 
     @visitor.when(parsed.CoolProgramNode)
-    def visit(self, node: parsed.CoolProgramNode):  # type: ignore
+    def visit(self, node: parsed.CoolProgramNode):
         object_type = ObjectType()
         int_type = IntType()
         bool_type = BoolType()
@@ -39,7 +39,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolClassNode)
-    def visit(self, node: parsed.CoolClassNode):  # type: ignore
+    def visit(self, node: parsed.CoolClassNode):
         try:
             type = self.types[node.id]
             self.errors.append(
@@ -58,14 +58,14 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolAttrDeclNode)
-    def visit(self, node: parsed.CoolAttrDeclNode):  # type: ignore
+    def visit(self, node: parsed.CoolAttrDeclNode):
         body = self.visit(node.body)
         return type_collected.CoolAttrDeclNode(
             node.lineno, node.columnno, node.id, node.type, body
         )
 
     @visitor.when(parsed.CoolMethodDeclNode)
-    def visit(self, node: parsed.CoolMethodDeclNode):  # type: ignore
+    def visit(self, node: parsed.CoolMethodDeclNode):
         body = self.visit(node.body)
         return type_collected.CoolMethodDeclNode(
             node.lineno,
@@ -78,12 +78,12 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolAssignNode)
-    def visit(self, node: parsed.CoolAssignNode):  # type: ignore
+    def visit(self, node: parsed.CoolAssignNode):
         expr = self.visit(node.expr)
         return type_collected.CoolAssignNode(node.lineno, node.columnno, node.id, expr)
 
     @visitor.when(parsed.CoolStaticDispatchNode)
-    def visit(self, node: parsed.CoolStaticDispatchNode):  # type: ignore
+    def visit(self, node: parsed.CoolStaticDispatchNode):
         expr = self.visit(node.expr)
         args = [self.visit(arg) for arg in node.args]
         return type_collected.CoolStaticDispatchNode(
@@ -91,7 +91,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolDispatchNode)
-    def visit(self, node: parsed.CoolDispatchNode):  # type: ignore
+    def visit(self, node: parsed.CoolDispatchNode):
         expr = self.visit(node.expr)
         args = [self.visit(arg) for arg in node.args]
         return type_collected.CoolDispatchNode(
@@ -99,7 +99,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolIfThenElseNode)
-    def visit(self, node: parsed.CoolIfThenElseNode):  # type: ignore
+    def visit(self, node: parsed.CoolIfThenElseNode):
         cond = self.visit(node.cond)
         then_expr = self.visit(node.then_expr)
         else_expr = self.visit(node.else_expr)
@@ -108,31 +108,31 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolWhileNode)
-    def visit(self, node: parsed.CoolWhileNode):  # type: ignore
+    def visit(self, node: parsed.CoolWhileNode):
         cond = self.visit(node.cond)
         body = self.visit(node.body)
         return type_collected.CoolWhileNode(node.lineno, node.columnno, cond, body)
 
     @visitor.when(parsed.CoolBlockNode)
-    def visit(self, node: parsed.CoolBlockNode):  # type: ignore
+    def visit(self, node: parsed.CoolBlockNode):
         expr_list = [self.visit(expr) for expr in node.expr_list]
         return type_collected.CoolBlockNode(node.lineno, node.columnno, expr_list)
 
     @visitor.when(parsed.CoolLetInNode)
-    def visit(self, node: parsed.CoolLetInNode):  # type: ignore
+    def visit(self, node: parsed.CoolLetInNode):
         decl_list = [self.visit(decl) for decl in node.decl_list]
         expr = self.visit(node.expr)
         return type_collected.CoolLetInNode(node.lineno, node.columnno, decl_list, expr)
 
     @visitor.when(parsed.CoolLetDeclNode)
-    def visit(self, node: parsed.CoolLetDeclNode):  # type: ignore
+    def visit(self, node: parsed.CoolLetDeclNode):
         expr = self.visit(node.expr)
         return type_collected.CoolLetDeclNode(
             node.lineno, node.columnno, node.id, node.type, expr
         )
 
     @visitor.when(parsed.CoolCaseNode)
-    def visit(self, node: parsed.CoolCaseNode):  # type: ignore
+    def visit(self, node: parsed.CoolCaseNode):
         case_branches = [self.visit(branch) for branch in node.case_branches]
         expr = self.visit(node.expr)
         return type_collected.CoolCaseNode(
@@ -140,38 +140,38 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolCaseBranchNode)
-    def visit(self, node: parsed.CoolCaseBranchNode):  # type: ignore
+    def visit(self, node: parsed.CoolCaseBranchNode):
         expr = self.visit(node.expr)
         return type_collected.CoolCaseBranchNode(
             node.lineno, node.columnno, node.id, node.type, expr
         )
 
     @visitor.when(parsed.CoolNewNode)
-    def visit(self, node: parsed.CoolNewNode):  # type: ignore
+    def visit(self, node: parsed.CoolNewNode):
         return type_collected.CoolNewNode(node.lineno, node.columnno, node.type_name)
 
     @visitor.when(parsed.CoolParenthNode)
-    def visit(self, node: parsed.CoolParenthNode):  # type: ignore
+    def visit(self, node: parsed.CoolParenthNode):
         expr = self.visit(node.expr)
         return type_collected.CoolParenthNode(node.lineno, node.columnno, expr)
 
     @visitor.when(parsed.CoolTildeNode)
-    def visit(self, node: parsed.CoolTildeNode):  # type: ignore
+    def visit(self, node: parsed.CoolTildeNode):
         expr = self.visit(node.expr)
         return type_collected.CoolTildeNode(node.lineno, node.columnno, expr)
 
     @visitor.when(parsed.CoolNotNode)
-    def visit(self, node: parsed.CoolNotNode):  # type: ignore
+    def visit(self, node: parsed.CoolNotNode):
         expr = self.visit(node.expr)
         return type_collected.CoolNotNode(node.lineno, node.columnno, expr)
 
     @visitor.when(parsed.CoolIsVoidNode)
-    def visit(self, node: parsed.CoolIsVoidNode):  # type: ignore
+    def visit(self, node: parsed.CoolIsVoidNode):
         expr = self.visit(node.expr)
         return type_collected.CoolIsVoidNode(node.lineno, node.columnno, expr)
 
     @visitor.when(parsed.CoolLeqNode)
-    def visit(self, node: parsed.CoolLeqNode):  # type: ignore
+    def visit(self, node: parsed.CoolLeqNode):
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_collected.CoolLeqNode(
@@ -179,7 +179,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolEqNode)
-    def visit(self, node: parsed.CoolEqNode):  # type: ignore
+    def visit(self, node: parsed.CoolEqNode):
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_collected.CoolEqNode(
@@ -187,7 +187,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolLeNode)
-    def visit(self, node: parsed.CoolLeNode):  # type: ignore
+    def visit(self, node: parsed.CoolLeNode):
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_collected.CoolLeNode(
@@ -195,7 +195,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolPlusNode)
-    def visit(self, node: parsed.CoolPlusNode):  # type: ignore
+    def visit(self, node: parsed.CoolPlusNode):
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_collected.CoolPlusNode(
@@ -203,7 +203,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolMinusNode)
-    def visit(self, node: parsed.CoolMinusNode):  # type: ignore
+    def visit(self, node: parsed.CoolMinusNode):
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_collected.CoolMinusNode(
@@ -211,7 +211,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolMultNode)
-    def visit(self, node: parsed.CoolMultNode):  # type: ignore
+    def visit(self, node: parsed.CoolMultNode):
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_collected.CoolMultNode(
@@ -219,7 +219,7 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolDivNode)
-    def visit(self, node: parsed.CoolDivNode):  # type: ignore
+    def visit(self, node: parsed.CoolDivNode):
         left_expr = self.visit(node.left_expr)
         right_expr = self.visit(node.right_expr)
         return type_collected.CoolDivNode(
@@ -227,17 +227,17 @@ class TypeCollectorVisitor(object):
         )
 
     @visitor.when(parsed.CoolIntNode)
-    def visit(self, node: parsed.CoolIntNode):  # type: ignore
+    def visit(self, node: parsed.CoolIntNode):
         return type_collected.CoolIntNode(node.lineno, node.columnno, node.value)
 
     @visitor.when(parsed.CoolBoolNode)
-    def visit(self, node: parsed.CoolBoolNode):  # type: ignore
+    def visit(self, node: parsed.CoolBoolNode):
         return type_collected.CoolBoolNode(node.lineno, node.columnno, node.value)
 
     @visitor.when(parsed.CoolStringNode)
-    def visit(self, node: parsed.CoolStringNode):  # type: ignore
+    def visit(self, node: parsed.CoolStringNode):
         return type_collected.CoolStringNode(node.lineno, node.columnno, node.value)
 
     @visitor.when(parsed.CoolVarNode)
-    def visit(self, node: parsed.CoolVarNode):  # type: ignore
+    def visit(self, node: parsed.CoolVarNode):
         return type_collected.CoolVarNode(node.lineno, node.columnno, node.value)
