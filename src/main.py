@@ -42,7 +42,8 @@ def pipeline(input_file: Path, output_file: Path = None):
     grammar, idx, type_id, string, num = define_cool_grammar()
 
     tokens, pos_data = tokenize_cool_text(grammar, idx, type_id, string, num, text, errors)
-    # print(tokens)
+    print(tokens)
+
     if len(errors) > 0:
         report_and_exit(errors)
     parser = LR1Parser(grammar, errors)

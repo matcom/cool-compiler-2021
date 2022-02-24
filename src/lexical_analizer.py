@@ -55,9 +55,6 @@ def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printin
                     elif tok.type == "id":
                         tokens.append(Token(tok.value, idx))
                     elif tok.type == "type_id":
-                        print(tok.value)
-                        print(tok.lineno)
-                        print(tok.lexpos)
                         tokens.append(Token(tok.value, type_id))
                     else:
                         tokens.append(Token(tok.value, num))

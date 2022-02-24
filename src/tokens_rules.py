@@ -23,6 +23,7 @@ first_tokens = [
     "type_id",
     "int",
     "string",
+    "if",
 ]
 # Add "ccom" to test comments
  
@@ -124,16 +125,20 @@ def t_comments_eof(t):
 def t_id(t):
     r"[a-z][a-zA-Z_0-9]*"
     t.type = reserved.get(
-        t.value, "id"
+        t.value.lower(), "id"
     )  # Check for reserved words. If it isn't a reserved word is categorized as identifier
     return t
 
 #Type identifiers
 def t_type_id(t):
     r"[A-Z][a-zA-Z_0-9]*"
-    t.type = reserved.get(
-        t.value, "type_id"
-    )  # Check for reserved words. If it isn't a reserved word is categorized as identifier
+    value_in_lowercase = t.value.lower()
+    if value_in_lowercase != "false" and value_in_lowercase != "true":
+        t.type = reserved.get(
+            value_in_lowercase, "type_id"
+        ) # Check for reserved words. If it isn't a reserved word is categorized as identifier
+    else:
+        t.type = "type_id"#this may be extra as t.type is already setted as type_id 
     # t.lexpos = t.lexpos - t.lexer.last_new_line_pos + 1
     return t
 
