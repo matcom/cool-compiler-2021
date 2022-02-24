@@ -1,0 +1,22 @@
+# Template for malloc function
+# Arguments:
+# $a0: Size to allocate
+# Return:
+# $v0: Address of the begining for allocation
+malloc:
+  addiu $sp, $sp, -12
+  sw $a0, 0($sp)
+  sw $t0, 4($sp)
+  sw $t1, 8($sp)
+  li $t0, 4
+  div $a0, $t0
+  mfhi $t1
+  sub $t0, $t0, $t1
+  add $a0, $a0, $t0
+  li $v0, 9
+  syscall
+  lw $a0, 0($sp)
+  lw $t0, 4($sp)
+  lw $t1, 8($sp)
+  addiu $sp, $sp, 12
+  jr $ra

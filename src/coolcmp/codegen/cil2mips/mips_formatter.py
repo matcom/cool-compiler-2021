@@ -1,6 +1,7 @@
 from coolcmp.utils import visitor
 from coolcmp.utils import mips
 from coolcmp.utils import registers
+from coolcmp.codegen.cil2mips.templates import load_templates
 
 
 class MIPSFormatter:
@@ -14,10 +15,11 @@ class MIPSFormatter:
     @visitor.when(mips.ProgramNode)
     def visit(self, node: mips.ProgramNode):
         data = "\n# data\n.data\n" + "\n".join(self.visit(d) for d in node.data)
+        template_code = load_templates()
         functions = "\n# functions\n.text\n" + "\n".join(
             self.visit(f) for f in node.functions
         )
-        return data + "\n" + functions
+        return "\n".join([data, template_code, functions])
 
     @visitor.when(mips.FunctionNode)
     def visit(self, node: mips.FunctionNode):
