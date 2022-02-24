@@ -42,11 +42,11 @@ class TypeCheckerVisitor:
         return object_type
 
     @visitor.on("node")
-    def visit(self, node, scope): # type: ignore
+    def visit(self, node, scope):
         pass
 
     @visitor.when(type_built.CoolProgramNode)
-    def visit(self, node, scope=None):  # type: ignore
+    def visit(self, node, scope=None):
         scope = semantic.Scope()
         self.types = node.types
         classes = [self.visit(c, scope.create_child()) for c in node.classes]
@@ -56,7 +56,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolClassNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         self.current_type = node.type
         scope.define_variable("self", self.current_type, first_self=True)
         for attr in self.current_type.all_attributes():
@@ -78,7 +78,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolAttrDeclNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         if node.body != [] and node.attr_info is not None:
             exp = self.visit(node.body, scope)
             node_type = node.attr_info.type
@@ -104,7 +104,7 @@ class TypeCheckerVisitor:
             )
 
     @visitor.when(type_built.CoolMethodDeclNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         if node.method_info is not None:
             self.current_method = self.current_type.get_method(node.method_info.name)
             method_scope = scope.create_child()
@@ -166,7 +166,7 @@ class TypeCheckerVisitor:
             )
 
     @visitor.when(type_built.CoolDispatchNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
 
         exp = self.visit(node.expr, scope)
 
@@ -214,7 +214,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolStaticDispatchNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         exp = self.visit(node.expr, scope)
         args = [self.visit(arg, scope) for arg in node.args]
         try:
@@ -277,7 +277,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolLetInNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         let_scope = scope.create_child()
 
         decl_list = [self.visit(decl, let_scope) for decl in node.decl_list]
@@ -291,7 +291,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolLetDeclNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         try:
             typex = self.get_type(node.type)
         except semantic.BaseSemanticError as e:
@@ -331,7 +331,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolCaseNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         exp = self.visit(node.expr, scope)
         return_type = None
         first = True
@@ -363,7 +363,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolCaseBranchNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         try:
             typex = self.get_type(node.type)
         except semantic.BaseSemanticError as e:
@@ -382,7 +382,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolBlockNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         exp = None
         expr_list = []
         for exp in node.expr_list:
@@ -396,7 +396,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolAssignNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         if node.id == "self":
             self.errors.append(
                 errors.IsReadOnlyError(node.lineno, node.columnno, "self")
@@ -422,7 +422,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolNotNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         exp = self.visit(node.expr, scope)
         bool_type = self.get_type("Bool")
         if exp.type != bool_type:
@@ -435,7 +435,7 @@ class TypeCheckerVisitor:
         return type_checked.CoolNotNode(node.lineno, node.columnno, exp, bool_type)
 
     @visitor.when(type_built.CoolTildeNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         exp = self.visit(node.expr, scope)
         int_type = self.get_type("Int")
         if not exp.type.conforms_to(int_type):
@@ -447,14 +447,14 @@ class TypeCheckerVisitor:
         return type_checked.CoolTildeNode(node.lineno, node.columnno, exp, int_type)
 
     @visitor.when(type_built.CoolIsVoidNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         exp = self.visit(node.expr, scope)
         return type_checked.CoolIsVoidNode(
             node.lineno, node.columnno, exp, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolParenthNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         exp = self.visit(node.expr, scope)
         return type_checked.CoolParenthNode(node.lineno, node.columnno, exp, exp.type)
 
@@ -471,7 +471,7 @@ class TypeCheckerVisitor:
 
 
     @visitor.when(type_built.CoolPlusNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         int_type = self.get_type("Int")
         left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolPlusNode(
@@ -479,7 +479,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolMinusNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         int_type = self.get_type("Int")
         left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolMinusNode(
@@ -487,7 +487,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolDivNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         int_type = self.get_type("Int")
         left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolDivNode(
@@ -495,7 +495,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolMultNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         int_type = self.get_type("Int")
         left, right = self.visit_arithmetic_operands(node, scope, int_type)
         return type_checked.CoolMultNode(
@@ -521,28 +521,28 @@ class TypeCheckerVisitor:
 
 
     @visitor.when(type_built.CoolLeqNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         left, right = self.visit_comparison_operands(node, scope)
         return type_checked.CoolLeqNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolEqNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         left, right = self.visit_comparison_operands(node, scope)
         return type_checked.CoolEqNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolLeNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         left, right = self.visit_comparison_operands(node, scope)
         return type_checked.CoolLeNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolWhileNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         conditional = self.visit(node.cond, scope)
         body = self.visit(node.body, scope)
 
@@ -558,7 +558,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolIfThenElseNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         conditional = self.visit(node.cond, scope)
         then_expr = self.visit(node.then_expr, scope)
         else_expr = self.visit(node.else_expr, scope)
@@ -577,25 +577,25 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolStringNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         return type_checked.CoolStringNode(
             node.lineno, node.columnno, node.value, self.get_type("String")
         )
 
     @visitor.when(type_built.CoolBoolNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         return type_checked.CoolBoolNode(
             node.lineno, node.columnno, node.value, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolIntNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         return type_checked.CoolIntNode(
             node.lineno, node.columnno, node.value, self.get_type("Int")
         )
 
     @visitor.when(type_built.CoolVarNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         try:
             var = scope.find_variable(node.value)
         except semantic.BaseSemanticError as e:
@@ -609,7 +609,7 @@ class TypeCheckerVisitor:
         )
 
     @visitor.when(type_built.CoolNewNode)
-    def visit(self, node, scope):  # type: ignore
+    def visit(self, node, scope):
         if node.type_name == "SELF_TYPE":
             type_checked.CoolNewNode(node.lineno, node.columnno, self.current_type)
 

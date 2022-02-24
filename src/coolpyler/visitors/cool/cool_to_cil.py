@@ -67,11 +67,11 @@ class CoolToCilVisitor(object):
         return dest
 
     @visitor.on("node")
-    def visit(self, node):  # type: ignore
+    def visit(self, node):
         pass
 
     @visitor.when(type_checked.CoolProgramNode)
-    def visit(self, node: type_checked.CoolProgramNode):  # type: ignore
+    def visit(self, node: type_checked.CoolProgramNode):
         main_type = "Main"
         main_method = "main"
         main_local = self.get_local("main")
@@ -97,7 +97,7 @@ class CoolToCilVisitor(object):
         return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
 
     @visitor.when(type_checked.CoolClassNode)
-    def visit(self, node: type_checked.CoolClassNode):  # type: ignore
+    def visit(self, node: type_checked.CoolClassNode):
         # TODO
         methods = node.type.all_methods()
         attributes = node.type.all_attributes()
@@ -140,13 +140,13 @@ class CoolToCilVisitor(object):
                 contructor_for(node.type.name),
                 [],
                 constructor_locals,
-                constructor_instructions + [cil.ReturnNode(self_local)],  # type: ignore
+                constructor_instructions + [cil.ReturnNode(self_local)],
             )
         )
         return dottype
 
     @visitor.when(type_checked.CoolAssignNode)
-    def visit(self, node: type_checked.CoolAssignNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolAssignNode) -> str:
         rhs_local = self.visit(node.expr)
 
         try:
@@ -168,7 +168,7 @@ class CoolToCilVisitor(object):
 
 
     @visitor.when(type_checked.CoolStaticDispatchNode)
-    def visit(self, node: type_checked.CoolStaticDispatchNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolStaticDispatchNode) -> str:
         return_local = self.register_local()
 
         sid = self.visit(node.expr)
@@ -185,7 +185,7 @@ class CoolToCilVisitor(object):
         return return_local
 
     @visitor.when(type_checked.CoolDispatchNode)
-    def visit(self, node: type_checked.CoolDispatchNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolDispatchNode) -> str:
         return_local = self.register_local()
 
         sid = self.visit(node.expr)
@@ -205,7 +205,7 @@ class CoolToCilVisitor(object):
         return return_local
 
     @visitor.when(type_checked.CoolIfThenElseNode)
-    def visit(self, node: type_checked.CoolIfThenElseNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolIfThenElseNode) -> str:
         return_local = self.register_local()
 
         then_label = self.get_label('then')
@@ -235,9 +235,7 @@ class CoolToCilVisitor(object):
         return return_local
 
     @visitor.when(type_checked.CoolWhileNode)
-    def visit(self, node: type_checked.CoolWhileNode) -> str:  # type: ignore
-        return_local = self.register_local()
-
+    def visit(self, node: type_checked.CoolWhileNode) -> str:
         while_label = self.get_label('while_label')
         loop_label = self.get_label('loop_label')
         pool_label = self.get_label('pool_label')
@@ -262,22 +260,22 @@ class CoolToCilVisitor(object):
         # Label pool
         self.instructions.append(cil.LabelNode(pool_label))
 
-        return return_local
+        return "void"
 
     @visitor.when(type_checked.CoolBlockNode)
-    def visit(self, node: type_checked.CoolBlockNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolBlockNode) -> str:
         for expr in node.expr_list:
             sid = self.visit(expr)
-        return sid # type: ignore
+        return sid
 
     @visitor.when(type_checked.CoolLetInNode)
-    def visit(self, node: type_checked.CoolLetInNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolLetInNode) -> str:
         for decl in node.decl_list:
             self.visit(decl)
         return self.visit(node.expr)
 
     @visitor.when(type_checked.CoolLetDeclNode)
-    def visit(self, node: type_checked.CoolLetDeclNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolLetDeclNode) -> str:
         try:
             lhs_local = self.named_locals[node.id]
         except KeyError:
@@ -287,30 +285,30 @@ class CoolToCilVisitor(object):
         return lhs_local
 
     @visitor.when(type_checked.CoolCaseNode)
-    def visit(self, node: type_checked.CoolCaseNode) -> str:  # type: ignore
-        raise NotImplementedError("This is not implemented yet") # TODO
+    def visit(self, node: type_checked.CoolCaseNode) -> str:
+        raise NotImplementedError("CaseOf is not implemented")
 
     @visitor.when(type_checked.CoolCaseBranchNode)
-    def visit(self, node: type_checked.CoolCaseBranchNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolCaseBranchNode) -> str:
         return self.visit(node.expr)
 
     @visitor.when(type_checked.CoolNewNode)
-    def visit(self, node: type_checked.CoolNewNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolNewNode) -> str:
         return self.register_new(node.type.name)
 
     @visitor.when(type_checked.CoolParenthNode)
-    def visit(self, node: type_checked.CoolParenthNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolParenthNode) -> str:
         return self.visit(node.expr)
 
     @visitor.when(type_checked.CoolTildeNode)
-    def visit(self, node: type_checked.CoolTildeNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolTildeNode) -> str:
         ret_local = self.register_local()
         sid = self.visit(node.expr)
         self.instructions.append(cil.MinusNode(ret_local, 1, sid))
         return ret_local
 
     @visitor.when(type_checked.CoolNotNode)
-    def visit(self, node: type_checked.CoolNotNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolNotNode) -> str:
         ret_local = self.register_local()
         sid = self.visit(node.expr)
         self.instructions.extend([
@@ -319,14 +317,14 @@ class CoolToCilVisitor(object):
         return self.register_new("Bool", ret_local)
 
     @visitor.when(type_checked.CoolIsVoidNode)
-    def visit(self, node: type_checked.CoolIsVoidNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolIsVoidNode) -> str:
         expr = node.expr
         ret_local = self.register_local()
         self.instructions.append(cil.TypeOfNode(expr, ret_local))
         return self.register_new("Bool", ret_local)
 
     @visitor.when(type_checked.CoolLeqNode)
-    def visit(self, node: type_checked.CoolLeqNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolLeqNode) -> str:
         left = self.visit(node.left_expr)
         if not is_value(left):
             left_value = self.register_local()
@@ -345,7 +343,7 @@ class CoolToCilVisitor(object):
         return self.register_new("Bool", cond_local)
 
     @visitor.when(type_checked.CoolEqNode)
-    def visit(self, node: type_checked.CoolEqNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolEqNode) -> str:
         left = self.visit(node.left_expr)
         if not is_value(left):
             left_value = self.register_local()
@@ -365,7 +363,7 @@ class CoolToCilVisitor(object):
         return self.register_new("Bool", cond_local)
 
     @visitor.when(type_checked.CoolLeNode)
-    def visit(self, node: type_checked.CoolLeNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolLeNode) -> str:
         left = self.visit(node.left_expr)
         if not is_value(left):
             left_value = self.register_local()
@@ -383,7 +381,7 @@ class CoolToCilVisitor(object):
         return self.register_new("Bool", cond_local)
 
     @visitor.when(type_checked.CoolPlusNode)
-    def visit(self, node: type_checked.CoolPlusNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolPlusNode) -> str:
         left = self.visit(node.left_expr)
         right = self.visit(node.right_expr)
         ret_local = self.register_local()
@@ -391,7 +389,7 @@ class CoolToCilVisitor(object):
         return ret_local
 
     @visitor.when(type_checked.CoolMinusNode)
-    def visit(self, node: type_checked.CoolMinusNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolMinusNode) -> str:
         left = self.visit(node.left_expr)
         right = self.visit(node.right_expr)
         ret_local = self.register_local()
@@ -399,7 +397,7 @@ class CoolToCilVisitor(object):
         return ret_local
 
     @visitor.when(type_checked.CoolMultNode)
-    def visit(self, node: type_checked.CoolMultNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolMultNode) -> str:
         left = self.visit(node.left_expr)
         right = self.visit(node.right_expr)
         ret_local = self.register_local()
@@ -407,7 +405,7 @@ class CoolToCilVisitor(object):
         return ret_local
 
     @visitor.when(type_checked.CoolDivNode)
-    def visit(self, node: type_checked.CoolDivNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolDivNode) -> str:
         left = self.visit(node.left_expr)
         right = self.visit(node.right_expr)
         ret_local = self.register_local()
@@ -415,22 +413,22 @@ class CoolToCilVisitor(object):
         return ret_local
 
     @visitor.when(type_checked.CoolIntNode)
-    def visit(self, node: type_checked.CoolIntNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolIntNode) -> str:
         return node.value
 
     @visitor.when(type_checked.CoolBoolNode)
-    def visit(self, node: type_checked.CoolBoolNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolBoolNode) -> str:
         return node.value
 
     @visitor.when(type_checked.CoolStringNode)
-    def visit(self, node: type_checked.CoolStringNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolStringNode) -> str:
         data_id = self.register_data("string", repr(node.value))
         return_sid = self.register_local()
         self.instructions.append(cil.LoadNode(return_sid, data_id))
         return return_sid
 
     @visitor.when(type_checked.CoolVarNode)
-    def visit(self, node: type_checked.CoolVarNode) -> str:  # type: ignore
+    def visit(self, node: type_checked.CoolVarNode) -> str:
         try:
             return self.named_locals[node.value]
         except KeyError:

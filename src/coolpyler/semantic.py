@@ -1,42 +1,44 @@
 # TODO: find location for this file
 
+from __future__ import annotations
+
 import itertools as itt
-from collections import OrderedDict
+from typing import List, Optional
 
 import coolpyler.errors as errors
 
 
 class BaseSemanticError(Exception):
-    @property
-    def text(self):
-        return self.args[0]
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+        self.msg = msg
 
-    def with_pos(self, line, column):
+    def with_pos(self, lineno: int, columnno: int) -> errors.CoolpylerError:
         raise NotImplementedError()
 
 
 class NameError(BaseSemanticError):
-    def with_pos(self, lineno, columnno):
-        return errors.NameError(lineno, columnno, self.text)
+    def with_pos(self, lineno: int, columnno: int) -> errors.CoolpylerError:
+        return errors.NameError(lineno, columnno, self.msg)
 
 
 class TypeError(BaseSemanticError):
-    def with_pos(self, lineno, columnno):
-        return errors.TypeError(lineno, columnno, self.text)
+    def with_pos(self, lineno: int, columnno: int) -> errors.CoolpylerError:
+        return errors.TypeError(lineno, columnno, self.msg)
 
 
 class AttributeError(BaseSemanticError):
-    def with_pos(self, lineno, columnno):
-        return errors.AttributeError(lineno, columnno, self.text)
+    def with_pos(self, lineno: int, columnno: int) -> errors.CoolpylerError:
+        return errors.AttributeError(lineno, columnno, self.msg)
 
 
 class SemanticError(BaseSemanticError):
-    def with_pos(self, lineno, columnno):
-        return errors.SemanticError(lineno, columnno, self.text)
+    def with_pos(self, lineno: int, columnno: int) -> errors.CoolpylerError:
+        return errors.SemanticError(lineno, columnno, self.msg)
 
 
 class Attribute:
-    def __init__(self, name, type):
+    def __init__(self, name: str, type: Type):
         self.name = name
         self.type = type
 
@@ -48,7 +50,13 @@ class Attribute:
 
 
 class Method:
-    def __init__(self, name, param_names, params_types, return_type):
+    def __init__(
+        self,
+        name: str,
+        param_names: List[str],
+        params_types: List[Type],
+        return_type: Type,
+    ):
         self.name = name
         self.param_names = param_names
         self.param_types = params_types
@@ -71,14 +79,14 @@ class Method:
 class Type:
     def __init__(self, name: str):
         self.name = name
-        self.attributes = []
-        self.methods = []
-        self.parent = None
+        self.attributes: List[Attribute] = []
+        self.methods: List[Method] = []
+        self.parent: Optional[Type] = None
 
-        self.reachable = [self]
+        self.reachable: List[Type] = [self]
         self.sealed = False
 
-    def set_parent(self, parent):
+    def set_parent(self, parent: Type) -> None:
         if self.parent is not None:
             raise TypeError(f"Parent type is already set for `{self.name}`.")
         if parent.sealed:
@@ -88,7 +96,7 @@ class Type:
         self.parent = parent
         self.parent.reachable.extend(self.reachable)  # TODO
 
-    def get_attribute(self, name: str):
+    def get_attribute(self, name: str) -> Attribute:
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
@@ -103,13 +111,13 @@ class Type:
                     f"Attribute `{name}` is not defined in `{self.name}`."
                 )
 
-    def define_attribute(self, name: str, typex):
+    def define_attribute(self, name: str, type: Type) -> Attribute:
         if name == "self":
             raise SemanticError("`self` cannot be the name of an attribute.")
         try:
             self.get_attribute(name)
         except BaseSemanticError:
-            attribute = Attribute(name, typex)
+            attribute = Attribute(name, type)
             self.attributes.append(attribute)
             return attribute
         else:
@@ -117,7 +125,7 @@ class Type:
                 f"Attribute `{name}` is already defined in `{self.name}`."
             )
 
-    def get_method(self, name: str):
+    def get_method(self, name: str) -> Method:
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
@@ -133,8 +141,8 @@ class Type:
                 )
 
     def define_method(
-        self, name: str, param_names: list, param_types: list, return_type
-    ):
+        self, name: str, param_names: list, param_types: list, return_type: Type
+    ) -> Method:
         if name in (method.name for method in self.methods):
             raise SemanticError(f"Method `{name}` already defined in `{self.name}`")
 
@@ -145,15 +153,15 @@ class Type:
         self.methods.append(method)
         return method
 
-    def all_attributes(self):
+    def all_attributes(self) -> List[Attribute]:
         return (
             [] if self.parent is None else self.parent.all_attributes()
         ) + self.attributes
 
-    def all_methods(self):
+    def all_methods(self) -> List[Method]:
         return ([] if self.parent is None else self.parent.all_methods()) + self.methods
 
-    def conforms_to(self, other):
+    def conforms_to(self, other: Type) -> bool:
         return (
             other.bypass()
             or self == other
@@ -185,7 +193,7 @@ class ErrorType(Type):
     def __init__(self):
         Type.__init__(self, "ERROR")
 
-    def conforms_to(self, other):
+    def conforms_to(self, other: Type):
         return True
 
     def bypass(self):
@@ -199,7 +207,7 @@ class ObjectType(Type):
     def __init__(self):
         Type.__init__(self, "Object")
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type):
         return other.name == self.name or isinstance(other, ObjectType)
 
 
@@ -208,7 +216,7 @@ class IntType(Type):
         Type.__init__(self, "Int")
         self.sealed = True
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type):
         return other.name == self.name or isinstance(other, IntType)
 
 
@@ -217,7 +225,7 @@ class BoolType(Type):
         Type.__init__(self, "Bool")
         self.sealed = True
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type):
         return other.name == self.name or isinstance(other, BoolType)
 
 
@@ -226,7 +234,7 @@ class StringType(Type):
         Type.__init__(self, "String")
         self.sealed = True
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type):
         return other.name == self.name or isinstance(other, StringType)
 
 
@@ -234,32 +242,32 @@ class IOType(Type):
     def __init__(self):
         Type.__init__(self, "IO")
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type):
         return other.name == self.name or isinstance(other, IOType)
 
 
 class SelfType(Type):
-    def __init__(self, type):
+    def __init__(self, type: Type):
         Type.__init__(self, f"SELF_TYPE_{type.name}")
         self.type = type
 
-    def __eq__(self, other):
+    def __eq__(self, other: Type):
         return other.name == self.name or isinstance(other, SelfType)
 
-    def conforms_to(self, other):
+    def conforms_to(self, other: Type):
         return (
             isinstance(other, SelfType) and self.type == other.type
         ) or self.type.conforms_to(other)
 
 
 class VariableInfo:
-    def __init__(self, name, vtype):
+    def __init__(self, name: str, vtype: Type):
         self.name = name
         self.type = vtype
 
 
 class Scope:
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[Scope] = None):
         self.locals = []
         self.parent = parent
         self.children = []
@@ -268,12 +276,14 @@ class Scope:
     def __len__(self):
         return len(self.locals)
 
-    def create_child(self):
+    def create_child(self) -> Scope:
         child = Scope(self)
         self.children.append(child)
         return child
 
-    def define_variable(self, vname, vtype, first_self=False, force=False):
+    def define_variable(
+        self, vname: str, vtype: Type, first_self=False, force=False
+    ) -> VariableInfo:
         if (vname == "self" and not first_self) or (self.is_local(vname) and not force):
             raise SemanticError("Variable already exists in the current scope")
 
@@ -281,7 +291,7 @@ class Scope:
         self.locals.append(info)
         return info
 
-    def find_variable(self, vname, index=None):
+    def find_variable(self, vname: str, index: Optional[int] = None) -> VariableInfo:
         locals = self.locals if index is None else itt.islice(self.locals, index)
         try:
             return next(x for x in locals if x.name == vname)
@@ -293,8 +303,8 @@ class Scope:
             except BaseSemanticError:
                 raise NameError(f"Variable `{vname}` is not defined in current scope.")
 
-    def is_defined(self, vname):
+    def is_defined(self, vname: str) -> bool:
         return self.find_variable(vname) is not None
 
-    def is_local(self, vname):
+    def is_local(self, vname: str) -> bool:
         return any(True for x in self.locals if x.name == vname)

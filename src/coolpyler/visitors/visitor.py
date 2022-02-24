@@ -24,7 +24,7 @@ class Visitor:
 
     def visit_down(self, ast):
         for visitor in self.visitors_down:
-            ast = visitor.visit(ast) # type: ignore
+            ast = visitor.visit(ast)
         return ast
 
     def visit(self, ast):
