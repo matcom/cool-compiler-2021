@@ -37,6 +37,7 @@ class CoolCreateType(VisitBase):
             else: self.global_types[name] = Type(name)
 
         class_list = self.visit_all(node.class_list)
+
         return class_list,
 
     @visitor.when(AST.CoolClass)

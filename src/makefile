@@ -1,7 +1,7 @@
 .PHONY: clean
 
 main:
-	python -m cool_compiler test.cl
+	rm -rf test.mips && python -m cool_compiler test.cl
 
 clean:
 	rm -rf build/*
@@ -24,3 +24,6 @@ parser:
 
 semantic:
 	python3.8  cool_compiler/semantic/__main__.py
+
+exec:
+	spim -file test.mips

@@ -1,4 +1,5 @@
 class Main inherits IO {
+<<<<<<< HEAD
 	-- the class has features. Only methods in this case.
 	main(): Object {
 		{
@@ -28,3 +29,9 @@ class Main inherits IO {
 
 };
 
+=======
+   main(): IO {
+	out_string("Hello, World.\n")
+   };
+};
+>>>>>>> 14b6210f6cb7d1ce1478a2cf7a95f05c89413b85

@@ -60,6 +60,11 @@ class Program(Node):
         self.data[self.data_list[-1]] = Data(self.data_list[-1], value)
         return self.data_list[-1]
         
+    def force_data(self, name, value):
+        self.data_list.append(name)
+        self.data[self.data_list[-1]] = Data(self.data_list[-1], value)
+        return self.data_list[-1]
+
     def add_type(self, type):
         self.ty_list.append(type.name)
         self.types[type.name] = type

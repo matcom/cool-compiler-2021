@@ -1,10 +1,7 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Daniel Orlando Ortiz Pacheco
+    github: danielorlando97
+    group: C412
+  - name: Aldo Veldecia
+    github: Yuli01
+    group: C412
