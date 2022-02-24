@@ -277,9 +277,9 @@ class StringType(Type):
         self.init_methods()
 
     def init_methods(self):
-        # self.define_method('abort', [], [], self)
-        # self.define_method('type_name', [], [], self)
-        # self.define_method('copy', [], [], SelfType())
+        self.define_method('abort', [], [], self)
+        self.define_method('type_name', [], [], self)
+        self.define_method('copy', [], [], SelfType())
         self.define_method('length', [], [], IntType())
         self.define_method('concat', ['s'], [self], self)
         self.define_method('substr', ['i', 'l'], [IntType(), IntType()], self)
