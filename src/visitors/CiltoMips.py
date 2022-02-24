@@ -32,34 +32,10 @@ class CiltoMipsVisitor:
         self.dotdata = node.dotdata
         self.dotcode = node.dotcode
 
-        self.write_data('.data')
-        self.write_code('.text')
-        
-        self.write_code("main:")
-        self.write_code(f'{o.move} {r.s7} {r.gp}')
-        self.write_code(f'{o.addi} {r.s7} {r.s7} 300000')
-        self.write_code(f"")
-        
-        self.write_data(f"_abort: {dt.asciiz} \"Program Aborted\"")
-        self.write_data(f"_zero: {dt.asciiz} \"0 Division Error\"")
-        self.write_data(f"_substr: {dt.asciiz} \"Substr Length Error\"")
-        self.write_data(f"_mem: {dt.asciiz} \"Memory Error\"")
-        self.write_data(f"")
-
-        for i, d in enumerate(self.dotdata):
-            self.write_data("msg{}: {} \"{}\"".format(i, dt.asciiz, d))   # every one of the user defined data through the program
-        
-        self.write_data('buffer: .space 1024')  # buffer for the in_string method
-
-        for i, t in enumerate(self.dottypes):
-            self.write_data(f"type_str{i}: {dt.asciiz} \"{t.name}\"")
-        
-        for i, t in enumerate(self.dottypes):
-            # words = f"{tipe.cType}: .word {tipe.t_in}, {tipe.t_out}, type_str{i}"
-            words = f"{t.name}: .word 12, 42, type_str{i}"
-            for method in t.methods:
-                words += ", " + "." + method[1]
-            self.write_data(words)
+        self.write_data('.data')  # initialize the .data segment
+        self.write_data(f'p_error: {dt.asciiz} "Aborting from String"')
+        self.write_data(f'zero_error: {dt.asciiz} "Division by zero"')
+        self.write_data(f'range_error: {dt.asciiz} "Index out of range"')
 
     @visitor.when(TypeNode)
     def visit(self, node):
@@ -152,7 +128,7 @@ class CiltoMipsVisitor:
         self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
         self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
         self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
-        # TODO: zero exception
+        # zero exception
         # self.write_code("la $t0, zero_error")
         # self.write_code("sw $t0, ($sp)")
         # self.write_code("subu $sp, $sp, 4")

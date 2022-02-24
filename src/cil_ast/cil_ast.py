@@ -199,3 +199,24 @@ class ToStrNode(InstructionNode):
     def __init__(self, dest, ivalue):
         self.dest = dest
         self.ivalue = ivalue
+
+class AbortNode(InstructionNode):
+    def __init__(self):
+        pass
+
+class CopyNode():
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+class PrintStrNode():
+    def __init__(self, output):
+        self.output = output
+
+class ReadStrNode():
+    def __init__(self, input):
+        self.input = input
+
+class PrintIntNode():
+    def __init__(self, output):
+        self.output = output
