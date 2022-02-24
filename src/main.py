@@ -7,8 +7,9 @@ from compiler.lexer.lex import CoolLexer
 from sys import exit
 
 from compiler.cmp.tools import LR1Parser
-# from compiler.cmp.evaluation import evaluate_reverse_parse
-# from compiler.visitors.formatter import FormatVisitor
+from compiler.cmp.evaluation import evaluate_reverse_parse
+from compiler.visitors.formatter import FormatVisitor
+
 # from compiler.visitors.type_collector import TypeCollector
 # from compiler.visitors.type_builder import TypeBuilder
 # from compiler.visitors.type_checker import TypeChecker
@@ -23,25 +24,24 @@ def main(args):
         print(f"(0,0) - CompilerError: file {args.file} not found")
         exit(1)
 
+    # Lexer
     lexer = CoolLexer()
     tokens, errors = lexer.tokenize(code)
     for error in errors:
         print(error)
-
     if errors:
         exit(1)
-    
+
+    # Parser
     parser = LR1Parser(G)
-    parseResult, (failed, token) = parser(tokens, get_shift_reduce=True)
-    if failed:
-        print(f"{token.pos} - SyntacticError: ERROR at or near {token.lex}")
+    parseResult, error = parser(tokens, get_shift_reduce=True)
+    if error:
+        print(error)
         exit(1)
 
-    # print('\n'.join(repr(x) for x in parse))
-    # print("---------------OPERATIONS---------------")
-    # print(operations)
-    # print('==================== AST ======================')
-    # ast = evaluate_reverse_parse(parse, operations, tokens)
+    # AST
+    parse, operations = parseResult
+    ast = evaluate_reverse_parse(parse, operations, tokens)
     # formatter = FormatVisitor()
     # tree = formatter.visit(ast)
     # print(tree)

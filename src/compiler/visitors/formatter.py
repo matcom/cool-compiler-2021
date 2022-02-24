@@ -37,7 +37,8 @@ class FormatVisitor(object):
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, tabs=0):
-        params = ", ".join(" : ".join(param) for param in node.params)
+        paramStr = [(id.lex, typex.lex) for (id, typex) in node.params]
+        params = ", ".join(" : ".join(param) for param in paramStr)
         ans = (
             "\t" * tabs
             + f"\\__FuncDeclarationNode: {node.id}({params}) : {node.type} {{ <expr> }}"
@@ -123,7 +124,9 @@ class FormatVisitor(object):
 
     @visitor.when(AtomicNode)
     def visit(self, node, tabs=0):
-        return "\t" * tabs + f"\\__ {node.__class__.__name__}: {node.lex}"
+        return (
+            "\t" * tabs + f"\\__ {node.__class__.__name__}: {node.lex, node.token.pos}"
+        )
 
     @visitor.when(UnaryNode)
     def visit(self, node, tabs=0):
