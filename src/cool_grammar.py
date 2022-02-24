@@ -107,7 +107,7 @@ def define_cool_grammar(print_grammar=False):
     )
     expr %= whilex + expr + loop + expr + pool, lambda h, s: WhileNode(s[2], s[4])
     expr %= case + expr + of + case_block + esac, lambda h, s: CaseNode(s[2], s[4])
-    expr %= notx + expr, lambda h, s: NotNode(s[2])
+    # expr %= notx + expr, lambda h, s: NotNode(s[2])
     expr %= comp, lambda h, s: s[1]
 
     identifiers_list %= (
@@ -134,6 +134,7 @@ def define_cool_grammar(print_grammar=False):
     comp %= comp + lesseq + arith, lambda h, s: LessEqualNode(s[1], s[3])
     comp %= arith, lambda h, s: s[1]
 
+    arith %= notx + term, lambda h, s: NotNode(s[2]) #used to be in expr's level
     arith %= arith + plus + term, lambda h, s: PlusNode(s[1], s[3])
     arith %= arith + minus + term, lambda h, s: MinusNode(s[1], s[3])
     arith %= term, lambda h, s: s[1]
