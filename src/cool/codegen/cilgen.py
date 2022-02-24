@@ -1,9 +1,10 @@
 from .utils import ProgramNode, LocalNode, FunctionNode, TypeNode, DataNode, ParamNode
 from .utils import ast_cil
-from semantic.helpers import Context, VariableInfo, Scope
-from semantic.types import Attribute, Type, StringType, ObjectType, IOType, Method
+from ..semantic.helpers import Context, VariableInfo, Scope
+from ..semantic.types import Attribute, Type, StringType, ObjectType, IOType, Method
 import re
-from utils.ast import *
+from ..utils.ast import BinaryNode, UnaryNode, AssignNode, ConstantBoolNode, ConstantVoidNode, ConstantStrNode, \
+    ConstantNumNode
 
 
 class BaseCil:
@@ -17,6 +18,9 @@ class BaseCil:
         self.context = context
         self.idx = 0
         self.void_data = None
+        self.constructors = []
+        self.void_data = None
+        self.inherit_graph = {}
 
     @property
     def params(self):
@@ -84,19 +88,19 @@ class BaseCil:
         return node
 
     def register_data(self, value):
-        vname = f'data_{len(len(self.data))}'
+        vname = f'data_{len(self.data)}'
         node = DataNode(vname, value, self.index)
         self.data.append(node)
         return node
 
-    def define_binary_node(self, node: BinaryNode, scope: Scope, cil_node: ast_cil.Node):
+    def _define_binary_node(self, node: BinaryNode, scope: Scope, cil_node: ast_cil.Node):
         result = self.define_internal_local()
         left, typex = self.visit(node.left, scope)
         right, typex = self.visit(node.right, scope)
         self.register_instruction(cil_node(result, left, right))
         return result, typex
 
-    def define_unary_node(self, node: UnaryNode, scope: Scope, cil_node):
+    def _define_unary_node(self, node: UnaryNode, scope: Scope, cil_node):
         result = self.define_internal_local()
         expr, typex = self.visit(node.expr, scope)
         self.register_instruction(cil_node(result, expr))
@@ -243,6 +247,8 @@ class BaseCil:
         io_methods = [('out_string', f4.name), ('out_int', f5.name), ('in_int', f6.name), ('in_string', f7.name)]
         int_methods = [('abort', f18.name), ('type_name', f13.name), ('copy', f14.name)]
         bool_methods = [('abort', f19.name), ('type_name', f15.name), ('copy', f16.name)]
+
+        a = TypeNode("String", [], string_methods)
 
         self.types_nodes += [TypeNode("Object", [], object_methods),
                              TypeNode("IO", [], object_methods + io_methods),

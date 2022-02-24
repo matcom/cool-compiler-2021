@@ -6,7 +6,7 @@ class ProgramNode(Node):
     def __init__(self, type_node, data, func_node, idx=None):
         self.type_node = type_node
         self.data = data
-        self.fun_node = func_node
+        self.func_node = func_node
         self.index = idx
 
 

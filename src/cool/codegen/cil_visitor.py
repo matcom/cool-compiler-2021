@@ -1,10 +1,10 @@
 from .cilgen import BaseCil
-from utils import visitor
-from utils.ast import *
-from semantic.helpers import Scope, VariableInfo
-from semantic.types import *
+from ..utils import visitor
+from ..utils.ast import *
+from ..semantic.helpers import Scope, VariableInfo
+from ..semantic.types import *
 from .utils import ast_cil
-from utils.helpers import get_type, get_common_base_type
+from ..utils.helpers import get_type, get_common_base_type
 
 
 class CilVisitor(BaseCil):
