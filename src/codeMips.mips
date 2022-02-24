@@ -257,7 +257,7 @@ li $v0, 9
 syscall
 bge $v0, $sp heap_error
 move $t0, $v0
-li $t1, 11
+li $t1, 2
 sw $t1, 0($t0)
 la $t1, Main_name
 sw $t1, 4($t0)
@@ -7143,7 +7143,7 @@ li $v0, 9
 syscall
 bge $v0, $sp heap_error
 move $t0, $v0
-li $t1, 10
+li $t1, 6
 sw $t1, 0($t0)
 la $t1, A2I_name
 sw $t1, 4($t0)
@@ -7634,7 +7634,7 @@ sw $t1, 4($sp)
 b label_75
 label_77:
 blt	$t1 8 label_78
-bgt	$t1 8 label_78
+bgt	$t1 9 label_78
 lw $t1, 132($sp)
 sw $t1, 28($sp)
 la $t0, data_35
@@ -7728,7 +7728,7 @@ sw $t1, 4($sp)
 b label_75
 label_79:
 blt	$t1 6 label_80
-bgt	$t1 6 label_80
+bgt	$t1 9 label_80
 lw $t1, 132($sp)
 sw $t1, 68($sp)
 la $t0, data_37
@@ -7775,7 +7775,7 @@ sw $t1, 4($sp)
 b label_75
 label_80:
 blt	$t1 5 label_81
-bgt	$t1 5 label_81
+bgt	$t1 9 label_81
 lw $t1, 132($sp)
 sw $t1, 88($sp)
 la $t0, data_38
@@ -7822,7 +7822,7 @@ sw $t1, 4($sp)
 b label_75
 label_81:
 blt	$t1 0 label_82
-bgt	$t1 11 label_82
+bgt	$t1 9 label_82
 lw $t1, 132($sp)
 sw $t1, 108($sp)
 la $t0, data_39
@@ -7883,7 +7883,7 @@ li $v0, 9
 syscall
 bge $v0, $sp heap_error
 move $t0, $v0
-li $t1, 10
+li $t1, 6
 sw $t1, 0($t0)
 la $t1, A2I_name
 sw $t1, 4($t0)
@@ -9296,7 +9296,7 @@ li $v0, 9
 syscall
 bge $v0, $sp heap_error
 move $t0, $v0
-li $t1, 10
+li $t1, 6
 sw $t1, 0($t0)
 la $t1, A2I_name
 sw $t1, 4($t0)
@@ -10036,7 +10036,7 @@ sw $t1, 1012($sp)
 b label_109
 label_111:
 blt	$t1 5 label_112
-bgt	$t1 5 label_112
+bgt	$t1 9 label_112
 lw $t1, 1132($sp)
 sw $t1, 1036($sp)
 move $t0, $sp
@@ -10072,7 +10072,7 @@ sw $t1, 1012($sp)
 b label_109
 label_112:
 blt	$t1 0 label_113
-bgt	$t1 11 label_113
+bgt	$t1 9 label_113
 lw $t1, 1132($sp)
 sw $t1, 1052($sp)
 la $t0, data_39

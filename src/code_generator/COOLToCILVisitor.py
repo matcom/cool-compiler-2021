@@ -642,7 +642,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         result_local = self.define_internal_local(scope=scope, name="result")
         result_init = self.define_internal_local(scope=scope, name="init")
 
-        if node.id == "Self":
+        if node.id == "SELF_TYPE":
             self.register_instruction(cil.AllocateNode(
                 self.current_type.name, self.current_type.tag, result_local))
             self.register_instruction(cil.CallNode(result_init, f'{self.current_type.name}_init', [

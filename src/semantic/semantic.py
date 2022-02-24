@@ -1,3 +1,4 @@
+from unicodedata import name
 from utils.errors import SemanticError
 from collections import OrderedDict
 import itertools as itt
@@ -230,7 +231,7 @@ class BoolType(Type):
 
 class SelfType(Type):
     def __init__(self, pos=(0, 0)):
-        self.name = 'Self'
+        self.name = 'SELF_TYPE'
         self.attributes = {}
         self.methods = {}
         self.parent = None
@@ -361,12 +362,12 @@ class Context:
         self.graph['Int'] = []
         self.graph['Bool'] = []
 
-    def create_type(self, name, pos):
-        if name in self.types:
-            error_text = 'Classes may not be redefined.'
-            raise SemanticError(error_text, *pos)
-        typex = self.types[name] = Type(name, pos)
+    def update_graph(self):
+        for tname, _ in self.types.items():
+            if not tname in ['Object', 'IO', 'String', 'Bool', 'Int', 'SELF_TYPE']:
+                self._update_graph(tname)
 
+    def _update_graph(self, name):
         parentName = self.types[name].parent.name
 
         if not self.graph.__contains__(name):
@@ -375,6 +376,13 @@ class Context:
             self.graph[parentName].append(name)
         else:
             self.graph[parentName] = [name]
+
+    def create_type(self, name, pos):
+        if name in self.types:
+            error_text = 'Classes may not be redefined.'
+            raise SemanticError(error_text, *pos)
+        typex = self.types[name] = Type(name, pos)
+
         return typex
 
     def get_type(self, name: str, pos=None):

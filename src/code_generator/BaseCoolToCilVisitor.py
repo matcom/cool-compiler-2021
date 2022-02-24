@@ -11,6 +11,7 @@ class BaseCOOLToCILVisitor:
         self.current_method = None
         self.current_function = None
         self.context = context
+        self.context.update_graph()
         self.context.set_type_tags()
         self.context.set_type_max_tags()
 
