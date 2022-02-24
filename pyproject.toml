@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "cool-compiler-2021"
+version = "0.1.0"
+description = "COOL language compiler"
+authors = ["rodrigo-pino <rodrodpino@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^6.2.5"
+ply = "^3.11"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
