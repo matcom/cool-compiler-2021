@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from coolcmp.codegen.cool2cil import CILVisitor
 from coolcmp.utils import visitor, ast, cil
 from coolcmp.utils.semantic import Context, Type
 
 
-class DotTypesDataVisitor(CILVisitor):
+class DotTypesDataVisitor:
     """
     Builds the .TYPES and .DATA sections.
     """

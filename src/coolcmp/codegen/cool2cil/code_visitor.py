@@ -1,12 +1,11 @@
 from __future__ import annotations
 from copy import deepcopy
 
-from coolcmp.codegen.cool2cil import CILVisitor
 from coolcmp.utils import ast, cil, visitor
 from coolcmp.utils.semantic import Scope
 
 
-class DotCodeVisitor(CILVisitor):
+class DotCodeVisitor:
     """
     Builds the .CODE section.
     """
@@ -97,19 +96,32 @@ class DotCodeVisitor(CILVisitor):
                     cil.ReturnNode(),
                 ]
             ),
-            # cil.FunctionNode(
-            #     name='type_name',
-            #     params=[
-            #         cil.ParamNode('self'),
-            #     ],
-            #     local_vars=[
-            #         cil.LocalNode('name'),
-            #     ],
-            #     instructions=[
-            #         cil.LoadNode('name', )
-            #         cil.ReturnNode(),
-            #     ]
-            # ),
+            cil.FunctionNode(
+                name='Object_type_name',
+                params=[
+                    cil.ParamNode('self'),
+                ],
+                local_vars=[
+                    cil.LocalNode('_name'),
+                ],
+                instructions=[
+                    cil.GetAttrNode('_name', 'self', 'Object__name'),
+                    cil.ReturnNode('_name'),
+                ]
+            ),
+            cil.FunctionNode(
+                name='Object_copy',
+                params=[
+                    cil.ParamNode('self'),
+                ],
+                local_vars=[
+                    cil.LocalNode('self_copy'),
+                ],
+                instructions=[
+                    cil.AssignNode('self_copy', 'self'),
+                    cil.ReturnNode('self_copy'),
+                ]
+            ),
             cil.FunctionNode(
                 name='IO_out_string',
                 params=[
@@ -134,7 +146,86 @@ class DotCodeVisitor(CILVisitor):
                     cil.ReturnNode(),
                 ]
             ),
-            # cil.FunctionNode('in_int', [], [], []),
+            cil.FunctionNode(
+                name='IO_in_string',
+                params=[
+                    cil.ParamNode('self'),
+                ],
+                local_vars=[
+                    cil.LocalNode('_in_string'),
+                ],
+                instructions=[
+                    cil.ReadStringNode('_in_string'),
+                    cil.ReturnNode('_in_string'),
+                ]
+            ),
+            cil.FunctionNode(
+                name='IO_in_int',
+                params=[
+                    cil.ParamNode('self'),
+                ],
+                local_vars=[
+                    cil.LocalNode('_in_int'),
+                ],
+                instructions=[
+                    cil.ReadIntNode('_in_int'),
+                    cil.ReturnNode('_in_int'),
+                ]
+            ),
+            cil.FunctionNode(
+                name='String_length',
+                params=[
+                    cil.ParamNode('self'),
+                ],
+                local_vars=[
+                    cil.LocalNode('value'),
+                    cil.LocalNode('_length'),
+                ],
+                instructions=[
+                    cil.GetAttrNode('value', 'self', 'String_value'),
+                    cil.LengthNode('_length', 'value'),
+                    cil.ReturnNode('_length'),
+                ]
+            ),
+            cil.FunctionNode(
+                name='String_concat',
+                params=[
+                    cil.ParamNode('self'),
+                    cil.ParamNode('other_str'),
+                ],
+                local_vars=[
+                    cil.LocalNode('value'),
+                    cil.LocalNode('other_value'),
+                    cil.LocalNode('result'),
+                ],
+                instructions=[
+                    cil.GetAttrNode('value', 'self', 'String_value'),
+                    cil.GetAttrNode('other_value', 'other', 'String_value'),
+                    cil.ConcatNode('result', 'value', 'other_value'),
+                    cil.ReturnNode('result'),
+                ]
+            ),
+            cil.FunctionNode(
+                name='String_substr',
+                params=[
+                    cil.ParamNode('self'),
+                    cil.ParamNode('index'),
+                    cil.ParamNode('length'),
+                ],
+                local_vars=[
+                    cil.LocalNode('value'),
+                    cil.LocalNode('index_value'),
+                    cil.LocalNode('length_value'),
+                    cil.LocalNode('result'),
+                ],
+                instructions=[
+                    cil.GetAttrNode('value', 'self', 'String_value'),
+                    cil.GetAttrNode('index_value', 'index', 'Int_value'),
+                    cil.GetAttrNode('length_value', 'length', 'Int_value'),
+                    cil.SubstringNode('result', 'value', 'index_value', 'length_value'),
+                    cil.ReturnNode('result'),
+                ]
+            )
         ]
 
     @visitor.when(ast.ClassDeclarationNode)

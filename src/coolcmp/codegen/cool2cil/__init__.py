@@ -1,4 +1,3 @@
-from .cil_visitor import CILVisitor
 from .types_data_visitor import DotTypesDataVisitor
 from .code_visitor import DotCodeVisitor
 

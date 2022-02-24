@@ -207,11 +207,16 @@ class LoadNode(InstructionNode):
 
 
 class LengthNode(InstructionNode):
-    pass
+    def __init__(self, src: str, dest: str):
+        self.src = src
+        self.dest = dest
 
 
 class ConcatNode(InstructionNode):
-    pass
+    def __init__(self, dest: str, str1: str, str2: str):
+        self.dest = dest
+        self.str1 = str1
+        self.str2 = str2
 
 
 class PrefixNode(InstructionNode):
@@ -219,7 +224,11 @@ class PrefixNode(InstructionNode):
 
 
 class SubstringNode(InstructionNode):
-    pass
+    def __init__(self, dest: str, src: str, index: str, length: str):
+        self.dest = dest
+        self.src = src
+        self.index = index
+        self.length = length
 
 
 class ToStrNode(InstructionNode):
@@ -231,6 +240,14 @@ class ToStrNode(InstructionNode):
 class ReadNode(InstructionNode):
     def __init__(self, dest):
         self.dest = dest
+
+
+class ReadIntNode(ReadNode):
+    pass
+
+
+class ReadStringNode(ReadNode):
+    pass
 
 
 class PrintNode(InstructionNode):

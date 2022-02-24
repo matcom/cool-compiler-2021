@@ -141,3 +141,19 @@ class CILFormatter(object):
     @visitor.when(cil.CommentNode)
     def visit(self, node: cil.CommentNode):
         return f'\033[32m# {node.text}\033[0m'
+
+    @visitor.when(cil.ReadNode)
+    def visit(self, node: cil.ReadNode):
+        return f'{node.dest} = READ'
+
+    @visitor.when(cil.LengthNode)
+    def visit(self, node: cil.LengthNode):
+        return f'{node.dest} = LENGTH {node.src}'
+
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node: cil.ConcatNode):
+        return f'{node.dest} = CONCAT {node.str1} {node.str2}'
+
+    @visitor.when(cil.SubstringNode)
+    def visit(self, node: cil.SubstringNode):
+        return f'{node.dest} = SUBSTR {node.src} {node.index} {node.length}'
