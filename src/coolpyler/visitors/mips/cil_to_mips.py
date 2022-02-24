@@ -1,3 +1,4 @@
+from dis import Instruction
 from random import choice
 
 import coolpyler.ast.cil.base as cil
@@ -57,6 +58,21 @@ class CilToMIPS:
             index = self.params.index(id)
             return index * 4
 
+    def load_value_to_reg(self, reg, id: str):
+        instructions = []
+        if id.isdigit():
+            instructions.append(mips.LoadInmediateNode(reg, int(id)))
+        elif id == "true" or id == "false":
+            instructions.append(mips.LoadInmediateNode(reg, id))
+        else:
+            obj1_dir = self.search_mem(id)
+            instructions.append(
+                mips.StoreWordNode(
+                    reg, mips.MemoryAddressRegisterNode(FP_REG, obj1_dir)
+                )
+            )
+        return instructions
+
     def push_arg(self):
         self.pushed_args += 1
 
@@ -92,7 +108,9 @@ class CilToMIPS:
         self.types[node.name] = mips.TypeNode(node.name, node.attributes, node.methods)
 
         self.data_section[node.name] = mips.DataNode(
-            mips.LabelNode(node.name), ".word", [mips.LabelNode(f"{method.name}") for method in node.methods]
+            mips.LabelNode(node.name),
+            ".word",
+            [mips.LabelNode(f"{method.name}") for method in node.methods],
         )
 
     @visitor.when(cil.FunctionNode)
@@ -175,21 +193,93 @@ class CilToMIPS:
 
     @visitor.when(cil.PlusNode)
     def visit(self, node: cil.PlusNode):
+        instructions = []
         self.memory_manager.save()
-        
+
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+        reg3 = self.memory_manager.get_unused_register()
+
+        instructions.extend(self.load_value_to_reg(reg1, node.left))
+        instructions.extend(self.load_value_to_reg(reg2, node.right))
+
+        instructions.append(mips.AddNode(reg3, reg1, reg2))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),)
+        )
+
         self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.MinusNode)
     def visit(self, node: cil.MinusNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+        reg3 = self.memory_manager.get_unused_register()
+
+        instructions.extend(self.load_value_to_reg(reg1, node.left))
+        instructions.extend(self.load_value_to_reg(reg2, node.right))
+
+        instructions.append(mips.SubNode(reg3, reg1, reg2))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),)
+        )
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.StarNode)
     def visit(self, node: cil.StarNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+
+        instructions.extend(self.load_value_to_reg(reg1, node.left))
+        instructions.extend(self.load_value_to_reg(reg2, node.right))
+
+        instructions.append(mips.MultNode(reg1, reg2))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(
+                LOW_REG, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+            )
+        )  # TODO: HI_REG ???
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.DivNode)
     def visit(self, node: cil.DivNode):
-        pass
+        instructions = []
+        self.memory_manager.save()
+
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+
+        instructions.extend(self.load_value_to_reg(reg1, node.left))
+        instructions.extend(self.load_value_to_reg(reg2, node.right))
+
+        instructions.append(mips.DivNode(reg1, reg2))
+
+        dest_dir = self.search_mem(node.dest)
+        instructions.append(
+            mips.StoreWordNode(
+                LOW_REG, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+            )
+        )  # TODO: HI_REG ???
+
+        self.memory_manager.clean()
+        return instructions
 
     @visitor.when(cil.GetAttrNode)
     def visit(self, node: cil.GetAttrNode):
