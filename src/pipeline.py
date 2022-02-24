@@ -53,8 +53,11 @@ class Pipeline():
             cil_ast = self.coolToCil.visit(self.ast, scope)
             # print(get_formatter(cil_ast))
             self.cilToMips = CiltoMipsVisitor(self.context)
-            mips_code = self.cilToMips.visit(cil_ast)
-
+            self.cilToMips.visit(cil_ast)
+            with open('out', 'w') as f:
+                mips_code = self.cilToMips.data + self.cilToMips.code
+                for line in mips_code:
+                    f.write(line+'\n')
         if verbose:
             print('This is after infering types:')
             print()

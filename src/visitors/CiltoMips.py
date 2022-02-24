@@ -37,10 +37,25 @@ class CiltoMipsVisitor:
         self.write_code(f"")
         
         self.write_data(f"_abort: {datatype.asciiz} \"Program Aborted\"")
-        self.write_data(f"_zero: .asciiz \"0 Division Error\"")
-        self.write_data(f"_substr: .asciiz \"Substr Length Error\"")
-        self.write_data(f"_mem: .asciiz \"Memory Error\"")
+        self.write_data(f"_zero: {datatype.asciiz} \"0 Division Error\"")
+        self.write_data(f"_substr: {datatype.asciiz} \"Substr Length Error\"")
+        self.write_data(f"_mem: {datatype.asciiz} \"Memory Error\"")
         self.write_data(f"")
+
+        for i, d in enumerate(self.dotdata):
+            self.write_data("msg{}: {} \"{}\"".format(i, datatype.asciiz, d))   # every one of the user defined data through the program
+        
+        self.write_data('buffer: .space 1024')  # buffer for the in_string method
+
+        for i, t in enumerate(self.dottypes):
+            self.write_data(f"type_str{i}: {datatype.asciiz} \"{t.name}\"")
+        
+        for i, t in enumerate(self.dottypes):
+            # words = f"{tipe.cType}: .word {tipe.t_in}, {tipe.t_out}, type_str{i}"
+            words = f"{t.name}: .word 12, 42, type_str{i}"
+            for method in t.methods:
+                words += ", " + "." + method[1]
+            self.write_data(words)
 
     @visitor.when(TypeNode)
     def visit(self, node):
