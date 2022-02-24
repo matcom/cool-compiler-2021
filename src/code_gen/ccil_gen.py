@@ -12,19 +12,15 @@ CLASS_VISITOR_RESULT = Tuple[Class, List[FunctionNode]]
 METHOD_VISITOR_RESULT = FunctionNode
 
 # TODO:
-# Define cool built in methods
-# The result of (type of) what is it
-# How to handle void nodes
-
 # Define abort nodes with a text:
 # * Dispacth on a void class
 # * No pattern match in case
 # * Division by zero
-# * Substring out of range
+# * Substring out of range (Done)
 # * Heap Overflow (don't know yet how to handle this)
 
-# Add text dynamically .data function, incluiding error messages
 
+# BOSS:
 # Test there are no runtimes errors
 # Test that results are obtained as expected
 
@@ -171,7 +167,7 @@ class CCILGenerator:
         block_val = fvalues[-1]
         fval_id = f"block_{times}"
 
-        fval = self.create_assignation(node, fval_id, node.type.name, block_val.id)
+        fval = self.create_assignation( fval_id, node.type.name, block_val.id)
         operations.append(fval)
 
         return (operations, fval)
@@ -247,7 +243,7 @@ class CCILGenerator:
         then_fval.id = else_fval.id = pre_fvalue_id
 
         fvalue_id = f"if_{times}_fv"
-        fvalue = self.create_assignation(node, fvalue_id, node.type.name, pre_fvalue_id)
+        fvalue = self.create_assignation( fvalue_id, node.type.name, pre_fvalue_id)
 
         return (
             [*if_ops, if_false, *then_ops, else_label, *else_ops, fvalue],
@@ -263,7 +259,7 @@ class CCILGenerator:
 
         # Storing the type of the resulting case expression
         type_of = self.create_type_of(
-            node, f"case_{times}_typeOf", extract_id(node, case_expr_fv)
+             f"case_{times}_typeOf", extract_id(node, case_expr_fv)
         )
 
         # Final label where all branch must jump to
@@ -281,20 +277,19 @@ class CCILGenerator:
             # Initializing the branch var
             branch_var_id = f"case_{times}_option_{i}"
             branch_var = self.create_uninitialized_storage(
-                option, branch_var_id, option.branch_type.name
+                branch_var_id, option.branch_type.name
             )
 
             # Initializing var which holds the branch var type
             branch_var_type_id = f"case_{times}_optionTypeOf_{i}"
             branch_var_type_of = self.create_type_of(
-                option, branch_var_type_id, extract_id(node, branch_var)
+                branch_var_type_id, extract_id(node, branch_var)
             )
 
             # Initializng var which holds the comparison result between
             # the case expression type of and branch var type of
             select_branch_id = f"case_{times}_optionSelect_{i}"
             select_branch = self.create_equality(
-                option,
                 select_branch_id,
                 extract_id(node, type_of),
                 extract_id(node, branch_var_type_of),
@@ -320,7 +315,7 @@ class CCILGenerator:
         # Merging all expression operations in correct order
         # and saving all to final value
         fval_id = f"case_{times}_fv"
-        fval = self.create_assignation(node, fval_id, node.type.name, pre_fvalue_id)
+        fval = self.create_assignation( fval_id, node.type.name, pre_fvalue_id)
         operations = [
             *case_expr_ops,
             type_of,
@@ -348,7 +343,7 @@ class CCILGenerator:
         if_false = IfFalseNode(node, cond_fval, end_loop_label)
         go_to = GoToNode(node, loop_label)
 
-        fval = self.create_uninitialized_storage(node, f"loop_{times}_fv", VOID)
+        fval = self.create_uninitialized_storage( f"loop_{times}_fv", VOID)
         # Loop Nodes have void return type, how to express it??
         return (
             [*cond_ops, loop_label, if_false, *body_ops, go_to, end_loop_label, fval],
@@ -394,7 +389,7 @@ class CCILGenerator:
             case _:
                 raise Exception("Pattern match failure visiting binary expression")
 
-        fval = self.create_storage(node, fval_id, node.type.id, op)
+        fval = self.create_storage( fval_id, node.type.id, op)
         return ([*left_ops, *right_ops, fval], fval)
 
     @visitor.when(sem_ast.UnaryNode)
@@ -419,7 +414,7 @@ class CCILGenerator:
             case _:
                 raise Exception("Pattern match failure while visiting unary expression")
 
-        fval = self.create_storage(node, fval_id, node.type.id, op)
+        fval = self.create_storage( fval_id, node.type.id, op)
         return [*expr_op, fval], fval
 
     @visitor.when(sem_ast.MethodCallNode)
@@ -439,7 +434,7 @@ class CCILGenerator:
         if node.expr is None:
             fval_id = f"vcall_{times}"
             call = self.create_vcall(
-                node, fval_id, node.type.id, node.id, node.caller_type.name
+                fval_id, node.type.id, node.id, node.caller_type.name
             )
             return [*args_ops, call], call
 
@@ -449,13 +444,13 @@ class CCILGenerator:
         if node.at_type is not None:
             fval_id = f"call_{times}"
             call = self.create_call(
-                node, fval_id, node.type.name, node.id, node.caller_type.name
+                fval_id, node.type.name, node.id, node.caller_type.name
             )
             return [*args_ops, *expr_ops, call]
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
-        call = self.create_vcall(node, fval_id, node.type.id, node.id, node.caller_type)
+        call = self.create_vcall( fval_id, node.type.id, node.id, node.caller_type)
 
         return [*args_ops, *expr_ops, call]
 
@@ -464,7 +459,7 @@ class CCILGenerator:
         times = self.times(node)
 
         fvalue_id = f"newType_{times}"
-        fvalue = self.create_new_type(node, fvalue_id, node.type.name)
+        fvalue = self.create_new_type( fvalue_id, node.type.name)
 
         return [fvalue], fvalue
 
@@ -477,11 +472,11 @@ class CCILGenerator:
 
         if is_attr:
             get_attr = self.create_attr_extraction(
-                node, id_id, node.type.name, "self", ccil_id
+                 id_id, node.type.name, "self", ccil_id
             )
             return [get_attr], get_attr
 
-        fval = self.create_assignation(node, id_id, node.type.name, ccil_id)
+        fval = self.create_assignation( id_id, node.type.name, ccil_id)
         return [fval], fval
 
     @visitor.when(sem_ast.StringNode)
@@ -492,7 +487,7 @@ class CCILGenerator:
         self.data.append(Data(data_id, node.value))
 
         load_id = f"load_str_{times}"
-        load_str = self.create_string_load_data(node, load_id, data_id)
+        load_str = self.create_string_load_data( load_id, data_id)
         return [load_str], load_str
 
     @visitor.when(sem_ast.IntNode)
@@ -500,7 +495,7 @@ class CCILGenerator:
         times = self.times(node)
 
         int_id = f"int_{times}"
-        int_node = self.create_int(node, int_id, node.value)
+        int_node = self.create_int( int_id, node.value)
 
         return [int_node], int_node
 
@@ -511,7 +506,7 @@ class CCILGenerator:
         bool_id = f"bool_{times}"
         value = "0" if node.value == "False" else "1"
 
-        bool_node = self.create_int(node, bool_id, value)
+        bool_node = self.create_int( bool_id, value)
         return [bool_node], bool_node
 
     def times(self, node: sem_ast.Node, extra: str = ""):
@@ -544,6 +539,7 @@ class CCILGenerator:
         return StorageNode(storage_idx, VCallOpNode(method_idx, method_type_idx, args))
 
     def define_built_ins(self):
+        # Defining Object class methods
         self.reset_scope()
         self.reset_locals()
         params = self.init_func_params(OBJECT)
@@ -575,6 +571,7 @@ class CCILGenerator:
             ],
         )
 
+        # Defining IO class methods
         self.reset_scope()
         self.reset_locals()
         params = self.init_func_params(IO)
@@ -612,6 +609,7 @@ class CCILGenerator:
             ],
         )
 
+        # Defining substring class methods
         self.reset_scope()
         self.reset_locals()
         params = self.init_func_params(STRING)
