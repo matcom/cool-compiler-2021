@@ -6,7 +6,7 @@ from compiler.cmp.grammar import G
 from compiler.lexer.lex import CoolLexer
 from sys import exit
 
-# from compiler.cmp.tools import LR1Parser
+from compiler.cmp.tools import LR1Parser
 # from compiler.cmp.evaluation import evaluate_reverse_parse
 # from compiler.visitors.formatter import FormatVisitor
 # from compiler.visitors.type_collector import TypeCollector
@@ -30,10 +30,16 @@ def main(args):
 
     if errors:
         exit(1)
-    # print('=================== PARSE =====================')
-    # parser = LR1Parser(G)
-    # parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
+    
+    parser = LR1Parser(G)
+    parseResult, (failed, token) = parser(tokens, get_shift_reduce=True)
+    if failed:
+        print(f"{token.pos} - SyntacticError: ERROR at or near {token.lex}")
+        exit(1)
+
     # print('\n'.join(repr(x) for x in parse))
+    # print("---------------OPERATIONS---------------")
+    # print(operations)
     # print('==================== AST ======================')
     # ast = evaluate_reverse_parse(parse, operations, tokens)
     # formatter = FormatVisitor()

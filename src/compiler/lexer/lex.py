@@ -1,4 +1,5 @@
 from distutils.log import debug
+from compiler.cmp.pycompiler import EOF
 import ply.lex as lex
 
 from ..cmp.grammar import *
@@ -308,13 +309,13 @@ class CoolLexer(object):
         self.add_column(t)
         return t
 
-    def t_LESS(self, t):
-        r"<"
+    def t_LEQ(self, t):
+        r"<="
         self.add_column(t)
         return t
 
-    def t_LEQ(self, t):
-        r"<="
+    def t_LESS(self, t):
+        r"<"
         self.add_column(t)
         return t
 
@@ -363,6 +364,9 @@ class CoolLexer(object):
                 token_list.append(
                     Token(tok.value, self.token_type[tok.type], (tok.lineno, tok.col))
                 )
+        if not token_list:
+            errors.append("(0, 0) - SyntacticError: Unexpected token EOF")
+        token_list.append(Token("$", G.EOF, self.lexer.eof))
         return token_list, errors
 
 
