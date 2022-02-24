@@ -1,5 +1,6 @@
 from .pycompiler import Production, Sentence, Symbol, EOF, Epsilon
 
+
 class ContainerSet:
     def __init__(self, *values, contains_epsilon=False):
         self.set = set(values)
@@ -42,7 +43,7 @@ class ContainerSet:
         return len(self.set) + int(self.contains_epsilon)
 
     def __str__(self):
-        return '%s-%s' % (str(self.set), self.contains_epsilon)
+        return "%s-%s" % (str(self.set), self.contains_epsilon)
 
     def __repr__(self):
         return str(self)
@@ -56,37 +57,49 @@ class ContainerSet:
     def __eq__(self, other):
         if isinstance(other, set):
             return self.set == other
-        return isinstance(other, ContainerSet) and self.set == other.set and self.contains_epsilon == other.contains_epsilon
+        return (
+            isinstance(other, ContainerSet)
+            and self.set == other.set
+            and self.contains_epsilon == other.contains_epsilon
+        )
 
 
-def inspect(item, grammar_name='G', mapper=None):
+def inspect(item, grammar_name="G", mapper=None):
     try:
         return mapper[item]
-    except (TypeError, KeyError ):
+    except (TypeError, KeyError):
         if isinstance(item, dict):
-            items = ',\n   '.join(f'{inspect(key, grammar_name, mapper)}: {inspect(value, grammar_name, mapper)}' for key, value in item.items() )
-            return f'{{\n   {items} \n}}'
+            items = ",\n   ".join(
+                f"{inspect(key, grammar_name, mapper)}: {inspect(value, grammar_name, mapper)}"
+                for key, value in item.items()
+            )
+            return f"{{\n   {items} \n}}"
         elif isinstance(item, ContainerSet):
-            args = f'{ ", ".join(inspect(x, grammar_name, mapper) for x in item.set) } ,' if item.set else ''
-            return f'ContainerSet({args} contains_epsilon={item.contains_epsilon})'
+            args = (
+                f'{ ", ".join(inspect(x, grammar_name, mapper) for x in item.set) } ,'
+                if item.set
+                else ""
+            )
+            return f"ContainerSet({args} contains_epsilon={item.contains_epsilon})"
         elif isinstance(item, EOF):
-            return f'{grammar_name}.EOF'
+            return f"{grammar_name}.EOF"
         elif isinstance(item, Epsilon):
-            return f'{grammar_name}.Epsilon'
+            return f"{grammar_name}.Epsilon"
         elif isinstance(item, Symbol):
             return f"G['{item.Name}']"
         elif isinstance(item, Sentence):
-            items = ', '.join(inspect(s, grammar_name, mapper) for s in item._symbols)
-            return f'Sentence({items})'
+            items = ", ".join(inspect(s, grammar_name, mapper) for s in item._symbols)
+            return f"Sentence({items})"
         elif isinstance(item, Production):
             left = inspect(item.Left, grammar_name, mapper)
             right = inspect(item.Right, grammar_name, mapper)
-            return f'Production({left}, {right})'
+            return f"Production({left}, {right})"
         elif isinstance(item, tuple) or isinstance(item, list):
-            ctor = ('(', ')') if isinstance(item, tuple) else ('[',']')
+            ctor = ("(", ")") if isinstance(item, tuple) else ("[", "]")
             return f'{ctor[0]} {("%s, " * len(item)) % tuple(inspect(x, grammar_name, mapper) for x in item)}{ctor[1]}'
         else:
-            raise ValueError(f'Invalid: {item}')
+            raise ValueError(f"Invalid: {item}")
+
 
 def pprint(item, header=""):
     if header:
@@ -94,14 +107,15 @@ def pprint(item, header=""):
 
     if isinstance(item, dict):
         for key, value in item.items():
-            print(f'{key}  --->  {value}')
+            print(f"{key}  --->  {value}")
     elif isinstance(item, list):
-        print('[')
+        print("[")
         for x in item:
-            print(f'   {repr(x)}')
-        print(']')
+            print(f"   {repr(x)}")
+        print("]")
     else:
         print(item)
+
 
 class Token:
     """
@@ -113,14 +127,17 @@ class Token:
         Token's lexeme.
     token_type : Enum
         Token's type.
+    pos : (int, int)
+        Token's starting position (row, column)
     """
 
-    def __init__(self, lex, token_type):
+    def __init__(self, lex, token_type, pos):
         self.lex = lex
         self.token_type = token_type
+        self.pos = pos
 
     def __str__(self):
-        return f'{self.token_type}: {self.lex}'
+        return f"{self.token_type}: {self.lex}"
 
     def __repr__(self):
         return str(self)
@@ -129,20 +146,22 @@ class Token:
     def is_valid(self):
         return True
 
+
 class UnknownToken(Token):
-    def __init__(self, lex):
-        Token.__init__(self, lex, None)
+    def __init__(self, lex, pos):
+        Token.__init__(self, lex, None, pos)
 
     def transform_to(self, token_type):
-        return Token(self.lex, token_type)
+        return Token(self.lex, token_type, self.pos)
 
     @property
     def is_valid(self):
         return False
-        
+
+
 class DisjointSet:
     def __init__(self, *items):
-        self.nodes = { x: DisjointNode(x) for x in items }
+        self.nodes = {x: DisjointNode(x) for x in items}
 
     def merge(self, items):
         items = (self.nodes[x] for x in items)
@@ -155,11 +174,14 @@ class DisjointSet:
 
     @property
     def representatives(self):
-        return { n.representative for n in self.nodes.values() }
+        return {n.representative for n in self.nodes.values()}
 
     @property
     def groups(self):
-        return [[n for n in self.nodes.values() if n.representative == r] for r in self.representatives]
+        return [
+            [n for n in self.nodes.values() if n.representative == r]
+            for r in self.representatives
+        ]
 
     def __len__(self):
         return len(self.representatives)
@@ -172,6 +194,7 @@ class DisjointSet:
 
     def __repr__(self):
         return str(self)
+
 
 class DisjointNode:
     def __init__(self, value):
@@ -193,10 +216,11 @@ class DisjointNode:
     def __repr__(self):
         return str(self)
 
+
 class ShiftReduceParser:
-    SHIFT = 'SHIFT'
-    REDUCE = 'REDUCE'
-    OK = 'OK'
+    SHIFT = "SHIFT"
+    REDUCE = "REDUCE"
+    OK = "OK"
 
     def __init__(self, G, verbose=False):
         self.G = G
@@ -217,7 +241,8 @@ class ShiftReduceParser:
         while True:
             state = stack[-1]
             lookahead = w[cursor]
-            if self.verbose: print(stack, w[cursor:])
+            if self.verbose:
+                print(stack, w[cursor:])
 
             try:
                 if state not in self.action or lookahead not in self.action[state]:
@@ -236,12 +261,10 @@ class ShiftReduceParser:
             elif action is self.REDUCE:
                 operations.append(self.REDUCE)
                 if len(tag.Right):
-                    stack = stack[:-len(tag.Right)]
+                    stack = stack[: -len(tag.Right)]
                 stack.append(list(self.goto[stack[-1]][tag.Left])[0])
                 output.append(tag)
             elif action is ShiftReduceParser.OK:
                 return output if not get_shift_reduce else (output, operations)
             else:
                 raise ValueError
-
-

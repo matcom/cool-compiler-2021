@@ -6,14 +6,15 @@ import compiler.visitors.visitor as visitor
 from itertools import islice
 
 
-
 class Node:
     def evaluate(self):
         raise NotImplementedError()
 
+
 class AtomicNode(Node):
     def __init__(self, lex):
         self.lex = lex
+
 
 class UnaryNode(Node):
     def __init__(self, node):
@@ -26,6 +27,7 @@ class UnaryNode(Node):
     @staticmethod
     def operate(value):
         raise NotImplementedError()
+
 
 class BinaryNode(Node):
     def __init__(self, left, right):
@@ -41,30 +43,40 @@ class BinaryNode(Node):
     def operate(lvalue, rvalue):
         raise NotImplementedError()
 
+
 class EpsilonNode(AtomicNode):
     def evaluate(self):
         return NFA(1, [0], {})
 
+
 class SymbolNode(AtomicNode):
     def evaluate(self):
         s = self.lex
-        return NFA(2, [1], {(0, s) : [1],})
+        return NFA(
+            2,
+            [1],
+            {
+                (0, s): [1],
+            },
+        )
+
 
 class ClosureNode(UnaryNode):
     @staticmethod
     def operate(value):
         return automata_closure(value)
 
+
 class UnionNode(BinaryNode):
     @staticmethod
     def operate(lvalue, rvalue):
         return automata_union(lvalue, rvalue)
 
+
 class ConcatNode(BinaryNode):
     @staticmethod
     def operate(lvalue, rvalue):
         return automata_concatenation(lvalue, rvalue)
-
 
 
 def upd_table(table, head, symbol, production):
@@ -74,7 +86,8 @@ def upd_table(table, head, symbol, production):
         table[head][symbol] = []
     if production not in table[head][symbol]:
         table[head][symbol].append(production)
-    return (len(table[head][symbol]) <= 1)
+    return len(table[head][symbol]) <= 1
+
 
 def compute_local_first(firsts, alpha):
     first_alpha = ContainerSet()
@@ -96,6 +109,7 @@ def compute_local_first(firsts, alpha):
             first_alpha.set_epsilon()
 
     return first_alpha
+
 
 def compute_firsts(G):
     firsts = {}
@@ -128,8 +142,9 @@ def compute_firsts(G):
 
     return firsts
 
+
 def compute_follows(G, firsts):
-    follows = { }
+    follows = {}
     change = True
 
     local_firsts = {}
@@ -152,12 +167,15 @@ def compute_follows(G, firsts):
                     try:
                         beta_f = local_firsts[alpha, i]
                     except KeyError:
-                        beta_f = local_firsts[alpha, i] = compute_local_first(firsts, islice(alpha, i + 1, None))
+                        beta_f = local_firsts[alpha, i] = compute_local_first(
+                            firsts, islice(alpha, i + 1, None)
+                        )
                     change |= follows[Y].update(beta_f)
                     if beta_f.contains_epsilon:
                         change |= follows[Y].update(follow_X)
 
     return follows
+
 
 def build_parsing_table(G, firsts, follows):
     M = {}
@@ -176,6 +194,7 @@ def build_parsing_table(G, firsts, follows):
 
     return M, ok
 
+
 def deprecated_metodo_predictivo_no_recursivo(G, M=None, firsts=None, follows=None):
 
     if M is None:
@@ -187,7 +206,7 @@ def deprecated_metodo_predictivo_no_recursivo(G, M=None, firsts=None, follows=No
 
     def parser(w):
 
-        stack =  [G.EOF, G.startSymbol]
+        stack = [G.EOF, G.startSymbol]
         cursor = 0
         output = []
 
@@ -212,12 +231,14 @@ def deprecated_metodo_predictivo_no_recursivo(G, M=None, firsts=None, follows=No
 
     return parser
 
-def metodo_predictivo_no_recursivo(G, M = None):
+
+def metodo_predictivo_no_recursivo(G, M=None):
     parser = deprecated_metodo_predictivo_no_recursivo(G, M)
+
     def updated(tokens):
         return parser([t.token_type for t in tokens])
-    return updated
 
+    return updated
 
 
 def evaluate_parse(left_parse, tokens):
@@ -230,6 +251,7 @@ def evaluate_parse(left_parse, tokens):
 
     assert isinstance(next(tokens).token_type, EOF)
     return result
+
 
 def evaluate(production, left_parse, tokens, inherited_value=None):
     _, body = production
@@ -257,7 +279,6 @@ def evaluate(production, left_parse, tokens, inherited_value=None):
     return attr(inherited, synteticed)
 
 
-
 def expand(item, firsts):
     next_symbol = item.NextSymbol
     if next_symbol is None or not next_symbol.IsNonTerminal:
@@ -270,6 +291,7 @@ def expand(item, firsts):
     assert not lookaheads.contains_epsilon
     return [Item(prod, 0, lookaheads) for prod in next_symbol.productions]
 
+
 def compress(items):
     centers = {}
 
@@ -281,7 +303,10 @@ def compress(items):
             centers[center] = lookaheads = set()
         lookaheads.update(item.lookaheads)
 
-    return {Item(x.production, x.pos, set(lookahead)) for x, lookahead in centers.items()}
+    return {
+        Item(x.production, x.pos, set(lookahead)) for x, lookahead in centers.items()
+    }
+
 
 def closure_lr1(items, firsts):
     closure = ContainerSet(*items)
@@ -298,13 +323,17 @@ def closure_lr1(items, firsts):
 
     return compress(closure)
 
+
 def goto_lr1(items, symbol, firsts=None, just_kernel=False):
-    assert just_kernel or firsts is not None, '`firsts` must be provided if `just_kernel=False`'
+    assert (
+        just_kernel or firsts is not None
+    ), "`firsts` must be provided if `just_kernel=False`"
     items = frozenset(item.NextItem() for item in items if item.NextSymbol == symbol)
     return items if just_kernel else closure_lr1(items, firsts)
 
+
 def build_LR1_automaton(G):
-    assert len(G.startSymbol.productions) == 1, 'Grammar must be augmented'
+    assert len(G.startSymbol.productions) == 1, "Grammar must be augmented"
 
     firsts = compute_firsts(G)
     firsts[G.EOF] = ContainerSet(G.EOF)
@@ -340,6 +369,7 @@ def build_LR1_automaton(G):
     automaton.set_formatter(lambda x: "")
     return automaton
 
+
 class LR1Parser(ShiftReduceParser):
     def _build_parsing_table(self):
         self.ok = True
@@ -347,9 +377,10 @@ class LR1Parser(ShiftReduceParser):
 
         automaton = self.automaton = build_LR1_automaton(G)
         for i, node in enumerate(automaton):
-            if self.verbose: print(i, '\t', '\n\t '.join(str(x) for x in node.state), '\n')
+            if self.verbose:
+                print(i, "\t", "\n\t ".join(str(x) for x in node.state), "\n")
             node.idx = i
-            node.tag = f'I{i}'
+            node.tag = f"I{i}"
 
         for node in automaton:
             idx = node.idx
@@ -357,17 +388,30 @@ class LR1Parser(ShiftReduceParser):
                 if item.IsReduceItem:
                     prod = item.production
                     if prod.Left == G.startSymbol:
-                        self.ok &= upd_table(self.action, idx, G.EOF, (ShiftReduceParser.OK, ''))
+                        self.ok &= upd_table(
+                            self.action, idx, G.EOF, (ShiftReduceParser.OK, "")
+                        )
                     else:
                         for lookahead in item.lookaheads:
-                            self.ok &= upd_table(self.action, idx, lookahead, (ShiftReduceParser.REDUCE, prod))
+                            self.ok &= upd_table(
+                                self.action,
+                                idx,
+                                lookahead,
+                                (ShiftReduceParser.REDUCE, prod),
+                            )
                 else:
                     next_symbol = item.NextSymbol
                     if next_symbol.IsTerminal:
-                        self.ok &= upd_table(self.action, idx, next_symbol, (ShiftReduceParser.SHIFT, node[next_symbol.Name][0].idx))
+                        self.ok &= upd_table(
+                            self.action,
+                            idx,
+                            next_symbol,
+                            (ShiftReduceParser.SHIFT, node[next_symbol.Name][0].idx),
+                        )
                     else:
-                        self.ok &= upd_table(self.goto, idx, next_symbol, node[next_symbol.Name][0].idx)
-
+                        self.ok &= upd_table(
+                            self.goto, idx, next_symbol, node[next_symbol.Name][0].idx
+                        )
 
 
 def move(automaton, states, symbol):
@@ -380,16 +424,17 @@ def move(automaton, states, symbol):
             pass
     return moves
 
+
 def epsilon_closure(automaton, states):
-    pending = [ s for s in states ] # equivalente a list(states) pero me gusta así :p
-    closure = { s for s in states } # equivalente a  set(states) pero me gusta así :p
+    pending = [s for s in states]  # equivalente a list(states) pero me gusta así :p
+    closure = {s for s in states}  # equivalente a  set(states) pero me gusta así :p
 
     while pending:
         state = pending.pop()
 
-        l = move(automaton, [state], '')
+        l = move(automaton, [state], "")
         for i in l:
-            if(i in closure):
+            if i in closure:
                 pass
             else:
                 closure.add(i)
@@ -397,15 +442,16 @@ def epsilon_closure(automaton, states):
 
     return ContainerSet(*closure)
 
+
 def nfa_to_dfa(automaton):
     transitions = {}
 
     start = epsilon_closure(automaton, [automaton.start])
     start.id = 0
     start.is_final = any(s in automaton.finals for s in start)
-    states = [ start ]
+    states = [start]
 
-    pending = [ start ]
+    pending = [start]
     while pending:
         state = pending.pop()
 
@@ -417,7 +463,7 @@ def nfa_to_dfa(automaton):
                 continue
 
             for s in states:
-                if(s == new_state):
+                if s == new_state:
                     new_state = s
                     break
             else:
@@ -428,14 +474,13 @@ def nfa_to_dfa(automaton):
 
             try:
                 transitions[state.id, symbol]
-                assert False, 'Invalid DFA!!!'
+                assert False, "Invalid DFA!!!"
             except KeyError:
                 transitions[state.id, symbol] = new_state.id
 
-    finals = [ state.id for state in states if state.is_final ]
+    finals = [state.id for state in states if state.is_final]
     dfa = DFA(len(states), finals, transitions)
     return dfa
-
 
 
 def distinguish_states(group, automaton, partition):
@@ -465,15 +510,17 @@ def distinguish_states(group, automaton, partition):
         else:
             split[member.value] = [member.value]
 
+    return [group for group in split.values()]
 
-    return [ group for group in split.values()]
 
 def state_minimization(automaton):
     partition = DisjointSet(*range(automaton.states))
 
     ## partition = { NON-FINALS | FINALS }
     finals = list(automaton.finals)
-    non_finals = [state for state in range(automaton.states) if not state in automaton.finals]
+    non_finals = [
+        state for state in range(automaton.states) if not state in automaton.finals
+    ]
     partition.merge(finals)
     partition.merge(non_finals)
 
@@ -493,6 +540,7 @@ def state_minimization(automaton):
 
     return partition
 
+
 def automata_minimization(automaton):
     partition = state_minimization(automaton)
 
@@ -505,7 +553,7 @@ def automata_minimization(automaton):
             new_dest = states.index(partition[destinations[0]].representative)
 
             try:
-                transitions[i,symbol]
+                transitions[i, symbol]
                 assert False
             except KeyError:
                 transitions[i, symbol] = new_dest
@@ -515,6 +563,7 @@ def automata_minimization(automaton):
     finals = set([i for i in range(len(states)) if states[i].value in automaton.finals])
 
     return DFA(len(states), finals, transitions, start)
+
 
 def automata_union(a1, a2):
     transitions = {}
@@ -532,23 +581,23 @@ def automata_union(a1, a2):
         other = [q + d2 for q in destinations]
         transitions[origin + d2, symbol] = other
 
-
-    transitions[start, ''] = [a1.start + d1, a2.start + d2]
+    transitions[start, ""] = [a1.start + d1, a2.start + d2]
     for i in a1.finals:
         try:
-            transitions[i + d1, ''].add(final)
+            transitions[i + d1, ""].add(final)
         except KeyError:
-            transitions[i + d1, ''] = [final]
+            transitions[i + d1, ""] = [final]
     for i in a2.finals:
         try:
-            transitions[i + d2, ''].add(final)
+            transitions[i + d2, ""].add(final)
         except KeyError:
-            transitions[i + d2, ''] = [final]
+            transitions[i + d2, ""] = [final]
 
     states = a1.states + a2.states + 2
-    finals = { final }
+    finals = {final}
 
     return NFA(states, finals, transitions, start)
+
 
 def automata_concatenation(a1, a2):
     transitions = {}
@@ -562,26 +611,26 @@ def automata_concatenation(a1, a2):
         other = [q + d1 for q in destinations]
         transitions[origin + d1, symbol] = other
 
-
     for (origin, symbol), destinations in a2.map.items():
         other = [q + d2 for q in destinations]
         transitions[origin + d2, symbol] = other
 
     for i in a1.finals:
         try:
-            transitions[i + d1, ''].add(a2.start + d2)
+            transitions[i + d1, ""].add(a2.start + d2)
         except KeyError:
-            transitions[i + d1, ''] = [a2.start + d2]
+            transitions[i + d1, ""] = [a2.start + d2]
     for i in a2.finals:
         try:
-            transitions[i + d2, ''].append(final)
+            transitions[i + d2, ""].append(final)
         except KeyError:
-            transitions[i + d2, ''] = [final]
+            transitions[i + d2, ""] = [final]
 
     states = a1.states + a2.states + 1
-    finals = { final }
+    finals = {final}
 
     return NFA(states, finals, transitions, start)
+
 
 def automata_closure(a1):
     transitions = {}
@@ -594,48 +643,51 @@ def automata_closure(a1):
         other = [q + d1 for q in destinations]
         transitions[origin + d1, symbol] = other
 
-    transitions[start, ''] = [final, a1.start + d1]
+    transitions[start, ""] = [final, a1.start + d1]
 
     for i in a1.finals:
         try:
-            transitions[i + d1, ''].add(final)
+            transitions[i + d1, ""].add(final)
         except KeyError:
-            transitions[i + d1, ''] = [final]
+            transitions[i + d1, ""] = [final]
 
     try:
-        transitions[final, ''].add(start)
+        transitions[final, ""].add(start)
     except:
-        transitions[final,''] = [start]
+        transitions[final, ""] = [start]
 
-    states = a1.states +  2
-    finals = { final }
+    states = a1.states + 2
+    finals = {final}
 
     return NFA(states, finals, transitions, start)
 
 
-
-def get_printer(AtomicNode=AtomicNode, UnaryNode=UnaryNode, BinaryNode=BinaryNode, ):
+def get_printer(
+    AtomicNode=AtomicNode,
+    UnaryNode=UnaryNode,
+    BinaryNode=BinaryNode,
+):
     class PrintVisitor(object):
-        @visitor.on('node')
+        @visitor.on("node")
         def visit(self, node, tabs=0):
             pass
 
         @visitor.when(UnaryNode)
         def visit(self, node, tabs=0):
-            ans = '\t' * tabs + f'\\__<expr> {node.__class__.__name__}'
+            ans = "\t" * tabs + f"\\__<expr> {node.__class__.__name__}"
             child = self.visit(node.node, tabs + 1)
-            return f'{ans}\n{child}'
+            return f"{ans}\n{child}"
 
         @visitor.when(BinaryNode)
         def visit(self, node, tabs=0):
-            ans = '\t' * tabs + f'\\__<expr> {node.__class__.__name__} <expr>'
+            ans = "\t" * tabs + f"\\__<expr> {node.__class__.__name__} <expr>"
             left = self.visit(node.left, tabs + 1)
             right = self.visit(node.right, tabs + 1)
-            return f'{ans}\n{left}\n{right}'
+            return f"{ans}\n{left}\n{right}"
 
         @visitor.when(AtomicNode)
         def visit(self, node, tabs=0):
-            return '\t' * tabs + f'\\__ {node.__class__.__name__}: {node.lex}'
+            return "\t" * tabs + f"\\__ {node.__class__.__name__}: {node.lex}"
 
     printer = PrintVisitor()
-    return (lambda ast: printer.visit(ast))
+    return lambda ast: printer.visit(ast)
