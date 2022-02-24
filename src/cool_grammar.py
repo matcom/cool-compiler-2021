@@ -144,9 +144,9 @@ def define_cool_grammar(print_grammar=False):
 
     factor %= isvoid + element, lambda h, s: IsvoidNode(s[2])
     factor %= neg + element, lambda h, s: NegNode(s[2])
-    factor %= new + type_id, lambda h, s: InstantiateNode(s[2])
     factor %= element, lambda h, s: s[1]
 
+    element %= new + type_id, lambda h, s: InstantiateNode(s[2])
     element %= opar + expr + cpar, lambda h, s: s[2]
     element %= ocur + block + ccur, lambda h, s: BlockNode(s[2])
     element %= (element + dot + func_call, lambda h, s: CallNode(*s[3], obj=s[1]))
