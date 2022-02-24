@@ -3,8 +3,8 @@ import pytest
 import os
 base_dir = os.path.dirname(__file__)
 sys.path.append(os.path.join(base_dir, ".."))
-from cool.pipeline import cool_pipeline, generate_cool_pipeline
-from cool.error.errors import CoolError
+from cool_cmp.pipes.pipelines import cool_pipeline, generate_cool_pipeline
+from error.errors import CoolError
 from .tests import tests, tests_run
 
 class TestPrograms:

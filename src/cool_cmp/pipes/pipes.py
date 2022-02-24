@@ -8,10 +8,10 @@ from cool.parser.comment_parser import comment_parser
 from cool.visitors.visitors import *
 from cool.grammar.cool_grammar import G, comment_open, comment_close
 from cool.grammar.comment_grammar import C
-from cool.semantic.scope import Scope
-from cool.pipes.utils import pprint_tokens, print_errors
-from cool.pipes.pipeline import Pipe
-from cool.visitors.cil_visitor import CILPrintVisitor, CILRunnerVisitor, COOLToCILVisitor
+from semantic.scope import Scope
+from pipes.utils import pprint_tokens, print_errors
+from pipes.pipeline import Pipe
+from cil.visitors.cil_visitor import CILPrintVisitor, CILRunnerVisitor, COOLToCILVisitor
 from mips.visitors.mips_visitors import CILToMIPSVisitor, MIPSPrintVisitor
 
 ply_lexer = PlyLexer()
@@ -229,7 +229,7 @@ def ast_pipe(result:dict):
     return result
 
 ast_pipe = Pipe(ast_pipe, lambda x: not x["errors"])
-    
+
 def type_collector_pipe(result:dict, collector=TypeCollector):
     """
     Collects the types in the program.

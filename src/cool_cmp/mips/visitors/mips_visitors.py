@@ -1,7 +1,7 @@
 from typing import List
 from mips.ast.mips_ast import *
 import cmp.visitor as visitor
-import cool.ast.cil_ast as cil
+import cil.ast.cil_ast as cil
 from mips.error.errors import MetaCILInvalidError
 from mips.registers import Reg
 

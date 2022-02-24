@@ -1,15 +1,33 @@
 # Informe
 
-El objetivo principal de la aplicación es contruir un compilador que convierta un programa de COOL en un programa funcionalmente equivalente en MIPS. Se mostrará cómo se usa el compilador y se describirá la arquitectura y procesos relacionados con la contrucción y funcionamiento de este.
+El objetivo principal de la aplicación es contruir un compilador que convierta un programa de COOL en un programa funcionalmente equivalente en MIPS. Se mostrará su uso y se describirá la arquitectura y procesos relacionados con su contrucción y funcionamiento.
 
 ## ¿Cómo usar el compilador?
 
-Para el uso del compilador es necesario correr el archivo `src/coolc.sh`.
+### Uso básico
 
-- `$ ./src/coolc.sh <archivo_programa_cool> <salida_del_programa_mips>` Uso básico
-- TODO Agregar más usos (COOL Interpretado, Salida de AUTO_TYPE Inferido, Salida de CIL generado)
+Para el uso del compilador es necesario correr el archivo `src/coolc.sh`. Este compilará el programa COOL que se le dió como entrada y guardará el programa MIPS en la misma localización con extensión _.mips_.
 
-El compilador viene con una ayuda que ayuda a documentar los otros usos posibles de este.
+- `$ ./src/coolc.sh <archivo_programa_cool>`
+
+### Uso avanzado
+
+El compilador hecho presenta además otras características que son posibles si se llama al programa
+`src/cool_cmp/main.py` estas características son activada mediante diferentes flags que se le pasan al programa:
+
+- `-m`: Guarda el programa compilado a MIPS en el archivo de salida dado con extensión `.mips`
+- `-c`: Guarda el programa generado de CIL en el archivo de salida dado con extensión `.cil`
+- `-i`: Guarda el progama de COOL con los AutoType resueltos en el archivo de salida dado con extensión `.infer.cil`
+- `-icil`: Interpreta el AST de CIL generado por el programa de entrada
+- `-icool`: Interpreta el AST de Cool generado por el programa de entrada
+
+Por ejemplo el siguiente programa interpreta y guarda el código CIL generado
+> $python3 src/cool_cmp/main.py src/testing.cl src/testing.cil -icil -c
+
+También posee otras características previstas para el desarrollador del compilador:
+
+- `-ucp`: Actualiza el parser serializado de Cool
+- `-ucl`: Actualiza el lexer serializado de Cool
 
 ## Arquitectura
 

@@ -1,6 +1,5 @@
-from cool.pipes.pipes import *
-from cool.libs import add_std_pipe
-from cool.pipes.pipeline import Pipeline, Pipe
+from pipes.pipes import *
+from pipes.pipeline import Pipeline, Pipe
 
 lexer_pipeline = Pipeline(start_pipe,
                             ply_lexer_pipe
@@ -38,7 +37,7 @@ pre_semantic_pipeline = Pipeline(ast_pipe,
 
 def get_std():
     import os
-    std_dir = os.path.join(os.path.dirname(__file__),"lib","std.cool")
+    std_dir = os.path.join(os.path.dirname(__file__), "..", "cool", "lib", "std.cl")
     with open(std_dir, "r") as f:
         std = f.read()
     return std

@@ -1,9 +1,9 @@
 import cmp.visitor as visitor
 from cool.ast.cool_ast import *
-from cool.semantic.type import Type,ErrorType,StringType,IntType,IOType,BoolType,ObjectType,SelfType,VoidType,AutoType
-from cool.semantic.context import Context
+from semantic.type import Type,ErrorType,StringType,IntType,IOType,BoolType,ObjectType,SelfType,VoidType,AutoType
+from semantic.context import Context
 from cool.semantic.atomic import ClassInstance
-from cool.error.errors import *
+from cool.errors.errors import *
 import cool.visitors.utils as ut
 from cool.semantic.operations import Operator
 

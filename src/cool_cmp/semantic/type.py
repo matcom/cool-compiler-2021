@@ -2,9 +2,10 @@ from cmp.semantic import Attribute, Method
 from cmp.semantic import Type as DeprecatedType
 from cmp.semantic import SemanticError as DeprecatedSemanticError
 from cool.ast.cool_ast import VoidNode,ConstantNumNode,StringNode,BoolNode,SpecialNode,InstantiateNode
-import cool.ast.cil_ast as cil
+import cil.ast.cil_ast as cil
 from cool.semantic.atomic import ClassInstance
-from cool.error.errors import CoolError, RunError, SemanticError, TypeCoolError, InferError, \
+from error.errors import CoolError, RunError
+from cool.errors.errors import SemanticError, TypeCoolError, InferError, \
     VOID_TYPE_CONFORMS, METHOD_NOT_DEFINED, METHOD_ALREADY_DEFINED, \
     SUBSTR_OUT_RANGE, ATTRIBUTE_NOT_DEFINED, ATTRIBUTE_ALREADY_DEFINED, \
     ATTRIBUTE_CANT_INFER, METHOD_CANT_INFER, TYPE_CANT_INFER, TYPE_CANT_BE_INHERITED, \

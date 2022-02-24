@@ -1,5 +1,5 @@
 from cmp.semantic import Scope as DeprecatedScope
-from cool.error.errors import SemanticError
+from cool.errors.errors import SemanticError
 from cool.visitors.visitors import RunVisitor
 class Scope(DeprecatedScope):
     

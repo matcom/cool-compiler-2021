@@ -1,10 +1,10 @@
-import cool.ast.cil_ast as cil
+import cil.ast.cil_ast as cil
 from cool.ast.cool_ast import *
 import cmp.visitor as visitor
 from cmp.semantic import VariableInfo
-from cool.semantic.context import Context
-from cool.error.errors import RunError, ZERO_DIVISION, AbortError
-from cool.semantic.type import SelfType
+from semantic.context import Context
+from cil.errors.errors import RunError, ZERO_DIVISION, AbortError
+from semantic.type import SelfType
 from math import floor
 
 class CILPrintVisitor():

@@ -16,7 +16,7 @@
 - Separar CIL en un paquete aparte como está MIPS
 - Separar COOL en un paquete aparte
 - Separar paquete de integración de COOL, CIL, MIPS
-
+- Limpar el proyecto de archivos innecesarios
 - Hacer algo inteligente para eliminar generacion de variables innecesarias
 - Hacer mecanismo para reducir codigo generado eliminando el codigo que no se usa o no alcanzable
 - **PASAR TESTING GENERACION Locales y en Github**

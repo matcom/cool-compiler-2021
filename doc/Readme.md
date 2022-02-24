@@ -10,7 +10,7 @@ Modifique el contenido de este documento para documentar de forma clara y concis
 
 ## Sobre los Equipos de Desarrollo
 
-Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o 3 integrantes. El proyecto de Compilación será recogido y evaluado únicamente a través de Github. Es imprescindible tener una cuenta de Github para cada participante, y que su proyecto esté correctamente hosteado en esta plataforma. 
+Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o 3 integrantes. El proyecto de Compilación será recogido y evaluado únicamente a través de Github. Es imprescindible tener una cuenta de Github para cada participante, y que su proyecto esté correctamente hosteado en esta plataforma.
 
 **⚠️ NOTA**: Debe completar el archivo `team.yml` con los datos correctos de cada miembro de su equipo.
 

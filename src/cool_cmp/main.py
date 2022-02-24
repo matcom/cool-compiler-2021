@@ -2,8 +2,8 @@
 # base_dir = os.path.dirname(__file__)
 # sys.path.append(os.path.join(base_dir, ".."))
 
-from cool.error.errors import AbortError
-from cool.pipeline import cool_pipeline, generate_cool_pipeline, interprete_cil_pipeline,\
+from cil.errors.errors import AbortError
+from pipes.pipelines import cool_pipeline, generate_cool_pipeline, interprete_cil_pipeline,\
                           interprete_cool_pipeline, generate_cil_pipeline, generate_mips_pipeline
 from cool.grammar.cool_grammar import G
 from cool.parser.cool_parser import save_parser,cool_parser_path, cool_parser
@@ -79,11 +79,11 @@ def main(
     ast, g_errors, parse, tokens, context, scope, operator, value, reconstr, cil_text, cil_value, mips_text = [result.get(x, None) for x in ["ast", "errors", "text_parse", "text_tokens", "context", "scope", "operator", "value", "reconstructed_text", "cil_text", "cil_value", "mips_text"]] 
     
     if reconstr and out_infer:
-        with open(program_dir + ".infer.cl", "w") as file:
+        with open(output_dir + ".infer.cl", "w") as file:
             file.write(reconstr)
 
     if cil_text and out_cil:
-        with open(program_dir + ".cil", "w") as file:
+        with open(output_dir + ".cil", "w") as file:
             file.write(cil_text)
             
     if mips_text and out_mips:

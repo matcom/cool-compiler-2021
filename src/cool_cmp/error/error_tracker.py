@@ -1,5 +1,14 @@
 from typing import List
-from cool.error.errors import CoolError
+from error.errors import CoolError, PositionError
+
+class LexerCoolError(PositionError):
+    """
+    Error class for lexical errors
+    """
+    
+    FORMAT = "({}, {}) - {}: {}"
+    
+    ERROR_TYPE = "LexicographicError"
 
 class ErrorTracker():
     """

@@ -1,6 +1,6 @@
 from cmp.semantic import Context as DeprecatedContext
-from cool.semantic.type import Type, SelfType, AutoType
-from cool.error.errors import SemanticError, TYPE_NOT_DEFINED, TYPE_ALREADY_DEFINED
+from semantic.type import Type, SelfType, AutoType
+from cool.errors.errors import SemanticError, TYPE_NOT_DEFINED, TYPE_ALREADY_DEFINED
 
 class Context(DeprecatedContext):
     
