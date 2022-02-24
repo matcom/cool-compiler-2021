@@ -29,7 +29,7 @@ class C inherits B {
 		let x: Int <- x1, y: Int <-y1 in {
 			x <- x + a;
 			y <- y + a;
-			if b then new IO.out_string(c) else d fi;
+            if b then new IO.out_string(c) else d fi;
 		}
 	};
 };
