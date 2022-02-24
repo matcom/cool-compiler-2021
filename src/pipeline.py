@@ -27,7 +27,7 @@ class Pipeline():
         # derivations, operations = self.parser.Parser(self.tokens, True)
 
         self.ast = parser.parse(lexer, program)#= evaluate_reverse_parse(derivations, operations, self.tokens)
-
+        self.errors = self.lexer.errors
         if len(parser.errors) != 0:
             return
         
