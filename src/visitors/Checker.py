@@ -302,7 +302,7 @@ class TypeChecker:
                 ancestor_type = self.context.get_type(node.parent)
             except SemanticError as e:
                 ancestor_type = ErrorType()
-                self.errors.append(e.text)
+                # self.errors.append(e.text)
 
             if not obj_type.conforms_to(ancestor_type):
                 self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f'Expression type {obj_type.name} does not conform to declared static dispatch type {ancestor_type.name}.'))
@@ -319,8 +319,8 @@ class TypeChecker:
                 self.visit(arg, scope)
             return ErrorType()
 
-        if len(node.args) != len(method.param_names):
-            self.errors.append(f'Function {method.name} is already defined in {obj_type.name}.')
+        # if len(node.args) != len(method.param_names):
+        #     self.errors.append(f'Function {method.name} is already defined in {obj_type.name}.')
 
         if len(node.args) != len(method.param_types):
             self.errors.append(_SemanticError %(node.token_list[1].lineno, node.token_list[1].col, f"Method {method.name} called with wrong number of arguments"))
@@ -363,7 +363,6 @@ class TypeChecker:
                     _var = self.current_type.get_attribute(node.lex, self.current_type, False)
                     variable = VariableInfo(_var.name, _var.type)
                 except SemanticError as e:
-                    print(e.text)
                     pass
         if variable is None:
             # self.errors.append(f'Variable {node.lex} is not defined in {self.current_method.name}.')

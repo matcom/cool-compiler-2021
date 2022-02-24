@@ -162,7 +162,7 @@ class CoolLexer:
     def t_chunkComment_eof(self, t):
         if t.lexer.level > 0:
             self.errors.append(_LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), 'EOF in comment'))
-            print(_LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), 'EOF in comment'))
+            # print(_LexicographicError % (t.lexer.lineno, self.find_column(t.lexer.lexdata,t), 'EOF in comment'))
         return None
 
     # t_assignArrow = r'<\-'
@@ -296,11 +296,11 @@ class CoolLexer:
         a = self.find_column(t.lexer.lexdata,t)
         row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
         if eof:
-            self.errors.append(LexicographicError % (row, col, f'EOF in string constant'))
+            self.errors.append(_LexicographicError % (row, col, f'EOF in string constant'))
             # print(LexicographicError % (row, col, f'EOF in string constant'))
             t.lexer.skip(len(t.value))
         else:
-            self.errors.append(LexicographicError % (row, col, f'Unterminated string constant'))
+            self.errors.append(_LexicographicError % (row, col, f'Unterminated string constant'))
             # print(LexicographicError % (row, col, f'Unterminated string constant'))
             t.lexer.skip(1)
         

@@ -20,8 +20,6 @@ class BaseCOOLToCILVisitor:
         self.parameters = set()
         self.instances = []
 
-        self.ctrs = {}
-
     def transform_to_keys(self, xtype, keys):
         for i, key in enumerate(keys):
             xtype.attrs[key] = i
@@ -85,6 +83,7 @@ class BaseCOOLToCILVisitor:
             self.register_instruction(set_attr_node)
         self.register_instruction(cil.ReturnNode(VariableInfo('self', self.current_type)))
         
+        
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
     def visit(self, node):
@@ -110,10 +109,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ######################################################
         
         # class_nodes = [self.class_node_from_context(c) for c in self.context.types]
-        builtin_types = ['Object', 'IO', 'Int', 'Bool', 'String']
-        built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types if c in builtin_types]
-        for built_in_class in built_in_classes:
-            self.visit(built_in_class, scope)
+        built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types]
+
 
 
         self.current_function = self.register_function('entry')
@@ -206,7 +203,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             elif type == 'String':
                 return StringNode("")
             else:
-                return VoidNode('void')
+                return VoidNode()
         if node.value:
             value = self.visit(node.value, scope)
 
@@ -216,9 +213,9 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 value = 'void'
             else:
                 value = self.visit(default_value, scope)
-        self_ref = VariableInfo('self', self.current_type)
-        self_ref.index = 0
-        return cil.SetAttribNode(self_ref, node.id, value)
+            self_ref = VariableInfo('self', self.current_type)
+            self_ref.index = 0
+            return cil.SetAttribNode(self_ref, node.id, value)
         
         ## old code
         # elif node.type in ["Int", "String", "Object", "IO", "Bool"]:
