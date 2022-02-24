@@ -76,7 +76,6 @@ def main():
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
         input_file = "./tests/codegen/hello_world.cl"#"debbuging/tests/Auto/call1.cl"
-        input_file = "./tests/parser/assignment1.cl"#"debbuging/tests/Auto/call1.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)

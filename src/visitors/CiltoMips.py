@@ -30,6 +30,42 @@ class CiltoMipsVisitor:
 
         self.write_data('.data')
         self.write_code('.text')
+
+        inherited = "# Inherited Method\n" \
+                     ".inherited:\n" \
+                     "lw $a0, 8($sp)\n" \
+                     "lw $a1, 4($sp)\n" \
+                     "lw $a0, ($a0)\n" \
+                     "lw $a2, ($a0)\n" \
+                     "lw $a3, 4($a0)\n" \
+                     "lw $a0, ($a1)\n" \
+                     "lw $a1, 4($a1)\n" \
+                     "sge $t0, $a2, $a0\n" \
+                     "sle $t1, $a3, $a1\n" \
+                     "and $a0, $t0, $t1\n" \
+                     "sw $a0, ($sp)\n" \
+                     "subu $sp, $sp, 4\n" \
+                     "jr $ra\n" \
+                     "\n"
+
+        raise_exc = "# raise exception Method\n" \
+                    ".raise:\n" \
+                    "lw $a0, 4($sp)\n" \
+                    "li $v0, 4\n" \
+                    "syscall\n" \
+                    "li $v0, 10\n" \
+                    "syscall"
+
+        self.write_data("# Start .data segment (data!)")
+        self.write_data(".data")
+        self.write_data("zero_error: .asciiz \"Divition by zero exception\"")
+        self.write_data("index_error: .asciiz \"Invalid index exception\"")
+        self.write_data("void_error: .asciiz \"Objects must be inizializated before use exception\"")
+        self.write_data("case_error: .asciiz \"Case expression no match exception\"")
+        self.write_data("void_str: .asciiz \"\"")
+        
+        self.write_code(inherited)
+        self.write_code(raise_exc)
         
         self.write_code("main:")
         self.write_code(f'{operations.move} {registers.s7} {registers.gp}')
@@ -56,6 +92,10 @@ class CiltoMipsVisitor:
             for method in t.methods:
                 words += ", " + "." + method[1]
             self.write_data(words)
+
+        for instr in self.dotcode:
+            a = 0
+
 
     @visitor.when(TypeNode)
     def visit(self, node):

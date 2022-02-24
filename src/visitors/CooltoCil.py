@@ -20,6 +20,7 @@ class BaseCOOLToCILVisitor:
         self.parameters = set()
         self.instances = []
 
+        self.builtin_types = ['Object', 'IO', 'Int', 'Bool', 'String']
         self.ctrs = {}
 
     def transform_to_keys(self, xtype, keys):
@@ -73,6 +74,8 @@ class BaseCOOLToCILVisitor:
         return data_node
 
     def create_ctr(self, class_node, scope):
+        if self.current_type in self.builtin_types:
+            return
         attrs = [att for att in class_node.features if isinstance(att, AttrDeclarationNode)]
         while True:
             break
@@ -110,8 +113,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ######################################################
         
         # class_nodes = [self.class_node_from_context(c) for c in self.context.types]
-        builtin_types = ['Object', 'IO', 'Int', 'Bool', 'String']
-        built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types if c in builtin_types]
+        built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types if c in self.builtin_types]
         for built_in_class in built_in_classes:
             self.visit(built_in_class, scope)
 
@@ -240,7 +242,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.body -> [ ExpressionNode ... ]
         ###############################
-        
+        if self.current_type.name in self.builtin_types:
+            return
         self.current_method = self.current_type.get_method(node.id, self.current_type, False)
         
         # Your code here!!! (Handle PARAMS)
