@@ -1,25 +1,39 @@
+--Attributes are local to the class in which they are defined or inherited.
+
+class A {
+	a: Int <- 5;
+};
+class B inherits A {
+	b: Bool <- true;
+	test(x1: Int, y1: Int): Int {
+		let x: Int <- x1, y: Int <-y1 in {
+			x <- x + a;
+			y <- y + a;
+			if b then x + y else x - y fi;
+		}
+	};
+};
+class D inherits B {
+	d: IO <- new Main.main();
+	test3(x1: Int, y1: Int): IO {
+		let x: Int <- x1, y: Int <-y1, c: String <- "C" in {
+			x <- x + a;
+			y <- y + a;
+			if b then new IO.out_string(c) else d fi;
+		}
+	};
+};
+class C inherits B {
+	c: String <- "C";
+	test2(x1: Int, y1: Int): IO {
+		let x: Int <- x1, y: Int <-y1 in {
+			x <- x + a;
+			y <- y + a;
+            if b then new IO.out_string(c) else d fi;
+		}
+	};
+};
+
 class Main inherits IO {
-    pal(s : String) : Bool {
-	if s.length() = 0
-	then true
-	else if s.length() = 1
-	then true
-	else if s.substr(0, 1) = s.substr(s.length() - 1, 1)
-	then pal(s.substr(1, s.length() -2))
-	else false
-	fi fi fi
-    };
-
-    i : Int;
-
-    main() : IO {
-	{
-            i <- ~1;
-	    out_string("enter a string\n");
-	    if pal(in_string())
-	    then out_string("that was a palindrome\n")
-	    else out_string("that was not a palindrome\n")
-	    fi;
-	}
-    };
+	main(): IO { out_string("Hello World!") };
 };
