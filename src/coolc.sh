@@ -10,5 +10,4 @@ echo "Copyright (c) 2021: Richard García De la Osa, Andy A. Castañeda Guerra."
 # Llamar al compilador
 # echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
 
-source env/bin/activate
 exec python3 __main__.py $INPUT_FILE 
