@@ -165,7 +165,9 @@ class CilToMIPS:
 
     @visitor.when(cil.PlusNode)
     def visit(self, node: cil.PlusNode):
-        pass
+        self.memory_manager.save()
+        
+        self.memory_manager.clean()
 
     @visitor.when(cil.MinusNode)
     def visit(self, node: cil.MinusNode):
@@ -335,7 +337,7 @@ class CilToMIPS:
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
         instructions = []
-        local_index = self.locals[node.name].index()
+        local_index = self.locals[node.dest].index()
         self.memory_manager.save()
         reg1 = self.memory_manager.get_unused_register()
 
@@ -379,6 +381,10 @@ class CilToMIPS:
 
     @visitor.when(cil.PrintNode)
     def visit(self, node: cil.PrintNode):
+        pass
+
+    @visitor.when(cil.AssignNode)
+    def visit(self, node: cil.AssignNode):
         pass
 
     def exit_program(self):
