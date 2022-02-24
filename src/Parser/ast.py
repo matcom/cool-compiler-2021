@@ -13,9 +13,6 @@ class DeclarationNode(Node):
 class ExpressionNode(Node):
     pass
 
-class ErrorNode(Node):
-    pass
-
 class ClassDeclarationNode(DeclarationNode):
     def __init__(self, idx, features, parent=None):
         self.id = idx.value

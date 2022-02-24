@@ -1,7 +1,7 @@
 .PHONY: clean
 
 main:
-	# Compiling the compiler :)
+	@echo "Compiled successfully..."
 
 clean:
 	rm -rf build/*

@@ -2,171 +2,189 @@
 
 > Proyecto base para el compilador de 4to año en Ciencia de la Computación.
 
-## Generalidades
-
-La evaluación de la asignatura Complementos de Compilación, inscrita en el programa del 4to año de la Licenciatura en Ciencia de la Computación de la Facultad de Matemática y Computación de la
-Universidad de La Habana, consiste este curso en la implementación de un compilador completamente
-funcional para el lenguaje _COOL_.
-
-_COOL (Classroom Object-Oriented Language)_ es un pequeño lenguaje que puede ser implementado con un esfuerzo razonable en un semestre del curso. Aun así, _COOL_ mantiene muchas de las características de los lenguajes de programación modernos, incluyendo orientación a objetos, tipado estático y manejo automático de memoria.
-
-## Cómo comenzar (o terminar)
-
-El proyecto de Compilación será recogido y evaluado **únicamente** a través de Github. Es imprescindible tener una cuenta de Github para cada participante, y que su proyecto esté correctamente hosteado en esta plataforma. A continuación le damos las instrucciones mínimas necesarias para ello:
-
-### 1. Si no lo han hecho ya, regístrense en [Github](https://github.com) todos los miembros del equipo (es gratis).
-
-![](img/img1.png)
-
-### 2. Haga click en el botón **Fork** para hacer una copia del proyecto en el perfil de Github de uno de los miembros.
-
-Opcionalmente pueden [crear una organización](https://github.com/organizations/new) y copiar el proyecto en el perfil de la misma.
-
-![](img/img2.png)
-
-### 3. Una vez hecho esto, tendrá un nuevo repositorio en `github/<usuario>`.
-
-Revise que el repositorio de su equipo está en su perfil.
-En este ejemplo se ha copiado a la cuenta de `github.com/apiad`.
-
-Debe indicar bajo el nombre del repositorio: `"forked from matcom/cool-compiler-2021"`.
-
-![](img/img3.png)
-
-### 4. Clone este proyecto en un repositorio local.
-
-Busque la URL de su proyecto en la interfaz web de Github.
-
-Asegúrese de clonar **su copia** y no el proyecto original en `matcom/cool-compiler-2021`.
-
-![](img/img4.png)
-
 ```bash
-$ git clone git@github.com:<usuario>/cool-compiler-2021.git
+make test
+
+pytest-3 ../tests -v --tb=short -m= -p no:warnings
+============================================================================= test session starts ==============================================================================
+platform linux -- Python 3.8.10, pytest-4.6.9, py-1.8.1, pluggy-0.13.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/reinaldo/Projects/cool-compiler-2021
+collected 168 items                                                                                                                                                            
+
+../tests/codegen_test.py::test_codegen[atoi.cl] PASSED                                                                                                                   [  0%]
+../tests/codegen_test.py::test_codegen[book_list.cl] PASSED                                                                                                              [  1%]
+../tests/codegen_test.py::test_codegen[new_complex.cl] PASSED                                                                                                            [  1%]
+../tests/codegen_test.py::test_codegen[arith.cl] PASSED                                                                                                                  [  2%]
+../tests/codegen_test.py::test_codegen[io.cl] PASSED                                                                                                                     [  2%]
+../tests/codegen_test.py::test_codegen[hairyscary.cl] PASSED                                                                                                             [  3%]
+../tests/codegen_test.py::test_codegen[palindrome.cl] PASSED                                                                                                             [  4%]
+../tests/codegen_test.py::test_codegen[print-cool.cl] PASSED                                                                                                             [  4%]
+../tests/codegen_test.py::test_codegen[complex.cl] PASSED                                                                                                                [  5%]
+../tests/codegen_test.py::test_codegen[list.cl] PASSED                                                                                                                   [  5%]
+../tests/codegen_test.py::test_codegen[sort-list.cl] PASSED                                                                                                              [  6%]
+../tests/codegen_test.py::test_codegen[primes.cl] PASSED                                                                                                                 [  7%]
+../tests/codegen_test.py::test_codegen[graph.cl] PASSED                                                                                                                  [  7%]
+../tests/codegen_test.py::test_codegen[life.cl] PASSED                                                                                                                   [  8%]
+../tests/codegen_test.py::test_codegen[hello_world.cl] PASSED                                                                                                            [  8%]
+../tests/codegen_test.py::test_codegen[cells.cl] PASSED                                                                                                                  [  9%]
+../tests/codegen_test.py::test_codegen[fib.cl] PASSED                                                                                                                    [ 10%]
+../tests/lexer_test.py::test_lexer_errors[string2.cl] PASSED                                                                                                             [ 10%]
+../tests/lexer_test.py::test_lexer_errors[iis1.cl] PASSED                                                                                                                [ 11%]
+../tests/lexer_test.py::test_lexer_errors[iis2.cl] PASSED                                                                                                                [ 11%]
+../tests/lexer_test.py::test_lexer_errors[comment1.cl] PASSED                                                                                                            [ 12%]
+../tests/lexer_test.py::test_lexer_errors[string4.cl] PASSED                                                                                                             [ 13%]
+../tests/lexer_test.py::test_lexer_errors[iis6.cl] PASSED                                                                                                                [ 13%]
+../tests/lexer_test.py::test_lexer_errors[iis4.cl] PASSED                                                                                                                [ 14%]
+../tests/lexer_test.py::test_lexer_errors[string1.cl] PASSED                                                                                                             [ 14%]
+../tests/lexer_test.py::test_lexer_errors[iis3.cl] PASSED                                                                                                                [ 15%]
+../tests/lexer_test.py::test_lexer_errors[iis5.cl] PASSED                                                                                                                [ 16%]
+../tests/lexer_test.py::test_lexer_errors[string3.cl] PASSED                                                                                                             [ 16%]
+../tests/lexer_test.py::test_lexer_errors[mixed2.cl] PASSED                                                                                                              [ 17%]
+../tests/lexer_test.py::test_lexer_errors[mixed1.cl] PASSED                                                                                                              [ 17%]
+../tests/parser_test.py::test_parser_errors[loop1.cl] PASSED                                                                                                             [ 18%]
+../tests/parser_test.py::test_parser_errors[let2.cl] PASSED                                                                                                              [ 19%]
+../tests/parser_test.py::test_parser_errors[dispatch4.cl] PASSED                                                                                                         [ 19%]
+../tests/parser_test.py::test_parser_errors[conditional6.cl] PASSED                                                                                                      [ 20%]
+../tests/parser_test.py::test_parser_errors[class2.cl] PASSED                                                                                                            [ 20%]
+../tests/parser_test.py::test_parser_errors[program3.cl] PASSED                                                                                                          [ 21%]
+../tests/parser_test.py::test_parser_errors[method1.cl] PASSED                                                                                                           [ 22%]
+../tests/parser_test.py::test_parser_errors[case1.cl] PASSED                                                                                                             [ 22%]
+../tests/parser_test.py::test_parser_errors[assignment1.cl] PASSED                                                                                                       [ 23%]
+../tests/parser_test.py::test_parser_errors[block3.cl] PASSED                                                                                                            [ 23%]
+../tests/parser_test.py::test_parser_errors[method3.cl] PASSED                                                                                                           [ 24%]
+../tests/parser_test.py::test_parser_errors[mixed6.cl] PASSED                                                                                                            [ 25%]
+../tests/parser_test.py::test_parser_errors[dispatch5.cl] PASSED                                                                                                         [ 25%]
+../tests/parser_test.py::test_parser_errors[case3.cl] PASSED                                                                                                             [ 26%]
+../tests/parser_test.py::test_parser_errors[assignment3.cl] PASSED                                                                                                       [ 26%]
+../tests/parser_test.py::test_parser_errors[dispatch9.cl] PASSED                                                                                                         [ 27%]
+../tests/parser_test.py::test_parser_errors[method5.cl] PASSED                                                                                                           [ 27%]
+../tests/parser_test.py::test_parser_errors[let3.cl] PASSED                                                                                                              [ 28%]
+../tests/parser_test.py::test_parser_errors[dispatch8.cl] PASSED                                                                                                         [ 29%]
+../tests/parser_test.py::test_parser_errors[method6.cl] PASSED                                                                                                           [ 29%]
+../tests/parser_test.py::test_parser_errors[class5.cl] PASSED                                                                                                            [ 30%]
+../tests/parser_test.py::test_parser_errors[let4.cl] PASSED                                                                                                              [ 30%]
+../tests/parser_test.py::test_parser_errors[method4.cl] PASSED                                                                                                           [ 31%]
+../tests/parser_test.py::test_parser_errors[case4.cl] PASSED                                                                                                             [ 32%]
+../tests/parser_test.py::test_parser_errors[mixed3.cl] PASSED                                                                                                            [ 32%]
+../tests/parser_test.py::test_parser_errors[loop4.cl] PASSED                                                                                                             [ 33%]
+../tests/parser_test.py::test_parser_errors[method2.cl] PASSED                                                                                                           [ 33%]
+../tests/parser_test.py::test_parser_errors[dispatch1.cl] PASSED                                                                                                         [ 34%]
+../tests/parser_test.py::test_parser_errors[conditional5.cl] PASSED                                                                                                      [ 35%]
+../tests/parser_test.py::test_parser_errors[dispatch7.cl] PASSED                                                                                                         [ 35%]
+../tests/parser_test.py::test_parser_errors[class6.cl] PASSED                                                                                                            [ 36%]
+../tests/parser_test.py::test_parser_errors[block4.cl] PASSED                                                                                                            [ 36%]
+../tests/parser_test.py::test_parser_errors[case2.cl] PASSED                                                                                                             [ 37%]
+../tests/parser_test.py::test_parser_errors[mixed4.cl] PASSED                                                                                                            [ 38%]
+../tests/parser_test.py::test_parser_errors[case6.cl] PASSED                                                                                                             [ 38%]
+../tests/parser_test.py::test_parser_errors[conditional1.cl] PASSED                                                                                                      [ 39%]
+../tests/parser_test.py::test_parser_errors[operation1.cl] PASSED                                                                                                        [ 39%]
+../tests/parser_test.py::test_parser_errors[let7.cl] PASSED                                                                                                              [ 40%]
+../tests/parser_test.py::test_parser_errors[let5.cl] PASSED                                                                                                              [ 41%]
+../tests/parser_test.py::test_parser_errors[dispatch3.cl] PASSED                                                                                                         [ 41%]
+../tests/parser_test.py::test_parser_errors[program2.cl] PASSED                                                                                                          [ 42%]
+../tests/parser_test.py::test_parser_errors[attribute1.cl] PASSED                                                                                                        [ 42%]
+../tests/parser_test.py::test_parser_errors[operation4.cl] PASSED                                                                                                        [ 43%]
+../tests/parser_test.py::test_parser_errors[class3.cl] PASSED                                                                                                            [ 44%]
+../tests/parser_test.py::test_parser_errors[operation3.cl] PASSED                                                                                                        [ 44%]
+../tests/parser_test.py::test_parser_errors[conditional4.cl] PASSED                                                                                                      [ 45%]
+../tests/parser_test.py::test_parser_errors[class4.cl] PASSED                                                                                                            [ 45%]
+../tests/parser_test.py::test_parser_errors[block1.cl] PASSED                                                                                                            [ 46%]
+../tests/parser_test.py::test_parser_errors[dispatch2.cl] PASSED                                                                                                         [ 47%]
+../tests/parser_test.py::test_parser_errors[conditional2.cl] PASSED                                                                                                      [ 47%]
+../tests/parser_test.py::test_parser_errors[attribute3.cl] PASSED                                                                                                        [ 48%]
+../tests/parser_test.py::test_parser_errors[loop3.cl] PASSED                                                                                                             [ 48%]
+../tests/parser_test.py::test_parser_errors[block2.cl] PASSED                                                                                                            [ 49%]
+../tests/parser_test.py::test_parser_errors[assignment2.cl] PASSED                                                                                                       [ 50%]
+../tests/parser_test.py::test_parser_errors[conditional3.cl] PASSED                                                                                                      [ 50%]
+../tests/parser_test.py::test_parser_errors[mixed5.cl] PASSED                                                                                                            [ 51%]
+../tests/parser_test.py::test_parser_errors[mixed2.cl] PASSED                                                                                                            [ 51%]
+../tests/parser_test.py::test_parser_errors[attribute2.cl] PASSED                                                                                                        [ 52%]
+../tests/parser_test.py::test_parser_errors[let1.cl] PASSED                                                                                                              [ 52%]
+../tests/parser_test.py::test_parser_errors[case5.cl] PASSED                                                                                                             [ 53%]
+../tests/parser_test.py::test_parser_errors[operation2.cl] PASSED                                                                                                        [ 54%]
+../tests/parser_test.py::test_parser_errors[let6.cl] PASSED                                                                                                              [ 54%]
+../tests/parser_test.py::test_parser_errors[dispatch6.cl] PASSED                                                                                                         [ 55%]
+../tests/parser_test.py::test_parser_errors[mixed1.cl] PASSED                                                                                                            [ 55%]
+../tests/parser_test.py::test_parser_errors[program1.cl] PASSED                                                                                                          [ 56%]
+../tests/parser_test.py::test_parser_errors[loop2.cl] PASSED                                                                                                             [ 57%]
+../tests/parser_test.py::test_parser_errors[class1.cl] PASSED                                                                                                            [ 57%]
+../tests/semantic_test.py::test_semantic_errors[basics2.cl] PASSED                                                                                                       [ 58%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic5.cl] PASSED                                                                                                   [ 58%]
+../tests/semantic_test.py::test_semantic_errors[features1.cl] PASSED                                                                                                     [ 59%]
+../tests/semantic_test.py::test_semantic_errors[let2.cl] PASSED                                                                                                          [ 60%]
+../tests/semantic_test.py::test_semantic_errors[basics7.cl] PASSED                                                                                                       [ 60%]
+../tests/semantic_test.py::test_semantic_errors[features2.cl] PASSED                                                                                                     [ 61%]
+../tests/semantic_test.py::test_semantic_errors[inheritance4.cl] PASSED                                                                                                  [ 61%]
+../tests/semantic_test.py::test_semantic_errors[basics4.cl] PASSED                                                                                                       [ 62%]
+../tests/semantic_test.py::test_semantic_errors[dispatch4.cl] PASSED                                                                                                     [ 63%]
+../tests/semantic_test.py::test_semantic_errors[methods3.cl] PASSED                                                                                                      [ 63%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic3.cl] PASSED                                                                                                   [ 64%]
+../tests/semantic_test.py::test_semantic_errors[loops2.cl] PASSED                                                                                                        [ 64%]
+../tests/semantic_test.py::test_semantic_errors[new1.cl] PASSED                                                                                                          [ 65%]
+../tests/semantic_test.py::test_semantic_errors[case1.cl] PASSED                                                                                                         [ 66%]
+../tests/semantic_test.py::test_semantic_errors[assignment1.cl] PASSED                                                                                                   [ 66%]
+../tests/semantic_test.py::test_semantic_errors[eq3.cl] PASSED                                                                                                           [ 67%]
+../tests/semantic_test.py::test_semantic_errors[dispatch5.cl] PASSED                                                                                                     [ 67%]
+../tests/semantic_test.py::test_semantic_errors[basics6.cl] PASSED                                                                                                       [ 68%]
+../tests/semantic_test.py::test_semantic_errors[case3.cl] PASSED                                                                                                         [ 69%]
+../tests/semantic_test.py::test_semantic_errors[attributes2.cl] PASSED                                                                                                   [ 69%]
+../tests/semantic_test.py::test_semantic_errors[assignment3.cl] PASSED                                                                                                   [ 70%]
+../tests/semantic_test.py::test_semantic_errors[attributes4.cl] PASSED                                                                                                   [ 70%]
+../tests/semantic_test.py::test_semantic_errors[methods2.cl] PASSED                                                                                                      [ 71%]
+../tests/semantic_test.py::test_semantic_errors[self1.cl] PASSED                                                                                                         [ 72%]
+../tests/semantic_test.py::test_semantic_errors[let3.cl] PASSED                                                                                                          [ 72%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic6.cl] PASSED                                                                                                   [ 73%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic10.cl] PASSED                                                                                                  [ 73%]
+../tests/semantic_test.py::test_semantic_errors[eq1.cl] PASSED                                                                                                           [ 74%]
+../tests/semantic_test.py::test_semantic_errors[methods1.cl] PASSED                                                                                                      [ 75%]
+../tests/semantic_test.py::test_semantic_errors[methods5.cl] PASSED                                                                                                      [ 75%]
+../tests/semantic_test.py::test_semantic_errors[eq2.cl] PASSED                                                                                                           [ 76%]
+../tests/semantic_test.py::test_semantic_errors[attributes3.cl] PASSED                                                                                                   [ 76%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic11.cl] PASSED                                                                                                  [ 77%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic1.cl] PASSED                                                                                                   [ 77%]
+../tests/semantic_test.py::test_semantic_errors[isvoid1.cl] PASSED                                                                                                       [ 78%]
+../tests/semantic_test.py::test_semantic_errors[self4.cl] PASSED                                                                                                         [ 79%]
+../tests/semantic_test.py::test_semantic_errors[self2.cl] PASSED                                                                                                         [ 79%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic2.cl] PASSED                                                                                                   [ 80%]
+../tests/semantic_test.py::test_semantic_errors[basics1.cl] PASSED                                                                                                       [ 80%]
+../tests/semantic_test.py::test_semantic_errors[dispatch1.cl] PASSED                                                                                                     [ 81%]
+../tests/semantic_test.py::test_semantic_errors[inheritance5.cl] PASSED                                                                                                  [ 82%]
+../tests/semantic_test.py::test_semantic_errors[attributes1.cl] PASSED                                                                                                   [ 82%]
+../tests/semantic_test.py::test_semantic_errors[case2.cl] PASSED                                                                                                         [ 83%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic8.cl] PASSED                                                                                                   [ 83%]
+../tests/semantic_test.py::test_semantic_errors[methods7.cl] PASSED                                                                                                      [ 84%]
+../tests/semantic_test.py::test_semantic_errors[self3.cl] PASSED                                                                                                         [ 85%]
+../tests/semantic_test.py::test_semantic_errors[dispatch3.cl] PASSED                                                                                                     [ 85%]
+../tests/semantic_test.py::test_semantic_errors[methods8.cl] PASSED                                                                                                      [ 86%]
+../tests/semantic_test.py::test_semantic_errors[basics5.cl] PASSED                                                                                                       [ 86%]
+../tests/semantic_test.py::test_semantic_errors[methods6.cl] PASSED                                                                                                      [ 87%]
+../tests/semantic_test.py::test_semantic_errors[blocks1.cl] PASSED                                                                                                       [ 88%]
+../tests/semantic_test.py::test_semantic_errors[dispatch2.cl] PASSED                                                                                                     [ 88%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic4.cl] PASSED                                                                                                   [ 89%]
+../tests/semantic_test.py::test_semantic_errors[inheritance1.cl] PASSED                                                                                                  [ 89%]
+../tests/semantic_test.py::test_semantic_errors[conditionals1.cl] PASSED                                                                                                 [ 90%]
+../tests/semantic_test.py::test_semantic_errors[features3.cl] PASSED                                                                                                     [ 91%]
+../tests/semantic_test.py::test_semantic_errors[assignment2.cl] PASSED                                                                                                   [ 91%]
+../tests/semantic_test.py::test_semantic_errors[eq4.cl] PASSED                                                                                                           [ 92%]
+../tests/semantic_test.py::test_semantic_errors[inheritance2.cl] PASSED                                                                                                  [ 92%]
+../tests/semantic_test.py::test_semantic_errors[inheritance3.cl] PASSED                                                                                                  [ 93%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic7.cl] PASSED                                                                                                   [ 94%]
+../tests/semantic_test.py::test_semantic_errors[conditionals2.cl] PASSED                                                                                                 [ 94%]
+../tests/semantic_test.py::test_semantic_errors[let1.cl] PASSED                                                                                                          [ 95%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic12.cl] PASSED                                                                                                  [ 95%]
+../tests/semantic_test.py::test_semantic_errors[arithmetic9.cl] PASSED                                                                                                   [ 96%]
+../tests/semantic_test.py::test_semantic_errors[loops1.cl] PASSED                                                                                                        [ 97%]
+../tests/semantic_test.py::test_semantic_errors[methods4.cl] PASSED                                                                                                      [ 97%]
+../tests/semantic_test.py::test_semantic_errors[dispatch6.cl] PASSED                                                                                                     [ 98%]
+../tests/semantic_test.py::test_semantic_errors[basics8.cl] PASSED                                                                                                       [ 98%]
+../tests/semantic_test.py::test_semantic_errors[basics3.cl] PASSED                                                                                                       [ 99%]
+../tests/semantic_test.py::test_semantic_errors[class1.cl] PASSED                                                                                                        [100%]
+
+========================================================================= 168 passed in 34.23 seconds ==========================================================================
+
 ```
 
-> Donde `<usuario>` es posiblemente el nombre de su equipo o del miembro donde se hizo el _fork_.
+![](img/Screenshot from 2022-02-24 04-36-02.png)
 
-A partir de este punto debe tener un proyecto `cool-compiler-2021` local.
-El siguiente paso depende de si usted ya tiene su código versionado con `git` o no.
-
-### 5.A. Si tiene su proyecto en git (y no quiere perder la historia):
-
-#### 5.1. Mezcle hacia el nuevo respositorio su repositorio anterior:
-
-```bash
-$ cd cool-compiler-2021
-$ git pull --allow-unrelated-histories <my-old-compiler-project> master
-```
-
-#### 5.2. Organice su proyecto, código fuente y documentación, de acuerdo a las instrucciones de este documento, y vuelva a hacer `commit`.
-
-```bash
-$ mv <my-old-code> src/
-$ git add .
-$ git commit -a -m "Mezclado con el proyecto base"
-```
-
-#### 5.3. A partir de este punto puede hacer `push` cada vez que tenga cambios que subir.
-
-```bash
-$ git push origin master
-```
-
-### 5.B Si aún no tiene su proyecto en git (o no le importa la historia):
-
-#### 5.1. Simplemente copie el código de su proyecto en la carpeta correspondiente `src` y haga su primer commit.
-
-```bash
-$ mv <my-old-code> src/
-$ git commit -a -m "Hello Git!"
-```
-
-#### 5.2. A partir de este punto asegúrese de hacer `commit` de forma regular para mantener su repositorio actualizado.
-
-Si necesita saber más sobre `git`, todo lo imprescindible está en [esta guía](doc/github-git-cheat-sheet.pdf).
-
-#### 5.3. A partir de este punto puede hacer `push` cada vez que tenga cambios que subir.
-
-```bash
-$ git push origin master
-```
-
-## Entregas
-
-En este proyecto se realizarán entregas parciales a lo largo del curso. Para realizar una entrega, siga los siguientes pasos.
-
-### 1. Cree un pull request al proyecto original desde su copia.
-
-![](img/img5.png)
-
-### 2. Asegúrese de tener la siguiente configuración antes de hacer click en **Create pull request**.
-
-- **base repository**: `matcom/cool-compiler-2021` (repositorio original)
-  - **branch**: `master`
-- **head repository**: `<usuario>/cool-compiler-2021` (repositorio propio)
-  - **branch**: `master` (o la que corresponda)
-
-> Asegúrese que se indica **Able to merge**. De lo contrario, existen cambios en el repositorio original que usted no tiene, y debe actualizarlos.
-
-> **NOTA**: Asegúrese que el _pull request_ se hace a la rama `master`.
-
-![](img/img6.png)
-
-### 3. Introduzca un título y descripción adecuados, y haga click en **Create pull request**.
-
-![](img/img7.png)
-
-### 4. Espere mientras se ejecutan las pruebas.
-
-Verá la indicación **Some checks haven't completed yet**.
-
-![](img/img8.png)
-
-Es posible que tenga que actualizar los cambios que se hayan hecho en el repositorio original, por ejemplo, si se han agregado nuevos tests. En este caso obtendrá el siguiente mensaje:
-
-> **This branch is out-of-date with base branch**
-
-Haga click en **Update branch** y siga las instrucciones.
-### 5. Verifique que no hubo errores en las pruebas.
-
-Si ve el mensaje **(All | Some) checks have failed**, significa que su código no pasó las pruebas.
-
-![](img/img9.png)
-
-Para ver los resultados de las pruebas haga click en el link **Details**.
-
-![](img/img10.png)
-
-
-### 6. Arregle los errores y repita el paso 5 hasta que todas las pruebas pasen.
-
-Para cualquier modificación que haga a su proyecto, haga _commit_ y _push_ para **su repositorio personal** y automáticamente se actualizará el estado del _pull request_ y se volverán a ejecutar las pruebas. **No es necesario** abrir un _pull request_ nuevo por cada entrega, sino actualizar el anterior.
-
-> **Por favor asegúrese de mantener un solo _pull request_ activo por equipo**. En caso de abrir uno nuevo, cerrar el anterior.
-
-## Sobre la implementación
-
-Ponga todo su código e instrucciones necesarias en la carpeta `src`. Más información en [`src/Readme.md`](src/Readme.md).
-
-## Sobre la documentación
-
-Usted debe presentar un reporte escrito documentando el proceso de construcción de su compilador y los detalles más importantes de su funcionamiento. Más información en [`doc/Readme.md`](doc/Readme.md).
-
-## Sobre los equipos de desarrollo
-
-Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o 3 integrantes.
-
-## Sobre los casos de prueba
-
-La carpeta `tests` contiene todos los casos de prueba que son obligatorios de pasar para que su proyecto tenga derecho a ser evaluado.
-
-Estos tests se ejecutan automáticamente cada vez que hace un _pull request_ al repositorio `matcom/cool-compiler-2021`. Solo aquellos proyectos que pasen todas las pruebas con éxito serán evaluados.
-
-Para ejecutar las pruebas localmente, debe tener instalado `Python 3.7`, `pip` y `make` (normalmente viene con Linux). Ejecute:
-
-```bash
-$ pip install -r requirements.txt
-$ cd src
-$ make test
-```
+![](img/Screenshot from 2022-02-24 04-36-21.png)
