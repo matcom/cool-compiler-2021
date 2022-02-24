@@ -168,26 +168,14 @@ class CCILToMIPSGenerator:
 
     @visitor.when(ccil_ast.VCallOpNode)
     def visit(self, node: ccil_ast.VCallOpNode):
-        obj_location = self.__location[node.args[0]]
         instructions = []
 
-        # TODO use free register instead of 8
+        obj_location = self.__location[node.args[0]]
         obj_type = mips_ast.RegisterNode(node, 8)
+        instructions.append(mips_ast.LoadWord(node, obj_type, obj_location))
 
-        if isinstance(obj_location, mips_ast.RegisterNode):
-            instructions.append(
-                mips_ast.LoadWord(
-                    node, obj_type, mips_ast.MemoryIndexNode(node, 0, obj_location)
-                )
-            )
-        elif isinstance(obj_location, mips_ast.MemoryIndexNode):
-            instructions.append(mips_ast.LoadWord(node, obj_type, obj_location))
-
-        function_index = self.get_method_index(node.type, node.id) * WORD + DOUBLE_WORD
-
-        # TODO use free register instead of 9
         register_function = mips_ast.RegisterNode(node, 9)
-
+        function_index = self.get_method_index(node.type, node.id) * WORD + DOUBLE_WORD
         instructions.append(
             mips_ast.LoadWord(
                 node,
@@ -195,7 +183,19 @@ class CCILToMIPSGenerator:
                 mips_ast.MemoryIndexNode(node, function_index, obj_type),
             )
         )
+        reg_arg = mips_ast.RegisterNode(node, 10)
+        instructions = []
+        for arg in node.args:
+            instructions.append(mips_ast.LoadWord(node, reg_arg, self.__location[arg]))
+            instructions.append(self.push_stack(node, reg_arg))
         instructions.append(mips_ast.JumpAndLink(node, register_function))
+
+        if len(node.args) > 0:
+            stack_pointer = mips_ast.RegisterNode(node, 29)
+            instructions.append(
+                mips_ast.Addi(node, stack_pointer, stack_pointer, len(node.args) * WORD)
+            )
+
         return instructions
 
     @visitor.when(ccil_ast.StorageNode)
@@ -216,7 +216,6 @@ class CCILToMIPSGenerator:
         reg_rigth = mips_ast.RegisterNode(node, 12)
         left_location = self.__location[node.left.value]
         right_location = self.__location[node.left.value]
-
 
         return instructions
 
