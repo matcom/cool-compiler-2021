@@ -1,168 +1,223 @@
-from typing import Union
+from typing import Union, Dict, List
 from utils import visitor
-from asts.mips_ast import (
-    Addu,
-    DataNode,
-    InstructionNode,
-    JumpAndLink,
-    JumpRegister,
-    LabelDeclaration,
-    LoadWord,
-    MIPSProgram,
-    MemoryIndexNode,
-    Move,
-    RegisterNode,
-    StoreWord,
-    Subu,
-    Label,
-    TextNode,
-    WordDirective,
-)
+from asts import mips_ast, ccil_ast
 from utils import visitor
-from asts.ccil_ast import *
 
-Location = Dict[str, Union[MemoryIndexNode, RegisterNode]]
+WORD = 4
+DOUBLE_WORD = 8
+Location = Dict[str, mips_ast.MemoryIndexNode]
+Types = Dict[str, str]
 
 
 class CCILToMIPSGenerator:
     def __init__(self) -> None:
-        self.types_table: List[Class]  # list or dict for classes???
+        self.__types_table: List[ccil_ast.Class]  # list or dict for classes???
+        self.__location: Location
+        self.__types: Types
+        self.__current_type: str
+        self.__current_function: ccil_ast.FunctionNode
+
+    def push_stack(self, node, register: mips_ast.RegisterNode):
+        stack_pointer = mips_ast.RegisterNode(node, 29)
+        instructions = []
+        instructions.append(
+            mips_ast.Addi(node, stack_pointer, stack_pointer, -1 * WORD)
+        )
+        instructions.append(
+            mips_ast.StoreWord(
+                node, register, mips_ast.MemoryIndexNode(node, 0, stack_pointer)
+            )
+        )
+        return instructions
+
+    def pop_stack(self, node, register: mips_ast.RegisterNode):
+        stack_pointer = mips_ast.RegisterNode(node, 29)
+        instructions = []
+        instructions.append(
+            mips_ast.LoadWord(
+                node, register, mips_ast.MemoryIndexNode(node, 0, stack_pointer)
+            )
+        )
+        instructions.append(mips_ast.Addi(node, stack_pointer, stack_pointer, WORD))
+        return instructions
 
     @visitor.on("node")
     def visit(self, node):
         pass
 
-    @visitor.when(CCILProgram)
-    def visit(self, node: CCILProgram, location: Location = None):
+    @visitor.when(ccil_ast.CCILProgram)
+    def visit(self, node: ccil_ast.CCILProgram):
         self.types = node.types_section
 
         types_table = []
         for classx in node.types_section:
             word_directive = [
-                Label(node, classx.id),
-                Label(node, classx.init_operations.id),
+                mips_ast.Label(node, classx.id),
+                mips_ast.Label(node, classx.init_operations.id),
             ]
             for method in classx.methods:
-                word_directive.append(Label(node, method.function.id))
+                word_directive.append(mips_ast.Label(node, method.function.id))
             types_table.append(
-                (LabelDeclaration(node, classx.id), WordDirective(node, word_directive))
+                (
+                    mips_ast.LabelDeclaration(node, classx.id),
+                    mips_ast.WordDirective(node, word_directive),
+                )
             )
 
         # TODO: other .data section static data inicializations like strings
 
         functions = []
         for classx in node.types_section:
-            functions += self.visit(classx.init_operations, {})
+            functions.extend(self.visit(classx.init_operations))
         for func in node.code_section:
-            functions += self.visit(func, {})
+            functions.extend(self.visit(func))
 
-        return MIPSProgram(None, TextNode(node, functions), DataNode(node, types_table))
+        return mips_ast.MIPSProgram(
+            None,
+            mips_ast.TextNode(node, functions),
+            mips_ast.DataNode(node, types_table),
+        )
 
-    @visitor.when(FunctionNode)
-    def visit(self, node: FunctionNode, location: Location):
-        label = LabelDeclaration(node, node.id)
-        body: List[InstructionNode] = []
+    @visitor.when(ccil_ast.FunctionNode)
+    def visit(self, node: ccil_ast.FunctionNode):
+        instructions = []
+        instructions.append(mips_ast.LabelDeclaration(node, node.id))
 
-        frame_size = (len(node.params) + len(node.locals)) * 4 + 12
-        stack_pointer = RegisterNode(node, 29)
-        return_address = RegisterNode(node, 31)
-        frame_pointer = RegisterNode(node, 30)
+        frame_size = (len(node.locals)) * WORD + 12
+        stack_pointer = mips_ast.RegisterNode(node, 29)
+        return_address = mips_ast.RegisterNode(node, 31)
+        frame_pointer = mips_ast.RegisterNode(node, 30)
 
         index = 0
-        for param in node.params:
-            location[param.id] = MemoryIndexNode(node, index, frame_pointer)
-            index += 4
+        for param in reversed(node.locals):
+            self.__location[param.id] = mips_ast.MemoryIndexNode(
+                node, index, frame_pointer
+            )
+            index += WORD
+        index = 0
         for local in node.params:
-            location[local.id] = MemoryIndexNode(node, index, frame_pointer)
-            index += 4
+            self.__location[local.id] = mips_ast.MemoryIndexNode(
+                node, -1 * index, frame_pointer
+            )
+            index += WORD
 
-        body.append(Subu(node, stack_pointer, stack_pointer, frame_size))
-        body.append(
-            StoreWord(
+        instructions.append(
+            mips_ast.Subu(node, stack_pointer, stack_pointer, frame_size)
+        )
+        instructions.append(
+            mips_ast.StoreWord(
                 node,
                 return_address,
-                MemoryIndexNode(node, frame_size - 8, stack_pointer),
+                mips_ast.MemoryIndexNode(node, frame_size - 2 * WORD, stack_pointer),
             )
         )
-        body.append(
-            StoreWord(
+        instructions.append(
+            mips_ast.StoreWord(
                 node,
                 frame_pointer,
-                MemoryIndexNode(node, frame_size - 12, stack_pointer),
+                mips_ast.MemoryIndexNode(node, frame_size - 3 * WORD, stack_pointer),
             )
         )
-        body.append(Addu(node, frame_pointer, frame_pointer, frame_size - 4))
+        instructions.append(
+            mips_ast.Addu(node, frame_pointer, frame_pointer, frame_size - WORD)
+        )
 
         for op in node.operations:
-            body += self.visit(op, location)
+            instructions += self.visit(op)
 
-        ret_location = location[node.ret]
-        ret_register = RegisterNode(node, 3)
-        if isinstance(ret_location, RegisterNode):
-            body.append(Move(node, ret_register, ret_location))
-        elif isinstance(ret_location, MemoryIndexNode):
-            body.append(LoadWord(node, ret_register, ret_location))
+        ret_location = self.__location[node.ret]
+        ret_register = mips_ast.RegisterNode(node, 3)
+        instructions.append(mips_ast.LoadWord(node, ret_register, ret_location))
 
-        body.append(
-            LoadWord(
+        instructions.append(
+            mips_ast.LoadWord(
                 node,
                 return_address,
-                MemoryIndexNode(node, frame_size - 8, stack_pointer),
+                mips_ast.MemoryIndexNode(node, frame_size - 8, stack_pointer),
             )
         )
-        body.append(
-            LoadWord(
+        instructions.append(
+            mips_ast.LoadWord(
                 node,
                 frame_pointer,
-                MemoryIndexNode(node, frame_size - 12, stack_pointer),
+                mips_ast.MemoryIndexNode(node, frame_size - 12, stack_pointer),
             )
         )
-        body.append(Addu(node, stack_pointer, stack_pointer, frame_size))
-        body.append(JumpRegister(node, return_address))
+        instructions.append(
+            mips_ast.Addu(node, stack_pointer, stack_pointer, frame_size)
+        )
+        instructions.append(mips_ast.JumpRegister(node, return_address))
 
-        return [label, *body]
-
-    @visitor.when(CallOpNode)
-    def visit(self, node: CallOpNode, location: Location):
-        stack_pointer = RegisterNode(node, 29)
-        instructions = []
-        index = 4
-        for arg in node.args:
-            arg_location = location[arg]
-            if isinstance(arg_location, RegisterNode):
-                instructions.append(
-                    StoreWord(node, arg_location, MemoryIndexNode(index, stack_pointer))
-                )
-                index += 4
-        instructions.append(JumpAndLink(node, node.id))
         return instructions
 
-    @visitor.when(VCallOpNode)
-    def visit(self, node: VCallOpNode, location: Location):
-        obj_location = location[node.args[0]]
+    @visitor.when(ccil_ast.CallOpNode)
+    def visit(self, node: ccil_ast.CallOpNode):
+        reg = mips_ast.RegisterNode(node, 10)
+        instructions = []
+        for arg in node.args:
+            instructions.append(mips_ast.LoadWord(node, reg, self.__location[arg]))
+            instructions.append(self.push_stack(node, reg))
+        instructions.append(mips_ast.JumpAndLink(node, node.id))
+
+        if len(node.args) > 0:
+            stack_pointer = mips_ast.RegisterNode(node, 29)
+            instructions.append(
+                mips_ast.Addi(node, stack_pointer, stack_pointer, len(node.args) * WORD)
+            )
+        return instructions
+
+    @visitor.when(ccil_ast.VCallOpNode)
+    def visit(self, node: ccil_ast.VCallOpNode):
+        obj_location = self.__location[node.args[0]]
         instructions = []
 
         # TODO use free register instead of 8
-        obj_type = RegisterNode(node, 8)
+        obj_type = mips_ast.RegisterNode(node, 8)
 
-        if isinstance(obj_location, RegisterNode):
+        if isinstance(obj_location, mips_ast.RegisterNode):
             instructions.append(
-                LoadWord(node, obj_type, MemoryIndexNode(node, 0, obj_location))
+                mips_ast.LoadWord(
+                    node, obj_type, mips_ast.MemoryIndexNode(node, 0, obj_location)
+                )
             )
-        elif isinstance(obj_location, MemoryIndexNode):
-            instructions.append(LoadWord(node, obj_type, obj_location))
+        elif isinstance(obj_location, mips_ast.MemoryIndexNode):
+            instructions.append(mips_ast.LoadWord(node, obj_type, obj_location))
 
-        function_index = self.get_method_index(node.type, node.id) * 4 + 8
+        function_index = self.get_method_index(node.type, node.id) * WORD + DOUBLE_WORD
 
         # TODO use free register instead of 9
-        register_function = RegisterNode(node, 9)
+        register_function = mips_ast.RegisterNode(node, 9)
 
         instructions.append(
-            LoadWord(
-                node, register_function, MemoryIndexNode(node, function_index, obj_type)
+            mips_ast.LoadWord(
+                node,
+                register_function,
+                mips_ast.MemoryIndexNode(node, function_index, obj_type),
             )
         )
-        instructions.append(JumpAndLink(node, register_function))
+        instructions.append(mips_ast.JumpAndLink(node, register_function))
+        return instructions
+
+    @visitor.when(ccil_ast.StorageNode)
+    def visit(self, node: ccil_ast.StorageNode):
+        location_id = self.__location[node.id]
+        instructions = []
+        instructions.append(self.visit(node.operation))
+        instructions.append(
+            mips_ast.LoadWord(node, mips_ast.RegisterNode(node, 3), location_id)
+        )
+        return instructions
+
+    @visitor.when(ccil_ast.SumOpNode)
+    def visit(self, node: ccil_ast.SumOpNode):
+        instructions = []
+        reg = mips_ast.RegisterNode(node, 10)
+        reg_left = mips_ast.RegisterNode(node, 11)
+        reg_rigth = mips_ast.RegisterNode(node, 12)
+        left_location = self.__location[node.left.value]
+        right_location = self.__location[node.left.value]
+
+
         return instructions
 
     def get_init_function(self, typex: str):
