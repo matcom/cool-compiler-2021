@@ -62,7 +62,7 @@ class DotCodeVisitor(CILVisitor):
             if class_.id == 'Main':
                 for feature in class_.features:
                     if isinstance(feature, ast.FuncDeclarationNode) and feature.id == 'main':
-                        self.add_function('entry')
+                        self.add_function('main')
                         void = self.add_local('void', internal=False)
                         self.add_inst(cil.AllocateNode('<void>', void))
                         main_scope = deepcopy(scope.get_tagged_scope('Main'))
