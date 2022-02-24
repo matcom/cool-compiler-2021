@@ -6,7 +6,10 @@ class MipsGenerate:
     def __init__(self, errors) -> None:
         self.func_list = ['new_ctr_Main']
         self.native_fun = {
-            "IO_out_string": ASTR.Out_String
+            "IO_out_string": ASTR.Out_String,
+            "IO_in_int":ASTR.In_Int,
+            "IO_in_string":ASTR.In_String,
+            "IO_out_int":ASTR.Out_Int
         }
 
     @visitor.on('node')
@@ -251,13 +254,13 @@ class MipsGenerate:
         stack_plus_dest = self.stack_index(memory_dest)
 
         return [ ASTR.LW('$t1', f'{stack_plus_opr_1}($sp)')  ,
-                 ASTR.Comment("carga en $t1 lo que hay en f'{stack_plus_opr_1} "),
+                 ASTR.Comment(f"carga en $t1 lo que hay en {stack_plus_opr_1} "),
                  ASTR.LW ('$t2', f'{stack_plus_opr_2}($sp)'),
-                 ASTR.Comment("carga en $t2 lo que hay en f'{stack_plus_opr_2} "),
+                 ASTR.Comment(f"carga en $t2 lo que hay en {stack_plus_opr_2} "),
                  ASTR.SEQ ('$t3','$t2','$t1'),
                  ASTR.Comment("$t3 = $t2 == $ t1" ),
                  ASTR.SW ('$t3',f'{stack_plus_dest}($sp)'),
-                 ASTR.Comment("Pon en la posicion f's{stack_plus_opr_1} el valor de $t3")
+                 ASTR.Comment(f"Pon en la posicion {stack_plus_dest} el valor de $t3")
         ]
 
     @visitor.when(AST.Assign)
@@ -269,17 +272,17 @@ class MipsGenerate:
         if(type(dir_value)==type(int()) or type(dir_value)==type(float())):
             return [ 
                      ASTR.LI('$t0' , str(dir_value)),
-                     ASTR.Comment("pon en $t0  f'{dir_value}  "),
+                     ASTR.Comment(f"pon en $t0  {dir_value}  "),
                      ASTR.SW ('$t0',f'{stack_plus}($sp)'),
-                     ASTR.Comment("pon en la posicion  f'{dir_value} el valor $t0  ")
+                     ASTR.Comment(f"pon en la posicion  {dir_value} el valor $t0  ")
                    ]
         else:
             stack_plus_dir_value = self.stack_index(dir_value)
             return [ 
                      ASTR.LW ('$t0',f'{stack_plus_dir_value}($sp)'),
-                     ASTR.Comment("pon en $t0  el contenido de la pos  f'{stack_plus_dir_value}  "),
+                     ASTR.Comment(f"pon en $t0  el contenido de la pos  {stack_plus_dir_value}  "),
                      ASTR.SW ('$t0',f'{stack_plus}($sp)'),
-                     ASTR.Comment("pon en la pos  f'{stack_plus_dir_value}  el valor de $t0")
+                     ASTR.Comment(f"pon en la pos  {stack_plus_dir_value}  el valor de $t0")
                    ]           
 
     @visitor.when(AST.Neg)
@@ -291,13 +294,13 @@ class MipsGenerate:
 
         return [
                 ASTR.LW ('$t0',f'{stack_plus_opr_1}($sp)'),
-                ASTR.Comment("Carga la pos f'{stack_plus_opr_1} en $t0"),
+                ASTR.Comment(f"Carga la pos {stack_plus_opr_1} en $t0"),
                 ASTR.AddI ('$t1','$t0',-1 ),
                 ASTR.Comment("$t1 =  $t0 + (-1)"),
                 ASTR.MUL ('$t0','$t1',-1),
                 ASTR.Comment("$t0 =  $t1 * (-1)"),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
-                ASTR.Comment("poner en la posicion f'{stack_plus_memory_dest} el contenido de $t0")
+                ASTR.Comment(f"poner en la posicion {stack_plus_memory_dest} el contenido de $t0")
 
 
                 ]                   
@@ -313,13 +316,13 @@ class MipsGenerate:
         stack_plus_opr_2 = self.stack_index(memory_op2)
 
         return [ASTR.LW('$t0', f'{stack_plus_opr_1}($sp)'),
-                ASTR.Comment("poner en registro $t0 lo que hay en f'{stack_plus_opr_1}"),
+                ASTR.Comment(f"poner en registro $t0 lo que hay en {stack_plus_opr_1}"),
                 ASTR.LW('$t1', f'{stack_plus_opr_2}($sp)'),
-                ASTR.Comment("poner en registro $t1 lo que hay en f'{stack_plus_opr_2}"),
+                ASTR.Comment(f"poner en registro $t1 lo que hay en {stack_plus_opr_2}"),
                 ASTR.Add('$t0' , '$t0','$t1'),
                 ASTR.Comment("en $t0 pon el resultado de la suma"),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
-                ASTR.Comment("poner en la posicion f'{stack_plus_memory_dest} el resultado ")
+                ASTR.Comment(f"poner en la posicion {stack_plus_memory_dest} el resultado ")
                 ]
 
     @ visitor.when(AST.Rest)
@@ -333,13 +336,13 @@ class MipsGenerate:
         stack_plus_opr_2 = self.stack_index(memory_op2)
 
         return [ASTR.LW('$t0', f'{stack_plus_opr_1}($sp)'),
-                ASTR.Comment("poner en registro $t0 lo que hay en f'{stack_plus_opr_1}"),
+                ASTR.Comment(f"poner en registro $t0 lo que hay en {stack_plus_opr_1}"),
                 ASTR.LW('$t1', f'{stack_plus_opr_2}($sp)'),
                 ASTR.Comment("poner en registro $t1 lo que hay en f'{stack_plus_opr_2}"),
                 ASTR.SUB('$t0' , '$t0','$t1'),
                 ASTR.Comment("poner en registro $t0 la suma "),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
-                ASTR.Comment("poner en f'{stack_plus_memory_dest} el resultado de la suma "),
+                ASTR.Comment(f"poner en {stack_plus_memory_dest} el resultado de la suma "),
 
                 ]
 
@@ -353,16 +356,42 @@ class MipsGenerate:
         return [ASTR.LI("$t0" ,1),
                 ASTR.Comment("Cargar 1 a $t0 pa comparar"),
                 ASTR.LW("$t1", f'{stack_plus_memory_cmp}($sp)' ),
-                ASTR.Comment("Cargar el valor de la pos  f'{stack_plus_memory_cmp} a $t1 pa comparar"),
+                ASTR.Comment(f"Cargar el valor de la pos  {stack_plus_memory_cmp} a $t1 pa comparar"),
                 ASTR.BEQ("$t0","$t1", label_memory),
-                ASTR.Comment("if $t1==$t0 then jump f'{label_memory}")
+                ASTR.Comment(f"if $t1==$t0 then jump {label_memory}")
                 ]
 
     @ visitor.when(AST.Label) 
     def visit(self,node:AST.Label):
         return [ASTR.Label(node.x),
-                ASTR.Comment("Crea el label f'{node.x} ")
+                ASTR.Comment(f"Crea el label {node.x} ")
                 ]  
+
+    @visitor.when(AST.CheckType)
+    def visit(self,node:AST.CheckType):
+        memory_dir = node.x
+        memory_instance = node.y
+        type_name = node.z
+
+        stack_plus_memory_dir = self.stack_index(memory_dir)
+        stack_plus_memory_instance = self.stack_index(memory_instance)
+        
+        return [
+                ASTR.LW('$s2',f'{stack_plus_memory_instance}($sp)'),
+                ASTR.Comment(f' pon en $s2 el contenido de {stack_plus_memory_instance}($sp)'),
+                ASTR.LW('$a1', type_name),
+                ASTR.Comment(f"guarda en $a1 {type_name} "),
+                ASTR.JAL('Contain'),
+                ASTR.Comment("Salta para Contain"),
+                ASTR.SW ('$s0',f'{stack_plus_memory_dir}($sp)'),
+                ASTR.Comment(f"Guarda en la pos {stack_plus_memory_dir}($sp) el contenido de $s0")
+
+
+
+                
+
+               ]
+
 
     @ visitor.when(AST.GoTo)
     def visit(self,node:AST.GoTo):

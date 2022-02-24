@@ -1,6 +1,7 @@
 .data
 bool: .word  1
 
+
 .text
 main:
 li $v0 , 1
