@@ -15,6 +15,8 @@ from asts.mips_ast import (
     MIPSProgram,
     MemoryIndexNode,
     Move,
+    Multiply,
+    MultiplyOpNode,
     RegisterNode,
     Sub,
     Subu,
@@ -128,10 +130,13 @@ class MIPSGenerator:
     def visit(self, node: Addi) -> str:
         return f"\taddi {node.left}, {node.middle}, {node.right}"
 
+    @visitor.when(Multiply)
+    def visit(self, node: Multiply) -> str:
+
     @visitor.when(BranchOnEqual)
     def visit(self, node: BranchOnEqual) -> str:
         return f"\tbeq {node.left}, {node.middle}, {node.right}"
-    @visitor.when(BranchOnEqual)
 
+    @visitor.when(BranchOnEqual)
     def visit(self, node: BranchOnNotEqual) -> str:
         return f"\tbne {node.left}, {node.middle}, {node.right}"

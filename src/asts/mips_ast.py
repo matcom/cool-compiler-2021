@@ -51,13 +51,16 @@ class DataNode(Node):
             self.data = []
         self.data = data
 
+
 class Constant(Node):
     """
-    This class represents a literal integer in MIPS 
+    This class represents a literal integer in MIPS
     """
-    def __init__(self, node, value : str) -> None:
+
+    def __init__(self, node, value: str) -> None:
         super().__init__(node)
         self.value = value
+
 
 class RegisterNode(Node):
     """
@@ -119,6 +122,13 @@ class TernaryOpNode(InstructionNode):
         self.middle = middle
         self.right = right
 
+
+class Multiply(TernaryOpNode):
+    """
+    This node represents `mul` instruction in MIPS
+    """
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
 
 class Subu(TernaryOpNode):
     """
@@ -182,6 +192,7 @@ class LoadImmediate(BinaryOpNode):
     def __init__(self, node, left, right) -> None:
         super().__init__(node, left, right)
 
+
 class LoadWord(BinaryOpNode):
     """
     This node represents `lw` instruction in MIPS
@@ -238,19 +249,24 @@ class JumpAndLink(InstructionNode):
         super().__init__(node)
         self.address = address
 
+
 class BranchOnEqual(TernaryOpNode):
     """
     This node represents `beq` instruction in MIPS
     """
+
     def __init__(self, node, left, middle, right) -> None:
         super().__init__(node, left, middle, right)
+
 
 class BranchOnNotEqual(TernaryOpNode):
     """
     This node represents `bne` instruction in MIPS
     """
+
     def __init__(self, node, left, middle, right) -> None:
         super().__init__(node, left, middle, right)
+
 
 class AssemblerDirective(Node):
     def __init__(self, node, list) -> None:
@@ -276,4 +292,3 @@ class Syscall(InstructionNode):
 
     def __init__(self, node) -> None:
         super().__init__(node)
-

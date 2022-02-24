@@ -286,6 +286,18 @@ class CCILToMIPSGenerator:
         )
         return instructions
 
+    @visitor.when(ccil_ast.SetAttrOpNode)
+    def visist(self, node: ccil_ast.SetAttrOpNode):
+        instructions = []
+
+        # TODO missing object location
+        attr_offset = self.get_attr_index(node.type, node.attr)
+        object_location = self.__location[node.source_id.value]
+
+        instructions.append(
+            mips_ast.LoadWord(node, mips_ast.RegisterNode(node, T0), object_location)
+        )
+
     @visitor.when(ccil_ast.SumOpNode)
     def visit(self, node: ccil_ast.SumOpNode):
         instructions = []
@@ -312,6 +324,64 @@ class CCILToMIPSGenerator:
 
         reg_ret = mips_ast.RegisterNode(node, V0)
         instructions.append(mips_ast.Add(node, reg_ret, reg_left, reg_right))
+
+        return instructions
+
+    @visitor.when(ccil_ast.MinusOpNode)
+    def visit(self, node: ccil_ast.MinusOpNode):
+        instructions = []
+
+        reg_left = mips_ast.RegisterNode(node, T3)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_left, self.__location[node.left.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(mips_ast.LoadImmediate(node, reg_left, node.left.value))
+
+        reg_right = mips_ast.RegisterNode(node, T4)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_right, self.__location[node.right.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(
+                mips_ast.LoadImmediate(node, reg_right, node.right.value)
+            )
+        else:
+            raise Exception("Invalid type of ccil node")
+
+        reg_ret = mips_ast.RegisterNode(node, V0)
+        instructions.append(mips_ast.Sub(node, reg_ret, reg_left, reg_right))
+
+        return instructions
+
+    @visitor.when(ccil_ast.MultOpNode)
+    def visit(self, node: ccil_ast.MultOpNode):
+        instructions = []
+
+        reg_left = mips_ast.RegisterNode(node, T3)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_left, self.__location[node.left.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(mips_ast.LoadImmediate(node, reg_left, node.left.value))
+
+        reg_right = mips_ast.RegisterNode(node, T4)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_right, self.__location[node.right.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(
+                mips_ast.LoadImmediate(node, reg_right, node.right.value)
+            )
+        else:
+            raise Exception("Invalid type of ccil node")
+
+        reg_ret = mips_ast.RegisterNode(node, V0)
+        instructions.append(mips_ast.Multiply(node, reg_ret, reg_left, reg_right))
 
         return instructions
 
