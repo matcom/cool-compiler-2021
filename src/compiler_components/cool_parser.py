@@ -27,7 +27,8 @@ def p_def_class(p):
     '''def_class : CLASS TYPE_ID LBRACE feature_list RBRACE
                  | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
+
     if len(p) == 6:
         p[0] = ClassDeclarationNode(p[2], p[4], line = line, column = column)
     else:
@@ -51,7 +52,7 @@ def p_def_attr(p):
     '''def_attr : ID DOUBLE_DOT TYPE_ID
                 | ID DOUBLE_DOT TYPE_ID LEFT_ARROW expr
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if len(p) == 4:
         p[0] = AttrDeclarationNode(p[1], p[3], line = line, column = column)
     else:
@@ -60,7 +61,7 @@ def p_def_attr(p):
 def p_def_func(p):
     '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT TYPE_ID LBRACE expr RBRACE
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = FuncDeclarationNode(p[1], p[3], p[6], p[8], line = line, column = column)
 
 def p_param_list(p):
@@ -106,7 +107,7 @@ def p_bool(p):
             | arith EQUALS arith
             | arith
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if len(p) == 3:
         p[0] = NotNode(p[2], line = line, column = column)
 
@@ -122,7 +123,7 @@ def p_bool(p):
 
 def p_expr2(p):
     'expr : ID LEFT_ARROW expr'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = AssignNode(p[1], p[3], line = line, column = column)
 
 def p_arith(p):
@@ -131,7 +132,7 @@ def p_arith(p):
              | arith PLUS term
              | arith MINUS term
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if len(p) == 2:
         p[0] = p[1]
     elif len(p) == 3:
@@ -147,7 +148,7 @@ def p_term(p):
              | term TIMES factor
              | term DIVIDE factor
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if len(p) == 2:
         p[0] = p[1]
     else:
@@ -168,12 +169,12 @@ def p_factor(p):
 #4 (por ahora) metodos para el no-terminal 'atom' 
 def p_atom1(p):
     'atom : ID'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = VariableNode(p[1], line = line, column = column)
 
 def p_atom2(p):
     'atom : NUMBER'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = ConstantNumNode(p[1], line = line, column = column)
 
 def p_atom3(p):
@@ -183,19 +184,19 @@ def p_atom3(p):
 def p_atom4(p):
     '''atom : NEW TYPE_ID 
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = InstantiateNode(p[2], line = line, column = column)
 
 def p_atomString(p):
     'atom : STRING'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = ConstantStringNode(p[1][1:len(p[1]) -1 ], line = line, column = column)
 
 def p_atomBool(p):
     '''atom : TRUE
             | FALSE
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if p[1].lower() == "true":
         p[0] = ConstantBooleanNode(True, line = line, column = column)
     else:
@@ -207,22 +208,22 @@ def p_atomBool(p):
 
 def p_atomIF(p):
     'atom : IF expr THEN expr ELSE expr FI'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = IfNode(p[2], p[4], p[6], line = line, column = column)
 
 def p_atomCicle(p):
     'atom : WHILE expr LOOP expr POOL'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = WhileNode(p[2], p[4], line = line, column = column)
 
 def p_atomBlock(p):
     'atom : LBRACE expr_list RBRACE'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = BlockNode(p[2], line = line, column = column)
 
 def p_atomLet(p):
     'atom : LET atr_decl_list IN expr'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = LetNode(p[2], p[4], line = line, column = column)
 
 def p_atr_decl_list(p):
@@ -237,14 +238,14 @@ def p_atr_decl_list(p):
 
 def p_atomCase(p):
     'atom : CASE expr OF case_list ESAC'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = CaseNode(p[2], p[4], line = line, column = column)
 
 def p_caseList(p):
     '''case_list : ID DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON
                  | ID DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON case_list
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if len(p) == 7:
         p[0] = [AttrDeclarationNode(p[1], p[3], p[5], line = line, column = column)]
     else:
@@ -252,7 +253,7 @@ def p_caseList(p):
 
 def p_atomIsVoid(p):
     'atom : ISVOID factor'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = IsVoidNode(p[2], line = line, column = column)
 
 '''
@@ -263,23 +264,23 @@ def p_atomNot(p):
 
 def p_atomNhanhara(p):
     'atom : NHANHARA factor'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = NhanharaNode(p[2], line = line, column = column)
 
 def p_func_call(p):
     '''func_call : factor DOT ID LPAREN arg_list RPAREN
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = DispatchNode(p[1], p[3], p[5], line = line, column = column)
 
 def p_func_call2(p):
     'func_call : ID LPAREN arg_list RPAREN'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = CallNode(None, p[1], p[3], line = line, column = column)
 
 def p_func_call3(p):
     'func_call : factor ARROBA TYPE_ID DOT ID LPAREN arg_list RPAREN'
-    line, column = calculate_position(p.lexer.lexdata, p.lexpos)
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] = DispatchNode(p[1], p[5], params = p[7], typex = p[3], line = line, column = column)
 
 
