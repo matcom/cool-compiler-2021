@@ -41,19 +41,6 @@ class ShiftReduceParser:
                 action, tag = self.action[state, lookahead]
 
             except KeyError:
-                print("State before error")
-                print(state)
-                print(lookahead)
-                print("cursor")
-                print(cursor)
-
-                # self.errors.append(
-                #     SyntacticError(
-                #         cursor,
-                #         0,
-                #         "No transition available. Sentence given does not belong to the grammar",
-                #     )
-                # )
                 self.errors.append(
                     SyntacticError(
                         pos[cursor][0],
@@ -63,9 +50,6 @@ class ShiftReduceParser:
                 )
 
                 return output, operations
-            # Exception(
-            #         "No transition available"
-            #     )  # string does not belong to this grammar
 
             # Shift case
             if action == self.SHIFT:
@@ -94,7 +78,7 @@ class ShiftReduceParser:
                     )
                 )
                 return output, operations
-                        # "Invalid case. Sentence given does not belong to the grammar",
+             # "Invalid case. Sentence given does not belong to the grammar",
 
             if cursor >= len(w):  # or not stack
                 self.errors.append(
