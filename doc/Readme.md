@@ -23,54 +23,32 @@ pytest3. Por otra parte, para instalar las dependencias también se debe usar el
 ##Estructura del proyecto
 
 .
-├── CIL
-│   ├── ast.py
-│   ├── cil.py
-│   └── __pycache__
-│       ├── ast.cpython-38.pyc
-│       └── cil.cpython-38.pyc
-├── coolc.sh
-├── main.py
-├── makefile
-├── MIPS
-│   ├── mips.py
-│   └── __pycache__
-│       └── mips.cpython-38.pyc
-├── Parser
-│   ├── ast.py
-│   ├── lexer.py
-│   ├── parser.out
-│   ├── parser.py
-│   ├── parsetab.py
-│   └── __pycache__
-│       ├── ast.cpython-38.pyc
-│       ├── lexer.cpython-38.pyc
-│       ├── parser.cpython-38.pyc
-│       └── parsetab.cpython-38.pyc
-├── Semantic
-│   ├── builder.py
-│   ├── checker.py
-│   ├── collector.py
-│   └── __pycache__
-│       ├── builder.cpython-38.pyc
-│       ├── checker.cpython-38.pyc
-│       └── collector.cpython-38.pyc
-└── Tools
-    ├── context.py
-    ├── errors.py
-    ├── messages.py
-    ├── __pycache__
-    │   ├── context.cpython-38.pyc
-    │   ├── errors.cpython-38.pyc
-    │   ├── messages.cpython-38.pyc
-    │   ├── scope.cpython-38.pyc
-    │   ├── tokens.cpython-38.pyc
-    │   ├── utils.cpython-38.pyc
-    │   └── visitor.cpython-38.pyc
-    ├── scope.py
-    ├── tokens.py
-    ├── utils.py
-    └── visitor.py
+├── CIL  
+│   ├── ast.py  
+│   ├── cil.py   
+├── coolc.sh  
+├── main.py  
+├── makefile  
+├── MIPS  
+│   ├── mips.py     
+├── Parser  
+│   ├── ast.py  
+│   ├── lexer.py  
+│   ├── parser.out  
+│   ├── parser.py  
+│   ├── parsetab.py  
+├── Semantic  
+│   ├── builder.py  
+│   ├── checker.py  
+│   ├── collector.py  
+└── Tools  
+    ├── context.py  
+    ├── errors.py  
+    ├── messages.py  
+    ├── scope.py  
+    ├── tokens.py  
+    ├── utils.py  
+    └── visitor.py  
 
 ## Compilando su proyecto
 Una vez dentro de la carpeta cool-compiler-2021 se abre una terminal y se ejecutan los siguientes comandos :
