@@ -24,9 +24,9 @@ def p_class_def(p):
     '''class_def : CLASS TYPE OBRACE feature_list CBRACE SEMI 
                  | CLASS TYPE INHERITS TYPE OBRACE feature_list CBRACE SEMI'''
     if len(p) == 7:
-        p[0] = ast.ClassDecNode(p[2], p[4], p.lineno(1), p.lexpos(1))
+        p[0] = ast.ClassDecNode(p[2], p[4])
     elif len(p) == 9:
-        p[0] = ast.ClassDecNode(p[2], p[6], p.lineno(1), p.lexpos(1), p[4])
+        p[0] = ast.ClassDecNode(p[2], p[6], p[4])
 
 # def p_class_def_error(p):
 #     '''class_def : CLASS TYPE OBRACE error CBRACE SEMI

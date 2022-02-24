@@ -1,5 +1,10 @@
 class Node:
-    pass
+    line: int
+    lexpos: int
+
+    def set_line_lexpos(self, line, lexpos):
+        self.line = line
+        self.lexpos = lexpos
 
 class DeclarationNode(Node):
     pass
@@ -13,11 +18,10 @@ class ProgramNode(Node):
         
 
 class ClassDecNode(DeclarationNode):
-    def __init__(self, name, data, line, lexpos, parent=None):
+    def __init__(self, name, data, parent=None):
         self.name = name
         self.parent = parent
         self.data = data
-        self.line_lex_pos = (line, lexpos)
 
 class AttributeDecNode(DeclarationNode):
     def __init__(self, name, _type, expr=None):

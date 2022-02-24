@@ -21,7 +21,7 @@ def read_file(file_name: str):
         s = f.read()
     return s
     
-def log_error(s: str):
+def print_errors(s: str):
     styled_e = typer.style(s, fg=typer.colors.RED, bold=True)
     typer.echo(styled_e)
 
@@ -87,11 +87,13 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
     program = erase_single_line_comment(program) #### Aca es el error
     
     lexer.input(program)
+    tokens = []
     # print(program)
     while True:
         t = lexer.token()
         if not t:
             break
+        tokens.append(t)
         if type(t) == tuple:
             column = 1
             current_pos = t[2]
@@ -121,7 +123,7 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
         if verbose:
             print(t)
 
-    return errors, program, lexer
+    return errors, program, tokens
 
 def erase_single_line_comment(program: str):
     temp = ''
@@ -228,29 +230,30 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
     context = Context()
     scope = Scope()
     
-    errors, program, _ = tokenize(program_file, debug, verbose)
+    errors, program, tokens = tokenize(program_file, debug, verbose)
+
 
     if errors or lexer_errors:
         for (_, line, lexpos, value) in lexer_errors:
             totallines = program.count('\n')
             col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
-            log_error(f'({line}, {col - 1}) - LexicographicError: ERROR \"{value}\"')
+            print_errors(f'({line}, {col - 1}) - LexicographicError: ERROR \"{value}\"')
         for e in errors:
-            log_error(e)
+            print_errors(e)
         exit(1)
 
     ast = parse(program, debug=debug)
 
     # if it has no instructions
     if ast is None and not parser_errors:
-        log_error("(0, 0) - SyntacticError: ERROR at or near EOF")
+        print_errors("(0, 0) - SyntacticError: ERROR at or near EOF")
         exit(1)
 
     if parser_errors:  
         for (line, lexpos, _, value) in parser_errors:
             totallines = program.count('\n')
             col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
-            log_error(f'({line - totallines}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
+            print_errors(f'({line - totallines}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
         exit(1)
 
     else:
@@ -261,13 +264,14 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             TypeChecker(context, errors).visit(ast, scope)
         except:
             errors
-        if not errors:
+        if errors:
+            print_errors('\n'.join(errors))
             # InferenceTypeChecker(context, errors).visit(ast, Scope())
-            CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
-            Execution(context).visit(ast, Scope())
+            # CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
+            # Execution(context).visit(ast, Scope())
+        
+        ### code generation ###          
             
-        else:
-            return '\n'.join(errors) 
     # return "\n".join(errors) 
     
 if __name__ == '__main__':
