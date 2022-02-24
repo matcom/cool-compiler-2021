@@ -298,8 +298,8 @@ li $v0,8
 li $a1 , 10000
 syscall
 move $s0 , $a0
-
-
+addi $sp, $sp, 4
+jr $ra
 """
 
 class In_Int:
@@ -309,6 +309,7 @@ IO_in_int:
 li $v0,5
 syscall
 move $s0 , $v0
+addi $sp, $sp, 4
 jr $ra
 """
 
