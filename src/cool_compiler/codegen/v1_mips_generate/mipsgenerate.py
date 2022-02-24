@@ -10,7 +10,8 @@ class MipsGenerate:
             "IO_out_string": ASTR.Out_String,
             "IO_in_int":ASTR.In_Int,
             "IO_in_string":ASTR.In_String,
-            "IO_out_int":ASTR.Out_Int
+            "IO_out_int":ASTR.Out_Int,
+            "String_length":ASTR.Length
         }
 
     @visitor.on('node')
@@ -190,6 +191,9 @@ class MipsGenerate:
         _type, func_name = node.z.split('@')
 
         self.func_list += [func for func in self.cil_func.keys() 
+            if func_name in func and  not func in self.func_list]
+
+        self.func_list += [func for func in self.native_fun.keys() 
             if func_name in func and  not func in self.func_list]
 
         func_address = self.cil_type[_type].method_list.index(func_name) * 4 + 4

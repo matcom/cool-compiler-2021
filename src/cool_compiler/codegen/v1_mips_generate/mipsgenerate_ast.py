@@ -346,24 +346,21 @@ jr $ra
 ################################# Native Func Str ################################################
 class Length:
     def __str__(self) -> str:
-       return """ 
-       
-    legnht:
-    li $t0 , 0
-    lw $s2 , ($sp)
-        loop:
-        lb $s0 , ($s2)
-        beq $s0 , $zero, END
-        add $t0 , $t0 ,1
-        add $s2,$s2,4
-        j loop
-    
+       return """        
+String_length:
+li $t0 , 0
+lw $s2 , ($sp)
+    loop:
+    lb $s0 , ($s2)
+    beq $s0 , $zero, END
+    add $t0 , $t0 ,1
+    add $s2,$s2,4
+    j loop
 
-    END:
-        move $s0 , $t0
-        addi $sp, $sp, 4
-        jr $ra
-
+END:
+    move $s0 , $t0
+    addi $sp, $sp, 4
+    jr $ra
 """
 
 class Concat:
