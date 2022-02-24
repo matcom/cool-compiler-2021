@@ -167,7 +167,7 @@ class ErrorType(Type):
 
 class VoidType(Type):
     def __init__(self):
-        Type.__init__(self, '<void>')
+        Type.__init__(self, 'Void')
 
     def conforms_to(self, other) -> bool:
         # raise Exception('Invalid type: void type.')

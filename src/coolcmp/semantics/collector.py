@@ -20,7 +20,7 @@ class TypeCollector(object):
 
         # Default types definition
         self.context.types['<error>'] = ErrorType()
-        void = self.context.types['<void>'] = VoidType()
+        void = self.context.types['Void'] = VoidType()
         self_ = self.context.create_type('SELF_TYPE')
         object_ = self.context.create_type('Object')
         io = self.context.create_type('IO')

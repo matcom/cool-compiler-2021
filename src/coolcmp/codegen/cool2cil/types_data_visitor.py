@@ -99,13 +99,13 @@ class DotTypesDataVisitor(CILVisitor):
                 }
             ),
             cil.TypeNode(
-                name='<void>',
+                name='Void',
                 attrs=[
-                    '<void>__name',
+                    'Void__name',
                 ],
                 methods=[],
                 attr_expr_nodes={
-                    '<void>__name': ast.StringNode('"<void>"')
+                    'Void__name': ast.StringNode('"<void>"')
                 }
             ),
         ]
