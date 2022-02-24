@@ -135,7 +135,6 @@ class TypeChecker:
             #     self.errors.append(f'Variable {_id} is already defined in {self.current_method.name}.')
             # else:
             #     scope.define_variable(_id, var_type)
-            scope.define_variable(_id, var_type)
 
             if _e is not None:
                 expr = self.visit(_e, scope.create_child()) 
@@ -144,6 +143,9 @@ class TypeChecker:
             if expr is not None and not expr.conforms_to(var_type):
                 # self.errors.append(f"Can't convert {expr.name} to {var_type.name}.")
                 self.errors.append(_TypeError %(node.decl_list[iteration].token_list[0].lineno, node.decl_list[iteration].token_list[0].col, f"Infered type {expr.name} of initialization of {_id} does not conform to identifier's declared type {var_type.name}"))
+            else:
+                var_type = expr
+            scope.define_variable(_id, var_type)
             iteration+=1
         return self.visit(node.expression, scope.create_child())
 
@@ -169,6 +171,7 @@ class TypeChecker:
             if not value_t.conforms_to(attrType):
                 # self.errors.append(f"Can't convert {value_t.name} to {attrType.name}.")
                 self.errors.append(_TypeError %(node.value.token_list[0].lineno, node.value.token_list[0].col, f'Infered type {value_t.name} of initialization of attribute {node.id} does not conform to declared type {attrType.name}'))
+            attrType = value_t
         else:
             scope.create_child()
 

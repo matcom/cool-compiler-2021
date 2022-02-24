@@ -28,10 +28,74 @@ class CiltoMipsVisitor:
         self.dotdata = node.dotdata
         self.dotcode = node.dotcode
 
-        self.write_data('.data')  # initialize the .data segment
-        self.write_data(f'p_error: {datatype.asciiz} "Aborting from String"')
-        self.write_data(f'zero_error: {datatype.asciiz} "Division by zero"')
-        self.write_data(f'range_error: {datatype.asciiz} "Index out of range"')
+        self.write_data('.data')
+        self.write_code('.text')
+
+        inherited = "# Inherited Method\n" \
+                     ".inherited:\n" \
+                     "lw $a0, 8($sp)\n" \
+                     "lw $a1, 4($sp)\n" \
+                     "lw $a0, ($a0)\n" \
+                     "lw $a2, ($a0)\n" \
+                     "lw $a3, 4($a0)\n" \
+                     "lw $a0, ($a1)\n" \
+                     "lw $a1, 4($a1)\n" \
+                     "sge $t0, $a2, $a0\n" \
+                     "sle $t1, $a3, $a1\n" \
+                     "and $a0, $t0, $t1\n" \
+                     "sw $a0, ($sp)\n" \
+                     "subu $sp, $sp, 4\n" \
+                     "jr $ra\n" \
+                     "\n"
+
+        raise_exc = "# raise exception Method\n" \
+                    ".raise:\n" \
+                    "lw $a0, 4($sp)\n" \
+                    "li $v0, 4\n" \
+                    "syscall\n" \
+                    "li $v0, 10\n" \
+                    "syscall"
+
+        self.write_data("# Start .data segment (data!)")
+        self.write_data(".data")
+        self.write_data("zero_error: .asciiz \"Divition by zero exception\"")
+        self.write_data("index_error: .asciiz \"Invalid index exception\"")
+        self.write_data("void_error: .asciiz \"Objects must be inizializated before use exception\"")
+        self.write_data("case_error: .asciiz \"Case expression no match exception\"")
+        self.write_data("void_str: .asciiz \"\"")
+        
+        self.write_code(inherited)
+        self.write_code(raise_exc)
+        
+        self.write_code("main:")
+        self.write_code(f'{operations.move} {registers.s7} {registers.gp}')
+        self.write_code(f'{operations.addi} {registers.s7} {registers.s7} 300000')
+        self.write_code(f"")
+        
+        self.write_data(f"_abort: {datatype.asciiz} \"Program Aborted\"")
+        self.write_data(f"_zero: {datatype.asciiz} \"0 Division Error\"")
+        self.write_data(f"_substr: {datatype.asciiz} \"Substr Length Error\"")
+        self.write_data(f"_mem: {datatype.asciiz} \"Memory Error\"")
+        self.write_data(f"")
+
+        for i, d in enumerate(self.dotdata):
+            self.write_data("msg{}: {} \"{}\"".format(i, datatype.asciiz, d))   # every one of the user defined data through the program
+        
+        self.write_data('buffer: .space 1024')  # buffer for the in_string method
+
+        for i, t in enumerate(self.dottypes):
+            self.write_data(f"type_str{i}: {datatype.asciiz} \"{t.name}\"")
+        
+        for i, t in enumerate(self.dottypes):
+            # words = f"{tipe.cType}: .word {tipe.t_in}, {tipe.t_out}, type_str{i}"
+            words = f"{t.name}: .word 12, 42, type_str{i}"
+            for method in t.methods:
+                words += ", " + "." + method[1]
+            self.write_data(words)
+
+        for instr in self.dotcode:
+            a = 0
+
 
     @visitor.when(TypeNode)
     def visit(self, node):

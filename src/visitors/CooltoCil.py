@@ -46,8 +46,8 @@ class BaseCOOLToCILVisitor:
         self.localvars.append(local_node)
         return vinfo.name
 
-    def define_internal_local(self):
-        vinfo = VariableInfo('internal', None)
+    def define_internal_local(self, name='internal'):
+        vinfo = VariableInfo(name, None)
         return self.register_local(vinfo)
 
     def register_instruction(self, instruction):
@@ -57,8 +57,8 @@ class BaseCOOLToCILVisitor:
     def to_function_name(self, method_name, type_name):
         return f'function_{method_name}_at_{type_name}'
     
-    def register_function(self, function_name):
-        function_node = cil.FunctionNode(function_name, [], [], [])
+    def register_function(self, function_name, params= [], localvars= []):
+        function_node = cil.FunctionNode(function_name, params, localvars, [])
         self.dotcode.append(function_node)
         return function_node
     
@@ -77,17 +77,76 @@ class BaseCOOLToCILVisitor:
         if self.current_type in self.builtin_types:
             return
         attrs = [att for att in class_node.features if isinstance(att, AttrDeclarationNode)]
-        while True:
+        while True: # we may need to search for te attributes of the ancestors
             break
         self.current_function = self.register_function(self.to_function_name('ctor', self.current_type.name))
-        self.register_instruction(cil.ParamNode('self'))
+        local_self = self.define_internal_local('self')
+        self.register_instruction(cil.AllocateNode(self.current_type.name, 'self'))
 
         for i, attr in enumerate(attrs):
             set_attr_node = self.visit(attr, scope)
             set_attr_node.index = i
             self.register_instruction(set_attr_node)
-        self.register_instruction(cil.ReturnNode(VariableInfo('self', self.current_type)))
+        self.register_instruction(cil.ReturnNode())
         
+    def add_builtin_types(self):
+        def build_Object():
+            type = self.register_type('Object')
+            self.current_type = type
+            
+            self.current_function = self.register_function(self.to_function_name('abort', self.current_type.name), ['self'])
+            self.register_instruction(cil.AbortNode())
+
+            self.current_function = self.register_function(self.to_function_name('copy', self.current_type.name), ['self'])
+            self.register_instruction(cil.CopyNode(1,1))
+
+            self.current_function = self.register_function(self.to_function_name('type_name', self.current_type.name), ['self'])
+            dest = self.define_internal_local()
+            self.register_instruction(cil.TypeOfNode('self', dest))
+            str_store = self.define_internal_local()
+            self.register_instruction(cil.AllocateNode('String', str_store))
+            self.register_instruction(cil.SetAttribNode(str_store, 0, dest))
+            self.register_instruction(cil.ReturnNode(str_store))
+
+        def build_String():
+            type = self.register_type('String')
+            self.current_type = type
+
+            self.current_function = self.register_function(self.to_function_name('concat'), ['self', 'suffix'])
+            dest = self.define_internal_local() # variable para guardar el resultado de la concatenación
+            self.register_instruction(cil.ConcatNode(dest, 'self', 'suffix'))   # agregar el nodo concat al ast de las instrucciones
+            str_store = self.define_internal_local()    # nueva instancia de string donde guardar el resultado y retornarla
+            self.register_instruction(cil.AllocateNode('String', str_store))
+            self.register_instruction(cil.SetAttribNode(str_store, 0, dest))
+            self.register_instruction(cil.ReturnNode(str_store))
+            
+            self.current_function = self.register_function(self.to_function_name('length'), ['self'])
+            dest = self.define_internal_local()
+            self.register_instruction(cil.LengthNode(dest, 'self'))
+            int_store = self.define_internal_local()
+            self.register_instruction(cil.AllocateNode('Int', int_store))
+            self.register_instruction(cil.SetAttribNode(int_store, 0, dest))
+            self.register_instruction(cil.ReturnNode(int_store))
+
+            self.current_function = self.register_function(self.to_function_name('substr'), ['self', 'index', 'length'])
+            dest = self.define_internal_local()
+            self.register_instruction(cil.SubstringNode(dest, 'self', 'index', 'length'))
+            str_store = self.define_internal_local()
+            self.register_instruction(cil.AllocateNode('String', str_store))
+            self.register_instruction(cil.SetAttribNode(str_store, 0, dest))
+            self.register_instruction(cil.ReturnNode(str_store))
+
+        def build_IO():
+            type = self.register_type('String')
+            self.current_type = type
+
+            self.current_function = self.register_function(self.to_function_name('out_string'), ['self', 'str'])
+            # self.register_instruction(cil.)
+
+
+        build_Object()
+        build_String()
+
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
     def visit(self, node):
@@ -112,10 +171,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.declarations -> [ ClassDeclarationNode ... ]
         ######################################################
         
+        # self.add_builtin_types()
         # class_nodes = [self.class_node_from_context(c) for c in self.context.types]
-        built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types if c in self.builtin_types]
-        for built_in_class in built_in_classes:
-            self.visit(built_in_class, scope)
+        # built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types if c in self.builtin_types]
+        # for built_in_class in built_in_classes:
+        #     self.visit(built_in_class, scope)
 
 
         self.current_function = self.register_function('entry')
@@ -242,8 +302,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.body -> [ ExpressionNode ... ]
         ###############################
-        if self.current_type.name in self.builtin_types:
-            return
+        # if self.current_type.name in self.builtin_types:
+        #     return
         self.current_method = self.current_type.get_method(node.id, self.current_type, False)
         
         # Your code here!!! (Handle PARAMS)
