@@ -1,8 +1,11 @@
-ATTR_NAME = "attr"
+PARAM = "param"
+LET = "let"
+ATTR = "attr"
 
 CASE_INIT = "init_case"
 CASE_END = "end_case"
 CASE_BRANCH = "case_branch"
+
 # Registers
 ZERO = 0
 AT = 1
@@ -36,3 +39,11 @@ GP = 28
 SP = 29
 FP = 30
 RA = 31
+
+OBJECT = "Object"
+BOOL = "Bool"
+INT = "Int"
+STRING = "String"
+VOID = "Void"
+SELFTYPE = "SELF_TYPE"
+ADDRESS = INT

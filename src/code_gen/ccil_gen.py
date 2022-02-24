@@ -1,34 +1,26 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import  Tuple, List, Dict
+from typing import Tuple, List, Dict
 from code_gen.tools import *
 
+from constants import *
 
 # All operations that define an expression and where it is stored
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
 CLASS_VISITOR_RESULT = Tuple[Class, List[FunctionNode]]
 METHOD_VISITOR_RESULT = FunctionNode
 
-PARAM = "param"
-LET = "let"
-ATTR = "attr"
-
-
-BOOL = "Bool"
-INT = "Int"
-STRING = "String"
-VOID = "Void"
-ADDRESS = INT
-
 # TODO:
 # Define cool built in methods
 # The result of (type of) what is it
 # How to handle void nodes
-# Diference between method id and function id
-# Handdle all remaining operations:
-#   * IO operations
-#   * Handle constants and IDs
+
+# Define abort nodes with a text
+# Add text dynamically .data function, incluiding error messages
+
+# Test there are no runtimes errors
+# Test that results are obtained as expected
 
 
 # CCIL stands for Cool Cows Intermediate Language ;)
@@ -150,7 +142,12 @@ class CCILGenerator:
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
-            node, f"f_{times}", params, to_vars(self.locals, Parameter), operations, fval_id
+            node,
+            f"f_{times}",
+            params,
+            to_vars(self.locals, Parameter),
+            operations,
+            fval_id,
         )
 
     @visitor.when(sem_ast.BlocksNode)
@@ -575,7 +572,7 @@ class CCILGenerator:
 
     def create_string_load_data(self, node, idx: str, target: str):
         self.add_local(idx, STRING)
-        return StorageNode(node, idx, LoadOpNod(node, target))
+        return StorageNode(node, idx, LoadOpNode(node, target))
 
     def create_int(self, node, idx: str, value: str):
         self.add_local(idx, INT)
