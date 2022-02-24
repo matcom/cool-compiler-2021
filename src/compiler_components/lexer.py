@@ -80,8 +80,72 @@ class Tokenizer:
         return t
 
     def t_STRING(self, t):
-        r'"[^"]*"'
-        return t    
+        r'"'
+        rest_data = t.lexer.lexdata[t.lexer.lexpos:]
+        s = ''
+        ok = False
+        index = 0
+        while index < len(rest_data):
+            if rest_data[index] == '"':
+                ok = True
+                t.lexer.skip(1)
+                s += rest_data[index]
+                break
+
+            if rest_data[index] == '\n' or rest_data[index] == '\000':
+                s = t.lexer.lexdata.split('\n')
+                count = 0
+                for i in range(t.lexer.lineno - 1):
+                    count += len(s[i])
+
+                posAtLine = t.lexer.lexpos - count - t.lexer.lineno + 2
+                if rest_data[index] == '\n':
+                    self.errors.append("(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ") - LexicographicError: Unterminated string constant")
+                if rest_data[index] == '\000':
+                    self.errors.append("(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ") - LexicographicError: String contains null character")
+                t.lexer.lineno+=1
+                return
+
+
+            if rest_data[index] == '\\':
+                t.lexer.skip(1)
+                index += 1
+                if index == len(rest_data) - 1:
+                    s = t.lexer.lexdata.split('\n')
+                    count = 0
+                    for i in range(t.lexer.lineno - 1):
+                        count += len(s[i])
+
+                    posAtLine = t.lexer.lexpos - count - t.lexer.lineno + 2
+                    self.errors.append("(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ") - LexicographicError: EOF in string constant")
+                    return
+                if rest_data[index] == 'b':
+                    s = s[0:len(s) - 1]    
+
+                elif rest_data[index] == 't':
+                    s+='\t'
+                elif rest_data[index] == 'f':
+                    s+='\f'
+                elif rest_data[index] == '\n':
+                    s+='\n'
+                    t.lexer.lineno += 1
+                else:
+                    s+= rest_data[index]
+
+            t.lexer.skip(1)
+            index+=1
+
+        if ok:
+            t.value += s
+            return t
+        else:
+            s = t.lexer.lexdata.split('\n')
+            count = 0
+            for i in range(t.lexer.lineno - 1):
+                count += len(s[i])
+
+            posAtLine = t.lexer.lexpos - count - t.lexer.lineno + 2
+            self.errors.append("(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ") - LexicographicError: EOF in string constant")  
 
     def t_ID(self, t):
         r'[a-z][a-zA-Z_0-9]*'
