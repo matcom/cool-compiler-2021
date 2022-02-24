@@ -123,7 +123,7 @@ class FunctionNode(Node):
         locals = "\n".join(str(l) for l in self.locals)
         ops = "\n".join(str(o) for o in self.operations)
 
-        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops}"
+        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n \t\treturn {self.ret.id}"
 
 
 class OperationNode(Node):
