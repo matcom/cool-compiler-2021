@@ -49,16 +49,16 @@ class Pipeline():
             if len(self.errors) == 0:
                 self.typeChecker = TypeChecker(self.context, self.errors)
                 self.typeChecker.visit( self.ast, scope)
-                
-            self.coolToCil = COOLToCILVisitor(self.context)
-            cil_ast = self.coolToCil.visit(self.ast, scope)
-            # print(get_formatter(cil_ast))
-            self.cilToMips = CiltoMipsVisitor(self.context)
-            self.cilToMips.visit(cil_ast)
-            with open('out', 'w') as f:
-                mips_code = self.cilToMips.data + self.cilToMips.code
-                for line in mips_code:
-                    f.write(line+'\n')
+                if len(self.errors) == 0:
+                    self.coolToCil = COOLToCILVisitor(self.context)
+                    cil_ast = self.coolToCil.visit(self.ast, scope)
+                    # print(get_formatter(cil_ast))
+                    self.cilToMips = CiltoMipsVisitor(self.context)
+                    self.cilToMips.visit(cil_ast)
+                    with open('out', 'w') as f:
+                        mips_code = self.cilToMips.data + self.cilToMips.code
+                        for line in mips_code:
+                            f.write(line+'\n')
         if verbose:
             print('This is after infering types:')
             print()
