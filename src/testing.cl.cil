@@ -878,8 +878,6 @@ function __init_String_type {
 
 	
 
-	ARG self
-	self = CALL __init_Object_type
 	
 	RETURN self
 }
@@ -888,8 +886,6 @@ function __init_Bool_type {
 
 	
 
-	ARG self
-	self = CALL __init_Object_type
 	
 	RETURN self
 }
@@ -898,8 +894,6 @@ function __init_Int_type {
 
 	
 
-	ARG self
-	self = CALL __init_Object_type
 	
 	RETURN self
 }
@@ -908,8 +902,6 @@ function __init_IO_type {
 
 	
 
-	ARG self
-	self = CALL __init_Object_type
 	
 	RETURN self
 }
@@ -918,14 +910,21 @@ function __init_Foo_type {
 
 	LOCAL local__init_Foo_type_internal_0
 	LOCAL local__init_Foo_type_internal_1
+	LOCAL local__init_Foo_type_internal_2
+	LOCAL local__init_Foo_type_internal_3
+	LOCAL local__init_Foo_type_internal_4
 
-	ARG self
-	self = CALL __init_Bazz_type
 	
 	ARG self
-	local__init_Foo_type_internal_0 = CALL __init_a_at_Foo
+	local__init_Foo_type_internal_0 = CALL __init_h_at_Bazz
 	ARG self
-	local__init_Foo_type_internal_1 = CALL __init_b_at_Foo
+	local__init_Foo_type_internal_1 = CALL __init_g_at_Bazz
+	ARG self
+	local__init_Foo_type_internal_2 = CALL __init_i_at_Bazz
+	ARG self
+	local__init_Foo_type_internal_3 = CALL __init_a_at_Foo
+	ARG self
+	local__init_Foo_type_internal_4 = CALL __init_b_at_Foo
 	RETURN self
 }
 function __init_Bar_type {
@@ -933,14 +932,33 @@ function __init_Bar_type {
 
 	LOCAL local__init_Bar_type_internal_0
 	LOCAL local__init_Bar_type_internal_1
+	LOCAL local__init_Bar_type_internal_2
+	LOCAL local__init_Bar_type_internal_3
+	LOCAL local__init_Bar_type_internal_4
+	LOCAL local__init_Bar_type_internal_5
+	LOCAL local__init_Bar_type_internal_6
+	LOCAL local__init_Bar_type_internal_7
+	LOCAL local__init_Bar_type_internal_8
 
-	ARG self
-	self = CALL __init_Razz_type
 	
 	ARG self
-	local__init_Bar_type_internal_0 = CALL __init_c_at_Bar
+	local__init_Bar_type_internal_0 = CALL __init_h_at_Bazz
 	ARG self
-	local__init_Bar_type_internal_1 = CALL __init_d_at_Bar
+	local__init_Bar_type_internal_1 = CALL __init_g_at_Bazz
+	ARG self
+	local__init_Bar_type_internal_2 = CALL __init_i_at_Bazz
+	ARG self
+	local__init_Bar_type_internal_3 = CALL __init_a_at_Foo
+	ARG self
+	local__init_Bar_type_internal_4 = CALL __init_b_at_Foo
+	ARG self
+	local__init_Bar_type_internal_5 = CALL __init_e_at_Razz
+	ARG self
+	local__init_Bar_type_internal_6 = CALL __init_f_at_Razz
+	ARG self
+	local__init_Bar_type_internal_7 = CALL __init_c_at_Bar
+	ARG self
+	local__init_Bar_type_internal_8 = CALL __init_d_at_Bar
 	RETURN self
 }
 function __init_Razz_type {
@@ -948,14 +966,27 @@ function __init_Razz_type {
 
 	LOCAL local__init_Razz_type_internal_0
 	LOCAL local__init_Razz_type_internal_1
+	LOCAL local__init_Razz_type_internal_2
+	LOCAL local__init_Razz_type_internal_3
+	LOCAL local__init_Razz_type_internal_4
+	LOCAL local__init_Razz_type_internal_5
+	LOCAL local__init_Razz_type_internal_6
 
-	ARG self
-	self = CALL __init_Foo_type
 	
 	ARG self
-	local__init_Razz_type_internal_0 = CALL __init_e_at_Razz
+	local__init_Razz_type_internal_0 = CALL __init_h_at_Bazz
 	ARG self
-	local__init_Razz_type_internal_1 = CALL __init_f_at_Razz
+	local__init_Razz_type_internal_1 = CALL __init_g_at_Bazz
+	ARG self
+	local__init_Razz_type_internal_2 = CALL __init_i_at_Bazz
+	ARG self
+	local__init_Razz_type_internal_3 = CALL __init_a_at_Foo
+	ARG self
+	local__init_Razz_type_internal_4 = CALL __init_b_at_Foo
+	ARG self
+	local__init_Razz_type_internal_5 = CALL __init_e_at_Razz
+	ARG self
+	local__init_Razz_type_internal_6 = CALL __init_f_at_Razz
 	RETURN self
 }
 function __init_Bazz_type {
@@ -965,8 +996,6 @@ function __init_Bazz_type {
 	LOCAL local__init_Bazz_type_internal_1
 	LOCAL local__init_Bazz_type_internal_2
 
-	ARG self
-	self = CALL __init_IO_type
 	
 	ARG self
 	local__init_Bazz_type_internal_0 = CALL __init_h_at_Bazz
@@ -984,8 +1013,6 @@ function __init_Main_type {
 	LOCAL local__init_Main_type_internal_2
 	LOCAL local__init_Main_type_internal_3
 
-	ARG self
-	self = CALL __init_Object_type
 	
 	ARG self
 	local__init_Main_type_internal_0 = CALL __init_a_at_Main

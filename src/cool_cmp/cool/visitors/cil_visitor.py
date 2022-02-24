@@ -1007,9 +1007,9 @@ class COOLToCILVisitor():
         type_node.methods.insert(0, ("__init", init_function.name))
         self.params.append(cil.ParamNode('self', node.row, node.column, "Class Declaration Node"))
 
-        if self.current_type.parent and self.current_type.parent.name not in ["String", "Int", "Bool"]:
-            self.register_instruction(cil.ArgNode('self', node.row, node.column, "Calling father init function"))
-            self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(self.current_type.parent.name), "self", node.row, node.column))
+        # if self.current_type.parent and self.current_type.parent.name not in ["String", "Int", "Bool"]:
+        #     self.register_instruction(cil.ArgNode('self', node.row, node.column, "Calling father init function"))
+        #     self.register_instruction(cil.StaticCallNode(self.to_init_type_function_name(self.current_type.parent.name), "self", node.row, node.column))
         
         self.register_instruction(cil.InitInstance('self', type_node.name, node.row, node.column, "Class Declaration Node"))
         
@@ -1018,6 +1018,9 @@ class COOLToCILVisitor():
             init_attr_function = self.get_function(self.to_init_attr_function_name(attr.name, type_node.name))
             self.current_function = init_attr_function
             self.visit(attr.node, attr.node.scope)
+        
+        for attr,typex in self.current_type.all_attributes():
+            init_attr_function = self.get_function(self.to_init_attr_function_name(attr.name, typex.name))
             
             # Calling function in type init function
             self.current_function = init_function
