@@ -6,7 +6,8 @@ class Node:
 class ProgramNode(Node):
     def __init__(self, declarations):
         self.declarations = declarations
-        self.line = -1
+        self.line = 1
+        self.column = 1
 
 
     def visit(self, tabs = 0):
@@ -25,9 +26,10 @@ class ExpressionNode(Node):
 
 
 class AtomicNode(ExpressionNode):
-    def __init__(self, lex):
+    def __init__(self, lex, line, column):
         self.lex = lex
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -35,11 +37,12 @@ class AtomicNode(ExpressionNode):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx, features, parent=None):
+    def __init__(self, idx, features, parent=None, line = -1, column=-1):
         self.id = idx
         self.parent = parent
         self.features = features
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -50,12 +53,13 @@ class ClassDeclarationNode(DeclarationNode):
     
 
 class FuncDeclarationNode(DeclarationNode):
-    def __init__(self, idx, params, return_type, body):
+    def __init__(self, idx, params, return_type, body, line = -1, column=-1):
         self.id = idx
         self.params = params
         self.type = return_type
         self.body = body
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -67,11 +71,12 @@ class FuncDeclarationNode(DeclarationNode):
 
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, idx, typex, expr = None):
+    def __init__(self, idx, typex, expr = None, line = -1, column=-1):
         self.id = idx
         self.type = typex
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -82,11 +87,12 @@ class AttrDeclarationNode(DeclarationNode):
 
 
 class VarDeclarationNode(ExpressionNode):
-    def __init__(self, idx, typex, expr):
+    def __init__(self, idx, typex, expr, line = -1, column=-1):
         self.id = idx
         self.type = typex
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -96,10 +102,11 @@ class VarDeclarationNode(ExpressionNode):
 
 
 class AssignNode(AtomicNode):
-    def __init__(self, idx, expr):
+    def __init__(self, idx, expr, line = -1, column=-1):
         self.id = idx
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -109,9 +116,10 @@ class AssignNode(AtomicNode):
 
 
 class IsVoidNode(AtomicNode):
-    def __init__(self, expr):
+    def __init__(self, expr, line = -1, column=-1):
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
     
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__IsVoid <expr>"
@@ -119,9 +127,10 @@ class IsVoidNode(AtomicNode):
 
 
 class NotNode(AtomicNode):
-    def __init__(self, expr):
+    def __init__(self, expr, line = -1, column=-1):
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
     
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__NOT <expr>"
@@ -129,9 +138,10 @@ class NotNode(AtomicNode):
 
 
 class NhanharaNode(AtomicNode):
-    def __init__(self, expr):
+    def __init__(self, expr, line = -1, column=-1):
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
     
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__~ <expr>"
@@ -139,7 +149,7 @@ class NhanharaNode(AtomicNode):
         
 
 class CallNode(AtomicNode):
-    def __init__(self, obj, idx, args = None, type = None):
+    def __init__(self, obj, idx, args = None, type = None, line = -1, column=-1):
         self.obj = obj
         self.id = idx
         if args is None:
@@ -147,7 +157,8 @@ class CallNode(AtomicNode):
         else:
             self.args = args
         self.type = type
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -173,11 +184,12 @@ class CallNode(AtomicNode):
 
 
 class IfNode(AtomicNode):
-    def __init__(self, if_c, then_c, else_c):
+    def __init__(self, if_c, then_c, else_c, line = -1, column=-1):
         self.if_c = if_c
         self.then_c = then_c
         self.else_c = else_c
-        self.line = -1
+        self.line = line
+        self.column = column
         
     def visit(self, tabs = 0):
         node = self
@@ -189,10 +201,11 @@ class IfNode(AtomicNode):
 
 
 class WhileNode(AtomicNode):
-    def __init__(self, condition, body):
+    def __init__(self, condition, body, line = -1, column=-1):
         self.condition = condition
         self.body = body
-        self.line = -1
+        self.line = line
+        self.column = column
         
     def visit(self, tabs = 0):
         node = self
@@ -204,9 +217,10 @@ class WhileNode(AtomicNode):
 
 
 class BlockNode(AtomicNode):
-    def __init__(self, expr_list):
+    def __init__(self, expr_list, line = -1, column=-1):
         self.expr_list = expr_list
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + " {<expr>; .... <expr>;}\n"
@@ -215,10 +229,11 @@ class BlockNode(AtomicNode):
 
 
 class LetNode(AtomicNode):
-    def __init__(self, list_decl, expr):
+    def __init__(self, list_decl, expr, line = -1, column=-1):
         self.list_decl = list_decl
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + " LET <decl>, <decl> ... <decl> in <expr>\n "
@@ -228,10 +243,11 @@ class LetNode(AtomicNode):
 
 
 class CaseNode(AtomicNode):
-    def __init__(self, expr, list_case):
+    def __init__(self, expr, list_case, line = -1, column=-1):
         self.list_case = list_case
         self.expr = expr
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + "\\__Case <expre> in <list-assign> esac"
@@ -241,10 +257,11 @@ class CaseNode(AtomicNode):
         
 
 class BinaryNode(ExpressionNode):
-    def __init__(self, left, right):
+    def __init__(self, left, right, line = -1, column=-1):
         self.left = left
         self.right = right
-        self.line = -1
+        self.line = line
+        self.column = column
 
     def visit(self, tabs = 0):
         node = self
@@ -275,7 +292,7 @@ class SelfNode(AtomicNode):
 
 
 class DispatchNode(ExpressionNode):
-    def __init__(self, expr, f, params, typex = None):
+    def __init__(self, expr, f, params, typex = None, line = -1, column=-1):
         self.id = f
         self.expr = expr
         self.f = f
@@ -284,7 +301,8 @@ class DispatchNode(ExpressionNode):
         else:
             self.params = params
         self.typex = typex
-        self.line = -1
+        self.line = line
+        self.column = column
     
     def visit(self, tabs = 0):
         node = self
