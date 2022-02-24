@@ -144,12 +144,18 @@ class ReturnOpNode(OperationNode):
         super().__init__()
 
 
-class ReadOpNode(ReturnOpNode):
+class ReadStrNode(ReturnOpNode):
     """
-    This nodes reads input from the standard input"
+    This nodes reads a string from the standard input
     """
 
     pass
+
+
+class ReadIntNode(ReturnOpNode):
+    """
+    This nodes reads an int from the standard input
+    """
 
 
 class GetAttrOpNode(ReturnOpNode):
@@ -273,6 +279,19 @@ class StrOpNode(ChainOpNode):
     pass
 
 
+class ConcatOpNode(ChainOpNode):
+    def __init__(self, source: str, target: str) -> None:
+        super().__init__(target)
+        self.source = source
+
+
+class SubstringOpNode(ReturnOpNode):
+    def __init__(self, start: AtomOpNode, length: AtomOpNode) -> None:
+        super().__init__()
+        self.start = start
+        self.length = length
+
+
 class AtomOpNode(ReturnOpNode):
     def __init__(self, value: str) -> None:
         """
@@ -283,18 +302,18 @@ class AtomOpNode(ReturnOpNode):
 
 
 class IdNode(AtomOpNode):
-    def __init__(self, node, value: str) -> None:
-        super().__init__(node, value)
+    def __init__(self, value: str) -> None:
+        super().__init__(value)
 
 
 class ConstantNode(AtomOpNode):
-    def __init__(self, node, value: str) -> None:
-        super().__init__(node, value)
+    def __init__(self, value: str) -> None:
+        super().__init__(value)
 
 
 class IntNode(ConstantNode):
-    def __init__(self, node, value: str) -> None:
-        super().__init__(node, value)
+    def __init__(self, value: str) -> None:
+        super().__init__(value)
 
 
 class FlowControlNode(OperationNode):
@@ -304,6 +323,11 @@ class FlowControlNode(OperationNode):
 
     def __init__(self, node) -> None:
         super().__init__(node)
+
+
+class CurrentTypeNameNode(ReturnOpNode):
+    def __init__(self) -> None:
+        super().__init__()
 
 
 class IfNode(FlowControlNode):
