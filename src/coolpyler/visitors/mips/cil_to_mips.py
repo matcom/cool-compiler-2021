@@ -123,6 +123,7 @@ class CilToMIPS:
         # instructions.append(mips.AddiNode(SP_REG, SP_REG, -locals_size))
 
         for instruction in node.instructions:
+            print(instruction)
             instructions.extend(self.visit(instruction))
 
         instructions.append(mips.AddiNode(SP_REG, SP_REG, locals_size))
@@ -308,7 +309,7 @@ class CilToMIPS:
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
         instructions = []
-        local_index = self.locals[node.name].index()
+        local_index = self.locals.index(node.name)
         self.memory_manager.save()
         reg1 = self.memory_manager.get_unused_register()
 
@@ -332,7 +333,7 @@ class CilToMIPS:
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
-        pass
+        return []
 
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
