@@ -705,15 +705,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                                   cil.ArgNode(value), cil.ArgNode(instance)], "Bool"))
         return instance
 
-    @visitor.when(VoidNode)
-    def visit(self, node, scope):
-        result_local = self.define_internal_local(scope=scope)
-        self.register_instruction(cil.LoadStringNode(node.id, result_local))
-        instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(cil.AllocateNode(
-            'String', self.context.get_type('String').tag, instance))
-        result_init = self.define_internal_local(
-            scope=scope, name="result_init")
-        self.register_instruction(cil.CallNode(result_init, 'Void_init', [
-                                  cil.ArgNode(result_local), cil.ArgNode(instance)], "String"))
-        return instance
+    # @visitor.when(VoidNode)
+    # def visit(self, node, scope):
+    #     result_local = self.define_internal_local(scope=scope)
+    #     self.register_instruction(cil.LoadStringNode(node.id, result_local))
+    #     instance = self.define_internal_local(scope=scope, name="instance")
+    #     self.register_instruction(cil.AllocateNode(
+    #         'String', self.context.get_type('String').tag, instance))
+    #     result_init = self.define_internal_local(
+    #         scope=scope, name="result_init")
+    #     self.register_instruction(cil.CallNode(result_init, 'Void_init', [
+    #                               cil.ArgNode(result_local), cil.ArgNode(instance)], "String"))
+    #     return instance
