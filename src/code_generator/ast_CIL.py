@@ -1,4 +1,3 @@
-
 from attr import attributes
 from matplotlib.pyplot import cla
 
@@ -22,7 +21,6 @@ class CILProgramNode(CILNode):
         for d in self.data:
             text += str(d) + '\n'
         text += "Functions:\n"
-        print(str(self.functions) + " gggg")
         for f in self.functions:
             text += str(f) + '\n'
         return text
@@ -91,6 +89,7 @@ class CILAttributeNode(CILNode):
         text += f"type: {self.type}\n"
         return text   
 
+
 class CILMethodNode(CILNode):
     def __init__(self, id, function_id):
         self.id = id
@@ -101,6 +100,7 @@ class CILMethodNode(CILNode):
         text += f"id: {self.id}\n"
         text += f"function_id: {self.function_id}\n"
         return text   
+
 
 class CILParamNode(CILNode):
     def __init__(self, id, type):
@@ -113,6 +113,7 @@ class CILParamNode(CILNode):
         text += f"type: {self.type}\n"
         return text   
 
+
 class CILLocalNode(CILNode):
     def __init__(self, id, type):
         self.id = id 
@@ -124,9 +125,11 @@ class CILLocalNode(CILNode):
         text += f"type: {self.type}\n"
         return text     
 
-#Instructions
+
+# Instructions
 class CILInstructionNode(CILNode):
     pass
+
 
 class CILAssignNode(CILInstructionNode):
     def __init__(self, id, expr):
@@ -139,7 +142,7 @@ class CILAssignNode(CILInstructionNode):
         text += f"expr: {self.expr}\n"
         return text     
 
-# id.attr = var
+
 class CILSetAttributeNode(CILInstructionNode): 
     def __init__(self, id, type, attr , var):
         self.id = id
@@ -155,24 +158,50 @@ class CILSetAttributeNode(CILInstructionNode):
         text += f"var: {self.var}\n"
         return text         
 
-class CILArgNode (CILInstructionNode):
+
+class CILArgNode(CILInstructionNode):
     def __init__(self, var):
         self.var = var
+        
+    def __str__(self):
+        text = "ArgNode:\n"
+        text += f"var: {self.var}\n"
+        return text 
    
-class CILIfGotoNode (CILInstructionNode):
+
+class CILIfGotoNode(CILInstructionNode):
     def __init__(self, var, label):
         self.var = var
         self.label = label
 
-class CILGotoNode (CILInstructionNode):
+    def __str__(self):
+        text = "IfGotoNode:\n"
+        text += f"var: {self.var}\n"
+        text += f"label: {self.label}\n"
+        return text 
+   
+
+class CILGotoNode(CILInstructionNode):
     def __init__(self, label):
             self.label = label       
 
-class CILLabelNode (CILInstructionNode):
+    def __str__(self):
+        text = "GotoNode:\n"
+        text += f"label: {self.label}\n"
+        return text 
+
+
+class CILLabelNode(CILInstructionNode):
     def __init__(self, id):
         self.id = id 
-        
-class CILReturnNode (CILInstructionNode):
+
+    def __str__(self):
+        text = "LabelNode:\n"
+        text += f"id: {self.id}\n"
+        return text 
+
+
+class CILReturnNode(CILInstructionNode):
     def __init__(self, var = None):
         self.var = var   
     
@@ -181,15 +210,24 @@ class CILReturnNode (CILInstructionNode):
         if self.var is not None:
             text += f"var: {self.var}\n"               
         return text                      
-class CILPrint (CILInstructionNode):
+
+
+class CILPrint(CILInstructionNode):
     def __init__(self, var):
         self.var = var
 
-#Expressions
+    def __str__(self):
+        text = "PrintNode:\n"
+        text += f"var: {self.var}\n"
+        return text
+
+
+# Expressions
 class CILExpressionNode(CILNode):
     pass
 
-class CILBinaryOperationNode (CILExpressionNode):
+
+class CILBinaryOperationNode(CILExpressionNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
@@ -200,6 +238,7 @@ class CILBinaryOperationNode (CILExpressionNode):
         text += f"right: {self.right}\n"
         return text     
     
+
 class CILGetAttribute(CILExpressionNode):
     def __init__(self, var, type, attr):
         self.var = var
@@ -214,39 +253,85 @@ class CILGetAttribute(CILExpressionNode):
         return text             
         
 
-class CILAllocateNode (CILExpressionNode):
+class CILAllocateNode(CILExpressionNode):
     def __init__(self, type):
         self.type = type
-        
-class CILTypeOfNode (CILExpressionNode):
-    def __init__(self, var):
-        self.var = var        
 
-class CILCallNode (CILExpressionNode):
+    def __str__(self):
+        text = "AllocateNode:\n"
+        text += f"var: {self.var}\n"
+        text += f"type: {self.type}\n"
+        text += f"att: {self.attr}\n"
+        return text    
+        
+
+class CILTypeOfNode(CILExpressionNode):
+    def __init__(self, var):
+        self.var = var    
+
+    def __str__(self):
+        text = "TypeOfNode:\n"
+        text += f"var: {self.var}\n"
+        return text      
+
+
+class CILCallNode(CILExpressionNode):
     def __init__(self, func):
         self.func = func  
+        
+    def __str__(self):
+        text = "CallNode:\n"
+        text += f"func: {self.func}\n"
+        return text   
 
-class CILVCallNode (CILExpressionNode):
+
+class CILVCallNode(CILExpressionNode):
     def __init__(self, type,  func):
         self.type = type
         self.func = func 
+        
+    def __str__(self):
+        text = "VCallNode:\n"
+        text += f"type: {self.func}\n"
+        text += f"func: {self.func}\n"
+        return text 
 
-class CILLoadNode (CILExpressionNode):
+
+class CILLoadNode(CILExpressionNode):
     def __init__(self, var):
         self.var = var
 
-class CILLengthNode (CILExpressionNode):
+    def __str__(self):
+        text = "LoadNode:\n"
+        text += f"var: {self.var}\n"
+        return text 
+
+
+class CILLengthNode(CILExpressionNode):
     def __init__(self, var):
             self.var = var
 
-class CILStrNode (CILExpressionNode):  
+    def __str__(self):
+        text = "LengthNode:\n"
+        text += f"var: {self.var}\n"
+        return text 
+
+
+class CILStringNode(CILExpressionNode):  
     def __init__(self, var):
-            self.var = var
+        self.var = var
                   
-class CILReadNode (CILExpressionNode):
+    def __str__(self):
+        text = "StringNode:\n"
+        text += f"var: {self.var}\n"
+        return text 
+
+
+class CILReadNode(CILExpressionNode):
     pass  
 
-class CILAtomicNode (CILExpressionNode):
+
+class CILAtomicNode(CILExpressionNode):
     def __init__(self, lex):
             self.lex = lex 
             
@@ -255,19 +340,22 @@ class CILAtomicNode (CILExpressionNode):
         text += f"lex: {self.lex}\n"
         return text     
 
-class CILVariableNode (CILAtomicNode):
+
+class CILVariableNode(CILAtomicNode):
     pass     
 
+
 class CILTypeConstantNode(CILAtomicNode):
-    pass         
-        
+    pass               
            
 
-class CILStringNode (CILAtomicNode):
+class CILStringNode(CILAtomicNode):
     pass
 
-class CILNumberNode (CILAtomicNode):
+
+class CILNumberNode(CILAtomicNode):
     pass
+
 
 # Arithmetic Operations
 class CILPlusNode(CILBinaryOperationNode):
@@ -298,8 +386,3 @@ class CILElessNode(CILBinaryOperationNode):
 class CILEqualsNode(CILBinaryOperationNode):
     pass
                 
-              
-        
-          
-        
-    

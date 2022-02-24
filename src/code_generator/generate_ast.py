@@ -1,7 +1,7 @@
+from math import exp
 from parsing.ast import *
 from .ast_CIL import *
 import cmp.visitor as visitor
-
 
 
 class CILScope:
@@ -45,7 +45,6 @@ class CILScope:
         return name
     
     def find_local(self, id):
-        
         for i in range (len(self.locals) - 1 , -1, -1):
             d = self.locals[i]
             try:
@@ -111,6 +110,7 @@ class CIL:
     
     @visitor.when(FuncDeclarationNode) 
     def visit(self, node):
+        self.scope.all_locals = []
         self.scope.locals = [{}]
         self.scope.instructions = []
         
@@ -119,14 +119,14 @@ class CIL:
         params.append(param_node)
         
         for param in node.params:
-            param_node = CILParamNode(param.id, CILTypeConstantNode(param.type))
+            name = self.scope.add_local(param.id, param.type, True)
+            param_node = CILParamNode(name, CILTypeConstantNode(param.type))
             params.append(param_node)
-            self.scope.add_local(param.id, param.type, True)
             
         expr = self.visit(node.expr)  
         new_var = self.scope.add_new_local(node.type)
-        self.scope.instructions.append(CILAssignNode(CILVariableNode (new_var), expr))
-        self.scope.instructions.append(CILReturnNode(CILVariableNode (new_var)))
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(new_var), expr))
+        self.scope.instructions.append(CILReturnNode(CILVariableNode(new_var)))
         return CILFuncNode(f'{node.id}_{self.scope.current_class}', params, self.scope.all_locals, self.scope.instructions)
                    
     @visitor.when(BlockNode)
@@ -138,7 +138,35 @@ class CIL:
             
     @visitor.when(DispatchNode)
     def visit(self, node):
-        pass        
+        if not isinstance(node.expr, VariableNode) or node.expr.lex != 'self':
+            expr = self.visit(node.expr)
+            name = self.scope.add_new_local(None)  # TODO revisar el tipo de retorno (idea, a;adir una instruccio typeof)
+            instruction = CILAssignNode(CILVariableNode(name), expr)
+            self.scope.instructions.append(instruction)  
+        else: 
+            name = f'self_{self.scope.current_class}' 
+        
+        args = []
+        args.append(CILArgNode(CILVariableNode(name)))
+        for arg in node.arg:
+            expr = self.visit(arg)
+            name_arg = self.scope.add_new_local(None) # TODO lo mismo de arriba
+            if not isinstance(expr, VariableNode):
+                instruction = CILAssignNode(CILVariableNode(name_arg), expr)
+                self.scope.instructions.append(instruction)
+                args.append(CILArgNode(CILVariableNode(name_arg)))
+            else: 
+                args.append(CILArgNode(CILVariableNode(expr.lex)))   
+        self.scope.instructions.extend(args)        
+        
+        if node.type is not None:
+            expression = CILVCallNode(CILTypeConstantNode(node.type.name), node.id)
+        else:         
+            expression = CILCallNode(node.id)
+        new_var = self.scope.add_new_local(None) # TODO
+        node_var = CILVariableNode(new_var)
+        self.scope.instructions.append(CILAssignNode(node_var, expression))     
+        return node_var
 
     @visitor.when(ConditionalNode)
     def visit(self, node):
@@ -182,7 +210,7 @@ class CIL:
     @visitor.when(CaseAttrNode)
     def visit(self, node):  
         #local = mself.scope.add_new_local(node.id)
-        self.scope.instructions.append(CILLabelNode(case_label))
+        self.scope.instructions.append(CILLabelNode(""))
         expresion_branch = self.visit(node.expr)
          
     @visitor.when(AssignNode)
@@ -258,8 +286,6 @@ class CIL:
         else:
             return CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), CILTypeConstantNode(self.scope.current_class), CILVariableNode(node.lex))
         
-         
-   
     @visitor.when(TrueNode)
     def visit(self, node):
        pass
