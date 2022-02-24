@@ -83,7 +83,7 @@ class TypeBuilder:
             self.current_type.set_parent(obj)
         
         for item in node.data:
-            self.visit(item)
+             self.visit(item)
 
     @visitor.when(ast.MethodDecNode)
     def visit(self, node: ast.MethodDecNode):

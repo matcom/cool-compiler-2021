@@ -72,7 +72,7 @@ class Test {
         -- Missing ')'
         in isvoid (3 + a * (x / w + new Int) - y - (((if tRue = not faLSe then ~z else 3 <= 4 + "hey".length() fi + a)/(0)*(((4 * 4)))))
     };
- };
+};
 
 class Test2 {
     test1: Test <- new Test;

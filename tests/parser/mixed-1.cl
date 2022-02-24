@@ -2,7 +2,8 @@
 class Test {
 
     testing8(): Bool {
-        z: Int <- 3
+        let z: Int <- 3
+        in isvoid ((((if tRue = not faLSe then ~z else 3 <= 4 + "hey".length() fi + a))/(0)*(((4 * 4)))))
     };
 }      -- ;
 

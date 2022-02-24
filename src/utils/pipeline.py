@@ -226,8 +226,9 @@ def print_list(list):
 @app.command()
 def final_execution(program_file, program_file_out, debug: bool = False, verbose=False):
     context = Context()
+    scope = Scope()
     
-    errors, program, lexer = tokenize(program_file, debug, verbose)
+    errors, program, _ = tokenize(program_file, debug, verbose)
 
     if errors or lexer_errors:
         for (_, line, lexpos, value) in lexer_errors:
@@ -238,38 +239,12 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             log_error(e)
         exit(1)
 
-    # ast = parse(None, lexer=lexer, debug=debug)
     ast = parse(program, debug=debug)
 
     # if it has no instructions
     if ast is None and not parser_errors:
         log_error("(0, 0) - SyntacticError: ERROR at or near EOF")
         exit(1)
-
-    # p_error_temp = []
-    # for pos, cl in enumerate(ast.class_list):
-    #     if cl is None:
-    #         p_error_temp.append(pos)
-
-    # if p_error_temp:
-    #     for pos in p_error_temp:
-    #         line, lexpos = ast.class_list[pos + 1].line_lex_pos
-    #         totallines = program.count('\n')
-    #         col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
-    #         log_error(f'({line - totallines}, {col-1}) - SyntacticError: ERROR at or near CLASS')
-    #     exit(1)
-
-    if "CLASS" in [type_ for (_,_,_,type_) in parser_errors]:
-        line = 0
-        lexpos = 0
-        for (l, lp, _, t) in parser_errors:
-            if t == 'CLASS':
-                line, lexpos = l, lp
-                break
-            totallines = program.count('\n')
-            col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
-            log_error(f'({line - totallines + 1}, {col-1}) - SyntacticError: ERROR at or near CLASS')
-        exit(1)    
 
     if parser_errors:  
         for (line, lexpos, _, value) in parser_errors:
@@ -278,17 +253,21 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             log_error(f'({line - totallines}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
         exit(1)
 
-    # else:
-    #     TypeCollector(context, errors).visit(ast)
-    #     TypeBuilder(context, errors).visit(ast)
-    #     CyclicDependency(context, errors)
-    #     if not errors:
-    #         InferenceTypeChecker(context, errors).visit(ast, Scope())
-    #         CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
-    #         Execution(context).visit(ast, Scope())
+    else:
+        TypeCollector(context, errors).visit(ast)
+        TypeBuilder(context, errors).visit(ast)
+        CyclicDependency(context, errors)
+        try:
+            TypeChecker(context, errors).visit(ast, scope)
+        except:
+            errors
+        if not errors:
+            # InferenceTypeChecker(context, errors).visit(ast, Scope())
+            CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
+            Execution(context).visit(ast, Scope())
             
-    #     else:
-    #         return '\n'.join(errors) 
+        else:
+            return '\n'.join(errors) 
     # return "\n".join(errors) 
     
 if __name__ == '__main__':

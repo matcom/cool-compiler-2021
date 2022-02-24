@@ -87,26 +87,32 @@ def p_param_list(p):
 def p_expr(p):
     '''expr : ID ASSIGN expr
             | OBRACE block CBRACE
+            | IF expr THEN expr ELSE expr FI
             | WHILE expr LOOP expr POOL
             | LET declaration_list IN expr
             | CASE expr OF case_list ESAC
+            | NOT expr
             | comp'''
     if len(p) == 2:
         p[0] = p[1]
+    elif p[1] == 'if':
+        p[0] = ast.ConditionalNode(p[2], p[4], p[6])
     elif p[1] == 'while':
         p[0] = ast.WhileNode(p[2], p[4])
     elif p[1] == 'let':
         p[0] = ast.LetNode(p[2], p[4])
     elif p[1] == 'case':
         p[0] = ast.CaseNode(p[2], p[4])
+    elif p[1] == 'not':
+        p[0] = ast.NegationNode(p[2])
     elif p[2] == '<-':
         p[0] = ast.AssignNode(p[1], p[3])
     elif p[1] == '{':
         p[0] = ast.BlockNode(p[2])
 
-# def p_expr_error(p):
-#     '''expr : error'''
-#     errors.append((p.lineno(1), p.lexpos(1), '', p[1].value))
+def p_expr_error(p):
+    '''expr : error'''
+    errors.append((p.lineno(1), p.lexpos(1), '', p[1].value))
 
 def p_comp(p):
     '''comp : arith LESS arith
@@ -169,9 +175,7 @@ def p_factor(p):
 def p_atom(p):
     '''atom : ID
             | NEW TYPE
-            | OPAR expr CPAR
-            | IF expr THEN expr ELSE expr FI
-            | NOT expr'''
+            | OPAR expr CPAR'''
 
     if len(p) == 4:
         p[0] = p[2]
@@ -179,10 +183,6 @@ def p_atom(p):
         p[0] = ast.NewNode(p[2])
     elif len(p) == 2:
         p[0] = ast.VariableNode(p[1])
-    elif len(p) == 8:
-        p[0] = ast.ConditionalNode(p[2], p[4], p[6])
-    elif p[1] == 'not':
-        p[0] = ast.NegationNode(p[2])
 
 
 def p_atom_funccall(p):
@@ -259,16 +259,16 @@ def p_function_call(p):
 
 def p_expr_list(p):
     '''expr_list : empty
-                 | list_not_empty'''
+                 | not_empty_expr_list'''
     if p[1]:
         p[0] = p[1]
     else:
         p[0] = []
 
 
-def p_list_not_empty(p):
-    '''list_not_empty : expr
-                      | expr COMA list_not_empty'''
+def p_not_empty_expr_list(p):
+    '''not_empty_expr_list : expr
+                           | expr COMA not_empty_expr_list'''
     if len(p) == 2:
         p[0] = [p[1]]
     elif len(p) == 4:
