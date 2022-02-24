@@ -75,7 +75,7 @@ class CILGenerate:
         type_list = []
         for parent in parent_list(_type):
             type_list.append(self.map_type(parent.name))
-            self.currentType.attr_push('type', self.currentType.name)
+            self.currentType.attr_push('type_name', self.currentType.name)
             for attr in parent.attributes:
                 self.currentType.attr_push(attr.name, f'{parent.name}@{attr.name}')
             for func in parent.methods:
@@ -118,7 +118,7 @@ class CILGenerate:
         self.new_type_func.expr_push(ASTR.Assign('self', 'instance'))
         self.new_type_func.expr_push(ASTR.Load(tn, _type.name))
         self.new_type_func.expr_push(ASTR.Comment(f'Cargando el nombre del tipo desde el data'))
-        self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type', tn))
+        self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type_name', tn))
         self.new_type_func.expr_push(ASTR.Comment(f'Assignando el nombre del tipo en el campo type'))
 
     @visitor.when(AST.AtrDef)

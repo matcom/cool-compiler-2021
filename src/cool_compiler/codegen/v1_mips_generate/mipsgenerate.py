@@ -42,7 +42,7 @@ class MipsGenerate:
         self.final_len_stack = len(node.param) + len(node.local) + 2
         self.local_push = 0
         
-        for param in [AST.Param('Return $ra')] + node.param:
+        for param in node.param:
             new_func.cmd += self.visit(param)
 
         for _local in node.local + [AST.Local('$ra')]:
@@ -83,15 +83,14 @@ class MipsGenerate:
 
         stack_plus = self.stack_index(memory_dir)
         attr_list = self.cil_type[_type].attributes 
-        _len = len(attr_list) * 4 + 4
+        _len = len(attr_list) * 4
 
         result = [
             ASTR.Header_Comment(f"Allocate a una class {_type} puntero en sp + {stack_plus}"),
-            ASTR.Header_Comment(f"atributo @type en puntero + 0"),
         ]
 
         for i, attr in enumerate(attr_list):
-            result.append(ASTR.Header_Comment(f'atributo {attr} en puntero + {(i + 1) * 4}'))
+            result.append(ASTR.Header_Comment(f'atributo {attr} en puntero + {i * 4}'))
 
         return result + [
             ASTR.LI('$a0', _len),
@@ -110,7 +109,7 @@ class MipsGenerate:
 
         stack_plus_dest = self.stack_index(memory_dest)
         stack_plus_instance = self.stack_index(memory_dir_instance)
-        attr_plus = self.cil_type[_type].attributes.index(attr) * 4 + 4
+        attr_plus = self.cil_type[_type].attributes.index(attr) * 4 
 
         return [
             ASTR.LW('$t0', f'{stack_plus_instance}($sp)'),
@@ -123,13 +122,13 @@ class MipsGenerate:
     
     @visitor.when(AST.SetAttr)
     def visit(self, node: AST.SetAttr):
-        if node.y == 'type': 
+        if node.y == 'type_name': 
             attr_plus = 0
         else: 
             attr_name = node.y.split('@')
             _type = attr_name[0]
             attr = attr_name[1]
-            attr_plus = self.cil_type[_type].attributes.index(attr) * 4 + 4
+            attr_plus = self.cil_type[_type].attributes.index(attr) * 4
 
         memory_dir_instance = node.x
         memory_dir_value = node.z
@@ -139,7 +138,7 @@ class MipsGenerate:
 
         return [
             ASTR.LW('$t0', f'{stack_plus_instance}($sp)'),
-            ASTR.Comment(f'Buscando la instancia en la pila {node.x}'),
+            ASTR.Comment(f'Buscando en la pila la variable {node.x} y guarda la direccion a la que apunta'),
             ASTR.LW('$t1', f'{stack_plus_dir_value}($sp)'),
             ASTR.Comment(f'Buscando el valor que se va a guardar en la propiedad'),
             ASTR.SW('$t1', f'{attr_plus}($t0)'),
@@ -220,7 +219,7 @@ class MipsGenerate:
         return [
             ASTR.LW('$s0', f'{stack_plus}($sp)'),
             ASTR.Comment("Envia el resultado de la funcion en $s0"),
-            ASTR.LW('$ra', f'{(len(self.stack) - 1)* 4}($sp)'),
+            ASTR.LW('$ra', '0($sp)'),#f'{(len(self.stack) - 1)* 4}($sp)'),
             ASTR.Comment("Lee el $ra mas profundo de la pila para retornar a la funcion anterior"),
             ASTR.AddI('$sp', '$sp', len(self.stack) * 4),
             ASTR.Comment("Limpia la pila"),
