@@ -256,8 +256,8 @@ class MipsGenerate:
                  ASTR.Comment("carga en $t2 lo que hay en f'{stack_plus_opr_2} "),
                  ASTR.SEQ ('$t3','$t2','$t1'),
                  ASTR.Comment("$t3 = $t2 == $ t1" ),
-                 ASTR.SW ('$t3',f'{stack_plus_opr_1}($sp)'),
-                 ASTR.Comment("Pon en la posicion f'{stack_plus_opr_1} el valor de $t3")
+                 ASTR.SW ('$t3',f'{stack_plus_dest}($sp)'),
+                 ASTR.Comment("Pon en la posicion f's{stack_plus_opr_1} el valor de $t3")
         ]
 
     @visitor.when(AST.Assign)
