@@ -100,11 +100,11 @@ class Type:
             else:
                 raise SemanticError(f'Method "{name}" already defined in {self.name} ', pos)
             
-        except SemanticError:
+        except AttributeError as e:
             method = Method(name, param_names, param_types, return_type)
             self.methods.append(method)
 
-    """ def all_attributes(self, clean=True):
+    def all_attributes(self, clean=True):
         plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
         for attr in self.attributes:
             plain[attr.name] = (attr, self)
@@ -114,7 +114,7 @@ class Type:
         plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
         for method in self.methods:
             plain[method.name] = (method, self)
-        return plain.values() if clean else plain """
+        return plain.values() if clean else plain
 
     def conforms_to(self, other):
         return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
@@ -123,7 +123,7 @@ class Type:
         return False
 
     def __str__(self):
-        output = f'{self.name}'
+        output = f'Type {self.name}'
         return output
 
     def __repr__(self):
@@ -302,10 +302,12 @@ class Scope:
 
     def find_variable(self, vname, index=None):
         locals = self.locals if index is None else itt.islice(self.locals, index)
-        try:
-            return next(x for x in locals if x.name == vname)
-        except StopIteration:
-            if not self.parent is None:
-                return self.parent.find_variable(vname, self.index)  
-            else:
-                return None
+        
+        for l in locals:
+            if l.name == vname:
+                return l
+        
+        if not self.parent is None:
+            return self.parent.find_variable(vname, self.index)  
+        else:
+            return None

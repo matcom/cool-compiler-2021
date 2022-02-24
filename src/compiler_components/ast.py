@@ -197,8 +197,8 @@ class WhileNode(AtomicNode):
     def visit(self, tabs = 0):
         node = self
         ans = '\t'*tabs + 'while <expr> loop <expr> pool'
-        ans += "\n" + '\t'*(tabs +1) + "condition: " + self.if_c.visit()
-        ans += "\n" + '\t'*(tabs +1) + "body: " + self.then_c.visit()
+        ans += "\n" + '\t'*(tabs +1) + "condition: " + self.condition.visit()
+        ans += "\n" + '\t'*(tabs +1) + "body: " + self.body.visit()
         
         return ans
 

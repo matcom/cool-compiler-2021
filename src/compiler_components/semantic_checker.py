@@ -16,21 +16,21 @@ class SemanticChecker(CompilerComponent):
     def execute(self):
         self.errors = []
         self.ast = self.parser.ast
-        print('......................')
-        print(self.ast.visit())
         tcollector = TypeCollector(self.errors)
         tcollector.visit(self.ast)
-        context = tcollector.context
-        cycles = context.circular_dependency()
-        for cycle in cycles:
-            self.errors.append(SemanticError(f"Class {cycle[0][0]},  is involved in an inheritance cycle.",cycle[0][1]))
+        if(self.has_errors()):
             return
+        context = tcollector.context
 
         tbuilder = TypeBuilder(context,self.errors)
+        
         tbuilder.visit(self.ast)
+        if self.has_errors():
+            return
 
         tchecking = TypeChecker(context,self.errors)
         scope = Scope()
+        
         tchecking.visit(self.ast, scope)
 
     def has_errors(self):

@@ -123,11 +123,14 @@ def p_expr2(p):
 
 def p_arith(p):
     '''arith : term
+             | NOT bool   
              | arith PLUS term
              | arith MINUS term
     '''
     if len(p) == 2:
         p[0] = p[1]
+    elif len(p) == 3:
+        p[0] = NotNode(p[2])
     else:
         if p[2] == '+':
             p[0] = PlusNode(p[1], p[3])
@@ -176,7 +179,6 @@ def p_atom4(p):
 
 def p_atomString(p):
     'atom : STRING'
-    print(p[1][1:len(p[1]) -1 ])
     p[0] = ConstantStringNode(p[1][1:len(p[1]) -1 ])
 
 def p_atomBool(p):
@@ -188,9 +190,9 @@ def p_atomBool(p):
     else:
         p[0] = ConstantBooleanNode(False)
 
-def p_atomSelf(p):
-    'atom : SELF'
-    p[0] = SelfNode(None)
+#def p_atomSelf(p):
+    #'atom : SELF'
+    #p[0] = SelfNode(None)
 
 def p_atomIF(p):
     'atom : IF expr THEN expr ELSE expr FI'
@@ -198,6 +200,7 @@ def p_atomIF(p):
 
 def p_atomCicle(p):
     'atom : WHILE expr LOOP expr POOL'
+    p[0] = WhileNode(p[2], p[4])
 
 def p_atomBlock(p):
     'atom : LBRACE expr_list RBRACE'
@@ -257,7 +260,7 @@ def p_func_call2(p):
 def p_func_call3(p):
     'func_call : factor ARROBA TYPE_ID DOT ID LPAREN arg_list RPAREN'
     
-    p[0] = DispatchNode(p[1], p[5], args = p[7], typex = p[3])
+    p[0] = DispatchNode(p[1], p[5], params = p[7], typex = p[3])
 
 
 
@@ -306,4 +309,3 @@ class Parser(CompilerComponent):
     def print_errors(self):
         for e in errors:
             print(e)
-        print()

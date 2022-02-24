@@ -27,6 +27,7 @@ class TypeChecker:
     def visit(self, node:ClassDeclarationNode, scope:Scope):      
         try :
             typex = self.context.get_type(node.id, node.line)
+            
         except SemanticError as e:
             self.errors.append(e)
 
@@ -40,13 +41,16 @@ class TypeChecker:
             if isinstance(feat, FuncDeclarationNode):
                 self.visit(feat,mscope.create_child())
             else:
-                self.visit(feat, ascope.create_child())
+                self.visit(feat, ascope)
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node:AttrDeclarationNode,scope:Scope):
-        self.visit(node.expr, scope.create_child())
+        node_type = self.context.get_type(node.type)
+        scope.define_variable(node.id, node_type)
         if not node.expr is None:
+            self.visit(node.expr, scope.create_child())
             try:
+    
                 typex =self.current_type if node.type == "SELF_TYPE" else self.context.get_type(node.type,node.line)
                 self.context.check_type(node.expr.type,typex,node.line)
             except SemanticError as e:
@@ -56,10 +60,12 @@ class TypeChecker:
     def visit(self, node:FuncDeclarationNode,scope:Scope):
 
         method = self.current_type.get_method(node.id)
+        
         for i in range(len(method.param_names)):
             try:
                 if method.param_names[i] == "self":
-                    raise SemanticError('Trying to assign value to self' ,node.line)   
+                    raise SemanticError('Trying to assign value to self' ,node.line)
+                
                 scope.define_variable(method.param_names[i],method.param_types[i],node.line)
             except SemanticError as e:
                 self.errors.append(e)
@@ -76,25 +82,25 @@ class TypeChecker:
     def visit(self, node:CaseNode, scope:Scope):
         node.type = ErrorType()
         sce = scope.create_child()
-        self.visit(node.expression, sce)
+        self.visit(node.expr, sce)
         scb = scope.create_child()
         common_type = None
         typesbr = set()
-        for branches in node.branches:
+        for branches in node.list_case:
             tmpscope = scb.create_child()
-            if branches[1 ]in typesbr:
-                self.errors.append(SemanticError("Type in more than one branch",branches[2].line))
-            typesbr.add(branches[1])
+            if branches.type in typesbr:
+                self.errors.append(SemanticError("Type in more than one branch",branches.expr.line))
+            typesbr.add(branches.type)
             try :
-                typex = self.context.get_type(branches[1],branches[2].line)
+                typex = self.context.get_type(branches.type,branches.expr.line)
             except SemanticError as e:
                 self.errors.append(e)
-            tmpscope.define_variable(branches[0],typex,node.line)
-            self.visit(branches[2],tmpscope)
+            tmpscope.define_variable(branches.id,typex,node.line)
+            self.visit(branches.expr,tmpscope)
             if common_type is None:
-                common_type = branches[2].type
+                common_type = branches.expr.type
             else:
-                common_type = self.context.closest_common_antecesor(common_type,branches[2].type)
+                common_type = self.context.closest_common_antecesor(common_type,branches.expr.type)
         
         node.type = common_type
         
@@ -105,6 +111,7 @@ class TypeChecker:
     @visitor.when(DispatchNode)
     def visit(self, node:DispatchNode, scope:Scope):    
         self.visit(node.expr,scope.create_child())
+        
         node.type = ErrorType()
         node.typexa = node.typex
         for i in range(len(node.params)):
@@ -113,7 +120,7 @@ class TypeChecker:
         if not node.typex is None:            
             try:
                 temp = self.context.get_type(node.typex,node.line)
-                self.context.check_type(node.obj.type,temp,node.line)
+                self.context.check_type(node.expr.type,temp,node.line)
             except SemanticError as e:
                 self.errors.append(e)
                 return
@@ -171,18 +178,18 @@ class TypeChecker:
 
     @visitor.when(IfNode)
     def visit(self,node:IfNode,scope:Scope):
-        self.visit(node.condition,scope.create_child())
+        self.visit(node.if_c,scope.create_child())
         try:
-            self.context.check_type(node.condition.type,self.context.get_type("Bool"),node.line)
+            self.context.check_type(node.if_c.type,self.context.get_type("Bool"),node.line)
         except SemanticError as e:
             self.errors.append(e)
         
-        self.visit(node.if_body,scope.create_child())
+        self.visit(node.then_c,scope.create_child())
         
-        self.visit(node.else_body, scope.create_child())
+        self.visit(node.else_c, scope.create_child())
 
         try:    
-            node.type = self.context.closest_common_antecesor(node.if_body.type, node.else_body.type)
+            node.type = self.context.closest_common_antecesor(node.then_c.type, node.else_c.type)
         except SemanticError as e:
             self.errors.append(e)
             node.type =  ErrorType()
@@ -194,7 +201,7 @@ class TypeChecker:
         try:
             if node.id == "self":
                 raise SemanticError('Trying to assign value to self' ,node.line)
-                
+
             var = scope.find_variable(node.id)
             
             if var is None:
@@ -205,6 +212,7 @@ class TypeChecker:
                     raise NameError(f"Variable {node.id} not defined",node.line)
 
             typex = self.current_type if isinstance(var.type , SELF_TYPE) else var.type
+
             self.context.check_type(node.expr.type, typex, node.line)
             node.type = node.expr.type
         except SemanticError as e:
@@ -223,23 +231,28 @@ class TypeChecker:
 
     @visitor.when(BlockNode)
     def visit (self, node:BlockNode, scope:Scope):
-        for expr in node.expressions:
+        for expr in node.expr_list:
             self.visit(expr,scope.create_child())
-        node.type = node.expressions[-1].type
-        
+        node.type = node.expr_list[-1].type
+
+    @visitor.when(SelfNode)
+    def visit(self, node:SelfNode, scope:Scope):
+        node.type = self.current_type    
 
     @visitor.when(LetNode)
     def visit(self, node:LetNode,scope:Scope):
         sc = scope.create_child()
         for init in node.list_decl:
             if not init is None:
-                self.visit(init.expr,sc)
-                try:
-                    typex = self.context.get_type(str(init.expr.type),node.line) if  init.expr.type != "SELF_TYPE" else self.current_type
-                    typey = self.context.get_type(str(init.type),node.line) if  init.expr.type != "SELF_TYPE" else self.current_type
-                    self.context.check_type(typey,typex,node.line)
-                except SemanticError as e:
-                    self.errors.append(e)
+                if(not init.expr is None):
+                    self.visit(init.expr,sc)
+                    try:
+                        typex = self.context.get_type(init.expr.type.name,node.line) if  init.expr.type != "SELF_TYPE" else self.current_type
+                        typey = self.context.get_type(init.type,node.line) if  init.expr.type != "SELF_TYPE" else self.current_type
+                        self.context.check_type(typex,typey,node.line)
+                    except SemanticError as e:
+                        self.errors.append(e)
+                        
 
             sc = sc.create_child()
             typex= None
@@ -277,7 +290,7 @@ class TypeChecker:
     @visitor.when(IsVoidNode)
     def visit(self, node:IsVoidNode, scope:Scope):
        
-        self.visit(node.expression,scope.create_child())
+        self.visit(node.expr,scope.create_child())
         node.type = self.context.get_type("Bool", node.line)
         
 
@@ -318,7 +331,7 @@ class TypeChecker:
         if node.left.type != node.right.type:
             basic = ['Int', 'String', 'Bool']
             if node.left.type.name in basic or node.right.type.name in basic:
-                self.errors.append(TypeError("Exprs must have same type", node.line))
+                self.errors.append(TypeError("Ilegal comparison with a basic type", node.line))
         node.type = self.context.get_type("Bool", node.line)
 
     @visitor.when(NhanharaNode)

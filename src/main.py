@@ -43,3 +43,5 @@ if __name__ == '__main__':
     with_errors: bool = execute_compiler(coolprogram, inputfile)
     if with_errors:
         exit(1)
+    else:
+        exit(0)
