@@ -1,7 +1,14 @@
+from typing import List
+
 from coolcmp.utils import visitor
 from coolcmp.utils import mips
 from coolcmp.utils import registers
 from coolcmp.codegen.cil2mips.templates import load_templates
+
+
+def generate_type_labels(types: List[mips.Type]):
+    type_label_lines = [f"\t.word \t\t prototype_{t.label}" for t in types]
+    return f"{mips.PROTOTYPES}:\n" + "\n".join(type_label_lines) + "\n"
 
 
 class MIPSFormatter:
@@ -15,11 +22,31 @@ class MIPSFormatter:
     @visitor.when(mips.ProgramNode)
     def visit(self, node: mips.ProgramNode):
         data = "\n# data\n.data\n" + "\n".join(self.visit(d) for d in node.data)
+
         template_code = load_templates()
+        type_labels = generate_type_labels(node.types)
+        type_defs = "\n\n".join([self.visit(t) for t in node.types])
+
         functions = "\n# functions\n.text\n" + "\n".join(
             self.visit(f) for f in node.functions
         )
-        return "\n".join([data, template_code, functions])
+        return "\n".join([data, template_code, type_labels, type_defs, functions])
+
+    @visitor.when(mips.Type)
+    def visit(self, node: mips.Type):
+        methods = "\n".join(f"\t.word\t {i}" for i in node.methods)
+        dispatch_labels = f"dispatch_{node.label}:\n{methods}"
+
+        proto_begin = f"prototype_{node.label}:\n\t.word\t{node.index}\n\t.word\t{node.length()}\n\t.word\tdispatch_{node.label}"
+        proto_attr = "\n".join([f"\t.word\t0" for _ in node.attrs])
+        proto_end = f"\t.word\t-1"
+        proto = (
+            f"{proto_begin}\n{proto_attr}\n{proto_end}"
+            if proto_attr != ""
+            else f"{proto_begin}\n{proto_end}"
+        )
+
+        return f"{dispatch_labels}\n\n{proto}"
 
     @visitor.when(mips.FunctionNode)
     def visit(self, node: mips.FunctionNode):

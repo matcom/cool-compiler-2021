@@ -4,6 +4,9 @@ from typing import List, Tuple, Union
 from coolcmp.utils.registers import FP, Register, SP, DW
 
 
+PROTOTYPES = "__prototypes_labels__"
+
+
 class Node:
     pass
 
