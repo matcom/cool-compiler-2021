@@ -209,12 +209,20 @@ function function_main_at_Main {
     a = COPY b
     ```
 
-* EQUAL
-    >Indica si a y b son iguales
+* OBJEQUAL
+    >Indica si los objetos a y b son iguales guardando el resultado en c
 
     ```python
     # Ejemplo
-    EQUAL a b
+    c = OBJEQUAL a b
+    ```
+
+* EQUAL
+    >Indica si a y b son iguales guardando el resultado en c
+
+    ```python
+    # Ejemplo
+    c = EQUAL a b
     ```
 
 * FATHER
