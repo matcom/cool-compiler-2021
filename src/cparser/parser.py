@@ -1,7 +1,7 @@
 from ply import yacc
 from utils.ast import *
 from utils.errors import SyntacticError
-from utils.utils import find_column, tokens
+from utils.utils import tokens
 
 
 class CoolParser:
@@ -10,16 +10,6 @@ class CoolParser:
         self.tokens = tokens
         self.parser = yacc.yacc(start='program', module=self)
         self.errors = []
-
-    # precedence = (
-    #     ('left, AT'),
-    #     ('left, NOT'),
-    #     ('left, ISVOID'),
-    #     ('left, EQUAL, LESS, LESSEQ'),
-    #     ('left, PLUS, MINUS'),
-    #     ('left, STAR, DIV'),
-    #     ('left, DOT')
-    # )
 
     precedence = (
         ('right', 'ASSIGN'),
@@ -248,11 +238,6 @@ class CoolParser:
             self.add_error(p)
         else:
             self.errors.append(SyntacticError('ERROR at or near EOF', 0, 0))
-
-            # column = find_column(p.lexer.lexdata, p.lexpos)
-            # line = self.lexer.lexer.lineno
-            # self.errors.append(SyntacticError(
-            #     'ERROR at or near EOF', line, column - 1))
 
     def add_error(self, p):
         self.errors.append(SyntacticError(

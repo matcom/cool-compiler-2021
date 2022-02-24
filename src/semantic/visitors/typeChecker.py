@@ -1,4 +1,3 @@
-from cgi import print_directory
 from semantic.semantic import AutoType, BoolType, ErrorType, IntType, MethodError, ObjectType, StringType, VariableInfo, VoidType
 from utils.errors import AttributexError, SemanticError, TypexError
 from utils import visitor

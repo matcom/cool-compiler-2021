@@ -8,7 +8,6 @@ from semantic.visitors.typeCollector import TypeCollector
 from semantic.visitors.varCollector import VarCollector
 from code_generator.COOLToCILVisitor import COOLToCILVisitor
 from code_generator.CILToMIPSVisitor import CILToMIPSVisitor
-from utils.errors import SemanticError
 
 
 def main(_input, _output):
@@ -31,34 +30,16 @@ def main(_input, _output):
     semanticErrors = []
     typeCollector = TypeCollector(semanticErrors)
     typeCollector.visit(ast)
-    # print("TYPE COLLECTOR")
-    # if semanticErrors:
-    #     for error in semanticErrors:
-    #         print(error)
 
     context = typeCollector.context
     typeBuilder = TypeBuilder(context, semanticErrors)
     typeBuilder.visit(ast)
 
-    # print("CONTEXT")
-    # print("TYPE Builder")
-    # print(context)
-    # if semanticErrors:
-    #     for error in semanticErrors:
-    #         print(error)
-
     varCollector = VarCollector(context, semanticErrors)
     scope = varCollector.visit(ast)
-    # print("Var Collector")
-    # print(context)
-    # if semanticErrors:
-    #     for error in semanticErrors:
-    #         print(error)
 
     typeChecker = TypeChecker(context, semanticErrors)
     typeChecker.visit(ast, scope)
-    # print("Type Checker")
-    # print(context)
 
     if semanticErrors:
         for error in semanticErrors:
@@ -75,8 +56,6 @@ def main(_input, _output):
     with open(_output, 'w+') as f:
         f.write(mips_code)
 
-
-    # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":
 
     in_path = '/home/cwjki/Projects/cool-compiler-2021/tests/codegen/arith.cl'

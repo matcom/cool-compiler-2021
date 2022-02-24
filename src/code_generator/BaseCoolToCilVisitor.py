@@ -14,14 +14,7 @@ class BaseCOOLToCILVisitor:
         self.context.update_graph()
         self.context.set_type_tags()
         self.context.set_type_max_tags()
-
-        # print("Context")
-        # print(self.context)
-        # print("GRAPH")
-        # print(self.context.graph)
-
         self.label_count = 0
-
 
     @property
     def params(self):
@@ -71,7 +64,6 @@ class BaseCOOLToCILVisitor:
     def register_instruction(self, instruction):
         self.instructions.append(instruction)
         return instruction
-        ###############################
 
     def to_function_name(self, method_name, type_name):
         return f'{type_name}.{method_name}'

@@ -1,4 +1,3 @@
-from unicodedata import name
 from utils.errors import SemanticError
 from collections import OrderedDict
 import itertools as itt
@@ -441,29 +440,6 @@ class Scope:
 
     def __len__(self):
         return len(self.locals)
-
-    # def __str__(self):
-    #     res = ''
-    #     for scope in self.children:
-    #         try:
-    #             classx = scope.locals[0]
-    #             name = classx.type.name
-    #         except:
-    #             name = '1'
-    #         # '\n\t' +  ('\n' + '\t').join(str(local) for local in scope.locals) + '\n'
-    #         res += name + scope.tab_level(1, '', 1)
-    #     return res
-
-    # def tab_level(self, tabs, name, num) -> str:
-    #     res = ('\t' * tabs) + ('\n' + ('\t' * tabs)).join(str(local)
-    #                                                       for local in self.locals)
-    #     if self.functions:
-    #         children = '\n'.join(v.tab_level(
-    #             tabs + 1, '[method] ' + k, num) for k, v in self.functions.items())
-    #     else:
-    #         children = '\n'.join(child.tab_level(
-    #             tabs + 1, num, num + 1) for child in self.children)
-    #     return "\t" * (tabs-1) + f'{name}' + "\t" * tabs + f'\n{res}\n{children}'
 
     def __repr__(self):
         return str(self)
