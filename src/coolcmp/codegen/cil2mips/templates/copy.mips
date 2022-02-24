@@ -1,0 +1,28 @@
+# Template for copy function:
+# Copy $a2 size from address at $a0 to address $a1
+# Arguments:
+# $a0: from
+# $a1: to
+# $a2: size
+copy:
+    addiu $sp $sp -16                                # Save content of registers in sp
+    sw $a0 0($sp)
+    sw $a1 4($sp)
+    sw $a2 8($sp)
+    sw $t0 12($sp)
+loop_copy:
+    beq $a2 $zero break_loop_copy                           # Copy finished (copy size is 0)
+    lw $t0 0($a0)                                    # Load in t0 content of source address a0
+    sw $t0 0($a1)                                    # Save in destiny a1 content of t0
+    addiu $a0 $a0 4                                  # Increase source address a0
+    addiu $a1 $a1 4                                  # Increase destiny addres a1
+    addi $a2 $a2 -4                                  # Decrease copy size
+    j loop_copy
+break_loop_copy:
+    lw $a0 0($sp)                                    # Return original content to registers
+    lw $a1 4($sp)
+    lw $a2 8($sp)
+    lw $t0 12($sp)
+    addiu $sp $sp 16
+
+    jr $ra
