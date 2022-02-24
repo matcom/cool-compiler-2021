@@ -267,35 +267,40 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
-        instance = None
-
-        if node.type in ['Int', 'Bool']:
-            instance = self.define_internal_local(scope=scope, name="instance")
-            self.register_instruction(cil.AllocateNode(
-                node.type, self.context.get_type(node.type).tag, instance))
-            value = self.define_internal_local(scope=scope, name="value")
-            self.register_instruction(cil.LoadIntNode(0, value))
-            result_init = self.define_internal_local(
-                scope=scope, name="result_init")
-            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [
-                                      cil.ArgNode(value), cil.ArgNode(instance)], node.type))
-        elif node.type == 'String':
-            instance = self.define_internal_local(scope=scope, name="instance")
-            self.register_instruction(cil.AllocateNode(
-                node.type, self.context.get_type(node.type).tag, instance))
-            value = self.define_internal_local(scope=scope, name="value")
-            self.register_instruction(cil.LoadStringNode('empty_str', value))
-            result_init = self.define_internal_local(
-                scope=scope, name="result_init")
-            self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [
-                                      cil.ArgNode(value), cil.ArgNode(instance)], node.type))
 
         if not node.expr is None:
             expr_value = self.visit(node.expr, scope)
             let_var = self.define_internal_local(
                 scope=scope, name=node.id, cool_var=node.id)
             self.register_instruction(cil.AssignNode(let_var, expr_value))
+
         else:
+            instance = None
+
+            if node.type in ['Int', 'Bool']:
+                instance = self.define_internal_local(
+                    scope=scope, name="instance")
+                self.register_instruction(cil.AllocateNode(
+                    node.type, self.context.get_type(node.type).tag, instance))
+                value = self.define_internal_local(scope=scope, name="value")
+                self.register_instruction(cil.LoadIntNode(0, value))
+                result_init = self.define_internal_local(
+                    scope=scope, name="result_init")
+                self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [
+                    cil.ArgNode(value), cil.ArgNode(instance)], node.type))
+            elif node.type == 'String':
+                instance = self.define_internal_local(
+                    scope=scope, name="instance")
+                self.register_instruction(cil.AllocateNode(
+                    node.type, self.context.get_type(node.type).tag, instance))
+                value = self.define_internal_local(scope=scope, name="value")
+                self.register_instruction(
+                    cil.LoadStringNode('empty_str', value))
+                result_init = self.define_internal_local(
+                    scope=scope, name="result_init")
+                self.register_instruction(cil.CallNode(result_init, f'{node.type}_init', [
+                    cil.ArgNode(value), cil.ArgNode(instance)], node.type))
+
             let_var = self.define_internal_local(
                 scope=scope, name=node.id, cool_var=node.id)
             self.register_instruction(cil.AssignNode(let_var, instance))
