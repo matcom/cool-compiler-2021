@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict
+from typing import Dict, Set
 
 from coolcmp.utils import cil, visitor
 from coolcmp.utils import mips, registers
@@ -12,31 +12,15 @@ class CILToMipsVisitor:
         self.functions: Dict[str, mips.FunctionNode] = {}
         self.cur_function: mips.FunctionNode = None
 
-        self.function_names: Dict[str, str] = {}
-
         self.labels = {}
 
     @visitor.on("node")
     def visit(self, node):
         pass
 
-    @visitor.on("node")
-    def collect_function_names(self, node):
-        pass
-
-    @visitor.when(cil.ProgramNode)
-    def collect_function_names(self, node: cil.ProgramNode):
-        for f in node.dot_code:
-            self.collect_function_names(f)
-
-    @visitor.when(cil.FunctionNode)
-    def collect_function_names(self, node: cil.FunctionNode):
-        self.function_names[node.name] = "main" if node.name == "entry" else node.name
-
     @visitor.when(cil.ProgramNode)
     def visit(self, node: cil.ProgramNode):
         print("ProgramNode")
-        self.collect_function_names(node)
 
         for i in node.dot_types:
             self.visit(i)
@@ -54,19 +38,13 @@ class CILToMipsVisitor:
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
         print(f"TypeNode {node.name} {node.methods}")
-        self.data[node.name] = mips.StringNode(node.name, f'"{node.value}"')
-
-        methods = [
-            self.function_names[i]
-            for i in node.methods.values()
-            if self.function_names.get(i)
-        ]
+        self.data[node.name] = mips.StringNode(node.name, f'"{node.name}"')
 
         type_ = mips.Type(
             node.name,
             node.name,
             list(node.attributes),
-            methods,
+            node.methods,
             len(self.types),
             [],
         )
@@ -81,18 +59,17 @@ class CILToMipsVisitor:
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
         print(f"FunctionNode {node.name}")
-        function_label = self.function_names[node.name]
         params = [x.name for x in node.params]
         local_vars = [x.name for x in node.local_vars]
 
         local_vars_size = len(local_vars) * registers.DW
 
-        function_node = mips.FunctionNode(function_label, params, local_vars)
+        function_node = mips.FunctionNode(node.name, params, local_vars)
         self.functions[node.name] = function_node
         self.cur_function = function_node
         self.labels = {}
 
-        instructions = [f"# <function:{self.function_names[node.name]}>"]
+        instructions = [f"# <function:{node.name}>"]
 
         # Push local vars
         push_instructions = (
@@ -124,7 +101,7 @@ class CILToMipsVisitor:
         function_node.instructions = instructions
         self.cur_function = None
 
-        instructions.extend([f"# </function:{self.function_names[node.name]}>"])
+        instructions.extend([f"# </function:{node.name}>"])
         return instructions
 
     @visitor.when(cil.AllocateNode)
@@ -132,18 +109,15 @@ class CILToMipsVisitor:
         print(f"AllocateNode {node.type} {node.dest}")
 
         # TODO: Finish this
-        type_ = node.type if isinstance(node.type, int) else self.types[node.type].index
+        type_ = self.types[node.type].index
 
         reg_t0 = registers.T[0]
         reg_t1 = registers.T[1]
-        v0 = registers.V0
 
-        li = mips.LINode(reg_t0, type_)
-        # sw = mips.SWNode(
-        #     v0,
-        # )
-
-        instructions = ["# <allocate>", "# </allocate>"]
+        instructions = [
+            f"# <allocate:{node.type}-{node.dest}>",
+            f"# </allocate:{node.type}-{node.dest}>",
+        ]
 
         return instructions
 
@@ -190,6 +164,7 @@ class CILToMipsVisitor:
     def visit(self, node: cil.DynamicCallNode):
         print(f"DynamicCallNode {node.method} {node.type} {node.dest}")
         instructions = []
+        node.type
 
         # print(self.types)
         # type_ = self.types[node.type]
@@ -209,3 +184,23 @@ class CILToMipsVisitor:
 
         # instructions.extend(self.visit(node.obj))
         # instruc
+
+    @visitor.when(cil.PlusNode)
+    def visit(self, node: cil.PlusNode):
+        """
+        assuming left and right operands are ints
+        """
+        instructions = [f"<sum:{node.dest}<-{node.left}+{node.right}>"]
+        t0, t1, t2 = registers.T[0], registers.T[1], registers.T[2]
+
+        instructions.extend(
+            [
+                mips.LINode(t0, node.left),
+                mips.LINode(t1, node.right),
+                mips.ADDNode(t2, t0, t1),
+            ]
+        )
+
+        instructions.append(f"</sum:{node.dest}<-{node.left}+{node.right}>")
+
+        return instructions
