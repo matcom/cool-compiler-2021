@@ -51,12 +51,27 @@ type IO {
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
 }
-type Book {
+type Graph {
+	parent: Object
+	attribute vertices
+	attribute edges
+
+	method __init: __init_Graph_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init_vertices_at_Graph: __init_vertices_at_Graph
+	method __init_edges_at_Graph: __init_edges_at_Graph
+	method add_vertice: function_add_vertice_at_Graph
+	method print_E: function_print_E_at_Graph
+	method print_V: function_print_V_at_Graph
+}
+type Vertice {
 	parent: IO
-	attribute title
-	attribute author
+	attribute num
+	attribute out
 
-	method __init: __init_Book_type
+	method __init: __init_Vertice_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -64,37 +79,21 @@ type Book {
 	method out_int: function_out_int_at_IO
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
-	method __init_title_at_Book: __init_title_at_Book
-	method __init_author_at_Book: __init_author_at_Book
-	method initBook: function_initBook_at_Book
-	method print: function_print_at_Book
+	method __init_num_at_Vertice: __init_num_at_Vertice
+	method __init_out_at_Vertice: __init_out_at_Vertice
+	method outgoing: function_outgoing_at_Vertice
+	method number: function_number_at_Vertice
+	method init: function_init_at_Vertice
+	method add_out: function_add_out_at_Vertice
+	method print: function_print_at_Vertice
 }
-type Article {
-	parent: Book
-	attribute title
-	attribute author
-	attribute per_title
-
-	method __init: __init_Article_type
-	method abort: function_abort_at_Object
-	method type_name: function_type_name_at_Object
-	method copy: function_copy_at_Object
-	method out_string: function_out_string_at_IO
-	method out_int: function_out_int_at_IO
-	method in_string: function_in_string_at_IO
-	method in_int: function_in_int_at_IO
-	method __init_title_at_Book: __init_title_at_Book
-	method __init_author_at_Book: __init_author_at_Book
-	method initBook: function_initBook_at_Book
-	method print: function_print_at_Article
-	method __init_per_title_at_Article: __init_per_title_at_Article
-	method initArticle: function_initArticle_at_Article
-}
-type BookList {
+type Edge {
 	parent: IO
-	
+	attribute from
+	attribute to
+	attribute weight
 
-	method __init: __init_BookList_type
+	method __init: __init_Edge_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -102,18 +101,17 @@ type BookList {
 	method out_int: function_out_int_at_IO
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
-	method isNil: function_isNil_at_BookList
-	method cons: function_cons_at_BookList
-	method car: function_car_at_BookList
-	method cdr: function_cdr_at_BookList
-	method print_list: function_print_list_at_BookList
+	method __init_from_at_Edge: __init_from_at_Edge
+	method __init_to_at_Edge: __init_to_at_Edge
+	method __init_weight_at_Edge: __init_weight_at_Edge
+	method init: function_init_at_Edge
+	method print: function_print_at_Edge
 }
-type Cons {
-	parent: BookList
-	attribute xcar
-	attribute xcdr
+type EList {
+	parent: IO
+	attribute car
 
-	method __init: __init_Cons_type
+	method __init: __init_EList_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -121,20 +119,20 @@ type Cons {
 	method out_int: function_out_int_at_IO
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
-	method isNil: function_isNil_at_Cons
-	method cons: function_cons_at_BookList
-	method car: function_car_at_Cons
-	method cdr: function_cdr_at_Cons
-	method print_list: function_print_list_at_Cons
-	method __init_xcar_at_Cons: __init_xcar_at_Cons
-	method __init_xcdr_at_Cons: __init_xcdr_at_Cons
-	method init: function_init_at_Cons
+	method __init_car_at_EList: __init_car_at_EList
+	method isNil: function_isNil_at_EList
+	method head: function_head_at_EList
+	method tail: function_tail_at_EList
+	method cons: function_cons_at_EList
+	method append: function_append_at_EList
+	method print: function_print_at_EList
 }
-type Nil {
-	parent: BookList
-	
+type ECons {
+	parent: EList
+	attribute car
+	attribute cdr
 
-	method __init: __init_Nil_type
+	method __init: __init_ECons_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -142,22 +140,112 @@ type Nil {
 	method out_int: function_out_int_at_IO
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
-	method isNil: function_isNil_at_Nil
-	method cons: function_cons_at_BookList
-	method car: function_car_at_BookList
-	method cdr: function_cdr_at_BookList
-	method print_list: function_print_list_at_Nil
+	method __init_car_at_EList: __init_car_at_EList
+	method isNil: function_isNil_at_ECons
+	method head: function_head_at_ECons
+	method tail: function_tail_at_ECons
+	method cons: function_cons_at_EList
+	method append: function_append_at_EList
+	method print: function_print_at_ECons
+	method __init_cdr_at_ECons: __init_cdr_at_ECons
+	method init: function_init_at_ECons
+}
+type VList {
+	parent: IO
+	attribute car
+
+	method __init: __init_VList_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init_car_at_VList: __init_car_at_VList
+	method isNil: function_isNil_at_VList
+	method head: function_head_at_VList
+	method tail: function_tail_at_VList
+	method cons: function_cons_at_VList
+	method print: function_print_at_VList
+}
+type VCons {
+	parent: VList
+	attribute car
+	attribute cdr
+
+	method __init: __init_VCons_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init_car_at_VList: __init_car_at_VList
+	method isNil: function_isNil_at_VCons
+	method head: function_head_at_VCons
+	method tail: function_tail_at_VCons
+	method cons: function_cons_at_VList
+	method print: function_print_at_VCons
+	method __init_cdr_at_VCons: __init_cdr_at_VCons
+	method init: function_init_at_VCons
+}
+type Parse {
+	parent: IO
+	attribute boolop
+	attribute rest
+
+	method __init: __init_Parse_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init_boolop_at_Parse: __init_boolop_at_Parse
+	method __init_rest_at_Parse: __init_rest_at_Parse
+	method read_input: function_read_input_at_Parse
+	method parse_line: function_parse_line_at_Parse
+	method c2i: function_c2i_at_Parse
+	method a2i: function_a2i_at_Parse
+	method a2i_aux: function_a2i_aux_at_Parse
 }
 type Main {
-	parent: Object
-	attribute books
+	parent: Parse
+	attribute boolop
+	attribute rest
+	attribute g
 
 	method __init: __init_Main_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
-	method __init_books_at_Main: __init_books_at_Main
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init_boolop_at_Parse: __init_boolop_at_Parse
+	method __init_rest_at_Parse: __init_rest_at_Parse
+	method read_input: function_read_input_at_Parse
+	method parse_line: function_parse_line_at_Parse
+	method c2i: function_c2i_at_Parse
+	method a2i: function_a2i_at_Parse
+	method a2i_aux: function_a2i_aux_at_Parse
+	method __init_g_at_Main: __init_g_at_Main
 	method main: function_main_at_Main
+}
+type BoolOp {
+	parent: Object
+	
+
+	method __init: __init_BoolOp_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method and: function_and_at_BoolOp
+	method or: function_or_at_BoolOp
 }
 
 .DATA
@@ -166,29 +254,42 @@ data_1 = "String"
 data_2 = "Bool"
 data_3 = "Int"
 data_4 = "IO"
-data_5 = "Book"
-data_6 = "Article"
-data_7 = "BookList"
-data_8 = "Cons"
-data_9 = "Nil"
-data_10 = "Main"
-data_11 = "Abort called from class "
-data_12 = ""
-data_13 = ""
-data_14 = "title:      "
-data_15 = "\n"
-data_16 = "author:     "
-data_17 = "\n"
-data_18 = ""
-data_19 = "periodical:  "
+data_5 = "Graph"
+data_6 = "Vertice"
+data_7 = "Edge"
+data_8 = "EList"
+data_9 = "ECons"
+data_10 = "VList"
+data_11 = "VCons"
+data_12 = "Parse"
+data_13 = "Main"
+data_14 = "BoolOp"
+data_15 = "Abort called from class "
+data_16 = "\n"
+data_17 = " ("
+data_18 = ","
+data_19 = ")"
 data_20 = "\n"
-data_21 = "- dynamic type was Book -\n"
-data_22 = "- dynamic type was Article -\n"
-data_23 = "Compilers, Principles, Techniques, and Tools"
-data_24 = "Aho, Sethi, and Ullman"
-data_25 = "The Top 100 CD_ROMs"
-data_26 = "Ulanoff"
-data_27 = "PC Magazine"
+data_21 = "\n"
+data_22 = ""
+data_23 = "\n"
+data_24 = ""
+data_25 = "0"
+data_26 = "1"
+data_27 = "2"
+data_28 = "3"
+data_29 = "4"
+data_30 = "5"
+data_31 = "6"
+data_32 = "7"
+data_33 = "8"
+data_34 = "9"
+data_35 = "-"
+data_36 = " "
+data_37 = " "
+data_38 = ","
+data_39 = ""
+data_40 = ""
 
 .CODE
 function main {
@@ -262,11 +363,15 @@ function function_abort_at_Bool {
 	LOCAL local_abort_at_Bool_internal_0
 	LOCAL local_abort_at_Bool_internal_1
 	LOCAL local_abort_at_Bool_internal_2
+	LOCAL local_abort_at_Bool_internal_3
+	LOCAL local_abort_at_Bool_internal_4
 
 	local_abort_at_Bool_internal_0 = LOAD data_2
-	local_abort_at_Bool_internal_1 = LOAD data_11
-	local_abort_at_Bool_internal_2 = CONCAT local_abort_at_Bool_internal_1 local_abort_at_Bool_internal_0
-	PRINT local_abort_at_Bool_internal_2
+	local_abort_at_Bool_internal_1 = LOAD data_15
+	local_abort_at_Bool_internal_2 = LOAD data_16
+	local_abort_at_Bool_internal_3 = CONCAT local_abort_at_Bool_internal_1 local_abort_at_Bool_internal_0
+	local_abort_at_Bool_internal_4 = CONCAT local_abort_at_Bool_internal_3 local_abort_at_Bool_internal_2
+	PRINT local_abort_at_Bool_internal_4
 	ABORT
 	RETURN 0
 }
@@ -284,11 +389,15 @@ function function_abort_at_Int {
 	LOCAL local_abort_at_Int_internal_0
 	LOCAL local_abort_at_Int_internal_1
 	LOCAL local_abort_at_Int_internal_2
+	LOCAL local_abort_at_Int_internal_3
+	LOCAL local_abort_at_Int_internal_4
 
 	local_abort_at_Int_internal_0 = LOAD data_3
-	local_abort_at_Int_internal_1 = LOAD data_11
-	local_abort_at_Int_internal_2 = CONCAT local_abort_at_Int_internal_1 local_abort_at_Int_internal_0
-	PRINT local_abort_at_Int_internal_2
+	local_abort_at_Int_internal_1 = LOAD data_15
+	local_abort_at_Int_internal_2 = LOAD data_16
+	local_abort_at_Int_internal_3 = CONCAT local_abort_at_Int_internal_1 local_abort_at_Int_internal_0
+	local_abort_at_Int_internal_4 = CONCAT local_abort_at_Int_internal_3 local_abort_at_Int_internal_2
+	PRINT local_abort_at_Int_internal_4
 	ABORT
 	RETURN 0
 }
@@ -300,299 +409,576 @@ function function_type_name_at_Int {
 	local_type_name_at_Int_internal_0 = LOAD data_3
 	RETURN local_type_name_at_Int_internal_0
 }
-function __init_title_at_Book {
+function __init_vertices_at_Graph {
 	PARAM self
 
-	LOCAL local__init_title_at_Book_internal_0
+	LOCAL local__init_vertices_at_Graph_internal_0
 
-	local__init_title_at_Book_internal_0 = LOAD data_12
-	SETATTR self title local__init_title_at_Book_internal_0
+	local__init_vertices_at_Graph_internal_0 = ALLOCATE VList
+	ARG local__init_vertices_at_Graph_internal_0
+	local__init_vertices_at_Graph_internal_0 = CALL __init_VList_type
+	SETATTR self vertices local__init_vertices_at_Graph_internal_0
 	RETURN 
 }
-function __init_author_at_Book {
+function __init_edges_at_Graph {
 	PARAM self
 
-	LOCAL local__init_author_at_Book_internal_0
+	LOCAL local__init_edges_at_Graph_internal_0
 
-	local__init_author_at_Book_internal_0 = LOAD data_13
-	SETATTR self author local__init_author_at_Book_internal_0
+	local__init_edges_at_Graph_internal_0 = ALLOCATE EList
+	ARG local__init_edges_at_Graph_internal_0
+	local__init_edges_at_Graph_internal_0 = CALL __init_EList_type
+	SETATTR self edges local__init_edges_at_Graph_internal_0
 	RETURN 
 }
-function function_initBook_at_Book {
+function function_add_vertice_at_Graph {
 	PARAM self
-	PARAM title_p
-	PARAM author_p
+	PARAM v
 
-	LOCAL local_initBook_at_Book_internal_0
+	LOCAL local_add_vertice_at_Graph_internal_0
+	LOCAL local_add_vertice_at_Graph_internal_1
+	LOCAL local_add_vertice_at_Graph_internal_2
+	LOCAL local_add_vertice_at_Graph_internal_3
+	LOCAL local_add_vertice_at_Graph_internal_4
+	LOCAL local_add_vertice_at_Graph_internal_5
+	LOCAL local_add_vertice_at_Graph_internal_6
+	LOCAL local_add_vertice_at_Graph_internal_7
+	LOCAL local_add_vertice_at_Graph_internal_8
 
-	SETATTR self title title_p
-	SETATTR self author author_p
+	ARG v
+	local_add_vertice_at_Graph_internal_2 = TYPEOF v
+	local_add_vertice_at_Graph_internal_1 = VCALL local_add_vertice_at_Graph_internal_2 outgoing
+	local_add_vertice_at_Graph_internal_3 = GETATTR self edges
+	ARG local_add_vertice_at_Graph_internal_1
+	ARG local_add_vertice_at_Graph_internal_3
+	local_add_vertice_at_Graph_internal_5 = TYPEOF local_add_vertice_at_Graph_internal_1
+	local_add_vertice_at_Graph_internal_4 = VCALL local_add_vertice_at_Graph_internal_5 append
+	SETATTR self edges local_add_vertice_at_Graph_internal_4
+	local_add_vertice_at_Graph_internal_6 = GETATTR self vertices
+	ARG local_add_vertice_at_Graph_internal_6
+	ARG v
+	local_add_vertice_at_Graph_internal_8 = TYPEOF local_add_vertice_at_Graph_internal_6
+	local_add_vertice_at_Graph_internal_7 = VCALL local_add_vertice_at_Graph_internal_8 cons
+	SETATTR self vertices local_add_vertice_at_Graph_internal_7
+	RETURN local_add_vertice_at_Graph_internal_7
+}
+function function_print_E_at_Graph {
+	PARAM self
+
+	LOCAL local_print_E_at_Graph_internal_0
+	LOCAL local_print_E_at_Graph_internal_1
+	LOCAL local_print_E_at_Graph_internal_2
+
+	local_print_E_at_Graph_internal_0 = GETATTR self edges
+	ARG local_print_E_at_Graph_internal_0
+	local_print_E_at_Graph_internal_2 = TYPEOF local_print_E_at_Graph_internal_0
+	local_print_E_at_Graph_internal_1 = VCALL local_print_E_at_Graph_internal_2 print
+	RETURN local_print_E_at_Graph_internal_1
+}
+function function_print_V_at_Graph {
+	PARAM self
+
+	LOCAL local_print_V_at_Graph_internal_0
+	LOCAL local_print_V_at_Graph_internal_1
+	LOCAL local_print_V_at_Graph_internal_2
+
+	local_print_V_at_Graph_internal_0 = GETATTR self vertices
+	ARG local_print_V_at_Graph_internal_0
+	local_print_V_at_Graph_internal_2 = TYPEOF local_print_V_at_Graph_internal_0
+	local_print_V_at_Graph_internal_1 = VCALL local_print_V_at_Graph_internal_2 print
+	RETURN local_print_V_at_Graph_internal_1
+}
+function __init_num_at_Vertice {
+	PARAM self
+
+	
+
+	SETATTR self num 0
+	RETURN 
+}
+function __init_out_at_Vertice {
+	PARAM self
+
+	LOCAL local__init_out_at_Vertice_internal_0
+
+	local__init_out_at_Vertice_internal_0 = ALLOCATE EList
+	ARG local__init_out_at_Vertice_internal_0
+	local__init_out_at_Vertice_internal_0 = CALL __init_EList_type
+	SETATTR self out local__init_out_at_Vertice_internal_0
+	RETURN 
+}
+function function_outgoing_at_Vertice {
+	PARAM self
+
+	LOCAL local_outgoing_at_Vertice_internal_0
+
+	local_outgoing_at_Vertice_internal_0 = GETATTR self out
+	RETURN local_outgoing_at_Vertice_internal_0
+}
+function function_number_at_Vertice {
+	PARAM self
+
+	LOCAL local_number_at_Vertice_internal_0
+
+	local_number_at_Vertice_internal_0 = GETATTR self num
+	RETURN local_number_at_Vertice_internal_0
+}
+function function_init_at_Vertice {
+	PARAM self
+	PARAM n
+
+	LOCAL local_init_at_Vertice_internal_0
+
+	SETATTR self num n
 	RETURN self
 }
-function function_print_at_Book {
+function function_add_out_at_Vertice {
 	PARAM self
+	PARAM s
 
-	LOCAL local_print_at_Book_internal_0
-	LOCAL local_print_at_Book_internal_1
-	LOCAL local_print_at_Book_internal_2
-	LOCAL local_print_at_Book_internal_3
-	LOCAL local_print_at_Book_internal_4
-	LOCAL local_print_at_Book_internal_5
-	LOCAL local_print_at_Book_internal_6
-	LOCAL local_print_at_Book_internal_7
-	LOCAL local_print_at_Book_internal_8
-	LOCAL local_print_at_Book_internal_9
-	LOCAL local_print_at_Book_internal_10
-	LOCAL local_print_at_Book_internal_11
-	LOCAL local_print_at_Book_internal_12
-	LOCAL local_print_at_Book_internal_13
-	LOCAL local_print_at_Book_internal_14
-	LOCAL local_print_at_Book_internal_15
-	LOCAL local_print_at_Book_internal_16
-	LOCAL local_print_at_Book_internal_17
-	LOCAL local_print_at_Book_internal_18
+	LOCAL local_add_out_at_Vertice_internal_0
+	LOCAL local_add_out_at_Vertice_internal_1
+	LOCAL local_add_out_at_Vertice_internal_2
+	LOCAL local_add_out_at_Vertice_internal_3
 
-	local_print_at_Book_internal_1 = LOAD data_14
-	ARG self
-	ARG local_print_at_Book_internal_1
-	local_print_at_Book_internal_3 = TYPEOF self
-	local_print_at_Book_internal_2 = VCALL local_print_at_Book_internal_3 out_string
-	local_print_at_Book_internal_4 = GETATTR self title
-	ARG local_print_at_Book_internal_2
-	ARG local_print_at_Book_internal_4
-	local_print_at_Book_internal_6 = TYPEOF local_print_at_Book_internal_2
-	local_print_at_Book_internal_5 = VCALL local_print_at_Book_internal_6 out_string
-	local_print_at_Book_internal_7 = LOAD data_15
-	ARG local_print_at_Book_internal_5
-	ARG local_print_at_Book_internal_7
-	local_print_at_Book_internal_9 = TYPEOF local_print_at_Book_internal_5
-	local_print_at_Book_internal_8 = VCALL local_print_at_Book_internal_9 out_string
-	local_print_at_Book_internal_10 = LOAD data_16
-	ARG self
-	ARG local_print_at_Book_internal_10
-	local_print_at_Book_internal_12 = TYPEOF self
-	local_print_at_Book_internal_11 = VCALL local_print_at_Book_internal_12 out_string
-	local_print_at_Book_internal_13 = GETATTR self author
-	ARG local_print_at_Book_internal_11
-	ARG local_print_at_Book_internal_13
-	local_print_at_Book_internal_15 = TYPEOF local_print_at_Book_internal_11
-	local_print_at_Book_internal_14 = VCALL local_print_at_Book_internal_15 out_string
-	local_print_at_Book_internal_16 = LOAD data_17
-	ARG local_print_at_Book_internal_14
-	ARG local_print_at_Book_internal_16
-	local_print_at_Book_internal_18 = TYPEOF local_print_at_Book_internal_14
-	local_print_at_Book_internal_17 = VCALL local_print_at_Book_internal_18 out_string
+	local_add_out_at_Vertice_internal_1 = GETATTR self out
+	ARG local_add_out_at_Vertice_internal_1
+	ARG s
+	local_add_out_at_Vertice_internal_3 = TYPEOF local_add_out_at_Vertice_internal_1
+	local_add_out_at_Vertice_internal_2 = VCALL local_add_out_at_Vertice_internal_3 cons
+	SETATTR self out local_add_out_at_Vertice_internal_2
 	RETURN self
 }
-function __init_per_title_at_Article {
+function function_print_at_Vertice {
 	PARAM self
 
-	LOCAL local__init_per_title_at_Article_internal_0
+	LOCAL local_print_at_Vertice_internal_0
+	LOCAL local_print_at_Vertice_internal_1
+	LOCAL local_print_at_Vertice_internal_2
+	LOCAL local_print_at_Vertice_internal_3
+	LOCAL local_print_at_Vertice_internal_4
+	LOCAL local_print_at_Vertice_internal_5
+	LOCAL local_print_at_Vertice_internal_6
 
-	local__init_per_title_at_Article_internal_0 = LOAD data_18
-	SETATTR self per_title local__init_per_title_at_Article_internal_0
+	local_print_at_Vertice_internal_1 = GETATTR self num
+	ARG self
+	ARG local_print_at_Vertice_internal_1
+	local_print_at_Vertice_internal_3 = TYPEOF self
+	local_print_at_Vertice_internal_2 = VCALL local_print_at_Vertice_internal_3 out_int
+	local_print_at_Vertice_internal_4 = GETATTR self out
+	ARG local_print_at_Vertice_internal_4
+	local_print_at_Vertice_internal_6 = TYPEOF local_print_at_Vertice_internal_4
+	local_print_at_Vertice_internal_5 = VCALL local_print_at_Vertice_internal_6 print
+	RETURN local_print_at_Vertice_internal_5
+}
+function __init_from_at_Edge {
+	PARAM self
+
+	
+
+	SETATTR self from 0
 	RETURN 
 }
-function function_initArticle_at_Article {
+function __init_to_at_Edge {
 	PARAM self
-	PARAM title_p
-	PARAM author_p
-	PARAM per_title_p
 
-	LOCAL local_initArticle_at_Article_internal_0
-	LOCAL local_initArticle_at_Article_internal_1
-	LOCAL local_initArticle_at_Article_internal_2
+	
 
-	ARG self
-	ARG title_p
-	ARG author_p
-	local_initArticle_at_Article_internal_2 = TYPEOF self
-	local_initArticle_at_Article_internal_1 = VCALL local_initArticle_at_Article_internal_2 initBook
-	SETATTR self per_title per_title_p
+	SETATTR self to 0
+	RETURN 
+}
+function __init_weight_at_Edge {
+	PARAM self
+
+	
+
+	SETATTR self weight 0
+	RETURN 
+}
+function function_init_at_Edge {
+	PARAM self
+	PARAM f
+	PARAM t
+	PARAM w
+
+	LOCAL local_init_at_Edge_internal_0
+
+	SETATTR self from f
+	SETATTR self to t
+	SETATTR self weight w
 	RETURN self
 }
-function function_print_at_Article {
+function function_print_at_Edge {
 	PARAM self
 
-	LOCAL local_print_at_Article_internal_0
-	LOCAL local_print_at_Article_internal_1
-	LOCAL local_print_at_Article_internal_2
-	LOCAL local_print_at_Article_internal_3
-	LOCAL local_print_at_Article_internal_4
-	LOCAL local_print_at_Article_internal_5
-	LOCAL local_print_at_Article_internal_6
-	LOCAL local_print_at_Article_internal_7
-	LOCAL local_print_at_Article_internal_8
-	LOCAL local_print_at_Article_internal_9
-	LOCAL local_print_at_Article_internal_10
+	LOCAL local_print_at_Edge_internal_0
+	LOCAL local_print_at_Edge_internal_1
+	LOCAL local_print_at_Edge_internal_2
+	LOCAL local_print_at_Edge_internal_3
+	LOCAL local_print_at_Edge_internal_4
+	LOCAL local_print_at_Edge_internal_5
+	LOCAL local_print_at_Edge_internal_6
+	LOCAL local_print_at_Edge_internal_7
+	LOCAL local_print_at_Edge_internal_8
+	LOCAL local_print_at_Edge_internal_9
+	LOCAL local_print_at_Edge_internal_10
+	LOCAL local_print_at_Edge_internal_11
+	LOCAL local_print_at_Edge_internal_12
+	LOCAL local_print_at_Edge_internal_13
+	LOCAL local_print_at_Edge_internal_14
+	LOCAL local_print_at_Edge_internal_15
+	LOCAL local_print_at_Edge_internal_16
+	LOCAL local_print_at_Edge_internal_17
+	LOCAL local_print_at_Edge_internal_18
+
+	local_print_at_Edge_internal_1 = LOAD data_17
+	ARG self
+	ARG local_print_at_Edge_internal_1
+	local_print_at_Edge_internal_3 = TYPEOF self
+	local_print_at_Edge_internal_2 = VCALL local_print_at_Edge_internal_3 out_string
+	local_print_at_Edge_internal_4 = GETATTR self from
+	ARG self
+	ARG local_print_at_Edge_internal_4
+	local_print_at_Edge_internal_6 = TYPEOF self
+	local_print_at_Edge_internal_5 = VCALL local_print_at_Edge_internal_6 out_int
+	local_print_at_Edge_internal_7 = LOAD data_18
+	ARG self
+	ARG local_print_at_Edge_internal_7
+	local_print_at_Edge_internal_9 = TYPEOF self
+	local_print_at_Edge_internal_8 = VCALL local_print_at_Edge_internal_9 out_string
+	local_print_at_Edge_internal_10 = GETATTR self to
+	ARG self
+	ARG local_print_at_Edge_internal_10
+	local_print_at_Edge_internal_12 = TYPEOF self
+	local_print_at_Edge_internal_11 = VCALL local_print_at_Edge_internal_12 out_int
+	local_print_at_Edge_internal_13 = LOAD data_19
+	ARG self
+	ARG local_print_at_Edge_internal_13
+	local_print_at_Edge_internal_15 = TYPEOF self
+	local_print_at_Edge_internal_14 = VCALL local_print_at_Edge_internal_15 out_string
+	local_print_at_Edge_internal_16 = GETATTR self weight
+	ARG self
+	ARG local_print_at_Edge_internal_16
+	local_print_at_Edge_internal_18 = TYPEOF self
+	local_print_at_Edge_internal_17 = VCALL local_print_at_Edge_internal_18 out_int
+	RETURN local_print_at_Edge_internal_17
+}
+function __init_car_at_EList {
+	PARAM self
+
+	LOCAL local__init_car_at_EList_internal_0
+
+	local__init_car_at_EList_internal_0 = VOID
+	SETATTR self car local__init_car_at_EList_internal_0
+	RETURN 
+}
+function function_isNil_at_EList {
+	PARAM self
+
+	
+
+	RETURN 1
+}
+function function_head_at_EList {
+	PARAM self
+
+	LOCAL local_head_at_EList_internal_0
+	LOCAL local_head_at_EList_internal_1
+	LOCAL local_head_at_EList_internal_2
+	LOCAL local_head_at_EList_internal_3
 
 	ARG self
-	local_print_at_Article_internal_1 = CALL function_print_at_Book
-	local_print_at_Article_internal_2 = LOAD data_19
+	local_head_at_EList_internal_2 = TYPEOF self
+	local_head_at_EList_internal_1 = VCALL local_head_at_EList_internal_2 abort
+	local_head_at_EList_internal_3 = GETATTR self car
+	RETURN local_head_at_EList_internal_3
+}
+function function_tail_at_EList {
+	PARAM self
+
+	LOCAL local_tail_at_EList_internal_0
+	LOCAL local_tail_at_EList_internal_1
+	LOCAL local_tail_at_EList_internal_2
+
 	ARG self
-	ARG local_print_at_Article_internal_2
-	local_print_at_Article_internal_4 = TYPEOF self
-	local_print_at_Article_internal_3 = VCALL local_print_at_Article_internal_4 out_string
-	local_print_at_Article_internal_5 = GETATTR self per_title
-	ARG local_print_at_Article_internal_3
-	ARG local_print_at_Article_internal_5
-	local_print_at_Article_internal_7 = TYPEOF local_print_at_Article_internal_3
-	local_print_at_Article_internal_6 = VCALL local_print_at_Article_internal_7 out_string
-	local_print_at_Article_internal_8 = LOAD data_20
-	ARG local_print_at_Article_internal_6
-	ARG local_print_at_Article_internal_8
-	local_print_at_Article_internal_10 = TYPEOF local_print_at_Article_internal_6
-	local_print_at_Article_internal_9 = VCALL local_print_at_Article_internal_10 out_string
+	local_tail_at_EList_internal_2 = TYPEOF self
+	local_tail_at_EList_internal_1 = VCALL local_tail_at_EList_internal_2 abort
 	RETURN self
 }
-function __init_xcar_at_Cons {
+function function_cons_at_EList {
+	PARAM self
+	PARAM e
+
+	LOCAL local_cons_at_EList_internal_0
+	LOCAL local_cons_at_EList_internal_1
+	LOCAL local_cons_at_EList_internal_2
+
+	local_cons_at_EList_internal_0 = ALLOCATE ECons
+	ARG local_cons_at_EList_internal_0
+	local_cons_at_EList_internal_0 = CALL __init_ECons_type
+	ARG local_cons_at_EList_internal_0
+	ARG e
+	ARG self
+	local_cons_at_EList_internal_2 = TYPEOF local_cons_at_EList_internal_0
+	local_cons_at_EList_internal_1 = VCALL local_cons_at_EList_internal_2 init
+	RETURN local_cons_at_EList_internal_1
+}
+function function_append_at_EList {
+	PARAM self
+	PARAM l
+
+	LOCAL local_append_at_EList_internal_0
+	LOCAL local_append_at_EList_internal_1
+	LOCAL local_append_at_EList_internal_2
+	LOCAL local_append_at_EList_internal_3
+	LOCAL local_append_at_EList_internal_4
+	LOCAL local_append_at_EList_internal_5
+	LOCAL local_append_at_EList_internal_6
+	LOCAL local_append_at_EList_internal_7
+	LOCAL local_append_at_EList_internal_8
+	LOCAL local_append_at_EList_internal_9
+	LOCAL local_append_at_EList_internal_10
+
+	ARG self
+	local_append_at_EList_internal_2 = TYPEOF self
+	local_append_at_EList_internal_1 = VCALL local_append_at_EList_internal_2 isNil
+	IF local_append_at_EList_internal_1 GOTO append_at_EList_label_0
+	ARG self
+	local_append_at_EList_internal_4 = TYPEOF self
+	local_append_at_EList_internal_3 = VCALL local_append_at_EList_internal_4 tail
+	ARG local_append_at_EList_internal_3
+	ARG l
+	local_append_at_EList_internal_6 = TYPEOF local_append_at_EList_internal_3
+	local_append_at_EList_internal_5 = VCALL local_append_at_EList_internal_6 append
+	ARG self
+	local_append_at_EList_internal_8 = TYPEOF self
+	local_append_at_EList_internal_7 = VCALL local_append_at_EList_internal_8 head
+	ARG local_append_at_EList_internal_5
+	ARG local_append_at_EList_internal_7
+	local_append_at_EList_internal_10 = TYPEOF local_append_at_EList_internal_5
+	local_append_at_EList_internal_9 = VCALL local_append_at_EList_internal_10 cons
+	local_append_at_EList_internal_0 = local_append_at_EList_internal_9
+	GOTO append_at_EList_label_1
+	LABEL append_at_EList_label_0
+	local_append_at_EList_internal_0 = l
+	LABEL append_at_EList_label_1
+	RETURN local_append_at_EList_internal_0
+}
+function function_print_at_EList {
 	PARAM self
 
-	LOCAL local__init_xcar_at_Cons_internal_0
+	LOCAL local_print_at_EList_internal_0
+	LOCAL local_print_at_EList_internal_1
+	LOCAL local_print_at_EList_internal_2
 
-	local__init_xcar_at_Cons_internal_0 = VOID
-	SETATTR self xcar local__init_xcar_at_Cons_internal_0
-	RETURN 
+	local_print_at_EList_internal_0 = LOAD data_20
+	ARG self
+	ARG local_print_at_EList_internal_0
+	local_print_at_EList_internal_2 = TYPEOF self
+	local_print_at_EList_internal_1 = VCALL local_print_at_EList_internal_2 out_string
+	RETURN local_print_at_EList_internal_1
 }
-function __init_xcdr_at_Cons {
+function __init_cdr_at_ECons {
 	PARAM self
 
-	LOCAL local__init_xcdr_at_Cons_internal_0
+	LOCAL local__init_cdr_at_ECons_internal_0
 
-	local__init_xcdr_at_Cons_internal_0 = VOID
-	SETATTR self xcdr local__init_xcdr_at_Cons_internal_0
+	local__init_cdr_at_ECons_internal_0 = VOID
+	SETATTR self cdr local__init_cdr_at_ECons_internal_0
 	RETURN 
 }
-function function_isNil_at_Cons {
+function function_isNil_at_ECons {
 	PARAM self
 
 	
 
 	RETURN 0
 }
-function function_init_at_Cons {
+function function_head_at_ECons {
 	PARAM self
-	PARAM hd
-	PARAM tl
 
-	LOCAL local_init_at_Cons_internal_0
+	LOCAL local_head_at_ECons_internal_0
 
-	SETATTR self xcar hd
-	SETATTR self xcdr tl
+	local_head_at_ECons_internal_0 = GETATTR self car
+	RETURN local_head_at_ECons_internal_0
+}
+function function_tail_at_ECons {
+	PARAM self
+
+	LOCAL local_tail_at_ECons_internal_0
+
+	local_tail_at_ECons_internal_0 = GETATTR self cdr
+	RETURN local_tail_at_ECons_internal_0
+}
+function function_init_at_ECons {
+	PARAM self
+	PARAM e
+	PARAM rest
+
+	LOCAL local_init_at_ECons_internal_0
+
+	SETATTR self car e
+	SETATTR self cdr rest
 	RETURN self
 }
-function function_car_at_Cons {
+function function_print_at_ECons {
 	PARAM self
 
-	LOCAL local_car_at_Cons_internal_0
+	LOCAL local_print_at_ECons_internal_0
+	LOCAL local_print_at_ECons_internal_1
+	LOCAL local_print_at_ECons_internal_2
+	LOCAL local_print_at_ECons_internal_3
+	LOCAL local_print_at_ECons_internal_4
+	LOCAL local_print_at_ECons_internal_5
+	LOCAL local_print_at_ECons_internal_6
 
-	local_car_at_Cons_internal_0 = GETATTR self xcar
-	RETURN local_car_at_Cons_internal_0
+	local_print_at_ECons_internal_1 = GETATTR self car
+	ARG local_print_at_ECons_internal_1
+	local_print_at_ECons_internal_3 = TYPEOF local_print_at_ECons_internal_1
+	local_print_at_ECons_internal_2 = VCALL local_print_at_ECons_internal_3 print
+	local_print_at_ECons_internal_4 = GETATTR self cdr
+	ARG local_print_at_ECons_internal_4
+	local_print_at_ECons_internal_6 = TYPEOF local_print_at_ECons_internal_4
+	local_print_at_ECons_internal_5 = VCALL local_print_at_ECons_internal_6 print
+	RETURN local_print_at_ECons_internal_5
 }
-function function_cdr_at_Cons {
+function __init_car_at_VList {
 	PARAM self
 
-	LOCAL local_cdr_at_Cons_internal_0
+	LOCAL local__init_car_at_VList_internal_0
 
-	local_cdr_at_Cons_internal_0 = GETATTR self xcdr
-	RETURN local_cdr_at_Cons_internal_0
+	local__init_car_at_VList_internal_0 = VOID
+	SETATTR self car local__init_car_at_VList_internal_0
+	RETURN 
 }
-function function_print_list_at_Cons {
+function function_isNil_at_VList {
 	PARAM self
 
-	LOCAL local_print_list_at_Cons_internal_0
-	LOCAL local_print_list_at_Cons_internal_1
-	LOCAL local_print_list_at_Cons_internal_2
-	LOCAL local_print_list_at_Cons_internal_3
-	LOCAL local_print_list_at_Cons_internal_4
-	LOCAL local_print_list_at_Cons_internal_5
-	LOCAL local_print_list_at_Cons_internal_6
-	LOCAL local_print_list_at_Cons_internal_7
-	LOCAL local_print_list_at_Cons_internal_8
-	LOCAL local_print_list_at_Cons_internal_9
-	LOCAL local_print_list_at_Cons_internal_10
-	LOCAL local_print_list_at_Cons_internal_11
-	LOCAL local_print_list_at_Cons_internal_12
-	LOCAL local_print_list_at_Cons_internal_13
-	LOCAL local_print_list_at_Cons_internal_14
-	LOCAL local_print_list_at_Cons_internal_15
-	LOCAL local_print_list_at_Cons_dummy_16
-	LOCAL local_print_list_at_Cons_internal_17
-	LOCAL local_print_list_at_Cons_internal_18
-	LOCAL local_print_list_at_Cons_internal_19
-	LOCAL local_print_list_at_Cons_dummy_20
-	LOCAL local_print_list_at_Cons_internal_21
-	LOCAL local_print_list_at_Cons_internal_22
-	LOCAL local_print_list_at_Cons_internal_23
-	LOCAL local_print_list_at_Cons_internal_24
-	LOCAL local_print_list_at_Cons_internal_25
-	LOCAL local_print_list_at_Cons_internal_26
+	
 
-	local_print_list_at_Cons_internal_1 = GETATTR self xcar
-	ARG local_print_list_at_Cons_internal_1
-	local_print_list_at_Cons_internal_3 = TYPEOF local_print_list_at_Cons_internal_1
-	local_print_list_at_Cons_internal_2 = VCALL local_print_list_at_Cons_internal_3 print
-	local_print_list_at_Cons_internal_5 = TYPEOF local_print_list_at_Cons_internal_2
-	local_print_list_at_Cons_internal_6 = ARRAY Object 2
-	SETINDEX local_print_list_at_Cons_internal_6 0 Book
-	SETINDEX local_print_list_at_Cons_internal_6 1 Article
-	local_print_list_at_Cons_internal_7 = -1
-	local_print_list_at_Cons_internal_9 = -2
-	LABEL print_list_at_Cons_label_0
-	local_print_list_at_Cons_internal_7 = local_print_list_at_Cons_internal_7 + 1
-	local_print_list_at_Cons_internal_12 = EQUAL local_print_list_at_Cons_internal_7 2
-	IF local_print_list_at_Cons_internal_12 GOTO print_list_at_Cons_label_2
-	local_print_list_at_Cons_internal_11 = GETINDEX local_print_list_at_Cons_internal_6 local_print_list_at_Cons_internal_7
-	ARG local_print_list_at_Cons_internal_5
-	ARG local_print_list_at_Cons_internal_11
-	local_print_list_at_Cons_internal_10 = CALL type_distance
-	local_print_list_at_Cons_internal_13 = EQUAL local_print_list_at_Cons_internal_10 -1
-	IF local_print_list_at_Cons_internal_13 GOTO print_list_at_Cons_label_0
-	local_print_list_at_Cons_internal_14 = EQUAL local_print_list_at_Cons_internal_9 -2
-	IF local_print_list_at_Cons_internal_14 GOTO print_list_at_Cons_label_1
-	local_print_list_at_Cons_internal_14 = local_print_list_at_Cons_internal_9 > local_print_list_at_Cons_internal_10
-	IF local_print_list_at_Cons_internal_14 GOTO print_list_at_Cons_label_1
-	GOTO print_list_at_Cons_label_0
-	LABEL print_list_at_Cons_label_1
-	local_print_list_at_Cons_internal_9 = local_print_list_at_Cons_internal_10
-	local_print_list_at_Cons_internal_8 = local_print_list_at_Cons_internal_7
-	GOTO print_list_at_Cons_label_0
-	LABEL print_list_at_Cons_label_2
-	local_print_list_at_Cons_internal_14 = EQUAL local_print_list_at_Cons_internal_9 -2
-	IF local_print_list_at_Cons_internal_14 GOTO print_list_at_Cons_label_3
-	local_print_list_at_Cons_internal_11 = GETINDEX local_print_list_at_Cons_internal_6 local_print_list_at_Cons_internal_8
-	local_print_list_at_Cons_internal_15 = EQUAL Book local_print_list_at_Cons_internal_11
-	local_print_list_at_Cons_internal_15 = NOT local_print_list_at_Cons_internal_15
-	IF local_print_list_at_Cons_internal_15 GOTO print_list_at_Cons_label_5
-	local_print_list_at_Cons_dummy_16 = local_print_list_at_Cons_internal_2
-	local_print_list_at_Cons_internal_17 = LOAD data_21
+	RETURN 1
+}
+function function_head_at_VList {
+	PARAM self
+
+	LOCAL local_head_at_VList_internal_0
+	LOCAL local_head_at_VList_internal_1
+	LOCAL local_head_at_VList_internal_2
+	LOCAL local_head_at_VList_internal_3
+
 	ARG self
-	ARG local_print_list_at_Cons_internal_17
-	local_print_list_at_Cons_internal_19 = TYPEOF self
-	local_print_list_at_Cons_internal_18 = VCALL local_print_list_at_Cons_internal_19 out_string
-	local_print_list_at_Cons_internal_4 = local_print_list_at_Cons_internal_18
-	GOTO print_list_at_Cons_label_4
-	LABEL print_list_at_Cons_label_5
-	local_print_list_at_Cons_internal_15 = EQUAL Article local_print_list_at_Cons_internal_11
-	local_print_list_at_Cons_internal_15 = NOT local_print_list_at_Cons_internal_15
-	IF local_print_list_at_Cons_internal_15 GOTO print_list_at_Cons_label_6
-	local_print_list_at_Cons_dummy_20 = local_print_list_at_Cons_internal_2
-	local_print_list_at_Cons_internal_21 = LOAD data_22
+	local_head_at_VList_internal_2 = TYPEOF self
+	local_head_at_VList_internal_1 = VCALL local_head_at_VList_internal_2 abort
+	local_head_at_VList_internal_3 = GETATTR self car
+	RETURN local_head_at_VList_internal_3
+}
+function function_tail_at_VList {
+	PARAM self
+
+	LOCAL local_tail_at_VList_internal_0
+	LOCAL local_tail_at_VList_internal_1
+	LOCAL local_tail_at_VList_internal_2
+
 	ARG self
-	ARG local_print_list_at_Cons_internal_21
-	local_print_list_at_Cons_internal_23 = TYPEOF self
-	local_print_list_at_Cons_internal_22 = VCALL local_print_list_at_Cons_internal_23 out_string
-	local_print_list_at_Cons_internal_4 = local_print_list_at_Cons_internal_22
-	GOTO print_list_at_Cons_label_4
-	LABEL print_list_at_Cons_label_6
-	LABEL print_list_at_Cons_label_3
-	ABORT
-	LABEL print_list_at_Cons_label_4
-	local_print_list_at_Cons_internal_24 = GETATTR self xcdr
-	ARG local_print_list_at_Cons_internal_24
-	local_print_list_at_Cons_internal_26 = TYPEOF local_print_list_at_Cons_internal_24
-	local_print_list_at_Cons_internal_25 = VCALL local_print_list_at_Cons_internal_26 print_list
-	RETURN local_print_list_at_Cons_internal_25
+	local_tail_at_VList_internal_2 = TYPEOF self
+	local_tail_at_VList_internal_1 = VCALL local_tail_at_VList_internal_2 abort
+	RETURN self
+}
+function function_cons_at_VList {
+	PARAM self
+	PARAM v
+
+	LOCAL local_cons_at_VList_internal_0
+	LOCAL local_cons_at_VList_internal_1
+	LOCAL local_cons_at_VList_internal_2
+
+	local_cons_at_VList_internal_0 = ALLOCATE VCons
+	ARG local_cons_at_VList_internal_0
+	local_cons_at_VList_internal_0 = CALL __init_VCons_type
+	ARG local_cons_at_VList_internal_0
+	ARG v
+	ARG self
+	local_cons_at_VList_internal_2 = TYPEOF local_cons_at_VList_internal_0
+	local_cons_at_VList_internal_1 = VCALL local_cons_at_VList_internal_2 init
+	RETURN local_cons_at_VList_internal_1
+}
+function function_print_at_VList {
+	PARAM self
+
+	LOCAL local_print_at_VList_internal_0
+	LOCAL local_print_at_VList_internal_1
+	LOCAL local_print_at_VList_internal_2
+
+	local_print_at_VList_internal_0 = LOAD data_21
+	ARG self
+	ARG local_print_at_VList_internal_0
+	local_print_at_VList_internal_2 = TYPEOF self
+	local_print_at_VList_internal_1 = VCALL local_print_at_VList_internal_2 out_string
+	RETURN local_print_at_VList_internal_1
+}
+function __init_cdr_at_VCons {
+	PARAM self
+
+	LOCAL local__init_cdr_at_VCons_internal_0
+
+	local__init_cdr_at_VCons_internal_0 = VOID
+	SETATTR self cdr local__init_cdr_at_VCons_internal_0
+	RETURN 
+}
+function function_isNil_at_VCons {
+	PARAM self
+
+	
+
+	RETURN 0
+}
+function function_head_at_VCons {
+	PARAM self
+
+	LOCAL local_head_at_VCons_internal_0
+
+	local_head_at_VCons_internal_0 = GETATTR self car
+	RETURN local_head_at_VCons_internal_0
+}
+function function_tail_at_VCons {
+	PARAM self
+
+	LOCAL local_tail_at_VCons_internal_0
+
+	local_tail_at_VCons_internal_0 = GETATTR self cdr
+	RETURN local_tail_at_VCons_internal_0
+}
+function function_init_at_VCons {
+	PARAM self
+	PARAM v
+	PARAM rest
+
+	LOCAL local_init_at_VCons_internal_0
+
+	SETATTR self car v
+	SETATTR self cdr rest
+	RETURN self
+}
+function function_print_at_VCons {
+	PARAM self
+
+	LOCAL local_print_at_VCons_internal_0
+	LOCAL local_print_at_VCons_internal_1
+	LOCAL local_print_at_VCons_internal_2
+	LOCAL local_print_at_VCons_internal_3
+	LOCAL local_print_at_VCons_internal_4
+	LOCAL local_print_at_VCons_internal_5
+	LOCAL local_print_at_VCons_internal_6
+
+	local_print_at_VCons_internal_1 = GETATTR self car
+	ARG local_print_at_VCons_internal_1
+	local_print_at_VCons_internal_3 = TYPEOF local_print_at_VCons_internal_1
+	local_print_at_VCons_internal_2 = VCALL local_print_at_VCons_internal_3 print
+	local_print_at_VCons_internal_4 = GETATTR self cdr
+	ARG local_print_at_VCons_internal_4
+	local_print_at_VCons_internal_6 = TYPEOF local_print_at_VCons_internal_4
+	local_print_at_VCons_internal_5 = VCALL local_print_at_VCons_internal_6 print
+	RETURN local_print_at_VCons_internal_5
 }
 function function_out_string_at_IO {
 	PARAM self
@@ -628,94 +1014,581 @@ function function_in_int_at_IO {
 	local_in_int_at_IO_internal_0 = READINT
 	RETURN local_in_int_at_IO_internal_0
 }
-function function_isNil_at_BookList {
+function __init_boolop_at_Parse {
 	PARAM self
 
-	LOCAL local_isNil_at_BookList_internal_0
-	LOCAL local_isNil_at_BookList_internal_1
-	LOCAL local_isNil_at_BookList_internal_2
+	LOCAL local__init_boolop_at_Parse_internal_0
+
+	local__init_boolop_at_Parse_internal_0 = ALLOCATE BoolOp
+	ARG local__init_boolop_at_Parse_internal_0
+	local__init_boolop_at_Parse_internal_0 = CALL __init_BoolOp_type
+	SETATTR self boolop local__init_boolop_at_Parse_internal_0
+	RETURN 
+}
+function __init_rest_at_Parse {
+	PARAM self
+
+	LOCAL local__init_rest_at_Parse_internal_0
+
+	local__init_rest_at_Parse_internal_0 = LOAD data_22
+	SETATTR self rest local__init_rest_at_Parse_internal_0
+	RETURN 
+}
+function function_read_input_at_Parse {
+	PARAM self
+
+	LOCAL local_read_input_at_Parse_g_0
+	LOCAL local_read_input_at_Parse_internal_1
+	LOCAL local_read_input_at_Parse_internal_2
+	LOCAL local_read_input_at_Parse_line_3
+	LOCAL local_read_input_at_Parse_internal_4
+	LOCAL local_read_input_at_Parse_internal_5
+	LOCAL local_read_input_at_Parse_internal_6
+	LOCAL local_read_input_at_Parse_internal_7
+	LOCAL local_read_input_at_Parse_internal_8
+	LOCAL local_read_input_at_Parse_internal_9
+	LOCAL local_read_input_at_Parse_internal_10
+	LOCAL local_read_input_at_Parse_internal_11
+	LOCAL local_read_input_at_Parse_internal_12
+	LOCAL local_read_input_at_Parse_internal_13
+	LOCAL local_read_input_at_Parse_internal_14
+	LOCAL local_read_input_at_Parse_internal_15
+	LOCAL local_read_input_at_Parse_internal_16
+	LOCAL local_read_input_at_Parse_internal_17
+	LOCAL local_read_input_at_Parse_internal_18
+	LOCAL local_read_input_at_Parse_internal_19
+	LOCAL local_read_input_at_Parse_internal_20
+	LOCAL local_read_input_at_Parse_internal_21
+	LOCAL local_read_input_at_Parse_internal_22
+
+	local_read_input_at_Parse_internal_1 = ALLOCATE Graph
+	ARG local_read_input_at_Parse_internal_1
+	local_read_input_at_Parse_internal_1 = CALL __init_Graph_type
+	local_read_input_at_Parse_g_0 = local_read_input_at_Parse_internal_1
+	ARG self
+	local_read_input_at_Parse_internal_5 = TYPEOF self
+	local_read_input_at_Parse_internal_4 = VCALL local_read_input_at_Parse_internal_5 in_string
+	local_read_input_at_Parse_line_3 = local_read_input_at_Parse_internal_4
+	local_read_input_at_Parse_internal_6 = VOID
+	LABEL read_input_at_Parse_label_0
+	local_read_input_at_Parse_internal_7 = GETATTR self boolop
+	local_read_input_at_Parse_internal_10 = LOAD data_23
+	local_read_input_at_Parse_internal_9 = OBJEQUAL local_read_input_at_Parse_line_3 local_read_input_at_Parse_internal_10
+	local_read_input_at_Parse_internal_8 = NOT local_read_input_at_Parse_internal_9
+	local_read_input_at_Parse_internal_13 = LOAD data_24
+	local_read_input_at_Parse_internal_12 = OBJEQUAL local_read_input_at_Parse_line_3 local_read_input_at_Parse_internal_13
+	local_read_input_at_Parse_internal_11 = NOT local_read_input_at_Parse_internal_12
+	ARG local_read_input_at_Parse_internal_7
+	ARG local_read_input_at_Parse_internal_8
+	ARG local_read_input_at_Parse_internal_11
+	local_read_input_at_Parse_internal_15 = TYPEOF local_read_input_at_Parse_internal_7
+	local_read_input_at_Parse_internal_14 = VCALL local_read_input_at_Parse_internal_15 and
+	IF local_read_input_at_Parse_internal_14 GOTO read_input_at_Parse_label_1
+	GOTO read_input_at_Parse_label_2
+	LABEL read_input_at_Parse_label_1
+	ARG self
+	ARG local_read_input_at_Parse_line_3
+	local_read_input_at_Parse_internal_18 = TYPEOF self
+	local_read_input_at_Parse_internal_17 = VCALL local_read_input_at_Parse_internal_18 parse_line
+	ARG local_read_input_at_Parse_g_0
+	ARG local_read_input_at_Parse_internal_17
+	local_read_input_at_Parse_internal_20 = TYPEOF local_read_input_at_Parse_g_0
+	local_read_input_at_Parse_internal_19 = VCALL local_read_input_at_Parse_internal_20 add_vertice
+	ARG self
+	local_read_input_at_Parse_internal_22 = TYPEOF self
+	local_read_input_at_Parse_internal_21 = VCALL local_read_input_at_Parse_internal_22 in_string
+	local_read_input_at_Parse_line_3 = local_read_input_at_Parse_internal_21
+	GOTO read_input_at_Parse_label_0
+	LABEL read_input_at_Parse_label_2
+	RETURN local_read_input_at_Parse_g_0
+}
+function function_parse_line_at_Parse {
+	PARAM self
+	PARAM s
+
+	LOCAL local_parse_line_at_Parse_v_0
+	LOCAL local_parse_line_at_Parse_internal_1
+	LOCAL local_parse_line_at_Parse_internal_2
+	LOCAL local_parse_line_at_Parse_internal_3
+	LOCAL local_parse_line_at_Parse_internal_4
+	LOCAL local_parse_line_at_Parse_internal_5
+	LOCAL local_parse_line_at_Parse_internal_6
+	LOCAL local_parse_line_at_Parse_internal_7
+	LOCAL local_parse_line_at_Parse_internal_8
+	LOCAL local_parse_line_at_Parse_internal_9
+	LOCAL local_parse_line_at_Parse_internal_10
+	LOCAL local_parse_line_at_Parse_internal_11
+	LOCAL local_parse_line_at_Parse_internal_12
+	LOCAL local_parse_line_at_Parse_internal_13
+	LOCAL local_parse_line_at_Parse_succ_14
+	LOCAL local_parse_line_at_Parse_internal_15
+	LOCAL local_parse_line_at_Parse_internal_16
+	LOCAL local_parse_line_at_Parse_internal_17
+	LOCAL local_parse_line_at_Parse_weight_18
+	LOCAL local_parse_line_at_Parse_internal_19
+	LOCAL local_parse_line_at_Parse_internal_20
+	LOCAL local_parse_line_at_Parse_internal_21
+	LOCAL local_parse_line_at_Parse_internal_22
+	LOCAL local_parse_line_at_Parse_internal_23
+	LOCAL local_parse_line_at_Parse_internal_24
+	LOCAL local_parse_line_at_Parse_internal_25
+	LOCAL local_parse_line_at_Parse_internal_26
+	LOCAL local_parse_line_at_Parse_internal_27
+	LOCAL local_parse_line_at_Parse_internal_28
+
+	local_parse_line_at_Parse_internal_1 = ALLOCATE Vertice
+	ARG local_parse_line_at_Parse_internal_1
+	local_parse_line_at_Parse_internal_1 = CALL __init_Vertice_type
+	ARG self
+	ARG s
+	local_parse_line_at_Parse_internal_3 = TYPEOF self
+	local_parse_line_at_Parse_internal_2 = VCALL local_parse_line_at_Parse_internal_3 a2i
+	ARG local_parse_line_at_Parse_internal_1
+	ARG local_parse_line_at_Parse_internal_2
+	local_parse_line_at_Parse_internal_5 = TYPEOF local_parse_line_at_Parse_internal_1
+	local_parse_line_at_Parse_internal_4 = VCALL local_parse_line_at_Parse_internal_5 init
+	local_parse_line_at_Parse_v_0 = local_parse_line_at_Parse_internal_4
+	local_parse_line_at_Parse_internal_7 = VOID
+	LABEL parse_line_at_Parse_label_0
+	local_parse_line_at_Parse_internal_10 = GETATTR self rest
+	ARG local_parse_line_at_Parse_internal_10
+	local_parse_line_at_Parse_internal_12 = TYPEOF local_parse_line_at_Parse_internal_10
+	local_parse_line_at_Parse_internal_11 = VCALL local_parse_line_at_Parse_internal_12 length
+	local_parse_line_at_Parse_internal_9 = OBJEQUAL local_parse_line_at_Parse_internal_11 0
+	local_parse_line_at_Parse_internal_8 = NOT local_parse_line_at_Parse_internal_9
+	IF local_parse_line_at_Parse_internal_8 GOTO parse_line_at_Parse_label_1
+	GOTO parse_line_at_Parse_label_2
+	LABEL parse_line_at_Parse_label_1
+	local_parse_line_at_Parse_internal_15 = GETATTR self rest
+	ARG self
+	ARG local_parse_line_at_Parse_internal_15
+	local_parse_line_at_Parse_internal_17 = TYPEOF self
+	local_parse_line_at_Parse_internal_16 = VCALL local_parse_line_at_Parse_internal_17 a2i
+	local_parse_line_at_Parse_succ_14 = local_parse_line_at_Parse_internal_16
+	local_parse_line_at_Parse_internal_19 = GETATTR self rest
+	ARG self
+	ARG local_parse_line_at_Parse_internal_19
+	local_parse_line_at_Parse_internal_21 = TYPEOF self
+	local_parse_line_at_Parse_internal_20 = VCALL local_parse_line_at_Parse_internal_21 a2i
+	local_parse_line_at_Parse_weight_18 = local_parse_line_at_Parse_internal_20
+	local_parse_line_at_Parse_internal_22 = ALLOCATE Edge
+	ARG local_parse_line_at_Parse_internal_22
+	local_parse_line_at_Parse_internal_22 = CALL __init_Edge_type
+	ARG local_parse_line_at_Parse_v_0
+	local_parse_line_at_Parse_internal_24 = TYPEOF local_parse_line_at_Parse_v_0
+	local_parse_line_at_Parse_internal_23 = VCALL local_parse_line_at_Parse_internal_24 number
+	ARG local_parse_line_at_Parse_internal_22
+	ARG local_parse_line_at_Parse_internal_23
+	ARG local_parse_line_at_Parse_succ_14
+	ARG local_parse_line_at_Parse_weight_18
+	local_parse_line_at_Parse_internal_26 = TYPEOF local_parse_line_at_Parse_internal_22
+	local_parse_line_at_Parse_internal_25 = VCALL local_parse_line_at_Parse_internal_26 init
+	ARG local_parse_line_at_Parse_v_0
+	ARG local_parse_line_at_Parse_internal_25
+	local_parse_line_at_Parse_internal_28 = TYPEOF local_parse_line_at_Parse_v_0
+	local_parse_line_at_Parse_internal_27 = VCALL local_parse_line_at_Parse_internal_28 add_out
+	GOTO parse_line_at_Parse_label_0
+	LABEL parse_line_at_Parse_label_2
+	RETURN local_parse_line_at_Parse_v_0
+}
+function function_c2i_at_Parse {
+	PARAM self
+	PARAM char
+
+	LOCAL local_c2i_at_Parse_internal_0
+	LOCAL local_c2i_at_Parse_internal_1
+	LOCAL local_c2i_at_Parse_internal_2
+	LOCAL local_c2i_at_Parse_internal_3
+	LOCAL local_c2i_at_Parse_internal_4
+	LOCAL local_c2i_at_Parse_internal_5
+	LOCAL local_c2i_at_Parse_internal_6
+	LOCAL local_c2i_at_Parse_internal_7
+	LOCAL local_c2i_at_Parse_internal_8
+	LOCAL local_c2i_at_Parse_internal_9
+	LOCAL local_c2i_at_Parse_internal_10
+	LOCAL local_c2i_at_Parse_internal_11
+	LOCAL local_c2i_at_Parse_internal_12
+	LOCAL local_c2i_at_Parse_internal_13
+	LOCAL local_c2i_at_Parse_internal_14
+	LOCAL local_c2i_at_Parse_internal_15
+	LOCAL local_c2i_at_Parse_internal_16
+	LOCAL local_c2i_at_Parse_internal_17
+	LOCAL local_c2i_at_Parse_internal_18
+	LOCAL local_c2i_at_Parse_internal_19
+	LOCAL local_c2i_at_Parse_internal_20
+	LOCAL local_c2i_at_Parse_internal_21
+	LOCAL local_c2i_at_Parse_internal_22
+	LOCAL local_c2i_at_Parse_internal_23
+	LOCAL local_c2i_at_Parse_internal_24
+	LOCAL local_c2i_at_Parse_internal_25
+	LOCAL local_c2i_at_Parse_internal_26
+	LOCAL local_c2i_at_Parse_internal_27
+	LOCAL local_c2i_at_Parse_internal_28
+	LOCAL local_c2i_at_Parse_internal_29
+	LOCAL local_c2i_at_Parse_internal_30
+	LOCAL local_c2i_at_Parse_internal_31
+	LOCAL local_c2i_at_Parse_internal_32
+
+	local_c2i_at_Parse_internal_2 = LOAD data_25
+	local_c2i_at_Parse_internal_1 = OBJEQUAL char local_c2i_at_Parse_internal_2
+	IF local_c2i_at_Parse_internal_1 GOTO c2i_at_Parse_label_0
+	local_c2i_at_Parse_internal_5 = LOAD data_26
+	local_c2i_at_Parse_internal_4 = OBJEQUAL char local_c2i_at_Parse_internal_5
+	IF local_c2i_at_Parse_internal_4 GOTO c2i_at_Parse_label_2
+	local_c2i_at_Parse_internal_8 = LOAD data_27
+	local_c2i_at_Parse_internal_7 = OBJEQUAL char local_c2i_at_Parse_internal_8
+	IF local_c2i_at_Parse_internal_7 GOTO c2i_at_Parse_label_4
+	local_c2i_at_Parse_internal_11 = LOAD data_28
+	local_c2i_at_Parse_internal_10 = OBJEQUAL char local_c2i_at_Parse_internal_11
+	IF local_c2i_at_Parse_internal_10 GOTO c2i_at_Parse_label_6
+	local_c2i_at_Parse_internal_14 = LOAD data_29
+	local_c2i_at_Parse_internal_13 = OBJEQUAL char local_c2i_at_Parse_internal_14
+	IF local_c2i_at_Parse_internal_13 GOTO c2i_at_Parse_label_8
+	local_c2i_at_Parse_internal_17 = LOAD data_30
+	local_c2i_at_Parse_internal_16 = OBJEQUAL char local_c2i_at_Parse_internal_17
+	IF local_c2i_at_Parse_internal_16 GOTO c2i_at_Parse_label_10
+	local_c2i_at_Parse_internal_20 = LOAD data_31
+	local_c2i_at_Parse_internal_19 = OBJEQUAL char local_c2i_at_Parse_internal_20
+	IF local_c2i_at_Parse_internal_19 GOTO c2i_at_Parse_label_12
+	local_c2i_at_Parse_internal_23 = LOAD data_32
+	local_c2i_at_Parse_internal_22 = OBJEQUAL char local_c2i_at_Parse_internal_23
+	IF local_c2i_at_Parse_internal_22 GOTO c2i_at_Parse_label_14
+	local_c2i_at_Parse_internal_26 = LOAD data_33
+	local_c2i_at_Parse_internal_25 = OBJEQUAL char local_c2i_at_Parse_internal_26
+	IF local_c2i_at_Parse_internal_25 GOTO c2i_at_Parse_label_16
+	local_c2i_at_Parse_internal_29 = LOAD data_34
+	local_c2i_at_Parse_internal_28 = OBJEQUAL char local_c2i_at_Parse_internal_29
+	IF local_c2i_at_Parse_internal_28 GOTO c2i_at_Parse_label_18
+	ARG self
+	local_c2i_at_Parse_internal_32 = TYPEOF self
+	local_c2i_at_Parse_internal_31 = VCALL local_c2i_at_Parse_internal_32 abort
+	local_c2i_at_Parse_internal_27 = 0
+	GOTO c2i_at_Parse_label_19
+	LABEL c2i_at_Parse_label_18
+	local_c2i_at_Parse_internal_27 = 9
+	LABEL c2i_at_Parse_label_19
+	local_c2i_at_Parse_internal_24 = local_c2i_at_Parse_internal_27
+	GOTO c2i_at_Parse_label_17
+	LABEL c2i_at_Parse_label_16
+	local_c2i_at_Parse_internal_24 = 8
+	LABEL c2i_at_Parse_label_17
+	local_c2i_at_Parse_internal_21 = local_c2i_at_Parse_internal_24
+	GOTO c2i_at_Parse_label_15
+	LABEL c2i_at_Parse_label_14
+	local_c2i_at_Parse_internal_21 = 7
+	LABEL c2i_at_Parse_label_15
+	local_c2i_at_Parse_internal_18 = local_c2i_at_Parse_internal_21
+	GOTO c2i_at_Parse_label_13
+	LABEL c2i_at_Parse_label_12
+	local_c2i_at_Parse_internal_18 = 6
+	LABEL c2i_at_Parse_label_13
+	local_c2i_at_Parse_internal_15 = local_c2i_at_Parse_internal_18
+	GOTO c2i_at_Parse_label_11
+	LABEL c2i_at_Parse_label_10
+	local_c2i_at_Parse_internal_15 = 5
+	LABEL c2i_at_Parse_label_11
+	local_c2i_at_Parse_internal_12 = local_c2i_at_Parse_internal_15
+	GOTO c2i_at_Parse_label_9
+	LABEL c2i_at_Parse_label_8
+	local_c2i_at_Parse_internal_12 = 4
+	LABEL c2i_at_Parse_label_9
+	local_c2i_at_Parse_internal_9 = local_c2i_at_Parse_internal_12
+	GOTO c2i_at_Parse_label_7
+	LABEL c2i_at_Parse_label_6
+	local_c2i_at_Parse_internal_9 = 3
+	LABEL c2i_at_Parse_label_7
+	local_c2i_at_Parse_internal_6 = local_c2i_at_Parse_internal_9
+	GOTO c2i_at_Parse_label_5
+	LABEL c2i_at_Parse_label_4
+	local_c2i_at_Parse_internal_6 = 2
+	LABEL c2i_at_Parse_label_5
+	local_c2i_at_Parse_internal_3 = local_c2i_at_Parse_internal_6
+	GOTO c2i_at_Parse_label_3
+	LABEL c2i_at_Parse_label_2
+	local_c2i_at_Parse_internal_3 = 1
+	LABEL c2i_at_Parse_label_3
+	local_c2i_at_Parse_internal_0 = local_c2i_at_Parse_internal_3
+	GOTO c2i_at_Parse_label_1
+	LABEL c2i_at_Parse_label_0
+	local_c2i_at_Parse_internal_0 = 0
+	LABEL c2i_at_Parse_label_1
+	RETURN local_c2i_at_Parse_internal_0
+}
+function function_a2i_at_Parse {
+	PARAM self
+	PARAM s
+
+	LOCAL local_a2i_at_Parse_internal_0
+	LOCAL local_a2i_at_Parse_internal_1
+	LOCAL local_a2i_at_Parse_internal_2
+	LOCAL local_a2i_at_Parse_internal_3
+	LOCAL local_a2i_at_Parse_internal_4
+	LOCAL local_a2i_at_Parse_internal_5
+	LOCAL local_a2i_at_Parse_internal_6
+	LOCAL local_a2i_at_Parse_internal_7
+	LOCAL local_a2i_at_Parse_internal_8
+	LOCAL local_a2i_at_Parse_internal_9
+	LOCAL local_a2i_at_Parse_internal_10
+	LOCAL local_a2i_at_Parse_internal_11
+	LOCAL local_a2i_at_Parse_internal_12
+	LOCAL local_a2i_at_Parse_internal_13
+	LOCAL local_a2i_at_Parse_internal_14
+	LOCAL local_a2i_at_Parse_internal_15
+	LOCAL local_a2i_at_Parse_internal_16
+	LOCAL local_a2i_at_Parse_internal_17
+	LOCAL local_a2i_at_Parse_internal_18
+	LOCAL local_a2i_at_Parse_internal_19
+	LOCAL local_a2i_at_Parse_internal_20
+	LOCAL local_a2i_at_Parse_internal_21
+	LOCAL local_a2i_at_Parse_internal_22
+	LOCAL local_a2i_at_Parse_internal_23
+	LOCAL local_a2i_at_Parse_internal_24
+	LOCAL local_a2i_at_Parse_internal_25
+	LOCAL local_a2i_at_Parse_internal_26
+	LOCAL local_a2i_at_Parse_internal_27
+	LOCAL local_a2i_at_Parse_internal_28
+	LOCAL local_a2i_at_Parse_internal_29
+	LOCAL local_a2i_at_Parse_internal_30
+
+	ARG s
+	local_a2i_at_Parse_internal_3 = TYPEOF s
+	local_a2i_at_Parse_internal_2 = VCALL local_a2i_at_Parse_internal_3 length
+	local_a2i_at_Parse_internal_1 = OBJEQUAL local_a2i_at_Parse_internal_2 0
+	IF local_a2i_at_Parse_internal_1 GOTO a2i_at_Parse_label_0
+	ARG s
+	ARG 0
+	ARG 1
+	local_a2i_at_Parse_internal_7 = TYPEOF s
+	local_a2i_at_Parse_internal_6 = VCALL local_a2i_at_Parse_internal_7 substr
+	local_a2i_at_Parse_internal_8 = LOAD data_35
+	local_a2i_at_Parse_internal_5 = OBJEQUAL local_a2i_at_Parse_internal_6 local_a2i_at_Parse_internal_8
+	IF local_a2i_at_Parse_internal_5 GOTO a2i_at_Parse_label_2
+	ARG s
+	ARG 0
+	ARG 1
+	local_a2i_at_Parse_internal_12 = TYPEOF s
+	local_a2i_at_Parse_internal_11 = VCALL local_a2i_at_Parse_internal_12 substr
+	local_a2i_at_Parse_internal_13 = LOAD data_36
+	local_a2i_at_Parse_internal_10 = OBJEQUAL local_a2i_at_Parse_internal_11 local_a2i_at_Parse_internal_13
+	IF local_a2i_at_Parse_internal_10 GOTO a2i_at_Parse_label_4
+	ARG self
+	ARG s
+	local_a2i_at_Parse_internal_15 = TYPEOF self
+	local_a2i_at_Parse_internal_14 = VCALL local_a2i_at_Parse_internal_15 a2i_aux
+	local_a2i_at_Parse_internal_9 = local_a2i_at_Parse_internal_14
+	GOTO a2i_at_Parse_label_5
+	LABEL a2i_at_Parse_label_4
+	ARG s
+	local_a2i_at_Parse_internal_17 = TYPEOF s
+	local_a2i_at_Parse_internal_16 = VCALL local_a2i_at_Parse_internal_17 length
+	local_a2i_at_Parse_internal_18 = local_a2i_at_Parse_internal_16 - 1
+	ARG s
+	ARG 1
+	ARG local_a2i_at_Parse_internal_18
+	local_a2i_at_Parse_internal_20 = TYPEOF s
+	local_a2i_at_Parse_internal_19 = VCALL local_a2i_at_Parse_internal_20 substr
+	ARG self
+	ARG local_a2i_at_Parse_internal_19
+	local_a2i_at_Parse_internal_22 = TYPEOF self
+	local_a2i_at_Parse_internal_21 = VCALL local_a2i_at_Parse_internal_22 a2i
+	local_a2i_at_Parse_internal_9 = local_a2i_at_Parse_internal_21
+	LABEL a2i_at_Parse_label_5
+	local_a2i_at_Parse_internal_4 = local_a2i_at_Parse_internal_9
+	GOTO a2i_at_Parse_label_3
+	LABEL a2i_at_Parse_label_2
+	ARG s
+	local_a2i_at_Parse_internal_25 = TYPEOF s
+	local_a2i_at_Parse_internal_24 = VCALL local_a2i_at_Parse_internal_25 length
+	local_a2i_at_Parse_internal_26 = local_a2i_at_Parse_internal_24 - 1
+	ARG s
+	ARG 1
+	ARG local_a2i_at_Parse_internal_26
+	local_a2i_at_Parse_internal_28 = TYPEOF s
+	local_a2i_at_Parse_internal_27 = VCALL local_a2i_at_Parse_internal_28 substr
+	ARG self
+	ARG local_a2i_at_Parse_internal_27
+	local_a2i_at_Parse_internal_30 = TYPEOF self
+	local_a2i_at_Parse_internal_29 = VCALL local_a2i_at_Parse_internal_30 a2i_aux
+	local_a2i_at_Parse_internal_23 = 0 - local_a2i_at_Parse_internal_29
+	local_a2i_at_Parse_internal_4 = local_a2i_at_Parse_internal_23
+	LABEL a2i_at_Parse_label_3
+	local_a2i_at_Parse_internal_0 = local_a2i_at_Parse_internal_4
+	GOTO a2i_at_Parse_label_1
+	LABEL a2i_at_Parse_label_0
+	local_a2i_at_Parse_internal_0 = 0
+	LABEL a2i_at_Parse_label_1
+	RETURN local_a2i_at_Parse_internal_0
+}
+function function_a2i_aux_at_Parse {
+	PARAM self
+	PARAM s
+
+	LOCAL local_a2i_aux_at_Parse_int_0
+	LOCAL local_a2i_aux_at_Parse_internal_1
+	LOCAL local_a2i_aux_at_Parse_j_2
+	LOCAL local_a2i_aux_at_Parse_internal_3
+	LOCAL local_a2i_aux_at_Parse_internal_4
+	LOCAL local_a2i_aux_at_Parse_i_5
+	LOCAL local_a2i_aux_at_Parse_internal_6
+	LOCAL local_a2i_aux_at_Parse_internal_7
+	LOCAL local_a2i_aux_at_Parse_c_8
+	LOCAL local_a2i_aux_at_Parse_internal_9
+	LOCAL local_a2i_aux_at_Parse_internal_10
+	LOCAL local_a2i_aux_at_Parse_internal_11
+	LOCAL local_a2i_aux_at_Parse_internal_12
+	LOCAL local_a2i_aux_at_Parse_internal_13
+	LOCAL local_a2i_aux_at_Parse_internal_14
+	LOCAL local_a2i_aux_at_Parse_internal_15
+	LOCAL local_a2i_aux_at_Parse_internal_16
+	LOCAL local_a2i_aux_at_Parse_internal_17
+	LOCAL local_a2i_aux_at_Parse_internal_18
+	LOCAL local_a2i_aux_at_Parse_internal_19
+	LOCAL local_a2i_aux_at_Parse_internal_20
+	LOCAL local_a2i_aux_at_Parse_internal_21
+	LOCAL local_a2i_aux_at_Parse_internal_22
+	LOCAL local_a2i_aux_at_Parse_internal_23
+	LOCAL local_a2i_aux_at_Parse_internal_24
+	LOCAL local_a2i_aux_at_Parse_internal_25
+	LOCAL local_a2i_aux_at_Parse_internal_26
+	LOCAL local_a2i_aux_at_Parse_internal_27
+	LOCAL local_a2i_aux_at_Parse_internal_28
+	LOCAL local_a2i_aux_at_Parse_internal_29
+	LOCAL local_a2i_aux_at_Parse_internal_30
+	LOCAL local_a2i_aux_at_Parse_internal_31
+	LOCAL local_a2i_aux_at_Parse_internal_32
+	LOCAL local_a2i_aux_at_Parse_internal_33
+	LOCAL local_a2i_aux_at_Parse_internal_34
+	LOCAL local_a2i_aux_at_Parse_internal_35
+	LOCAL local_a2i_aux_at_Parse_internal_36
+	LOCAL local_a2i_aux_at_Parse_internal_37
+	LOCAL local_a2i_aux_at_Parse_internal_38
+	LOCAL local_a2i_aux_at_Parse_internal_39
+	LOCAL local_a2i_aux_at_Parse_internal_40
+	LOCAL local_a2i_aux_at_Parse_internal_41
+	LOCAL local_a2i_aux_at_Parse_internal_42
+	LOCAL local_a2i_aux_at_Parse_internal_43
+	LOCAL local_a2i_aux_at_Parse_internal_44
+
+	local_a2i_aux_at_Parse_int_0 = 0
+	ARG s
+	local_a2i_aux_at_Parse_internal_4 = TYPEOF s
+	local_a2i_aux_at_Parse_internal_3 = VCALL local_a2i_aux_at_Parse_internal_4 length
+	local_a2i_aux_at_Parse_j_2 = local_a2i_aux_at_Parse_internal_3
+	local_a2i_aux_at_Parse_i_5 = 0
+	local_a2i_aux_at_Parse_internal_6 = VOID
+	LABEL a2i_aux_at_Parse_label_0
+	local_a2i_aux_at_Parse_internal_7 = local_a2i_aux_at_Parse_i_5 < local_a2i_aux_at_Parse_j_2
+	IF local_a2i_aux_at_Parse_internal_7 GOTO a2i_aux_at_Parse_label_1
+	GOTO a2i_aux_at_Parse_label_2
+	LABEL a2i_aux_at_Parse_label_1
+	ARG s
+	ARG local_a2i_aux_at_Parse_i_5
+	ARG 1
+	local_a2i_aux_at_Parse_internal_10 = TYPEOF s
+	local_a2i_aux_at_Parse_internal_9 = VCALL local_a2i_aux_at_Parse_internal_10 substr
+	local_a2i_aux_at_Parse_c_8 = local_a2i_aux_at_Parse_internal_9
+	local_a2i_aux_at_Parse_internal_13 = LOAD data_37
+	local_a2i_aux_at_Parse_internal_12 = OBJEQUAL local_a2i_aux_at_Parse_c_8 local_a2i_aux_at_Parse_internal_13
+	IF local_a2i_aux_at_Parse_internal_12 GOTO a2i_aux_at_Parse_label_3
+	local_a2i_aux_at_Parse_internal_16 = LOAD data_38
+	local_a2i_aux_at_Parse_internal_15 = OBJEQUAL local_a2i_aux_at_Parse_c_8 local_a2i_aux_at_Parse_internal_16
+	IF local_a2i_aux_at_Parse_internal_15 GOTO a2i_aux_at_Parse_label_5
+	local_a2i_aux_at_Parse_internal_18 = local_a2i_aux_at_Parse_int_0 * 10
+	ARG s
+	ARG local_a2i_aux_at_Parse_i_5
+	ARG 1
+	local_a2i_aux_at_Parse_internal_20 = TYPEOF s
+	local_a2i_aux_at_Parse_internal_19 = VCALL local_a2i_aux_at_Parse_internal_20 substr
+	ARG self
+	ARG local_a2i_aux_at_Parse_internal_19
+	local_a2i_aux_at_Parse_internal_22 = TYPEOF self
+	local_a2i_aux_at_Parse_internal_21 = VCALL local_a2i_aux_at_Parse_internal_22 c2i
+	local_a2i_aux_at_Parse_internal_23 = local_a2i_aux_at_Parse_internal_18 + local_a2i_aux_at_Parse_internal_21
+	local_a2i_aux_at_Parse_int_0 = local_a2i_aux_at_Parse_internal_23
+	local_a2i_aux_at_Parse_internal_24 = local_a2i_aux_at_Parse_i_5 + 1
+	local_a2i_aux_at_Parse_i_5 = local_a2i_aux_at_Parse_internal_24
+	local_a2i_aux_at_Parse_internal_26 = OBJEQUAL local_a2i_aux_at_Parse_i_5 local_a2i_aux_at_Parse_j_2
+	IF local_a2i_aux_at_Parse_internal_26 GOTO a2i_aux_at_Parse_label_7
+	local_a2i_aux_at_Parse_internal_27 = LOAD data_39
+	local_a2i_aux_at_Parse_internal_25 = local_a2i_aux_at_Parse_internal_27
+	GOTO a2i_aux_at_Parse_label_8
+	LABEL a2i_aux_at_Parse_label_7
+	local_a2i_aux_at_Parse_internal_28 = LOAD data_40
+	SETATTR self rest local_a2i_aux_at_Parse_internal_28
+	local_a2i_aux_at_Parse_internal_25 = local_a2i_aux_at_Parse_internal_28
+	LABEL a2i_aux_at_Parse_label_8
+	local_a2i_aux_at_Parse_internal_14 = local_a2i_aux_at_Parse_internal_25
+	GOTO a2i_aux_at_Parse_label_6
+	LABEL a2i_aux_at_Parse_label_5
+	local_a2i_aux_at_Parse_internal_30 = local_a2i_aux_at_Parse_i_5 + 1
+	ARG s
+	local_a2i_aux_at_Parse_internal_32 = TYPEOF s
+	local_a2i_aux_at_Parse_internal_31 = VCALL local_a2i_aux_at_Parse_internal_32 length
+	local_a2i_aux_at_Parse_internal_33 = local_a2i_aux_at_Parse_internal_31 - local_a2i_aux_at_Parse_i_5
+	local_a2i_aux_at_Parse_internal_34 = local_a2i_aux_at_Parse_internal_33 - 1
+	ARG s
+	ARG local_a2i_aux_at_Parse_internal_30
+	ARG local_a2i_aux_at_Parse_internal_34
+	local_a2i_aux_at_Parse_internal_36 = TYPEOF s
+	local_a2i_aux_at_Parse_internal_35 = VCALL local_a2i_aux_at_Parse_internal_36 substr
+	SETATTR self rest local_a2i_aux_at_Parse_internal_35
+	local_a2i_aux_at_Parse_i_5 = local_a2i_aux_at_Parse_j_2
+	local_a2i_aux_at_Parse_internal_14 = local_a2i_aux_at_Parse_i_5
+	LABEL a2i_aux_at_Parse_label_6
+	local_a2i_aux_at_Parse_internal_11 = local_a2i_aux_at_Parse_internal_14
+	GOTO a2i_aux_at_Parse_label_4
+	LABEL a2i_aux_at_Parse_label_3
+	local_a2i_aux_at_Parse_internal_38 = local_a2i_aux_at_Parse_i_5 + 1
+	ARG s
+	local_a2i_aux_at_Parse_internal_40 = TYPEOF s
+	local_a2i_aux_at_Parse_internal_39 = VCALL local_a2i_aux_at_Parse_internal_40 length
+	local_a2i_aux_at_Parse_internal_41 = local_a2i_aux_at_Parse_internal_39 - local_a2i_aux_at_Parse_i_5
+	local_a2i_aux_at_Parse_internal_42 = local_a2i_aux_at_Parse_internal_41 - 1
+	ARG s
+	ARG local_a2i_aux_at_Parse_internal_38
+	ARG local_a2i_aux_at_Parse_internal_42
+	local_a2i_aux_at_Parse_internal_44 = TYPEOF s
+	local_a2i_aux_at_Parse_internal_43 = VCALL local_a2i_aux_at_Parse_internal_44 substr
+	SETATTR self rest local_a2i_aux_at_Parse_internal_43
+	local_a2i_aux_at_Parse_i_5 = local_a2i_aux_at_Parse_j_2
+	local_a2i_aux_at_Parse_internal_11 = local_a2i_aux_at_Parse_i_5
+	LABEL a2i_aux_at_Parse_label_4
+	GOTO a2i_aux_at_Parse_label_0
+	LABEL a2i_aux_at_Parse_label_2
+	RETURN local_a2i_aux_at_Parse_int_0
+}
+function __init_g_at_Main {
+	PARAM self
+
+	LOCAL local__init_g_at_Main_internal_0
+	LOCAL local__init_g_at_Main_internal_1
 
 	ARG self
-	local_isNil_at_BookList_internal_2 = TYPEOF self
-	local_isNil_at_BookList_internal_1 = VCALL local_isNil_at_BookList_internal_2 abort
-	RETURN 1
+	local__init_g_at_Main_internal_1 = TYPEOF self
+	local__init_g_at_Main_internal_0 = VCALL local__init_g_at_Main_internal_1 read_input
+	SETATTR self g local__init_g_at_Main_internal_0
+	RETURN 
 }
-function function_cons_at_BookList {
-	PARAM self
-	PARAM hd
-
-	LOCAL local_cons_at_BookList_new_cell_0
-	LOCAL local_cons_at_BookList_internal_1
-	LOCAL local_cons_at_BookList_internal_2
-	LOCAL local_cons_at_BookList_internal_3
-
-	local_cons_at_BookList_internal_1 = ALLOCATE Cons
-	ARG local_cons_at_BookList_internal_1
-	local_cons_at_BookList_internal_1 = CALL __init_Cons_type
-	local_cons_at_BookList_new_cell_0 = local_cons_at_BookList_internal_1
-	ARG local_cons_at_BookList_new_cell_0
-	ARG hd
-	ARG self
-	local_cons_at_BookList_internal_3 = TYPEOF local_cons_at_BookList_new_cell_0
-	local_cons_at_BookList_internal_2 = VCALL local_cons_at_BookList_internal_3 init
-	RETURN local_cons_at_BookList_internal_2
-}
-function function_car_at_BookList {
+function function_main_at_Main {
 	PARAM self
 
-	LOCAL local_car_at_BookList_internal_0
-	LOCAL local_car_at_BookList_internal_1
-	LOCAL local_car_at_BookList_internal_2
-	LOCAL local_car_at_BookList_internal_3
+	LOCAL local_main_at_Main_internal_0
+	LOCAL local_main_at_Main_internal_1
+	LOCAL local_main_at_Main_internal_2
+	LOCAL local_main_at_Main_internal_3
+	LOCAL local_main_at_Main_internal_4
+	LOCAL local_main_at_Main_internal_5
+	LOCAL local_main_at_Main_internal_6
 
-	ARG self
-	local_car_at_BookList_internal_2 = TYPEOF self
-	local_car_at_BookList_internal_1 = VCALL local_car_at_BookList_internal_2 abort
-	local_car_at_BookList_internal_3 = ALLOCATE Book
-	ARG local_car_at_BookList_internal_3
-	local_car_at_BookList_internal_3 = CALL __init_Book_type
-	RETURN local_car_at_BookList_internal_3
-}
-function function_cdr_at_BookList {
-	PARAM self
-
-	LOCAL local_cdr_at_BookList_internal_0
-	LOCAL local_cdr_at_BookList_internal_1
-	LOCAL local_cdr_at_BookList_internal_2
-	LOCAL local_cdr_at_BookList_internal_3
-
-	ARG self
-	local_cdr_at_BookList_internal_2 = TYPEOF self
-	local_cdr_at_BookList_internal_1 = VCALL local_cdr_at_BookList_internal_2 abort
-	local_cdr_at_BookList_internal_3 = ALLOCATE BookList
-	ARG local_cdr_at_BookList_internal_3
-	local_cdr_at_BookList_internal_3 = CALL __init_BookList_type
-	RETURN local_cdr_at_BookList_internal_3
-}
-function function_print_list_at_BookList {
-	PARAM self
-
-	LOCAL local_print_list_at_BookList_internal_0
-	LOCAL local_print_list_at_BookList_internal_1
-
-	ARG self
-	local_print_list_at_BookList_internal_1 = TYPEOF self
-	local_print_list_at_BookList_internal_0 = VCALL local_print_list_at_BookList_internal_1 abort
-	RETURN local_print_list_at_BookList_internal_0
-}
-function function_isNil_at_Nil {
-	PARAM self
-
-	
-
-	RETURN 1
-}
-function function_print_list_at_Nil {
-	PARAM self
-
-	
-
-	RETURN 1
+	local_main_at_Main_internal_1 = GETATTR self g
+	ARG local_main_at_Main_internal_1
+	local_main_at_Main_internal_3 = TYPEOF local_main_at_Main_internal_1
+	local_main_at_Main_internal_2 = VCALL local_main_at_Main_internal_3 print_V
+	local_main_at_Main_internal_4 = GETATTR self g
+	ARG local_main_at_Main_internal_4
+	local_main_at_Main_internal_6 = TYPEOF local_main_at_Main_internal_4
+	local_main_at_Main_internal_5 = VCALL local_main_at_Main_internal_6 print_E
+	RETURN local_main_at_Main_internal_5
 }
 function function_abort_at_Object {
 	PARAM self
@@ -724,12 +1597,16 @@ function function_abort_at_Object {
 	LOCAL local_abort_at_Object_internal_1
 	LOCAL local_abort_at_Object_internal_2
 	LOCAL local_abort_at_Object_internal_3
+	LOCAL local_abort_at_Object_internal_4
+	LOCAL local_abort_at_Object_internal_5
 
 	local_abort_at_Object_internal_0 = TYPEOF self
 	local_abort_at_Object_internal_1 = TYPENAME local_abort_at_Object_internal_0
-	local_abort_at_Object_internal_2 = LOAD data_11
-	local_abort_at_Object_internal_3 = CONCAT local_abort_at_Object_internal_2 local_abort_at_Object_internal_1
-	PRINT local_abort_at_Object_internal_3
+	local_abort_at_Object_internal_2 = LOAD data_15
+	local_abort_at_Object_internal_3 = LOAD data_16
+	local_abort_at_Object_internal_4 = CONCAT local_abort_at_Object_internal_2 local_abort_at_Object_internal_1
+	local_abort_at_Object_internal_5 = CONCAT local_abort_at_Object_internal_4 local_abort_at_Object_internal_3
+	PRINT local_abort_at_Object_internal_5
 	ABORT
 	RETURN 0
 }
@@ -750,82 +1627,35 @@ function function_copy_at_Object {
 	local_copy_at_Object_internal_0 = COPY self
 	RETURN local_copy_at_Object_internal_0
 }
-function __init_books_at_Main {
+function function_and_at_BoolOp {
 	PARAM self
+	PARAM b1
+	PARAM b2
 
-	LOCAL local__init_books_at_Main_internal_0
+	LOCAL local_and_at_BoolOp_internal_0
 
-	local__init_books_at_Main_internal_0 = VOID
-	SETATTR self books local__init_books_at_Main_internal_0
-	RETURN 
+	IF b1 GOTO and_at_BoolOp_label_0
+	local_and_at_BoolOp_internal_0 = 0
+	GOTO and_at_BoolOp_label_1
+	LABEL and_at_BoolOp_label_0
+	local_and_at_BoolOp_internal_0 = b2
+	LABEL and_at_BoolOp_label_1
+	RETURN local_and_at_BoolOp_internal_0
 }
-function function_main_at_Main {
+function function_or_at_BoolOp {
 	PARAM self
+	PARAM b1
+	PARAM b2
 
-	LOCAL local_main_at_Main_a_book_0
-	LOCAL local_main_at_Main_internal_1
-	LOCAL local_main_at_Main_internal_2
-	LOCAL local_main_at_Main_internal_3
-	LOCAL local_main_at_Main_internal_4
-	LOCAL local_main_at_Main_internal_5
-	LOCAL local_main_at_Main_an_article_6
-	LOCAL local_main_at_Main_internal_7
-	LOCAL local_main_at_Main_internal_8
-	LOCAL local_main_at_Main_internal_9
-	LOCAL local_main_at_Main_internal_10
-	LOCAL local_main_at_Main_internal_11
-	LOCAL local_main_at_Main_internal_12
-	LOCAL local_main_at_Main_internal_13
-	LOCAL local_main_at_Main_internal_14
-	LOCAL local_main_at_Main_internal_15
-	LOCAL local_main_at_Main_internal_16
-	LOCAL local_main_at_Main_internal_17
-	LOCAL local_main_at_Main_internal_18
-	LOCAL local_main_at_Main_internal_19
-	LOCAL local_main_at_Main_internal_20
-	LOCAL local_main_at_Main_internal_21
+	LOCAL local_or_at_BoolOp_internal_0
 
-	local_main_at_Main_internal_1 = ALLOCATE Book
-	ARG local_main_at_Main_internal_1
-	local_main_at_Main_internal_1 = CALL __init_Book_type
-	local_main_at_Main_internal_2 = LOAD data_23
-	local_main_at_Main_internal_3 = LOAD data_24
-	ARG local_main_at_Main_internal_1
-	ARG local_main_at_Main_internal_2
-	ARG local_main_at_Main_internal_3
-	local_main_at_Main_internal_5 = TYPEOF local_main_at_Main_internal_1
-	local_main_at_Main_internal_4 = VCALL local_main_at_Main_internal_5 initBook
-	local_main_at_Main_a_book_0 = local_main_at_Main_internal_4
-	local_main_at_Main_internal_7 = ALLOCATE Article
-	ARG local_main_at_Main_internal_7
-	local_main_at_Main_internal_7 = CALL __init_Article_type
-	local_main_at_Main_internal_8 = LOAD data_25
-	local_main_at_Main_internal_9 = LOAD data_26
-	local_main_at_Main_internal_10 = LOAD data_27
-	ARG local_main_at_Main_internal_7
-	ARG local_main_at_Main_internal_8
-	ARG local_main_at_Main_internal_9
-	ARG local_main_at_Main_internal_10
-	local_main_at_Main_internal_12 = TYPEOF local_main_at_Main_internal_7
-	local_main_at_Main_internal_11 = VCALL local_main_at_Main_internal_12 initArticle
-	local_main_at_Main_an_article_6 = local_main_at_Main_internal_11
-	local_main_at_Main_internal_14 = ALLOCATE Nil
-	ARG local_main_at_Main_internal_14
-	local_main_at_Main_internal_14 = CALL __init_Nil_type
-	ARG local_main_at_Main_internal_14
-	ARG local_main_at_Main_a_book_0
-	local_main_at_Main_internal_16 = TYPEOF local_main_at_Main_internal_14
-	local_main_at_Main_internal_15 = VCALL local_main_at_Main_internal_16 cons
-	ARG local_main_at_Main_internal_15
-	ARG local_main_at_Main_an_article_6
-	local_main_at_Main_internal_18 = TYPEOF local_main_at_Main_internal_15
-	local_main_at_Main_internal_17 = VCALL local_main_at_Main_internal_18 cons
-	SETATTR self books local_main_at_Main_internal_17
-	local_main_at_Main_internal_19 = GETATTR self books
-	ARG local_main_at_Main_internal_19
-	local_main_at_Main_internal_21 = TYPEOF local_main_at_Main_internal_19
-	local_main_at_Main_internal_20 = VCALL local_main_at_Main_internal_21 print_list
-	RETURN local_main_at_Main_internal_20
+	IF b1 GOTO or_at_BoolOp_label_0
+	local_or_at_BoolOp_internal_0 = b2
+	GOTO or_at_BoolOp_label_1
+	LABEL or_at_BoolOp_label_0
+	local_or_at_BoolOp_internal_0 = 1
+	LABEL or_at_BoolOp_label_1
+	RETURN local_or_at_BoolOp_internal_0
 }
 function __init_Object_type {
 	PARAM self
@@ -875,66 +1705,115 @@ function __init_IO_type {
 	
 	RETURN self
 }
-function __init_Book_type {
+function __init_Graph_type {
 	PARAM self
 
-	LOCAL local__init_Book_type_internal_0
-	LOCAL local__init_Book_type_internal_1
+	LOCAL local__init_Graph_type_internal_0
+	LOCAL local__init_Graph_type_internal_1
+
+	ARG self
+	self = CALL __init_Object_type
+	
+	ARG self
+	local__init_Graph_type_internal_0 = CALL __init_vertices_at_Graph
+	ARG self
+	local__init_Graph_type_internal_1 = CALL __init_edges_at_Graph
+	RETURN self
+}
+function __init_Vertice_type {
+	PARAM self
+
+	LOCAL local__init_Vertice_type_internal_0
+	LOCAL local__init_Vertice_type_internal_1
 
 	ARG self
 	self = CALL __init_IO_type
 	
 	ARG self
-	local__init_Book_type_internal_0 = CALL __init_title_at_Book
+	local__init_Vertice_type_internal_0 = CALL __init_num_at_Vertice
 	ARG self
-	local__init_Book_type_internal_1 = CALL __init_author_at_Book
+	local__init_Vertice_type_internal_1 = CALL __init_out_at_Vertice
 	RETURN self
 }
-function __init_Article_type {
+function __init_Edge_type {
 	PARAM self
 
-	LOCAL local__init_Article_type_internal_0
-
-	ARG self
-	self = CALL __init_Book_type
-	
-	ARG self
-	local__init_Article_type_internal_0 = CALL __init_per_title_at_Article
-	RETURN self
-}
-function __init_BookList_type {
-	PARAM self
-
-	
+	LOCAL local__init_Edge_type_internal_0
+	LOCAL local__init_Edge_type_internal_1
+	LOCAL local__init_Edge_type_internal_2
 
 	ARG self
 	self = CALL __init_IO_type
 	
+	ARG self
+	local__init_Edge_type_internal_0 = CALL __init_from_at_Edge
+	ARG self
+	local__init_Edge_type_internal_1 = CALL __init_to_at_Edge
+	ARG self
+	local__init_Edge_type_internal_2 = CALL __init_weight_at_Edge
 	RETURN self
 }
-function __init_Cons_type {
+function __init_EList_type {
 	PARAM self
 
-	LOCAL local__init_Cons_type_internal_0
-	LOCAL local__init_Cons_type_internal_1
+	LOCAL local__init_EList_type_internal_0
 
 	ARG self
-	self = CALL __init_BookList_type
+	self = CALL __init_IO_type
 	
 	ARG self
-	local__init_Cons_type_internal_0 = CALL __init_xcar_at_Cons
-	ARG self
-	local__init_Cons_type_internal_1 = CALL __init_xcdr_at_Cons
+	local__init_EList_type_internal_0 = CALL __init_car_at_EList
 	RETURN self
 }
-function __init_Nil_type {
+function __init_ECons_type {
 	PARAM self
 
-	
+	LOCAL local__init_ECons_type_internal_0
 
 	ARG self
-	self = CALL __init_BookList_type
+	self = CALL __init_EList_type
 	
+	ARG self
+	local__init_ECons_type_internal_0 = CALL __init_cdr_at_ECons
+	RETURN self
+}
+function __init_VList_type {
+	PARAM self
+
+	LOCAL local__init_VList_type_internal_0
+
+	ARG self
+	self = CALL __init_IO_type
+	
+	ARG self
+	local__init_VList_type_internal_0 = CALL __init_car_at_VList
+	RETURN self
+}
+function __init_VCons_type {
+	PARAM self
+
+	LOCAL local__init_VCons_type_internal_0
+
+	ARG self
+	self = CALL __init_VList_type
+	
+	ARG self
+	local__init_VCons_type_internal_0 = CALL __init_cdr_at_VCons
+	RETURN self
+}
+function __init_Parse_type {
+	PARAM self
+
+	LOCAL local__init_Parse_type_internal_0
+	LOCAL local__init_Parse_type_internal_1
+
+	ARG self
+	self = CALL __init_IO_type
+	
+	ARG self
+	local__init_Parse_type_internal_0 = CALL __init_boolop_at_Parse
+	ARG self
+	local__init_Parse_type_internal_1 = CALL __init_rest_at_Parse
 	RETURN self
 }
 function __init_Main_type {
@@ -943,9 +1822,19 @@ function __init_Main_type {
 	LOCAL local__init_Main_type_internal_0
 
 	ARG self
-	self = CALL __init_Object_type
+	self = CALL __init_Parse_type
 	
 	ARG self
-	local__init_Main_type_internal_0 = CALL __init_books_at_Main
+	local__init_Main_type_internal_0 = CALL __init_g_at_Main
+	RETURN self
+}
+function __init_BoolOp_type {
+	PARAM self
+
+	
+
+	ARG self
+	self = CALL __init_Object_type
+	
 	RETURN self
 }

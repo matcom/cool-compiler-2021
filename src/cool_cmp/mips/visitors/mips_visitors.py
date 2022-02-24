@@ -566,6 +566,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(LoadWordNode(Reg.t(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
         start_loop = "__remove_last_char_start"
         end_loop = "__remove_last_char_end"
+        return_label = "__remove_last_char_return"
+
+        self.add_instruction(LoadByteNode(Reg.t(1), 0, Reg.t(0), comment="Get current char"))
+        self.add_instruction(BranchEqualNode(Reg.t(1), Reg.zero(), return_label, comment="if char is null then return"))
 
         self.add_instruction(LabelNode(start_loop, comment="Initial loop"))
         self.add_instruction(LoadByteNode(Reg.t(1), 0, Reg.t(0), comment="Get current char"))
@@ -577,6 +581,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), -1, comment="Back one char to last one"))
         self.add_instruction(StoreByteNode(Reg.zero(), 0, Reg.t(0), comment="Store null character"))
 
+        self.add_instruction(LabelNode(return_label, comment="Return, removing last char"))
         self.add_instruction(JumpRegisterNode(Reg.ra()))
 
     def _add_string_equal_function(self, row=None, column=None, comment=None):
