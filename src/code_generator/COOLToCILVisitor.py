@@ -289,11 +289,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if not node.expr is None:
             expr_value = self.visit(node.expr, scope)
             let_var = self.define_internal_local(
-                scope=scope, name=node.name, cool_var_name=node.name)
+                scope=scope, name=node.id, cool_var=node.id)
             self.register_instruction(cil.AssignNode(let_var, expr_value))
         else:
             let_var = self.define_internal_local(
-                scope=scope, name=node.name, cool_var_name=node.name)
+                scope=scope, name=node.id, cool_var=node.id)
             self.register_instruction(cil.AssignNode(let_var, instance))
 
         return let_var
@@ -383,7 +383,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.GetAttrNode(
             right_local, right_value, "value", node.rvalue.computed_type.name))
 
-        self.register_instruction(cil.BinaryOperator(
+        self.register_instruction(cil.BinaryOperationNode(
             op_local, left_local, right_local, "-"))
 
         # Allocate Int result
@@ -411,7 +411,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.GetAttrNode(
             right_local, right_value, "value", node.rvalue.computed_type.name))
 
-        self.register_instruction(cil.BinaryOperator(
+        self.register_instruction(cil.BinaryOperationNode(
             op_local, left_local, right_local, "*"))
 
         # Allocate Int result
@@ -439,7 +439,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.GetAttrNode(
             right_local, right_value, "value", node.rvalue.computed_type.name))
 
-        self.register_instruction(cil.BinaryOperator(
+        self.register_instruction(cil.BinaryOperationNode(
             op_local, left_local, right_local, "/"))
 
         # Allocate Int result

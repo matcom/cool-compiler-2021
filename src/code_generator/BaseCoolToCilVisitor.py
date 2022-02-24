@@ -13,6 +13,8 @@ class BaseCOOLToCILVisitor:
         self.context = context
         self.context.set_type_tags()
         self.context.set_type_max_tags()
+        self.label_count = 0
+
 
     @property
     def params(self):
@@ -31,6 +33,10 @@ class BaseCOOLToCILVisitor:
             if p.name == name:
                 return True
         return False
+
+    def get_label(self):
+        self.label_count += 1
+        return f'label_{self.label_count}'
 
     def register_param(self, vinfo):
         # 'param_{self.current_function.name[9:]}_{vinfo.name}_{len(self.params)}'

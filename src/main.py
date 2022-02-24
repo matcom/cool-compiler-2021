@@ -19,7 +19,6 @@ def main(_input, _output):
     # Lexer
     lexer = CoolLexer()
     tokens = lexer.run(text)
-    
 
     # Parser
     parser = CoolParser(lexer)
@@ -54,7 +53,7 @@ def main(_input, _output):
     # if semanticErrors:
     #     for error in semanticErrors:
     #         print(error)
-    
+
     typeChecker = TypeChecker(context, semanticErrors)
     typeChecker.visit(ast, scope)
 
@@ -72,15 +71,13 @@ def main(_input, _output):
 
     with open(_output, 'w+') as f:
         f.write(mips_code)
-    
 
     # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":
 
-    in_path = '/mnt/c/Users/Liviton/Desktop/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/codegen/print-cool.cl'
+    in_path = '/mnt/c/Users/Liviton/Desktop/Complementos de Compilacion/cool-compiler/cool-compiler-2021/tests/codegen/fib.cl'
     out_path = '/mnt/c/Users/Liviton/Desktop/Complementos de Compilacion/cool-compiler/cool-compiler-2021/src/codeMips.mips'
     _input = sys.argv[1] if len(sys.argv) > 1 else in_path
     _output = sys.argv[2] if len(sys.argv) > 2 else out_path
 
     main(_input, _output)
-
