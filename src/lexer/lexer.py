@@ -131,7 +131,7 @@ class CoolLexer:
         self.errors.append(LexicographicError(
             'EOF in string constant', t.lineno, t.column))
 
-    t_ignore = '  \t\f\r\t\v'
+    t_ignore = '  \t\f\r\v'
 
     def compute_column(self, t):
         t.column = t.lexpos - t.lexer.linestart + 1
