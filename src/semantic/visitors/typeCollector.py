@@ -23,10 +23,10 @@ class TypeCollector(object):
         self.context.types['SELF_TYPE'] = SelfType()
         self.context.types['IO'] = IOType()
 
-        # self.context.types['IO'].set_parent(self.context.types['Object'])
-        # self.context.types['String'].set_parent(self.context.types['Object'])
-        # self.context.types['Int'].set_parent(self.context.types['Object'])
-        # self.context.types['Bool'].set_parent(self.context.types['Object'])
+        self.context.types['IO'].set_parent(self.context.types['Object'])
+        self.context.types['String'].set_parent(self.context.types['Object'])
+        self.context.types['Int'].set_parent(self.context.types['Object'])
+        self.context.types['Bool'].set_parent(self.context.types['Object'])
 
         for classDeclarationNode in programNode.declarations:
             self.visit(classDeclarationNode)

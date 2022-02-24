@@ -1,3 +1,4 @@
+from cgi import print_directory
 from semantic.semantic import AutoType, BoolType, ErrorType, IntType, MethodError, ObjectType, StringType, VariableInfo, VoidType
 from utils.errors import AttributexError, SemanticError, TypexError
 from utils import visitor
@@ -205,7 +206,6 @@ class TypeChecker:
                     errorText = f'In call of method {method.name}, type {argType.name} of parameter {paramName} does not conform to declared type {paramType.name}.'
                     self.errors.append(TypexError(
                         errorText, memberCallNode.line, memberCallNode.col))
-
 
         memberCallNode.static_type = typex
         memberCallNode.computed_type = get_type(method.return_type, typex)
@@ -456,6 +456,8 @@ class TypeChecker:
         try:
             return typex.get_method(name, pos)
         except SemanticError:
+            print(self.context)
+            print(typex.parent)
             if type(typex) != ErrorType and type(typex) != AutoType:
                 errorText = f'Dispatch to undefined method {name}.'
                 self.errors.append(AttributexError(errorText, *pos))
