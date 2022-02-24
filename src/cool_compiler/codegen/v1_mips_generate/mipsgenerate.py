@@ -379,13 +379,7 @@ class MipsGenerate:
                 ASTR.Comment("Salta para Contain"),
                 ASTR.SW ('$s0',f'{stack_plus_memory_dir}($sp)'),
                 ASTR.Comment(f"Guarda en la pos {stack_plus_memory_dir}($sp) el contenido de $s0")
-
-
-
-                
-
-               ]
-
+          ]
 
     @ visitor.when(AST.GoTo)
     def visit(self,node:AST.GoTo):
