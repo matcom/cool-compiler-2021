@@ -334,7 +334,6 @@ loop:
     add $s2,$s2,4
     j loop
     
-
 Equal:
 li $s0 , 1
 jr $ra
@@ -362,6 +361,7 @@ class Length:
 
     END:
         move $s0 , $t0
+        addi $sp, $sp, 4
         jr $ra
 
 """
@@ -396,14 +396,14 @@ class Concat:
 
     ENDConcat:
         move $s0, $v0
+        addi $sp, $sp, 8
         jr $ra
 """
 
 class SubStr:
     def __str__(self) -> str:
-       return """ 
-       
-       Substring:
+       return """        
+Substring:
     li $t0 ,0 
     find_index:
         beq			$t0, $s1, find_length	# if $t0 == $t1 then target
@@ -422,6 +422,7 @@ class SubStr:
         j find_length
         
     END_Substring:
+        addi $sp, $sp, 12
         jr $ra  
 """
 ################################# Native Func Obj ################################################
