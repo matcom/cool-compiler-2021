@@ -114,7 +114,7 @@ class Type:
         return method
 
     def has_attr(self, name: str):
-        try: 
+        try:
             attr_name = self.get_attribute(name)
         except:
             return False
@@ -211,7 +211,7 @@ class BoolType(Type):
         self.methods = {}
         self.parent = None
         self.pos = pos
-        # self.init_methods()
+        self.init_methods()
 
     def init_methods(self):
         self.define_method('abort', [], [], self)
@@ -250,7 +250,7 @@ class IntType(Type):
         self.methods = {}
         self.parent = None
         self.pos = pos
-        # self.init_methods()
+        self.init_methods()
 
     def init_methods(self):
         self.define_method('abort', [], [], self)
@@ -377,7 +377,7 @@ class Context:
             self.graph[parentName] = [name]
         return typex
 
-    def get_type(self, name: str, pos = None):
+    def get_type(self, name: str, pos=None):
         try:
             return self.types[name]
         except KeyError:

@@ -41,8 +41,8 @@ def main(_input, _output):
     typeBuilder.visit(ast)
 
     # print("CONTEXT")
-    # print(context)
     # print("TYPE Builder")
+    # print(context)
     # if semanticErrors:
     #     for error in semanticErrors:
     #         print(error)
@@ -50,12 +50,15 @@ def main(_input, _output):
     varCollector = VarCollector(context, semanticErrors)
     scope = varCollector.visit(ast)
     # print("Var Collector")
+    # print(context)
     # if semanticErrors:
     #     for error in semanticErrors:
     #         print(error)
 
     typeChecker = TypeChecker(context, semanticErrors)
     typeChecker.visit(ast, scope)
+    # print("Type Checker")
+    # print(context)
 
     if semanticErrors:
         for error in semanticErrors:
@@ -71,6 +74,7 @@ def main(_input, _output):
 
     with open(_output, 'w+') as f:
         f.write(mips_code)
+
 
     # ast, errors, context, scope = SemanticAn
 if __name__ == "__main__":

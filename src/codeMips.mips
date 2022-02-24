@@ -14,9 +14,9 @@ Object_methods:
 .word Object.copy
 Int_name: .asciiz "Int"
 Int_methods:
-.word Object.abort
-.word Object.type_name
-.word Object.copy
+.word Int.abort
+.word Int.type_name
+.word Int.copy
 String_name: .asciiz "String"
 String_methods:
 .word String.abort
@@ -27,9 +27,9 @@ String_methods:
 .word String.substr
 Bool_name: .asciiz "Bool"
 Bool_methods:
-.word Object.abort
-.word Object.type_name
-.word Object.copy
+.word Bool.abort
+.word Bool.type_name
+.word Bool.copy
 IO_name: .asciiz "IO"
 IO_methods:
 .word Object.abort
