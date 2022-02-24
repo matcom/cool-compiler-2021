@@ -35,15 +35,19 @@ class ProgramNode(Node):
 
 
 class TypeNode(Node):
-    def __init__(self, name: str, attrs: list[str], methods: dict[str, str]):
+    def __init__(self,
+                 name: str,
+                 attrs: list[str],
+                 methods: dict[str, str],
+                 attr_expr_nodes: dict[str, ast.ExpressionNode] = None):
         self.name = name
         self.attributes = attrs
         self.methods = methods
-        self.attr_expr_nodes: dict[str, ast.ExpressionNode] = {}
+        self.attr_expr_nodes = attr_expr_nodes or {}
 
     # Add the expression node of the attributes, so when is created an instance
     #   get quick access to the instructions of the attribute initialization.
-    def add_attr_node(self, attr: str, node: ast.ExpressionNode):
+    def add_attr_node(self, attr: str, node: ast.ExpressionNode | int | str):
         self.attr_expr_nodes[attr] = node
 
     def get_attr_node(self, attr: str):

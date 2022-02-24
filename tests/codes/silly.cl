@@ -6,6 +6,7 @@ class Main {
 };
 
 class Silly {
+    a: Int <- 10;
     copy() : SELF_TYPE {
         self
     };

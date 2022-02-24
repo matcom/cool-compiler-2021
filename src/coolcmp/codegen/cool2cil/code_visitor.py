@@ -23,9 +23,9 @@ class DotCodeVisitor(CILVisitor):
         name = f'_{name}_{self.label_count}'
         return cil.LabelNode(name)
 
-    def add_function(self, name: str = None):
-        if name is None:
-            name = f'f{self.next_function_id}'
+    def add_function(self, name: str):
+        # if name is None:
+        #     name = f'f{self.next_function_id}'
         self.current_function = cil.FunctionNode(name, [], [], [])
         self.code.append(self.current_function)
 
@@ -81,6 +81,29 @@ class DotCodeVisitor(CILVisitor):
         # TODO: add missing instructions
         self.code += [
             cil.FunctionNode(
+                name='abort',
+                params=[
+                    cil.ParamNode('self'),
+                ],
+                local_vars=[],
+                instructions=[
+                    cil.ReturnNode(),
+                ]
+            ),
+            # cil.FunctionNode(
+            #     name='type_name',
+            #     params=[
+            #         cil.ParamNode('self'),
+            #     ],
+            #     local_vars=[
+            #         cil.LocalNode('name'),
+            #     ],
+            #     instructions=[
+            #         cil.LoadNode('name', )
+            #         cil.ReturnNode(),
+            #     ]
+            # ),
+            cil.FunctionNode(
                 name='out_string',
                 params=[
                     cil.ParamNode('self'),
@@ -119,8 +142,10 @@ class DotCodeVisitor(CILVisitor):
     @visitor.when(ast.FuncDeclarationNode)
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
         print('>>> method', node.id)
-        self.add_function()
+        self.add_function(f'f{self.current_type}_{node.id}')
 
+        local_name = self.add_local(f'_name', internal=False)
+        self.add_inst(cil.GetAttrNode(local_name, 'self', f'{self.current_type}__name'))
         for local in scope.all_locals():
             if local.is_param:
                 self.add_param(local.name)
@@ -260,24 +285,67 @@ class DotCodeVisitor(CILVisitor):
         return call_res
 
     @visitor.when(ast.InstantiateNode)
-    def visit(self, node: ast.StringNode, scope: Scope):
+    def visit(self, node: ast.InstantiateNode, scope: Scope):
+        print('>>> instantiate node', node.lex)
         instance = self.add_local('instance')
         self.add_inst(cil.AllocateNode(node.lex, instance))
         type_node = self.root.get_type(node.lex)
+        def f(a):
+            try:
+                return a.lex
+            except AttributeError:
+                return 'error'
+        print([a for a in type_node.attributes])
+        print([(x, f(y)) for (x, y) in type_node.attr_expr_nodes.items()])
+
         for attr in type_node.attributes:
             attr_expr = type_node.get_attr_node(attr)
             attr_dest = self.visit(attr_expr, scope)
+            print('attr_dest =', attr_dest)
             self.add_inst(cil.SetAttrNode(instance, attr, attr_dest))
+        for method, function in type_node.methods.items():
+            self.add_inst(cil.SetAttrNode(instance, method, function))
         return instance
 
     @visitor.when(ast.StringNode)
-    def visit(self, node: ast.StringNode, _):
-        dest = self.add_local('string')
-        self.add_inst(cil.LoadNode(dest, self.root.get_data_name(node.lex)))
-        return dest
+    def visit(self, node: ast.StringNode, scope: Scope):
+        print('>>> string node', node.lex)
+        str_instance = self.add_local('str_instance')
+        self.add_inst(cil.AllocateNode('String', str_instance))
+        type_node = self.root.get_type('String')
+        for attr in type_node.attributes:
+            attr_dest = self.visit(node.lex, scope)
+            self.add_inst(cil.SetAttrNode(str_instance, attr, attr_dest))
+        for method, function in type_node.methods.items():
+            self.add_inst(cil.SetAttrNode(str_instance, method, function))
+        return str_instance
 
-    @visitor.when(ast.AtomicNode)
-    def visit(self, node: ast.AtomicNode, _):
+    @visitor.when(ast.IntegerNode)
+    def visit(self, node: ast.IntegerNode, scope: Scope):
+        int_instance = self.add_local('int_instance')
+        self.add_inst(cil.AllocateNode('Int', int_instance))
+        type_node = self.root.get_type('Int')
+        for attr in type_node.attributes:
+            attr_dest = self.visit(int(node.lex), scope)
+            self.add_inst(cil.SetAttrNode(int_instance, attr, attr_dest))
+        for method, function in type_node.methods.items():
+            self.add_inst(cil.SetAttrNode(int_instance, method, function))
+        return int_instance
+
+    @visitor.when(ast.BooleanNode)
+    def visit(self, node: ast.BooleanNode, scope: Scope):
+        bool_instance = self.add_local('bool_instance')
+        self.add_inst(cil.AllocateNode('Bool', bool_instance))
+        type_node = self.root.get_type('Bool')
+        for attr in type_node.attributes:
+            attr_dest = self.visit(node.lex == 'true', scope)
+            self.add_inst(cil.SetAttrNode(bool_instance, attr, attr_dest))
+        for method, function in type_node.methods.items():
+            self.add_inst(cil.SetAttrNode(bool_instance, method, function))
+        return bool_instance
+
+    @visitor.when(ast.VariableNode)
+    def visit(self, node: ast.VariableNode, _):
         return node.lex
 
     @visitor.when(ast.PlusNode)
@@ -341,6 +409,20 @@ class DotCodeVisitor(CILVisitor):
         expr_res = self.visit(node.expr, scope)
         self.add_inst(cil.ComplementNode(com_res, expr_res))
         return com_res
+
+    @visitor.when(str)
+    def visit(self, lex: str, _):
+        str_dest = self.add_local('str_dest')
+        self.add_inst(cil.LoadNode(str_dest, self.root.get_data_name(lex)))
+        return str_dest
+
+    @visitor.when(bool)
+    def visit(self, bool_value: bool, _):
+        return int(bool_value)
+
+    @visitor.when(int)
+    def visit(self, value: int, _):
+        return value
 
     def build_arithmetic_node(self, new_node_cls, node: ast.BinaryNode, scope: Scope):
         left_dest = self.visit(node.left, scope)
