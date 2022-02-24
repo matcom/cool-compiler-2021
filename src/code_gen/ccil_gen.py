@@ -102,10 +102,15 @@ class CCILGenerator:
 
         # Explore all functions
         self.reset_scope()
-        self.ccil_cool_names.add_new_names((a.id, a.type) for a in attributes)
-        class_code: List[FunctionNode] = [self.visit(x) for x in func_nodes]
-        # Store the functions inside the class
-        methods: List[Method] = [Method("some id", x) for x in class_code]
+        self.ccil_cool_names.add_new_names(
+            (n.id, a.id) for (n, a) in zip(attr_nodes, attributes)
+        )
+        class_code: List[FunctionNode] = []
+        methods: List[Method] = []
+        for func in func_nodes:
+            f = self.visit(func)
+            class_code.append(f)
+            methods.append(Method(func.id, f))
 
         return (Class(attributes, methods, init_func), class_code)
 
@@ -130,11 +135,15 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.MethodDeclarationNode)
     def visit(self, node: sem_ast.MethodDeclarationNode) -> METHOD_VISITOR_RESULT:
+        times = self.times(node)
         self.ccil_cool_names = self.ccil_cool_names.create_child()
-        params: List[Parameter] = [
-            Parameter("self", self.current_type),
-            *(Parameter(param.id, param.type.name) for param in node.params),
-        ]
+
+        params: List[Parameter] = [Parameter("self", self.current_type)]
+        self.ccil_cool_names.add_new_name_pair("self", "self")
+        for param in node.params:
+            new_param_id = PARAM + param.id
+            params.append(Parameter(new_param_id, param.type.name))
+            self.ccil_cool_names.add_new_name_pair(param.id, new_param_id)
 
         self.locals = dict()
         (operations, fval_id) = self.visit(node.body)
@@ -571,9 +580,6 @@ class CCILGenerator:
     def create_int(self, node, idx: str, value: str):
         self.add_local(idx, INT)
         return StorageNode(node, idx, IntNode(node, value))
-
-    def extract_id(self, node, storage_node: StorageNode) -> IdNode:
-        return IdNode(node, storage_node.id)
 
     def update_locals(self, old_id: str, new_id: str):
         self.locals[new_id] = self.locals[old_id]
