@@ -1,7 +1,7 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import Tuple, List, Dict
+from typing import IO, Tuple, List, Dict
 from code_gen.tools import *
 
 from constants import *
@@ -16,7 +16,13 @@ METHOD_VISITOR_RESULT = FunctionNode
 # The result of (type of) what is it
 # How to handle void nodes
 
-# Define abort nodes with a text
+# Define abort nodes with a text:
+# * Dispacth on a void class
+# * No pattern match in case
+# * Division by zero
+# * Substring out of range
+# * Heap Overflow (don't know yet how to handle this)
+
 # Add text dynamically .data function, incluiding error messages
 
 # Test there are no runtimes errors
@@ -63,6 +69,7 @@ class CCILGenerator:
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
         self.current_type = node.id
+        self.add_data(f"class_{node.id}", node.id)
 
         attr_nodes = []
         func_nodes = []
@@ -517,18 +524,16 @@ class CCILGenerator:
 
     def create_call(
         self,
-        node,
         storage_idx: str,
         type_idx: str,
         method_idx: str,
         args: List[StorageNode],
     ):
         self.add_local(storage_idx, type_idx)
-        return StorageNode(node, storage_idx, CallOpNode(node, method_idx, args))
+        return StorageNode(storage_idx, CallOpNode(method_idx, args))
 
     def create_vcall(
         self,
-        node,
         storage_idx: str,
         type_idx: str,
         method_idx: str,
@@ -536,47 +541,223 @@ class CCILGenerator:
         args: List[StorageNode],
     ):
         self.add_local(storage_idx, type_idx)
-        return StorageNode(
-            node, storage_idx, VCallOpNode(node, method_idx, method_type_idx, args)
+        return StorageNode(storage_idx, VCallOpNode(method_idx, method_type_idx, args))
+
+    def define_built_ins(self):
+        self.reset_scope()
+        self.reset_locals()
+        params = self.init_func_params(OBJECT)
+        abort_msg = self.add_data("abort_msg", "Execution aborted")
+        load = self.create_string_load_data("abort_temp", abort_msg.id)
+        [print, abort] = self.notifiy_and_abort(load.id)
+        abort_func = FunctionNode(
+            "abort", params, to_vars(self.locals), [load, print, abort], "self"
+        )
+        self.reset_locals()
+        params = self.init_func_params(OBJECT)
+        get_name = self.create_current_type_name("get_name")
+        type_name_func = FunctionNode(
+            "type_name", params, self.locals, [get_name], get_name.id
+        )
+        self.reset_locals()
+        params = self.init_func_params(OBJECT)
+        new_instance = self.create_new_type("copy", SELFTYPE)
+        copy_func = FunctionNode(
+            "copy", params, to_vars(self.locals), [new_instance], new_instance.id
+        )
+        object_class = Class(
+            OBJECT,
+            [],
+            [
+                Method("abort", abort_func),
+                Method("type_name", type_name_func),
+                Method("copy", copy_func),
+            ],
         )
 
-    def create_assignation(self, node, idx: str, type_idx: str, target: str):
-        self.add_local(idx, type_idx)
-        return StorageNode(node, idx, IdNode(node, target))
+        self.reset_scope()
+        self.reset_locals()
+        params = self.init_func_params(IO)
+        str_input = Parameter("x", STRING)
+        params.append(str_input)
+        print = PrintOpNode(str_input.id)
+        out_string_func = FunctionNode(
+            "out_string", params, to_vars(self.locals), [print], "self"
+        )
+        self.reset_locals()
+        params = self.init_func_params(IO)
+        int_input = Parameter("x", INT)
+        params.append(int_input)
+        int_to_str = self.create_int_to_str("int_to_str", int_input.id)
+        print = PrintOpNode(int_to_str.id)
+        out_int_func = FunctionNode(
+            "out_int", params, to_vars(self.locals), [int_to_str, print], "self"
+        )
+        self.reset_locals()
+        params = self.init_func_params(IO)
+        read = self.create_read_str("read_str")
+        in_string_func = FunctionNode("in_string", params, self.locals, [read], read.id)
+        self.reset_locals()
+        params = self.init_func_params(IO)
+        read = self.create_read_int("read_int")
+        in_int_func = FunctionNode("in_int", params, self.locals, [read], read.id)
+        io_class = Class(
+            IO,
+            [],
+            [
+                Method("out_string", out_string_func),
+                Method("out_int", out_int_func),
+                Method("in_string", in_string_func),
+                Method("in_int", in_int_func),
+            ],
+        )
 
-    def create_uninitialized_storage(self, node, idx: str, type_idx: str):
-        self.add_local(idx, type_idx)
-        return StorageNode(node, idx, VoidNode(node))
+        self.reset_scope()
+        self.reset_locals()
+        params = self.init_func_params(STRING)
+        length = self.create_length("lenght_var", "self")
+        lenght_func = FunctionNode("length", params, self.locals, [length], length.id)
+        self.reset_locals()
+        params = self.init_func_params(STRING)
+        input_s = Parameter("s", STRING)
+        params.append(input_s)
+        concat = self.create_storage(
+            "concat_var", STRING, ConcatOpNode("self", input_s.id)
+        )
+        concat_func = FunctionNode("concat", params, self.locals, [concat], concat.id)
+        self.reset_locals()
+        params = self.init_func_params(STRING)
+        start_index = Parameter("s", INT)
+        take = Parameter("l", INT)
+        params += [start_index, take]
+        length = self.create_length("length_var", "self")
+        max_take = self.create_storage(
+            "max_take", INT, SumOpNode(IdNode(start_index.id), IdNode(take.id))
+        )
+        upper_bound = self.create_storage(
+            "upper_bound", LessOpNode(extract_id(length), extract_id(max_take))
+        )
+        lesser_bound = self.create_storage(
+            "lesser_bound", LessOpNode(IdNode(start_index.id), IntNode("0"))
+        )
+        error_label = LabelNode("substring_error")
+        ok_label = LabelNode("substring_success")
+        if_upper_bound = IfNode(extract_id(upper_bound), error_label)
+        if_lesser_bound = IfNode(extract_id(lesser_bound), error_label)
+        print_and_abort = self.notifiy_and_abort("Index out of range exception")
+        substr = self.create_storage(
+            "substr_var",
+            STRING,
+            SubstringOpNode(IdNode(start_index.id), IdNode(take.id)),
+        )
+        goto_ok = GoToNode(ok_label)
+        operations = [
+            length,
+            max_take,
+            upper_bound,
+            lesser_bound,
+            if_upper_bound,
+            if_lesser_bound,
+            substr,
+            goto_ok,
+            error_label,
+            *print_and_abort,
+            ok_label,
+        ]
+        substr_func = FunctionNode("substr", params, self.locals, operations, substr.id)
+        string_class = Class(
+            STRING,
+            [],
+            [
+                Method("length", lenght_func),
+                Method("concat", concat_func),
+                Method("substr", substr_func),
+            ],
+        )
 
-    def create_storage(self, node, idx: str, type_idx: str, op: ReturnOpNode):
+        return [object_class, io_class, string_class], [
+            abort_func,
+            type_name_func,
+            copy_func,
+            out_string_func,
+            out_int_func,
+            in_string_func,
+            in_int_func,
+            lenght_func,
+            concat_func,
+            substr_func,
+        ]
+
+    def init_func_params(self, typex: str):
+        return [Parameter("self", typex)]
+
+    def create_assignation(self, idx: str, type_idx: str, target: str):
         self.add_local(idx, type_idx)
-        return StorageNode(node, idx, op)
+        return StorageNode(idx, IdNode(target))
+
+    def create_uninitialized_storage(self, idx: str, type_idx: str):
+        self.add_local(idx, type_idx)
+        return StorageNode(idx, VoidNode())
+
+    def create_storage(self, idx: str, type_idx: str, op: ReturnOpNode):
+        self.add_local(idx, type_idx)
+        return StorageNode(idx, op)
 
     def create_attr_extraction(
-        self, node, idx: str, type_idx: str, from_idx: str, attr_idx: str
+        self, idx: str, type_idx: str, from_idx: str, attr_idx: str
     ):
         self.add_local(idx, type_idx)
-        return StorageNode(node, idx, GetAttrOpNode(node, from_idx, attr_idx))
+        return StorageNode(idx, GetAttrOpNode(from_idx, attr_idx))
 
-    def create_new_type(self, node, idx: str, type_idx: str):
+    def create_new_type(self, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
-        return StorageNode(node, idx, NewOpNode(node, type_idx))
+        return StorageNode(idx, NewOpNode(type_idx))
 
-    def create_type_of(self, node, idx: str, target: AtomOpNode):
+    def create_type_of(self, idx: str, target: AtomOpNode):
         self.add_local(idx, ADDRESS)
-        return StorageNode(node, idx, GetTypeOpNode(node, target))
+        return StorageNode(idx, GetTypeOpNode(target))
 
-    def create_equality(self, node, idx, left: AtomOpNode, right: AtomOpNode):
+    def create_equality(self, idx, left: AtomOpNode, right: AtomOpNode):
         self.add_local(idx, BOOL)
-        return StorageNode(node, idx, EqualOpNode(node, left, right))
+        return StorageNode(idx, EqualOpNode(left, right))
 
-    def create_string_load_data(self, node, idx: str, target: str):
+    def notifiy_and_abort(self, target: str):
+        print = PrintOpNode(target)
+        abort = Abort()
+        return [print, abort]
+
+    def create_string_load_data(self, idx: str, target: str):
         self.add_local(idx, STRING)
-        return StorageNode(node, idx, LoadOpNode(node, target))
+        return StorageNode(idx, LoadOpNode(target))
 
-    def create_int(self, node, idx: str, value: str):
+    def create_int(self, idx: str, value: str):
         self.add_local(idx, INT)
-        return StorageNode(node, idx, IntNode(node, value))
+        return StorageNode(idx, IntNode(value))
+
+    def create_int_to_str(self, idx: str, target: str):
+        self.add_local(str, STRING)
+        return StorageNode(idx, StrOpNode(target))
+
+    def create_read_str(self, idx: str):
+        self.add_local(idx, STRING)
+        return StorageNode(idx, ReadStrNode())
+
+    def create_read_int(self, idx: str):
+        self.add_local(idx, INT)
+        return StorageNode(idx, ReadIntNode())
+
+    def create_current_type_name(self, idx: str):
+        self.add_local(idx, STRING)
+        return StorageNode(idx, CurrentTypeNameNode())
+
+    def create_length(self, idx: str, target: str):
+        self.add_local(idx, INT)
+        return StorageNode(idx, LengthOpNode(target))
+
+    def add_data(self, idx: str, value: str):
+        data = Data(idx, value)
+        self.data.append(data)
+        return data
 
     def update_locals(self, old_id: str, new_id: str):
         self.locals[new_id] = self.locals[old_id]
