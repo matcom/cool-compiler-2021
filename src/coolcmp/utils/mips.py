@@ -47,13 +47,13 @@ class FunctionNode(Node):
         index = self.params.index(name)
         params_amount = len(self.params)
         offset = (params_amount - 1 - index) * DW
-        return (FP, offset)
+        return offset
 
     def local_address(self, name: str):
         index = self.local_vars.index(name)
         locals_amount = len(self.local_vars)
         offset = (locals_amount + 2 - index) * DW
-        return (FP, offset)
+        return offset
 
     def variable_address(self, name: str):
         try:
