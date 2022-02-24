@@ -36,7 +36,7 @@ class MIPSFormatter:
 
     @visitor.when(mips.StringNode)
     def visit(self, node: mips.StringNode):
-        return f"{node.label}: .asciiz {repr(node.value)}"
+        return f"{node.label}: .asciiz {repr(node.value)[1:-1]}"
 
     @visitor.when(registers.Register)
     def visit(self, node: registers.Register):
