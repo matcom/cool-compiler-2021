@@ -123,12 +123,68 @@ class TernaryOpNode(InstructionNode):
         self.right = right
 
 
+class Div(BinaryOpNode):
+    """
+    This node represents `div` instruction in MIPS
+    """
+
+    def __init__(self, node, left, right) -> None:
+        super().__init__(node, left, right)
+
+
+class Xori(TernaryOpNode):
+    """
+    This node represents `xori` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
+class Not(BinaryOpNode):
+    """
+    This node represents `not` instruction in MIPS
+    """
+
+    def __init__(self, node, left, right) -> None:
+        super().__init__(node, left, right)
+
+
+class Equal(TernaryOpNode):
+    """
+    This node represents `seq` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
+class LessOrEqual(TernaryOpNode):
+    """
+    This node represents `sle` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
+class Less(TernaryOpNode):
+    """
+    This node represents `slt` instruction in MIPS
+    """
+
+    def __init__(self, node, left, middle, right) -> None:
+        super().__init__(node, left, middle, right)
+
+
 class Multiply(TernaryOpNode):
     """
     This node represents `mul` instruction in MIPS
     """
+
     def __init__(self, node, left, middle, right) -> None:
         super().__init__(node, left, middle, right)
+
 
 class Subu(TernaryOpNode):
     """

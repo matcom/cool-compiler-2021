@@ -385,6 +385,162 @@ class CCILToMIPSGenerator:
 
         return instructions
 
+    @visitor.when(ccil_ast.DivOpNode)
+    def visit(self, node: ccil_ast.DivOpNode):
+        instructions = []
+
+        reg_left = mips_ast.RegisterNode(node, T3)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_left, self.__location[node.left.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(mips_ast.LoadImmediate(node, reg_left, node.left.value))
+
+        reg_right = mips_ast.RegisterNode(node, T4)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_right, self.__location[node.right.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(
+                mips_ast.LoadImmediate(node, reg_right, node.right.value)
+            )
+        else:
+            raise Exception("Invalid type of ccil node")
+
+        reg_ret = mips_ast.RegisterNode(node, V0)
+        instructions.append(mips_ast.Div(node, reg_left, reg_right))
+        instructions.append(
+            mips_ast.Move(node, reg_ret, mips_ast.RegisterNode(node, "lo"))
+        )
+        return instructions
+
+    @visitor.when(ccil_ast.LessOpNode)
+    def visit(self, node: ccil_ast.LessOpNode):
+        instructions = []
+
+        reg_left = mips_ast.RegisterNode(node, T3)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_left, self.__location[node.left.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(mips_ast.LoadImmediate(node, reg_left, node.left.value))
+
+        reg_right = mips_ast.RegisterNode(node, T4)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_right, self.__location[node.right.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(
+                mips_ast.LoadImmediate(node, reg_right, node.right.value)
+            )
+        else:
+            raise Exception("Invalid type of ccil node")
+
+        reg_ret = mips_ast.RegisterNode(node, V0)
+        instructions.append(mips_ast.Less(node, reg_ret, reg_left, reg_right))
+
+        return instructions
+
+    @visitor.when(ccil_ast.LessOrEqualOpNode)
+    def visit(self, node: ccil_ast.LessOrEqualOpNode):
+        instructions = []
+
+        reg_left = mips_ast.RegisterNode(node, T3)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_left, self.__location[node.left.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(mips_ast.LoadImmediate(node, reg_left, node.left.value))
+
+        reg_right = mips_ast.RegisterNode(node, T4)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_right, self.__location[node.right.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(
+                mips_ast.LoadImmediate(node, reg_right, node.right.value)
+            )
+        else:
+            raise Exception("Invalid type of ccil node")
+
+        reg_ret = mips_ast.RegisterNode(node, V0)
+        instructions.append(mips_ast.LessOrEqual(node, reg_ret, reg_left, reg_right))
+
+        return instructions
+
+    @visitor.when(ccil_ast.EqualOpNode)
+    def visit(self, node: ccil_ast.EqualOpNode):
+        instructions = []
+
+        reg_left = mips_ast.RegisterNode(node, T3)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_left, self.__location[node.left.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(mips_ast.LoadImmediate(node, reg_left, node.left.value))
+
+        reg_right = mips_ast.RegisterNode(node, T4)
+        if isinstance(node.left, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg_right, self.__location[node.right.value])
+            )
+        elif isinstance(node.left, ccil_ast.ConstantNode):
+            instructions.append(
+                mips_ast.LoadImmediate(node, reg_right, node.right.value)
+            )
+        else:
+            raise Exception("Invalid type of ccil node")
+
+        reg_ret = mips_ast.RegisterNode(node, V0)
+        instructions.append(mips_ast.Equal(node, reg_ret, reg_left, reg_right))
+
+        return instructions
+
+    @visitor.when(ccil_ast.NotOpNode)
+    def visit(self, node: ccil_ast.NotOpNode):
+        instructions = []
+
+        reg = mips_ast.RegisterNode(node, V0)
+        if isinstance(node.atom, ccil_ast.IntNode):
+            instructions.append(
+                mips_ast.LoadImmediate(
+                    node, reg, mips_ast.Constant(node, node.atom.value)
+                )
+            )
+        elif isinstance(node.atom, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg, self.__location[node.atom.value])
+            )
+        instructions.append(mips_ast.Not(node, reg, reg))
+
+        return instructions
+
+    @visitor.when(ccil_ast.NegOpNode)
+    def visit(self, node: ccil_ast.NegOpNode):
+        instructions = []
+
+        reg = mips_ast.RegisterNode(node, V0)
+        if isinstance(node.atom, ccil_ast.IntNode):
+            instructions.append(
+                mips_ast.LoadImmediate(
+                    node, reg, mips_ast.Constant(node, node.atom.value)
+                )
+            )
+        elif isinstance(node.atom, ccil_ast.IdNode):
+            instructions.append(
+                mips_ast.LoadWord(node, reg, self.__location[node.atom.value])
+            )
+        instructions.append(mips_ast.Xori(node, reg, reg, mips_ast.Constant(node, "1")))
+
+        return instructions
+
     @visitor.when(ccil_ast.IfFalseNode)
     def visit(self, node: ccil_ast.IfFalseNode):
         instructions = []
