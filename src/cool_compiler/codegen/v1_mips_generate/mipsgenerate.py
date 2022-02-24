@@ -6,7 +6,10 @@ class MipsGenerate:
     def __init__(self, errors) -> None:
         self.func_list = ['new_ctr_Main']
         self.native_fun = {
-            "IO_out_string": ASTR.Out_String
+            "IO_out_string": ASTR.Out_String,
+            "IO_in_int":ASTR.In_Int,
+            "IO_in_string":ASTR.In_String,
+            "IO_out_int":ASTR.Out_Int
         }
 
     @visitor.on('node')
@@ -272,7 +275,7 @@ class MipsGenerate:
                 ASTR.MUL ('$t0','$t1',-1),
                 ASTR.Comment("$t0 =  $t1 * (-1)"),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
-                ASTR.Comment("poner en la posicion f'{stack_plus_memory_dest} el contenido de $t0")
+                ASTR.Comment(f"poner en la posicion {stack_plus_memory_dest} el contenido de $t0")
 
 
                 ]                   
@@ -339,14 +342,33 @@ class MipsGenerate:
 
 
     @ visitor.when(AST.Label) 
-    def visitor(self,node:AST.Label):
+    def visit(self,node:AST.Label):
         return [ASTR.Label(node.x),
                 ASTR.Comment("Crea el label f'{node.x} ")
                 ]  
 
+    @visitor.when(AST.CheckType)
+    def visit(self,node:AST.CheckType):
+        memory_dir = node.x
+        memory_instance = node.y
+        type_name = node.z
+
+        stack_plus_memory_dir = self.stack_index(memory_dir)
+        stack_plus_memory_instance = self.stack_index(memory_instance)
+        
+        return [
+                ASTR.LW('$s2',f'{stack_plus_memory_instance}($sp)'),
+                ASTR.LW('$a1', type_name),
+                ASTR.JAL('Contain'),
+                ASTR.SW ('$S0',f'{stack_plus_memory_dir}($sp)')
+
+                
+
+               ]
+
 
     @ visitor.when(AST.GoTo)
-    def visitor(self,node:AST.GoTo):
+    def visit(self,node:AST.GoTo):
         label = node.x
         return [ASTR.Jump (label),
                 ASTR.Comment("Salta para f{label} ")

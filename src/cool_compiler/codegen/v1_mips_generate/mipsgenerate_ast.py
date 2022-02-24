@@ -48,6 +48,36 @@ class Func:
                 result += str(cmd) + '\n'
         return result
 
+class Compare_String:
+    def __init__(self) -> None:
+        pass
+
+    def __str__(self) -> str:
+        return  """
+compare_String:  # compare str1 ($a0), str2 ($a1) salida en $s0
+LOOP:
+	lb $t0, ($a0)
+	lb $t1, ($a1)
+	add $a0, $a0, 1
+	add $a1, $a1, 1
+	beqz $t0, LOOP_END
+	beqz $t1, LOOP_END
+	beq $t0, $t1, LOOP
+    li $s0 , 0
+	jr $ra 
+
+EQUAL:
+	li $s0, 1
+	j END
+
+LOOP_END:
+	beq $t0, $t1, EQUAL
+	li $s0 , 0
+	jr $ra
+END:
+	jr $ra"""
+        
+
 class Comment:
     def __init__(self, msg) -> None:
         self.msg = msg
@@ -214,7 +244,7 @@ class Add(Operation):
 
 class MUL (Operation):
     def __init__(self,dest,op1,op2) -> None:
-            super().__init__('mult',dest,op1,op2)
+            super().__init__('mul',dest,op1,op2)
 
 class SUB (Operation):
      def __init__(self,dest,op1,op2) -> None:
@@ -244,44 +274,105 @@ lw $a0, 4($sp)
 addi $sp, $sp, 8
 jr $ra"""
 
+class Out_Float:
+    def __str__(self) -> str:
+        return """
+IO_out_Float:
+li $v0, 2
+lw $a0, 0($sp)
+syscall
+lw $a0, 4($sp)
+addi $sp, $sp, 8
+jr $ra"""
+
 class In_String:
     def __str__(self) -> str:
        return """
+IO_in_string:
+li $v0,8
+li $a1 , 10000
+syscall
+move $s0 , $a0
+
+
 """
 
 class In_Int:
     def __str__(self) -> str:
        return """
+IO_in_int:
+li $v0,5
+syscall
+move $s0 , $a0
 """
+
+class In_Float:
+    def __str__(self) -> str:
+           return """
+In_Float:
+li $v0,6
+syscall
+move $s0 , $a0
+"""
+
+class Contain:
+    def __str__(self) -> str:
+           return """
+Contain:
+
+loop:
+    lw $s0 , ($s2)
+    beq	$s0, $a1, Equal	# if $s0 ==a$t1 then target
+    beq $s0 , $zero, END
+    add $s2,$s2,4
+    j loop
+    
+
+Equal:
+li $s0 , 1
+jr $ra
+
+END:
+li $s0 , 0
+jr $ra
+"""
+
 ################################# Native Func Str ################################################
 class Length:
     def __str__(self) -> str:
-       return """
+       return """  yaaaa
 """
 
 class Concat:
     def __str__(self) -> str:
-       return """
+       return """  yaaaa
 """
 
 class SubStr:
     def __str__(self) -> str:
-       return """
+       return """ yaaaaa
 """
 ################################# Native Func Obj ################################################
 class Copy:
     def __str__(self) -> str:
        return """
+       El método de copia, sabemos que el resultado de la copia es el
+igual que el tipo del autoparámetro
+
+
 """
 
 class Abort:
     def __str__(self) -> str:
        return """
+      El método abortar detiene la ejecución del programa con un mensaje de error.
 """
 
 class Type_Name:
     def __str__(self) -> str:
        return """
+       El nombre del tipo de método devuelve un
+cadena con el nombre de la clase del objeto
 """
 
 
