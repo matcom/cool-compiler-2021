@@ -23,7 +23,6 @@ first_tokens = [
     "type_id",
     "int",
     "string",
-    "if",
 ]
 # Add "ccom" to test comments
  
