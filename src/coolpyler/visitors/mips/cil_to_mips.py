@@ -110,7 +110,7 @@ class CilToMIPS:
         self.data_section[node.name] = mips.DataNode(
             mips.LabelNode(node.name),
             ".word",
-            [mips.LabelNode(f"{method.name}") for method in node.methods],
+            [mips.LabelNode(f"{method}") for method in node.methods],
         )
 
     @visitor.when(cil.FunctionNode)
@@ -534,7 +534,12 @@ class CilToMIPS:
 
         dest_dir = self.search_mem(node.dest)
 
-        instructions.append(mips.LoadInmediateNode(V0_REG, 8))
+        if node.is_string:
+            n = 5
+        else:
+            n = 8
+
+        instructions.append(mips.LoadInmediateNode(V0_REG, n))
         instructions.append(mips.SyscallNode())
         instructions.append(
             mips.StoreWordNode(
@@ -552,7 +557,12 @@ class CilToMIPS:
 
         str_dir = self.search_mem(node.str_addr)
 
-        instructions.append(mips.LoadInmediateNode(V0_REG, 4))
+        if node.is_string:
+            n = 4
+        else:
+            n = 1
+
+        instructions.append(mips.LoadInmediateNode(V0_REG, n))
         instructions.append(
             mips.LoadWordNode(
                 ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, str_dir)
