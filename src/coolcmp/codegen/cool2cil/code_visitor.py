@@ -49,7 +49,7 @@ class DotCodeVisitor:
 
     @visitor.on('node')
     def visit(self, node: ast.Node, scope: Scope):
-        pass
+        raise NotImplementedError()
 
     @visitor.when(ast.ProgramNode)
     def visit(self, node: ast.ProgramNode, scope: Scope):
@@ -67,9 +67,9 @@ class DotCodeVisitor:
                         self.add_function('main')
                         # void = self.add_local('void', internal=False)
                         # self.add_inst(cil.AllocateNode('<void>', void))
-                        void_dest = self.visit(ast.InstantiateNode('Void'), scope)
-                        void = self.add_local('void', internal=False)
-                        self.add_inst(cil.AssignNode(void, void_dest))
+                        # void_dest = self.visit(ast.InstantiateNode('Void'), scope)
+                        # void = self.add_local('void', internal=False)
+                        # self.add_inst(cil.AssignNode(void, void_dest))
                         main_scope = deepcopy(scope.get_tagged_scope('Main'))
                         instance = self.visit(ast.InstantiateNode('Main'), main_scope)
                         self.add_comment('Calling main')
@@ -102,11 +102,11 @@ class DotCodeVisitor:
                     cil.ParamNode('self'),
                 ],
                 local_vars=[
-                    cil.LocalNode('_name'),
+                    cil.LocalNode('name'),
                 ],
                 instructions=[
-                    cil.GetAttrNode('_name', 'self', 'Object__name'),
-                    cil.ReturnNode('_name'),
+                    cil.TypeNameNode('name', 'self'),
+                    cil.ReturnNode('name'),
                 ]
             ),
             cil.FunctionNode(
@@ -341,7 +341,7 @@ class DotCodeVisitor:
         GOTO while_cond
         LABEL end_while
 
-        void_res = VCALL Object get_void
+        void_res = VCALL Object Void
         """
         self.add_comment('While loop')
 
@@ -438,50 +438,52 @@ class DotCodeVisitor:
 
     @visitor.when(ast.PlusNode)
     def visit(self, node: ast.PlusNode, scope: Scope):
-        return self.build_arithmetic_node(cil.PlusNode, node, scope)
+        return self.build_binary_node(cil.PlusNode, node, scope)
 
     @visitor.when(ast.MinusNode)
     def visit(self, node: ast.MinusNode, scope: Scope):
-        return self.build_arithmetic_node(cil.MinusNode, node, scope)
+        return self.build_binary_node(cil.MinusNode, node, scope)
 
     @visitor.when(ast.StarNode)
     def visit(self, node: ast.PlusNode, scope: Scope):
-        return self.build_arithmetic_node(cil.StarNode, node, scope)
+        return self.build_binary_node(cil.StarNode, node, scope)
 
     @visitor.when(ast.DivNode)
     def visit(self, node: ast.DivNode, scope: Scope):
-        return self.build_arithmetic_node(cil.DivNode, node, scope)
+        return self.build_binary_node(cil.DivNode, node, scope)
 
     @visitor.when(ast.LessThanNode)
     def visit(self, node: ast.LessThanNode, scope: Scope):
-        return self.build_arithmetic_node(cil.MinusNode, node, scope)
+        return self.build_binary_node(cil.LessThanNode, node, scope)
 
     @visitor.when(ast.LessEqualNode)
     def visit(self, node: ast.LessEqualNode, scope: Scope):
-        return self.build_arithmetic_node(cil.MinusNode, node, scope)
+        return self.build_binary_node(cil.LessEqualNode, node, scope)
+
+    def build_binary_node(self, new_node_cls, node: ast.BinaryNode, scope: Scope):
+        left_dest = self.visit(node.left, scope)
+        right_dest = self.visit(node.right, scope)
+        oper_dest = self.add_local('oper_dest')
+        self.add_inst(new_node_cls(oper_dest, left_dest, right_dest))
+        return oper_dest
 
     @visitor.when(ast.EqualNode)
     def visit(self, node: ast.EqualNode, scope: Scope):
-        if isinstance(node.left, ast.IntegerNode) and isinstance(node.right, ast.IntegerNode):
-            return self.build_arithmetic_node(cil.MinusNode, node, scope)
-        else:
-            left_dest = self.visit(node.left, scope)
-            right_dest = self.visit(node.right, scope)
-            left_type = self.add_local('left_type')
-            right_type = self.add_local('right_type')
-            self.add_inst(cil.TypeOfNode(left_dest, left_type))
-            self.add_inst(cil.TypeOfNode(right_dest, right_type))
-            comp_res = self.add_local('comp_res')
-            self.add_inst(cil.CompareNode(comp_res, left_type, right_type))
-            return comp_res
+        by_value = isinstance(
+            node.left,
+            (ast.StringNode, ast.BooleanNode, ast.IntegerNode, )
+        )
+        left_dest = self.visit(node.left, scope)
+        right_dest = self.visit(node.right, scope)
+        comp_res = self.add_local('comp_res')
+        self.add_inst(cil.EqualNode(comp_res, left_dest, right_dest, by_value))
+        return comp_res
 
     @visitor.when(ast.IsVoidNode)
     def visit(self, node: ast.IsVoidNode, scope: Scope):
         expr_dest = self.visit(node.expr, scope)
-        type_expr = self.add_local('expr_type')
-        self.add_inst(cil.TypeOfNode(expr_dest, type_expr))
         comp_res = self.add_local('comp_res')
-        self.add_inst(cil.CompareNode(comp_res, type_expr, 'Void'))
+        self.add_inst(cil.IsVoidNode(comp_res, expr_dest))
         return comp_res
 
     @visitor.when(ast.NegationNode)
@@ -511,10 +513,3 @@ class DotCodeVisitor:
     @visitor.when(int)
     def visit(self, value: int, _):
         return value
-
-    def build_arithmetic_node(self, new_node_cls, node: ast.BinaryNode, scope: Scope):
-        left_dest = self.visit(node.left, scope)
-        right_dest = self.visit(node.right, scope)
-        oper_dest = self.add_local('oper_dest')
-        self.add_inst(new_node_cls(oper_dest, left_dest, right_dest))
-        return oper_dest
