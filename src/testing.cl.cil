@@ -25,8 +25,8 @@ type Bool {
 	
 
 	method __init: __init_Bool_type
-	method abort: function_abort_at_Object
-	method type_name: function_type_name_at_Object
+	method abort: function_abort_at_Bool
+	method type_name: function_type_name_at_Bool
 	method copy: function_copy_at_Object
 }
 type Int {
@@ -34,8 +34,8 @@ type Int {
 	
 
 	method __init: __init_Int_type
-	method abort: function_abort_at_Object
-	method type_name: function_type_name_at_Object
+	method abort: function_abort_at_Int
+	method type_name: function_type_name_at_Int
 	method copy: function_copy_at_Object
 }
 type IO {
@@ -51,11 +51,15 @@ type IO {
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
 }
-type Main {
-	parent: IO
-	
+type Foo {
+	parent: Bazz
+	attribute h
+	attribute g
+	attribute i
+	attribute a
+	attribute b
 
-	method __init: __init_Main_type
+	method __init: __init_Foo_type
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -63,6 +67,109 @@ type Main {
 	method out_int: function_out_int_at_IO
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
+	method __init_h_at_Bazz: __init_h_at_Bazz
+	method __init_g_at_Bazz: __init_g_at_Bazz
+	method __init_i_at_Bazz: __init_i_at_Bazz
+	method printh: function_printh_at_Bazz
+	method doh: function_doh_at_Foo
+	method __init_a_at_Foo: __init_a_at_Foo
+	method __init_b_at_Foo: __init_b_at_Foo
+}
+type Bar {
+	parent: Razz
+	attribute h
+	attribute g
+	attribute i
+	attribute a
+	attribute b
+	attribute e
+	attribute f
+	attribute c
+	attribute d
+
+	method __init: __init_Bar_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init_h_at_Bazz: __init_h_at_Bazz
+	method __init_g_at_Bazz: __init_g_at_Bazz
+	method __init_i_at_Bazz: __init_i_at_Bazz
+	method printh: function_printh_at_Bazz
+	method doh: function_doh_at_Foo
+	method __init_a_at_Foo: __init_a_at_Foo
+	method __init_b_at_Foo: __init_b_at_Foo
+	method __init_e_at_Razz: __init_e_at_Razz
+	method __init_f_at_Razz: __init_f_at_Razz
+	method __init_c_at_Bar: __init_c_at_Bar
+	method __init_d_at_Bar: __init_d_at_Bar
+}
+type Razz {
+	parent: Foo
+	attribute h
+	attribute g
+	attribute i
+	attribute a
+	attribute b
+	attribute e
+	attribute f
+
+	method __init: __init_Razz_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init_h_at_Bazz: __init_h_at_Bazz
+	method __init_g_at_Bazz: __init_g_at_Bazz
+	method __init_i_at_Bazz: __init_i_at_Bazz
+	method printh: function_printh_at_Bazz
+	method doh: function_doh_at_Foo
+	method __init_a_at_Foo: __init_a_at_Foo
+	method __init_b_at_Foo: __init_b_at_Foo
+	method __init_e_at_Razz: __init_e_at_Razz
+	method __init_f_at_Razz: __init_f_at_Razz
+}
+type Bazz {
+	parent: IO
+	attribute h
+	attribute g
+	attribute i
+
+	method __init: __init_Bazz_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init_h_at_Bazz: __init_h_at_Bazz
+	method __init_g_at_Bazz: __init_g_at_Bazz
+	method __init_i_at_Bazz: __init_i_at_Bazz
+	method printh: function_printh_at_Bazz
+	method doh: function_doh_at_Bazz
+}
+type Main {
+	parent: Object
+	attribute a
+	attribute b
+	attribute c
+	attribute d
+
+	method __init: __init_Main_type
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init_a_at_Main: __init_a_at_Main
+	method __init_b_at_Main: __init_b_at_Main
+	method __init_c_at_Main: __init_c_at_Main
+	method __init_d_at_Main: __init_d_at_Main
 	method main: function_main_at_Main
 }
 
@@ -72,16 +179,14 @@ data_1 = "String"
 data_2 = "Bool"
 data_3 = "Int"
 data_4 = "IO"
-data_5 = "Main"
-data_6 = "Hello"
-data_7 = "Hello"
-data_8 = "Mal4"
-data_9 = "0"
-data_10 = "1"
-data_11 = "Mal3"
-data_12 = "Bien"
-data_13 = "Mal2"
-data_14 = "Mal1"
+data_5 = "Foo"
+data_6 = "Bar"
+data_7 = "Razz"
+data_8 = "Bazz"
+data_9 = "Main"
+data_10 = "Abort called from class "
+data_11 = "\n"
+data_12 = "do nothing"
 
 .CODE
 function main {
@@ -149,30 +254,341 @@ function function_substr_at_String {
 	local_substr_at_String_internal_0 = SUBSTRING self i l
 	RETURN local_substr_at_String_internal_0
 }
-function function_abort_at_Object {
+function function_abort_at_Bool {
 	PARAM self
 
-	
+	LOCAL local_abort_at_Bool_internal_0
+	LOCAL local_abort_at_Bool_internal_1
+	LOCAL local_abort_at_Bool_internal_2
+	LOCAL local_abort_at_Bool_internal_3
+	LOCAL local_abort_at_Bool_internal_4
 
+	local_abort_at_Bool_internal_0 = LOAD data_2
+	local_abort_at_Bool_internal_1 = LOAD data_10
+	local_abort_at_Bool_internal_2 = LOAD data_11
+	local_abort_at_Bool_internal_3 = CONCAT local_abort_at_Bool_internal_1 local_abort_at_Bool_internal_0
+	local_abort_at_Bool_internal_4 = CONCAT local_abort_at_Bool_internal_3 local_abort_at_Bool_internal_2
+	PRINT local_abort_at_Bool_internal_4
 	ABORT
 	RETURN 0
 }
-function function_type_name_at_Object {
+function function_type_name_at_Bool {
 	PARAM self
 
-	LOCAL local_type_name_at_Object_internal_0
+	LOCAL local_type_name_at_Bool_internal_0
 
-	local_type_name_at_Object_internal_0 = TYPEOF self
-	local_type_name_at_Object_internal_0 = TYPENAME local_type_name_at_Object_internal_0
-	RETURN local_type_name_at_Object_internal_0
+	local_type_name_at_Bool_internal_0 = LOAD data_2
+	RETURN local_type_name_at_Bool_internal_0
 }
-function function_copy_at_Object {
+function function_abort_at_Int {
 	PARAM self
 
-	LOCAL local_copy_at_Object_internal_0
+	LOCAL local_abort_at_Int_internal_0
+	LOCAL local_abort_at_Int_internal_1
+	LOCAL local_abort_at_Int_internal_2
+	LOCAL local_abort_at_Int_internal_3
+	LOCAL local_abort_at_Int_internal_4
 
-	local_copy_at_Object_internal_0 = COPY self
-	RETURN local_copy_at_Object_internal_0
+	local_abort_at_Int_internal_0 = LOAD data_3
+	local_abort_at_Int_internal_1 = LOAD data_10
+	local_abort_at_Int_internal_2 = LOAD data_11
+	local_abort_at_Int_internal_3 = CONCAT local_abort_at_Int_internal_1 local_abort_at_Int_internal_0
+	local_abort_at_Int_internal_4 = CONCAT local_abort_at_Int_internal_3 local_abort_at_Int_internal_2
+	PRINT local_abort_at_Int_internal_4
+	ABORT
+	RETURN 0
+}
+function function_type_name_at_Int {
+	PARAM self
+
+	LOCAL local_type_name_at_Int_internal_0
+
+	local_type_name_at_Int_internal_0 = LOAD data_3
+	RETURN local_type_name_at_Int_internal_0
+}
+function __init_c_at_Bar {
+	PARAM self
+
+	LOCAL local__init_c_at_Bar_internal_0
+	LOCAL local__init_c_at_Bar_internal_1
+
+	ARG self
+	local__init_c_at_Bar_internal_1 = TYPEOF self
+	local__init_c_at_Bar_internal_0 = VCALL local__init_c_at_Bar_internal_1 doh
+	SETATTR self c local__init_c_at_Bar_internal_0
+	RETURN 
+}
+function __init_d_at_Bar {
+	PARAM self
+
+	LOCAL local__init_d_at_Bar_internal_0
+	LOCAL local__init_d_at_Bar_internal_1
+
+	ARG self
+	local__init_d_at_Bar_internal_1 = TYPEOF self
+	local__init_d_at_Bar_internal_0 = VCALL local__init_d_at_Bar_internal_1 printh
+	SETATTR self d local__init_d_at_Bar_internal_0
+	RETURN 
+}
+function __init_a_at_Foo {
+	PARAM self
+
+	LOCAL local__init_a_at_Foo_internal_0
+	LOCAL local__init_a_at_Foo_internal_1
+	LOCAL local__init_a_at_Foo_internal_2
+	LOCAL local__init_a_at_Foo_internal_3
+	LOCAL local__init_a_at_Foo_internal_4
+	LOCAL local__init_a_at_Foo_internal_5
+	LOCAL local__init_a_at_Foo_internal_6
+	LOCAL local__init_a_at_Foo_internal_7
+	LOCAL local__init_a_at_Foo_internal_8
+	LOCAL local__init_a_at_Foo_internal_9
+	LOCAL local__init_a_at_Foo_internal_10
+	LOCAL local__init_a_at_Foo_internal_11
+	LOCAL local__init_a_at_Foo_internal_12
+	LOCAL local__init_a_at_Foo_n_13
+	LOCAL local__init_a_at_Foo_internal_14
+	LOCAL local__init_a_at_Foo_n_15
+	LOCAL local__init_a_at_Foo_internal_16
+	LOCAL local__init_a_at_Foo_n_17
+
+	local__init_a_at_Foo_internal_2 = VOID
+	local__init_a_at_Foo_internal_2 = EQUAL self local__init_a_at_Foo_internal_2
+	IF local__init_a_at_Foo_internal_2 GOTO _init_a_at_Foo_label_0
+	local__init_a_at_Foo_internal_1 = TYPEOF self
+	local__init_a_at_Foo_internal_3 = ARRAY Object 3
+	SETINDEX local__init_a_at_Foo_internal_3 0 Razz
+	SETINDEX local__init_a_at_Foo_internal_3 1 Foo
+	SETINDEX local__init_a_at_Foo_internal_3 2 Bar
+	local__init_a_at_Foo_internal_4 = -1
+	local__init_a_at_Foo_internal_6 = -2
+	LABEL _init_a_at_Foo_label_1
+	local__init_a_at_Foo_internal_4 = local__init_a_at_Foo_internal_4 + 1
+	local__init_a_at_Foo_internal_9 = EQUAL local__init_a_at_Foo_internal_4 3
+	IF local__init_a_at_Foo_internal_9 GOTO _init_a_at_Foo_label_3
+	local__init_a_at_Foo_internal_8 = GETINDEX local__init_a_at_Foo_internal_3 local__init_a_at_Foo_internal_4
+	ARG local__init_a_at_Foo_internal_1
+	ARG local__init_a_at_Foo_internal_8
+	local__init_a_at_Foo_internal_7 = CALL type_distance
+	local__init_a_at_Foo_internal_10 = EQUAL local__init_a_at_Foo_internal_7 -1
+	IF local__init_a_at_Foo_internal_10 GOTO _init_a_at_Foo_label_1
+	local__init_a_at_Foo_internal_11 = EQUAL local__init_a_at_Foo_internal_6 -2
+	IF local__init_a_at_Foo_internal_11 GOTO _init_a_at_Foo_label_2
+	local__init_a_at_Foo_internal_11 = local__init_a_at_Foo_internal_6 > local__init_a_at_Foo_internal_7
+	IF local__init_a_at_Foo_internal_11 GOTO _init_a_at_Foo_label_2
+	GOTO _init_a_at_Foo_label_1
+	LABEL _init_a_at_Foo_label_2
+	local__init_a_at_Foo_internal_6 = local__init_a_at_Foo_internal_7
+	local__init_a_at_Foo_internal_5 = local__init_a_at_Foo_internal_4
+	GOTO _init_a_at_Foo_label_1
+	LABEL _init_a_at_Foo_label_3
+	local__init_a_at_Foo_internal_11 = EQUAL local__init_a_at_Foo_internal_6 -2
+	IF local__init_a_at_Foo_internal_11 GOTO _init_a_at_Foo_label_0
+	local__init_a_at_Foo_internal_8 = GETINDEX local__init_a_at_Foo_internal_3 local__init_a_at_Foo_internal_5
+	local__init_a_at_Foo_internal_12 = EQUAL Razz local__init_a_at_Foo_internal_8
+	local__init_a_at_Foo_internal_12 = NOT local__init_a_at_Foo_internal_12
+	IF local__init_a_at_Foo_internal_12 GOTO _init_a_at_Foo_label_5
+	local__init_a_at_Foo_n_13 = self
+	local__init_a_at_Foo_internal_14 = ALLOCATE Bar
+	ARG local__init_a_at_Foo_internal_14
+	local__init_a_at_Foo_internal_14 = CALL __init_Bar_type
+	local__init_a_at_Foo_internal_0 = local__init_a_at_Foo_internal_14
+	GOTO _init_a_at_Foo_label_4
+	LABEL _init_a_at_Foo_label_5
+	local__init_a_at_Foo_internal_12 = EQUAL Foo local__init_a_at_Foo_internal_8
+	local__init_a_at_Foo_internal_12 = NOT local__init_a_at_Foo_internal_12
+	IF local__init_a_at_Foo_internal_12 GOTO _init_a_at_Foo_label_6
+	local__init_a_at_Foo_n_15 = self
+	local__init_a_at_Foo_internal_16 = ALLOCATE Razz
+	ARG local__init_a_at_Foo_internal_16
+	local__init_a_at_Foo_internal_16 = CALL __init_Razz_type
+	local__init_a_at_Foo_internal_0 = local__init_a_at_Foo_internal_16
+	GOTO _init_a_at_Foo_label_4
+	LABEL _init_a_at_Foo_label_6
+	local__init_a_at_Foo_internal_12 = EQUAL Bar local__init_a_at_Foo_internal_8
+	local__init_a_at_Foo_internal_12 = NOT local__init_a_at_Foo_internal_12
+	IF local__init_a_at_Foo_internal_12 GOTO _init_a_at_Foo_label_7
+	local__init_a_at_Foo_n_17 = self
+	local__init_a_at_Foo_internal_0 = local__init_a_at_Foo_n_17
+	GOTO _init_a_at_Foo_label_4
+	LABEL _init_a_at_Foo_label_7
+	LABEL _init_a_at_Foo_label_0
+	ABORT
+	LABEL _init_a_at_Foo_label_4
+	SETATTR self a local__init_a_at_Foo_internal_0
+	RETURN 
+}
+function __init_b_at_Foo {
+	PARAM self
+
+	LOCAL local__init_b_at_Foo_internal_0
+	LOCAL local__init_b_at_Foo_internal_1
+	LOCAL local__init_b_at_Foo_internal_2
+	LOCAL local__init_b_at_Foo_internal_3
+	LOCAL local__init_b_at_Foo_internal_4
+	LOCAL local__init_b_at_Foo_internal_5
+	LOCAL local__init_b_at_Foo_internal_6
+	LOCAL local__init_b_at_Foo_internal_7
+	LOCAL local__init_b_at_Foo_internal_8
+	LOCAL local__init_b_at_Foo_internal_9
+	LOCAL local__init_b_at_Foo_internal_10
+	LOCAL local__init_b_at_Foo_internal_11
+	LOCAL local__init_b_at_Foo_internal_12
+
+	local__init_b_at_Foo_internal_0 = GETATTR self a
+	ARG local__init_b_at_Foo_internal_0
+	local__init_b_at_Foo_internal_2 = TYPEOF local__init_b_at_Foo_internal_0
+	local__init_b_at_Foo_internal_1 = VCALL local__init_b_at_Foo_internal_2 doh
+	local__init_b_at_Foo_internal_3 = GETATTR self g
+	ARG local__init_b_at_Foo_internal_3
+	local__init_b_at_Foo_internal_5 = TYPEOF local__init_b_at_Foo_internal_3
+	local__init_b_at_Foo_internal_4 = VCALL local__init_b_at_Foo_internal_5 doh
+	local__init_b_at_Foo_internal_6 = local__init_b_at_Foo_internal_1 + local__init_b_at_Foo_internal_4
+	ARG self
+	local__init_b_at_Foo_internal_8 = TYPEOF self
+	local__init_b_at_Foo_internal_7 = VCALL local__init_b_at_Foo_internal_8 doh
+	local__init_b_at_Foo_internal_9 = local__init_b_at_Foo_internal_6 + local__init_b_at_Foo_internal_7
+	ARG self
+	local__init_b_at_Foo_internal_11 = TYPEOF self
+	local__init_b_at_Foo_internal_10 = VCALL local__init_b_at_Foo_internal_11 printh
+	local__init_b_at_Foo_internal_12 = local__init_b_at_Foo_internal_9 + local__init_b_at_Foo_internal_10
+	SETATTR self b local__init_b_at_Foo_internal_12
+	RETURN 
+}
+function function_doh_at_Foo {
+	PARAM self
+
+	LOCAL local_doh_at_Foo_i_0
+	LOCAL local_doh_at_Foo_internal_1
+	LOCAL local_doh_at_Foo_internal_2
+	LOCAL local_doh_at_Foo_internal_3
+	LOCAL local_doh_at_Foo_internal_4
+
+	local_doh_at_Foo_internal_1 = GETATTR self h
+	local_doh_at_Foo_i_0 = local_doh_at_Foo_internal_1
+	local_doh_at_Foo_internal_3 = GETATTR self h
+	local_doh_at_Foo_internal_4 = local_doh_at_Foo_internal_3 + 2
+	SETATTR self h local_doh_at_Foo_internal_4
+	RETURN local_doh_at_Foo_i_0
+}
+function __init_e_at_Razz {
+	PARAM self
+
+	LOCAL local__init_e_at_Razz_internal_0
+	LOCAL local__init_e_at_Razz_internal_1
+	LOCAL local__init_e_at_Razz_internal_2
+	LOCAL local__init_e_at_Razz_internal_3
+	LOCAL local__init_e_at_Razz_internal_4
+	LOCAL local__init_e_at_Razz_internal_5
+	LOCAL local__init_e_at_Razz_internal_6
+	LOCAL local__init_e_at_Razz_internal_7
+	LOCAL local__init_e_at_Razz_internal_8
+	LOCAL local__init_e_at_Razz_internal_9
+	LOCAL local__init_e_at_Razz_internal_10
+	LOCAL local__init_e_at_Razz_internal_11
+	LOCAL local__init_e_at_Razz_internal_12
+	LOCAL local__init_e_at_Razz_n_13
+	LOCAL local__init_e_at_Razz_internal_14
+	LOCAL local__init_e_at_Razz_n_15
+
+	local__init_e_at_Razz_internal_2 = VOID
+	local__init_e_at_Razz_internal_2 = EQUAL self local__init_e_at_Razz_internal_2
+	IF local__init_e_at_Razz_internal_2 GOTO _init_e_at_Razz_label_0
+	local__init_e_at_Razz_internal_1 = TYPEOF self
+	local__init_e_at_Razz_internal_3 = ARRAY Object 2
+	SETINDEX local__init_e_at_Razz_internal_3 0 Razz
+	SETINDEX local__init_e_at_Razz_internal_3 1 Bar
+	local__init_e_at_Razz_internal_4 = -1
+	local__init_e_at_Razz_internal_6 = -2
+	LABEL _init_e_at_Razz_label_1
+	local__init_e_at_Razz_internal_4 = local__init_e_at_Razz_internal_4 + 1
+	local__init_e_at_Razz_internal_9 = EQUAL local__init_e_at_Razz_internal_4 2
+	IF local__init_e_at_Razz_internal_9 GOTO _init_e_at_Razz_label_3
+	local__init_e_at_Razz_internal_8 = GETINDEX local__init_e_at_Razz_internal_3 local__init_e_at_Razz_internal_4
+	ARG local__init_e_at_Razz_internal_1
+	ARG local__init_e_at_Razz_internal_8
+	local__init_e_at_Razz_internal_7 = CALL type_distance
+	local__init_e_at_Razz_internal_10 = EQUAL local__init_e_at_Razz_internal_7 -1
+	IF local__init_e_at_Razz_internal_10 GOTO _init_e_at_Razz_label_1
+	local__init_e_at_Razz_internal_11 = EQUAL local__init_e_at_Razz_internal_6 -2
+	IF local__init_e_at_Razz_internal_11 GOTO _init_e_at_Razz_label_2
+	local__init_e_at_Razz_internal_11 = local__init_e_at_Razz_internal_6 > local__init_e_at_Razz_internal_7
+	IF local__init_e_at_Razz_internal_11 GOTO _init_e_at_Razz_label_2
+	GOTO _init_e_at_Razz_label_1
+	LABEL _init_e_at_Razz_label_2
+	local__init_e_at_Razz_internal_6 = local__init_e_at_Razz_internal_7
+	local__init_e_at_Razz_internal_5 = local__init_e_at_Razz_internal_4
+	GOTO _init_e_at_Razz_label_1
+	LABEL _init_e_at_Razz_label_3
+	local__init_e_at_Razz_internal_11 = EQUAL local__init_e_at_Razz_internal_6 -2
+	IF local__init_e_at_Razz_internal_11 GOTO _init_e_at_Razz_label_0
+	local__init_e_at_Razz_internal_8 = GETINDEX local__init_e_at_Razz_internal_3 local__init_e_at_Razz_internal_5
+	local__init_e_at_Razz_internal_12 = EQUAL Razz local__init_e_at_Razz_internal_8
+	local__init_e_at_Razz_internal_12 = NOT local__init_e_at_Razz_internal_12
+	IF local__init_e_at_Razz_internal_12 GOTO _init_e_at_Razz_label_5
+	local__init_e_at_Razz_n_13 = self
+	local__init_e_at_Razz_internal_14 = ALLOCATE Bar
+	ARG local__init_e_at_Razz_internal_14
+	local__init_e_at_Razz_internal_14 = CALL __init_Bar_type
+	local__init_e_at_Razz_internal_0 = local__init_e_at_Razz_internal_14
+	GOTO _init_e_at_Razz_label_4
+	LABEL _init_e_at_Razz_label_5
+	local__init_e_at_Razz_internal_12 = EQUAL Bar local__init_e_at_Razz_internal_8
+	local__init_e_at_Razz_internal_12 = NOT local__init_e_at_Razz_internal_12
+	IF local__init_e_at_Razz_internal_12 GOTO _init_e_at_Razz_label_6
+	local__init_e_at_Razz_n_15 = self
+	local__init_e_at_Razz_internal_0 = local__init_e_at_Razz_n_15
+	GOTO _init_e_at_Razz_label_4
+	LABEL _init_e_at_Razz_label_6
+	LABEL _init_e_at_Razz_label_0
+	ABORT
+	LABEL _init_e_at_Razz_label_4
+	SETATTR self e local__init_e_at_Razz_internal_0
+	RETURN 
+}
+function __init_f_at_Razz {
+	PARAM self
+
+	LOCAL local__init_f_at_Razz_internal_0
+	LOCAL local__init_f_at_Razz_internal_1
+	LOCAL local__init_f_at_Razz_internal_2
+	LOCAL local__init_f_at_Razz_internal_3
+	LOCAL local__init_f_at_Razz_internal_4
+	LOCAL local__init_f_at_Razz_internal_5
+	LOCAL local__init_f_at_Razz_internal_6
+	LOCAL local__init_f_at_Razz_internal_7
+	LOCAL local__init_f_at_Razz_internal_8
+	LOCAL local__init_f_at_Razz_internal_9
+	LOCAL local__init_f_at_Razz_internal_10
+	LOCAL local__init_f_at_Razz_internal_11
+	LOCAL local__init_f_at_Razz_internal_12
+	LOCAL local__init_f_at_Razz_internal_13
+	LOCAL local__init_f_at_Razz_internal_14
+	LOCAL local__init_f_at_Razz_internal_15
+
+	local__init_f_at_Razz_internal_0 = GETATTR self a
+	ARG local__init_f_at_Razz_internal_0
+	local__init_f_at_Razz_internal_1 = CALL function_doh_at_Bazz
+	local__init_f_at_Razz_internal_2 = GETATTR self g
+	ARG local__init_f_at_Razz_internal_2
+	local__init_f_at_Razz_internal_4 = TYPEOF local__init_f_at_Razz_internal_2
+	local__init_f_at_Razz_internal_3 = VCALL local__init_f_at_Razz_internal_4 doh
+	local__init_f_at_Razz_internal_5 = local__init_f_at_Razz_internal_1 + local__init_f_at_Razz_internal_3
+	local__init_f_at_Razz_internal_6 = GETATTR self e
+	ARG local__init_f_at_Razz_internal_6
+	local__init_f_at_Razz_internal_8 = TYPEOF local__init_f_at_Razz_internal_6
+	local__init_f_at_Razz_internal_7 = VCALL local__init_f_at_Razz_internal_8 doh
+	local__init_f_at_Razz_internal_9 = local__init_f_at_Razz_internal_5 + local__init_f_at_Razz_internal_7
+	ARG self
+	local__init_f_at_Razz_internal_11 = TYPEOF self
+	local__init_f_at_Razz_internal_10 = VCALL local__init_f_at_Razz_internal_11 doh
+	local__init_f_at_Razz_internal_12 = local__init_f_at_Razz_internal_9 + local__init_f_at_Razz_internal_10
+	ARG self
+	local__init_f_at_Razz_internal_14 = TYPEOF self
+	local__init_f_at_Razz_internal_13 = VCALL local__init_f_at_Razz_internal_14 printh
+	local__init_f_at_Razz_internal_15 = local__init_f_at_Razz_internal_12 + local__init_f_at_Razz_internal_13
+	SETATTR self f local__init_f_at_Razz_internal_15
+	RETURN 
 }
 function function_out_string_at_IO {
 	PARAM self
@@ -208,102 +624,245 @@ function function_in_int_at_IO {
 	local_in_int_at_IO_internal_0 = READINT
 	RETURN local_in_int_at_IO_internal_0
 }
+function __init_h_at_Bazz {
+	PARAM self
+
+	
+
+	SETATTR self h 1
+	RETURN 
+}
+function __init_g_at_Bazz {
+	PARAM self
+
+	LOCAL local__init_g_at_Bazz_internal_0
+	LOCAL local__init_g_at_Bazz_internal_1
+	LOCAL local__init_g_at_Bazz_internal_2
+	LOCAL local__init_g_at_Bazz_internal_3
+	LOCAL local__init_g_at_Bazz_internal_4
+	LOCAL local__init_g_at_Bazz_internal_5
+	LOCAL local__init_g_at_Bazz_internal_6
+	LOCAL local__init_g_at_Bazz_internal_7
+	LOCAL local__init_g_at_Bazz_internal_8
+	LOCAL local__init_g_at_Bazz_internal_9
+	LOCAL local__init_g_at_Bazz_internal_10
+	LOCAL local__init_g_at_Bazz_internal_11
+	LOCAL local__init_g_at_Bazz_internal_12
+	LOCAL local__init_g_at_Bazz_n_13
+	LOCAL local__init_g_at_Bazz_internal_14
+	LOCAL local__init_g_at_Bazz_n_15
+	LOCAL local__init_g_at_Bazz_internal_16
+	LOCAL local__init_g_at_Bazz_n_17
+	LOCAL local__init_g_at_Bazz_internal_18
+	LOCAL local__init_g_at_Bazz_n_19
+
+	local__init_g_at_Bazz_internal_2 = VOID
+	local__init_g_at_Bazz_internal_2 = EQUAL self local__init_g_at_Bazz_internal_2
+	IF local__init_g_at_Bazz_internal_2 GOTO _init_g_at_Bazz_label_0
+	local__init_g_at_Bazz_internal_1 = TYPEOF self
+	local__init_g_at_Bazz_internal_3 = ARRAY Object 4
+	SETINDEX local__init_g_at_Bazz_internal_3 0 Bazz
+	SETINDEX local__init_g_at_Bazz_internal_3 1 Razz
+	SETINDEX local__init_g_at_Bazz_internal_3 2 Foo
+	SETINDEX local__init_g_at_Bazz_internal_3 3 Bar
+	local__init_g_at_Bazz_internal_4 = -1
+	local__init_g_at_Bazz_internal_6 = -2
+	LABEL _init_g_at_Bazz_label_1
+	local__init_g_at_Bazz_internal_4 = local__init_g_at_Bazz_internal_4 + 1
+	local__init_g_at_Bazz_internal_9 = EQUAL local__init_g_at_Bazz_internal_4 4
+	IF local__init_g_at_Bazz_internal_9 GOTO _init_g_at_Bazz_label_3
+	local__init_g_at_Bazz_internal_8 = GETINDEX local__init_g_at_Bazz_internal_3 local__init_g_at_Bazz_internal_4
+	ARG local__init_g_at_Bazz_internal_1
+	ARG local__init_g_at_Bazz_internal_8
+	local__init_g_at_Bazz_internal_7 = CALL type_distance
+	local__init_g_at_Bazz_internal_10 = EQUAL local__init_g_at_Bazz_internal_7 -1
+	IF local__init_g_at_Bazz_internal_10 GOTO _init_g_at_Bazz_label_1
+	local__init_g_at_Bazz_internal_11 = EQUAL local__init_g_at_Bazz_internal_6 -2
+	IF local__init_g_at_Bazz_internal_11 GOTO _init_g_at_Bazz_label_2
+	local__init_g_at_Bazz_internal_11 = local__init_g_at_Bazz_internal_6 > local__init_g_at_Bazz_internal_7
+	IF local__init_g_at_Bazz_internal_11 GOTO _init_g_at_Bazz_label_2
+	GOTO _init_g_at_Bazz_label_1
+	LABEL _init_g_at_Bazz_label_2
+	local__init_g_at_Bazz_internal_6 = local__init_g_at_Bazz_internal_7
+	local__init_g_at_Bazz_internal_5 = local__init_g_at_Bazz_internal_4
+	GOTO _init_g_at_Bazz_label_1
+	LABEL _init_g_at_Bazz_label_3
+	local__init_g_at_Bazz_internal_11 = EQUAL local__init_g_at_Bazz_internal_6 -2
+	IF local__init_g_at_Bazz_internal_11 GOTO _init_g_at_Bazz_label_0
+	local__init_g_at_Bazz_internal_8 = GETINDEX local__init_g_at_Bazz_internal_3 local__init_g_at_Bazz_internal_5
+	local__init_g_at_Bazz_internal_12 = EQUAL Bazz local__init_g_at_Bazz_internal_8
+	local__init_g_at_Bazz_internal_12 = NOT local__init_g_at_Bazz_internal_12
+	IF local__init_g_at_Bazz_internal_12 GOTO _init_g_at_Bazz_label_5
+	local__init_g_at_Bazz_n_13 = self
+	local__init_g_at_Bazz_internal_14 = ALLOCATE Foo
+	ARG local__init_g_at_Bazz_internal_14
+	local__init_g_at_Bazz_internal_14 = CALL __init_Foo_type
+	local__init_g_at_Bazz_internal_0 = local__init_g_at_Bazz_internal_14
+	GOTO _init_g_at_Bazz_label_4
+	LABEL _init_g_at_Bazz_label_5
+	local__init_g_at_Bazz_internal_12 = EQUAL Razz local__init_g_at_Bazz_internal_8
+	local__init_g_at_Bazz_internal_12 = NOT local__init_g_at_Bazz_internal_12
+	IF local__init_g_at_Bazz_internal_12 GOTO _init_g_at_Bazz_label_6
+	local__init_g_at_Bazz_n_15 = self
+	local__init_g_at_Bazz_internal_16 = ALLOCATE Bar
+	ARG local__init_g_at_Bazz_internal_16
+	local__init_g_at_Bazz_internal_16 = CALL __init_Bar_type
+	local__init_g_at_Bazz_internal_0 = local__init_g_at_Bazz_internal_16
+	GOTO _init_g_at_Bazz_label_4
+	LABEL _init_g_at_Bazz_label_6
+	local__init_g_at_Bazz_internal_12 = EQUAL Foo local__init_g_at_Bazz_internal_8
+	local__init_g_at_Bazz_internal_12 = NOT local__init_g_at_Bazz_internal_12
+	IF local__init_g_at_Bazz_internal_12 GOTO _init_g_at_Bazz_label_7
+	local__init_g_at_Bazz_n_17 = self
+	local__init_g_at_Bazz_internal_18 = ALLOCATE Razz
+	ARG local__init_g_at_Bazz_internal_18
+	local__init_g_at_Bazz_internal_18 = CALL __init_Razz_type
+	local__init_g_at_Bazz_internal_0 = local__init_g_at_Bazz_internal_18
+	GOTO _init_g_at_Bazz_label_4
+	LABEL _init_g_at_Bazz_label_7
+	local__init_g_at_Bazz_internal_12 = EQUAL Bar local__init_g_at_Bazz_internal_8
+	local__init_g_at_Bazz_internal_12 = NOT local__init_g_at_Bazz_internal_12
+	IF local__init_g_at_Bazz_internal_12 GOTO _init_g_at_Bazz_label_8
+	local__init_g_at_Bazz_n_19 = self
+	local__init_g_at_Bazz_internal_0 = local__init_g_at_Bazz_n_19
+	GOTO _init_g_at_Bazz_label_4
+	LABEL _init_g_at_Bazz_label_8
+	LABEL _init_g_at_Bazz_label_0
+	ABORT
+	LABEL _init_g_at_Bazz_label_4
+	SETATTR self g local__init_g_at_Bazz_internal_0
+	RETURN 
+}
+function __init_i_at_Bazz {
+	PARAM self
+
+	LOCAL local__init_i_at_Bazz_internal_0
+	LOCAL local__init_i_at_Bazz_internal_1
+
+	ARG self
+	local__init_i_at_Bazz_internal_1 = TYPEOF self
+	local__init_i_at_Bazz_internal_0 = VCALL local__init_i_at_Bazz_internal_1 printh
+	SETATTR self i local__init_i_at_Bazz_internal_0
+	RETURN 
+}
+function function_printh_at_Bazz {
+	PARAM self
+
+	LOCAL local_printh_at_Bazz_internal_0
+	LOCAL local_printh_at_Bazz_internal_1
+	LOCAL local_printh_at_Bazz_internal_2
+	LOCAL local_printh_at_Bazz_internal_3
+
+	local_printh_at_Bazz_internal_1 = GETATTR self h
+	ARG self
+	ARG local_printh_at_Bazz_internal_1
+	local_printh_at_Bazz_internal_3 = TYPEOF self
+	local_printh_at_Bazz_internal_2 = VCALL local_printh_at_Bazz_internal_3 out_int
+	RETURN 0
+}
+function function_doh_at_Bazz {
+	PARAM self
+
+	LOCAL local_doh_at_Bazz_i_0
+	LOCAL local_doh_at_Bazz_internal_1
+	LOCAL local_doh_at_Bazz_internal_2
+	LOCAL local_doh_at_Bazz_internal_3
+	LOCAL local_doh_at_Bazz_internal_4
+
+	local_doh_at_Bazz_internal_1 = GETATTR self h
+	local_doh_at_Bazz_i_0 = local_doh_at_Bazz_internal_1
+	local_doh_at_Bazz_internal_3 = GETATTR self h
+	local_doh_at_Bazz_internal_4 = local_doh_at_Bazz_internal_3 + 1
+	SETATTR self h local_doh_at_Bazz_internal_4
+	RETURN local_doh_at_Bazz_i_0
+}
+function function_abort_at_Object {
+	PARAM self
+
+	LOCAL local_abort_at_Object_internal_0
+	LOCAL local_abort_at_Object_internal_1
+	LOCAL local_abort_at_Object_internal_2
+	LOCAL local_abort_at_Object_internal_3
+	LOCAL local_abort_at_Object_internal_4
+	LOCAL local_abort_at_Object_internal_5
+
+	local_abort_at_Object_internal_0 = TYPEOF self
+	local_abort_at_Object_internal_1 = TYPENAME local_abort_at_Object_internal_0
+	local_abort_at_Object_internal_2 = LOAD data_10
+	local_abort_at_Object_internal_3 = LOAD data_11
+	local_abort_at_Object_internal_4 = CONCAT local_abort_at_Object_internal_2 local_abort_at_Object_internal_1
+	local_abort_at_Object_internal_5 = CONCAT local_abort_at_Object_internal_4 local_abort_at_Object_internal_3
+	PRINT local_abort_at_Object_internal_5
+	ABORT
+	RETURN 0
+}
+function function_type_name_at_Object {
+	PARAM self
+
+	LOCAL local_type_name_at_Object_internal_0
+
+	local_type_name_at_Object_internal_0 = TYPEOF self
+	local_type_name_at_Object_internal_0 = TYPENAME local_type_name_at_Object_internal_0
+	RETURN local_type_name_at_Object_internal_0
+}
+function function_copy_at_Object {
+	PARAM self
+
+	LOCAL local_copy_at_Object_internal_0
+
+	local_copy_at_Object_internal_0 = COPY self
+	RETURN local_copy_at_Object_internal_0
+}
+function __init_a_at_Main {
+	PARAM self
+
+	LOCAL local__init_a_at_Main_internal_0
+
+	local__init_a_at_Main_internal_0 = ALLOCATE Bazz
+	ARG local__init_a_at_Main_internal_0
+	local__init_a_at_Main_internal_0 = CALL __init_Bazz_type
+	SETATTR self a local__init_a_at_Main_internal_0
+	RETURN 
+}
+function __init_b_at_Main {
+	PARAM self
+
+	LOCAL local__init_b_at_Main_internal_0
+
+	local__init_b_at_Main_internal_0 = ALLOCATE Foo
+	ARG local__init_b_at_Main_internal_0
+	local__init_b_at_Main_internal_0 = CALL __init_Foo_type
+	SETATTR self b local__init_b_at_Main_internal_0
+	RETURN 
+}
+function __init_c_at_Main {
+	PARAM self
+
+	LOCAL local__init_c_at_Main_internal_0
+
+	local__init_c_at_Main_internal_0 = ALLOCATE Razz
+	ARG local__init_c_at_Main_internal_0
+	local__init_c_at_Main_internal_0 = CALL __init_Razz_type
+	SETATTR self c local__init_c_at_Main_internal_0
+	RETURN 
+}
+function __init_d_at_Main {
+	PARAM self
+
+	LOCAL local__init_d_at_Main_internal_0
+
+	local__init_d_at_Main_internal_0 = ALLOCATE Bar
+	ARG local__init_d_at_Main_internal_0
+	local__init_d_at_Main_internal_0 = CALL __init_Bar_type
+	SETATTR self d local__init_d_at_Main_internal_0
+	RETURN 
+}
 function function_main_at_Main {
 	PARAM self
 
 	LOCAL local_main_at_Main_internal_0
-	LOCAL local_main_at_Main_internal_1
-	LOCAL local_main_at_Main_internal_2
-	LOCAL local_main_at_Main_internal_3
-	LOCAL local_main_at_Main_internal_4
-	LOCAL local_main_at_Main_internal_5
-	LOCAL local_main_at_Main_internal_6
-	LOCAL local_main_at_Main_internal_7
-	LOCAL local_main_at_Main_internal_8
-	LOCAL local_main_at_Main_internal_9
-	LOCAL local_main_at_Main_internal_10
-	LOCAL local_main_at_Main_internal_11
-	LOCAL local_main_at_Main_internal_12
-	LOCAL local_main_at_Main_internal_13
-	LOCAL local_main_at_Main_internal_14
-	LOCAL local_main_at_Main_internal_15
-	LOCAL local_main_at_Main_internal_16
-	LOCAL local_main_at_Main_internal_17
-	LOCAL local_main_at_Main_internal_18
-	LOCAL local_main_at_Main_internal_19
-	LOCAL local_main_at_Main_internal_20
-	LOCAL local_main_at_Main_internal_21
-	LOCAL local_main_at_Main_internal_22
-	LOCAL local_main_at_Main_internal_23
-	LOCAL local_main_at_Main_internal_24
-	LOCAL local_main_at_Main_internal_25
-	LOCAL local_main_at_Main_internal_26
-	LOCAL local_main_at_Main_internal_27
-	LOCAL local_main_at_Main_internal_28
 
-	local_main_at_Main_internal_2 = LOAD data_6
-	local_main_at_Main_internal_3 = LOAD data_7
-	local_main_at_Main_internal_1 = EQUAL local_main_at_Main_internal_2 local_main_at_Main_internal_3
-	IF local_main_at_Main_internal_1 GOTO main_at_Main_label_0
-	local_main_at_Main_internal_4 = LOAD data_8
-	ARG self
-	ARG local_main_at_Main_internal_4
-	local_main_at_Main_internal_6 = TYPEOF self
-	local_main_at_Main_internal_5 = VCALL local_main_at_Main_internal_6 out_string
-	local_main_at_Main_internal_0 = local_main_at_Main_internal_5
-	GOTO main_at_Main_label_1
-	LABEL main_at_Main_label_0
-	local_main_at_Main_internal_9 = LOAD data_9
-	local_main_at_Main_internal_10 = LOAD data_10
-	local_main_at_Main_internal_8 = EQUAL local_main_at_Main_internal_9 local_main_at_Main_internal_10
-	IF local_main_at_Main_internal_8 GOTO main_at_Main_label_2
-	local_main_at_Main_internal_13 = ALLOCATE Object
-	ARG local_main_at_Main_internal_13
-	local_main_at_Main_internal_13 = CALL __init_Object_type
-	local_main_at_Main_internal_14 = ALLOCATE Object
-	ARG local_main_at_Main_internal_14
-	local_main_at_Main_internal_14 = CALL __init_Object_type
-	local_main_at_Main_internal_12 = EQUAL local_main_at_Main_internal_13 local_main_at_Main_internal_14
-	IF local_main_at_Main_internal_12 GOTO main_at_Main_label_4
-	local_main_at_Main_internal_16 = EQUAL self self
-	IF local_main_at_Main_internal_16 GOTO main_at_Main_label_6
-	local_main_at_Main_internal_17 = LOAD data_11
-	ARG self
-	ARG local_main_at_Main_internal_17
-	local_main_at_Main_internal_19 = TYPEOF self
-	local_main_at_Main_internal_18 = VCALL local_main_at_Main_internal_19 out_string
-	local_main_at_Main_internal_15 = local_main_at_Main_internal_18
-	GOTO main_at_Main_label_7
-	LABEL main_at_Main_label_6
-	local_main_at_Main_internal_20 = LOAD data_12
-	ARG self
-	ARG local_main_at_Main_internal_20
-	local_main_at_Main_internal_22 = TYPEOF self
-	local_main_at_Main_internal_21 = VCALL local_main_at_Main_internal_22 out_string
-	local_main_at_Main_internal_15 = local_main_at_Main_internal_21
-	LABEL main_at_Main_label_7
-	local_main_at_Main_internal_11 = local_main_at_Main_internal_15
-	GOTO main_at_Main_label_5
-	LABEL main_at_Main_label_4
-	local_main_at_Main_internal_23 = LOAD data_13
-	ARG self
-	ARG local_main_at_Main_internal_23
-	local_main_at_Main_internal_25 = TYPEOF self
-	local_main_at_Main_internal_24 = VCALL local_main_at_Main_internal_25 out_string
-	local_main_at_Main_internal_11 = local_main_at_Main_internal_24
-	LABEL main_at_Main_label_5
-	local_main_at_Main_internal_7 = local_main_at_Main_internal_11
-	GOTO main_at_Main_label_3
-	LABEL main_at_Main_label_2
-	local_main_at_Main_internal_26 = LOAD data_14
-	ARG self
-	ARG local_main_at_Main_internal_26
-	local_main_at_Main_internal_28 = TYPEOF self
-	local_main_at_Main_internal_27 = VCALL local_main_at_Main_internal_28 out_string
-	local_main_at_Main_internal_7 = local_main_at_Main_internal_27
-	LABEL main_at_Main_label_3
-	local_main_at_Main_internal_0 = local_main_at_Main_internal_7
-	LABEL main_at_Main_label_1
+	local_main_at_Main_internal_0 = LOAD data_12
 	RETURN local_main_at_Main_internal_0
 }
 function __init_Object_type {
@@ -354,13 +913,87 @@ function __init_IO_type {
 	
 	RETURN self
 }
-function __init_Main_type {
+function __init_Foo_type {
 	PARAM self
 
+	LOCAL local__init_Foo_type_internal_0
+	LOCAL local__init_Foo_type_internal_1
+
+	ARG self
+	self = CALL __init_Bazz_type
 	
+	ARG self
+	local__init_Foo_type_internal_0 = CALL __init_a_at_Foo
+	ARG self
+	local__init_Foo_type_internal_1 = CALL __init_b_at_Foo
+	RETURN self
+}
+function __init_Bar_type {
+	PARAM self
+
+	LOCAL local__init_Bar_type_internal_0
+	LOCAL local__init_Bar_type_internal_1
+
+	ARG self
+	self = CALL __init_Razz_type
+	
+	ARG self
+	local__init_Bar_type_internal_0 = CALL __init_c_at_Bar
+	ARG self
+	local__init_Bar_type_internal_1 = CALL __init_d_at_Bar
+	RETURN self
+}
+function __init_Razz_type {
+	PARAM self
+
+	LOCAL local__init_Razz_type_internal_0
+	LOCAL local__init_Razz_type_internal_1
+
+	ARG self
+	self = CALL __init_Foo_type
+	
+	ARG self
+	local__init_Razz_type_internal_0 = CALL __init_e_at_Razz
+	ARG self
+	local__init_Razz_type_internal_1 = CALL __init_f_at_Razz
+	RETURN self
+}
+function __init_Bazz_type {
+	PARAM self
+
+	LOCAL local__init_Bazz_type_internal_0
+	LOCAL local__init_Bazz_type_internal_1
+	LOCAL local__init_Bazz_type_internal_2
 
 	ARG self
 	self = CALL __init_IO_type
 	
+	ARG self
+	local__init_Bazz_type_internal_0 = CALL __init_h_at_Bazz
+	ARG self
+	local__init_Bazz_type_internal_1 = CALL __init_g_at_Bazz
+	ARG self
+	local__init_Bazz_type_internal_2 = CALL __init_i_at_Bazz
+	RETURN self
+}
+function __init_Main_type {
+	PARAM self
+
+	LOCAL local__init_Main_type_internal_0
+	LOCAL local__init_Main_type_internal_1
+	LOCAL local__init_Main_type_internal_2
+	LOCAL local__init_Main_type_internal_3
+
+	ARG self
+	self = CALL __init_Object_type
+	
+	ARG self
+	local__init_Main_type_internal_0 = CALL __init_a_at_Main
+	ARG self
+	local__init_Main_type_internal_1 = CALL __init_b_at_Main
+	ARG self
+	local__init_Main_type_internal_2 = CALL __init_c_at_Main
+	ARG self
+	local__init_Main_type_internal_3 = CALL __init_d_at_Main
 	RETURN self
 }

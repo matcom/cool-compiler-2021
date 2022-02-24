@@ -566,6 +566,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(LoadWordNode(Reg.t(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
         start_loop = "__remove_last_char_start"
         end_loop = "__remove_last_char_end"
+        return_label = "__remove_last_char_return"
+
+        self.add_instruction(LoadByteNode(Reg.t(1), 0, Reg.t(0), comment="Get current char"))
+        self.add_instruction(BranchEqualNode(Reg.t(1), Reg.zero(), return_label, comment="if char is null then return"))
 
         self.add_instruction(LabelNode(start_loop, comment="Initial loop"))
         self.add_instruction(LoadByteNode(Reg.t(1), 0, Reg.t(0), comment="Get current char"))
@@ -577,6 +581,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(AddImmediateNode(Reg.t(0), Reg.t(0), -1, comment="Back one char to last one"))
         self.add_instruction(StoreByteNode(Reg.zero(), 0, Reg.t(0), comment="Store null character"))
 
+        self.add_instruction(LabelNode(return_label, comment="Return, removing last char"))
         self.add_instruction(JumpRegisterNode(Reg.ra()))
 
     def _add_string_equal_function(self, row=None, column=None, comment=None):
@@ -617,12 +622,21 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         self.add_instruction(LabelNode("__object_equal"))
         
-        obj_cmp_label = "__object_equal_label"
+        obj_cmp_false_section = "__object_equal_false_section"
         obj_end_cmp_label = "__object_equal_end"
         
         self.add_instruction(SetEqualToNode(Reg.v(0), Reg.a(0), Reg.a(1), comment="Compare obj by address"))
         self.add_instruction(BranchNotEqualNode(Reg.v(0), Reg.zero(), obj_end_cmp_label, comment="Equal Address or Value obj are equal"))
-                
+        
+        # Here a0 != a1
+        
+        self.add_instruction(SetEqualToNode(Reg.t(0), Reg.zero(), Reg.a(0), comment="Check if first obj is null"))
+        self.add_instruction(BranchNotEqualNode(Reg.t(0), Reg.zero(), obj_cmp_false_section, comment="Set v0 to False and return"))
+
+        self.add_instruction(SetEqualToNode(Reg.t(0), Reg.zero(), Reg.a(1), comment="Check if second obj is null"))
+        self.add_instruction(BranchNotEqualNode(Reg.t(0), Reg.zero(), obj_cmp_false_section, comment="Set v0 to False and return"))
+
+
         self.add_instruction(MoveNode(Reg.t(0), Reg.a(0), comment="t0 = left object"))
         self.add_instruction(MoveNode(Reg.t(1), Reg.a(1), comment="t1 = right object"))
 
@@ -637,19 +651,19 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         self.add_instruction(SetEqualToNode(Reg.t(1), Reg.t(1), Reg.t(2), comment="t1 = right type == String"))
         self.add_instruction(AndNode(Reg.t(0), Reg.t(0), Reg.t(1), comment="Both types are equal to String"))
         
-        self.add_instruction(BranchEqualNode(Reg.t(0), Reg.zero(), obj_cmp_label, comment="If not equal return 0"))
+        self.add_instruction(BranchEqualNode(Reg.t(0), Reg.zero(), obj_cmp_false_section, comment="If not equal return 0"))
         
         self._push([Reg.ra(), Reg.a(0), Reg.a(1)])
         self.add_instruction(JumpAndLinkNode("__string_equal"))
         # In $v0 if equal or not
         self._pop([Reg.ra(), Reg.a(0), Reg.a(1)])
         
-        self.add_instruction(JumpNode(obj_end_cmp_label))
-        self.add_instruction(LabelNode(obj_cmp_label, comment="Do Obj cmp"))
+        self.add_instruction(JumpNode(obj_end_cmp_label, comment="Go to end"))
+        self.add_instruction(LabelNode(obj_cmp_false_section, comment="Do Obj cmp"))
 
         self.add_instruction(MoveNode(Reg.v(0), Reg.zero(), comment="Not equal objects"))            
-                
-        self.add_instruction(LabelNode(obj_end_cmp_label, comment="End cmp"))   
+        
+        self.add_instruction(LabelNode(obj_end_cmp_label, comment="End cmp"))
         
         self.add_instruction(JumpRegisterNode(Reg.ra()))
 
