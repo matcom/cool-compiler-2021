@@ -19,7 +19,7 @@ class MIPSGenerator:
         global_main = "\t.globl main"
         text_section = "\t.text\n" + self.visit(node.text_section)
         data_section = "\t.data\n" + self.visit(node.data_section)
-        return f"{global_main}\n{text_section}\n{data_section}"
+        return f"{global_main}\n\n{data_section}\n\n{text_section}"
 
     @visitor.when(mips.TextNode)
     def visit(self, node: mips.TextNode):
@@ -27,11 +27,14 @@ class MIPSGenerator:
 
     @visitor.when(mips.DataSectionNode)
     def visit(self, node: mips.DataNode):
-        return "\n".join(self.visit(data) for data in node.data)
+        return "\n".join(self.visit(data) for data in node.data.values())
 
     @visitor.when(mips.DataNode)
     def visit(self, node: mips.DataNode):
-        return f"\t{node.label}: {node.storage_type} {node.data}"
+        def visit_value(value):
+            return str(value) if isinstance(value, int) or isinstance(value, str) else self.visit(value)
+        data_value = ",".join(visit_value(value) for value in node.data)
+        return f"{self.visit(node.label)}: {node.storage_type} {data_value}"
 
     @visitor.when(mips.RegisterNode)
     def visit(self, node: mips.RegisterNode):
@@ -47,11 +50,11 @@ class MIPSGenerator:
 
     @visitor.when(mips.MemoryAddressRegisterNode)
     def visit(self, node: mips.MemoryAddressRegisterNode):
-        return f"{self.visit(node.register)}({(node.index)})"
+        return f"{(node.index)}({self.visit(node.register)})"
 
     @visitor.when(mips.MemoryAddressLabelNode)
     def visit(self, node: mips.MemoryAddressLabelNode):
-        return f"{self.visit(node.address)}({(node.index)})"
+        return f"({(node.index)}){self.visit(node.address)}"
 
     @visitor.when(mips.MoveNode)
     def visit(self, node: mips.MoveNode):
@@ -59,11 +62,11 @@ class MIPSGenerator:
 
     @visitor.when(mips.SyscallNode)
     def visit(self, node: mips.SyscallNode):
-        return "syscall"
+        return "\tsyscall"
 
     @visitor.when(mips.LoadAddressNode)
     def visit(self, node: mips.LoadAddressNode):
-        return f"\tla {self.visit(node.left)}, {self.visit(node.right)}"
+        return f"\tla {self.visit(node.left)}, {node.right}"
 
     @visitor.when(mips.LoadWordNode)
     def visit(self, node: mips.LoadWordNode):
@@ -107,7 +110,7 @@ class MIPSGenerator:
 
     @visitor.when(mips.JumpAndLinkNode)
     def visit(self, node: mips.JumpAndLinkNode):
-        return f"\tjal {self.visit(node.address)}"
+        return f"\tjal {node.address}"
 
     @visitor.when(mips.JumpRegisterLinkNode)
     def visit(self, node: mips.JumpRegisterLinkNode):

@@ -35,7 +35,9 @@ def coolpyler(input: Path, output: Path = None):
     ast = parser.parse(tokens)  # noqa: F841
 
     visitor = Visitor(errors)
-    ast = visitor.visit(ast)
+    mips = visitor.visit(ast)
+
+    print(mips)
 
     if len(errors) > 0:
         report_and_exit(errors)
