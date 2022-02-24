@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import List, Tuple, Union
 
-from coolcmp.utils.registers import FP, Register, SP, DW
+from coolcmp.utils.registers import FP, Register, SP, DW, ARG, V0
 
 
 PROTOTYPES = "__prototypes_labels__"
@@ -46,16 +46,16 @@ class FunctionNode(Node):
         self.local_vars = local_vars
         self.instructions = []
 
-    def param_address(self, name: str) -> Tuple[Register, int]:
-        index = self.params.index(name)
-        params_amount = len(self.params)
-        offset = (params_amount - 1 - index) * DW
-        return offset
-
     def local_address(self, name: str):
         index = self.local_vars.index(name)
         locals_amount = len(self.local_vars)
         offset = (locals_amount + 2 - index) * DW
+        return -offset
+
+    def param_address(self, name: str):
+        index = self.params.index(name)
+        params_amount = len(self.params)
+        offset = (params_amount + 2 - index) * DW
         return offset
 
     def variable_address(self, name: str):
@@ -87,7 +87,7 @@ class SWNode(InstructionNode):
     Copy from register to memory.
     """
 
-    def __init__(self, dest: int, offset: int, src: Register):
+    def __init__(self, dest: Register, offset: int, src: Register):
         self.dest = dest
         self.offset = offset
         self.src = src
@@ -99,7 +99,7 @@ class LWNode(InstructionNode):
     Copy from memory to register.
     """
 
-    def __init__(self, dest: Register, offset: int, src: int):
+    def __init__(self, dest: Register, offset: int, src: Register):
         self.dest = dest
         self.offset = offset
         self.src = src
@@ -123,7 +123,7 @@ class JALNode(InstructionNode):
     This saves the return address in $ra.
     """
 
-    def __init__(self, dest: int):
+    def __init__(self, dest: str):
         self.dest = dest
 
 
@@ -171,6 +171,29 @@ class JRNode(InstructionNode):
         self.dest = dest
 
 
+class SLLNode(InstructionNode):
+    """
+    shift left logical by a constant number of bits
+    sll $1, $2, 10 -> $1 = $2<<10
+    """
+
+    def __init__(self, dest: Register, src: Register, bits: int):
+        self.dest = dest
+        self.src = src
+        self.bits = bits
+
+
+class MoveNode(InstructionNode):
+    """
+    copy from register to register
+    move $1,$2 -> $1=$2
+    """
+
+    def __init__(self, reg1: Register, reg2: Register):
+        self.reg1 = reg1
+        self.reg2 = reg2
+
+
 class SysCallNode(InstructionNode):
     pass
 
@@ -213,3 +236,19 @@ def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
     addi = ADDINode(SP, SP, DW)
 
     return [lw, addi]
+
+
+def create_object_instructions(r1: Register, r2: Register):
+    return [
+        SLLNode(r1, r1, 2),
+        LANode(r2, PROTOTYPES),
+        ADDNode(r2, r2, r1),
+        LWNode(r2, 0, r2),
+        LWNode(ARG[0], 4, r2),
+        SLLNode(ARG[0], ARG[0], 2),
+        JALNode("malloc"),
+        MoveNode(ARG[2], ARG[0]),
+        MoveNode(ARG[0], r2),
+        MoveNode(ARG[1], V0),
+        JALNode("copy"),
+    ]
