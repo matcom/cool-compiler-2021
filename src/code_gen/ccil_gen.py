@@ -1,7 +1,7 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import Set, Tuple, List, Dict, Unknown
+from typing import  Tuple, List, Dict
 from code_gen.tools import *
 
 
@@ -150,7 +150,7 @@ class CCILGenerator:
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
-            node, node.id, params, to_vars(self.locals, Parameter), operations, fval_id
+            node, f"f_{times}", params, to_vars(self.locals, Parameter), operations, fval_id
         )
 
     @visitor.when(sem_ast.BlocksNode)

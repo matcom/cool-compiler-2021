@@ -8,7 +8,7 @@ from asts.parser_ast import (
     AttrDeclarationNode,
 )
 from semantics.tools.errors import SemanticError
-from semantics.tools import SelfType, TypeBag, Context
+from semantics.tools import TypeBag, Context
 
 
 class TypeBuilder:
