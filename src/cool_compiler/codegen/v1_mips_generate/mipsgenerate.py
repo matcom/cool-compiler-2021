@@ -274,7 +274,7 @@ class MipsGenerate:
                      ASTR.LI('$t0' , str(dir_value)),
                      ASTR.Comment(f"pon en $t0  {dir_value}  "),
                      ASTR.SW ('$t0',f'{stack_plus}($sp)'),
-                     ASTR.Comment(f"pon en la posicion  {dir_value} el valor $t0  ")
+                     ASTR.Comment(f'pon en la posicion  {stack_plus} el valor $t0  ')
                    ]
         else:
             stack_plus_dir_value = self.stack_index(dir_value)
@@ -282,7 +282,7 @@ class MipsGenerate:
                      ASTR.LW ('$t0',f'{stack_plus_dir_value}($sp)'),
                      ASTR.Comment(f"pon en $t0  el contenido de la pos  {stack_plus_dir_value}  "),
                      ASTR.SW ('$t0',f'{stack_plus}($sp)'),
-                     ASTR.Comment(f"pon en la pos  {stack_plus_dir_value}  el valor de $t0")
+                     ASTR.Comment(f"pon en la pos  {stack_plus}  el valor de $t0")
                    ]           
 
     @visitor.when(AST.Neg)
