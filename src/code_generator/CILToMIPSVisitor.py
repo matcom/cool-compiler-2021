@@ -77,8 +77,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.AssignNode)
     def visit(self, node):
-        # print(self.current_function.name)
-        # print(node.local_dest)
         offset = self.var_offset[self.current_function.name][node.local_dest]
         if node.expr:
             if isinstance(node.expr, int):

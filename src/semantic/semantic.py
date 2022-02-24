@@ -62,7 +62,7 @@ class Type:
             raise SemanticError(error_msg, *self.pos)
         self.parent = parent
 
-    def get_attribute(self, name: str, pos):
+    def get_attribute(self, name: str, pos=None):
         try:
             return self.attributes[name]
         except KeyError:

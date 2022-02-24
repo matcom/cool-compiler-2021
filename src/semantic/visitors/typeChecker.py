@@ -152,7 +152,8 @@ class TypeChecker:
                     self.errors.append(TypexError(
                         errorText, arrobaCallNode.line, arrobaCallNode.col))
 
-        return get_type(method.return_type, typex)
+        arrobaCallNode.computed_type = get_type(method.return_type, TypexError)
+        return arrobaCallNode.computed_type
 
     @visitor.when(DotCallNode)
     def visit(self, dotCallNode, scope):
