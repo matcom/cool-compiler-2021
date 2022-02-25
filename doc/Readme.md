@@ -39,7 +39,7 @@ El compilador está compuesto por distintos módulos que son los encargados de t
 el código escrito inicialmente en COOL y obtener el resultado final en código MIPS que 
 permita su ejecución. 
 
-## Organizacion
+## Organización
 
 La estructura de archivos del proyecto es la siguiente:         
  
@@ -92,23 +92,23 @@ Se omitieron algunos archivos pues no son relevantes en la implementación del c
 El fichero _Main.py_ contiene el pipeline de ejecución del compilador
 1. Lexer       
 2. Parser     
-3. Recolección de Tipos         
-4. Construcción de Tipos        
-5. Chequeo de Tipos
-6. COOL a CIL
-7. CIL a Mips
-8. MIPS a representación como string
-9. Escritura en el archivo final
+3. Recolección de Tipos                
+4. Construcción de Tipos              
+5. Chequeo de Tipos           
+6. COOL a CIL              
+7. CIL a Mips                 
+8. MIPS a representación como string                 
+9. Escritura en el archivo final                          
 
 #### Lexer 
 
 El Lexer es el encargado de dado un string con el código del programa COOL separar el
-mismo en tokenspara luego ser usado por el parser. En esta fase se utilizó el paquete 
-_ply_ el cual contieneherramientas de tokenización. Se definieron las expresiones
-regulares y símbolos que correspondían a lostokens de la gramática, definiendo reglas 
-especiales para poder también reconocer los string y comentariosanidados. Además,
-se almacena por cada Token la línea y la columna correspondienteen el código, 
-lo que permite tener mayor información en los mensajes de errory para nuestro uso
+mismo en tokens para luego ser usado por el parser. En esta fase se utilizó el paquete 
+_ply_ el cual contiene herramientas de tokenización. Se definieron las expresiones
+regulares y símbolos que correspondían a los tokens de la gramática, definiendo reglas 
+especiales para poder también reconocer los string y comentarios anidados. Además,
+se almacena por cada Token la línea y la columna correspondiente en el código, 
+lo que permite tener mayor información en los mensajes de error y para nuestro uso
 en la depuración.
 
 
@@ -116,7 +116,7 @@ en la depuración.
 #### Parser
 
 El Parser define la estructura que tendrá el Árbol de Sintaxis Abstracta (AST) del lenguaje COOL, además
-de la gramática que se usará para parsear este.
+de la gramática que se usará para parsear.
 El archivo donde se definen los símbolos y producciones de la gramática puede verse al final
 de este fichero en la sección Gramática.
 
@@ -202,7 +202,8 @@ en memoria.
 - Puntero a la tabla de dispatch (4 bytes): Un entero que representa la posición en memoria donde se encuentra
 la tabla de dispatch del objeto.
 - Definición de atributos de la clase padre.
-- Definición de atributos de la clase hijo. Primero son definidos los atributos de la clase padre de forma recursiva,
+- Definición de atributos de la clase hijo.         
+Primero son definidos los atributos de la clase padre de forma recursiva,
 luego son definidos los atributos de la clase hijo, colocando estos de forma ordenada según los nombres que tenían
 en el código COOL inicial.
 Las tablas de dispatch de cada tipo se definen de manera similar, primero las direcciones de memoria correspondientes
