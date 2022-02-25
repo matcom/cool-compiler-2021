@@ -84,7 +84,7 @@ class CCILGenerator:
         self.reset_locals()
         self.reset_scope()
         init_params = self.init_func_params(node.id)
-        self.ccil_cool_names.add_new_name_pair("self", node.type.name)
+        self.ccil_cool_names.add_new_name_pair("self", node.id)
         attributes: List[Attribute] = list()
         init_attr_ops: List[OperationNode] = []
         for attr in attr_nodes:
@@ -151,7 +151,7 @@ class CCILGenerator:
             self.ccil_cool_names.add_new_name_pair(param.id, new_param_id)
 
         self.locals = dict()
-        (operations, fval_id) = self.visit(node.body)
+        (operations, fval) = self.visit(node.body)
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
@@ -159,7 +159,7 @@ class CCILGenerator:
             params,
             to_vars(self.locals, Local),
             operations,
-            fval_id,
+            fval.id,
         )
 
     @visitor.when(sem_ast.BlocksNode)

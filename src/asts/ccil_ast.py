@@ -34,7 +34,8 @@ class Class:
     def __str__(self) -> str:
         attributes = "\n".join(str(a) for a in self.attributes)
         methods = "\n".join(str(m) for m in self.methods)
-        return f"\ttype {self.id} {{\n {attributes} \n {methods} \n\t}}"
+        init_function = str(self.init_operations)
+        return f"\ttype {self.id} {{\n {attributes} \n {methods} \n \n {init_function}\n\t}}"
 
 
 @dataclass(frozen=True)
@@ -124,7 +125,7 @@ class FunctionNode(Node):
         locals = "\n".join(indent + str(l) for l in self.locals)
         ops = "\n".join(indent + str(o) for o in self.operations)
 
-        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n {indent}return {self.ret.id}"
+        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n {indent}return {self.ret}"
 
 
 class OperationNode(Node):
