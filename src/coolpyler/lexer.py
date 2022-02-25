@@ -237,12 +237,13 @@ class CoolStringLexer(CoolLexerBase, Lexer):
 
     def STRING(self, t):
         self.pop_state()
+        self.string.value += '"'
         t = self.string
         self.string = None
         return t
 
     def ESCAPED_CHAR(self, t):
-        special_map = {"b": "\b", "t": "\t", "n": "\n", "f": "\f"}
+        special_map = {"b": "\b", "t": "\t", "n": "\\n", "f": "\f"}
         if t.value[-1] == "\n":
             self.lineno += 1
         self.string.value += special_map.get(t.value[-1], t.value[-1])

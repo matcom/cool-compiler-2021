@@ -382,7 +382,7 @@ class CilToMIPS:
         )
         instructions.append(
             mips.StoreWordNode(
-                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS_NAMES[0], 0)
+                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
             )
         )
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 4))
@@ -548,7 +548,7 @@ class CilToMIPS:
         if isinstance(node.msg, int):
             instructions.append(mips.LoadInmediateNode(reg1, node.msg))
         else:
-            instructions.append(mips.LoadAddressNode(reg1, node.msg))
+            instructions.append(mips.LoadAddressNode(reg1, mips.LabelNode(node.msg)))
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
