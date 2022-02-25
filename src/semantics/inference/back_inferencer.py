@@ -217,6 +217,7 @@ class BackInferencer:
 
         if node.expr:
             new_expr_node = self.visit(node.expr, scope)
+            new_node.expr = new_expr_node
             decl_type = node.inferenced_type
             expr_type = new_expr_node.inferenced_type
             new_node.inferenced_type, changed = unify(decl_type, expr_type)
