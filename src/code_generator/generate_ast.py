@@ -1,79 +1,13 @@
 from math import exp
 from parsing.ast import *
 from .ast_CIL import *
+from .scope_CIL import *
+from cmp.semantic import IntType, StringType, BoolType
 import cmp.visitor as visitor
 
 
-class CILScope:
-    def __init__(self, context):
-        self.let_count = 0
-        self.if_count = 0
-        self.case_count = 0
-        self.variables_count = 0
-        self.str_count = 0
-        
-        
-        self.locals = []
-        self.all_locals = []
-        self.instructions = []
-        self.data = []
-        self.functions = []
-        self.current_class = ""
-        self.context = context
-         
-    def add_local(self, id, type, is_param = False):
-        local_dict = self.locals[-1] 
-        if id in local_dict.keys():
-            nickname = local_dict[id].id
-            local_dict[id] = CILLocalNode(nickname, type) 
-        else:
-            nickname = f'{id}_{self.variables_count}'
-            self.variables_count += 1
-            node = CILLocalNode(nickname, type)
-            local_dict[id] = node
-            
-            if not is_param:
-                self.all_locals.append(node)
-                
-        return nickname
-                
-    def add_new_local(self, type):
-        local_dict = self.locals[-1] 
-        name = f't_{self.variables_count}'
-        self.variables_count += 1
-        node = CILLocalNode(name, type)
-        local_dict[name] = node
-        self.all_locals.append(node)
-        return name
-    
-    def find_local(self, id):
-        for i in range (len(self.locals) - 1 , -1, -1):
-            d = self.locals[i]
-            try:
-                return d[id]
-            except:
-                pass
-        return None
-
-    def find_data(self, id):
-        for d in self.data:
-            if d.id == id:
-                return d
-        return None
-
-    def retur_type_of_method (self, name_meth, name_class):
-        type_class = self.context.get_type(name_class)
-        method = type_class.get_method(name_meth)
-        return method.return_type.name
-
-    #pending 
-    def create_init_class(attributes, expresions):
-        for attr,expr in zip(attributes,expresions):
-            assig = CILAssignNode (attr.id,expr)
-
-
 class CIL:
-    def __init__(self,context):
+    def __init__(self, context):
         self.scope = CILScope(context)
 
     @visitor.on('node')
@@ -83,10 +17,19 @@ class CIL:
     @visitor.when(ProgramNode)
     def visit(self, node):
         types = []
-        for d in node.declarations:  # TODO organizar de modo q quede el main de primero
+        for d in node.declarations:
             type = self.visit(d)
             types.append(type)
-          
+        
+        # Add built-in types and functions
+        types.extend(self.scope.create_builtin_types())
+        
+        # Brings main function to the first position
+        main_idx = [idx for idx, element in enumerate(self.scope.functions) if element.id == 'main_Main'][0]
+        main = self.scope.functions[main_idx]
+        self.scope.functions.pop(main_idx)
+        self.scope.functions.insert(0, main)
+        
         return CILProgramNode(types, self.scope.data, self.scope.functions)
     
     @visitor.when(ClassDeclarationNode)
@@ -113,8 +56,8 @@ class CIL:
         #init_class = create_init_class (type.attributes,expressions)    
         #self.scope.functions.append (init_class)  
         
-        # herencia          
-              
+        # herencia
+                              
         return CILTypeNode(node.id, attributes, methods)
             
     @visitor.when(AttrDeclarationNode)
@@ -176,7 +119,7 @@ class CIL:
             expression = CILVCallNode(node.type.name, node.id)
         else:         
             expression = CILCallNode(node.id)
-        type = self.scope.retur_type_of_method(node.id, self.scope.current_class)
+        type = self.scope.ret_type_of_method(node.id, self.scope.current_class)
         new_var = self.scope.add_new_local(type) # TODO
         node_var = CILVariableNode(new_var)
         self.scope.instructions.append(CILAssignNode(node_var, expression))     
@@ -218,10 +161,37 @@ class CIL:
             expr = self.visit(node.expr)
             instruction = CILAssignNode(CILVariableNode(name), expr)
             self.scope.instructions.append(instruction)
+        elif isinstance(node.computed_type, IntType): 
+            self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
+            self.scope.instructions.append(CILVCallNode('Int', 'init'))
+        elif isinstance(node.computed_type, BoolType): 
+            self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
+            self.scope.instructions.append(CILVCallNode('Bool', 'init'))
+        elif isinstance(node.computed_type, StringType):
+            self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
+            self.scope.instructions.append(CILVCallNode('String', 'init'))
             
     @visitor.when(LoopNode)
     def visit(self, node):
-        pass
+        count = self.scope.loop_count
+        self.scope.loop_count += 1
+        self.scope.instructions.append(CILLabelNode(f'while_{count}'))
+        pred = self.visit(node.predicate)
+        name_pred = self.scope.add_new_local("Bool")
+        name_return = self.scope.add_new_local(node.computed_type.name)
+        
+        var_condition = CILVariableNode(name_pred) 
+        var_return = CILVariableNode(name_return) 
+        self.scope.instructions.append(CILAssignNode(var_condition, pred))
+        self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'body_{count}')))
+        self.scope.instructions.append(CILGotoNode(CILLabelNode(f'pool_{count}')))
+        self.scope.instructions.append(CILLabelNode(f'body_{count}'))
+        body = self.visit(node.body)
+        self.scope.instructions.append(CILAssignNode(var_return, body))
+        self.scope.instructions.append(CILGotoNode(CILLabelNode(f'while_{count}')))
+        self.scope.instructions.append(CILLabelNode(f'pool_{count}'))
+
+        return var_return
           
     @visitor.when(CaseNode)
     def visit(self, node):
@@ -316,12 +286,14 @@ class CIL:
                 
     @visitor.when(PrimeNode)
     def visit(self, node):
-        pass
+        expr = self.visit(node.expr)
+        return CILStarNode(expr , CILNumberNode(-1))
    
     @visitor.when(NotNode)
     def visit(self, node):
-       pass
-   
+        expr = self.visit(node.expr)
+        return  CILNotEqualsNode( expr, CILNumberNode(0))
+    
     @visitor.when(StringNode)
     def visit(self, node):
         data = CILDataNode(f'str_{self.scope.str_count}', node.lex)
@@ -330,7 +302,13 @@ class CIL:
 
     @visitor.when(IsVoidNode)
     def visit(self, node):
-        pass
+        expr = self.visit(node.expr)
+        if isinstance(node.expr.computed_type, IntType) or isinstance(node.expr.computed_type, StringType) or isinstance(node.expr.computed_type, BoolType):
+            return CILNumberNode(0)
+        else: 
+            name = self.scope.add_new_local(node.computed_type)
+            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
+            return CILEqualsNode(CILVariableNode(name), CILNumberNode(0)) 
     
     @visitor.when(ConstantNumNode)
     def visit(self, node):

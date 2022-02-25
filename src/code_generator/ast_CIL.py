@@ -291,7 +291,7 @@ class CILVCallNode(CILExpressionNode):
         
     def __str__(self):
         text = "VCallNode:\n"
-        text += f"type: {self.func}\n"
+        text += f"type: {self.type}\n"
         text += f"func: {self.func}\n"
         return text 
 
@@ -380,6 +380,7 @@ class CILElessNode(CILBinaryOperationNode):
 
 class CILEqualsNode(CILBinaryOperationNode):
     pass
+
 
 class CILNotEqualsNode(CILBinaryOperationNode):
     pass
