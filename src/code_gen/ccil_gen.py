@@ -80,7 +80,10 @@ class CCILGenerator:
             self.program_codes += class_code
 
         return CCILProgram(
-            list(self.program_types.values()), self.program_codes, self.data
+            self.define_entry_func(),
+            list(self.program_types.values()),
+            self.program_codes,
+            self.data,
         )
 
     @visitor.when(sem_ast.ClassDeclarationNode)
@@ -916,6 +919,15 @@ class CCILGenerator:
                 self.create_string_load_data(EMPTY, DEFAULT_STR.id),
             ]
         return []
+
+    def define_entry_func(self):
+        program = self.create_new_type("program", "Main")
+        execute = self.create_call(
+            "execute_program", INT, "main", INT, [IdNode(program.id)]
+        )
+        return FunctionNode(
+            "entry", [], self.dump_locals(), [program, execute], execute.id
+        )
 
     def define_empty_init_func(self, class_name: str):
         params = self.init_func_params(class_name)
