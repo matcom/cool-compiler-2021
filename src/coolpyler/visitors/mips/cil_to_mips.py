@@ -145,7 +145,7 @@ class CilToMIPS:
             self.memory_manager.save()
             reg = self.memory_manager.get_unused_register()
 
-            instructions.append(mips.LoadInmediateNode(reg, param.name))
+            instructions.append(mips.LoadAddressNode(reg, (mips.LabelNode(param.name))))
             instructions.append(
                 mips.StoreWordNode(reg, mips.MemoryAddressRegisterNode(SP_REG, i * 4))
             )
@@ -173,16 +173,16 @@ class CilToMIPS:
     def visit(self, node: cil.ParamNode):
         self.memory_manager.save()
         instructions = []
-        reg = self.memory_manager.get_unused_register()
+        # reg = self.memory_manager.get_unused_register()
 
-        self.params.append(node.name)
+        # self.params.append(node.name)
 
-        instructions.append(mips.LoadInmediateNode(reg, node.name))
-        instructions.append(
-            mips.StoreWordNode(
-                reg, mips.MemoryAddressRegisterNode(FP_REG, len(self.params) * 4)
-            )
-        )
+        # instructions.append(mips.LoadInmediateNode(reg, node.name))
+        # instructions.append(
+        #     mips.StoreWordNode(
+        #         reg, mips.MemoryAddressRegisterNode(FP_REG, len(self.params) * 4)
+        #     )
+        # )
 
         self.memory_manager.clean()
         return instructions
@@ -195,7 +195,7 @@ class CilToMIPS:
 
         self.locals.append(node.name)
 
-        instructions.append(mips.LoadInmediateNode(reg, node.name))
+        instructions.append(mips.LoadAddressNode(reg, (mips.LabelNode(node.name))))
         instructions.append(
             mips.StoreWordNode(reg, mips.MemoryAddressRegisterNode(SP_REG, 0))
         )
