@@ -60,7 +60,12 @@ class AssignNode(InstructionNode):
 
 
 class ArithmeticNode(InstructionNode):
-    def __init__(self, dest, left, right):
+    def __init__(
+        self,
+        dest,
+        left,
+        right,
+    ):
         self.dest = dest
         self.left = left
         self.right = right
@@ -79,6 +84,32 @@ class StarNode(ArithmeticNode):
 
 
 class DivNode(ArithmeticNode):
+    pass
+
+
+class LessNode(ArithmeticNode):
+    pass
+
+
+class LessEqualNode(ArithmeticNode):
+    pass
+
+
+class EqualNode(ArithmeticNode):
+    pass
+
+
+class UnaryNode(InstructionNode):
+    def __init__(self, dest, expr):
+        self.dest = dest
+        self.expr = expr
+
+
+class NotNode(UnaryNode):
+    pass
+
+
+class IntComplementNode(UnaryNode):
     pass
 
 
@@ -103,7 +134,7 @@ class GetIndexNode(InstructionNode):
 class SetIndexNode(InstructionNode):
     pass
 
- 
+
 class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):
         self.type = itype
@@ -125,11 +156,14 @@ class LabelNode(InstructionNode):
 
 
 class GotoNode(InstructionNode):
-    pass
+    def __init__(self, label):
+        self.label = label
 
 
 class GotoIfNode(InstructionNode):
-    pass
+    def __init__(self, condition, label):
+        self.condition = condition
+        self.label = label
 
 
 class StaticCallNode(InstructionNode):
@@ -224,12 +258,11 @@ class TypeNameNode(InstructionNode):
         self.dest = dest
         self.source = source
 
+
 class PrintVisitor(object):
     @visitor.on("node")
     def visit(self, node):
         pass
-
-   
 
     @visitor.when(ProgramNode)
     def visit(self, node):
@@ -253,6 +286,7 @@ class PrintVisitor(object):
         instructions = "\n\t".join(self.visit(x) for x in node.instructions)
 
         return f"function {node.name} {{\n\t{params}\n\n\t{localvars}\n\n\t{instructions}\n}}"
+
     @visitor.when(DataNode)
     def visit(self, node):
         return f'{node.name} = "{node.value}"'
@@ -260,7 +294,6 @@ class PrintVisitor(object):
     @visitor.when(ParamNode)
     def visit(self, node):
         return f"PARAM {node.name}"
-
 
     @visitor.when(LocalNode)
     def visit(self, node):
@@ -289,6 +322,7 @@ class PrintVisitor(object):
     @visitor.when(AllocateNode)
     def visit(self, node):
         return f"{node.dest} = ALLOCATE {node.type}"
+
     @visitor.when(SetAttribNode)
     def visit(self, node):
         return f" SETATTR {node.type} {node.attr} {node.value}"
@@ -301,45 +335,58 @@ class PrintVisitor(object):
     def visit(self, node):
         return f"{node.dest} = TYPEOF {node.type}"
 
-
-
     @visitor.when(StaticCallNode)
     def visit(self, node):
-         return f"{node.dest} = CALL {node.function}"
+        return f"{node.dest} = CALL {node.function}"
+
     @visitor.when(DynamicCallNode)
     def visit(self, node):
-         return f"{node.dest} = VCALL {node.type} {node.method}"
+        return f"{node.dest} = VCALL {node.type} {node.method}"
+
     @visitor.when(ArgNode)
     def visit(self, node):
-         return f"ARG {node.name}"
+        return f"ARG {node.name}"
+
     @visitor.when(ReturnNode)
     def visit(self, node):
-         return f'RETURN {node.value if node.value is not None else ""}'
+        return f'RETURN {node.value if node.value is not None else ""}'
+
     @visitor.when(RuntimeErrorNode)
     def visit(self, node):
-         return f"ABORT {node.signal}"
+        return f"ABORT {node.signal}"
+
     @visitor.when(CopyNode)
     def visit(self, node):
-         return f"{node.dest} = COPY {node.source}"
+        return f"{node.dest} = COPY {node.source}"
+
     @visitor.when(TypeNameNode)
     def visit(self, node):
-         return f"{node.dest} = TYPE_NAME {node.source}"
+        return f"{node.dest} = TYPE_NAME {node.source}"
+
     @visitor.when(ToStrNode)
     def visit(self, node):
-         return f"{node.dest} = STR {node.ivalue}"
+        return f"{node.dest} = STR {node.ivalue}"
+
     @visitor.when(ReadNode)
     def visit(self, node):
-         return f"{node.dest} = READ"
+        return f"{node.dest} = READ"
+
     @visitor.when(PrintNode)
     def visit(self, node):
-         return f"PRINT {node.str_addr}"
+        return f"PRINT {node.str_addr}"
+
     @visitor.when(LengthNode)
     def visit(self, node):
-         return f"{node.dest} = LENGTH {node.source}"
+        return f"{node.dest} = LENGTH {node.source}"
+
     @visitor.when(ConcatNode)
     def visit(self, node):
-         return f"{node.dest} = CONCAT {node.left} {node.right}"
+        return f"{node.dest} = CONCAT {node.left} {node.right}"
+
     @visitor.when(SubstringNode)
     def visit(self, node):
-         return f"{node.dest} = SUBSTRING {node.source} {node.id} {node.length}"
- 
+        return f"{node.dest} = SUBSTRING {node.source} {node.id} {node.length}"
+
+
+# printer = PrintVisitor()
+# return lambda ast: printer.visit(ast)
