@@ -51,27 +51,25 @@ class LabelNode(MipsAstNode):
 
 
 class InstructionNode(MipsAstNode):
-    def __init__(self):
-        # super().__init__(node)
-        pass
+    def __init__(self, comment=""):
+        self.comment = comment
 
 
 class SyscallNode(InstructionNode):
-    def __init__(self):
-        # super().__init__(node)
-        pass
+    def __init__(self, comment):
+        super().__init__(comment)
 
 
 class BinaryOpNode(InstructionNode):
-    def __init__(self, left, right):
-        # super().__init__(node)
+    def __init__(self, left, right, comment):
+        super().__init__(comment)
         self.left = left
         self.right = right
 
 
 class LoadAddressNode(BinaryOpNode):
-    def __init__(self, register, address):
-        super().__init__(register, address)
+    def __init__(self, register, address, comment):
+        super().__init__(register, address, comment)
 
 
 class LoadWordNode(BinaryOpNode):
@@ -80,111 +78,100 @@ class LoadWordNode(BinaryOpNode):
 
 
 class LoadByteNode(BinaryOpNode):
-    def __init__(self, register, ram_dir):
-        super().__init__(register, ram_dir)
+    def __init__(self, register, ram_dir, comment):
+        super().__init__(register, ram_dir, comment)
 
 
 class StoreWordNode(BinaryOpNode):
-    def __init__(self, register, ram_dir):
-        super().__init__(register, ram_dir)
+    def __init__(self, register, ram_dir, comment):
+        super().__init__(register, ram_dir, comment)
 
 
 class LoadInmediateNode(BinaryOpNode):
-    def __init__(self, register, value):
-        super().__init__(register, value)
+    def __init__(self, register, value, comment):
+        super().__init__(register, value, comment)
 
 
 class MultNode(BinaryOpNode):
-    def __init__(self, left, right):
-        super().__init__(left, right)
+    def __init__(self, left, right, comment):
+        super().__init__(left, right, comment)
 
 
 class DivNode(BinaryOpNode):
-    def __init__(self, left, right):
-        super().__init__(left, right)
+    def __init__(self, left, right, comment):
+        super().__init__(left, right, comment)
 
 
 class MoveNode(BinaryOpNode):
-    def __init__(self, left, right):
-        super().__init__(left, right)
+    def __init__(self, left, right, comment):
+        super().__init__(left, right, comment)
 
 
 class StoreWordNode(BinaryOpNode):
-    def __init__(self, register, address):
-        super().__init__(register, address)
+    def __init__(self, register, address, comment):
+        super().__init__(register, address, comment)
 
 
 class StoreByteNode(BinaryOpNode):
-    def __init__(self, register, address):
-        super().__init__(register, address)
+    def __init__(self, register, address, comment):
+        super().__init__(register, address, comment)
 
 
 class TernaryOpNode(InstructionNode):
-    def __init__(self, left, middle, right):
-        # super().__init__(node)
+    def __init__(self, left, middle, right, comment):
+        super().__init__(comment)
         self.left = left
         self.middle = middle
         self.right = right
 
 
 class AddNode(TernaryOpNode):
-    def __init__(self, register_dest, register_left, register_right):
-        super().__init__(register_dest, register_left, register_right)
+    def __init__(self, register_dest, register_left, register_right, comment):
+        super().__init__(register_dest, register_left, register_right, comment)
 
 
 class SubNode(TernaryOpNode):
-    def __init__(self, register_dest, register_left, register_right):
-        super().__init__(register_dest, register_left, register_right)
+    def __init__(self, register_dest, register_left, register_right, comment):
+        super().__init__(register_dest, register_left, register_right, comment)
 
 
 class AddiNode(TernaryOpNode):
-    def __init__(self, register_dest, register_left, value):
-        super().__init__(register_dest, register_left, value)
+    def __init__(self, register_dest, register_left, value, comment):
+        super().__init__(register_dest, register_left, value, comment)
 
 
 class BgtNode(TernaryOpNode):
-    def __init__(self, register_left, register_right, target):
-        super().__init__(register_left, register_right, target)
+    def __init__(self, register_left, register_right, target, comment):
+        super().__init__(register_left, register_right, target, comment)
 
 
 class BeqzNode(BinaryOpNode):
-    def __init__(self, register, target):
-        super().__init__(register, target)
+    def __init__(self, register, target, comment):
+        super().__init__(register, target, comment)
 
 
-class JumpNode(MipsAstNode):
-    def __init__(self, address):
-        # super().__init__(node)
+class JumpNode(InstructionNode):
+    def __init__(self, address, comment):
+        super().__init__(comment)
         self.address = address
 
 
-class JumpRegisterNode(MipsAstNode):
-    def __init__(self, register):
-        # super().__init__(node)
+class JumpRegisterNode(InstructionNode):
+    def __init__(self, register, comment):
+        super().__init__(comment)
         self.register = register
 
 
-class JumpAndLinkNode(MipsAstNode):
-    def __init__(self, address):
-        # super().__init__(node)
+class JumpAndLinkNode(InstructionNode):
+    def __init__(self, address, comment):
+        super().__init__(comment)
         self.address = address
 
 
-class JumpRegisterLinkNode(MipsAstNode):
-    def __init__(self, register):
-        # super().__init__(node)
+class JumpRegisterLinkNode(InstructionNode):
+    def __init__(self, register, comment):
+        super().__init__(comment)
         self.register = register
-
-
-class AssemblerDirectiveNode(MipsAstNode):
-    def __init__(self, list=[]):
-        # super().__init__(node)
-        self.list = list
-
-
-class WordDirectiveNode(AssemblerDirectiveNode):
-    def __init__(self, list):
-        super().__init__(list)
 
 
 class MemoryAddressLabelNode(MipsAstNode):

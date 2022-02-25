@@ -63,76 +63,88 @@ class MIPSGenerator:
 
     @visitor.when(mips.MoveNode)
     def visit(self, node: mips.MoveNode):
-        return f"\tmove {self.visit(node.left)}, {self.visit(node.right)}"
+        return f"\tmove {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.SyscallNode)
     def visit(self, node: mips.SyscallNode):
-        return "\tsyscall"
+        return "\tsyscall \t#{node.comment}"
 
     @visitor.when(mips.LoadAddressNode)
     def visit(self, node: mips.LoadAddressNode):
-        return f"\tla {self.visit(node.left)}, {self.visit(node.right)}"
+        return (
+            f"\tla {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
+        )
 
     @visitor.when(mips.LoadWordNode)
     def visit(self, node: mips.LoadWordNode):
-        return f"\tlw {self.visit(node.left)}, {self.visit(node.right)}"
+        return (
+            f"\tlw {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
+        )
 
     @visitor.when(mips.StoreByteNode)
     def visit(self, node: mips.StoreByteNode):
-        return f"\tlb {self.visit(node.left)}, {self.visit(node.right)}"
+        return (
+            f"\tlb {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
+        )
 
     @visitor.when(mips.LoadByteNode)
     def visit(self, node: mips.LoadByteNode):
-        return f"\tlb {self.visit(node.left)}, {self.visit(node.right)}"
+        return (
+            f"\tlb {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
+        )
 
     @visitor.when(mips.LoadInmediateNode)
     def visit(self, node: mips.LoadInmediateNode):
-        return f"\tli {self.visit(node.left)}, {str(node.right)}"
+        return f"\tli {self.visit(node.left)}, {str(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.MultNode)
     def visit(self, node: mips.MultNode):
-        return f"\tmult {self.visit(node.left)}, {self.visit(node.right)}"
+        return f"\tmult {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.DivNode)
     def visit(self, node: mips.DivNode):
-        return f"\tdiv {self.visit(node.left)}, {self.visit(node.right)}"
+        return (
+            f"\tdiv {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
+        )
 
     @visitor.when(mips.StoreWordNode)
     def visit(self, node: mips.StoreWordNode):
-        return f"\tsw {self.visit(node.left)}, {self.visit(node.right)}"
+        return (
+            f"\tsw {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
+        )
 
     @visitor.when(mips.AddNode)
     def visit(self, node: mips.AddNode):
-        return f"\tadd {self.visit(node.left)},  {self.visit(node.middle)}, {self.visit(node.right)}"
+        return f"\tadd {self.visit(node.left)},  {self.visit(node.middle)}, {self.visit(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.SubNode)
     def visit(self, node: mips.SubNode):
-        return f"\tsub {self.visit(node.left)},  {self.visit(node.middle)}, {self.visit(node.right)}"
+        return f"\tsub {self.visit(node.left)},  {self.visit(node.middle)}, {self.visit(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.AddiNode)
     def visit(self, node: mips.AddiNode):
-        return f"\taddi {self.visit(node.left)},  {self.visit(node.middle)}, {str(node.right)}"
+        return f"\taddi {self.visit(node.left)},  {self.visit(node.middle)}, {str(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.BgtNode)
     def visit(self, node: mips.BgtNode):
-        return f"\tbgt {self.visit(node.left)},  {self.visit(node.right)}, {str(node.label)}"
+        return f"\tbgt {self.visit(node.left)},  {self.visit(node.right)}, {str(node.label)} \t#{node.comment}"
 
     @visitor.when(mips.BeqzNode)
     def visit(self, node: mips.BeqzNode):
-        return f"\tbeqz {self.visit(node.left)}, {self.visit(node.right)}"
+        return f"\tbeqz {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.JumpNode)
     def visit(self, node: mips.JumpNode):
-        return f"\tj {self.visit(node.address)}"
+        return f"\tj {self.visit(node.address)} \t#{node.comment}"
 
     @visitor.when(mips.JumpRegisterNode)
     def visit(self, node: mips.JumpRegisterNode):
-        return f"\tjr {self.visit(node.register)}"
+        return f"\tjr {self.visit(node.register)} \t#{node.comment}"
 
     @visitor.when(mips.JumpAndLinkNode)
     def visit(self, node: mips.JumpAndLinkNode):
-        return f"\tjal {node.address}"
+        return f"\tjal {node.address} \t#{node.comment}"
 
     @visitor.when(mips.JumpRegisterLinkNode)
     def visit(self, node: mips.JumpRegisterLinkNode):
-        return f"\tjalr {self.visit(node.register)}"
+        return f"\tjalr {self.visit(node.register)} \t#{node.comment}"
