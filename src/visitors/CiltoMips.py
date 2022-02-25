@@ -224,11 +224,28 @@ class CiltoMipsVisitor:
         
     @visitor.when(GetAttribNode)
     def visit(self, node):
-        pass
+        inst = self.stack_pos(node.inst)
+        dest = self.stack_pos(node.dest)
+        self.add('# GetAttrib') 
+        self.add('{} {}, {}({})'.format(o.lw, r.s1, inst, r.fp))
+        self.add('{} {}, {}({})'.format(o.lw, r.s0, 4*node.attr + 8, r.s1))
+        self.add('{} {}, {}({})'.format(o.sw, r.s0, dest, r.fp))
 
     @visitor.when(SetAttribNode)
     def visit(self, node):
-        pass
+        inst = self.stack_offset(node.inst) 
+        src = self.stack_offset(node.source)
+
+        self.write_code('# SetAttrib') 
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s1, inst, r.fp))
+
+        if isinstance(node.source, int):
+            self.write_code('{} {}, {}'.format(o.li, r.s0, node.source))
+
+        else:
+            self.write_code('{} {}, {}({})'.format(o.lw, r.s0, src, r.fp)) 
+
+        self.add('{} {}, {}({})'.format(o.sw, r.s0, 4*node.attr + 8, r.s1))
 
     @visitor.when(AllocateNode)
     def visit(self, node):
@@ -318,67 +335,67 @@ class CiltoMipsVisitor:
 
     @visitor.when(AbortNode)
     def visit(self, node):
-      pass
+        pass
 
     @visitor.when(CopyNode)
     def visit(self, node):
-      pass
+        pass
 
     @visitor.when(PrintStrNode)
     def visit(self, node):
-      self.write_code('## out_string builtin')
-      self.write_code(f'{o.li} {r.v0}, 4')  # syscall print str code, a0 = address of null-terminates string
-      dest_pos = self.stack_offset(node.output)
-      self.write_code(f'{o.lw} {r.t0}, {dest_pos}({r.fp})')
-      self.write_code(f'{o.lw} {r.a0}, 8({r.t0})')
-      self.write_code(f'{o.syscall}') # syscall with the parameters set
+        self.write_code('## out_string builtin')
+        self.write_code(f'{o.li} {r.v0}, 4')  # syscall print str code, a0 = address of null-terminates string
+        dest_pos = self.stack_offset(node.output)
+        self.write_code(f'{o.lw} {r.t0}, {dest_pos}({r.fp})')
+        self.write_code(f'{o.lw} {r.a0}, 8({r.t0})')
+        self.write_code(f'{o.syscall}') # syscall with the parameters set
 
     @visitor.when(ReadStrNode)
     def visit(self, node):
-      self.write_code('## in_string builtin')
-      self.write_code(f'{o.li} {r.v0}, 9')  # syscall code for allocate mem
-      self.write_code(f'{o.li} {r.a0}, 1024') # buffer size in bytes to allocate
-      self.write_code(f'{o.syscall}') # stores in v0 address of allocated memory
+        self.write_code('## in_string builtin')
+        self.write_code(f'{o.li} {r.v0}, 9')  # syscall code for allocate mem
+        self.write_code(f'{o.li} {r.a0}, 1024') # buffer size in bytes to allocate
+        self.write_code(f'{o.syscall}') # stores in v0 address of allocated memory
 
-      # time to set up the actual syscall for read string
-      self.write_code(f'{o.move} {r.a0}, {r.v0}') # a0 <- v0, a0 = address of input buffer
-      self.write_code(f'{o.move} {r.v0}, 8') # syscall(8) = read string
-      self.write_code(f'{o.la} {r.a1}, 1024') # a1 = amount to read, input should be at most n-1 bytes, since last byte is used to null-terminate the stream
-      self.write_code(f'{o.syscall}') # stores in a0 the data read, if any, an null terminates it
+        # time to set up the actual syscall for read string
+        self.write_code(f'{o.move} {r.a0}, {r.v0}') # a0 <- v0, a0 = address of input buffer
+        self.write_code(f'{o.move} {r.v0}, 8') # syscall(8) = read string
+        self.write_code(f'{o.la} {r.a1}, 1024') # a1 = amount to read, input should be at most n-1 bytes, since last byte is used to null-terminate the stream
+        self.write_code(f'{o.syscall}') # stores in a0 the data read, if any, an null terminates it
 
-      # gotta add a null character to the input
-      self.write_code(f'{o.move} {r.t0}, {r.a0}') # t0 <- a0, later used for the address of the last non-null character of the stream to null-terminate it
-      self.write_code(f'{o.move} {r.a3}, {r.ra}') # store the return address of the current method before calling the length subroutine
-      self.write_code(f'{o.jal} str_len') # stores in v0 the length+1 of the string, in v1 the v0-th character of the string
-      self.write_code(f'{o.move} {r.ra}, {r.a3}')  #restore the ra address previously saved
-      self.write_code(f'{o.subu} {r.v0}, {r.v0}, 1')  # actual length = v0-1
-      self.write_code(f'{o.addu} {r.v1}, {r.v0}, {r.t0}') # v1 = v0 + t0 = address of the last character of the input
-      self.write_code(f'{o.sb} $0, 0({r.v1})')  # null terminate that mf
+        # gotta add a null character to the input
+        self.write_code(f'{o.move} {r.t0}, {r.a0}') # t0 <- a0, later used for the address of the last non-null character of the stream to null-terminate it
+        self.write_code(f'{o.move} {r.a3}, {r.ra}') # store the return address of the current method before calling the length subroutine
+        self.write_code(f'{o.jal} str_len') # stores in v0 the length+1 of the string, in v1 the v0-th character of the string
+        self.write_code(f'{o.move} {r.ra}, {r.a3}')  #restore the ra address previously saved
+        self.write_code(f'{o.subu} {r.v0}, {r.v0}, 1')  # actual length = v0-1
+        self.write_code(f'{o.addu} {r.v1}, {r.v0}, {r.t0}') # v1 = v0 + t0 = address of the last character of the input
+        self.write_code(f'{o.sb} $0, 0({r.v1})')  # null terminate that mf
 
-      dest_pos = self.stack_offset(node.input)
-      self.write_code(f'{o.move} {r.v0}, {r.t0}') # returns in v0 the address of the received string
-      self.write_code(f'{o.sw} {r.v0}, {dest_pos}({r.fp})') # store the result in the param variable
+        dest_pos = self.stack_offset(node.input)
+        self.write_code(f'{o.move} {r.v0}, {r.t0}') # returns in v0 the address of the received string
+        self.write_code(f'{o.sw} {r.v0}, {dest_pos}({r.fp})') # store the result in the param variable
 
 
     @visitor.when(PrintIntNode)
     def visit(self, node):
-      self.write_code('## out_int builtin')
-      self.write_code(f'{o.li} {r.v0}, 1')  # syscall print str code, a0 = address of null-terminates string
-      dest_pos = self.stack_offset(node.output)
-      self.write_code(f'{o.lw} {r.t0}, {dest_pos}({r.fp})')
-      self.write_code(f'{o.lw} {r.a0}, 8({r.t0})')
-      self.write_code(f'{o.syscall}') # syscall with the parameters set
-      
+        self.write_code('## out_int builtin')
+        self.write_code(f'{o.li} {r.v0}, 1')  # syscall print str code, a0 = address of null-terminates string
+        dest_pos = self.stack_offset(node.output)
+        self.write_code(f'{o.lw} {r.t0}, {dest_pos}({r.fp})')
+        self.write_code(f'{o.lw} {r.a0}, 8({r.t0})')
+        self.write_code(f'{o.syscall}') # syscall with the parameters set
+
 
     @visitor.when(ReadIntNode)
     def visit(self, node):
-      self.write_code('## out_int builtin')
-      self.write_code(f'{o.li} {r.v0}, 5')  # syscall read int code, result stored in v0
-      self.write_code(f'{o.syscall}')
-      
-      dest_pos = self.stack_offset(node.input)
-      self.write_code(f'{o.move} {r.t0}, {r.v0}')
-      self.write_code(f'{o.sw} {r.t0}, {dest_pos}({r.fp})') # stores the result to the corresponding stack value
+        self.write_code('## out_int builtin')
+        self.write_code(f'{o.li} {r.v0}, 5')  # syscall read int code, result stored in v0
+        self.write_code(f'{o.syscall}')
+
+        dest_pos = self.stack_offset(node.input)
+        self.write_code(f'{o.move} {r.t0}, {r.v0}')
+        self.write_code(f'{o.sw} {r.t0}, {dest_pos}({r.fp})') # stores the result to the corresponding stack value
 
 # Input espacio a reservar en $a0
 # Output direccion de memoria reservada en $a0
