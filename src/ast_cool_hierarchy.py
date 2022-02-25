@@ -1,6 +1,7 @@
 class Node:
     def __init__(self, line_no: int):
         self.lineno = line_no
+        self.computed_type = None
 
 
 class ProgramNode(Node):
