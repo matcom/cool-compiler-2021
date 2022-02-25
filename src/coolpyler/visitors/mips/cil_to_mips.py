@@ -142,13 +142,13 @@ class CilToMIPS:
         for i in range(len(node.params)):
             param = node.params[i]
             self.params.append(param.name)
-            self.memory_manager.save()
-            reg = self.memory_manager.get_unused_register()
+            # self.memory_manager.save()
+            # reg = self.memory_manager.get_unused_register()
 
-            instructions.append(mips.LoadAddressNode(reg, (mips.LabelNode(param.name))))
-            instructions.append(
-                mips.StoreWordNode(reg, mips.MemoryAddressRegisterNode(SP_REG, i * 4))
-            )
+            # instructions.append(mips.LoadAddressNode(reg, (mips.LabelNode(param.name))))
+            # instructions.append(
+            #     mips.StoreWordNode(reg, mips.MemoryAddressRegisterNode(SP_REG, i * 4))
+            # )
 
             self.memory_manager.clean()
 
@@ -195,10 +195,10 @@ class CilToMIPS:
 
         self.locals.append(node.name)
 
-        instructions.append(mips.LoadAddressNode(reg, (mips.LabelNode(node.name))))
-        instructions.append(
-            mips.StoreWordNode(reg, mips.MemoryAddressRegisterNode(SP_REG, 0))
-        )
+        # instructions.append(mips.LoadAddressNode(reg, (mips.LabelNode(node.name))))
+        # instructions.append(
+        #     mips.StoreWordNode(reg, mips.MemoryAddressRegisterNode(SP_REG, 0))
+        # )
         instructions.append(mips.AddiNode(SP_REG, SP_REG, -4))
 
         self.memory_manager.clean()

@@ -80,6 +80,25 @@ class CoolToCilVisitor(object):
         return dest
 
     def register_builtins(self):
+        self.type = "Object"
+
+        self.methods[self.type] = {
+            m: (i, self.type)
+            for i, m in enumerate(["copy", "type_name", "abort"])
+        }
+
+        self.reset_state()
+        str_param = self.register_param("str")
+        self.instructions.append(cil.PrintNode(str_param, True))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("Object", "out_string"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
         self.type = "IO"
 
         self.methods[self.type] = {
@@ -128,7 +147,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.ReadNode(int_local, False))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("IO", "out_string"),
+                self.get_func_id("IO", "in_int"),
                 self.params,
                 self.locals,
                 self.instructions,
