@@ -88,7 +88,6 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
-        print(node.parent, type(node.parent))
         self.current_type = node.id
         self.add_data(f"class_{node.id}", node.id)
 
@@ -533,7 +532,6 @@ class CCILGenerator:
             )
             return [*args_ops, call], call
 
-        print("nn", node.expr)
         (expr_ops, expr_fval) = self.visit(node.expr)
 
         # Runtime error depending if expr is void or not
@@ -921,6 +919,7 @@ class CCILGenerator:
         return []
 
     def define_entry_func(self):
+        self.reset_locals()
         program = self.create_new_type("program", "Main")
         execute = self.create_call(
             "execute_program", INT, "main", INT, [IdNode(program.id)]
