@@ -81,33 +81,16 @@ class CCILGenerator:
 
         attr_nodes = []
         func_nodes = []
+        attributes: List[Attribute] = list()
         for feature in node.features:
             if isinstance(feature, sem_ast.AttrDeclarationNode):
+                attributes.append(Attribute(ATTR + feature.id, feature.type.name))
                 attr_nodes.append(feature)
             else:
                 func_nodes.append(feature)
 
-        # Explore all attributes and join their operations in an initializer function
-        self.reset_locals()
-        self.reset_scope()
-        init_params = self.init_func_params(node.id)
-        self.ccil_cool_names.add_new_name_pair("self", node.id)
-        attributes: List[Attribute] = list()
-        init_attr_ops: List[OperationNode] = self.init_default_values()
-        for attr in attr_nodes:
-            attributes.append(Attribute(ATTR + attr.id, attr.type.name))
-            attr_ops = self.visit(attr)
-            init_attr_ops += attr_ops
-
-        dummy_return = self.create_storage(f"init_type_{node.id}_ret", INT, IntNode(0))
-        init_attr_ops.append(dummy_return)
-        init_func = FunctionNode(
-            f"init_{node.id}",
-            init_params,
-            to_vars(self.locals, Local),
-            init_attr_ops,
-            dummy_return.id,
-        )
+        # Create init func using attributes and their expressions
+        init_func = self.create_class_init_func(node, attr_nodes)
 
         # Explore all functions
         self.reset_scope()
@@ -461,7 +444,7 @@ class CCILGenerator:
         # Boolean Binary Nodes
         if node_type == sem_ast.EqualsNode:
             op = (
-                EqualOpNode(left_id, right_id)
+                EqualIntNode(left_id, right_id)
                 if node.left.type.name != STRING
                 else EqualStrNode(left_id, right_id)
             )
@@ -517,11 +500,11 @@ class CCILGenerator:
         # Translate all call arguments to ccil
         # Name all fvalues as ARG <result>
         args_ops: List[OperationNode] = []
-        args: List[StorageNode] = []
+        args: List[IdNode] = []
         for arg_expr in node.args:
             (arg_op, arg_fval) = self.visit(arg_expr)
             args_ops += arg_op
-            args += [arg_fval]
+            args += [extract_id(arg_fval)]
 
         # id(arg1, arg2, ..., argn)
         if node.expr is None:
@@ -619,39 +602,48 @@ class CCILGenerator:
         times = self.times(node)
 
         bool_id = f"bool_{times}"
-        value = "0" if node.value == "False" else "1"
+        value = "0" if node.value == "false" else "1"
 
         bool_node = self.create_int(bool_id, value)
         return [bool_node], bool_node
 
-    def times(self, node: sem_ast.Node, extra: str = ""):
-        key: str = type(node).__name__ + extra
-        try:
-            self.time_record[key] += 1
-        except KeyError:
-            self.time_record[key] = 0
-        return self.time_record[key]
-
-    def create_call(
+    def create_class_init_func(
         self,
-        storage_idx: str,
-        type_idx: str,
-        method_idx: str,
-        args: List[StorageNode],
+        node: sem_ast.ClassDeclarationNode,
+        attr_nodes: List[sem_ast.AttrDeclarationNode],
     ):
-        self.add_local(storage_idx, type_idx)
-        return StorageNode(storage_idx, CallOpNode(method_idx, args))
+        self.reset_locals()
+        self.reset_scope()
 
-    def create_vcall(
-        self,
-        storage_idx: str,
-        type_idx: str,
-        method_idx: str,
-        method_type_idx: str,
-        args: List[StorageNode],
-    ):
-        self.add_local(storage_idx, type_idx)
-        return StorageNode(storage_idx, VCallOpNode(method_idx, method_type_idx, args))
+        init_params = self.init_func_params(node.id)
+        self.ccil_cool_names.add_new_name_pair("self", node.id)
+
+        # First operation, initalizing parent attributes
+        init_parent = self.create_call(
+            f"call_parent_{node.parent}",
+            INT,
+            f"init_{node.parent}",
+            node.parent,
+            [IdNode("self")],
+        )
+
+        # Execute all attributes operation and set them
+        init_attr_ops: List[OperationNode] = [init_parent, *self.init_default_values()]
+        for attr in attr_nodes:
+            attr_ops = self.visit(attr)
+            init_attr_ops += attr_ops
+
+        dummy_return = self.create_storage(f"init_type_{node.id}_ret", INT, IntNode(0))
+        init_attr_ops.append(dummy_return)
+
+        # return init function
+        return FunctionNode(
+            f"init_{node.id}",
+            init_params,
+            to_vars(self.locals, Local),
+            init_attr_ops,
+            dummy_return.id,
+        )
 
     def define_built_ins(self):
         # Defining Object class methods
@@ -692,7 +684,7 @@ class CCILGenerator:
         params = self.init_func_params(IO)
         str_input = Parameter("x", STRING)
         params.append(str_input)
-        print = PrintOpNode(str_input.id)
+        print = PrintStrNode(str_input.id)
         out_string_func = FunctionNode(
             "out_string", params, to_vars(self.locals), [print], "self"
         )
@@ -700,10 +692,9 @@ class CCILGenerator:
         params = self.init_func_params(IO)
         int_input = Parameter("x", INT)
         params.append(int_input)
-        int_to_str = self.create_int_to_str("int_to_str", int_input.id)
-        print = PrintOpNode(int_to_str.id)
+        print = PrintIntNode(int_input.id)
         out_int_func = FunctionNode(
-            "out_int", params, to_vars(self.locals), [int_to_str, print], "self"
+            "out_int", params, to_vars(self.locals), [print], "self"
         )
         self.reset_locals()
         params = self.init_func_params(IO)
@@ -826,16 +817,38 @@ class CCILGenerator:
         self.add_local(idx, type_idx)
         return StorageNode(idx, NewOpNode(type_idx))
 
+    def create_call(
+        self,
+        storage_idx: str,
+        type_idx: str,
+        method_idx: str,
+        method_type_idx: str,
+        args: List[StorageNode],
+    ):
+        self.add_local(storage_idx, type_idx)
+        return StorageNode(storage_idx, CallOpNode(method_idx, method_type_idx, args))
+
+    def create_vcall(
+        self,
+        storage_idx: str,
+        type_idx: str,
+        method_idx: str,
+        method_type_idx: str,
+        args: List[StorageNode],
+    ):
+        self.add_local(storage_idx, type_idx)
+        return StorageNode(storage_idx, VCallOpNode(method_idx, method_type_idx, args))
+
     def create_type_of(self, idx: str, target: AtomOpNode):
         self.add_local(idx, ADDRESS)
         return StorageNode(idx, GetTypeOpNode(target))
 
     def create_equality(self, idx, left: AtomOpNode, right: AtomOpNode):
         self.add_local(idx, BOOL)
-        return StorageNode(idx, EqualOpNode(left, right))
+        return StorageNode(idx, EqualIntNode(left, right))
 
     def notifiy_and_abort(self, target: str):
-        print = PrintOpNode(target)
+        print = PrintStrNode(target)
         abort = Abort()
         return [print, abort]
 
@@ -874,6 +887,14 @@ class CCILGenerator:
                 self.create_string_load_data(EMPTY, DEFAULT_STR.id),
             ]
         return []
+
+    def times(self, node: sem_ast.Node, extra: str = ""):
+        key: str = type(node).__name__ + extra
+        try:
+            self.time_record[key] += 1
+        except KeyError:
+            self.time_record[key] = 0
+        return self.time_record[key]
 
     def add_data(self, idx: str, value: str):
         data = Data(idx, value)
