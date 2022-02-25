@@ -27,7 +27,6 @@ EMPTY = "empty"
 # * Heap Overflow (don't know yet how to handle this)
 
 # TEST:
-# * Let nodes
 # * Built in methods
 
 
@@ -66,10 +65,13 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ProgramNode)
     def visit(self, node: sem_ast.ProgramNode) -> None:
-        program_types: List[Class] = list()
-        program_codes: List[Method] = list()
-
         self.data = [DEFAULT_STR]
+        self.reset_locals()
+
+        builtin_classes, builtin_methods = self.define_built_ins()
+        program_types: List[Class] = builtin_classes
+        program_codes: List[FunctionNode] = builtin_methods
+
         for type in node.declarations:
             classx, class_code = self.visit(type)
             program_types.append(classx)
@@ -150,7 +152,7 @@ class CCILGenerator:
         return FunctionNode(
             f"f_{times}",
             params,
-            to_vars(self.locals, Local),
+            self.dump_locals(),
             operations,
             fval.id,
         )
@@ -657,25 +659,22 @@ class CCILGenerator:
     def define_built_ins(self):
         # Defining Object class methods
         self.reset_scope()
-        self.reset_locals()
         params = self.init_func_params(OBJECT)
         abort_msg = self.add_data("abort_msg", "RuntimeError: Execution aborted")
         load = self.create_string_load_data("abort_temp", abort_msg.id)
         [print, abort] = self.notifiy_and_abort(load.id)
         abort_func = FunctionNode(
-            "abort", params, to_vars(self.locals), [load, print, abort], "self"
+            "abort", params, self.dump_locals(), [load, print, abort], "self"
         )
-        self.reset_locals()
         params = self.init_func_params(OBJECT)
         get_name = self.create_current_type_name("get_name")
         type_name_func = FunctionNode(
-            "type_name", params, self.locals, [get_name], get_name.id
+            "type_name", params, self.dump_locals(), [get_name], get_name.id
         )
-        self.reset_locals()
         params = self.init_func_params(OBJECT)
         new_instance = self.create_new_type("copy", SELFTYPE)
         copy_func = FunctionNode(
-            "copy", params, to_vars(self.locals), [new_instance], new_instance.id
+            "copy", params, self.dump_locals(), [new_instance], new_instance.id
         )
         object_class = Class(
             OBJECT,
@@ -685,34 +684,35 @@ class CCILGenerator:
                 Method("type_name", type_name_func),
                 Method("copy", copy_func),
             ],
+            self.define_empty_init_func(OBJECT),
         )
 
         # Defining IO class methods
         self.reset_scope()
-        self.reset_locals()
         params = self.init_func_params(IO)
         str_input = Parameter("x", STRING)
         params.append(str_input)
         print = PrintStrNode(str_input.id)
         out_string_func = FunctionNode(
-            "out_string", params, to_vars(self.locals), [print], "self"
+            "out_string", params, self.dump_locals(), [print], "self"
         )
-        self.reset_locals()
         params = self.init_func_params(IO)
         int_input = Parameter("x", INT)
         params.append(int_input)
         print = PrintIntNode(int_input.id)
         out_int_func = FunctionNode(
-            "out_int", params, to_vars(self.locals), [print], "self"
+            "out_int", params, self.dump_locals(), [print], "self"
         )
-        self.reset_locals()
         params = self.init_func_params(IO)
         read = self.create_read_str("read_str")
-        in_string_func = FunctionNode("in_string", params, self.locals, [read], read.id)
-        self.reset_locals()
+        in_string_func = FunctionNode(
+            "in_string", params, self.dump_locals(), [read], read.id
+        )
         params = self.init_func_params(IO)
         read = self.create_read_int("read_int")
-        in_int_func = FunctionNode("in_int", params, self.locals, [read], read.id)
+        in_int_func = FunctionNode(
+            "in_int", params, self.dump_locals(), [read], read.id
+        )
         io_class = Class(
             IO,
             [],
@@ -722,14 +722,16 @@ class CCILGenerator:
                 Method("in_string", in_string_func),
                 Method("in_int", in_int_func),
             ],
+            self.define_empty_init_func(IO),
         )
 
         # Defining substring class methods
         self.reset_scope()
-        self.reset_locals()
         params = self.init_func_params(STRING)
         length = self.create_length("lenght_var", "self")
-        lenght_func = FunctionNode("length", params, self.locals, [length], length.id)
+        lenght_func = FunctionNode(
+            "length", params, self.dump_locals(), [length], length.id
+        )
         self.reset_locals()
         params = self.init_func_params(STRING)
         input_s = Parameter("s", STRING)
@@ -737,7 +739,9 @@ class CCILGenerator:
         concat = self.create_storage(
             "concat_var", STRING, ConcatOpNode("self", input_s.id)
         )
-        concat_func = FunctionNode("concat", params, self.locals, [concat], concat.id)
+        concat_func = FunctionNode(
+            "concat", params, self.dump_locals(), [concat], concat.id
+        )
         self.reset_locals()
         params = self.init_func_params(STRING)
         start_index = Parameter("s", INT)
@@ -748,10 +752,10 @@ class CCILGenerator:
             "max_take", INT, SumOpNode(IdNode(start_index.id), IdNode(take.id))
         )
         upper_bound = self.create_storage(
-            "upper_bound", LessOpNode(extract_id(length), extract_id(max_take))
+            "upper_bound", INT, LessOpNode(extract_id(length), extract_id(max_take))
         )
         lesser_bound = self.create_storage(
-            "lesser_bound", LessOpNode(IdNode(start_index.id), IntNode("0"))
+            "lesser_bound", INT, LessOpNode(IdNode(start_index.id), IntNode("0"))
         )
         error_label = LabelNode("substring_error")
         ok_label = LabelNode("substring_success")
@@ -779,7 +783,9 @@ class CCILGenerator:
             *print_and_abort,
             ok_label,
         ]
-        substr_func = FunctionNode("substr", params, self.locals, operations, substr.id)
+        substr_func = FunctionNode(
+            "substr", params, self.dump_locals(), operations, substr.id
+        )
         string_class = Class(
             STRING,
             [],
@@ -788,6 +794,7 @@ class CCILGenerator:
                 Method("concat", concat_func),
                 Method("substr", substr_func),
             ],
+            self.define_empty_init_func(STRING)
         )
 
         return [object_class, io_class, string_class], [
@@ -899,6 +906,19 @@ class CCILGenerator:
             ]
         return []
 
+    def define_empty_init_func(self, class_name: str):
+        params = self.init_func_params(class_name)
+        dummy_return = self.create_storage(
+            f"init_type_{class_name}_ret", INT, IntNode(0)
+        )
+        return FunctionNode(
+            f"init_{class_name}",
+            params,
+            self.dump_locals(),
+            [dummy_return],
+            dummy_return.id,
+        )
+
     def times(self, node: sem_ast.Node, extra: str = ""):
         key: str = type(node).__name__ + extra
         try:
@@ -921,17 +941,22 @@ class CCILGenerator:
             raise Exception(f"Trying to insert {idx} again as local")
         self.locals[idx] = typex
 
-    def add_warning(self, msg: str):
-        self.add_warning(msg)
-
     def reset_locals(self):
         """
         Apply at the beginning of every method to reset local vars
         """
         self.locals = dict()
 
+    def dump_locals(self):
+        var_locals = to_vars(self.locals, Local)
+        self.locals = dict()
+        return var_locals
+
     def reset_scope(self):
         self.ccil_cool_names = Scope()
+
+    def add_warning(self, msg: str):
+        self.add_warning(msg)
 
 
 def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
