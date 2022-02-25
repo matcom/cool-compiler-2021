@@ -59,6 +59,8 @@ class Type:
         self.attributes = []
         self.methods = []
         self.parent = None
+        self.tag = None
+        self.max_tag = None
 
     def set_parent(self, parent):
         if self.parent is not None and self.parent.name != ObjType().name:
@@ -102,6 +104,12 @@ class Type:
                 return self.parent.get_method(name)
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
+
+    def get_type_that_define_method(self, name: str):
+        for method in self.methods:
+            if method.name == name:
+                return self
+        return self.parent.get_type_that_define_method(name)
 
     def define_method(
         self, name: str, param_names: list, param_types: list, return_type
@@ -236,11 +244,26 @@ class AutoType(Type):
 class Context:
     def __init__(self):
         self.types = {}
+        self.graph = {}
+        self.classes = {}
+        self.graph['Object'] = ['IO', 'String', 'Bool', 'Int']
+        self.graph['IO'] = []
+        self.graph['String'] = []
+        self.graph['Int'] = []
+        self.graph['Bool'] = []
 
-    def create_type(self, name: str):
-        if name in self.types:
-            raise SemanticError(f"Type with the same name ({name}) already in context.")
-        typex = self.types[name] = Type(name)
+    def create_type(self, node):
+        if node.name in self.types:
+            raise SemanticError(
+                f'Type with the same name ({node.name}) already in context.')
+        typex = self.types[node.name] = Type(node.name)
+        self.classes[node.name] = node
+        if not self.graph.__contains__(node.name):
+            self.graph[node.name] = []
+        if self.graph.__contains__(node.parent):
+            self.graph[node.parent].append(node.name)
+        else:
+            self.graph[node.parent] = [node.name]
         return typex
 
     def get_type(self, name: str):
@@ -248,6 +271,22 @@ class Context:
             return self.types[name]
         except KeyError:
             raise SemanticError(f'Type "{name}" is not defined.')
+
+    def set_type_tags(self, node='Object', tag=0):
+        self.types[node].tag = tag
+        for i, t in enumerate(self.graph[node]):
+            self.set_type_tags(t, tag + i + 1)
+
+    def set_type_max_tags(self, node='Object'):
+        if not self.graph[node]:
+            self.types[node].max_tag = self.types[node].tag
+        else:
+            for t in self.graph[node]:
+                self.set_type_max_tags(t)
+            maximum = 0
+            for t in self.graph[node]:
+                maximum = max(maximum, self.types[t].max_tag)
+            self.types[node].max_tag = maximum
 
     def __str__(self):
         return (
@@ -280,17 +319,18 @@ class VariableInfo:
 
 
 class Scope:
-    def __init__(self, id, parent=None):
+    def __init__(self, id=-1, parent=None):
         self.locals = []
         self.parent = parent
         self.children = []
         self.index = 0 if parent is None else len(parent)
         self.id = id
+        self.cil_locals = {}
 
     def __len__(self):
         return len(self.locals)
 
-    def create_child(self, id):
+    def create_child(self, id=-1):
         child = Scope(id, self)
         self.children.append(child)
         return child
@@ -299,6 +339,23 @@ class Scope:
         info = VariableInfo(vname, vtype)
         self.locals.append(info)
         return info
+
+    def define_cil_local(self, vname, cilname, vtype=None):
+        self.define_variable(vname, vtype)
+        self.cil_locals[vname] = cilname
+
+    def get_cil_local(self, vname):
+        if self.cil_locals.__contains__(vname):
+            return self.cil_locals[vname]
+        else:
+            return None
+
+    def find_cil_local(self, vname, index=None):
+        locals = self.cil_locals.items() if index is None else itt.islice(self.cil_locals.items(), index)
+        try:
+            return next(cil_name for name, cil_name in locals if name == vname)
+        except StopIteration:
+            return self.parent.find_cil_local(vname, self.index) if (self.parent is not None) else None
 
     def find_variable(self, vname, index=None):
         locals = self.locals if index is None else itt.islice(self.locals, index)
