@@ -299,7 +299,7 @@ class TypeChecker:
         self.visit(node.left,scope.create_child())
         self.visit(node.right,scope.create_child())
         if node.left.type != self.context.get_type("Int", node.line) or node.right.type != self.context.get_type("Int", node.line):
-            self.errors.append("The static types of the two sub-expressions must be Int.")
+            self.errors.append(f"({node.line},{node.column}) - TypeError: static types of the two sub-expressions must be Int.")
         
         node.type = self.context.get_type("Int", node.line)
         

@@ -25,14 +25,20 @@ def p_class_list(p):
 
 def p_def_class(p):
     '''def_class : CLASS TYPE_ID LBRACE feature_list RBRACE
-                 | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE
+                 | CLASS TYPE_ID INHERITS type_inherit LBRACE feature_list RBRACE
     '''
+    
     line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
 
     if len(p) == 6:
         p[0] = ClassDeclarationNode(p[2], p[4], line = line, column = column)
     else:
-        p[0] = ClassDeclarationNode(p[2], p[6], p[4], line = line, column = column)
+        p[0] = ClassDeclarationNode(p[2], p[6], p[4]['value'], line = line, column = column, line_father = p[4]['line'], column_father = p[4]['column'])
+
+def p_type_inherit(p):
+    'type_inherit : TYPE_ID'
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
+    p[0] = {'value':p[1], 'line':line, 'column':column}
 
 def p_empty(p):
     'empty :'

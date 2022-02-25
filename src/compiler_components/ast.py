@@ -37,12 +37,14 @@ class AtomicNode(ExpressionNode):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx, features, parent=None, line = -1, column=-1):
+    def __init__(self, idx, features, parent=None, line = -1, column=-1, line_father = -1, column_father = -1):
         self.id = idx
         self.parent = parent
         self.features = features
         self.line = line
         self.column = column
+        self.line_father = line_father
+        self.column_father = column_father
 
     def visit(self, tabs = 0):
         node = self
@@ -325,29 +327,29 @@ class InstantiateNode(AtomicNode):
         return '\t' * tabs + f'\\__ InstantiateNode: new {node.lex}()'
 
 
-class PlusNode(BinaryNode):
+class PlusNode(ArithmeticNode):
     pass
 
 
-class MinusNode(BinaryNode):
+class MinusNode(ArithmeticNode):
     pass
 
 
-class StarNode(BinaryNode):
+class StarNode(ArithmeticNode):
     pass
 
 
-class DivNode(BinaryNode):
+class DivNode(ArithmeticNode):
     pass
 
 
-class MinorNode(BinaryNode):
+class MinorNode(ArithmeticNode):
     pass
 
 
-class MinorEqualsNode(BinaryNode):
+class MinorEqualsNode(ArithmeticNode):
     pass
 
 
-class EqualsNode(BinaryNode):
+class EqualsNode(ArithmeticNode):
     pass

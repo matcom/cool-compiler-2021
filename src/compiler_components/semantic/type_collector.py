@@ -28,7 +28,7 @@ class TypeCollector(object):
             try:
                 if dec_node.parent is not None:
                     if dec_node.parent in ["String","Int","Bool"]:
-                        self.errors.append(SemanticError("Basic type as parent", dec_node.line))
+                        self.errors.append(f"({dec_node.line_father},{dec_node.column_father}) - SemanticError: Basic type as parent")
                     self.context.get_type(dec_node.id, dec_node.line).set_parent(self.context.get_type(dec_node.parent,dec_node.line),node.line)
             except SemanticError as e:
                 self.errors.append(e)

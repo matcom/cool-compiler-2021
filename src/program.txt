@@ -1,11 +1,9 @@
---The static types of the two sub-expressions must be Int.
-
-class A { };
-class B inherits A { };
-class C inherits B { };
+-- It is an error to inherit from or redefine Int.
 
 class Main inherits IO {
 	main(): IO { out_string("Hello World!")};
-	test: Int <- let x: Int <- 1 * 2 / 3 - 4 + new A.type_name().concat(new B.type_name().concat(new C.type_name())).length()
-				in x <- x + new A.type_name().concat(new B.type_name().concat(new C.type_name()));
+}; 
+ 
+class A inherits Int {
+	is_prime(): Bool { false };
 };
