@@ -60,14 +60,13 @@ def p_feature_list(p):
         p[0] = [p[1]] + p[3]
 
 def p_def_attr(p):
-    '''def_attr : ID DOUBLE_DOT type_id
-                | ID DOUBLE_DOT type_id LEFT_ARROW expr
+    '''def_attr : id DOUBLE_DOT type_id
+                | id DOUBLE_DOT type_id LEFT_ARROW expr
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if len(p) == 4:
-        p[0] = AttrDeclarationNode(p[1], p[3]['value'], line = line, column = column, type_line = p[3]['line'], type_column = p[3]['column'])
+        p[0] = AttrDeclarationNode(p[1]['value'], p[3]['value'], line = p[1]['line'], column = p[1]['column'], type_line = p[3]['line'], type_column = p[3]['column'])
     else:
-        p[0] = AttrDeclarationNode(p[1], p[3]['value'], p[5], line = line, column = column, type_line = p[3]['line'], type_column = p[3]['column'])
+        p[0] = AttrDeclarationNode(p[1]['value'], p[3]['value'], p[5], line = p[1]['line'], column = p[1]['column'], type_line = p[3]['line'], type_column = p[3]['column'])
 
 def p_def_func(p):
     '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT TYPE_ID LBRACE expr RBRACE
@@ -253,8 +252,8 @@ def p_atomCase(p):
     p[0] = CaseNode(p[2], p[4], line = line, column = column)
 
 def p_caseList(p):
-    '''case_list : id_case DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON
-                 | id_case DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON case_list
+    '''case_list : id DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON
+                 | id DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON case_list
     '''
     
     if len(p) == 7:
@@ -262,8 +261,8 @@ def p_caseList(p):
     else:
         p[0] = [AttrDeclarationNode(p[1]['value'], p[3], p[5], line = p[1]['line'], column = p[1]['column'])] + p[7]
 
-def p_id_case(p):
-    'id_case : ID'
+def p_id(p):
+    'id : ID'
     line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     p[0] ={'value':p[1], 'line':line, 'column':column}
 

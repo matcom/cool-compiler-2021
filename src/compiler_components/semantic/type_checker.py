@@ -77,6 +77,8 @@ class TypeChecker:
             self.context.check_type(node.body.type,typex,node.line)
         except SemanticError as e:
             self.errors.append(f"({node.line},{node.column-4}) - TypeError: " + str(e))
+        except ParentError as p:
+            self.errors.append(f"({node.line},{node.column-4}) - SemanticError: " + str(e))
         
 
     @visitor.when(CaseNode)
@@ -95,7 +97,7 @@ class TypeChecker:
             try :
                 typex = self.context.get_type(branches.type,branches.expr.line)
             except SemanticError as e:
-                self.errors.append(f"({node.line},{node.column}) - TypeError: " + str(e))
+                self.errors.append(f"({branches.line},{branches.column}) - TypeError: {typex} is not defined")
             tmpscope.define_variable(branches.id,typex,node.line)
             self.visit(branches.expr,tmpscope)
             if common_type is None:
@@ -147,7 +149,7 @@ class TypeChecker:
                 try:
                     self.context.check_type(node.params[i].type,method.param_types[i],node.line)
                 except SemanticError as e:
-                    self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
+                    self.errors.append(f"({node.line},{node.column}) - TypeError: " + str(e))
         except SemanticError as e:
             self.errors.append(f"({node.line},{node.column}) - AttributeError: dispatch undeclared method {node.f}")
         except ParamError as p:

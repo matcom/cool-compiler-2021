@@ -60,7 +60,7 @@ class TypeCollector(object):
                 raise SemanticError('', -1)  #change -1 for line number
             self.current_type.define_attribute(node.id, attr_type, -1) #change -1 for line number
         except SemanticError as e:
-            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
+            self.errors.append(f"({node.line},{node.column}) - {str(e)} {node.id} already defined" )
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):

@@ -13,7 +13,9 @@ class NameError(SemanticError):
 class AttributeError(SemanticError):
     pass
 class ParamError(Exception):
-    pass    
+    pass
+class ParentError(Exception):
+    pass      
 ############## End Semantic Errors #############################
 
 ############ Class members ###############################
@@ -63,27 +65,33 @@ class Type:
         self.parent = parent
         parent.sons.append(self)
 
-    def get_attribute(self, name:str,pos=0):
+    def get_attribute(self, name:str,pos=0, parent={'value':False}):
         try:
             return next(attr for attr in self.attributes if attr.name == name)
         except StopIteration:
             if self.parent is None:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}',pos)
             try:
-                return self.parent.get_attribute(name)
+                parent['value'] = True
+                return self.parent.get_attribute(name, parent=parent)
             except SemanticError:
                 raise SemanticError(f'Attribute "{name}" is not defined in {self.name}',pos)
 
     def define_attribute(self, name:str, typex, pos):
         try:
-            self.get_attribute(name)
+            parent = {}
+            parent['value'] = False
+            self.get_attribute(name, parent = parent)
         except SemanticError:
             a = Attribute(name, typex)
             self.attributes.append(a)
             return a
         else:
-            raise SemanticError(f'Attribute "{name}" is already defined in {self.name}',pos)
-
+            if not parent['value']:
+                raise SemanticError(f'SemanticError:')
+            else:
+                raise SemanticError(f'SemanticError:')
+    
     def get_method(self, name:str,line=0, col=0, own={'value':True}):
         try:
             return next(method for method in self.methods if method.name == name)
@@ -222,7 +230,7 @@ class Context:
         try:
             return self.types[name]
         except KeyError:
-            raise TypeError(f'Type "{name}" is not defined.' , pos)
+            raise TypeError(f'TypeError:')
 
     def closest_common_antecesor(self, type1:Type, type2:Type):
         antecesors = []
