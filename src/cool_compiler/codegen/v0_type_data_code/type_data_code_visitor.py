@@ -267,7 +267,7 @@ class CILGenerate:
 
         label_then = new_name(f'then_{self.currentFunc.name}', self.label_list)
         label_fin = new_name(f'fin_{self.currentFunc.name}', self.label_list)
-        self.get_value(cond_result, 'Bool')
+        expr_list.append(self.get_value(cond_result, 'Bool'))
         expr_list.append(ASTR.IfGoTo(cond_result, label_then))
         
         expr_list.append(ASTR.Comment(f'Else case'))
@@ -300,7 +300,7 @@ class CILGenerate:
         cond_local = self.currentFunc.local_push('cond@while', scope)
         result_list += self.visit(node.condition, scope)
         result_list[-1].set_value(cond_local)
-        self.get_value(cond_local, 'Bool')
+        result_list.append(self.get_value(cond_local, 'Bool'))
         result_list.append(ASTR.IfGoTo(cond_local, while_back))
         result_list.append(ASTR.Comment(f'Fin de la condicion de un While'))
 
@@ -509,7 +509,7 @@ class CILGenerate:
             return [ASTR.GetAttr(super_value, 'self', self.currentType.attr[node.item])]    
     
     def get_value(self, memory_dir, _type):
-        return [ASTR.GetAttr(memory_dir, memory_dir, f'{_type}@value')]
+        return ASTR.GetAttr(memory_dir, memory_dir, f'{_type}@value')
 
     def value_def(self, _value, type_name, scope):
         upper_type = type_name.upper()
@@ -530,7 +530,7 @@ class CILGenerate:
 
     @visitor.when(AST.Int)
     def visit(self, node: AST.Int, scope: Scope) -> ASTR.Node:
-        int_value = self.currentFunc.local_push('value_boolean', scope)
+        int_value = self.currentFunc.local_push('value_int', scope)
         return [
             ASTR.Assign(int_value, node.item), ASTR.Comment(f"Int value {node.item}")
             ] + self.value_def(int_value, 'Int', scope)

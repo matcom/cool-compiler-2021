@@ -103,7 +103,6 @@ class Header_Comment:
     def __str__(self) -> str:
         return f'#{self.msg}'
 
-
 class Label:
     def __init__(self,label) -> None:
         self.label = label
@@ -157,8 +156,7 @@ class JumpConditional:
 
     def __str__(self) -> str:
         return f'{self.cmd} {self.reg1} {self.reg2} {self.label}'    
-
-    
+  
 class SysCall :
     def __init__(self) -> None:
         pass
@@ -176,7 +174,6 @@ class Operation:
      def __str__(self) -> str:
         return f'{self.cmd} {self.dest}, {self.op_1}, {self.op_2}'
 
-
 class Move :
     def __init__(self,cmd ,Rds) -> None:
         self.cmd = cmd
@@ -185,9 +182,7 @@ class Move :
     def __str__(self) -> str:
         return f'{self.cmd} {self.Rds}'
     
-
 ############################# Move ###################################################
-
 class MFHI(Move):
       def __init__(self,Rds) -> None:
           super().__init__('mfhi', Rds)
@@ -195,7 +190,6 @@ class MFHI(Move):
 class MFLO(Move):
     def __init__(self,Rds) -> None:
         super().__init__('mflo', Rds)          
-
 ############################  Loads   ##################################################
 class LW(Load):
     def __init__(self, registry, memory_dir) -> None:
@@ -208,18 +202,11 @@ class LI(Load):
 class LA(Load):
     def __init__(self, registry, memory_dir) -> None:
         super().__init__('la', registry, memory_dir)
-
-
-
 ############################  Store   ##################################################
 class SW(Store):
      def __init__(self, registry, memory_dir) -> None:
             super().__init__('sw', registry, memory_dir)
-
-
-
 ############################  Cmp   ##################################################
-
 class SEQ(CmpNotJump):  #comparacion igualdad
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
             super().__init__( 'seq' ,r_dest, r_src_1, r_src_2)
@@ -241,10 +228,6 @@ class SLE(CmpNotJump):  # <=
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
             super().__init__( 'sle' ,r_dest, r_src_1, r_src_2)
 
-
-
-
-
 ###########################  Jump #####################################################
 class JAL(JumpInconditional):
     def __init__(self,dest) -> None:
@@ -258,13 +241,10 @@ class Jump(JumpInconditional):
     def __init__(self,dest) -> None:
             super().__init__('j',dest)
 ################################# JUMPConditional #######################################
-
 class BEQ (JumpConditional):
      def __init__(self ,register1, register2, label) -> None:
             super().__init__( 'beq' ,register1, register2,label)
-
 ################################# Operator ##############################################
-
 class AddI(Operation):
     def __init__(self,dest,op1,op2) -> None:
             super().__init__('addi',dest,op1,op2)
@@ -285,11 +265,9 @@ class DIV (Operation):
     def __init__(self, dest, op1, op2) -> None:
         super().__init__('div', dest, op1, op2)   
 
-
 class XOR(Operation):
     def __init__(self, dest, op1, op2) -> None:
         super().__init__('xor', dest, op1, op2)
-
 
 ################################# Native Func IO ################################################
 class Out_String:
@@ -302,30 +280,43 @@ lw $t0, 0($sp)   #Guarda en $t0 la direccion del string
 li $v0, 4
 lw $a0, 4($t0) #Pintando la propiedad value del string
 syscall
-
 addi $sp, $sp, 8
-move $s0,$t1
-
+move $s0, $t1
 jr $ra"""
 
 class Out_Int:
     def __str__(self) -> str:
        return """
 IO_out_int:
+lw $t1 , 4($sp)
+lw $t0, 0($sp)   #Guarda en $t0 la direccion del int
 li $v0, 1
-lw $a0, 0($sp)
+lw $a0, 4($t0)  #Pintando la propiedad value del int
 syscall
 addi $sp, $sp, 8
+move $s0, $t1
 jr $ra"""
 
 class In_String:
     def __str__(self) -> str:
        return """
 IO_in_string:
-li $v0,8
+li $v0, 8
 li $a1 , 10000
 syscall
-move $s0 , $a0
+move $t6 $v0
+
+#Allocate a una class String puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo string
+la $t4, String
+sw $t4, 0($v0)   # Asigna el tipo String al string
+sw $t6, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
+
+move $s0 , $v0
 addi $sp, $sp, 4
 jr $ra
 """
@@ -336,6 +327,18 @@ class In_Int:
 IO_in_int:
 li $v0, 5
 syscall
+move $t6 $v0
+
+#Allocate a una class Int puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo Int
+la $t4, Int
+sw $t4, 0($v0)   # Asigna el tipo Int al int
+sw $t6, 4($v0)  # Asigan el nombre de la clase a la propiededa value del int
+
 move $s0 , $v0
 addi $sp, $sp, 4
 jr $ra
@@ -532,6 +535,7 @@ lw $t0 0($sp)   #Guarda en $t0 la direccion del self
 lw $t1 0($t0)   #La primera posicion de self es la propiedad type_name 
 lw $t2 0($t1)   #La propiedad type_name apunta a la definicion del tipo
 la $t3 0($t2)   #La definicion de tipo tiene en la primera poscion su nombre 
+
 #Allocate a una class String puntero en sp + 12
 #atributo type_name en puntero + 0
 #atributo value en puntero + 4
@@ -544,8 +548,6 @@ sw $t3, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
 addi $sp, $sp, 4
 move $s0, $v0
-
-
 
 jr $ra
 """
