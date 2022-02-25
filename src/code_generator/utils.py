@@ -71,6 +71,7 @@ class CILScope:
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
+            CILMethodNode('init', 'init_Object'),
         ]
         types.append(CILTypeNode('Object', [], obj_methods))
         init_Object = CILFuncNode(
