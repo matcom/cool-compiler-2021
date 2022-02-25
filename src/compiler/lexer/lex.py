@@ -1,4 +1,3 @@
-from distutils.log import debug
 import ply.lex as lex
 
 from ..cmp.grammar import *
@@ -308,13 +307,13 @@ class CoolLexer(object):
         self.add_column(t)
         return t
 
-    def t_LESS(self, t):
-        r"<"
+    def t_LEQ(self, t):
+        r"<="
         self.add_column(t)
         return t
 
-    def t_LEQ(self, t):
-        r"<="
+    def t_LESS(self, t):
+        r"<"
         self.add_column(t)
         return t
 
@@ -337,7 +336,6 @@ class CoolLexer(object):
 
     # Build the lexer
     def build(self, **kwargs):
-        # self.lexer = lex.lex(module=self, **kwargs)
         self.lexer = lex.lex(
             module=self, errorlog=lex.NullLogger(), debug=False, **kwargs
         )
@@ -363,31 +361,7 @@ class CoolLexer(object):
                 token_list.append(
                     Token(tok.value, self.token_type[tok.type], (tok.lineno, tok.col))
                 )
+        if not token_list:
+            errors.append("(0, 0) - SyntacticError: Unexpected token EOF")
+        token_list.append(Token("$", G.EOF, self.lexer.eof))
         return token_list, errors
-
-
-def pprint_tokens(tokens, get=False):
-    indent = 0
-    pending = []
-    result = ""
-    for token in tokens:
-        pending.append(token)
-        if token.token_type in {ocur, ccur, semi}:
-            if token.token_type == ccur:
-                indent -= 1
-            if get:
-                result += (
-                    "    " * indent
-                    + " ".join(str(t.token_type) for t in pending)
-                    + "\n"
-                )
-            else:
-                print("    " * indent + " ".join(str(t.token_type) for t in pending))
-            pending.clear()
-            if token.token_type == ocur:
-                indent += 1
-    if get:
-        result += " ".join([str(t.token_type) for t in pending]) + "\n"
-        return result
-    else:
-        print(" ".join([str(t.token_type) for t in pending]))

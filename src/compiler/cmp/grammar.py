@@ -1,5 +1,6 @@
 from .pycompiler import Grammar
 from .ast import *
+from .utils import selfToken
 
 # grammar
 G = Grammar()
@@ -51,11 +52,11 @@ class_list %= def_class + class_list, lambda h, s: [s[1]] + s[2]
 
 def_class %= (
     classx + typeid + ocur + feature_list + ccur + semi,
-    lambda h, s: ClassDeclarationNode(s[2], s[4]),
+    lambda h, s: ClassDeclarationNode(s[2], s[4], s[1]),
 )
 def_class %= (
     classx + typeid + inherits + typeid + ocur + feature_list + ccur + semi,
-    lambda h, s: ClassDeclarationNode(s[2], s[6], s[4]),
+    lambda h, s: ClassDeclarationNode(s[2], s[6], s[1], s[4]),
 )
 
 feature_list %= G.Epsilon, lambda h, s: []
@@ -67,7 +68,7 @@ def_attr %= objectid + colon + typeid + semi, lambda h, s: AttrDeclarationNode(
 )
 def_attr %= (
     objectid + colon + typeid + larrow + expr + semi,
-    lambda h, s: AttrDeclarationNode(s[1], s[3], s[5]),
+    lambda h, s: AttrDeclarationNode(s[1], s[3], s[5], s[4]),
 )
 
 def_func %= (
@@ -87,22 +88,22 @@ expr %= comp, lambda h, s: s[1]
 expr %= s_comp, lambda h, s: s[1]
 
 comp %= arith, lambda h, s: s[1]
-comp %= arith + leq + arith, lambda h, s: LeqNode(s[1], s[3])
-comp %= arith + less + arith, lambda h, s: LessNode(s[1], s[3])
-comp %= arith + equal + arith, lambda h, s: EqualNode(s[1], s[3])
+comp %= arith + leq + arith, lambda h, s: LeqNode(s[1], s[3], s[2])
+comp %= arith + less + arith, lambda h, s: LessNode(s[1], s[3], s[2])
+comp %= arith + equal + arith, lambda h, s: EqualNode(s[1], s[3], s[2])
 
 arith %= term, lambda h, s: s[1]
-arith %= arith + plus + term, lambda h, s: PlusNode(s[1], s[3])
-arith %= arith + minus + term, lambda h, s: MinusNode(s[1], s[3])
+arith %= arith + plus + term, lambda h, s: PlusNode(s[1], s[3], s[2])
+arith %= arith + minus + term, lambda h, s: MinusNode(s[1], s[3], s[2])
 
 term %= factor, lambda h, s: s[1]
-term %= term + star + factor, lambda h, s: StarNode(s[1], s[3])
-term %= term + div + factor, lambda h, s: DivNode(s[1], s[3])
+term %= term + star + factor, lambda h, s: StarNode(s[1], s[3], s[2])
+term %= term + div + factor, lambda h, s: DivNode(s[1], s[3], s[2])
 
 factor %= atom, lambda h, s: s[1]
 factor %= opar + expr + cpar, lambda h, s: s[2]
-factor %= isvoid + factor, lambda h, s: VoidNode(s[2])
-factor %= neg + factor, lambda h, s: NegNode(s[2])
+# factor %= isvoid + factor, lambda h, s: VoidNode(s[2], s[1])
+# factor %= neg + factor, lambda h, s: NegNode(s[2], s[1])
 factor %= func_call, lambda h, s: s[1]
 factor %= case_def, lambda h, s: s[1]
 factor %= block_def, lambda h, s: s[1]
@@ -116,7 +117,7 @@ atom %= objectid, lambda h, s: VariableNode(s[1])
 atom %= new + typeid, lambda h, s: InstantiateNode(s[2])
 
 func_call %= objectid + opar + arg_list + cpar, lambda h, s: CallNode(
-    VariableNode("self"), s[1], s[3]
+    VariableNode(selfToken), s[1], s[3]
 )
 func_call %= factor + dot + objectid + opar + arg_list + cpar, lambda h, s: CallNode(
     s[1], s[3], s[5]
@@ -131,48 +132,51 @@ arg_list %= args, lambda h, s: s[1]
 args %= expr, lambda h, s: [s[1]]
 args %= expr + comma + args, lambda h, s: [s[1]] + s[3]
 
-case_def %= case + expr + of + branch_list + esac, lambda h, s: CaseNode(s[2], s[4])
+case_def %= case + expr + of + branch_list + esac, lambda h, s: CaseNode(
+    s[2], s[4], s[1]
+)
 branch_list %= branch, lambda h, s: [s[1]]
 branch_list %= branch + branch_list, lambda h, s: [s[1]] + s[2]
-branch %= objectid + colon + typeid + rarrow + expr + semi, lambda h, s: (
-    s[1],
-    s[3],
-    s[5],
+branch %= objectid + colon + typeid + rarrow + expr + semi, lambda h, s: CaseBranchNode(
+    s[4], s[1], s[3], s[5]
 )
 
-block_def %= ocur + expr_list + ccur, lambda h, s: BlockNode(s[2])
+block_def %= ocur + expr_list + ccur, lambda h, s: BlockNode(s[2], s[1])
 expr_list %= expr + semi, lambda h, s: [s[1]]
 expr_list %= expr + semi + expr_list, lambda h, s: [s[1]] + s[3]
 
-loop_def %= whilex + expr + loop + expr + pool, lambda h, s: LoopNode(s[2], s[4])
+loop_def %= whilex + expr + loop + expr + pool, lambda h, s: LoopNode(s[2], s[4], s[1])
 
 cond_def %= ifx + expr + then + expr + elsex + expr + fi, lambda h, s: ConditionalNode(
-    s[2], s[4], s[6]
+    s[2], s[4], s[6], s[1]
 )
 
 s_comp %= s_arith, lambda h, s: s[1]
-s_comp %= arith + leq + s_arith, lambda h, s: LeqNode(s[1], s[3])
-s_comp %= arith + less + s_arith, lambda h, s: LessNode(s[1], s[3])
-s_comp %= arith + equal + s_arith, lambda h, s: EqualNode(s[1], s[3])
+s_comp %= arith + leq + s_arith, lambda h, s: LeqNode(s[1], s[3], s[2])
+s_comp %= arith + less + s_arith, lambda h, s: LessNode(s[1], s[3], s[2])
+s_comp %= arith + equal + s_arith, lambda h, s: EqualNode(s[1], s[3], s[2])
 
 s_arith %= s_term, lambda h, s: s[1]
-s_arith %= arith + plus + s_term, lambda h, s: PlusNode(s[1], s[3])
-s_arith %= arith + minus + s_term, lambda h, s: MinusNode(s[1], s[3])
+s_arith %= arith + plus + s_term, lambda h, s: PlusNode(s[1], s[3], s[2])
+s_arith %= arith + minus + s_term, lambda h, s: MinusNode(s[1], s[3], s[2])
 
 s_term %= s_factor, lambda h, s: s[1]
-s_term %= term + star + s_factor, lambda h, s: StarNode(s[1], s[3])
-s_term %= term + div + s_factor, lambda h, s: DivNode(s[1], s[3])
+s_term %= term + star + s_factor, lambda h, s: StarNode(s[1], s[3], s[2])
+s_term %= term + div + s_factor, lambda h, s: DivNode(s[1], s[3], s[2])
 
-s_factor %= notx + expr, lambda h, s: NotNode(s[2])
+s_factor %= notx + expr, lambda h, s: NotNode(s[2], s[1])
 s_factor %= let_def, lambda h, s: s[1]
 s_factor %= assign_def, lambda h, s: s[1]
-s_factor %= isvoid + s_factor, lambda h, s: VoidNode(s[2])
-s_factor %= neg + s_factor, lambda h, s: NegNode(s[2])
+s_factor %= isvoid + s_factor, lambda h, s: VoidNode(s[2], s[1])
+s_factor %= neg + s_factor, lambda h, s: NegNode(s[2], s[1])
+s_factor %= factor, lambda h, s: s[1]
 
-let_def %= let + iden_list + inx + expr, lambda h, s: LetNode(s[2], s[4])
+let_def %= let + iden_list + inx + expr, lambda h, s: LetNode(s[2], s[4], s[1])
 iden_list %= iden, lambda h, s: [s[1]]
 iden_list %= iden + comma + iden_list, lambda h, s: [s[1]] + s[3]
-iden %= objectid + colon + typeid, lambda h, s: (s[1], s[3], None)
-iden %= objectid + colon + typeid + larrow + expr, lambda h, s: (s[1], s[3], s[5])
+iden %= objectid + colon + typeid, lambda h, s: LetVarNode(s[1], s[3])
+iden %= objectid + colon + typeid + larrow + expr, lambda h, s: LetVarNode(
+    s[1], s[3], s[5], s[4]
+)
 
-assign_def %= objectid + larrow + expr, lambda h, s: AssignNode(s[1], s[3])
+assign_def %= objectid + larrow + expr, lambda h, s: AssignNode(s[1], s[3], s[2])

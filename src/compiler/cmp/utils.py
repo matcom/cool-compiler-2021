@@ -1,3 +1,7 @@
+from typing import List
+
+from black import err
+from numpy import empty
 from .pycompiler import Production, Sentence, Symbol, EOF, Epsilon
 
 
@@ -232,7 +236,7 @@ class ShiftReduceParser:
     def _build_parsing_table(self):
         raise NotImplementedError()
 
-    def __call__(self, w, get_shift_reduce=False):
+    def __call__(self, w: List[Token], get_shift_reduce=False):
         stack = [0]
         cursor = 0
         output = []
@@ -240,18 +244,20 @@ class ShiftReduceParser:
 
         while True:
             state = stack[-1]
-            lookahead = w[cursor]
+            lookahead = w[cursor].token_type
             if self.verbose:
                 print(stack, w[cursor:])
 
             try:
                 if state not in self.action or lookahead not in self.action[state]:
-                    return None
+                    error = f"{w[cursor].pos} - SyntacticError: ERROR at or near {w[cursor].lex}"
+                    return None, error
             except:
                 print(state)
                 print(self.action)
                 print(lookahead)
-                return None
+                error = f"{w[cursor].pos} - SyntacticError: ERROR at or near {w[cursor].lex}"
+                return None, error
 
             action, tag = list(self.action[state][lookahead])[0]
             if action is self.SHIFT:
@@ -265,6 +271,10 @@ class ShiftReduceParser:
                 stack.append(list(self.goto[stack[-1]][tag.Left])[0])
                 output.append(tag)
             elif action is ShiftReduceParser.OK:
-                return output if not get_shift_reduce else (output, operations)
+                return (output if not get_shift_reduce else (output, operations)), None
             else:
                 raise ValueError
+
+
+emptyToken = Token("", "", (0, 0))
+selfToken = Token("self", "", (0, 0))

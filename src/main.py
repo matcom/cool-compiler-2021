@@ -1,18 +1,16 @@
-# import streamlit as st
-
 from compiler.cmp.grammar import G
 
-# from compiler.lexer.lexer import tokenize_text, pprint_tokens
 from compiler.lexer.lex import CoolLexer
 from sys import exit
 
-# from compiler.cmp.tools import LR1Parser
-# from compiler.cmp.evaluation import evaluate_reverse_parse
-# from compiler.visitors.formatter import FormatVisitor
-# from compiler.visitors.type_collector import TypeCollector
-# from compiler.visitors.type_builder import TypeBuilder
-# from compiler.visitors.type_checker import TypeChecker
-# from compiler.visitors.type_inferencer import TypeInferencer
+from compiler.cmp.tools import LR1Parser
+from compiler.cmp.evaluation import evaluate_reverse_parse
+from compiler.visitors.formatter import FormatVisitor
+
+from compiler.visitors.type_collector import TypeCollector
+from compiler.visitors.type_builder import TypeBuilder
+from compiler.visitors.type_checker import TypeChecker
+from compiler.visitors.type_inferencer import TypeInferencer
 
 
 def main(args):
@@ -23,86 +21,66 @@ def main(args):
         print(f"(0,0) - CompilerError: file {args.file} not found")
         exit(1)
 
+    # Lexer
     lexer = CoolLexer()
     tokens, errors = lexer.tokenize(code)
     for error in errors:
         print(error)
-
     if errors:
         exit(1)
-    # print('=================== PARSE =====================')
-    # parser = LR1Parser(G)
-    # parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
-    # print('\n'.join(repr(x) for x in parse))
-    # print('==================== AST ======================')
-    # ast = evaluate_reverse_parse(parse, operations, tokens)
-    # formatter = FormatVisitor()
-    # tree = formatter.visit(ast)
-    # print(tree)
-    # print('============== COLLECTING TYPES ===============')
-    # errors = []
-    # collector = TypeCollector(errors)
-    # collector.visit(ast)
-    # context = collector.context
-    # print('Errors:', errors)
-    # print('Context:')
-    # print(context)
-    # print('=============== BUILDING TYPES ================')
-    # builder = TypeBuilder(context, errors)
-    # builder.visit(ast)
-    # manager = builder.manager
-    # print('Errors: [')
-    # for error in errors:
-    #     print('\t', error)
-    # print(']')
-    # print('Context:')import argparse
-    # print('Errors: [')
-    # for error in errors:
-    #     print('\t', error)
-    # print(']')
-    # formatter = FormatVisitor()
-    # tree = formatter.visit(ast)
-    # print(tree)
 
-    # return ast
+    # Parser
+    parser = LR1Parser(G)
+    parseResult, error = parser(tokens, get_shift_reduce=True)
+    if error:
+        print(error)
+        exit(1)
 
+    parse, operations = parseResult
+    ast = evaluate_reverse_parse(parse, operations, tokens)
 
-text = """
-class Main inherits IO {
-    number: Int <- 5;
+    # Collecting types
+    collector = TypeCollector()
+    collector.visit(ast)
+    context = collector.context
+    for (e, pos) in collector.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if collector.errors:
+        exit(1)
 
-    main () : Object {
-        testing_fibonacci(number)
-    };
+    # Building types
+    builder = TypeBuilder(context)
+    builder.visit(ast)
+    manager = builder.manager
+    for (e, pos) in builder.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if builder.errors:
+        exit(1)
 
-    testing_fibonacci(n: Int) : IO {{
-        out_string("Iterative Fibonacci : ");
-        out_int(iterative_fibonacci(5));
-        out_string("\\n");
+    # Type checking
+    checker = TypeChecker(context, manager)
+    scope = checker.visit(ast)
+    for (e, pos) in checker.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if checker.errors:
+        exit(1)
 
-        out_string("Recursive Fibonacci : ");
-        out_int(recursive_fibonacci(5));
-        out_string("\\n");
-    }};
+    # Inferencing Autotype
+    inferencer = TypeInferencer(context, manager)
+    inferencer.visit(ast, scope)
+    for e in inferencer.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if inferencer.errors:
+        exit(1)
 
-    recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
-        if n <= 2 then 1 else recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2) fi
-    };
+    # Last check without autotypes
+    checker = TypeChecker(context, manager)
+    checker.visit(ast)
+    for (e, pos) in checker.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if checker.errors:
+        exit(1)
 
-    iterative_fibonacci(n: AUTO_TYPE) : AUTO_TYPE {
-        let  i: Int <- 2, n1: Int <- 1, n2: Int <- 1, temp: Int in {
-            while i < n loop
-                let temp: Int <- n2 in {
-                    n2 <- n2 + n1;
-                    n1 <- temp;
-                    i <- i + 1;
-                }
-            pool;
-            n2;
-        }
-    };
-};
-"""
 
 if __name__ == "__main__":
     import argparse

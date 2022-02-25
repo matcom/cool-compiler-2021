@@ -1,4 +1,4 @@
-import pydot
+# import pydot
 
 
 class NFA:
@@ -24,75 +24,75 @@ class NFA:
         except KeyError:
             return ()
 
-    def graph(self):
-        G = pydot.Dot(rankdir="LR", margin=0.1)
-        G.add_node(pydot.Node("start", shape="plaintext", label="", width=0, height=0))
+    # def graph(self):
+    #     G = pydot.Dot(rankdir="LR", margin=0.1)
+    #     G.add_node(pydot.Node("start", shape="plaintext", label="", width=0, height=0))
 
-        for (start, tran), destinations in self.map.items():
-            tran = "ε" if tran == "" else tran
-            G.add_node(
-                pydot.Node(
-                    start, shape="circle", style="bold" if start in self.finals else ""
-                )
-            )
-            for end in destinations:
-                G.add_node(
-                    pydot.Node(
-                        end, shape="circle", style="bold" if end in self.finals else ""
-                    )
-                )
-                G.add_edge(pydot.Edge(start, end, label=tran, labeldistance=2))
+    #     for (start, tran), destinations in self.map.items():
+    #         tran = "ε" if tran == "" else tran
+    #         G.add_node(
+    #             pydot.Node(
+    #                 start, shape="circle", style="bold" if start in self.finals else ""
+    #             )
+    #         )
+    #         for end in destinations:
+    #             G.add_node(
+    #                 pydot.Node(
+    #                     end, shape="circle", style="bold" if end in self.finals else ""
+    #                 )
+    #             )
+    #             G.add_edge(pydot.Edge(start, end, label=tran, labeldistance=2))
 
-        G.add_edge(pydot.Edge("start", self.start, label="", style="dashed"))
-        return G
+    #     G.add_edge(pydot.Edge("start", self.start, label="", style="dashed"))
+    #     return G
 
-    def _repr_svg_(self):
-        try:
-            return self.graph().create_svg().decode("utf8")
-        except:
-            pass
+    # def _repr_svg_(self):
+    #     try:
+    #         return self.graph().create_svg().decode("utf8")
+    #     except:
+    #         pass
 
-    def _repr_png_(self):
-        try:
-            return self.graph()
-        except:
-            pass
+    # def _repr_png_(self):
+    #     try:
+    #         return self.graph()
+    #     except:
+    #         pass
 
 
 class DFA(NFA):
-    def graph(self):
-        G = pydot.Dot(rankdir="LR", margin=0.1)
-        G.add_node(pydot.Node("start", shape="plaintext", label="", width=0, height=0))
+    # def graph(self):
+    #     G = pydot.Dot(rankdir="LR", margin=0.1)
+    #     G.add_node(pydot.Node("start", shape="plaintext", label="", width=0, height=0))
 
-        for (start, tran), destinations in self.map.items():
-            tran = "ε" if tran == "" else tran
-            G.add_node(
-                pydot.Node(
-                    start, shape="circle", style="bold" if start in self.finals else ""
-                )
-            )
-            for end in destinations:
-                G.add_node(
-                    pydot.Node(
-                        end, shape="circle", style="bold" if end in self.finals else ""
-                    )
-                )
-                G.add_edge(pydot.Edge(start, end, label=tran, labeldistance=2))
+    #     for (start, tran), destinations in self.map.items():
+    #         tran = "ε" if tran == "" else tran
+    #         G.add_node(
+    #             pydot.Node(
+    #                 start, shape="circle", style="bold" if start in self.finals else ""
+    #             )
+    #         )
+    #         for end in destinations:
+    #             G.add_node(
+    #                 pydot.Node(
+    #                     end, shape="circle", style="bold" if end in self.finals else ""
+    #                 )
+    #             )
+    #             G.add_edge(pydot.Edge(start, end, label=tran, labeldistance=2))
 
-        G.add_edge(pydot.Edge("start", self.start, label="", style="dashed"))
-        return G
+    #     G.add_edge(pydot.Edge("start", self.start, label="", style="dashed"))
+    #     return G
 
-    def _repr_svg_(self):
-        try:
-            return self.graph().create_svg().decode("utf8")
-        except:
-            pass
+    # def _repr_svg_(self):
+    #     try:
+    #         return self.graph().create_svg().decode("utf8")
+    #     except:
+    #         pass
 
-    def _repr_png_(self):
-        try:
-            return self.graph()
-        except:
-            pass
+    # def _repr_png_(self):
+    #     try:
+    #         return self.graph()
+    #     except:
+    #         pass
 
     def __init__(self, states, finals, transitions, start=0):
         assert all(isinstance(value, int) for value in transitions.values())
