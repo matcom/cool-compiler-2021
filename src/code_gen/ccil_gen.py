@@ -762,8 +762,12 @@ class CCILGenerator:
         ok_label = LabelNode("substring_success")
         if_upper_bound = IfNode(extract_id(upper_bound), error_label)
         if_lesser_bound = IfNode(extract_id(lesser_bound), error_label)
+        error_msg = self.add_data(
+            "substr_error", "RuntimeError: Index out of range exception"
+        )
+        error_var = self.create_string_load_data("substr_error_var", error_msg.id)
         print_and_abort = self.notifiy_and_abort(
-            "RuntimeError: Index out of range exception"
+            error_var.id
         )
         substr = self.create_storage(
             "substr_var",
@@ -781,6 +785,7 @@ class CCILGenerator:
             substr,
             goto_ok,
             error_label,
+            error_var,
             *print_and_abort,
             ok_label,
         ]
