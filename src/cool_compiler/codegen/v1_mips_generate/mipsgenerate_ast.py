@@ -274,7 +274,6 @@ class Out_String:
     def __str__(self) -> str:
        return  """
 IO_out_string:
-
 lw $t1 , 4($sp)  #Guardando self
 lw $t0, 0($sp)   #Guarda en $t0 la direccion del string
 li $v0, 4
@@ -457,8 +456,10 @@ class SubStr:
        return """   
 String_substr:
 lw $s5, 8($sp)   # self. 
-lw $s1, 4($sp)   # guarda el indice 
-lw $t4, ($sp)    #guarda el j
+lw $t0, 4($sp)   # lee el int indice 
+lw $s1, 4($t0)   # guarda el value de indece
+lw $t0, ($sp)    # lee el int j
+lw $t4, 4($t0)   # guarda el value de indece
 
 li $t0, 0        # Inicia el contador en 0 
 li $s6, 1        # Contador de tamaño 
@@ -476,8 +477,8 @@ move $s4, $v0
 li $a0,8
 li $v0 , 9
 syscall
-la $t4, String
-sw $t4, 0($v0)   # Asigna el tipo String al string
+la $t9, String
+sw $t9, 0($v0)   # Asigna el tipo String al string
 sw $s4, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
 
