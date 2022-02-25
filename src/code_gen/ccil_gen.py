@@ -446,7 +446,7 @@ class CCILGenerator:
         return ([*left_ops, *right_ops, *extra_ops, fval], fval)
 
     @visitor.when(sem_ast.ComparerNode)
-    def visit(self, node: sem_ast.BinaryNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.ComparerNode) -> VISITOR_RESULT:
         times = self.times(node)
 
         (left_ops, left_fval) = self.visit(node.left)
@@ -457,11 +457,14 @@ class CCILGenerator:
 
         fval_id: str
         op: BinaryOpNode
-        # Arithmetic Binary Nodes
         node_type = type(node)
         # Boolean Binary Nodes
         if node_type == sem_ast.EqualsNode:
-            op = EqualOpNode(left_id, right_id)
+            op = (
+                EqualOpNode(left_id, right_id)
+                if node.left.type.name != STRING
+                else EqualStrNode(left_id, right_id)
+            )
             fval_id = f"eq_{times}"
         elif node_type == sem_ast.LessNode:
             op = LessOpNode(left_id, right_id)
@@ -476,6 +479,10 @@ class CCILGenerator:
 
         fval = self.create_storage(fval_id, node.type.name, op)
         return ([*left_ops, *right_ops, fval], fval)
+
+    @visitor.when(sem_ast.EqualsNode)
+    def visit(self, node: sem_ast.EqualsNode) -> VISITOR_RESULT:
+        pass
 
     @visitor.when(sem_ast.UnaryNode)
     def visit(self, node: sem_ast.UnaryNode) -> VISITOR_RESULT:
