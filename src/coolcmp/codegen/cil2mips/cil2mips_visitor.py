@@ -111,13 +111,19 @@ class CILToMipsVisitor:
         # TODO: Finish this
         type_ = self.types[node.type].index
 
-        reg_t0 = registers.T[0]
-        reg_t1 = registers.T[1]
+        t0 = registers.T[0]
+        t1 = registers.T[1]
 
-        instructions = [
-            f"# <allocate:{node.type}-{node.dest}>",
-            f"# </allocate:{node.type}-{node.dest}>",
-        ]
+        instructions = [f"# <allocate:{node.type}-{node.dest}>"]
+        instructions.append(mips.LINode(t0, type_))
+        allocate_object_instructions = mips.create_object_instructions(t0, t1)
+        instructions.extend(allocate_object_instructions)
+        instructions.extend(self.visit(node.dest))
+
+        address = self.cur_function.variable_address(node.dest)
+        instructions.append(mips.SWNode(registers.V0, address, registers.FP))
+
+        instructions.append(f"# </allocate:{node.type}-{node.dest}>")
 
         return instructions
 
@@ -138,24 +144,34 @@ class CILToMipsVisitor:
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
         print(f"PrintIntNode {node.addr}")
+        instructions = [f"# <printint:{node.addr}>"]
 
-        return [f"# <printint:{node.addr}>", f"# <printint:{node.addr}"]
+        instructions.append(mips.LINode(registers.V0, 1))
+
+        address = self.cur_function.variable_address(node.addr)
+
+        print(self.cur_function.variable_address(node.addr))
+        input()
+
+        instructions.append(mips.LWNode(registers.ARG[0], address, registers.FP))
+        instructions.append(mips.SysCallNode())
+
+        instructions.append(f"# </printint:{node.addr}>")
+        return instructions
 
     @visitor.when(cil.PrintStringNode)
     def visit(self, node: cil.PrintStringNode):
-        """
-        li $v0, 4
-        la $a0, str
-        syscall
-        """
+        """ """
         li = mips.LINode(registers.V0, 4)
-        la = mips.LANode(registers.A0, node.addr)
+        address = self.cur_function.variable_address(node.addr)
+        lw = mips.LWNode(registers.ARG[0], address, registers.FP)
+        # la = mips.LANode(registers.A0, node.addr)
         syscall = mips.SysCallNode()
 
         return [
             f"# <printstring:{node.addr}>",
             li,
-            la,
+            lw,
             syscall,
             f"# </printstring:{node.addr}>",
         ]
@@ -202,5 +218,23 @@ class CILToMipsVisitor:
         )
 
         instructions.append(f"</sum:{node.dest}<-{node.left}+{node.right}>")
+
+        return instructions
+
+    @visitor.when(cil.LoadNode)
+    def visit(self, node: cil.LoadNode):
+        instructions = [f"# <loadnode:{node.dest}-{node.msg}>"]
+
+        t0 = registers.T[0]
+        data = self.data[node.msg]
+
+        instructions.append(mips.LANode(t0, data.label))
+        if isinstance(node.dest, cil.Node):
+            instructions.extend(self.visit(node.dest))
+
+        address = self.cur_function.variable_address(node.dest)
+        instructions.append(mips.SWNode(t0, address, registers.FP))
+
+        instructions.append(f"# </loadnode:{node.dest}-{node.msg}>")
 
         return instructions
