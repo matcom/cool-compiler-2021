@@ -40,6 +40,7 @@ class CoolParser(Parser):
                 self.cool_error.add_syntactic(f"ERROR at or near {char}")
         self.lte = tok
         return tok
+        
     @_("")
     def epsilon(self, prod):
         pass

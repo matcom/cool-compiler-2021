@@ -263,11 +263,6 @@ class BEQ (JumpConditional):
      def __init__(self ,register1, register2, label) -> None:
             super().__init__( 'beq' ,register1, register2,label)
 
-
-
-
-
-
 ################################# Operator ##############################################
 
 class AddI(Operation):

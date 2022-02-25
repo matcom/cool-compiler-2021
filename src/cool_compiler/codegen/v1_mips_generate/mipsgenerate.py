@@ -134,6 +134,8 @@ class MipsGenerate:
     def visit(self, node: AST.SetAttr):
         if node.y == 'type_name': 
             attr_plus = 0
+            attr = 'type_name'
+            _type = "SELF"
         else: 
             attr_name = node.y.split('@')
             _type = attr_name[0]
@@ -152,7 +154,7 @@ class MipsGenerate:
             ASTR.LW('$t1', f'{stack_plus_dir_value}($sp)'),
             ASTR.Comment(f'Buscando el valor que se va a guardar en la propiedad'),
             ASTR.SW('$t1', f'{attr_plus}($t0)'),
-            ASTR.Comment(f'Seteando el valor en la direccion de la memoria del objeto'),
+            ASTR.Comment(f'Seteando el valor {memory_dir_value} en la direccion de la memoria del la propiedad {attr} del objeto de typo {_type}'),
         ]
 
     @visitor.when(AST.Arg)
@@ -313,8 +315,8 @@ class MipsGenerate:
                  ASTR.Comment(f"carga en $t1  {dir_cmp1} lo que hay en {stack_plus_opr_1} "),
                  ASTR.LW ('$t2', f'{stack_plus_opr_2}($sp)'),
                  ASTR.Comment(f"carga en $t2 {dir_cmp2} lo que hay en {stack_plus_opr_2} "),
-                 ASTR.SLT ('$t3','$t2','$t1'),
-                 ASTR.Comment("$t3 = $t2 < $ t1" ),
+                 ASTR.SLT ('$t3','$t1','$t2'),
+                 ASTR.Comment(f"$t3 = $t1 < $ t2 osea {dir_cmp1} < {dir_cmp2}" ),
                  ASTR.SW ('$t3',f'{stack_plus_dest}($sp)'),
                  ASTR.Comment(f"Pon en la posicion {stack_plus_dest} el valor de $t3")
                 ]
@@ -333,8 +335,8 @@ class MipsGenerate:
                  ASTR.Comment(f"carga en $t1 {dir_cmp1} lo que hay en {stack_plus_opr_1} "),
                  ASTR.LW ('$t2', f'{stack_plus_opr_2}($sp)'),
                  ASTR.Comment(f"carga en $t2 {dir_cmp2} lo que hay en {stack_plus_opr_2} "),
-                 ASTR.SLE ('$t3','$t2','$t1'),
-                 ASTR.Comment("$t3 = $t2 <= $ t1" ),
+                 ASTR.SLE ('$t3','$t1','$t2'),
+                 ASTR.Comment(f"$t3 = $t1 <= $t2 osea {dir_cmp1} <= {dir_cmp2}" ),
                  ASTR.SW ('$t3',f'{stack_plus_dest}($sp)'),
                  ASTR.Comment(f"Pon en la posicion {stack_plus_dest} el valor de $t3")
                 ]
@@ -344,7 +346,6 @@ class MipsGenerate:
         memory_dest = node.x
         dir_value = node.y
         stack_plus = self.stack.index(memory_dest)
-        print(dir_value)
 
         if type(dir_value) in [type(int()), type(float())]:
             return [ 
@@ -378,8 +379,6 @@ class MipsGenerate:
                 ASTR.Comment("$t0 =  $t1 * (-1)"),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
                 ASTR.Comment(f"poner en la posicion {stack_plus_memory_dest} el contenido de $t0")
-
-
                 ]                   
 
     @visitor.when(AST.Complemnet)
@@ -421,9 +420,9 @@ class MipsGenerate:
                 ASTR.LW('$t1', f'{stack_plus_opr_2}($sp)'),
                 ASTR.Comment("poner en registro $t1 {memory_op2} lo que hay en f'{stack_plus_opr_2}"),
                 ASTR.SUB('$t0' , '$t0','$t1'),
-                ASTR.Comment("poner en registro $t0 la suma "),
+                ASTR.Comment("poner en registro $t0 la RESTA"),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
-                ASTR.Comment(f"poner en {stack_plus_memory_dest} el resultado de la suma "),
+                ASTR.Comment(f"poner en {stack_plus_memory_dest} el resultado de la RESTA "),
 
                 ]
 
@@ -442,7 +441,7 @@ class MipsGenerate:
                 ASTR.LW('$t1', f'{stack_plus_opr_2}($sp)'),
                 ASTR.Comment(f"poner en registro $t1 {memory_op2} lo que hay en {stack_plus_opr_2}"),
                 ASTR.MUL('$t0' , '$t0','$t1'),
-                ASTR.Comment("poner en registro $t0 la suma "),
+                ASTR.Comment("poner en registro $t0 la MULT "),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
                 ASTR.Comment(f"poner en {stack_plus_memory_dest} el resultado de la multiplicacion "),
 
@@ -464,14 +463,10 @@ class MipsGenerate:
                 ASTR.LW('$t1', f'{stack_plus_opr_2}($sp)'),
                 ASTR.Comment("poner en registro $t1 {memory_op2} lo que hay en f'{stack_plus_opr_2}"),
                 ASTR.DIV('$t0' , '$t0','$t1'),
-                ASTR.Comment("poner en registro $t0 la suma "),
+                ASTR.Comment("poner en registro $t0 la DIV "),
                 ASTR.SW ('$t0', f'{stack_plus_memory_dest}($sp)'),
                 ASTR.Comment(f"poner en {stack_plus_memory_dest} el resultado de la Division entera el resto esta en LO "),
                 ]
-
-
-
-
 
     @ visitor.when(AST.IfGoTo)
     def visit(self,node:AST.IfGoTo):
