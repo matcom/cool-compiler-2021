@@ -308,7 +308,7 @@ class CilToMIPS:
             )
         )
         instructions.append(
-            mips.LoadWordNode(reg2, mips.MemoryAddressLabelNode(reg1, node.attr * 4))
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(reg1, node.attr * 4))
         )
         dest_dir = self.search_mem(node.dest)
         instructions.append(
@@ -375,11 +375,7 @@ class CilToMIPS:
 
         reg1 = self.memory_manager.get_unused_register()
 
-        instructions.append(
-            mips.LoadAddressNode(
-                reg1, mips.MemoryAddressLabelNode(mips.LabelNode(node.type), 0)
-            )
-        )
+        instructions.append(mips.LoadAddressNode(reg1, mips.LabelNode(node.type)))
         instructions.append(
             mips.StoreWordNode(
                 reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
