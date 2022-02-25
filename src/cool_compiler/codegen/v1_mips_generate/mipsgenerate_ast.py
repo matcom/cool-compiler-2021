@@ -321,7 +321,7 @@ la $t4, String
 sw $t4, 0($v0)   # Asigna el tipo String al string
 sw $s0, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
-
+move $s0, $v0
 addi $sp, $sp, 4
 jr $ra
 """

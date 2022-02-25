@@ -12,12 +12,9 @@ class MipsGenerate:
             "IO_in_string":ASTR.In_String,
             "IO_out_int":ASTR.Out_Int,
             "String_length":ASTR.Length,
-            #"String_length":ASTR.Length,
             "String_concat": ASTR.Concat,
-
-
-            "String_substr":ASTR.SubStr
-,
+            "String_substr":ASTR.SubStr,
+            'Compare_String': ASTR.Compare_String,
             "Object_copy": ASTR.Copy,
             "Object_type_name":ASTR.Type_Name,
             "Object_abort": ASTR.Abort,
@@ -291,17 +288,26 @@ class MipsGenerate:
         memory_str2 = node.z
 
         stack_plus_str1 = self.stack.index(memory_str1)
+        self.stack.push(memory_str1)
         stack_plus_str2 = self.stack.index(memory_str2)
-        stack_plus_dest = self.stack.index(memory_dest)
+        self.stack.push(memory_str2)
 
-        return [ASTR.LW('$t0',f'{stack_plus_str1}'),
-                ASTR.Comment(f"Si no viene como funcion pon el string {memory_str1} de la posicion {stack_plus_str1}"),
-                ASTR.LW('$t1',f'{stack_plus_str2}'),
-                ASTR.Comment(f"Si no viene como funcion pon el string {memory_str2} de la posicion {stack_plus_str2}"),
-                ASTR.Compare_String(),
-                ASTR.SW ('$s0', f'{stack_plus_dest}'),
-                ASTR.Comment(f"Como no retorna sigue lineal entoces en $s0 esta el resultado y se pone en  {stack_plus_dest}")
-        ]
+        func = 'Compare_String'
+        if not func in self.func_list: self.func_list.append(func)
+
+        return [
+            ASTR.Header_Comment("COMPARACION DE STR\n"),
+            ASTR.LW('$t0', f'{stack_plus_str1}($sp)'),
+            ASTR.Comment(f'Saca de la pila {node.y}'),
+            ASTR.AddI('$sp', '$sp', -4),
+            ASTR.SW('$t0', '0($sp)'),
+            ASTR.Comment(f'Mete para la pila {node.y}'),
+            ASTR.LW('$t0', f'{stack_plus_str2}($sp)'),
+            ASTR.Comment(f'Saca de la pila {node.z}'),
+            ASTR.AddI('$sp', '$sp', -4),
+            ASTR.SW('$t0', '0($sp)'),
+            ASTR.Comment(f'Mete para la pila {node.z}'),
+        ]  +  self.call('Compare_String', memory_dest) + [ASTR.Header_Comment("Fin de la Comparacion\n")]
 
     @visitor.when(AST.Less)
     def visit (self,node:AST.Less):

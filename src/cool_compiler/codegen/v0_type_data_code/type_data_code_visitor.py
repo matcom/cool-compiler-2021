@@ -157,7 +157,6 @@ class CILGenerate:
         
         self.currentFunc = save_current_func
 
-
     @visitor.when(AST.FuncDef)
     def visit(self, node: AST.FuncDef, scope: Scope):
         func_scope = scope.create_child(node.name)
@@ -444,10 +443,10 @@ class CILGenerate:
 
     @visitor.when(AST.Equals)
     def visit(self, node: AST.Equals, scope: Scope):
-        if node.static_type in [CoolInt, CoolBool]: 
+        if node.left.static_type in [CoolInt, CoolBool]: 
             return self.binary_op('int_eq', node, ASTR.CmpInt, scope)
-        if node.static_type == CoolStr: 
-            return self.binary_op('str_eq', node, ASTR.CmpStr, scope, 'String', 'Boolena')
+        if node.left.static_type == CoolStr: 
+            return self.binary_op('str_eq', node, ASTR.CmpStr, scope, 'String', 'Bool')
         
         op_1 = self.currentFunc.local_push(f'ref@_a', scope)
         op_2 = self.currentFunc.local_push(f'ref@_b', scope)
