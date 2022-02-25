@@ -81,7 +81,7 @@ class CCILToMIPSGenerator:
         # TODO: other .data section static data inicializations like strings
 
         functions = []
-        functions.extend(self.visit(node.entry_func))
+        # functions.extend(self.visit(node.entry_func))
         functions.extend(
             [self.visit(func) for func in node.code_section if func.id == "main"][0]
         )
@@ -313,7 +313,7 @@ class CCILToMIPSGenerator:
         )
         instructions.append(
             mips_ast.LoadImmediate(
-                node, mips_ast.RegisterNode(node, V1), mips_ast.Constant(node, 9)
+                node, mips_ast.RegisterNode(node, V0), mips_ast.Constant(node, 9)
             )
         )
         instructions.append(mips_ast.Syscall(node))
@@ -839,6 +839,7 @@ class CCILToMIPSGenerator:
     def get_attr_count(self, typex: str):
         for _type in self.__types_table:
             if _type.id == typex:
+                print(_type.attributes)
                 return len(_type.attributes)
         raise Exception("Type declaration not found")
 
