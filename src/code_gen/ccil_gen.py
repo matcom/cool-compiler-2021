@@ -10,6 +10,9 @@ from code_gen.constants import *
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
 CLASS_VISITOR_RESULT = Tuple[Class, List[FunctionNode]]
 METHOD_VISITOR_RESULT = FunctionNode
+ATTR_VISITOR_RESULT = List[OperationNode]
+
+DEFAULT_STR = Data("default_str", "")
 
 # TODO:
 # Define abort nodes with a text:
@@ -35,7 +38,7 @@ class CCILGenerator:
         # To keep track of how many times a certain expression has been evaluated
         self.time_record: Dict[str, int] = dict()
         # Track all constant values. Only strings for now
-        self.data: List[Data] = list()
+        self.data: List[Data]
 
         # To keep track of the current class being analysed
         self.current_type: str
@@ -55,6 +58,8 @@ class CCILGenerator:
     def visit(self, node: sem_ast.ProgramNode) -> None:
         program_types: List[Class] = list()
         program_codes: List[Method] = list()
+
+        self.data = [DEFAULT_STR]
         for type in node.declarations:
             classx, class_code = self.visit(type)
             program_types.append(classx)
@@ -78,6 +83,8 @@ class CCILGenerator:
         # Explore all attributes and join their operations in an initializer function
         self.reset_locals()
         self.reset_scope()
+        init_params = self.init_func_params(node.id)
+        self.ccil_cool_names.add_new_name_pair("self", node.type.name)
         attributes: List[Attribute] = list()
         init_attr_ops: List[OperationNode] = []
         for attr in attr_nodes:
@@ -85,13 +92,14 @@ class CCILGenerator:
             (attr_ops, _) = self.visit(attr)
             init_attr_ops += attr_ops
 
-        # Return type is set as itself? Use selftype maybe?
+        dummy_return = self.create_storage(f"init_type_{node.id}_ret", INT, IntNode(0))
+        init_attr_ops.append(dummy_return)
         init_func = FunctionNode(
             f"init_{node.id}",
-            [],
+            init_params,
             to_vars(self.locals, Local),
             init_attr_ops,
-            node.id,
+            dummy_return.id,
         )
 
         # Explore all functions
@@ -109,23 +117,26 @@ class CCILGenerator:
         return (Class(node.id, attributes, methods, init_func), class_code)
 
     @visitor.when(sem_ast.AttrDeclarationNode)
-    def visit(self, node: sem_ast.AttrDeclarationNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.AttrDeclarationNode) -> ATTR_VISITOR_RESULT:
         self.ccil_cool_names = self.ccil_cool_names.create_child()
 
-        fval_id = ATTR + node.id
-        self.ccil_cool_names.add_new_name_pair(node.id, fval_id)
+        attr_id = ATTR + node.id
+        self.ccil_cool_names.add_new_name_pair(node.id, attr_id)
 
         if node.expr is None:
-            self.add_local(fval_id, node.type.name)
-            return ([], None)
+            if node.type.name != STRING:
+                value_0 = self.create_storage("zero", INT, IntNode("0"))
+            else:
+                value_0 = self.create_string_load_data("empty", DEFAULT_STR.id)
+            set_attr = SetAttrOpNode("self", attr_id, extract_id(value_0), SELFTYPE)
+            return [value_0, set_attr]
 
         (expr_op, expr_fval) = self.visit(node.expr)
 
-        self.update_locals(expr_fval.id, fval_id)
-        expr_fval.id = fval_id
+        set_attr = SetAttrOpNode("self", attr_id, expr_fval.id, SELFTYPE)
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
-        return (expr_op, expr_fval)
+        return [*expr_op, set_attr]
 
     @visitor.when(sem_ast.MethodDeclarationNode)
     def visit(self, node: sem_ast.MethodDeclarationNode) -> METHOD_VISITOR_RESULT:
@@ -196,8 +207,12 @@ class CCILGenerator:
         self.ccil_cool_names.add_new_name_pair(node.id, fvalue_id)
 
         if node.expr is None:
-            self.add_local(fvalue_id, node.type.name)
-            self.locals[fvalue_id] = node.type.name
+            if node.type.name != STRING:
+                value_0 = self.create_storage("zero", INT, IntNode("0"))
+            else:
+                value_0 = self.create_string_load_data("empty", DEFAULT_STR.id)
+            fval = self.create_assignation(fvalue_id, node.type.name, value_0.id)
+            return [fval], fval
 
         (expr_ops, expr_fv) = self.visit(node.expr)
 
