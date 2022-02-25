@@ -41,9 +41,9 @@ class CILDebug:
     def visit(self, node: cil.TypeNode, indent=0, inline=False):
         self.print(indent, inline, f"type {node.name} {{")
         for attr in node.attributes:
-            self.print(indent + 2, inline, f"attribute {attr.name};")
+            self.print(indent + 2, inline, f"attribute {attr};")
         for method in node.methods:
-            self.print(indent + 2, inline, f"method {method.name};")
+            self.print(indent + 2, inline, f"method {method};")
         self.print(indent, inline, "}")
 
     @visitor.when(cil.DataNode)
@@ -54,13 +54,13 @@ class CILDebug:
     def visit(self, node: cil.FunctionNode, indent=0, inline=False):
         self.print(indent, inline, f"function {node.name} {{")
         for param in node.params:
-            self.visit(param, indent+2)
+            self.visit(param, indent + 2)
         print(file=self.file)
         for local in node.localvars:
-            self.visit(local, indent+2)
+            self.visit(local, indent + 2)
         print(file=self.file)
         for inst in node.instructions:
-            self.visit(inst, indent+2)
+            self.visit(inst, indent + 2)
         self.print(indent, inline, "}")
 
     @visitor.when(cil.ParamNode)
@@ -105,11 +105,15 @@ class CILDebug:
 
     @visitor.when(cil.GetAttrNode)
     def visit(self, node: cil.GetAttrNode, indent=0, inline=False):
-        self.print(indent, inline, f"{node.dest} = GETATTR {node.instance} {node.attr};")
+        self.print(
+            indent, inline, f"{node.dest} = GETATTR {node.instance} {node.attr};"
+        )
 
     @visitor.when(cil.SetAttrNode)
     def visit(self, node: cil.SetAttrNode, indent=0, inline=False):
-        self.print(indent, inline, f"SETATTR {node.instance} {node.attr} {node.source};")
+        self.print(
+            indent, inline, f"SETATTR {node.instance} {node.attr} {node.source};"
+        )
 
     @visitor.when(cil.GetIndexNode)
     def visit(self, node: cil.GetIndexNode, indent=0, inline=False):

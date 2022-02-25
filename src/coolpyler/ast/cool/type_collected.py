@@ -161,4 +161,3 @@ class CoolBoolNode(parsed.CoolBoolNode):
 
 class CoolVarNode(parsed.CoolVarNode):
     pass
-

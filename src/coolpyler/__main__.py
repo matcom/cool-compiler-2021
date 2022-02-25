@@ -42,13 +42,15 @@ def coolpyler(input: Path, output: Path = None, debug: bool = False):
     if len(errors) > 0:
         report_and_exit(errors)
 
+    cil = visitor.visit_middle(ast)
+
     if output is None:
         cil_file = input.with_suffix(".cil")
 
     with cil_file.open("w") as file:
-        CILDebug(file).visit(ast)
+        CILDebug(file).visit(cil)
 
-    mips = visitor.visit_down(ast)
+    mips = visitor.visit_down(cil)
 
     if output is None:
         mips_file = input.with_suffix(".mips")

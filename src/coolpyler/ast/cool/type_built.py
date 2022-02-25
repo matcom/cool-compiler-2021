@@ -19,6 +19,7 @@ class CoolAstNode(type_collected.CoolAstNode):
 #         self.type = type
 #         self.features = features
 
+
 class CoolProgramNode(type_collected.CoolProgramNode):
     pass
 

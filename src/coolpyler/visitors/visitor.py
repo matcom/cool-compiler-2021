@@ -7,17 +7,24 @@ from coolpyler.visitors.mips.mips_to_text import MIPSGenerator
 
 
 class Visitor:
-    def __init__(self, errors:list):
+    def __init__(self, errors: list):
         self.visitors_up = [
             TypeCollectorVisitor(errors),
             TypeBuilderVisitor(errors),
             TypeCheckerVisitor(errors),
+        ]
+        self.visitors_middle = [
             CoolToCilVisitor(),
         ]
         self.visitors_down = [CilToMIPS(), MIPSGenerator()]
 
     def visit_up(self, ast):
         for visitor in self.visitors_up:
+            ast = visitor.visit(ast)
+        return ast
+
+    def visit_middle(self, ast):
+        for visitor in self.visitors_middle:
             ast = visitor.visit(ast)
         return ast
 
