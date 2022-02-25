@@ -997,8 +997,10 @@ class CilToMIPS:
         self.memory_manager.clean()
         return instructions
 
-    def exit_program(self):
+    @visitor.when(cil.ExitNode)
+    def visit(self, node: cil.AssignNode):
         instructions = []
         instructions.append(mips.LoadInmediateNode(V0_REG, 10, f"EXIT"))
         instructions.append(mips.SyscallNode())
         return instructions
+
