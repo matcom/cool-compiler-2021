@@ -13,8 +13,8 @@ METHOD_VISITOR_RESULT = FunctionNode
 
 # TODO:
 # Define abort nodes with a text:
-# * Dispacth on a void class
-# * No pattern match in case
+# * Dispatch on a void class
+# * No pattern match in case (Done)
 # * Division by zero
 # * Substring out of range (Done)
 # * Heap Overflow (don't know yet how to handle this)
@@ -327,6 +327,7 @@ class CCILGenerator:
             f"case_error_msg_{times}",
             f"Pattern match failure in {node.line}, {node.col}",
         )
+        err_var = self.create_string_load_data(f"case_error_var_{times}", err_msg.id)
 
         fval_id = f"case_{times}_fv"
         fval = self.create_assignation(fval_id, node.type.name, pre_fvalue_id)
@@ -334,7 +335,7 @@ class CCILGenerator:
             *case_expr_ops,
             type_of,
             *pattern_match_ops,
-            *self.notifiy_and_abort(err_msg.id),
+            *self.notifiy_and_abort(err_var.id),
             *branch_ops,
             final_label,
             fval,
@@ -365,10 +366,9 @@ class CCILGenerator:
             fval,
         )
 
-    @visitor.when(sem_ast.BinaryNode)
-    def visit(self, node: sem_ast.BinaryNode) -> VISITOR_RESULT:
+    @visitor.when(sem_ast.ArithmeticNode)
+    def visit(self, node: sem_ast.ArithmeticNode) -> VISITOR_RESULT:
         times = self.times(node)
-
         (left_ops, left_fval) = self.visit(node.left)
         (right_ops, right_fval) = self.visit(node.right)
 
@@ -376,9 +376,10 @@ class CCILGenerator:
         right_id = extract_id(right_fval)
 
         fval_id: str
-        op: BinaryOpNode
+        op: ArithmeticOpNode
 
         # Arithmetic Binary Nodes
+        extra_ops: List[OperationNode] = []
         node_type = type(node)
         if node_type == sem_ast.PlusNode:
             op = SumOpNode(left_id, right_id)
@@ -392,8 +393,50 @@ class CCILGenerator:
         elif node_type == sem_ast.DivNode:
             op = DivOpNode(left_id, right_id)
             fval_id = f"div_{times}"
+            # Generating divison by zero warning
+            ok_label = LabelNode(f"ok_div_{times}")
+            right_id_is_zero = self.create_equality(
+                f"check_right_zero_{times}", left_id, IntNode("0")
+            )
+            if_id_is_not_zero = IfFalseNode(extract_id(right_id_is_zero), ok_label)
+            error_msg = self.add_data(
+                f"error_msg_div_zero_{times}",
+                f"Error. Zero division detected on {node.line}, {node.col}.",
+            )
+            error_var = self.create_string_load_data(f"error_var_{times}", error_msg.id)
+            extra_ops = [
+                right_id_is_zero,
+                if_id_is_not_zero,
+                error_var,
+                *self.notifiy_and_abort(error_var.id),
+                ok_label,
+            ]
+
+        else:
+            raise Exception(
+                f"Pattern match failure visiting arithmetic expression"
+                f" with {type(node).__name__}"
+            )
+
+        fval = self.create_storage(fval_id, node.type.name, op)
+        return ([*left_ops, *right_ops, *extra_ops, fval], fval)
+
+    @visitor.when(sem_ast.ComparerNode)
+    def visit(self, node: sem_ast.BinaryNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        (left_ops, left_fval) = self.visit(node.left)
+        (right_ops, right_fval) = self.visit(node.right)
+
+        left_id = extract_id(left_fval)
+        right_id = extract_id(right_fval)
+
+        fval_id: str
+        op: BinaryOpNode
+        # Arithmetic Binary Nodes
+        node_type = type(node)
         # Boolean Binary Nodes
-        elif node_type == sem_ast.EqualsNode:
+        if node_type == sem_ast.EqualsNode:
             op = EqualOpNode(left_id, right_id)
             fval_id = f"eq_{times}"
         elif node_type == sem_ast.LessNode:
