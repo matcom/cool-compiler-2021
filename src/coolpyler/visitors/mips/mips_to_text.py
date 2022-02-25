@@ -127,7 +127,7 @@ class MIPSGenerator:
 
     @visitor.when(mips.BgtNode)
     def visit(self, node: mips.BgtNode):
-        return f"\tbgt {self.visit(node.left)},  {self.visit(node.right)}, {str(node.label)} \t#{node.comment}"
+        return f"\tbgt {self.visit(node.left)},  {self.visit(node.middle)}, {str(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.BeqzNode)
     def visit(self, node: mips.BeqzNode):
