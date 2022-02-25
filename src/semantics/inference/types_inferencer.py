@@ -175,7 +175,7 @@ class TypesInferencer:
     @visitor.when(MethodCallNode)
     def visit(self, node: MethodCallNode, scope: Scope) -> types_ast.MethodCallNode:
         args = [self.visit(arg, scope) for arg in node.args]
-        caller_expr = self.visit(node.expr, scope)
+        caller_expr = self.visit(node.expr, scope) if node.expr is not None else None
         new_node = types_ast.MethodCallNode(node.caller_type, caller_expr, args, node)
         new_node.type = self._reduce_to_type(node.inferenced_type, node)
         return new_node
