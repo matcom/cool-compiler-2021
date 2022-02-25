@@ -1,10 +1,46 @@
-# Generacion de Codigo Intermedio
+# Generación de Código Intermedio
 
-Despues de realizado el chequeo semantico se procede a realizar la generacion de codigo con el ast obtenido como resultado.
+Se utliza el partron visitor para generar un árbol en CCIL (Cool Cows Intermediate Language).  Por cada expresion de Cool se desglosa y traduce en operaciones (o instrucciones) de CIL.  
 
-Se utiliza un nuevo ast para esta parte del compilador _codegen_ast.py_. 
+Cada instruccion cumple un propositio. Cada instruccion hace de las suyas.
 
-Cada nodo de este nuevo AST se representa a si mismo en ccil (cool cows intermediate language).
+Tambien se genera el codigo que hace runtime exception
+
+El codigo built ini de las clases esta definido aqui tambien.
+
+
+
+El nodo programa se divide en 3 secciones
+
+Una seccion de tipos donde se almacenan con todos sus atributos  + sus funciones
+
+Una secciond de datos donde se almacenan todos los string producidos
+
+Una seccion de codigo donde estan almacenados todos los codigos dsitribuidos por una funcion
+
+La function esta compuesta por operaciones que son el resultado de desglosar  las expresiones interiores
+
+Para trabajar con sub expresiones estas se trabajan primero que las expresiones grandes, y se alamcena su valor en un lugar conocido, ya sea una variable interna o una definida por el usuario.
+
+Los primeras operaciones de toda funcion es nombrar sus parametros de entrada y las variables locales necesarias que necesita inicializadas.
+
+Todas las variables definidas por el usuario tienen una traduccion a cil.
+
+Variables con mismo nombre en scopes distintos tienen diferentes nombres en cil
+
+
+
+Todas las funciones se les define una init_func que se encarga de inicializar todos sus atributos. Esta funcon recibe un parametro self que indica el tipo en runtime al que se le van actualizar los atributos
+
+Despues de calculadas las expresiones se setean los atributos
+
+
+
+
+
+## Lenguage CCIL
+
+Definicion del lenguage CCIL. Tomamos como No Terminales todos los simbolos que empiezen con palabras mayusculas. El resto se considera como Terminales.
 $$
 \begin{array}{rcl}
 \text{Program} &\rarr& \text{.type TypeList .code CodeList}\\
@@ -13,27 +49,22 @@ $$
 \text{FeatureList} &\rarr& \text{Attribute } | \text{ Function } | \text{ FeatureList } | \space\epsilon\\
 &|& \text{ Attribute; FeatureList } | \text{ Function; FeatureList}\\
 \\
-\text{CodeList} &\rarr& \text{AttrCode }|\text{ FuncCode }|\text{ CodeList }| \space\epsilon\\
-&|& \text{ AttrCode; CodeList } | \text{ FuncCode; CodeList}\\
-\text{AttrCode} &\rarr& \text{id }\{ \text{LocalList Expression} \}\\
+\text{CodeList} &\rarr& \text{ FuncCode CodeList }| \space\epsilon \\
+\text{AttrCode} &\rarr& \text{id }\{ \text{LocalList OperationList} \}\\
 \text{FuncCode} &\rarr& \text{id }\{\\
 &&\text{ParamList}\\
 &&\text{LocalList}\\
-&&\text{Expression}\\
-&&\text{\}}\\
+&&\text{OperationList} \text{\}}\\
 \\
-\text{Expression} &\rarr& \text{id = ReturnOp}\\
+\text{OperationList} &\rarr& \text{Operation; OperationList } | \space\epsilon \\
+\text{Operation} &\rarr& \text{id = ReturnOp}\\
 &|& \text{goto id}\\
 &|& \text{label id}\\
 &|& \text{return Atom}\\
 &|& \text{setattr id id Atom}\\
 &|& \text{if Atom goto id}\\
 &|& \text{ifFalse Atom goto id}\\
-&|& \text{ArgList id = call id integer}\\
-&|& \text{ArgList id = vcall id id integer }\\
-&|& \text{ExpressionList}\\
-\text{ExpressionList} &\rarr& \text{Expression; ExpressionList } | \text{ Expression} \\
-\text{ArgList} &\rarr& \text{arg id; ArgList } | \space\epsilon \\
+&|& \text{arg id}\\
 
 \text{ReturnOp} &\rarr& \text{Atom + Atom}\\
 &|& \text{Atom - Atom}\\
@@ -41,16 +72,19 @@ $$
 &|& \text{Atom / Atom}\\
 &|& \text{not Atom}\\
 &|& \text{neg Atom}\\
-&|& \text{typeOf id}\\
+&|& \text{call id}\\
+&|& \text{vcall typeId id}\\
+&|& \text{typeof id}\\
+&|& \text{getatrr id id}\\
 &|& \text{allocate typeId}\\
 &|& \text{Atom < Atom}\\
 &|& \text{Atom <= Atom}\\
 &|& \text{Atom = Atom}\\
-&|& \text{allocate id}\\
+&|& \text{allocate typeId}\\
 &|& \text{getattr id id}\\
 &|& \text{Atom}\\
 \text{Atom} &\rarr& \text{Constant } | \text{ id}\\
-\text{Constant} &\rarr& \text{ integer } | \text{ string } | \text{ boolean }
+\text{Constant} &\rarr& \text{ integer } | \text{ string } 
 \end{array}
 $$
 
@@ -456,10 +490,4 @@ t = t / 2
 ```
 
 
-
-## Convenciones de variables en Cool
-
-Si es una variable definida por el usuario se le agrega el prefijo _user_. Se aplica tanto a variables definidas en un _let in_ como en _atributos_.
-
-Si es una variable creada cuando se analiza una expresion en particular se convierte en: _<expression_name>\_<expresssion_amounts>_\__<extra_name>_
 

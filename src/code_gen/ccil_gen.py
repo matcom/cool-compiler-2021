@@ -485,8 +485,8 @@ class CCILGenerator:
             fval_id = f"is_void_fv_{times}"
             if node.expr.type.name in {BOOL, INT, STRING}:
                 self.add_warning(
-                    f"Warning: Redundant isVoid expression in {node.line}, {node.col}."
-                    " It will always evaluate to false"
+                    f"Redundant isVoid expression in {node.line}, {node.col}."
+                    f" Type {node.expr.type.name} will always evaluate to false"
                 )
                 op = IntNode("0")
             else:
@@ -567,7 +567,7 @@ class CCILGenerator:
     def visit(self, node: sem_ast.InstantiateNode) -> VISITOR_RESULT:
         times = self.times(node)
 
-        fvalue_id = f"newType_{times}"
+        fvalue_id = f"new_type_{times}"
         fvalue = self.create_new_type(fvalue_id, node.type.name)
 
         return [fvalue], fvalue
@@ -959,7 +959,7 @@ class CCILGenerator:
         self.ccil_cool_names = Scope()
 
     def add_warning(self, msg: str):
-        self.add_warning(msg)
+        self.add_warning(f"Warning: {msg}")
 
 
 def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:

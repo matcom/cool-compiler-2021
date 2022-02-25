@@ -1,5 +1,9 @@
 # Inferencia
 
+La idea principal para realizar la inferencia es considerar todo declaración como AUTO_TYPE no como un tipo especifico sino como un conjunto de tipos, donde inicialmente ese conjunto esta compuesto por todos los tipos definidos en un programa Cool. Los tipos declarados específicamente como Int o String se consideran conjuntos con un solo elemento.
+
+La inferencia se realiza varias veces por visitores distintos que explicaremos mas adelante. En nuestra implementación debido a que le inferencia se apoya fuertemente sobre el reglas semánticas estas se realizan también durante la inferencia, distribuida a lo largo de los visitores.
+
 Se infieren los tipos  lo mas posbile aplicando las reglas de la semantica de cool. Cuando el inferenciador debe elegir entre varios tipos a asignar a una variable, escoge el mas general. El inferenciador da errores si entre los tipos que tiene a esocoger existe alguno que no tiene un ancestro comun mas general con los demas.
 
 ## Funcionamiento
@@ -46,3 +50,7 @@ En esta parte el inferenicador realiza las misma acciones que en el Soft Inferen
 ### Back Inferencer
 
 Este se encarga de inferir el tipo de una variable a base del valor de la expresion.
+
+### Types Inferencer
+
+Pasa una ultima vez por todas las expresiones 

@@ -257,8 +257,10 @@ class BackInferencer:
 
         new_expr = self.visit(node.expr, scope) if node.expr else None
         new_node = MethodCallNode(node.caller_type, new_expr, new_args, node)
+
+        method_return_type = method.return_type.clone().swap_self_type(caller_type)
         new_node.inferenced_type, changed = unify(
-            node.inferenced_type, method.return_type
+            node.inferenced_type, method_return_type
         )
         self.changed |= changed
         return new_node
