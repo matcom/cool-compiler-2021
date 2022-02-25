@@ -13,15 +13,15 @@ class CILCodegen:
     def visit(self, node: CILProgramNode):
         code = '.TYPES\n\n'
         for t in node.types:
-            code += self.visit(t)
+            code += self.visit(t) + '\n'
         code += '\n'
         code += '.DATA\n\n'
         for d in node.data:
-            code += self.visit(d) + '\n\n'
+            code += self.visit(d) + '\n'
         code += '\n'
         code += '.CODE\n\n'
         for f in node.functions:
-            code += self.visit(f) + '\n\n'
+            code += self.visit(f) + '\n'
         return code
 
     @visitor.when(CILTypeNode)
@@ -52,12 +52,7 @@ class CILCodegen:
             code += self.visit(l)
         code += eol
         for i in node.instructions:
-            try:
-                code += self.visit(i)
-            except:
-                print(code)
-                print('--------------------------')
-                print(i)
+            code += self.visit(i)
         code += eol
         code += '}\n\n'
         return code
@@ -98,7 +93,7 @@ class CILCodegen:
 
     @visitor.when(CILArgNode)
     def visit(self, node:CILArgNode):
-        return f'\tARG {node.id};\n'
+        return f'\tARG {node.var.lex};\n'
 
     @visitor.when(CILGotoNode)
     def visit(self, node: CILGotoNode):
@@ -142,7 +137,7 @@ class CILCodegen:
 
     @visitor.when(CILLoadNode)
     def visit(self, node: CILLoadNode):
-        return f'LOAD {node.var.lex}'
+        return f'LOAD {node.var}'
 
     @visitor.when(CILAtomicNode)
     def visit(self, node: CILAtomicNode):
