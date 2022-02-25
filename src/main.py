@@ -15,7 +15,7 @@ def main(file):
         f_input = open(file, 'r')
         code = f_input.read()
     except:
-        print(f"(0, 0) - CompilerError: file {file} not found")
+        print(f"(0,0) - CompilerError: file {file} not found")
         exit(1)
 
 
@@ -24,7 +24,7 @@ def main(file):
     tokens = lexer.tokenize(code)
     
     if len(tokens) == 1 and tokens[0].lex == '$':
-        print("(0, 0) - SyntacticError: Unexpected token EOF") 
+        print("(0,0) - SyntacticError: Unexpected token EOF") 
         exit(1)
 
     lexer_err = False
@@ -41,7 +41,7 @@ def main(file):
     parsedData, (failure, token) = CoolParser(tokens, get_shift_reduce=True)
     
     if failure:
-        print(f"({token.row}, {token.column}) - SyntacticError: ERROR at or near \"{token.lex}\"")
+        print(f"({token.row},{token.column}) - SyntacticError: ERROR at or near \"{token.lex}\"")
         exit(1)
 
     parse, operations = parsedData
