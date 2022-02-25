@@ -20,7 +20,7 @@ class TypeChecker:
             try:
                 self.visit(dec,scope.create_child())
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
 
 
     @visitor.when(ClassDeclarationNode)
@@ -29,7 +29,7 @@ class TypeChecker:
             typex = self.context.get_type(node.id, node.line)
             
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
 
         self.current_type = typex
         #for at in typex.all_attributes():
@@ -54,7 +54,7 @@ class TypeChecker:
                 typex =self.current_type if node.type == "SELF_TYPE" else self.context.get_type(node.type,node.line)
                 self.context.check_type(node.expr.type,typex,node.line)
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node:FuncDeclarationNode,scope:Scope):
@@ -68,14 +68,14 @@ class TypeChecker:
                 
                 scope.define_variable(method.param_names[i],method.param_types[i],node.line)
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
 
         self.visit(node.body,scope.create_child())
         try:
             typex = method.return_type if not isinstance(method.return_type,SELF_TYPE) else self.current_type
             self.context.check_type(node.body.type,typex,node.line)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
         
 
     @visitor.when(CaseNode)
@@ -89,12 +89,12 @@ class TypeChecker:
         for branches in node.list_case:
             tmpscope = scb.create_child()
             if branches.type in typesbr:
-                self.errors.append(SemanticError("Type in more than one branch",branches.expr.line))
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: Type in more than one branch")
             typesbr.add(branches.type)
             try :
                 typex = self.context.get_type(branches.type,branches.expr.line)
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
             tmpscope.define_variable(branches.id,typex,node.line)
             self.visit(branches.expr,tmpscope)
             if common_type is None:
@@ -122,7 +122,7 @@ class TypeChecker:
                 temp = self.context.get_type(node.typex,node.line)
                 self.context.check_type(node.expr.type,temp,node.line)
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
                 return
         else:
             if  isinstance( node.expr.type , ErrorType):
@@ -131,7 +131,7 @@ class TypeChecker:
         try:
             typex = self.context.get_type(node.typex,node.line)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
             return
         try :
             if  isinstance( typex , ErrorType):
@@ -146,9 +146,9 @@ class TypeChecker:
                 try:
                     self.context.check_type(node.params[i].type,method.param_types[i],node.line)
                 except SemanticError as e:
-                    self.errors.append(e)
+                    self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
         except SemanticError as e:
-            self.errors.append(e)  
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
 
     @visitor.when(CallNode)
     def visit(self, node:CallNode, scope:Scope):    
@@ -169,9 +169,9 @@ class TypeChecker:
                 try:
                     self.context.check_type(node.args[i].type,method.param_types[i],node.line)
                 except SemanticError as e:
-                    self.errors.append(e)
+                    self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
 
 
         
@@ -182,7 +182,7 @@ class TypeChecker:
         try:
             self.context.check_type(node.if_c.type,self.context.get_type("Bool"),node.line)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
         
         self.visit(node.then_c,scope.create_child())
         
@@ -191,7 +191,7 @@ class TypeChecker:
         try:    
             node.type = self.context.closest_common_antecesor(node.then_c.type, node.else_c.type)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
             node.type =  ErrorType()
 
 
@@ -216,7 +216,7 @@ class TypeChecker:
             self.context.check_type(node.expr.type, typex, node.line)
             node.type = node.expr.type
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
             node.type = node.expr.type
      
 
@@ -251,7 +251,7 @@ class TypeChecker:
                         typey = self.context.get_type(init.type,node.line) if  init.expr.type != "SELF_TYPE" else self.current_type
                         self.context.check_type(typex,typey,node.line)
                     except SemanticError as e:
-                        self.errors.append(e)
+                        self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
                         
 
             sc = sc.create_child()
@@ -259,14 +259,14 @@ class TypeChecker:
             try:
                 typex = self.context.get_type(init.type,node.line) if  init.type != "SELF_TYPE" else self.current_type
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
                 typex = ErrorType()
             try:    
                 if init.id == "self":
                     raise SemanticError('Trying to assign value to self' ,node.line)    
                 sc.define_variable(init.id,typex,node.line)
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
         
         sc = sc.create_child()
         node.body_scope=sc
@@ -282,7 +282,7 @@ class TypeChecker:
             else:
                 node.type = self.context.get_type(node.lex,node.line)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
             node.type = ErrorType()
 
         
@@ -308,20 +308,20 @@ class TypeChecker:
     def visit(self, node:MinorNode,scope:Scope):
         self.visit(node.left,scope.create_child())
         if node.left.type != self.context.get_type("Int", node.line):
-            self.errors.append("Expr must be Int not " + str(node.left.type))
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: Expr must be Int not " + str(node.left.type))
         self.visit(node.right,scope.create_child())
         if node.right.type != self.context.get_type("Int", node.line):
-            self.errors.append("Expr must be Int not " + str(node.right.type))
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: Expr must be Int not " + str(node.right.type))
         node.type = self.context.get_type("Bool", node.line)
 
     @visitor.when(MinorEqualsNode)
     def visit(self, node:MinorEqualsNode, scope:Scope):
         self.visit(node.left,scope.create_child())
         if node.left.type != self.context.get_type("Int", node.line):
-            self.errors.append("Expr must be Int not " + str(node.left.type))
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: Expr must be Int not " + str(node.left.type))
         self.visit(node.right,scope.create_child())
         if node.right.type != self.context.get_type("Int", node.line):
-            self.errors.append("Expr must be Int not " + str(node.right.type))
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: Expr must be Int not " + str(node.right.type))
         node.type = self.context.get_type("Bool", node.line)
 
     @visitor.when(EqualsNode)
@@ -331,21 +331,21 @@ class TypeChecker:
         if node.left.type != node.right.type:
             basic = ['Int', 'String', 'Bool']
             if node.left.type.name in basic or node.right.type.name in basic:
-                self.errors.append(TypeError("Ilegal comparison with a basic type", node.line))
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: Ilegal comparison with a basic type")
         node.type = self.context.get_type("Bool", node.line)
 
     @visitor.when(NhanharaNode)
     def visit(self, node:NhanharaNode, scope:Scope):
         self.visit(node.expr, scope.create_child())
         if node.expr.type != self.context.get_type("Int", node.line):
-            self.errors.append("Expr must be an int not " + str(node.expr.type))
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: Expr must be an int not " + str(node.expr.type))
         node.type = self.context.get_type("Int", node.line)
 
     @visitor.when(NotNode)
     def visit(self, node:NotNode, scope:Scope):
         self.visit(node.expr, scope.create_child())
         if node.expr.type != self.context.get_type("Bool", node.line):
-            self.errors.append("Expr must be Bool not " + str(node.expr.type))
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: Expr must be Bool not " + str(node.expr.type))
         node.type = self.context.get_type("Bool", node.line)
 
 
@@ -371,7 +371,7 @@ class TypeChecker:
                 x = at[0]
             except:    
                 node.type = ErrorType()
-                self.errors.append(NameError(f"({node.line}, {node.column}) - NameError: Undeclared identifier {node.lex}"))
+                self.errors.append(f"({node.line}, {node.column}) - SemanticError: Undeclared identifier {node.lex}")
                 return
         node.type = x.type if not isinstance(x.type , SELF_TYPE) else self.current_type
        

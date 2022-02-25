@@ -31,11 +31,11 @@ class TypeCollector(object):
                         self.errors.append(f"({dec_node.line_father},{dec_node.column_father}) - SemanticError: Basic type as parent")
                     self.context.get_type(dec_node.id, dec_node.line).set_parent(self.context.get_type(dec_node.parent,dec_node.line),node.line)
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + e)
         
         cycles = self.context.circular_dependency()
         for cycle in cycles:
-            self.errors.append(SemanticError(f"Class {cycle[0][0]},  is involved in an inheritance cycle.",cycle[0][1]))
+            self.errors.append(f"({cycle[0][0].line},{cycle[0][0].column}) - SemanticError: Class {cycle[0][0]}, is involved in an inheritance cycle.")
             return
 
         for decl in classes:
@@ -46,23 +46,21 @@ class TypeCollector(object):
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         try:
-            self.current_type = self.context.create_type(node.id,node.line)
+            self.current_type = self.context.create_type(node.id, node.line)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
             return
-        #for feature in node.features:
-            #self.visit(feature)
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):        
         try:
             attr_type = SELF_TYPE() if node.type == "SELF_TYPE" else self.context.get_type(node.type,-1) #change -1 for line number
             if node.id == "self":
-                    raise SemanticError('Trying to assign value to self' ,-1)  #change -1 for line number
-            
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: Trying to assign value to self")
+                raise SemanticError('', -1)  #change -1 for line number
             self.current_type.define_attribute(node.id, attr_type, -1) #change -1 for line number
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):
@@ -72,14 +70,14 @@ class TypeCollector(object):
             try:
                 arg_types.append(self.context.get_type(param[1],node.line) )
             except SemanticError as e:
-                self.errors.append(e)
+                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
                 arg_types.append(ErrorType())
         try:
             ret_type = SELF_TYPE() if node.type =="SELF_TYPE" else self.context.get_type(node.type,node.line)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
             ret_type = ErrorType()
         try:
             self.current_type.define_method(node.id, arg_names, arg_types, ret_type, node.line)
         except SemanticError as e:
-            self.errors.append(e)
+            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
