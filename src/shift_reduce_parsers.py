@@ -6,7 +6,7 @@ from parser_automatons import (
 from methods import compute_firsts, compute_local_first, compute_follows
 from cmp.automata import State
 from errors import shift_reduce_error, invalid_sentence_error, SyntacticError
-
+from utils import find_column
 
 class ShiftReduceParser:
     SHIFT = "SHIFT"
@@ -24,7 +24,7 @@ class ShiftReduceParser:
     def _build_parsing_table(self):
         raise NotImplementedError()
 
-    def __call__(self, w):
+    def __call__(self, w, values, pos, text):
         stack = [0]
         cursor = 0
         output = []
@@ -43,15 +43,13 @@ class ShiftReduceParser:
             except KeyError:
                 self.errors.append(
                     SyntacticError(
-                        cursor,
-                        0,
-                        "No transition available. Sentence given does not belong to the grammar",
+                        pos[cursor][0],
+                        find_column(text, pos[cursor][1]),
+                        "ERROR at or near "+ str(values[cursor])
                     )
                 )
+
                 return output, operations
-            # Exception(
-            #         "No transition available"
-            #     )  # string does not belong to this grammar
 
             # Shift case
             if action == self.SHIFT:
@@ -74,18 +72,19 @@ class ShiftReduceParser:
             else:
                 self.errors.append(
                     SyntacticError(
-                        cursor,
-                        0,
-                        "Invalid case. Sentence given does not belong to the grammar",
+                        pos[cursor][0],
+                        find_column(text, pos[cursor][1]),
+                        "ERROR at or near"+ str(values[cursor])
                     )
                 )
                 return output, operations
+             # "Invalid case. Sentence given does not belong to the grammar",
 
             if cursor >= len(w):  # or not stack
                 self.errors.append(
                     SyntacticError(
-                        cursor - 1,
-                        0,
+                        pos[cursor][-1],
+                        find_column(text, pos[cursor][-1]),
                         "Exceed word length while looking for a viable derivation. Sentence given does not belong to the grammar",
                     )
                 )

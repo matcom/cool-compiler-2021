@@ -18,7 +18,7 @@ def pprint_tokens(tokens):
     print(" ".join([str(t.token_type) for t in pending]))
 
 
-def tokenize_cool_text(grammar, idx, string, num, data, errors, printing=False):
+def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printing=False):
     # lexer starts with: lexpos = 0, lineno = 1, last_new_line = 0
     # lexpos: Within token rule functions, this points to the first character after the matched text.
     lexer = lex.lex(module = tokens_rules)
@@ -31,20 +31,27 @@ def tokenize_cool_text(grammar, idx, string, num, data, errors, printing=False):
     fixed_tokens = {
         t.Name: Token(t.Name, t)
         for t in grammar.terminals
-        if t not in {idx, string, num}
+        if t not in {idx, type_id, string, num}
     }
 
     tokens = []
+    pos_data = []
     # Tokenize
     while True:
         tok = lexer.token()
-        if not tok:
+        if not tok:#append EOF
+            if len(pos_data) > 0:
+                last_lineno, last_col = pos_data[-1]
+                col = last_col + len(tokens[-1].lex)
+            else:#empty program
+                last_lineno = 0
+                col = -1
+            pos_data.append([last_lineno, col])
             tokens.append(Token("$", grammar.EOF))
             break  # No more input
         else:
             try:
                 tokens.append(fixed_tokens[tok.type])
-                # print(tok.type)
             except:
                 try:  # for <=, ->, <-
                     tokens.append(fixed_tokens[tok.value])
@@ -53,9 +60,12 @@ def tokenize_cool_text(grammar, idx, string, num, data, errors, printing=False):
                         tokens.append(Token(tok.value, string))
                     elif tok.type == "id":
                         tokens.append(Token(tok.value, idx))
+                    elif tok.type == "type_id":
+                        tokens.append(Token(tok.value, type_id))
                     else:
                         tokens.append(Token(tok.value, num))
+            pos_data.append([tok.lineno,tok.lexpos])
 
     if printing:
         pprint_tokens(tokens)
-    return tokens
+    return tokens, pos_data

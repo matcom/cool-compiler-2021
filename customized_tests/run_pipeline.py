@@ -11,11 +11,11 @@ from src.cmp.evaluation import evaluate_reverse_parse
 
 def run_pipeline(text):
     # define grammar
-    grammar, idx, string, num = define_cool_grammar()
+    grammar, idx, typeIdx, string, num = define_cool_grammar()
 
     # tokenize text
     # tokens = tokenize_cool_text(grammar, text, idx, num, True)
-    tokens = tokenize_cool_text(grammar, idx, string, num, text, True)
+    tokens = tokenize_cool_text(grammar, idx, typeIdx, typeIdx, string, num, text, [], True)
 
     # print(tokens)
     # try:
