@@ -4,6 +4,7 @@ import ast_cool_print
 import type_collector
 import type_builder
 import type_checker
+import translate_cool_cil
 from lexer import tokenize
 from parser import parse
 from testers import test_parser
@@ -34,7 +35,7 @@ if execute_mode == "test":
 
 # RUN
 programs_files = [
-    file for file in os.listdir(program_directory) if file.endswith(".cl")
+    file for file in os.listdir(program_directory) if file.endswith("a.cl")
 ]
 for program_file in programs_files:
     input("Press enter to analyze " + program_file)
@@ -68,9 +69,9 @@ for program_file in programs_files:
     # To run semantic
     elif module_to_execute == "semantic":
         with open(program_route, "r", encoding="UTF-8") as f:
-            program_route = program_route[: len(program_route) - 3] + "_error.txt"
-            with open(program_route, "r", encoding="UTF-8") as f1:
-                print(f1.read())
+            # program_route = program_route[: len(program_route) - 3] + "_error.txt"
+            # with open(program_route, "r", encoding="UTF-8") as f1:
+            #     print(f1.read())
             ast, errors = parse(f.read())
             if len(errors):
                 print(errors)
@@ -85,11 +86,10 @@ for program_file in programs_files:
 
             checker = type_checker.TypeChecker(context, errors)
             scope = checker.visit(ast)
-            # print(str(scope))
 
-            if len(errors):
-                print(errors)
-                continue
+            translate = translate_cool_cil.TranslateCool2Cil(context)
+            tree = translate.visit(ast)
+            print('jasdwqe')
 
     else:
         print("Invalid section to execute: " + module_to_execute)

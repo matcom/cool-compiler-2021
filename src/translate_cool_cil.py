@@ -8,12 +8,31 @@ FUNCTION_NAME = 'f_%s_%s'
 LOCAL_NAME = 'local_%s_%s'
 
 
+class Locals:
+    def __init__(self):
+        self.list = []
+        self.dict = {}
+        self.id = 0
+
+    def add(self, var_name, local_name):
+        self.list.append((var_name, self.id))
+        self.dict[(var_name, self.id)] = local_name
+        self.id += 1
+
+    def get(self, var_name):
+        for i in range(len(self.list)-1, -1, -1):
+            v_name, identifier = self.list[i]
+            if v_name == var_name:
+                return self.dict[v_name, identifier]
+
+
 class TranslateCool2Cil:
-    def __init__(self, cool_tree, context):
+    def __init__(self, context):
         self.context: Context = context
         self.cil_program = ast_cil.Program()
         self.current_function: ast_cil.Function = None
-        self.current_class: ast_cool.ClassDeclarationNode = None
+        self.current_type: ast_cil.Type = None
+        self.local_vars = Locals()
 
     def create_cil_type(self, type_name):
         _type = ast_cil.Type(type_name)
@@ -26,10 +45,18 @@ class TranslateCool2Cil:
         return function
 
     @staticmethod
-    def create_local(function: ast_cil.Function):
-        local = LOCAL_NAME % (function.fun_name, len(function.local_vars))
+    def create_local(function: ast_cil.Function, var_name='anonymous'):
+        local = LOCAL_NAME % (var_name, len(function.local_vars))
         function.local_vars.append(local)
         return local
+
+    def get_attribute_index(self, type_name, attr_name):
+        for _type in self.cil_program.type_section:
+            if _type.name == type_name:
+                for i, name in enumerate(_type.attributes):
+                    if name == attr_name:
+                        return i
+        Exception()
 
     @visitor.on('cool_node')
     def visit(self, cool_node):
@@ -51,9 +78,12 @@ class TranslateCool2Cil:
         for declaration in cool_node.declarations:
             self.visit(declaration)
 
+        return self.cil_program
+
     @visitor.when(ast_cool.ClassDeclarationNode)
     def visit(self, cool_node: ast_cool.ClassDeclarationNode):
         cil_type = self.create_cil_type(cool_node.id)
+        self.current_type = cil_type
 
         # Create Type Section
         class_type: Type = self.context.get_type(cool_node.id)
@@ -74,12 +104,8 @@ class TranslateCool2Cil:
         self_instance = self.create_local(init_funct)
         init_funct.instructions.append(
             ast_cil.Allocate(self_instance, cool_node.id))
-        index = 0
         for attribute in [f for f in cool_node.features if isinstance(f, ast_cool.AttrDeclarationNode)]:
-            attribute_instance = self.visit(attribute)
-            init_funct.instructions.append(
-                ast_cil.SetAttr(attribute_instance, self_instance, index))
-            index += 1
+            self.visit(attribute)
         init_funct.instructions.append(
             ast_cil.Return(self_instance))
         self.current_function = None
@@ -91,23 +117,33 @@ class TranslateCool2Cil:
     @visitor.when(ast_cool.AttrDeclarationNode)
     def visit(self, cool_node: ast_cool.AttrDeclarationNode):
         if cool_node.val is None:
-            if cool_node.type == 'Int':
-                local1 = self.create_local(self.current_function)
-                self.current_function.instructions.extend([
-                    ast_cil.Assign(local1, 0)
-                ])
-            # TODO add rest of default values
+            if cool_node.type == 'Int' or cool_node.type == 'Bool':
+                value = 0
+            elif cool_node.type == 'String':
+                value = self.create_local(self.current_function)
+                self.current_function.instructions.append(
+                    ast_cil.Load(value, '_empty'))
+            else:
+                value = self.create_local(self.current_function)
+                self.current_function.instructions.append(
+                    ast_cil.Load(value, '_void'))
         else:
-            return self.visit(cool_node.val)
+            value = self.visit(cool_node.val)
+
+        attrib_index = self.get_attribute_index(self.current_type.name, cool_node.id)
+        self.current_function.instructions.append(
+            ast_cil.SetAttr('self', attrib_index, value))
 
     @visitor.when(ast_cool.FuncDeclarationNode)
     def visit(self, cool_node: ast_cool.FuncDeclarationNode):
-        function = self.create_cil_function(FUNCTION_NAME % (self.current_class.id, cool_node.id))
+        function = self.create_cil_function(FUNCTION_NAME % (self.current_type.name, cool_node.id))
         function.params.append('self')
         for param in cool_node.params:
             function.params.append(param)
-
         result = self.visit(cool_node.body)
-
         function.instructions.append(
             ast_cil.Return(result))
+
+    @visitor.when(ast_cool.ConstantNumNode)
+    def visit(self, cool_node: ast_cool.ConstantNumNode):
+        return int(cool_node.lex)

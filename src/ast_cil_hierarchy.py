@@ -72,7 +72,7 @@ class GetAttr(Instruction):
 
 
 class SetAttr(Instruction):
-    def __init__(self, value, type_instance_address, attribute_position):
+    def __init__(self, type_instance_address, attribute_position, value):
         self.value = value
         self.type_instance_address = type_instance_address
         self.attribute_position = attribute_position
