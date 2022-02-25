@@ -13,7 +13,6 @@ class SemanticAnalyzer:
         self.errors = []
         self.context = None
         self.scope = None
-        self.tree = None
 
     def analyze(self):
         

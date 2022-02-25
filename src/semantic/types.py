@@ -7,7 +7,7 @@ class Attribute:
     representar los atributos del lenguaje.
     '''
 
-    def __init__(self, name, typex, index, tok=None):
+    def __init__(self, name, typex, index):
         self.name = name
         self.type = typex
         self.index = index
