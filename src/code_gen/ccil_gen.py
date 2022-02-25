@@ -322,14 +322,20 @@ class CCILGenerator:
 
         # Merging all expression operations in correct order
         # and saving all to final value
+
+        err_msg = self.add_data(
+            f"case_error_msg_{times}",
+            f"Pattern match failure in {node.line}, {node.col}",
+        )
+
         fval_id = f"case_{times}_fv"
         fval = self.create_assignation(fval_id, node.type.name, pre_fvalue_id)
         operations = [
             *case_expr_ops,
             type_of,
             *pattern_match_ops,
-            *self.notifiy_and_abort(f"Pattern match failure in {node.row}, {node.col}")
-            * branch_ops,
+            *self.notifiy_and_abort(err_msg.id),
+            *branch_ops,
             final_label,
             fval,
         ]
