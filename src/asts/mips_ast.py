@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from asts.parser_ast import BinaryNode
 
@@ -57,7 +57,7 @@ class Constant(Node):
     This class represents a literal integer in MIPS
     """
 
-    def __init__(self, node, value: str) -> None:
+    def __init__(self, node, value: Union[str, int]) -> None:
         super().__init__(node)
         self.value = value
 
@@ -121,6 +121,15 @@ class TernaryOpNode(InstructionNode):
         self.left = left
         self.middle = middle
         self.right = right
+
+
+class MoveFromLo(InstructionNode):
+    """
+    This node represents `mflo` instruction in MIPS
+    """
+    def __init__(self, node, register) -> None:
+        super().__init__(node)
+        self.register = register
 
 
 class Div(BinaryOpNode):

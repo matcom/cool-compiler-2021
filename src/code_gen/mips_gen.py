@@ -20,6 +20,7 @@ from asts.mips_ast import (
     MIPSProgram,
     MemoryIndexNode,
     Move,
+    MoveFromLo,
     Multiply,
     Not,
     RegisterNode,
@@ -180,3 +181,7 @@ class MIPSGenerator:
     @visitor.when(Not)
     def visit(self, node: Not) -> str:
         return f"\tnot {self.visit(node.left)}, {self.visit(node.right)}"
+
+    @visitor.when(MoveFromLo)
+    def visit(self, node: MoveFromLo) -> str:
+        return f"\tmflo {self.visit(node.register)}"
