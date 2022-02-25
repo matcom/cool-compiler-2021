@@ -42,7 +42,7 @@ class CCILGenerator:
     """
 
     def __init__(self) -> None:
-        self.program_types: List[Class]
+        self.program_types: Dict[str, Class]
         self.program_codes: List[FunctionNode]
         # To keep track of how many times a certain expression has been evaluated
         self.time_record: Dict[str, int] = dict()
@@ -566,7 +566,9 @@ class CCILGenerator:
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
-        call = self.create_vcall(fval_id, node.type.name, node.id, node.caller_type, args)
+        call = self.create_vcall(
+            fval_id, node.type.name, node.id, node.caller_type, args
+        )
 
         return [*expr_ops, *error_ops, *args_ops, call], call
 
@@ -922,7 +924,11 @@ class CCILGenerator:
         self.reset_locals()
         program = self.create_new_type("program", "Main")
         execute = self.create_call(
-            "execute_program", INT, "main", INT, [IdNode(program.id)]
+            "execute_program",
+            INT,
+            "main",
+            INT,
+            [IdNode(self.find_function_id("Main", "main"))],
         )
         return FunctionNode(
             "main", [], self.dump_locals(), [program, execute], execute.id
@@ -989,6 +995,12 @@ class CCILGenerator:
             inherited_methods = [m for m in parent_class.methods]
 
         return inherited_attr, inherited_methods
+
+    def find_function_id(self, class_name: str, method_name: str):
+        for method in self.program_types[class_name].methods:
+            if method.id == method_name:
+                return method.function.id
+        raise Exception(f"Method: {method_name} was not found in {class_name}")
 
 
 def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
