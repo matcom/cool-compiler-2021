@@ -1,16 +1,25 @@
 {
     "cSpell.words": [
         "addi",
+        "addiu",
+        "addu",
         "alloc",
+        "argumentos",
         "asciiz",
+        "beqz",
         "bnez",
+        "cattrs",
+        "dfunc",
         "direccion",
         "dividir",
+        "dparents",
         "funciones",
         "límite",
         "mult",
+        "pusieron",
         "reservada",
         "reservar",
+        "subu",
         "tipe"
     ]
 }
