@@ -322,6 +322,7 @@ class CCILGenerator:
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
 
+        
         # Merging all expression operations in correct order
         # and saving all to final value
         fval_id = f"case_{times}_fv"
@@ -330,6 +331,7 @@ class CCILGenerator:
             *case_expr_ops,
             type_of,
             *pattern_match_ops,
+            *self.notifiy_and_abort(f"Pattern match failure in {node.row}, {node.col}")
             *branch_ops,
             final_label,
             fval,
