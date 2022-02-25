@@ -1,36 +1,25 @@
-(*
-e0 .f(e1, . . . , en )
-Assume e0 has static type A.
-Class A must have a method f
-the static type of the ith actual parameter must conform to the declared type of the ith formal parameter.
-*)
-
-class A inherits IO {
-	f(x: Int, y: Int): Int { x + y };
-	g(x: Int): Int { x + x };
-};
-class B inherits A {
-	f(a: Int, b: Int): Int { a - b };
-};
-class C inherits B {
-	ident(m: Int): Int { m };
-	f(m: Int, n: Int): Int { m * n };
-};
-class D inherits B { 
-	ident(v: String): IO { new IO.out_string(v) };
-	f(v: Int, w: Int): Int { v / w };
-	g(v: Int): Int { v + v + v };
-
-	back(s: String): B { {
-		out_string(s);
-		self; 
-	} };
-
-	alphabet(a: A, b: B, c: C): D { self };
-};
-
 class Main inherits IO {
-	main(): IO { out_string("Hello World!")};
+    pal(s : String) : Bool {
+	if s.length() = 0
+	then true
+	else if s.length() = 1
+	then true
+	else if s.substr(0, 1) = s.substr(s.length() - 1, 1)
+	then pal(s.substr(1, s.length() -2))
+	else false
+	fi fi fi
+    };
 
-	test: B <- new D.alphabet(new D, new D, new D.back("Hello ")).back("World!");
+    i : Int;
+
+    main() : IO {
+	{
+            i <- ~1;
+	    out_string("enter a string\n");
+	    if pal(in_string())
+	    then out_string("that was a palindrome\n")
+	    else out_string("that was not a palindrome\n")
+	    fi;
+	}
+    };
 };

@@ -36,8 +36,46 @@ __virtual_table__IO:
 			 .word function_out_int_at_IO
 			 .word function_in_int_at_IO
 			 .word function_in_string_at_IO
+			A_name:     .asciiz      "A"
+			A_size:     .word     16
+__virtual_table__A:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_a_at_A
+			B_name:     .asciiz      "B"
+			B_size:     .word     16
+__virtual_table__B:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_a_at_A
+			 .word function_out_b_at_B
+			C_name:     .asciiz      "C"
+			C_size:     .word     12
+__virtual_table__C:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			 .word function_out_c_at_C
+			D_name:     .asciiz      "D"
+			D_size:     .word     12
+__virtual_table__D:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			 .word function_out_c_at_C
+			 .word function_out_d_at_D
 			Main_name:     .asciiz      "Main"
-			Main_size:     .word     16
+			Main_size:     .word     12
 __virtual_table__Main:
 			 .word function_abort_at_Object
 			 .word function_type_name_at_Object
@@ -46,7 +84,6 @@ __virtual_table__Main:
 			 .word function_out_int_at_IO
 			 .word function_in_int_at_IO
 			 .word function_in_string_at_IO
-			 .word function_pal_at_Main
 			 .word function_main_at_Main
 			_empty:     .asciiz      ""
 			data_1:     .asciiz      "n"
@@ -113,7 +150,7 @@ main:
  #comienzo llamada dinamica
 
 			la $a0, __virtual_table__Main
-			lw $a0, 32($a0)
+			lw $a0, 28($a0)
 			jalr $a0
 			sw $a0, -12($fp)
 
@@ -130,7 +167,7 @@ main:
 			addiu $sp, $sp, 20
 			lw $fp, 0($sp)
 			jr $ra
-function_pal_at_Main:
+function_out_a_at_A:
 
  #muevo el fp al sp, pongo en sp ra y avanzo la pila
 
@@ -140,47 +177,86 @@ function_pal_at_Main:
 
  #muevo la pila x las variables locales
 
-			addiu $sp, $sp, -72
+			addiu $sp, $sp, -12
 
- #guardando los parametros
+ #init get attribute
 
-			sw $fp, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, 8($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-
- # fin guardando los parametros
-
-
- #comienzo llamada al constructor
-
-			jal function_length_at_String
+			lw $a0, 4($fp)
+			lw $a0, 12($a0)
 			sw $a0, -8($fp)
+			la $t1, data_1
+			sw $t1, -12($fp)
 
- #fin llamada dinamica
+ #guardando los parametros
 
-			lw $t1, -8($fp)
-			li $a0, 0
-			sub $a0, $t1, $a0
-			sw $a0, -12($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
 			lw $a0, -12($fp)
-			bne $a0, $zero, label_pal_at_Main_0
-			li $t1, 1
-			sw $t1, -4($fp)
-			j label_pal_at_Main_1
-label_pal_at_Main_0:
-			li $t1, 0
-			sw $t1, -4($fp)
-label_pal_at_Main_1:
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -8($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
 			lw $a0, -4($fp)
-			bne $a0, $zero, label_pal_at_Main_2
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 24
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_A:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, A_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, A_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__A
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
 
  #guardando los parametros
 
 			sw $fp, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, 8($fp)
+			lw $a0, 4($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 
@@ -189,38 +265,39 @@ label_pal_at_Main_1:
 
  #comienzo llamada al constructor
 
-			jal function_length_at_String
-			sw $a0, -24($fp)
+			jal function_Init_at_A
+			sw $a0, -4($fp)
 
  #fin llamada dinamica
 
-			lw $t1, -24($fp)
-			li $a0, 1
-			sub $a0, $t1, $a0
-			sw $a0, -28($fp)
-			lw $a0, -28($fp)
-			bne $a0, $zero, label_pal_at_Main_4
-			li $t1, 1
-			sw $t1, -20($fp)
-			j label_pal_at_Main_5
-label_pal_at_Main_4:
-			li $t1, 0
-			sw $t1, -20($fp)
-label_pal_at_Main_5:
-			lw $a0, -20($fp)
-			bne $a0, $zero, label_pal_at_Main_6
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_A:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -8
 
  #guardando los parametros
 
 			sw $fp, 0($sp)
 			addiu $sp, $sp, -4
-			li $a0, 1
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			li $a0, 0
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, 8($fp)
+			lw $a0, 4($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 
@@ -229,17 +306,123 @@ label_pal_at_Main_5:
 
  #comienzo llamada al constructor
 
-			jal function_substr_at_String
-			sw $a0, -40($fp)
+			jal function_Init_at_Object
+			sw $a0, -4($fp)
 
  #fin llamada dinamica
 
+			la $t1, _void
+			sw $t1, -8($fp)
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			lw $t1, -8($fp)
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_out_b_at_B:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -12
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 12($a0)
+			sw $a0, -8($fp)
+			la $t1, data_1
+			sw $t1, -12($fp)
 
  #guardando los parametros
 
 			sw $fp, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, 8($fp)
+			lw $a0, -12($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -8($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 24
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_B:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, B_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, B_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__B
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 
@@ -248,32 +431,39 @@ label_pal_at_Main_5:
 
  #comienzo llamada al constructor
 
-			jal function_length_at_String
-			sw $a0, -52($fp)
+			jal function_Init_at_B
+			sw $a0, -4($fp)
 
  #fin llamada dinamica
 
-			lw $t1, -52($fp)
-			li $a0, 1
-			blt $t1, $a0, label_pal_at_Main_8
-			li $a0, 0
-			j label_pal_at_Main_9
-label_pal_at_Main_8:
-			li $a0, 1
-label_pal_at_Main_9:
-			sw $a0, -48($fp)
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_B:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
 
  #guardando los parametros
 
 			sw $fp, 0($sp)
 			addiu $sp, $sp, -4
-			li $a0, 1
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, -48($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, 8($fp)
+			lw $a0, 4($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 
@@ -282,86 +472,41 @@ label_pal_at_Main_9:
 
  #comienzo llamada al constructor
 
-			jal function_substr_at_String
-			sw $a0, -44($fp)
+			jal function_Init_at_A
+			sw $a0, -4($fp)
 
  #fin llamada dinamica
 
-			sw $fp, 0($sp)
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_out_c_at_C:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, -40($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, -44($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			jal function_comparer_string
-			sw $a0, -36($fp)
-			lw $a0, -36($fp)
-			bne $a0, $zero, label_pal_at_Main_10
-			li $t1, 0
-			sw $t1, -56($fp)
-			j label_pal_at_Main_11
-label_pal_at_Main_10:
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -8
+			la $t1, data_1
+			sw $t1, -8($fp)
 
  #guardando los parametros
 
 			sw $fp, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, 8($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-
- # fin guardando los parametros
-
-
- #comienzo llamada al constructor
-
-			jal function_length_at_String
-			sw $a0, -72($fp)
-
- #fin llamada dinamica
-
-			lw $t1, -72($fp)
-			li $a0, 2
-			blt $t1, $a0, label_pal_at_Main_12
-			li $a0, 0
-			j label_pal_at_Main_13
-label_pal_at_Main_12:
-			li $a0, 1
-label_pal_at_Main_13:
-			sw $a0, -68($fp)
-
- #guardando los parametros
-
-			sw $fp, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, -68($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			li $a0, 1
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, 8($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-
- # fin guardando los parametros
-
-
- #comienzo llamada al constructor
-
-			jal function_substr_at_String
-			sw $a0, -64($fp)
-
- #fin llamada dinamica
-
-
- #guardando los parametros
-
-			sw $fp, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, -64($fp)
+			lw $a0, -8($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 			lw $a0, 4($fp)
@@ -372,35 +517,261 @@ label_pal_at_Main_13:
 
 			lw $a0, 4($fp)
 			lw $a0, 8($a0)
-			lw $a0, 28($a0)
+			lw $a0, 12($a0)
 			jalr $a0
-			sw $a0, -60($fp)
-			lw $t1, -60($fp)
-			sw $t1, -56($fp)
-label_pal_at_Main_11:
-			lw $t1, -56($fp)
-			sw $t1, -32($fp)
-			j label_pal_at_Main_7
-label_pal_at_Main_6:
-			li $t1, 1
-			sw $t1, -32($fp)
-label_pal_at_Main_7:
-			lw $t1, -32($fp)
-			sw $t1, -16($fp)
-			j label_pal_at_Main_3
-label_pal_at_Main_2:
-			li $t1, 1
-			sw $t1, -16($fp)
-label_pal_at_Main_3:
+			sw $a0, -4($fp)
 
  #retornando el valor
 
-			lw $a0, -16($fp)
+			lw $a0, -4($fp)
 
  #return sp, fp, ra
 
 			lw $ra, 0($fp)
-			addiu $sp, $sp, 88
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_C:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, C_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, C_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__C
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_C
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_C:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_IO
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_out_d_at_D:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -8
+			la $t1, data_1
+			sw $t1, -8($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -4($fp)
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_D:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, D_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, D_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__D
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_D
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_D:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_C
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
 			lw $fp, 0($sp)
 			jr $ra
 function_main_at_Main:
@@ -413,57 +784,68 @@ function_main_at_Main:
 
  #muevo la pila x las variables locales
 
-			addiu $sp, $sp, -40
-			li $t1, 1
-			li $t2, -1
-			mul $t1 $t1 $t2
-			sw $t1, -4($fp)
+			addiu $sp, $sp, -56
 
- #init set attribute
+ #init allocate
 
-			lw $a0, 4($fp)
-			lw $t1, -4($fp)
-			sw $t1, 12($a0)
+			li $v0, 9
+			lw $a0, A_size
+			syscall
+			sw $v0, -8($fp)
 
- #end set attribute
+ #end allocate
 
-			la $t1, data_1
-			sw $t1, -12($fp)
 
  #guardando los parametros
 
 			sw $fp, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, -12($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, 4($fp)
+			lw $a0, -8($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 
  # fin guardando los parametros
 
-			lw $a0, 4($fp)
+
+ #comienzo llamada al constructor
+
+			jal function_Ctr_at_A
+			sw $a0, -12($fp)
+
+ #fin llamada dinamica
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -8($fp)
 			lw $a0, 8($a0)
 			lw $a0, 12($a0)
 			jalr $a0
-			sw $a0, -8($fp)
+			sw $a0, -4($fp)
 
- #guardando los parametros
+ #fin llamada dinamica
 
-			sw $fp, 0($sp)
-			addiu $sp, $sp, -4
-			lw $a0, 4($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
 
- # fin guardando los parametros
+ #init allocate
 
-			lw $a0, 4($fp)
-			lw $a0, 8($a0)
-			lw $a0, 24($a0)
-			jalr $a0
-			sw $a0, -20($fp)
+			li $v0, 9
+			lw $a0, B_size
+			syscall
+			sw $v0, -20($fp)
+
+ #end allocate
+
 
  #guardando los parametros
 
@@ -472,21 +854,49 @@ function_main_at_Main:
 			lw $a0, -20($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, 4($fp)
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Ctr_at_B
+			sw $a0, -24($fp)
+
+ #fin llamada dinamica
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -20($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 
  # fin guardando los parametros
 
-			lw $a0, 4($fp)
+
+ #comienzo llamada dinamica
+
+			lw $a0, -20($fp)
 			lw $a0, 8($a0)
-			lw $a0, 28($a0)
+			lw $a0, 16($a0)
 			jalr $a0
 			sw $a0, -16($fp)
-			lw $a0, -16($fp)
-			bne $a0, $zero, label_main_at_Main_0
-			la $t1, data_1
-			sw $t1, -32($fp)
+
+ #fin llamada dinamica
+
+
+ #init allocate
+
+			li $v0, 9
+			lw $a0, C_size
+			syscall
+			sw $v0, -32($fp)
+
+ #end allocate
+
 
  #guardando los parametros
 
@@ -495,29 +905,98 @@ function_main_at_Main:
 			lw $a0, -32($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, 4($fp)
-			sw $a0, 0($sp)
-			addiu $sp, $sp, -4
 
  # fin guardando los parametros
 
-			lw $a0, 4($fp)
-			lw $a0, 8($a0)
-			lw $a0, 12($a0)
-			jalr $a0
-			sw $a0, -28($fp)
-			lw $t1, -28($fp)
-			sw $t1, -24($fp)
-			j label_main_at_Main_1
-label_main_at_Main_0:
-			la $t1, data_1
-			sw $t1, -40($fp)
+
+ #comienzo llamada al constructor
+
+			jal function_Ctr_at_C
+			sw $a0, -36($fp)
+
+ #fin llamada dinamica
+
 
  #guardando los parametros
 
 			sw $fp, 0($sp)
 			addiu $sp, $sp, -4
-			lw $a0, -40($fp)
+			lw $a0, -32($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -32($fp)
+			lw $a0, 8($a0)
+			lw $a0, 28($a0)
+			jalr $a0
+			sw $a0, -28($fp)
+
+ #fin llamada dinamica
+
+
+ #init allocate
+
+			li $v0, 9
+			lw $a0, D_size
+			syscall
+			sw $v0, -44($fp)
+
+ #end allocate
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Ctr_at_D
+			sw $a0, -48($fp)
+
+ #fin llamada dinamica
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -44($fp)
+			lw $a0, 8($a0)
+			lw $a0, 32($a0)
+			jalr $a0
+			sw $a0, -40($fp)
+
+ #fin llamada dinamica
+
+			la $t1, data_1
+			sw $t1, -56($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -56($fp)
 			sw $a0, 0($sp)
 			addiu $sp, $sp, -4
 			lw $a0, 4($fp)
@@ -530,19 +1009,16 @@ label_main_at_Main_0:
 			lw $a0, 8($a0)
 			lw $a0, 12($a0)
 			jalr $a0
-			sw $a0, -36($fp)
-			lw $t1, -36($fp)
-			sw $t1, -24($fp)
-label_main_at_Main_1:
+			sw $a0, -52($fp)
 
  #retornando el valor
 
-			lw $a0, -24($fp)
+			lw $a0, -52($fp)
 
  #return sp, fp, ra
 
 			lw $ra, 0($fp)
-			addiu $sp, $sp, 52
+			addiu $sp, $sp, 68
 			lw $fp, 0($sp)
 			jr $ra
 function_Ctr_at_Main:

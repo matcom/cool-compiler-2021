@@ -1,0 +1,156 @@
+# Informe de Complementos de Compilación
+## Datos Generales
+### Autores
+- Luis Alejandro Lara Rojas
+- Carlos Alejandro Arrieta Montes de Oca
+
+
+## Ejecución
+Para ejecutar el proyecto se necesita tener instalado `Python` y el conjunto de dependencias listado en [requirements.txt](https://github.com/Los-Mangotes-SA/cool-compiler-2021/blob/master/requirements.txt).
+
+Para instalar las dependencias desde la dirección `<project-dir>/src`, puede utilizar:
+```bash
+make install
+```
+Una vez estén instaladas las dependencias, puede compilar y ejecutar cualquier archivo de código cool utilizando el comando:
+```bash
+make main <code-file>.cl
+```
+
+### Sobre el proyecto
+Para el diseño e implementación de este proyecto se toma como base los contenidos adquiridos durante tercer año de análisis lexicográfico, sintáctico y semántico de programas en lenguaje COOL.
+
+Este proyecto está basado en gran parte en las implementaciones hechas durante tercer año del Lexer, Parser y Semantic Checker.
+
+
+## Estructura del proyecto
+Como se puede ver en [main.py](https://github.com/Los-Mangotes-SA/cool-compiler-2021/blob/master/src/main.py) el proyecto está estructurado en 4 componentes principales:
+
+1. Lexer
+2. Parser
+3. Semantic Checker
+4. Code Generator
+
+Cada una de estas componentes será explicada con mayor detenimiento a continuación.
+
+## Lexer
+
+Para esta componente se utilizó el paquete de Python PLY lex.
+
+# FILL #
+Pon aquí majomeno como funciona el Lexer
+#
+
+## Parser
+Para el parser se ha utilizado el paquete de Python PLY yacc.
+
+# FILL #
+Pon aqui majomeno como funciona el parser.
+#
+
+
+## Semantic Checker
+Esta componente se ha dividido a su vez en 3 componentes principales:
+- Type Collector: encargado de recolectar los tipos.
+- Type Checker: encargado de hacer chequeo de tipos.
+- Type Builder: encargado de construir los tipos.
+
+Cada una de estas sub-componentes serán explicadas a continuación.
+### Type Collector
+Durante la recolección de tipos se visitan todas las declaraciones de clases, se crean los tipos asociados a ellas y se valida la correctitud de las mismas.
+
+**Errores detectados**:
+- Herencia cíclica
+- Redefinición de clases
+- Nombres de clase no válidos
+  
+
+### Type checker
+En esta fase se evalúa la correctitud de todas las expresiones del lenguaje y se decide el tipo estático de cada una de ellas.
+
+**Errores detectados**:
+- Incompatibilidad de tipos
+- Uso de tipos no definidos
+- Uso de variables, tipos y métodos no definidos
+- mal usos de `self` y `SELF_TYPE`
+- mal usos del `case` 
+
+
+### Type builder
+A los tipos creados en la fase anterior se le añaden todos sus atributos y métodos. Además se verifica que se cumplan los requerimientos de un programa válido de Cool q son tener una clase `Main` con su método `main`.
+
+**Errores detectados**:
+- Mal uso de herencia
+- Uso de tipos no definidos 
+- Problemas de nombrado de atributos y métodos
+- Redefinición de atributos
+- Redefinición incorrecta de métodos
+- No definición de la clase `Main` o su método `main`
+- Incorrecta definición del método `main`
+
+## Code Generator
+Esta componente a su vez está constituida por 2 sub-componentes:
+- COOL-CIL Converter: encargado de convertir el código COOL a código CIL.
+- CIL-MIPS Converter: encargado de convertir el código CIL a código MIPS.
+
+### COOL-CIL Converter
+El lenguaje CIL utilizado es bastante parecido al estudiado en clases.
+En esta etapa del proceso de compilación, requirió especial atención la generación de las expresiones *case*. Para ello se requiere ordenar las instrucciones de tal modo que se asegure el emparejamiento del tipo de la expresión principal con el tipo más específico declarado en las ramas del *case*.   
+
+**Errores detectados**:
+- Dispatch estático o dinámico desde un objeto void
+- Ejecución de un *case* sin que ocurra algún emparejamiento con alguna rama.
+- División por cero
+- Substring fuera de rango
+
+> Aunque estos errores realmente se detectan en ejecución, es en esta fase que se genera el código que permite detectarlos.
+
+### CIL-MIPS Converter
+Para esta fase se ejecuta un recorrido por los nodos de CIL, creando las instrucciones equivalentes en MIPS. Como apoyo a la hora de generar las instrucciones en MIPS, se utilizó
+
+
+# FILL #
+Aqui habría que sutituir esta explicación por la del proyecto de nosotros.
+Ya lo que hay de aquí en adelante es la explicación de otro proyecto.
+#
+### Estructura de los objetos en memoria.
+Determinar el modelo que seguirían los objetos en la memoria fue un paso fundamental para la toma de múltiples decisiones tanto en la generación de código `CIL` como `MIPS`. Los objetos en memoria siguen el siguiente modelo:
+
+```| Tipo | Tamaño  | Tabla de dispatch | -- Atributos -- | Marca de objeto |```
+ - Tipo: Esta sección tiene tamaño 1 `palabra`, el valor aquí encontrado se interpreta como un entero e indica el tipo del objeto.
+ - Tamaño: Esta sección tiene tamaño 1 `palabra`, el valor aquí encontrado se interpreta como un entero e indica el tamaño en `palabras` del objeto.
+ - Tabla de dispatch: Esta sección tiene tamaño 1 `palabra`, el valor aquí encontrado se interpreta como una dirección de memoria e indica el inicio de la tabla de dispatch del objeto. La tabla de dispatch del objeto es un segmento de la memoria donde interpretamos cada `palabra` como la dirección a uno de los métodos del objeto.
+ - Atributos: Esta sección tiene tamaño **N** `palabras` donde **N** es la cantidad de atributos que conforman el objeto, cada una de las `palabras` que conforman esta sección representa el valor de un atributo del objeto.
+ - Marca de objeto: Esta sección tiene tamaño 1 `palabra`, es un valor usado para marcar que esta zona de la memoria corresponde a un objeto, se añadió con el objetivo de hacer menos propenso a fallos la tarea de identificar objetos en memoria en el `Garbage Collector`.
+
+### Definición de tipos en memoria.
+Un tipo está representado por tres estructuras en la memoria:
+ - Una dirección a una cadena alfanumérica que representa el nombre del tipo.
+ - Un prototipo que es una especie de plantilla que se utiliza en la creación de los objetos. Cuando se crea un objeto este prototipo es copiado al segmento de memoria asignado al objeto. Un prototipo es un objeto válido por lo que tiene exactamente la misma estructura explicada anteriormente. El prototipo es también la solución escogida para el problema de los valores por defecto de los objetos.
+ - Una tabla de dispatch que como se explicó anteriormente contiene las direcciones de los métodos del objeto.
+Existe una tabla de prototipos (nombres) donde se puede encontrar el prototipo (nombre) de un tipo específico, utilizando como índice el valor que representa al tipo.
+
+### Elección de registros.
+La elección de registros fue un proceso que se decidió optimizar para disminuir la utilización de las operaciones `lw` y `sw` en `MIPS` que como se sabe, añaden una demora considerable a nuestros programas por el tiempo que tarda en realizarse un operación de escritura o lectura en la memoria.
+El proceso de elección de registros se realiza para cada función y consta de los siguientes pasos:
+ - Separación del código en bloques básicos:
+
+   Para obtener los bloques básicos primero se hace un recorrido por las instrucciones de la función marcando los líderes. Son considerados líderes las instrucciones de tipo `Label` y las instrucciones que tengan como predecesor un instrucción de tipo `Goto` o `Goto if`. Luego de tener marcados los líderes, se obtienen los bloques que serán los conjuntos de instrucciones consecutivas que comienzan con un líder y terminan con la primera instrucción que sea predecesor de un líder (notar que un bloque puede estar formado por una sola instrucción).
+
+ - Creación del grafo de flujo:
+
+   Este es un grafo dirigido que indica los caminos posibles entre los bloques básicos su elaboración es bastante sencilla: si la última instrucción de un bloque es un `Goto`, entonces se añadirá una arista desde este bloque hacia el bloque iniciado por la instrucción `Label` a la que hace referencia el `Goto`; si la última instrucción es de tipo `Goto if`, entonces se añadirán dos aristas una hacia el bloque que comienza con la instrucción `Label` a la que se hace referencia, y otra hacia el bloque que comienza con la instrucción siguiente en la función; en el caso de que la última instrucción sea de cualquier otro tipo, se colocará una sola arista desde el bloque actual hacia el bloque que comienza con la instrucción siguiente en la función.
+   
+ - Análisis de vida de las variables:
+
+   En este procedimiento se computan cinco conjuntos para cada instrucción **I**: `succ`, `gen`, `kill`, `in` y `out`. `succ` contiene las instrucciones que se pueden ejecutar inmediatamente después de la instrucción **I**; `gen` contiene las variables de las que se necesita el valor en la instrucción **I**; `kill` contiene las variables a las que se les asigna un valor en la instrucción **I**; `in` contiene las variables que pueden estar vivas al llegar a la instrucción **I**, y `out` contiene las variables que pueden estar vivas luego de ejecutada la instrucción **I**.
+ 
+ - Creación del grafo de interferencia:
+   
+   Los vértices de este grafo serán las variables que se utilizan en la función y existirá una arista entre los vértices **x** y **y**, si las variables que representan esos nodos interfieren. Dos variables interfieren si existe alguna instrucción **I** tal que **x** pertenezca al `kill` de **I** y **y** pertenezca al `out` de **I**.
+
+ - Asignación de registros:
+
+   Contando con el grafo de interferencia, se asignan registros a las variables de forma tal que dos variables que interfieran no se les asigne el mismo registro, esto puede verse como el problema de colorear un grafo con **N** colores siendo **N** la cantidad de registros que se tienen. Es conocido que este problema es *NP* por lo que para asignar los registros se usa una heurística muy sencilla que consiste en lo siguiente:
+
+         Primero se va eliminando del grafo y colocando en una pila cada nodo que tenga menos de N vecinos, se nota que todos estos elementos pueden ser coloreados sin problemas. Si en algún momento no existe algún nodo con menos de N vecinos, se tomará un nodo al azar; este proceso terminará cuando no queden nodos en el grafo. Luego se va sacando cada nodo de la pila y se le asigna un registro que no esté usado por alguno de los nodos que eran vecinos de este en el momento en que se eliminó del grafo, en el caso de que existan más de un nodo posible, se le asigna el menor, en caso de que no exista nodo posible la variable no tendrá registro y su valor permanecerá en la memoria.
