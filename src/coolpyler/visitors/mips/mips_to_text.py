@@ -55,11 +55,19 @@ class MIPSGenerator:
 
     @visitor.when(mips.MemoryAddressRegisterNode)
     def visit(self, node: mips.MemoryAddressRegisterNode):
-        return f"{(node.index)}({self.visit(node.register)})"
+        if node.index == 0:
+            t = ""
+        else:
+            t = f"({str(node.index)})"
+        return f"{t}({self.visit(node.register)})"
 
     @visitor.when(mips.MemoryAddressLabelNode)
     def visit(self, node: mips.MemoryAddressLabelNode):
-        return f"({(node.index)}){self.visit(node.address)}"
+        if node.index == 0:
+            t = ""
+        else:
+            t = f"({str(node.index)})"
+        return f"{t}{self.visit(node.address)}"
 
     @visitor.when(mips.MoveNode)
     def visit(self, node: mips.MoveNode):
