@@ -288,9 +288,9 @@ class MipsGenerate:
         stack_plus_str2 = self.stack.index(memory_str2)
         stack_plus_dest = self.stack.index(memory_dest)
 
-        return [ASTR.LW('$a0',f'{stack_plus_str1}'),
+        return [ASTR.LW('$t0',f'{stack_plus_str1}'),
                 ASTR.Comment(f"Si no viene como funcion pon el string {memory_str1} de la posicion {stack_plus_str1}"),
-                ASTR.LW('$a1',f'{stack_plus_str2}'),
+                ASTR.LW('$t1',f'{stack_plus_str2}'),
                 ASTR.Comment(f"Si no viene como funcion pon el string {memory_str2} de la posicion {stack_plus_str2}"),
                 ASTR.Compare_String(),
                 ASTR.SW ('$s0', f'{stack_plus_dest}'),
@@ -529,5 +529,19 @@ class MipsGenerate:
 
         stack_plus_memory_dest= self.stack.index(memory_dest)
         stack_plus_memory_number = self.stack.index(memory_number)
+
+        # return [ASTR.LW('$t1', f'{stack_plus_memory_number}($sp)'),
+        #         ASTR.MUL('$s0','$t1',-1),
+        #         ASTR.SW ('$s0', f'{stack_plus_memory_dest}($sp)')
+            
+
+                
+        #         ]
+        return [ASTR.LI ('$t0',4294967295),
+                ASTR.LW ('$t1', f'{stack_plus_memory_number}($sp)'),
+                ASTR.XOR ("$s0" , '$t0','$t1'),
+                ASTR.Add ('$s0' ,'$s0' ,'1'),
+                ASTR.SW ('$s0', f'{stack_plus_memory_dest}($sp)')
+                ]
 
 

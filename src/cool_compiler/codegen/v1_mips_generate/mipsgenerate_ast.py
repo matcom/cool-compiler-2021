@@ -60,8 +60,8 @@ class Compare_String:
     def __str__(self) -> str:
         return  """
  # compare str1 0($sp), str2 4($sp) salida en $s0
-#lw $a0 , (sp)      si viene x la pila
-#lw $a1 , 4(sp)     si viene por la pila
+lw $a0 , 4($t0)     
+lw $a1 , 4($t1)     
 
 LOOP:
 	lb $t0, ($a0)
@@ -288,7 +288,12 @@ class SUB (Operation):
 
 class DIV (Operation):
     def __init__(self, dest, op1, op2) -> None:
-        super().__init__('div', dest, op1, op2)            
+        super().__init__('div', dest, op1, op2)   
+
+
+class XOR(Operation):
+    def __init__(self, dest, op1, op2) -> None:
+        super().__init__('xor', dest, op1, op2)
 
 
 ################################# Native Func IO ################################################
@@ -365,8 +370,10 @@ class Length:
        return """ 
        
     String_length:
-    li $t0 , 0
-    lw $s2 , ($sp)
+    lw $t4 , ($sp)   #self
+    li $t0 , 0       #contador
+    lw $s2 , 4($t4)  # propiedad value
+
         loop:
         lb $s0 , ($s2)
         beq $s0 , $zero, END
@@ -386,13 +393,13 @@ class Concat:
     def __str__(self) -> str:
        return """ 
     Concat:
-    lw $s2 , 4($sp) 
-    lw $s1 , 0($sp) 
-    lw $s2 ,4($s2)
-    lw $s1 ,4($s1)
+    lw $t2 , 4($sp)   #self
+    lw $t1 , 0($sp)   # str1
+    lw $s2 ,4($t2)    # propiedad value
+    lw $s1 ,4($t1)    # propiedad value
 
     li $v0 , 9
-    li $a0 , 100
+    li $a0 , 100      # reservar memoria pal proximo string
     syscall
     move $s3 , $v0
 
@@ -420,11 +427,23 @@ class Concat:
 
 class SubStr:
     def __str__(self) -> str:
-       return """        
+       return """   
+
+    lw $s1 , (sp)   # guarda el indice
+    lw $t4 , 4(sp) # guarda el j 
+    lw $s5 , 8(sp) # self.
+    lw $s3 , 4($s5)   # tomar la propiedad value del string
+    add $a0 , $s1 , $t4   #tamano a reservar
+
+    li $v0 , 9
+    syscall
+    move $s4 , $v0           # $s4 direciion de destino
+
+
 Substring:
     li $t0 ,0 
     find_index:
-        beq			$t0, $s1, find_length	# if $t0 == $t1 then target
+        beq			$t0, $s1, find_length	# if $t0 == $s1 then estas en el indice
         add			$s3, $s3, 1		#s2 = s2 + 1
         add			$t0, $t0, 1	    # $t0 = $t0 + 1
         j find_index
@@ -440,6 +459,7 @@ Substring:
         j find_length
         
     END_Substring:
+        move s0 , $a0
         addi $sp, $sp, 12
         jr $ra  
 """
