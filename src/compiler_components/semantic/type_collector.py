@@ -31,7 +31,7 @@ class TypeCollector(object):
                         self.errors.append(f"({dec_node.line_father},{dec_node.column_father}) - SemanticError: Basic type as parent")
                     self.context.get_type(dec_node.id, dec_node.line).set_parent(self.context.get_type(dec_node.parent,dec_node.line),node.line)
             except SemanticError as e:
-                self.errors.append(f"({dec_node.line},{dec_node.column}) - TypeError: " + str(e))
+                self.errors.append(f"({dec_node.line_father},{dec_node.column_father}) - TypeError: " + str(e))
         
         cycles = self.context.circular_dependency()
         for cycle in cycles:
