@@ -25,7 +25,7 @@ class COOLtoCIL(BaseCOOLToCIL):
             self.to_function_name('main', 'Main'), result))
         self.register_instruction(nodes_cil.ReturnNode(0))
 
-        self.register_data('Aborting... in class ')
+        self.register_data('Abort called from class ')
         self.register_built_in()
         self.current_function = None
 

@@ -16,7 +16,7 @@ from utils.code_generation.cil.print_CIL_AST import get_formatter
 
 if __name__ == "__main__":
     add = "codegen/"
-    _file = "cells.cl"
+    _file = "primes.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}{_file}"
