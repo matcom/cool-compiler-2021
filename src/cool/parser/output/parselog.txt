@@ -6161,13 +6161,13 @@
    yacc.py: 430:Defaulted state 45: Reduce using 34
    yacc.py: 434:Stack  : class type inherits type ocur id opar epsilon . LexToken(cpar,')',2,33)
    yacc.py: 469:Action : Reduce rule [param_list_empty -> epsilon] with [None] and goto state 43
-   yacc.py: 506:Result : <list @ 0x7f341a39dc00> ([])
+   yacc.py: 506:Result : <list @ 0x7fb17c191200> ([])
    yacc.py: 410:
    yacc.py: 411:State  : 43
    yacc.py: 430:Defaulted state 43: Reduce using 31
    yacc.py: 434:Stack  : class type inherits type ocur id opar param_list_empty . LexToken(cpar,')',2,33)
    yacc.py: 469:Action : Reduce rule [formals -> param_list_empty] with [[]] and goto state 51
-   yacc.py: 506:Result : <list @ 0x7f341a39dc00> ([])
+   yacc.py: 506:Result : <list @ 0x7fb17c191200> ([])
    yacc.py: 410:
    yacc.py: 411:State  : 51
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals . LexToken(cpar,')',2,33)
@@ -6199,49 +6199,49 @@
    yacc.py: 410:
    yacc.py: 411:State  : 93
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar string . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [atom -> string] with [<str @ 0x7f341a495170>] and goto state 79
-   yacc.py: 506:Result : <ConstantStrNode @ 0x7f341a4e56d0> (<cool.utils.ast.ConstantStrNode object a ...)
+   yacc.py: 469:Action : Reduce rule [atom -> string] with [<str @ 0x7fb17a7ecf30>] and goto state 79
+   yacc.py: 506:Result : <ConstantStrNode @ 0x7fb17a7918e0> (<cool.utils.ast.ConstantStrNode object a ...)
    yacc.py: 410:
    yacc.py: 411:State  : 79
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar atom . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [factor -> atom] with [<ConstantStrNode @ 0x7f341a4e56d0>] and goto state 77
-   yacc.py: 506:Result : <ConstantStrNode @ 0x7f341a4e56d0> (<cool.utils.ast.ConstantStrNode object a ...)
+   yacc.py: 469:Action : Reduce rule [factor -> atom] with [<ConstantStrNode @ 0x7fb17a7918e0>] and goto state 77
+   yacc.py: 506:Result : <ConstantStrNode @ 0x7fb17a7918e0> (<cool.utils.ast.ConstantStrNode object a ...)
    yacc.py: 410:
    yacc.py: 411:State  : 77
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar factor . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [base_call -> factor] with [<ConstantStrNode @ 0x7f341a4e56d0>] and goto state 76
-   yacc.py: 506:Result : <ConstantStrNode @ 0x7f341a4e56d0> (<cool.utils.ast.ConstantStrNode object a ...)
+   yacc.py: 469:Action : Reduce rule [base_call -> factor] with [<ConstantStrNode @ 0x7fb17a7918e0>] and goto state 76
+   yacc.py: 506:Result : <ConstantStrNode @ 0x7fb17a7918e0> (<cool.utils.ast.ConstantStrNode object a ...)
    yacc.py: 410:
    yacc.py: 411:State  : 76
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar base_call . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [term -> base_call] with [<ConstantStrNode @ 0x7f341a4e56d0>] and goto state 75
-   yacc.py: 506:Result : <ConstantStrNode @ 0x7f341a4e56d0> (<cool.utils.ast.ConstantStrNode object a ...)
+   yacc.py: 469:Action : Reduce rule [term -> base_call] with [<ConstantStrNode @ 0x7fb17a7918e0>] and goto state 75
+   yacc.py: 506:Result : <ConstantStrNode @ 0x7fb17a7918e0> (<cool.utils.ast.ConstantStrNode object a ...)
    yacc.py: 410:
    yacc.py: 411:State  : 75
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar term . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [op -> term] with [<ConstantStrNode @ 0x7f341a4e56d0>] and goto state 74
-   yacc.py: 506:Result : <ConstantStrNode @ 0x7f341a4e56d0> (<cool.utils.ast.ConstantStrNode object a ...)
+   yacc.py: 469:Action : Reduce rule [op -> term] with [<ConstantStrNode @ 0x7fb17a7918e0>] and goto state 74
+   yacc.py: 506:Result : <ConstantStrNode @ 0x7fb17a7918e0> (<cool.utils.ast.ConstantStrNode object a ...)
    yacc.py: 410:
    yacc.py: 411:State  : 74
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar op . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [comp -> op] with [<ConstantStrNode @ 0x7f341a4e56d0>] and goto state 73
-   yacc.py: 506:Result : <ConstantStrNode @ 0x7f341a4e56d0> (<cool.utils.ast.ConstantStrNode object a ...)
+   yacc.py: 469:Action : Reduce rule [comp -> op] with [<ConstantStrNode @ 0x7fb17a7918e0>] and goto state 73
+   yacc.py: 506:Result : <ConstantStrNode @ 0x7fb17a7918e0> (<cool.utils.ast.ConstantStrNode object a ...)
    yacc.py: 410:
    yacc.py: 411:State  : 73
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar comp . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [expr -> comp] with [<ConstantStrNode @ 0x7f341a4e56d0>] and goto state 155
-   yacc.py: 506:Result : <ConstantStrNode @ 0x7f341a4e56d0> (<cool.utils.ast.ConstantStrNode object a ...)
+   yacc.py: 469:Action : Reduce rule [expr -> comp] with [<ConstantStrNode @ 0x7fb17a7918e0>] and goto state 155
+   yacc.py: 506:Result : <ConstantStrNode @ 0x7fb17a7918e0> (<cool.utils.ast.ConstantStrNode object a ...)
    yacc.py: 410:
    yacc.py: 411:State  : 155
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar expr . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [arg_list -> expr] with [<ConstantStrNode @ 0x7f341a4e56d0>] and goto state 148
-   yacc.py: 506:Result : <list @ 0x7f341a39dd40> ([<cool.utils.ast.ConstantStrNode object  ...)
+   yacc.py: 469:Action : Reduce rule [arg_list -> expr] with [<ConstantStrNode @ 0x7fb17a7918e0>] and goto state 148
+   yacc.py: 506:Result : <list @ 0x7fb17a83be80> ([<cool.utils.ast.ConstantStrNode object  ...)
    yacc.py: 410:
    yacc.py: 411:State  : 148
    yacc.py: 430:Defaulted state 148: Reduce using 91
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar arg_list . LexToken(cpar,')',3,70)
-   yacc.py: 469:Action : Reduce rule [args -> arg_list] with [<list @ 0x7f341a39dd40>] and goto state 153
-   yacc.py: 506:Result : <list @ 0x7f341a39dd40> ([<cool.utils.ast.ConstantStrNode object  ...)
+   yacc.py: 469:Action : Reduce rule [args -> arg_list] with [<list @ 0x7fb17a83be80>] and goto state 153
+   yacc.py: 506:Result : <list @ 0x7fb17a83be80> ([<cool.utils.ast.ConstantStrNode object  ...)
    yacc.py: 410:
    yacc.py: 411:State  : 153
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar args . LexToken(cpar,')',3,70)
@@ -6249,38 +6249,38 @@
    yacc.py: 410:
    yacc.py: 411:State  : 191
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur id opar args cpar . LexToken(ccur,'}',4,75)
-   yacc.py: 469:Action : Reduce rule [func_call -> id opar args cpar] with ['out_string','(',<list @ 0x7f341a39dd40>,')'] and goto state 78
-   yacc.py: 506:Result : <tuple @ 0x7f341a39d300> ((LexToken(id,'out_string',3,42), [<cool. ...)
+   yacc.py: 469:Action : Reduce rule [func_call -> id opar args cpar] with ['out_string','(',<list @ 0x7fb17a83be80>,')'] and goto state 78
+   yacc.py: 506:Result : <tuple @ 0x7fb17a894d40> ((LexToken(id,'out_string',3,42), [<cool. ...)
    yacc.py: 410:
    yacc.py: 411:State  : 78
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur func_call . LexToken(ccur,'}',4,75)
-   yacc.py: 469:Action : Reduce rule [factor -> func_call] with [<tuple @ 0x7f341a39d300>] and goto state 77
-   yacc.py: 506:Result : <StaticCallNode @ 0x7f341a4e5100> (<cool.utils.ast.StaticCallNode object at ...)
+   yacc.py: 469:Action : Reduce rule [factor -> func_call] with [<tuple @ 0x7fb17a894d40>] and goto state 77
+   yacc.py: 506:Result : <StaticCallNode @ 0x7fb17a791340> (<cool.utils.ast.StaticCallNode object at ...)
    yacc.py: 410:
    yacc.py: 411:State  : 77
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur factor . LexToken(ccur,'}',4,75)
-   yacc.py: 469:Action : Reduce rule [base_call -> factor] with [<StaticCallNode @ 0x7f341a4e5100>] and goto state 76
-   yacc.py: 506:Result : <StaticCallNode @ 0x7f341a4e5100> (<cool.utils.ast.StaticCallNode object at ...)
+   yacc.py: 469:Action : Reduce rule [base_call -> factor] with [<StaticCallNode @ 0x7fb17a791340>] and goto state 76
+   yacc.py: 506:Result : <StaticCallNode @ 0x7fb17a791340> (<cool.utils.ast.StaticCallNode object at ...)
    yacc.py: 410:
    yacc.py: 411:State  : 76
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur base_call . LexToken(ccur,'}',4,75)
-   yacc.py: 469:Action : Reduce rule [term -> base_call] with [<StaticCallNode @ 0x7f341a4e5100>] and goto state 75
-   yacc.py: 506:Result : <StaticCallNode @ 0x7f341a4e5100> (<cool.utils.ast.StaticCallNode object at ...)
+   yacc.py: 469:Action : Reduce rule [term -> base_call] with [<StaticCallNode @ 0x7fb17a791340>] and goto state 75
+   yacc.py: 506:Result : <StaticCallNode @ 0x7fb17a791340> (<cool.utils.ast.StaticCallNode object at ...)
    yacc.py: 410:
    yacc.py: 411:State  : 75
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur term . LexToken(ccur,'}',4,75)
-   yacc.py: 469:Action : Reduce rule [op -> term] with [<StaticCallNode @ 0x7f341a4e5100>] and goto state 74
-   yacc.py: 506:Result : <StaticCallNode @ 0x7f341a4e5100> (<cool.utils.ast.StaticCallNode object at ...)
+   yacc.py: 469:Action : Reduce rule [op -> term] with [<StaticCallNode @ 0x7fb17a791340>] and goto state 74
+   yacc.py: 506:Result : <StaticCallNode @ 0x7fb17a791340> (<cool.utils.ast.StaticCallNode object at ...)
    yacc.py: 410:
    yacc.py: 411:State  : 74
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur op . LexToken(ccur,'}',4,75)
-   yacc.py: 469:Action : Reduce rule [comp -> op] with [<StaticCallNode @ 0x7f341a4e5100>] and goto state 73
-   yacc.py: 506:Result : <StaticCallNode @ 0x7f341a4e5100> (<cool.utils.ast.StaticCallNode object at ...)
+   yacc.py: 469:Action : Reduce rule [comp -> op] with [<StaticCallNode @ 0x7fb17a791340>] and goto state 73
+   yacc.py: 506:Result : <StaticCallNode @ 0x7fb17a791340> (<cool.utils.ast.StaticCallNode object at ...)
    yacc.py: 410:
    yacc.py: 411:State  : 73
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur comp . LexToken(ccur,'}',4,75)
-   yacc.py: 469:Action : Reduce rule [expr -> comp] with [<StaticCallNode @ 0x7f341a4e5100>] and goto state 206
-   yacc.py: 506:Result : <StaticCallNode @ 0x7f341a4e5100> (<cool.utils.ast.StaticCallNode object at ...)
+   yacc.py: 469:Action : Reduce rule [expr -> comp] with [<StaticCallNode @ 0x7fb17a791340>] and goto state 206
+   yacc.py: 506:Result : <StaticCallNode @ 0x7fb17a791340> (<cool.utils.ast.StaticCallNode object at ...)
    yacc.py: 410:
    yacc.py: 411:State  : 206
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur expr . LexToken(ccur,'}',4,75)
@@ -6289,8 +6289,8 @@
    yacc.py: 411:State  : 222
    yacc.py: 430:Defaulted state 222: Reduce using 25
    yacc.py: 434:Stack  : class type inherits type ocur id opar formals cpar colon type ocur expr ccur . None
-   yacc.py: 469:Action : Reduce rule [def_func -> id opar formals cpar colon type ocur expr ccur] with ['main','(',[],')',':','IO','{',<StaticCallNode @ 0x7f341a4e5100>,'}'] and goto state 18
-   yacc.py: 506:Result : <FuncDeclarationNode @ 0x7f341a4e51f0> (<cool.utils.ast.FuncDeclarationNode obje ...)
+   yacc.py: 469:Action : Reduce rule [def_func -> id opar formals cpar colon type ocur expr ccur] with ['main','(',[],')',':','IO','{',<StaticCallNode @ 0x7fb17a791340>,'}'] and goto state 18
+   yacc.py: 506:Result : <FuncDeclarationNode @ 0x7fb17a791430> (<cool.utils.ast.FuncDeclarationNode obje ...)
    yacc.py: 410:
    yacc.py: 411:State  : 18
    yacc.py: 434:Stack  : class type inherits type ocur def_func . LexToken(semi,';',4,76)
@@ -6305,13 +6305,13 @@
    yacc.py: 430:Defaulted state 16: Reduce using 14
    yacc.py: 434:Stack  : class type inherits type ocur def_func semi epsilon . LexToken(ccur,'}',5,78)
    yacc.py: 469:Action : Reduce rule [feature_list -> epsilon] with [None] and goto state 48
-   yacc.py: 506:Result : <list @ 0x7f341a39d640> ([])
+   yacc.py: 506:Result : <list @ 0x7fb17c191d00> ([])
    yacc.py: 410:
    yacc.py: 411:State  : 48
    yacc.py: 430:Defaulted state 48: Reduce using 16
    yacc.py: 434:Stack  : class type inherits type ocur def_func semi feature_list . LexToken(ccur,'}',5,78)
-   yacc.py: 469:Action : Reduce rule [feature_list -> def_func semi feature_list] with [<FuncDeclarationNode @ 0x7f341a4e51f0>,';',[]] and goto state 53
-   yacc.py: 506:Result : <list @ 0x7f341a39cd00> ([<cool.utils.ast.FuncDeclarationNode obj ...)
+   yacc.py: 469:Action : Reduce rule [feature_list -> def_func semi feature_list] with [<FuncDeclarationNode @ 0x7fb17a791430>,';',[]] and goto state 53
+   yacc.py: 506:Result : <list @ 0x7fb17a83bb40> ([<cool.utils.ast.FuncDeclarationNode obj ...)
    yacc.py: 410:
    yacc.py: 411:State  : 53
    yacc.py: 434:Stack  : class type inherits type ocur feature_list . LexToken(ccur,'}',5,78)
@@ -6323,21 +6323,21 @@
    yacc.py: 410:
    yacc.py: 411:State  : 102
    yacc.py: 434:Stack  : class type inherits type ocur feature_list ccur semi . $end
-   yacc.py: 469:Action : Reduce rule [def_class -> class type inherits type ocur feature_list ccur semi] with ['class','Main','inherits','IO','{',<list @ 0x7f341a39cd00>,'}',';'] and goto state 3
-   yacc.py: 506:Result : <ClassDeclarationNode @ 0x7f341a4e5280> (<cool.utils.ast.ClassDeclarationNode obj ...)
+   yacc.py: 469:Action : Reduce rule [def_class -> class type inherits type ocur feature_list ccur semi] with ['class','Main','inherits','IO','{',<list @ 0x7fb17a83bb40>,'}',';'] and goto state 3
+   yacc.py: 506:Result : <ClassDeclarationNode @ 0x7fb17a7914c0> (<cool.utils.ast.ClassDeclarationNode obj ...)
    yacc.py: 410:
    yacc.py: 411:State  : 3
    yacc.py: 434:Stack  : def_class . $end
-   yacc.py: 469:Action : Reduce rule [class_list -> def_class] with [<ClassDeclarationNode @ 0x7f341a4e5280>] and goto state 2
-   yacc.py: 506:Result : <list @ 0x7f341a39dc80> ([<cool.utils.ast.ClassDeclarationNode ob ...)
+   yacc.py: 469:Action : Reduce rule [class_list -> def_class] with [<ClassDeclarationNode @ 0x7fb17a7914c0>] and goto state 2
+   yacc.py: 506:Result : <list @ 0x7fb17a83bfc0> ([<cool.utils.ast.ClassDeclarationNode ob ...)
    yacc.py: 410:
    yacc.py: 411:State  : 2
    yacc.py: 430:Defaulted state 2: Reduce using 1
    yacc.py: 434:Stack  : class_list . $end
-   yacc.py: 469:Action : Reduce rule [program -> class_list] with [<list @ 0x7f341a39dc80>] and goto state 1
-   yacc.py: 506:Result : <ProgramNode @ 0x7f341a4e5550> (<cool.utils.ast.ProgramNode object at 0x ...)
+   yacc.py: 469:Action : Reduce rule [program -> class_list] with [<list @ 0x7fb17a83bfc0>] and goto state 1
+   yacc.py: 506:Result : <ProgramNode @ 0x7fb17a791760> (<cool.utils.ast.ProgramNode object at 0x ...)
    yacc.py: 410:
    yacc.py: 411:State  : 1
    yacc.py: 434:Stack  : program . $end
-   yacc.py: 571:Done   : Returning <ProgramNode @ 0x7f341a4e5550> (<cool.utils.ast.ProgramNode object at 0x ...)
+   yacc.py: 571:Done   : Returning <ProgramNode @ 0x7fb17a791760> (<cool.utils.ast.ProgramNode object at 0x ...)
    yacc.py: 572:PLY: PARSE DEBUG END
