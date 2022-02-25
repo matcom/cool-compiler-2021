@@ -13,6 +13,9 @@ class String(Type):
     def is_shield(self):
         return True
 
+    def value(self):
+        self.define_attribute("value", self)
+
     def length(self):
         self.define_method("length", [], Int())
     
