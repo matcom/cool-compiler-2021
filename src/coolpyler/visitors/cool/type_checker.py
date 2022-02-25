@@ -51,7 +51,7 @@ class TypeCheckerVisitor:
         self.types = node.types
         classes = [self.visit(c, scope.create_child()) for c in node.classes]
 
-        return type_checked.CoolProgramNode(node.lineno, node.columnno, classes)
+        return type_checked.CoolProgramNode(node.lineno, node.columnno, list(self.types.values()), classes)
 
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):

@@ -79,36 +79,55 @@ class CoolToCilVisitor(object):
         )
         return dest
 
-    def register_builtins(self):
-        self.type = "Object"
-
-        self.methods[self.type] = {
-            m: (i, self.type)
-            for i, m in enumerate(["copy", "type_name", "abort"])
-        }
-
+    def register_object_abort(self):
         self.reset_state()
-        str_param = self.register_param("str")
-        self.instructions.append(cil.PrintNode(str_param, True))
+        self.register_param("self")
+        self.instructions.append(cil.PrintNode(self.register_data("abort_msg", "Program Halted!"), True))
+        self.instructions.append(cil.ExitNode(1))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("Object", "out_string"),
+                self.get_func_id("Object", "abort"),
                 self.params,
                 self.locals,
                 self.instructions,
             )
         )
 
-        self.type = "IO"
-
-        self.methods[self.type] = {
-            m: (i, self.type)
-            for i, m in enumerate(["out_string", "out_int", "in_string", "in_int"])
-        }
-
+    def register_type_name(self, type:str):
         self.reset_state()
+        self.register_param("self")
+        type_name = self.register_data(f"type_name_{type}", type)
+        ret_local = self.register_new("String", type_name)
+        self.instructions.append(cil.ReturnNode(ret_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id(type, "out_string"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_object_copy(self):
+        self.reset_state()
+        self.register_param("self")
+        self.instructions.append(cil.PrintNode(self.register_data("abort_msg", "Program Halted!"), True))
+        self.instructions.append(cil.ExitNode(1))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("Object", "copy"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_io_out_string(self):
+        self.reset_state()
+        self_param = self.register_param("self")
         str_param = self.register_param("str")
         self.instructions.append(cil.PrintNode(str_param, True))
+        self.instructions.append(cil.ReturnNode(self_param))
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("IO", "out_string"),
@@ -118,9 +137,12 @@ class CoolToCilVisitor(object):
             )
         )
 
+    def register_io_out_int(self):
         self.reset_state()
+        self_param = self.register_param("self")
         int_param = self.register_param("int")
         self.instructions.append(cil.PrintNode(int_param, False))
+        self.instructions.append(cil.ReturnNode(self_param))
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("IO", "out_int"),
@@ -130,9 +152,12 @@ class CoolToCilVisitor(object):
             )
         )
 
+    def register_io_in_string(self):
         self.reset_state()
+        self.register_param("self")
         str_local = self.register_local("str")
         self.instructions.append(cil.ReadNode(str_local, True))
+        self.instructions.append(cil.ReturnNode(str_local))
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("IO", "in_string"),
@@ -142,9 +167,12 @@ class CoolToCilVisitor(object):
             )
         )
 
+    def register_io_in_int(self):
         self.reset_state()
+        self.register_param("self")
         int_local = self.register_local("int")
         self.instructions.append(cil.ReadNode(int_local, False))
+        self.instructions.append(cil.ReturnNode(int_local))
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("IO", "in_int"),
@@ -154,16 +182,100 @@ class CoolToCilVisitor(object):
             )
         )
 
-        self.dottypes.append(
-            cil.TypeNode(
-                self.type,
-                [],
-                [
-                    self.get_func_id(htype, method)
-                    for method, (_, htype) in self.methods[self.type].items()
-                ],
+    def register_string_length(self):
+        self.reset_state()
+        self_param = self.register_param("self")
+        length_local = self.register_local("length")
+        self.instructions.append(cil.LengthNode(self_param, length_local))
+        self.instructions.append(cil.ReturnNode(self.register_new("Int", length_local)))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("String", "length"),
+                self.params,
+                self.locals,
+                self.instructions,
             )
         )
+
+    def register_string_concat(self):
+        self.reset_state()
+        self_param = self.register_param("self")
+        other_param = self.register_param("other")
+
+        concat_local = self.register_local("concat")
+        self_len_local = self.register_local("self_len")
+        other_len_local = self.register_local("other_len")
+        concat_len_local = self.register_local("concat_len")
+
+        self.instructions.append(cil.LengthNode(self_len_local, self_param))
+        self.instructions.append(cil.LengthNode(other_len_local, other_param))
+        self.instructions.append(cil.PlusNode(concat_len_local, self_len_local, other_len_local))
+        self.instructions.append(cil.ConcatNode(concat_local, self_param, other_param, concat_len_local))
+        self.instructions.append(cil.ReturnNode(self.register_new("String", concat_local)))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("String", "concat"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_string_substr(self):
+        self.reset_state()
+        self_param = self.register_param("self")
+        i_param = self.register_param("i")
+        l_param = self.register_param("l")
+        ret_local = self.register_local("substr")
+        self.instructions.append(cil.SubstringNode(ret_local,self_param, l_param, i_param))
+        self.instructions.append(cil.ReturnNode(ret_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("String", "substr"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_builtins(self):
+        # registers = {
+        #         "Object_abort": self.register_object_abort,
+        #         "Object_copy": self.register_object_copy,
+        #
+        #         "IO_out_string": self.register_io_out_string,
+        #         "IO_out_int": self.register_io_out_int,
+        #         "IO_in_string": self.register_io_in_string,
+        #         "IO_in_int": self.register_io_in_int,
+        #
+        #         "String_length": self.register_string_length,
+        #         "String_concat": self.register_string_concat,
+        #         "String_substr": self.register_string_substr,
+        # }
+        #
+        # for method in self.methods["Object"]:
+        #     registers[f"Object_{method}"]()
+        #
+        # for method in self.methods["IO"]:
+        #     registers[f"IO_{method}"]()
+        #
+        # for method in self.methods["String"]:
+        #     registers[f"String_{method}"]()
+
+        self.register_object_abort()
+        self.register_object_copy()
+
+        for type in self.methods:
+            self.register_type_name(type)
+
+        self.register_io_out_string()
+        self.register_io_out_int()
+        self.register_io_in_string()
+        self.register_io_in_int()
+
+        self.register_string_length()
+        self.register_string_concat()
+        self.register_string_substr()
 
     @visitor.on("node")
     def visit(self, node):
@@ -172,21 +284,27 @@ class CoolToCilVisitor(object):
     @visitor.when(type_checked.CoolProgramNode)
     def visit(self, node: type_checked.CoolProgramNode):
         self.attrs, self.methods = dict(), dict()
-        for cclass in node.classes:
-            type = cclass.type
-            self.attrs[cclass.type.name] = {
+        for type in node.types:
+            self.attrs[type.name] = {
                 attr.name: (i, htype.name)
                 for i, (attr, htype) in enumerate(type.all_attributes())
             }
-            self.methods[cclass.type.name] = {
-                method.name: (i, htype.name)
+            self.methods[type.name] = {
+                method.name: (i, htype.name) if method.name != "type_name" else (i, type.name)
                 for i, (method, htype) in enumerate(type.all_methods())
             }
-
-        self.reset_state()
+            self.dottypes.append(cil.TypeNode(
+                type.name,
+                list(self.attrs[type.name].keys()),
+                [
+                    self.get_func_id(htype, method)
+                    for method, (_, htype) in self.methods[type.name].items()
+                ],
+            ))
 
         self.register_builtins()
 
+        self.reset_state()
         main_instance = self.register_new("Main")
         self.instructions.append(cil.ArgNode(main_instance))
         self.instructions.append(
@@ -198,8 +316,7 @@ class CoolToCilVisitor(object):
         )
 
         for cool_class in node.classes:
-            dottype = self.visit(cool_class)
-            self.dottypes.append(dottype)
+            self.visit(cool_class)
 
         return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
 
@@ -230,14 +347,6 @@ class CoolToCilVisitor(object):
             function = self.visit(feat)
             self.dotcode.append(function)
 
-        return cil.TypeNode(
-            node.type.name,
-            list(self.attrs[node.type.name].keys()),
-            [
-                self.get_func_id(htype, method)
-                for method, (_, htype) in self.methods[node.type.name].items()
-            ],
-        )
 
     @visitor.when(type_checked.CoolAttrDeclNode)
     def visit(self, node: type_checked.CoolAttrDeclNode) -> cil.FunctionNode:

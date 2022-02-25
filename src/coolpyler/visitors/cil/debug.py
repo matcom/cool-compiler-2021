@@ -115,14 +115,6 @@ class CILDebug:
             indent, inline, f"SETATTR {node.instance} {node.attr} {node.source};"
         )
 
-    @visitor.when(cil.GetIndexNode)
-    def visit(self, node: cil.GetIndexNode, indent=0, inline=False):
-        pass
-
-    @visitor.when(cil.SetIndexNode)
-    def visit(self, node: cil.SetIndexNode, indent=0, inline=False):
-        pass
-
     @visitor.when(cil.AllocateNode)
     def visit(self, node: cil.AllocateNode, indent=0, inline=False):
         self.print(indent, inline, f"{node.dest} = ALLOCATE {node.type};")
@@ -133,15 +125,15 @@ class CILDebug:
 
     @visitor.when(cil.LabelNode)
     def visit(self, node: cil.LabelNode, indent=0, inline=False):
-        self.print(indent, inline, f"LABEL <label>;")
+        self.print(indent, inline, f"LABEL {node.name};")
 
     @visitor.when(cil.GotoNode)
     def visit(self, node: cil.GotoNode, indent=0, inline=False):
-        self.print(indent, inline, f"GOTO <label>;")
+        self.print(indent, inline, f"GOTO {node.label};")
 
     @visitor.when(cil.GotoIfNode)
     def visit(self, node: cil.GotoIfNode, indent=0, inline=False):
-        self.print(indent, inline, f"IF <cond> GOTO <label>;")
+        self.print(indent, inline, f"IF {node.cond} GOTO {node.label};")
 
     @visitor.when(cil.StaticCallNode)
     def visit(self, node: cil.StaticCallNode, indent=0, inline=False):
@@ -165,31 +157,20 @@ class CILDebug:
 
     @visitor.when(cil.LengthNode)
     def visit(self, node: cil.LengthNode, indent=0, inline=False):
-        pass
+        self.print(indent, inline, f"{node.dest} = length({node.string})")
 
     @visitor.when(cil.ConcatNode)
     def visit(self, node: cil.ConcatNode, indent=0, inline=False):
-        self.print(indent, inline, f"CONCAT ...")
-
-    @visitor.when(cil.PrefixNode)
-    def visit(self, node: cil.PrefixNode, indent=0, inline=False):
-        self.print(indent, inline, f"PREFIX ...")
+        self.print(indent, inline, f"{node.dest} = concat({node.string1}, {node.string2}, {node.dest_lenght})")
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode, indent=0, inline=False):
-        self.print(indent, inline, f"SUBSTR ...")
-        pass
-
-    @visitor.when(cil.ToStrNode)
-    def visit(self, node: cil.ToStrNode, indent=0, inline=False):
-        self.print(indent, inline, f"STR ...")
-        pass
+        self.print(indent, inline, f"{node.dest} = substr({node.string}, {node.index}, {node.n})")
 
     @visitor.when(cil.ReadNode)
     def visit(self, node: cil.ReadNode, indent=0, inline=False):
-        self.print(indent, inline, f"READ ...")
-        pass
+        self.print(indent, inline, f"{node.dest} = read({'str' if node.is_string else 'int'})")
 
     @visitor.when(cil.PrintNode)
     def visit(self, node: cil.PrintNode, indent=0, inline=False):
-        self.print(indent, inline, f"PRINT ...")
+        self.print(indent, inline, f"print({'str' if node.is_string else 'int'}, {node.str_addr}")
