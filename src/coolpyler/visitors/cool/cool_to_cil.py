@@ -82,7 +82,7 @@ class CoolToCilVisitor(object):
     def register_object_abort(self):
         self.reset_state()
         self.register_param("self")
-        self.instructions.append(cil.PrintNode(self.register_data("abort_msg", "Program Halted!"), True))
+        self.instructions.append(cil.PrintNode(self.register_data("abort_msg", '"Program Halted!"'), True))
         self.instructions.append(cil.ExitNode(1))
         self.dotcode.append(
             cil.FunctionNode(
@@ -101,7 +101,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.ReturnNode(ret_local))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id(type, "out_string"),
+                self.get_func_id(type, "type_name"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -111,7 +111,7 @@ class CoolToCilVisitor(object):
     def register_object_copy(self):
         self.reset_state()
         self.register_param("self")
-        self.instructions.append(cil.PrintNode(self.register_data("abort_msg", "Program Halted!"), True))
+        self.instructions.append(cil.PrintNode(self.register_data("abort_msg", '"Program Halted!"'), True))
         self.instructions.append(cil.ExitNode(1))
         self.dotcode.append(
             cil.FunctionNode(
@@ -239,29 +239,6 @@ class CoolToCilVisitor(object):
         )
 
     def register_builtins(self):
-        # registers = {
-        #         "Object_abort": self.register_object_abort,
-        #         "Object_copy": self.register_object_copy,
-        #
-        #         "IO_out_string": self.register_io_out_string,
-        #         "IO_out_int": self.register_io_out_int,
-        #         "IO_in_string": self.register_io_in_string,
-        #         "IO_in_int": self.register_io_in_int,
-        #
-        #         "String_length": self.register_string_length,
-        #         "String_concat": self.register_string_concat,
-        #         "String_substr": self.register_string_substr,
-        # }
-        #
-        # for method in self.methods["Object"]:
-        #     registers[f"Object_{method}"]()
-        #
-        # for method in self.methods["IO"]:
-        #     registers[f"IO_{method}"]()
-        #
-        # for method in self.methods["String"]:
-        #     registers[f"String_{method}"]()
-
         self.register_object_abort()
         self.register_object_copy()
 

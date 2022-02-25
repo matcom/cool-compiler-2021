@@ -73,35 +73,19 @@ class CILDebug:
 
     @visitor.when(cil.PlusNode)
     def visit(self, node: cil.PlusNode, indent=0, inline=False):
-        self.print(indent, True, f"{node.dest}")
-        self.print(0, True, " = ")
-        self.visit(node.left, inline=True)
-        self.print(0, True, " + ")
-        self.visit(node.right, inline=inline)
+        self.print(indent, inline, f"{node.dest} = {node.left} + {node.right}")
 
     @visitor.when(cil.MinusNode)
     def visit(self, node: cil.MinusNode, indent=0, inline=False):
-        self.print(indent, True, f"{node.dest}")
-        self.print(0, True, " = ")
-        self.visit(node.left, inline=True)
-        self.print(0, True, " - ")
-        self.visit(node.right, inline=inline)
+        self.print(indent, inline, f"{node.dest} = {node.left} - {node.right}")
 
     @visitor.when(cil.StarNode)
     def visit(self, node: cil.StarNode, indent=0, inline=False):
-        self.print(indent, True, f"{node.dest}")
-        self.print(0, True, " = ")
-        self.visit(node.left, inline=True)
-        self.print(0, True, " * ")
-        self.visit(node.right, inline=inline)
+        self.print(indent, inline, f"{node.dest} = {node.left} * {node.right}")
 
     @visitor.when(cil.DivNode)
     def visit(self, node: cil.DivNode, indent=0, inline=False):
-        self.print(indent, True, f"{node.dest}")
-        self.print(0, True, " = ")
-        self.visit(node.left, inline=True)
-        self.print(0, True, " / ")
-        self.visit(node.right, inline=inline)
+        self.print(indent, inline, f"{node.dest} = {node.left} / {node.right}")
 
     @visitor.when(cil.GetAttrNode)
     def visit(self, node: cil.GetAttrNode, indent=0, inline=False):

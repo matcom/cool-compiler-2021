@@ -73,8 +73,8 @@ class LoadAddressNode(BinaryOpNode):
 
 
 class LoadWordNode(BinaryOpNode):
-    def __init__(self, register, ram_dir):
-        super().__init__(register, ram_dir)
+    def __init__(self, register, ram_dir, comment=""):
+        super().__init__(register, ram_dir, comment)
 
 
 class LoadByteNode(BinaryOpNode):
