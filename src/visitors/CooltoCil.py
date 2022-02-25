@@ -20,6 +20,10 @@ class BaseCOOLToCILVisitor:
         self.parameters = set()
         self.instances = []
 
+        self.dfunc = {}
+        self.cattrs = {}
+        self.dparents = {'Object': None}
+
         self.builtin_types = ['Object', 'IO', 'Int', 'Bool', 'String']
         self.ctrs = {}
 
@@ -58,6 +62,10 @@ class BaseCOOLToCILVisitor:
         return f'function_{method_name}_at_{type_name}'
     
     def register_function(self, function_name):
+        try:
+            self.dfunc[self.current_type.name].append(function_name)
+        except:
+            self.dfunc[self.current_type.name] = [function_name]
         function_node = cil.FunctionNode(function_name, [], [], [])
         self.dotcode.append(function_node)
         return function_node
@@ -89,9 +97,18 @@ class BaseCOOLToCILVisitor:
             self.register_instruction(set_attr_node)
         self.register_instruction(cil.ReturnNode(local_self))
         
+
+    def build_prerreq(self, programNode):
+        functions = {}
+        attr_counts = {}
+        parents = {}
+
     def add_builtin_types(self):
         def build_Object():
             type = self.register_type('Object')
+            self.dparents['Object'] = None
+            self.cattrs['Object'] = 0
+
             self.current_type = type
             
             self.current_function = self.register_function(self.to_function_name('abort', self.current_type.name))
@@ -113,6 +130,8 @@ class BaseCOOLToCILVisitor:
 
         def build_String():
             type = self.register_type('String')
+            self.cattrs['String'] = 1
+            self.dparents['String'] = 'Object'
             self.current_type = type
 
             self.current_function = self.register_function(self.to_function_name('concat', self.current_type.name))
@@ -147,6 +166,8 @@ class BaseCOOLToCILVisitor:
 
         def build_IO():
             type = self.register_type('IO')
+            self.cattrs['IO'] = 0
+            self.dparents['IO'] = 'Object'
             self.current_type = type
 
             self.current_function = self.register_function(self.to_function_name('out_string', self.current_type.name))
@@ -180,10 +201,20 @@ class BaseCOOLToCILVisitor:
             self.register_instruction(cil.SetAttribNode(int_store, 0, dest))
             self.register_instruction(cil.ReturnNode(int_store))
 
+        def build_Int():
+            self.cattrs['Int'] = 1
+            self.dparents['Int'] = 'Object'
+
+        def build_Bool():
+            self.cattrs['Bool'] = 1
+            self.dparents['Bool'] = 'Object'
 
         build_Object()
         build_String()
         build_IO()
+        build_Int()
+        build_Bool()
+
 
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
@@ -215,7 +246,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         #     self.visit(built_in_class, scope)
 
 
-        self.current_function = self.register_function('entry')
+        # self.current_function = self.register_function('entry')
+        function_node = cil.FunctionNode('entry', [], [], [])
+        self.dotcode.append(function_node)
+        self.current_function = function_node
+
         instance = self.define_internal_local()
         self.instances.append(instance)
         result = self.define_internal_local()
@@ -231,7 +266,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.visit(declaration, child_scope)
 
         self.instances.pop()
-        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
+
+        programNode = cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
+        programNode.dfunc = self.dfunc
+        programNode.cattrs = self.cattrs
+        programNode.dparents = self.dparents
+        return programNode
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
@@ -243,6 +283,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         
         self.current_type = self.context.get_type(node.id)
         
+        if node.parent:
+            self.dparents[node.id] = node.parent
+        else:
+            self.dparents[node.id] = 'Object'
+        self.cattrs[node.id] = 0
+
         # Your code here!!! (Handle all the .TYPE section)
         type_node = self.register_type(node.id)
 
@@ -272,6 +318,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             current_type = current_type.parent
             
         self.attrs = self.transform_to_keys(type_node, attributes)# type_node.attributes = attributes
+        self.cattrs[node.id] = len(attributes)
         type_node.methods = methods
         self.create_ctr(node, scope)
         
