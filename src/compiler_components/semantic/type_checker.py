@@ -149,7 +149,7 @@ class TypeChecker:
                 except SemanticError as e:
                     self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
         except SemanticError as e:
-            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
+            self.errors.append(f"({node.line},{node.column}) - AttributeError: dispatch undeclared method {node.f}")
 
     @visitor.when(CallNode)
     def visit(self, node:CallNode, scope:Scope):    
@@ -209,7 +209,7 @@ class TypeChecker:
                     at =  [ at[0] for at in self.current_type.all_attributes() if at[0].name == node.id]
                     var = at[0]
                 except:
-                    raise NameError(f"({node.line}, {node.column}) - NameError: Undeclared identifier {node.id}")
+                    raise SemanticError(f"({node.line}, {node.column}) - NameError: Undeclared identifier {node.id}")
 
             typex = self.current_type if isinstance(var.type , SELF_TYPE) else var.type
 
