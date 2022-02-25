@@ -28,42 +28,42 @@ class Parser:
 
     # region GRAMMAR RULES
 
-    def p_program(self, p):
+    def p_program(self, parse):
         '''
             program : class_list
         '''
-        p[0] = ProgramNode(p[1])
+        parse[0] = ProgramNode(parse[1])
 
-    def p_epsilon(self, p):
+    def p_epsilon(self, parse):
         '''
             epsilon :
         '''
         pass
 
-    def p_class_list(self, p):
+    def p_class_list(self, parse):
         '''
             class_list : def_class class_list 
                        | def_class
         '''
-        p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[2]
+        parse[0] = [parse[1]] if len(parse) == 2 else [parse[1]] + parse[2]
 
-    def p_class_list_error(self, p):
+    def p_class_list_error(self, parse):
         '''
             class_list : error class_list
         '''
-        p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[2]
+        parse[0] = [parse[1]] if len(parse) == 2 else [parse[1]] + parse[2]
 
-    def p_def_class(self, p):
+    def p_def_class(self, parse):
         '''
             def_class : CLASS TYPE OCUR feature_list CCUR SEMICOLON
                       | CLASS TYPE INHERITS TYPE OCUR feature_list CCUR SEMICOLON
         '''
-        if len(p) == 7:
-            p[0] = ClassDeclarationNode(p.slice[2], p[4])
+        if len(parse) == 7:
+            parse[0] = ClassDeclarationNode(parse.slice[2], parse[4])
         else:
-            p[0] = ClassDeclarationNode(p.slice[2], p[6], p.slice[4])
+            parse[0] = ClassDeclarationNode(parse.slice[2], parse[6], parse.slice[4])
 
-    def p_def_class_error(self, p):
+    def p_def_class_error(self, parse):
         '''
             def_class : CLASS error OCUR feature_list CCUR SEMICOLON 
                       | CLASS TYPE OCUR feature_list CCUR error   
@@ -72,33 +72,33 @@ class Parser:
                       | CLASS TYPE INHERITS error OCUR feature_list CCUR SEMICOLON
                       | CLASS TYPE INHERITS TYPE OCUR feature_list CCUR error
         '''
-        p[0] = ErrorNode()
+        parse[0] = ErrorNode()
 
-    def p_feature_list(self, p):
+    def p_feature_list(self, parse):
         '''
             feature_list : epsilon
                          | def_attr SEMICOLON feature_list
                          | def_func SEMICOLON feature_list
         '''
-        p[0] = [] if len(p) == 2 else [p[1]] + p[3]
+        parse[0] = [] if len(parse) == 2 else [parse[1]] + parse[3]
 
-    def p_feature_list_error(self, p):
+    def p_feature_list_error(self, parse):
         '''
             feature_list : error feature_list
         '''
-        p[0] = [p[1]] + p[2]
+        parse[0] = [parse[1]] + parse[2]
 
-    def p_def_attr(self, p):
+    def p_def_attr(self, parse):
         '''
             def_attr : ID COLON TYPE
                      | ID COLON TYPE LARROW expr
         '''
-        if len(p) == 4:
-            p[0] = AttrDeclarationNode(p.slice[1], p.slice[3])
+        if len(parse) == 4:
+            parse[0] = AttrDeclarationNode(parse.slice[1], parse.slice[3])
         else:
-            p[0] = AttrDeclarationNode(p.slice[1], p.slice[3], p[5])
+            parse[0] = AttrDeclarationNode(parse.slice[1], parse.slice[3], parse[5])
 
-    def p_def_attr_error(self, p):
+    def p_def_attr_error(self, parse):
         '''
             def_attr : error COLON TYPE
                      | ID COLON error
@@ -106,316 +106,316 @@ class Parser:
                      | ID COLON error LARROW expr
                      | ID COLON TYPE LARROW error
         '''
-        p[0] = ErrorNode()
+        parse[0] = ErrorNode()
 
-    def p_def_func(self, p):
+    def p_def_func(self, parse):
         '''
             def_func : ID OPAR formals CPAR COLON TYPE OCUR expr CCUR
         '''
-        p[0] = FuncDeclarationNode(p.slice[1], p[3], p.slice[6], p[8])
+        parse[0] = FuncDeclarationNode(parse.slice[1], parse[3], parse.slice[6], parse[8])
 
-    def p_def_func_error(self, p):
+    def p_def_func_error(self, parse):
         '''
             def_func : error OPAR formals CPAR COLON TYPE OCUR expr CCUR
                      | ID OPAR error CPAR COLON TYPE OCUR expr CCUR
                      | ID OPAR formals CPAR COLON error OCUR expr CCUR
                      | ID OPAR formals CPAR COLON TYPE OCUR error CCUR
         '''
-        p[0] = ErrorNode()
+        parse[0] = ErrorNode()
 
-    def p_formals(self, p):
+    def p_formals(self, parse):
         '''
             formals  : param_list
                      | param_list_empty
         '''
-        p[0] = p[1]
+        parse[0] = parse[1]
 
-    def p_param_list(self, p):
+    def p_param_list(self, parse):
         '''
             param_list : param
                        | param COMMA param_list
         '''
-        p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[3]
+        parse[0] = [parse[1]] if len(parse) == 2 else [parse[1]] + parse[3]
 
-    def p_param_list_empty(self, p):
+    def p_param_list_empty(self, parse):
         '''
             param_list_empty : epsilon
         '''
-        p[0] = []
+        parse[0] = []
 
-    def p_param(self, p):
+    def p_param(self, parse):
         '''
             param : ID COLON TYPE
         '''
-        p[0] = (p.slice[1], p.slice[3])
+        parse[0] = (parse.slice[1], parse.slice[3])
 
-    def p_let_list(self, p):
+    def p_let_list(self, parse):
         '''
             let_list : let_assign
                      | let_assign COMMA let_list
         '''
-        p[0] = [p[1]] if len(p) == 2 else [p[1]] + p[3]
+        parse[0] = [parse[1]] if len(parse) == 2 else [parse[1]] + parse[3]
 
-    def p_let_assign(self, p):
+    def p_let_assign(self, parse):
         '''
             let_assign : param LARROW expr
                        | param
         '''
-        if len(p) == 2:
-            p[0] = VarDeclarationNode(p[1][0], p[1][1])
+        if len(parse) == 2:
+            parse[0] = VarDeclarationNode(parse[1][0], parse[1][1])
         else:
-            p[0] = VarDeclarationNode(p[1][0], p[1][1], p[3])
+            parse[0] = VarDeclarationNode(parse[1][0], parse[1][1], parse[3])
 
-    def p_cases_list(self, p):
+    def p_cases_list(self, parse):
         '''
             cases_list : casep SEMICOLON
                        | casep SEMICOLON cases_list
         '''
-        p[0] = [p[1]] if len(p) == 3 else [p[1]] + p[3]
+        parse[0] = [parse[1]] if len(parse) == 3 else [parse[1]] + parse[3]
 
-    def p_cases_list_error(self, p):
+    def p_cases_list_error(self, parse):
         '''
             cases_list : error cases_list
                        | error SEMICOLON
         '''
-        p[0] = [ErrorNode()]
+        parse[0] = [ErrorNode()]
 
-    def p_case(self, p):
+    def p_case(self, parse):
         '''
             casep : ID COLON TYPE RARROW expr
         '''
-        p[0] = OptionNode(p.slice[1], p.slice[3], p[5])
+        parse[0] = OptionNode(parse.slice[1], parse.slice[3], parse[5])
 
-    def p_expr(self, p):
+    def p_expr(self, parse):
         '''
             expr : ID LARROW expr
                  | comp
         '''
-        if len(p) == 4:
-            p[0] = AssignNode(p.slice[1], p[3])
+        if len(parse) == 4:
+            parse[0] = AssignNode(parse.slice[1], parse[3])
         else:
-            p[0] = p[1]
+            parse[0] = parse[1]
 
-    def p_comp(self, p):
+    def p_comp(self, parse):
         '''
             comp : comp LESS op
                  | comp LESSEQ op
                  | comp EQUAL op
                  | op
         '''
-        if len(p) == 2:
-            p[0] = p[1]
-        elif p[2] == '<':
-            p[0] = LessNode(p[1], p[3])
-        elif p[2] == '<=':
-            p[0] = LessEqNode(p[1], p[3])
-        elif p[2] == '=':
-            p[0] = EqualNode(p[1], p[3])
+        if len(parse) == 2:
+            parse[0] = parse[1]
+        elif parse[2] == '<':
+            parse[0] = LessNode(parse[1], parse[3])
+        elif parse[2] == '<=':
+            parse[0] = LessEqNode(parse[1], parse[3])
+        elif parse[2] == '=':
+            parse[0] = EqualNode(parse[1], parse[3])
 
-    def p_op(self, p):
+    def p_op(self, parse):
         '''
             op : op PLUS term
                | op MINUS term
                | term
         '''
-        if len(p) == 2:
-            p[0] = p[1]
-        elif p[2] == '+':
-            p[0] = PlusNode(p[1], p[3])
-        elif p[2] == '-':
-            p[0] = MinusNode(p[1], p[3])
+        if len(parse) == 2:
+            parse[0] = parse[1]
+        elif parse[2] == '+':
+            parse[0] = PlusNode(parse[1], parse[3])
+        elif parse[2] == '-':
+            parse[0] = MinusNode(parse[1], parse[3])
  
-    def p_term(self, p):
+    def p_term(self, parse):
         '''
             term : term STAR base_call
                  | term DIV base_call
                  | base_call
         '''
-        if len(p) == 2:
-            p[0] = p[1]
-        elif p[2] == '*':
-            p[0] = StarNode(p[1], p[3])
-        elif p[2] == '/': 
-            p[0] = DivNode(p[1], p[3])
+        if len(parse) == 2:
+            parse[0] = parse[1]
+        elif parse[2] == '*':
+            parse[0] = StarNode(parse[1], parse[3])
+        elif parse[2] == '/': 
+            parse[0] = DivNode(parse[1], parse[3])
 
-    def p_term_error(self, p):
+    def p_term_error(self, parse):
         '''
             term : term STAR error
                  | term DIV error
         '''
-        p[0] = ErrorNode()
+        parse[0] = ErrorNode()
       
-    def p_base_call(self, p):
+    def p_base_call(self, parse):
         '''
             base_call : factor ARROBA TYPE DOT func_call
                       | factor
         '''
-        if len(p) == 2:
-            p[0] = p[1]
+        if len(parse) == 2:
+            parse[0] = parse[1]
         else:
-            p[0] = BaseCallNode(p[1], p.slice[3], *p[5])
+            parse[0] = BaseCallNode(parse[1], parse.slice[3], *parse[5])
 
-    def p_base_call_error(self, p):
+    def p_base_call_error(self, parse):
         '''
             base_call : error ARROBA TYPE DOT func_call
                       | factor ARROBA error DOT func_call
         '''
-        p[0] = ErrorNode()
+        parse[0] = ErrorNode()
 
-    def p_factor1(self, p):
+    def p_factor1(self, parse):
         '''
             factor : atom
                    | OPAR expr CPAR
         ''' 
-        p[0] = p[1] if len(p) == 2 else p[2]
+        parse[0] = parse[1] if len(parse) == 2 else parse[2]
         
-    def p_factor2(self, p):
+    def p_factor2(self, parse):
         '''
             factor : factor DOT func_call
                    | NOT expr
                    | func_call
         '''
-        if len(p) == 2:
-            p[0] = StaticCallNode(*p[1])
-        elif p[1] == 'not':
-            p[0] = NotNode(p[2], p.slice[1])
+        if len(parse) == 2:
+            parse[0] = StaticCallNode(*parse[1])
+        elif parse[1] == 'not':
+            parse[0] = NotNode(parse[2], parse.slice[1])
         else:
-            p[0] = CallNode(p[1], *p[3])
+            parse[0] = CallNode(parse[1], *parse[3])
 
-    def p_factor3(self, p):
+    def p_factor3(self, parse):
         '''
             factor : ISVOID base_call
                    | NOX base_call
         '''
-        if p[1] == 'isvoid':
-            p[0] = IsVoidNode(p[2], p.slice[1])
+        if parse[1] == 'isvoid':
+            parse[0] = IsVoidNode(parse[2], parse.slice[1])
         else:
-            p[0] = BinaryNotNode(p[2], p.slice[1])
+            parse[0] = BinaryNotNode(parse[2], parse.slice[1])
         
-    def p_expr_let(self, p):
+    def p_expr_let(self, parse):
         '''
             factor : LET let_list IN expr
         '''
-        p[0] = LetNode(p[2], p[4], p.slice[1])
+        parse[0] = LetNode(parse[2], parse[4], parse.slice[1])
 
-    def p_expr_case(self, p):
+    def p_expr_case(self, parse):
         '''
             factor : CASE expr OF cases_list ESAC
         '''
-        p[0] = CaseNode(p[2], p[4], p.slice[1])
+        parse[0] = CaseNode(parse[2], parse[4], parse.slice[1])
 
-    def p_expr_if(self, p):
+    def p_expr_if(self, parse):
         '''
             factor : IF expr THEN expr ELSE expr FI
         '''
-        p[0] = ConditionalNode(p[2], p[4], p[6], p.slice[1])
+        parse[0] = ConditionalNode(parse[2], parse[4], parse[6], parse.slice[1])
 
-    def p_expr_while(self, p):
+    def p_expr_while(self, parse):
         '''
             factor : WHILE expr LOOP expr POOL
         '''
-        p[0] = WhileNode(p[2], p[4], p.slice[1])
+        parse[0] = WhileNode(parse[2], parse[4], parse.slice[1])
 
-    def p_atom_num(self, p):
+    def p_atom_num(self, parse):
         '''
             atom : NUM
         '''
-        p[0] = ConstantNumNode(p.slice[1])
+        parse[0] = ConstantNumNode(parse.slice[1])
     
-    def p_atom_id(self, p):
+    def p_atom_id(self, parse):
         '''
             atom : ID
         '''
-        p[0] = VariableNode(p.slice[1])
+        parse[0] = VariableNode(parse.slice[1])
 
-    def p_atom_new(self, p):
+    def p_atom_new(self, parse):
         '''
             atom : NEW TYPE
         '''
-        p[0] = InstantiateNode(p.slice[2])
+        parse[0] = InstantiateNode(parse.slice[2])
 
-    def p_atom_block(self, p):
+    def p_atom_block(self, parse):
         '''
             atom : OCUR block CCUR
         '''
-        p[0] = BlockNode(p[2], p.slice[1])
+        parse[0] = BlockNode(parse[2], parse.slice[1])
 
-    def p_atom_block_error(self, p):
+    def p_atom_block_error(self, parse):
         '''
             atom : error block CCUR
                  | OCUR error CCUR
                  | OCUR block error
         '''
-        p[0] = ErrorNode()
+        parse[0] = ErrorNode()
 
-    def p_atom_boolean(self, p):
+    def p_atom_boolean(self, parse):
         '''
             atom : TRUE
                  | FALSE
         '''
-        p[0] = ConstantBoolNode(p.slice[1])
+        parse[0] = ConstantBoolNode(parse.slice[1])
 
-    def p_atom_string(self, p):
+    def p_atom_string(self, parse):
         '''
             atom : STRING
         '''
-        p[0] = ConstantStrNode(p.slice[1])
+        parse[0] = ConstantStrNode(parse.slice[1])
 
-    def p_block(self, p):
+    def p_block(self, parse):
         '''
             block : expr SEMICOLON
                   | expr SEMICOLON block
         '''
-        p[0] = [p[1]] if len(p) == 3 else [p[1]] + p[3]
+        parse[0] = [parse[1]] if len(parse) == 3 else [parse[1]] + parse[3]
 
-    def p_block_error(self, p):
+    def p_block_error(self, parse):
         '''
             block : error block
                   | error SEMICOLON
         '''
-        p[0] = [ErrorNode()]
+        parse[0] = [ErrorNode()]
 
-    def p_func_call(self, p):
+    def p_func_call(self, parse):
         '''
             func_call : ID OPAR args CPAR
         '''
-        p[0] = (p.slice[1], p[3])
+        parse[0] = (parse.slice[1], parse[3])
 
-    def p_func_call_error(self, p):
+    def p_func_call_error(self, parse):
         '''
             func_call : ID OPAR error CPAR
                       | error OPAR args CPAR
         '''
-        p[0] = (ErrorNode(), ErrorNode())
+        parse[0] = (ErrorNode(), ErrorNode())
 
-    def p_args(self, p):
+    def p_args(self, parse):
         '''
             args : arg_list
                  | arg_list_empty
         '''
-        p[0] = p[1]
+        parse[0] = parse[1]
 
-    def p_arg_list(self, p):
+    def p_arg_list(self, parse):
         '''
             arg_list : expr  
                      | expr COMMA arg_list
         '''
-        if len(p) == 2:
-            p[0] = [p[1]]
+        if len(parse) == 2:
+            parse[0] = [parse[1]]
         else:
-            p[0] = [p[1]] + p[3]
+            parse[0] = [parse[1]] + parse[3]
 
-    def p_arg_list_error(self, p):
+    def p_arg_list_error(self, parse):
         '''
             arg_list : error arg_list
         '''
-        p[0] = [ErrorNode()]
+        parse[0] = [ErrorNode()]
 
-    def p_arg_list_empty(self, p):
+    def p_arg_list_empty(self, parse):
         '''
             arg_list_empty : epsilon
         '''
-        p[0] = []
+        parse[0] = []
 
     def p_error(self, parse):
         if parse:
