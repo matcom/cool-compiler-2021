@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
-from cool.error.error_tracker import ErrorTracker
-from cool.error.errors import LexerCoolError
+from error.error_tracker import ErrorTracker
+from cool.errors.errors import LexerCoolError
 from cool.grammar import cool_grammar as cool_G
 import ply.lex as lex
 
@@ -241,7 +241,7 @@ class PlyLexer():
                 int(t.value)
             except ValueError:
                 msg = "Integer value too large %d", t.value
-                self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value, t.type, t.lineno, t.lexpos))) # TODO Set Token column
+                self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value, t.type, t.lineno, t.lexpos))) 
                 t.value = 'Invalid'
             return t
 
@@ -297,7 +297,7 @@ class PlyLexer():
 
         def t_error(t):
             msg = f'ERROR "{t.value[0]}"'
-            self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value[0], t.type, t.lineno, t.lexpos))) # TODO Set Token column
+            self.add_error(LexerCoolError(msg, token = PlyCoolToken(t.value[0], t.type, t.lineno, t.lexpos))) 
             t.lexer.skip(1)
 
         self.lexer = lex.lex()

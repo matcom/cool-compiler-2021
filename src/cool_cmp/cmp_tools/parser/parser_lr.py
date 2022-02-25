@@ -7,7 +7,7 @@ from cmp.utils import ContainerSet, DisjointNode, DisjointSet, Token
 from cmp_tools.parser.parser import Parser
 from cmp_tools.grammar.grammar_fixer import fix_non_derive_terminal
 from cmp_tools.utils.automaton import state_transpose
-from cool.error.errors import SyntacticCoolError, SYNTACTIC_ERROR
+from cool.errors.errors import SyntacticCoolError, SYNTACTIC_ERROR
 
 ######################  LR0 and SLR1  ###########################
 def get_state(visited,pending,item):

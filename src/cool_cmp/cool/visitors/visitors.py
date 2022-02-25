@@ -1,9 +1,9 @@
 import cmp.visitor as visitor
-from cool.ast.ast import *
-from cool.semantic.type import Type,ErrorType,StringType,IntType,IOType,BoolType,ObjectType,SelfType,VoidType,AutoType
-from cool.semantic.context import Context
+from cool.ast.cool_ast import *
+from semantic.type import Type,ErrorType,StringType,IntType,IOType,BoolType,ObjectType,SelfType,VoidType,AutoType
+from semantic.context import Context
 from cool.semantic.atomic import ClassInstance
-from cool.error.errors import *
+from cool.errors.errors import *
 import cool.visitors.utils as ut
 from cool.semantic.operations import Operator
 
@@ -363,6 +363,8 @@ class TypeCollector(object):
             if class_decl.id in self.context.special_types:
                 typex = self.context.get_type(class_decl.id)
                 typex.class_node = class_decl
+                if typex.name != "Object":
+                    typex.parent = self.context.get_type(class_decl.parent) if class_decl.parent is not None else None
                 self.add_semantic_error(SemanticError(REDEFINITION_BASIC_CLASS, class_decl.id), class_decl.row, class_decl.column)
             else:
                 try:
@@ -428,7 +430,7 @@ class TypeBuilder:
             self.add_semantic_error(er, node.row, node.column)
             return
         try:
-            node.type = self.context.get_type(node.type)
+            node.type = self.context.get_type(node.type, current_type = self.current_type)
         except SemanticError as er:
             er = TypeCoolError(ATTRIBUTE_TYPE_UNDEFINED, node.type, node.id)
             node.type = ErrorType()
@@ -446,7 +448,7 @@ class TypeBuilder:
                 er = SemanticError(PARAM_NAME_SELF)
                 self.add_semantic_error(er, x.row, x.column)
             try:
-                x.type = self.context.get_type(x.type)
+                x.type = self.context.get_type(x.type, current_type = self.current_type)
             except SemanticError as er:
                 er = TypeCoolError(UNDEFINED_PARAM_TYPE, x.type, x.id)
                 x.type = ErrorType()
@@ -455,7 +457,7 @@ class TypeBuilder:
                 er = SemanticError(METHOD_REPEATED_ARGS_NAME, x.id)
                 self.add_semantic_error(er, x.row, x.column)
         try:
-            node.type = self.context.get_type(node.type)
+            node.type = self.context.get_type(node.type, current_type = self.current_type)
         except SemanticError as er:
             er = TypeCoolError(UNDEFINED_RETURN_TYPE, node.type, node.id)
             node.type = ErrorType()
@@ -480,7 +482,7 @@ class TypeChecker:
         self.operator = Operator(context,errors)
 
     def complete_initial_types(self):
-        complete_types = ['Object','String','IO']
+        complete_types = ['Object','String','IO', 'Int', 'Bool']
         for cmp_type in complete_types:
             self.context.get_type(cmp_type).complete()
 
@@ -529,7 +531,13 @@ class TypeChecker:
                 node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
             else:
                 return # No default expr can be assing at this moment
-        self.visit(node.expr,scope)
+        
+        scope.define_variable(node.id,node.type)
+        
+        a_scope = scope.create_child()
+        self.visit(node.expr,a_scope)
+        
+        node.scope = a_scope
         
         if not node.expr.type.conforms_to(node.type,self.current_type):
             self.add_semantic_error(TypeCoolError(ATTRIBUTE_INCOMPATIBLE_TYPES, node.id, node.type.name, node.expr.type.name),node.expr.row,node.expr.column)
@@ -583,31 +591,26 @@ class TypeChecker:
             self.add_semantic_error(err, node.row, node.column)
         
         try:
-            node.type = self.context.get_type(node.type)
+            node.type = self.context.get_type(node.type, current_type = self.current_type)
         except SemanticError as er:
             if let_variable:
                 er = TypeCoolError(LET_BOUND_TYPE_NOT_DEFINED, node.type, node.id)
             node.type = ErrorType()
             self.add_semantic_error(er, node.row, node.column)
-        if not node.expr:
-            if node.type.name != "AUTO_TYPE":
-                node.expr = node.type.default
-                node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
-            else:
-                if scope.is_local(node.id):
-                    er = SemanticError(LOCAL_ALREADY_DEFINED, node.id, self.current_method.name)
-                    self.add_semantic_error(er, node.row, node.column)
-                else:
-                    scope.define_variable(node.id,node.type)
-                return # No default expr can be assing at this moment
+        if not node.expr and node.type.name != "AUTO_TYPE":
+            node.expr = node.type.default
+            node.expr.type = node.type # if type is void then is not assigned in the visit else the type is overridden
 
-        self.visit(node.expr,scope)
-        
         if scope.is_local(node.id):
             er = SemanticError(LOCAL_ALREADY_DEFINED, node.id, self.current_method.name)
             self.add_semantic_error(er, node.row, node.column)
         else:
             scope.define_variable(node.id,node.type)
+
+        if not node.expr and node.type.name == "AUTO_TYPE":
+            return # No default expr can be assing at this moment
+
+        self.visit(node.expr,scope)
         
         if not node.expr.type.conforms_to(node.type,self.current_type):
             er = TypeCoolError(INCOMPATIBLE_TYPES, node.expr.type.name, node.id, node.type.name)
@@ -692,6 +695,7 @@ class TypeChecker:
     @visitor.when(LetNode)
     def visit(self, node: LetNode, scope):
         let_scope = scope.create_child()
+        node.scope = let_scope
         curr_scope = let_scope
         for var_node in node.params:
             attr_scope = curr_scope.create_child()
@@ -717,7 +721,7 @@ class TypeChecker:
             self.add_semantic_error(er, node.row, node.column)
         
         try:
-            node.type = self.context.get_type(node.type)
+            node.type = self.context.get_type(node.type, current_type = self.current_type)
         except SemanticError:
             er = TypeCoolError(UNDEFINED_CLASS_CASE_BRANCH, node.type)
             self.add_semantic_error(er, node.row, node.column)
@@ -735,6 +739,8 @@ class TypeChecker:
     def visit(self, node:CaseNode, scope):
         self.visit(node.expr,scope)
         
+        node.scope = scope = scope.create_child()
+
         types = []
         param_types = []
         for i,param in enumerate(node.params):
@@ -824,7 +830,7 @@ class TypeChecker:
     @visitor.when(InstantiateNode)
     def visit(self, node, scope):
         try:
-            node.type = self.context.get_type(node.lex)
+            node.type = self.context.get_type(node.lex, current_type = self.current_type)
         except SemanticError as er:
             er = TypeCoolError(UNDEFINED_NEW_TYPE, node.lex)
             node.type = ErrorType()

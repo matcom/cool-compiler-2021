@@ -45,16 +45,12 @@ def get_file_name(path: str):
 
 def compare_errors(compiler_path: str, cool_file_path: str, error_file_path: str, cmp=first_error, timeout=100):
     try:
-        f = open("test_log.txt",mode="x")
-    except:
-        f = open("test_log.txt", mode="a")
-    try:
+        # sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
         sp = subprocess.run(['bash', compiler_path, cool_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
         return_code, output = sp.returncode, sp.stdout.decode()
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
-    f.write(cool_file_path + "\n")
-    f.write(output + "\n")
+
     assert return_code == 1, TEST_MUST_FAIL % get_file_name(cool_file_path)
 
     fd = open(error_file_path, 'r')
@@ -72,7 +68,8 @@ See the file README for a full copyright notice\.
 (?:Loaded: .+\n)*'''
 def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: str, output_file_path: str, timeout=100):
     try:
-        sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        # sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        sp = subprocess.run(['bash', compiler_path, cool_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
         assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
@@ -81,7 +78,8 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
 
     try:
         fd = open(input_file_path, 'rb')
-        sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), capture_output=True, timeout=timeout)
+        # sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), capture_output=True, timeout=timeout)
+        sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
         fd.close()
         mo = re.match(SPIM_HEADER, sp.stdout.decode())
         if mo:
@@ -94,3 +92,22 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
     fd.close()
 
     assert output == eoutput, UNEXPECTED_OUTPUT % (spim_file, repr(output), repr(eoutput))
+
+def compare_outputs_icil(main_path: str, cool_file_path: str, input_file_path: str, output_file_path, timeout=100):
+    out_file = cool_file_path + '.cil'
+    fd = open(input_file_path, 'rb')
+
+    try:
+        # sp = subprocess.run(['python3', compiler_path, cool_file_path, out_file, '-icil', '-c'], capture_output=True, timeout=timeout)
+        sp = subprocess.run(['python3', main_path, cool_file_path, out_file, '-icil', '-c'], input=fd.read(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
+        assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
+    except subprocess.TimeoutExpired:
+        assert False, COMPILER_TIMEOUT
+
+    output = sp.stdout.decode()
+
+    fd = open(output_file_path, 'r')
+    eoutput = fd.read()
+    fd.close()
+
+    assert output == eoutput, UNEXPECTED_OUTPUT % (cool_file_path, repr(output), repr(eoutput))

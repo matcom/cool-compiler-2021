@@ -1,6 +1,7 @@
-from cool.error.errors import SemanticError,RunError, NO_OPERATION_DEFINDED, MULTIPLE_OPERATION_DEFINED, ZERO_DIVISION
-from cool.ast.ast import * 
-from cool.semantic.type import *
+from error.errors import RunError
+from cool.errors.errors import SemanticError, NO_OPERATION_DEFINDED, MULTIPLE_OPERATION_DEFINED, ZERO_DIVISION
+from cool.ast.cool_ast import * 
+from semantic.type import *
 from cool.semantic.atomic import *
 
 class Operator:
@@ -162,6 +163,9 @@ class OperationDict:
     
     def __getitem__(self,key):
         operator,types = key
+        if operator == "=" and len(types) == 2: # Special Equal Restriction
+            if any(isinstance(types[0], x) for x in [BoolType, IntType, StringType] ) and types[0] != types[1]:
+                raise KeyError()
         try:
             return self.operations[key]
         except KeyError:

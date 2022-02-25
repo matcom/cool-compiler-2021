@@ -12,5 +12,4 @@ echo "Copyright (c) 2019: Luis Ernesto, Damián, Luis Enrique"
 # Llamar al compilador
 # echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
 
-python3 $PROGRAM $INPUT_FILE $OUTPUT_FILE
-exit $?
+python3 $PROGRAM $INPUT_FILE $OUTPUT_FILE -m
