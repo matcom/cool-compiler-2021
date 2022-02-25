@@ -5,6 +5,7 @@ import typer
 from coolpyler.errors import InvalidInputFileError
 from coolpyler.lexer import CoolLexer
 from coolpyler.parser import CoolParser
+from coolpyler.visitors.cil.debug import CILDebug
 from coolpyler.visitors.visitor import Visitor
 
 
@@ -17,7 +18,7 @@ def report_and_exit(errors):
     raise typer.Exit(code=1)
 
 
-def coolpyler(input: Path, output: Path = None):
+def coolpyler(input: Path, output: Path = None, debug: bool = False):
     errors = []
 
     if not input.is_file:
@@ -35,15 +36,25 @@ def coolpyler(input: Path, output: Path = None):
     ast = parser.parse(tokens)  # noqa: F841
 
     visitor = Visitor(errors)
-    mips = visitor.visit(ast)
 
-    print(mips)
+    ast = visitor.visit_up(ast)
 
     if len(errors) > 0:
         report_and_exit(errors)
 
     if output is None:
-        output = input.with_suffix(".mips")
+        cil_file = input.with_suffix(".cil")
+
+    with cil_file.open("w") as file:
+        CILDebug(file).visit(ast)
+
+    mips = visitor.visit_down(ast)
+
+    if output is None:
+        mips_file = input.with_suffix(".mips")
+
+    with mips_file.open("w") as file:
+        print(mips, file=file)
 
 
 if __name__ == "__main__":

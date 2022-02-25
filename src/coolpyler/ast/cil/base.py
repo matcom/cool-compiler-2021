@@ -154,6 +154,10 @@ class ReturnNode(InstructionNode):
     def __init__(self, value):
         self.value = value
 
+class ExitNode(InstructionNode):
+    def __init__(self, code) -> None:
+        self.code = code
+
 
 class LoadNode(InstructionNode):
     def __init__(self, dest, msg):

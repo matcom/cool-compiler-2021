@@ -1,9 +1,7 @@
-# TODO: find location for this file
-
 from __future__ import annotations
 
 import itertools as itt
-from typing import List, Optional
+from typing import List, Optional, OrderedDict
 
 import coolpyler.errors as errors
 
@@ -153,13 +151,19 @@ class Type:
         self.methods.append(method)
         return method
 
-    def all_attributes(self) -> List[Attribute]:
-        return (
-            [] if self.parent is None else self.parent.all_attributes()
-        ) + self.attributes
+    def all_attributes(self, clean=True):
+        plain = (
+            OrderedDict() if self.parent is None else self.parent.all_attributes(False)
+        )
+        for attr in self.attributes:
+            plain[attr.name] = (attr, self)
+        return plain.values() if clean else plain
 
-    def all_methods(self) -> List[Method]:
-        return ([] if self.parent is None else self.parent.all_methods()) + self.methods
+    def all_methods(self, clean=True):
+        plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
+        for method in self.methods:
+            plain[method.name] = (method, self)
+        return plain.values() if clean else plain
 
     def conforms_to(self, other: Type) -> bool:
         return (

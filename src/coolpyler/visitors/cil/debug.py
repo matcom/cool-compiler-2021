@@ -1,15 +1,18 @@
+import sys
+
 import coolpyler.ast.cil.base as cil
 import coolpyler.utils.visitor as visitor
 
 
 class CILDebug:
-    def __init__(self):
+    def __init__(self, file=sys.stdout):
         self.types_table = []
         self.location = dict()
+        self.file = file
 
     def print(self, indent_size, inline, *args, **kwargs):
-        print(" " * indent_size, end="")
-        return print(*args, **kwargs, end=("" if inline else "\n"))
+        print(" " * indent_size, file=self.file, end="")
+        return print(*args, **kwargs, file=self.file, end=("" if inline else "\n"))
 
     @visitor.on("node")
     def visit(self, node):
@@ -17,24 +20,20 @@ class CILDebug:
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node: cil.ProgramNode, indent=0, inline=False):
-        self.print(indent, inline, "=" * 10 + " CIL " + "="*10)
-
         self.print(indent, inline, ".types\n")
         for type in node.dottypes:
             self.visit(type, indent + 2)
-        print()
+        print(file=self.file)
 
         self.print(indent, inline, ".data\n")
         for type in node.dotdata:
             self.visit(type, indent + 2)
-        print()
+        print(file=self.file)
 
         self.print(indent, inline, ".code\n")
         for type in node.dotcode:
             self.visit(type, indent + 2)
-            print()
-
-        self.print(indent, inline, "=" * 10 + "=====" + "="*10)
+            print(file=self.file)
 
         return node
 
@@ -56,10 +55,10 @@ class CILDebug:
         self.print(indent, inline, f"function {node.name} {{")
         for param in node.params:
             self.visit(param, indent+2)
-        print()
+        print(file=self.file)
         for local in node.localvars:
             self.visit(local, indent+2)
-        print()
+        print(file=self.file)
         for inst in node.instructions:
             self.visit(inst, indent+2)
         self.print(indent, inline, "}")
