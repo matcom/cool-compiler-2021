@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_AboutAuthors(object):
     def setupUi(self, AboutAuthors):
         AboutAuthors.setObjectName("AboutAuthors")
-        AboutAuthors.resize(871, 709)
+        AboutAuthors.resize(871, 604)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("./uis/../../img/icons/python.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         AboutAuthors.setWindowIcon(icon)
@@ -52,15 +52,11 @@ class Ui_AboutAuthors(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:7pt;\"> </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">                   Juan Carlos Esquivel Lamis</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; color:#000000;\"> </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">                   Carlos Aryam Martínez Molina</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:7pt;\"> </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">                   Ariel Plasencia Díaz</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:6pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; color:#005500;\"> </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; font-weight:600; color:#000000;\">Emails :</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\"> j.lopez2@estudiantes.matcom.uh.cu</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; color:#000000;\"> </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">               j.esquivel@estudiantes.matcom.uh.cu</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; color:#000000;\"> </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">               c.molina@estudiantes.matcom.uh.cu</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; color:#000000;\"> </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">               a.plasencia@estudiantes.matcom.uh.cu</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:6pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; color:#005500;\"> </span></p>\n"
@@ -70,7 +66,7 @@ class Ui_AboutAuthors(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:6pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; color:#005500;\"> </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; font-weight:600; color:#000000;\">Course :</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\"> Complements of Compilation</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:6pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; color:#005500;\"> </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; font-weight:600; color:#000000;\">Date :</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">2021</span></p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; font-weight:600; color:#000000;\">Date :</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#005500;\"> </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:24pt; color:#000000;\">2022</span></p></body></html>"))
         self.label.setText(_translate("AboutAuthors", "<html><head/><body><p align=\"center\">About Authors</p></body></html>"))
 
 
