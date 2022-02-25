@@ -253,14 +253,19 @@ def p_atomCase(p):
     p[0] = CaseNode(p[2], p[4], line = line, column = column)
 
 def p_caseList(p):
-    '''case_list : ID DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON
-                 | ID DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON case_list
+    '''case_list : id_case DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON
+                 | id_case DOUBLE_DOT TYPE_ID RIGHT_ARROW expr SEMICOLON case_list
     '''
-    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
+    
     if len(p) == 7:
-        p[0] = [AttrDeclarationNode(p[1], p[3], p[5], line = line, column = column)]
+        p[0] = [AttrDeclarationNode(p[1]['value'], p[3], p[5], line = p[1]['line'], column = p[1]['column'])]
     else:
-        p[0] = [AttrDeclarationNode(p[1], p[3], p[5], line = line, column = column)] + p[7]
+        p[0] = [AttrDeclarationNode(p[1]['value'], p[3], p[5], line = p[1]['line'], column = p[1]['column'])] + p[7]
+
+def p_id_case(p):
+    'id_case : ID'
+    line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
+    p[0] ={'value':p[1], 'line':line, 'column':column}
 
 def p_atomIsVoid(p):
     'atom : ISVOID factor'

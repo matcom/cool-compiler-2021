@@ -90,7 +90,7 @@ class TypeChecker:
         for branches in node.list_case:
             tmpscope = scb.create_child()
             if branches.type in typesbr:
-                self.errors.append(f"({node.line},{node.column}) - SemanticError: Type in more than one branch")
+                self.errors.append(f"({branches.line},{branches.column}) - SemanticError: Type in more than one branch")
             typesbr.add(branches.type)
             try :
                 typex = self.context.get_type(branches.type,branches.expr.line)
