@@ -477,7 +477,8 @@ class CILGenerate:
         result_list = self.visit(node.item, scope)
         result_list[-1].set_value(op)
 
-        return result_list + [self.get_value(op, _type), astr_node(super_value, op)]
+        op_result = self.currentFunc.local_push(f'ref@_result', scope)
+        return result_list + [self.get_value(op, _type), astr_node(op_result, op)] + self.value_def(op_result, _type, scope)
 
     @visitor.when(AST.Complement)
     def visit(self, node: AST.Complement, scope: Scope):
