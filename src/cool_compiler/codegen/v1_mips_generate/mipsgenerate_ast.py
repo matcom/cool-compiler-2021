@@ -350,7 +350,7 @@ class Length:
     def __str__(self) -> str:
        return """ 
        
-    legnht:
+    String_length:
     li $t0 , 0
     lw $s2 , ($sp)
         loop:
