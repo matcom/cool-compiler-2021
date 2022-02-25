@@ -1,3 +1,4 @@
+from ast import arg
 from os import listdir
 import sys
 
@@ -8,14 +9,14 @@ from Cil import COOLToCIL
 from Mips import CILToMIPS, MIPSPrinter
 
 
-def main(file):
+def main(args):
 
     ###INPUT###
     try:
-        f_input = open(file, 'r')
+        f_input = open(args.file, 'r')
         code = f_input.read()
     except:
-        print(f"(0, 0) - CompilerError: file {file} not found")
+        print(f"(0, 0) - CompilerError: file {args.file} not found")
         exit(1)
 
 
@@ -94,7 +95,7 @@ def main(file):
 
 
     ###OUTPUT###
-    out_file = file.split(".")
+    out_file = args.file.split(".")
     out_file[-1] = "mips"
     out_file = ".".join(out_file)
 
@@ -107,5 +108,14 @@ def main(file):
 
 
 if __name__ == "__main__":
+
+    import argparse 
+
+    parser = argparse.ArgumentParser(description='CoolCompiler pipeline')
+    parser.add_argument('-f', '--file', type=str, default='code.cl', help='file to read')
+
+    args = parser.parse_args()
+    print(args)
+
     file = sys.argv[1]
-    main(file)
+    main(args)
