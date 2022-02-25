@@ -156,7 +156,7 @@ class CCILGenerator:
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
-            f"f_{self.times(node)}" if node.id != "main" else "main",
+            f"f_{self.times(node)}",
             params,
             self.dump_locals(),
             operations,
@@ -566,7 +566,7 @@ class CCILGenerator:
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
-        call = self.create_vcall(fval_id, node.type.id, node.id, node.caller_type, args)
+        call = self.create_vcall(fval_id, node.type.name, node.id, node.caller_type, args)
 
         return [*expr_ops, *error_ops, *args_ops, call]
 
@@ -925,7 +925,7 @@ class CCILGenerator:
             "execute_program", INT, "main", INT, [IdNode(program.id)]
         )
         return FunctionNode(
-            "entry", [], self.dump_locals(), [program, execute], execute.id
+            "main", [], self.dump_locals(), [program, execute], execute.id
         )
 
     def define_empty_init_func(self, class_name: str):
