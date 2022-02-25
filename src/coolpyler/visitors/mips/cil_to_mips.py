@@ -299,12 +299,21 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
         reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
 
         instance_dir = self.search_mem(node.instance)
-        instructions.append(mips.LoadWordNode(reg1, instance_dir * (node.attr + 1) * 4))
-
+        instructions.append(
+            mips.LoadWordNode(
+                reg1, mips.MemoryAddressRegisterNode(FP_REG, instance_dir)
+            )
+        )
+        instructions.append(
+            mips.LoadWordNode(reg2, mips.MemoryAddressLabelNode(reg1, node.attr * 4))
+        )
         dest_dir = self.search_mem(node.dest)
-        instructions.append(mips.StoreWordNode(reg1, dest_dir))
+        instructions.append(
+            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
 
         self.memory_manager.clean()
         return instructions
@@ -315,13 +324,22 @@ class CilToMIPS:
         self.memory_manager.save()
 
         reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
 
         source_dir = self.search_mem(node.source)
-        instructions.append(mips.LoadWordNode(reg1, source_dir))
-
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, source_dir))
+        )
         instance_dir = self.search_mem(node.instance)
         instructions.append(
-            mips.StoreWordNode(reg1, instance_dir * (node.attr + 1) * 4)
+            mips.LoadWordNode(
+                reg2, mips.MemoryAddressRegisterNode(FP_REG, instance_dir)
+            )
+        )
+        instructions.append(
+            mips.StoreWordNode(
+                reg1, mips.MemoryAddressRegisterNode(reg2, node.attr * 4)
+            )
         )
 
         self.memory_manager.clean()
@@ -348,20 +366,24 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
 
-        typ = self.types[node.type]
-        reserved_bytes = (len(typ.attributes) + 1) * 4
+        reserved_bytes = (len(node.type) + 1) * 4
 
         instructions.append(mips.LoadInmediateNode(V0_REG, 9))
         instructions.append(mips.LoadInmediateNode(ARG_REGISTERS[0], reserved_bytes))
         instructions.append(mips.SyscallNode())
 
         reg1 = self.memory_manager.get_unused_register()
-        instructions.append(mips.LoadInmediateNode(reg1, node.type))
-        instructions.append(
-            mips.StoreWordNode(
-                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS_NAMES[0], 0)
-            )
-        )
+
+        # type_dir = self.search_mem(node.type)
+        # instructions.append(
+        #     mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, type_dir))
+        # )
+        # instructions.append(
+        #     mips.StoreWordNode(
+        #         reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS_NAMES[0], 0)
+        #     )
+        # )
+        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 4))
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
@@ -376,18 +398,23 @@ class CilToMIPS:
     @visitor.when(cil.TypeOfNode)
     def visit(self, node: cil.TypeOfNode):
         self.memory_manager.save()
-        reg = self.memory_manager.get_unused_register()
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
 
         instructions = []
 
         obj_dir = self.search_mem(node.obj)
         instructions.append(
-            mips.LoadWordNode(reg, mips.MemoryAddressRegisterNode(FP_REG, obj_dir),)
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, obj_dir),)
+        )
+
+        instructions.append(
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(reg1, -4))
         )
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
-            mips.StoreWordNode(reg, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),)
+            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),)
         )
 
         self.memory_manager.clean()
