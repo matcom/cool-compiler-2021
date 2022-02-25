@@ -34,7 +34,7 @@ class Class:
     def __str__(self) -> str:
         attributes = "\n".join(str(a) for a in self.attributes)
         methods = "\n".join(str(m) for m in self.methods)
-        return f"\ttype {self.id} {{ {attributes} \n {methods} \n\t}}"
+        return f"\ttype {self.id} {{\n {attributes} \n {methods} \n\t}}"
 
 
 @dataclass(frozen=True)
@@ -52,17 +52,17 @@ class BaseVar:
 
 class Attribute(BaseVar):
     def __str__(self) -> str:
-        return "\t\tattr " + super().__str__()
+        return "attr " + super().__str__()
 
 
 class Parameter(BaseVar):
     def __str__(self) -> str:
-        return "\t\tparam " + super().__str__()
+        return "param " + super().__str__()
 
 
 class Local(BaseVar):
     def __str__(self) -> str:
-        return "\t\tlocal " + super().__str__()
+        return "local " + super().__str__()
 
 
 @dataclass(frozen=True)
@@ -119,11 +119,12 @@ class FunctionNode(Node):
         self.operations = operations
 
     def __str__(self) -> str:
-        params = "\n".join(str(p) for p in self.params)
-        locals = "\n".join(str(l) for l in self.locals)
-        ops = "\n".join(str(o) for o in self.operations)
+        indent = "\t\t"
+        params = "\n".join(indent + str(p) for p in self.params)
+        locals = "\n".join(indent + str(l) for l in self.locals)
+        ops = "\n".join(indent + str(o) for o in self.operations)
 
-        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n \t\treturn {self.ret.id}"
+        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n {indent}return {self.ret.id}"
 
 
 class OperationNode(Node):
@@ -149,7 +150,7 @@ class StorageNode(OperationNode):
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"\t\t{self.id} = {str(self.operation)}"
+        return f"{self.id} = {str(self.operation)}"
 
 
 class SetAttrOpNode(OperationNode):
@@ -160,6 +161,9 @@ class SetAttrOpNode(OperationNode):
         self.new_value = new_value
         self.attr = attr_id
         self.instance = instance_id
+
+    def __str__(self) -> str:
+        return f"set_attr {self.instance}({self.instance_type}) {self.attr} {self.new_value}"
 
 
 class Abort(OperationNode):
@@ -398,8 +402,8 @@ class FlowControlNode(OperationNode):
     Base class for all flow control operations like If, Label, goto, etc...
     """
 
-    def __init__(self, node) -> None:
-        super().__init__(node)
+    def __init__(self) -> None:
+        super().__init__()
 
 
 class CurrentTypeNameNode(ReturnOpNode):
