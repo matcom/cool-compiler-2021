@@ -42,6 +42,8 @@ from cmp.cil import (
     CopyNode,
     TypeNameNode,
     STRNode,
+    SetAttribNode,
+    GetAttribNode,
 )
 from cool_visitor import FormatVisitor
 
@@ -140,8 +142,27 @@ class CILBuilder:
         self.data.append(data_node)
         return data_node
 
+    def is_attribute(self, vname):
+        return vname not in [var.name for var in self.current_function.localvars]
+
     def build_constructor(self, node):
-        pass
+        attributeNodes = [
+            feat for feat in node.features if isinstance(feat, cool.AttrDeclarationNode)
+        ]
+
+        expr_list = []
+        # for attr in attributeNodes:  # Assign default value first
+        #     assign = cool.AssignNode(attr.id, cool.DefaultValueNode(attr.type))
+        #     expr_list.append(assign)
+
+        for attr in attributeNodes:  # Assign init_expr if not None
+            if attr.init_exp:
+                assign = cool.AssignNode(attr.id, attr.init_exp)
+                expr_list.append(assign)
+
+        body = cool.BlockNode(expr_list)
+        self.current_type.define_method("constructor", [], [], "Object")
+        return cool.FuncDeclarationNode("constructor", [], "Object", body)
 
     def add_builtin_functions(self):
         # Object
@@ -333,7 +354,7 @@ class CILBuilder:
 
         type_node = self.register_type(self.current_type.name)
 
-        self.build_constructor(node)
+        constructor = self.build_constructor(node)
 
         visited_func = []
         current_type = self.current_type
@@ -359,6 +380,7 @@ class CILBuilder:
         type_node.attributes.reverse()
         type_node.methods.reverse()
 
+        self.visit(constructor)
         for feature in node.features:
             self.visit(feature)
 
@@ -408,7 +430,11 @@ class CILBuilder:
     @visitor.when(cool.AssignNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        self.register_instruction(AssignNode(node.id, expr))
+
+        if self.is_attribute(node.id):
+            self.register_instruction(SetAttribNode("self", node.id, expr))
+        else:
+            self.register_instruction(AssignNode(node.id, expr))
 
     @visitor.when(cool.CallNode)
     def visit(self, node):

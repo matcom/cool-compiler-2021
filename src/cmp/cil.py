@@ -114,11 +114,17 @@ class IntComplementNode(UnaryNode):
 
 
 class GetAttribNode(InstructionNode):
-    pass
+    def __init__(self, dest, typex, attr):
+        self.dest = dest
+        self.type = typex
+        self.attr = attr
 
 
 class SetAttribNode(InstructionNode):
-    pass
+    def __init__(self, typex, attr, value):
+        self.type = typex
+        self.value = value
+        self.attr = attr
 
 
 class GetIndexNode(InstructionNode):
@@ -316,6 +322,14 @@ class PrintVisitor(object):
     @visitor.when(AllocateNode)
     def visit(self, node):
         return f"{node.dest} = ALLOCATE {node.type}"
+
+    @visitor.when(SetAttribNode)
+    def visit(self, node):
+        return f" SETATTR {node.type} {node.attr} {node.value}"
+
+    @visitor.when(GetAttribNode)
+    def visit(self, node):
+        return f" {node.dest} = GETATTR {node.type} {node.attr}"
 
     @visitor.when(TypeOfNode)
     def visit(self, node):
