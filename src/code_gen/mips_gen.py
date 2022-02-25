@@ -16,12 +16,14 @@ from asts.mips_ast import (
     LessOrEqual,
     LoadAddress,
     LoadImmediate,
+    LoadWord,
     MIPSProgram,
     MemoryIndexNode,
     Move,
     Multiply,
     Not,
     RegisterNode,
+    StoreWord,
     Sub,
     Subu,
     Syscall,
@@ -102,6 +104,14 @@ class MIPSGenerator:
     @visitor.when(Move)
     def visit(self, node: Move) -> str:
         return f"\tmove {self.visit(node.left)}, {self.visit(node.right)}"
+
+    @visitor.when(StoreWord)
+    def visit(self, node: StoreWord) -> str:
+        return f"\tsw {self.visit(node.left)}, {self.visit(node.right)}"
+
+    @visitor.when(LoadWord)
+    def visit(self, node: LoadWord) -> str:
+        return f"\tlw {self.visit(node.left)}, {self.visit(node.right)}"
 
     @visitor.when(Subu)
     def visit(self, node: Subu) -> str:
