@@ -151,7 +151,7 @@ class CILGenerate:
             self.new_type_func.expr[-1].set_value(default)
             self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], default))
         else: 
-            null = self.new_type_func.local_push('null')
+            null = self.new_type_func.local_push('null',scope)
             self.new_type_func.expr_push(ASTR.Load(null, '_______null_______'))
             self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], null))
         
