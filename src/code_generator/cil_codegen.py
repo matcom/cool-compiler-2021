@@ -116,10 +116,6 @@ class CILCodegen:
     def visit(self, node: CILReturnNode):
         return f'\tRETURN {node.var.lex};\n'
 
-    @visitor.when(CILPrint)
-    def visit(self, node: CILPrint):
-        return f'\tPRINT {node.var.lex};\n'
-
     @visitor.when(CILExpressionNode)
     def visit(self, node: CILExpressionNode):
         pass
@@ -148,18 +144,6 @@ class CILCodegen:
     def visit(self, node: CILLoadNode):
         return f'LOAD {node.var.lex}'
 
-    @visitor.when(CILLengthNode)
-    def visit(self, node: CILLengthNode):
-        return f'LENGTH {node.var.lex}'
-
-    @visitor.when(CILStringNode)
-    def visit(self, node: CILStringNode):
-        return f'STRING {node.var.id}'
-
-    @visitor.when(CILReadNode)
-    def visit(self, node: CILReadNode):
-        return 'READ'
-
     @visitor.when(CILAtomicNode)
     def visit(self, node: CILAtomicNode):
         return f'{node.lex}'
@@ -167,15 +151,15 @@ class CILCodegen:
     @visitor.when(CILNumberNode)
     def visit(self, node):
         return f'{node.lex}'
+    
     @visitor.when(CILTypeConstantNode)
     def visit(self, node):
         return f'{node.lex}'
+    
     @visitor.when(CILVariableNode)
     def visit(self, node):
         return f'{node.lex}'
-    @visitor.when(CILStringNode)
-    def visit(self, node):
-        return f'{node.lex}'
+    
     @visitor.when(CILPlusNode)
     def visit(self, node: CILPlusNode):
         l = self.visit(node.left)

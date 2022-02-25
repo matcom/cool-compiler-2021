@@ -1,6 +1,3 @@
-from attr import attributes
-
-
 class CILNode:
     pass
 
@@ -211,16 +208,6 @@ class CILReturnNode(CILInstructionNode):
         return text                      
 
 
-class CILPrint(CILInstructionNode):
-    def __init__(self, var):
-        self.var = var
-
-    def __str__(self):
-        text = "PrintNode:\n"
-        text += f"var: {self.var}\n"
-        return text
-
-
 # Expressions
 class CILExpressionNode(CILNode):
     pass
@@ -304,30 +291,6 @@ class CILLoadNode(CILExpressionNode):
         text = "LoadNode:\n"
         text += f"var: {self.var}\n"
         return text 
-
-
-class CILLengthNode(CILExpressionNode):
-    def __init__(self, var):
-        self.var = var
-
-    def __str__(self):
-        text = "LengthNode:\n"
-        text += f"var: {self.var}\n"
-        return text 
-
-
-class CILStringNode(CILExpressionNode):  
-    def __init__(self, var):
-        self.var = var
-                  
-    def __str__(self):
-        text = "StringNode:\n"
-        text += f"var: {self.var}\n"
-        return text 
-
-
-class CILReadNode(CILExpressionNode):
-    pass  
 
 
 class CILAtomicNode(CILExpressionNode):
