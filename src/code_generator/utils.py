@@ -130,7 +130,7 @@ class CILScope:
         
         if not isinstance(type.parent,ObjectType):
             instructions.append(CILArgNode(CILVariableNode(f'self')))
-            call = CILVCallNode(type.parent.name, f'init_{type.parent.name}')  
+            call = CILVCallNode(type.parent.name, f'init')  
             instructions.append(CILAssignNode(CILVariableNode('self'), call))   
                      
         for attr, (expr, type) in zip(attributes, expresions):

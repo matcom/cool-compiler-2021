@@ -324,6 +324,7 @@ class CIL:
     @visitor.when(StringNode)
     def visit(self, node):
         data = CILDataNode(f'str_{self.scope.str_count}', node.lex)
+        self.scope.str_count += 1
         self.scope.data.append(data)
         name = self.scope.add_new_local('String')
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILLoadNode(data.id)))
@@ -349,7 +350,10 @@ class CIL:
         if local is not None:
             return CILVariableNode(local.id)
         else:
-            return CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.lex))
+            if node.lex == 'self':
+                return CILVariableNode(f'self_{self.scope.current_class}')
+            else:
+                return CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.lex))
         
     @visitor.when(TrueNode)
     def visit(self, node):
