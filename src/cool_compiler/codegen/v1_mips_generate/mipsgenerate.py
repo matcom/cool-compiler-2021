@@ -13,8 +13,11 @@ class MipsGenerate:
             "IO_out_int":ASTR.Out_Int,
             "String_length":ASTR.Length,
             #"String_length":ASTR.Length,
-            "String_concat":1,
-            "String_substr":1,
+            "String_concat": ASTR.Concat,
+
+
+            "String_substr":ASTR.SubStr
+,
             "Object_copy": ASTR.Copy,
             "Object_type_name":ASTR.Type_Name,
             "Object_abort": ASTR.Abort,
