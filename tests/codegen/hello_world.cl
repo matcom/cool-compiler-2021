@@ -1,6 +1,6 @@
 class Main inherits IO {
    main(): IO {
-      out_int(12)
+      out_string("Hello world")
    };
 };
 
