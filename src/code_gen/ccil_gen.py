@@ -17,7 +17,6 @@ ZERO = "zero"
 EMPTY = "empty"
 
 # TODO:
-# See built in classes methods are correctly executed
 # See how typeof should work, a special kind of equality?
 # Define abort nodes with a text:
 # * Dispatch on a void class (Done)
@@ -31,8 +30,8 @@ EMPTY = "empty"
 
 
 # BOSS:
-# Test there are no runtimes errors
-# Test that results are obtained as expected
+# Test there are no runtimes errors during generation
+# Test that generation is correct
 
 
 # CCIL stands for Cool Cows Intermediate Language ;)
@@ -487,7 +486,8 @@ class CCILGenerator:
             fval_id = f"is_void_fv_{times}"
             if node.expr.type.name in {BOOL, INT, STRING}:
                 self.add_warning(
-                    "Warning: Redundant isVoid expression, alway evaluate to false"
+                    f"Warning: Redundant isVoid expression in {node.line}, {node.col}."
+                    " It will always evaluate to false"
                 )
                 op = IntNode("0")
             else:
@@ -766,9 +766,7 @@ class CCILGenerator:
             "substr_error", "RuntimeError: Index out of range exception"
         )
         error_var = self.create_string_load_data("substr_error_var", error_msg.id)
-        print_and_abort = self.notifiy_and_abort(
-            error_var.id
-        )
+        print_and_abort = self.notifiy_and_abort(error_var.id)
         substr = self.create_storage(
             "substr_var",
             STRING,
