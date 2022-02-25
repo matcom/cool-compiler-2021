@@ -91,14 +91,14 @@ states = (("STRING", "exclusive"), ("COMMENT", 'exclusive'),)
 
 # Integers are non-empty strings of digits 0-9.
 def t_INTEGER(t):
-    r'[0-9]+'
+    r"""[0-9]+"""
     t.value = int(t.value)
     return t
 
 
 # Booleans are true=True or false=False
 def t_BOOL(t):
-    r'[t][rR][uU][eE]|[f][aA][lL][sS][eE]'
+    r"""[t][rR][uU][eE]|[f][aA][lL][sS][eE]"""
     t.value = True if t.value.lower() == 'true' else False
     return t
 
@@ -106,7 +106,7 @@ def t_BOOL(t):
 # Type identifiers begin with a capital letter
 # Object identifiers begin with a lower case letter
 def t_TYPES(t):
-    r'[a-zA-Z][a-zA-Z0-9_]*'
+    r"""[a-zA-Z][a-zA-Z0-9_]*"""
     t.type = keywords.get(t.value.lower(), 'IDENTIFIER')
     if t.type == 'IDENTIFIER':
         if t.value[0].islower():
@@ -122,7 +122,7 @@ t_STRING_ignore = ''
 
 # A string start with " caracter
 def t_start_string(t):
-    r'\"'
+    r"""\\"""
     t.lexer.push_state("STRING")  # Changes the lexing state and saves old on stack
     t.lexer.string_backslash = False
     t.lexer.string_buffer = ""  # start string with no chart
@@ -135,7 +135,7 @@ def t_start_string(t):
 # "This is not
 # OK"
 def t_STRING_newline(t):
-    r'\n'
+    r"""\n"""
     if not t.lexer.string_backslash:  # FATAL ERROR
         col = find_column(input_text, t)
         errors.append('(%s, %s) - LexicographicError: STRING ERROR NON-ESCAPED NEWLINE CHARACTER' % (t.lexer.lineno, col))
@@ -147,7 +147,7 @@ def t_STRING_newline(t):
 
 # A string ends with " caracter
 def t_STRING_end(t):
-    r'\"'
+    r"""\\"""
     if t.lexer.string_backslash:
         t.lexer.string_buffer += '\"'
         t.lexer.string_backslash = False
@@ -159,7 +159,7 @@ def t_STRING_end(t):
 
 
 def t_STRING_null(t):
-    r"\0"
+    r"""\0"""
     col = find_column(input_text, t)
     errors.append('(%s, %s) - LexicographicError: STRING NULL ERROR' % (t.lexer.lineno, col))
     t.lexer.skip(1)
@@ -172,7 +172,7 @@ def t_STRING_null(t):
 # \\ backslash caracter
 # A string may not contain the null
 def t_STRING_something(t):
-    r'[^\n]'
+    r"""[^\n]"""
     if not t.lexer.string_backslash:  # if the previosur chat is not '\'
         if t.value == '\\':
             t.lexer.string_backslash = True  # backslash caracter
@@ -216,14 +216,14 @@ t_COMMENT_ignore = ''
 
 # COMMENT TYPE 1:  “--” and the next newline (or EOF, if there is no next newline)
 def t_COMMENT(t):
-    r'\-\-[^\n]*'
+    r"""\-\-[^\n]*"""
     t.value = t.value[2:]
     # return t
 
 
 # COMMENT TYPE 2:  enclosing text in (∗ . . . ∗)
 def t_start_comment(t):
-    r'\(\*'
+    r"""\(\*"""
     t.lexer.push_state("COMMENT")  # Changes the lexing state and saves old on stack
     t.lexer.comment_count = 0
     t.lexer.string_buffer = ""
@@ -231,19 +231,19 @@ def t_start_comment(t):
 
 # A comment start with " (* "
 def t_COMMENT_start(t):
-    r'\(\*'
+    r"""\(\*"""
     t.lexer.comment_count += 1
 
 
 # A comment can has as many lines as it wants.. until the end comment " *) "
 def t_COMMENT_newline(t):
-    r'\n+'
+    r"""\n+"""
     t.lexer.lineno += len(t.value)
 
 
 # A comment finish with " *) "
 def t_COMMENT_end(t):
-    r'\*\)'
+    r"""\*\)"""
     if t.lexer.comment_count == 0:
         t.lexer.pop_state()
         t.value = t.lexer.string_buffer
@@ -255,7 +255,7 @@ def t_COMMENT_end(t):
 
 # any caracter in a COMMENT
 def t_COMMENT_something(t):
-    r'[^\n]'
+    r"""[^\n]"""
     t.lexer.string_buffer += t.value
 
 
@@ -280,7 +280,7 @@ t_ignore = ' \t\r\f'
 
 # Define a rule so we can track line numbers
 def t_newline(t):
-    r'\n+'
+    r"""\n+"""
     t.lexer.lineno += len(t.value)
 
 
