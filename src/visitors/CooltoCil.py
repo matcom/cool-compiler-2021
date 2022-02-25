@@ -472,7 +472,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         error_label = self.define_internal_local()
         dest = self.define_internal_local()
-        if node.obj is not None: # dynamic
+        if node.obj is not None and node.obj.lex != 'self': # dynamic
             obj = self.visit(node.obj, scope)
             self.instances.append(obj)
             if isinstance(node.obj, InstantiateNode):
@@ -493,16 +493,34 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             
             obj_type = obj_type if node.parent == None else node.parent
             self.register_instruction(cil.DynamicCallNode(local, self.to_function_name(node.method, obj_type), dest))
+            self.instances.pop()
+            self.register_instruction(cil.LabelNode(error_label))
         else: # static
             self.register_instruction(cil.ArgNode(self.instances[-1]))
             for arg in node.args:
                 self.register_instruction(cil.ArgNode(self.visit(arg, scope)))
                 
-            self.register_instruction(cil.StaticCallNode(self.to_function_name(node.method, self.current_type.type.name), dest))
+            fname = self.get_function_name(self.current_type.name, node.method, self.dottypes[-1].methods, True)
+            self.register_instruction(cil.StaticCallNode(fname , dest))
         
-        self.register_instruction(cil.LabelNode(error_label))
-        self.instances.pop()
         return dest
+
+    def get_function_name(_, type_name, call_name, method_lists, static=True):
+        if static:
+            name = None
+            for method in method_lists:
+                (m, m_name) = method
+                if call_name == m:
+                    name = m_name
+            return name # returns always the last one found, wich should be the overriden one
+        else:
+            name = None
+            for method in method_lists:
+                (m, m_name) = method
+                if call_name == m:
+                    spl = m_name.split('_')
+                    if spl[-1] == type_name:
+                        return m_name
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
