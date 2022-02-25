@@ -1,7 +1,7 @@
 import utils.visitor as visitor
 from utils.semantic import Scope, BasicTypes
 from utils.semantic import SemanticError
-from ast_hierarchy import *
+from ast_cool_hierarchy import *
 
 
 WRONG_SIGNATURE = '(Line %s) Method "%s" already defined in "%s" with a different signature.'
@@ -102,7 +102,9 @@ class TypeChecker:
         if return_type.name == BasicTypes.SELF.value:
             return_type = self.current_type
         if not return_type.conforms_to(attr_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, return_type.name, attr_type.name))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (node.lineno, return_type.name, attr_type.name)
+            )
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope, set_type=None):
@@ -178,6 +180,7 @@ class TypeChecker:
         common_ancestor_type = self.context.find_first_common_ancestor(
             then_expr_type, else_expr_type
         )
+        node.computed_type = common_ancestor_type
         return common_ancestor_type
 
     @visitor.when(LoopNode)
@@ -190,6 +193,7 @@ class TypeChecker:
 
         self.visit(node.body, scope)
         obj_type = self.context.get_type(BasicTypes.OBJECT.value)
+        node.computed_type = obj_type
         return obj_type
 
     @visitor.when(BlockNode)
@@ -201,6 +205,7 @@ class TypeChecker:
         return_type = error_type
         for expr in node.expr_list:
             return_type = self.visit(expr, child_scope)
+        node.computed_type = return_type
         return return_type
 
     @visitor.when(LetNode)
@@ -233,7 +238,9 @@ class TypeChecker:
             if not expr_type.conforms_to(var_type):
                 self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, var_type.name))
             child_scope.define_variable(var, var_type)
-        return self.visit(node.body, child_scope)
+        return_type = self.visit(node.body, child_scope)
+        node.computed_type = return_type
+        return return_type
 
     @visitor.when(CaseNode)
     def visit(self, node, scope, set_type=None):
@@ -274,7 +281,7 @@ class TypeChecker:
             return_type = self.context.find_first_common_ancestor(
                 expr_type, return_type
             )
-
+        node.computed_type = return_type
         return return_type
 
     @visitor.when(AssignNode)
@@ -295,7 +302,10 @@ class TypeChecker:
             var_type = var.type
         expr_type = self.visit(node.expr, scope)
         if not expr_type.conforms_to(var_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, var_type.name))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, var_type.name)
+            )
+        node.computed_type = expr_type
         return expr_type
 
     @visitor.when(CallNode)
@@ -331,15 +341,17 @@ class TypeChecker:
                 method_param_type = method.param_types[i]
                 if not arg_type.conforms_to(method_param_type):
                     self.errors.append(
-                        INCOMPATIBLE_TYPES % (node.lineno, arg_type.name, method.param_types[i].name)
+                        INCOMPATIBLE_TYPES
+                        % (node.lineno, arg_type.name, method.param_types[i].name)
                     )
         return_type = method.return_type
 
         if return_type.name == BasicTypes.SELF.value:
             if self.current_type.conforms_to(obj_type):
-                return self.current_type
+                return_type = self.current_type
             else:
-                return obj_type
+                return_type = obj_type
+        node.computed_type = return_type
         return return_type
 
     @visitor.when(ArithBinaryNode)
@@ -349,7 +361,10 @@ class TypeChecker:
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
         if not left_type.conforms_to(int_type) or not right_type.conforms_to(int_type):
-            self.errors.append(INVALID_OPERATION % (node.lineno, left_type.name, right_type.name))
+            self.errors.append(
+                INVALID_OPERATION % (node.lineno, left_type.name, right_type.name)
+            )
+        node.computed_type = int_type
         return int_type
 
     @visitor.when(BooleanBinaryNode)
@@ -364,29 +379,41 @@ class TypeChecker:
                 left_type.name in {"Int", "String", "Bool"}
                 or right_type.name in {"Int", "String", "Bool"}
             ) and left_type != right_type:
-                self.errors.append(INVALID_OPERATION % (node.lineno, left_type.name, right_type.name))
+                self.errors.append(
+                    INVALID_OPERATION % (node.lineno, left_type.name, right_type.name)
+                )
+            node.computed_type = bool_type
             return bool_type
 
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
         if not left_type.conforms_to(int_type) or not right_type.conforms_to(int_type):
-            self.errors.append(INVALID_OPERATION % (node.lineno, left_type.name, right_type.name))
+            self.errors.append(
+                INVALID_OPERATION % (node.lineno, left_type.name, right_type.name)
+            )
+        node.computed_type = bool_type
         return bool_type
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope, set_type=None):
         # print('constant')
-        return self.context.get_type(BasicTypes.INT.value)
+        return_type = self.context.get_type(BasicTypes.INT.value)
+        node.computed_type = return_type
+        return return_type
 
     @visitor.when(StringNode)
     def visit(self, node, scope, set_type=None):
         # print('constant')
-        return self.context.get_type(BasicTypes.STRING.value)
+        return_type = self.context.get_type(BasicTypes.STRING.value)
+        node.computed_type = return_type
+        return return_type
 
     @visitor.when(BoolNode)
     def visit(self, node, scope, set_type=None):
         # print('bool')
-        return self.context.get_type(BasicTypes.BOOL.value)
+        return_type = self.context.get_type(BasicTypes.BOOL.value)
+        node.computed_type = return_type
+        return return_type
 
     @visitor.when(VariableNode)
     def visit(self, node, scope: Scope, set_type=None):
@@ -399,6 +426,7 @@ class TypeChecker:
             error_type = self.context.get_type(BasicTypes.ERROR.value)
             return error_type
         else:
+            node.computed_type = var.type
             return var.type
 
     @visitor.when(InstantiateNode)
@@ -413,6 +441,7 @@ class TypeChecker:
 
         if instance_type.name == BasicTypes.SELF.value:
             instance_type = self.current_type
+        node.computed_type = instance_type
         return instance_type
 
     @visitor.when(NotNode)
@@ -421,7 +450,11 @@ class TypeChecker:
         bool_type = self.context.get_type(BasicTypes.BOOL.value)
         expr_type = self.visit(node.expr, scope)
         if not expr_type.conforms_to(bool_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, BasicTypes.BOOL.value))
+            self.errors.append(
+                INCOMPATIBLE_TYPES
+                % (node.lineno, expr_type.name, BasicTypes.BOOL.value)
+            )
+        node.computed_type = bool_type
         return bool_type
 
     @visitor.when(IsVoidNode)
@@ -429,6 +462,7 @@ class TypeChecker:
         # print('is void')
         bool_type = self.context.get_type(BasicTypes.BOOL.value)
         self.visit(node.expr, scope)
+        node.computed_type = bool_type
         return bool_type
 
     @visitor.when(IntCompNode)
@@ -437,5 +471,8 @@ class TypeChecker:
         int_type = self.context.get_type(BasicTypes.INT.value)
         expr_type = self.visit(node.expr, scope, set_type)
         if not expr_type.conforms_to(int_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, int_type.name))
+            self.errors.append(
+                INCOMPATIBLE_TYPES % (node.lineno, expr_type.name, int_type.name)
+            )
+        node.computed_type = int_type
         return int_type

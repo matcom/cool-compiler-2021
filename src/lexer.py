@@ -159,7 +159,7 @@ def t_STRING_end(t):
 
 
 def t_STRING_null(t):
-    r'\0'
+    r"\0"
     col = find_column(input_text, t)
     errors.append('(%s, %s) - LexicographicError: STRING NULL ERROR' % (t.lexer.lineno, col))
     t.lexer.skip(1)
