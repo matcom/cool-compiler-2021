@@ -16,6 +16,16 @@ class TypeNode(Node):
         self.methods = []
 
 
+class InstructionNode(Node):
+    pass
+
+
+class TypeNameNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+
 class DataNode(Node):
     def __init__(self, vname, value):
         self.name = vname
@@ -39,10 +49,6 @@ class ParamNode(Node):
 class LocalNode(Node):
     def __init__(self, name):
         self.name = name
-
-
-class InstructionNode(Node):
-    pass
 
 
 class AssignNode(InstructionNode):
@@ -105,17 +111,19 @@ class ComplementNode(InstructionNode):
 
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, dest, obj, attr):
+    def __init__(self, dest, obj, attr, computed_type):
         self.dest = dest
         self.obj = obj
         self.attr = attr
+        self.computed_type = computed_type
 
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, obj, attr, value):
+    def __init__(self, obj, attr, value, computed_type):
         self.obj = obj
         self.attr = attr
         self.value = value
+        self.computed_type = computed_type
 
 
 class GetIndexNode(InstructionNode):
@@ -170,6 +178,12 @@ class StaticCallNode(InstructionNode):
         self.dest = dest
 
 
+class CopyNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+
 class DynamicCallNode(InstructionNode):
     def __init__(self, xtype, method, dest):
         self.type = xtype
@@ -194,11 +208,17 @@ class LoadNode(InstructionNode):
 
 
 class LengthNode(InstructionNode):
-    pass
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
 
 
 class ConcatNode(InstructionNode):
-    pass
+    def __init__(self, dest, prefix, suffix, length):
+        self.dest = dest
+        self.prefix = prefix
+        self.suffix = suffix
+        self.length = length
 
 
 class PrefixNode(InstructionNode):
@@ -206,7 +226,11 @@ class PrefixNode(InstructionNode):
 
 
 class SubstringNode(InstructionNode):
-    pass
+    def __init__(self, dest, str_value, index, length):
+        self.dest = dest
+        self.str_value = str_value
+        self.index = index
+        self.length = length
 
 
 class ToStrNode(InstructionNode):
@@ -220,9 +244,29 @@ class ReadNode(InstructionNode):
         self.dest = dest
 
 
+class ReadStrNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
+
+class ReadIntNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
+
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+
+class PrintStrNode(InstructionNode):
+    def __init__(self, value):
+        self.value = value
+
+
+class PrintIntNode(InstructionNode):
+    def __init__(self, value):
+        self.value = value
 
 
 class ErrorNode(InstructionNode):

@@ -292,7 +292,7 @@ class Context:
 
 
 class VariableInfo:
-    def __init__(self, name, vtype, idx):
+    def __init__(self, name, vtype, idx=None):
         self.name = name
         self.type = vtype
         self.idx = idx
