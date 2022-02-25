@@ -36,7 +36,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabCode">
        <attribute name="title">
@@ -61,8 +61,8 @@
        <widget class="QPlainTextEdit" name="textLexer">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>10</y>
+          <x>9</x>
+          <y>9</y>
           <width>1261</width>
           <height>591</height>
          </rect>

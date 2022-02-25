@@ -45,7 +45,7 @@ class Ui_COOLCompiler(object):
         self.tabLexer = QtWidgets.QWidget()
         self.tabLexer.setObjectName("tabLexer")
         self.textLexer = QtWidgets.QPlainTextEdit(self.tabLexer)
-        self.textLexer.setGeometry(QtCore.QRect(10, 10, 1261, 591))
+        self.textLexer.setGeometry(QtCore.QRect(9, 9, 1261, 591))
         font = QtGui.QFont()
         font.setPointSize(18)
         self.textLexer.setFont(font)
@@ -282,7 +282,7 @@ class Ui_COOLCompiler(object):
         self.menubar.addAction(self.menuOptions.menuAction())
 
         self.retranslateUi(COOLCompiler)
-        self.tabCOOLMenu.setCurrentIndex(0)
+        self.tabCOOLMenu.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(COOLCompiler)
 
     def retranslateUi(self, COOLCompiler):
