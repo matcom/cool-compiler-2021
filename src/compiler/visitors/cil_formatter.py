@@ -22,6 +22,14 @@ class PrintCILVisitor(object):
 
         return f"type {node.name} {{\n\t{attributes}\n\n\t{methods}\n}}"
 
+    @visitor.when(CopyNode)
+    def visit(self, node):
+        return f"{node.dest} = COPY {node.source}"
+
+    @visitor.when(DataNode)
+    def visit(self, node):
+        return f"{node.name} = {node.value}"
+
     @visitor.when(FunctionNode)
     def visit(self, node):
         params = "\n\t".join(self.visit(x) for x in node.params)
@@ -33,6 +41,10 @@ class PrintCILVisitor(object):
     @visitor.when(ParamNode)
     def visit(self, node):
         return f"PARAM {node.name}"
+
+    @visitor.when(LoadNode)
+    def visit(self, node):
+        return f"{node.dest} = Load {node.msg}"
 
     @visitor.when(LocalNode)
     def visit(self, node):
@@ -145,3 +157,35 @@ class PrintCILVisitor(object):
     @visitor.when(PrintNode)
     def visit(self, node):
         return f"PRINT {node.value}"
+
+    @visitor.when(ExitNode)
+    def visit(self, node):
+        return f"EXIT"
+
+    @visitor.when(LoadNode)
+    def visit(self, node):
+        return f"{node.dest} = Load {node.msg}"
+
+    @visitor.when(TypeNameNode)
+    def visit(self, node):
+        return f"{node.dest} = TYPENAME {node.source}"
+
+    @visitor.when(ReadStrNode)
+    def visit(self, node):
+        return f"{node.dest} = READSTR"
+
+    @visitor.when(ReadIntNode)
+    def visit(self, node):
+        return f"{node.dest} = READINT"
+
+    @visitor.when(PrintStrNode)
+    def visit(self, node):
+        return f"PRINT {node.value}"
+
+    @visitor.when(PrintIntNode)
+    def visit(self, node):
+        return f"PRINT {node.value}"
+
+    @visitor.when(ErrorNode)
+    def visit(self, node):
+        return f"ERROR {node.data_node}"

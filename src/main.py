@@ -1,5 +1,6 @@
 # import streamlit as st
 
+from black import err
 from compiler.cmp.grammar import G
 
 # from compiler.lexer.lexer import tokenize_text, pprint_tokens
@@ -10,10 +11,12 @@ from compiler.cmp.tools import LR1Parser
 from compiler.cmp.evaluation import evaluate_reverse_parse
 from compiler.visitors.formatter import FormatVisitor
 
-# from compiler.visitors.type_collector import TypeCollector
-# from compiler.visitors.type_builder import TypeBuilder
-# from compiler.visitors.type_checker import TypeChecker
-# from compiler.visitors.type_inferencer import TypeInferencer
+from compiler.visitors.type_collector import TypeCollector
+from compiler.visitors.type_builder import TypeBuilder
+from compiler.visitors.type_checker import TypeChecker
+from compiler.visitors.type_inferencer import TypeInferencer
+from compiler.visitors.cool2cil import COOLToCILVisitor
+from compiler.visitors.cil_formatter import PrintCILVisitor
 
 
 def main(args):
@@ -39,38 +42,57 @@ def main(args):
         print(error)
         exit(1)
 
-    # AST
     parse, operations = parseResult
     ast = evaluate_reverse_parse(parse, operations, tokens)
-    # formatter = FormatVisitor()
-    # tree = formatter.visit(ast)
-    # print(tree)
-    # print('============== COLLECTING TYPES ===============')
-    # errors = []
-    # collector = TypeCollector(errors)
-    # collector.visit(ast)
-    # context = collector.context
-    # print('Errors:', errors)
-    # print('Context:')
-    # print(context)
-    # print('=============== BUILDING TYPES ================')
-    # builder = TypeBuilder(context, errors)
-    # builder.visit(ast)
-    # manager = builder.manager
-    # print('Errors: [')
-    # for error in errors:
-    #     print('\t', error)
-    # print(']')
-    # print('Context:')import argparse
-    # print('Errors: [')
-    # for error in errors:
-    #     print('\t', error)
-    # print(']')
-    # formatter = FormatVisitor()
-    # tree = formatter.visit(ast)
-    # print(tree)
 
-    # return ast
+    # Collecting types
+    collector = TypeCollector()
+    collector.visit(ast)
+    context = collector.context
+    for (e, pos) in collector.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if collector.errors:
+        exit(1)
+
+    # Building types
+    builder = TypeBuilder(context)
+    builder.visit(ast)
+    manager = builder.manager
+    for (e, pos) in builder.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if builder.errors:
+        exit(1)
+
+    # Type checking
+    checker = TypeChecker(context, manager)
+    scope = checker.visit(ast)
+    for (e, pos) in checker.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if checker.errors:
+        exit(1)
+
+    # # Inferencing Autotype
+    # inferencer = TypeInferencer(context, manager)
+    # inferencer.visit(ast, scope)
+    # for e in inferencer.errors:
+    #     print(f"{pos} - {type(e).__name__}: {str(e)}")
+    # if inferencer.errors:
+    #     exit(1)
+
+    # # Last check without autotypes
+    # checker = TypeChecker(context, manager)
+    # checker.visit(ast)
+    # for (e, pos) in checker.errors:
+    #     print(f"{pos} - {type(e).__name__}: {str(e)}")
+    # if checker.errors:
+    #     exit(1)
+
+    # mips to cil
+    cil_visitor = COOLToCILVisitor(context)
+    cil_ast = cil_visitor.visit(ast, scope)
+
+    cil_formatter = PrintCILVisitor()
+    print(cil_formatter.visit(cil_ast))
 
 
 text = """
