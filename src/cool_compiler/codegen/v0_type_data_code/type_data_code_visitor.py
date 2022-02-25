@@ -53,6 +53,8 @@ class CILGenerate:
     def visit(self, node: AST.Program, scope: Scope = None):
         self.program = ASTR.Program()
         self.program.try_add_data('_______error______', 'runtime error')
+        self.program.try_add_data('_______null_______', 'null')
+
         scope = Scope()
 
         _dictt = CoolTypeBuildInManager().dictt
@@ -142,7 +144,14 @@ class CILGenerate:
             exp_list.append(ASTR.Comment(f"Assignando el resultado de la expression al atributo {node.name} de la clase {self.currentType.name}"))
             self.new_type_func.expr += exp_list
             self.currentFunc = save_current_func
-
+        elif node.type in [CoolInt, CoolBool]:
+            default = self.new_type_func.local_push('default_prop', self.new_class_scope)
+            self.new_type_func.expr_push(ASTR.Assign(default, 0))
+            self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], default))
+        else: 
+            null = self.new_type_func.local_push('null')
+            self.new_type_func.expr_push(ASTR.Load(null, '_______null_______'))
+            self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], null))
 
     @visitor.when(AST.FuncDef)
     def visit(self, node: AST.FuncDef, scope: Scope):
@@ -431,7 +440,7 @@ class CILGenerate:
         if node.static_type == CoolStr: 
             return self.binary_op('str_eq', node, ASTR.CmpStr, scope)
         
-        return self.binary_op('req_eq', node, ASTR.CmpRef, scope)
+        return self.binary_op('req_eq', node, ASTR.CmpInt, scope)
     
     @visitor.when(AST.New)
     def visit(self, node: AST.New, scope: Scope):
@@ -464,11 +473,10 @@ class CILGenerate:
         unary_list = self.visit(node.item, scope)
         unary_list[-1].set_value(op_1)
 
-        self.program.try_add_data('NULL', 'null')
         return (
-            [ASTR.Load(null, "NULL")] 
+            [ASTR.Load(null, "_______null_______")] 
             + unary_list
-            + [ASTR.CmpRef(super_value, null, op_1)]
+            + [ASTR.CmpInt(super_value, null, op_1)]
         )
     
     @visitor.when(AST.Id)

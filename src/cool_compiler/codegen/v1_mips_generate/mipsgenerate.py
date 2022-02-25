@@ -179,6 +179,7 @@ class MipsGenerate:
             ASTR.SW('$s0', f'{stack_plus}($sp)' ),
             ASTR.Comment(f'Save el resultado de la funcion que esta en $s0 pa la pila'),
         ]
+   
     @visitor.when(AST.SimpleCall)
     def visit(self, node: AST.SimpleCall):
         if not node.x in self.func_list: self.func_list.append(node.x)
@@ -276,6 +277,10 @@ class MipsGenerate:
                  ASTR.Comment(f"Pon en la posicion {stack_plus_dest} el valor de $t3")
         ]
 
+    @visitor.when(AST.CmpStr)
+    def visit(self, node: AST.CmpStr):
+        pass
+
     @visitor.when(AST.Assign)
     def visit(self,node:AST.Assign):
         memory_dest = node.x
@@ -318,7 +323,11 @@ class MipsGenerate:
 
                 ]                   
 
-    @ visitor.when(AST.Sum)
+    @visitor.when(AST.Complemnet)
+    def visit(self, node: AST.Complemnet):
+        pass
+
+    @visitor.when(AST.Sum)
     def visit(self,node:AST.Sum):
         memory_dest=node.x
         memory_op1=node.y
@@ -338,7 +347,7 @@ class MipsGenerate:
                 ASTR.Comment(f"poner en la posicion {stack_plus_memory_dest} el resultado ")
                 ]
 
-    @ visitor.when(AST.Rest)
+    @visitor.when(AST.Rest)
     def visit(self,node:AST.Rest):
         memory_dest=node.x
         memory_op1=node.y
@@ -358,6 +367,22 @@ class MipsGenerate:
                 ASTR.Comment(f"poner en {stack_plus_memory_dest} el resultado de la suma "),
 
                 ]
+
+    @visitor.when(AST.Mult)
+    def visit(self, node: AST.Mult):
+        pass
+
+    @visitor.when(AST.Div)
+    def visit(self, node: AST.Div):
+        pass
+
+    @visitor.when(AST.Less)
+    def visit(self, node: AST.Less):
+        pass
+
+    @visitor.when(AST.LessOrEqual)
+    def visit(self, node: AST.LessOrEqual):
+        pass
 
     @ visitor.when(AST.IfGoTo)
     def visit(self,node:AST.IfGoTo):
