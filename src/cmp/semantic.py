@@ -263,9 +263,11 @@ class Context:
 
 
 class VariableInfo:
-    def __init__(self, name, vtype):
+    def __init__(self, name, vtype=None, is_attr=False):
         self.name = name
         self.type = vtype
+        self.is_attr = is_attr
+        self.offset = None
 
 
 class Scope:

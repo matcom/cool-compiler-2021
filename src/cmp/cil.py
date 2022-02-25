@@ -13,10 +13,10 @@ class ProgramNode(Node):
 
 
 class TypeNode(Node):
-    def __init__(self, name):
+    def __init__(self, name, attributes=[], methods=[]):
         self.name = name
-        self.attributes = []
-        self.methods = []
+        self.attributes = attributes
+        self.methods = methods
 
 
 class DataNode(Node):
@@ -31,6 +31,12 @@ class FunctionNode(Node):
         self.params = params
         self.localvars = localvars
         self.instructions = instructions
+
+    # def __str__(self):
+    #     print("NAME:", self.name)
+    #     # print("PARAMS:", self.params)
+    #     # print("LOCALS:", self.localvars)
+    #     print("INSTRUCTIONS", self.instructions)
 
 
 class ParamNode(Node):
@@ -184,11 +190,16 @@ class LoadNode(InstructionNode):
 
 
 class LengthNode(InstructionNode):
-    pass
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
 
 
 class ConcatNode(InstructionNode):
-    pass
+    def __init__(self, dest, left, right):
+        self.dest = dest
+        self.left = left
+        self.right = right
 
 
 class PrefixNode(InstructionNode):
@@ -196,7 +207,11 @@ class PrefixNode(InstructionNode):
 
 
 class SubstringNode(InstructionNode):
-    pass
+    def __init__(self, dest, source, idx, length):
+        self.dest = dest
+        self.source = source
+        self.id = idx
+        self.length = length
 
 
 class ToStrNode(InstructionNode):
@@ -210,9 +225,32 @@ class ReadNode(InstructionNode):
         self.dest = dest
 
 
+class RuntimeErrorNode(InstructionNode):
+    def __init__(self, signal):
+        self.signal = signal
+
+
+class CopyNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+
+class STRNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+
+class TypeNameNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
 
 
 class PrintVisitor(object):
@@ -242,6 +280,10 @@ class PrintVisitor(object):
         instructions = "\n\t".join(self.visit(x) for x in node.instructions)
 
         return f"function {node.name} {{\n\t{params}\n\n\t{localvars}\n\n\t{instructions}\n}}"
+
+    @visitor.when(DataNode)
+    def visit(self, node):
+        return f'{node.name} = "{node.value}"'
 
     @visitor.when(ParamNode)
     def visit(self, node):
@@ -294,6 +336,42 @@ class PrintVisitor(object):
     @visitor.when(ReturnNode)
     def visit(self, node):
         return f'RETURN {node.value if node.value is not None else ""}'
+
+    @visitor.when(RuntimeErrorNode)
+    def visit(self, node):
+        return f"ABORT {node.signal}"
+
+    @visitor.when(CopyNode)
+    def visit(self, node):
+        return f"{node.dest} = COPY {node.source}"
+
+    @visitor.when(TypeNameNode)
+    def visit(self, node):
+        return f"{node.dest} = TYPE_NAME {node.source}"
+
+    @visitor.when(ToStrNode)
+    def visit(self, node):
+        return f"{node.dest} = STR {node.ivalue}"
+
+    @visitor.when(ReadNode)
+    def visit(self, node):
+        return f"{node.dest} = READ"
+
+    @visitor.when(PrintNode)
+    def visit(self, node):
+        return f"PRINT {node.str_addr}"
+
+    @visitor.when(LengthNode)
+    def visit(self, node):
+        return f"{node.dest} = LENGTH {node.source}"
+
+    @visitor.when(ConcatNode)
+    def visit(self, node):
+        return f"{node.dest} = CONCAT {node.left} {node.right}"
+
+    @visitor.when(SubstringNode)
+    def visit(self, node):
+        return f"{node.dest} = SUBSTRING {node.source} {node.id} {node.length}"
 
 
 # printer = PrintVisitor()
