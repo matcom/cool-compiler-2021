@@ -137,7 +137,7 @@ class CILGenerate:
             except AttributeError:
                 save_current_func = None
             self.currentFunc = self.new_type_func
-            attr_name = self.new_type_func.local_push(node.name, self.new_class_scope)
+            attr_name = self.new_type_func.local_push(f'value_to_set_{node.name}', self.new_class_scope)
             exp_list = self.visit(node.expr, self.new_class_scope)
             exp_list[-1].set_value(attr_name)
             exp_list.append(ASTR.SetAttr('self', self.currentType.attr[node.name], attr_name))
@@ -494,9 +494,9 @@ class CILGenerate:
 
     @visitor.when(AST.Bool)
     def visit(self, node: AST.Bool, scope: Scope) -> ASTR.Node:
-        if node.item == 'True': value = 1
+        if node.item == 'true': value = 1
         else: value = 0
-        return [ASTR.Assign(super_value, value)]
+        return [ ASTR.Comment(f"Boolean value next {node.item}"),ASTR.Assign(super_value, value)]
 
     @visitor.when(AST.Str)
     def visit(self, node: AST.Str, scope: Scope):
