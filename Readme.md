@@ -123,7 +123,7 @@ Verá la indicación **Some checks haven't completed yet**.
 
 ![](img/img8.png)
 
-Es posible que tenga que actualizar los cambios que se hayan hecho en el repositorio original, por ejemplo, si se han agregado nuevos tests. En este caso obtendrá el siguiente mensaje:
+Es posible que tenga que actualizar los cambios que se hayan hecho en el repositorio original, por ejemplo, si se han agregado nuevos tests. En este caso obtendrá el siguiente mensaje: 
 
 > **This branch is out-of-date with base branch**
 
