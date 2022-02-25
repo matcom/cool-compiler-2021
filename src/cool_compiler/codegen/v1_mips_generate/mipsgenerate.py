@@ -15,7 +15,7 @@ class MipsGenerate:
             "String_concat":1,
             "String_substr":1,
             "Object_copy":1,
-            "Object_type_name":1,
+            "Object_type_name":ASTR.Type_Name,
             "Object_abort":1
         }
 

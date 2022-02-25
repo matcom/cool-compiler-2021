@@ -503,6 +503,7 @@ class CILGenerate:
             ASTR.ALLOCATE(string_instance, 'String'),
             ASTR.SetAttr(string_instance, 'String@value', string_value),
             ASTR.Comment(f"Setear la propiedad value al string en la variable {string_value}"),
+            ASTR.Load(string_type, 'String'),
             ASTR.SetAttr(string_instance, 'type_name', string_type),
             ASTR.Comment(f"Setear la propiedad type_name al string en la variable {string_value}"),
             ASTR.Assign(super_value, string_instance),

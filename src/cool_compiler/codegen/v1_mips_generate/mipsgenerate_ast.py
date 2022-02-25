@@ -429,8 +429,23 @@ class Abort:
 class Type_Name:
     def __str__(self) -> str:
        return """
-       El nombre del tipo de método devuelve un
-cadena con el nombre de la clase del objeto
-"""
+IO_out_string:
+lw $t0 0($sp)   #Guarda en $t0 la direccion del self
+lw $t1 0($t0)   #La primera posicion de self es la propiedad type_name 
+lw $t2 0($t1)   #La propiedad type_name apunta a la definicion del tipo
+la $t3 0($t2)   #La definicion de tipo tiene en la primera poscion su nombre 
+#Allocate a una class String puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo string
+la $t4, String
+sw $t4, 0($v0)   # Asigna el tipo String al string
+sw $t3, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
+
+addi $sp, $sp, 4
+move $s0, $v0
+jr $ra"""
 
 
