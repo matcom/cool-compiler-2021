@@ -13,11 +13,17 @@ class CCILProgram:
     code_section: List[FunctionNode]
     data_section: List[str]  # no idea what will be this the node,
 
-    def __str__(self) -> str:
+    def __str__(self, all=False) -> str:
+        types_section = self.types_section
+        code_section = self.code_section
+        if not all:
+            types_section = self.types_section[3:]
+            code_section = self.code_section[10:]
+
         ident = "\t"
-        types = "\n".join(ident + str(type) for type in self.types_section)
+        types = "\n".join(ident + str(type) for type in types_section)
         data = "\n".join(ident + str(data) for data in self.data_section)
-        code = "\n".join(str(func) for func in self.code_section)
+        code = "\n".join(str(func) for func in code_section)
         return f"TYPES:\n{types}\nDATA:\n{data}\nCODE:\n{code} "
 
 
@@ -32,14 +38,12 @@ class Class:
     methods: List[Method]
     init_operations: FunctionNode
 
-    def __str__(self) -> str:
+    def __str__(self, all=True) -> str:
         ident = "\t\t"
         attributes = "\n".join(ident + str(a) for a in self.attributes)
         methods = "\n".join(ident + str(m) for m in self.methods)
-        init_function = str(self.init_operations)
-        return (
-            f"type {self.id} {{\n {attributes} \n {methods} \n \n {init_function}\n\t}}"
-        )
+        init_function = "\n" + str(self.init_operations) + "\n" if all else ""
+        return f"type {self.id} {{\n {attributes} \n {methods} \n  {init_function}\t}}"
 
 
 @dataclass(frozen=True)
