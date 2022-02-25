@@ -89,7 +89,7 @@ class CCILGenerator:
         init_func = FunctionNode(
             f"init_{node.id}",
             [],
-            to_vars(self.locals, Parameter),
+            to_vars(self.locals, Local),
             init_attr_ops,
             node.id,
         )
@@ -117,7 +117,7 @@ class CCILGenerator:
 
         if node.expr is None:
             self.add_local(fval_id, node.type.name)
-            return []
+            return ([], None)
 
         (expr_op, expr_fval) = self.visit(node.expr)
 
@@ -146,7 +146,7 @@ class CCILGenerator:
         return FunctionNode(
             f"f_{times}",
             params,
-            to_vars(self.locals, Parameter),
+            to_vars(self.locals, Local),
             operations,
             fval_id,
         )
@@ -160,7 +160,7 @@ class CCILGenerator:
         for expr in node.expr_list:
             (expr_ops, expr_fval) = self.visit(expr)
             operations += expr_ops
-            fvalues += expr_fval
+            fvalues.append(expr_fval)
 
         block_val = fvalues[-1]
         fval_id = f"block_{times}"
@@ -214,9 +214,7 @@ class CCILGenerator:
 
         if is_attr:
             # Assignation occurring to an attribute Go update the attribute
-            set_attr = SetAttrOpNode(
-                node, "self", ccil_id, extract_id(node, expr_fval), SELFTYPE
-            )
+            set_attr = SetAttrOpNode("self", ccil_id, extract_id(expr_fval), SELFTYPE)
             return [*expr_ops, set_attr], expr_fval
 
         self.update_locals(expr_fval.id, ccil_id)
@@ -233,8 +231,11 @@ class CCILGenerator:
 
         # translating condition to ccil
         label_id = f"ifElse_{times}"
-        else_label = LabelNode(node, label_id)
-        if_false = IfFalseNode(node, if_fval, else_label)
+        else_label = LabelNode(label_id)
+        if_false = IfFalseNode(extract_id(if_fval), else_label)
+
+        endif_label = LabelNode("endIf")
+        goto_endif = GoToNode(endif_label)
 
         # Setting the final operation which will simbolize the return value of this expr
         pre_fvalue_id = f"if_{times}_pre_fv"
@@ -246,7 +247,16 @@ class CCILGenerator:
         fvalue = self.create_assignation(fvalue_id, node.type.name, pre_fvalue_id)
 
         return (
-            [*if_ops, if_false, *then_ops, else_label, *else_ops, fvalue],
+            [
+                *if_ops,
+                if_false,
+                *then_ops,
+                goto_endif,
+                else_label,
+                *else_ops,
+                endif_label,
+                fvalue,
+            ],
             fvalue,
         )
 
@@ -259,15 +269,15 @@ class CCILGenerator:
 
         # Storing the type of the resulting case expression
         type_of = self.create_type_of(
-            f"case_{times}_typeOf", extract_id(node, case_expr_fv)
+            f"case_{times}_typeOf", extract_id( case_expr_fv)
         )
 
         # Final label where all branch must jump to
         final_label_id = f"case_{times}_end"
-        final_label = LabelNode(node, final_label_id)
+        final_label = LabelNode( final_label_id)
 
         # Inconditional jump to final label
-        final_goto = GoToNode(node, final_label)
+        final_goto = GoToNode( final_label)
 
         # All branch must end in a var named like this
         pre_fvalue_id = f"case_{times}_pre_fv"
@@ -283,7 +293,7 @@ class CCILGenerator:
             # Initializing var which holds the branch var type
             branch_var_type_id = f"case_{times}_optionTypeOf_{i}"
             branch_var_type_of = self.create_type_of(
-                branch_var_type_id, extract_id(node, branch_var)
+                branch_var_type_id, extract_id( branch_var)
             )
 
             # Initializng var which holds the comparison result between
@@ -291,16 +301,16 @@ class CCILGenerator:
             select_branch_id = f"case_{times}_optionSelect_{i}"
             select_branch = self.create_equality(
                 select_branch_id,
-                extract_id(node, type_of),
-                extract_id(node, branch_var_type_of),
+                extract_id( type_of),
+                extract_id( branch_var_type_of),
             )
 
             # Label that means the start of this branch logic
             branch_label_id = f"case_{times}_branch_{i}"
-            branch_label = LabelNode(option, branch_label_id)
+            branch_label = LabelNode( branch_label_id)
 
             # Conditional jump to the right branch label
-            if_op = IfNode(option, extract_id(option, branch_var_type_of), branch_label)
+            if_op = IfNode( extract_id( branch_var_type_of), branch_label)
             # Storing logic to jump to branch logic if this branch is selected
             pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
 
@@ -357,12 +367,12 @@ class CCILGenerator:
         (left_ops, left_fval) = self.visit(node.left)
         (right_ops, right_fval) = self.visit(node.right)
 
-        left_id = extract_id(node, left_fval)
-        right_id = extract_id(node, right_fval)
+        left_id = extract_id(left_fval)
+        right_id = extract_id(right_fval)
 
         fval_id: str
         op: BinaryOpNode
-        match node:
+        match type(node):
             # Arithmetic Binary Nodes
             case sem_ast.PlusNode:
                 op = SumOpNode(left_id, right_id)
@@ -387,9 +397,11 @@ class CCILGenerator:
                 op = LessOrEqualOpNode(left_id, right_id)
                 fval_id = f"leq_{times}"
             case _:
-                raise Exception("Pattern match failure visiting binary expression")
+                raise Exception(
+                    f"Pattern match failure visiting binary expression with {type(node).__name__}"
+                )
 
-        fval = self.create_storage(fval_id, node.type.id, op)
+        fval = self.create_storage(fval_id, node.type.name, op)
         return ([*left_ops, *right_ops, fval], fval)
 
     @visitor.when(sem_ast.UnaryNode)
@@ -397,24 +409,24 @@ class CCILGenerator:
         times = self.times(node)
 
         (expr_op, expr_fval) = self.visit(node.expr)
-        expr_id = extract_id(node.expr, expr_fval)
+        expr_id = extract_id(expr_fval)
 
         fval_id: str
         op: UnaryOpNode
-        match node:
+        match type(node):
             case sem_ast.IsVoidNode:
                 fval_id = f"isVoid_{times}"
-                op = IsVoidOpNode(node, expr_id)
+                op = IsVoidOpNode(expr_id)
             case sem_ast.NotNode:
                 fval_id = f"not_{times}"
-                op = NotOpNode(node, expr_id)
+                op = NotOpNode(expr_id)
             case sem_ast.ComplementNode:
                 fval_id = f"neg_{times}"
-                op = NegOpNode(node, expr_id)
+                op = NegOpNode(expr_id)
             case _:
                 raise Exception("Pattern match failure while visiting unary expression")
 
-        fval = self.create_storage(fval_id, node.type.id, op)
+        fval = self.create_storage(fval_id, node.type.name, op)
         return [*expr_op, fval], fval
 
     @visitor.when(sem_ast.MethodCallNode)

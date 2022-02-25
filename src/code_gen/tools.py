@@ -41,7 +41,9 @@ class Scope:
             return (self.names[key], self.parent is None)
         except KeyError:
             return (
-                self.parent.search_for(key) if self.parent is not None else (None, None)
+                self.parent.search_value_position(key)
+                if self.parent is not None
+                else (None, None)
             )
 
     def get_value_position(self, key: str) -> Tuple[str, bool]:
