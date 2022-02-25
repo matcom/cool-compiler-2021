@@ -40,7 +40,7 @@ class CILCodegen:
 
     @visitor.when(CILDataNode)
     def visit(self, node: CILDataNode):
-        code = f'{node.id.lex} = \"{text}\";'
+        return f'{node.id} = {node.text};'
 
     @visitor.when(CILFuncNode)
     def visit(self, node: CILFuncNode):
