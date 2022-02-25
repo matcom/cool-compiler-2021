@@ -301,10 +301,21 @@ class In_String:
     def __str__(self) -> str:
        return """
 IO_in_string:
+
 li $v0, 8
 li $a1 , 10000
 syscall
-move $t6 $v0
+move $t6 ,$v0
+
+ li $v0 ,4
+ move $a0,$t6
+    syscall
+
+    li $v0,10
+    syscall
+
+
+move $s0 , $v0
 
 #Allocate a una class String puntero en sp + 12
 #atributo type_name en puntero + 0
@@ -316,7 +327,7 @@ la $t4, String
 sw $t4, 0($v0)   # Asigna el tipo String al string
 sw $t6, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
-move $s0 , $v0
+
 addi $sp, $sp, 4
 jr $ra
 """
@@ -374,28 +385,27 @@ class Length:
        
     String_length:
 
-    li $v0,1
-    li $a0,4
-    syscall
-
-    li $v0,10
-    syscall
-
     lw $t4 , ($sp)   #self
     li $t0 , 0       #contador
     lw $s2 , 4($t4)  # propiedad value
 
+    
         loop:
         lb $s0 , ($s2)
+        li $v0,4
+   
         beq $s0 , $zero, END
         add $t0 , $t0 ,1
-        add $s2,$s2,4
+        add $s2,$s2,1
         j loop
     
 
     END:
         move $s0 , $t0
         addi $sp, $sp, 4
+
+
+    
         jr $ra
         """        
 

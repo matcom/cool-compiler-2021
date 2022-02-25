@@ -1,18 +1,27 @@
 .data
+_______error______: .asciiz "Abort called from class "
+_______null_______: .asciiz "null"
 Bool_parents: .word 1, 2, 0, 
-Bool: .word Bool_parents, Object_abort, Object_copy, Object_type_name, 
+Bool_Name: .asciiz "Bool"
+Bool: .word Bool_Name, 2, Bool_parents, Object_abort, Object_copy, Object_type_name, 
 Int_parents: .word 1, 3, 0, 
-Int: .word Int_parents, Object_abort, Object_copy, Object_type_name, 
+Int_Name: .asciiz "Int"
+Int: .word Int_Name, 2, Int_parents, Object_abort, Object_copy, Object_type_name, 
 String_parents: .word 1, 4, 0, 
-String: .word String_parents, Object_abort, Object_copy, Object_type_name, String_concat, String_length, String_substr, 
+String_Name: .asciiz "String"
+String: .word String_Name, 2, String_parents, Object_abort, Object_copy, Object_type_name, String_concat, String_length, String_substr, 
 SELF_TYPE_parents: .word 1, 5, 0, 
-SELF_TYPE: .word SELF_TYPE_parents, Object_abort, Object_copy, Object_type_name, 
+SELF_TYPE_Name: .asciiz "SELF_TYPE"
+SELF_TYPE: .word SELF_TYPE_Name, 1, SELF_TYPE_parents, Object_abort, Object_copy, Object_type_name, 
 Object_parents: .word 1, 0, 
-Object: .word Object_parents, Object_abort, Object_copy, Object_type_name, 
+Object_Name: .asciiz "Object"
+Object: .word Object_Name, 1, Object_parents, Object_abort, Object_copy, Object_type_name, 
 IO_parents: .word 1, 6, 0, 
-IO: .word IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
+IO_Name: .asciiz "IO"
+IO: .word IO_Name, 1, IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
 Main_parents: .word 1, 6, 7, 0, 
-Main: .word Main_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Main_pal, Main_main, 
+Main_Name: .asciiz "Main"
+Main: .word Main_Name, 2, Main_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Main_pal, Main_main, 
 string_0: .asciiz "enter a string\n"
 string_1: .asciiz "that was not a palindrome\n"
 string_2: .asciiz "that was a palindrome\n"
@@ -20,335 +29,979 @@ string_2: .asciiz "that was a palindrome\n"
 .text
 .globl main
 main:
-addi $sp, $sp, -4          #Push local var self stackpointer 16
-addi $sp, $sp, -4          #Push local var instance stackpointer 12
-addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 8
+addi $sp, $sp, -4          #Push local var self stackpointer 8
 addi $sp, $sp, -4          #Push local var @result stackpointer 4
 addi $sp, $sp, -4          #Push local var $ra stackpointer 0
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
-#Allocate a una class Main puntero en sp + 12
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion main
+#Allocate a una class Main puntero en sp + 8
 #atributo type_name en puntero + 0
 #atributo i en puntero + 4
 li $a0, 8
 li $v0, 9
 syscall
-sw $v0, 12($sp)          #Reservando memoria para una instancia de tipo Main
-lw $t0, 12($sp)          #Lee de la pila instance en 12 para assignar
-sw $t0, 16($sp)          #Escribe en la pila el valor que se le asigno a self
-la $t0, Main
-sw $t0, 8($sp)          #Cargando el nombre del tipo desde el data
-lw $t0, 12($sp)          #Buscando en la pila la variable instance y guarda la direccion a la que apunta
-lw $t1, 8($sp)          #Buscando el valor que se va a guardar en la propiedad
-sw $t1, 0($t0)          #Seteando el valor en la direccion de la memoria del objeto          #Assignando el nombre del tipo en el campo type
-lw $t0, 12($sp)          #Saca de la pila instance
+sw $v0, 8($sp)          #Guardando en la pila el pintero de la instancia de la clase Main
+lw $t0, 8($sp)          #Saca de la pila self
 addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance
+sw $t0, 0($sp)          #Mete para la pila self
+jal new_ctr_Main          #Call a la function new_ctr_Main
+lw $t0, 8($sp)          #Saca de la pila self
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila self
 jal Main_main          #Call a la function Main_main
 sw $s0, 4($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
 li $v0, 10
 syscall
 
+new_ctr_Main:
+#Parametro self en stackpoiner + 20
+addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 16
+addi $sp, $sp, -4          #Push local var default_prop@0 stackpointer 12
+addi $sp, $sp, -4          #Push local var type_INT@0 stackpointer 8
+addi $sp, $sp, -4          #Push local var INT_instance@0 stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
+lw $t0, 20($sp)          #Saca de la pila self
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila self
+jal new_ctr_IO          #Call a la function new_ctr_IO
+la $t0, Main
+sw $t0, 16($sp)          #Cargando el nombre del tipo desde el data
+lw $t0, 20($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
+lw $t1, 16($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_name@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Assignando el nombre del tipo en el campo type
+li $t0, 0          #Guarda el numbero que se va a asignar
+sw $t0, 12($sp)          #Escribe en la pila el numero que se le asigno a default_prop@0
+#Allocate a una class Int puntero en sp + 4
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 4($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 4($sp)          #Buscando en la pila la variable INT_instance@0 y guarda la direccion a la que apunta
+lw $t1, 12($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor default_prop@0 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable default_prop@0
+la $t0, Int
+sw $t0, 8($sp)
+lw $t0, 4($sp)          #Buscando en la pila la variable INT_instance@0 y guarda la direccion a la que apunta
+lw $t1, 8($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable default_prop@0
+lw $t0, 4($sp)          #Lee de la pila INT_instance@0 en 4 para assignar
+sw $t0, 12($sp)          #Escribe en la pila el valor que se le asigno a default_prop@0
+lw $t0, 20($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
+lw $t1, 12($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor default_prop@0 en la direccion de la memoria del la propiedad i del objeto de typo Main
+lw $s0, 20($sp)          #Envia el resultado de la funcion en $s0
+lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 24          #Limpia la pila
+jr $ra
+
 Main_main:
-#Parametro self en stackpoiner + 48
-addi $sp, $sp, -4          #Push local var step@block@0 stackpointer 44
-addi $sp, $sp, -4          #Push local var compl@_unary@0 stackpointer 40
-addi $sp, $sp, -4          #Push local var result@assing@i@0 stackpointer 36
-addi $sp, $sp, -4          #Push local var step@block@1 stackpointer 32
-addi $sp, $sp, -4          #Push local var param_0_to_out_string@0 stackpointer 28
-addi $sp, $sp, -4          #Push local var cond@if_else@0 stackpointer 24
-addi $sp, $sp, -4          #Push local var param_0_to_pal@0 stackpointer 20
-addi $sp, $sp, -4          #Push local var result@if@0 stackpointer 16
-addi $sp, $sp, -4          #Push local var param_0_to_out_string@1 stackpointer 12
+#Parametro self en stackpoiner + 96
+addi $sp, $sp, -4          #Push local var step@block@0 stackpointer 92
+addi $sp, $sp, -4          #Push local var compl@_unary@0 stackpointer 88
+addi $sp, $sp, -4          #Push local var value_int@0 stackpointer 84
+addi $sp, $sp, -4          #Push local var type_INT@0 stackpointer 80
+addi $sp, $sp, -4          #Push local var INT_instance@0 stackpointer 76
+addi $sp, $sp, -4          #Push local var result@assing@i@0 stackpointer 72
+addi $sp, $sp, -4          #Push local var step@block@1 stackpointer 68
+addi $sp, $sp, -4          #Push local var value_string@0 stackpointer 64
+addi $sp, $sp, -4          #Push local var type_STRING@0 stackpointer 60
+addi $sp, $sp, -4          #Push local var STRING_instance@0 stackpointer 56
+addi $sp, $sp, -4          #Push local var param_0_to_out_string@0 stackpointer 52
+addi $sp, $sp, -4          #Push local var cond@if_else@0 stackpointer 48
+addi $sp, $sp, -4          #Push local var param_0_to_pal@0 stackpointer 44
+addi $sp, $sp, -4          #Push local var result@if@0 stackpointer 40
+addi $sp, $sp, -4          #Push local var value_string@1 stackpointer 36
+addi $sp, $sp, -4          #Push local var type_STRING@1 stackpointer 32
+addi $sp, $sp, -4          #Push local var STRING_instance@1 stackpointer 28
+addi $sp, $sp, -4          #Push local var param_0_to_out_string@1 stackpointer 24
+addi $sp, $sp, -4          #Push local var value_string@2 stackpointer 20
+addi $sp, $sp, -4          #Push local var type_STRING@2 stackpointer 16
+addi $sp, $sp, -4          #Push local var STRING_instance@2 stackpointer 12
 addi $sp, $sp, -4          #Push local var param_0_to_out_string@2 stackpointer 8
 addi $sp, $sp, -4          #Push local var @result stackpointer 4
 addi $sp, $sp, -4          #Push local var $ra stackpointer 0
 sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main          #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block
 li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 40($sp)          #Escribe en la pila el numero que se le asigno a compl@_unary@0          #Fin de la expresion lista para ser asignada
-lw $t0, 48($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
-lw $t1, 36($sp)          #Buscando el valor que se va a guardar en la propiedad
-sw $t1, 4($t0)          #Seteando el valor en la direccion de la memoria del objeto
-lw $t0, 48($sp)          #Buscando la instancia de la clase Main en la pila
+sw $t0, 84($sp)          #Escribe en la pila el numero que se le asigno a value_int@0          #Int value 1
+#Allocate a una class Int puntero en sp + 76
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 76($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 76($sp)          #Buscando en la pila la variable INT_instance@0 y guarda la direccion a la que apunta
+lw $t1, 84($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@0 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@0
+la $t0, Int
+sw $t0, 80($sp)
+lw $t0, 76($sp)          #Buscando en la pila la variable INT_instance@0 y guarda la direccion a la que apunta
+lw $t1, 80($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@0
+lw $t0, 76($sp)          #Lee de la pila INT_instance@0 en 76 para assignar
+sw $t0, 88($sp)          #Escribe en la pila el valor que se le asigno a compl@_unary@0
+lw $t0, 88($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 88($sp)          #Salvando el valor de la propiedad value en la pila en el valor local compl@_unary@0
+li $t0, 4294967295
+lw $t1, 88($sp)
+xor $s0, $t0, $t1
+add $s0, $s0, 1
+sw $s0, 72($sp)          #Fin de la expresion lista para ser asignada
+lw $t0, 96($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
+lw $t1, 72($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor result@assing@i@0 en la direccion de la memoria del la propiedad i del objeto de typo Main
+lw $t0, 96($sp)          #Buscando la instancia de la clase Main en la pila
 lw $t1, 4($t0)          #Buscando el valor de la propiedad i
-sw $t1, 44($sp)          #Salvando el valor de la propiedad i en la pila en el valor local step@block@0          #Inicio del paso 1 de una sequencia Block
+sw $t1, 92($sp)          #Salvando el valor de la propiedad i en la pila en el valor local step@block@0          #Inicio del paso 1 de una sequencia Block
 la $t0, string_0
-sw $t0, 28($sp)          #Fin del paramentro 0 al StaticDispatch out_string
-lw $t0, 48($sp)          #Saca de la pila self
+sw $t0, 64($sp)          #Carga la referecia a string
+#Allocate a una class String puntero en sp + 56
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 56($sp)          #Guardando en la pila el pintero de la instancia de la clase String
+lw $t0, 56($sp)          #Buscando en la pila la variable STRING_instance@0 y guarda la direccion a la que apunta
+lw $t1, 64($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_string@0 en la direccion de la memoria del la propiedad value del objeto de typo String          #Setear la propiedad value al STRING en la variable value_string@0
+la $t0, String
+sw $t0, 60($sp)
+lw $t0, 56($sp)          #Buscando en la pila la variable STRING_instance@0 y guarda la direccion a la que apunta
+lw $t1, 60($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_STRING@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_string@0
+lw $t0, 56($sp)          #Lee de la pila STRING_instance@0 en 56 para assignar
+sw $t0, 52($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_out_string@0          #Fin del paramentro 0 al StaticDispatch out_string
+lw $t0, 96($sp)          #Saca de la pila self
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch out_string
-lw $t0, 32($sp)          #Saca de la pila param_0_to_out_string@0
+lw $t0, 56($sp)          #Saca de la pila param_0_to_out_string@0
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_out_string@0          #Agrega a la pila el paramentro 1 al StaticDispatch out_string
 jal IO_out_string          #Call a la function IO_out_string
-sw $s0, 32($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Inicio del paso 2 de una sequencia Block
-lw $t0, 48($sp)          #Saca de la pila self
+sw $s0, 68($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Inicio del paso 2 de una sequencia Block
+lw $t0, 96($sp)          #Saca de la pila self
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch in_string
 jal IO_in_string          #Call a la function IO_in_string
-sw $s0, 20($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin del paramentro 0 al StaticDispatch pal
-lw $t0, 48($sp)          #Saca de la pila self
+sw $s0, 44($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin del paramentro 0 al StaticDispatch pal
+lw $t0, 96($sp)          #Saca de la pila self
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch pal
-lw $t0, 24($sp)          #Saca de la pila param_0_to_pal@0
+lw $t0, 48($sp)          #Saca de la pila param_0_to_pal@0
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_pal@0          #Agrega a la pila el paramentro 1 al StaticDispatch pal
 jal Main_pal          #Call a la function Main_pal
-sw $s0, 24($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la evaluacion de la condicion de un IF
+sw $s0, 48($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la evaluacion de la condicion de un IF
+lw $t0, 48($sp)          #Buscando la instancia de la clase Bool en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 48($sp)          #Salvando el valor de la propiedad value en la pila en el valor local cond@if_else@0
 li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 24($sp)          #Cargar el valor de la pos  24 a $t1 pa comparar
+lw $t1, 48($sp)          #Cargar el valor cond@if_else@0  de la pos  48 a $t1 pa comparar
 beq $t0 $t1 then_Main_main_0          #if $t1==$t0 then jump then_Main_main_0          #Else case
 la $t0, string_1
-sw $t0, 12($sp)          #Fin del paramentro 0 al StaticDispatch out_string
-lw $t0, 48($sp)          #Saca de la pila self
+sw $t0, 36($sp)          #Carga la referecia a string
+#Allocate a una class String puntero en sp + 28
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 28($sp)          #Guardando en la pila el pintero de la instancia de la clase String
+lw $t0, 28($sp)          #Buscando en la pila la variable STRING_instance@1 y guarda la direccion a la que apunta
+lw $t1, 36($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_string@1 en la direccion de la memoria del la propiedad value del objeto de typo String          #Setear la propiedad value al STRING en la variable value_string@1
+la $t0, String
+sw $t0, 32($sp)
+lw $t0, 28($sp)          #Buscando en la pila la variable STRING_instance@1 y guarda la direccion a la que apunta
+lw $t1, 32($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_STRING@1 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_string@1
+lw $t0, 28($sp)          #Lee de la pila STRING_instance@1 en 28 para assignar
+sw $t0, 24($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_out_string@1          #Fin del paramentro 0 al StaticDispatch out_string
+lw $t0, 96($sp)          #Saca de la pila self
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch out_string
-lw $t0, 16($sp)          #Saca de la pila param_0_to_out_string@1
+lw $t0, 28($sp)          #Saca de la pila param_0_to_out_string@1
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_out_string@1          #Agrega a la pila el paramentro 1 al StaticDispatch out_string
 jal IO_out_string          #Call a la function IO_out_string
-sw $s0, 16($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-j fin_Main_main_0          #Salta para f{label} 
+sw $s0, 40($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
+j fin_Main_main_0          #Salta para fin_Main_main_0 
 then_Main_main_0 :           #Crea el label then_Main_main_0           #Then case
 la $t0, string_2
-sw $t0, 8($sp)          #Fin del paramentro 0 al StaticDispatch out_string
-lw $t0, 48($sp)          #Saca de la pila self
+sw $t0, 20($sp)          #Carga la referecia a string
+#Allocate a una class String puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 12($sp)          #Guardando en la pila el pintero de la instancia de la clase String
+lw $t0, 12($sp)          #Buscando en la pila la variable STRING_instance@2 y guarda la direccion a la que apunta
+lw $t1, 20($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_string@2 en la direccion de la memoria del la propiedad value del objeto de typo String          #Setear la propiedad value al STRING en la variable value_string@2
+la $t0, String
+sw $t0, 16($sp)
+lw $t0, 12($sp)          #Buscando en la pila la variable STRING_instance@2 y guarda la direccion a la que apunta
+lw $t1, 16($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_STRING@2 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_string@2
+lw $t0, 12($sp)          #Lee de la pila STRING_instance@2 en 12 para assignar
+sw $t0, 8($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_out_string@2          #Fin del paramentro 0 al StaticDispatch out_string
+lw $t0, 96($sp)          #Saca de la pila self
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch out_string
 lw $t0, 12($sp)          #Saca de la pila param_0_to_out_string@2
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_out_string@2          #Agrega a la pila el paramentro 1 al StaticDispatch out_string
 jal IO_out_string          #Call a la function IO_out_string
-sw $s0, 16($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
+sw $s0, 40($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
 fin_Main_main_0 :           #Crea el label fin_Main_main_0           #Fin de un If
-lw $t0, 16($sp)          #Lee de la pila result@if@0 en 16 para assignar
+lw $t0, 40($sp)          #Lee de la pila result@if@0 en 40 para assignar
 sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
 lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
 lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 52          #Limpia la pila
+addi $sp, $sp, 100          #Limpia la pila
 jr $ra          #Final de la function main
+
+new_ctr_IO:
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_IO
+lw $t0, 8($sp)          #Saca de la pila self
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila self
+jal new_ctr_Object          #Call a la function new_ctr_Object
+la $t0, IO
+sw $t0, 4($sp)          #Cargando el nombre del tipo desde el data
+lw $t0, 8($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
+lw $t1, 4($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_name@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Assignando el nombre del tipo en el campo type
+lw $s0, 8($sp)          #Envia el resultado de la funcion en $s0
+lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12          #Limpia la pila
+jr $ra
 
 
 IO_out_string:
+
+lw $t1 , 4($sp)
+lw $t0, 0($sp)   #Guarda en $t0 la direccion del string
 li $v0, 4
-lw $a0, 0($sp)
+lw $a0, 4($t0) #Pintando la propiedad value del string
 syscall
-lw $a0, 4($sp)
 addi $sp, $sp, 8
+move $s0, $t1
 jr $ra
 
 IO_in_string:
-li $v0,8
+li $v0, 8
 li $a1 , 10000
 syscall
-move $s0 , $a0
+move $t6 ,$v0
+
+ li $v0 ,4
+ move $a0,$t6
+    syscall
+
+    li $v0,10
+    syscall
+
+
+move $s0 , $v0
+
+#Allocate a una class String puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo string
+la $t4, String
+sw $t4, 0($v0)   # Asigna el tipo String al string
+sw $t6, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
+
+
 addi $sp, $sp, 4
 jr $ra
 
 Main_pal:
-#Parametro self en stackpoiner + 132
-#Parametro s@0 en stackpoiner + 128
-addi $sp, $sp, -4          #Push local var cond@if_else@0 stackpointer 124
-addi $sp, $sp, -4          #Push local var int_eq@_a@0 stackpointer 120
-addi $sp, $sp, -4          #Push local var int_eq@_b@0 stackpointer 116
-addi $sp, $sp, -4          #Push local var instance_to_call_length@0 stackpointer 112
-addi $sp, $sp, -4          #Push local var result@if@0 stackpointer 108
-addi $sp, $sp, -4          #Push local var cond@if_else@1 stackpointer 104
-addi $sp, $sp, -4          #Push local var int_eq@_a@1 stackpointer 100
-addi $sp, $sp, -4          #Push local var int_eq@_b@1 stackpointer 96
-addi $sp, $sp, -4          #Push local var instance_to_call_length@1 stackpointer 92
-addi $sp, $sp, -4          #Push local var result@if@1 stackpointer 88
-addi $sp, $sp, -4          #Push local var cond@if_else@2 stackpointer 84
-addi $sp, $sp, -4          #Push local var int_eq@_a@2 stackpointer 80
-addi $sp, $sp, -4          #Push local var int_eq@_b@2 stackpointer 76
-addi $sp, $sp, -4          #Push local var instance_to_call_substr@0 stackpointer 72
-addi $sp, $sp, -4          #Push local var param_0_to_substr@0 stackpointer 68
-addi $sp, $sp, -4          #Push local var param_1_to_substr@0 stackpointer 64
-addi $sp, $sp, -4          #Push local var instance_to_call_substr@1 stackpointer 60
-addi $sp, $sp, -4          #Push local var rest@_a@0 stackpointer 56
-addi $sp, $sp, -4          #Push local var rest@_b@0 stackpointer 52
-addi $sp, $sp, -4          #Push local var instance_to_call_length@2 stackpointer 48
-addi $sp, $sp, -4          #Push local var param_0_to_substr@1 stackpointer 44
-addi $sp, $sp, -4          #Push local var param_1_to_substr@1 stackpointer 40
-addi $sp, $sp, -4          #Push local var result@if@2 stackpointer 36
-addi $sp, $sp, -4          #Push local var instance_to_call_substr@2 stackpointer 32
-addi $sp, $sp, -4          #Push local var param_0_to_substr@2 stackpointer 28
-addi $sp, $sp, -4          #Push local var rest@_a@1 stackpointer 24
-addi $sp, $sp, -4          #Push local var rest@_b@1 stackpointer 20
-addi $sp, $sp, -4          #Push local var instance_to_call_length@3 stackpointer 16
-addi $sp, $sp, -4          #Push local var param_1_to_substr@2 stackpointer 12
-addi $sp, $sp, -4          #Push local var param_0_to_pal@0 stackpointer 8
+#Parametro self en stackpoiner + 324
+#Parametro s@0 en stackpoiner + 320
+addi $sp, $sp, -4          #Push local var cond@if_else@0 stackpointer 316
+addi $sp, $sp, -4          #Push local var int_eq@_a@0 stackpointer 312
+addi $sp, $sp, -4          #Push local var int_eq@_b@0 stackpointer 308
+addi $sp, $sp, -4          #Push local var instance_to_call_length@0 stackpointer 304
+addi $sp, $sp, -4          #Push local var value_int@0 stackpointer 300
+addi $sp, $sp, -4          #Push local var type_INT@0 stackpointer 296
+addi $sp, $sp, -4          #Push local var INT_instance@0 stackpointer 292
+addi $sp, $sp, -4          #Push local var int_eq@_result@0 stackpointer 288
+addi $sp, $sp, -4          #Push local var type_INT@1 stackpointer 284
+addi $sp, $sp, -4          #Push local var INT_instance@1 stackpointer 280
+addi $sp, $sp, -4          #Push local var result@if@0 stackpointer 276
+addi $sp, $sp, -4          #Push local var cond@if_else@1 stackpointer 272
+addi $sp, $sp, -4          #Push local var int_eq@_a@1 stackpointer 268
+addi $sp, $sp, -4          #Push local var int_eq@_b@1 stackpointer 264
+addi $sp, $sp, -4          #Push local var instance_to_call_length@1 stackpointer 260
+addi $sp, $sp, -4          #Push local var value_int@1 stackpointer 256
+addi $sp, $sp, -4          #Push local var type_INT@2 stackpointer 252
+addi $sp, $sp, -4          #Push local var INT_instance@2 stackpointer 248
+addi $sp, $sp, -4          #Push local var int_eq@_result@1 stackpointer 244
+addi $sp, $sp, -4          #Push local var type_INT@3 stackpointer 240
+addi $sp, $sp, -4          #Push local var INT_instance@3 stackpointer 236
+addi $sp, $sp, -4          #Push local var result@if@1 stackpointer 232
+addi $sp, $sp, -4          #Push local var cond@if_else@2 stackpointer 228
+addi $sp, $sp, -4          #Push local var int_eq@_a@2 stackpointer 224
+addi $sp, $sp, -4          #Push local var int_eq@_b@2 stackpointer 220
+addi $sp, $sp, -4          #Push local var instance_to_call_substr@0 stackpointer 216
+addi $sp, $sp, -4          #Push local var value_int@2 stackpointer 212
+addi $sp, $sp, -4          #Push local var type_INT@4 stackpointer 208
+addi $sp, $sp, -4          #Push local var INT_instance@4 stackpointer 204
+addi $sp, $sp, -4          #Push local var param_0_to_substr@0 stackpointer 200
+addi $sp, $sp, -4          #Push local var value_int@3 stackpointer 196
+addi $sp, $sp, -4          #Push local var type_INT@5 stackpointer 192
+addi $sp, $sp, -4          #Push local var INT_instance@5 stackpointer 188
+addi $sp, $sp, -4          #Push local var param_1_to_substr@0 stackpointer 184
+addi $sp, $sp, -4          #Push local var instance_to_call_substr@1 stackpointer 180
+addi $sp, $sp, -4          #Push local var rest@_a@0 stackpointer 176
+addi $sp, $sp, -4          #Push local var rest@_b@0 stackpointer 172
+addi $sp, $sp, -4          #Push local var instance_to_call_length@2 stackpointer 168
+addi $sp, $sp, -4          #Push local var value_int@4 stackpointer 164
+addi $sp, $sp, -4          #Push local var type_INT@6 stackpointer 160
+addi $sp, $sp, -4          #Push local var INT_instance@6 stackpointer 156
+addi $sp, $sp, -4          #Push local var rest@_result@0 stackpointer 152
+addi $sp, $sp, -4          #Push local var type_INT@7 stackpointer 148
+addi $sp, $sp, -4          #Push local var INT_instance@7 stackpointer 144
+addi $sp, $sp, -4          #Push local var param_0_to_substr@1 stackpointer 140
+addi $sp, $sp, -4          #Push local var value_int@5 stackpointer 136
+addi $sp, $sp, -4          #Push local var type_INT@8 stackpointer 132
+addi $sp, $sp, -4          #Push local var INT_instance@8 stackpointer 128
+addi $sp, $sp, -4          #Push local var param_1_to_substr@1 stackpointer 124
+addi $sp, $sp, -4          #Push local var int_eq@_result@2 stackpointer 120
+addi $sp, $sp, -4          #Push local var type_INT@9 stackpointer 116
+addi $sp, $sp, -4          #Push local var INT_instance@9 stackpointer 112
+addi $sp, $sp, -4          #Push local var result@if@2 stackpointer 108
+addi $sp, $sp, -4          #Push local var value_boolean@0 stackpointer 104
+addi $sp, $sp, -4          #Push local var type_BOOL@0 stackpointer 100
+addi $sp, $sp, -4          #Push local var BOOL_instance@0 stackpointer 96
+addi $sp, $sp, -4          #Push local var instance_to_call_substr@2 stackpointer 92
+addi $sp, $sp, -4          #Push local var value_int@6 stackpointer 88
+addi $sp, $sp, -4          #Push local var type_INT@10 stackpointer 84
+addi $sp, $sp, -4          #Push local var INT_instance@10 stackpointer 80
+addi $sp, $sp, -4          #Push local var param_0_to_substr@2 stackpointer 76
+addi $sp, $sp, -4          #Push local var rest@_a@1 stackpointer 72
+addi $sp, $sp, -4          #Push local var rest@_b@1 stackpointer 68
+addi $sp, $sp, -4          #Push local var instance_to_call_length@3 stackpointer 64
+addi $sp, $sp, -4          #Push local var value_int@7 stackpointer 60
+addi $sp, $sp, -4          #Push local var type_INT@11 stackpointer 56
+addi $sp, $sp, -4          #Push local var INT_instance@11 stackpointer 52
+addi $sp, $sp, -4          #Push local var rest@_result@1 stackpointer 48
+addi $sp, $sp, -4          #Push local var type_INT@12 stackpointer 44
+addi $sp, $sp, -4          #Push local var INT_instance@12 stackpointer 40
+addi $sp, $sp, -4          #Push local var param_1_to_substr@2 stackpointer 36
+addi $sp, $sp, -4          #Push local var param_0_to_pal@0 stackpointer 32
+addi $sp, $sp, -4          #Push local var value_boolean@1 stackpointer 28
+addi $sp, $sp, -4          #Push local var type_BOOL@1 stackpointer 24
+addi $sp, $sp, -4          #Push local var BOOL_instance@1 stackpointer 20
+addi $sp, $sp, -4          #Push local var value_boolean@2 stackpointer 16
+addi $sp, $sp, -4          #Push local var type_BOOL@2 stackpointer 12
+addi $sp, $sp, -4          #Push local var BOOL_instance@2 stackpointer 8
 addi $sp, $sp, -4          #Push local var @result stackpointer 4
 addi $sp, $sp, -4          #Push local var $ra stackpointer 0
 sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_pal
-lw $t0, 128($sp)          #Lee de la pila s@0 en 128 para assignar
-sw $t0, 112($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@0          #Fin de la exprecion previa al Dispatch length
-lw $t0, 112($sp)          #Saca de la pila instance_to_call_length@0
+lw $t0, 320($sp)          #Lee de la pila s@0 en 320 para assignar
+sw $t0, 304($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@0          #Fin de la exprecion previa al Dispatch length
+lw $t0, 304($sp)          #Saca de la pila instance_to_call_length@0
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila instance_to_call_length@0
-lw $t0, 116($sp)          #Sacando la instancia de la pila (en 112) de una clase que hereda de String
+lw $t0, 308($sp)          #Sacando la instancia de la pila (en 304) de una clase que hereda de String
 lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 20($t1)          #Buscando el metodo dinamico para la funcion length
-
-li $v0 , 10
-syscall
-
+lw $t3, 28($t1)          #Buscando el metodo dinamico para la funcion length
 jal $t3          #Call a la function $t3
-sw $s0, 120($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
+sw $s0, 312($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
+lw $t0, 312($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 312($sp)          #Salvando el valor de la propiedad value en la pila en el valor local int_eq@_a@0
 li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 116($sp)          #Escribe en la pila el numero que se le asigno a int_eq@_b@0          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 120($sp)          #carga en $t1 lo que hay en 120 
-lw $t2, 116($sp)          #carga en $t2 lo que hay en 116 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 124($sp)          #Pon en la posicion 124 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
+sw $t0, 300($sp)          #Escribe en la pila el numero que se le asigno a value_int@0          #Int value 0
+#Allocate a una class Int puntero en sp + 292
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 292($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 292($sp)          #Buscando en la pila la variable INT_instance@0 y guarda la direccion a la que apunta
+lw $t1, 300($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@0 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@0
+la $t0, Int
+sw $t0, 296($sp)
+lw $t0, 292($sp)          #Buscando en la pila la variable INT_instance@0 y guarda la direccion a la que apunta
+lw $t1, 296($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@0
+lw $t0, 292($sp)          #Lee de la pila INT_instance@0 en 292 para assignar
+sw $t0, 308($sp)          #Escribe en la pila el valor que se le asigno a int_eq@_b@0          #Resolucion del operado derecha de una opercion int_eq
+lw $t0, 308($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 308($sp)          #Salvando el valor de la propiedad value en la pila en el valor local int_eq@_b@0
+lw $t1, 312($sp)          #carga en $t1 int_eq@_a@0  de la pos 312 
+lw $t2, 308($sp)          #carga en $t2  int_eq@_b@0 de la pos 308 
+seq $t3, $t2, $t1          #$t3 = int_eq@_a@0  $t0  == int_eq@_b@0 $ t1
+sw $t3, 288($sp)          #Pon en la posicion 288 el valor de $t3
+#Allocate a una class Int puntero en sp + 280
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 280($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 280($sp)          #Buscando en la pila la variable INT_instance@1 y guarda la direccion a la que apunta
+lw $t1, 288($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor int_eq@_result@0 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable int_eq@_result@0
+la $t0, Int
+sw $t0, 284($sp)
+lw $t0, 280($sp)          #Buscando en la pila la variable INT_instance@1 y guarda la direccion a la que apunta
+lw $t1, 284($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@1 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable int_eq@_result@0
+lw $t0, 280($sp)          #Lee de la pila INT_instance@1 en 280 para assignar
+sw $t0, 316($sp)          #Escribe en la pila el valor que se le asigno a cond@if_else@0          #Fin de la evaluacion de la condicion de un IF
+lw $t0, 316($sp)          #Buscando la instancia de la clase Bool en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 316($sp)          #Salvando el valor de la propiedad value en la pila en el valor local cond@if_else@0
 li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 124($sp)          #Cargar el valor de la pos  124 a $t1 pa comparar
+lw $t1, 316($sp)          #Cargar el valor cond@if_else@0  de la pos  316 a $t1 pa comparar
 beq $t0 $t1 then_Main_pal_0          #if $t1==$t0 then jump then_Main_pal_0          #Else case
-lw $t0, 128($sp)          #Lee de la pila s@0 en 128 para assignar
-sw $t0, 92($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@1          #Fin de la exprecion previa al Dispatch length
-lw $t0, 92($sp)          #Saca de la pila instance_to_call_length@1
+lw $t0, 320($sp)          #Lee de la pila s@0 en 320 para assignar
+sw $t0, 260($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@1          #Fin de la exprecion previa al Dispatch length
+lw $t0, 260($sp)          #Saca de la pila instance_to_call_length@1
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila instance_to_call_length@1
-lw $t0, 96($sp)          #Sacando la instancia de la pila (en 92) de una clase que hereda de String
+lw $t0, 264($sp)          #Sacando la instancia de la pila (en 260) de una clase que hereda de String
 lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 20($t1)          #Buscando el metodo dinamico para la funcion length
+lw $t3, 28($t1)          #Buscando el metodo dinamico para la funcion length
 jal $t3          #Call a la function $t3
-sw $s0, 100($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
+sw $s0, 268($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
+lw $t0, 268($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 268($sp)          #Salvando el valor de la propiedad value en la pila en el valor local int_eq@_a@1
 li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 96($sp)          #Escribe en la pila el numero que se le asigno a int_eq@_b@1          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 100($sp)          #carga en $t1 lo que hay en 100 
-lw $t2, 96($sp)          #carga en $t2 lo que hay en 96 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 104($sp)          #Pon en la posicion 104 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
+sw $t0, 256($sp)          #Escribe en la pila el numero que se le asigno a value_int@1          #Int value 1
+#Allocate a una class Int puntero en sp + 248
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 248($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 248($sp)          #Buscando en la pila la variable INT_instance@2 y guarda la direccion a la que apunta
+lw $t1, 256($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@1 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@1
+la $t0, Int
+sw $t0, 252($sp)
+lw $t0, 248($sp)          #Buscando en la pila la variable INT_instance@2 y guarda la direccion a la que apunta
+lw $t1, 252($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@2 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@1
+lw $t0, 248($sp)          #Lee de la pila INT_instance@2 en 248 para assignar
+sw $t0, 264($sp)          #Escribe en la pila el valor que se le asigno a int_eq@_b@1          #Resolucion del operado derecha de una opercion int_eq
+lw $t0, 264($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 264($sp)          #Salvando el valor de la propiedad value en la pila en el valor local int_eq@_b@1
+lw $t1, 268($sp)          #carga en $t1 int_eq@_a@1  de la pos 268 
+lw $t2, 264($sp)          #carga en $t2  int_eq@_b@1 de la pos 264 
+seq $t3, $t2, $t1          #$t3 = int_eq@_a@1  $t0  == int_eq@_b@1 $ t1
+sw $t3, 244($sp)          #Pon en la posicion 244 el valor de $t3
+#Allocate a una class Int puntero en sp + 236
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 236($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 236($sp)          #Buscando en la pila la variable INT_instance@3 y guarda la direccion a la que apunta
+lw $t1, 244($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor int_eq@_result@1 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable int_eq@_result@1
+la $t0, Int
+sw $t0, 240($sp)
+lw $t0, 236($sp)          #Buscando en la pila la variable INT_instance@3 y guarda la direccion a la que apunta
+lw $t1, 240($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@3 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable int_eq@_result@1
+lw $t0, 236($sp)          #Lee de la pila INT_instance@3 en 236 para assignar
+sw $t0, 272($sp)          #Escribe en la pila el valor que se le asigno a cond@if_else@1          #Fin de la evaluacion de la condicion de un IF
+lw $t0, 272($sp)          #Buscando la instancia de la clase Bool en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 272($sp)          #Salvando el valor de la propiedad value en la pila en el valor local cond@if_else@1
 li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 104($sp)          #Cargar el valor de la pos  104 a $t1 pa comparar
+lw $t1, 272($sp)          #Cargar el valor cond@if_else@1  de la pos  272 a $t1 pa comparar
 beq $t0 $t1 then_Main_pal_1          #if $t1==$t0 then jump then_Main_pal_1          #Else case
-lw $t0, 128($sp)          #Lee de la pila s@0 en 128 para assignar
-sw $t0, 72($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_substr@0          #Fin de la exprecion previa al Dispatch substr
+lw $t0, 320($sp)          #Lee de la pila s@0 en 320 para assignar
+sw $t0, 216($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_substr@0          #Fin de la exprecion previa al Dispatch substr
 li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 68($sp)          #Escribe en la pila el numero que se le asigno a param_0_to_substr@0          #Fin del paramentro 0 al Dispatch substr
+sw $t0, 212($sp)          #Escribe en la pila el numero que se le asigno a value_int@2          #Int value 0
+#Allocate a una class Int puntero en sp + 204
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 204($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 204($sp)          #Buscando en la pila la variable INT_instance@4 y guarda la direccion a la que apunta
+lw $t1, 212($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@2 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@2
+la $t0, Int
+sw $t0, 208($sp)
+lw $t0, 204($sp)          #Buscando en la pila la variable INT_instance@4 y guarda la direccion a la que apunta
+lw $t1, 208($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@4 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@2
+lw $t0, 204($sp)          #Lee de la pila INT_instance@4 en 204 para assignar
+sw $t0, 200($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_substr@0          #Fin del paramentro 0 al Dispatch substr
 li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 64($sp)          #Escribe en la pila el numero que se le asigno a param_1_to_substr@0          #Fin del paramentro 1 al Dispatch substr
-lw $t0, 72($sp)          #Saca de la pila instance_to_call_substr@0
+sw $t0, 196($sp)          #Escribe en la pila el numero que se le asigno a value_int@3          #Int value 1
+#Allocate a una class Int puntero en sp + 188
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 188($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 188($sp)          #Buscando en la pila la variable INT_instance@5 y guarda la direccion a la que apunta
+lw $t1, 196($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@3 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@3
+la $t0, Int
+sw $t0, 192($sp)
+lw $t0, 188($sp)          #Buscando en la pila la variable INT_instance@5 y guarda la direccion a la que apunta
+lw $t1, 192($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@5 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@3
+lw $t0, 188($sp)          #Lee de la pila INT_instance@5 en 188 para assignar
+sw $t0, 184($sp)          #Escribe en la pila el valor que se le asigno a param_1_to_substr@0          #Fin del paramentro 1 al Dispatch substr
+lw $t0, 216($sp)          #Saca de la pila instance_to_call_substr@0
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila instance_to_call_substr@0
-lw $t0, 72($sp)          #Saca de la pila param_0_to_substr@0
+lw $t0, 204($sp)          #Saca de la pila param_0_to_substr@0
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_substr@0
-lw $t0, 72($sp)          #Saca de la pila param_1_to_substr@0
+lw $t0, 192($sp)          #Saca de la pila param_1_to_substr@0
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_1_to_substr@0
-lw $t0, 84($sp)          #Sacando la instancia de la pila (en 72) de una clase que hereda de String
+lw $t0, 228($sp)          #Sacando la instancia de la pila (en 216) de una clase que hereda de String
 lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 24($t1)          #Buscando el metodo dinamico para la funcion substr
+lw $t3, 32($t1)          #Buscando el metodo dinamico para la funcion substr
 jal $t3          #Call a la function $t3
-li $s0 ,3
-sw $s0, 80($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
-lw $t0, 128($sp)          #Lee de la pila s@0 en 128 para assignar
-sw $t0, 60($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_substr@1          #Fin de la exprecion previa al Dispatch substr
-lw $t0, 128($sp)          #Lee de la pila s@0 en 128 para assignar
-sw $t0, 48($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@2          #Fin de la exprecion previa al Dispatch length
-lw $t0, 48($sp)          #Saca de la pila instance_to_call_length@2
+sw $s0, 224($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
+lw $t0, 224($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 224($sp)          #Salvando el valor de la propiedad value en la pila en el valor local int_eq@_a@2
+lw $t0, 320($sp)          #Lee de la pila s@0 en 320 para assignar
+sw $t0, 180($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_substr@1          #Fin de la exprecion previa al Dispatch substr
+lw $t0, 320($sp)          #Lee de la pila s@0 en 320 para assignar
+sw $t0, 168($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@2          #Fin de la exprecion previa al Dispatch length
+lw $t0, 168($sp)          #Saca de la pila instance_to_call_length@2
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila instance_to_call_length@2
-lw $t0, 52($sp)          #Sacando la instancia de la pila (en 48) de una clase que hereda de String
+lw $t0, 172($sp)          #Sacando la instancia de la pila (en 168) de una clase que hereda de String
 lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 20($t1)          #Buscando el metodo dinamico para la funcion length
+lw $t3, 28($t1)          #Buscando el metodo dinamico para la funcion length
 jal $t3          #Call a la function $t3
-sw $s0, 56($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion rest
+sw $s0, 176($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion rest
+lw $t0, 176($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 176($sp)          #Salvando el valor de la propiedad value en la pila en el valor local rest@_a@0
 li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 52($sp)          #Escribe en la pila el numero que se le asigno a rest@_b@0          #Resolucion del operado derecha de una opercion rest
-lw $t0, 56($sp)          #poner en registro $t0 lo que hay en 56
-lw $t1, 52($sp)          #poner en registro $t1 lo que hay en f'{stack_plus_opr_2}
-sub $t0, $t0, $t1          #poner en registro $t0 la suma 
-sw $t0, 44($sp)          #poner en 44 el resultado de la suma           #Fin del paramentro 0 al Dispatch substr
+sw $t0, 164($sp)          #Escribe en la pila el numero que se le asigno a value_int@4          #Int value 1
+#Allocate a una class Int puntero en sp + 156
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 156($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 156($sp)          #Buscando en la pila la variable INT_instance@6 y guarda la direccion a la que apunta
+lw $t1, 164($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@4 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@4
+la $t0, Int
+sw $t0, 160($sp)
+lw $t0, 156($sp)          #Buscando en la pila la variable INT_instance@6 y guarda la direccion a la que apunta
+lw $t1, 160($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@6 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@4
+lw $t0, 156($sp)          #Lee de la pila INT_instance@6 en 156 para assignar
+sw $t0, 172($sp)          #Escribe en la pila el valor que se le asigno a rest@_b@0          #Resolucion del operado derecha de una opercion rest
+lw $t0, 172($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 172($sp)          #Salvando el valor de la propiedad value en la pila en el valor local rest@_b@0
+lw $t0, 176($sp)          #poner en registro $t0 rest@_a@0 lo que hay en 176
+lw $t1, 172($sp)          #poner en registro $t1 {memory_op2} lo que hay en f'{stack_plus_opr_2}
+sub $t0, $t0, $t1          #poner en registro $t0 la RESTA
+sw $t0, 152($sp)          #poner en 152 el resultado de la RESTA 
+#Allocate a una class Int puntero en sp + 144
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 144($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 144($sp)          #Buscando en la pila la variable INT_instance@7 y guarda la direccion a la que apunta
+lw $t1, 152($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor rest@_result@0 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable rest@_result@0
+la $t0, Int
+sw $t0, 148($sp)
+lw $t0, 144($sp)          #Buscando en la pila la variable INT_instance@7 y guarda la direccion a la que apunta
+lw $t1, 148($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@7 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable rest@_result@0
+lw $t0, 144($sp)          #Lee de la pila INT_instance@7 en 144 para assignar
+sw $t0, 140($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_substr@1          #Fin del paramentro 0 al Dispatch substr
 li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 40($sp)          #Escribe en la pila el numero que se le asigno a param_1_to_substr@1          #Fin del paramentro 1 al Dispatch substr
-lw $t0, 60($sp)          #Saca de la pila instance_to_call_substr@1
+sw $t0, 136($sp)          #Escribe en la pila el numero que se le asigno a value_int@5          #Int value 1
+#Allocate a una class Int puntero en sp + 128
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 128($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 128($sp)          #Buscando en la pila la variable INT_instance@8 y guarda la direccion a la que apunta
+lw $t1, 136($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@5 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@5
+la $t0, Int
+sw $t0, 132($sp)
+lw $t0, 128($sp)          #Buscando en la pila la variable INT_instance@8 y guarda la direccion a la que apunta
+lw $t1, 132($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@8 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@5
+lw $t0, 128($sp)          #Lee de la pila INT_instance@8 en 128 para assignar
+sw $t0, 124($sp)          #Escribe en la pila el valor que se le asigno a param_1_to_substr@1          #Fin del paramentro 1 al Dispatch substr
+lw $t0, 180($sp)          #Saca de la pila instance_to_call_substr@1
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila instance_to_call_substr@1
-lw $t0, 48($sp)          #Saca de la pila param_0_to_substr@1
+lw $t0, 144($sp)          #Saca de la pila param_0_to_substr@1
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_substr@1
-lw $t0, 48($sp)          #Saca de la pila param_1_to_substr@1
+lw $t0, 132($sp)          #Saca de la pila param_1_to_substr@1
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_1_to_substr@1
-lw $t0, 72($sp)          #Sacando la instancia de la pila (en 60) de una clase que hereda de String
+lw $t0, 192($sp)          #Sacando la instancia de la pila (en 180) de una clase que hereda de String
 lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 24($t1)          #Buscando el metodo dinamico para la funcion substr
+lw $t3, 32($t1)          #Buscando el metodo dinamico para la funcion substr
 jal $t3          #Call a la function $t3
-sw $s0, 76($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 80($sp)          #carga en $t1 lo que hay en 80 
-lw $t2, 76($sp)          #carga en $t2 lo que hay en 76 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 84($sp)          #Pon en la posicion 84 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
+sw $s0, 220($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado derecha de una opercion int_eq
+lw $t0, 220($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 220($sp)          #Salvando el valor de la propiedad value en la pila en el valor local int_eq@_b@2
+lw $t1, 224($sp)          #carga en $t1 int_eq@_a@2  de la pos 224 
+lw $t2, 220($sp)          #carga en $t2  int_eq@_b@2 de la pos 220 
+seq $t3, $t2, $t1          #$t3 = int_eq@_a@2  $t0  == int_eq@_b@2 $ t1
+sw $t3, 120($sp)          #Pon en la posicion 120 el valor de $t3
+#Allocate a una class Int puntero en sp + 112
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 112($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 112($sp)          #Buscando en la pila la variable INT_instance@9 y guarda la direccion a la que apunta
+lw $t1, 120($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor int_eq@_result@2 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable int_eq@_result@2
+la $t0, Int
+sw $t0, 116($sp)
+lw $t0, 112($sp)          #Buscando en la pila la variable INT_instance@9 y guarda la direccion a la que apunta
+lw $t1, 116($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@9 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable int_eq@_result@2
+lw $t0, 112($sp)          #Lee de la pila INT_instance@9 en 112 para assignar
+sw $t0, 228($sp)          #Escribe en la pila el valor que se le asigno a cond@if_else@2          #Fin de la evaluacion de la condicion de un IF
+lw $t0, 228($sp)          #Buscando la instancia de la clase Bool en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 228($sp)          #Salvando el valor de la propiedad value en la pila en el valor local cond@if_else@2
 li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 84($sp)          #Cargar el valor de la pos  84 a $t1 pa comparar
+lw $t1, 228($sp)          #Cargar el valor cond@if_else@2  de la pos  228 a $t1 pa comparar
 beq $t0 $t1 then_Main_pal_2          #if $t1==$t0 then jump then_Main_pal_2          #Else case
 li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 36($sp)          #Escribe en la pila el numero que se le asigno a result@if@2
-j fin_Main_pal_2          #Salta para f{label} 
+sw $t0, 104($sp)          #Escribe en la pila el numero que se le asigno a value_boolean@0          #Bool value false
+#Allocate a una class Bool puntero en sp + 96
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 96($sp)          #Guardando en la pila el pintero de la instancia de la clase Bool
+lw $t0, 96($sp)          #Buscando en la pila la variable BOOL_instance@0 y guarda la direccion a la que apunta
+lw $t1, 104($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_boolean@0 en la direccion de la memoria del la propiedad value del objeto de typo Bool          #Setear la propiedad value al BOOL en la variable value_boolean@0
+la $t0, Bool
+sw $t0, 100($sp)
+lw $t0, 96($sp)          #Buscando en la pila la variable BOOL_instance@0 y guarda la direccion a la que apunta
+lw $t1, 100($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_BOOL@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_boolean@0
+lw $t0, 96($sp)          #Lee de la pila BOOL_instance@0 en 96 para assignar
+sw $t0, 108($sp)          #Escribe en la pila el valor que se le asigno a result@if@2
+j fin_Main_pal_2          #Salta para fin_Main_pal_2 
 then_Main_pal_2 :           #Crea el label then_Main_pal_2           #Then case
-lw $t0, 128($sp)          #Lee de la pila s@0 en 128 para assignar
-sw $t0, 32($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_substr@2          #Fin de la exprecion previa al Dispatch substr
+lw $t0, 320($sp)          #Lee de la pila s@0 en 320 para assignar
+sw $t0, 92($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_substr@2          #Fin de la exprecion previa al Dispatch substr
 li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 28($sp)          #Escribe en la pila el numero que se le asigno a param_0_to_substr@2          #Fin del paramentro 0 al Dispatch substr
-lw $t0, 128($sp)          #Lee de la pila s@0 en 128 para assignar
-sw $t0, 16($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@3          #Fin de la exprecion previa al Dispatch length
-lw $t0, 16($sp)          #Saca de la pila instance_to_call_length@3
+sw $t0, 88($sp)          #Escribe en la pila el numero que se le asigno a value_int@6          #Int value 1
+#Allocate a una class Int puntero en sp + 80
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 80($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 80($sp)          #Buscando en la pila la variable INT_instance@10 y guarda la direccion a la que apunta
+lw $t1, 88($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@6 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@6
+la $t0, Int
+sw $t0, 84($sp)
+lw $t0, 80($sp)          #Buscando en la pila la variable INT_instance@10 y guarda la direccion a la que apunta
+lw $t1, 84($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@10 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@6
+lw $t0, 80($sp)          #Lee de la pila INT_instance@10 en 80 para assignar
+sw $t0, 76($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_substr@2          #Fin del paramentro 0 al Dispatch substr
+lw $t0, 320($sp)          #Lee de la pila s@0 en 320 para assignar
+sw $t0, 64($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_length@3          #Fin de la exprecion previa al Dispatch length
+lw $t0, 64($sp)          #Saca de la pila instance_to_call_length@3
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila instance_to_call_length@3
-lw $t0, 20($sp)          #Sacando la instancia de la pila (en 16) de una clase que hereda de String
+lw $t0, 68($sp)          #Sacando la instancia de la pila (en 64) de una clase que hereda de String
 lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 20($t1)          #Buscando el metodo dinamico para la funcion length
+lw $t3, 28($t1)          #Buscando el metodo dinamico para la funcion length
 jal $t3          #Call a la function $t3
-sw $s0, 24($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion rest
+sw $s0, 72($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion rest
+lw $t0, 72($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 72($sp)          #Salvando el valor de la propiedad value en la pila en el valor local rest@_a@1
 li $t0, 2          #Guarda el numbero que se va a asignar
-sw $t0, 20($sp)          #Escribe en la pila el numero que se le asigno a rest@_b@1          #Resolucion del operado derecha de una opercion rest
-lw $t0, 24($sp)          #poner en registro $t0 lo que hay en 24
-lw $t1, 20($sp)          #poner en registro $t1 lo que hay en f'{stack_plus_opr_2}
-sub $t0, $t0, $t1          #poner en registro $t0 la suma 
-sw $t0, 12($sp)          #poner en 12 el resultado de la suma           #Fin del paramentro 1 al Dispatch substr
-lw $t0, 32($sp)          #Saca de la pila instance_to_call_substr@2
+sw $t0, 60($sp)          #Escribe en la pila el numero que se le asigno a value_int@7          #Int value 2
+#Allocate a una class Int puntero en sp + 52
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 52($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 52($sp)          #Buscando en la pila la variable INT_instance@11 y guarda la direccion a la que apunta
+lw $t1, 60($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_int@7 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable value_int@7
+la $t0, Int
+sw $t0, 56($sp)
+lw $t0, 52($sp)          #Buscando en la pila la variable INT_instance@11 y guarda la direccion a la que apunta
+lw $t1, 56($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@11 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_int@7
+lw $t0, 52($sp)          #Lee de la pila INT_instance@11 en 52 para assignar
+sw $t0, 68($sp)          #Escribe en la pila el valor que se le asigno a rest@_b@1          #Resolucion del operado derecha de una opercion rest
+lw $t0, 68($sp)          #Buscando la instancia de la clase Int en la pila
+lw $t1, 4($t0)          #Buscando el valor de la propiedad value
+sw $t1, 68($sp)          #Salvando el valor de la propiedad value en la pila en el valor local rest@_b@1
+lw $t0, 72($sp)          #poner en registro $t0 rest@_a@1 lo que hay en 72
+lw $t1, 68($sp)          #poner en registro $t1 {memory_op2} lo que hay en f'{stack_plus_opr_2}
+sub $t0, $t0, $t1          #poner en registro $t0 la RESTA
+sw $t0, 48($sp)          #poner en 48 el resultado de la RESTA 
+#Allocate a una class Int puntero en sp + 40
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 40($sp)          #Guardando en la pila el pintero de la instancia de la clase Int
+lw $t0, 40($sp)          #Buscando en la pila la variable INT_instance@12 y guarda la direccion a la que apunta
+lw $t1, 48($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor rest@_result@1 en la direccion de la memoria del la propiedad value del objeto de typo Int          #Setear la propiedad value al INT en la variable rest@_result@1
+la $t0, Int
+sw $t0, 44($sp)
+lw $t0, 40($sp)          #Buscando en la pila la variable INT_instance@12 y guarda la direccion a la que apunta
+lw $t1, 44($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_INT@12 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable rest@_result@1
+lw $t0, 40($sp)          #Lee de la pila INT_instance@12 en 40 para assignar
+sw $t0, 36($sp)          #Escribe en la pila el valor que se le asigno a param_1_to_substr@2          #Fin del paramentro 1 al Dispatch substr
+lw $t0, 92($sp)          #Saca de la pila instance_to_call_substr@2
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila instance_to_call_substr@2
-lw $t0, 32($sp)          #Saca de la pila param_0_to_substr@2
+lw $t0, 80($sp)          #Saca de la pila param_0_to_substr@2
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_substr@2
-lw $t0, 20($sp)          #Saca de la pila param_1_to_substr@2
+lw $t0, 44($sp)          #Saca de la pila param_1_to_substr@2
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_1_to_substr@2
-lw $t0, 44($sp)          #Sacando la instancia de la pila (en 32) de una clase que hereda de String
+lw $t0, 104($sp)          #Sacando la instancia de la pila (en 92) de una clase que hereda de String
 lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 24($t1)          #Buscando el metodo dinamico para la funcion substr
+lw $t3, 32($t1)          #Buscando el metodo dinamico para la funcion substr
 jal $t3          #Call a la function $t3
-sw $s0, 8($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin del paramentro 0 al StaticDispatch pal
-lw $t0, 132($sp)          #Saca de la pila self
+sw $s0, 32($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin del paramentro 0 al StaticDispatch pal
+lw $t0, 324($sp)          #Saca de la pila self
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch pal
-lw $t0, 12($sp)          #Saca de la pila param_0_to_pal@0
+lw $t0, 36($sp)          #Saca de la pila param_0_to_pal@0
 addi $sp, $sp, -4
 sw $t0, 0($sp)          #Mete para la pila param_0_to_pal@0          #Agrega a la pila el paramentro 1 al StaticDispatch pal
 jal Main_pal          #Call a la function Main_pal
-sw $s0, 36($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
+sw $s0, 108($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
 fin_Main_pal_2 :           #Crea el label fin_Main_pal_2           #Fin de un If
-lw $t0, 36($sp)          #Lee de la pila result@if@2 en 36 para assignar
-sw $t0, 88($sp)          #Escribe en la pila el valor que se le asigno a result@if@1
-j fin_Main_pal_1          #Salta para f{label} 
+lw $t0, 108($sp)          #Lee de la pila result@if@2 en 108 para assignar
+sw $t0, 232($sp)          #Escribe en la pila el valor que se le asigno a result@if@1
+j fin_Main_pal_1          #Salta para fin_Main_pal_1 
 then_Main_pal_1 :           #Crea el label then_Main_pal_1           #Then case
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 88($sp)          #Escribe en la pila el numero que se le asigno a result@if@1
+li $t0, 1          #Guarda el numbero que se va a asignar
+sw $t0, 28($sp)          #Escribe en la pila el numero que se le asigno a value_boolean@1          #Bool value true
+#Allocate a una class Bool puntero en sp + 20
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 20($sp)          #Guardando en la pila el pintero de la instancia de la clase Bool
+lw $t0, 20($sp)          #Buscando en la pila la variable BOOL_instance@1 y guarda la direccion a la que apunta
+lw $t1, 28($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_boolean@1 en la direccion de la memoria del la propiedad value del objeto de typo Bool          #Setear la propiedad value al BOOL en la variable value_boolean@1
+la $t0, Bool
+sw $t0, 24($sp)
+lw $t0, 20($sp)          #Buscando en la pila la variable BOOL_instance@1 y guarda la direccion a la que apunta
+lw $t1, 24($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_BOOL@1 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_boolean@1
+lw $t0, 20($sp)          #Lee de la pila BOOL_instance@1 en 20 para assignar
+sw $t0, 232($sp)          #Escribe en la pila el valor que se le asigno a result@if@1
 fin_Main_pal_1 :           #Crea el label fin_Main_pal_1           #Fin de un If
-lw $t0, 88($sp)          #Lee de la pila result@if@1 en 88 para assignar
-sw $t0, 108($sp)          #Escribe en la pila el valor que se le asigno a result@if@0
-j fin_Main_pal_0          #Salta para f{label} 
+lw $t0, 232($sp)          #Lee de la pila result@if@1 en 232 para assignar
+sw $t0, 276($sp)          #Escribe en la pila el valor que se le asigno a result@if@0
+j fin_Main_pal_0          #Salta para fin_Main_pal_0 
 then_Main_pal_0 :           #Crea el label then_Main_pal_0           #Then case
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 108($sp)          #Escribe en la pila el numero que se le asigno a result@if@0
+li $t0, 1          #Guarda el numbero que se va a asignar
+sw $t0, 16($sp)          #Escribe en la pila el numero que se le asigno a value_boolean@2          #Bool value true
+#Allocate a una class Bool puntero en sp + 8
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 8($sp)          #Guardando en la pila el pintero de la instancia de la clase Bool
+lw $t0, 8($sp)          #Buscando en la pila la variable BOOL_instance@2 y guarda la direccion a la que apunta
+lw $t1, 16($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 4($t0)          #Seteando el valor value_boolean@2 en la direccion de la memoria del la propiedad value del objeto de typo Bool          #Setear la propiedad value al BOOL en la variable value_boolean@2
+la $t0, Bool
+sw $t0, 12($sp)
+lw $t0, 8($sp)          #Buscando en la pila la variable BOOL_instance@2 y guarda la direccion a la que apunta
+lw $t1, 12($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_BOOL@2 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Setear la propiedad type_name al string en la variable value_boolean@2
+lw $t0, 8($sp)          #Lee de la pila BOOL_instance@2 en 8 para assignar
+sw $t0, 276($sp)          #Escribe en la pila el valor que se le asigno a result@if@0
 fin_Main_pal_0 :           #Crea el label fin_Main_pal_0           #Fin de un If
-lw $t0, 108($sp)          #Lee de la pila result@if@0 en 108 para assignar
+lw $t0, 276($sp)          #Lee de la pila result@if@0 en 276 para assignar
 sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
 lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
 lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 136          #Limpia la pila
+addi $sp, $sp, 328          #Limpia la pila
 jr $ra          #Final de la function pal
+
+new_ctr_Object:
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Object
+la $t0, Object
+sw $t0, 4($sp)          #Cargando el nombre del tipo desde el data
+lw $t0, 8($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
+lw $t1, 4($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor type_name@0 en la direccion de la memoria del la propiedad type_name del objeto de typo SELF          #Assignando el nombre del tipo en el campo type
+lw $s0, 8($sp)          #Envia el resultado de la funcion en $s0
+lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12          #Limpia la pila
+jr $ra
+
+ 
+       
+    String_length:
+
+    lw $t4 , ($sp)   #self
+    li $t0 , 0       #contador
+    lw $s2 , 4($t4)  # propiedad value
+
+    
+        loop:
+        lb $s0 , ($s2)
+        li $v0,4
+   
+        beq $s0 , $zero, END
+        add $t0 , $t0 ,1
+        add $s2,$s2,1
+        j loop
+    
+
+    END:
+        move $s0 , $t0
+        addi $sp, $sp, 4
+
+
+    
+        jr $ra
+        
+   
+String_substr:
+    
+    li $t0 ,0 
+    li $s6 ,1
+    lw $s1 , 4($sp)   # guarda el indice
+    lw $t4 , ($sp) # guarda el j 
+    lw $s5 , 8($sp) # self. 
+    lw $s3 , 4($s5)   # tomar la propiedad value del string
+    #add $a0 , $s1 , $t4   #tamano a reservar
+    
+    li $a0,8
+
+    li $v0 , 9
+    syscall
+
+    move $t7 , $v0           # $t4 direciion de destino
+    move $t5 , $v0            #guarde la dir de la clase string      #
+    la $s7 , String           #primer atributo de la calse
+    sw $s7 , ($t5)
+    add $t5,$t5,4            #posicion de la direccion del valor del string
+    
+
+    li $a0 ,100
+    li $v0,9
+    syscall                 #genere espacio para crear string
+    move $s4,$v0
+    
+
+    find_index:
+        beq			$t0, $s1, find_length	# if $t0 == $s1 then estas en el indice
+        add			$s3, $s3, 1		#s2 = s2 + 1
+        add			$t0, $t0, 1	    # $t0 = $t0 + 1
+       
+        j find_index
+
+    find_length:
+        lb			$t1, ($s3)			# 
+        sb		    $t1, ($s4)
+        beq			$s6, $t4, END_Substring	# if $t0 == $t1 then target
+        add			$s4, $s4, 1		# $S4 = s41 1t2			# 
+        add			$s3, $s3, 1		#s2 = s2 + 1
+        add			$s6, $s6, 1	    # $t0 = $t0 + 1
+        j find_length
+        
+    END_Substring:
+        move $s0 , $v0
+        sw $s0 , ($t5)
+        move $s0 , $t7
+        addi $sp, $sp, 12
+
+    
+        jr $ra  
+
+new_ctr_Bool:          #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_Int:          #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_String:          #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_SELF_TYPE:          #Esta funcion no se invoca en la ejecucion del programa
+
+IO_in_int:          #Esta funcion no se invoca en la ejecucion del programa
+
+IO_out_int:          #Esta funcion no se invoca en la ejecucion del programa
+
+String_concat:          #Esta funcion no se invoca en la ejecucion del programa
+
+Object_copy:          #Esta funcion no se invoca en la ejecucion del programa
+
+Object_type_name:          #Esta funcion no se invoca en la ejecucion del programa
+
+Object_abort:          #Esta funcion no se invoca en la ejecucion del programa
 
