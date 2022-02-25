@@ -1,4 +1,4 @@
-import cmp.visitor as visitor
+import visitor as visitor
 
 
 class Node:
