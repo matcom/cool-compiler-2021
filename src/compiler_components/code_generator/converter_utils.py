@@ -41,11 +41,11 @@ def get_method(converter, type_name, method_name):
 
 def box(converter, typeName, value):
     obj_internal = define_internal_local(converter)
-    converter.register_instruction(AllocateNode(typeName, obj_internal))
-    converter.register_instruction(SetAttribNode(obj_internal, 0, value))
-    converter.register_instruction(LoadNode(obj_internal, f'{typeName}_name'))
-    converter.register_instruction(LoadIntNode(obj_internal, f'{typeName}_size', 4))
-    converter.register_instruction(LoadNode(obj_internal, f'__virtual_table__{typeName}', 8))
+    register_instruction(converter, CilAllocateNode(typeName, obj_internal))
+    register_instruction(converter, CilSetAttribNode(obj_internal, 0, value))
+    register_instruction(converter, CilLoadNode(obj_internal, f'{typeName}_name'))
+    register_instruction(converter, CilLoadIntNode(obj_internal, f'{typeName}_size', 4))
+    register_instruction(converter, CilLoadNode(obj_internal, f'__virtual_table__{typeName}', 8))
     return obj_internal
 
 
@@ -59,14 +59,14 @@ def to_attribute_name(attr_name):
 
 def register_param(converter, var_info):
     var_info.cilName = var_info.name
-    param_node = cil.ParamNode(var_info.cilName)
+    param_node = CilParamNode(var_info.cilName)
     converter.params.append(param_node)
     return var_info.cilName
 
 
 def register_local(converter, var_info):
     var_info.cilName = f'local_{converter.current_function.name[9:]}_{var_info.name}_{len(converter.localvars)}'
-    local_node = cil.LocalNode(var_info.cilName)
+    local_node = CilLocalNode(var_info.cilName)
     converter.localvars.append(local_node)
     return var_info.cilName
 
@@ -83,13 +83,13 @@ def register_instruction(converter, instruction):
 
 
 def register_function(converter, function_name):
-    function_node = FunctionNode(function_name, [], [], [], [])
+    function_node = CilFunctionNode(function_name, [], [], [], [])
     converter.dotcode.append(function_node)
     return function_node
 
 
 def register_type(converter, name):
-    type_node = TypeNode(name)
+    type_node = CilTypeNode(name)
     converter.dottypes.append(type_node)
     return type_node
 
@@ -100,7 +100,7 @@ def register_data(converter, value):
             return dataNode
 
     vname = f'data_{len(converter.dotdata)}'
-    data_node = DataNode(vname, value)
+    data_node = CilDataNode(vname, value)
     converter.dotdata.append(data_node)
     return data_node
 
@@ -134,3 +134,9 @@ def basic_types(converter):
         cil_type = register_type(converter, basicType)
         for method, typeMethod in converter.context.get_type(basicType).all_methods():
             cil_type.methods.append((method.name, to_function_name(method.name, typeMethod.name)))
+
+
+class VariableInfo:
+    def __init__(self, name, typex):
+        self.name = name
+        self.type = typex

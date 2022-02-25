@@ -31,11 +31,11 @@ class TypeCollector(object):
                         self.errors.append(f"({dec_node.line_father},{dec_node.column_father}) - SemanticError: Basic type as parent")
                     self.context.get_type(dec_node.id, dec_node.line).set_parent(self.context.get_type(dec_node.parent,dec_node.line),node.line)
             except SemanticError as e:
-                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + e)
+                self.errors.append(f"({dec_node.line},{dec_node.column}) - TypeError: " + str(e))
         
         cycles = self.context.circular_dependency()
         for cycle in cycles:
-            self.errors.append(f"({cycle[0][0].line},{cycle[0][0].column}) - SemanticError: Class {cycle[0][0]}, is involved in an inheritance cycle.")
+            self.errors.append(f"({cycle[0][1]},{cycle[0][2]+1}) - SemanticError: Class {cycle[0][0]}, is involved in an inheritance cycle.")
             return
 
         for decl in classes:
@@ -46,7 +46,7 @@ class TypeCollector(object):
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         try:
-            self.current_type = self.context.create_type(node.id, node.type_line)
+            self.current_type = self.context.create_type(node.id, node.type_line, node.type_column)
         except SemanticError as e:
             self.errors.append(f"({node.type_line},{node.type_column}) - SemanticError: " + str(e))
             return
@@ -70,12 +70,12 @@ class TypeCollector(object):
             try:
                 arg_types.append(self.context.get_type(param[1],node.line) )
             except SemanticError as e:
-                self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
+                self.errors.append(f"({node.line},{node.column}) - TypeError: " + str(e))
                 arg_types.append(ErrorType())
         try:
             ret_type = SELF_TYPE() if node.type =="SELF_TYPE" else self.context.get_type(node.type,node.line)
         except SemanticError as e:
-            self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
+            self.errors.append(f"({node.line},{node.column}) - TypeError: " + str(e))
             ret_type = ErrorType()
         try:
             self.current_type.define_method(node.id, arg_names, arg_types, ret_type, node.line)

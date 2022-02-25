@@ -4,7 +4,7 @@ from .converter_utils import *
 class Converter:
     def __init__(self, context):
         self.dottypes = []
-        self.dotdata = [cil.DataNode('_empty', '')]
+        self.dotdata = [CilDataNode('_empty', '')]
         self.dotcode = []
         self.current_type = None
         self.current_method = None

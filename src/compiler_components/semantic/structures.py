@@ -5,7 +5,7 @@ import itertools as itt
 class SemanticError(Exception):
     @property
     def text(self):
-        return str(self.args[1][0])
+        return str(self.args[0])
 class TypeError(SemanticError):
     pass
 class NameError(SemanticError):
@@ -46,13 +46,14 @@ class Method:
 
 ############# Type #######################################
 class Type:
-    def __init__(self, name:str,line=-1):
+    def __init__(self, name:str,line=-1, column=-1):
         self.name = name
         self.attributes = []
         self.methods = []
         self.parent = None
         self.sons = []
         self.line = line
+        self.column = column
 
     def set_parent(self, parent, pos=0):
         if self.parent is not None:
@@ -97,8 +98,8 @@ class Type:
             method = self.get_method(name, pos)
             if method.return_type != return_type or method.param_types != param_types:
                 raise SemanticError(f'Method "{name}" already defined in {self.name} with a different signature.', pos)
-            else:
-                raise SemanticError(f'Method "{name}" already defined in {self.name} ', pos)
+            #else:
+            #    raise SemanticError(f'Method "{name}" already defined in {self.name} ', pos)
             
         except AttributeError as e:
             method = Method(name, param_names, param_types, return_type)
@@ -205,10 +206,10 @@ class Context:
         if not x.conforms_to(y) :
             raise(TypeError(f"Expr type {x.name} is no subclass of {y.name} ",pos))
 
-    def create_type(self, name:str,pos=0):
+    def create_type(self, name:str,line=0, column=0):
         if name in self.types:
             raise SemanticError(f'Type with the same name ({name}) already in context.')
-        t = self.types[name] = Type(name,pos)
+        t = self.types[name] = Type(name, line, column)
         return t
         
     def get_type(self, name:str,pos=0):
@@ -253,10 +254,10 @@ class Context:
                     break
                 if temp.parent.name in ancestors:
                     on_cycle[count] = []
-                    on_cycle[count].append((temp.name,temp.line))
+                    on_cycle[count].append((temp.name,temp.line, temp.column))
                     temp2 = temp.parent
                     while temp != temp2:
-                        on_cycle[count].append((temp2.name,temp2.line))
+                        on_cycle[count].append((temp2.name,temp2.line, temp2.column))
                         temp2 = temp2.parent
                     on_cycle[count].sort(key= lambda x:x[1],reverse=True)
                     count = count + 1

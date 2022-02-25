@@ -97,11 +97,11 @@ class CoolToCilConverter(Converter):
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
-        if not node.expression is None:
-            value = self.visit(node.expression, scope.children[0])
+        if not node.expr is None:
+            value = self.visit(node.expr, scope.children[0])
 
-            if node.type == 'Object' and node.expression.type.name in ['Int', 'Bool', 'String']:
-                value = box(self, node.expression.type.name, value)
+            if node.type == 'Object' and node.expr.type.name in ['Int', 'Bool', 'String']:
+                value = box(self, node.expr.type.name, value)
 
         else:
             if node.type == 'String':
@@ -316,7 +316,7 @@ class CoolToCilConverter(Converter):
 
     @visitor.when(ConstantStringNode)
     def visit(self, node, scope):
-        msg = register_data(self, node.token).name
+        msg = register_data(self, node.lex).name
         internal = define_internal_local(self)
         register_instruction(self, CilLoadAddressNode(internal, msg))
         return internal

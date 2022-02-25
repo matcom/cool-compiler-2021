@@ -221,14 +221,14 @@ class WhileNode(AtomicNode):
 
 
 class BlockNode(AtomicNode):
-    def __init__(self, expr_list, line = -1, column=-1):
+    def __init__(self, expr_list, line=-1, column=-1):
         self.expr_list = expr_list
         self.line = line
         self.column = column
 
     def visit(self, tabs = 0):
         ans = '\t'*tabs + " {<expr>; .... <expr>;}\n"
-        exprs = '\n'.join(param.visit( tabs + 1) for param in self.expr_list)
+        exprs = '\n'.join(param.visit(tabs + 1) for param in self.expr_list)
         return ans+exprs
 
 
