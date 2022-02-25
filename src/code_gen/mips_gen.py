@@ -50,7 +50,7 @@ class MIPSGenerator:
 
     @visitor.when(MIPSProgram)
     def visit(self, node: MIPSProgram) -> str:
-        global_main = "\t.globl main"
+        global_main = "\t.globl entry"
         text_section = "\t.text\n" + self.visit(node.text_section)
         data_section = "\t.data\n" + self.visit(node.data_section)
         return f"{global_main}\n{text_section}\n{data_section}"

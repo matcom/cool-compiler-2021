@@ -81,6 +81,7 @@ class CCILToMIPSGenerator:
         # TODO: other .data section static data inicializations like strings
 
         functions = []
+        functions.extend(self.visit(node.entry_func))
         functions.extend(
             [self.visit(func) for func in node.code_section if func.id == "main"][0]
         )
@@ -113,7 +114,7 @@ class CCILToMIPSGenerator:
             self.set_relative_location(
                 param.id,
                 mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, -1*index), frame_pointer
+                    node, mips_ast.Constant(node, -1 * index), frame_pointer
                 ),
             )
             index += DOUBLE_WORD
@@ -233,7 +234,7 @@ class CCILToMIPSGenerator:
 
     @visitor.when(ccil_ast.CallOpNode)
     def visit(self, node: ccil_ast.CallOpNode):
-        reg = mips_ast.RegisterNode(node, 10)
+        reg = mips_ast.RegisterNode(node, T0)
         instructions = []
         for arg in node.args:
             instructions.append(
@@ -390,7 +391,7 @@ class CCILToMIPSGenerator:
             mips_ast.LoadWord(node, mips_ast.RegisterNode(node, T0), object_location)
         )
 
-        reg_new_value = mips_ast.RegisterNode(node, T0)
+        reg_new_value = mips_ast.RegisterNode(node, T1)
         if isinstance(node.new_value, ccil_ast.IntNode):
             instructions.append(
                 mips_ast.LoadImmediate(
@@ -410,7 +411,9 @@ class CCILToMIPSGenerator:
                 node,
                 reg_new_value,
                 mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, attr_offset), object_location
+                    node,
+                    mips_ast.Constant(node, attr_offset),
+                    mips_ast.RegisterNode(node, T0),
                 ),
             )
         )
@@ -561,7 +564,7 @@ class CCILToMIPSGenerator:
         elif isinstance(node.right, ccil_ast.ConstantNode):
             instructions.append(
                 mips_ast.LoadImmediate(
-                    node, reg_right, mips_ast.Constant(ndoe, node.right.value)
+                    node, reg_right, mips_ast.Constant(node, node.right.value)
                 )
             )
         else:
@@ -570,7 +573,8 @@ class CCILToMIPSGenerator:
         reg_ret = mips_ast.RegisterNode(node, V0)
         instructions.append(mips_ast.Div(node, reg_left, reg_right))
         instructions.append(
-            mips_ast.Move(node, reg_ret, mips_ast.RegisterNode(node, "lo"))
+            # mips_ast.Move(node, reg_ret, mips_ast.RegisterNode(node, "lo"))
+            mips_ast.MoveFromLo(node, reg_ret)
         )
         return instructions
 
