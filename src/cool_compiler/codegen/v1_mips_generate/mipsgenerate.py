@@ -17,7 +17,8 @@ class MipsGenerate:
             "String_substr":1,
             "Object_copy": ASTR.Copy,
             "Object_type_name":ASTR.Type_Name,
-            "Object_abort": ASTR.Abort
+            "Object_abort": ASTR.Abort,
+            "String_substr":ASTR.SubStr
         }
 
     @visitor.on('node')
