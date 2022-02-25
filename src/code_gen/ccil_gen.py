@@ -1,7 +1,7 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import IO, Tuple, List, Dict
+from typing import Tuple, List, Dict
 from code_gen.tools import *
 
 from code_gen.constants import *
@@ -134,7 +134,6 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.MethodDeclarationNode)
     def visit(self, node: sem_ast.MethodDeclarationNode) -> METHOD_VISITOR_RESULT:
-        times = self.times(node)
         self.ccil_cool_names = self.ccil_cool_names.create_child()
 
         params: List[Parameter] = [Parameter("self", self.current_type)]
@@ -149,7 +148,7 @@ class CCILGenerator:
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
-            f"f_{times}",
+            f"f_{self.times(node)}" if node.id != "main" else "main",
             params,
             self.dump_locals(),
             operations,

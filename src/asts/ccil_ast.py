@@ -13,7 +13,7 @@ class CCILProgram:
     code_section: List[FunctionNode]
     data_section: List[str]  # no idea what will be this the node,
 
-    def __str__(self, all=False) -> str:
+    def __str__(self, all=True) -> str:
         types_section = self.types_section
         code_section = self.code_section
         if not all:

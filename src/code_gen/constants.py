@@ -46,4 +46,5 @@ INT = "Int"
 STRING = "String"
 VOID = "Void"
 SELFTYPE = "SELF_TYPE"
+IO = "IO"
 ADDRESS = INT
