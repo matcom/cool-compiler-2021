@@ -1,8 +1,8 @@
-from logging import Manager
 from typing import List, Tuple
 import compiler.visitors.visitor as visitor
 from ..cmp.semantic import (
     Context,
+    InferencerManager,
     Method,
     Scope,
     SemanticError,
@@ -17,8 +17,6 @@ from ..cmp.ast import (
     ClassDeclarationNode,
     AttrDeclarationNode,
     FuncDeclarationNode,
-)
-from ..cmp.ast import (
     AssignNode,
     CallNode,
     CaseNode,
@@ -26,26 +24,26 @@ from ..cmp.ast import (
     LoopNode,
     ConditionalNode,
     LetNode,
-)
-from ..cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
-from ..cmp.ast import VoidNode, NotNode, NegNode
-from ..cmp.ast import (
+    ArithmeticNode,
+    ComparisonNode,
+    EqualNode,
+    VoidNode,
+    NotNode,
+    NegNode,
     ConstantNumNode,
     ConstantStringNode,
     ConstantBoolNode,
     VariableNode,
     InstantiateNode,
 )
-
-
-AUTOTYPE_ERROR = "Incorrect use of AUTO_TYPE"
+from .utils import AUTOTYPE_ERROR
 
 
 class TypeInferencer:
     def __init__(self, context, manager):
         self.context: Context = context
         self.errors: List[Tuple[Exception, Tuple[int, int]]] = []
-        self.manager: Manager = manager
+        self.manager: InferencerManager = manager
 
         self.current_type: Type = None
         self.current_method: Method = None

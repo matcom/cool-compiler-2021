@@ -1,7 +1,5 @@
-from ast import Call
 from typing import List, Optional, Tuple
 
-from numpy import void
 import compiler.visitors.visitor as visitor
 from ..cmp.semantic import (
     Context,
@@ -10,8 +8,6 @@ from ..cmp.semantic import (
     Scope,
     SemanticError,
     ErrorType,
-    IntType,
-    BoolType,
     SelfType,
     AutoType,
     LCA,
@@ -23,8 +19,6 @@ from ..cmp.ast import (
     ClassDeclarationNode,
     AttrDeclarationNode,
     FuncDeclarationNode,
-)
-from ..cmp.ast import (
     AssignNode,
     CallNode,
     CaseNode,
@@ -32,25 +26,19 @@ from ..cmp.ast import (
     LoopNode,
     ConditionalNode,
     LetNode,
-)
-from ..cmp.ast import ArithmeticNode, ComparisonNode, EqualNode
-from ..cmp.ast import VoidNode, NotNode, NegNode
-from ..cmp.ast import (
+    ArithmeticNode,
+    ComparisonNode,
+    EqualNode,
+    VoidNode,
+    NotNode,
+    NegNode,
     ConstantNumNode,
     ConstantStringNode,
     ConstantBoolNode,
     VariableNode,
     InstantiateNode,
 )
-
-
-WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
-SELF_IS_READONLY = 'Variable "self" is read-only.'
-LOCAL_ALREADY_DEFINED = 'Variable "%s" is already defined in method "%s".'
-INCOMPATIBLE_TYPES = 'Cannot convert "%s" into "%s".'
-VARIABLE_NOT_DEFINED = 'Variable "%s" is not defined in "%s".'
-INVALID_OPERATION = 'Operation is not defined between "%s" and "%s".'
-INVALID_TYPE = "SELF_TYPE is not valid"
+from .utils import *
 
 
 class TypeChecker:
@@ -73,7 +61,6 @@ class TypeChecker:
 
     @visitor.when(ProgramNode)
     def visit(self, node: ProgramNode, scope: Optional[Scope] = None) -> Scope:
-        # print("Hola program node")
         scope = Scope()
         for declaration in node.declarations:
             self.visit(declaration, scope.create_child())
@@ -81,7 +68,6 @@ class TypeChecker:
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode, scope: Scope):
-        # print(f"Hola class {node.id}")
         self.current_type = self.context.get_type(node.id)
         scope.define_variable("self", SelfType(self.current_type))
         attributes = self.current_type.all_attributes()
@@ -94,26 +80,21 @@ class TypeChecker:
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode, scope: Scope):
-        # print(f"Hola attribute {node.id}")
         var = scope.find_variable(node.id)
         attr_type = var.type
 
         if node.expr is not None:
-            # print("Hola adentro")
             computed_type = self.visit(node.expr, scope)
             if not self.check_conformance(computed_type, attr_type):
                 self.errors.append(
                     (
-                        TypeError(
-                            f"Inferred type {computed_type.name} of initialization of attribute {node.id} does not conform to declared type {node.type}."
-                        ),
+                        TypeError(INCOMPATIBLE_TYPES % (computed_type.name, node.type)),
                         node.token.pos,
                     )
                 )
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node: FuncDeclarationNode, scope: Scope):
-        # print(f"Hola func {node.id}")
         self.current_method = self.current_type.get_method(node.id)
 
         # checking overwriting
@@ -123,7 +104,7 @@ class TypeChecker:
                 self.errors.append(
                     (
                         SemanticError(
-                            f"Incompatible number of formal parameters in redefined method {node.id}."
+                            WRONG_SIGNATURE % (node.id, self.current_type.name)
                         ),
                         node.token.pos,
                     )
@@ -134,7 +115,7 @@ class TypeChecker:
                         self.errors.append(
                             (
                                 SemanticError(
-                                    f"In redefined method {node.id}, parameter type {t.name} is different from original type {method.param_types[i].name}."
+                                    WRONG_SIGNATURE % (node.id, self.current_type.name)
                                 ),
                                 node.token.pos,
                             )
@@ -145,7 +126,7 @@ class TypeChecker:
                         self.errors.append(
                             (
                                 SemanticError(
-                                    f"In redefined method {node.id}, return type {self.current_method.return_type.name} is different from original return type {method.return_type.name}."
+                                    WRONG_SIGNATURE % (node.id, self.current_type.name)
                                 ),
                                 node.typeToken.pos,
                             )
@@ -179,7 +160,8 @@ class TypeChecker:
             self.errors.append(
                 (
                     TypeError(
-                        f"Inferred return type {computed_type.name} of method {node.id} does not conform to declared return type {rtype.name}."
+                        INCOMPATIBLE_TYPES
+                        % (computed_type.name, self.current_method.return_type.name)
                     ),
                     node.typeToken.pos,
                 )
@@ -187,17 +169,17 @@ class TypeChecker:
 
     @visitor.when(AssignNode)
     def visit(self, node: AssignNode, scope: Scope) -> Type:
-        # print(f"Hola assignment {node.id}")
         if node.id == "self":
-            self.errors.append(
-                (SemanticError("Cannot assign to 'self'."), node.idToken.pos)
-            )
+            self.errors.append((SemanticError(SELF_IS_READONLY), node.idToken.pos))
 
         # checking variable is defined
         var = scope.find_variable(node.id)
         if var is None:
             self.errors.append(
-                (NameError(f"Undeclared identifier {node.id}."), node.idToken.pos)
+                (
+                    NameError(VARIABLE_NOT_DEFINED % (node.id, self.current_type.name)),
+                    node.idToken.pos,
+                )
             )
             var = scope.define_variable(node.id, ErrorType())
 
@@ -215,62 +197,46 @@ class TypeChecker:
 
     @visitor.when(CallNode)
     def visit(self, node: CallNode, scope: Scope):
-        # print(f"Hola callNode {node.id}")
         # Evaluate object
         obj_type = self.visit(node.obj, scope)
-        # print("step 1")
 
         # Check object type conforms to cast type
         cast_type = obj_type
         if not node.type == "":
-            # print("step 2")
             try:
                 cast_type = self.context.get_type(node.type)
-                # print("step 3")
                 if isinstance(cast_type, AutoType):
-                    # print("step 4")
-                    raise SemanticError(
-                        "AUTO_TYPE can't be the type on this type of dispatch"
-                    )
+                    raise SemanticError(AUTOTYPE_ERROR)
                 if isinstance(cast_type, SelfType):
-                    # print("step 5")
                     cast_type = SelfType(self.current_type)
             except (SemanticError, TypeError) as ex:
-                # print("step 6")
                 cast_type = ErrorType()
                 self.errors.append((ex, node.typeToken.pos))
-        # print(obj_type, cast_type)
         if not self.check_conformance(obj_type, cast_type):
-            # print("step 7")
             self.errors.append(
                 (
                     TypeError(INCOMPATIBLE_TYPES % (obj_type.name, cast_type.name)),
                     node.typeToken.pos,
                 )
             )
-        # print("aqui estoy")
 
         # if the obj that is calling the function is autotype, let it pass
         if isinstance(cast_type, AutoType):
-            # print("step 8")
             node.computed_type = cast_type
             return cast_type
 
         if isinstance(cast_type, SelfType):
-            # print("step 9")
             cast_type = self.current_type
 
         # Check this function is defined for cast_type
         try:
             method = cast_type.get_method(node.id)
-            # print("step 10")
             # Check equal number of parameters
             if not len(node.args) == len(method.param_types):
-                # print("step 11")
                 self.errors.append(
                     (
                         SemanticError(
-                            f"Method {method.name} called with wrong number of arguments. "
+                            INVALID_OPERATION % (method.name, cast_type.name)
                         ),
                         node.token.pos,
                     )
@@ -281,9 +247,7 @@ class TypeChecker:
             # Check conformance to parameter types
             for i, arg in enumerate(node.args):
                 computed_type = self.visit(arg, scope)
-                # print("step 12 - ", i)
                 if not self.check_conformance(computed_type, method.param_types[i]):
-                    # print("step 13 - ", i)
                     self.errors.append(
                         (
                             TypeError(
@@ -298,15 +262,13 @@ class TypeChecker:
             rtype = method.return_type
             if isinstance(rtype, SelfType):
                 rtype = obj_type
-            # print("step 14")
             node.computed_type = rtype
             return rtype
 
         except SemanticError:
-            # print("step 15")
             self.errors.append(
                 (
-                    AttributeError(f"Dispatch to undefined method {node.id}."),
+                    AttributeError(METHOD_NOT_DEFINED % (node.id)),
                     node.token.pos,
                 )
             )
@@ -339,9 +301,7 @@ class TypeChecker:
             if size == len(decTypes):
                 self.errors.append(
                     (
-                        SemanticError(
-                            f"Duplicate branch {branch.typex} in case statement."
-                        ),
+                        SemanticError(CASE_BRANCH_ERROR % (branch.typex)),
                         branch.typexToken.pos,
                     )
                 )
@@ -370,7 +330,6 @@ class TypeChecker:
 
     @visitor.when(BlockNode)
     def visit(self, node: BlockNode, scope: Scope):
-        # print(f"Hola block {node.token.pos}")
         nscope = scope.create_child()
 
         # Check expressions
@@ -531,11 +490,7 @@ class TypeChecker:
 
     @visitor.when(NegNode)
     def visit(self, node: NegNode, scope: Scope):
-        # if isinstance(node.expr, InstantiateNode):
-        #     print(node.expr.token)
-
         typex = self.visit(node.expr, scope)
-        # print(typex)
         if not typex.conforms_to(self.int_type):
             self.errors.append(
                 (
@@ -584,7 +539,7 @@ class TypeChecker:
         try:
             typex = self.context.get_type(node.lex)
             if isinstance(typex, AutoType):
-                raise SemanticError("AUTO_TYPE can't be instanciate with new")
+                raise SemanticError(AUTOTYPE_ERROR)
             if isinstance(typex, SelfType):
                 typex = SelfType(self.current_type)
         except (SemanticError, TypeError) as ex:
