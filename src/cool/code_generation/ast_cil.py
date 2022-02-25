@@ -1,3 +1,4 @@
+from operator import le
 from typing import Any, List, Optional, Tuple
 
 
@@ -109,18 +110,19 @@ class XorNode(ArithmeticNode):
 
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, dest: str, instance: str, attr: str) -> None:
+    def __init__(self, dest: str, instance: str, attr: str, attr_index: int) -> None:
         self.dest: str = dest
         self.instance: str = instance
         self.attr: str = attr
+        self.attr_index: int = attr_index
 
 
-class SetAttribNode(InstructionNode):
-    def __init__(self, instance: str, attr: str, source: str) -> None:
+class SetAttributeNode(InstructionNode):
+    def __init__(self, instance: str, attr: str, source: str, attr_index: int) -> None:
         self.instance: str = instance
         self.attr: str = attr
         self.source: str = source
-
+        self.attr_index: int = attr_index
 
 class GetIndexNode(InstructionNode):
     def __init__(self, dest: str, instance: str, index: str) -> None:
@@ -154,13 +156,13 @@ class TypeOfNode(InstructionNode):
         dest: str,
         obj: str,
     ):
-        self.obj: str = obj
+        self.source: str = obj
         self.dest: str = dest
 
 
 class AncestorNode(InstructionNode):
-    def __init__(self, dest: str, obj: str):
-        self.obj: str = obj
+    def __init__(self, dest: str, source: str):
+        self.source: str = source
         self.dest: str = dest
 
 
@@ -193,15 +195,18 @@ class StaticCallNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype: str, method: str, dest: str):
+    def __init__(self, xtype: str, method: str, dest: str, total_args: int):
         self.type = xtype
         self.method = method
         self.dest = dest
+        self.total_args = total_args
 
 
 class ArgNode(InstructionNode):
-    def __init__(self, name: str):
+    def __init__(self, name: str, arg_index: int, total_args: int):
         self.name: str = name
+        self.arg_index: int = arg_index
+        self.total_args: int = total_args
 
 
 class ReturnNode(InstructionNode):
@@ -239,11 +244,26 @@ class SubstringNode(InstructionNode):
         self.start: int = start
         self.length: int = length
 
-class ToStrNode(InstructionNode):
-    def __init__(self, dest, ivalue):
-        self.dest = dest
-        self.ivalue = ivalue
+class AllocateStrNode(InstructionNode):
+    def __init__(self, dest: str, value: str):
+        self.dest: str = dest
+        self.value: str = value
 
+    @property
+    def string(self):
+        s = self.value.replace('\\n', '\n')
+        s = s.replace('\\t', '\t')
+        s = s.replace('\\b', '\b')
+        s = s.replace('\\f', '\f')
+        return s[1:-1]
+
+    @property
+    def length(self):
+        x = self.value.count('\\n')
+        x += self.value.count('\\t')
+        x += self.value.count('\\b')
+        x += self.value.count('\\f')
+        return len(self.value)  - x -  2
 
 class ReadStringNode(InstructionNode):
     def __init__(self, dest):
@@ -262,7 +282,7 @@ class PrintStringNode(InstructionNode):
 
 class PrintIntNode(InstructionNode):
     def __init__(self, value):
-        self.value = value
+        self.source = value
 
 
 class CopyNode(InstructionNode):

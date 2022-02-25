@@ -31,6 +31,10 @@ class WordDataNode(DataNode):
     data_type = ".word"
 
 
+class SpaceDataNode(DataNode):
+    data_type = ".space"
+
+
 class AsciizDataNode(DataNode):
     data_type = ".asciiz"
 
@@ -175,6 +179,13 @@ class SltiuNode(ThreeAddressIntructionNode):
     code = "sltiu"
 
 
+class SleNode(ThreeAddressIntructionNode):
+    code = "sle"
+
+
+class SeqNode(ThreeAddressIntructionNode):
+    code = "seq"
+
 #########################################
 # End Arithmetic and Logic Instructions #
 #########################################
@@ -186,6 +197,10 @@ class SltiuNode(ThreeAddressIntructionNode):
 
 class BeqNode(ThreeAddressIntructionNode):
     code = "beq"
+
+
+class BgeNode(ThreeAddressIntructionNode):
+    code = "bge"
 
 
 class BgezNode(TwoAddressIntructionNode):
@@ -241,12 +256,33 @@ class JumpRegisterNode(OneAddressInstructionNode):
 # Memory Access and Load Instructions #
 #######################################
 
+
+class LoadInmediateNode(TwoAddressIntructionNode):
+    code = "li"
+
+
+class LoadAddressNode(TwoAddressIntructionNode):
+    code = "la"
+
+
+class LoadByteNode(TwoAddressIntructionNode):
+    code = "lb"
+
+
 class LoadWordNode(TwoAddressIntructionNode):
     code = "lw"
 
 
 class StoreWordNode(TwoAddressIntructionNode):
     code = "sw"
+
+
+class StoreByteNode(TwoAddressIntructionNode):
+    code = "sb"
+
+
+class MoveNode(TwoAddressIntructionNode):
+    code = "move"
 
 
 class MoveFromLowNode(OneAddressInstructionNode):
@@ -260,6 +296,10 @@ class MoveFromHighNode(OneAddressInstructionNode):
 ###########################################
 # End Memory Access and Load Instructions #
 ###########################################
+
+class SystemCallNode(InstructionNode):
+    code = "syscall"
+
 
 class LabelNode(InstructionNode):
     def __init__(self, name: str):

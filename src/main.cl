@@ -52,27 +52,44 @@ class Point3D inherits Point {
 };
 *)
 
-class Main inherits IO{
+class Main {
     number: Int <- 0;
+    data: Int <- 2;
 
     main() : Object {
-        -- out_string("Hello, World!\n")
-        0
+        -- let s: String <- "Hello, World!\n", x: Int <- 0 in {
+        --     x <- number + data;
+        --     self.out_string(s);
+        -- }
+
+        (new IO).out_string("Hello, World!\n")
     };
 
-    plus(a: Int, b: Int) : Int {
-        a + b
-    };
+--     plus(a: Int, b: Int) : Int {
+--         a + b
+--     };
 
-    minus(a: Int, b: Int) : Int {
-        a - b
-    };
+--     minus(a: Int, b: Int) : Int {
+--         a - b
+--     };
 
-    mult(a: Int, b: Int) : Int {
-        a * b
-    };
+--     mult(a: Int, b: Int) : Int {
+--         a * b
+--     };
 
-    div(a: Int, b: Int) : Int {
-        a / b
-    };
+--     div(a: Int, b: Int) : Int {
+--         a / b
+--     };
+
+--     equals(a: Bool, b: Bool) : Bool {
+--         a = b
+--     };
+
+--     less(a: Int, b: Int) : Bool {
+--         a < b
+--     };
+    
+--     less_equals(a: Int, b: Int) : Bool {
+--         a <= b
+--     };
 };

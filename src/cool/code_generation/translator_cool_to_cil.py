@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional, Tuple
+from unittest import result
 
 import cool.code_generation.ast_cil as cil
 import cool.code_generation.ast_ecool as ecool
@@ -667,11 +668,11 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.current_function = self.register_function(self.to_function_name("abort", "Object"))
         self.current_function.params.append(cil.ParamNode("self"))
         self.register_instruction(cil.HaltNode())
-        self.register_instruction(cil.ReturnNode())
+        self.register_instruction(cil.ReturnNode("self"))
         
         self.current_function = self.register_function(self.to_function_name("type_name", "Object"))
         self.current_function.params.append(cil.ParamNode("self"))
-        type_name = self.register_local("type_name")
+        type_name = self.define_internal_local("type_name")
         self.register_instruction(cil.TypeNameNode(type_name, "self"))
         self.register_instruction(cil.ReturnNode(type_name))
 
@@ -688,7 +689,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.current_function = self.register_function(self.to_function_name("out_string", "IO"))
         self.current_function.params.append(cil.ParamNode("self"))
         self.current_function.params.append(cil.ParamNode("x"))
-        self.register_instruction(cil.PrintIntNode("x"))
+        self.register_instruction(cil.PrintStringNode("x"))
         self.register_instruction(cil.ReturnNode("self"))
 
         self.current_function = self.register_function(self.to_function_name("out_int", "IO"))
@@ -700,7 +701,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.current_function = self.register_function(self.to_function_name("in_string", "IO"))
         self.current_function.params.append(cil.ParamNode("self"))
         local_int = self.define_internal_local()
-        self.register_instruction(cil.ReadIntNode(local_int))
+        self.register_instruction(cil.ReadStringNode(local_int))
         self.register_instruction(cil.ReturnNode(local_int))
 
         self.current_function = self.register_function(self.to_function_name("in_int", "IO"))
@@ -736,6 +737,18 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         
         for i, declaration in enumerate(node.declarations):
             self.visit(declaration, scope.children[i])
+
+        self.current_function = self.register_function("main")
+        local_main = self.define_internal_local()
+        local_result = self.define_internal_local()
+        self.register_instruction(cil.AllocateNode("Main", local_main))
+        self.register_instruction(cil.ArgNode(local_main, 0, 1))
+        self.register_instruction(cil.DynamicCallNode("Main", self.to_function_name("__init__", "Main"), local_main, 1))
+        self.register_empty_instruction()
+        self.register_instruction(cil.ArgNode(local_main, 0, 1))
+        self.register_instruction(cil.DynamicCallNode("Main", self.to_function_name("main", "Main"), local_result, 1))
+        self.register_empty_instruction()
+        self.register_instruction(cil.HaltNode())
 
         return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
 
@@ -825,11 +838,14 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         )
 
         if is_attribute:
-            self.register_instruction(cil.SetAttribNode("self", variable.name, source))
+            attr_names = [attr.name for attr, _ in self.current_type.all_attributes()]
+            # local_var = self.define_internal_local()
+            self.register_instruction(cil.SetAttributeNode("self", variable.name, source, attr_names.index(variable.name)))
+            # self.register_instruction(cil.AssignNode(local_var, source))
+            return source, variable.type
         else:
             self.register_instruction(cil.AssignNode(variable.name, source))
-
-        return variable.name, variable.type
+            return variable.name, variable.type
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
@@ -1106,15 +1122,15 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
             arg_source, _ = self.visit(arg, scope)
             args_sources.append(arg_source)
 
-        self.register_instruction(cil.ArgNode(obj_source))
-        for arg_source in args_sources:
-            self.register_instruction(cil.ArgNode(arg_source))
+        self.register_instruction(cil.ArgNode(obj_source, 0, len(args_sources) + 1))
+        for index, arg_source in enumerate(args_sources, start=1):
+            self.register_instruction(cil.ArgNode(arg_source, index, len(args_sources) + 1))
 
         call_dest = self.define_internal_local()
         method, owner = obj_type.get_method(node.id, get_owner=True)
         self.register_instruction(
             cil.DynamicCallNode(
-                obj_type.name, self.to_function_name(node.id, owner.name), call_dest
+                obj_type.name, self.to_function_name(node.id, owner.name), call_dest, len(args_sources) + 1
             )
         )
         return call_dest, method.return_type
@@ -1125,7 +1141,9 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope: Scope):
-        return node.lex, self.context.get_type("String")
+        local_str_var = self.define_internal_local(f"String {node.lex}")
+        self.register_instruction(cil.AllocateStrNode(local_str_var, node.lex))
+        return local_str_var, self.context.get_type("String")
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
@@ -1146,7 +1164,8 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
         if is_attribute:
             dest = self.define_internal_local()
-            self.register_instruction(cil.GetAttribNode(dest, "self", variable.name))
+            attr_names = [a.name for a, _ in self.current_type.all_attributes()]
+            self.register_instruction(cil.GetAttribNode(dest, "self", variable.name, attr_names.index(variable.name)))
             return dest, variable.type
         return variable.name, variable.type
 
@@ -1154,8 +1173,8 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
     def visit(self, node: cool.InstantiateNode, scope: Scope):
         local = self.define_internal_local(f"Store an instance of the class {node.lex}")
         self.register_instruction(cil.AllocateNode(node.lex, local).set_comment(f"Allocate the object {node.lex}"))
-        self.register_instruction(cil.ArgNode(local).set_comment("Pass the instance to the constructor"))
-        self.register_instruction(cil.DynamicCallNode(node.lex, self.to_function_name("__init__", node.lex), local).set_comment("Call the constructor"))
+        self.register_instruction(cil.ArgNode(local, 0, 1).set_comment("Pass the instance to the constructor"))
+        self.register_instruction(cil.DynamicCallNode(node.lex, self.to_function_name("__init__", node.lex), local, 1).set_comment("Call the constructor"))
         return local, self.context.get_type(node.lex)
 
     @visitor.when(cool.NegationNode)

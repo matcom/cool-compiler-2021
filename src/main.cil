@@ -47,22 +47,15 @@ type Bool {
 	method __init__: function___init___at_Bool
 }
 type Main {
-	inherits from IO
+	inherits from Object
 
 	attribute number
+	attribute data
 
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
-	method out_string: function_out_string_at_IO
-	method out_int: function_out_int_at_IO
-	method in_string: function_in_string_at_IO
-	method in_int: function_in_int_at_IO
 	method main: function_main_at_Main
-	method plus: function_plus_at_Main
-	method minus: function_minus_at_Main
-	method mult: function_mult_at_Main
-	method div: function_div_at_Main
 	method __init__: function___init___at_Main
 }
 
@@ -80,16 +73,16 @@ function function_abort_at_Object{
 
 	HALT
 	
-	RETURN 0
+	RETURN self
 }
 function function_type_name_at_Object{
 	PARAM self
 
-	LOCAL type_name
+	LOCAL internal_0 # type_name
 
-	type_name = TYPENAME self
+	internal_0 = TYPENAME self
 	
-	RETURN type_name
+	RETURN internal_0
 }
 function function_copy_at_Object{
 	PARAM self
@@ -109,7 +102,7 @@ function function_out_string_at_IO{
 	PARAM self
 	PARAM x
 
-	PRINTINT x
+	PRINTSTR x
 	
 	RETURN self
 }
@@ -126,7 +119,7 @@ function function_in_string_at_IO{
 
 	LOCAL internal_0
 
-	READINT internal_0
+	READSTR internal_0
 	
 	RETURN internal_0
 }
@@ -178,55 +171,39 @@ function function___init___at_Main{
 	PARAM self
 
 	SETATTR self number 0
+	SETATTR self data 2
 	
 	RETURN self
 }
 function function_main_at_Main{
 	PARAM self
+
+	LOCAL internal_0 # Store an instance of the class IO
+	LOCAL internal_1 # String "Hello, World!\n"
+	LOCAL internal_2
+
+	internal_0 = ALLOCATE IO # Allocate the object IO
+	ARG internal_0 # Pass the instance to the constructor
+	internal_0 = VCALL IO function___init___at_IO # Call the constructor
+	internal_1 = ALLOCSTR "Hello, World!\n"
+	ARG internal_0
+	ARG internal_1
+	internal_2 = VCALL IO function_out_string_at_IO
 	
-	RETURN 0
+	RETURN internal_2
 }
-function function_plus_at_Main{
-	PARAM self
-	PARAM a
-	PARAM b
+function main{
+	
 
 	LOCAL internal_0
+	LOCAL internal_1
 
-	internal_0 = a + b
+	internal_0 = ALLOCATE Main
+	ARG internal_0
+	internal_0 = VCALL Main function___init___at_Main
 	
-	RETURN internal_0
-}
-function function_minus_at_Main{
-	PARAM self
-	PARAM a
-	PARAM b
-
-	LOCAL internal_0
-
-	internal_0 = a - b
+	ARG internal_0
+	internal_1 = VCALL Main function_main_at_Main
 	
-	RETURN internal_0
-}
-function function_mult_at_Main{
-	PARAM self
-	PARAM a
-	PARAM b
-
-	LOCAL internal_0
-
-	internal_0 = a * b
-	
-	RETURN internal_0
-}
-function function_div_at_Main{
-	PARAM self
-	PARAM a
-	PARAM b
-
-	LOCAL internal_0
-
-	internal_0 = a / b
-	
-	RETURN internal_0
+	HALT
 }

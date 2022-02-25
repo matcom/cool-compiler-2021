@@ -147,9 +147,9 @@ class CilFormatter:
     @visitor.when(cil.TypeOfNode)
     def visit(self, node: cil.TypeOfNode):
         return (
-            f"{node.dest} = TYPEOF {node.obj}"
+            f"{node.dest} = TYPEOF {node.source}"
             if node.comment == ""
-            else f"{node.dest} = TYPEOF {node.obj} # {node.comment}"
+            else f"{node.dest} = TYPEOF {node.source} # {node.comment}"
         )
 
     @visitor.when(cil.TypeDirectionNode)
@@ -163,9 +163,9 @@ class CilFormatter:
     @visitor.when(cil.AncestorNode)
     def visit(self, node: cil.AncestorNode):
         return (
-            f"{node.dest} = ANCESTOR {node.obj}"
+            f"{node.dest} = ANCESTOR {node.source}"
             if node.comment == ""
-            else f"{node.dest} = ANCESTOR {node.obj} # {node.comment}"
+            else f"{node.dest} = ANCESTOR {node.source} # {node.comment}"
         )
 
     @visitor.when(cil.StaticCallNode)
@@ -192,8 +192,8 @@ class CilFormatter:
             else f"{node.dest} = GETATTR {node.instance} {node.attr} # {node.comment}"
         )
 
-    @visitor.when(cil.SetAttribNode)
-    def visit(self, node: cil.SetAttribNode):
+    @visitor.when(cil.SetAttributeNode)
+    def visit(self, node: cil.SetAttributeNode):
         return (
             f"SETATTR {node.instance} {node.attr} {node.source}"
             if node.comment == ""
@@ -295,9 +295,9 @@ class CilFormatter:
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
         return (
-            f"PRINTINT {node.value}"
+            f"PRINTINT {node.source}"
             if node.comment == ""
-            else f"PRININT {node.value} # {node.comment}"
+            else f"PRININT {node.source} # {node.comment}"
         )
 
     @visitor.when(cil.ReadStringNode)
@@ -339,6 +339,10 @@ class CilFormatter:
             if node.comment == ""
             else f"{node.dest} = SUBSTRING {node.str_address} {node.start} {node.length} # {node.comment}"
         )
+
+    @visitor.when(cil.AllocateStrNode)
+    def visit(self, node: cil.AllocateStrNode):
+        return (f"{node.dest} = ALLOCSTR {node.value}") if node.comment == "" else f"{node.dest} = ALLOCSTR {node.value} # {node.comment}"
 
     @visitor.when(cil.CommentNode)
     def visit(self, node: cil.CommentNode):
@@ -408,6 +412,10 @@ class MipsFormatter:
             else f"{node.code} {node.dest}, {node.source1}, {node.source2} # {node.comment}"
         )
 
+    @visitor.when(mips.SystemCallNode)
+    def visit(self, node: mips.SystemCallNode):
+        return node.code
+    
     @visitor.when(mips.LabelNode)
     def visit(self, node: mips.LabelNode):
         return (

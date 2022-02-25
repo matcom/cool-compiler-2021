@@ -318,9 +318,7 @@ atom %= "true", lambda s: cool.BooleanNode(s[1])
 atom %= "false", lambda s: cool.BooleanNode(s[1])
 atom %= "int", lambda s: cool.IntegerNode(s[1])
 atom %= "string", lambda s: cool.StringNode(s[1])
-atom %= "if expr then expr else expr fi", lambda s: cool.ConditionalNode(
-    s[2], s[4], s[6]
-)
+atom %= "if expr then expr else expr fi", lambda s: cool.ConditionalNode(s[2], s[4], s[6])
 atom %= "function-call", lambda s: s[1]
 atom %= "new type", lambda s: cool.InstantiateNode(s[2])
 atom %= "( expr )", lambda s: s[2]
@@ -330,25 +328,15 @@ block %= "expr ; block", lambda s: [s[1]] + s[3]
 
 declaration_list %= "id : type", lambda s: [(s[1], s[3], None)]
 declaration_list %= "id : type <- expr", lambda s: [(s[1], s[3], s[5])]
-declaration_list %= (
-    "id : type , declaration-list",
-    lambda s: [(s[1], s[3], None)] + s[5],
-)
-declaration_list %= (
-    "id : type <- expr , declaration-list",
-    lambda s: [(s[1], s[3], s[5])] + s[7],
-)
+declaration_list %= "id : type , declaration-list",lambda s: [(s[1], s[3], None)] + s[5]
+declaration_list %= "id : type <- expr , declaration-list",lambda s: [(s[1], s[3], s[5])] + s[7]
 
 case_list %= "id : type => expr ;", lambda s: [(s[1], s[3], s[5])]
 case_list %= "id : type => expr ; case-list", lambda s: [(s[1], s[3], s[5])] + s[7]
 
 function_call %= "id ( expr-list )", lambda s: cool.MethodCallNode(s[1], s[3])
-function_call %= "atom . id ( expr-list )", lambda s: cool.MethodCallNode(
-    s[3], s[5], s[1]
-)
-function_call %= "atom @ type . id ( expr-list )", lambda s: cool.MethodCallNode(
-    s[5], s[7], s[1], s[3]
-)
+function_call %= "atom . id ( expr-list )", lambda s: cool.MethodCallNode(s[3], s[5], s[1])
+function_call %= "atom @ type . id ( expr-list )", lambda s: cool.MethodCallNode(s[5], s[7], s[1], s[3])
 
 expr_list %= "", lambda s: []
 expr_list %= "not-empty-expr-list", lambda s: s[1]
