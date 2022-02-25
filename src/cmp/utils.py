@@ -127,11 +127,14 @@ class Token:
         Token's lexeme.
     token_type : Enum
         Token's type.
+    location : (Int, Int)
+        (Row, position since the start of the text). 
     """
 
-    def __init__(self, lex, token_type):
+    def __init__(self, lex, token_type, location):
         self.lex = lex
         self.token_type = token_type
+        self.location = location
 
     def __str__(self):
         return f"{self.token_type}: {self.lex}"
@@ -145,11 +148,11 @@ class Token:
 
 
 class UnknownToken(Token):
-    def __init__(self, lex):
-        Token.__init__(self, lex, None)
+    def __init__(self, lex, location):
+        Token.__init__(self, lex, None, location)
 
     def transform_to(self, token_type):
-        return Token(self.lex, token_type)
+        return Token(self.lex, token_type, self.location)
 
     @property
     def is_valid(self):

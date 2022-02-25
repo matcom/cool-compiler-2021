@@ -71,11 +71,11 @@ def define_cool_grammar(print_grammar=False):
 
     def_class %= (
         classx + type_id + ocur + feature_list + ccur + semi,
-        lambda h, s: ClassDeclarationNode(s[2], s[4]),
+        lambda h, s: ClassDeclarationNode(s[2], s[4], s[1]),
     )
     def_class %= (
         classx + type_id + inherits + type_id + ocur + feature_list + ccur + semi,
-        lambda h, s: ClassDeclarationNode(s[2], s[6], s[4]),
+        lambda h, s: ClassDeclarationNode(s[2], s[6], s[1], s[4]),
     )
 
     feature_list %= def_attr + semi + feature_list, lambda h, s: [s[1]] + s[3]
@@ -83,14 +83,14 @@ def define_cool_grammar(print_grammar=False):
     feature_list %= G.Epsilon, lambda h, s: []
 
     def_attr %= (
-        idx + colon + type_id + larrow + expr,
-        lambda h, s: AttrDeclarationNode(s[1], s[3], s[5]),
+        idx + colon + type_id + larrow + expr, # el token podria ser el del id en estos 3
+        lambda h, s: AttrDeclarationNode(s[1], s[3], s[5], s[4]),
     )
-    def_attr %= idx + colon + type_id, lambda h, s: AttrDeclarationNode(s[1], s[3])
+    def_attr %= idx + colon + type_id, lambda h, s: AttrDeclarationNode(s[1], s[3], token = s[2])
 
-    def_func %= (
+    def_func %= (#verificar el token que se manda
         idx + opar + param_list + cpar + colon + type_id + ocur + expr + ccur,
-        lambda h, s: FuncDeclarationNode(s[1], s[3], s[6], s[8]),
+        lambda h, s: FuncDeclarationNode(s[1], s[3], s[6], s[8], s[2]),
     )
 
     param_list %= param + param_list_rest, lambda h, s: [s[1]] + s[2]
@@ -99,13 +99,14 @@ def define_cool_grammar(print_grammar=False):
 
     param_list_rest %= comma + param + param_list_rest, lambda h, s: [s[2]] + s[3]
     param_list_rest %= comma + param, lambda h, s: [s[2]]
-
+    #aqui podria ser conveniente annadir un token para registrar la pos ante un error
     param %= idx + colon + type_id, lambda h, s: (s[1], s[3])
 
-    expr %= idx + larrow + expr, lambda h, s: AssignNode(s[1], s[3])
-    expr %= let + identifiers_list + inx + expr, lambda h, s: LetNode(s[2], s[4])
+    expr %= idx + larrow + expr, lambda h, s: AssignNode(s[1], s[3], s[2])
+    expr %= let + identifiers_list + inx + expr, lambda h, s: LetNode(s[2], s[4], s[1])
     expr %= comp, lambda h, s: s[1]
 
+    # igual, deberia considerarse registrar estos tokens
     identifiers_list %= (
         identifier_init + comma + identifiers_list,
         lambda h, s: [s[1]] + s[3],
@@ -118,39 +119,39 @@ def define_cool_grammar(print_grammar=False):
     )
     identifier_init %= idx + colon + type_id, lambda h, s: VarDeclarationNode(s[1], s[3])
 
-    comp %= comp + less + arith, lambda h, s: LessNode(s[1], s[3])
-    comp %= comp + equal + arith, lambda h, s: EqualNode(s[1], s[3])
-    comp %= comp + lesseq + arith, lambda h, s: LessEqualNode(s[1], s[3])
+    comp %= comp + less + arith, lambda h, s: LessNode(s[1], s[3], s[2])
+    comp %= comp + equal + arith, lambda h, s: EqualNode(s[1], s[3], s[2])
+    comp %= comp + lesseq + arith, lambda h, s: LessEqualNode(s[1], s[3], s[2])
     comp %= arith, lambda h, s: s[1]
 
-    arith %= notx + term, lambda h, s: NotNode(s[2]) 
-    arith %= arith + plus + term, lambda h, s: PlusNode(s[1], s[3])
-    arith %= arith + minus + term, lambda h, s: MinusNode(s[1], s[3])
+    arith %= notx + term, lambda h, s: NotNode(s[2], s[1]) 
+    arith %= arith + plus + term, lambda h, s: PlusNode(s[1], s[3], s[2])
+    arith %= arith + minus + term, lambda h, s: MinusNode(s[1], s[3], s[2])
     arith %= term, lambda h, s: s[1]
 
-    term %= term + star + factor, lambda h, s: StarNode(s[1], s[3])
-    term %= term + div + factor, lambda h, s: DivNode(s[1], s[3])
+    term %= term + star + factor, lambda h, s: StarNode(s[1], s[3], s[2])
+    term %= term + div + factor, lambda h, s: DivNode(s[1], s[3], s[2])
     term %= factor, lambda h, s: s[1]
 
-    factor %= isvoid + element, lambda h, s: IsvoidNode(s[2])
-    factor %= neg + element, lambda h, s: NegNode(s[2])
+    factor %= isvoid + element, lambda h, s: IsvoidNode(s[2], s[1])
+    factor %= neg + element, lambda h, s: NegNode(s[2], s[1])
     factor %= element, lambda h, s: s[1]
 
     element %= (
         ifx + expr + then + expr + elsex + expr + fi,
-        lambda h, s: IfNode(s[2], s[4], s[6]),
+        lambda h, s: IfNode(s[2], s[4], s[6], s[1]),
     )
-    element %= whilex + expr + loop + expr + pool, lambda h, s: WhileNode(s[2], s[4])
-    element %= case + expr + of + case_block + esac, lambda h, s: CaseNode(s[2], s[4])
-    element %= new + type_id, lambda h, s: InstantiateNode(s[2])
+    element %= whilex + expr + loop + expr + pool, lambda h, s: WhileNode(s[2], s[4], s[1])
+    element %= case + expr + of + case_block + esac, lambda h, s: CaseNode(s[2], s[4], s[1])
+    element %= new + type_id, lambda h, s: InstantiateNode(s[2], s[1])
     element %= opar + expr + cpar, lambda h, s: s[2]
     element %= ocur + block + ccur, lambda h, s: BlockNode(s[2])
-    element %= (element + dot + func_call, lambda h, s: CallNode(*s[3], obj=s[1]))
+    element %= (element + dot + func_call, lambda h, s: CallNode(*s[3], obj=s[1], token = s[2]))#arreglar
     element %= (
         element + at + type_id + dot + func_call,
-        lambda h, s: CallNode(*s[5], obj=s[1], at_type=s[3]),
+        lambda h, s: CallNode(*s[5], obj=s[1], at_type=s[3], token = s[2]),
     )
-    element %= func_call, lambda h, s: CallNode(*s[1])
+    element %= func_call, lambda h, s: CallNode(*s[1],)
     element %= atom, lambda h, s: s[1]
 
     case_block %= case_item + case_block, lambda h, s: [s[1]] + s[2]

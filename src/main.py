@@ -44,8 +44,7 @@ def pipeline(input_file: Path, output_file: Path = None):
     # define grammar
     grammar, idx, type_id, string, num = define_cool_grammar()
 
-    tokens, pos_data = tokenize_cool_text(grammar, idx, type_id, string, num, text, errors)
-    # print(tokens)
+    tokens = tokenize_cool_text(grammar, idx, type_id, string, num, text, errors)
 
     if len(errors) > 0:
         report_and_exit(errors)
@@ -54,7 +53,7 @@ def pipeline(input_file: Path, output_file: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    parse, operations = parser([t.token_type for t in tokens], [t.lex for t in tokens], pos_data, text)
+    parse, operations = parser(tokens, text)
 
     # print("Parse")
     # print(parse)
@@ -73,6 +72,9 @@ def pipeline(input_file: Path, output_file: Path = None):
     visitors = [TypeCollector(errors), TypeBuilder(errors)]
     for visitor in visitors:
         ast = visitor.visit(ast)
+
+    type_checker = TypeChecker(errors)
+    scope = type_checker.visit(ast)
 
     # formatter = FormatVisitor()
     # tree = formatter.visit(ast)
