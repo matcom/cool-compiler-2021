@@ -1,15 +1,10 @@
-from .utils import emptyToken
+from typing import List, Optional, Tuple, Union
+from .utils import Token, emptyToken
 
 
 class Node:
-    def __init__(self, token):
+    def __init__(self, token: Token):
         self.token = token
-
-
-class ProgramNode(Node):
-    def __init__(self, declarations):
-        super().__init__(emptyToken)
-        self.declarations = declarations
 
 
 class DeclarationNode(Node):
@@ -20,100 +15,167 @@ class ExpressionNode(Node):
     pass
 
 
-class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx, features, token, parent=None):
-        self.id = idx
-        self.token = token
-        self.parent = parent
-        self.features = features
-
-
 class FuncDeclarationNode(DeclarationNode):
-    def __init__(self, token, params, return_type, body):
+    def __init__(
+        self,
+        token: Token,
+        params: List[Tuple[Token, Token]],
+        return_type: Token,
+        body: ExpressionNode,
+    ):
         self.id = token.lex
         # param = (name, type)
         self.params = params
-        self.type = return_type
+        self.type = return_type.lex
+        self.typeToken = return_type
         self.body = body
         self.token = token
 
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, idx, typex, expr=None, token=emptyToken):
-        self.id = idx
-        self.type = typex
+    def __init__(
+        self,
+        idx: Token,
+        typex: Token,
+        expr: Optional[ExpressionNode] = None,
+        token: Token = emptyToken,
+    ):
+        self.id = idx.lex
+        self.idToken = idx
+        self.type = typex.lex
+        self.typeToken = typex
         self.expr = expr
         self.token = token
 
 
+class ClassDeclarationNode(DeclarationNode):
+    def __init__(
+        self,
+        idx: Token,
+        features: List[Union[FuncDeclarationNode, AttrDeclarationNode]],
+        token: Token,
+        parent: Optional[Token] = None,
+    ):
+        self.id = idx.lex
+        self.tokenId = idx
+        self.token = token
+        self.parent = parent
+        self.features = features
+
+
+class ProgramNode(Node):
+    def __init__(self, declarations: List[ClassDeclarationNode]):
+        super().__init__(emptyToken)
+        self.declarations = declarations
+
+
 class AssignNode(ExpressionNode):
-    def __init__(self, idx, expr, token):
-        self.id = idx
+    def __init__(self, idx: Token, expr: ExpressionNode, token: Token):
+        self.id = idx.lex
+        self.idToken = idx
         self.expr = expr
         self.token = token
 
 
 class CallNode(ExpressionNode):
-    def __init__(self, obj, token, args, cast_type=emptyToken):
+    def __init__(
+        self,
+        obj: ExpressionNode,
+        idx: Token,
+        args: List[ExpressionNode],
+        cast_type: Token = emptyToken,
+    ):
         self.obj = obj
-        self.id = token.lex
+        self.id = idx.lex
         self.args = args
         self.type = cast_type.lex
-        self.token = token
+        self.token = idx
         self.typeToken = cast_type
 
 
+class CaseBranchNode(Node):
+    def __init__(self, token: Token, idx: Token, typex: Token, expr: ExpressionNode):
+        self.token = token
+        self.id = idx.lex
+        self.idToken = idx
+        self.typex = typex.lex
+        self.typexToken = typex
+        self.expression = expr
+
+
 class CaseNode(ExpressionNode):
-    def __init__(self, expr, branch_list, token):
+    def __init__(
+        self, expr: ExpressionNode, branch_list: List[CaseBranchNode], token: Token
+    ):
         self.expr = expr
-        # [(id, type, expr), ...]
         self.branch_list = branch_list
         self.token = token
 
 
 class BlockNode(ExpressionNode):
-    def __init__(self, expr_list, token):
+    def __init__(self, expr_list: List[ExpressionNode], token: Token):
         self.expr_list = expr_list
         self.token = token
 
 
 class LoopNode(ExpressionNode):
-    def __init__(self, cond, body, token):
+    def __init__(self, cond: ExpressionNode, body: ExpressionNode, token: Token):
         self.condition = cond
         self.body = body
         self.token = token
 
 
 class ConditionalNode(ExpressionNode):
-    def __init__(self, cond, then_body, else_body, token):
+    def __init__(
+        self,
+        cond: ExpressionNode,
+        then_body: ExpressionNode,
+        else_body: ExpressionNode,
+        token: Token,
+    ):
         self.condition = cond
         self.then_body = then_body
         self.else_body = else_body
         self.token = token
 
 
+class LetVarNode(Node):
+    def __init__(
+        self,
+        idx: Token,
+        typex: Token,
+        expr: Optional[ExpressionNode] = None,
+        token: Token = emptyToken,
+    ):
+        self.token = token
+        self.id = idx.lex
+        self.idToken = idx
+        self.typex = typex.lex
+        self.typexToken = typex
+        self.expression = expr
+
+
 class LetNode(ExpressionNode):
-    def __init__(self, id_list, body, token):
-        # [(id, type, expr), ...]
+    def __init__(self, id_list: List[LetVarNode], body: ExpressionNode, token: Token):
         self.id_list = id_list
         self.body = body
         self.token = token
 
 
 class AtomicNode(ExpressionNode):
-    def __init__(self, token):
+    def __init__(self, token: Token):
         self.lex = token.lex
         self.token = token
 
 
 class UnaryNode(ExpressionNode):
-    def __init__(self, expr, symbol):
+    def __init__(self, expr: ExpressionNode, symbol: Token):
         self.expr = expr
         self.token = symbol
 
 
 class BinaryNode(ExpressionNode):
-    def __init__(self, left, right, symbol):
+    def __init__(self, left: ExpressionNode, right: ExpressionNode, symbol: Token):
         self.left = left
         self.right = right
         self.token = symbol

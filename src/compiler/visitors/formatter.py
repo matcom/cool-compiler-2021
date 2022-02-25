@@ -103,14 +103,14 @@ class FormatVisitor(object):
         return f"{ans}\n{cond}\n{then_body}\n{else_body}"
 
     @visitor.when(LetNode)
-    def visit(self, node, tabs=0):
+    def visit(self, node: LetNode, tabs=0):
         ans = "\t" * tabs + f"\\__LetNode: let <iden_list> in <expr>"
         expr = self.visit(node.body, tabs + 1)
         iden_list = []
         for item in node.id_list:
-            iden = "\t" * (tabs + 1) + f"{item[0]} : {item[1]}"
-            if item[2] is not None:
-                iden = f"{iden} <- <expr>\n{self.visit(item[2], tabs + 2)}"
+            iden = "\t" * (tabs + 1) + f"{item.id} : {item.typex}"
+            if item.expression is not None:
+                iden = f"{iden} <- <expr>\n{self.visit(item.expression, tabs + 2)}"
             iden_list.append(iden)
         iden_list = "\n".join(iden_list)
         return f"{ans}\n{iden_list}\n{expr}"

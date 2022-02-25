@@ -1,5 +1,6 @@
 import itertools as itt
 from collections import OrderedDict
+from typing import Dict, List, Optional, Tuple
 
 
 class SemanticError(Exception):
@@ -47,11 +48,12 @@ class Method:
 
 
 class Type:
-    def __init__(self, name: str):
-        self.name = name
-        self.attributes = []
-        self.methods = []
-        self.parent = None
+    def __init__(self, name: str, pos: Tuple[int, int] = (0, 0)):
+        self.name: str = name
+        self.attributes: List[Attribute] = []
+        self.methods: List[Method] = []
+        self.parent: Optional[Type] = None
+        self.pos: Tuple[int, int] = pos
 
     def set_parent(self, parent):
         if self.parent is not None:
@@ -73,7 +75,7 @@ class Type:
                     f'Attribute "{name}" is not defined in {self.name}.'
                 )
 
-    def define_attribute(self, name: str, typex, idx=None):
+    def define_attribute(self, name: str, typex, idx=None) -> Attribute:
         try:
             self.get_attribute(name)
         except SemanticError:
@@ -85,7 +87,7 @@ class Type:
                 f'Attribute "{name}" is already defined in {self.name}.'
             )
 
-    def get_method(self, name: str):
+    def get_method(self, name: str) -> Method:
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
@@ -106,7 +108,7 @@ class Type:
         ridx=None,
     ):
         if name in (method.name for method in self.methods):
-            raise SemanticError(f'Method "{name}" already defined in {self.name}')
+            raise SemanticError(f'Method "{name}" is multiply defined.')
 
         method = Method(name, param_names, param_types, return_type, param_idx, ridx)
         self.methods.append(method)
@@ -266,19 +268,19 @@ class AutoType(Type):
 
 class Context:
     def __init__(self):
-        self.types = {}
+        self.types: Dict[str, Type] = {}
 
-    def create_type(self, name: str):
+    def create_type(self, name: str, pos: Tuple[int, int] = (0, 0)):
         if name in self.types:
-            raise SemanticError(f"Type with the same name ({name}) already in context.")
-        typex = self.types[name] = Type(name)
+            raise SemanticError("Classes may not be redefined")
+        typex = self.types[name] = Type(name, pos)
         return typex
 
     def get_type(self, name: str):
         try:
             return self.types[name]
         except KeyError:
-            raise SemanticError(f'Type "{name}" is not defined.')
+            raise TypeError(f'Type "{name}" is not defined.')
 
     def __str__(self):
         return (

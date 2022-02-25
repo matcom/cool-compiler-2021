@@ -1,5 +1,5 @@
 import compiler.visitors.visitor as visitor
-from ..cmp.semantic import SemanticError, ErrorType, SelfType, AutoType, LCA
+from ..cmp.semantic import Context, SemanticError, ErrorType, SelfType, AutoType, LCA
 from ..cmp.ast import (
     ProgramNode,
     ClassDeclarationNode,
@@ -30,9 +30,9 @@ AUTOTYPE_ERROR = "Incorrect use of AUTO_TYPE"
 
 
 class TypeInferencer:
-    def __init__(self, context, manager, errors=[]):
-        self.context = context
-        self.errors = errors
+    def __init__(self, context, manager):
+        self.context: Context = context
+        self.errors: Li = []
         self.manager = manager
 
         self.current_type = None
