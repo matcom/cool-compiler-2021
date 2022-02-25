@@ -284,7 +284,7 @@ def t_newline(t):
 # Error handling rule
 def t_error(t):
     col = find_column(input_text, t)
-    errors.append('(%s, %s)- LexicographicError: ILLEGAL CHARACTER "%s"' % (col, t.lexer.lineno, t.value[0]))
+    errors.append('(%s, %s) - LexicographicError: ILLEGAL CHARACTER "%s"' % (col, t.lexer.lineno, t.value[0]))
     t.lexer.skip(1)
 
 
