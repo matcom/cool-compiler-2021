@@ -60,7 +60,7 @@ class TypeCollector(object):
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         try:
-            typex = self.context.create_type(node.id)
+            typex = self.context.create_type(node)
             typex.set_parent(self.context.types[BasicTypes.OBJECT.value])
         except SemanticError as error:
             self.errors.append(f"(Line {node.lineno}) {error.text}")
