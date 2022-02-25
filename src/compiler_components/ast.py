@@ -37,7 +37,7 @@ class AtomicNode(ExpressionNode):
 
 
 class ClassDeclarationNode(DeclarationNode):
-    def __init__(self, idx, features, parent=None, line = -1, column=-1, line_father = -1, column_father = -1):
+    def __init__(self, idx, features, parent=None, line = -1, column=-1, line_father = -1, column_father = -1, type_line = -1, type_column = -1):
         self.id = idx
         self.parent = parent
         self.features = features
@@ -45,6 +45,8 @@ class ClassDeclarationNode(DeclarationNode):
         self.column = column
         self.line_father = line_father
         self.column_father = column_father
+        self.type_line = type_line
+        self.type_column = type_column
 
     def visit(self, tabs = 0):
         node = self

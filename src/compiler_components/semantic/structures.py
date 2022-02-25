@@ -207,7 +207,7 @@ class Context:
 
     def create_type(self, name:str,pos=0):
         if name in self.types:
-            raise SemanticError(f'Type with the same name ({name}) already in context.' , pos)
+            raise SemanticError(f'Type with the same name ({name}) already in context.')
         t = self.types[name] = Type(name,pos)
         return t
         
