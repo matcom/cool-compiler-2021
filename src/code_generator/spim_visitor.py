@@ -228,7 +228,11 @@ class MIPSCodegen:
 
         # use the information of the static type to get the location of the method in memory
         t = self.scope.types[node.type]
-        method_addr = t.get_method_addr(node.func, register0)
+        try:
+            method_addr = t.get_method_addr(node.func, register0)
+        except:
+            print('shdglsdglsjdg0000000000000')
+            print(t.methods_offset)
 
         self.add_line(f'jal {method_addr}') # calls the method and by convention methods return in $v0
         frame.clear_args() # clear arguments for the new function
