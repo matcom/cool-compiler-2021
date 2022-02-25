@@ -5,7 +5,7 @@ from tours.TypeCollector import TypeCollector
 from tours.TypeBuilder import TypeBuilder
 from tours.TypeChecker import TypeChecker
 from code_generator.generate_ast import CIL
-
+from code_generator.cil_codegen import CILCodegen
 
 input_file = sys.argv[1]
 with open(input_file, 'r') as f:
@@ -47,6 +47,11 @@ if errors:
         
 cil_generator = CIL(context)
 cil = cil_generator.visit(ast)
+cil_codegen = CILCodegen()
+code = cil_codegen.visit(cil)
+print('-----------------CIL AST----------------------')
 print(cil)
-
+print('---------------- CIL Code------------------')
+print(code)
+print('-------------------Done--------------------')
 exit(0)
