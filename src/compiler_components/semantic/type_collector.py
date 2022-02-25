@@ -39,6 +39,7 @@ class TypeCollector(object):
             return
 
         for decl in classes:
+            self.current_type = self.context.get_type(decl.id)
             for feature in decl.features:
                 self.visit(feature)
 

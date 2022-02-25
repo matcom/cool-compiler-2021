@@ -81,16 +81,16 @@ class Type:
         else:
             raise SemanticError(f'Attribute "{name}" is already defined in {self.name}',pos)
 
-    def get_method(self, name:str,pos=0):
+    def get_method(self, name:str,line=0, col=0):
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
             if self.parent is None:
-                raise AttributeError(f'Method "{name}" is not defined in {self.name}',pos)
+                raise AttributeError(f'{line},{col} - NameError: Undeclared identifier {name}')
             try:
                 return self.parent.get_method(name)
             except SemanticError:
-                raise AttributeError(f'Method "{name}" is not defined in {self.name}',pos)
+                raise AttributeError(f'{line},{col} - NameError: Undeclared identifier {name}')
 
     def define_method(self, name:str, param_names:list, param_types:list,  return_type, pos):
         try:
@@ -103,6 +103,7 @@ class Type:
         except AttributeError as e:
             method = Method(name, param_names, param_types, return_type)
             self.methods.append(method)
+            return method
 
     def all_attributes(self, clean=True):
         plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)

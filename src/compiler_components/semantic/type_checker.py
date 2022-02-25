@@ -59,7 +59,7 @@ class TypeChecker:
     @visitor.when(FuncDeclarationNode)
     def visit(self, node:FuncDeclarationNode,scope:Scope):
 
-        method = self.current_type.get_method(node.id)
+        method = self.current_type.get_method(node.id, node.line, node.column)
         
         for i in range(len(method.param_names)):
             try:
@@ -209,7 +209,7 @@ class TypeChecker:
                     at =  [ at[0] for at in self.current_type.all_attributes() if at[0].name == node.id]
                     var = at[0]
                 except:
-                    raise NameError(f"Variable {node.id} not defined",node.line)
+                    raise NameError(f"({node.line}, {node.column}) - NameError: Undeclared identifier {node.id}")
 
             typex = self.current_type if isinstance(var.type , SELF_TYPE) else var.type
 
@@ -371,7 +371,7 @@ class TypeChecker:
                 x = at[0]
             except:    
                 node.type = ErrorType()
-                self.errors.append(NameError(f"Variable {node.lex} not defined",node.line))
+                self.errors.append(NameError(f"({node.line}, {node.column}) - NameError: Undeclared identifier {node.lex}"))
                 return
         node.type = x.type if not isinstance(x.type , SELF_TYPE) else self.current_type
        
