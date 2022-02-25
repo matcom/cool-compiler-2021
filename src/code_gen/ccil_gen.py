@@ -521,10 +521,11 @@ class CCILGenerator:
         if node.expr is None:
             fval_id = f"vcall_{times}"
             call = self.create_vcall(
-                fval_id, node.type.id, node.id, node.caller_type.name
+                fval_id, node.type.name, node.id, node.caller_type.name, args
             )
             return [*args_ops, call], call
 
+        print("nn", node.expr)
         (expr_ops, expr_fval) = self.visit(node.expr)
 
         # Runtime error depending if expr is void or not
@@ -553,13 +554,13 @@ class CCILGenerator:
         if node.at_type is not None:
             fval_id = f"call_{times}"
             call = self.create_call(
-                fval_id, node.type.name, node.id, node.caller_type.name
+                fval_id, node.type.name, node.id, node.caller_type.name, args
             )
             return [*expr_ops, *error_ops, *args_ops, call]
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
-        call = self.create_vcall(fval_id, node.type.id, node.id, node.caller_type)
+        call = self.create_vcall(fval_id, node.type.id, node.id, node.caller_type, args)
 
         return [*expr_ops, *error_ops, *args_ops, call]
 
@@ -794,7 +795,7 @@ class CCILGenerator:
                 Method("concat", concat_func),
                 Method("substr", substr_func),
             ],
-            self.define_empty_init_func(STRING)
+            self.define_empty_init_func(STRING),
         )
 
         return [object_class, io_class, string_class], [
