@@ -6,6 +6,8 @@ from coolcmp.utils.registers import FP, Register, SP, DW, ARG, V0
 
 PROTOTYPES = "__prototypes_labels__"
 
+Memory = Union[str, int]
+
 
 class Node:
     pass
@@ -87,7 +89,7 @@ class SWNode(InstructionNode):
     Copy from register to memory.
     """
 
-    def __init__(self, dest: Register, offset: int, src: Register):
+    def __init__(self, dest: Register, offset: int, src: Memory):
         self.dest = dest
         self.offset = offset
         self.src = src
@@ -99,7 +101,7 @@ class LWNode(InstructionNode):
     Copy from memory to register.
     """
 
-    def __init__(self, dest: Register, offset: int, src: Register):
+    def __init__(self, dest: Register, offset: int, src: Memory):
         self.dest = dest
         self.offset = offset
         self.src = src
