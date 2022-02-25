@@ -38,12 +38,18 @@ from cmp.cil import (
     LessNode,
     LessEqualNode,
     EqualNode,
+    RuntimeErrorNode,
+    CopyNode,
+    TypeNameNode,
+    STRNode,
+    SetAttribNode,
+    GetAttribNode,
 )
 from cool_visitor import FormatVisitor
 
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import VoidType, ErrorType, IntType
-from cmp.semantic import Context
+from cmp.semantic import Context, VariableInfo
 
 from cmp.semantic import Scope
 
@@ -60,6 +66,7 @@ class CILBuilder:
         self.string_count = 0
         self.temp_vars_count = 0
         self._count = 0
+        self.internal_count = 0
         self.context = None
 
     def generate_next_method_id(self):
@@ -81,6 +88,21 @@ class CILBuilder:
     def to_function_name(self, method_name, type_name):
         return f"function_{method_name}_at_{type_name}"
 
+    def to_data_name(self, type_name, value):
+        return f"{type_name}_{value}"
+
+    @property
+    def params(self):
+        return self.current_function.params
+
+    @property
+    def localvars(self):
+        return self.current_function.localvars
+
+    @property
+    def instructions(self):
+        return self.current_function.instructions
+
     def register_instruction(self, instruction):
         self.current_function.instructions.append(instruction)
 
@@ -88,6 +110,195 @@ class CILBuilder:
         type_node = TypeNode(name)
         self.types.append(type_node)
         return type_node
+
+    def register_function(self, function_name):
+        function_node = FunctionNode(function_name, [], [], [])
+        self.code.append(function_node)
+        return function_node
+
+    def register_local(self, vinfo):
+        vinfo.name = f"local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.current_function.localvars)}"
+        local_node = LocalNode(vinfo.name)
+        self.current_function.localvars.append(local_node)
+        return vinfo.name
+
+    def register_param(self, vinfo):
+        vinfo.name = self.build_internal_vname(vinfo.name)
+        arg_node = ParamNode(vinfo.name)
+        self.params.append(arg_node)
+        return vinfo
+
+    def build_internal_vname(self, vname):
+        vname = f"{self.internal_count}_{self.current_function.name[9:]}_{vname}"
+        self.internal_count += 1
+        return vname
+
+    def define_internal_local(self):
+        vinfo = VariableInfo("internal", None)
+        return self.register_local(vinfo)
+
+    def register_data(self, name, value):
+        data_node = DataNode(name, value)
+        self.data.append(data_node)
+        return data_node
+
+    def is_attribute(self, vname):
+        return vname not in [var.name for var in self.current_function.localvars]
+
+    def build_constructor(self, node):
+        attributeNodes = [
+            feat for feat in node.features if isinstance(feat, cool.AttrDeclarationNode)
+        ]
+
+        expr_list = []
+        # for attr in attributeNodes:  # Assign default value first
+        #     assign = cool.AssignNode(attr.id, cool.DefaultValueNode(attr.type))
+        #     expr_list.append(assign)
+
+        for attr in attributeNodes:  # Assign init_expr if not None
+            if attr.init_exp:
+                assign = cool.AssignNode(attr.id, attr.init_exp)
+                expr_list.append(assign)
+
+        body = cool.BlockNode(expr_list)
+        self.current_type.define_method("constructor", [], [], "Object")
+        return cool.FuncDeclarationNode("constructor", [], "Object", body)
+
+    def add_builtin_functions(self):
+        # Object
+        obj_functions = [
+            self.cil_predef_method("abort", "Object", self.object_abort),
+            self.cil_predef_method("copy", "Object", self.object_copy),
+            self.cil_predef_method("type_name", "Object", self.object_type_name),
+        ]
+        object_type = TypeNode("Object", [], obj_functions)
+
+        # "IO"
+        functions = [
+            self.cil_predef_method("out_string", "IO", self.io_outstring),
+            self.cil_predef_method("out_int", "IO", self.io_outint),
+            self.cil_predef_method("in_string", "IO", self.io_instring),
+            self.cil_predef_method("in_int", "IO", self.io_inint),
+        ]
+        io_type = TypeNode("IO", [], obj_functions + functions)
+
+        # String
+        functions = [
+            self.cil_predef_method("length", "String", self.string_length),
+            self.cil_predef_method("concat", "String", self.string_concat),
+            self.cil_predef_method("substr", "String", self.string_substr),
+        ]
+        string_type = TypeNode(
+            "String",
+            [VariableInfo("length").name, VariableInfo("str_ref").name],
+            obj_functions + functions,
+        )
+
+        # Int
+        int_type = TypeNode(
+            "Int",
+            [VariableInfo("value", is_attr=True).name],
+            obj_functions,
+        )
+
+        # Bool
+        bool_type = TypeNode(
+            "Bool",
+            [VariableInfo("value", is_attr=True).name],
+            obj_functions,
+        )
+        for typex in [object_type, io_type, string_type, int_type, bool_type]:
+            self.types.append(typex)
+
+    # predefined functions cil
+    def cil_predef_method(self, mname, cname, specif_code):
+        self.current_type = self.context.get_type(cname)
+        self.current_method = self.current_type.get_method(mname)
+        self.current_function = FunctionNode(
+            self.to_function_name(mname, cname), [], [], []
+        )
+
+        specif_code()
+
+        self.code.append(self.current_function)
+        self.current_function = None
+        self.current_type = None
+
+        return (mname, self.to_function_name(mname, cname))
+
+    def string_length(self):
+        self.params.append(ParamNode("self"))
+
+        result = self.define_internal_local()
+
+        self.register_instruction(LengthNode(result, "self"))
+        self.register_instruction(ReturnNode(result))
+
+    def string_concat(self):
+        self.params.append(ParamNode("self"))
+        other_arg = VariableInfo("other_arg")
+        self.register_param(other_arg)
+
+        ret_vinfo = self.define_internal_local()
+
+        self.register_instruction(ConcatNode(ret_vinfo, "self", other_arg.name))
+        self.register_instruction(ReturnNode(ret_vinfo))
+
+    def string_substr(self):
+        self.params.append(ParamNode("self"))
+        idx_arg = VariableInfo("idx_arg")
+        self.register_param(idx_arg)
+        length_arg = VariableInfo("length_arg")
+        self.register_param(length_arg)
+
+        ret_vinfo = self.define_internal_local()
+
+        self.register_instruction(
+            SubstringNode(ret_vinfo, "self", idx_arg.name, length_arg.name)
+        )
+        self.register_instruction(ReturnNode(ret_vinfo))
+
+    def object_abort(self):
+        self.register_instruction(RuntimeErrorNode("ABORT_SIGNAL"))
+
+    def object_copy(self):
+        self.params.append(ParamNode("self"))
+        ret_vinfo = self.define_internal_local()
+        self.register_instruction(CopyNode(ret_vinfo, "self"))
+        self.register_instruction(ReturnNode(ret_vinfo))
+
+    def object_type_name(self):
+        self.params.append(ParamNode("self"))
+        ret_vinfo = self.define_internal_local()
+        self.register_instruction(TypeNameNode(ret_vinfo, "self"))
+        self.register_instruction(ReturnNode(ret_vinfo))
+
+    def io_outstring(self):
+        self.params.append(ParamNode("self"))
+        str_arg = VariableInfo("str")
+        self.register_param(str_arg)
+        self.register_instruction(PrintNode(str_arg.name))
+        self.register_instruction(ReturnNode("self"))
+
+    def io_outint(self):
+        self.params.append(ParamNode("self"))
+        int_arg = VariableInfo("int")
+        self.register_param(int_arg)
+        result = self.define_internal_local()
+        self.register_instruction(ToStrNode(result, int_arg.name))
+        self.register_instruction(ReturnNode(VariableInfo(result).name))
+
+    def io_instring(self):
+        self.params.append(ParamNode("self"))
+        ret_vinfo = self.define_internal_local()
+        self.register_instruction(ReadNode(ret_vinfo))
+        self.register_instruction(ReturnNode(ret_vinfo))
+
+    def io_inint(self):
+        self.params.append(ParamNode("self"))
+        ret_vinfo = self.define_internal_local()
+        self.register_instruction(ReadNode(ret_vinfo))  # TODO: ReadInt?
+        self.register_instruction(ReturnNode(ret_vinfo))
 
     @visitor.on("node")
     def visit(self, node=None):
@@ -97,14 +308,16 @@ class CILBuilder:
     def visit(self, node):
         self.context = node.context
 
+        self.add_builtin_functions()
+
         # Add entry function and call Main.main()
         self.current_function = FunctionNode("entry", [], [], [])
         self.code.append(self.current_function)
 
-        instance = self.generate_next_tvar_id()
+        instance = "l_instance"
         self.register_instruction(LocalNode(instance))
 
-        result = self.generate_next_tvar_id()
+        result = "l_result"
         self.register_instruction(LocalNode(result))
 
         main_method_name = self.to_function_name("Main", "main")
@@ -117,6 +330,8 @@ class CILBuilder:
 
         for declaration in node.declarations:
             self.visit(declaration)
+
+        program_node = ProgramNode(self.types, self.data, self.code)
 
         # Reset state
         self.types = []
@@ -131,19 +346,22 @@ class CILBuilder:
         self._count = 0
         self.context = None
 
-        return ProgramNode(self.types, self.data, self.code)
+        return program_node
 
     @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node):
         self.current_type = self.context.get_type(node.id)
-        self.types.append(self.current_type)
 
         type_node = self.register_type(self.current_type.name)
+
+        constructor = self.build_constructor(node)
 
         visited_func = []
         current_type = self.current_type
         while current_type is not None:
-            attributes = [attr.name for attr in current_type.attributes]
+            attributes = [
+                (node.id + "_" + attr.name) for attr in current_type.attributes
+            ]
             methods = [
                 func.name
                 for func in current_type.methods
@@ -162,6 +380,7 @@ class CILBuilder:
         type_node.attributes.reverse()
         type_node.methods.reverse()
 
+        self.visit(constructor)
         for feature in node.features:
             self.visit(feature)
 
@@ -169,33 +388,31 @@ class CILBuilder:
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node):
-        pass
+        self.visit(node.init_exp)
 
     @visitor.when(cool.FuncDeclarationNode)
     def visit(self, node):
         self.current_method = self.current_type.get_method(node.id)
 
-        # Generate ref
-        ref = self.generate_next_method_id()
-        self.current_type.methods.append((node.id, ref))
+        # Add function to .CODE
+        self.current_function = self.register_function(
+            self.to_function_name(node.id, self.current_type.name)
+        )
 
         # Add params
-        function = FunctionNode(ref, [], [], [])
+        self.current_function.params.append(ParamNode("self"))
         for pname, _ in node.params:
-            function.params.append(ParamNode(pname))
-
-        # Add function to .CODE
-        self.current_function = function
-        self.code.append(function)
+            self.current_function.params.append(ParamNode(pname))
 
         # Body
         value = self.visit(node.body)
 
-        # Handle return
+        # Return
         if isinstance(self.current_method.return_type, VoidType):
             value = None
 
         self.register_instruction(ReturnNode(value))
+
         self.current_method = None
         self.current_function = None
 
@@ -213,11 +430,25 @@ class CILBuilder:
     @visitor.when(cool.AssignNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        self.register_instruction(AssignNode(node.id, expr))
+
+        if self.is_attribute(node.id):
+            self.register_instruction(SetAttribNode("self", node.id, expr))
+        else:
+            self.register_instruction(AssignNode(node.id, expr))
 
     @visitor.when(cool.CallNode)
     def visit(self, node):
-        pass
+        for arg in node.args:
+            temp = self.define_internal_local()
+            value = self.visit(arg)
+            self.register_instruction(AssignNode(temp, value))
+            self.register_instruction(ArgNode(temp))
+
+        method_name = self.to_function_name(node.id, self.current_type.name)
+        result = self.define_internal_local()
+        self.register_instruction(StaticCallNode(method_name, result))
+
+        return result
 
     @visitor.when(cool.IfNode)
     def visit(self, node):

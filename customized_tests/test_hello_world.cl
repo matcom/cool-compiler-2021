@@ -1,7 +1,7 @@
 class Main inherits IO {
-    msg : String <- " Hello World ";
+    msg : String <- "Hello World";
 
     main() : IO{
-        self.print(msg)
+        out_string(msg)
     };
 };
