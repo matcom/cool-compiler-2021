@@ -331,13 +331,6 @@ class GetTypeOpNode(UnaryOpNode):
         return f"typeof {self.atom.value}"
 
 
-class IsVoidOpNode(UnaryOpNode):
-    """Operation that returns true if the Storage Node is uninitialized"""
-
-    def __str__(self) -> str:
-        return f"isvoid {self.atom.value}"
-
-
 class NotOpNode(UnaryOpNode):
     def __str__(self) -> str:
         return f"not {self.atom.value}"
