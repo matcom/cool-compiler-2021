@@ -12,16 +12,41 @@ class CiltoMipsVisitor:
         self.data = []
         self.label_id = 0
         self.current_function: FunctionNode = None
-
+        self.conform = {}
     def stack_offset(self, name):
-        all_ = self.current_function.params + self.current_function.localvars
-        return -4*all_.index(name)
-    
+        try:
+            all_ = []
+            for i in self.current_function.params:
+                if isinstance(i, ParamNode):
+                    all_.append(i.name)
+                else:
+                    all_.append(i)
+            for i in self.current_function.localvars:
+                if isinstance(i, LocalNode):
+                    all_.append(i.name)
+                else:
+                    all_.append(i)
+            return -4*all_.index(name)
+        except:
+            a = 0
+            return 0
     def write_data(self, instruction):
         self.data.append(instruction)
 
     def write_code(self, instruction):
         self.code.append(instruction)
+
+    def compute_parents(self, inherit):
+        self.conform['Object'] = ['Object']
+        class_list = []
+        for c, _ in inherit.items():
+            self.conform[c] = [c]
+            class_list.append(c)
+        for c in class_list:
+            current = c
+            while not current == 'Object':
+                self.conform[c].append(inherit[current])
+                current = inherit[current]
 
     @visitor.on('node')
     def visit(self, node):
@@ -35,11 +60,301 @@ class CiltoMipsVisitor:
         self.attrs = node.cattrs
         self.functions = node.dfunc
         self.parents = node.dparents
+        self.compute_parents(self.parents)
 
         self.write_data('.data')  # initialize the .data segment
         self.write_data(f'p_error: {dt.asciiz} "Aborting from String"')
         self.write_data(f'zero_error: {dt.asciiz} "Division by zero"')
         self.write_data(f'range_error: {dt.asciiz} "Index out of range"')
+
+        for c in self.attrs:
+            self.write_data(c + '_class_name' + ': .asciiz "' + c + '"')
+
+        for c, conform_list in self.conform.items():
+            line = c + '_conforms_to: .word '+ conform_list[0] + '_class_name'
+            n = len(conform_list)
+            for i in range(1, n): line += ', ' + conform_list[i] + '_class_name'
+            self.write_data(line)
+
+        for usr_data in self.dotdata:
+            data_addr = usr_data.name
+            data_value = usr_data.value
+            self.write_data('{}: {} {}'.format(usr_data.name, dt.asciiz, usr_data.value))
+
+        self.write_code('.text')
+        self.write_code('.globl main')
+        self.write_code('''
+            str_len:
+                    li $v0,0
+                    move $v1, $a0
+                __lenLoop:
+                    lbu $t1, 0($v1)
+                    beq $t1,$0,__lenExit
+                    addu $v0,$v0,1
+                    addu $v1,$v1,1
+                    b __lenLoop
+                __lenExit:
+                    jr $ra
+
+            str_copy:
+                lw $a0, -4($fp)
+                lw $a1, -8($fp)
+                lw $a2, -12($fp)
+                
+                move $v0, $a0
+                
+                str__while_copy:
+                beqz $a2, str__end_copy
+                
+                xor $t0, $t0, $t0
+                lb $t0, 0($a1)
+                sb $t0, 0($a0)
+                
+                subu $a2, $a2,1
+                addu $a0, $a0,1
+                addu $a1, $a1,1
+                j str__while_copy
+                
+                str__end_copy:
+                jr $ra
+                
+                str_index_error:
+                    li $v0, 4
+                    la $a0, range_error
+                    syscall
+                    li $v0, 10
+                    syscall
+                    jr $ra
+
+            str_substring:
+                # load arguments
+                move $t5, $a0
+                move $t3, $a1
+                li $t4, 0
+                move $t2, $a2
+
+                # check for index out of range
+                move $a3, $ra
+                jal str_len
+                move $ra, $a3
+
+                addu $t6, $t3, $t2
+                bgt $t6, $v0, str_index_error
+
+                # create substring
+                move $a0, $t2           #length
+                addu $a0, $a0, 1
+                li $v0, 9       #make space
+                syscall
+                # tenemos en $v0 la direccion del nuevo string
+
+                addu $t5, $t5, $t3
+
+                subu $sp, $sp, 4
+                sw $ra, 0($sp)
+                subu $sp, $sp, 4
+                sw $fp, 0($sp)
+                move $fp,$sp
+                subu $sp, $sp, 4
+                sw $v0, 0($sp)
+                subu $sp, $sp, 4
+                sw $t5, 0($sp)
+                subu $sp, $sp, 4
+                sw $t2, 0($sp)
+
+                jal str_copy
+                move $sp,$fp
+
+                lw $fp, 0($sp)
+                addi $sp,$sp, 4
+
+                lw $ra, 0($sp)
+                addi $sp,$sp, 4
+
+                addu $t9, $v0, $t2          #null terminated
+                sb $0, 0($t9)
+                jr $ra
+
+
+                #$a0 el prefijo, y en $a1, el str.
+            
+            str1_prefix_of_str2:
+                lb $t0, 0($a0)
+                lb $t1, 0($a1)
+                beqz $t0, prefixTrue
+                bne	 $t0, $t1, prefixFalse
+                addu $a0,$a0,1
+                addu $a1,$a1,1
+                b str1_prefix_of_str2
+                prefixFalse:
+                    li $v0, 0
+                    jr $ra
+                prefixTrue:
+                    li $v0, 1
+                    jr $ra
+
+            str_comparer:
+                move $a0, $a2
+                move $a1, $ra
+                jal str_len       #$v0=len(message1)
+                move $ra, $a1
+
+                move $s1, $v0
+
+                move $a0, $a3
+
+                move $a1, $ra
+                jal str_len       #$v0=len(message2)
+                move $ra, $a1
+
+                beq $v0, $s1, string_length_comparer_end
+                li $v0, 0
+                j string_comparer_end
+
+                string_length_comparer_end:
+                move $a0, $a2
+                move $a1, $a3
+                move $s1, $ra
+                jal str1_prefix_of_str2
+                move $ra, $s1
+                string_comparer_end:
+                jr $ra
+
+            case_conform:
+                move $s0, $a0
+                move $s1, $a1
+                START_CASE_LOOP:
+
+                    lw $a1, 0($s0)
+
+                    addi $s0, $s0, 4
+
+                    move $t0, $s1	# Address of 1st element in array.
+                    li $v0, 4		# System call code 4 (print_string).
+                    li $t1, 0		# Initialize array offset.
+
+                loop_INTERNAL:
+
+                    # Use the address mode label(register).
+
+                    lw $a0, 0($t0)	# Load value at address str_array + $t1 (offset).	
+
+                    beq $a0, $a1, END_CASE_LOOP
+
+                    addi $t0, $t0, 4	# Next element, i.e., increment offset by 4.
+                    addi $t1, $t1, 4	# Next element, i.e., increment offset by 4.
+
+                    # Done or loop once more?
+
+                    ble $t1, $a2, loop_INTERNAL
+                    b START_CASE_LOOP
+                END_CASE_LOOP:
+                move $v0, $a0
+                jr $ra
+
+            str_concat:
+                move $a3, $ra
+                jal str_len
+                move $ra, $a3
+
+                # guardamos en $t4, la longitud de str1
+                move $t4, $v0
+                # el str1
+                move $t5, $a0
+                move $a0, $a1
+                move $t8, $a1
+
+                move $a3, $ra
+                jal str_len
+                move $ra, $a3
+
+                # reservamos espacio para el nuevo string
+                # guardamos en $t7 la longitud de str2
+                move $t7, $v0
+                addu $v0, $t4, $v0
+                addu $v0, $v0, 1
+                move $a0, $v0
+                li $v0, 9
+                syscall
+
+                # en $t5 esta str1, y en $t8, str2-------------------------
+
+                # save str1 part------------------------------------------
+                # push $ra
+                subu $sp, $sp, 4
+                sw $ra, 0($sp)
+                # push $fp
+                subu $sp, $sp, 4
+                sw $fp, 0($sp)
+
+                move $fp, $sp
+
+                # push dest to copy pointer
+                subu $sp, $sp, 4
+                sw $v0, 0($sp)
+
+                # push copy from
+                subu $sp, $sp, 4
+                sw $t5, 0($sp)
+
+                # push how much to copy
+                subu $sp, $sp, 4
+                sw $t4, 0($sp)
+
+                jal str_copy
+
+                move $sp, $fp
+
+                lw $fp, 0($sp)
+                addu $sp, $sp, 4
+
+                lw $ra, 0($sp)
+                addu $sp, $sp, 4
+
+                # save str2 part-------------
+                # push $ra
+                subu $sp, $sp, 4
+                sw $ra, 0($sp)
+
+                # push $fp
+                subu $sp, $sp, 4
+                sw $fp, 0($sp)
+
+                move $fp, $sp
+
+                # push where to copy
+                move $t9, $v0
+                addu $t0, $v0, $t4
+                subu $sp, $sp, 4
+                sw $t0, 0($sp)
+
+                # push copy from
+                subu $sp, $sp, 4
+                sw $t8, 0($sp)
+
+                subu $sp, $sp, 4
+                sw $t7, 0($sp)
+
+                jal str_copy
+
+                move $sp, $fp
+
+                lw $fp, 0($sp)
+                addu $sp, $sp, 4
+
+                lw $ra, 0($sp)
+                addu $sp, $sp, 4
+
+                addu $v0, $t7, $v0
+                sb $0, 0($v0)
+
+                move $v0, $t9
+                jr $ra
+            ''')
+
+        for c in self.dotcode:
+            self.visit(c)
+
 
     @visitor.when(TypeNode)
     def visit(self, node):
@@ -67,20 +382,20 @@ class CiltoMipsVisitor:
         #     return
         
         self.current_function = node
-        self.write_code(function.name + ':')        
+        self.write_code(node.name + ':')        
 
         #ya se guardaron los argumentos en la pila
         #tenemos que guardar espacio para las variables locales        
-        self.write_code('{} {}, {}, -{}'.format(o.addi, r.sp, r.sp, str(4*len(function.localvars))))        
+        self.write_code('{} {}, {}, -{}'.format(o.addi, r.sp, r.sp, str(4*len(node.localvars))))        
 
         self.write_code('{} {}, {}, -8'.format(o.addi, r.sp, r.sp))
         self.write_code('{} {}, 4({}) # save $ra'.format(o.sw, r.ra, r.sp))
         self.write_code('{} {}, 0({}) # save $fp'.format(o.sw, r.fp, r.sp))
 
-        n = 4*(len(function.params) + len(function.localvars) + 1)
+        n = 4*(len(node.params) + len(node.localvars) + 1)
         self.write_code('{} {}, {}, {}'.format(o.addi, r.fp, r.sp, n)) 
 
-        for instruction in function.instructions:
+        for instruction in node.instructions:
             self.visit(instruction)
         
 
@@ -270,7 +585,6 @@ class CiltoMipsVisitor:
     @visitor.when(SetAttribNode)
     def visit(self, node):
         inst = self.stack_offset(node.inst) 
-        src = self.stack_offset(node.source)
 
         self.write_code('# SetAttrib') 
         self.write_code('{} {}, {}({})'.format(o.lw, r.s1, inst, r.fp))
@@ -279,6 +593,7 @@ class CiltoMipsVisitor:
             self.write_code('{} {}, {}'.format(o.li, r.s0, node.source))
 
         else:
+            src = self.stack_offset(node.source)
             self.write_code('{} {}, {}({})'.format(o.lw, r.s0, src, r.fp)) 
 
         self.write_code('{} {}, {}({})'.format(o.sw, r.s0, 4*node.attr + 8, r.s1))
@@ -353,9 +668,9 @@ class CiltoMipsVisitor:
         method = self.functions[node.type].index(node.method)
         dest = self.stack_offset(node.dest)
 
-        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, _type, r.fp)) 	        # Dir en el heap
-        self.write_code('{} {}, 4({})'.format(o.lw, r.a0, r.t0))                              # Dispatch pointer
-        self.write_code('{} {}, {}({})'.format(o.lw, r.a1, 4*method, r.a0))    # Load function
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, _type, r.fp))
+        self.write_code('{} {}, 4({})'.format(o.lw, r.a0, r.t0))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.a1, 4*method, r.a0))   
 
         self.write_code('{} {}'.format(o.jalr, r.a1))
         
@@ -382,7 +697,7 @@ class CiltoMipsVisitor:
     def visit(self, node):
         index = self.stack_offset(node.dest)
         self.write_code('# Load')
-        self.write_code('{} {}, {}'.format(o.la, r.t1, node.msg))
+        self.write_code('{} {}, {}'.format(o.la, r.t1, node.msg.name))
         self.write_code('{} {}, {}({})'.format(o.lw, r.t2, index, r.fp))      #direccion en el heap 
         self.write_code('{} {}, 8({})'.format(o.sw, r.t1, r.t2))
 
@@ -404,7 +719,7 @@ class CiltoMipsVisitor:
         str2 = self.stack_offset(node.sufix)
         dest = self.stack_offset(node.dest)
 
-        self.write_code('{} {}, {}({})'.format(o.lw, r.so, str1, r.fp))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s0, str1, r.fp))
         self.write_code('{} {}, 8({})'. format(o.lw, r.a0, r.s0))
 
         self.write_code('{} {}, {}({})'.format(o.lw, r.s0, str2, r.fp))
@@ -448,8 +763,8 @@ class CiltoMipsVisitor:
 
     @visitor.when(CopyNode)
     def visit(self, node):
-        pos_dest = self.stack_pos(node.dest)
-        pos_source = self.stack_pos(node.source)
+        pos_dest = self.stack_offset(node.dest)
+        pos_source = self.stack_offset(node.source)
         self.add('{} {}, {}({})'.format(o.lw, r.t0, pos_source, r.sp))
         self.add('{} {}, {}({})'.format(o.sw, r.t0, pos_dest, r.sp))
 
@@ -471,7 +786,7 @@ class CiltoMipsVisitor:
 
         # time to set up the actual syscall for read string
         self.write_code(f'{o.move} {r.a0}, {r.v0}') # a0 <- v0, a0 = address of input buffer
-        self.write_code(f'{o.move} {r.v0}, 8') # syscall(8) = read string
+        self.write_code(f'{o.li} {r.v0}, 8') # syscall(8) = read string
         self.write_code(f'{o.la} {r.a1}, 1024') # a1 = amount to read, input should be at most n-1 bytes, since last byte is used to null-terminate the stream
         self.write_code(f'{o.syscall}') # stores in a0 the data read, if any, an null terminates it
 

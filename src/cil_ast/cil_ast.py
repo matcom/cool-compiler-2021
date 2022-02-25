@@ -166,6 +166,10 @@ class ReturnNode(InstructionNode):
     def __init__(self, value=None):
         self.value = value
 
+class ExitNode(InstructionNode):
+    def __init__(self):
+        pass
+
 class LoadNode(InstructionNode):
     def __init__(self, dest, msg):
         self.dest = dest

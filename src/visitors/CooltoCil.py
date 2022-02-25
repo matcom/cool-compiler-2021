@@ -62,10 +62,10 @@ class BaseCOOLToCILVisitor:
         return f'function_{method_name}_at_{type_name}'
     
     def register_function(self, function_name):
-        try:
-            self.dfunc[self.current_type.name].append(function_name)
-        except:
-            self.dfunc[self.current_type.name] = [function_name]
+        # try:
+        #     self.dfunc[self.current_type.name].append(function_name)
+        # except:
+        #     self.dfunc[self.current_type.name] = [function_name]
         function_node = cil.FunctionNode(function_name, [], [], [])
         self.dotcode.append(function_node)
         return function_node
@@ -108,8 +108,8 @@ class BaseCOOLToCILVisitor:
             type = self.register_type('Object')
             self.dparents['Object'] = None
             self.cattrs['Object'] = 0
-
             self.current_type = type
+            self.dfunc['Object'] = ['function_abort_at_Object', 'function_type_name_at_Object', 'function_copy_at_Object']
             
             self.current_function = self.register_function(self.to_function_name('abort', self.current_type.name))
             self.current_function.params.append(cil.ParamNode('self') )
@@ -117,7 +117,8 @@ class BaseCOOLToCILVisitor:
 
             self.current_function = self.register_function(self.to_function_name('copy', self.current_type.name))
             self.current_function.params.append(cil.ParamNode('self'))
-            self.register_instruction(cil.CopyNode(1,1))
+            self.register_instruction(cil.AbortNode())
+            # self.register_instruction(cil.CopyNode(1,1))
 
             self.current_function = self.register_function(self.to_function_name('type_name', self.current_type.name))
             self.current_function.params.append(cil.ParamNode('self'))
@@ -133,6 +134,7 @@ class BaseCOOLToCILVisitor:
             self.cattrs['String'] = 1
             self.dparents['String'] = 'Object'
             self.current_type = type
+            self.dfunc['String'] = ['function_abort_at_Object', 'function_type_name_at_Object', 'function_copy_at_Object', 'function_length_at_String', 'function_substr_at_String', 'function_concat_at_String' ]
 
             self.current_function = self.register_function(self.to_function_name('concat', self.current_type.name))
             self.current_function.params.append(cil.ParamNode('self'))
@@ -169,6 +171,7 @@ class BaseCOOLToCILVisitor:
             self.cattrs['IO'] = 0
             self.dparents['IO'] = 'Object'
             self.current_type = type
+            self.dfunc['IO'] = ['function_abort_at_Object', 'function_type_name_at_Object', 'function_copy_at_Object', 'function_in_string_at_IO', 'function_out_string_at_IO', 'function_in_int_at_IO', 'function_out_int_at_IO']
 
             self.current_function = self.register_function(self.to_function_name('out_string', self.current_type.name))
             self.current_function.params.append(cil.ParamNode('self'))
@@ -202,12 +205,16 @@ class BaseCOOLToCILVisitor:
             self.register_instruction(cil.ReturnNode(int_store))
 
         def build_Int():
+            type = self.register_type('Int')
             self.cattrs['Int'] = 1
             self.dparents['Int'] = 'Object'
+            self.dfunc['Int'] = ['function_abort_at_Object', 'function_type_name_at_Object', 'function_copy_at_Object']
 
         def build_Bool():
+            type = self.register_type('Bool')
             self.cattrs['Bool'] = 1
             self.dparents['Bool'] = 'Object'
+            self.dfunc['Bool'] = ['function_abort_at_Object', 'function_type_name_at_Object', 'function_copy_at_Object']
 
         build_Object()
         build_String()
@@ -247,18 +254,22 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
 
         # self.current_function = self.register_function('entry')
-        function_node = cil.FunctionNode('entry', [], [], [])
+        function_node = cil.FunctionNode('main', [], [], [])
         self.dotcode.append(function_node)
         self.current_function = function_node
 
-        instance = self.define_internal_local()
+        vinfo = VariableInfo(f'local_main_internal_{len(self.localvars)}',None)
+        local_node = cil.LocalNode(vinfo.name)
+        self.localvars.append(local_node)
+
+        instance = vinfo.name
         self.instances.append(instance)
         result = self.define_internal_local()
         main_method_name = self.to_function_name('main', 'Main')
         self.register_instruction(cil.AllocateNode('Main', instance))
         self.register_instruction(cil.ArgNode(instance))
         self.register_instruction(cil.StaticCallNode(main_method_name, result))
-        self.register_instruction(cil.ReturnNode(0))
+        self.register_instruction(cil.ExitNode())
         self.current_function = None
         self.add_builtin_types()
         
@@ -320,6 +331,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.attrs = self.transform_to_keys(type_node, attributes)# type_node.attributes = attributes
         self.cattrs[node.id] = len(attributes)
         type_node.methods = methods
+        self.dfunc[node.id] = [i[1] for i in methods]
         self.create_ctr(node, scope)
         
         # attributes
@@ -395,7 +407,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_function = self.register_function(self.to_function_name(node.id, self.current_type.name))
 
         self.parameters.clear()
-        self.current_function.params.append(cil.ParamNode('self'))
+        self.current_function.params.append(cil.ParamNode(self.instances[-1]))
         for arg_name, ptype in node.params:
             self.parameters.add((arg_name, ptype))
             self.params.append(cil.ParamNode(arg_name))
@@ -472,7 +484,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         error_label = self.define_internal_local()
         dest = self.define_internal_local()
-        if node.obj is not None: # dynamic
+        if node.obj is not None and node.obj.lex != 'self': # dynamic
             obj = self.visit(node.obj, scope)
             self.instances.append(obj)
             if isinstance(node.obj, InstantiateNode):
@@ -493,16 +505,34 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             
             obj_type = obj_type if node.parent == None else node.parent
             self.register_instruction(cil.DynamicCallNode(local, self.to_function_name(node.method, obj_type), dest))
+            self.instances.pop()
+            self.register_instruction(cil.LabelNode(error_label))
         else: # static
             self.register_instruction(cil.ArgNode(self.instances[-1]))
             for arg in node.args:
                 self.register_instruction(cil.ArgNode(self.visit(arg, scope)))
                 
-            self.register_instruction(cil.StaticCallNode(self.to_function_name(node.method, self.current_type.type.name), dest))
+            fname = self.get_function_name(self.current_type.name, node.method, self.dottypes[-1].methods, True)
+            self.register_instruction(cil.StaticCallNode(fname , dest))
         
-        self.register_instruction(cil.LabelNode(error_label))
-        self.instances.pop()
         return dest
+
+    def get_function_name(_, type_name, call_name, method_lists, static=True):
+        if static:
+            name = None
+            for method in method_lists:
+                (m, m_name) = method
+                if call_name == m:
+                    name = m_name
+            return name # returns always the last one found, wich should be the overriden one
+        else:
+            name = None
+            for method in method_lists:
+                (m, m_name) = method
+                if call_name == m:
+                    spl = m_name.split('_')
+                    if spl[-1] == type_name:
+                        return m_name
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
@@ -783,6 +813,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node, scope):
         data_node = self.register_data(node.lex)
         var = self.define_internal_local()
+        data_node.name = var
+        self.register_instruction(cil.AllocateNode('String', var))
         self.register_instruction(cil.LoadNode(var, data_node))
         return data_node.name
 
