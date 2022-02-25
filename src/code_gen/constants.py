@@ -1,6 +1,6 @@
-PARAM = "param"
-LET = "let"
-ATTR = "attr"
+PARAM = "param_"
+LET = "let_"
+ATTR = "attr_"
 
 CASE_INIT = "init_case"
 CASE_END = "end_case"

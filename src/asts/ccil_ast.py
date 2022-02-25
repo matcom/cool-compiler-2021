@@ -14,8 +14,9 @@ class CCILProgram:
     data_section: List[str]  # no idea what will be this the node,
 
     def __str__(self) -> str:
-        types = "\n".join(str(type) for type in self.types_section)
-        data = "\n".join(str(data) for data in self.data_section)
+        ident = "\t"
+        types = "\n".join(ident + str(type) for type in self.types_section)
+        data = "\n".join(ident + str(data) for data in self.data_section)
         code = "\n".join(str(func) for func in self.code_section)
         return f"TYPES:\n{types}\nDATA:\n{data}\nCODE:\n{code} "
 
@@ -32,9 +33,13 @@ class Class:
     init_operations: FunctionNode
 
     def __str__(self) -> str:
-        attributes = "\n".join(str(a) for a in self.attributes)
-        methods = "\n".join(str(m) for m in self.methods)
-        return f"\ttype {self.id} {{\n {attributes} \n {methods} \n\t}}"
+        ident = "\t\t"
+        attributes = "\n".join(ident + str(a) for a in self.attributes)
+        methods = "\n".join(ident + str(m) for m in self.methods)
+        init_function = str(self.init_operations)
+        return (
+            f"type {self.id} {{\n {attributes} \n {methods} \n \n {init_function}\n\t}}"
+        )
 
 
 @dataclass(frozen=True)
@@ -75,7 +80,7 @@ class Data:
     value: str
 
     def __str__(self) -> str:
-        return f"\t{self.id} : '{self.value}'"
+        return f"{self.id} : '{self.value}'"
 
 
 @dataclass(frozen=True)
@@ -88,7 +93,7 @@ class Method:
     function: FunctionNode
 
     def __str__(self) -> str:
-        return f"\t\tmethod {self.id} : {self.function.id}"
+        return f"method {self.id} : {self.function.id}"
 
 
 class Node:
@@ -124,7 +129,7 @@ class FunctionNode(Node):
         locals = "\n".join(indent + str(l) for l in self.locals)
         ops = "\n".join(indent + str(o) for o in self.operations)
 
-        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n {indent}return {self.ret.id}"
+        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n {indent}return {self.ret}"
 
 
 class OperationNode(Node):
@@ -171,13 +176,18 @@ class Abort(OperationNode):
         return "abort"
 
 
-class PrintOpNode(OperationNode):
+class PrintStrNode(OperationNode):
     def __init__(self, idx: str) -> None:
         super().__init__()
         self.id = idx
 
     def __str__(self) -> str:
-        return f"print {self.id}"
+        return f"print_str {self.id}"
+
+
+class PrintIntNode(PrintStrNode):
+    def __str__(self) -> str:
+        return f"print_int {self.id}"
 
 
 class ReturnOpNode(OperationNode):
@@ -272,31 +282,43 @@ class BinaryOpNode(ReturnOpNode):
         return f"{self.left.value} op {self.right.value}"
 
 
-class SumOpNode(BinaryOpNode):
+class ArithmeticOpNode(BinaryOpNode):
     pass
 
 
-class MinusOpNode(BinaryOpNode):
+class SumOpNode(ArithmeticOpNode):
     pass
 
 
-class MultOpNode(BinaryOpNode):
+class MinusOpNode(ArithmeticOpNode):
     pass
 
 
-class DivOpNode(BinaryOpNode):
+class MultOpNode(ArithmeticOpNode):
     pass
 
 
-class EqualOpNode(BinaryOpNode):
+class DivOpNode(ArithmeticOpNode):
     pass
 
 
-class LessOrEqualOpNode(BinaryOpNode):
+class ComparisonOpNode(BinaryOpNode):
     pass
 
 
-class LessOpNode(BinaryOpNode):
+class EqualIntNode(ComparisonOpNode):
+    pass
+
+
+class EqualStrNode(ComparisonOpNode):
+    pass
+
+
+class LessOrEqualOpNode(ComparisonOpNode):
+    pass
+
+
+class LessOpNode(ComparisonOpNode):
     pass
 
 

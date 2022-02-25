@@ -10,12 +10,22 @@ from code_gen.constants import *
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]
 CLASS_VISITOR_RESULT = Tuple[Class, List[FunctionNode]]
 METHOD_VISITOR_RESULT = FunctionNode
+ATTR_VISITOR_RESULT = List[OperationNode]
+
+DEFAULT_STR = Data("default_str", "")
+ZERO = "zero"
+EMPTY = "empty"
 
 # TODO:
+# Define how inherited attributes are executed in inherited class
+# Define how equality is handled
+# Define how isVoid is handled
+# See built in classes methods are correctly executed
+# See how typeof should work, a special kind of equality?
 # Define abort nodes with a text:
-# * Dispacth on a void class
-# * No pattern match in case
-# * Division by zero
+# * Dispatch on a void class (Done)
+# * No pattern match in case (Done)
+# * Division by zero (Done)
 # * Substring out of range (Done)
 # * Heap Overflow (don't know yet how to handle this)
 
@@ -35,7 +45,7 @@ class CCILGenerator:
         # To keep track of how many times a certain expression has been evaluated
         self.time_record: Dict[str, int] = dict()
         # Track all constant values. Only strings for now
-        self.data: List[Data] = list()
+        self.data: List[Data]
 
         # To keep track of the current class being analysed
         self.current_type: str
@@ -55,6 +65,8 @@ class CCILGenerator:
     def visit(self, node: sem_ast.ProgramNode) -> None:
         program_types: List[Class] = list()
         program_codes: List[Method] = list()
+
+        self.data = [DEFAULT_STR]
         for type in node.declarations:
             classx, class_code = self.visit(type)
             program_types.append(classx)
@@ -78,20 +90,23 @@ class CCILGenerator:
         # Explore all attributes and join their operations in an initializer function
         self.reset_locals()
         self.reset_scope()
+        init_params = self.init_func_params(node.id)
+        self.ccil_cool_names.add_new_name_pair("self", node.id)
         attributes: List[Attribute] = list()
-        init_attr_ops: List[OperationNode] = []
+        init_attr_ops: List[OperationNode] = self.init_default_values()
         for attr in attr_nodes:
             attributes.append(Attribute(ATTR + attr.id, attr.type.name))
-            (attr_ops, _) = self.visit(attr)
+            attr_ops = self.visit(attr)
             init_attr_ops += attr_ops
 
-        # Return type is set as itself? Use selftype maybe?
+        dummy_return = self.create_storage(f"init_type_{node.id}_ret", INT, IntNode(0))
+        init_attr_ops.append(dummy_return)
         init_func = FunctionNode(
             f"init_{node.id}",
-            [],
+            init_params,
             to_vars(self.locals, Local),
             init_attr_ops,
-            node.id,
+            dummy_return.id,
         )
 
         # Explore all functions
@@ -109,23 +124,26 @@ class CCILGenerator:
         return (Class(node.id, attributes, methods, init_func), class_code)
 
     @visitor.when(sem_ast.AttrDeclarationNode)
-    def visit(self, node: sem_ast.AttrDeclarationNode) -> VISITOR_RESULT:
+    def visit(self, node: sem_ast.AttrDeclarationNode) -> ATTR_VISITOR_RESULT:
         self.ccil_cool_names = self.ccil_cool_names.create_child()
 
-        fval_id = ATTR + node.id
-        self.ccil_cool_names.add_new_name_pair(node.id, fval_id)
+        attr_id = ATTR + node.id
+        self.ccil_cool_names.add_new_name_pair(node.id, attr_id)
 
         if node.expr is None:
-            self.add_local(fval_id, node.type.name)
-            return ([], None)
+            if node.type.name != STRING:
+                value_0 = IdNode(ZERO)
+            else:
+                value_0 = IdNode(EMPTY)
+            set_attr = SetAttrOpNode("self", attr_id, value_0, self.current_type)
+            return [set_attr]
 
         (expr_op, expr_fval) = self.visit(node.expr)
 
-        self.update_locals(expr_fval.id, fval_id)
-        expr_fval.id = fval_id
+        set_attr = SetAttrOpNode("self", attr_id, expr_fval.id, self.current_type)
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
-        return (expr_op, expr_fval)
+        return [*expr_op, set_attr]
 
     @visitor.when(sem_ast.MethodDeclarationNode)
     def visit(self, node: sem_ast.MethodDeclarationNode) -> METHOD_VISITOR_RESULT:
@@ -140,7 +158,7 @@ class CCILGenerator:
             self.ccil_cool_names.add_new_name_pair(param.id, new_param_id)
 
         self.locals = dict()
-        (operations, fval_id) = self.visit(node.body)
+        (operations, fval) = self.visit(node.body)
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
@@ -148,7 +166,7 @@ class CCILGenerator:
             params,
             to_vars(self.locals, Local),
             operations,
-            fval_id,
+            fval.id,
         )
 
     @visitor.when(sem_ast.BlocksNode)
@@ -174,7 +192,7 @@ class CCILGenerator:
     def visit(self, node: sem_ast.LetNode) -> VISITOR_RESULT:
         self.ccil_cool_names = self.ccil_cool_names.create_child()
 
-        operations: List[OperationNode] = []
+        operations: List[OperationNode] = self.init_default_values()
         fvalues: List[StorageNode] = []
 
         for var in node.var_decl_list:
@@ -196,8 +214,12 @@ class CCILGenerator:
         self.ccil_cool_names.add_new_name_pair(node.id, fvalue_id)
 
         if node.expr is None:
-            self.add_local(fvalue_id, node.type.name)
-            self.locals[fvalue_id] = node.type.name
+            if node.type.name != STRING:
+                value_0 = IdNode(ZERO)
+            else:
+                value_0 = IdNode(EMPTY)
+            fval = self.create_assignation(fvalue_id, node.type.name, value_0.value)
+            return [fval], fval
 
         (expr_ops, expr_fv) = self.visit(node.expr)
 
@@ -279,7 +301,7 @@ class CCILGenerator:
 
         # All branch must end in a var named like this
         pre_fvalue_id = f"case_{times}_pre_fv"
-        pattern_match_ops = []
+        pattern_match_ops = self.init_default_values()
         branch_ops = []
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
@@ -320,6 +342,15 @@ class CCILGenerator:
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
 
+        self.locals[pre_fvalue_id] = node.type.name
+
+        # Error handling when there is not pattern match
+        err_msg = self.add_data(
+            f"case_error_msg_{times}",
+            f"Pattern match failure in {node.line}, {node.col}",
+        )
+        err_var = self.create_string_load_data(f"case_error_var_{times}", err_msg.id)
+
         # Merging all expression operations in correct order
         # and saving all to final value
         fval_id = f"case_{times}_fv"
@@ -328,8 +359,8 @@ class CCILGenerator:
             *case_expr_ops,
             type_of,
             *pattern_match_ops,
-            *self.notifiy_and_abort(f"Pattern match failure in {node.row}, {node.col}")
-            * branch_ops,
+            *self.notifiy_and_abort(err_var.id),
+            *branch_ops,
             final_label,
             fval,
         ]
@@ -359,10 +390,9 @@ class CCILGenerator:
             fval,
         )
 
-    @visitor.when(sem_ast.BinaryNode)
-    def visit(self, node: sem_ast.BinaryNode) -> VISITOR_RESULT:
+    @visitor.when(sem_ast.ArithmeticNode)
+    def visit(self, node: sem_ast.ArithmeticNode) -> VISITOR_RESULT:
         times = self.times(node)
-
         (left_ops, left_fval) = self.visit(node.left)
         (right_ops, right_fval) = self.visit(node.right)
 
@@ -370,9 +400,10 @@ class CCILGenerator:
         right_id = extract_id(right_fval)
 
         fval_id: str
-        op: BinaryOpNode
+        op: ArithmeticOpNode
 
         # Arithmetic Binary Nodes
+        extra_ops: List[OperationNode] = []
         node_type = type(node)
         if node_type == sem_ast.PlusNode:
             op = SumOpNode(left_id, right_id)
@@ -386,9 +417,54 @@ class CCILGenerator:
         elif node_type == sem_ast.DivNode:
             op = DivOpNode(left_id, right_id)
             fval_id = f"div_{times}"
+            # Generating divison by zero runtime error
+            ok_label = LabelNode(f"ok_div_{times}")
+            right_id_is_zero = self.create_equality(
+                f"check_right_zero_{times}", left_id, IntNode("0")
+            )
+            if_id_is_not_zero = IfFalseNode(extract_id(right_id_is_zero), ok_label)
+            error_msg = self.add_data(
+                f"error_msg_div_zero_{times}",
+                f"Error. Zero division detected on {node.line}, {node.col}.",
+            )
+            error_var = self.create_string_load_data(f"error_var_{times}", error_msg.id)
+            extra_ops = [
+                right_id_is_zero,
+                if_id_is_not_zero,
+                error_var,
+                *self.notifiy_and_abort(error_var.id),
+                ok_label,
+            ]
+
+        else:
+            raise Exception(
+                f"Pattern match failure visiting arithmetic expression"
+                f" with {type(node).__name__}"
+            )
+
+        fval = self.create_storage(fval_id, node.type.name, op)
+        return ([*left_ops, *right_ops, *extra_ops, fval], fval)
+
+    @visitor.when(sem_ast.ComparerNode)
+    def visit(self, node: sem_ast.ComparerNode) -> VISITOR_RESULT:
+        times = self.times(node)
+
+        (left_ops, left_fval) = self.visit(node.left)
+        (right_ops, right_fval) = self.visit(node.right)
+
+        left_id = extract_id(left_fval)
+        right_id = extract_id(right_fval)
+
+        fval_id: str
+        op: BinaryOpNode
+        node_type = type(node)
         # Boolean Binary Nodes
-        elif node_type == sem_ast.EqualsNode:
-            op = EqualOpNode(left_id, right_id)
+        if node_type == sem_ast.EqualsNode:
+            op = (
+                EqualOpNode(left_id, right_id)
+                if node.left.type.name != STRING
+                else EqualStrNode(left_id, right_id)
+            )
             fval_id = f"eq_{times}"
         elif node_type == sem_ast.LessNode:
             op = LessOpNode(left_id, right_id)
@@ -403,6 +479,10 @@ class CCILGenerator:
 
         fval = self.create_storage(fval_id, node.type.name, op)
         return ([*left_ops, *right_ops, fval], fval)
+
+    @visitor.when(sem_ast.EqualsNode)
+    def visit(self, node: sem_ast.EqualsNode) -> VISITOR_RESULT:
+        pass
 
     @visitor.when(sem_ast.UnaryNode)
     def visit(self, node: sem_ast.UnaryNode) -> VISITOR_RESULT:
@@ -451,7 +531,29 @@ class CCILGenerator:
             )
             return [*args_ops, call], call
 
-        (expr_ops, _) = self.visit(node.expr)
+        (expr_ops, expr_fval) = self.visit(node.expr)
+
+        # Runtime error depending if expr is void or not
+        error_ops = []
+        if node.expr.type.name not in {INT, STRING, BOOL}:
+            expr_fval_is_void = self.create_equality(
+                "expr_is_void", extract_id(expr_fval), IntNode("0")
+            )
+            ok_label = LabelNode(f"expr_is_not_void")
+            if_is_not_void = IfFalseNode(extract_id(expr_fval_is_void), ok_label)
+            error_msg = self.add_data(
+                "caller_void_err",
+                f"RuntimeError: expresion in {node.line}, {node.col} is void",
+            )
+            load_err = self.create_string_load_data("callor_void_err_var", error_msg.id)
+            print_and_abort = self.notifiy_and_abort(load_err.id)
+            error_ops = [
+                expr_fval_is_void,
+                if_is_not_void,
+                load_err,
+                *print_and_abort,
+                ok_label,
+            ]
 
         # <expr>@type.id(arg1, arg2, ..., argn)
         if node.at_type is not None:
@@ -459,13 +561,13 @@ class CCILGenerator:
             call = self.create_call(
                 fval_id, node.type.name, node.id, node.caller_type.name
             )
-            return [*args_ops, *expr_ops, call]
+            return [*expr_ops, *error_ops, *args_ops, call]
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
         call = self.create_vcall(fval_id, node.type.id, node.id, node.caller_type)
 
-        return [*args_ops, *expr_ops, call]
+        return [*expr_ops, *error_ops, *args_ops, call]
 
     @visitor.when(sem_ast.InstantiateNode)
     def visit(self, node: sem_ast.InstantiateNode) -> VISITOR_RESULT:
@@ -485,7 +587,7 @@ class CCILGenerator:
 
         if is_attr:
             get_attr = self.create_attr_extraction(
-                id_id, node.type.name, "self", ccil_id
+                id_id, node.type.name, "self", ccil_id, self.current_type
             )
             return [get_attr], get_attr
 
@@ -708,17 +810,17 @@ class CCILGenerator:
 
     def create_uninitialized_storage(self, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
-        return StorageNode(idx, VoidNode())
+        return StorageNode(idx, ZERO if type_idx != STRING else EMPTY)
 
     def create_storage(self, idx: str, type_idx: str, op: ReturnOpNode):
         self.add_local(idx, type_idx)
         return StorageNode(idx, op)
 
     def create_attr_extraction(
-        self, idx: str, type_idx: str, from_idx: str, attr_idx: str
+        self, idx: str, type_idx: str, from_idx: str, attr_idx: str, from_type_idx: str
     ):
         self.add_local(idx, type_idx)
-        return StorageNode(idx, GetAttrOpNode(from_idx, attr_idx))
+        return StorageNode(idx, GetAttrOpNode(from_type_idx, from_idx, attr_idx))
 
     def create_new_type(self, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
@@ -765,6 +867,14 @@ class CCILGenerator:
         self.add_local(idx, INT)
         return StorageNode(idx, LengthOpNode(target))
 
+    def init_default_values(self):
+        if not ZERO in self.locals and not EMPTY in self.locals:
+            return [
+                self.create_storage(ZERO, INT, IntNode("0")),
+                self.create_string_load_data(EMPTY, DEFAULT_STR.id),
+            ]
+        return []
+
     def add_data(self, idx: str, value: str):
         data = Data(idx, value)
         self.data.append(data)
@@ -778,14 +888,12 @@ class CCILGenerator:
         if idx in self.locals:
             raise Exception(f"Trying to insert {idx} again as local")
         self.locals[idx] = typex
-        self.defined_vars.add(idx)
 
     def reset_locals(self):
         """
         Apply at the beginning of every method to reset local vars
         """
         self.locals = dict()
-        self.defined_vars = set()
 
     def reset_scope(self):
         self.ccil_cool_names = Scope()
