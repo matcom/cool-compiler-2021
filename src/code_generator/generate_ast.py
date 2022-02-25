@@ -56,9 +56,9 @@ class CIL:
         type_info = self.scope.infos[node.id]
         for a in type_info.attrs:   
             attributes.append(CILAttributeNode(a.name, a.type))
+        methods.append(CILMethodNode('init', f'init_{node.id}'))         
         for m in type_info.methods.keys():        
             methods.append(CILMethodNode(m, type_info.methods[m])) 
-        methods.append(CILMethodNode('init', f'init_{node.id}'))         
                 
         for feature in node.features:
             if isinstance(feature, AttrDeclarationNode):

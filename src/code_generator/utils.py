@@ -68,10 +68,10 @@ class CILScope:
         types = []
         
         obj_methods = [
+            CILMethodNode('init', 'init_Object'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
-            CILMethodNode('init', 'init_Object'),
         ]
         types.append(CILTypeNode('Object', [], obj_methods))
         init_Object = CILFuncNode(
@@ -81,8 +81,12 @@ class CILScope:
             [CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_Object)
         
-        int_methods = obj_methods.copy()
-        int_methods.extend([CILMethodNode('init', 'init_Int')])
+        int_methods = [
+            CILMethodNode('init', 'init_Int'),
+            CILMethodNode('abort', 'abort_Object'), 
+            CILMethodNode('type_name', 'type_name_Object'),
+            CILMethodNode('copy', 'copy_Object'),
+        ]
         types.append(CILTypeNode('Int', [CILAttributeNode('value', None)], int_methods))
         init_int = CILFuncNode(
             'init_Int', 
@@ -91,13 +95,15 @@ class CILScope:
             [CILSetAttributeNode(CILVariableNode('self'), 'Int', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_int)
         
-        str_methods = obj_methods.copy()
-        str_methods.extend([
+        str_methods = [
             CILMethodNode('init', 'init_String'), 
+            CILMethodNode('abort', 'abort_Object'), 
+            CILMethodNode('type_name', 'type_name_Object'),
+            CILMethodNode('copy', 'copy_Object'),
             CILMethodNode('length', 'length_String'), 
             CILMethodNode('concat', 'concat_String'),
             CILMethodNode('substr', 'substr_String'),
-        ])
+        ]
         types.append(CILTypeNode('String', [CILAttributeNode('value', None)], str_methods))
         init_string = CILFuncNode(
             'init_String', 
@@ -106,8 +112,12 @@ class CILScope:
             [CILSetAttributeNode(CILVariableNode('self'), 'String', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_string)
         
-        bool_methods = obj_methods.copy()
-        bool_methods.extend([CILMethodNode('init', 'init_Bool')])
+        bool_methods = [
+            CILMethodNode('init', 'init_Bool'),
+            CILMethodNode('abort', 'abort_Object'), 
+            CILMethodNode('type_name', 'type_name_Object'),
+            CILMethodNode('copy', 'copy_Object'),
+        ]
         types.append(CILTypeNode('Bool', [CILAttributeNode('value', None)], bool_methods))
         init_bool = CILFuncNode(
             'init_Bool', 
@@ -116,14 +126,16 @@ class CILScope:
             [CILSetAttributeNode(CILVariableNode('self'), 'Bool', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_bool)
         
-        io_methods = obj_methods.copy()
-        io_methods.extend([
+        io_methods = [
+            CILMethodNode('init', 'init_IO'),
+            CILMethodNode('abort', 'abort_Object'), 
+            CILMethodNode('type_name', 'type_name_Object'),
+            CILMethodNode('copy', 'copy_Object'),
             CILMethodNode('out_string', 'out_string_IO'), 
             CILMethodNode('out_int', 'out_int_IO'),
             CILMethodNode('in_string', 'in_string_IO'),
             CILMethodNode('in_int', 'in_int_IO'),
-            CILMethodNode('init', 'init_IO'),
-        ])
+        ]
         types.append(CILTypeNode('IO', [], io_methods))
         init_IO = CILFuncNode(
             'init_IO', 
@@ -138,7 +150,7 @@ class CILScope:
         type = self.context.get_type(self.current_class)
         instructions = []
         
-        if not isinstance(type.parent,ObjectType):
+        if not isinstance(type.parent, ObjectType):
             instructions.append(CILArgNode(CILVariableNode(f'self')))
             call = CILVCallNode(type.parent.name, f'init')  
             instructions.append(CILAssignNode(CILVariableNode('self'), call))   
