@@ -9,11 +9,11 @@ class A : Int{
    aa : Int <- 101;
    a(): Int {
    	aa
-   };
-};
+   }
+}
 class B : Int{
    bb : Int <- 102;
    a(): Int {
    	bb
-   };
-};
+   }
+}
