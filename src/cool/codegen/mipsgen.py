@@ -28,7 +28,7 @@ class BaseMips:
             entry: ObjTabEntry
             self.methods.extend(entry.dispatch_table_entry)
 
-    def get_runtime_errors(self):
+    def initialize_runtime_errors(self):
         self.code.append('# Raise exception method')
         self.code.append('.raise:')
         self.code.append('li $v0, 4')
@@ -41,7 +41,7 @@ class BaseMips:
         self.data_code.append('dispatch_error: .asciiz \"Dispatch on void error\n\"')
         self.data_code.append('case_error: .asciiz \"Case statement without a matching branch error\n\"')
         self.data_code.append('index_error: .asciiz \"Substring out of range error\n\"')
-        self.data_code.append('heap_error: .asciiz \"Heap overflow error\n\"')
+        self.data_code.append('heap_error: .asciiz \"Heap overflow error\n\"')  # no idea how to check for this
 
     def get_abort_messages(self):
         self.data_code.append("abort_msg: .asciiz \"Abort called from class \"")
@@ -77,7 +77,7 @@ class BaseMips:
     def add_entry_symb_tab(self, name):
         self.symbol_table.insert(name)
 
-    def next_use(self, basic_blocks: List[List[InstructionNode]]):
+    def construct_next_use(self, basic_blocks: List[List[InstructionNode]]):
         next_use = {}
         for basic_block in basic_blocks:
             for x in self.symbol_table:

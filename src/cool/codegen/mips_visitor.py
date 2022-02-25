@@ -27,7 +27,7 @@ class MipsVisitor(BaseMips):
         for code in node.func_node:
             self.visit(code)
 
-        self.get_runtime_errors()
+        self.initialize_runtime_errors()
 
         return self.data_code, self.code
 
@@ -59,7 +59,7 @@ class MipsVisitor(BaseMips):
             self.visit(var, i)
         self.locals = len(node.params) + len(node.localvars)
         blocks = self.get_basic_blocks(node.instructions)
-        self.next_use = self.next_use(blocks)
+        self.next_use = self.construct_next_use(blocks)
 
         for block in blocks:
             self.block = block
