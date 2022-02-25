@@ -7,13 +7,13 @@ El objetivo principal de la aplicación es contruir un compilador que convierta 
 ### Clonar el repositorio
   
   ``` bash
-  $ git clone https://github.com/WataLuisoDalmauCompiler/cool-compiler-2021.git
+  git clone https://github.com/WataLuisoDalmauCompiler/cool-compiler-2021.git
   ```
 
 ### Instalar requerimientos
 
 ``` bash
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## ¿Cómo usar el compilador?
@@ -238,3 +238,22 @@ Gracias a que la representación de los objetos en memoria tienen el tipo al que
 TODO
 
 Dejamos a su disposición dentro de la carpeta src el archivo test_mips.sh que corre el caso detro de testing.cl y compara con expected_output.txt el resultado obtenido.
+
+``` bash
+./src/test_mips.sh
+```
+
+Debe recibir el siguiente resultado:
+
+- En caso de pasar:
+
+  ``` bash
+  Test Passed
+  ```
+
+- En caso de fallar:
+
+  ``` bash
+  Test Failed
+  ```
+  
