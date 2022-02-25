@@ -87,13 +87,8 @@ class TypeBuilder:
                     t = SelfType(self.current_type)
                 elif isinstance(t, AutoType):
                     node.index[-1] = self.manager.assign_id(self.obj_type)
-            except SemanticError:
-                self.errors.append(
-                    (
-                        TypeError(f"Class {t} of formal parameter {n} is undefined."),
-                        typex.pos,
-                    )
-                )
+            except TypeError as ex:
+                self.errors.append((ex, typex.pos))
                 t = ErrorType()
             param_types.append(t)
 
@@ -102,15 +97,8 @@ class TypeBuilder:
             rtype = self.context.get_type(node.type)
             if isinstance(rtype, SelfType):
                 rtype = SelfType(self.current_type)
-        except SemanticError:
-            self.errors.append(
-                (
-                    TypeError(
-                        f"Undefined return type {node.type} in method {node.id}."
-                    ),
-                    node.typeToken.pos,
-                )
-            )
+        except TypeError as ex:
+            self.errors.append((ex, node.typeToken.pos))
             rtype = ErrorType()
 
         node.idx = (
@@ -134,15 +122,8 @@ class TypeBuilder:
             attr_type = self.context.get_type(node.type)
             if isinstance(attr_type, SelfType):
                 attr_type = SelfType(self.current_type)
-        except SemanticError:
-            self.errors.append(
-                (
-                    TypeError(
-                        f"Class {node.type} of attribute {node.id} is undefined."
-                    ),
-                    node.typeToken.pos,
-                )
-            )
+        except TypeError as ex:
+            self.errors.append((ex, node.typeToken.pos))
             attr_type = ErrorType()
 
         node.idx = (
@@ -188,7 +169,7 @@ class TypeBuilder:
                 self.errors.append(
                     (SemanticError("Class Main must contain a method main"), (0, 0))
                 )
-        except SemanticError:
+        except TypeError:
             self.errors.append(
                 (SemanticError("Program must contain a class Main"), (0, 0))
             )

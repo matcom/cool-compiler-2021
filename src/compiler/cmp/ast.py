@@ -80,13 +80,12 @@ class AssignNode(ExpressionNode):
 class CallNode(ExpressionNode):
     def __init__(
         self,
-        obj: Token,
+        obj: ExpressionNode,
         idx: Token,
         args: List[ExpressionNode],
         cast_type: Token = emptyToken,
     ):
-        self.obj = obj.lex
-        self.objToken = obj
+        self.obj = obj
         self.id = idx.lex
         self.args = args
         self.type = cast_type.lex

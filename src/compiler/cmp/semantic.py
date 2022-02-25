@@ -75,7 +75,7 @@ class Type:
                     f'Attribute "{name}" is not defined in {self.name}.'
                 )
 
-    def define_attribute(self, name: str, typex, idx=None):
+    def define_attribute(self, name: str, typex, idx=None) -> Attribute:
         try:
             self.get_attribute(name)
         except SemanticError:
@@ -87,7 +87,7 @@ class Type:
                 f'Attribute "{name}" is already defined in {self.name}.'
             )
 
-    def get_method(self, name: str):
+    def get_method(self, name: str) -> Method:
         try:
             return next(method for method in self.methods if method.name == name)
         except StopIteration:
@@ -280,7 +280,7 @@ class Context:
         try:
             return self.types[name]
         except KeyError:
-            raise SemanticError(f'Type "{name}" is not defined.')
+            raise TypeError(f'Type "{name}" is not defined.')
 
     def __str__(self):
         return (

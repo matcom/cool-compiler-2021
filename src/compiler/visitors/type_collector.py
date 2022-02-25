@@ -124,15 +124,8 @@ class TypeCollector(object):
                         )
                         typex = built_in_types[0]
                     item_type.set_parent(typex)
-                except SemanticError as ex:
-                    self.errors.append(
-                        (
-                            TypeError(
-                                f"Class {item_type.name} inherits from an undefined class {self.parent[item].lex}."
-                            ),
-                            self.parent[item].pos,
-                        )
-                    )
+                except TypeError as ex:
+                    self.errors.append((ex, self.parent[item].pos))
                     item_type.set_parent(built_in_types[0])
 
     def check_cyclic_inheritance(self) -> void:
