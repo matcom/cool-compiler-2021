@@ -1,5 +1,3 @@
-from git import Object
-
 from cmp.semantic import ObjectType
 from .ast_CIL import *
 
@@ -70,9 +68,9 @@ class CILScope:
         types = []
         
         obj_methods = [
-            CILMethodNode('abort', 'abort'), 
-            CILMethodNode('type_name', 'type_name'),
-            CILMethodNode('copy', 'copy'),
+            CILMethodNode('abort', 'abort_Object'), 
+            CILMethodNode('type_name', 'type_name_Object'),
+            CILMethodNode('copy', 'copy_Object'),
         ]
         types.append(CILTypeNode('Object', [], obj_methods))
         
@@ -83,22 +81,22 @@ class CILScope:
         types.append(CILTypeNode('Int', [CILAttributeNode('value', None)], int_methods))
         init_int = CILFuncNode(
             'init_Int', 
-            [CILParamNode('v', None)], 
+            [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
             [CILSetAttributeNode(CILVariableNode('self'), 'Int', CILVariableNode('value'), CILVariableNode('v'))])               
         self.functions.append(init_int)
         
         str_methods = [
             CILMethodNode('init', 'init_String'), 
-            CILMethodNode('length', 'length'), 
-            CILMethodNode('concat', 'concat'),
-            CILMethodNode('substr', 'substr'),
+            CILMethodNode('length', 'length_String'), 
+            CILMethodNode('concat', 'concat_String'),
+            CILMethodNode('substr', 'substr_String'),
         ]
         str_methods.extend(obj_methods)
         types.append(CILTypeNode('String', [CILAttributeNode('value', None)], str_methods))
         init_string = CILFuncNode(
             'init_String', 
-            [CILParamNode('v', None)], 
+            [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
             [CILSetAttributeNode(CILVariableNode('self'), 'String', CILVariableNode('value'), CILVariableNode('v'))])               
         self.functions.append(init_string)
@@ -110,16 +108,16 @@ class CILScope:
         types.append(CILTypeNode('Bool', [CILAttributeNode('value', None)], bool_methods))
         bool_string = CILFuncNode(
             'init_Bool', 
-            [CILParamNode('v', None)], 
+            [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
             [CILSetAttributeNode(CILVariableNode('self'), 'Bool', CILVariableNode('value'), CILVariableNode('v'))])               
         self.functions.append(bool_string)
         
         io_methods = [
-            CILMethodNode('out_string', 'out_string'), 
-            CILMethodNode('out_int', 'out_int'),
-            CILMethodNode('in_string', 'in_string'),
-            CILMethodNode('in_int', 'in_int'),
+            CILMethodNode('out_string', 'out_string_IO'), 
+            CILMethodNode('out_int', 'out_int_IO'),
+            CILMethodNode('in_string', 'in_string_IO'),
+            CILMethodNode('in_int', 'in_int_IO'),
         ]
         io_methods.extend(obj_methods)
         types.append(CILTypeNode('IO', [], io_methods))
@@ -130,15 +128,16 @@ class CILScope:
         type = self.context.get_type(self.current_class)
         instructions = []
         
+        instructions.append(CILParamNode('self', None)) 
+        
         if not isinstance(type.parent,ObjectType):
-            instructions.append(CILArgNode(CILVariableNode(f'self_{self.current_class}')))
-            instructions.append(CILCallNode(f'init_{type.parent.name}'))   
+            instructions.append(CILArgNode(CILVariableNode(f'self')))
+            instructions.append(CILVCallNode(type.parent.name, f'init_{type.parent.name}'))   
              
         for attr,expr in zip(attributes,expresions):
-            instructions.append(CILAssignNode (CILVariableNode(attr), expr))
+            instructions.append(CILSetAttributeNode(CILVariableNode('self'), self.current_class, CILVariableNode(attr), expr)) 
         
         return CILFuncNode(f'init_{self.current_class}',[], [], instructions)
-        
         
         
 class TypeInfo:
