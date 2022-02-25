@@ -9,11 +9,12 @@ from semantics.tools.type import Type
 class CCILProgram:
     """Top level class that represents a CCIL program"""
 
+    entry_func: FunctionNode
     types_section: List[Class]
     code_section: List[FunctionNode]
     data_section: List[str]  # no idea what will be this the node,
 
-    def __str__(self, all=True) -> str:
+    def __str__(self, all=False) -> str:
         types_section = self.types_section
         code_section = self.code_section
         if not all:
@@ -38,7 +39,7 @@ class Class:
     methods: List[Method]
     init_operations: FunctionNode
 
-    def __str__(self, all=True) -> str:
+    def __str__(self, all=False) -> str:
         ident = "\t\t"
         attributes = "\n".join(ident + str(a) for a in self.attributes)
         methods = "\n".join(ident + str(m) for m in self.methods)
