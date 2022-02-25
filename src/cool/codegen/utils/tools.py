@@ -35,8 +35,6 @@ class SymbolTable:
 
 
 class NextUseEntry:
-    """For each line : for all three variables involved their next use and is live information"""
-
     def __init__(self, in1, in2, out, in1nextuse, in2nextuse, outnextuse, in1islive, in2islive, outislive):
         self.in1 = in1
         self.in2 = in2
@@ -57,9 +55,7 @@ class AddrType(Enum):
     VOID = 5
 
 
-class AddressDescriptor:
-    'Stores the location of each variable'
-
+class AddrDescriptor:
     def __init__(self):
         self.vars = {}
 
@@ -99,8 +95,6 @@ class RegisterType(Enum):
 
 
 class RegisterDescriptor:
-    'Stores the contents of each register'
-
     def __init__(self):
         registers = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 'a1', 'a2', 'a3', \
                      's0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 'v1']
@@ -145,8 +139,6 @@ class DispatchTable:
         return None
 
     def get_methods(self, type_name):
-        "Returns all the methods of a specific type"
-
         return self.classes[type_name]
 
     def __len__(self):
@@ -177,7 +169,6 @@ class ObjTabEntry:
         return self.attrs.index(attr) + 3
 
     def method_offset(self, meth):
-        "Method offset in dispatch table"
         return self.dispatch_table_entry.index(meth)
 
 

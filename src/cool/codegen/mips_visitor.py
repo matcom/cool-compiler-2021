@@ -1,55 +1,29 @@
 from .mipsgen import BaseMips
 from ..utils import visitor
-from .utils.tools import SymbolTable, AddressDescriptor, RegisterDescriptor, AddrType
+from .utils.tools import SymbolTable, AddrDescriptor, RegisterDescriptor, AddrType
 from ..semantic.helpers import VariableInfo
 from ..semantic.types import VOID_NAME
 from .utils.ast_cil import *
 
 
 class MipsVisitor(BaseMips):
-    '''
-    Registers:
-    v0-v1: Used for expression evaluations and to hold the integer type
-        function results. Also used to pass the static link when calling
-        nested procedures.
-    a0-a3: Used to pass the first 4 words of integer type actual
-        arguments, their values are not preserved across procedure
-        calls.
-    t0-t7: Temporary registers used for expression evaluations; their
-        values aren’t preserved across procedure calls.
-    s0-s7: Saved registers. Their values must be preserved across
-        procedure calls.
-    t8-t9: Temporary registers used for expression evaluations; their
-        values aren’t preserved across procedure calls.
-    k0-k1: Reserved for the operating system kernel.
-    gp: Contains the global pointer.
-    sp: Contains the stack pointer.
-    fp: Contains the frame pointer (if needed); otherwise a saved register.
-    ra: Contains the return address and is used for expression evaluation.
-        Register $ra only needs to be saved if the callee itself makes a call.
-
-    '''
-
     @visitor.on('node')
     def visit(self, node):
         pass
 
     @visitor.when(ProgramNode)
     def visit(self, node: ProgramNode):
-        # ? Quizá tenga que cambiar el orden en que estas cosas se visitan
-        # visit TypeNodes
+        self.code.append('# debug: ProgramNode')
         for type_ in node.type_node:
             self.visit(type_)
 
-        # guardo las direcciones de cada método
         self.save_meth_addr(node.func_node)
-        self.data_code.append(f"type_Void: .asciiz \"Void\"")  # guarda el nombre de Void Type
-        # guardo las direcciones de cada tipo
+        self.data_code.append(f"type_Void: .asciiz \"Void\"")
         self.save_types_addr(node.type_node)
-        # visit DataNodes
+
         for d in node.data:
             self.visit(d)
-        # visit code instrunctions
+
         for code in node.func_node:
             self.visit(code)
 
@@ -59,20 +33,22 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(TypeNode)
     def visit(self, node: TypeNode):
+        self.code.append('# debug: TypeNode')
         self.obj_table.add_entry(node.name, node.methods, node.attributes)
         self.data_code.append(
-            f"type_{node.name}: .asciiz \"{node.name}\"")  # guarda el nombre de la variable en la memoria
+            f"type_{node.name}: .asciiz \"{node.name}\"")
 
     @visitor.when(DataNode)
     def visit(self, node: DataNode):
+        self.code.append('# debug: DataNode')
         self.data_code.append(f"{node.name}: .asciiz \"{node.value}\"")
 
     @visitor.when(FunctionNode)
     def visit(self, node: FunctionNode):
+        self.code.append('# debug: FunctionNode')
         self.code.append('')
         self.code.append(f'{node.name}:')
-        self.locals = 0  # pointer to count the ammount of locals that are pushed into the stack
-
+        self.locals = 0
         self.code.append('# Gets the params from the stack')
         self.code.append(f'move $fp, $sp')  # gets the frame pointer from the stack
         n = len(node.params)
@@ -95,25 +71,27 @@ class MipsVisitor(BaseMips):
             if not (isinstance(inst, GotoNode) or isinstance(inst, GotoIfNode) or isinstance(inst, ReturnNode) \
                     or isinstance(inst, StaticCallNode) or isinstance(inst, DynamicCallNode)):
                 self.empty_registers()
-            # self.empty_registers()
 
     @visitor.when(ParamNode)
     def visit(self, node: ParamNode, idx: int, length: int):
+        self.code.append('# debug: ParamNode')
         self.symbol_table.insert_name(node.name)
         self.var_address[node.name] = self.get_type(node.type)
         self.code.append(f'# Pops the register with the param value {node.name}')
-        self.code.append('addiu $fp, $fp, 4')  # pops the register with the param value from stack
+        self.code.append('addiu $fp, $fp, 4')
         self.addr_desc.insert_var(node.name, length - idx)
 
     @visitor.when(LocalNode)
     def visit(self, node: LocalNode, idx: int):
-        self.symbol_table.insert_name(node.name)  # inserts the var in the symbol table, local by default
-        self.addr_desc.insert_var(node.name, idx)  # saves the address relative from the actual fp
+        self.code.append('# debug: LocalNode')
+        self.symbol_table.insert_name(node.name)
+        self.addr_desc.insert_var(node.name, idx)
         self.code.append(f'# Updates stack pointer pushing {node.name} to the stack')
-        self.code.append(f'addiu $sp, $sp, -4')  # updates stack pointers (pushing this value)
+        self.code.append(f'addiu $sp, $sp, -4')
 
     @visitor.when(AssignNode)
     def visit(self, node: AssignNode):
+        self.code.append('# debug: AssignNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append(f'# Moving {node.source} to {node.dest}')
         if self.is_variable(node.source):
@@ -127,6 +105,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(NotNode)
     def visit(self, node: NotNode):
+        self.code.append('#debug: NotNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         rsrc = self.save_to_register(node.expr)
         self.code.append(f'# {node.dest} <- ~{node.expr}')
@@ -136,6 +115,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(LogicalNotNode)
     def visit(self, node: LogicalNotNode):
+        self.code.append('#debug: LogicalNotNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         rsrc = self.save_to_register(node.expr)
         self.code.append(f'# {node.dest} <- not {node.expr}')
@@ -150,6 +130,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(PlusNode)
     def visit(self, node: PlusNode):
+        self.code.append('#debug: PlusNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append(f'# {node.dest} <- {node.left} + {node.right}')
         if self.is_variable(node.left):
@@ -169,6 +150,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(MinusNode)
     def visit(self, node: MinusNode):
+        self.code.append('#debug: MinusNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append(f'# {node.dest} <- {node.left} - {node.right}')
         if self.is_variable(node.left):
@@ -189,11 +171,13 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(StarNode)
     def visit(self, node: StarNode):
+        self.code.append('#debug: StartNode')
         self.code.append(f'# {node.dest} <- {node.left} * {node.right}')
         self._code_to_mult_div(node, op='mult', func_op=lambda x, y: x * y)
 
     @visitor.when(DivNode)
     def visit(self, node: DivNode):
+        self.code.append('#debug: DivNode')
         self.code.append(f'# {node.dest} <- {node.left} / {node.right}')
         self._code_to_mult_div(node, op='div', func_op=lambda x, y: int(x / y))
 
@@ -227,16 +211,19 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(LessNode)
     def visit(self, node: LessNode):
+        self.code.append('#debug: LessNode')
         self.code.append(f'# {node.dest} <- {node.left} < {node.right}')
         self._code_to_comp(node, 'slt', lambda x, y: x < y)
 
     @visitor.when(LessEqNode)
-    def visit(self, node: MinusNode):
+    def visit(self, node: LessEqNode):
+        self.code.append('#debug: LessEqNode')
         self.code.append(f'# {node.dest} <- {node.left} <= {node.right}')
         self._code_to_comp(node, 'sle', lambda x, y: x <= y)
 
     @visitor.when(EqualNode)
-    def visit(self, node: MinusNode):
+    def visit(self, node: EqualNode):
+        self.code.append('#debug: EqualNode')
         self.code.append(f'# {node.dest} <- {node.left} = {node.right}')
         if self.is_variable(node.left) and self.is_variable(node.right) and self.var_address[
             node.left] == AddrType.STR and self.var_address[node.right] == AddrType.STR:
@@ -265,6 +252,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(GetAttribNode)
     def visit(self, node: GetAttribNode):
+        self.code.append('#debug: GetAttribNode')
         self.code.append(f'# {node.dest} <- GET {node.obj} . {node.attr}')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.var_address[node.dest] = self.get_type(node.attr_type)
@@ -274,6 +262,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(SetAttribNode)
     def visit(self, node: SetAttribNode):
+        self.code.append('#debug: SetAttribNode')
         self.code.append(f'# {node.obj} . {node.attr} <- SET {node.value}')
         rdest = self.addr_desc.get_var_reg(node.obj)
         attr_offset = 4 * self.get_attr_offset(node.attr, node.type_name)
@@ -289,28 +278,25 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(AllocateNode)
     def visit(self, node: AllocateNode):
+        self.code.append('#debug: AllocateNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
-        size = 4 * self.obj_table.size_of_entry(node.type)  # size of the table entry of the new type
+        size = 4 * self.obj_table.size_of_entry(node.type)
         self.var_address[node.dest] = AddrType.REF
-        # syscall to allocate memory of the object entry in heap
 
         self.code.append('# Syscall to allocate memory of the object entry in heap')
-        self.code.append('li $v0, 9')  # code to request memory
-        self.code.append(f'li $a0, {size}')  # argument (size)
+        self.code.append('li $v0, 9')
+        self.code.append(f'li $a0, {size}')
         self.code.append('syscall')
-        # in v0 is the address of the new memory
         addrs_stack = self.addr_desc.get_var_addr(node.dest)
-        # self.code.append('# Save the address in the stack')
-        # self.code.append(f'sw $v0, -{addrs_stack}($fp)')     # save the address in the stack (where is the local variable)
 
         self.code.append('# Loads the name of the variable and saves the name like the first field')
-        self.code.append(f'la $t9, type_{node.type}')  # loads the name of the variable
-        self.code.append(f'sw $t9, 0($v0)')  # saves the name like the first field
+        self.code.append(f'la $t9, type_{node.type}')
+        self.code.append(f'sw $t9, 0($v0)')
 
         self.code.append(f'# Saves the size of the node')
-        self.code.append(f'li $t9, {size}')  # saves the size of the node
-        self.code.append(f'sw $t9, 4($v0)')  # this is the second file of the table offset
-        self.code.append(f'move ${rdest}, $v0')  # guarda la nueva dirección de la variable en el registro destino
+        self.code.append(f'li $t9, {size}')
+        self.code.append(f'sw $t9, 4($v0)')
+        self.code.append(f'move ${rdest}, $v0')
 
         idx = self.types.index(node.type)
         self.code.append('# Adding Type Info addr')
@@ -320,12 +306,13 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(TypeOfNode)
     def visit(self, node: TypeOfNode):
+        self.code.append('#debug: TypeOfNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append(f'# {node.dest} <- Type of {node.obj}')
         if self.is_variable(node.obj):
             rsrc = self.addr_desc.get_var_reg(node.obj)
             if self.var_address[node.obj] == AddrType.REF:
-                self.code.append(f'lw ${rdest}, 0(${rsrc})')  # como en el offset 0 está el nombre del tipo this is ok
+                self.code.append(f'lw ${rdest}, 0(${rsrc})')
             elif self.var_address[node.obj] == AddrType.STR:
                 self.code.append(f'la ${rdest}, type_String')
             elif self.var_address[node.obj] == AddrType.INT:
@@ -338,15 +325,18 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(LabelNode)
     def visit(self, node: LabelNode):
+        self.code.append('#debug: LabelNode')
         self.code.append(f'{node.label}:')
 
     @visitor.when(GotoNode)
     def visit(self, node: GotoNode):
+        self.code.append('#debug: GotoNode')
         self.empty_registers()
         self.code.append(f'j {node.label}')
 
     @visitor.when(GotoIfNode)
     def visit(self, node: GotoIfNode):
+        self.code.append('#debug: GotoIfNode')
         reg = self.save_to_register(node.cond)
         self.code.append(f'# If {node.cond} goto {node.label}')
         self.empty_registers()
@@ -354,6 +344,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(GotoIfFalseNode)
     def visit(self, node: GotoIfNode):
+        self.code.append('#debug: GotoIfFalseNode')
         reg = self.save_to_register(node.cond)
         self.code.append(f'# If not {node.cond} goto {node.label}')
         self.empty_registers()
@@ -361,6 +352,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(StaticCallNode)
     def visit(self, node: StaticCallNode):
+        self.code.append('#debug: StaticCallNode')
         function = self.dispatch_table.find_full_name(node.type, node.function)
         self.code.append(f'# Static Dispatch of the method {node.function}')
         self._code_to_function_call(node.args, function, node.dest)
@@ -369,46 +361,43 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(DynamicCallNode)
     def visit(self, node: DynamicCallNode):
-        # Find the actual name of the method in the dispatch table
+        self.code.append('#debug: DynamicCallNode')
         self.code.append('# Find the actual name in the dispatch table')
-        reg = self.addr_desc.get_var_reg(node.obj)  # obtiene la instancia actual
-
+        reg = self.addr_desc.get_var_reg(node.obj)
         self.code.append('# Gets in a0 the actual direction of the dispatch table')
-        self.code.append(f'lw $t9, 8(${reg})')  # obtiene en t9 la dirección del dispatch table
+        self.code.append(f'lw $t9, 8(${reg})')
         self.code.append('lw $a0, 8($t9)')
         function = self.dispatch_table.find_full_name(node.type, node.method)
-        index = 4 * self.dispatch_table.get_offset(node.type, function) + 4  # guarda el offset del me
+        index = 4 * self.dispatch_table.get_offset(node.type, function) + 4
         self.code.append(f'# Saves in t8 the direction of {function}')
-        self.code.append(f'lw $t8, {index}($a0)')  # guarda en $t8 la dirección de la función a llamar
-        # Call function
+        self.code.append(f'lw $t8, {index}($a0)')
         self._code_to_function_call(node.args, '$t8', node.dest, function)
 
         self.var_address[node.dest] = self.get_type(node.return_type)
 
     def _code_to_function_call(self, args, function, dest, function_name=None):
-        self.push_register('fp')  # pushes fp register to the stack
-        self.push_register('ra')  # pushes ra register to the stack
+        self.push_register('fp')
+        self.push_register('ra')
         self.code.append('# Push the arguments to the stack')
-        for arg in reversed(args):  # push the arguments to the stack
+        for arg in reversed(args):
             self.visit(arg)
-
         self.code.append('# Empty all used registers and saves them to memory')
         self.empty_registers()
         self.code.append('# This function will consume the arguments')
-
-        self.code.append(f'jal {function}')  # this function will consume the arguments
+        self.code.append(f'jal {function}')
         self.code.append('# Pop ra register of return function of the stack')
-        self.pop_register('ra')  # pop register ra from the stack
+        self.pop_register('ra')
         self.code.append('# Pop fp register from the stack')
-        self.pop_register('fp')  # pop fp register from the stack
+        self.pop_register('fp')
         if dest is not None:
             self.get_reg_var(dest)
             rdest = self.addr_desc.get_var_reg(dest)
             self.code.append('# saves the return value')
-            self.code.append(f'move ${rdest}, $v0')  # v0 es usado para guardar el valor de retorno
+            self.code.append(f'move ${rdest}, $v0')
 
     @visitor.when(ArgNode)
     def visit(self, node: ArgNode):
+        self.code.append('#debug: ArgNode')
         self.code.append('# The rest of the arguments are push into the stack')
         if self.is_variable(node.dest):
             self.get_reg_var(node.dest)
@@ -421,23 +410,22 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(ReturnNode)
     def visit(self, node: ReturnNode):
-        # save the return value
+        self.code.append('#debug: ReturnNode')
         if self.is_variable(node.value):
             rdest = self.addr_desc.get_var_reg(node.value)
             self.code.append(f'move $v0, ${rdest}')
         elif self.is_int(node.value):
             self.code.append(f'li $v0, {node.value}')
         self.code.append('# Empty all used registers and saves them to memory')
-        self.empty_registers()  # empty all used registers and saves them to memory
+        self.empty_registers()
         self.code.append('# Removing all locals from stack')
         self.code.append(f'addiu $sp, $sp, {self.locals * 4}')
-        # return to the caller
         self.code.append(f'jr $ra')
-
         self.code.append('')
 
     @visitor.when(LoadNode)
     def visit(self, node: LoadNode):
+        self.code.append('#debug: LoadNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append(f'# Saves in {node.dest} {node.msg}')
         self.var_address[node.dest] = AddrType.STR
@@ -445,36 +433,34 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(LengthNode)
     def visit(self, node: LengthNode):
+        self.code.append('#debug: LengthNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         reg = self.addr_desc.get_var_reg(node.arg)
         loop = f'loop_{self.loop_idx}'
         end = f'end_{self.loop_idx}'
-        # saving the value of reg to iterate
         self.code.append(f'move $t8, ${reg}')
-        self.code.append('# Determining the length of a string')
+        self.code.append('# Get length of a string')
         self.code.append(f'{loop}:')
         self.code.append(f'lb $t9, 0($t8)')
         self.code.append(f'beq $t9, $zero, {end}')
         self.code.append(f'addi $t8, $t8, 1')
         self.code.append(f'j {loop}')
         self.code.append(f'{end}:')
-
         self.code.append(f'sub ${rdest}, $t8, ${reg}')
         self.loop_idx += 1
 
     @visitor.when(ConcatNode)
     def visit(self, node: ConcatNode):
+        self.code.append('#debug: ConcatFNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append('# Allocating memory for the buffer')
         self.code.append('li $a0, 356')
         self.code.append('li $v0, 9')
         self.code.append('syscall')
         self.code.append(f'move ${rdest}, $v0')
-
         rsrc1 = self.addr_desc.get_var_reg(node.arg1)
         if node.arg2 is not None:
             rsrc2 = self.addr_desc.get_var_reg(node.arg2)
-
         self.code.append('# Copy the first string to dest')
         var = self.save_reg_if_occupied('a1')
         self.code.append(f'move $a0, ${rsrc1}')
@@ -513,6 +499,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(SubstringNode)
     def visit(self, node: SubstringNode):
+        self.code.append('#debug: SubstringNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append('# Allocating memory for the buffer')
         self.code.append('li $a0, 356')
@@ -537,15 +524,11 @@ class MipsVisitor(BaseMips):
         rself = self.addr_desc.get_var_reg(node.word)
 
         self.code.append("# Getting the substring of a node")
-        # Moves to the first position of the string
-        # self.code.append(f'sll $t9, ${rstart}, 2')      # multiplicar por 4
         start = f'start_{self.loop_idx}'
         error = f'error_{self.loop_idx}'
         end_lp = f'end_len_{self.loop_idx}'
-
         self.code.append('# Move to the first position in the string')
         self.code.append('li $v0, 0')
-
         self.code.append(f'move $t8, ${rself}')
         self.code.append(f'{start}:')
         self.code.append('lb $t9, 0($t8)')
@@ -555,38 +538,32 @@ class MipsVisitor(BaseMips):
         self.code.append(f'addi $t8, 1')
         self.code.append(f'j {start}')
         self.code.append(f'{end_lp}:')
-
         self.code.append('# Saving dest to iterate over him')
         self.code.append(f'move $v0, ${rdest}')
 
         loop = f'loop_{self.loop_idx}'
         end = f'end_{self.loop_idx}'
-        # Loops moving the bytes until reaching to end
+
         self.code.append(f'{loop}:')
         self.code.append(f'sub $t9, $v0, ${rdest}')
-
         self.code.append(f'beq $t9, ${rend}, {end}')
         self.code.append(f'lb $t9, 0($t8)')
-        self.code.append(f'beqz $t9, {error}')  # if $t9 is zero error cause havent finished
+        self.code.append(f'beqz $t9, {error}')
         self.code.append(f'sb $t9, 0($v0)')
         self.code.append('addi $t8, $t8, 1')
         self.code.append(f'addi $v0, $v0, 1')
         self.code.append(f'j {loop}')
         self.code.append(f'{error}:')
         self.code.append('la $a0, index_error')
-
         self.code.append('li $v0, 4')
         self.code.append(f'move $a0, ${rself}')
         self.code.append('syscall')
-
         self.code.append('li $v0, 1')
         self.code.append(f'move $a0, ${rstart}')
         self.code.append('syscall')
-
         self.code.append('li $v0, 1')
         self.code.append(f'move $a0, ${rend}')
         self.code.append('syscall')
-
         self.code.append('j .raise')
         self.code.append(f'{end}:')
         self.code.append('sb $0, 0($v0)')
@@ -595,6 +572,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(OutStringNode)
     def visit(self, node: OutStringNode):
+        self.code.append('#debug: OutStringNode')
         reg = self.addr_desc.get_var_reg(node.value)
         self.code.append('# Printing a string')
         self.code.append('li $v0, 4')
@@ -603,6 +581,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(OutIntNode)
     def visit(self, node: OutIntNode):
+        self.code.append('#debug: OutIntNode')
         if self.is_variable(node.value):
             reg = self.addr_desc.get_var_reg(node.value)
         elif self.is_int(node.value):
@@ -616,15 +595,13 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(ReadStringNode)
     def visit(self, node: ReadStringNode):
-        # self.data_code.append(f'{node.dest}: .space 20')
+        self.code.append('#debug: ReadStringNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append('# Allocating memory for the buffer')
         self.code.append('li $a0, 356')
         self.code.append('li $v0, 9')
         self.code.append('syscall')
         self.code.append(f'move ${rdest}, $v0')
-        # self.code.append(f'sb $0, 0(${rdest})')
-
         self.code.append('# Reading a string')
         var = self.save_reg_if_occupied('a1')
         self.code.append('# Putting buffer in a0')
@@ -633,25 +610,24 @@ class MipsVisitor(BaseMips):
         self.code.append(f'li $a1, 356')
         self.code.append('li $v0, 8')
         self.code.append('syscall')
-        self.code.append('# Walks to eliminate the newline')
-
         start = f'start_{self.loop_idx}'
         end = f'end_{self.loop_idx}'
 
         self.code.append(f'move $t9, ${rdest}')
-        self.code.append(f'{start}:')  # moves to the newline
+        self.code.append(f'{start}:')
         self.code.append('lb $t8, 0($t9)')
         self.code.append(f"beqz $t8, {end}")
         self.code.append('add $t9, $t9, 1')
         self.code.append(f'j {start}')
         self.code.append(f'{end}:')
         self.code.append('addiu $t9, $t9, -1')
-        self.code.append('sb $0, ($t9)')  # overwrites the newline with zero
+        self.code.append('sb $0, ($t9)')
         self.loop_idx += 1
         self.load_var_if_occupied(var)
 
     @visitor.when(ReadIntNode)
     def visit(self, node: ReadIntNode):
+        self.code.append('#debug: ReadIntNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append('# Reading a int')
         self.code.append('li $v0, 5')
@@ -660,6 +636,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(ExitNode)
     def visit(self, node: ExitNode):
+        self.code.append('#debug: ExitNode')
         self.code.append('# Exiting the program')
         if self.is_variable(node.value):
             reg = self.addr_desc.get_var_reg(node.value)
@@ -668,14 +645,11 @@ class MipsVisitor(BaseMips):
             self.code.append(f'li $t8, {node.value}')
 
         rself = self.addr_desc.get_var_reg(node.classx)
-
-        'Abort called from class String'
         if self.var_address[node.classx] == AddrType.REF:
             self.code.append('# Printing abort message')
             self.code.append('li $v0, 4')
             self.code.append(f'la $a0, abort_msg')
             self.code.append('syscall')
-
             self.code.append('li $v0, 4')
             self.code.append(f'lw $a0, 0(${rself})')
             self.code.append('syscall')
@@ -689,19 +663,18 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(CopyNode)
     def visit(self, node: CopyNode):
+        self.code.append('#debug: CopyNode')
+
         rdest = self.addr_desc.get_var_reg(node.dest)
         rsrc = self.addr_desc.get_var_reg(node.source)
 
-        self.code.append(f'lw $t9, 4(${rsrc})')  # getting the size of the object
+        self.code.append(f'lw $t9, 4(${rsrc})')
         self.code.append('# Syscall to allocate memory of the object entry in heap')
-        self.code.append('li $v0, 9')  # code to request memory
-        self.code.append(f'move $a0, $t9')  # argument (size)
+        self.code.append('li $v0, 9')
+        self.code.append(f'move $a0, $t9')
         self.code.append('syscall')
-
         self.code.append(f'move ${rdest}, $v0')
-
         self.code.append('# Loop to copy every field of the previous object')
-        # loop to copy every field of the previous object
         self.code.append('# t8 the register to loop')
         self.code.append('li $t8, 0')
         self.code.append(f'loop_{self.loop_idx}:')
@@ -709,9 +682,7 @@ class MipsVisitor(BaseMips):
         self.code.append(f'bge $t8, $t9, exit_{self.loop_idx}')
         self.code.append(f'lw $a0, (${rsrc})')
         self.code.append('sw $a0, ($v0)')
-        # offset in the copied element
         self.code.append('addi $v0, $v0, 4')
-        # offset in the original element
         self.code.append(f'addi ${rsrc}, ${rsrc}, 4')
         self.code.append('# Increase loop counter')
         self.code.append('addi $t8, $t8, 4')
@@ -721,6 +692,7 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(ConformsNode)
     def visit(self, node: ConformsNode):
+        self.code.append('#debug: ConformsNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         if self.is_variable(node.expr):
             rsrc = self.addr_desc.get_var_reg(node.expr)
@@ -737,37 +709,37 @@ class MipsVisitor(BaseMips):
 
     @visitor.when(ErrorNode)
     def visit(self, node: ErrorNode):
+        self.code.append('#debug: ErrorNode')
         self.code.append(f'la $a0, {node.type}')
         self.code.append('j .raise')
 
     @visitor.when(VoidConstantNode)
     def visit(self, node: VoidConstantNode):
+        self.code.append('#debug: VoidConstantNode')
         rdest = self.addr_desc.get_var_reg(node.out)
         self.code.append('# Initialize void node')
-        self.code.append(f'li $a0, 4')  # argument (size)
-        self.code.append('li $v0, 9')  # code to request memory
+        self.code.append(f'li $a0, 4')
+        self.code.append('li $v0, 9')
         self.code.append('syscall')
         self.code.append('# Loads the name of the variable and saves the name like the first field')
-        self.code.append(f'la $t9, type_{VOID_NAME}')  # loads the name of the variable
-        self.code.append('sw $t9, 0($v0)')  # saves the name like the first field
+        self.code.append(f'la $t9, type_{VOID_NAME}')
+        self.code.append('sw $t9, 0($v0)')
         self.code.append(f'move ${rdest}, $v0')
         self.var_address[node.obj] = AddrType.REF
 
     @visitor.when(BoxingNode)
     def visit(self, node: BoxingNode):
-        "Node to convert a value type into object"
+        self.code.append('#debug: BoxingNode')
         rdest = self.addr_desc.get_var_reg(node.dest)
         self.code.append('# Initialize new node')
         self.code.append('li $a0, 12')
         self.code.append('li $v0, 9')
         self.code.append('syscall')
-
         self.code.append(f'la $t9, type_{node.type}')
-        self.code.append('sw $t9, 0($v0)')  # saves the name like the first field
+        self.code.append('sw $t9, 0($v0)')
         self.code.append('li $t9, 12')
-        self.code.append('sw $t9, 4($v0)')  # saves the size like the second field
+        self.code.append('sw $t9, 4($v0)')
         self.code.append(f'move ${rdest}, $v0')
-
         self.code.append('# Saving the methods of object')
         idx = self.types.index('Object')
         self.code.append('# Adding Type Info addr')

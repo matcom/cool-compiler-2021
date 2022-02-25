@@ -119,136 +119,139 @@ class BaseCil:
             constructor.body.expr_list.append(AssignNode(attr.name, ConstantVoidNode(attr.name)))
 
     def built_in_functions(self):
-        f1_params = [ParamNode("self", 'Object')]
-        f1_localVars = [LocalNode("local_abort_Object_self_0")]
-        f1_instructions = [ast_cil.AssignNode(f1_localVars[0].name, f1_params[0].name, self.index),
-                           ast_cil.ExitNode(f1_params[0].name, idx=self.index)]
-        f1 = FunctionNode("function_abort_Object", f1_params, f1_localVars, f1_instructions)
+        func1_params = [ParamNode("self", 'Object')]
+        func1_localVars = [LocalNode("local_abort_Object_self_0")]
+        func1_instructions = [ast_cil.AssignNode(func1_localVars[0].name, func1_params[0].name, self.index),
+                              ast_cil.ExitNode(func1_params[0].name, idx=self.index)]
+        func1 = FunctionNode("function_abort_Object", func1_params, func1_localVars, func1_instructions)
 
-        f2_params = [ParamNode("self", 'Object')]
-        f2_localVars = [LocalNode("local_type_name_Object_result_0")]
-        f2_instructions = [ast_cil.TypeOfNode(f2_params[0].name, f2_localVars[0].name, self.index),
-                           ast_cil.ReturnNode(f2_localVars[0].name, self.index)]
-        f2 = FunctionNode("function_type_name_Object", f2_params, f2_localVars, f2_instructions)
+        func2_params = [ParamNode("self", 'Object')]
+        func2_localVars = [LocalNode("local_type_name_Object_result_0")]
+        func2_instructions = [ast_cil.TypeOfNode(func2_params[0].name, func2_localVars[0].name, self.index),
+                              ast_cil.ReturnNode(func2_localVars[0].name, self.index)]
+        func2 = FunctionNode("function_type_name_Object", func2_params, func2_localVars, func2_instructions)
 
-        f3_params = [ParamNode("self", 'Object')]
-        f3_localVars = [LocalNode("local_copy_Object_result_0")]
-        f3_instructions = [ast_cil.CopyNode(f3_localVars[0].name, f3_params[0].name, self.index),
-                           ast_cil.ReturnNode(f3_localVars[0].name, self.index)]
-        f3 = FunctionNode("function_copy_Object", f3_params, f3_localVars, f3_instructions)
+        func3_params = [ParamNode("self", 'Object')]
+        func3_localVars = [LocalNode("local_copy_Object_result_0")]
+        func3_instructions = [ast_cil.CopyNode(func3_localVars[0].name, func3_params[0].name, self.index),
+                              ast_cil.ReturnNode(func3_localVars[0].name, self.index)]
+        func3 = FunctionNode("function_copy_Object", func3_params, func3_localVars, func3_instructions)
 
-        f4_params = [ParamNode("self", 'IO'), ParamNode("word", 'String')]
-        f4_localVars = [LocalNode("local_out_string_String_self_0")]
-        f4_instructions = [ast_cil.AssignNode(f4_localVars[0].name, f4_params[0].name, self.index),
-                           ast_cil.OutStringNode(f4_params[1].name, self.index),
-                           ast_cil.ReturnNode(f4_localVars[0].name, self.index)]
-        f4 = FunctionNode("function_out_string_IO", f4_params, f4_localVars, f4_instructions)
+        func4_params = [ParamNode("self", 'IO'), ParamNode("word", 'String')]
+        func4_localVars = [LocalNode("local_out_string_String_self_0")]
+        func4_instructions = [ast_cil.AssignNode(func4_localVars[0].name, func4_params[0].name, self.index),
+                              ast_cil.OutStringNode(func4_params[1].name, self.index),
+                              ast_cil.ReturnNode(func4_localVars[0].name, self.index)]
+        func4 = FunctionNode("function_out_string_IO", func4_params, func4_localVars, func4_instructions)
 
-        f5_params = [ParamNode("self", 'IO'), ParamNode("number", 'Int')]
-        f5_localVars = [LocalNode("local_out_int_IO_self_0")]
-        f5_instructions = [ast_cil.AssignNode(f5_localVars[0].name, f5_params[0].name, self.index),
-                           ast_cil.OutIntNode(f5_params[1].name, self.index),
-                           ast_cil.ReturnNode(f5_localVars[0].name, self.index)]
-        f5 = FunctionNode("function_out_int_IO", f5_params, f5_localVars, f5_instructions)
+        func5_params = [ParamNode("self", 'IO'), ParamNode("number", 'Int')]
+        func5_localVars = [LocalNode("local_out_int_IO_self_0")]
+        func5_instructions = [ast_cil.AssignNode(func5_localVars[0].name, func5_params[0].name, self.index),
+                              ast_cil.OutIntNode(func5_params[1].name, self.index),
+                              ast_cil.ReturnNode(func5_localVars[0].name, self.index)]
+        func5 = FunctionNode("function_out_int_IO", func5_params, func5_localVars, func5_instructions)
 
-        f6_params = [ParamNode("self", 'IO')]
-        f6_localVars = [LocalNode("local_in_int_IO_result_0")]
-        f6_instructions = [ast_cil.ReadIntNode(f6_localVars[0].name, self.index),
-                           ast_cil.ReturnNode(f6_localVars[0].name, self.index)]
-        f6 = FunctionNode("function_in_int_IO", f6_params, f6_localVars, f6_instructions)
+        func6_params = [ParamNode("self", 'IO')]
+        func6_localVars = [LocalNode("local_in_int_IO_result_0")]
+        func6_instructions = [ast_cil.ReadIntNode(func6_localVars[0].name, self.index),
+                              ast_cil.ReturnNode(func6_localVars[0].name, self.index)]
+        func6 = FunctionNode("function_in_int_IO", func6_params, func6_localVars, func6_instructions)
 
-        f7_params = [ParamNode("self", 'IO')]
-        f7_localVars = [LocalNode("local_in_string_IO_result_0")]
-        f7_instructions = [ast_cil.ReadStringNode(f7_localVars[0].name, self.index),
-                           ast_cil.ReturnNode(f7_localVars[0].name, self.index)]
-        f7 = FunctionNode("function_in_string_IO", f7_params, f7_localVars, f7_instructions)
+        func7_params = [ParamNode("self", 'IO')]
+        func7_localVars = [LocalNode("local_in_string_IO_result_0")]
+        func7_instructions = [ast_cil.ReadStringNode(func7_localVars[0].name, self.index),
+                              ast_cil.ReturnNode(func7_localVars[0].name, self.index)]
+        func7 = FunctionNode("function_in_string_IO", func7_params, func7_localVars, func7_instructions)
 
-        f8_params = [ParamNode("self", 'String')]
-        f8_localVars = [LocalNode("local_length_String_result_0")]
-        f8_instructions = [ast_cil.LengthNode(f8_localVars[0].name, f8_params[0].name, self.index),
-                           ast_cil.ReturnNode(f8_localVars[0].name, self.index)]
-        f8 = FunctionNode("function_length_String", f8_params, f8_localVars, f8_instructions)
+        func8_params = [ParamNode("self", 'String')]
+        func8_localVars = [LocalNode("local_length_String_result_0")]
+        func8_instructions = [ast_cil.LengthNode(func8_localVars[0].name, func8_params[0].name, self.index),
+                              ast_cil.ReturnNode(func8_localVars[0].name, self.index)]
+        func8 = FunctionNode("function_length_String", func8_params, func8_localVars, func8_instructions)
 
-        f9_params = [ParamNode("self", 'String'), ParamNode("word", 'String')]
-        f9_localVars = [LocalNode("local_concat_String_result_0")]
-        f9_instructions = [ast_cil.ConcatNode(f9_localVars[0].name, f9_params[0].name, f9_params[1].name, self.index),
-                           ast_cil.ReturnNode(f9_localVars[0].name, self.index)]
-        f9 = FunctionNode("function_concat_String", f9_params, f9_localVars, f9_instructions)
+        func9_params = [ParamNode("self", 'String'), ParamNode("word", 'String')]
+        func9_localVars = [LocalNode("local_concat_String_result_0")]
+        func9_instructions = [
+            ast_cil.ConcatNode(func9_localVars[0].name, func9_params[0].name, func9_params[1].name, self.index),
+            ast_cil.ReturnNode(func9_localVars[0].name, self.index)]
+        func9 = FunctionNode("function_concat_String", func9_params, func9_localVars, func9_instructions)
 
-        f10_params = [ParamNode("self", 'String'), ParamNode("begin", 'Int'), ParamNode("end", 'Int')]
-        f10_localVars = [LocalNode("local_substr_String_result_0")]
-        f10_instructions = [
-            ast_cil.SubstringNode(f10_localVars[0].name, f10_params[0].name, f10_params[1].name, f10_params[2].name,
+        func10_params = [ParamNode("self", 'String'), ParamNode("begin", 'Int'), ParamNode("end", 'Int')]
+        func10_localVars = [LocalNode("local_substr_String_result_0")]
+        func10_instructions = [
+            ast_cil.SubstringNode(func10_localVars[0].name, func10_params[0].name, func10_params[1].name,
+                                  func10_params[2].name,
                                   self.index),
-            ast_cil.ReturnNode(f10_localVars[0].name, self.index)]
-        f10 = FunctionNode("function_substr_String", f10_params, f10_localVars, f10_instructions)
+            ast_cil.ReturnNode(func10_localVars[0].name, self.index)]
+        func10 = FunctionNode("function_substr_String", func10_params, func10_localVars, func10_instructions)
 
-        f11_params = [ParamNode("self", 'String')]
-        f11_localVars = [LocalNode("local_type_name_String_result_0")]
-        f11_instructions = [ast_cil.LoadNode(f11_localVars[0].name, 'type_String', self.index),
-                            ast_cil.ReturnNode(f11_localVars[0].name, self.index)]
-        f11 = FunctionNode("function_type_name_String", f11_params, f11_localVars, f11_instructions)
+        func11_params = [ParamNode("self", 'String')]
+        func11_localVars = [LocalNode("local_type_name_String_result_0")]
+        func11_instructions = [ast_cil.LoadNode(func11_localVars[0].name, 'type_String', self.index),
+                               ast_cil.ReturnNode(func11_localVars[0].name, self.index)]
+        func11 = FunctionNode("function_type_name_String", func11_params, func11_localVars, func11_instructions)
 
-        f12_params = [ParamNode("self", 'String')]
-        f12_localVars = [LocalNode("local_copy_String_result_0")]
-        f12_instructions = [ast_cil.ConcatNode(f12_localVars[0].name, f12_params[0].name, None, self.index),
-                            ast_cil.ReturnNode(f12_localVars[0].name, self.index)]
-        f12 = FunctionNode("function_copy_String", f12_params, f12_localVars, f12_instructions)
+        func12_params = [ParamNode("self", 'String')]
+        func12_localVars = [LocalNode("local_copy_String_result_0")]
+        func12_instructions = [ast_cil.ConcatNode(func12_localVars[0].name, func12_params[0].name, None, self.index),
+                               ast_cil.ReturnNode(func12_localVars[0].name, self.index)]
+        func12 = FunctionNode("function_copy_String", func12_params, func12_localVars, func12_instructions)
 
-        f17_params = [ParamNode("self", 'String')]
-        f17_localVars = [LocalNode('local_abort_String_msg_0')]
-        f17_instructions = [ast_cil.LoadNode(f17_params[0].name, 'string_abort'),
-                            ast_cil.OutStringNode(f17_params[0].name, self.index),
-                            ast_cil.ExitNode(f17_params[0].name, idx=self.index)]
-        f17 = FunctionNode("function_abort_String", f17_params, f17_localVars, f17_instructions)
+        func17_params = [ParamNode("self", 'String')]
+        func17_localVars = [LocalNode('local_abort_String_msg_0')]
+        func17_instructions = [ast_cil.LoadNode(func17_params[0].name, 'string_abort'),
+                               ast_cil.OutStringNode(func17_params[0].name, self.index),
+                               ast_cil.ExitNode(func17_params[0].name, idx=self.index)]
+        func17 = FunctionNode("function_abort_String", func17_params, func17_localVars, func17_instructions)
 
-        f13_params = [ParamNode("self", 'Int')]
-        f13_localVars = [LocalNode("local_type_name_Int_result_0")]
-        f13_instructions = [ast_cil.LoadNode(f13_localVars[0].name, 'type_Int', self.index),
-                            ast_cil.ReturnNode(f13_localVars[0].name, self.index)]
-        f13 = FunctionNode("function_type_name_Int", f13_params, f13_localVars, f13_instructions)
+        func13_params = [ParamNode("self", 'Int')]
+        func13_localVars = [LocalNode("local_type_name_Int_result_0")]
+        func13_instructions = [ast_cil.LoadNode(func13_localVars[0].name, 'type_Int', self.index),
+                               ast_cil.ReturnNode(func13_localVars[0].name, self.index)]
+        func13 = FunctionNode("function_type_name_Int", func13_params, func13_localVars, func13_instructions)
 
-        f14_params = [ParamNode("self", 'Int')]
-        f14_localVars = [LocalNode("local_copy_Int_result_0")]
-        f14_instructions = [ast_cil.AssignNode(f14_localVars[0].name, f14_params[0].name),
-                            ast_cil.ReturnNode(f14_localVars[0].name, self.index)]
-        f14 = FunctionNode("function_copy_Int", f14_params, f14_localVars, f14_instructions)
+        func14_params = [ParamNode("self", 'Int')]
+        func14_localVars = [LocalNode("local_copy_Int_result_0")]
+        func14_instructions = [ast_cil.AssignNode(func14_localVars[0].name, func14_params[0].name),
+                               ast_cil.ReturnNode(func14_localVars[0].name, self.index)]
+        func14 = FunctionNode("function_copy_Int", func14_params, func14_localVars, func14_instructions)
 
-        f18_params = [ParamNode("self", 'Int')]
-        f18_localVars = [LocalNode('local_abort_Int_msg_0')]
-        f18_instructions = [ast_cil.LoadNode(f18_params[0].name, 'int_abort'),
-                            ast_cil.OutStringNode(f18_params[0].name, self.index),
-                            ast_cil.ExitNode(f18_params[0].name, idx=self.index)]
-        f18 = FunctionNode("function_abort_Int", f18_params, f18_localVars, f18_instructions)
+        func18_params = [ParamNode("self", 'Int')]
+        func18_localVars = [LocalNode('local_abort_Int_msg_0')]
+        func18_instructions = [ast_cil.LoadNode(func18_params[0].name, 'int_abort'),
+                               ast_cil.OutStringNode(func18_params[0].name, self.index),
+                               ast_cil.ExitNode(func18_params[0].name, idx=self.index)]
+        func18 = FunctionNode("function_abort_Int", func18_params, func18_localVars, func18_instructions)
 
-        f15_params = [ParamNode("self", 'Bool')]
-        f15_localVars = [LocalNode("local_type_name_Bool_result_0")]
-        f15_instructions = [ast_cil.LoadNode(f15_localVars[0].name, 'type_Bool', self.index),
-                            ast_cil.ReturnNode(f15_localVars[0].name, self.index)]
-        f15 = FunctionNode("function_type_name_Bool", f15_params, f15_localVars, f15_instructions)
+        func15_params = [ParamNode("self", 'Bool')]
+        func15_localVars = [LocalNode("local_type_name_Bool_result_0")]
+        func15_instructions = [ast_cil.LoadNode(func15_localVars[0].name, 'type_Bool', self.index),
+                               ast_cil.ReturnNode(func15_localVars[0].name, self.index)]
+        func15 = FunctionNode("function_type_name_Bool", func15_params, func15_localVars, func15_instructions)
 
-        f16_params = [ParamNode("self", 'Bool')]
-        f16_localVars = [LocalNode("local_copy_result_Bool_0")]
-        f16_instructions = [ast_cil.AssignNode(f16_localVars[0].name, f16_params[0].name),
-                            ast_cil.ReturnNode(f16_localVars[0].name, self.index)]
-        f16 = FunctionNode("function_copy_Bool", f16_params, f16_localVars, f16_instructions)
+        func16_params = [ParamNode("self", 'Bool')]
+        func16_localVars = [LocalNode("local_copy_result_Bool_0")]
+        func16_instructions = [ast_cil.AssignNode(func16_localVars[0].name, func16_params[0].name),
+                               ast_cil.ReturnNode(func16_localVars[0].name, self.index)]
+        func16 = FunctionNode("function_copy_Bool", func16_params, func16_localVars, func16_instructions)
 
-        f19_params = [ParamNode("self", 'Bool')]
-        f19_localVars = [LocalNode('local_abort_Bool_msg_0')]
-        f19_instructions = [ast_cil.LoadNode(f19_params[0].name, 'bool_abort'),
-                            ast_cil.OutStringNode(f19_params[0].name, self.index),
-                            ast_cil.ExitNode(f19_params[0].name, idx=self.index)]
-        f19 = FunctionNode("function_abort_Bool", f19_params, f19_localVars, f19_instructions)
+        func19_params = [ParamNode("self", 'Bool')]
+        func19_localVars = [LocalNode('local_abort_Bool_msg_0')]
+        func19_instructions = [ast_cil.LoadNode(func19_params[0].name, 'bool_abort'),
+                               ast_cil.OutStringNode(func19_params[0].name, self.index),
+                               ast_cil.ExitNode(func19_params[0].name, idx=self.index)]
+        func19 = FunctionNode("function_abort_Bool", func19_params, func19_localVars, func19_instructions)
 
-        self.fun_nodes += [f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19]
-        object_methods = [('abort', f1.name), ('type_name', f2.name), ('copy', f3.name)]
-        string_methods = [('length', f8.name), ('concat', f9.name), ('substr', f10.name), ('abort', f17.name),
-                          ('type_name', f11.name), ('copy', f12.name)]
-        io_methods = [('out_string', f4.name), ('out_int', f5.name), ('in_int', f6.name), ('in_string', f7.name)]
-        int_methods = [('abort', f18.name), ('type_name', f13.name), ('copy', f14.name)]
-        bool_methods = [('abort', f19.name), ('type_name', f15.name), ('copy', f16.name)]
-
-        a = TypeNode("String", [], string_methods)
+        self.fun_nodes += [func1, func2, func3, func4, func5, func6, func7, func8, func9, func10, func11, func12,
+                           func13, func14, func15, func16, func17, func18, func19]
+        object_methods = [('abort', func1.name), ('type_name', func2.name), ('copy', func3.name)]
+        string_methods = [('length', func8.name), ('concat', func9.name), ('substr', func10.name),
+                          ('abort', func17.name),
+                          ('type_name', func11.name), ('copy', func12.name)]
+        io_methods = [('out_string', func4.name), ('out_int', func5.name), ('in_int', func6.name),
+                      ('in_string', func7.name)]
+        int_methods = [('abort', func18.name), ('type_name', func13.name), ('copy', func14.name)]
+        bool_methods = [('abort', func19.name), ('type_name', func15.name), ('copy', func16.name)]
 
         self.types_nodes += [TypeNode("Object", [], object_methods),
                              TypeNode("IO", [], object_methods + io_methods),

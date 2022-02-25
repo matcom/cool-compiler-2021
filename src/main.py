@@ -6,15 +6,15 @@ from cool.lexer import CoolLexer, main
 from cool.parser.parser import CoolParser
 from cool.semantic.semantic import main_semantic
 from cool.utils.errors import SyntacticError
-from cool.codegen.__main__ import run_pipeline
+from cool.codegen.codegen import run_pipeline
 
 if __name__ == '__main__':
-    add = "codegen/book_list.cl"
+    add = "codegen/hello_world.cl"
 
     path: str = f"{Path.cwd()}/tests/{add}" if os.path.exists(
         f"{Path.cwd()}/tests/{add}") else f"{Path.cwd()}/../tests/{add}"
 
-    out: str = f"{Path.cwd()}/mips-code.txt"
+    out: str = f"{Path.cwd()}/mips-code.asm"
 
     _in = sys.argv[1] if len(sys.argv) > 1 else path
     _out = sys.argv[2] if len(sys.argv) > 2 else out

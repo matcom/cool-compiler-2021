@@ -38,8 +38,6 @@ class CilVisitor(BaseCil):
 
         return ast_cil.ProgramNode(self.types_nodes, self.data, self.fun_nodes, idx)
 
-    # result_year = [x for x in range(1986, 2011)]
-
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode, scope: Scope):
         self.current_type = self.context.get_type(node.id, node.pos)
@@ -235,8 +233,6 @@ class CilVisitor(BaseCil):
         typex = get_type(typex, self.current_type)
         self.register_instruction(ast_cil.AllocateNode(typex.name, instance))
 
-        # calling the constructor to load all attributes
-        # Si tiene atributos entonces tendrá constructor (esto se deberia optimizar mas)
         if typex.all_attributes():
             self.register_instruction(
                 ast_cil.StaticCallNode(typex.name, typex.name, instance, [ast_cil.ArgNode(instance)], typex.name))
@@ -245,13 +241,6 @@ class CilVisitor(BaseCil):
 
     @visitor.when(WhileNode)
     def visit(self, node: WhileNode, scope: Scope):
-        '''
-        LABEL start
-        IF NOT <cond> GOTO end
-        res = <expr>
-        GOTO start
-        LABEL end
-        '''
         start_label = ast_cil.LabelNode(f'start__{self.idx}')
         end_label = ast_cil.LabelNode(f'end__{self.idx}')
 
@@ -270,14 +259,6 @@ class CilVisitor(BaseCil):
 
     @visitor.when(ConditionalNode)
     def visit(self, node: ConditionalNode, scope: Scope):
-        '''
-        IF cond GOTO true
-        result = <false.expr>
-        GOTO end
-        LABEL true
-        result = <true.expr>
-        LABEL end
-        '''
         cond, _ = self.visit(node.cond, scope)
 
         true_label = ast_cil.LabelNode(f"true__{self.idx}")

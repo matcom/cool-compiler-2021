@@ -354,7 +354,7 @@ class ReadIntNode(InstructionNode):
 class ExitNode(InstructionNode):
     def __init__(self, classx, value=0, idx=None):
         super().__init__(idx)
-        self.classx = classx  # instance of the method that called the class
+        self.classx = classx
         self.value = value
 
         self.in1 = value
@@ -379,7 +379,7 @@ class ConformsNode(InstructionNode):
         self.type = type2
 
         self.out = dest
-        self.in1 = expr  # is a string, so is always a variable
+        self.in1 = expr
 
 
 class VoidConstantNode(InstructionNode):
@@ -401,5 +401,4 @@ class BoxingNode(InstructionNode):
         super().__init__(idx)
         self.dest = dest
         self.type = type_name
-
         self.out = dest
