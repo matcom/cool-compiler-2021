@@ -17,9 +17,6 @@ ZERO = "zero"
 EMPTY = "empty"
 
 # TODO:
-# Define how inherited attributes are executed in inherited class
-# Define how equality is handled
-# Define how isVoid is handled
 # See built in classes methods are correctly executed
 # See how typeof should work, a special kind of equality?
 # Define abort nodes with a text:
@@ -28,6 +25,10 @@ EMPTY = "empty"
 # * Division by zero (Done)
 # * Substring out of range (Done)
 # * Heap Overflow (don't know yet how to handle this)
+
+# TEST:
+# * Let nodes
+# * Built in methods
 
 
 # BOSS:
@@ -46,6 +47,8 @@ class CCILGenerator:
         self.time_record: Dict[str, int] = dict()
         # Track all constant values. Only strings for now
         self.data: List[Data]
+        # Notify about possible but senseless combination of expressions
+        self.warnings: List[str] = []
 
         # To keep track of the current class being analysed
         self.current_type: str
@@ -330,7 +333,7 @@ class CCILGenerator:
         # Error handling when there is not pattern match
         err_msg = self.add_data(
             f"case_error_msg_{times}",
-            f"Pattern match failure in {node.line}, {node.col}",
+            f"RuntimeError: Pattern match failure in {node.line}, {node.col}",
         )
         err_var = self.create_string_load_data(f"case_error_var_{times}", err_msg.id)
 
@@ -408,7 +411,7 @@ class CCILGenerator:
             if_id_is_not_zero = IfFalseNode(extract_id(right_id_is_zero), ok_label)
             error_msg = self.add_data(
                 f"error_msg_div_zero_{times}",
-                f"Error. Zero division detected on {node.line}, {node.col}.",
+                f"RuntimeError: Zero division detected on {node.line}, {node.col}.",
             )
             error_var = self.create_string_load_data(f"error_var_{times}", error_msg.id)
             extra_ops = [
@@ -479,8 +482,14 @@ class CCILGenerator:
 
         node_type = type(node)
         if node_type == sem_ast.IsVoidNode:
-            fval_id = f"isVoid_{times}"
-            op = IsVoidOpNode(expr_id)
+            fval_id = f"is_void_fv_{times}"
+            if node.expr.type.name in {BOOL, INT, STRING}:
+                self.add_warning(
+                    "Warning: Redundant isVoid expression, alway evaluate to false"
+                )
+                op = IntNode("0")
+            else:
+                op = EqualIntNode(IdNode(fval_id), IntNode("0"))
         elif node_type == sem_ast.NotNode:
             fval_id = f"not_{times}"
             op = NotOpNode(expr_id)
@@ -650,7 +659,7 @@ class CCILGenerator:
         self.reset_scope()
         self.reset_locals()
         params = self.init_func_params(OBJECT)
-        abort_msg = self.add_data("abort_msg", "Execution aborted")
+        abort_msg = self.add_data("abort_msg", "RuntimeError: Execution aborted")
         load = self.create_string_load_data("abort_temp", abort_msg.id)
         [print, abort] = self.notifiy_and_abort(load.id)
         abort_func = FunctionNode(
@@ -748,7 +757,9 @@ class CCILGenerator:
         ok_label = LabelNode("substring_success")
         if_upper_bound = IfNode(extract_id(upper_bound), error_label)
         if_lesser_bound = IfNode(extract_id(lesser_bound), error_label)
-        print_and_abort = self.notifiy_and_abort("Index out of range exception")
+        print_and_abort = self.notifiy_and_abort(
+            "RuntimeError: Index out of range exception"
+        )
         substr = self.create_storage(
             "substr_var",
             STRING,
@@ -909,6 +920,9 @@ class CCILGenerator:
         if idx in self.locals:
             raise Exception(f"Trying to insert {idx} again as local")
         self.locals[idx] = typex
+
+    def add_warning(self, msg: str):
+        self.add_warning(msg)
 
     def reset_locals(self):
         """
