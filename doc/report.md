@@ -6,9 +6,10 @@ El objetivo principal de la aplicación es contruir un compilador que convierta 
 
 ### Clonar el repositorio
   
-  ``` bash
-  git clone https://github.com/WataLuisoDalmauCompiler/cool-compiler-2021.git
-  ```
+``` bash
+git clone https://github.com/WataLuisoDalmauCompiler/cool-compiler-2021.git
+cd cool-compiler-2021  
+```
 
 ### Instalar requerimientos
 
@@ -22,7 +23,9 @@ pip install -r requirements.txt
 
 Para el uso del compilador es necesario correr el archivo `src/coolc.sh`. Este compilará el programa COOL que se le dió como entrada y guardará el programa MIPS en la misma localización con extensión _.mips_.
 
-- `$ ./src/coolc.sh <archivo_programa_cool>`
+``` bash
+ ./src/coolc.sh <archivo_programa_cool>
+```
 
 ### Uso avanzado
 
@@ -42,6 +45,16 @@ También posee otras características previstas para el desarrollador del compil
 
 - `-ucp`: Actualiza el parser serializado de Cool
 - `-ucl`: Actualiza el lexer serializado de Cool
+
+### Uso para el desarrollador
+
+Para probar un programa específico de COOL, se dejó una configuración por defecto para debuguear en el Visual Studio Code. Esta tiene como entrada el archivo testing.cl.
+
+Para probar el código generado por el compilador debe escribir la entrada en el archivo input.txt, la salida esperada en el archivo expected\_output.txt y ejecutar el siguiente comando:
+
+``` bash
+./src/test_mips.sh
+```
 
 ## Arquitectura
 
@@ -220,7 +233,7 @@ Para representar un programa de CIL en MIPS se tuvieron ciertos convenios a la h
   - Las variables locales se guardan luego de los parámetros
   - Se asigna actualiza el frame pointer con el valor actual del stack pointer
   - Se salvan los registros viejos de frame pointer y de return address
-  - Al final de la función se restauran los valores de frame pointer y de return address y se quitan de la pila los argumentos y variables locales 
+  - Al final de la función se restauran los valores de frame pointer y de return address y se quitan de la pila los argumentos y variables locales
 
 ![images/stack.jpg](images/stack.jpg)
 
@@ -250,28 +263,3 @@ En el caso de los String estos se trataron como una mezcla de referencia y valor
 ### Despachado dinámico
 
 Gracias a que la representación de los objetos en memoria tienen el tipo al que pertenecen y los tipos poseen la dirección a los métodos que implementan se tiene toda la información necesaria el despachado dinámico.
-
-### Extra
-
-TODO
-
-Dejamos a su disposición dentro de la carpeta src el archivo test_mips.sh que corre el caso detro de testing.cl y compara con expected_output.txt el resultado obtenido.
-
-``` bash
-./src/test_mips.sh
-```
-
-Debe recibir el siguiente resultado:
-
-- En caso de pasar:
-
-  ``` bash
-  Test Passed
-  ```
-
-- En caso de fallar:
-
-  ``` bash
-  Test Failed
-  ```
-  
