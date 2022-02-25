@@ -227,27 +227,23 @@ class GetAttrOpNode(ReturnOpNode):
 
 
 class CallOpNode(ReturnOpNode):
-    def __init__(self, idx: str, type_idx: str, args: List[str]) -> None:
+    def __init__(self, idx: str, type_idx: str, args: List[IdNode]) -> None:
         super().__init__()
         self.id = idx
         self.type = type_idx
         self.args = args
 
     def __str__(self) -> str:
-        args = ", ".join(f"arg {a}" for a in self.args)
-        return f"call {self.id} : {self.type} ({args})"
+        args = ", ".join(f"{a.value}" for a in self.args)
+        return f"call {self.id} : {self.type} (args: {args})"
 
 
-class VCallOpNode(ReturnOpNode):
-    def __init__(self, idx: str, type_idx: str, args: List[str]) -> None:
-        super().__init__()
-        self.id = idx
-        self.type = type_idx
-        self.args = args
+class VCallOpNode(CallOpNode):
+    def __init__(self, idx: str, type_idx: str, args: List[IdNode]) -> None:
+        super().__init__(idx, type_idx, args)
 
     def __str__(self) -> str:
-        args = ", ".join(f"arg {a}" for a in self.args)
-        return f"vcall {self.id} : {self.type} ({args})"
+        return "v" + super().__str__()
 
 
 class VoidNode(ReturnOpNode):
@@ -333,13 +329,6 @@ class GetTypeOpNode(UnaryOpNode):
 
     def __str__(self) -> str:
         return f"typeof {self.atom.value}"
-
-
-class IsVoidOpNode(UnaryOpNode):
-    """Operation that returns true if the Storage Node is uninitialized"""
-
-    def __str__(self) -> str:
-        return f"isvoid {self.atom.value}"
 
 
 class NotOpNode(UnaryOpNode):
