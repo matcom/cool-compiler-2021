@@ -30,7 +30,7 @@ class MIPSFormatter:
         functions = "\n# functions\n.text\n" + "\n".join(
             self.visit(f) for f in node.functions
         )
-        return "\n".join([data, template_code, type_labels, type_defs, functions])
+        return "\n".join([data, type_labels, type_defs, functions, template_code])
 
     @visitor.when(mips.Type)
     def visit(self, node: mips.Type):
@@ -50,10 +50,21 @@ class MIPSFormatter:
 
     @visitor.when(mips.FunctionNode)
     def visit(self, node: mips.FunctionNode):
-        print(node.name, node.instructions)
         return f"{node.name}:\n\t" + f"\n\t".join(
             self.visit(ins) for ins in node.instructions
         )
+
+    @visitor.when(mips.JALNode)
+    def visit(self, node: mips.JALNode):
+        return f"jal {self.visit(node.dest)}"
+
+    @visitor.when(mips.SLLNode)
+    def visit(self, node: mips.SLLNode):
+        return f"sll {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.bits)}"
+
+    @visitor.when(mips.MoveNode)
+    def visit(self, node: mips.MoveNode):
+        return f"move {self.visit(node.reg1)}, {self.visit(node.reg2)}"
 
     @visitor.when(str)
     def visit(self, node: str):
@@ -94,6 +105,10 @@ class MIPSFormatter:
     @visitor.when(mips.SWNode)
     def visit(self, node: mips.SWNode):
         return f"sw {self.visit(node.dest)}, {node.offset}({self.visit(node.src)})"
+
+    @visitor.when(mips.ADDNode)
+    def visit(self, node: mips.ADDNode):
+        return f"add {self.visit(node.dest)} {self.visit(node.src1)} {self.visit(node.src2)}"
 
     @visitor.when(mips.ADDINode)
     def visit(self, node: mips.ADDINode):
