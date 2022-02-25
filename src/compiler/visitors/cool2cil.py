@@ -805,11 +805,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         # sorting the branches
         order = []
-        for b in node.branches:
+        for b in node.branch_list:
             count = 0
-            t1 = self.context.get_type(b.type)
-            for other in node.branches:
-                t2 = self.context.get_type(other.type)
+            t1 = self.context.get_type(b.typex)
+            for other in node.branch_list:
+                t2 = self.context.get_type(other.typex)
                 count += t2.conforms_to(t1)
             order.append((count, b))
         order.sort(key=lambda x: x[0])
@@ -818,11 +818,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         old = {}
         for idx, (_, b) in enumerate(order):
             labels.append(self.register_label(f"{idx}_label"))
-            h = self.buildHierarchy(b.type)
+            h = self.buildHierarchy(b.typex)
             if not h:
                 self.register_instruction(cil.GotoNode(labels[-1].label))
                 break
-            h.add(b.type)
+            h.add(b.typex)
             for s in old:
                 h -= s
             for t in h:
@@ -837,7 +837,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         # Raise runtime error if no Goto was executed
         data_node = self.register_data(
-            f"({node.token.pos[0] + 1 + len(node.branches)},{node.token.pos[1] - 5}) - RuntimeError: Execution of a case statement without a matching branch\n"
+            f"({node.token.pos[0] + 1 + len(node.branch_list)},{node.token.pos[1] - 5}) - RuntimeError: Execution of a case statement without a matching branch\n"
         )
         self.register_instruction(cil.ErrorNode(data_node))
 
@@ -862,7 +862,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         ret = self.register_local(VariableInfo("block_node_value", None))
 
-        ret_value = self.visit(node.expr, scope)
+        ret_value = self.visit(node.expression, scope)
 
         self.register_instruction(cil.AssignNode(ret, ret_value))
 
@@ -1130,19 +1130,21 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         ret = self.define_internal_local()
 
-        if node.type == SelfType().name:
+        if node.computed_type.name == SelfType().name:
             value = self.define_internal_local()
-            self.register_instruction(cil.TypeOfNode(value, node.type))
+            self.register_instruction(cil.TypeOfNode(value, node.computed_type.name))
             self.register_instruction(cil.AllocateNode(value, ret))
-        elif node.type == "Int" or node.type == "Bool":
+        elif node.computed_type.name == "Int" or node.computed_type.name == "Bool":
             self.register_instruction(cil.ArgNode(0))
-        elif node.type == "String":
+        elif node.computed_type.name == "String":
             data_node = [dn for dn in self.dotdata if dn.value == ""][0]
             vmsg = self.register_local(VariableInfo("msg", None))
             self.register_instruction(cil.LoadNode(vmsg, data_node))
             self.register_instruction(cil.ArgNode(vmsg))
 
-        self.register_instruction(cil.StaticCallNode(self.init_name(node.type), ret))
+        self.register_instruction(
+            cil.StaticCallNode(self.init_name(node.computed_type.name), ret)
+        )
         return ret
 
     @visitor.when(VariableNode)
