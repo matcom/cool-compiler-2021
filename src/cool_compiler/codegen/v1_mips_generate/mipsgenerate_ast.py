@@ -322,7 +322,7 @@ la $t4, String
 sw $t4, 0($v0)   # Asigna el tipo String al string
 sw $s0, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
-move $s0 , $v0
+
 addi $sp, $sp, 4
 jr $ra
 """
@@ -408,35 +408,46 @@ jr $ra"""
 class Concat:
     def __str__(self) -> str:
        return """ 
-Concat:
-lw $t2 , 4($sp)    #self
-lw $t1 , 0($sp)    # str1
-lw $s2 , 4($t2)    # propiedad value de self
-lw $s1 , 4($t1)    # propiedad value de str1
+String_concat:
+lw $t2, 4($sp)   #self
+lw $t1, 0($sp)   # str1
+lw $s1, 4($t2)    # propiedad value self
+lw $s2, 4($t1)    # propiedad value str1
 
-li $v0 , 9
-li $a0 , 100      # reservar memoria pal proximo string
-syscall
-move $s3 , $v0
+li $a0, 100
+li $v0, 9
+syscall                 #genere espacio para crear string
+move $s3, $v0
+
+#Allocate a una class String puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo string
+la $t4, String
+sw $t4, 0($v0)   # Asigna el tipo String al string
+sw $s3, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
+move $t7, $v0
 
 loop_str1:
-    lb $t0 , ($s1)
-    beq  $t0 , $zero, loop_str2
-    add $s1 , $s1 ,1
-    sb $t0,($s3)
-    add $s3 , $s3 , 1
+    lb   $t0, ($s1)       # primera letra del puntero al string self
+    beq  $t0, $zero, loop_str2 
+    add  $s1, $s1, 1      # mueve el puntero del sstring self
+    sb   $t0, ($s3)       # guarda la letra en el nuevo string 
+    add  $s3, $s3, 1      # mueve el puntero del nuevo string
     j loop_str1
 
 loop_str2:
-    lb $t0 , ($s2)
-    beq  $t0 , $zero, ENDConcat
-    add $s2 , $s2 ,1
-    sb $t0,($s3)
-    add $s3 , $s3 , 1
+    lb   $t0, ($s2)       # primera letra del puntero al string str1
+    beq  $t0, $zero, ENDConcat
+    add  $s2, $s2, 1    # mueve el puntero del sstring str1
+    sb   $t0, ($s3)     # guarda la letra en el nuevo string 
+    add  $s3,  $s3, 1   # mueve el puntero del nuevo string
     j loop_str1
 
 ENDConcat:
-    move $s0, $v0
+    move $s0 , $t7
     addi $sp, $sp, 8
     jr $ra
 """
@@ -445,57 +456,50 @@ class SubStr:
     def __str__(self) -> str:
        return """   
 String_substr:
+lw $s5, 8($sp)   # self. 
+lw $s1, 4($sp)   # guarda el indice 
+lw $t4, ($sp)    #guarda el j
+
+li $t0, 0        # Inicia el contador en 0 
+li $s6, 1        # Contador de tamaño 
+
+lw $s3, 4($s5)   # tomar la propiedad value self
+
+li $a0 ,100      # reserva memoria para el string
+li $v0,9
+syscall           #genere espacio para crear string
+move $s4, $v0    
+
+#Allocate a una class String puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0,8
+li $v0 , 9
+syscall
+la $t4, String
+sw $t4, 0($v0)   # Asigna el tipo String al string
+sw $s4, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
+
+
+find_index:
+    beq	 $t0, $s1, find_length	# si el contador es el indice comiensa a crear el sub
+    add	 $s3, $s3, 1		    # mueve el puntero del string de self
+    add	 $t0, $t0, 1	        # mueve el contador 
+    j find_index
+
+find_length:
+    lb	 $t1, ($s3)			# guarda la primera letra del string self  
+    sb	 $t1, ($s4)         # guarda la primera letra del string self en el nuevo string
+    beq	 $s6, $t4, END_Substring	# si el contador del tamaño es igual a j end
+    add	 $s4, $s4, 1		# Mueve el puntero del nuevo string 
+    add	 $s3, $s3, 1		# Mueve el puntero del string self
+    add	 $s6, $s6, 1	    # Contador de tamaño += 1 
+    j find_length
     
-    li $t0 ,0 
-    li $s6 ,1
-    lw $s1 , 4($sp)   # guarda el indice
-    lw $t4 , ($sp) # guarda el j 
-    lw $s5 , 8($sp) # self. 
-    lw $s3 , 4($s5)   # tomar la propiedad value del string
-    #add $a0 , $s1 , $t4   #tamano a reservar
-    
-    li $a0,8
-
-    li $v0 , 9
-    syscall
-
-    move $t7 , $v0           # $t4 direciion de destino
-    move $t5 , $v0            #guarde la dir de la clase string      #
-    la $s7 , String           #primer atributo de la calse
-    sw $s7 , ($t5)
-    add $t5,$t5,4            #posicion de la direccion del valor del string
-    
-
-    li $a0 ,100
-    li $v0,9
-    syscall                 #genere espacio para crear string
-    move $s4,$v0
-    
-
-    find_index:
-        beq			$t0, $s1, find_length	# if $t0 == $s1 then estas en el indice
-        add			$s3, $s3, 1		#s2 = s2 + 1
-        add			$t0, $t0, 1	    # $t0 = $t0 + 1
-       
-        j find_index
-
-    find_length:
-        lb			$t1, ($s3)			# 
-        sb		    $t1, ($s4)
-        beq			$s6, $t4, END_Substring	# if $t0 == $t1 then target
-        add			$s4, $s4, 1		# $S4 = s41 1t2			# 
-        add			$s3, $s3, 1		#s2 = s2 + 1
-        add			$s6, $s6, 1	    # $t0 = $t0 + 1
-        j find_length
-        
-    END_Substring:
-        move $s0 , $v0
-        sw $s0 , ($t5)
-        move $s0 , $t7
-        addi $sp, $sp, 12
-
-    
-        jr $ra  
+END_Substring:
+    move $s0 , $v0
+    addi $sp, $sp, 12
+    jr $ra  
 """
 ################################# Native Func Obj ################################################
 class Copy:
@@ -505,21 +509,24 @@ Object_copy:
 lw $t0, 0($sp)   #Guarda en $t0 self
 lw $t1, 0($t0)   #Guarda definicion del tipo
 lw $t3, 4($t1)   #En la segunda posicion la definicion de tipo contiene el
+
+mul $t3, $t3, 4
 move $a0, $t3    #tamaño que ocupa en la pila 
 li $v0, 9        
 syscall          #En $v0 la nueva instancia
 move $s0, $v0
+
 copy_loop:
     beq $t3, $zero, end_copy
-    lw  $t1, 0($t0)
+    lw  $t1, 0($t0)             
     sw  $t1, 0($v0)
     addi $t3, $t3, -4
     add $t0, $t0, 4
     add $v0, $v0, 4
     jr copy_loop
 end_copy:
-addi $sp, $sp, 4
 
+addi $sp, $sp, 4
 jr $ra
 """
 
