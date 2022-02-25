@@ -54,7 +54,7 @@ class TypeChecker:
                 typex =self.current_type if node.type == "SELF_TYPE" else self.context.get_type(node.type,node.line)
                 self.context.check_type(node.expr.type,typex,node.line)
             except SemanticError as e:
-                self.errors.append(f"({node.line},{node.column}) - TypeError: " + str(e))
+                self.errors.append(f"({node.type_line},{node.type_column}) - TypeError: " + str(e))
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node:FuncDeclarationNode,scope:Scope):
@@ -73,6 +73,7 @@ class TypeChecker:
         self.visit(node.body,scope.create_child())
         try:
             typex = method.return_type if not isinstance(method.return_type,SELF_TYPE) else self.current_type
+
             self.context.check_type(node.body.type,typex,node.line)
         except SemanticError as e:
             self.errors.append(f"({node.line},{node.column-4}) - TypeError: " + str(e))

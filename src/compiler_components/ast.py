@@ -75,12 +75,14 @@ class FuncDeclarationNode(DeclarationNode):
 
 
 class AttrDeclarationNode(DeclarationNode):
-    def __init__(self, idx, typex, expr = None, line = -1, column=-1):
+    def __init__(self, idx, typex, expr = None, line = -1, column=-1, type_line = -1, type_column = -1):
         self.id = idx
         self.type = typex
         self.expr = expr
         self.line = line
         self.column = column
+        self.type_line = type_line
+        self.type_column = type_column
 
     def visit(self, tabs = 0):
         node = self

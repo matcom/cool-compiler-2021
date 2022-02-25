@@ -60,14 +60,14 @@ def p_feature_list(p):
         p[0] = [p[1]] + p[3]
 
 def p_def_attr(p):
-    '''def_attr : ID DOUBLE_DOT TYPE_ID
-                | ID DOUBLE_DOT TYPE_ID LEFT_ARROW expr
+    '''def_attr : ID DOUBLE_DOT type_id
+                | ID DOUBLE_DOT type_id LEFT_ARROW expr
     '''
     line, column = calculate_position(p.lexer.lexdata, p.lexer.lexpos)
     if len(p) == 4:
-        p[0] = AttrDeclarationNode(p[1], p[3], line = line, column = column)
+        p[0] = AttrDeclarationNode(p[1], p[3]['value'], line = line, column = column, type_line = p[3]['line'], type_column = p[3]['column'])
     else:
-        p[0] = AttrDeclarationNode(p[1], p[3], p[5], line = line, column = column)
+        p[0] = AttrDeclarationNode(p[1], p[3]['value'], p[5], line = line, column = column, type_line = p[3]['line'], type_column = p[3]['column'])
 
 def p_def_func(p):
     '''def_func : ID LPAREN param_list RPAREN DOUBLE_DOT TYPE_ID LBRACE expr RBRACE
