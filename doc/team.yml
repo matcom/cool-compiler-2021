@@ -1,10 +1,10 @@
 members:
-  - name: Nombre Apellido1 Apellido2
+  - name: Andy Sánchez Sierra
+    github: andysanchezsierra97
+    group: C411
+  - name: Edaurdo Moreira González
     github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
+    group: C411
+  - name: Yadiel Felipe Medina
     github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+    group: C411

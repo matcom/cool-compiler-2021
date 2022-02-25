@@ -105,5 +105,6 @@ def main(file):
 
 
 if __name__ == "__main__":
+    print(sys.argv)
     file = sys.argv[1]
     main(file)

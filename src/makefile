@@ -1,7 +1,7 @@
 .PHONY: clean
 
 main:
-	# Compiling the compiler :)
+	@./coolc.sh $(CODE)
 
 clean:
 	rm -rf build/*
@@ -9,4 +9,9 @@ clean:
 
 test:
 	pytest ../tests -v --tb=short -m=${TAG}
+ 
+install:
+	pip install ../requeriments.txt
+
+
 
