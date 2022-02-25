@@ -17,12 +17,13 @@ ZERO = "zero"
 EMPTY = "empty"
 
 # TODO:
+# Define how inherited attributes are executed in inherited class
 # Define how equality is handled
 # Define how isVoid is handled
 # See built in classes methods are correctly executed
 # See how typeof should work, a special kind of equality?
 # Define abort nodes with a text:
-# * Dispatch on a void class
+# * Dispatch on a void class (Done)
 # * No pattern match in case (Done)
 # * Division by zero (Done)
 # * Substring out of range (Done)
@@ -300,7 +301,7 @@ class CCILGenerator:
 
         # All branch must end in a var named like this
         pre_fvalue_id = f"case_{times}_pre_fv"
-        pattern_match_ops = [self.init_default_values()]
+        pattern_match_ops = self.init_default_values()
         branch_ops = []
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
@@ -341,15 +342,17 @@ class CCILGenerator:
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
 
-        # Merging all expression operations in correct order
-        # and saving all to final value
+        self.locals[pre_fvalue_id] = node.type.name
 
+        # Error handling when there is not pattern match
         err_msg = self.add_data(
             f"case_error_msg_{times}",
             f"Pattern match failure in {node.line}, {node.col}",
         )
         err_var = self.create_string_load_data(f"case_error_var_{times}", err_msg.id)
 
+        # Merging all expression operations in correct order
+        # and saving all to final value
         fval_id = f"case_{times}_fv"
         fval = self.create_assignation(fval_id, node.type.name, pre_fvalue_id)
         operations = [
@@ -521,7 +524,29 @@ class CCILGenerator:
             )
             return [*args_ops, call], call
 
-        (expr_ops, _) = self.visit(node.expr)
+        (expr_ops, expr_fval) = self.visit(node.expr)
+
+        # Runtime error depending if expr is void or not
+        error_ops = []
+        if node.expr.type.name not in {INT, STRING, BOOL}:
+            expr_fval_is_void = self.create_equality(
+                "expr_is_void", extract_id(expr_fval), IntNode("0")
+            )
+            ok_label = LabelNode(f"expr_is_not_void")
+            if_is_not_void = IfFalseNode(extract_id(expr_fval_is_void), ok_label)
+            error_msg = self.add_data(
+                "caller_void_err",
+                f"RuntimeError: expresion in {node.line}, {node.col} is void",
+            )
+            load_err = self.create_string_load_data("callor_void_err_var", error_msg.id)
+            print_and_abort = self.notifiy_and_abort(load_err.id)
+            error_ops = [
+                expr_fval_is_void,
+                if_is_not_void,
+                load_err,
+                *print_and_abort,
+                ok_label,
+            ]
 
         # <expr>@type.id(arg1, arg2, ..., argn)
         if node.at_type is not None:
@@ -529,13 +554,13 @@ class CCILGenerator:
             call = self.create_call(
                 fval_id, node.type.name, node.id, node.caller_type.name
             )
-            return [*args_ops, *expr_ops, call]
+            return [*expr_ops, *error_ops, *args_ops, call]
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
         call = self.create_vcall(fval_id, node.type.id, node.id, node.caller_type)
 
-        return [*args_ops, *expr_ops, call]
+        return [*expr_ops, *error_ops, *args_ops, call]
 
     @visitor.when(sem_ast.InstantiateNode)
     def visit(self, node: sem_ast.InstantiateNode) -> VISITOR_RESULT:
