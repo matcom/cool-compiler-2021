@@ -1,0 +1,116 @@
+.globl main
+
+.data
+
+data_8_string: .asciiz "Hello, World.\n"
+Main: .word 0
+String: .word 0
+
+.text
+
+main:
+    la $a4, IO_out_string
+    sw $a4, String
+	move $t3, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 8 	#push local vars
+	jal Main_init 	#Jump to function and save link
+	lw $t4, 0($sp) 	#
+	sw $t4, 0($fp) 	#
+	addi $sp,  $sp, 0 	#Remove args from stack
+	lw $t0, 0($fp) 	#Obtain alue of Arg
+	sw $t0, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal Main_main 	#Jump to function and save link
+	lw $t0, 0($sp) 	#
+	sw $t0, 4($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	li $v0, 10 	#EXIT
+	syscall 	#
+
+Main_main:
+	move $t0, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 16 	#push local vars
+	la $t7, data_8_string 	#LOAD
+	sw $t7, 4($fp) 	#Save loaded value in destination
+	lw $t6, 4($fp) 	#Obtain alue of Arg
+	sw $t6, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal String_init 	#Jump to function and save link
+	lw $t5, 0($sp) 	#
+	sw $t5, 8($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	# lw $t2, -4($fp) 	#Typeof
+	# lw $t9, -4($t2) 	#
+    la $t9, String
+	sw $t9, 12($fp) 	#Save type value in destination
+	lw $t1, -4($fp) 	#Obtain alue of Arg
+	sw $t1, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	lw $t3, 8($fp) 	#Obtain alue of Arg
+	sw $t3, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	lw $t1, 12($fp) 	#get type dir for Dynamic Call
+	lw $t0, 0($t1) 	#Get method of index 3
+	jalr $t0 	#Jump to function
+	lw $t1, 0($sp) 	#Obtain return value from stack
+	sw $t1, 0($fp) 	#Save return value in destination
+	addi $sp,  $sp, -8 	#Remove Args from Stack
+	lw $t9, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -16 	#Remove locals from Stack
+	sw $t9, 0($sp) 	#Save return value in Stack
+	move $fp, $t0 	#restore FP
+	jr $ra 	#RETURN
+
+
+Main_init:
+	move $t8, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 4 	#push local vars
+	li $v0, 9 	#Allocating instance of type Main
+	li $a0, 4 	#Save 4 bytes
+	syscall 	#
+	la $t4, Main 	#Save type address in register
+	sw $t4, 0($v0) 	#Save type address in firts position of memory allocated
+	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
+	sw $v0, 0($fp) 	#Save instance address in destination
+	lw $t7, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#Remove locals from Stack
+	sw $t7, 0($sp) 	#Save return value in Stack
+	move $fp, $t8 	#restore FP
+	jr $ra 	#RETURN
+
+
+String_init:
+	move $t5, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 4 	#push local vars
+	li $v0, 9 	#Allocating instance of type String
+	li $a0, 4 	#Save 4 bytes
+	syscall 	#
+	la $t8, String 	#Save type address in register
+	sw $t8, 0($v0) 	#Save type address in firts position of memory allocated
+	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
+	sw $v0, 0($fp) 	#Save instance address in destination
+	lw $t6, 0($fp) 	#Dir of instance of attribute to set
+	lw $t4, 0($fp) 	#Obtain value from source dir
+	sw $t6, 0($t4) 	#Save value in attribute of index 0
+	lw $t1, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#Remove locals from Stack
+	sw $t1, 0($sp) 	#Save return value in Stack
+	move $fp, $t5 	#restore FP
+	jr $ra 	#RETURN
+
+IO_out_string:
+	move $t4, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 0 	#push local vars
+	li $v0, 4 	#PRINT
+	lw $a0, -4($fp) 	#
+	syscall 	#
+	lw $t5, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, 0 	#Remove locals from Stack
+	sw $t5, 0($sp) 	#Save return value in Stack
+	move $fp, $t4 	#restore FP
+	jr $ra 	#RETURN

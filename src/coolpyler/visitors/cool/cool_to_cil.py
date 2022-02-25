@@ -64,7 +64,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.LoadNode(return_sid, data_id))
         return return_sid
 
-    def register_num(self, name: Optional[str], value: int):
+    def register_num(self, value: int, name: Optional[str]=None):
         return_sid = self.register_local(name)
         self.instructions.append(cil.LoadNode(return_sid, value))
         return return_sid
@@ -96,7 +96,7 @@ class CoolToCilVisitor(object):
     def register_type_name(self, type:str):
         self.reset_state()
         self.register_param("self")
-        type_name = self.register_data(f"type_name_{type}", type)
+        type_name = self.register_data(f"type_name_{type}", f'"{type}"')
         ret_local = self.register_new("String", type_name)
         self.instructions.append(cil.ReturnNode(ret_local))
         self.dotcode.append(
@@ -238,6 +238,68 @@ class CoolToCilVisitor(object):
             )
         )
 
+    def register_object_init(self):
+        self.reset_state()
+        self_local = self.register_local("self")
+        self.instructions.append(cil.AllocateNode("Object", self_local))
+        self.instructions.append(cil.ReturnNode(self_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("Object", "init"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_int_init(self):
+        self.reset_state()
+        value_param = self.register_param("value")
+        self_local = self.register_local("self")
+        self.instructions.append(cil.AllocateNode("Int", self_local))
+        self.instructions.append(cil.SetAttrNode(self_local, 0, value_param))
+        self.instructions.append(cil.ReturnNode(self_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("Int", "init"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_bool_init(self):
+        self.reset_state()
+        value_param = self.register_param("value")
+        self_local = self.register_local("self")
+        self.instructions.append(cil.AllocateNode("Bool", self_local))
+        self.instructions.append(cil.SetAttrNode(self_local, 0, value_param))
+        self.instructions.append(cil.ReturnNode(self_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("Bool", "init"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_string_init(self):
+        self.reset_state()
+        value_param = self.register_param("value")
+        self_local = self.register_local("self")
+        self.instructions.append(cil.AllocateNode("String", self_local))
+        self.instructions.append(cil.SetAttrNode(self_local, 0, value_param))
+        self.instructions.append(cil.ReturnNode(self_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("String", "init"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
     def register_builtins(self):
         self.register_object_abort()
         self.register_object_copy()
@@ -253,6 +315,11 @@ class CoolToCilVisitor(object):
         self.register_string_length()
         self.register_string_concat()
         self.register_string_substr()
+
+        self.register_object_init()
+        self.register_int_init()
+        self.register_bool_init()
+        self.register_string_init()
 
     @visitor.on("node")
     def visit(self, node):
@@ -279,8 +346,6 @@ class CoolToCilVisitor(object):
                 ],
             ))
 
-        self.register_builtins()
-
         self.reset_state()
         main_instance = self.register_new("Main")
         self.instructions.append(cil.ArgNode(main_instance))
@@ -291,6 +356,8 @@ class CoolToCilVisitor(object):
         self.dotcode.append(
             cil.FunctionNode("main", self.params, self.locals, self.instructions)
         )
+
+        self.register_builtins()
 
         for cool_class in node.classes:
             self.visit(cool_class)
@@ -637,12 +704,12 @@ class CoolToCilVisitor(object):
 
     @visitor.when(type_checked.CoolIntNode)
     def visit(self, node: type_checked.CoolIntNode) -> str:
-        literal = self.register_num("", int(node.value))
+        literal = self.register_num(int(node.value))
         return self.register_new("Int", literal)
 
     @visitor.when(type_checked.CoolBoolNode)
     def visit(self, node: type_checked.CoolBoolNode) -> str:
-        literal = self.register_num("", 1 if node.value == "true" else 0)
+        literal = self.register_num(1 if node.value == "true" else 0)
         return self.register_new("Bool", literal)
 
     @visitor.when(type_checked.CoolStringNode)
@@ -655,8 +722,6 @@ class CoolToCilVisitor(object):
         local_sid = self.get_local(node.value)
         if any(local_sid == l.name for l in self.locals):
             return local_sid
-
-        local_sid = self.register_local(node.value)
 
         param_sid = self.get_param(node.value)
         if any(param_sid == p.name for p in self.params):

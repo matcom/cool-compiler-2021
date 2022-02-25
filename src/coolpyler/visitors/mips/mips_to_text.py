@@ -67,7 +67,7 @@ class MIPSGenerator:
 
     @visitor.when(mips.SyscallNode)
     def visit(self, node: mips.SyscallNode):
-        return "\tsyscall \t#{node.comment}"
+        return f"\tsyscall \t#{node.comment}"
 
     @visitor.when(mips.LoadAddressNode)
     def visit(self, node: mips.LoadAddressNode):
