@@ -51,7 +51,7 @@ class Program(Node):
         try: 
             _ = self.data[name]
         except KeyError: 
-            self.data[name] = value
+            self.data[name] = Data(name, value)
 
     def add_data(self, name, value):
         index = 0
@@ -262,6 +262,9 @@ class VCall(Expression):
     pass
 
 class Call(Expression):
+    pass
+
+class SimpleCall(Expression):
     pass
 
 class Load(Expression):

@@ -1,10 +1,9 @@
 from cool_compiler.cmp.scope import Scope
 from cool_compiler.types.cool_type_build_in_manager import OBJECT_NAME, CoolTypeBuildInManager
-from cool_compiler.types.type import Type
 from ...cmp import visitor
 from ...semantic.v2_semantic_checking import semantic_checking_ast as AST
 from . import type_data_code_ast as ASTR
-from .type_data_code_ast import result, super_value
+from .type_data_code_ast import Arg, result, super_value
 
 CoolInt = CoolTypeBuildInManager().find("Int")
 CoolBool = CoolTypeBuildInManager().find("Bool")
@@ -53,16 +52,28 @@ class CILGenerate:
     @visitor.when(AST.Program)
     def visit(self, node: AST.Program, scope: Scope = None):
         self.program = ASTR.Program()
+        self.program.try_add_data('_______error______', 'runtime error')
         scope = Scope()
 
         _dictt = CoolTypeBuildInManager().dictt
         for key in _dictt.keys():
             self.create_type(_dictt[key], scope)
-            self.new_type_func.expr_push(ASTR.Return('instance'))
+            self.new_type_func.expr_push(ASTR.Return('self'))
             self.program.add_func(self.new_type_func)
 
         for cls in node.class_list:
             self.visit(cls, scope)
+
+        main = ASTR.Function('main')
+        main.force_local('self', scope)
+        main.force_local(result, scope)
+        main.expr_push(ASTR.ALLOCATE('self', 'Main'))
+        main.expr_push(ASTR.Arg('self'))
+        main.expr_push(ASTR.SimpleCall('new_ctr_Main'))
+        main.expr_push(ASTR.Arg('self'))
+        main.expr_push(ASTR.VCall(result, 'Main', 'main'))
+        main.expr_push(ASTR.Return(0))
+        self.program.add_func(main)
 
         return self.program
 
@@ -82,8 +93,9 @@ class CILGenerate:
                 self.currentType.method_push(func.name, f'{parent.name}_{func.name}')
         
         self.program.force_data(f'{_type.name}_parents', type_list + [0])
+        self.program.force_data(f'{_type.name}_Name', _type.name)
         self.program.force_data(_type.name, 
-            [f'{_type.name}_parents'] + 
+            [f'{_type.name}_Name', len(self.currentType.attr), f'{_type.name}_parents'] + 
             [self.currentType.methods[key] for key in self.currentType.methods.keys()])
         
         self.create_new_func_by_type(_type, scope)
@@ -96,29 +108,23 @@ class CILGenerate:
         for feat in node.feature_list:
             self.visit(feat, self.class_scope)
 
-        if node.type.name == 'Main':
-            self.new_type_func.force_local(result, self.new_class_scope)
-            self.new_type_func.expr_push(ASTR.Arg('instance'))
-            self.new_type_func.expr_push(ASTR.VCall(result, 'Main', 'main'))
-            self.new_type_func.expr_push(ASTR.Return(0))
-        else:
-            self.new_type_func.expr_push(ASTR.Return('instance'))
 
+        self.new_type_func.expr_push(ASTR.Return('self'))
         self.program.add_func(self.new_type_func)
     
     def create_new_func_by_type(self, _type, scope):
         self.new_class_scope = scope.create_child(f'new_{_type.name}')
         self.new_type_func = ASTR.Function(f'new_ctr_{_type.name}')
-        
-        self.new_type_func.force_local('self', self.new_class_scope)
-        self.new_type_func.force_local('instance', self.new_class_scope)
+        self.new_type_func.force_parma('self', self.new_class_scope)
         tn = self.new_type_func.local_push('type_name', self.new_class_scope)
-        self.new_type_func.expr_push(ASTR.ALLOCATE('instance', _type.name))
-        self.new_type_func.expr_push(ASTR.Comment(f'Reservando memoria para una instancia de tipo {_type.name}'))
-        self.new_type_func.expr_push(ASTR.Assign('self', 'instance'))
+
+        if not _type.parent is None:
+            self.new_type_func.expr_push(ASTR.Arg('self'))
+            self.new_type_func.expr_push(ASTR.SimpleCall(f'new_ctr_{_type.parent.name}'))
+
         self.new_type_func.expr_push(ASTR.Load(tn, _type.name))
         self.new_type_func.expr_push(ASTR.Comment(f'Cargando el nombre del tipo desde el data'))
-        self.new_type_func.expr_push(ASTR.SetAttr('instance', 'type_name', tn))
+        self.new_type_func.expr_push(ASTR.SetAttr('self', 'type_name', tn))
         self.new_type_func.expr_push(ASTR.Comment(f'Assignando el nombre del tipo en el campo type'))
 
     @visitor.when(AST.AtrDef)
@@ -132,7 +138,7 @@ class CILGenerate:
             attr_name = self.new_type_func.local_push(node.name, self.new_class_scope)
             exp_list = self.visit(node.expr, self.new_class_scope)
             exp_list[-1].set_value(attr_name)
-            exp_list.append(ASTR.SetAttr('instance', self.currentType.attr[node.name], attr_name))
+            exp_list.append(ASTR.SetAttr('self', self.currentType.attr[node.name], attr_name))
             exp_list.append(ASTR.Comment(f"Assignando el resultado de la expression al atributo {node.name} de la clase {self.currentType.name}"))
             self.new_type_func.expr += exp_list
             self.currentFunc = save_current_func
@@ -220,7 +226,6 @@ class CILGenerate:
         param_expr_list.append(ASTR.VCall(super_value, self.currentClass.name, node.id))
         return param_expr_list
     
-
     @visitor.when(AST.Assing)
     def visit(self, node: AST.Assing, scope: Scope):
         exp_list = self.visit(node.expr, scope)
@@ -430,7 +435,12 @@ class CILGenerate:
     
     @visitor.when(AST.New)
     def visit(self, node: AST.New, scope: Scope):
-        return [ASTR.New(super_value, node.item.name)]   
+        instance = self.currentFunc.local_push(f'instance_{node.item.name}', scope)
+        return [
+            ASTR.ALLOCATE(instance, node.item.name),
+            ASTR.Arg(instance),
+            ASTR.New(super_value, node.item.name)
+        ]   
 
     def unary_op(self, name, node, astr_node, scope: Scope):
         op = self.currentFunc.local_push(f'{name}@_unary', scope)
@@ -451,9 +461,10 @@ class CILGenerate:
     def visit(self, node: AST.Void, scope: Scope):
         op_1 = self.currentFunc.local_push('void@_op', scope)
         null = self.currentFunc.local_push('void@_null', scope)
-        unary_list = self.unary_op('void', node, ASTR.Complemnet, scope)
+        unary_list = self.visit(node.item, scope)
         unary_list[-1].set_value(op_1)
 
+        self.program.try_add_data('NULL', 'null')
         return (
             [ASTR.Load(null, "NULL")] 
             + unary_list
@@ -482,4 +493,17 @@ class CILGenerate:
     @visitor.when(AST.Str)
     def visit(self, node: AST.Str, scope: Scope):
         name = self.program.add_data('string', node.item)
-        return [ASTR.Load(super_value, name)]
+        string_value = self.currentFunc.local_push('value_string', scope)
+        string_type = self.currentFunc.local_push('type_string', scope)
+        string_instance = self.currentFunc.local_push('string_instance', scope)
+
+        return [
+            ASTR.Load(string_value, name),
+            ASTR.Comment("Carga la referecia a string"),
+            ASTR.ALLOCATE(string_instance, 'String'),
+            ASTR.SetAttr(string_instance, 'String@value', string_value),
+            ASTR.Comment(f"Setear la propiedad value al string en la variable {string_value}"),
+            ASTR.SetAttr(string_instance, 'type_name', string_type),
+            ASTR.Comment(f"Setear la propiedad type_name al string en la variable {string_value}"),
+            ASTR.Assign(super_value, string_instance),
+        ]

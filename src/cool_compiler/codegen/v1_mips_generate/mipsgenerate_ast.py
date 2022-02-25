@@ -261,10 +261,10 @@ class Out_String:
     def __str__(self) -> str:
        return  """
 IO_out_string:
+lw $t0 0($sp)   #Guarda en $t0 la direccion del string
 li $v0, 4
-lw $a0, 0($sp)
+lw $a0, 4($t0) #Pintando la propiedad value del string
 syscall
-lw $a0, 4($sp)
 addi $sp, $sp, 8
 jr $ra"""
 
@@ -275,18 +275,6 @@ IO_out_int:
 li $v0, 1
 lw $a0, 0($sp)
 syscall
-lw $a0, 4($sp)
-addi $sp, $sp, 8
-jr $ra"""
-
-class Out_Float:
-    def __str__(self) -> str:
-        return """
-IO_out_Float:
-li $v0, 2
-lw $a0, 0($sp)
-syscall
-lw $a0, 4($sp)
 addi $sp, $sp, 8
 jr $ra"""
 

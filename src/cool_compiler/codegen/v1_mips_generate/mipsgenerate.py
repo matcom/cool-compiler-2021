@@ -5,13 +5,18 @@ from . import mipsgenerate_ast as ASTR
 
 class MipsGenerate: 
     def __init__(self, errors) -> None:
-        self.func_list = ['new_ctr_Main']
+        self.func_list = ['main']
         self.native_fun = {
             "IO_out_string": ASTR.Out_String,
             "IO_in_int":ASTR.In_Int,
             "IO_in_string":ASTR.In_String,
             "IO_out_int":ASTR.Out_Int,
-            "String_length":ASTR.Length
+            "String_length":ASTR.Length,
+            "String_concat":1,
+            "String_substr":1,
+            "Object_copy":1,
+            "Object_type_name":1,
+            "Object_abort":1
         }
 
     @visitor.on('node')
@@ -31,15 +36,20 @@ class MipsGenerate:
 
         for func in self.func_list:
             if func in self.native_fun: 
-                self.new_program.func[func]  = self.native_fun[func]()
+                self.new_program.func[func] = self.native_fun[func]()
             else:
                 self.visit(self.cil_func[func])
         
+        for func in list(self.cil_func.keys()) + list(self.native_fun.keys()):
+            if func in self.func_list: continue
+            self.new_program.func[func] = ASTR.Func(func)
+            self.new_program.func[func].cmd += [ASTR.Comment("Esta funcion no se invoca en la ejecucion del programa")]
+
         return self.new_program
 
     @visitor.when(AST.Function)
     def visit(self, node: AST.Function):
-        new_func = ASTR.Func(node.name if not node.name == 'new_ctr_Main' else 'main')
+        new_func = ASTR.Func(node.name)
         self.stack = Stack(node)
         
         for param in node.param:
@@ -94,7 +104,8 @@ class MipsGenerate:
             ASTR.LI('$a0', _len),
             ASTR.LI('$v0', 9),
             ASTR.SysCall(),
-            ASTR.SW('$v0', f'{stack_plus}($sp)')
+            ASTR.SW('$v0', f'{stack_plus}($sp)'),
+            ASTR.Comment(f'Guardando en la pila el pintero de la instancia de la clase {_type}')
         ]
 
     @visitor.when(AST.GetAttr)
@@ -168,6 +179,10 @@ class MipsGenerate:
             ASTR.SW('$s0', f'{stack_plus}($sp)' ),
             ASTR.Comment(f'Save el resultado de la funcion que esta en $s0 pa la pila'),
         ]
+    @visitor.when(AST.SimpleCall)
+    def visit(self, node: AST.SimpleCall):
+        if not node.x in self.func_list: self.func_list.append(node.x)
+        return self.call(node.x, 'self')[0: -2]
 
     @visitor.when(AST.VCall)
     def visit(self, node: AST.VCall):
@@ -196,7 +211,7 @@ class MipsGenerate:
         self.func_list += [func for func in self.native_fun.keys() 
             if func_name in func and  not func in self.func_list]
 
-        func_address = self.cil_type[_type].method_list.index(func_name) * 4 + 4
+        func_address = self.cil_type[_type].method_list.index(func_name) * 4 + 12
         result = [
             ASTR.LW('$t0', f'{instance_stack}($sp)'),
             ASTR.Comment(f"Sacando la instancia de la pila (en {instance_stack - self.stack.local_push * 4}) de una clase que hereda de {_type}"),
