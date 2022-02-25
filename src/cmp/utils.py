@@ -137,7 +137,7 @@ class Token:
         self.location = location
 
     def __str__(self):
-        return f"{self.token_type}: {self.lex}"
+        return f"{self.token_type}: {self.lex} at ({self.location[0]}, {self.location[1]})"
 
     def __repr__(self):
         return str(self)

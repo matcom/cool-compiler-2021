@@ -88,7 +88,7 @@ class TypeChecker:
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
         try:
-            typex = self.context.get_type(node.type)
+            typex = self.context.get_type(node.type.lex)
 
         except SemanticError as e:
             self.errors.append(e)
@@ -106,7 +106,7 @@ class TypeChecker:
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
-        self.current_method = self.current_type.get_method(node.id)
+        self.current_method = self.current_type.get_method(node.id.lex)
         method_return_type = self.current_method.return_type
         if method_return_type.name == "SELF_TYPE":
             method_return_type = self.current_type
@@ -158,7 +158,7 @@ class TypeChecker:
                 pass
 
         try:
-            return_type = self.context.get_type(node.type)
+            return_type = self.context.get_type(node.type.lex)
             if return_type.name == "SELF_TYPE":
                 return self.current_type
 
@@ -170,14 +170,14 @@ class TypeChecker:
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
-        if scope.is_local(node.id):
+        if scope.is_local(node.id.lex):
             self.errors.append(
                 LOCAL_ALREADY_DEFINED % (node.id, self.current_method.name)
             )
-        elif node.id == "self":
+        elif node.id.lex == "self":
             self.errors.append(SELF_IS_READONLY)
         try:
-            static_type = self.context.get_type(node.type)
+            static_type = self.context.get_type(node.type.lex)
         except SemanticError as error:
             self.errors.append(error.text)
             static_type = ErrorType()
@@ -186,22 +186,22 @@ class TypeChecker:
         if not expr_type.conforms_to(static_type):
             self.errors.append(INCOMPATIBLE_TYPES % (expr_type.name, static_type.name))
 
-        scope.define_variable(node.id, static_type)
+        scope.define_variable(node.id.lex, static_type)
         return static_type
 
     @visitor.when(AssignNode)
     def visit(self, node, scope):
-        if node.id == "self":
+        if node.id.lex == "self":
             self.errors.append(SELF_IS_READONLY)
 
         var_type = None
-        if not scope.is_defined(node.id):
+        if not scope.is_defined(node.id.lex):
             self.errors.append(
                 VARIABLE_NOT_DEFINED % (node.id, self.current_method.name)
             )
             var_type = ErrorType()
         else:
-            var_type = scope.find_variable(node.id).type
+            var_type = scope.find_variable(node.id.lex).type
 
         expr_type = self.visit(node.expr, scope)
         if not expr_type.conforms_to(var_type):
@@ -223,16 +223,16 @@ class TypeChecker:
 
         method = None
         try:
-            if node.at_type is not None:
-                node_at_type = self.context.get_type(node.at_type)
-                method = node_at_type.get_method(node.id)
+            if not( node.at_type is None):
+                node_at_type = self.context.get_type(node.at_type.lex)
+                method = node_at_type.get_method(node.id.lex)
                 if not typex.conforms_to(node_at_type):
                     self.errors.append(
                         f"The static type to the left of @ ({typex.name}) must conform to the type specified to the right of @ ({node_at_type.name}) "
                     )
                     return ErrorType()
             else:
-                method = typex.get_method(node.id)
+                method = typex.get_method(node.id.lex)
         except SemanticError as error:
             self.errors.append(error.text)
             return ErrorType()
@@ -304,7 +304,7 @@ class TypeChecker:
 
         static_type = None
         try:
-            static_type = self.context.get_type(node.type)
+            static_type = self.context.get_type(node.type.lex)
             if static_type.name == "SELF_TYPE":
                 static_type = self.current_type
             scope.define_variable(node.id, static_type)
@@ -337,8 +337,8 @@ class TypeChecker:
     @visitor.when(CaseItemNode)
     def visit(self, node, scope):
         try:
-            static_type = self.context.get_type(node.type)
-            scope.define_variable(node.id, static_type)
+            static_type = self.context.get_type(node.type.lex)
+            scope.define_variable(node.id.lex, static_type)
         except SemanticError as e:
             self.errors.append(e)
             return ErrorType()
@@ -350,7 +350,7 @@ class TypeChecker:
     @visitor.when(InstantiateNode)  # NewNode
     def visit(self, node, scope):
         try:
-            typex = self.context.get_type(node.lex)
+            typex = self.context.get_type(node.lex.lex)
             if typex.name == "SELF_TYPE":
                 return self.current_type
 

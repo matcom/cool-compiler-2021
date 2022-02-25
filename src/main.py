@@ -63,11 +63,17 @@ def pipeline(input_file: Path, output_file: Path = None):
         
     #get parsing tree
     ast = evaluate_reverse_parse(parse, operations, tokens)
-
+    print("AST")
+    # print(ast)
     #printing tree
-    # formatter = FormatVisitorST()
-    # tree = formatter.visit(ast)
-    # print(tree)
+    formatter = FormatVisitorST()
+    tree = formatter.visit(ast)
+    print(tree)
+
+    # type_visitor = TypeCollector(errors)
+    # ast = type_visitor.visit(ast)
+    # print("Type visitor tree")
+    # print(ast.context)
 
     visitors = [TypeCollector(errors), TypeBuilder(errors)]
     for visitor in visitors:

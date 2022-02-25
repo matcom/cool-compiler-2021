@@ -7,8 +7,8 @@ class Node:
 
 
 class ProgramNode(Node):
-    def __init__( declarations, context=None):
-        super().__init__(self, Token("", "", (0,0))) # symbolic initial token
+    def __init__(self,  declarations, context=None):
+        super().__init__(Token("", "", (0,0))) # symbolic initial token
         self.declarations = declarations
         self.context = context
 
@@ -58,8 +58,8 @@ class LetNode(ExpressionNode):
 
 #No tiene uno asi
 class VarDeclarationNode:
-    def __init__(self, idx, typex, expr=None):
-        self.id = idx
+    def __init__(self, token, typex, expr=None):
+        self.id = token.lex
         self.type = typex
         self.expr = expr
         self.token = token
@@ -111,8 +111,8 @@ class BlockNode(ExpressionNode):
  
 
 class AtomicNode(ExpressionNode):
-    def __init__(self, lex, token):
-        self.lex = lex
+    def __init__(self, token):
+        self.lex = token.lex
         self.token = token
 
 
@@ -155,7 +155,9 @@ class BooleanNode(AtomicNode):
 
 
 class InstantiateNode(AtomicNode):
-    pass
+    def __init__(self, lex, token):
+        self.lex = lex
+        self.token = token
 
 
 class NotNode(UnaryNode):

@@ -99,7 +99,10 @@ class TypeBuilder:
 
         for class_declaration in node.declarations:
             not_visited.append(class_declaration)  # ++
-            parent_type = class_declaration.parent
+            if not (class_declaration.parent is None):
+                parent_type = class_declaration.parent.lex
+            else:
+                parent_type = None
             try:
                 self.context.get_type(parent_type)
                 try:
@@ -169,7 +172,7 @@ class TypeBuilder:
 
         if node.parent is not None:
             try:
-                parent_type = self.get_type(node.parent)
+                parent_type = self.get_type(node.parent.lex)
                 self.current_type.set_parent(parent_type)
             except SemanticError as error:
                 self.errors.append(error.text)
@@ -185,13 +188,13 @@ class TypeBuilder:
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):
-        param_names = [fname for fname, ftype in node.params]
+        param_names = [fname.lex for fname, ftype in node.params]
 
         try:
-            param_types = [self.get_type(ftype) for fname, ftype in node.params]
-            return_type = self.get_type(node.type)
+            param_types = [self.get_type(ftype.lex) for fname, ftype in node.params]
+            return_type = self.get_type(node.type.lex)
             self.current_type.define_method(
-                node.id, param_names, param_types, return_type
+                node.id.lex, param_names, param_types, return_type
             )
         except SemanticError as error:
             # print("--------aqui se esta reportando el error del metodo doble---------")
@@ -200,8 +203,8 @@ class TypeBuilder:
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
         try:
-            attr_type = self.get_type(node.type)
-            self.current_type.define_attribute(node.id, attr_type)
+            attr_type = self.get_type(node.type.lex)
+            self.current_type.define_attribute(node.id.lex, attr_type)
         except SemanticError as error:
             self.errors.append(error.text)
 
