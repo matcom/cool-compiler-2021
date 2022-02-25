@@ -208,7 +208,10 @@ class CiltoMipsVisitor:
 
     @visitor.when(ReturnNode)
     def visit(self, node):
-        pass
+        stack_ptr = self.stack_offset(node.value)
+        self.write_code('# ReturnNode')
+        self.write_code(f'{o.lw} {r.t0}, {stack_ptr}({r.fp})')  # t0 <- stack pointer to the value
+        self.write_code(f'{o.move} {r.v0}, {r.t0}') # return the node value
 
     @visitor.when(LoadNode)
     def visit(self, node):
@@ -216,7 +219,14 @@ class CiltoMipsVisitor:
 
     @visitor.when(LengthNode)
     def visit(self, node):
-        pass
+        self.write_code('# LengthNode')
+        dest_addr = self.stack_offset(node.dest)
+        string_addr = self.stack_offset(node.string)
+        self.write_code(f'{o.lw} {r.s0}, {string_addr}({r.fp})')  # loads to s0(to keep it through calls) the string address
+        self.write_code(f'{o.lw} {r.a0}, 8({r.s0})')
+        self.write_code(f'jal str_len') # jumps to str_len multi-use function, length is stores at v0
+        self.write_code(f'{o.sw} {r.v0}, {dest_addr}({r.fp})')
+
 
     @visitor.when(ConcatNode)
     def visit(self, node):
