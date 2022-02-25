@@ -125,7 +125,7 @@ class CILCodegen:
 
     @visitor.when(CILAllocateNode)
     def visit(self, node: CILAllocateNode):
-        return f'ALLOCATE {node.type}'
+        return f'ALLOCATE {node.type.lex}'
 
     @visitor.when(CILTypeOfNode)
     def visit(self, node: CILTypeOfNode):
@@ -196,3 +196,9 @@ class CILCodegen:
         l = self.visit(node.left)
         r = self.visit(node.right)
         return f'{l} == {r}'
+    
+    @visitor.when(CILNotEqualsNode)
+    def visit(self, node: CILNotEqualsNode):
+        l = self.visit(node.left)
+        r = self.visit(node.right)
+        return f'{l} != {r}'

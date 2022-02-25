@@ -245,9 +245,7 @@ class CILAllocateNode(CILExpressionNode):
 
     def __str__(self):
         text = "AllocateNode:\n"
-        text += f"var: {self.var}\n"
         text += f"type: {self.type}\n"
-        text += f"att: {self.attr}\n"
         return text    
         
 

@@ -12,7 +12,7 @@ class CILScope:
         self.str_count = 0
         self.loop_count = 0
         
-        self.locals = []
+        self.locals = [{}]
         self.all_locals = []
         self.instructions = []
         self.data = []
@@ -134,10 +134,15 @@ class CILScope:
             instructions.append(CILArgNode(CILVariableNode(f'self')))
             call = CILVCallNode(type.parent.name, f'init_{type.parent.name}')  
             instructions.append(CILAssignNode(CILVariableNode('self'), call))   
-            
-             
-        for attr,expr in zip(attributes,expresions):
-            instructions.append(CILSetAttributeNode(CILVariableNode('self'), self.current_class, CILVariableNode(attr), expr)) 
+                     
+        for attr, (expr, type) in zip(attributes, expresions):
+            if not isinstance(expr, CILAtomicNode):
+                variable = CILVariableNode(self.add_new_local(type))
+                self.instructions.append(CILAssignNode(variable, expr))
+            else:   
+                variable = CILVariableNode(expr.lex)
+                
+            instructions.append(CILSetAttributeNode(CILVariableNode('self'), self.current_class, CILVariableNode(attr), variable)) 
         
         instructions.append(CILReturnNode(CILVariableNode('self')))
         
