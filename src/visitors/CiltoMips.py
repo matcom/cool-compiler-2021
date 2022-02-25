@@ -102,7 +102,17 @@ class CiltoMipsVisitor:
 
     @visitor.when(AssignNode)
     def visit(self, node):
-        pass
+        src = self.stack_pos(node.source)
+        dest = self.stack_pos(node.dest)
+
+        self.write_code('# Assign ')
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, src, r.fp))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t1, dest, r.fp))
+
+        n = self.attributes[node.type]
+        for i in range(n):
+            self.write_code('{} {}, {}({})'.format(o.lw, r.s0, 4*(i+2), r.t0))
+            self.write_code('{} {}, {}({})'.format(o.sw, r.s0, 4*(i+2), r.t1))
 
     @visitor.when(PlusNode)
     def visit(self, node):
@@ -281,7 +291,7 @@ class CiltoMipsVisitor:
         self.write_code('{} {}, 9'.format(o.li, r.v0))
         self.write_code('{}'.format(o.syscall))
         
-        self.write_code('{} {}, {}, {}'.format(o.addi, r.s1, r.zero, r.v0))
+        self.write_code('{} {}, {}, {}'.format(o.addu, r.s1, r.zero, r.v0))
         
         count = len(self.functions[node.type])
         sizeof_dispatch = count*4
@@ -329,15 +339,27 @@ class CiltoMipsVisitor:
         pass
 
     @visitor.when(StaticCallNode)
-    def visit(self, node):
-        self.add('# Call')
-        self.add('{} {}'.format(o.jal, node.function))
-        pos = self.stack_pos(node.dest)
-        self.add('{} {}, {}({})'.format(o.sw, r.v0, pos, r.fp))
+    def visit(self, node):  
+        self.write_code('# Static Call')
+        self.write_code('{} {}'.format(o.jal, node.function))
+        pos = self.stack_offset(node.dest)
+        self.write_code('{} {}, {}({})'.format(o.sw, r.v0, pos, r.fp))
 
     @visitor.when(DynamicCallNode)
     def visit(self, node):
-        pass
+        self.add('# Dynamic_Call')
+
+        _type = self.stack_offset(node.type)
+        method = self.functions[node.type].index(node.method)
+        dest = self.stack_offset(node.dest)
+
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, _type, r.fp)) 	        # Dir en el heap
+        self.write_code('{} {}, 4({})'.format(o.lw, r.a0, r.t0))                              # Dispatch pointer
+        self.write_code('{} {}, {}({})'.format(o.lw, r.a1, 4*method, r.a0))    # Load function
+
+        self.write_code('{} {}'.format(o.jalr, r.a1))
+        
+        self.write_code('{} {}, {}({})'.format(o.sw, r.v0, dest, r.fp))
     
     @visitor.when(ArgNode)
     def visit(self, node):
