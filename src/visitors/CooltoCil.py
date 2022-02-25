@@ -174,7 +174,7 @@ class BaseCOOLToCILVisitor:
             self.current_function = self.register_function(self.to_function_name('in_int', self.current_type.name))
             self.current_function.params.append(cil.ParamNode('self'))
             dest = self.define_internal_local()
-            self.register_instruction(cil.ReadStrNode(dest))
+            self.register_instruction(cil.ReadIntNode(dest))
             int_store = self.define_internal_local()
             self.register_instruction(cil.AllocateNode('Int', int_store))
             self.register_instruction(cil.SetAttribNode(int_store, 0, dest))
