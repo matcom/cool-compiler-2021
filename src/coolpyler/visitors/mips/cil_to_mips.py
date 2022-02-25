@@ -618,10 +618,10 @@ class CilToMIPS:
             )
         )
 
-        instructions.append(mips.MoveNode(FP_REG, self.fp_save))
+        instructions.append(mips.MoveNode(FP_REG, self.fp_save, f"restore FP"))
         self.locals = self.locals_save
 
-        instructions.append(mips.JumpRegisterNode(RA_REG), f"RETURN")
+        instructions.append(mips.JumpRegisterNode(RA_REG, f"RETURN"))
 
         self.memory_manager.clean()
         return instructions
