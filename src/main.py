@@ -15,7 +15,7 @@ def main(file):
         f_input = open(file, 'r')
         code = f_input.read()
     except:
-        print(f"(0,0) - CompilerError: file {file} not found")
+        print(f"(0, 0) - CompilerError: file {file} not found")
         exit(1)
 
 
@@ -41,7 +41,7 @@ def main(file):
     parsedData, (failure, token) = CoolParser(tokens, get_shift_reduce=True)
     
     if failure:
-        print(f"({token.row},{token.column}) - SyntacticError: ERROR at or near \"{token.lex}\"")
+        print(f"({token.row}, {token.column}) - SyntacticError: ERROR at or near \"{token.lex}\"")
         exit(1)
 
     parse, operations = parsedData
@@ -77,7 +77,7 @@ def main(file):
     
     if errors:
         for (ex, token) in errors:
-            print(f"({token.row},{token.column}) - {type(ex).__name__}: {str(ex)}")
+            print(f"({token.row}, {token.column}) - {type(ex).__name__}: {str(ex)}")
         exit(1)
 
 
