@@ -6,8 +6,11 @@ from ..tools import type_body_def
 class Bool(Type):
     def __init__(self):
         super().__init__("Bool")
-        type_body_def(self.__class__)
+        type_body_def(self)
 
     @property
     def is_shield(self):
         return True
+    
+    def value(self):
+        self.define_attribute("value", self)

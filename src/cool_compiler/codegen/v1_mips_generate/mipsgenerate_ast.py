@@ -470,6 +470,12 @@ Object_abort:
 li		$v0, 4		# system call #4 - print string
 la		$a0, _______error______
 syscall	
+lw $t0 0($sp)   #Guarda en $t0 self
+lw $t1 0($t0)   #Guarga en tipo de self
+lw $t2 0($t1)
+li		$v0, 4		# system call #4 - print string
+la		$a0, ($t2)
+syscall	
 li		$v0, 10
 syscall				# execute
 """
