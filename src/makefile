@@ -1,7 +1,6 @@
 .PHONY: clean
 
 main:
-	@./coolc.sh $(CODE)
 
 clean:
 	rm -rf build/*
