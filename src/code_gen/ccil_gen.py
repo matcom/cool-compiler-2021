@@ -13,12 +13,18 @@ METHOD_VISITOR_RESULT = FunctionNode
 ATTR_VISITOR_RESULT = List[OperationNode]
 
 DEFAULT_STR = Data("default_str", "")
+ZERO = "zero"
+EMPTY = "empty"
 
 # TODO:
+# Define how equality is handled
+# Define how isVoid is handled
+# See built in classes methods are correctly executed
+# See how typeof should work, a special kind of equality?
 # Define abort nodes with a text:
 # * Dispatch on a void class
 # * No pattern match in case (Done)
-# * Division by zero
+# * Division by zero (Done)
 # * Substring out of range (Done)
 # * Heap Overflow (don't know yet how to handle this)
 
@@ -86,10 +92,7 @@ class CCILGenerator:
         init_params = self.init_func_params(node.id)
         self.ccil_cool_names.add_new_name_pair("self", node.id)
         attributes: List[Attribute] = list()
-        init_attr_ops: List[OperationNode] = [
-            self.create_storage("zero", INT, IntNode("0")),
-            self.create_string_load_data("empty", DEFAULT_STR.id),
-        ]
+        init_attr_ops: List[OperationNode] = self.init_default_values()
         for attr in attr_nodes:
             attributes.append(Attribute(ATTR + attr.id, attr.type.name))
             attr_ops = self.visit(attr)
@@ -128,9 +131,9 @@ class CCILGenerator:
 
         if node.expr is None:
             if node.type.name != STRING:
-                value_0 = IdNode("zero")
+                value_0 = IdNode(ZERO)
             else:
-                value_0 = IdNode("empty")
+                value_0 = IdNode(EMPTY)
             set_attr = SetAttrOpNode("self", attr_id, value_0, self.current_type)
             return [set_attr]
 
@@ -188,7 +191,7 @@ class CCILGenerator:
     def visit(self, node: sem_ast.LetNode) -> VISITOR_RESULT:
         self.ccil_cool_names = self.ccil_cool_names.create_child()
 
-        operations: List[OperationNode] = []
+        operations: List[OperationNode] = self.init_default_values()
         fvalues: List[StorageNode] = []
 
         for var in node.var_decl_list:
@@ -211,10 +214,10 @@ class CCILGenerator:
 
         if node.expr is None:
             if node.type.name != STRING:
-                value_0 = self.create_storage("zero", INT, IntNode("0"))
+                value_0 = IdNode(ZERO)
             else:
-                value_0 = self.create_string_load_data("empty", DEFAULT_STR.id)
-            fval = self.create_assignation(fvalue_id, node.type.name, value_0.id)
+                value_0 = IdNode(EMPTY)
+            fval = self.create_assignation(fvalue_id, node.type.name, value_0.value)
             return [fval], fval
 
         (expr_ops, expr_fv) = self.visit(node.expr)
@@ -297,7 +300,7 @@ class CCILGenerator:
 
         # All branch must end in a var named like this
         pre_fvalue_id = f"case_{times}_pre_fv"
-        pattern_match_ops = []
+        pattern_match_ops = [self.init_default_values()]
         branch_ops = []
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
@@ -411,7 +414,7 @@ class CCILGenerator:
         elif node_type == sem_ast.DivNode:
             op = DivOpNode(left_id, right_id)
             fval_id = f"div_{times}"
-            # Generating divison by zero warning
+            # Generating divison by zero runtime error
             ok_label = LabelNode(f"ok_div_{times}")
             right_id_is_zero = self.create_equality(
                 f"check_right_zero_{times}", left_id, IntNode("0")
@@ -552,7 +555,7 @@ class CCILGenerator:
 
         if is_attr:
             get_attr = self.create_attr_extraction(
-                id_id, node.type.name, "self", ccil_id
+                id_id, node.type.name, "self", ccil_id, self.current_type
             )
             return [get_attr], get_attr
 
@@ -775,17 +778,17 @@ class CCILGenerator:
 
     def create_uninitialized_storage(self, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
-        return StorageNode(idx, VoidNode())
+        return StorageNode(idx, ZERO if type_idx != STRING else EMPTY)
 
     def create_storage(self, idx: str, type_idx: str, op: ReturnOpNode):
         self.add_local(idx, type_idx)
         return StorageNode(idx, op)
 
     def create_attr_extraction(
-        self, idx: str, type_idx: str, from_idx: str, attr_idx: str
+        self, idx: str, type_idx: str, from_idx: str, attr_idx: str, from_type_idx: str
     ):
         self.add_local(idx, type_idx)
-        return StorageNode(idx, GetAttrOpNode(type_idx, from_idx, attr_idx))
+        return StorageNode(idx, GetAttrOpNode(from_type_idx, from_idx, attr_idx))
 
     def create_new_type(self, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
@@ -832,6 +835,14 @@ class CCILGenerator:
         self.add_local(idx, INT)
         return StorageNode(idx, LengthOpNode(target))
 
+    def init_default_values(self):
+        if not ZERO in self.locals and not EMPTY in self.locals:
+            return [
+                self.create_storage(ZERO, INT, IntNode("0")),
+                self.create_string_load_data(EMPTY, DEFAULT_STR.id),
+            ]
+        return []
+
     def add_data(self, idx: str, value: str):
         data = Data(idx, value)
         self.data.append(data)
@@ -845,14 +856,12 @@ class CCILGenerator:
         if idx in self.locals:
             raise Exception(f"Trying to insert {idx} again as local")
         self.locals[idx] = typex
-        self.defined_vars.add(idx)
 
     def reset_locals(self):
         """
         Apply at the beginning of every method to reset local vars
         """
         self.locals = dict()
-        self.defined_vars = set()
 
     def reset_scope(self):
         self.ccil_cool_names = Scope()
