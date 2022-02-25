@@ -3,13 +3,16 @@ import visitors.visitor as visitor
 from cil_ast.cil_ast import *
 
 class CiltoMipsVisitor:
-    def __init__(self, context):
+    def __init__(self, context, class_function_lists, class_attributes_lists, class_parents_lists):
         self.dottypes = []
         self.dotdata =[]
         self.dotcode =[]
         self.context = context
+        self.attrs = class_attributes_lists
+        self.class_functions_list = class_function_lists
         self.code = []
         self.data = []
+        self.label_id = 0
         self.current_function: FunctionNode = None
 
     def stack_offset(self, name):
@@ -142,15 +145,69 @@ class CiltoMipsVisitor:
 
     @visitor.when(EqualNode)
     def visit(self, node):
-        pass
+        pos_dest = self.stack_offset(node.dest)
+        pos_left = self.stack_offset(node.left)
+        pos_right = self.stack_offset(node.right)
+        
+        self.write_code('# equal ')
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t2, pos_left, r.fp))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t3, pos_right, r.fp))
+        
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a0, r.t2))
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a1, r.t3))
 
-    @visitor.when(LessNode)
-    def visit(self, node):
-        pass
+        self.write_code('{} {}, 0 # initialize with 0 '.format(o.li, r.t1))
+        label = 'not_equal_label_{}'.format(self.label_id)
+        self.label_id+=1
+        self.write_code('{} {}, {} {} # branch if not equal to label'.format(o.bne, r.a0, r.a1, label))
+        self.write_code('{} {}, 1 # change value to 1 if equal'. format(o.li, r.t1))
+        self.write_code('{}:'.format(label))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, pos_dest, r.fp))
+        self.write_code('{} {}, 8({})'.format(o.sw, r.t1, r.t0))
 
     @visitor.when(LeqNode)
     def visit(self, node):
-        pass
+        pos_dest = self.stack_offset(node.dest)
+        pos_left = self.stack_offset(node.left)
+        pos_right = self.stack_offset(node.right)
+        
+        self.write_code('# less than or equal ')
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t2, pos_left, r.fp))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t3, pos_right, r.fp))
+        
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a0, r.t2))
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a1, r.t3))
+
+        self.write_code('{} {}, 0 # initialize with 0 '.format(o.li, r.t1))
+        label = 'not_less_than_ or_equal_label_{}'.format(self.label_id)
+        self.label_id+=1
+        self.write_code('{} {}, {} {} # branch if not less than or equal to label'.format(o.bgt, r.a0, r.a1, label))
+        self.write_code('{} {}, 1 # change value to 1 if equal'. format(o.li, r.t1))
+        self.write_code('{}:'.format(label))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, pos_dest, r.fp))
+        self.write_code('{} {}, 8({})'.format(o.sw, r.t1, r.t0)) 
+
+    @visitor.when(LessNode)
+    def visit(self, node):
+        pos_dest = self.stack_offset(node.dest)
+        pos_left = self.stack_offset(node.left)
+        pos_right = self.stack_offset(node.right)
+        
+        self.write_code('# less than ')
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t2, pos_left, r.fp))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t3, pos_right, r.fp))
+        
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a0, r.t2))
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a1, r.t3))
+
+        self.write_code('{} {}, 0 # initialize with 0 '.format(o.li, r.t1))
+        label = 'not_less_than_label_{}'.format(self.label_id)
+        self.label_id+=1
+        self.write_code('{} {}, {} {} # branch if not less than to label'.format(o.bge, r.a0, r.a1, label))
+        self.write_code('{} {}, 1 # change value to 1 if equal'. format(o.li, r.t1))
+        self.write_code('{}:'.format(label))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, pos_dest, r.fp))
+        self.write_code('{} {}, 8({})'.format(o.sw, r.t1, r.t0))
 
     @visitor.when(GotoNode)
     def visit(self, node):
@@ -175,7 +232,32 @@ class CiltoMipsVisitor:
 
     @visitor.when(AllocateNode)
     def visit(self, node):
-        pass
+        self.write_code('# Allocate ')
+        sizeof = self.attrs[node.type]*4 + 8
+        self.write_code('{} {}, {}, {}'.format(o.addiu, r.a0, r.zero, sizeof))
+        self.write_code('{} {}, 9'.format(o.li, r.v0))
+        self.write_code('{}'.format(o.syscall))
+        
+        self.write_code('{} {}, {}, {}'.format(o.addi, r.s1, r.zero, r.v0))
+        
+        count = len(self.class_functions_list[node.type])
+        sizeof_dispatch = count*4
+        self.write_code('{} {}, {}, {}'.format(o.addiu, r.a0, r.zero, sizeof_dispatch))
+        self.write_code('{} {}, 9'. format(o.li, r.v0))
+        self.write_code('{}'.format(o.syscall))
+        
+        self.write_code('{} {}, {}, {}'.format(o.addu, r.s0, r.zero, r.v0))
+        for i in range(count):
+            self.write_code('{} {}, {}'.format(o.la, r.a0, self.class_functions_list[node.type][i]))
+            self.write_code('{} {}, {}({})'.format(o.sw, r.a0, 4*i, r.s0))
+        self.add('{} {}, 4({})'.format(o.sw, r.s0, r.s1))
+
+        #class tag
+        self.add('{} {}, {}'.format(o.la, r.a0, node.type + '_conforms_to'))
+        self.add('{} {}, 0({})'.format(o.sw, r.a0, r.s1))
+
+        index = self.stack_pos(node.dest)    
+        self.add('{} {}, {}({})'.format(o.sw, r.s1, index, r.fp))
 
     @visitor.when(TypeOfNode)
     def visit(self, node):
