@@ -562,13 +562,13 @@ class CCILGenerator:
             call = self.create_call(
                 fval_id, node.type.name, node.id, node.caller_type.name, args
             )
-            return [*expr_ops, *error_ops, *args_ops, call]
+            return [*expr_ops, *error_ops, *args_ops, call], call
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
         call = self.create_vcall(fval_id, node.type.name, node.id, node.caller_type, args)
 
-        return [*expr_ops, *error_ops, *args_ops, call]
+        return [*expr_ops, *error_ops, *args_ops, call], call
 
     @visitor.when(sem_ast.InstantiateNode)
     def visit(self, node: sem_ast.InstantiateNode) -> VISITOR_RESULT:
