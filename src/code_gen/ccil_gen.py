@@ -926,9 +926,9 @@ class CCILGenerator:
         execute = self.create_call(
             "execute_program",
             INT,
-            "main",
+            self.find_function_id("Main", "main"),
             INT,
-            [IdNode(self.find_function_id("Main", "main"))],
+            [IdNode(program.id)],
         )
         return FunctionNode(
             "main", [], self.dump_locals(), [program, execute], execute.id
