@@ -37,11 +37,11 @@ realizarón pequeñas modificaciones para ajustarlas, más aun, a las necesidade
 
 Módulo que comienza con el analisis de código de cool que se desea compilar, su función principal
 es convertir la cadena de caracteres en una cadena de token. Los token son la primera abstracción
-que se le aplica al código, estos son subcadenas que son sintácticamente significativas y según
+que se le aplica al código, estos son subcadenas que son lexicograficamente significativas y según
 este significado se les asigan un tipo (literal, keyword, type, identificador, number, string, etc).
 El desarrollo de este módulo se apoyo en la libreria **sly**; expecificamente la clase **Lexer**, la cual
-brinda la facilidad de definir un automata que reconozca las subcadenas significativas para una
-sintaxis dada. Heredando de la clase **Lexer** y definiendo las propiedades _literals_ y _tokens_ se
+brinda la facilidad de definir un automata que reconozca las subcadenas significativas para un
+lenguaje dad. Heredando de la clase **Lexer** y definiendo las propiedades _literals_ y _tokens_ se
 puede expersar la lista de expersiones regulares que el automata debe reconocer, en este caso en
 particular se definieron de la siguiente manera:
 
@@ -101,3 +101,49 @@ Estos fragmentos de código tiene un comportamientos similares al lenguaje `(ab)
 cual no basta con un automata finito determinista para reconocer todo el lenguaje. Para completar el reconocimiento
 de estos fragmentos, apoyados en **sly**, se impelmentaro automatas con manipulación de memoria y asi poder contar
 la cantidad de ocurrencias de los distintos delimitadores
+
+### 3 - Módulo Parser
+
+El módulo Parser se encarga de checkear la consistencia sintáxtica del código en cuestión. Dicho módulo tambien fue
+implementado con la ayuda de **sly**, expecificamente con su clase **Parser**. Esta clase facilita la definición de
+gramáticas atributadas de manera extremadamente comoda. Heredando de **Parser** se pueden definir métodos como
+atributo de cada produccion de la gramatica y mediante el decorador **@\_** se expecifica la produccion a la que se le
+debe asignar dicho atributo. Ejemplo:
+
+```python
+    # cclass: no terminal y epsilon terminal
+    # en prod.cclass se encuentra el resultado del no teminal cclass
+    # en prod.epsilon se encuentra el teminal epsilon
+    @_("cclass epsilon")
+    def class_list(self, prod):
+        return [prod.cclass]
+```
+
+Además **Parser** ofrece las herramientas para desambiguar en casos en que exista colisiones entre las producciones,
+como por ejemplo las producciones que tiene como cabezera el no terminal `expressionn`. Para que el parser sepa decidir
+cual de las producciones se debe seleccionar en cada escenario se necesita definir una prioridad entre las producciones.
+Para definir las presedencias de los distintos operadores, la clase **Parser** tiene la propiedad **precedence**, tupla de
+tuplas ordenadas de menor a mayor precedencia. Dicha propiedad inicialmente se encuentra vacia, y de ser necesario se pueden
+redefinir, en el caso particular del compilador de cool se redefinio de la manera siguiente:
+
+```python
+    ...
+    precedence = (
+        ('right', 'ARROW'),
+        ('left','NOT'),
+        ('nonassoc', '=','<','LESS_OR'),
+        ('left', '+', '-'),
+        ('left', '*', '/'),
+        ('left', "ISVOID"),
+        ('left', '~'),
+        ('left', '@'),
+        ('right', 'IN'),
+        ('left', '.'),
+    )
+    ...
+```
+
+Aprovechando la caracteristica de que la gramatica se encuentra recogida en una clase, se desarrollaro algunas herramientas
+para realizar la inversion de la dependencia entre la gramatica y el ast, mediante el patrón **Factory**. Desde el módulo
+parser se definio un enum con los nombres de los nodos que la clase parser le pasara a la fatoria de nodos, además de un
+decorador que enlace un metodo con el nombre del nodo que el mismo creará
