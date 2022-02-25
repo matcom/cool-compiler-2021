@@ -100,6 +100,8 @@ def main(file):
 
     with open(out_file, 'w') as f:
         f.write(mips_code)
+        with open("./Mips/mips_lib.asm") as f2:
+            f.write("".join(f2.readlines()))
 
     exit(0)
 
