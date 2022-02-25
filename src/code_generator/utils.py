@@ -73,54 +73,62 @@ class CILScope:
             CILMethodNode('copy', 'copy_Object'),
         ]
         types.append(CILTypeNode('Object', [], obj_methods))
+        init_Object = CILFuncNode(
+            'init_Object', 
+            [CILParamNode('self', None)], 
+            [], 
+            [CILReturnNode(CILVariableNode('self'))])               
+        self.functions.append(init_Object)
         
-        int_methods = [
-            CILMethodNode('init', 'init_Int'),
-        ]
-        int_methods.extend(obj_methods)
+        int_methods = obj_methods.copy()
+        int_methods.extend([CILMethodNode('init', 'init_Int')])
         types.append(CILTypeNode('Int', [CILAttributeNode('value', None)], int_methods))
         init_int = CILFuncNode(
             'init_Int', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
-            [CILSetAttributeNode(CILVariableNode('self'), 'Int', CILVariableNode('value'), CILVariableNode('v'))])               
+            [CILSetAttributeNode(CILVariableNode('self'), 'Int', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_int)
         
-        str_methods = [
+        str_methods = obj_methods.copy()
+        str_methods.extend([
             CILMethodNode('init', 'init_String'), 
             CILMethodNode('length', 'length_String'), 
             CILMethodNode('concat', 'concat_String'),
             CILMethodNode('substr', 'substr_String'),
-        ]
-        str_methods.extend(obj_methods)
+        ])
         types.append(CILTypeNode('String', [CILAttributeNode('value', None)], str_methods))
         init_string = CILFuncNode(
             'init_String', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
-            [CILSetAttributeNode(CILVariableNode('self'), 'String', CILVariableNode('value'), CILVariableNode('v'))])               
+            [CILSetAttributeNode(CILVariableNode('self'), 'String', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_string)
         
-        bool_methods = [
-            CILMethodNode('init', 'init_Bool'),
-        ]
-        bool_methods.extend(obj_methods)
+        bool_methods = obj_methods.copy()
+        bool_methods.extend([CILMethodNode('init', 'init_Bool')])
         types.append(CILTypeNode('Bool', [CILAttributeNode('value', None)], bool_methods))
-        bool_string = CILFuncNode(
+        init_bool = CILFuncNode(
             'init_Bool', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
-            [CILSetAttributeNode(CILVariableNode('self'), 'Bool', CILVariableNode('value'), CILVariableNode('v'))])               
-        self.functions.append(bool_string)
+            [CILSetAttributeNode(CILVariableNode('self'), 'Bool', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
+        self.functions.append(init_bool)
         
-        io_methods = [
+        io_methods = obj_methods.copy()
+        io_methods.extend([
             CILMethodNode('out_string', 'out_string_IO'), 
             CILMethodNode('out_int', 'out_int_IO'),
             CILMethodNode('in_string', 'in_string_IO'),
             CILMethodNode('in_int', 'in_int_IO'),
-        ]
-        io_methods.extend(obj_methods)
+        ])
         types.append(CILTypeNode('IO', [], io_methods))
+        init_IO = CILFuncNode(
+            'init_IO', 
+            [CILParamNode('self', None)], 
+            [], 
+            [CILReturnNode(CILVariableNode('self'))])               
+        self.functions.append(init_IO)
         
         return types
         

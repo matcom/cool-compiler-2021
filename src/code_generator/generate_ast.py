@@ -1,7 +1,7 @@
 from parsing.ast import *
 from .ast_CIL import *
 from .utils import *
-from cmp.semantic import IntType, StringType, BoolType, ObjectType
+from cmp.semantic import IOType, IntType, StringType, BoolType, ObjectType
 import cmp.visitor as visitor
         
     
@@ -183,13 +183,16 @@ class CIL:
             self.scope.instructions.append(instruction)
         elif isinstance(node.computed_type, IntType): 
             self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
-            self.scope.instructions.append(CILVCallNode('Int', 'init'))
+            var = CILVariableNode(name)
+            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Int', 'init')))
         elif isinstance(node.computed_type, BoolType): 
             self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
-            self.scope.instructions.append(CILVCallNode('Bool', 'init'))
+            var = CILVariableNode(name)
+            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Bool', 'init')))
         elif isinstance(node.computed_type, StringType):
             self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
-            self.scope.instructions.append(CILVCallNode('String', 'init'))
+            var = CILVariableNode(name)
+            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('String', 'init')))
             
     @visitor.when(LoopNode)
     def visit(self, node):
@@ -269,7 +272,7 @@ class CIL:
         local = self.scope.find_local(node.id.lex)
 
         if local is not None:
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(local.id), var))
+            self.scope.instructions.append(CILAssignNode(CILVariableNode(local.id), variable))
             return CILVariableNode(local.id)
         else:
             self.scope.instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.id.lex), variable))
@@ -281,20 +284,17 @@ class CIL:
         expr_right = self.visit(node.right)
         if not isinstance(expr_left, CILAtomicNode):
             name = self.scope.add_new_local(node.left.computed_type.name)
-            expr = self.visit(node.left)
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
+            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr_left))
             left = CILVariableNode(name)
-            
         else:
             left = expr_left 
 
         if not isinstance(expr_right, CILAtomicNode):
             name = self.scope.add_new_local(node.right.computed_type.name)
-            expr = self.visit(node.right)
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
+            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr_right))
             right = CILVariableNode(name)
         else:
-            right = self.visit(node.right)
+            right = expr_right
         
         if isinstance(node, PlusNode):
             return CILPlusNode(left, right)
