@@ -2,6 +2,20 @@
 
 El objetivo principal de la aplicación es contruir un compilador que convierta un programa de COOL en un programa funcionalmente equivalente en MIPS. Se mostrará su uso y se describirá la arquitectura y procesos relacionados con su contrucción y funcionamiento.
 
+## ¿Cómo Instalarlo?
+
+### Clonar el repositorio
+  
+  ``` bash
+  git clone https://github.com/WataLuisoDalmauCompiler/cool-compiler-2021.git
+  ```
+
+### Instalar requerimientos
+
+``` bash
+pip install -r requirements.txt
+```
+
 ## ¿Cómo usar el compilador?
 
 ### Uso básico
@@ -229,10 +243,35 @@ Object: .word 0, 4, data_0, __init_Object_type, function_abort_at_Object, functi
 
 En este nivel se efectuaron las implementaciones de las funciones básicas provistas por Cool, estas funciones son abort, copy, type_name, las operaciones de IO, las operaciones con String.
 
-**Manejo de String**
+### Manejo de String
 
 En el caso de los String estos se trataron como una mezcla de referencia y valor, al ser el String un objeto por referencia y su valor no cabe en un solo word estos se representan en memoria como una tupla de Dirección de tipo, Dirección a String. Al realizar cualquier operación sobre una cadena el resultado devuelve una nueva cadena dejando la anterior sin cambios. Esto facilita en gran medida el trabajo con estas, aunque no hace un manejo eficiente de los recursos.
 
-**Despachado dinámico**
+### Despachado dinámico
 
 Gracias a que la representación de los objetos en memoria tienen el tipo al que pertenecen y los tipos poseen la dirección a los métodos que implementan se tiene toda la información necesaria el despachado dinámico.
+
+### Extra
+
+TODO
+
+Dejamos a su disposición dentro de la carpeta src el archivo test_mips.sh que corre el caso detro de testing.cl y compara con expected_output.txt el resultado obtenido.
+
+``` bash
+./src/test_mips.sh
+```
+
+Debe recibir el siguiente resultado:
+
+- En caso de pasar:
+
+  ``` bash
+  Test Passed
+  ```
+
+- En caso de fallar:
+
+  ``` bash
+  Test Failed
+  ```
+  

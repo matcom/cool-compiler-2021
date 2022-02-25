@@ -60,7 +60,7 @@ class IOInIntNode(InstructionNode):
     def __init__(self,row,column,comment=None):
         super().__init__(row,column,comment)
 
-class InitInstance(InstructionNode): # TODO Add to META MIPS Section
+class InitInstance(InstructionNode): 
     def __init__(self, source, instance_type, row, column, comment=None)-> None:
         super().__init__(row, column, comment)
         self.source = source
@@ -111,7 +111,7 @@ class GreaterNode(ArithmeticNode):
 class LesserNode(ArithmeticNode):
     pass
 
-class ObjEqualNode(ArithmeticNode): # TODO Add to CIL Section
+class ObjEqualNode(ArithmeticNode):
     def __init__(self, dest, left, right, row=None, column=None, comment=None, value_compare=None) -> None:
         super().__init__(dest, left, right, row, column, comment=comment)
         if value_compare is None:

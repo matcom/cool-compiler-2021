@@ -249,6 +249,6 @@ class CopyNode(InstructionNode):
         self.result = result
 
 class CommentNode(InstructionNode):
-    def __init__(self, string, row, column, comment=None) -> None:
+    def __init__(self, msg, row, column, comment=None) -> None:
         super().__init__(row,column,comment)
-        self.string = string
+        self.msg = msg

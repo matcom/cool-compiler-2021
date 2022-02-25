@@ -117,6 +117,11 @@ class DivideOverflowNode(OperationOverflowNode):
 class InstructionNode(Node):
     pass
 
+class CommentNode(InstructionNode):
+    def __init__(self, msg ,row=None, column=None, comment=None):
+        super().__init__(row=row, column=column)
+        self.msg = msg
+
 class LoadWordNode(InstructionNode):
     def __init__(self, dest, offset, base_source_dir, row=None, column=None, comment=None):
         super().__init__(row=row, column=column, comment=comment)
@@ -214,9 +219,10 @@ class JumpAndLinkNode(InstructionNode):
         self.address = address
 
 class LabelNode(InstructionNode):
-    def __init__(self, label, row=None, column=None, comment=None):
+    def __init__(self, label, row=None, column=None, comment=None, isFunc=False):
         super().__init__(row=row, column=column, comment=comment)
         self.label = label
+        self.isFunc = isFunc
 
 class SyscallNode(InstructionNode):
     def __init__(self, row=None, column=None, comment=None):
