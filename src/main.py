@@ -22,15 +22,10 @@ def execute_compiler(cool_program : str, input_file):
 
         if component.has_errors():
             component.print_errors()
-            # with errors
-            #print('with errors')
             return True
 
-    # TODO: write generated code to output file
     open(input_file.split(".")[0] + ".mips", 'w').write(code_generator.mips_text)
 
-    # without errors
-    #print('false')
     return False
 
 

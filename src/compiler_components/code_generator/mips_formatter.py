@@ -1,4 +1,5 @@
 from .mips_nodes import *
+from . import visitor
 
 
 def get_formatter():
