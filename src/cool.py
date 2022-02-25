@@ -4,9 +4,10 @@ from parsing.lexer import COOL_Lexer
 from tours.TypeCollector import TypeCollector
 from tours.TypeBuilder import TypeBuilder
 from tours.TypeChecker import TypeChecker
-from code_generator.generate_ast import *
+from code_generator.generate_ast import CIL
 from code_generator.cil_codegen import CILCodegen
-
+from code_generator.spim_scope import MIPSScopeBuilder
+from code_generator.spim_visitor import MIPSCodegen
 input_file = sys.argv[1]
 with open(input_file, 'r') as f:
     s = f.read()
@@ -49,9 +50,13 @@ cil_generator = CIL(context)
 cil = cil_generator.visit(ast)
 cil_codegen = CILCodegen()
 code = cil_codegen.visit(cil)
-print('-----------------CIL AST----------------------')
+mips_scope_builder = MIPSScopeBuilder()
 print(cil)
 print('---------------- CIL Code------------------')
 print(code)
-print('-------------------Done--------------------')
+print('-----------------MIPS----------------------')
+scope = mips_scope_builder.visit(cil)
+mips_codegen = MIPSCodegen(scope)
+mips_codegen.visit(cil, None)
+print(mips_codegen.code)
 exit(0)
