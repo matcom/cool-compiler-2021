@@ -59,7 +59,7 @@ class TypeCheckerVisitor:
     def visit(self, node, scope):
         self.current_type = node.type
         scope.define_variable("self", self.current_type, first_self=True)
-        for attr in self.current_type.all_attributes():
+        for attr, _ in self.current_type.all_attributes():
             try:
                 scope.define_variable(attr.name, attr.type)
             except semantic.BaseSemanticError as e:
