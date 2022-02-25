@@ -366,7 +366,8 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
 
-        reserved_bytes = (len(node.type) + 1) * 4
+        typ = self.types[node.type]
+        reserved_bytes = (len(typ.attributes) + 1) * 4
 
         instructions.append(mips.LoadInmediateNode(V0_REG, 9))
         instructions.append(mips.LoadInmediateNode(ARG_REGISTERS[0], reserved_bytes))
@@ -374,15 +375,16 @@ class CilToMIPS:
 
         reg1 = self.memory_manager.get_unused_register()
 
-        # type_dir = self.search_mem(node.type)
-        # instructions.append(
-        #     mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, type_dir))
-        # )
-        # instructions.append(
-        #     mips.StoreWordNode(
-        #         reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS_NAMES[0], 0)
-        #     )
-        # )
+        instructions.append(
+            mips.LoadAddressNode(
+                reg1, mips.MemoryAddressLabelNode(mips.LabelNode(node.type), 0)
+            )
+        )
+        instructions.append(
+            mips.StoreWordNode(
+                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS_NAMES[0], 0)
+            )
+        )
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 4))
 
         dest_dir = self.search_mem(node.dest)
