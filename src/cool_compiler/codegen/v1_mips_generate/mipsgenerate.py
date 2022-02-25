@@ -180,7 +180,7 @@ class MipsGenerate:
             ASTR.SW('$s0', f'{stack_plus}($sp)' ),
             ASTR.Comment(f'Save el resultado de la funcion que esta en $s0 pa la pila'),
         ]
-    
+   
     @visitor.when(AST.SimpleCall)
     def visit(self, node: AST.SimpleCall):
         if not node.x in self.func_list: self.func_list.append(node.x)
@@ -382,7 +382,11 @@ class MipsGenerate:
 
                 ]                   
 
-    @ visitor.when(AST.Sum)
+    @visitor.when(AST.Complemnet)
+    def visit(self, node: AST.Complemnet):
+        pass
+
+    @visitor.when(AST.Sum)
     def visit(self,node:AST.Sum):
         memory_dest=node.x
         memory_op1=node.y
@@ -402,7 +406,7 @@ class MipsGenerate:
                 ASTR.Comment(f"poner en la posicion {stack_plus_memory_dest} el resultado ")
                 ]
 
-    @ visitor.when(AST.Rest)
+    @visitor.when(AST.Rest)
     def visit(self,node:AST.Rest):
         memory_dest=node.x
         memory_op1=node.y
