@@ -188,13 +188,17 @@ class ReadStrNode(ReturnOpNode):
     This nodes reads a string from the standard input
     """
 
-    pass
+    def __str__(self) -> str:
+        return "read_str"
 
 
 class ReadIntNode(ReturnOpNode):
     """
     This nodes reads an int from the standard input
     """
+
+    def __str__(self) -> str:
+        return "read_int"
 
 
 class GetAttrOpNode(ReturnOpNode):
@@ -204,6 +208,9 @@ class GetAttrOpNode(ReturnOpNode):
         self.instance = instance_id
         self.attr = attr_id
 
+    def __str__(self) -> str:
+        return f"get_attr {self.instance}({self.instance_type}) {self.attr}"
+
 
 class CallOpNode(ReturnOpNode):
     def __init__(self, idx: str, type_idx: str, args: List[str]) -> None:
@@ -211,6 +218,10 @@ class CallOpNode(ReturnOpNode):
         self.id = idx
         self.type = type_idx
         self.args = args
+
+    def __str__(self) -> str:
+        args = ", ".join(f"arg {a}" for a in self.args)
+        return f"call {self.id} : {self.type} ({args})"
 
 
 class VCallOpNode(ReturnOpNode):
@@ -220,17 +231,25 @@ class VCallOpNode(ReturnOpNode):
         self.type = type_idx
         self.args = args
 
+    def __str__(self) -> str:
+        args = ", ".join(f"arg {a}" for a in self.args)
+        return f"vcall {self.id} : {self.type} ({args})"
+
 
 class VoidNode(ReturnOpNode):
     """Operation that indicate that the Storage Node is not initialized"""
 
-    pass
+    def __str__(self) -> str:
+        return "<Uninitalized>"
 
 
 class NewOpNode(ReturnOpNode):
     def __init__(self, type_idx: str) -> None:
         super().__init__()
-        self.type_idx: str = type_idx
+        self.type: str = type_idx
+
+    def __str__(self) -> str:
+        return f"new {self.type}"
 
 
 class BinaryOpNode(ReturnOpNode):
@@ -244,6 +263,9 @@ class BinaryOpNode(ReturnOpNode):
         super().__init__()
         self.left = left
         self.right = right
+
+    def __str__(self) -> str:
+        return f"{self.left.value} op {self.right.value}"
 
 
 class SumOpNode(BinaryOpNode):
@@ -283,21 +305,25 @@ class UnaryOpNode(ReturnOpNode):
 class GetTypeOpNode(UnaryOpNode):
     """Extracts the type of a node"""
 
-    pass
+    def __str__(self) -> str:
+        return f"typeof {self.atom.value}"
 
 
 class IsVoidOpNode(UnaryOpNode):
     """Operation that returns true if the Storage Node is uninitialized"""
 
-    pass
+    def __str__(self) -> str:
+        return f"isvoid {self.atom.value}"
 
 
 class NotOpNode(UnaryOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"not {self.atom.value}"
 
 
 class NegOpNode(UnaryOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"neg {self.atom.value}"
 
 
 class ChainOpNode(ReturnOpNode):
@@ -307,15 +333,18 @@ class ChainOpNode(ReturnOpNode):
 
 
 class LoadOpNode(ChainOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"load {self.target}"
 
 
 class LengthOpNode(ChainOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"length {self.target}"
 
 
 class StrOpNode(ChainOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"str {self.target}"
 
 
 class ConcatOpNode(ChainOpNode):
