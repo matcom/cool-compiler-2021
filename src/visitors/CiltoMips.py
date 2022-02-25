@@ -51,21 +51,46 @@ class CiltoMipsVisitor:
 
     @visitor.when(FunctionNode)
     def visit(self, node):
-        methods = [
-            'Object_abort',
-            'Object_type_name',
-            'Object_copy',
-            'String_concat',
-            'String_substr',
-            'String_length',
-            'IO_in_int',
-            'IO_out_int',
-            'IO_in_string',
-            'IO_out_string',
-        ]
-        if node.fname in methods: 
-            return
-        pass
+        # methods = [
+        #     'Object_abort',
+        #     'Object_type_name',
+        #     'Object_copy',
+        #     'String_concat',
+        #     'String_substr',
+        #     'String_length',
+        #     'IO_in_int',
+        #     'IO_out_int',
+        #     'IO_in_string',
+        #     'IO_out_string',
+        # ]
+        # if node.fname in methods: 
+        #     return
+        
+        self.current_function = node
+        self.write_code(function.name + ':')        
+
+        #ya se guardaron los argumentos en la pila
+        #tenemos que guardar espacio para las variables locales        
+        self.write_code('{} {}, {}, -{}'.format(o.addi, r.sp, r.sp, str(4*len(function.localvars))))        
+
+        self.write_code('{} {}, {}, -8'.format(o.addi, r.sp, r.sp))
+        self.write_code('{} {}, 4({}) # save $ra'.format(o.sw, r.ra, r.sp))
+        self.write_code('{} {}, 0({}) # save $fp'.format(o.sw, r.fp, r.sp))
+
+        n = 4*(len(function.params) + len(function.localvars) + 1)
+        self.write_code('{} {}, {}, {}'.format(o.addi, r.fp, r.sp, n)) 
+
+        for instruction in function.instructions:
+            self.visit(instruction)
+        
+
+        self.write_code('{} {}, 4({}) # restore $ra'.format(o.lw, r.ra, r.sp))
+        self.write_code('{} {}, 0({})'.format(o.lw, r.t1, r.sp))
+        self.write_code('{} {}, {}, 4'.format(o.addi, r.sp, r.fp))
+        self.write_code('{} {}, {} # restore $fp'.format(o.move, r.fp, r.t1))
+        
+        self.write_code('{} {}'.format(o.jr, r.ra))    # and return
+        self.current_function = None
     
     @visitor.when(ParamNode)
     def visit(self, node):
@@ -225,12 +250,12 @@ class CiltoMipsVisitor:
         
     @visitor.when(GetAttribNode)
     def visit(self, node):
-        inst = self.stack_pos(node.inst)
-        dest = self.stack_pos(node.dest)
-        self.add('# GetAttrib') 
-        self.add('{} {}, {}({})'.format(o.lw, r.s1, inst, r.fp))
-        self.add('{} {}, {}({})'.format(o.lw, r.s0, 4*node.attr + 8, r.s1))
-        self.add('{} {}, {}({})'.format(o.sw, r.s0, dest, r.fp))
+        inst = self.stack_offset(node.inst)
+        dest = self.stack_offset(node.dest)
+        self.write_code('# GetAttrib') 
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s1, inst, r.fp))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s0, 4*node.attr + 8, r.s1))
+        self.write_code('{} {}, {}({})'.format(o.sw, r.s0, dest, r.fp))
 
     @visitor.when(SetAttribNode)
     def visit(self, node):
@@ -246,7 +271,7 @@ class CiltoMipsVisitor:
         else:
             self.write_code('{} {}, {}({})'.format(o.lw, r.s0, src, r.fp)) 
 
-        self.add('{} {}, {}({})'.format(o.sw, r.s0, 4*node.attr + 8, r.s1))
+        self.write_code('{} {}, {}({})'.format(o.sw, r.s0, 4*node.attr + 8, r.s1))
 
     @visitor.when(AllocateNode)
     def visit(self, node):
@@ -268,18 +293,27 @@ class CiltoMipsVisitor:
         for i in range(count):
             self.write_code('{} {}, {}'.format(o.la, r.a0, self.functions[node.type][i]))
             self.write_code('{} {}, {}({})'.format(o.sw, r.a0, 4*i, r.s0))
-        self.add('{} {}, 4({})'.format(o.sw, r.s0, r.s1))
+        self.write_code('{} {}, 4({})'.format(o.sw, r.s0, r.s1))
 
         #class tag
-        self.add('{} {}, {}'.format(o.la, r.a0, node.type + '_conforms_to'))
-        self.add('{} {}, 0({})'.format(o.sw, r.a0, r.s1))
+        self.write_code('{} {}, {}'.format(o.la, r.a0, node.type + '_conforms_to'))
+        self.write_code('{} {}, 0({})'.format(o.sw, r.a0, r.s1))
 
-        index = self.stack_pos(node.dest)    
-        self.add('{} {}, {}({})'.format(o.sw, r.s1, index, r.fp))
+        index = self.stack_offset(node.dest)    
+        self.write_code('{} {}, {}({})'.format(o.sw, r.s1, index, r.fp))
 
     @visitor.when(TypeOfNode)
     def visit(self, node):
-        pass
+        self.write_code('# TypeOf')
+        index1 = self.stack_offset(node.obj)
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s0, index1, r.fp))
+        self.write_code('{} {}, 0({})'.format(o.lw, r.t1, r.s0))
+        self.write_code('{} {}, 0({})'.format(o.lw, r.t2, r.t1))
+        ## $t1 = typeOf
+                        
+        #el valor esta en $t1
+        index = self.stack_offset(node.dest)
+        self.write_code('{} {}, {}({})'.format(o.sw, r.t2, index, r.fp))
 
     @visitor.when(LabelNode)
     def visit(self, node):
@@ -296,7 +330,10 @@ class CiltoMipsVisitor:
 
     @visitor.when(StaticCallNode)
     def visit(self, node):
-        pass
+        self.add('# Call')
+        self.add('{} {}'.format(o.jal, node.function))
+        pos = self.stack_pos(node.dest)
+        self.add('{} {}, {}({})'.format(o.sw, r.v0, pos, r.fp))
 
     @visitor.when(DynamicCallNode)
     def visit(self, node):
@@ -304,7 +341,13 @@ class CiltoMipsVisitor:
     
     @visitor.when(ArgNode)
     def visit(self, node):
-        pass
+        self.write_code('# Arg')
+        self.write_code('{} {}, {}, -4'.format(o.addi, r.sp, r.sp)) 
+        
+        pos = self.stack_offset(node.name)
+
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t1, pos, r.fp))
+        self.write_code('{} {}, 0({})'.format(o.sw, r.t1, r.sp))
 
     @visitor.when(ReturnNode)
     def visit(self, node):
@@ -315,7 +358,11 @@ class CiltoMipsVisitor:
 
     @visitor.when(LoadNode)
     def visit(self, node):
-        pass
+        index = self.stack_offset(node.dest)
+        self.write_code('# Load')
+        self.write_code('{} {}, {}'.format(o.la, r.t1, node.msg))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t2, index, r.fp))      #direccion en el heap 
+        self.write_code('{} {}, 8({})'.format(o.sw, r.t1, r.t2))
 
     @visitor.when(LengthNode)
     def visit(self, node):
@@ -324,13 +371,27 @@ class CiltoMipsVisitor:
         string_addr = self.stack_offset(node.string)
         self.write_code(f'{o.lw} {r.s0}, {string_addr}({r.fp})')  # loads to s0(to keep it through calls) the string address
         self.write_code(f'{o.lw} {r.a0}, 8({r.s0})')
-        self.write_code(f'jal str_len') # jumps to str_len multi-use function, length is stores at v0
+        self.write_code(f'{o.jal} str_len') # jumps to str_len multi-use function, length is stores at v0
         self.write_code(f'{o.sw} {r.v0}, {dest_addr}({r.fp})')
 
 
     @visitor.when(ConcatNode)
     def visit(self, node):
-        pass
+        self.write_code('# Concat')
+        str1 = self.stack_offset(node.prefix)
+        str2 = self.stack_offset(node.sufix)
+        dest = self.stack_offset(node.dest)
+
+        self.write_code('{} {}, {}({})'.format(o.lw, r.so, str1, r.fp))
+        self.write_code('{} {}, 8({})'. format(o.lw, r.a0, r.s0))
+
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s0, str2, r.fp))
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a1, r.s0))
+
+        self.write_code('{} str_concat'.format(o.jal))
+
+        #el str esta en $v0
+        self.write_code('{} {}, {}({})'.format(o.sw, r.v0, dest, r.fp))
 
     @visitor.when(PrefixNode)
     def visit(self, node):
@@ -338,7 +399,22 @@ class CiltoMipsVisitor:
 
     @visitor.when(SubstringNode)
     def visit(self, node):
-        pass
+        self.write_code('# Substring')
+        string = self.stack_offset(node.string)
+        i = self.stack_offset(node.i)
+        n = self.stack_offset(node.n)
+        dest = self.stack_offset(node.dest)
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s0, string, r.fp))
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a0, r.s0))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s0, i, r.fp))
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a1, r.s0))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.s0, n, r.fp))
+        self.write_code('{} {}, 8({})'.format(o.lw, r.a2, r.s0))
+
+        self.write_code('{} str_substring'.format(o.jal))        
+
+        #el str esta en $v0
+        self.write_code('{} {}, {}({})'.format(o.sw, r.v0, dest, r.fp))
 
     @visitor.when(ToStrNode)
     def visit(self, node):
@@ -350,7 +426,10 @@ class CiltoMipsVisitor:
 
     @visitor.when(CopyNode)
     def visit(self, node):
-        pass
+        pos_dest = self.stack_pos(node.dest)
+        pos_source = self.stack_pos(node.source)
+        self.add('{} {}, {}({})'.format(o.lw, r.t0, pos_source, r.sp))
+        self.add('{} {}, {}({})'.format(o.sw, r.t0, pos_dest, r.sp))
 
     @visitor.when(PrintStrNode)
     def visit(self, node):
@@ -387,7 +466,6 @@ class CiltoMipsVisitor:
         self.write_code(f'{o.move} {r.v0}, {r.t0}') # returns in v0 the address of the received string
         self.write_code(f'{o.sw} {r.v0}, {dest_pos}({r.fp})') # store the result in the param variable
 
-
     @visitor.when(PrintIntNode)
     def visit(self, node):
         self.write_code('## out_int builtin')
@@ -396,7 +474,6 @@ class CiltoMipsVisitor:
         self.write_code(f'{o.lw} {r.t0}, {dest_pos}({r.fp})')
         self.write_code(f'{o.lw} {r.a0}, 8({r.t0})')
         self.write_code(f'{o.syscall}') # syscall with the parameters set
-
 
     @visitor.when(ReadIntNode)
     def visit(self, node):
