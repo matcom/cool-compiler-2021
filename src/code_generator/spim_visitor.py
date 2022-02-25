@@ -50,8 +50,10 @@ class MIPSCodegen:
         self.set_tabs(1)
         self.add_line(".data")
         self.set_tabs(0)
+        type_info = self.scope.types[node.id]
         methods_str = ' '.join(m.function_id for m in node.methods)
-        self.add_line(f"{node.id}: .word {node.id} {methods_str}")
+        self.add_line(f"_{node.id}: .asciiz \"{node.id}\"")
+        self.add_line(f"{node.id}: .word {type_info.size} _{node.id} {methods_str}")
         self.add_line('')
 
     @visitor.when(CILDataNode)
@@ -136,13 +138,13 @@ class MIPSCodegen:
     @visitor.when(CILArgNode)
     def visit(self, node: CILArgNode, frame):
         frame.push_arg(node.var) # keep track of the args to be pass to the funcion to get the instance to bind the dynamic type
-        value_addr = frame.get_addr(node.var.id)
+        value_addr = frame.get_addr(node.var.lex)
         self.gen_push(value_addr)
      
     @visitor.when(CILIfGotoNode)
     def visit(self, node: CILIfGotoNode, frame):
         register = '$v1'
-        value_addr = frame.get_addr(node.var.id)
+        value_addr = frame.get_addr(node.var.lex)
         self.add_line(f'lw {register}, {value_addr}')
         self.add_line(f'bne {register}, $zero, {node.label.id}')
         
@@ -162,12 +164,6 @@ class MIPSCodegen:
         self.add_line(f'move {register0}, {register1}')
         self.add_line('')
 
-    @visitor.when(CILPrint)
-    def visit(self, node: CILPrint,frame):
-        value_addr = frame.get_addr(node.var.id)
-        self.add_line(f'lw $a0, {value_addr}')
-        self.add_line(f'li $v0, 1')
-        self.add_line(f'syscall')
 
     @visitor.when(CILExpressionNode)
     def visit(self, node: CILExpressionNode,frame):
@@ -223,7 +219,7 @@ class MIPSCodegen:
     def visit(self, node: CILVCallNode, frame):
         # the instance of type T is always the first argument to be passed to the function
         instance = frame.arg_queue[0]
-        instance_addr = self.visit(instance) # load into a register the address of the instance in the heap
+        instance_addr = self.visit(instance, frame) # load into a register the address of the instance in the heap
 
         register0 = '$v0'
         # register0 has the dynamic type address of the instance 
@@ -231,7 +227,7 @@ class MIPSCodegen:
         self.add_line('lw {register0}, {instance_addr}')
 
         # use the information of the static type to get the location of the method in memory
-        t = scope.types[node.type]
+        t = self.scope.types[node.type]
         method_addr = t.get_method_addr(node.func, register0)
 
         self.add_line(f'jal {method_addr}') # calls the method and by convention methods return in $v0
@@ -241,26 +237,12 @@ class MIPSCodegen:
 
     @visitor.when(CILLoadNode)
     def visit(self, node: CILLoadNode, frame):
-        self.add_line(f'#load the string {node.var.id}')
+        self.add_line(f'#load the string {node.var}')
         register = '$v0'
-        self.add_line(f'lw {register}, {node.var.id}')
+        self.add_line(f'lw {register}, {node.var}')
         return register
 
-    @visitor.when(CILLengthNode)
-    def visit(self, node: CILLengthNode, frame):
-        register = '$v0'
-        str_addr = frame.get_addr(node.var.id)
-        self.gen_push(str_addr)
-        self.add_line(f'jal strlen')
-        return register
 
-    @visitor.when(CILStringNode)
-    def visit(self, node: CILStringNode, frame):
-        register = '$v0'
-        int_addr = frame.get_addr(node.var.id)
-        self.gen_push(int_addr)
-        self.add_line(f'jal str')
-        return register
 
     @visitor.when(CILNumberNode)
     def visit(self, node: CILNumberNode, frame):
