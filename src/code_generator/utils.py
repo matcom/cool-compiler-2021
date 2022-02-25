@@ -122,6 +122,7 @@ class CILScope:
             CILMethodNode('out_int', 'out_int_IO'),
             CILMethodNode('in_string', 'in_string_IO'),
             CILMethodNode('in_int', 'in_int_IO'),
+            CILMethodNode('init', 'init_IO'),
         ])
         types.append(CILTypeNode('IO', [], io_methods))
         init_IO = CILFuncNode(
