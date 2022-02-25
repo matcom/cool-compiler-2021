@@ -139,9 +139,9 @@ class CilToMIPS:
         self.memory_manager.save()
         self.fp_save = self.memory_manager.get_unused_register()
         instructions.append(
-            mips.MoveNode(self.fp_save, FP_REG), f"save previous FP value"
+            mips.MoveNode(self.fp_save, FP_REG, f"save previous FP value")
         )
-        instructions.append(mips.MoveNode(FP_REG, SP_REG), f"FP <- SP")
+        instructions.append(mips.MoveNode(FP_REG, SP_REG, f"FP <- SP"))
 
         for i in range(len(node.params)):
             param = node.params[i]
@@ -644,8 +644,8 @@ class CilToMIPS:
             mips.StoreWordNode(
                 reg1,
                 mips.MemoryAddressRegisterNode(
-                    FP_REG, dest_dir, f"Save loaded value in destination"
-                ),
+                    FP_REG, dest_dir
+                ),f"Save loaded value in destination"
             )
         )
 
