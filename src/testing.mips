@@ -1,1943 +1,3635 @@
 # Genereted MIPS
 .text 
+
 __get_ra:
-move $v0, $ra
-addi $v0, $v0, 8
-jr $ra
+    move $v0, $ra
+    addi $v0, $v0, 8
+    jr $ra
+
 __copy:
-move $t0, $a0
-lw $t1, 0($t0)
-lw $a0, 4($t1)
-li $v0, 9
-syscall
-move $t1, $a0
-srl $t1, $t1, 2
-move $t3, $v0
-__start_copy_loop:
-ble $t1, $zero, __end_copy_loop
-lw $t2, 0($t0)
-sw $t2, 0($t3)
-addi $t0, $t0, 4
-addi $t3, $t3, 4
-addi $t1, $t1, -1
-j __start_copy_loop
-__end_copy_loop:
-jr $ra
+    move $t0, $a0
+    lw $t1, 0($t0)
+    lw $a0, 4($t1)
+    li $v0, 9
+    syscall
+    move $t1, $a0
+    srl $t1, $t1, 2
+    move $t3, $v0
+    __start_copy_loop:
+    ble $t1, $zero, __end_copy_loop
+    lw $t2, 0($t0)
+    sw $t2, 0($t3)
+    addi $t0, $t0, 4
+    addi $t3, $t3, 4
+    addi $t1, $t1, -1
+    j __start_copy_loop
+    __end_copy_loop:
+    jr $ra
+
 __string_length:
-# Actual String address
-lw $a0, 4($a0)
-# v0 = current length
-li $v0, 0
-__string_length_start_loop:
-lb $t0, 0($a0)
-beq $t0, $zero, __string_length_end_loop
-addi $v0, $v0, 1
-addi $a0, $a0, 1
-j __string_length_start_loop
-__string_length_end_loop:
-jr $ra
+    # Actual String address
+    lw $a0, 4($a0)
+    # v0 = current length
+    li $v0, 0
+    __string_length_start_loop:
+    lb $t0, 0($a0)
+    beq $t0, $zero, __string_length_end_loop
+    addi $v0, $v0, 1
+    addi $a0, $a0, 1
+    j __string_length_start_loop
+    __string_length_end_loop:
+    jr $ra
+
 __string_substring:
-# Save arguments
-addi $sp, $sp, -16
-# Save arguments
-sw $a0, 0($sp)
-# Save arguments
-sw $a1, 4($sp)
-# Save arguments
-sw $a2, 8($sp)
-# Save arguments
-sw $ra, 12($sp)
-# $v0 = length of string
-jal __string_length
-# Restore arguments
-lw $a0, 0($sp)
-# Restore arguments
-lw $a1, 4($sp)
-# Restore arguments
-lw $a2, 8($sp)
-# Restore arguments
-lw $ra, 12($sp)
-# Restore arguments
-addi $sp, $sp, 16
-# Actual String address
-lw $a0, 4($a0)
-# If index >= length(string) then abort
-bge $a1, $v0, __string_substring_abort
-# t0 = index + length
-add $t0, $a1, $a2
-# If index + length >= length(string) then abort
-bgt $t0, $v0, __string_substring_abort
-# If 0 < 0 then abort
-blt $a2, $zero, __string_substring_abort
-# Saving the string address
-move $t1, $a0
-# a0 = length + 1. Extra space for null character
-addi $a0, $a2, 1
-li $v0, 9
-syscall
-# Saving the new string address
-move $t2, $v0
-# Removing the last null space from copy
-addi $a0, $a0, -1
-# Advance index positions in original string
-add $t1, $t1, $a1
-__string_substring_start_copy:
-ble $a0, $zero, __string_substring_end_copy
-lb $t3, 0($t1)
-sb $t3, 0($t2)
-addi $t1, $t1, 1
-addi $t2, $t2, 1
-addi $a0, $a0, -1
-j __string_substring_start_copy
-__string_substring_end_copy:
-# Saving String Address
-move $v1, $v0
-# Type address into $a0
-la $t0, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t0, 0($v0)
-# Store String Address
-sw $v1, 4($v0)
-# Return the address of the new String
-jr $ra
-__string_substring_abort:
-addi $v0, $zero, 10
-syscall
+    # Save arguments
+    addi $sp, $sp, -16
+    # Save arguments
+    sw $a0, 0($sp)
+    # Save arguments
+    sw $a1, 4($sp)
+    # Save arguments
+    sw $a2, 8($sp)
+    # Save arguments
+    sw $ra, 12($sp)
+    # $v0 = length of string
+    jal __string_length
+    # Restore arguments
+    lw $a0, 0($sp)
+    # Restore arguments
+    lw $a1, 4($sp)
+    # Restore arguments
+    lw $a2, 8($sp)
+    # Restore arguments
+    lw $ra, 12($sp)
+    # Restore arguments
+    addi $sp, $sp, 16
+    # Actual String address
+    lw $a0, 4($a0)
+    # If index >= length(string) then abort
+    bge $a1, $v0, __string_substring_abort
+    # t0 = index + length
+    add $t0, $a1, $a2
+    # If index + length >= length(string) then abort
+    bgt $t0, $v0, __string_substring_abort
+    # If 0 < 0 then abort
+    blt $a2, $zero, __string_substring_abort
+    # Saving the string address
+    move $t1, $a0
+    # a0 = length + 1. Extra space for null character
+    addi $a0, $a2, 1
+    li $v0, 9
+    syscall
+    # Saving the new string address
+    move $t2, $v0
+    # Removing the last null space from copy
+    addi $a0, $a0, -1
+    # Advance index positions in original string
+    add $t1, $t1, $a1
+    __string_substring_start_copy:
+    ble $a0, $zero, __string_substring_end_copy
+    lb $t3, 0($t1)
+    sb $t3, 0($t2)
+    addi $t1, $t1, 1
+    addi $t2, $t2, 1
+    addi $a0, $a0, -1
+    j __string_substring_start_copy
+    __string_substring_end_copy:
+    # Saving String Address
+    move $v1, $v0
+    # Type address into $a0
+    la $t0, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t0, 0($v0)
+    # Store String Address
+    sw $v1, 4($v0)
+    # Return the address of the new String
+    jr $ra
+    __string_substring_abort:
+    addi $v0, $zero, 10
+    syscall
+
 __type_name:
-# $t0 = type name address
-lw $t0, 8($a0)
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Return the address of the String
-jr $ra
+    # $t0 = type name address
+    lw $t0, 8($a0)
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Return the address of the String
+    jr $ra
+
 __concat:
-addi $sp, $sp, -12
-sw $a0, 0($sp)
-sw $a1, 4($sp)
-sw $ra, 8($sp)
-jal __string_length
-lw $a0, 0($sp)
-lw $a1, 4($sp)
-lw $ra, 8($sp)
-addi $sp, $sp, 12
-move $t1, $a0
-move $a0, $a1
-move $a1, $t1
-move $t0, $v0
-addi $sp, $sp, -16
-sw $a0, 0($sp)
-sw $a1, 4($sp)
-sw $t0, 8($sp)
-sw $ra, 12($sp)
-jal __string_length
-lw $a0, 0($sp)
-lw $a1, 4($sp)
-lw $t0, 8($sp)
-lw $ra, 12($sp)
-addi $sp, $sp, 16
-move $t1, $a0
-move $a0, $a1
-move $a1, $t1
-lw $a0, 4($a0)
-lw $a1, 4($a1)
-move $t1, $a0
-add $t2, $v0, $t0
-addi $a0, $t2, 1
-move $t2, $v0
-li $v0, 9
-syscall
-# Save string address
-move $v1, $v0
-__concat_string1_copy_start_copy:
-ble $t0, $zero, __concat_string1_copy_end_copy
-lb $t3, 0($t1)
-sb $t3, 0($v1)
-addi $t1, $t1, 1
-addi $v1, $v1, 1
-addi $t0, $t0, -1
-j __concat_string1_copy_start_copy
-__concat_string1_copy_end_copy:
-__concat_string2_copy_start_copy:
-ble $t2, $zero, __concat_string2_copy_end_copy
-lb $t3, 0($a1)
-sb $t3, 0($v1)
-addi $a1, $a1, 1
-addi $v1, $v1, 1
-addi $t2, $t2, -1
-j __concat_string2_copy_start_copy
-__concat_string2_copy_end_copy:
-sb $zero, 0($v1)
-# Save string address
-move $v1, $v0
-# Type address into $a0
-la $t0, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t0, 0($v0)
-# Store String Address
-sw $v1, 4($v0)
-# Returns the concatenated string instance in v0
-jr $ra
+    addi $sp, $sp, -12
+    sw $a0, 0($sp)
+    sw $a1, 4($sp)
+    sw $ra, 8($sp)
+    jal __string_length
+    lw $a0, 0($sp)
+    lw $a1, 4($sp)
+    lw $ra, 8($sp)
+    addi $sp, $sp, 12
+    move $t1, $a0
+    move $a0, $a1
+    move $a1, $t1
+    move $t0, $v0
+    addi $sp, $sp, -16
+    sw $a0, 0($sp)
+    sw $a1, 4($sp)
+    sw $t0, 8($sp)
+    sw $ra, 12($sp)
+    jal __string_length
+    lw $a0, 0($sp)
+    lw $a1, 4($sp)
+    lw $t0, 8($sp)
+    lw $ra, 12($sp)
+    addi $sp, $sp, 16
+    move $t1, $a0
+    move $a0, $a1
+    move $a1, $t1
+    lw $a0, 4($a0)
+    lw $a1, 4($a1)
+    move $t1, $a0
+    add $t2, $v0, $t0
+    addi $a0, $t2, 1
+    move $t2, $v0
+    li $v0, 9
+    syscall
+    # Save string address
+    move $v1, $v0
+    __concat_string1_copy_start_copy:
+    ble $t0, $zero, __concat_string1_copy_end_copy
+    lb $t3, 0($t1)
+    sb $t3, 0($v1)
+    addi $t1, $t1, 1
+    addi $v1, $v1, 1
+    addi $t0, $t0, -1
+    j __concat_string1_copy_start_copy
+    __concat_string1_copy_end_copy:
+    __concat_string2_copy_start_copy:
+    ble $t2, $zero, __concat_string2_copy_end_copy
+    lb $t3, 0($a1)
+    sb $t3, 0($v1)
+    addi $a1, $a1, 1
+    addi $v1, $v1, 1
+    addi $t2, $t2, -1
+    j __concat_string2_copy_start_copy
+    __concat_string2_copy_end_copy:
+    sb $zero, 0($v1)
+    # Save string address
+    move $v1, $v0
+    # Type address into $a0
+    la $t0, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t0, 0($v0)
+    # Store String Address
+    sw $v1, 4($v0)
+    # Returns the concatenated string instance in v0
+    jr $ra
+    # String Equal Function
+
 __string_equal:
-# Actual String address
-lw $t0, 4($a0)
-# Actual String address
-lw $t1, 4($a1)
-__string_equal_start_loop:
-# Load string1 char
-lb $t2, 0($t0)
-# Load string2 char
-lb $t3, 0($t1)
-# Equal chars?
-seq $t4, $t2, $t3
-# If not equal then
-beq $t4, $zero, __string_equal_end_loop
-# Both strings ended
-beq $t2, $zero, __string_equal_end_loop
-# Next char
-addi $t0, $t0, 1
-# Next char
-addi $t1, $t1, 1
-j __string_equal_start_loop
-__string_equal_end_loop:
-# Assign return value
-move $v0, $t4
-jr $ra
+    # Actual String address
+    lw $t0, 4($a0)
+    # Actual String address
+    lw $t1, 4($a1)
+    __string_equal_start_loop:
+    # Load string1 char
+    lb $t2, 0($t0)
+    # Load string2 char
+    lb $t3, 0($t1)
+    # Equal chars?
+    seq $t4, $t2, $t3
+    # If not equal then
+    beq $t4, $zero, __string_equal_end_loop
+    # Both strings ended
+    beq $t2, $zero, __string_equal_end_loop
+    # Next char
+    addi $t0, $t0, 1
+    # Next char
+    addi $t1, $t1, 1
+    j __string_equal_start_loop
+    __string_equal_end_loop:
+    # Assign return value
+    move $v0, $t4
+    jr $ra
+    # Object Equal Function
+
 __object_equal:
-# Compare obj by address
-seq $v0, $a0, $a1
-# Equal Address or Value obj are equal
-bne $v0, $zero, __object_equal_end
-# Check if first obj is null
-seq $t0, $zero, $a0
-# Set v0 to False and return
-bne $t0, $zero, __object_equal_false_section
-# Check if second obj is null
-seq $t0, $zero, $a1
-# Set v0 to False and return
-bne $t0, $zero, __object_equal_false_section
-# t0 = left object
-move $t0, $a0
-# t1 = right object
-move $t1, $a1
-# t0=left objType
-lw $t0, 0($t0)
-# t1=right objType
-lw $t1, 0($t1)
-# Loading String type address for comparison
-la $t2, String
-# t0 = left type == String
-seq $t0, $t0, $t2
-# t1 = right type == String
-seq $t1, $t1, $t2
-# Both types are equal to String
-and $t0, $t0, $t1
-# If not equal return 0
-beq $t0, $zero, __object_equal_false_section
-addi $sp, $sp, -12
-sw $ra, 0($sp)
-sw $a0, 4($sp)
-sw $a1, 8($sp)
-jal __string_equal
-lw $ra, 0($sp)
-lw $a0, 4($sp)
-lw $a1, 8($sp)
-addi $sp, $sp, 12
-# Go to end
-j __object_equal_end
-# Do Obj cmp
-__object_equal_false_section:
-# Not equal objects
-move $v0, $zero
-# End cmp
-__object_equal_end:
-jr $ra
-# Remove Final Char
+    # Compare obj by address
+    seq $v0, $a0, $a1
+    # Equal Address or Value obj are equal
+    bne $v0, $zero, __object_equal_end
+    # Check if first obj is null
+    seq $t0, $zero, $a0
+    # Set v0 to False and return
+    bne $t0, $zero, __object_equal_false_section
+    # Check if second obj is null
+    seq $t0, $zero, $a1
+    # Set v0 to False and return
+    bne $t0, $zero, __object_equal_false_section
+    # t0 = left object
+    move $t0, $a0
+    # t1 = right object
+    move $t1, $a1
+    # t0=left objType
+    lw $t0, 0($t0)
+    # t1=right objType
+    lw $t1, 0($t1)
+    # Loading String type address for comparison
+    la $t2, String
+    # t0 = left type == String
+    seq $t0, $t0, $t2
+    # t1 = right type == String
+    seq $t1, $t1, $t2
+    # Both types are equal to String
+    and $t0, $t0, $t1
+    # If not equal return 0
+    beq $t0, $zero, __object_equal_false_section
+    addi $sp, $sp, -12
+    sw $ra, 0($sp)
+    sw $a0, 4($sp)
+    sw $a1, 8($sp)
+    jal __string_equal
+    lw $ra, 0($sp)
+    lw $a0, 4($sp)
+    lw $a1, 8($sp)
+    addi $sp, $sp, 12
+    # Go to end
+    j __object_equal_end
+    # Do Obj cmp
+    __object_equal_false_section:
+    # Not equal objects
+    move $v0, $zero
+    # End cmp
+    __object_equal_end:
+    jr $ra
+    # Remove Final Char
+
 __remove_last_char:
-# Actual String address
-lw $t0, 4($a0)
-# Get current char
-lb $t1, 0($t0)
-# if char is null then return
-beq $t1, $zero, __remove_last_char_return
-# Initial loop
-__remove_last_char_start:
-# Get current char
-lb $t1, 0($t0)
-# if char is null then break
-beq $t1, $zero, __remove_last_char_end
-# Increment address
-addi $t0, $t0, 1
-j __remove_last_char_start
-# End loop, removing last char
-__remove_last_char_end:
-# Back one char to last one
-addi $t0, $t0, -1
-# Store null character
-sb $zero, 0($t0)
-# Return, removing last char
-__remove_last_char_return:
-jr $ra
-# Program Node
+    # Actual String address
+    lw $t0, 4($a0)
+    # Get current char
+    lb $t1, 0($t0)
+    # if char is null then return
+    beq $t1, $zero, __remove_last_char_return
+    # Initial loop
+    __remove_last_char_start:
+    # Get current char
+    lb $t1, 0($t0)
+    # if char is null then break
+    beq $t1, $zero, __remove_last_char_end
+    # Increment address
+    addi $t0, $t0, 1
+    j __remove_last_char_start
+    # End loop, removing last char
+    __remove_last_char_end:
+    # Back one char to last one
+    addi $t0, $t0, -1
+    # Store null character
+    sb $zero, 0($t0)
+    # Return, removing last char
+    __remove_last_char_return:
+    jr $ra
+    # Program Node
+
 main:
-# Program Node
-addi $sp, $sp, -12
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# Instantiate Node
-la $a0, Main
-# Instantiate Node
-lw $a0, 4($a0)
-li $v0, 9
-syscall
-sw $v0, 8($fp)
-# Instantiate Node
-lw $t0, 8($fp)
-# Instantiate Node
-addi $sp, $sp, -4
-# Instantiate Node
-sw $t0, 0($sp)
-# Instantiate Node
-jal __init_Main_type
-# Instantiate Node
-sw $v0, 8($fp)
-lw $t0, 8($fp)
-addi $sp, $sp, -4
-sw $t0, 0($sp)
-# Program Node
-jal function_main_at_Main
-# Program Node
-sw $v0, 4($fp)
-# Program Node
-li $v0, 0
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 12
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -12
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+# Allocate
+    # Instantiate Node
+    la $a0, Main
+    # Instantiate Node
+    lw $a0, 4($a0)
+    li $v0, 9
+    syscall
+    sw $v0, 8($fp)
+    # Instantiate Node
+    lw $t0, 8($fp)
+    # Instantiate Node
+    addi $sp, $sp, -4
+    # Instantiate Node
+    sw $t0, 0($sp)
+    # Instantiate Node
+    jal __init_Main_type
+    # Instantiate Node
+    sw $v0, 8($fp)
+    lw $t0, 8($fp)
+    addi $sp, $sp, -4
+    sw $t0, 0($sp)
+    # Program Node
+    jal function_main_at_Main
+    # Program Node
+    sw $v0, 4($fp)
+    # Program Node
+    li $v0, 0
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 12
+    # Program Node
+    jr $ra
+    # Program Node
+
 type_distance:
-# Program Node
-addi $sp, $sp, -16
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# Program Node
-sw $zero, 12($fp)
-# Program Node
-li $t0, 0
-# Program Node
-sw $t0, 0($fp)
-# Program Node
-distance_label_0:
-# Program Node
-lw $t0, 20($fp)
-# Program Node
-lw $t1, 16($fp)
-# Program Node
-seq $t2, $t0, $t1
-# Program Node
-sw $t2, 4($fp)
-# Program Node
-lw $t0, 4($fp)
-# Program Node
-bne $t0, $zero, distance_label_1
-# Program Node
-lw $t0, 20($fp)
-# Program Node
-lw $t0, 0($t0)
-# Program Node
-sw $t0, 20($fp)
-# Program Node
-lw $t0, 20($fp)
-# Program Node
-lw $t1, 12($fp)
-# Program Node
-seq $t2, $t0, $t1
-# Program Node
-sw $t2, 8($fp)
-# Program Node
-lw $t0, 8($fp)
-# Program Node
-bne $t0, $zero, distance_label_2
-# Program Node
-lw $t0, 0($fp)
-# Program Node
-li $t1, 1
-# Program Node
-add $t2, $t0, $t1
-# Program Node
-sw $t2, 0($fp)
-# Program Node
-j distance_label_0
-# Program Node
-distance_label_2:
-# Program Node
-li $t0, -1
-# Program Node
-sw $t0, 0($fp)
-# Program Node
-distance_label_1:
-# Program Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 24
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -16
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Program Node
+    sw $zero, 12($fp)
+    # Program Node
+    li $t0, 0
+    # Program Node
+    sw $t0, 0($fp)
+    # Program Node
+    distance_label_0:
+    # Program Node
+    lw $t0, 20($fp)
+    # Program Node
+    lw $t1, 16($fp)
+    # Program Node
+    seq $t2, $t0, $t1
+    # Program Node
+    sw $t2, 4($fp)
+    # Program Node
+    lw $t0, 4($fp)
+    # Program Node
+    bne $t0, $zero, distance_label_1
+    # Program Node
+    lw $t0, 20($fp)
+    # Program Node
+    lw $t0, 0($t0)
+    # Program Node
+    sw $t0, 20($fp)
+    # Program Node
+    lw $t0, 20($fp)
+    # Program Node
+    lw $t1, 12($fp)
+    # Program Node
+    seq $t2, $t0, $t1
+    # Program Node
+    sw $t2, 8($fp)
+    # Program Node
+    lw $t0, 8($fp)
+    # Program Node
+    bne $t0, $zero, distance_label_2
+    # Program Node
+    lw $t0, 0($fp)
+    # Program Node
+    li $t1, 1
+    # Program Node
+    add $t2, $t0, $t1
+    # Program Node
+    sw $t2, 0($fp)
+    # Program Node
+    j distance_label_0
+    # Program Node
+    distance_label_2:
+    # Program Node
+    li $t0, -1
+    # Program Node
+    sw $t0, 0($fp)
+    # Program Node
+    distance_label_1:
+    # Program Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 24
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_length_at_String:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# String Length Node
-lw $a0, 4($fp)
-# String Length Node
-jal __string_length
-# String Length Node
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # String Length Node
+    lw $a0, 4($fp)
+    # String Length Node
+    jal __string_length
+    # String Length Node
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_concat_at_String:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# String Concat Node
-lw $a0, 8($fp)
-# String Concat Node
-lw $a1, 4($fp)
-# String Concat Node
-jal __concat
-# String Concat Node
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 12
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # String Concat Node
+    lw $a0, 8($fp)
+    # String Concat Node
+    lw $a1, 4($fp)
+    # String Concat Node
+    jal __concat
+    # String Concat Node
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 12
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_substr_at_String:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# String Substring Node
-lw $a0, 12($fp)
-# String Substring Node
-lw $a1, 8($fp)
-# String Substring Node
-lw $a2, 4($fp)
-# String Substring Node
-jal __string_substring
-# String Substring Node
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 16
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # String Substring Node
+    lw $a0, 12($fp)
+    # String Substring Node
+    lw $a1, 8($fp)
+    # String Substring Node
+    lw $a2, 4($fp)
+    # String Substring Node
+    jal __string_substring
+    # String Substring Node
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 16
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_abort_at_Bool:
-# Program Node
-addi $sp, $sp, -20
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-la $t0, data_2
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 0($fp)
-la $t0, data_6
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 4($fp)
-la $t0, data_7
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 8($fp)
-# Final abort message
-lw $a0, 4($fp)
-# Final abort message
-lw $a1, 0($fp)
-# Final abort message
-jal __concat
-# Final abort message
-sw $v0, 12($fp)
-# Final Final abort message
-lw $a0, 12($fp)
-# Final Final abort message
-lw $a1, 8($fp)
-# Final Final abort message
-jal __concat
-# Final Final abort message
-sw $v0, 16($fp)
-# Print abort info
-lw $a0, 16($fp)
-# Getting the String address
-lw $a0, 4($a0)
-# 4 System call code for print string
-addi $v0, $zero, 4
-syscall
-# Abort Bool
-addi $v0, $zero, 10
-# Abort Bool
-syscall
-# Func Declaration Node
-li $v0, 0
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 24
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -20
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    la $t0, data_2
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 0($fp)
+    la $t0, data_11
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 4($fp)
+    la $t0, data_12
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 8($fp)
+    # Final abort message
+    lw $a0, 4($fp)
+    # Final abort message
+    lw $a1, 0($fp)
+    # Final abort message
+    jal __concat
+    # Final abort message
+    sw $v0, 12($fp)
+    # Final Final abort message
+    lw $a0, 12($fp)
+    # Final Final abort message
+    lw $a1, 8($fp)
+    # Final Final abort message
+    jal __concat
+    # Final Final abort message
+    sw $v0, 16($fp)
+    # Print abort info
+    lw $a0, 16($fp)
+    # Getting the String address
+    lw $a0, 4($a0)
+    # 4 System call code for print string
+    addi $v0, $zero, 4
+    syscall
+    # Abort Bool
+    addi $v0, $zero, 10
+    # Abort Bool
+    syscall
+    # Func Declaration Node
+    li $v0, 0
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 24
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_type_name_at_Bool:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-la $t0, data_2
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    la $t0, data_2
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_abort_at_Int:
-# Program Node
-addi $sp, $sp, -20
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-la $t0, data_3
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 0($fp)
-la $t0, data_6
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 4($fp)
-la $t0, data_7
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 8($fp)
-# Final abort message
-lw $a0, 4($fp)
-# Final abort message
-lw $a1, 0($fp)
-# Final abort message
-jal __concat
-# Final abort message
-sw $v0, 12($fp)
-# Final Final abort message
-lw $a0, 12($fp)
-# Final Final abort message
-lw $a1, 8($fp)
-# Final Final abort message
-jal __concat
-# Final Final abort message
-sw $v0, 16($fp)
-# Print abort info
-lw $a0, 16($fp)
-# Getting the String address
-lw $a0, 4($a0)
-# 4 System call code for print string
-addi $v0, $zero, 4
-syscall
-# Abort Int
-addi $v0, $zero, 10
-# Abort Int
-syscall
-# Func Declaration Node
-li $v0, 0
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 24
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -20
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    la $t0, data_3
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 0($fp)
+    la $t0, data_11
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 4($fp)
+    la $t0, data_12
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 8($fp)
+    # Final abort message
+    lw $a0, 4($fp)
+    # Final abort message
+    lw $a1, 0($fp)
+    # Final abort message
+    jal __concat
+    # Final abort message
+    sw $v0, 12($fp)
+    # Final Final abort message
+    lw $a0, 12($fp)
+    # Final Final abort message
+    lw $a1, 8($fp)
+    # Final Final abort message
+    jal __concat
+    # Final Final abort message
+    sw $v0, 16($fp)
+    # Print abort info
+    lw $a0, 16($fp)
+    # Getting the String address
+    lw $a0, 4($a0)
+    # 4 System call code for print string
+    addi $v0, $zero, 4
+    syscall
+    # Abort Int
+    addi $v0, $zero, 10
+    # Abort Int
+    syscall
+    # Func Declaration Node
+    li $v0, 0
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 24
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_type_name_at_Int:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-la $t0, data_3
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
-function_abort_at_Object:
-# Program Node
-addi $sp, $sp, -24
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# Assign object type
-lw $t0, 24($fp)
-# Assign object type
-lw $t0, 0($t0)
-# Assign object type
-sw $t0, 0($fp)
-# Get type name
-lw $a0, 0($fp)
-# Get type name
-jal __type_name
-# Get type name
-sw $v0, 4($fp)
-la $t0, data_6
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 8($fp)
-la $t0, data_7
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 12($fp)
-# Final abort message
-lw $a0, 8($fp)
-# Final abort message
-lw $a1, 4($fp)
-# Final abort message
-jal __concat
-# Final abort message
-sw $v0, 16($fp)
-# Final Final abort message
-lw $a0, 16($fp)
-# Final Final abort message
-lw $a1, 12($fp)
-# Final Final abort message
-jal __concat
-# Final Final abort message
-sw $v0, 20($fp)
-# Print abort info
-lw $a0, 20($fp)
-# Getting the String address
-lw $a0, 4($a0)
-# 4 System call code for print string
-addi $v0, $zero, 4
-syscall
-# Abort Object
-addi $v0, $zero, 10
-# Abort Object
-syscall
-# Func Declaration Node
-li $v0, 0
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 28
-# Program Node
-jr $ra
-# Program Node
-function_type_name_at_Object:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# Object Type Name Node
-lw $t0, 4($fp)
-# Object Type Name Node
-lw $t0, 0($t0)
-# Object Type Name Node
-sw $t0, 0($fp)
-# Object Type Name Node
-lw $a0, 0($fp)
-# Object Type Name Node
-jal __type_name
-# Object Type Name Node
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
-function_copy_at_Object:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# Object Copy Node
-lw $a0, 4($fp)
-# Object Copy Node
-jal __copy
-# Object Copy Node
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    la $t0, data_3
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Init title at Book
+
+__init_title_at_Book:
+    # Init title at Book
+    addi $sp, $sp, -4
+    # Init title at Book
+    move $t0, $sp
+    # Init title at Book
+    addi $sp, $sp, -8
+    # Init title at Book
+    sw $ra, 0($sp)
+    # Init title at Book
+    sw $fp, 4($sp)
+    # Init title at Book
+    move $fp, $t0
+    # String Node
+    la $t0, data_13
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 0($fp)
+    # Attr Declaration Node
+    lw $t0, 4($fp)
+    # Attr Declaration Node
+    lw $t1, 0($fp)
+    # Attr Declaration Node
+    sw $t1, 4($t0)
+    # Init title at Book
+    lw $ra, 0($sp)
+    # Init title at Book
+    lw $fp, 4($sp)
+    # Init title at Book
+    addi $sp, $sp, 8
+    # Init title at Book
+    addi $sp, $sp, 8
+    # Init title at Book
+    jr $ra
+    # Init author at Book
+
+__init_author_at_Book:
+    # Init author at Book
+    addi $sp, $sp, -4
+    # Init author at Book
+    move $t0, $sp
+    # Init author at Book
+    addi $sp, $sp, -8
+    # Init author at Book
+    sw $ra, 0($sp)
+    # Init author at Book
+    sw $fp, 4($sp)
+    # Init author at Book
+    move $fp, $t0
+    # String Node
+    la $t0, data_14
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 0($fp)
+    # Attr Declaration Node
+    lw $t0, 4($fp)
+    # Attr Declaration Node
+    lw $t1, 0($fp)
+    # Attr Declaration Node
+    sw $t1, 8($t0)
+    # Init author at Book
+    lw $ra, 0($sp)
+    # Init author at Book
+    lw $fp, 4($sp)
+    # Init author at Book
+    addi $sp, $sp, 8
+    # Init author at Book
+    addi $sp, $sp, 8
+    # Init author at Book
+    jr $ra
+    # Program Node
+
+function_initBook_at_Book:
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Assign Node
+    lw $t0, 12($fp)
+    # Assign Node
+    lw $t1, 8($fp)
+    # Assign Node
+    sw $t1, 4($t0)
+    # Assign Node
+    lw $t0, 12($fp)
+    # Assign Node
+    lw $t1, 4($fp)
+    # Assign Node
+    sw $t1, 8($t0)
+    # Func Declaration Node
+    lw $v0, 12($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 16
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_print_at_Book:
+    # Program Node
+    addi $sp, $sp, -76
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # String Node
+    la $t0, data_15
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 4($fp)
+    # Call Node
+    lw $t0, 76($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 4($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 76($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 12($fp)
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 8($fp)
+    # Variable Node
+    lw $t0, 76($fp)
+    # Variable Node
+    lw $t0, 4($t0)
+    # Variable Node
+    sw $t0, 16($fp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 24($fp)
+    # Call Node
+    lw $t0, 24($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 20($fp)
+    # String Node
+    la $t0, data_16
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 28($fp)
+    # Call Node
+    lw $t0, 20($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 28($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 20($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 36($fp)
+    # Call Node
+    lw $t0, 36($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 32($fp)
+    # String Node
+    la $t0, data_17
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 40($fp)
+    # Call Node
+    lw $t0, 76($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 40($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 76($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 48($fp)
+    # Call Node
+    lw $t0, 48($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 44($fp)
+    # Variable Node
+    lw $t0, 76($fp)
+    # Variable Node
+    lw $t0, 8($t0)
+    # Variable Node
+    sw $t0, 52($fp)
+    # Call Node
+    lw $t0, 44($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 52($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 44($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 60($fp)
+    # Call Node
+    lw $t0, 60($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 56($fp)
+    # String Node
+    la $t0, data_18
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 64($fp)
+    # Call Node
+    lw $t0, 56($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 64($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 56($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 72($fp)
+    # Call Node
+    lw $t0, 72($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 68($fp)
+    # Func Declaration Node
+    lw $v0, 76($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 80
+    # Program Node
+    jr $ra
+    # Init per_title at Article
+
+__init_per_title_at_Article:
+    # Init per_title at Article
+    addi $sp, $sp, -4
+    # Init per_title at Article
+    move $t0, $sp
+    # Init per_title at Article
+    addi $sp, $sp, -8
+    # Init per_title at Article
+    sw $ra, 0($sp)
+    # Init per_title at Article
+    sw $fp, 4($sp)
+    # Init per_title at Article
+    move $fp, $t0
+    # String Node
+    la $t0, data_19
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 0($fp)
+    # Attr Declaration Node
+    lw $t0, 4($fp)
+    # Attr Declaration Node
+    lw $t1, 0($fp)
+    # Attr Declaration Node
+    sw $t1, 12($t0)
+    # Init per_title at Article
+    lw $ra, 0($sp)
+    # Init per_title at Article
+    lw $fp, 4($sp)
+    # Init per_title at Article
+    addi $sp, $sp, 8
+    # Init per_title at Article
+    addi $sp, $sp, 8
+    # Init per_title at Article
+    jr $ra
+    # Program Node
+
+function_initArticle_at_Article:
+    # Program Node
+    addi $sp, $sp, -12
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Call Node
+    lw $t0, 24($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 20($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 24($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 8($fp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    lw $t0, 52($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 4($fp)
+    # Assign Node
+    lw $t0, 24($fp)
+    # Assign Node
+    lw $t1, 12($fp)
+    # Assign Node
+    sw $t1, 12($t0)
+    # Func Declaration Node
+    lw $v0, 24($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 28
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_print_at_Article:
+    # Program Node
+    addi $sp, $sp, -44
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Call Node
+    lw $t0, 44($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    jal function_print_at_Book
+    # Call Node
+    sw $v0, 4($fp)
+    # String Node
+    la $t0, data_20
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 8($fp)
+    # Call Node
+    lw $t0, 44($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 44($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 16($fp)
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 12($fp)
+    # Variable Node
+    lw $t0, 44($fp)
+    # Variable Node
+    lw $t0, 12($t0)
+    # Variable Node
+    sw $t0, 20($fp)
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 20($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 28($fp)
+    # Call Node
+    lw $t0, 28($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 24($fp)
+    # String Node
+    la $t0, data_21
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 32($fp)
+    # Call Node
+    lw $t0, 24($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 32($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 24($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 40($fp)
+    # Call Node
+    lw $t0, 40($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 36($fp)
+    # Func Declaration Node
+    lw $v0, 44($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 48
+    # Program Node
+    jr $ra
+    # Init xcar at Cons
+
+__init_xcar_at_Cons:
+    # Init xcar at Cons
+    addi $sp, $sp, -4
+    # Init xcar at Cons
+    move $t0, $sp
+    # Init xcar at Cons
+    addi $sp, $sp, -8
+    # Init xcar at Cons
+    sw $ra, 0($sp)
+    # Init xcar at Cons
+    sw $fp, 4($sp)
+    # Init xcar at Cons
+    move $fp, $t0
+    # Instantiate Node
+    sw $zero, 0($fp)
+    # Attr Declaration Node
+    lw $t0, 4($fp)
+    # Attr Declaration Node
+    lw $t1, 0($fp)
+    # Attr Declaration Node
+    sw $t1, 4($t0)
+    # Init xcar at Cons
+    lw $ra, 0($sp)
+    # Init xcar at Cons
+    lw $fp, 4($sp)
+    # Init xcar at Cons
+    addi $sp, $sp, 8
+    # Init xcar at Cons
+    addi $sp, $sp, 8
+    # Init xcar at Cons
+    jr $ra
+    # Init xcdr at Cons
+
+__init_xcdr_at_Cons:
+    # Init xcdr at Cons
+    addi $sp, $sp, -4
+    # Init xcdr at Cons
+    move $t0, $sp
+    # Init xcdr at Cons
+    addi $sp, $sp, -8
+    # Init xcdr at Cons
+    sw $ra, 0($sp)
+    # Init xcdr at Cons
+    sw $fp, 4($sp)
+    # Init xcdr at Cons
+    move $fp, $t0
+    # Instantiate Node
+    sw $zero, 0($fp)
+    # Attr Declaration Node
+    lw $t0, 4($fp)
+    # Attr Declaration Node
+    lw $t1, 0($fp)
+    # Attr Declaration Node
+    sw $t1, 8($t0)
+    # Init xcdr at Cons
+    lw $ra, 0($sp)
+    # Init xcdr at Cons
+    lw $fp, 4($sp)
+    # Init xcdr at Cons
+    addi $sp, $sp, 8
+    # Init xcdr at Cons
+    addi $sp, $sp, 8
+    # Init xcdr at Cons
+    jr $ra
+    # Program Node
+
+function_isNil_at_Cons:
+    # Program Node
+    addi $sp, $sp, 0
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Func Declaration Node
+    li $v0, 0
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 4
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_init_at_Cons:
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Assign Node
+    lw $t0, 12($fp)
+    # Assign Node
+    lw $t1, 8($fp)
+    # Assign Node
+    sw $t1, 4($t0)
+    # Assign Node
+    lw $t0, 12($fp)
+    # Assign Node
+    lw $t1, 4($fp)
+    # Assign Node
+    sw $t1, 8($t0)
+    # Func Declaration Node
+    lw $v0, 12($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 16
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_car_at_Cons:
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Variable Node
+    lw $t0, 4($fp)
+    # Variable Node
+    lw $t0, 4($t0)
+    # Variable Node
+    sw $t0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_cdr_at_Cons:
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Variable Node
+    lw $t0, 4($fp)
+    # Variable Node
+    lw $t0, 8($t0)
+    # Variable Node
+    sw $t0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_print_list_at_Cons:
+    # Program Node
+    addi $sp, $sp, -112
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Variable Node
+    lw $t0, 112($fp)
+    # Variable Node
+    lw $t0, 4($t0)
+    # Variable Node
+    sw $t0, 4($fp)
+    # Call Node
+    lw $t0, 4($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 4($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 12($fp)
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    lw $t0, 56($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 8($fp)
+    # Case Node void isVoid
+    sw $zero, 24($fp)
+    # Case Node equal isVoid value isVoid
+    lw $t0, 8($fp)
+    # Case Node equal isVoid value isVoid
+    lw $t1, 24($fp)
+    # Case Node equal isVoid value isVoid
+    seq $t2, $t0, $t1
+    # Case Node equal isVoid value isVoid
+    sw $t2, 24($fp)
+    # Case Node gotoif isVoid abort_label
+    lw $t0, 24($fp)
+    # Case Node gotoif isVoid abort_label
+    bne $t0, $zero, print_list_at_Cons_label_0
+    # Case Node typeof value
+    lw $t0, 8($fp)
+    # Case Node typeof value
+    lw $t0, 0($t0)
+    # Case Node typeof value
+    sw $t0, 20($fp)
+    # Case Node array declaration
+    li $a0, 8
+    # Case Node array declaration
+    li $v0, 9
+    # Case Node array declaration
+    syscall
+    # Case Node array declaration
+    sw $v0, 28($fp)
+    # Case Node array setindex 0
+    li $t2, 0
+    # Case Node array setindex 0
+    la $t3, Book
+    # Case Node array setindex 0
+    lw $t1, 28($fp)
+    # Case Node array setindex 0
+    add $t1, $t1, $t2
+    # Case Node array setindex 0
+    sw $t3, 0($t1)
+    # Case Node array setindex 1
+    li $t2, 4
+    # Case Node array setindex 1
+    la $t3, Article
+    # Case Node array setindex 1
+    lw $t1, 28($fp)
+    # Case Node array setindex 1
+    add $t1, $t1, $t2
+    # Case Node array setindex 1
+    sw $t3, 0($t1)
+    # Case Node assign index -1
+    li $t0, -1
+    # Case Node assign index -1
+    sw $t0, 32($fp)
+    # Case Node assign minim -2
+    li $t0, -2
+    # Case Node assign minim -2
+    sw $t0, 40($fp)
+    # Case Node start label
+    print_list_at_Cons_label_1:
+    # Case Node plus index 1
+    lw $t0, 32($fp)
+    # Case Node plus index 1
+    li $t1, 1
+    # Case Node plus index 1
+    add $t2, $t0, $t1
+    # Case Node plus index 1
+    sw $t2, 32($fp)
+    # Case Node equal stop_for index checks
+    lw $t0, 32($fp)
+    # Case Node equal stop_for index checks
+    li $t1, 2
+    # Case Node equal stop_for index checks
+    seq $t2, $t0, $t1
+    # Case Node equal stop_for index checks
+    sw $t2, 52($fp)
+    # Case Node gotoif stop_for end_label
+    lw $t0, 52($fp)
+    # Case Node gotoif stop_for end_label
+    bne $t0, $zero, print_list_at_Cons_label_3
+    # Case Node get_index array_types index
+    lw $t0, 32($fp)
+    # Case Node get_index array_types index
+    li $t2, 4
+    # Case Node get_index array_types index
+    mul $t2, $t2, $t0
+    # Case Node get_index array_types index
+    lw $t1, 28($fp)
+    # Case Node get_index array_types index
+    add $t1, $t1, $t2
+    # Case Node get_index array_types index
+    lw $t2, 0($t1)
+    # Case Node get_index array_types index
+    sw $t2, 48($fp)
+    # Case Node arg type_value
+    lw $t0, 20($fp)
+    # Case Node arg type_value
+    addi $sp, $sp, -4
+    # Case Node arg type_value
+    sw $t0, 0($sp)
+    # Case Node arg current_type
+    lw $t0, 48($fp)
+    # Case Node arg current_type
+    addi $sp, $sp, -4
+    # Case Node arg current_type
+    sw $t0, 0($sp)
+    # Case Node static_call type_distance
+    jal type_distance
+    # Case Node static_call type_distance
+    sw $v0, 44($fp)
+    # Case Node equal not_valid_distance distance -1
+    lw $t0, 44($fp)
+    # Case Node equal not_valid_distance distance -1
+    li $t1, -1
+    # Case Node equal not_valid_distance distance -1
+    seq $t2, $t0, $t1
+    # Case Node equal not_valid_distance distance -1
+    sw $t2, 56($fp)
+    # Case Node gotoif not_valid_distance start_label
+    lw $t0, 56($fp)
+    # Case Node gotoif not_valid_distance start_label
+    bne $t0, $zero, print_list_at_Cons_label_1
+    # Case Node equal minim_cond minim -2
+    lw $t0, 40($fp)
+    # Case Node equal minim_cond minim -2
+    li $t1, -2
+    # Case Node equal minim_cond minim -2
+    seq $t2, $t0, $t1
+    # Case Node equal minim_cond minim -2
+    sw $t2, 60($fp)
+    # Case Node gotoif minim_cond minim_label
+    lw $t0, 60($fp)
+    # Case Node gotoif minim_cond minim_label
+    bne $t0, $zero, print_list_at_Cons_label_2
+    # Case Node greater minim_cond minim distance
+    lw $t0, 40($fp)
+    # Case Node greater minim_cond minim distance
+    lw $t1, 44($fp)
+    # Case Node greater minim_cond minim distance
+    sgt $t2, $t0, $t1
+    # Case Node greater minim_cond minim distance
+    sw $t2, 60($fp)
+    # Case Node gotoif minim_cond minim_label
+    lw $t0, 60($fp)
+    # Case Node gotoif minim_cond minim_label
+    bne $t0, $zero, print_list_at_Cons_label_2
+    # Case Node goto start_label
+    j print_list_at_Cons_label_1
+    # Case Node minim label
+    print_list_at_Cons_label_2:
+    # Case Node assign minim distance
+    lw $t0, 44($fp)
+    # Case Node assign minim distance
+    sw $t0, 40($fp)
+    # Case Node assign minim_index index
+    lw $t0, 32($fp)
+    # Case Node assign minim_index index
+    sw $t0, 36($fp)
+    # Case Node goto start_label
+    j print_list_at_Cons_label_1
+    # Case Node end label
+    print_list_at_Cons_label_3:
+    # Case Node equal minim_cond minim -2
+    lw $t0, 40($fp)
+    # Case Node equal minim_cond minim -2
+    li $t1, -2
+    # Case Node equal minim_cond minim -2
+    seq $t2, $t0, $t1
+    # Case Node equal minim_cond minim -2
+    sw $t2, 60($fp)
+    # Case Node gotoif minim_cond abort_label
+    lw $t0, 60($fp)
+    # Case Node gotoif minim_cond abort_label
+    bne $t0, $zero, print_list_at_Cons_label_0
+    # Case Node get_index array_types minim_index
+    lw $t0, 36($fp)
+    # Case Node get_index array_types minim_index
+    li $t2, 4
+    # Case Node get_index array_types minim_index
+    mul $t2, $t2, $t0
+    # Case Node get_index array_types minim_index
+    lw $t1, 28($fp)
+    # Case Node get_index array_types minim_index
+    add $t1, $t1, $t2
+    # Case Node get_index array_types minim_index
+    lw $t2, 0($t1)
+    # Case Node get_index array_types minim_index
+    sw $t2, 48($fp)
+    # Case Node equal not_equal_types param.type.name current_type
+    la $t0, Book
+    # Case Node equal not_equal_types param.type.name current_type
+    lw $t1, 48($fp)
+    # Case Node equal not_equal_types param.type.name current_type
+    seq $t2, $t0, $t1
+    # Case Node equal not_equal_types param.type.name current_type
+    sw $t2, 64($fp)
+    # Case Node not not_equal_types not_equal_types
+    lw $t0, 64($fp)
+    # Case Node not not_equal_types not_equal_types
+    seq $t0, $t0, $zero
+    # Case Node not not_equal_types not_equal_types
+    sw $t0, 64($fp)
+    # Case Node gotoif not_equal_types lbl.label
+    lw $t0, 64($fp)
+    # Case Node gotoif not_equal_types lbl.label
+    bne $t0, $zero, print_list_at_Cons_label_5
+    # Check Node
+    lw $t0, 8($fp)
+    # Check Node
+    sw $t0, 68($fp)
+    # String Node
+    la $t0, data_22
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 72($fp)
+    # Call Node
+    lw $t0, 112($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 72($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 112($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 80($fp)
+    # Call Node
+    lw $t0, 80($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 76($fp)
+    # Case Node assign final_result result
+    lw $t0, 76($fp)
+    # Case Node assign final_result result
+    sw $t0, 16($fp)
+    # Case Node goto final_label
+    j print_list_at_Cons_label_4
+    # Case Node end_label <cool.ast.cool_ast.CheckNode object at 0x7fdcdddaea00>
+    print_list_at_Cons_label_5:
+    # Case Node equal not_equal_types param.type.name current_type
+    la $t0, Article
+    # Case Node equal not_equal_types param.type.name current_type
+    lw $t1, 48($fp)
+    # Case Node equal not_equal_types param.type.name current_type
+    seq $t2, $t0, $t1
+    # Case Node equal not_equal_types param.type.name current_type
+    sw $t2, 64($fp)
+    # Case Node not not_equal_types not_equal_types
+    lw $t0, 64($fp)
+    # Case Node not not_equal_types not_equal_types
+    seq $t0, $t0, $zero
+    # Case Node not not_equal_types not_equal_types
+    sw $t0, 64($fp)
+    # Case Node gotoif not_equal_types lbl.label
+    lw $t0, 64($fp)
+    # Case Node gotoif not_equal_types lbl.label
+    bne $t0, $zero, print_list_at_Cons_label_6
+    # Check Node
+    lw $t0, 8($fp)
+    # Check Node
+    sw $t0, 84($fp)
+    # String Node
+    la $t0, data_23
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 88($fp)
+    # Call Node
+    lw $t0, 112($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 88($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 112($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 96($fp)
+    # Call Node
+    lw $t0, 96($fp)
+    # Call Node
+    lw $t0, 28($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 92($fp)
+    # Case Node assign final_result result
+    lw $t0, 92($fp)
+    # Case Node assign final_result result
+    sw $t0, 16($fp)
+    # Case Node goto final_label
+    j print_list_at_Cons_label_4
+    # Case Node end_label <cool.ast.cool_ast.CheckNode object at 0x7fdcdddae940>
+    print_list_at_Cons_label_6:
+    # Case Node abort label
+    print_list_at_Cons_label_0:
+    # Case Node abort
+    addi $v0, $zero, 10
+    # Case Node abort
+    syscall
+    # Case Node final_label
+    print_list_at_Cons_label_4:
+    # Variable Node
+    lw $t0, 112($fp)
+    # Variable Node
+    lw $t0, 8($t0)
+    # Variable Node
+    sw $t0, 100($fp)
+    # Call Node
+    lw $t0, 100($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 100($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 108($fp)
+    # Call Node
+    lw $t0, 108($fp)
+    # Call Node
+    lw $t0, 60($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 104($fp)
+    # Func Declaration Node
+    lw $v0, 104($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 116
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_out_string_at_IO:
-# Program Node
-addi $sp, $sp, 0
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# IO Out String Node
-lw $a0, 0($fp)
-# Getting the String address
-lw $a0, 4($a0)
-# 4 System call code for print string
-addi $v0, $zero, 4
-syscall
-# Func Declaration Node
-lw $v0, 4($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, 0
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # IO Out String Node
+    lw $a0, 0($fp)
+    # Getting the String address
+    lw $a0, 4($a0)
+    # 4 System call code for print string
+    addi $v0, $zero, 4
+    syscall
+    # Func Declaration Node
+    lw $v0, 4($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_out_int_at_IO:
-# Program Node
-addi $sp, $sp, 0
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# IO Out Int Node
-lw $a0, 0($fp)
-# IO Out Int Node
-addi $v0, $zero, 1
-# IO Out Int Node
-syscall
-# Func Declaration Node
-lw $v0, 4($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, 0
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # IO Out Int Node
+    lw $a0, 0($fp)
+    # IO Out Int Node
+    addi $v0, $zero, 1
+    # IO Out Int Node
+    syscall
+    # Func Declaration Node
+    lw $v0, 4($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_in_string_at_IO:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# a1 = Allocated length Save the length in a1
-li $a1, 1024
-# Allocates 1024 bytes and return the address un v0
-move $a0, $a1
-# Allocates 1024 bytes and return the address un v0
-li $v0, 9
-# Allocates 1024 bytes and return the address un v0
-syscall
-# a0 = v0 Save the address in a0
-move $a0, $v0
-# 8 System call code for read string
-addi $v0, $zero, 8
-# Fills the address in a0 with the string
-syscall
-# a1 = a0 Save the address in a1
-move $a1, $a0
-# Type address into $a0
-la $t0, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t0, 0($v0)
-# Store String Address
-sw $a1, 4($v0)
-# a0 = v0 Get the string instance address
-move $a0, $v0
-addi $sp, $sp, -4
-sw $ra, 0($sp)
-# Remove last char
-jal __remove_last_char
-lw $ra, 0($sp)
-addi $sp, $sp, 4
-# Save the address in the final destination
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # a1 = Allocated length Save the length in a1
+    li $a1, 1024
+    # Allocates 1024 bytes and return the address un v0
+    move $a0, $a1
+    # Allocates 1024 bytes and return the address un v0
+    li $v0, 9
+    # Allocates 1024 bytes and return the address un v0
+    syscall
+    # a0 = v0 Save the address in a0
+    move $a0, $v0
+    # 8 System call code for read string
+    addi $v0, $zero, 8
+    # Fills the address in a0 with the string
+    syscall
+    # a1 = a0 Save the address in a1
+    move $a1, $a0
+    # Type address into $a0
+    la $t0, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t0, 0($v0)
+    # Store String Address
+    sw $a1, 4($v0)
+    # a0 = v0 Get the string instance address
+    move $a0, $v0
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    # Remove last char
+    jal __remove_last_char
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    # Save the address in the final destination
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
 function_in_int_at_IO:
-# Program Node
-addi $sp, $sp, -4
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# IO In Int Node
-addi $v0, $zero, 5
-# IO In Int Node
-syscall
-# IO In Int Node
-sw $v0, 0($fp)
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-jr $ra
-# Init i at Main
-__init_i_at_Main:
-# Init i at Main
-addi $sp, $sp, 0
-# Init i at Main
-move $t0, $sp
-# Init i at Main
-addi $sp, $sp, -8
-# Init i at Main
-sw $ra, 0($sp)
-# Init i at Main
-sw $fp, 4($sp)
-# Init i at Main
-move $fp, $t0
-# Attr Declaration Node
-lw $t0, 0($fp)
-# Attr Declaration Node
-li $t1, 0
-# Attr Declaration Node
-sw $t1, 4($t0)
-# Init i at Main
-lw $ra, 0($sp)
-# Init i at Main
-lw $fp, 4($sp)
-# Init i at Main
-addi $sp, $sp, 8
-# Init i at Main
-addi $sp, $sp, 4
-# Init i at Main
-jr $ra
-# Program Node
-function_pal_at_Main:
-# Program Node
-addi $sp, $sp, -96
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 12($fp)
-# Call Node
-lw $t0, 12($fp)
-# Call Node
-lw $t0, 28($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 8($fp)
-# Equal Node
-lw $t0, 8($fp)
-# Equal Node
-li $t1, 0
-# Equal Node
-seq $t2, $t0, $t1
-# Equal Node
-sw $t2, 4($fp)
-# Conditional Node
-lw $t0, 4($fp)
-# Conditional Node
-bne $t0, $zero, pal_at_Main_label_0
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 28($fp)
-# Call Node
-lw $t0, 28($fp)
-# Call Node
-lw $t0, 28($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 24($fp)
-# Equal Node
-lw $t0, 24($fp)
-# Equal Node
-li $t1, 1
-# Equal Node
-seq $t2, $t0, $t1
-# Equal Node
-sw $t2, 20($fp)
-# Conditional Node
-lw $t0, 20($fp)
-# Conditional Node
-bne $t0, $zero, pal_at_Main_label_2
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-li $t0, 0
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-li $t0, 1
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 44($fp)
-# Call Node
-lw $t0, 44($fp)
-# Call Node
-lw $t0, 36($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 40($fp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 52($fp)
-# Call Node
-lw $t0, 52($fp)
-# Call Node
-lw $t0, 28($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 48($fp)
-# Minus Node
-lw $t0, 48($fp)
-# Minus Node
-li $t1, 1
-# Minus Node
-sub $t2, $t0, $t1
-# Minus Node
-sw $t2, 56($fp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 56($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-li $t0, 1
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 64($fp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-lw $t0, 36($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 60($fp)
-# a0 = left object
-lw $a0, 40($fp)
-# a1 = right object
-lw $a1, 60($fp)
-addi $sp, $sp, -4
-sw $ra, 0($sp)
-jal __object_equal
-lw $ra, 0($sp)
-addi $sp, $sp, 4
-# Saving equal result
-sw $v0, 36($fp)
-# Conditional Node
-lw $t0, 36($fp)
-# Conditional Node
-bne $t0, $zero, pal_at_Main_label_4
-# Conditional Node
-li $t0, 0
-# Conditional Node
-sw $t0, 32($fp)
-# Conditional Node
-j pal_at_Main_label_5
-# Conditional Node
-pal_at_Main_label_4:
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 72($fp)
-# Call Node
-lw $t0, 72($fp)
-# Call Node
-lw $t0, 28($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 68($fp)
-# Minus Node
-lw $t0, 68($fp)
-# Minus Node
-li $t1, 2
-# Minus Node
-sub $t2, $t0, $t1
-# Minus Node
-sw $t2, 76($fp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-li $t0, 1
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 76($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 96($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 84($fp)
-# Call Node
-lw $t0, 84($fp)
-# Call Node
-lw $t0, 36($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 80($fp)
-# Call Node
-lw $t0, 100($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 80($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 100($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 92($fp)
-# Call Node
-lw $t0, 92($fp)
-# Call Node
-lw $t0, 48($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 88($fp)
-# Conditional Node
-lw $t0, 88($fp)
-# Conditional Node
-sw $t0, 32($fp)
-# Conditional Node
-pal_at_Main_label_5:
-# Conditional Node
-lw $t0, 32($fp)
-# Conditional Node
-sw $t0, 16($fp)
-# Conditional Node
-j pal_at_Main_label_3
-# Conditional Node
-pal_at_Main_label_2:
-# Conditional Node
-li $t0, 1
-# Conditional Node
-sw $t0, 16($fp)
-# Conditional Node
-pal_at_Main_label_3:
-# Conditional Node
-lw $t0, 16($fp)
-# Conditional Node
-sw $t0, 0($fp)
-# Conditional Node
-j pal_at_Main_label_1
-# Conditional Node
-pal_at_Main_label_0:
-# Conditional Node
-li $t0, 1
-# Conditional Node
-sw $t0, 0($fp)
-# Conditional Node
-pal_at_Main_label_1:
-# Func Declaration Node
-lw $v0, 0($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 104
-# Program Node
-jr $ra
-# Program Node
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # IO In Int Node
+    addi $v0, $zero, 5
+    # IO In Int Node
+    syscall
+    # IO In Int Node
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_isNil_at_BookList:
+    # Program Node
+    addi $sp, $sp, -12
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 8($fp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    lw $t0, 16($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 4($fp)
+    # Func Declaration Node
+    li $v0, 1
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 16
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_cons_at_BookList:
+    # Program Node
+    addi $sp, $sp, -16
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+# Allocate
+    # Instantiate Node
+    la $a0, Cons
+    # Instantiate Node
+    lw $a0, 4($a0)
+    li $v0, 9
+    syscall
+    sw $v0, 4($fp)
+    # Instantiate Node
+    lw $t0, 4($fp)
+    # Instantiate Node
+    addi $sp, $sp, -4
+    # Instantiate Node
+    sw $t0, 0($sp)
+    # Instantiate Node
+    jal __init_Cons_type
+    # Instantiate Node
+    sw $v0, 4($fp)
+    # Var Declaration Node
+    lw $t0, 4($fp)
+    # Var Declaration Node
+    sw $t0, 0($fp)
+    # Call Node
+    lw $t0, 0($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 20($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 0($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 12($fp)
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    lw $t0, 72($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 8($fp)
+    # Func Declaration Node
+    lw $v0, 8($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 24
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_car_at_BookList:
+    # Program Node
+    addi $sp, $sp, -16
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 8($fp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    lw $t0, 16($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 4($fp)
+# Allocate
+    # Instantiate Node
+    la $a0, Book
+    # Instantiate Node
+    lw $a0, 4($a0)
+    li $v0, 9
+    syscall
+    sw $v0, 12($fp)
+    # Instantiate Node
+    lw $t0, 12($fp)
+    # Instantiate Node
+    addi $sp, $sp, -4
+    # Instantiate Node
+    sw $t0, 0($sp)
+    # Instantiate Node
+    jal __init_Book_type
+    # Instantiate Node
+    sw $v0, 12($fp)
+    # Func Declaration Node
+    lw $v0, 12($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 20
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_cdr_at_BookList:
+    # Program Node
+    addi $sp, $sp, -16
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 16($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 8($fp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    lw $t0, 16($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 4($fp)
+# Allocate
+    # Instantiate Node
+    la $a0, BookList
+    # Instantiate Node
+    lw $a0, 4($a0)
+    li $v0, 9
+    syscall
+    sw $v0, 12($fp)
+    # Instantiate Node
+    lw $t0, 12($fp)
+    # Instantiate Node
+    addi $sp, $sp, -4
+    # Instantiate Node
+    sw $t0, 0($sp)
+    # Instantiate Node
+    jal __init_BookList_type
+    # Instantiate Node
+    sw $v0, 12($fp)
+    # Func Declaration Node
+    lw $v0, 12($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 20
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_print_list_at_BookList:
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 4($fp)
+    # Call Node
+    lw $t0, 4($fp)
+    # Call Node
+    lw $t0, 16($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 12
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_isNil_at_Nil:
+    # Program Node
+    addi $sp, $sp, 0
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Func Declaration Node
+    li $v0, 1
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 4
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_print_list_at_Nil:
+    # Program Node
+    addi $sp, $sp, 0
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Func Declaration Node
+    li $v0, 1
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 4
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_abort_at_Object:
+    # Program Node
+    addi $sp, $sp, -24
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Assign object type
+    lw $t0, 24($fp)
+    # Assign object type
+    lw $t0, 0($t0)
+    # Assign object type
+    sw $t0, 0($fp)
+    # Get type name
+    lw $a0, 0($fp)
+    # Get type name
+    jal __type_name
+    # Get type name
+    sw $v0, 4($fp)
+    la $t0, data_11
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 8($fp)
+    la $t0, data_12
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 12($fp)
+    # Final abort message
+    lw $a0, 8($fp)
+    # Final abort message
+    lw $a1, 4($fp)
+    # Final abort message
+    jal __concat
+    # Final abort message
+    sw $v0, 16($fp)
+    # Final Final abort message
+    lw $a0, 16($fp)
+    # Final Final abort message
+    lw $a1, 12($fp)
+    # Final Final abort message
+    jal __concat
+    # Final Final abort message
+    sw $v0, 20($fp)
+    # Print abort info
+    lw $a0, 20($fp)
+    # Getting the String address
+    lw $a0, 4($a0)
+    # 4 System call code for print string
+    addi $v0, $zero, 4
+    syscall
+    # Abort Object
+    addi $v0, $zero, 10
+    # Abort Object
+    syscall
+    # Func Declaration Node
+    li $v0, 0
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 28
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_type_name_at_Object:
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Object Type Name Node
+    lw $t0, 4($fp)
+    # Object Type Name Node
+    lw $t0, 0($t0)
+    # Object Type Name Node
+    sw $t0, 0($fp)
+    # Object Type Name Node
+    lw $a0, 0($fp)
+    # Object Type Name Node
+    jal __type_name
+    # Object Type Name Node
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Program Node
+
+function_copy_at_Object:
+    # Program Node
+    addi $sp, $sp, -4
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+    # Object Copy Node
+    lw $a0, 4($fp)
+    # Object Copy Node
+    jal __copy
+    # Object Copy Node
+    sw $v0, 0($fp)
+    # Func Declaration Node
+    lw $v0, 0($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    jr $ra
+    # Init books at Main
+
+__init_books_at_Main:
+    # Init books at Main
+    addi $sp, $sp, -4
+    # Init books at Main
+    move $t0, $sp
+    # Init books at Main
+    addi $sp, $sp, -8
+    # Init books at Main
+    sw $ra, 0($sp)
+    # Init books at Main
+    sw $fp, 4($sp)
+    # Init books at Main
+    move $fp, $t0
+    # Instantiate Node
+    sw $zero, 0($fp)
+    # Attr Declaration Node
+    lw $t0, 4($fp)
+    # Attr Declaration Node
+    lw $t1, 0($fp)
+    # Attr Declaration Node
+    sw $t1, 4($t0)
+    # Init books at Main
+    lw $ra, 0($sp)
+    # Init books at Main
+    lw $fp, 4($sp)
+    # Init books at Main
+    addi $sp, $sp, 8
+    # Init books at Main
+    addi $sp, $sp, 8
+    # Init books at Main
+    jr $ra
+    # Program Node
+
 function_main_at_Main:
-# Program Node
-addi $sp, $sp, -64
-# Program Node
-move $t0, $sp
-# Program Node
-addi $sp, $sp, -8
-# Program Node
-sw $ra, 0($sp)
-# Program Node
-sw $fp, 4($sp)
-# Program Node
-move $fp, $t0
-# Roof Node
-li $t0, 0
-# Roof Node
-li $t1, 1
-# Roof Node
-sub $t2, $t0, $t1
-# Roof Node
-sw $t2, 4($fp)
-# Assign Node
-lw $t0, 64($fp)
-# Assign Node
-lw $t1, 4($fp)
-# Assign Node
-sw $t1, 4($t0)
-# String Node
-la $t0, data_8
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 8($fp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 8($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 16($fp)
-# Call Node
-lw $t0, 16($fp)
-# Call Node
-lw $t0, 28($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 12($fp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 28($fp)
-# Call Node
-lw $t0, 28($fp)
-# Call Node
-lw $t0, 36($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 24($fp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 24($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 36($fp)
-# Call Node
-lw $t0, 36($fp)
-# Call Node
-lw $t0, 48($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 32($fp)
-# Conditional Node
-lw $t0, 32($fp)
-# Conditional Node
-bne $t0, $zero, main_at_Main_label_0
-# String Node
-la $t0, data_9
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 40($fp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 40($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 48($fp)
-# Call Node
-lw $t0, 48($fp)
-# Call Node
-lw $t0, 28($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 44($fp)
-# Conditional Node
-lw $t0, 44($fp)
-# Conditional Node
-sw $t0, 20($fp)
-# Conditional Node
-j main_at_Main_label_1
-# Conditional Node
-main_at_Main_label_0:
-# String Node
-la $t0, data_10
-# Type address into $a0
-la $t1, String
-# If String the is type and address
-li $a0, 8
-li $v0, 9
-syscall
-# Store String Type
-sw $t1, 0($v0)
-# Store String Address
-sw $t0, 4($v0)
-# Save string instance
-sw $v0, 52($fp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 52($fp)
-# Call Node
-addi $sp, $sp, -4
-# Call Node
-sw $t0, 0($sp)
-# Call Node
-lw $t0, 64($fp)
-# Call Node
-lw $t0, 0($t0)
-# Call Node
-sw $t0, 60($fp)
-# Call Node
-lw $t0, 60($fp)
-# Call Node
-lw $t0, 28($t0)
-# Call Node
-jal __get_ra
-# Call Node
-move $ra, $v0
-# Call Node
-jr $t0
-# Call Node
-sw $v0, 56($fp)
-# Conditional Node
-lw $t0, 56($fp)
-# Conditional Node
-sw $t0, 20($fp)
-# Conditional Node
-main_at_Main_label_1:
-# Func Declaration Node
-lw $v0, 20($fp)
-# Program Node
-lw $ra, 0($sp)
-# Program Node
-lw $fp, 4($sp)
-# Program Node
-addi $sp, $sp, 8
-# Program Node
-addi $sp, $sp, 68
-# Program Node
-jr $ra
-# Class Declaration Node
+    # Program Node
+    addi $sp, $sp, -88
+    # Program Node
+    move $t0, $sp
+    # Program Node
+    addi $sp, $sp, -8
+    # Program Node
+    sw $ra, 0($sp)
+    # Program Node
+    sw $fp, 4($sp)
+    # Program Node
+    move $fp, $t0
+# Allocate
+    # Instantiate Node
+    la $a0, Book
+    # Instantiate Node
+    lw $a0, 4($a0)
+    li $v0, 9
+    syscall
+    sw $v0, 4($fp)
+    # Instantiate Node
+    lw $t0, 4($fp)
+    # Instantiate Node
+    addi $sp, $sp, -4
+    # Instantiate Node
+    sw $t0, 0($sp)
+    # Instantiate Node
+    jal __init_Book_type
+    # Instantiate Node
+    sw $v0, 4($fp)
+    # String Node
+    la $t0, data_24
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 8($fp)
+    # String Node
+    la $t0, data_25
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 12($fp)
+    # Call Node
+    lw $t0, 4($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 8($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 12($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 4($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 20($fp)
+    # Call Node
+    lw $t0, 20($fp)
+    # Call Node
+    lw $t0, 52($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 16($fp)
+    # Var Declaration Node
+    lw $t0, 16($fp)
+    # Var Declaration Node
+    sw $t0, 0($fp)
+# Allocate
+    # Instantiate Node
+    la $a0, Article
+    # Instantiate Node
+    lw $a0, 4($a0)
+    li $v0, 9
+    syscall
+    sw $v0, 28($fp)
+    # Instantiate Node
+    lw $t0, 28($fp)
+    # Instantiate Node
+    addi $sp, $sp, -4
+    # Instantiate Node
+    sw $t0, 0($sp)
+    # Instantiate Node
+    jal __init_Article_type
+    # Instantiate Node
+    sw $v0, 28($fp)
+    # String Node
+    la $t0, data_26
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 32($fp)
+    # String Node
+    la $t0, data_27
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 36($fp)
+    # String Node
+    la $t0, data_28
+    # Type address into $a0
+    la $t1, String
+    # If String the is type and address
+    li $a0, 8
+    li $v0, 9
+    syscall
+    # Store String Type
+    sw $t1, 0($v0)
+    # Store String Address
+    sw $t0, 4($v0)
+    # Save string instance
+    sw $v0, 40($fp)
+    # Call Node
+    lw $t0, 28($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 32($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 36($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 40($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 28($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 48($fp)
+    # Call Node
+    lw $t0, 48($fp)
+    # Call Node
+    lw $t0, 64($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 44($fp)
+    # Var Declaration Node
+    lw $t0, 44($fp)
+    # Var Declaration Node
+    sw $t0, 24($fp)
+# Allocate
+    # Instantiate Node
+    la $a0, Nil
+    # Instantiate Node
+    lw $a0, 4($a0)
+    li $v0, 9
+    syscall
+    sw $v0, 56($fp)
+    # Instantiate Node
+    lw $t0, 56($fp)
+    # Instantiate Node
+    addi $sp, $sp, -4
+    # Instantiate Node
+    sw $t0, 0($sp)
+    # Instantiate Node
+    jal __init_Nil_type
+    # Instantiate Node
+    sw $v0, 56($fp)
+    # Call Node
+    lw $t0, 56($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 0($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 56($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 64($fp)
+    # Call Node
+    lw $t0, 64($fp)
+    # Call Node
+    lw $t0, 48($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 60($fp)
+    # Call Node
+    lw $t0, 60($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 24($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 60($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 72($fp)
+    # Call Node
+    lw $t0, 72($fp)
+    # Call Node
+    lw $t0, 48($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 68($fp)
+    # Assign Node
+    lw $t0, 88($fp)
+    # Assign Node
+    lw $t1, 68($fp)
+    # Assign Node
+    sw $t1, 4($t0)
+    # Variable Node
+    lw $t0, 88($fp)
+    # Variable Node
+    lw $t0, 4($t0)
+    # Variable Node
+    sw $t0, 76($fp)
+    # Call Node
+    lw $t0, 76($fp)
+    # Call Node
+    addi $sp, $sp, -4
+    # Call Node
+    sw $t0, 0($sp)
+    # Call Node
+    lw $t0, 76($fp)
+    # Call Node
+    lw $t0, 0($t0)
+    # Call Node
+    sw $t0, 84($fp)
+    # Call Node
+    lw $t0, 84($fp)
+    # Call Node
+    lw $t0, 60($t0)
+    # Call Node
+    jal __get_ra
+    # Call Node
+    move $ra, $v0
+    # Call Node
+    jr $t0
+    # Call Node
+    sw $v0, 80($fp)
+    # Func Declaration Node
+    lw $v0, 80($fp)
+    # Program Node
+    lw $ra, 0($sp)
+    # Program Node
+    lw $fp, 4($sp)
+    # Program Node
+    addi $sp, $sp, 8
+    # Program Node
+    addi $sp, $sp, 92
+    # Program Node
+    jr $ra
+    # Class Declaration Node
+
 __init_Object_type:
-# Class Declaration Node
-addi $sp, $sp, 0
-# Class Declaration Node
-move $t0, $sp
-# Class Declaration Node
-addi $sp, $sp, -8
-# Class Declaration Node
-sw $ra, 0($sp)
-# Class Declaration Node
-sw $fp, 4($sp)
-# Class Declaration Node
-move $fp, $t0
-lw $t0, 0($fp)
-la $t1, Object
-sw $t1, 0($t0)
-# return node
-lw $v0, 0($fp)
-# Class Declaration Node
-lw $ra, 0($sp)
-# Class Declaration Node
-lw $fp, 4($sp)
-# Class Declaration Node
-addi $sp, $sp, 8
-# Class Declaration Node
-addi $sp, $sp, 4
-# Class Declaration Node
-jr $ra
-# Class Declaration Node
+    # Class Declaration Node
+    addi $sp, $sp, 0
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 0($fp)
+    la $t1, Object
+    sw $t1, 0($t0)
+    # return node
+    lw $v0, 0($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 4
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
 __init_String_type:
-# Class Declaration Node
-addi $sp, $sp, 0
-# Class Declaration Node
-move $t0, $sp
-# Class Declaration Node
-addi $sp, $sp, -8
-# Class Declaration Node
-sw $ra, 0($sp)
-# Class Declaration Node
-sw $fp, 4($sp)
-# Class Declaration Node
-move $fp, $t0
-lw $t0, 0($fp)
-la $t1, String
-sw $t1, 0($t0)
-la $t1, __empty_string
-sw $t1, 4($t0)
-# return node
-lw $v0, 0($fp)
-# Class Declaration Node
-lw $ra, 0($sp)
-# Class Declaration Node
-lw $fp, 4($sp)
-# Class Declaration Node
-addi $sp, $sp, 8
-# Class Declaration Node
-addi $sp, $sp, 4
-# Class Declaration Node
-jr $ra
-# Class Declaration Node
+    # Class Declaration Node
+    addi $sp, $sp, 0
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 0($fp)
+    la $t1, String
+    sw $t1, 0($t0)
+    la $t1, __empty_string
+    sw $t1, 4($t0)
+    # return node
+    lw $v0, 0($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 4
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
 __init_Bool_type:
-# Class Declaration Node
-addi $sp, $sp, 0
-# Class Declaration Node
-move $t0, $sp
-# Class Declaration Node
-addi $sp, $sp, -8
-# Class Declaration Node
-sw $ra, 0($sp)
-# Class Declaration Node
-sw $fp, 4($sp)
-# Class Declaration Node
-move $fp, $t0
-lw $t0, 0($fp)
-la $t1, Bool
-sw $t1, 0($t0)
-# return node
-lw $v0, 0($fp)
-# Class Declaration Node
-lw $ra, 0($sp)
-# Class Declaration Node
-lw $fp, 4($sp)
-# Class Declaration Node
-addi $sp, $sp, 8
-# Class Declaration Node
-addi $sp, $sp, 4
-# Class Declaration Node
-jr $ra
-# Class Declaration Node
+    # Class Declaration Node
+    addi $sp, $sp, 0
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 0($fp)
+    la $t1, Bool
+    sw $t1, 0($t0)
+    # return node
+    lw $v0, 0($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 4
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
 __init_Int_type:
-# Class Declaration Node
-addi $sp, $sp, 0
-# Class Declaration Node
-move $t0, $sp
-# Class Declaration Node
-addi $sp, $sp, -8
-# Class Declaration Node
-sw $ra, 0($sp)
-# Class Declaration Node
-sw $fp, 4($sp)
-# Class Declaration Node
-move $fp, $t0
-lw $t0, 0($fp)
-la $t1, Int
-sw $t1, 0($t0)
-# return node
-lw $v0, 0($fp)
-# Class Declaration Node
-lw $ra, 0($sp)
-# Class Declaration Node
-lw $fp, 4($sp)
-# Class Declaration Node
-addi $sp, $sp, 8
-# Class Declaration Node
-addi $sp, $sp, 4
-# Class Declaration Node
-jr $ra
-# Class Declaration Node
+    # Class Declaration Node
+    addi $sp, $sp, 0
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 0($fp)
+    la $t1, Int
+    sw $t1, 0($t0)
+    # return node
+    lw $v0, 0($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 4
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
 __init_IO_type:
-# Class Declaration Node
-addi $sp, $sp, 0
-# Class Declaration Node
-move $t0, $sp
-# Class Declaration Node
-addi $sp, $sp, -8
-# Class Declaration Node
-sw $ra, 0($sp)
-# Class Declaration Node
-sw $fp, 4($sp)
-# Class Declaration Node
-move $fp, $t0
-lw $t0, 0($fp)
-la $t1, IO
-sw $t1, 0($t0)
-# return node
-lw $v0, 0($fp)
-# Class Declaration Node
-lw $ra, 0($sp)
-# Class Declaration Node
-lw $fp, 4($sp)
-# Class Declaration Node
-addi $sp, $sp, 8
-# Class Declaration Node
-addi $sp, $sp, 4
-# Class Declaration Node
-jr $ra
-# Class Declaration Node
+    # Class Declaration Node
+    addi $sp, $sp, 0
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 0($fp)
+    la $t1, IO
+    sw $t1, 0($t0)
+    # return node
+    lw $v0, 0($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 4
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
+__init_Book_type:
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 8($fp)
+    la $t1, Book
+    sw $t1, 0($t0)
+    # arg node
+    lw $t0, 8($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_title_at_Book
+    # Initialize arg function
+    sw $v0, 0($fp)
+    # arg node
+    lw $t0, 8($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_author_at_Book
+    # Initialize arg function
+    sw $v0, 4($fp)
+    # return node
+    lw $v0, 8($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 12
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
+__init_Article_type:
+    # Class Declaration Node
+    addi $sp, $sp, -12
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 12($fp)
+    la $t1, Article
+    sw $t1, 0($t0)
+    # arg node
+    lw $t0, 12($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_title_at_Book
+    # Initialize arg function
+    sw $v0, 0($fp)
+    # arg node
+    lw $t0, 12($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_author_at_Book
+    # Initialize arg function
+    sw $v0, 4($fp)
+    # arg node
+    lw $t0, 12($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_per_title_at_Article
+    # Initialize arg function
+    sw $v0, 8($fp)
+    # return node
+    lw $v0, 12($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 16
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
+__init_BookList_type:
+    # Class Declaration Node
+    addi $sp, $sp, 0
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 0($fp)
+    la $t1, BookList
+    sw $t1, 0($t0)
+    # return node
+    lw $v0, 0($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 4
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
+__init_Cons_type:
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 8($fp)
+    la $t1, Cons
+    sw $t1, 0($t0)
+    # arg node
+    lw $t0, 8($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_xcar_at_Cons
+    # Initialize arg function
+    sw $v0, 0($fp)
+    # arg node
+    lw $t0, 8($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_xcdr_at_Cons
+    # Initialize arg function
+    sw $v0, 4($fp)
+    # return node
+    lw $v0, 8($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 12
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
+__init_Nil_type:
+    # Class Declaration Node
+    addi $sp, $sp, 0
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 0($fp)
+    la $t1, Nil
+    sw $t1, 0($t0)
+    # return node
+    lw $v0, 0($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 4
+    # Class Declaration Node
+    jr $ra
+    # Class Declaration Node
+
 __init_Main_type:
-# Class Declaration Node
-addi $sp, $sp, -4
-# Class Declaration Node
-move $t0, $sp
-# Class Declaration Node
-addi $sp, $sp, -8
-# Class Declaration Node
-sw $ra, 0($sp)
-# Class Declaration Node
-sw $fp, 4($sp)
-# Class Declaration Node
-move $fp, $t0
-lw $t0, 4($fp)
-la $t1, Main
-sw $t1, 0($t0)
-# arg node
-lw $t0, 4($fp)
-# arg node
-addi $sp, $sp, -4
-# arg node
-sw $t0, 0($sp)
-# Initialize arg function
-jal __init_i_at_Main
-# Initialize arg function
-sw $v0, 0($fp)
-# return node
-lw $v0, 4($fp)
-# Class Declaration Node
-lw $ra, 0($sp)
-# Class Declaration Node
-lw $fp, 4($sp)
-# Class Declaration Node
-addi $sp, $sp, 8
-# Class Declaration Node
-addi $sp, $sp, 8
-# Class Declaration Node
-jr $ra
+    # Class Declaration Node
+    addi $sp, $sp, -4
+    # Class Declaration Node
+    move $t0, $sp
+    # Class Declaration Node
+    addi $sp, $sp, -8
+    # Class Declaration Node
+    sw $ra, 0($sp)
+    # Class Declaration Node
+    sw $fp, 4($sp)
+    # Class Declaration Node
+    move $fp, $t0
+    lw $t0, 4($fp)
+    la $t1, Main
+    sw $t1, 0($t0)
+    # arg node
+    lw $t0, 4($fp)
+    # arg node
+    addi $sp, $sp, -4
+    # arg node
+    sw $t0, 0($sp)
+    # Initialize arg function
+    jal __init_books_at_Main
+    # Initialize arg function
+    sw $v0, 0($fp)
+    # return node
+    lw $v0, 4($fp)
+    # Class Declaration Node
+    lw $ra, 0($sp)
+    # Class Declaration Node
+    lw $fp, 4($sp)
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    addi $sp, $sp, 8
+    # Class Declaration Node
+    jr $ra
 .data 
 data_0: .asciiz "Object"
 data_1: .asciiz "String"
 data_2: .asciiz "Bool"
 data_3: .asciiz "Int"
 data_4: .asciiz "IO"
-data_5: .asciiz "Main"
-data_6: .asciiz "Abort called from class "
-data_7: .asciiz "\n"
-data_8: .asciiz "enter a string\n"
-data_9: .asciiz "that was not a palindrome\n"
-data_10: .asciiz "that was a palindrome\n"
+data_5: .asciiz "Book"
+data_6: .asciiz "Article"
+data_7: .asciiz "BookList"
+data_8: .asciiz "Cons"
+data_9: .asciiz "Nil"
+data_10: .asciiz "Main"
+data_11: .asciiz "Abort called from class "
+data_12: .asciiz "\n"
+data_13: .asciiz ""
+data_14: .asciiz ""
+data_15: .asciiz "title:      "
+data_16: .asciiz "\n"
+data_17: .asciiz "author:     "
+data_18: .asciiz "\n"
+data_19: .asciiz ""
+data_20: .asciiz "periodical:  "
+data_21: .asciiz "\n"
+data_22: .asciiz "- dynamic type was Book -\n"
+data_23: .asciiz "- dynamic type was Article -\n"
+data_24: .asciiz "Compilers, Principles, Techniques, and Tools"
+data_25: .asciiz "Aho, Sethi, and Ullman"
+data_26: .asciiz "The Top 100 CD_ROMs"
+data_27: .asciiz "Ulanoff"
+data_28: .asciiz "PC Magazine"
 __empty_string: .asciiz ""
 # Program Node
 Object: .word 0, 4, data_0, __init_Object_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
@@ -1950,4 +3642,14 @@ Int: .word Object, 4, data_3, __init_Int_type, function_abort_at_Int, function_t
 # Program Node
 IO: .word Object, 4, data_4, __init_IO_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO
 # Program Node
-Main: .word IO, 8, data_5, __init_Main_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, __init_i_at_Main, function_pal_at_Main, function_main_at_Main
+Book: .word IO, 12, data_5, __init_Book_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, __init_title_at_Book, __init_author_at_Book, function_initBook_at_Book, function_print_at_Book
+# Program Node
+Article: .word Book, 16, data_6, __init_Article_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, __init_title_at_Book, __init_author_at_Book, function_initBook_at_Book, function_print_at_Article, __init_per_title_at_Article, function_initArticle_at_Article
+# Program Node
+BookList: .word IO, 4, data_7, __init_BookList_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, function_isNil_at_BookList, function_cons_at_BookList, function_car_at_BookList, function_cdr_at_BookList, function_print_list_at_BookList
+# Program Node
+Cons: .word BookList, 12, data_8, __init_Cons_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, function_isNil_at_Cons, function_cons_at_BookList, function_car_at_Cons, function_cdr_at_Cons, function_print_list_at_Cons, __init_xcar_at_Cons, __init_xcdr_at_Cons, function_init_at_Cons
+# Program Node
+Nil: .word BookList, 4, data_9, __init_Nil_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, function_out_string_at_IO, function_out_int_at_IO, function_in_string_at_IO, function_in_int_at_IO, function_isNil_at_Nil, function_cons_at_BookList, function_car_at_BookList, function_cdr_at_BookList, function_print_list_at_Nil
+# Program Node
+Main: .word Object, 8, data_10, __init_Main_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object, __init_books_at_Main, function_main_at_Main

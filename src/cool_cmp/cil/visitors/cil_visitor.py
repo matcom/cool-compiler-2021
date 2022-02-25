@@ -101,7 +101,7 @@ class CILPrintVisitor():
     
     @visitor.when(cil.CommentNode)
     def visit(self, node):
-        return f'# {node.string}'
+        return f'# {node.msg}'
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node):
@@ -575,7 +575,7 @@ class CILRunnerVisitor():
             analisis = caller_fun_scope['self']
             if isinstance(analisis, str):
                 typex = 'String'
-            elif isinstance(analisis, bool): # TODO Fix bool's conversion to int in Cil
+            elif isinstance(analisis, bool): 
                 typex = 'Bool'
             elif isinstance(analisis, int):
                 typex = 'Int'

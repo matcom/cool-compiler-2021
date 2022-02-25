@@ -9,14 +9,21 @@ class MIPSPrintVisitor():
 
     def __init__(self) -> None:
         self.lines = []
+        self.prefix="    "
     
-    def add_comments(self, node:Node):
+    def add_comments(self, node:Node , tabulated=False):
         if node.comment:
             if isinstance(node.comment, str):
-                self.add_line(f"# {node.comment}")
+                if tabulated:
+                    self.add_line(self.prefix + "# " + node.comment)
+                else:
+                    self.add_line(f"# {node.comment}")
             else:
                 for comment in node.comment:
-                    self.add_line(f"# {comment}")
+                    if tabulated:
+                        self.add_line(self.prefix + "# " + comment)
+                    else:
+                        self.add_line(f"# {comment}")
     
     def add_line(self, line=""):
         self.lines.append(line)
@@ -30,7 +37,7 @@ class MIPSPrintVisitor():
         self.add_comments(node)
         self.add_line(".text ")
         for n in node.instructions:
-            self.add_comments(n)
+            self.add_comments(n, tabulated=True)
             instr = self.visit(n)
             self.add_line(instr)
         self.add_line(".data ")
@@ -44,203 +51,191 @@ class MIPSPrintVisitor():
     def visit(self, node:DataNode):
         return f"{node.name}: {node.type} {', '.join([str(x) for x in node.values])}"
     
+    @visitor.when(CommentNode)
+    def visit(self, node:CommentNode):
+        return f"# {node.msg}"
+
     @visitor.when(AddNode)
     def visit(self, node:AddNode):
-        return f"add {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"add {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SubstractNode)
     def visit(self, node:SubstractNode):
-        return f"sub {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"sub {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(AddImmediateNode)
     def visit(self, node:AddImmediateNode):
-        return f"addi {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"addi {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(AddUnsignedNode)
     def visit(self, node:AddUnsignedNode):
-        return f"addu {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"addu {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SubstractUnsignedNode)
     def visit(self, node:SubstractUnsignedNode):
-        return f"subu {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"subu {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(AddImmediateUnsignedNode)
     def visit(self, node:AddImmediateUnsignedNode):
-        return f"addiu {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"addiu {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(MultiplyNoOverflowNode)
     def visit(self, node:MultiplyNoOverflowNode):
-        return f"mul {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"mul {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(AndNode)
     def visit(self, node:AndNode):
-        return f"and {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"and {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(OrNode)
     def visit(self, node:OrNode):
-        return f"or {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"or {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(NorNode)
     def visit(self, node:NorNode):
-        return f"nor {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"nor {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(XorNode)
     def visit(self, node: XorNode):
-        return f"xor {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"xor {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(AndImmediateNode)
     def visit(self, node:AndImmediateNode):
-        return f"andi {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"andi {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(OrImmediateNode)
     def visit(self, node:OrImmediateNode):
-        return f"ori {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"ori {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(ShiftLeftNode)
     def visit(self, node:ShiftLeftNode):
-        return f"sll {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"sll {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(ShiftRightNode)
     def visit(self, node:ShiftLeftNode):
-        return f"srl {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"srl {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(MultiplyOverflowNode)
     def visit(self, node:MultiplyOverflowNode):
-        return f"mult {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"mult {node.first_arg}, {node.second_arg}"
     
     @visitor.when(DivideOverflowNode)
     def visit(self, node:DivideOverflowNode):
-        return f"div {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"div {node.first_arg}, {node.second_arg}"
     
     @visitor.when(LoadWordNode)
     def visit(self, node:LoadWordNode):
-        return f"lw {node.dest}, {node.offset}({node.base_source_dir})"
+        return self.prefix  + f"lw {node.dest}, {node.offset}({node.base_source_dir})"
     
     @visitor.when(LoadByteNode)
     def visit(self, node:LoadByteNode):
-        return f"lb {node.dest}, {node.offset}({node.base_source_dir})"
+        return self.prefix  + f"lb {node.dest}, {node.offset}({node.base_source_dir})"
     
     @visitor.when(StoreWordNode)
     def visit(self, node:StoreWordNode):
-        return f"sw {node.source}, {node.offset}({node.base_dest_dir})"
+        return self.prefix  + f"sw {node.source}, {node.offset}({node.base_dest_dir})"
 
     @visitor.when(StoreByteNode)
     def visit(self, node:StoreByteNode):
-        return f"sb {node.source}, {node.offset}({node.base_dest_dir})"
+        return self.prefix  + f"sb {node.source}, {node.offset}({node.base_dest_dir})"
 
     @visitor.when(LoadAddressNode)
     def visit(self, node:LoadAddressNode):
-        return f"la {node.dest}, {node.label}"
+        return self.prefix  + f"la {node.dest}, {node.label}"
 
     @visitor.when(LoadImmediateNode)
     def visit(self, node:LoadImmediateNode):
-        return f"li {node.dest}, {node.value}"
+        return self.prefix  + f"li {node.dest}, {node.value}"
     
     @visitor.when(MoveFromHiNode)
     def visit(self, node:MoveFromHiNode):
-        return f"mfhi {node.dest}"
+        return self.prefix  + f"mfhi {node.dest}"
     
     @visitor.when(MoveFromLoNode)
     def visit(self, node:MoveFromLoNode):
-        return f"mflo {node.dest}"
+        return self.prefix  + f"mflo {node.dest}"
     
     @visitor.when(MoveNode)
     def visit(self, node:MoveNode):
-        return f"move {node.dest}, {node.source}"
+        return self.prefix  + f"move {node.dest}, {node.source}"
     
     @visitor.when(BranchEqualNode)
     def visit(self, node:BranchEqualNode):
-        return f"beq {node.first_arg}, {node.second_arg}, {node.address}"
+        return self.prefix  + f"beq {node.first_arg}, {node.second_arg}, {node.address}"
     
     @visitor.when(BranchNotEqualNode)
     def visit(self, node:BranchNotEqualNode):
-        return f"bne {node.first_arg}, {node.second_arg}, {node.address}"
+        return self.prefix  + f"bne {node.first_arg}, {node.second_arg}, {node.address}"
     
     @visitor.when(BranchGreaterNode)
     def visit(self, node:BranchGreaterNode):
-        return f"bgt {node.first_arg}, {node.second_arg}, {node.address}"
+        return self.prefix  + f"bgt {node.first_arg}, {node.second_arg}, {node.address}"
     
     @visitor.when(BranchGreaterEqualNode)
     def visit(self, node:BranchGreaterEqualNode):
-        return f"bge {node.first_arg}, {node.second_arg}, {node.address}"
+        return self.prefix  + f"bge {node.first_arg}, {node.second_arg}, {node.address}"
     
     @visitor.when(BranchLessNode)
     def visit(self, node:BranchLessNode):
-        return f"blt {node.first_arg}, {node.second_arg}, {node.address}"
+        return self.prefix  + f"blt {node.first_arg}, {node.second_arg}, {node.address}"
     
     @visitor.when(BranchLessEqualNode)
     def visit(self, node:BranchLessEqualNode):
-        return f"ble {node.first_arg}, {node.second_arg}, {node.address}"
+        return self.prefix  + f"ble {node.first_arg}, {node.second_arg}, {node.address}"
     
     @visitor.when(SetLessThanNode)
     def visit(self, node:SetLessThanNode):
-        return f"slt {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"slt {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SetLessOrEqualThanNode)
     def visit(self, node:SetLessOrEqualThanNode):
-        return f"sle {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"sle {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SetLessThanImmediateNode)
     def visit(self, node:SetLessThanNode):
-        return f"slti {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"slti {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SetGreaterThanNode)
     def visit(self, node:SetGreaterThanNode):
-        return f"sgt {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"sgt {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SetGreaterOrEqualThanNode)
     def visit(self, node:SetGreaterOrEqualThanNode):
-        return f"sge {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"sge {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SetEqualToNode)
     def visit(self, node:SetEqualToNode):
-        return f"seq {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"seq {node.result}, {node.first_arg}, {node.second_arg}"
     
     @visitor.when(SetNotEqualToNode)
     def visit(self, node:SetNotEqualToNode):
-        return f"sne {node.result}, {node.first_arg}, {node.second_arg}"
+        return self.prefix  + f"sne {node.result}, {node.first_arg}, {node.second_arg}"
 
     @visitor.when(JumpNode)
     def visit(self, node:JumpNode):
-        return f"j {node.address}"
+        return self.prefix  + f"j {node.address}"
     
     @visitor.when(JumpRegisterNode)
     def visit(self, node:JumpRegisterNode):
-        return f"jr {node.register}"
+        return self.prefix  + f"jr {node.register}"
     
     @visitor.when(JumpAndLinkNode)
     def visit(self, node:JumpAndLinkNode):
-        return f"jal {node.address}"
+        return self.prefix  + f"jal {node.address}"
 
     @visitor.when(SyscallNode)
     def visit(self, node:SyscallNode):
-        return f"syscall"
+        return self.prefix  + f"syscall"
     
     @visitor.when(LabelNode)
     def visit(self, node:LabelNode):
-        return f"{node.label}:"
+        if node.isFunc:
+            return f"\n{node.label}:"
+        return self.prefix  + f"{node.label}:"
     
-    # @visitor.when(PrintIntNode)
-    # def visit(self, node:PrintIntNode):
-    #     return f"print_int"
     
-    # @visitor.when(PrintStringNode)
-    # def visit(self, node:PrintStringNode):
-    #     return f"print_string"
-    
-    # @visitor.when(ReadIntNode)
-    # def visit(self, node:ReadIntNode):
-    #     return f"read_int"
-    
-    # @visitor.when(ReadStringNode)
-    # def visit(self, node:ReadStringNode):
-    #     return f"read_string"
-    
-    # @visitor.when(ExitNode)
-    # def visit(self, node:ExitNode):
-    #     return f"exit2"
 
-class CILToMIPSVisitor(): # TODO Complete the transition
+class CILToMIPSVisitor(): 
     
     WORD_SIZE = 4
     TO_METHODS_OFFSET = 12 # 4 Father, 4 Instance Size, 4 Type Name address, METHODS
@@ -369,7 +364,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         
         self.add_instruction(
-            LabelNode("__copy", row, column, comment))
+            LabelNode("__copy", row, column, comment, True))
         
         self.add_instruction(MoveNode(Reg.t(0), Reg.a(0),row,column,comment)) # t0 = object address
         self.add_instruction(LoadWordNode(Reg.t(1), 0, Reg.t(0),row,column,comment)) # t1 = instance type dir
@@ -408,7 +403,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         Function that returns in $v0 the length of the string passed in $a0
         """
-        self.add_instruction(LabelNode("__string_length",row,column,comment))
+        self.add_instruction(
+            LabelNode("__string_length", row, column, comment, True))
 
         self.add_instruction(LoadWordNode(Reg.a(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
 
@@ -434,7 +430,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         Returns in $v0 the result of the substring of $a0 starting in index $a1 with length $a2
         """
 
-        self.add_instruction(LabelNode("__string_substring",row,column,comment))
+        self.add_instruction(
+            LabelNode("__string_substring", row, column, comment, True))
 
         saved_register = [Reg.a(0), Reg.a(1), Reg.a(2), Reg.ra()]
         self._push(saved_register, row, column, "Save arguments")  # Save arguments
@@ -483,7 +480,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         Returns in $v0 the string address of the type given in $a0
         """
 
-        self.add_instruction(LabelNode("__type_name",row,column,comment))
+        self.add_instruction(
+            LabelNode("__type_name", row, column, comment, True))
         # $t0 = type name address
         self.add_instruction(LoadWordNode(Reg.t(0), self.TYPE_NAME_OFFSET, Reg.a(0), row, column, "$t0 = type name address"))
         
@@ -497,7 +495,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         Returns in $v0 the concatenation of the strings given in $a0 and $a1
         """
 
-        self.add_instruction(LabelNode("__concat", row, column, comment))
+        self.add_instruction(LabelNode("__concat", row, column, comment, True))
         
         saved_register = [Reg.a(0), Reg.a(1), Reg.ra()]
         self._push(saved_register,row,column,comment) # Save arguments
@@ -560,7 +558,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         String must be non empty, else undefined behavior. Uses t0 and t1
         """
 
-        self.add_instruction(LabelNode("__remove_last_char", row, column, comment))
+        self.add_instruction(
+            LabelNode("__remove_last_char", row, column, comment, True))
 
         #t0 = string addr
         self.add_instruction(LoadWordNode(Reg.t(0), self.WORD_SIZE, Reg.a(0), row, column, "Actual String address")) # Actual String address
@@ -588,8 +587,9 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         Returns in v0 if the strings given in a0 and a1 are equal
         """
-        # TODO 
-        self.add_instruction(LabelNode("__string_equal"))
+        
+        self.add_instruction(
+            LabelNode("__string_equal", row, column, comment, True))
  
         start_compare_loop = "__string_equal_start_loop"
         end_compare_loop = "__string_equal_end_loop"
@@ -620,7 +620,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         Returns in v0 if the objects given in a0 and a1 are equal
         """
-        self.add_instruction(LabelNode("__object_equal"))
+        self.add_instruction(
+            LabelNode("__object_equal", row, column, comment, True))
         
         obj_cmp_false_section = "__object_equal_false_section"
         obj_end_cmp_label = "__object_equal_end"
@@ -671,7 +672,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         """
         Adds a function that returns in $v0 2 instructions after the caller instruction
         """
-        self.add_instruction(LabelNode("__get_ra",row,column,comment))
+        self.add_instruction(LabelNode("__get_ra", row, column, comment, True))
         self.add_instruction(MoveNode(Reg.v(0), Reg.ra(),row,column,comment))
         self.add_instruction(AddImmediateNode(Reg.v(0), Reg.v(0), 2*self.WORD_SIZE,row,column,comment))
         self.add_instruction(JumpRegisterNode(Reg.ra(),row,column,comment))
@@ -779,7 +780,8 @@ class CILToMIPSVisitor(): # TODO Complete the transition
         
         self.local_variable_offset = {}
         
-        self.add_instruction(LabelNode(node.name, node.row, node.column, node.comment))
+        self.add_instruction(
+            LabelNode(node.name, node.row, node.column, node.comment, True))
         allocated_space = len(node.localvars) * self.WORD_SIZE # When a function is called the stack already contains all the params 
         self._allocate_stack_space(
             allocated_space,node.row, node.column, node.comment)
@@ -804,6 +806,10 @@ class CILToMIPSVisitor(): # TODO Complete the transition
                                      node.row, node.column, node.comment)  # Deallocate also the params
         self.add_instruction(JumpRegisterNode(
             Reg.ra(), node.row, node.column, node.comment))
+
+    @visitor.when(cil.CommentNode)
+    def visit(self, node:cil.CommentNode):
+        self.add_instruction(CommentNode(node.msg, node.row, node.column, node.comment))
     
     @visitor.when(cil.ReturnNode)
     def visit(self, node:cil.ReturnNode):
@@ -813,6 +819,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     
     @visitor.when(cil.AllocateNode)
     def visit(self, node:cil.AllocateNode):
+        self.add_instruction(CommentNode("Allocate", node.row, node.column, node.comment))
         if node.type in ["Int", "Bool"]:
             
             self._store_local_variable(Reg.zero(), node.dest, node.row, node.column, node.comment) # Default value for Int and Bool is 0
@@ -1057,7 +1064,7 @@ class CILToMIPSVisitor(): # TODO Complete the transition
     @visitor.when(cil.LabelNode)
     def visit(self, node:cil.LabelNode):
         self.add_instruction(
-            LabelNode(node.label, node.row, node.column, node.comment))
+            LabelNode(node.label,node.row, node.column, node.comment))
     
     @visitor.when(cil.GetFatherNode)
     def visit(self, node:cil.GetFatherNode):
