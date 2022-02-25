@@ -9,6 +9,8 @@
 
 ### Tipos
 
+Sección destinada a la definción de los tipos.
+
 Se inicializa la sección de tipos con :
 
 ```python
@@ -65,6 +67,8 @@ type Main {
 
 ### Datos
 
+Sección destinada a la definción de los datos estáticos del programa.
+
 Se inicializa la sección de datos con :
 
 ``` python
@@ -92,6 +96,8 @@ string_hola_mundo = "Hola Mundo"
 ```
 
 ### Código
+
+Sección destinada a la definción de las funciones del programa. Tiene que existir una función llamada main la cual es el punto de entrada al programa.
 
 Se inicializa la sección de código con :
 

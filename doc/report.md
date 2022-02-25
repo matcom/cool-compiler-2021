@@ -176,7 +176,7 @@ En esta fase:
 
 #### AST COOL a AST CIL
 
-Esta conversión se realiza mediante una visita al AST de COOL con el COOLToCILVisitor. El objetivo principal de esta parte es desenrollar las expresiones anidadas e implementar algunos features de COOL en este nivel sin tener que hacerlo en MIPS.
+Esta conversión se realiza mediante una visita al AST de COOL con el COOLToCILVisitor. El objetivo principal de esta parte es desenrollar las expresiones anidadas e implementar algunos features de COOL en este nivel sin tener que hacerlo en MIPS disminuyendo la carga de trabajo en la parte de generación.
 
 Para una mejor explicación sobre el lenguaje CIL referirse a `Manual de CIL.md`.
 
@@ -197,23 +197,41 @@ Entre los problemas principales resueltos en CIL se encuentran:
 
 #### AST CIL a AST MIPS
 
+Esta conversión se realiza mediante una visita al AST de CIL con el CILToMIPSVisitor. En esta visita se genera un AST MIPS que representa un programa equivalente al de CIL.
+
 Para representar un programa de CIL en MIPS se tuvieron ciertos convenios a la hora del uso de la pila para pasar argumentos a las funciones, sobre dónde se guardarán los valores de las variables locales necesarias para que el código se ejecute correctamente y la representación de tipos y de objetos en memoria.
 
-- Uso de la pila
+- Convenio de llamado de funciones
   - Los argumentos de las funciones se añaden en el orden de definición
   - Las variables locales se guardan luego de los parámetros
+  - Se asigna actualiza el frame pointer con el valor actual del stack pointer
+  - Se salvan los registros viejos de frame pointer y de return address
+  - Al final de la función se restauran los valores de frame pointer y de return address y se quitan de la pila los argumentos y variables locales 
+
+![images/stack.jpg](images/stack.jpg)
+
 - Representación de tipos
   - Se en el siguiente orden: Dirección del padre, Tamaño de instancia del objeto, Dirección al nombre del objeto, Direcciones de a los métodos correspondientes.
   - \[Obj, 4, obj_name, method1, method2, ...\]
+
+```asm
+# Representación de Object MIPS
+Object: .word 0, 4, data_0, __init_Object_type, function_abort_at_Object, function_type_name_at_Object, function_copy_at_Object
+```
+
 - Representación de objetos
-  - Para los objetos por referencia se guarda primero el tipo al que pertenece y luego los atributos por orden de definición
-  - \[Obj, attr1, attr2, ...\]
+  - Por referencia:
+    - Se crea un espacio de memoria para él en el heap del tamaño deseado
+    - Se guarda primero el tipo al que pertenece y el espacio restante corresponde a los atributos por orden de definición
+    - Ej: \[Obj, attr1, attr2, ...\]
+  - Por valor:
+    - El valor es el mismo representado
 
 En este nivel se efectuaron las implementaciones de las funciones básicas provistas por Cool, estas funciones son abort, copy, type_name, las operaciones de IO, las operaciones con String.
 
 **Manejo de String**
 
-En el caso de los String estos se trataron como una mezcla de referencia y valor, al ser el String un objeto por referencia y su valor no cabe en un solo word estos se representan en memoria como una tuple de Dirección de tipo Dirección a String. Al realizar cualquier operación sobre una cadena el resultado devuelve una nueva cadena dejando la anterior sin cambios. Esto facilita en gran medida el trabajo con estas.
+En el caso de los String estos se trataron como una mezcla de referencia y valor, al ser el String un objeto por referencia y su valor no cabe en un solo word estos se representan en memoria como una tupla de Dirección de tipo, Dirección a String. Al realizar cualquier operación sobre una cadena el resultado devuelve una nueva cadena dejando la anterior sin cambios. Esto facilita en gran medida el trabajo con estas, aunque no hace un manejo eficiente de los recursos.
 
 **Despachado dinámico**
 
