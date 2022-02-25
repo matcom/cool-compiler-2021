@@ -210,7 +210,7 @@ class TypeChecker:
                     node.token.pos,
                 )
             )
-
+        node.computed_type = computed_type
         return computed_type
 
     @visitor.when(CallNode)
@@ -253,6 +253,7 @@ class TypeChecker:
         # if the obj that is calling the function is autotype, let it pass
         if isinstance(cast_type, AutoType):
             # print("step 8")
+            node.computed_type = cast_type
             return cast_type
 
         if isinstance(cast_type, SelfType):
@@ -274,7 +275,8 @@ class TypeChecker:
                         node.token.pos,
                     )
                 )
-                return ErrorType()
+                node.computed_type = ErrorType()
+                return node.computed_type
 
             # Check conformance to parameter types
             for i, arg in enumerate(node.args):
@@ -297,6 +299,7 @@ class TypeChecker:
             if isinstance(rtype, SelfType):
                 rtype = obj_type
             # print("step 14")
+            node.computed_type = rtype
             return rtype
 
         except SemanticError:
@@ -307,7 +310,8 @@ class TypeChecker:
                     node.token.pos,
                 )
             )
-            return ErrorType()
+            node.computed_type = ErrorType()
+            return node.computed_type
 
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode, scope: Scope):
@@ -361,7 +365,8 @@ class TypeChecker:
             computed_type = self.visit(branch.expression, new_scope)
             types.append(computed_type)
 
-        return LCA(types)
+        node.computed_type = LCA(types)
+        return node.computed_type
 
     @visitor.when(BlockNode)
     def visit(self, node: BlockNode, scope: Scope):
@@ -374,6 +379,7 @@ class TypeChecker:
             computed_type = self.visit(expr, nscope)
 
         # return the type of the last expression of the list
+        node.computed_type = computed_type
         return computed_type
 
     @visitor.when(LoopNode)
@@ -395,7 +401,8 @@ class TypeChecker:
         # checking body
         self.visit(node.body, nscope)
 
-        return self.obj_type
+        node.computed_type = self.obj_type
+        return node.computed_type
 
     @visitor.when(ConditionalNode)
     def visit(self, node: ConditionalNode, scope: Scope):
@@ -415,7 +422,8 @@ class TypeChecker:
         then_type = self.visit(node.then_body, scope.create_child())
         else_type = self.visit(node.else_body, scope.create_child())
 
-        return LCA([then_type, else_type])
+        node.computed_type = LCA([then_type, else_type])
+        return node.computed_type
 
     @visitor.when(LetNode)
     def visit(self, node: LetNode, scope: Scope):
@@ -458,17 +466,20 @@ class TypeChecker:
             new_scope.define_variable(item.id, typex, node.idx_list[i])
             nscope = new_scope
 
-        return self.visit(node.body, nscope)
+        node.computed_type = self.visit(node.body, nscope)
+        return node.computed_type
 
     @visitor.when(ArithmeticNode)
     def visit(self, node: ArithmeticNode, scope: Scope):
         self.check_expr(node, scope)
-        return self.int_type
+        node.computed_type = self.int_type
+        return node.computed_type
 
     @visitor.when(ComparisonNode)
-    def visit(self, node, scope):
+    def visit(self, node: ComparisonNode, scope: Scope):
         self.check_expr(node, scope)
-        return self.bool_type
+        node.computed_type = self.bool_type
+        return node.computed_type
 
     @visitor.when(EqualNode)
     def visit(self, node: EqualNode, scope: Scope):
@@ -494,13 +505,15 @@ class TypeChecker:
         if not ok:
             check_equal(right, left)
 
-        return self.bool_type
+        node.computed_type = self.bool_type
+        return node.computed_type
 
     @visitor.when(VoidNode)
     def visit(self, node: VoidNode, scope: Scope):
         self.visit(node.expr, scope)
 
-        return self.bool_type
+        node.computed_type = self.bool_type
+        return node.computed_type
 
     @visitor.when(NotNode)
     def visit(self, node: NotNode, scope: Scope):
@@ -513,7 +526,8 @@ class TypeChecker:
                 )
             )
 
-        return self.bool_type
+        node.computed_type = self.bool_type
+        return node.computed_type
 
     @visitor.when(NegNode)
     def visit(self, node: NegNode, scope: Scope):
@@ -530,19 +544,23 @@ class TypeChecker:
                 )
             )
 
-        return self.int_type
+        node.computed_type = self.int_type
+        return node.computed_type
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
-        return self.int_type
+        node.computed_type = self.int_type
+        return node.computed_type
 
     @visitor.when(ConstantBoolNode)
     def visit(self, node, scope):
-        return self.bool_type
+        node.computed_type = self.bool_type
+        return node.computed_type
 
     @visitor.when(ConstantStringNode)
     def visit(self, node, scope):
-        return self.string_type
+        node.computed_type = self.string_type
+        return node.computed_type
 
     @visitor.when(VariableNode)
     def visit(self, node: VariableNode, scope: Scope):
@@ -558,6 +576,7 @@ class TypeChecker:
             )
             var = scope.define_variable(node.lex, ErrorType())
 
+        node.computed_type = var.type
         return var.type
 
     @visitor.when(InstantiateNode)
@@ -572,6 +591,7 @@ class TypeChecker:
             self.errors.append((ex, node.token.pos))
             typex = ErrorType()
 
+        node.computed_type = typex
         return typex
 
     def check_expr(self, node: BinaryNode, scope: Scope):

@@ -1,4 +1,6 @@
 from typing import List, Optional, Tuple, Union
+
+from compiler.cmp.semantic import Type
 from .utils import Token, emptyToken
 
 
@@ -12,7 +14,9 @@ class DeclarationNode(Node):
 
 
 class ExpressionNode(Node):
-    pass
+    def __init__(self, token: Token, computed_type: Optional[Type] = None):
+        super().__init__(token)
+        self.computed_type = computed_type
 
 
 class FuncDeclarationNode(DeclarationNode):
@@ -24,7 +28,7 @@ class FuncDeclarationNode(DeclarationNode):
         body: ExpressionNode,
     ):
         self.id = token.lex
-        # param = (name, type)
+        # `param` is (nameToken, typeToken)
         self.params = params
         self.type = return_type.lex
         self.typeToken = return_type
@@ -71,10 +75,10 @@ class ProgramNode(Node):
 
 class AssignNode(ExpressionNode):
     def __init__(self, idx: Token, expr: ExpressionNode, token: Token):
+        super().__init__(token)
         self.id = idx.lex
         self.idToken = idx
         self.expr = expr
-        self.token = token
 
 
 class CallNode(ExpressionNode):
@@ -85,11 +89,11 @@ class CallNode(ExpressionNode):
         args: List[ExpressionNode],
         cast_type: Token = emptyToken,
     ):
+        super().__init__(idx)
         self.obj = obj
         self.id = idx.lex
         self.args = args
         self.type = cast_type.lex
-        self.token = idx
         self.typeToken = cast_type
 
 
@@ -107,22 +111,22 @@ class CaseNode(ExpressionNode):
     def __init__(
         self, expr: ExpressionNode, branch_list: List[CaseBranchNode], token: Token
     ):
+        super().__init__(token)
         self.expr = expr
         self.branch_list = branch_list
-        self.token = token
 
 
 class BlockNode(ExpressionNode):
     def __init__(self, expr_list: List[ExpressionNode], token: Token):
+        super().__init__(token)
         self.expr_list = expr_list
-        self.token = token
 
 
 class LoopNode(ExpressionNode):
     def __init__(self, cond: ExpressionNode, body: ExpressionNode, token: Token):
+        super().__init__(token)
         self.condition = cond
         self.body = body
-        self.token = token
 
 
 class ConditionalNode(ExpressionNode):
@@ -133,10 +137,10 @@ class ConditionalNode(ExpressionNode):
         else_body: ExpressionNode,
         token: Token,
     ):
+        super().__init__(token)
         self.condition = cond
         self.then_body = then_body
         self.else_body = else_body
-        self.token = token
 
 
 class LetVarNode(Node):
@@ -157,28 +161,28 @@ class LetVarNode(Node):
 
 class LetNode(ExpressionNode):
     def __init__(self, id_list: List[LetVarNode], body: ExpressionNode, token: Token):
+        super().__init__(token)
         self.id_list = id_list
         self.body = body
-        self.token = token
 
 
 class AtomicNode(ExpressionNode):
     def __init__(self, token: Token):
+        super().__init__(token)
         self.lex = token.lex
-        self.token = token
 
 
 class UnaryNode(ExpressionNode):
     def __init__(self, expr: ExpressionNode, symbol: Token):
+        super().__init__(symbol)
         self.expr = expr
-        self.token = symbol
 
 
 class BinaryNode(ExpressionNode):
     def __init__(self, left: ExpressionNode, right: ExpressionNode, symbol: Token):
+        super().__init__(symbol)
         self.left = left
         self.right = right
-        self.token = symbol
 
 
 class ArithmeticNode(BinaryNode):
