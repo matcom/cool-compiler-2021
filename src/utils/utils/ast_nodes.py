@@ -1,5 +1,22 @@
+class Token:
+    def __init__(self, type, value, line, lexpos):
+        self.type = type
+        self.value = value
+        self.line = line
+        self.lexpos = lexpos
+
 class Node:
-    pass
+    line: int
+    lexpos: int
+
+    def set_line_lexpos(self, line, lexpos):
+        self.line = line
+        self.lexpos = lexpos
+        
+    def set_position(self, line, lexpos):
+        self.line = line
+        self.lexpos = lexpos
+        return self
 
 class DeclarationNode(Node):
     pass
@@ -13,17 +30,20 @@ class ProgramNode(Node):
         
 
 class ClassDecNode(DeclarationNode):
-    def __init__(self, name, data, line, lexpos, parent=None):
+    def __init__(self, name, data, parent=None):
         self.name = name
         self.parent = parent
         self.data = data
-        self.line_lex_pos = (line, lexpos)
+
+        self.parent_pos = (-1, -1)
 
 class AttributeDecNode(DeclarationNode):
     def __init__(self, name, _type, expr=None):
         self.name = name
         self._type = _type
         self.expr = expr
+        self.type_pos = (-1, -1)
+        self.expr_pos = (-1, -1)
         
 class MethodDecNode(DeclarationNode):
     def __init__(self, name, _type, expr, params=None):
@@ -31,6 +51,9 @@ class MethodDecNode(DeclarationNode):
         self.params = params
         self.type = _type
         self.expr = expr
+
+        self.p_types_pos = []
+        self.r_types_pos = (-1, -1)
 
 class ParamNode(ExprNode):
     def __init__(self, name, _type):
@@ -46,11 +69,15 @@ class LetNode(ExprNode):
     def __init__(self, declaration, expr):
         self.declaration = declaration
         self.expr = expr
+        self.dec_names_pos = []
+        self.dec_types_pos = []
+
 
 class CaseNode(ExprNode):
     def __init__(self, expr, params):
         self.expr = expr
         self.params = params
+        self.cases_positions = []
 
 class AssignNode(ExprNode):
     def __init__(self, idx, expr):
@@ -71,6 +98,9 @@ class MethodCallNode(ExprNode):
         self.exprlist = exprlist
         self.atom = atom
         self.type = typex
+        self.id_position = (-1, -1)
+        self.type_position = (-1, -1)
+        self.exprlist_positions = []
 
 class ConditionalNode(ExprNode):
     def __init__(self, if_expr, then_expr, else_expr):
@@ -85,6 +115,7 @@ class IsVoidNode(ExprNode):
 class NewNode(ExprNode):
     def __init__(self, type_):
         self.type = type_
+        self.type_position = (-1, -1)
 
 class AtomicNode(ExprNode):
     def __init__(self, lex):
@@ -93,6 +124,7 @@ class AtomicNode(ExprNode):
 class UnaryNode(ExprNode):
     def __init__(self, expr):
         self.expr: ExprNode = expr
+        self.operation_position = (-1, -1)
 
 class BinaryNode(ExprNode):
     def __init__(self, left, operation, right):
