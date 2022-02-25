@@ -184,7 +184,7 @@ class CCILGenerator:
         for var in node.var_decl_list:
             (var_ops, var_fv) = self.visit(var)
             operations += var_ops
-            fvalues += var_fv
+            fvalues.append(var_fv)
 
         (in_ops, in_fval) = self.visit(node.in_expr)
         operations += in_ops
