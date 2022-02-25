@@ -59,34 +59,63 @@ class Compare_String:
 
     def __str__(self) -> str:
         return  """
- # compare str1 0($sp), str2 4($sp) salida en $s0
-lw $a0 , 4($t0)     
-lw $a1 , 4($t1)     
 
-LOOP:
-	lb $t0, ($a0)
-	lb $t1, ($a1)
-	add $a0, $a0, 1
-	add $a1, $a1, 1
-	beqz $t0, LOOP_END
-	beqz $t1, LOOP_END
-	beq $t0, $t1, LOOP
-    li $s0 , 0
-    j End
-#	jr $ra 
+Compare_String:
 
-EQUAL:
-	li $s0, 1
-	j END
+lw $t0 , 0($sp)      # primer str1 a comparar     
+lw $t1 , 4($sp)      # segundo str2 a comparar
+lw $s1 , 8($sp)      # parametro self
 
-LOOP_END:
-	beq $t0, $t1, EQUAL
-	li $s0 , 0
+lw $a0 , 4($t0)      #toma la propiedad value de str1
+lw $a1 , 4($t1)      #toma la propieda value de str2
 
-#	jr $ra
-END:
-#	jr $ra"""
-        
+#Allocate a una class Bool puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo Int
+la $t4, Bool
+sw $t4, 0($v0)   # Asigna el tipo Int al int
+sw $t6, 4($v0)  # Asigan el nombre de la clase a la propiededa value del int
+
+LOOP_Str:
+	lb $t0, ($a0)    # primera letra str1
+	lb $t1, ($a1)    # primera letra de str2
+	add $a0, $a0, 1  # proximo caracter de str1
+	add $a1, $a1, 1  #proximo caracter de str2
+	beqz $t0, LOOP_END_Str   # temrino de analizar str1
+	beqz $t1, LOOP_END_Str   # temrino de analizar str2
+	beq $t0, $t1, LOOP_Str   # Alguno de los caracteres son diferentes
+    li $s0 , 0               # devuelve false
+    j End_Str               
+ 
+
+EQUAL_Str:
+	li $s0, 1       #Devuelve True
+	j END_Str
+
+LOOP_END_Str:
+	beq $t0, $t1, EQUAL_Str    # si ambos terminaron  en son iguales
+	li $s0 , 0                 # else false
+    j END_Str
+
+END_Str:
+
+#Allocate a una class Bool puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo Int
+la $t4, Bool
+sw $t4, 0($v0)   # Asigna el tipo Int al int
+sw $s0, 4($v0)  # Asigan el nombre de la clase a la propiededa value del int
+move $s0 , $v0
+    
+    add $sp,$sp,8       #saca str1,str2
+    jr $ra
+        """
 
 class Comment:
     def __init__(self, msg) -> None:
@@ -272,7 +301,7 @@ class XOR(Operation):
 ################################# Native Func IO ################################################
 class Out_String:
     def __str__(self) -> str:
-       return  """
+        return  """
 IO_out_string:
 lw $t1 , 4($sp)  #Guardando self
 lw $t0, 0($sp)   #Guarda en $t0 la direccion del string
@@ -281,7 +310,8 @@ lw $a0, 4($t0) #Pintando la propiedad value del string
 syscall
 addi $sp, $sp, 8
 move $s0, $t1  #return self
-jr $ra"""
+jr $ra
+"""
 
 class Out_Int:
     def __str__(self) -> str:
@@ -300,6 +330,10 @@ class In_String:
     def __str__(self) -> str:
        return """
 IO_in_string:
+
+
+
+
 
 li $a0, 1000   # reserva memoria para el string
 li $v0, 9
@@ -323,6 +357,7 @@ sw $s0, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
 move $s0, $v0
 addi $sp, $sp, 4
+
 jr $ra
 """
 
