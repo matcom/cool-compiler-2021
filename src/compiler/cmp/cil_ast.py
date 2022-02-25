@@ -26,6 +26,10 @@ class TypeNameNode(InstructionNode):
         self.source = source
 
 
+class ExitNode(InstructionNode):
+    pass
+
+
 class DataNode(Node):
     def __init__(self, vname, value):
         self.name = vname
@@ -33,12 +37,13 @@ class DataNode(Node):
 
 
 class FunctionNode(Node):
-    def __init__(self, fname, params, localvars, instructions, local_labels=0):
+    def __init__(self, fname, params, localvars, instructions):
         self.name = fname
         self.params = params
         self.localvars = localvars
         self.instructions = instructions
-        self.local_labels = local_labels
+        self.ids = dict()
+        self.labels_count = 0
 
 
 class ParamNode(Node):
@@ -96,7 +101,7 @@ class EqualStrNode(ArithmeticNode):
     pass
 
 
-class VoidNode(ArithmeticNode):
+class VoidNode(InstructionNode):
     pass
 
 
@@ -185,10 +190,11 @@ class CopyNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
+    def __init__(self, xtype, method, dest, computed_type):
         self.type = xtype
         self.method = method
         self.dest = dest
+        self.computed_type = computed_type
 
 
 class ArgNode(InstructionNode):

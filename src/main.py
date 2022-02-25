@@ -15,6 +15,8 @@ from compiler.visitors.type_collector import TypeCollector
 from compiler.visitors.type_builder import TypeBuilder
 from compiler.visitors.type_checker import TypeChecker
 from compiler.visitors.type_inferencer import TypeInferencer
+from compiler.visitors.cool2cil import COOLToCILVisitor
+from compiler.visitors.cil_formatter import PrintCILVisitor
 
 
 def main(args):
@@ -69,21 +71,28 @@ def main(args):
     if checker.errors:
         exit(1)
 
-    # Inferencing Autotype
-    inferencer = TypeInferencer(context, manager)
-    inferencer.visit(ast, scope)
-    for e in inferencer.errors:
-        print(f"{pos} - {type(e).__name__}: {str(e)}")
-    if inferencer.errors:
-        exit(1)
+    # # Inferencing Autotype
+    # inferencer = TypeInferencer(context, manager)
+    # inferencer.visit(ast, scope)
+    # for e in inferencer.errors:
+    #     print(f"{pos} - {type(e).__name__}: {str(e)}")
+    # if inferencer.errors:
+    #     exit(1)
 
-    # Last check without autotypes
-    checker = TypeChecker(context, manager)
-    checker.visit(ast)
-    for (e, pos) in checker.errors:
-        print(f"{pos} - {type(e).__name__}: {str(e)}")
-    if checker.errors:
-        exit(1)
+    # # Last check without autotypes
+    # checker = TypeChecker(context, manager)
+    # checker.visit(ast)
+    # for (e, pos) in checker.errors:
+    #     print(f"{pos} - {type(e).__name__}: {str(e)}")
+    # if checker.errors:
+    #     exit(1)
+
+    # mips to cil
+    cil_visitor = COOLToCILVisitor(context)
+    cil_ast = cil_visitor.visit(ast, scope)
+
+    cil_formatter = PrintCILVisitor()
+    print(cil_formatter.visit(cil_ast))
 
 
 text = """

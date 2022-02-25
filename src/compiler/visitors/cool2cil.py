@@ -1,3 +1,4 @@
+from pprint import pprint
 import compiler.visitors.visitor as visitor
 from ..cmp import cil_ast as cil
 from ..cmp.semantic import (
@@ -12,8 +13,10 @@ from ..cmp.semantic import (
     VariableInfo,
 )
 from ..cmp.ast import (
+    CaseBranchNode,
     LeqNode,
     LessNode,
+    LetVarNode,
     ProgramNode,
     ClassDeclarationNode,
     AttrDeclarationNode,
@@ -50,6 +53,7 @@ class BaseCOOLToCILVisitor:
         self.current_function = None
         self.context = context
         self.vself = VariableInfo("self", None)
+        self.value_types = ["String", "Int", "Bool"]
 
     @property
     def params(self):
@@ -68,16 +72,16 @@ class BaseCOOLToCILVisitor:
         return self.current_function.instructions
 
     def register_local(self, vinfo, id=False):
-        vinfo.name = (
+        new_vinfo = VariableInfo("", None)
+        new_vinfo.name = (
             f"local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}"
         )
-        local_node = cil.LocalNode(vinfo.name)
 
+        local_node = cil.LocalNode(new_vinfo.name)
         if id:
-            self.ids[vinfo.name] = vinfo.name
-
+            self.ids[vinfo.name] = new_vinfo.name
         self.localvars.append(local_node)
-        return vinfo.name
+        return new_vinfo.name
 
     def define_internal_local(self):
         vinfo = VariableInfo("internal", None, None)
@@ -162,7 +166,7 @@ class BaseCOOLToCILVisitor:
         ][0]
         self.register_instruction(cil.LoadNode(vname, data_node))
         self.register_instruction(cil.PrintStrNode(vname))
-        self.register_instruction(cil.TypeNode(vname, self.vself.name))
+        self.register_instruction(cil.TypeNameNode(vname, self.vself.name))
         self.register_instruction(cil.PrintStrNode(vname))
         data_node = self.register_data("\n")
         self.register_instruction(cil.LoadNode(vname, data_node))
@@ -583,7 +587,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                     self.vself.name, node.id, value, self.current_type.name
                 )
             )
-        except AttributeError:
+        except SemanticError:
             vname = None
             param_names = [pn.name for pn in self.current_function.params]
             if node.id in param_names:
@@ -628,7 +632,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.register_runtime_error(
             equal_result,
-            f"({node.token.row},{node.token.column}) - RuntimeError: Dispatch on void\n",
+            f"{node.token.pos} - RuntimeError: Dispatch on void\n",
         )
 
         # self
@@ -649,7 +653,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.TypeOfNode(vobj, type_of_node))
             computed_type = node.obj.computed_type
             if computed_type.name == "SELF_TYPE":
-                computed_type = computed_type.fixed
+                computed_type = computed_type.fixed_type
             self.register_instruction(
                 cil.DynamicCallNode(type_of_node, node.id, result, computed_type.name)
             )
@@ -729,11 +733,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(BlockNode)
     def visit(self, node, scope):
         #######################################
-        # node.exprs -> [ ExpressionNode ... ]
+        # node.expr_list -> [ ExpressionNode ... ]
         #######################################
         ret = self.register_local(VariableInfo("block_node_value", None))
 
-        for expr in node.exprs:
+        for expr in node.expr_list:
             ret_value = self.visit(expr, scope)
 
         self.register_instruction(cil.AssignNode(ret, ret_value))
@@ -751,12 +755,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         for let_var in node.id_list:
             self.visit(let_var, scope)
 
-        ret_val = self.visit(node.in_body, scope)
+        ret_val = self.visit(node.body, scope)
         self.register_instruction(cil.AssignNode(value, ret_val))
 
         return value
 
-    @visitor.when(LetAttributeNode)
+    @visitor.when(LetVarNode)
     def visit(self, node, scope):
         ###############################
         # node.id -> str
@@ -766,12 +770,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if node.id in self.ids:
             vname = self.ids[node.id]
         else:
-            vname = self.register_local(VariableInfo(node.id, node.type), id=True)
-        if node.expr:
-            ret_value = self.visit(node.expr, scope)
+            vname = self.register_local(VariableInfo(node.id, node.typex), id=True)
+        if node.expression:
+            ret_value = self.visit(node.expression, scope)
             self.register_instruction(cil.AssignNode(vname, ret_value))
-        elif node.type in self.value_types:
-            self.register_instruction(cil.AllocateNode(node.type, vname))
+        elif node.typex in self.value_types:
+            self.register_instruction(cil.AllocateNode(node.typex, vname))
 
     @visitor.when(CaseNode)
     def visit(self, node, scope):
@@ -796,7 +800,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.register_runtime_error(
             equal_result,
-            f"({node.position.row},{node.position.column}) - RuntimeError: Case on void\n",
+            f"{node.token.pos} - RuntimeError: Case on void\n",
         )
 
         # sorting the branches
@@ -833,7 +837,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         # Raise runtime error if no Goto was executed
         data_node = self.register_data(
-            f"({node.position.row + 1 + len(node.branches)},{node.position.column - 5}) - RuntimeError: Execution of a case statement without a matching branch\n"
+            f"({node.token.pos[0] + 1 + len(node.branches)},{node.token.pos[1] - 5}) - RuntimeError: Execution of a case statement without a matching branch\n"
         )
         self.register_instruction(cil.ErrorNode(data_node))
 
@@ -849,7 +853,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(end_label)
         return value
 
-    @visitor.when(CaseExpressionNode)
+    @visitor.when(CaseBranchNode)
     def visit(self, node, scope):
         ###############################
         # node.id -> str
@@ -1076,7 +1080,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.EqualNode(equal_result, value_right, 0))
         self.register_runtime_error(
             equal_result,
-            f"({node.position.row},{node.position.column}) - RuntimeError: Division by zero\n",
+            f"{node.token.pos} - RuntimeError: Division by zero\n",
         )
 
         self.register_instruction(cil.DivNode(value, value_left, value_right))
@@ -1147,17 +1151,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.lex -> str
         ###############################
 
-        self.current_type.get_attribute(node.lex)
-        attr = self.register_local(VariableInfo(node.lex, None))
-        self.register_instruction(cil.GetAttribNode(attr, node, node.lex))
-        return attr
-
-    @visitor.when(ConstantNumNode)
-    def visit(self, node, scope):
-        ###############################
-        # node.lex -> str
-        ###############################
-
         try:
             self.current_type.get_attribute(node.lex)
             attr = self.register_local(VariableInfo(node.lex, None), id=True)
@@ -1167,7 +1160,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 )
             )
             return attr
-        except AttributeError:
+        except SemanticError:
             param_names = [pn.name for pn in self.current_function.params]
             if node.lex in param_names:
                 for n in param_names:
@@ -1175,6 +1168,17 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                         return n
             else:
                 return self.ids[node.lex]
+
+    @visitor.when(ConstantNumNode)
+    def visit(self, node, scope):
+        ###############################
+        # node.lex -> str
+        ###############################
+
+        instance = self.define_internal_local()
+        self.register_instruction(cil.ArgNode(int(node.lex)))
+        self.register_instruction(cil.StaticCallNode(self.init_name("Int"), instance))
+        scope.ret_expr = instance
 
     @visitor.when(ConstantStringNode)
     def visit(self, node, scope):
