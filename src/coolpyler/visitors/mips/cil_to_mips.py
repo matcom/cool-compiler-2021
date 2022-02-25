@@ -220,7 +220,7 @@ class CilToMIPS:
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
-            mips.StoreWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),)
+            mips.StoreWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
         )
 
         self.memory_manager.clean()
@@ -242,7 +242,7 @@ class CilToMIPS:
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
-            mips.StoreWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),)
+            mips.StoreWordNode(reg3, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
         )
 
         self.memory_manager.clean()
@@ -264,7 +264,7 @@ class CilToMIPS:
         dest_dir = self.search_mem(node.dest)
         instructions.append(
             mips.StoreWordNode(
-                LOW_REG, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                LOW_REG, mips.MemoryAddressRegisterNode(FP_REG, dest_dir)
             )
         )  # TODO: HI_REG ???
 
@@ -287,7 +287,7 @@ class CilToMIPS:
         dest_dir = self.search_mem(node.dest)
         instructions.append(
             mips.StoreWordNode(
-                LOW_REG, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                LOW_REG, mips.MemoryAddressRegisterNode(FP_REG, dest_dir)
             )
         )  # TODO: HI_REG ???
 
@@ -390,7 +390,7 @@ class CilToMIPS:
         dest_dir = self.search_mem(node.dest)
         instructions.append(
             mips.StoreWordNode(
-                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, dest_dir)
             )
         )
 
@@ -416,7 +416,7 @@ class CilToMIPS:
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
-            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir),)
+            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
         )
 
         self.memory_manager.clean()

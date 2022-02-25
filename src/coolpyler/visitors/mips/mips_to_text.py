@@ -71,7 +71,7 @@ class MIPSGenerator:
 
     @visitor.when(mips.LoadAddressNode)
     def visit(self, node: mips.LoadAddressNode):
-        return f"\tla {self.visit(node.left)}, {node.right}"
+        return f"\tla {self.visit(node.left)}, {self.visit(node.right)}"
 
     @visitor.when(mips.LoadWordNode)
     def visit(self, node: mips.LoadWordNode):
