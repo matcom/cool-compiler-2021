@@ -1,199 +1,269 @@
-class Node:
-    pass
-
-
-class Program(Node):
+class AST:
     def __init__(self):
-        self.type_section = []
-        self.data_section = {}
-        self.code_section = []
+        pass
+
+    def __repr__(self):
+        return str(self)
 
 
-class Type(Node):
+class Program(AST):
+    def __init__(self, dottypes, dotdata, dotcode):
+        super(Program, self).__init__()
+        self.dottypes = dottypes
+        self.dotdata = dotdata
+        self.dotcode = dotcode
+
+
+class Type(AST):
     def __init__(self, name):
+        super(Type, self).__init__()
         self.name = name
         self.attributes = []
-        self.methods = []
+        self.methods = {}
 
 
-class Data(Node):
-    def __init__(self, var_name, value):
-        self.var_name = var_name
+class Function(AST):
+    def __init__(self, name, params=[], localvars=[], instructions=[]):
+        super(Function, self).__init__()
+        self.name = name
+        self.params = params  # list of Param
+        self.localvars = localvars  # list of LocalDec
+        self.instructions = instructions  # list of Instructions
+
+
+class Expr(AST):
+    def __init__(self):
+        super(Expr, self).__init__()
+
+
+class ParamDec(Expr):
+    def __init__(self, name):
+        super(ParamDec, self).__init__()
+        self.name = name
+
+
+class LocalDec(Expr):
+    def __init__(self, name):
+        super(LocalDec, self).__init__()
+        self.name = name
+
+
+class Halt(Expr):
+    def __init__(self):
+        super(Halt, self).__init__()
+
+
+class GetAttr(Expr):
+    def __init__(self, dest, instance, attr, static_type):
+        self.local_dest = dest
+        self.instance = instance
+        self.attr = attr
+        self.static_type = static_type
+
+
+class SetAttr(Expr):
+    def __init__(self, instance, attr, value, static_type):
+        self.instance = instance
+        self.attr = attr
+        self.value = value
+        self.static_type = static_type
+
+
+class Call(Expr):
+    def __init__(self, local_dest, function, params, static_type):
+        self.function = function
+        self.params = params
+        self.static_type = static_type
+        self.local_dest = local_dest
+
+
+class VCall(Expr):
+    def __init__(self, local_dest, function, params, dynamic_type, instance):
+        self.function = function
+        self.params = params
+        self.dynamic_type = dynamic_type
+        self.local_dest = local_dest
+        self.instance = instance
+
+
+class INTEGER(Expr):
+    def __init__(self, value):
+        super(INTEGER, self).__init__()
         self.value = value
 
 
-class Function(Node):
-    def __init__(self, fun_name):
-        self.fun_name = fun_name
-        self.params = []
-        self.local_vars = []
-        self.instructions = []
-
-
-class Instruction(Node):
-    pass
-
-
-class Assign(Instruction):
-    def __init__(self, dest, value):
-        self.dest = dest
+class STRING(Expr):
+    def __init__(self, value):
+        super(STRING, self).__init__()
         self.value = value
 
 
-class Arithmetic(Instruction):
-    def __init__(self, dest, left, right):
-        self.dest = dest
+class Assign(Expr):
+    def __init__(self, local_dest, right_expr):
+        self.local_dest = local_dest
+        self.right_expr = right_expr
+
+
+class UnaryOperator(Expr):
+    def __init__(self, local_dest, expr_value, op):
+        self.local_dest = local_dest
+        self.expr_value = expr_value
+        self.op = op
+
+
+class BinaryOperator(Expr):
+    def __init__(self, local_dest, left, right, op):
+        self.local_dest = local_dest
         self.left = left
         self.right = right
+        self.op = op
 
 
-class Plus(Arithmetic):
-    pass
+class Allocate(Expr):
+    def __init__(self, t, tag, dest):
+        self.type = t
+        self.local_dest = dest
+        self.tag = tag
 
 
-class Minus(Arithmetic):
-    pass
+class TypeOf(Expr):
+    def __init__(self, variable, local_dest):
+        self.variable = variable
+        self.local_dest = local_dest
 
 
-class Star(Arithmetic):
-    pass
+class Param(Expr):
+    def __init__(self, param, shift=0):
+        self.param = param
+        self.shift = shift
 
 
-class Div(Arithmetic):
-    pass
-
-
-# Attribute Access
-class GetAttr(Instruction):
-    def __init__(self, dest, type_instance_address, attribute_position):
-        self.dest = dest
-        self.type_instance_address = type_instance_address
-        self.attribute_position = attribute_position
-
-
-class SetAttr(Instruction):
-    def __init__(self, type_instance_address, attribute_position, value):
-        self.value = value
-        self.type_instance_address = type_instance_address
-        self.attribute_position = attribute_position
-
-
-# Array Access
-class GetIndex(Instruction):
-    def __init__(self, dest, direction, index):
-        self.dest = dest
-        self.direction = direction
-        self.index = index
-
-
-class SetIndex(Instruction):
-    def __init__(self, value, direction, index):
-        self.value = value
-        self.direction = direction
-        self.index = index
-
-
-# Memory Manipulation
-class Allocate(Instruction):
-    def __init__(self, destiny, _type):
-        self.destiny = destiny
-        self.type = _type
-
-
-class TypeOf(Instruction):
-    def __init__(self, destiny, var):
-        self.destiny = destiny
-        self.var = var
-
-
-class Array(Instruction):
-    def __init__(self, name, size):
-        self.name = name
-        self.size = size
-
-
-# Method Invocation
-class Call(Instruction):
-    def __init__(self, destiny, function_name):
-        self.destiny = destiny
-        self.function_name = function_name
-
-
-class DynamicCall(Instruction):
-    def __init__(self, destiny, type_name, function_name):
-        self.destiny = destiny
-        self.type_name = type_name
-        self.func_name = function_name
-
-
-class Arg(Instruction):
+class Arg(Expr):
     def __init__(self, arg):
         self.arg = arg
 
 
-# Jumps
-class IfGoto(Instruction):
-    def __init__(self, condition, label):
-        self.condition = condition
+class Case(Expr):
+    def __init__(self, local_expr, first_label):
+        self.local_expr = local_expr
+        self.first_label = first_label
+
+
+class Action(Expr):
+    def __init__(self, local_expr, tag, max_tag, next_label):
+        self.local_expr = local_expr
+        self.tag = tag
+        self.max_tag = max_tag
+        self.next_label = next_label
+
+
+class IfGoto(Expr):
+    def __init__(self, variable, label):
+        self.variable = variable
         self.label = label
 
 
-class Label(Instruction):
-    def __init__(self, name):
-        self.name = name
+class Goto(Expr):
+    def __init__(self, label):
+        self.label = label
 
 
-class Goto(Instruction):
-    def __init__(self, label_name):
-        self.label_name = label_name
+class Label(Expr):
+    def __init__(self, label):
+        self.label = label
 
 
-# Function Return
-class Return(Instruction):
-    def __init__(self, value=None):
+class Return(Expr):
+    def __init__(self, value):
         self.value = value
 
 
-# String Functions
-class Load(Instruction):
-    def __init__(self, dest, msg):
-        self.dest = dest
+class LoadInt(Expr):
+    def __init__(self, num, dest):
+        self.num = num
+        self.local_dest = dest
+
+
+class LoadStr(Expr):
+    def __init__(self, msg, dest):
         self.msg = msg
+        self.local_dest = dest
 
 
-class Length(Instruction):
-    def __init__(self, dest, str_address):
-        self.dest = dest
-        self.str_address = str_address
-
-
-class Concat(Instruction):
-    def __init__(self, dest, head1, head2):
-        self.dest = dest
-        self.head1 = head1
-        self.head2 = head2
-
-
-class Substring(Instruction):
-    def __init__(self, dest, str_addr, pos, length):
-        self.dest = dest
-        self.str_addr = str_addr
-        self.pos = pos
-        self.length = length
-
-
-class Str(Instruction):
-    def __init__(self, dest, numeric_value):
-        self.dest = dest
-        self.numeric_value = numeric_value
-
-
-# IO Operations
-class Read(Instruction):
+class LoadVoid(Expr):
     def __init__(self, dest):
-        self.dest = dest
+        self.local_dest = dest
 
 
-class Print(Instruction):
-    def __init__(self, str_address):
-        self.str_address = str_address
+class Length(Expr):
+    def __init__(self, variable, result):
+        self.variable = variable
+        self.result = result
+
+
+class Concat(Expr):
+    def __init__(self, str1, len1, str2, len2, result):
+        self.str1 = str1
+        self.len1 = len1
+        self.str2 = str2
+        self.len2 = len2
+        self.result = result
+
+
+class StringVar(Expr):
+    def __init__(self, variable):
+        self.variable = variable
+
+
+class SubStr(Expr):
+    def __init__(self, i, length, string, result):
+        self.i = i
+        self.length = length
+        self.string = string
+        self.result = result
+
+
+class StringEquals(Expr):
+    def __init__(self, s1, s2, result):
+        self.s1 = s1
+        self.s2 = s2
+        self.result = result
+
+
+class Read(Expr):
+    def __init__(self, result):
+        self.result = result
+
+
+class ReadString(Read):
+    pass
+
+
+class ReadInteger(Read):
+    pass
+
+
+class Print(Expr):
+    def __init__(self, variable):
+        self.variable = variable
+
+
+class PrintString(Print):
+    pass
+
+
+class PrintInteger(Print):
+    pass
+
+
+class IsVoid(Expr):
+    def __init__(self, result_local, expre_value):
+        self.result_local = result_local
+        self.expre_value = expre_value
+
+
+class Copy(Expr):
+    def __init__(self, type, local_dest):
+        self.type = type
+        self.local_dest = local_dest
+
