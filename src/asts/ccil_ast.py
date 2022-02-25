@@ -272,31 +272,39 @@ class BinaryOpNode(ReturnOpNode):
         return f"{self.left.value} op {self.right.value}"
 
 
-class SumOpNode(BinaryOpNode):
+class ArithmeticOpNode(BinaryOpNode):
     pass
 
 
-class MinusOpNode(BinaryOpNode):
+class SumOpNode(ArithmeticOpNode):
     pass
 
 
-class MultOpNode(BinaryOpNode):
+class MinusOpNode(ArithmeticOpNode):
     pass
 
 
-class DivOpNode(BinaryOpNode):
+class MultOpNode(ArithmeticOpNode):
     pass
 
 
-class EqualOpNode(BinaryOpNode):
+class DivOpNode(ArithmeticOpNode):
     pass
 
 
-class LessOrEqualOpNode(BinaryOpNode):
+class ComparisonOpNode(BinaryOpNode):
     pass
 
 
-class LessOpNode(BinaryOpNode):
+class EqualOpNode(ComparisonOpNode):
+    pass
+
+
+class LessOrEqualOpNode(ComparisonOpNode):
+    pass
+
+
+class LessOpNode(ComparisonOpNode):
     pass
 
 
