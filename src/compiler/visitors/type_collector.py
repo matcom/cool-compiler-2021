@@ -1,3 +1,7 @@
+from typing import Dict, List, Optional, Tuple
+from numpy import void
+from zmq import TYPE
+from compiler.cmp.utils import Token, pprint
 import compiler.visitors.visitor as visitor
 from ..cmp.semantic import (
     SemanticError,
@@ -17,17 +21,17 @@ built_in_types = []
 
 
 class TypeCollector(object):
-    def __init__(self, errors=[]):
-        self.context = None
-        self.errors = errors
-        self.parent = {}
+    def __init__(self):
+        self.context: Optional[Context] = None
+        self.errors: List[Tuple[Exception, Tuple[int, int]]] = []
+        self.parent: Dict[str, Optional[Token]] = {}
 
     @visitor.on("node")
     def visit(self, node):
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self, node):
+    def visit(self, node: ProgramNode):
         self.context = Context()
         self.define_built_in_types()
 
@@ -45,17 +49,17 @@ class TypeCollector(object):
         node.declarations = self.order_types(node)
 
     @visitor.when(ClassDeclarationNode)
-    def visit(self, node):
-        # flag will be True if the class is succesfully added to the context
+    def visit(self, node: ClassDeclarationNode) -> void:
+        # flag is set to True if the class is succesfully added to the context
         flag = False
         try:
             if node.id == "AUTO_TYPE":
                 raise SemanticError("Name of class can't be autotype")
-            self.context.create_type(node.id)
+            self.context.create_type(node.id, node.tokenId.pos)
             flag = True
             self.parent[node.id] = node.parent
         except SemanticError as ex:
-            self.errors.append(ex.text)
+            self.errors.append((ex, node.token.pos))
 
         # changing class id so it can be added to context
         while not flag:
@@ -67,7 +71,7 @@ class TypeCollector(object):
             except SemanticError:
                 pass
 
-    def define_built_in_types(self):
+    def define_built_in_types(self) -> void:
         objectx = ObjectType()
         iox = IOType()
         intx = IntType()
@@ -100,7 +104,7 @@ class TypeCollector(object):
 
         built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type, autotype])
 
-    def check_parents(self):
+    def check_parents(self) -> void:
         for item in self.parent.keys():
             item_type = self.context.get_type(item)
             if self.parent[item] is None:
@@ -108,27 +112,39 @@ class TypeCollector(object):
                 item_type.set_parent(built_in_types[0])
             else:
                 try:
-                    typex = self.context.get_type(self.parent[item])
+                    typex = self.context.get_type(self.parent[item].lex)
                     if not typex.can_be_inherited():
                         self.errors.append(
-                            f"Class {item} can not inherit from {typex.name}"
+                            (
+                                SemanticError(
+                                    f"Class {item} can not inherit class {typex.name}"
+                                ),
+                                self.parent[item].pos,
+                            )
                         )
                         typex = built_in_types[0]
                     item_type.set_parent(typex)
                 except SemanticError as ex:
-                    self.errors.append(ex.text)
+                    self.errors.append(
+                        (
+                            TypeError(
+                                f"Class {item_type.name} inherits from an undefined class {self.parent[item].lex}."
+                            ),
+                            self.parent[item].pos,
+                        )
+                    )
                     item_type.set_parent(built_in_types[0])
 
-    def check_cyclic_inheritance(self):
+    def check_cyclic_inheritance(self) -> void:
         flag = []
 
-        def find(item):
+        def find(item: Type) -> int:
             for i, typex in enumerate(flag):
                 if typex.name == item.name:
                     return i
             return len(flag)
 
-        def check_path(idx, item):
+        def check_path(idx: int, item: Type) -> void:
             while True:
                 flag.append(item)
                 parent = item.parent
@@ -138,7 +154,7 @@ class TypeCollector(object):
                 if pos < len(flag):
                     if pos >= idx:
                         self.errors.append(
-                            f"Class {item.name} can not inherit from {parent.name}"
+                            (SemanticError("Cyclic heritage."), item.pos)
                         )
                         item.parent = built_in_types[0]
                     break
@@ -149,8 +165,8 @@ class TypeCollector(object):
             if idx == len(flag):
                 check_path(idx, item)
 
-    def order_types(self, node):
-        sorted_declarations = []
+    def order_types(self, node: ProgramNode):
+        sorted_declarations: List[ClassDeclarationNode] = []
         flag = [False] * len(node.declarations)
 
         change = True
