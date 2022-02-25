@@ -312,10 +312,12 @@ class Out_Int:
     def __str__(self) -> str:
        return """
 IO_out_int:
+lw $t1 , 4($sp)      #cargar self
 li $v0, 1
 lw $a0, 0($sp)
 syscall
 addi $sp, $sp, 8
+move $s0, $t1
 jr $ra"""
 
 class In_String:
@@ -325,7 +327,7 @@ IO_in_string:
 li $v0,8
 li $a1 , 10000
 syscall
-move $s0 , $a0
+move $s0 , $v0
 addi $sp, $sp, 4
 jr $ra
 """
@@ -370,6 +372,14 @@ class Length:
        return """ 
        
     String_length:
+
+    li $v0,1
+    li $a0,4
+    syscall
+
+    li $v0,10
+    syscall
+
     lw $t4 , ($sp)   #self
     li $t0 , 0       #contador
     lw $s2 , 4($t4)  # propiedad value
@@ -386,7 +396,7 @@ class Length:
         move $s0 , $t0
         addi $sp, $sp, 4
         jr $ra
-       return """        
+        """        
 
 
 class Concat:
@@ -398,10 +408,21 @@ class Concat:
     lw $s2 ,4($t2)    # propiedad value
     lw $s1 ,4($t1)    # propiedad value
 
+    
+    li $a0,12
     li $v0 , 9
-    li $a0 , 100      # reservar memoria pal proximo string
     syscall
-    move $s3 , $v0
+    move $t7 , $v0           # $t7 direciion de destino de la clase
+    move $t5 , $v0            #guarde la dir de la clase string      #
+    la $s7 , String           #primer atributo de la calse
+    sw $s7 , ($t5)
+    add $t5,$t5,4            #posicion de la direccion del valor del string
+    
+
+    li $a0 ,100
+    li $v0,9
+    syscall                 #genere espacio para crear string
+    move $s3,$v0
 
     loop_str1:
         lb $t0 , ($s1)
@@ -420,7 +441,9 @@ class Concat:
         j loop_str1
 
     ENDConcat:
-        move $s0, $v0
+        move $s0 , $v0
+        sw $s0 , ($t5)
+        move $s0 , $t7
         addi $sp, $sp, 8
         jr $ra
 """
@@ -497,7 +520,7 @@ copy_loop:
     beq $t3, $zero, end_copy
     lw  $t1, 0($t0)
     sw  $t1, 0($v0)
-    addi $t3, $t3, -4
+    addi $t3, $t3, -1
     add $t0, $t0, 4
     add $v0, $v0, 4
     jr copy_loop
