@@ -4,7 +4,7 @@ from parsing.lexer import COOL_Lexer
 from tours.TypeCollector import TypeCollector
 from tours.TypeBuilder import TypeBuilder
 from tours.TypeChecker import TypeChecker
-from code_generator.generate_ast import CIL
+from code_generator.generate_ast import *
 from code_generator.cil_codegen import CILCodegen
 
 input_file = sys.argv[1]

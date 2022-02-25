@@ -1,0 +1,7 @@
+class Main {
+    w : Int <- 2;
+    s : Int <- 3;
+    main() : Object { 
+        while w  < s  loop  7 pool
+    };
+};

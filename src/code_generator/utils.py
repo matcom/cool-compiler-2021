@@ -1,3 +1,6 @@
+from git import Object
+
+from cmp.semantic import ObjectType
 from .ast_CIL import *
 
 
@@ -66,9 +69,17 @@ class CILScope:
     def create_builtin_types(self):
         types = []
         
+        obj_methods = [
+            CILMethodNode('abort', 'abort'), 
+            CILMethodNode('type_name', 'type_name'),
+            CILMethodNode('copy', 'copy'),
+        ]
+        types.append(CILTypeNode('Object', [], obj_methods))
+        
         int_methods = [
             CILMethodNode('init', 'init_Int'),
         ]
+        int_methods.extend(obj_methods)
         types.append(CILTypeNode('Int', [CILAttributeNode('value', None)], int_methods))
         init_int = CILFuncNode(
             'init_Int', 
@@ -83,6 +94,7 @@ class CILScope:
             CILMethodNode('concat', 'concat'),
             CILMethodNode('substr', 'substr'),
         ]
+        str_methods.extend(obj_methods)
         types.append(CILTypeNode('String', [CILAttributeNode('value', None)], str_methods))
         init_string = CILFuncNode(
             'init_String', 
@@ -94,6 +106,7 @@ class CILScope:
         bool_methods = [
             CILMethodNode('init', 'init_Bool'),
         ]
+        bool_methods.extend(obj_methods)
         types.append(CILTypeNode('Bool', [CILAttributeNode('value', None)], bool_methods))
         bool_string = CILFuncNode(
             'init_Bool', 
@@ -101,13 +114,6 @@ class CILScope:
             [], 
             [CILSetAttributeNode(CILVariableNode('self'), 'Bool', CILVariableNode('value'), CILVariableNode('v'))])               
         self.functions.append(bool_string)
-               
-        obj_methods = [
-            CILMethodNode('abort', 'abort'), 
-            CILMethodNode('type_name', 'type_name'),
-            CILMethodNode('copy', 'copy'),
-        ]
-        types.append(CILTypeNode('Object', [], obj_methods))
         
         io_methods = [
             CILMethodNode('out_string', 'out_string'), 
@@ -115,11 +121,49 @@ class CILScope:
             CILMethodNode('in_string', 'in_string'),
             CILMethodNode('in_int', 'in_int'),
         ]
+        io_methods.extend(obj_methods)
         types.append(CILTypeNode('IO', [], io_methods))
         
         return types
         
-    #pending 
-    def create_init_class(attributes, expresions):
+    def create_init_class(self, attributes, expresions):
+        type = self.context.get_type(self.current_class)
+        instructions = []
+        
+        if not isinstance(type.parent,ObjectType):
+            instructions.append(CILArgNode(CILVariableNode(f'self_{self.current_class}')))
+            instructions.append(CILCallNode(f'init_{type.parent.name}'))   
+             
         for attr,expr in zip(attributes,expresions):
-            assig = CILAssignNode (attr.id,expr)
+            instructions.append(CILAssignNode (CILVariableNode(attr), expr))
+        
+        return CILFuncNode(f'init_{self.current_class}',[], [], instructions)
+        
+        
+        
+class TypeInfo:
+    def __init__(self):
+        self.attrs = []
+        self.methods = {}
+        
+    def __repr__(self):
+        text = str(self.attrs) + '\n'
+        text += str(self.methods) + '\n'
+        return text
+        
+            
+def get_ts(context):
+    list = []
+    visited = []
+    for c in context.types.values():
+        if c not in visited:
+            dfs_visit_ts(context, c, list, visited)
+    return list
+
+
+def dfs_visit_ts(context, u, list, visited):
+    visited.append(u)
+    if u.parent is not None and u.parent not in visited:
+        dfs_visit_ts(context, u.parent, list, visited)
+    
+    list.append(u)

@@ -1,11 +1,10 @@
-from math import exp
 from parsing.ast import *
 from .ast_CIL import *
-from .scope_CIL import *
-from cmp.semantic import IntType, StringType, BoolType
+from .utils import *
+from cmp.semantic import IntType, StringType, BoolType, ObjectType
 import cmp.visitor as visitor
-
-
+        
+    
 class CIL:
     def __init__(self, context):
         self.scope = CILScope(context)
@@ -16,6 +15,20 @@ class CIL:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
+        types_ts = get_ts(self.scope.context)
+        infos = self.scope.infos = {}
+        for type in types_ts:
+            t = TypeInfo() 
+            infos[type.name] = t  
+            if type.parent is not None:
+                p = type.parent.name
+                t.attrs = infos[p].attrs.copy()
+                t.methods = infos[p].methods.copy()
+            
+            t.attrs.extend(type.attributes)
+            for m in type.methods:
+                t.methods[m.name] = f'{m.name}_{type.name}'
+            
         types = []
         for d in node.declarations:
             type = self.visit(d)
@@ -35,34 +48,37 @@ class CIL:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         self.scope.current_class = node.id
-        
+        att_aux = []
         attributes = []
         expressions = []
         methods = []
+        
+        type_info = self.scope.infos[node.id]
+        for a in type_info.attrs:   
+            attributes.append(CILAttributeNode(a.name, a.type))
+        for m in type_info.methods.keys():        
+            methods.append(CILMethodNode(m, type_info.methods[m])) 
+        methods.append(CILMethodNode('init', f'init_{node.id}'))         
+                
         for feature in node.features:
-            if isinstance (feature, AttrDeclarationNode):
-                attr = self.visit(feature)
-                attributes.append(attr)
+            if isinstance(feature, AttrDeclarationNode):
                 if feature.expr is not None:
                     expr = self.visit(feature.expr)
                     expressions.append(expr)
+                    att_aux.append(feature.id)
+                    
             else:
                 function = self.visit(feature)
                 self.scope.functions.append(function) 
-                methods.append(CILMethodNode(feature.id, function.id))   
-                
-        methods.append(CILMethodNode('init', f'init_{node.id}'))         
-        # use expressions here
-        #init_class = create_init_class (type.attributes,expressions)    
-        #self.scope.functions.append (init_class)  
+
+        init_class = self.scope.create_init_class(att_aux , expressions)    
+        self.scope.functions.append(init_class)  
         
-        # herencia
-                              
         return CILTypeNode(node.id, attributes, methods)
             
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
-        return CILAttributeNode(node.id, node.type)
+        pass
     
     @visitor.when(FuncDeclarationNode) 
     def visit(self, node):
@@ -96,7 +112,7 @@ class CIL:
     def visit(self, node):
         if not isinstance(node.expr, VariableNode) or node.expr.lex != 'self':
             expr = self.visit(node.expr)
-            name = self.scope.add_new_local(node.expr.computed_type.name)  # TODO revisar el tipo de retorno (idea, a;adir una instruccio typeof)
+            name = self.scope.add_new_local(node.expr.computed_type.name) 
             instruction = CILAssignNode(CILVariableNode(name), expr)
             self.scope.instructions.append(instruction)  
         else: 
@@ -106,7 +122,7 @@ class CIL:
         args.append(CILArgNode(CILVariableNode(name)))
         for arg in node.arg:
             expr = self.visit(arg)
-            name_arg = self.scope.add_new_local(arg.computed_type.name) # TODO lo mismo de arriba
+            name_arg = self.scope.add_new_local(arg.computed_type.name)
             if not isinstance(expr, VariableNode):
                 instruction = CILAssignNode(CILVariableNode(name_arg), expr)
                 self.scope.instructions.append(instruction)
@@ -120,7 +136,7 @@ class CIL:
         else:         
             expression = CILCallNode(node.id)
         type = self.scope.ret_type_of_method(node.id, self.scope.current_class)
-        new_var = self.scope.add_new_local(type) # TODO
+        new_var = self.scope.add_new_local(type) 
         node_var = CILVariableNode(new_var)
         self.scope.instructions.append(CILAssignNode(node_var, expression))     
         return node_var
