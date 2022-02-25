@@ -181,6 +181,35 @@ strcopy_String_loop:
     addu $sp, $sp, 4
     jr $ra
 
+length_String:
+    sw $ra, 0($sp)
+    addu $sp, $sp, -4
+    sw $fp, 0($sp)
+    addu $sp, $sp, -4
+    move $fp, $sp
+
+    lw $v0, 12($fp) # get the string instance address
+    lw $v1, 4($fp) # get the string value address
+
+    sw $v1, 0($sp)
+    addu $sp, $sp, -4
+    jal strlen_String # length at v0
+    
+    move $sp, $fp
+    lw $fp, 0($sp)
+    addu $sp, $sp, 4
+    lw $ra, 0($sp)
+    addu $sp, $sp, 4
+    jr $ra
+
+concat_String:
+    sw $ra, 0($sp)
+    addu $sp, $sp, -4
+    sw $fp, 0($sp)
+    addu $sp, $sp, -4
+    move $fp, $sp
+
+    lw $v0, 16($fp) # first str instance address 
 
     
 
