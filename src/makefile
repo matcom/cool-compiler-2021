@@ -20,4 +20,4 @@ test-done: lexer parser semantic
 
 .PHONY: style
 style:
-	for f in **/*.py; do [ -f $$f ] && black $$f && isort --profile black $$f; done
+	for f in $$(find . -name '*.py'); do [ -f $$f ] && echo "Formatting $$f" && black $$f && isort --profile black $$f; done

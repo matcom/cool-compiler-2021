@@ -51,9 +51,7 @@ class TypeCheckerVisitor:
         self.types = node.types
         classes = [self.visit(c, scope.create_child()) for c in node.classes]
 
-        return type_checked.CoolProgramNode(
-            node.lineno, node.columnno, classes
-        )
+        return type_checked.CoolProgramNode(node.lineno, node.columnno, classes)
 
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):
@@ -469,7 +467,6 @@ class TypeCheckerVisitor:
             )
         return left, right
 
-
     @visitor.when(type_built.CoolPlusNode)
     def visit(self, node, scope):
         int_type = self.get_type("Int")
@@ -506,19 +503,27 @@ class TypeCheckerVisitor:
         left = self.visit(node.left_expr, scope)
         right = self.visit(node.right_expr, scope)
 
-        static_types = self.get_type("Bool"), self.get_type("Int"), self.get_type("String")
+        static_types = (
+            self.get_type("Bool"),
+            self.get_type("Int"),
+            self.get_type("String"),
+        )
         for type in static_types:
             left_conforms = left.type.conforms_to(type)
             right_conforms = right.type.conforms_to(type)
-            if left_conforms and not right_conforms or right_conforms and not left_conforms:
+            if (
+                left_conforms
+                and not right_conforms
+                or right_conforms
+                and not left_conforms
+            ):
                 self.errors.append(
                     errors.InvalidComparissonError(
                         node.lineno, node.columnno, left.type.name, right.type.name
                     )
                 )
 
-        return left,right
-
+        return left, right
 
     @visitor.when(type_built.CoolLeqNode)
     def visit(self, node, scope):

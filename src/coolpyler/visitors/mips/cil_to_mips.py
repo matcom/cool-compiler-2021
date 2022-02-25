@@ -524,7 +524,7 @@ class CilToMIPS:
             mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, value_dir))
         )
 
-        locals_size = len(node.localvars) * 4
+        locals_size = len(self.locals) * 4
         instructions.append(mips.AddiNode(SP_REG, SP_REG, locals_size))
 
         instructions.append(

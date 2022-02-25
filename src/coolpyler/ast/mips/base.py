@@ -113,6 +113,7 @@ class StoreWordNode(BinaryOpNode):
     def __init__(self, register, address):
         super().__init__(register, address)
 
+
 class StoreByteNode(BinaryOpNode):
     def __init__(self, register, address):
         super().__init__(register, address)
@@ -204,4 +205,3 @@ class LabelInstructionNode(InstructionNode):
     def __init__(self, label):
         # super().__init__(node)
         self.label = label
-
