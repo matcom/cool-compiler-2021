@@ -268,16 +268,14 @@ class CCILGenerator:
         (case_expr_ops, case_expr_fv) = self.visit(node.case_expr)
 
         # Storing the type of the resulting case expression
-        type_of = self.create_type_of(
-            f"case_{times}_typeOf", extract_id( case_expr_fv)
-        )
+        type_of = self.create_type_of(f"case_{times}_typeOf", extract_id(case_expr_fv))
 
         # Final label where all branch must jump to
         final_label_id = f"case_{times}_end"
-        final_label = LabelNode( final_label_id)
+        final_label = LabelNode(final_label_id)
 
         # Inconditional jump to final label
-        final_goto = GoToNode( final_label)
+        final_goto = GoToNode(final_label)
 
         # All branch must end in a var named like this
         pre_fvalue_id = f"case_{times}_pre_fv"
@@ -293,7 +291,7 @@ class CCILGenerator:
             # Initializing var which holds the branch var type
             branch_var_type_id = f"case_{times}_optionTypeOf_{i}"
             branch_var_type_of = self.create_type_of(
-                branch_var_type_id, extract_id( branch_var)
+                branch_var_type_id, extract_id(branch_var)
             )
 
             # Initializng var which holds the comparison result between
@@ -301,16 +299,16 @@ class CCILGenerator:
             select_branch_id = f"case_{times}_optionSelect_{i}"
             select_branch = self.create_equality(
                 select_branch_id,
-                extract_id( type_of),
-                extract_id( branch_var_type_of),
+                extract_id(type_of),
+                extract_id(branch_var_type_of),
             )
 
             # Label that means the start of this branch logic
             branch_label_id = f"case_{times}_branch_{i}"
-            branch_label = LabelNode( branch_label_id)
+            branch_label = LabelNode(branch_label_id)
 
             # Conditional jump to the right branch label
-            if_op = IfNode( extract_id( branch_var_type_of), branch_label)
+            if_op = IfNode(extract_id(branch_var_type_of), branch_label)
             # Storing logic to jump to branch logic if this branch is selected
             pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
 
@@ -330,7 +328,8 @@ class CCILGenerator:
             *case_expr_ops,
             type_of,
             *pattern_match_ops,
-            *branch_ops,
+            *self.notifiy_and_abort(f"Pattern match failure in {node.row}, {node.col}")
+            * branch_ops,
             final_label,
             fval,
         ]
@@ -372,34 +371,35 @@ class CCILGenerator:
 
         fval_id: str
         op: BinaryOpNode
-        match type(node):
-            # Arithmetic Binary Nodes
-            case sem_ast.PlusNode:
-                op = SumOpNode(left_id, right_id)
-                fval_id = f"sum_{times}"
-            case sem_ast.MinusNode:
-                op = MinusOpNode(left_id, right_id)
-                fval_id = f"minus_{times}"
-            case sem_ast.StarNode:
-                op = MultOpNode(left_id, right_id)
-                fval_id = f"mult_{times}"
-            case sem_ast.DivNode:
-                op = DivOpNode(left_id, right_id)
-                fval_id = f"div_{times}"
-            # Boolean Binary Nodes
-            case sem_ast.EqualsNode:
-                op = EqualOpNode(left_id, right_id)
-                fval_id = f"eq_{times}"
-            case sem_ast.LessNode:
-                op = LessOpNode(left_id, right_id)
-                fval_id = f"le_{times}"
-            case sem_ast.LessOrEqualNode:
-                op = LessOrEqualOpNode(left_id, right_id)
-                fval_id = f"leq_{times}"
-            case _:
-                raise Exception(
-                    f"Pattern match failure visiting binary expression with {type(node).__name__}"
-                )
+
+        # Arithmetic Binary Nodes
+        node_type = type(node)
+        if node_type == sem_ast.PlusNode:
+            op = SumOpNode(left_id, right_id)
+            fval_id = f"sum_{times}"
+        elif node_type == sem_ast.MinusNode:
+            op = MinusOpNode(left_id, right_id)
+            fval_id = f"minus_{times}"
+        elif node_type == sem_ast.StarNode:
+            op = MultOpNode(left_id, right_id)
+            fval_id = f"mult_{times}"
+        elif node_type == sem_ast.DivNode:
+            op = DivOpNode(left_id, right_id)
+            fval_id = f"div_{times}"
+        # Boolean Binary Nodes
+        elif node_type == sem_ast.EqualsNode:
+            op = EqualOpNode(left_id, right_id)
+            fval_id = f"eq_{times}"
+        elif node_type == sem_ast.LessNode:
+            op = LessOpNode(left_id, right_id)
+            fval_id = f"le_{times}"
+        elif node_type == sem_ast.LessOrEqualNode:
+            op = LessOrEqualOpNode(left_id, right_id)
+            fval_id = f"leq_{times}"
+        else:
+            raise Exception(
+                f"Pattern match failure visiting binary expression with {type(node).__name__}"
+            )
 
         fval = self.create_storage(fval_id, node.type.name, op)
         return ([*left_ops, *right_ops, fval], fval)
@@ -413,18 +413,19 @@ class CCILGenerator:
 
         fval_id: str
         op: UnaryOpNode
-        match type(node):
-            case sem_ast.IsVoidNode:
-                fval_id = f"isVoid_{times}"
-                op = IsVoidOpNode(expr_id)
-            case sem_ast.NotNode:
-                fval_id = f"not_{times}"
-                op = NotOpNode(expr_id)
-            case sem_ast.ComplementNode:
-                fval_id = f"neg_{times}"
-                op = NegOpNode(expr_id)
-            case _:
-                raise Exception("Pattern match failure while visiting unary expression")
+
+        node_type = type(node)
+        if node_type == sem_ast.IsVoidNode:
+            fval_id = f"isVoid_{times}"
+            op = IsVoidOpNode(expr_id)
+        elif node_type == sem_ast.NotNode:
+            fval_id = f"not_{times}"
+            op = NotOpNode(expr_id)
+        elif node_type == sem_ast.ComplementNode:
+            fval_id = f"neg_{times}"
+            op = NegOpNode(expr_id)
+        else:
+            raise Exception("Pattern match failure while visiting unary expression")
 
         fval = self.create_storage(fval_id, node.type.name, op)
         return [*expr_op, fval], fval
