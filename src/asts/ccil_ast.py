@@ -14,8 +14,9 @@ class CCILProgram:
     data_section: List[str]  # no idea what will be this the node,
 
     def __str__(self) -> str:
-        types = "\n".join(str(type) for type in self.types_section)
-        data = "\n".join(str(data) for data in self.data_section)
+        ident = "\t"
+        types = "\n".join(ident + str(type) for type in self.types_section)
+        data = "\n".join(ident + str(data) for data in self.data_section)
         code = "\n".join(str(func) for func in self.code_section)
         return f"TYPES:\n{types}\nDATA:\n{data}\nCODE:\n{code} "
 
@@ -32,10 +33,13 @@ class Class:
     init_operations: FunctionNode
 
     def __str__(self) -> str:
-        attributes = "\n".join(str(a) for a in self.attributes)
-        methods = "\n".join(str(m) for m in self.methods)
+        ident = "\t\t"
+        attributes = "\n".join(ident + str(a) for a in self.attributes)
+        methods = "\n".join(ident + str(m) for m in self.methods)
         init_function = str(self.init_operations)
-        return f"\ttype {self.id} {{\n {attributes} \n {methods} \n \n {init_function}\n\t}}"
+        return (
+            f"type {self.id} {{\n {attributes} \n {methods} \n \n {init_function}\n\t}}"
+        )
 
 
 @dataclass(frozen=True)
@@ -76,7 +80,7 @@ class Data:
     value: str
 
     def __str__(self) -> str:
-        return f"\t{self.id} : '{self.value}'"
+        return f"{self.id} : '{self.value}'"
 
 
 @dataclass(frozen=True)
@@ -89,7 +93,7 @@ class Method:
     function: FunctionNode
 
     def __str__(self) -> str:
-        return f"\t\tmethod {self.id} : {self.function.id}"
+        return f"method {self.id} : {self.function.id}"
 
 
 class Node:
