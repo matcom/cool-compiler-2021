@@ -128,8 +128,6 @@ class CILScope:
         type = self.context.get_type(self.current_class)
         instructions = []
         
-        instructions.append(CILParamNode('self', None)) 
-        
         if not isinstance(type.parent,ObjectType):
             instructions.append(CILArgNode(CILVariableNode(f'self')))
             call = CILVCallNode(type.parent.name, f'init_{type.parent.name}')  
@@ -146,7 +144,7 @@ class CILScope:
         
         instructions.append(CILReturnNode(CILVariableNode('self')))
         
-        return CILFuncNode(f'init_{self.current_class}',[], [], instructions)
+        return CILFuncNode(f'init_{self.current_class}', [CILParamNode('self', None)], [], instructions)
         
         
 class TypeInfo:
