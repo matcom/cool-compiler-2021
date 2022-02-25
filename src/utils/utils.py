@@ -1,6 +1,6 @@
-def find_column(input_text, token):
-    line_start = input_text.rfind("\n", 0, token.lexpos) + 1
-    return (token.lexpos - line_start) + 1
+def find_column(input_text, pos):
+    line_start = input_text.rfind("\n", 0, pos) + 1
+    return (pos - line_start) + 1
 
 
 def find_last_line(input_text):
