@@ -1,0 +1,2050 @@
+
+.text
+main:
+	move       $fp, $sp
+	subu       $sp, $sp, 28
+	la         $t0, Object_abort
+	usw        $t0, vt_Object+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Object+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Object+8
+	la         $t0, Object_abort
+	usw        $t0, vt_IO+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_IO+4
+	la         $t0, Object_copy
+	usw        $t0, vt_IO+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_IO+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_IO+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_IO+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_IO+24
+	la         $t0, Int_abort
+	usw        $t0, vt_Int+0
+	la         $t0, Int_type_name
+	usw        $t0, vt_Int+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Int+8
+	la         $t0, String_abort
+	usw        $t0, vt_String+0
+	la         $t0, String_type_name
+	usw        $t0, vt_String+4
+	la         $t0, Object_copy
+	usw        $t0, vt_String+8
+	la         $t0, String_length
+	usw        $t0, vt_String+28
+	la         $t0, String_concat
+	usw        $t0, vt_String+32
+	la         $t0, String_substr
+	usw        $t0, vt_String+36
+	la         $t0, Bool_abort
+	usw        $t0, vt_Bool+0
+	la         $t0, Bool_type_name
+	usw        $t0, vt_Bool+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Bool+8
+	la         $t0, Object_abort
+	usw        $t0, vt_Book+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Book+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Book+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_Book+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_Book+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_Book+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_Book+24
+	la         $t0, Book_initBook
+	usw        $t0, vt_Book+40
+	la         $t0, Book_print
+	usw        $t0, vt_Book+44
+	la         $t0, Book___init__
+	usw        $t0, vt_Book+48
+	la         $t0, Object_abort
+	usw        $t0, vt_Article+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Article+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Article+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_Article+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_Article+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_Article+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_Article+24
+	la         $t0, Book_initBook
+	usw        $t0, vt_Article+40
+	la         $t0, Article_print
+	usw        $t0, vt_Article+44
+	la         $t0, Article_initArticle
+	usw        $t0, vt_Article+52
+	la         $t0, Article___init__
+	usw        $t0, vt_Article+48
+	la         $t0, Object_abort
+	usw        $t0, vt_BookList+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_BookList+4
+	la         $t0, Object_copy
+	usw        $t0, vt_BookList+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_BookList+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_BookList+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_BookList+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_BookList+24
+	la         $t0, BookList_isNil
+	usw        $t0, vt_BookList+56
+	la         $t0, BookList_cons
+	usw        $t0, vt_BookList+60
+	la         $t0, BookList_car
+	usw        $t0, vt_BookList+64
+	la         $t0, BookList_cdr
+	usw        $t0, vt_BookList+68
+	la         $t0, BookList_print_list
+	usw        $t0, vt_BookList+72
+	la         $t0, BookList___init__
+	usw        $t0, vt_BookList+48
+	la         $t0, Object_abort
+	usw        $t0, vt_Cons+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Cons+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Cons+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_Cons+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_Cons+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_Cons+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_Cons+24
+	la         $t0, Cons_isNil
+	usw        $t0, vt_Cons+56
+	la         $t0, BookList_cons
+	usw        $t0, vt_Cons+60
+	la         $t0, Cons_car
+	usw        $t0, vt_Cons+64
+	la         $t0, Cons_cdr
+	usw        $t0, vt_Cons+68
+	la         $t0, Cons_print_list
+	usw        $t0, vt_Cons+72
+	la         $t0, Cons_init
+	usw        $t0, vt_Cons+76
+	la         $t0, Cons___init__
+	usw        $t0, vt_Cons+48
+	la         $t0, Object_abort
+	usw        $t0, vt_Nil+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Nil+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Nil+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_Nil+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_Nil+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_Nil+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_Nil+24
+	la         $t0, Nil_isNil
+	usw        $t0, vt_Nil+56
+	la         $t0, BookList_cons
+	usw        $t0, vt_Nil+60
+	la         $t0, BookList_car
+	usw        $t0, vt_Nil+64
+	la         $t0, BookList_cdr
+	usw        $t0, vt_Nil+68
+	la         $t0, Nil_print_list
+	usw        $t0, vt_Nil+72
+	la         $t0, Nil___init__
+	usw        $t0, vt_Nil+48
+	la         $t0, Object_abort
+	usw        $t0, vt_Main+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Main+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Main+8
+	la         $t0, Main_main
+	usw        $t0, vt_Main+80
+	la         $t0, Main___init__
+	usw        $t0, vt_Main+48
+	#          self = ALLOCATE Main ;
+	li         $a0, 40
+	li         $v0, 9
+	syscall
+	sw         $v0, -4($fp)
+	la         $t0, vt_Main
+	sw         $t0, 8($v0)
+	#          local_1 = LOAD data_1 ;
+	la         $t0, data_1
+	sw         $t0, -8($fp)
+	#          SETATTR self @type local_1 ;
+	lw         $t0, -8($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 0($t1)
+	#          local_2 = 24 ;
+	li         $t0, 24
+	sw         $t0, -12($fp)
+	#          SETATTR self @size local_2 ;
+	lw         $t0, -12($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 4($t1)
+	#          local_3 = 1 ;
+	li         $t0, 1
+	sw         $t0, -16($fp)
+	#          SETATTR self @order local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 12($t1)
+	#          local_4 = 1 ;
+	li         $t0, 1
+	sw         $t0, -20($fp)
+	#          SETATTR self @min_order local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 16($t1)
+	#          local_5 = VCALL Main __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, -4($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Main___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -24($fp)
+	#          main_result = VCALL Main main ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_5 ;
+	lw         $t0, -24($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Main_main
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -28($fp)
+	#          RETURN main_result ;
+	lw         $v0, -28($fp)
+	addu       $sp, $sp, 28
+	li         $v0, 10
+	syscall
+IO_out_int:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          PRINT int ;
+	lw         $a0, 0($fp)
+	li         $v0, 1
+	syscall
+	#          RETURN self ;
+	lw         $v0, 4($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+IO_out_string:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          PRINT str ;
+	lw         $a0, 0($fp)
+	li         $v0, 4
+	syscall
+	#          RETURN self ;
+	lw         $v0, 4($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+IO_in_string:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	li         $a0, 1024
+	li         $v0, 9
+	syscall
+	move       $a0, $v0
+	move       $t3, $v0
+	li         $a1, 1024
+	li         $v0, 8
+	syscall
+	remove_nl_loop:
+
+	lb         $t0, ($a0)
+	beqz       $t0, end_loop
+	la         $t1, new_line
+	lb         $t2, ($t1)
+	beq        $t0, $t2, end_loop
+	addu       $a0, $a0, 1
+	b          remove_nl_loop
+	end_loop:
+
+	sb         $zero, ($a0)
+	sw         $t3, -4($fp)
+	#          RETURN read_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+IO_in_int:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          int = READINT ;
+	li         $v0, 5
+	syscall
+	sw         $v0, -4($fp)
+	#          RETURN int ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Object_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          type = TYPEOF self ;
+	lw         $t0, 0($fp)
+	lw         $t1, ($t0)
+	sw         $t1, -4($fp)
+	#          RETURN type ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Object_copy:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          copy = COPY self ;
+	lw         $a0, 8($fp)
+	li         $v0, 9
+	syscall
+	sw         $v0, -4($fp)
+	addu       $t1, $fp, 0
+	addu       $t2, $fp, -4
+	copy_loop:
+
+	lw         $t0, ($t1)
+	sw         $t0, ($t2)
+	addu       $t1, $t1, 4
+	addu       $t2, $t2, 4
+	subu       $a0, $a0, 4
+	beqz       $a0, end_copy_loop
+	b          copy_loop
+	end_copy_loop:
+
+	#          RETURN copy ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_length:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          len_result = LENGTH self ;
+	lw         $t2, 0($fp)
+	li         $t1, 0
+	length_loop:
+
+	lb         $t0, ($t2)
+	beqz       $t0, end_length_loop
+	addu       $t2, $t2, 1
+	addu       $t1, $t1, 1
+	b          length_loop
+	end_length_loop:
+
+	sw         $t1, -4($fp)
+	#          RETURN len_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_concat:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          concat_result = CONCAT self key ;
+	lw         $t2, 4($fp)
+	li         $t1, 0
+	concat_a_length_loop:
+
+	lb         $t0, ($t2)
+	beqz       $t0, concat_a_end_length_loop
+	addu       $t2, $t2, 1
+	addu       $t1, $t1, 1
+	b          concat_a_length_loop
+	concat_a_end_length_loop:
+
+	lw         $t2, 0($fp)
+	concat_b_length_loop:
+
+	lb         $t0, ($t2)
+	beqz       $t0, concat_b_end_length_loop
+	addu       $t2, $t2, 1
+	addu       $t1, $t1, 1
+	b          concat_b_length_loop
+	concat_b_end_length_loop:
+
+	addu       $a0, $t1, 1
+	li         $v0, 9
+	syscall
+	move       $t0, $v0
+	lw         $t1, 4($fp)
+	lw         $t2, 0($fp)
+	concat_loop_a:
+
+	lb         $a0, ($t1)
+	beqz       $a0, concat_loop_b
+	sb         $a0, ($t0)
+	addu       $t0, $t0, 1
+	addu       $t1, $t1, 1
+	b          concat_loop_a
+	concat_loop_b:
+
+	lb         $a0, ($t2)
+	beqz       $a0, end_concat
+	sb         $a0, ($t0)
+	addu       $t0, $t0, 1
+	addu       $t2, $t2, 1
+	b          concat_loop_b
+	end_concat:
+
+	sb         $zero, ($t0)
+	sw         $v0, -4($fp)
+	#          RETURN concat_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_substr:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          substring_result = SUBSTRING self i l;
+	lw         $t0, 8($fp)
+	lw         $a0, 0($fp)
+	addu       $a0, $a0, 1
+	li         $v0, 9
+	syscall
+	move       $t1, $v0
+	lw         $t4, 4($fp)
+	lw         $t2, 0($fp)
+	addu       $t0, $t0, $t4
+	substring_loop:
+
+	beqz       $t2, end_substring_loop
+	lb         $t3, ($t0)
+	sb         $t3, ($t1)
+	subu       $t2, $t2, 1
+	addu       $t0, $t0, 1
+	addu       $t1, $t1, 1
+	b          substring_loop
+	end_substring_loop:
+
+	sb         $zero, ($t1)
+	sw         $v0, -4($fp)
+	#          RETURN substring_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Object_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT None ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	lw         $a0, ($fp)
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+String_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT String ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	la         $a0, abort_String
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+Int_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT Int ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	la         $a0, abort_Int
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+Bool_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT Bool ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	la         $a0, abort_Bool
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+Bool_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_36 = LOAD data_18 ;
+	la         $t0, data_18
+	sw         $t0, -4($fp)
+	#          RETURN local_36 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Int_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_37 = LOAD data_19 ;
+	la         $t0, data_19
+	sw         $t0, -4($fp)
+	#          RETURN local_37 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_38 = LOAD data_20 ;
+	la         $t0, data_20
+	sw         $t0, -4($fp)
+	#          RETURN local_38 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Book___init__:
+	move       $fp, $sp
+	subu       $sp, $sp, 8
+	#          local_0 = ALLOCATE String ;
+	li         $a0, 1024
+	li         $v0, 9
+	syscall
+	sw         $v0, -4($fp)
+	#          SETATTR self title local_0 ;
+	lw         $t0, -4($fp)
+	lw         $t1, 0($fp)
+	sw         $t0, 20($t1)
+	#          local_1 = ALLOCATE String ;
+	li         $a0, 1024
+	li         $v0, 9
+	syscall
+	sw         $v0, -8($fp)
+	#          SETATTR self author local_1 ;
+	lw         $t0, -8($fp)
+	lw         $t1, 0($fp)
+	sw         $t0, 24($t1)
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 8
+	jr         $ra
+Book_initBook:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          SETATTR self title title_p ;
+	lw         $t0, 4($fp)
+	lw         $t1, 8($fp)
+	sw         $t0, 20($t1)
+	#          SETATTR self author author_p ;
+	lw         $t0, 0($fp)
+	lw         $t1, 8($fp)
+	sw         $t0, 24($t1)
+	#          RETURN self ;
+	lw         $v0, 8($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+Book_print:
+	move       $fp, $sp
+	subu       $sp, $sp, 68
+	#          local_2 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -12($fp)
+	#          local_3 = LOAD data_2 ;
+	la         $t0, data_2
+	sw         $t0, -16($fp)
+	#          local_4 = VCALL local_2 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_3 ;
+	lw         $t0, -16($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -12($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -20($fp)
+	#          local_1 = GETTYPEADDR local_4 ;
+	lw         $t1, -20($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -8($fp)
+	#          local_5 = GETATTR self title ;
+	lw         $t0, 0($fp)
+	lw         $t1, 20($t0)
+	sw         $t1, -24($fp)
+	#          local_6 = VCALL local_1 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_4 ;
+	lw         $t0, -20($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_5 ;
+	lw         $t0, -24($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -8($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -28($fp)
+	#          local_0 = GETTYPEADDR local_6 ;
+	lw         $t1, -28($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_7 = LOAD data_3 ;
+	la         $t0, data_3
+	sw         $t0, -32($fp)
+	#          local_8 = VCALL local_0 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_6 ;
+	lw         $t0, -28($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_7 ;
+	lw         $t0, -32($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -36($fp)
+	#          local_11 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -48($fp)
+	#          local_12 = LOAD data_4 ;
+	la         $t0, data_4
+	sw         $t0, -52($fp)
+	#          local_13 = VCALL local_11 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_12 ;
+	lw         $t0, -52($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -48($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -56($fp)
+	#          local_10 = GETTYPEADDR local_13 ;
+	lw         $t1, -56($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -44($fp)
+	#          local_14 = GETATTR self author ;
+	lw         $t0, 0($fp)
+	lw         $t1, 24($t0)
+	sw         $t1, -60($fp)
+	#          local_15 = VCALL local_10 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_13 ;
+	lw         $t0, -56($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_14 ;
+	lw         $t0, -60($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -44($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -64($fp)
+	#          local_9 = GETTYPEADDR local_15 ;
+	lw         $t1, -64($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -40($fp)
+	#          local_7 = LOAD data_3 ;
+	la         $t0, data_3
+	sw         $t0, -32($fp)
+	#          local_16 = VCALL local_9 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_15 ;
+	lw         $t0, -64($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_7 ;
+	lw         $t0, -32($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -40($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -68($fp)
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 68
+	jr         $ra
+Article___init__:
+	move       $fp, $sp
+	subu       $sp, $sp, 8
+	#          local_0 = VCALL Book __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Book___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -4($fp)
+	#          local_1 = ALLOCATE String ;
+	li         $a0, 1024
+	li         $v0, 9
+	syscall
+	sw         $v0, -8($fp)
+	#          SETATTR self per_title local_1 ;
+	lw         $t0, -8($fp)
+	lw         $t1, 0($fp)
+	sw         $t0, 28($t1)
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 8
+	jr         $ra
+Article_initArticle:
+	move       $fp, $sp
+	subu       $sp, $sp, 8
+	#          local_0 = GETTYPEADDR self ;
+	lw         $t1, 12($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_1 = VCALL local_0 initBook ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 12($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG title_p ;
+	lw         $t0, 8($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG author_p ;
+	lw         $t0, 4($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 40($t0)
+	jalr       $t1
+	addu       $sp, $sp, 12
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -8($fp)
+	#          SETATTR self per_title per_title_p ;
+	lw         $t0, 0($fp)
+	lw         $t1, 12($fp)
+	sw         $t0, 28($t1)
+	#          RETURN self ;
+	lw         $v0, 12($fp)
+	addu       $sp, $sp, 8
+	jr         $ra
+Article_print:
+	move       $fp, $sp
+	subu       $sp, $sp, 44
+	#          local_0 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_1 = VCALL Book print ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Book_print
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -8($fp)
+	#          local_4 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -20($fp)
+	#          local_5 = LOAD data_5 ;
+	la         $t0, data_5
+	sw         $t0, -24($fp)
+	#          local_6 = VCALL local_4 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_5 ;
+	lw         $t0, -24($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -20($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -28($fp)
+	#          local_3 = GETTYPEADDR local_6 ;
+	lw         $t1, -28($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -16($fp)
+	#          local_7 = GETATTR self per_title ;
+	lw         $t0, 0($fp)
+	lw         $t1, 28($t0)
+	sw         $t1, -32($fp)
+	#          local_8 = VCALL local_3 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_6 ;
+	lw         $t0, -28($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_7 ;
+	lw         $t0, -32($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -16($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -36($fp)
+	#          local_2 = GETTYPEADDR local_8 ;
+	lw         $t1, -36($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -12($fp)
+	#          local_9 = LOAD data_3 ;
+	la         $t0, data_3
+	sw         $t0, -40($fp)
+	#          local_10 = VCALL local_2 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_8 ;
+	lw         $t0, -36($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_9 ;
+	lw         $t0, -40($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -12($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -44($fp)
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 44
+	jr         $ra
+BookList___init__:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+BookList_isNil:
+	move       $fp, $sp
+	subu       $sp, $sp, 8
+	#          local_0 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_1 = VCALL local_0 abort ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 0($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -8($fp)
+	#          RETURN 1 ;
+	li         $v0, 1
+	addu       $sp, $sp, 8
+	jr         $ra
+BookList_cons:
+	move       $fp, $sp
+	subu       $sp, $sp, 36
+	#          local_1 = ALLOCATE Cons ;
+	li         $a0, 44
+	li         $v0, 9
+	syscall
+	sw         $v0, -8($fp)
+	la         $t0, vt_Cons
+	sw         $t0, 8($v0)
+	#          local_2 = LOAD data_6 ;
+	la         $t0, data_6
+	sw         $t0, -12($fp)
+	#          SETATTR local_1 @type local_2 ;
+	lw         $t0, -12($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 0($t1)
+	#          local_3 = 28 ;
+	li         $t0, 28
+	sw         $t0, -16($fp)
+	#          SETATTR local_1 @size local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 4($t1)
+	#          local_4 = 2 ;
+	li         $t0, 2
+	sw         $t0, -20($fp)
+	#          SETATTR local_1 @order local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 12($t1)
+	#          local_5 = 2 ;
+	li         $t0, 2
+	sw         $t0, -24($fp)
+	#          SETATTR local_1 @min_order local_5 ;
+	lw         $t0, -24($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 16($t1)
+	#          local_6 = VCALL Cons __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_1 ;
+	lw         $t0, -8($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Cons___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -28($fp)
+	#          new_cell = local_6 ;
+	lw         $t0, -28($fp)
+	sw         $t0, -4($fp)
+	#          local_7 = GETTYPEADDR new_cell ;
+	lw         $t1, -4($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -32($fp)
+	#          local_8 = VCALL local_7 init ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG new_cell ;
+	lw         $t0, -4($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG hd ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG self ;
+	lw         $t0, 4($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -32($fp)
+	ulw        $t1, 76($t0)
+	jalr       $t1
+	addu       $sp, $sp, 12
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -36($fp)
+	#          RETURN local_8 ;
+	lw         $v0, -36($fp)
+	addu       $sp, $sp, 36
+	jr         $ra
+BookList_car:
+	move       $fp, $sp
+	subu       $sp, $sp, 32
+	#          local_0 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_1 = VCALL local_0 abort ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 0($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -8($fp)
+	#          local_2 = ALLOCATE Book ;
+	li         $a0, 44
+	li         $v0, 9
+	syscall
+	sw         $v0, -12($fp)
+	la         $t0, vt_Book
+	sw         $t0, 8($v0)
+	#          local_3 = LOAD data_7 ;
+	la         $t0, data_7
+	sw         $t0, -16($fp)
+	#          SETATTR local_2 @type local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 0($t1)
+	#          local_4 = 28 ;
+	li         $t0, 28
+	sw         $t0, -20($fp)
+	#          SETATTR local_2 @size local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 4($t1)
+	#          local_5 = 6 ;
+	li         $t0, 6
+	sw         $t0, -24($fp)
+	#          SETATTR local_2 @order local_5 ;
+	lw         $t0, -24($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 12($t1)
+	#          local_6 = 5 ;
+	li         $t0, 5
+	sw         $t0, -28($fp)
+	#          SETATTR local_2 @min_order local_6 ;
+	lw         $t0, -28($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 16($t1)
+	#          local_7 = VCALL Book __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_2 ;
+	lw         $t0, -12($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Book___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -32($fp)
+	#          RETURN local_7 ;
+	lw         $v0, -32($fp)
+	addu       $sp, $sp, 32
+	jr         $ra
+BookList_cdr:
+	move       $fp, $sp
+	subu       $sp, $sp, 32
+	#          local_0 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_1 = VCALL local_0 abort ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 0($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -8($fp)
+	#          local_2 = ALLOCATE BookList ;
+	li         $a0, 36
+	li         $v0, 9
+	syscall
+	sw         $v0, -12($fp)
+	la         $t0, vt_BookList
+	sw         $t0, 8($v0)
+	#          local_3 = LOAD data_8 ;
+	la         $t0, data_8
+	sw         $t0, -16($fp)
+	#          SETATTR local_2 @type local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 0($t1)
+	#          local_4 = 20 ;
+	li         $t0, 20
+	sw         $t0, -20($fp)
+	#          SETATTR local_2 @size local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 4($t1)
+	#          local_5 = 4 ;
+	li         $t0, 4
+	sw         $t0, -24($fp)
+	#          SETATTR local_2 @order local_5 ;
+	lw         $t0, -24($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 12($t1)
+	#          local_6 = 2 ;
+	li         $t0, 2
+	sw         $t0, -28($fp)
+	#          SETATTR local_2 @min_order local_6 ;
+	lw         $t0, -28($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 16($t1)
+	#          local_7 = VCALL BookList __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_2 ;
+	lw         $t0, -12($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        BookList___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -32($fp)
+	#          RETURN local_7 ;
+	lw         $v0, -32($fp)
+	addu       $sp, $sp, 32
+	jr         $ra
+BookList_print_list:
+	move       $fp, $sp
+	subu       $sp, $sp, 8
+	#          local_0 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_1 = VCALL local_0 abort ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 0($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -8($fp)
+	#          RETURN local_1 ;
+	lw         $v0, -8($fp)
+	addu       $sp, $sp, 8
+	jr         $ra
+Cons___init__:
+	move       $fp, $sp
+	subu       $sp, $sp, 52
+	#          local_0 = VCALL BookList __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        BookList___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -4($fp)
+	#          local_1 = ALLOCATE Book ;
+	li         $a0, 44
+	li         $v0, 9
+	syscall
+	sw         $v0, -8($fp)
+	la         $t0, vt_Book
+	sw         $t0, 8($v0)
+	#          local_2 = LOAD data_7 ;
+	la         $t0, data_7
+	sw         $t0, -12($fp)
+	#          SETATTR local_1 @type local_2 ;
+	lw         $t0, -12($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 0($t1)
+	#          local_3 = 28 ;
+	li         $t0, 28
+	sw         $t0, -16($fp)
+	#          SETATTR local_1 @size local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 4($t1)
+	#          local_4 = 6 ;
+	li         $t0, 6
+	sw         $t0, -20($fp)
+	#          SETATTR local_1 @order local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 12($t1)
+	#          local_5 = 5 ;
+	li         $t0, 5
+	sw         $t0, -24($fp)
+	#          SETATTR local_1 @min_order local_5 ;
+	lw         $t0, -24($fp)
+	lw         $t1, -8($fp)
+	sw         $t0, 16($t1)
+	#          local_6 = VCALL Book __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_1 ;
+	lw         $t0, -8($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Book___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -28($fp)
+	#          SETATTR self xcar local_6 ;
+	lw         $t0, -28($fp)
+	lw         $t1, 0($fp)
+	sw         $t0, 20($t1)
+	#          local_7 = ALLOCATE BookList ;
+	li         $a0, 36
+	li         $v0, 9
+	syscall
+	sw         $v0, -32($fp)
+	la         $t0, vt_BookList
+	sw         $t0, 8($v0)
+	#          local_8 = LOAD data_8 ;
+	la         $t0, data_8
+	sw         $t0, -36($fp)
+	#          SETATTR local_7 @type local_8 ;
+	lw         $t0, -36($fp)
+	lw         $t1, -32($fp)
+	sw         $t0, 0($t1)
+	#          local_9 = 20 ;
+	li         $t0, 20
+	sw         $t0, -40($fp)
+	#          SETATTR local_7 @size local_9 ;
+	lw         $t0, -40($fp)
+	lw         $t1, -32($fp)
+	sw         $t0, 4($t1)
+	#          local_10 = 4 ;
+	li         $t0, 4
+	sw         $t0, -44($fp)
+	#          SETATTR local_7 @order local_10 ;
+	lw         $t0, -44($fp)
+	lw         $t1, -32($fp)
+	sw         $t0, 12($t1)
+	#          local_11 = 2 ;
+	li         $t0, 2
+	sw         $t0, -48($fp)
+	#          SETATTR local_7 @min_order local_11 ;
+	lw         $t0, -48($fp)
+	lw         $t1, -32($fp)
+	sw         $t0, 16($t1)
+	#          local_12 = VCALL BookList __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_7 ;
+	lw         $t0, -32($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        BookList___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -52($fp)
+	#          SETATTR self xcdr local_12 ;
+	lw         $t0, -52($fp)
+	lw         $t1, 0($fp)
+	sw         $t0, 24($t1)
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 52
+	jr         $ra
+Cons_isNil:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          RETURN ;
+	li         $v0, 0
+	addu       $sp, $sp, 0
+	jr         $ra
+Cons_init:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          SETATTR self xcar hd ;
+	lw         $t0, 4($fp)
+	lw         $t1, 8($fp)
+	sw         $t0, 20($t1)
+	#          SETATTR self xcdr tl ;
+	lw         $t0, 0($fp)
+	lw         $t1, 8($fp)
+	sw         $t0, 24($t1)
+	#          RETURN self ;
+	lw         $v0, 8($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+Cons_car:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_0 = GETATTR self xcar ;
+	lw         $t0, 0($fp)
+	lw         $t1, 20($t0)
+	sw         $t1, -4($fp)
+	#          RETURN local_0 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Cons_cdr:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_0 = GETATTR self xcdr ;
+	lw         $t0, 0($fp)
+	lw         $t1, 24($t0)
+	sw         $t1, -4($fp)
+	#          RETURN local_0 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Cons_print_list:
+	move       $fp, $sp
+	subu       $sp, $sp, 80
+	#          local_1 = GETATTR self xcar ;
+	lw         $t0, 0($fp)
+	lw         $t1, 20($t0)
+	sw         $t1, -8($fp)
+	#          local_0 = GETTYPEADDR local_1 ;
+	lw         $t1, -8($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_2 = VCALL local_0 print ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_1 ;
+	lw         $t0, -8($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 44($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -12($fp)
+	#          local_3 = GETTYPEORDER local_2 ;
+	lw         $t1, -12($fp)
+	lw         $t0, 12($t1)
+	sw         $t0, -16($fp)
+	#          local_4 = GETTYPEMINORDER local_2 ;
+	lw         $t1, -12($fp)
+	lw         $t0, 16($t1)
+	sw         $t0, -20($fp)
+	#          local_6 = 5 < local_3 ;
+	li         $t0, 5
+	lw         $t1, -16($fp)
+	slt        $t0, $t0, $t1
+	sw         $t0, -28($fp)
+	#          IF local_6 GOTO label_1 ;
+	lw         $t0, -28($fp)
+	bnez       $t0, label_1
+	#          local_7 = local_4 < 5 ;
+	lw         $t0, -20($fp)
+	li         $t1, 5
+	slt        $t0, $t0, $t1
+	sw         $t0, -32($fp)
+	#          IF local_7 GOTO label_1 ;
+	lw         $t0, -32($fp)
+	bnez       $t0, label_1
+	#          dummy = local_2 ;
+	lw         $t0, -12($fp)
+	sw         $t0, -36($fp)
+	#          local_9 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -40($fp)
+	#          local_10 = LOAD data_9 ;
+	la         $t0, data_9
+	sw         $t0, -44($fp)
+	#          local_11 = VCALL local_9 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_10 ;
+	lw         $t0, -44($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -40($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -48($fp)
+	#          local_5 = local_11 ;
+	lw         $t0, -48($fp)
+	sw         $t0, -24($fp)
+	#          GOTO label_2 ;
+	b          label_2
+	#          LABEL label_1 ;
+	label_1:
+
+	#          local_12 = 6 < local_3 ;
+	li         $t0, 6
+	lw         $t1, -16($fp)
+	slt        $t0, $t0, $t1
+	sw         $t0, -52($fp)
+	#          IF local_12 GOTO label_2 ;
+	lw         $t0, -52($fp)
+	bnez       $t0, label_2
+	#          local_13 = local_4 < 5 ;
+	lw         $t0, -20($fp)
+	li         $t1, 5
+	slt        $t0, $t0, $t1
+	sw         $t0, -56($fp)
+	#          IF local_13 GOTO label_2 ;
+	lw         $t0, -56($fp)
+	bnez       $t0, label_2
+	#          dummy = local_2 ;
+	lw         $t0, -12($fp)
+	sw         $t0, -36($fp)
+	#          local_14 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -60($fp)
+	#          local_15 = LOAD data_10 ;
+	la         $t0, data_10
+	sw         $t0, -64($fp)
+	#          local_16 = VCALL local_14 out_string ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_15 ;
+	lw         $t0, -64($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -60($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -68($fp)
+	#          local_5 = local_16 ;
+	lw         $t0, -68($fp)
+	sw         $t0, -24($fp)
+	#          GOTO label_2 ;
+	b          label_2
+	#          LABEL label_2 ;
+	label_2:
+
+	#          local_18 = GETATTR self xcdr ;
+	lw         $t0, 0($fp)
+	lw         $t1, 24($t0)
+	sw         $t1, -76($fp)
+	#          local_17 = GETTYPEADDR local_18 ;
+	lw         $t1, -76($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -72($fp)
+	#          local_19 = VCALL local_17 print_list ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_18 ;
+	lw         $t0, -76($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -72($fp)
+	ulw        $t1, 72($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -80($fp)
+	#          RETURN local_19 ;
+	lw         $v0, -80($fp)
+	addu       $sp, $sp, 80
+	jr         $ra
+Nil___init__:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_0 = VCALL BookList __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        BookList___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -4($fp)
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Nil_isNil:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          RETURN 1 ;
+	li         $v0, 1
+	addu       $sp, $sp, 0
+	jr         $ra
+Nil_print_list:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          RETURN 1 ;
+	li         $v0, 1
+	addu       $sp, $sp, 0
+	jr         $ra
+Main___init__:
+	move       $fp, $sp
+	subu       $sp, $sp, 24
+	#          local_0 = ALLOCATE BookList ;
+	li         $a0, 36
+	li         $v0, 9
+	syscall
+	sw         $v0, -4($fp)
+	la         $t0, vt_BookList
+	sw         $t0, 8($v0)
+	#          local_1 = LOAD data_8 ;
+	la         $t0, data_8
+	sw         $t0, -8($fp)
+	#          SETATTR local_0 @type local_1 ;
+	lw         $t0, -8($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 0($t1)
+	#          local_2 = 20 ;
+	li         $t0, 20
+	sw         $t0, -12($fp)
+	#          SETATTR local_0 @size local_2 ;
+	lw         $t0, -12($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 4($t1)
+	#          local_3 = 4 ;
+	li         $t0, 4
+	sw         $t0, -16($fp)
+	#          SETATTR local_0 @order local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 12($t1)
+	#          local_4 = 2 ;
+	li         $t0, 2
+	sw         $t0, -20($fp)
+	#          SETATTR local_0 @min_order local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 16($t1)
+	#          local_5 = VCALL BookList __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_0 ;
+	lw         $t0, -4($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        BookList___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -24($fp)
+	#          SETATTR self books local_5 ;
+	lw         $t0, -24($fp)
+	lw         $t1, 0($fp)
+	sw         $t0, 20($t1)
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 24
+	jr         $ra
+Main_main:
+	move       $fp, $sp
+	subu       $sp, $sp, 144
+	#          local_2 = ALLOCATE Book ;
+	li         $a0, 44
+	li         $v0, 9
+	syscall
+	sw         $v0, -12($fp)
+	la         $t0, vt_Book
+	sw         $t0, 8($v0)
+	#          local_3 = LOAD data_7 ;
+	la         $t0, data_7
+	sw         $t0, -16($fp)
+	#          SETATTR local_2 @type local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 0($t1)
+	#          local_4 = 28 ;
+	li         $t0, 28
+	sw         $t0, -20($fp)
+	#          SETATTR local_2 @size local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 4($t1)
+	#          local_5 = 6 ;
+	li         $t0, 6
+	sw         $t0, -24($fp)
+	#          SETATTR local_2 @order local_5 ;
+	lw         $t0, -24($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 12($t1)
+	#          local_6 = 5 ;
+	li         $t0, 5
+	sw         $t0, -28($fp)
+	#          SETATTR local_2 @min_order local_6 ;
+	lw         $t0, -28($fp)
+	lw         $t1, -12($fp)
+	sw         $t0, 16($t1)
+	#          local_7 = VCALL Book __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_2 ;
+	lw         $t0, -12($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Book___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -32($fp)
+	#          local_1 = GETTYPEADDR local_7 ;
+	lw         $t1, -32($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -8($fp)
+	#          local_8 = LOAD data_11 ;
+	la         $t0, data_11
+	sw         $t0, -36($fp)
+	#          local_9 = LOAD data_12 ;
+	la         $t0, data_12
+	sw         $t0, -40($fp)
+	#          local_10 = VCALL local_1 initBook ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_7 ;
+	lw         $t0, -32($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_8 ;
+	lw         $t0, -36($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_9 ;
+	lw         $t0, -40($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -8($fp)
+	ulw        $t1, 40($t0)
+	jalr       $t1
+	addu       $sp, $sp, 12
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -44($fp)
+	#          a_book = local_10 ;
+	lw         $t0, -44($fp)
+	sw         $t0, -4($fp)
+	#          local_13 = ALLOCATE Article ;
+	li         $a0, 48
+	li         $v0, 9
+	syscall
+	sw         $v0, -56($fp)
+	la         $t0, vt_Article
+	sw         $t0, 8($v0)
+	#          local_14 = LOAD data_13 ;
+	la         $t0, data_13
+	sw         $t0, -60($fp)
+	#          SETATTR local_13 @type local_14 ;
+	lw         $t0, -60($fp)
+	lw         $t1, -56($fp)
+	sw         $t0, 0($t1)
+	#          local_15 = 32 ;
+	li         $t0, 32
+	sw         $t0, -64($fp)
+	#          SETATTR local_13 @size local_15 ;
+	lw         $t0, -64($fp)
+	lw         $t1, -56($fp)
+	sw         $t0, 4($t1)
+	#          local_16 = 5 ;
+	li         $t0, 5
+	sw         $t0, -68($fp)
+	#          SETATTR local_13 @order local_16 ;
+	lw         $t0, -68($fp)
+	lw         $t1, -56($fp)
+	sw         $t0, 12($t1)
+	#          local_17 = 5 ;
+	li         $t0, 5
+	sw         $t0, -72($fp)
+	#          SETATTR local_13 @min_order local_17 ;
+	lw         $t0, -72($fp)
+	lw         $t1, -56($fp)
+	sw         $t0, 16($t1)
+	#          local_18 = VCALL Article __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_13 ;
+	lw         $t0, -56($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Article___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -76($fp)
+	#          local_12 = GETTYPEADDR local_18 ;
+	lw         $t1, -76($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -52($fp)
+	#          local_19 = LOAD data_14 ;
+	la         $t0, data_14
+	sw         $t0, -80($fp)
+	#          local_20 = LOAD data_15 ;
+	la         $t0, data_15
+	sw         $t0, -84($fp)
+	#          local_21 = LOAD data_16 ;
+	la         $t0, data_16
+	sw         $t0, -88($fp)
+	#          local_22 = VCALL local_12 initArticle ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_18 ;
+	lw         $t0, -76($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_19 ;
+	lw         $t0, -80($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_20 ;
+	lw         $t0, -84($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_21 ;
+	lw         $t0, -88($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -52($fp)
+	ulw        $t1, 52($t0)
+	jalr       $t1
+	addu       $sp, $sp, 16
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -92($fp)
+	#          an_article = local_22 ;
+	lw         $t0, -92($fp)
+	sw         $t0, -48($fp)
+	#          local_25 = ALLOCATE Nil ;
+	li         $a0, 36
+	li         $v0, 9
+	syscall
+	sw         $v0, -104($fp)
+	la         $t0, vt_Nil
+	sw         $t0, 8($v0)
+	#          local_26 = LOAD data_17 ;
+	la         $t0, data_17
+	sw         $t0, -108($fp)
+	#          SETATTR local_25 @type local_26 ;
+	lw         $t0, -108($fp)
+	lw         $t1, -104($fp)
+	sw         $t0, 0($t1)
+	#          local_27 = 20 ;
+	li         $t0, 20
+	sw         $t0, -112($fp)
+	#          SETATTR local_25 @size local_27 ;
+	lw         $t0, -112($fp)
+	lw         $t1, -104($fp)
+	sw         $t0, 4($t1)
+	#          local_28 = 3 ;
+	li         $t0, 3
+	sw         $t0, -116($fp)
+	#          SETATTR local_25 @order local_28 ;
+	lw         $t0, -116($fp)
+	lw         $t1, -104($fp)
+	sw         $t0, 12($t1)
+	#          local_29 = 3 ;
+	li         $t0, 3
+	sw         $t0, -120($fp)
+	#          SETATTR local_25 @min_order local_29 ;
+	lw         $t0, -120($fp)
+	lw         $t1, -104($fp)
+	sw         $t0, 16($t1)
+	#          local_30 = VCALL Nil __init__ ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_25 ;
+	lw         $t0, -104($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Nil___init__
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -124($fp)
+	#          local_24 = GETTYPEADDR local_30 ;
+	lw         $t1, -124($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -100($fp)
+	#          local_31 = VCALL local_24 cons ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_30 ;
+	lw         $t0, -124($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG a_book ;
+	lw         $t0, -4($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -100($fp)
+	ulw        $t1, 60($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -128($fp)
+	#          local_23 = GETTYPEADDR local_31 ;
+	lw         $t1, -128($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -96($fp)
+	#          local_32 = VCALL local_23 cons ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_31 ;
+	lw         $t0, -128($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG an_article ;
+	lw         $t0, -48($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -96($fp)
+	ulw        $t1, 60($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -132($fp)
+	#          SETATTR self books local_32 ;
+	lw         $t0, -132($fp)
+	lw         $t1, 0($fp)
+	sw         $t0, 20($t1)
+	#          local_34 = GETATTR self books ;
+	lw         $t0, 0($fp)
+	lw         $t1, 20($t0)
+	sw         $t1, -140($fp)
+	#          local_33 = GETTYPEADDR local_34 ;
+	lw         $t1, -140($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -136($fp)
+	#          local_35 = VCALL local_33 print_list ;
+	subu       $sp, $sp, 8
+	sw         $ra, 0($sp)
+	sw         $fp, 4($sp)
+	#          ARG local_34 ;
+	lw         $t0, -140($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -136($fp)
+	ulw        $t1, 72($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $ra, 0($sp)
+	lw         $fp, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -144($fp)
+	#          RETURN local_35 ;
+	lw         $v0, -144($fp)
+	addu       $sp, $sp, 144
+	jr         $ra
+
+.data
+	data_1:
+		.asciiz    "Main"
+	data_2:
+		.asciiz    "title:      "
+	data_3:
+		.asciiz    "\n"
+	data_4:
+		.asciiz    "author:     "
+	data_5:
+		.asciiz    "periodical:  "
+	data_6:
+		.asciiz    "Cons"
+	data_7:
+		.asciiz    "Book"
+	data_8:
+		.asciiz    "BookList"
+	data_9:
+		.asciiz    "- dynamic type was Article -\n"
+	data_10:
+		.asciiz    "- dynamic type was Book -\n"
+	data_11:
+		.asciiz    "Compilers, Principles, Techniques, and Tools"
+	data_12:
+		.asciiz    "Aho, Sethi, and Ullman"
+	data_13:
+		.asciiz    "Article"
+	data_14:
+		.asciiz    "The Top 100 CD_ROMs"
+	data_15:
+		.asciiz    "Ulanoff"
+	data_16:
+		.asciiz    "PC Magazine"
+	data_17:
+		.asciiz    "Nil"
+	data_18:
+		.asciiz    "Bool"
+	data_19:
+		.asciiz    "Int"
+	data_20:
+		.asciiz    "String"
+	data_abort:
+		.asciiz    "Abort called from class "
+	new_line:
+		.asciiz    "\n"
+	vt_Object:
+		.space     400
+	vt_IO:
+		.space     400
+	vt_Int:
+		.space     400
+	vt_String:
+		.space     400
+	vt_Bool:
+		.space     400
+	vt_Book:
+		.space     400
+	vt_Article:
+		.space     400
+	vt_BookList:
+		.space     400
+	vt_Cons:
+		.space     400
+	vt_Nil:
+		.space     400
+	vt_Main:
+		.space     400
+	abort_String:
+		.asciiz    "String"
+	abort_Int:
+		.asciiz    "Int"
+	abort_Bool:
+		.asciiz    "Bool"

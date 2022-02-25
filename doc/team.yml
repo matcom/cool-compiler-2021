@@ -1,10 +1,7 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Yandy Sanchez Orosa
+    github: tingui96
+    group: C411
+  - name: Juan Carlos Vazquez Garcia
+    github: Juano97
+    group: C412

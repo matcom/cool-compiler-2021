@@ -1,0 +1,665 @@
+
+.text
+main:
+	move       $fp, $sp
+	subu       $sp, $sp, 28
+	la         $t0, Object_abort
+	usw        $t0, vt_Object+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Object+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Object+8
+	la         $t0, Object_abort
+	usw        $t0, vt_IO+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_IO+4
+	la         $t0, Object_copy
+	usw        $t0, vt_IO+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_IO+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_IO+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_IO+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_IO+24
+	la         $t0, Int_abort
+	usw        $t0, vt_Int+0
+	la         $t0, Int_type_name
+	usw        $t0, vt_Int+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Int+8
+	la         $t0, String_abort
+	usw        $t0, vt_String+0
+	la         $t0, String_type_name
+	usw        $t0, vt_String+4
+	la         $t0, Object_copy
+	usw        $t0, vt_String+8
+	la         $t0, String_length
+	usw        $t0, vt_String+28
+	la         $t0, String_concat
+	usw        $t0, vt_String+32
+	la         $t0, String_substr
+	usw        $t0, vt_String+36
+	la         $t0, Bool_abort
+	usw        $t0, vt_Bool+0
+	la         $t0, Bool_type_name
+	usw        $t0, vt_Bool+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Bool+8
+	la         $t0, Object_abort
+	usw        $t0, vt_Main+0
+	la         $t0, Object_type_name
+	usw        $t0, vt_Main+4
+	la         $t0, Object_copy
+	usw        $t0, vt_Main+8
+	la         $t0, IO_out_string
+	usw        $t0, vt_Main+12
+	la         $t0, IO_out_int
+	usw        $t0, vt_Main+16
+	la         $t0, IO_in_string
+	usw        $t0, vt_Main+20
+	la         $t0, IO_in_int
+	usw        $t0, vt_Main+24
+	la         $t0, Main_main
+	usw        $t0, vt_Main+40
+	la         $t0, Main___init__
+	usw        $t0, vt_Main+44
+	#          self = ALLOCATE Main ;
+	li         $a0, 36
+	li         $v0, 9
+	syscall
+	sw         $v0, -4($fp)
+	la         $t0, vt_Main
+	sw         $t0, 8($v0)
+	#          local_1 = LOAD data_1 ;
+	la         $t0, data_1
+	sw         $t0, -8($fp)
+	#          SETATTR self @type local_1 ;
+	lw         $t0, -8($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 0($t1)
+	#          local_2 = 20 ;
+	li         $t0, 20
+	sw         $t0, -12($fp)
+	#          SETATTR self @size local_2 ;
+	lw         $t0, -12($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 4($t1)
+	#          local_3 = 2 ;
+	li         $t0, 2
+	sw         $t0, -16($fp)
+	#          SETATTR self @order local_3 ;
+	lw         $t0, -16($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 12($t1)
+	#          local_4 = 2 ;
+	li         $t0, 2
+	sw         $t0, -20($fp)
+	#          SETATTR self @min_order local_4 ;
+	lw         $t0, -20($fp)
+	lw         $t1, -4($fp)
+	sw         $t0, 16($t1)
+	#          local_5 = VCALL Main __init__ ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG self ;
+	lw         $t0, -4($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Main___init__
+	addu       $sp, $sp, 4
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -24($fp)
+	#          main_result = VCALL Main main ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG local_5 ;
+	lw         $t0, -24($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Main_main
+	addu       $sp, $sp, 4
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -28($fp)
+	#          RETURN main_result ;
+	lw         $v0, -28($fp)
+	addu       $sp, $sp, 28
+	li         $v0, 10
+	syscall
+IO_out_int:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          PRINT int ;
+	lw         $a0, 0($fp)
+	li         $v0, 1
+	syscall
+	#          RETURN self ;
+	lw         $v0, 4($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+IO_out_string:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          PRINT str ;
+	lw         $a0, 0($fp)
+	li         $v0, 4
+	syscall
+	#          RETURN self ;
+	lw         $v0, 4($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+IO_in_string:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	li         $a0, 1024
+	li         $v0, 9
+	syscall
+	move       $a0, $v0
+	move       $t3, $v0
+	li         $a1, 1024
+	li         $v0, 8
+	syscall
+	remove_nl_loop:
+
+	lb         $t0, ($a0)
+	beqz       $t0, end_loop
+	la         $t1, new_line
+	lb         $t2, ($t1)
+	beq        $t0, $t2, end_loop
+	addu       $a0, $a0, 1
+	b          remove_nl_loop
+	end_loop:
+
+	sb         $zero, ($a0)
+	sw         $t3, -4($fp)
+	#          RETURN read_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+IO_in_int:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          int = READINT ;
+	li         $v0, 5
+	syscall
+	sw         $v0, -4($fp)
+	#          RETURN int ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Object_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          type = TYPEOF self ;
+	lw         $t0, 0($fp)
+	lw         $t1, ($t0)
+	sw         $t1, -4($fp)
+	#          RETURN type ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Object_copy:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          copy = COPY self ;
+	lw         $a0, 8($fp)
+	li         $v0, 9
+	syscall
+	sw         $v0, -4($fp)
+	addu       $t1, $fp, 0
+	addu       $t2, $fp, -4
+	copy_loop:
+
+	lw         $t0, ($t1)
+	sw         $t0, ($t2)
+	addu       $t1, $t1, 4
+	addu       $t2, $t2, 4
+	subu       $a0, $a0, 4
+	beqz       $a0, end_copy_loop
+	b          copy_loop
+	end_copy_loop:
+
+	#          RETURN copy ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_length:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          len_result = LENGTH self ;
+	lw         $t2, 0($fp)
+	li         $t1, 0
+	length_loop:
+
+	lb         $t0, ($t2)
+	beqz       $t0, end_length_loop
+	addu       $t2, $t2, 1
+	addu       $t1, $t1, 1
+	b          length_loop
+	end_length_loop:
+
+	sw         $t1, -4($fp)
+	#          RETURN len_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_concat:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          concat_result = CONCAT self x ;
+	lw         $t2, 4($fp)
+	li         $t1, 0
+	concat_a_length_loop:
+
+	lb         $t0, ($t2)
+	beqz       $t0, concat_a_end_length_loop
+	addu       $t2, $t2, 1
+	addu       $t1, $t1, 1
+	b          concat_a_length_loop
+	concat_a_end_length_loop:
+
+	lw         $t2, 0($fp)
+	concat_b_length_loop:
+
+	lb         $t0, ($t2)
+	beqz       $t0, concat_b_end_length_loop
+	addu       $t2, $t2, 1
+	addu       $t1, $t1, 1
+	b          concat_b_length_loop
+	concat_b_end_length_loop:
+
+	addu       $a0, $t1, 1
+	li         $v0, 9
+	syscall
+	move       $t0, $v0
+	lw         $t1, 4($fp)
+	lw         $t2, 0($fp)
+	concat_loop_a:
+
+	lb         $a0, ($t1)
+	beqz       $a0, concat_loop_b
+	sb         $a0, ($t0)
+	addu       $t0, $t0, 1
+	addu       $t1, $t1, 1
+	b          concat_loop_a
+	concat_loop_b:
+
+	lb         $a0, ($t2)
+	beqz       $a0, end_concat
+	sb         $a0, ($t0)
+	addu       $t0, $t0, 1
+	addu       $t2, $t2, 1
+	b          concat_loop_b
+	end_concat:
+
+	sb         $zero, ($t0)
+	sw         $v0, -4($fp)
+	#          RETURN concat_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_substr:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          substring_result = SUBSTRING self i l;
+	lw         $t0, 8($fp)
+	lw         $a0, 0($fp)
+	addu       $a0, $a0, 1
+	li         $v0, 9
+	syscall
+	move       $t1, $v0
+	lw         $t4, 4($fp)
+	lw         $t2, 0($fp)
+	addu       $t0, $t0, $t4
+	substring_loop:
+
+	beqz       $t2, end_substring_loop
+	lb         $t3, ($t0)
+	sb         $t3, ($t1)
+	subu       $t2, $t2, 1
+	addu       $t0, $t0, 1
+	addu       $t1, $t1, 1
+	b          substring_loop
+	end_substring_loop:
+
+	sb         $zero, ($t1)
+	sw         $v0, -4($fp)
+	#          RETURN substring_result ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Object_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT None ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	lw         $a0, ($fp)
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+String_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT String ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	la         $a0, abort_String
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+Int_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT Int ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	la         $a0, abort_Int
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+Bool_abort:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          ABORT Bool ;
+	la         $a0, data_abort
+	li         $v0, 4
+	syscall
+	la         $a0, abort_Bool
+	li         $v0, 4
+	syscall
+	la         $a0, new_line
+	li         $v0, 4
+	syscall
+	li         $v0, 10
+	syscall
+Bool_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_20 = LOAD data_4 ;
+	la         $t0, data_4
+	sw         $t0, -4($fp)
+	#          RETURN local_20 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Int_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_21 = LOAD data_5 ;
+	la         $t0, data_5
+	sw         $t0, -4($fp)
+	#          RETURN local_21 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+String_type_name:
+	move       $fp, $sp
+	subu       $sp, $sp, 4
+	#          local_22 = LOAD data_6 ;
+	la         $t0, data_6
+	sw         $t0, -4($fp)
+	#          RETURN local_22 ;
+	lw         $v0, -4($fp)
+	addu       $sp, $sp, 4
+	jr         $ra
+Main___init__:
+	move       $fp, $sp
+	subu       $sp, $sp, 0
+	#          RETURN self ;
+	lw         $v0, 0($fp)
+	addu       $sp, $sp, 0
+	jr         $ra
+Main_main:
+	move       $fp, $sp
+	subu       $sp, $sp, 80
+	#          local_1 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -8($fp)
+	#          local_4 = ALLOCATE Object ;
+	li         $a0, 36
+	li         $v0, 9
+	syscall
+	sw         $v0, -20($fp)
+	la         $t0, vt_Object
+	sw         $t0, 8($v0)
+	#          local_5 = LOAD data_2 ;
+	la         $t0, data_2
+	sw         $t0, -24($fp)
+	#          SETATTR local_4 @type local_5 ;
+	lw         $t0, -24($fp)
+	lw         $t1, -20($fp)
+	sw         $t0, 0($t1)
+	#          local_6 = 20 ;
+	li         $t0, 20
+	sw         $t0, -28($fp)
+	#          SETATTR local_4 @size local_6 ;
+	lw         $t0, -28($fp)
+	lw         $t1, -20($fp)
+	sw         $t0, 4($t1)
+	#          local_7 = 6 ;
+	li         $t0, 6
+	sw         $t0, -32($fp)
+	#          SETATTR local_4 @order local_7 ;
+	lw         $t0, -32($fp)
+	lw         $t1, -20($fp)
+	sw         $t0, 12($t1)
+	#          local_8 = 1 ;
+	li         $t0, 1
+	sw         $t0, -36($fp)
+	#          SETATTR local_4 @min_order local_8 ;
+	lw         $t0, -36($fp)
+	lw         $t1, -20($fp)
+	sw         $t0, 16($t1)
+	#          local_3 = GETTYPEADDR local_4 ;
+	lw         $t1, -20($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -16($fp)
+	#          local_9 = VCALL local_3 type_name ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG local_4 ;
+	lw         $t0, -20($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -16($fp)
+	ulw        $t1, 4($t0)
+	jalr       $t1
+	addu       $sp, $sp, 4
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -40($fp)
+	#          local_10 = VCALL String substr ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG local_9 ;
+	lw         $t0, -40($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG 4 ;
+	li         $t0, 4
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG 1 ;
+	li         $t0, 1
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        String_substr
+	addu       $sp, $sp, 12
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -44($fp)
+	#          local_11 = VCALL local_1 out_string ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_10 ;
+	lw         $t0, -44($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -8($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -48($fp)
+	#          local_0 = GETTYPEADDR local_11 ;
+	lw         $t1, -48($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -4($fp)
+	#          local_14 = VCALL Bool type_name ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG 0 ;
+	li         $t0, 0
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        Bool_type_name
+	addu       $sp, $sp, 4
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -60($fp)
+	#          local_15 = VCALL String substr ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG local_14 ;
+	lw         $t0, -60($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG 1 ;
+	li         $t0, 1
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG 3 ;
+	li         $t0, 3
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	jal        String_substr
+	addu       $sp, $sp, 12
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -64($fp)
+	#          local_16 = VCALL local_0 out_string ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG local_11 ;
+	lw         $t0, -48($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_15 ;
+	lw         $t0, -64($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -4($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -68($fp)
+	#          local_17 = GETTYPEADDR self ;
+	lw         $t1, 0($fp)
+	lw         $t0, 8($t1)
+	sw         $t0, -72($fp)
+	#          local_18 = LOAD data_3 ;
+	la         $t0, data_3
+	sw         $t0, -76($fp)
+	#          local_19 = VCALL local_17 out_string ;
+	subu       $sp, $sp, 8
+	sw         $fp, 0($sp)
+	sw         $ra, 4($sp)
+	#          ARG self ;
+	lw         $t0, 0($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	#          ARG local_18 ;
+	lw         $t0, -76($fp)
+	subu       $sp, $sp, 4
+	sw         $t0, ($sp)
+	lw         $t0, -72($fp)
+	ulw        $t1, 12($t0)
+	jalr       $t1
+	addu       $sp, $sp, 8
+	lw         $fp, 0($sp)
+	lw         $ra, 4($sp)
+	addu       $sp, $sp, 8
+	sw         $v0, -80($fp)
+	#          RETURN local_19 ;
+	lw         $v0, -80($fp)
+	addu       $sp, $sp, 80
+	jr         $ra
+
+.data
+	data_1:
+		.asciiz    "Main"
+	data_2:
+		.asciiz    "Object"
+	data_3:
+		.asciiz    "\n"
+	data_4:
+		.asciiz    "Bool"
+	data_5:
+		.asciiz    "Int"
+	data_6:
+		.asciiz    "String"
+	data_abort:
+		.asciiz    "Abort called from class "
+	new_line:
+		.asciiz    "\n"
+	vt_Object:
+		.space     152
+	vt_IO:
+		.space     152
+	vt_Int:
+		.space     152
+	vt_String:
+		.space     152
+	vt_Bool:
+		.space     152
+	vt_Main:
+		.space     152
+	abort_String:
+		.asciiz    "String"
+	abort_Int:
+		.asciiz    "Int"
+	abort_Bool:
+		.asciiz    "Bool"
