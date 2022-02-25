@@ -5,12 +5,13 @@ import typer
 
 from cool_grammar import parser, errors as parser_errors
 from cool_lexer import lexer, lexer_errors
+from utils.ast_nodes import Token
 from utils.cyclic_dependency import CyclicDependency
 from utils.formatter import Formatter, CodeBuilder
 from utils.semantic import Context, Scope
 from utils.inference import InferenceTypeChecker
 from utils.instance import Execution
-from utils.type_analysis import TypeBuilder, TypeChecker, TypeCollector
+from utils.type_analysis import TypeBuilder, TypeChecker, TypeCollector, PositionateTokensInAST
 from utils.auxiliar_methods import erase_multiline_comment
 
 app = typer.Typer()
@@ -93,7 +94,8 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
         t = lexer.token()
         if not t:
             break
-        tokens.append(t)
+        # tokens.append(Token(t[0], t[1], t[2], t[3]))
+        tokens.append(Token(t.type, t.value, t.lineno, t.lexpos))
         if type(t) == tuple:
             column = 1
             current_pos = t[2]
@@ -257,6 +259,7 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         exit(1)
 
     else:
+        PositionateTokensInAST(tokens).visit(ast)
         TypeCollector(context, errors).visit(ast)
         TypeBuilder(context, errors).visit(ast)
         CyclicDependency(context, errors)

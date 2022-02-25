@@ -119,12 +119,22 @@ class TypeBuilder:
 
 
 class TypeChecker:
-    def __init__(self, context: Context, errors):
+    def __init__(self, context: Context, errors, program):
         self.context = context
         self.current_type = None
         self.current_method = None
         self.errors = errors
+        self.program = program
     
+    def get_tokencolumn(str, pos):
+        column = 1
+        temp_pos = pos
+        while str[temp_pos] != '\n':
+            if temp_pos == 0: break
+            temp_pos -= 1
+            column += 1
+        return column if column > 1 else 2
+
     @visitor.on('node')
     def visit(self, node, scope):
         pass
@@ -148,14 +158,14 @@ class TypeChecker:
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode, scope: Scope):
         if node.name == 'self':
-            self.errors.append('El nombre del atributo no puede ser \'self\'')
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Cannot set "self" as attribute of a class.')
 
         attr_type = self.current_type if node._type == 'SELF_TYPE' else self.context.get_type(node._type)
 
         if node.expr is not None:
             expr_type = self.visit(node.expr, scope.create_child())
             if not expr_type.conforms_to(attr_type):
-                self.errors.append(f'El tipo de la variable {node.name} no puede ser {expr_type}')
+                self.errors.append(f'({node.expr_pos[0]}, {node.expr_pos[1]}) - TypeError: Cannot convert "{expr_type.name}" into "{attr_type.name}".')
 
         scope.define_variable(node.name, attr_type)
     
@@ -169,20 +179,20 @@ class TypeChecker:
             param_name, param_type = item.name, self.context.get_type(item.type)
             if not scope.is_local_variable(param_name):
                 if param_type.name == 'SELF_TYPE':
-                    self.errors.append('El tipo \'SELF_TYPE\' es invalido')
+                    self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: "SELF_TYPE" cannot be a static type of a parameter.')
                     scope.define_variable(param_name, ErrorType())
                 else:
                     scope.define_variable(
                         param_name, self.context.get_type(param_type.name))
             else:
-                self.errors.append(f'La variable {param_name} ya esta definida en el metodo {self.current_method.name}')
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Variable "{param_name}" is already defined in method "{self.current_method.name}".')
 
         return_type = self.context.get_type(node.type) if node.type != 'SELF_TYPE' else self.current_type
 
         expr_type = self.visit(node.expr, scope)
 
         if not expr_type.conforms_to(return_type):
-            self.errors.append(f'El tipo esperado seria {return_type.name} y no {expr_type.name}')
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{return_type.name}".')
 
     # expresiones
     @visitor.when(ast.WhileNode)
@@ -191,34 +201,66 @@ class TypeChecker:
         cond_exp_type = self.context.get_type('Bool')
 
         if cond_type != cond_exp_type:
-            self.errors.append(f'La condicional del \'while\' debe ser de tipo Bool, no puede ser de tipo {cond_type}')
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{cond_type.name}" into "Bool".')
 
         return self.context.get_type('Object')
 
     @visitor.when(ast.LetNode)
     def visit(self, node: ast.LetNode, scope: Scope):
-        sc = scope.create_child()
-        for id_, type_, exp in node.declaration:
+        for pos, (id_, type_, exp) in enumerate(node.declaration):
+            if id_ == 'self':
+                l, lp = node.dec_names_pos[pos]
+                self.errors.append(f'({l}, {lp}) - SemanticError: "self" cannot be bound in a "let" expression')
+            else:
+                try:
+                    if type_ != "SELF_TYPE": 
+                        var_type = self.context.get_type(type_)
+                    else: 
+                        var_type = self.current_type
+                    
+                except SemanticError:
+                    line, lexpos = node.dec_types_pos[pos]
+                    self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Type "{type_}" is not defined')
+                    var_type = ErrorType()
+            scope.define_variable(id_, var_type)
+            
+            expr_type = None
             if exp is not None:
-                return_type = self.visit(exp, sc)
-                if return_type != type_:
-                    self.errors.append(f'La declaración {id_} debería ser de tipo {type_}')
-                    scope.define_variable(id_, ErrorType())
-                else:
-                    scope.define_variable(id_, type_)
-            else: 
-                scope.define_variable(id_, type_)
+                expr_type = self.visit(exp, scope.create_child())
+            if expr_type is not None and not expr_type.conforms_to(var_type):
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, self.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{var_type.name}".')
+            
+            # if exp is not None:
+            #     return_type = self.visit(exp, sc)
+            #     if return_type != type_:
+            #         self.errors.append(f'La declaración {id_} debería ser de tipo {type_}')
+            #         scope.define_variable(id_, ErrorType())
+            #     else:
+            #         scope.define_variable(id_, type_)
+            # else: 
+            #     scope.define_variable(id_, type_)
         
+        sc = scope.create_child()
         return self.visit(node.expr, sc)
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
-        type_ = self.visit(node.expr, scope)
-        if type_ is not None:
-            scope.define_variable(node.idx, type_)
+        var_type = scope.get_var_type(node.idx)
+        if var_type.name == "self":
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Variable "self" is read-only.')
+
+        type_ = self.visit(node.expr, scope.create_child())
+        if var_type is None:
+            self.error.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - NameError: Variable "{self.idx}" is not defined in "{self.current_method.name}".')
         else:
-            self.errors.append(f'El tipo asignado a {node.idx} es incorrecto')
-            scope.define_variable(node.idx, ErrorType())
+            if not type_.conforms_to(var_type.type):
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{type_.name}" into "{var_type.type.name}".')
+            # if type_ is not None:
+            #     scope.define_variable(node.idx, type_)
+            # else:
+            #     self.errors.append(f'El tipo asignado a {node.idx} es incorrecto')
+            #     scope.define_variable(node.idx, ErrorType())
+        return type_
 
     @visitor.when(ast.ParenthesisNode)
     def visit(self, node: ast.ParenthesisNode, scope: Scope):
@@ -247,28 +289,33 @@ class TypeChecker:
                 parent_type = self.context.get_type(node.type)
             except SemanticError as e:
                 parent_type = ErrorType()
-                self.errors.append(e.text)
+                line, lexpos = node.type_position
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Type "{node.type}" is not defined')
 
             if not obj_type.conforms_to(parent_type):
-                self.errors.append(f'El tipo {parent_type.name} no es ancestro de {obj_type.name}')
+                line, lexpos = node.type_position
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Class "{obj_type.name}" has no an ancestor class "{parent_type.name}".')
         else:
             parent_type = obj_type
 
         try:
             method = parent_type.get_method(node.idx)
         except SemanticError as e:
-            self.errors.append(e.text)
+            line, lexpos = node.id_position
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - AttributeError: Dispatch undefined method "{node.idx}" from type {obj_type.name}')
             for arg in node.exprlist:
                 self.visit(arg, scope)
             return ErrorType()
 
         if len(node.exprlist) != len(method.param_names):
-            self.errors.append(f'El metodo {method.name} ya ha sido definido en {obj_type.name} con diferente signatura')
+            line, lexpos = node.id_position
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: Method "{method.name}" of type "{obj_type.name}" called with wrong number of arguments. Expected {len(node.exprlist)} instead of {len(method.param_names)}')
 
         for i, arg in enumerate(node.exprlist):
             arg_type = self.visit(arg, scope)
             if not arg_type.conforms_to(method.param_types[i]):
-                self.errors.append(f'no de puede convertir a {arg_type.name} en { method.param_types[i].name}')
+                line, lexpos = node.exprlist_positions[i]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Cannot convert "{arg_type.name}" into "{method.param_types[i].name}".')
 
         return method.return_type if method.return_type.name != 'SELF_TYPE' else parent_type
 
@@ -276,7 +323,7 @@ class TypeChecker:
     def visit(self, node: ast.ConditionalNode, scope: Scope):
         if_type = self.visit(node.if_expr, scope)
         if if_type != self.context.get_type('Bool'):
-            self.errors.append('La condicion del \'if\' tiene que ser de tipo booleano')
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{if_type.name}" into "Bool".')
 
         self.visit(node.then_expr, scope.create_child())
         self.visit(node.else_expr, scope.create_child())
@@ -286,8 +333,9 @@ class TypeChecker:
         try:
             current_type = self.current_type if node.type == 'SELF_TYPE' else self.context.get_type(node.type) 
         except SemanticError as e:
-            self.errors.append(e.text)
-            current_type = ErrorType()
+            line, lexpos = node.type_position
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Using "new" expresion with undefined type "{node.type}"')
+            return ErrorType()
         return current_type
 
     @visitor.when(ast.IsVoidNode)
@@ -452,5 +500,316 @@ class TypeChecker:
         return self.context.get_type('String')
 
       
+class PositionateTokensInAST:
+    def __init__(self, tokens):
+        self.position = 0
+        self.tokens = tokens
 
-        
+    def inc_position(self, value=1):
+        self.position += value
+
+    def binary_op(self, node: ast.BinaryNode):
+        self.visit(node.left)
+
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+
+        self.visit(node.right)
+
+    def single_op(self, node: ast.UnaryNode):
+        token = self.tokens[self.position]
+        node.operation_position = token.line, token.lexpos
+
+        token = self.tokens[self.position + 1]
+        node.set_position(token.line, token.lexpos)
+
+        self.inc_position() 
+        self.visit(node.expr)
+
+    def atom(self, node: ast.Node):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+
+    @visitor.on("node")
+    def visit(self, node):
+        pass
+
+    @visitor.when(ast.ProgramNode)
+    def visit(self, node: ast.ProgramNode):
+        for cl in node.class_list:
+            self.visit(cl)
+            self.inc_position()
+
+        # there is always at least a class declaration
+        first_declaration = node.class_list[0] 
+        node.set_position(first_declaration.line, first_declaration.lexpos)
+
+    @visitor.when(ast.ClassDecNode)
+    def visit(self, node: ast.ClassDecNode):
+        token = self.tokens[self.position]
+        assert (token.value == "class"), f'Expected "class" instead of "{token.value}" in {node.name}'
+
+        token = self.tokens[self.position + 1]
+        node.set_position(token.line, token.lexpos)
+
+        if node.parent is not None:
+            token = self.tokens[self.position + 3]
+            node.parent_pos = token.line, token.lexpos
+
+        count = 3 if node.parent is None else 5
+        self.inc_position(count)
+
+        for d in node.data:
+            self.visit(d)
+            token = self.tokens[self.position]
+            assert (token.value == ";"), f'Expected ";" instead of "{token.value}" in {d.name} of class {node.name}'
+            self.inc_position()
+
+        self.inc_position()
+
+    @visitor.when(ast.AttributeDecNode)
+    def visit(self, node: ast.AttributeDecNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        token = self.tokens[self.position + 2]
+        node.type_pos = token.line, token.lexpos
+
+        if node.expr is not None:
+            self.inc_position(4)
+            token = self.tokens[self.position]
+            node.expr_pos = token.line, token.lexpos
+            self.visit(node.expr)
+            token = self.tokens[self.position]
+            return
+
+        self.inc_position(3)
+
+    @visitor.when(ast.MethodDecNode)
+    def visit(self, node: ast.MethodDecNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position(2)
+
+        for i, _ in enumerate(node.params):
+            self.inc_position(2)
+            token = self.tokens[self.position]
+            node.p_types_pos.append((token.line, token.lexpos))
+            self.inc_position() 
+            if i < len(node.params) - 1:
+                self.inc_position() 
+
+        self.inc_position(2) 
+        token = self.tokens[self.position]
+        node.r_types_pos = token.line, token.lexpos
+        self.inc_position(2) 
+
+        self.visit(node.expr)
+        self.inc_position() 
+
+    @visitor.when(ast.LetNode)
+    def visit(self, node: ast.LetNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position()
+
+        for _, _, expr in node.declaration:
+            token = self.tokens[self.position]
+            node.dec_names_pos.append((token.line, token.lexpos))
+            token = self.tokens[self.position + 2]
+            node.dec_types_pos.append((token.line, token.lexpos))
+            if expr is not None:
+                self.inc_position(4) 
+                token = self.tokens[self.position]
+                self.visit(expr)
+                self.inc_position()
+            else:
+                self.inc_position(4) 
+
+        self.visit(node.expr)
+
+    @visitor.when(ast.AssignNode)
+    def visit(self, node: ast.AssignNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        token = self.tokens[self.position + 1]
+        assert token.value == "<-", f'Expected "<-" instead of "{token.value}" in assign'
+
+        self.inc_position(2)  # ends after `<-`
+        self.visit(node.expr)
+
+    @visitor.when(ast.BlockNode)
+    def visit(self, node: ast.BlockNode):
+        token = self.tokens[self.position]
+        assert token.value == "{", f'Expected "{{" instead of "{token.value}" in block'
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+
+        for i, expr in enumerate(node.expr, start=1):
+            self.visit(expr)
+            token = self.tokens[self.position]
+            assert (token.value == ";"), f'Expected ";" instead of "{token.value}" in instruction {i} of a block'
+            self.inc_position() 
+
+        token = self.tokens[self.position]
+        assert (token.value == "}"), f'Expected "}}" instead of "{token.value}" at the end of a block'
+        self.inc_position()
+
+    @visitor.when(ast.ConditionalNode)
+    def visit(self, node: ast.ConditionalNode):
+        # IF
+        token = self.tokens[self.position]
+        assert (token.value == "if"), f'Expected "if" instead of "{token.value}" in conditional'
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+        self.visit(node.if_expr)
+        # THEN
+        token = self.tokens[self.position]
+        assert (token.value == "then"), f'Expected "then" instead of "{token.value}" in conditional'
+        self.inc_position() 
+        self.visit(node.then_expr)
+        # ELSE
+        token = self.tokens[self.position]
+        assert (token.value == "else"), f'Expected "else" instead of "{token.value}" in conditional'
+        self.inc_position() 
+        self.visit(node.else_expr)
+        # FI
+        token = self.tokens[self.position]
+        assert (token.value == "fi"), f'Expected "fi" instead of "{token.value}" in conditional'
+        self.inc_position() 
+
+    @visitor.when(ast.WhileNode)
+    def visit(self, node: ast.WhileNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+        self.visit(node.cond)
+        self.inc_position()  
+        self.visit(node.data)
+        self.inc_position()  
+
+    @visitor.when(ast.CaseNode)
+    def visit(self, node: ast.CaseNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        # CASE
+        self.inc_position()  
+        self.visit(node.expr)
+        # OF
+        self.inc_position()
+        for _, _, expr in node.params:
+            self.inc_position(2)
+            token = self.tokens[self.position]
+            node.cases_positions.append((token.line, token.lexpos))
+            self.inc_position(2)
+            self.visit(expr)
+            self.inc_position()
+        # ESAC
+        self.inc_position()
+
+    @visitor.when(ast.MethodCallNode)
+    def visit(self, node: ast.MethodCallNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        node.id_position = token.line, token.lexpos
+
+        _atom = node.atom is not None
+        _type = node.type is not None
+
+        if _atom:
+            self.visit(node.atom)
+
+            token = self.tokens[self.position]
+            assert token.value in ("@","."), f"Expected '.' or '@' instead of {token.value}"
+            self.inc_position()
+
+            token = self.tokens[self.position]
+            node.id_position = token.line, token.lexpos
+
+        if _type:
+            token = self.tokens[self.position]
+            node.type_position = token.line, token.lexpos
+            self.inc_position(2)
+            token = self.tokens[self.position]
+            node.id_position = token.line, token.lexpos
+
+        self.inc_position(2) 
+        token = self.tokens[self.position]
+        if node.exprlist:
+            for exp in node.exprlist:
+                token = self.tokens[self.position]
+                node.exprlist_positions.append((token.line, token.lexpos))
+                self.visit(exp)
+                token = self.tokens[self.position]
+                assert token.value in (",", ")"), f"Expected ',' or ')' instead of {token.value}"
+                self.inc_position()  
+        else:
+            self.inc_position()
+
+    @visitor.when(ast.NumberNode)
+    def visit(self, node: ast.NumberNode):
+        self.atom(node)
+
+    @visitor.when(ast.StringNode)
+    def visit(self, node: ast.StringNode):
+        self.atom(node)
+
+    @visitor.when(ast.BooleanNode)
+    def visit(self, node: ast.BooleanNode):
+        self.atom(node)
+
+    @visitor.when(ast.VariableNode)
+    def visit(self, node: ast.VariableNode):
+        self.atom(node)
+
+    @visitor.when(ast.NewNode)
+    def visit(self, node: ast.NewNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        token = self.tokens[self.position + 1]
+        node.type_position = token.line, token.lexpos
+        self.inc_position(2) 
+
+    @visitor.when(ast.NegationNode)
+    def visit(self, node: ast.NegationNode):
+        self.single_op(node)
+
+    @visitor.when(ast.ComplementNode)
+    def visit(self, node: ast.ComplementNode):
+        self.single_op(node)
+
+    @visitor.when(ast.IsVoidNode)
+    def visit(self, node: ast.IsVoidNode):
+        self.single_op(node)
+
+    @visitor.when(ast.PlusNode)
+    def visit(self, node: ast.PlusNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.MinusNode)
+    def visit(self, node: ast.MinusNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.TimesNode)
+    def visit(self, node: ast.TimesNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.DivNode)
+    def visit(self, node: ast.DivNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.LessEqualNode)
+    def visit(self, node: ast.LessEqualNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.LessNode)
+    def visit(self, node: ast.LessNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.EqualNode)
+    def visit(self, node: ast.EqualNode):
+        self.binary_op(node)
+
