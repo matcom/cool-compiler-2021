@@ -40,6 +40,7 @@ from cmp.semantic import Context
 
 from cmp.semantic import Scope
 from cmp.utils import find_least_type
+import copy
 
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
@@ -63,7 +64,7 @@ class TypeChecker:
     @visitor.when(ProgramNode)
     def visit(self, node):
         scope = Scope()
-        self.context = node.context.copy()
+        self.context = copy.copy(node.context)
         for declaration in node.declarations:
             self.visit(declaration, scope.create_child())
 
