@@ -12,6 +12,7 @@ class CILScope:
         self.variables_count = 0
         self.str_count = 0
         
+        
         self.locals = []
         self.all_locals = []
         self.instructions = []
@@ -127,7 +128,7 @@ class CIL:
         self.scope.instructions = []
         
         params = []
-        param_node = CILParamNode(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class)
+        param_node = CILParamNode(f'self_{self.scope.current_class}', self.scope.current_class)
         params.append(param_node)
         
         for param in node.params:
@@ -195,6 +196,7 @@ class CIL:
         exp_else = self.visit(node.elsex)
         self.scope.instructions.append(CILAssignNode(var_return, exp_else))
         self.scope.instructions.append(CILGotoNode(CILLabelNode(f'ifend{count}')))
+        self.scope.instructions.append(CILLabelNode( f'then{count}'))
         exp_then = self.visit(node.then)
         self.scope.instructions.append(CILAssignNode(var_return, exp_then))
         self.scope.instructions.append(CILLabelNode(f'ifend{count}'))
