@@ -24,4 +24,4 @@ class NullType(Type):
 
 class NullNode(cool.AtomicNode):
     def __init__(self):
-        super().__init__("null")
+        super().__init__("NULL")

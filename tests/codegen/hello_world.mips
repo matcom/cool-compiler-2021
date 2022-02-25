@@ -914,107 +914,92 @@
 		
 	function_main_at_Main:
 		# Function parameters
-		#   $ra = 28($sp)
-		#   self = 24($sp)
+		#   $ra = 12($sp)
+		#   self = 8($sp)
 		
 		# Reserving space for local variables
-		addi $sp, $sp, -24
+		addi $sp, $sp, -8
 		
-		# Allocating Int 2
+		# Allocating String
 		li $v0, 9
-		addi $a0, $zero, 12
+		addi $a0, $zero, 23 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
 		syscall
 		
-		la $t0, type_Int # $t0 = address of the type
+		la $t0, type_String
 		sw $t0, 0($v0) # Setting type in the first word of the object
-		sw $a0, 4($v0) # Setting size in the second word of the object
-		addi $t0, $zero, 2
-		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 20($sp) # internal_0 = address of allocated object Int
 		
-		# Allocating Int 2
-		li $v0, 9
-		addi $a0, $zero, 12
-		syscall
+		addi $t0, $zero, 14
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
 		
-		la $t0, type_Int # $t0 = address of the type
-		sw $t0, 0($v0) # Setting type in the first word of the object
-		sw $a0, 4($v0) # Setting size in the second word of the object
-		addi $t0, $zero, 2
-		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 16($sp) # internal_1 = address of allocated object Int
+		addi $t0, $zero, 72
+		sb $t0, 8($v0) # internal_0[0] = 'H'
 		
-		# Passing function arguments
-		addi $sp, $sp, -12 # Reserving space for arguments
-		sw $ra, 8($sp) # Storing return address
+		addi $t0, $zero, 101
+		sb $t0, 9($v0) # internal_0[1] = 'e'
 		
-		# Argument internal_0
-		lw $t0, 32($sp)
-		sw $t0, 4($sp) # Storing internal_0
+		addi $t0, $zero, 108
+		sb $t0, 10($v0) # internal_0[2] = 'l'
 		
-		# Argument internal_1
-		lw $t0, 28($sp)
-		sw $t0, 0($sp) # Storing internal_1
+		addi $t0, $zero, 108
+		sb $t0, 11($v0) # internal_0[3] = 'l'
 		
-		# Calling function function_add
-		jal function_add
-		lw $ra, 8($sp)
-		sw $v1, 24($sp) # internal_2 = result of function_add
-		addi $sp, $sp, 12 # Freeing space for arguments
+		addi $t0, $zero, 111
+		sb $t0, 12($v0) # internal_0[4] = 'o'
 		
-		# Allocating Int 2
-		li $v0, 9
-		addi $a0, $zero, 12
-		syscall
+		addi $t0, $zero, 44
+		sb $t0, 13($v0) # internal_0[5] = ','
 		
-		la $t0, type_Int # $t0 = address of the type
-		sw $t0, 0($v0) # Setting type in the first word of the object
-		sw $a0, 4($v0) # Setting size in the second word of the object
-		addi $t0, $zero, 2
-		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 8($sp) # internal_3 = address of allocated object Int
+		addi $t0, $zero, 32
+		sb $t0, 14($v0) # internal_0[6] = ' '
 		
-		# Passing function arguments
-		addi $sp, $sp, -12 # Reserving space for arguments
-		sw $ra, 8($sp) # Storing return address
+		addi $t0, $zero, 87
+		sb $t0, 15($v0) # internal_0[7] = 'W'
 		
-		# Argument internal_2
-		lw $t0, 24($sp)
-		sw $t0, 4($sp) # Storing internal_2
+		addi $t0, $zero, 111
+		sb $t0, 16($v0) # internal_0[8] = 'o'
 		
-		# Argument internal_3
-		lw $t0, 20($sp)
-		sw $t0, 0($sp) # Storing internal_3
+		addi $t0, $zero, 114
+		sb $t0, 17($v0) # internal_0[9] = 'r'
 		
-		# Calling function function_mult
-		jal function_mult
-		lw $ra, 8($sp)
-		sw $v1, 16($sp) # internal_4 = result of function_mult
-		addi $sp, $sp, 12 # Freeing space for arguments
+		addi $t0, $zero, 108
+		sb $t0, 18($v0) # internal_0[10] = 'l'
+		
+		addi $t0, $zero, 100
+		sb $t0, 19($v0) # internal_0[11] = 'd'
+		
+		addi $t0, $zero, 46
+		sb $t0, 20($v0) # internal_0[12] = '.'
+		
+		addi $t0, $zero, 10
+		sb $t0, 21($v0) # internal_0[13] = '\n'
+		
+		sb $zero, 22($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 4($sp) # internal_0 = "Hello, World.\n"
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
 		sw $ra, 8($sp) # Storing return address
 		
 		# Argument self
-		lw $t0, 36($sp)
+		lw $t0, 20($sp)
 		sw $t0, 4($sp) # Storing self
 		
-		# Argument internal_4
+		# Argument internal_0
 		lw $t0, 16($sp)
-		sw $t0, 0($sp) # Storing internal_4
+		sw $t0, 0($sp) # Storing internal_0
 		
-		# Calling function function_out_int_at_IO
-		jal function_out_int_at_IO
+		# Calling function function_out_string_at_IO
+		jal function_out_string_at_IO
 		lw $ra, 8($sp)
-		sw $v1, 12($sp) # internal_5 = result of function_out_int_at_IO
+		sw $v1, 12($sp) # internal_1 = result of function_out_string_at_IO
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
 		# Loading return value in $v1
 		lw $v1, 0($sp)
 		
 		# Freeing space for local variables
-		addi $sp, $sp, 24
+		addi $sp, $sp, 8
 		
 		jr $ra
 		

@@ -1,0 +1,7176 @@
+.data
+	type_Object: .word 8
+	type_Object_inherits_from: .word 0
+	type_Object_attributes: .word 0
+	type_Object_name_size: .word 6
+	type_Object_name: .asciiz "Object"
+	
+	type_IO: .word 8
+	type_IO_inherits_from: .word type_Object
+	type_IO_attributes: .word 0
+	type_IO_name_size: .word 2
+	type_IO_name: .asciiz "IO"
+	
+	type_Int: .word 8
+	type_Int_inherits_from: .word type_Object
+	type_Int_attributes: .word 0
+	type_Int_name_size: .word 3
+	type_Int_name: .asciiz "Int"
+	
+	type_String: .word 8
+	type_String_inherits_from: .word type_Object
+	type_String_attributes: .word 0
+	type_String_name_size: .word 6
+	type_String_name: .asciiz "String"
+	
+	type_Bool: .word 8
+	type_Bool_inherits_from: .word type_Object
+	type_Bool_attributes: .word 0
+	type_Bool_name_size: .word 4
+	type_Bool_name: .asciiz "Bool"
+	
+	type_Foo: .word 28
+	type_Foo_inherits_from: .word type_Bazz
+	type_Foo_attributes: .word 5
+	type_Foo_name_size: .word 3
+	type_Foo_name: .asciiz "Foo"
+	
+	type_Bar: .word 44
+	type_Bar_inherits_from: .word type_Razz
+	type_Bar_attributes: .word 9
+	type_Bar_name_size: .word 3
+	type_Bar_name: .asciiz "Bar"
+	
+	type_Razz: .word 36
+	type_Razz_inherits_from: .word type_Foo
+	type_Razz_attributes: .word 7
+	type_Razz_name_size: .word 4
+	type_Razz_name: .asciiz "Razz"
+	
+	type_Bazz: .word 20
+	type_Bazz_inherits_from: .word type_IO
+	type_Bazz_attributes: .word 3
+	type_Bazz_name_size: .word 4
+	type_Bazz_name: .asciiz "Bazz"
+	
+	type_Main: .word 24
+	type_Main_inherits_from: .word type_Object
+	type_Main_attributes: .word 4
+	type_Main_name_size: .word 4
+	type_Main_name: .asciiz "Main"
+	
+	buffer_input: .space 1024
+	debug_log: .asciiz "debug_log\n"
+
+.text
+	function_add:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Addition operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		add $t2, $t0, $t1 # $t2 = $t0 + $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_sub:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Subtraction operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		sub $t2, $t0, $t1 # $t2 = $t0 - $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_mult:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Multiplication operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		mult $t0, $t1 # $t2 = $t0 * $t1
+		mflo $t2
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_div:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Division operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		div $t0, $t1 # $t2 = $t0 / $t1
+		mflo $t2
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_xor:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Xor operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		xor $t2, $t0, $t1 # $t0 = $t0 ^ $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_less_than:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Less than operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_less_than_or_equal:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Less than operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		sle $t2, $t0, $t1 # $t2 = $t0 <= $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_equal:
+		# Function parameters
+		#   $ra = 40($sp)
+		#   a = 36($sp)
+		#   b = 32($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -32
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 28($sp) # internal_0 = address of allocated object Int
+		
+		# internal_1 = typeof a that is the first word of the object
+		lw $t0, 36($sp)
+		lw $t1, 0($t0)
+		sw $t1, 24($sp)
+		
+		# internal_2 = direction of Int
+		la $t0, type_Int
+		sw $t0, 20($sp)
+		
+		# internal_3 = direction of Bool
+		la $t0, type_Bool
+		sw $t0, 16($sp)
+		
+		# internal_4 = direction of String
+		la $t0, type_String
+		sw $t0, 12($sp)
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 8($sp) # internal_5 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_6 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_7 = address of allocated object Int
+		
+		# internal_5 = EqualAddress(internal_1, internal_2)
+		lw $t0, 24($sp)
+		lw $t1, 20($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 8($sp)
+		sw $t2, 8($t0)
+		
+		# internal_6 = EqualAddress(internal_1, internal_3)
+		lw $t0, 24($sp)
+		lw $t1, 16($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 4($sp)
+		sw $t2, 8($t0)
+		
+		# internal_7 = EqualAddress(internal_1, internal_4)
+		lw $t0, 24($sp)
+		lw $t1, 12($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		# If internal_5 then goto a_is_type_int_or_bool
+		lw $t0, 8($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, a_is_type_int_or_bool
+		
+		# If internal_6 then goto a_is_type_int_or_bool
+		lw $t0, 4($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, a_is_type_int_or_bool
+		
+		# If internal_7 then goto a_is_type_string
+		lw $t0, 0($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, a_is_type_string
+		
+		# Jumping to a_is_type_object
+		j a_is_type_object
+		
+		a_is_type_int_or_bool:
+		
+		# internal_0 = EqualInt(a, b)
+		lw $t0, 36($sp)
+		lw $t0, 8($t0)
+		lw $t1, 32($sp)
+		lw $t1, 8($t1)
+		seq $t2, $t0, $t1
+		lw $t0, 28($sp)
+		sw $t2, 8($t0)
+		
+		# Jumping to end_of_equal
+		j end_of_equal
+		
+		a_is_type_string:
+		
+		# internal_0 = EqualStr(a, b)
+		lw $t0, 36($sp)
+		lw $t1, 32($sp)
+		addi $t0, $t0, 8
+		addi $t1, $t1, 8
+		
+		# By default we assume the strings are equals
+		addi $t4, $zero, 1
+		lw $t5, 28($sp)
+		sw $t4, 8($t5)
+		
+		while_compare_strings_start:
+		lb $t2, 0($t0)
+		lb $t3, 0($t1)
+		beq $t2, $t3, while_compare_strings_update
+		
+		# The strings are no equals
+		lw $t5, 28($sp)
+		sw $zero, 8($t5)
+		j while_compare_strings_end
+		
+		while_compare_strings_update:
+		addi $t0, $t0, 1
+		addi $t1, $t1, 1
+		beq $t2, $zero, while_compare_strings_end
+		j while_compare_strings_start
+		while_compare_strings_end:
+		
+		# Jumping to end_of_equal
+		j end_of_equal
+		
+		a_is_type_object:
+		
+		# Equal operation
+		lw $t0, 36($sp) # Save in $t0 the left operand address
+		lw $t1, 32($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 28($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# Jumping to end_of_equal
+		j end_of_equal
+		
+		end_of_equal:
+		
+		# Loading return value in $v1
+		lw $v1, 28($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 32
+		
+		jr $ra
+		
+	function___init___at_Object:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_abort_at_Object:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Exit program
+		li $v0, 10
+		syscall
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_type_name_at_Object:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = name of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($t0) # $t1 = type of self
+		lw $t2, 12($t1) # $t1 = length of the name of self
+		lw $t3, 16($t1) # $t1 = name of self
+		
+		addi $t2, $t2, 9 # Setting space for the type, the size and the null byte
+		li $v0, 9
+		move $a0, $t2
+		syscall
+		addi $t2, $t2, -9 # Restoring space for the type, the size and the null byte
+		
+		la $t4, type_String
+		sw $t4, 0($v0) # Setting type in the first word of the object
+		
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		move $t4, $v0 # $t4 = direction of the new string
+		addi $t4, $t4, 8 # Pointer to the first character of the string
+		addi $t0, $t0, 8 # Pointer to the first character of the string in self
+		xor $t5, $t5, $t5 # Initializing counter
+		while_copy_name_start:
+		beq $t5, $t1, while_copy_name_end
+		lb $t6, 0($t0) # Loading the character
+		sb $t6, 0($t4)
+		addi $t4, $t4, 1 # Incrementing the pointer to the new string
+		addi $t0, $t0, 1 # Incrementing the pointer to the string in self
+		addi $t5, $t5, 1 # Incrementing counter
+		j while_copy_name_start
+		while_copy_name_end:
+		
+		sb $zero, 0($t4) # Setting the null byte
+		
+		sw $t4, 0($sp) # Storing the new string in internal_0
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_copy_at_Object:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = copy of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($t0) # $t1 = type of self
+		lw $t2, 4($t0) # $t2 = length of self in bytes
+		
+		# Allocating space for the new object
+		li $v0, 9
+		move $a0, $t2
+		syscall
+		move $t3, $v0 # $t3 = direction of the new object
+		sw $t1, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		# Initializing the variable of the loop
+		addi $t0, $t0, 8 # Pointer to the first character of the object
+		addi $t3, $t3, 8 # Pointer to the first character of the object
+		addi $t2, $2, -8 # Decrementing in 8 the length of the object
+		xor $t4, $t4, $t4 # Initializing counter
+		
+		# Loop copying the object
+		while_copy_start:
+		beq $t4, $t2, while_copy_end
+		lb $t5, 0($t0) # Loading the byte
+		sb $t5, 0($t3) # Storing the byte
+		addi $t0, $t0, 1 # Incrementing the pointer to the object
+		addi $t3, $t3, 1 # Incrementing the pointer to the new object
+		addi $t4, $t4, 1 # Incrementing counter
+		j while_copy_start
+		while_copy_end:
+		sw $v0, 0($sp) # Storing the new object in internal_0
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_IO:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_out_string_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		#   x = 0($sp)
+		
+		lw $t0, 0($sp) # $t0 = x
+		addi $t0, $t0, 8 # Pointer to the first character of the string
+		
+		# Printing the string x
+		li $v0, 4
+		move $a0, $t0
+		syscall
+		
+		# Loading return value in $v1
+		lw $v1, 4($sp)
+		
+		jr $ra
+		
+	function_out_int_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		#   x = 0($sp)
+		
+		# Printing the string x
+		li $v0, 1
+		lw $a0, 0($sp)
+		lw $a0, 8($a0)
+		syscall
+		
+		# Loading return value in $v1
+		lw $v1, 4($sp)
+		
+		jr $ra
+		
+	function_in_string_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		li $v0, 8
+		la $a0, buffer_input
+		li $a1, 1024
+		syscall
+		
+		xor $t0, $t0, $t0 # Initializing counter
+		while_read_start:
+		lw $t1, buffer_input($t0) # Loading the byte
+		beq $t1, $zero, while_read_end
+		addi $t0, $t0, 1 # Incrementing counter
+		j while_read_start
+		while_read_end:
+		
+		addi $t0, $t0, 9 # Adding space for the type, the size and the null byte
+		li $v0, 9
+		move $a0, $t0
+		syscall
+		la $t2, type_String
+		sw $t2, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		addi $t3, $v0, 8 # Pointer to the first character of the string
+		xor $t4, $t4, $t4 # Initializing counter
+		
+		while_copy_from_buffer_start:
+		beq $t4, $t0, while_copy_from_buffer_end
+		lw $t5, buffer_input($t4) # Loading the byte
+		sb $t5, 0($t3) # Storing the byte
+		addi $t3, $t3, 1 # Imcremeenting pointer
+		addi $t4, $t4, 1 # Incrementing counter
+		j while_copy_from_buffer_start
+		while_copy_from_buffer_end:
+		
+		sb $zero, 0($t3) # Storing the null byte
+		
+		sw $v0, 0($sp) # Storing the new object in internal_0
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_in_int_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		li $v0, 5
+		syscall
+		sw $v0, 0($sp) # Storing the new object in internal_0
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_String:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_length_at_String:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = length of self
+		lw $t0, 4($sp)
+		lw $t1, 4($t0)
+		addi $t1, $t1, -9 # Subtracting 9 for the type, length, and null-terminator
+		sw $t1, 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_concat_at_String:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   self = 8($sp)
+		#   s = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = self + s
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		lw $t2, 4($t0) # $t2 = length of str1
+		lw $t3, 4($t1) # $t3 = length of str2
+		add $t4, $t2, $t3 # $t4 = length of str1 + str2
+		addi $t4, $t4, 9 # Adding the space for the type (4bytes), the length(4bytes) and the null-terminator(1byte)
+		
+		li $v0, 9
+		move $a0, $t4
+		syscall
+		addi $t4, $t4, -9 # Restoring $t4 = length of str1 + str2
+		add $t5, $zero, $v0 # $t5 = address of the new string object
+		addi $t5, $t5, 8 # $t5 = address of the first byte of the new string
+		
+		la $t8, type_String
+		sw $t8, 0($v0) # Setting type in the first word of th object
+		
+		sw $a0, 4($v0) # Setting length of the string in the second word of the object
+		
+		# Copying str1 to the new string
+		xor $t6, $t6, $t6 # $t6 = 0 Initializing counter
+		while_copy_str1_start:
+		beq $t6, $t2, while_copy_str1_end
+		lb $t7, 0($t0)
+		sb $t7, 0($t5)
+		add $t0, $t0, 1 # $t0 = $t0 + 1 Incrementing the address of str1
+		add $t5, $t5, 1 # $t5 = $t5 + 1 Incrementing the address of the new string
+		addi $t6, $t6, 1 # $t6 = $t6 + 1 Incrementing counter
+		j while_copy_str1_start
+		while_copy_str1_end:
+		
+		# Copying str2 to the new string
+		while_copy_str2_start:
+		beq $t6, $t4, while_copy_str2_end
+		lb $t7, 0($t1)
+		sb $t7, 0($t5)
+		add $t1, $t1, 1 # $t0 = $t0 + 1 Incrementing the address of str1
+		add $t5, $t5, 1 # $t5 = $t5 + 1 Incrementing the address of the new string
+		addi $t6, $t6, 1 # $t6 = $t6 + 1 Incrementing counter
+		j while_copy_str2_start
+		while_copy_str2_end:
+		
+		sb $zero, 0($t5) # Setting the null-terminator
+		
+		sw $v0, 0($sp) # internal_0 = self + s
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_substr_at_String:
+		# Function parameters
+		#   $ra = 16($sp)
+		#   self = 12($sp)
+		#   i = 8($sp)
+		#   l = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = self[i:i + l]
+		lw $t0, 12($sp) # $t0 = address of the string
+		lw $t1, 4($t0) # $t1 = length of the string
+		lw $t2, 8($sp) # $t2 = start of the substring
+		lw $t3, 4($sp) # $t3 = length of the substring
+		add $t4, $t2, $t3 # $t4 = start of the substring + length of the substring
+		
+		bge $t4, $t1, substring_out_of_bounds
+		
+		addi $t3, $t3, 9
+		li $v0, 9
+		move $a0, $t3
+		syscall
+		addi $t3, $t3, -9
+		
+		la $t5, type_String
+		sw $t5, 0($v0) # Setting type in the first word of the object
+		
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		addi $t0, $t0, 8 # pointing to the first byte of the string
+		add $t0, $t0, $t2 # pointing to the first byte of the substring
+		move $t5, $v0 # $t5 = address of the new string
+		add $t5, $t5, 8 # pointing to the first byte of the string
+		xor $t6, $t6, $t6 # $t6 = 0 Initializing counter
+		while_copy_substr_start:
+		beq $t6, $t3, while_copy_substr_end
+		lb $t7, 0($t0)
+		sb $t7, 0($t5)
+		addi $t0, $t0, 1 # $t0 = $t0 + 1 Incrementing the address of the string
+		add $t5, $t5, 1 # $t5 = $t5 + 1 Incrementing the address of the new string
+		addi $t6, $t6, 1 # $t6 = $t6 + 1 Incrementing counter
+		j while_copy_substr_start
+		while_copy_substr_end:
+		
+		sb $zero, 0($t5) # Setting the null-terminator
+		
+		sw $v0, 0($sp) # internal_0 = self[i:i + l]
+		j substring_not_out_of_bounds
+		
+		substring_out_of_bounds:
+		li $v0, 17
+		addi $a0, $zero, 1
+		syscall
+		
+		substring_not_out_of_bounds:
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_Foo:
+		# Function parameters
+		#   $ra = 340($sp)
+		#   self = 336($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -336
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 332($sp) # internal_0 = address of allocated object Int
+		
+		# Set attribute h of self
+		lw $t0, 336($sp) # $t0 = self
+		lw $t1, 332($sp) # $t1 = internal_0
+		sw $t1, 8($t0) # self.h = internal_0
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 308($sp) # internal_6 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 316($sp) # internal_4 = address of allocated object Int
+		
+		
+		
+		
+		# internal_2 = typeof self that is the first word of the object
+		lw $t0, 336($sp)
+		lw $t1, 0($t0)
+		sw $t1, 324($sp)
+		
+		lw $t0, 324($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 320($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 324($sp)
+		sw $t0, 320($sp)
+		end_assign:
+		
+		lw $t0, 308($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 328($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_1 = internal_6
+		lw $t0, 308($sp)
+		sw $t0, 328($sp)
+		end_assign:
+		
+		while_start_8779768528306:
+		
+		# Equal operation
+		lw $t0, 320($sp) # Save in $t0 the left operand address
+		# If internal_4 then goto while_end_8779768528306
+		lw $t0, 316($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 328($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 320($sp)
+		lw $t1, 4($t0)
+		sw $t1, 320($sp)
+		
+		# Jumping to while_start_8779768528306
+		j while_start_8779768528306
+		
+		while_end_8779768528306:
+		
+		
+		
+		
+		lw $t0, 324($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 320($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 324($sp)
+		sw $t0, 320($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 300($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 328($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 296($sp) # $t0 = internal_9
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_9 then goto foreach_body_8779768528306
+		lw $t0, 296($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768528306
+		
+		# Jumping to foreach_end_8779768528306
+		j foreach_end_8779768528306
+		
+		foreach_body_8779768528306:
+		
+		
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 320($sp)
+		lw $t1, 4($t0)
+		sw $t1, 320($sp)
+		
+		# Addition operation
+		lw $t0, 300($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768528306
+		j foreach_start_8779768528306
+		
+		foreach_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		# internal_12 = direction of Bazz
+		la $t0, type_Bazz
+		sw $t0, 284($sp)
+		
+		
+		
+		# internal_13 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 280($sp)
+		
+		
+		
+		# internal_14 = direction of Foo
+		la $t0, type_Foo
+		sw $t0, 276($sp)
+		
+		
+		
+		# internal_15 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 272($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 268($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_17 then goto foreach_type_body_8779768528306
+		lw $t0, 264($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768528306
+		
+		# Jumping to foreach_type_end_8779768528306
+		j foreach_type_end_8779768528306
+		
+		foreach_type_body_8779768528306:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 256($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 328($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 252($sp) # $t0 = internal_20
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_20 then goto foreach_ancestor_body_8779768528306
+		lw $t0, 252($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768528306
+		
+		# Jumping to foreach_ancestor_end_8779768528306
+		j foreach_ancestor_end_8779768528306
+		
+		foreach_ancestor_body_8779768528306:
+		
+		
+		# Equal operation
+		lw $t0, 260($sp) # Save in $t0 the left operand address
+		lw $t1, 248($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 244($sp) # $t0 = internal_22
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_22 then goto foreach_ancestor_end_8779768528306
+		lw $t0, 244($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 256($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768528306
+		j foreach_ancestor_start_8779768528306
+		
+		foreach_ancestor_end_8779768528306:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 268($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768528306
+		j foreach_type_start_8779768528306
+		
+		foreach_type_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 328($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 228($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_1
+		lw $t0, 328($sp)
+		sw $t0, 228($sp)
+		end_assign:
+		
+		foreach_min_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 240($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_27 then goto foreach_min_body_8779768528306
+		lw $t0, 224($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		foreach_min_body_8779768528306:
+		
+		
+		# Less than operation
+		lw $t0, 232($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 228($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 224($sp) # $t0 = internal_27
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_27 then goto update_min_8779768528306
+		lw $t0, 224($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		update_min_8779768528306:
+		
+		lw $t0, 232($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 228($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_25
+		lw $t0, 232($sp)
+		sw $t0, 228($sp)
+		end_assign:
+		
+		lw $t0, 240($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 236($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_24 = internal_23
+		lw $t0, 240($sp)
+		sw $t0, 236($sp)
+		end_assign:
+		
+		update_min_end_8779768528306:
+		
+		# Addition operation
+		lw $t0, 240($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768528306
+		j foreach_min_start_8779768528306
+		
+		foreach_min_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 236($sp) # Save in $t0 the left operand address
+		lw $t1, 328($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 216($sp) # $t0 = internal_29
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_29 then goto error_branch_8779768528306
+		lw $t0, 216($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768528306
+		
+		
+		
+		# If internal_30 then goto branch_Bazz_8779768528306
+		lw $t0, 212($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bazz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Razz_8779768528306
+		lw $t0, 212($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Foo_8779768528306
+		lw $t0, 212($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Foo_8779768528306
+		
+		
+		# If internal_30 then goto branch_Bar_8779768528306
+		lw $t0, 212($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768528306
+		
+		branch_Bazz_8779768528306:
+		
+		# Allocating Foo
+		li $v0, 9
+		lw $a0, type_Foo
+		syscall
+		la $t0, type_Foo # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 200($sp) # internal_33 = address of allocated object Foo
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_33
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_33
+		
+		# Calling function function___init___at_Foo
+		jal function___init___at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 208($sp) # internal_33 = result of function___init___at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 200($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 208($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_33
+		lw $t0, 200($sp)
+		sw $t0, 208($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Razz_8779768528306:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 192($sp) # internal_35 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_35
+		lw $t0, 200($sp)
+		sw $t0, 0($sp) # Storing internal_35
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 200($sp) # internal_35 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 192($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 208($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_35
+		lw $t0, 192($sp)
+		sw $t0, 208($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Foo_8779768528306:
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 184($sp) # internal_37 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_37
+		lw $t0, 192($sp)
+		sw $t0, 0($sp) # Storing internal_37
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 192($sp) # internal_37 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 184($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 208($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_37
+		lw $t0, 184($sp)
+		sw $t0, 208($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Bar_8779768528306:
+		
+		lw $t0, 204($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 208($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = n
+		lw $t0, 204($sp)
+		sw $t0, 208($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		error_branch_8779768528306:
+		
+		
+		branch_end_8779768528306:
+		
+		# Set attribute g of self
+		lw $t0, 336($sp) # $t0 = self
+		lw $t1, 208($sp) # $t1 = internal_31
+		sw $t1, 12($t0) # self.g = internal_31
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 344($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 184($sp) # internal_39 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute i of self
+		lw $t0, 336($sp) # $t0 = self
+		lw $t1, 176($sp) # $t1 = internal_39
+		sw $t1, 16($t0) # self.i = internal_39
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 152($sp) # internal_45 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 160($sp) # internal_43 = address of allocated object Int
+		
+		
+		
+		
+		# internal_41 = typeof self that is the first word of the object
+		lw $t0, 336($sp)
+		lw $t1, 0($t0)
+		sw $t1, 168($sp)
+		
+		lw $t0, 168($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 164($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_42 = internal_41
+		lw $t0, 168($sp)
+		sw $t0, 164($sp)
+		end_assign:
+		
+		lw $t0, 152($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 172($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_40 = internal_45
+		lw $t0, 152($sp)
+		sw $t0, 172($sp)
+		end_assign:
+		
+		while_start_8779768552376:
+		
+		# Equal operation
+		lw $t0, 164($sp) # Save in $t0 the left operand address
+		# If internal_43 then goto while_end_8779768552376
+		lw $t0, 160($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768552376
+		
+		# Addition operation
+		lw $t0, 172($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_42 = ancestor of internal_42 that is the first word of the object
+		lw $t0, 164($sp)
+		lw $t1, 4($t0)
+		sw $t1, 164($sp)
+		
+		# Jumping to while_start_8779768552376
+		j while_start_8779768552376
+		
+		while_end_8779768552376:
+		
+		
+		
+		
+		lw $t0, 168($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 164($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_42 = internal_41
+		lw $t0, 168($sp)
+		sw $t0, 164($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 144($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 172($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 140($sp) # $t0 = internal_48
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_48 then goto foreach_body_8779768552376
+		lw $t0, 140($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768552376
+		
+		# Jumping to foreach_end_8779768552376
+		j foreach_end_8779768552376
+		
+		foreach_body_8779768552376:
+		
+		
+		# internal_42 = ancestor of internal_42 that is the first word of the object
+		lw $t0, 164($sp)
+		lw $t1, 4($t0)
+		sw $t1, 164($sp)
+		
+		# Addition operation
+		lw $t0, 144($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768552376
+		j foreach_start_8779768552376
+		
+		foreach_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		# internal_51 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 128($sp)
+		
+		
+		
+		# internal_52 = direction of Foo
+		la $t0, type_Foo
+		sw $t0, 124($sp)
+		
+		
+		
+		# internal_53 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 120($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 116($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_55 then goto foreach_type_body_8779768552376
+		lw $t0, 112($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768552376
+		
+		# Jumping to foreach_type_end_8779768552376
+		j foreach_type_end_8779768552376
+		
+		foreach_type_body_8779768552376:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 104($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 172($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 100($sp) # $t0 = internal_58
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_58 then goto foreach_ancestor_body_8779768552376
+		lw $t0, 100($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768552376
+		
+		# Jumping to foreach_ancestor_end_8779768552376
+		j foreach_ancestor_end_8779768552376
+		
+		foreach_ancestor_body_8779768552376:
+		
+		
+		# Equal operation
+		lw $t0, 108($sp) # Save in $t0 the left operand address
+		lw $t1, 96($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 92($sp) # $t0 = internal_60
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_60 then goto foreach_ancestor_end_8779768552376
+		lw $t0, 92($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768552376
+		
+		# Addition operation
+		lw $t0, 104($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768552376
+		j foreach_ancestor_start_8779768552376
+		
+		foreach_ancestor_end_8779768552376:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 116($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768552376
+		j foreach_type_start_8779768552376
+		
+		foreach_type_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 172($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 76($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_64 = internal_40
+		lw $t0, 172($sp)
+		sw $t0, 76($sp)
+		end_assign:
+		
+		foreach_min_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 88($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_65 then goto foreach_min_body_8779768552376
+		lw $t0, 72($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768552376
+		
+		# Jumping to foreach_min_end_8779768552376
+		j foreach_min_end_8779768552376
+		
+		foreach_min_body_8779768552376:
+		
+		
+		# Less than operation
+		lw $t0, 80($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 76($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 72($sp) # $t0 = internal_65
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_65 then goto update_min_8779768552376
+		lw $t0, 72($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768552376
+		
+		# Jumping to foreach_min_end_8779768552376
+		j foreach_min_end_8779768552376
+		
+		update_min_8779768552376:
+		
+		lw $t0, 80($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 76($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_64 = internal_63
+		lw $t0, 80($sp)
+		sw $t0, 76($sp)
+		end_assign:
+		
+		lw $t0, 88($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 84($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_62 = internal_61
+		lw $t0, 88($sp)
+		sw $t0, 84($sp)
+		end_assign:
+		
+		update_min_end_8779768552376:
+		
+		# Addition operation
+		lw $t0, 88($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768552376
+		j foreach_min_start_8779768552376
+		
+		foreach_min_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 84($sp) # Save in $t0 the left operand address
+		lw $t1, 172($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 64($sp) # $t0 = internal_67
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_67 then goto error_branch_8779768552376
+		lw $t0, 64($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768552376
+		
+		
+		
+		# If internal_68 then goto branch_Razz_8779768552376
+		lw $t0, 60($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768552376
+		
+		
+		# If internal_68 then goto branch_Foo_8779768552376
+		lw $t0, 60($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Foo_8779768552376
+		
+		
+		# If internal_68 then goto branch_Bar_8779768552376
+		lw $t0, 60($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768552376
+		
+		branch_Razz_8779768552376:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 48($sp) # internal_71 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_71
+		lw $t0, 56($sp)
+		sw $t0, 0($sp) # Storing internal_71
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 56($sp) # internal_71 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 48($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 56($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = internal_71
+		lw $t0, 48($sp)
+		sw $t0, 56($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		branch_Foo_8779768552376:
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 40($sp) # internal_73 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_73
+		lw $t0, 48($sp)
+		sw $t0, 0($sp) # Storing internal_73
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 48($sp) # internal_73 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 40($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 56($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = internal_73
+		lw $t0, 40($sp)
+		sw $t0, 56($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		branch_Bar_8779768552376:
+		
+		lw $t0, 204($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 56($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = n
+		lw $t0, 204($sp)
+		sw $t0, 56($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		error_branch_8779768552376:
+		
+		
+		branch_end_8779768552376:
+		
+		# Set attribute a of self
+		lw $t0, 336($sp) # $t0 = self
+		lw $t1, 56($sp) # $t1 = internal_69
+		sw $t1, 20($t0) # self.a = internal_69
+		
+		# Get attribute a of self
+		lw $t0, 336($sp) # Get the address of self
+		lw $t1, 20($t0) # Get the attribute 'a' from the instance
+		sw $t1, 32($sp) # internal_75 = a
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_75
+		lw $t0, 40($sp)
+		sw $t0, 0($sp) # Storing internal_75
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 36($sp) # internal_76 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Get attribute g of self
+		lw $t0, 336($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'g' from the instance
+		sw $t1, 24($sp) # internal_77 = g
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_77
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing internal_77
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 28($sp) # internal_78 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_76
+		lw $t0, 40($sp)
+		sw $t0, 4($sp) # Storing internal_76
+		
+		# Argument internal_78
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing internal_78
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 28($sp) # internal_79 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 344($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_80 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_79
+		lw $t0, 28($sp)
+		sw $t0, 4($sp) # Storing internal_79
+		
+		# Argument internal_80
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing internal_80
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 20($sp) # internal_81 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 344($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 12($sp) # internal_82 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_81
+		lw $t0, 20($sp)
+		sw $t0, 4($sp) # Storing internal_81
+		
+		# Argument internal_82
+		lw $t0, 16($sp)
+		sw $t0, 0($sp) # Storing internal_82
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 12($sp) # internal_83 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute b of self
+		lw $t0, 336($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_83
+		sw $t1, 24($t0) # self.b = internal_83
+		
+		# Loading return value in $v1
+		lw $v1, 336($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 336
+		
+		jr $ra
+		
+	function_doh_at_Foo:
+		# Function parameters
+		#   $ra = 24($sp)
+		#   self = 20($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -20
+		
+		# Get attribute h of self
+		lw $t0, 20($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'h' from the instance
+		sw $t1, 12($sp) # internal_1 = h
+		
+		lw $t0, 12($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 16($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# i = internal_1
+		lw $t0, 12($sp)
+		sw $t0, 16($sp)
+		end_assign:
+		
+		# Get attribute h of self
+		lw $t0, 20($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'h' from the instance
+		sw $t1, 8($sp) # internal_2 = h
+		
+		# Allocating Int 2
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 2
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_3 = address of allocated object Int
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_2
+		lw $t0, 20($sp)
+		sw $t0, 4($sp) # Storing internal_2
+		
+		# Argument internal_3
+		lw $t0, 16($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 12($sp) # internal_4 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute h of self
+		lw $t0, 20($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_4
+		sw $t1, 8($t0) # self.h = internal_4
+		
+		# Loading return value in $v1
+		lw $v1, 16($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 20
+		
+		jr $ra
+		
+	function___init___at_Bar:
+		# Function parameters
+		#   $ra = 524($sp)
+		#   self = 520($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -520
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 516($sp) # internal_0 = address of allocated object Int
+		
+		# Set attribute h of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 516($sp) # $t1 = internal_0
+		sw $t1, 8($t0) # self.h = internal_0
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 492($sp) # internal_6 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 500($sp) # internal_4 = address of allocated object Int
+		
+		
+		
+		
+		# internal_2 = typeof self that is the first word of the object
+		lw $t0, 520($sp)
+		lw $t1, 0($t0)
+		sw $t1, 508($sp)
+		
+		lw $t0, 508($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 504($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 508($sp)
+		sw $t0, 504($sp)
+		end_assign:
+		
+		lw $t0, 492($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 512($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_1 = internal_6
+		lw $t0, 492($sp)
+		sw $t0, 512($sp)
+		end_assign:
+		
+		while_start_8779768528306:
+		
+		# Equal operation
+		lw $t0, 504($sp) # Save in $t0 the left operand address
+		# If internal_4 then goto while_end_8779768528306
+		lw $t0, 500($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 512($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 504($sp)
+		lw $t1, 4($t0)
+		sw $t1, 504($sp)
+		
+		# Jumping to while_start_8779768528306
+		j while_start_8779768528306
+		
+		while_end_8779768528306:
+		
+		
+		
+		
+		lw $t0, 508($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 504($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 508($sp)
+		sw $t0, 504($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 484($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 512($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 480($sp) # $t0 = internal_9
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_9 then goto foreach_body_8779768528306
+		lw $t0, 480($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768528306
+		
+		# Jumping to foreach_end_8779768528306
+		j foreach_end_8779768528306
+		
+		foreach_body_8779768528306:
+		
+		
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 504($sp)
+		lw $t1, 4($t0)
+		sw $t1, 504($sp)
+		
+		# Addition operation
+		lw $t0, 484($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768528306
+		j foreach_start_8779768528306
+		
+		foreach_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		# internal_12 = direction of Bazz
+		la $t0, type_Bazz
+		sw $t0, 468($sp)
+		
+		
+		
+		# internal_13 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 464($sp)
+		
+		
+		
+		# internal_14 = direction of Foo
+		la $t0, type_Foo
+		sw $t0, 460($sp)
+		
+		
+		
+		# internal_15 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 456($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 452($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_17 then goto foreach_type_body_8779768528306
+		lw $t0, 448($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768528306
+		
+		# Jumping to foreach_type_end_8779768528306
+		j foreach_type_end_8779768528306
+		
+		foreach_type_body_8779768528306:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 440($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 512($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 436($sp) # $t0 = internal_20
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_20 then goto foreach_ancestor_body_8779768528306
+		lw $t0, 436($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768528306
+		
+		# Jumping to foreach_ancestor_end_8779768528306
+		j foreach_ancestor_end_8779768528306
+		
+		foreach_ancestor_body_8779768528306:
+		
+		
+		# Equal operation
+		lw $t0, 444($sp) # Save in $t0 the left operand address
+		lw $t1, 432($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 428($sp) # $t0 = internal_22
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_22 then goto foreach_ancestor_end_8779768528306
+		lw $t0, 428($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 440($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768528306
+		j foreach_ancestor_start_8779768528306
+		
+		foreach_ancestor_end_8779768528306:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 452($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768528306
+		j foreach_type_start_8779768528306
+		
+		foreach_type_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 512($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 412($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_1
+		lw $t0, 512($sp)
+		sw $t0, 412($sp)
+		end_assign:
+		
+		foreach_min_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 424($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_27 then goto foreach_min_body_8779768528306
+		lw $t0, 408($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		foreach_min_body_8779768528306:
+		
+		
+		# Less than operation
+		lw $t0, 416($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 412($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 408($sp) # $t0 = internal_27
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_27 then goto update_min_8779768528306
+		lw $t0, 408($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		update_min_8779768528306:
+		
+		lw $t0, 416($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 412($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_25
+		lw $t0, 416($sp)
+		sw $t0, 412($sp)
+		end_assign:
+		
+		lw $t0, 424($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 420($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_24 = internal_23
+		lw $t0, 424($sp)
+		sw $t0, 420($sp)
+		end_assign:
+		
+		update_min_end_8779768528306:
+		
+		# Addition operation
+		lw $t0, 424($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768528306
+		j foreach_min_start_8779768528306
+		
+		foreach_min_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 420($sp) # Save in $t0 the left operand address
+		lw $t1, 512($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 400($sp) # $t0 = internal_29
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_29 then goto error_branch_8779768528306
+		lw $t0, 400($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768528306
+		
+		
+		
+		# If internal_30 then goto branch_Bazz_8779768528306
+		lw $t0, 396($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bazz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Razz_8779768528306
+		lw $t0, 396($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Foo_8779768528306
+		lw $t0, 396($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Foo_8779768528306
+		
+		
+		# If internal_30 then goto branch_Bar_8779768528306
+		lw $t0, 396($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768528306
+		
+		branch_Bazz_8779768528306:
+		
+		# Allocating Foo
+		li $v0, 9
+		lw $a0, type_Foo
+		syscall
+		la $t0, type_Foo # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 384($sp) # internal_33 = address of allocated object Foo
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_33
+		lw $t0, 392($sp)
+		sw $t0, 0($sp) # Storing internal_33
+		
+		# Calling function function___init___at_Foo
+		jal function___init___at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 392($sp) # internal_33 = result of function___init___at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 384($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 392($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_33
+		lw $t0, 384($sp)
+		sw $t0, 392($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Razz_8779768528306:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 376($sp) # internal_35 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_35
+		lw $t0, 384($sp)
+		sw $t0, 0($sp) # Storing internal_35
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 384($sp) # internal_35 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 376($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 392($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_35
+		lw $t0, 376($sp)
+		sw $t0, 392($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Foo_8779768528306:
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 368($sp) # internal_37 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_37
+		lw $t0, 376($sp)
+		sw $t0, 0($sp) # Storing internal_37
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 376($sp) # internal_37 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 368($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 392($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_37
+		lw $t0, 368($sp)
+		sw $t0, 392($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Bar_8779768528306:
+		
+		lw $t0, 388($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 392($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = n
+		lw $t0, 388($sp)
+		sw $t0, 392($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		error_branch_8779768528306:
+		
+		
+		branch_end_8779768528306:
+		
+		# Set attribute g of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 392($sp) # $t1 = internal_31
+		sw $t1, 12($t0) # self.g = internal_31
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 528($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 368($sp) # internal_39 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute i of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 360($sp) # $t1 = internal_39
+		sw $t1, 16($t0) # self.i = internal_39
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 336($sp) # internal_45 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 344($sp) # internal_43 = address of allocated object Int
+		
+		
+		
+		
+		# internal_41 = typeof self that is the first word of the object
+		lw $t0, 520($sp)
+		lw $t1, 0($t0)
+		sw $t1, 352($sp)
+		
+		lw $t0, 352($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 348($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_42 = internal_41
+		lw $t0, 352($sp)
+		sw $t0, 348($sp)
+		end_assign:
+		
+		lw $t0, 336($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 356($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_40 = internal_45
+		lw $t0, 336($sp)
+		sw $t0, 356($sp)
+		end_assign:
+		
+		while_start_8779768552376:
+		
+		# Equal operation
+		lw $t0, 348($sp) # Save in $t0 the left operand address
+		# If internal_43 then goto while_end_8779768552376
+		lw $t0, 344($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768552376
+		
+		# Addition operation
+		lw $t0, 356($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_42 = ancestor of internal_42 that is the first word of the object
+		lw $t0, 348($sp)
+		lw $t1, 4($t0)
+		sw $t1, 348($sp)
+		
+		# Jumping to while_start_8779768552376
+		j while_start_8779768552376
+		
+		while_end_8779768552376:
+		
+		
+		
+		
+		lw $t0, 352($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 348($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_42 = internal_41
+		lw $t0, 352($sp)
+		sw $t0, 348($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 328($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 356($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 324($sp) # $t0 = internal_48
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_48 then goto foreach_body_8779768552376
+		lw $t0, 324($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768552376
+		
+		# Jumping to foreach_end_8779768552376
+		j foreach_end_8779768552376
+		
+		foreach_body_8779768552376:
+		
+		
+		# internal_42 = ancestor of internal_42 that is the first word of the object
+		lw $t0, 348($sp)
+		lw $t1, 4($t0)
+		sw $t1, 348($sp)
+		
+		# Addition operation
+		lw $t0, 328($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768552376
+		j foreach_start_8779768552376
+		
+		foreach_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		# internal_51 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 312($sp)
+		
+		
+		
+		# internal_52 = direction of Foo
+		la $t0, type_Foo
+		sw $t0, 308($sp)
+		
+		
+		
+		# internal_53 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 304($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 300($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_55 then goto foreach_type_body_8779768552376
+		lw $t0, 296($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768552376
+		
+		# Jumping to foreach_type_end_8779768552376
+		j foreach_type_end_8779768552376
+		
+		foreach_type_body_8779768552376:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 288($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 356($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 284($sp) # $t0 = internal_58
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_58 then goto foreach_ancestor_body_8779768552376
+		lw $t0, 284($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768552376
+		
+		# Jumping to foreach_ancestor_end_8779768552376
+		j foreach_ancestor_end_8779768552376
+		
+		foreach_ancestor_body_8779768552376:
+		
+		
+		# Equal operation
+		lw $t0, 292($sp) # Save in $t0 the left operand address
+		lw $t1, 280($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 276($sp) # $t0 = internal_60
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_60 then goto foreach_ancestor_end_8779768552376
+		lw $t0, 276($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768552376
+		
+		# Addition operation
+		lw $t0, 288($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768552376
+		j foreach_ancestor_start_8779768552376
+		
+		foreach_ancestor_end_8779768552376:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 300($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768552376
+		j foreach_type_start_8779768552376
+		
+		foreach_type_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 356($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 260($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_64 = internal_40
+		lw $t0, 356($sp)
+		sw $t0, 260($sp)
+		end_assign:
+		
+		foreach_min_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 272($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_65 then goto foreach_min_body_8779768552376
+		lw $t0, 256($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768552376
+		
+		# Jumping to foreach_min_end_8779768552376
+		j foreach_min_end_8779768552376
+		
+		foreach_min_body_8779768552376:
+		
+		
+		# Less than operation
+		lw $t0, 264($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 260($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 256($sp) # $t0 = internal_65
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_65 then goto update_min_8779768552376
+		lw $t0, 256($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768552376
+		
+		# Jumping to foreach_min_end_8779768552376
+		j foreach_min_end_8779768552376
+		
+		update_min_8779768552376:
+		
+		lw $t0, 264($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 260($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_64 = internal_63
+		lw $t0, 264($sp)
+		sw $t0, 260($sp)
+		end_assign:
+		
+		lw $t0, 272($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 268($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_62 = internal_61
+		lw $t0, 272($sp)
+		sw $t0, 268($sp)
+		end_assign:
+		
+		update_min_end_8779768552376:
+		
+		# Addition operation
+		lw $t0, 272($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768552376
+		j foreach_min_start_8779768552376
+		
+		foreach_min_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 268($sp) # Save in $t0 the left operand address
+		lw $t1, 356($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 248($sp) # $t0 = internal_67
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_67 then goto error_branch_8779768552376
+		lw $t0, 248($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768552376
+		
+		
+		
+		# If internal_68 then goto branch_Razz_8779768552376
+		lw $t0, 244($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768552376
+		
+		
+		# If internal_68 then goto branch_Foo_8779768552376
+		lw $t0, 244($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Foo_8779768552376
+		
+		
+		# If internal_68 then goto branch_Bar_8779768552376
+		lw $t0, 244($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768552376
+		
+		branch_Razz_8779768552376:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 232($sp) # internal_71 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_71
+		lw $t0, 240($sp)
+		sw $t0, 0($sp) # Storing internal_71
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 240($sp) # internal_71 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 232($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 240($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = internal_71
+		lw $t0, 232($sp)
+		sw $t0, 240($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		branch_Foo_8779768552376:
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 224($sp) # internal_73 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_73
+		lw $t0, 232($sp)
+		sw $t0, 0($sp) # Storing internal_73
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 232($sp) # internal_73 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 224($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 240($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = internal_73
+		lw $t0, 224($sp)
+		sw $t0, 240($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		branch_Bar_8779768552376:
+		
+		lw $t0, 388($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 240($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = n
+		lw $t0, 388($sp)
+		sw $t0, 240($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		error_branch_8779768552376:
+		
+		
+		branch_end_8779768552376:
+		
+		# Set attribute a of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 240($sp) # $t1 = internal_69
+		sw $t1, 20($t0) # self.a = internal_69
+		
+		# Get attribute a of self
+		lw $t0, 520($sp) # Get the address of self
+		lw $t1, 20($t0) # Get the attribute 'a' from the instance
+		sw $t1, 216($sp) # internal_75 = a
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_75
+		lw $t0, 224($sp)
+		sw $t0, 0($sp) # Storing internal_75
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 220($sp) # internal_76 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Get attribute g of self
+		lw $t0, 520($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'g' from the instance
+		sw $t1, 208($sp) # internal_77 = g
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_77
+		lw $t0, 216($sp)
+		sw $t0, 0($sp) # Storing internal_77
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 212($sp) # internal_78 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_76
+		lw $t0, 224($sp)
+		sw $t0, 4($sp) # Storing internal_76
+		
+		# Argument internal_78
+		lw $t0, 216($sp)
+		sw $t0, 0($sp) # Storing internal_78
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 212($sp) # internal_79 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 528($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 204($sp) # internal_80 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_79
+		lw $t0, 212($sp)
+		sw $t0, 4($sp) # Storing internal_79
+		
+		# Argument internal_80
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_80
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 204($sp) # internal_81 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 528($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 196($sp) # internal_82 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_81
+		lw $t0, 204($sp)
+		sw $t0, 4($sp) # Storing internal_81
+		
+		# Argument internal_82
+		lw $t0, 200($sp)
+		sw $t0, 0($sp) # Storing internal_82
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 196($sp) # internal_83 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute b of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 184($sp) # $t1 = internal_83
+		sw $t1, 24($t0) # self.b = internal_83
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 160($sp) # internal_89 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 168($sp) # internal_87 = address of allocated object Int
+		
+		
+		
+		
+		# internal_85 = typeof self that is the first word of the object
+		lw $t0, 520($sp)
+		lw $t1, 0($t0)
+		sw $t1, 176($sp)
+		
+		lw $t0, 176($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 172($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_86 = internal_85
+		lw $t0, 176($sp)
+		sw $t0, 172($sp)
+		end_assign:
+		
+		lw $t0, 160($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 180($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_84 = internal_89
+		lw $t0, 160($sp)
+		sw $t0, 180($sp)
+		end_assign:
+		
+		while_start_8779768528207:
+		
+		# Equal operation
+		lw $t0, 172($sp) # Save in $t0 the left operand address
+		# If internal_87 then goto while_end_8779768528207
+		lw $t0, 168($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768528207
+		
+		# Addition operation
+		lw $t0, 180($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_86 = ancestor of internal_86 that is the first word of the object
+		lw $t0, 172($sp)
+		lw $t1, 4($t0)
+		sw $t1, 172($sp)
+		
+		# Jumping to while_start_8779768528207
+		j while_start_8779768528207
+		
+		while_end_8779768528207:
+		
+		
+		
+		
+		lw $t0, 176($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 172($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_86 = internal_85
+		lw $t0, 176($sp)
+		sw $t0, 172($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 152($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 180($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 148($sp) # $t0 = internal_92
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_92 then goto foreach_body_8779768528207
+		lw $t0, 148($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768528207
+		
+		# Jumping to foreach_end_8779768528207
+		j foreach_end_8779768528207
+		
+		foreach_body_8779768528207:
+		
+		
+		# internal_86 = ancestor of internal_86 that is the first word of the object
+		lw $t0, 172($sp)
+		lw $t1, 4($t0)
+		sw $t1, 172($sp)
+		
+		# Addition operation
+		lw $t0, 152($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768528207
+		j foreach_start_8779768528207
+		
+		foreach_end_8779768528207:
+		
+		
+		
+		
+		
+		
+		# internal_95 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 136($sp)
+		
+		
+		
+		# internal_96 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 132($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 128($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_98 then goto foreach_type_body_8779768528207
+		lw $t0, 124($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768528207
+		
+		# Jumping to foreach_type_end_8779768528207
+		j foreach_type_end_8779768528207
+		
+		foreach_type_body_8779768528207:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 116($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 180($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 112($sp) # $t0 = internal_101
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_101 then goto foreach_ancestor_body_8779768528207
+		lw $t0, 112($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768528207
+		
+		# Jumping to foreach_ancestor_end_8779768528207
+		j foreach_ancestor_end_8779768528207
+		
+		foreach_ancestor_body_8779768528207:
+		
+		
+		# Equal operation
+		lw $t0, 120($sp) # Save in $t0 the left operand address
+		lw $t1, 108($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 104($sp) # $t0 = internal_103
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_103 then goto foreach_ancestor_end_8779768528207
+		lw $t0, 104($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768528207
+		
+		# Addition operation
+		lw $t0, 116($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768528207
+		j foreach_ancestor_start_8779768528207
+		
+		foreach_ancestor_end_8779768528207:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 128($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768528207
+		j foreach_type_start_8779768528207
+		
+		foreach_type_end_8779768528207:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 180($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 88($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_107 = internal_84
+		lw $t0, 180($sp)
+		sw $t0, 88($sp)
+		end_assign:
+		
+		foreach_min_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 100($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_108 then goto foreach_min_body_8779768528207
+		lw $t0, 84($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768528207
+		
+		# Jumping to foreach_min_end_8779768528207
+		j foreach_min_end_8779768528207
+		
+		foreach_min_body_8779768528207:
+		
+		
+		# Less than operation
+		lw $t0, 92($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 88($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 84($sp) # $t0 = internal_108
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_108 then goto update_min_8779768528207
+		lw $t0, 84($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768528207
+		
+		# Jumping to foreach_min_end_8779768528207
+		j foreach_min_end_8779768528207
+		
+		update_min_8779768528207:
+		
+		lw $t0, 92($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 88($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_107 = internal_106
+		lw $t0, 92($sp)
+		sw $t0, 88($sp)
+		end_assign:
+		
+		lw $t0, 100($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 96($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_105 = internal_104
+		lw $t0, 100($sp)
+		sw $t0, 96($sp)
+		end_assign:
+		
+		update_min_end_8779768528207:
+		
+		# Addition operation
+		lw $t0, 100($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768528207
+		j foreach_min_start_8779768528207
+		
+		foreach_min_end_8779768528207:
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 96($sp) # Save in $t0 the left operand address
+		lw $t1, 180($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 76($sp) # $t0 = internal_110
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_110 then goto error_branch_8779768528207
+		lw $t0, 76($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768528207
+		
+		
+		
+		# If internal_111 then goto branch_Razz_8779768528207
+		lw $t0, 72($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768528207
+		
+		
+		# If internal_111 then goto branch_Bar_8779768528207
+		lw $t0, 72($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768528207
+		
+		branch_Razz_8779768528207:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 60($sp) # internal_114 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_114
+		lw $t0, 68($sp)
+		sw $t0, 0($sp) # Storing internal_114
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 68($sp) # internal_114 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 60($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 68($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_112 = internal_114
+		lw $t0, 60($sp)
+		sw $t0, 68($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528207
+		j branch_end_8779768528207
+		
+		branch_Bar_8779768528207:
+		
+		lw $t0, 388($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 68($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_112 = n
+		lw $t0, 388($sp)
+		sw $t0, 68($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528207
+		j branch_end_8779768528207
+		
+		error_branch_8779768528207:
+		
+		
+		branch_end_8779768528207:
+		
+		# Set attribute e of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 68($sp) # $t1 = internal_112
+		sw $t1, 28($t0) # self.e = internal_112
+		
+		# Get attribute a of self
+		lw $t0, 520($sp) # Get the address of self
+		lw $t1, 20($t0) # Get the attribute 'a' from the instance
+		sw $t1, 52($sp) # internal_116 = a
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_116
+		lw $t0, 60($sp)
+		sw $t0, 0($sp) # Storing internal_116
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 56($sp) # internal_117 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Get attribute g of self
+		lw $t0, 520($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'g' from the instance
+		sw $t1, 44($sp) # internal_118 = g
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_118
+		lw $t0, 52($sp)
+		sw $t0, 0($sp) # Storing internal_118
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 48($sp) # internal_119 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_117
+		lw $t0, 60($sp)
+		sw $t0, 4($sp) # Storing internal_117
+		
+		# Argument internal_119
+		lw $t0, 52($sp)
+		sw $t0, 0($sp) # Storing internal_119
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 48($sp) # internal_120 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Get attribute e of self
+		lw $t0, 520($sp) # Get the address of self
+		lw $t1, 28($t0) # Get the attribute 'e' from the instance
+		sw $t1, 32($sp) # internal_121 = e
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_121
+		lw $t0, 40($sp)
+		sw $t0, 0($sp) # Storing internal_121
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 36($sp) # internal_122 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_120
+		lw $t0, 48($sp)
+		sw $t0, 4($sp) # Storing internal_120
+		
+		# Argument internal_122
+		lw $t0, 40($sp)
+		sw $t0, 0($sp) # Storing internal_122
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 36($sp) # internal_123 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 528($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 28($sp) # internal_124 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_123
+		lw $t0, 36($sp)
+		sw $t0, 4($sp) # Storing internal_123
+		
+		# Argument internal_124
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing internal_124
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 28($sp) # internal_125 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 528($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_126 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_125
+		lw $t0, 28($sp)
+		sw $t0, 4($sp) # Storing internal_125
+		
+		# Argument internal_126
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing internal_126
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 20($sp) # internal_127 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute f of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 8($sp) # $t1 = internal_127
+		sw $t1, 32($t0) # self.f = internal_127
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 528($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 12($sp) # internal_128 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute c of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 4($sp) # $t1 = internal_128
+		sw $t1, 36($t0) # self.c = internal_128
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 528($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 8($sp) # internal_129 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute d of self
+		lw $t0, 520($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_129
+		sw $t1, 40($t0) # self.d = internal_129
+		
+		# Loading return value in $v1
+		lw $v1, 520($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 520
+		
+		jr $ra
+		
+	function___init___at_Razz:
+		# Function parameters
+		#   $ra = 516($sp)
+		#   self = 512($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -512
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 508($sp) # internal_0 = address of allocated object Int
+		
+		# Set attribute h of self
+		lw $t0, 512($sp) # $t0 = self
+		lw $t1, 508($sp) # $t1 = internal_0
+		sw $t1, 8($t0) # self.h = internal_0
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 484($sp) # internal_6 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 492($sp) # internal_4 = address of allocated object Int
+		
+		
+		
+		
+		# internal_2 = typeof self that is the first word of the object
+		lw $t0, 512($sp)
+		lw $t1, 0($t0)
+		sw $t1, 500($sp)
+		
+		lw $t0, 500($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 496($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 500($sp)
+		sw $t0, 496($sp)
+		end_assign:
+		
+		lw $t0, 484($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 504($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_1 = internal_6
+		lw $t0, 484($sp)
+		sw $t0, 504($sp)
+		end_assign:
+		
+		while_start_8779768528306:
+		
+		# Equal operation
+		lw $t0, 496($sp) # Save in $t0 the left operand address
+		# If internal_4 then goto while_end_8779768528306
+		lw $t0, 492($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 504($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 496($sp)
+		lw $t1, 4($t0)
+		sw $t1, 496($sp)
+		
+		# Jumping to while_start_8779768528306
+		j while_start_8779768528306
+		
+		while_end_8779768528306:
+		
+		
+		
+		
+		lw $t0, 500($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 496($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 500($sp)
+		sw $t0, 496($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 476($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 504($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 472($sp) # $t0 = internal_9
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_9 then goto foreach_body_8779768528306
+		lw $t0, 472($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768528306
+		
+		# Jumping to foreach_end_8779768528306
+		j foreach_end_8779768528306
+		
+		foreach_body_8779768528306:
+		
+		
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 496($sp)
+		lw $t1, 4($t0)
+		sw $t1, 496($sp)
+		
+		# Addition operation
+		lw $t0, 476($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768528306
+		j foreach_start_8779768528306
+		
+		foreach_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		# internal_12 = direction of Bazz
+		la $t0, type_Bazz
+		sw $t0, 460($sp)
+		
+		
+		
+		# internal_13 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 456($sp)
+		
+		
+		
+		# internal_14 = direction of Foo
+		la $t0, type_Foo
+		sw $t0, 452($sp)
+		
+		
+		
+		# internal_15 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 448($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 444($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_17 then goto foreach_type_body_8779768528306
+		lw $t0, 440($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768528306
+		
+		# Jumping to foreach_type_end_8779768528306
+		j foreach_type_end_8779768528306
+		
+		foreach_type_body_8779768528306:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 432($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 504($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 428($sp) # $t0 = internal_20
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_20 then goto foreach_ancestor_body_8779768528306
+		lw $t0, 428($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768528306
+		
+		# Jumping to foreach_ancestor_end_8779768528306
+		j foreach_ancestor_end_8779768528306
+		
+		foreach_ancestor_body_8779768528306:
+		
+		
+		# Equal operation
+		lw $t0, 436($sp) # Save in $t0 the left operand address
+		lw $t1, 424($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 420($sp) # $t0 = internal_22
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_22 then goto foreach_ancestor_end_8779768528306
+		lw $t0, 420($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 432($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768528306
+		j foreach_ancestor_start_8779768528306
+		
+		foreach_ancestor_end_8779768528306:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 444($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768528306
+		j foreach_type_start_8779768528306
+		
+		foreach_type_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 504($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 404($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_1
+		lw $t0, 504($sp)
+		sw $t0, 404($sp)
+		end_assign:
+		
+		foreach_min_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 416($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_27 then goto foreach_min_body_8779768528306
+		lw $t0, 400($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		foreach_min_body_8779768528306:
+		
+		
+		# Less than operation
+		lw $t0, 408($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 404($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 400($sp) # $t0 = internal_27
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_27 then goto update_min_8779768528306
+		lw $t0, 400($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		update_min_8779768528306:
+		
+		lw $t0, 408($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 404($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_25
+		lw $t0, 408($sp)
+		sw $t0, 404($sp)
+		end_assign:
+		
+		lw $t0, 416($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 412($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_24 = internal_23
+		lw $t0, 416($sp)
+		sw $t0, 412($sp)
+		end_assign:
+		
+		update_min_end_8779768528306:
+		
+		# Addition operation
+		lw $t0, 416($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768528306
+		j foreach_min_start_8779768528306
+		
+		foreach_min_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 412($sp) # Save in $t0 the left operand address
+		lw $t1, 504($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 392($sp) # $t0 = internal_29
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_29 then goto error_branch_8779768528306
+		lw $t0, 392($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768528306
+		
+		
+		
+		# If internal_30 then goto branch_Bazz_8779768528306
+		lw $t0, 388($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bazz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Razz_8779768528306
+		lw $t0, 388($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Foo_8779768528306
+		lw $t0, 388($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Foo_8779768528306
+		
+		
+		# If internal_30 then goto branch_Bar_8779768528306
+		lw $t0, 388($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768528306
+		
+		branch_Bazz_8779768528306:
+		
+		# Allocating Foo
+		li $v0, 9
+		lw $a0, type_Foo
+		syscall
+		la $t0, type_Foo # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 376($sp) # internal_33 = address of allocated object Foo
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_33
+		lw $t0, 384($sp)
+		sw $t0, 0($sp) # Storing internal_33
+		
+		# Calling function function___init___at_Foo
+		jal function___init___at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 384($sp) # internal_33 = result of function___init___at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 376($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 384($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_33
+		lw $t0, 376($sp)
+		sw $t0, 384($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Razz_8779768528306:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 368($sp) # internal_35 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_35
+		lw $t0, 376($sp)
+		sw $t0, 0($sp) # Storing internal_35
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 376($sp) # internal_35 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 368($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 384($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_35
+		lw $t0, 368($sp)
+		sw $t0, 384($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Foo_8779768528306:
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 360($sp) # internal_37 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_37
+		lw $t0, 368($sp)
+		sw $t0, 0($sp) # Storing internal_37
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 368($sp) # internal_37 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 360($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 384($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_37
+		lw $t0, 360($sp)
+		sw $t0, 384($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Bar_8779768528306:
+		
+		lw $t0, 380($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 384($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = n
+		lw $t0, 380($sp)
+		sw $t0, 384($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		error_branch_8779768528306:
+		
+		
+		branch_end_8779768528306:
+		
+		# Set attribute g of self
+		lw $t0, 512($sp) # $t0 = self
+		lw $t1, 384($sp) # $t1 = internal_31
+		sw $t1, 12($t0) # self.g = internal_31
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 520($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 360($sp) # internal_39 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute i of self
+		lw $t0, 512($sp) # $t0 = self
+		lw $t1, 352($sp) # $t1 = internal_39
+		sw $t1, 16($t0) # self.i = internal_39
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 328($sp) # internal_45 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 336($sp) # internal_43 = address of allocated object Int
+		
+		
+		
+		
+		# internal_41 = typeof self that is the first word of the object
+		lw $t0, 512($sp)
+		lw $t1, 0($t0)
+		sw $t1, 344($sp)
+		
+		lw $t0, 344($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 340($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_42 = internal_41
+		lw $t0, 344($sp)
+		sw $t0, 340($sp)
+		end_assign:
+		
+		lw $t0, 328($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 348($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_40 = internal_45
+		lw $t0, 328($sp)
+		sw $t0, 348($sp)
+		end_assign:
+		
+		while_start_8779768552376:
+		
+		# Equal operation
+		lw $t0, 340($sp) # Save in $t0 the left operand address
+		# If internal_43 then goto while_end_8779768552376
+		lw $t0, 336($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768552376
+		
+		# Addition operation
+		lw $t0, 348($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_42 = ancestor of internal_42 that is the first word of the object
+		lw $t0, 340($sp)
+		lw $t1, 4($t0)
+		sw $t1, 340($sp)
+		
+		# Jumping to while_start_8779768552376
+		j while_start_8779768552376
+		
+		while_end_8779768552376:
+		
+		
+		
+		
+		lw $t0, 344($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 340($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_42 = internal_41
+		lw $t0, 344($sp)
+		sw $t0, 340($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 320($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 348($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 316($sp) # $t0 = internal_48
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_48 then goto foreach_body_8779768552376
+		lw $t0, 316($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768552376
+		
+		# Jumping to foreach_end_8779768552376
+		j foreach_end_8779768552376
+		
+		foreach_body_8779768552376:
+		
+		
+		# internal_42 = ancestor of internal_42 that is the first word of the object
+		lw $t0, 340($sp)
+		lw $t1, 4($t0)
+		sw $t1, 340($sp)
+		
+		# Addition operation
+		lw $t0, 320($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768552376
+		j foreach_start_8779768552376
+		
+		foreach_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		# internal_51 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 304($sp)
+		
+		
+		
+		# internal_52 = direction of Foo
+		la $t0, type_Foo
+		sw $t0, 300($sp)
+		
+		
+		
+		# internal_53 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 296($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 292($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_55 then goto foreach_type_body_8779768552376
+		lw $t0, 288($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768552376
+		
+		# Jumping to foreach_type_end_8779768552376
+		j foreach_type_end_8779768552376
+		
+		foreach_type_body_8779768552376:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 280($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 348($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 276($sp) # $t0 = internal_58
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_58 then goto foreach_ancestor_body_8779768552376
+		lw $t0, 276($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768552376
+		
+		# Jumping to foreach_ancestor_end_8779768552376
+		j foreach_ancestor_end_8779768552376
+		
+		foreach_ancestor_body_8779768552376:
+		
+		
+		# Equal operation
+		lw $t0, 284($sp) # Save in $t0 the left operand address
+		lw $t1, 272($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 268($sp) # $t0 = internal_60
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_60 then goto foreach_ancestor_end_8779768552376
+		lw $t0, 268($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768552376
+		
+		# Addition operation
+		lw $t0, 280($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768552376
+		j foreach_ancestor_start_8779768552376
+		
+		foreach_ancestor_end_8779768552376:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 292($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768552376
+		j foreach_type_start_8779768552376
+		
+		foreach_type_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 348($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 252($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_64 = internal_40
+		lw $t0, 348($sp)
+		sw $t0, 252($sp)
+		end_assign:
+		
+		foreach_min_start_8779768552376:
+		
+		# Less than operation
+		lw $t0, 264($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_65 then goto foreach_min_body_8779768552376
+		lw $t0, 248($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768552376
+		
+		# Jumping to foreach_min_end_8779768552376
+		j foreach_min_end_8779768552376
+		
+		foreach_min_body_8779768552376:
+		
+		
+		# Less than operation
+		lw $t0, 256($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 252($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 248($sp) # $t0 = internal_65
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_65 then goto update_min_8779768552376
+		lw $t0, 248($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768552376
+		
+		# Jumping to foreach_min_end_8779768552376
+		j foreach_min_end_8779768552376
+		
+		update_min_8779768552376:
+		
+		lw $t0, 256($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 252($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_64 = internal_63
+		lw $t0, 256($sp)
+		sw $t0, 252($sp)
+		end_assign:
+		
+		lw $t0, 264($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 260($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_62 = internal_61
+		lw $t0, 264($sp)
+		sw $t0, 260($sp)
+		end_assign:
+		
+		update_min_end_8779768552376:
+		
+		# Addition operation
+		lw $t0, 264($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768552376
+		j foreach_min_start_8779768552376
+		
+		foreach_min_end_8779768552376:
+		
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 260($sp) # Save in $t0 the left operand address
+		lw $t1, 348($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 240($sp) # $t0 = internal_67
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_67 then goto error_branch_8779768552376
+		lw $t0, 240($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768552376
+		
+		
+		
+		# If internal_68 then goto branch_Razz_8779768552376
+		lw $t0, 236($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768552376
+		
+		
+		# If internal_68 then goto branch_Foo_8779768552376
+		lw $t0, 236($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Foo_8779768552376
+		
+		
+		# If internal_68 then goto branch_Bar_8779768552376
+		lw $t0, 236($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768552376
+		
+		branch_Razz_8779768552376:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 224($sp) # internal_71 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_71
+		lw $t0, 232($sp)
+		sw $t0, 0($sp) # Storing internal_71
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 232($sp) # internal_71 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 224($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 232($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = internal_71
+		lw $t0, 224($sp)
+		sw $t0, 232($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		branch_Foo_8779768552376:
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 216($sp) # internal_73 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_73
+		lw $t0, 224($sp)
+		sw $t0, 0($sp) # Storing internal_73
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 224($sp) # internal_73 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 216($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 232($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = internal_73
+		lw $t0, 216($sp)
+		sw $t0, 232($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		branch_Bar_8779768552376:
+		
+		lw $t0, 380($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 232($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_69 = n
+		lw $t0, 380($sp)
+		sw $t0, 232($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768552376
+		j branch_end_8779768552376
+		
+		error_branch_8779768552376:
+		
+		
+		branch_end_8779768552376:
+		
+		# Set attribute a of self
+		lw $t0, 512($sp) # $t0 = self
+		lw $t1, 232($sp) # $t1 = internal_69
+		sw $t1, 20($t0) # self.a = internal_69
+		
+		# Get attribute a of self
+		lw $t0, 512($sp) # Get the address of self
+		lw $t1, 20($t0) # Get the attribute 'a' from the instance
+		sw $t1, 208($sp) # internal_75 = a
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_75
+		lw $t0, 216($sp)
+		sw $t0, 0($sp) # Storing internal_75
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 212($sp) # internal_76 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Get attribute g of self
+		lw $t0, 512($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'g' from the instance
+		sw $t1, 200($sp) # internal_77 = g
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_77
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_77
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 204($sp) # internal_78 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_76
+		lw $t0, 216($sp)
+		sw $t0, 4($sp) # Storing internal_76
+		
+		# Argument internal_78
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_78
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 204($sp) # internal_79 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 520($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 196($sp) # internal_80 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_79
+		lw $t0, 204($sp)
+		sw $t0, 4($sp) # Storing internal_79
+		
+		# Argument internal_80
+		lw $t0, 200($sp)
+		sw $t0, 0($sp) # Storing internal_80
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 196($sp) # internal_81 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 520($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 188($sp) # internal_82 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_81
+		lw $t0, 196($sp)
+		sw $t0, 4($sp) # Storing internal_81
+		
+		# Argument internal_82
+		lw $t0, 192($sp)
+		sw $t0, 0($sp) # Storing internal_82
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 188($sp) # internal_83 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute b of self
+		lw $t0, 512($sp) # $t0 = self
+		lw $t1, 176($sp) # $t1 = internal_83
+		sw $t1, 24($t0) # self.b = internal_83
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 152($sp) # internal_89 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 160($sp) # internal_87 = address of allocated object Int
+		
+		
+		
+		
+		# internal_85 = typeof self that is the first word of the object
+		lw $t0, 512($sp)
+		lw $t1, 0($t0)
+		sw $t1, 168($sp)
+		
+		lw $t0, 168($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 164($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_86 = internal_85
+		lw $t0, 168($sp)
+		sw $t0, 164($sp)
+		end_assign:
+		
+		lw $t0, 152($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 172($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_84 = internal_89
+		lw $t0, 152($sp)
+		sw $t0, 172($sp)
+		end_assign:
+		
+		while_start_8779768528207:
+		
+		# Equal operation
+		lw $t0, 164($sp) # Save in $t0 the left operand address
+		# If internal_87 then goto while_end_8779768528207
+		lw $t0, 160($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768528207
+		
+		# Addition operation
+		lw $t0, 172($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_86 = ancestor of internal_86 that is the first word of the object
+		lw $t0, 164($sp)
+		lw $t1, 4($t0)
+		sw $t1, 164($sp)
+		
+		# Jumping to while_start_8779768528207
+		j while_start_8779768528207
+		
+		while_end_8779768528207:
+		
+		
+		
+		
+		lw $t0, 168($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 164($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_86 = internal_85
+		lw $t0, 168($sp)
+		sw $t0, 164($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 144($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 172($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 140($sp) # $t0 = internal_92
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_92 then goto foreach_body_8779768528207
+		lw $t0, 140($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768528207
+		
+		# Jumping to foreach_end_8779768528207
+		j foreach_end_8779768528207
+		
+		foreach_body_8779768528207:
+		
+		
+		# internal_86 = ancestor of internal_86 that is the first word of the object
+		lw $t0, 164($sp)
+		lw $t1, 4($t0)
+		sw $t1, 164($sp)
+		
+		# Addition operation
+		lw $t0, 144($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768528207
+		j foreach_start_8779768528207
+		
+		foreach_end_8779768528207:
+		
+		
+		
+		
+		
+		
+		# internal_95 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 128($sp)
+		
+		
+		
+		# internal_96 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 124($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 120($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_98 then goto foreach_type_body_8779768528207
+		lw $t0, 116($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768528207
+		
+		# Jumping to foreach_type_end_8779768528207
+		j foreach_type_end_8779768528207
+		
+		foreach_type_body_8779768528207:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 108($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 172($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 104($sp) # $t0 = internal_101
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_101 then goto foreach_ancestor_body_8779768528207
+		lw $t0, 104($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768528207
+		
+		# Jumping to foreach_ancestor_end_8779768528207
+		j foreach_ancestor_end_8779768528207
+		
+		foreach_ancestor_body_8779768528207:
+		
+		
+		# Equal operation
+		lw $t0, 112($sp) # Save in $t0 the left operand address
+		lw $t1, 100($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 96($sp) # $t0 = internal_103
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_103 then goto foreach_ancestor_end_8779768528207
+		lw $t0, 96($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768528207
+		
+		# Addition operation
+		lw $t0, 108($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768528207
+		j foreach_ancestor_start_8779768528207
+		
+		foreach_ancestor_end_8779768528207:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 120($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768528207
+		j foreach_type_start_8779768528207
+		
+		foreach_type_end_8779768528207:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 172($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 80($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_107 = internal_84
+		lw $t0, 172($sp)
+		sw $t0, 80($sp)
+		end_assign:
+		
+		foreach_min_start_8779768528207:
+		
+		# Less than operation
+		lw $t0, 92($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_108 then goto foreach_min_body_8779768528207
+		lw $t0, 76($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768528207
+		
+		# Jumping to foreach_min_end_8779768528207
+		j foreach_min_end_8779768528207
+		
+		foreach_min_body_8779768528207:
+		
+		
+		# Less than operation
+		lw $t0, 84($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 80($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 76($sp) # $t0 = internal_108
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_108 then goto update_min_8779768528207
+		lw $t0, 76($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768528207
+		
+		# Jumping to foreach_min_end_8779768528207
+		j foreach_min_end_8779768528207
+		
+		update_min_8779768528207:
+		
+		lw $t0, 84($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 80($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_107 = internal_106
+		lw $t0, 84($sp)
+		sw $t0, 80($sp)
+		end_assign:
+		
+		lw $t0, 92($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 88($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_105 = internal_104
+		lw $t0, 92($sp)
+		sw $t0, 88($sp)
+		end_assign:
+		
+		update_min_end_8779768528207:
+		
+		# Addition operation
+		lw $t0, 92($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768528207
+		j foreach_min_start_8779768528207
+		
+		foreach_min_end_8779768528207:
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 88($sp) # Save in $t0 the left operand address
+		lw $t1, 172($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 68($sp) # $t0 = internal_110
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_110 then goto error_branch_8779768528207
+		lw $t0, 68($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768528207
+		
+		
+		
+		# If internal_111 then goto branch_Razz_8779768528207
+		lw $t0, 64($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768528207
+		
+		
+		# If internal_111 then goto branch_Bar_8779768528207
+		lw $t0, 64($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768528207
+		
+		branch_Razz_8779768528207:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 52($sp) # internal_114 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_114
+		lw $t0, 60($sp)
+		sw $t0, 0($sp) # Storing internal_114
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 60($sp) # internal_114 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 52($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 60($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_112 = internal_114
+		lw $t0, 52($sp)
+		sw $t0, 60($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528207
+		j branch_end_8779768528207
+		
+		branch_Bar_8779768528207:
+		
+		lw $t0, 380($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 60($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_112 = n
+		lw $t0, 380($sp)
+		sw $t0, 60($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528207
+		j branch_end_8779768528207
+		
+		error_branch_8779768528207:
+		
+		
+		branch_end_8779768528207:
+		
+		# Set attribute e of self
+		lw $t0, 512($sp) # $t0 = self
+		lw $t1, 60($sp) # $t1 = internal_112
+		sw $t1, 28($t0) # self.e = internal_112
+		
+		# Get attribute a of self
+		lw $t0, 512($sp) # Get the address of self
+		lw $t1, 20($t0) # Get the attribute 'a' from the instance
+		sw $t1, 44($sp) # internal_116 = a
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_116
+		lw $t0, 52($sp)
+		sw $t0, 0($sp) # Storing internal_116
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 48($sp) # internal_117 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Get attribute g of self
+		lw $t0, 512($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'g' from the instance
+		sw $t1, 36($sp) # internal_118 = g
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_118
+		lw $t0, 44($sp)
+		sw $t0, 0($sp) # Storing internal_118
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 40($sp) # internal_119 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_117
+		lw $t0, 52($sp)
+		sw $t0, 4($sp) # Storing internal_117
+		
+		# Argument internal_119
+		lw $t0, 44($sp)
+		sw $t0, 0($sp) # Storing internal_119
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 40($sp) # internal_120 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Get attribute e of self
+		lw $t0, 512($sp) # Get the address of self
+		lw $t1, 28($t0) # Get the attribute 'e' from the instance
+		sw $t1, 24($sp) # internal_121 = e
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_121
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing internal_121
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 28($sp) # internal_122 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_120
+		lw $t0, 40($sp)
+		sw $t0, 4($sp) # Storing internal_120
+		
+		# Argument internal_122
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing internal_122
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 28($sp) # internal_123 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 520($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_doh_at_Foo
+		jal function_doh_at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_124 = result of function_doh_at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_123
+		lw $t0, 28($sp)
+		sw $t0, 4($sp) # Storing internal_123
+		
+		# Argument internal_124
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing internal_124
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 20($sp) # internal_125 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 520($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 12($sp) # internal_126 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_125
+		lw $t0, 20($sp)
+		sw $t0, 4($sp) # Storing internal_125
+		
+		# Argument internal_126
+		lw $t0, 16($sp)
+		sw $t0, 0($sp) # Storing internal_126
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 12($sp) # internal_127 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute f of self
+		lw $t0, 512($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_127
+		sw $t1, 32($t0) # self.f = internal_127
+		
+		# Loading return value in $v1
+		lw $v1, 512($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 512
+		
+		jr $ra
+		
+	function___init___at_Bazz:
+		# Function parameters
+		#   $ra = 164($sp)
+		#   self = 160($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -160
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 156($sp) # internal_0 = address of allocated object Int
+		
+		# Set attribute h of self
+		lw $t0, 160($sp) # $t0 = self
+		lw $t1, 156($sp) # $t1 = internal_0
+		sw $t1, 8($t0) # self.h = internal_0
+		
+		
+		
+		
+		
+		
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 132($sp) # internal_6 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 140($sp) # internal_4 = address of allocated object Int
+		
+		
+		
+		
+		# internal_2 = typeof self that is the first word of the object
+		lw $t0, 160($sp)
+		lw $t1, 0($t0)
+		sw $t1, 148($sp)
+		
+		lw $t0, 148($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 144($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 148($sp)
+		sw $t0, 144($sp)
+		end_assign:
+		
+		lw $t0, 132($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 152($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_1 = internal_6
+		lw $t0, 132($sp)
+		sw $t0, 152($sp)
+		end_assign:
+		
+		while_start_8779768528306:
+		
+		# Equal operation
+		lw $t0, 144($sp) # Save in $t0 the left operand address
+		# If internal_4 then goto while_end_8779768528306
+		lw $t0, 140($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 152($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 144($sp)
+		lw $t1, 4($t0)
+		sw $t1, 144($sp)
+		
+		# Jumping to while_start_8779768528306
+		j while_start_8779768528306
+		
+		while_end_8779768528306:
+		
+		
+		
+		
+		lw $t0, 148($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 144($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_3 = internal_2
+		lw $t0, 148($sp)
+		sw $t0, 144($sp)
+		end_assign:
+		
+		
+		foreach_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 124($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 152($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 120($sp) # $t0 = internal_9
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_9 then goto foreach_body_8779768528306
+		lw $t0, 120($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8779768528306
+		
+		# Jumping to foreach_end_8779768528306
+		j foreach_end_8779768528306
+		
+		foreach_body_8779768528306:
+		
+		
+		# internal_3 = ancestor of internal_3 that is the first word of the object
+		lw $t0, 144($sp)
+		lw $t1, 4($t0)
+		sw $t1, 144($sp)
+		
+		# Addition operation
+		lw $t0, 124($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_start_8779768528306
+		j foreach_start_8779768528306
+		
+		foreach_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		# internal_12 = direction of Bazz
+		la $t0, type_Bazz
+		sw $t0, 108($sp)
+		
+		
+		
+		# internal_13 = direction of Razz
+		la $t0, type_Razz
+		sw $t0, 104($sp)
+		
+		
+		
+		# internal_14 = direction of Foo
+		la $t0, type_Foo
+		sw $t0, 100($sp)
+		
+		
+		
+		# internal_15 = direction of Bar
+		la $t0, type_Bar
+		sw $t0, 96($sp)
+		
+		
+		
+		
+		
+		
+		foreach_type_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 92($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_17 then goto foreach_type_body_8779768528306
+		lw $t0, 88($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8779768528306
+		
+		# Jumping to foreach_type_end_8779768528306
+		j foreach_type_end_8779768528306
+		
+		foreach_type_body_8779768528306:
+		
+		
+		
+		
+		
+		foreach_ancestor_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 80($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 152($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 76($sp) # $t0 = internal_20
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_20 then goto foreach_ancestor_body_8779768528306
+		lw $t0, 76($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8779768528306
+		
+		# Jumping to foreach_ancestor_end_8779768528306
+		j foreach_ancestor_end_8779768528306
+		
+		foreach_ancestor_body_8779768528306:
+		
+		
+		# Equal operation
+		lw $t0, 84($sp) # Save in $t0 the left operand address
+		lw $t1, 72($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 68($sp) # $t0 = internal_22
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_22 then goto foreach_ancestor_end_8779768528306
+		lw $t0, 68($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8779768528306
+		
+		# Addition operation
+		lw $t0, 80($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_ancestor_start_8779768528306
+		j foreach_ancestor_start_8779768528306
+		
+		foreach_ancestor_end_8779768528306:
+		
+		
+		
+		
+		
+		# Addition operation
+		lw $t0, 92($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_type_start_8779768528306
+		j foreach_type_start_8779768528306
+		
+		foreach_type_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		lw $t0, 152($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 52($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_1
+		lw $t0, 152($sp)
+		sw $t0, 52($sp)
+		end_assign:
+		
+		foreach_min_start_8779768528306:
+		
+		# Less than operation
+		lw $t0, 64($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# If internal_27 then goto foreach_min_body_8779768528306
+		lw $t0, 48($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		foreach_min_body_8779768528306:
+		
+		
+		# Less than operation
+		lw $t0, 56($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 52($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 48($sp) # $t0 = internal_27
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_27 then goto update_min_8779768528306
+		lw $t0, 48($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8779768528306
+		
+		# Jumping to foreach_min_end_8779768528306
+		j foreach_min_end_8779768528306
+		
+		update_min_8779768528306:
+		
+		lw $t0, 56($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 52($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_26 = internal_25
+		lw $t0, 56($sp)
+		sw $t0, 52($sp)
+		end_assign:
+		
+		lw $t0, 64($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 60($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_24 = internal_23
+		lw $t0, 64($sp)
+		sw $t0, 60($sp)
+		end_assign:
+		
+		update_min_end_8779768528306:
+		
+		# Addition operation
+		lw $t0, 64($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		# Jumping to foreach_min_start_8779768528306
+		j foreach_min_start_8779768528306
+		
+		foreach_min_end_8779768528306:
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		# Equal operation
+		lw $t0, 60($sp) # Save in $t0 the left operand address
+		lw $t1, 152($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 40($sp) # $t0 = internal_29
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# If internal_29 then goto error_branch_8779768528306
+		lw $t0, 40($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8779768528306
+		
+		
+		
+		# If internal_30 then goto branch_Bazz_8779768528306
+		lw $t0, 36($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bazz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Razz_8779768528306
+		lw $t0, 36($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Razz_8779768528306
+		
+		
+		# If internal_30 then goto branch_Foo_8779768528306
+		lw $t0, 36($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Foo_8779768528306
+		
+		
+		# If internal_30 then goto branch_Bar_8779768528306
+		lw $t0, 36($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Bar_8779768528306
+		
+		branch_Bazz_8779768528306:
+		
+		# Allocating Foo
+		li $v0, 9
+		lw $a0, type_Foo
+		syscall
+		la $t0, type_Foo # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 24($sp) # internal_33 = address of allocated object Foo
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_33
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing internal_33
+		
+		# Calling function function___init___at_Foo
+		jal function___init___at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 32($sp) # internal_33 = result of function___init___at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 24($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 32($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_33
+		lw $t0, 24($sp)
+		sw $t0, 32($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Razz_8779768528306:
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 16($sp) # internal_35 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_35
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing internal_35
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 24($sp) # internal_35 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 16($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 32($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_35
+		lw $t0, 16($sp)
+		sw $t0, 32($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Foo_8779768528306:
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 8($sp) # internal_37 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_37
+		lw $t0, 16($sp)
+		sw $t0, 0($sp) # Storing internal_37
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 16($sp) # internal_37 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		lw $t0, 8($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 32($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = internal_37
+		lw $t0, 8($sp)
+		sw $t0, 32($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		branch_Bar_8779768528306:
+		
+		lw $t0, 28($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 32($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# internal_31 = n
+		lw $t0, 28($sp)
+		sw $t0, 32($sp)
+		end_assign:
+		
+		# Jumping to branch_end_8779768528306
+		j branch_end_8779768528306
+		
+		error_branch_8779768528306:
+		
+		
+		branch_end_8779768528306:
+		
+		# Set attribute g of self
+		lw $t0, 160($sp) # $t0 = self
+		lw $t1, 32($sp) # $t1 = internal_31
+		sw $t1, 12($t0) # self.g = internal_31
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 168($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_printh_at_Bazz
+		jal function_printh_at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 8($sp) # internal_39 = result of function_printh_at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute i of self
+		lw $t0, 160($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_39
+		sw $t1, 16($t0) # self.i = internal_39
+		
+		# Loading return value in $v1
+		lw $v1, 160($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 160
+		
+		jr $ra
+		
+	function_printh_at_Bazz:
+		# Function parameters
+		#   $ra = 16($sp)
+		#   self = 12($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -12
+		
+		# Get attribute h of self
+		lw $t0, 12($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'h' from the instance
+		sw $t1, 8($sp) # internal_0 = h
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 24($sp)
+		sw $t0, 4($sp) # Storing self
+		
+		# Argument internal_0
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function function_out_int_at_IO
+		jal function_out_int_at_IO
+		lw $ra, 8($sp)
+		sw $v1, 16($sp) # internal_1 = result of function_out_int_at_IO
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_2 = address of allocated object Int
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function_doh_at_Bazz:
+		# Function parameters
+		#   $ra = 24($sp)
+		#   self = 20($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -20
+		
+		# Get attribute h of self
+		lw $t0, 20($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'h' from the instance
+		sw $t1, 12($sp) # internal_1 = h
+		
+		lw $t0, 12($sp)
+		lw $t1, 0($t0)
+		la $t2, type_Main
+		la $t3, type_Bool
+		beq $t1, $t2, is_Bool_or_Int
+		beq $t1, $t3, is_Bool_or_Int
+		j not_is_Bool_or_Int
+		is_Bool_or_Int:
+		lw $t4, 8($t0)
+		lw $t5, 16($sp)
+		j end_assign
+		not_is_Bool_or_Int:
+		# i = internal_1
+		lw $t0, 12($sp)
+		sw $t0, 16($sp)
+		end_assign:
+		
+		# Get attribute h of self
+		lw $t0, 20($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'h' from the instance
+		sw $t1, 8($sp) # internal_2 = h
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_3 = address of allocated object Int
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_2
+		lw $t0, 20($sp)
+		sw $t0, 4($sp) # Storing internal_2
+		
+		# Argument internal_3
+		lw $t0, 16($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 12($sp) # internal_4 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute h of self
+		lw $t0, 20($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_4
+		sw $t1, 8($t0) # self.h = internal_4
+		
+		# Loading return value in $v1
+		lw $v1, 16($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 20
+		
+		jr $ra
+		
+	function___init___at_Main:
+		# Function parameters
+		#   $ra = 20($sp)
+		#   self = 16($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -16
+		
+		# Allocating Bazz
+		li $v0, 9
+		lw $a0, type_Bazz
+		syscall
+		la $t0, type_Bazz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 12($sp) # internal_0 = address of allocated object Bazz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_0
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function function___init___at_Bazz
+		jal function___init___at_Bazz
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_0 = result of function___init___at_Bazz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute a of self
+		lw $t0, 16($sp) # $t0 = self
+		lw $t1, 12($sp) # $t1 = internal_0
+		sw $t1, 8($t0) # self.a = internal_0
+		
+		# Allocating Foo
+		li $v0, 9
+		lw $a0, type_Foo
+		syscall
+		la $t0, type_Foo # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 8($sp) # internal_1 = address of allocated object Foo
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_1
+		lw $t0, 16($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function function___init___at_Foo
+		jal function___init___at_Foo
+		lw $ra, 4($sp)
+		sw $v1, 16($sp) # internal_1 = result of function___init___at_Foo
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute b of self
+		lw $t0, 16($sp) # $t0 = self
+		lw $t1, 8($sp) # $t1 = internal_1
+		sw $t1, 12($t0) # self.b = internal_1
+		
+		# Allocating Razz
+		li $v0, 9
+		lw $a0, type_Razz
+		syscall
+		la $t0, type_Razz # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 4($sp) # internal_2 = address of allocated object Razz
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_2
+		lw $t0, 12($sp)
+		sw $t0, 0($sp) # Storing internal_2
+		
+		# Calling function function___init___at_Razz
+		jal function___init___at_Razz
+		lw $ra, 4($sp)
+		sw $v1, 12($sp) # internal_2 = result of function___init___at_Razz
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute c of self
+		lw $t0, 16($sp) # $t0 = self
+		lw $t1, 4($sp) # $t1 = internal_2
+		sw $t1, 16($t0) # self.c = internal_2
+		
+		# Allocating Bar
+		li $v0, 9
+		lw $a0, type_Bar
+		syscall
+		la $t0, type_Bar # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 0($sp) # internal_3 = address of allocated object Bar
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_3
+		lw $t0, 8($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function function___init___at_Bar
+		jal function___init___at_Bar
+		lw $ra, 4($sp)
+		sw $v1, 8($sp) # internal_3 = result of function___init___at_Bar
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Set attribute d of self
+		lw $t0, 16($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_3
+		sw $t1, 20($t0) # self.d = internal_3
+		
+		# Loading return value in $v1
+		lw $v1, 16($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_main_at_Main:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 19 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 100
+		sb $t0, 8($v0) # internal_0[0] = 'd'
+		
+		addi $t0, $zero, 111
+		sb $t0, 9($v0) # internal_0[1] = 'o'
+		
+		addi $t0, $zero, 32
+		sb $t0, 10($v0) # internal_0[2] = ' '
+		
+		addi $t0, $zero, 110
+		sb $t0, 11($v0) # internal_0[3] = 'n'
+		
+		addi $t0, $zero, 111
+		sb $t0, 12($v0) # internal_0[4] = 'o'
+		
+		addi $t0, $zero, 116
+		sb $t0, 13($v0) # internal_0[5] = 't'
+		
+		addi $t0, $zero, 104
+		sb $t0, 14($v0) # internal_0[6] = 'h'
+		
+		addi $t0, $zero, 105
+		sb $t0, 15($v0) # internal_0[7] = 'i'
+		
+		addi $t0, $zero, 110
+		sb $t0, 16($v0) # internal_0[8] = 'n'
+		
+		addi $t0, $zero, 103
+		sb $t0, 17($v0) # internal_0[9] = 'g'
+		
+		sb $zero, 18($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 0($sp) # internal_0 = "do nothing"
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	main:
+		# Reserving space for local variables
+		addi $sp, $sp, -8
+		
+		# Allocating Main
+		li $v0, 9
+		lw $a0, type_Main
+		syscall
+		la $t0, type_Main # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 4($sp) # internal_0 = address of allocated object Main
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_0
+		lw $t0, 12($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function function___init___at_Main
+		jal function___init___at_Main
+		lw $ra, 4($sp)
+		sw $v1, 12($sp) # internal_0 = result of function___init___at_Main
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_0
+		lw $t0, 12($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function function_main_at_Main
+		jal function_main_at_Main
+		lw $ra, 4($sp)
+		sw $v1, 8($sp) # internal_1 = result of function_main_at_Main
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Exit program
+		li $v0, 10
+		syscall
+		
+		

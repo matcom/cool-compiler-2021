@@ -56,8 +56,9 @@ class ParamNode(Node):
 
 
 class LocalNode(Node):
-    def __init__(self, name: str):
+    def __init__(self, name: str, type: str = "Object"):
         self.name: str = name
+        self.type: str = type
 
 
 class InstructionNode(Node):
@@ -102,6 +103,7 @@ class LessThanNode(ArithmeticNode):
 
 
 class EqualNode(ArithmeticNode):
+    equality_type: str = "Object"
     pass
 
 
@@ -144,6 +146,18 @@ class AllocateNode(InstructionNode):
         self.dest: str = dest
 
 
+class AllocateIntNode(InstructionNode):
+    def __init__(self, dest: str, value: str):
+        self.dest: str = dest
+        self.value: str = value
+
+
+class AllocateBoolNode(InstructionNode):
+    def __init__(self, dest: str, value: str):
+        self.dest: str = dest
+        self.value: str = value
+
+
 class ArrayNode(InstructionNode):
     def __init__(self, dest: str, size: int) -> None:
         self.dest: str = dest
@@ -166,11 +180,31 @@ class AncestorNode(InstructionNode):
         self.dest: str = dest
 
 
-class TypeDirectionNode(InstructionNode):
+class TypeAddressNode(InstructionNode):
     def __init__(self, dest: str, name: str):
         self.name: str = name
         self.dest: str = dest
 
+
+class EqualAddressNode(InstructionNode):
+    def __init__(self, dest: str, left: str, right: str):
+        self.left: str = left
+        self.right: str = right
+        self.dest: str = dest
+
+
+class EqualIntNode(InstructionNode):
+    def __init__(self, dest: str, left: str, right: str):
+        self.left: str = left
+        self.right: str = right
+        self.dest: str = dest
+
+
+class EqualStrNode(InstructionNode):
+    def __init__(self, dest: str, left: str, right: str):
+        self.left: str = left
+        self.right: str = right
+        self.dest: str = dest
 
 class LabelNode(InstructionNode):
     def __init__(self, label: str):
@@ -189,9 +223,10 @@ class GotoIfNode(InstructionNode):
 
 
 class StaticCallNode(InstructionNode):
-    def __init__(self, function, dest):
-        self.function = function
-        self.dest = dest
+    def __init__(self, function: str, dest: str, total_args: int):
+        self.function: str = function
+        self.dest: str = dest
+        self.total_args: str = total_args 
 
 
 class DynamicCallNode(InstructionNode):

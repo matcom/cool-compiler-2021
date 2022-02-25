@@ -274,6 +274,8 @@ class InferenceChecker:
         if scope is None:
             scope = Scope()
 
+        node.scope = scope
+
         for item in node.declarations:
             self.visit(item, scope.create_child())
 
@@ -284,6 +286,7 @@ class InferenceChecker:
 
     @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
+        node.scope = scope
         self.current_type = self.context.get_type(node.id)
 
         attrs = [
@@ -309,6 +312,7 @@ class InferenceChecker:
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node: cool.AttrDeclarationNode, scope: Scope):
+        node.scope = scope
         if node.id == "self":
             if node.expr is not None:
                 scope.create_child()
@@ -349,6 +353,7 @@ class InferenceChecker:
 
     @visitor.when(cool.MethodDeclarationNode)
     def visit(self, node: cool.MethodDeclarationNode, scope: Scope):
+        node.scope = scope
         self.current_method = self.current_type.get_method(node.id)
 
         # Define 'self' as a variable in the scope
@@ -391,6 +396,7 @@ class InferenceChecker:
 
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):
+        node.scope = scope
         for _id, _type, _expr in node.declarations:
             try:
                 # Define and get the var_info
@@ -420,9 +426,10 @@ class InferenceChecker:
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope: Scope):
+        node.scope = scope
         var_info = scope.find_variable(node.id)
 
-        expr_node = self.visit(node.expr, scope.create_child())
+        expr_node = self.visit(node.expr, scope)
 
         if var_info is not None:
             if expr_node.type.name != "AUTO_TYPE" and var_info.type.name == "AUTO_TYPE":
@@ -446,6 +453,7 @@ class InferenceChecker:
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
+        node.scope = scope
         result_node = None
         for expr in node.expressions:
             result_node = self.visit(expr, scope)
@@ -453,13 +461,14 @@ class InferenceChecker:
 
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope: Scope):
+        node.scope = scope
         if_node = self.visit(node.if_expr, scope)
 
         if if_node is not None and not isinstance(if_node, AtomNode):
             self.graph.add_edge(AtomNode(self.context.get_type("Bool")), if_node)
 
-        then_node = self.visit(node.then_expr, scope.create_child())
-        else_node = self.visit(node.else_expr, scope.create_child())
+        then_node = self.visit(node.then_expr, scope)
+        else_node = self.visit(node.else_expr, scope)
 
         if isinstance(then_node, AtomNode) and isinstance(else_node, AtomNode):
             return AtomNode(then_node.type.join(else_node.type))
@@ -485,12 +494,14 @@ class InferenceChecker:
 
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope: Scope):
+        node.scope = scope
         self.visit(node.condition, scope)
         self.visit(node.body, scope)
         return AtomNode(self.context.get_type("Object"))
 
     @visitor.when(cool.SwitchCaseNode)
     def visit(self, node: cool.SwitchCaseNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
 
         defined_nodes = []
@@ -525,6 +536,7 @@ class InferenceChecker:
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):
+        node.scope = scope
         if node.obj is None:
             node.obj = cool.VariableNode("self")
         obj_node = self.visit(node.obj, scope)
@@ -568,18 +580,22 @@ class InferenceChecker:
 
     @visitor.when(cool.IntegerNode)
     def visit(self, node: cool.IntegerNode, scope: Scope):
+        node.scope = scope
         return AtomNode(self.context.get_type("Int"))
 
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope: Scope):
+        node.scope = scope
         return AtomNode(self.context.get_type("String"))
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
+        node.scope = scope
         return AtomNode(self.context.get_type("Bool"))
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
+        node.scope = scope
         variable = scope.find_variable(node.lex)
 
         if variable is not None:
@@ -592,63 +608,74 @@ class InferenceChecker:
 
     @visitor.when(cool.InstantiateNode)
     def visit(self, node: cool.InstantiateNode, scope: Scope):
+        node.scope = scope
         if node.lex in self.context.types:
             return AtomNode(self.context.get_type(node.lex))
         return AtomNode(self.context.get_type("Object"))
 
     @visitor.when(cool.NegationNode)
     def visit(self, node: cool.NegationNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         return AtomNode(self.context.get_type("Bool"))
 
     @visitor.when(cool.ComplementNode)
     def visit(self, node: cool.ComplementNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         return AtomNode(self.context.get_type("Int"))
 
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         return AtomNode(self.context.get_type("Bool"))
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope: Scope):
+        node.scope = scope
         return self._visit_arithmetic_node(
             node, scope, self.context.get_type("Int"), self.context.get_type("Int")
         )
 
     @visitor.when(cool.MinusNode)
     def visit(self, node: cool.MinusNode, scope: Scope):
+        node.scope = scope
         return self._visit_arithmetic_node(
             node, scope, self.context.get_type("Int"), self.context.get_type("Int")
         )
 
     @visitor.when(cool.StarNode)
     def visit(self, node: cool.StarNode, scope: Scope):
+        node.scope = scope
         return self._visit_arithmetic_node(
             node, scope, self.context.get_type("Int"), self.context.get_type("Int")
         )
 
     @visitor.when(cool.DivNode)
     def visit(self, node: cool.DivNode, scope: Scope):
+        node.scope = scope
         return self._visit_arithmetic_node(
             node, scope, self.context.get_type("Int"), self.context.get_type("Int")
         )
 
     @visitor.when(cool.LessEqualNode)
     def visit(self, node: cool.LessEqualNode, scope: Scope):
+        node.scope = scope
         return self._visit_arithmetic_node(
             node, scope, self.context.get_type("Int"), self.context.get_type("Bool")
         )
 
     @visitor.when(cool.LessThanNode)
     def visit(self, node: cool.LessThanNode, scope: Scope):
+        node.scope = scope
         return self._visit_arithmetic_node(
             node, scope, self.context.get_type("Int"), self.context.get_type("Bool")
         )
 
     @visitor.when(cool.EqualNode)
     def visit(self, node: cool.EqualNode, scope: Scope):
+        node.scope = scope
         self.visit(node.left, scope)
         self.visit(node.right, scope)
         return AtomNode(self.context.get_type("Bool"))
@@ -681,12 +708,14 @@ class InferenceTypeSubstitute:
 
     @visitor.when(cool.ProgramNode)
     def visit(self, node: cool.ProgramNode, scope: Scope):
+        scope = node.scope
         for i, elem in enumerate(node.declarations):
             self.visit(elem, scope.children[i])
         return scope
 
     @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
+        scope = node.scope
         self.current_type = self.context.get_type(node.id)
 
         attrs = [
@@ -709,11 +738,12 @@ class InferenceTypeSubstitute:
             self.visit(attr, scope)
 
         # print(scope.children, len(methods), i)
-        for i, method in enumerate(methods, i):
+        for i, method in enumerate(methods, start=i):
             self.visit(method, scope.children[i])
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node: cool.AttrDeclarationNode, scope: Scope):
+        scope = node.scope
         try:
             attr_type = self.context.get_type(node.type)
             var_info = scope.find_variable(node.id)
@@ -730,6 +760,7 @@ class InferenceTypeSubstitute:
 
     @visitor.when(cool.MethodDeclarationNode)
     def visit(self, node: cool.MethodDeclarationNode, scope: Scope):
+        scope = node.scope
         self.current_method = self.current_type.get_method(node.id)
 
         try:
@@ -761,6 +792,7 @@ class InferenceTypeSubstitute:
 
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):
+        scope = node.scope
         child_index = 0
         for i, (_id, _type, _expr) in enumerate(node.declarations):
             variable_info = scope.find_variable(_id)
@@ -778,32 +810,38 @@ class InferenceTypeSubstitute:
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope: Scope):
-        self.visit(node.expr, scope.children[0])
+        scope = node.scope
+        self.visit(node.expr, scope)
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
+        scope = node.scope
         for _, expr in enumerate(node.expressions):
             self.visit(expr, scope)
 
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope: Scope):
+        scope = node.scope
         self.visit(node.if_expr, scope)
         self.visit(node.then_expr, scope)
         self.visit(node.else_expr, scope)
 
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope: Scope):
+        scope = node.scope
         self.visit(node.condition, scope)
         self.visit(node.body, scope)
 
     @visitor.when(cool.SwitchCaseNode)
     def visit(self, node: cool.SwitchCaseNode, scope: Scope):
+        scope = node.scope
         self.visit(node.expr, scope)
         for i, (_, _, _expr) in enumerate(node.cases):
             self.visit(_expr, scope.children[i])
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):
+        scope = node.scope
         self.visit(node.obj, scope)
 
         for arg in node.args:
@@ -811,13 +849,15 @@ class InferenceTypeSubstitute:
 
     @visitor.when(cool.AtomicNode)
     def visit(self, node: cool.AtomicNode, scope: Scope):
-        pass
+        scope = node.scope
 
     @visitor.when(cool.UnaryNode)
     def visit(self, node: cool.UnaryNode, scope: Scope):
+        scope = node.scope
         self.visit(node.expr, scope)
 
     @visitor.when(cool.BinaryNode)
     def visit(self, node: cool.BinaryNode, scope: Scope):
+        scope = node.scope
         self.visit(node.left, scope)
         self.visit(node.right, scope)

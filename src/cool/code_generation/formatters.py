@@ -152,12 +152,12 @@ class CilFormatter:
             else f"{node.dest} = TYPEOF {node.source} # {node.comment}"
         )
 
-    @visitor.when(cil.TypeDirectionNode)
-    def visit(self, node: cil.TypeDirectionNode):
+    @visitor.when(cil.TypeAddressNode)
+    def visit(self, node: cil.TypeAddressNode):
         return (
-            f"{node.dest} = TYPEDIR {node.name}"
+            f"{node.dest} = TYPEADDR {node.name}"
             if node.comment == ""
-            else f"{node.dest} = TYPEDIR {node.name} # {node.comment}"
+            else f"{node.dest} = TYPEADDR {node.name} # {node.comment}"
         )
 
     @visitor.when(cil.AncestorNode)
@@ -166,6 +166,30 @@ class CilFormatter:
             f"{node.dest} = ANCESTOR {node.source}"
             if node.comment == ""
             else f"{node.dest} = ANCESTOR {node.source} # {node.comment}"
+        )
+
+    @visitor.when(cil.EqualAddressNode)
+    def visit(self, node: cil.EqualAddressNode):
+        return (
+            f"{node.dest} = EQUALADDR {node.left} {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = EQUALADDR {node.left} {node.right} # {node.comment}"
+        )
+
+    @visitor.when(cil.EqualIntNode)
+    def visit(self, node: cil.EqualIntNode):
+        return (
+            f"{node.dest} = EQUALINT {node.left} {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = EQUALINT {node.left} {node.right} # {node.comment}"
+        )
+    
+    @visitor.when(cil.EqualStrNode)
+    def visit(self, node: cil.EqualStrNode):
+        return (
+            f"{node.dest} = EQUALSTR {node.left} {node.right}"
+            if node.comment == ""
+            else f"{node.dest} = EQUALSTR {node.left} {node.right} # {node.comment}"
         )
 
     @visitor.when(cil.StaticCallNode)
@@ -343,6 +367,14 @@ class CilFormatter:
     @visitor.when(cil.AllocateStrNode)
     def visit(self, node: cil.AllocateStrNode):
         return (f"{node.dest} = ALLOCSTR {node.value}") if node.comment == "" else f"{node.dest} = ALLOCSTR {node.value} # {node.comment}"
+    
+    @visitor.when(cil.AllocateIntNode)
+    def visit(self, node: cil.AllocateIntNode):
+        return (f"{node.dest} = ALLOCINT {node.value}") if node.comment == "" else f"{node.dest} = ALLOCINT {node.value} # {node.comment}"
+    
+    @visitor.when(cil.AllocateBoolNode)
+    def visit(self, node: cil.AllocateBoolNode):
+        return (f"{node.dest} = ALLOCBOOL {node.value}") if node.comment == "" else f"{node.dest} = ALLOCBOOL {node.value} # {node.comment}"
 
     @visitor.when(cil.CommentNode)
     def visit(self, node: cil.CommentNode):

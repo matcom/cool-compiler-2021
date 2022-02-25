@@ -1,0 +1,3288 @@
+.TYPES
+type Object {
+	inherits from null
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Object
+}
+type IO {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init__: function___init___at_IO
+}
+type Int {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Int
+}
+type String {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method length: function_length_at_String
+	method concat: function_concat_at_String
+	method substr: function_substr_at_String
+	method __init__: function___init___at_String
+}
+type Bool {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Bool
+}
+type A {
+	inherits from Object
+
+	attribute var
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method value: function_value_at_A
+	method set_var: function_set_var_at_A
+	method method1: function_method1_at_A
+	method method2: function_method2_at_A
+	method method3: function_method3_at_A
+	method method4: function_method4_at_A
+	method method5: function_method5_at_A
+	method __init__: function___init___at_A
+}
+type B {
+	inherits from A
+
+	attribute var
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method value: function_value_at_A
+	method set_var: function_set_var_at_A
+	method method1: function_method1_at_A
+	method method2: function_method2_at_A
+	method method3: function_method3_at_A
+	method method4: function_method4_at_A
+	method method5: function_method5_at_B
+	method __init__: function___init___at_B
+}
+type C {
+	inherits from B
+
+	attribute var
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method value: function_value_at_A
+	method set_var: function_set_var_at_A
+	method method1: function_method1_at_A
+	method method2: function_method2_at_A
+	method method3: function_method3_at_A
+	method method4: function_method4_at_A
+	method method5: function_method5_at_C
+	method __init__: function___init___at_C
+	method method6: function_method6_at_C
+}
+type D {
+	inherits from B
+
+	attribute var
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method value: function_value_at_A
+	method set_var: function_set_var_at_A
+	method method1: function_method1_at_A
+	method method2: function_method2_at_A
+	method method3: function_method3_at_A
+	method method4: function_method4_at_A
+	method method5: function_method5_at_B
+	method __init__: function___init___at_D
+	method method7: function_method7_at_D
+}
+type E {
+	inherits from D
+
+	attribute var
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method value: function_value_at_A
+	method set_var: function_set_var_at_A
+	method method1: function_method1_at_A
+	method method2: function_method2_at_A
+	method method3: function_method3_at_A
+	method method4: function_method4_at_A
+	method method5: function_method5_at_B
+	method __init__: function___init___at_E
+	method method7: function_method7_at_D
+	method method6: function_method6_at_E
+}
+type A2I {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method c2i: function_c2i_at_A2I
+	method i2c: function_i2c_at_A2I
+	method a2i: function_a2i_at_A2I
+	method a2i_aux: function_a2i_aux_at_A2I
+	method i2a: function_i2a_at_A2I
+	method i2a_aux: function_i2a_aux_at_A2I
+	method __init__: function___init___at_A2I
+}
+type Main {
+	inherits from IO
+
+	attribute char
+	attribute avar
+	attribute a_var
+	attribute flag
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method menu: function_menu_at_Main
+	method prompt: function_prompt_at_Main
+	method get_int: function_get_int_at_Main
+	method is_even: function_is_even_at_Main
+	method class_type: function_class_type_at_Main
+	method print: function_print_at_Main
+	method main: function_main_at_Main
+	method __init__: function___init___at_Main
+}
+
+.DATA
+
+
+.CODE
+function function_add{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Adding result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a + b
+	
+	RETURN internal_0
+}
+function function_sub{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Substracting result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a - b
+	
+	RETURN internal_0
+}
+function function_mult{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Multiting result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a * b
+	
+	RETURN internal_0
+}
+function function_div{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Dividing result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a / b
+	
+	RETURN internal_0
+}
+function function_xor{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Xor result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = XOR a b
+	
+	RETURN internal_0
+}
+function function_less_than{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Less than result
+
+	internal_0 = ALLOCBOOL 0
+	internal_0 = a < b
+	
+	RETURN internal_0
+}
+function function_less_than_or_equal{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Less than or equal result
+
+	internal_0 = ALLOCBOOL 0
+	internal_0 = a <= b
+	
+	RETURN internal_0
+}
+function function_equal{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Equal result
+	LOCAL internal_1 # Type of a
+	LOCAL internal_2 # Type Int
+	LOCAL internal_3 # Type Bool
+	LOCAL internal_4 # Type String
+	LOCAL internal_5 # Type of a equals int
+	LOCAL internal_6 # Type of a equals bool
+	LOCAL internal_7 # Type of a equals string
+
+	internal_0 = ALLOCBOOL 0
+	internal_1 = TYPEOF a
+	internal_2 = TYPEADDR Int
+	internal_3 = TYPEADDR Bool
+	internal_4 = TYPEADDR String
+	internal_5 = ALLOCBOOL 0
+	internal_6 = ALLOCBOOL 0
+	internal_7 = ALLOCBOOL 0
+	internal_5 = EQUALADDR internal_1 internal_2
+	internal_6 = EQUALADDR internal_1 internal_3
+	internal_7 = EQUALADDR internal_1 internal_4
+	
+	IF internal_5 GOTO a_is_type_int_or_bool
+	IF internal_6 GOTO a_is_type_int_or_bool
+	IF internal_7 GOTO a_is_type_string
+	GOTO a_is_type_object
+	
+	a_is_type_int_or_bool:
+	internal_0 = EQUALINT a b
+	GOTO end_of_equal
+	
+	a_is_type_string:
+	internal_0 = EQUALSTR a b
+	GOTO end_of_equal
+	
+	a_is_type_object:
+	internal_0 = a == b
+	GOTO end_of_equal
+	
+	end_of_equal:
+	
+	RETURN internal_0
+}
+function function___init___at_Object{
+	PARAM self
+	
+	RETURN self
+}
+function function_abort_at_Object{
+	PARAM self
+
+	HALT
+	
+	RETURN self
+}
+function function_type_name_at_Object{
+	PARAM self
+
+	LOCAL internal_0 # type_name
+
+	internal_0 = TYPENAME self
+	
+	RETURN internal_0
+}
+function function_copy_at_Object{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = COPY self
+	
+	RETURN internal_0
+}
+function function___init___at_IO{
+	PARAM self
+	
+	RETURN self
+}
+function function_out_string_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTSTR x
+	
+	RETURN self
+}
+function function_out_int_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTINT x
+	
+	RETURN self
+}
+function function_in_string_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	READSTR internal_0
+	
+	RETURN internal_0
+}
+function function_in_int_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	READINT internal_0
+	
+	RETURN internal_0
+}
+function function___init___at_String{
+	PARAM self
+	
+	RETURN self
+}
+function function_length_at_String{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = LENGTH self
+	
+	RETURN internal_0
+}
+function function_concat_at_String{
+	PARAM self
+	PARAM s
+
+	LOCAL internal_0
+
+	internal_0 = CONCAT self s
+	
+	RETURN internal_0
+}
+function function_substr_at_String{
+	PARAM self
+	PARAM i
+	PARAM l
+
+	LOCAL internal_0
+
+	internal_0 = SUBSTRING self i l
+	
+	RETURN internal_0
+}
+function function___init___at_A{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+
+	internal_0 = ALLOCINT 0
+	SETATTR self var internal_0
+	
+	RETURN self
+}
+function function_value_at_A{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = GETATTR self var
+	
+	RETURN internal_0
+}
+function function_set_var_at_A{
+	PARAM self
+	PARAM num
+
+	SETATTR self var num
+	
+	RETURN self
+}
+function function_method1_at_A{
+	PARAM self
+	PARAM num
+	
+	RETURN self
+}
+function function_method2_at_A{
+	PARAM self
+	PARAM num1
+	PARAM num2
+
+	LOCAL x
+	LOCAL internal_1 # Store the result of the operation function_add
+	LOCAL internal_2 # Store an instance of the class B
+	LOCAL internal_3
+
+	x = 0
+	
+	ARG num1
+	ARG num2
+	internal_1 = CALL function_add
+	x = internal_1
+	internal_2 = ALLOCATE B # Allocate the object B
+	ARG internal_2 # Pass the instance to the constructor
+	internal_2 = VCALL B function___init___at_B # Call the constructor
+	ARG internal_2
+	ARG x
+	internal_3 = VCALL B function_set_var_at_A
+	
+	RETURN internal_3
+}
+function function_method3_at_A{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1 # Integer 1
+	LOCAL internal_2 # Integer 4294967295
+	LOCAL internal_3 # Store the complement a2 of num
+	LOCAL internal_4 # Store an instance of the class C
+	LOCAL internal_5
+
+	x = 0
+	internal_3 = XOR num internal_2 # Getting the complement a1 of num
+	internal_3 = internal_3 + internal_1 # Adding 1 to the complement a1 we get the complement a2 of num
+	x = internal_3
+	internal_4 = ALLOCATE C # Allocate the object C
+	ARG internal_4 # Pass the instance to the constructor
+	internal_4 = VCALL C function___init___at_C # Call the constructor
+	ARG internal_4
+	ARG x
+	internal_5 = VCALL C function_set_var_at_A
+	
+	RETURN internal_5
+}
+function function_method4_at_A{
+	PARAM self
+	PARAM num1
+	PARAM num2
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # Store the result of the operation function_less_than
+	LOCAL x
+	LOCAL internal_4 # Store the result of the operation function_sub
+	LOCAL internal_5 # Store an instance of the class D
+	LOCAL internal_6
+	LOCAL x
+	LOCAL internal_8 # Store the result of the operation function_sub
+	LOCAL internal_9 # Store an instance of the class D
+	LOCAL internal_10
+
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	
+	ARG num2
+	ARG num1
+	internal_2 = CALL function_less_than
+	internal_1 = internal_2
+	IF internal_1 GOTO then_8792981814074
+	GOTO else_8792981814074
+	
+	then_8792981814074:
+	x = 0
+	
+	ARG num1
+	ARG num2
+	internal_4 = CALL function_sub
+	x = internal_4
+	internal_5 = ALLOCATE D # Allocate the object D
+	ARG internal_5 # Pass the instance to the constructor
+	internal_5 = VCALL D function___init___at_D # Call the constructor
+	ARG internal_5
+	ARG x
+	internal_6 = VCALL D function_set_var_at_A
+	internal_0 = internal_6
+	GOTO endif_8792981814074
+	
+	else_8792981814074:
+	x = 0
+	
+	ARG num2
+	ARG num1
+	internal_8 = CALL function_sub
+	x = internal_8
+	internal_9 = ALLOCATE D # Allocate the object D
+	ARG internal_9 # Pass the instance to the constructor
+	internal_9 = VCALL D function___init___at_D # Call the constructor
+	ARG internal_9
+	ARG x
+	internal_10 = VCALL D function_set_var_at_A
+	internal_0 = internal_10
+	GOTO endif_8792981814074
+	
+	endif_8792981814074:
+	
+	RETURN internal_0
+}
+function function_method5_at_A{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1 # Integer 1
+	LOCAL y
+	LOCAL internal_3 # Integer 1
+	LOCAL internal_4
+	LOCAL internal_5 # Store the result of the operation function_less_than_or_equal
+	LOCAL internal_6 # Store the result of the operation function_mult
+	LOCAL internal_7 # Integer 1
+	LOCAL internal_8 # Store the result of the operation function_add
+	LOCAL internal_9 # Store an instance of the class E
+	LOCAL internal_10
+
+	internal_1 = ALLOCINT 1
+	x = internal_1
+	internal_3 = ALLOCINT 1
+	y = internal_3
+	while_start_8792981814158:
+	
+	ARG y
+	ARG num
+	internal_5 = CALL function_less_than_or_equal
+	internal_4 = internal_5
+	IF internal_4 GOTO while_body_8792981814158
+	GOTO while_end_8792981814158
+	
+	while_body_8792981814158:
+	
+	ARG x
+	ARG y
+	internal_6 = CALL function_mult
+	x = internal_6
+	internal_7 = ALLOCINT 1
+	
+	ARG y
+	ARG internal_7
+	internal_8 = CALL function_add
+	y = internal_8
+	GOTO while_start_8792981814158
+	
+	while_end_8792981814158:
+	internal_9 = ALLOCATE E # Allocate the object E
+	ARG internal_9 # Pass the instance to the constructor
+	internal_9 = VCALL E function___init___at_E # Call the constructor
+	ARG internal_9
+	ARG x
+	internal_10 = VCALL E function_set_var_at_A
+	
+	RETURN internal_10
+}
+function function___init___at_B{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+
+	internal_0 = ALLOCINT 0
+	SETATTR self var internal_0
+	
+	RETURN self
+}
+function function_method5_at_B{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1 # Store the result of the operation function_mult
+	LOCAL internal_2 # Store an instance of the class E
+	LOCAL internal_3
+
+	x = 0
+	
+	ARG num
+	ARG num
+	internal_1 = CALL function_mult
+	x = internal_1
+	internal_2 = ALLOCATE E # Allocate the object E
+	ARG internal_2 # Pass the instance to the constructor
+	internal_2 = VCALL E function___init___at_E # Call the constructor
+	ARG internal_2
+	ARG x
+	internal_3 = VCALL E function_set_var_at_A
+	
+	RETURN internal_3
+}
+function function___init___at_C{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+
+	internal_0 = ALLOCINT 0
+	SETATTR self var internal_0
+	
+	RETURN self
+}
+function function_method6_at_C{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1 # Integer 1
+	LOCAL internal_2 # Integer 4294967295
+	LOCAL internal_3 # Store the complement a2 of num
+	LOCAL internal_4 # Store an instance of the class A
+	LOCAL internal_5
+
+	x = 0
+	internal_3 = XOR num internal_2 # Getting the complement a1 of num
+	internal_3 = internal_3 + internal_1 # Adding 1 to the complement a1 we get the complement a2 of num
+	x = internal_3
+	internal_4 = ALLOCATE A # Allocate the object A
+	ARG internal_4 # Pass the instance to the constructor
+	internal_4 = VCALL A function___init___at_A # Call the constructor
+	ARG internal_4
+	ARG x
+	internal_5 = VCALL A function_set_var_at_A
+	
+	RETURN internal_5
+}
+function function_method5_at_C{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1 # Store the result of the operation function_mult
+	LOCAL internal_2 # Store the result of the operation function_mult
+	LOCAL internal_3 # Store an instance of the class E
+	LOCAL internal_4
+
+	x = 0
+	
+	ARG num
+	ARG num
+	internal_1 = CALL function_mult
+	
+	ARG internal_1
+	ARG num
+	internal_2 = CALL function_mult
+	x = internal_2
+	internal_3 = ALLOCATE E # Allocate the object E
+	ARG internal_3 # Pass the instance to the constructor
+	internal_3 = VCALL E function___init___at_E # Call the constructor
+	ARG internal_3
+	ARG x
+	internal_4 = VCALL E function_set_var_at_A
+	
+	RETURN internal_4
+}
+function function___init___at_D{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+
+	internal_0 = ALLOCINT 0
+	SETATTR self var internal_0
+	
+	RETURN self
+}
+function function_method7_at_D{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3 # Integer 0
+	LOCAL internal_4 # Store the result of the operation function_less_than
+	LOCAL internal_5 # Integer 1
+	LOCAL internal_6 # Integer 4294967295
+	LOCAL internal_7 # Store the complement a2 of x
+	LOCAL internal_8
+	LOCAL internal_9
+	LOCAL internal_10
+	LOCAL internal_11 # Integer 0
+	LOCAL internal_12 # Store the result of the operation function_equal
+	LOCAL internal_13 # Boolean true
+	LOCAL internal_14
+	LOCAL internal_15
+	LOCAL internal_16 # Integer 1
+	LOCAL internal_17 # Store the result of the operation function_equal
+	LOCAL internal_18 # Boolean false
+	LOCAL internal_19
+	LOCAL internal_20
+	LOCAL internal_21 # Integer 2
+	LOCAL internal_22 # Store the result of the operation function_equal
+	LOCAL internal_23 # Boolean false
+	LOCAL internal_24 # Integer 3
+	LOCAL internal_25 # Store the result of the operation function_sub
+	LOCAL internal_26
+
+	x = num
+	# Conditional
+	internal_2 = ALLOCBOOL 0
+	internal_3 = ALLOCINT 0
+	
+	ARG x
+	ARG internal_3
+	internal_4 = CALL function_less_than
+	internal_2 = internal_4
+	IF internal_2 GOTO then_8792981815568
+	GOTO else_8792981815568
+	
+	then_8792981815568:
+	internal_7 = XOR x internal_6 # Getting the complement a1 of x
+	internal_7 = internal_7 + internal_5 # Adding 1 to the complement a1 we get the complement a2 of x
+	ARG self
+	ARG internal_7
+	internal_8 = VCALL D function_method7_at_D
+	internal_1 = internal_8
+	GOTO endif_8792981815568
+	
+	else_8792981815568:
+	# Conditional
+	internal_10 = ALLOCBOOL 0
+	internal_11 = ALLOCINT 0
+	
+	ARG internal_11
+	ARG x
+	internal_12 = CALL function_equal
+	internal_10 = internal_12
+	IF internal_10 GOTO then_8792981815559
+	GOTO else_8792981815559
+	
+	then_8792981815559:
+	internal_13 = ALLOCBOOL 1
+	internal_9 = internal_13
+	GOTO endif_8792981815559
+	
+	else_8792981815559:
+	# Conditional
+	internal_15 = ALLOCBOOL 0
+	internal_16 = ALLOCINT 1
+	
+	ARG internal_16
+	ARG x
+	internal_17 = CALL function_equal
+	internal_15 = internal_17
+	IF internal_15 GOTO then_8792981815290
+	GOTO else_8792981815290
+	
+	then_8792981815290:
+	internal_18 = ALLOCBOOL 0
+	internal_14 = internal_18
+	GOTO endif_8792981815290
+	
+	else_8792981815290:
+	# Conditional
+	internal_20 = ALLOCBOOL 0
+	internal_21 = ALLOCINT 2
+	
+	ARG internal_21
+	ARG x
+	internal_22 = CALL function_equal
+	internal_20 = internal_22
+	IF internal_20 GOTO then_8792981815556
+	GOTO else_8792981815556
+	
+	then_8792981815556:
+	internal_23 = ALLOCBOOL 0
+	internal_19 = internal_23
+	GOTO endif_8792981815556
+	
+	else_8792981815556:
+	internal_24 = ALLOCINT 3
+	
+	ARG x
+	ARG internal_24
+	internal_25 = CALL function_sub
+	ARG self
+	ARG internal_25
+	internal_26 = VCALL D function_method7_at_D
+	internal_19 = internal_26
+	GOTO endif_8792981815556
+	
+	endif_8792981815556:
+	internal_14 = internal_19
+	GOTO endif_8792981815290
+	
+	endif_8792981815290:
+	internal_9 = internal_14
+	GOTO endif_8792981815559
+	
+	endif_8792981815559:
+	internal_1 = internal_9
+	GOTO endif_8792981815568
+	
+	endif_8792981815568:
+	
+	RETURN internal_1
+}
+function function___init___at_E{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+
+	internal_0 = ALLOCINT 0
+	SETATTR self var internal_0
+	
+	RETURN self
+}
+function function_method6_at_E{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1 # Integer 8
+	LOCAL internal_2 # Store the result of the operation function_div
+	LOCAL internal_3 # Store an instance of the class A
+	LOCAL internal_4
+
+	x = 0
+	internal_1 = ALLOCINT 8
+	
+	ARG num
+	ARG internal_1
+	internal_2 = CALL function_div
+	x = internal_2
+	internal_3 = ALLOCATE A # Allocate the object A
+	ARG internal_3 # Pass the instance to the constructor
+	internal_3 = VCALL A function___init___at_A # Call the constructor
+	ARG internal_3
+	ARG x
+	internal_4 = VCALL A function_set_var_at_A
+	
+	RETURN internal_4
+}
+function function___init___at_A2I{
+	PARAM self
+	
+	RETURN self
+}
+function function_c2i_at_A2I{
+	PARAM self
+	PARAM char
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # String "0"
+	LOCAL internal_3 # Store the result of the operation function_equal
+	LOCAL internal_4 # Integer 0
+	LOCAL internal_5
+	LOCAL internal_6
+	LOCAL internal_7 # String "1"
+	LOCAL internal_8 # Store the result of the operation function_equal
+	LOCAL internal_9 # Integer 1
+	LOCAL internal_10
+	LOCAL internal_11
+	LOCAL internal_12 # String "2"
+	LOCAL internal_13 # Store the result of the operation function_equal
+	LOCAL internal_14 # Integer 2
+	LOCAL internal_15
+	LOCAL internal_16
+	LOCAL internal_17 # String "3"
+	LOCAL internal_18 # Store the result of the operation function_equal
+	LOCAL internal_19 # Integer 3
+	LOCAL internal_20
+	LOCAL internal_21
+	LOCAL internal_22 # String "4"
+	LOCAL internal_23 # Store the result of the operation function_equal
+	LOCAL internal_24 # Integer 4
+	LOCAL internal_25
+	LOCAL internal_26
+	LOCAL internal_27 # String "5"
+	LOCAL internal_28 # Store the result of the operation function_equal
+	LOCAL internal_29 # Integer 5
+	LOCAL internal_30
+	LOCAL internal_31
+	LOCAL internal_32 # String "6"
+	LOCAL internal_33 # Store the result of the operation function_equal
+	LOCAL internal_34 # Integer 6
+	LOCAL internal_35
+	LOCAL internal_36
+	LOCAL internal_37 # String "7"
+	LOCAL internal_38 # Store the result of the operation function_equal
+	LOCAL internal_39 # Integer 7
+	LOCAL internal_40
+	LOCAL internal_41
+	LOCAL internal_42 # String "8"
+	LOCAL internal_43 # Store the result of the operation function_equal
+	LOCAL internal_44 # Integer 8
+	LOCAL internal_45
+	LOCAL internal_46
+	LOCAL internal_47 # String "9"
+	LOCAL internal_48 # Store the result of the operation function_equal
+	LOCAL internal_49 # Integer 9
+	LOCAL internal_50
+	LOCAL internal_51 # Integer 0
+
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	internal_2 = ALLOCSTR "0"
+	
+	ARG char
+	ARG internal_2
+	internal_3 = CALL function_equal
+	internal_1 = internal_3
+	IF internal_1 GOTO then_8792981816474
+	GOTO else_8792981816474
+	
+	then_8792981816474:
+	internal_4 = ALLOCINT 0
+	internal_0 = internal_4
+	GOTO endif_8792981816474
+	
+	else_8792981816474:
+	# Conditional
+	internal_6 = ALLOCBOOL 0
+	internal_7 = ALLOCSTR "1"
+	
+	ARG char
+	ARG internal_7
+	internal_8 = CALL function_equal
+	internal_6 = internal_8
+	IF internal_6 GOTO then_8792981816468
+	GOTO else_8792981816468
+	
+	then_8792981816468:
+	internal_9 = ALLOCINT 1
+	internal_5 = internal_9
+	GOTO endif_8792981816468
+	
+	else_8792981816468:
+	# Conditional
+	internal_11 = ALLOCBOOL 0
+	internal_12 = ALLOCSTR "2"
+	
+	ARG char
+	ARG internal_12
+	internal_13 = CALL function_equal
+	internal_11 = internal_13
+	IF internal_11 GOTO then_8792981816462
+	GOTO else_8792981816462
+	
+	then_8792981816462:
+	internal_14 = ALLOCINT 2
+	internal_10 = internal_14
+	GOTO endif_8792981816462
+	
+	else_8792981816462:
+	# Conditional
+	internal_16 = ALLOCBOOL 0
+	internal_17 = ALLOCSTR "3"
+	
+	ARG char
+	ARG internal_17
+	internal_18 = CALL function_equal
+	internal_16 = internal_18
+	IF internal_16 GOTO then_8792981816456
+	GOTO else_8792981816456
+	
+	then_8792981816456:
+	internal_19 = ALLOCINT 3
+	internal_15 = internal_19
+	GOTO endif_8792981816456
+	
+	else_8792981816456:
+	# Conditional
+	internal_21 = ALLOCBOOL 0
+	internal_22 = ALLOCSTR "4"
+	
+	ARG char
+	ARG internal_22
+	internal_23 = CALL function_equal
+	internal_21 = internal_23
+	IF internal_21 GOTO then_8792981816450
+	GOTO else_8792981816450
+	
+	then_8792981816450:
+	internal_24 = ALLOCINT 4
+	internal_20 = internal_24
+	GOTO endif_8792981816450
+	
+	else_8792981816450:
+	# Conditional
+	internal_26 = ALLOCBOOL 0
+	internal_27 = ALLOCSTR "5"
+	
+	ARG char
+	ARG internal_27
+	internal_28 = CALL function_equal
+	internal_26 = internal_28
+	IF internal_26 GOTO then_8792981816444
+	GOTO else_8792981816444
+	
+	then_8792981816444:
+	internal_29 = ALLOCINT 5
+	internal_25 = internal_29
+	GOTO endif_8792981816444
+	
+	else_8792981816444:
+	# Conditional
+	internal_31 = ALLOCBOOL 0
+	internal_32 = ALLOCSTR "6"
+	
+	ARG char
+	ARG internal_32
+	internal_33 = CALL function_equal
+	internal_31 = internal_33
+	IF internal_31 GOTO then_8792981816438
+	GOTO else_8792981816438
+	
+	then_8792981816438:
+	internal_34 = ALLOCINT 6
+	internal_30 = internal_34
+	GOTO endif_8792981816438
+	
+	else_8792981816438:
+	# Conditional
+	internal_36 = ALLOCBOOL 0
+	internal_37 = ALLOCSTR "7"
+	
+	ARG char
+	ARG internal_37
+	internal_38 = CALL function_equal
+	internal_36 = internal_38
+	IF internal_36 GOTO then_8792981816432
+	GOTO else_8792981816432
+	
+	then_8792981816432:
+	internal_39 = ALLOCINT 7
+	internal_35 = internal_39
+	GOTO endif_8792981816432
+	
+	else_8792981816432:
+	# Conditional
+	internal_41 = ALLOCBOOL 0
+	internal_42 = ALLOCSTR "8"
+	
+	ARG char
+	ARG internal_42
+	internal_43 = CALL function_equal
+	internal_41 = internal_43
+	IF internal_41 GOTO then_8792981816426
+	GOTO else_8792981816426
+	
+	then_8792981816426:
+	internal_44 = ALLOCINT 8
+	internal_40 = internal_44
+	GOTO endif_8792981816426
+	
+	else_8792981816426:
+	# Conditional
+	internal_46 = ALLOCBOOL 0
+	internal_47 = ALLOCSTR "9"
+	
+	ARG char
+	ARG internal_47
+	internal_48 = CALL function_equal
+	internal_46 = internal_48
+	IF internal_46 GOTO then_8792981816405
+	GOTO else_8792981816405
+	
+	then_8792981816405:
+	internal_49 = ALLOCINT 9
+	internal_45 = internal_49
+	GOTO endif_8792981816405
+	
+	else_8792981816405:
+	ARG self
+	internal_50 = VCALL A2I function_abort_at_Object
+	internal_51 = ALLOCINT 0
+	internal_45 = internal_51
+	GOTO endif_8792981816405
+	
+	endif_8792981816405:
+	internal_40 = internal_45
+	GOTO endif_8792981816426
+	
+	endif_8792981816426:
+	internal_35 = internal_40
+	GOTO endif_8792981816432
+	
+	endif_8792981816432:
+	internal_30 = internal_35
+	GOTO endif_8792981816438
+	
+	endif_8792981816438:
+	internal_25 = internal_30
+	GOTO endif_8792981816444
+	
+	endif_8792981816444:
+	internal_20 = internal_25
+	GOTO endif_8792981816450
+	
+	endif_8792981816450:
+	internal_15 = internal_20
+	GOTO endif_8792981816456
+	
+	endif_8792981816456:
+	internal_10 = internal_15
+	GOTO endif_8792981816462
+	
+	endif_8792981816462:
+	internal_5 = internal_10
+	GOTO endif_8792981816468
+	
+	endif_8792981816468:
+	internal_0 = internal_5
+	GOTO endif_8792981816474
+	
+	endif_8792981816474:
+	
+	RETURN internal_0
+}
+function function_i2c_at_A2I{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # Integer 0
+	LOCAL internal_3 # Store the result of the operation function_equal
+	LOCAL internal_4 # String "0"
+	LOCAL internal_5
+	LOCAL internal_6
+	LOCAL internal_7 # Integer 1
+	LOCAL internal_8 # Store the result of the operation function_equal
+	LOCAL internal_9 # String "1"
+	LOCAL internal_10
+	LOCAL internal_11
+	LOCAL internal_12 # Integer 2
+	LOCAL internal_13 # Store the result of the operation function_equal
+	LOCAL internal_14 # String "2"
+	LOCAL internal_15
+	LOCAL internal_16
+	LOCAL internal_17 # Integer 3
+	LOCAL internal_18 # Store the result of the operation function_equal
+	LOCAL internal_19 # String "3"
+	LOCAL internal_20
+	LOCAL internal_21
+	LOCAL internal_22 # Integer 4
+	LOCAL internal_23 # Store the result of the operation function_equal
+	LOCAL internal_24 # String "4"
+	LOCAL internal_25
+	LOCAL internal_26
+	LOCAL internal_27 # Integer 5
+	LOCAL internal_28 # Store the result of the operation function_equal
+	LOCAL internal_29 # String "5"
+	LOCAL internal_30
+	LOCAL internal_31
+	LOCAL internal_32 # Integer 6
+	LOCAL internal_33 # Store the result of the operation function_equal
+	LOCAL internal_34 # String "6"
+	LOCAL internal_35
+	LOCAL internal_36
+	LOCAL internal_37 # Integer 7
+	LOCAL internal_38 # Store the result of the operation function_equal
+	LOCAL internal_39 # String "7"
+	LOCAL internal_40
+	LOCAL internal_41
+	LOCAL internal_42 # Integer 8
+	LOCAL internal_43 # Store the result of the operation function_equal
+	LOCAL internal_44 # String "8"
+	LOCAL internal_45
+	LOCAL internal_46
+	LOCAL internal_47 # Integer 9
+	LOCAL internal_48 # Store the result of the operation function_equal
+	LOCAL internal_49 # String "9"
+	LOCAL internal_50
+	LOCAL internal_51 # String ""
+
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	internal_2 = ALLOCINT 0
+	
+	ARG i
+	ARG internal_2
+	internal_3 = CALL function_equal
+	internal_1 = internal_3
+	IF internal_1 GOTO then_8792981817308
+	GOTO else_8792981817308
+	
+	then_8792981817308:
+	internal_4 = ALLOCSTR "0"
+	internal_0 = internal_4
+	GOTO endif_8792981817308
+	
+	else_8792981817308:
+	# Conditional
+	internal_6 = ALLOCBOOL 0
+	internal_7 = ALLOCINT 1
+	
+	ARG i
+	ARG internal_7
+	internal_8 = CALL function_equal
+	internal_6 = internal_8
+	IF internal_6 GOTO then_8792981817302
+	GOTO else_8792981817302
+	
+	then_8792981817302:
+	internal_9 = ALLOCSTR "1"
+	internal_5 = internal_9
+	GOTO endif_8792981817302
+	
+	else_8792981817302:
+	# Conditional
+	internal_11 = ALLOCBOOL 0
+	internal_12 = ALLOCINT 2
+	
+	ARG i
+	ARG internal_12
+	internal_13 = CALL function_equal
+	internal_11 = internal_13
+	IF internal_11 GOTO then_8792981817296
+	GOTO else_8792981817296
+	
+	then_8792981817296:
+	internal_14 = ALLOCSTR "2"
+	internal_10 = internal_14
+	GOTO endif_8792981817296
+	
+	else_8792981817296:
+	# Conditional
+	internal_16 = ALLOCBOOL 0
+	internal_17 = ALLOCINT 3
+	
+	ARG i
+	ARG internal_17
+	internal_18 = CALL function_equal
+	internal_16 = internal_18
+	IF internal_16 GOTO then_8792981817290
+	GOTO else_8792981817290
+	
+	then_8792981817290:
+	internal_19 = ALLOCSTR "3"
+	internal_15 = internal_19
+	GOTO endif_8792981817290
+	
+	else_8792981817290:
+	# Conditional
+	internal_21 = ALLOCBOOL 0
+	internal_22 = ALLOCINT 4
+	
+	ARG i
+	ARG internal_22
+	internal_23 = CALL function_equal
+	internal_21 = internal_23
+	IF internal_21 GOTO then_8792981817284
+	GOTO else_8792981817284
+	
+	then_8792981817284:
+	internal_24 = ALLOCSTR "4"
+	internal_20 = internal_24
+	GOTO endif_8792981817284
+	
+	else_8792981817284:
+	# Conditional
+	internal_26 = ALLOCBOOL 0
+	internal_27 = ALLOCINT 5
+	
+	ARG i
+	ARG internal_27
+	internal_28 = CALL function_equal
+	internal_26 = internal_28
+	IF internal_26 GOTO then_8792981817278
+	GOTO else_8792981817278
+	
+	then_8792981817278:
+	internal_29 = ALLOCSTR "5"
+	internal_25 = internal_29
+	GOTO endif_8792981817278
+	
+	else_8792981817278:
+	# Conditional
+	internal_31 = ALLOCBOOL 0
+	internal_32 = ALLOCINT 6
+	
+	ARG i
+	ARG internal_32
+	internal_33 = CALL function_equal
+	internal_31 = internal_33
+	IF internal_31 GOTO then_8792981817272
+	GOTO else_8792981817272
+	
+	then_8792981817272:
+	internal_34 = ALLOCSTR "6"
+	internal_30 = internal_34
+	GOTO endif_8792981817272
+	
+	else_8792981817272:
+	# Conditional
+	internal_36 = ALLOCBOOL 0
+	internal_37 = ALLOCINT 7
+	
+	ARG i
+	ARG internal_37
+	internal_38 = CALL function_equal
+	internal_36 = internal_38
+	IF internal_36 GOTO then_8792981817266
+	GOTO else_8792981817266
+	
+	then_8792981817266:
+	internal_39 = ALLOCSTR "7"
+	internal_35 = internal_39
+	GOTO endif_8792981817266
+	
+	else_8792981817266:
+	# Conditional
+	internal_41 = ALLOCBOOL 0
+	internal_42 = ALLOCINT 8
+	
+	ARG i
+	ARG internal_42
+	internal_43 = CALL function_equal
+	internal_41 = internal_43
+	IF internal_41 GOTO then_8792981817260
+	GOTO else_8792981817260
+	
+	then_8792981817260:
+	internal_44 = ALLOCSTR "8"
+	internal_40 = internal_44
+	GOTO endif_8792981817260
+	
+	else_8792981817260:
+	# Conditional
+	internal_46 = ALLOCBOOL 0
+	internal_47 = ALLOCINT 9
+	
+	ARG i
+	ARG internal_47
+	internal_48 = CALL function_equal
+	internal_46 = internal_48
+	IF internal_46 GOTO then_8792981817239
+	GOTO else_8792981817239
+	
+	then_8792981817239:
+	internal_49 = ALLOCSTR "9"
+	internal_45 = internal_49
+	GOTO endif_8792981817239
+	
+	else_8792981817239:
+	ARG self
+	internal_50 = VCALL A2I function_abort_at_Object
+	internal_51 = ALLOCSTR ""
+	internal_45 = internal_51
+	GOTO endif_8792981817239
+	
+	endif_8792981817239:
+	internal_40 = internal_45
+	GOTO endif_8792981817260
+	
+	endif_8792981817260:
+	internal_35 = internal_40
+	GOTO endif_8792981817266
+	
+	endif_8792981817266:
+	internal_30 = internal_35
+	GOTO endif_8792981817272
+	
+	endif_8792981817272:
+	internal_25 = internal_30
+	GOTO endif_8792981817278
+	
+	endif_8792981817278:
+	internal_20 = internal_25
+	GOTO endif_8792981817284
+	
+	endif_8792981817284:
+	internal_15 = internal_20
+	GOTO endif_8792981817290
+	
+	endif_8792981817290:
+	internal_10 = internal_15
+	GOTO endif_8792981817296
+	
+	endif_8792981817296:
+	internal_5 = internal_10
+	GOTO endif_8792981817302
+	
+	endif_8792981817302:
+	internal_0 = internal_5
+	GOTO endif_8792981817308
+	
+	endif_8792981817308:
+	
+	RETURN internal_0
+}
+function function_a2i_at_A2I{
+	PARAM self
+	PARAM s
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3 # Integer 0
+	LOCAL internal_4 # Store the result of the operation function_equal
+	LOCAL internal_5 # Integer 0
+	LOCAL internal_6
+	LOCAL internal_7
+	LOCAL internal_8 # Integer 0
+	LOCAL internal_9 # Integer 1
+	LOCAL internal_10
+	LOCAL internal_11 # String "-"
+	LOCAL internal_12 # Store the result of the operation function_equal
+	LOCAL internal_13 # Integer 1
+	LOCAL internal_14
+	LOCAL internal_15 # Integer 1
+	LOCAL internal_16 # Store the result of the operation function_sub
+	LOCAL internal_17
+	LOCAL internal_18
+	LOCAL internal_19 # Integer 1
+	LOCAL internal_20 # Integer 4294967295
+	LOCAL internal_21 # Store the complement a2 of internal_18
+	LOCAL internal_22
+	LOCAL internal_23
+	LOCAL internal_24 # Integer 0
+	LOCAL internal_25 # Integer 1
+	LOCAL internal_26
+	LOCAL internal_27 # String "+"
+	LOCAL internal_28 # Store the result of the operation function_equal
+	LOCAL internal_29 # Integer 1
+	LOCAL internal_30
+	LOCAL internal_31 # Integer 1
+	LOCAL internal_32 # Store the result of the operation function_sub
+	LOCAL internal_33
+	LOCAL internal_34
+	LOCAL internal_35
+
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	ARG s
+	internal_2 = VCALL String function_length_at_String
+	internal_3 = ALLOCINT 0
+	
+	ARG internal_2
+	ARG internal_3
+	internal_4 = CALL function_equal
+	internal_1 = internal_4
+	IF internal_1 GOTO then_8792981817498
+	GOTO else_8792981817498
+	
+	then_8792981817498:
+	internal_5 = ALLOCINT 0
+	internal_0 = internal_5
+	GOTO endif_8792981817498
+	
+	else_8792981817498:
+	# Conditional
+	internal_7 = ALLOCBOOL 0
+	internal_8 = ALLOCINT 0
+	internal_9 = ALLOCINT 1
+	ARG s
+	ARG internal_8
+	ARG internal_9
+	internal_10 = VCALL String function_substr_at_String
+	internal_11 = ALLOCSTR "-"
+	
+	ARG internal_10
+	ARG internal_11
+	internal_12 = CALL function_equal
+	internal_7 = internal_12
+	IF internal_7 GOTO then_8792981817513
+	GOTO else_8792981817513
+	
+	then_8792981817513:
+	internal_13 = ALLOCINT 1
+	ARG s
+	internal_14 = VCALL String function_length_at_String
+	internal_15 = ALLOCINT 1
+	
+	ARG internal_14
+	ARG internal_15
+	internal_16 = CALL function_sub
+	ARG s
+	ARG internal_13
+	ARG internal_16
+	internal_17 = VCALL String function_substr_at_String
+	ARG self
+	ARG internal_17
+	internal_18 = VCALL A2I function_a2i_aux_at_A2I
+	internal_21 = XOR internal_18 internal_20 # Getting the complement a1 of internal_18
+	internal_21 = internal_21 + internal_19 # Adding 1 to the complement a1 we get the complement a2 of internal_18
+	internal_6 = internal_21
+	GOTO endif_8792981817513
+	
+	else_8792981817513:
+	# Conditional
+	internal_23 = ALLOCBOOL 0
+	internal_24 = ALLOCINT 0
+	internal_25 = ALLOCINT 1
+	ARG s
+	ARG internal_24
+	ARG internal_25
+	internal_26 = VCALL String function_substr_at_String
+	internal_27 = ALLOCSTR "+"
+	
+	ARG internal_26
+	ARG internal_27
+	internal_28 = CALL function_equal
+	internal_23 = internal_28
+	IF internal_23 GOTO then_8792981817507
+	GOTO else_8792981817507
+	
+	then_8792981817507:
+	internal_29 = ALLOCINT 1
+	ARG s
+	internal_30 = VCALL String function_length_at_String
+	internal_31 = ALLOCINT 1
+	
+	ARG internal_30
+	ARG internal_31
+	internal_32 = CALL function_sub
+	ARG s
+	ARG internal_29
+	ARG internal_32
+	internal_33 = VCALL String function_substr_at_String
+	ARG self
+	ARG internal_33
+	internal_34 = VCALL A2I function_a2i_aux_at_A2I
+	internal_22 = internal_34
+	GOTO endif_8792981817507
+	
+	else_8792981817507:
+	ARG self
+	ARG s
+	internal_35 = VCALL A2I function_a2i_aux_at_A2I
+	internal_22 = internal_35
+	GOTO endif_8792981817507
+	
+	endif_8792981817507:
+	internal_6 = internal_22
+	GOTO endif_8792981817513
+	
+	endif_8792981817513:
+	internal_0 = internal_6
+	GOTO endif_8792981817498
+	
+	endif_8792981817498:
+	
+	RETURN internal_0
+}
+function function_a2i_aux_at_A2I{
+	PARAM self
+	PARAM s
+
+	LOCAL int
+	LOCAL internal_1 # Integer 0
+	LOCAL j
+	LOCAL internal_3
+	LOCAL i
+	LOCAL internal_5 # Integer 0
+	LOCAL internal_6
+	LOCAL internal_7 # Store the result of the operation function_less_than
+	LOCAL internal_8 # Integer 10
+	LOCAL internal_9 # Store the result of the operation function_mult
+	LOCAL internal_10 # Integer 1
+	LOCAL internal_11
+	LOCAL internal_12
+	LOCAL internal_13 # Store the result of the operation function_add
+	LOCAL internal_14 # Integer 1
+	LOCAL internal_15 # Store the result of the operation function_add
+
+	internal_1 = ALLOCINT 0
+	int = internal_1
+	ARG s
+	internal_3 = VCALL String function_length_at_String
+	j = internal_3
+	internal_5 = ALLOCINT 0
+	i = internal_5
+	while_start_8792981818167:
+	
+	ARG i
+	ARG j
+	internal_7 = CALL function_less_than
+	internal_6 = internal_7
+	IF internal_6 GOTO while_body_8792981818167
+	GOTO while_end_8792981818167
+	
+	while_body_8792981818167:
+	internal_8 = ALLOCINT 10
+	
+	ARG int
+	ARG internal_8
+	internal_9 = CALL function_mult
+	internal_10 = ALLOCINT 1
+	ARG s
+	ARG i
+	ARG internal_10
+	internal_11 = VCALL String function_substr_at_String
+	ARG self
+	ARG internal_11
+	internal_12 = VCALL A2I function_c2i_at_A2I
+	
+	ARG internal_9
+	ARG internal_12
+	internal_13 = CALL function_add
+	int = internal_13
+	internal_14 = ALLOCINT 1
+	
+	ARG i
+	ARG internal_14
+	internal_15 = CALL function_add
+	i = internal_15
+	GOTO while_start_8792981818167
+	
+	while_end_8792981818167:
+	
+	RETURN int
+}
+function function_i2a_at_A2I{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # Integer 0
+	LOCAL internal_3 # Store the result of the operation function_equal
+	LOCAL internal_4 # String "0"
+	LOCAL internal_5
+	LOCAL internal_6
+	LOCAL internal_7 # Integer 0
+	LOCAL internal_8 # Store the result of the operation function_less_than
+	LOCAL internal_9
+	LOCAL internal_10 # String "-"
+	LOCAL internal_11 # Integer 1
+	LOCAL internal_12 # Integer 1
+	LOCAL internal_13 # Integer 4294967295
+	LOCAL internal_14 # Store the complement a2 of internal_11
+	LOCAL internal_15 # Store the result of the operation function_mult
+	LOCAL internal_16
+	LOCAL internal_17
+
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	internal_2 = ALLOCINT 0
+	
+	ARG i
+	ARG internal_2
+	internal_3 = CALL function_equal
+	internal_1 = internal_3
+	IF internal_1 GOTO then_8792981818296
+	GOTO else_8792981818296
+	
+	then_8792981818296:
+	internal_4 = ALLOCSTR "0"
+	internal_0 = internal_4
+	GOTO endif_8792981818296
+	
+	else_8792981818296:
+	# Conditional
+	internal_6 = ALLOCBOOL 0
+	internal_7 = ALLOCINT 0
+	
+	ARG internal_7
+	ARG i
+	internal_8 = CALL function_less_than
+	internal_6 = internal_8
+	IF internal_6 GOTO then_8792981818302
+	GOTO else_8792981818302
+	
+	then_8792981818302:
+	ARG self
+	ARG i
+	internal_9 = VCALL A2I function_i2a_aux_at_A2I
+	internal_5 = internal_9
+	GOTO endif_8792981818302
+	
+	else_8792981818302:
+	internal_10 = ALLOCSTR "-"
+	internal_11 = ALLOCINT 1
+	internal_14 = XOR internal_11 internal_13 # Getting the complement a1 of internal_11
+	internal_14 = internal_14 + internal_12 # Adding 1 to the complement a1 we get the complement a2 of internal_11
+	
+	ARG i
+	ARG internal_14
+	internal_15 = CALL function_mult
+	ARG self
+	ARG internal_15
+	internal_16 = VCALL A2I function_i2a_aux_at_A2I
+	ARG internal_10
+	ARG internal_16
+	internal_17 = VCALL String function_concat_at_String
+	internal_5 = internal_17
+	GOTO endif_8792981818302
+	
+	endif_8792981818302:
+	internal_0 = internal_5
+	GOTO endif_8792981818296
+	
+	endif_8792981818296:
+	
+	RETURN internal_0
+}
+function function_i2a_aux_at_A2I{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # Integer 0
+	LOCAL internal_3 # Store the result of the operation function_equal
+	LOCAL internal_4 # String ""
+	LOCAL next
+	LOCAL internal_6 # Integer 10
+	LOCAL internal_7 # Store the result of the operation function_div
+	LOCAL internal_8
+	LOCAL internal_9 # Integer 10
+	LOCAL internal_10 # Store the result of the operation function_mult
+	LOCAL internal_11 # Store the result of the operation function_sub
+	LOCAL internal_12
+	LOCAL internal_13
+
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	internal_2 = ALLOCINT 0
+	
+	ARG i
+	ARG internal_2
+	internal_3 = CALL function_equal
+	internal_1 = internal_3
+	IF internal_1 GOTO then_8792981818670
+	GOTO else_8792981818670
+	
+	then_8792981818670:
+	internal_4 = ALLOCSTR ""
+	internal_0 = internal_4
+	GOTO endif_8792981818670
+	
+	else_8792981818670:
+	internal_6 = ALLOCINT 10
+	
+	ARG i
+	ARG internal_6
+	internal_7 = CALL function_div
+	next = internal_7
+	ARG self
+	ARG next
+	internal_8 = VCALL A2I function_i2a_aux_at_A2I
+	internal_9 = ALLOCINT 10
+	
+	ARG next
+	ARG internal_9
+	internal_10 = CALL function_mult
+	
+	ARG i
+	ARG internal_10
+	internal_11 = CALL function_sub
+	ARG self
+	ARG internal_11
+	internal_12 = VCALL A2I function_i2c_at_A2I
+	ARG internal_8
+	ARG internal_12
+	internal_13 = VCALL String function_concat_at_String
+	internal_0 = internal_13
+	GOTO endif_8792981818670
+	
+	endif_8792981818670:
+	
+	RETURN internal_0
+}
+function function___init___at_Main{
+	PARAM self
+
+	LOCAL internal_0 # String ""
+	LOCAL internal_1 # Boolean true
+
+	internal_0 = ALLOCSTR ""
+	SETATTR self char internal_0
+	SETATTR self avar NULL
+	SETATTR self a_var NULL
+	internal_1 = ALLOCBOOL 1
+	SETATTR self flag internal_1
+	
+	RETURN self
+}
+function function_menu_at_Main{
+	PARAM self
+
+	LOCAL internal_0 # String "\n\tTo add a number to "
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+	LOCAL internal_4 # String "...enter a:\n"
+	LOCAL internal_5
+	LOCAL internal_6 # String "\tTo negate "
+	LOCAL internal_7
+	LOCAL internal_8
+	LOCAL internal_9
+	LOCAL internal_10 # String "...enter b:\n"
+	LOCAL internal_11
+	LOCAL internal_12 # String "\tTo find the difference between "
+	LOCAL internal_13
+	LOCAL internal_14
+	LOCAL internal_15
+	LOCAL internal_16 # String "and another number...enter c:\n"
+	LOCAL internal_17
+	LOCAL internal_18 # String "\tTo find the factorial of "
+	LOCAL internal_19
+	LOCAL internal_20
+	LOCAL internal_21
+	LOCAL internal_22 # String "...enter d:\n"
+	LOCAL internal_23
+	LOCAL internal_24 # String "\tTo square "
+	LOCAL internal_25
+	LOCAL internal_26
+	LOCAL internal_27
+	LOCAL internal_28 # String "...enter e:\n"
+	LOCAL internal_29
+	LOCAL internal_30 # String "\tTo cube "
+	LOCAL internal_31
+	LOCAL internal_32
+	LOCAL internal_33
+	LOCAL internal_34 # String "...enter f:\n"
+	LOCAL internal_35
+	LOCAL internal_36 # String "\tTo find out if "
+	LOCAL internal_37
+	LOCAL internal_38
+	LOCAL internal_39
+	LOCAL internal_40 # String "is a multiple of 3...enter g:\n"
+	LOCAL internal_41
+	LOCAL internal_42 # String "\tTo divide "
+	LOCAL internal_43
+	LOCAL internal_44
+	LOCAL internal_45
+	LOCAL internal_46 # String "by 8...enter h:\n"
+	LOCAL internal_47
+	LOCAL internal_48 # String "\tTo get a new number...enter j:\n"
+	LOCAL internal_49
+	LOCAL internal_50 # String "\tTo quit...enter q:\n\n"
+	LOCAL internal_51
+	LOCAL internal_52
+
+	internal_0 = ALLOCSTR "\n\tTo add a number to "
+	ARG self
+	ARG internal_0
+	internal_1 = VCALL Main function_out_string_at_IO
+	internal_2 = GETATTR self avar
+	ARG self
+	ARG internal_2
+	internal_3 = VCALL Main function_print_at_Main
+	internal_4 = ALLOCSTR "...enter a:\n"
+	ARG self
+	ARG internal_4
+	internal_5 = VCALL Main function_out_string_at_IO
+	internal_6 = ALLOCSTR "\tTo negate "
+	ARG self
+	ARG internal_6
+	internal_7 = VCALL Main function_out_string_at_IO
+	internal_8 = GETATTR self avar
+	ARG self
+	ARG internal_8
+	internal_9 = VCALL Main function_print_at_Main
+	internal_10 = ALLOCSTR "...enter b:\n"
+	ARG self
+	ARG internal_10
+	internal_11 = VCALL Main function_out_string_at_IO
+	internal_12 = ALLOCSTR "\tTo find the difference between "
+	ARG self
+	ARG internal_12
+	internal_13 = VCALL Main function_out_string_at_IO
+	internal_14 = GETATTR self avar
+	ARG self
+	ARG internal_14
+	internal_15 = VCALL Main function_print_at_Main
+	internal_16 = ALLOCSTR "and another number...enter c:\n"
+	ARG self
+	ARG internal_16
+	internal_17 = VCALL Main function_out_string_at_IO
+	internal_18 = ALLOCSTR "\tTo find the factorial of "
+	ARG self
+	ARG internal_18
+	internal_19 = VCALL Main function_out_string_at_IO
+	internal_20 = GETATTR self avar
+	ARG self
+	ARG internal_20
+	internal_21 = VCALL Main function_print_at_Main
+	internal_22 = ALLOCSTR "...enter d:\n"
+	ARG self
+	ARG internal_22
+	internal_23 = VCALL Main function_out_string_at_IO
+	internal_24 = ALLOCSTR "\tTo square "
+	ARG self
+	ARG internal_24
+	internal_25 = VCALL Main function_out_string_at_IO
+	internal_26 = GETATTR self avar
+	ARG self
+	ARG internal_26
+	internal_27 = VCALL Main function_print_at_Main
+	internal_28 = ALLOCSTR "...enter e:\n"
+	ARG self
+	ARG internal_28
+	internal_29 = VCALL Main function_out_string_at_IO
+	internal_30 = ALLOCSTR "\tTo cube "
+	ARG self
+	ARG internal_30
+	internal_31 = VCALL Main function_out_string_at_IO
+	internal_32 = GETATTR self avar
+	ARG self
+	ARG internal_32
+	internal_33 = VCALL Main function_print_at_Main
+	internal_34 = ALLOCSTR "...enter f:\n"
+	ARG self
+	ARG internal_34
+	internal_35 = VCALL Main function_out_string_at_IO
+	internal_36 = ALLOCSTR "\tTo find out if "
+	ARG self
+	ARG internal_36
+	internal_37 = VCALL Main function_out_string_at_IO
+	internal_38 = GETATTR self avar
+	ARG self
+	ARG internal_38
+	internal_39 = VCALL Main function_print_at_Main
+	internal_40 = ALLOCSTR "is a multiple of 3...enter g:\n"
+	ARG self
+	ARG internal_40
+	internal_41 = VCALL Main function_out_string_at_IO
+	internal_42 = ALLOCSTR "\tTo divide "
+	ARG self
+	ARG internal_42
+	internal_43 = VCALL Main function_out_string_at_IO
+	internal_44 = GETATTR self avar
+	ARG self
+	ARG internal_44
+	internal_45 = VCALL Main function_print_at_Main
+	internal_46 = ALLOCSTR "by 8...enter h:\n"
+	ARG self
+	ARG internal_46
+	internal_47 = VCALL Main function_out_string_at_IO
+	internal_48 = ALLOCSTR "\tTo get a new number...enter j:\n"
+	ARG self
+	ARG internal_48
+	internal_49 = VCALL Main function_out_string_at_IO
+	internal_50 = ALLOCSTR "\tTo quit...enter q:\n\n"
+	ARG self
+	ARG internal_50
+	internal_51 = VCALL Main function_out_string_at_IO
+	ARG self
+	internal_52 = VCALL Main function_in_string_at_IO
+	
+	RETURN internal_52
+}
+function function_prompt_at_Main{
+	PARAM self
+
+	LOCAL internal_0 # String "\n"
+	LOCAL internal_1
+	LOCAL internal_2 # String "Please enter a number...  "
+	LOCAL internal_3
+	LOCAL internal_4
+
+	internal_0 = ALLOCSTR "\n"
+	ARG self
+	ARG internal_0
+	internal_1 = VCALL Main function_out_string_at_IO
+	internal_2 = ALLOCSTR "Please enter a number...  "
+	ARG self
+	ARG internal_2
+	internal_3 = VCALL Main function_out_string_at_IO
+	ARG self
+	internal_4 = VCALL Main function_in_string_at_IO
+	
+	RETURN internal_4
+}
+function function_get_int_at_Main{
+	PARAM self
+
+	LOCAL z
+	LOCAL internal_1 # Store an instance of the class A2I
+	LOCAL s
+	LOCAL internal_3
+	LOCAL internal_4
+
+	internal_1 = ALLOCATE A2I # Allocate the object A2I
+	ARG internal_1 # Pass the instance to the constructor
+	internal_1 = VCALL A2I function___init___at_A2I # Call the constructor
+	z = internal_1
+	ARG self
+	internal_3 = VCALL Main function_prompt_at_Main
+	s = internal_3
+	ARG z
+	ARG s
+	internal_4 = VCALL A2I function_a2i_at_A2I
+	
+	RETURN internal_4
+}
+function function_is_even_at_Main{
+	PARAM self
+	PARAM num
+
+	LOCAL x
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3 # Integer 0
+	LOCAL internal_4 # Store the result of the operation function_less_than
+	LOCAL internal_5 # Integer 1
+	LOCAL internal_6 # Integer 4294967295
+	LOCAL internal_7 # Store the complement a2 of x
+	LOCAL internal_8
+	LOCAL internal_9
+	LOCAL internal_10
+	LOCAL internal_11 # Integer 0
+	LOCAL internal_12 # Store the result of the operation function_equal
+	LOCAL internal_13 # Boolean true
+	LOCAL internal_14
+	LOCAL internal_15
+	LOCAL internal_16 # Integer 1
+	LOCAL internal_17 # Store the result of the operation function_equal
+	LOCAL internal_18 # Boolean false
+	LOCAL internal_19 # Integer 2
+	LOCAL internal_20 # Store the result of the operation function_sub
+	LOCAL internal_21
+
+	x = num
+	# Conditional
+	internal_2 = ALLOCBOOL 0
+	internal_3 = ALLOCINT 0
+	
+	ARG x
+	ARG internal_3
+	internal_4 = CALL function_less_than
+	internal_2 = internal_4
+	IF internal_2 GOTO then_8792981820167
+	GOTO else_8792981820167
+	
+	then_8792981820167:
+	internal_7 = XOR x internal_6 # Getting the complement a1 of x
+	internal_7 = internal_7 + internal_5 # Adding 1 to the complement a1 we get the complement a2 of x
+	ARG self
+	ARG internal_7
+	internal_8 = VCALL Main function_is_even_at_Main
+	internal_1 = internal_8
+	GOTO endif_8792981820167
+	
+	else_8792981820167:
+	# Conditional
+	internal_10 = ALLOCBOOL 0
+	internal_11 = ALLOCINT 0
+	
+	ARG internal_11
+	ARG x
+	internal_12 = CALL function_equal
+	internal_10 = internal_12
+	IF internal_10 GOTO then_8792981820170
+	GOTO else_8792981820170
+	
+	then_8792981820170:
+	internal_13 = ALLOCBOOL 1
+	internal_9 = internal_13
+	GOTO endif_8792981820170
+	
+	else_8792981820170:
+	# Conditional
+	internal_15 = ALLOCBOOL 0
+	internal_16 = ALLOCINT 1
+	
+	ARG internal_16
+	ARG x
+	internal_17 = CALL function_equal
+	internal_15 = internal_17
+	IF internal_15 GOTO then_8792981820176
+	GOTO else_8792981820176
+	
+	then_8792981820176:
+	internal_18 = ALLOCBOOL 0
+	internal_14 = internal_18
+	GOTO endif_8792981820176
+	
+	else_8792981820176:
+	internal_19 = ALLOCINT 2
+	
+	ARG x
+	ARG internal_19
+	internal_20 = CALL function_sub
+	ARG self
+	ARG internal_20
+	internal_21 = VCALL Main function_is_even_at_Main
+	internal_14 = internal_21
+	GOTO endif_8792981820176
+	
+	endif_8792981820176:
+	internal_9 = internal_14
+	GOTO endif_8792981820170
+	
+	endif_8792981820170:
+	internal_1 = internal_9
+	GOTO endif_8792981820167
+	
+	endif_8792981820167:
+	
+	RETURN internal_1
+}
+function function_class_type_at_Main{
+	PARAM self
+	PARAM var
+
+	LOCAL internal_0 # Count of ancestors of the switch expression
+	LOCAL internal_1 # Switch expression type
+	LOCAL internal_2 # Ancestor type
+	LOCAL internal_3 # Step 1 comparison result
+	LOCAL internal_4 # Step 1 Array of ancestors
+	LOCAL internal_5 # Integer 0 
+	LOCAL internal_6 # Null pointer
+	LOCAL internal_7 # Step 2 iteration index
+	LOCAL internal_8 # Step 2 comparison result
+	LOCAL internal_9 # Array to store the branch types
+	LOCAL internal_10 # Array to store the nearest ancestor index of the expression type of the i-th branch type 
+	LOCAL internal_11 # Address of the type A
+	LOCAL internal_12 # Address of the type B
+	LOCAL internal_13 # Address of the type C
+	LOCAL internal_14 # Address of the type D
+	LOCAL internal_15 # Address of the type E
+	LOCAL internal_16 # Address of the type Object
+	LOCAL internal_17 # Step 3 - Iteration index of the branch types array
+	LOCAL internal_18 # Step 3 - Comparison for the index of the branch types array
+	LOCAL internal_19 # Step 3 - Type of the i-th branch
+	LOCAL internal_20 # Step 3 - Index of the ancestor
+	LOCAL internal_21 # Step 3 - Comparison for the index of the ancestor
+	LOCAL internal_22 # Step 3 - Type of the j-th ancestor
+	LOCAL internal_23 # Step 3 - Comparison for the branch type nad the ancestor type
+	LOCAL internal_24 # Step 4 - Iteration index
+	LOCAL internal_25 # Step 4 - Index of the minimum counter in the counter array
+	LOCAL internal_26 # Step 4 - Temporary variable
+	LOCAL internal_27 # Step 4 - Current minimum of the counter array
+	LOCAL internal_28 # Step 4 - Comparison for the minimum of the counter array
+	LOCAL internal_29 # Step 5 - Bool array
+	LOCAL internal_30 # Step 5 - Exists an error
+	LOCAL internal_31 # Step 5 - Comparison for the correct branch result
+	LOCAL internal_32 # Result of the switch expression address
+	LOCAL a # Specialiced variable for the branch A
+	LOCAL internal_34 # String "Class type is now A\n"
+	LOCAL internal_35
+	LOCAL b # Specialiced variable for the branch B
+	LOCAL internal_37 # String "Class type is now B\n"
+	LOCAL internal_38
+	LOCAL c # Specialiced variable for the branch C
+	LOCAL internal_40 # String "Class type is now C\n"
+	LOCAL internal_41
+	LOCAL d # Specialiced variable for the branch D
+	LOCAL internal_43 # String "Class type is now D\n"
+	LOCAL internal_44
+	LOCAL e # Specialiced variable for the branch E
+	LOCAL internal_46 # String "Class type is now E\n"
+	LOCAL internal_47
+	LOCAL o # Specialiced variable for the branch Object
+	LOCAL internal_49 # String "Oooops\n"
+	LOCAL internal_50
+
+	# Switch Case Algorithm Steps:
+	#  1 - Count how many ancestors has the dynamic type of the expression
+	#  2 - Create an array of the same size where to store the ancestors
+	#  3 - For each branch type, store the ancestor index that match with it, if no one match, store `count of ancestors`
+	#  4 - Find the minimum of the ancestors indexes
+	#  5 - With the minimum index, get the correct branch type
+	internal_5 = ALLOCINT 0
+	internal_3 = ALLOCBOOL 0 # Initialize the comparison result
+	
+	# ######################################################################## #
+	# Step 1 - Count how many ancestors has the dynamic type of the expression #
+	# ######################################################################## #
+	internal_1 = TYPEOF var # Get the switch expression type
+	internal_2 = internal_1 # The first ancestor will be the type itself
+	internal_0 = internal_5 # Initialize the counter
+	while_start_8792981820269:
+	internal_3 = internal_2 == 0
+	IF internal_3 GOTO while_end_8792981820269
+	internal_0 = internal_0 + 1 # Increment the counter
+	internal_2 = ANCESTOR internal_2
+	GOTO while_start_8792981820269
+	while_end_8792981820269:
+	
+	# ###################################################################### #
+	# Step 2 - Create an array of the same size where to store the ancestors #
+	# ###################################################################### #
+	internal_2 = internal_1 # The first ancestor will be the type itself
+	internal_4 = ARRAY internal_0 # Create an array of ancestors
+	internal_7 = 0 # Initialize the index with the value 0
+	foreach_start_8792981820269:
+	internal_8 = internal_7 < internal_0 # Check if the index is less than the counter
+	IF internal_8 GOTO foreach_body_8792981820269
+	GOTO foreach_end_8792981820269
+	foreach_body_8792981820269:
+	SETINDEX internal_4 internal_7 internal_2 # Set the index of the array with the ancestor type
+	internal_2 = ANCESTOR internal_2 # Get the next ancestor
+	internal_7 = internal_7 + 1 # Increment index
+	GOTO foreach_start_8792981820269
+	foreach_end_8792981820269:
+	
+	# #################################################################################################### #
+	# Step 3 - For each branch type, store the ancestor index that match with it (Simulating a double for) #
+	# #################################################################################################### #
+	internal_9 = ARRAY 6
+	internal_10 = ARRAY 6
+	internal_11 = TYPEADDR A
+	SETINDEX internal_9 0 internal_11
+	SETINDEX internal_10 0 internal_0
+	internal_12 = TYPEADDR B
+	SETINDEX internal_9 1 internal_12
+	SETINDEX internal_10 1 internal_0
+	internal_13 = TYPEADDR C
+	SETINDEX internal_9 2 internal_13
+	SETINDEX internal_10 2 internal_0
+	internal_14 = TYPEADDR D
+	SETINDEX internal_9 3 internal_14
+	SETINDEX internal_10 3 internal_0
+	internal_15 = TYPEADDR E
+	SETINDEX internal_9 4 internal_15
+	SETINDEX internal_10 4 internal_0
+	internal_16 = TYPEADDR Object
+	SETINDEX internal_9 5 internal_16
+	SETINDEX internal_10 5 internal_0
+	
+	# ############# #
+	# Outer Foreach #
+	# ############# #
+	internal_17 = 0 # Initialize the index i of the case to 0
+	foreach_type_start_8792981820269:
+	internal_18 = internal_17 < 6 # Check if the type index is less than the count of branches
+	IF internal_18 GOTO foreach_type_body_8792981820269
+	GOTO foreach_type_end_8792981820269
+	foreach_type_body_8792981820269:
+	internal_19 = GETINDEX internal_9 internal_17 # Get the type of the i-th branch
+	
+	# ############# #
+	# Inner Foreach #
+	# ############# #
+	internal_20 = 0 # Initialize the index j of the case to 0
+	foreach_ancestor_start_8792981820269:
+	internal_21 = internal_20 < internal_0 # Check if the case index is less than the count of ancestors
+	IF internal_21 GOTO foreach_ancestor_body_8792981820269
+	GOTO foreach_ancestor_end_8792981820269
+	foreach_ancestor_body_8792981820269:
+	internal_22 = GETINDEX internal_4 internal_20 # Get the j-th ancestor type
+	internal_23 = internal_19 == internal_22 # Compare if the type of the i-th branch is equal to the j-th ancestor
+	IF internal_23 GOTO foreach_ancestor_end_8792981820269 # If the types are equal, we have a match, then we can exit
+	internal_20 = internal_20 + 1 # Increment the ancestor index
+	GOTO foreach_ancestor_start_8792981820269
+	foreach_ancestor_end_8792981820269:
+	SETINDEX internal_10 internal_17 internal_20 # Set the counter of the i-th branch equals to j
+	# #################### #
+	# End of Inner Foreach #
+	# #################### #
+	
+	internal_17 = internal_17 + 1 # Increment type index
+	GOTO foreach_type_start_8792981820269
+	foreach_type_end_8792981820269:
+	# ################# #
+	# End Outer Foreach #
+	# ################# #
+	
+	# ######################################## #
+	# Step 4 - Find the minimum ancestor index #
+	# ######################################## #
+	internal_24 = 0 # Initialize the index of the counter array to 0
+	internal_25 = 0 # Initialize the index of the lower counter to 0
+	internal_27 = internal_0 # Initialize the current minimum to `count of ancestors`
+	foreach_min_start_8792981820269:
+	internal_28 = internal_24 < 6 # Check if the index of the lower counter is less than the count of branches
+	IF internal_28 GOTO foreach_min_body_8792981820269
+	GOTO foreach_min_end_8792981820269
+	foreach_min_body_8792981820269:
+	internal_26 = GETINDEX internal_10 internal_24 # Get the nearest ancestor index of the i-th branch type
+	internal_28 = internal_26 < internal_27 # Compare if the nearest ancestor index is less than the current minimum
+	IF internal_28 GOTO update_min_8792981820269
+	GOTO foreach_min_end_8792981820269
+	update_min_8792981820269:
+	internal_27 = internal_26 # Update the current minimum
+	internal_25 = internal_24 # Update the index of the lower counter
+	update_min_end_8792981820269:
+	internal_24 = internal_24 + 1 # Increment the index of the counter array
+	GOTO foreach_min_start_8792981820269
+	foreach_min_end_8792981820269:
+	
+	# ################################################################# #
+	# Step 5 - Using the minimun ancestor index find the correct branch #
+	# ################################################################# #
+	internal_29 = ARRAY 6 # Create the bool array
+	SETINDEX internal_29 0 0 # Initialize the bool array
+	SETINDEX internal_29 1 0 # Initialize the bool array
+	SETINDEX internal_29 2 0 # Initialize the bool array
+	SETINDEX internal_29 3 0 # Initialize the bool array
+	SETINDEX internal_29 4 0 # Initialize the bool array
+	SETINDEX internal_29 5 0 # Initialize the bool array
+	
+	internal_30 = internal_25 == internal_0 # Check if the minimum index is equal to the count of ancestors
+	IF internal_30 GOTO error_branch_8792981820269
+	SETINDEX internal_29 internal_25 1 # Set the bool array in the correct index to 1
+	
+	internal_31 = GETINDEX internal_29 0 # Get the bool value of the branch A
+	IF internal_31 GOTO branch_A_8792981820269 # If the bool value is 1, then we have a match
+	
+	internal_31 = GETINDEX internal_29 1 # Get the bool value of the branch B
+	IF internal_31 GOTO branch_B_8792981820269 # If the bool value is 1, then we have a match
+	
+	internal_31 = GETINDEX internal_29 2 # Get the bool value of the branch C
+	IF internal_31 GOTO branch_C_8792981820269 # If the bool value is 1, then we have a match
+	
+	internal_31 = GETINDEX internal_29 3 # Get the bool value of the branch D
+	IF internal_31 GOTO branch_D_8792981820269 # If the bool value is 1, then we have a match
+	
+	internal_31 = GETINDEX internal_29 4 # Get the bool value of the branch E
+	IF internal_31 GOTO branch_E_8792981820269 # If the bool value is 1, then we have a match
+	
+	internal_31 = GETINDEX internal_29 5 # Get the bool value of the branch Object
+	IF internal_31 GOTO branch_Object_8792981820269 # If the bool value is 1, then we have a match
+	
+	branch_A_8792981820269:
+	internal_34 = ALLOCSTR "Class type is now A\n"
+	ARG self
+	ARG internal_34
+	internal_35 = VCALL Main function_out_string_at_IO
+	internal_32 = internal_35 # Assign the result
+	GOTO branch_end_8792981820269
+	
+	branch_B_8792981820269:
+	internal_37 = ALLOCSTR "Class type is now B\n"
+	ARG self
+	ARG internal_37
+	internal_38 = VCALL Main function_out_string_at_IO
+	internal_32 = internal_38 # Assign the result
+	GOTO branch_end_8792981820269
+	
+	branch_C_8792981820269:
+	internal_40 = ALLOCSTR "Class type is now C\n"
+	ARG self
+	ARG internal_40
+	internal_41 = VCALL Main function_out_string_at_IO
+	internal_32 = internal_41 # Assign the result
+	GOTO branch_end_8792981820269
+	
+	branch_D_8792981820269:
+	internal_43 = ALLOCSTR "Class type is now D\n"
+	ARG self
+	ARG internal_43
+	internal_44 = VCALL Main function_out_string_at_IO
+	internal_32 = internal_44 # Assign the result
+	GOTO branch_end_8792981820269
+	
+	branch_E_8792981820269:
+	internal_46 = ALLOCSTR "Class type is now E\n"
+	ARG self
+	ARG internal_46
+	internal_47 = VCALL Main function_out_string_at_IO
+	internal_32 = internal_47 # Assign the result
+	GOTO branch_end_8792981820269
+	
+	branch_Object_8792981820269:
+	internal_49 = ALLOCSTR "Oooops\n"
+	ARG self
+	ARG internal_49
+	internal_50 = VCALL Main function_out_string_at_IO
+	internal_32 = internal_50 # Assign the result
+	GOTO branch_end_8792981820269
+	
+	error_branch_8792981820269:
+	# Insert an error call
+	branch_end_8792981820269:
+	
+	RETURN internal_32
+}
+function function_print_at_Main{
+	PARAM self
+	PARAM var
+
+	LOCAL z
+	LOCAL internal_1 # Store an instance of the class A2I
+	LOCAL internal_2
+	LOCAL internal_3
+	LOCAL internal_4
+	LOCAL internal_5 # String " "
+	LOCAL internal_6
+
+	internal_1 = ALLOCATE A2I # Allocate the object A2I
+	ARG internal_1 # Pass the instance to the constructor
+	internal_1 = VCALL A2I function___init___at_A2I # Call the constructor
+	z = internal_1
+	ARG var
+	internal_2 = VCALL A function_value_at_A
+	ARG z
+	ARG internal_2
+	internal_3 = VCALL A2I function_i2a_at_A2I
+	ARG self
+	ARG internal_3
+	internal_4 = VCALL Main function_out_string_at_IO
+	internal_5 = ALLOCSTR " "
+	ARG self
+	ARG internal_5
+	internal_6 = VCALL Main function_out_string_at_IO
+	
+	RETURN internal_6
+}
+function function_main_at_Main{
+	PARAM self
+
+	LOCAL internal_0 # Store an instance of the class A
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3 # String "number "
+	LOCAL internal_4
+	LOCAL internal_5
+	LOCAL internal_6
+	LOCAL internal_7
+	LOCAL internal_8
+	LOCAL internal_9
+	LOCAL internal_10
+	LOCAL internal_11
+	LOCAL internal_12 # String "is even!\n"
+	LOCAL internal_13
+	LOCAL internal_14 # String "is odd!\n"
+	LOCAL internal_15
+	LOCAL internal_16
+	LOCAL internal_17
+	LOCAL internal_18
+	LOCAL internal_19
+	LOCAL internal_20
+	LOCAL internal_21
+	LOCAL internal_22 # String "a"
+	LOCAL internal_23 # Store the result of the operation function_equal
+	LOCAL internal_24 # Store an instance of the class A
+	LOCAL internal_25
+	LOCAL internal_26
+	LOCAL internal_27 # Store an instance of the class B
+	LOCAL internal_28
+	LOCAL internal_29
+	LOCAL internal_30
+	LOCAL internal_31
+	LOCAL internal_32
+	LOCAL internal_33
+	LOCAL internal_34
+	LOCAL internal_35
+	LOCAL internal_36 # String "b"
+	LOCAL internal_37 # Store the result of the operation function_equal
+	LOCAL internal_38
+	LOCAL internal_39 # Count of ancestors of the switch expression
+	LOCAL internal_40 # Switch expression type
+	LOCAL internal_41 # Ancestor type
+	LOCAL internal_42 # Step 1 comparison result
+	LOCAL internal_43 # Step 1 Array of ancestors
+	LOCAL internal_44 # Integer 0 
+	LOCAL internal_45 # Null pointer
+	LOCAL internal_46 # Step 2 iteration index
+	LOCAL internal_47 # Step 2 comparison result
+	LOCAL internal_48 # Array to store the branch types
+	LOCAL internal_49 # Array to store the nearest ancestor index of the expression type of the i-th branch type 
+	LOCAL internal_50 # Address of the type C
+	LOCAL internal_51 # Address of the type A
+	LOCAL internal_52 # Address of the type Object
+	LOCAL internal_53 # Step 3 - Iteration index of the branch types array
+	LOCAL internal_54 # Step 3 - Comparison for the index of the branch types array
+	LOCAL internal_55 # Step 3 - Type of the i-th branch
+	LOCAL internal_56 # Step 3 - Index of the ancestor
+	LOCAL internal_57 # Step 3 - Comparison for the index of the ancestor
+	LOCAL internal_58 # Step 3 - Type of the j-th ancestor
+	LOCAL internal_59 # Step 3 - Comparison for the branch type nad the ancestor type
+	LOCAL internal_60 # Step 4 - Iteration index
+	LOCAL internal_61 # Step 4 - Index of the minimum counter in the counter array
+	LOCAL internal_62 # Step 4 - Temporary variable
+	LOCAL internal_63 # Step 4 - Current minimum of the counter array
+	LOCAL internal_64 # Step 4 - Comparison for the minimum of the counter array
+	LOCAL internal_65 # Step 5 - Bool array
+	LOCAL internal_66 # Step 5 - Exists an error
+	LOCAL internal_67 # Step 5 - Comparison for the correct branch result
+	LOCAL internal_68 # Result of the switch expression address
+	LOCAL c # Specialiced variable for the branch C
+	LOCAL internal_70
+	LOCAL internal_71
+	LOCAL a # Specialiced variable for the branch A
+	LOCAL internal_73
+	LOCAL internal_74
+	LOCAL o # Specialiced variable for the branch Object
+	LOCAL internal_76 # String "Oooops\n"
+	LOCAL internal_77
+	LOCAL internal_78
+	LOCAL internal_79 # Integer 0
+	LOCAL internal_80
+	LOCAL internal_81
+	LOCAL internal_82
+	LOCAL internal_83 # String "c"
+	LOCAL internal_84 # Store the result of the operation function_equal
+	LOCAL internal_85 # Store an instance of the class A
+	LOCAL internal_86
+	LOCAL internal_87
+	LOCAL internal_88 # Store an instance of the class D
+	LOCAL internal_89
+	LOCAL internal_90
+	LOCAL internal_91
+	LOCAL internal_92
+	LOCAL internal_93
+	LOCAL internal_94
+	LOCAL internal_95
+	LOCAL internal_96
+	LOCAL internal_97 # String "d"
+	LOCAL internal_98 # Store the result of the operation function_equal
+	LOCAL internal_99 # Store an instance of the class C
+	LOCAL internal_100
+	LOCAL internal_101
+	LOCAL internal_102
+	LOCAL internal_103
+	LOCAL internal_104
+	LOCAL internal_105
+	LOCAL internal_106 # String "e"
+	LOCAL internal_107 # Store the result of the operation function_equal
+	LOCAL internal_108 # Store an instance of the class C
+	LOCAL internal_109
+	LOCAL internal_110
+	LOCAL internal_111
+	LOCAL internal_112
+	LOCAL internal_113
+	LOCAL internal_114
+	LOCAL internal_115 # String "f"
+	LOCAL internal_116 # Store the result of the operation function_equal
+	LOCAL internal_117 # Store an instance of the class C
+	LOCAL internal_118
+	LOCAL internal_119
+	LOCAL internal_120
+	LOCAL internal_121
+	LOCAL internal_122
+	LOCAL internal_123
+	LOCAL internal_124 # String "g"
+	LOCAL internal_125 # Store the result of the operation function_equal
+	LOCAL internal_126
+	LOCAL internal_127
+	LOCAL internal_128 # Store an instance of the class D
+	LOCAL internal_129
+	LOCAL internal_130
+	LOCAL internal_131
+	LOCAL internal_132 # String "number "
+	LOCAL internal_133
+	LOCAL internal_134
+	LOCAL internal_135
+	LOCAL internal_136 # String "is divisible by 3.\n"
+	LOCAL internal_137
+	LOCAL internal_138 # String "number "
+	LOCAL internal_139
+	LOCAL internal_140
+	LOCAL internal_141
+	LOCAL internal_142 # String "is not divisible by 3.\n"
+	LOCAL internal_143
+	LOCAL internal_144
+	LOCAL internal_145
+	LOCAL internal_146
+	LOCAL internal_147 # String "h"
+	LOCAL internal_148 # Store the result of the operation function_equal
+	LOCAL x
+	LOCAL internal_150 # Store an instance of the class E
+	LOCAL internal_151
+	LOCAL internal_152
+	LOCAL internal_153
+	LOCAL r
+	LOCAL internal_155
+	LOCAL internal_156
+	LOCAL internal_157
+	LOCAL internal_158 # Integer 8
+	LOCAL internal_159 # Store the result of the operation function_mult
+	LOCAL internal_160 # Store the result of the operation function_sub
+	LOCAL internal_161 # String "number "
+	LOCAL internal_162
+	LOCAL internal_163
+	LOCAL internal_164
+	LOCAL internal_165 # String "is equal to "
+	LOCAL internal_166
+	LOCAL internal_167
+	LOCAL internal_168 # String "times 8 with a remainder of "
+	LOCAL internal_169
+	LOCAL a
+	LOCAL internal_171 # Store an instance of the class A2I
+	LOCAL internal_172
+	LOCAL internal_173
+	LOCAL internal_174 # String "\n"
+	LOCAL internal_175
+	LOCAL internal_176
+	LOCAL internal_177
+	LOCAL internal_178
+	LOCAL internal_179 # String "j"
+	LOCAL internal_180 # Store the result of the operation function_equal
+	LOCAL internal_181 # Store an instance of the class A
+	LOCAL internal_182
+	LOCAL internal_183
+	LOCAL internal_184
+	LOCAL internal_185 # String "q"
+	LOCAL internal_186 # Store the result of the operation function_equal
+	LOCAL internal_187 # Boolean false
+	LOCAL internal_188 # Store an instance of the class A
+	LOCAL internal_189
+	LOCAL internal_190
+	LOCAL internal_191
+
+	internal_0 = ALLOCATE A # Allocate the object A
+	ARG internal_0 # Pass the instance to the constructor
+	internal_0 = VCALL A function___init___at_A # Call the constructor
+	SETATTR self avar internal_0
+	while_start_8792981790296:
+	internal_2 = GETATTR self flag
+	internal_1 = internal_2
+	IF internal_1 GOTO while_body_8792981790296
+	GOTO while_end_8792981790296
+	
+	while_body_8792981790296:
+	internal_3 = ALLOCSTR "number "
+	ARG self
+	ARG internal_3
+	internal_4 = VCALL Main function_out_string_at_IO
+	internal_5 = GETATTR self avar
+	ARG self
+	ARG internal_5
+	internal_6 = VCALL Main function_print_at_Main
+	# Conditional
+	internal_8 = ALLOCBOOL 0
+	internal_9 = GETATTR self avar
+	ARG internal_9
+	internal_10 = VCALL A function_value_at_A
+	ARG self
+	ARG internal_10
+	internal_11 = VCALL Main function_is_even_at_Main
+	internal_8 = internal_11
+	IF internal_8 GOTO then_8792981820386
+	GOTO else_8792981820386
+	
+	then_8792981820386:
+	internal_12 = ALLOCSTR "is even!\n"
+	ARG self
+	ARG internal_12
+	internal_13 = VCALL Main function_out_string_at_IO
+	internal_7 = internal_13
+	GOTO endif_8792981820386
+	
+	else_8792981820386:
+	internal_14 = ALLOCSTR "is odd!\n"
+	ARG self
+	ARG internal_14
+	internal_15 = VCALL Main function_out_string_at_IO
+	internal_7 = internal_15
+	GOTO endif_8792981820386
+	
+	endif_8792981820386:
+	internal_16 = GETATTR self avar
+	ARG self
+	ARG internal_16
+	internal_17 = VCALL Main function_class_type_at_Main
+	ARG self
+	internal_18 = VCALL Main function_menu_at_Main
+	SETATTR self char internal_18
+	# Conditional
+	internal_20 = ALLOCBOOL 0
+	internal_21 = GETATTR self char
+	internal_22 = ALLOCSTR "a"
+	
+	ARG internal_21
+	ARG internal_22
+	internal_23 = CALL function_equal
+	internal_20 = internal_23
+	IF internal_20 GOTO then_8792981790281
+	GOTO else_8792981790281
+	
+	then_8792981790281:
+	internal_24 = ALLOCATE A # Allocate the object A
+	ARG internal_24 # Pass the instance to the constructor
+	internal_24 = VCALL A function___init___at_A # Call the constructor
+	ARG self
+	internal_25 = VCALL Main function_get_int_at_Main
+	ARG internal_24
+	ARG internal_25
+	internal_26 = VCALL A function_set_var_at_A
+	SETATTR self a_var internal_26
+	internal_27 = ALLOCATE B # Allocate the object B
+	ARG internal_27 # Pass the instance to the constructor
+	internal_27 = VCALL B function___init___at_B # Call the constructor
+	internal_28 = GETATTR self avar
+	ARG internal_28
+	internal_29 = VCALL A function_value_at_A
+	internal_30 = GETATTR self a_var
+	ARG internal_30
+	internal_31 = VCALL A function_value_at_A
+	ARG internal_27
+	ARG internal_29
+	ARG internal_31
+	internal_32 = VCALL B function_method2_at_A
+	SETATTR self avar internal_32
+	internal_19 = internal_32
+	GOTO endif_8792981790281
+	
+	else_8792981790281:
+	# Conditional
+	internal_34 = ALLOCBOOL 0
+	internal_35 = GETATTR self char
+	internal_36 = ALLOCSTR "b"
+	
+	ARG internal_35
+	ARG internal_36
+	internal_37 = CALL function_equal
+	internal_34 = internal_37
+	IF internal_34 GOTO then_8792981790275
+	GOTO else_8792981790275
+	
+	then_8792981790275:
+	internal_38 = GETATTR self avar
+	# Switch Case Algorithm Steps:
+	#  1 - Count how many ancestors has the dynamic type of the expression
+	#  2 - Create an array of the same size where to store the ancestors
+	#  3 - For each branch type, store the ancestor index that match with it, if no one match, store `count of ancestors`
+	#  4 - Find the minimum of the ancestors indexes
+	#  5 - With the minimum index, get the correct branch type
+	internal_44 = ALLOCINT 0
+	internal_42 = ALLOCBOOL 0 # Initialize the comparison result
+	
+	# ######################################################################## #
+	# Step 1 - Count how many ancestors has the dynamic type of the expression #
+	# ######################################################################## #
+	internal_40 = TYPEOF internal_38 # Get the switch expression type
+	internal_41 = internal_40 # The first ancestor will be the type itself
+	internal_39 = internal_44 # Initialize the counter
+	while_start_8792981788591:
+	internal_42 = internal_41 == 0
+	IF internal_42 GOTO while_end_8792981788591
+	internal_39 = internal_39 + 1 # Increment the counter
+	internal_41 = ANCESTOR internal_41
+	GOTO while_start_8792981788591
+	while_end_8792981788591:
+	
+	# ###################################################################### #
+	# Step 2 - Create an array of the same size where to store the ancestors #
+	# ###################################################################### #
+	internal_41 = internal_40 # The first ancestor will be the type itself
+	internal_43 = ARRAY internal_39 # Create an array of ancestors
+	internal_46 = 0 # Initialize the index with the value 0
+	foreach_start_8792981788591:
+	internal_47 = internal_46 < internal_39 # Check if the index is less than the counter
+	IF internal_47 GOTO foreach_body_8792981788591
+	GOTO foreach_end_8792981788591
+	foreach_body_8792981788591:
+	SETINDEX internal_43 internal_46 internal_41 # Set the index of the array with the ancestor type
+	internal_41 = ANCESTOR internal_41 # Get the next ancestor
+	internal_46 = internal_46 + 1 # Increment index
+	GOTO foreach_start_8792981788591
+	foreach_end_8792981788591:
+	
+	# #################################################################################################### #
+	# Step 3 - For each branch type, store the ancestor index that match with it (Simulating a double for) #
+	# #################################################################################################### #
+	internal_48 = ARRAY 3
+	internal_49 = ARRAY 3
+	internal_50 = TYPEADDR C
+	SETINDEX internal_48 0 internal_50
+	SETINDEX internal_49 0 internal_39
+	internal_51 = TYPEADDR A
+	SETINDEX internal_48 1 internal_51
+	SETINDEX internal_49 1 internal_39
+	internal_52 = TYPEADDR Object
+	SETINDEX internal_48 2 internal_52
+	SETINDEX internal_49 2 internal_39
+	
+	# ############# #
+	# Outer Foreach #
+	# ############# #
+	internal_53 = 0 # Initialize the index i of the case to 0
+	foreach_type_start_8792981788591:
+	internal_54 = internal_53 < 3 # Check if the type index is less than the count of branches
+	IF internal_54 GOTO foreach_type_body_8792981788591
+	GOTO foreach_type_end_8792981788591
+	foreach_type_body_8792981788591:
+	internal_55 = GETINDEX internal_48 internal_53 # Get the type of the i-th branch
+	
+	# ############# #
+	# Inner Foreach #
+	# ############# #
+	internal_56 = 0 # Initialize the index j of the case to 0
+	foreach_ancestor_start_8792981788591:
+	internal_57 = internal_56 < internal_39 # Check if the case index is less than the count of ancestors
+	IF internal_57 GOTO foreach_ancestor_body_8792981788591
+	GOTO foreach_ancestor_end_8792981788591
+	foreach_ancestor_body_8792981788591:
+	internal_58 = GETINDEX internal_43 internal_56 # Get the j-th ancestor type
+	internal_59 = internal_55 == internal_58 # Compare if the type of the i-th branch is equal to the j-th ancestor
+	IF internal_59 GOTO foreach_ancestor_end_8792981788591 # If the types are equal, we have a match, then we can exit
+	internal_56 = internal_56 + 1 # Increment the ancestor index
+	GOTO foreach_ancestor_start_8792981788591
+	foreach_ancestor_end_8792981788591:
+	SETINDEX internal_49 internal_53 internal_56 # Set the counter of the i-th branch equals to j
+	# #################### #
+	# End of Inner Foreach #
+	# #################### #
+	
+	internal_53 = internal_53 + 1 # Increment type index
+	GOTO foreach_type_start_8792981788591
+	foreach_type_end_8792981788591:
+	# ################# #
+	# End Outer Foreach #
+	# ################# #
+	
+	# ######################################## #
+	# Step 4 - Find the minimum ancestor index #
+	# ######################################## #
+	internal_60 = 0 # Initialize the index of the counter array to 0
+	internal_61 = 0 # Initialize the index of the lower counter to 0
+	internal_63 = internal_39 # Initialize the current minimum to `count of ancestors`
+	foreach_min_start_8792981788591:
+	internal_64 = internal_60 < 3 # Check if the index of the lower counter is less than the count of branches
+	IF internal_64 GOTO foreach_min_body_8792981788591
+	GOTO foreach_min_end_8792981788591
+	foreach_min_body_8792981788591:
+	internal_62 = GETINDEX internal_49 internal_60 # Get the nearest ancestor index of the i-th branch type
+	internal_64 = internal_62 < internal_63 # Compare if the nearest ancestor index is less than the current minimum
+	IF internal_64 GOTO update_min_8792981788591
+	GOTO foreach_min_end_8792981788591
+	update_min_8792981788591:
+	internal_63 = internal_62 # Update the current minimum
+	internal_61 = internal_60 # Update the index of the lower counter
+	update_min_end_8792981788591:
+	internal_60 = internal_60 + 1 # Increment the index of the counter array
+	GOTO foreach_min_start_8792981788591
+	foreach_min_end_8792981788591:
+	
+	# ################################################################# #
+	# Step 5 - Using the minimun ancestor index find the correct branch #
+	# ################################################################# #
+	internal_65 = ARRAY 3 # Create the bool array
+	SETINDEX internal_65 0 0 # Initialize the bool array
+	SETINDEX internal_65 1 0 # Initialize the bool array
+	SETINDEX internal_65 2 0 # Initialize the bool array
+	
+	internal_66 = internal_61 == internal_39 # Check if the minimum index is equal to the count of ancestors
+	IF internal_66 GOTO error_branch_8792981788591
+	SETINDEX internal_65 internal_61 1 # Set the bool array in the correct index to 1
+	
+	internal_67 = GETINDEX internal_65 0 # Get the bool value of the branch C
+	IF internal_67 GOTO branch_C_8792981788591 # If the bool value is 1, then we have a match
+	
+	internal_67 = GETINDEX internal_65 1 # Get the bool value of the branch A
+	IF internal_67 GOTO branch_A_8792981788591 # If the bool value is 1, then we have a match
+	
+	internal_67 = GETINDEX internal_65 2 # Get the bool value of the branch Object
+	IF internal_67 GOTO branch_Object_8792981788591 # If the bool value is 1, then we have a match
+	
+	branch_C_8792981788591:
+	ARG c
+	internal_70 = VCALL C function_value_at_A
+	ARG c
+	ARG internal_70
+	internal_71 = VCALL C function_method6_at_C
+	SETATTR self avar internal_71
+	internal_68 = internal_71 # Assign the result
+	GOTO branch_end_8792981788591
+	
+	branch_A_8792981788591:
+	ARG a
+	internal_73 = VCALL A function_value_at_A
+	ARG a
+	ARG internal_73
+	internal_74 = VCALL A function_method3_at_A
+	SETATTR self avar internal_74
+	internal_68 = internal_74 # Assign the result
+	GOTO branch_end_8792981788591
+	
+	branch_Object_8792981788591:
+	internal_76 = ALLOCSTR "Oooops\n"
+	ARG self
+	ARG internal_76
+	internal_77 = VCALL Main function_out_string_at_IO
+	ARG self
+	internal_78 = VCALL Main function_abort_at_Object
+	internal_79 = ALLOCINT 0
+	internal_68 = internal_79 # Assign the result
+	GOTO branch_end_8792981788591
+	
+	error_branch_8792981788591:
+	# Insert an error call
+	branch_end_8792981788591:
+	internal_33 = internal_68
+	GOTO endif_8792981790275
+	
+	else_8792981790275:
+	# Conditional
+	internal_81 = ALLOCBOOL 0
+	internal_82 = GETATTR self char
+	internal_83 = ALLOCSTR "c"
+	
+	ARG internal_82
+	ARG internal_83
+	internal_84 = CALL function_equal
+	internal_81 = internal_84
+	IF internal_81 GOTO then_8792981790269
+	GOTO else_8792981790269
+	
+	then_8792981790269:
+	internal_85 = ALLOCATE A # Allocate the object A
+	ARG internal_85 # Pass the instance to the constructor
+	internal_85 = VCALL A function___init___at_A # Call the constructor
+	ARG self
+	internal_86 = VCALL Main function_get_int_at_Main
+	ARG internal_85
+	ARG internal_86
+	internal_87 = VCALL A function_set_var_at_A
+	SETATTR self a_var internal_87
+	internal_88 = ALLOCATE D # Allocate the object D
+	ARG internal_88 # Pass the instance to the constructor
+	internal_88 = VCALL D function___init___at_D # Call the constructor
+	internal_89 = GETATTR self avar
+	ARG internal_89
+	internal_90 = VCALL A function_value_at_A
+	internal_91 = GETATTR self a_var
+	ARG internal_91
+	internal_92 = VCALL A function_value_at_A
+	ARG internal_88
+	ARG internal_90
+	ARG internal_92
+	internal_93 = VCALL D function_method4_at_A
+	SETATTR self avar internal_93
+	internal_80 = internal_93
+	GOTO endif_8792981790269
+	
+	else_8792981790269:
+	# Conditional
+	internal_95 = ALLOCBOOL 0
+	internal_96 = GETATTR self char
+	internal_97 = ALLOCSTR "d"
+	
+	ARG internal_96
+	ARG internal_97
+	internal_98 = CALL function_equal
+	internal_95 = internal_98
+	IF internal_95 GOTO then_8792981790263
+	GOTO else_8792981790263
+	
+	then_8792981790263:
+	internal_99 = ALLOCATE C # Allocate the object C
+	ARG internal_99 # Pass the instance to the constructor
+	internal_99 = VCALL C function___init___at_C # Call the constructor
+	internal_100 = GETATTR self avar
+	ARG internal_100
+	internal_101 = VCALL A function_value_at_A
+	ARG internal_99
+	ARG internal_101
+	internal_102 = VCALL C function_method5_at_C
+	SETATTR self avar internal_102
+	internal_94 = internal_102
+	GOTO endif_8792981790263
+	
+	else_8792981790263:
+	# Conditional
+	internal_104 = ALLOCBOOL 0
+	internal_105 = GETATTR self char
+	internal_106 = ALLOCSTR "e"
+	
+	ARG internal_105
+	ARG internal_106
+	internal_107 = CALL function_equal
+	internal_104 = internal_107
+	IF internal_104 GOTO then_8792981790257
+	GOTO else_8792981790257
+	
+	then_8792981790257:
+	internal_108 = ALLOCATE C # Allocate the object C
+	ARG internal_108 # Pass the instance to the constructor
+	internal_108 = VCALL C function___init___at_C # Call the constructor
+	internal_109 = GETATTR self avar
+	ARG internal_109
+	internal_110 = VCALL A function_value_at_A
+	ARG internal_108
+	ARG internal_110
+	internal_111 = VCALL C function_method5_at_C
+	SETATTR self avar internal_111
+	internal_103 = internal_111
+	GOTO endif_8792981790257
+	
+	else_8792981790257:
+	# Conditional
+	internal_113 = ALLOCBOOL 0
+	internal_114 = GETATTR self char
+	internal_115 = ALLOCSTR "f"
+	
+	ARG internal_114
+	ARG internal_115
+	internal_116 = CALL function_equal
+	internal_113 = internal_116
+	IF internal_113 GOTO then_8792981790251
+	GOTO else_8792981790251
+	
+	then_8792981790251:
+	internal_117 = ALLOCATE C # Allocate the object C
+	ARG internal_117 # Pass the instance to the constructor
+	internal_117 = VCALL C function___init___at_C # Call the constructor
+	internal_118 = GETATTR self avar
+	ARG internal_118
+	internal_119 = VCALL A function_value_at_A
+	ARG internal_117
+	ARG internal_119
+	internal_120 = VCALL C function_method5_at_C
+	SETATTR self avar internal_120
+	internal_112 = internal_120
+	GOTO endif_8792981790251
+	
+	else_8792981790251:
+	# Conditional
+	internal_122 = ALLOCBOOL 0
+	internal_123 = GETATTR self char
+	internal_124 = ALLOCSTR "g"
+	
+	ARG internal_123
+	ARG internal_124
+	internal_125 = CALL function_equal
+	internal_122 = internal_125
+	IF internal_122 GOTO then_8792981790245
+	GOTO else_8792981790245
+	
+	then_8792981790245:
+	# Conditional
+	internal_127 = ALLOCBOOL 0
+	internal_128 = ALLOCATE D # Allocate the object D
+	ARG internal_128 # Pass the instance to the constructor
+	internal_128 = VCALL D function___init___at_D # Call the constructor
+	internal_129 = GETATTR self avar
+	ARG internal_129
+	internal_130 = VCALL A function_value_at_A
+	ARG internal_128
+	ARG internal_130
+	internal_131 = VCALL D function_method7_at_D
+	internal_127 = internal_131
+	IF internal_127 GOTO then_8792981789148
+	GOTO else_8792981789148
+	
+	then_8792981789148:
+	internal_132 = ALLOCSTR "number "
+	ARG self
+	ARG internal_132
+	internal_133 = VCALL Main function_out_string_at_IO
+	internal_134 = GETATTR self avar
+	ARG self
+	ARG internal_134
+	internal_135 = VCALL Main function_print_at_Main
+	internal_136 = ALLOCSTR "is divisible by 3.\n"
+	ARG self
+	ARG internal_136
+	internal_137 = VCALL Main function_out_string_at_IO
+	internal_126 = internal_137
+	GOTO endif_8792981789148
+	
+	else_8792981789148:
+	internal_138 = ALLOCSTR "number "
+	ARG self
+	ARG internal_138
+	internal_139 = VCALL Main function_out_string_at_IO
+	internal_140 = GETATTR self avar
+	ARG self
+	ARG internal_140
+	internal_141 = VCALL Main function_print_at_Main
+	internal_142 = ALLOCSTR "is not divisible by 3.\n"
+	ARG self
+	ARG internal_142
+	internal_143 = VCALL Main function_out_string_at_IO
+	internal_126 = internal_143
+	GOTO endif_8792981789148
+	
+	endif_8792981789148:
+	internal_121 = internal_126
+	GOTO endif_8792981790245
+	
+	else_8792981790245:
+	# Conditional
+	internal_145 = ALLOCBOOL 0
+	internal_146 = GETATTR self char
+	internal_147 = ALLOCSTR "h"
+	
+	ARG internal_146
+	ARG internal_147
+	internal_148 = CALL function_equal
+	internal_145 = internal_148
+	IF internal_145 GOTO then_8792981790239
+	GOTO else_8792981790239
+	
+	then_8792981790239:
+	x = NULL
+	internal_150 = ALLOCATE E # Allocate the object E
+	ARG internal_150 # Pass the instance to the constructor
+	internal_150 = VCALL E function___init___at_E # Call the constructor
+	internal_151 = GETATTR self avar
+	ARG internal_151
+	internal_152 = VCALL A function_value_at_A
+	ARG internal_150
+	ARG internal_152
+	internal_153 = VCALL E function_method6_at_E
+	x = internal_153
+	internal_155 = GETATTR self avar
+	ARG internal_155
+	internal_156 = VCALL A function_value_at_A
+	ARG x
+	internal_157 = VCALL A function_value_at_A
+	internal_158 = ALLOCINT 8
+	
+	ARG internal_157
+	ARG internal_158
+	internal_159 = CALL function_mult
+	
+	ARG internal_156
+	ARG internal_159
+	internal_160 = CALL function_sub
+	r = internal_160
+	internal_161 = ALLOCSTR "number "
+	ARG self
+	ARG internal_161
+	internal_162 = VCALL Main function_out_string_at_IO
+	internal_163 = GETATTR self avar
+	ARG self
+	ARG internal_163
+	internal_164 = VCALL Main function_print_at_Main
+	internal_165 = ALLOCSTR "is equal to "
+	ARG self
+	ARG internal_165
+	internal_166 = VCALL Main function_out_string_at_IO
+	ARG self
+	ARG x
+	internal_167 = VCALL Main function_print_at_Main
+	internal_168 = ALLOCSTR "times 8 with a remainder of "
+	ARG self
+	ARG internal_168
+	internal_169 = VCALL Main function_out_string_at_IO
+	internal_171 = ALLOCATE A2I # Allocate the object A2I
+	ARG internal_171 # Pass the instance to the constructor
+	internal_171 = VCALL A2I function___init___at_A2I # Call the constructor
+	a = internal_171
+	ARG a
+	ARG r
+	internal_172 = VCALL A2I function_i2a_at_A2I
+	ARG self
+	ARG internal_172
+	internal_173 = VCALL Main function_out_string_at_IO
+	internal_174 = ALLOCSTR "\n"
+	ARG self
+	ARG internal_174
+	internal_175 = VCALL Main function_out_string_at_IO
+	SETATTR self avar x
+	internal_144 = x
+	GOTO endif_8792981790239
+	
+	else_8792981790239:
+	# Conditional
+	internal_177 = ALLOCBOOL 0
+	internal_178 = GETATTR self char
+	internal_179 = ALLOCSTR "j"
+	
+	ARG internal_178
+	ARG internal_179
+	internal_180 = CALL function_equal
+	internal_177 = internal_180
+	IF internal_177 GOTO then_8792981790233
+	GOTO else_8792981790233
+	
+	then_8792981790233:
+	internal_181 = ALLOCATE A # Allocate the object A
+	ARG internal_181 # Pass the instance to the constructor
+	internal_181 = VCALL A function___init___at_A # Call the constructor
+	SETATTR self avar internal_181
+	internal_176 = internal_181
+	GOTO endif_8792981790233
+	
+	else_8792981790233:
+	# Conditional
+	internal_183 = ALLOCBOOL 0
+	internal_184 = GETATTR self char
+	internal_185 = ALLOCSTR "q"
+	
+	ARG internal_184
+	ARG internal_185
+	internal_186 = CALL function_equal
+	internal_183 = internal_186
+	IF internal_183 GOTO then_8792981789693
+	GOTO else_8792981789693
+	
+	then_8792981789693:
+	internal_187 = ALLOCBOOL 0
+	SETATTR self flag internal_187
+	internal_182 = internal_187
+	GOTO endif_8792981789693
+	
+	else_8792981789693:
+	internal_188 = ALLOCATE A # Allocate the object A
+	ARG internal_188 # Pass the instance to the constructor
+	internal_188 = VCALL A function___init___at_A # Call the constructor
+	internal_189 = GETATTR self avar
+	ARG internal_189
+	internal_190 = VCALL A function_value_at_A
+	ARG internal_188
+	ARG internal_190
+	internal_191 = VCALL A function_method1_at_A
+	SETATTR self avar internal_191
+	internal_182 = internal_191
+	GOTO endif_8792981789693
+	
+	endif_8792981789693:
+	internal_176 = internal_182
+	GOTO endif_8792981790233
+	
+	endif_8792981790233:
+	internal_144 = internal_176
+	GOTO endif_8792981790239
+	
+	endif_8792981790239:
+	internal_121 = internal_144
+	GOTO endif_8792981790245
+	
+	endif_8792981790245:
+	internal_112 = internal_121
+	GOTO endif_8792981790251
+	
+	endif_8792981790251:
+	internal_103 = internal_112
+	GOTO endif_8792981790257
+	
+	endif_8792981790257:
+	internal_94 = internal_103
+	GOTO endif_8792981790263
+	
+	endif_8792981790263:
+	internal_80 = internal_94
+	GOTO endif_8792981790269
+	
+	endif_8792981790269:
+	internal_33 = internal_80
+	GOTO endif_8792981790275
+	
+	endif_8792981790275:
+	internal_19 = internal_33
+	GOTO endif_8792981790281
+	
+	endif_8792981790281:
+	GOTO while_start_8792981790296
+	
+	while_end_8792981790296:
+	
+	RETURN 0
+}
+function main{
+	
+
+	LOCAL internal_0
+	LOCAL internal_1
+
+	internal_0 = ALLOCATE Main
+	ARG internal_0
+	internal_0 = VCALL Main function___init___at_Main
+	
+	ARG internal_0
+	internal_1 = VCALL Main function_main_at_Main
+	
+	HALT
+}

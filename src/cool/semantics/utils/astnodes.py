@@ -1,11 +1,14 @@
 from typing import List, Union, Tuple, Optional
 
+from cool.semantics.utils.scope import Scope
+
 Feature = Union["MethodDeclarationNode", "AttrDeclarationNode"]
 
 
 class Node:
     line: int
     column: int
+    scope: Scope
 
     def set_main_position(self, line: int, col: int) -> "Node":
         self.line = line
@@ -125,6 +128,7 @@ class MethodCallNode(ExprNode):
 class AtomicNode(ExprNode):
     def __init__(self, lex: str):
         self.lex: str = lex
+        self.scope = None
 
 
 class UnaryNode(ExprNode):

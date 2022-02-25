@@ -1,5 +1,4 @@
 from typing import Any, Dict, List, Optional, Tuple
-from unittest import result
 
 import cool.code_generation.ast_cil as cil
 import cool.code_generation.ast_ecool as ecool
@@ -77,7 +76,6 @@ class ExtendedCoolTranslator:
             "__init__", [], self.current_type.name, body
         )
 
-        # Added the Type
         self.current_type.define_method("__init__", [], [], self.current_type)
 
         attrs = [
@@ -132,6 +130,8 @@ class ExtendedCoolTypeChecker:
         if scope is None:
             scope = Scope()
 
+        node.scope = scope
+
         for elem in node.declarations:
             self.visit(elem, scope.create_child())
 
@@ -139,6 +139,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
+        node.scope = scope
         self.current_type = self.context.get_type(node.id)
 
         attrs = [
@@ -164,6 +165,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node: cool.AttrDeclarationNode, scope: Scope):
+        node.scope = scope
         if node.id == "self":
             self.errors.append(err.SELF_INVALID_ATTRIBUTE_ID % (node.line, node.column))
 
@@ -195,6 +197,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.MethodDeclarationNode)
     def visit(self, node: cool.MethodDeclarationNode, scope: Scope):
+        node.scope = scope
         self.current_method = self.current_type.get_method(node.id)
         self.current_attribute = None
 
@@ -243,6 +246,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):
+        node.scope = scope
         for i, (_id, _type, _expr) in enumerate(node.declarations):
             if _id == "self":
                 line, column = node.declaration_names_positions[i]
@@ -260,13 +264,6 @@ class ExtendedCoolTypeChecker:
                 self.errors.append(err.UNDEFINED_TYPE % (line, column, _type))
                 var_static_type = ErrorType()
 
-            # if scope.is_local(_id):
-            #     feature = self.current_method or self.current_attribute
-            #     self.errors.append(
-            #         err.LOCAL_ALREADY_DEFINED
-            #         % (node.line, node.column, _id, feature.name)
-            #     )
-            # else:
             scope.define_variable(_id, var_static_type)
 
             expr_type = (
@@ -282,6 +279,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope: Scope):
+        node.scope = scope
         var_info = scope.find_variable(node.id)
 
         if var_info.name == "self":
@@ -305,6 +303,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
+        node.scope = scope
         return_type = ErrorType()
         for expr in node.expressions:
             return_type = self.visit(expr, scope)
@@ -312,6 +311,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope: Scope):
+        node.scope = scope
         if_type = self.visit(node.if_expr, scope)
         then_type = self.visit(node.then_expr, scope)
         else_type = self.visit(node.else_expr, scope)
@@ -323,6 +323,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope: Scope):
+        node.scope = scope
         condition = self.visit(node.condition, scope)
         if condition != self.context.get_type("Bool"):
             self.errors.append(
@@ -335,6 +336,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.SwitchCaseNode)
     def visit(self, node: cool.SwitchCaseNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         types = []
         visited = set()
@@ -368,6 +370,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):
+        node.scope = scope
         if node.obj is None:
             node.obj = cool.VariableNode("self")
         obj_type = self.visit(node.obj, scope)
@@ -433,22 +436,27 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.IntegerNode)
     def visit(self, node: cool.IntegerNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type("Int")
 
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type("String")
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type("Bool")
 
     @visitor.when(ecool.NullNode)
     def visit(self, node: ecool.NullNode, scope: Scope):
+        node.scope = scope
         return ecool.NullType()
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
+        node.scope = scope
         variable = scope.find_variable(node.lex)
         if variable is None:
             if self.current_attribute is not None:
@@ -464,6 +472,7 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.InstantiateNode)
     def visit(self, node: cool.InstantiateNode, scope: Scope):
+        node.scope = scope
         try:
             return (
                 self.context.get_type(node.lex)
@@ -477,59 +486,69 @@ class ExtendedCoolTypeChecker:
 
     @visitor.when(cool.NegationNode)
     def visit(self, node: cool.NegationNode, scope: Scope):
+        node.scope = scope
         return self._check_unary_operation(
             node, scope, "not", self.context.get_type("Bool")
         )
 
     @visitor.when(cool.ComplementNode)
     def visit(self, node: cool.ComplementNode, scope: Scope):
+        node.scope = scope
         return self._check_unary_operation(
             node, scope, "~", self.context.get_type("Int")
         )
 
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         return self.context.get_type("Bool")
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "+", self.context.get_type("Int")
         )
 
     @visitor.when(cool.MinusNode)
     def visit(self, node: cool.MinusNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "-", self.context.get_type("Int")
         )
 
     @visitor.when(cool.StarNode)
     def visit(self, node: cool.StarNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "*", self.context.get_type("Int")
         )
 
     @visitor.when(cool.DivNode)
     def visit(self, node: cool.DivNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "/", self.context.get_type("Int")
         )
 
     @visitor.when(cool.LessEqualNode)
     def visit(self, node: cool.LessEqualNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "<=", self.context.get_type("Bool")
         )
 
     @visitor.when(cool.LessThanNode)
     def visit(self, node: cool.LessThanNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "<", self.context.get_type("Bool")
         )
 
     @visitor.when(cool.EqualNode)
     def visit(self, node: cool.EqualNode, scope: Scope):
+        node.scope = scope
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
 
@@ -651,6 +670,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.ProgramNode)
     def visit(self, node: cool.ProgramNode, scope: Scope):
+        scope = node.scope
         default_class_names = ["Object", "IO", "Int", "String", "Bool"]
         for name in default_class_names:
             t = self.context.get_type(name)
@@ -660,6 +680,109 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
                 cil_type_node.methods.append((method.name, self.to_function_name(method.name, owner.name)))
             cil_type_node.methods.append(("__init__", self.to_function_name("__init__", t.name)))
 
+        self.current_function = self.register_function("function_add")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Adding result")
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.PlusNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+
+        self.current_function = self.register_function("function_sub")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Substracting result")
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.MinusNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+        
+        self.current_function = self.register_function("function_mult")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Multiting result")
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.StarNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+
+        self.current_function = self.register_function("function_div")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Dividing result")
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.DivNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+
+        self.current_function = self.register_function("function_xor")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Xor result")
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.XorNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+
+        self.current_function = self.register_function("function_less_than")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Less than result")
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.LessThanNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+        
+        self.current_function = self.register_function("function_less_than_or_equal")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Less than or equal result")
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.LessEqualNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+
+        self.current_function = self.register_function("function_equal")
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local("Equal result")
+        type_of_a = self.define_internal_local("Type of a")
+        type_int = self.define_internal_local("Type Int")
+        type_bool = self.define_internal_local("Type Bool")
+        type_string = self.define_internal_local("Type String")
+        type_a_equals_int = self.define_internal_local("Type of a equals int")
+        type_a_equals_bool = self.define_internal_local("Type of a equals bool")
+        type_a_equals_string = self.define_internal_local("Type of a equals string")
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.TypeOfNode(type_of_a, "a"))
+        self.register_instruction(cil.TypeAddressNode(type_int, "Int"))
+        self.register_instruction(cil.TypeAddressNode(type_bool, "Bool"))
+        self.register_instruction(cil.TypeAddressNode(type_string, "String"))
+        self.register_instruction(cil.AllocateBoolNode(type_a_equals_int, "0"))
+        self.register_instruction(cil.AllocateBoolNode(type_a_equals_bool, "0"))
+        self.register_instruction(cil.AllocateBoolNode(type_a_equals_string, "0"))
+        self.register_instruction(cil.EqualAddressNode(type_a_equals_int, type_of_a, type_int))
+        self.register_instruction(cil.EqualAddressNode(type_a_equals_bool, type_of_a, type_bool))
+        self.register_instruction(cil.EqualAddressNode(type_a_equals_string, type_of_a, type_string))
+        self.register_empty_instruction()
+        self.register_instruction(cil.GotoIfNode(type_a_equals_int, "a_is_type_int_or_bool"))
+        self.register_instruction(cil.GotoIfNode(type_a_equals_bool, "a_is_type_int_or_bool"))
+        self.register_instruction(cil.GotoIfNode(type_a_equals_string, "a_is_type_string"))       
+        self.register_instruction(cil.GotoNode("a_is_type_object"))
+        
+        self.register_empty_instruction()
+        self.register_instruction(cil.LabelNode("a_is_type_int_or_bool"))
+        self.register_instruction(cil.EqualIntNode(result, "a", "b"))
+        self.register_instruction(cil.GotoNode("end_of_equal"))
+
+        self.register_empty_instruction()
+        self.register_instruction(cil.LabelNode("a_is_type_string"))
+        self.register_instruction(cil.EqualStrNode(result, "a", "b"))
+        self.register_instruction(cil.GotoNode("end_of_equal"))
+
+        self.register_empty_instruction()
+        self.register_instruction(cil.LabelNode("a_is_type_object"))
+        self.register_instruction(cil.EqualNode(result, "a", "b"))
+        self.register_instruction(cil.GotoNode("end_of_equal"))
+        
+        self.register_empty_instruction()
+        self.register_instruction(cil.LabelNode("end_of_equal"))
+
+        self.register_instruction(cil.ReturnNode(result))
 
         self.current_function = self.register_function(self.to_function_name("__init__", "Object"))
         self.current_function.params.append(cil.ParamNode("self"))
@@ -754,6 +877,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
+        scope = node.scope
         self.current_type = self.context.get_type(node.id)
 
         type_node = self.register_type(self.current_type.name, self.current_type.parent.name)
@@ -793,10 +917,12 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node: cool.AttrDeclarationNode, scope: Scope):
+        scope = node.scope
         pass
 
     @visitor.when(cool.MethodDeclarationNode)
     def visit(self, node: cool.MethodDeclarationNode, scope: Scope):
+        scope = node.scope
         self.current_method, owner_type = self.current_type.get_method(
             node.id, get_owner=True
         )
@@ -813,8 +939,9 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):
+        scope = node.scope
         i = 0
-        for name, _, expr in node.declarations:
+        for name, type_name, expr in node.declarations:
             self.register_local(name)
 
             if expr:
@@ -822,13 +949,20 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
                 if source:
                     self.register_instruction(cil.AssignNode(name, source))
                 i += 1
-
+            else:
+                if type_name in ("Int", "Bool"):
+                    self.register_instruction(cil.AssignNode(name, "0"))
+                elif type_name == "String":
+                    self.register_instruction(cil.AllocateStrNode(name, "\"\""))
+                else:
+                    self.register_instruction(cil.AssignNode(name, "NULL"))
         source, t = self.visit(node.expr, scope.children[i])
 
         return source, t
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope: Scope):
+        scope = node.scope
         variable = scope.find_variable(node.id)
         variables = scope.find_all_variables(node.id)
         source, _ = self.visit(node.expr, scope)
@@ -839,9 +973,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
         if is_attribute:
             attr_names = [attr.name for attr, _ in self.current_type.all_attributes()]
-            # local_var = self.define_internal_local()
             self.register_instruction(cil.SetAttributeNode("self", variable.name, source, attr_names.index(variable.name)))
-            # self.register_instruction(cil.AssignNode(local_var, source))
             return source, variable.type
         else:
             self.register_instruction(cil.AssignNode(variable.name, source))
@@ -849,6 +981,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
+        scope = node.scope
         source, inst_type = None, None
         for expr in node.expressions:
             source, inst_type = self.visit(expr, scope)
@@ -856,30 +989,32 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope: Scope):
+        scope = node.scope
         self.register_instruction(cil.CommentNode("Conditional"))
 
         node_id = hash(node)
         result_address = self.define_internal_local()
         conditional_address = self.define_internal_local()
+
+        self.register_instruction(cil.AllocateBoolNode(conditional_address, "0"))
+
         source, _ = self.visit(node.if_expr, scope)
 
         self.register_instruction(cil.AssignNode(conditional_address, source))
-        self.register_instruction(
-            cil.GotoIfNode(conditional_address, f"then_{node_id}")
-        )
+        self.register_instruction(cil.GotoIfNode(conditional_address, f"then_{node_id}"))
         self.register_instruction(cil.GotoNode(f"else_{node_id}"))
 
         self.register_instruction(cil.EmptyInstruction())
         self.register_instruction(cil.LabelNode(f"then_{node_id}"))
         then_source, then_type = self.visit(node.then_expr, scope)
         self.register_instruction(cil.AssignNode(result_address, then_source))
-        self.register_instruction(cil.GotoNode(f"end_{node_id}"))
+        self.register_instruction(cil.GotoNode(f"endif_{node_id}"))
 
         self.register_instruction(cil.EmptyInstruction())
         self.register_instruction(cil.LabelNode(f"else_{node_id}"))
         else_source, else_type = self.visit(node.else_expr, scope)
         self.register_instruction(cil.AssignNode(result_address, else_source))
-        self.register_instruction(cil.GotoNode(f"end_{node_id}"))
+        self.register_instruction(cil.GotoNode(f"endif_{node_id}"))
 
         self.register_instruction(cil.EmptyInstruction())
         self.register_instruction(cil.LabelNode(f"endif_{node_id}"))
@@ -888,6 +1023,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope: Scope):
+        scope = node.scope
         # result_addres = self.define_internal_local()
         node_id = hash(node)
         conditional_address = self.define_internal_local()
@@ -908,10 +1044,11 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.register_instruction(cil.EmptyInstruction())
         self.register_instruction(cil.LabelNode(f"while_end_{node_id}"))
 
-        return 0, self.context.get_type("Object")
+        return "0", self.context.get_type("Object")
 
     @visitor.when(cool.SwitchCaseNode)
     def visit(self, node: cool.SwitchCaseNode, scope: Scope):
+        scope = node.scope
         node_id = hash(node)
         swicth_expression, _ = self.visit(node.expr, scope)
         count_of_ancestors = self.define_internal_local("Count of ancestors of the switch expression")
@@ -919,6 +1056,8 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         ancestor_type = self.define_internal_local("Ancestor type")
         step1_comparison = self.define_internal_local("Step 1 comparison result")
         array_of_ancestors = self.define_internal_local("Step 1 Array of ancestors")
+        constant_zero_int = self.define_internal_local("Integer 0 ")
+        constant_null_ptr = self.define_internal_local("Null pointer")
 
         self.register_comment("Switch Case Algorithm Steps:")
         self.register_comment(" 1 - Count how many ancestors has the dynamic type of the expression")
@@ -930,13 +1069,17 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         ############################################
         # While loop to get the count of ancestors #
         ############################################
+
+        self.register_instruction(cil.AllocateIntNode(constant_zero_int, 0))
+        self.register_instruction(cil.AllocateBoolNode(step1_comparison, "0").set_comment("Initialize the comparison result"))
+
         self.register_empty_instruction()
         self.register_comment("######################################################################## #")
         self.register_comment("Step 1 - Count how many ancestors has the dynamic type of the expression #")
         self.register_comment("######################################################################## #")
         self.register_instruction(cil.TypeOfNode(switch_expr_type, swicth_expression).set_comment("Get the switch expression type"))
         self.register_instruction(cil.AssignNode(ancestor_type, switch_expr_type).set_comment("The first ancestor will be the type itself"))
-        self.register_instruction(cil.AssignNode(count_of_ancestors, 0).set_comment("Initialize the counter"))
+        self.register_instruction(cil.AssignNode(count_of_ancestors, constant_zero_int).set_comment("Initialize the counter"))
         self.register_instruction(cil.LabelNode(f"while_start_{node_id}"))
         self.register_instruction(cil.EqualNode(step1_comparison, ancestor_type, "0"))
         self.register_instruction(cil.GotoIfNode(step1_comparison, f"while_end_{node_id}"))
@@ -989,7 +1132,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.register_instruction(cil.ArrayNode(nearest_ancestor_array, f"{len(types)}"))
         for i, t in enumerate(types):
             x = self.define_internal_local(f"Address of the type {t.name}")
-            self.register_instruction(cil.TypeDirectionNode(x, t.name))
+            self.register_instruction(cil.TypeAddressNode(x, t.name))
             self.register_instruction(cil.SetIndexNode(type_branch_array, f"{i}", x))
             self.register_instruction(cil.SetIndexNode(nearest_ancestor_array, f"{i}", count_of_ancestors))
         self.register_empty_instruction()
@@ -1115,6 +1258,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):
+        scope = node.scope
         obj_source, obj_type = self.visit(node.obj, scope)
 
         args_sources = []
@@ -1137,24 +1281,33 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.IntegerNode)
     def visit(self, node: cool.IntegerNode, scope: Scope):
-        return node.lex, self.context.get_type("Int")
+        scope = node.scope
+        local_int = self.define_internal_local(f"Integer {node.lex}")
+        self.register_instruction(cil.AllocateIntNode(local_int, node.lex))
+        return local_int, self.context.get_type("Int")
 
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope: Scope):
+        scope = node.scope
         local_str_var = self.define_internal_local(f"String {node.lex}")
         self.register_instruction(cil.AllocateStrNode(local_str_var, node.lex))
         return local_str_var, self.context.get_type("String")
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
-        return ("1" if node.lex == "true" else "0"), self.context.get_type("Bool")
+        scope = node.scope
+        local_bool_var = self.define_internal_local(f"Boolean {node.lex}")
+        self.register_instruction(cil.AllocateBoolNode(local_bool_var, ("1" if node.lex == "true" else "0")))
+        return local_bool_var, self.context.get_type("Bool")
 
     @visitor.when(ecool.NullNode)
     def visit(self, node: ecool.NullNode, scope: Scope):
+        scope = node.scope
         return node.lex, ecool.NullType
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
+        scope = node.scope
         variable = scope.find_variable(node.lex)
         variables = scope.find_all_variables(node.lex)
 
@@ -1171,6 +1324,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.InstantiateNode)
     def visit(self, node: cool.InstantiateNode, scope: Scope):
+        scope = node.scope
         local = self.define_internal_local(f"Store an instance of the class {node.lex}")
         self.register_instruction(cil.AllocateNode(node.lex, local).set_comment(f"Allocate the object {node.lex}"))
         self.register_instruction(cil.ArgNode(local, 0, 1).set_comment("Pass the instance to the constructor"))
@@ -1179,59 +1333,76 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
     @visitor.when(cool.NegationNode)
     def visit(self, node: cool.NegationNode, scope: Scope):
+        scope = node.scope
         source, _ = self.visit(node.expr, scope)
+        local_int = self.define_internal_local("Integer 1")
         result = self.define_internal_local(f"Store the negation of {source}")
-        self.register_instruction(cil.XorNode(result, source, "1").set_comment(f"not {source}"))
+        self.register_instruction(cil.AllocateIntNode(local_int, "1"))
+        self.register_instruction(cil.XorNode(result, source, local_int).set_comment(f"not {source}"))
         return result, self.context.get_type("Bool")
 
     @visitor.when(cool.ComplementNode)
     def visit(self, node: cool.ComplementNode, scope: Scope):
+        scope = node.scope
         source, _ = self.visit(node.expr, scope)
+        local_int_0 = self.define_internal_local("Integer 1")
+        local_int_1 = self.define_internal_local(f"Integer {2**32 - 1}")
         result = self.define_internal_local(f"Store the complement a2 of {source}")
-        self.register_instruction(cil.XorNode(result, source, f"{2**32 - 1}").set_comment(f"Getting the complement a1 of {source}"))
-        self.register_instruction(cil.PlusNode(result, result, "1").set_comment(f"Adding 1 to the complement a1 we get the complement a2 of {source}")) 
+        self.register_instruction(cil.XorNode(result, source,local_int_1 ).set_comment(f"Getting the complement a1 of {source}"))
+        self.register_instruction(cil.PlusNode(result, result, local_int_0).set_comment(f"Adding 1 to the complement a1 we get the complement a2 of {source}")) 
         return result, self.context.get_type("Int")
     
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
+        scope = node.scope
         source, _ = self.visit(node.expr, scope)
-        result = self.define_internal_local(f"Store if {source} is null")
-        self.register_instruction(cil.EqualNode(result, source, "null"))
+        result = self.define_internal_local(f"Store if {source} is NULL")
+        self.register_instruction(cil.EqualNode(result, source, "0"))
         return result, self.context.get_type("Bool")
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope: Scope):
-        return self.visit_arith_node(node, scope, cil.PlusNode)
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "function_add", "Int")  
 
     @visitor.when(cool.MinusNode)
     def visit(self, node: cool.MinusNode, scope: Scope):
-        return self.visit_arith_node(node, scope, cil.MinusNode)
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "function_sub", "Int")  
 
     @visitor.when(cool.StarNode)
     def visit(self, node: cool.StarNode, scope: Scope):
-        return self.visit_arith_node(node, scope, cil.StarNode)
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "function_mult", "Int")  
 
     @visitor.when(cool.DivNode)
     def visit(self, node: cool.DivNode, scope: Scope):
-        return self.visit_arith_node(node, scope, cil.DivNode)
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "function_div", "Int")  
 
     @visitor.when(cool.LessEqualNode)
     def visit(self, node: cool.LessEqualNode, scope: Scope):
-        return self.visit_arith_node(node, scope, cil.LessEqualNode)
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "function_less_than_or_equal", "Bool")  
 
     @visitor.when(cool.LessThanNode)
     def visit(self, node: cool.LessThanNode, scope: Scope):
-        return self.visit_arith_node(node, scope, cil.LessThanNode)
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "function_less_than", "Bool")  
 
     @visitor.when(cool.EqualNode)
     def visit(self, node: cool.EqualNode, scope: Scope):
-        return self.visit_arith_node(node, scope, cil.EqualNode)
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "function_equal", "Bool")       
 
     def visit_arith_node(
-        self, node: cool.BinaryNode, scope: Scope, cil_type: type
+        self, node: cool.BinaryNode, scope: Scope, operation_function: str, return_type_name: str = "Int"
     ) -> Tuple[str, Type]:
         left, _ = self.visit(node.left, scope)
         right, _ = self.visit(node.right, scope)
-        dest = self.define_internal_local()
-        self.register_instruction(cil_type(dest, left, right))
-        return dest, self.context.get_type("Int")
+        dest = self.define_internal_local(f"Store the result of the operation {operation_function}")
+        self.register_empty_instruction()
+        self.register_instruction(cil.ArgNode(left, 0, 2))
+        self.register_instruction(cil.ArgNode(right, 1, 2))
+        self.register_instruction(cil.StaticCallNode(operation_function, dest, 2))
+        return dest, self.context.get_type(return_type_name)

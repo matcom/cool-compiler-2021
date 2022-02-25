@@ -31,6 +31,8 @@ class TypeChecker:
         if scope is None:
             scope = Scope()
 
+        node.scope = scope
+
         for elem in node.declarations:
             self.visit(elem, scope.create_child())
 
@@ -38,6 +40,7 @@ class TypeChecker:
 
     @visitor.when(cool.ClassDeclarationNode)
     def visit(self, node: cool.ClassDeclarationNode, scope: Scope):
+        node.scope = scope
         self.current_type = self.context.get_type(node.id)
 
         attrs = [
@@ -63,6 +66,7 @@ class TypeChecker:
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node: cool.AttrDeclarationNode, scope: Scope):
+        node.scope = scope
         if node.id == "self":
             self.errors.append(err.SELF_INVALID_ATTRIBUTE_ID % (node.line, node.column))
 
@@ -94,6 +98,7 @@ class TypeChecker:
 
     @visitor.when(cool.MethodDeclarationNode)
     def visit(self, node: cool.MethodDeclarationNode, scope: Scope):
+        node.scope = scope
         self.current_method = self.current_type.get_method(node.id)
         self.current_attribute = None
 
@@ -142,6 +147,7 @@ class TypeChecker:
 
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):
+        node.scope = scope
         for i, (_id, _type, _expr) in enumerate(node.declarations):
             if _id == "self":
                 line, column = node.declaration_names_positions[i]
@@ -159,13 +165,6 @@ class TypeChecker:
                 self.errors.append(err.UNDEFINED_TYPE % (line, column, _type))
                 var_static_type = ErrorType()
 
-            # if scope.is_local(_id):
-            #     feature = self.current_method or self.current_attribute
-            #     self.errors.append(
-            #         err.LOCAL_ALREADY_DEFINED
-            #         % (node.line, node.column, _id, feature.name)
-            #     )
-            # else:
             scope.define_variable(_id, var_static_type)
 
             expr_type = (
@@ -181,6 +180,7 @@ class TypeChecker:
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope: Scope):
+        node.scope = scope
         var_info = scope.find_variable(node.id)
 
         if var_info.name == "self":
@@ -204,6 +204,7 @@ class TypeChecker:
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
+        node.scope = scope
         return_type = ErrorType()
         for expr in node.expressions:
             return_type = self.visit(expr, scope)
@@ -211,6 +212,7 @@ class TypeChecker:
 
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope: Scope):
+        node.scope = scope
         if_type = self.visit(node.if_expr, scope)
         then_type = self.visit(node.then_expr, scope)
         else_type = self.visit(node.else_expr, scope)
@@ -222,6 +224,7 @@ class TypeChecker:
 
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope: Scope):
+        node.scope = scope
         condition = self.visit(node.condition, scope)
         if condition != self.context.get_type("Bool"):
             self.errors.append(
@@ -234,6 +237,7 @@ class TypeChecker:
 
     @visitor.when(cool.SwitchCaseNode)
     def visit(self, node: cool.SwitchCaseNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         types = []
         visited = set()
@@ -267,6 +271,7 @@ class TypeChecker:
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):
+        node.scope = scope
         if node.obj is None:
             node.obj = cool.VariableNode("self")
         obj_type = self.visit(node.obj, scope)
@@ -332,18 +337,22 @@ class TypeChecker:
 
     @visitor.when(cool.IntegerNode)
     def visit(self, node: cool.IntegerNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type("Int")
 
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type("String")
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type("Bool")
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
+        node.scope = scope
         variable = scope.find_variable(node.lex)
         if variable is None:
             if self.current_attribute is not None:
@@ -359,6 +368,7 @@ class TypeChecker:
 
     @visitor.when(cool.InstantiateNode)
     def visit(self, node: cool.InstantiateNode, scope: Scope):
+        node.scope = scope
         try:
             return (
                 self.context.get_type(node.lex)
@@ -372,59 +382,69 @@ class TypeChecker:
 
     @visitor.when(cool.NegationNode)
     def visit(self, node: cool.NegationNode, scope: Scope):
+        node.scope = scope
         return self._check_unary_operation(
             node, scope, "not", self.context.get_type("Bool")
         )
 
     @visitor.when(cool.ComplementNode)
     def visit(self, node: cool.ComplementNode, scope: Scope):
+        node.scope = scope
         return self._check_unary_operation(
             node, scope, "~", self.context.get_type("Int")
         )
 
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         return self.context.get_type("Bool")
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "+", self.context.get_type("Int")
         )
 
     @visitor.when(cool.MinusNode)
     def visit(self, node: cool.MinusNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "-", self.context.get_type("Int")
         )
 
     @visitor.when(cool.StarNode)
     def visit(self, node: cool.StarNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "*", self.context.get_type("Int")
         )
 
     @visitor.when(cool.DivNode)
     def visit(self, node: cool.DivNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "/", self.context.get_type("Int")
         )
 
     @visitor.when(cool.LessEqualNode)
     def visit(self, node: cool.LessEqualNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "<=", self.context.get_type("Bool")
         )
 
     @visitor.when(cool.LessThanNode)
     def visit(self, node: cool.LessThanNode, scope: Scope):
+        node.scope = scope
         return self._check_int_binary_operation(
             node, scope, "<", self.context.get_type("Bool")
         )
 
     @visitor.when(cool.EqualNode)
     def visit(self, node: cool.EqualNode, scope: Scope):
+        node.scope = scope
         left_type = self.visit(node.left, scope)
         right_type = self.visit(node.right, scope)
 

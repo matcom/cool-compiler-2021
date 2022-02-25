@@ -52,17 +52,10 @@ class Point3D inherits Point {
 };
 *)
 
-class Main {
-    number: Int <- 0;
-    data: Int <- 2;
-
+class Main inherits IO {
     main() : Object {
-        -- let s: String <- "Hello, World!\n", x: Int <- 0 in {
-        --     x <- number + data;
-        --     self.out_string(s);
-        -- }
-
-        (new IO).out_string("Hello, World!\n")
+        -- out_string("Hello, World!\n")
+        out_int((2 + 2) * 2)
     };
 
 --     plus(a: Int, b: Int) : Int {

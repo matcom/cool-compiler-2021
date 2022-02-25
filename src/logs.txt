@@ -1,0 +1,253 @@
+r
+{
+    self: Main
+    children (6): [
+        {
+            children (0): [
+
+            ]
+        },
+        {
+            children (0): [
+
+            ]
+        },
+        {
+            children (0): [
+
+            ]
+        },
+        {
+            children (0): [
+
+            ]
+        },
+        {
+            children (2): [
+                {
+                    children (0): [
+
+                    ]
+                },
+                {
+                    children (0): [
+
+                    ]
+                },
+
+            ]
+        },
+        {
+            children (2): [
+                {
+                    children (3): [
+                        {
+                            c: C
+                            children (1): [
+                                {
+                                    children (0): [
+
+                                    ]
+                                },
+
+                            ]
+                        },
+                        {
+                            a: A
+                            children (1): [
+                                {
+                                    children (0): [
+
+                                    ]
+                                },
+
+                            ]
+                        },
+                        {
+                            o: Object
+                            children (0): [
+
+                            ]
+                        },
+
+                    ]
+                },
+                {
+                    children (2): [
+                        {
+                            children (2): [
+                                {
+                                    children (0): [
+
+                                    ]
+                                },
+                                {
+                                    children (0): [
+
+                                    ]
+                                },
+
+                            ]
+                        },
+                        {
+                            children (2): [
+                                {
+                                    children (1): [
+                                        {
+                                            children (0): [
+
+                                            ]
+                                        },
+
+                                    ]
+                                },
+                                {
+                                    children (2): [
+                                        {
+                                            children (1): [
+                                                {
+                                                    children (0): [
+
+                                                    ]
+                                                },
+
+                                            ]
+                                        },
+                                        {
+                                            children (2): [
+                                                {
+                                                    children (1): [
+                                                        {
+                                                            children (0): [
+
+                                                            ]
+                                                        },
+
+                                                    ]
+                                                },
+                                                {
+                                                    children (2): [
+                                                        {
+                                                            children (2): [
+                                                                {
+                                                                    children (0): [
+
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    children (0): [
+
+                                                                    ]
+                                                                },
+
+                                                            ]
+                                                        },
+                                                        {
+                                                            children (2): [
+                                                                {
+                                                                    x: A
+                                                                    children (1): [
+                                                                        {
+                                                                            r: Int
+                                                                            children (4): [
+                                                                                {
+                                                                                    children (0): [
+
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    children (0): [
+
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    a: A2I
+                                                                                    children (2): [
+                                                                                        {
+                                                                                            children (0): [
+
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            children (0): [
+
+                                                                                            ]
+                                                                                        },
+
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    children (0): [
+
+                                                                                    ]
+                                                                                },
+
+                                                                            ]
+                                                                        },
+
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    children (2): [
+                                                                        {
+                                                                            children (1): [
+                                                                                {
+                                                                                    children (0): [
+
+                                                                                    ]
+                                                                                },
+
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            children (2): [
+                                                                                {
+                                                                                    children (1): [
+                                                                                        {
+                                                                                            children (0): [
+
+                                                                                            ]
+                                                                                        },
+
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    children (1): [
+                                                                                        {
+                                                                                            children (0): [
+
+                                                                                            ]
+                                                                                        },
+
+                                                                                    ]
+                                                                                },
+
+                                                                            ]
+                                                                        },
+
+                                                                    ]
+                                                                },
+
+                                                            ]
+                                                        },
+
+                                                    ]
+                                                },
+
+                                            ]
+                                        },
+
+                                    ]
+                                },
+
+                            ]
+                        },
+
+                    ]
+                },
+
+            ]
+        },
+
+    ]
+}
