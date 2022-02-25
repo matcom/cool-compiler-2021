@@ -172,7 +172,7 @@ class MIPSBuilder:
     def visit(self,node):
         self.memo.save()
         reg = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadInmediate,reg,node.name)
+        self.register_instruction(mips.LoadAddress,reg,node.name)
         self.register_instruction(mips.StoreWordNode,reg,0,sp)
         
         self.register_instruction(mips.AddiNode,sp,sp,-4)
@@ -193,7 +193,20 @@ class MIPSBuilder:
         
     @visitor.when(cil.ArgNode)                                          
     def visit(self,node):
-        pass                    
+        self.memo.save()
+        reg = self.memo.get_unused_reg()
+        
+        dir = self.get_dir_in_memo(node.name)
+        self.register_instruction(mips.LoadWordNode,reg,dir,fp)
+        
+        self.register_instruction(mips.StoreWordNode,reg,0,sp)
+        
+        self.register_instruction(mips.AddiNode,sp,sp,4)
+        
+        self.memo.clean()
+        
+        
+                            
         
         
     @visitor.when(cil.FunctionNode)
@@ -204,7 +217,10 @@ class MIPSBuilder:
         self.register_push(ra)
 
         self.register_instruction(mips.CommentNode,"Saving $fp")
-        self.register_instruction(mips.MoveNode, fp, sp)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+        self.register_instruction(mips.MoveNode, fp, sp)
+        
+        self.register_comment("Reserving space for locals")
+        self.register_instruction(mips.AddiNode, sp, sp, -4*len(node.localvars))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 
         self.register_instruction(mips.CommentNode("Executing instructions"))
         for inst in node.instructions:
@@ -251,12 +267,17 @@ class MIPSBuilder:
         pass
             
     @visitor.when(cil.GotoNode)
-    def visit(self):
+    def visit(self,node):
+        self.register_instruction(mips.UnconditionalJumpNode,node.label)
+        
+    @visitor.when(cil.GotoIfNode)
+    def visit(self,node):
         pass
     
     @visitor.when(cil.AllocateNode)
     def visit(self,node):
         _size = (len(self.types[node.type].attributes)+1)*4
+        self.register_instruction(mips.LoadInmediate,v0,9)
         self.register_instruction(mips.LoadInmediate,a0,_size)
         self.register_instruction(mips.SyscallNode)
         
@@ -266,5 +287,70 @@ class MIPSBuilder:
         
         self.memo.clean()
         
+    
+    
+    
+    @visitor.when(cil.AssignNode)
+    def visit(self,node):
+        self.save()
         
-                                
+        reg = self.memo.get_unused_reg()
+        
+        source_dir = self.get_dir_in_memo(node.source)
+        dest_dir = self.get_dir_in_memo(node.dest)
+        
+        self.register_instruction(mips.LoadWordNode,reg,source_dir,fp)
+        
+        self.register_instruction(mips.StoreWordNode,reg,dest_dir,fp)
+
+        self.memo.clean()        
+        
+        
+        
+    
+    @visitor.when(cil.PlusNode)
+    def visit(self,node):
+        self.save()
+        
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+        reg3 = self.memo.get_unused_reg()
+        
+        self.register_instruction(mips.LoadInmediate,reg1,node.left)
+        self.register_instruction(mips.LoadInmediate,reg2,node.right)
+        
+        self.register_instruction(mips.AddNode,reg3,reg1,reg2)
+        
+        dir = self.get_dir_in_memo(node.dest)
+        self.register_instruction(mips.StoreWordNode,reg3,dir,fp)
+        
+        self.memo.clean()
+    
+    @visitor.when(cil.MinusNode)
+    def visit(self,node):
+        self.save()
+        
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+        reg3 = self.memo.get_unused_reg()
+        
+        self.register_instruction(mips.LoadInmediate,reg1,node.left)
+        self.register_instruction(mips.LoadInmediate,reg2,node.right)
+        
+        self.register_instruction(mips.SubNode,reg3,reg1,reg2)
+        
+        dir = self.get_dir_in_memo(node.dest)
+        self.register_instruction(mips.StoreWordNode,reg3,dir,fp)
+        
+        self.memo.clean()
+        
+    @visitor.when(cil.TypeOfNode)
+    def visit(self,node):
+        self.memo.save()
+        
+        reg1 = self.get_dir_in_memo()
+        reg2 = self.get_dir_in_memo()
+        
+        
+        
+    

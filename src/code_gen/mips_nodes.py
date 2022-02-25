@@ -82,6 +82,7 @@ class ArithAnfLogicNode(MIPSInstructionNode):
         self.destination = destination
         self.left = left
         self.right = right
+        
 class AddNode(ArithAnfLogicNode):
     def __str__(self):
         return f"add {self.destination}, {self.left}, {self.right}"        
