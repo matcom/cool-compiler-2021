@@ -3,13 +3,11 @@ import visitors.visitor as visitor
 from cil_ast.cil_ast import *
 
 class CiltoMipsVisitor:
-    def __init__(self, context, class_function_lists, class_attributes_lists, class_parents_lists):
+    def __init__(self, context):
         self.dottypes = []
         self.dotdata =[]
         self.dotcode =[]
         self.context = context
-        self.attrs = class_attributes_lists
-        self.class_functions_list = class_function_lists
         self.code = []
         self.data = []
         self.label_id = 0
@@ -34,6 +32,9 @@ class CiltoMipsVisitor:
         self.dottypes = node.dottypes
         self.dotdata = node.dotdata
         self.dotcode = node.dotcode
+        self.attrs = node.cattrs
+        self.functions = node.dfunc
+        self.parents = node.dparents
 
         self.write_data('.data')  # initialize the .data segment
         self.write_data(f'p_error: {dt.asciiz} "Aborting from String"')
@@ -240,7 +241,7 @@ class CiltoMipsVisitor:
         
         self.write_code('{} {}, {}, {}'.format(o.addi, r.s1, r.zero, r.v0))
         
-        count = len(self.class_functions_list[node.type])
+        count = len(self.functions[node.type])
         sizeof_dispatch = count*4
         self.write_code('{} {}, {}, {}'.format(o.addiu, r.a0, r.zero, sizeof_dispatch))
         self.write_code('{} {}, 9'. format(o.li, r.v0))
@@ -248,7 +249,7 @@ class CiltoMipsVisitor:
         
         self.write_code('{} {}, {}, {}'.format(o.addu, r.s0, r.zero, r.v0))
         for i in range(count):
-            self.write_code('{} {}, {}'.format(o.la, r.a0, self.class_functions_list[node.type][i]))
+            self.write_code('{} {}, {}'.format(o.la, r.a0, self.functions[node.type][i]))
             self.write_code('{} {}, {}({})'.format(o.sw, r.a0, 4*i, r.s0))
         self.add('{} {}, 4({})'.format(o.sw, r.s0, r.s1))
 
