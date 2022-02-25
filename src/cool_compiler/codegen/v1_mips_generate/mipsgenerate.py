@@ -10,7 +10,8 @@ class MipsGenerate:
             "IO_out_string": ASTR.Out_String,
             "IO_in_int":ASTR.In_Int,
             "IO_in_string":ASTR.In_String,
-            "IO_out_int":ASTR.Out_Int
+            "IO_out_int":ASTR.Out_Int,
+            "String_length":ASTR.Length
         }
 
     @visitor.on('node')
