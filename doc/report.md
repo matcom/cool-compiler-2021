@@ -145,5 +145,5 @@ redefinir, en el caso particular del compilador de cool se redefinio de la maner
 
 Aprovechando la caracteristica de que la gramatica se encuentra recogida en una clase, se desarrollaro algunas herramientas
 para realizar la inversion de la dependencia entre la gramatica y el ast, mediante el patrón **Factory**. Desde el módulo
-parser se definio un enum con los nombres de los nodos que la clase parser le pasara a la fatoria de nodos, además de un
-decorador que enlace un metodo con el nombre del nodo que el mismo creará
+parser se definió un enum con los nombres de los nodos que la clase parser le pasará a la fatoria de nodos, además de un
+decorador que enlace un método con el nombre del nodo que el mismo creará

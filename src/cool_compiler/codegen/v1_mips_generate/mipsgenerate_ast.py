@@ -275,36 +275,42 @@ class Out_String:
        return  """
 IO_out_string:
 
-lw $t1 , 4($sp)
+lw $t1 , 4($sp)  #Guardando self
 lw $t0, 0($sp)   #Guarda en $t0 la direccion del string
 li $v0, 4
 lw $a0, 4($t0) #Pintando la propiedad value del string
 syscall
 addi $sp, $sp, 8
-move $s0, $t1
+move $s0, $t1  #return self
 jr $ra"""
 
 class Out_Int:
     def __str__(self) -> str:
        return """
 IO_out_int:
-lw $t1 , 4($sp)
+lw $t1 , 4($sp)  #guarda self
 lw $t0, 0($sp)   #Guarda en $t0 la direccion del int
 li $v0, 1
 lw $a0, 4($t0)  #Pintando la propiedad value del int
 syscall
 addi $sp, $sp, 8
-move $s0, $t1
+move $s0, $t1 #return self
 jr $ra"""
 
 class In_String:
     def __str__(self) -> str:
        return """
 IO_in_string:
+
+li $a0, 1000   # reserva memoria para el string
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo string
+
+move $a0, $v0
 li $v0, 8
-li $a1 , 10000
+li $a1 , 1000
 syscall
-move $t6 $v0
+move $s0 $a0  # Restun string
 
 #Allocate a una class String puntero en sp + 12
 #atributo type_name en puntero + 0
@@ -314,7 +320,7 @@ li $v0, 9
 syscall         # En $v0 la instancia del nuevo string
 la $t4, String
 sw $t4, 0($v0)   # Asigna el tipo String al string
-sw $t6, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
+sw $s0, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
 move $s0 , $v0
 addi $sp, $sp, 4
@@ -370,62 +376,69 @@ jr $ra
 ################################# Native Func Str ################################################
 class Length:
     def __str__(self) -> str:
-       return """ 
-       
-    String_length:
-    lw $t4 , ($sp)   #self
-    li $t0 , 0       #contador
-    lw $s2 , 4($t4)  # propiedad value
-
-        loop:
-        lb $s0 , ($s2)
-        beq $s0 , $zero, END
-        add $t0 , $t0 ,1
-        add $s2,$s2,4
-        j loop
-    
-
-    END:
-        move $s0 , $t0
-        addi $sp, $sp, 4
-        jr $ra
        return """        
+String_length:
+lw $t4 , ($sp)   #self
+li $t0 , 0       #contador
+lw $s2 , 4($t4)  # propiedad value
+
+loop_len:
+lb $s0 , ($s2)  # Guarda la primara letra
+beq $s0 , $zero, end_len  
+add $t0 , $t0, 1 # Suma al contador 
+add $s2, $s2, 1  # Mueve el punteron del string en 1 
+j loop_len
+
+end_len:
+#Allocate a una class Int puntero en sp + 12
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo Int
+la $t4, Int
+sw $t4, 0($v0)   # Asigna el tipo Int al int
+sw $t0, 4($v0)  # Asigan el nombre de la clase a la propiededa value del int
+
+move $s0 , $v0
+addi $sp, $sp, 4
+jr $ra"""        
 
 
 class Concat:
     def __str__(self) -> str:
        return """ 
-    Concat:
-    lw $t2 , 4($sp)   #self
-    lw $t1 , 0($sp)   # str1
-    lw $s2 ,4($t2)    # propiedad value
-    lw $s1 ,4($t1)    # propiedad value
+Concat:
+lw $t2 , 4($sp)    #self
+lw $t1 , 0($sp)    # str1
+lw $s2 , 4($t2)    # propiedad value de self
+lw $s1 , 4($t1)    # propiedad value de str1
 
-    li $v0 , 9
-    li $a0 , 100      # reservar memoria pal proximo string
-    syscall
-    move $s3 , $v0
+li $v0 , 9
+li $a0 , 100      # reservar memoria pal proximo string
+syscall
+move $s3 , $v0
 
-    loop_str1:
-        lb $t0 , ($s1)
-        beq  $t0 , $zero, loop_str2
-        add $s1 , $s1 ,1
-        sb $t0,($s3)
-        add $s3 , $s3 , 1
-        j loop_str1
+loop_str1:
+    lb $t0 , ($s1)
+    beq  $t0 , $zero, loop_str2
+    add $s1 , $s1 ,1
+    sb $t0,($s3)
+    add $s3 , $s3 , 1
+    j loop_str1
 
-    loop_str2:
-        lb $t0 , ($s2)
-        beq  $t0 , $zero, ENDConcat
-        add $s2 , $s2 ,1
-        sb $t0,($s3)
-        add $s3 , $s3 , 1
-        j loop_str1
+loop_str2:
+    lb $t0 , ($s2)
+    beq  $t0 , $zero, ENDConcat
+    add $s2 , $s2 ,1
+    sb $t0,($s3)
+    add $s3 , $s3 , 1
+    j loop_str1
 
-    ENDConcat:
-        move $s0, $v0
-        addi $sp, $sp, 8
-        jr $ra
+ENDConcat:
+    move $s0, $v0
+    addi $sp, $sp, 8
+    jr $ra
 """
 
 class SubStr:

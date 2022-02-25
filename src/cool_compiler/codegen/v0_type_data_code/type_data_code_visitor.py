@@ -494,11 +494,12 @@ class CILGenerate:
         null = self.currentFunc.local_push('void@_null', scope)
         unary_list = self.visit(node.item, scope)
         unary_list[-1].set_value(op_1)
-
+        op_result = self.currentFunc.local_push(f'void@_result', scope)
         return (
-            [ASTR.Load(null, "_______null_______")] 
+            [ASTR.Load(null, "_______null_______"), ASTR.Comment("void check")] 
             + unary_list
-            + [ASTR.CmpInt(super_value, null, op_1)]
+            + [ASTR.CmpInt(op_result, null, op_1)]
+            + self.value_def(op_result, 'Bool', scope)
         )
     
     @visitor.when(AST.Id)
