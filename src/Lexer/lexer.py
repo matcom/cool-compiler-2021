@@ -348,7 +348,7 @@ class CoolLexer:
         error_text = t.value[0]
         t.lexer.skip(1)
         t.type = "ERROR"
-        t.value = f"({line},{column}) - LexicographicError: \"{error_text}\""
+        t.value = f"({line}, {column}) - LexicographicError: \"{error_text}\""
         self.add_line_column(t)
         return t
      

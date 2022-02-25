@@ -8,7 +8,7 @@ class LR1Parser(ShiftReduceParser):
 
         automaton = self.automaton = build_LR1_automaton(G)
         for i, node in enumerate(automaton):
-            if self.verbose: print(i, '\t', '\n\t '.join(str(x) for x in node.state), '\n')
+            # if self.verbose: print(i, '\t', '\n\t '.join(str(x) for x in node.state), '\n')
             node.idx = i
             node.tag = f'I{i}'
 

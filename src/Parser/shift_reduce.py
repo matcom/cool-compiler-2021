@@ -22,7 +22,7 @@ class ShiftReduceParser:
         while True:
             state = stack[-1]
             lookahead = w[cursor].token_type
-            if self.verbose: print(stack, w[cursor:])
+            # if self.verbose: print(stack, w[cursor:])
 
             # Your code here!!! (Detect error)
             if state not in self.action or lookahead not in self.action[state]:
