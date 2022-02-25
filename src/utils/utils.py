@@ -8,3 +8,10 @@ def find_last_line(input_text):
         return 0
     line_no = input_text.count("\n")
     return line_no
+
+
+def display_errors(error_list):
+    if error_list:
+        for e in error_list:
+            print(e)
+        exit(1)
