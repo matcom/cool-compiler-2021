@@ -176,13 +176,18 @@ class Abort(OperationNode):
         return "abort"
 
 
-class PrintOpNode(OperationNode):
+class PrintStrNode(OperationNode):
     def __init__(self, idx: str) -> None:
         super().__init__()
         self.id = idx
 
     def __str__(self) -> str:
-        return f"print {self.id}"
+        return f"print_str {self.id}"
+
+
+class PrintIntNode(PrintStrNode):
+    def __str__(self) -> str:
+        return f"print_int {self.id}"
 
 
 class ReturnOpNode(OperationNode):
@@ -301,7 +306,11 @@ class ComparisonOpNode(BinaryOpNode):
     pass
 
 
-class EqualOpNode(ComparisonOpNode):
+class EqualIntNode(ComparisonOpNode):
+    pass
+
+
+class EqualStrNode(ComparisonOpNode):
     pass
 
 
