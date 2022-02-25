@@ -67,6 +67,14 @@ class Type:
             raise SemanticError(f"Parent type is already set for {self.name}.")
         self.parent = parent
 
+    def has_attr(self, name: str):
+        try:
+            attr_name = self.get_attribute(name)
+        except:
+            return False
+        else:
+            return True
+
     def get_attribute(self, name: str):
         try:
             return next(attr for attr in self.attributes if attr.name == name)
@@ -120,6 +128,16 @@ class Type:
         method = Method(name, param_names, param_types, return_type)
         self.methods.append(method)
         return method
+
+    def get_all_attributes(self):
+        all_attributes = self.parent and self.parent.get_all_attributes() or []
+        all_attributes += [(self.name, attr) for attr in self.attributes]
+        return all_attributes
+
+    def get_all_methods(self):
+        all_methods = self.parent and self.parent.get_all_methods() or []
+        all_methods += [(self.name, method) for method in self.methods]
+        return all_methods
 
     def all_attributes(self, clean=True):
         plain = (
@@ -253,17 +271,17 @@ class Context:
         self.graph['Bool'] = []
 
     def create_type(self, node):
-        if node.name in self.types:
+        if node.id in self.types:
             raise SemanticError(
-                f'Type with the same name ({node.name}) already in context.')
-        typex = self.types[node.name] = Type(node.name)
-        self.classes[node.name] = node
-        if not self.graph.__contains__(node.name):
-            self.graph[node.name] = []
+                f'Type with the same name ({node.id}) already in context.')
+        typex = self.types[node.id] = Type(node.id)
+        self.classes[node.id] = node
+        if not self.graph.__contains__(node.id):
+            self.graph[node.id] = []
         if self.graph.__contains__(node.parent):
-            self.graph[node.parent].append(node.name)
+            self.graph[node.parent].append(node.id)
         else:
-            self.graph[node.parent] = [node.name]
+            self.graph[node.parent] = [node.id]
         return typex
 
     def get_type(self, name: str):
