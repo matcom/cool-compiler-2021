@@ -86,10 +86,13 @@ class CCILGenerator:
         init_params = self.init_func_params(node.id)
         self.ccil_cool_names.add_new_name_pair("self", node.id)
         attributes: List[Attribute] = list()
-        init_attr_ops: List[OperationNode] = []
+        init_attr_ops: List[OperationNode] = [
+            self.create_storage("zero", INT, IntNode("0")),
+            self.create_string_load_data("empty", DEFAULT_STR.id),
+        ]
         for attr in attr_nodes:
             attributes.append(Attribute(ATTR + attr.id, attr.type.name))
-            (attr_ops, _) = self.visit(attr)
+            attr_ops = self.visit(attr)
             init_attr_ops += attr_ops
 
         dummy_return = self.create_storage(f"init_type_{node.id}_ret", INT, IntNode(0))
@@ -125,15 +128,15 @@ class CCILGenerator:
 
         if node.expr is None:
             if node.type.name != STRING:
-                value_0 = self.create_storage("zero", INT, IntNode("0"))
+                value_0 = IdNode("zero")
             else:
-                value_0 = self.create_string_load_data("empty", DEFAULT_STR.id)
-            set_attr = SetAttrOpNode("self", attr_id, extract_id(value_0), SELFTYPE)
-            return [value_0, set_attr]
+                value_0 = IdNode("empty")
+            set_attr = SetAttrOpNode("self", attr_id, value_0, self.current_type)
+            return [set_attr]
 
         (expr_op, expr_fval) = self.visit(node.expr)
 
-        set_attr = SetAttrOpNode("self", attr_id, expr_fval.id, SELFTYPE)
+        set_attr = SetAttrOpNode("self", attr_id, expr_fval.id, self.current_type)
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return [*expr_op, set_attr]
@@ -782,7 +785,7 @@ class CCILGenerator:
         self, idx: str, type_idx: str, from_idx: str, attr_idx: str
     ):
         self.add_local(idx, type_idx)
-        return StorageNode(idx, GetAttrOpNode(from_idx, attr_idx))
+        return StorageNode(idx, GetAttrOpNode(type_idx, from_idx, attr_idx))
 
     def create_new_type(self, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
