@@ -137,10 +137,8 @@ case_def %= case + expr + of + branch_list + esac, lambda h, s: CaseNode(
 )
 branch_list %= branch, lambda h, s: [s[1]]
 branch_list %= branch + branch_list, lambda h, s: [s[1]] + s[2]
-branch %= objectid + colon + typeid + rarrow + expr + semi, lambda h, s: (
-    s[1],
-    s[3],
-    s[5],
+branch %= objectid + colon + typeid + rarrow + expr + semi, lambda h, s: CaseBranchNode(
+    s[4], s[1], s[3], s[5]
 )
 
 block_def %= ocur + expr_list + ccur, lambda h, s: BlockNode(s[2], s[1])
@@ -175,7 +173,9 @@ s_factor %= neg + s_factor, lambda h, s: NegNode(s[2], s[1])
 let_def %= let + iden_list + inx + expr, lambda h, s: LetNode(s[2], s[4], s[1])
 iden_list %= iden, lambda h, s: [s[1]]
 iden_list %= iden + comma + iden_list, lambda h, s: [s[1]] + s[3]
-iden %= objectid + colon + typeid, lambda h, s: (s[1], s[3], None)
-iden %= objectid + colon + typeid + larrow + expr, lambda h, s: (s[1], s[3], s[5])
+iden %= objectid + colon + typeid, lambda h, s: LetVarNode(s[1], s[3])
+iden %= objectid + colon + typeid + larrow + expr, lambda h, s: LetVarNode(
+    s[1], s[3], s[5], s[4]
+)
 
 assign_def %= objectid + larrow + expr, lambda h, s: AssignNode(s[1], s[3], s[2])
