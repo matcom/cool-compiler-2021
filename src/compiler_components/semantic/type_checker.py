@@ -142,7 +142,7 @@ class TypeChecker:
             ret_type = method.return_type  if not isinstance(method.return_type,SELF_TYPE) else typex    
             node.type = ret_type
             if len(method.param_types) != len(node.params):
-                raise SemanticError (f'Method takes {len(method.param_types)} params but {len(node.params)} were given', node.line)
+                raise ParamError()
             for i in range(len(node.params)):
                 try:
                     self.context.check_type(node.params[i].type,method.param_types[i],node.line)
@@ -150,6 +150,8 @@ class TypeChecker:
                     self.errors.append(f"({node.line},{node.column}) - SemanticError: " + str(e))
         except SemanticError as e:
             self.errors.append(f"({node.line},{node.column}) - AttributeError: dispatch undeclared method {node.f}")
+        except ParamError as p:
+            self.errors.append(f'({node.line},{node.column}) - SemanticError: Method takes {len(method.param_types)} params but {len(node.params)} were given')
 
     @visitor.when(CallNode)
     def visit(self, node:CallNode, scope:Scope):    

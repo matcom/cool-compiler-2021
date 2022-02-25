@@ -12,6 +12,8 @@ class NameError(SemanticError):
     pass 
 class AttributeError(SemanticError):
     pass
+class ParamError(Exception):
+    pass    
 ############## End Semantic Errors #############################
 
 ############ Class members ###############################
