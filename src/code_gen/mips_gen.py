@@ -5,18 +5,22 @@ from asts.mips_ast import (
     BranchOnEqual,
     BranchOnNotEqual,
     Constant,
+    Div,
+    Equal,
     Jump,
     JumpAndLink,
     JumpRegister,
     Label,
     LabelDeclaration,
+    Less,
+    LessOrEqual,
     LoadAddress,
     LoadImmediate,
     MIPSProgram,
     MemoryIndexNode,
     Move,
     Multiply,
-    MultiplyOpNode,
+    Not,
     RegisterNode,
     Sub,
     Subu,
@@ -24,6 +28,7 @@ from asts.mips_ast import (
     TextNode,
     DataNode,
     WordDirective,
+    Xori,
 )
 from utils import visitor
 
@@ -76,15 +81,15 @@ class MIPSGenerator:
 
     @visitor.when(JumpAndLink)
     def visit(self, node: JumpAndLink) -> str:
-        return f"\tjal {node.address}"
+        return f"\tjal {self.visit(node.address)}"
 
     @visitor.when(Jump)
     def visit(self, node: Jump) -> str:
-        return f"\tj {node.address}"
+        return f"\tj {self.visit(node.address)}"
 
     @visitor.when(JumpRegister)
     def visit(self, node: JumpRegister) -> str:
-        return f"\tj {node.register}"
+        return f"\tj {self.visit(node.register)}"
 
     @visitor.when(MemoryIndexNode)
     def visit(self, node: MemoryIndexNode) -> str:
@@ -100,23 +105,23 @@ class MIPSGenerator:
 
     @visitor.when(Subu)
     def visit(self, node: Subu) -> str:
-        return f"\tsubu {node.left}, {node.middle}, {node.right}"
+        return f"\tsubu {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
     @visitor.when(Sub)
     def visit(self, node: Sub) -> str:
-        return f"\tsub {node.left}, {node.middle}, {node.right}"
+        return f"\tsub {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
     @visitor.when(Addu)
     def visit(self, node: Addu) -> str:
-        return f"\taddu {node.left}, {node.middle}, {node.right}"
+        return f"\taddu {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
     @visitor.when(LoadAddress)
     def visit(self, node: LoadAddress) -> str:
-        return f"\tla {node.left},  {node.right}"
+        return f"\tla {self.visit(node.left)},  {self.visit(node.right)}"
 
     @visitor.when(LoadImmediate)
     def visit(self, node: LoadImmediate) -> str:
-        return f"\tli {node.left},  {node.right}"
+        return f"\tli {self.visit(node.left)},  {self.visit(node.right)}"
 
     @visitor.when(Syscall)
     def visit(self, node: Syscall) -> str:
@@ -124,19 +129,44 @@ class MIPSGenerator:
 
     @visitor.when(Add)
     def visit(self, node: Add) -> str:
-        return f"\tadd {node.left}, {node.middle}, {node.right}"
+        return f"\tadd {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
     @visitor.when(Addi)
     def visit(self, node: Addi) -> str:
-        return f"\taddi {node.left}, {node.middle}, {node.right}"
+        return f"\taddi {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
     @visitor.when(Multiply)
     def visit(self, node: Multiply) -> str:
+        return f"\tmul {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
+
+    @visitor.when(Div)
+    def visit(self, node: Div) -> str:
+        return f"\tdiv {self.visit(node.left)}, {self.visit(node.right)}"
 
     @visitor.when(BranchOnEqual)
     def visit(self, node: BranchOnEqual) -> str:
-        return f"\tbeq {node.left}, {node.middle}, {node.right}"
+        return f"\tbeq {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
     @visitor.when(BranchOnEqual)
     def visit(self, node: BranchOnNotEqual) -> str:
-        return f"\tbne {node.left}, {node.middle}, {node.right}"
+        return f"\tbne {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
+
+    @visitor.when(Less)
+    def visit(self, node: Less) -> str:
+        return f"\tslt {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
+
+    @visitor.when(LessOrEqual)
+    def visit(self, node: LessOrEqual) -> str:
+        return f"\tsle {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
+
+    @visitor.when(Equal)
+    def visit(self, node: Equal) -> str:
+        return f"\tseq {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
+
+    @visitor.when(Xori)
+    def visit(self, node: Xori) -> str:
+        return f"\txori {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
+
+    @visitor.when(Not)
+    def visit(self, node: Not) -> str:
+        return f"\tnot {self.visit(node.left)}, {self.visit(node.right)}"
