@@ -294,20 +294,11 @@ class In_Int:
     def __str__(self) -> str:
        return """
 IO_in_int:
-li $v0,5
+li $v0, 5
 syscall
 move $s0 , $v0
 addi $sp, $sp, 4
 jr $ra
-"""
-
-class In_Float:
-    def __str__(self) -> str:
-           return """
-In_Float:
-li $v0,6
-syscall
-move $s0 , $a0
 """
 
 class Contain:
@@ -414,16 +405,36 @@ Substring:
 class Copy:
     def __str__(self) -> str:
        return """
-       El método de copia, sabemos que el resultado de la copia es el
-igual que el tipo del autoparámetro
-
-
+Object_copy:
+lw $t0, 0($sp)   #Guarda en $t0 self
+lw $t1, 0($t0)   #Guarda definicion del tipo
+lw $t3, 4($t1)   #En la segunda posicion la definicion de tipo contiene el
+move $a0, $t3    #tamaño que ocupa en la pila 
+li $v0, 9        
+syscall          #En $v0 la nueva instancia
+move $s0, $v0
+copy_loop:
+    beq $t3, $zero, end_copy
+    lw  $t1, 0($t0)
+    sw  $t1, 0($v0)
+    addi $t3, $t3, -4
+    add $t0, $t0, 4
+    add $v0, $v0, 4
+    jr copy_loop
+end_copy:
+addi $sp, $sp, 4
+jr $ra
 """
 
 class Abort:
     def __str__(self) -> str:
        return """
-      El método abortar detiene la ejecución del programa con un mensaje de error.
+Object_abort:
+li		$v0, 4		# system call #4 - print string
+la		$a0, _______error______
+syscall	
+li		$v0, 10
+syscall				# execute
 """
 
 class Type_Name:
@@ -446,6 +457,7 @@ sw $t3, 4($v0)  # Asigan el nombre de la clase a la propiededa value del string
 
 addi $sp, $sp, 4
 move $s0, $v0
-jr $ra"""
+jr $ra
+"""
 
 
