@@ -59,7 +59,10 @@ class Compare_String:
 
     def __str__(self) -> str:
         return  """
-compare_String:  # compare str1 ($a0), str2 ($a1) salida en $s0
+ # compare str1 0($sp), str2 4($sp) salida en $s0
+#lw $a0 , (sp)      si viene x la pila
+#lw $a1 , 4(sp)     si viene por la pila
+
 LOOP:
 	lb $t0, ($a0)
 	lb $t1, ($a1)
@@ -69,7 +72,8 @@ LOOP:
 	beqz $t1, LOOP_END
 	beq $t0, $t1, LOOP
     li $s0 , 0
-	jr $ra 
+    j End
+#	jr $ra 
 
 EQUAL:
 	li $s0, 1
@@ -78,9 +82,10 @@ EQUAL:
 LOOP_END:
 	beq $t0, $t1, EQUAL
 	li $s0 , 0
-	jr $ra
+
+#	jr $ra
 END:
-	jr $ra"""
+#	jr $ra"""
         
 
 class Comment:
@@ -172,6 +177,25 @@ class Operation:
         return f'{self.cmd} {self.dest}, {self.op_1}, {self.op_2}'
 
 
+class Move :
+    def __init__(self,cmd ,Rds) -> None:
+        self.cmd = cmd
+        self.Rds = Rds
+
+    def __str__(self) -> str:
+        return f'{self.cmd} {self.Rds}'
+    
+
+############################# Move ###################################################
+
+class MFHI(Move):
+      def __init__(self,Rds) -> None:
+          super().__init__('mfhi', Rds)
+
+class MFLO(Move):
+    def __init__(self,Rds) -> None:
+        super().__init__('mflo', Rds)          
+
 ############################  Loads   ##################################################
 class LW(Load):
     def __init__(self, registry, memory_dir) -> None:
@@ -200,18 +224,23 @@ class SEQ(CmpNotJump):  #comparacion igualdad
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
             super().__init__( 'seq' ,r_dest, r_src_1, r_src_2)
 
-class SGE(CmpNotJump):
+class SGE(CmpNotJump): #>=
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
             super().__init__( 'sge' ,r_dest, r_src_1, r_src_2)
 
-class SLT (CmpNotJump):
+class SGT (CmpNotJump): #>
+    def __init__(self, r_dest, r_src_1, r_src_2) -> None:
+        super().__init__('sgt', r_dest, r_src_1, r_src_2)            
+
+class SLT (CmpNotJump): #<
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
         super().__init__( 'slt' ,r_dest, r_src_1, r_src_2)
 
 
-class SLE(CmpNotJump):
+class SLE(CmpNotJump):  # <=
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
             super().__init__( 'sle' ,r_dest, r_src_1, r_src_2)
+
 
 
 
@@ -237,6 +266,8 @@ class BEQ (JumpConditional):
 
 
 
+
+
 ################################# Operator ##############################################
 
 class AddI(Operation):
@@ -254,6 +285,10 @@ class MUL (Operation):
 class SUB (Operation):
      def __init__(self,dest,op1,op2) -> None:
             super().__init__('sub',dest,op1,op2)
+
+class DIV (Operation):
+    def __init__(self, dest, op1, op2) -> None:
+        super().__init__('div', dest, op1, op2)            
 
 
 ################################# Native Func IO ################################################
@@ -345,21 +380,7 @@ class Length:
         addi $sp, $sp, 4
         jr $ra
        return """        
-String_length:
-li $t0 , 0
-lw $s2 , ($sp)
-    loop:
-    lb $s0 , ($s2)
-    beq $s0 , $zero, END
-    add $t0 , $t0 ,1
-    add $s2,$s2,4
-    j loop
 
-END:
-    move $s0 , $t0
-    addi $sp, $sp, 4
-    jr $ra
-"""
 
 class Concat:
     def __str__(self) -> str:
@@ -367,6 +388,8 @@ class Concat:
     Concat:
     lw $s2 , 4($sp) 
     lw $s1 , 0($sp) 
+    lw $s2 ,4($s2)
+    lw $s1 ,4($s1)
 
     li $v0 , 9
     li $a0 , 100

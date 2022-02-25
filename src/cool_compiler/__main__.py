@@ -13,7 +13,7 @@ path = ""
 if len(sys.argv) > 1:
     path = sys.argv[1]
 
-path = "test.cl"
+#path = "test.cl"
 
 with open(path, 'r') as _file:
     text = _file.read()
