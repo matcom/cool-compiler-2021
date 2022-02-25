@@ -278,16 +278,18 @@ class CIL:
                                      
     @visitor.when(BinaryNode)
     def visit(self, node):
-        if not isinstance(node.left, AtomicNode):
+        expr_left = self.visit(node.left)
+        expr_right = self.visit(node.right)
+        if not isinstance(expr_left, CILAtomicNode):
             name = self.scope.add_new_local(node.left.computed_type.name)
             expr = self.visit(node.left)
             self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
             left = CILVariableNode(name)
             
         else:
-            left = self.visit(node.left)  
+            left = expr_left 
 
-        if not isinstance(node.right, AtomicNode):
+        if not isinstance(expr_right, CILAtomicNode):
             name = self.scope.add_new_local(node.right.computed_type.name)
             expr = self.visit(node.right)
             self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))

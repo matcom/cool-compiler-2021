@@ -1,0 +1,10 @@
+class Main {
+    w : Int;
+
+    main(a : Int) : Int { 
+        {
+        w <- 3;
+        let y : Int <- 3 in (a + y) + w;
+        }
+    };
+};
