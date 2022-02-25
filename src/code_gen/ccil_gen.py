@@ -1,8 +1,9 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import Tuple, List, Dict
+from typing import OrderedDict, Tuple, List, Dict
 from code_gen.tools import *
+from collections import OrderedDict
 
 from code_gen.constants import *
 
@@ -41,6 +42,8 @@ class CCILGenerator:
     """
 
     def __init__(self) -> None:
+        self.program_types: List[Class]
+        self.program_codes: List[FunctionNode]
         # To keep track of how many times a certain expression has been evaluated
         self.time_record: Dict[str, int] = dict()
         # Track all constant values. Only strings for now
@@ -67,25 +70,29 @@ class CCILGenerator:
         self.data = [DEFAULT_STR]
         self.reset_locals()
 
-        builtin_classes, builtin_methods = self.define_built_ins()
-        program_types: List[Class] = builtin_classes
-        program_codes: List[FunctionNode] = builtin_methods
+        [obj, io, str], builtin_methods = self.define_built_ins()
+        self.program_types = OrderedDict({OBJECT: obj, IO: io, STRING: str})
+        self.program_codes: List[FunctionNode] = builtin_methods
 
         for type in node.declarations:
             classx, class_code = self.visit(type)
-            program_types.append(classx)
-            program_codes += class_code
+            self.program_types[classx.id] = classx
+            self.program_codes += class_code
 
-        return CCILProgram(program_types, program_codes, self.data)
+        return CCILProgram(
+            list(self.program_types.values()), self.program_codes, self.data
+        )
 
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
+        print(node.parent, type(node.parent))
         self.current_type = node.id
         self.add_data(f"class_{node.id}", node.id)
 
+        attributes, methods = self.get_inherited_features(node)
+
         attr_nodes = []
         func_nodes = []
-        attributes: List[Attribute] = list()
         for feature in node.features:
             if isinstance(feature, sem_ast.AttrDeclarationNode):
                 attributes.append(Attribute(ATTR + feature.id, feature.type.name))
@@ -102,7 +109,6 @@ class CCILGenerator:
             *[(n.id, a.id) for (n, a) in zip(attr_nodes, attributes)]
         )
         class_code: List[FunctionNode] = []
-        methods: List[Method] = []
         for func in func_nodes:
             f = self.visit(func)
             class_code.append(f)
@@ -717,6 +723,7 @@ class CCILGenerator:
             IO,
             [],
             [
+                *object_class.methods,
                 Method("out_string", out_string_func),
                 Method("out_int", out_int_func),
                 Method("in_string", in_string_func),
@@ -793,6 +800,7 @@ class CCILGenerator:
             STRING,
             [],
             [
+                *object_class.methods,
                 Method("length", lenght_func),
                 Method("concat", concat_func),
                 Method("substr", substr_func),
@@ -960,6 +968,16 @@ class CCILGenerator:
 
     def add_warning(self, msg: str):
         self.add_warning(f"Warning: {msg}")
+
+    def get_inherited_features(self, node: sem_ast.ClassDeclarationNode):
+        inherited_attr: List[Attribute] = []
+        inherited_methods: List[Method] = []
+        if node.parent is not None:
+            parent_class: Class = self.program_types[node.parent]
+            inherited_attr = [a for a in parent_class.attributes]
+            inherited_methods = [m for m in parent_class.methods]
+
+        return inherited_attr, inherited_methods
 
 
 def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
