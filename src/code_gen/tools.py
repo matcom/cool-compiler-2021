@@ -1,5 +1,4 @@
 from __future__ import annotations
-from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 
@@ -18,6 +17,7 @@ class Scope:
 
     def create_child(self):
         self.children.append(Scope())
+        self.children[-1].parent = self
         return self.children[-1]
 
     def add_new_name_pair(self, key: str, value: str):

@@ -2,7 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
-from code_gen.tools import Attribute, Method
 from semantics.tools.type import Type
 
 
@@ -13,6 +12,12 @@ class CCILProgram:
     types_section: List[Class]
     code_section: List[FunctionNode]
     data_section: List[str]  # no idea what will be this the node,
+
+    def __str__(self) -> str:
+        types = "\n".join(str(type) for type in self.types_section)
+        data = "\n".join(str(data) for data in self.data_section)
+        code = "\n".join(str(func) for func in self.code_section)
+        return f"TYPES:\n{types}\nDATA:\n{data}\nCODE:\n{code} "
 
 
 @dataclass(frozen=True)
@@ -26,6 +31,11 @@ class Class:
     methods: List[Method]
     init_operations: FunctionNode
 
+    def __str__(self) -> str:
+        attributes = "\n".join(str(a) for a in self.attributes)
+        methods = "\n".join(str(m) for m in self.methods)
+        return f"\ttype {self.id} {{ {attributes} \n {methods} \n\t}}"
+
 
 @dataclass(frozen=True)
 class BaseVar:
@@ -36,17 +46,23 @@ class BaseVar:
     id: str
     type: str
 
+    def __str__(self) -> str:
+        return f"{self.id} : {self.type}"
+
 
 class Attribute(BaseVar):
-    pass
+    def __str__(self) -> str:
+        return "\t\tattr " + super().__str__()
 
 
 class Parameter(BaseVar):
-    pass
+    def __str__(self) -> str:
+        return "\t\tparam " + super().__str__()
 
 
 class Local(BaseVar):
-    pass
+    def __str__(self) -> str:
+        return "\t\tlocal " + super().__str__()
 
 
 @dataclass(frozen=True)
@@ -58,6 +74,9 @@ class Data:
     id: str
     value: str
 
+    def __str__(self) -> str:
+        return f"\t{self.id} : '{self.value}'"
+
 
 @dataclass(frozen=True)
 class Method:
@@ -67,6 +86,9 @@ class Method:
 
     id: str
     function: FunctionNode
+
+    def __str__(self) -> str:
+        return f"\t\tmethod {self.id} : {self.function.id}"
 
 
 class Node:
@@ -96,6 +118,13 @@ class FunctionNode(Node):
         self.locals = locals
         self.operations = operations
 
+    def __str__(self) -> str:
+        params = "\n".join(str(p) for p in self.params)
+        locals = "\n".join(str(l) for l in self.locals)
+        ops = "\n".join(str(o) for o in self.operations)
+
+        return f"\tfunc {self.id}:\n {params}\n {locals} \n {ops} \n \t\treturn {self.ret.id}"
+
 
 class OperationNode(Node):
     """
@@ -119,22 +148,32 @@ class StorageNode(OperationNode):
         self.id = idx
         self.operation = operation
 
+    def __str__(self) -> str:
+        return f"\t\t{self.id} = {str(self.operation)}"
+
 
 class SetAttrOpNode(OperationNode):
-    def __init__(self, type_id: str, attr_id: str, source_id: AtomOpNode) -> None:
-        self.type = type_id
+    def __init__(
+        self, instance_id: str, attr_id: str, new_value: AtomOpNode, instance_type: str
+    ) -> None:
+        self.instance_type = instance_type
+        self.new_value = new_value
         self.attr = attr_id
-        self.source_id = source_id
+        self.instance = instance_id
 
 
 class Abort(OperationNode):
-    pass
+    def __str__(self) -> str:
+        return "abort"
 
 
 class PrintOpNode(OperationNode):
     def __init__(self, idx: str) -> None:
         super().__init__()
-        self.idx = idx
+        self.id = idx
+
+    def __str__(self) -> str:
+        return f"print {self.id}"
 
 
 class ReturnOpNode(OperationNode):
@@ -149,13 +188,17 @@ class ReadStrNode(ReturnOpNode):
     This nodes reads a string from the standard input
     """
 
-    pass
+    def __str__(self) -> str:
+        return "read_str"
 
 
 class ReadIntNode(ReturnOpNode):
     """
     This nodes reads an int from the standard input
     """
+
+    def __str__(self) -> str:
+        return "read_int"
 
 
 class GetAttrOpNode(ReturnOpNode):
@@ -165,6 +208,9 @@ class GetAttrOpNode(ReturnOpNode):
         self.instance = instance_id
         self.attr = attr_id
 
+    def __str__(self) -> str:
+        return f"get_attr {self.instance}({self.instance_type}) {self.attr}"
+
 
 class CallOpNode(ReturnOpNode):
     def __init__(self, idx: str, type_idx: str, args: List[str]) -> None:
@@ -172,6 +218,10 @@ class CallOpNode(ReturnOpNode):
         self.id = idx
         self.type = type_idx
         self.args = args
+
+    def __str__(self) -> str:
+        args = ", ".join(f"arg {a}" for a in self.args)
+        return f"call {self.id} : {self.type} ({args})"
 
 
 class VCallOpNode(ReturnOpNode):
@@ -181,17 +231,25 @@ class VCallOpNode(ReturnOpNode):
         self.type = type_idx
         self.args = args
 
+    def __str__(self) -> str:
+        args = ", ".join(f"arg {a}" for a in self.args)
+        return f"vcall {self.id} : {self.type} ({args})"
+
 
 class VoidNode(ReturnOpNode):
     """Operation that indicate that the Storage Node is not initialized"""
 
-    pass
+    def __str__(self) -> str:
+        return "<Uninitalized>"
 
 
 class NewOpNode(ReturnOpNode):
     def __init__(self, type_idx: str) -> None:
         super().__init__()
-        self.type_idx: str = type_idx
+        self.type: str = type_idx
+
+    def __str__(self) -> str:
+        return f"new {self.type}"
 
 
 class BinaryOpNode(ReturnOpNode):
@@ -205,6 +263,9 @@ class BinaryOpNode(ReturnOpNode):
         super().__init__()
         self.left = left
         self.right = right
+
+    def __str__(self) -> str:
+        return f"{self.left.value} op {self.right.value}"
 
 
 class SumOpNode(BinaryOpNode):
@@ -244,21 +305,25 @@ class UnaryOpNode(ReturnOpNode):
 class GetTypeOpNode(UnaryOpNode):
     """Extracts the type of a node"""
 
-    pass
+    def __str__(self) -> str:
+        return f"typeof {self.atom.value}"
 
 
 class IsVoidOpNode(UnaryOpNode):
     """Operation that returns true if the Storage Node is uninitialized"""
 
-    pass
+    def __str__(self) -> str:
+        return f"isvoid {self.atom.value}"
 
 
 class NotOpNode(UnaryOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"not {self.atom.value}"
 
 
 class NegOpNode(UnaryOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"neg {self.atom.value}"
 
 
 class ChainOpNode(ReturnOpNode):
@@ -268,21 +333,27 @@ class ChainOpNode(ReturnOpNode):
 
 
 class LoadOpNode(ChainOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"load {self.target}"
 
 
 class LengthOpNode(ChainOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"length {self.target}"
 
 
 class StrOpNode(ChainOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"str {self.target}"
 
 
 class ConcatOpNode(ChainOpNode):
     def __init__(self, source: str, target: str) -> None:
         super().__init__(target)
         self.source = source
+
+    def __str__(self) -> str:
+        return f"concat {self.source} {self.target}"
 
 
 class SubstringOpNode(ReturnOpNode):
@@ -291,6 +362,9 @@ class SubstringOpNode(ReturnOpNode):
         self.start = start
         self.length = length
 
+    def __str__(self) -> str:
+        return f"substr {self.start.value} {self.length.value}"
+
 
 class AtomOpNode(ReturnOpNode):
     def __init__(self, value: str) -> None:
@@ -298,7 +372,10 @@ class AtomOpNode(ReturnOpNode):
         AtomNode represents all single value nodes, like ids and constants
         """
         super().__init__()
-        self.value = value
+        self.value = str(value)
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class IdNode(AtomOpNode):
@@ -336,10 +413,16 @@ class IfNode(FlowControlNode):
         self.eval_value = eval_value
         self.target = target
 
+    def __str__(self) -> str:
+        return f"if {self.eval_value.value} goto {self.target.id}"
+
 
 class IfFalseNode(IfNode):
     def __init__(self, eval_value: AtomOpNode, target: LabelNode) -> None:
         super().__init__(eval_value, target)
+
+    def __str__(self) -> str:
+        return f"ifFalse {self.eval_value.value} goto {self.target.id}"
 
 
 class GoToNode(FlowControlNode):
@@ -347,11 +430,17 @@ class GoToNode(FlowControlNode):
         super().__init__()
         self.target = target
 
+    def __str__(self) -> str:
+        return f"goto {self.target.id}"
+
 
 class LabelNode(FlowControlNode):
     def __init__(self, idx: str) -> None:
         super().__init__()
         self.id = idx
+
+    def __str__(self) -> str:
+        return f"label {self.id}"
 
 
 def extract_id(storage_node: StorageNode) -> IdNode:
