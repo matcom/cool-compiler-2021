@@ -1,5 +1,4 @@
 from attr import attributes
-from matplotlib.pyplot import cla
 
 
 class CILNode:
@@ -183,7 +182,7 @@ class CILIfGotoNode(CILInstructionNode):
 
 class CILGotoNode(CILInstructionNode):
     def __init__(self, label):
-            self.label = label       
+        self.label = label       
 
     def __str__(self):
         text = "GotoNode:\n"
@@ -309,7 +308,7 @@ class CILLoadNode(CILExpressionNode):
 
 class CILLengthNode(CILExpressionNode):
     def __init__(self, var):
-            self.var = var
+        self.var = var
 
     def __str__(self):
         text = "LengthNode:\n"
@@ -333,7 +332,7 @@ class CILReadNode(CILExpressionNode):
 
 class CILAtomicNode(CILExpressionNode):
     def __init__(self, lex):
-            self.lex = lex 
+        self.lex = lex 
             
     def __str__(self):
         text = "AtomicNode:\n"
@@ -348,10 +347,6 @@ class CILVariableNode(CILAtomicNode):
 class CILTypeConstantNode(CILAtomicNode):
     pass               
            
-
-class CILStringNode(CILAtomicNode):
-    pass
-
 
 class CILNumberNode(CILAtomicNode):
     pass
@@ -384,5 +379,8 @@ class CILElessNode(CILBinaryOperationNode):
 
 
 class CILEqualsNode(CILBinaryOperationNode):
+    pass
+
+class CILNotEqualsNode(CILBinaryOperationNode):
     pass
                 

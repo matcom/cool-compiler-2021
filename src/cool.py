@@ -45,7 +45,7 @@ if errors:
         print(e)
         exit(1)
         
-cil_generator = CIL()
+cil_generator = CIL(context)
 cil = cil_generator.visit(ast)
 print(cil)
 
