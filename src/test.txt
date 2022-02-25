@@ -1,9 +1,8 @@
-class Point {
-x : AUTO_TYPE;
-y : AUTO_TYPE;
-init(n : Int, m : Int) : SELF_TYPE {
-{
-x <- n;
-y <- m;
-}};
+
+class Main {
+
+    main() : Int { 
+        let x : Int <- 3 , y : Int <- 2 in if x = y then 2 else 3 fi 
+    };
 };
+

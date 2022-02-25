@@ -183,7 +183,22 @@ class CIL:
 
     @visitor.when(ConditionalNode)
     def visit(self, node):
-       pass
+        exp = self.visit(node.predicate)
+        name_expr = self.scope.add_new_local("Int")
+        name_return = self.scope.add_new_local(node.computed_type.name)
+        var_condition = CILVariableNode(name_expr) 
+        var_return = CILVariableNode(name_return) 
+        self.scope.instructions.append(CILAssignNode(var_condition, exp))
+        self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'then_{self.scope.if_count}')))
+        count = self.scope.if_count
+        self.scope.if_count += 1
+        exp_else = self.visit(node.elsex)
+        self.scope.instructions.append(CILAssignNode(var_return, exp_else))
+        self.scope.instructions.append(CILGotoNode(CILLabelNode(f'ifend{count}')))
+        exp_then = self.visit(node.then)
+        self.scope.instructions.append(CILAssignNode(var_return, exp_then))
+        self.scope.instructions.append(CILLabelNode(f'ifend{count}'))
+        return var_return
             
     @visitor.when(LetNode)
     def visit(self, node):
