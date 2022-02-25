@@ -12,8 +12,6 @@ class CILToMipsVisitor:
         self.functions: Dict[str, mips.FunctionNode] = {}
         self.cur_function: mips.FunctionNode = None
 
-        self.labels = {}
-
     @visitor.on("node")
     def visit(self, node):
         pass
@@ -67,7 +65,6 @@ class CILToMipsVisitor:
         function_node = mips.FunctionNode(node.name, params, local_vars)
         self.functions[node.name] = function_node
         self.cur_function = function_node
-        self.labels = {}
 
         instructions = [f"# <function:{node.name}>"]
 
@@ -223,18 +220,28 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
-        instructions = [f"# <loadnode:{node.dest}-{node.msg}>"]
 
         t0 = registers.T[0]
-        data = self.data[node.msg]
+        dest_address = self.cur_function.variable_address(node.dest)
 
-        instructions.append(mips.LANode(t0, data.label))
-        if isinstance(node.dest, cil.Node):
-            instructions.extend(self.visit(node.dest))
+        instructions = [
+            f"# <loadnode:{node.dest}-{node.msg}>",
+            mips.LANode(t0, node.dest),
+            mips.SWNode(t0, dest_address, registers.FP),
+            f"# </loadnode:{node.dest}-{node.msg}>",
+        ]
 
-        address = self.cur_function.variable_address(node.dest)
-        instructions.append(mips.SWNode(t0, address, registers.FP))
+        return instructions
 
-        instructions.append(f"# </loadnode:{node.dest}-{node.msg}>")
+    @visitor.when(cil.AssignNode)
+    def visit(self, node: cil.AssignNode):
+        t0 = registers.T[0]
+
+        instructions = [
+            f"# <assignode:{node.dest}-{node.source}>",
+            mips.LWNode(t0, 0, node.source),
+            mips.SWNode(t0, 0, node.dest),
+            f"# </assignode:{node.dest}-{node.source}>",
+        ]
 
         return instructions
