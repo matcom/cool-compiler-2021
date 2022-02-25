@@ -298,9 +298,7 @@ class MipsGenerate:
                 ASTR.Compare_String(),
                 ASTR.SW ('$s0', f'{stack_plus_dest}'),
                 ASTR.Comment(f"Como no retorna sigue lineal entoces en $s0 esta el resultado y se pone en  {stack_plus_dest}")
-
-
-               ]
+        ]
 
     @visitor.when(AST.Less)
     def visit (self,node:AST.Less):

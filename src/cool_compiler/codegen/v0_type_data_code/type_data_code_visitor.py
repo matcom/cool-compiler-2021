@@ -3,7 +3,7 @@ from cool_compiler.types.cool_type_build_in_manager import OBJECT_NAME, CoolType
 from ...cmp import visitor
 from ...semantic.v2_semantic_checking import semantic_checking_ast as AST
 from . import type_data_code_ast as ASTR
-from .type_data_code_ast import Arg, result, super_value
+from .type_data_code_ast import Arg, CmpInt, result, super_value
 
 CoolInt = CoolTypeBuildInManager().find("Int")
 CoolBool = CoolTypeBuildInManager().find("Bool")
@@ -52,7 +52,7 @@ class CILGenerate:
     @visitor.when(AST.Program)
     def visit(self, node: AST.Program, scope: Scope = None):
         self.program = ASTR.Program()
-        self.program.try_add_data('_______error______', 'runtime error')
+        self.program.try_add_data('_______error______', 'Abort called from class ')
         self.program.try_add_data('_______null_______', 'null')
 
         scope = Scope()
@@ -131,27 +131,32 @@ class CILGenerate:
 
     @visitor.when(AST.AtrDef)
     def visit(self, node: AST.AtrDef, scope: Scope):
+        try: 
+            save_current_func = self.currentFunc
+        except AttributeError:
+            save_current_func = None
+        self.currentFunc = self.new_type_func
+
         if not node.expr in [None, []]:
-            try: 
-                save_current_func = self.currentFunc
-            except AttributeError:
-                save_current_func = None
-            self.currentFunc = self.new_type_func
             attr_name = self.new_type_func.local_push(f'value_to_set_{node.name}', self.new_class_scope)
             exp_list = self.visit(node.expr, self.new_class_scope)
             exp_list[-1].set_value(attr_name)
             exp_list.append(ASTR.SetAttr('self', self.currentType.attr[node.name], attr_name))
             exp_list.append(ASTR.Comment(f"Assignando el resultado de la expression al atributo {node.name} de la clase {self.currentType.name}"))
             self.new_type_func.expr += exp_list
-            self.currentFunc = save_current_func
         elif node.type in [CoolInt, CoolBool]:
             default = self.new_type_func.local_push('default_prop', self.new_class_scope)
             self.new_type_func.expr_push(ASTR.Assign(default, 0))
+            self.new_type_func.expr += self.value_def(default, node.type.name, scope)
+            self.new_type_func.expr[-1].set_value(default)
             self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], default))
         else: 
             null = self.new_type_func.local_push('null')
             self.new_type_func.expr_push(ASTR.Load(null, '_______null_______'))
             self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], null))
+        
+        self.currentFunc = save_current_func
+
 
     @visitor.when(AST.FuncDef)
     def visit(self, node: AST.FuncDef, scope: Scope):
@@ -202,7 +207,6 @@ class CILGenerate:
         instance_expr_list.append(ASTR.Comment(f"Fin de la exprecion previa al Dispatch {node.id}"))
 
         arg_list = [instance_name]
-
         for i, param in enumerate(node.params):
             instance_expr_list += self.visit(param, scope)
             param_name = self.currentFunc.local_push(f'param_{i}_to_{node.id}', scope)
@@ -263,6 +267,7 @@ class CILGenerate:
 
         label_then = new_name(f'then_{self.currentFunc.name}', self.label_list)
         label_fin = new_name(f'fin_{self.currentFunc.name}', self.label_list)
+        expr_list.append(self.get_value(cond_result, 'Bool'))
         expr_list.append(ASTR.IfGoTo(cond_result, label_then))
         
         expr_list.append(ASTR.Comment(f'Else case'))
@@ -295,6 +300,7 @@ class CILGenerate:
         cond_local = self.currentFunc.local_push('cond@while', scope)
         result_list += self.visit(node.condition, scope)
         result_list[-1].set_value(cond_local)
+        result_list.append(self.get_value(cond_local, 'Bool'))
         result_list.append(ASTR.IfGoTo(cond_local, while_back))
         result_list.append(ASTR.Comment(f'Fin de la condicion de un While'))
 
@@ -395,19 +401,22 @@ class CILGenerate:
 
         return self.general_case(node, scope, expr_cond_list)
 
-    def binary_op(self, name, node, astr_node, scope: Scope):
+    def binary_op(self, name, node, astr_node, scope: Scope, _type = 'Int', type_result = 'Int'):
         op_1 = self.currentFunc.local_push(f'{name}@_a', scope)
         op_2 = self.currentFunc.local_push(f'{name}@_b', scope)
 
         result_list = self.visit(node.left, scope)
         result_list[-1].set_value(op_1)
         result_list.append(ASTR.Comment(f'Resolucion del operado izquierdo de una opercion {name}'))
+        result_list.append(self.get_value(op_1, _type))
 
         result_list += self.visit(node.right, scope)
         result_list[-1].set_value(op_2)
         result_list.append(ASTR.Comment(f'Resolucion del operado derecha de una opercion {name}'))
+        result_list.append(self.get_value(op_2, _type)) 
 
-        return result_list + [astr_node(super_value, op_1, op_2)]
+        op_result = self.currentFunc.local_push(f'{name}@_result', scope)
+        return result_list + [astr_node(op_result, op_1, op_2)] + self.value_def(op_result, type_result, scope)
 
     @visitor.when(AST.Sum)
     def visit(self, node: AST.Sum, scope: Scope):
@@ -427,20 +436,32 @@ class CILGenerate:
 
     @visitor.when(AST.Less)
     def visit(self, node: AST.Less, scope: Scope):
-        return self.binary_op('less', node, ASTR.Less, scope)
+        return self.binary_op('less', node, ASTR.Less, scope, type_result='Bool')
 
     @visitor.when(AST.LessOrEquals)
     def visit(self, node: AST.LessOrEquals, scope: Scope):
-        return self.binary_op('le', node, ASTR.LessOrEqual, scope)
+        return self.binary_op('le', node, ASTR.LessOrEqual, scope, type_result='Bool')
 
     @visitor.when(AST.Equals)
     def visit(self, node: AST.Equals, scope: Scope):
         if node.static_type in [CoolInt, CoolBool]: 
             return self.binary_op('int_eq', node, ASTR.CmpInt, scope)
         if node.static_type == CoolStr: 
-            return self.binary_op('str_eq', node, ASTR.CmpStr, scope)
+            return self.binary_op('str_eq', node, ASTR.CmpStr, scope, 'String', 'Boolena')
         
-        return self.binary_op('req_eq', node, ASTR.CmpInt, scope)
+        op_1 = self.currentFunc.local_push(f'ref@_a', scope)
+        op_2 = self.currentFunc.local_push(f'ref@_b', scope)
+
+        result_list = self.visit(node.left, scope)
+        result_list[-1].set_value(op_1)
+        result_list.append(ASTR.Comment(f'Resolucion del operado izquierdo de una opercion cmpref'))
+
+        result_list += self.visit(node.right, scope)
+        result_list[-1].set_value(op_2)
+        result_list.append(ASTR.Comment(f'Resolucion del operado derecha de una opercion cmpref'))
+
+        op_result = self.currentFunc.local_push(f'ref@_result', scope)
+        return result_list + [CmpInt(op_result, op_1, op_2)] + self.value_def(op_result, 'Bool', scope)
     
     @visitor.when(AST.New)
     def visit(self, node: AST.New, scope: Scope):
@@ -451,20 +472,20 @@ class CILGenerate:
             ASTR.New(super_value, node.item.name)
         ]   
 
-    def unary_op(self, name, node, astr_node, scope: Scope):
+    def unary_op(self, name, node, astr_node, scope: Scope, _type):
         op = self.currentFunc.local_push(f'{name}@_unary', scope)
         result_list = self.visit(node.item, scope)
         result_list[-1].set_value(op)
 
-        return result_list + [astr_node(super_value, op)]
+        return result_list + [self.get_value(op, _type), astr_node(super_value, op)]
 
     @visitor.when(AST.Complement)
     def visit(self, node: AST.Complement, scope: Scope):
-        return self.unary_op('compl', node, ASTR.Complemnet, scope)
+        return self.unary_op('compl', node, ASTR.Complemnet, scope, 'Int')
 
     @visitor.when(AST.Neg)
     def visit(self, node: AST.Neg, scope: Scope):
-        return self.unary_op('neg', node, ASTR.Neg, scope)
+        return self.unary_op('neg', node, ASTR.Neg, scope, 'Bool')
 
     @visitor.when(AST.Void)
     def visit(self, node: AST.Void, scope: Scope):
@@ -483,36 +504,52 @@ class CILGenerate:
     def visit(self, node: AST.Id, scope: Scope):
         var = scope.find_variable(node.item)
         if not var is None:
-            return [ASTR.Assign(super_value, var.type)]
-        
+            return [ASTR.Assign(super_value, var.type)]     
         else:
-            return [ASTR.GetAttr(super_value, 'self', self.currentType.attr[node.item])]
+            return [ASTR.GetAttr(super_value, 'self', self.currentType.attr[node.item])]    
+    
+    def get_value(self, memory_dir, _type):
+        return ASTR.GetAttr(memory_dir, memory_dir, f'{_type}@value')
+
+    def value_def(self, _value, type_name, scope):
+        upper_type = type_name.upper()
+        _type = self.currentFunc.local_push(f'type_{upper_type}', scope)
+        _instance = self.currentFunc.local_push(f'{upper_type}_instance', scope)
+
+        return [
+            # ASTR.Load(string_value, name),
+            # ASTR.Comment("Carga la referecia a string"),
+            ASTR.ALLOCATE(_instance, type_name),
+            ASTR.SetAttr(_instance, f'{type_name}@value', _value),
+            ASTR.Comment(f"Setear la propiedad value al {upper_type} en la variable {_value}"),
+            ASTR.Load(_type, type_name),
+            ASTR.SetAttr(_instance, 'type_name', _type),
+            ASTR.Comment(f"Setear la propiedad type_name al string en la variable {_value}"),
+            ASTR.Assign(super_value, _instance),
+        ]
 
     @visitor.when(AST.Int)
     def visit(self, node: AST.Int, scope: Scope) -> ASTR.Node:
-        return [ASTR.Assign(super_value, node.item)]
+        int_value = self.currentFunc.local_push('value_int', scope)
+        return [
+            ASTR.Assign(int_value, node.item), ASTR.Comment(f"Int value {node.item}")
+            ] + self.value_def(int_value, 'Int', scope)
 
     @visitor.when(AST.Bool)
     def visit(self, node: AST.Bool, scope: Scope) -> ASTR.Node:
+        boolean_value = self.currentFunc.local_push('value_boolean', scope)
         if node.item == 'true': value = 1
         else: value = 0
-        return [ ASTR.Comment(f"Boolean value next {node.item}"),ASTR.Assign(super_value, value)]
+        return [
+            ASTR.Assign(boolean_value, value), ASTR.Comment(f"Bool value {node.item}")
+            ] + self.value_def(boolean_value, 'Bool', scope)
 
     @visitor.when(AST.Str)
     def visit(self, node: AST.Str, scope: Scope):
         name = self.program.add_data('string', node.item)
         string_value = self.currentFunc.local_push('value_string', scope)
-        string_type = self.currentFunc.local_push('type_string', scope)
-        string_instance = self.currentFunc.local_push('string_instance', scope)
 
         return [
             ASTR.Load(string_value, name),
             ASTR.Comment("Carga la referecia a string"),
-            ASTR.ALLOCATE(string_instance, 'String'),
-            ASTR.SetAttr(string_instance, 'String@value', string_value),
-            ASTR.Comment(f"Setear la propiedad value al string en la variable {string_value}"),
-            ASTR.Load(string_type, 'String'),
-            ASTR.SetAttr(string_instance, 'type_name', string_type),
-            ASTR.Comment(f"Setear la propiedad type_name al string en la variable {string_value}"),
-            ASTR.Assign(super_value, string_instance),
-        ]
+        ] + self.value_def(string_value, 'String', scope)
