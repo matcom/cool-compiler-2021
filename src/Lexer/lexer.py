@@ -134,7 +134,7 @@ class CoolLexer:
         line = t.lexer.lineno
         column = self.compute_column(t)
         t.type = "ERROR"
-        t.value = f"({line},{column}) - LexicographicError: Null caracter in string"
+        t.value = f"({line}, {column}) - LexicographicError: Null caracter in string"
         self.add_line_column(t)
         return t
 
@@ -154,7 +154,7 @@ class CoolLexer:
         column = self.compute_column(t)
         t.lexer.begin("INITIAL")
         t.type = "ERROR"
-        t.value = f"({line},{column}) - LexicographicError: Unterminated string constant"
+        t.value = f"({line}, {column}) - LexicographicError: Unterminated string constant"
         self.add_line_column(t)
         return t
 
@@ -182,7 +182,7 @@ class CoolLexer:
         line = t.lexer.lineno
         column = self.compute_column(t)
         t.type = "ERROR"
-        t.value = f"({line},{column}) - LexicographicError: EOF in string constant"
+        t.value = f"({line}, {column}) - LexicographicError: EOF in string constant"
         t.lexer.begin("INITIAL")
         self.add_line_column(t)
         return t
@@ -238,7 +238,7 @@ class CoolLexer:
         line = t.lexer.lineno
         column = self.compute_column(t)
         t.type = "ERROR"
-        t.value = f"({line},{column}) - LexicographicError: EOF in comment"
+        t.value = f"({line}, {column}) - LexicographicError: EOF in comment"
         t.lexer.begin("INITIAL")
         self.add_line_column(t)
         return t

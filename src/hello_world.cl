@@ -1,37 +1,38 @@
-(* An assignment has the form <id> <- <expr> *)
-
 class Main {
-    main(): Object {
-        (new Alpha).print()
+    str <- "The big brown fox
+            jumped over the fence";
+	main() : Object {
+        {
+            out_string("Yay! This is the newest shites );
+        }
     };
 };
 
-class Test {
-    test1: Object;
-    
-    testing1(): Int {
-        2 + 2
-    };
-
-    test2: Int <- 1;
-
-    test3: String <- "1";
-
-    testing2(a: Alpha, b: Int): Int {
-        2 + 2
-    };
-
-    testing3(): String {
-        "2 + 2"
-    };
-
-    testing4(): String {
-        Test1 <- "Hello World" -- Identifiers begin with a lower case letter
-    };
-};
-
-class Alpha inherits IO {
-    print() : Object {
-        out_string("reached!!\n")
-    };
-};
+(*
+#1 CLASS
+#1 TYPEID Main
+#1 '{'
+#2 OBJECTID str
+#2 ASSIGN
+#3 ERROR "Unterminated string constant"
+#3 OBJECTID jumped
+#3 OBJECTID over
+#3 OBJECTID the
+#3 OBJECTID fence
+#4 ERROR "Unterminated string constant"
+#4 OBJECTID main
+#4 '('
+#4 ')'
+#4 ':'
+#4 TYPEID Object
+#4 '{'
+#5 '{'
+#6 OBJECTID out_string
+#6 '('
+#7 ERROR "Unterminated string constant"
+#7 '}'
+#8 '}'
+#8 ';'
+#9 '}'
+#9 ';'
+*)
