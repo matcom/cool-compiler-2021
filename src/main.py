@@ -41,7 +41,7 @@ def main(file):
     parsedData, (failure, token) = CoolParser(tokens, get_shift_reduce=True)
     
     if failure:
-        print(f"({token.row},{token.column}) - SyntacticError: Unexpected token {token.lex}")
+        print(f"({token.row},{token.column}) - SyntacticError: ERROR at or near \"{token.lex}\"")
         exit(1)
 
     parse, operations = parsedData
