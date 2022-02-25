@@ -137,7 +137,7 @@ def t_start_string(t):
 def t_STRING_newline(t):
     r"""\n"""
     if not t.lexer.string_backslash:  # FATAL ERROR
-        col = find_column(input_text, t)
+        col = find_column(input_text, t.lexpos)
         errors.append('(%s, %s) - LexicographicError: STRING ERROR NON-ESCAPED NEWLINE CHARACTER' % (t.lexer.lineno, col))
         t.lexer.pop_state()
     else:
@@ -160,7 +160,7 @@ def t_STRING_end(t):
 
 def t_STRING_null(t):
     r"""\0"""
-    col = find_column(input_text, t)
+    col = find_column(input_text, t.lexpos)
     errors.append('(%s, %s) - LexicographicError: STRING NULL ERROR' % (t.lexer.lineno, col))
     t.lexer.skip(1)
 
@@ -195,7 +195,7 @@ def t_STRING_something(t):
 
 # String Error handling
 def t_STRING_error(t):
-    col = find_column(input_text, t)
+    col = find_column(input_text, t.lexpos)
     errors.append('(%s, %s) - LexicographicError: ERROR %s ' % (t.lexer.lineno, col, t.value[0]))
     t.lexer.skip(1)
 
@@ -204,7 +204,7 @@ def t_STRING_error(t):
 # STRING EOF handling
 def t_STRING_eof(t):
     if t.lexer.current_state():
-        col = find_column(input_text, t)
+        col = find_column(input_text, t.lexpos)
         errors.append('(%s, %s) - LexicographicError: EOF ERROR IN STRING STATE' % (t.lexer.lineno, col))
 
 
@@ -261,7 +261,7 @@ def t_COMMENT_something(t):
 
 # Comment Error handling
 def t_COMMENT_error(t):
-    col = find_column(input_text, t)
+    col = find_column(input_text, t.lexpos)
     errors.append('(%s, %s) - LexicographicError: COMMENT ERROR ' % (t.lexer.lineno, col))
     t.lexer.skip(1)
 
@@ -270,7 +270,7 @@ def t_COMMENT_error(t):
 # Comment EOF handling
 def t_COMMENT_eof(t):
     if t.lexer.current_state():
-        col = find_column(input_text, t)
+        col = find_column(input_text, t.lexpos)
         errors.append('(%s, %s) - LexicographicError: EOF in comment' % (t.lexer.lineno, col))
 
 
@@ -286,7 +286,7 @@ def t_newline(t):
 
 # Error handling rule
 def t_error(t):
-    col = find_column(input_text, t)
+    col = find_column(input_text, t.lexpos)
     errors.append('(%s, %s) - LexicographicError: ERROR "%s"' % (t.lexer.lineno, col, t.value[0]))
     t.lexer.skip(1)
 

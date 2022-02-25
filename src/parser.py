@@ -398,7 +398,7 @@ def p_error(p):
         line_no = find_last_line(input_text)
         errors.append('(%s, 0) - SyntacticError: ERROR at or near EOF' % line_no)
     else:
-        col_no = find_column(input_text, p)
+        col_no = find_column(input_text, p.lexpos)
         errors.append(('(%s, %s) - SyntacticError: ERROR at or near "%s"'.format(p) % (p.lineno, col_no, p.value)))
 
 
