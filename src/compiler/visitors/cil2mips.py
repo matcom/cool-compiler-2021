@@ -1,5 +1,5 @@
 import compiler.visitors.visitor as visitor
-from ..cmp.cil_ast import *
+from ..cmp.cil import *
 from ..cmp import mips_ast as mips
 
 
@@ -262,7 +262,32 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         return instructions
 
-    @visitor.when(LeqNode)
+    # @visitor.when(LeqNode)
+    # def visit(self, node):
+    #     instructions = []
+
+    #     if type(node.left) == int:
+    #         instructions.append(mips.LoadInmediateNode(mips.A0, node.left))
+    #     else:
+    #         instructions.append(
+    #             mips.LoadWordNode(mips.A0, self.get_var_location(node.left))
+    #         )
+
+    #     if type(node.right) == int:
+    #         instructions.append(mips.LoadInmediateNode(mips.A1, node.right))
+    #     else:
+    #         instructions.append(
+    #             mips.LoadWordNode(mips.A1, self.get_var_location(node.right))
+    #         )
+
+    #     instructions.append(mips.JumpAndLinkNode("less_equal"))
+    #     instructions.append(
+    #         mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
+    #     )
+
+    #     return instructions
+
+    @visitor.when(LessEqualNode)
     def visit(self, node):
         instructions = []
 
@@ -298,8 +323,8 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
                 mips.LoadWordNode(mips.A0, self.get_var_location(node.left))
             )
 
-        if type(node.right) == int:
-            instructions.append(mips.LoadInmediateNode(mips.A1, node.right))
+        if type(node.rigth) == int:
+            instructions.append(mips.LoadInmediateNode(mips.A1, node.rigth))
         else:
             instructions.append(
                 mips.LoadWordNode(mips.A1, self.get_var_location(node.right))
