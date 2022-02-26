@@ -8,11 +8,11 @@ from coolcmp.codegen.cil2mips import build_mips
 from coolcmp.utils.ast_formatter import ASTFormatter
 from coolcmp.utils.cil_formatter import CILFormatter
 
-from test_cil2mips import hello_world, allocate
+from test_cil2mips import hello_world, allocate, print_int
 
 
 def main():
-    cil_ast = allocate
+    cil_ast = print_int
 
     mips_ast = build_mips(cil_ast, None, None)
 

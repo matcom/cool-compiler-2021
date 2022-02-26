@@ -1,4 +1,5 @@
 from __future__ import annotations
+from re import L
 from typing import Dict
 
 from coolcmp.utils import cil, visitor
@@ -156,7 +157,6 @@ class CILToMipsVisitor:
             mips.CommentNode(f"<printstring:{node.addr}>"),
             mips.LINode(registers.V0, 4),
             mips.LWNode(registers.ARG[0], address, registers.FP),
-            mips.LANode(registers.A0, node.addr),
             mips.SysCallNode(),
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
@@ -184,12 +184,24 @@ class CILToMipsVisitor:
         assuming left and right operands are ints
         """
         t0, t1, t2 = registers.T[0], registers.T[1], registers.T[2]
+        dest_address = self.cur_function.variable_address(node.dest)
 
+        self.visit(node.left)
+        self.visit(node.right)
+
+        def handle_set_register_value(reg: registers.Register, value: int | str):
+            if isinstance(value, int):
+                self.add_inst(mips.LINode(reg, value))
+            else:
+                address = self.cur_function.variable_address(value)
+                self.add_inst(mips.LWNode(reg, address, registers.FP))
+
+        self.add_inst(mips.CommentNode(f"<sum:{node.dest}<-{node.left}+{node.right}>"))
+        handle_set_register_value(t0, node.left)
+        handle_set_register_value(t1, node.right)
         self.add_inst(
-            mips.CommentNode(f"<sum:{node.dest}<-{node.left}+{node.right}>"),
-            mips.LINode(t0, node.left),
-            mips.LINode(t1, node.right),
             mips.ADDNode(t2, t0, t1),
+            mips.SWNode(t2, dest_address, registers.FP),
             mips.CommentNode(f"</sum:{node.dest}<-{node.left}+{node.right}>"),
         )
 
@@ -208,13 +220,12 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
-
         t0 = registers.T[0]
         dest_address = self.cur_function.variable_address(node.dest)
 
         self.add_inst(
             mips.CommentNode(f"<loadnode:{node.dest}-{node.msg}>"),
-            mips.LANode(t0, node.dest),
+            mips.LANode(t0, self.data[node.msg].label),
             mips.SWNode(t0, dest_address, registers.FP),
             mips.CommentNode(f"</loadnode:{node.dest}-{node.msg}>"),
         )
@@ -222,11 +233,23 @@ class CILToMipsVisitor:
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
         t0 = registers.T[0]
+        dest_address = self.cur_function.variable_address(node.dest)
 
+        self.add_inst(mips.CommentNode(f"<assignode:{node.dest}-{node.source}>"))
+
+        if isinstance(node.source, int):
+            self.add_inst(
+                mips.LINode(t0, node.source),
+                mips.SWNode(t0, dest_address, registers.FP),
+            )
+        else:
+            self.visit(node.source)
+            source_address = self.cur_function.variable_address(node.source)
+            self.add_inst(
+                mips.LWNode(t0, source_address, registers.FP),
+                mips.SWNode(t0, dest_address, registers.FP),
+            )
         self.add_inst(
-            mips.CommentNode(f"<assignode:{node.dest}-{node.source}>"),
-            mips.LWNode(t0, 0, node.source),
-            mips.SWNode(t0, 0, node.dest),
             mips.CommentNode(f"</assignode:{node.dest}-{node.source}>"),
         )
 
