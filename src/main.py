@@ -6,6 +6,7 @@ from utils.utils import Utils
 from lexing.lexer import Lexer
 from parsing.parser import Parser
 from semantic.semantic import SemanticAnalyzer
+from code_generation.code_generation import CodeGeneration
 
 class Compiler:
 
@@ -105,10 +106,10 @@ class Compiler:
         '''
         Lleva a cabo la generación de código.
         '''
-        # codigo referente a la generacion de codigo y en la 
-        # carpeta code_generation tambien se pueden poner los 
-        # metodos auxiliares
-        pass
+        code_generation = CodeGeneration(self.ast, self.context, self.scope, self.debug_path)
+        self.mips_code = code_generation.code_generation()
+        self.output_file.write_text(self.mips_code)
+
 
 def main():
 
