@@ -1,3 +1,4 @@
+from code_generation import MyCodeGenerator
 from lexer import MyLexer
 from parser import MyParser
 from semantic import MySemanticAnalyzer
@@ -30,11 +31,14 @@ if __name__ == "__main__":
 
         # SemanticTODO
         semantic_analyzer = MySemanticAnalyzer(myAst)
-        semantic_analyzer.analyze()
+        context, scope = semantic_analyzer.analyze()
 
         for e in semantic_analyzer.errors:
             print(e)
             exit(1)
 
-
         # CodeGenTODO
+        code_generator = MyCodeGenerator(context=context)
+        mips_code = code_generator.compile(myAst, scope)
+        with open(f'{sys.argv[1][:-3]}.mips','w') as f:
+            f.write(f'{mips_code}')

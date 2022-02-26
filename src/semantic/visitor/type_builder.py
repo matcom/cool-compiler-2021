@@ -1,6 +1,6 @@
 from semantic.tools.error import SemanticError, SemanticException, circular_dependency_, attr_not_exist_, invalid_return_type_, param_not_exist_, inherits_builtin_type, main_method_not_exist_, Main_not_defined_
 from semantic.tools.type import Error_Type
-from nodes import ProgramNode, ClassNode, ClassMethodNode, AttrInitNode, AttrDefNode
+from nodes.ast_nodes import ProgramNode, ClassNode, ClassMethodNode, AttrInitNode, AttrDefNode
 from semantic.visitor import visitor
 
 

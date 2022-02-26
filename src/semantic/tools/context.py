@@ -40,8 +40,6 @@ class Context:
         self.types['String'].define_method('concat', ['s'], [self.types['String']], self.types['String'])
         self.types['String'].define_method('substr', ['i', 'l'], [self.types['Int'], self.types['Int']], self.types['String'])
 
-
-
     def create_type(self, node):
         if node.name in self.types:
             raise SemanticException(
@@ -76,9 +74,8 @@ class Context:
             maximum = 0
             for t in self.graph[node]:
                 maximum = max(maximum, self.types[t].max_tag)
-            self.types[node].max_tag = maximum
+            self.types[node].max_tag = maximum 
             
-
     def __str__(self):
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
 

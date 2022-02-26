@@ -1,7 +1,10 @@
 from semantic.tools.error import incompatible_types_, param_wrong_signature, invalid_SELFTYPE, self_name, incorrect_count_params_, read_only_, var_not_defined_, other_branch_declared_, wrong_type_, self_let_, SemanticError, SemanticException
 from semantic.tools.type import Error_Type
 from semantic.tools.scope import Scope
-from nodes import *
+#from nodes import *
+from nodes.ast_nodes import *
+from nodes.expr_nodes import *
+from nodes.operations_nodes import *
 from semantic.visitor import visitor
 
 
@@ -313,7 +316,7 @@ class TypeChecker:
         except SemanticException as ex:
             error = SemanticError(ex.text, node.row, node.col, 'TypeError')
             self.errors.append(error)
-            node_type = ErrorType()
+            node_type = Error_Type()
 
         self.visit(node.expression, scope)
         expr_type = node.expression.expr_type

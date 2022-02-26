@@ -1,6 +1,6 @@
 from semantic.tools.context import Context
 from semantic.tools.error import SemanticError, SemanticException
-from nodes import ProgramNode, ClassNode
+from nodes.ast_nodes import ProgramNode, ClassNode
 from semantic.visitor import visitor
 
 class TypeCollector(object):
