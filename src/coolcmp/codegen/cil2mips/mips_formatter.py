@@ -109,3 +109,7 @@ class MIPSFormatter:
     @visitor.when(mips.ADDINode)
     def visit(self, node: mips.ADDINode):
         return f"addi {node.dest}, {node.src}, {node.isrc}"
+
+    @visitor.when(mips.CommentNode)
+    def visit(self, node: mips.CommentNode):
+        return f"# {node.text}"

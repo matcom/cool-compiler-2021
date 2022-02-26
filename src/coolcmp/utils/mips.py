@@ -71,6 +71,11 @@ class InstructionNode(Node):
     pass
 
 
+class CommentNode(InstructionNode):
+    def __init__(self, text: str):
+        self.text = text
+
+
 class DataNode(Node):
     def __init__(self, label: str):
         self.label = label
