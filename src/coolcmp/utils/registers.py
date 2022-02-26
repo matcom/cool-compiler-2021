@@ -6,7 +6,7 @@ class Register:
         self.name = name
 
     def __str__(self):
-        return f"reg_{self.name}"
+        return f"${self.name}"
 
 
 T = [Register(f"t{i}") for i in range(9)]

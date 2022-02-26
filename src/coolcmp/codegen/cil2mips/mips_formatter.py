@@ -21,7 +21,7 @@ class MIPSFormatter:
 
     @visitor.when(mips.ProgramNode)
     def visit(self, node: mips.ProgramNode):
-        data = "\n# data\n.data\n" + "\n".join(self.visit(d) for d in node.data)
+        data = "# data\n.data\n" + "\n".join(self.visit(d) for d in node.data)
 
         template_code = load_templates()
         type_labels = generate_type_labels(node.types)
@@ -56,15 +56,15 @@ class MIPSFormatter:
 
     @visitor.when(mips.JALNode)
     def visit(self, node: mips.JALNode):
-        return f"jal {self.visit(node.dest)}"
+        return f"jal {node.dest}"
 
     @visitor.when(mips.SLLNode)
     def visit(self, node: mips.SLLNode):
-        return f"sll {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.bits)}"
+        return f"sll {node.dest}, {node.src}, {node.bits}"
 
     @visitor.when(mips.MoveNode)
     def visit(self, node: mips.MoveNode):
-        return f"move {self.visit(node.reg1)}, {self.visit(node.reg2)}"
+        return f"move {node.reg1}, {node.reg2}"
 
     @visitor.when(str)
     def visit(self, node: str):
@@ -78,38 +78,34 @@ class MIPSFormatter:
     def visit(self, node: mips.StringNode):
         return f"{node.label}: .asciiz {repr(node.value)[1:-1]}"
 
-    @visitor.when(registers.Register)
-    def visit(self, node: registers.Register):
-        return f"${node.name}"
-
     @visitor.when(mips.LINode)
     def visit(self, node: mips.LINode):
-        return f"li {self.visit(node.reg)}, {node.value}"
+        return f"li {node.reg}, {node.value}"
 
     @visitor.when(mips.LANode)
     def visit(self, node: mips.LANode):
-        return f"la {self.visit(node.reg)}, {node.label}"
+        return f"la {node.reg}, {node.label}"
 
     @visitor.when(mips.SysCallNode)
-    def visit(self, node: mips.SysCallNode):
+    def visit(self, _: mips.SysCallNode):
         return "syscall"
 
     @visitor.when(mips.JRNode)
     def visit(self, node: mips.JRNode):
-        return f"jr {self.visit(node.dest)}"
+        return f"jr {node.dest}"
 
     @visitor.when(mips.LWNode)
     def visit(self, node: mips.LWNode):
-        return f"lw {self.visit(node.dest)}, {node.offset}({self.visit(node.src)})"
+        return f"lw {node.dest}, {node.offset}({node.src})"
 
     @visitor.when(mips.SWNode)
     def visit(self, node: mips.SWNode):
-        return f"sw {self.visit(node.dest)}, {node.offset}({self.visit(node.src)})"
+        return f"sw {node.dest}, {node.offset}({node.src})"
 
     @visitor.when(mips.ADDNode)
     def visit(self, node: mips.ADDNode):
-        return f"add {self.visit(node.dest)} {self.visit(node.src1)} {self.visit(node.src2)}"
+        return f"add {node.dest} {node.src1} {node.src2}"
 
     @visitor.when(mips.ADDINode)
     def visit(self, node: mips.ADDINode):
-        return f"addi {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.isrc)}"
+        return f"addi {node.dest}, {node.src}, {node.isrc}"
