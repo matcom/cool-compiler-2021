@@ -110,3 +110,7 @@ class MIPSFormatter:
     @visitor.when(mips.CommentNode)
     def visit(self, node: mips.CommentNode):
         return f"# {node.text}"
+
+    @visitor.when(mips.SUBNode)
+    def visit(self, node: mips.SUBNode):
+        return f"sub {node.rdest}, {node.r1}, {node.r2},"

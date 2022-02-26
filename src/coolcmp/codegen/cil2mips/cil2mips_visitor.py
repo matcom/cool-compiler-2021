@@ -202,6 +202,19 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</sum:{node.dest}<-{node.left}+{node.right}>"),
         )
 
+    @visitor.when(cil.MinusNode)
+    def visit(self, node: cil.MinusNode):
+        t0, t1, t2 = registers.T[0], registers.T[1], registers.T[2]
+
+        self.add_inst(
+            mips.CommentNode(f"<minus:{node.dest}<-{node.left}+{node.right}>"),
+            mips.LWNode(t0, 4, node.left),      # load Int_value at offset 4
+            mips.LWNode(t1, 4, node.right),     # load Int_value at offset 4
+            mips.SUBNode(t2, t0, t1),           # subtract the integer values
+            # allocate here new Int with the value in t0 as Int_value
+            mips.CommentNode(f"</minus:{node.dest}<-{node.left}+{node.right}>"),
+        )
+
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
 
@@ -224,4 +237,10 @@ class CILToMipsVisitor:
             mips.LWNode(t0, 0, node.source),
             mips.SWNode(t0, 0, node.dest),
             mips.CommentNode(f"</assignode:{node.dest}-{node.source}>"),
+        )
+
+    @visitor.when(cil.ReturnNode)
+    def visit(self, node: cil.ReturnNode):
+        self.add_inst(
+            mips.LANode(registers.V0, node.value)
         )

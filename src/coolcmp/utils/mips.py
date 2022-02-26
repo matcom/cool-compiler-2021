@@ -166,6 +166,17 @@ class ADDINode(InstructionNode):
         self.isrc = isrc
 
 
+class SUBNode(InstructionNode):
+    """
+    subtract | sub $1, $2, $3 | $1 = $2 - $3
+    """
+
+    def __init__(self, rdest: Register, r1: Register, r2: Register):
+        self.rdest = rdest
+        self.r1 = r1
+        self.r2 = r2
+
+
 class JRNode(InstructionNode):
     """
     jump register | jr $1 | go to address stored in $1
