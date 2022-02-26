@@ -1,98 +1,73 @@
 # Generación de Código Intermedio
 
-Se utliza el partron visitor para generar un árbol en CCIL (Cool Cows Intermediate Language).  Por cada expresion de Cool se desglosa y traduce en operaciones (o instrucciones) de CIL.  
+Para producir código CIL se toma como principal el guia el capitulo 7 del libro de `Cool Compilers`  por su simpleza y facilidad luego para traducirlo a smips.
 
-Cada instruccion cumple un propositio. Cada instruccion hace de las suyas.
+El programa original se divide en tres secciones:
 
-Tambien se genera el codigo que hace runtime exception
+*  En **types** se  guarda la signatura de los tipos. Nombre de atributos y funciones.
+* **data** almacena todos los `String` definidos en tiempo de compilación por el usarion así como `Strings` definidos durante la propia generación de código. 
+* En **code** se encuentra el quivalente en CIL de las funciones definidas en Cool. Cada funcion en vez de tener expresiones y sub expresiones complejas tienen una sequencia de operaciones más sencillas que producen un resultado equivalente.
 
-El codigo built ini de las clases esta definido aqui tambien.
+## Types
 
+Contiene solo el nombre de la clase, los metodos y su identificador único para buscarlo cuando se necesite llamar a un metodo y los atributos de la misma. Los tipos tambien contienen dentro de ellos los atributos de las clases que heredan al igual que sus funciones.
 
+## Data
 
-El nodo programa se divide en 3 secciones
+Se almacenan todos los string definidos por el usuario en el programa Cool. Ademas se tiene tambien la cadena vacia para inicializar strings por defecto apuntando a ella.
 
-Una seccion de tipos donde se almacenan con todos sus atributos  + sus funciones
+El program se representa a traves de un nuevo ast. Donde antes habia una expresion
+ahora la sustituyen varias operaciones sencillas en CIL.
 
-Una secciond de datos donde se almacenan todos los string producidos
+Todas las expresiones tienen en comun que su resultado final siempre se guarda en
+memoria en alguna variable local.
 
-Una seccion de codigo donde estan almacenados todos los codigos dsitribuidos por una funcion
+Algunas expresiones desaperecen desaparecen, como `isVoid x` que se transforma
+en preguntar si el valor final de la expresion `x` es 0 (Representamos el 0
+como Void) y el tipo estatico no es `Int`, `String` o `Bool`
 
-La function esta compuesta por operaciones que son el resultado de desglosar  las expresiones interiores
+Para todas las clases se les genera una funcion `init` donde se setean los
+valores inciales de todos sus atributos. Si el atributo tienen una expresion
+su valor es el resultado de evaluar esa expresion, si no es un valor por
+defecto, una direccion de memoria apuntando a una cadena vacia "" si es
+de tipo String y 0 si es de culaquier otro tipo.
 
-Para trabajar con sub expresiones estas se trabajan primero que las expresiones grandes, y se alamcena su valor en un lugar conocido, ya sea una variable interna o una definida por el usuario.
+Se genera alrededor de las expresiones pertinentes casos para lanzar
+runtime error, cuando se tiene division por cero, el substring tiene
+indices incorrectos fuera de rango. Cuando la instancia que llama a una
+funcion es Void.
 
-Los primeras operaciones de toda funcion es nombrar sus parametros de entrada y las variables locales necesarias que necesita inicializadas.
+Las clases predefinidas de Cool se implementan tambien en CIL.
 
-Todas las variables definidas por el usuario tienen una traduccion a cil.
+La manera de trabajar con sub expresiones es que estas se generan, y despues
+la expresion padre las ubica en donde las considere pertinente. La expresion
+padre tambien tiene acceso a la variable local donde esta alamacenado el
+resultado final de sus subexpresiones pudiendo modificar, ubicar donde
+considere necesario.
 
-Variables con mismo nombre en scopes distintos tienen diferentes nombres en cil
+Ante el problema de ocurrencia de variables con el mismo nombre se utiliza
+un calse Scope como la de las semantica pero mucho mas sencillo con el
+objetivo de tener segun el contexto la variable y su traduccion a cool.
 
+Luego dado el nombre de una variable en cool y el contexto actual puedo
+saber a que local de CIL me quiero referir
 
-
-Todas las funciones se les define una init_func que se encarga de inicializar todos sus atributos. Esta funcon recibe un parametro self que indica el tipo en runtime al que se le van actualizar los atributos
-
-Despues de calculadas las expresiones se setean los atributos
-
-
-
-
-
-## Lenguage CCIL
-
-Definicion del lenguage CCIL. Tomamos como No Terminales todos los simbolos que empiezen con palabras mayusculas. El resto se considera como Terminales.
-$$
-\begin{array}{rcl}
-\text{Program} &\rarr& \text{.type TypeList .code CodeList}\\
-\text{TypeList} &\rarr& \text{Type } | \text{ Type TypeList}\\
-\text{Type} &\rarr& \text{FeatureList}\\
-\text{FeatureList} &\rarr& \text{Attribute } | \text{ Function } | \text{ FeatureList } | \space\epsilon\\
-&|& \text{ Attribute; FeatureList } | \text{ Function; FeatureList}\\
-\\
-\text{CodeList} &\rarr& \text{ FuncCode CodeList }| \space\epsilon \\
-\text{AttrCode} &\rarr& \text{id }\{ \text{LocalList OperationList} \}\\
-\text{FuncCode} &\rarr& \text{id }\{\\
-&&\text{ParamList}\\
-&&\text{LocalList}\\
-&&\text{OperationList} \text{\}}\\
-\\
-\text{OperationList} &\rarr& \text{Operation; OperationList } | \space\epsilon \\
-\text{Operation} &\rarr& \text{id = ReturnOp}\\
-&|& \text{goto id}\\
-&|& \text{label id}\\
-&|& \text{return Atom}\\
-&|& \text{setattr id id Atom}\\
-&|& \text{if Atom goto id}\\
-&|& \text{ifFalse Atom goto id}\\
-&|& \text{arg id}\\
-
-\text{ReturnOp} &\rarr& \text{Atom + Atom}\\
-&|& \text{Atom - Atom}\\
-&|& \text{Atom * Atom}\\
-&|& \text{Atom / Atom}\\
-&|& \text{not Atom}\\
-&|& \text{neg Atom}\\
-&|& \text{call id}\\
-&|& \text{vcall typeId id}\\
-&|& \text{typeof id}\\
-&|& \text{getatrr id id}\\
-&|& \text{allocate typeId}\\
-&|& \text{Atom < Atom}\\
-&|& \text{Atom <= Atom}\\
-&|& \text{Atom = Atom}\\
-&|& \text{allocate typeId}\\
-&|& \text{getattr id id}\\
-&|& \text{Atom}\\
-\text{Atom} &\rarr& \text{Constant } | \text{ id}\\
-\text{Constant} &\rarr& \text{ integer } | \text{ string } 
-\end{array}
-$$
+```assembly
+# COOL
+let x:int = 3
+    in let x:int = 4
+        in x
+# CIL
+local let_x_0
+local let_x_1
+...
+```
 
 ## Transformaciones
 
-#### Program Declaration
+### Clases
 
-**Cool Input**
+#### Cool Input
 
 ```haskell
 class A1 { ... }
@@ -101,9 +76,18 @@ class A2 { ... }
 class AN { ... }
 ```
 
-**CCIL Output**
+#### CCIL Output
 
 ```assembly
+.TYPES:
+
+class A1 {
+    attr a1
+    attr a2
+    ...
+    method m1
+
+}
 <class_A1_attr_and_func_declaration>
 ...
 <class_AN_attr_and_func_declaration>
@@ -116,11 +100,11 @@ class AN { ... }
 <all_code_from_class_AN
 ```
 
-#### Class Declaration
+### Declaracion de Clase
 
 En que momento se ejecuta la inicializacion de los atributos?
 
-**Cool Input**
+#### Cool Input
 
 ```haskell
 class C {
@@ -133,17 +117,17 @@ class C {
     aq: <attr_type>;
     ...
     ak: <attr_type>;
-    
+
     -- Functions
 	f1(<param_list>) { <expression> }
     f2(<param_list>) { <expression> }
     ...
     fn(<param_list>) { <expression> }
-    
+
 }
 ```
 
-**CCIL Output**
+#### CCIL Output
 
 ```assembly
 type C {
@@ -154,22 +138,22 @@ type C {
 	attribute aq;
 	...
 	attribute ak;
-	
+
 	method f1 : <func_code_name>;
 	...
 	method fn : <func_code_name>;
 }
 ```
 
-#### Class Inheritance
+### Herencia de Clases
 
 Se annade sobre la que ya tiene A, como se maneja la memoria, se annaden los atributos de B, despues de las funciones de A, o despues de los atributos de A
 
-**Cool Input**
+#### Cool Input
 
 ```haskell
 class A {
-	
+
 }
 
 class B inherits A {
@@ -177,14 +161,13 @@ class B inherits A {
 }
 ```
 
-**CCIL Output**
+#### CCIL Output
 
 ```
+
 ```
 
-
-
-#### While Loop
+### While Loop
 
 **Cool Input**
 
@@ -324,7 +307,7 @@ goto end_case
 label end_case
 ```
 
-El typeof tambien se conforma con un ancestro.  Que evaluaria la operacion de igualdad para escoger la rama adecuada? Lanzar un runtime error si no se escoge ninguna rama(eso puede pasar despues del cheque semantico?)
+El typeof tambien se conforma con un ancestro. Que evaluaria la operacion de igualdad para escoger la rama adecuada? Lanzar un runtime error si no se escoge ninguna rama(eso puede pasar despues del cheque semantico?)
 
 #### Function Static Call
 
@@ -421,7 +404,7 @@ function <function_id> {
 
 #### Arithmetic Expression
 
-###### Simple 
+###### Simple
 
 **Cool Input**
 
@@ -435,7 +418,7 @@ function <function_id> {
 t = 3 + 5
 ```
 
-----
+---
 
 ###### More than one
 
@@ -450,15 +433,13 @@ t = 3 + 5
 ```assembly
 # Naive
 t1 = 5 + 7
-t2 = 3 + t1 
+t2 = 3 + t1
 # A little better
 t1 = 5 + 7
 t1 = 3 + t1
 ```
 
-
-
-----
+---
 
 ###### Using non commutative operations
 
@@ -470,10 +451,10 @@ t1 = 3 + t1
 
 ```assembly
 t = 3 - 5
-t = t - 7 
+t = t - 7
 ```
 
-----
+---
 
 **Cool Input**
 
@@ -489,5 +470,53 @@ t = t / 5
 t = t / 2
 ```
 
+## Lenguage CCIL
 
+Definicion del lenguage CCIL. Tomamos como No Terminales todos los simbolos que empiezen con palabras mayusculas. El resto se considera como Terminales.
 
+$$
+\begin{array}{rcl}
+\text{Program} &\rarr& \text{.type TypeList .code CodeList}\\
+\text{TypeList} &\rarr& \text{Type } | \text{ Type TypeList}\\
+\text{Type} &\rarr& \text{FeatureList}\\
+\text{FeatureList} &\rarr& \text{Attribute } | \text{ Function } | \text{ FeatureList } | \space\epsilon\\
+&|& \text{ Attribute; FeatureList } | \text{ Function; FeatureList}\\
+\\
+\text{CodeList} &\rarr& \text{ FuncCode CodeList }| \space\epsilon \\
+\text{AttrCode} &\rarr& \text{id }\{ \text{LocalList OperationList} \}\\
+\text{FuncCode} &\rarr& \text{id }\{\\
+&&\text{ParamList}\\
+&&\text{LocalList}\\
+&&\text{OperationList} \text{\}}\\
+\\
+\text{OperationList} &\rarr& \text{Operation; OperationList } | \space\epsilon \\
+\text{Operation} &\rarr& \text{id = ReturnOp}\\
+&|& \text{goto id}\\
+&|& \text{label id}\\
+&|& \text{return Atom}\\
+&|& \text{setattr id id Atom}\\
+&|& \text{if Atom goto id}\\
+&|& \text{ifFalse Atom goto id}\\
+&|& \text{arg id}\\
+
+\text{ReturnOp} &\rarr& \text{Atom + Atom}\\
+&|& \text{Atom - Atom}\\
+&|& \text{Atom * Atom}\\
+&|& \text{Atom / Atom}\\
+&|& \text{not Atom}\\
+&|& \text{neg Atom}\\
+&|& \text{call id}\\
+&|& \text{vcall typeId id}\\
+&|& \text{typeof id}\\
+&|& \text{getatrr id id}\\
+&|& \text{allocate typeId}\\
+&|& \text{Atom < Atom}\\
+&|& \text{Atom <= Atom}\\
+&|& \text{Atom = Atom}\\
+&|& \text{allocate typeId}\\
+&|& \text{getattr id id}\\
+&|& \text{Atom}\\
+\text{Atom} &\rarr& \text{Constant } | \text{ id}\\
+\text{Constant} &\rarr& \text{ integer } | \text{ string }
+\end{array}
+$$
