@@ -122,7 +122,7 @@ class BaseCOOLToCIL:
         self.register_param(self.vself)
         vname = self.define_internal_local()
         data_node = [dn for dn in self.dotdata if dn.value ==
-                     'Aborting... in class '][0]
+                     'Abort called from class '][0]
         self.register_instruction(nodes.LoadNode(vname, data_node))
         self.register_instruction(nodes.PrintStrNode(vname))
         self.register_instruction(nodes.TypeNameNode(vname, self.vself.name))
