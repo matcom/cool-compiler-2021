@@ -73,9 +73,13 @@ class BaseCOOLToCILVisitor:
 
     def register_local(self, vinfo, id=False):
         new_vinfo = VariableInfo("", None)
-        new_vinfo.name = (
-            f"local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}"
-        )
+        if (
+            len(self.current_function.name) >= 8
+            and self.current_function.name[:8] == "function"
+        ):
+            new_vinfo.name = f"local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}"
+        else:
+            new_vinfo.name = f"local_{self.current_function.name[5:]}_{vinfo.name}_{len(self.localvars)}"
 
         local_node = cil.LocalNode(new_vinfo.name)
         if id:
@@ -428,10 +432,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ######################################################
 
         self.current_function = self.register_function("entry")
+        result = self.define_internal_local()
         instance = self.register_local(VariableInfo("instance", None))
         self.register_instruction(cil.StaticCallNode(self.init_name("Main"), instance))
         self.register_instruction(cil.ArgNode(instance))
-        result = self.define_internal_local()
         main_method_name = self.to_function_name("main", "Main")
         self.register_instruction(cil.StaticCallNode(main_method_name, result))
         self.register_instruction(cil.ReturnNode(0))
@@ -555,12 +559,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.to_function_name(self.current_method.name, self.current_type.name)
         )
 
-        self.params.append(cil.ParamNode(self.vself.name))
-        self.params.extend([cil.ParamNode(p) for p in self.current_method.param_names])
+        self.register_param(self.vself)
+        for param_name, _ in node.params:
+            self.register_param(VariableInfo(param_name, None))
 
         value = self.visit(node.body, scope)
-
-        # Your code here!!! (Handle RETURN)
+        # (Handle RETURN)
         if value is None:
             self.register_instruction(cil.ReturnNode(""))
         elif self.current_function.name == "entry":
@@ -611,6 +615,35 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         ###############################
 
+        # static call node
+        if node.obj.lex == self.vself.name:
+            args = []
+            for arg in node.args:
+                vname = self.register_local(
+                    VariableInfo(f"{node.id}_arg", None), id=True
+                )
+                ret = self.visit(arg, scope)
+                self.register_instruction(cil.AssignNode(vname, ret))
+                args.append(cil.ArgNode(vname))
+            result = self.register_local(
+                VariableInfo(f"return_value_of_{node.id}", None), id=True
+            )
+
+            self.register_instruction(cil.ArgNode(self.vself.name))
+            for arg in args:
+                self.register_instruction(arg)
+
+            type_of_node = self.register_local(
+                VariableInfo(f"{self.vself.name}_type", None)
+            )
+            self.register_instruction(cil.TypeOfNode(type_of_node, self.vself.name))
+            self.register_instruction(
+                cil.DynamicCallNode(
+                    type_of_node, node.id, result, self.current_type.name
+                )
+            )
+            return result
+
         args = []
         for arg in node.args:
             vname = self.register_local(VariableInfo(f"{node.id}_arg", None), id=True)
@@ -650,7 +683,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             type_of_node = self.register_local(
                 VariableInfo(f"{node.id}_type", None), id=True
             )
-            self.register_instruction(cil.TypeOfNode(vobj, type_of_node))
+            self.register_instruction(cil.TypeOfNode(type_of_node, vobj))
             computed_type = node.obj.computed_type
             if computed_type.name == "SELF_TYPE":
                 computed_type = computed_type.fixed_type
