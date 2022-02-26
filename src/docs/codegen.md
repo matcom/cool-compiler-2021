@@ -1,110 +1,67 @@
 # Generación de Código Intermedio
 
-Para producir código CIL se toma como principal el guia el capitulo 7 del libro de `Cool Compilers`  por su simpleza y facilidad luego para traducirlo a smips.
+Para producir código CIL se toma como principal el guía el capitulo 7 del libro de `Cool Compilers`  por su simpleza y facilidad luego para traducirlo a smips.
 
 El programa original se divide en tres secciones:
 
 *  En **types** se  guarda la signatura de los tipos. Nombre de atributos y funciones.
 * **data** almacena todos los `String` definidos en tiempo de compilación por el usarion así como `Strings` definidos durante la propia generación de código. 
-* En **code** se encuentra el quivalente en CIL de las funciones definidas en Cool. Cada funcion en vez de tener expresiones y sub expresiones complejas tienen una sequencia de operaciones más sencillas que producen un resultado equivalente.
+* En **code** se encuentra el equivalente en CIL de las funciones definidas en Cool. Cada función en vez de tener expresiones y sub-expresiones complejas tienen una secuencia de operaciones más sencillas que producen un resultado equivalente.
 
 ## Types
 
-Contiene solo el nombre de la clase, los metodos y su identificador único para buscarlo cuando se necesite llamar a un metodo y los atributos de la misma. Los tipos tambien contienen dentro de ellos los atributos de las clases que heredan al igual que sus funciones.
+Contiene solo el nombre de la clase, los métodos y su identificador único para buscarlo cuando se necesite llamar a un método y los atributos de la misma. Los tipos también contienen dentro de ellos los atributos de las clases que heredan al igual que sus funciones.
+
+Para todas las clases se les genera una función `init` donde se inicializan los valores iniciales de todos sus atributos. Si el atributo no esta inicializado, se inicializa por defecto apuntando a la cadena vacía en caso de ser de tipo `String` o con valor 0 en otro caso.
+
+En caso de que el atributo se inicialice con una expresión, se transforma a operaciones en CIL y se le asigna el resultado final al atributo correspondiente.
+
+La función `init` se ejecuta siempre que se  instancie una clase.
 
 ## Data
 
-Se almacenan todos los string definidos por el usuario en el programa Cool. Ademas se tiene tambien la cadena vacia para inicializar strings por defecto apuntando a ella.
+Se almacenan todos las cadenas definidos por el usuario en el programa Cool. Ademas se tiene también la cadena vacía  a la cual apuntan las variables  `String` sin inicializar. Durante la generación de código se almacena aquí además los mensajes de errores en ejecución.
 
-El program se representa a traves de un nuevo ast. Donde antes habia una expresion
-ahora la sustituyen varias operaciones sencillas en CIL.
+## Code
 
-Todas las expresiones tienen en comun que su resultado final siempre se guarda en
-memoria en alguna variable local.
+Cada expresión de Cool tiene una representación en secuencia de operaciones en CIL. Se asegura siempre que dentro de esa secuencia haya una instrucción que guarde en una variable local el resultado final de dicha expresión. 
 
-Algunas expresiones desaperecen desaparecen, como `isVoid x` que se transforma
-en preguntar si el valor final de la expresion `x` es 0 (Representamos el 0
-como Void) y el tipo estatico no es `Int`, `String` o `Bool`
+Las expresiones no siempre tienen la misma secuencia de instrucciones, pues necesitan muchas veces del valor de sus sub-expresiones. El workflow para producir una serie de operaciones para una expresión es:
 
-Para todas las clases se les genera una funcion `init` donde se setean los
-valores inciales de todos sus atributos. Si el atributo tienen una expresion
-su valor es el resultado de evaluar esa expresion, si no es un valor por
-defecto, una direccion de memoria apuntando a una cadena vacia "" si es
-de tipo String y 0 si es de culaquier otro tipo.
+1. Produce las operaciones de todas sus sub-expresiones
+2. Produce las operaciones propias, sustituyendo donde se necesite cierta sub-expresion  por la variable local donde esta guardada su resultado final.
+3. Organiza las operaciones, crea una variable local donde se almacene el valor final propio y retorna
 
-Se genera alrededor de las expresiones pertinentes casos para lanzar
-runtime error, cuando se tiene division por cero, el substring tiene
-indices incorrectos fuera de rango. Cuando la instancia que llama a una
-funcion es Void.
+Existen ciertas expresiones que en CIL se pueden reducir hasta un punto y no mas, como la igualdad entre dos variables de tipo `String`, o como obtener un substring.
 
-Las clases predefinidas de Cool se implementan tambien en CIL.
+Existen otras que no es necesario que lleguen a smips como el operador unario `isVoid`. Como en smips todo son enteros, se puede saber dado el tipo estático si tiene sentido calcularlo. Para una variable de tipo `Int`, `String` o `Bool`, `isVoid` siempre retorna falso, en cambio con los demás tipos se evalúa la dirección de memoria, si esta es 0 (Equivalente a `Void` en nuestra implementación) el resultado de la expresión es `true` o `1` sino es `false` o `0`.
 
-La manera de trabajar con sub expresiones es que estas se generan, y despues
-la expresion padre las ubica en donde las considere pertinente. La expresion
-padre tambien tiene acceso a la variable local donde esta alamacenado el
-resultado final de sus subexpresiones pudiendo modificar, ubicar donde
-considere necesario.
+Durante la generación de código se genera también las excepciones que pueden ser lanzadas durante la ejecución:
 
-Ante el problema de ocurrencia de variables con el mismo nombre se utiliza
-un calse Scope como la de las semantica pero mucho mas sencillo con el
-objetivo de tener segun el contexto la variable y su traduccion a cool.
++ División por cero
++ El despacho ocurre desde un tipo sin inicializar (`Void`)
++ El rango del substring no es válido
++ Ninguna rama de algún `case of` es igual al tipo de la expresión
 
-Luego dado el nombre de una variable en cool y el contexto actual puedo
-saber a que local de CIL me quiero referir
+Es posible para el usuario definir variables con mismos nombres con distintos contextos, para tratar con esto se reutilizan una versión simplificada del `Scope` de la semántica, donde se almacenan según el contexto la variable definida por el usuario y su traducción a Cool. Gracias a esto, en el ejemplo siguiente se conoce siempre  a que variable `x` se refiere el programa:
 
 ```assembly
 # COOL
 let x:int = 3
-    in let x:int = 4
-        in x
+    in (let x:int = 4 in x) + x
 # CIL
 local let_x_0
 local let_x_1
 ...
 ```
 
-## Transformaciones
+### Transformaciones
 
-### Clases
+Ejemplos de traducción de Cool a CIL
 
-#### Cool Input
+#### Declaración de Clase
 
-```haskell
-class A1 { ... }
-class A2 { ... }
-...
-class AN { ... }
-```
-
-#### CCIL Output
-
-```assembly
-.TYPES:
-
-class A1 {
-    attr a1
-    attr a2
-    ...
-    method m1
-
-}
-<class_A1_attr_and_func_declaration>
-...
-<class_AN_attr_and_func_declaration>
-
-# Pending, should string literals be added here?
-<all_constant_data_from_program>
-
-<all_code_from_class_A1>
-...
-<all_code_from_class_AN
-```
-
-### Declaracion de Clase
-
-En que momento se ejecuta la inicializacion de los atributos?
-
-#### Cool Input
+ **Cool Input**
 
 ```haskell
 class C {
@@ -113,10 +70,6 @@ class C {
     a2: <attr_type> <- <expression>;
     ...
     am: <attr_type> <- <expression>;
-    -- Uninitialized attributes
-    aq: <attr_type>;
-    ...
-    ak: <attr_type>;
 
     -- Functions
 	f1(<param_list>) { <expression> }
@@ -127,17 +80,13 @@ class C {
 }
 ```
 
-#### CCIL Output
+**CCIL Output**
 
 ```assembly
 type C {
-	# Initialized and uninitialized attributes together
 	attribute a1;
 	...
 	attribute am;
-	attribute aq;
-	...
-	attribute ak;
 
 	method f1 : <func_code_name>;
 	...
@@ -145,29 +94,39 @@ type C {
 }
 ```
 
-### Herencia de Clases
+#### Herencia de Clases
 
-Se annade sobre la que ya tiene A, como se maneja la memoria, se annaden los atributos de B, despues de las funciones de A, o despues de los atributos de A
-
-#### Cool Input
+ **Cool Input**
 
 ```haskell
 class A {
-
+	a1:<attr_type>
+	f1():{...}
 }
 
 class B inherits A {
-
+	b1:<attr_type>
+	g1():{...}
 }
 ```
 
-#### CCIL Output
+**CCIL Output**
 
+```assembly
+type A {
+	attr a1;
+	method f1 : f_f1_A
+}
+
+type B {
+	attr a1;
+	attr b1;
+	method f1: f_f1_A
+	method g1: f_g1_B
+}
 ```
 
-```
-
-### While Loop
+#### While Loop
 
 **Cool Input**
 
@@ -199,20 +158,18 @@ if <if_expr> then <then_expr> else <else_expr> fi
 **CCIL Output**
 
 ```assembly
-LOCAL f # Init var which will store if result
-<if_cond_expr_locals_init> # Init all local vars from the condition expression
-<do_if_cond_expr> # Execute the condition
-x = <if_cond_expr_result>  # And store it in a local var!
-ifFalse x goto else_expr # 0 means True, otherwise False
-
-label then_expr # Not really needed!
+<do_if_cond_expr> # Produce todas las operaciones de la expr de la cond. inicial
+x = <if_cond_expr_result>  # Guarda ese valor
+ifFalse x goto else_expr 
+# x = 1
 <do then_expr>
-f = <then_expr_result>
+f = <then_expr_result> # El resultado final de la expresion if
 goto endif
 
+# x = 0
 label else_expr
 <do_else_expr>
-f = <else_expr_result>
+f = <else_expr_result> # El resultado final de la expresion if
 
 label endif
 ```
@@ -228,23 +185,14 @@ let <id1>:<type1>, ... <idn>:<typen> in <expr>
 **CCIL Output**
 
 ```assembly
-<init id1>
-<init id2>
+# Inicializa todas las variables let, tengan expresión o no
+<init_let_var1>
+<init_let_var2>
 ...
-<init idn>
-
-# Execute expressions of let vars
-<init_idq_expr_locals>
-<do_idq_expr_and_store_in_idq>
-
-<init_idk_locals>
-<do_idk_expr_and_store_in_idk>
-...
-<init_idm_expr_locals>
-<do_idm_expr_and_store_in_idm>
-
-<init_final_expression_locals>
-<do_expr>
+<init_let_varn>
+# traduce la expresion en operacions
+<do_in_expr>
+f = <in_expr_fval> # Almacena el resultado final de la expresion let
 ```
 
 #### Case Of
@@ -270,36 +218,41 @@ esac
 
 <do_case_expr>
 x = <case_expr_result>
-
-# Pattern Match Logic!
 t = typeof x
-label init_case # This is not really needed
-t1 = typeof <id1>
-b1 = t1 == t # Comparing types, they must be all equal
-if b1 goto branch1:
 
+# Analiznado rama 1
+t1 = typeof <id1>
+b1 = t1 == t # Comparando tipos
+if b1 goto branch1: # En caso de exito ve a la rama
+
+# Analizando rama 2
 t2 = typeof <id2>
 b2 = t2 == t
 if b2 goto branch2
 
 ...
 
+# Analizando rama n
 tn = typeof <idn>
 bn = tn == t
 if bn goto brannch
-# It is not possible to avoid pattern matching
 
-# Branch Logic
+<throw_runtime_exception> # Lanza una excepcion en ejcucion si no se ejecuta ninguna rama
+
+
+# Realizando logica the rama1
 label branch1
 <do_expr1>
 goto end_case
 
+# Realizando logica the rama2
 label branch2
 <do_expr2>
 goto end_case
 
 ...
 
+# Realizando logica the raman
 label branchn
 <do_exprn>
 goto end_case
@@ -307,9 +260,7 @@ goto end_case
 label end_case
 ```
 
-El typeof tambien se conforma con un ancestro. Que evaluaria la operacion de igualdad para escoger la rama adecuada? Lanzar un runtime error si no se escoge ninguna rama(eso puede pasar despues del cheque semantico?)
-
-#### Function Static Call
+#### Despacho Estático
 
 **Cool Input**
 
@@ -327,7 +278,7 @@ El typeof tambien se conforma con un ancestro. Que evaluaria la operacion de igu
 r = call <func_id> n
 ```
 
-#### Function Dynamic Call
+#### Despacho Dinámico
 
 **Cool Input**
 
@@ -346,7 +297,7 @@ t = allocate <type2> # It needs to give the same attributes that type one has
 r = vcall t <func_id>  n
 ```
 
-#### Method Declaration
+#### Declaración de un método
 
 **Cool Input**
 
@@ -375,7 +326,7 @@ function <function_id> {
 }
 ```
 
-#### Expression Block
+#### Expresión de Bloque
 
 **Cool Input**
 
@@ -402,9 +353,7 @@ function <function_id> {
 <do_exprn>
 ```
 
-#### Arithmetic Expression
-
-###### Simple
+#### Expresiones Aritméticas
 
 **Cool Input**
 
@@ -434,9 +383,6 @@ t = 3 + 5
 # Naive
 t1 = 5 + 7
 t2 = 3 + t1
-# A little better
-t1 = 5 + 7
-t1 = 3 + t1
 ```
 
 ---
@@ -470,9 +416,11 @@ t = t / 5
 t = t / 2
 ```
 
-## Lenguage CCIL
 
-Definicion del lenguage CCIL. Tomamos como No Terminales todos los simbolos que empiezen con palabras mayusculas. El resto se considera como Terminales.
+
+## Lenguaje CCIL
+
+Definición del lenguaje CCIL. Tomamos como No Terminales sólo las palabras que empiecen con  mayúsculas. El resto de palabras  y símbolos se consideran como Terminales.
 
 $$
 \begin{array}{rcl}
