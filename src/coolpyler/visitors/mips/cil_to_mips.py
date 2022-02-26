@@ -137,10 +137,8 @@ class CilToMIPS:
         instructions.append(mips.LabelInstructionNode(node.name))
 
         self.memory_manager.save()
-        self.fp_save = self.memory_manager.get_unused_register()
-        instructions.append(
-            mips.MoveNode(self.fp_save, FP_REG, f"save previous FP value")
-        )
+        fp_save = self.memory_manager.get_unused_register()
+        instructions.append(mips.MoveNode(fp_save, FP_REG, f"save previous FP value"))
         instructions.append(mips.MoveNode(FP_REG, SP_REG, f"FP <- SP"))
 
         for i in range(len(node.params)):
@@ -155,6 +153,16 @@ class CilToMIPS:
         instructions.append(
             mips.AddiNode(SP_REG, SP_REG, locals_size * 4, f"push local vars")
         )
+
+        instructions.append(
+            mips.StoreWordNode(RA_REG, mips.MemoryAddressRegisterNode(SP_REG, 0))
+        )
+        instructions.append(mips.AddiNode(SP_REG, SP_REG, 4, f"Push prev $ra in stack"))
+
+        instructions.append(
+            mips.StoreWordNode(fp_save, mips.MemoryAddressRegisterNode(SP_REG, 0))
+        )
+        instructions.append(mips.AddiNode(SP_REG, SP_REG, 4, f"Push prev $fp in stack"))
 
         for instruction in node.instructions:
             instructions.extend(self.visit(instruction))
@@ -328,7 +336,7 @@ class CilToMIPS:
             mips.LoadWordNode(
                 reg1,
                 mips.MemoryAddressRegisterNode(FP_REG, source_dir),
-                f"Dir of instance of attribute to set",
+                f"Obtain value from source dir",
             )
         )
         instance_dir = self.search_mem(node.instance)
@@ -336,7 +344,7 @@ class CilToMIPS:
             mips.LoadWordNode(
                 reg2,
                 mips.MemoryAddressRegisterNode(FP_REG, instance_dir),
-                f"Obtain value from source dir",
+                f"Dir of instance of attribute to set",
             )
         )
         instructions.append(
@@ -372,15 +380,25 @@ class CilToMIPS:
         self.memory_manager.save()
 
         typ = self.types[node.type]
-        reserved_bytes = (len(typ.attributes) + 1) * 4
+        if (
+            node.type == "String"
+            or node.type == "Int"
+            or node.type == "Bool"
+            or node.type == "Object"
+        ):
+            reserved_bytes = 8
+        else:
+            reserved_bytes = (len(typ.attributes) + 1) * 4
 
         instructions.append(
-            mips.LoadInmediateNode(V0_REG, 9,
-            f"Allocating instance of type {node.type}",)
+            mips.LoadInmediateNode(
+                V0_REG, 9, f"Allocating instance of type {node.type}",
+            )
         )
         instructions.append(
-            mips.LoadInmediateNode(ARG_REGISTERS[0], reserved_bytes,
-            f"Save {reserved_bytes} bytes",)
+            mips.LoadInmediateNode(
+                ARG_REGISTERS[0], reserved_bytes, f"Save {reserved_bytes} bytes",
+            )
         )
         instructions.append(mips.SyscallNode())
 
@@ -492,6 +510,7 @@ class CilToMIPS:
 
     @visitor.when(cil.StaticCallNode)
     def visit(self, node: cil.StaticCallNode):
+        self.memory_manager.save()
         instructions = []
 
         dest_dir = self.search_mem(node.dest)
@@ -500,11 +519,18 @@ class CilToMIPS:
             mips.JumpAndLinkNode(node.function, f"Jump to function and save link")
         )
 
+        instructions.append(mips.AddiNode(SP_REG, SP_REG, -4))
         reg1 = self.memory_manager.get_unused_register()
-        instructions.append(mips.LoadWordNode(
-            reg1, mips.MemoryAddressRegisterNode(SP_REG, 0)
-            ))
-        instructions.append(mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG , dest_dir)))
+        instructions.append(
+            mips.LoadWordNode(
+                reg1,
+                mips.MemoryAddressRegisterNode(SP_REG, 0),
+                f"Obtain return value from stack",
+            )
+        )
+        instructions.append(
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
+        )
 
         instructions.append(
             mips.AddiNode(
@@ -513,6 +539,7 @@ class CilToMIPS:
         )
         self.clean_pushed_args()
 
+        self.memory_manager.clean()
         return instructions
 
     @visitor.when(cil.DynamicCallNode)
@@ -537,7 +564,7 @@ class CilToMIPS:
         instructions.append(
             mips.LoadWordNode(
                 reg2,
-                mips.MemoryAddressRegisterNode(reg1, node.method*4),
+                mips.MemoryAddressRegisterNode(reg1, node.method * 4),
                 f"Get method of index {node.method}",
             )
         )
@@ -545,20 +572,20 @@ class CilToMIPS:
         instructions.append(mips.JumpRegisterLinkNode(reg2, f"Jump to function"))
 
         dest_dir = self.search_mem(node.dest)
+        instructions.append(mips.AddiNode(SP_REG, SP_REG, -4))
         instructions.append(
             mips.LoadWordNode(
                 reg1,
-                mips.MemoryAddressRegisterNode(
-                    SP_REG, 0
-                ), f"Obtain return value from stack"
+                mips.MemoryAddressRegisterNode(SP_REG, 0),
+                f"Obtain return value from stack",
             )
         )
+
         instructions.append(
             mips.StoreWordNode(
                 reg1,
-                mips.MemoryAddressRegisterNode(
-                    FP_REG, dest_dir
-                ), f"Save return value in destination"
+                mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                f"Save return value in destination",
             )
         )
 
@@ -582,15 +609,14 @@ class CilToMIPS:
         instructions.append(
             mips.LoadWordNode(
                 reg1,
-                mips.MemoryAddressRegisterNode(
-                    FP_REG, local_dir
-                ),f"Obtain alue of Arg"
+                mips.MemoryAddressRegisterNode(FP_REG, local_dir),
+                f"Obtain alue of Arg",
             )
         )
 
         instructions.append(
             mips.StoreWordNode(
-                reg1, mips.MemoryAddressRegisterNode(SP_REG, 0 ), f"Save Arg in Stack"
+                reg1, mips.MemoryAddressRegisterNode(SP_REG, 0), f"Save Arg in Stack"
             )
         )
         instructions.append(mips.AddiNode(SP_REG, SP_REG, 4, f"Move Stack"))
@@ -603,34 +629,43 @@ class CilToMIPS:
     def visit(self, node: cil.ReturnNode):
         instructions = []
         self.memory_manager.save()
-
         reg1 = self.memory_manager.get_unused_register()
 
         value_dir = self.search_mem(node.value)
         instructions.append(
             mips.LoadWordNode(
                 reg1,
-                mips.MemoryAddressRegisterNode(
-                    FP_REG, value_dir
-                ), f"Obtain return value"
+                mips.MemoryAddressRegisterNode(FP_REG, value_dir),
+                f"Obtain return value",
             )
+        )
+
+        instructions.append(
+            mips.AddiNode(SP_REG, SP_REG, -4, f"remove prev $fp from stack")
+        )
+        instructions.append(
+            mips.LoadWordNode(FP_REG, mips.MemoryAddressRegisterNode(SP_REG, 0))
+        )
+
+        instructions.append(
+            mips.AddiNode(SP_REG, SP_REG, -4, f"remove prev $ra from stack")
+        )
+        instructions.append(
+            mips.LoadWordNode(RA_REG, mips.MemoryAddressRegisterNode(SP_REG, 0))
         )
 
         locals_size = len(self.locals)
         instructions.append(
-            mips.AddiNode(SP_REG, SP_REG, -locals_size*4, f"Remove locals from Stack")
+            mips.AddiNode(SP_REG, SP_REG, -locals_size * 4, f"Remove locals from Stack")
         )
 
         instructions.append(
-            mips.StoreWordNode(
-                reg1,
-                mips.MemoryAddressRegisterNode(
-                    SP_REG, 0
-                ), f"Save return value in Stack"
-            )
+            mips.StoreWordNode(reg1, mips.MemoryAddressRegisterNode(SP_REG, 0))
+        )
+        instructions.append(
+            mips.AddiNode(SP_REG, SP_REG, 4, f"Save return value in Stack")
         )
 
-        instructions.append(mips.MoveNode(FP_REG, self.fp_save, f"restore FP"))
         instructions.append(mips.JumpRegisterNode(RA_REG, f"RETURN"))
 
         self.memory_manager.clean()
@@ -653,9 +688,8 @@ class CilToMIPS:
         instructions.append(
             mips.StoreWordNode(
                 reg1,
-                mips.MemoryAddressRegisterNode(
-                    FP_REG, dest_dir
-                ),f"Save loaded value in destination"
+                mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                f"Save loaded value in destination",
             )
         )
 
@@ -698,9 +732,8 @@ class CilToMIPS:
         instructions.append(
             mips.StoreWordNode(
                 reg1,
-                mips.MemoryAddressRegisterNode(
-                    FP_REG, dest_dir
-                ), f"Save Calculated Length"
+                mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                f"Save Calculated Length",
             )
         )
 
@@ -722,7 +755,11 @@ class CilToMIPS:
 
         lenght_dir = self.search_mem(node.dest_lenght)
         instructions.append(
-            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, lenght_dir), f"Concat two Strings")
+            mips.LoadWordNode(
+                reg1,
+                mips.MemoryAddressRegisterNode(FP_REG, lenght_dir),
+                f"Concat two Strings",
+            )
         )
         instructions.append(mips.LoadInmediateNode(V0_REG, 9))
         instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
@@ -781,9 +818,8 @@ class CilToMIPS:
         instructions.append(
             mips.StoreWordNode(
                 reg2,
-                mips.MemoryAddressRegisterNode(
-                    FP_REG, dest_dir
-                ), f"Save concated Strings"
+                mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                f"Save concated Strings",
             )
         )
 
@@ -869,7 +905,8 @@ class CilToMIPS:
         instructions.append(
             mips.LoadWordNode(
                 reg3,
-                mips.MemoryAddressRegisterNode(FP_REG, lenght_dir), f"Obtain substring"
+                mips.MemoryAddressRegisterNode(FP_REG, lenght_dir),
+                f"Obtain substring",
             )
         )
 
@@ -918,7 +955,8 @@ class CilToMIPS:
         instructions.append(
             mips.StoreWordNode(
                 reg2,
-                mips.MemoryAddressRegisterNode(FP_REG, dest_dir), f"Save substring"
+                mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                f"Save substring",
             )
         )
 
@@ -950,7 +988,8 @@ class CilToMIPS:
         instructions.append(
             mips.StoreWordNode(
                 ARG_REGISTERS[0],
-                mips.MemoryAddressRegisterNode(FP_REG, dest_dir), f"Save readed value"
+                mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                f"Save readed value",
             )
         )
 
@@ -969,11 +1008,14 @@ class CilToMIPS:
         else:
             n = 1
 
+        reg1 = self.memory_manager.get_unused_register()
+
         instructions.append(mips.LoadInmediateNode(V0_REG, n, f"PRINT"))
         instructions.append(
-            mips.LoadWordNode(
-                ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(FP_REG, str_dir)
-            )
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, str_dir))
+        )
+        instructions.append(
+            mips.LoadWordNode(ARG_REGISTERS[0], mips.MemoryAddressRegisterNode(reg1, 0))
         )
         instructions.append(mips.SyscallNode())
 
