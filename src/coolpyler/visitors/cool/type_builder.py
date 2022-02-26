@@ -35,12 +35,18 @@ class TypeBuilderVisitor:
 
         object_type.define_method("abort", [], [], object_type)
         object_type.define_method("type_name", [], [], string_type)
-        object_type.define_method("copy", [], [], semantic.SelfType(object_type))
+        # object_type.define_method("copy", [], [], semantic.SelfType(object_type))
 
-        io_type.define_method(
-            "out_string", ["x"], [string_type], semantic.SelfType(io_type)
-        )
-        io_type.define_method("out_int", ["x"], [int_type], semantic.SelfType(io_type))
+        # io_type.define_method(
+        #     "out_string", ["x"], [string_type], semantic.SelfType(io_type)
+        # )
+        # io_type.define_method("out_int", ["x"], [int_type], semantic.SelfType(io_type))
+
+        object_type.define_method("copy", [], [], object_type)
+
+        io_type.define_method("out_string", ["x"], [string_type], io_type)
+        io_type.define_method("out_int", ["x"], [int_type], io_type)
+
         io_type.define_method("in_string", [], [], string_type)
         io_type.define_method("in_int", [], [], int_type)
 

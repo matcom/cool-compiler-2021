@@ -1034,14 +1034,13 @@ class CilToMIPS:
         instructions.append(
             mips.LoadWordNode(
                 reg1,
-                mips.MemoryAddressRegisterNode(
-                    FP_REG, source_dir, f"Obtain value to assign"
-                ),
+                mips.MemoryAddressRegisterNode(FP_REG, source_dir),
+                f"Obtain value to assign",
             )
         )
         instructions.append(
             mips.StoreWordNode(
-                reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir, f"Assign value")
+                reg1, mips.MemoryAddressRegisterNode(FP_REG, dest_dir), f"Assign value"
             )
         )
 
