@@ -579,7 +579,7 @@ class CCILGenerator:
             fval_id,
             node.type.name,
             node.id,
-            node.caller_type,
+            node.caller_type.name,
             [extract_id(expr_fval), *args],
         )
 
