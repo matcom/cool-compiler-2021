@@ -1,0 +1,173 @@
+.TYPES
+
+type Main {
+
+	method init : init_Main;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+	method out_string : out_string_IO;
+	method out_int : out_int_IO;
+	method in_string : in_string_IO;
+	method in_int : in_int_IO;
+	method main : main_Main;
+}
+
+type Object {
+
+	method init : init_Object;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+}
+
+type Int {
+	attribute value;
+
+	method init : init_Int;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+}
+
+type String {
+	attribute value;
+
+	method init : init_String;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+	method length : length_String;
+	method concat : concat_String;
+	method substr : substr_String;
+}
+
+type Bool {
+	attribute value;
+
+	method init : init_Bool;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+}
+
+type IO {
+
+	method init : init_IO;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+	method out_string : out_string_IO;
+	method out_int : out_int_IO;
+	method in_string : in_string_IO;
+	method in_int : in_int_IO;
+}
+
+
+.DATA
+
+
+.CODE
+
+function main {
+
+	LOCAL m0;
+	LOCAL m1;
+	LOCAL m2;
+
+	m0 = ALLOCATE Main;
+	ARG m0;
+	m1 = VCALL Main init;
+	ARG m1;
+	m2 = VCALL Main main;
+	RETURN m2;
+
+}
+
+
+function main_Main {
+	PARAM self_Main;
+
+	LOCAL t_0;
+	LOCAL t_1;
+	LOCAL t_2;
+	LOCAL t_3;
+	LOCAL t_4;
+	LOCAL t_5;
+
+	t_0 = self_Main;
+	t_1 = t_0 == 0;
+	ARG t_1;
+	t_2 = VCALL Bool type_name;
+	t_3 = t_2;
+	ARG self_Main;
+	ARG t_3;
+	t_4 = VCALL Main out_string;
+	t_5 = t_4;
+	RETURN t_5;
+
+}
+
+
+function init_Main {
+	PARAM self;
+
+
+	ARG self;
+	self = CALL init_IO;
+	RETURN self;
+
+}
+
+
+function init_Object {
+	PARAM self;
+
+
+	RETURN self;
+
+}
+
+
+function init_Int {
+	PARAM self;
+	PARAM v;
+
+
+	SETATTR self value v;
+	RETURN self;
+
+}
+
+
+function init_String {
+	PARAM self;
+	PARAM v;
+
+
+	SETATTR self value v;
+	RETURN self;
+
+}
+
+
+function init_Bool {
+	PARAM self;
+	PARAM v;
+
+
+	SETATTR self value v;
+	RETURN self;
+
+}
+
+
+function init_IO {
+	PARAM self;
+
+
+	RETURN self;
+
+}
+
+
