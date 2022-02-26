@@ -1,18 +1,3 @@
-from typing import List, Optional, Tuple
-
-import compiler.visitors.visitor as visitor
-from ..cmp.semantic import (
-    Context,
-    InferencerManager,
-    Method,
-    Scope,
-    SemanticError,
-    ErrorType,
-    SelfType,
-    AutoType,
-    LCA,
-    Type,
-)
 from ..cmp.ast import (
     BinaryNode,
     ProgramNode,
@@ -38,7 +23,22 @@ from ..cmp.ast import (
     VariableNode,
     InstantiateNode,
 )
+from ..cmp.semantic import (
+    Context,
+    InferencerManager,
+    Method,
+    Scope,
+    SemanticError,
+    ErrorType,
+    SelfType,
+    AutoType,
+    LCA,
+    Type,
+)
 from .utils import *
+from typing import List, Optional, Tuple
+
+import compiler.visitors.visitor as visitor
 
 
 class TypeChecker:

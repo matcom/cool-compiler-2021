@@ -1,6 +1,3 @@
-from typing import List, Optional, Tuple
-
-import compiler.visitors.visitor as visitor
 from ..cmp.ast import (
     ProgramNode,
     ClassDeclarationNode,
@@ -22,6 +19,8 @@ from .utils import (
     MAIN_PROGRAM_ERROR,
     SELF_ERROR,
 )
+from typing import List, Optional, Tuple
+import compiler.visitors.visitor as visitor
 
 
 class TypeBuilder:

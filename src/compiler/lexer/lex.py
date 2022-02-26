@@ -1,7 +1,7 @@
-import ply.lex as lex
-
 from ..cmp.grammar import *
 from ..cmp.utils import Token
+
+import ply.lex as lex
 
 
 class CoolLexer(object):
