@@ -150,8 +150,8 @@ def t_STRING_newline(t):
     r"\n"
     if not t.lexer.string_backslash:  # FATAL ERROR
         errors.append(
-            "(%s)- LexicographicError: STRING ERROR NON-ESCAPED NEWLINE CHARACTER"
-            % t.lexer.lineno
+            "(%s, %s) - LexicographicError: STRING ERROR NON-ESCAPED NEWLINE CHARACTER"
+            % (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos))
         )
         t.lexer.pop_state()
     else:
@@ -174,7 +174,8 @@ def t_STRING_end(t):
 
 def t_STRING_null(t):
     r"\0"
-    errors.append("(%s)- LexicographicError: STRING NULL ERROR" % t.lexer.lineno)
+    errors.append("(%s, %s) - LexicographicError: STRING NULL ERROR" %
+                  (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos)))
     t.lexer.skip(1)
 
 
@@ -208,9 +209,9 @@ def t_STRING_something(t):
 
 # String Error handling
 def t_STRING_error(t):
-    col = find_column(input_text, t)
+    col = find_column(t.lexer.lexdata, t.lexpos)
     errors.append(
-        "(%s, %s)- LexicographicError: ERROR %s " % (col, t.lexer.lineno, t.value[0])
+        "(%s, %s) - LexicographicError: ERROR %s " % (t.lexer.lineno, col, t.value[0])
     )
     t.lexer.skip(1)
 
@@ -220,7 +221,8 @@ def t_STRING_error(t):
 def t_STRING_eof(t):
     if t.lexer.current_state():
         errors.append(
-            "(%s)- LexicographicError: EOF ERROR IN STRING STATE" % t.lexer.lineno
+            "(%s, %s) - LexicographicError: EOF ERROR IN STRING STATE" %
+            (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos))
         )
 
 
@@ -277,9 +279,9 @@ def t_COMMENT_something(t):
 
 # Comment Error handling
 def t_COMMENT_error(t):
-    col = find_column(input_text, t)
+    col = find_column(t.lexer.lexdata, t.lexpos)
     errors.append(
-        "(%s, %s)- LexicographicError: COMMENT ERROR " % (col, t.lexer.lineno)
+        "(%s, %s) - LexicographicError: COMMENT ERROR " % (t.lexer.lineno, col)
     )
     t.lexer.skip(1)
 
@@ -288,9 +290,9 @@ def t_COMMENT_error(t):
 # Comment EOF handling
 def t_COMMENT_eof(t):
     if t.lexer.current_state():
-        col = find_column(input_text, t)
+        col = find_column(t.lexer.lexdata, t.lexpos)
         errors.append(
-            "(%s, %s)- LexicographicError: EOF in comment" % (col, t.lexer.lineno)
+            "(%s, %s) - LexicographicError: EOF in comment" % (t.lexer.lineno, col)
         )
 
 
@@ -306,10 +308,10 @@ def t_newline(t):
 
 # Error handling rule
 def t_error(t):
-    col = find_column(input_text, t)
+    col = find_column(t.lexer.lexdata, t.lexpos)
     errors.append(
-        '(%s, %s)- LexicographicError: ILLEGAL CHARACTER "%s"'
-        % (col, t.lexer.lineno, t.value[0])
+        '(%s, %s) - LexicographicError: ILLEGAL CHARACTER "%s"'
+        % (t.lexer.lineno, col, t.value[0])
     )
     t.lexer.skip(1)
 
