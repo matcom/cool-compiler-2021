@@ -1,10 +1,7 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Yasmin Cisneros Cimadevila
+    github: ycimadevila
+    group: C411
+  - name: Jessy Gigato Izquierdo
+    github: JessyGigato
+    group: C411

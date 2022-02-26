@@ -263,10 +263,11 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         TypeCollector(context, errors).visit(ast)
         TypeBuilder(context, errors).visit(ast)
         CyclicDependency(context, errors)
-        try:
-            TypeChecker(context, errors).visit(ast, scope)
-        except:
-            errors
+        # try:
+        TypeChecker(context, errors, program).visit(ast, scope)
+        # except Exception as e:
+            # e.text
+            # errors
         if errors:
             print_errors('\n'.join(errors))
             # InferenceTypeChecker(context, errors).visit(ast, Scope())

@@ -1,3 +1,4 @@
+from signal import raise_signal
 from .semantic import SemanticError
 from .semantic import Type
 from .semantic import VoidType, ErrorType
@@ -126,7 +127,7 @@ class TypeChecker:
         self.errors = errors
         self.program = program
     
-    def get_tokencolumn(str, pos):
+    def get_tokencolumn(self, str, pos):
         column = 1
         temp_pos = pos
         while str[temp_pos] != '\n':
@@ -245,7 +246,7 @@ class TypeChecker:
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
-        var_type = scope.get_var_type(node.idx)
+        var_type = scope.find_variable(node.idx)
         if var_type.name == "self":
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Variable "self" is read-only.')
 
@@ -350,23 +351,36 @@ class TypeChecker:
             return_type = self.visit(node.expr, scope)
         else:
             self.errors.append('La expresión del \'case\' no puede ser nula.')
-
+        t = []
+        v = []
         sc = scope.create_child()
-        for id_, type_, expr in node.params:
-            if type_ == 'SELF_TYPE':
-                current_type = self.current_type
-            else:
-                try:
-                    current_type = self.context.get_type(type_) 
-                except SemanticError as e:
-                    current_type = ErrorType()
-            if scope.is_local_variable(id_):
-                self.errors.append(f'La variable \'{id_}\' ya ha sido definida.')
-            else:
-                sc.define_variable(id_, current_type)
+        for pos, (id_, type_, expr) in enumerate(node.params):
+            try:
+                if type_ == 'SELF_TYPE':
+                    sc.define_variable(id_, self.context.get_type(type_))
+                    current_type = self.current_type
+                else:
+                    line, lexpos = node.cases_positions[pos]
+                    self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: "{type_.name}" cannot be a static type of a case branch.')
+            except SemanticError:
+                sc.define_variable(id_, ErrorType())
+                line, lexpos = node.cases_positions[pos]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Class "{type_}" of case branch is undefined')
+            
+            # Cannot be dublicate Branches types
+            if type_ in v:
+                line, lexpos = node.cases_positions[pos]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: Duplicate branch "{type_}" in case statement')
+
+            v.append(type_)
+            t.append(self.visit(expr, sc))
+            # if scope.is_local_variable(id_):
+            #     self.errors.append(f'La variable \'{id_}\' ya ha sido definida.')
+            # else:
+            #     sc.define_variable(id_, current_type)
                 
-            if expr is not None:
-                self.visit(expr, sc)
+            # if expr is not None:
+                # self.visit(expr, sc)
         
         return return_type
         
@@ -380,7 +394,8 @@ class TypeChecker:
     def visit(self, node: ast.VariableNode, scope: Scope):
         var_ = scope.find_variable(node.lex)
         if var_ is None:
-            self.errors.append(f'La variable {node.lex} no ha sido definida definida')
+            self.errors.append(#f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - NameError: Variable "%s" is not defined in "%s".')
+                f'La variable {node.lex} no ha sido definida definida')
             return ErrorType()
         return var_.type
 
@@ -391,10 +406,10 @@ class TypeChecker:
         left = self.visit(node.left, scope)
         int_type = self.context.get_type('Int')
 
-        if right == int_type and left == int_type:
+        if right.name == int_type.name and left.name == int_type.name:
             return int_type
         else:
-            self.errors.append('La operación \'Suma\' debe ser efectuada entre valores enteros')  
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "+" is not defined between "{left.name}" and "{right.name}".')  
             return ErrorType()      
  
     @visitor.when(ast.MinusNode)
@@ -406,7 +421,7 @@ class TypeChecker:
         if right == int_type and left == int_type:
             return int_type
         else:
-            self.errors.append('La operación \'Resta\' debe ser efectuada entre valores enteros')  
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "-" is not defined between "{left.name}" and "{right.name}".') 
             return ErrorType()      
 
     @visitor.when(ast.TimesNode)
@@ -418,7 +433,7 @@ class TypeChecker:
         if right == int_type and left == int_type:
             return int_type
         else:
-            self.errors.append('La operación \'Multiplicación\' debe ser efectuada entre valores enteros')  
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "*" is not defined between "{left.name}" and "{right.name}".')   
             return ErrorType()      
 
     @visitor.when(ast.DivNode)
@@ -430,7 +445,7 @@ class TypeChecker:
         if right == int_type and left == int_type:
             return int_type
         else:
-            self.errors.append('La operación \'Divición\' debe ser efectuada entre valores enteros')  
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "/" is not defined between "{left.name}" and "{right.name}".') 
             return ErrorType()      
 
 
@@ -444,7 +459,7 @@ class TypeChecker:
         if right == bool_type and left == bool_type:
             return bool_type
         else:
-            self.errors.append('La operación \'Menor que\' debe ser efectuada entre valores booleanos')  
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<" is not defined between "{left.name}" and "{right.name}".') 
             return ErrorType()      
 
     @visitor.when(ast.LessEqualNode)
@@ -456,13 +471,18 @@ class TypeChecker:
         if right == bool_type and left == bool_type:
             return bool_type
         else:
-            self.errors.append('La operación \'Menor o igual que\' debe ser efectuada entre valores booleanos')  
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<=" is not defined between "{left.name}" and "{right.name}".') 
             return ErrorType()      
 
     @visitor.when(ast.EqualNode)
     def visit(self, node: ast.EqualNode, scope: Scope):
-        self.visit(node.right, scope)
-        self.visit(node.left, scope)
+        right = self.visit(node.right, scope)
+        left = self.visit(node.left, scope)
+
+        types_ = ['Int', 'Bool', 'String']
+        if (right.name not in types_ or left.name not in types_) and right.name != left.name:
+            self.errors.append('({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: For operation "=" if one of the expression has static type Int, Bool or String, then the other must have the same static type')
+        
         return self.context.get_type('Bool')     
 
 
@@ -473,7 +493,7 @@ class TypeChecker:
         if type_ == self.context.get_type('Int'):
             return type_
         else:
-            self.errors.append('La operación \'Complemento\' esperaba un entero')
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "~" is not defined for "{type_.name}".')
             return ErrorType()
 
     @visitor.when(ast.NegationNode)
@@ -482,7 +502,7 @@ class TypeChecker:
         if type_ == self.context.get_type('Bool'):
             return type_
         else:
-            self.errors.append('La operación \'Negación\' esperaba un booleano')
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "not" is not defined for "{type_.name}".')
             return ErrorType()
 
 
