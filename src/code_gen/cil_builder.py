@@ -41,7 +41,6 @@ from cmp.cil import (
     RuntimeErrorNode,
     CopyNode,
     TypeNameNode,
-    STRNode,
     SetAttribNode,
     GetAttribNode,
     DefaultValueNode,
@@ -373,7 +372,6 @@ class CILBuilder:
             ]
             visited_func.extend(methods)
             type_node.attributes.extend(attributes[::-1])
-            # print("-------EXTENDED:", type_node.attributes)
             type_node.methods.extend(
                 [
                     (item, self.to_function_name(item, current_type.name))
@@ -391,7 +389,6 @@ class CILBuilder:
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node):
-        # self.visit(node.init_exp)
         pass
 
     @visitor.when(cool.FuncDeclarationNode)
@@ -442,6 +439,9 @@ class CILBuilder:
 
     @visitor.when(cool.CallNode)
     def visit(self, node):
+        # TODO: Pending <expr>.id(<expr>,...,<expr>)
+        # TODO: Pending <expr>@<type>.id(<expr>,...,<expr>)
+
         for arg in node.args:
             temp = self.define_internal_local()
             value = self.visit(arg)
