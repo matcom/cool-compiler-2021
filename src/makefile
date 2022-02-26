@@ -8,8 +8,8 @@ UI_FILES	:= about_authors compiler_COOL help orientation
 
 main: ## Compiling the compiler :)
 	@echo "Compiling the compiler :)"
-	for ui_file in $(UI_FILES); do pyuic5 -x ./uis/$${ui_file}.ui -o ./uis/$${ui_file}.py; done
-	python3 utils/remove_character.py
+#	for ui_file in $(UI_FILES); do pyuic5 -x ./uis/$${ui_file}.ui -o ./uis/$${ui_file}.py; done
+#	python3 utils/remove_character.py
 
 visual: ## Open the app desktop ;)
 	python3 visual.py
