@@ -1,5 +1,5 @@
 from .mips import *
-import app.utils.visitor as visitor
+import app.shared.visitor as visitor
 
 
 class PrintVisitor:

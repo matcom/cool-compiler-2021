@@ -1,9 +1,9 @@
 from inspect import currentframe
 from typing import Type
-import app.semantics.inference.inferencer_ast as inf_ast
+import app.semantics.ast as inf_ast
 from app.parser.ast import *
 
-import app.utils.visitor as visitor
+import app.shared.visitor as visitor
 from app.semantics.tools.errors import SemanticError, AttributeError
 from app.semantics.tools import (
     Context,
@@ -485,7 +485,7 @@ class SoftInferencer:
 
     @visitor.when(ArithmeticNode)
     def visit(self, node: ArithmeticNode, scope):
-        left_node, right_node = self.__arithmetic_operation(node, scope)
+        left_node, right_node = self._arithmetic_operation(node, scope)
         if isinstance(node, PlusNode):
             arith_node = inf_ast.PlusNode(left_node, right_node, node)
         elif isinstance(node, MinusNode):
@@ -502,14 +502,14 @@ class SoftInferencer:
 
     @visitor.when(LeNode)
     def visit(self, node: LeNode, scope: Scope):
-        left_node, right_node = self.__arithmetic_operation(node, scope)
+        left_node, right_node = self._arithmetic_operation(node, scope)
         less_node = inf_ast.LessNode(left_node, right_node, node)
         less_node.inferenced_type = self.context.get_type("Bool")
         return less_node
 
     @visitor.when(LeqNode)
     def visit(self, node, scope: Scope):
-        left_node, right_node = self.__arithmetic_operation(node, scope)
+        left_node, right_node = self._arithmetic_operation(node, scope)
         lesseq_node = inf_ast.LessOrEqualNode(left_node, right_node, node)
         lesseq_node.inferenced_type = self.context.get_type("Bool")
         return lesseq_node
@@ -620,7 +620,7 @@ class SoftInferencer:
     def visit(self, node: ParenthNode, scope):
         return self.visit(node.expr, scope)
 
-    def __arithmetic_operation(self, node: ArithmeticNode, scope):
+    def _arithmetic_operation(self, node: ArithmeticNode, scope):
         left_node = self.visit(node.left_expr, scope)
         left_type = left_node.inferenced_type
         left_clone = left_type.clone()

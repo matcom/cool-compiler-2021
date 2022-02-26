@@ -1,8 +1,8 @@
 import app.cil.ast_cil as cil
-import app.utils.visitor as visitor
+import app.shared.visitor as visitor
 from app.semantics.tools.scope import VariableInfo
 from app.semantics.tools.errors import AttributeError
-import app.semantics.inference.inferencer_ast as cool
+import app.semantics.ast as cool
 
 
 def get_token(node):

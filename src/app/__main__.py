@@ -6,11 +6,11 @@ import typer
 from app.shared.errors import InvalidInputFileError
 from app.lexer.main import CoolLexer
 from app.parser import CoolParser
-from app.semantics.inference.inferencer_ast import ProgramNode
+from app.semantics.ast import ProgramNode
 from app.semantics.type_builder import TypeBuilder
 from app.semantics.type_collector import TypeCollector
 from app.semantics.inference.soft_inferencer import SoftInferencer
-from app.semantics.inference.hard_inferencer import HardInferencer
+from app.semantics.inference.hard_inferencer import DeepInferrer
 from app.cil.cool_to_cil import COOLToCILVisitor
 from app.mips.cil_to_mips import CILToMIPSVisitor
 from app.mips.ast_printer import PrintVisitor
@@ -58,7 +58,7 @@ def app(input: Path, output: Path = None):
     soft_ast: ProgramNode = soft.visit(ast)
     errors += soft.errors
 
-    hard = HardInferencer(context)
+    hard = DeepInferrer(context)
     hard_ast: ProgramNode = hard.visit(soft_ast)
     errors += hard.errors
 

@@ -1,6 +1,6 @@
 import itertools as itt
 
-import app.utils.visitor as visitor
+import app.shared.visitor as visitor
 import app.cil.ast_cil as cil
 from app.mips import mips
 from random import choice

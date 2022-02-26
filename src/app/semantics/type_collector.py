@@ -1,7 +1,9 @@
+from http.client import FORBIDDEN
 from app.parser.ast import AstNode, ClassNode, ProgramNode
 from app.semantics.tools import Context, SelfType
 from app.semantics.tools.errors import SemanticError
-import app.utils.visitor as visitor
+import app.shared.visitor as visitor
+from .constants import *
 
 
 class TypeCollector:
@@ -9,7 +11,7 @@ class TypeCollector:
         self.context = Context()
         self.errors = []
         self.type_graph = {
-            "Object": ["IO", "String", "Int", "Bool"],
+            "Object": [*FORBIDDEN_INHERITANCE_TYPES.union({IO_TYPE})],
             "IO": [],
             "String": [],
             "Int": [],
@@ -24,68 +26,70 @@ class TypeCollector:
     @visitor.when(ProgramNode)
     def visit(self, node: ProgramNode):
         self.context = Context()
-        self.init_default_classes()
+        self.build_built_in()
+        [self.visit(class_def) for class_def in node.classes]
 
-        for class_def in node.classes:
-            self.visit(class_def)
-
-        new_classes = self.get_type_hierarchy()
-        node.classes = new_classes
+        node.classes = self.get_type_hierarchy()
         self.context.type_graph = self.type_graph
 
     @visitor.when(ClassNode)
     def visit(self, node: ClassNode):
+        self.node_dict[node.id] = node
+        if not node.id in self.type_graph:
+            self.type_graph[node.id] = []
+
+        if node.parent:
+            self._check_parent(node)
+        else:
+            node.parent = OBJECT_TYPE
+            self.type_graph[OBJECT_TYPE].append(node.id)
+
+        # Register type in context
         try:
             self.context.create_type(node.id)
-            self.node_dict[node.id] = node
-            try:
-                self.type_graph[node.id]
-            except KeyError:
-                self.type_graph[node.id] = []
-            if node.parent:
-                if node.parent in {"String", "Int", "Bool"}:
-                    raise SemanticError(
-                        f"Type '{node.id}' cannot inherit from '{node.parent}' beacuse it is forbidden."
-                    )
-                try:
-                    self.type_graph[node.parent].append(node.id)
-                except KeyError:
-                    self.type_graph[node.parent] = [node.id]
-            else:
-                node.parent = "Object"
-                self.type_graph["Object"].append(node.id)
-        except SemanticError as error:
-            self.add_error(node, error.text)
+        except SemanticError as e:
+            self.add_error(node, e.text)
+            return
+
+    def _check_parent(self, node):
+        if node.parent in FORBIDDEN_INHERITANCE_TYPES:
+            self.add_error(node, SemanticError(
+                "'{}' cannot inherit from '{}'".format(
+                    node.id, node.parent)
+            ).text)
+        if node.parent in self.type_graph:
+            self.type_graph[node.parent].append(node.id)
+        else:
+            self.type_graph[node.parent] = [node.id]
 
     def get_type_hierarchy(self):
-        visited = set(["Object"])
-        new_order = []
-        self.dfs_type_graph("Object", self.type_graph, visited, new_order, 1)
-
-        circular_heritage_errors = []
+        visited = set([OBJECT_TYPE])
+        hierarchy = []
+        errors = []
+        self.dfs_type_graph(OBJECT_TYPE, self.type_graph,
+                            visited, hierarchy, 1)
         for node in self.type_graph:
-            if not node in visited:
-                visited.add(node)
-                path = [node]
-                err = self.check_circular_heritage(
-                    node, self.type_graph, path, visited)
-                if len(err) > 0:  # Nodes with invalid parents will be checked to ;)
-                    circular_heritage_errors.append(
-                        (path[1 if len(path) - 1 else 0], err)
-                    )
-                    # path[1] to detect circular heritage same place tests do :(
-                try:
-                    new_order = new_order + \
-                        [self.node_dict[node] for node in path]
-                except KeyError:
-                    pass
+            if node in visited:
+                continue
+            visited.add(node)
+            path = [node]
+            err = self.check_circular_heritage(
+                node, self.type_graph, path, visited)
+            if err is not None:
+                errors.append(
+                    (path[1 if len(path) - 1 else 0], err)
+                )
+            for node in path:
+                if not node in self.node_dict:
+                    continue
+                hierarchy = [*hierarchy, self.node_dict[node]]
 
-        for node_id, err in circular_heritage_errors:
+        for node_id, err in errors:
             self.add_error(
-                self.node_dict[node_id], "SemanticError: Circular Heritage: " + err
+                self.node_dict[node_id], "SemanticError: Circular dependency detected: " + err
             )
 
-        return new_order
+        return hierarchy
 
     def dfs_type_graph(self, root, graph, visited: set, new_order, index):
         if not root in graph:
@@ -95,31 +99,31 @@ class TypeCollector:
             if node in visited:
                 continue
             visited.add(node)
-            if node not in {"Int", "String", "IO", "Bool", "Object"}:
+            if node not in ALL_BUILT_IN_TYPES:
                 new_order.append(self.node_dict[node])
             self.context.get_type(node, unpacked=True).index = index
             self.dfs_type_graph(node, graph, visited, new_order, index + 1)
 
+    def _check_node(self, node, root, graph, path, visited):
+        if node in path:
+            return " inherits from ".join(child for child in path + [path[0]])
+
+        visited.add(node)
+        path.append(node)
+        return self.check_circular_heritage(node, graph, path, visited)
+
     def check_circular_heritage(self, root, graph, path, visited):
-        for node in graph[root]:
-            if node in path:
-                return " -> ".join(child for child in path + [path[0]])
+        nodes_len = len(graph[root])
+        current_index = 0
+        while(current_index < nodes_len):
+            node = graph[root][current_index]
+            current_index += 1
+            return self._check_node(node, root, graph, path, visited)
 
-            visited.add(node)
-            path.append(node)
-            return self.check_circular_heritage(node, graph, path, visited)
-        return ""
+    def build_built_in(self):
+        self.context.create_type(OBJECT_TYPE).index = 0
+        for type_name in ALL_BUILT_IN_TYPES - {OBJECT_TYPE}:
+            self.context.create_type(type_name)
 
-    def init_default_classes(self):
-        self.context.create_type("Object").index = 0
-        self.context.create_type("String")
-        self.context.create_type("Int")
-        self.context.create_type("IO")
-        self.context.create_type("Bool")
-
-    def init_self_type(self):
-        self.context.types["SELF_TYPE"] = SelfType()
-
-    def add_error(self, node: AstNode, text: str):
-        line, col = node.lineno, node.columnno if node else (0, 0)
-        self.errors.append(f"({line}, {col}) - " + text)
+    def add_error(self, node: AstNode, message: str):
+        self.errors.append(f"({node.lineno}, {node.columnno}) - " + message)

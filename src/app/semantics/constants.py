@@ -1,0 +1,27 @@
+
+from lib2to3.pgen2.token import STRING
+
+# Built-in Types
+OBJECT_TYPE = "Object"
+STRING_TYPE = 'String'
+INT_TYPE = 'Int'
+BOOL_TYPE = 'Bool'
+IO_TYPE = "IO"
+SELF_TYPE = "SELF_TYPE"
+
+# Built-in Methods
+ABORT_METHOD_NAME = "abort"
+TYPE_NAME_METHOD_NAME = "type_name"
+COPY_METHOD_NAME = "copy"
+LENGTH_METHOD_NAME = 'length'
+CONCAT_METHOD_NAME = 'concat'
+SUBSTR_METHOD_NAME = "substr"
+OUT_STRING_METHOD_NAME = "out_string"
+OUT_INT_METHOD_NAME = "out_int"
+IN_STRING_METHOD_NAME = "in_string"
+IN_INT_METHOD_NAME = "in_int"
+
+
+FORBIDDEN_INHERITANCE_TYPES = {STRING_TYPE, INT_TYPE, BOOL_TYPE}
+ALL_BUILT_IN_TYPES = FORBIDDEN_INHERITANCE_TYPES.union(
+    {IO_TYPE}).union({OBJECT_TYPE})
