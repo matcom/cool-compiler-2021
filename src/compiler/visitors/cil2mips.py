@@ -22,9 +22,11 @@ class BaseCILToMIPSVisitor:
         self.type_count = 0
 
     def register_type(self, type_name):
-        type_node = mips.TypeNode(self.to_type_label_address(type_name))
+        label_name = self.to_type_label_address(type_name)
+        type_node = mips.TypeNode(label_name)
         self.types[type_name] = type_node
-        return type_node
+        self.register_data(label_name, type_name)
+        return (type_node, label_name)
 
     def register_data(self, data_name, data):
         data_node = mips.DataNode(self.to_data_label_address(data_name), data)
@@ -113,10 +115,11 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(TypeNode)
     def visit(self, node: TypeNode):
-        type_node = self.register_type(node.name)
+        type_node, label_name = self.register_type(node.name)
         type_node.methods = node.methods
         type_node.attributes = node.attributes
         type_node.pos = self.type_count
+        type_node.label_name = label_name
         self.type_count += 1
 
     @visitor.when(DataNode)
@@ -127,6 +130,8 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node: FunctionNode):
         params = [p.name for p in node.params]
         local_vars = [lv.name for lv in node.localvars]
+        if node.name == "entry":
+            node.name = "main"
         function_node = self.register_function(node.name, params, local_vars)
 
         init_callee = self.make_callee_init_instructions(function_node)
@@ -135,7 +140,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         final_callee = self.make_callee_final_instructions(function_node)
 
         total_instructions = list(flatten(init_callee + body + final_callee))
-        function_node.instrucctions = total_instructions
+        function_node.instructions = total_instructions
         self.current_function = None
 
     @visitor.when(AssignNode)
@@ -383,10 +388,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
         return instructions
 
-    @visitor.when(NotNode)
-    def visit(self, node):
-        pass
-
     @visitor.when(ComplementNode)
     def visit(self, node):
         instructions = []
@@ -406,38 +407,39 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         return instructions
 
-    @visitor.when(GetAttribNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(SetAttribNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(GetIndexNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(SetIndexNode)
-    def visit(self, node):
-        pass
-
     @visitor.when(AllocateNode)
     def visit(self, node: AllocateNode):
         instructions = []
-        type_size = self.get_type_size(node.type)
-        instructions.append(mips.LoadInmediateNode(mips.A0, type_size))
-        instructions.append(mips.LoadInmediateNode(mips.V0, 9))
-        instructions.append(mips.SyscallNode())
+
+        tp = 0
+        if node.type.isnumeric():
+            tp = node.type
+        else:
+            tp = self.types[node.type].pos
+
+        instructions.append(mips.LoadInmediateNode(mips.A0, tp))
+
+        instructions.append(mips.ShiftLeftLogicalNode(mips.A0, mips.A0, 2))
+        instructions.append(mips.LoadAddressNode(mips.A1, mips.VIRTUAL_TABLE))
+        instructions.append(mips.AddUnsignedNode(mips.A1, mips.A1, mips.A0))
+        instructions.append(
+            mips.LoadWordNode(mips.A1, mips.RegisterRelativeLocation(mips.A1, 0))
+        )
+        instructions.append(
+            mips.LoadWordNode(mips.A0, mips.RegisterRelativeLocation(mips.A1, 4))
+        )
+        instructions.append(mips.ShiftLeftLogicalNode(mips.A0, mips.A0, 2))
+        instructions.append(mips.JumpAndLinkNode("malloc"))
+        instructions.append(mips.MoveNode(mips.A2, mips.A0))
+        instructions.append(mips.MoveNode(mips.A0, mips.A1))
+        instructions.append(mips.MoveNode(mips.A1, mips.V0))
+        instructions.append(mips.JumpAndLinkNode("copy"))
+
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
 
         return instructions
-
-    @visitor.when(ArrayNode)
-    def visit(self, node):
-        pass
 
     @visitor.when(TypeOfNode)
     def visit(self, node: TypeOfNode):
@@ -609,10 +611,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
 
         return instructions
-
-    @visitor.when(PrefixNode)
-    def visit(self, node):
-        pass
 
     @visitor.when(SubstringNode)
     def visit(self, node):
@@ -832,3 +830,23 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
 
         return instructions
+
+    # @visitor.when(NotNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(GetIndexNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(SetIndexNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(ArrayNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(PrefixNode)
+    # def visit(self, node):
+    #     pass
