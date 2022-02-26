@@ -9,6 +9,9 @@ from visitors.Executor import Executor, RuntimeException
 from visitors.CooltoCilM import COOLToCILVisitor
 from visitors.CilDepicter import get_formatter
 # from visitors.CiltoMips import CiltoMipsVisitor
+from cil_ast.cil_ast import get_formatter
+from mmips.CilToMipsVisitor import CILToMIPSVisitor
+from mmips.MIPSAstFormatter import MIPSAstFormatter
 
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
@@ -61,6 +64,14 @@ class Pipeline():
                     #     mips_code = self.cilToMips.data + self.cilToMips.code
                     #     for line in mips_code:
                     #         f.write(line+'\n')
+                    MIPSVisitor = CILToMIPSVisitor()
+                    MIPSAst = MIPSVisitor.visit(cil_ast)
+                    MIPSFormatter = MIPSAstFormatter()
+                    mipsCode = MIPSFormatter.visit(MIPSAst)
+                    with open('asd.mips', 'w') as f:
+                        f.write(mipsCode)
+                        f.close()
+
         if verbose:
             print('This is after infering types:')
             print()

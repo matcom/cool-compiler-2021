@@ -374,14 +374,16 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         generation.reverse()
         for i in generation:
+            a = 0
             methods = [m.name for m in i.methods]
-            attributes = [a.name for m in i.attributes]
+            _attributes = i.attributes
+            attributes = [x.name for x in _attributes]
             methods.sort()
             attributes.sort()
             for meth in methods:
                 type.methods[meth] = self.to_function_name(meth, i.name)
             for attr in attributes:
-                type.attributes[attr.name] = cil.AttributeNode(attr.name, i.name)
+                type.attributes[attr] = cil.AttributeNode(attr, i.name)
 
 
     @visitor.when(ProgramNode)
@@ -485,14 +487,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 return VoidNode('void')
         
         variable = self.define_internal_local()
-        if node.expression:
-            self.visit(node.expression, scope.children[0])
-            self.register_instruction(cil.AssignNode(variable, node.expression.ret_expr))
-        elif node.type.lex in self.value_types:
-            if node.type.lex == 'SELF_TYPE':
+        if node.value:
+            self.visit(node.value, scope)
+            self.register_instruction(cil.AssignNode(variable, node.value.ret_expr))
+        elif node.type in self.value_types:
+            if node.type == 'SELF_TYPE':
                 stype = self.current_type.name
             else:
-                stype = node.type.lex
+                stype = node.type
 
             if stype == 'Int':
                 self.register_instruction(cil.ArgNode(0))
@@ -637,10 +639,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         # node.lex -> str
         ###############################
-        if node.token.lex == 'self':
+        if node.lex == 'self':
             node.ret_expr = self.vself.name
         else:
-            node.ret_expr = self.var_names[node.token.lex]
+            node.ret_expr = self.var_names[node.lex]
 
     @visitor.when(InstantiateNode)
     def visit(self, node, scope):
@@ -811,16 +813,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.expression -> ExpressionNode
         ###############################
 
-        for (id, type, expr), child in zip(node.let_body, scope.children[:-1]):
-            variable = self.register_local(VariableInfo(id.lex, type.lex))
-            if expr:
-                self.visit(expr, child)
-                self.register_instruction(cil.AssignNode(variable, expr.ret_expr))
-            elif type.lex in self.value_types:
-                if type.lex == 'SELF_TYPE':
+        # for (id, type, expr), child in zip(node.let_body, scope.children[:-1]):
+        for decl, child in zip(node.decl_list, scope.children[:-1]):
+            id = decl.id
+            type = decl.type
+            variable = self.register_local(VariableInfo(id, type))
+            if decl.expr:
+                self.visit(decl.expr, child)
+                self.register_instruction(cil.AssignNode(variable, decl.expr.ret_expr))
+            elif type in self.value_types:
+                if type == 'SELF_TYPE':
                     stype = self.current_type.name
                 else:
-                    stype = type.lex
+                    stype = type
                 if stype == 'Int':
                     self.register_instruction(cil.ArgNode(0))
                 elif stype == 'Bool':
@@ -832,8 +837,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 self.register_instruction(cil.StaticCallNode(self.init_name(stype), variable,
                                                              ))
 
-        self.visit(node.in_body, scope.children[-1])
-        node.ret_expr = node.in_body.ret_expr
+        self.visit(node.expression, scope.children[-1])
+        node.ret_expr = node.expression.ret_expr
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
@@ -973,7 +978,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node, scope):
         ret = self.define_internal_local()
 
-        self.register_instruction(cil.ArgNode(1 if node.token.lex else 0))
+        self.register_instruction(cil.ArgNode(1))
         self.register_instruction(cil.StaticCallNode(self.init_name('Bool'), ret))
         node.ret_expr = ret
 
@@ -981,16 +986,25 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node, scope):
         ret = self.define_internal_local()
 
-        self.register_instruction(cil.ArgNode(1 if node.token.lex else 0))
+        self.register_instruction(cil.ArgNode(0))
         self.register_instruction(cil.StaticCallNode(self.init_name('Bool'), ret))
         node.ret_expr = ret
 
     @visitor.when(StringNode)
     def visit(self, node, scope):
-        data_node = self.register_data(node.lex)
-        var = self.define_internal_local()
-        self.register_instruction(cil.LoadNode(var, data_node))
-        return data_node.name
+        try:
+            data = [i for i in self.dotdata if i.value == node.lex][0]
+        except IndexError:
+            data = self.register_data(node.lex[1:-1])
+
+        variable = self.define_internal_local()
+        ret = self.define_internal_local()
+
+        self.register_instruction(cil.LoadNode(variable, data))
+        self.register_instruction(cil.ArgNode(variable))
+        self.register_instruction(cil.StaticCallNode(self.init_name('String'), ret))
+        node.ret_expr = ret
+
 
     @visitor.when(LessNode)
     def visit(self, node, scope):

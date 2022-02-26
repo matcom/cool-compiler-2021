@@ -1,6 +1,7 @@
 class Main inherits IO {
+   a : String <- "Hello world\n";
    main(): IO {
-      out_int(12)
+      let b : Int <- 0, c : Bool <- false in out_string(a)
    };
 };
 

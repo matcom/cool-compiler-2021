@@ -1,4 +1,0 @@
-.data
-p_error: .asciiz "Aborting from String"
-zero_error: .asciiz "Division by zero"
-range_error: .asciiz "Index out of range"
