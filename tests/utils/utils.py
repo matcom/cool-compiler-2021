@@ -13,6 +13,7 @@ UNEXPECTED_OUTPUT = 'La salida de %s no es la esperada:\n%s\nEsperada:\n%s'
 
 ERROR_FORMAT = r'^\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*-\s*(\w+)\s*:(.*)$'
 
+
 def parse_error(error: str):
     merror = re.fullmatch(ERROR_FORMAT, error)
     assert merror, BAD_ERROR_FORMAT % error
@@ -26,7 +27,9 @@ def first_error(compiler_output: list, errors: list):
     oline, ocolumn, oerror_type, _ = parse_error(compiler_output[0])
 
     assert line == oline and column == ocolumn and error_type == oerror_type,\
-        UNEXPECTED_ERROR % (error_type, line, column, oerror_type, oline, ocolumn)
+        UNEXPECTED_ERROR % (error_type, line, column,
+                            oerror_type, oline, ocolumn)
+
 
 def first_error_only_line(compiler_output: list, errors: list):
     line, column, error_type, _ = parse_error(errors[0])
@@ -34,7 +37,8 @@ def first_error_only_line(compiler_output: list, errors: list):
     oline, ocolumn, oerror_type, _ = parse_error(compiler_output[0])
 
     assert line == oline and error_type == oerror_type,\
-        UNEXPECTED_ERROR % (error_type, line, column, oerror_type, oline, ocolumn)
+        UNEXPECTED_ERROR % (error_type, line, column,
+                            oerror_type, oline, ocolumn)
 
 
 def get_file_name(path: str):
@@ -43,9 +47,11 @@ def get_file_name(path: str):
     except ValueError:
         return path
 
+
 def compare_errors(compiler_path: str, cool_file_path: str, error_file_path: str, cmp=first_error, timeout=100):
     try:
-        sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        sp = subprocess.run(
+            ['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
         return_code, output = sp.returncode, sp.stdout.decode()
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
@@ -60,15 +66,16 @@ def compare_errors(compiler_path: str, cool_file_path: str, error_file_path: str
     compiler_output = output.split('\n')
     cmp(compiler_output[2:], errors)
 
-SPIM_HEADER = r'''^SPIM Version .+ of .+
-Copyright .+\, James R\. Larus\.
-All Rights Reserved\.
-See the file README for a full copyright notice\.
-(?:Loaded: .+\n)*'''
+
+SPIM_HEADER = r'''(?:Loaded: .+\n)*'''
+
+
 def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: str, output_file_path: str, timeout=100):
     try:
-        sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
-        assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
+        sp = subprocess.run(
+            ['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(
+            cool_file_path)
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
 
@@ -76,7 +83,8 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
 
     try:
         fd = open(input_file_path, 'rb')
-        sp = subprocess.run(['spim', '-file', spim_file], input=fd.read(), capture_output=True, timeout=timeout)
+        sp = subprocess.run(['spim', '-file', spim_file],
+                            input=fd.read(), capture_output=True, timeout=timeout)
         fd.close()
         mo = re.match(SPIM_HEADER, sp.stdout.decode())
         if mo:
@@ -88,4 +96,5 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
     eoutput = fd.read()
     fd.close()
 
-    assert output == eoutput, UNEXPECTED_OUTPUT % (spim_file, repr(output), repr(eoutput))
+    assert output == eoutput, UNEXPECTED_OUTPUT % (
+        spim_file, repr(output), repr(eoutput))

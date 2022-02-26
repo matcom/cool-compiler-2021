@@ -1,10 +1,10 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Javier Alejandro Valdés González
+    github: jvaldesgonzalez
+    group: C411
+  - name: Yansaro Rodríguez Páez
+    github: yarn-rp
+    group: C412
+  - name: Osmany Pérez Rodríguez
+    github: osmany-perez-1998
+    group: C412

@@ -1,14 +1,17 @@
 [tool.poetry]
+authors = [
+  "jvaldesgonzalez <jvaldesgonzalez9@gmail.com>",
+  "osmany-perez-1998 <osmanypr2013@gmail.com>",
+  "yarn-rp <yansarorodriguezpaez@gmail.com>",
+]
+description = "Parser for COOL programming language"
 name = "cool-compiler-2021"
 version = "0.1.0"
-description = "Parser for COOL programming language"
-authors = ["jvaldesgonzalez <jvaldesgonzalez9@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-sly = "^0.4"
 pytest = "^6.2.2"
 pytest-ordering = "^0.6"
+sly = "^0.4"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
@@ -16,13 +19,13 @@ commitizen = "^2.16.0"
 isort = "^5.7.0"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
 
 [tool.pytest.ini_options]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "lexer: comments lexer",
-    "error",
-]
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+  "lexer: comments lexer",
+  "error",
+]
