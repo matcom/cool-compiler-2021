@@ -502,7 +502,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.init_name(node.id, attr=True)
         )
         self.register_param(self.vself)
-        if node.parent.lex != "Object" and node.parent.lex != "IO":
+        if (
+            node.parent is not None
+            and node.parent.lex != "Object"
+            and node.parent.lex != "IO"
+        ):
             self.register_instruction(cil.ArgNode(self.vself.name))
             self.register_instruction(
                 cil.StaticCallNode(self.init_name(node.parent, attr=True), vtemp)
@@ -561,7 +565,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.register_param(self.vself)
         for param_name, _ in node.params:
-            self.register_param(VariableInfo(param_name, None))
+            self.register_param(VariableInfo(param_name.lex, None))
 
         value = self.visit(node.body, scope)
         # (Handle RETURN)
@@ -616,7 +620,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
 
         # static call node
-        if node.obj.lex == self.vself.name:
+        if isinstance(node.obj, VariableNode) and node.obj.lex == self.vself.name:
             args = []
             for arg in node.args:
                 vname = self.register_local(
@@ -768,14 +772,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         #######################################
         # node.expr_list -> [ ExpressionNode ... ]
         #######################################
-        ret = self.register_local(VariableInfo("block_node_value", None))
 
         for expr in node.expr_list:
             ret_value = self.visit(expr, scope)
 
-        self.register_instruction(cil.AssignNode(ret, ret_value))
-
-        return ret
+        return ret_value
 
     @visitor.when(LetNode)
     def visit(self, node, scope):
@@ -824,7 +825,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ret_val = self.visit(node.expr, scope)
 
         self.register_instruction(cil.AssignNode(ret, ret_val))
-        self.register_instruction(cil.TypeOfNode(ret_type, ret_val))
+        self.register_instruction(cil.TypeNameNode(ret_type, ret_val))
 
         # Check if node.expr is void and raise proper error if vexpr value is void
         void = cil.VoidNode()
@@ -985,7 +986,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         left = self.visit(node.left, scope)
         right = self.visit(node.right, scope)
 
-        self.register_instruction(cil.TypeOfNode(type_left, left))
+        self.register_instruction(cil.TypeNameNode(type_left, left))
         self.register_instruction(cil.NameNode(type_int, "Int"))
         self.register_instruction(cil.NameNode(type_bool, "Bool"))
         self.register_instruction(cil.NameNode(type_string, "String"))
@@ -1213,7 +1214,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         instance = self.define_internal_local()
         self.register_instruction(cil.ArgNode(int(node.lex)))
         self.register_instruction(cil.StaticCallNode(self.init_name("Int"), instance))
-        scope.ret_expr = instance
+        return instance
 
     @visitor.when(ConstantStringNode)
     def visit(self, node, scope):
