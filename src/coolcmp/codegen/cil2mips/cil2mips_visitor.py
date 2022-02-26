@@ -124,23 +124,6 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
         )
 
-    @visitor.when(cil.ReturnNode)
-    def visit(self, node: cil.ReturnNode):
-        value = 0 if node.value is None else node.value
-
-        if node.value is None:
-            value = 0
-        elif isinstance(node.value, int):
-            value = node.value
-        else:
-            pass
-        # TODO: Handle returns
-
-        self.add_inst(
-            mips.CommentNode("<return>"),
-            mips.CommentNode("</return>"),
-        )
-
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
         print(f"PrintIntNode {node.addr}")
@@ -148,6 +131,14 @@ class CILToMipsVisitor:
             mips.CommentNode(f"<printint:{node.addr}>"),
             mips.LINode(registers.V0, 1),
         )
+
+        if isinstance(node.addr, int):
+            self.add_inst(
+                mips.LINode(registers.ARG[0], node.addr),
+                mips.SysCallNode(),
+                mips.CommentNode(f"</printint:{node.addr}>"),
+            )
+            return
 
         address = self.cur_function.variable_address(node.addr)
 
@@ -208,9 +199,9 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<minus:{node.dest}<-{node.left}+{node.right}>"),
-            mips.LWNode(t0, 4, node.left),      # load Int_value at offset 4
-            mips.LWNode(t1, 4, node.right),     # load Int_value at offset 4
-            mips.SUBNode(t2, t0, t1),           # subtract the integer values
+            mips.LWNode(t0, 4, node.left),  # load Int_value at offset 4
+            mips.LWNode(t1, 4, node.right),  # load Int_value at offset 4
+            mips.SUBNode(t2, t0, t1),  # subtract the integer values
             # allocate here new Int with the value in t0 as Int_value
             mips.CommentNode(f"</minus:{node.dest}<-{node.left}+{node.right}>"),
         )
@@ -241,6 +232,9 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
-        self.add_inst(
-            mips.LANode(registers.V0, node.value)
-        )
+        if isinstance(node.value, int):
+            self.add_inst(mips.LINode(registers.V0, node.value))
+        else:
+            self.visit(node.value)
+            address = self.cur_function.variable_address(node.value)
+            self.add_inst(mips.LWNode(registers.V0, address, registers.FP))
