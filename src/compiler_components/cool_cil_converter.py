@@ -370,6 +370,18 @@ class CoolToCilConverter(Converter):
         result = define_internal_local(self)
         left = self.visit(node.left, scope.children[0])
         right = self.visit(node.right, scope.children[1])
+
+        labelTrue = register_label(self)
+        labelEnd = register_label(self)
+
+        register_instruction(self, CilLessNode(result, left, right, labelTrue, labelEnd))
+        return result
+
+    @visitor.when(MinorNode)
+    def visit(self, node, scope):
+        result = define_internal_local(self)
+        left = self.visit(node.left, scope.children[0])
+        right = self.visit(node.right, scope.children[1])
         register_instruction(self, CilMinusNode(result, left, right))
         return result
 

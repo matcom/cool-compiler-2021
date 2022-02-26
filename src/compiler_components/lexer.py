@@ -126,12 +126,14 @@ class Tokenizer:
                     s+='\t'
                 elif rest_data[index] == 'f':
                     s+='\f'
-                elif rest_data[index] == '\n':
+                elif rest_data[index] == '\n' or rest_data[index] == 'n':
                     s+='\n'
                     t.lexer.lineno += 1
                 else:
                     s+= rest_data[index]
-
+            else:
+                s+= rest_data[index]
+           
             t.lexer.skip(1)
             index+=1
 
