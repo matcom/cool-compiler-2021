@@ -166,6 +166,10 @@ class PrintCILVisitor(object):
     def visit(self, node):
         return f"{node.dest} = Load {node.msg}"
 
+    @visitor.when(NameNode)
+    def visit(self, node):
+        return f"{node.dest} = NAME {node.name}"
+
     @visitor.when(TypeNameNode)
     def visit(self, node):
         return f"{node.dest} = TYPENAME {node.source}"
@@ -189,3 +193,7 @@ class PrintCILVisitor(object):
     @visitor.when(ErrorNode)
     def visit(self, node):
         return f"ERROR {node.data_node}"
+
+    @visitor.when(EqualStrNode)
+    def visit(self, node):
+        return f"{node.dest} = {node.left} == {node.right}"
