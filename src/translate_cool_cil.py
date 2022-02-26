@@ -535,24 +535,24 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         tag_lst = []
         action_dict = {}
-        for action_name, action_type, action_body in node.actions:
-            tag = self.context.get_type(action_type).tag
+        for action in node.actions:
+            tag = self.context.get_type(action.type).tag
             tag_lst.append(tag)
-            action_dict[tag] = (action_name, action_type, action_body)
+            action_dict[tag] = action
         tag_lst.sort()
 
         for t in reversed(tag_lst):
-            action_name, action_type, action_body = action_dict[t]
+            action = action_dict[t]
             self.register_instruction(CIL_AST.Label(label))
             label = self.get_label()
 
-            action_Type = self.context.get_type(action_type)
+            action_Type = self.context.get_type(action.type)
             self.register_instruction(CIL_AST.Action(case_expr, action_Type.tag, action_Type.max_tag, label))
 
             action_scope = scope.create_child()
-            action_id = self.define_internal_local(scope=action_scope, name=action_name, cool_var_name=action_name)
+            action_id = self.define_internal_local(scope=action_scope, name=action.id, cool_var_name=action.id)
             self.register_instruction(CIL_AST.Assign(action_id, case_expr))
-            expr_result = self.visit(action_body, action_scope)
+            expr_result = self.visit(action.action, action_scope)
 
             self.register_instruction(CIL_AST.Assign(result_local, expr_result))
             self.register_instruction(CIL_AST.Goto(exit_label))

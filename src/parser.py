@@ -341,9 +341,9 @@ def p_branch_list(p):
                 | OBJECT_ID COLON type ACTION expr SEMICOLON branch_list
     """
     if len(p) == 7:
-        p[0] = [(p[1], p[3], p[5])]
+        p[0] = [ast.BranchNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])]
     else:
-        p[0] = [(p[1], p[3], p[5])] + p[7]
+        p[0] = [ast.BranchNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])] + p[7]
 
 
 def p_func_call(p):

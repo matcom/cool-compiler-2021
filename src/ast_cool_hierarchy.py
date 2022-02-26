@@ -79,6 +79,14 @@ class CaseNode(ExpressionNode):
         self.branch_list = branch_list
 
 
+class BranchNode(Node):
+    def __init__(self, line_no, col_no, _id, _type, action):
+        super().__init__(line_no, col_no)
+        self.id = _id
+        self.type = _type
+        self.action = action
+
+
 class AssignNode(ExpressionNode):
     def __init__(self, line_no, col_no, idx, expr):
         super().__init__(line_no, col_no)
