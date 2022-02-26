@@ -23,6 +23,8 @@ T2 = Register("t2")
 # ***********************Utils***********************
 
 MAIN_FUNCTION_NAME = "function_main_at_Main"
+VIRTUAL_TABLE = "virtual_table"
+TYPE_LIST = "type_list"
 
 
 def push_to_stack(register: Register):
@@ -79,6 +81,8 @@ class TypeNode(Node):
     def __init__(self, label):
         self.label = label
         self.methods = []
+        self.attributes = []
+        self.pos = -1
 
 
 class InstructionNode(Node):
@@ -221,3 +225,9 @@ class RegisterRelativeLocation:
     def __init__(self, register, offset):
         self.register = register
         self.offset = offset
+
+
+class LabelRelativeLocation:
+    def __init__(self, label, offset):
+        self._label = label
+        self._offset = offset

@@ -12,70 +12,70 @@ from compiler.visitors.cool2cil import COOLToCILVisitor
 
 
 def run_pipeline(G, text):
-    print('=================== TEXT ======================')
+    print("=================== TEXT ======================")
     print(text)
-    print('================== TOKENS =====================')
+    print("================== TOKENS =====================")
     tokens = list(tokenize_text(text))
     pprint_tokens(tokens)
-    print('=================== PARSE =====================')
+    print("=================== PARSE =====================")
     parser = LR1Parser(G)
     parse, operations = parser([t.token_type for t in tokens], get_shift_reduce=True)
-    print('\n'.join(repr(x) for x in parse))
-    print('==================== AST ======================')
+    print("\n".join(repr(x) for x in parse))
+    print("==================== AST ======================")
     ast = evaluate_reverse_parse(parse, operations, tokens)
     formatter = FormatVisitor()
     tree = formatter.visit(ast)
     print(tree)
-    print('============== COLLECTING TYPES ===============')
+    print("============== COLLECTING TYPES ===============")
     errors = []
     collector = TypeCollector(errors)
     collector.visit(ast)
     context = collector.context
-    print('Errors:', errors)
-    print('Context:')
+    print("Errors:", errors)
+    print("Context:")
     print(context)
-    print('=============== BUILDING TYPES ================')
+    print("=============== BUILDING TYPES ================")
     builder = TypeBuilder(context, errors)
     builder.visit(ast)
     manager = builder.manager
-    print('Errors: [')
+    print("Errors: [")
     for error in errors:
-        print('\t', error)
-    print(']')
-    print('Context:')
+        print("\t", error)
+    print("]")
+    print("Context:")
     print(context)
-    print('=============== CHECKING TYPES ================')
+    print("=============== CHECKING TYPES ================")
     checker = TypeChecker(context, manager, [])
     scope = checker.visit(ast)
-    print('=============== INFERING TYPES ================')
+    print("=============== INFERING TYPES ================")
     temp_errors = []
     inferencer = TypeInferencer(context, manager, temp_errors)
     inferencer.visit(ast, scope)
-    print('Errors: [')
+    print("Errors: [")
     for error in temp_errors:
-        print('\t', error)
-    print(']')
-    print('=============== LAST CHECK ================')
+        print("\t", error)
+    print("]")
+    print("=============== LAST CHECK ================")
     errors.extend(temp_errors)
     checker = TypeChecker(context, manager, errors)
     checker.visit(ast)
-    print('Errors: [')
+    print("Errors: [")
     for error in errors:
-        print('\t', error)
-    print(']')
+        print("\t", error)
+    print("]")
     formatter = FormatVisitor()
     tree = formatter.visit(ast)
-    #print(tree)
+    # print(tree)
 
-    print('=============== CIL CODE ================')
-    cil_visitor = COOLToCILVisitor(context) 
-    cil_ast = cil_visitor.visit(ast,scope)
-    cil_formatter =  PrintCILVisitor()
+    print("=============== CIL CODE ================")
+    cil_visitor = COOLToCILVisitor(context)
+    cil_ast = cil_visitor.visit(ast, scope)
+    cil_formatter = PrintCILVisitor()
     print(cil_formatter.visit(cil_ast))
     return ast
 
 
-text = '''
+text = """
 class Main inherits IO {
     number: Int <- 5;
 
@@ -89,9 +89,7 @@ class Main inherits IO {
 
     
 };
-'''
-
-
+"""
 
 
 ast = run_pipeline(G, text)
