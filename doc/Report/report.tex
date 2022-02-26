@@ -1,0 +1,215 @@
+\documentclass[twoside]{article}
+
+\usepackage{lipsum}
+\usepackage[none]{hyphenat} 
+
+\usepackage[sc]{mathpazo} 
+\usepackage{amsmath}
+\usepackage[T1]{fontenc} 
+\linespread{1.05}
+\usepackage{microtype}
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry}
+\usepackage{multicol} 
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} 
+\usepackage{booktabs} 
+\usepackage{float} 
+\usepackage[hidelinks]{hyperref} 
+\usepackage[usenames]{color}
+
+\usepackage{lettrine} 
+\usepackage{paralist}
+
+\usepackage{abstract} 
+\renewcommand{\abstractnamefont}{\normalfont\bfseries}
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} 
+
+\usepackage{titlesec} 
+\renewcommand\thesection{\Roman{section}} 
+\renewcommand\thesubsection{\Roman{subsection}} 
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} 
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}
+
+\usepackage{fancyhdr} 
+\pagestyle{fancy} 
+\fancyhead{} 
+\fancyfoot{}
+
+\fancyhead[C]{ Compilaci\'on $\bullet$ COOL $\bullet$ C-411}
+\fancyfoot[RO,LE]{\thepage}
+
+\title{\vspace{-15mm}\fontsize{20pt}{10pt}\selectfont\textbf{Proyecto de Complementos de Compilaci\'on}}
+
+\author{
+\large
+\textbf{\large Compilador para el lenguaje COOL} \\[1.5cm]
+\textsc{Alejandro Campos, Darian Dominguez}\\\\[2mm]
+\normalsize Facultad de Matem\'atica y Computaci\'on \\
+\normalsize Universidad de la Habana \\
+\normalsize 2022 \\[2cm]
+\vspace{-5mm}
+}
+\date{}
+
+
+\usepackage{graphicx}
+\begin{document}
+
+\maketitle
+
+\thispagestyle{fancy} 
+
+\begin{center}
+\textbf{Resumen}
+\end{center}
+\noindent \textit{Este reporte contiene las principales ideas seguidas en la implementaci\'on de un compilador completamente funcional para el lenguaje COOL. El cual es un peque\~no lenguaje que mantiene muchas de las caracter\'isticas de los lenguajes de programaci\'on modernos, incluyendo orientaci\'on a objetos, tipado est\'atico y manejo autom\'atico de memoria. A lo largo de este informe se explicar\'an, adem\'as, cada una de las etapas o fases seguidas en la implementaci\'on del compilador. Por \'ultimo, daremos, a groso modo, una peque\~na ojeada al c\'odigo con el objetivo de que el lector entienda el funcionamiento de los m\'etodos que consideramos fundamentales para el desarrollo del compilador.}\\[0.5cm]
+
+\section{Introducci\'on}
+Un compilador es un programa que traduce c\'odigo escrito en un lenguaje de programaci\'on, llamado fuente, a otro lenguaje. En este tipo de traductor, el lenguaje fuente es generalmente un lenguaje de alto nivel, y el otro, un lenguaje de bajo nivel. Un compilador es uno de los pilares de la programaci\'on y de c\'omo entender la comunicaci\'on entre un lenguaje de alto nivel y una m\'aquina. Al poder conocer el funcionamiento de este paso intermedio nos permitir\'a desarrollar y programar de una forma m\'as precisa en los lenguajes de alto nivel. El proceso de compilaci\'on es aquel por el cual se traducen las instrucciones escritas en un determinado lenguaje de programaci\'on a lenguaje de m\'aquina, es decir, a algo que la computadora entiende.
+
+En nuestro caso, el lenguaje fuente es COOL. Un programa en COOL son conjuntos de clases. Una clase encapsula las variables y procedimientos de un tipo de datos. Las instancias de una clase son objetos. En COOL se identifican clases y tipos; es decir, cada clase define un tipo. Las clases permiten a los programadores definir nuevos tipos y procedimientos asociados (o m\'etodos) espec\'ificos para esos tipos. La herencia permite que los nuevos tipos ampl\'ien el comportamiento de los tipos existentes. COOL es un lenguaje de expresi\'on. La mayor\'ia de las construcciones son expresiones, y cada expresi\'on tiene un valor y un tipo. Este lenguaje es type safe, es decir, se garantiza que los procedimientos se aplicar\'an a los datos del tipo correcto. Si bien el tipeo est\'atico impone una fuerte disciplina en la programaci\'on, garantiza que no puedan surgir errores de tipo en la ejecuci\'on de los programas en COOL.
+
+Una vez se tiene una idea acerca del funcionamiento de un compilador y del lenguaje COOL, podemos decir que el objetivo de este informe es presentar la soluci\'on al proceso de compilaci\'on del lenguaje COOL a lenguaje ensamblador, implementado en el lenguaje de pogramaci\'on python. Cuyo c\'odigo se encuentra en este \href{https://github.com/BeginnerCompilers/cool-compiler-2021}{\textcolor{red}{\underline{repositorio}}} de Github.\\\\
+
+\section{Gram\'atica y AST de COOL}
+La gram\'atica de este lenguaje responde al manual de COOL \cite{cool}. Se encuentra definida en \texttt{src/utils/COOL\_Grammar.py} y su estructura se presenta a continuaci\'on:\\
+
+\begin{align*}
+\textit{program} &\rightarrow \textit{class-list}\\
+\textit{class-list} &\rightarrow \textit{def-class ;}\\
+					 &\rightarrow \textit{def\_class ; class-list}\\
+\textit{def\_class} &\rightarrow \textit{class type  \{ feature-list \} }\\	
+&\rightarrow \textit{class type inherits type \{ feature-list \} }\\
+\textit{feature-list} &\rightarrow \textit{def-attr ; feature-list}\\
+&\rightarrow \textit{def-meth ; feature-list}\\
+&\rightarrow \epsilon\\
+\textit{def-attr} &\rightarrow \textit{id : type}\\
+&\rightarrow \textit{id : type <- expr}\\
+\textit{def-meth} &\rightarrow \textit{id ( param-list ) : type \{ expr \} }\\
+\textit{param-list} &\rightarrow \textit{non-empty-param-list}\\
+&\rightarrow \epsilon\\
+\textit{non-empty-param-list} &\rightarrow \textit{param}\\
+&\rightarrow \textit{param , non-empty-param-list}\\
+\textit{param} &\rightarrow \textit{id : type}\\
+\textit{expr} &\rightarrow \textit{id <- expr}\\
+&\rightarrow \textit{while expr loop expr pool}\\
+&\rightarrow \textit{ \{ expr-list \} }\\
+\textit{expr-list} &\rightarrow \textit{expr ;}\\
+&\rightarrow \textit{expr ; expr-list}\\
+\textit{expr} &\rightarrow \textit{let id-list in expr}\\
+\end{align*}
+\begin{align*}
+\textit{id-list} &\rightarrow \textit{id : type}\\
+&\rightarrow \textit{id : type <- expr}\\
+&\rightarrow \textit{id : type, id-list}\\
+&\rightarrow \textit{id : type <- expr , id-list}\\
+\textit{expr} &\rightarrow \textit{case expr of case-list esac}\\
+\textit{case-list} &\rightarrow \textit{id : type <- expr ;}\\
+&\rightarrow \textit{id : type <- expr ; case-list}\\
+\textit{expr} &\rightarrow \textit{not expr}\\
+&\rightarrow \textit{comp = expr}\\
+&\rightarrow \textit{comp}\\
+\textit{comp} &\rightarrow \textit{comp $<$ artih}\\
+&\rightarrow \textit{comp $\leq$ arith}\\
+&\rightarrow \textit{arith}\\
+\textit{arith} &\rightarrow \textit{arith + term}\\
+&\rightarrow \textit{arith - term}\\
+&\rightarrow \textit{term}\\
+\textit{term} &\rightarrow \textit{term * factor}\\
+&\rightarrow \textit{term / factor}\\
+&\rightarrow \textit{factor}\\
+\textit{factor} &\rightarrow \textit{isvoid factor}\\
+&\rightarrow \textit{$\sim$ factor}\\
+&\rightarrow \textit{atom}\\
+\textit{atom} &\rightarrow \textit{true}\\
+&\rightarrow \textit{false}\\
+&\rightarrow \textit{string}\\
+&\rightarrow \textit{num}\\
+&\rightarrow \textit{id}\\
+&\rightarrow \textit{new type}\\
+&\rightarrow \textit{if expr then expr else expr fi}\\
+&\rightarrow \textit{( expr )}\\
+&\rightarrow \textit{dispatch}\\
+\textit{dispatch} &\rightarrow \textit{atom . id ( arg-list )}\\
+&\rightarrow \textit{id ( arg-list )}\\
+&\rightarrow \textit{atom @ type . id ( arg-list )}\\
+\textit{arg-list} &\rightarrow \textit{non-empty-arg-list}\\
+&\rightarrow \epsilon\\
+\textit{non-empty-arg-list} &\rightarrow \textit{expr}\\
+&\rightarrow \textit{expr , non-empty-arg-list}\\
+\end{align*}
+
+El \'arbol de sint\'axis abstracta de COOL se encuentra definido en \texttt{src/utils/ast/AST\_Nodes.py}. Se defini\'o teniendo en cuenta la gram\'atica que definimos anteriormente. Esta gram\'atica es atributada y cada producci\'on contiene como computar cada uno de los atributos que la conforman que, en la mayor\'ia de los casos son argumentos que se pasan como par\'ametros para la creaci\'on de los nodos del ast de nuestro lenguaje.\\\\
+
+
+\section{An\'alisis lexicogr\'afico.}
+El an\'alisis lexicogr\'afico es la primera fase del proceso de compilaci\'on, es donde transformamos la entrada del usuario en tokens v\'alidos del lenguaje. Esta fase se encuentra implementada en \texttt{src/utils/COOL\_Lexer.py}. 
+
+El lexer en nuestro proyecto se apoya en el m\'odulo \textbf{re} de python para expresiones regulares. La clase \texttt{COOL\_Lexer} contiene las expresiones regulares que conforman el lenguaje COOL, esta clase hereda de \texttt{Lexer}, que implementa el m\'etodo \texttt{tokenize}, el cual recibe un texto como entrada y devuelve los tokens del lenguaje. Tambi\'en se detectan los errores lexicogr\'aficos que pueden existir y, en caso de que hayan, se reportan y se detiene la ejecuci\'on del programa. Los errores que se detectan en esta etapa son token inv\'alido, y los errores relacionados con los comentarios y la definici\'on de cadenas de texto, es decir, variables de tipo String. Estos \'ultimos se analizan de forma independiente al m\'odulo \textbf{re} de pyhton para clasificar cada uno de los errores que pueden surgir.\\\\
+
+
+\section{An\'alisis sint\'actico}
+El proceso de parsing b\'asicamente de lo que se encarga es en convertir cadenas de texto escritas en el lenguaje origen a una estructura arb\'orea que captura la sem\'antica del programa. Nuestro parser consiste en analizar la secuencia de tokens calculada en el lexer, y produce un \'arbol de derivaci\'on. 
+
+La implementaci\'on del parser se enuentra en \texttt{src/utils/parser}. 
+
+Primeramente tenemos la clase \texttt{parser}, que contiene las caracter\'isticas comunes a todos los parsers, en esta clase es donde se calculan los conjuntos firsts y follows, y contiene los m\'etodos que deben implementar los parsers que heredan de esta. El parser utilizado es un parser ShiftReduce, la clase \texttt{ShiftReduceParser} devuelve el \'arbol de derivaci\'on de la cadena de texto analizada y las operaciones (shift o reduce) que, posteriormente, se utilizan para generar el ast correspondiente. Adem\'as esta clase es la encargada de devolver los errores sint\'acticos o de parser, en caso de que ocurra alg\'un conflicto. La clase \texttt{LR1\_Parser} implementa los m\'etodos que calculan la tabla de parsing y su respectivo aut\'omata. Finalmente, el parser utilizado fue el LALR 1, que es un parser LR 1, solo que reduce los estados del aut\'omata antes mencionado.
+
+En \texttt{COOL\_Parser} se encuentran los valores precalculados de las tablas action y goto, que se guardan para acelerar la ejecuci\'on del programa, ya que de otra forma demora un poco en calcularlas desde 0. De esta forma \texttt{ShiftReduceParser} ejecuta el proceso de parsing con estas tablas ya calculadas. Si se detecta alg\'un error se reporta y se detiene la ejecuci\'on del algoritmo.\\\\
+
+
+\section{An\'alisis Sem\'antico}
+Llegados a esta fase, no existen errores lexicogr\'aficos ni de parsing, por lo que el texto est\'a sint\'acticamente correcto y podemos pasar al chequeo de tipos sin problemas. Podemos encontrar la implementaci\'on de esta fase en \texttt{src/utils/semantic\_check}.
+
+Para verificar la consistencia de tipos se realizan tres recorridos por el ast. El primero de estos recorridos, \texttt{TypeCollector} a\~nade al contexto todos los tipos declarados en el lenguaje, no sin antes a\~nadir los tipos predeterminados de COOL con sus respectivos m\'etodos. Verifica las redefiniciones de clases.
+
+Luego, antes de pasar al cuerpo de los m\'etodos y despu\'es de recolectar todos los tipos, se hace necesario otro recorrido que verifique declaraci\'on de atributos, par\'ametros, valores de retorno y otras referencias a tipos, y esto precisamnte es lo que hace \texttt{TypeBuilder}. 
+
+El tercer y \'ultimo recorrido, \texttt{TypeChecker}, verifica que el programa haga un uso correcto de los tipos definidos, seg\'un las especificaciones del manual de COOL. En este recorrido tambi\'en se chequea la herencia circular, la redefinici\'on de m\'etodos y que el programa contenga una clase Main con un m\'etodo main sin par\'ametros. 
+
+Al principio de cada recorrido aparecen los errores e incosistencias que se detectan en cada uno. Los recorridos del ast fueron implementados con ayuda del patr\'on visitor.\\\\
+
+
+\section{Generaci\'on de c\'odigo}
+Para la generaci\'on de c\'odigo intermedio de COOL a MIPS vamos a dise\~nar un lenguaje de m\'aquina con capacidades orientadas a objeto. Este lenguaje nos va a permitir generar c\'odigo de MIPS de forma m\'as sencilla, ya que el salto directamente desde COOL a MIPS es demasiado complejo. Este lenguaje se denomina CIL, 3-address object-oriented.
+
+En esta fase no hay incosistencia de tipos, es decir el c\'odigo de COOL est\'a lexicogr\'afica, sint\'actica y sem\'anticamente correcto, listo para la ejecuci\'on. Esta fase se encuentra implementada en \texttt{src/utils/code\_generation}
+
+\subsection{CIL}
+Como ya se dijo, primeramente, pasaremos de COOL para un lenguaje intermedio, CIL. El ast de este lenguaje se implement\'o seg\'un la definici\'on brindada en \cite{compilers} Cap\'itulo 7. Donde, adem\'as de las funciones que ah\'i se describen, se a\~naden otras para realizar la ejecuci\'on de las funciones predefinidas en COOL, y que son necesarias para el retorno de valores de m\'etodos de este lenguaje.
+
+Con ayuda del patr\'on visitor se recorre el ast de COOL y, primeramente se a\~naden todas las funciones y tipos built-in, es decir, que est\'an definidas por defecto en COOL. Posteriormente, por cada nodo del ast de COOL se crean las instrucciones correspondientes en CIL de acuerdo a su definici\'on.
+
+Contamos con una clase auxiliar, \texttt{BaseCOOLToCIL}, que contiene funciones \'utiles para el registro de par\'ametros, funciones, instrucciones, variables locales y otras declaraciones en CIL. Esta clase contiene, adem\'as, la definici\'on de los me\'etodos built-in de COOL.\\
+
+\subsection{MIPS}
+Despu\'es de tener el ast de CIL, el siguiente paso es, finalmente, generar el c\'odigo ensamblador correspondiente a la entrada de COOL. Para ello, primeramente definimos el ast de MIPS, con ayuda de \cite{mips}, en el cual cada nodo representa una instrucci\'on v\'alida en MIPS. Siguiendo la misma idea de generaci\'on de c\'odigo anterior, se recorre cada nodo del ast de CIL y se va creando el correspondiente ast v\'alido en MIPS. Una vez m\'as, los recorridos de cada ast se realizan con ayuda del patr\'on visitor, mediante el cual tambi\'en, se genera el c\'odigo ensamblador en la clase \texttt{PrintMIPS}, que tranforma cada nodo del ast en el c\'odigo de MIPS correspondiente.
+
+Los objetos en memoria est\'an ubicados de la siguiente forma: tipo, espacio que ocupa, direcci\'on de tabla de dispatch, atributos y un valor que indica que hay un objeto en esta zona de memoria. 
+
+El valor que se encuentra en la secci\'on que guarda el tipo se interpreta, como su nombre lo indica, como el tipo del objeto. 
+
+La segunda secci\'on de este segmento se interpreta como el tama\~no en palabras del objeto. 
+
+La tabla de dispatch es una direcci\'on que indica el inicio del segmento de la memoria donde esta se encuentra. Las secciones de dicho segmento se interpretan como la direcci\'on a cada uno de los m\'etodos del objeto. 
+
+Cada una de las subsecciones de la secci\'on de los atributos representa el valor de un atributo del objeto. 
+
+La \'ultima secci\'on nos dice que esta zona de la memoria corresponde a un objeto.
+
+Los tipos est\'an representados en memoria mediante tres estructuras. Primeramente est\'a definida una direcci\'on a un segmento de memoria que representa el nombre del tipo. Luego se representa una estructura que es utilizada en la creaci\'on de los objetos, por lo tanto se representa como se dijo anteriormente. Este segmento de memoria es asignado al objeto una vez que se crea y contiene los valores por defecto de estos. Por \'ultimo, tambi\'en se encuentra una tabla de dispatch, y existe una tabla de nombres, donde se puede encontrar el nombre de un tipo espec\'ifico.
+
+\section{Ejecuci\'on}
+Este proyecto no usa ninguna librer\'ia de python fuera de la librer\'ia est\'andar. Por lo que para ejecutarlo solo debe tener instalado python 3 o superior. Desde el directorio del proyecto ejecutar \texttt{python3 main.py file} donde file debe ser un archivo ubicado en el mismo directorio del proyecto. El compilador generar\'a como salida un archivo con extensi\'on \texttt{.mips} que puede ejecutar con cualquier simulador de spim. Sugerimos el uso de QtSpim.\\\\
+
+
+\begin{thebibliography}{99}
+	\bibitem{cool} Cool-manual \href{https://github.com/BeginnerCompilers/cool-compiler-2021/tree/master/doc/Report/files/cool-manual.pdf}{(\textcolor{red}{\underline{abrir}})}
+	
+	\bibitem{compilers} Compilers \href{https://github.com/BeginnerCompilers/cool-compiler-2021/tree/master/doc/Report/files/compilers.pdf}{(\textcolor{red}{\underline{abrir}})}
+	
+	\bibitem{mips} Spim Manual \href{https://github.com/BeginnerCompilers/cool-compiler-2021/tree/master/doc/Report/files/SPIM\_Manual.pdf}{(\textcolor{red}{\underline{abrir}})}
+\end{thebibliography}
+
+
+\end{document}
