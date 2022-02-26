@@ -11,16 +11,6 @@
 El proyecto presenta un compilador capaz de interpretar el lenguaje COOL 
 "The Classroom Object-Oriented Language". La solución está desarrollada en python.
 
-## Contenido
-
-
-| Compiler Stage     | Python Module                                        |
-|:-------------------|:-----------------------------------------------------|
-| Lexical Analysis   | [lexer.py](/src/lexer.py)                            |
-| Parser             | [parser.py](/src/parser.py)                          |
-| Semantic Analysis  | [semantic_analyzer.py](/src/semantic_analizaer.py)  |
-| Code Generation    | [mips_generator.py](/src/mips_genertor.py);          |
-
 
 ## Lexer y Parser
 Para el desarrollo del lexer y el parser se utilizó la herramienta de parsing **PLY**.
@@ -31,110 +21,110 @@ La Grámatica usada es libre de contexto y de recursión extrema izquierda. Debi
 en la que esta es definida, no presenta problemas de ambigüedad
 
 ```
-    program : class_list
+program : class_list
 
-    class_list : class_def
-            | class_def class_list
-            
-    class_def : CLASS TYPE_ID LBRACE feature_list RBRACE SEMICOLON
-              | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE SEMICOLON
+class_list : class_def
+        | class_def class_list
+        
+class_def : CLASS TYPE_ID LBRACE feature_list RBRACE SEMICOLON
+          | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE SEMICOLON
 
-    feature_list : attrs_def SEMICOLON feature_list
-                 | meth_def SEMICOLON feature_list
-                 | empty
-                     
-    attrs_def : attr_def
-              | attr_def COMMA attrs_def
-              
-    attr_def : OBJECT_ID COLON type
-             | OBJECT_ID COLON type ASSIGN expr
-             
-    meth_def : OBJECT_ID LPAREN param_list RPAREN COLON type LBRACE expr RBRACE
-    
-    param_list : param other_param
-               | empty
-               
-    param : OBJECT_ID COLON type
-
-    other_param : COMMA param other_param
-                | empty
-                
-    expr : comparer LT open_expr_lvl1
-         | comparer LTEQ open_expr_lvl1
-         | comparer EQ open_expr_lvl1
-         | open_expr_lvl1
-         | comparer
-         
-    open_expr_lvl1 : arith PLUS open_expr_lvl2
-                   | arith MINUS open_expr_lvl2
-                   | open_expr_lvl2
-                   
-    open_expr_lvl2 : term MULT open_expr_lvl3
-                   | term DIV open_expr_lvl3
-                   | open_expr_lvl3
-                   
-    open_expr_lvl3 : ISVOID open_expr_lvl3
-                   | INT_COMP open_expr_lvl3
-                   | open_expr
-                   
-    open_expr : LET let_var_list IN expr
-              | OBJECT_ID ASSIGN expr
-              | NOT expr
-                   
-    comparer : comparer LT arith
-             | comparer LTEQ arith
-             | comparer EQ arith
-             | arith
-             
-    arith : arith PLUS term
-          | arith MINUS term
-          | term
-          
-    term : term MULT factor
-         | term DIV factor
-         | factor
-         
-    factor : ISVOID factor
-           | INT_COMP factor
-           | atom
-           
-    atom : INTEGER
-         | OBJECT_ID
-         | STRING
-         | BOOL
-         | LPAREN expr RPAREN
-         | NEW TYPE_ID
-         | IF expr THEN expr ELSE expr FI
-         | WHILE expr LOOP expr POOL
-         | LBRACE expr_list RBRACE
-         | CASE expr OF branch_list ESAC
-         | func_call
-          
-    expr_list : expr SEMICOLON
-              | expr SEMICOLON expr_list
-              
-    let_var_list : OBJECT_ID COLON type
-                 | OBJECT_ID COLON type ASSIGN expr
-                 | OBJECT_ID COLON type COMMA let_var_list
-                 | OBJECT_ID COLON type ASSIGN expr COMMA let_var_list
-                 
-    branch_list : OBJECT_ID COLON type ACTION expr SEMICOLON
-                | OBJECT_ID COLON type ACTION expr SEMICOLON branch_list
-                
-    func_call : atom DOT OBJECT_ID LPAREN arg_list RPAREN
-              | OBJECT_ID LPAREN arg_list RPAREN
-              | atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
-              
-    arg_list : expr other_arg
+feature_list : attrs_def SEMICOLON feature_list
+             | meth_def SEMICOLON feature_list
              | empty
-             
-    other_arg : COMMA expr other_arg
-              | empty
-              
-    type : TYPE_ID
-            | SELF_TYPE
+                 
+attrs_def : attr_def
+          | attr_def COMMA attrs_def
+          
+attr_def : OBJECT_ID COLON type
+         | OBJECT_ID COLON type ASSIGN expr
+         
+meth_def : OBJECT_ID LPAREN param_list RPAREN COLON type LBRACE expr RBRACE
+
+param_list : param other_param
+           | empty
+           
+param : OBJECT_ID COLON type
+
+other_param : COMMA param other_param
+            | empty
             
-    empty :
+expr : comparer LT open_expr_lvl1
+     | comparer LTEQ open_expr_lvl1
+     | comparer EQ open_expr_lvl1
+     | open_expr_lvl1
+     | comparer
+     
+open_expr_lvl1 : arith PLUS open_expr_lvl2
+               | arith MINUS open_expr_lvl2
+               | open_expr_lvl2
+               
+open_expr_lvl2 : term MULT open_expr_lvl3
+               | term DIV open_expr_lvl3
+               | open_expr_lvl3
+               
+open_expr_lvl3 : ISVOID open_expr_lvl3
+               | INT_COMP open_expr_lvl3
+               | open_expr
+               
+open_expr : LET let_var_list IN expr
+          | OBJECT_ID ASSIGN expr
+          | NOT expr
+               
+comparer : comparer LT arith
+         | comparer LTEQ arith
+         | comparer EQ arith
+         | arith
+         
+arith : arith PLUS term
+      | arith MINUS term
+      | term
+      
+term : term MULT factor
+     | term DIV factor
+     | factor
+     
+factor : ISVOID factor
+       | INT_COMP factor
+       | atom
+       
+atom : INTEGER
+     | OBJECT_ID
+     | STRING
+     | BOOL
+     | LPAREN expr RPAREN
+     | NEW TYPE_ID
+     | IF expr THEN expr ELSE expr FI
+     | WHILE expr LOOP expr POOL
+     | LBRACE expr_list RBRACE
+     | CASE expr OF branch_list ESAC
+     | func_call
+      
+expr_list : expr SEMICOLON
+          | expr SEMICOLON expr_list
+          
+let_var_list : OBJECT_ID COLON type
+             | OBJECT_ID COLON type ASSIGN expr
+             | OBJECT_ID COLON type COMMA let_var_list
+             | OBJECT_ID COLON type ASSIGN expr COMMA let_var_list
+             
+branch_list : OBJECT_ID COLON type ACTION expr SEMICOLON
+            | OBJECT_ID COLON type ACTION expr SEMICOLON branch_list
+            
+func_call : atom DOT OBJECT_ID LPAREN arg_list RPAREN
+          | OBJECT_ID LPAREN arg_list RPAREN
+          | atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
+          
+arg_list : expr other_arg
+         | empty
+         
+other_arg : COMMA expr other_arg
+          | empty
+          
+type : TYPE_ID
+        | SELF_TYPE
+        
+empty :
 ```
 ## Lexer
 En la implementación del lexer se declaran los tokens, que definien todos los posibles tokens 
