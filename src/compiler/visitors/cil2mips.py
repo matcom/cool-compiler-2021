@@ -363,10 +363,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
         return instructions
 
-    @visitor.when(NotNode)
-    def visit(self, node):
-        pass
-
     @visitor.when(ComplementNode)
     def visit(self, node):
         instructions = []
@@ -385,22 +381,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
 
         return instructions
-
-    @visitor.when(GetAttribNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(SetAttribNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(GetIndexNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(SetIndexNode)
-    def visit(self, node):
-        pass
 
     @visitor.when(AllocateNode)
     def visit(self, node: AllocateNode):
@@ -435,10 +415,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
 
         return instructions
-
-    @visitor.when(ArrayNode)
-    def visit(self, node):
-        pass
 
     @visitor.when(TypeOfNode)
     def visit(self, node: TypeOfNode):
@@ -610,10 +586,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
 
         return instructions
-
-    @visitor.when(PrefixNode)
-    def visit(self, node):
-        pass
 
     @visitor.when(SubstringNode)
     def visit(self, node):
@@ -833,3 +805,23 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         )
 
         return instructions
+
+    # @visitor.when(NotNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(GetIndexNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(SetIndexNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(ArrayNode)
+    # def visit(self, node):
+    #     pass
+
+    # @visitor.when(PrefixNode)
+    # def visit(self, node):
+    #     pass
