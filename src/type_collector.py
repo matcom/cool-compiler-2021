@@ -12,6 +12,9 @@ from utils.semantic import (
     Type,
 )
 
+TYPE_ERROR = '(%s, %s) - TypeError: %s'
+SEMANTIC_ERROR = '(%s, %s) - SemanticError: %s'
+
 
 class TypeCollector(object):
     def __init__(self, errors=None):
@@ -63,7 +66,7 @@ class TypeCollector(object):
             typex = self.context.create_type(node)
             typex.set_parent(self.context.types[BasicTypes.OBJECT.value])
         except SemanticError as error:
-            self.errors.append(f'(Line {node.lineno}) {error.text}')
+            self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno, error.text))
             node.id = BasicTypes.ERROR.value
 
 
