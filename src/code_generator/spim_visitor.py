@@ -9,6 +9,7 @@ class MIPSCodegen:
         self.scope = scope
         self.code = ""
         self.tabs = ''
+        self.main = True
 
     # =================== Utils ========================
     def add_line(self,line):
@@ -25,7 +26,7 @@ class MIPSCodegen:
 
     def gen_pop(self,dst):
         self.add_line(f'# pop the top of the stack to {dst}')
-        self.add_line(f'sw 0($sp), {dst}')
+        self.add_line(f'lw {dst}, 0($sp)')
         self.add_line(f'addu $sp $sp {WSIZE}')
         self.add_line('')
 
@@ -37,6 +38,11 @@ class MIPSCodegen:
     def visit(self, node: CILProgramNode, frame):
         for t in node.types:
             self.visit(t, frame)
+    
+        self.set_tabs(1)
+        self.add_line(".data")
+        self.set_tabs(0)
+        self.add_line("ObjectErrorMessage : .asciiz \"Program was halted\n\"")
 
         for d in node.data:
             self.visit(d, frame)
@@ -44,16 +50,20 @@ class MIPSCodegen:
         for f in node.functions:
             self.visit(f, frame)
 
+        with open('./code_generator/mips_built_in.txt') as file:
+            self.code += file.read()
+
     @visitor.when(CILTypeNode)
     def visit(self, node: CILTypeNode, frame):
         # place the type name as a string in static data
         self.set_tabs(1)
         self.add_line(".data")
         self.set_tabs(0)
-        type_info = self.scope.types[node.id]
+        t = self.scope.types[node.id]
         methods_str = ' '.join(m.function_id for m in node.methods)
+        assert len(node.methods) == len(t.methods_offset)
         self.add_line(f"_{node.id}: .asciiz \"{node.id}\"")
-        self.add_line(f"{node.id}: .word {type_info.size} _{node.id} {methods_str}")
+        self.add_line(f"{node.id}: .word {t.size} _{node.id} {methods_str}")
         self.add_line('')
 
     @visitor.when(CILDataNode)
@@ -61,15 +71,20 @@ class MIPSCodegen:
         self.set_tabs(1)
         self.add_line(".data")
         self.set_tabs(0)
-        self.add_line(f"_{node.id}: .asciiz \"{node.text}\"")
+        self.add_line(f"{node.id}: .asciiz {node.text}")
         self.add_line('')
         
     @visitor.when(CILFuncNode)
     def visit(self, node: CILFuncNode, frame):
         frame = self.scope.functions[node.id]
-
+        self.set_tabs(1)
+        self.add_line('.text')
         self.set_tabs(0)
-        self.add_line(f'{node.id}:') # Place the label
+        if self.main:
+            self.add_line(f'main:')
+        else:
+            self.add_line(f'{node.id}:') # Place the label
+
 
         self.set_tabs(1)
         self.add_line('# save the return address and frame pointer')
@@ -90,6 +105,13 @@ class MIPSCodegen:
         self.add_line(f'move $sp $fp')
         self.gen_pop('$fp')
         self.gen_pop('$ra')
+
+        if self.main:
+            self.add_line('li $v0, 10')
+            self.add_line('syscall')
+            self.main = False
+        else:
+            self.add_line('jr $ra')
 
     @visitor.when(CILAttributeNode)
     def visit(self, node: CILAttributeNode, frame):
@@ -127,7 +149,7 @@ class MIPSCodegen:
         inst_addr = frame.get_addr(node.id.lex)
         t = self.scope.types[node.type] # Change this for dynamic type? Not needed because the attributes are always declared in the same order in inhereted classes
         register1 = '$v1'
-        register2 = '$v2'
+        register2 = '$s2'
         attr_addr = t.get_attr_addr(node.attr.lex, register1) #
         value_addr = self.visit(node.var, frame)
         self.add_line(f'move {register2}, {value_addr}')
@@ -139,7 +161,8 @@ class MIPSCodegen:
     def visit(self, node: CILArgNode, frame):
         frame.push_arg(node.var) # keep track of the args to be pass to the funcion to get the instance to bind the dynamic type
         value_addr = frame.get_addr(node.var.lex)
-        self.gen_push(value_addr)
+        self.add_line(f'lw $v0, {value_addr}')
+        self.gen_push('$v0')
      
     @visitor.when(CILIfGotoNode)
     def visit(self, node: CILIfGotoNode, frame):
@@ -224,7 +247,7 @@ class MIPSCodegen:
         register0 = '$v0'
         # register0 has the dynamic type address of the instance 
         # since every instance stores its type in the first word of the allocated memory
-        self.add_line('lw {register0}, {instance_addr}')
+        self.add_line(f'lw {register0}, 0({instance_addr})')
 
         # use the information of the static type to get the location of the method in memory
         t = self.scope.types[node.type]
@@ -233,8 +256,9 @@ class MIPSCodegen:
         except:
             print('shdglsdglsjdg0000000000000')
             print(t.methods_offset)
-
-        self.add_line(f'jal {method_addr}') # calls the method and by convention methods return in $v0
+        
+        self.add_line(f'lw $v1, {method_addr}')
+        self.add_line(f'jal $v1') # calls the method and by convention methods return in $v0
         frame.clear_args() # clear arguments for the new function
 
         return '$v0'
@@ -322,10 +346,10 @@ class MIPSCodegen:
     @visitor.when(CILElessNode)
     def visit(self, node: CILElessNode, frame):
         register0 = '$v0'
-        register1 = '$v1'
-        register2 = '$v2'
-        register3 = '$v3'
-        register4 = '$v4'
+        register1 = '$s1'
+        register2 = '$s2'
+        register3 = '$s3'
+        register4 = '$s4'
         self.visit(node.left, frame)
         self.add_line(f'move {register1}, {register0}')
         self.add_line(f'move {register3}, {register0}')
@@ -339,11 +363,11 @@ class MIPSCodegen:
 
     @visitor.when(CILEqualsNode)
     def visit(self, node: CILEqualsNode, frame):
-        register0 = '$v0'
-        register1 = '$v1'
-        register2 = '$v2'
-        register3 = '$v3'
-        register4 = '$v4'
+        register0 = '$s0'
+        register1 = '$s1'
+        register2 = '$s2'
+        register3 = '$s3'
+        register4 = '$s4'
         self.visit(node.left, frame)
         self.add_line(f'move {register1}, {register0}')
         self.add_line(f'move {register3}, {register0}')

@@ -1,221 +1,274 @@
 abort_Object:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
-    li $v0, 55
-    move $a0, ObjectErrorMessage
-    li $a1, 0
-    syscall
+        li $v0, 55
+        la $a0, ObjectErrorMessage
+        li $a1, 0
+        syscall
 
-    li $v0, 17
-    li $a0, 1
-    syscall
+        li $v0, 17
+        li $a0, 1
+        syscall
 
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
 
 typename_Object:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
-    lw $v7, 12($fp})
-    lw $v6, 0($v7)
+        lw $t7, 12($fp)
+        lw $t6, 0($t7)
 
-    lw $a0, 4($v6)
-    li $v0, 4
-    syscall
+        lw $a0, 4($t6)
+        li $v0, 4
+        syscall
 
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
 
 copy_Object:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
 
-    lw $v7, 12($fp)
-    lw $v6, 0($v7)
-    lw $v5, 0($v6)
+        lw $t7, 12($fp) # load the object address
+        lw $t6, 0($t7) # get the type info address
+        lw $t5, 0($t6) # get the size of the type
 
-    move $a0, $v7
-    li $v0, 9
-    syscall
-    move $v6, $v0
+        move $a0, $t5
+        li $v0, 9
+        syscall
+        move $t6, $v0
 copy_Object_loop:
-    lw $v4, 0($v7)
-    sw $v4, 0($v6)
-    addu $v7, $v7, 4
-    addu $v6, $v6, 4
-    addu $v5, $v5, -4
-    bgtz $v5, copy_Object_loop              
-    
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        lw $t4, 0($t7)
+        sw $t4, 0($t6)
+        addu $t7, $t7, 4
+        addu $t6, $t6, 4
+        addu $t5, $t5, -4
+        bgtz $t5, copy_Object_loop              
+        
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
 
 out_int_IO:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
 
-    lw $v1, 12($fp)
-    lw $a0, 4($v1)
-    li $v0, 1
-    syscall
-    
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        lw $v1, 12($fp)
+        lw $a0, 4($v1)
+        li $v0, 1
+        syscall
+        
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
 
 out_string_IO:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
 
-    lw $a1, 12($fp) # reference to string object
-    lw $a0, 4($a1) # get the address of the value of the string 
-    move $v0, 4
-    syscall
-    
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        lw $a1, 12($fp) # reference to string object
+        lw $a0, 4($a1) # get the address of the value of the string 
+        li $v0, 4
+        syscall
+        
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
 
 strlen_String:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
 
-    lw $a0, 12$fp
-    li $t0, 0
+        lw $a0, 12($fp)
+        li $t0, 0
 srtlen_String_loop:
-    lb $t1, 0($a0)
-    beqz $t1, strlen_String_exit
-    addu $a0, $a0, 1
-    addu $t0, $t0, 1
-    j strlen_String_loop:
-    strlen_String_exit:
-    move $v0, $t0
-    
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        lb $t1, 0($a0)
+        beqz $t1, strlen_String_exit
+        addu $a0, $a0, 1
+        addu $t0, $t0, 1
+        j strlen_String_loop
+        strlen_String_exit:
+        move $v0, $t0
+        
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
 
 strcopy_String:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
 
-    lw $a0, 12$fp
+        lw $a0, 12($fp)
 
-    sw $a0, 0($sp) # pass the string address as a parameter
-    addu $sp, $sp, -4
-    jal strlen_String # len of the string at v0
+        sw $a0, 0($sp) # pass the string address as a parameter
+        addu $sp, $sp, -4
+        jal strlen_String # len of the string at v0
 
-    # push v0 to stack and save the len
-    sw $v0, 0($sp) 
-    addu $sp, $sp, -4
+        # push v0 to stack and save the len
+        sw $v0, 0($sp) 
+        addu $sp, $sp, -4
 
-    move $a0, $v0 # pass as argument the size to alloc
-    li $v0, 9
-    syscall # v0 location of the dst string
+        move $a0, $v0 # pass as argument the size to alloc
+        li $v0, 9
+        syscall # v0 location of the dst string
 
-    lw $v1, 12$fp # load the source string address
-    move $v2, $v0 # copy the dst string address
+        lw $v1, 12($fp) # load the source string address
+        move $t2, $v0 # copy the dst string address
 
-    lw $v3, 0($sp) # pop the len of the string
-    addu $sp, $sp, 4
 strcopy_String_loop:
-    lb $t0, 0($v1) # load the next char
-    sb $t0, 0($v2) # copy the char
-    addu $v1, $v1, 1
-    addu $v2, $v2, 1
-    addu $v3, $v3, -1 # decrease the size
-    bgtz $v3, strcopy_String_loop
+        lb $t0, 0($v1) # load the next char
+        sb $t0, 0($t2) # copy the char
+        addu $v1, $v1, 1
+        addu $t2, $t2, 1
+        bgtz $t0, strcopy_String_loop
 
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
 
 length_String:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
-    lw $v0, 12($fp) # get the string instance address
-    lw $v1, 4($fp) # get the string value address
+        lw $v0, 12($fp) # get the string instance address
+        lw $v1, 4($fp) # get the string value address
 
-    sw $v1, 0($sp)
-    addu $sp, $sp, -4
-    jal strlen_String # length at v0
-    
-    move $sp, $fp
-    lw $fp, 0($sp)
-    addu $sp, $sp, 4
-    lw $ra, 0($sp)
-    addu $sp, $sp, 4
-    jr $ra
+        sw $v1, 0($sp)
+        addu $sp, $sp, -4
+        jal strlen_String # length at v0
+        
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+      
+        jr $ra
 
 concat_String:
-    sw $ra, 0($sp)
-    addu $sp, $sp, -4
-    sw $fp, 0($sp)
-    addu $sp, $sp, -4
-    move $fp, $sp
+        sw $ra, 0($sp)
+        addu $sp, $sp, -4
+        sw $fp, 0($sp)
+        addu $sp, $sp, -4
+        move $fp, $sp
 
-    lw $v0, 16($fp) # first str instance address 
+        lw $v0, 16($fp) # first str instance address 
+        sw $v0, 0($sp) # pass the instance 
+        addu $sp, $sp, -4
+        jal length_String
 
-    
+        sw $v0, 0($sp) # save the length of the first string
+        addu $sp, $sp, -4
 
+        lw $v0, 12($fp) # second str instance address 
+        sw $v0, 0($sp) # pass the instance 
+        addu $sp, $sp, -4
+        jal length_String # second str lenght in $v0
 
-    
+        lw $v1, 0($sp) # load the length of the first string
+        addu $sp, $sp, 4
 
+        addu $a0, $v1, $v0
+        addu $a0, $a0, 1
+        li $v0, 9
+        syscall # allocate memory for the new string
+        
+        # the new string is at $v0
+        lw $v1, 16($fp)
+        move $t2, $v0
 
+concat_String_loop1: # copy the first string
+        lb $t0, 0($v1) # load the next char
+        beq $t0, $zero, concat_String_eloop1
+        sb $t0, 0($t2) # copy the char
+        addu $v1, $v1, 1
+        addu $t2, $t2, 1
+        j concat_String_loop1
 
+concat_String_eloop1: 
+        lw $v1, 12($fp)
 
+concat_String_loop2: # copy the second string
+        lb $t0, 0($v1) # load the next char
+        sb $t0, 0($t2) # copy the char
+        addu $v1, $v1, 1
+        addu $t2, $t2, 1
+        bgtz $t0, concat_String_loop2
+
+        sw $v0, 0($sp) # save the address of the result string
+        addu $sp, $sp, -4
+
+        # allocate space for an String intance
+        li $v0, 9
+        li $a0, 8
+        syscall # v0 is the address for the instance
+
+        la $v1, String
+        sw $v1, 0($v0) # copy type info
+        
+        lw $v1, 0($sp) # load the address of the result string
+        addu $sp, $sp, 4
+
+        sw $v1, 4($v0) # copy value
+
+        move $sp, $fp
+        lw $fp, 0($sp)
+        addu $sp, $sp, 4
+        lw $ra, 0($sp)
+        addu $sp, $sp, 4
+        jr $ra
+
+substr_String:

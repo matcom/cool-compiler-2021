@@ -10,6 +10,9 @@ class MIPSScope:
 
     def __str__(self):
         r = ''
+        for t, ti in self.types.items():
+            r += f'{t}\n'
+            r += f'{ti}\n\n'
         for f, cf in self.functions.items():
             r += f'{f}\n'
             r += f'{cf}\n\n'
@@ -38,7 +41,13 @@ class TypeInfo:
     def get_method_addr(self, method, register):
         offset = self.methods_offset[method]
         return f'{(offset + 1) * WSIZE}({register})'
-        
+    
+    def __str__(self):
+        r = '--------------------Type----------------\n'
+        r += f'Attrs : {self.attrs_offset}\n'
+        r += f'Methods : {self.methods_offset}\n'
+        r += '-------------------------------------------'
+        return r
 
 class ProcCallFrame:
     def __init__(self, nargs, nvars):
