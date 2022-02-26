@@ -4,7 +4,7 @@ from typing import List, Tuple, Union
 from coolcmp.utils.registers import FP, Register, SP, DW, ARG, V0
 
 
-PROTOTYPES = "__prototypes_labels__"
+TYPES_LABELS = "__types_definition__"
 
 Memory = Union[str, int]
 
@@ -14,11 +14,9 @@ class Node:
 
 
 class Type:
-    def __init__(self, label, address, attrs, methods, index, default=None):
+    def __init__(self, label, attrs, methods, index):
         self.label = label
-        self.address = address
         self.attrs = attrs
-        self.default_attrs = dict(default) if default is not None else {}
         self.methods = methods
         self.index = index
 
@@ -26,7 +24,7 @@ class Type:
         return len(self.attrs)
 
     def __str__(self):
-        return f"{self.label}-{self.address}-{self.attrs}-{self.default_attrs}-{self.methods}-{self.index}"
+        return f"{self.label}-{self.attrs}-{self.default_attrs}-{self.methods}-{self.index}"
 
 
 class ProgramNode(Node):
@@ -57,7 +55,7 @@ class FunctionNode(Node):
     def param_address(self, name: str):
         index = self.params.index(name)
         params_amount = len(self.params)
-        offset = (params_amount + 2 - index) * DW
+        offset = (params_amount - 1 - index) * DW
         return offset
 
     def variable_address(self, name: str):
@@ -248,7 +246,7 @@ def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
 def create_object_instructions(r1: Register, r2: Register):
     return [
         SLLNode(r1, r1, 2),
-        LANode(r2, PROTOTYPES),
+        LANode(r2, TYPES_LABELS),
         ADDNode(r2, r2, r1),
         LWNode(r2, 0, r2),
         LWNode(ARG[0], 4, r2),

@@ -39,15 +39,12 @@ class CILToMipsVisitor:
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
         print(f"TypeNode {node.name} {node.methods}")
-        self.data[node.name] = mips.StringNode(node.name, f'"{node.name}"')
 
         type_ = mips.Type(
             label=node.name,
-            address=node.name,
             attrs=list(node.attributes),
             methods=node.methods,
             index=len(self.types),
-            default=[],
         )
 
         self.types[node.name] = type_
@@ -70,10 +67,10 @@ class CILToMipsVisitor:
 
         # Push local vars
         push_instructions = (
-                mips.push_register_instructions(registers.RA)
-                + mips.push_register_instructions(registers.FP)
-                + [mips.ADDINode(registers.FP, registers.SP, 8)]
-                + [mips.ADDINode(registers.SP, registers.SP, -local_vars_size)]
+            mips.push_register_instructions(registers.RA)
+            + mips.push_register_instructions(registers.FP)
+            + [mips.ADDINode(registers.FP, registers.SP, 8)]
+            + [mips.ADDINode(registers.SP, registers.SP, -local_vars_size)]
         )
 
         self.add_inst(
@@ -86,9 +83,9 @@ class CILToMipsVisitor:
 
         # Pop local vars
         pop_instructions = (
-                [mips.ADDINode(registers.SP, registers.SP, local_vars_size)]
-                + mips.pop_register_instructions(registers.FP)
-                + mips.pop_register_instructions(registers.RA)
+            [mips.ADDINode(registers.SP, registers.SP, local_vars_size)]
+            + mips.pop_register_instructions(registers.FP)
+            + mips.pop_register_instructions(registers.RA)
         )
 
         return_instructions = (
@@ -100,7 +97,7 @@ class CILToMipsVisitor:
         self.add_inst(
             *pop_instructions,
             *return_instructions,
-            mips.CommentNode(f"</function:{node.name}>")
+            mips.CommentNode(f"</function:{node.name}>"),
         )
 
     @visitor.when(cil.AllocateNode)
@@ -124,7 +121,7 @@ class CILToMipsVisitor:
         address = self.cur_function.variable_address(node.dest)
         self.add_inst(
             mips.SWNode(registers.V0, address, registers.FP),
-            mips.CommentNode(f"</allocate:{node.type}-{node.dest}>")
+            mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
         )
 
     @visitor.when(cil.ReturnNode)
@@ -153,8 +150,6 @@ class CILToMipsVisitor:
         )
 
         address = self.cur_function.variable_address(node.addr)
-        print(self.cur_function.variable_address(node.addr))
-        input()
 
         self.add_inst(
             mips.LWNode(registers.ARG[0], address, registers.FP),
