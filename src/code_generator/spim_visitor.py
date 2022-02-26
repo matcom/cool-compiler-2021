@@ -21,13 +21,14 @@ class MIPSCodegen:
     def gen_push(self,src):
         self.add_line(f'# push {src} to the stack')
         self.add_line(f'sw {src}, 0($sp)')
-        self.add_line(f'subu $sp $sp {WSIZE}')
+        self.add_line(f'addi $sp $sp -{WSIZE}')
+       
         self.add_line('')
 
     def gen_pop(self,dst):
         self.add_line(f'# pop the top of the stack to {dst}')
+        self.add_line(f'addi $sp $sp {WSIZE}')
         self.add_line(f'lw {dst}, 0($sp)')
-        self.add_line(f'addu $sp $sp {WSIZE}')
         self.add_line('')
 
     @visitor.on('node')
@@ -42,13 +43,14 @@ class MIPSCodegen:
         self.set_tabs(1)
         self.add_line(".data")
         self.set_tabs(0)
-        self.add_line("ObjectErrorMessage : .asciiz \"Program was halted\n\"")
+        self.add_line("ObjectErrorMessage : .asciiz \"Program was halted\"")
 
         for d in node.data:
             self.visit(d, frame)
 
         for f in node.functions:
             self.visit(f, frame)
+            self.add_line('')
 
         with open('./code_generator/mips_built_in.txt') as file:
             self.code += file.read()
@@ -63,6 +65,8 @@ class MIPSCodegen:
         methods_str = ' '.join(m.function_id for m in node.methods)
         assert len(node.methods) == len(t.methods_offset)
         self.add_line(f"_{node.id}: .asciiz \"{node.id}\"")
+        self.add_line("\t.data")
+        self.add_line("\t.align 4")
         self.add_line(f"{node.id}: .word {t.size} _{node.id} {methods_str}")
         self.add_line('')
 
@@ -80,16 +84,12 @@ class MIPSCodegen:
         self.set_tabs(1)
         self.add_line('.text')
         self.set_tabs(0)
-        if self.main:
-            self.add_line(f'main:')
-        else:
-            self.add_line(f'{node.id}:') # Place the label
-
-
+        self.add_line(f'{node.id}:')
         self.set_tabs(1)
         self.add_line('# save the return address and frame pointer')
         self.gen_push('$ra') # Save the return address
         self.gen_push('$fp') # Save the frame pointer
+        
         
         self.add_line('# update the frame pointer and allocate the frame in the stack')  
         self.add_line(f'move $fp $sp') # Update the frame pointer to the top of the stack
@@ -100,9 +100,9 @@ class MIPSCodegen:
 
         for i in node.instructions:
             self.visit(i, frame)
-       
+        
         self.add_line(f'# restore the stack pointer, frame pointer y return address')
-        self.add_line(f'move $sp $fp')
+        self.add_line(f'addu $sp $sp {frame.size}')
         self.gen_pop('$fp')
         self.gen_pop('$ra')
 
@@ -214,12 +214,13 @@ class MIPSCodegen:
     def visit(self, node: CILAllocateNode, frame):
         register0 = '$v0'
         register1 = '$a0'
-        t = self.scope.types[node.type]
+        t = self.scope.types[node.type.lex]
 
         self.add_line(f'li {register1}, {t.size}')
         self.add_line(f'li {register0}, 9')
         self.add_line(f'syscall')
-        self.add_line(f'sw {node.type},  {register0}') # Place the dynamic type of the instance in memory
+        self.add_line(f'la {register1}, {node.type.lex}')
+        self.add_line(f'sw {register1},  0({register0})') # Place the dynamic type of the instance in memory
         return register0
 
     @visitor.when(CILTypeOfNode) # Get the dynamic type of an instance
@@ -236,11 +237,15 @@ class MIPSCodegen:
     def visit(self, node: CILCallNode, frame):
         register0 = '$v0'
         self.add_line(f'jal {node.func}')
+        for a in frame.arg_queue:
+            self.gen_pop('$v1')
+        frame.clear_args() # clear arguments for the new function
         return register0
 
     @visitor.when(CILVCallNode)
     def visit(self, node: CILVCallNode, frame):
         # the instance of type T is always the first argument to be passed to the function
+        self.add_line(f'# calling the method {node.func} of type {node.type}')
         instance = frame.arg_queue[0]
         instance_addr = self.visit(instance, frame) # load into a register the address of the instance in the heap
 
@@ -254,11 +259,15 @@ class MIPSCodegen:
         try:
             method_addr = t.get_method_addr(node.func, register0)
         except:
+            print(node.func)
+            print(t.id)
             print('shdglsdglsjdg0000000000000')
             print(t.methods_offset)
         
         self.add_line(f'lw $v1, {method_addr}')
         self.add_line(f'jal $v1') # calls the method and by convention methods return in $v0
+        for a in frame.arg_queue:
+            self.gen_pop('$v1')
         frame.clear_args() # clear arguments for the new function
 
         return '$v0'
@@ -267,15 +276,29 @@ class MIPSCodegen:
     def visit(self, node: CILLoadNode, frame):
         self.add_line(f'#load the string {node.var}')
         register = '$v0'
-        self.add_line(f'lw {register}, {node.var}')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+        self.add_line(f'la $v1, String')
+        self.add_line(f'sw $v1, 0($v0)')
+        self.add_line(f'la $v1, {node.var}')
+        self.add_line(f'sw $v1, 4($v0)')
         return register
-
 
 
     @visitor.when(CILNumberNode)
     def visit(self, node: CILNumberNode, frame):
         register = '$v0'
-        self.add_line(f'li {register}, {node.lex}')
+        self.add_line(f'# Creating Int instance for atomic {node.lex}')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+
+        self.add_line(f'la $t0, Int')
+        self.add_line(f'li $t1, {node.lex}')
+        self.add_line(f'sw $t0, 0($v0)')
+        self.add_line(f'sw $t1, 4($v0)')
+        self.add_line(f'')
         return register
 
     @visitor.when(CILVariableNode)

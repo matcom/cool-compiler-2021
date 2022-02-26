@@ -146,28 +146,32 @@ class CILScope:
         
         return types
         
-    def create_init_class(self, attributes, expresions):
+    def create_init_class(self, attributes, expresions, locals):
         type = self.context.get_type(self.current_class)
         instructions = []
-        
+        print(expresions)
         if not isinstance(type.parent, ObjectType):
             instructions.append(CILArgNode(CILVariableNode(f'self')))
-            call = CILVCallNode(type.parent.name, f'init')  
+            call = CILCallNode(f'init_{type.parent.name}')  
             instructions.append(CILAssignNode(CILVariableNode('self'), call))   
                      
-        for attr, (expr, type) in zip(attributes, expresions):
+        for attr, (expr, type, inst) in zip(attributes, expresions):
+
+            instructions.extend(inst)
             if not isinstance(expr, CILAtomicNode):
                 variable = CILVariableNode(self.add_new_local(type))
-                self.instructions.append(CILAssignNode(variable, expr))
+            #     print
+                instructions.append(CILAssignNode(variable, expr))
             else:   
-                variable = CILVariableNode(expr.lex)
+                variable = expr
                 
             instructions.append(CILSetAttributeNode(CILVariableNode('self'), self.current_class, CILVariableNode(attr), variable)) 
         
         instructions.append(CILReturnNode(CILVariableNode('self')))
         
-        return CILFuncNode(f'init_{self.current_class}', [CILParamNode('self', None)], [], instructions)
-        
+        return CILFuncNode(f'init_{self.current_class}', [CILParamNode('self', None)], locals, instructions)
+
+
         
 class TypeInfo:
     def __init__(self):

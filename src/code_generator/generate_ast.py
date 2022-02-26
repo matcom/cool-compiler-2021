@@ -7,7 +7,7 @@ import cmp.visitor as visitor
     
 class CIL:
     def __init__(self, context):
-        self.scope = CILScope(context)
+        self.scope = CILScope(context)       
 
     @visitor.on('node')
     def visit(self, node, scope):
@@ -15,6 +15,21 @@ class CIL:
 
     @visitor.when(ProgramNode)
     def visit(self, node):
+        # Creates the first function to execute
+        locals = []
+        locals.append(CILLocalNode("m0", "Main"))
+        locals.append(CILLocalNode("m1", "Main"))
+        locals.append(CILLocalNode("m2", "Main")) 
+        
+        instructions = []
+        instructions.append(CILAssignNode(CILVariableNode("m0"), CILAllocateNode(CILTypeConstantNode("Main"))))
+        instructions.append(CILArgNode(CILVariableNode("m0")))
+        instructions.append(CILAssignNode(CILVariableNode("m1"), CILVCallNode("Main", "init")))
+        instructions.append(CILArgNode(CILVariableNode("m1")))
+        instructions.append(CILAssignNode(CILVariableNode("m2"), CILVCallNode("Main", "main")))
+        instructions.append(CILReturnNode(CILVariableNode("m2")))
+        self.scope.functions.append(CILFuncNode('main', [], locals, instructions))
+        
         types_ts = get_ts(self.scope.context)
         infos = self.scope.infos = {}
         for type in types_ts:
@@ -35,13 +50,7 @@ class CIL:
             types.append(type)
         
         # Add built-in types and functions
-        types.extend(self.scope.create_builtin_types())
-        
-        # Brings main function to the first position
-        main_idx = [idx for idx, element in enumerate(self.scope.functions) if element.id == 'main_Main'][0]
-        main = self.scope.functions[main_idx]
-        self.scope.functions.pop(main_idx)
-        self.scope.functions.insert(0, main)
+        types.extend(self.scope.create_builtin_types())     
         
         return CILProgramNode(types, self.scope.data, self.scope.functions)
     
@@ -52,7 +61,7 @@ class CIL:
         attributes = []
         expressions = []
         methods = []
-        
+        locals  = []
         type_info = self.scope.infos[node.id]
         for a in type_info.attrs:   
             attributes.append(CILAttributeNode(a.name, a.type))
@@ -64,14 +73,18 @@ class CIL:
             if isinstance(feature, AttrDeclarationNode):
                 if feature.expr is not None:
                     expr = self.visit(feature.expr)
-                    expressions.append((expr, feature.expr.computed_type))
+                    expressions.append((expr, feature.expr.computed_type, self.scope.instructions.copy()))
+                    self.scope.instructions =  []
                     att_aux.append(feature.id)
-                    
+                    locals.extend(self.scope.all_locals.copy())
+                    self.scope.locals = [{}]
+                    self.scope.all_locals = []
+                   
             else:
                 function = self.visit(feature)
                 self.scope.functions.append(function) 
 
-        init_class = self.scope.create_init_class(att_aux, expressions)    
+        init_class = self.scope.create_init_class(att_aux, expressions, locals)    
         self.scope.functions.append(init_class)  
         
         return CILTypeNode(node.id, attributes, methods)
@@ -135,8 +148,8 @@ class CIL:
                 args.append(CILArgNode(CILVariableNode(expr.lex)))   
         self.scope.instructions.extend(args)        
         
-        if node.type is not None:
-            expression = CILVCallNode(node.type, node.id)
+        if type is not None:
+            expression = CILVCallNode(type, node.id)
         else:         
             expression = CILVCallNode(self.scope.current_class, node.id)
         type = self.scope.ret_type_of_method(node.id, type)
@@ -367,4 +380,7 @@ class CIL:
     def visit(self, node):
         name = self.scope.add_new_local(node.lex)
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name),CILAllocateNode(CILTypeConstantNode(node.lex))))
+        self.scope.instructions.append(CILArgNode(CILVariableNode(name)))
+        name = self.scope.add_new_local(node.lex)
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILVCallNode(node.lex, f"init")))
         return  CILVariableNode(name) 

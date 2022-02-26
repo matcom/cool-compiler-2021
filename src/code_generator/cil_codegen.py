@@ -131,6 +131,10 @@ class CILCodegen:
     def visit(self, node: CILTypeOfNode):
         return f'TYPEOF {node.var.lex}'
 
+    @visitor.when(CILCallNode)
+    def visit(self, node: CILCallNode):
+        return f'CALL {node.func}'
+
     @visitor.when(CILVCallNode)
     def visit(self, node: CILVCallNode):
         return f'VCALL {node.type} {node.func}'

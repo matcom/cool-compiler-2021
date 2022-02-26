@@ -40,7 +40,7 @@ class TypeInfo:
     
     def get_method_addr(self, method, register):
         offset = self.methods_offset[method]
-        return f'{(offset + 1) * WSIZE}({register})'
+        return f'{(offset + 2) * WSIZE}({register})'
     
     def __str__(self):
         r = '--------------------Type----------------\n'
@@ -72,11 +72,11 @@ class ProcCallFrame:
 
     def arg_addr(self, id):
         offset = self.args[id]
-        return f'{(3 + offset) * WSIZE}($fp)'
+        return f'{(2 + offset) * WSIZE}($fp)'
     
     def var_addr(self, id):
         offset = self.vars[id]
-        return f'{offset * WSIZE}($fp)'
+        return f'-{offset * WSIZE}($fp)'
 
     def get_addr(self, id):
         try:
