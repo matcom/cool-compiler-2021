@@ -576,7 +576,11 @@ class CCILGenerator:
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
         call = self.create_vcall(
-            fval_id, node.type.name, node.id, node.caller_type, args
+            fval_id,
+            node.type.name,
+            node.id,
+            node.caller_type,
+            [extract_id(expr_fval), *args],
         )
 
         return [*expr_ops, *error_ops, *args_ops, call], call
