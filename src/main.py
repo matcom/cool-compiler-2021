@@ -83,8 +83,8 @@ def main(args):
     cil_visitor = COOLToCILVisitor(context)
     cil_ast = cil_visitor.visit(ast, scope)
 
-    cil_formatter = PrintCILVisitor()
-    print(cil_formatter.visit(cil_ast))
+    # cil_formatter = PrintCILVisitor()
+    # print(cil_formatter.visit(cil_ast))
 
 
 if __name__ == "__main__":
