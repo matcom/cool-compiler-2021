@@ -41,6 +41,7 @@ from cmp.semantic import Context
 from cmp.semantic import Scope
 from cmp.utils import find_least_type
 import copy
+from errors import TypeError
 
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
@@ -373,7 +374,8 @@ class TypeChecker:
         if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
             right_type != int_type and right_type.name != "AUTO_TYPE"
         ):
-            self.errors.append(INVALID_OPERATION % (left_type.name, right_type.name))
+            node_row, node_col = node.token.location
+            self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
 
         return int_type
 

@@ -1,7 +1,7 @@
 import ply.lex as lex
 import tokens_rules as tokens_rules
 from cmp.utils import Token
-
+from utils import find_column
 
 def pprint_tokens(tokens):
     indent = 0
@@ -46,7 +46,7 @@ def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printin
             else: # empty program
                 last_lineno = 0
                 col = -1
-            tokens.append(Token("$", grammar.EOF, (last_lineno, col)))
+            tokens.append(Token("$", grammar.EOF, (last_lineno, find_column(data, col))))
             break  # No more input
         else:
             try:
@@ -64,7 +64,7 @@ def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printin
                         ttype = type_id
                     else:
                         ttype = num
-            tokens.append(Token(tval, ttype, (tok.lineno,tok.lexpos)))
+            tokens.append(Token(tval, ttype, (tok.lineno, find_column(data, tok.lexpos))))
 
     if printing:
         pprint_tokens(tokens)

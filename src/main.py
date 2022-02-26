@@ -53,7 +53,7 @@ def pipeline(input_file: Path, output_file: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    parse, operations = parser(tokens, text)
+    parse, operations = parser(tokens)
 
     # print("Parse")
     # print(parse)
@@ -63,12 +63,12 @@ def pipeline(input_file: Path, output_file: Path = None):
         
     #get parsing tree
     ast = evaluate_reverse_parse(parse, operations, tokens)
-    print("AST")
+    # print("AST")
     # print(ast)
     #printing tree
     formatter = FormatVisitorST()
     tree = formatter.visit(ast)
-    print(tree)
+    # print(tree)
 
     # type_visitor = TypeCollector(errors)
     # ast = type_visitor.visit(ast)

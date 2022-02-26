@@ -6,7 +6,6 @@ from parser_automatons import (
 from methods import compute_firsts, compute_local_first, compute_follows
 from cmp.automata import State
 from errors import shift_reduce_error, invalid_sentence_error, SyntacticError
-from utils import find_column
 
 class ShiftReduceParser:
     SHIFT = "SHIFT"
@@ -24,7 +23,7 @@ class ShiftReduceParser:
     def _build_parsing_table(self):
         raise NotImplementedError()
 
-    def __call__(self, w, text):
+    def __call__(self, w):
         stack = [0]
         cursor = 0
         output = []
@@ -45,7 +44,7 @@ class ShiftReduceParser:
                 self.errors.append(
                     SyntacticError(
                         current_token.location[0],
-                        find_column(text, current_token.location[1]),
+                        current_token.location[1],
                         "ERROR at or near "+ str(current_token.lex)
                     )
                 )
@@ -75,7 +74,7 @@ class ShiftReduceParser:
                 self.errors.append(
                     SyntacticError(
                         current_token.location[0],
-                        find_column(text, current_token.location[1]),
+                        current_token.location[1],
                         "ERROR at or near"+ str(current_token.lex)
                     )
                 )
@@ -87,7 +86,7 @@ class ShiftReduceParser:
                 self.errors.append(
                     SyntacticError(
                         current_token.location[0],
-                        find_column(text, current_token.location[1]),
+                        current_token.location[1],
                         "Exceed word length while looking for a viable derivation. Sentence given does not belong to the grammar",
                     )
                 )
