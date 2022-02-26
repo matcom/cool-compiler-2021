@@ -28,7 +28,7 @@ def p_program(p):
     """
     program : class_list
     """
-    p[0] = ast.ProgramNode(p.lineno(1), p[1])
+    p[0] = ast.ProgramNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1])
     pass
 
 
@@ -353,11 +353,11 @@ def p_func_call(p):
               | atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
     """
     if len(p) == 7:
-        p[0] = ast.CallNode(p.lineno(1), p[1], p[3], p[5])
+        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])
     elif len(p) == 5:
-        p[0] = ast.CallNode(p.lineno(1), None, p[1], p[3])
+        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), None, p[1], p[3])
     elif len(p) == 9:
-        p[0] = ast.CallNode(p.lineno(1), p[1], p[5], p[7], p[3])
+        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[5], p[7], p[3])
 
 
 def p_arg_list(p):

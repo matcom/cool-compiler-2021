@@ -35,7 +35,7 @@ if execute_mode == "test":
 
 # RUN
 programs_files = [
-    file for file in os.listdir(program_directory) if file.endswith("a.cl")
+    file for file in os.listdir(program_directory) if file.endswith("conditional3.cl")
 ]
 for program_file in programs_files:
     input("Press enter to analyze " + program_file)
