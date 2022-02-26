@@ -617,7 +617,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.ArgNode(self.vself.name))
 
             stype = self.current_type.name
-            self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.id.lex], ret))
+            self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.method], ret))
             node.ret_expr = ret
 
 
