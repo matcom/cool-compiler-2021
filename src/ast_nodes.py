@@ -177,3 +177,8 @@ class LessEqualNode(ComparisonOperation):
 
 class EqualNode(ComparisonOperation):
     pass
+
+
+class DefaultValueNode(ExpressionNode):
+    def __init__(self, typex):
+        self.type = typex

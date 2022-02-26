@@ -44,6 +44,8 @@ from cmp.cil import (
     STRNode,
     SetAttribNode,
     GetAttribNode,
+    DefaultValueNode,
+    IsVoidNode,
 )
 from cool_visitor import FormatVisitor
 
@@ -151,9 +153,9 @@ class CILBuilder:
         ]
 
         expr_list = []
-        # for attr in attributeNodes:  # Assign default value first
-        #     assign = cool.AssignNode(attr.id, cool.DefaultValueNode(attr.type))
-        #     expr_list.append(assign)
+        for attr in attributeNodes:  # Assign default value first
+            assign = cool.AssignNode(attr.id, cool.DefaultValueNode(attr.type))
+            expr_list.append(assign)
 
         for attr in attributeNodes:  # Assign init_expr if not None
             if attr.init_exp:
@@ -171,7 +173,9 @@ class CILBuilder:
             self.cil_predef_method("copy", "Object", self.object_copy),
             self.cil_predef_method("type_name", "Object", self.object_type_name),
         ]
-        object_type = TypeNode("Object", [], obj_functions)
+        object_type = TypeNode("Object")
+        object_type.attributes = []
+        object_type.methods = obj_functions
 
         # "IO"
         functions = [
@@ -180,7 +184,9 @@ class CILBuilder:
             self.cil_predef_method("in_string", "IO", self.io_instring),
             self.cil_predef_method("in_int", "IO", self.io_inint),
         ]
-        io_type = TypeNode("IO", [], obj_functions + functions)
+        io_type = TypeNode("IO")
+        io_type.attributes = []
+        io_type.methods = obj_functions + functions
 
         # String
         functions = [
@@ -188,25 +194,23 @@ class CILBuilder:
             self.cil_predef_method("concat", "String", self.string_concat),
             self.cil_predef_method("substr", "String", self.string_substr),
         ]
-        string_type = TypeNode(
-            "String",
-            [VariableInfo("length").name, VariableInfo("str_ref").name],
-            obj_functions + functions,
-        )
+        string_type = TypeNode("String")
+        string_type.attributes = [
+            VariableInfo("length").name,
+            VariableInfo("str_ref").name,
+        ]
+        string_type.methods = obj_functions + functions
 
         # Int
-        int_type = TypeNode(
-            "Int",
-            [VariableInfo("value", is_attr=True).name],
-            obj_functions,
-        )
+        int_type = TypeNode("Int")
+        int_type.attributes = [VariableInfo("value", is_attr=True).name]
+        int_type.methods = obj_functions
 
         # Bool
-        bool_type = TypeNode(
-            "Bool",
-            [VariableInfo("value", is_attr=True).name],
-            obj_functions,
-        )
+        bool_type = TypeNode("Bool")
+        bool_type.attributes = [VariableInfo("value", is_attr=True).name]
+        bool_type.methods = obj_functions
+
         for typex in [object_type, io_type, string_type, int_type, bool_type]:
             self.types.append(typex)
 
@@ -369,6 +373,7 @@ class CILBuilder:
             ]
             visited_func.extend(methods)
             type_node.attributes.extend(attributes[::-1])
+            # print("-------EXTENDED:", type_node.attributes)
             type_node.methods.extend(
                 [
                     (item, self.to_function_name(item, current_type.name))
@@ -384,11 +389,10 @@ class CILBuilder:
         for feature in node.features:
             self.visit(feature)
 
-        self.current_type = None
-
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node):
-        self.visit(node.init_exp)
+        # self.visit(node.init_exp)
+        pass
 
     @visitor.when(cool.FuncDeclarationNode)
     def visit(self, node):
@@ -455,7 +459,7 @@ class CILBuilder:
         # IF condition GOTO label
         condition_value = self.visit(node.if_expr)
         then_label = "THEN_" + self.next_id()
-        self.register_instruction(GotoIfNode(condition_value, then_label))
+        self.register_instruction(GotoIfNode(condition_value, LabelNode(then_label)))
 
         # Else
         self.visit(node.else_expr)
@@ -500,6 +504,11 @@ class CILBuilder:
         # End while label
         self.register_instruction(LabelNode(end_while_label))
 
+        solve = self.define_internal_local()
+        self.register_instruction(DefaultValueNode(solve, "Void"))
+
+        return solve
+
     @visitor.when(cool.BlockNode)
     def visit(self, node):
         value = None
@@ -514,7 +523,7 @@ class CILBuilder:
             self.visit(var_dec.expr)
             self.current_function.localvars.append(LocalNode(var_dec.id))
 
-        self.visit(node.body)
+        return self.visit(node.body)
 
     @visitor.when(cool.CaseNode)
     def visit(self, node):
@@ -530,89 +539,99 @@ class CILBuilder:
         left = self.visit(node.left)
         right = self.visit(node.right)
 
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(PlusNode(local, left, right))
+        solve = self.define_internal_local()
+        self.register_instruction(PlusNode(solve, left, right))
+
+        return solve
 
     @visitor.when(cool.MinusNode)
     def visit(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
 
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(MinusNode(local, left, right))
+        solve = self.define_internal_local()
+        self.register_instruction(MinusNode(solve, left, right))
+
+        return solve
 
     @visitor.when(cool.StarNode)
     def visit(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
 
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(StarNode(local, left, right))
+        solve = self.define_internal_local()
+        self.register_instruction(StarNode(solve, left, right))
+
+        return solve
 
     @visitor.when(cool.DivNode)
     def visit(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
 
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(DivNode(local, left, right))
+        solve = self.define_internal_local()
+        self.register_instruction(DivNode(solve, left, right))
+
+        return solve
 
     @visitor.when(cool.LessEqualNode)
     def visit(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
 
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(LessEqualNode(local, left, right))
+        solve = self.define_internal_local()
+        self.register_instruction(LessEqualNode(solve, left, right))
+
+        return solve
 
     @visitor.when(cool.LessNode)
     def visit(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
 
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(LessNode(local, left, right))
+        solve = self.define_internal_local()
+        self.register_instruction(LessNode(solve, left, right))
+
+        return solve
 
     @visitor.when(cool.EqualNode)
     def visit(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)
 
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(EqualNode(local, left, right))
+        solve = self.define_internal_local()
+        self.register_instruction(EqualNode(solve, left, right))
+
+        return solve
 
     # Unary operators
     @visitor.when(cool.InstantiateNode)  # NewNode
     def visit(self, node):
-        new_local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(new_local))
+        new_local = self.define_internal_local()
         self.register_instruction(AllocateNode(node.lex, new_local))
+
+        return new_local
 
     @visitor.when(cool.IsvoidNode)
     def visit(self, node):
         value = self.visit(node.expr)
-        return value
+        solve = self.define_internal_local()
+        self.register_instruction(IsVoidNode(solve, value))
+        return solve
 
     @visitor.when(cool.NotNode)
     def visit(self, node):
         value = self.visit(node.expr)
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(NotNode(local, value))
+        solve = self.define_internal_local()
+        self.register_instruction(NotNode(solve, value))
+        return solve
 
     @visitor.when(cool.NegNode)
     def visit(self, node):
         value = self.visit(node.expr)
-        local = self.generate_next_tvar_id()
-        self.register_instruction(LocalNode(local))
-        self.register_instruction(IntComplementNode(local, value))
+        solve = self.define_internal_local()
+        self.register_instruction(IntComplementNode(solve, value))
+        return solve
 
     @visitor.when(cool.ConstantNumNode)
     def visit(self, node):
@@ -630,7 +649,10 @@ class CILBuilder:
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node):
-        if node.lex == "true":
-            return 1
-        else:
-            return 0
+        1 if node.lex == "true" else 0
+
+    @visitor.when(cool.DefaultValueNode)
+    def visit(self, node):
+        solve = self.define_internal_local()
+        self.register_instruction(DefaultValueNode(solve, node.type))
+        return solve
