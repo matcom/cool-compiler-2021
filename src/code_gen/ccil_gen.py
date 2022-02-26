@@ -1,7 +1,7 @@
 from utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import OrderedDict, Tuple, List, Dict
+from typing import OrderedDict, Set, Tuple, List, Dict
 from code_gen.tools import *
 from collections import OrderedDict
 
@@ -146,17 +146,18 @@ class CCILGenerator:
 
         params: List[Parameter] = [Parameter("self", self.current_type)]
         self.ccil_cool_names.add_new_name_pair("self", "self")
+
         for param in node.params:
             new_param_id = PARAM + param.id
             params.append(Parameter(new_param_id, param.type.name))
             self.ccil_cool_names.add_new_name_pair(param.id, new_param_id)
 
-        self.locals = dict()
+        self.reset_locals()
         (operations, fval) = self.visit(node.body)
 
         self.ccil_cool_names = self.ccil_cool_names.get_parent
         return FunctionNode(
-            f"f_{self.times(node)}",
+            f"f_{node.id}_{self.current_type}",
             params,
             self.dump_locals(),
             operations,
@@ -528,7 +529,11 @@ class CCILGenerator:
         if node.expr is None:
             fval_id = f"vcall_{times}"
             call = self.create_vcall(
-                fval_id, node.type.name, node.id, node.caller_type.name, args
+                fval_id,
+                node.type.name,
+                node.id,
+                node.caller_type.name,
+                [IdNode("self"), *args],
             )
             return [*args_ops, call], call
 
@@ -546,7 +551,7 @@ class CCILGenerator:
                 "caller_void_err",
                 f"RuntimeError: expresion in {node.line}, {node.col} is void",
             )
-            load_err = self.create_string_load_data("callor_void_err_var", error_msg.id)
+            load_err = self.create_string_load_data("caller_void_err_var", error_msg.id)
             print_and_abort = self.notifiy_and_abort(load_err.id)
             error_ops = [
                 expr_fval_is_void,
@@ -560,14 +565,22 @@ class CCILGenerator:
         if node.at_type is not None:
             fval_id = f"call_{times}"
             call = self.create_call(
-                fval_id, node.type.name, node.id, node.caller_type.name, args
+                fval_id,
+                node.type.name,
+                make_unique_func_id(node.id, node.caller_type.name),
+                node.caller_type.name,
+                [extract_id(expr_fval), *args],
             )
             return [*expr_ops, *error_ops, *args_ops, call], call
 
         # <expr>.id(arg1, arg2, ..., argn)
         fval_id = f"vcall_{times}"
         call = self.create_vcall(
-            fval_id, node.type.name, node.id, node.caller_type, args
+            fval_id,
+            node.type.name,
+            node.id,
+            node.caller_type,
+            [extract_id(expr_fval), *args],
         )
 
         return [*expr_ops, *error_ops, *args_ops, call], call
@@ -926,7 +939,7 @@ class CCILGenerator:
         execute = self.create_call(
             "execute_program",
             INT,
-            self.find_function_id("Main", "main"),
+            make_unique_func_id("main", "Main"),
             INT,
             [IdNode(program.id)],
         )
@@ -986,13 +999,19 @@ class CCILGenerator:
     def add_warning(self, msg: str):
         self.add_warning(f"Warning: {msg}")
 
-    def get_inherited_features(self, node: sem_ast.ClassDeclarationNode):
+    def get_inherited_features(
+        self, node: sem_ast.ClassDeclarationNode, node_methods: List[Method]
+    ):
+        node_methods: Set[str] = {m.id for m in node_methods}
+
         inherited_attr: List[Attribute] = []
         inherited_methods: List[Method] = []
         if node.parent is not None:
             parent_class: Class = self.program_types[node.parent]
             inherited_attr = [a for a in parent_class.attributes]
-            inherited_methods = [m for m in parent_class.methods]
+            inherited_methods = [
+                m for m in parent_class.methods if m.id not in node_methods
+            ]
 
         return inherited_attr, inherited_methods
 
@@ -1001,6 +1020,10 @@ class CCILGenerator:
             if method.id == method_name:
                 return method.function.id
         raise Exception(f"Method: {method_name} was not found in {class_name}")
+
+
+def make_unique_func_id(method_name: str, class_name: str):
+    return f"f_{method_name}_{class_name}"
 
 
 def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
