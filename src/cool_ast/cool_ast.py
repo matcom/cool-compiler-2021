@@ -107,7 +107,9 @@ class ConstantNumNode(AtomicNode):
 class VariableNode(AtomicNode):
     pass
 class InstantiateNode(AtomicNode):
-    pass
+    def __init__(self, lex):
+        super().__init__(lex)
+        self.type = lex
 
 #mios
 class TrueNode(AtomicNode):

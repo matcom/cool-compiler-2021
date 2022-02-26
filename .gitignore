@@ -4,7 +4,9 @@
 # Edit at https://www.gitignore.io/?templates=visualstudiocode,linux,latex,python
 CooltoCilM
 imm.asm
+asd.mips
 src/mmips
+src/visitors/Cil2MipsCurrent.py
 #CooltoCilA
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
