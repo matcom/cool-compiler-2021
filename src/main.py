@@ -1,6 +1,8 @@
 from compiler.cmp.grammar import G
 from compiler.lexer.lex import CoolLexer
 from compiler.parser.parser import LR1Parser, evaluate_reverse_parse
+from compiler.visitors.cil_formatter import PrintCILVisitor
+from compiler.visitors.cool2cil import COOLToCILVisitor
 from compiler.visitors.formatter import FormatVisitor
 from compiler.visitors.type_collector import TypeCollector
 from compiler.visitors.type_builder import TypeBuilder
@@ -76,6 +78,13 @@ def main(args):
         print(f"{pos} - {type(e).__name__}: {str(e)}")
     if checker.errors:
         exit(1)
+
+    # COOL to CIL
+    cil_visitor = COOLToCILVisitor(context)
+    cil_ast = cil_visitor.visit(ast, scope)
+
+    # cil_formatter = PrintCILVisitor()
+    # print(cil_formatter.visit(cil_ast))
 
 
 if __name__ == "__main__":

@@ -6,7 +6,6 @@
 - **David Guaty Domínguez** - [Gu4ty](https://github.com/Gu4ty)
 - **Enrique Martínez González** - [kikeXD](https://github.com/kikeXD)
 
-
 ## Requerimientos 📋
 
 Para la ejecución de este proyecto necesita tener istalado:
@@ -14,7 +13,7 @@ Para la ejecución de este proyecto necesita tener istalado:
 - Python3.7 o superior
 - Las dependencias que se encuentran listadas en el archivo [requirements.txt](../requirements.txt)
 - Spim para ejecutar programas MIPS32
-  
+
 Si lo desea, usted puede instalar todas las dependencias necesarias ejecutando en su terminal el siguiente comando, desde el directorio `<project_dir>/src`:
 
 ```bash
@@ -43,6 +42,7 @@ Para la implementación de este proyecto se utilizaron como base los contenidos 
 ### Fases
 
 Las fases en que se divide el proceso de compilación se muestran a continuación y serán explicadas con más detalle en las secciones siguientes:
+
 1. Lexer
 2. Parsing
 3. Recolección de tipos
@@ -53,9 +53,9 @@ Las fases en que se divide el proceso de compilación se muestran a continuació
 
 #### Lexer
 
-Para el análisis léxico se utilizó el módulo `lex.py` del paquete PLY de Python, que permite separar el texto de entrada (código COOL) en una colección de *tokens* dado un conjunto de reglas de expresiones regulares.
+Para el análisis léxico se utilizó el módulo `lex.py` del paquete PLY de Python, que permite separar el texto de entrada (código COOL) en una colección de _tokens_ dado un conjunto de reglas de expresiones regulares.
 
-Para la obtención de los tokens de *string* y los comentarios multilíneas se definieron en el lexer, además del *INITIAL*, que es el estado que usa el lexer por defecto, dos estados exclusivos:
+Para la obtención de los tokens de _string_ y los comentarios multilíneas se definieron en el lexer, además del _INITIAL_, que es el estado que usa el lexer por defecto, dos estados exclusivos:
 
 ```python
     states = (
@@ -70,56 +70,71 @@ Además se llevaron a cabo cálculos auxiliares para obtener el valor de la colu
 
 #### Parsing
 
-Se utilizó una modificación de la implementación previa del parser LR1 para llevar a cabo la fase de *parsing*; esta se realizó para poder almacenar el token, en lugar de solo su lexema; puesto que el token también guarda la posición *(fila, columna)*.
+Se utilizó una modificación de la implementación previa del parser LR1 para llevar a cabo la fase de _parsing_; esta se realizó para poder almacenar el token, en lugar de solo su lexema; puesto que el token también guarda la posición _(fila, columna)_.
 
 La gramática utilizada es S-atributada. Podrá encontrar la implementación de la misma en [grammar.py](https://github.com/codersUP/cool-compiler-2021/blob/master/src/compiler/cmp/grammar.py)
 
 #### Recolección de tipos
 
-Esta fase se realiza mediante la clase *Type Collector* que sigue los siguientes pasos:
+Esta fase se realiza mediante la clase _Type Collector_ que sigue los siguientes pasos:
 
-- Definición de los *built-in types*, o sea, los tipos que son inherentes al lenguaje Cool : *Int*, *String*, *Bool*, *IO*, *Object*; incluyendo la definición de sus métodos. Además se añaden como tipos *SELF_TYPE*, *AUTO_TYPE*.
+- Definición de los _built-in types_, o sea, los tipos que son inherentes al lenguaje Cool : _Int_, _String_, _Bool_, _IO_, _Object_; incluyendo la definición de sus métodos. Además se añaden como tipos _SELF_TYPE_, _AUTO_TYPE_.
 - Recorrido por las declaraciones hechas en el programa recolectando los tipos creados.
-- Chequeo de los padres que están asignados a cada tipo. Como las clases pueden definirse de modo desordenado, el chequeo de la asignación correcta de padres para cada clase debe hacerse después de recolectar los tipos. De esta forma es posible capturar errores como que un tipo intente heredar de otro que no existe. Aquellas clases que no tengan un padre explícito se les asigna *Object* como padre.
+- Chequeo de los padres que están asignados a cada tipo. Como las clases pueden definirse de modo desordenado, el chequeo de la asignación correcta de padres para cada clase debe hacerse después de recolectar los tipos. De esta forma es posible capturar errores como que un tipo intente heredar de otro que no existe. Aquellas clases que no tengan un padre explícito se les asigna _Object_ como padre.
 - Chequeo de herencia cíclica. En caso de detectar algún ciclo en la jerarquía de tipos, se reporta el error, y a la clase por la cual hubo problema se le asigna Object como padre, para continuar el análisis.
 - Una vez chequeados los puntos anteriores, se reorganiza la lista de nodos de declaración de clases que está guardada en el nodo Program. La reorganización se realiza tal que para cada tipo A, si este hereda del tipo B (siendo B otra de las clases definidas en el programa) la posición de B en la lista es menor que la de A. De esta manera, cuando se visite un nodo de declaración de clase, todas las clases de las cuales él es descendiente, ya fueron visitadas previamente.
 
 #### Construcción de tipos
 
-La construcción de tipos se desarrolla empleando la clase *Type Builder*. Esta se encarga de visitar los *features* de las declaraciones de clase, dígase: funciones y atributos; tal que cada tipo contenga los atributos y métodos que lo caracterizan.
+La construcción de tipos se desarrolla empleando la clase _Type Builder_. Esta se encarga de visitar los _features_ de las declaraciones de clase, dígase: funciones y atributos; tal que cada tipo contenga los atributos y métodos que lo caracterizan.
 
 Además se encarga de chequear la existencia del tipo **Main** con su método **main** correspondiente, como es requerido en COOL.
 
-En esta clase también se hace uso de la clase *Inferencer Manager* que permitirá luego realizar la inferencia de tipo. Por tanto, a todo atributo, parámetro de método o tipo de retorno de método, que esté definido como AUTO_TYPE se le asigna un *id* que será manejado por el manager mencionado anteriormente. Este id será guardado en el nodo en cuestión para poder acceder a su información en el manager cuando sea necesario.
+En esta clase también se hace uso de la clase _Inferencer Manager_ que permitirá luego realizar la inferencia de tipo. Por tanto, a todo atributo, parámetro de método o tipo de retorno de método, que esté definido como AUTO*TYPE se le asigna un \_id* que será manejado por el manager mencionado anteriormente. Este id será guardado en el nodo en cuestión para poder acceder a su información en el manager cuando sea necesario.
 
 #### Chequeo e Inferencia de tipos
 
-En primer lugar se utiliza la clase *Type Checker* para validar el correcto uso de los tipos definidos. Toma la instancia de clase *Inferencer Manager* utilizada en el *Type Builder* para continuar la asignación de *id* a otros elementos en el código que también pueden estar definidos como *AUTO_TYPE*, como es el caso de las variables definidas en la expresión *Let*. Las variables definidas en el *Scope* se encargarán de guardar el *id* asignado; en caso de que no se les haya asignado ninguno, el id será *None*.
+En primer lugar se utiliza la clase _Type Checker_ para validar el correcto uso de los tipos definidos. Toma la instancia de clase _Inferencer Manager_ utilizada en el _Type Builder_ para continuar la asignación de _id_ a otros elementos en el código que también pueden estar definidos como _AUTO_TYPE_, como es el caso de las variables definidas en la expresión _Let_. Las variables definidas en el _Scope_ se encargarán de guardar el _id_ asignado; en caso de que no se les haya asignado ninguno, el id será _None_.
 
-La instancia de *Scope* creada en el *Type Checker*, así como la de *Inferencer Manager* se pasarán al *Type Inferencer* para realizar la inferencia de tipos.
+La instancia de _Scope_ creada en el _Type Checker_, así como la de _Inferencer Manager_ se pasarán al _Type Inferencer_ para realizar la inferencia de tipos.
 
-Ahora bien, la clase Inferencer Manager guarda las listas *conforms_to*, *conformed_by*, *infered_type*. El *id* asignado a una variable representa la posición donde se encuentra la información relacionada a la misma en las listas.
+Ahora bien, la clase Inferencer Manager guarda las listas _conforms_to_, _conformed_by_, _infered_type_. El _id_ asignado a una variable representa la posición donde se encuentra la información relacionada a la misma en las listas.
 
-Sea una variable con *id = i*, que está definida como *AUTO_TYPE* y sea *A* el tipo estático que se ha de inferir:
+Sea una variable con _id = i_, que está definida como _AUTO_TYPE_ y sea _A_ el tipo estático que se ha de inferir:
 
-- `conforms_to[i]` guarda una lista con los tipos a los que debe conformarse *A*; note que esta lista contiene al menos al tipo *Object*. El hecho de que *A* se conforme a estos tipos, implica que todos ellos deben encontrarse en el camino de él a Object en el árbol de jerarquía de tipos. En caso contrario se puede decir que hubo algún error en la utilización del *AUTO_TYPE* para esta variable. Sea *B* el tipo más lejano a *Object* de los que aparecen en la lista.
-- `conformed_by[i]` almacena una lista con los tipos que deben conformarse a *A*. Luego el menor ancestro común (*LCA - Lowest Common Ancestor*) de dichos tipos deberá conformarse a A. Note que este siempre existirá, pues en caso peor será *Object*, que es la raíz del árbol de tipos. Sea *C* el *LCA* de los tipos guardados. Note que si la lista está vacía, (que puede suceder) *C* será *None*.
-- Como *C* se conforma a *A* y *A* se conforma a *B*, tiene que ocurrir que *C* se conforma a *B*. En caso contrario, se reporta un uso incorrecto de *AUTO_TYPE* para esa variable. Todos los tipos en el camino entre *B* y *C* son válidos para inferir *A*; pues cumplen con todas las restricciones que impone el programa. En nuestro caso se elige *C*, que es el tipo más restringido, para la inferencia. En caso de que *C* sea *None* se toma *B* como tipo de inferencia.
-- `infered_type[i]` guardará el tipo inferido una vez realizado el procedimiento anterior; mientras tanto su valor es *None*.
+- `conforms_to[i]` guarda una lista con los tipos a los que debe conformarse _A_; note que esta lista contiene al menos al tipo _Object_. El hecho de que _A_ se conforme a estos tipos, implica que todos ellos deben encontrarse en el camino de él a Object en el árbol de jerarquía de tipos. En caso contrario se puede decir que hubo algún error en la utilización del _AUTO_TYPE_ para esta variable. Sea _B_ el tipo más lejano a _Object_ de los que aparecen en la lista.
+- `conformed_by[i]` almacena una lista con los tipos que deben conformarse a _A_. Luego el menor ancestro común (_LCA - Lowest Common Ancestor_) de dichos tipos deberá conformarse a A. Note que este siempre existirá, pues en caso peor será _Object_, que es la raíz del árbol de tipos. Sea _C_ el _LCA_ de los tipos guardados. Note que si la lista está vacía, (que puede suceder) _C_ será _None_.
+- Como _C_ se conforma a _A_ y _A_ se conforma a _B_, tiene que ocurrir que _C_ se conforma a _B_. En caso contrario, se reporta un uso incorrecto de _AUTO_TYPE_ para esa variable. Todos los tipos en el camino entre _B_ y _C_ son válidos para inferir _A_; pues cumplen con todas las restricciones que impone el programa. En nuestro caso se elige _C_, que es el tipo más restringido, para la inferencia. En caso de que _C_ sea _None_ se toma _B_ como tipo de inferencia.
+- `infered_type[i]` guardará el tipo inferido una vez realizado el procedimiento anterior; mientras tanto su valor es _None_.
 
-La clase *Inferencer Manager* además, está equipada con métodos para actualizar las listas dado un *id*, y para realizar la inferencia dados los tipos almacenados.
+La clase _Inferencer Manager_ además, está equipada con métodos para actualizar las listas dado un _id_, y para realizar la inferencia dados los tipos almacenados.
 
-El *Type Inferencer* por su parte, realizará un algoritmo de punto fijo para llevar a cabo la inferencia:
+El _Type Inferencer_ por su parte, realizará un algoritmo de punto fijo para llevar a cabo la inferencia:
 
-1. Realiza un recorrido del AST (Árbol de Sintaxis Abstracta) actualizando los conjuntos ya mencionados. Cuando se visita un nodo, específicamente un *ExpressionNode*, este recibe como parámetro un conjunto de tipos a los que debe conformarse la expresión; a su vez retorna el tipo estático computado y el conjunto de tipos que se conforman a él. Esto es lo que permite actualizar las listas que están almacenadas en el *manager*.
+1. Realiza un recorrido del AST (Árbol de Sintaxis Abstracta) actualizando los conjuntos ya mencionados. Cuando se visita un nodo, específicamente un _ExpressionNode_, este recibe como parámetro un conjunto de tipos a los que debe conformarse la expresión; a su vez retorna el tipo estático computado y el conjunto de tipos que se conforman a él. Esto es lo que permite actualizar las listas que están almacenadas en el _manager_.
 2. Infiere todos los tipos que pueda con la información recogida.
-3.  - Si pudo inferir al menos uno nuevo, regresa al punto 1; puesto que este tipo puede influir en la inferencia de otros.
-    - Si no pudo inferir ninguno, significa que ya no hay más información que se pueda inferir, por tanto se realiza un último recorrido asignando tipo *Object* a todos los AUTO_TYPES que no pudieron ser inferidos.
+3. - Si pudo inferir al menos uno nuevo, regresa al punto 1; puesto que este tipo puede influir en la inferencia de otros.
+   - Si no pudo inferir ninguno, significa que ya no hay más información que se pueda inferir, por tanto se realiza un último recorrido asignando tipo _Object_ a todos los AUTO_TYPES que no pudieron ser inferidos.
 
-> Se considera que un tipo puede ser inferido, si no ha sido inferido anteriormente, y si su lista *conforms_to* contiene a otro tipo distinto de Object o su lista *conformed_by* contiene al menos un tipo.
+> Se considera que un tipo puede ser inferido, si no ha sido inferido anteriormente, y si su lista _conforms_to_ contiene a otro tipo distinto de Object o su lista _conformed_by_ contiene al menos un tipo.
 
-Por último se realiza un nuevo recorrido del *AST* con el *Type Checker* para detectar nuevamente los errores semánticos que puedan existir en el código, ahora con los *AUTO_TYPES* sustituidos por el tipo inferido.
+Por último se realiza un nuevo recorrido del _AST_ con el _Type Checker_ para detectar nuevamente los errores semánticos que puedan existir en el código, ahora con los _AUTO_TYPES_ sustituidos por el tipo inferido.
 
+#### Traducción de COOL a CIL
+
+Se definió un _visitor_ en el que se recorre todo el _ast_ generado en etapas anteriores y que recibe el contexto, que también fue creado previamente, para tener la información relacionada a los tipos que se encuentren en el código. El objetivo fundamental de este recorrido es generar otro _ast_ que posee estructuras pertenecientes a CIL y que hará más fácil la generación de código MIPS posteriormente. Además, se generan chequeos que permitirán lanzar errores en tiempo de ejecución.
+
+Primero que todo, se generan todos los tipos pertenecientes a COOL por defecto. Para ello, por cada tipo se crea un nodo que contenga sus atributos y funciones, lo que permite luego generarlos en MIPS. Después de este paso, comienza en sí el recorrido al _ast_ de COOL.
+
+En este recorrido se generan las 3 principales estructuras que posee el código de CIL:
+
+- los **tipos**, donde se guarda un resumen de los _features_ de cada uno de los tipos declarados en el código,
+- los **datos**, sección en la que se encuentran todas las "macros" que serán utilizadas durante la ejecución,
+- el **código**, donde son colocadas todas las funciones generadas a partir del recorrido.
+
+Dentro de los errores chequeados en el ast de CIL se encuentra la comprobación de que no se realicen divisiones por 0. Aunque es cierto que el valor se tiene mayormente en tiempo de ejecución, agregar esta comprobación en el ast de CIL hace mucho más sencillo el proceso de recorrido de este ast posteriormente. También se chequea el llamado a una función dinámica de una variable de tipo _void_ y los índices en _strings_ fuera de rango.
+
+En el caso del _case_ se chequea que la expresión principal no sea de tipo _void_ y además, que se conforme a alguna rama en la ejecución de este. El algoritmo empleado para reconocer por cuál de las ramas continuará la ejecución del código comienza por: tomar el tipo de todas las ramas del _case_, llámese a este conjunto $A$; por cada elemento del conjunto $A$ se toma la cantidad de tipos dentro del propio conjunto que se conforman a $a_i, i \in [1, |A|]$ ,de modo que se obtienen los pares $<a_i, |\{a_j \leq a_i, \forall j, j\in[1, |A|]\}|>$. Se define $|\{a_j \leq a_i, \forall j, j\in[1, |A|]\}|$ como $a_{i_c}$. Tomando los elementos $a_i$ por el que menor $a_{i_c}$ tenga, se estará tomando los nodos más abajos en el árbol de tipos dentro de cada posible rama de este. Si se ordenan las ramas del _case_ por el que menor $a_{i_c}$ se obtendrá una lista. Luego se recorre esta generando por cada elemento el subconjunto $B_i$ donde $b_{i_i} \in B_i$ si $b_{i_i} <= a_i$. Se chequea si el tipo de la expresión principal del _case_ aparece en este subconjunto. En el caso de que aparezca, el case se resuelve yendo por la rama que posee el tipo $a_i$.
 
 ## Licencia
 
