@@ -14,6 +14,7 @@ class BaseCOOLToCILVisitor:
         self.current_method = None
         self.current_function = None
         self.context = context
+        self.id = 0
 
         self.locals = {}
         self.attrs = {}#set()
@@ -50,8 +51,15 @@ class BaseCOOLToCILVisitor:
         self.localvars.append(local_node)
         return vinfo.name
 
+    def register_label(self):
+        label = 'label' + str(self.id)
+        self.id += 1
+        return label
+
+
     def define_internal_local(self, name='internal'):
         vinfo = VariableInfo(name, None)
+        self.id += 1
         return self.register_local(vinfo)
 
     def register_instruction(self, instruction):
@@ -88,7 +96,7 @@ class BaseCOOLToCILVisitor:
         while True: # we may need to search for te attributes of the ancestors
             break
         self.current_function = self.register_function(self.to_function_name('ctor', self.current_type.name))
-        local_self = self.define_internal_local('self')
+        local_self = self.define_internal_local(self.instances[-1])
         self.register_instruction(cil.AllocateNode(self.current_type.name, local_self))
 
         for i, attr in enumerate(attrs):
@@ -269,7 +277,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.AllocateNode('Main', instance))
         self.register_instruction(cil.ArgNode(instance))
         self.register_instruction(cil.StaticCallNode(main_method_name, result))
-        self.register_instruction(cil.ExitNode())
+        self.register_instruction(cil.EndNode())
         self.current_function = None
         self.add_builtin_types()
         
@@ -375,7 +383,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 value = 'void'
             else:
                 value = self.visit(default_value, scope)
-        self_ref = VariableInfo('self', self.current_type)
+        self_ref = VariableInfo(self.instances[-1], self.current_type)
         self_ref.index = 0
         return cil.SetAttribNode(self_ref, node.id, value)
         
@@ -482,8 +490,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.method -> str
         # node.args -> [ ExpressionNode ... ]
         ###############################
-        error_label = self.define_internal_local()
         dest = self.define_internal_local()
+        args = []
+        for arg in node.args:
+            args.append(cil.ArgNode(self.visit(arg,scope)))
         if node.obj is not None and node.obj.lex != 'self': # dynamic
             obj = self.visit(node.obj, scope)
             self.instances.append(obj)
@@ -495,13 +505,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             local = self.define_internal_local()
             self.register_instruction(cil.TypeOfNode(obj, local))
             
+            error_label = self.define_internal_local()
             condition = self.define_internal_local()
             self.register_instruction(cil.IsTypeNode(condition, local, "Void"))
             self.register_instruction(cil.GotoIfNode(error_label, condition))
             
             self.register_instruction(cil.ArgNode(obj))
-            for arg in node.args:
-                self.register_instruction(cil.ArgNode(self.visit(arg, scope)))
+            for arg in args:
+                self.register_instruction(arg)
             
             obj_type = obj_type if node.parent == None else node.parent
             self.register_instruction(cil.DynamicCallNode(local, self.to_function_name(node.method, obj_type), dest))
@@ -509,8 +520,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.LabelNode(error_label))
         else: # static
             self.register_instruction(cil.ArgNode(self.instances[-1]))
-            for arg in node.args:
-                self.register_instruction(cil.ArgNode(self.visit(arg, scope)))
+            for arg in args:
+                self.register_instruction(arg)
                 
             fname = self.get_function_name(self.current_type.name, node.method, self.dottypes[-1].methods, True)
             self.register_instruction(cil.StaticCallNode(fname , dest))
@@ -631,23 +642,26 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.thenChunk -> ExpressionNode
         # node.elseChunk -> ExpressionNode
         ###############################
-
         var = self.define_internal_local()
-        then_label = self.define_internal_local()
-        else_label = self.define_internal_local()
+        # then_label = self.define_internal_local()
+        # else_label = self.define_internal_local()
+        then_label = self.register_label()
+        else_label = self.register_label()
 
         ifexpr = self.visit(node.ifChunk, scope.children[0])
         self.register_instruction(cil.GotoIfNode(then_label, ifexpr))
 
         # else
         elseexpr = self.visit(node.elseChunk, scope.children[2])
-        self.register_instruction(cil.AssignNode(var, elseexpr))
+        self.register_instruction(cil.CopyNode(var, elseexpr))
+        # self.register_instruction(cil.AssignNode(var, elseexpr))
         self.register_instruction(cil.GotoNode(else_label))
 
         # then 
         self.register_instruction(cil.LabelNode(then_label))
         thenexpr = self.visit(node.thenChunk, scope.children[1])
-        self.register_instruction(cil.AssignNode(var, thenexpr))
+        self.register_instruction(cil.CopyNode(var, thenexpr))
+        # self.register_instruction(cil.AssignNode(var, thenexpr))
 
         self.register_instruction(cil.LabelNode(else_label))
         return var
@@ -848,8 +862,18 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.left -> ExpressionNode
         # node.right -> ExpressionNode
         ###############################
+        # bool_inst = self.define_internal_local()
+
         dest = self.define_internal_local()
+        self.register_instruction(cil.AllocateNode('Bool', dest))
         left = self.visit(node.left, scope)
         right = self.visit(node.right, scope)
-        self.register_instruction(cil.EqualNode(dest, left, right))
+
+        self.register_instruction(cil.StringEqualNode(dest, left, right) if isinstance(node.right, StringNode) and isinstance(node.left, StringNode) else cil.EqualNode(dest, left, right))
+        ## equivalent to:
+        # if isinstance(node.right, StringNode) and isinstance(node.left, StringNode):
+        #     self.register_instruction(cil.StringEqualNode(dest, left, right))
+        # else:
+        #     self.register_instruction(cil.EqualNode(dest, left, right))
+        
         return dest

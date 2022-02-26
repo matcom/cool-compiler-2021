@@ -76,6 +76,10 @@ class EqualNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
 
+class StringEqualNode(BinaryOperatorNode):
+    def __init__(self, dest, left, right):
+        super().__init__(dest, left, right)
+
 class LessNode(BinaryOperatorNode):
     def __init__(self, dest, left, right):
         super().__init__(dest, left, right)
@@ -166,7 +170,7 @@ class ReturnNode(InstructionNode):
     def __init__(self, value=None):
         self.value = value
 
-class ExitNode(InstructionNode):
+class EndNode(InstructionNode):
     def __init__(self):
         pass
 

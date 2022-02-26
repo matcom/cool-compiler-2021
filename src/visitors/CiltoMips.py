@@ -57,6 +57,21 @@ class CiltoMipsVisitor:
         self.dottypes = node.dottypes
         self.dotdata = node.dotdata
         self.dotcode = node.dotcode
+        # self.dotcode[13].instructions = [
+        #     self.dotcode[13].instructions[8],
+        #     self.dotcode[13].instructions[9],
+        #     self.dotcode[13].instructions[3],
+        #     self.dotcode[13].instructions[4],
+        #     self.dotcode[13].instructions[0],
+        #     self.dotcode[13].instructions[1],
+        #     self.dotcode[13].instructions[2],
+        #     self.dotcode[13].instructions[5],
+        #     self.dotcode[13].instructions[6],
+        #     self.dotcode[13].instructions[7],
+        #     self.dotcode[13].instructions[10],
+        #     self.dotcode[13].instructions[11],
+        #     self.dotcode[13].instructions[12]
+        # ]
         self.attrs = node.cattrs
         self.functions = node.dfunc
         self.parents = node.dparents
@@ -77,9 +92,7 @@ class CiltoMipsVisitor:
             self.write_data(line)
 
         for usr_data in self.dotdata:
-            data_addr = usr_data.name
-            data_value = usr_data.value
-            self.write_data('{}: {} {}'.format(usr_data.name, dt.asciiz, usr_data.value))
+            self.visit(usr_data)
 
         self.write_code('.text')
         self.write_code('.globl main')
@@ -362,7 +375,7 @@ class CiltoMipsVisitor:
 
     @visitor.when(DataNode)
     def visit(self, node):
-        pass
+        self.write_data('{}: {} {}'.format(node.name, dt.asciiz, node.value))
 
     @visitor.when(FunctionNode)
     def visit(self, node):
@@ -428,7 +441,7 @@ class CiltoMipsVisitor:
         self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
         self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
         self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
-        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, r.t0))
         self.write_code('{} {}, {}, {} # saving to $t1 the result'.format(o.add, r.t1, r.t1, r.t2))
         self.write_code('{} {}, {}({}) # heap address of dest'.format(o.lw, r.t0, dest_pos, r.fp))
         self.write_code('{} {}, 8({}) # store result'.format(o.sw, r.t1, r.t0))
@@ -442,7 +455,7 @@ class CiltoMipsVisitor:
         self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
         self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
         self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
-        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, r.t0))
         self.write_code('{} {}, {}, {} # saving to $t1 the result'.format(o.sub, r.t1, r.t1, r.t2))
         self.write_code('{} {}, {}({}) # heap address of dest'.format(o.lw, r.t0, dest_pos, r.fp))
         self.write_code('{} {}, 8({}) # store result'.format(o.sw, r.t1, r.t0))
@@ -456,7 +469,7 @@ class CiltoMipsVisitor:
         self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
         self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
         self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
-        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, r.t0))
         self.write_code('{} {}, {} # multiply'.format(o.mul, r.t1, r.t2))
         self.write_code('{} {} # get the result in lo'.format(o.mflo, r.t1, r.t2))
         self.write_code('{} {}, {}({}) # heap address of dest'.format(o.lw, r.t0, dest_pos, r.fp))
@@ -471,7 +484,7 @@ class CiltoMipsVisitor:
         self.write_code('{} {}, {}({}) # heap address of the left Int'.format(o.lw, r.t0, left_pos, r.fp))
         self.write_code('{} {}, 8({}) # left Int value'.format(o.lw, r.t1, r.t0))
         self.write_code('{} {}, {}({}) # heap address of the right Int'.format(o.lw, r.t0, right_pos, r.fp))
-        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, right_pos, r.t0))
+        self.write_code('{} {}, 8({}) # right Int value'.format(o.lw, r.t2, r.t0))
         # zero exception
         # self.write_code("la $t0, zero_error")
         # self.write_code("sw $t0, ($sp)")
@@ -505,6 +518,23 @@ class CiltoMipsVisitor:
         self.write_code('{}:'.format(label))
         self.write_code('{} {}, {}({})'.format(o.lw, r.t0, pos_dest, r.fp))
         self.write_code('{} {}, 8({})'.format(o.sw, r.t1, r.t0))
+
+    @visitor.when(StringEqualNode)
+    def visit(self, node):
+        left_addr = self.stack_offset(node.left)
+        right_addr = self.stack_offset(node.right)
+        dest_addr = self.stack_offset(node.dest)
+
+        self.write_code('{} {}, {}($fp)'.format( o.lw, r.s0, left_addr)) 	        # dir en el heap
+        self.write_code('{} {}, 8({})'.format( o.lw, r.a2, r.s0))
+        self.write_code('{} {}, {}($fp)'.format( o.lw, r.s0, right_addr)) 	        # dir en el heap
+        self.write_code('{} {}, 8({})'.format( o.lw, r.a3, r.s0))
+
+        self.write_code('jal str_comparer')        
+
+        self.write_code('{} {}, {}($fp)'.format( o.lw, r.s0, dest_addr))           # dir en el heap
+        self.write_code('{} {}, 8({})'.format( o.sw, r.v0, r.s0))                          # store bool result
+
 
     @visitor.when(LeqNode)
     def visit(self, node):
@@ -743,8 +773,8 @@ class CiltoMipsVisitor:
     def visit(self, node):
         pos_dest = self.stack_offset(node.dest)
         pos_source = self.stack_offset(node.source)
-        self.add('{} {}, {}({})'.format(o.lw, r.t0, pos_source, r.sp))
-        self.add('{} {}, {}({})'.format(o.sw, r.t0, pos_dest, r.sp))
+        self.write_code('{} {}, {}({})'.format(o.lw, r.t0, pos_source, r.sp))
+        self.write_code('{} {}, {}({})'.format(o.sw, r.t0, pos_dest, r.sp))
 
     @visitor.when(PrintStrNode)
     def visit(self, node):

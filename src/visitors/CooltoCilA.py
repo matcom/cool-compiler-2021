@@ -109,29 +109,26 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.declarations -> [ ClassDeclarationNode ... ]
         ######################################################
         
-        # class_nodes = [self.class_node_from_context(c) for c in self.context.types]
-        builtin_types = ['Object', 'IO', 'Int', 'Bool', 'String']
-        built_in_classes = [self.class_node_from_context(self.context.types[c]) for c in self.context.types if c in builtin_types]
-        for built_in_class in built_in_classes:
-            self.visit(built_in_class, scope)
 
+        basic_classes.Build(self.astCIL.code_section, self.astCIL.type_section)
+        func = 'main'
+        f = AST_CIL.Function(func)
 
-        self.current_function = self.register_function('entry')
-        instance = self.define_internal_local()
-        self.instances.append(instance)
-        result = self.define_internal_local()
-        main_method_name = self.to_function_name('main', 'Main')
-        self.register_instruction(cil.AllocateNode('Main', instance))
-        self.register_instruction(cil.ArgNode(instance))
-        self.register_instruction(cil.StaticCallNode(main_method_name, result))
-        self.register_instruction(cil.ReturnNode(0))
-        self.current_function = None
+        self_instance = 'self'          #crear instancia de un valor entero
+        false_local = 'false'
+
+        intr  = AST_CIL.Call(self_instance, 'function_Main___init__')
+
+        intr2 = AST_CIL.Arg(self_instance)
+        intr3 = AST_CIL.Call(false_local, 'function_Main_main')
+        intr4 = AST_CIL.Exit()
         
-        for declaration, child_scope in zip(node.declarations, scope.children):
-            self.visit(declaration, child_scope)
-
-        self.instances.pop()
-        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
+        f.instructions += [intr, intr2, intr3, intr4]
+        f.localvars += [false_local, self_instance]
+        self.astCIL.code_section.insert(0, f)
+        
+        for c in program.classes:
+            self.visit(c, programCIL)
     
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope):
