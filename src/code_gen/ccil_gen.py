@@ -1000,18 +1000,16 @@ class CCILGenerator:
         self.add_warning(f"Warning: {msg}")
 
     def get_inherited_features(
-        self, node: sem_ast.ClassDeclarationNode, node_methods: List[Method]
+        self, node: sem_ast.ClassDeclarationNode#, node_methods: List[Method]
     ):
-        node_methods: Set[str] = {m.id for m in node_methods}
+        # node_methods: Set[str] = {m.id for m in node_methods}
 
         inherited_attr: List[Attribute] = []
         inherited_methods: List[Method] = []
         if node.parent is not None:
             parent_class: Class = self.program_types[node.parent]
             inherited_attr = [a for a in parent_class.attributes]
-            inherited_methods = [
-                m for m in parent_class.methods if m.id not in node_methods
-            ]
+            inherited_methods = [m for m in parent_class.methods]
 
         return inherited_attr, inherited_methods
 
