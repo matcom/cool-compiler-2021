@@ -22,12 +22,6 @@ class DotTypesDataVisitor:
     @visitor.when(ast.ProgramNode)
     def visit(self, node: ast.ProgramNode):
         self.root.set_data('""')
-        self.root.set_data('"Object"')
-        self.root.set_data('"IO"')
-        self.root.set_data('"String"')
-        self.root.set_data('"Bool"')
-        self.root.set_data('"Int"')
-        self.root.set_data('"<void>"')
 
         # add Object, IO, String, Bool, Int and <void> to types
         self.types += [
@@ -97,7 +91,6 @@ class DotTypesDataVisitor:
             attrs=type_attributes,
             methods=type_methods
         )
-        self.root.set_data(f'"{node.id}"')
 
         for attr, _ in type_.all_attributes():
             type_attributes.append(f'{type_.name}_{attr.name}')
