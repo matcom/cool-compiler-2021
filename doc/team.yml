@@ -1,10 +1,7 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Abel Antonio Cruz Suarez
+    github: abelo98
+    group: C411
+  - name: Daniel Reynel Dominguez Ceballos
+    github: zondekallix
+    group: C411
