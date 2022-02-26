@@ -29,10 +29,16 @@ class Method:
         params = ', '.join(f'{n}: {t.name}' for n, t in zip(self.param_names, self.param_types))
         return f'[method] {self.name}({params}): {self.return_type.name};'
 
+
     def __eq__(self, other):
-        return (other.name == self.name and
-                other.return_type == self.return_type and
-                tuple(other.param_types) == tuple(self.param_types))
+        return other.name == self.name and \
+               other.return_type == self.return_type and \
+               other.param_types == self.param_types
+
+    # def __eq__(self, other):
+    #     return (other.name == self.name and
+    #             other.return_type == self.return_type and
+    #             tuple(other.param_types) == tuple(self.param_types))
 
 class Type:
     def __init__(self, name: str):

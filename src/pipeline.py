@@ -6,9 +6,9 @@ from visitors.Checker import TypeChecker
 from visitors.Inferencer import Inferencer
 from visitors.Executor import Executor, RuntimeException
 # from visitors.CooltoCil import COOLToCILVisitor
-from visitors.CooltoCil import COOLToCILVisitor
+from visitors.CooltoCilM import COOLToCILVisitor
 from visitors.CilDepicter import get_formatter
-from visitors.CiltoMips import CiltoMipsVisitor
+# from visitors.CiltoMips import CiltoMipsVisitor
 
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
@@ -51,15 +51,16 @@ class Pipeline():
                 self.typeChecker = TypeChecker(self.context, self.errors)
                 self.typeChecker.visit( self.ast, scope)
                 if len(self.errors) == 0:
-                    self.coolToCil = COOLToCILVisitor(self.ast, self.context)
+                    self.coolToCil = COOLToCILVisitor(self.context)
                     cil_ast = self.coolToCil.visit(self.ast, scope)
+                    __a = 0
                     # print(get_formatter(cil_ast))
-                    self.cilToMips = CiltoMipsVisitor(self.context)
-                    self.cilToMips.visit(cil_ast)
-                    with open('out', 'w') as f:
-                        mips_code = self.cilToMips.data + self.cilToMips.code
-                        for line in mips_code:
-                            f.write(line+'\n')
+                    # self.cilToMips = CiltoMipsVisitor(self.context)
+                    # self.cilToMips.visit(cil_ast)
+                    # with open('out', 'w') as f:
+                    #     mips_code = self.cilToMips.data + self.cilToMips.code
+                    #     for line in mips_code:
+                    #         f.write(line+'\n')
         if verbose:
             print('This is after infering types:')
             print()
