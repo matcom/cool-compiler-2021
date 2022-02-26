@@ -49,8 +49,6 @@ type Bool {
 type Main {
 	inherits from IO
 
-	attribute m_main
-
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -59,6 +57,7 @@ type Main {
 	method in_string: function_in_string_at_IO
 	method in_int: function_in_int_at_IO
 	method main: function_main_at_Main
+	method fib: function_fib_at_Main
 	method __init__: function___init___at_Main
 }
 
@@ -148,36 +147,29 @@ function function_equal{
 	PARAM b
 
 	LOCAL internal_0 # Equal result
-	LOCAL internal_1 # Null Pointer
-	LOCAL internal_2 # One of params is null
-	LOCAL internal_3 # Type of a
-	LOCAL internal_4 # Type Int
-	LOCAL internal_5 # Type Bool
-	LOCAL internal_6 # Type String
-	LOCAL internal_7 # Type of a equals int
-	LOCAL internal_8 # Type of a equals bool
-	LOCAL internal_9 # Type of a equals string
+	LOCAL internal_1 # Type of a
+	LOCAL internal_2 # Type Int
+	LOCAL internal_3 # Type Bool
+	LOCAL internal_4 # Type String
+	LOCAL internal_5 # Type of a equals int
+	LOCAL internal_6 # Type of a equals bool
+	LOCAL internal_7 # Type of a equals string
 
 	internal_0 = ALLOCBOOL 0
-	internal_1 = ALLOCNULL
-	internal_2 = ALLOCBOOL 0
-	internal_2 = EQUALADDR a internal_1
-	internal_2 = EQUALADDR b internal_1
-	IF internal_2 GOTO a_is_type_object
-	internal_3 = TYPEOF a
-	internal_4 = TYPEADDR Int
-	internal_5 = TYPEADDR Bool
-	internal_6 = TYPEADDR String
+	internal_1 = TYPEOF a
+	internal_2 = TYPEADDR Int
+	internal_3 = TYPEADDR Bool
+	internal_4 = TYPEADDR String
+	internal_5 = ALLOCBOOL 0
+	internal_6 = ALLOCBOOL 0
 	internal_7 = ALLOCBOOL 0
-	internal_8 = ALLOCBOOL 0
-	internal_9 = ALLOCBOOL 0
-	internal_7 = EQUALADDR internal_3 internal_4
-	internal_8 = EQUALADDR internal_3 internal_5
-	internal_9 = EQUALADDR internal_3 internal_6
+	internal_5 = EQUALADDR internal_1 internal_2
+	internal_6 = EQUALADDR internal_1 internal_3
+	internal_7 = EQUALADDR internal_1 internal_4
 	
-	IF internal_7 GOTO a_is_type_int_or_bool
-	IF internal_8 GOTO a_is_type_int_or_bool
-	IF internal_9 GOTO a_is_type_string
+	IF internal_5 GOTO a_is_type_int_or_bool
+	IF internal_6 GOTO a_is_type_int_or_bool
+	IF internal_7 GOTO a_is_type_string
 	GOTO a_is_type_object
 	
 	a_is_type_int_or_bool:
@@ -200,29 +192,22 @@ function function_assign{
 	PARAM dest
 	PARAM source
 
-	LOCAL internal_0 # Null Pointer
-	LOCAL internal_1 # One of params is null
-	LOCAL internal_2 # Type of source
-	LOCAL internal_3 # Type Int
-	LOCAL internal_4 # Type Bool
-	LOCAL internal_5 # Type of source equals int
-	LOCAL internal_6 # Type of source equals bool
+	LOCAL internal_0 # Type of source
+	LOCAL internal_1 # Type Int
+	LOCAL internal_2 # Type Bool
+	LOCAL internal_3 # Type of source equals int
+	LOCAL internal_4 # Type of source equals bool
 
-	internal_0 = ALLOCNULL
-	internal_1 = ALLOCBOOL 0
-	internal_1 = EQUALADDR source internal_0
-	internal_1 = EQUALADDR dest internal_0
-	IF internal_1 GOTO source_is_type_object
-	internal_2 = TYPEOF source
-	internal_3 = TYPEADDR Int
-	internal_4 = TYPEADDR Bool
-	internal_5 = ALLOCBOOL 0
-	internal_6 = ALLOCBOOL 0
-	internal_5 = EQUALADDR internal_2 internal_3
-	internal_6 = EQUALADDR internal_2 internal_4
+	internal_0 = TYPEOF source
+	internal_1 = TYPEADDR Int
+	internal_2 = TYPEADDR Bool
+	internal_3 = ALLOCBOOL 0
+	internal_4 = ALLOCBOOL 0
+	internal_3 = EQUALADDR internal_1 internal_1
+	internal_4 = EQUALADDR internal_1 internal_2
 	
-	IF internal_5 GOTO source_is_type_int_or_bool
-	IF internal_6 GOTO source_is_type_int_or_bool
+	IF internal_3 GOTO source_is_type_int_or_bool
+	IF internal_4 GOTO source_is_type_int_or_bool
 	GOTO source_is_type_object
 	
 	source_is_type_int_or_bool:
@@ -245,22 +230,6 @@ function function___init___at_Object{
 function function_abort_at_Object{
 	PARAM self
 
-	LOCAL internal_0
-	LOCAL internal_1
-	LOCAL internal_2
-	LOCAL internal_3
-
-	internal_0 = ALLOCSTR "Abort called from class "
-	internal_2 = ALLOCSTR "\n"
-	ARG self
-	internal_1 = VCALL String function_type_name_at_Object
-	ARG internal_0
-	ARG internal_1
-	internal_3 = VCALL String function_concat_at_String
-	ARG internal_3
-	ARG internal_2
-	internal_3 = VCALL String function_concat_at_String
-	PRINTSTR internal_3
 	HALT
 	
 	RETURN self
@@ -333,7 +302,6 @@ function function_length_at_String{
 
 	LOCAL internal_0
 
-	internal_0 = ALLOCINT 0
 	internal_0 = LENGTH self
 	
 	RETURN internal_0
@@ -361,28 +329,119 @@ function function_substr_at_String{
 }
 function function___init___at_Main{
 	PARAM self
-
-	LOCAL internal_0 # Null
-
-	internal_0 = ALLOCNULL
-	
-	SETATTR self m_main internal_0
 	
 	RETURN self
 }
 function function_main_at_Main{
 	PARAM self
 
-	LOCAL internal_0
+	LOCAL internal_0 # String "Enter n to find nth fibonacci number!\n"
 	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+	LOCAL internal_4
+	LOCAL internal_5 # String "\n"
+	LOCAL internal_6
 
-	ARG self
-	internal_0 = VCALL Main function_in_string_at_IO
+	internal_0 = ALLOCSTR "Enter n to find nth fibonacci number!\n"
 	ARG self
 	ARG internal_0
 	internal_1 = VCALL Main function_out_string_at_IO
+	ARG self
+	internal_2 = VCALL Main function_in_int_at_IO
+	ARG self
+	ARG internal_2
+	internal_3 = VCALL Main function_fib_at_Main
+	ARG self
+	ARG internal_3
+	internal_4 = VCALL Main function_out_int_at_IO
+	internal_5 = ALLOCSTR "\n"
+	ARG self
+	ARG internal_5
+	internal_6 = VCALL Main function_out_string_at_IO
 	
-	RETURN internal_1
+	RETURN internal_6
+}
+function function_fib_at_Main{
+	PARAM self
+	PARAM i
+
+	LOCAL a
+	LOCAL internal_1 # Integer 1
+	LOCAL b
+	LOCAL internal_3 # Integer 0
+	LOCAL c
+	LOCAL internal_5 # Integer 0
+	LOCAL internal_6 # Integer 0
+	LOCAL internal_7 # Store the result of the operation function_equal
+	LOCAL internal_8 # Integer 1
+	LOCAL internal_9 # Store the negation of internal_7
+	LOCAL internal_10 # Store the result of the operation function_add
+	LOCAL internal_11 # Integer 1
+	LOCAL internal_12 # Store the result of the operation function_sub
+
+	# Let a: Int b: Int c: Int
+	
+	internal_1 = ALLOCINT 1
+	ARG a
+	ARG internal_1
+	a = CALL function_assign
+	
+	internal_3 = ALLOCINT 0
+	ARG b
+	ARG internal_3
+	b = CALL function_assign
+	
+	internal_5 = ALLOCINT 0
+	ARG c
+	ARG internal_5
+	c = CALL function_assign
+	
+	# While loop
+	while_start_8738608219667:
+	internal_6 = ALLOCINT 0
+	
+	ARG i
+	ARG internal_6
+	internal_7 = CALL function_equal
+	internal_8 = ALLOCINT 1
+	ARG internal_7
+	ARG internal_8
+	internal_9 = CALL function_xor
+	IF internal_9 GOTO while_body_8738608219667
+	GOTO while_end_8738608219667
+	
+	while_body_8738608219667:
+	
+	ARG a
+	ARG b
+	internal_10 = CALL function_add
+	
+	ARG c
+	ARG internal_10
+	c = CALL function_assign
+	internal_11 = ALLOCINT 1
+	
+	ARG i
+	ARG internal_11
+	internal_12 = CALL function_sub
+	
+	ARG i
+	ARG internal_12
+	i = CALL function_assign
+	
+	ARG b
+	ARG a
+	b = CALL function_assign
+	
+	ARG a
+	ARG c
+	a = CALL function_assign
+	GOTO while_start_8738608219667
+	
+	while_end_8738608219667:
+	
+	RETURN c
 }
 function main{
 	

@@ -260,29 +260,36 @@ function function_equal{
 	PARAM b
 
 	LOCAL internal_0 # Equal result
-	LOCAL internal_1 # Type of a
-	LOCAL internal_2 # Type Int
-	LOCAL internal_3 # Type Bool
-	LOCAL internal_4 # Type String
-	LOCAL internal_5 # Type of a equals int
-	LOCAL internal_6 # Type of a equals bool
-	LOCAL internal_7 # Type of a equals string
+	LOCAL internal_1 # Null Pointer
+	LOCAL internal_2 # One of params is null
+	LOCAL internal_3 # Type of a
+	LOCAL internal_4 # Type Int
+	LOCAL internal_5 # Type Bool
+	LOCAL internal_6 # Type String
+	LOCAL internal_7 # Type of a equals int
+	LOCAL internal_8 # Type of a equals bool
+	LOCAL internal_9 # Type of a equals string
 
 	internal_0 = ALLOCBOOL 0
-	internal_1 = TYPEOF a
-	internal_2 = TYPEADDR Int
-	internal_3 = TYPEADDR Bool
-	internal_4 = TYPEADDR String
-	internal_5 = ALLOCBOOL 0
-	internal_6 = ALLOCBOOL 0
+	internal_1 = ALLOCNULL
+	internal_2 = ALLOCBOOL 0
+	internal_2 = EQUALADDR a internal_1
+	internal_2 = EQUALADDR b internal_1
+	IF internal_2 GOTO a_is_type_object
+	internal_3 = TYPEOF a
+	internal_4 = TYPEADDR Int
+	internal_5 = TYPEADDR Bool
+	internal_6 = TYPEADDR String
 	internal_7 = ALLOCBOOL 0
-	internal_5 = EQUALADDR internal_1 internal_2
-	internal_6 = EQUALADDR internal_1 internal_3
-	internal_7 = EQUALADDR internal_1 internal_4
+	internal_8 = ALLOCBOOL 0
+	internal_9 = ALLOCBOOL 0
+	internal_7 = EQUALADDR internal_3 internal_4
+	internal_8 = EQUALADDR internal_3 internal_5
+	internal_9 = EQUALADDR internal_3 internal_6
 	
-	IF internal_5 GOTO a_is_type_int_or_bool
-	IF internal_6 GOTO a_is_type_int_or_bool
-	IF internal_7 GOTO a_is_type_string
+	IF internal_7 GOTO a_is_type_int_or_bool
+	IF internal_8 GOTO a_is_type_int_or_bool
+	IF internal_9 GOTO a_is_type_string
 	GOTO a_is_type_object
 	
 	a_is_type_int_or_bool:
@@ -301,6 +308,47 @@ function function_equal{
 	
 	RETURN internal_0
 }
+function function_assign{
+	PARAM dest
+	PARAM source
+
+	LOCAL internal_0 # Null Pointer
+	LOCAL internal_1 # One of params is null
+	LOCAL internal_2 # Type of source
+	LOCAL internal_3 # Type Int
+	LOCAL internal_4 # Type Bool
+	LOCAL internal_5 # Type of source equals int
+	LOCAL internal_6 # Type of source equals bool
+
+	internal_0 = ALLOCNULL
+	internal_1 = ALLOCBOOL 0
+	internal_1 = EQUALADDR source internal_0
+	internal_1 = EQUALADDR dest internal_0
+	IF internal_1 GOTO source_is_type_object
+	internal_2 = TYPEOF source
+	internal_3 = TYPEADDR Int
+	internal_4 = TYPEADDR Bool
+	internal_5 = ALLOCBOOL 0
+	internal_6 = ALLOCBOOL 0
+	internal_5 = EQUALADDR internal_2 internal_3
+	internal_6 = EQUALADDR internal_2 internal_4
+	
+	IF internal_5 GOTO source_is_type_int_or_bool
+	IF internal_6 GOTO source_is_type_int_or_bool
+	GOTO source_is_type_object
+	
+	source_is_type_int_or_bool:
+	dest = INT source
+	GOTO source_end_of_equal
+	
+	source_is_type_object:
+	dest = source
+	GOTO source_end_of_equal
+	
+	source_end_of_equal:
+	
+	RETURN dest
+}
 function function___init___at_Object{
 	PARAM self
 	
@@ -309,6 +357,22 @@ function function___init___at_Object{
 function function_abort_at_Object{
 	PARAM self
 
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+
+	internal_0 = ALLOCSTR "Abort called from class "
+	internal_2 = ALLOCSTR "\n"
+	ARG self
+	internal_1 = VCALL String function_type_name_at_Object
+	ARG internal_0
+	ARG internal_1
+	internal_3 = VCALL String function_concat_at_String
+	ARG internal_3
+	ARG internal_2
+	internal_3 = VCALL String function_concat_at_String
+	PRINTSTR internal_3
 	HALT
 	
 	RETURN self
@@ -366,6 +430,7 @@ function function_in_int_at_IO{
 
 	LOCAL internal_0
 
+	internal_0 = ALLOCINT 0
 	READINT internal_0
 	
 	RETURN internal_0
@@ -380,6 +445,7 @@ function function_length_at_String{
 
 	LOCAL internal_0
 
+	internal_0 = ALLOCINT 0
 	internal_0 = LENGTH self
 	
 	RETURN internal_0
@@ -411,6 +477,7 @@ function function___init___at_A{
 	LOCAL internal_0 # Integer 0
 
 	internal_0 = ALLOCINT 0
+	
 	SETATTR self var internal_0
 	
 	RETURN self
@@ -428,6 +495,7 @@ function function_set_var_at_A{
 	PARAM self
 	PARAM num
 
+	
 	SETATTR self var num
 	
 	RETURN self
@@ -448,12 +516,16 @@ function function_method2_at_A{
 	LOCAL internal_2 # Store an instance of the class B
 	LOCAL internal_3
 
-	x = 0
+	# Let x: Int
+	x = ALLOCINT 0
 	
 	ARG num1
 	ARG num2
 	internal_1 = CALL function_add
-	x = internal_1
+	
+	ARG x
+	ARG internal_1
+	x = CALL function_assign
 	internal_2 = ALLOCATE B # Allocate the object B
 	ARG internal_2 # Pass the instance to the constructor
 	internal_2 = VCALL B function___init___at_B # Call the constructor
@@ -474,10 +546,21 @@ function function_method3_at_A{
 	LOCAL internal_4 # Store an instance of the class C
 	LOCAL internal_5
 
-	x = 0
-	internal_3 = XOR num internal_2 # Getting the complement a1 of num
-	internal_3 = internal_3 + internal_1 # Adding 1 to the complement a1 we get the complement a2 of num
-	x = internal_3
+	# Let x: Int
+	x = ALLOCINT 0
+	internal_1 = ALLOCINT 1
+	internal_2 = ALLOCINT 4294967295
+	internal_3 = ALLOCINT 0
+	ARG num
+	ARG internal_2
+	internal_3 = CALL function_xor
+	ARG internal_3
+	ARG internal_1
+	internal_3 = CALL function_add
+	
+	ARG x
+	ARG internal_3
+	x = CALL function_assign
 	internal_4 = ALLOCATE C # Allocate the object C
 	ARG internal_4 # Pass the instance to the constructor
 	internal_4 = VCALL C function___init___at_C # Call the constructor
@@ -511,16 +594,20 @@ function function_method4_at_A{
 	ARG num1
 	internal_2 = CALL function_less_than
 	internal_1 = internal_2
-	IF internal_1 GOTO then_8792981814074
-	GOTO else_8792981814074
+	IF internal_1 GOTO then_8781702322008
+	GOTO else_8781702322008
 	
-	then_8792981814074:
-	x = 0
+	then_8781702322008:
+	# Let x: Int
+	x = ALLOCINT 0
 	
 	ARG num1
 	ARG num2
 	internal_4 = CALL function_sub
-	x = internal_4
+	
+	ARG x
+	ARG internal_4
+	x = CALL function_assign
 	internal_5 = ALLOCATE D # Allocate the object D
 	ARG internal_5 # Pass the instance to the constructor
 	internal_5 = VCALL D function___init___at_D # Call the constructor
@@ -528,15 +615,19 @@ function function_method4_at_A{
 	ARG x
 	internal_6 = VCALL D function_set_var_at_A
 	internal_0 = internal_6
-	GOTO endif_8792981814074
+	GOTO endif_8781702322008
 	
-	else_8792981814074:
-	x = 0
+	else_8781702322008:
+	# Let x: Int
+	x = ALLOCINT 0
 	
 	ARG num2
 	ARG num1
 	internal_8 = CALL function_sub
-	x = internal_8
+	
+	ARG x
+	ARG internal_8
+	x = CALL function_assign
 	internal_9 = ALLOCATE D # Allocate the object D
 	ARG internal_9 # Pass the instance to the constructor
 	internal_9 = VCALL D function___init___at_D # Call the constructor
@@ -544,9 +635,9 @@ function function_method4_at_A{
 	ARG x
 	internal_10 = VCALL D function_set_var_at_A
 	internal_0 = internal_10
-	GOTO endif_8792981814074
+	GOTO endif_8781702322008
 	
-	endif_8792981814074:
+	endif_8781702322008:
 	
 	RETURN internal_0
 }
@@ -558,50 +649,64 @@ function function_method5_at_A{
 	LOCAL internal_1 # Integer 1
 	LOCAL y
 	LOCAL internal_3 # Integer 1
-	LOCAL internal_4
-	LOCAL internal_5 # Store the result of the operation function_less_than_or_equal
-	LOCAL internal_6 # Store the result of the operation function_mult
-	LOCAL internal_7 # Integer 1
-	LOCAL internal_8 # Store the result of the operation function_add
-	LOCAL internal_9 # Store an instance of the class E
-	LOCAL internal_10
+	LOCAL internal_4 # Store the result of the operation function_less_than_or_equal
+	LOCAL internal_5 # Store the result of the operation function_mult
+	LOCAL internal_6 # Integer 1
+	LOCAL internal_7 # Store the result of the operation function_add
+	LOCAL internal_8 # Store an instance of the class E
+	LOCAL internal_9
 
+	# Let x: Int
+	
 	internal_1 = ALLOCINT 1
-	x = internal_1
+	ARG x
+	ARG internal_1
+	x = CALL function_assign
+	# Let y: Int
+	
 	internal_3 = ALLOCINT 1
-	y = internal_3
-	while_start_8792981814158:
+	ARG y
+	ARG internal_3
+	y = CALL function_assign
+	
+	# While loop
+	while_start_8781702322092:
 	
 	ARG y
 	ARG num
-	internal_5 = CALL function_less_than_or_equal
-	internal_4 = internal_5
-	IF internal_4 GOTO while_body_8792981814158
-	GOTO while_end_8792981814158
+	internal_4 = CALL function_less_than_or_equal
+	IF internal_4 GOTO while_body_8781702322092
+	GOTO while_end_8781702322092
 	
-	while_body_8792981814158:
+	while_body_8781702322092:
 	
 	ARG x
 	ARG y
-	internal_6 = CALL function_mult
-	x = internal_6
-	internal_7 = ALLOCINT 1
+	internal_5 = CALL function_mult
+	
+	ARG x
+	ARG internal_5
+	x = CALL function_assign
+	internal_6 = ALLOCINT 1
+	
+	ARG y
+	ARG internal_6
+	internal_7 = CALL function_add
 	
 	ARG y
 	ARG internal_7
-	internal_8 = CALL function_add
-	y = internal_8
-	GOTO while_start_8792981814158
+	y = CALL function_assign
+	GOTO while_start_8781702322092
 	
-	while_end_8792981814158:
-	internal_9 = ALLOCATE E # Allocate the object E
-	ARG internal_9 # Pass the instance to the constructor
-	internal_9 = VCALL E function___init___at_E # Call the constructor
-	ARG internal_9
+	while_end_8781702322092:
+	internal_8 = ALLOCATE E # Allocate the object E
+	ARG internal_8 # Pass the instance to the constructor
+	internal_8 = VCALL E function___init___at_E # Call the constructor
+	ARG internal_8
 	ARG x
-	internal_10 = VCALL E function_set_var_at_A
+	internal_9 = VCALL E function_set_var_at_A
 	
-	RETURN internal_10
+	RETURN internal_9
 }
 function function___init___at_B{
 	PARAM self
@@ -609,6 +714,7 @@ function function___init___at_B{
 	LOCAL internal_0 # Integer 0
 
 	internal_0 = ALLOCINT 0
+	
 	SETATTR self var internal_0
 	
 	RETURN self
@@ -622,12 +728,16 @@ function function_method5_at_B{
 	LOCAL internal_2 # Store an instance of the class E
 	LOCAL internal_3
 
-	x = 0
+	# Let x: Int
+	x = ALLOCINT 0
 	
 	ARG num
 	ARG num
 	internal_1 = CALL function_mult
-	x = internal_1
+	
+	ARG x
+	ARG internal_1
+	x = CALL function_assign
 	internal_2 = ALLOCATE E # Allocate the object E
 	ARG internal_2 # Pass the instance to the constructor
 	internal_2 = VCALL E function___init___at_E # Call the constructor
@@ -643,6 +753,7 @@ function function___init___at_C{
 	LOCAL internal_0 # Integer 0
 
 	internal_0 = ALLOCINT 0
+	
 	SETATTR self var internal_0
 	
 	RETURN self
@@ -658,10 +769,21 @@ function function_method6_at_C{
 	LOCAL internal_4 # Store an instance of the class A
 	LOCAL internal_5
 
-	x = 0
-	internal_3 = XOR num internal_2 # Getting the complement a1 of num
-	internal_3 = internal_3 + internal_1 # Adding 1 to the complement a1 we get the complement a2 of num
-	x = internal_3
+	# Let x: Int
+	x = ALLOCINT 0
+	internal_1 = ALLOCINT 1
+	internal_2 = ALLOCINT 4294967295
+	internal_3 = ALLOCINT 0
+	ARG num
+	ARG internal_2
+	internal_3 = CALL function_xor
+	ARG internal_3
+	ARG internal_1
+	internal_3 = CALL function_add
+	
+	ARG x
+	ARG internal_3
+	x = CALL function_assign
 	internal_4 = ALLOCATE A # Allocate the object A
 	ARG internal_4 # Pass the instance to the constructor
 	internal_4 = VCALL A function___init___at_A # Call the constructor
@@ -681,7 +803,8 @@ function function_method5_at_C{
 	LOCAL internal_3 # Store an instance of the class E
 	LOCAL internal_4
 
-	x = 0
+	# Let x: Int
+	x = ALLOCINT 0
 	
 	ARG num
 	ARG num
@@ -690,7 +813,10 @@ function function_method5_at_C{
 	ARG internal_1
 	ARG num
 	internal_2 = CALL function_mult
-	x = internal_2
+	
+	ARG x
+	ARG internal_2
+	x = CALL function_assign
 	internal_3 = ALLOCATE E # Allocate the object E
 	ARG internal_3 # Pass the instance to the constructor
 	internal_3 = VCALL E function___init___at_E # Call the constructor
@@ -706,6 +832,7 @@ function function___init___at_D{
 	LOCAL internal_0 # Integer 0
 
 	internal_0 = ALLOCINT 0
+	
 	SETATTR self var internal_0
 	
 	RETURN self
@@ -742,7 +869,11 @@ function function_method7_at_D{
 	LOCAL internal_25 # Store the result of the operation function_sub
 	LOCAL internal_26
 
-	x = num
+	# Let x: Int
+	
+	ARG x
+	ARG num
+	x = CALL function_assign
 	# Conditional
 	internal_2 = ALLOCBOOL 0
 	internal_3 = ALLOCINT 0
@@ -751,19 +882,26 @@ function function_method7_at_D{
 	ARG internal_3
 	internal_4 = CALL function_less_than
 	internal_2 = internal_4
-	IF internal_2 GOTO then_8792981815568
-	GOTO else_8792981815568
+	IF internal_2 GOTO then_8781702323502
+	GOTO else_8781702323502
 	
-	then_8792981815568:
-	internal_7 = XOR x internal_6 # Getting the complement a1 of x
-	internal_7 = internal_7 + internal_5 # Adding 1 to the complement a1 we get the complement a2 of x
+	then_8781702323502:
+	internal_5 = ALLOCINT 1
+	internal_6 = ALLOCINT 4294967295
+	internal_7 = ALLOCINT 0
+	ARG x
+	ARG internal_6
+	internal_7 = CALL function_xor
+	ARG internal_7
+	ARG internal_5
+	internal_7 = CALL function_add
 	ARG self
 	ARG internal_7
 	internal_8 = VCALL D function_method7_at_D
 	internal_1 = internal_8
-	GOTO endif_8792981815568
+	GOTO endif_8781702323502
 	
-	else_8792981815568:
+	else_8781702323502:
 	# Conditional
 	internal_10 = ALLOCBOOL 0
 	internal_11 = ALLOCINT 0
@@ -772,15 +910,15 @@ function function_method7_at_D{
 	ARG x
 	internal_12 = CALL function_equal
 	internal_10 = internal_12
-	IF internal_10 GOTO then_8792981815559
-	GOTO else_8792981815559
+	IF internal_10 GOTO then_8781702323481
+	GOTO else_8781702323481
 	
-	then_8792981815559:
+	then_8781702323481:
 	internal_13 = ALLOCBOOL 1
 	internal_9 = internal_13
-	GOTO endif_8792981815559
+	GOTO endif_8781702323481
 	
-	else_8792981815559:
+	else_8781702323481:
 	# Conditional
 	internal_15 = ALLOCBOOL 0
 	internal_16 = ALLOCINT 1
@@ -789,15 +927,15 @@ function function_method7_at_D{
 	ARG x
 	internal_17 = CALL function_equal
 	internal_15 = internal_17
-	IF internal_15 GOTO then_8792981815290
-	GOTO else_8792981815290
+	IF internal_15 GOTO then_8781702323484
+	GOTO else_8781702323484
 	
-	then_8792981815290:
+	then_8781702323484:
 	internal_18 = ALLOCBOOL 0
 	internal_14 = internal_18
-	GOTO endif_8792981815290
+	GOTO endif_8781702323484
 	
-	else_8792981815290:
+	else_8781702323484:
 	# Conditional
 	internal_20 = ALLOCBOOL 0
 	internal_21 = ALLOCINT 2
@@ -806,15 +944,15 @@ function function_method7_at_D{
 	ARG x
 	internal_22 = CALL function_equal
 	internal_20 = internal_22
-	IF internal_20 GOTO then_8792981815556
-	GOTO else_8792981815556
+	IF internal_20 GOTO then_8781702323490
+	GOTO else_8781702323490
 	
-	then_8792981815556:
+	then_8781702323490:
 	internal_23 = ALLOCBOOL 0
 	internal_19 = internal_23
-	GOTO endif_8792981815556
+	GOTO endif_8781702323490
 	
-	else_8792981815556:
+	else_8781702323490:
 	internal_24 = ALLOCINT 3
 	
 	ARG x
@@ -824,21 +962,21 @@ function function_method7_at_D{
 	ARG internal_25
 	internal_26 = VCALL D function_method7_at_D
 	internal_19 = internal_26
-	GOTO endif_8792981815556
+	GOTO endif_8781702323490
 	
-	endif_8792981815556:
+	endif_8781702323490:
 	internal_14 = internal_19
-	GOTO endif_8792981815290
+	GOTO endif_8781702323484
 	
-	endif_8792981815290:
+	endif_8781702323484:
 	internal_9 = internal_14
-	GOTO endif_8792981815559
+	GOTO endif_8781702323481
 	
-	endif_8792981815559:
+	endif_8781702323481:
 	internal_1 = internal_9
-	GOTO endif_8792981815568
+	GOTO endif_8781702323502
 	
-	endif_8792981815568:
+	endif_8781702323502:
 	
 	RETURN internal_1
 }
@@ -848,6 +986,7 @@ function function___init___at_E{
 	LOCAL internal_0 # Integer 0
 
 	internal_0 = ALLOCINT 0
+	
 	SETATTR self var internal_0
 	
 	RETURN self
@@ -862,13 +1001,17 @@ function function_method6_at_E{
 	LOCAL internal_3 # Store an instance of the class A
 	LOCAL internal_4
 
-	x = 0
+	# Let x: Int
+	x = ALLOCINT 0
 	internal_1 = ALLOCINT 8
 	
 	ARG num
 	ARG internal_1
 	internal_2 = CALL function_div
-	x = internal_2
+	
+	ARG x
+	ARG internal_2
+	x = CALL function_assign
 	internal_3 = ALLOCATE A # Allocate the object A
 	ARG internal_3 # Pass the instance to the constructor
 	internal_3 = VCALL A function___init___at_A # Call the constructor
@@ -948,15 +1091,15 @@ function function_c2i_at_A2I{
 	ARG internal_2
 	internal_3 = CALL function_equal
 	internal_1 = internal_3
-	IF internal_1 GOTO then_8792981816474
-	GOTO else_8792981816474
+	IF internal_1 GOTO then_8781702324152
+	GOTO else_8781702324152
 	
-	then_8792981816474:
+	then_8781702324152:
 	internal_4 = ALLOCINT 0
 	internal_0 = internal_4
-	GOTO endif_8792981816474
+	GOTO endif_8781702324152
 	
-	else_8792981816474:
+	else_8781702324152:
 	# Conditional
 	internal_6 = ALLOCBOOL 0
 	internal_7 = ALLOCSTR "1"
@@ -965,15 +1108,15 @@ function function_c2i_at_A2I{
 	ARG internal_7
 	internal_8 = CALL function_equal
 	internal_6 = internal_8
-	IF internal_6 GOTO then_8792981816468
-	GOTO else_8792981816468
+	IF internal_6 GOTO then_8781702324146
+	GOTO else_8781702324146
 	
-	then_8792981816468:
+	then_8781702324146:
 	internal_9 = ALLOCINT 1
 	internal_5 = internal_9
-	GOTO endif_8792981816468
+	GOTO endif_8781702324146
 	
-	else_8792981816468:
+	else_8781702324146:
 	# Conditional
 	internal_11 = ALLOCBOOL 0
 	internal_12 = ALLOCSTR "2"
@@ -982,15 +1125,15 @@ function function_c2i_at_A2I{
 	ARG internal_12
 	internal_13 = CALL function_equal
 	internal_11 = internal_13
-	IF internal_11 GOTO then_8792981816462
-	GOTO else_8792981816462
+	IF internal_11 GOTO then_8781702324140
+	GOTO else_8781702324140
 	
-	then_8792981816462:
+	then_8781702324140:
 	internal_14 = ALLOCINT 2
 	internal_10 = internal_14
-	GOTO endif_8792981816462
+	GOTO endif_8781702324140
 	
-	else_8792981816462:
+	else_8781702324140:
 	# Conditional
 	internal_16 = ALLOCBOOL 0
 	internal_17 = ALLOCSTR "3"
@@ -999,15 +1142,15 @@ function function_c2i_at_A2I{
 	ARG internal_17
 	internal_18 = CALL function_equal
 	internal_16 = internal_18
-	IF internal_16 GOTO then_8792981816456
-	GOTO else_8792981816456
+	IF internal_16 GOTO then_8781702324134
+	GOTO else_8781702324134
 	
-	then_8792981816456:
+	then_8781702324134:
 	internal_19 = ALLOCINT 3
 	internal_15 = internal_19
-	GOTO endif_8792981816456
+	GOTO endif_8781702324134
 	
-	else_8792981816456:
+	else_8781702324134:
 	# Conditional
 	internal_21 = ALLOCBOOL 0
 	internal_22 = ALLOCSTR "4"
@@ -1016,15 +1159,15 @@ function function_c2i_at_A2I{
 	ARG internal_22
 	internal_23 = CALL function_equal
 	internal_21 = internal_23
-	IF internal_21 GOTO then_8792981816450
-	GOTO else_8792981816450
+	IF internal_21 GOTO then_8781702324128
+	GOTO else_8781702324128
 	
-	then_8792981816450:
+	then_8781702324128:
 	internal_24 = ALLOCINT 4
 	internal_20 = internal_24
-	GOTO endif_8792981816450
+	GOTO endif_8781702324128
 	
-	else_8792981816450:
+	else_8781702324128:
 	# Conditional
 	internal_26 = ALLOCBOOL 0
 	internal_27 = ALLOCSTR "5"
@@ -1033,15 +1176,15 @@ function function_c2i_at_A2I{
 	ARG internal_27
 	internal_28 = CALL function_equal
 	internal_26 = internal_28
-	IF internal_26 GOTO then_8792981816444
-	GOTO else_8792981816444
+	IF internal_26 GOTO then_8781702324122
+	GOTO else_8781702324122
 	
-	then_8792981816444:
+	then_8781702324122:
 	internal_29 = ALLOCINT 5
 	internal_25 = internal_29
-	GOTO endif_8792981816444
+	GOTO endif_8781702324122
 	
-	else_8792981816444:
+	else_8781702324122:
 	# Conditional
 	internal_31 = ALLOCBOOL 0
 	internal_32 = ALLOCSTR "6"
@@ -1050,15 +1193,15 @@ function function_c2i_at_A2I{
 	ARG internal_32
 	internal_33 = CALL function_equal
 	internal_31 = internal_33
-	IF internal_31 GOTO then_8792981816438
-	GOTO else_8792981816438
+	IF internal_31 GOTO then_8781702324116
+	GOTO else_8781702324116
 	
-	then_8792981816438:
+	then_8781702324116:
 	internal_34 = ALLOCINT 6
 	internal_30 = internal_34
-	GOTO endif_8792981816438
+	GOTO endif_8781702324116
 	
-	else_8792981816438:
+	else_8781702324116:
 	# Conditional
 	internal_36 = ALLOCBOOL 0
 	internal_37 = ALLOCSTR "7"
@@ -1067,15 +1210,15 @@ function function_c2i_at_A2I{
 	ARG internal_37
 	internal_38 = CALL function_equal
 	internal_36 = internal_38
-	IF internal_36 GOTO then_8792981816432
-	GOTO else_8792981816432
+	IF internal_36 GOTO then_8781702324110
+	GOTO else_8781702324110
 	
-	then_8792981816432:
+	then_8781702324110:
 	internal_39 = ALLOCINT 7
 	internal_35 = internal_39
-	GOTO endif_8792981816432
+	GOTO endif_8781702324110
 	
-	else_8792981816432:
+	else_8781702324110:
 	# Conditional
 	internal_41 = ALLOCBOOL 0
 	internal_42 = ALLOCSTR "8"
@@ -1084,15 +1227,15 @@ function function_c2i_at_A2I{
 	ARG internal_42
 	internal_43 = CALL function_equal
 	internal_41 = internal_43
-	IF internal_41 GOTO then_8792981816426
-	GOTO else_8792981816426
+	IF internal_41 GOTO then_8781702324104
+	GOTO else_8781702324104
 	
-	then_8792981816426:
+	then_8781702324104:
 	internal_44 = ALLOCINT 8
 	internal_40 = internal_44
-	GOTO endif_8792981816426
+	GOTO endif_8781702324104
 	
-	else_8792981816426:
+	else_8781702324104:
 	# Conditional
 	internal_46 = ALLOCBOOL 0
 	internal_47 = ALLOCSTR "9"
@@ -1101,58 +1244,58 @@ function function_c2i_at_A2I{
 	ARG internal_47
 	internal_48 = CALL function_equal
 	internal_46 = internal_48
-	IF internal_46 GOTO then_8792981816405
-	GOTO else_8792981816405
+	IF internal_46 GOTO then_8781702324083
+	GOTO else_8781702324083
 	
-	then_8792981816405:
+	then_8781702324083:
 	internal_49 = ALLOCINT 9
 	internal_45 = internal_49
-	GOTO endif_8792981816405
+	GOTO endif_8781702324083
 	
-	else_8792981816405:
+	else_8781702324083:
 	ARG self
 	internal_50 = VCALL A2I function_abort_at_Object
 	internal_51 = ALLOCINT 0
 	internal_45 = internal_51
-	GOTO endif_8792981816405
+	GOTO endif_8781702324083
 	
-	endif_8792981816405:
+	endif_8781702324083:
 	internal_40 = internal_45
-	GOTO endif_8792981816426
+	GOTO endif_8781702324104
 	
-	endif_8792981816426:
+	endif_8781702324104:
 	internal_35 = internal_40
-	GOTO endif_8792981816432
+	GOTO endif_8781702324110
 	
-	endif_8792981816432:
+	endif_8781702324110:
 	internal_30 = internal_35
-	GOTO endif_8792981816438
+	GOTO endif_8781702324116
 	
-	endif_8792981816438:
+	endif_8781702324116:
 	internal_25 = internal_30
-	GOTO endif_8792981816444
+	GOTO endif_8781702324122
 	
-	endif_8792981816444:
+	endif_8781702324122:
 	internal_20 = internal_25
-	GOTO endif_8792981816450
+	GOTO endif_8781702324128
 	
-	endif_8792981816450:
+	endif_8781702324128:
 	internal_15 = internal_20
-	GOTO endif_8792981816456
+	GOTO endif_8781702324134
 	
-	endif_8792981816456:
+	endif_8781702324134:
 	internal_10 = internal_15
-	GOTO endif_8792981816462
+	GOTO endif_8781702324140
 	
-	endif_8792981816462:
+	endif_8781702324140:
 	internal_5 = internal_10
-	GOTO endif_8792981816468
+	GOTO endif_8781702324146
 	
-	endif_8792981816468:
+	endif_8781702324146:
 	internal_0 = internal_5
-	GOTO endif_8792981816474
+	GOTO endif_8781702324152
 	
-	endif_8792981816474:
+	endif_8781702324152:
 	
 	RETURN internal_0
 }
@@ -1221,15 +1364,15 @@ function function_i2c_at_A2I{
 	ARG internal_2
 	internal_3 = CALL function_equal
 	internal_1 = internal_3
-	IF internal_1 GOTO then_8792981817308
-	GOTO else_8792981817308
+	IF internal_1 GOTO then_8781702324730
+	GOTO else_8781702324730
 	
-	then_8792981817308:
+	then_8781702324730:
 	internal_4 = ALLOCSTR "0"
 	internal_0 = internal_4
-	GOTO endif_8792981817308
+	GOTO endif_8781702324730
 	
-	else_8792981817308:
+	else_8781702324730:
 	# Conditional
 	internal_6 = ALLOCBOOL 0
 	internal_7 = ALLOCINT 1
@@ -1238,15 +1381,15 @@ function function_i2c_at_A2I{
 	ARG internal_7
 	internal_8 = CALL function_equal
 	internal_6 = internal_8
-	IF internal_6 GOTO then_8792981817302
-	GOTO else_8792981817302
+	IF internal_6 GOTO then_8781702324724
+	GOTO else_8781702324724
 	
-	then_8792981817302:
+	then_8781702324724:
 	internal_9 = ALLOCSTR "1"
 	internal_5 = internal_9
-	GOTO endif_8792981817302
+	GOTO endif_8781702324724
 	
-	else_8792981817302:
+	else_8781702324724:
 	# Conditional
 	internal_11 = ALLOCBOOL 0
 	internal_12 = ALLOCINT 2
@@ -1255,15 +1398,15 @@ function function_i2c_at_A2I{
 	ARG internal_12
 	internal_13 = CALL function_equal
 	internal_11 = internal_13
-	IF internal_11 GOTO then_8792981817296
-	GOTO else_8792981817296
+	IF internal_11 GOTO then_8781702324718
+	GOTO else_8781702324718
 	
-	then_8792981817296:
+	then_8781702324718:
 	internal_14 = ALLOCSTR "2"
 	internal_10 = internal_14
-	GOTO endif_8792981817296
+	GOTO endif_8781702324718
 	
-	else_8792981817296:
+	else_8781702324718:
 	# Conditional
 	internal_16 = ALLOCBOOL 0
 	internal_17 = ALLOCINT 3
@@ -1272,15 +1415,15 @@ function function_i2c_at_A2I{
 	ARG internal_17
 	internal_18 = CALL function_equal
 	internal_16 = internal_18
-	IF internal_16 GOTO then_8792981817290
-	GOTO else_8792981817290
+	IF internal_16 GOTO then_8781702324712
+	GOTO else_8781702324712
 	
-	then_8792981817290:
+	then_8781702324712:
 	internal_19 = ALLOCSTR "3"
 	internal_15 = internal_19
-	GOTO endif_8792981817290
+	GOTO endif_8781702324712
 	
-	else_8792981817290:
+	else_8781702324712:
 	# Conditional
 	internal_21 = ALLOCBOOL 0
 	internal_22 = ALLOCINT 4
@@ -1289,15 +1432,15 @@ function function_i2c_at_A2I{
 	ARG internal_22
 	internal_23 = CALL function_equal
 	internal_21 = internal_23
-	IF internal_21 GOTO then_8792981817284
-	GOTO else_8792981817284
+	IF internal_21 GOTO then_8781702324706
+	GOTO else_8781702324706
 	
-	then_8792981817284:
+	then_8781702324706:
 	internal_24 = ALLOCSTR "4"
 	internal_20 = internal_24
-	GOTO endif_8792981817284
+	GOTO endif_8781702324706
 	
-	else_8792981817284:
+	else_8781702324706:
 	# Conditional
 	internal_26 = ALLOCBOOL 0
 	internal_27 = ALLOCINT 5
@@ -1306,15 +1449,15 @@ function function_i2c_at_A2I{
 	ARG internal_27
 	internal_28 = CALL function_equal
 	internal_26 = internal_28
-	IF internal_26 GOTO then_8792981817278
-	GOTO else_8792981817278
+	IF internal_26 GOTO then_8781702324700
+	GOTO else_8781702324700
 	
-	then_8792981817278:
+	then_8781702324700:
 	internal_29 = ALLOCSTR "5"
 	internal_25 = internal_29
-	GOTO endif_8792981817278
+	GOTO endif_8781702324700
 	
-	else_8792981817278:
+	else_8781702324700:
 	# Conditional
 	internal_31 = ALLOCBOOL 0
 	internal_32 = ALLOCINT 6
@@ -1323,15 +1466,15 @@ function function_i2c_at_A2I{
 	ARG internal_32
 	internal_33 = CALL function_equal
 	internal_31 = internal_33
-	IF internal_31 GOTO then_8792981817272
-	GOTO else_8792981817272
+	IF internal_31 GOTO then_8781702324694
+	GOTO else_8781702324694
 	
-	then_8792981817272:
+	then_8781702324694:
 	internal_34 = ALLOCSTR "6"
 	internal_30 = internal_34
-	GOTO endif_8792981817272
+	GOTO endif_8781702324694
 	
-	else_8792981817272:
+	else_8781702324694:
 	# Conditional
 	internal_36 = ALLOCBOOL 0
 	internal_37 = ALLOCINT 7
@@ -1340,15 +1483,15 @@ function function_i2c_at_A2I{
 	ARG internal_37
 	internal_38 = CALL function_equal
 	internal_36 = internal_38
-	IF internal_36 GOTO then_8792981817266
-	GOTO else_8792981817266
+	IF internal_36 GOTO then_8781702324688
+	GOTO else_8781702324688
 	
-	then_8792981817266:
+	then_8781702324688:
 	internal_39 = ALLOCSTR "7"
 	internal_35 = internal_39
-	GOTO endif_8792981817266
+	GOTO endif_8781702324688
 	
-	else_8792981817266:
+	else_8781702324688:
 	# Conditional
 	internal_41 = ALLOCBOOL 0
 	internal_42 = ALLOCINT 8
@@ -1357,15 +1500,15 @@ function function_i2c_at_A2I{
 	ARG internal_42
 	internal_43 = CALL function_equal
 	internal_41 = internal_43
-	IF internal_41 GOTO then_8792981817260
-	GOTO else_8792981817260
+	IF internal_41 GOTO then_8781702324682
+	GOTO else_8781702324682
 	
-	then_8792981817260:
+	then_8781702324682:
 	internal_44 = ALLOCSTR "8"
 	internal_40 = internal_44
-	GOTO endif_8792981817260
+	GOTO endif_8781702324682
 	
-	else_8792981817260:
+	else_8781702324682:
 	# Conditional
 	internal_46 = ALLOCBOOL 0
 	internal_47 = ALLOCINT 9
@@ -1374,58 +1517,58 @@ function function_i2c_at_A2I{
 	ARG internal_47
 	internal_48 = CALL function_equal
 	internal_46 = internal_48
-	IF internal_46 GOTO then_8792981817239
-	GOTO else_8792981817239
+	IF internal_46 GOTO then_8781702324661
+	GOTO else_8781702324661
 	
-	then_8792981817239:
+	then_8781702324661:
 	internal_49 = ALLOCSTR "9"
 	internal_45 = internal_49
-	GOTO endif_8792981817239
+	GOTO endif_8781702324661
 	
-	else_8792981817239:
+	else_8781702324661:
 	ARG self
 	internal_50 = VCALL A2I function_abort_at_Object
 	internal_51 = ALLOCSTR ""
 	internal_45 = internal_51
-	GOTO endif_8792981817239
+	GOTO endif_8781702324661
 	
-	endif_8792981817239:
+	endif_8781702324661:
 	internal_40 = internal_45
-	GOTO endif_8792981817260
+	GOTO endif_8781702324682
 	
-	endif_8792981817260:
+	endif_8781702324682:
 	internal_35 = internal_40
-	GOTO endif_8792981817266
+	GOTO endif_8781702324688
 	
-	endif_8792981817266:
+	endif_8781702324688:
 	internal_30 = internal_35
-	GOTO endif_8792981817272
+	GOTO endif_8781702324694
 	
-	endif_8792981817272:
+	endif_8781702324694:
 	internal_25 = internal_30
-	GOTO endif_8792981817278
+	GOTO endif_8781702324700
 	
-	endif_8792981817278:
+	endif_8781702324700:
 	internal_20 = internal_25
-	GOTO endif_8792981817284
+	GOTO endif_8781702324706
 	
-	endif_8792981817284:
+	endif_8781702324706:
 	internal_15 = internal_20
-	GOTO endif_8792981817290
+	GOTO endif_8781702324712
 	
-	endif_8792981817290:
+	endif_8781702324712:
 	internal_10 = internal_15
-	GOTO endif_8792981817296
+	GOTO endif_8781702324718
 	
-	endif_8792981817296:
+	endif_8781702324718:
 	internal_5 = internal_10
-	GOTO endif_8792981817302
+	GOTO endif_8781702324724
 	
-	endif_8792981817302:
+	endif_8781702324724:
 	internal_0 = internal_5
-	GOTO endif_8792981817308
+	GOTO endif_8781702324730
 	
-	endif_8792981817308:
+	endif_8781702324730:
 	
 	RETURN internal_0
 }
@@ -1480,15 +1623,15 @@ function function_a2i_at_A2I{
 	ARG internal_3
 	internal_4 = CALL function_equal
 	internal_1 = internal_4
-	IF internal_1 GOTO then_8792981817498
-	GOTO else_8792981817498
+	IF internal_1 GOTO then_8781702325176
+	GOTO else_8781702325176
 	
-	then_8792981817498:
+	then_8781702325176:
 	internal_5 = ALLOCINT 0
 	internal_0 = internal_5
-	GOTO endif_8792981817498
+	GOTO endif_8781702325176
 	
-	else_8792981817498:
+	else_8781702325176:
 	# Conditional
 	internal_7 = ALLOCBOOL 0
 	internal_8 = ALLOCINT 0
@@ -1503,10 +1646,10 @@ function function_a2i_at_A2I{
 	ARG internal_11
 	internal_12 = CALL function_equal
 	internal_7 = internal_12
-	IF internal_7 GOTO then_8792981817513
-	GOTO else_8792981817513
+	IF internal_7 GOTO then_8781702325191
+	GOTO else_8781702325191
 	
-	then_8792981817513:
+	then_8781702325191:
 	internal_13 = ALLOCINT 1
 	ARG s
 	internal_14 = VCALL String function_length_at_String
@@ -1522,12 +1665,19 @@ function function_a2i_at_A2I{
 	ARG self
 	ARG internal_17
 	internal_18 = VCALL A2I function_a2i_aux_at_A2I
-	internal_21 = XOR internal_18 internal_20 # Getting the complement a1 of internal_18
-	internal_21 = internal_21 + internal_19 # Adding 1 to the complement a1 we get the complement a2 of internal_18
+	internal_19 = ALLOCINT 1
+	internal_20 = ALLOCINT 4294967295
+	internal_21 = ALLOCINT 0
+	ARG internal_18
+	ARG internal_20
+	internal_21 = CALL function_xor
+	ARG internal_21
+	ARG internal_19
+	internal_21 = CALL function_add
 	internal_6 = internal_21
-	GOTO endif_8792981817513
+	GOTO endif_8781702325191
 	
-	else_8792981817513:
+	else_8781702325191:
 	# Conditional
 	internal_23 = ALLOCBOOL 0
 	internal_24 = ALLOCINT 0
@@ -1542,10 +1692,10 @@ function function_a2i_at_A2I{
 	ARG internal_27
 	internal_28 = CALL function_equal
 	internal_23 = internal_28
-	IF internal_23 GOTO then_8792981817507
-	GOTO else_8792981817507
+	IF internal_23 GOTO then_8781702325185
+	GOTO else_8781702325185
 	
-	then_8792981817507:
+	then_8781702325185:
 	internal_29 = ALLOCINT 1
 	ARG s
 	internal_30 = VCALL String function_length_at_String
@@ -1562,24 +1712,24 @@ function function_a2i_at_A2I{
 	ARG internal_33
 	internal_34 = VCALL A2I function_a2i_aux_at_A2I
 	internal_22 = internal_34
-	GOTO endif_8792981817507
+	GOTO endif_8781702325185
 	
-	else_8792981817507:
+	else_8781702325185:
 	ARG self
 	ARG s
 	internal_35 = VCALL A2I function_a2i_aux_at_A2I
 	internal_22 = internal_35
-	GOTO endif_8792981817507
+	GOTO endif_8781702325185
 	
-	endif_8792981817507:
+	endif_8781702325185:
 	internal_6 = internal_22
-	GOTO endif_8792981817513
+	GOTO endif_8781702325191
 	
-	endif_8792981817513:
+	endif_8781702325191:
 	internal_0 = internal_6
-	GOTO endif_8792981817498
+	GOTO endif_8781702325176
 	
-	endif_8792981817498:
+	endif_8781702325176:
 	
 	RETURN internal_0
 }
@@ -1593,61 +1743,79 @@ function function_a2i_aux_at_A2I{
 	LOCAL internal_3
 	LOCAL i
 	LOCAL internal_5 # Integer 0
-	LOCAL internal_6
-	LOCAL internal_7 # Store the result of the operation function_less_than
-	LOCAL internal_8 # Integer 10
-	LOCAL internal_9 # Store the result of the operation function_mult
-	LOCAL internal_10 # Integer 1
+	LOCAL internal_6 # Store the result of the operation function_less_than
+	LOCAL internal_7 # Integer 10
+	LOCAL internal_8 # Store the result of the operation function_mult
+	LOCAL internal_9 # Integer 1
+	LOCAL internal_10
 	LOCAL internal_11
-	LOCAL internal_12
-	LOCAL internal_13 # Store the result of the operation function_add
-	LOCAL internal_14 # Integer 1
-	LOCAL internal_15 # Store the result of the operation function_add
+	LOCAL internal_12 # Store the result of the operation function_add
+	LOCAL internal_13 # Integer 1
+	LOCAL internal_14 # Store the result of the operation function_add
 
+	# Let int: Int
+	
 	internal_1 = ALLOCINT 0
-	int = internal_1
+	ARG int
+	ARG internal_1
+	int = CALL function_assign
+	# Let j: Int
+	
 	ARG s
 	internal_3 = VCALL String function_length_at_String
-	j = internal_3
+	ARG j
+	ARG internal_3
+	j = CALL function_assign
+	# Let i: Int
+	
 	internal_5 = ALLOCINT 0
-	i = internal_5
-	while_start_8792981818167:
+	ARG i
+	ARG internal_5
+	i = CALL function_assign
+	
+	# While loop
+	while_start_8781702325589:
 	
 	ARG i
 	ARG j
-	internal_7 = CALL function_less_than
-	internal_6 = internal_7
-	IF internal_6 GOTO while_body_8792981818167
-	GOTO while_end_8792981818167
+	internal_6 = CALL function_less_than
+	IF internal_6 GOTO while_body_8781702325589
+	GOTO while_end_8781702325589
 	
-	while_body_8792981818167:
-	internal_8 = ALLOCINT 10
+	while_body_8781702325589:
+	internal_7 = ALLOCINT 10
 	
 	ARG int
-	ARG internal_8
-	internal_9 = CALL function_mult
-	internal_10 = ALLOCINT 1
+	ARG internal_7
+	internal_8 = CALL function_mult
+	internal_9 = ALLOCINT 1
 	ARG s
 	ARG i
-	ARG internal_10
-	internal_11 = VCALL String function_substr_at_String
-	ARG self
-	ARG internal_11
-	internal_12 = VCALL A2I function_c2i_at_A2I
-	
 	ARG internal_9
+	internal_10 = VCALL String function_substr_at_String
+	ARG self
+	ARG internal_10
+	internal_11 = VCALL A2I function_c2i_at_A2I
+	
+	ARG internal_8
+	ARG internal_11
+	internal_12 = CALL function_add
+	
+	ARG int
 	ARG internal_12
-	internal_13 = CALL function_add
-	int = internal_13
-	internal_14 = ALLOCINT 1
+	int = CALL function_assign
+	internal_13 = ALLOCINT 1
+	
+	ARG i
+	ARG internal_13
+	internal_14 = CALL function_add
 	
 	ARG i
 	ARG internal_14
-	internal_15 = CALL function_add
-	i = internal_15
-	GOTO while_start_8792981818167
+	i = CALL function_assign
+	GOTO while_start_8781702325589
 	
-	while_end_8792981818167:
+	while_end_8781702325589:
 	
 	RETURN int
 }
@@ -1682,15 +1850,15 @@ function function_i2a_at_A2I{
 	ARG internal_2
 	internal_3 = CALL function_equal
 	internal_1 = internal_3
-	IF internal_1 GOTO then_8792981818296
-	GOTO else_8792981818296
+	IF internal_1 GOTO then_8781702325718
+	GOTO else_8781702325718
 	
-	then_8792981818296:
+	then_8781702325718:
 	internal_4 = ALLOCSTR "0"
 	internal_0 = internal_4
-	GOTO endif_8792981818296
+	GOTO endif_8781702325718
 	
-	else_8792981818296:
+	else_8781702325718:
 	# Conditional
 	internal_6 = ALLOCBOOL 0
 	internal_7 = ALLOCINT 0
@@ -1699,21 +1867,28 @@ function function_i2a_at_A2I{
 	ARG i
 	internal_8 = CALL function_less_than
 	internal_6 = internal_8
-	IF internal_6 GOTO then_8792981818302
-	GOTO else_8792981818302
+	IF internal_6 GOTO then_8781702325724
+	GOTO else_8781702325724
 	
-	then_8792981818302:
+	then_8781702325724:
 	ARG self
 	ARG i
 	internal_9 = VCALL A2I function_i2a_aux_at_A2I
 	internal_5 = internal_9
-	GOTO endif_8792981818302
+	GOTO endif_8781702325724
 	
-	else_8792981818302:
+	else_8781702325724:
 	internal_10 = ALLOCSTR "-"
 	internal_11 = ALLOCINT 1
-	internal_14 = XOR internal_11 internal_13 # Getting the complement a1 of internal_11
-	internal_14 = internal_14 + internal_12 # Adding 1 to the complement a1 we get the complement a2 of internal_11
+	internal_12 = ALLOCINT 1
+	internal_13 = ALLOCINT 4294967295
+	internal_14 = ALLOCINT 0
+	ARG internal_11
+	ARG internal_13
+	internal_14 = CALL function_xor
+	ARG internal_14
+	ARG internal_12
+	internal_14 = CALL function_add
 	
 	ARG i
 	ARG internal_14
@@ -1725,13 +1900,13 @@ function function_i2a_at_A2I{
 	ARG internal_16
 	internal_17 = VCALL String function_concat_at_String
 	internal_5 = internal_17
-	GOTO endif_8792981818302
+	GOTO endif_8781702325724
 	
-	endif_8792981818302:
+	endif_8781702325724:
 	internal_0 = internal_5
-	GOTO endif_8792981818296
+	GOTO endif_8781702325718
 	
-	endif_8792981818296:
+	endif_8781702325718:
 	
 	RETURN internal_0
 }
@@ -1762,21 +1937,25 @@ function function_i2a_aux_at_A2I{
 	ARG internal_2
 	internal_3 = CALL function_equal
 	internal_1 = internal_3
-	IF internal_1 GOTO then_8792981818670
-	GOTO else_8792981818670
+	IF internal_1 GOTO then_8781702326348
+	GOTO else_8781702326348
 	
-	then_8792981818670:
+	then_8781702326348:
 	internal_4 = ALLOCSTR ""
 	internal_0 = internal_4
-	GOTO endif_8792981818670
+	GOTO endif_8781702326348
 	
-	else_8792981818670:
+	else_8781702326348:
+	# Let next: Int
+	
 	internal_6 = ALLOCINT 10
 	
 	ARG i
 	ARG internal_6
 	internal_7 = CALL function_div
-	next = internal_7
+	ARG next
+	ARG internal_7
+	next = CALL function_assign
 	ARG self
 	ARG next
 	internal_8 = VCALL A2I function_i2a_aux_at_A2I
@@ -1796,9 +1975,9 @@ function function_i2a_aux_at_A2I{
 	ARG internal_12
 	internal_13 = VCALL String function_concat_at_String
 	internal_0 = internal_13
-	GOTO endif_8792981818670
+	GOTO endif_8781702326348
 	
-	endif_8792981818670:
+	endif_8781702326348:
 	
 	RETURN internal_0
 }
@@ -1806,14 +1985,22 @@ function function___init___at_Main{
 	PARAM self
 
 	LOCAL internal_0 # String ""
-	LOCAL internal_1 # Boolean true
+	LOCAL internal_1 # Null
+	LOCAL internal_2 # Null
+	LOCAL internal_3 # Boolean true
 
 	internal_0 = ALLOCSTR ""
+	
 	SETATTR self char internal_0
-	SETATTR self avar NULL
-	SETATTR self a_var NULL
-	internal_1 = ALLOCBOOL 1
-	SETATTR self flag internal_1
+	internal_1 = ALLOCNULL
+	
+	SETATTR self avar internal_1
+	internal_2 = ALLOCNULL
+	
+	SETATTR self a_var internal_2
+	internal_3 = ALLOCBOOL 1
+	
+	SETATTR self flag internal_3
 	
 	RETURN self
 }
@@ -2014,13 +2201,21 @@ function function_get_int_at_Main{
 	LOCAL internal_3
 	LOCAL internal_4
 
+	# Let z: A2I
+	
 	internal_1 = ALLOCATE A2I # Allocate the object A2I
 	ARG internal_1 # Pass the instance to the constructor
 	internal_1 = VCALL A2I function___init___at_A2I # Call the constructor
-	z = internal_1
+	ARG z
+	ARG internal_1
+	z = CALL function_assign
+	# Let s: String
+	
 	ARG self
 	internal_3 = VCALL Main function_prompt_at_Main
-	s = internal_3
+	ARG s
+	ARG internal_3
+	s = CALL function_assign
 	ARG z
 	ARG s
 	internal_4 = VCALL A2I function_a2i_at_A2I
@@ -2054,7 +2249,11 @@ function function_is_even_at_Main{
 	LOCAL internal_20 # Store the result of the operation function_sub
 	LOCAL internal_21
 
-	x = num
+	# Let x: Int
+	
+	ARG x
+	ARG num
+	x = CALL function_assign
 	# Conditional
 	internal_2 = ALLOCBOOL 0
 	internal_3 = ALLOCINT 0
@@ -2063,19 +2262,26 @@ function function_is_even_at_Main{
 	ARG internal_3
 	internal_4 = CALL function_less_than
 	internal_2 = internal_4
-	IF internal_2 GOTO then_8792981820167
-	GOTO else_8792981820167
+	IF internal_2 GOTO then_8781702295071
+	GOTO else_8781702295071
 	
-	then_8792981820167:
-	internal_7 = XOR x internal_6 # Getting the complement a1 of x
-	internal_7 = internal_7 + internal_5 # Adding 1 to the complement a1 we get the complement a2 of x
+	then_8781702295071:
+	internal_5 = ALLOCINT 1
+	internal_6 = ALLOCINT 4294967295
+	internal_7 = ALLOCINT 0
+	ARG x
+	ARG internal_6
+	internal_7 = CALL function_xor
+	ARG internal_7
+	ARG internal_5
+	internal_7 = CALL function_add
 	ARG self
 	ARG internal_7
 	internal_8 = VCALL Main function_is_even_at_Main
 	internal_1 = internal_8
-	GOTO endif_8792981820167
+	GOTO endif_8781702295071
 	
-	else_8792981820167:
+	else_8781702295071:
 	# Conditional
 	internal_10 = ALLOCBOOL 0
 	internal_11 = ALLOCINT 0
@@ -2084,15 +2290,15 @@ function function_is_even_at_Main{
 	ARG x
 	internal_12 = CALL function_equal
 	internal_10 = internal_12
-	IF internal_10 GOTO then_8792981820170
-	GOTO else_8792981820170
+	IF internal_10 GOTO then_8781702295074
+	GOTO else_8781702295074
 	
-	then_8792981820170:
+	then_8781702295074:
 	internal_13 = ALLOCBOOL 1
 	internal_9 = internal_13
-	GOTO endif_8792981820170
+	GOTO endif_8781702295074
 	
-	else_8792981820170:
+	else_8781702295074:
 	# Conditional
 	internal_15 = ALLOCBOOL 0
 	internal_16 = ALLOCINT 1
@@ -2101,15 +2307,15 @@ function function_is_even_at_Main{
 	ARG x
 	internal_17 = CALL function_equal
 	internal_15 = internal_17
-	IF internal_15 GOTO then_8792981820176
-	GOTO else_8792981820176
+	IF internal_15 GOTO then_8781702295080
+	GOTO else_8781702295080
 	
-	then_8792981820176:
+	then_8781702295080:
 	internal_18 = ALLOCBOOL 0
 	internal_14 = internal_18
-	GOTO endif_8792981820176
+	GOTO endif_8781702295080
 	
-	else_8792981820176:
+	else_8781702295080:
 	internal_19 = ALLOCINT 2
 	
 	ARG x
@@ -2119,17 +2325,17 @@ function function_is_even_at_Main{
 	ARG internal_20
 	internal_21 = VCALL Main function_is_even_at_Main
 	internal_14 = internal_21
-	GOTO endif_8792981820176
+	GOTO endif_8781702295080
 	
-	endif_8792981820176:
+	endif_8781702295080:
 	internal_9 = internal_14
-	GOTO endif_8792981820170
+	GOTO endif_8781702295074
 	
-	endif_8792981820170:
+	endif_8781702295074:
 	internal_1 = internal_9
-	GOTO endif_8792981820167
+	GOTO endif_8781702295071
 	
-	endif_8792981820167:
+	endif_8781702295071:
 	
 	RETURN internal_1
 }
@@ -2137,156 +2343,200 @@ function function_class_type_at_Main{
 	PARAM self
 	PARAM var
 
-	LOCAL internal_0 # Count of ancestors of the switch expression
-	LOCAL internal_1 # Switch expression type
-	LOCAL internal_2 # Ancestor type
-	LOCAL internal_3 # Step 1 comparison result
-	LOCAL internal_4 # Step 1 Array of ancestors
-	LOCAL internal_5 # Integer 0 
-	LOCAL internal_6 # Null pointer
-	LOCAL internal_7 # Step 2 iteration index
-	LOCAL internal_8 # Step 2 comparison result
-	LOCAL internal_9 # Array to store the branch types
-	LOCAL internal_10 # Array to store the nearest ancestor index of the expression type of the i-th branch type 
-	LOCAL internal_11 # Address of the type A
-	LOCAL internal_12 # Address of the type B
-	LOCAL internal_13 # Address of the type C
-	LOCAL internal_14 # Address of the type D
-	LOCAL internal_15 # Address of the type E
-	LOCAL internal_16 # Address of the type Object
-	LOCAL internal_17 # Step 3 - Iteration index of the branch types array
-	LOCAL internal_18 # Step 3 - Comparison for the index of the branch types array
-	LOCAL internal_19 # Step 3 - Type of the i-th branch
-	LOCAL internal_20 # Step 3 - Index of the ancestor
-	LOCAL internal_21 # Step 3 - Comparison for the index of the ancestor
-	LOCAL internal_22 # Step 3 - Type of the j-th ancestor
-	LOCAL internal_23 # Step 3 - Comparison for the branch type nad the ancestor type
-	LOCAL internal_24 # Step 4 - Iteration index
-	LOCAL internal_25 # Step 4 - Index of the minimum counter in the counter array
-	LOCAL internal_26 # Step 4 - Temporary variable
-	LOCAL internal_27 # Step 4 - Current minimum of the counter array
-	LOCAL internal_28 # Step 4 - Comparison for the minimum of the counter array
-	LOCAL internal_29 # Step 5 - Bool array
-	LOCAL internal_30 # Step 5 - Exists an error
-	LOCAL internal_31 # Step 5 - Comparison for the correct branch result
-	LOCAL internal_32 # Result of the switch expression address
+	LOCAL internal_0 # Constant Integer 0 
+	LOCAL internal_1 # Constant Integer 1
+	LOCAL internal_2 # Constant Integer 6
+	LOCAL internal_3 # Null pointer
+	LOCAL internal_4 # Count of ancestors of the switch expression
+	LOCAL internal_5 # Switch expression type
+	LOCAL internal_6 # Ancestor type
+	LOCAL internal_7 # Step 1 comparison result
+	LOCAL internal_8 # Step 1 Array of ancestors
+	LOCAL internal_9 # Step 2 iteration index
+	LOCAL internal_10 # Step 2 comparison result
+	LOCAL internal_11 # Array to store the branch types
+	LOCAL internal_12 # Array to store the nearest ancestor index of the expression type of the i-th branch type 
+	LOCAL internal_13 # Address of the type A
+	LOCAL internal_14 # Index of the type A
+	LOCAL internal_15 # Address of the type B
+	LOCAL internal_16 # Index of the type B
+	LOCAL internal_17 # Address of the type C
+	LOCAL internal_18 # Index of the type C
+	LOCAL internal_19 # Address of the type D
+	LOCAL internal_20 # Index of the type D
+	LOCAL internal_21 # Address of the type E
+	LOCAL internal_22 # Index of the type E
+	LOCAL internal_23 # Address of the type Object
+	LOCAL internal_24 # Index of the type Object
+	LOCAL internal_25 # Step 3 - Iteration index of the branch types array
+	LOCAL internal_26 # Step 3 - Comparison for the index of the branch types array
+	LOCAL internal_27 # Step 3 - Type of the i-th branch
+	LOCAL internal_28 # Step 3 - Index of the ancestor
+	LOCAL internal_29 # Step 3 - Comparison for the index of the ancestor
+	LOCAL internal_30 # Step 3 - Type of the j-th ancestor
+	LOCAL internal_31 # Step 3 - Comparison for the branch type nad the ancestor type
+	LOCAL internal_32 # Step 4 - Iteration index
+	LOCAL internal_33 # Step 4 - Index of the minimum counter in the counter array
+	LOCAL internal_34 # Step 4 - Temporary variable
+	LOCAL internal_35 # Step 4 - Current minimum of the counter array
+	LOCAL internal_36 # Step 4 - Comparison for the minimum of the counter array
+	LOCAL internal_37 # endl
+	LOCAL internal_38 # space
+	LOCAL internal_39 # Step 5 - Bool array
+	LOCAL internal_40 # Step 5 - Branch 0
+	LOCAL internal_41 # Step 5 - Branch 1
+	LOCAL internal_42 # Step 5 - Branch 2
+	LOCAL internal_43 # Step 5 - Branch 3
+	LOCAL internal_44 # Step 5 - Branch 4
+	LOCAL internal_45 # Step 5 - Branch 5
+	LOCAL internal_46 # Step 5 - Exists an error
+	LOCAL internal_47 # Step 5 - Comparison for the correct branch result
+	LOCAL internal_48 # Index 0
+	LOCAL internal_49 # Index 1
+	LOCAL internal_50 # Index 2
+	LOCAL internal_51 # Index 3
+	LOCAL internal_52 # Index 4
+	LOCAL internal_53 # Index 5
+	LOCAL internal_54 # Result of the switch expression address
 	LOCAL a # Specialiced variable for the branch A
-	LOCAL internal_34 # String "Class type is now A\n"
-	LOCAL internal_35
+	LOCAL internal_56 # String "Class type is now A\n"
+	LOCAL internal_57
 	LOCAL b # Specialiced variable for the branch B
-	LOCAL internal_37 # String "Class type is now B\n"
-	LOCAL internal_38
+	LOCAL internal_59 # String "Class type is now B\n"
+	LOCAL internal_60
 	LOCAL c # Specialiced variable for the branch C
-	LOCAL internal_40 # String "Class type is now C\n"
-	LOCAL internal_41
+	LOCAL internal_62 # String "Class type is now C\n"
+	LOCAL internal_63
 	LOCAL d # Specialiced variable for the branch D
-	LOCAL internal_43 # String "Class type is now D\n"
-	LOCAL internal_44
+	LOCAL internal_65 # String "Class type is now D\n"
+	LOCAL internal_66
 	LOCAL e # Specialiced variable for the branch E
-	LOCAL internal_46 # String "Class type is now E\n"
-	LOCAL internal_47
+	LOCAL internal_68 # String "Class type is now E\n"
+	LOCAL internal_69
 	LOCAL o # Specialiced variable for the branch Object
-	LOCAL internal_49 # String "Oooops\n"
-	LOCAL internal_50
+	LOCAL internal_71 # String "Oooops\n"
+	LOCAL internal_72
 
+	internal_0 = ALLOCINT 0
+	internal_1 = ALLOCINT 1
+	internal_2 = ALLOCINT 6
+	internal_3 = ALLOCNULL
+	internal_4 = ALLOCINT 0
+	internal_7 = ALLOCBOOL 0
+	
 	# Switch Case Algorithm Steps:
 	#  1 - Count how many ancestors has the dynamic type of the expression
 	#  2 - Create an array of the same size where to store the ancestors
 	#  3 - For each branch type, store the ancestor index that match with it, if no one match, store `count of ancestors`
 	#  4 - Find the minimum of the ancestors indexes
 	#  5 - With the minimum index, get the correct branch type
-	internal_5 = ALLOCINT 0
-	internal_3 = ALLOCBOOL 0 # Initialize the comparison result
 	
 	# ######################################################################## #
 	# Step 1 - Count how many ancestors has the dynamic type of the expression #
 	# ######################################################################## #
-	internal_1 = TYPEOF var # Get the switch expression type
-	internal_2 = internal_1 # The first ancestor will be the type itself
-	internal_0 = internal_5 # Initialize the counter
-	while_start_8792981820269:
-	internal_3 = internal_2 == 0
-	IF internal_3 GOTO while_end_8792981820269
-	internal_0 = internal_0 + 1 # Increment the counter
-	internal_2 = ANCESTOR internal_2
-	GOTO while_start_8792981820269
-	while_end_8792981820269:
+	internal_5 = TYPEOF var # Get the switch expression type
+	internal_6 = internal_5 # The first ancestor will be the type itself
+	while_start_8781702295173:
+	internal_7 = EQUALADDR internal_6 internal_3
+	IF internal_7 GOTO while_end_8781702295173
+	# Increment the count of ancestors
+	ARG internal_4
+	ARG internal_1
+	internal_4 = CALL function_add
+	internal_6 = ANCESTOR internal_6
+	GOTO while_start_8781702295173
+	while_end_8781702295173:
 	
 	# ###################################################################### #
 	# Step 2 - Create an array of the same size where to store the ancestors #
 	# ###################################################################### #
-	internal_2 = internal_1 # The first ancestor will be the type itself
-	internal_4 = ARRAY internal_0 # Create an array of ancestors
-	internal_7 = 0 # Initialize the index with the value 0
-	foreach_start_8792981820269:
-	internal_8 = internal_7 < internal_0 # Check if the index is less than the counter
-	IF internal_8 GOTO foreach_body_8792981820269
-	GOTO foreach_end_8792981820269
-	foreach_body_8792981820269:
-	SETINDEX internal_4 internal_7 internal_2 # Set the index of the array with the ancestor type
-	internal_2 = ANCESTOR internal_2 # Get the next ancestor
-	internal_7 = internal_7 + 1 # Increment index
-	GOTO foreach_start_8792981820269
-	foreach_end_8792981820269:
+	internal_6 = internal_5 # The first ancestor will be the type itself
+	internal_8 = ARRAY internal_4 # Create an array of ancestors
+	internal_9 = ALLOCINT 0
+	internal_10 = ALLOCBOOL 0
+	foreach_start_8781702295173:
+	ARG internal_9
+	ARG internal_4
+	internal_10 = CALL function_less_than
+	IF internal_10 GOTO foreach_body_8781702295173
+	GOTO foreach_end_8781702295173
+	foreach_body_8781702295173:
+	SETINDEX internal_8 internal_9 internal_6 # Set the index of the array with the ancestor type
+	internal_6 = ANCESTOR internal_6 # Get the next ancestor
+	ARG internal_9
+	ARG internal_1
+	internal_9 = CALL function_add
+	GOTO foreach_start_8781702295173
+	foreach_end_8781702295173:
 	
-	# #################################################################################################### #
-	# Step 3 - For each branch type, store the ancestor index that match with it (Simulating a double for) #
-	# #################################################################################################### #
-	internal_9 = ARRAY 6
-	internal_10 = ARRAY 6
-	internal_11 = TYPEADDR A
-	SETINDEX internal_9 0 internal_11
-	SETINDEX internal_10 0 internal_0
-	internal_12 = TYPEADDR B
-	SETINDEX internal_9 1 internal_12
-	SETINDEX internal_10 1 internal_0
-	internal_13 = TYPEADDR C
-	SETINDEX internal_9 2 internal_13
-	SETINDEX internal_10 2 internal_0
-	internal_14 = TYPEADDR D
-	SETINDEX internal_9 3 internal_14
-	SETINDEX internal_10 3 internal_0
-	internal_15 = TYPEADDR E
-	SETINDEX internal_9 4 internal_15
-	SETINDEX internal_10 4 internal_0
-	internal_16 = TYPEADDR Object
-	SETINDEX internal_9 5 internal_16
-	SETINDEX internal_10 5 internal_0
+	internal_11 = ARRAY internal_2
+	internal_12 = ARRAY internal_2
+	internal_14 = ALLOCINT 0
+	internal_13 = TYPEADDR A
+	SETINDEX internal_11 internal_14 internal_13
+	SETVALUEINDEX internal_12 internal_14 internal_4
+	internal_16 = ALLOCINT 1
+	internal_15 = TYPEADDR B
+	SETINDEX internal_11 internal_16 internal_15
+	SETVALUEINDEX internal_12 internal_16 internal_4
+	internal_18 = ALLOCINT 2
+	internal_17 = TYPEADDR C
+	SETINDEX internal_11 internal_18 internal_17
+	SETVALUEINDEX internal_12 internal_18 internal_4
+	internal_20 = ALLOCINT 3
+	internal_19 = TYPEADDR D
+	SETINDEX internal_11 internal_20 internal_19
+	SETVALUEINDEX internal_12 internal_20 internal_4
+	internal_22 = ALLOCINT 4
+	internal_21 = TYPEADDR E
+	SETINDEX internal_11 internal_22 internal_21
+	SETVALUEINDEX internal_12 internal_22 internal_4
+	internal_24 = ALLOCINT 5
+	internal_23 = TYPEADDR Object
+	SETINDEX internal_11 internal_24 internal_23
+	SETVALUEINDEX internal_12 internal_24 internal_4
 	
-	# ############# #
-	# Outer Foreach #
-	# ############# #
-	internal_17 = 0 # Initialize the index i of the case to 0
-	foreach_type_start_8792981820269:
-	internal_18 = internal_17 < 6 # Check if the type index is less than the count of branches
-	IF internal_18 GOTO foreach_type_body_8792981820269
-	GOTO foreach_type_end_8792981820269
-	foreach_type_body_8792981820269:
-	internal_19 = GETINDEX internal_9 internal_17 # Get the type of the i-th branch
-	
-	# ############# #
-	# Inner Foreach #
-	# ############# #
-	internal_20 = 0 # Initialize the index j of the case to 0
-	foreach_ancestor_start_8792981820269:
-	internal_21 = internal_20 < internal_0 # Check if the case index is less than the count of ancestors
-	IF internal_21 GOTO foreach_ancestor_body_8792981820269
-	GOTO foreach_ancestor_end_8792981820269
-	foreach_ancestor_body_8792981820269:
-	internal_22 = GETINDEX internal_4 internal_20 # Get the j-th ancestor type
-	internal_23 = internal_19 == internal_22 # Compare if the type of the i-th branch is equal to the j-th ancestor
-	IF internal_23 GOTO foreach_ancestor_end_8792981820269 # If the types are equal, we have a match, then we can exit
-	internal_20 = internal_20 + 1 # Increment the ancestor index
-	GOTO foreach_ancestor_start_8792981820269
-	foreach_ancestor_end_8792981820269:
-	SETINDEX internal_10 internal_17 internal_20 # Set the counter of the i-th branch equals to j
+	internal_25 = ALLOCINT 0
+	internal_26 = ALLOCBOOL 0
+	internal_28 = ALLOCINT 0
+	internal_29 = ALLOCBOOL 0
+	internal_31 = ALLOCBOOL 0
+	foreach_type_start_8781702295173:
+	ARG internal_25
+	ARG internal_2
+	internal_26 = CALL function_less_than
+	IF internal_26 GOTO foreach_type_body_8781702295173
+	GOTO foreach_type_end_8781702295173
+	foreach_type_body_8781702295173:
+	internal_27 = GETINDEX internal_11 internal_25 # Get the type of the i-th branch
+	ARG internal_28
+	ARG internal_0
+	internal_28 = CALL function_assign
+	foreach_ancestor_start_8781702295173:
+	ARG internal_28
+	ARG internal_4
+	internal_29 = CALL function_less_than
+	IF internal_29 GOTO foreach_ancestor_body_8781702295173
+	GOTO foreach_ancestor_end_8781702295173
+	foreach_ancestor_body_8781702295173:
+	internal_30 = GETINDEX internal_8 internal_28 # Get the j-th ancestor type
+	internal_31 = EQUALADDR internal_27 internal_30 # Compare if the type of the i-th branch is equal to the j-th ancestor
+	IF internal_31 GOTO foreach_ancestor_end_8781702295173 # If the types are equal, we have a match, then we can exit
+	ARG internal_28
+	ARG internal_1
+	internal_28 = CALL function_add
+	GOTO foreach_ancestor_start_8781702295173
+	foreach_ancestor_end_8781702295173:
+	SETVALUEINDEX internal_12 internal_25 internal_28 # Set the counter of the i-th branch equals to j
 	# #################### #
 	# End of Inner Foreach #
 	# #################### #
 	
-	internal_17 = internal_17 + 1 # Increment type index
-	GOTO foreach_type_start_8792981820269
-	foreach_type_end_8792981820269:
+	ARG internal_25
+	ARG internal_1
+	internal_25 = CALL function_add
+	GOTO foreach_type_start_8781702295173
+	foreach_type_end_8781702295173:
 	# ################# #
 	# End Outer Foreach #
 	# ################# #
@@ -2294,112 +2544,181 @@ function function_class_type_at_Main{
 	# ######################################## #
 	# Step 4 - Find the minimum ancestor index #
 	# ######################################## #
-	internal_24 = 0 # Initialize the index of the counter array to 0
-	internal_25 = 0 # Initialize the index of the lower counter to 0
-	internal_27 = internal_0 # Initialize the current minimum to `count of ancestors`
-	foreach_min_start_8792981820269:
-	internal_28 = internal_24 < 6 # Check if the index of the lower counter is less than the count of branches
-	IF internal_28 GOTO foreach_min_body_8792981820269
-	GOTO foreach_min_end_8792981820269
-	foreach_min_body_8792981820269:
-	internal_26 = GETINDEX internal_10 internal_24 # Get the nearest ancestor index of the i-th branch type
-	internal_28 = internal_26 < internal_27 # Compare if the nearest ancestor index is less than the current minimum
-	IF internal_28 GOTO update_min_8792981820269
-	GOTO foreach_min_end_8792981820269
-	update_min_8792981820269:
-	internal_27 = internal_26 # Update the current minimum
-	internal_25 = internal_24 # Update the index of the lower counter
-	update_min_end_8792981820269:
-	internal_24 = internal_24 + 1 # Increment the index of the counter array
-	GOTO foreach_min_start_8792981820269
-	foreach_min_end_8792981820269:
+	internal_37 = ALLOCSTR "\n"
+	internal_38 = ALLOCSTR " "
+	internal_32 = ALLOCINT 0
+	internal_33 = ALLOCINT 0
+	internal_34 = ALLOCINT 0
+	internal_35 = ALLOCINT 0
+	internal_36 = ALLOCBOOL 0
+	ARG internal_35
+	ARG internal_4
+	internal_35 = CALL function_assign
+	foreach_min_start_8781702295173:
+	ARG internal_32
+	ARG internal_2
+	internal_36 = CALL function_less_than
+	IF internal_36 GOTO foreach_min_body_8781702295173
+	GOTO foreach_min_end_8781702295173
+	foreach_min_body_8781702295173:
+	internal_34 = GETVALUEINDEX internal_12 internal_32 # Get the nearest ancestor index of the i-th branch type
+	ARG internal_34
+	ARG internal_35
+	internal_36 = CALL function_less_than
+	IF internal_36 GOTO update_min_8781702295173
+	GOTO update_min_end_8781702295173
+	update_min_8781702295173:
+	ARG internal_35
+	ARG internal_34
+	internal_35 = CALL function_assign
+	ARG internal_33
+	ARG internal_32
+	internal_33 = CALL function_assign
+	update_min_end_8781702295173:
+	ARG internal_32
+	ARG internal_1
+	internal_32 = CALL function_add
+	GOTO foreach_min_start_8781702295173
+	foreach_min_end_8781702295173:
 	
 	# ################################################################# #
 	# Step 5 - Using the minimun ancestor index find the correct branch #
 	# ################################################################# #
-	internal_29 = ARRAY 6 # Create the bool array
-	SETINDEX internal_29 0 0 # Initialize the bool array
-	SETINDEX internal_29 1 0 # Initialize the bool array
-	SETINDEX internal_29 2 0 # Initialize the bool array
-	SETINDEX internal_29 3 0 # Initialize the bool array
-	SETINDEX internal_29 4 0 # Initialize the bool array
-	SETINDEX internal_29 5 0 # Initialize the bool array
+	internal_39 = ARRAY internal_2 # Create the bool array
+	internal_40 = ALLOCINT 0
+	SETVALUEINDEX internal_39 internal_40 internal_0 # Initialize the bool array
+	internal_41 = ALLOCINT 1
+	SETVALUEINDEX internal_39 internal_41 internal_0 # Initialize the bool array
+	internal_42 = ALLOCINT 2
+	SETVALUEINDEX internal_39 internal_42 internal_0 # Initialize the bool array
+	internal_43 = ALLOCINT 3
+	SETVALUEINDEX internal_39 internal_43 internal_0 # Initialize the bool array
+	internal_44 = ALLOCINT 4
+	SETVALUEINDEX internal_39 internal_44 internal_0 # Initialize the bool array
+	internal_45 = ALLOCINT 5
+	SETVALUEINDEX internal_39 internal_45 internal_0 # Initialize the bool array
 	
-	internal_30 = internal_25 == internal_0 # Check if the minimum index is equal to the count of ancestors
-	IF internal_30 GOTO error_branch_8792981820269
-	SETINDEX internal_29 internal_25 1 # Set the bool array in the correct index to 1
+	internal_46 = ALLOCBOOL 0
+	ARG internal_35
+	ARG internal_4
+	internal_46 = CALL function_equal
+	IF internal_46 GOTO error_branch_8781702295173
+	SETVALUEINDEX internal_39 internal_33 internal_1 # Set the bool array in the correct index to 1
+	internal_47 = ALLOCBOOL 0
 	
-	internal_31 = GETINDEX internal_29 0 # Get the bool value of the branch A
-	IF internal_31 GOTO branch_A_8792981820269 # If the bool value is 1, then we have a match
+	internal_48 = ALLOCINT 0
+	internal_47 = GETVALUEINDEX internal_39 internal_48 # Get the bool value of the branch A
+	IF internal_47 GOTO branch_A_8781702295173 # If the bool value is 1, then we have a match
 	
-	internal_31 = GETINDEX internal_29 1 # Get the bool value of the branch B
-	IF internal_31 GOTO branch_B_8792981820269 # If the bool value is 1, then we have a match
+	internal_49 = ALLOCINT 1
+	internal_47 = GETVALUEINDEX internal_39 internal_49 # Get the bool value of the branch B
+	IF internal_47 GOTO branch_B_8781702295173 # If the bool value is 1, then we have a match
 	
-	internal_31 = GETINDEX internal_29 2 # Get the bool value of the branch C
-	IF internal_31 GOTO branch_C_8792981820269 # If the bool value is 1, then we have a match
+	internal_50 = ALLOCINT 2
+	internal_47 = GETVALUEINDEX internal_39 internal_50 # Get the bool value of the branch C
+	IF internal_47 GOTO branch_C_8781702295173 # If the bool value is 1, then we have a match
 	
-	internal_31 = GETINDEX internal_29 3 # Get the bool value of the branch D
-	IF internal_31 GOTO branch_D_8792981820269 # If the bool value is 1, then we have a match
+	internal_51 = ALLOCINT 3
+	internal_47 = GETVALUEINDEX internal_39 internal_51 # Get the bool value of the branch D
+	IF internal_47 GOTO branch_D_8781702295173 # If the bool value is 1, then we have a match
 	
-	internal_31 = GETINDEX internal_29 4 # Get the bool value of the branch E
-	IF internal_31 GOTO branch_E_8792981820269 # If the bool value is 1, then we have a match
+	internal_52 = ALLOCINT 4
+	internal_47 = GETVALUEINDEX internal_39 internal_52 # Get the bool value of the branch E
+	IF internal_47 GOTO branch_E_8781702295173 # If the bool value is 1, then we have a match
 	
-	internal_31 = GETINDEX internal_29 5 # Get the bool value of the branch Object
-	IF internal_31 GOTO branch_Object_8792981820269 # If the bool value is 1, then we have a match
+	internal_53 = ALLOCINT 5
+	internal_47 = GETVALUEINDEX internal_39 internal_53 # Get the bool value of the branch Object
+	IF internal_47 GOTO branch_Object_8781702295173 # If the bool value is 1, then we have a match
 	
-	branch_A_8792981820269:
-	internal_34 = ALLOCSTR "Class type is now A\n"
+	branch_A_8781702295173:
+	ARG a
+	ARG var
+	a = CALL function_assign
+	internal_56 = ALLOCSTR "Class type is now A\n"
 	ARG self
-	ARG internal_34
-	internal_35 = VCALL Main function_out_string_at_IO
-	internal_32 = internal_35 # Assign the result
-	GOTO branch_end_8792981820269
+	ARG internal_56
+	internal_57 = VCALL Main function_out_string_at_IO
+	ARG internal_54
+	ARG internal_57
+	internal_54 = CALL function_assign
+	internal_54 = internal_57 # Assign the result
+	GOTO branch_end_8781702295173
 	
-	branch_B_8792981820269:
-	internal_37 = ALLOCSTR "Class type is now B\n"
+	branch_B_8781702295173:
+	ARG b
+	ARG var
+	b = CALL function_assign
+	internal_59 = ALLOCSTR "Class type is now B\n"
 	ARG self
-	ARG internal_37
-	internal_38 = VCALL Main function_out_string_at_IO
-	internal_32 = internal_38 # Assign the result
-	GOTO branch_end_8792981820269
+	ARG internal_59
+	internal_60 = VCALL Main function_out_string_at_IO
+	ARG internal_54
+	ARG internal_60
+	internal_54 = CALL function_assign
+	internal_54 = internal_60 # Assign the result
+	GOTO branch_end_8781702295173
 	
-	branch_C_8792981820269:
-	internal_40 = ALLOCSTR "Class type is now C\n"
+	branch_C_8781702295173:
+	ARG c
+	ARG var
+	c = CALL function_assign
+	internal_62 = ALLOCSTR "Class type is now C\n"
 	ARG self
-	ARG internal_40
-	internal_41 = VCALL Main function_out_string_at_IO
-	internal_32 = internal_41 # Assign the result
-	GOTO branch_end_8792981820269
+	ARG internal_62
+	internal_63 = VCALL Main function_out_string_at_IO
+	ARG internal_54
+	ARG internal_63
+	internal_54 = CALL function_assign
+	internal_54 = internal_63 # Assign the result
+	GOTO branch_end_8781702295173
 	
-	branch_D_8792981820269:
-	internal_43 = ALLOCSTR "Class type is now D\n"
+	branch_D_8781702295173:
+	ARG d
+	ARG var
+	d = CALL function_assign
+	internal_65 = ALLOCSTR "Class type is now D\n"
 	ARG self
-	ARG internal_43
-	internal_44 = VCALL Main function_out_string_at_IO
-	internal_32 = internal_44 # Assign the result
-	GOTO branch_end_8792981820269
+	ARG internal_65
+	internal_66 = VCALL Main function_out_string_at_IO
+	ARG internal_54
+	ARG internal_66
+	internal_54 = CALL function_assign
+	internal_54 = internal_66 # Assign the result
+	GOTO branch_end_8781702295173
 	
-	branch_E_8792981820269:
-	internal_46 = ALLOCSTR "Class type is now E\n"
+	branch_E_8781702295173:
+	ARG e
+	ARG var
+	e = CALL function_assign
+	internal_68 = ALLOCSTR "Class type is now E\n"
 	ARG self
-	ARG internal_46
-	internal_47 = VCALL Main function_out_string_at_IO
-	internal_32 = internal_47 # Assign the result
-	GOTO branch_end_8792981820269
+	ARG internal_68
+	internal_69 = VCALL Main function_out_string_at_IO
+	ARG internal_54
+	ARG internal_69
+	internal_54 = CALL function_assign
+	internal_54 = internal_69 # Assign the result
+	GOTO branch_end_8781702295173
 	
-	branch_Object_8792981820269:
-	internal_49 = ALLOCSTR "Oooops\n"
+	branch_Object_8781702295173:
+	ARG o
+	ARG var
+	o = CALL function_assign
+	internal_71 = ALLOCSTR "Oooops\n"
 	ARG self
-	ARG internal_49
-	internal_50 = VCALL Main function_out_string_at_IO
-	internal_32 = internal_50 # Assign the result
-	GOTO branch_end_8792981820269
+	ARG internal_71
+	internal_72 = VCALL Main function_out_string_at_IO
+	ARG internal_54
+	ARG internal_72
+	internal_54 = CALL function_assign
+	internal_54 = internal_72 # Assign the result
+	GOTO branch_end_8781702295173
 	
-	error_branch_8792981820269:
+	error_branch_8781702295173:
 	# Insert an error call
-	branch_end_8792981820269:
+	branch_end_8781702295173:
 	
-	RETURN internal_32
+	RETURN internal_54
 }
 function function_print_at_Main{
 	PARAM self
@@ -2413,10 +2732,14 @@ function function_print_at_Main{
 	LOCAL internal_5 # String " "
 	LOCAL internal_6
 
+	# Let z: A2I
+	
 	internal_1 = ALLOCATE A2I # Allocate the object A2I
 	ARG internal_1 # Pass the instance to the constructor
 	internal_1 = VCALL A2I function___init___at_A2I # Call the constructor
-	z = internal_1
+	ARG z
+	ARG internal_1
+	z = CALL function_assign
 	ARG var
 	internal_2 = VCALL A function_value_at_A
 	ARG z
@@ -2437,8 +2760,8 @@ function function_main_at_Main{
 
 	LOCAL internal_0 # Store an instance of the class A
 	LOCAL internal_1
-	LOCAL internal_2
-	LOCAL internal_3 # String "number "
+	LOCAL internal_2 # String "number "
+	LOCAL internal_3
 	LOCAL internal_4
 	LOCAL internal_5
 	LOCAL internal_6
@@ -2446,23 +2769,23 @@ function function_main_at_Main{
 	LOCAL internal_8
 	LOCAL internal_9
 	LOCAL internal_10
-	LOCAL internal_11
-	LOCAL internal_12 # String "is even!\n"
-	LOCAL internal_13
-	LOCAL internal_14 # String "is odd!\n"
+	LOCAL internal_11 # String "is even!\n"
+	LOCAL internal_12
+	LOCAL internal_13 # String "is odd!\n"
+	LOCAL internal_14
 	LOCAL internal_15
 	LOCAL internal_16
 	LOCAL internal_17
 	LOCAL internal_18
 	LOCAL internal_19
 	LOCAL internal_20
-	LOCAL internal_21
-	LOCAL internal_22 # String "a"
-	LOCAL internal_23 # Store the result of the operation function_equal
-	LOCAL internal_24 # Store an instance of the class A
+	LOCAL internal_21 # String "a"
+	LOCAL internal_22 # Store the result of the operation function_equal
+	LOCAL internal_23 # Store an instance of the class A
+	LOCAL internal_24
 	LOCAL internal_25
-	LOCAL internal_26
-	LOCAL internal_27 # Store an instance of the class B
+	LOCAL internal_26 # Store an instance of the class B
+	LOCAL internal_27
 	LOCAL internal_28
 	LOCAL internal_29
 	LOCAL internal_30
@@ -2470,362 +2793,398 @@ function function_main_at_Main{
 	LOCAL internal_32
 	LOCAL internal_33
 	LOCAL internal_34
-	LOCAL internal_35
-	LOCAL internal_36 # String "b"
-	LOCAL internal_37 # Store the result of the operation function_equal
-	LOCAL internal_38
-	LOCAL internal_39 # Count of ancestors of the switch expression
-	LOCAL internal_40 # Switch expression type
-	LOCAL internal_41 # Ancestor type
-	LOCAL internal_42 # Step 1 comparison result
-	LOCAL internal_43 # Step 1 Array of ancestors
-	LOCAL internal_44 # Integer 0 
-	LOCAL internal_45 # Null pointer
-	LOCAL internal_46 # Step 2 iteration index
-	LOCAL internal_47 # Step 2 comparison result
-	LOCAL internal_48 # Array to store the branch types
-	LOCAL internal_49 # Array to store the nearest ancestor index of the expression type of the i-th branch type 
-	LOCAL internal_50 # Address of the type C
-	LOCAL internal_51 # Address of the type A
-	LOCAL internal_52 # Address of the type Object
-	LOCAL internal_53 # Step 3 - Iteration index of the branch types array
-	LOCAL internal_54 # Step 3 - Comparison for the index of the branch types array
-	LOCAL internal_55 # Step 3 - Type of the i-th branch
-	LOCAL internal_56 # Step 3 - Index of the ancestor
-	LOCAL internal_57 # Step 3 - Comparison for the index of the ancestor
-	LOCAL internal_58 # Step 3 - Type of the j-th ancestor
-	LOCAL internal_59 # Step 3 - Comparison for the branch type nad the ancestor type
-	LOCAL internal_60 # Step 4 - Iteration index
-	LOCAL internal_61 # Step 4 - Index of the minimum counter in the counter array
-	LOCAL internal_62 # Step 4 - Temporary variable
-	LOCAL internal_63 # Step 4 - Current minimum of the counter array
-	LOCAL internal_64 # Step 4 - Comparison for the minimum of the counter array
-	LOCAL internal_65 # Step 5 - Bool array
-	LOCAL internal_66 # Step 5 - Exists an error
-	LOCAL internal_67 # Step 5 - Comparison for the correct branch result
-	LOCAL internal_68 # Result of the switch expression address
+	LOCAL internal_35 # String "b"
+	LOCAL internal_36 # Store the result of the operation function_equal
+	LOCAL internal_37
+	LOCAL internal_38 # Constant Integer 0 
+	LOCAL internal_39 # Constant Integer 1
+	LOCAL internal_40 # Constant Integer 3
+	LOCAL internal_41 # Null pointer
+	LOCAL internal_42 # Count of ancestors of the switch expression
+	LOCAL internal_43 # Switch expression type
+	LOCAL internal_44 # Ancestor type
+	LOCAL internal_45 # Step 1 comparison result
+	LOCAL internal_46 # Step 1 Array of ancestors
+	LOCAL internal_47 # Step 2 iteration index
+	LOCAL internal_48 # Step 2 comparison result
+	LOCAL internal_49 # Array to store the branch types
+	LOCAL internal_50 # Array to store the nearest ancestor index of the expression type of the i-th branch type 
+	LOCAL internal_51 # Address of the type C
+	LOCAL internal_52 # Index of the type C
+	LOCAL internal_53 # Address of the type A
+	LOCAL internal_54 # Index of the type A
+	LOCAL internal_55 # Address of the type Object
+	LOCAL internal_56 # Index of the type Object
+	LOCAL internal_57 # Step 3 - Iteration index of the branch types array
+	LOCAL internal_58 # Step 3 - Comparison for the index of the branch types array
+	LOCAL internal_59 # Step 3 - Type of the i-th branch
+	LOCAL internal_60 # Step 3 - Index of the ancestor
+	LOCAL internal_61 # Step 3 - Comparison for the index of the ancestor
+	LOCAL internal_62 # Step 3 - Type of the j-th ancestor
+	LOCAL internal_63 # Step 3 - Comparison for the branch type nad the ancestor type
+	LOCAL internal_64 # Step 4 - Iteration index
+	LOCAL internal_65 # Step 4 - Index of the minimum counter in the counter array
+	LOCAL internal_66 # Step 4 - Temporary variable
+	LOCAL internal_67 # Step 4 - Current minimum of the counter array
+	LOCAL internal_68 # Step 4 - Comparison for the minimum of the counter array
+	LOCAL internal_69 # endl
+	LOCAL internal_70 # space
+	LOCAL internal_71 # Step 5 - Bool array
+	LOCAL internal_72 # Step 5 - Branch 0
+	LOCAL internal_73 # Step 5 - Branch 1
+	LOCAL internal_74 # Step 5 - Branch 2
+	LOCAL internal_75 # Step 5 - Exists an error
+	LOCAL internal_76 # Step 5 - Comparison for the correct branch result
+	LOCAL internal_77 # Index 0
+	LOCAL internal_78 # Index 1
+	LOCAL internal_79 # Index 2
+	LOCAL internal_80 # Result of the switch expression address
 	LOCAL c # Specialiced variable for the branch C
-	LOCAL internal_70
-	LOCAL internal_71
-	LOCAL a # Specialiced variable for the branch A
-	LOCAL internal_73
-	LOCAL internal_74
-	LOCAL o # Specialiced variable for the branch Object
-	LOCAL internal_76 # String "Oooops\n"
-	LOCAL internal_77
-	LOCAL internal_78
-	LOCAL internal_79 # Integer 0
-	LOCAL internal_80
-	LOCAL internal_81
 	LOCAL internal_82
-	LOCAL internal_83 # String "c"
-	LOCAL internal_84 # Store the result of the operation function_equal
-	LOCAL internal_85 # Store an instance of the class A
+	LOCAL internal_83
+	LOCAL a # Specialiced variable for the branch A
+	LOCAL internal_85
 	LOCAL internal_86
-	LOCAL internal_87
-	LOCAL internal_88 # Store an instance of the class D
+	LOCAL o # Specialiced variable for the branch Object
+	LOCAL internal_88 # String "Oooops\n"
 	LOCAL internal_89
 	LOCAL internal_90
-	LOCAL internal_91
+	LOCAL internal_91 # Integer 0
 	LOCAL internal_92
 	LOCAL internal_93
 	LOCAL internal_94
-	LOCAL internal_95
-	LOCAL internal_96
-	LOCAL internal_97 # String "d"
-	LOCAL internal_98 # Store the result of the operation function_equal
-	LOCAL internal_99 # Store an instance of the class C
-	LOCAL internal_100
+	LOCAL internal_95 # String "c"
+	LOCAL internal_96 # Store the result of the operation function_equal
+	LOCAL internal_97 # Store an instance of the class A
+	LOCAL internal_98
+	LOCAL internal_99
+	LOCAL internal_100 # Store an instance of the class D
 	LOCAL internal_101
 	LOCAL internal_102
 	LOCAL internal_103
 	LOCAL internal_104
 	LOCAL internal_105
-	LOCAL internal_106 # String "e"
-	LOCAL internal_107 # Store the result of the operation function_equal
-	LOCAL internal_108 # Store an instance of the class C
-	LOCAL internal_109
-	LOCAL internal_110
-	LOCAL internal_111
+	LOCAL internal_106
+	LOCAL internal_107
+	LOCAL internal_108
+	LOCAL internal_109 # String "d"
+	LOCAL internal_110 # Store the result of the operation function_equal
+	LOCAL internal_111 # Store an instance of the class C
 	LOCAL internal_112
 	LOCAL internal_113
 	LOCAL internal_114
-	LOCAL internal_115 # String "f"
-	LOCAL internal_116 # Store the result of the operation function_equal
-	LOCAL internal_117 # Store an instance of the class C
-	LOCAL internal_118
-	LOCAL internal_119
-	LOCAL internal_120
+	LOCAL internal_115
+	LOCAL internal_116
+	LOCAL internal_117
+	LOCAL internal_118 # String "e"
+	LOCAL internal_119 # Store the result of the operation function_equal
+	LOCAL internal_120 # Store an instance of the class C
 	LOCAL internal_121
 	LOCAL internal_122
 	LOCAL internal_123
-	LOCAL internal_124 # String "g"
-	LOCAL internal_125 # Store the result of the operation function_equal
+	LOCAL internal_124
+	LOCAL internal_125
 	LOCAL internal_126
-	LOCAL internal_127
-	LOCAL internal_128 # Store an instance of the class D
-	LOCAL internal_129
+	LOCAL internal_127 # String "f"
+	LOCAL internal_128 # Store the result of the operation function_equal
+	LOCAL internal_129 # Store an instance of the class C
 	LOCAL internal_130
 	LOCAL internal_131
-	LOCAL internal_132 # String "number "
+	LOCAL internal_132
 	LOCAL internal_133
 	LOCAL internal_134
 	LOCAL internal_135
-	LOCAL internal_136 # String "is divisible by 3.\n"
-	LOCAL internal_137
-	LOCAL internal_138 # String "number "
+	LOCAL internal_136 # String "g"
+	LOCAL internal_137 # Store the result of the operation function_equal
+	LOCAL internal_138
 	LOCAL internal_139
-	LOCAL internal_140
+	LOCAL internal_140 # Store an instance of the class D
 	LOCAL internal_141
-	LOCAL internal_142 # String "is not divisible by 3.\n"
+	LOCAL internal_142
 	LOCAL internal_143
-	LOCAL internal_144
+	LOCAL internal_144 # String "number "
 	LOCAL internal_145
 	LOCAL internal_146
-	LOCAL internal_147 # String "h"
-	LOCAL internal_148 # Store the result of the operation function_equal
-	LOCAL x
-	LOCAL internal_150 # Store an instance of the class E
+	LOCAL internal_147
+	LOCAL internal_148 # String "is divisible by 3.\n"
+	LOCAL internal_149
+	LOCAL internal_150 # String "number "
 	LOCAL internal_151
 	LOCAL internal_152
 	LOCAL internal_153
-	LOCAL r
+	LOCAL internal_154 # String "is not divisible by 3.\n"
 	LOCAL internal_155
 	LOCAL internal_156
 	LOCAL internal_157
-	LOCAL internal_158 # Integer 8
-	LOCAL internal_159 # Store the result of the operation function_mult
-	LOCAL internal_160 # Store the result of the operation function_sub
-	LOCAL internal_161 # String "number "
-	LOCAL internal_162
+	LOCAL internal_158
+	LOCAL internal_159 # String "h"
+	LOCAL internal_160 # Store the result of the operation function_equal
+	LOCAL x
+	LOCAL internal_162 # Store an instance of the class E
 	LOCAL internal_163
 	LOCAL internal_164
-	LOCAL internal_165 # String "is equal to "
-	LOCAL internal_166
+	LOCAL internal_165
+	LOCAL r
 	LOCAL internal_167
-	LOCAL internal_168 # String "times 8 with a remainder of "
+	LOCAL internal_168
 	LOCAL internal_169
-	LOCAL a
-	LOCAL internal_171 # Store an instance of the class A2I
-	LOCAL internal_172
-	LOCAL internal_173
-	LOCAL internal_174 # String "\n"
+	LOCAL internal_170 # Integer 8
+	LOCAL internal_171 # Store the result of the operation function_mult
+	LOCAL internal_172 # Store the result of the operation function_sub
+	LOCAL internal_173 # String "number "
+	LOCAL internal_174
 	LOCAL internal_175
 	LOCAL internal_176
-	LOCAL internal_177
+	LOCAL internal_177 # String "is equal to "
 	LOCAL internal_178
-	LOCAL internal_179 # String "j"
-	LOCAL internal_180 # Store the result of the operation function_equal
-	LOCAL internal_181 # Store an instance of the class A
-	LOCAL internal_182
-	LOCAL internal_183
+	LOCAL internal_179
+	LOCAL internal_180 # String "times 8 with a remainder of "
+	LOCAL internal_181
+	LOCAL a
+	LOCAL internal_183 # Store an instance of the class A2I
 	LOCAL internal_184
-	LOCAL internal_185 # String "q"
-	LOCAL internal_186 # Store the result of the operation function_equal
-	LOCAL internal_187 # Boolean false
-	LOCAL internal_188 # Store an instance of the class A
+	LOCAL internal_185
+	LOCAL internal_186 # String "\n"
+	LOCAL internal_187
+	LOCAL internal_188
 	LOCAL internal_189
 	LOCAL internal_190
-	LOCAL internal_191
+	LOCAL internal_191 # String "j"
+	LOCAL internal_192 # Store the result of the operation function_equal
+	LOCAL internal_193 # Store an instance of the class A
+	LOCAL internal_194
+	LOCAL internal_195
+	LOCAL internal_196
+	LOCAL internal_197 # String "q"
+	LOCAL internal_198 # Store the result of the operation function_equal
+	LOCAL internal_199 # Boolean false
+	LOCAL internal_200 # Store an instance of the class A
+	LOCAL internal_201
+	LOCAL internal_202
+	LOCAL internal_203
 
 	internal_0 = ALLOCATE A # Allocate the object A
 	ARG internal_0 # Pass the instance to the constructor
 	internal_0 = VCALL A function___init___at_A # Call the constructor
+	
 	SETATTR self avar internal_0
-	while_start_8792981790296:
-	internal_2 = GETATTR self flag
-	internal_1 = internal_2
-	IF internal_1 GOTO while_body_8792981790296
-	GOTO while_end_8792981790296
 	
-	while_body_8792981790296:
-	internal_3 = ALLOCSTR "number "
+	# While loop
+	while_start_8781702298224:
+	internal_1 = GETATTR self flag
+	IF internal_1 GOTO while_body_8781702298224
+	GOTO while_end_8781702298224
+	
+	while_body_8781702298224:
+	internal_2 = ALLOCSTR "number "
 	ARG self
-	ARG internal_3
-	internal_4 = VCALL Main function_out_string_at_IO
-	internal_5 = GETATTR self avar
+	ARG internal_2
+	internal_3 = VCALL Main function_out_string_at_IO
+	internal_4 = GETATTR self avar
 	ARG self
-	ARG internal_5
-	internal_6 = VCALL Main function_print_at_Main
+	ARG internal_4
+	internal_5 = VCALL Main function_print_at_Main
 	# Conditional
-	internal_8 = ALLOCBOOL 0
-	internal_9 = GETATTR self avar
+	internal_7 = ALLOCBOOL 0
+	internal_8 = GETATTR self avar
+	ARG internal_8
+	internal_9 = VCALL A function_value_at_A
+	ARG self
 	ARG internal_9
-	internal_10 = VCALL A function_value_at_A
-	ARG self
-	ARG internal_10
-	internal_11 = VCALL Main function_is_even_at_Main
-	internal_8 = internal_11
-	IF internal_8 GOTO then_8792981820386
-	GOTO else_8792981820386
+	internal_10 = VCALL Main function_is_even_at_Main
+	internal_7 = internal_10
+	IF internal_7 GOTO then_8781702295290
+	GOTO else_8781702295290
 	
-	then_8792981820386:
-	internal_12 = ALLOCSTR "is even!\n"
+	then_8781702295290:
+	internal_11 = ALLOCSTR "is even!\n"
 	ARG self
-	ARG internal_12
-	internal_13 = VCALL Main function_out_string_at_IO
-	internal_7 = internal_13
-	GOTO endif_8792981820386
+	ARG internal_11
+	internal_12 = VCALL Main function_out_string_at_IO
+	internal_6 = internal_12
+	GOTO endif_8781702295290
 	
-	else_8792981820386:
-	internal_14 = ALLOCSTR "is odd!\n"
+	else_8781702295290:
+	internal_13 = ALLOCSTR "is odd!\n"
 	ARG self
-	ARG internal_14
-	internal_15 = VCALL Main function_out_string_at_IO
-	internal_7 = internal_15
-	GOTO endif_8792981820386
+	ARG internal_13
+	internal_14 = VCALL Main function_out_string_at_IO
+	internal_6 = internal_14
+	GOTO endif_8781702295290
 	
-	endif_8792981820386:
-	internal_16 = GETATTR self avar
+	endif_8781702295290:
+	internal_15 = GETATTR self avar
 	ARG self
-	ARG internal_16
-	internal_17 = VCALL Main function_class_type_at_Main
+	ARG internal_15
+	internal_16 = VCALL Main function_class_type_at_Main
 	ARG self
-	internal_18 = VCALL Main function_menu_at_Main
-	SETATTR self char internal_18
+	internal_17 = VCALL Main function_menu_at_Main
+	
+	SETATTR self char internal_17
 	# Conditional
-	internal_20 = ALLOCBOOL 0
-	internal_21 = GETATTR self char
-	internal_22 = ALLOCSTR "a"
+	internal_19 = ALLOCBOOL 0
+	internal_20 = GETATTR self char
+	internal_21 = ALLOCSTR "a"
 	
+	ARG internal_20
 	ARG internal_21
-	ARG internal_22
-	internal_23 = CALL function_equal
-	internal_20 = internal_23
-	IF internal_20 GOTO then_8792981790281
-	GOTO else_8792981790281
+	internal_22 = CALL function_equal
+	internal_19 = internal_22
+	IF internal_19 GOTO then_8781702298209
+	GOTO else_8781702298209
 	
-	then_8792981790281:
-	internal_24 = ALLOCATE A # Allocate the object A
-	ARG internal_24 # Pass the instance to the constructor
-	internal_24 = VCALL A function___init___at_A # Call the constructor
+	then_8781702298209:
+	internal_23 = ALLOCATE A # Allocate the object A
+	ARG internal_23 # Pass the instance to the constructor
+	internal_23 = VCALL A function___init___at_A # Call the constructor
 	ARG self
-	internal_25 = VCALL Main function_get_int_at_Main
+	internal_24 = VCALL Main function_get_int_at_Main
+	ARG internal_23
 	ARG internal_24
-	ARG internal_25
-	internal_26 = VCALL A function_set_var_at_A
-	SETATTR self a_var internal_26
-	internal_27 = ALLOCATE B # Allocate the object B
-	ARG internal_27 # Pass the instance to the constructor
-	internal_27 = VCALL B function___init___at_B # Call the constructor
-	internal_28 = GETATTR self avar
-	ARG internal_28
-	internal_29 = VCALL A function_value_at_A
-	internal_30 = GETATTR self a_var
-	ARG internal_30
-	internal_31 = VCALL A function_value_at_A
+	internal_25 = VCALL A function_set_var_at_A
+	
+	SETATTR self a_var internal_25
+	internal_26 = ALLOCATE B # Allocate the object B
+	ARG internal_26 # Pass the instance to the constructor
+	internal_26 = VCALL B function___init___at_B # Call the constructor
+	internal_27 = GETATTR self avar
 	ARG internal_27
+	internal_28 = VCALL A function_value_at_A
+	internal_29 = GETATTR self a_var
 	ARG internal_29
-	ARG internal_31
-	internal_32 = VCALL B function_method2_at_A
-	SETATTR self avar internal_32
-	internal_19 = internal_32
-	GOTO endif_8792981790281
+	internal_30 = VCALL A function_value_at_A
+	ARG internal_26
+	ARG internal_28
+	ARG internal_30
+	internal_31 = VCALL B function_method2_at_A
 	
-	else_8792981790281:
+	SETATTR self avar internal_31
+	internal_18 = internal_31
+	GOTO endif_8781702298209
+	
+	else_8781702298209:
 	# Conditional
-	internal_34 = ALLOCBOOL 0
-	internal_35 = GETATTR self char
-	internal_36 = ALLOCSTR "b"
+	internal_33 = ALLOCBOOL 0
+	internal_34 = GETATTR self char
+	internal_35 = ALLOCSTR "b"
 	
+	ARG internal_34
 	ARG internal_35
-	ARG internal_36
-	internal_37 = CALL function_equal
-	internal_34 = internal_37
-	IF internal_34 GOTO then_8792981790275
-	GOTO else_8792981790275
+	internal_36 = CALL function_equal
+	internal_33 = internal_36
+	IF internal_33 GOTO then_8781702298203
+	GOTO else_8781702298203
 	
-	then_8792981790275:
-	internal_38 = GETATTR self avar
+	then_8781702298203:
+	internal_37 = GETATTR self avar
+	internal_38 = ALLOCINT 0
+	internal_39 = ALLOCINT 1
+	internal_40 = ALLOCINT 3
+	internal_41 = ALLOCNULL
+	internal_42 = ALLOCINT 0
+	internal_45 = ALLOCBOOL 0
+	
 	# Switch Case Algorithm Steps:
 	#  1 - Count how many ancestors has the dynamic type of the expression
 	#  2 - Create an array of the same size where to store the ancestors
 	#  3 - For each branch type, store the ancestor index that match with it, if no one match, store `count of ancestors`
 	#  4 - Find the minimum of the ancestors indexes
 	#  5 - With the minimum index, get the correct branch type
-	internal_44 = ALLOCINT 0
-	internal_42 = ALLOCBOOL 0 # Initialize the comparison result
 	
 	# ######################################################################## #
 	# Step 1 - Count how many ancestors has the dynamic type of the expression #
 	# ######################################################################## #
-	internal_40 = TYPEOF internal_38 # Get the switch expression type
-	internal_41 = internal_40 # The first ancestor will be the type itself
-	internal_39 = internal_44 # Initialize the counter
-	while_start_8792981788591:
-	internal_42 = internal_41 == 0
-	IF internal_42 GOTO while_end_8792981788591
-	internal_39 = internal_39 + 1 # Increment the counter
-	internal_41 = ANCESTOR internal_41
-	GOTO while_start_8792981788591
-	while_end_8792981788591:
+	internal_43 = TYPEOF internal_37 # Get the switch expression type
+	internal_44 = internal_43 # The first ancestor will be the type itself
+	while_start_8781702296263:
+	internal_45 = EQUALADDR internal_44 internal_41
+	IF internal_45 GOTO while_end_8781702296263
+	# Increment the count of ancestors
+	ARG internal_42
+	ARG internal_39
+	internal_42 = CALL function_add
+	internal_44 = ANCESTOR internal_44
+	GOTO while_start_8781702296263
+	while_end_8781702296263:
 	
 	# ###################################################################### #
 	# Step 2 - Create an array of the same size where to store the ancestors #
 	# ###################################################################### #
-	internal_41 = internal_40 # The first ancestor will be the type itself
-	internal_43 = ARRAY internal_39 # Create an array of ancestors
-	internal_46 = 0 # Initialize the index with the value 0
-	foreach_start_8792981788591:
-	internal_47 = internal_46 < internal_39 # Check if the index is less than the counter
-	IF internal_47 GOTO foreach_body_8792981788591
-	GOTO foreach_end_8792981788591
-	foreach_body_8792981788591:
-	SETINDEX internal_43 internal_46 internal_41 # Set the index of the array with the ancestor type
-	internal_41 = ANCESTOR internal_41 # Get the next ancestor
-	internal_46 = internal_46 + 1 # Increment index
-	GOTO foreach_start_8792981788591
-	foreach_end_8792981788591:
+	internal_44 = internal_43 # The first ancestor will be the type itself
+	internal_46 = ARRAY internal_42 # Create an array of ancestors
+	internal_47 = ALLOCINT 0
+	internal_48 = ALLOCBOOL 0
+	foreach_start_8781702296263:
+	ARG internal_47
+	ARG internal_42
+	internal_48 = CALL function_less_than
+	IF internal_48 GOTO foreach_body_8781702296263
+	GOTO foreach_end_8781702296263
+	foreach_body_8781702296263:
+	SETINDEX internal_46 internal_47 internal_44 # Set the index of the array with the ancestor type
+	internal_44 = ANCESTOR internal_44 # Get the next ancestor
+	ARG internal_47
+	ARG internal_39
+	internal_47 = CALL function_add
+	GOTO foreach_start_8781702296263
+	foreach_end_8781702296263:
 	
-	# #################################################################################################### #
-	# Step 3 - For each branch type, store the ancestor index that match with it (Simulating a double for) #
-	# #################################################################################################### #
-	internal_48 = ARRAY 3
-	internal_49 = ARRAY 3
-	internal_50 = TYPEADDR C
-	SETINDEX internal_48 0 internal_50
-	SETINDEX internal_49 0 internal_39
-	internal_51 = TYPEADDR A
-	SETINDEX internal_48 1 internal_51
-	SETINDEX internal_49 1 internal_39
-	internal_52 = TYPEADDR Object
-	SETINDEX internal_48 2 internal_52
-	SETINDEX internal_49 2 internal_39
+	internal_49 = ARRAY internal_40
+	internal_50 = ARRAY internal_40
+	internal_52 = ALLOCINT 0
+	internal_51 = TYPEADDR C
+	SETINDEX internal_49 internal_52 internal_51
+	SETVALUEINDEX internal_50 internal_52 internal_42
+	internal_54 = ALLOCINT 1
+	internal_53 = TYPEADDR A
+	SETINDEX internal_49 internal_54 internal_53
+	SETVALUEINDEX internal_50 internal_54 internal_42
+	internal_56 = ALLOCINT 2
+	internal_55 = TYPEADDR Object
+	SETINDEX internal_49 internal_56 internal_55
+	SETVALUEINDEX internal_50 internal_56 internal_42
 	
-	# ############# #
-	# Outer Foreach #
-	# ############# #
-	internal_53 = 0 # Initialize the index i of the case to 0
-	foreach_type_start_8792981788591:
-	internal_54 = internal_53 < 3 # Check if the type index is less than the count of branches
-	IF internal_54 GOTO foreach_type_body_8792981788591
-	GOTO foreach_type_end_8792981788591
-	foreach_type_body_8792981788591:
-	internal_55 = GETINDEX internal_48 internal_53 # Get the type of the i-th branch
-	
-	# ############# #
-	# Inner Foreach #
-	# ############# #
-	internal_56 = 0 # Initialize the index j of the case to 0
-	foreach_ancestor_start_8792981788591:
-	internal_57 = internal_56 < internal_39 # Check if the case index is less than the count of ancestors
-	IF internal_57 GOTO foreach_ancestor_body_8792981788591
-	GOTO foreach_ancestor_end_8792981788591
-	foreach_ancestor_body_8792981788591:
-	internal_58 = GETINDEX internal_43 internal_56 # Get the j-th ancestor type
-	internal_59 = internal_55 == internal_58 # Compare if the type of the i-th branch is equal to the j-th ancestor
-	IF internal_59 GOTO foreach_ancestor_end_8792981788591 # If the types are equal, we have a match, then we can exit
-	internal_56 = internal_56 + 1 # Increment the ancestor index
-	GOTO foreach_ancestor_start_8792981788591
-	foreach_ancestor_end_8792981788591:
-	SETINDEX internal_49 internal_53 internal_56 # Set the counter of the i-th branch equals to j
+	internal_57 = ALLOCINT 0
+	internal_58 = ALLOCBOOL 0
+	internal_60 = ALLOCINT 0
+	internal_61 = ALLOCBOOL 0
+	internal_63 = ALLOCBOOL 0
+	foreach_type_start_8781702296263:
+	ARG internal_57
+	ARG internal_40
+	internal_58 = CALL function_less_than
+	IF internal_58 GOTO foreach_type_body_8781702296263
+	GOTO foreach_type_end_8781702296263
+	foreach_type_body_8781702296263:
+	internal_59 = GETINDEX internal_49 internal_57 # Get the type of the i-th branch
+	ARG internal_60
+	ARG internal_38
+	internal_60 = CALL function_assign
+	foreach_ancestor_start_8781702296263:
+	ARG internal_60
+	ARG internal_42
+	internal_61 = CALL function_less_than
+	IF internal_61 GOTO foreach_ancestor_body_8781702296263
+	GOTO foreach_ancestor_end_8781702296263
+	foreach_ancestor_body_8781702296263:
+	internal_62 = GETINDEX internal_46 internal_60 # Get the j-th ancestor type
+	internal_63 = EQUALADDR internal_59 internal_62 # Compare if the type of the i-th branch is equal to the j-th ancestor
+	IF internal_63 GOTO foreach_ancestor_end_8781702296263 # If the types are equal, we have a match, then we can exit
+	ARG internal_60
+	ARG internal_39
+	internal_60 = CALL function_add
+	GOTO foreach_ancestor_start_8781702296263
+	foreach_ancestor_end_8781702296263:
+	SETVALUEINDEX internal_50 internal_57 internal_60 # Set the counter of the i-th branch equals to j
 	# #################### #
 	# End of Inner Foreach #
 	# #################### #
 	
-	internal_53 = internal_53 + 1 # Increment type index
-	GOTO foreach_type_start_8792981788591
-	foreach_type_end_8792981788591:
+	ARG internal_57
+	ARG internal_39
+	internal_57 = CALL function_add
+	GOTO foreach_type_start_8781702296263
+	foreach_type_end_8781702296263:
 	# ################# #
 	# End Outer Foreach #
 	# ################# #
@@ -2833,441 +3192,509 @@ function function_main_at_Main{
 	# ######################################## #
 	# Step 4 - Find the minimum ancestor index #
 	# ######################################## #
-	internal_60 = 0 # Initialize the index of the counter array to 0
-	internal_61 = 0 # Initialize the index of the lower counter to 0
-	internal_63 = internal_39 # Initialize the current minimum to `count of ancestors`
-	foreach_min_start_8792981788591:
-	internal_64 = internal_60 < 3 # Check if the index of the lower counter is less than the count of branches
-	IF internal_64 GOTO foreach_min_body_8792981788591
-	GOTO foreach_min_end_8792981788591
-	foreach_min_body_8792981788591:
-	internal_62 = GETINDEX internal_49 internal_60 # Get the nearest ancestor index of the i-th branch type
-	internal_64 = internal_62 < internal_63 # Compare if the nearest ancestor index is less than the current minimum
-	IF internal_64 GOTO update_min_8792981788591
-	GOTO foreach_min_end_8792981788591
-	update_min_8792981788591:
-	internal_63 = internal_62 # Update the current minimum
-	internal_61 = internal_60 # Update the index of the lower counter
-	update_min_end_8792981788591:
-	internal_60 = internal_60 + 1 # Increment the index of the counter array
-	GOTO foreach_min_start_8792981788591
-	foreach_min_end_8792981788591:
+	internal_69 = ALLOCSTR "\n"
+	internal_70 = ALLOCSTR " "
+	internal_64 = ALLOCINT 0
+	internal_65 = ALLOCINT 0
+	internal_66 = ALLOCINT 0
+	internal_67 = ALLOCINT 0
+	internal_68 = ALLOCBOOL 0
+	ARG internal_67
+	ARG internal_42
+	internal_67 = CALL function_assign
+	foreach_min_start_8781702296263:
+	ARG internal_64
+	ARG internal_40
+	internal_68 = CALL function_less_than
+	IF internal_68 GOTO foreach_min_body_8781702296263
+	GOTO foreach_min_end_8781702296263
+	foreach_min_body_8781702296263:
+	internal_66 = GETVALUEINDEX internal_50 internal_64 # Get the nearest ancestor index of the i-th branch type
+	ARG internal_66
+	ARG internal_67
+	internal_68 = CALL function_less_than
+	IF internal_68 GOTO update_min_8781702296263
+	GOTO update_min_end_8781702296263
+	update_min_8781702296263:
+	ARG internal_67
+	ARG internal_66
+	internal_67 = CALL function_assign
+	ARG internal_65
+	ARG internal_64
+	internal_65 = CALL function_assign
+	update_min_end_8781702296263:
+	ARG internal_64
+	ARG internal_39
+	internal_64 = CALL function_add
+	GOTO foreach_min_start_8781702296263
+	foreach_min_end_8781702296263:
 	
 	# ################################################################# #
 	# Step 5 - Using the minimun ancestor index find the correct branch #
 	# ################################################################# #
-	internal_65 = ARRAY 3 # Create the bool array
-	SETINDEX internal_65 0 0 # Initialize the bool array
-	SETINDEX internal_65 1 0 # Initialize the bool array
-	SETINDEX internal_65 2 0 # Initialize the bool array
+	internal_71 = ARRAY internal_40 # Create the bool array
+	internal_72 = ALLOCINT 0
+	SETVALUEINDEX internal_71 internal_72 internal_38 # Initialize the bool array
+	internal_73 = ALLOCINT 1
+	SETVALUEINDEX internal_71 internal_73 internal_38 # Initialize the bool array
+	internal_74 = ALLOCINT 2
+	SETVALUEINDEX internal_71 internal_74 internal_38 # Initialize the bool array
 	
-	internal_66 = internal_61 == internal_39 # Check if the minimum index is equal to the count of ancestors
-	IF internal_66 GOTO error_branch_8792981788591
-	SETINDEX internal_65 internal_61 1 # Set the bool array in the correct index to 1
+	internal_75 = ALLOCBOOL 0
+	ARG internal_67
+	ARG internal_42
+	internal_75 = CALL function_equal
+	IF internal_75 GOTO error_branch_8781702296263
+	SETVALUEINDEX internal_71 internal_65 internal_39 # Set the bool array in the correct index to 1
+	internal_76 = ALLOCBOOL 0
 	
-	internal_67 = GETINDEX internal_65 0 # Get the bool value of the branch C
-	IF internal_67 GOTO branch_C_8792981788591 # If the bool value is 1, then we have a match
+	internal_77 = ALLOCINT 0
+	internal_76 = GETVALUEINDEX internal_71 internal_77 # Get the bool value of the branch C
+	IF internal_76 GOTO branch_C_8781702296263 # If the bool value is 1, then we have a match
 	
-	internal_67 = GETINDEX internal_65 1 # Get the bool value of the branch A
-	IF internal_67 GOTO branch_A_8792981788591 # If the bool value is 1, then we have a match
+	internal_78 = ALLOCINT 1
+	internal_76 = GETVALUEINDEX internal_71 internal_78 # Get the bool value of the branch A
+	IF internal_76 GOTO branch_A_8781702296263 # If the bool value is 1, then we have a match
 	
-	internal_67 = GETINDEX internal_65 2 # Get the bool value of the branch Object
-	IF internal_67 GOTO branch_Object_8792981788591 # If the bool value is 1, then we have a match
+	internal_79 = ALLOCINT 2
+	internal_76 = GETVALUEINDEX internal_71 internal_79 # Get the bool value of the branch Object
+	IF internal_76 GOTO branch_Object_8781702296263 # If the bool value is 1, then we have a match
 	
-	branch_C_8792981788591:
+	branch_C_8781702296263:
 	ARG c
-	internal_70 = VCALL C function_value_at_A
+	ARG internal_37
+	c = CALL function_assign
 	ARG c
-	ARG internal_70
-	internal_71 = VCALL C function_method6_at_C
-	SETATTR self avar internal_71
-	internal_68 = internal_71 # Assign the result
-	GOTO branch_end_8792981788591
-	
-	branch_A_8792981788591:
-	ARG a
-	internal_73 = VCALL A function_value_at_A
-	ARG a
-	ARG internal_73
-	internal_74 = VCALL A function_method3_at_A
-	SETATTR self avar internal_74
-	internal_68 = internal_74 # Assign the result
-	GOTO branch_end_8792981788591
-	
-	branch_Object_8792981788591:
-	internal_76 = ALLOCSTR "Oooops\n"
-	ARG self
-	ARG internal_76
-	internal_77 = VCALL Main function_out_string_at_IO
-	ARG self
-	internal_78 = VCALL Main function_abort_at_Object
-	internal_79 = ALLOCINT 0
-	internal_68 = internal_79 # Assign the result
-	GOTO branch_end_8792981788591
-	
-	error_branch_8792981788591:
-	# Insert an error call
-	branch_end_8792981788591:
-	internal_33 = internal_68
-	GOTO endif_8792981790275
-	
-	else_8792981790275:
-	# Conditional
-	internal_81 = ALLOCBOOL 0
-	internal_82 = GETATTR self char
-	internal_83 = ALLOCSTR "c"
-	
+	internal_82 = VCALL C function_value_at_A
+	ARG c
 	ARG internal_82
+	internal_83 = VCALL C function_method6_at_C
+	
+	SETATTR self avar internal_83
+	ARG internal_80
 	ARG internal_83
-	internal_84 = CALL function_equal
-	internal_81 = internal_84
-	IF internal_81 GOTO then_8792981790269
-	GOTO else_8792981790269
+	internal_80 = CALL function_assign
+	internal_80 = internal_83 # Assign the result
+	GOTO branch_end_8781702296263
 	
-	then_8792981790269:
-	internal_85 = ALLOCATE A # Allocate the object A
-	ARG internal_85 # Pass the instance to the constructor
-	internal_85 = VCALL A function___init___at_A # Call the constructor
-	ARG self
-	internal_86 = VCALL Main function_get_int_at_Main
+	branch_A_8781702296263:
+	ARG a
+	ARG internal_37
+	a = CALL function_assign
+	ARG a
+	internal_85 = VCALL A function_value_at_A
+	ARG a
 	ARG internal_85
+	internal_86 = VCALL A function_method3_at_A
+	
+	SETATTR self avar internal_86
+	ARG internal_80
 	ARG internal_86
-	internal_87 = VCALL A function_set_var_at_A
-	SETATTR self a_var internal_87
-	internal_88 = ALLOCATE D # Allocate the object D
-	ARG internal_88 # Pass the instance to the constructor
-	internal_88 = VCALL D function___init___at_D # Call the constructor
-	internal_89 = GETATTR self avar
-	ARG internal_89
-	internal_90 = VCALL A function_value_at_A
-	internal_91 = GETATTR self a_var
-	ARG internal_91
-	internal_92 = VCALL A function_value_at_A
+	internal_80 = CALL function_assign
+	internal_80 = internal_86 # Assign the result
+	GOTO branch_end_8781702296263
+	
+	branch_Object_8781702296263:
+	ARG o
+	ARG internal_37
+	o = CALL function_assign
+	internal_88 = ALLOCSTR "Oooops\n"
+	ARG self
 	ARG internal_88
-	ARG internal_90
-	ARG internal_92
-	internal_93 = VCALL D function_method4_at_A
-	SETATTR self avar internal_93
-	internal_80 = internal_93
-	GOTO endif_8792981790269
+	internal_89 = VCALL Main function_out_string_at_IO
+	ARG self
+	internal_90 = VCALL Main function_abort_at_Object
+	internal_91 = ALLOCINT 0
+	ARG internal_80
+	ARG internal_91
+	internal_80 = CALL function_assign
+	internal_80 = internal_91 # Assign the result
+	GOTO branch_end_8781702296263
 	
-	else_8792981790269:
+	error_branch_8781702296263:
+	# Insert an error call
+	branch_end_8781702296263:
+	internal_32 = internal_80
+	GOTO endif_8781702298203
+	
+	else_8781702298203:
 	# Conditional
-	internal_95 = ALLOCBOOL 0
-	internal_96 = GETATTR self char
-	internal_97 = ALLOCSTR "d"
+	internal_93 = ALLOCBOOL 0
+	internal_94 = GETATTR self char
+	internal_95 = ALLOCSTR "c"
 	
-	ARG internal_96
+	ARG internal_94
+	ARG internal_95
+	internal_96 = CALL function_equal
+	internal_93 = internal_96
+	IF internal_93 GOTO then_8781702298197
+	GOTO else_8781702298197
+	
+	then_8781702298197:
+	internal_97 = ALLOCATE A # Allocate the object A
+	ARG internal_97 # Pass the instance to the constructor
+	internal_97 = VCALL A function___init___at_A # Call the constructor
+	ARG self
+	internal_98 = VCALL Main function_get_int_at_Main
 	ARG internal_97
-	internal_98 = CALL function_equal
-	internal_95 = internal_98
-	IF internal_95 GOTO then_8792981790263
-	GOTO else_8792981790263
+	ARG internal_98
+	internal_99 = VCALL A function_set_var_at_A
 	
-	then_8792981790263:
-	internal_99 = ALLOCATE C # Allocate the object C
-	ARG internal_99 # Pass the instance to the constructor
-	internal_99 = VCALL C function___init___at_C # Call the constructor
-	internal_100 = GETATTR self avar
-	ARG internal_100
-	internal_101 = VCALL A function_value_at_A
-	ARG internal_99
+	SETATTR self a_var internal_99
+	internal_100 = ALLOCATE D # Allocate the object D
+	ARG internal_100 # Pass the instance to the constructor
+	internal_100 = VCALL D function___init___at_D # Call the constructor
+	internal_101 = GETATTR self avar
 	ARG internal_101
-	internal_102 = VCALL C function_method5_at_C
-	SETATTR self avar internal_102
-	internal_94 = internal_102
-	GOTO endif_8792981790263
+	internal_102 = VCALL A function_value_at_A
+	internal_103 = GETATTR self a_var
+	ARG internal_103
+	internal_104 = VCALL A function_value_at_A
+	ARG internal_100
+	ARG internal_102
+	ARG internal_104
+	internal_105 = VCALL D function_method4_at_A
 	
-	else_8792981790263:
+	SETATTR self avar internal_105
+	internal_92 = internal_105
+	GOTO endif_8781702298197
+	
+	else_8781702298197:
 	# Conditional
-	internal_104 = ALLOCBOOL 0
-	internal_105 = GETATTR self char
-	internal_106 = ALLOCSTR "e"
+	internal_107 = ALLOCBOOL 0
+	internal_108 = GETATTR self char
+	internal_109 = ALLOCSTR "d"
 	
-	ARG internal_105
-	ARG internal_106
-	internal_107 = CALL function_equal
-	internal_104 = internal_107
-	IF internal_104 GOTO then_8792981790257
-	GOTO else_8792981790257
-	
-	then_8792981790257:
-	internal_108 = ALLOCATE C # Allocate the object C
-	ARG internal_108 # Pass the instance to the constructor
-	internal_108 = VCALL C function___init___at_C # Call the constructor
-	internal_109 = GETATTR self avar
-	ARG internal_109
-	internal_110 = VCALL A function_value_at_A
 	ARG internal_108
-	ARG internal_110
-	internal_111 = VCALL C function_method5_at_C
-	SETATTR self avar internal_111
-	internal_103 = internal_111
-	GOTO endif_8792981790257
+	ARG internal_109
+	internal_110 = CALL function_equal
+	internal_107 = internal_110
+	IF internal_107 GOTO then_8781702298191
+	GOTO else_8781702298191
 	
-	else_8792981790257:
+	then_8781702298191:
+	internal_111 = ALLOCATE C # Allocate the object C
+	ARG internal_111 # Pass the instance to the constructor
+	internal_111 = VCALL C function___init___at_C # Call the constructor
+	internal_112 = GETATTR self avar
+	ARG internal_112
+	internal_113 = VCALL A function_value_at_A
+	ARG internal_111
+	ARG internal_113
+	internal_114 = VCALL C function_method5_at_C
+	
+	SETATTR self avar internal_114
+	internal_106 = internal_114
+	GOTO endif_8781702298191
+	
+	else_8781702298191:
 	# Conditional
-	internal_113 = ALLOCBOOL 0
-	internal_114 = GETATTR self char
-	internal_115 = ALLOCSTR "f"
+	internal_116 = ALLOCBOOL 0
+	internal_117 = GETATTR self char
+	internal_118 = ALLOCSTR "e"
 	
-	ARG internal_114
-	ARG internal_115
-	internal_116 = CALL function_equal
-	internal_113 = internal_116
-	IF internal_113 GOTO then_8792981790251
-	GOTO else_8792981790251
-	
-	then_8792981790251:
-	internal_117 = ALLOCATE C # Allocate the object C
-	ARG internal_117 # Pass the instance to the constructor
-	internal_117 = VCALL C function___init___at_C # Call the constructor
-	internal_118 = GETATTR self avar
-	ARG internal_118
-	internal_119 = VCALL A function_value_at_A
 	ARG internal_117
-	ARG internal_119
-	internal_120 = VCALL C function_method5_at_C
-	SETATTR self avar internal_120
-	internal_112 = internal_120
-	GOTO endif_8792981790251
+	ARG internal_118
+	internal_119 = CALL function_equal
+	internal_116 = internal_119
+	IF internal_116 GOTO then_8781702298185
+	GOTO else_8781702298185
 	
-	else_8792981790251:
+	then_8781702298185:
+	internal_120 = ALLOCATE C # Allocate the object C
+	ARG internal_120 # Pass the instance to the constructor
+	internal_120 = VCALL C function___init___at_C # Call the constructor
+	internal_121 = GETATTR self avar
+	ARG internal_121
+	internal_122 = VCALL A function_value_at_A
+	ARG internal_120
+	ARG internal_122
+	internal_123 = VCALL C function_method5_at_C
+	
+	SETATTR self avar internal_123
+	internal_115 = internal_123
+	GOTO endif_8781702298185
+	
+	else_8781702298185:
 	# Conditional
-	internal_122 = ALLOCBOOL 0
-	internal_123 = GETATTR self char
-	internal_124 = ALLOCSTR "g"
+	internal_125 = ALLOCBOOL 0
+	internal_126 = GETATTR self char
+	internal_127 = ALLOCSTR "f"
 	
-	ARG internal_123
-	ARG internal_124
-	internal_125 = CALL function_equal
-	internal_122 = internal_125
-	IF internal_122 GOTO then_8792981790245
-	GOTO else_8792981790245
+	ARG internal_126
+	ARG internal_127
+	internal_128 = CALL function_equal
+	internal_125 = internal_128
+	IF internal_125 GOTO then_8781702298179
+	GOTO else_8781702298179
 	
-	then_8792981790245:
-	# Conditional
-	internal_127 = ALLOCBOOL 0
-	internal_128 = ALLOCATE D # Allocate the object D
-	ARG internal_128 # Pass the instance to the constructor
-	internal_128 = VCALL D function___init___at_D # Call the constructor
-	internal_129 = GETATTR self avar
-	ARG internal_129
-	internal_130 = VCALL A function_value_at_A
-	ARG internal_128
+	then_8781702298179:
+	internal_129 = ALLOCATE C # Allocate the object C
+	ARG internal_129 # Pass the instance to the constructor
+	internal_129 = VCALL C function___init___at_C # Call the constructor
+	internal_130 = GETATTR self avar
 	ARG internal_130
-	internal_131 = VCALL D function_method7_at_D
-	internal_127 = internal_131
-	IF internal_127 GOTO then_8792981789148
-	GOTO else_8792981789148
+	internal_131 = VCALL A function_value_at_A
+	ARG internal_129
+	ARG internal_131
+	internal_132 = VCALL C function_method5_at_C
 	
-	then_8792981789148:
-	internal_132 = ALLOCSTR "number "
-	ARG self
-	ARG internal_132
-	internal_133 = VCALL Main function_out_string_at_IO
-	internal_134 = GETATTR self avar
-	ARG self
-	ARG internal_134
-	internal_135 = VCALL Main function_print_at_Main
-	internal_136 = ALLOCSTR "is divisible by 3.\n"
-	ARG self
-	ARG internal_136
-	internal_137 = VCALL Main function_out_string_at_IO
-	internal_126 = internal_137
-	GOTO endif_8792981789148
+	SETATTR self avar internal_132
+	internal_124 = internal_132
+	GOTO endif_8781702298179
 	
-	else_8792981789148:
-	internal_138 = ALLOCSTR "number "
-	ARG self
-	ARG internal_138
-	internal_139 = VCALL Main function_out_string_at_IO
-	internal_140 = GETATTR self avar
-	ARG self
-	ARG internal_140
-	internal_141 = VCALL Main function_print_at_Main
-	internal_142 = ALLOCSTR "is not divisible by 3.\n"
-	ARG self
-	ARG internal_142
-	internal_143 = VCALL Main function_out_string_at_IO
-	internal_126 = internal_143
-	GOTO endif_8792981789148
-	
-	endif_8792981789148:
-	internal_121 = internal_126
-	GOTO endif_8792981790245
-	
-	else_8792981790245:
+	else_8781702298179:
 	# Conditional
-	internal_145 = ALLOCBOOL 0
-	internal_146 = GETATTR self char
-	internal_147 = ALLOCSTR "h"
+	internal_134 = ALLOCBOOL 0
+	internal_135 = GETATTR self char
+	internal_136 = ALLOCSTR "g"
 	
+	ARG internal_135
+	ARG internal_136
+	internal_137 = CALL function_equal
+	internal_134 = internal_137
+	IF internal_134 GOTO then_8781702298173
+	GOTO else_8781702298173
+	
+	then_8781702298173:
+	# Conditional
+	internal_139 = ALLOCBOOL 0
+	internal_140 = ALLOCATE D # Allocate the object D
+	ARG internal_140 # Pass the instance to the constructor
+	internal_140 = VCALL D function___init___at_D # Call the constructor
+	internal_141 = GETATTR self avar
+	ARG internal_141
+	internal_142 = VCALL A function_value_at_A
+	ARG internal_140
+	ARG internal_142
+	internal_143 = VCALL D function_method7_at_D
+	internal_139 = internal_143
+	IF internal_139 GOTO then_8781702296820
+	GOTO else_8781702296820
+	
+	then_8781702296820:
+	internal_144 = ALLOCSTR "number "
+	ARG self
+	ARG internal_144
+	internal_145 = VCALL Main function_out_string_at_IO
+	internal_146 = GETATTR self avar
+	ARG self
 	ARG internal_146
-	ARG internal_147
-	internal_148 = CALL function_equal
-	internal_145 = internal_148
-	IF internal_145 GOTO then_8792981790239
-	GOTO else_8792981790239
+	internal_147 = VCALL Main function_print_at_Main
+	internal_148 = ALLOCSTR "is divisible by 3.\n"
+	ARG self
+	ARG internal_148
+	internal_149 = VCALL Main function_out_string_at_IO
+	internal_138 = internal_149
+	GOTO endif_8781702296820
 	
-	then_8792981790239:
-	x = NULL
-	internal_150 = ALLOCATE E # Allocate the object E
-	ARG internal_150 # Pass the instance to the constructor
-	internal_150 = VCALL E function___init___at_E # Call the constructor
-	internal_151 = GETATTR self avar
-	ARG internal_151
-	internal_152 = VCALL A function_value_at_A
+	else_8781702296820:
+	internal_150 = ALLOCSTR "number "
+	ARG self
 	ARG internal_150
+	internal_151 = VCALL Main function_out_string_at_IO
+	internal_152 = GETATTR self avar
+	ARG self
 	ARG internal_152
-	internal_153 = VCALL E function_method6_at_E
-	x = internal_153
-	internal_155 = GETATTR self avar
-	ARG internal_155
-	internal_156 = VCALL A function_value_at_A
-	ARG x
-	internal_157 = VCALL A function_value_at_A
-	internal_158 = ALLOCINT 8
+	internal_153 = VCALL Main function_print_at_Main
+	internal_154 = ALLOCSTR "is not divisible by 3.\n"
+	ARG self
+	ARG internal_154
+	internal_155 = VCALL Main function_out_string_at_IO
+	internal_138 = internal_155
+	GOTO endif_8781702296820
 	
-	ARG internal_157
+	endif_8781702296820:
+	internal_133 = internal_138
+	GOTO endif_8781702298173
+	
+	else_8781702298173:
+	# Conditional
+	internal_157 = ALLOCBOOL 0
+	internal_158 = GETATTR self char
+	internal_159 = ALLOCSTR "h"
+	
 	ARG internal_158
-	internal_159 = CALL function_mult
-	
-	ARG internal_156
 	ARG internal_159
-	internal_160 = CALL function_sub
-	r = internal_160
-	internal_161 = ALLOCSTR "number "
-	ARG self
-	ARG internal_161
-	internal_162 = VCALL Main function_out_string_at_IO
+	internal_160 = CALL function_equal
+	internal_157 = internal_160
+	IF internal_157 GOTO then_8781702298167
+	GOTO else_8781702298167
+	
+	then_8781702298167:
+	# Let x: A
+	x = ALLOCNULL
+	internal_162 = ALLOCATE E # Allocate the object E
+	ARG internal_162 # Pass the instance to the constructor
+	internal_162 = VCALL E function___init___at_E # Call the constructor
 	internal_163 = GETATTR self avar
-	ARG self
 	ARG internal_163
-	internal_164 = VCALL Main function_print_at_Main
-	internal_165 = ALLOCSTR "is equal to "
-	ARG self
+	internal_164 = VCALL A function_value_at_A
+	ARG internal_162
+	ARG internal_164
+	internal_165 = VCALL E function_method6_at_E
+	
+	ARG x
 	ARG internal_165
-	internal_166 = VCALL Main function_out_string_at_IO
+	x = CALL function_assign
+	# Let r: Int
+	
+	internal_167 = GETATTR self avar
+	ARG internal_167
+	internal_168 = VCALL A function_value_at_A
+	ARG x
+	internal_169 = VCALL A function_value_at_A
+	internal_170 = ALLOCINT 8
+	
+	ARG internal_169
+	ARG internal_170
+	internal_171 = CALL function_mult
+	
+	ARG internal_168
+	ARG internal_171
+	internal_172 = CALL function_sub
+	ARG r
+	ARG internal_172
+	r = CALL function_assign
+	internal_173 = ALLOCSTR "number "
+	ARG self
+	ARG internal_173
+	internal_174 = VCALL Main function_out_string_at_IO
+	internal_175 = GETATTR self avar
+	ARG self
+	ARG internal_175
+	internal_176 = VCALL Main function_print_at_Main
+	internal_177 = ALLOCSTR "is equal to "
+	ARG self
+	ARG internal_177
+	internal_178 = VCALL Main function_out_string_at_IO
 	ARG self
 	ARG x
-	internal_167 = VCALL Main function_print_at_Main
-	internal_168 = ALLOCSTR "times 8 with a remainder of "
+	internal_179 = VCALL Main function_print_at_Main
+	internal_180 = ALLOCSTR "times 8 with a remainder of "
 	ARG self
-	ARG internal_168
-	internal_169 = VCALL Main function_out_string_at_IO
-	internal_171 = ALLOCATE A2I # Allocate the object A2I
-	ARG internal_171 # Pass the instance to the constructor
-	internal_171 = VCALL A2I function___init___at_A2I # Call the constructor
-	a = internal_171
+	ARG internal_180
+	internal_181 = VCALL Main function_out_string_at_IO
+	# Let a: A2I
+	
+	internal_183 = ALLOCATE A2I # Allocate the object A2I
+	ARG internal_183 # Pass the instance to the constructor
+	internal_183 = VCALL A2I function___init___at_A2I # Call the constructor
+	ARG a
+	ARG internal_183
+	a = CALL function_assign
 	ARG a
 	ARG r
-	internal_172 = VCALL A2I function_i2a_at_A2I
+	internal_184 = VCALL A2I function_i2a_at_A2I
 	ARG self
-	ARG internal_172
-	internal_173 = VCALL Main function_out_string_at_IO
-	internal_174 = ALLOCSTR "\n"
-	ARG self
-	ARG internal_174
-	internal_175 = VCALL Main function_out_string_at_IO
-	SETATTR self avar x
-	internal_144 = x
-	GOTO endif_8792981790239
-	
-	else_8792981790239:
-	# Conditional
-	internal_177 = ALLOCBOOL 0
-	internal_178 = GETATTR self char
-	internal_179 = ALLOCSTR "j"
-	
-	ARG internal_178
-	ARG internal_179
-	internal_180 = CALL function_equal
-	internal_177 = internal_180
-	IF internal_177 GOTO then_8792981790233
-	GOTO else_8792981790233
-	
-	then_8792981790233:
-	internal_181 = ALLOCATE A # Allocate the object A
-	ARG internal_181 # Pass the instance to the constructor
-	internal_181 = VCALL A function___init___at_A # Call the constructor
-	SETATTR self avar internal_181
-	internal_176 = internal_181
-	GOTO endif_8792981790233
-	
-	else_8792981790233:
-	# Conditional
-	internal_183 = ALLOCBOOL 0
-	internal_184 = GETATTR self char
-	internal_185 = ALLOCSTR "q"
-	
 	ARG internal_184
-	ARG internal_185
-	internal_186 = CALL function_equal
-	internal_183 = internal_186
-	IF internal_183 GOTO then_8792981789693
-	GOTO else_8792981789693
+	internal_185 = VCALL Main function_out_string_at_IO
+	internal_186 = ALLOCSTR "\n"
+	ARG self
+	ARG internal_186
+	internal_187 = VCALL Main function_out_string_at_IO
 	
-	then_8792981789693:
-	internal_187 = ALLOCBOOL 0
-	SETATTR self flag internal_187
-	internal_182 = internal_187
-	GOTO endif_8792981789693
+	SETATTR self avar x
+	internal_156 = x
+	GOTO endif_8781702298167
 	
-	else_8792981789693:
-	internal_188 = ALLOCATE A # Allocate the object A
-	ARG internal_188 # Pass the instance to the constructor
-	internal_188 = VCALL A function___init___at_A # Call the constructor
-	internal_189 = GETATTR self avar
-	ARG internal_189
-	internal_190 = VCALL A function_value_at_A
-	ARG internal_188
+	else_8781702298167:
+	# Conditional
+	internal_189 = ALLOCBOOL 0
+	internal_190 = GETATTR self char
+	internal_191 = ALLOCSTR "j"
+	
 	ARG internal_190
-	internal_191 = VCALL A function_method1_at_A
-	SETATTR self avar internal_191
-	internal_182 = internal_191
-	GOTO endif_8792981789693
+	ARG internal_191
+	internal_192 = CALL function_equal
+	internal_189 = internal_192
+	IF internal_189 GOTO then_8781702298161
+	GOTO else_8781702298161
 	
-	endif_8792981789693:
-	internal_176 = internal_182
-	GOTO endif_8792981790233
+	then_8781702298161:
+	internal_193 = ALLOCATE A # Allocate the object A
+	ARG internal_193 # Pass the instance to the constructor
+	internal_193 = VCALL A function___init___at_A # Call the constructor
 	
-	endif_8792981790233:
-	internal_144 = internal_176
-	GOTO endif_8792981790239
+	SETATTR self avar internal_193
+	internal_188 = internal_193
+	GOTO endif_8781702298161
 	
-	endif_8792981790239:
-	internal_121 = internal_144
-	GOTO endif_8792981790245
+	else_8781702298161:
+	# Conditional
+	internal_195 = ALLOCBOOL 0
+	internal_196 = GETATTR self char
+	internal_197 = ALLOCSTR "q"
 	
-	endif_8792981790245:
-	internal_112 = internal_121
-	GOTO endif_8792981790251
+	ARG internal_196
+	ARG internal_197
+	internal_198 = CALL function_equal
+	internal_195 = internal_198
+	IF internal_195 GOTO then_8781702298137
+	GOTO else_8781702298137
 	
-	endif_8792981790251:
-	internal_103 = internal_112
-	GOTO endif_8792981790257
+	then_8781702298137:
+	internal_199 = ALLOCBOOL 0
 	
-	endif_8792981790257:
-	internal_94 = internal_103
-	GOTO endif_8792981790263
+	SETATTR self flag internal_199
+	internal_194 = internal_199
+	GOTO endif_8781702298137
 	
-	endif_8792981790263:
-	internal_80 = internal_94
-	GOTO endif_8792981790269
+	else_8781702298137:
+	internal_200 = ALLOCATE A # Allocate the object A
+	ARG internal_200 # Pass the instance to the constructor
+	internal_200 = VCALL A function___init___at_A # Call the constructor
+	internal_201 = GETATTR self avar
+	ARG internal_201
+	internal_202 = VCALL A function_value_at_A
+	ARG internal_200
+	ARG internal_202
+	internal_203 = VCALL A function_method1_at_A
 	
-	endif_8792981790269:
-	internal_33 = internal_80
-	GOTO endif_8792981790275
+	SETATTR self avar internal_203
+	internal_194 = internal_203
+	GOTO endif_8781702298137
 	
-	endif_8792981790275:
-	internal_19 = internal_33
-	GOTO endif_8792981790281
+	endif_8781702298137:
+	internal_188 = internal_194
+	GOTO endif_8781702298161
 	
-	endif_8792981790281:
-	GOTO while_start_8792981790296
+	endif_8781702298161:
+	internal_156 = internal_188
+	GOTO endif_8781702298167
 	
-	while_end_8792981790296:
+	endif_8781702298167:
+	internal_133 = internal_156
+	GOTO endif_8781702298173
+	
+	endif_8781702298173:
+	internal_124 = internal_133
+	GOTO endif_8781702298179
+	
+	endif_8781702298179:
+	internal_115 = internal_124
+	GOTO endif_8781702298185
+	
+	endif_8781702298185:
+	internal_106 = internal_115
+	GOTO endif_8781702298191
+	
+	endif_8781702298191:
+	internal_92 = internal_106
+	GOTO endif_8781702298197
+	
+	endif_8781702298197:
+	internal_32 = internal_92
+	GOTO endif_8781702298203
+	
+	endif_8781702298203:
+	internal_18 = internal_32
+	GOTO endif_8781702298209
+	
+	endif_8781702298209:
+	GOTO while_start_8781702298224
+	
+	while_end_8781702298224:
 	
 	RETURN 0
 }

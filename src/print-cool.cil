@@ -49,8 +49,6 @@ type Bool {
 type Main {
 	inherits from IO
 
-	attribute m_main
-
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -361,28 +359,64 @@ function function_substr_at_String{
 }
 function function___init___at_Main{
 	PARAM self
-
-	LOCAL internal_0 # Null
-
-	internal_0 = ALLOCNULL
-	
-	SETATTR self m_main internal_0
 	
 	RETURN self
 }
 function function_main_at_Main{
 	PARAM self
 
-	LOCAL internal_0
+	LOCAL internal_0 # Store an instance of the class Object
 	LOCAL internal_1
+	LOCAL internal_2 # Integer 4
+	LOCAL internal_3 # Integer 1
+	LOCAL internal_4
+	LOCAL internal_5
+	LOCAL internal_6 # Null pointer
+	LOCAL internal_7 # Store if self is NULL
+	LOCAL internal_8
+	LOCAL internal_9 # Integer 1
+	LOCAL internal_10 # Integer 3
+	LOCAL internal_11
+	LOCAL internal_12
+	LOCAL internal_13 # String "\n"
+	LOCAL internal_14
 
-	ARG self
-	internal_0 = VCALL Main function_in_string_at_IO
-	ARG self
+	internal_0 = ALLOCATE Object # Allocate the object Object
+	ARG internal_0 # Pass the instance to the constructor
+	internal_0 = VCALL Object function___init___at_Object # Call the constructor
 	ARG internal_0
-	internal_1 = VCALL Main function_out_string_at_IO
+	internal_1 = VCALL Object function_type_name_at_Object
+	internal_2 = ALLOCINT 4
+	internal_3 = ALLOCINT 1
+	ARG internal_1
+	ARG internal_2
+	ARG internal_3
+	internal_4 = VCALL String function_substr_at_String
+	ARG self
+	ARG internal_4
+	internal_5 = VCALL Main function_out_string_at_IO
+	internal_7 = ALLOCBOOL 0
+	internal_6 = ALLOCNULL
+	ARG self
+	ARG self
+	internal_7 = CALL function_equal
+	ARG internal_7
+	internal_8 = VCALL Bool function_type_name_at_Object
+	internal_9 = ALLOCINT 1
+	internal_10 = ALLOCINT 3
+	ARG internal_8
+	ARG internal_9
+	ARG internal_10
+	internal_11 = VCALL String function_substr_at_String
+	ARG internal_5
+	ARG internal_11
+	internal_12 = VCALL Main function_out_string_at_IO
+	internal_13 = ALLOCSTR "\n"
+	ARG self
+	ARG internal_13
+	internal_14 = VCALL Main function_out_string_at_IO
 	
-	RETURN internal_1
+	RETURN internal_14
 }
 function main{
 	

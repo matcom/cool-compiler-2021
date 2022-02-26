@@ -53,36 +53,17 @@ class Point3D inherits Point {
 *)
 
 class Main inherits IO {
+    m_main: Main;
+
     main() : Object {
-        -- out_string("Hello, World!\n")
-        out_int((2 + 2) * 2)
+        -- case 1 of
+        --     x: Int => {
+        --         out_int(x);
+        --         out_string(" is Int\n");
+        --     };
+        --     y: Bool => out_string("is Bool\n");
+        --     z: Object => out_string("is Object\n");
+        -- esac
+        out_string(in_string())
     };
-
---     plus(a: Int, b: Int) : Int {
---         a + b
---     };
-
---     minus(a: Int, b: Int) : Int {
---         a - b
---     };
-
---     mult(a: Int, b: Int) : Int {
---         a * b
---     };
-
---     div(a: Int, b: Int) : Int {
---         a / b
---     };
-
---     equals(a: Bool, b: Bool) : Bool {
---         a = b
---     };
-
---     less(a: Int, b: Int) : Bool {
---         a < b
---     };
-    
---     less_equals(a: Int, b: Int) : Bool {
---         a <= b
---     };
 };

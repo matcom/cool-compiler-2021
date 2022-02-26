@@ -39,8 +39,8 @@ class PositionAssigner:
         """
         token = self.tokens[self.position]
         assert (
-            token.lex == "class"
-        ), f'Expected "class" instead of "{token.lex}" in {node.id}'
+            token.lex.lower() == "class"
+        ), f'{token.line, token.column} Expected "class" instead of "{token.lex}" in {node.id}'
 
         token = self.tokens[self.position + 1]
         node.set_main_position(token.line, token.column)
@@ -182,6 +182,8 @@ class PositionAssigner:
         *
         { block }
         """
+        self._skip_open_parentheses()
+
         token = self.tokens[self.position]
         assert token.lex == "{", f'{token.line, token.column} Expected "{{" instead of "{token.lex}" in block'
 
@@ -206,6 +208,7 @@ class PositionAssigner:
         ), f'Expected "}}" instead of "{token.lex}" at the end of a block'
 
         self.inc_position()  # ends after `}`
+        self._skip_closed_parentheses()
 
     @visitor.when(ast.ConditionalNode)
     def visit(self, node: ast.ConditionalNode):

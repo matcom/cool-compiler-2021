@@ -1,0 +1,623 @@
+.TYPES
+type Object {
+	inherits from null
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Object
+}
+type IO {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init__: function___init___at_IO
+}
+type Int {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Int
+}
+type String {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method length: function_length_at_String
+	method concat: function_concat_at_String
+	method substr: function_substr_at_String
+	method __init__: function___init___at_String
+}
+type Bool {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Bool
+}
+type Main {
+	inherits from IO
+
+	attribute out
+	attribute testee
+	attribute divisor
+	attribute stop
+	attribute m
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method main: function_main_at_Main
+	method __init__: function___init___at_Main
+}
+
+.DATA
+
+
+.CODE
+function function_add{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Adding result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a + b
+	
+	RETURN internal_0
+}
+function function_sub{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Substracting result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a - b
+	
+	RETURN internal_0
+}
+function function_mult{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Multiting result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a * b
+	
+	RETURN internal_0
+}
+function function_div{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Dividing result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a / b
+	
+	RETURN internal_0
+}
+function function_xor{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Xor result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = XOR a b
+	
+	RETURN internal_0
+}
+function function_less_than{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Less than result
+
+	internal_0 = ALLOCBOOL 0
+	internal_0 = a < b
+	
+	RETURN internal_0
+}
+function function_less_than_or_equal{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Less than or equal result
+
+	internal_0 = ALLOCBOOL 0
+	internal_0 = a <= b
+	
+	RETURN internal_0
+}
+function function_equal{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Equal result
+	LOCAL internal_1 # Type of a
+	LOCAL internal_2 # Type Int
+	LOCAL internal_3 # Type Bool
+	LOCAL internal_4 # Type String
+	LOCAL internal_5 # Type of a equals int
+	LOCAL internal_6 # Type of a equals bool
+	LOCAL internal_7 # Type of a equals string
+
+	internal_0 = ALLOCBOOL 0
+	internal_1 = TYPEOF a
+	internal_2 = TYPEADDR Int
+	internal_3 = TYPEADDR Bool
+	internal_4 = TYPEADDR String
+	internal_5 = ALLOCBOOL 0
+	internal_6 = ALLOCBOOL 0
+	internal_7 = ALLOCBOOL 0
+	internal_5 = EQUALADDR internal_1 internal_2
+	internal_6 = EQUALADDR internal_1 internal_3
+	internal_7 = EQUALADDR internal_1 internal_4
+	
+	IF internal_5 GOTO a_is_type_int_or_bool
+	IF internal_6 GOTO a_is_type_int_or_bool
+	IF internal_7 GOTO a_is_type_string
+	GOTO a_is_type_object
+	
+	a_is_type_int_or_bool:
+	internal_0 = EQUALINT a b
+	GOTO end_of_equal
+	
+	a_is_type_string:
+	internal_0 = EQUALSTR a b
+	GOTO end_of_equal
+	
+	a_is_type_object:
+	internal_0 = a == b
+	GOTO end_of_equal
+	
+	end_of_equal:
+	
+	RETURN internal_0
+}
+function function_assign{
+	PARAM dest
+	PARAM source
+
+	LOCAL internal_0 # Type of source
+	LOCAL internal_1 # Type Int
+	LOCAL internal_2 # Type Bool
+	LOCAL internal_3 # Type of source equals int
+	LOCAL internal_4 # Type of source equals bool
+
+	internal_0 = TYPEOF source
+	internal_1 = TYPEADDR Int
+	internal_2 = TYPEADDR Bool
+	internal_3 = ALLOCBOOL 0
+	internal_4 = ALLOCBOOL 0
+	internal_3 = EQUALADDR internal_1 internal_1
+	internal_4 = EQUALADDR internal_1 internal_2
+	
+	IF internal_3 GOTO source_is_type_int_or_bool
+	IF internal_4 GOTO source_is_type_int_or_bool
+	GOTO source_is_type_object
+	
+	source_is_type_int_or_bool:
+	dest = INT source
+	GOTO source_end_of_equal
+	
+	source_is_type_object:
+	dest = source
+	GOTO source_end_of_equal
+	
+	source_end_of_equal:
+	
+	RETURN dest
+}
+function function___init___at_Object{
+	PARAM self
+	
+	RETURN self
+}
+function function_abort_at_Object{
+	PARAM self
+
+	LOCAL internal_0 # Message
+	LOCAL internal_1 # Message
+	LOCAL internal_2 # Endl
+	LOCAL internal_3 # Message
+
+	internal_0 = ALLOCSTR "Abort in "
+	internal_2 = ALLOCSTR "\n"
+	ARG self
+	internal_1 = VCALL String function_type_name_at_Object
+	ARG internal_0
+	ARG internal_1
+	internal_3 = VCALL String function_concat_at_String
+	ARG internal_3
+	ARG internal_2
+	internal_3 = VCALL String function_concat_at_String
+	PRINTSTR internal_3
+	HALT
+	
+	RETURN self
+}
+function function_type_name_at_Object{
+	PARAM self
+
+	LOCAL internal_0 # type_name
+
+	internal_0 = TYPENAME self
+	
+	RETURN internal_0
+}
+function function_copy_at_Object{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = COPY self
+	
+	RETURN internal_0
+}
+function function___init___at_IO{
+	PARAM self
+	
+	RETURN self
+}
+function function_out_string_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTSTR x
+	
+	RETURN self
+}
+function function_out_int_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTINT x
+	
+	RETURN self
+}
+function function_in_string_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	READSTR internal_0
+	
+	RETURN internal_0
+}
+function function_in_int_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = ALLOCINT 0
+	READINT internal_0
+	
+	RETURN internal_0
+}
+function function___init___at_String{
+	PARAM self
+	
+	RETURN self
+}
+function function_length_at_String{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = LENGTH self
+	
+	RETURN internal_0
+}
+function function_concat_at_String{
+	PARAM self
+	PARAM s
+
+	LOCAL internal_0
+
+	internal_0 = CONCAT self s
+	
+	RETURN internal_0
+}
+function function_substr_at_String{
+	PARAM self
+	PARAM i
+	PARAM l
+
+	LOCAL internal_0
+
+	internal_0 = SUBSTRING self i l
+	
+	RETURN internal_0
+}
+function function___init___at_Main{
+	PARAM self
+
+	LOCAL internal_0 # String "2 is trivially prime.\n"
+	LOCAL internal_1
+	LOCAL internal_2 # Integer 2
+	LOCAL internal_3
+	LOCAL internal_4 # Integer 0
+	LOCAL internal_5 # Integer 500
+	LOCAL internal_6 # Boolean true
+	LOCAL internal_7
+	LOCAL internal_8 # Integer 1
+	LOCAL internal_9 # Store the result of the operation function_add
+	LOCAL internal_10 # Integer 2
+	LOCAL internal_11
+	LOCAL internal_12
+	LOCAL internal_13
+	LOCAL internal_14
+	LOCAL internal_15
+	LOCAL internal_16 # Store the result of the operation function_mult
+	LOCAL internal_17 # Store the result of the operation function_less_than
+	LOCAL internal_18 # Boolean false
+	LOCAL internal_19
+	LOCAL internal_20
+	LOCAL internal_21
+	LOCAL internal_22
+	LOCAL internal_23
+	LOCAL internal_24
+	LOCAL internal_25 # Store the result of the operation function_div
+	LOCAL internal_26 # Store the result of the operation function_mult
+	LOCAL internal_27 # Store the result of the operation function_sub
+	LOCAL internal_28 # Integer 0
+	LOCAL internal_29 # Store the result of the operation function_equal
+	LOCAL internal_30 # Boolean false
+	LOCAL internal_31 # Boolean true
+	LOCAL internal_32
+	LOCAL internal_33 # Integer 1
+	LOCAL internal_34 # Store the result of the operation function_add
+	LOCAL internal_35
+	LOCAL internal_36
+	LOCAL internal_37
+	LOCAL internal_38
+	LOCAL internal_39
+	LOCAL internal_40 # Store the result of the operation function_mult
+	LOCAL internal_41 # Store the result of the operation function_less_than
+	LOCAL internal_42
+	LOCAL internal_43
+	LOCAL internal_44
+	LOCAL internal_45 # String " is prime.\n"
+	LOCAL internal_46
+	LOCAL internal_47 # Integer 0
+	LOCAL internal_48
+	LOCAL internal_49
+	LOCAL internal_50
+	LOCAL internal_51
+	LOCAL internal_52 # Store the result of the operation function_less_than_or_equal
+	LOCAL internal_53 # String "halt"
+	LOCAL internal_54
+	LOCAL internal_55 # String "continue"
+
+	internal_0 = ALLOCSTR "2 is trivially prime.\n"
+	ARG self
+	ARG internal_0
+	internal_1 = VCALL Main function_out_string_at_IO
+	internal_2 = ALLOCINT 2
+	
+	SETATTR self out internal_2
+	internal_3 = GETATTR self out
+	
+	SETATTR self testee internal_3
+	internal_4 = ALLOCINT 0
+	
+	SETATTR self divisor internal_4
+	internal_5 = ALLOCINT 500
+	
+	SETATTR self stop internal_5
+	
+	# While loop
+	while_start_8783432246748:
+	internal_6 = ALLOCBOOL 1
+	IF internal_6 GOTO while_body_8783432246748
+	GOTO while_end_8783432246748
+	
+	while_body_8783432246748:
+	internal_7 = GETATTR self testee
+	internal_8 = ALLOCINT 1
+	
+	ARG internal_7
+	ARG internal_8
+	internal_9 = CALL function_add
+	
+	SETATTR self testee internal_9
+	internal_10 = ALLOCINT 2
+	
+	SETATTR self divisor internal_10
+	
+	# While loop
+	while_start_8783432246616:
+	# Conditional
+	internal_12 = ALLOCBOOL 0
+	internal_13 = GETATTR self testee
+	internal_14 = GETATTR self divisor
+	internal_15 = GETATTR self divisor
+	
+	ARG internal_14
+	ARG internal_15
+	internal_16 = CALL function_mult
+	
+	ARG internal_13
+	ARG internal_16
+	internal_17 = CALL function_less_than
+	internal_12 = internal_17
+	IF internal_12 GOTO then_8783432246592
+	GOTO else_8783432246592
+	
+	then_8783432246592:
+	internal_18 = ALLOCBOOL 0
+	internal_11 = internal_18
+	GOTO endif_8783432246592
+	
+	else_8783432246592:
+	# Conditional
+	internal_20 = ALLOCBOOL 0
+	internal_21 = GETATTR self testee
+	internal_22 = GETATTR self divisor
+	internal_23 = GETATTR self testee
+	internal_24 = GETATTR self divisor
+	
+	ARG internal_23
+	ARG internal_24
+	internal_25 = CALL function_div
+	
+	ARG internal_22
+	ARG internal_25
+	internal_26 = CALL function_mult
+	
+	ARG internal_21
+	ARG internal_26
+	internal_27 = CALL function_sub
+	internal_28 = ALLOCINT 0
+	
+	ARG internal_27
+	ARG internal_28
+	internal_29 = CALL function_equal
+	internal_20 = internal_29
+	IF internal_20 GOTO then_8783432246586
+	GOTO else_8783432246586
+	
+	then_8783432246586:
+	internal_30 = ALLOCBOOL 0
+	internal_19 = internal_30
+	GOTO endif_8783432246586
+	
+	else_8783432246586:
+	internal_31 = ALLOCBOOL 1
+	internal_19 = internal_31
+	GOTO endif_8783432246586
+	
+	endif_8783432246586:
+	internal_11 = internal_19
+	GOTO endif_8783432246592
+	
+	endif_8783432246592:
+	IF internal_11 GOTO while_body_8783432246616
+	GOTO while_end_8783432246616
+	
+	while_body_8783432246616:
+	internal_32 = GETATTR self divisor
+	internal_33 = ALLOCINT 1
+	
+	ARG internal_32
+	ARG internal_33
+	internal_34 = CALL function_add
+	
+	SETATTR self divisor internal_34
+	GOTO while_start_8783432246616
+	
+	while_end_8783432246616:
+	# Conditional
+	internal_36 = ALLOCBOOL 0
+	internal_37 = GETATTR self testee
+	internal_38 = GETATTR self divisor
+	internal_39 = GETATTR self divisor
+	
+	ARG internal_38
+	ARG internal_39
+	internal_40 = CALL function_mult
+	
+	ARG internal_37
+	ARG internal_40
+	internal_41 = CALL function_less_than
+	internal_36 = internal_41
+	IF internal_36 GOTO then_8783432246682
+	GOTO else_8783432246682
+	
+	then_8783432246682:
+	internal_42 = GETATTR self testee
+	
+	SETATTR self out internal_42
+	internal_43 = GETATTR self out
+	ARG self
+	ARG internal_43
+	internal_44 = VCALL Main function_out_int_at_IO
+	internal_45 = ALLOCSTR " is prime.\n"
+	ARG self
+	ARG internal_45
+	internal_46 = VCALL Main function_out_string_at_IO
+	internal_35 = internal_46
+	GOTO endif_8783432246682
+	
+	else_8783432246682:
+	internal_47 = ALLOCINT 0
+	internal_35 = internal_47
+	GOTO endif_8783432246682
+	
+	endif_8783432246682:
+	# Conditional
+	internal_49 = ALLOCBOOL 0
+	internal_50 = GETATTR self stop
+	internal_51 = GETATTR self testee
+	
+	ARG internal_50
+	ARG internal_51
+	internal_52 = CALL function_less_than_or_equal
+	internal_49 = internal_52
+	IF internal_49 GOTO then_8783432246730
+	GOTO else_8783432246730
+	
+	then_8783432246730:
+	internal_53 = ALLOCSTR "halt"
+	ARG internal_53
+	internal_54 = VCALL String function_abort_at_Object
+	internal_48 = internal_54
+	GOTO endif_8783432246730
+	
+	else_8783432246730:
+	internal_55 = ALLOCSTR "continue"
+	internal_48 = internal_55
+	GOTO endif_8783432246730
+	
+	endif_8783432246730:
+	GOTO while_start_8783432246748
+	
+	while_end_8783432246748:
+	
+	SETATTR self m 0
+	
+	RETURN self
+}
+function function_main_at_Main{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+
+	internal_0 = ALLOCINT 0
+	
+	RETURN internal_0
+}
+function main{
+	
+
+	LOCAL internal_0
+	LOCAL internal_1
+
+	internal_0 = ALLOCATE Main
+	ARG internal_0
+	internal_0 = VCALL Main function___init___at_Main
+	
+	ARG internal_0
+	internal_1 = VCALL Main function_main_at_Main
+	
+	HALT
+}

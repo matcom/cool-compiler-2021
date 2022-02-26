@@ -49,8 +49,6 @@ type Bool {
 type Main {
 	inherits from IO
 
-	attribute m_main
-
 	method abort: function_abort_at_Object
 	method type_name: function_type_name_at_Object
 	method copy: function_copy_at_Object
@@ -60,6 +58,26 @@ type Main {
 	method in_int: function_in_int_at_IO
 	method main: function_main_at_Main
 	method __init__: function___init___at_Main
+}
+type Complex {
+	inherits from IO
+
+	attribute x
+	attribute y
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method init: function_init_at_Complex
+	method print: function_print_at_Complex
+	method reflect_0: function_reflect_0_at_Complex
+	method reflect_X: function_reflect_X_at_Complex
+	method reflect_Y: function_reflect_Y_at_Complex
+	method __init__: function___init___at_Complex
 }
 
 .DATA
@@ -361,28 +379,283 @@ function function_substr_at_String{
 }
 function function___init___at_Main{
 	PARAM self
-
-	LOCAL internal_0 # Null
-
-	internal_0 = ALLOCNULL
-	
-	SETATTR self m_main internal_0
 	
 	RETURN self
 }
 function function_main_at_Main{
 	PARAM self
 
+	LOCAL c
+	LOCAL internal_1 # Store an instance of the class Complex
+	LOCAL internal_2 # Integer 1
+	LOCAL internal_3 # Integer 1
+	LOCAL internal_4
+	LOCAL internal_5
+	LOCAL internal_6
+	LOCAL internal_7
+	LOCAL internal_8
+	LOCAL internal_9
+	LOCAL internal_10 # Store the result of the operation function_equal
+	LOCAL internal_11 # String "=)\n"
+	LOCAL internal_12
+	LOCAL internal_13 # String "=(\n"
+	LOCAL internal_14
+
+	# Let c: Complex
+	
+	internal_1 = ALLOCATE Complex # Allocate the object Complex
+	ARG internal_1 # Pass the instance to the constructor
+	internal_1 = VCALL Complex function___init___at_Complex # Call the constructor
+	internal_2 = ALLOCINT 1
+	internal_3 = ALLOCINT 1
+	ARG internal_1
+	ARG internal_2
+	ARG internal_3
+	internal_4 = VCALL Complex function_init_at_Complex
+	ARG c
+	ARG internal_4
+	c = CALL function_assign
+	# Conditional
+	internal_6 = ALLOCBOOL 0
+	ARG c
+	internal_7 = VCALL Complex function_reflect_X_at_Complex
+	ARG internal_7
+	internal_8 = VCALL Complex function_reflect_Y_at_Complex
+	ARG c
+	internal_9 = VCALL Complex function_reflect_0_at_Complex
+	
+	ARG internal_8
+	ARG internal_9
+	internal_10 = CALL function_equal
+	internal_6 = internal_10
+	IF internal_6 GOTO then_8741814694660
+	GOTO else_8741814694660
+	
+	then_8741814694660:
+	internal_11 = ALLOCSTR "=)\n"
+	ARG self
+	ARG internal_11
+	internal_12 = VCALL Main function_out_string_at_IO
+	internal_5 = internal_12
+	GOTO endif_8741814694660
+	
+	else_8741814694660:
+	internal_13 = ALLOCSTR "=(\n"
+	ARG self
+	ARG internal_13
+	internal_14 = VCALL Main function_out_string_at_IO
+	internal_5 = internal_14
+	GOTO endif_8741814694660
+	
+	endif_8741814694660:
+	
+	RETURN internal_5
+}
+function function___init___at_Complex{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+	LOCAL internal_1 # Integer 0
+
+	internal_0 = ALLOCINT 0
+	
+	SETATTR self x internal_0
+	internal_1 = ALLOCINT 0
+	
+	SETATTR self y internal_1
+	
+	RETURN self
+}
+function function_init_at_Complex{
+	PARAM self
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0
+	LOCAL internal_1 # Store the result of the operation function_equal
+	LOCAL internal_2
+	LOCAL internal_3 # Store the result of the operation function_equal
+
+	internal_0 = GETATTR self x
+	
+	ARG internal_0
+	ARG a
+	internal_1 = CALL function_equal
+	internal_2 = GETATTR self y
+	
+	ARG internal_2
+	ARG b
+	internal_3 = CALL function_equal
+	
+	RETURN self
+}
+function function_print_at_Complex{
+	PARAM self
+
 	LOCAL internal_0
 	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3 # Integer 0
+	LOCAL internal_4 # Store the result of the operation function_equal
+	LOCAL internal_5
+	LOCAL internal_6
+	LOCAL internal_7
+	LOCAL internal_8
+	LOCAL internal_9 # String "+"
+	LOCAL internal_10
+	LOCAL internal_11
+	LOCAL internal_12
+	LOCAL internal_13 # String "I"
+	LOCAL internal_14
 
-	ARG self
-	internal_0 = VCALL Main function_in_string_at_IO
-	ARG self
-	ARG internal_0
-	internal_1 = VCALL Main function_out_string_at_IO
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	internal_2 = GETATTR self y
+	internal_3 = ALLOCINT 0
 	
-	RETURN internal_1
+	ARG internal_2
+	ARG internal_3
+	internal_4 = CALL function_equal
+	internal_1 = internal_4
+	IF internal_1 GOTO then_8741814694807
+	GOTO else_8741814694807
+	
+	then_8741814694807:
+	internal_5 = GETATTR self x
+	ARG self
+	ARG internal_5
+	internal_6 = VCALL Complex function_out_int_at_IO
+	internal_0 = internal_6
+	GOTO endif_8741814694807
+	
+	else_8741814694807:
+	internal_7 = GETATTR self x
+	ARG self
+	ARG internal_7
+	internal_8 = VCALL Complex function_out_int_at_IO
+	internal_9 = ALLOCSTR "+"
+	ARG internal_8
+	ARG internal_9
+	internal_10 = VCALL Complex function_out_string_at_IO
+	internal_11 = GETATTR self y
+	ARG internal_10
+	ARG internal_11
+	internal_12 = VCALL Complex function_out_int_at_IO
+	internal_13 = ALLOCSTR "I"
+	ARG internal_12
+	ARG internal_13
+	internal_14 = VCALL Complex function_out_string_at_IO
+	internal_0 = internal_14
+	GOTO endif_8741814694807
+	
+	endif_8741814694807:
+	
+	RETURN internal_0
+}
+function function_reflect_0_at_Complex{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # Integer 1
+	LOCAL internal_3 # Integer 4294967295
+	LOCAL internal_4 # Store the complement a2 of internal_1
+	LOCAL internal_5 # Store the result of the operation function_equal
+	LOCAL internal_6
+	LOCAL internal_7
+	LOCAL internal_8 # Integer 1
+	LOCAL internal_9 # Integer 4294967295
+	LOCAL internal_10 # Store the complement a2 of internal_7
+	LOCAL internal_11 # Store the result of the operation function_equal
+
+	internal_0 = GETATTR self x
+	internal_1 = GETATTR self x
+	internal_2 = ALLOCINT 1
+	internal_3 = ALLOCINT 4294967295
+	internal_4 = ALLOCINT 0
+	ARG internal_1
+	ARG internal_3
+	internal_4 = CALL function_xor
+	ARG internal_4
+	ARG internal_2
+	internal_4 = CALL function_add
+	
+	ARG internal_0
+	ARG internal_4
+	internal_5 = CALL function_equal
+	internal_6 = GETATTR self y
+	internal_7 = GETATTR self y
+	internal_8 = ALLOCINT 1
+	internal_9 = ALLOCINT 4294967295
+	internal_10 = ALLOCINT 0
+	ARG internal_7
+	ARG internal_9
+	internal_10 = CALL function_xor
+	ARG internal_10
+	ARG internal_8
+	internal_10 = CALL function_add
+	
+	ARG internal_6
+	ARG internal_10
+	internal_11 = CALL function_equal
+	
+	RETURN self
+}
+function function_reflect_X_at_Complex{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # Integer 1
+	LOCAL internal_3 # Integer 4294967295
+	LOCAL internal_4 # Store the complement a2 of internal_1
+	LOCAL internal_5 # Store the result of the operation function_equal
+
+	internal_0 = GETATTR self y
+	internal_1 = GETATTR self y
+	internal_2 = ALLOCINT 1
+	internal_3 = ALLOCINT 4294967295
+	internal_4 = ALLOCINT 0
+	ARG internal_1
+	ARG internal_3
+	internal_4 = CALL function_xor
+	ARG internal_4
+	ARG internal_2
+	internal_4 = CALL function_add
+	
+	ARG internal_0
+	ARG internal_4
+	internal_5 = CALL function_equal
+	
+	RETURN self
+}
+function function_reflect_Y_at_Complex{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # Integer 1
+	LOCAL internal_3 # Integer 4294967295
+	LOCAL internal_4 # Store the complement a2 of internal_1
+	LOCAL internal_5 # Store the result of the operation function_equal
+
+	internal_0 = GETATTR self x
+	internal_1 = GETATTR self x
+	internal_2 = ALLOCINT 1
+	internal_3 = ALLOCINT 4294967295
+	internal_4 = ALLOCINT 0
+	ARG internal_1
+	ARG internal_3
+	internal_4 = CALL function_xor
+	ARG internal_4
+	ARG internal_2
+	internal_4 = CALL function_add
+	
+	ARG internal_0
+	ARG internal_4
+	internal_5 = CALL function_equal
+	
+	RETURN self
 }
 function main{
 	

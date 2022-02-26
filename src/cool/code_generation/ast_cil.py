@@ -71,6 +71,12 @@ class AssignNode(InstructionNode):
         self.source: str = source
 
 
+class AssignIntNode(InstructionNode):
+    def __init__(self, dest: str, source: str):
+        self.dest: str = dest
+        self.source: str = source
+
+
 class ArithmeticNode(InstructionNode):
     def __init__(self, dest: str, left: str, right: str):
         self.dest: str = dest
@@ -111,7 +117,7 @@ class XorNode(ArithmeticNode):
     pass
 
 
-class GetAttribNode(InstructionNode):
+class GetAttributeNode(InstructionNode):
     def __init__(self, dest: str, instance: str, attr: str, attr_index: int) -> None:
         self.dest: str = dest
         self.instance: str = instance
@@ -140,6 +146,21 @@ class SetIndexNode(InstructionNode):
         self.source: str = source
 
 
+class GetValueInIndexNode(InstructionNode):
+    def __init__(self, dest: str, instance: str, index: str) -> None:
+        self.dest: str = dest
+        self.instance: str = instance
+        self.index: str = index
+
+
+class SetValueInIndexNode(InstructionNode):
+    def __init__(self, instance: str, index: int, source: str) -> None:
+        self.instance: str = instance
+        self.index: int = index
+        self.source: str = source
+
+
+
 class AllocateNode(InstructionNode):
     def __init__(self, itype: str, dest: str):
         self.type: str = itype
@@ -156,6 +177,11 @@ class AllocateBoolNode(InstructionNode):
     def __init__(self, dest: str, value: str):
         self.dest: str = dest
         self.value: str = value
+
+
+class AllocateNullPtrNode(InstructionNode):
+    def __init__(self, dest: str):
+        self.dest: str = dest
 
 
 class ArrayNode(InstructionNode):
@@ -345,3 +371,8 @@ class TypeNameNode(InstructionNode):
 class HaltNode(InstructionNode):
     def __init__(self):
         pass
+
+
+class AssertTypeNode(InstructionNode):
+    def __init__(self, address: str):
+        self.address: str = address

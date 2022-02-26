@@ -72,6 +72,14 @@ class CilFormatter:
             else f"{node.dest} = {node.source} # {node.comment}"
         )
 
+    @visitor.when(cil.AssignIntNode)
+    def visit(self, node: cil.AssignIntNode):
+        return (
+            f"{node.dest} = INT {node.source}"
+            if node.comment == ""
+            else f"{node.dest} = INT {node.source} # {node.comment}"
+        )
+
     @visitor.when(cil.PlusNode)
     def visit(self, node: cil.PlusNode):
         return (
@@ -208,8 +216,8 @@ class CilFormatter:
             else f"{node.dest} = VCALL {node.type} {node.method} # {node.comment}"
         )
 
-    @visitor.when(cil.GetAttribNode)
-    def visit(self, node: cil.GetAttribNode):
+    @visitor.when(cil.GetAttributeNode)
+    def visit(self, node: cil.GetAttributeNode):
         return (
             f"{node.dest} = GETATTR {node.instance} {node.attr}"
             if node.comment == ""
@@ -286,6 +294,22 @@ class CilFormatter:
             f"SETINDEX {node.instance} {node.index} {node.source}"
             if node.comment == ""
             else f"SETINDEX {node.instance} {node.index} {node.source} # {node.comment}"
+        )
+    
+    @visitor.when(cil.GetValueInIndexNode)
+    def visit(self, node: cil.GetIndexNode):
+        return (
+            f"{node.dest} = GETVALUEINDEX {node.instance} {node.index}"
+            if node.comment == ""
+            else f"{node.dest} = GETVALUEINDEX {node.instance} {node.index} # {node.comment}"
+        )
+
+    @visitor.when(cil.SetValueInIndexNode)
+    def visit(self, node: cil.SetIndexNode):
+        return (
+            f"SETVALUEINDEX {node.instance} {node.index} {node.source}"
+            if node.comment == ""
+            else f"SETVALUEINDEX {node.instance} {node.index} {node.source} # {node.comment}"
         )
 
     @visitor.when(cil.HaltNode)
@@ -375,6 +399,16 @@ class CilFormatter:
     @visitor.when(cil.AllocateBoolNode)
     def visit(self, node: cil.AllocateBoolNode):
         return (f"{node.dest} = ALLOCBOOL {node.value}") if node.comment == "" else f"{node.dest} = ALLOCBOOL {node.value} # {node.comment}"
+
+    @visitor.when(cil.AllocateNullPtrNode)
+    def visit(self, node: cil.AllocateNullPtrNode):
+        return (f"{node.dest} = ALLOCNULL") if node.comment == "" else f"{node.dest} = ALLOCNULL # {node.comment}"
+
+
+    @visitor.when(cil.AssertTypeNode)
+    def visit(self, node: cil.AssertTypeNode):
+        return f"ASSERT {node.address}"
+
 
     @visitor.when(cil.CommentNode)
     def visit(self, node: cil.CommentNode):

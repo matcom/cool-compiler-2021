@@ -199,6 +199,10 @@ class BeqNode(ThreeAddressIntructionNode):
     code = "beq"
 
 
+class BgtNode(ThreeAddressIntructionNode):
+    code = "bgt"
+
+
 class BgeNode(ThreeAddressIntructionNode):
     code = "bge"
 

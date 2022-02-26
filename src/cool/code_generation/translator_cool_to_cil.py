@@ -1,3 +1,4 @@
+from atexit import register
 from typing import Any, Dict, List, Optional, Tuple
 
 import cool.code_generation.ast_cil as cil
@@ -740,6 +741,8 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.current_function.params.append(cil.ParamNode("a"))
         self.current_function.params.append(cil.ParamNode("b"))
         result = self.define_internal_local("Equal result")
+        constant_null = self.define_internal_local("Null Pointer")
+        is_null = self.define_internal_local("One of params is null")
         type_of_a = self.define_internal_local("Type of a")
         type_int = self.define_internal_local("Type Int")
         type_bool = self.define_internal_local("Type Bool")
@@ -747,7 +750,15 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         type_a_equals_int = self.define_internal_local("Type of a equals int")
         type_a_equals_bool = self.define_internal_local("Type of a equals bool")
         type_a_equals_string = self.define_internal_local("Type of a equals string")
+        
         self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.AllocateNullPtrNode(constant_null))
+        self.register_instruction(cil.AllocateBoolNode(is_null, "0"))
+        
+        self.register_instruction(cil.EqualAddressNode(is_null, "a", constant_null))
+        self.register_instruction(cil.EqualAddressNode(is_null, "b", constant_null))
+        self.register_instruction(cil.GotoIfNode(is_null, "a_is_type_object"))
+
         self.register_instruction(cil.TypeOfNode(type_of_a, "a"))
         self.register_instruction(cil.TypeAddressNode(type_int, "Int"))
         self.register_instruction(cil.TypeAddressNode(type_bool, "Bool"))
@@ -755,6 +766,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.register_instruction(cil.AllocateBoolNode(type_a_equals_int, "0"))
         self.register_instruction(cil.AllocateBoolNode(type_a_equals_bool, "0"))
         self.register_instruction(cil.AllocateBoolNode(type_a_equals_string, "0"))
+
         self.register_instruction(cil.EqualAddressNode(type_a_equals_int, type_of_a, type_int))
         self.register_instruction(cil.EqualAddressNode(type_a_equals_bool, type_of_a, type_bool))
         self.register_instruction(cil.EqualAddressNode(type_a_equals_string, type_of_a, type_string))
@@ -784,12 +796,76 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
         self.register_instruction(cil.ReturnNode(result))
 
+        self.current_function = self.register_function("function_assign")
+        self.current_function.params.append(cil.ParamNode("dest"))
+        self.current_function.params.append(cil.ParamNode("source"))
+        constant_null = self.define_internal_local("Null Pointer")
+        is_null = self.define_internal_local("One of params is null")
+        type_of_source = self.define_internal_local("Type of source")
+        type_int = self.define_internal_local("Type Int")
+        type_bool = self.define_internal_local("Type Bool")
+        type_source_equals_int = self.define_internal_local("Type of source equals int")
+        type_source_equals_bool = self.define_internal_local("Type of source equals bool")
+       
+        self.register_instruction(cil.AllocateNullPtrNode(constant_null))
+        self.register_instruction(cil.AllocateBoolNode(is_null, "0"))
+        self.register_instruction(cil.EqualAddressNode(is_null, "source", constant_null))
+        self.register_instruction(cil.EqualAddressNode(is_null, "dest", constant_null))
+        self.register_instruction(cil.GotoIfNode(is_null, "source_is_type_object"))
+
+        self.register_instruction(cil.TypeOfNode(type_of_source, "source"))
+        self.register_instruction(cil.TypeAddressNode(type_int, "Int"))
+        self.register_instruction(cil.TypeAddressNode(type_bool, "Bool"))
+        self.register_instruction(cil.AllocateBoolNode(type_source_equals_int, "0"))
+        self.register_instruction(cil.AllocateBoolNode(type_source_equals_bool, "0"))
+        self.register_instruction(cil.EqualAddressNode(type_source_equals_int, type_of_source, type_int))
+        self.register_instruction(cil.EqualAddressNode(type_source_equals_bool, type_of_source, type_bool))
+        self.register_empty_instruction()
+        self.register_instruction(cil.GotoIfNode(type_source_equals_int, "source_is_type_int_or_bool"))
+        self.register_instruction(cil.GotoIfNode(type_source_equals_bool, "source_is_type_int_or_bool"))
+        self.register_instruction(cil.GotoNode("source_is_type_object"))
+
+        self.register_empty_instruction()
+        self.register_instruction(cil.LabelNode("source_is_type_int_or_bool"))
+
+        self.register_instruction(cil.AssignIntNode("dest", "source"))
+        self.register_instruction(cil.GotoNode("source_end_of_equal"))
+
+        self.register_empty_instruction()
+        self.register_instruction(cil.LabelNode("source_is_type_object"))
+        self.register_instruction(cil.AssignNode("dest", "source"))
+        self.register_instruction(cil.GotoNode("source_end_of_equal"))
+        
+        self.register_empty_instruction()
+        self.register_instruction(cil.LabelNode("source_end_of_equal"))
+
+        self.register_instruction(cil.ReturnNode("dest"))
+
+
         self.current_function = self.register_function(self.to_function_name("__init__", "Object"))
         self.current_function.params.append(cil.ParamNode("self"))
         self.register_instruction(cil.ReturnNode("self"))
 
         self.current_function = self.register_function(self.to_function_name("abort", "Object"))
         self.current_function.params.append(cil.ParamNode("self"))
+        msg1 = self.define_internal_local()
+        msg2 = self.define_internal_local()
+        endl = self.define_internal_local()
+        msg = self.define_internal_local()
+        self.register_instruction(cil.AllocateStrNode(msg1, "\"Abort called from class \""))
+        self.register_instruction(cil.AllocateStrNode(endl, "\"\\n\""))
+        self.register_instruction(cil.ArgNode("self", 0, 1))
+        self.register_instruction(cil.DynamicCallNode("String", self.to_function_name("type_name", "Object"), msg2, 1))
+        
+        self.register_instruction(cil.ArgNode(msg1, 0, 2))
+        self.register_instruction(cil.ArgNode(msg2, 1, 2)) 
+        self.register_instruction(cil.DynamicCallNode("String", self.to_function_name("concat", "String"), msg, 2))
+
+        self.register_instruction(cil.ArgNode(msg, 0, 2))
+        self.register_instruction(cil.ArgNode(endl, 1, 2)) 
+        self.register_instruction(cil.DynamicCallNode("String", self.to_function_name("concat", "String"), msg, 2))
+
+        self.register_instruction(cil.PrintStringNode(msg))
         self.register_instruction(cil.HaltNode())
         self.register_instruction(cil.ReturnNode("self"))
         
@@ -823,15 +899,16 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         
         self.current_function = self.register_function(self.to_function_name("in_string", "IO"))
         self.current_function.params.append(cil.ParamNode("self"))
-        local_int = self.define_internal_local()
-        self.register_instruction(cil.ReadStringNode(local_int))
-        self.register_instruction(cil.ReturnNode(local_int))
+        local_str = self.define_internal_local()
+        self.register_instruction(cil.ReadStringNode(local_str))
+        self.register_instruction(cil.ReturnNode(local_str))
 
         self.current_function = self.register_function(self.to_function_name("in_int", "IO"))
         self.current_function.params.append(cil.ParamNode("self"))
-        local_int = self.define_internal_local()
-        self.register_instruction(cil.ReadIntNode(local_int))
-        self.register_instruction(cil.ReturnNode(local_int))
+        local_str = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(local_str, "0"))
+        self.register_instruction(cil.ReadIntNode(local_str))
+        self.register_instruction(cil.ReturnNode(local_str))
 
         self.current_function = self.register_function(self.to_function_name("__init__", "String"))
         self.current_function.params.append(cil.ParamNode("self"))
@@ -840,6 +917,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.current_function = self.register_function(self.to_function_name("length", "String"))
         self.current_function.params.append(cil.ParamNode("self"))
         len_local =  self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(len_local, "0"))
         self.register_instruction(cil.LengthNode(len_local, "self"))
         self.register_instruction(cil.ReturnNode(len_local))
 
@@ -855,9 +933,19 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.current_function.params.append(cil.ParamNode("i"))
         self.current_function.params.append(cil.ParamNode("l"))
         substr =  self.define_internal_local()
-        self.register_instruction(cil.SubstringNode(substr, "self", "i", "l"))
+        self.register_instruction(cil.SubstringNode(substr, "self", "i", "l"))            
         self.register_instruction(cil.ReturnNode(substr))
         
+        self.current_function = self.register_function(self.to_function_name("__init__", "Int"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.register_instruction(cil.AllocateIntNode("self", "0"))
+        self.register_instruction(cil.ReturnNode("self"))
+
+        self.current_function = self.register_function(self.to_function_name("__init__", "Bool"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.register_instruction(cil.AllocateBoolNode("self", "0"))
+        self.register_instruction(cil.ReturnNode("self"))
+
         for i, declaration in enumerate(node.declarations):
             self.visit(declaration, scope.children[i])
 
@@ -940,22 +1028,29 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):
         scope = node.scope
+        x = " ".join([f"{name}: {type_name}" for name, type_name, _ in node.declarations])
+        self.register_comment(f"Let {x}")
+        
         i = 0
         for name, type_name, expr in node.declarations:
             self.register_local(name)
 
             if expr:
+                self.register_empty_instruction()
                 source, _ = self.visit(expr, scope.children[i])
-                if source:
-                    self.register_instruction(cil.AssignNode(name, source))
+                self.register_instruction(cil.ArgNode(name, 0, 2))
+                self.register_instruction(cil.ArgNode(source, 1, 2))
+                self.register_instruction(cil.StaticCallNode("function_assign", name, 2))        
                 i += 1
             else:
-                if type_name in ("Int", "Bool"):
-                    self.register_instruction(cil.AssignNode(name, "0"))
+                if type_name == "Int":
+                    self.register_instruction(cil.AllocateIntNode(name, "0"))
+                elif type_name == "Bool":
+                    self.register_instruction(cil.AllocateBoolNode(name, "0"))
                 elif type_name == "String":
                     self.register_instruction(cil.AllocateStrNode(name, "\"\""))
                 else:
-                    self.register_instruction(cil.AssignNode(name, "NULL"))
+                    self.register_instruction(cil.AllocateNullPtrNode(name))
         source, t = self.visit(node.expr, scope.children[i])
 
         return source, t
@@ -967,6 +1062,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         variables = scope.find_all_variables(node.id)
         source, _ = self.visit(node.expr, scope)
 
+        self.register_empty_instruction()
         is_attribute = (
             self.current_type.contains_attribute(node.id) and len(variables) == 1
         )
@@ -976,7 +1072,10 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
             self.register_instruction(cil.SetAttributeNode("self", variable.name, source, attr_names.index(variable.name)))
             return source, variable.type
         else:
-            self.register_instruction(cil.AssignNode(variable.name, source))
+            self.register_instruction(cil.ArgNode(variable.name, 0, 2))
+            self.register_instruction(cil.ArgNode(source, 1, 2))
+            self.register_instruction(cil.StaticCallNode("function_assign", variable.name, 2))
+            # self.register_instruction(cil.AssignNode(variable.name, source))
             return variable.name, variable.type
 
     @visitor.when(cool.BlockNode)
@@ -1026,14 +1125,14 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         scope = node.scope
         # result_addres = self.define_internal_local()
         node_id = hash(node)
-        conditional_address = self.define_internal_local()
+        self.register_empty_instruction()
+        self.register_comment(f"While loop")
 
         # self.register_instruction(cil.AssignNode(result_addres, 0))
         self.register_instruction(cil.LabelNode(f"while_start_{node_id}"))
 
         conditional_source, _ = self.visit(node.condition, scope)
-        self.register_instruction(cil.AssignNode(conditional_address, conditional_source))
-        self.register_instruction(cil.GotoIfNode(conditional_address, f"while_body_{node_id}"))
+        self.register_instruction(cil.GotoIfNode(conditional_source, f"while_body_{node_id}"))
         self.register_instruction(cil.GotoNode(f"while_end_{node_id}"))
 
         self.register_instruction(cil.EmptyInstruction())
@@ -1051,13 +1150,24 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         scope = node.scope
         node_id = hash(node)
         swicth_expression, _ = self.visit(node.expr, scope)
-        count_of_ancestors = self.define_internal_local("Count of ancestors of the switch expression")
-        switch_expr_type = self.define_internal_local("Switch expression type")
-        ancestor_type = self.define_internal_local("Ancestor type")
-        step1_comparison = self.define_internal_local("Step 1 comparison result")
-        array_of_ancestors = self.define_internal_local("Step 1 Array of ancestors")
-        constant_zero_int = self.define_internal_local("Integer 0 ")
+        
+        constant_zero_int = self.define_internal_local("Constant Integer 0 ")
+        constant_one_int = self.define_internal_local("Constant Integer 1")
+        constant_len_types_int = self.define_internal_local(f"Constant Integer {len(node.cases)}")
         constant_null_ptr = self.define_internal_local("Null pointer")
+        count_of_ancestors_int = self.define_internal_local("Count of ancestors of the switch expression")
+        switch_expr_type_address = self.define_internal_local("Switch expression type")
+        ancestor_type_address = self.define_internal_local("Ancestor type")
+        step1_comparison_result_bool = self.define_internal_local("Step 1 comparison result")
+        ancestors_array = self.define_internal_local("Step 1 Array of ancestors")
+
+        self.register_instruction(cil.AllocateIntNode(constant_zero_int, "0"))
+        self.register_instruction(cil.AllocateIntNode(constant_one_int, "1"))
+        self.register_instruction(cil.AllocateIntNode(constant_len_types_int, str(len(node.cases))))
+        self.register_instruction(cil.AllocateNullPtrNode(constant_null_ptr))
+        self.register_instruction(cil.AllocateIntNode(count_of_ancestors_int, "0"))
+        self.register_instruction(cil.AllocateBoolNode(step1_comparison_result_bool, "0"))
+        self.register_empty_instruction()
 
         self.register_comment("Switch Case Algorithm Steps:")
         self.register_comment(" 1 - Count how many ancestors has the dynamic type of the expression")
@@ -1070,121 +1180,190 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         # While loop to get the count of ancestors #
         ############################################
 
-        self.register_instruction(cil.AllocateIntNode(constant_zero_int, 0))
-        self.register_instruction(cil.AllocateBoolNode(step1_comparison, "0").set_comment("Initialize the comparison result"))
-
         self.register_empty_instruction()
         self.register_comment("######################################################################## #")
         self.register_comment("Step 1 - Count how many ancestors has the dynamic type of the expression #")
         self.register_comment("######################################################################## #")
-        self.register_instruction(cil.TypeOfNode(switch_expr_type, swicth_expression).set_comment("Get the switch expression type"))
-        self.register_instruction(cil.AssignNode(ancestor_type, switch_expr_type).set_comment("The first ancestor will be the type itself"))
-        self.register_instruction(cil.AssignNode(count_of_ancestors, constant_zero_int).set_comment("Initialize the counter"))
+        self.register_instruction(cil.TypeOfNode(switch_expr_type_address, swicth_expression).set_comment("Get the switch expression type"))
+        self.register_instruction(cil.AssignNode(ancestor_type_address, switch_expr_type_address).set_comment("The first ancestor will be the type itself"))
+        
+        # self.register_instruction(cil.ArgNode(count_of_ancestors_int, 0, 2))
+        # self.register_instruction(cil.ArgNode(constant_zero_int, 1, 2))
+        # self.register_instruction(cil.StaticCallNode("function_assign", count_of_ancestors_int, 2))
+        # self.register_instruction(cil.PrintIntNode(count_of_ancestors_int))
+        
         self.register_instruction(cil.LabelNode(f"while_start_{node_id}"))
-        self.register_instruction(cil.EqualNode(step1_comparison, ancestor_type, "0"))
-        self.register_instruction(cil.GotoIfNode(step1_comparison, f"while_end_{node_id}"))
-        self.register_instruction(cil.PlusNode(count_of_ancestors, count_of_ancestors, "1").set_comment("Increment the counter"))
-        self.register_instruction(cil.AncestorNode(ancestor_type, ancestor_type))
+        self.register_instruction(cil.EqualAddressNode(step1_comparison_result_bool, ancestor_type_address, constant_null_ptr))
+        self.register_instruction(cil.GotoIfNode(step1_comparison_result_bool, f"while_end_{node_id}"))
+
+        self.register_comment("Increment the count of ancestors")
+        self.register_instruction(cil.ArgNode(count_of_ancestors_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_one_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_add", count_of_ancestors_int, 2))
+        # self.register_instruction(cil.PrintIntNode(count_of_ancestors_int))
+
+        # self.register_instruction(cil.AssertTypeNode(ancestor_type_address))
+
+        self.register_instruction(cil.AncestorNode(ancestor_type_address, ancestor_type_address))
         self.register_instruction(cil.GotoNode(f"while_start_{node_id}"))
         self.register_instruction(cil.LabelNode(f"while_end_{node_id}"))
-        #################################################
-        # End While loop to get the count of ancestors  #
-        #################################################
+        # #################################################
+        # # End While loop to get the count of ancestors  #
+        # #################################################
 
 
-        #######################################################################
-        # Foreach to create the array of ancestors and fill it with the types #
-        #######################################################################
+        # #######################################################################
+        # # Foreach to create the array of ancestors and fill it with the types #
+        # #######################################################################
         self.register_empty_instruction()
-        
         self.register_comment("###################################################################### #")
         self.register_comment("Step 2 - Create an array of the same size where to store the ancestors #")
         self.register_comment("###################################################################### #")
-        self.register_instruction(cil.AssignNode(ancestor_type, switch_expr_type).set_comment("The first ancestor will be the type itself"))
-        self.register_instruction(cil.ArrayNode(array_of_ancestors, count_of_ancestors).set_comment("Create an array of ancestors"))
-        step2_iter_index = self.define_internal_local("Step 2 iteration index")
-        step2_comparison = self.define_internal_local("Step 2 comparison result")
-        self.register_instruction(cil.AssignNode(step2_iter_index, "0").set_comment("Initialize the index with the value 0"))
+        self.register_instruction(cil.AssignNode(ancestor_type_address, switch_expr_type_address).set_comment("The first ancestor will be the type itself"))
+        self.register_instruction(cil.ArrayNode(ancestors_array, count_of_ancestors_int).set_comment("Create an array of ancestors"))
+    
+        step2_iter_index_int = self.define_internal_local("Step 2 iteration index")
+        step2_comparison_result_bool = self.define_internal_local("Step 2 comparison result")
+        
+        self.register_instruction(cil.AllocateIntNode(step2_iter_index_int, "0"))
+        self.register_instruction(cil.AllocateBoolNode(step2_comparison_result_bool, "0"))
+        
+        # self.register_instruction(cil.AssignNode(step2_iter_index_int, constant_zero_int).set_comment("Initialize the index with the value 0"))
+        
         self.register_instruction(cil.LabelNode(f"foreach_start_{node_id}"))
-        self.register_instruction(cil.LessThanNode(step2_comparison, step2_iter_index, count_of_ancestors).set_comment("Check if the index is less than the counter"))
-        self.register_instruction(cil.GotoIfNode(step2_comparison, f"foreach_body_{node_id}"))
+
+        self.register_instruction(cil.ArgNode(step2_iter_index_int, 0, 2))
+        self.register_instruction(cil.ArgNode(count_of_ancestors_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_less_than", step2_comparison_result_bool, 2))
+        # self.register_instruction(cil.PrintIntNode(step2_iter_index_int))
+        # self.register_instruction(cil.PrintIntNode(step2_comparison_result_bool))
+        
+        self.register_instruction(cil.GotoIfNode(step2_comparison_result_bool, f"foreach_body_{node_id}"))
         self.register_instruction(cil.GotoNode(f"foreach_end_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_body_{node_id}"))
-        self.register_instruction(cil.SetIndexNode(array_of_ancestors, step2_iter_index, ancestor_type).set_comment("Set the index of the array with the ancestor type"))
-        self.register_instruction(cil.AncestorNode(ancestor_type, ancestor_type).set_comment("Get the next ancestor"))
-        self.register_instruction(cil.PlusNode(step2_iter_index, step2_iter_index, "1").set_comment("Increment index"))
+        self.register_instruction(cil.SetIndexNode(ancestors_array, step2_iter_index_int, ancestor_type_address).set_comment("Set the index of the array with the ancestor type"))
+        # self.register_instruction(cil.GetIndexNode(ancestor_type_address, ancestors_array, step2_iter_index_int))
+        # self.register_instruction(cil.AssertTypeNode(ancestor_type_address))
+        self.register_instruction(cil.AncestorNode(ancestor_type_address, ancestor_type_address).set_comment("Get the next ancestor"))
+    
+
+        self.register_instruction(cil.ArgNode(step2_iter_index_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_one_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_add", step2_iter_index_int, 2))
+        
         self.register_instruction(cil.GotoNode(f"foreach_start_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_end_{node_id}"))
         self.register_empty_instruction()
-        ###########################################################################
-        # End Foreach to create the array of ancestors and fill it with the types #
-        ###########################################################################
+        # ###########################################################################
+        # # End Foreach to create the array of ancestors and fill it with the types #
+        # ###########################################################################
 
         
-        self.register_comment("#################################################################################################### #")
-        self.register_comment("Step 3 - For each branch type, store the ancestor index that match with it (Simulating a double for) #")
-        self.register_comment("#################################################################################################### #")
+        # self.register_comment("#################################################################################################### #")
+        # self.register_comment("Step 3 - For each branch type, store the ancestor index that match with it (Simulating a double for) #")
+        # self.register_comment("#################################################################################################### #")
         
         types = [self.context.get_type(type_name) for _, type_name, _ in node.cases]
         type_branch_array = self.define_internal_local("Array to store the branch types")
         nearest_ancestor_array = self.define_internal_local("Array to store the nearest ancestor index of the expression type of the i-th branch type ")
-        self.register_instruction(cil.ArrayNode(type_branch_array, f"{len(types)}"))
-        self.register_instruction(cil.ArrayNode(nearest_ancestor_array, f"{len(types)}"))
-        for i, t in enumerate(types):
+        self.register_instruction(cil.ArrayNode(type_branch_array, constant_len_types_int))
+        self.register_instruction(cil.ArrayNode(nearest_ancestor_array, constant_len_types_int))
+        for i_int, t in enumerate(types):
             x = self.define_internal_local(f"Address of the type {t.name}")
+            i = self.define_internal_local(f"Index of the type {t.name}")
+            self.register_instruction(cil.AllocateIntNode(i, i_int))
             self.register_instruction(cil.TypeAddressNode(x, t.name))
-            self.register_instruction(cil.SetIndexNode(type_branch_array, f"{i}", x))
-            self.register_instruction(cil.SetIndexNode(nearest_ancestor_array, f"{i}", count_of_ancestors))
+            self.register_instruction(cil.SetIndexNode(type_branch_array, i, x))
+            # self.register_instruction(cil.GetIndexNode(x, ancestors_array, i))
+            # self.register_instruction(cil.AssertTypeNode(x))
+            self.register_instruction(cil.SetValueInIndexNode(nearest_ancestor_array, i, count_of_ancestors_int))
+            # self.register_instruction(cil.GetValueInIndexNode(count_of_ancestors_int, nearest_ancestor_array, i))
+            # self.register_instruction(cil.PrintIntNode(count_of_ancestors_int))
+            
         self.register_empty_instruction()
 
-        i = self.define_internal_local("Step 3 - Iteration index of the branch types array")
-        comp_i = self.define_internal_local("Step 3 - Comparison for the index of the branch types array")
+        i_int = self.define_internal_local("Step 3 - Iteration index of the branch types array")
+        comp_i_bool = self.define_internal_local("Step 3 - Comparison for the index of the branch types array")
         type_i = self.define_internal_local("Step 3 - Type of the i-th branch")
-        j = self.define_internal_local("Step 3 - Index of the ancestor")
-        comp_j = self.define_internal_local("Step 3 - Comparison for the index of the ancestor")
+        j_int = self.define_internal_local("Step 3 - Index of the ancestor")
+        comp_j_bool = self.define_internal_local("Step 3 - Comparison for the index of the ancestor")
         type_j = self.define_internal_local("Step 3 - Type of the j-th ancestor")
-        types_comparison = self.define_internal_local("Step 3 - Comparison for the branch type nad the ancestor type")
+        types_comparison_bool = self.define_internal_local("Step 3 - Comparison for the branch type nad the ancestor type")
 
-        self.register_comment("############# #")
-        self.register_comment("Outer Foreach #")
-        self.register_comment("############# #")
-        self.register_instruction(cil.AssignNode(i, "0").set_comment("Initialize the index i of the case to 0"))
-        self.register_instruction(cil.LabelNode(f"foreach_type_start_{node_id}")) 
-        self.register_instruction(cil.LessThanNode(comp_i, i, f"{len(types)}").set_comment("Check if the type index is less than the count of branches"))
-        self.register_instruction(cil.GotoIfNode(comp_i, f"foreach_type_body_{node_id}"))
+        self.register_instruction(cil.AllocateIntNode(i_int, "0"))
+        self.register_instruction(cil.AllocateBoolNode(comp_i_bool, "0"))
+        self.register_instruction(cil.AllocateIntNode(j_int, "0"))
+        self.register_instruction(cil.AllocateBoolNode(comp_j_bool, "0"))
+        self.register_instruction(cil.AllocateBoolNode(types_comparison_bool, "0"))
+
+        # self.register_comment("############# #")
+        # self.register_comment("Outer Foreach #")
+        # self.register_comment("############# #")
+        # self.register_instruction(cil.AssignNode(i_int, constant_zero_int).set_comment("Initialize the index i of the case to 0"))
+        self.register_instruction(cil.LabelNode(f"foreach_type_start_{node_id}"))
+        
+        self.register_instruction(cil.ArgNode(i_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_len_types_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_less_than", comp_i_bool, 2))
+        # self.register_instruction(cil.PrintIntNode(i_int))
+        # self.register_instruction(cil.PrintIntNode(comp_i_bool))
+        
+        self.register_instruction(cil.GotoIfNode(comp_i_bool, f"foreach_type_body_{node_id}"))
         self.register_instruction(cil.GotoNode(f"foreach_type_end_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_type_body_{node_id}"))
-        self.register_instruction(cil.GetIndexNode(type_i, type_branch_array, i).set_comment("Get the type of the i-th branch"))
+        self.register_instruction(cil.GetIndexNode(type_i, type_branch_array, i_int).set_comment("Get the type of the i-th branch"))
+        # self.register_instruction(cil.AssertTypeNode(type_i))
         
-        #################
-        # Inner Foreach #
-        #################
-        self.register_empty_instruction()
-        self.register_comment("############# #")
-        self.register_comment("Inner Foreach #")
-        self.register_comment("############# #")
-        self.register_instruction(cil.AssignNode(j, "0").set_comment("Initialize the index j of the case to 0"))
+        # #################
+        # # Inner Foreach #
+        # #################
+        # self.register_empty_instruction()
+        # self.register_comment("############# #")
+        # self.register_comment("Inner Foreach #")
+        # self.register_comment("############# #")
+        
+        self.register_instruction(cil.ArgNode(j_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_zero_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_assign", j_int, 2))
+        # self.register_instruction(cil.PrintIntNode(j_int))
+
         self.register_instruction(cil.LabelNode(f"foreach_ancestor_start_{node_id}"))
-        self.register_instruction(cil.LessThanNode(comp_j, j, count_of_ancestors).set_comment("Check if the case index is less than the count of ancestors"))
-        self.register_instruction(cil.GotoIfNode(comp_j, f"foreach_ancestor_body_{node_id}"))
+
+        self.register_instruction(cil.ArgNode(j_int, 0, 2))
+        self.register_instruction(cil.ArgNode(count_of_ancestors_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_less_than", comp_j_bool, 2))
+        # self.register_instruction(cil.PrintIntNode(j_int))
+        # self.register_instruction(cil.PrintIntNode(comp_j_bool))
+        # self.register_instruction(cil.LessThanNode(comp_j_bool, j_int, count_of_ancestors_int).set_comment("Check if the case index is less than the count of ancestors"))
+        self.register_instruction(cil.GotoIfNode(comp_j_bool, f"foreach_ancestor_body_{node_id}"))
         self.register_instruction(cil.GotoNode(f"foreach_ancestor_end_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_ancestor_body_{node_id}"))
-        self.register_instruction(cil.GetIndexNode(type_j, array_of_ancestors, j).set_comment("Get the j-th ancestor type"))
-        self.register_instruction(cil.EqualNode(types_comparison, type_i, type_j).set_comment("Compare if the type of the i-th branch is equal to the j-th ancestor"))
-        self.register_instruction(cil.GotoIfNode(types_comparison, f"foreach_ancestor_end_{node_id}").set_comment("If the types are equal, we have a match, then we can exit"))
-        self.register_instruction(cil.PlusNode(j, j, "1").set_comment("Increment the ancestor index"))
+        self.register_instruction(cil.GetIndexNode(type_j, ancestors_array, j_int).set_comment("Get the j-th ancestor type"))
+        # self.register_instruction(cil.AssertTypeNode(type_j))
+
+        self.register_instruction(cil.EqualAddressNode(types_comparison_bool, type_i, type_j).set_comment("Compare if the type of the i-th branch is equal to the j-th ancestor"))
+        # self.register_instruction(cil.PrintIntNode(types_comparison_bool))
+        self.register_instruction(cil.GotoIfNode(types_comparison_bool, f"foreach_ancestor_end_{node_id}").set_comment("If the types are equal, we have a match, then we can exit"))
+       
+        self.register_instruction(cil.ArgNode(j_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_one_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_add", j_int, 2))
         self.register_instruction(cil.GotoNode(f"foreach_ancestor_start_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_ancestor_end_{node_id}"))
-        self.register_instruction(cil.SetIndexNode(nearest_ancestor_array, i, j).set_comment("Set the counter of the i-th branch equals to j"))
+        self.register_instruction(cil.SetValueInIndexNode(nearest_ancestor_array, i_int, j_int).set_comment("Set the counter of the i-th branch equals to j"))
+        # self.register_instruction(cil.GetValueInIndexNode(j_int, nearest_ancestor_array, i_int))
+        # self.register_instruction(cil.PrintIntNode(j_int))
         self.register_comment("#################### #")
         self.register_comment("End of Inner Foreach #")
         self.register_comment("#################### #")
         self.register_empty_instruction()
-        #######################
-        # End Inner Foreach 1 #
-        #######################
+        # #######################
+        # # End Inner Foreach 1 #
+        # #######################
         
-        self.register_instruction(cil.PlusNode(i, i, "1").set_comment("Increment type index"))
+        self.register_instruction(cil.ArgNode(i_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_one_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_add", i_int, 2))
         self.register_instruction(cil.GotoNode(f"foreach_type_start_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_type_end_{node_id}"))
         self.register_comment("################# #")
@@ -1195,58 +1374,135 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.register_comment("######################################## #")
         self.register_comment("Step 4 - Find the minimum ancestor index #")
         self.register_comment("######################################## #")
-        step4_index = self.define_internal_local("Step 4 - Iteration index")
-        step4_current_min_index = self.define_internal_local("Step 4 - Index of the minimum counter in the counter array")
-        step4_temp = self.define_internal_local("Step 4 - Temporary variable")
-        step4_current_min = self.define_internal_local("Step 4 - Current minimum of the counter array")
-        step4_comparison = self.define_internal_local("Step 4 - Comparison for the minimum of the counter array")
-        self.register_instruction(cil.AssignNode(step4_index, "0").set_comment("Initialize the index of the counter array to 0"))
-        self.register_instruction(cil.AssignNode(step4_current_min_index, "0").set_comment("Initialize the index of the lower counter to 0"))
-        self.register_instruction(cil.AssignNode(step4_current_min, count_of_ancestors).set_comment("Initialize the current minimum to `count of ancestors`"))
+        step4_index_int = self.define_internal_local("Step 4 - Iteration index")
+        step4_current_min_index_int = self.define_internal_local("Step 4 - Index of the minimum counter in the counter array")
+        step4_temp_int = self.define_internal_local("Step 4 - Temporary variable")
+        step4_current_min_int = self.define_internal_local("Step 4 - Current minimum of the counter array")
+        step4_comparison_bool = self.define_internal_local("Step 4 - Comparison for the minimum of the counter array")
+        
+        endl =self.define_internal_local("endl")
+        space  =self.define_internal_local("space")
+        self.register_instruction(cil.AllocateStrNode(endl, '"\\n"'))
+        self.register_instruction(cil.AllocateStrNode(space, '" "'))
+
+        self.register_instruction(cil.AllocateIntNode(step4_index_int, "0"))
+        self.register_instruction(cil.AllocateIntNode(step4_current_min_index_int, "0"))
+        self.register_instruction(cil.AllocateIntNode(step4_temp_int, "0"))
+        self.register_instruction(cil.AllocateIntNode(step4_current_min_int, "0"))
+        self.register_instruction(cil.AllocateBoolNode(step4_comparison_bool, "0"))
+
+        self.register_instruction(cil.ArgNode(step4_current_min_int, 0, 2))
+        self.register_instruction(cil.ArgNode(count_of_ancestors_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_assign", step4_current_min_int, 2))
+        # self.register_instruction(cil.PrintIntNode(step4_current_min_int))
+        
         self.register_instruction(cil.LabelNode(f"foreach_min_start_{node_id}"))
-        self.register_instruction(cil.LessThanNode(step4_comparison, step4_index, f"{len(types)}").set_comment("Check if the index of the lower counter is less than the count of branches"))
-        self.register_instruction(cil.GotoIfNode(step4_comparison, f"foreach_min_body_{node_id}"))
+        
+        self.register_instruction(cil.ArgNode(step4_index_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_len_types_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_less_than", step4_comparison_bool, 2))
+        # self.register_instruction(cil.PrintIntNode(step4_index_int))
+        # self.register_instruction(cil.PrintStringNode(space))
+        # self.register_instruction(cil.PrintIntNode(step4_comparison_bool))
+        # self.register_instruction(cil.PrintStringNode(space))
+
+        self.register_instruction(cil.GotoIfNode(step4_comparison_bool, f"foreach_min_body_{node_id}"))
         self.register_instruction(cil.GotoNode(f"foreach_min_end_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_min_body_{node_id}"))
-        self.register_instruction(cil.GetIndexNode(step4_temp, nearest_ancestor_array, step4_index).set_comment("Get the nearest ancestor index of the i-th branch type"))
-        self.register_instruction(cil.LessThanNode(step4_comparison, step4_temp, step4_current_min).set_comment("Compare if the nearest ancestor index is less than the current minimum"))
-        self.register_instruction(cil.GotoIfNode(step4_comparison, f"update_min_{node_id}"))
-        self.register_instruction(cil.GotoNode(f"foreach_min_end_{node_id}"))
+        self.register_instruction(cil.GetValueInIndexNode(step4_temp_int, nearest_ancestor_array, step4_index_int).set_comment("Get the nearest ancestor index of the i-th branch type"))
+        # self.register_instruction(cil.PrintIntNode(step4_temp_int))
+        # self.register_instruction(cil.PrintStringNode(space))
+        # self.register_instruction(cil.PrintIntNode(step4_current_min_int))
+        # self.register_instruction(cil.PrintStringNode(space))
+
+        self.register_instruction(cil.ArgNode(step4_temp_int, 0, 2))
+        self.register_instruction(cil.ArgNode(step4_current_min_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_less_than", step4_comparison_bool, 2))
+        # self.register_instruction(cil.PrintIntNode(step4_comparison_bool))
+        # self.register_instruction(cil.PrintStringNode(space))      
+
+        self.register_instruction(cil.GotoIfNode(step4_comparison_bool, f"update_min_{node_id}"))
+        self.register_instruction(cil.GotoNode(f"update_min_end_{node_id}"))
         self.register_instruction(cil.LabelNode(f"update_min_{node_id}"))
-        self.register_instruction(cil.AssignNode(step4_current_min, step4_temp).set_comment("Update the current minimum"))
-        self.register_instruction(cil.AssignNode(step4_current_min_index, step4_index).set_comment("Update the index of the lower counter"))
+        
+        self.register_instruction(cil.ArgNode(step4_current_min_int, 0, 2))
+        self.register_instruction(cil.ArgNode(step4_temp_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_assign", step4_current_min_int, 2))
+        # self.register_instruction(cil.PrintIntNode(step4_current_min_int))
+        # self.register_instruction(cil.PrintStringNode(space))
+
+        self.register_instruction(cil.ArgNode(step4_current_min_index_int, 0, 2))
+        self.register_instruction(cil.ArgNode(step4_index_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_assign", step4_current_min_index_int, 2))
+        # self.register_instruction(cil.PrintIntNode(step4_current_min_index_int))
+        # self.register_instruction(cil.PrintStringNode(space))
+
         self.register_instruction(cil.LabelNode(f"update_min_end_{node_id}"))
-        self.register_instruction(cil.PlusNode(step4_index, step4_index, "1").set_comment("Increment the index of the counter array"))
+
+        self.register_instruction(cil.ArgNode(step4_index_int, 0, 2))
+        self.register_instruction(cil.ArgNode(constant_one_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_add", step4_index_int, 2))
+        
+        # self.register_instruction(cil.PrintStringNode(endl))
         self.register_instruction(cil.GotoNode(f"foreach_min_start_{node_id}"))
         self.register_instruction(cil.LabelNode(f"foreach_min_end_{node_id}"))
+
+        # self.register_instruction(cil.PrintStringNode(endl))
+        # self.register_instruction(cil.PrintIntNode(step4_current_min_int))
+        # self.register_instruction(cil.PrintStringNode(space))
+        # self.register_instruction(cil.PrintIntNode(step4_current_min_index_int))
+        # self.register_instruction(cil.PrintStringNode(space))
 
         self.register_empty_instruction()
         self.register_comment("################################################################# #")
         self.register_comment("Step 5 - Using the minimun ancestor index find the correct branch #")
         self.register_comment("################################################################# #")
         bool_array = self.define_internal_local("Step 5 - Bool array")
-        self.register_instruction(cil.ArrayNode(bool_array, f"{len(types)}").set_comment("Create the bool array"))
+        self.register_instruction(cil.ArrayNode(bool_array, constant_len_types_int).set_comment("Create the bool array"))
         for i, _ in enumerate(types):
-            self.register_instruction(cil.SetIndexNode(bool_array, f"{i}", "0").set_comment("Initialize the bool array"))
-        
-        self.register_empty_instruction()
-        exists_error = self.define_internal_local("Step 5 - Exists an error")
-        self.register_instruction(cil.EqualNode(exists_error, step4_current_min_index, count_of_ancestors).set_comment("Check if the minimum index is equal to the count of ancestors"))
-        self.register_instruction(cil.GotoIfNode(exists_error, f"error_branch_{node_id}"))
-        self.register_instruction(cil.SetIndexNode(bool_array, step4_current_min_index, "1").set_comment("Set the bool array in the correct index to 1"))
+            x = self.define_internal_local(f"Step 5 - Branch {i}")
+            self.register_instruction(cil.AllocateIntNode(x, f"{i}"))
+            self.register_instruction(cil.SetValueInIndexNode(bool_array, x, constant_zero_int).set_comment("Initialize the bool array"))
+            # self.register_instruction(cil.GetValueInIndexNode(constant_zero_int, bool_array, x))
+            # self.register_instruction(cil.PrintIntNode(constant_zero_int))
 
-        step5_comparison = self.define_internal_local("Step 5 - Comparison for the correct branch result")
         self.register_empty_instruction()
-        for i, t in enumerate(types):
-            self.register_instruction(cil.GetIndexNode(step5_comparison, bool_array, f"{i}").set_comment(f"Get the bool value of the branch {t.name}"))
+        exists_error_bool = self.define_internal_local("Step 5 - Exists an error")
+        self.register_instruction(cil.AllocateBoolNode(exists_error_bool, "0"))
+        
+        self.register_instruction(cil.ArgNode(step4_current_min_int, 0, 2))
+        self.register_instruction(cil.ArgNode(count_of_ancestors_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_equal", exists_error_bool, 2))
+        # self.register_instruction(cil.PrintIntNode(exists_error_bool))
+
+        self.register_instruction(cil.GotoIfNode(exists_error_bool, f"error_branch_{node_id}"))
+        self.register_instruction(cil.SetValueInIndexNode(bool_array, step4_current_min_index_int, constant_one_int).set_comment("Set the bool array in the correct index to 1"))
+        # self.register_instruction(cil.PrintStringNode(endl))
+        # self.register_instruction(cil.PrintIntNode(step4_current_min_index_int))
+        # self.register_instruction(cil.PrintStringNode(space))
+        
+        step5_comparison = self.define_internal_local("Step 5 - Comparison for the correct branch result")
+        self.register_instruction(cil.AllocateBoolNode(step5_comparison, "0"))
+        self.register_empty_instruction()
+        for i_int, t in enumerate(types):
+            x = self.define_internal_local(f"Index {i_int}")
+            self.register_instruction(cil.AllocateIntNode(x, f"{i_int}"))
+            self.register_instruction(cil.GetValueInIndexNode(step5_comparison, bool_array, x).set_comment(f"Get the bool value of the branch {t.name}"))
             self.register_instruction(cil.GotoIfNode(step5_comparison, f"branch_{t.name}_{node_id}").set_comment("If the bool value is 1, then we have a match"))
             self.register_empty_instruction()
 
         resutl_address = self.define_internal_local("Result of the switch expression address")
-        for i, (var_name, type_name, expr) in enumerate(node.cases):
+        for i_int, (var_name, type_name, expr) in enumerate(node.cases):
             self.register_instruction(cil.LabelNode(f"branch_{type_name}_{node_id}"))
-            self.register_local(var_name, f"Specialiced variable for the branch {type_name}")
-            expr_source, _ = self.visit(expr, scope.children[i])
+            var = self.register_local(var_name, f"Specialiced variable for the branch {type_name}")
+            self.register_instruction(cil.ArgNode(var, 0, 2))
+            self.register_instruction(cil.ArgNode(swicth_expression, 1, 2))
+            self.register_instruction(cil.StaticCallNode("function_assign", var, 2))
+            
+            expr_source, _ = self.visit(expr, scope.children[i_int])
+            self.register_instruction(cil.ArgNode(resutl_address, 0, 2))
+            self.register_instruction(cil.ArgNode(expr_source, 1, 2))
+            self.register_instruction(cil.StaticCallNode("function_assign", resutl_address, 2))
             self.register_instruction(cil.AssignNode(resutl_address, expr_source).set_comment("Assign the result"))
             self.register_instruction(cil.GotoNode(f"branch_end_{node_id}"))
             self.register_empty_instruction()
@@ -1260,6 +1516,8 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
     def visit(self, node: cool.MethodCallNode, scope: Scope):
         scope = node.scope
         obj_source, obj_type = self.visit(node.obj, scope)
+        if obj_type.name == "SELF_TYPE":
+            obj_type = self.current_type
 
         args_sources = []
         for arg in node.args:
@@ -1272,6 +1530,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
 
         call_dest = self.define_internal_local()
         method, owner = obj_type.get_method(node.id, get_owner=True)
+        
         self.register_instruction(
             cil.DynamicCallNode(
                 obj_type.name, self.to_function_name(node.id, owner.name), call_dest, len(args_sources) + 1
@@ -1303,7 +1562,9 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
     @visitor.when(ecool.NullNode)
     def visit(self, node: ecool.NullNode, scope: Scope):
         scope = node.scope
-        return node.lex, ecool.NullType
+        local_null_var = self.define_internal_local(f"Null")
+        self.register_instruction(cil.AllocateNullPtrNode(local_null_var))
+        return local_null_var, ecool.NullType
 
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
@@ -1318,7 +1579,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         if is_attribute:
             dest = self.define_internal_local()
             attr_names = [a.name for a, _ in self.current_type.all_attributes()]
-            self.register_instruction(cil.GetAttribNode(dest, "self", variable.name, attr_names.index(variable.name)))
+            self.register_instruction(cil.GetAttributeNode(dest, "self", variable.name, attr_names.index(variable.name)))
             return dest, variable.type
         return variable.name, variable.type
 
@@ -1338,7 +1599,12 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         local_int = self.define_internal_local("Integer 1")
         result = self.define_internal_local(f"Store the negation of {source}")
         self.register_instruction(cil.AllocateIntNode(local_int, "1"))
-        self.register_instruction(cil.XorNode(result, source, local_int).set_comment(f"not {source}"))
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.ArgNode(source, 0, 2))
+        self.register_instruction(cil.ArgNode(local_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_xor", result, 2))
+        # self.register_instruction(cil.AllocateIntNode(result, "0"))
+        # self.register_instruction(cil.XorNode(result, source, local_int).set_comment(f"not {source}"))
         return result, self.context.get_type("Bool")
 
     @visitor.when(cool.ComplementNode)
@@ -1348,16 +1614,33 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         local_int_0 = self.define_internal_local("Integer 1")
         local_int_1 = self.define_internal_local(f"Integer {2**32 - 1}")
         result = self.define_internal_local(f"Store the complement a2 of {source}")
-        self.register_instruction(cil.XorNode(result, source,local_int_1 ).set_comment(f"Getting the complement a1 of {source}"))
-        self.register_instruction(cil.PlusNode(result, result, local_int_0).set_comment(f"Adding 1 to the complement a1 we get the complement a2 of {source}")) 
+        self.register_instruction(cil.AllocateIntNode(local_int_0, "1"))
+        self.register_instruction(cil.AllocateIntNode(local_int_1, str(2**32 - 1)))
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.ArgNode(source, 0, 2))
+        self.register_instruction(cil.ArgNode(local_int_1, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_xor", result, 2))
+        # self.register_instruction(cil.PrintIntNode(result))
+        # self.register_instruction(cil.AllocateIntNode(result, "0"))
+        # self.register_instruction(cil.XorNode(result, source, local_int_1).set_comment(f"Getting the complement a1 of {source}"))
+        self.register_instruction(cil.ArgNode(result, 0, 2))
+        self.register_instruction(cil.ArgNode(local_int_0, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_add", result, 2))
+        # self.register_instruction(cil.PrintIntNode(result))
+        # self.register_instruction(cil.PlusNode(result, result, local_int_0).set_comment(f"Adding 1 to the complement a1 we get the complement a2 of {source}")) 
         return result, self.context.get_type("Int")
     
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
         scope = node.scope
         source, _ = self.visit(node.expr, scope)
+        null_ptr = self.define_internal_local("Null pointer")
         result = self.define_internal_local(f"Store if {source} is NULL")
-        self.register_instruction(cil.EqualNode(result, source, "0"))
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.AllocateNullPtrNode(null_ptr))
+        self.register_instruction(cil.ArgNode(source, 0, 2))
+        self.register_instruction(cil.ArgNode(source, 1, 2))
+        self.register_instruction(cil.StaticCallNode("function_equal", result, 2))
         return result, self.context.get_type("Bool")
 
     @visitor.when(cool.PlusNode)

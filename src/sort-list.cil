@@ -1,0 +1,940 @@
+.TYPES
+type Object {
+	inherits from null
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Object
+}
+type IO {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method __init__: function___init___at_IO
+}
+type Int {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Int
+}
+type String {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method length: function_length_at_String
+	method concat: function_concat_at_String
+	method substr: function_substr_at_String
+	method __init__: function___init___at_String
+}
+type Bool {
+	inherits from Object
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method __init__: function___init___at_Bool
+}
+type List {
+	inherits from IO
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method isNil: function_isNil_at_List
+	method cons: function_cons_at_List
+	method car: function_car_at_List
+	method cdr: function_cdr_at_List
+	method rev: function_rev_at_List
+	method sort: function_sort_at_List
+	method insert: function_insert_at_List
+	method rcons: function_rcons_at_List
+	method print_list: function_print_list_at_List
+	method __init__: function___init___at_List
+}
+type Cons {
+	inherits from List
+
+	attribute xcar
+	attribute xcdr
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method isNil: function_isNil_at_Cons
+	method cons: function_cons_at_List
+	method car: function_car_at_Cons
+	method cdr: function_cdr_at_Cons
+	method rev: function_rev_at_Cons
+	method sort: function_sort_at_Cons
+	method insert: function_insert_at_Cons
+	method rcons: function_rcons_at_Cons
+	method print_list: function_print_list_at_Cons
+	method __init__: function___init___at_Cons
+	method init: function_init_at_Cons
+}
+type Nil {
+	inherits from List
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method isNil: function_isNil_at_Nil
+	method cons: function_cons_at_List
+	method car: function_car_at_List
+	method cdr: function_cdr_at_List
+	method rev: function_rev_at_Nil
+	method sort: function_sort_at_Nil
+	method insert: function_insert_at_Nil
+	method rcons: function_rcons_at_Nil
+	method print_list: function_print_list_at_Nil
+	method __init__: function___init___at_Nil
+}
+type Main {
+	inherits from IO
+
+	attribute l
+
+	method abort: function_abort_at_Object
+	method type_name: function_type_name_at_Object
+	method copy: function_copy_at_Object
+	method out_string: function_out_string_at_IO
+	method out_int: function_out_int_at_IO
+	method in_string: function_in_string_at_IO
+	method in_int: function_in_int_at_IO
+	method iota: function_iota_at_Main
+	method main: function_main_at_Main
+	method __init__: function___init___at_Main
+}
+
+.DATA
+
+
+.CODE
+function function_add{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Adding result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a + b
+	
+	RETURN internal_0
+}
+function function_sub{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Substracting result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a - b
+	
+	RETURN internal_0
+}
+function function_mult{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Multiting result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a * b
+	
+	RETURN internal_0
+}
+function function_div{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Dividing result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = a / b
+	
+	RETURN internal_0
+}
+function function_xor{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Xor result
+
+	internal_0 = ALLOCINT 0
+	internal_0 = XOR a b
+	
+	RETURN internal_0
+}
+function function_less_than{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Less than result
+
+	internal_0 = ALLOCBOOL 0
+	internal_0 = a < b
+	
+	RETURN internal_0
+}
+function function_less_than_or_equal{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Less than or equal result
+
+	internal_0 = ALLOCBOOL 0
+	internal_0 = a <= b
+	
+	RETURN internal_0
+}
+function function_equal{
+	PARAM a
+	PARAM b
+
+	LOCAL internal_0 # Equal result
+	LOCAL internal_1 # Null Pointer
+	LOCAL internal_2 # One of params is null
+	LOCAL internal_3 # Type of a
+	LOCAL internal_4 # Type Int
+	LOCAL internal_5 # Type Bool
+	LOCAL internal_6 # Type String
+	LOCAL internal_7 # Type of a equals int
+	LOCAL internal_8 # Type of a equals bool
+	LOCAL internal_9 # Type of a equals string
+
+	internal_0 = ALLOCBOOL 0
+	internal_1 = ALLOCNULL
+	internal_2 = ALLOCBOOL 0
+	internal_2 = EQUALADDR a internal_1
+	internal_2 = EQUALADDR b internal_1
+	IF internal_2 GOTO a_is_type_object
+	internal_3 = TYPEOF a
+	internal_4 = TYPEADDR Int
+	internal_5 = TYPEADDR Bool
+	internal_6 = TYPEADDR String
+	internal_7 = ALLOCBOOL 0
+	internal_8 = ALLOCBOOL 0
+	internal_9 = ALLOCBOOL 0
+	internal_7 = EQUALADDR internal_3 internal_4
+	internal_8 = EQUALADDR internal_3 internal_5
+	internal_9 = EQUALADDR internal_3 internal_6
+	
+	IF internal_7 GOTO a_is_type_int_or_bool
+	IF internal_8 GOTO a_is_type_int_or_bool
+	IF internal_9 GOTO a_is_type_string
+	GOTO a_is_type_object
+	
+	a_is_type_int_or_bool:
+	internal_0 = EQUALINT a b
+	GOTO end_of_equal
+	
+	a_is_type_string:
+	internal_0 = EQUALSTR a b
+	GOTO end_of_equal
+	
+	a_is_type_object:
+	internal_0 = a == b
+	GOTO end_of_equal
+	
+	end_of_equal:
+	
+	RETURN internal_0
+}
+function function_assign{
+	PARAM dest
+	PARAM source
+
+	LOCAL internal_0 # Null Pointer
+	LOCAL internal_1 # One of params is null
+	LOCAL internal_2 # Type of source
+	LOCAL internal_3 # Type Int
+	LOCAL internal_4 # Type Bool
+	LOCAL internal_5 # Type of source equals int
+	LOCAL internal_6 # Type of source equals bool
+
+	internal_0 = ALLOCNULL
+	internal_1 = ALLOCBOOL 0
+	internal_1 = EQUALADDR source internal_0
+	internal_1 = EQUALADDR dest internal_0
+	IF internal_1 GOTO source_is_type_object
+	internal_2 = TYPEOF source
+	internal_3 = TYPEADDR Int
+	internal_4 = TYPEADDR Bool
+	internal_5 = ALLOCBOOL 0
+	internal_6 = ALLOCBOOL 0
+	internal_5 = EQUALADDR internal_2 internal_3
+	internal_6 = EQUALADDR internal_2 internal_4
+	
+	IF internal_5 GOTO source_is_type_int_or_bool
+	IF internal_6 GOTO source_is_type_int_or_bool
+	GOTO source_is_type_object
+	
+	source_is_type_int_or_bool:
+	dest = INT source
+	GOTO source_end_of_equal
+	
+	source_is_type_object:
+	dest = source
+	GOTO source_end_of_equal
+	
+	source_end_of_equal:
+	
+	RETURN dest
+}
+function function___init___at_Object{
+	PARAM self
+	
+	RETURN self
+}
+function function_abort_at_Object{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+
+	internal_0 = ALLOCSTR "Abort called from class "
+	internal_2 = ALLOCSTR "\n"
+	ARG self
+	internal_1 = VCALL String function_type_name_at_Object
+	ARG internal_0
+	ARG internal_1
+	internal_3 = VCALL String function_concat_at_String
+	ARG internal_3
+	ARG internal_2
+	internal_3 = VCALL String function_concat_at_String
+	PRINTSTR internal_3
+	HALT
+	
+	RETURN self
+}
+function function_type_name_at_Object{
+	PARAM self
+
+	LOCAL internal_0 # type_name
+
+	internal_0 = TYPENAME self
+	
+	RETURN internal_0
+}
+function function_copy_at_Object{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = COPY self
+	
+	RETURN internal_0
+}
+function function___init___at_IO{
+	PARAM self
+	
+	RETURN self
+}
+function function_out_string_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTSTR x
+	
+	RETURN self
+}
+function function_out_int_at_IO{
+	PARAM self
+	PARAM x
+
+	PRINTINT x
+	
+	RETURN self
+}
+function function_in_string_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	READSTR internal_0
+	
+	RETURN internal_0
+}
+function function_in_int_at_IO{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = ALLOCINT 0
+	READINT internal_0
+	
+	RETURN internal_0
+}
+function function___init___at_String{
+	PARAM self
+	
+	RETURN self
+}
+function function_length_at_String{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = ALLOCINT 0
+	internal_0 = LENGTH self
+	
+	RETURN internal_0
+}
+function function_concat_at_String{
+	PARAM self
+	PARAM s
+
+	LOCAL internal_0
+
+	internal_0 = CONCAT self s
+	
+	RETURN internal_0
+}
+function function_substr_at_String{
+	PARAM self
+	PARAM i
+	PARAM l
+
+	LOCAL internal_0
+
+	internal_0 = SUBSTRING self i l
+	
+	RETURN internal_0
+}
+function function___init___at_Int{
+	PARAM self
+
+	self = ALLOCINT 0
+	
+	RETURN self
+}
+function function___init___at_Bool{
+	PARAM self
+
+	self = ALLOCBOOL 0
+	
+	RETURN self
+}
+function function___init___at_List{
+	PARAM self
+	
+	RETURN self
+}
+function function_isNil_at_List{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1 # Boolean true
+
+	ARG self
+	internal_0 = VCALL List function_abort_at_Object
+	internal_1 = ALLOCBOOL 1
+	
+	RETURN internal_1
+}
+function function_cons_at_List{
+	PARAM self
+	PARAM hd
+
+	LOCAL new_cell
+	LOCAL internal_1 # Store an instance of the class Cons
+	LOCAL internal_2
+
+	# Let new_cell: Cons
+	
+	internal_1 = ALLOCATE Cons # Allocate the object Cons
+	ARG internal_1 # Pass the instance to the constructor
+	internal_1 = VCALL Cons function___init___at_Cons # Call the constructor
+	ARG new_cell
+	ARG internal_1
+	new_cell = CALL function_assign
+	ARG new_cell
+	ARG hd
+	ARG self
+	internal_2 = VCALL Cons function_init_at_Cons
+	
+	RETURN internal_2
+}
+function function_car_at_List{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1 # Store an instance of the class Int
+
+	ARG self
+	internal_0 = VCALL List function_abort_at_Object
+	internal_1 = ALLOCATE Int # Allocate the object Int
+	ARG internal_1 # Pass the instance to the constructor
+	internal_1 = VCALL Int function___init___at_Int # Call the constructor
+	
+	RETURN internal_1
+}
+function function_cdr_at_List{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1 # Store an instance of the class List
+
+	ARG self
+	internal_0 = VCALL List function_abort_at_Object
+	internal_1 = ALLOCATE List # Allocate the object List
+	ARG internal_1 # Pass the instance to the constructor
+	internal_1 = VCALL List function___init___at_List # Call the constructor
+	
+	RETURN internal_1
+}
+function function_rev_at_List{
+	PARAM self
+
+	LOCAL internal_0
+
+	ARG self
+	internal_0 = VCALL List function_cdr_at_List
+	
+	RETURN internal_0
+}
+function function_sort_at_List{
+	PARAM self
+
+	LOCAL internal_0
+
+	ARG self
+	internal_0 = VCALL List function_cdr_at_List
+	
+	RETURN internal_0
+}
+function function_insert_at_List{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0
+
+	ARG self
+	internal_0 = VCALL List function_cdr_at_List
+	
+	RETURN internal_0
+}
+function function_rcons_at_List{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0
+
+	ARG self
+	internal_0 = VCALL List function_cdr_at_List
+	
+	RETURN internal_0
+}
+function function_print_list_at_List{
+	PARAM self
+
+	LOCAL internal_0
+
+	ARG self
+	internal_0 = VCALL List function_abort_at_Object
+	
+	RETURN internal_0
+}
+function function___init___at_Cons{
+	PARAM self
+
+	LOCAL internal_0 # Integer 0
+	LOCAL internal_1 # Null
+
+	internal_0 = ALLOCINT 0
+	
+	SETATTR self xcar internal_0
+	internal_1 = ALLOCNULL
+	
+	SETATTR self xcdr internal_1
+	
+	RETURN self
+}
+function function_isNil_at_Cons{
+	PARAM self
+
+	LOCAL internal_0 # Boolean false
+
+	internal_0 = ALLOCBOOL 0
+	
+	RETURN internal_0
+}
+function function_init_at_Cons{
+	PARAM self
+	PARAM hd
+	PARAM tl
+
+	
+	SETATTR self xcar hd
+	
+	SETATTR self xcdr tl
+	
+	RETURN self
+}
+function function_car_at_Cons{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = GETATTR self xcar
+	
+	RETURN internal_0
+}
+function function_cdr_at_Cons{
+	PARAM self
+
+	LOCAL internal_0
+
+	internal_0 = GETATTR self xcdr
+	
+	RETURN internal_0
+}
+function function_rev_at_Cons{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+
+	internal_0 = GETATTR self xcdr
+	ARG internal_0
+	internal_1 = VCALL List function_rev_at_List
+	internal_2 = GETATTR self xcar
+	ARG internal_1
+	ARG internal_2
+	internal_3 = VCALL List function_rcons_at_List
+	
+	RETURN internal_3
+}
+function function_sort_at_Cons{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+
+	internal_0 = GETATTR self xcdr
+	ARG internal_0
+	internal_1 = VCALL List function_sort_at_List
+	internal_2 = GETATTR self xcar
+	ARG internal_1
+	ARG internal_2
+	internal_3 = VCALL List function_insert_at_List
+	
+	RETURN internal_3
+}
+function function_insert_at_Cons{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3 # Store the result of the operation function_less_than
+	LOCAL internal_4 # Store an instance of the class Cons
+	LOCAL internal_5
+	LOCAL internal_6 # Store an instance of the class Cons
+	LOCAL internal_7
+	LOCAL internal_8
+	LOCAL internal_9
+	LOCAL internal_10
+
+	# Conditional
+	internal_1 = ALLOCBOOL 0
+	internal_2 = GETATTR self xcar
+	
+	ARG i
+	ARG internal_2
+	internal_3 = CALL function_less_than
+	internal_1 = internal_3
+	IF internal_1 GOTO then_8750086234655
+	GOTO else_8750086234655
+	
+	then_8750086234655:
+	internal_4 = ALLOCATE Cons # Allocate the object Cons
+	ARG internal_4 # Pass the instance to the constructor
+	internal_4 = VCALL Cons function___init___at_Cons # Call the constructor
+	ARG internal_4
+	ARG i
+	ARG self
+	internal_5 = VCALL Cons function_init_at_Cons
+	internal_0 = internal_5
+	GOTO endif_8750086234655
+	
+	else_8750086234655:
+	internal_6 = ALLOCATE Cons # Allocate the object Cons
+	ARG internal_6 # Pass the instance to the constructor
+	internal_6 = VCALL Cons function___init___at_Cons # Call the constructor
+	internal_7 = GETATTR self xcar
+	internal_8 = GETATTR self xcdr
+	ARG internal_8
+	ARG i
+	internal_9 = VCALL List function_insert_at_List
+	ARG internal_6
+	ARG internal_7
+	ARG internal_9
+	internal_10 = VCALL Cons function_init_at_Cons
+	internal_0 = internal_10
+	GOTO endif_8750086234655
+	
+	endif_8750086234655:
+	
+	RETURN internal_0
+}
+function function_rcons_at_Cons{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0 # Store an instance of the class Cons
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+	LOCAL internal_4
+
+	internal_0 = ALLOCATE Cons # Allocate the object Cons
+	ARG internal_0 # Pass the instance to the constructor
+	internal_0 = VCALL Cons function___init___at_Cons # Call the constructor
+	internal_1 = GETATTR self xcar
+	internal_2 = GETATTR self xcdr
+	ARG internal_2
+	ARG i
+	internal_3 = VCALL List function_rcons_at_List
+	ARG internal_0
+	ARG internal_1
+	ARG internal_3
+	internal_4 = VCALL Cons function_init_at_Cons
+	
+	RETURN internal_4
+}
+function function_print_list_at_Cons{
+	PARAM self
+
+	LOCAL internal_0
+	LOCAL internal_1
+	LOCAL internal_2 # String "\n"
+	LOCAL internal_3
+	LOCAL internal_4
+	LOCAL internal_5
+
+	internal_0 = GETATTR self xcar
+	ARG self
+	ARG internal_0
+	internal_1 = VCALL Cons function_out_int_at_IO
+	internal_2 = ALLOCSTR "\n"
+	ARG self
+	ARG internal_2
+	internal_3 = VCALL Cons function_out_string_at_IO
+	internal_4 = GETATTR self xcdr
+	ARG internal_4
+	internal_5 = VCALL List function_print_list_at_List
+	
+	RETURN internal_5
+}
+function function___init___at_Nil{
+	PARAM self
+	
+	RETURN self
+}
+function function_isNil_at_Nil{
+	PARAM self
+
+	LOCAL internal_0 # Boolean true
+
+	internal_0 = ALLOCBOOL 1
+	
+	RETURN internal_0
+}
+function function_rev_at_Nil{
+	PARAM self
+	
+	RETURN self
+}
+function function_sort_at_Nil{
+	PARAM self
+	
+	RETURN self
+}
+function function_insert_at_Nil{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0
+
+	ARG self
+	ARG i
+	internal_0 = VCALL Nil function_rcons_at_Nil
+	
+	RETURN internal_0
+}
+function function_rcons_at_Nil{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0 # Store an instance of the class Cons
+	LOCAL internal_1
+
+	internal_0 = ALLOCATE Cons # Allocate the object Cons
+	ARG internal_0 # Pass the instance to the constructor
+	internal_0 = VCALL Cons function___init___at_Cons # Call the constructor
+	ARG internal_0
+	ARG i
+	ARG self
+	internal_1 = VCALL Cons function_init_at_Cons
+	
+	RETURN internal_1
+}
+function function_print_list_at_Nil{
+	PARAM self
+
+	LOCAL internal_0 # Boolean true
+
+	internal_0 = ALLOCBOOL 1
+	
+	RETURN internal_0
+}
+function function___init___at_Main{
+	PARAM self
+
+	LOCAL internal_0 # Null
+
+	internal_0 = ALLOCNULL
+	
+	SETATTR self l internal_0
+	
+	RETURN self
+}
+function function_iota_at_Main{
+	PARAM self
+	PARAM i
+
+	LOCAL internal_0 # Store an instance of the class Nil
+	LOCAL j
+	LOCAL internal_2 # Integer 0
+	LOCAL internal_3 # Store the result of the operation function_less_than
+	LOCAL internal_4 # Store an instance of the class Cons
+	LOCAL internal_5
+	LOCAL internal_6
+	LOCAL internal_7 # Integer 1
+	LOCAL internal_8 # Store the result of the operation function_add
+	LOCAL internal_9
+
+	internal_0 = ALLOCATE Nil # Allocate the object Nil
+	ARG internal_0 # Pass the instance to the constructor
+	internal_0 = VCALL Nil function___init___at_Nil # Call the constructor
+	
+	SETATTR self l internal_0
+	# Let j: Int
+	
+	internal_2 = ALLOCINT 0
+	ARG j
+	ARG internal_2
+	j = CALL function_assign
+	
+	# While loop
+	while_start_8750086235432:
+	
+	ARG j
+	ARG i
+	internal_3 = CALL function_less_than
+	IF internal_3 GOTO while_body_8750086235432
+	GOTO while_end_8750086235432
+	
+	while_body_8750086235432:
+	internal_4 = ALLOCATE Cons # Allocate the object Cons
+	ARG internal_4 # Pass the instance to the constructor
+	internal_4 = VCALL Cons function___init___at_Cons # Call the constructor
+	internal_5 = GETATTR self l
+	ARG internal_4
+	ARG j
+	ARG internal_5
+	internal_6 = VCALL Cons function_init_at_Cons
+	
+	SETATTR self l internal_6
+	internal_7 = ALLOCINT 1
+	
+	ARG j
+	ARG internal_7
+	internal_8 = CALL function_add
+	
+	ARG j
+	ARG internal_8
+	j = CALL function_assign
+	GOTO while_start_8750086235432
+	
+	while_end_8750086235432:
+	internal_9 = GETATTR self l
+	
+	RETURN internal_9
+}
+function function_main_at_Main{
+	PARAM self
+
+	LOCAL internal_0 # String "How many numbers to sort? "
+	LOCAL internal_1
+	LOCAL internal_2
+	LOCAL internal_3
+	LOCAL internal_4
+	LOCAL internal_5
+	LOCAL internal_6
+
+	internal_0 = ALLOCSTR "How many numbers to sort? "
+	ARG self
+	ARG internal_0
+	internal_1 = VCALL Main function_out_string_at_IO
+	ARG self
+	internal_2 = VCALL Main function_in_int_at_IO
+	ARG self
+	ARG internal_2
+	internal_3 = VCALL Main function_iota_at_Main
+	ARG internal_3
+	internal_4 = VCALL List function_rev_at_List
+	ARG internal_4
+	internal_5 = VCALL List function_sort_at_List
+	ARG internal_5
+	internal_6 = VCALL List function_print_list_at_List
+	
+	RETURN internal_6
+}
+function main{
+	
+
+	LOCAL internal_0
+	LOCAL internal_1
+
+	internal_0 = ALLOCATE Main
+	ARG internal_0
+	internal_0 = VCALL Main function___init___at_Main
+	
+	ARG internal_0
+	internal_1 = VCALL Main function_main_at_Main
+	
+	HALT
+}
