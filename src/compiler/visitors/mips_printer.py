@@ -2,7 +2,7 @@ from ..cmp.mips_ast import *
 import compiler.visitors.visitor as visitor
 
 
-class PrintVisitor:
+class MIPSPrintVisitor:
     @visitor.on("node")
     def visit(self, node):
         pass
@@ -22,37 +22,31 @@ class PrintVisitor:
     @visitor.when(ProgramNode)
     def visit(self, node):
         data_section_header = "\t.data"
-        static_strings = "\n".join(
-            [self.visit(string_const) for string_const in node.data]
-        )
+        static_strings = "\n".join([self.visit(node.data[d]) for d in node.data])
 
         names_table = f"{TYPE_LIST}:\n" + "\n".join(
-            [f"\t.word\t{tp.string_name_label}" for tp in node.types]
+            [f"\t.word\t{node.types[tp].label}" for tp in node.types]
         )
         proto_table = f"{VIRTUAL_TABLE}:\n" + "\n".join(
-            [f"\t.word\t{tp.label}_proto" for tp in node.types]
+            [f"\t.word\t{node.types[tp].label}_proto" for tp in node.types]
         )
 
-        types = "\n\n".join([self.visit(tp) for tp in node.types])
+        types = "\n\n".join([self.visit(node.types[tp]) for tp in node.types])
 
-        code = "\n".join([self.visit(func) for func in node.functions])
+        code = "\n".join([self.visit(node.text[func]) for func in node.text])
         return f"{data_section_header}\n{static_strings}\n\n{names_table}\n\n{proto_table}\n\n{types}\n\t.text\n\t.globl main\n{code}"
 
-    @visitor.when(StringConst)
+    @visitor.when(DataNode)
     def visit(self, node):
-        return f'{node.label}: .asciiz "{node.string}"'
+        new_data = node.data.replace("\n", "")
+        return f'{node.label}: .asciiz "{new_data}"'
 
-    @visitor.when(MIPSType)
-    def visit(self, node):
-        methods = "\n".join([f"\t.word\t {node.methods[k]}" for k in node.methods])
+    @visitor.when(TypeNode)
+    def visit(self, node: TypeNode):
+        methods = "\n".join([f"\t.word\t {m[1]}" for m in node.methods])
         dispatch_table = f"{node.label}_dispatch:\n{methods}"
-        proto_begin = f"{node.label}_proto:\n\t.word\t{node.index}\n\t.word\t{node.size}\n\t.word\t{node.label}_dispatch"
-        proto_attr = "\n".join(
-            [
-                f'\t.word\t{node._default_attributes.get(attr, "0")}'
-                for attr in node.attributes
-            ]
-        )
+        proto_begin = f"{node.label}_proto:\n\t.word\t{node.pos}\n\t.word\t{len(node.attributes)*4}\n\t.word\t{node.label}_dispatch"
+        proto_attr = "\n".join([f"\t.word\t{0}" for attr in node.attributes])
         proto_end = f"\t.word\t{-1}"
         proto = (
             f"{proto_begin}\n{proto_attr}\n{proto_end}"
@@ -84,7 +78,7 @@ class PrintVisitor:
 
     @visitor.when(AddInmediateNode)
     def visit(self, node):
-        return f"addi {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.value)}"
+        return f"addi {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.constant_number)}"
 
     @visitor.when(StoreWordNode)
     def visit(self, node):
@@ -132,7 +126,7 @@ class PrintVisitor:
 
     @visitor.when(LabelNode)
     def visit(self, node):
-        return f"{node.name}:"
+        return f"{node.label}:"
 
     @visitor.when(BranchOnNotEqualNode)
     def visit(self, node):

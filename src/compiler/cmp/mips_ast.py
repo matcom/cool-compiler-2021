@@ -58,7 +58,8 @@ class Node:
 
 
 class ProgramNode(Node):
-    def __init__(self, data, text):
+    def __init__(self, types, data, text):
+        self.types = types
         self.data = data
         self.text = text
 
@@ -74,7 +75,7 @@ class FunctionNode(Node):
         self.label = label
         self.params = params
         self.localvars = localvars
-        self.instrucctions = []
+        self.instructions = []
 
 
 class TypeNode(Node):
@@ -82,6 +83,7 @@ class TypeNode(Node):
         self.label = label
         self.methods = []
         self.attributes = []
+        self.label_name = None
         self.pos = -1
 
 
@@ -229,5 +231,5 @@ class RegisterRelativeLocation:
 
 class LabelRelativeLocation:
     def __init__(self, label, offset):
-        self._label = label
-        self._offset = offset
+        self.label = label
+        self.offset = offset

@@ -17,6 +17,8 @@ from compiler.visitors.type_checker import TypeChecker
 from compiler.visitors.type_inferencer import TypeInferencer
 from compiler.visitors.cool2cil import COOLToCILVisitor
 from compiler.visitors.cil_formatter import PrintCILVisitor
+from compiler.visitors.cil2mips import CILToMIPSVisitor
+from compiler.visitors.mips_printer import MIPSPrintVisitor
 
 
 def main(args):
@@ -92,7 +94,12 @@ def main(args):
     cil_ast = cil_visitor.visit(ast, scope)
 
     cil_formatter = PrintCILVisitor()
-    print(cil_formatter.visit(cil_ast))
+    # print(cil_formatter.visit(cil_ast))
+
+    mips_visitor = CILToMIPSVisitor()
+    mips_ast = mips_visitor.visit(cil_ast)
+    mips_formatter = MIPSPrintVisitor()
+    print(mips_formatter.visit(mips_ast))
 
 
 text = """
