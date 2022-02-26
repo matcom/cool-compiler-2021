@@ -99,7 +99,14 @@ def main(args):
     mips_visitor = CILToMIPSVisitor()
     mips_ast = mips_visitor.visit(cil_ast)
     mips_formatter = MIPSPrintVisitor()
-    print(mips_formatter.visit(mips_ast))
+    mips_code = mips_formatter.visit(mips_ast)
+
+    out_file = args.file[:-2] + "mips"
+
+    with open(out_file, "w") as f:
+        f.write(mips_code)
+        with open("mips_lib.asm") as f2:
+            f.write("".join(f2.readlines()))
 
 
 text = """
