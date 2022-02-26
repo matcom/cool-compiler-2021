@@ -1,16 +1,12 @@
 from compiler.cmp.grammar import G
-
 from compiler.lexer.lex import CoolLexer
-from sys import exit
-
-from compiler.cmp.tools import LR1Parser
-from compiler.cmp.evaluation import evaluate_reverse_parse
+from compiler.parser.parser import LR1Parser, evaluate_reverse_parse
 from compiler.visitors.formatter import FormatVisitor
-
 from compiler.visitors.type_collector import TypeCollector
 from compiler.visitors.type_builder import TypeBuilder
 from compiler.visitors.type_checker import TypeChecker
 from compiler.visitors.type_inferencer import TypeInferencer
+from sys import exit
 
 
 def main(args):

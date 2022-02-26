@@ -1,7 +1,6 @@
-from typing import List, Optional, Tuple, Union
-
-from compiler.cmp.semantic import Type
+from .semantic import Type
 from .utils import Token, emptyToken
+from typing import List, Optional, Tuple, Union
 
 
 class Node:

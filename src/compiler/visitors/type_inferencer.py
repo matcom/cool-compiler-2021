@@ -1,17 +1,3 @@
-from typing import List, Tuple
-import compiler.visitors.visitor as visitor
-from ..cmp.semantic import (
-    Context,
-    InferencerManager,
-    Method,
-    Scope,
-    SemanticError,
-    ErrorType,
-    SelfType,
-    AutoType,
-    LCA,
-    Type,
-)
 from ..cmp.ast import (
     ProgramNode,
     ClassDeclarationNode,
@@ -36,7 +22,21 @@ from ..cmp.ast import (
     VariableNode,
     InstantiateNode,
 )
+from ..cmp.semantic import (
+    Context,
+    InferencerManager,
+    Method,
+    Scope,
+    SemanticError,
+    ErrorType,
+    SelfType,
+    AutoType,
+    LCA,
+    Type,
+)
 from .utils import AUTOTYPE_ERROR
+from typing import List, Tuple
+import compiler.visitors.visitor as visitor
 
 
 class TypeInferencer:

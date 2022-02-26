@@ -1,7 +1,3 @@
-from typing import List
-
-from black import err
-from numpy import empty
 from .pycompiler import Production, Sentence, Symbol, EOF, Epsilon
 
 
@@ -105,22 +101,6 @@ def inspect(item, grammar_name="G", mapper=None):
             raise ValueError(f"Invalid: {item}")
 
 
-def pprint(item, header=""):
-    if header:
-        print(header)
-
-    if isinstance(item, dict):
-        for key, value in item.items():
-            print(f"{key}  --->  {value}")
-    elif isinstance(item, list):
-        print("[")
-        for x in item:
-            print(f"   {repr(x)}")
-        print("]")
-    else:
-        print(item)
-
-
 class Token:
     """
     Basic token class.
@@ -219,61 +199,6 @@ class DisjointNode:
 
     def __repr__(self):
         return str(self)
-
-
-class ShiftReduceParser:
-    SHIFT = "SHIFT"
-    REDUCE = "REDUCE"
-    OK = "OK"
-
-    def __init__(self, G, verbose=False):
-        self.G = G
-        self.verbose = verbose
-        self.action = {}
-        self.goto = {}
-        self._build_parsing_table()
-
-    def _build_parsing_table(self):
-        raise NotImplementedError()
-
-    def __call__(self, w: List[Token], get_shift_reduce=False):
-        stack = [0]
-        cursor = 0
-        output = []
-        operations = []
-
-        while True:
-            state = stack[-1]
-            lookahead = w[cursor].token_type
-            if self.verbose:
-                print(stack, w[cursor:])
-
-            try:
-                if state not in self.action or lookahead not in self.action[state]:
-                    error = f"{w[cursor].pos} - SyntacticError: ERROR at or near {w[cursor].lex}"
-                    return None, error
-            except:
-                print(state)
-                print(self.action)
-                print(lookahead)
-                error = f"{w[cursor].pos} - SyntacticError: ERROR at or near {w[cursor].lex}"
-                return None, error
-
-            action, tag = list(self.action[state][lookahead])[0]
-            if action is self.SHIFT:
-                operations.append(self.SHIFT)
-                stack.append(tag)
-                cursor += 1
-            elif action is self.REDUCE:
-                operations.append(self.REDUCE)
-                if len(tag.Right):
-                    stack = stack[: -len(tag.Right)]
-                stack.append(list(self.goto[stack[-1]][tag.Left])[0])
-                output.append(tag)
-            elif action is ShiftReduceParser.OK:
-                return (output if not get_shift_reduce else (output, operations)), None
-            else:
-                raise ValueError
 
 
 emptyToken = Token("", "", (0, 0))
