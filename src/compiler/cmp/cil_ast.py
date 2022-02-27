@@ -1,3 +1,4 @@
+# AST
 class Node:
     pass
 
@@ -14,20 +15,6 @@ class TypeNode(Node):
         self.name = name
         self.attributes = []
         self.methods = []
-
-
-class InstructionNode(Node):
-    pass
-
-
-class TypeNameNode(InstructionNode):
-    def __init__(self, dest, source):
-        self.dest = dest
-        self.source = source
-
-
-class ExitNode(InstructionNode):
-    pass
 
 
 class DataNode(Node):
@@ -56,10 +43,18 @@ class LocalNode(Node):
         self.name = name
 
 
+class InstructionNode(Node):
+    def __init__(self):
+        self.leader = False
+
+
 class AssignNode(InstructionNode):
     def __init__(self, dest, source):
         self.dest = dest
         self.source = source
+
+    def __repr__(self):
+        return f"{self.dest} = {self.source}"
 
 
 class ArithmeticNode(InstructionNode):
@@ -94,25 +89,12 @@ class LessNode(ArithmeticNode):
 
 
 class EqualNode(ArithmeticNode):
-    pass
+    def __repr__(self):
+        return f"{self.dest} = {self.left} == {self.right}"
 
 
 class EqualStrNode(ArithmeticNode):
     pass
-
-
-class VoidNode(InstructionNode):
-    pass
-
-
-class NotNode(ArithmeticNode):
-    pass
-
-
-class ComplementNode(InstructionNode):
-    def __init__(self, dest, obj):
-        self.dest = dest
-        self.obj = obj
 
 
 class GetAttribNode(InstructionNode):
@@ -121,6 +103,9 @@ class GetAttribNode(InstructionNode):
         self.obj = obj
         self.attr = attr
         self.computed_type = computed_type
+
+    def __repr__(self):
+        return f"{self.dest} = GETATTR {self.obj} {self.attr}"
 
 
 class SetAttribNode(InstructionNode):
@@ -150,25 +135,28 @@ class ArrayNode(InstructionNode):
 
 
 class TypeOfNode(InstructionNode):
-    def __init__(self, dest, obj):
-        self.dest = dest
+    def __init__(self, obj, dest):
         self.obj = obj
-
-
-class NameNode(InstructionNode):
-    def __init__(self, dest, name):
         self.dest = dest
-        self.name = name
+
+    def __repr__(self):
+        return f"{self.dest} = TYPEOF {self.obj}"
 
 
 class LabelNode(InstructionNode):
     def __init__(self, label):
         self.label = label
 
+    def __repr__(self):
+        return f"LABEL {self.label}:"
+
 
 class GotoNode(InstructionNode):
     def __init__(self, label):
         self.label = label
+
+    def __repr__(self):
+        return f"GOTO {self.label}"
 
 
 class GotoIfNode(InstructionNode):
@@ -176,17 +164,17 @@ class GotoIfNode(InstructionNode):
         self.condition = condition
         self.label = label
 
+    def __repr__(self):
+        return f"GOTO {self.label} if {self.condition}"
+
 
 class StaticCallNode(InstructionNode):
     def __init__(self, function, dest):
         self.function = function
         self.dest = dest
 
-
-class CopyNode(InstructionNode):
-    def __init__(self, dest, source):
-        self.dest = dest
-        self.source = source
+    def __repr__(self):
+        return f"{self.dest} = CALL {self.function}"
 
 
 class DynamicCallNode(InstructionNode):
@@ -196,21 +184,61 @@ class DynamicCallNode(InstructionNode):
         self.dest = dest
         self.computed_type = computed_type
 
+    def __repr__(self):
+        return f"{self.dest} = VCALL {self.type} {self.method}"
+
 
 class ArgNode(InstructionNode):
     def __init__(self, name):
         self.name = name
+
+    def __repr__(self):
+        return f"ARG {self.name}"
 
 
 class ReturnNode(InstructionNode):
     def __init__(self, value=None):
         self.value = value
 
+    def __repr__(self):
+        return f"RETURN {self.value}"
+
 
 class LoadNode(InstructionNode):
     def __init__(self, dest, msg):
         self.dest = dest
         self.msg = msg
+
+    def __repr__(self):
+        return f"{self.dest} LOAD {self.msg}"
+
+
+class ExitNode(InstructionNode):
+    pass
+
+
+class TypeNameNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+    def __repr__(self):
+        return f"{self.dest} = TYPENAME {self.source}"
+
+
+class NameNode(InstructionNode):
+    def __init__(self, dest, name):
+        self.dest = dest
+        self.name = name
+
+    def __repr__(self):
+        return f"{self.dest} = NAME {self.name}"
+
+
+class CopyNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
 
 
 class LengthNode(InstructionNode):
@@ -227,27 +255,12 @@ class ConcatNode(InstructionNode):
         self.length = length
 
 
-class PrefixNode(InstructionNode):
-    pass
-
-
 class SubstringNode(InstructionNode):
     def __init__(self, dest, str_value, index, length):
         self.dest = dest
         self.str_value = str_value
         self.index = index
         self.length = length
-
-
-class ToStrNode(InstructionNode):
-    def __init__(self, dest, ivalue):
-        self.dest = dest
-        self.ivalue = ivalue
-
-
-class ReadNode(InstructionNode):
-    def __init__(self, dest):
-        self.dest = dest
 
 
 class ReadStrNode(InstructionNode):
@@ -260,14 +273,12 @@ class ReadIntNode(InstructionNode):
         self.dest = dest
 
 
-class PrintNode(InstructionNode):
-    def __init__(self, str_addr):
-        self.str_addr = str_addr
-
-
 class PrintStrNode(InstructionNode):
     def __init__(self, value):
         self.value = value
+
+    def __repr__(self):
+        return f"PRINTSTR {self.value}"
 
 
 class PrintIntNode(InstructionNode):
@@ -275,6 +286,19 @@ class PrintIntNode(InstructionNode):
         self.value = value
 
 
+class ComplementNode(InstructionNode):
+    def __init__(self, dest, obj):
+        self.dest = dest
+        self.obj = obj
+
+
+class VoidNode(InstructionNode):
+    pass
+
+
 class ErrorNode(InstructionNode):
     def __init__(self, data_node):
         self.data_node = data_node
+
+    def __repr__(self):
+        return f"ERROR {self.data_node}"
