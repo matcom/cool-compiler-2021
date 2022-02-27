@@ -1,37 +1,37 @@
 from ..cmp.ast import (
-    ProgramNode,
-    ClassDeclarationNode,
-    AttrDeclarationNode,
-    FuncDeclarationNode,
+    ArithmeticNode,
     AssignNode,
+    AttrDeclarationNode,
+    BlockNode,
     CallNode,
     CaseNode,
-    BlockNode,
-    LoopNode,
-    ConditionalNode,
-    LetNode,
-    ArithmeticNode,
+    ClassDeclarationNode,
     ComparisonNode,
-    EqualNode,
-    VoidNode,
-    NotNode,
-    NegNode,
+    ConditionalNode,
+    ConstantBoolNode,
     ConstantNumNode,
     ConstantStringNode,
-    ConstantBoolNode,
-    VariableNode,
+    EqualNode,
+    FuncDeclarationNode,
     InstantiateNode,
+    LetNode,
+    LoopNode,
+    NegNode,
+    NotNode,
+    ProgramNode,
+    VariableNode,
+    VoidNode,
 )
 from ..cmp.semantic import (
+    AutoType,
     Context,
+    ErrorType,
     InferencerManager,
+    LCA,
     Method,
     Scope,
-    SemanticError,
-    ErrorType,
     SelfType,
-    AutoType,
-    LCA,
+    SemanticError,
     Type,
 )
 from .utils import AUTOTYPE_ERROR
@@ -207,21 +207,21 @@ class TypeInferencer:
 
         scope_index = self.scope_children_id
         self.scope_children_id = 0
-
         typex, computed_types = self.visit(
             node.expr, scope.children[scope_index], conforms_to_types
         )
+        self.scope_children_id = scope_index + 1
+
         if isinstance(var.type, AutoType):
             self.manager.upd_conformed_by(var.idx, computed_types)
 
-        self.scope_children_id = scope_index + 1
         return typex, computed_types
 
     @visitor.when(CallNode)
     def visit(self, node, scope, types):
         # Check cast type
         cast_type = None
-        if node.type is not None:
+        if not node.type == "":
             try:
                 cast_type = self.context.get_type(node.type)
                 if isinstance(cast_type, AutoType):
@@ -312,7 +312,6 @@ class TypeInferencer:
                     child_scope.update_variable(branch_name, inf_type)
 
             self.scope_children_id = 0
-
             _, computed_types = self.visit(expr, child_scope, types)
             expr_types.extend(computed_types)
 
@@ -326,15 +325,14 @@ class TypeInferencer:
         self.scope_children_id = 0
 
         # Check expressions but last one
-        sz = len(node.expr_list) - 1
-        for expr in node.expr_list[:sz]:
+        for expr in node.expr_list[:-1]:
             self.visit(expr, nscope, [])
 
         # Check last expression
         typex, computed_types = self.visit(node.expr_list[-1], nscope, types)
 
         # return the type of the last expression of the list
-        self.scope_children_id = scope_index
+        self.scope_children_id = scope_index + 1
         return typex, computed_types
 
     @visitor.when(LoopNode)
@@ -349,7 +347,7 @@ class TypeInferencer:
         # checking body
         self.visit(node.body, nscope, [])
 
-        self.scope_children_id = scope_index
+        self.scope_children_id = scope_index + 1
         return self.obj_type, [self.obj_type]
 
     @visitor.when(ConditionalNode)
