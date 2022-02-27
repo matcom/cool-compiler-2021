@@ -1,5 +1,5 @@
+from ...cmp.cil_ast import *
 import compiler.visitors.visitor as visitor
-from ..cmp.cil_ast import *
 
 
 class PrintCILVisitor(object):

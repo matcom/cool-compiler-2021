@@ -1,13 +1,13 @@
 from compiler.cmp.grammar import G
 from compiler.lexer.lex import CoolLexer
 from compiler.parser.parser import LR1Parser, evaluate_reverse_parse
-from compiler.visitors.cil_formatter import PrintCILVisitor
-from compiler.visitors.cool2cil import COOLToCILVisitor
-from compiler.visitors.formatter import FormatVisitor
-from compiler.visitors.type_collector import TypeCollector
-from compiler.visitors.type_builder import TypeBuilder
-from compiler.visitors.type_checker import TypeChecker
-from compiler.visitors.type_inferencer import TypeInferencer
+from compiler.visitors.cool2cil.cil_formatter import PrintCILVisitor
+from compiler.visitors.cool2cil.cool2cil import COOLToCILVisitor
+from compiler.visitors.semantics_check.formatter import FormatVisitor
+from compiler.visitors.semantics_check.type_builder import TypeBuilder
+from compiler.visitors.semantics_check.type_checker import TypeChecker
+from compiler.visitors.semantics_check.type_collector import TypeCollector
+from compiler.visitors.semantics_check.type_inferencer import TypeInferencer
 from sys import exit
 
 

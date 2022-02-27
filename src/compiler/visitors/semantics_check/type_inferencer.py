@@ -1,4 +1,4 @@
-from ..cmp.ast import (
+from ...cmp.ast import (
     ArithmeticNode,
     AssignNode,
     AttrDeclarationNode,
@@ -22,7 +22,7 @@ from ..cmp.ast import (
     VariableNode,
     VoidNode,
 )
-from ..cmp.semantic import (
+from ...cmp.semantic import (
     AutoType,
     Context,
     ErrorType,
@@ -34,7 +34,7 @@ from ..cmp.semantic import (
     SemanticError,
     Type,
 )
-from .utils import AUTOTYPE_ERROR
+from ..utils import AUTOTYPE_ERROR
 from typing import List, Tuple
 import compiler.visitors.visitor as visitor
 
