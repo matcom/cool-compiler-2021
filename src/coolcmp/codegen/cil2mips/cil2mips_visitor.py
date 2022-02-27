@@ -20,7 +20,7 @@ class CILToMipsVisitor:
         a0, v0, sp, fp, ra = registers.A0, registers.V0, registers.SP, registers.FP, registers.RA
 
         get_args_inst = [
-            mips.LWNode(t0, node.name),
+            mips.LANode(t0, node.name),
             mips.SWNode(t0, 0, v0),
         ]
         for i, _ in enumerate(node.attributes):
