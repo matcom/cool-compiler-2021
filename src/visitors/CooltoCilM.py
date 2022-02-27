@@ -449,7 +449,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # Visitar funciones dentro de la clase
         for feat, child in zip(node.features, scope.children):
             if isinstance(feat, FuncDeclarationNode):
-                self.visit(feat, child)
+                try:
+                    self.visit(feat, child)
+                except Exception as e:
+                    _ = 0
         self.vself.name = 'self'
 
         # Allocate de la clase
@@ -516,7 +519,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.body -> [ ExpressionNode ... ]
         ###############################
-        if node.id == 'a2i':
+        if node.id == 'main':
             _ = 0
         self.current_method = self.current_type.get_method(node.id, self.current_type, False)
         type = self.types_map[self.current_type.name]
@@ -608,9 +611,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             if isinstance(node.obj, InstantiateNode):
                 stype = node.obj.lex
             elif isinstance(node.obj, CallNode):
-                for m in scope.methods:
-                    if m.name == node.obj.method:
-                        stype = m.return_type
+                stype = node.type.name
             else:
                 stype = scope.find_variable(node.obj.lex)
                 if stype is None:
@@ -796,8 +797,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.chunk -> [ ExpressionNode... ]
         ###############################
 
-        for expr in node.chunk:
-            self.visit(expr, scope)
+        for i, expr in enumerate(node.chunk):
+            self.visit(expr, scope.children[i])
         node.ret_expr = node.chunk[-1].ret_expr
 
 
@@ -872,19 +873,24 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
+        try:
+            if node.condition.lex == 'flag':
+                _ = 0
+        except:
+            pass
         while_label = self.register_label('while_label')
         loop_label = self.register_label('loop_label')
         pool_label = self.register_label('pool_label')
         condition = self.define_internal_local()
 
         self.register_instruction(while_label)
-        self.visit(node.condition, scope.children[0])
+        self.visit(node.condition, scope)
         self.register_instruction(cil.GetAttribNode(condition, node.condition.ret_expr, 'value', 'Bool'))
         self.register_instruction(cil.GotoIfNode(condition, loop_label.label))
         self.register_instruction(cil.GotoNode(pool_label.label))
 
         self.register_instruction(loop_label)
-        self.visit(node.loopChunk, scope.children[1])
+        self.visit(node.loopChunk, scope.children[0])
         self.register_instruction(
             cil.GotoNode(while_label.label))
 
@@ -951,11 +957,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         vtype = self.define_internal_local()
         cond = self.define_internal_local()
 
-        self.visit(node.expression, scope.children[0])
-        self.register_instruction(cil.TypeOfNode(vtype, node.expression.ret_expr))
+        self.visit(node.expr, scope)
+        self.register_instruction(cil.TypeOfNode(vtype, node.expr.ret_expr))
 
         isvoid = self.define_internal_local()
-        self.register_instruction(cil.EqualNode(isvoid, node.expression.ret_expr, cil.VoidNode()))
+        self.register_instruction(cil.EqualNode(isvoid, node.expr.ret_expr, cil.VoidNode()))
         self.register_runtime_error(isvoid, 'RuntimeError: void in switch case')
 
         end_label = self.register_label('case_end_label')
@@ -963,11 +969,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         branch_type = self.define_internal_local()
         seen = []
         labels = []
-        branches = sorted(node.branches, key=lambda x: self.context.get_type(x[1].lex).depth, reverse=True)
-        for p, (id, type, expr) in enumerate(branches):
+        branches = sorted(node.case_list, key=lambda x: self.context.get_type(x[1]).depth, reverse=True)
+        # for p, (id, type, expr) in enumerate(branches):
+        for p, case in enumerate(branches):
+            id   = case[0]
+            type = case[1]
+            expr = case[2]
             labels.append(self.register_label(f'case_label_{p}'))
 
-            for t in self.context.subtree(type.lex):
+            for t in self.context.subtree(type):
                 if t not in seen:
                     seen.append(t)
                     self.register_instruction(cil.NameNode(branch_type, t.name))
@@ -978,12 +988,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ErrorNode(data))
 
         for p, label in enumerate(labels):
-            id, type, expr = branches[p]
-            sc = scope.children[p + 1]
+            id   = branches[p][0]
+            type = branches[p][1]
+            expr = branches[p][2]
+            # id, type, expr = branches[p]
+            sc = scope.children[p]
 
             self.register_instruction(label)
-            var = self.register_local(VariableInfo(id.lex, vtype))
-            self.register_instruction(cil.AssignNode(var, node.expression.ret_expr))
+            var = self.register_local(VariableInfo(id, vtype))
+            self.register_instruction(cil.AssignNode(var, node.expr.ret_expr))
             self.visit(expr, sc)
             self.register_instruction(cil.AssignNode(ret, expr.ret_expr))
             self.register_instruction(cil.GotoNode(end_label.label))
@@ -991,18 +1004,18 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(end_label)
         node.ret_expr = ret
         
-        var = self.define_internal_local()
-        self.register_instruction(cil.ParentTypeNode(var, obj_type))
-        self.register_instruction(cil.AssignNode(obj_type, var))
+        # var = self.define_internal_local()
+        # self.register_instruction(cil.ParentTypeNode(var, obj_type))
+        # self.register_instruction(cil.AssignNode(obj_type, var))
 
-        self.register_instruction(cil.GotoNode(start_case_label))
+        # self.register_instruction(cil.GotoNode(start_case_label))
         
-        self.register_instruction(cil.LabelNode(error_label))
-        self.register_instruction(cil.ParamNode(self.instances[-1]))
-        self.regster_instruction(cil.DynamicCallNode(var, self.to_function_name("abort", self.current_type.name), result))
+        # self.register_instruction(cil.LabelNode(error_label))
+        # self.register_instruction(cil.ParamNode(self.instances[-1]))
+        # self.regster_instruction(cil.DynamicCallNode(var, self.to_function_name("abort", self.current_type.name), result))
         
-        self.register_instruction(cil.GotoNode(end_case_label))
-        return result
+        # self.register_instruction(cil.GotoNode(end_case_label))
+        # return result
 
     @visitor.when(TrueNode)
     def visit(self, node, scope):

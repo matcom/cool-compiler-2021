@@ -9,9 +9,12 @@ from visitors.Executor import Executor, RuntimeException
 from visitors.CooltoCilM import COOLToCILVisitor
 from visitors.CilDepicter import get_formatter
 # from visitors.CiltoMips import CiltoMipsVisitor
+
 from cil_ast.cil_ast import get_formatter
 from mmips.CilToMipsVisitor import CILToMIPSVisitor
 from mmips.MIPSAstFormatter import MIPSAstFormatter
+
+# from visitors.Cil2MipsCurrent import CILToMipsVisitor
 
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
@@ -68,6 +71,8 @@ class Pipeline():
                     MIPSAst = MIPSVisitor.visit(cil_ast)
                     MIPSFormatter = MIPSAstFormatter()
                     mipsCode = MIPSFormatter.visit(MIPSAst)
+                    # MIPSVisitor = CILToMipsVisitor()
+                    # mipsCode = MIPSVisitor.visit(cil_ast)
                     with open('asd.mips', 'w') as f:
                         f.write(mipsCode)
                         f.close()

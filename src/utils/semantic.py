@@ -43,6 +43,7 @@ class Method:
 class Type:
     def __init__(self, name: str):
         self.name: str = name
+        self.depth = 0
         self.attributes_dict: OrderedDict[str, Attribute] = OrderedDict()
         self.methods_dict: OrderedDict[str, Method] = OrderedDict()
         self.parent: Optional['Type'] = None
@@ -204,6 +205,10 @@ class Context:
             return self.types[name]
         except KeyError:
             raise SemanticError(f'Type "{name}" is not defined.')
+
+    def subtree(self, name : str):
+        type = self.get_type(name)
+        return (i for i in self.types.values() if i.conforms_to(type))
 
     def __str__(self):
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'

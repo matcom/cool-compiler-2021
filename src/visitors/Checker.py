@@ -20,6 +20,13 @@ class TypeChecker:
             scope = Scope()
 
         for declaration in node.declarations:
+            current = self.context.get_type(declaration.id)
+            parent = current.parent
+            while parent is not None:
+                current.depth += 1
+                parent = parent.parent
+
+        for declaration in node.declarations:
             self.visit(declaration, scope.create_child())
 
         return scope
@@ -117,6 +124,9 @@ class TypeChecker:
             _t = nod.type
             _e = nod.expr
 
+            if _id == 'y' and _t == 'Int':
+                _ = 0
+
             if _id =='self':
                 self.errors.append(_SemanticError %(node.decl_list[iteration].token_list[0].lineno, node.decl_list[iteration].token_list[0].col, f"'self' cannot be bound in a 'let' expression."))
                 continue
@@ -211,11 +221,11 @@ class TypeChecker:
 
     @visitor.when(ChunkNode)
     def visit(self, node, scope):
-        child_scope = scope.create_child()
+        # child_scope = scope.create_child()
         return_type = ErrorType()
         
         for expr in node.chunk:
-            return_type = self.visit(expr, child_scope)
+            return_type = self.visit(expr, scope.create_child())
         return return_type
     
     @visitor.when(SwitchCaseNode)
@@ -324,6 +334,7 @@ class TypeChecker:
             # self.errors.append(e.text)
             for arg in node.args:
                 self.visit(arg, scope)
+            node.type = ErrorType()
             return ErrorType()
 
         # if len(node.args) != len(method.param_names):
@@ -339,8 +350,10 @@ class TypeChecker:
                     self.errors.append(_TypeError %(node.args[i].token_list[0].lineno, node.args[i].token_list[0].col, f"In call of {method.name}, type {arg_type.name} of parameter {method.param_names[i]} does not conform to declare type {method.param_types[i].name}"))
 
         if method.return_type.name != 'SELF_TYPE':
+            node.type = method.return_type
             return method.return_type 
         else:
+            node.type = ancestor_type
             return ancestor_type
 
     @visitor.when(ConstantNumNode)

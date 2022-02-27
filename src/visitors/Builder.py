@@ -33,6 +33,12 @@ class TypeBuilder:
         _int.set_parent(_object)
         _bool.set_parent(_object)
 
+        _object.depth = 0
+        _io.depth = 1
+        _string.depth = 1
+        _int.depth = 1
+        _bool.depth = 1
+
         _io.define_method('in_string', [], [], _string)
         _io.define_method('out_string', ['x'], [_string], _self)
         _io.define_method('in_int', [], [], _int)
