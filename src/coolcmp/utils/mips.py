@@ -74,17 +74,25 @@ class CommentNode(InstructionNode):
     def __init__(self, text: str):
         self.text = text
 
+    def __str__(self):
+        return f"# {self.text}"
+
 
 class DataNode(Node):
     def __init__(self, label: str):
         self.label = label
 
+    def __str__(self):
+        return f"{self.label}:"
+
 
 class StringNode(DataNode):
     def __init__(self, label: str, value: str):
         super().__init__(label)
-
         self.value = value
+
+    def __str__(self):
+        return f"{self.label}: .asciiz {repr(self.value)[1:-1]}"
 
 
 class SWNode(InstructionNode):
@@ -92,11 +100,13 @@ class SWNode(InstructionNode):
     store word | sw $1, 100($2) | Memory[$2 + 100] = $1
     Copy from register to memory.
     """
-
     def __init__(self, dest: Register, offset: int, src: Memory):
         self.dest = dest
         self.offset = offset
         self.src = src
+
+    def __str__(self):
+        return f"sw         {self.dest}, {self.offset}({self.src})"
 
 
 class LWNode(InstructionNode):
@@ -104,16 +114,15 @@ class LWNode(InstructionNode):
     load word | lw $1, 100($2) | $1 = Memory[$2 + 100]
     Copy from memory to register.
     """
-
     def __init__(self, dest: Register, src: tuple[int, Memory] | str):
         self.dest = dest
         self.src = src
 
     def __str__(self):
         if isinstance(self.src, tuple):
-            return f'lw {self.src[0]}(${self.src[1]})'
+            return f'lw         {self.dest}, {self.src[0]}({self.src[1]})'
         else:
-            return f'lw {self.src}'
+            return f'lw         {self.dest}, {self.src}'
 
 
 class LINode(InstructionNode):
@@ -121,10 +130,12 @@ class LINode(InstructionNode):
     load immediate | li $1, 100 | $1 = 100
     Loads immediate value into register.
     """
-
     def __init__(self, reg: Register, value: int):
         self.reg = reg
         self.value = value
+
+    def __str__(self):
+        return f"li         {self.reg}, {self.value}"
 
 
 class JALNode(InstructionNode):
@@ -133,9 +144,11 @@ class JALNode(InstructionNode):
     Use when making procedure call.
     This saves the return address in $ra.
     """
-
     def __init__(self, dest: str):
         self.dest = dest
+
+    def __str__(self):
+        return f"jal        {self.dest}"
 
 
 class LANode(InstructionNode):
@@ -143,21 +156,25 @@ class LANode(InstructionNode):
     load address | la $1, label | $1 = Address of label
     Loads computed address of label (not its contents) into register.
     """
-
     def __init__(self, reg: Register, label: str):
         self.reg = reg
         self.label = label
+
+    def __str__(self):
+        return f"la         {self.reg}, {self.label}"
 
 
 class ADDNode(InstructionNode):
     """
     add | add $1, $2, $3 | $1 = $2 + $3
     """
-
     def __init__(self, dest: Register, src1: Register | int, src2: Register | int):
         self.dest = dest
         self.src1 = src1
         self.src2 = src2
+
+    def __str__(self):
+        return f"add        {self.dest}, {self.src1}, {self.src2}"
 
 
 class ADDINode(InstructionNode):
@@ -165,34 +182,40 @@ class ADDINode(InstructionNode):
     add immediate | addi $1, $2, 100 | $1 = $2 + 100
     "Immediate" means a constant number.
     """
-
     def __init__(self, dest: Register, src: Register | int, isrc: Register | int):
         self.dest = dest
         self.src = src
         self.isrc = isrc
 
+    def __str__(self):
+        return f"addi       {self.dest}, {self.src}, {self.isrc}"
+
 
 class ADDUNode(InstructionNode):
     """
-    add unsigned | subu $1, $2, $3 | $1 = $2 + $3
+    add unsigned | addu $1, $2, $3 | $1 = $2 + $3
     Values are treated as unsigned integers, not two's complement integers.
     """
-
     def __init__(self, rdest: Register, r1: Register, r2: Register | int):
         self.rdest = rdest
         self.r1 = r1
         self.r2 = r2
+
+    def __str__(self):
+        return f"addu       {self.rdest}, {self.r1}, {self.r2}"
 
 
 class SUBNode(InstructionNode):
     """
     subtract | sub $1, $2, $3 | $1 = $2 - $3
     """
-
     def __init__(self, rdest: Register, r1: Register, r2: Register | int):
         self.rdest = rdest
         self.r1 = r1
         self.r2 = r2
+
+    def __str__(self):
+        return f"sub        {self.rdest}, {self.r1}, {self.r2}"
 
 
 class SUBUNode(InstructionNode):
@@ -200,11 +223,13 @@ class SUBUNode(InstructionNode):
     subtract unsigned | subu $1, $2, $3 | $1 = $2 - $3
     Values are treated as unsigned integers, not two's complement integers.
     """
-
     def __init__(self, rdest: Register, r1: Register, r2: Register | int):
         self.rdest = rdest
         self.r1 = r1
         self.r2 = r2
+
+    def __str__(self):
+        return f"subu       {self.rdest}, {self.r1}, {self.r2}"
 
 
 class JRNode(InstructionNode):
@@ -212,9 +237,11 @@ class JRNode(InstructionNode):
     jump register | jr $1 | go to address stored in $1
     For switch, procedure return.
     """
-
     def __init__(self, dest: Register):
         self.dest = dest
+
+    def __str__(self):
+        return f"jr         {str(self.dest)}"
 
 
 class SLLNode(InstructionNode):
@@ -222,11 +249,13 @@ class SLLNode(InstructionNode):
     shift left logical by a constant number of bits
     sll $1, $2, 10 -> $1 = $2<<10
     """
-
     def __init__(self, dest: Register, src: Register, bits: int):
         self.dest = dest
         self.src = src
         self.bits = bits
+
+    def __str__(self):
+        return f"sll        {self.dest}, {self.src}, {self.bits}"
 
 
 class MoveNode(InstructionNode):
@@ -239,9 +268,13 @@ class MoveNode(InstructionNode):
         self.reg1 = reg1
         self.reg2 = reg2
 
+    def __str__(self):
+        return f"move       {self.reg1}, {self.reg2}"
+
 
 class SysCallNode(InstructionNode):
-    pass
+    def __str__(self):
+        return "syscall"
 
 
 class PrintIntNode(SysCallNode):
@@ -249,7 +282,6 @@ class PrintIntNode(SysCallNode):
     print_int | $a0 = integer to be printed | code in v0 = 1
     Print integer number (32 bit).
     """
-
     pass
 
 
@@ -258,7 +290,6 @@ class PrintStringNode(SysCallNode):
     print_string | $a0 = address of string in memory | code in v0 = 4
     Print null-terminated character string.
     """
-
     pass
 
 
@@ -278,7 +309,7 @@ def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
     lw <reg_name>, 0($sp)
     addi $sp, $sp, 4
     """
-    lw = LWNode(reg_name, 0, SP)
+    lw = LWNode(reg_name, (0, SP))
     addi = ADDINode(SP, SP, DW)
 
     return [lw, addi]
@@ -289,8 +320,8 @@ def create_object_instructions(r1: Register, r2: Register):
         SLLNode(r1, r1, 2),
         LANode(r2, TYPES_LABELS),
         ADDNode(r2, r2, r1),
-        LWNode(r2, 0, r2),
-        LWNode(ARG[0], 4, r2),
+        LWNode(r2, (0, r2)),
+        LWNode(ARG[0], (4, r2)),
         SLLNode(ARG[0], ARG[0], 2),
         JALNode("malloc"),
         MoveNode(ARG[2], ARG[0]),

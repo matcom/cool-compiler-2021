@@ -1,5 +1,4 @@
 from __future__ import annotations
-from re import L
 from typing import Dict
 
 from coolcmp.utils import cil, visitor
@@ -26,22 +25,23 @@ class CILToMipsVisitor:
         ]
         for i, _ in enumerate(node.attributes):
             get_args_inst.extend([
-                mips.LWNode(t0, (i * 4 + 24, sp)),
-                mips.SWNode(t0, (i + 1) * 4, v0)
+                mips.LWNode(t0, (i * 4 + 24, sp)),  # 24 size of the stack between $sp and the init args pushed
+                mips.SWNode(t0, (i + 1) * 4, v0)    # $v0 has a pointer to the memory reserved by malloc.
             ])
 
         return [
             mips.SUBUNode(sp, sp, 24),
             mips.SWNode(ra, 8, sp),
-            mips.SWNode(fp, sp, 20),
+            mips.SWNode(fp, 4, sp),
+            mips.ADDUNode(fp, sp, 20),
 
             mips.LWNode(a0, node.name),
             mips.JALNode('malloc'),
             *get_args_inst,
 
-            mips.LWNode(ra, (20, sp)),
-            mips.LWNode(fp, (16, sp)),
-            mips.ADDUNode(sp, sp, 32),
+            mips.LWNode(ra, (8, sp)),
+            mips.LWNode(fp, (4, sp)),
+            mips.ADDUNode(sp, sp, 24),
             mips.JRNode(ra),
         ]
 
@@ -70,12 +70,16 @@ class CILToMipsVisitor:
     def visit(self, node: cil.TypeNode):
         print(f"TypeNode {node.name} {node.methods}")
 
+        init = self.build_init(node)
+        print(f'_{node.name}_init:')
+        print('    ' + '\n    '.join(str(inst) for inst in init))
+
         type_ = mips.Type(
             label=node.name,
             attrs=list(node.attributes),
             methods=node.methods,
             index=len(self.types),
-            init=self.build_init(node)
+            init=init
         )
 
         self.types[node.name] = type_
@@ -287,7 +291,8 @@ class CILToMipsVisitor:
     def visit(self, node: cil.ReturnNode):
         if isinstance(node.value, int):
             self.add_inst(mips.LINode(registers.V0, node.value))
-        else:
-            self.visit(node.value)
-            address = self.cur_function.variable_address(node.value)
-            self.add_inst(mips.LWNode(registers.V0, (address, registers.FP)))
+        elif node.value is None:
+            pass
+            # self.visit(node.value)
+            # address = self.cur_function.variable_address(node.value)
+            # self.add_inst(mips.LWNode(registers.V0, (address, registers.FP)))
