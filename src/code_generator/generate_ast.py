@@ -346,12 +346,12 @@ class CIL:
     @visitor.when(IsVoidNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        if isinstance(node.expr.computed_type, IntType) or isinstance(node.expr.computed_type, StringType) or isinstance(node.expr.computed_type, BoolType):
-            return CILNumberNode(0)
-        else: 
-            name = self.scope.add_new_local(node.computed_type)
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
-            return CILEqualsNode(CILVariableNode(name), CILNumberNode(0)) 
+        name = self.scope.add_new_local(node.computed_type)
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
+        self.scope.instructions.append(CILArgNode(CILVariableNode(name)))
+        name = self.scope.add_new_local("Bool")
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILCallNode("isvoid") ))
+        return CILVariableNode(name)
     
     @visitor.when(ConstantNumNode)
     def visit(self, node):

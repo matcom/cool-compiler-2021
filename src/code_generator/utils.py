@@ -149,7 +149,6 @@ class CILScope:
     def create_init_class(self, attributes, expresions, locals):
         type = self.context.get_type(self.current_class)
         instructions = []
-        print(expresions)
         if not isinstance(type.parent, ObjectType):
             instructions.append(CILArgNode(CILVariableNode(f'self')))
             call = CILCallNode(f'init_{type.parent.name}')  
@@ -160,7 +159,6 @@ class CILScope:
             instructions.extend(inst)
             if not isinstance(expr, CILAtomicNode):
                 variable = CILVariableNode(self.add_new_local(type))
-            #     print
                 instructions.append(CILAssignNode(variable, expr))
             else:   
                 variable = expr
