@@ -31,6 +31,8 @@ class CIL:
         instructions.append(CILReturnNode(CILVariableNode("m2")))
         self.scope.functions.append(CILFuncNode('main', [], locals, instructions))
         
+        self.scope.data.append(CILDataNode(f'str_empty', ""))
+
         types_ts = get_ts(self.scope.context)
         infos = self.scope.infos = {}
         for type in types_ts:
@@ -58,15 +60,16 @@ class CIL:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         self.scope.current_class = node.id
-        att_aux = []
         attributes = []
-        expressions = []
+        features = []
         methods = []
         locals  = []
         type_info = self.scope.infos[node.id]
+        
         for a in type_info.attrs:   
             attributes.append(CILAttributeNode(a.name, a.type))
         methods.append(CILMethodNode(f'Init_{node.id}', f'Init_{node.id}'))         
+        
         for m in type_info.methods.keys():        
             methods.append(CILMethodNode(m, type_info.methods[m])) 
                 
@@ -75,18 +78,20 @@ class CIL:
             self.scope.locals = [{}]
             self.scope.all_locals = []
             if isinstance(feature, AttrDeclarationNode):
-                if feature.expr is not None:
+                if feature.expr is not None:    
                     expr = self.visit(feature.expr)
-                    expressions.append((expr, feature.expr.computed_type, self.scope.instructions.copy()))
+                    features.append((feature.id, feature.type, expr, self.scope.instructions.copy()))
                     self.scope.instructions =  []
-                    att_aux.append(feature.id)
                     locals.extend(self.scope.all_locals.copy())
+                else:
+                    expr = None
+                    features.append((feature.id, feature.type, None, None))
                    
             else:
                 function = self.visit(feature)
                 self.scope.functions.append(function) 
 
-        init_class = self.scope.create_init_class(att_aux, expressions, locals)    
+        init_class = self.scope.create_init_class(features, locals)    
         self.scope.functions.append(init_class)  
         
         return CILTypeNode(node.id, attributes, methods)
@@ -192,23 +197,21 @@ class CIL:
     @visitor.when(VarDeclarationNode)
     def visit(self, node):
         name = self.scope.add_local(node.id, node.type)
+
         if node.expr is not None:
             expr = self.visit(node.expr)
-            instruction = CILAssignNode(CILVariableNode(name), expr)
-            self.scope.instructions.append(instruction)
         elif isinstance(node.computed_type, IntType): 
-            self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
-            var = CILVariableNode(name)
-            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Int', 'Init_Int')))
+            expr = CILNumberNode(0)
         elif isinstance(node.computed_type, BoolType): 
-            self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
-            var = CILVariableNode(name)
-            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Bool', 'Init_Bool')))
+            expr = CILEqualsNode(CILNumberNode(0), CILNumberNode(1))
         elif isinstance(node.computed_type, StringType):
-            self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
-            var = CILVariableNode(name)
-            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('String', 'Init_String')))
-            
+            expr = CILLoadNode('str_empty')
+        else:
+            expr = None
+
+        if expr is not None:
+            self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
+
     @visitor.when(LoopNode)
     def visit(self, node):
         count = self.scope.loop_count

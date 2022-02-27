@@ -1,4 +1,4 @@
-from cmp.semantic import ObjectType
+from cmp.semantic import IntType, ObjectType, StringType, BoolType
 from .ast_CIL import *
 
 
@@ -146,24 +146,35 @@ class CILScope:
         
         return types
         
-    def create_init_class(self, attributes, expresions, locals):
+    def create_init_class(self, attributes, locals):
         type = self.context.get_type(self.current_class)
         instructions = []
         if not isinstance(type.parent, ObjectType):
             instructions.append(CILArgNode(CILVariableNode(f'self_{self.current_class}')))
             call = CILCallNode(f'Init_{type.parent.name}')  
             instructions.append(CILAssignNode(CILVariableNode(f'self_{self.current_class}'), call))   
-                     
-        for attr, (expr, type, inst) in zip(attributes, expresions):
 
-            instructions.extend(inst)
-            if not isinstance(expr, CILAtomicNode):
+        for id, type, expr, inst in attributes:
+            if expr is not None:
+                instructions.extend(inst)
+                if not isinstance(expr, CILAtomicNode):
+                    variable = CILVariableNode(self.add_new_local(type))
+                    instructions.append(CILAssignNode(variable, expr))
+                else:   
+                    variable = expr
+            elif type == 'Int':
+                variable = CILNumberNode(0)
+            elif type == 'String':
                 variable = CILVariableNode(self.add_new_local(type))
-                instructions.append(CILAssignNode(variable, expr))
-            else:   
-                variable = expr
-                
-            instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.current_class}'), self.current_class, CILVariableNode(attr), variable)) 
+                instructions.append(CILAssignNode(variable, CILLoadNode('str_empty')))
+            elif type == 'Bool':
+                variable = CILVariableNode(self.add_new_local(type))
+                instructions.append(CILAssignNode(variable, CILEqualsNode(CILNumberNode(0), CILNumberNode(1))))
+            else:
+                variable = None
+            
+            if variable is not None:
+                instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.current_class}'), self.current_class, CILVariableNode(id), variable)) 
         
         instructions.append(CILReturnNode(CILVariableNode(f'self_{self.current_class}')))
         
