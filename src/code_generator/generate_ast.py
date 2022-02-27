@@ -1,3 +1,4 @@
+from cmath import exp
 from parsing.ast import *
 from .ast_CIL import *
 from .utils import *
@@ -311,29 +312,42 @@ class CIL:
             right = expr_right
         
         if isinstance(node, PlusNode):
-            return CILPlusNode(left, right)
+            oper =  CILPlusNode(left, right)
         elif isinstance(node, MinusNode):
-            return CILMinusNode(left, right)
+            oper = CILMinusNode(left, right)
         elif isinstance(node, DivNode):
-            return CILDivNode(left, right)
+            oper = CILDivNode(left, right)
         elif isinstance(node, StarNode):
-            return CILStarNode(left, right)
+            oper = CILStarNode(left, right)
         elif isinstance(node, ElessNode):
-            return CILElessNode(left, right)
+            oper = CILElessNode(left, right)
         elif isinstance(node, LessNode):
-            return CILLessNode(left, right)
+            oper = CILLessNode(left, right)
         else:
-            return CILEqualsNode(left, right)
-                
+            oper = CILEqualsNode(left, right)
+        name = self.scope.add_new_local(node.computed_type.name)       
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name),oper))
+        return CILVariableNode(name)
     @visitor.when(PrimeNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        return CILStarNode(expr , CILNumberNode(-1))
+        name_exp = self.scope.add_new_local(node.expr.computed_type.name)
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name_exp), expr))  
+        name = self.scope.add_new_local(node.computed_type.name)   
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILMinusNode(CILNumberNode(0), CILVariableNode(name_exp))))
+        return CILVariableNode(name)
    
     @visitor.when(NotNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        return  CILNotEqualsNode( expr, CILNumberNode(0))
+        name_exp = self.scope.add_new_local(node.expr.computed_type.name)
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name_exp), expr))  
+        name = self.scope.add_new_local(node.computed_type.name)   
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILNotEqualsNode(CILVariableNode(name_exp) , CILNumberNode(0))))
+        return CILVariableNode(name)
+    
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILNotEqualsNode( expr, CILNumberNode(0))))
+        return  CILVariableNode(name)
     
     @visitor.when(StringNode)
     def visit(self, node):
