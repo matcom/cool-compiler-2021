@@ -245,7 +245,7 @@ class CIL:
         name_return =  self.scope.add_new_local(node.computed_type.name)
         return_ = CILVariableNode(name_return)
         
-        for case, index in zip(node.cases,range(0,len(node.cases))):
+        for case, index in zip(node.cases,range(0, len(node.cases))):
             if index != 0:
                 self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
             
@@ -253,13 +253,16 @@ class CIL:
             name_var_condition = self.scope.add_new_local(None)
             var_condition = CILVariableNode(name_var_condition)
             self.scope.instructions.append(CILAssignNode(var_condition, CILNotEqualsNode(CILVariableNode(name_type_expr),case_expr_type_of)))
-            self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))
-            
+            if index == len(node.cases) - 1:
+                self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
+            else:
+                self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))
+
             expr_attr = self.visit(case)
             
             self.scope.instructions.append(CILAssignNode(return_, expr_attr))    
-       
             self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))
+
         self.scope.instructions.append(CILLabelNode(f'case_end{ self.scope.case_count}'))
         self.scope.case_count += 1 
         return return_
@@ -382,7 +385,6 @@ class CIL:
                 name = self.scope.add_new_local(node.computed_type.name)
                 self.scope.instructions.append(CILAssignNode(CILVariableNode(name),CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.lex))))
                 return  CILVariableNode(name)
-            CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.lex))
         
     @visitor.when(TrueNode)
     def visit(self, node):
