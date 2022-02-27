@@ -189,6 +189,18 @@ class CCILToMIPSGenerator:
         )
         return instructions
 
+    @visitor.when(ccil_ast.IdNode)
+    def visit(self, node: ccil_ast.IdNode):
+        instructions = []
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                mips_ast.RegisterNode(node, V0),
+                self.get_relative_location(node.value),
+            )
+        )
+        return instructions
+
     @visitor.when(ccil_ast.IntNode)
     def visit(self, node: ccil_ast.IntNode):
         instructions = []
