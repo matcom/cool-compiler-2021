@@ -246,7 +246,7 @@ class CCILGenerator:
 
         if is_attr:
             # Assignation occurring to an attribute Go update the attribute
-            set_attr = SetAttrOpNode("self", ccil_id, extract_id(expr_fval), SELFTYPE)
+            set_attr = SetAttrOpNode("self", ccil_id, extract_id(expr_fval), self.current_type)
             return [*expr_ops, set_attr], expr_fval
 
         self.update_locals(expr_fval.id, ccil_id)
