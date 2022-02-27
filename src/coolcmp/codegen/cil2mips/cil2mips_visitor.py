@@ -16,6 +16,35 @@ class CILToMipsVisitor:
     def add_inst(self, *inst: mips.InstructionNode) -> None:
         self.cur_function.instructions.extend(inst)
 
+    def build_init(self, node: cil.TypeNode) -> list[mips.InstructionNode]:
+        t0 = registers.T[0]
+        a0, v0, sp, fp, ra = registers.A0, registers.V0, registers.SP, registers.FP, registers.RA
+
+        get_args_inst = [
+            mips.LWNode(t0, node.name),
+            mips.SWNode(t0, 0, v0),
+        ]
+        for i, _ in enumerate(node.attributes):
+            get_args_inst.extend([
+                mips.LWNode(t0, (i * 4 + 24, sp)),
+                mips.SWNode(t0, (i + 1) * 4, v0)
+            ])
+
+        return [
+            mips.SUBUNode(sp, sp, 24),
+            mips.SWNode(ra, 8, sp),
+            mips.SWNode(fp, sp, 20),
+
+            mips.LWNode(a0, node.name),
+            mips.JALNode('malloc'),
+            *get_args_inst,
+
+            mips.LWNode(ra, (20, sp)),
+            mips.LWNode(fp, (16, sp)),
+            mips.ADDUNode(sp, sp, 32),
+            mips.JRNode(ra),
+        ]
+
     @visitor.on("node")
     def visit(self, node):
         pass
@@ -46,6 +75,7 @@ class CILToMipsVisitor:
             attrs=list(node.attributes),
             methods=node.methods,
             index=len(self.types),
+            init=self.build_init(node)
         )
 
         self.types[node.name] = type_
@@ -144,7 +174,7 @@ class CILToMipsVisitor:
         address = self.cur_function.variable_address(node.addr)
 
         self.add_inst(
-            mips.LWNode(registers.ARG[0], address, registers.FP),
+            mips.LWNode(registers.ARG[0], (address, registers.FP)),
             mips.SysCallNode(),
             mips.CommentNode(f"</printint:{node.addr}>"),
         )
@@ -156,7 +186,7 @@ class CILToMipsVisitor:
         self.add_inst(
             mips.CommentNode(f"<printstring:{node.addr}>"),
             mips.LINode(registers.V0, 4),
-            mips.LWNode(registers.ARG[0], address, registers.FP),
+            mips.LWNode(registers.ARG[0], (address, registers.FP)),
             mips.SysCallNode(),
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
@@ -194,7 +224,7 @@ class CILToMipsVisitor:
                 self.add_inst(mips.LINode(reg, value))
             else:
                 address = self.cur_function.variable_address(value)
-                self.add_inst(mips.LWNode(reg, address, registers.FP))
+                self.add_inst(mips.LWNode(reg, (address, registers.FP)))
 
         self.add_inst(mips.CommentNode(f"<sum:{node.dest}<-{node.left}+{node.right}>"))
         handle_set_register_value(t0, node.left)
@@ -211,8 +241,8 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<minus:{node.dest}<-{node.left}+{node.right}>"),
-            mips.LWNode(t0, 4, node.left),  # load Int_value at offset 4
-            mips.LWNode(t1, 4, node.right),  # load Int_value at offset 4
+            mips.LWNode(t0, (4, node.left)),  # load Int_value at offset 4
+            mips.LWNode(t1, (4, node.right)),  # load Int_value at offset 4
             mips.SUBNode(t2, t0, t1),  # subtract the integer values
             # allocate here new Int with the value in t0 as Int_value
             mips.CommentNode(f"</minus:{node.dest}<-{node.left}+{node.right}>"),
@@ -246,7 +276,7 @@ class CILToMipsVisitor:
             self.visit(node.source)
             source_address = self.cur_function.variable_address(node.source)
             self.add_inst(
-                mips.LWNode(t0, source_address, registers.FP),
+                mips.LWNode(t0, (source_address, registers.FP)),
                 mips.SWNode(t0, dest_address, registers.FP),
             )
         self.add_inst(
@@ -260,4 +290,4 @@ class CILToMipsVisitor:
         else:
             self.visit(node.value)
             address = self.cur_function.variable_address(node.value)
-            self.add_inst(mips.LWNode(registers.V0, address, registers.FP))
+            self.add_inst(mips.LWNode(registers.V0, (address, registers.FP)))

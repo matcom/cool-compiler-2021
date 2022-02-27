@@ -93,7 +93,7 @@ class MIPSFormatter:
 
     @visitor.when(mips.LWNode)
     def visit(self, node: mips.LWNode):
-        return f"lw {node.dest}, {node.offset}({node.src})"
+        return str(node)
 
     @visitor.when(mips.SWNode)
     def visit(self, node: mips.SWNode):

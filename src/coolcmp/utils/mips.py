@@ -14,17 +14,18 @@ class Node:
 
 
 class Type:
-    def __init__(self, label, attrs, methods, index):
+    def __init__(self, label, attrs, methods, index, init: list[InstructionNode]):
         self.label = label
         self.attrs = attrs
         self.methods = methods
         self.index = index
+        self.init = init
 
     def length(self):
         return len(self.attrs)
 
     def __str__(self):
-        return f"{self.label}-{self.attrs}-{self.default_attrs}-{self.methods}-{self.index}"
+        return f"{self.label}-{self.attrs}-{self.methods}-{self.index}"
 
 
 class ProgramNode(Node):
@@ -104,10 +105,15 @@ class LWNode(InstructionNode):
     Copy from memory to register.
     """
 
-    def __init__(self, dest: Register, offset: int, src: Memory):
+    def __init__(self, dest: Register, src: tuple[int, Memory] | str):
         self.dest = dest
-        self.offset = offset
         self.src = src
+
+    def __str__(self):
+        if isinstance(self.src, tuple):
+            return f'lw {self.src[0]}(${self.src[1]})'
+        else:
+            return f'lw {self.src}'
 
 
 class LINode(InstructionNode):
@@ -166,12 +172,36 @@ class ADDINode(InstructionNode):
         self.isrc = isrc
 
 
+class ADDUNode(InstructionNode):
+    """
+    add unsigned | subu $1, $2, $3 | $1 = $2 + $3
+    Values are treated as unsigned integers, not two's complement integers.
+    """
+
+    def __init__(self, rdest: Register, r1: Register, r2: Register | int):
+        self.rdest = rdest
+        self.r1 = r1
+        self.r2 = r2
+
+
 class SUBNode(InstructionNode):
     """
     subtract | sub $1, $2, $3 | $1 = $2 - $3
     """
 
-    def __init__(self, rdest: Register, r1: Register, r2: Register):
+    def __init__(self, rdest: Register, r1: Register, r2: Register | int):
+        self.rdest = rdest
+        self.r1 = r1
+        self.r2 = r2
+
+
+class SUBUNode(InstructionNode):
+    """
+    subtract unsigned | subu $1, $2, $3 | $1 = $2 - $3
+    Values are treated as unsigned integers, not two's complement integers.
+    """
+
+    def __init__(self, rdest: Register, r1: Register, r2: Register | int):
         self.rdest = rdest
         self.r1 = r1
         self.r2 = r2
