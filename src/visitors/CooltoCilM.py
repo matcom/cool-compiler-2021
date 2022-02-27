@@ -436,15 +436,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 self.init_attr_name(self.current_type.parent.name), variable))
 
         # Inicializando los atributos de la clase
-        for feat in node.features:
+        for i, feat in enumerate(node.features):
             if isinstance(feat, AttrDeclarationNode):
-                try:
-                    att_scope = Scope()
-                    att_scope.locals = scope.locals
-                    self.visit(feat, att_scope)
-                    self.register_instruction(cil.SetAttribNode(self_param, feat.id, feat.ret_expr, node.id,))
-                except Exception as e:
-                    _ = 0
+                # try:
+                self.visit(feat, scope.children[i])
+                self.register_instruction(cil.SetAttribNode(self_param, feat.id, feat.ret_expr, node.id,))
+                # except Exception as e:
+                    # _ = 0
         self.register_instruction(cil.ReturnNode(self_param))
 
         # TypeNode de la clase
@@ -493,11 +491,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 return StringNode("")
             else:
                 return VoidNode('void')
-        if node.id == 'm':
-            _ = 0
+
         variable = self.define_internal_local()
         if node.value:
-            self.visit(node.value, scope)
+            self.visit(node.value, scope.children[0])
             self.register_instruction(cil.AssignNode(variable, node.value.ret_expr))
         elif node.type in self.value_types:
             if node.type == 'SELF_TYPE':
@@ -525,8 +522,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.body -> [ ExpressionNode ... ]
         ###############################
-        if node.id == 'm':
-            _ = 0
         self.current_method = self.current_type.get_method(node.id, self.current_type, False)
         type = self.types_map[self.current_type.name]
         self.current_function = self.register_function(self.to_function_name(self.current_method.name,
@@ -630,7 +625,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
             if node.parent is not None:
                 # stype = node.type.lex
-                self.register_instruction(cil.StaticCallNode(self.types_map[stype].methods[node.method], ret))
+                self.register_instruction(cil.StaticCallNode(self.types_map[node.parent].methods[node.method], ret))
             else:
                 # stype = node.obj.static_type.name
                 self.register_instruction(cil.ArgNode(node.obj.ret_expr))
@@ -879,24 +874,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
-        try:
-            if node.condition.lex == 'flag':
-                _ = 0
-        except:
-            pass
         while_label = self.register_label('while_label')
         loop_label = self.register_label('loop_label')
         pool_label = self.register_label('pool_label')
         condition = self.define_internal_local()
 
         self.register_instruction(while_label)
-        self.visit(node.condition, scope)
+        self.visit(node.condition, scope.children[0])
         self.register_instruction(cil.GetAttribNode(condition, node.condition.ret_expr, 'value', 'Bool'))
         self.register_instruction(cil.GotoIfNode(condition, loop_label.label))
         self.register_instruction(cil.GotoNode(pool_label.label))
 
         self.register_instruction(loop_label)
-        self.visit(node.loopChunk, scope.children[0])
+        self.visit(node.loopChunk, scope.children[1])
         self.register_instruction(
             cil.GotoNode(while_label.label))
 

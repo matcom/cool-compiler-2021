@@ -2,6 +2,7 @@ from cool_ast.cool_ast import *
 from utils.semantic import Context, SemanticError, Type, Method, Scope, ErrorType, VariableInfo
 import visitors.visitor as visitor
 from utils.errors import _TypeError, _NameError, _SemanticError, _AtributeError
+count = 0
 class TypeChecker:
     def __init__(self, context, errors, c_m = None, c_t = None):
         self.context = context
@@ -47,8 +48,11 @@ class TypeChecker:
         #         methods.append(feature)
                 
         for attr, owner in self.current_type.all_attributes(): #definir atributos de los ancestros
-            if owner != self.current_type:
-                scope.define_variable(attr.name, attr.type)
+            # if owner != self.current_type:
+                # scope.define_variable(attr.name, attr.type)
+            scope.define_variable(attr.name, attr.type)
+
+
         # for attr in attrs:
         #     self.visit(attr, scope)
 
@@ -57,9 +61,12 @@ class TypeChecker:
         
         for feature in node.features:
             if isinstance(feature, AttrDeclarationNode):
-                self.visit(feature, scope)
+                cscope = scope.create_child()
+                self.visit(feature, cscope)
             else:
                 self.visit(feature, scope.create_child())
+
+        
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -124,9 +131,6 @@ class TypeChecker:
             _t = nod.type
             _e = nod.expr
 
-            if _id == 'y' and _t == 'Int':
-                _ = 0
-
             if _id =='self':
                 self.errors.append(_SemanticError %(node.decl_list[iteration].token_list[0].lineno, node.decl_list[iteration].token_list[0].col, f"'self' cannot be bound in a 'let' expression."))
                 continue
@@ -186,10 +190,10 @@ class TypeChecker:
             
             ## this is to assign to the variable the type of the right-side expression, but it doesnt pass the semantic tests this way, f
             # attrType = value_t
-        else:
-            scope.create_child()
+        # else:
+        #     scope.create_child()
 
-        scope.define_variable(node.id, attrType)
+        # scope.define_variable(node.id, attrType)
         
     @visitor.when(AssignNode)
     def visit(self, node, scope):
@@ -202,6 +206,7 @@ class TypeChecker:
             return ErrorType()
         
         if var_info is None:
+            raise Exception('var not found in scope')
             self.errors.append(f'Undefined variable {node.id} in {self.current_method.name}.')
         else:
             if not exprType.conforms_to(var_info.type):
@@ -211,7 +216,9 @@ class TypeChecker:
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
-        condition = self.visit(node.condition, scope)
+        # if node.condition.lex == 'true':
+        #     _ = 0
+        condition = self.visit(node.condition, scope.create_child())
         if condition != self.context.get_type('Bool'):
             # self.errors.append(f"Can't convert {condition.name} to Bool.")
             self.errors.append(_TypeError %(node.condition.token_list[0].lineno, node.condition.token_list[0].col, f'Loop condition does not have type Bool.'))
@@ -394,8 +401,10 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             if node.lex != 'SELF_TYPE':
-                return self.context.get_type(node.lex) 
+                node.type = self.context.get_type(node.lex)
+                return  node.type
             else:
+                node.type = self.current_type
                 return self.current_type
         except SemanticError as e:
             self.errors.append(_TypeError % (node.token_list[1].lineno, node.token_list[1].col, f"'new' used with undefined class {node.lex}."))
@@ -404,7 +413,7 @@ class TypeChecker:
 
     @visitor.when(NotNode)
     def visit(self, node, scope):
-        tp = self.visit(node.expression, scope)
+        tp = self.visit(node.expression, scope.create_child())
         if tp == self.context.get_type('Bool'):
             return tp
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f"Argument of 'not' has type {tp.name} instead of Bool."))

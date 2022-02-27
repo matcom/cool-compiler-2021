@@ -229,11 +229,17 @@ class FunctionInfo:
         self.name = name
         self.params = params
 
+from random import randint
+count = 0
 class Scope:
     def __init__(self, parent: Optional['Scope'] = None):
+        global count
         self.locals: Dict[str, VariableInfo] = {}
         self.parent: Optional['Scope'] = parent
         self.children: List[Scope] = []
+        # self.id = randint(1,1000)
+        self.id = count
+        count+=1
 
     def create_child(self) -> 'Scope':
         child = Scope(self)
@@ -245,11 +251,18 @@ class Scope:
         self.locals[vname] = info
         return info
 
-    def find_variable(self, vname: str) -> Optional[VariableInfo]:
+    # def find_variable(self, vname: str) -> Optional[VariableInfo]:
+    #     try:
+    #         return self.locals[vname]
+    #     except KeyError:
+    #         return self.parent.find_variable(vname) if self.parent is not None else None
+
+    def find_variable(self, vname : str):
         try:
             return self.locals[vname]
         except KeyError:
             return self.parent.find_variable(vname) if self.parent is not None else None
+
 
     def is_defined(self, vname) -> bool:
         return self.find_variable(vname) is not None
