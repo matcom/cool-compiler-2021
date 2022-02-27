@@ -68,35 +68,35 @@ class CILScope:
         types = []
         
         obj_methods = [
-            CILMethodNode('init_Object', 'init_Object'),
+            CILMethodNode('Init_Object', 'Init_Object'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
         ]
         types.append(CILTypeNode('Object', [], obj_methods))
         init_Object = CILFuncNode(
-            'init_Object', 
+            'Init_Object', 
             [CILParamNode('self', None)], 
             [], 
             [CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_Object)
         
         int_methods = [
-            CILMethodNode('init_Int', 'init_Int'),
+            CILMethodNode('Init_Int', 'Init_Int'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
         ]
         types.append(CILTypeNode('Int', [CILAttributeNode('value', None)], int_methods))
         init_int = CILFuncNode(
-            'init_Int', 
+            'Init_Int', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
             [CILSetAttributeNode(CILVariableNode('self'), 'Int', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_int)
         
         str_methods = [
-            CILMethodNode('init_String', 'init_String'), 
+            CILMethodNode('Init_String', 'Init_String'), 
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
@@ -106,28 +106,28 @@ class CILScope:
         ]
         types.append(CILTypeNode('String', [CILAttributeNode('value', None)], str_methods))
         init_string = CILFuncNode(
-            'init_String', 
+            'Init_String', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
             [CILSetAttributeNode(CILVariableNode('self'), 'String', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_string)
         
         bool_methods = [
-            CILMethodNode('init_Bool', 'init_Bool'),
+            CILMethodNode('Init_Bool', 'Init_Bool'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
         ]
         types.append(CILTypeNode('Bool', [CILAttributeNode('value', None)], bool_methods))
         init_bool = CILFuncNode(
-            'init_Bool', 
+            'Init_Bool', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
             [], 
             [CILSetAttributeNode(CILVariableNode('self'), 'Bool', CILVariableNode('value'), CILVariableNode('v')), CILReturnNode(CILVariableNode('self'))])               
         self.functions.append(init_bool)
         
         io_methods = [
-            CILMethodNode('init_IO', 'init_IO'),
+            CILMethodNode('Init_IO', 'Init_IO'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
@@ -138,7 +138,7 @@ class CILScope:
         ]
         types.append(CILTypeNode('IO', [], io_methods))
         init_IO = CILFuncNode(
-            'init_IO', 
+            'Init_IO', 
             [CILParamNode('self', None)], 
             [], 
             [CILReturnNode(CILVariableNode('self'))])               
@@ -150,9 +150,9 @@ class CILScope:
         type = self.context.get_type(self.current_class)
         instructions = []
         if not isinstance(type.parent, ObjectType):
-            instructions.append(CILArgNode(CILVariableNode(f'self')))
-            call = CILCallNode(f'init_{type.parent.name}')  
-            instructions.append(CILAssignNode(CILVariableNode('self'), call))   
+            instructions.append(CILArgNode(CILVariableNode(f'self_{self.current_class}')))
+            call = CILCallNode(f'Init_{type.parent.name}')  
+            instructions.append(CILAssignNode(CILVariableNode(f'self_{self.current_class}'), call))   
                      
         for attr, (expr, type, inst) in zip(attributes, expresions):
 
@@ -163,11 +163,11 @@ class CILScope:
             else:   
                 variable = expr
                 
-            instructions.append(CILSetAttributeNode(CILVariableNode('self'), self.current_class, CILVariableNode(attr), variable)) 
+            instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.current_class}'), self.current_class, CILVariableNode(attr), variable)) 
         
-        instructions.append(CILReturnNode(CILVariableNode('self')))
+        instructions.append(CILReturnNode(CILVariableNode(f'self_{self.current_class}')))
         
-        return CILFuncNode(f'init_{self.current_class}', [CILParamNode('self', None)], locals, instructions)
+        return CILFuncNode(f'Init_{self.current_class}', [CILParamNode(f'self_{self.current_class}', None)], locals, instructions)
 
 
         

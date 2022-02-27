@@ -1,3 +1,36 @@
+abort_Object:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+		
+		la $a0, ObjectAbortMessage
+		li $v0, 4
+		syscall
+
+		lw $t0, 12($fp)
+		lw $t0, 0($t0)
+		lw $t0, 4($t0)
+
+		move $a0, $t0
+		li $v0, 4
+		syscall
+		
+        li $v0, 10
+        syscall
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+
+
 out_string_IO:
         # calling conventions
         sw $ra, 0($sp)
@@ -21,6 +54,124 @@ out_string_IO:
         lw $ra, 0($sp)
        
         jr $ra
+
+out_int_IO:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+        lw $v1, 12($fp)
+        lw $a0, 4($v1)
+        li $v0, 1
+        syscall
+        
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+in_string_IO:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+        # Read the string to the buffer
+        la $a0, IO_Buffer
+        li $a1, 1000
+        li $v0, 8
+        syscall
+
+        # get the length of the string to allocate the memory
+        la $t0, IO_Buffer
+        sw $t0, 0($sp)
+        addi $sp, $sp, -4
+		jal strlen
+        addi $sp, $sp, 4
+        lw $t0, 0($sp) # the length is now in $v0
+
+        addi $v0, $v0, 1
+        move $a0, $v0
+        li $v0, 9
+        syscall # in $v0 is the address of the value string
+                
+        la $t1, IO_Buffer # copy the string value from the buffer to the heap
+        move $t2, $v0
+        in_string_IO_loop:
+        lb $t3, 0($t1)
+        sb $t3, 0($t2)
+        addi $t1, $t1, 1
+        addi $t2, $t2, 1
+        bgtz $t3, in_string_IO_loop
+        addi $t2, $t2, -2
+        li $t3, 0
+        sb $t3, 0($t2)
+
+        move $t0, $v0
+
+        li $a0, 8
+        li $v0, 9
+        syscall
+
+        la $t1, String
+        sw $t0, 4($v0)
+        sw $t1, 0($v0)
+
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+in_int_IO:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+        li $v0, 5
+        syscall
+        move $t0, $v0
+
+        li $v0, 9
+        li $a0, 8
+        syscall
+
+        la $t1, Int
+        sw $t1, 0($v0)
+        sw $t0, 4($v0)
+
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+		
+
+
+
+
+
+
+		
+
+
 
 type_name_Object:
         # calling conventions
@@ -107,6 +258,179 @@ substr_String:
 
         sw $t1, 0($v0)
         sw $t0, 4($v0)
+
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+
+isvoid:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+        lw $t0, 12($fp)
+        li $t1, 0
+        beq $t0, $t1, isvoid_end
+        li $t0, 1
+        isvoid_end:
+                
+        li $a0, 8
+        li $v0, 9
+        syscall
+
+        la $t1, Bool
+        sw $t1, 0($v0)
+        sw $t0, 4($v0)
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+# function to get the length of a string value
+strlen:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+
+        lw $a0, 12($fp)
+        li $t0, 0
+strlen_loop:
+        lb $t1, 0($a0)
+        beqz $t1, strlen_exit
+        addu $a0, $a0, 1
+        addu $t0, $t0, 1
+        j strlen_loop
+        strlen_exit:
+        move $v0, $t0
+        
+        
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+
+length_String:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+        lw $v0, 12($fp) # get the string instance address
+        lw $v1, 4($v0) # get the string value address
+
+        # push the instace in the stack
+        sw $v1, 0($sp)
+        addi $sp, $sp, -4
+
+        jal strlen # length at v0
+        
+        addi $sp, $sp, 4
+        lw $t0, 0($sp)
+
+
+        move $t0, $v0
+
+        # allocate space for the Int instace
+        li $a0, 8
+        li $v0, 9
+        syscall
+
+        la $t1, Int
+        sw $t1, 0($v0)
+        sw $t0, 4($v0)
+      
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+	
+compare:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+		lw $t0, 12($fp)
+		lw $t1, 16($fp)
+
+		lw $t3, 0($t0)
+
+		la $t4, Int
+		beq $t3, $t4, compare_branch1
+
+		la $t4, Bool
+		beq $t3, $t4, compare_branch1
+
+		la $t4, String
+		beq $t3, $t4, compare_branch2
+
+		j compare_values
+
+		compare_branch1:
+		lw $t0, 4($t0)
+		lw $t1, 4($t1)
+		
+		compare_values:
+		beq $t0, $t1, compare_true
+		j compare_false
+
+		
+		compare_branch2:
+		lw $t0, 4($t0)
+		lw $t1, 4($t1)
+		compare_str_loop:
+		lb $t3, 0($t0)
+		lb $t4, 0($t1)
+		bne $t3, $t4, compare_false
+		beq $t3, $zero, compare_true
+		addi $t0, $t0, 1
+		addi $t1, $t1, 1
+		j compare_str_loop
+
+		compare_true:
+		li $t0, 1
+		j compare_end
+
+		compare_false:
+		li $t0, 0
+
+		compare_end:
+
+		li $a0, 8
+		li $v0, 9
+		syscall
+		la $t1, Bool
+		sw $t1, 0($v0)
+		sw $t0, 4($v0)
 
 
         # calling conventions

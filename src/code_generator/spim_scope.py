@@ -50,7 +50,8 @@ class TypeInfo:
         return r
 
 class ProcCallFrame:
-    def __init__(self, nargs, nvars):
+    def __init__(self,name, nargs, nvars):
+        self.name = name
         self.nargs = nargs
         self.size = WSIZE * nvars
         self.args = {} # Associates each argument with the offset to be accessed in the stack
@@ -85,7 +86,7 @@ class ProcCallFrame:
             return self.var_addr(id)
 
     def __str__(self):
-        r = '-------------- Frame -----------------\n'
+        r = f'-------------- Frame {self.name} -----------------\n'
         r += f'Size: {self.size}\n'
         r += f'Args: {self.args}\n'
         r += f'Vars: {self.vars}\n'
@@ -117,7 +118,7 @@ class MIPSScopeBuilder:
 
     @visitor.when(CILFuncNode)
     def visit(self, node: CILFuncNode):
-        frame = ProcCallFrame(len(node.params), len(node.locals))
+        frame = ProcCallFrame(node.id, len(node.params), len(node.locals))
         for p in node.params:
             frame.add_argument(p.id)
         for l in node.locals:

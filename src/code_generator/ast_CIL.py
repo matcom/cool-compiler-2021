@@ -345,4 +345,8 @@ class CILEqualsNode(CILBinaryOperationNode):
 
 class CILNotEqualsNode(CILBinaryOperationNode):
     pass
+
+class CILNotNode(CILExpressionNode):
+    def __init__(self, var):
+        self.var = var
                 
