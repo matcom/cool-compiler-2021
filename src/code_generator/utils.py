@@ -68,7 +68,7 @@ class CILScope:
         types = []
         
         obj_methods = [
-            CILMethodNode('init', 'init_Object'),
+            CILMethodNode('init_Object', 'init_Object'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
@@ -82,7 +82,7 @@ class CILScope:
         self.functions.append(init_Object)
         
         int_methods = [
-            CILMethodNode('init', 'init_Int'),
+            CILMethodNode('init_Int', 'init_Int'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
@@ -96,7 +96,7 @@ class CILScope:
         self.functions.append(init_int)
         
         str_methods = [
-            CILMethodNode('init', 'init_String'), 
+            CILMethodNode('init_String', 'init_String'), 
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
@@ -113,7 +113,7 @@ class CILScope:
         self.functions.append(init_string)
         
         bool_methods = [
-            CILMethodNode('init', 'init_Bool'),
+            CILMethodNode('init_Bool', 'init_Bool'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
@@ -127,7 +127,7 @@ class CILScope:
         self.functions.append(init_bool)
         
         io_methods = [
-            CILMethodNode('init', 'init_IO'),
+            CILMethodNode('init_IO', 'init_IO'),
             CILMethodNode('abort', 'abort_Object'), 
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),

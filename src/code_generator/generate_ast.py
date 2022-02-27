@@ -24,7 +24,7 @@ class CIL:
         instructions = []
         instructions.append(CILAssignNode(CILVariableNode("m0"), CILAllocateNode(CILTypeConstantNode("Main"))))
         instructions.append(CILArgNode(CILVariableNode("m0")))
-        instructions.append(CILAssignNode(CILVariableNode("m1"), CILVCallNode("Main", "init")))
+        instructions.append(CILAssignNode(CILVariableNode("m1"), CILVCallNode("Main", "init_Main")))
         instructions.append(CILArgNode(CILVariableNode("m1")))
         instructions.append(CILAssignNode(CILVariableNode("m2"), CILVCallNode("Main", "main")))
         instructions.append(CILReturnNode(CILVariableNode("m2")))
@@ -65,7 +65,7 @@ class CIL:
         type_info = self.scope.infos[node.id]
         for a in type_info.attrs:   
             attributes.append(CILAttributeNode(a.name, a.type))
-        methods.append(CILMethodNode('init', f'init_{node.id}'))         
+        methods.append(CILMethodNode(f'init_{node.id}', f'init_{node.id}'))         
         for m in type_info.methods.keys():        
             methods.append(CILMethodNode(m, type_info.methods[m])) 
                 
@@ -198,15 +198,15 @@ class CIL:
         elif isinstance(node.computed_type, IntType): 
             self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
             var = CILVariableNode(name)
-            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Int', 'init')))
+            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Int', 'init_Int')))
         elif isinstance(node.computed_type, BoolType): 
             self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
             var = CILVariableNode(name)
-            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Bool', 'init')))
+            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('Bool', 'init_Bool')))
         elif isinstance(node.computed_type, StringType):
             self.scope.instructions.append(CILArgNode(CILNumberNode(0)))
             var = CILVariableNode(name)
-            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('String', 'init')))
+            self.scope.instructions.append(CILAssignNode(var, CILVCallNode('String', 'init_String')))
             
     @visitor.when(LoopNode)
     def visit(self, node):
@@ -383,5 +383,5 @@ class CIL:
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name),CILAllocateNode(CILTypeConstantNode(node.lex))))
         self.scope.instructions.append(CILArgNode(CILVariableNode(name)))
         name = self.scope.add_new_local(node.lex)
-        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILVCallNode(node.lex, f"init")))
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILVCallNode(node.lex, f"init_{node.lex}")))
         return  CILVariableNode(name) 
