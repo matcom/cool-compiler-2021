@@ -71,6 +71,8 @@ class CIL:
                 
         for feature in node.features:
             self.scope.instructions = []
+            self.scope.locals = [{}]
+            self.scope.all_locals = []
             if isinstance(feature, AttrDeclarationNode):
                 if feature.expr is not None:
                     expr = self.visit(feature.expr)
