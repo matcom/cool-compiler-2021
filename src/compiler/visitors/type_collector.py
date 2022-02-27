@@ -1,7 +1,6 @@
 from typing import Dict, List, Optional, Tuple
-from numpy import void
-from zmq import TYPE
-from compiler.cmp.utils import Token, pprint
+from compiler.cmp.utils import Token
+from compiler.visitors.utils import AUTOTYPE_ERROR
 import compiler.visitors.visitor as visitor
 from ..cmp.semantic import (
     SemanticError,
@@ -49,12 +48,12 @@ class TypeCollector(object):
         node.declarations = self.order_types(node)
 
     @visitor.when(ClassDeclarationNode)
-    def visit(self, node: ClassDeclarationNode) -> void:
+    def visit(self, node: ClassDeclarationNode):
         # flag is set to True if the class is succesfully added to the context
         flag = False
         try:
             if node.id == "AUTO_TYPE":
-                raise SemanticError("Name of class can't be autotype")
+                raise SemanticError(AUTOTYPE_ERROR)
             self.context.create_type(node.id, node.tokenId.pos)
             flag = True
             self.parent[node.id] = node.parent
@@ -71,7 +70,7 @@ class TypeCollector(object):
             except SemanticError:
                 pass
 
-    def define_built_in_types(self) -> void:
+    def define_built_in_types(self):
         objectx = ObjectType()
         iox = IOType()
         intx = IntType()
@@ -104,7 +103,7 @@ class TypeCollector(object):
 
         built_in_types.extend([objectx, iox, stringx, intx, boolx, self_type, autotype])
 
-    def check_parents(self) -> void:
+    def check_parents(self):
         for item in self.parent.keys():
             item_type = self.context.get_type(item)
             if self.parent[item] is None:
@@ -128,7 +127,7 @@ class TypeCollector(object):
                     self.errors.append((ex, self.parent[item].pos))
                     item_type.set_parent(built_in_types[0])
 
-    def check_cyclic_inheritance(self) -> void:
+    def check_cyclic_inheritance(self):
         flag = []
 
         def find(item: Type) -> int:
@@ -137,7 +136,7 @@ class TypeCollector(object):
                     return i
             return len(flag)
 
-        def check_path(idx: int, item: Type) -> void:
+        def check_path(idx: int, item: Type):
             while True:
                 flag.append(item)
                 parent = item.parent

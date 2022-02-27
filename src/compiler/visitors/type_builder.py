@@ -1,7 +1,3 @@
-from typing import List, Optional, Tuple
-
-from numpy import void
-import compiler.visitors.visitor as visitor
 from ..cmp.ast import (
     ProgramNode,
     ClassDeclarationNode,
@@ -17,6 +13,14 @@ from ..cmp.semantic import (
     SelfType,
     Type,
 )
+from .utils import (
+    ALREADY_DEFINED,
+    MAIN_CLASS_ERROR,
+    MAIN_PROGRAM_ERROR,
+    SELF_ERROR,
+)
+from typing import List, Optional, Tuple
+import compiler.visitors.visitor as visitor
 
 
 class TypeBuilder:
@@ -33,7 +37,7 @@ class TypeBuilder:
         pass
 
     @visitor.when(ProgramNode)
-    def visit(self, node: ProgramNode) -> void:
+    def visit(self, node: ProgramNode):
         for dec in node.declarations:
             self.visit(dec)
 
@@ -57,20 +61,13 @@ class TypeBuilder:
 
             # Checking param name can't be self
             if n == "self":
-                self.errors.append(
-                    (
-                        SemanticError(
-                            "'self' cannot be the name of a formal parameter."
-                        ),
-                        namex.pos,
-                    )
-                )
+                self.errors.append((SemanticError(SELF_ERROR), namex.pos))
 
             # Generate valid parameter name
             if n in param_names:
                 self.errors.append(
                     (
-                        SemanticError(f"Formal parameter {n} is multiply defined."),
+                        SemanticError(ALREADY_DEFINED % (n)),
                         namex.pos,
                     )
                 )
@@ -136,7 +133,7 @@ class TypeBuilder:
         if node.id == "self":
             self.errors.append(
                 (
-                    SemanticError("'self' cannot be the name of an attribute."),
+                    SemanticError(SELF_ERROR),
                     node.idToken.pos,
                 )
             )
@@ -149,7 +146,7 @@ class TypeBuilder:
         except SemanticError as ex:
             self.errors.append(
                 (
-                    SemanticError(f"Attribute {node.id} is multiply defined in class."),
+                    SemanticError(ALREADY_DEFINED % (node.id)),
                     node.idToken.pos,
                 )
             )
@@ -166,10 +163,6 @@ class TypeBuilder:
         try:
             typex = self.context.get_type("Main")
             if not any(method.name == "main" for method in typex.methods):
-                self.errors.append(
-                    (SemanticError("Class Main must contain a method main"), (0, 0))
-                )
+                self.errors.append((SemanticError(MAIN_CLASS_ERROR), (0, 0)))
         except TypeError:
-            self.errors.append(
-                (SemanticError("Program must contain a class Main"), (0, 0))
-            )
+            self.errors.append((SemanticError(MAIN_PROGRAM_ERROR), (0, 0)))

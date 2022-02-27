@@ -1,20 +1,14 @@
-# import streamlit as st
-
-from black import err
 from compiler.cmp.grammar import G
-
-# from compiler.lexer.lexer import tokenize_text, pprint_tokens
 from compiler.lexer.lex import CoolLexer
-from sys import exit
-
-from compiler.cmp.tools import LR1Parser
-from compiler.cmp.evaluation import evaluate_reverse_parse
+from compiler.parser.parser import LR1Parser, evaluate_reverse_parse
+from compiler.visitors.cil_formatter import PrintCILVisitor
+from compiler.visitors.cool2cil import COOLToCILVisitor
 from compiler.visitors.formatter import FormatVisitor
-
 from compiler.visitors.type_collector import TypeCollector
 from compiler.visitors.type_builder import TypeBuilder
 from compiler.visitors.type_checker import TypeChecker
 from compiler.visitors.type_inferencer import TypeInferencer
+from sys import exit
 
 # from compiler.visitors.cool2cil import COOLToCILVisitor
 from compiler.visitors.cool2cil import COOLToCILVisitor
@@ -106,43 +100,13 @@ def main(args):
     cil_visitor = COOLToCILVisitor(context)
     cil_ast = cil_visitor.visit(ast, scope)
 
+    # COOL to CIL
+    cil_visitor = COOLToCILVisitor(context)
+    cil_ast = cil_visitor.visit(ast, scope)
 
-text = """
-class Main inherits IO {
-    number: Int <- 5;
+    # cil_formatter = PrintCILVisitor()
+    # print(cil_formatter.visit(cil_ast))
 
-    main () : Object {
-        testing_fibonacci(number)
-    };
-
-    testing_fibonacci(n: Int) : IO {{
-        out_string("Iterative Fibonacci : ");
-        out_int(iterative_fibonacci(5));
-        out_string("\\n");
-
-        out_string("Recursive Fibonacci : ");
-        out_int(recursive_fibonacci(5));
-        out_string("\\n");
-    }};
-
-    recursive_fibonacci (n: AUTO_TYPE) : AUTO_TYPE {
-        if n <= 2 then 1 else recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2) fi
-    };
-
-    iterative_fibonacci(n: AUTO_TYPE) : AUTO_TYPE {
-        let  i: Int <- 2, n1: Int <- 1, n2: Int <- 1, temp: Int in {
-            while i < n loop
-                let temp: Int <- n2 in {
-                    n2 <- n2 + n1;
-                    n1 <- temp;
-                    i <- i + 1;
-                }
-            pool;
-            n2;
-        }
-    };
-};
-"""
 
 if __name__ == "__main__":
     import argparse
