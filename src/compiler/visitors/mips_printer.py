@@ -1,5 +1,5 @@
-from ..cmp.mips_ast import *
-import compiler.visitors.visitor as visitor
+from compiler.cmp.mips_ast import *
+from compiler.visitors import visitor
 
 
 class MIPSPrintVisitor:
@@ -22,36 +22,39 @@ class MIPSPrintVisitor:
     @visitor.when(ProgramNode)
     def visit(self, node):
         data_section_header = "\t.data"
-        static_strings = "\n".join([self.visit(node.data[d]) for d in node.data])
+        static_strings = "\n".join([self.visit(d) for d in node.data])
 
-        names_table = f"{TYPE_LIST}:\n" + "\n".join(
-            [f"\t.word\t{node.types[tp].label}" for tp in node.types]
+        names_table = f"{TYPE_LIST}:\n\t .word " + ", ".join(
+            [f"{tp.data_label}" for tp in node.types]
         )
-        proto_table = f"{VIRTUAL_TABLE}:\n" + "\n".join(
-            [f"\t.word\t{node.types[tp].label}_proto" for tp in node.types]
+        proto_table = f"{VIRTUAL_TABLE}:\n\t .word " + ", ".join(
+            [f"{tp.type_label}_proto" for tp in node.types]
         )
 
-        types = "\n\n".join([self.visit(node.types[tp]) for tp in node.types])
+        types = "\n\n".join([self.visit(tp) for tp in node.types])
 
-        code = "\n".join([self.visit(node.text[func]) for func in node.text])
+        code = "\n".join([self.visit(func) for func in node.text])
         return f"{data_section_header}\n{static_strings}\n\n{names_table}\n\n{proto_table}\n\n{types}\n\t.text\n\t.globl main\n{code}"
 
-    @visitor.when(DataNode)
+    @visitor.when(StringConst)
     def visit(self, node):
-        new_data = node.data.replace("\n", "")
-        return f'{node.label}: .asciiz "{new_data}"'
+        return f'{node.label}: .asciiz "{node.string}"'
 
     @visitor.when(TypeNode)
     def visit(self, node: TypeNode):
-        methods = "\n".join([f"\t.word\t {m[1]}" for m in node.methods])
-        dispatch_table = f"{node.label}_dispatch:\n{methods}"
-        proto_begin = f"{node.label}_proto:\n\t.word\t{node.pos}\n\t.word\t{len(node.attributes)*4}\n\t.word\t{node.label}_dispatch"
-        proto_attr = "\n".join([f"\t.word\t{0}" for attr in node.attributes])
-        proto_end = f"\t.word\t{-1}"
+        print(node.data_label, ":")
+        print(node.attributes)
+        methods = ", ".join([f"{node.methods[m]}" for m in node.methods])
+        dispatch_table = f"{node.type_label}_dispatch:\n\t .word {methods}"
+        proto_begin = f"{node.type_label}_proto:\n\t.word\t{node.pos}, {len(node.attributes)*4}, {node.type_label}_dispatch"
+        proto_attr = ", ".join(
+            [f'{node.defaults.get(attr,"0")}' for attr in node.attributes]
+        )
+        proto_end = f"{-1}"
         proto = (
-            f"{proto_begin}\n{proto_attr}\n{proto_end}"
+            f"{proto_begin}, {proto_attr}, {proto_end}"
             if proto_attr != ""
-            else f"{proto_begin}\n{proto_end}"
+            else f"{proto_begin}, {proto_end}"
         )
 
         return f"{dispatch_table}\n\n{proto}"

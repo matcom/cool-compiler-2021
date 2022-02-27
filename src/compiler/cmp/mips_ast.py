@@ -64,10 +64,10 @@ class ProgramNode(Node):
         self.text = text
 
 
-class DataNode(Node):
-    def __init__(self, label, data):
+class StringConst(Node):
+    def __init__(self, label, string):
         self.label = label
-        self.data = data
+        self.string = string
 
 
 class FunctionNode(Node):
@@ -79,12 +79,13 @@ class FunctionNode(Node):
 
 
 class TypeNode(Node):
-    def __init__(self, label):
-        self.label = label
-        self.methods = []
-        self.attributes = []
-        self.label_name = None
-        self.pos = -1
+    def __init__(self, data_label, type_label, attributes, methods, pos, defaults):
+        self.data_label = data_label
+        self.type_label = type_label
+        self.attributes = attributes
+        self.methods = methods
+        self.pos = pos
+        self.defaults = defaults
 
 
 class InstructionNode(Node):

@@ -85,27 +85,27 @@ def main(args):
     # if checker.errors:
     #     exit(1)
 
-    # mips to cil
-    # cil_visitor = COOLToCILVisitor(context)
-    # cil_ast = cil_visitor.visit(ast, scope)
-
-    # cil_formatter = PrintCILVisitor()
-    # print(cil_formatter.visit(cil_ast))
-
-    # mips_visitor = CILToMIPSVisitor()
-    # mips_ast = mips_visitor.visit(cil_ast)
-    # mips_formatter = MIPSPrintVisitor()
-    # print(mips_formatter.visit(mips_ast))
-
-    cil_visitor = COOLToCILVisitor(context)
-    cil_ast = cil_visitor.visit(ast, scope)
-
     # COOL to CIL
     cil_visitor = COOLToCILVisitor(context)
     cil_ast = cil_visitor.visit(ast, scope)
 
     # cil_formatter = PrintCILVisitor()
     # print(cil_formatter.visit(cil_ast))
+
+    cil_to_mips = CILToMIPSVisitor()
+    mips_ast = cil_to_mips.visit(cil_ast)
+    printer = MIPSPrintVisitor()
+    mips_code = printer.visit(mips_ast)
+    # print(mips_code)
+
+    out_file = args.file.split(".")
+    out_file[-1] = "mips"
+    out_file = ".".join(out_file)
+
+    with open(out_file, "w") as f:
+        f.write(mips_code)
+        with open("src/compiler/visitors/mips_lib.asm") as f2:
+            f.write("".join(f2.readlines()))
 
 
 if __name__ == "__main__":
