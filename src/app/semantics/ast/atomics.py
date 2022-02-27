@@ -1,5 +1,7 @@
 from .base import ExpressionNode
 from app.semantics.tools import TypeBag
+from app.semantics.tools.errors import SemanticError
+from app.semantics.constants import *
 
 
 class AtomicNode(ExpressionNode):
@@ -14,7 +16,23 @@ class VariableNode(AtomicNode):
         self.defined = False
 
     @staticmethod
-    def infer(node, scope, deep_inferrer):
+    def shallow_infer(node, scope, shallow_inferrer):
+        var_node = VariableNode(node)
+
+        var = scope.find_variable(node.value)
+        if var:
+            var_node.defined = True
+            var_type = var.get_type()
+        else:
+            shallow_inferrer.add_error(
+                node, f"NameError: Variable '{node.value}' is not defined.")
+            var_type = TypeBag(set())
+
+        var_node.inferenced_type = var_type
+        return var_node
+
+    @staticmethod
+    def deep_infer(node, scope, deep_inferrer):
         var_node = VariableNode(node)
         if not node.defined:
             var_node.inferenced_type = TypeBag(set())
@@ -27,8 +45,23 @@ class VariableNode(AtomicNode):
 
 
 class InstantiateNode(ExpressionNode):
+    def shallow_infer(node, _, shallow_inferrer):
+        instantiate_node = InstantiateNode(node)
+        try:
+            node_type = shallow_inferrer.context.get_type(
+                node.type, autotype=False)
+        except SemanticError as err:
+            shallow_inferrer.add_error(
+                node,
+                err.text + f" Could not instantiate type '{node.type}'.",
+            )
+            node_type = TypeBag(set())
+
+        instantiate_node.inferenced_type = node_type
+        return instantiate_node
+
     @staticmethod
-    def infer(node, _, __):
+    def deep_infer(node, _, __):
         instantiate_node = InstantiateNode(node)
         instantiate_node.inferenced_type = node.inferenced_type
         return instantiate_node
@@ -40,23 +73,39 @@ class InstantiateNode(ExpressionNode):
 
 
 class BooleanNode(AtomicNode):
-    def infer(node, _, deep_inferrer):
+    def shallow_infer(node, _, shallow_inferrer):
         bool_node = BooleanNode(node)
-        bool_node.inferenced_type = deep_inferrer.context.get_type("Bool")
+        bool_node.inferenced_type = shallow_inferrer.context.get_type(
+            BOOL_TYPE)
         return bool_node
-    pass
+
+    def deep_infer(node, _, deep_inferrer):
+        bool_node = BooleanNode(node)
+        bool_node.inferenced_type = deep_inferrer.context.get_type(BOOL_TYPE)
+        return bool_node
 
 
 class IntNode(AtomicNode):
-    def infer(node, _, deep_inferrer):
+    def shallow_infer(node, _, shallow_inferrer):
         int_node = IntNode(node)
-        int_node.inferenced_type = deep_inferrer.context.get_type("Int")
+        int_node.inferenced_type = shallow_inferrer.context.get_type(INT_TYPE)
+        return int_node
+
+    def deep_infer(node, _, deep_inferrer):
+        int_node = IntNode(node)
+        int_node.inferenced_type = deep_inferrer.context.get_type(INT_TYPE)
         return int_node
 
 
 class StringNode(AtomicNode):
-    def infer(node, _, deep_inferrer):
+    def shallow_infer(node, _, shallow_inferrer):
+        string_node = StringNode(node)
+        string_node.inferenced_type = shallow_inferrer.context.get_type(
+            STRING_TYPE)
+        return string_node
+
+    def deep_infer(node, _, deep_inferrer):
         str_node = StringNode(node)
-        str_node.inferenced_type = deep_inferrer.context.get_type("String")
+        str_node.inferenced_type = deep_inferrer.context.get_type(STRING_TYPE)
         return str_node
     pass

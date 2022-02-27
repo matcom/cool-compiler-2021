@@ -1,3 +1,5 @@
+import app.semantics.ast as inf_ast
+
 
 class Node:
     def __init__(self, node) -> None:
@@ -24,8 +26,17 @@ class ProgramNode(Node):
         self.declarations = declarations
         self.scope = scope
 
+    def shallow_infer(node, scope, shallow_inferrer):
+        new_classes = []
+        for declaration in node.classes:
+            new_classes.append(shallow_inferrer.visit(
+                declaration, scope.create_child()))
+
+        program = inf_ast.ProgramNode(new_classes, scope, node)
+        return program
+
     @staticmethod
-    def infer(node, hard_inferrer):
+    def deep_infer(node, hard_inferrer):
         scope = node.scope
         new_declaration = []
         for declaration in node.declarations:

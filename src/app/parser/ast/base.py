@@ -1,4 +1,5 @@
 from typing import List
+import app.semantics.ast as inf_ast
 
 
 class AstNode:

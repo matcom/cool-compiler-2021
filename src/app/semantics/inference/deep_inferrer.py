@@ -26,95 +26,95 @@ class DeepInferrer:
 
     @visitor.when(ProgramNode)
     def visit(self, node: ProgramNode) -> ProgramNode:
-        return ProgramNode.infer(node, self)
+        return ProgramNode.deep_infer(node, self)
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode, scope: Scope) -> ClassDeclarationNode:
-        return ClassDeclarationNode.infer(node, scope, self)
+        return ClassDeclarationNode.deep_infer(node, scope, self)
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
-        return AttrDeclarationNode.infer(node, scope, self)
+        return AttrDeclarationNode.deep_infer(node, scope, self)
 
     @visitor.when(MethodDeclarationNode)
     def visit(self, node, scope: Scope):
-        return MethodDeclarationNode.infer(node, scope, self)
+        return MethodDeclarationNode.deep_infer(node, scope, self)
 
     @visitor.when(BlocksNode)
     def visit(self, node, scope):
-        return BlocksNode.infer(node, scope, self)
+        return BlocksNode.deep_infer(node, scope, self)
 
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
-        return ConditionalNode.infer(node, scope, self)
+        return ConditionalNode.deep_infer(node, scope, self)
 
     @visitor.when(CaseNode)
     def visit(self, node, scope: Scope):
-        return CaseNode.infer(node, scope, self)
+        return CaseNode.deep_infer(node, scope, self)
 
     @visitor.when(CaseOptionNode)
     def visit(self, node, scope: Scope):
-        return CaseOptionNode.infer(node, scope, self)
+        return CaseOptionNode.deep_infer(node, scope, self)
 
     @visitor.when(LoopNode)
     def visit(self, node, scope):
-        return LoopNode.infer(node, scope, self)
+        return LoopNode.deep_infer(node, scope, self)
 
     @visitor.when(LetNode)
     def visit(self, node, scope: Scope):
-        return LetNode.infer(node, scope, self)
+        return LetNode.deep_infer(node, scope, self)
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope: Scope):
-        return VarDeclarationNode.infer(node, scope, self)
+        return VarDeclarationNode.deep_infer(node, scope, self)
 
     @visitor.when(AssignNode)
     def visit(self, node, scope: Scope):
-        return AssignNode.infer(node, scope, self)
+        return AssignNode.deep_infer(node, scope, self)
 
     @visitor.when(MethodCallNode)
     def visit(self, node: MethodCallNode, scope):
-        return MethodCallNode.infer(node, scope, self)
+        return MethodCallNode.deep_infer(node, scope, self)
 
     @visitor.when(ArithmeticNode)
     def visit(self, node, scope):
-        return ArithmeticNode.infer(node, scope, self)
+        return ArithmeticNode.deep_infer(node, scope, self)
 
     @visitor.when(LessNode)
     def visit(self, node, scope: Scope):
-        return LessNode.infer(node, scope, self)
+        return LessNode.deep_infer(node, scope, self)
 
     @visitor.when(LessOrEqualNode)
     def visit(self, node, scope: Scope):
-        return LessOrEqualNode.infer(node, scope, self)
+        return LessOrEqualNode.deep_infer(node, scope, self)
 
     @visitor.when(EqualsNode)
     def visit(self, node, scope):
-        return EqualsNode.infer(node, scope, self)
+        return EqualsNode.deep_infer(node, scope, self)
 
     @visitor.when(VariableNode)
     def visit(self, node, scope: Scope):
-        return VariableNode.infer(node, scope, self)
+        return VariableNode.deep_infer(node, scope, self)
 
     @visitor.when(NotNode)
     def visit(self, node, scope):
-        return NotNode.infer(node, scope, self)
+        return NotNode.deep_infer(node, scope, self)
 
     @visitor.when(ComplementNode)
     def visit(self, node, scope):
-        return ComplementNode.infer(node, scope, self)
+        return ComplementNode.deep_infer(node, scope, self)
 
     @visitor.when(IsVoidNode)
     def visit(self, node, scope):
-        return IsVoidNode.infer(node, scope, self)
+        return IsVoidNode.deep_infer(node, scope, self)
 
     @visitor.when(InstantiateNode)
     def visit(self, node, scope):
-        return InstantiateNode.infer(node, scope, self)
+        return InstantiateNode.deep_infer(node, scope, self)
 
     @visitor.when(IntNode)
     def visit(self, node, scope):
-        return IntNode.infer(node, scope, self)
+        return IntNode.deep_infer(node, scope, self)
 
     @visitor.when(StringNode)
     def visit(self, node, scope):
@@ -124,7 +124,7 @@ class DeepInferrer:
 
     @visitor.when(BooleanNode)
     def visit(self, node, scope):
-        return BooleanNode.infer(node, scope, self)
+        return BooleanNode.deep_infer(node, scope, self)
 
     def add_error(self, node: Node, text: str):
         line, col = node.lineno, node.columnno if node else (0, 0)
