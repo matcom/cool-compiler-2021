@@ -163,7 +163,7 @@ class MIPSGenerator:
     def visit(self, node: BranchOnEqual) -> str:
         return f"\tbeq {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
-    @visitor.when(BranchOnEqual)
+    @visitor.when(BranchOnNotEqual)
     def visit(self, node: BranchOnNotEqual) -> str:
         return f"\tbne {self.visit(node.left)}, {self.visit(node.middle)}, {self.visit(node.right)}"
 
