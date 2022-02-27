@@ -172,11 +172,11 @@ class CIL:
         self.scope.if_count += 1
         exp_else = self.visit(node.elsex)
         self.scope.instructions.append(CILAssignNode(var_return, exp_else))
-        self.scope.instructions.append(CILGotoNode(CILLabelNode(f'ifend{count}')))
-        self.scope.instructions.append(CILLabelNode( f'then{count}'))
+        self.scope.instructions.append(CILGotoNode(CILLabelNode(f'ifend_{count}')))
+        self.scope.instructions.append(CILLabelNode( f'then_{count}'))
         exp_then = self.visit(node.then)
         self.scope.instructions.append(CILAssignNode(var_return, exp_then))
-        self.scope.instructions.append(CILLabelNode(f'ifend{count}'))
+        self.scope.instructions.append(CILLabelNode(f'ifend_{count}'))
         return var_return
             
     @visitor.when(LetNode)
