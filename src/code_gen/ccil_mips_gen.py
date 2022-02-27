@@ -63,6 +63,8 @@ class CCILToMIPSGenerator:
     @visitor.when(ccil_ast.CCILProgram)
     def visit(self, node: ccil_ast.CCILProgram):
         self.__types_table = node.types_section
+
+        data = []
         types_table = []
         for classx in node.types_section:
             word_directive = [
@@ -77,11 +79,16 @@ class CCILToMIPSGenerator:
                     mips_ast.WordDirective(node, word_directive),
                 )
             )
-
-        # TODO: other .data section static data inicializations like strings
+        data.extend(types_table)
+        for d in node.data_section:
+            data.append(
+                (
+                    mips_ast.LabelDeclaration(node, d.id),
+                    mips_ast.AsciizDirective(node, [mips_ast.Label(node, d.value)]),
+                )
+            )
 
         functions = []
-
         print(node.entry_func)
         functions.extend(self.visit(node.entry_func))
 
@@ -93,7 +100,7 @@ class CCILToMIPSGenerator:
         return mips_ast.MIPSProgram(
             None,
             mips_ast.TextNode(node, functions),
-            mips_ast.DataNode(node, types_table),
+            mips_ast.DataNode(node, data),
         )
 
     @visitor.when(ccil_ast.FunctionNode)
@@ -709,6 +716,11 @@ class CCILToMIPSGenerator:
     @visitor.when(ccil_ast.LoadOpNode)
     def visit(self, node: ccil_ast.LoadOpNode):
         instructions = []
+        instructions.append(
+            mips_ast.LoadAddress(
+                node, mips_ast.RegisterNode(node, V0), mips_ast.Label(node, node.target)
+            )
+        )
 
         return instructions
 
@@ -793,6 +805,16 @@ class CCILToMIPSGenerator:
         instructions.append(
             mips_ast.LoadImmediate(
                 node, mips_ast.RegisterNode(node, V0), mips_ast.Constant(node, 5)
+            )
+        )
+        return instructions
+
+    @visitor.when(ccil_ast.Abort)
+    def visit(self, node: ccil_ast.Abort):
+        instructions = []
+        instructions.append(
+            mips_ast.LoadImmediate(
+                node, mips_ast.RegisterNode(node, V0), mips_ast.Constant(node, 10)
             )
         )
         return instructions

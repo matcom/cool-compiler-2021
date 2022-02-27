@@ -2,6 +2,7 @@ from asts.mips_ast import (
     Add,
     Addi,
     Addu,
+    AsciizDirective,
     BranchOnEqual,
     BranchOnNotEqual,
     Constant,
@@ -50,7 +51,7 @@ class MIPSGenerator:
 
     @visitor.when(MIPSProgram)
     def visit(self, node: MIPSProgram) -> str:
-        global_main = "\t.globl entry"
+        global_main = "\t.globl main"
         text_section = "\t.text\n" + self.visit(node.text_section)
         data_section = "\t.data\n" + self.visit(node.data_section)
         return f"{global_main}\n{text_section}\n{data_section}"
@@ -101,6 +102,10 @@ class MIPSGenerator:
     @visitor.when(WordDirective)
     def visit(self, node: WordDirective) -> str:
         return ".word " + (" ".join(self.visit(i) for i in node.list))
+
+    @visitor.when(AsciizDirective)
+    def visit(self, node: AsciizDirective) -> str:
+        return ".asciiz " + (" ".join(f'"{self.visit(i)}"' for i in node.list))
 
     @visitor.when(Move)
     def visit(self, node: Move) -> str:

@@ -127,6 +127,7 @@ class MoveFromLo(InstructionNode):
     """
     This node represents `mflo` instruction in MIPS
     """
+
     def __init__(self, node, register) -> None:
         super().__init__(node)
         self.register = register
@@ -267,13 +268,13 @@ class LoadWord(BinaryOpNode):
         super().__init__(node, left, right)
 
 
-class LoadAddress(BinaryNode):
+class LoadAddress(BinaryOpNode):
     """
     This node represents `la` instruction in MIPS
     """
 
-    def __init__(self, left, right):
-        super().__init__(left, right)
+    def __init__(self, node, left, right) -> None:
+        super().__init__(node, left, right)
 
 
 class StoreWord(BinaryOpNode):
@@ -344,6 +345,15 @@ class AssemblerDirective(Node):
 class WordDirective(AssemblerDirective):
     """
     This node represents `.word` assembler directive
+    """
+
+    def __init__(self, node, list) -> None:
+        super().__init__(node, list)
+
+
+class AsciizDirective(AssemblerDirective):
+    """
+    This node represents `.asciiz` assembler directive
     """
 
     def __init__(self, node, list) -> None:

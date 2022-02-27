@@ -12,7 +12,7 @@ class CCILProgram:
     entry_func: FunctionNode
     types_section: List[Class]
     code_section: List[FunctionNode]
-    data_section: List[str]  # no idea what will be this the node,
+    data_section: List[Data]  
 
     def __str__(self, all=False) -> str:
         types_section = self.types_section
