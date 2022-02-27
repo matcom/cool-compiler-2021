@@ -93,7 +93,8 @@ class CCILGenerator:
         self.current_type = node.id
         self.add_data(f"class_{node.id}", node.id)
 
-        attributes, methods = self.get_inherited_features(node)
+        attributes: List[Attribute] = []
+        methods: List[Method] = []
 
         attr_nodes = []
         func_nodes = []
@@ -118,7 +119,19 @@ class CCILGenerator:
             class_code.append(f)
             methods.append(Method(func.id, f))
 
-        return (Class(node.id, attributes, methods, init_func), class_code)
+        methods, inherited_methods, inherited_attrs = self.get_inherited_features(
+            node, methods
+        )
+
+        return (
+            Class(
+                node.id,
+                inherited_attrs + attributes,
+                inherited_methods + methods,
+                init_func,
+            ),
+            class_code,
+        )
 
     @visitor.when(sem_ast.AttrDeclarationNode)
     def visit(self, node: sem_ast.AttrDeclarationNode) -> ATTR_VISITOR_RESULT:
@@ -1002,18 +1015,36 @@ class CCILGenerator:
         self.add_warning(f"Warning: {msg}")
 
     def get_inherited_features(
-        self, node: sem_ast.ClassDeclarationNode  # , node_methods: List[Method]
+        self, node: sem_ast.ClassDeclarationNode, defined_methods: List[Method]
     ):
-        # node_methods: Set[str] = {m.id for m in node_methods}
+        defined_methods: Dict[str, Method] = OrderedDict(
+            (m.id, m) for m in defined_methods
+        )
 
+        new_defined_methods: List[Method] = []
         inherited_attr: List[Attribute] = []
         inherited_methods: List[Method] = []
+
         if node.parent is not None:
             parent_class: Class = self.program_types[node.parent]
-            inherited_attr = [a for a in parent_class.attributes]
-            inherited_methods = [m for m in parent_class.methods]
 
-        return inherited_attr, inherited_methods
+            inherited_attr = [a for a in parent_class.attributes]
+
+            for method in parent_class.methods:
+                try:
+                    # Method override for an inherited method
+                    override_method = defined_methods[method.id]
+                except KeyError:
+                    pass
+                else:
+                    method = Method(method.id, override_method.function)
+                    del defined_methods[method.id]
+
+                inherited_methods.append(method)
+
+        new_defined_methods = list(defined_methods.values())
+
+        return new_defined_methods, inherited_attr, inherited_methods
 
     def find_function_id(self, class_name: str, method_name: str):
         for method in self.program_types[class_name].methods:
@@ -1037,6 +1068,6 @@ def update_self_type_attr(classes: List[Class]):
                 lambda attr: attr
                 if attr.type != SELFTYPE
                 else Attribute(attr.id, classx.id),
-                classx.attributes
+                classx.attributes,
             )
         )
