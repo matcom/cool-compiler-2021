@@ -82,10 +82,6 @@ class PrintCILVisitor(object):
     def visit(self, node):
         return f"{node.dest} = {node.left} == {node.right}"
 
-    @visitor.when(NotNode)
-    def visit(self, node):
-        return f"{node.dest} = NOT {node.obj}"
-
     @visitor.when(ComplementNode)
     def visit(self, node):
         return f"{node.dest} = COMPL {node.obj}"
@@ -149,14 +145,6 @@ class PrintCILVisitor(object):
     @visitor.when(SubstringNode)
     def visit(self, node):
         return f"{node.dest} = SUBSTRING {node.index} {node.length}"
-
-    @visitor.when(ReadNode)
-    def visit(self, node):
-        return f"{node.dest} = READ"
-
-    @visitor.when(PrintNode)
-    def visit(self, node):
-        return f"PRINT {node.value}"
 
     @visitor.when(ExitNode)
     def visit(self, node):
