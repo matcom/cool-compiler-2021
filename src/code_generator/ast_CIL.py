@@ -270,7 +270,7 @@ class CILCallNode(CILExpressionNode):
 
 
 class CILVCallNode(CILExpressionNode):
-    def __init__(self, type,  func):
+    def __init__(self, type, func):
         self.type = type
         self.func = func 
         

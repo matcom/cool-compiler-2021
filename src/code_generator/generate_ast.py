@@ -282,7 +282,7 @@ class CIL:
             variable = CILVariableNode(self.scope.add_new_local(node.expr.computed_type.name))
             self.scope.instructions.append(CILAssignNode(variable, var))
         else:
-            variable = CILVariableNode(var.lex)
+            variable = var
       
         local = self.scope.find_local(node.id.lex)
 
