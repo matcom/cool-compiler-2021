@@ -1,3 +1,36 @@
+abort_Object:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+		
+		la $a0, ObjectAbortMessage
+		li $v0, 4
+		syscall
+
+		lw $t0, 12($fp)
+		lw $t0, 0($t0)
+		lw $t0, 4($t0)
+
+		move $a0, $t0
+		li $v0, 4
+		syscall
+		
+        li $v0, 10
+        syscall
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+
+
 out_string_IO:
         # calling conventions
         sw $ra, 0($sp)
@@ -101,7 +134,34 @@ in_string_IO:
        
         jr $ra
 
+in_int_IO:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
 
+        li $v0, 5
+        syscall
+        move $t0, $v0
+
+        li $v0, 9
+        li $a0, 8
+        syscall
+
+        la $t1, Int
+        sw $t1, 0($v0)
+        sw $t0, 4($v0)
+
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
 		
 
 

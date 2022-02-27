@@ -206,3 +206,8 @@ class CILCodegen:
         l = self.visit(node.left)
         r = self.visit(node.right)
         return f'{l} != {r}'
+
+    @visitor.when(CILNotNode)
+    def visit(self, node: CILNotNode):
+        return f'~ {self.var.lex}'
+    

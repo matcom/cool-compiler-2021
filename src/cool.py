@@ -48,21 +48,20 @@ if errors:
         
 cil_generator = CIL(context)
 cil = cil_generator.visit(ast)
-#print(cil)
+print(cil)
 cil_codegen = CILCodegen()
 code = cil_codegen.visit(cil)
+with open(f'output.cil', 'w') as f:
+    f.write(code)
+
 mips_scope_builder = MIPSScopeBuilder()
-#print(cil)
-print('---------------- CIL Code------------------')
-print(code)
-print('-----------------MIPS----------------------')
 scope = mips_scope_builder.visit(cil)
 #print(scope)
 mips_codegen = MIPSCodegen(scope)
 mips_codegen.visit(cil, None)
 #print(mips_codegen.code)
-with open(f'output.cil', 'w') as f:
-    f.write(code)
 with open(f'output.out', 'w') as f:
     f.write(mips_codegen.code)
+#with open(f'{input_file[:-3]}.mips', 'w') as f:
+#    f.write(mips_codegen.code)
 exit(0)

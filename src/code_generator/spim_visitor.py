@@ -43,7 +43,7 @@ class MIPSCodegen:
         self.set_tabs(1)
         self.add_line(".data")
         self.set_tabs(0)
-        self.add_line("ObjectErrorMessage : .asciiz \"Program was halted\"")
+        self.add_line("ObjectAbortMessage : .asciiz \"Abort called from class \"")
 
         self.set_tabs(1)
         self.add_line(".data")
@@ -355,25 +355,41 @@ class MIPSCodegen:
     @visitor.when(CILStarNode)
     def visit(self, node: CILStarNode, frame):
         register0 = '$v0'
-        register1 = '$v1'
-        self.add_line(f'# computes the multiplication of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
-        self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
+        self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
+        self.visit(node.left, frame) # in $v0 is the address of the Int instance 
+        self.add_line(f'lw $t0, 4($v0)')
+        self.gen_push('$t0')
         self.visit(node.right, frame)
-        self.add_line(f'mult {register0}, {register0}')
-        self.add_line(f'mflo {register0}')
+        self.add_line(f'lw $t1, 4($v0)')
+        self.gen_pop('$t0')
+        self.add_line(f'mul $t0, $t1')
+        self.add_line(f'mflo $t0')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+        self.add_line(f'la $t1, Int')
+        self.add_line(f'sw $t1, 0($v0)')
+        self.add_line(f'sw $t0, 4($v0)')
         return register0
 
     @visitor.when(CILDivNode)
     def visit(self, node: CILDivNode, frame):
         register0 = '$v0'
-        register1 = '$v1'
-        self.add_line(f'# computes the quotient of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
-        self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
+        self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
+        self.visit(node.left, frame) # in $v0 is the address of the Int instance 
+        self.add_line(f'lw $t0, 4($v0)')
+        self.gen_push('$t0')
         self.visit(node.right, frame)
-        self.add_line(f'div {register1}, {register0}')
-        self.add_line(f'mflo {register0}')
+        self.add_line(f'lw $t1, 4($v0)')
+        self.gen_pop('$t0')
+        self.add_line(f'div $t0, $t1')
+        self.add_line(f'mflo $t0')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+        self.add_line(f'la $t1, Int')
+        self.add_line(f'sw $t1, 0($v0)')
+        self.add_line(f'sw $t0, 4($v0)')
         return register0
 
     @visitor.when(CILLessNode)
@@ -431,8 +447,33 @@ class MIPSCodegen:
         self.gen_pop('$t0')
         self.gen_pop('$t0')
         return '$v0'
-        
 
+    
+    @visitor.when(CILNotEqualsNode)
+    def visit(self, node: CILNotEqualsNode, frame):
+        self.visit(node.left, frame)
+        self.gen_push('$v0')
+        self.visit(node.right, frame)
+        self.gen_push('$v0')
+        self.add_line('jal compare')
+        self.gen_pop('$t0')
+        self.gen_pop('$t0')
+        self.add_line('lw $t0, 4($v0)')
+        self.add_line('li $t1, 1')
+        self.add_line('xor $t0, $t0, $t1')
+        self.add_line('andi $t0, $t0, 0x01')
+        self.add_line('sw $t0, 4($v0)')
+        return '$v0'
+        
+    @visitor.when(CILNotNode)
+    def visit(self, node: CILNotNode, frame):
+        self.visit(node.var, frame)
+        self.add_line('lw $t0, 4($v0)')
+        self.add_line('li $t1, 1')
+        self.add_line('xor $t0, $t0, $t1')
+        self.add_line('andi $t0, $t0, 0x01')
+        self.add_line('sw $t0, 4($v0)')
+        return '$v0'
 
         
 
