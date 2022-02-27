@@ -359,7 +359,7 @@ class CIL:
     @visitor.when(IsVoidNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        name = self.scope.add_new_local(node.computed_type)
+        name = self.scope.add_new_local(node.computed_type.name)
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name), expr))
         self.scope.instructions.append(CILArgNode(CILVariableNode(name)))
         name = self.scope.add_new_local("Bool")
@@ -379,7 +379,10 @@ class CIL:
             if node.lex == 'self':
                 return CILVariableNode(f'self_{self.scope.current_class}')
             else:
-                return CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.lex))
+                name = self.scope.add_new_local(node.computed_type.name)
+                self.scope.instructions.append(CILAssignNode(CILVariableNode(name),CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.lex))))
+                return  CILVariableNode(name)
+            CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.lex))
         
     @visitor.when(TrueNode)
     def visit(self, node):
