@@ -2,7 +2,7 @@
 	a : A;
 	main(): Main {
 		{
-		a <- new A;
+		a <- new B;
 		out_int(a.f());
 		}		
 	};
