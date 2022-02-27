@@ -266,7 +266,7 @@ class CCILGenerator:
         else_label = LabelNode(label_id)
         if_false = IfFalseNode(extract_id(if_fval), else_label)
 
-        endif_label = LabelNode("endIf")
+        endif_label = LabelNode(f"endIf_{times}")
         goto_endif = GoToNode(endif_label)
 
         # Setting the final operation which will simbolize the return value of this expr
@@ -385,13 +385,13 @@ class CCILGenerator:
 
         # Setting control flow labels
         loop_label_id = f"loop_{times}"
-        loop_label = LabelNode(node, loop_label_id)
+        loop_label = LabelNode(loop_label_id)
         end_loop_label_id = f"endLoop_{times}"
-        end_loop_label = LabelNode(node, end_loop_label_id)
+        end_loop_label = LabelNode(end_loop_label_id)
 
         # Setting control flow instructions ifFalse & GoTo
-        if_false = IfFalseNode(node, cond_fval, end_loop_label)
-        go_to = GoToNode(node, loop_label)
+        if_false = IfFalseNode(cond_fval, end_loop_label)
+        go_to = GoToNode(loop_label)
 
         fval = self.create_uninitialized_storage(f"loop_{times}_fv", VOID)
         # Loop Nodes have void return type, how to express it??
@@ -558,9 +558,9 @@ class CCILGenerator:
         error_ops = []
         if node.expr.type.name not in {INT, STRING, BOOL}:
             expr_fval_is_void = self.create_equality(
-                "expr_is_void", extract_id(expr_fval), IntNode("0")
+                f"expr_is_void_{times}", extract_id(expr_fval), IntNode("0")
             )
-            ok_label = LabelNode(f"expr_is_not_void")
+            ok_label = LabelNode(f"expr_is_not_void_{times}")
             if_is_not_void = IfFalseNode(extract_id(expr_fval_is_void), ok_label)
             error_msg = self.add_data(
                 "caller_void_err",
