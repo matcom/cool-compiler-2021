@@ -563,10 +563,12 @@ class CCILGenerator:
             ok_label = LabelNode(f"expr_is_not_void_{times}")
             if_is_not_void = IfFalseNode(extract_id(expr_fval_is_void), ok_label)
             error_msg = self.add_data(
-                "caller_void_err",
+                f"caller_void_err_{times}",
                 f"RuntimeError: expresion in {node.line}, {node.col} is void",
             )
-            load_err = self.create_string_load_data("caller_void_err_var", error_msg.id)
+            load_err = self.create_string_load_data(
+                f"caller_void_err_var_{times}", error_msg.id
+            )
             print_and_abort = self.notifiy_and_abort(load_err.id)
             error_ops = [
                 expr_fval_is_void,
@@ -1043,8 +1045,7 @@ class CCILGenerator:
                 inherited_methods.append(method)
 
         new_defined_methods = list(defined_methods.values())
-
-        return new_defined_methods, inherited_attr, inherited_methods
+        return new_defined_methods, inherited_methods, inherited_attr
 
     def find_function_id(self, class_name: str, method_name: str):
         for method in self.program_types[class_name].methods:
@@ -1062,6 +1063,7 @@ def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
 
 
 def update_self_type_attr(classes: List[Class]):
+    new_classes:List[Class] = []
     for classx in classes:
         classx.attributes = list(
             map(
@@ -1071,3 +1073,5 @@ def update_self_type_attr(classes: List[Class]):
                 classx.attributes,
             )
         )
+        new_classes.append(classx)
+    return new_classes
