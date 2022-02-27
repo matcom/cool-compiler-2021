@@ -60,7 +60,10 @@ class BaseVar:
         return f"{self.id} : {self.type}"
 
 
+@dataclass(frozen=True)
 class Attribute(BaseVar):
+    cool_id: str
+
     def __str__(self) -> str:
         return "attr " + super().__str__()
 

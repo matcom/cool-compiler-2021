@@ -90,17 +90,18 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ClassDeclarationNode)
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
+        self.reset_scope()
         self.current_type = node.id
         self.add_data(f"class_{node.id}", node.id)
 
-        attributes: List[Attribute] = []
+        attributes: List[Attribute] = self.get_inherited_attributes(node)
         methods: List[Method] = []
 
         attr_nodes = []
         func_nodes = []
         for feature in node.features:
             if isinstance(feature, sem_ast.AttrDeclarationNode):
-                attributes.append(Attribute(ATTR + feature.id, feature.type.name))
+                attributes.append(Attribute(ATTR + feature.id, feature.type.name, feature.id))
                 attr_nodes.append(feature)
             else:
                 func_nodes.append(feature)
@@ -108,10 +109,10 @@ class CCILGenerator:
         # Create init func using attributes and their expressions
         init_func = self.create_class_init_func(node, attr_nodes)
 
-        # Explore all functions
         self.reset_scope()
+        # Explore all functions
         self.ccil_cool_names.add_new_names(
-            *[(n.id, a.id) for (n, a) in zip(attr_nodes, attributes)]
+            *[(a.cool_id, a.id) for a in attributes]
         )
         class_code: List[FunctionNode] = []
         for func in func_nodes:
@@ -119,14 +120,12 @@ class CCILGenerator:
             class_code.append(f)
             methods.append(Method(func.id, f))
 
-        methods, inherited_methods, inherited_attrs = self.get_inherited_features(
-            node, methods
-        )
+        methods, inherited_methods = self.get_inherited_methods(node, methods)
 
         return (
             Class(
                 node.id,
-                inherited_attrs + attributes,
+                attributes,
                 inherited_methods + methods,
                 init_func,
             ),
@@ -246,7 +245,9 @@ class CCILGenerator:
 
         if is_attr:
             # Assignation occurring to an attribute Go update the attribute
-            set_attr = SetAttrOpNode("self", ccil_id, extract_id(expr_fval), self.current_type)
+            set_attr = SetAttrOpNode(
+                "self", ccil_id, extract_id(expr_fval), self.current_type
+            )
             return [*expr_ops, set_attr], expr_fval
 
         self.update_locals(expr_fval.id, ccil_id)
@@ -1016,7 +1017,14 @@ class CCILGenerator:
     def add_warning(self, msg: str):
         self.add_warning(f"Warning: {msg}")
 
-    def get_inherited_features(
+    def get_inherited_attributes(self, node: sem_ast.ClassDeclarationNode):
+        return (
+            [a for a in self.program_types[node.parent].attributes]
+            if node.parent is not None
+            else []
+        )
+
+    def get_inherited_methods(
         self, node: sem_ast.ClassDeclarationNode, defined_methods: List[Method]
     ):
         defined_methods: Dict[str, Method] = OrderedDict(
@@ -1024,13 +1032,10 @@ class CCILGenerator:
         )
 
         new_defined_methods: List[Method] = []
-        inherited_attr: List[Attribute] = []
         inherited_methods: List[Method] = []
 
         if node.parent is not None:
             parent_class: Class = self.program_types[node.parent]
-
-            inherited_attr = [a for a in parent_class.attributes]
 
             for method in parent_class.methods:
                 try:
@@ -1045,7 +1050,7 @@ class CCILGenerator:
                 inherited_methods.append(method)
 
         new_defined_methods = list(defined_methods.values())
-        return new_defined_methods, inherited_methods, inherited_attr
+        return new_defined_methods, inherited_methods
 
     def find_function_id(self, class_name: str, method_name: str):
         for method in self.program_types[class_name].methods:
@@ -1063,7 +1068,7 @@ def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
 
 
 def update_self_type_attr(classes: List[Class]):
-    new_classes:List[Class] = []
+    new_classes: List[Class] = []
     for classx in classes:
         classx.attributes = list(
             map(
