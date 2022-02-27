@@ -11,7 +11,8 @@ Location = Dict[Tuple[str, str], mips_ast.MemoryIndexNode]
 
 class CCILToMIPSGenerator:
     def __init__(self) -> None:
-        self.__types_table: List[ccil_ast.Class] = []  # list or dict for classes???
+        self.__id = 0
+        self.__types_table: List[ccil_ast.Class] = []
         self.__location: Location = {}
         self.__current_function: ccil_ast.FunctionNode
 
@@ -560,10 +561,7 @@ class CCILToMIPSGenerator:
 
         reg_ret = mips_ast.RegisterNode(node, V0)
         instructions.append(mips_ast.Div(node, reg_left, reg_right))
-        instructions.append(
-            # mips_ast.Move(node, reg_ret, mips_ast.RegisterNode(node, "lo"))
-            mips_ast.MoveFromLo(node, reg_ret)
-        )
+        instructions.append(mips_ast.MoveFromLo(node, reg_ret))
         return instructions
 
     @visitor.when(ccil_ast.LessOpNode)
@@ -831,6 +829,56 @@ class CCILToMIPSGenerator:
         )
         return instructions
 
+    @visitor.when(ccil_ast.LengthOpNode)
+    def visit(self, node: ccil_ast.LengthOpNode):
+        instructions = []
+        count = mips_ast.RegisterNode(node, V0)
+        instructions.append(
+            mips_ast.LoadImmediate(node, count, mips_ast.Constant(node, 0))
+        )
+        string = mips_ast.RegisterNode(node, T1)
+        instructions.append(
+            mips_ast.LoadAddress(node, string, self.get_relative_location(node.target))
+        )
+
+        loop = self.generate_unique_label()
+        instructions.append(mips_ast.LabelDeclaration(node, loop))
+
+        char = mips_ast.RegisterNode(node, T2)
+        instructions.append(
+            mips_ast.LoadByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), string),
+            )
+        )
+        zero = mips_ast.RegisterNode(node, ZERO)
+        exit = self.generate_unique_label()
+        instructions.append(
+            mips_ast.BranchOnEqual(node, char, zero, mips_ast.Label(node,exit))
+        )
+        instructions.append(
+            mips_ast.Addi(node, string, string, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(node, count, count, mips_ast.Constant(node, 1))
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop)))
+        instructions.append(mips_ast.LabelDeclaration(node,exit))
+        return instructions
+
+    # @visitor.when(ccil_ast.EqualStrNode)
+    # def visit(self, node: ccil_ast.EqualStrNode):
+    #     pass
+
+    # @visitor.when(ccil_ast.ConcatOpNode)
+    # def visit(self, node: ccil_ast.ConcatOpNode):
+    #     pass
+
+    # @visitor.when(ccil_ast.SubstringOpNode)
+    # def visit(self, node: ccil_ast.SubstringOpNode):
+    #     pass
+
     def get_attr_index(self, typex: str, attr: str):
         for _type in self.__types_table:
             if _type.id == typex:
@@ -874,3 +922,7 @@ class CCILToMIPSGenerator:
 
     def set_relative_location(self, id: str, memory: mips_ast.MemoryIndexNode):
         self.__location[self.__current_function.id, id] = memory
+
+    def generate_unique_label(self):
+        self.__id += 1
+        return f"label_{self.__id}"
