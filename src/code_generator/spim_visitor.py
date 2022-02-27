@@ -43,8 +43,12 @@ class MIPSCodegen:
         self.set_tabs(1)
         self.add_line(".data")
         self.set_tabs(0)
-        self.add_line("ObjectErrorMessage : .asciiz \"Program was halted\"")
+        self.add_line("ObjectAbortMessage : .asciiz \"Abort called from class \"")
 
+        self.set_tabs(1)
+        self.add_line(".data")
+        self.set_tabs(0)
+        self.add_line("IO_Buffer : .space 1001")
         for d in node.data:
             self.visit(d, frame)
 
@@ -166,10 +170,10 @@ class MIPSCodegen:
      
     @visitor.when(CILIfGotoNode)
     def visit(self, node: CILIfGotoNode, frame):
-        register = '$v1'
         value_addr = frame.get_addr(node.var.lex)
-        self.add_line(f'lw {register}, {value_addr}')
-        self.add_line(f'bne {register}, $zero, {node.label.id}')
+        self.add_line(f'lw $t1, {value_addr}')
+        self.add_line(f'lw $t0, 4($t1)')
+        self.add_line(f'bne $t0, $zero, {node.label.id}')
         
     @visitor.when(CILGotoNode)
     def visit(self, node: CILGotoNode, frame):
@@ -312,98 +316,164 @@ class MIPSCodegen:
     @visitor.when(CILPlusNode)
     def visit(self, node: CILPlusNode, frame):
         register0 = '$v0'
-        register1 = '$v1'
         self.add_line(f'# computes the sum of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
-        self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
+        self.visit(node.left, frame) # in $v0 is the address of the Int instance 
+        self.add_line(f'lw $t0, 4($v0)')
+        self.gen_push('$t0')
         self.visit(node.right, frame)
-        self.add_line(f'addu {register0}, {register0}, {register1}')
+        self.gen_pop('$t0')
+        self.add_line(f'lw $t1, 4($v0)')
+        self.add_line(f'add $t0, $t0, $t1')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+        self.add_line(f'la $t1, Int')
+        self.add_line(f'sw $t1, 0($v0)')
+        self.add_line(f'sw $t0, 4($v0)')
         return register0
 
     @visitor.when(CILMinusNode)
     def visit(self, node: CILMinusNode, frame):
         register0 = '$v0'
-        register1 = '$v1'
-        self.add_line(f'# computes the substraction of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
-        self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
+        self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
+        self.visit(node.left, frame) # in $v0 is the address of the Int instance 
+        self.add_line(f'lw $t0, 4($v0)')
+        self.gen_push('$t0')
         self.visit(node.right, frame)
-        self.add_line(f'subu {register0}, {register1}, {register0}')
+        self.add_line(f'lw $t1, 4($v0)')
+        self.gen_pop('$t0')
+        self.add_line(f'sub $t0, $t0, $t1')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+        self.add_line(f'la $t1, Int')
+        self.add_line(f'sw $t1, 0($v0)')
+        self.add_line(f'sw $t0, 4($v0)')
         return register0
 
     
     @visitor.when(CILStarNode)
     def visit(self, node: CILStarNode, frame):
         register0 = '$v0'
-        register1 = '$v1'
-        self.add_line(f'# computes the multiplication of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
-        self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
+        self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
+        self.visit(node.left, frame) # in $v0 is the address of the Int instance 
+        self.add_line(f'lw $t0, 4($v0)')
+        self.gen_push('$t0')
         self.visit(node.right, frame)
-        self.add_line(f'mult {register0}, {register0}')
-        self.add_line(f'mflo {register0}')
+        self.add_line(f'lw $t1, 4($v0)')
+        self.gen_pop('$t0')
+        self.add_line(f'mul $t0, $t1')
+        self.add_line(f'mflo $t0')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+        self.add_line(f'la $t1, Int')
+        self.add_line(f'sw $t1, 0($v0)')
+        self.add_line(f'sw $t0, 4($v0)')
         return register0
 
     @visitor.when(CILDivNode)
     def visit(self, node: CILDivNode, frame):
         register0 = '$v0'
-        register1 = '$v1'
-        self.add_line(f'# computes the quotient of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
-        self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
+        self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
+        self.visit(node.left, frame) # in $v0 is the address of the Int instance 
+        self.add_line(f'lw $t0, 4($v0)')
+        self.gen_push('$t0')
         self.visit(node.right, frame)
-        self.add_line(f'div {register1}, {register0}')
-        self.add_line(f'mflo {register0}')
+        self.add_line(f'lw $t1, 4($v0)')
+        self.gen_pop('$t0')
+        self.add_line(f'div $t0, $t1')
+        self.add_line(f'mflo $t0')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line(f'syscall')
+        self.add_line(f'la $t1, Int')
+        self.add_line(f'sw $t1, 0($v0)')
+        self.add_line(f'sw $t0, 4($v0)')
         return register0
 
     @visitor.when(CILLessNode)
     def visit(self, node: CILLessNode, frame):
-        register0 = '$v0'
-        register1 = '$v1'
         self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
+        self.add_line(f'move $t1, $v0') # get the address to the left Int instance 
+        self.add_line(f'lw $t1, 4($t1)') # get the value of the instance
+
         self.visit(node.right, frame)
-        self.add_line(f'slt {register0}, {register1}, {register0}')
-        return register0
+        self.add_line(f'move $t2, $v0') # get the address to the right Int instance 
+        self.add_line(f'lw $t2, 4($t2)') # get the value of the instance
+
+        
+        self.add_line(f'slt $t3, $t1, $t2') # l < r ?
+
+        self.add_line(f'la $t4, Bool')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line('syscall')
+        self.add_line(f'sw $t4, 0($v0)')
+        self.add_line(f'sw $t3, 4($v0)')
+        return '$v0'
 
     @visitor.when(CILElessNode)
     def visit(self, node: CILElessNode, frame):
-        register0 = '$v0'
-        register1 = '$s1'
-        register2 = '$s2'
-        register3 = '$s3'
-        register4 = '$s4'
         self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
-        self.add_line(f'move {register3}, {register0}')
+        self.add_line(f'move $t1, $v0') # get the address to the left Int instance 
+        self.add_line(f'lw $t1, 4($t1)') # get the value of the instance
+
         self.visit(node.right, frame)
-        self.add_line(f'move {register2}, {register0}')
-        self.add_line(f'slt {register0}, {register1}, {register0}')
-        self.add_line(f'slt {register2}, {register2}, {register3}')
-        self.add_line(f'nor {register2}, {register2}, $zero')
-        self.add_line(f'and {register0}, {register0}, {register2}')
-        return register0
+        self.add_line(f'move $t2, $v0') # get the address to the right Int instance 
+        self.add_line(f'lw $t2, 4($t2)') # get the value of the instance
+
+        
+        self.add_line(f'slt $t4, $t2, $t1')  # r < l?
+        self.add_line(f'li $t3, 1')
+        self.add_line(f'xor $t3, $t3, $t4')
+        self.add_line(f'andi $t3, $t3, 0x01') # get the last bit
+
+        self.add_line(f'la $t4, Bool')
+        self.add_line(f'li $a0, 8')
+        self.add_line(f'li $v0, 9')
+        self.add_line('syscall')
+        self.add_line(f'sw $t4, 0($v0)')
+        self.add_line(f'sw $t3, 4($v0)')
+        return '$v0'
 
     @visitor.when(CILEqualsNode)
     def visit(self, node: CILEqualsNode, frame):
-        register0 = '$s0'
-        register1 = '$s1'
-        register2 = '$s2'
-        register3 = '$s3'
-        register4 = '$s4'
         self.visit(node.left, frame)
-        self.add_line(f'move {register1}, {register0}')
-        self.add_line(f'move {register3}, {register0}')
+        self.gen_push('$v0')
         self.visit(node.right, frame)
-        self.add_line(f'move {register2}, {register0}')
-        self.add_line(f'slt {register0}, {register1}, {register0}')
-        self.add_line(f'nor {register0}, {register0}, $zero')
-        self.add_line(f'slt {register2}, {register2}, {register3}')
-        self.add_line(f'nor {register2}, {register2}, $zero')
-        self.add_line(f'and {register0}, {register0}, {register2}')
-        return register0
-        
+        self.gen_push('$v0')
+        self.add_line('jal compare')
+        self.gen_pop('$t0')
+        self.gen_pop('$t0')
+        return '$v0'
 
+    
+    @visitor.when(CILNotEqualsNode)
+    def visit(self, node: CILNotEqualsNode, frame):
+        self.visit(node.left, frame)
+        self.gen_push('$v0')
+        self.visit(node.right, frame)
+        self.gen_push('$v0')
+        self.add_line('jal compare')
+        self.gen_pop('$t0')
+        self.gen_pop('$t0')
+        self.add_line('lw $t0, 4($v0)')
+        self.add_line('li $t1, 1')
+        self.add_line('xor $t0, $t0, $t1')
+        self.add_line('andi $t0, $t0, 0x01')
+        self.add_line('sw $t0, 4($v0)')
+        return '$v0'
+        
+    @visitor.when(CILNotNode)
+    def visit(self, node: CILNotNode, frame):
+        self.visit(node.var, frame)
+        self.add_line('lw $t0, 4($v0)')
+        self.add_line('li $t1, 1')
+        self.add_line('xor $t0, $t0, $t1')
+        self.add_line('andi $t0, $t0, 0x01')
+        self.add_line('sw $t0, 4($v0)')
+        return '$v0'
 
         
 

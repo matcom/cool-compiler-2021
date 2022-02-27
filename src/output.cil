@@ -1,8 +1,13 @@
 .TYPES
 
 type Main {
+	attribute out;
+	attribute testee;
+	attribute divisor;
+	attribute stop;
+	attribute m;
 
-	method init : init_Main;
+	method Init_Main : Init_Main;
 	method abort : abort_Object;
 	method type_name : type_name_Object;
 	method copy : copy_Object;
@@ -15,7 +20,7 @@ type Main {
 
 type Object {
 
-	method init : init_Object;
+	method Init_Object : Init_Object;
 	method abort : abort_Object;
 	method type_name : type_name_Object;
 	method copy : copy_Object;
@@ -24,7 +29,7 @@ type Object {
 type Int {
 	attribute value;
 
-	method init : init_Int;
+	method Init_Int : Init_Int;
 	method abort : abort_Object;
 	method type_name : type_name_Object;
 	method copy : copy_Object;
@@ -33,7 +38,7 @@ type Int {
 type String {
 	attribute value;
 
-	method init : init_String;
+	method Init_String : Init_String;
 	method abort : abort_Object;
 	method type_name : type_name_Object;
 	method copy : copy_Object;
@@ -45,7 +50,7 @@ type String {
 type Bool {
 	attribute value;
 
-	method init : init_Bool;
+	method Init_Bool : Init_Bool;
 	method abort : abort_Object;
 	method type_name : type_name_Object;
 	method copy : copy_Object;
@@ -53,7 +58,7 @@ type Bool {
 
 type IO {
 
-	method init : init_IO;
+	method Init_IO : Init_IO;
 	method abort : abort_Object;
 	method type_name : type_name_Object;
 	method copy : copy_Object;
@@ -66,6 +71,10 @@ type IO {
 
 .DATA
 
+str_0 = "2 is trivially prime.\n";
+str_1 = " is prime.\n";
+str_2 = "continue";
+str_3 = "halt";
 
 .CODE
 
@@ -77,7 +86,7 @@ function main {
 
 	m0 = ALLOCATE Main;
 	ARG m0;
-	m1 = VCALL Main init;
+	m1 = VCALL Main Init_Main;
 	ARG m1;
 	m2 = VCALL Main main;
 	RETURN m2;
@@ -89,47 +98,190 @@ function main_Main {
 	PARAM self_Main;
 
 	LOCAL t_0;
+
+	t_0 = 0;
+	RETURN t_0;
+
+}
+
+
+function Init_Main {
+	PARAM self_Main;
+
 	LOCAL t_1;
 	LOCAL t_2;
 	LOCAL t_3;
 	LOCAL t_4;
 	LOCAL t_5;
+	LOCAL t_6;
+	LOCAL t_7;
+	LOCAL t_8;
+	LOCAL t_9;
+	LOCAL t_10;
+	LOCAL t_11;
+	LOCAL t_12;
+	LOCAL t_13;
+	LOCAL t_14;
+	LOCAL t_15;
+	LOCAL t_16;
+	LOCAL t_17;
+	LOCAL t_18;
+	LOCAL t_19;
+	LOCAL t_20;
+	LOCAL t_21;
+	LOCAL t_22;
+	LOCAL t_23;
+	LOCAL t_24;
+	LOCAL t_25;
+	LOCAL t_26;
+	LOCAL t_27;
+	LOCAL t_28;
+	LOCAL t_29;
+	LOCAL t_30;
+	LOCAL t_31;
+	LOCAL t_32;
+	LOCAL t_33;
+	LOCAL t_34;
+	LOCAL t_35;
+	LOCAL t_36;
+	LOCAL t_37;
+	LOCAL t_38;
+	LOCAL t_39;
+	LOCAL t_40;
+	LOCAL t_41;
+	LOCAL t_42;
+	LOCAL t_43;
+	LOCAL t_44;
+	LOCAL t_45;
+	LOCAL t_46;
+	LOCAL t_47;
+	LOCAL t_48;
+	LOCAL t_49;
+	LOCAL t_50;
+	LOCAL t_51;
+	LOCAL t_52;
+	LOCAL t_53;
+	LOCAL t_54;
 
-	t_0 = self_Main;
-	t_1 = t_0 == 0;
-	ARG t_1;
-	t_2 = VCALL Bool type_name;
-	t_3 = t_2;
 	ARG self_Main;
-	ARG t_3;
-	t_4 = VCALL Main out_string;
+	self_Main = CALL Init_IO;
+	t_1 = LOAD str_0;
+	t_2 = t_1;
+	ARG self_Main;
+	ARG t_2;
+	t_3 = VCALL Main out_string;
+	SETATTR self_Main out 2;
+	t_55 = GETATTR self_Main out;
+	SETATTR self_Main testee t_55;
+	SETATTR self_Main stop 500;
+while_0:
+	t_4 = 0 == 0;
 	t_5 = t_4;
-	RETURN t_5;
+	IF t_5 GOTO body_0;
+	GOTO pool_0;
+body_0:
+	t_7 = GETATTR self_Main testee;
+	t_8 = t_7 + 1;
+	SETATTR self_Main testee t_8;
+	SETATTR self_Main divisor 2;
+while_1:
+	t_9 = GETATTR self_Main divisor;
+	t_10 = GETATTR self_Main divisor;
+	t_11 = t_9 * t_10;
+	t_12 = GETATTR self_Main testee;
+	t_13 = t_12 < t_11;
+	t_14 = t_13;
+	IF t_14 GOTO then_0;
+	t_16 = GETATTR self_Main testee;
+	t_17 = GETATTR self_Main divisor;
+	t_18 = t_16 / t_17;
+	t_19 = GETATTR self_Main divisor;
+	t_20 = t_19 * t_18;
+	t_21 = GETATTR self_Main testee;
+	t_22 = t_21 - t_20;
+	t_23 = t_22 == 0;
+	t_24 = t_23;
+	IF t_24 GOTO then_1;
+	t_26 = 0 == 0;
+	t_25 = t_26;
+	GOTO ifend_1;
+then_1:
+	t_27 = 0 == 1;
+	t_25 = t_27;
+ifend_1:
+	t_15 = t_25;
+	GOTO ifend_0;
+then_0:
+	t_28 = 0 == 1;
+	t_15 = t_28;
+ifend_0:
+	t_29 = t_15;
+	IF t_29 GOTO body_1;
+	GOTO pool_1;
+body_1:
+	t_31 = GETATTR self_Main divisor;
+	t_32 = t_31 + 1;
+	SETATTR self_Main divisor t_32;
+	t_30 = t_32;
+	GOTO while_1;
+pool_1:
+	t_33 = GETATTR self_Main divisor;
+	t_34 = GETATTR self_Main divisor;
+	t_35 = t_33 * t_34;
+	t_36 = GETATTR self_Main testee;
+	t_37 = t_36 < t_35;
+	t_38 = t_37;
+	IF t_38 GOTO then_2;
+	t_39 = 0;
+	GOTO ifend_2;
+then_2:
+	t_40 = GETATTR self_Main testee;
+	SETATTR self_Main out t_40;
+	t_41 = GETATTR self_Main out;
+	ARG self_Main;
+	ARG t_41;
+	t_42 = VCALL Main out_int;
+	t_43 = LOAD str_1;
+	t_44 = t_43;
+	ARG self_Main;
+	ARG t_44;
+	t_45 = VCALL Main out_string;
+	t_39 = t_45;
+ifend_2:
+	t_46 = GETATTR self_Main stop;
+	t_47 = GETATTR self_Main testee;
+	t_48 = t_46 <= t_47;
+	t_49 = t_48;
+	IF t_49 GOTO then_3;
+	t_51 = LOAD str_2;
+	t_50 = t_51;
+	GOTO ifend_3;
+then_3:
+	t_52 = LOAD str_3;
+	t_53 = t_52;
+	ARG t_53;
+	t_54 = VCALL String abort;
+	t_50 = t_54;
+ifend_3:
+	t_6 = t_50;
+	GOTO while_0;
+pool_0:
+	SETATTR self_Main m t_6;
+	RETURN self_Main;
 
 }
 
 
-function init_Main {
+function Init_Object {
 	PARAM self;
 
 
-	ARG self;
-	self = CALL init_IO;
 	RETURN self;
 
 }
 
 
-function init_Object {
-	PARAM self;
-
-
-	RETURN self;
-
-}
-
-
-function init_Int {
+function Init_Int {
 	PARAM self;
 	PARAM v;
 
@@ -140,7 +292,7 @@ function init_Int {
 }
 
 
-function init_String {
+function Init_String {
 	PARAM self;
 	PARAM v;
 
@@ -151,7 +303,7 @@ function init_String {
 }
 
 
-function init_Bool {
+function Init_Bool {
 	PARAM self;
 	PARAM v;
 
@@ -162,7 +314,7 @@ function init_Bool {
 }
 
 
-function init_IO {
+function Init_IO {
 	PARAM self;
 
 
