@@ -81,16 +81,14 @@ class CCILToMIPSGenerator:
         # TODO: other .data section static data inicializations like strings
 
         functions = []
-        # functions.extend(self.visit(node.entry_func))
-        functions.extend(
-            [self.visit(func) for func in node.code_section if func.id == "main"][0]
-        )
+
+        print(node.entry_func)
+        functions.extend(self.visit(node.entry_func))
 
         for classx in node.types_section:
             functions.extend(self.visit(classx.init_operations))
         for func in node.code_section:
-            if func.id != "main":
-                functions.extend(self.visit(func))
+            functions.extend(self.visit(func))
 
         return mips_ast.MIPSProgram(
             None,
@@ -104,100 +102,64 @@ class CCILToMIPSGenerator:
         instructions = []
         instructions.append(mips_ast.LabelDeclaration(node, node.id))
 
-        frame_size = (len(node.locals)) * DOUBLE_WORD + 2 * DOUBLE_WORD
+        frame_size = len(node.locals) * DOUBLE_WORD
         stack_pointer = mips_ast.RegisterNode(node, SP)
         return_address = mips_ast.RegisterNode(node, RA)
         frame_pointer = mips_ast.RegisterNode(node, FP)
 
-        index = 0
-        for param in reversed(node.locals):
-            self.set_relative_location(
-                param.id,
-                mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, -1 * index), frame_pointer
-                ),
-            )
-            index += DOUBLE_WORD
-        index = DOUBLE_WORD
-        for local in node.params:
+        for index, local in enumerate(node.locals):
             self.set_relative_location(
                 local.id,
                 mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, index), frame_pointer
+                    node,
+                    mips_ast.Constant(
+                        node, -1 * (len(node.locals) + 2 - index) * DOUBLE_WORD
+                    ),
+                    frame_pointer,
                 ),
             )
-            index += DOUBLE_WORD
+        for index, param in enumerate(node.params):
+            self.set_relative_location(
+                param.id,
+                mips_ast.MemoryIndexNode(
+                    node,
+                    mips_ast.Constant(
+                        node, ((len(node.params) - 1) - index) * DOUBLE_WORD
+                    ),
+                    frame_pointer,
+                ),
+            )
 
+        instructions.extend(self.push_stack(node, return_address))
+        instructions.extend(self.push_stack(node, frame_pointer))
         instructions.append(
-            mips_ast.Subu(
-                node, stack_pointer, stack_pointer, mips_ast.Constant(node, frame_size)
+            mips_ast.Addi(
+                node, frame_pointer, stack_pointer, mips_ast.Constant(node, 16)
             )
         )
         instructions.append(
-            mips_ast.StoreWord(
+            mips_ast.Addi(
                 node,
-                return_address,
-                mips_ast.MemoryIndexNode(
-                    node,
-                    mips_ast.Constant(node, frame_size - DOUBLE_WORD),
-                    stack_pointer,
-                ),
-            )
-        )
-        instructions.append(
-            mips_ast.StoreWord(
-                node,
-                frame_pointer,
-                mips_ast.MemoryIndexNode(
-                    node,
-                    mips_ast.Constant(node, frame_size - 2 * DOUBLE_WORD),
-                    stack_pointer,
-                ),
-            )
-        )
-        instructions.append(
-            mips_ast.Addu(
-                node,
-                frame_pointer,
                 stack_pointer,
-                mips_ast.Constant(node, frame_size - DOUBLE_WORD),
+                stack_pointer,
+                mips_ast.Constant(node, -1 * frame_size),
             )
         )
 
         for op in node.operations:
             instructions.extend(self.visit(op))
-
         ret_location = self.get_relative_location(node.ret)
         ret_register = mips_ast.RegisterNode(node, V0)
         instructions.append(mips_ast.LoadWord(node, ret_register, ret_location))
 
         instructions.append(
-            mips_ast.LoadWord(
-                node,
-                return_address,
-                mips_ast.MemoryIndexNode(
-                    node,
-                    mips_ast.Constant(node, frame_size - DOUBLE_WORD),
-                    stack_pointer,
-                ),
-            )
-        )
-        instructions.append(
-            mips_ast.LoadWord(
-                node,
-                frame_pointer,
-                mips_ast.MemoryIndexNode(
-                    node,
-                    mips_ast.Constant(node, frame_size - 2 * DOUBLE_WORD),
-                    stack_pointer,
-                ),
-            )
-        )
-        instructions.append(
-            mips_ast.Addu(
+            mips_ast.Addi(
                 node, stack_pointer, stack_pointer, mips_ast.Constant(node, frame_size)
             )
         )
+        instructions.extend(self.pop_stack(node, frame_pointer))
+        instructions.extend(self.pop_stack(node, return_address))
+
         if node.id == "main":
             instructions.append(
                 mips_ast.LoadImmediate(
@@ -250,7 +212,7 @@ class CCILToMIPSGenerator:
                     node,
                     stack_pointer,
                     stack_pointer,
-                    mips_ast.Constant(node, len(node.args) * WORD),
+                    mips_ast.Constant(node, len(node.args) * DOUBLE_WORD),
                 )
             )
         return instructions
@@ -260,10 +222,18 @@ class CCILToMIPSGenerator:
         instructions = []
 
         obj_location = self.get_relative_location(node.args[0].value)
-        obj_type = mips_ast.RegisterNode(node, T0)
-        instructions.append(mips_ast.LoadWord(node, obj_type, obj_location))
+        reg_obj = mips_ast.RegisterNode(node, T0)
+        instructions.append(mips_ast.LoadWord(node, reg_obj, obj_location))
 
-        register_function = mips_ast.RegisterNode(node, T1)
+        obj_type = mips_ast.RegisterNode(node, T1)
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                obj_type,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), reg_obj),
+            )
+        )
+        register_function = mips_ast.RegisterNode(node, T2)
         function_index = self.get_method_index(node.type, node.id)
         instructions.append(
             mips_ast.LoadWord(
@@ -274,8 +244,7 @@ class CCILToMIPSGenerator:
                 ),
             )
         )
-        reg_arg = mips_ast.RegisterNode(node, T2)
-        instructions = []
+        reg_arg = mips_ast.RegisterNode(node, T3)
         for arg in node.args:
             instructions.append(
                 mips_ast.LoadWord(node, reg_arg, self.get_relative_location(arg.value))
@@ -839,7 +808,6 @@ class CCILToMIPSGenerator:
     def get_attr_count(self, typex: str):
         for _type in self.__types_table:
             if _type.id == typex:
-                print(_type.attributes)
                 return len(_type.attributes)
         raise Exception("Type declaration not found")
 
@@ -850,12 +818,14 @@ class CCILToMIPSGenerator:
         raise Exception("Type's function for inicialization not found")
 
     def get_method_index(self, typex: str, method: str) -> int:
+
         for _type in self.__types_table:
             if _type.id == typex:
                 for index, _method in enumerate(_type.methods):
                     if _method.id == method:
                         return index * WORD + DOUBLE_WORD
-        raise Exception("Method implementation not found")
+
+        raise Exception(f"Method implementation not found:{typex} {method}")
 
     def get_class_method(self, typex: str, method: str) -> str:
         for _type in self.__types_table:
@@ -863,7 +833,7 @@ class CCILToMIPSGenerator:
                 for _method in _type.methods:
                     if _method.id == method:
                         return _method.function.id
-        raise Exception("Method implementation not found")
+        raise Exception(f"Method implementation not found")
 
     def get_relative_location(self, id: str):
         return self.__location[self.__current_function.id, id]
