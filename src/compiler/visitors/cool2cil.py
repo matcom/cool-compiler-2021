@@ -608,7 +608,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         )
 
         # static call node
-        if isinstance(node.obj, VariableNode) and node.obj.lex == self.vself.name:
+        if (
+            isinstance(node.obj, VariableNode)
+            and node.obj.lex == self.vself.name
+            and not node.type
+        ):
             self.register_instruction(cil.ArgNode(self.vself.name))
             for arg in args:
                 self.register_instruction(arg)
