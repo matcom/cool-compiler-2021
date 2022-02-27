@@ -60,6 +60,8 @@ class BackInferencer:
     def visit(self, node: ClassDeclarationNode, scope: Scope) -> ClassDeclarationNode:
         self.current_type = self.context.get_type(node.id, unpacked=True)
         scope.define_variable("self", TypeBag({SelfType()}))
+        for attr in self.current_type.attributes:
+            scope.define_variable(attr.name, attr.type)
 
         new_features = []
         for feature in node.features:
