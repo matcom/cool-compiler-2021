@@ -82,9 +82,9 @@ class CoolToCilVisitor(object):
     def register_object_abort(self):
         self.reset_state()
         self.register_param("self")
-        self.instructions.append(
-            cil.PrintNode(self.register_data("abort_msg", '"Program Halted!"'), True)
-        )
+        data = self.register_data("abort_msg", '"Program Halted!"')
+        instance = self.register_new("String", data)
+        self.instructions.append(cil.PrintNode(instance, True))
         self.instructions.append(cil.ExitNode(1))
         self.dotcode.append(
             cil.FunctionNode(
@@ -113,9 +113,9 @@ class CoolToCilVisitor(object):
     def register_object_copy(self):
         self.reset_state()
         self.register_param("self")
-        self.instructions.append(
-            cil.PrintNode(self.register_data("abort_msg", '"Program Halted!"'), True)
-        )
+        data = self.register_data("abort_msg", '"Program Halted!"')
+        instance = self.register_new("String", data)
+        self.instructions.append(cil.PrintNode(instance, True))
         self.instructions.append(cil.ExitNode(1))
         self.dotcode.append(
             cil.FunctionNode(
@@ -389,7 +389,7 @@ class CoolToCilVisitor(object):
         self_local = self.register_local("self")
         self.instructions.append(cil.AllocateNode(node.type.name, self_local))
         for attr, (i, htype) in self.attrs[node.type.name].items():
-            attr_local = self.get_local(attr)
+            attr_local = self.register_local(attr)
             self.instructions.append(
                 cil.StaticCallNode(self.get_func_id(htype, f"{attr}_init"), attr_local,)
             )
@@ -452,7 +452,7 @@ class CoolToCilVisitor(object):
             self.instructions.append(cil.AssignNode(param_sid, rhs_local))
             return param_sid
 
-        attr_id = self.get_attr_id(node.type.name, node.id)
+        attr_id = self.get_attr_id(self.type, node.id)
         self.instructions.append(
             cil.SetAttrNode(self.get_param("self"), attr_id, local_sid)
         )
@@ -746,7 +746,7 @@ class CoolToCilVisitor(object):
 
         local_sid = self.register_local(node.value)
         # print((node.type.name, node.value))
-        attr_id = self.get_attr_id(node.type.name, node.value)
+        attr_id = self.get_attr_id(self.type, node.value)
         self.instructions.append(
             cil.GetAttrNode(self.get_param("self"), attr_id, local_sid)
         )

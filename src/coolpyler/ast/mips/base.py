@@ -174,6 +174,18 @@ class JumpRegisterLinkNode(InstructionNode):
         self.register = register
 
 
+class MoveFromHi(InstructionNode):
+    def __init__(self, register, comment=""):
+        super().__init__(comment)
+        self.register = register
+
+
+class MoveFromLo(InstructionNode):
+    def __init__(self, register, comment=""):
+        super().__init__(comment)
+        self.register = register
+
+
 class MemoryAddressLabelNode(MipsAstNode):
     def __init__(self, address, index):
         # super().__init__(node)

@@ -75,18 +75,24 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
     local_0 = LOAD data_0_abort_msg;
-    print(str, local_0
+    ARG local_0;
+    local_1 = CALL String_init;
+    print(str, local_1
   }
 
   function Object_copy {
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
     local_0 = LOAD data_1_abort_msg;
-    print(str, local_0
+    ARG local_0;
+    local_1 = CALL String_init;
+    print(str, local_1
   }
 
   function Object_type_name {

@@ -18,7 +18,7 @@ RA_REG = mips.RegisterNode("ra")
 V0_REG = mips.RegisterNode("v0")
 V1_REG = mips.RegisterNode("v1")
 ZERO_REG = mips.RegisterNode("zero")
-LOW_REG = mips.RegisterNode("low")
+LOW_REG = mips.RegisterNode("lo")
 
 
 class MemoryManager:
@@ -253,13 +253,15 @@ class CilToMIPS:
         instructions.append(mips.MultNode(reg1, reg2, f"Mult"))
 
         dest_dir = self.search_mem(node.dest)
+        instructions.append(mips.MoveFromHi(reg1))  # TODO: Lo_REG ???
+
         instructions.append(
             mips.StoreWordNode(
-                LOW_REG,
+                reg1,
                 mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
                 f"Save result of Mult",
             )
-        )  # TODO: HI_REG ???
+        )
 
         self.memory_manager.clean()
         return instructions
@@ -278,13 +280,15 @@ class CilToMIPS:
         instructions.append(mips.DivNode(reg1, reg2, f"Div"))
 
         dest_dir = self.search_mem(node.dest)
+        instructions.append(mips.MoveFromLo(reg1))  # TODO: Hi_REG ???
+
         instructions.append(
             mips.StoreWordNode(
-                LOW_REG,
+                reg1,
                 mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
-                f"Save result of div",
+                f"Save result of Div",
             )
-        )  # TODO: HI_REG ???
+        )
 
         self.memory_manager.clean()
         return instructions
@@ -725,7 +729,7 @@ class CilToMIPS:
         instructions.append(mips.BeqzNode(reg2, mips.LabelNode(exit)))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(reg1, reg1, 1))
-        instructions.append(mips.JumpNode(mips.LabelNode(loop)))
+        instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
 
         dest_dir = self.search_mem(node.dest)
@@ -796,7 +800,7 @@ class CilToMIPS:
         instructions.append(mips.BeqzNode(ARG_REGISTERS[1], mips.LabelNode(exit1)))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
-        instructions.append(mips.JumpNode(mips.LabelNode(loop1)))
+        instructions.append(mips.JumpNode(loop1))
         instructions.append(mips.LabelInstructionNode(exit1))
 
         instructions.append(mips.LabelInstructionNode(loop2))
@@ -811,7 +815,7 @@ class CilToMIPS:
         instructions.append(mips.BeqzNode(ARG_REGISTERS[2], mips.LabelNode(exit2)))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[2], ARG_REGISTERS[2], 1))
-        instructions.append(mips.JumpNode(mips.LabelNode(loop2)))
+        instructions.append(mips.JumpNode(loop2))
         instructions.append(mips.LabelInstructionNode(exit2))
 
         dest_dir = self.search_mem(node.dest)
@@ -875,7 +879,7 @@ class CilToMIPS:
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
         instructions.append(mips.AddiNode(reg3, reg3, 1))
-        instructions.append(mips.JumpNode(mips.LabelNode(loop)))
+        instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
 
         dest_dir = self.search_mem(node.dest)
@@ -948,7 +952,7 @@ class CilToMIPS:
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
         instructions.append(mips.AddiNode(reg3, reg3, 1))
-        instructions.append(mips.JumpNode(mips.LabelNode(loop)))
+        instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
 
         dest_dir = self.search_mem(node.dest)
@@ -1027,7 +1031,7 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
 
-        reg1 = self.memory_manager.get_unused_register
+        reg1 = self.memory_manager.get_unused_register()
         source_dir = self.search_mem(node.source)
         dest_dir = self.search_mem(node.dest)
 

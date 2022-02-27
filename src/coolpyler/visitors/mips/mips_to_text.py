@@ -135,11 +135,19 @@ class MIPSGenerator:
 
     @visitor.when(mips.JumpNode)
     def visit(self, node: mips.JumpNode):
-        return f"\tj {self.visit(node.address)} \t#{node.comment}"
+        return f"\tj {node.address} \t#{node.comment}"
 
     @visitor.when(mips.JumpRegisterNode)
     def visit(self, node: mips.JumpRegisterNode):
         return f"\tjr {self.visit(node.register)} \t#{node.comment}"
+
+    @visitor.when(mips.MoveFromHi)
+    def visit(self, node: mips.MoveFromHi):
+        return f"\tmfhi {self.visit(node.register)} \t#{node.comment}"
+
+    @visitor.when(mips.MoveFromLo)
+    def visit(self, node: mips.MoveFromLo):
+        return f"\tmflo {self.visit(node.register)} \t#{node.comment}"
 
     @visitor.when(mips.JumpAndLinkNode)
     def visit(self, node: mips.JumpAndLinkNode):

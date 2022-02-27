@@ -71,18 +71,24 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
     local_0 = LOAD data_0_abort_msg;
-    print(str, local_0
+    ARG local_0;
+    local_1 = CALL String_init;
+    print(str, local_1
   }
 
   function Object_copy {
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
     local_0 = LOAD data_1_abort_msg;
-    print(str, local_0
+    ARG local_0;
+    local_1 = CALL String_init;
+    print(str, local_1
   }
 
   function Object_type_name {
@@ -331,7 +337,7 @@
     ARG param_self;
     ARG local_2;
     local_1 = VCALL local_11 3;
-    local_14 = TYPEOF <coolpyler.ast.cool.type_checked.CoolVarNode object at 0x7f04299a6250>;
+    local_14 = TYPEOF <coolpyler.ast.cool.type_checked.CoolVarNode object at 0x7f5f979ff490>;
     ARG local_14;
     local_15 = CALL Bool_init;
     local_16 = TYPEOF local_15;
