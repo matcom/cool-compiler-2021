@@ -80,8 +80,6 @@ class CIL:
                     self.scope.instructions =  []
                     att_aux.append(feature.id)
                     locals.extend(self.scope.all_locals.copy())
-                    self.scope.locals = [{}]
-                    self.scope.all_locals = []
                    
             else:
                 function = self.visit(feature)
