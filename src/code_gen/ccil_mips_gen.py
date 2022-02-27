@@ -736,13 +736,13 @@ class CCILToMIPSGenerator:
         )
         instructions.append(
             mips_ast.LoadImmediate(
-                node, mips_ast.RegisterNode(node, 9), mips_ast.Constant(node, 0)
+                node, mips_ast.RegisterNode(node, T1), mips_ast.Constant(node, 0)
             )
         )
         instructions.append(
             mips_ast.BranchOnEqual(
                 node,
-                mips_ast.RegisterNode(node, 9),
+                mips_ast.RegisterNode(node, T1),
                 mips_ast.RegisterNode(node, T0),
                 mips_ast.Label(node, node.target.id),
             )
