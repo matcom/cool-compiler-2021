@@ -76,7 +76,7 @@ class BackInferencer:
 
         if not node.expr:
             attr_node.inferenced_type = node.inferenced_type
-            scope.define_variable(node.id, node.inferenced_type)
+            scope.get_variable(node.id).type = node.inferenced_type
             return attr_node
 
         expr_node = self.visit(node.expr, scope)
@@ -84,7 +84,6 @@ class BackInferencer:
 
         decl_type = node.inferenced_type
         decl_type, changed = unify(decl_type, expr_type)
-        scope.define_variable(node.id, decl_type)
         self.changed |= changed
 
         attr_node.expr = expr_node
