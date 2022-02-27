@@ -22,7 +22,7 @@ T2 = Register("t2")
 
 # ***********************Utils***********************
 
-MAIN_FUNCTION_NAME = "function_main_at_Main"
+MAIN_FUNCTION_NAME = "main"
 VIRTUAL_TABLE = "virtual_table"
 TYPE_LIST = "type_list"
 
