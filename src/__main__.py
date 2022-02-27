@@ -75,7 +75,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "./tests/codegen/arith.cl"#"debbuging/tests/Auto/call1.cl"
+        input_file = "./tests/codegen/primes.cl"#"debbuging/tests/Auto/call1.cl"
     #   raise Exception("Incorrect number of arguments")
     try:
         program_file = open(input_file)
@@ -95,6 +95,13 @@ def main():
             for error in pipe.errors:
                 print(error)
             exit(1)
+        else:
+            out_file = input_file.split(".")
+            out_file[-1] = "mips"
+            out_file = ".".join(out_file)
+
+            with open(out_file, 'w') as f:
+                f.write(pipe.mipsCode)
     except Exception as e:
         print(e)
         exit(1)

@@ -73,9 +73,10 @@ class Pipeline():
                     mipsCode = MIPSFormatter.visit(MIPSAst)
                     # MIPSVisitor = CILToMipsVisitor()
                     # mipsCode = MIPSVisitor.visit(cil_ast)
-                    with open('asd.mips', 'w') as f:
-                        f.write(mipsCode)
-                        f.close()
+                    self.mipsCode = mipsCode
+                    # with open('asd.mips', 'w') as f:
+                    #     f.write(mipsCode)
+                    #     f.close()
 
         if verbose:
             print('This is after infering types:')

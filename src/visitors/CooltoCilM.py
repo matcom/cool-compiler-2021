@@ -436,10 +436,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 self.init_attr_name(self.current_type.parent.name), variable))
 
         # Inicializando los atributos de la clase
-        for feat, child in zip(node.features, scope.children):
+        for feat in node.features:
             if isinstance(feat, AttrDeclarationNode):
-                self.visit(feat, child)
-                self.register_instruction(cil.SetAttribNode(self_param, feat.id, feat.ret_expr, node.id,))
+                try:
+                    att_scope = Scope()
+                    att_scope.locals = scope.locals
+                    self.visit(feat, att_scope)
+                    self.register_instruction(cil.SetAttribNode(self_param, feat.id, feat.ret_expr, node.id,))
+                except Exception as e:
+                    _ = 0
         self.register_instruction(cil.ReturnNode(self_param))
 
         # TypeNode de la clase
@@ -488,7 +493,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 return StringNode("")
             else:
                 return VoidNode('void')
-        
+        if node.id == 'm':
+            _ = 0
         variable = self.define_internal_local()
         if node.value:
             self.visit(node.value, scope)
@@ -519,7 +525,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.body -> [ ExpressionNode ... ]
         ###############################
-        if node.id == 'main':
+        if node.id == 'm':
             _ = 0
         self.current_method = self.current_type.get_method(node.id, self.current_type, False)
         type = self.types_map[self.current_type.name]
