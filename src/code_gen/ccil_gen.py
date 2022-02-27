@@ -79,9 +79,11 @@ class CCILGenerator:
             self.program_types[classx.id] = classx
             self.program_codes += class_code
 
+        program_types = update_self_type_attr(self.program_types.values())
+
         return CCILProgram(
             self.define_entry_func(),
-            list(self.program_types.values()),
+            program_types,
             self.program_codes,
             self.data,
         )
@@ -1000,7 +1002,7 @@ class CCILGenerator:
         self.add_warning(f"Warning: {msg}")
 
     def get_inherited_features(
-        self, node: sem_ast.ClassDeclarationNode#, node_methods: List[Method]
+        self, node: sem_ast.ClassDeclarationNode  # , node_methods: List[Method]
     ):
         # node_methods: Set[str] = {m.id for m in node_methods}
 
@@ -1026,3 +1028,15 @@ def make_unique_func_id(method_name: str, class_name: str):
 
 def to_vars(dict: Dict[str, str], const: BaseVar = BaseVar) -> List[BaseVar]:
     return list(map(lambda x: const(*x), dict.items()))
+
+
+def update_self_type_attr(classes: List[Class]):
+    for classx in classes:
+        classx.attributes = list(
+            map(
+                lambda attr: attr
+                if attr.type != SELFTYPE
+                else Attribute(attr.id, classx.id),
+                classx.attributes
+            )
+        )

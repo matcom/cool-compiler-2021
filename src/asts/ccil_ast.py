@@ -12,7 +12,7 @@ class CCILProgram:
     entry_func: FunctionNode
     types_section: List[Class]
     code_section: List[FunctionNode]
-    data_section: List[Data]  
+    data_section: List[Data]
 
     def __str__(self, all=False) -> str:
         types_section = self.types_section
@@ -28,7 +28,7 @@ class CCILProgram:
         return f"TYPES:\n{types}\nDATA:\n{data}\nCODE:\n{code} "
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class Class:
     """
     This item represent the .type section in ccil
