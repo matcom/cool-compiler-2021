@@ -9,11 +9,9 @@ from app.parser import CoolParser
 from app.semantics.ast import ProgramNode
 from app.semantics.type_builder import TypeBuilder
 from app.semantics.type_collector import TypeCollector
-from app.semantics.inference.soft_inferencer import SoftInferencer
+from app.semantics.inference.soft_inferencer import ShallowInferrer
 from app.semantics.inference.deep_inferrer import DeepInferrer
 from app.cil.cool_to_cil import COOLToCILVisitor
-from app.mips.cil_to_mips import CILToMIPSVisitor
-from app.mips.ast_printer import PrintVisitor
 
 
 def notify_failures(errors):
@@ -54,7 +52,7 @@ def app(input: Path, output: Path = None):
     builder.visit(ast)
     errors += builder.errors
 
-    soft = SoftInferencer(context)
+    soft = ShallowInferrer(context)
     soft_ast: ProgramNode = soft.visit(ast)
     errors += soft.errors
 
@@ -75,22 +73,6 @@ def app(input: Path, output: Path = None):
     astfile = open('ast.json', 'w')
     frozen = jsonpickle.encode(cil_ast)
     astfile.write(str(frozen))
-
-    cil_to_mips = CILToMIPSVisitor()
-    mips_ast = cil_to_mips.visit(cil_ast)
-    printer = PrintVisitor()
-    mips_code = printer.visit(mips_ast)
-
-    out_file = str(input).split(".")
-    out_file[-1] = "mips"
-    out_file = ".".join(out_file)
-
-    with open(out_file, 'w') as f:
-        f.write(mips_code)
-        with open("app/mips/mips_lib.asm") as f2:
-            f.write("".join(f2.readlines()))
-
-    typer.Exit(code=0)
 
 
 if __name__ == "__main__":

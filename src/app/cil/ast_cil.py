@@ -51,6 +51,7 @@ class InstructionNode(Node):
 class AssignNode(InstructionNode):
     def __init__(self, dest, source):
         self.dest = dest
+        # TODO: agregar type
         self.source = source
 
     def __repr__(self):

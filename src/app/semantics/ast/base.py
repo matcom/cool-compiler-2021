@@ -5,13 +5,13 @@ class Node:
     def __init__(self, node) -> None:
         self.lineno = node.lineno
         self.columnno = node.columnno
-        self.inferenced_type = None
+        self.inferred_type = None
         self._exec_inferred_type = None
 
     @property
     def exec_inferred_type(self):
         if self._exec_inferred_type is None:
-            return self.inferenced_type
+            return self.inferred_type
         else:
             return self._exec_inferred_type
 

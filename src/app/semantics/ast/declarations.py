@@ -68,11 +68,11 @@ class AttrDeclarationNode(DeclarationNode):
 
         attr_node = inf_ast.AttrDeclarationNode(node)
         if not node.body:
-            attr_node.inferenced_type = node_type
+            attr_node.inferred_type = node_type
             return attr_node
 
         expr_node = shallow_inferrer.visit(node.body, scope)
-        expr_type: TypeBag = expr_node.inferenced_type
+        expr_type: TypeBag = expr_node.inferred_type
         added_type = expr_type.add_self_type(shallow_inferrer.current_type)
 
         expr_name = expr_type.generate_name()
@@ -89,27 +89,27 @@ class AttrDeclarationNode(DeclarationNode):
             expr_type.remove_self_type(shallow_inferrer.current_type)
 
         attr_node.expr = expr_node
-        attr_node.inferenced_type = expr_type
+        attr_node.inferred_type = expr_type
         return attr_node
 
     @staticmethod
     def deep_infer(node, scope, deep_inferrer):
         attr_node = AttrDeclarationNode(node)
-        attr_node.inferenced_type = node.inferenced_type
+        attr_node.inferred_type = node.inferred_type
 
         if not node.expr:
             return attr_node
 
         expr_node = deep_inferrer.visit(node.expr, scope)
-        expr_type = expr_node.inferenced_type
+        expr_type = expr_node.inferred_type
 
         attr_node.expr = expr_node
-        if equal(expr_type, node.expr.inferenced_type):
+        if equal(expr_type, node.expr.inferred_type):
             return attr_node
 
         expr_name = expr_type.generate_name()
-        node_type = attr_node.inferenced_type
-        if not conforms(expr_type, attr_node.inferenced_type):
+        node_type = attr_node.inferred_type
+        if not conforms(expr_type, attr_node.inferred_type):
             deep_inferrer.add_error(
                 node,
                 (
@@ -149,7 +149,7 @@ class MethodDeclarationNode(DeclarationNode):
         ret_type_decl: TypeBag = current_method.return_type
 
         body_node = shallow_inferrer.visit(node.body, scope)
-        ret_type_expr = body_node.inferenced_type
+        ret_type_expr = body_node.inferred_type
         added_self = ret_type_expr.add_self_type(shallow_inferrer.current_type)
 
         ret_expr_name = ret_type_expr.generate_name()
@@ -168,7 +168,7 @@ class MethodDeclarationNode(DeclarationNode):
             new_params, node.type, body_node, node
         )
         method_node.exec_inferred_type = ret_type_expr
-        method_node.inferenced_type = ret_type_decl
+        method_node.inferred_type = ret_type_decl
         return method_node
 
     @staticmethod
@@ -182,16 +182,16 @@ class MethodDeclarationNode(DeclarationNode):
             new_params.append(param)
 
         body_node = deep_inferrer.visit(node.body, scope)
-        body_type = body_node.inferenced_type
+        body_type = body_node.inferred_type
         method_node = MethodDeclarationNode(
             new_params, node.type, body_node, node)
-        method_node.inferenced_type = node.inferenced_type
+        method_node.inferred_type = node.inferred_type
 
-        if equal(body_type, node.body.inferenced_type):
+        if equal(body_type, node.body.inferred_type):
             method_node.exec_inferred_type = body_type
             return method_node
 
-        node_type = method_node.inferenced_type
+        node_type = method_node.inferred_type
         body_name = body_type.generate_name()
         if not conforms(body_type, node_type):
             deep_inferrer.add_error(

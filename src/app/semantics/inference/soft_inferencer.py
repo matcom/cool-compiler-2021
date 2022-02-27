@@ -1,19 +1,17 @@
-from inspect import currentframe
 from typing import Type
 import app.semantics.ast as inf_ast
 from app.parser.ast import *
-
+from app.semantics.constants import *
 import app.shared.visitor as visitor
-from app.semantics.tools.errors import SemanticError, AttributeError
+
 from app.semantics.tools import (
     Context,
     Scope,
-    conforms,
-
+    conforms
 )
 
 
-class SoftInferencer:
+class ShallowInferrer:
     def __init__(self, context: Context) -> None:
         self.context = context
         self.errors = []
@@ -133,14 +131,14 @@ class SoftInferencer:
 
     def _arithmetic_operation(self, node: ArithmeticNode, scope):
         left_node = self.visit(node.left_expr, scope)
-        left_type = left_node.inferenced_type
+        left_type = left_node.inferred_type
         left_clone = left_type.clone()
 
         right_node = self.visit(node.right_expr, scope)
-        right_type = right_node.inferenced_type
+        right_type = right_node.inferred_type
         right_clone = right_type.clone()
 
-        int_type = self.context.get_type("Int")
+        int_type = self.context.get_type(INT_TYPE)
         if not conforms(left_type, int_type):
             self.add_error(
                 node.left_expr,

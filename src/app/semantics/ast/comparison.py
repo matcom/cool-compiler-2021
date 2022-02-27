@@ -13,7 +13,7 @@ class LessNode(ComparerNode):
         left_node, right_node = shallow_inferrer._arithmetic_operation(
             node, scope)
         less_node = LessNode(left_node, right_node, node)
-        less_node.inferenced_type = shallow_inferrer.context.get_type(
+        less_node.inferred_type = shallow_inferrer.context.get_type(
             BOOL_TYPE)
         return less_node
 
@@ -22,7 +22,7 @@ class LessNode(ComparerNode):
         left_node, right_node = deep_inferrer._arithmetic_operation(
             node, scope)
         less_node = LessNode(left_node, right_node, node)
-        less_node.inferenced_type = deep_inferrer.context.get_type(BOOL_TYPE)
+        less_node.inferred_type = deep_inferrer.context.get_type(BOOL_TYPE)
         return less_node
 
 
@@ -33,7 +33,7 @@ class LessOrEqualNode(ComparerNode):
         left_node, right_node = shallow_inferrer._arithmetic_operation(
             node, scope)
         lesseq_node = LessOrEqualNode(left_node, right_node, node)
-        lesseq_node.inferenced_type = shallow_inferrer.context.get_type(
+        lesseq_node.inferred_type = shallow_inferrer.context.get_type(
             BOOL_TYPE)
         return lesseq_node
 
@@ -42,7 +42,7 @@ class LessOrEqualNode(ComparerNode):
         left_node, right_node = deep_inferrer._arithmetic_operation(
             node, scope)
         lesseq_node = LessOrEqualNode(left_node, right_node, node)
-        lesseq_node.inferenced_type = deep_inferrer.context.get_type(BOOL_TYPE)
+        lesseq_node.inferred_type = deep_inferrer.context.get_type(BOOL_TYPE)
         return lesseq_node
 
 
@@ -52,7 +52,7 @@ class EqualsNode(ComparerNode):
         right_node = shallow_inferrer.visit(node.right_expr, scope)
 
         equal_node = EqualsNode(left_node, right_node, node)
-        equal_node.inferenced_type = shallow_inferrer.context.get_type(
+        equal_node.inferred_type = shallow_inferrer.context.get_type(
             BOOL_TYPE)
         return equal_node
 
@@ -64,5 +64,5 @@ class EqualsNode(ComparerNode):
         deep_inferrer._check_member_types(left_node, right_node)
 
         eq_node = EqualsNode(left_node, right_node, node)
-        eq_node.inferenced_type = node.inferenced_type  # Bool Type :)
+        eq_node.inferred_type = node.inferred_type  # Bool Type :)
         return eq_node

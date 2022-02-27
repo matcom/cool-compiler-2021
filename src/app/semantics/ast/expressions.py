@@ -28,7 +28,7 @@ class BlocksNode(ExpressionNode):
             new_expr_list.append(shallow_inferrer.visit(expr, scope))
 
         block_node = inf_ast.BlocksNode(new_expr_list, node)
-        block_node.inferenced_type = block_node.expr_list[-1].inferenced_type
+        block_node.inferred_type = block_node.expr_list[-1].inferred_type
         return block_node
 
     @staticmethod
@@ -38,7 +38,7 @@ class BlocksNode(ExpressionNode):
             new_expr_list.append(deep_inferrer.visit(expr, scope))
 
         block_node = BlocksNode(new_expr_list, node)
-        block_node.inferenced_type = block_node.expr_list[-1].inferenced_type
+        block_node.inferred_type = block_node.expr_list[-1].inferred_type
         return block_node
 
 
@@ -53,7 +53,7 @@ class ConditionalNode(ExpressionNode):
     def shallow_infer(node, scope, shallow_inferrer):
         condition_node = shallow_inferrer.visit(node.cond, scope)
 
-        condition_type = condition_node.inferenced_type
+        condition_type = condition_node.inferred_type
         bool_type = shallow_inferrer.context.get_type(BOOL_TYPE)
 
         condition_clone = condition_type.clone()
@@ -70,11 +70,11 @@ class ConditionalNode(ExpressionNode):
         if_node = inf_ast.ConditionalNode(
             condition_node, then_node, else_node, node)
 
-        then_type = then_node.inferenced_type
-        else_type = else_node.inferenced_type
+        then_type = then_node.inferred_type
+        else_type = else_node.inferred_type
         joined_type = join(then_type, else_type)
 
-        if_node.inferenced_type = joined_type
+        if_node.inferred_type = joined_type
         return if_node
 
     @staticmethod
@@ -83,8 +83,8 @@ class ConditionalNode(ExpressionNode):
         then_node = deep_inferrer.visit(node.then_body, scope)
         else_node = deep_inferrer.visit(node.else_body, scope)
 
-        condition_type = condition_node.inferenced_type
-        if not equal(condition_type, node.condition.inferenced_type):
+        condition_type = condition_node.inferred_type
+        if not equal(condition_type, node.condition.inferred_type):
             condition_clone = condition_type.clone()
             bool_type = deep_inferrer.context.get_type(BOOL_TYPE)
             if not conforms(condition_type, bool_type):
@@ -97,15 +97,15 @@ class ConditionalNode(ExpressionNode):
         if_node = ConditionalNode(condition_node, then_node, else_node, node)
 
         if not equal(
-            then_node.inferenced_type, node.then_body.inferenced_type
-        ) or not equal(else_node.inferenced_type, node.else_body.inferenced_type):
-            then_type = then_node.inferenced_type
-            else_type = else_node.inferenced_type
+            then_node.inferred_type, node.then_body.inferred_type
+        ) or not equal(else_node.inferred_type, node.else_body.inferred_type):
+            then_type = then_node.inferred_type
+            else_type = else_node.inferred_type
             joined_type = join(then_type, else_type)
         else:
-            joined_type = node.inferenced_type
+            joined_type = node.inferred_type
 
-        if_node.inferenced_type = joined_type
+        if_node.inferred_type = joined_type
         return if_node
 
 
@@ -125,7 +125,7 @@ class CaseNode(ExpressionNode):
         for option in node.case_branches:
             child = scope.create_child()
             new_options.append(deep_inferrer.visit(option, child))
-            type_list.append(new_options[-1].inferenced_type)
+            type_list.append(new_options[-1].inferred_type)
             var_type = child.get_variable(option.id).get_type()
             var_type = var_type.heads[0] if not var_type.error_type else var_type
             if var_type in types_visited:
@@ -139,7 +139,7 @@ class CaseNode(ExpressionNode):
         joined_type = join_list(type_list)
 
         case_node = inf_ast.CaseNode(expr_node, new_options, node)
-        case_node.inferenced_type = joined_type
+        case_node.inferred_type = joined_type
         return case_node
 
     @staticmethod
@@ -150,11 +150,11 @@ class CaseNode(ExpressionNode):
         for option in node.options:
             child = scope.next_child()
             new_options.append(deep_inferrer.visit(option, child))
-            type_list.append(new_options[-1].inferenced_type)
+            type_list.append(new_options[-1].inferred_type)
 
         join_type = join_list(type_list)
         case_node = CaseNode(expr_node, new_options, node)
-        case_node.inferenced_type = join_type
+        case_node.inferred_type = join_type
         return case_node
 
 
@@ -183,14 +183,14 @@ class CaseOptionNode(ExpressionNode):
         expr_node = deep_inferrer.visit(node.expr, scope)
 
         case_opt_node = inf_ast.CaseOptionNode(expr_node, node_type, node)
-        case_opt_node.inferenced_type = expr_node.inferenced_type
+        case_opt_node.inferred_type = expr_node.inferred_type
         return case_opt_node
 
     @staticmethod
     def deep_infer(node, scope, deep_inferrer):
         expr_node = deep_inferrer.visit(node.expr, scope)
         opt_node = CaseOptionNode(expr_node, node.branch_type, node)
-        opt_node.inferenced_type = expr_node.inferenced_type
+        opt_node.inferred_type = expr_node.inferred_type
 
         return opt_node
 
@@ -203,7 +203,7 @@ class LoopNode(ExpressionNode):
 
     def shallow_infer(node, scope, shallow_inferrer):
         condition_node = shallow_inferrer.visit(node.cond, scope)
-        condition_type = condition_node.inferenced_type
+        condition_type = condition_node.inferred_type
 
         bool_type = shallow_inferrer.context.get_type(BOOL_TYPE)
         condition_clone = condition_type.clone()
@@ -216,16 +216,16 @@ class LoopNode(ExpressionNode):
 
         body_node = shallow_inferrer.visit(node.body, scope)
         loop_node = inf_ast.LoopNode(condition_node, body_node, node)
-        loop_node.inferenced_type = shallow_inferrer.context.get_type(
+        loop_node.inferred_type = shallow_inferrer.context.get_type(
             OBJECT_TYPE)
         return loop_node
 
     @staticmethod
     def deep_infer(node, scope, deep_inferrer):
         condition_node = deep_inferrer.visit(node.condition, scope)
-        condition_type = condition_node.inferenced_type
+        condition_type = condition_node.inferred_type
 
-        if not equal(condition_type, node.condition.inferenced_type):
+        if not equal(condition_type, node.condition.inferred_type):
             bool_type = deep_inferrer.context.get_type(BOOL_TYPE)
             condition_clone = condition_type.clone()
             if not conforms(condition_type, bool_type):
@@ -237,7 +237,7 @@ class LoopNode(ExpressionNode):
 
         body_node = deep_inferrer.visit(node.body, scope)
         loop_node = LoopNode(condition_node, body_node, node)
-        loop_node.inferenced_type = node.inferenced_type
+        loop_node.inferred_type = node.inferred_type
         return loop_node
 
 
@@ -258,7 +258,7 @@ class LetNode(ExpressionNode):
         in_expr_node = shallow_inferrer.visit(node.expr, child)
 
         let_node = inf_ast.LetNode(new_decl_list, in_expr_node, node)
-        let_node.inferenced_type = in_expr_node.inferenced_type
+        let_node.inferred_type = in_expr_node.inferred_type
         return let_node
 
     @staticmethod
@@ -272,7 +272,7 @@ class LetNode(ExpressionNode):
         in_expr_node = deep_inferrer.visit(node.in_expr, child)
 
         let_node = LetNode(new_decl_list, in_expr_node, node)
-        let_node.inferenced_type = in_expr_node.inferenced_type
+        let_node.inferred_type = in_expr_node.inferred_type
         return let_node
 
 
@@ -303,11 +303,11 @@ class VarDeclarationNode(ExpressionNode):
         scope.define_variable(var_decl_node.id, node_type)
         var_decl_node.index = len(scope.locals) - 1
 
-        var_decl_node.inferenced_type = node_type
+        var_decl_node.inferred_type = node_type
 
         if node.expr:
             expr_node = shallow_inferrer.visit(node.expr, scope)
-            expr_type: TypeBag = expr_node.inferenced_type
+            expr_type: TypeBag = expr_node.inferred_type
             added_type = expr_type.add_self_type(shallow_inferrer.current_type)
             expr_clone = expr_type.clone()
             if not conforms(expr_type, node_type):
@@ -320,7 +320,7 @@ class VarDeclarationNode(ExpressionNode):
             if added_type:
                 expr_type.remove_self_type(shallow_inferrer.current_type)
             var_decl_node.expr = expr_node
-            var_decl_node.inferenced_type = expr_node.inferenced_type
+            var_decl_node.inferred_type = expr_node.inferred_type
 
         return var_decl_node
 
@@ -329,7 +329,7 @@ class VarDeclarationNode(ExpressionNode):
         var_decl_node = VarDeclarationNode(node)
         var_decl_node.index = node.index
         if node.expr is None:
-            var_decl_node.inferenced_type = node.inferenced_type
+            var_decl_node.inferred_type = node.inferred_type
             return var_decl_node
 
         expr_node = deep_inferrer.visit(node.expr, scope)
@@ -337,8 +337,8 @@ class VarDeclarationNode(ExpressionNode):
 
         node_type = scope.get_local_by_index(node.index).get_type()
 
-        expr_type = expr_node.inferenced_type
-        if equal(expr_type, node.expr.inferenced_type):
+        expr_type = expr_node.inferred_type
+        if equal(expr_type, node.expr.inferred_type):
             expr_clone = expr_type.clone()
             if not conforms(expr_type, node_type):
                 deep_inferrer.add_error(
@@ -348,7 +348,7 @@ class VarDeclarationNode(ExpressionNode):
                     f" type({node_type.name}).",
                 )
 
-        var_decl_node.inferenced_type = expr_node.inferenced_type
+        var_decl_node.inferred_type = expr_node.inferred_type
         return var_decl_node
 
 
@@ -381,7 +381,7 @@ class AssignNode(ExpressionNode):
                     "Variable 'self' is Read-Only.",
                 )
 
-            expr_type: TypeBag = expr_node.inferenced_type
+            expr_type: TypeBag = expr_node.inferred_type
             added_type = expr_type.add_self_type(shallow_inferrer.current_type)
             expr_name = expr_type.name
             if not conforms(expr_type, decl_type):
@@ -394,7 +394,7 @@ class AssignNode(ExpressionNode):
             if added_type:
                 expr_type.remove_self_type(shallow_inferrer.current_type)
 
-        assign_node.inferenced_type = expr_node.inferenced_type
+        assign_node.inferred_type = expr_node.inferred_type
         return assign_node
 
     @staticmethod
@@ -403,14 +403,14 @@ class AssignNode(ExpressionNode):
         assign_node = AssignNode(expr_node, node)
 
         if not node.defined or node.id == "self":
-            assign_node.inferenced_type = TypeBag(set())
+            assign_node.inferred_type = TypeBag(set())
             return assign_node
 
         assign_node.defined = True
 
         decl_type = scope.get_variable(node.id).get_type()
-        expr_type = expr_node.inferenced_type
-        if not equal(expr_type, node.expr.inferenced_type):
+        expr_type = expr_node.inferred_type
+        if not equal(expr_type, node.expr.inferred_type):
             expr_clone = expr_type.clone()
             if not conforms(expr_type, decl_type):
                 deep_inferrer.add_error(
@@ -420,7 +420,7 @@ class AssignNode(ExpressionNode):
                     f" declared type ({decl_type.name}).",
                 )
 
-        assign_node.inferenced_type = expr_node.inferenced_type
+        assign_node.inferred_type = expr_node.inferred_type
         assign_node.exec_inferred_type = expr_node.exec_inferred_type
         return assign_node
 
@@ -442,7 +442,7 @@ class MethodCallNode(ExpressionNode):
             caller_type = TypeBag({shallow_inferrer.current_type})
         elif node.static_type is None:
             expr_node = shallow_inferrer.visit(node.expr, scope)
-            caller_type = expr_node.inferenced_type
+            caller_type = expr_node.inferred_type
         else:
             try:
                 caller_type = shallow_inferrer.context.get_type(
@@ -454,7 +454,7 @@ class MethodCallNode(ExpressionNode):
                     node, err + " While setting dispatch caller.")
 
             expr_node = shallow_inferrer.visit(node.expr, scope)
-            expr_type = expr_node.inferenced_type
+            expr_type = expr_node.inferred_type
             added_type = expr_type.add_self_type(shallow_inferrer.current_type)
             expr_name = expr_type.generate_name()
             if not conforms(expr_type, caller_type):
@@ -512,9 +512,9 @@ class MethodCallNode(ExpressionNode):
                 ret_type = method.return_type.clone()
                 ret_type.swap_self_type(typex)
                 type_set = smart_add(type_set, heads, ret_type)
-            method_call_node.inferenced_type = TypeBag(type_set, heads)
+            method_call_node.inferred_type = TypeBag(type_set, heads)
         else:
-            method_call_node.inferenced_type = TypeBag(set())
+            method_call_node.inferred_type = TypeBag(set())
         return method_call_node
 
     def shallow_infer_dynamic(node, scope, shallow_inferrer):
@@ -524,7 +524,7 @@ class MethodCallNode(ExpressionNode):
             caller_type = TypeBag({shallow_inferrer.current_type})
         else:
             expr_node = shallow_inferrer.visit(node.expr, scope)
-            caller_type = expr_node.inferenced_type
+            caller_type = expr_node.inferred_type
 
         methods = None
         if len(caller_type.type_set) > 1:
@@ -571,9 +571,9 @@ class MethodCallNode(ExpressionNode):
                 ret_type = method.return_type.clone()
                 ret_type.swap_self_type(typex)
                 type_set = smart_add(type_set, heads, ret_type)
-            method_call_node.inferenced_type = TypeBag(type_set, heads)
+            method_call_node.inferred_type = TypeBag(type_set, heads)
         else:
-            method_call_node.inferenced_type = TypeBag(set())  # ErrorType
+            method_call_node.inferred_type = TypeBag(set())  # ErrorType
         return method_call_node
 
     @staticmethod
@@ -582,8 +582,8 @@ class MethodCallNode(ExpressionNode):
         expr_node = None
         if node.type is not None and node.expr is not None:
             expr_node = deep_inferrer.visit(node.expr, scope)
-            expr_type = expr_node.inferenced_type
-            if not equal(expr_type, node.expr.inferenced_type):
+            expr_type = expr_node.inferred_type
+            if not equal(expr_type, node.expr.inferred_type):
                 expr_clone = expr_type.clone()
                 if not conforms(expr_type, caller_type):
                     deep_inferrer.add_error(
@@ -594,7 +594,7 @@ class MethodCallNode(ExpressionNode):
                     )
         elif node.expr is not None:
             expr_node = deep_inferrer.visit(node.expr, scope)
-            caller_type = expr_node.inferenced_type
+            caller_type = expr_node.inferred_type
 
         if len(caller_type.type_set) > 1:
             methods_by_name = deep_inferrer.context.get_method_by_name(
@@ -647,7 +647,7 @@ class MethodCallNode(ExpressionNode):
                 for i in range(len(node.args)):
                     new_args.append(deep_inferrer.visit(node.args[i], scope))
                     if i < len(method.param_types):
-                        arg_type: TypeBag = new_args[-1].inferenced_type
+                        arg_type: TypeBag = new_args[-1].inferred_type
                         added_type = arg_type.add_self_type(
                             deep_inferrer.current_type)
                         arg_name = arg_type.generate_name()
@@ -665,7 +665,7 @@ class MethodCallNode(ExpressionNode):
 
         real_caller_type_name = caller_type.name
         call_node = MethodCallNode(caller_type, expr_node, new_args, node)
-        call_node.inferenced_type = infered_type
+        call_node.inferred_type = infered_type
         if(real_caller_type_name == 'SELF_TYPE'):
             real_caller_type_name = deep_inferrer.current_type.name
         try:
@@ -682,7 +682,7 @@ class MethodCallNode(ExpressionNode):
                 real_return_type, TypeBag) else TypeBag({real_return_type})
             call_node = MethodCallNode(caller_type, expr_node, new_args, node)
             call_node.exec_inferred_type = real_return_type
-            call_node.inferenced_type = infered_type
+            call_node.inferred_type = infered_type
 
         except AttributeError as err:
             deep_inferrer.add_error(node, err.text)

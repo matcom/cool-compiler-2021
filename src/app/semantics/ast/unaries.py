@@ -10,14 +10,14 @@ class IsVoidNode(UnaryNode):
     def shallow_infer(node, scope, shallow_inferrer):
         node_expr = shallow_inferrer.visit(node.expr, scope)
         is_void_node = IsVoidNode(node_expr, node)
-        is_void_node.inferenced_type = shallow_inferrer.context.get_type(
+        is_void_node.inferred_type = shallow_inferrer.context.get_type(
             BOOL_TYPE)
         return is_void_node
 
     def deep_infer(node, scope, deep_inferrer):
         node_expr = deep_inferrer.visit(node.expr, scope)
         is_void_node = IsVoidNode(node_expr, node)
-        is_void_node.inferenced_type = deep_inferrer.context.get_type(
+        is_void_node.inferred_type = deep_inferrer.context.get_type(
             BOOL_TYPE)
         return is_void_node
 
@@ -26,7 +26,7 @@ class NotNode(UnaryNode):
     def shallow_infer(node, scope, shallow_inferrer):
         expr_node = shallow_inferrer.visit(node.expr, scope)
 
-        expr_type = expr_node.inferenced_type
+        expr_type = expr_node.inferred_type
         expr_clone = expr_type.clone()
         bool_type = shallow_inferrer.context.get_type(BOOL_TYPE)
         if not conforms(expr_type, bool_type):
@@ -37,15 +37,15 @@ class NotNode(UnaryNode):
             )
 
         not_node = NotNode(expr_node, node)
-        not_node.inferenced_type = bool_type
+        not_node.inferred_type = bool_type
         return not_node
 
     @staticmethod
     def deep_infer(node, scope, deep_inferrer):
         expr_node = deep_inferrer.visit(node.expr, scope)
-        expr_type = expr_node.inferenced_type
+        expr_type = expr_node.inferred_type
         bool_type = deep_inferrer.context.get_type(BOOL_TYPE)
-        if not equal(expr_type, node.expr.inferenced_type):
+        if not equal(expr_type, node.expr.inferred_type):
             expr_clone = expr_type.clone()
             if not conforms(expr_type, bool_type):
                 deep_inferrer.add_error(
@@ -55,7 +55,7 @@ class NotNode(UnaryNode):
                 )
 
         not_node = NotNode(expr_node, node)
-        not_node.inferenced_type = bool_type
+        not_node.inferred_type = bool_type
         return not_node
 
 
@@ -63,7 +63,7 @@ class ComplementNode(UnaryNode):
     def shallow_infer(node, scope, shallow_inferrer):
         expr_node = shallow_inferrer.visit(node.expr, scope)
 
-        expr_type = expr_node.inferenced_type
+        expr_type = expr_node.inferred_type
         expr_clone = expr_type.clone()
         int_type = shallow_inferrer.context.get_type("Int")
         if not conforms(expr_type, int_type):
@@ -74,15 +74,15 @@ class ComplementNode(UnaryNode):
             )
 
         complement_node = ComplementNode(expr_node, node)
-        complement_node.inferenced_type = int_type
+        complement_node.inferred_type = int_type
         return complement_node
 
     @staticmethod
     def deep_infer(node, scope, deep_inferrer):
         expr_node = deep_inferrer.visit(node.expr, scope)
-        expr_type = expr_node.inferenced_type
+        expr_type = expr_node.inferred_type
         int_type = deep_inferrer.context.get_type("Int")
-        if not equal(expr_type, node.expr.inferenced_type):
+        if not equal(expr_type, node.expr.inferred_type):
             expr_clone = expr_type.clone()
             if not conforms(expr_type, int_type):
                 deep_inferrer.add_error(
@@ -92,5 +92,5 @@ class ComplementNode(UnaryNode):
                 )
 
         complement_node = ComplementNode(expr_node, node)
-        complement_node.inferenced_type = int_type
+        complement_node.inferred_type = int_type
         return complement_node

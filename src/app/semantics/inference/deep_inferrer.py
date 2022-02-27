@@ -119,7 +119,7 @@ class DeepInferrer:
     @visitor.when(StringNode)
     def visit(self, node, scope):
         str_node = StringNode(node)
-        str_node.inferenced_type = self.context.get_type("String")
+        str_node.inferred_type = self.context.get_type("String")
         return str_node
 
     @visitor.when(BooleanNode)
@@ -137,8 +137,8 @@ class DeepInferrer:
         if self._unrelated_types(left_node) or self._unrelated_types(right_node):
             return
 
-        bag1: TypeBag = left_node.inferenced_type
-        bag2: TypeBag = right_node.inferenced_type
+        bag1: TypeBag = left_node.inferred_type
+        bag2: TypeBag = right_node.inferred_type
 
         u_obj = self.context.get_type("Object", unpacked=True)
         u_int = self.context.get_type("Int", unpacked=True)
@@ -179,7 +179,7 @@ class DeepInferrer:
                 self._conform_to_type(left_node, bag2)
 
     def _conform_to_type(self, node: Node, bag: TypeBag):
-        node_type = node.inferenced_type
+        node_type = node.inferred_type
         node_name = node_type.generate_name()
         if not conforms(node_type, bag):
             self.add_error(
@@ -190,13 +190,13 @@ class DeepInferrer:
 
     def _arithmetic_operation(self, node, scope):
         left_node = self.visit(node.left, scope)
-        left_type = left_node.inferenced_type
+        left_type = left_node.inferred_type
 
         right_node = self.visit(node.right, scope)
-        right_type = right_node.inferenced_type
+        right_type = right_node.inferred_type
 
         int_type = self.context.get_type("Int")
-        if not equal(left_type, node.left.inferenced_type):
+        if not equal(left_type, node.left.inferred_type):
             if not conforms(left_type, int_type):
                 left_clone = left_type.clone()
                 self.add_error(
@@ -205,7 +205,7 @@ class DeepInferrer:
                     "does not conforms to Int type.",
                 )
 
-        if not equal(right_type, node.right.inferenced_type):
+        if not equal(right_type, node.right.inferred_type):
             right_clone = right_type.clone()
             if not conforms(right_type, int_type):
                 self.add_error(
@@ -217,7 +217,7 @@ class DeepInferrer:
         return left_node, right_node
 
     def _unrelated_types(self, node):
-        typex: TypeBag = node.inferenced_type
+        typex: TypeBag = node.inferred_type
         if typex.error_type:
             return True
         if len(typex.heads) > 1:
@@ -227,6 +227,6 @@ class DeepInferrer:
                 + ", ".join(typez.name for typez in typex.heads),
                 +"}",
             )
-            node.inferenced_type = TypeBag(set())
+            node.inferred_type = TypeBag(set())
             return True
         return False

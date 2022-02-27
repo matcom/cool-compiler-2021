@@ -19,7 +19,7 @@ class ArithmeticNode(BinaryNode):
         else:
             raise Exception("Unknown arithmetic node detected")
 
-        arith_node.inferenced_type = shallow_inferrer.context.get_type(
+        arith_node.inferred_type = shallow_inferrer.context.get_type(
             INT_TYPE)
         return arith_node
 
@@ -38,7 +38,7 @@ class ArithmeticNode(BinaryNode):
         else:
             raise InternalError("This should never happen")
 
-        arith_node.inferenced_type = deep_inferrer.context.get_type("Int")
+        arith_node.inferred_type = deep_inferrer.context.get_type("Int")
         return arith_node
 
 
