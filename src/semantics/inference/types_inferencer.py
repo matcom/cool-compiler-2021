@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Tuple
+from semantics.tools.context import Context
 from semantics.tools.errors import InternalError
 from semantics.tools.type import Type, join_list
 from utils import visitor
@@ -44,8 +45,9 @@ from asts.inferencer_ast import (
 
 
 class TypesInferencer:
-    def __init__(self) -> None:
+    def __init__(self, context: Context) -> None:
         self.errors = []
+        self.context = context
 
     @visitor.on("node")
     def visit(self, node, scope):
@@ -119,19 +121,38 @@ class TypesInferencer:
     def visit(self, node: CaseNode, scope: Scope) -> types_ast.CaseNode:
         expr = self.visit(node.case_expr, scope)
 
-        case_options = []
+        case_options: List[CaseOptionNode] = []
         for option in node.options:
             child_scope = scope.create_child()
             case_options.append(self.visit(option, child_scope))
 
-        new_node = types_ast.CaseNode(expr, case_options, node)
+        # Order case options by specificity, most common go last
+        new_option_order: List[Tuple[int, CaseOptionNode]] = []
+        for option1 in case_options:
+            specificity = 0
+            for option2 in case_options:
+                specificity += (
+                    1 if option2.branch_type.conforms_to(option1.branch_type) else 0
+                )
+            new_option_order.append((specificity, option1))
+
+        new_option_order: List[CaseOptionNode] = [
+            opt for (_, opt) in sorted(new_option_order, key=lambda x: x[0])
+        ]
+
+        new_node = types_ast.CaseNode(expr, new_option_order, node)
         new_node.type = self._reduce_to_type(node.inferenced_type, node)
         return new_node
 
     @visitor.when(CaseOptionNode)
     def visit(self, node: CaseOptionNode, scope: Scope) -> types_ast.CaseOptionNode:
+        ancestor_types: List[str] = self.context.get_successors(node.branch_type.name)
+
         return types_ast.CaseOptionNode(
-            self.visit(node.expr, scope), node.branch_type, node
+            self.visit(node.expr, scope),
+            node.branch_type.heads[0],
+            ancestor_types,
+            node,
         )
 
     @visitor.when(LoopNode)

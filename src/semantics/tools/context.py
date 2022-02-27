@@ -1,6 +1,6 @@
 from semantics.tools.errors import *
 from semantics.tools.type import TypeBag, Type, SelfType
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 
 class Context:
@@ -49,6 +49,13 @@ class Context:
         dfs("Object", results)
         return results
 
+    def get_successors(self, type_name: str) -> List[str]:
+        successors: List[str] = [type_name]
+        for type in successors:
+            for succ in self.type_graph[type]:
+                successors.append(succ)
+        return successors
+
     def __str__(self):
         return (
             "{\n\t"
@@ -58,4 +65,3 @@ class Context:
 
     def __repr__(self):
         return str(self)
-
