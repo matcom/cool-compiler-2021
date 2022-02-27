@@ -25,14 +25,14 @@ make install
 Para compilar y ejecutar un archivo en COOL deberá ejecutar el siguiente comando en la terminal desde el directorio `<project_dir>/src`:
 
 ```bash
-make main <file_name>.cl
+make main <file_path>.cl
 ```
 
 Si usted no proporciona ningún archivo, se tomará por defecto el archivo `code.cl` presente en dicho directorio. El comando anterior es equivalente a:
 
 ```bash
-./coolc.sh <file_name>.cl
-spim -file <file_name>.mips
+./coolc.sh <file_path>.cl
+spim -file <file_path>.mips
 ```
 
 ## Arquitectura del compilador
@@ -132,9 +132,51 @@ En este recorrido se generan las 3 principales estructuras que posee el código 
 - los **datos**, sección en la que se encuentran todas las "macros" que serán utilizadas durante la ejecución,
 - el **código**, donde son colocadas todas las funciones generadas a partir del recorrido.
 
-Dentro de los errores chequeados en el ast de CIL se encuentra la comprobación de que no se realicen divisiones por 0. Aunque es cierto que el valor se tiene mayormente en tiempo de ejecución, agregar esta comprobación en el ast de CIL hace mucho más sencillo el proceso de recorrido de este ast posteriormente. También se chequea el llamado a una función dinámica de una variable de tipo _void_ y los índices en _strings_ fuera de rango.
+En este recorrido por el ast, se define la estructura necesaria para la detección de ciertos errores en tiempo de ejecución. Entre los errores que se chequean se encuentran: la comprobación de que no se realicen divisiones por 0, el llamado a una función dinámica de una variable de tipo _void_, los índices en _strings_ fuera de rango, entre otros. Agregar esta comprobación en el ast de CIL hace mucho más sencillo el proceso de recorrido de este *ast* posteriormente.
 
 En el caso del _case_ se chequea que la expresión principal no sea de tipo _void_ y además, que se conforme a alguna rama en la ejecución de este. El algoritmo empleado para reconocer por cuál de las ramas continuará la ejecución del código comienza por: tomar el tipo de todas las ramas del _case_, llámese a este conjunto $A$; por cada elemento del conjunto $A$ se toma la cantidad de tipos dentro del propio conjunto que se conforman a $a_i, i \in [1, |A|]$ ,de modo que se obtienen los pares $<a_i, |\{a_j \leq a_i, \forall j, j\in[1, |A|]\}|>$. Se define $|\{a_j \leq a_i, \forall j, j\in[1, |A|]\}|$ como $a_{i_c}$. Tomando los elementos $a_i$ por el que menor $a_{i_c}$ tenga, se estará tomando los nodos más abajos en el árbol de tipos dentro de cada posible rama de este. Si se ordenan las ramas del _case_ por el que menor $a_{i_c}$ se obtendrá una lista. Luego se recorre esta generando por cada elemento el subconjunto $B_i$ donde $b_{i_i} \in B_i$ si $b_{i_i} <= a_i$. Se chequea si el tipo de la expresión principal del _case_ aparece en este subconjunto. En el caso de que aparezca, el case se resuelve yendo por la rama que posee el tipo $a_i$.
+
+### Estructura del proyecto
+
+El *pipeline* que sigue el proceso de compilación se observa en el archivo [main.py](https://github.com/codersUP/cool-compiler-2021/blob/master/src/main.py). Se hace uso de las funcionalidades implementadas en el paquete `compiler`, que presenta la siguiente estructura:
+
+```bash
+compiler/
+├── cmp
+│   ├── ast.py
+│   ├── automata.py
+│   ├── cil_ast.py
+│   ├── grammar.py
+│   ├── __init__.py
+│   ├── pycompiler.py
+│   ├── semantic.py
+│   └── utils.py
+├── __init__.py
+├── lexer
+│   ├── __init__.py
+│   └── lex.py
+├── parser
+│   ├── __init__.py
+│   ├── parser.py
+│   └── utils.py
+└── visitors
+    ├── cool2cil
+    │   ├── cil_formatter.py
+    │   ├── cool2cil.py
+    │   └── __init__.py
+    ├── __init__.py
+    ├── semantics_check
+    │   ├── formatter.py
+    │   ├── __init__.py
+    │   ├── type_builder.py
+    │   ├── type_checker.py
+    │   ├── type_collector.py
+    │   └── type_inferencer.py
+    ├── utils.py
+    └── visitor.py
+```
+
+En su mayoría los módulos que posee el paquete `cmp` fueron tomados de los proyectos y contenidos vistos en 3er año. Los paquetes `lexer` y `parser` definen la lógica para la tokenización y posterior parsing del texto de entrada respectivamente. El paquete `visitors` contiene las funcionalidades para llevar a cabo los recorridos sobre los *ast*, que en este caso serían: los *visitors* para realizar el chequeo semántico, el *visitor* que permite traducir de COOL a CIL, y finalmente, el *visitor* que permite traducir de CIL a MIPS.
 
 ## Licencia
 

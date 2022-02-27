@@ -1,4 +1,4 @@
-from ..cmp.ast import (
+from ...cmp.ast import (
     BinaryNode,
     ProgramNode,
     ClassDeclarationNode,
@@ -23,7 +23,7 @@ from ..cmp.ast import (
     VariableNode,
     InstantiateNode,
 )
-from ..cmp.semantic import (
+from ...cmp.semantic import (
     Context,
     InferencerManager,
     Method,
@@ -35,7 +35,7 @@ from ..cmp.semantic import (
     LCA,
     Type,
 )
-from .utils import *
+from ..utils import *
 from typing import List, Optional, Tuple
 
 import compiler.visitors.visitor as visitor
