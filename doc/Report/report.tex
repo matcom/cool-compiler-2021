@@ -62,14 +62,14 @@
 \begin{center}
 \textbf{Resumen}
 \end{center}
-\noindent \textit{Este reporte contiene las principales ideas seguidas en la implementaci\'on de un compilador completamente funcional para el lenguaje COOL. El cual es un peque\~no lenguaje que mantiene muchas de las caracter\'isticas de los lenguajes de programaci\'on modernos, incluyendo orientaci\'on a objetos, tipado est\'atico y manejo autom\'atico de memoria. A lo largo de este informe se explicar\'an, adem\'as, cada una de las etapas o fases seguidas en la implementaci\'on del compilador. Por \'ultimo, daremos, a groso modo, una peque\~na ojeada al c\'odigo con el objetivo de que el lector entienda el funcionamiento de los m\'etodos que consideramos fundamentales para el desarrollo del compilador.}\\[0.5cm]
+\noindent \textit{Este reporte contiene las principales ideas seguidas en la implementaci\'on de un compilador completamente funcional para el lenguaje COOL, el cual es un peque\~no lenguaje que mantiene muchas de las caracter\'isticas de los lenguajes de programaci\'on modernos, incluyendo orientaci\'on a objetos, tipado est\'atico y manejo autom\'atico de memoria. A lo largo de este informe se explicar\'an, adem\'as, cada una de las etapas o fases seguidas en la implementaci\'on del compilador. Por \'ultimo, daremos, a groso modo, una peque\~na ojeada al c\'odigo con el objetivo de que el lector entienda el funcionamiento de los m\'etodos que consideramos fundamentales para el desarrollo del compilador.}\\[0.5cm]
 
 \section{Introducci\'on}
 Un compilador es un programa que traduce c\'odigo escrito en un lenguaje de programaci\'on, llamado fuente, a otro lenguaje. En este tipo de traductor, el lenguaje fuente es generalmente un lenguaje de alto nivel, y el otro, un lenguaje de bajo nivel. Un compilador es uno de los pilares de la programaci\'on y de c\'omo entender la comunicaci\'on entre un lenguaje de alto nivel y una m\'aquina. Al poder conocer el funcionamiento de este paso intermedio nos permitir\'a desarrollar y programar de una forma m\'as precisa en los lenguajes de alto nivel. El proceso de compilaci\'on es aquel por el cual se traducen las instrucciones escritas en un determinado lenguaje de programaci\'on a lenguaje de m\'aquina, es decir, a algo que la computadora entiende.
 
 En nuestro caso, el lenguaje fuente es COOL. Un programa en COOL son conjuntos de clases. Una clase encapsula las variables y procedimientos de un tipo de datos. Las instancias de una clase son objetos. En COOL se identifican clases y tipos; es decir, cada clase define un tipo. Las clases permiten a los programadores definir nuevos tipos y procedimientos asociados (o m\'etodos) espec\'ificos para esos tipos. La herencia permite que los nuevos tipos ampl\'ien el comportamiento de los tipos existentes. COOL es un lenguaje de expresi\'on. La mayor\'ia de las construcciones son expresiones, y cada expresi\'on tiene un valor y un tipo. Este lenguaje es type safe, es decir, se garantiza que los procedimientos se aplicar\'an a los datos del tipo correcto. Si bien el tipeo est\'atico impone una fuerte disciplina en la programaci\'on, garantiza que no puedan surgir errores de tipo en la ejecuci\'on de los programas en COOL.
 
-Una vez se tiene una idea acerca del funcionamiento de un compilador y del lenguaje COOL, podemos decir que el objetivo de este informe es presentar la soluci\'on al proceso de compilaci\'on del lenguaje COOL a lenguaje ensamblador, implementado en el lenguaje de pogramaci\'on python. Cuyo c\'odigo se encuentra en este \href{https://github.com/BeginnerCompilers/cool-compiler-2021}{\textcolor{red}{\underline{repositorio}}} de Github.\\\\
+Una vez se tiene una idea acerca del funcionamiento de un compilador y del lenguaje COOL, podemos decir que el objetivo de este informe es presentar la soluci\'on al proceso de compilaci\'on del lenguaje COOL a lenguaje ensamblador, implementado en el lenguaje de pogramaci\'on python, cuyo c\'odigo se encuentra en este \href{https://github.com/BeginnerCompilers/cool-compiler-2021}{\textcolor{red}{\underline{repositorio}}} de Github.\\\\
 
 \section{Gram\'atica y AST de COOL}
 La gram\'atica de este lenguaje responde al manual de COOL \cite{cool}. Se encuentra definida en \texttt{src/utils/COOL\_Grammar.py} y su estructura se presenta a continuaci\'on:\\
@@ -139,7 +139,7 @@ La gram\'atica de este lenguaje responde al manual de COOL \cite{cool}. Se encue
 &\rightarrow \textit{expr , non-empty-arg-list}\\
 \end{align*}
 
-El \'arbol de sint\'axis abstracta de COOL se encuentra definido en \texttt{src/utils/ast/AST\_Nodes.py}. Se defini\'o teniendo en cuenta la gram\'atica que definimos anteriormente. Esta gram\'atica es atributada y cada producci\'on contiene como computar cada uno de los atributos que la conforman que, en la mayor\'ia de los casos son argumentos que se pasan como par\'ametros para la creaci\'on de los nodos del ast de nuestro lenguaje.\\\\
+El \'arbol de sint\'axis abstracta de COOL se encuentra definido en \texttt{src/utils/ast/AST\_Nodes.py}. Se defini\'o teniendo en cuenta la gram\'atica que mostramos anteriormente. Esta gram\'atica es atributada y cada producci\'on contiene como computar cada uno de los atributos que la conforman que, en la mayor\'ia de los casos, son argumentos que se pasan como par\'ametros para la creaci\'on de los nodos del ast de nuestro lenguaje.\\\\
 
 
 \section{An\'alisis lexicogr\'afico.}
@@ -171,16 +171,16 @@ Al principio de cada recorrido aparecen los errores e incosistencias que se dete
 
 
 \section{Generaci\'on de c\'odigo}
-Para la generaci\'on de c\'odigo intermedio de COOL a MIPS vamos a dise\~nar un lenguaje de m\'aquina con capacidades orientadas a objeto. Este lenguaje nos va a permitir generar c\'odigo de MIPS de forma m\'as sencilla, ya que el salto directamente desde COOL a MIPS es demasiado complejo. Este lenguaje se denomina CIL, 3-address object-oriented.
+Para la generaci\'on de c\'odigo intermedio de COOL a MIPS vamos a dise\~nar un lenguaje de m\'aquina con capacidades orientadas a objetos. Este lenguaje nos va a permitir generar c\'odigo de MIPS de forma m\'as sencilla, ya que el salto directamente desde COOL a MIPS es demasiado complejo. Este lenguaje se denomina CIL, 3-address object-oriented.
 
 En esta fase no hay incosistencia de tipos, es decir el c\'odigo de COOL est\'a lexicogr\'afica, sint\'actica y sem\'anticamente correcto, listo para la ejecuci\'on. Esta fase se encuentra implementada en \texttt{src/utils/code\_generation}
 
 \subsection{CIL}
-Como ya se dijo, primeramente, pasaremos de COOL para un lenguaje intermedio, CIL. El ast de este lenguaje se implement\'o seg\'un la definici\'on brindada en \cite{compilers} Cap\'itulo 7. Donde, adem\'as de las funciones que ah\'i se describen, se a\~naden otras para realizar la ejecuci\'on de las funciones predefinidas en COOL, y que son necesarias para el retorno de valores de m\'etodos de este lenguaje.
+Como ya se dijo, primeramente, pasaremos de COOL para un lenguaje intermedio, CIL. El ast de este lenguaje se implement\'o seg\'un la definici\'on brindada en \cite{compilers} Cap\'itulo 7, donde, adem\'as de las funciones que ah\'i se describen, se a\~naden otras para realizar la ejecuci\'on de las funciones predefinidas en COOL, y que son necesarias para el retorno de valores de m\'etodos de este lenguaje.
 
-Con ayuda del patr\'on visitor se recorre el ast de COOL y, primeramente se a\~naden todas las funciones y tipos built-in, es decir, que est\'an definidas por defecto en COOL. Posteriormente, por cada nodo del ast de COOL se crean las instrucciones correspondientes en CIL de acuerdo a su definici\'on.
+Con ayuda del patr\'on visitor se recorre el ast de COOL y, primeramente, se a\~naden todas las funciones y tipos built-in, es decir, que est\'an definidas por defecto en COOL. Posteriormente, por cada nodo del ast de COOL se crean las instrucciones correspondientes en CIL de acuerdo a su definici\'on.
 
-Contamos con una clase auxiliar, \texttt{BaseCOOLToCIL}, que contiene funciones \'utiles para el registro de par\'ametros, funciones, instrucciones, variables locales y otras declaraciones en CIL. Esta clase contiene, adem\'as, la definici\'on de los me\'etodos built-in de COOL.\\
+Contamos con una clase auxiliar, \texttt{BaseCOOLToCIL}, que contiene funciones \'utiles para el registro de par\'ametros, funciones, instrucciones, variables locales y otras declaraciones en CIL. Esta clase contiene, adem\'as, la definici\'on de los m\'etodos built-in de COOL.\\
 
 \subsection{MIPS}
 Despu\'es de tener el ast de CIL, el siguiente paso es, finalmente, generar el c\'odigo ensamblador correspondiente a la entrada de COOL. Para ello, primeramente definimos el ast de MIPS, con ayuda de \cite{mips}, en el cual cada nodo representa una instrucci\'on v\'alida en MIPS. Siguiendo la misma idea de generaci\'on de c\'odigo anterior, se recorre cada nodo del ast de CIL y se va creando el correspondiente ast v\'alido en MIPS. Una vez m\'as, los recorridos de cada ast se realizan con ayuda del patr\'on visitor, mediante el cual tambi\'en, se genera el c\'odigo ensamblador en la clase \texttt{PrintMIPS}, que tranforma cada nodo del ast en el c\'odigo de MIPS correspondiente.
