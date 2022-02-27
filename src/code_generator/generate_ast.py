@@ -312,7 +312,7 @@ class CIL:
             right = expr_right
         
         if isinstance(node, PlusNode):
-            oper =  CILPlusNode(left, right)
+            oper = CILPlusNode(left, right)
         elif isinstance(node, MinusNode):
             oper = CILMinusNode(left, right)
         elif isinstance(node, DivNode):
@@ -328,6 +328,7 @@ class CIL:
         name = self.scope.add_new_local(node.computed_type.name)       
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name),oper))
         return CILVariableNode(name)
+
     @visitor.when(PrimeNode)
     def visit(self, node):
         expr = self.visit(node.expr)
@@ -345,10 +346,7 @@ class CIL:
         name = self.scope.add_new_local(node.computed_type.name)   
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILNotEqualsNode(CILVariableNode(name_exp) , CILNumberNode(0))))
         return CILVariableNode(name)
-    
-        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILNotEqualsNode( expr, CILNumberNode(0))))
-        return  CILVariableNode(name)
-    
+
     @visitor.when(StringNode)
     def visit(self, node):
         data = CILDataNode(f'str_{self.scope.str_count}', node.lex)
@@ -385,11 +383,17 @@ class CIL:
         
     @visitor.when(TrueNode)
     def visit(self, node):
-       return CILNumberNode(1)
+        oper = CILEqualsNode(CILNumberNode(0), CILNumberNode(0))
+        name = self.scope.add_new_local('Bool')       
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), oper))
+        return CILVariableNode(name)
 
     @visitor.when(FalseNode)
     def visit(self, node):
-       return CILNumberNode(0)
+        oper = CILEqualsNode(CILNumberNode(0), CILNumberNode(1))
+        name = self.scope.add_new_local('Bool')       
+        self.scope.instructions.append(CILAssignNode(CILVariableNode(name), oper))
+        return CILVariableNode(name)
     
     @visitor.when(InstantiateNode)
     def visit(self, node):
