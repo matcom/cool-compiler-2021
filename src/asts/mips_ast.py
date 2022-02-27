@@ -259,6 +259,15 @@ class LoadImmediate(BinaryOpNode):
         super().__init__(node, left, right)
 
 
+class LoadByte(BinaryOpNode):
+    """
+    This node represents `lb` instruction in MIPS
+    """
+
+    def __init__(self, node, left, right) -> None:
+        super().__init__(node, left, right)
+
+
 class LoadWord(BinaryOpNode):
     """
     This node represents `lw` instruction in MIPS

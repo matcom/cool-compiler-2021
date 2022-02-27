@@ -16,6 +16,7 @@ from asts.mips_ast import (
     Less,
     LessOrEqual,
     LoadAddress,
+    LoadByte,
     LoadImmediate,
     LoadWord,
     MIPSProgram,
@@ -190,3 +191,7 @@ class MIPSGenerator:
     @visitor.when(MoveFromLo)
     def visit(self, node: MoveFromLo) -> str:
         return f"\tmflo {self.visit(node.register)}"
+
+    @visitor.when(LoadByte)
+    def visit(self, node: LoadByte) -> str:
+        return f"\tlb {self.visit(node.left)} {self.visit(node.right)}"
