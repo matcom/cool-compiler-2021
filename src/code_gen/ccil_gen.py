@@ -21,6 +21,7 @@ EMPTY = "empty"
 # See how typeof should work, a special kind of equality?
 # Define abort nodes with a text:
 # * Dispatch on a void class (Done)
+# * Case expr is void
 # * No pattern match in case (Done)
 # * Division by zero (Done)
 # * Substring out of range (Done)
@@ -300,6 +301,17 @@ class CCILGenerator:
         # Visiting case expression
         (case_expr_ops, case_expr_fv) = self.visit(node.case_expr)
 
+        # Handling case expression is not void
+
+        void_expr_error_ops = (
+            self.throw_runtime_error(
+                f"case_{times}_void_expr_error",
+                f"RuntimeError: Case expression in {node.row}, {node.col} is void",
+            )
+            if node.expr.type.name not in {STRING, INT, BOOL}
+            else []
+        )
+
         # Storing the type of the resulting case expression
         type_of = self.create_type_of(f"case_{times}_typeOf", extract_id(case_expr_fv))
 
@@ -356,11 +368,10 @@ class CCILGenerator:
         self.locals[pre_fvalue_id] = node.type.name
 
         # Error handling when there is not pattern match
-        err_msg = self.add_data(
-            f"case_error_msg_{times}",
+        pattern_match_error_ops = self.throw_runtime_error(
+            f"case_{times}_pattern_match_fail",
             f"RuntimeError: Pattern match failure in {node.line}, {node.col}",
         )
-        err_var = self.create_string_load_data(f"case_error_var_{times}", err_msg.id)
 
         # Merging all expression operations in correct order
         # and saving all to final value
@@ -368,9 +379,10 @@ class CCILGenerator:
         fval = self.create_assignation(fval_id, node.type.name, pre_fvalue_id)
         operations = [
             *case_expr_ops,
+            *void_expr_error_ops,
             type_of,
             *pattern_match_ops,
-            *self.notifiy_and_abort(err_var.id),
+            *pattern_match_error_ops,
             *branch_ops,
             final_label,
             fval,
@@ -916,7 +928,7 @@ class CCILGenerator:
         self.add_local(idx, BOOL)
         return StorageNode(idx, EqualIntNode(left, right))
 
-    def notifiy_and_abort(self, target: str):
+    def notifiy_and_abort(self, target: str) -> List[OperationNode]:
         print = PrintStrNode(target)
         abort = Abort()
         return [print, abort]
@@ -1057,6 +1069,13 @@ class CCILGenerator:
 
         new_defined_methods = list(defined_methods.values())
         return new_defined_methods, inherited_methods
+
+    def throw_runtime_error(self, name: str, error_msg: str) -> List[OperationNode]:
+        data = self.add_data(name + "_msg", error_msg)
+        err_var = self.create_string_load_data(name + "_var", data.id)
+        abort_ops = self.notifiy_and_abort(err_var.id)
+
+        return [err_var, *abort_ops]
 
     def find_function_id(self, class_name: str, method_name: str):
         for method in self.program_types[class_name].methods:
