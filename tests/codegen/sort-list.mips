@@ -298,30 +298,6 @@ type_9_prototype:
 
 .text
 .globl main
-main:
-addi $sp $sp -4
-sw $ra 0($sp)
-addi $sp $sp -4
-sw $fp 0($sp)
-addi $fp $sp 8
-addi $sp $sp -4
-jal __init_at_Main
-sw $v0 -12($fp)
-lw $t0 -12($fp)
-addi $sp $sp -4
-sw $t0 0($sp)
-jal function_main_at_Main
-addi $sp $sp 4
-sw $v0 -12($fp)
-li $v0 0
-addi $sp $sp 4
-lw $fp 0($sp)
-addi $sp $sp 4
-lw $ra 0($sp)
-addi $sp $sp 4
-li $v0 10
-syscall
-
 __init_at_Object:
 addi $sp $sp -4
 sw $ra 0($sp)
@@ -784,6 +760,30 @@ addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
+
+main:
+addi $sp $sp -4
+sw $ra 0($sp)
+addi $sp $sp -4
+sw $fp 0($sp)
+addi $fp $sp 8
+addi $sp $sp -4
+jal __init_at_Main
+sw $v0 -12($fp)
+lw $t0 -12($fp)
+addi $sp $sp -4
+sw $t0 0($sp)
+jal function_main_at_Main
+addi $sp $sp 4
+sw $v0 -12($fp)
+li $v0 0
+addi $sp $sp 4
+lw $fp 0($sp)
+addi $sp $sp 4
+lw $ra 0($sp)
+addi $sp $sp 4
+li $v0 10
+syscall
 
 __init_attr_at_List:
 addi $sp $sp -4

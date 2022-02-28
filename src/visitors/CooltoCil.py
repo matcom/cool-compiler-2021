@@ -18,7 +18,7 @@ class BaseCOOLToCILVisitor:
 
         self.var_names = {}
         self.ctrs = {}
-        self.types_map = {}
+        self.dtypes = {}
 
         self.breakline_data = self.register_data('\n')
         self.emptystring_data = self.register_data('')
@@ -31,23 +31,25 @@ class BaseCOOLToCILVisitor:
             xtype.attrs[key] = i
         return xtype.attrs
     
-    def build_type(self, node):
-        self.types_map[node.id.lex] = type = self.register_type(node.id)
-        iter_type = self.context.get_type(node.id.lex)
+    # def build_type(self, node):
+    #     type = self.register_type(node.id)
+    #     self.dtypes[node.id.lex] = type
+    #     ctype = self.context.get_type(node.id.lex)
 
-        generation = []
-        while iter_type is not None:
-            generation.append(iter_type)
-            iter_type = iter_type.parent
+    #     queue = []
+    #     while ctype is not None:
+    #         queue.append(ctype)
+    #         ctype = ctype.parent
 
-        generation.reverse()
-        for i in generation:
-            methods = sorted(i.methods)
-            attributes = sorted(i.attributes)
-            for meth in methods:
-                type.methods[meth] = self.to_function_name(meth, i.name)
-            for attr in attributes:
-                type.attributes[attr.name] = cil.AttributeNode(attr.name, i.name)
+    #     rqueue = [ queue[i] for i in range(len(queue)-1, -1, -1)] #.reverse()
+    #     for i in rqueue:
+    #         _ = 0
+    #         mm = sorted(i.methods)
+    #         attribs = sorted(i.attributes)
+    #         for attr in attribs:
+    #             type.attributes[attr.name] = cil.AttributeNode(attr.name, i.name)
+    #         for meth in mm:
+    #             type.methods[meth] = self.to_function_name(meth, i.name)
 
 
     @property
@@ -100,7 +102,7 @@ class BaseCOOLToCILVisitor:
     
     def register_type(self, name):
         type_node = cil.TypeNode(name)
-        self.types_map[name] = type_node
+        self.dtypes[name] = type_node
         self.dottypes.append(type_node)
         return type_node
 
@@ -360,28 +362,51 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         return feats
 
 
-    def collect_types(self, node):
-        self.types_map[node.id] = type = self.register_type(node.id)
-        # Guardar métodos de las clases padres
-        iter_type = self.context.get_type(node.id)
+    def build_types(self, node):
+        type = self.register_type(node.id)
+        self.dtypes[node.id] = type
+        ctype = self.context.get_type(node.id)
 
-        generation = []
-        while iter_type is not None:
-            generation.append(iter_type)
-            iter_type = iter_type.parent
+        queue = []
+        while ctype is not None:
+            queue.append(ctype)
+            ctype = ctype.parent
 
-        generation.reverse()
-        for i in generation:
-            a = 0
+        # queue.reverse()
+        rqueue = [ queue[i] for i in range(len(queue)-1, -1, -1)] #.reverse()
+        for i in rqueue:
+            _ = 0
             methods = [m.name for m in i.methods]
             _attributes = i.attributes
             attributes = [x.name for x in _attributes]
             methods.sort()
             attributes.sort()
-            for meth in methods:
-                type.methods[meth] = self.to_function_name(meth, i.name)
             for attr in attributes:
                 type.attributes[attr] = cil.AttributeNode(attr, i.name)
+            for meth in methods:
+                type.methods[meth] = self.to_function_name(meth, i.name)
+
+
+    # def build_type(self, node):
+    #     type = self.register_type(node.id)
+    #     self.dtypes[node.id.lex] = type
+    #     ctype = self.context.get_type(node.id.lex)
+
+    #     queue = []
+    #     while ctype is not None:
+    #         queue.append(ctype)
+    #         ctype = ctype.parent
+
+    #     rqueue = [ queue[i] for i in range(len(queue)-1, -1, -1)] #.reverse()
+    #     for i in rqueue:
+    #         _ = 0
+    #         mm = sorted(i.methods)
+    #         attribs = sorted(i.attributes)
+    #         for attr in attribs:
+    #             type.attributes[attr.name] = cil.AttributeNode(attr.name, i.name)
+    #         for meth in mm:
+    #             type.methods[meth] = self.to_function_name(meth, i.name)
+
 
 
     @visitor.when(ProgramNode)
@@ -389,20 +414,23 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ######################################################
         # node.declarations -> [ ClassDeclarationNode ... ]
         ######################################################
-        self.current_function = self.register_function('entry')
-        main_instance = self.define_internal_local()
-        self.register_instruction(cil.StaticCallNode(self.init_name('Main'), main_instance))
-        self.register_instruction(cil.ArgNode(main_instance))
-        self.register_instruction(cil.StaticCallNode(self.to_function_name('main', 'Main'),main_instance))
-        self.register_instruction(cil.ReturnNode(value=0))
-
         self.register_builtin()
         self.current_function = None
-        for x in node.declarations:
-            self.collect_types(x)
+        
+        self.current_function = self.register_function('entry')
+        inst = self.define_internal_local()
 
-        for x, y in zip(node.declarations, scope.children):
-            self.visit(x, y)
+
+        self.register_instruction(cil.StaticCallNode(self.init_name('Main'), inst))
+        self.register_instruction(cil.ArgNode(inst))
+        self.register_instruction(cil.StaticCallNode(self.to_function_name('main', 'Main'),inst))
+        self.register_instruction(cil.ReturnNode(0))
+
+        for typ in node.declarations:
+            self.build_types(typ)
+
+        for i, typ in enumerate(node.declarations):
+            self.visit(typ, scope.children[i])
 
         return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
 
@@ -414,9 +442,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.parent -> str
         # node.features -> [ FuncDeclarationNode/AttrDeclarationNode ... ]
         ####################################################################
-        
         self.current_type = self.context.get_type(node.id)
-        type = self.types_map[node.id]
+        type = self.dtypes[node.id]
 
         self.current_function = self.register_function(self.init_attr_name(node.id))
         type.methods['__init_attr'] = self.current_function.name
@@ -444,7 +471,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ReturnNode(self_param))
 
         # TypeNode de la clase
-        # type = self.types_map[node.id.lex]
+        # type = self.dtypes[node.id.lex]
         # type.attributes = [i.name for i in self.current_type.attributes]
 
         # Visitar funciones dentro de la clase
@@ -520,7 +547,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.body -> [ ExpressionNode ... ]
         ###############################
         self.current_method = self.current_type.get_method(node.id, self.current_type, False)
-        type = self.types_map[self.current_type.name]
+        type = self.dtypes[self.current_type.name]
         self.current_function = self.register_function(self.to_function_name(self.current_method.name, self.current_type.name))
         self.localvars.extend(type.attributes.values())
 
@@ -620,14 +647,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
             if node.parent is not None:
                 # stype = node.type.lex
-                nodefunc = self.types_map[node.parent].methods[node.method]
+                nodefunc = self.dtypes[node.parent].methods[node.method]
                 if nodefunc == '__init_at_type Object {\n\t[method] abort(): Object;\n\t[method] type_name(): String;\n\t[method] copy(): SELF_TYPE;\n}\n':
                     _ = 0
-                self.register_instruction(cil.StaticCallNode(self.types_map[node.parent].methods[node.method], ret))
+                self.register_instruction(cil.StaticCallNode(self.dtypes[node.parent].methods[node.method], ret))
             else:
                 # stype = node.obj.static_type.name
                 self.register_instruction(cil.ArgNode(node.obj.ret_expr))
-                self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.method], ret))
+                self.register_instruction(cil.DynamicCallNode(stype, self.dtypes[stype].methods[node.method], ret))
 
 
             node.ret_expr = ret
@@ -646,7 +673,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.ArgNode(self.vself.name))
 
             stype = self.current_type.name
-            self.register_instruction(cil.DynamicCallNode(stype, self.types_map[stype].methods[node.method], ret))
+            self.register_instruction(cil.DynamicCallNode(stype, self.dtypes[stype].methods[node.method], ret))
             node.ret_expr = ret
 
 
