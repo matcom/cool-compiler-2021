@@ -5,16 +5,16 @@ from pipeline import Pipeline
 
 def main():
     if len(sys.argv) > 1:
-        input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
+        input_file = sys.argv[1]
     else:
-        input_file = "./tests/codegen/arith.cl"#"debbuging/tests/Auto/call1.cl"
-
+        input_file = "./tests/codegen/basic.cl"
+        # raise Exception("Incorrect number of arguments")
+    
     program_file = open(input_file)
     program = program_file.read()
     program_file.close()
 
-
-    pipe = Pipeline(program, lexer.CoolLexer(),parser.CoolParser(), False)
+    pipe = Pipeline(program, lexer.CoolLexer(), parser.CoolParser())
     if pipe.errors:
         for error in pipe.errors:
             print(error)
@@ -25,6 +25,6 @@ def main():
         out_file = ".".join(out_file)
         with open(out_file, 'w') as f:
             f.write(pipe.mipsCode)
-
-
-main()
+            
+if __name__ == "__main__":
+    main()

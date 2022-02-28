@@ -297,16 +297,13 @@ class CoolLexer:
         row, col, eof = find_last(t.value, t.lexer.lineno, self.find_column(t.lexer.lexdata,t))
         if eof:
             self.errors.append(_LexicographicError % (row, col, f'EOF in string constant'))
-            # print(LexicographicError % (row, col, f'EOF in string constant'))
             t.lexer.skip(len(t.value))
         else:
             self.errors.append(_LexicographicError % (row, col, f'Unterminated string constant'))
-            # print(LexicographicError % (row, col, f'Unterminated string constant'))
             t.lexer.skip(1)
         
         t.lexer.begin('INITIAL')
         
-    # t_arroba = r'@'
     def t_arroba(self, t):
         r'@'
         t.col = self.find_column(t.lexer.lexdata,t) + (self.col - self.col//4)

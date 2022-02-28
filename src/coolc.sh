@@ -8,6 +8,4 @@ echo "Cool Compiler v0.1"        # TODO: Recuerde cambiar estas
 echo "Copyright (c) 2021: Richard García De la Osa, Andy A. Castañeda Guerra."    # TODO: líneas a los valores correctos
 
 # Llamar al compilador
-# echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
-
-exec python3 __main__.py $INPUT_FILE 
+exec python3 __main__.py $INPUT_FILE

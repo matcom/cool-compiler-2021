@@ -57,18 +57,10 @@ class BinaryNode(ExpressionNode):
         self.left = left
         self.right = right
 
-
-#mios
 class ChunkNode(ExpressionNode):
     def __init__(self, chunk):
         self.chunk = chunk
         
-# class VarNode(ExpressionNode):
-#     def __init__(self, idx, type, expr = None):
-#         self.id = idx
-#         self.type = type
-#         self.value = expr
-
 class ConditionalNode(ExpressionNode):
     def __init__(self, ifChunk, thenChunk, elseChunk):
         self.ifChunk = ifChunk
@@ -111,7 +103,6 @@ class InstantiateNode(AtomicNode):
         super().__init__(lex)
         self.type = lex
 
-#mios
 class TrueNode(AtomicNode):
     pass
 class FalseNode(AtomicNode):
@@ -132,7 +123,6 @@ class StarNode(BinaryNode):
 class DivNode(BinaryNode):
     pass
 
-#mios
 class LessNode(BinaryNode):
     pass
 class LeqNode(BinaryNode):

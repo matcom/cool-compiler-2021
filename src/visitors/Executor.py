@@ -1,8 +1,6 @@
 from cool_ast.cool_ast import *
-from typing import List, Dict
 import visitors.visitor as visitor
-from utils.semantic import Context, Type, Method, Scope
-from typing import Any
+from utils.semantic import Context, Scope
 from utils.exceptions import RuntimeException
 
 class Pod:
@@ -151,21 +149,11 @@ class Executor:
 
         
         _funcCall_scope.define_variable('self', token.type).token = token
-        # atrbs = []
-        # if node.obj.lex != 'self':
-        #     for attr in token.attr_values.keys():
-        #         if scope.is_local(attr):
-        #             pass
-        #         else:
-        #             child_scope.define_variable(attr, token.attr_values[attr].type).token = token.attr_values[attr]
-        #             atrbs.append(attr)
+        
         self.stack.append(self.currentPod)
         self.currentPod = token
         
         result = self.visit(method.expr, _funcCall_scope)
-        
-        # for name in atrbs:
-        #     token.attr_values[name] = child_scope.find_variable(name).token
 
         self.currentPod = self.stack.pop()
         return result
@@ -241,7 +229,6 @@ class Executor:
                 attr_token = self.visit(attr.expr, scope)
             else:
                 attr_token = VoidPod()
-            # scope.define_variable(attr.name, attr.type).token = attr_token
             self.currentPod.set_attribute(attr.name, attr_token)
         self.currentPod = self.stack.pop()
         return token
@@ -283,7 +270,7 @@ class Executor:
             raise RuntimeException('Reference to an instance of a void object.')
 
         types = [(i, self.context.get_type(t)) for i, (_, t, _) in enumerate(node.case_list)
-                 if token.type.conforms_to(self.context.get_type(t))]
+                    if token.type.conforms_to(self.context.get_type(t))]
 
         if len(types) == 0:
             raise RuntimeException('NotTypeFoundError: None of the types were valid')
@@ -300,7 +287,6 @@ class Executor:
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
-        # if isinstance(node.condition, ConditionalNode) and isinstance(node.condition.ifChunk, CallNode):
         a = 0
         while self.visit(node.condition, scope).value:
             self.visit(node.loopChunk, scope.create_child())
@@ -359,7 +345,6 @@ class Executor:
 class VoidPod(Pod):
     def __init__(self):
         super(VoidPod, self).__init__(None, None)
-        # raise Exception('hola worl')
 
     def __eq__(self, cousin):
         return isinstance(cousin, VoidPod)

@@ -1,9 +1,7 @@
-from distutils.log import error
 from cool_ast.cool_ast import *
 import cil_ast.cil_ast as cil
-from utils.semantic import Context, SemanticError, Type, Method, Scope, ErrorType, VariableInfo
+from utils.semantic import VariableInfo
 import visitors.visitor as visitor
-# from utils.errors import _TypeError, _NameError, _SemanticError, _AtributeError
 
 class BaseCOOLToCILVisitor:
     def __init__(self, context):
@@ -510,8 +508,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 data = self.emptystring_data
                 self.register_instruction(cil.LoadNode(variable, data))
                 self.register_instruction(cil.ArgNode(variable))
-            self.register_instruction(cil.StaticCallNode(self.init_name(stype), variable,
-                                                         ))
+            self.register_instruction(cil.StaticCallNode(self.init_name(stype), variable))
         node.ret_expr = variable
 
     @visitor.when(FuncDeclarationNode)
@@ -524,9 +521,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         ###############################
         self.current_method = self.current_type.get_method(node.id, self.current_type, False)
         type = self.types_map[self.current_type.name]
-        self.current_function = self.register_function(self.to_function_name(self.current_method.name,
-                                                                             self.current_type.name),
-                                                       )
+        self.current_function = self.register_function(self.to_function_name(self.current_method.name, self.current_type.name))
         self.localvars.extend(type.attributes.values())
 
         self_param = self.register_param(self.vself)
@@ -869,8 +864,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                     data = self.emptystring_data
                     self.register_instruction(cil.LoadNode(variable, data))
                     self.register_instruction(cil.ArgNode(variable))
-                self.register_instruction(cil.StaticCallNode(self.init_name(stype), variable,
-                                                             ))
+                self.register_instruction(cil.StaticCallNode(self.init_name(stype), variable))
 
         self.visit(node.expression, scope.children[-1])
         node.ret_expr = node.expression.ret_expr
@@ -976,7 +970,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             expr = case[2]
             labels.append(self.register_label(f'case_label_{p}'))
 
-            for t in self.context.subtree(type):
+            st = self.context.subtree(type)
+            for t in st:
                 if t not in seen:
                     seen.append(t)
                     self.register_instruction(cil.NameNode(branch_type, t.name))

@@ -1,26 +1,22 @@
 from utils.semantic import Scope, Context
-from visitors.Depicter import Depicter#, Formatter
+from visitors.Depicter import Depicter
 from visitors.Collector import TypeCollector
 from visitors.Builder import TypeBuilder
 from visitors.Checker import TypeChecker
-from visitors.Inferencer import Inferencer
-from visitors.Executor import Executor, RuntimeException
 from visitors.CooltoCil import COOLToCILVisitor
-from visitors.CilDepicter import get_formatter
-
+from visitors.CiltoMips import CILToMipsVisitor
 
 
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
         self.context: Context = Context()
-        self.errors = []
         self.scope: Scope = Scope()
         self.program = program
-        self.lexer = lexer
         self.parser = parser
-        
-        self.ast = self.parser.parse(lexer, program)#= evaluate_reverse_parse(derivations, operations, self.tokens)
+        self.lexer = lexer
+        self.ast = self.parser.parse(self.lexer, self.program)
         self.errors = self.lexer.errors + self.parser.errors
+        
         if len(self.errors) != 0:
             return
         
@@ -29,7 +25,7 @@ class Pipeline():
                 
         self.depicter = Depicter()
         if verbose:
-            print(self.depicter.visit(self.ast,0), '\n')
+            print(self.depicter.visit(self.ast, 0), '\n')
             print()
         
         self.typeCollector = TypeCollector(self.context, self.errors)
@@ -44,9 +40,7 @@ class Pipeline():
                 if len(self.errors) == 0:
                     self.coolToCil = COOLToCILVisitor(self.context)
                     cil_ast = self.coolToCil.visit(self.ast, scope)
-                    __a = 0
-                    MIPSVisitor = CILToMIPSVisitor()
-                    MIPSAst = MIPSVisitor.visit(cil_ast)
-                    MIPSFormatter = MIPSAstFormatter()
-                    mipsCode = MIPSFormatter.visit(MIPSAst)
-                    self.mipsCode = mipsCode
+                    
+                    self.cilToMips = CILToMipsVisitor()
+                    self.mipsCode = self.cilToMips.visit(cil_ast)
+        return

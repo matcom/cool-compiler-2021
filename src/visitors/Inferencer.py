@@ -56,7 +56,6 @@ class Inferencer:
         attrType = self.context.get_type(node.type)
         attr = scope.define_variable(node.id, attrType)
         self.vars[attr] = VarNode(attrType, attr)
-        # self.vars[attr] = VarNode(self.context.get_type('AUTO_TYPE'), attr) ??
         varNode = self.vars[attr]
         
         attrValueNode = None
@@ -83,9 +82,7 @@ class Inferencer:
         paramNodeList, _returnTypeNode = self.methods[self.currentType.name, self.currentMethod.name]
         
         
-        # for i, (_paramName, _paramType) in enumerate(zip(self.currentMethod.param_names, self.currentMethod.param_types)):
-        for i in range(len(self.currentMethod.param_names)): #param_names.Length = param_types.Length
-            #i -> indice del parametro en la lista de parametros
+        for i in range(len(self.currentMethod.param_names)): 
             _ithParamName = self.currentMethod.param_names[i]
             _ithParamType = self.currentMethod.param_types[i]
             
@@ -259,12 +256,6 @@ class Inferencer:
         node.obj = node.obj if node.obj is not None else VariableNode('self')
         _node = self.visit(node.obj, scope)
         if isinstance(_node, PrimeNode):
-            # if _node.type.name == 'SELF_TYPE':
-            #     _method_type = self.context.get_type(node.parent) if node.parent is not None else self.currentType
-            #     _function, _obj = _method_type.get_method(node.method, _method_type, False, True)
-            # else:
-            #     _method_type = self.context.get_type(node.parent) if node.parent is not None else _node.type
-            #     _function, _obj = _method_type.get_method(node.method, _method_type, False, True)
             _method_type = self.context.get_type(node.parent) if node.parent is not None else _node.type
             _function, _obj = _method_type.get_method(node.method, _method_type, False, True)
             paramNodeList, _returnTypeNode = self.methods[_obj.name, _function.name]
@@ -328,9 +319,6 @@ class Inferencer:
     def visit(self, node, scope):
         #definir cada una de las variables de node.decl_list en el scope y luego visitar la expresion
         for d in node.decl_list:
-            # _varName = node.decl_list[i].id
-            # _varTypeName = node.decl_list[i].type
-            # _varValue = node.decl_list[i].expr
             try:
                 _varType = self.context.get_type(d.type)
                 _var = scope.define_variable(d.id, _varType)
@@ -377,8 +365,6 @@ class Inferencer:
     @visitor.when(ChunkNode)#
     def visit(self, node, scope):
         innerScope = scope.create_child()
-        #exprNode = [ ]
-        #if
         exprNodes = [self.visit(i, innerScope) for i in node.chunk]
         return exprNodes[-1] if exprNodes else None
     
@@ -386,17 +372,6 @@ class Inferencer:
     def visit(self, node, scope):
         var = scope.find_variable(node.id)
         valueNode = self.visit(node.expr, scope.create_child())
-        
-        #THE PARCHE
-        # if valueNode.type.name == 'SELF_TYPE' and isinstance(node.expr, CallNode) and node.expr.obj is not None:
-        #     try:
-        #         rType = scope.find_variable(node.expr.obj.lex).type if node.expr.parent is None else self.context.get_type(node.expr.parent)
-        #     except:
-        #         rType = self.context.get_type(node.expr.obj.lex) if node.expr.parent is None else self.context.get_type(node.expr.parent)
-        #     if self.currentType.conforms_to(rType):
-        #         pass
-        #     else:
-        #         valueNode = PrimeNode(rType)
         
         if var is not None: #cuando es None es xq esa variable no existe, y ese error no toca detectarlo ahora
             _var = self.vars[var]
@@ -457,7 +432,6 @@ class Backtracker:
     
     @visitor.when(ClassDeclarationNode)#
     def visit(self, node, scope):
-        # attrIndex = 0
         index = 0
         
         self.currentType = self.context.get_type(node.id)
@@ -500,7 +474,7 @@ class Backtracker:
         if self.context.get_type(node.type.name) == self.autoType:
             if _func.return_type == self.autoType:
                 self.errors.append(f'Unable to infer the type of {_func.name}')
-            node.type = _func.return_type.name # .name?
+            node.type = _func.return_type.name # 
         elif isinstance(node.type, Type):
             node.type = node.type.name
         
@@ -543,15 +517,6 @@ class Backtracker:
                     _var.type = _var.type.type
                 d.type = _var.type.name
                 
-
-        # for i in range(len(node.decl_list)):
-        #     _ithName, _ithTypeName, _value = node.decl_list[i]
-        #     _ithVar = scope.find_variable(_ithName)
-        #     if _ithTypeName == 'AUTO_TYPE':
-        #         if _ithVar.type == self.autoType:
-        #             self.errors.append(f'Unable to infer the type of {_ithVar.name}')
-        #         node.decl_list[i] = (_ithName, _ithVar.type.name, _value)
-    
     @visitor.when(SwitchCaseNode)#
     def visit(self, node, scope):
         self.visit(node.expr, scope)
