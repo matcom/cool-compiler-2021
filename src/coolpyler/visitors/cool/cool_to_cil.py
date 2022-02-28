@@ -72,6 +72,13 @@ class CoolToCilVisitor(object):
     def register_new(self, type: str, *args, dest: Optional[str] = None):
         if dest is None:
             dest = self.register_local()
+
+        if len(args) == 0:
+            if type == "Int" or type == "Bool":
+                self.instructions.append(cil.ArgNode(self.register_num(0)))
+            elif type == "String":
+                self.instructions.append(cil.ArgNode(self.register_data("")))
+
         for arg in args:
             self.instructions.append(cil.ArgNode(arg))
         self.instructions.append(
@@ -365,6 +372,20 @@ class CoolToCilVisitor(object):
             )
 
         self.reset_state()
+        self_local = self.register_local("self")
+        self.instructions.append(cil.AllocateNode("Void", self_local))
+        self.instructions.append(cil.ReturnNode(self_local))
+
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("Void", "init"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+        self.reset_state()
         main_instance = self.register_new("Main")
         self.instructions.append(cil.ArgNode(main_instance))
         self.instructions.append(
@@ -412,7 +433,10 @@ class CoolToCilVisitor(object):
     @visitor.when(type_checked.CoolAttrDeclNode)
     def visit(self, node: type_checked.CoolAttrDeclNode) -> cil.FunctionNode:
         self.reset_state()
-        sid = self.visit(node.body)
+        if node.body is not None:
+            sid = self.visit(node.body)
+        else: # Void
+            sid = self.register_new("Void")
         self.instructions.append(cil.ReturnNode(sid))
         return cil.FunctionNode(
             self.get_func_id(self.type, node.attr_info.name),
@@ -577,7 +601,7 @@ class CoolToCilVisitor(object):
             rhs_local = self.visit(node.expr)
             self.instructions.append(cil.AssignNode(lhs_local, rhs_local))
         else:
-            self.register_new("Int", self.register_num(0), dest=lhs_local)
+            self.register_new("Void", dest=lhs_local)
 
         return lhs_local
 
