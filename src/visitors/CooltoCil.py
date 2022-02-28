@@ -9,7 +9,6 @@ class BaseCOOLToCILVisitor:
         self.dotdata = []
         self.dotcode = []
         self.current_type = None
-        self.current_method = None
         self.current_function = None
 
         self.context = context
@@ -228,7 +227,7 @@ class BaseCOOLToCILVisitor:
         instance = self.define_internal_local()
         self.register_instruction(cil.ArgNode(result))
         self.register_instruction(cil.StaticCallNode(self.ctor('String'), instance))
-        self.register_instruction(cil.ReturnNode(value=instance))
+        self.register_instruction(cil.ReturnNode(instance))
 
         self.current_function = self.register_function(self.to_function_name('in_int', 'IO'))
         self_ref = self.register_param(self._self)
@@ -456,7 +455,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_function = self.register_function(self.attrib_ctor_name(node.id))
         type.methods['__attributes_ctor'] = self.current_function.name
         self_ref = self.register_param(self._self)
-        self.localvars.extend(type.attributes.values())
+
+        # for at in type.attributes:
+        #     # try:
+        #     #     type[attributes][at]
+        #     # except:
+        #     #     _ = 0
+        #     self.localvars.append(type.attributes[at])
+
         self.dvars.update({i:cil.AttributeNode(j.name, type.name)
                                for i,j in type.attributes.items()})
 
@@ -487,7 +493,9 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         self.current_function = self.register_function(self.ctor(node.id))
         type.methods['__ctor'] = self.current_function.name
-        self.localvars.extend(type.attributes.values())
+        # for at in type.attributes:
+        #     self.localvars.append(type.attributes[at])
+
         instance = self.define_internal_local()
         self.register_instruction(cil.AllocateNode(node.id, instance))
 
@@ -495,7 +503,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ArgNode(instance))
         self.register_instruction(cil.StaticCallNode(self.attrib_ctor_name(node.id), variable))
 
-        self.register_instruction(cil.ReturnNode(value=variable))
+        self.register_instruction(cil.ReturnNode(variable))
 
         self.current_function = None
         self.current_type = None
@@ -545,10 +553,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.type -> str
         # node.body -> [ ExpressionNode ... ]
         ###############################
-        self.current_method = self.current_type.get_method(node.id, self.current_type, False)
+        m = self.current_type.get_method(node.id, self.current_type, False)
         type = self.dtypes[self.current_type.name]
-        self.current_function = self.register_function(self.to_function_name(self.current_method.name, self.current_type.name))
-        self.localvars.extend(type.attributes.values())
+        self.current_function = self.register_function(self.to_function_name(m.name, self.current_type.name))
+        # for at in type.attributes:
+        #     self.localvars.append(type.attributes[at])
 
         self_ref = self.register_param(self._self)
         self._self.name = self_ref
@@ -556,8 +565,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_param(VariableInfo(param, type))
 
         self.visit(node.body, scope)
-        self.register_instruction(cil.ReturnNode(value=node.body.ret_expr))
-        self.current_method = None
+        self.register_instruction(cil.ReturnNode(node.body.ret_expr))
         self._self.name = 'self'
 
     @visitor.when(VarDeclarationNode) # AssignNode
