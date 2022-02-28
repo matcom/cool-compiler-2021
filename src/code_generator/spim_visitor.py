@@ -233,8 +233,8 @@ class MIPSCodegen:
         register1 = '$v1'
         var_addr = frame.get_addr(node.var.lex)
         # register0 points to the heap
-        self.add_line = ('lw {register1}, {var_addr}')
-        self.add_line = ('lw {register0}, {register1}')
+        self.add_line(f'lw $t1, {var_addr}')
+        self.add_line('lw $v0, 0($t1)') 
         return register0
 
     @visitor.when(CILCallNode) # I don't think this is necessary
@@ -362,7 +362,7 @@ class MIPSCodegen:
         self.visit(node.right, frame)
         self.add_line(f'lw $t1, 4($v0)')
         self.gen_pop('$t0')
-        self.add_line(f'mul $t0, $t1')
+        self.add_line(f'mult $t0, $t1')
         self.add_line(f'mflo $t0')
         self.add_line(f'li $a0, 8')
         self.add_line(f'li $v0, 9')

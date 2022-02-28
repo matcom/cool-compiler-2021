@@ -31,7 +31,7 @@ class CIL:
         instructions.append(CILReturnNode(CILVariableNode("m2")))
         self.scope.functions.append(CILFuncNode('main', [], locals, instructions))
         
-        self.scope.data.append(CILDataNode(f'str_empty', ""))
+        self.scope.data.append(CILDataNode(f'str_empty', "\"\""))
 
         types_ts = get_ts(self.scope.context)
         infos = self.scope.infos = {}

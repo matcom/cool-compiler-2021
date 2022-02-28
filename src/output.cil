@@ -1,13 +1,10 @@
 .TYPES
 
-type Main {
-	attribute out;
-	attribute testee;
-	attribute divisor;
-	attribute stop;
-	attribute m;
+type Book {
+	attribute title;
+	attribute author;
 
-	method Init_Main : Init_Main;
+	method Init_Book : Init_Book;
 	method abort : abort_Object;
 	method type_name : type_name_Object;
 	method copy : copy_Object;
@@ -15,6 +12,89 @@ type Main {
 	method out_int : out_int_IO;
 	method in_string : in_string_IO;
 	method in_int : in_int_IO;
+	method initBook : initBook_Book;
+	method print : print_Book;
+}
+
+type Article {
+	attribute title;
+	attribute author;
+	attribute per_title;
+
+	method Init_Article : Init_Article;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+	method out_string : out_string_IO;
+	method out_int : out_int_IO;
+	method in_string : in_string_IO;
+	method in_int : in_int_IO;
+	method initBook : initBook_Book;
+	method print : print_Article;
+	method initArticle : initArticle_Article;
+}
+
+type BookList {
+
+	method Init_BookList : Init_BookList;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+	method out_string : out_string_IO;
+	method out_int : out_int_IO;
+	method in_string : in_string_IO;
+	method in_int : in_int_IO;
+	method isNil : isNil_BookList;
+	method cons : cons_BookList;
+	method car : car_BookList;
+	method cdr : cdr_BookList;
+	method print_list : print_list_BookList;
+}
+
+type Cons {
+	attribute xcar;
+	attribute xcdr;
+
+	method Init_Cons : Init_Cons;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+	method out_string : out_string_IO;
+	method out_int : out_int_IO;
+	method in_string : in_string_IO;
+	method in_int : in_int_IO;
+	method isNil : isNil_Cons;
+	method cons : cons_BookList;
+	method car : car_Cons;
+	method cdr : cdr_Cons;
+	method print_list : print_list_Cons;
+	method init : init_Cons;
+}
+
+type Nil {
+
+	method Init_Nil : Init_Nil;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
+	method out_string : out_string_IO;
+	method out_int : out_int_IO;
+	method in_string : in_string_IO;
+	method in_int : in_int_IO;
+	method isNil : isNil_Nil;
+	method cons : cons_BookList;
+	method car : car_BookList;
+	method cdr : cdr_BookList;
+	method print_list : print_list_Nil;
+}
+
+type Main {
+	attribute books;
+
+	method Init_Main : Init_Main;
+	method abort : abort_Object;
+	method type_name : type_name_Object;
+	method copy : copy_Object;
 	method main : main_Main;
 }
 
@@ -71,10 +151,20 @@ type IO {
 
 .DATA
 
-str_0 = "2 is trivially prime.\n";
-str_1 = " is prime.\n";
-str_2 = "continue";
-str_3 = "halt";
+str_empty = "";
+str_0 = "title:      ";
+str_1 = "\n";
+str_2 = "author:     ";
+str_3 = "\n";
+str_4 = "periodical:  ";
+str_5 = "\n";
+str_6 = "- dynamic type was Book -\n";
+str_7 = "- dynamic type was Article -\n";
+str_8 = "Compilers, Principles, Techniques, and Tools";
+str_9 = "Aho, Sethi, and Ullman";
+str_10 = "The Top 100 CD_ROMs";
+str_11 = "Ulanoff";
+str_12 = "PC Magazine";
 
 .CODE
 
@@ -94,22 +184,24 @@ function main {
 }
 
 
-function main_Main {
-	PARAM self_Main;
+function initBook_Book {
+	PARAM self_Book;
+	PARAM title_p_0;
+	PARAM author_p_1;
 
-	LOCAL t_0;
+	LOCAL t_2;
 
-	t_0 = 0;
-	RETURN t_0;
+	SETATTR self_Book title title_p_0;
+	SETATTR self_Book author author_p_1;
+	t_2 = self_Book;
+	RETURN t_2;
 
 }
 
 
-function Init_Main {
-	PARAM self_Main;
+function print_Book {
+	PARAM self_Book;
 
-	LOCAL t_1;
-	LOCAL t_2;
 	LOCAL t_3;
 	LOCAL t_4;
 	LOCAL t_5;
@@ -135,13 +227,89 @@ function Init_Main {
 	LOCAL t_25;
 	LOCAL t_26;
 	LOCAL t_27;
-	LOCAL t_28;
-	LOCAL t_29;
-	LOCAL t_30;
+
+	t_3 = LOAD str_0;
+	t_4 = t_3;
+	ARG self_Book;
+	ARG t_4;
+	t_5 = VCALL Book out_string;
+	t_6 = t_5;
+	t_7 = GETATTR self_Book title;
+	t_8 = t_7;
+	ARG t_6;
+	ARG t_8;
+	t_9 = VCALL Book out_string;
+	t_10 = t_9;
+	t_11 = LOAD str_1;
+	t_12 = t_11;
+	ARG t_10;
+	ARG t_12;
+	t_13 = VCALL Book out_string;
+	t_14 = LOAD str_2;
+	t_15 = t_14;
+	ARG self_Book;
+	ARG t_15;
+	t_16 = VCALL Book out_string;
+	t_17 = t_16;
+	t_18 = GETATTR self_Book author;
+	t_19 = t_18;
+	ARG t_17;
+	ARG t_19;
+	t_20 = VCALL Book out_string;
+	t_21 = t_20;
+	t_22 = LOAD str_3;
+	t_23 = t_22;
+	ARG t_21;
+	ARG t_23;
+	t_24 = VCALL Book out_string;
+	t_25 = self_Book;
+	RETURN t_25;
+
+}
+
+
+function Init_Book {
+	PARAM self_Book;
+
+
+	ARG self_Book;
+	self_Book = CALL Init_IO;
+	t_26 = LOAD str_empty;
+	SETATTR self_Book title t_26;
+	t_27 = LOAD str_empty;
+	SETATTR self_Book author t_27;
+	RETURN self_Book;
+
+}
+
+
+function initArticle_Article {
+	PARAM self_Article;
+	PARAM title_p_28;
+	PARAM author_p_29;
+	PARAM per_title_p_30;
+
 	LOCAL t_31;
 	LOCAL t_32;
 	LOCAL t_33;
 	LOCAL t_34;
+
+	t_31 = title_p_28;
+	t_32 = author_p_29;
+	ARG self_Article;
+	ARG t_31;
+	ARG t_32;
+	t_33 = VCALL Article initBook;
+	SETATTR self_Article per_title per_title_p_30;
+	t_34 = self_Article;
+	RETURN t_34;
+
+}
+
+
+function print_Article {
+	PARAM self_Article;
+
 	LOCAL t_35;
 	LOCAL t_36;
 	LOCAL t_37;
@@ -156,117 +324,411 @@ function Init_Main {
 	LOCAL t_46;
 	LOCAL t_47;
 	LOCAL t_48;
+
+	ARG self_Article;
+	t_35 = VCALL Article print;
+	t_36 = LOAD str_4;
+	t_37 = t_36;
+	ARG self_Article;
+	ARG t_37;
+	t_38 = VCALL Article out_string;
+	t_39 = t_38;
+	t_40 = GETATTR self_Article per_title;
+	t_41 = t_40;
+	ARG t_39;
+	ARG t_41;
+	t_42 = VCALL Article out_string;
+	t_43 = t_42;
+	t_44 = LOAD str_5;
+	t_45 = t_44;
+	ARG t_43;
+	ARG t_45;
+	t_46 = VCALL Article out_string;
+	t_47 = self_Article;
+	RETURN t_47;
+
+}
+
+
+function Init_Article {
+	PARAM self_Article;
+
+
+	ARG self_Article;
+	self_Article = CALL Init_Book;
+	t_48 = LOAD str_empty;
+	SETATTR self_Article per_title t_48;
+	RETURN self_Article;
+
+}
+
+
+function isNil_BookList {
+	PARAM self_BookList;
+
 	LOCAL t_49;
 	LOCAL t_50;
 	LOCAL t_51;
-	LOCAL t_52;
-	LOCAL t_53;
-	LOCAL t_54;
 
-	ARG self_Main;
-	self_Main = CALL Init_IO;
-	t_1 = LOAD str_0;
-	t_2 = t_1;
-	ARG self_Main;
-	ARG t_2;
-	t_3 = VCALL Main out_string;
-	SETATTR self_Main out 2;
-	t_55 = GETATTR self_Main out;
-	SETATTR self_Main testee t_55;
-	SETATTR self_Main stop 500;
-while_0:
-	t_4 = 0 == 0;
-	t_5 = t_4;
-	IF t_5 GOTO body_0;
-	GOTO pool_0;
-body_0:
-	t_7 = GETATTR self_Main testee;
-	t_8 = t_7 + 1;
-	SETATTR self_Main testee t_8;
-	SETATTR self_Main divisor 2;
-while_1:
-	t_9 = GETATTR self_Main divisor;
-	t_10 = GETATTR self_Main divisor;
-	t_11 = t_9 * t_10;
-	t_12 = GETATTR self_Main testee;
-	t_13 = t_12 < t_11;
-	t_14 = t_13;
-	IF t_14 GOTO then_0;
-	t_16 = GETATTR self_Main testee;
-	t_17 = GETATTR self_Main divisor;
-	t_18 = t_16 / t_17;
-	t_19 = GETATTR self_Main divisor;
-	t_20 = t_19 * t_18;
-	t_21 = GETATTR self_Main testee;
-	t_22 = t_21 - t_20;
-	t_23 = t_22 == 0;
-	t_24 = t_23;
-	IF t_24 GOTO then_1;
-	t_26 = 0 == 0;
-	t_25 = t_26;
-	GOTO ifend_1;
-then_1:
-	t_27 = 0 == 1;
-	t_25 = t_27;
-ifend_1:
-	t_15 = t_25;
-	GOTO ifend_0;
-then_0:
-	t_28 = 0 == 1;
-	t_15 = t_28;
-ifend_0:
-	t_29 = t_15;
-	IF t_29 GOTO body_1;
-	GOTO pool_1;
-body_1:
-	t_31 = GETATTR self_Main divisor;
-	t_32 = t_31 + 1;
-	SETATTR self_Main divisor t_32;
-	t_30 = t_32;
-	GOTO while_1;
-pool_1:
-	t_33 = GETATTR self_Main divisor;
-	t_34 = GETATTR self_Main divisor;
-	t_35 = t_33 * t_34;
-	t_36 = GETATTR self_Main testee;
-	t_37 = t_36 < t_35;
-	t_38 = t_37;
-	IF t_38 GOTO then_2;
-	t_39 = 0;
-	GOTO ifend_2;
-then_2:
-	t_40 = GETATTR self_Main testee;
-	SETATTR self_Main out t_40;
-	t_41 = GETATTR self_Main out;
-	ARG self_Main;
-	ARG t_41;
-	t_42 = VCALL Main out_int;
-	t_43 = LOAD str_1;
-	t_44 = t_43;
-	ARG self_Main;
-	ARG t_44;
-	t_45 = VCALL Main out_string;
-	t_39 = t_45;
-ifend_2:
-	t_46 = GETATTR self_Main stop;
-	t_47 = GETATTR self_Main testee;
-	t_48 = t_46 <= t_47;
-	t_49 = t_48;
-	IF t_49 GOTO then_3;
-	t_51 = LOAD str_2;
-	t_50 = t_51;
-	GOTO ifend_3;
-then_3:
-	t_52 = LOAD str_3;
-	t_53 = t_52;
-	ARG t_53;
-	t_54 = VCALL String abort;
-	t_50 = t_54;
-ifend_3:
-	t_6 = t_50;
-	GOTO while_0;
-pool_0:
-	SETATTR self_Main m t_6;
+	ARG self_BookList;
+	t_49 = VCALL BookList abort;
+	t_50 = 0 == 0;
+	t_51 = t_50;
+	RETURN t_51;
+
+}
+
+
+function cons_BookList {
+	PARAM self_BookList;
+	PARAM hd_52;
+
+	LOCAL new_cell_53;
+	LOCAL t_54;
+	LOCAL t_55;
+	LOCAL t_56;
+	LOCAL t_57;
+	LOCAL t_58;
+	LOCAL t_59;
+	LOCAL t_60;
+
+	t_54 = ALLOCATE Cons;
+	ARG t_54;
+	t_55 = VCALL Cons Init_Cons;
+	new_cell_53 = t_55;
+	t_56 = new_cell_53;
+	t_57 = hd_52;
+	t_58 = self_BookList;
+	ARG t_56;
+	ARG t_57;
+	ARG t_58;
+	t_59 = VCALL Cons init;
+	t_60 = t_59;
+	RETURN t_60;
+
+}
+
+
+function car_BookList {
+	PARAM self_BookList;
+
+	LOCAL t_61;
+	LOCAL t_62;
+	LOCAL t_63;
+	LOCAL t_64;
+
+	ARG self_BookList;
+	t_61 = VCALL BookList abort;
+	t_62 = ALLOCATE Book;
+	ARG t_62;
+	t_63 = VCALL Book Init_Book;
+	t_64 = t_63;
+	RETURN t_64;
+
+}
+
+
+function cdr_BookList {
+	PARAM self_BookList;
+
+	LOCAL t_65;
+	LOCAL t_66;
+	LOCAL t_67;
+	LOCAL t_68;
+
+	ARG self_BookList;
+	t_65 = VCALL BookList abort;
+	t_66 = ALLOCATE BookList;
+	ARG t_66;
+	t_67 = VCALL BookList Init_BookList;
+	t_68 = t_67;
+	RETURN t_68;
+
+}
+
+
+function print_list_BookList {
+	PARAM self_BookList;
+
+	LOCAL t_69;
+	LOCAL t_70;
+
+	ARG self_BookList;
+	t_69 = VCALL BookList abort;
+	t_70 = t_69;
+	RETURN t_70;
+
+}
+
+
+function Init_BookList {
+	PARAM self_BookList;
+
+
+	ARG self_BookList;
+	self_BookList = CALL Init_IO;
+	RETURN self_BookList;
+
+}
+
+
+function isNil_Cons {
+	PARAM self_Cons;
+
+	LOCAL t_71;
+	LOCAL t_72;
+
+	t_71 = 0 == 1;
+	t_72 = t_71;
+	RETURN t_72;
+
+}
+
+
+function init_Cons {
+	PARAM self_Cons;
+	PARAM hd_73;
+	PARAM tl_74;
+
+	LOCAL t_75;
+
+	SETATTR self_Cons xcar hd_73;
+	SETATTR self_Cons xcdr tl_74;
+	t_75 = self_Cons;
+	RETURN t_75;
+
+}
+
+
+function car_Cons {
+	PARAM self_Cons;
+
+	LOCAL t_76;
+	LOCAL t_77;
+
+	t_76 = GETATTR self_Cons xcar;
+	t_77 = t_76;
+	RETURN t_77;
+
+}
+
+
+function cdr_Cons {
+	PARAM self_Cons;
+
+	LOCAL t_78;
+	LOCAL t_79;
+
+	t_78 = GETATTR self_Cons xcdr;
+	t_79 = t_78;
+	RETURN t_79;
+
+}
+
+
+function print_list_Cons {
+	PARAM self_Cons;
+
+	LOCAL t_80;
+	LOCAL t_81;
+	LOCAL t_82;
+	LOCAL t_83;
+	LOCAL t_84;
+	LOCAL t_85;
+	LOCAL t_86;
+	LOCAL dummy_87;
+	LOCAL t_88;
+	LOCAL t_89;
+	LOCAL t_90;
+	LOCAL t_91;
+	LOCAL dummy_92;
+	LOCAL t_93;
+	LOCAL t_94;
+	LOCAL t_95;
+	LOCAL t_96;
+	LOCAL t_97;
+	LOCAL t_98;
+	LOCAL t_99;
+
+	t_80 = GETATTR self_Cons xcar;
+	t_81 = t_80;
+	ARG t_81;
+	t_82 = VCALL Book print;
+	t_83 = t_82;
+	t_84 = TYPEOF t_83;
+	t_86 = t_84 != Book;
+	IF t_86 GOTO branch_0_0;
+	dummy_87 = t_82;
+	t_88 = LOAD str_6;
+	t_89 = t_88;
+	ARG self_Cons;
+	ARG t_89;
+	t_90 = VCALL Cons out_string;
+	t_85 = t_90;
+	GOTO case_end0;
+branch_0_0:
+	t_91 = t_84 != Article;
+	IF t_91 GOTO case_end0;
+	dummy_92 = t_82;
+	t_93 = LOAD str_7;
+	t_94 = t_93;
+	ARG self_Cons;
+	ARG t_94;
+	t_95 = VCALL Cons out_string;
+	t_85 = t_95;
+	GOTO case_end0;
+case_end0:
+	t_96 = GETATTR self_Cons xcdr;
+	t_97 = t_96;
+	ARG t_97;
+	t_98 = VCALL BookList print_list;
+	t_99 = t_98;
+	RETURN t_99;
+
+}
+
+
+function Init_Cons {
+	PARAM self_Cons;
+
+
+	ARG self_Cons;
+	self_Cons = CALL Init_BookList;
+	RETURN self_Cons;
+
+}
+
+
+function isNil_Nil {
+	PARAM self_Nil;
+
+	LOCAL t_100;
+	LOCAL t_101;
+
+	t_100 = 0 == 0;
+	t_101 = t_100;
+	RETURN t_101;
+
+}
+
+
+function print_list_Nil {
+	PARAM self_Nil;
+
+	LOCAL t_102;
+	LOCAL t_103;
+
+	t_102 = 0 == 0;
+	t_103 = t_102;
+	RETURN t_103;
+
+}
+
+
+function Init_Nil {
+	PARAM self_Nil;
+
+
+	ARG self_Nil;
+	self_Nil = CALL Init_BookList;
+	RETURN self_Nil;
+
+}
+
+
+function main_Main {
+	PARAM self_Main;
+
+	LOCAL a_book_104;
+	LOCAL t_105;
+	LOCAL t_106;
+	LOCAL t_107;
+	LOCAL t_108;
+	LOCAL t_109;
+	LOCAL t_110;
+	LOCAL t_111;
+	LOCAL t_112;
+	LOCAL an_article_113;
+	LOCAL t_114;
+	LOCAL t_115;
+	LOCAL t_116;
+	LOCAL t_117;
+	LOCAL t_118;
+	LOCAL t_119;
+	LOCAL t_120;
+	LOCAL t_121;
+	LOCAL t_122;
+	LOCAL t_123;
+	LOCAL t_124;
+	LOCAL t_125;
+	LOCAL t_126;
+	LOCAL t_127;
+	LOCAL t_128;
+	LOCAL t_129;
+	LOCAL t_130;
+	LOCAL t_131;
+	LOCAL t_132;
+	LOCAL t_133;
+	LOCAL t_134;
+	LOCAL t_135;
+
+	t_105 = ALLOCATE Book;
+	ARG t_105;
+	t_106 = VCALL Book Init_Book;
+	t_107 = t_106;
+	t_108 = LOAD str_8;
+	t_109 = t_108;
+	t_110 = LOAD str_9;
+	t_111 = t_110;
+	ARG t_107;
+	ARG t_109;
+	ARG t_111;
+	t_112 = VCALL Book initBook;
+	a_book_104 = t_112;
+	t_114 = ALLOCATE Article;
+	ARG t_114;
+	t_115 = VCALL Article Init_Article;
+	t_116 = t_115;
+	t_117 = LOAD str_10;
+	t_118 = t_117;
+	t_119 = LOAD str_11;
+	t_120 = t_119;
+	t_121 = LOAD str_12;
+	t_122 = t_121;
+	ARG t_116;
+	ARG t_118;
+	ARG t_120;
+	ARG t_122;
+	t_123 = VCALL Article initArticle;
+	an_article_113 = t_123;
+	t_124 = ALLOCATE Nil;
+	ARG t_124;
+	t_125 = VCALL Nil Init_Nil;
+	t_126 = t_125;
+	t_127 = a_book_104;
+	ARG t_126;
+	ARG t_127;
+	t_128 = VCALL Nil cons;
+	t_129 = t_128;
+	t_130 = an_article_113;
+	ARG t_129;
+	ARG t_130;
+	t_131 = VCALL Cons cons;
+	SETATTR self_Main books t_131;
+	t_132 = GETATTR self_Main books;
+	t_133 = t_132;
+	ARG t_133;
+	t_134 = VCALL BookList print_list;
+	t_135 = t_134;
+	RETURN t_135;
+
+}
+
+
+function Init_Main {
+	PARAM self_Main;
+
+
 	RETURN self_Main;
 
 }

@@ -442,6 +442,16 @@ compare:
         jr $ra
 
 
+concat_String:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+		
+
+
 
 
 

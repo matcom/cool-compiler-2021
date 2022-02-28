@@ -1,84 +1,132 @@
+-- example of static and dynamic type differing for a dispatch
 
-(*
- * methodless-primes.cl
- *
- * Designed by Jesse H. Willett, jhw@cory, 11103234, with 
- *             Istvan Siposs, isiposs@cory, 12342921.
- *
- * This program generates primes in order without using any methods.
- * Actually, it does use three methods: those of IO to print out each
- * prime, and abort() to halt the program.  These methods are incidental,
- * however, to the information-processing functionality of the program.  We
- * could regard the attribute 'out's sequential values as our output, and
- * the string "halt" as our terminate signal.
- *
- * Naturally, using Cool this way is a real waste, basically reducing it 
- * to assembly without the benefit of compilation.  
- *
- * There could even be a subroutine-like construction, in that different
- * code could be in the assign fields of attributes of other classes,
- * and it could be executed by calling 'new Sub', but no parameters
- * could be passed to the subroutine, and it could only return itself.
- * but returning itself would be useless since we couldn't call methods
- * and the only operators we have are for Int and Bool, which do nothing
- * interesting when we initialize them!
- *)
+Class Book inherits IO {
+    title : String;
+    author : String;
 
-class Main inherits IO {
-
-  main() : Int {	-- main() is an atrophied method so we can parse. 
-    0 
-  };
-
-  out : Int <-		-- out is our 'output'.  Its values are the primes.
-    {
-      out_string("2 is trivially prime.\n");
-      2;
+    initBook(title_p : String, author_p : String) : Book {
+        {
+            title <- title_p;
+            author <- author_p;
+            self;
+        }
     };
 
-  testee : Int <- out;	-- testee is a number to be tested for primeness.   
+    print() : Book {
+        {
+            out_string("title:      ").out_string(title).out_string("\n");
+            out_string("author:     ").out_string(author).out_string("\n");
+            self;
+        }
+    };
+};
 
-  divisor : Int;	-- divisor is a number which may factor testee.
+Class Article inherits Book {
+    per_title : String;
 
-  stop : Int <- 500;	-- stop is an arbitrary value limiting testee. 	
+    initArticle(title_p : String, author_p : String,
+		per_title_p : String) : Article {
+        {
+            initBook(title_p, author_p);
+            per_title <- per_title_p;
+            self;
+        }
+    };
 
-  m : Object <-		-- m supplants the main method.
-    while true loop 
-      {
+    print() : Book {
+        {
+	    self@Book.print();
+            out_string("periodical:  ").out_string(per_title).out_string("\n");
+            self;
+        }
+    };
+};
 
-        testee <- testee + 1;
-        divisor <- 2;
+Class BookList inherits IO { 
+    (* Since abort "returns" type Object, we have to add
+       an expression of type Bool here to satisfy the typechecker.
+       This code is unreachable, since abort() halts the program.
+    *)
+    isNil() : Bool { { abort(); true; } };
+    
+    cons(hd : Book) : Cons {
+        (let new_cell : Cons <- new Cons in
+            new_cell.init(hd,self)
+        )
+    };
 
-        while 
-          if testee < divisor * divisor 
-            then false 		-- can stop if divisor > sqrt(testee).
-	  else if testee - divisor*(testee/divisor) = 0 
-            then false 		-- can stop if divisor divides testee. 
-            else true
-          fi fi     
-        loop 
-          divisor <- divisor + 1
-        pool;        
+    (* Since abort "returns" type Object, we have to add
+       an expression of type Book here to satisfy the typechecker.
+       This code is unreachable, since abort() halts the program.
+    *)
+    car() : Book { { abort(); new Book; } };
+    
+    (* Since abort "returns" type Object, we have to add
+       an expression of type BookList here to satisfy the typechecker.
+       This code is unreachable, since abort() halts the program.
+    *)
+    cdr() : BookList { { abort(); new BookList; } };
+    
+    print_list() : Object { abort() };
+};
 
-        if testee < divisor * divisor	-- which reason did we stop for?
-        then 	-- testee has no factors less than sqrt(testee).
-          {
-            out <- testee;	-- we could think of out itself as the output.
-            out_int(out); 
-            out_string(" is prime.\n");
-          }
-        else	-- the loop halted on testee/divisor = 0, testee isn't prime.
-          0	-- testee isn't prime, do nothing.
-	fi;   	
+Class Cons inherits BookList {
+    xcar : Book;  -- We keep the car and cdr in attributes.
+    xcdr : BookList; -- Because methods and features must have different names,
+    -- we use xcar and xcdr for the attributes and reserve
+    -- car and cdr for the features.
+    
+    isNil() : Bool { false };
+    
+    init(hd : Book, tl : BookList) : Cons {
+        {
+            xcar <- hd;
+            xcdr <- tl;
+            self;
+        }
+    };
 
-        if stop <= testee then 
-          "halt".abort()	-- we could think of "halt" as SIGTERM.
-        else 
-          "continue"
-        fi;       
+    car() : Book { xcar };
 
-      } 
-    pool;
+    cdr() : BookList { xcdr };
+    
+    print_list() : Object {
+        {
+            case xcar.print() of
+                dummy : Book => out_string("- dynamic type was Book -\n");
+                dummy : Article => out_string("- dynamic type was Article -\n");
+            esac;
+            xcdr.print_list();
+        }
+    };
+};
 
-}; (* end of Main *)
+Class Nil inherits BookList {
+    isNil() : Bool { true };
 
+    print_list() : Object { true };
+};
+
+
+Class Main {
+
+    books : BookList;
+
+    main() : Object {
+        (let a_book : Book <-
+            (new Book).initBook("Compilers, Principles, Techniques, and Tools",
+                                "Aho, Sethi, and Ullman")
+        in
+            (let an_article : Article <-
+                (new Article).initArticle("The Top 100 CD_ROMs",
+                                          "Ulanoff",
+                                          "PC Magazine")
+            in
+                {
+                    books <- (new Nil).cons(a_book).cons(an_article);
+                    books.print_list();
+                }
+            )  -- end let an_article
+        )  -- end let a_book
+    };
+};

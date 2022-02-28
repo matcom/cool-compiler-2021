@@ -1,20 +1,14 @@
 	.data
-_List: .asciiz "List"
-	.data
-	.align 4
-List: .word 4 _List Init_List abort_Object type_name_Object copy_Object isNil_List head_List tail_List cons_List
-
-	.data
-_Cons: .asciiz "Cons"
-	.data
-	.align 4
-Cons: .word 12 _Cons Init_Cons abort_Object type_name_Object copy_Object isNil_Cons head_Cons tail_Cons cons_List init_Cons
-
-	.data
 _Main: .asciiz "Main"
 	.data
 	.align 4
-Main: .word 8 _Main Init_Main abort_Object type_name_Object copy_Object out_string_IO out_int_IO in_string_IO in_int_IO print_list_Main main_Main
+Main: .word 4 _Main Init_Main abort_Object type_name_Object copy_Object out_string_IO out_int_IO in_string_IO in_int_IO main_Main
+
+	.data
+_Complex: .asciiz "Complex"
+	.data
+	.align 4
+Complex: .word 12 _Complex Init_Complex abort_Object type_name_Object copy_Object out_string_IO out_int_IO in_string_IO in_int_IO init_Complex print_Complex reflect_0_Complex reflect_X_Complex reflect_Y_Complex equal_Complex x_value_Complex y_value_Complex
 
 	.data
 _Object: .asciiz "Object"
@@ -51,10 +45,16 @@ ObjectAbortMessage : .asciiz "Abort called from class "
 	.data
 IO_Buffer : .space 1001
 	.data
-str_0: .asciiz " "
+str_0: .asciiz "=(\n"
 
 	.data
-str_1: .asciiz "\n"
+str_1: .asciiz "=)\n"
+
+	.data
+str_2: .asciiz "+"
+
+	.data
+str_3: .asciiz "I"
 
 	.text
 main:
@@ -72,7 +72,7 @@ main:
 	subu $sp $sp 12
 	
 	# assign (add here the expr.to_string) to m0
-	li $a0, 8
+	li $a0, 4
 	li $v0, 9
 	syscall
 	la $a0, Main
@@ -107,7 +107,7 @@ main:
 	#load the variable m1
 	lw $v0, -4($fp)
 	lw $v0, 0($v0)
-	lw $v1, 44($v0)
+	lw $v1, 40($v0)
 	jal $v1
 	# pop the top of the stack to $v1
 	addi $sp $sp 4
@@ -134,866 +134,6 @@ main:
 	syscall
 	
 	.text
-isNil_List:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 8
-	
-	# assign (add here the expr.to_string) to t_0
-	# Creating Int instance for atomic 0
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 0
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# Creating Int instance for atomic 0
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 0
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	jal compare
-	# pop the top of the stack to $t0
-	addi $sp $sp 4
-	lw $t0, 0($sp)
-	
-	# pop the top of the stack to $t0
-	addi $sp $sp 4
-	lw $t0, 0($sp)
-	
-	sw $v0, -0($fp)
-	
-	# assign (add here the expr.to_string) to t_1
-	#load the variable t_0
-	lw $v0, -0($fp)
-	sw $v0, -4($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_1
-	lw $v0, -4($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 8
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-head_List:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 8
-	
-	lw $v0, 12($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_2
-	# calling the method abort of type List
-	#load the variable self_List
-	lw $v0, 12($fp)
-	lw $v0, 0($v0)
-	lw $v1, 12($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -0($fp)
-	
-	# assign (add here the expr.to_string) to t_3
-	# Creating Int instance for atomic 0
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 0
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	sw $v0, -4($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_3
-	lw $v0, -4($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 8
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-tail_List:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 8
-	
-	lw $v0, 12($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_4
-	# calling the method abort of type List
-	#load the variable self_List
-	lw $v0, 12($fp)
-	lw $v0, 0($v0)
-	lw $v1, 12($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -0($fp)
-	
-	# assign (add here the expr.to_string) to t_5
-	#load the variable self_List
-	lw $v0, 12($fp)
-	sw $v0, -4($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_5
-	lw $v0, -4($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 8
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-cons_List:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 28
-	
-	# assign (add here the expr.to_string) to t_7
-	li $a0, 12
-	li $v0, 9
-	syscall
-	la $a0, Cons
-	sw $a0,  0($v0)
-	sw $v0, -0($fp)
-	
-	lw $v0, -0($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_8
-	# calling the method Init_Cons of type Cons
-	#load the variable t_7
-	lw $v0, -0($fp)
-	lw $v0, 0($v0)
-	lw $v1, 8($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -4($fp)
-	
-	# assign (add here the expr.to_string) to t_9
-	#load the variable t_8
-	lw $v0, -4($fp)
-	sw $v0, -8($fp)
-	
-	# assign (add here the expr.to_string) to t_10
-	#load the variable i_6
-	lw $v0, 12($fp)
-	sw $v0, -12($fp)
-	
-	# assign (add here the expr.to_string) to t_11
-	#load the variable self_List
-	lw $v0, 16($fp)
-	sw $v0, -16($fp)
-	
-	lw $v0, -8($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -12($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -16($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_12
-	# calling the method init of type Cons
-	#load the variable t_9
-	lw $v0, -8($fp)
-	lw $v0, 0($v0)
-	lw $v1, 40($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -20($fp)
-	
-	# assign (add here the expr.to_string) to t_13
-	#load the variable t_12
-	lw $v0, -20($fp)
-	sw $v0, -24($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_13
-	lw $v0, -24($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 28
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-Init_List:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 0
-	
-	# return the value of the function in the register $v0
-	#load the variable self
-	lw $v0, 12($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 0
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-isNil_Cons:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 8
-	
-	# assign (add here the expr.to_string) to t_14
-	# Creating Int instance for atomic 0
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 0
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# Creating Int instance for atomic 1
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 1
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	jal compare
-	# pop the top of the stack to $t0
-	addi $sp $sp 4
-	lw $t0, 0($sp)
-	
-	# pop the top of the stack to $t0
-	addi $sp $sp 4
-	lw $t0, 0($sp)
-	
-	sw $v0, -0($fp)
-	
-	# assign (add here the expr.to_string) to t_15
-	#load the variable t_14
-	lw $v0, -0($fp)
-	sw $v0, -4($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_15
-	lw $v0, -4($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 8
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-head_Cons:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 4
-	
-	# assign (add here the expr.to_string) to t_16
-	lw $v1, 12($fp)
-	lw $v0, 4($v1)
-	sw $v0, -0($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_16
-	lw $v0, -0($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 4
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-tail_Cons:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 4
-	
-	# assign (add here the expr.to_string) to t_17
-	lw $v1, 12($fp)
-	lw $v0, 8($v1)
-	sw $v0, -0($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_17
-	lw $v0, -0($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 4
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-init_Cons:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 4
-	
-	# Setting value of the attribute car in the instance self_Cons to i_18
-	#load the variable i_18
-	lw $v0, 16($fp)
-	move $s2, $v0
-	lw $v1, 20($fp)
-	sw $s2, 4($v1)
-	
-	# Setting value of the attribute cdr in the instance self_Cons to rest_19
-	#load the variable rest_19
-	lw $v0, 12($fp)
-	move $s2, $v0
-	lw $v1, 20($fp)
-	sw $s2, 8($v1)
-	
-	# assign (add here the expr.to_string) to t_20
-	#load the variable self_Cons
-	lw $v0, 20($fp)
-	sw $v0, -0($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_20
-	lw $v0, -0($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 4
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-Init_Cons:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 0
-	
-	lw $v0, 12($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to self
-	jal Init_List
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, 12($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable self
-	lw $v0, 12($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 0
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
-print_list_Main:
-	# save the return address and frame pointer
-	# push $ra to the stack
-	sw $ra, 0($sp)
-	addi $sp $sp -4
-	
-	# push $fp to the stack
-	sw $fp, 0($sp)
-	addi $sp $sp -4
-	
-	# update the frame pointer and allocate the frame in the stack
-	move $fp $sp
-	subu $sp $sp 76
-	
-	# assign (add here the expr.to_string) to t_22
-	#load the variable l_21
-	lw $v0, 12($fp)
-	sw $v0, -0($fp)
-	
-	lw $v0, -0($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_23
-	# calling the method isNil of type List
-	#load the variable t_22
-	lw $v0, -0($fp)
-	lw $v0, 0($v0)
-	lw $v1, 24($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -4($fp)
-	
-	# assign (add here the expr.to_string) to t_24
-	#load the variable t_23
-	lw $v0, -4($fp)
-	sw $v0, -8($fp)
-	
-	lw $t1, -8($fp)
-	lw $t0, 4($t1)
-	bne $t0, $zero, then_0
-	# assign (add here the expr.to_string) to t_26
-	#load the variable l_21
-	lw $v0, 12($fp)
-	sw $v0, -16($fp)
-	
-	lw $v0, -16($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_27
-	# calling the method head of type List
-	#load the variable t_26
-	lw $v0, -16($fp)
-	lw $v0, 0($v0)
-	lw $v1, 28($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -20($fp)
-	
-	# assign (add here the expr.to_string) to t_28
-	#load the variable t_27
-	lw $v0, -20($fp)
-	sw $v0, -24($fp)
-	
-	lw $v0, 16($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -24($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_29
-	# calling the method out_int of type Main
-	#load the variable self_Main
-	lw $v0, 16($fp)
-	lw $v0, 0($v0)
-	lw $v1, 28($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -28($fp)
-	
-	# assign (add here the expr.to_string) to t_30
-	#load the string str_0
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $v1, String
-	sw $v1, 0($v0)
-	la $v1, str_0
-	sw $v1, 4($v0)
-	sw $v0, -32($fp)
-	
-	# assign (add here the expr.to_string) to t_31
-	#load the variable t_30
-	lw $v0, -32($fp)
-	sw $v0, -36($fp)
-	
-	lw $v0, 16($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -36($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_32
-	# calling the method out_string of type Main
-	#load the variable self_Main
-	lw $v0, 16($fp)
-	lw $v0, 0($v0)
-	lw $v1, 24($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -40($fp)
-	
-	# assign (add here the expr.to_string) to t_33
-	#load the variable l_21
-	lw $v0, 12($fp)
-	sw $v0, -44($fp)
-	
-	lw $v0, -44($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_34
-	# calling the method tail of type List
-	#load the variable t_33
-	lw $v0, -44($fp)
-	lw $v0, 0($v0)
-	lw $v1, 32($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -48($fp)
-	
-	# assign (add here the expr.to_string) to t_35
-	#load the variable t_34
-	lw $v0, -48($fp)
-	sw $v0, -52($fp)
-	
-	lw $v0, 16($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -52($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_36
-	# calling the method print_list of type Main
-	#load the variable self_Main
-	lw $v0, 16($fp)
-	lw $v0, 0($v0)
-	lw $v1, 40($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -56($fp)
-	
-	# assign (add here the expr.to_string) to t_25
-	#load the variable t_36
-	lw $v0, -56($fp)
-	sw $v0, -12($fp)
-	
-	j ifend_0
-	then_0:
-	# assign (add here the expr.to_string) to t_37
-	#load the string str_1
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $v1, String
-	sw $v1, 0($v0)
-	la $v1, str_1
-	sw $v1, 4($v0)
-	sw $v0, -60($fp)
-	
-	# assign (add here the expr.to_string) to t_38
-	#load the variable t_37
-	lw $v0, -60($fp)
-	sw $v0, -64($fp)
-	
-	lw $v0, 16($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -64($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_39
-	# calling the method out_string of type Main
-	#load the variable self_Main
-	lw $v0, 16($fp)
-	lw $v0, 0($v0)
-	lw $v1, 24($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -68($fp)
-	
-	# assign (add here the expr.to_string) to t_25
-	#load the variable t_39
-	lw $v0, -68($fp)
-	sw $v0, -12($fp)
-	
-	ifend_0:
-	# assign (add here the expr.to_string) to t_40
-	#load the variable t_25
-	lw $v0, -12($fp)
-	sw $v0, -72($fp)
-	
-	# return the value of the function in the register $v0
-	#load the variable t_40
-	lw $v0, -72($fp)
-	move $v0, $v0
-	
-	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 76
-	# pop the top of the stack to $fp
-	addi $sp $sp 4
-	lw $fp, 0($sp)
-	
-	# pop the top of the stack to $ra
-	addi $sp $sp 4
-	lw $ra, 0($sp)
-	
-	jr $ra
-	
-	.text
 main_Main:
 	# save the return address and frame pointer
 	# push $ra to the stack
@@ -1006,25 +146,25 @@ main_Main:
 	
 	# update the frame pointer and allocate the frame in the stack
 	move $fp $sp
-	subu $sp $sp 112
+	subu $sp $sp 84
 	
-	# assign (add here the expr.to_string) to t_41
-	li $a0, 4
+	# assign (add here the expr.to_string) to t_1
+	li $a0, 12
 	li $v0, 9
 	syscall
-	la $a0, List
+	la $a0, Complex
 	sw $a0,  0($v0)
-	sw $v0, -0($fp)
+	sw $v0, -4($fp)
 	
-	lw $v0, -0($fp)
+	lw $v0, -4($fp)
 	# push $v0 to the stack
 	sw $v0, 0($sp)
 	addi $sp $sp -4
 	
-	# assign (add here the expr.to_string) to t_42
-	# calling the method Init_List of type List
-	#load the variable t_41
-	lw $v0, -0($fp)
+	# assign (add here the expr.to_string) to t_2
+	# calling the method Init_Complex of type Complex
+	#load the variable t_1
+	lw $v0, -4($fp)
 	lw $v0, 0($v0)
 	lw $v1, 8($v0)
 	jal $v1
@@ -1032,14 +172,14 @@ main_Main:
 	addi $sp $sp 4
 	lw $v1, 0($sp)
 	
-	sw $v0, -4($fp)
-	
-	# assign (add here the expr.to_string) to t_43
-	#load the variable t_42
-	lw $v0, -4($fp)
 	sw $v0, -8($fp)
 	
-	# assign (add here the expr.to_string) to t_44
+	# assign (add here the expr.to_string) to t_3
+	#load the variable t_2
+	lw $v0, -8($fp)
+	sw $v0, -12($fp)
+	
+	# assign (add here the expr.to_string) to t_4
 	# Creating Int instance for atomic 1
 	li $a0, 8
 	li $v0, 9
@@ -1049,255 +189,10 @@ main_Main:
 	sw $t0, 0($v0)
 	sw $t1, 4($v0)
 	
-	sw $v0, -12($fp)
-	
-	lw $v0, -8($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -12($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_45
-	# calling the method cons of type List
-	#load the variable t_43
-	lw $v0, -8($fp)
-	lw $v0, 0($v0)
-	lw $v1, 36($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
 	sw $v0, -16($fp)
 	
-	# assign (add here the expr.to_string) to t_46
-	#load the variable t_45
-	lw $v0, -16($fp)
-	sw $v0, -20($fp)
-	
-	# assign (add here the expr.to_string) to t_47
-	# Creating Int instance for atomic 2
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 2
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	sw $v0, -24($fp)
-	
-	lw $v0, -20($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -24($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_48
-	# calling the method cons of type List
-	#load the variable t_46
-	lw $v0, -20($fp)
-	lw $v0, 0($v0)
-	lw $v1, 36($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -28($fp)
-	
-	# assign (add here the expr.to_string) to t_49
-	#load the variable t_48
-	lw $v0, -28($fp)
-	sw $v0, -32($fp)
-	
-	# assign (add here the expr.to_string) to t_50
-	# Creating Int instance for atomic 3
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 3
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	sw $v0, -36($fp)
-	
-	lw $v0, -32($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -36($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_51
-	# calling the method cons of type List
-	#load the variable t_49
-	lw $v0, -32($fp)
-	lw $v0, 0($v0)
-	lw $v1, 36($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -40($fp)
-	
-	# assign (add here the expr.to_string) to t_52
-	#load the variable t_51
-	lw $v0, -40($fp)
-	sw $v0, -44($fp)
-	
-	# assign (add here the expr.to_string) to t_53
-	# Creating Int instance for atomic 4
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 4
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	sw $v0, -48($fp)
-	
-	lw $v0, -44($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -48($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_54
-	# calling the method cons of type List
-	#load the variable t_52
-	lw $v0, -44($fp)
-	lw $v0, 0($v0)
-	lw $v1, 36($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -52($fp)
-	
-	# assign (add here the expr.to_string) to t_55
-	#load the variable t_54
-	lw $v0, -52($fp)
-	sw $v0, -56($fp)
-	
-	# assign (add here the expr.to_string) to t_56
-	# Creating Int instance for atomic 5
-	li $a0, 8
-	li $v0, 9
-	syscall
-	la $t0, Int
-	li $t1, 5
-	sw $t0, 0($v0)
-	sw $t1, 4($v0)
-	
-	sw $v0, -60($fp)
-	
-	lw $v0, -56($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	lw $v0, -60($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_57
-	# calling the method cons of type List
-	#load the variable t_55
-	lw $v0, -56($fp)
-	lw $v0, 0($v0)
-	lw $v1, 36($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -64($fp)
-	
-	# Setting value of the attribute mylist in the instance self_Main to t_57
-	#load the variable t_57
-	lw $v0, -64($fp)
-	move $s2, $v0
-	lw $v1, 12($fp)
-	sw $s2, 4($v1)
-	
-	while_0:
-	# assign (add here the expr.to_string) to t_58
-	lw $v1, 12($fp)
-	lw $v0, 4($v1)
-	sw $v0, -68($fp)
-	
-	lw $v0, -68($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# assign (add here the expr.to_string) to t_59
-	# calling the method isNil of type List
-	#load the variable t_58
-	lw $v0, -68($fp)
-	lw $v0, 0($v0)
-	lw $v1, 24($v0)
-	jal $v1
-	# pop the top of the stack to $v1
-	addi $sp $sp 4
-	lw $v1, 0($sp)
-	
-	sw $v0, -72($fp)
-	
-	# assign (add here the expr.to_string) to t_60
-	#load the variable t_59
-	lw $v0, -72($fp)
-	sw $v0, -76($fp)
-	
-	# assign (add here the expr.to_string) to t_61
-	#load the variable t_60
-	lw $v0, -76($fp)
-	# push $v0 to the stack
-	sw $v0, 0($sp)
-	addi $sp $sp -4
-	
-	# Creating Int instance for atomic 0
+	# assign (add here the expr.to_string) to t_5
+	# Creating Int instance for atomic 1
 	li $a0, 8
 	li $v0, 9
 	syscall
@@ -1306,6 +201,104 @@ main_Main:
 	sw $t0, 0($v0)
 	sw $t1, 4($v0)
 	
+	sw $v0, -20($fp)
+	
+	lw $v0, -12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	lw $v0, -16($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	lw $v0, -20($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_6
+	# calling the method init of type Complex
+	#load the variable t_3
+	lw $v0, -12($fp)
+	lw $v0, 0($v0)
+	lw $v1, 40($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -24($fp)
+	
+	# assign (add here the expr.to_string) to c_0
+	#load the variable t_6
+	lw $v0, -24($fp)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_7
+	#load the variable c_0
+	lw $v0, -0($fp)
+	sw $v0, -28($fp)
+	
+	lw $v0, -28($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_8
+	# calling the method reflect_X of type Complex
+	#load the variable t_7
+	lw $v0, -28($fp)
+	lw $v0, 0($v0)
+	lw $v1, 52($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -32($fp)
+	
+	# assign (add here the expr.to_string) to t_9
+	#load the variable c_0
+	lw $v0, -0($fp)
+	sw $v0, -36($fp)
+	
+	lw $v0, -36($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_10
+	# calling the method reflect_0 of type Complex
+	#load the variable t_9
+	lw $v0, -36($fp)
+	lw $v0, 0($v0)
+	lw $v1, 48($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -40($fp)
+	
+	# assign (add here the expr.to_string) to t_11
+	#load the variable t_8
+	lw $v0, -32($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_10
+	lw $v0, -40($fp)
 	# push $v0 to the stack
 	sw $v0, 0($sp)
 	addi $sp $sp -4
@@ -1319,44 +312,48 @@ main_Main:
 	addi $sp $sp 4
 	lw $t0, 0($sp)
 	
-	lw $t0, 4($v0)
-	li $t1, 1
-	xor $t0, $t0, $t1
-	andi $t0, $t0, 0x01
-	sw $t0, 4($v0)
-	sw $v0, -80($fp)
+	sw $v0, -44($fp)
 	
-	# assign (add here the expr.to_string) to t_62
-	#load the variable t_61
-	lw $v0, -80($fp)
-	sw $v0, -84($fp)
+	# assign (add here the expr.to_string) to t_12
+	#load the variable t_11
+	lw $v0, -44($fp)
+	sw $v0, -48($fp)
 	
-	lw $t1, -84($fp)
+	lw $t1, -48($fp)
 	lw $t0, 4($t1)
-	bne $t0, $zero, body_0
-	j pool_0
-	body_0:
-	# assign (add here the expr.to_string) to t_64
-	lw $v1, 12($fp)
-	lw $v0, 4($v1)
-	sw $v0, -92($fp)
+	bne $t0, $zero, then_0
+	# assign (add here the expr.to_string) to t_14
+	#load the string str_0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $v1, String
+	sw $v1, 0($v0)
+	la $v1, str_0
+	sw $v1, 4($v0)
+	sw $v0, -56($fp)
+	
+	# assign (add here the expr.to_string) to t_15
+	#load the variable t_14
+	lw $v0, -56($fp)
+	sw $v0, -60($fp)
 	
 	lw $v0, 12($fp)
 	# push $v0 to the stack
 	sw $v0, 0($sp)
 	addi $sp $sp -4
 	
-	lw $v0, -92($fp)
+	lw $v0, -60($fp)
 	# push $v0 to the stack
 	sw $v0, 0($sp)
 	addi $sp $sp -4
 	
-	# assign (add here the expr.to_string) to t_65
-	# calling the method print_list of type Main
+	# assign (add here the expr.to_string) to t_16
+	# calling the method out_string of type Main
 	#load the variable self_Main
 	lw $v0, 12($fp)
 	lw $v0, 0($v0)
-	lw $v1, 40($v0)
+	lw $v1, 24($v0)
 	jal $v1
 	# pop the top of the stack to $v1
 	addi $sp $sp 4
@@ -1366,57 +363,76 @@ main_Main:
 	addi $sp $sp 4
 	lw $v1, 0($sp)
 	
-	sw $v0, -96($fp)
+	sw $v0, -64($fp)
 	
-	# assign (add here the expr.to_string) to t_66
-	lw $v1, 12($fp)
-	lw $v0, 4($v1)
-	sw $v0, -100($fp)
+	# assign (add here the expr.to_string) to t_13
+	#load the variable t_16
+	lw $v0, -64($fp)
+	sw $v0, -52($fp)
 	
-	lw $v0, -100($fp)
+	j ifend_0
+	then_0:
+	# assign (add here the expr.to_string) to t_17
+	#load the string str_1
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $v1, String
+	sw $v1, 0($v0)
+	la $v1, str_1
+	sw $v1, 4($v0)
+	sw $v0, -68($fp)
+	
+	# assign (add here the expr.to_string) to t_18
+	#load the variable t_17
+	lw $v0, -68($fp)
+	sw $v0, -72($fp)
+	
+	lw $v0, 12($fp)
 	# push $v0 to the stack
 	sw $v0, 0($sp)
 	addi $sp $sp -4
 	
-	# assign (add here the expr.to_string) to t_67
-	# calling the method tail of type List
-	#load the variable t_66
-	lw $v0, -100($fp)
+	lw $v0, -72($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_19
+	# calling the method out_string of type Main
+	#load the variable self_Main
+	lw $v0, 12($fp)
 	lw $v0, 0($v0)
-	lw $v1, 32($v0)
+	lw $v1, 24($v0)
 	jal $v1
 	# pop the top of the stack to $v1
 	addi $sp $sp 4
 	lw $v1, 0($sp)
 	
-	sw $v0, -104($fp)
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
 	
-	# Setting value of the attribute mylist in the instance self_Main to t_67
-	#load the variable t_67
-	lw $v0, -104($fp)
-	move $s2, $v0
-	lw $v1, 12($fp)
-	sw $s2, 4($v1)
+	sw $v0, -76($fp)
 	
-	# assign (add here the expr.to_string) to t_63
-	#load the variable t_67
-	lw $v0, -104($fp)
-	sw $v0, -88($fp)
+	# assign (add here the expr.to_string) to t_13
+	#load the variable t_19
+	lw $v0, -76($fp)
+	sw $v0, -52($fp)
 	
-	j while_0
-	pool_0:
-	# assign (add here the expr.to_string) to t_68
-	#load the variable t_63
-	lw $v0, -88($fp)
-	sw $v0, -108($fp)
+	ifend_0:
+	# assign (add here the expr.to_string) to t_20
+	#load the variable t_13
+	lw $v0, -52($fp)
+	sw $v0, -80($fp)
 	
 	# return the value of the function in the register $v0
-	#load the variable t_68
-	lw $v0, -108($fp)
+	#load the variable t_20
+	lw $v0, -80($fp)
 	move $v0, $v0
 	
 	# restore the stack pointer, frame pointer y return address
-	addu $sp $sp 112
+	addu $sp $sp 84
 	# pop the top of the stack to $fp
 	addi $sp $sp 4
 	lw $fp, 0($sp)
@@ -1447,7 +463,7 @@ Init_Main:
 	sw $v0, 0($sp)
 	addi $sp $sp -4
 	
-	# assign (add here the expr.to_string) to self
+	# assign (add here the expr.to_string) to self_Main
 	jal Init_IO
 	# pop the top of the stack to $v1
 	addi $sp $sp 4
@@ -1456,7 +472,1229 @@ Init_Main:
 	sw $v0, 12($fp)
 	
 	# return the value of the function in the register $v0
-	#load the variable self
+	#load the variable self_Main
+	lw $v0, 12($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 0
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+init_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 20
+	
+	# assign (add here the expr.to_string) to t_23
+	lw $v1, 20($fp)
+	lw $v0, 4($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_24
+	#load the variable t_23
+	lw $v0, -0($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable a_21
+	lw $v0, 16($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -4($fp)
+	
+	# assign (add here the expr.to_string) to t_25
+	lw $v1, 20($fp)
+	lw $v0, 8($v1)
+	sw $v0, -8($fp)
+	
+	# assign (add here the expr.to_string) to t_26
+	#load the variable t_25
+	lw $v0, -8($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable b_22
+	lw $v0, 12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -12($fp)
+	
+	# assign (add here the expr.to_string) to t_27
+	#load the variable self_Complex
+	lw $v0, 20($fp)
+	sw $v0, -16($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_27
+	lw $v0, -16($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 20
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+print_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 92
+	
+	# assign (add here the expr.to_string) to t_28
+	lw $v1, 12($fp)
+	lw $v0, 8($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_29
+	#load the variable t_28
+	lw $v0, -0($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -4($fp)
+	
+	# assign (add here the expr.to_string) to t_30
+	#load the variable t_29
+	lw $v0, -4($fp)
+	sw $v0, -8($fp)
+	
+	lw $t1, -8($fp)
+	lw $t0, 4($t1)
+	bne $t0, $zero, then_1
+	# assign (add here the expr.to_string) to t_32
+	lw $v1, 12($fp)
+	lw $v0, 4($v1)
+	sw $v0, -16($fp)
+	
+	# assign (add here the expr.to_string) to t_33
+	#load the variable t_32
+	lw $v0, -16($fp)
+	sw $v0, -20($fp)
+	
+	lw $v0, 12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	lw $v0, -20($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_34
+	# calling the method out_int of type Complex
+	#load the variable self_Complex
+	lw $v0, 12($fp)
+	lw $v0, 0($v0)
+	lw $v1, 28($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -24($fp)
+	
+	# assign (add here the expr.to_string) to t_35
+	#load the variable t_34
+	lw $v0, -24($fp)
+	sw $v0, -28($fp)
+	
+	# assign (add here the expr.to_string) to t_36
+	#load the string str_2
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $v1, String
+	sw $v1, 0($v0)
+	la $v1, str_2
+	sw $v1, 4($v0)
+	sw $v0, -32($fp)
+	
+	# assign (add here the expr.to_string) to t_37
+	#load the variable t_36
+	lw $v0, -32($fp)
+	sw $v0, -36($fp)
+	
+	lw $v0, -28($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	lw $v0, -36($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_38
+	# calling the method out_string of type Complex
+	#load the variable t_35
+	lw $v0, -28($fp)
+	lw $v0, 0($v0)
+	lw $v1, 24($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -40($fp)
+	
+	# assign (add here the expr.to_string) to t_39
+	#load the variable t_38
+	lw $v0, -40($fp)
+	sw $v0, -44($fp)
+	
+	# assign (add here the expr.to_string) to t_40
+	lw $v1, 12($fp)
+	lw $v0, 8($v1)
+	sw $v0, -48($fp)
+	
+	# assign (add here the expr.to_string) to t_41
+	#load the variable t_40
+	lw $v0, -48($fp)
+	sw $v0, -52($fp)
+	
+	lw $v0, -44($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	lw $v0, -52($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_42
+	# calling the method out_int of type Complex
+	#load the variable t_39
+	lw $v0, -44($fp)
+	lw $v0, 0($v0)
+	lw $v1, 28($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -56($fp)
+	
+	# assign (add here the expr.to_string) to t_43
+	#load the variable t_42
+	lw $v0, -56($fp)
+	sw $v0, -60($fp)
+	
+	# assign (add here the expr.to_string) to t_44
+	#load the string str_3
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $v1, String
+	sw $v1, 0($v0)
+	la $v1, str_3
+	sw $v1, 4($v0)
+	sw $v0, -64($fp)
+	
+	# assign (add here the expr.to_string) to t_45
+	#load the variable t_44
+	lw $v0, -64($fp)
+	sw $v0, -68($fp)
+	
+	lw $v0, -60($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	lw $v0, -68($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_46
+	# calling the method out_string of type Complex
+	#load the variable t_43
+	lw $v0, -60($fp)
+	lw $v0, 0($v0)
+	lw $v1, 24($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -72($fp)
+	
+	# assign (add here the expr.to_string) to t_31
+	#load the variable t_46
+	lw $v0, -72($fp)
+	sw $v0, -12($fp)
+	
+	j ifend_1
+	then_1:
+	# assign (add here the expr.to_string) to t_47
+	lw $v1, 12($fp)
+	lw $v0, 4($v1)
+	sw $v0, -76($fp)
+	
+	# assign (add here the expr.to_string) to t_48
+	#load the variable t_47
+	lw $v0, -76($fp)
+	sw $v0, -80($fp)
+	
+	lw $v0, 12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	lw $v0, -80($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_49
+	# calling the method out_int of type Complex
+	#load the variable self_Complex
+	lw $v0, 12($fp)
+	lw $v0, 0($v0)
+	lw $v1, 28($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -84($fp)
+	
+	# assign (add here the expr.to_string) to t_31
+	#load the variable t_49
+	lw $v0, -84($fp)
+	sw $v0, -12($fp)
+	
+	ifend_1:
+	# assign (add here the expr.to_string) to t_50
+	#load the variable t_31
+	lw $v0, -12($fp)
+	sw $v0, -88($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_50
+	lw $v0, -88($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 92
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+reflect_0_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 44
+	
+	# assign (add here the expr.to_string) to t_51
+	lw $v1, 12($fp)
+	lw $v0, 4($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_52
+	lw $v1, 12($fp)
+	lw $v0, 4($v1)
+	sw $v0, -4($fp)
+	
+	# assign (add here the expr.to_string) to t_53
+	#load the variable t_52
+	lw $v0, -4($fp)
+	sw $v0, -8($fp)
+	
+	# assign (add here the expr.to_string) to t_54
+	# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at $v0
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	lw $t0, 4($v0)
+	# push $t0 to the stack
+	sw $t0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_53
+	lw $v0, -8($fp)
+	lw $t1, 4($v0)
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sub $t0, $t0, $t1
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t1, Int
+	sw $t1, 0($v0)
+	sw $t0, 4($v0)
+	sw $v0, -12($fp)
+	
+	# assign (add here the expr.to_string) to t_55
+	#load the variable t_51
+	lw $v0, -0($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_54
+	lw $v0, -12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -16($fp)
+	
+	# assign (add here the expr.to_string) to t_56
+	lw $v1, 12($fp)
+	lw $v0, 8($v1)
+	sw $v0, -20($fp)
+	
+	# assign (add here the expr.to_string) to t_57
+	lw $v1, 12($fp)
+	lw $v0, 8($v1)
+	sw $v0, -24($fp)
+	
+	# assign (add here the expr.to_string) to t_58
+	#load the variable t_57
+	lw $v0, -24($fp)
+	sw $v0, -28($fp)
+	
+	# assign (add here the expr.to_string) to t_59
+	# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at $v0
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	lw $t0, 4($v0)
+	# push $t0 to the stack
+	sw $t0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_58
+	lw $v0, -28($fp)
+	lw $t1, 4($v0)
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sub $t0, $t0, $t1
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t1, Int
+	sw $t1, 0($v0)
+	sw $t0, 4($v0)
+	sw $v0, -32($fp)
+	
+	# assign (add here the expr.to_string) to t_60
+	#load the variable t_56
+	lw $v0, -20($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_59
+	lw $v0, -32($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -36($fp)
+	
+	# assign (add here the expr.to_string) to t_61
+	#load the variable self_Complex
+	lw $v0, 12($fp)
+	sw $v0, -40($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_61
+	lw $v0, -40($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 44
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+reflect_X_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 24
+	
+	# assign (add here the expr.to_string) to t_62
+	lw $v1, 12($fp)
+	lw $v0, 8($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_63
+	lw $v1, 12($fp)
+	lw $v0, 8($v1)
+	sw $v0, -4($fp)
+	
+	# assign (add here the expr.to_string) to t_64
+	#load the variable t_63
+	lw $v0, -4($fp)
+	sw $v0, -8($fp)
+	
+	# assign (add here the expr.to_string) to t_65
+	# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at $v0
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	lw $t0, 4($v0)
+	# push $t0 to the stack
+	sw $t0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_64
+	lw $v0, -8($fp)
+	lw $t1, 4($v0)
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sub $t0, $t0, $t1
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t1, Int
+	sw $t1, 0($v0)
+	sw $t0, 4($v0)
+	sw $v0, -12($fp)
+	
+	# assign (add here the expr.to_string) to t_66
+	#load the variable t_62
+	lw $v0, -0($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_65
+	lw $v0, -12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -16($fp)
+	
+	# assign (add here the expr.to_string) to t_67
+	#load the variable self_Complex
+	lw $v0, 12($fp)
+	sw $v0, -20($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_67
+	lw $v0, -20($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 24
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+reflect_Y_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 24
+	
+	# assign (add here the expr.to_string) to t_68
+	lw $v1, 12($fp)
+	lw $v0, 4($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_69
+	lw $v1, 12($fp)
+	lw $v0, 4($v1)
+	sw $v0, -4($fp)
+	
+	# assign (add here the expr.to_string) to t_70
+	#load the variable t_69
+	lw $v0, -4($fp)
+	sw $v0, -8($fp)
+	
+	# assign (add here the expr.to_string) to t_71
+	# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at $v0
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	lw $t0, 4($v0)
+	# push $t0 to the stack
+	sw $t0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_70
+	lw $v0, -8($fp)
+	lw $t1, 4($v0)
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sub $t0, $t0, $t1
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t1, Int
+	sw $t1, 0($v0)
+	sw $t0, 4($v0)
+	sw $v0, -12($fp)
+	
+	# assign (add here the expr.to_string) to t_72
+	#load the variable t_68
+	lw $v0, -0($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_71
+	lw $v0, -12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -16($fp)
+	
+	# assign (add here the expr.to_string) to t_73
+	#load the variable self_Complex
+	lw $v0, 12($fp)
+	sw $v0, -20($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_73
+	lw $v0, -20($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 24
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+equal_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 64
+	
+	# assign (add here the expr.to_string) to t_75
+	lw $v1, 16($fp)
+	lw $v0, 4($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_76
+	#load the variable d_74
+	lw $v0, 12($fp)
+	sw $v0, -4($fp)
+	
+	lw $v0, -4($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_77
+	# calling the method x_value of type Complex
+	#load the variable t_76
+	lw $v0, -4($fp)
+	lw $v0, 0($v0)
+	lw $v1, 64($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -8($fp)
+	
+	# assign (add here the expr.to_string) to t_78
+	#load the variable t_75
+	lw $v0, -0($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_77
+	lw $v0, -8($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -12($fp)
+	
+	# assign (add here the expr.to_string) to t_79
+	#load the variable t_78
+	lw $v0, -12($fp)
+	sw $v0, -16($fp)
+	
+	lw $t1, -16($fp)
+	lw $t0, 4($t1)
+	bne $t0, $zero, then_2
+	# assign (add here the expr.to_string) to t_81
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# Creating Int instance for atomic 1
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 1
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -24($fp)
+	
+	# assign (add here the expr.to_string) to t_80
+	#load the variable t_81
+	lw $v0, -24($fp)
+	sw $v0, -20($fp)
+	
+	j ifend_2
+	then_2:
+	# assign (add here the expr.to_string) to t_82
+	lw $v1, 16($fp)
+	lw $v0, 8($v1)
+	sw $v0, -28($fp)
+	
+	# assign (add here the expr.to_string) to t_83
+	#load the variable d_74
+	lw $v0, 12($fp)
+	sw $v0, -32($fp)
+	
+	lw $v0, -32($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to t_84
+	# calling the method y_value of type Complex
+	#load the variable t_83
+	lw $v0, -32($fp)
+	lw $v0, 0($v0)
+	lw $v1, 68($v0)
+	jal $v1
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, -36($fp)
+	
+	# assign (add here the expr.to_string) to t_85
+	#load the variable t_82
+	lw $v0, -28($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	#load the variable t_84
+	lw $v0, -36($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -40($fp)
+	
+	# assign (add here the expr.to_string) to t_86
+	#load the variable t_85
+	lw $v0, -40($fp)
+	sw $v0, -44($fp)
+	
+	lw $t1, -44($fp)
+	lw $t0, 4($t1)
+	bne $t0, $zero, then_3
+	# assign (add here the expr.to_string) to t_88
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# Creating Int instance for atomic 1
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 1
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -52($fp)
+	
+	# assign (add here the expr.to_string) to t_87
+	#load the variable t_88
+	lw $v0, -52($fp)
+	sw $v0, -48($fp)
+	
+	j ifend_3
+	then_3:
+	# assign (add here the expr.to_string) to t_89
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# Creating Int instance for atomic 0
+	li $a0, 8
+	li $v0, 9
+	syscall
+	la $t0, Int
+	li $t1, 0
+	sw $t0, 0($v0)
+	sw $t1, 4($v0)
+	
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	jal compare
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	# pop the top of the stack to $t0
+	addi $sp $sp 4
+	lw $t0, 0($sp)
+	
+	sw $v0, -56($fp)
+	
+	# assign (add here the expr.to_string) to t_87
+	#load the variable t_89
+	lw $v0, -56($fp)
+	sw $v0, -48($fp)
+	
+	ifend_3:
+	# assign (add here the expr.to_string) to t_80
+	#load the variable t_87
+	lw $v0, -48($fp)
+	sw $v0, -20($fp)
+	
+	ifend_2:
+	# assign (add here the expr.to_string) to t_90
+	#load the variable t_80
+	lw $v0, -20($fp)
+	sw $v0, -60($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_90
+	lw $v0, -60($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 64
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+x_value_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 8
+	
+	# assign (add here the expr.to_string) to t_91
+	lw $v1, 12($fp)
+	lw $v0, 4($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_92
+	#load the variable t_91
+	lw $v0, -0($fp)
+	sw $v0, -4($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_92
+	lw $v0, -4($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 8
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+y_value_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 8
+	
+	# assign (add here the expr.to_string) to t_93
+	lw $v1, 12($fp)
+	lw $v0, 8($v1)
+	sw $v0, -0($fp)
+	
+	# assign (add here the expr.to_string) to t_94
+	#load the variable t_93
+	lw $v0, -0($fp)
+	sw $v0, -4($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable t_94
+	lw $v0, -4($fp)
+	move $v0, $v0
+	
+	# restore the stack pointer, frame pointer y return address
+	addu $sp $sp 8
+	# pop the top of the stack to $fp
+	addi $sp $sp 4
+	lw $fp, 0($sp)
+	
+	# pop the top of the stack to $ra
+	addi $sp $sp 4
+	lw $ra, 0($sp)
+	
+	jr $ra
+	
+	.text
+Init_Complex:
+	# save the return address and frame pointer
+	# push $ra to the stack
+	sw $ra, 0($sp)
+	addi $sp $sp -4
+	
+	# push $fp to the stack
+	sw $fp, 0($sp)
+	addi $sp $sp -4
+	
+	# update the frame pointer and allocate the frame in the stack
+	move $fp $sp
+	subu $sp $sp 0
+	
+	lw $v0, 12($fp)
+	# push $v0 to the stack
+	sw $v0, 0($sp)
+	addi $sp $sp -4
+	
+	# assign (add here the expr.to_string) to self_Complex
+	jal Init_IO
+	# pop the top of the stack to $v1
+	addi $sp $sp 4
+	lw $v1, 0($sp)
+	
+	sw $v0, 12($fp)
+	
+	# return the value of the function in the register $v0
+	#load the variable self_Complex
 	lw $v0, 12($fp)
 	move $v0, $v0
 	
@@ -1683,11 +1921,6 @@ abort_Object:
         lw $ra, 0($sp)
        
         jr $ra
-        
-
-
-
-
 
 
 
@@ -1794,7 +2027,34 @@ in_string_IO:
        
         jr $ra
 
+in_int_IO:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
 
+        li $v0, 5
+        syscall
+        move $t0, $v0
+
+        li $v0, 9
+        li $a0, 8
+        syscall
+
+        la $t1, Int
+        sw $t1, 0($v0)
+        sw $t0, 4($v0)
+
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
 		
 
 
@@ -2073,6 +2333,16 @@ compare:
         lw $ra, 0($sp)
         
         jr $ra
+
+
+concat_String:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+		
 
 
 
