@@ -82,15 +82,18 @@ class CIL:
                     expr = self.visit(feature.expr)
                     features.append((feature.id, feature.type, expr, self.scope.instructions.copy()))
                     self.scope.instructions =  []
-                    locals.extend(self.scope.all_locals.copy())
                 else:
                     expr = None
                     features.append((feature.id, feature.type, None, None))
+                
+                locals.extend(self.scope.all_locals.copy())
                    
             else:
                 function = self.visit(feature)
                 self.scope.functions.append(function) 
 
+        self.scope.locals = [{}]
+        self.scope.all_locals = []
         init_class = self.scope.create_init_class(features, locals)    
         self.scope.functions.append(init_class)  
         

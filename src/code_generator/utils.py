@@ -177,7 +177,7 @@ class CILScope:
                 instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.current_class}'), self.current_class, CILVariableNode(id), variable)) 
         
         instructions.append(CILReturnNode(CILVariableNode(f'self_{self.current_class}')))
-        
+        locals.extend(self.all_locals.copy())
         return CILFuncNode(f'Init_{self.current_class}', [CILParamNode(f'self_{self.current_class}', None)], locals, instructions)
 
 
