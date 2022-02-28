@@ -146,12 +146,12 @@ class TypesInferencer:
 
     @visitor.when(CaseOptionNode)
     def visit(self, node: CaseOptionNode, scope: Scope) -> types_ast.CaseOptionNode:
-        ancestor_types: List[str] = self.context.get_successors(node.branch_type.name)
+        successors: List[str] = self.context.get_successors(node.branch_type.name)
 
         return types_ast.CaseOptionNode(
             self.visit(node.expr, scope),
             node.branch_type.heads[0],
-            ancestor_types,
+            successors,
             node,
         )
 
