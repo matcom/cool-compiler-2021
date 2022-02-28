@@ -159,6 +159,10 @@ class CILCodegen:
     def visit(self, node):
         return f'{node.lex}'
     
+    @visitor.when(CILExceptionNode)
+    def visit(self, node):
+        return f'{node.lex}'
+    
     @visitor.when(CILPlusNode)
     def visit(self, node: CILPlusNode):
         l = self.visit(node.left)

@@ -5,8 +5,7 @@ from .ast_CIL import *
 from .utils import *
 from cmp.semantic import IOType, IntType, StringType, BoolType, ObjectType
 import cmp.visitor as visitor
-from itertools import chain
-from collections import OrderedDict
+
 
     
 class CIL:
@@ -248,53 +247,76 @@ class CIL:
     def visit(self, node):
         expr = self.visit(node.expr)
         self.expression_var_case = expr
+        
+        list, valid = return_list_valid_case(node,self.to,self.table)
         name = self.scope.add_new_local(node.expr.computed_type.name)
         var = CILVariableNode(name)
+       
         self.scope.instructions.append(CILAssignNode(var, expr))
         
         expr_type_of = CILTypeOfNode(var)
         name_type_expr = self.scope.add_new_local(node.expr.computed_type.name)
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name_type_expr), expr_type_of))     
+       
         name_return =  self.scope.add_new_local(node.computed_type.name)
         return_ = CILVariableNode(name_return)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("Listt: ------")  
+        print(list)
+        print("valid-----")
+        print(valid)
+        print("node_casess----------")
+        for case in  node.cases:
+            print(case.type)
+        keys = [branch.type for branch in node.cases]    
+        #for case, index in zip(node.cases,range(0, len(node.cases))):
+           # if index != 0:
+           #     self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
         
-        order = order_case_branc_to(node.cases,self.to)
-        valid = valid_case(self.table,order)
-        s = list(valid.values())
-        iterator = chain(*s)
-        l = list(iterator)
-        m = list(OrderedDict.fromkeys(l))
-        print(m)
-            
-        for case, index in zip(node.cases,range(0, len(node.cases))):
-            if index != 0:
-                self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
-        
-            case_expr_type_of = CILTypeConstantNode(case.type)    
-            
-        #index  = 0
-        #for case in node.cases:
-            #s = m 
-            #for new_branch in m :
-               # try:
-                   # if new_branch in valid[case.type]:
-            #if index != 0:
-                #self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
+            #case_expr_type_of = CILTypeConstantNode(case.type)       
+        index  = 0
+        for case in node.cases:
+            print("FORrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+            print(case.type)
+            s = list 
             name_var_condition = self.scope.add_new_local(None)
             var_condition = CILVariableNode(name_var_condition)
+            
+            if index != 0:
+                self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index - 1}')) 
             case_expr_type_of = CILTypeConstantNode(case.type)
             self.scope.instructions.append(CILAssignNode(var_condition, CILNotEqualsNode(CILVariableNode(name_type_expr),case_expr_type_of)))
+            
+            expr_attr = self.visit(case)
             
             if index == len(node.cases) - 1:
                     self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
             else:
                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))
-
-            expr_attr = self.visit(case)
-            
+                
             self.scope.instructions.append(CILAssignNode(return_, expr_attr))    
             self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))
-
+            index += 1
+            for new_branch in s :
+                print("lolllllllllllllllllllllllllllllll")
+                print(new_branch)
+                try:
+                    if new_branch not in keys and new_branch in valid[case.type]:
+                        print("entrooooo")
+                        print(new_branch)
+                        case_expr_type_of = CILTypeConstantNode(new_branch)    
+                        self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
+                        index +=1
+                        list.remove(new_branch)
+                        if index == len(node.cases) - 1:
+                            self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
+                        else:
+                            self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))     
+                        self.scope.instructions.append(CILAssignNode(return_, expr_attr)) 
+                        self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))                       
+                except :
+                    pass        
+        self.scope.instructions.append(CILAssignNode(return_,CILExceptionNode("Exception in case ")))
         self.scope.instructions.append(CILLabelNode(f'case_end{ self.scope.case_count}'))
         self.scope.case_count += 1 
         return return_

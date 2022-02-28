@@ -2,6 +2,8 @@ from cmp.semantic import IntType, ObjectType, StringType, BoolType
 from .ast_CIL import *
 from collections import deque
 import numpy as np 
+from itertools import chain
+from collections import OrderedDict
 
 class CILScope:
     def __init__(self, context):
@@ -287,7 +289,16 @@ def valid_case (table, branchs):
                valid[key].append(m[0])
             except:
                 valid[key] = [m[0]]
-    return valid            
+    return valid  
+
+def return_list_valid_case(node, to, table ):
+        order = order_case_branc_to(node.cases,to)
+        valid = valid_case(table,order)
+        s = list(valid.values())
+        iterator = chain(*s)
+        l = list(iterator)
+        m = list(OrderedDict.fromkeys(l))
+        return m, valid         
   
             
                      

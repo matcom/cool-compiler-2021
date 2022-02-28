@@ -303,9 +303,11 @@ class CILAtomicNode(CILExpressionNode):
 
 
 class CILVariableNode(CILAtomicNode):
-    pass     
+    pass   
 
-
+class CILExceptionNode(CILAtomicNode):
+    pass
+  
 class CILTypeConstantNode(CILAtomicNode):
     pass               
            
