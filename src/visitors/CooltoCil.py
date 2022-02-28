@@ -65,20 +65,28 @@ class BaseCOOLToCILVisitor:
         return self.current_function.instructions
     
 
-    def register_param(self, vinfo):
-        name = f'local_param_{self.current_function.name}_{vinfo.name}_{len(self.params)}'
+    def register_param(self, p):
+        # try:
+        #     p.lex
+        # except:
+        #     _ = 0
+        name = f'param_at_{self.current_function.name}_{p.name}_{len(self.params)}'
         pnode = cil.ParamNode(name)
+        self.dvars[p.name] = cil.VarNode(name)
         self.params.append(pnode)
-        self.dvars[vinfo.name] = cil.VarNode(name)
-        return self.dvars[vinfo.name]
+        return self.dvars[p.name]
 
-    def register_local(self, vinfo):
-        name = vinfo.name
-        vinfo.name = f'local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}'
-        local_node = cil.LocalNode(vinfo.name)
+    def register_local(self, v):
+        name = v.name
+        try:
+            v.lex
+        except:
+            _ = 0
+        v.name = f'local_{self.current_function.name[9:]}_{v.name}_{len(self.localvars)}'
+        local_node = cil.LocalNode(v.name)
+        self.dvars[name] = cil.VarNode(v.name)
         self.localvars.append(local_node)
-        self.dvars[name] = cil.VarNode(vinfo.name)
-        return self.dvars[name] # indexar en vinfo.name y quitar la 1ra linea
+        return self.dvars[name]
 
     def register_attribute(self, name, type):
         name =  f'attr_{type}_{name}'
