@@ -147,7 +147,7 @@ class Lexer:
     # String rules
     def t_string(self, t):
         r'"'
-        self._string_value = '"'
+        self._string_value = ''
         t.lexer.col += 1
         self._string_value += t.value
         self._string_line = t.lexer.lineno
@@ -165,13 +165,14 @@ class Lexer:
         t.value = self._string_value + t.value
         t.col = self._string_col
         t.line = self._string_line
-        for index, char in enumerate(t.value[1:-1]):
+        for index, char in enumerate(t.value):
             if char == "\0":
                 null_col = t.col + index
                 null_line = t.line
                 self.errors.append(
                     LexicographicError(null_line, null_col, "NULL CHARACTER")
                 )
+        t.value = t.value[1:-1]
         return t
 
     def t_string_space(self, t):
