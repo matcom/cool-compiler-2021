@@ -9,6 +9,7 @@ from visitors.CooltoCil import COOLToCILVisitor
 from visitors.CilDepicter import get_formatter
 
 
+
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
         self.context: Context = Context()
@@ -44,4 +45,8 @@ class Pipeline():
                     self.coolToCil = COOLToCILVisitor(self.context)
                     cil_ast = self.coolToCil.visit(self.ast, scope)
                     __a = 0
-                    self.mipsCode = ''
+                    MIPSVisitor = CILToMIPSVisitor()
+                    MIPSAst = MIPSVisitor.visit(cil_ast)
+                    MIPSFormatter = MIPSAstFormatter()
+                    mipsCode = MIPSFormatter.visit(MIPSAst)
+                    self.mipsCode = mipsCode
