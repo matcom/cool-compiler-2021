@@ -1,3 +1,4 @@
+import visitors.visitor as visitor
 class Node:
     def __init__(self):
       pass
