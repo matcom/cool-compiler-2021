@@ -1,9 +1,7 @@
-from distutils.log import error
 from cool_ast.cool_ast import *
 import cil_ast.cil_ast as cil
-from utils.semantic import Context, SemanticError, Type, Method, Scope, ErrorType, VariableInfo
+from utils.semantic import VariableInfo
 import visitors.visitor as visitor
-# from utils.errors import _TypeError, _NameError, _SemanticError, _AtributeError
 
 class BaseCOOLToCILVisitor:
     def __init__(self, context):

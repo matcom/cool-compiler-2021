@@ -41,17 +41,9 @@ class TypeChecker:
 
                 
         for attr, owner in self.current_type.all_attributes(): #definir atributos de los ancestros
-            # if owner != self.current_type:
-                # scope.define_variable(attr.name, attr.type)
             scope.define_variable(attr.name, attr.type)
 
 
-        # for attr in attrs:
-        #     self.visit(attr, scope)
-
-        # for method in methods:
-        #     self.visit(method, scope.create_child())
-        
         for feature in node.features:
             if isinstance(feature, AttrDeclarationNode):
                 cscope = scope.create_child()
@@ -102,7 +94,6 @@ class TypeChecker:
         elseT = self.visit(node.elseChunk, scope.create_child())
 
         if ifT != self.context.get_type('Bool'):
-            # self.errors.append(f"Can't convert {ifT.name} to Bool.")
             self.errors.append(_TypeError % (node.ifChunk.token_list[0].lineno, node.ifChunk.token_list[0].col,f"Predicate of 'if' does not have type Bool."))
         try:
             node.type = thenT.join(elseT)
@@ -138,16 +129,12 @@ class TypeChecker:
             else:
                 expr = None
             if expr is not None and not expr.conforms_to(var_type):
-                # self.errors.append(f"Can't convert {expr.name} to {var_type.name}.")
                 self.errors.append(_TypeError %(node.decl_list[iteration].token_list[0].lineno, node.decl_list[iteration].token_list[0].col, f"Infered type {expr.name} of initialization of {_id} does not conform to identifier's declared type {var_type.name}"))
             
-            ## this else is to assign to the variable the type of the right-side expression, but it doesnt pass the semantic tests this way, f
-            # else:
-            #     var_type = expr
             scope.define_variable(_id, var_type)
             iteration+=1
         expr_type = self.visit(node.expression, scope.create_child())
-        node.type = expr_type #node.expression.type
+        node.type = expr_type 
         return node.type
 
     @visitor.when(AttrDeclarationNode)
@@ -159,7 +146,6 @@ class TypeChecker:
         _char = node.id[0]
 
         if _char not in ''.join(chr(n) for n in range(ord('a'),ord('z')+1)):
-            # self.errors.append((f'Attribute names must not be capitalized'))
             self.errors.append(_SemanticError %(node.token_list[0].lineno, node.token_list[0].col, f"Attribute names must not be capitalized."))
 
         if node.type != 'SELF_TYPE':
@@ -172,15 +158,7 @@ class TypeChecker:
         if node.value is not None:
             value_t = self.visit(node.value, scope.create_child())
             if not value_t.conforms_to(attrType):
-                # self.errors.append(f"Can't convert {value_t.name} to {attrType.name}.")
                 self.errors.append(_TypeError %(node.value.token_list[0].lineno, node.value.token_list[0].col, f'Infered type {value_t.name} of initialization of attribute {node.id} does not conform to declared type {attrType.name}'))
-            
-            ## this is to assign to the variable the type of the right-side expression, but it doesnt pass the semantic tests this way, f
-            # attrType = value_t
-        # else:
-        #     scope.create_child()
-
-        # scope.define_variable(node.id, attrType)
         
     @visitor.when(AssignNode)
     def visit(self, node, scope):
@@ -204,11 +182,8 @@ class TypeChecker:
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
-        # if node.condition.lex == 'true':
-        #     _ = 0
         condition = self.visit(node.condition, scope.create_child())
         if condition != self.context.get_type('Bool'):
-            # self.errors.append(f"Can't convert {condition.name} to Bool.")
             self.errors.append(_TypeError %(node.condition.token_list[0].lineno, node.condition.token_list[0].col, f'Loop condition does not have type Bool.'))
 
         self.visit(node.loopChunk, scope.create_child())
@@ -217,7 +192,6 @@ class TypeChecker:
 
     @visitor.when(ChunkNode)
     def visit(self, node, scope):
-        # child_scope = scope.create_child()
         return_type = ErrorType()
         
         for expr in node.chunk:
@@ -264,7 +238,6 @@ class TypeChecker:
             node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' + '+str(rt.name)))
-        # self.errors.append(f'Undefined operation "+" between {lt.name} and {rt.name}.')
         node.type = ErrorType()
         return ErrorType()
 
@@ -279,7 +252,6 @@ class TypeChecker:
             node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' - '+str(rt.name)))
-        # self.errors.append(f'Undefined operation "-" between {lt.name} and {rt.name}.')
         node.type = ErrorType()
         return ErrorType()
 
@@ -294,7 +266,6 @@ class TypeChecker:
             node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' * '+str(rt.name)))
-        # self.errors.append(f'Undefined operation "*" between {lt.name} and {rt.name}.')
         node.type = ErrorType()
         return ErrorType()
 
@@ -309,7 +280,6 @@ class TypeChecker:
             node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' / '+str(rt.name)))
-        # self.errors.append(f'Undefined operation "/" between {lt.name} and {rt.name}.')
         node.type = ErrorType()
         return ErrorType()
 
@@ -327,7 +297,6 @@ class TypeChecker:
 
             if not obj_type.conforms_to(ancestor_type):
                 self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f'Expression type {obj_type.name} does not conform to declared static dispatch type {ancestor_type.name}.'))
-                # self.errors.append(f'{obj_type.name} does not inherits from {ancestor_type.name}.')
         else:
             ancestor_type = obj_type
 
@@ -346,7 +315,6 @@ class TypeChecker:
             for i, arg in enumerate(node.args):
                 arg_type = self.visit(arg, scope)
                 if not arg_type.conforms_to(method.param_types[i]):
-                    # self.errors.append(f"Can't convert {arg_type.name} to {method.param_types[i].name}.")
                     self.errors.append(_TypeError %(node.args[i].token_list[0].lineno, node.args[i].token_list[0].col, f"In call of {method.name}, type {arg_type.name} of parameter {method.param_names[i]} does not conform to declare type {method.param_types[i].name}"))
 
         if method.return_type.name != 'SELF_TYPE':
@@ -389,7 +357,6 @@ class TypeChecker:
                 except SemanticError as e:
                     pass
         if variable is None:
-            # self.errors.append(f'Variable {node.lex} is not defined in {self.current_method.name}.')
             self.errors.append(_NameError % (node.token_list[0].lineno, node.token_list[0].col, f"Undeclared identifier {node.lex}."))
             node.type = ErrorType()
             return ErrorType()
@@ -407,7 +374,6 @@ class TypeChecker:
                 return self.current_type
         except SemanticError as e:
             self.errors.append(_TypeError % (node.token_list[1].lineno, node.token_list[1].col, f"'new' used with undefined class {node.lex}."))
-            # self.errors.append(e.text)
             node.errors = ErrorType
             return ErrorType()
 
@@ -418,7 +384,6 @@ class TypeChecker:
             node.type = tp
             return tp
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f"Argument of 'not' has type {tp.name} instead of Bool."))
-        # self.errors.append(f'Undefined operation "not" for {tp.name}.')
         node.type = ErrorType()
         return ErrorType()
 
@@ -429,7 +394,6 @@ class TypeChecker:
             node.type = tp
             return tp
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f"Argument of '~' has type {tp.name} instead of Int."))
-        # self.errors.append(f'Undefined operation "~" for {tp.name}.')
         node.type = ErrorType()
         return ErrorType()
 
@@ -451,7 +415,6 @@ class TypeChecker:
             node.type = boolType
             return boolType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' <= '+str(rt.name)))
-        # self.errors.append(f'Undefined operation "<=" for {lt.name} and {rt.name}.')
         node.type = ErrorType()
         return ErrorType()
 
@@ -466,7 +429,6 @@ class TypeChecker:
             node.type = boolType
             return boolType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' < '+str(rt.name)))
-        # self.errors.append(f'Undefined operation "<" for {lt.name} and {rt.name}.')
         return ErrorType()
 
     @visitor.when(EqualNode)

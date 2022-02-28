@@ -1217,7 +1217,6 @@ class CILToMipsVisitor:
         return instructions
     
     def define_util_functions(self):
-        # instructions = [self.allocate(), self.copy(), self.length(), self.substring(), self.concat(), self.read_string(), self.string_equals()]
         instructions = [self.allocate(), self.copy(), self.length(), self.concat(), self.substring(), self.string_equals(), self.read_string()]
         
         code = '\n\n'.join('\n'.join(i for i in j) for j in instructions)

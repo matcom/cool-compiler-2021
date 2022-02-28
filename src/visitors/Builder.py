@@ -1,6 +1,6 @@
 from cool_ast.cool_ast import ProgramNode, ClassDeclarationNode, AttrDeclarationNode, FuncDeclarationNode
 import visitors.visitor as visitor
-from utils.semantic import Context, SemanticError, Type, ErrorType
+from utils.semantic import SemanticError, ErrorType
 from utils.errors import _SemanticError, _TypeError
 
 class TypeBuilder:
