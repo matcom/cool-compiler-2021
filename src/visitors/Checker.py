@@ -66,7 +66,7 @@ class TypeChecker:
             else:
                 self.visit(feature, scope.create_child())
 
-        
+        node.type = self.current_type
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -104,6 +104,7 @@ class TypeChecker:
             rType = self.current_type
 
         exprType = self.visit(node.body, scope)
+        node.type = self.current_method.return_type
 
         if not exprType.conforms_to(rType):
             self.errors.append(_TypeError %(node.body.token_list[0].lineno, node.body.token_list[0].col, f'Infered return type {exprType.name} of method {node.id} does not conform to declared return type {rType.name}.'))
@@ -119,8 +120,10 @@ class TypeChecker:
             # self.errors.append(f"Can't convert {ifT.name} to Bool.")
             self.errors.append(_TypeError % (node.ifChunk.token_list[0].lineno, node.ifChunk.token_list[0].col,f"Predicate of 'if' does not have type Bool."))
         try:
-            return thenT.join(elseT)
+            node.type = thenT.join(elseT)
+            return node.type
         except:
+            node.type = ErrorType()
             return ErrorType()
     
     @visitor.when(LetInNode)
@@ -163,7 +166,9 @@ class TypeChecker:
             #     var_type = expr
             scope.define_variable(_id, var_type)
             iteration+=1
-        return self.visit(node.expression, scope.create_child())
+        expr_type = self.visit(node.expression, scope.create_child())
+        node.type = expr_type #node.expression.type
+        return node.type
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
@@ -178,9 +183,11 @@ class TypeChecker:
             self.errors.append(_SemanticError %(node.token_list[0].lineno, node.token_list[0].col, f"Attribute names must not be capitalized."))
 
         if node.type != 'SELF_TYPE':
-            attrType = self.context.get_type(node.type) 
+            attrType = self.context.get_type(node.type)
+            node.type = attrType
         else:
             attrType = self.current_type
+            node.type = self.current_type
 
         if node.value is not None:
             value_t = self.visit(node.value, scope.create_child())
@@ -200,7 +207,8 @@ class TypeChecker:
         var_info = scope.find_variable(node.id)
 
         exprType = self.visit(node.expr, scope.create_child())
-        
+        node.type = exprType
+
         if node.id == 'self':
             self.errors.append(_SemanticError % (node.token_list[1].lineno, node.token_list[1].col, f"Cannot assign to 'self'."))
             return ErrorType()
@@ -224,7 +232,8 @@ class TypeChecker:
             self.errors.append(_TypeError %(node.condition.token_list[0].lineno, node.condition.token_list[0].col, f'Loop condition does not have type Bool.'))
 
         self.visit(node.loopChunk, scope.create_child())
-        return self.context.get_type('Object')
+        node.type = self.context.get_type('Object')
+        return node.type
 
     @visitor.when(ChunkNode)
     def visit(self, node, scope):
@@ -233,6 +242,8 @@ class TypeChecker:
         
         for expr in node.chunk:
             return_type = self.visit(expr, scope.create_child())
+
+        node.type = return_type
         return return_type
     
     @visitor.when(SwitchCaseNode)
@@ -260,7 +271,8 @@ class TypeChecker:
             
             types.append(self.visit(e, child_scope))
 
-        return Type.multi_join(types)
+        node.type = Type.multi_join(types)
+        return node.type
 
 
     @visitor.when(PlusNode)
@@ -271,9 +283,11 @@ class TypeChecker:
         intType = self.context.get_type('Int')
 
         if lt == rt == intType:
+            node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' + '+str(rt.name)))
         # self.errors.append(f'Undefined operation "+" between {lt.name} and {rt.name}.')
+        node.type = ErrorType()
         return ErrorType()
 
     @visitor.when(MinusNode)
@@ -284,9 +298,11 @@ class TypeChecker:
         intType = self.context.get_type('Int')
 
         if lt == rt == intType:
+            node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' - '+str(rt.name)))
         # self.errors.append(f'Undefined operation "-" between {lt.name} and {rt.name}.')
+        node.type = ErrorType()
         return ErrorType()
 
     @visitor.when(StarNode)
@@ -297,9 +313,11 @@ class TypeChecker:
         intType = self.context.get_type('Int')
 
         if lt == rt == intType:
+            node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' * '+str(rt.name)))
         # self.errors.append(f'Undefined operation "*" between {lt.name} and {rt.name}.')
+        node.type = ErrorType()
         return ErrorType()
 
     @visitor.when(DivNode)
@@ -310,9 +328,11 @@ class TypeChecker:
         intType = self.context.get_type('Int')
 
         if lt == rt == intType:
+            node.type = intType
             return intType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' / '+str(rt.name)))
         # self.errors.append(f'Undefined operation "/" between {lt.name} and {rt.name}.')
+        node.type = ErrorType()
         return ErrorType()
 
     @visitor.when(CallNode)
@@ -365,19 +385,23 @@ class TypeChecker:
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
-        return self.context.get_type('Int')
+        node.type =  self.context.get_type('Int')
+        return node.type
 
     @visitor.when(StringNode)
     def visit(self, node, scope):
-        return self.context.get_type('String')
+        node.type =  self.context.get_type('String')
+        return node.type
 
     @visitor.when(TrueNode)
     def visit(self, node, scope):
-        return self.context.get_type('Bool')
+        node.type =  self.context.get_type('Bool')
+        return node.type
 
     @visitor.when(FalseNode)
     def visit(self, node, scope):
-        return self.context.get_type('Bool')
+        node.type =  self.context.get_type('Bool')
+        return node.type
 
     @visitor.when(VariableNode)
     def visit(self, node, scope):
@@ -394,7 +418,9 @@ class TypeChecker:
         if variable is None:
             # self.errors.append(f'Variable {node.lex} is not defined in {self.current_method.name}.')
             self.errors.append(_NameError % (node.token_list[0].lineno, node.token_list[0].col, f"Undeclared identifier {node.lex}."))
+            node.type = ErrorType()
             return ErrorType()
+        node.type = variable.type
         return variable.type
 
     @visitor.when(InstantiateNode)
@@ -409,30 +435,36 @@ class TypeChecker:
         except SemanticError as e:
             self.errors.append(_TypeError % (node.token_list[1].lineno, node.token_list[1].col, f"'new' used with undefined class {node.lex}."))
             # self.errors.append(e.text)
+            node.errors = ErrorType
             return ErrorType()
 
     @visitor.when(NotNode)
     def visit(self, node, scope):
         tp = self.visit(node.expression, scope.create_child())
         if tp == self.context.get_type('Bool'):
+            node.type = tp
             return tp
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f"Argument of 'not' has type {tp.name} instead of Bool."))
         # self.errors.append(f'Undefined operation "not" for {tp.name}.')
+        node.type = ErrorType()
         return ErrorType()
 
     @visitor.when(ComplementNode)
     def visit(self, node, scope):
         tp = self.visit(node.expr, scope)
         if tp == self.context.get_type('Int'):
+            node.type = tp
             return tp
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f"Argument of '~' has type {tp.name} instead of Int."))
         # self.errors.append(f'Undefined operation "~" for {tp.name}.')
+        node.type = ErrorType()
         return ErrorType()
 
     @visitor.when(IsVoidNode)
     def visit(self, node, scope):
-        self.visit(node.method, scope)
-        return self.context.get_type('Bool')
+        self.visit(node.method, scope.create_child())
+        node.type =  self.context.get_type('Bool')
+        return node.type
 
     @visitor.when(LeqNode)
     def visit(self, node, scope):
@@ -443,9 +475,11 @@ class TypeChecker:
         boolType = self.context.get_type('Bool')
 
         if lt == rt == intType:
+            node.type = boolType
             return boolType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' <= '+str(rt.name)))
         # self.errors.append(f'Undefined operation "<=" for {lt.name} and {rt.name}.')
+        node.type = ErrorType()
         return ErrorType()
 
     @visitor.when(LessNode)
@@ -456,6 +490,7 @@ class TypeChecker:
         intType = self.context.get_type('Int')
         boolType = self.context.get_type('Bool')
         if lt == rt == intType:
+            node.type = boolType
             return boolType
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, 'non-Int arguments: '+str(lt.name)+' < '+str(rt.name)))
         # self.errors.append(f'Undefined operation "<" for {lt.name} and {rt.name}.')
@@ -465,10 +500,13 @@ class TypeChecker:
     def visit(self, node, scope):
         lt = self.visit(node.left, scope)
         rt = self.visit(node.right, scope)
+        boolType = self.context.get_type('Bool')
         # quite self type de los basicos aqui
         if lt.name not in ("Int", "String", "Bool", "IO", "Object") and rt.name not in ("Int", "String", "Bool", "IO", "Object"):
-            return self.context.get_type('Bool')
+            node.type = boolType
+            return node.type
         if lt == rt:
-            return self.context.get_type('Bool')
+            node.type = boolType
+            return node.type
         self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f'Illegal comparison with a basic type.'))
         return ErrorType()
