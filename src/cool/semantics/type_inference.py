@@ -524,7 +524,7 @@ class InferenceChecker:
                 not_defined_nodes.append(case_node)
             case_nodes.append(case_node)
 
-        if any(e.type.name == "AUTO_TYPE" for e in case_nodes):
+        if any(e is not None and e.type.name == "AUTO_TYPE" for e in case_nodes):
             if defined_nodes:
                 t = Type.multi_join([x.type for x in defined_nodes])
                 for x in not_defined_nodes:
@@ -532,7 +532,7 @@ class InferenceChecker:
             case_of_node = CaseOfNode(self.context.get_type("AUTO_TYPE"), case_nodes)
             self.graph.add_node(case_of_node)
             return case_of_node
-        return AtomNode(Type.multi_join([e.type for e in case_nodes]))
+        return AtomNode(Type.multi_join([e.type for e in case_nodes if e is not None]))
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):

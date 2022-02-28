@@ -1,0 +1,5934 @@
+.data
+	type_Object: .word 24
+	type_Object_inherits_from: .word 0
+	type_Object_name_address: .word type_Object_name_size
+	type_Object___init__: .word function___init___at_Object
+	type_Object_abort: .word function_abort_at_Object
+	type_Object_type_name: .word function_type_name_at_Object
+	type_Object_copy: .word function_copy_at_Object
+	
+	type_IO: .word 40
+	type_IO_inherits_from: .word type_Object
+	type_IO_name_address: .word type_IO_name_size
+	type_IO___init__: .word function___init___at_IO
+	type_IO_abort: .word function_abort_at_Object
+	type_IO_type_name: .word function_type_name_at_Object
+	type_IO_copy: .word function_copy_at_Object
+	type_IO_out_string: .word function_out_string_at_IO
+	type_IO_out_int: .word function_out_int_at_IO
+	type_IO_in_string: .word function_in_string_at_IO
+	type_IO_in_int: .word function_in_int_at_IO
+	
+	type_String: .word 36
+	type_String_inherits_from: .word type_Object
+	type_String_name_address: .word type_String_name_size
+	type_String___init__: .word function___init___at_String
+	type_String_abort: .word function_abort_at_Object
+	type_String_type_name: .word function_type_name_at_Object
+	type_String_copy: .word function_copy_at_Object
+	type_String_length: .word function_length_at_String
+	type_String_concat: .word function_concat_at_String
+	type_String_substr: .word function_substr_at_String
+	
+	type_Int: .word 24
+	type_Int_inherits_from: .word type_Object
+	type_Int_name_address: .word type_Int_name_size
+	type_Int___init__: .word function___init___at_Int
+	type_Int_abort: .word function_abort_at_Object
+	type_Int_type_name: .word function_type_name_at_Object
+	type_Int_copy: .word function_copy_at_Object
+	
+	type_Bool: .word 24
+	type_Bool_inherits_from: .word type_Object
+	type_Bool_name_address: .word type_Bool_name_size
+	type_Bool___init__: .word function___init___at_Bool
+	type_Bool_abort: .word function_abort_at_Object
+	type_Bool_type_name: .word function_type_name_at_Object
+	type_Bool_copy: .word function_copy_at_Object
+	
+	type_Book: .word 56
+	type_Book_inherits_from: .word type_IO
+	type_Book_name_address: .word type_Book_name_size
+	type_Book___init__: .word function___init___at_Book
+	type_Book_abort: .word function_abort_at_Object
+	type_Book_type_name: .word function_type_name_at_Object
+	type_Book_copy: .word function_copy_at_Object
+	type_Book_out_string: .word function_out_string_at_IO
+	type_Book_out_int: .word function_out_int_at_IO
+	type_Book_in_string: .word function_in_string_at_IO
+	type_Book_in_int: .word function_in_int_at_IO
+	type_Book_initBook: .word function_initBook_at_Book
+	type_Book_print: .word function_print_at_Book
+	
+	type_Article: .word 64
+	type_Article_inherits_from: .word type_Book
+	type_Article_name_address: .word type_Article_name_size
+	type_Article___init__: .word function___init___at_Article
+	type_Article_abort: .word function_abort_at_Object
+	type_Article_type_name: .word function_type_name_at_Object
+	type_Article_copy: .word function_copy_at_Object
+	type_Article_out_string: .word function_out_string_at_IO
+	type_Article_out_int: .word function_out_int_at_IO
+	type_Article_in_string: .word function_in_string_at_IO
+	type_Article_in_int: .word function_in_int_at_IO
+	type_Article_initBook: .word function_initBook_at_Book
+	type_Article_print: .word function_print_at_Article
+	type_Article_initArticle: .word function_initArticle_at_Article
+	
+	type_BookList: .word 60
+	type_BookList_inherits_from: .word type_IO
+	type_BookList_name_address: .word type_BookList_name_size
+	type_BookList___init__: .word function___init___at_BookList
+	type_BookList_abort: .word function_abort_at_Object
+	type_BookList_type_name: .word function_type_name_at_Object
+	type_BookList_copy: .word function_copy_at_Object
+	type_BookList_out_string: .word function_out_string_at_IO
+	type_BookList_out_int: .word function_out_int_at_IO
+	type_BookList_in_string: .word function_in_string_at_IO
+	type_BookList_in_int: .word function_in_int_at_IO
+	type_BookList_isNil: .word function_isNil_at_BookList
+	type_BookList_cons: .word function_cons_at_BookList
+	type_BookList_car: .word function_car_at_BookList
+	type_BookList_cdr: .word function_cdr_at_BookList
+	type_BookList_print_list: .word function_print_list_at_BookList
+	
+	type_Cons: .word 72
+	type_Cons_inherits_from: .word type_BookList
+	type_Cons_name_address: .word type_Cons_name_size
+	type_Cons___init__: .word function___init___at_Cons
+	type_Cons_abort: .word function_abort_at_Object
+	type_Cons_type_name: .word function_type_name_at_Object
+	type_Cons_copy: .word function_copy_at_Object
+	type_Cons_out_string: .word function_out_string_at_IO
+	type_Cons_out_int: .word function_out_int_at_IO
+	type_Cons_in_string: .word function_in_string_at_IO
+	type_Cons_in_int: .word function_in_int_at_IO
+	type_Cons_isNil: .word function_isNil_at_Cons
+	type_Cons_cons: .word function_cons_at_BookList
+	type_Cons_car: .word function_car_at_Cons
+	type_Cons_cdr: .word function_cdr_at_Cons
+	type_Cons_print_list: .word function_print_list_at_Cons
+	type_Cons_init: .word function_init_at_Cons
+	
+	type_Nil: .word 60
+	type_Nil_inherits_from: .word type_BookList
+	type_Nil_name_address: .word type_Nil_name_size
+	type_Nil___init__: .word function___init___at_Nil
+	type_Nil_abort: .word function_abort_at_Object
+	type_Nil_type_name: .word function_type_name_at_Object
+	type_Nil_copy: .word function_copy_at_Object
+	type_Nil_out_string: .word function_out_string_at_IO
+	type_Nil_out_int: .word function_out_int_at_IO
+	type_Nil_in_string: .word function_in_string_at_IO
+	type_Nil_in_int: .word function_in_int_at_IO
+	type_Nil_isNil: .word function_isNil_at_Nil
+	type_Nil_cons: .word function_cons_at_BookList
+	type_Nil_car: .word function_car_at_BookList
+	type_Nil_cdr: .word function_cdr_at_BookList
+	type_Nil_print_list: .word function_print_list_at_Nil
+	
+	type_Main: .word 32
+	type_Main_inherits_from: .word type_Object
+	type_Main_name_address: .word type_Main_name_size
+	type_Main___init__: .word function___init___at_Main
+	type_Main_abort: .word function_abort_at_Object
+	type_Main_type_name: .word function_type_name_at_Object
+	type_Main_copy: .word function_copy_at_Object
+	type_Main_main: .word function_main_at_Main
+	
+	type_Object_name_size: .word 6
+	type_Object_name: .asciiz "Object"
+	
+	type_IO_name_size: .word 2
+	type_IO_name: .asciiz "IO"
+	
+	type_String_name_size: .word 6
+	type_String_name: .asciiz "String"
+	
+	type_Int_name_size: .word 3
+	type_Int_name: .asciiz "Int"
+	
+	type_Bool_name_size: .word 4
+	type_Bool_name: .asciiz "Bool"
+	
+	type_Book_name_size: .word 4
+	type_Book_name: .asciiz "Book"
+	
+	type_Article_name_size: .word 7
+	type_Article_name: .asciiz "Article"
+	
+	type_BookList_name_size: .word 8
+	type_BookList_name: .asciiz "BookList"
+	
+	type_Cons_name_size: .word 4
+	type_Cons_name: .asciiz "Cons"
+	
+	type_Nil_name_size: .word 3
+	type_Nil_name: .asciiz "Nil"
+	
+	type_Main_name_size: .word 4
+	type_Main_name: .asciiz "Main"
+	
+	buffer_input: .space 1024
+	debug_log: .asciiz "debug_log\n"
+
+.text
+	function_add:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Addition operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		add $t2, $t0, $t1 # $t2 = $t0 + $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_sub:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Subtraction operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		sub $t2, $t0, $t1 # $t2 = $t0 - $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_mult:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Multiplication operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		mult $t0, $t1 # $t2 = $t0 * $t1
+		mflo $t2
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_div:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Division operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		div $t0, $t1 # $t2 = $t0 / $t1
+		mflo $t2
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_xor:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Xor operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		xor $t2, $t0, $t1 # $t0 = $t0 ^ $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Int object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_less_than:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Less than operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		slt $t2, $t0, $t1 # $t2 = $t0 < $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_less_than_or_equal:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   a = 8($sp)
+		#   b = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Less than operation
+		lw $t0, 8($sp) # Save in $t0 the left operand address
+		lw $t0, 8($t0) # Save in $t0 the left operand value
+		lw $t1, 4($sp) # Save in $t1 the right operand address
+		lw $t1, 8($t1) # Save in $t1 the rigth operand value
+		sle $t2, $t0, $t1 # $t2 = $t0 <= $t1
+		
+		lw $t0, 0($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_equal:
+		# Function parameters
+		#   $ra = 48($sp)
+		#   a = 44($sp)
+		#   b = 40($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -40
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 36($sp) # internal_0 = address of allocated object Int
+		
+		# Allocating NUll to internal_1
+		sw $zero, 32($sp) # internal_1 = 0
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 28($sp) # internal_2 = address of allocated object Int
+		
+		# internal_2 = EqualAddress(a, internal_1)
+		lw $t0, 44($sp)
+		lw $t1, 32($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 28($sp)
+		sw $t2, 8($t0)
+		
+		# internal_2 = EqualAddress(b, internal_1)
+		lw $t0, 40($sp)
+		lw $t1, 32($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 28($sp)
+		sw $t2, 8($t0)
+		
+		# If internal_2 then goto a_is_type_object
+		lw $t0, 28($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, a_is_type_object
+		
+		# internal_3 = typeof a that is the first word of the object
+		lw $t0, 44($sp)
+		lw $t0, 0($t0)
+		sw $t0, 24($sp)
+		
+		# internal_4 = direction of Int
+		la $t0, type_Int
+		sw $t0, 20($sp)
+		
+		# internal_5 = direction of Bool
+		la $t0, type_Bool
+		sw $t0, 16($sp)
+		
+		# internal_6 = direction of String
+		la $t0, type_String
+		sw $t0, 12($sp)
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 8($sp) # internal_7 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_8 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_9 = address of allocated object Int
+		
+		# internal_7 = EqualAddress(internal_3, internal_4)
+		lw $t0, 24($sp)
+		lw $t1, 20($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 8($sp)
+		sw $t2, 8($t0)
+		
+		# internal_8 = EqualAddress(internal_3, internal_5)
+		lw $t0, 24($sp)
+		lw $t1, 16($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 4($sp)
+		sw $t2, 8($t0)
+		
+		# internal_9 = EqualAddress(internal_3, internal_6)
+		lw $t0, 24($sp)
+		lw $t1, 12($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		# If internal_7 then goto a_is_type_int_or_bool
+		lw $t0, 8($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, a_is_type_int_or_bool
+		
+		# If internal_8 then goto a_is_type_int_or_bool
+		lw $t0, 4($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, a_is_type_int_or_bool
+		
+		# If internal_9 then goto a_is_type_string
+		lw $t0, 0($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, a_is_type_string
+		
+		# Jumping to a_is_type_object
+		j a_is_type_object
+		
+		a_is_type_int_or_bool:
+		
+		# internal_0 = EqualInt(a, b)
+		lw $t0, 44($sp)
+		lw $t0, 8($t0)
+		lw $t1, 40($sp)
+		lw $t1, 8($t1)
+		seq $t2, $t0, $t1
+		lw $t0, 36($sp)
+		sw $t2, 8($t0)
+		
+		# Jumping to end_of_equal
+		j end_of_equal
+		
+		a_is_type_string:
+		
+		# internal_0 = EqualStr(a, b)
+		lw $t0, 44($sp)
+		lw $t1, 40($sp)
+		addi $t0, $t0, 8
+		addi $t1, $t1, 8
+		
+		# By default we assume the strings are equals
+		addi $t4, $zero, 1
+		lw $t5, 36($sp)
+		sw $t4, 8($t5)
+		
+		while_compare_strings_start:
+		lb $t2, 0($t0)
+		lb $t3, 0($t1)
+		beq $t2, $t3, while_compare_strings_update
+		
+		# The strings are no equals
+		lw $t5, 36($sp)
+		sw $zero, 8($t5)
+		j while_compare_strings_end
+		
+		while_compare_strings_update:
+		addi $t0, $t0, 1
+		addi $t1, $t1, 1
+		beq $t2, $zero, while_compare_strings_end
+		beq $t3, $zero, while_compare_strings_end
+		j while_compare_strings_start
+		while_compare_strings_end:
+		
+		# Jumping to end_of_equal
+		j end_of_equal
+		
+		a_is_type_object:
+		
+		# Equal operation
+		lw $t0, 44($sp) # Save in $t0 the left operand address
+		lw $t1, 40($sp) # Save in $t1 the right operand address
+		seq $t2, $t0, $t1 # $t2 = $t0 == $t1
+		
+		lw $t0, 36($sp) # $t0 = internal_0
+		sw $t2, 8($t0) # Setting value in the third word of the Bool object
+		
+		# Jumping to end_of_equal
+		j end_of_equal
+		
+		end_of_equal:
+		
+		# Loading return value in $v1
+		lw $v1, 36($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 40
+		
+		jr $ra
+		
+	function_assign:
+		# Function parameters
+		#   $ra = 36($sp)
+		#   dest = 32($sp)
+		#   source = 28($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -28
+		
+		# Allocating NUll to internal_0
+		sw $zero, 24($sp) # internal_0 = 0
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 20($sp) # internal_1 = address of allocated object Int
+		
+		# internal_1 = EqualAddress(source, internal_0)
+		lw $t0, 28($sp)
+		lw $t1, 24($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 20($sp)
+		sw $t2, 8($t0)
+		
+		# internal_1 = EqualAddress(dest, internal_0)
+		lw $t0, 32($sp)
+		lw $t1, 24($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 20($sp)
+		sw $t2, 8($t0)
+		
+		# If internal_1 then goto source_is_type_object
+		lw $t0, 20($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, source_is_type_object
+		
+		# internal_2 = typeof source that is the first word of the object
+		lw $t0, 28($sp)
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# internal_3 = direction of Int
+		la $t0, type_Int
+		sw $t0, 12($sp)
+		
+		# internal_4 = direction of Bool
+		la $t0, type_Bool
+		sw $t0, 8($sp)
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_5 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_6 = address of allocated object Int
+		
+		# internal_5 = EqualAddress(internal_2, internal_3)
+		lw $t0, 16($sp)
+		lw $t1, 12($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 4($sp)
+		sw $t2, 8($t0)
+		
+		# internal_6 = EqualAddress(internal_2, internal_4)
+		lw $t0, 16($sp)
+		lw $t1, 8($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		# If internal_5 then goto source_is_type_int_or_bool
+		lw $t0, 4($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, source_is_type_int_or_bool
+		
+		# If internal_6 then goto source_is_type_int_or_bool
+		lw $t0, 0($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, source_is_type_int_or_bool
+		
+		# Jumping to source_is_type_object
+		j source_is_type_object
+		
+		source_is_type_int_or_bool:
+		
+		# dest = source where source is an integer
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		lw $t0, 28($sp) # Pointer to source
+		lw $t1, 0($t0) # $t1 = type of source
+		lw $t2, 8($t0) # $t2 = value of source
+		sw $t1, 0($v0) # Save type of dest
+		sw $a0, 4($v0) # Save size of dest
+		sw $t2, 8($v0) # Save value of dest
+		sw $v0, 32($sp)
+		
+		# Jumping to source_end_of_equal
+		j source_end_of_equal
+		
+		source_is_type_object:
+		
+		# dest = source
+		lw $t0, 28($sp)
+		sw $t0, 32($sp)
+		
+		# Jumping to source_end_of_equal
+		j source_end_of_equal
+		
+		source_end_of_equal:
+		
+		# Loading return value in $v1
+		lw $v1, 32($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 28
+		
+		jr $ra
+		
+	function___init___at_Object:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_abort_at_Object:
+		# Function parameters
+		#   $ra = 28($sp)
+		#   self = 24($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -24
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 33 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 33
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 65
+		sb $t0, 8($v0) # internal_0[0] = 'A'
+		
+		addi $t0, $zero, 98
+		sb $t0, 9($v0) # internal_0[1] = 'b'
+		
+		addi $t0, $zero, 111
+		sb $t0, 10($v0) # internal_0[2] = 'o'
+		
+		addi $t0, $zero, 114
+		sb $t0, 11($v0) # internal_0[3] = 'r'
+		
+		addi $t0, $zero, 116
+		sb $t0, 12($v0) # internal_0[4] = 't'
+		
+		addi $t0, $zero, 32
+		sb $t0, 13($v0) # internal_0[5] = ' '
+		
+		addi $t0, $zero, 99
+		sb $t0, 14($v0) # internal_0[6] = 'c'
+		
+		addi $t0, $zero, 97
+		sb $t0, 15($v0) # internal_0[7] = 'a'
+		
+		addi $t0, $zero, 108
+		sb $t0, 16($v0) # internal_0[8] = 'l'
+		
+		addi $t0, $zero, 108
+		sb $t0, 17($v0) # internal_0[9] = 'l'
+		
+		addi $t0, $zero, 101
+		sb $t0, 18($v0) # internal_0[10] = 'e'
+		
+		addi $t0, $zero, 100
+		sb $t0, 19($v0) # internal_0[11] = 'd'
+		
+		addi $t0, $zero, 32
+		sb $t0, 20($v0) # internal_0[12] = ' '
+		
+		addi $t0, $zero, 102
+		sb $t0, 21($v0) # internal_0[13] = 'f'
+		
+		addi $t0, $zero, 114
+		sb $t0, 22($v0) # internal_0[14] = 'r'
+		
+		addi $t0, $zero, 111
+		sb $t0, 23($v0) # internal_0[15] = 'o'
+		
+		addi $t0, $zero, 109
+		sb $t0, 24($v0) # internal_0[16] = 'm'
+		
+		addi $t0, $zero, 32
+		sb $t0, 25($v0) # internal_0[17] = ' '
+		
+		addi $t0, $zero, 99
+		sb $t0, 26($v0) # internal_0[18] = 'c'
+		
+		addi $t0, $zero, 108
+		sb $t0, 27($v0) # internal_0[19] = 'l'
+		
+		addi $t0, $zero, 97
+		sb $t0, 28($v0) # internal_0[20] = 'a'
+		
+		addi $t0, $zero, 115
+		sb $t0, 29($v0) # internal_0[21] = 's'
+		
+		addi $t0, $zero, 115
+		sb $t0, 30($v0) # internal_0[22] = 's'
+		
+		addi $t0, $zero, 32
+		sb $t0, 31($v0) # internal_0[23] = ' '
+		
+		sb $zero, 32($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 20($sp) # internal_0 = "Abort called from class "
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 10 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0) # internal_3[0] = '\n'
+		
+		sb $zero, 9($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 8($sp) # internal_3 = "\n"
+		
+		# Allocating Int 2
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 2
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_4 = address of allocated object Int
+		
+		# Get method type_name of String
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function internal_5
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 24($sp) # internal_1 = result of internal_5
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating Int 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 5
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_4 = address of allocated object Int
+		
+		# Get method concat of String
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_0
+		lw $t0, 32($sp)
+		sw $t0, 4($sp) # Storing internal_0
+		
+		# Argument internal_1
+		lw $t0, 28($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp) # internal_2 = result of internal_5
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating Int 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 5
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_4 = address of allocated object Int
+		
+		# Get method concat of String
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_2
+		lw $t0, 24($sp)
+		sw $t0, 4($sp) # Storing internal_2
+		
+		# Argument internal_3
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp) # internal_2 = result of internal_5
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		lw $t0, 12($sp) # $t0 = internal_2
+		addi $t0, $t0, 8 # Pointer to the first character of the string
+		
+		# Printing the String internal_2
+		li $v0, 4
+		move $a0, $t0
+		syscall
+		
+		# Exit program
+		li $v0, 10
+		syscall
+		
+		# Loading return value in $v1
+		lw $v1, 24($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 24
+		
+		jr $ra
+		
+	function_type_name_at_Object:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = name of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($t0) # $t1 = type of self
+		lw $t2, 8($t1) # $t2 = direction of the type name
+		la $t3, 4($t2) # $t3 = address of the name
+		lw $t2, 0($t2) # $t2 = length of the name
+		
+		addi $t2, $t2, 9 # Setting space for the type, the size and the null byte
+		li $v0, 9
+		move $a0, $t2
+		syscall
+		addi $t2, $t2, -9 # Restoring space for the type, the size and the null byte
+		
+		la $t4, type_String
+		sw $t4, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		addi $t4, $v0, 0 # $t4 = direction of the new string
+		addi $t4, $t4, 8 # Pointer to the first character of the string
+		xor $t5, $t5, $t5 # Initializing counter
+		while_copy_name_start:
+		beq $t5, $t2, while_copy_name_end
+		lb $t6, 0($t3) # Loading the character
+		sb $t6, 0($t4)
+		addi $t4, $t4, 1 # Incrementing the pointer to the new string
+		addi $t3, $t3, 1 # Incrementing the pointer to the string in self
+		addi $t5, $t5, 1 # Incrementing counter
+		j while_copy_name_start
+		while_copy_name_end:
+		
+		sb $zero, 0($t4) # Setting the null byte
+		
+		sw $v0, 0($sp) # Storing the new string in internal_0
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_copy_at_Object:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = copy of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($t0) # $t1 = type of self
+		lw $t2, 4($t0) # $t2 = length of self in bytes
+		
+		# Allocating space for the new object
+		li $v0, 9
+		move $a0, $t2
+		syscall
+		move $t3, $v0 # $t3 = direction of the new object
+		sw $t1, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		# Initializing the variable of the loop
+		addi $t0, $t0, 8 # Pointer to the first character of the object
+		addi $t3, $t3, 8 # Pointer to the first character of the object
+		addi $t2, $2, -8 # Decrementing in 8 the length of the object
+		xor $t4, $t4, $t4 # Initializing counter
+		
+		# Loop copying the object
+		while_copy_start:
+		beq $t4, $t2, while_copy_end
+		lb $t5, 0($t0) # Loading the byte
+		sb $t5, 0($t3) # Storing the byte
+		addi $t0, $t0, 1 # Incrementing the pointer to the object
+		addi $t3, $t3, 1 # Incrementing the pointer to the new object
+		addi $t4, $t4, 1 # Incrementing counter
+		j while_copy_start
+		while_copy_end:
+		sw $v0, 0($sp) # Storing the new object in internal_0
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_IO:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_out_string_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		#   x = 0($sp)
+		
+		lw $t0, 0($sp) # $t0 = x
+		addi $t0, $t0, 8 # Pointer to the first character of the string
+		
+		# Printing the String x
+		li $v0, 4
+		move $a0, $t0
+		syscall
+		
+		# Loading return value in $v1
+		lw $v1, 4($sp)
+		
+		jr $ra
+		
+	function_out_int_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		#   x = 0($sp)
+		
+		# Printing the Int x
+		li $v0, 1
+		lw $a0, 0($sp)
+		lw $a0, 8($a0)
+		syscall
+		
+		# Loading return value in $v1
+		lw $v1, 4($sp)
+		
+		jr $ra
+		
+	function_in_string_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		li $v0, 8
+		la $a0, buffer_input
+		li $a1, 1024
+		syscall
+		
+		xor $t0, $t0, $t0 # Initializing counter
+		while_read_start:
+		lb $t1, buffer_input($t0) # Loading the byte
+		addi $t2, $zero, 10
+		beq $t1, $t2, while_read_end
+		addi $t2, $zero, 13
+		beq $t1, $t2, while_read_end
+		addi $t0, $t0, 1 # Incrementing counter
+		j while_read_start
+		while_read_end:
+		
+		addi $t0, $t0, 9 # Adding space for the type, the size and the null byte
+		li $v0, 9
+		move $a0, $t0
+		syscall
+		addi $t0, $t0, -9 # Adding space for the type, the size and the null byte
+		la $t2, type_String
+		sw $t2, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		addi $t3, $v0, 8 # Pointer to the first character of the string
+		xor $t4, $t4, $t4 # Initializing counter
+		
+		while_copy_from_buffer_start:
+		beq $t4, $t0, while_copy_from_buffer_end
+		lb $t5, buffer_input($t4) # Loading the byte
+		sb $t5, 0($t3) # Storing the byte
+		addi $t3, $t3, 1 # Imcremeenting pointer
+		addi $t4, $t4, 1 # Incrementing counter
+		j while_copy_from_buffer_start
+		while_copy_from_buffer_end:
+		
+		sb $zero, 0($t3) # Storing the null byte
+		
+		sw $v0, 0($sp) # Storing the new object in internal_0
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_in_int_at_IO:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		li $v0, 5
+		syscall
+		lw $t0, 0($sp)
+		sw $v0, 8($t0)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_String:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_length_at_String:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# internal_0 = length of self
+		lw $t0, 4($sp)
+		lw $t1, 4($t0)
+		addi $t1, $t1, -9 # Subtracting 9 for the type, length, and null-terminator
+		lw $t0, 0($sp)
+		sw $t1, 8($t0)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_concat_at_String:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   self = 8($sp)
+		#   s = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = self + s
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		lw $t2, 4($t0) # $t2 = length of str1
+		lw $t3, 4($t1) # $t3 = length of str2
+		addi $t2, $t2, -9
+		addi $t3, $t3, -9
+		add $t4, $t2, $t3 # $t4 = length of str1 + str2
+		addi $t4, $t4, 9 # Adding the space for the type (4bytes), the length(4bytes) and the null-terminator(1byte)
+		
+		li $v0, 9
+		move $a0, $t4
+		syscall
+		addi $t4, $t4, -9 # Restoring $t4 = length of str1 + str2
+		add $t5, $zero, $v0 # $t5 = address of the new string object
+		addi $t5, $t5, 8 # $t5 = address of the first byte of the new string
+		
+		la $t8, type_String
+		sw $t8, 0($v0) # Setting type in the first word of th object
+		
+		sw $a0, 4($v0) # Setting length of the string in the second word of the object
+		
+		# Copying str1 to the new string
+		xor $t6, $t6, $t6 # $t6 = 0 Initializing counter
+		while_copy_str1_start:
+		beq $t6, $t2, while_copy_str1_end
+		lb $t7, 8($t0)
+		sb $t7, 0($t5)
+		add $t0, $t0, 1 # $t0 = $t0 + 1 Incrementing the address of str1
+		add $t5, $t5, 1 # $t5 = $t5 + 1 Incrementing the address of the new string
+		addi $t6, $t6, 1 # $t6 = $t6 + 1 Incrementing counter
+		j while_copy_str1_start
+		while_copy_str1_end:
+		
+		# Copying str2 to the new string
+		while_copy_str2_start:
+		beq $t6, $t4, while_copy_str2_end
+		lb $t7, 8($t1)
+		sb $t7, 0($t5)
+		add $t1, $t1, 1 # $t0 = $t0 + 1 Incrementing the address of str1
+		add $t5, $t5, 1 # $t5 = $t5 + 1 Incrementing the address of the new string
+		addi $t6, $t6, 1 # $t6 = $t6 + 1 Incrementing counter
+		j while_copy_str2_start
+		while_copy_str2_end:
+		
+		sb $zero, 0($t5) # Setting the null-terminator
+		
+		sw $v0, 0($sp) # internal_0 = self + s
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_substr_at_String:
+		# Function parameters
+		#   $ra = 16($sp)
+		#   self = 12($sp)
+		#   i = 8($sp)
+		#   l = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# internal_0 = self[i:i + l]
+		lw $t0, 12($sp) # $t0 = address of the string
+		lw $t1, 4($t0) # $t1 = length of the string
+		addi $t1, $t1, -9 # $t1 = length of the string + 9
+		lw $t2, 8($sp) # $t2 = start of the substring
+		lw $t2, 8($t2)
+		lw $t3, 4($sp) # $t3 = length of the substring
+		lw $t3, 8($t3)
+		add $t4, $t2, $t3 # $t4 = start of the substring + length of the substring
+		
+		bgt $t4, $t1, substring_out_of_bounds
+		
+		addi $t3, $t3, 9
+		li $v0, 9
+		move $a0, $t3
+		syscall
+		addi $t3, $t3, -9
+		
+		la $t5, type_String
+		sw $t5, 0($v0) # Setting type in the first word of the object
+		
+		sw $a0, 4($v0) # Setting length in the second word of the object
+		
+		addi $t0, $t0, 8 # pointing to the first byte of the string
+		add $t0, $t0, $t2 # pointing to the first byte of the substring
+		move $t5, $v0 # $t5 = address of the new string
+		add $t5, $t5, 8 # pointing to the first byte of the string
+		xor $t6, $t6, $t6 # $t6 = 0 Initializing counter
+		while_copy_substr_start:
+		beq $t6, $t3, while_copy_substr_end
+		lb $t7, 0($t0)
+		sb $t7, 0($t5)
+		addi $t0, $t0, 1 # $t0 = $t0 + 1 Incrementing the address of the string
+		add $t5, $t5, 1 # $t5 = $t5 + 1 Incrementing the address of the new string
+		addi $t6, $t6, 1 # $t6 = $t6 + 1 Incrementing counter
+		j while_copy_substr_start
+		while_copy_substr_end:
+		
+		sb $zero, 0($t5) # Setting the null-terminator
+		
+		sw $v0, 0($sp) # internal_0 = self[i:i + l]
+		j substring_not_out_of_bounds
+		
+		substring_out_of_bounds:
+		li $v0, 17
+		addi $a0, $zero, 1
+		syscall
+		
+		substring_not_out_of_bounds:
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_Int:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function___init___at_Bool:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function___init___at_Book:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   self = 8($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -8
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 9 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		sb $zero, 8($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 4($sp) # internal_0 = ""
+		
+		# Set attribute title of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 4($sp) # $t1 = internal_0
+		beq $t1, $zero, object_set_attribute_8728344732944
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344732944
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344732944
+		j object_set_attribute_8728344732944
+		int_set_attribute_8728344732944:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.title = internal_0
+		j end_set_attribute_8728344732944
+		bool_set_attribute_8728344732944:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.title = internal_0
+		j end_set_attribute_8728344732944
+		object_set_attribute_8728344732944:
+		sw $t1, 8($t0) # self.title = internal_0
+		end_set_attribute_8728344732944:
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 9 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		sb $zero, 8($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 0($sp) # internal_1 = ""
+		
+		# Set attribute author of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_1
+		beq $t1, $zero, object_set_attribute_8728344732965
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344732965
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344732965
+		j object_set_attribute_8728344732965
+		int_set_attribute_8728344732965:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.author = internal_1
+		j end_set_attribute_8728344732965
+		bool_set_attribute_8728344732965:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.author = internal_1
+		j end_set_attribute_8728344732965
+		object_set_attribute_8728344732965:
+		sw $t1, 12($t0) # self.author = internal_1
+		end_set_attribute_8728344732965:
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 8
+		
+		jr $ra
+		
+	function_initBook_at_Book:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   self = 8($sp)
+		#   title_p = 4($sp)
+		#   author_p = 0($sp)
+		
+		# Set attribute title of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 4($sp) # $t1 = title_p
+		beq $t1, $zero, object_set_attribute_8728344733016
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344733016
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344733016
+		j object_set_attribute_8728344733016
+		int_set_attribute_8728344733016:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.title = title_p
+		j end_set_attribute_8728344733016
+		bool_set_attribute_8728344733016:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.title = title_p
+		j end_set_attribute_8728344733016
+		object_set_attribute_8728344733016:
+		sw $t1, 8($t0) # self.title = title_p
+		end_set_attribute_8728344733016:
+		
+		# Set attribute author of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = author_p
+		beq $t1, $zero, object_set_attribute_8728344733025
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344733025
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344733025
+		j object_set_attribute_8728344733025
+		int_set_attribute_8728344733025:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.author = author_p
+		j end_set_attribute_8728344733025
+		bool_set_attribute_8728344733025:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.author = author_p
+		j end_set_attribute_8728344733025
+		object_set_attribute_8728344733025:
+		sw $t1, 12($t0) # self.author = author_p
+		end_set_attribute_8728344733025:
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		jr $ra
+		
+	function_print_at_Book:
+		# Function parameters
+		#   $ra = 100($sp)
+		#   self = 96($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -96
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 21 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 21
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 116
+		sb $t0, 8($v0) # internal_0[0] = 't'
+		
+		addi $t0, $zero, 105
+		sb $t0, 9($v0) # internal_0[1] = 'i'
+		
+		addi $t0, $zero, 116
+		sb $t0, 10($v0) # internal_0[2] = 't'
+		
+		addi $t0, $zero, 108
+		sb $t0, 11($v0) # internal_0[3] = 'l'
+		
+		addi $t0, $zero, 101
+		sb $t0, 12($v0) # internal_0[4] = 'e'
+		
+		addi $t0, $zero, 58
+		sb $t0, 13($v0) # internal_0[5] = ':'
+		
+		addi $t0, $zero, 32
+		sb $t0, 14($v0) # internal_0[6] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 15($v0) # internal_0[7] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 16($v0) # internal_0[8] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 17($v0) # internal_0[9] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 18($v0) # internal_0[10] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 19($v0) # internal_0[11] = ' '
+		
+		sb $zero, 20($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 92($sp) # internal_0 = "title:      "
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 84($sp) # internal_2 = address of allocated object Int
+		
+		# Get method out_string of Book
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 84($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 80($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 108($sp)
+		sw $t0, 4($sp) # Storing self
+		
+		# Argument internal_0
+		lw $t0, 104($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function internal_3
+		lw $t0, 92($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 100($sp) # internal_1 = result of internal_3
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Get attribute title of self
+		lw $t0, 96($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'title' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344733139
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344733139
+		j object_get_attribute_8728344733139
+		int_get_attribute_8728344733139:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 76($sp) # internal_4 = self.title
+		j end_get_attribute_8728344733139
+		bool_get_attribute_8728344733139:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 76($sp) # internal_4 = self.title
+		j end_get_attribute_8728344733139
+		object_get_attribute_8728344733139:
+		sw $t1, 76($sp) # internal_4 = self.title
+		end_get_attribute_8728344733139:
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 68($sp) # internal_6 = address of allocated object Int
+		
+		# Get method out_string of Book
+		lw $t0, 88($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 68($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 64($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_1
+		lw $t0, 100($sp)
+		sw $t0, 4($sp) # Storing internal_1
+		
+		# Argument internal_4
+		lw $t0, 88($sp)
+		sw $t0, 0($sp) # Storing internal_4
+		
+		# Calling function internal_7
+		lw $t0, 76($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 84($sp) # internal_5 = result of internal_7
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 10 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0) # internal_8[0] = '\n'
+		
+		sb $zero, 9($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 60($sp) # internal_8 = "\n"
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 52($sp) # internal_10 = address of allocated object Int
+		
+		# Get method out_string of Book
+		lw $t0, 72($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 52($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 48($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_5
+		lw $t0, 84($sp)
+		sw $t0, 4($sp) # Storing internal_5
+		
+		# Argument internal_8
+		lw $t0, 72($sp)
+		sw $t0, 0($sp) # Storing internal_8
+		
+		# Calling function internal_11
+		lw $t0, 60($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 68($sp) # internal_9 = result of internal_11
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 21 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 21
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 97
+		sb $t0, 8($v0) # internal_12[0] = 'a'
+		
+		addi $t0, $zero, 117
+		sb $t0, 9($v0) # internal_12[1] = 'u'
+		
+		addi $t0, $zero, 116
+		sb $t0, 10($v0) # internal_12[2] = 't'
+		
+		addi $t0, $zero, 104
+		sb $t0, 11($v0) # internal_12[3] = 'h'
+		
+		addi $t0, $zero, 111
+		sb $t0, 12($v0) # internal_12[4] = 'o'
+		
+		addi $t0, $zero, 114
+		sb $t0, 13($v0) # internal_12[5] = 'r'
+		
+		addi $t0, $zero, 58
+		sb $t0, 14($v0) # internal_12[6] = ':'
+		
+		addi $t0, $zero, 32
+		sb $t0, 15($v0) # internal_12[7] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 16($v0) # internal_12[8] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 17($v0) # internal_12[9] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 18($v0) # internal_12[10] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 19($v0) # internal_12[11] = ' '
+		
+		sb $zero, 20($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 44($sp) # internal_12 = "author:     "
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 36($sp) # internal_14 = address of allocated object Int
+		
+		# Get method out_string of Book
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 36($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 32($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 108($sp)
+		sw $t0, 4($sp) # Storing self
+		
+		# Argument internal_12
+		lw $t0, 56($sp)
+		sw $t0, 0($sp) # Storing internal_12
+		
+		# Calling function internal_15
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 52($sp) # internal_13 = result of internal_15
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Get attribute author of self
+		lw $t0, 96($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'author' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344734347
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344734347
+		j object_get_attribute_8728344734347
+		int_get_attribute_8728344734347:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp) # internal_16 = self.author
+		j end_get_attribute_8728344734347
+		bool_get_attribute_8728344734347:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp) # internal_16 = self.author
+		j end_get_attribute_8728344734347
+		object_get_attribute_8728344734347:
+		sw $t1, 28($sp) # internal_16 = self.author
+		end_get_attribute_8728344734347:
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 20($sp) # internal_18 = address of allocated object Int
+		
+		# Get method out_string of Book
+		lw $t0, 40($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_13
+		lw $t0, 52($sp)
+		sw $t0, 4($sp) # Storing internal_13
+		
+		# Argument internal_16
+		lw $t0, 40($sp)
+		sw $t0, 0($sp) # Storing internal_16
+		
+		# Calling function internal_19
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp) # internal_17 = result of internal_19
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 10 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0) # internal_20[0] = '\n'
+		
+		sb $zero, 9($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 12($sp) # internal_20 = "\n"
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_22 = address of allocated object Int
+		
+		# Get method out_string of Book
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_17
+		lw $t0, 36($sp)
+		sw $t0, 4($sp) # Storing internal_17
+		
+		# Argument internal_20
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing internal_20
+		
+		# Calling function internal_23
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp) # internal_21 = result of internal_23
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 96($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 96
+		
+		jr $ra
+		
+	function___init___at_Article:
+		# Function parameters
+		#   $ra = 16($sp)
+		#   self = 12($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -12
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 9 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		sb $zero, 8($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 8($sp) # internal_0 = ""
+		
+		# Set attribute title of self
+		lw $t0, 12($sp) # $t0 = self
+		lw $t1, 8($sp) # $t1 = internal_0
+		beq $t1, $zero, object_set_attribute_8728344734458
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344734458
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344734458
+		j object_set_attribute_8728344734458
+		int_set_attribute_8728344734458:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.title = internal_0
+		j end_set_attribute_8728344734458
+		bool_set_attribute_8728344734458:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.title = internal_0
+		j end_set_attribute_8728344734458
+		object_set_attribute_8728344734458:
+		sw $t1, 8($t0) # self.title = internal_0
+		end_set_attribute_8728344734458:
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 9 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		sb $zero, 8($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 4($sp) # internal_1 = ""
+		
+		# Set attribute author of self
+		lw $t0, 12($sp) # $t0 = self
+		lw $t1, 4($sp) # $t1 = internal_1
+		beq $t1, $zero, object_set_attribute_8728344732441
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344732441
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344732441
+		j object_set_attribute_8728344732441
+		int_set_attribute_8728344732441:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.author = internal_1
+		j end_set_attribute_8728344732441
+		bool_set_attribute_8728344732441:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.author = internal_1
+		j end_set_attribute_8728344732441
+		object_set_attribute_8728344732441:
+		sw $t1, 12($t0) # self.author = internal_1
+		end_set_attribute_8728344732441:
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 9 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		sb $zero, 8($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 0($sp) # internal_2 = ""
+		
+		# Set attribute per_title of self
+		lw $t0, 12($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_2
+		beq $t1, $zero, object_set_attribute_8728344732462
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344732462
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344732462
+		j object_set_attribute_8728344732462
+		int_set_attribute_8728344732462:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0) # self.per_title = internal_2
+		j end_set_attribute_8728344732462
+		bool_set_attribute_8728344732462:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0) # self.per_title = internal_2
+		j end_set_attribute_8728344732462
+		object_set_attribute_8728344732462:
+		sw $t1, 16($t0) # self.per_title = internal_2
+		end_set_attribute_8728344732462:
+		
+		# Loading return value in $v1
+		lw $v1, 12($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function_initArticle_at_Article:
+		# Function parameters
+		#   $ra = 28($sp)
+		#   self = 24($sp)
+		#   title_p = 20($sp)
+		#   author_p = 16($sp)
+		#   per_title_p = 12($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -12
+		
+		# Allocating Int 8
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 8
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_1 = address of allocated object Int
+		
+		# Get method initBook of Article
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -16 # Reserving space for arguments
+		sw $ra, 12($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 40($sp)
+		sw $t0, 8($sp) # Storing self
+		
+		# Argument title_p
+		lw $t0, 36($sp)
+		sw $t0, 4($sp) # Storing title_p
+		
+		# Argument author_p
+		lw $t0, 32($sp)
+		sw $t0, 0($sp) # Storing author_p
+		
+		# Calling function internal_2
+		lw $t0, 16($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 24($sp) # internal_0 = result of internal_2
+		addi $sp, $sp, 16 # Freeing space for arguments
+		
+		# Set attribute per_title of self
+		lw $t0, 24($sp) # $t0 = self
+		lw $t1, 12($sp) # $t1 = per_title_p
+		beq $t1, $zero, object_set_attribute_8728344732573
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344732573
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344732573
+		j object_set_attribute_8728344732573
+		int_set_attribute_8728344732573:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0) # self.per_title = per_title_p
+		j end_set_attribute_8728344732573
+		bool_set_attribute_8728344732573:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0) # self.per_title = per_title_p
+		j end_set_attribute_8728344732573
+		object_set_attribute_8728344732573:
+		sw $t1, 16($t0) # self.per_title = per_title_p
+		end_set_attribute_8728344732573:
+		
+		# Loading return value in $v1
+		lw $v1, 24($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function_print_at_Article:
+		# Function parameters
+		#   $ra = 64($sp)
+		#   self = 60($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -60
+		
+		# Allocating Int 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 9
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 52($sp) # internal_1 = address of allocated object Int
+		
+		# Get method print of Book
+		lw $t0, 60($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 52($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 48($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 68($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function function_print_at_Book
+		jal function_print_at_Book
+		lw $ra, 4($sp)
+		sw $v1, 64($sp) # internal_0 = result of function_print_at_Book
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 22 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 22
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 112
+		sb $t0, 8($v0) # internal_3[0] = 'p'
+		
+		addi $t0, $zero, 101
+		sb $t0, 9($v0) # internal_3[1] = 'e'
+		
+		addi $t0, $zero, 114
+		sb $t0, 10($v0) # internal_3[2] = 'r'
+		
+		addi $t0, $zero, 105
+		sb $t0, 11($v0) # internal_3[3] = 'i'
+		
+		addi $t0, $zero, 111
+		sb $t0, 12($v0) # internal_3[4] = 'o'
+		
+		addi $t0, $zero, 100
+		sb $t0, 13($v0) # internal_3[5] = 'd'
+		
+		addi $t0, $zero, 105
+		sb $t0, 14($v0) # internal_3[6] = 'i'
+		
+		addi $t0, $zero, 99
+		sb $t0, 15($v0) # internal_3[7] = 'c'
+		
+		addi $t0, $zero, 97
+		sb $t0, 16($v0) # internal_3[8] = 'a'
+		
+		addi $t0, $zero, 108
+		sb $t0, 17($v0) # internal_3[9] = 'l'
+		
+		addi $t0, $zero, 58
+		sb $t0, 18($v0) # internal_3[10] = ':'
+		
+		addi $t0, $zero, 32
+		sb $t0, 19($v0) # internal_3[11] = ' '
+		
+		addi $t0, $zero, 32
+		sb $t0, 20($v0) # internal_3[12] = ' '
+		
+		sb $zero, 21($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 44($sp) # internal_3 = "periodical:  "
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 36($sp) # internal_5 = address of allocated object Int
+		
+		# Get method out_string of Article
+		lw $t0, 60($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 36($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 32($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 72($sp)
+		sw $t0, 4($sp) # Storing self
+		
+		# Argument internal_3
+		lw $t0, 56($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function internal_6
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 52($sp) # internal_4 = result of internal_6
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Get attribute per_title of self
+		lw $t0, 60($sp) # Get the address of self
+		lw $t1, 16($t0) # Get the attribute 'per_title' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344703037
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344703037
+		j object_get_attribute_8728344703037
+		int_get_attribute_8728344703037:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp) # internal_7 = self.per_title
+		j end_get_attribute_8728344703037
+		bool_get_attribute_8728344703037:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp) # internal_7 = self.per_title
+		j end_get_attribute_8728344703037
+		object_get_attribute_8728344703037:
+		sw $t1, 28($sp) # internal_7 = self.per_title
+		end_get_attribute_8728344703037:
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 20($sp) # internal_9 = address of allocated object Int
+		
+		# Get method out_string of Article
+		lw $t0, 40($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_4
+		lw $t0, 52($sp)
+		sw $t0, 4($sp) # Storing internal_4
+		
+		# Argument internal_7
+		lw $t0, 40($sp)
+		sw $t0, 0($sp) # Storing internal_7
+		
+		# Calling function internal_10
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp) # internal_8 = result of internal_10
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 10 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0) # internal_11[0] = '\n'
+		
+		sb $zero, 9($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 12($sp) # internal_11 = "\n"
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_13 = address of allocated object Int
+		
+		# Get method out_string of Article
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_8
+		lw $t0, 36($sp)
+		sw $t0, 4($sp) # Storing internal_8
+		
+		# Argument internal_11
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing internal_11
+		
+		# Calling function internal_14
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp) # internal_12 = result of internal_14
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 60($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 60
+		
+		jr $ra
+		
+	function___init___at_BookList:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_isNil_at_BookList:
+		# Function parameters
+		#   $ra = 20($sp)
+		#   self = 16($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -16
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 8($sp) # internal_1 = address of allocated object Int
+		
+		# Get method abort of BookList
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 8($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 4($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_0 = result of internal_2
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating Bool 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_3 = address of allocated object Int
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_cons_at_BookList:
+		# Function parameters
+		#   $ra = 28($sp)
+		#   self = 24($sp)
+		#   hd = 20($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -20
+		
+		# Allocating Cons
+		li $v0, 9
+		lw $a0, type_Cons
+		syscall
+		la $t0, type_Cons # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 12($sp) # internal_1 = address of allocated object Cons
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_1
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function function___init___at_Cons
+		jal function___init___at_Cons
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_1 = result of function___init___at_Cons
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument new_cell
+		lw $t0, 28($sp)
+		sw $t0, 4($sp) # Storing new_cell
+		
+		# Argument internal_1
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 28($sp) # new_cell = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating Int 13
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 13
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_3 = address of allocated object Int
+		
+		# Get method init of Cons
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -16 # Reserving space for arguments
+		sw $ra, 12($sp) # Storing return address
+		
+		# Argument new_cell
+		lw $t0, 32($sp)
+		sw $t0, 8($sp) # Storing new_cell
+		
+		# Argument hd
+		lw $t0, 36($sp)
+		sw $t0, 4($sp) # Storing hd
+		
+		# Argument self
+		lw $t0, 40($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function internal_4
+		lw $t0, 16($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 24($sp) # internal_2 = result of internal_4
+		addi $sp, $sp, 16 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 20
+		
+		jr $ra
+		
+	function_car_at_BookList:
+		# Function parameters
+		#   $ra = 20($sp)
+		#   self = 16($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -16
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 8($sp) # internal_1 = address of allocated object Int
+		
+		# Get method abort of BookList
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 8($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 4($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_0 = result of internal_2
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating Book
+		li $v0, 9
+		lw $a0, type_Book
+		syscall
+		la $t0, type_Book # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 0($sp) # internal_3 = address of allocated object Book
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_3
+		lw $t0, 8($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function function___init___at_Book
+		jal function___init___at_Book
+		lw $ra, 4($sp)
+		sw $v1, 8($sp) # internal_3 = result of function___init___at_Book
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_cdr_at_BookList:
+		# Function parameters
+		#   $ra = 20($sp)
+		#   self = 16($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -16
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 8($sp) # internal_1 = address of allocated object Int
+		
+		# Get method abort of BookList
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 8($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 4($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 24($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_0 = result of internal_2
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating BookList
+		li $v0, 9
+		lw $a0, type_BookList
+		syscall
+		la $t0, type_BookList # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 0($sp) # internal_3 = address of allocated object BookList
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_3
+		lw $t0, 8($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function function___init___at_BookList
+		jal function___init___at_BookList
+		lw $ra, 4($sp)
+		sw $v1, 8($sp) # internal_3 = result of function___init___at_BookList
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_print_list_at_BookList:
+		# Function parameters
+		#   $ra = 16($sp)
+		#   self = 12($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -12
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_1 = address of allocated object Int
+		
+		# Get method abort of BookList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing self
+		
+		# Calling function internal_2
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp) # internal_0 = result of internal_2
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function___init___at_Cons:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   self = 8($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -8
+		
+		# Allocating NUll to internal_0
+		sw $zero, 4($sp) # internal_0 = 0
+		
+		# Set attribute xcar of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 4($sp) # $t1 = internal_0
+		beq $t1, $zero, object_set_attribute_8728344704645
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344704645
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344704645
+		j object_set_attribute_8728344704645
+		int_set_attribute_8728344704645:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.xcar = internal_0
+		j end_set_attribute_8728344704645
+		bool_set_attribute_8728344704645:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.xcar = internal_0
+		j end_set_attribute_8728344704645
+		object_set_attribute_8728344704645:
+		sw $t1, 8($t0) # self.xcar = internal_0
+		end_set_attribute_8728344704645:
+		
+		# Allocating NUll to internal_1
+		sw $zero, 0($sp) # internal_1 = 0
+		
+		# Set attribute xcdr of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_1
+		beq $t1, $zero, object_set_attribute_8728344704666
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344704666
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344704666
+		j object_set_attribute_8728344704666
+		int_set_attribute_8728344704666:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.xcdr = internal_1
+		j end_set_attribute_8728344704666
+		bool_set_attribute_8728344704666:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.xcdr = internal_1
+		j end_set_attribute_8728344704666
+		object_set_attribute_8728344704666:
+		sw $t1, 12($t0) # self.xcdr = internal_1
+		end_set_attribute_8728344704666:
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 8
+		
+		jr $ra
+		
+	function_isNil_at_Cons:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_init_at_Cons:
+		# Function parameters
+		#   $ra = 12($sp)
+		#   self = 8($sp)
+		#   hd = 4($sp)
+		#   tl = 0($sp)
+		
+		# Set attribute xcar of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 4($sp) # $t1 = hd
+		beq $t1, $zero, object_set_attribute_8728344704747
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344704747
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344704747
+		j object_set_attribute_8728344704747
+		int_set_attribute_8728344704747:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.xcar = hd
+		j end_set_attribute_8728344704747
+		bool_set_attribute_8728344704747:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.xcar = hd
+		j end_set_attribute_8728344704747
+		object_set_attribute_8728344704747:
+		sw $t1, 8($t0) # self.xcar = hd
+		end_set_attribute_8728344704747:
+		
+		# Set attribute xcdr of self
+		lw $t0, 8($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = tl
+		beq $t1, $zero, object_set_attribute_8728344704756
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344704756
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344704756
+		j object_set_attribute_8728344704756
+		int_set_attribute_8728344704756:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.xcdr = tl
+		j end_set_attribute_8728344704756
+		bool_set_attribute_8728344704756:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0) # self.xcdr = tl
+		j end_set_attribute_8728344704756
+		object_set_attribute_8728344704756:
+		sw $t1, 12($t0) # self.xcdr = tl
+		end_set_attribute_8728344704756:
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		jr $ra
+		
+	function_car_at_Cons:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Get attribute xcar of self
+		lw $t0, 4($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'xcar' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344705028
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344705028
+		j object_get_attribute_8728344705028
+		int_get_attribute_8728344705028:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp) # internal_0 = self.xcar
+		j end_get_attribute_8728344705028
+		bool_get_attribute_8728344705028:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp) # internal_0 = self.xcar
+		j end_get_attribute_8728344705028
+		object_get_attribute_8728344705028:
+		sw $t1, 0($sp) # internal_0 = self.xcar
+		end_get_attribute_8728344705028:
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_cdr_at_Cons:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Get attribute xcdr of self
+		lw $t0, 4($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'xcdr' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344705058
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344705058
+		j object_get_attribute_8728344705058
+		int_get_attribute_8728344705058:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp) # internal_0 = self.xcdr
+		j end_get_attribute_8728344705058
+		bool_get_attribute_8728344705058:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp) # internal_0 = self.xcdr
+		j end_get_attribute_8728344705058
+		object_get_attribute_8728344705058:
+		sw $t1, 0($sp) # internal_0 = self.xcdr
+		end_get_attribute_8728344705058:
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_print_list_at_Cons:
+		# Function parameters
+		#   $ra = 224($sp)
+		#   self = 220($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -220
+		
+		# Get attribute xcar of self
+		lw $t0, 220($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'xcar' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344705130
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344705130
+		j object_get_attribute_8728344705130
+		int_get_attribute_8728344705130:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 216($sp) # internal_0 = self.xcar
+		j end_get_attribute_8728344705130
+		bool_get_attribute_8728344705130:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 216($sp) # internal_0 = self.xcar
+		j end_get_attribute_8728344705130
+		object_get_attribute_8728344705130:
+		sw $t1, 216($sp) # internal_0 = self.xcar
+		end_get_attribute_8728344705130:
+		
+		# Allocating Int 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 9
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 208($sp) # internal_2 = address of allocated object Int
+		
+		# Get method print of Book
+		lw $t0, 216($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 208($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 204($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_0
+		lw $t0, 224($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function internal_3
+		lw $t0, 212($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 220($sp) # internal_1 = result of internal_3
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 200($sp) # internal_4 = address of allocated object Int
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 196($sp) # internal_5 = address of allocated object Int
+		
+		# Allocating Int 2
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 2
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 192($sp) # internal_6 = address of allocated object Int
+		
+		# Allocating NUll to internal_7
+		sw $zero, 188($sp) # internal_7 = 0
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 184($sp) # internal_8 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 172($sp) # internal_11 = address of allocated object Int
+		
+		# internal_9 = typeof internal_1 that is the first word of the object
+		lw $t0, 212($sp)
+		lw $t0, 0($t0)
+		sw $t0, 180($sp)
+		
+		# internal_10 = internal_9
+		lw $t0, 180($sp)
+		sw $t0, 176($sp)
+		
+		while_start_8728344748960:
+		
+		# internal_11 = EqualAddress(internal_10, internal_7)
+		lw $t0, 176($sp)
+		lw $t1, 188($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 172($sp)
+		sw $t2, 8($t0)
+		
+		# If internal_11 then goto while_end_8728344748960
+		lw $t0, 172($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, while_end_8728344748960
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_8
+		lw $t0, 196($sp)
+		sw $t0, 4($sp) # Storing internal_8
+		
+		# Argument internal_5
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_5
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 196($sp) # internal_8 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# internal_10 = ancestor of internal_10
+		lw $t0, 176($sp)
+		lw $t0, 4($t0)
+		sw $t0, 176($sp)
+		
+		# Jumping to while_start_8728344748960
+		j while_start_8728344748960
+		
+		while_end_8728344748960:
+		
+		# internal_10 = internal_9
+		lw $t0, 180($sp)
+		sw $t0, 176($sp)
+		
+		# initialize Array [internal_8]
+		lw $t0, 184($sp) # $t0 = internal_8
+		lw $t0, 8($t0) # $t0 = value of the size
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		li $v0, 9
+		move $a0, $t0
+		syscall
+		sw $v0, 168($sp) # internal_12 = new Array[internal_8]
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 164($sp) # internal_13 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 160($sp) # internal_14 = address of allocated object Int
+		
+		foreach_start_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_13
+		lw $t0, 176($sp)
+		sw $t0, 4($sp) # Storing internal_13
+		
+		# Argument internal_8
+		lw $t0, 196($sp)
+		sw $t0, 0($sp) # Storing internal_8
+		
+		# Calling function function_less_than
+		jal function_less_than
+		lw $ra, 8($sp)
+		sw $v1, 172($sp) # internal_14 = result of function_less_than
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# If internal_14 then goto foreach_body_8728344748960
+		lw $t0, 160($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_body_8728344748960
+		
+		# Jumping to foreach_end_8728344748960
+		j foreach_end_8728344748960
+		
+		foreach_body_8728344748960:
+		
+		# array internal_12[4 * internal_13] = internal_10
+		lw $t0, 164($sp) # $t0 = internal_13
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 168($sp) # $t1 = internal_12
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 176($sp)
+		sw $t0, 0($t1)
+		
+		# internal_10 = ancestor of internal_10
+		lw $t0, 176($sp)
+		lw $t0, 4($t0)
+		sw $t0, 176($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_13
+		lw $t0, 176($sp)
+		sw $t0, 4($sp) # Storing internal_13
+		
+		# Argument internal_5
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_5
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 176($sp) # internal_13 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Jumping to foreach_start_8728344748960
+		j foreach_start_8728344748960
+		
+		foreach_end_8728344748960:
+		
+		# initialize Array [internal_6]
+		lw $t0, 192($sp) # $t0 = internal_6
+		lw $t0, 8($t0) # $t0 = value of the size
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		li $v0, 9
+		move $a0, $t0
+		syscall
+		sw $v0, 156($sp) # internal_15 = new Array[internal_6]
+		
+		# initialize Array [internal_6]
+		lw $t0, 192($sp) # $t0 = internal_6
+		lw $t0, 8($t0) # $t0 = value of the size
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		li $v0, 9
+		move $a0, $t0
+		syscall
+		sw $v0, 152($sp) # internal_16 = new Array[internal_6]
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 144($sp) # internal_18 = address of allocated object Int
+		
+		# internal_17 = direction of Book
+		la $t0, type_Book
+		sw $t0, 148($sp)
+		
+		# array internal_15[4 * internal_18] = internal_17
+		lw $t0, 144($sp) # $t0 = internal_18
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 156($sp) # $t1 = internal_15
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 148($sp)
+		sw $t0, 0($t1)
+		
+		# array internal_16[4 * internal_18] = internal_8
+		lw $t0, 144($sp) # $t0 = internal_18
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 152($sp) # $t1 = internal_16
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 184($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 136($sp) # internal_20 = address of allocated object Int
+		
+		# internal_19 = direction of Article
+		la $t0, type_Article
+		sw $t0, 140($sp)
+		
+		# array internal_15[4 * internal_20] = internal_19
+		lw $t0, 136($sp) # $t0 = internal_20
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 156($sp) # $t1 = internal_15
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 140($sp)
+		sw $t0, 0($t1)
+		
+		# array internal_16[4 * internal_20] = internal_8
+		lw $t0, 136($sp) # $t0 = internal_20
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 152($sp) # $t1 = internal_16
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 184($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 132($sp) # internal_21 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 128($sp) # internal_22 = address of allocated object Int
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 120($sp) # internal_24 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 116($sp) # internal_25 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 108($sp) # internal_27 = address of allocated object Int
+		
+		foreach_type_start_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_21
+		lw $t0, 144($sp)
+		sw $t0, 4($sp) # Storing internal_21
+		
+		# Argument internal_6
+		lw $t0, 204($sp)
+		sw $t0, 0($sp) # Storing internal_6
+		
+		# Calling function function_less_than
+		jal function_less_than
+		lw $ra, 8($sp)
+		sw $v1, 140($sp) # internal_22 = result of function_less_than
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# If internal_22 then goto foreach_type_body_8728344748960
+		lw $t0, 128($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_type_body_8728344748960
+		
+		# Jumping to foreach_type_end_8728344748960
+		j foreach_type_end_8728344748960
+		
+		foreach_type_body_8728344748960:
+		
+		# internal_23 = array internal_15[4 * internal_21]
+		lw $t0, 132($sp) # $t0 = internal_21
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 156($sp) # $t1 = internal_15
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 0($t1) # $t1 = value in the position
+		sw $t0, 124($sp) # internal_23 = array internal_15[4 * internal_21]
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_24
+		lw $t0, 132($sp)
+		sw $t0, 4($sp) # Storing internal_24
+		
+		# Argument internal_4
+		lw $t0, 212($sp)
+		sw $t0, 0($sp) # Storing internal_4
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 132($sp) # internal_24 = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		foreach_ancestor_start_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_24
+		lw $t0, 132($sp)
+		sw $t0, 4($sp) # Storing internal_24
+		
+		# Argument internal_8
+		lw $t0, 196($sp)
+		sw $t0, 0($sp) # Storing internal_8
+		
+		# Calling function function_less_than
+		jal function_less_than
+		lw $ra, 8($sp)
+		sw $v1, 128($sp) # internal_25 = result of function_less_than
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# If internal_25 then goto foreach_ancestor_body_8728344748960
+		lw $t0, 116($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_body_8728344748960
+		
+		# Jumping to foreach_ancestor_end_8728344748960
+		j foreach_ancestor_end_8728344748960
+		
+		foreach_ancestor_body_8728344748960:
+		
+		# internal_26 = array internal_12[4 * internal_24]
+		lw $t0, 120($sp) # $t0 = internal_24
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 168($sp) # $t1 = internal_12
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 0($t1) # $t1 = value in the position
+		sw $t0, 112($sp) # internal_26 = array internal_12[4 * internal_24]
+		
+		# internal_27 = EqualAddress(internal_23, internal_26)
+		lw $t0, 124($sp)
+		lw $t1, 112($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 108($sp)
+		sw $t2, 8($t0)
+		
+		# If internal_27 then goto foreach_ancestor_end_8728344748960
+		lw $t0, 108($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_ancestor_end_8728344748960
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_24
+		lw $t0, 132($sp)
+		sw $t0, 4($sp) # Storing internal_24
+		
+		# Argument internal_5
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_5
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 132($sp) # internal_24 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Jumping to foreach_ancestor_start_8728344748960
+		j foreach_ancestor_start_8728344748960
+		
+		foreach_ancestor_end_8728344748960:
+		
+		# array internal_16[4 * internal_21] = internal_24
+		lw $t0, 132($sp) # $t0 = internal_21
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 152($sp) # $t1 = internal_16
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 120($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_21
+		lw $t0, 144($sp)
+		sw $t0, 4($sp) # Storing internal_21
+		
+		# Argument internal_5
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_5
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 144($sp) # internal_21 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Jumping to foreach_type_start_8728344748960
+		j foreach_type_start_8728344748960
+		
+		foreach_type_end_8728344748960:
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 104($sp) # internal_28 = address of allocated object Int
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 100($sp) # internal_29 = address of allocated object Int
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 96($sp) # internal_30 = address of allocated object Int
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 92($sp) # internal_31 = address of allocated object Int
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 88($sp) # internal_32 = address of allocated object Int
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_31
+		lw $t0, 104($sp)
+		sw $t0, 4($sp) # Storing internal_31
+		
+		# Argument internal_8
+		lw $t0, 196($sp)
+		sw $t0, 0($sp) # Storing internal_8
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 104($sp) # internal_31 = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		foreach_min_start_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_28
+		lw $t0, 116($sp)
+		sw $t0, 4($sp) # Storing internal_28
+		
+		# Argument internal_6
+		lw $t0, 204($sp)
+		sw $t0, 0($sp) # Storing internal_6
+		
+		# Calling function function_less_than
+		jal function_less_than
+		lw $ra, 8($sp)
+		sw $v1, 100($sp) # internal_32 = result of function_less_than
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# If internal_32 then goto foreach_min_body_8728344748960
+		lw $t0, 88($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, foreach_min_body_8728344748960
+		
+		# Jumping to foreach_min_end_8728344748960
+		j foreach_min_end_8728344748960
+		
+		foreach_min_body_8728344748960:
+		
+		# internal_30 = array internal_16[4 * internal_28]
+		lw $t0, 104($sp) # $t0 = internal_28
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 152($sp) # $t1 = internal_16
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 0($t1) # $t1 = value in the position
+		lw $t2, 96($sp) # internal_30 = array internal_16[4 * internal_28]
+		sw $t0, 8($t2)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_30
+		lw $t0, 108($sp)
+		sw $t0, 4($sp) # Storing internal_30
+		
+		# Argument internal_31
+		lw $t0, 104($sp)
+		sw $t0, 0($sp) # Storing internal_31
+		
+		# Calling function function_less_than
+		jal function_less_than
+		lw $ra, 8($sp)
+		sw $v1, 100($sp) # internal_32 = result of function_less_than
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# If internal_32 then goto update_min_8728344748960
+		lw $t0, 88($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, update_min_8728344748960
+		
+		# Jumping to update_min_end_8728344748960
+		j update_min_end_8728344748960
+		
+		update_min_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_31
+		lw $t0, 104($sp)
+		sw $t0, 4($sp) # Storing internal_31
+		
+		# Argument internal_30
+		lw $t0, 108($sp)
+		sw $t0, 0($sp) # Storing internal_30
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 104($sp) # internal_31 = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_29
+		lw $t0, 112($sp)
+		sw $t0, 4($sp) # Storing internal_29
+		
+		# Argument internal_28
+		lw $t0, 116($sp)
+		sw $t0, 0($sp) # Storing internal_28
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 112($sp) # internal_29 = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		update_min_end_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_28
+		lw $t0, 116($sp)
+		sw $t0, 4($sp) # Storing internal_28
+		
+		# Argument internal_5
+		lw $t0, 208($sp)
+		sw $t0, 0($sp) # Storing internal_5
+		
+		# Calling function function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 116($sp) # internal_28 = result of function_add
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Jumping to foreach_min_start_8728344748960
+		j foreach_min_start_8728344748960
+		
+		foreach_min_end_8728344748960:
+		
+		# initialize Array [internal_6]
+		lw $t0, 192($sp) # $t0 = internal_6
+		lw $t0, 8($t0) # $t0 = value of the size
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		li $v0, 9
+		move $a0, $t0
+		syscall
+		sw $v0, 84($sp) # internal_33 = new Array[internal_6]
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 80($sp) # internal_34 = address of allocated object Int
+		
+		# array internal_33[4 * internal_34] = internal_4
+		lw $t0, 80($sp) # $t0 = internal_34
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 84($sp) # $t1 = internal_33
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 200($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 76($sp) # internal_35 = address of allocated object Int
+		
+		# array internal_33[4 * internal_35] = internal_4
+		lw $t0, 76($sp) # $t0 = internal_35
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 84($sp) # $t1 = internal_33
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 200($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 72($sp) # internal_36 = address of allocated object Int
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_31
+		lw $t0, 104($sp)
+		sw $t0, 4($sp) # Storing internal_31
+		
+		# Argument internal_8
+		lw $t0, 196($sp)
+		sw $t0, 0($sp) # Storing internal_8
+		
+		# Calling function function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 84($sp) # internal_36 = result of function_equal
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# If internal_36 then goto error_branch_8728344748960
+		lw $t0, 72($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, error_branch_8728344748960
+		
+		# array internal_33[4 * internal_29] = internal_5
+		lw $t0, 100($sp) # $t0 = internal_29
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 84($sp) # $t1 = internal_33
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 196($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
+		
+		# Allocating Bool 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 68($sp) # internal_37 = address of allocated object Int
+		
+		# Allocating Int 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 0
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 64($sp) # internal_38 = address of allocated object Int
+		
+		# internal_37 = array internal_33[4 * internal_38]
+		lw $t0, 64($sp) # $t0 = internal_38
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 84($sp) # $t1 = internal_33
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 0($t1) # $t1 = value in the position
+		lw $t2, 68($sp) # internal_37 = array internal_33[4 * internal_38]
+		sw $t0, 8($t2)
+		
+		# If internal_37 then goto branch_Book_8728344748960
+		lw $t0, 68($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Book_8728344748960
+		
+		# Allocating Int 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 60($sp) # internal_39 = address of allocated object Int
+		
+		# internal_37 = array internal_33[4 * internal_39]
+		lw $t0, 60($sp) # $t0 = internal_39
+		lw $t0, 8($t0) # $t0 = value of the index
+		addi $t1, $zero, 4 # $t1 = 4
+		mult $t0, $t1 # $t0 = $t0 * 4
+		mflo $t0
+		lw $t1, 84($sp) # $t1 = internal_33
+		add $t1, $t1, $t0 # Move the pointer to the index
+		lw $t0, 0($t1) # $t1 = value in the position
+		lw $t2, 68($sp) # internal_37 = array internal_33[4 * internal_39]
+		sw $t0, 8($t2)
+		
+		# If internal_37 then goto branch_Article_8728344748960
+		lw $t0, 68($sp) # Loading the address of the condition
+		lw $t0, 8($t0) # Loading the value of the condition
+		addi $t1, $zero, 1 # Setting the value to 1 for comparison
+		beq $t0, $t1, branch_Article_8728344748960
+		
+		branch_Book_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument dummy
+		lw $t0, 64($sp)
+		sw $t0, 4($sp) # Storing dummy
+		
+		# Argument internal_1
+		lw $t0, 224($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 64($sp) # dummy = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 35 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 35
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 45
+		sb $t0, 8($v0) # internal_42[0] = '-'
+		
+		addi $t0, $zero, 32
+		sb $t0, 9($v0) # internal_42[1] = ' '
+		
+		addi $t0, $zero, 100
+		sb $t0, 10($v0) # internal_42[2] = 'd'
+		
+		addi $t0, $zero, 121
+		sb $t0, 11($v0) # internal_42[3] = 'y'
+		
+		addi $t0, $zero, 110
+		sb $t0, 12($v0) # internal_42[4] = 'n'
+		
+		addi $t0, $zero, 97
+		sb $t0, 13($v0) # internal_42[5] = 'a'
+		
+		addi $t0, $zero, 109
+		sb $t0, 14($v0) # internal_42[6] = 'm'
+		
+		addi $t0, $zero, 105
+		sb $t0, 15($v0) # internal_42[7] = 'i'
+		
+		addi $t0, $zero, 99
+		sb $t0, 16($v0) # internal_42[8] = 'c'
+		
+		addi $t0, $zero, 32
+		sb $t0, 17($v0) # internal_42[9] = ' '
+		
+		addi $t0, $zero, 116
+		sb $t0, 18($v0) # internal_42[10] = 't'
+		
+		addi $t0, $zero, 121
+		sb $t0, 19($v0) # internal_42[11] = 'y'
+		
+		addi $t0, $zero, 112
+		sb $t0, 20($v0) # internal_42[12] = 'p'
+		
+		addi $t0, $zero, 101
+		sb $t0, 21($v0) # internal_42[13] = 'e'
+		
+		addi $t0, $zero, 32
+		sb $t0, 22($v0) # internal_42[14] = ' '
+		
+		addi $t0, $zero, 119
+		sb $t0, 23($v0) # internal_42[15] = 'w'
+		
+		addi $t0, $zero, 97
+		sb $t0, 24($v0) # internal_42[16] = 'a'
+		
+		addi $t0, $zero, 115
+		sb $t0, 25($v0) # internal_42[17] = 's'
+		
+		addi $t0, $zero, 32
+		sb $t0, 26($v0) # internal_42[18] = ' '
+		
+		addi $t0, $zero, 66
+		sb $t0, 27($v0) # internal_42[19] = 'B'
+		
+		addi $t0, $zero, 111
+		sb $t0, 28($v0) # internal_42[20] = 'o'
+		
+		addi $t0, $zero, 111
+		sb $t0, 29($v0) # internal_42[21] = 'o'
+		
+		addi $t0, $zero, 107
+		sb $t0, 30($v0) # internal_42[22] = 'k'
+		
+		addi $t0, $zero, 32
+		sb $t0, 31($v0) # internal_42[23] = ' '
+		
+		addi $t0, $zero, 45
+		sb $t0, 32($v0) # internal_42[24] = '-'
+		
+		addi $t0, $zero, 10
+		sb $t0, 33($v0) # internal_42[25] = '\n'
+		
+		sb $zero, 34($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 48($sp) # internal_42 = "- dynamic type was Book -\n"
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 40($sp) # internal_44 = address of allocated object Int
+		
+		# Get method out_string of Cons
+		lw $t0, 220($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 40($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 36($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 232($sp)
+		sw $t0, 4($sp) # Storing self
+		
+		# Argument internal_42
+		lw $t0, 60($sp)
+		sw $t0, 0($sp) # Storing internal_42
+		
+		# Calling function internal_45
+		lw $t0, 48($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 56($sp) # internal_43 = result of internal_45
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_40
+		lw $t0, 68($sp)
+		sw $t0, 4($sp) # Storing internal_40
+		
+		# Argument internal_43
+		lw $t0, 56($sp)
+		sw $t0, 0($sp) # Storing internal_43
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 68($sp) # internal_40 = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# internal_40 = internal_43
+		lw $t0, 44($sp)
+		sw $t0, 56($sp)
+		
+		# Jumping to branch_end_8728344748960
+		j branch_end_8728344748960
+		
+		branch_Article_8728344748960:
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument dummy
+		lw $t0, 64($sp)
+		sw $t0, 4($sp) # Storing dummy
+		
+		# Argument internal_1
+		lw $t0, 224($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 64($sp) # dummy = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 38 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 38
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 45
+		sb $t0, 8($v0) # internal_47[0] = '-'
+		
+		addi $t0, $zero, 32
+		sb $t0, 9($v0) # internal_47[1] = ' '
+		
+		addi $t0, $zero, 100
+		sb $t0, 10($v0) # internal_47[2] = 'd'
+		
+		addi $t0, $zero, 121
+		sb $t0, 11($v0) # internal_47[3] = 'y'
+		
+		addi $t0, $zero, 110
+		sb $t0, 12($v0) # internal_47[4] = 'n'
+		
+		addi $t0, $zero, 97
+		sb $t0, 13($v0) # internal_47[5] = 'a'
+		
+		addi $t0, $zero, 109
+		sb $t0, 14($v0) # internal_47[6] = 'm'
+		
+		addi $t0, $zero, 105
+		sb $t0, 15($v0) # internal_47[7] = 'i'
+		
+		addi $t0, $zero, 99
+		sb $t0, 16($v0) # internal_47[8] = 'c'
+		
+		addi $t0, $zero, 32
+		sb $t0, 17($v0) # internal_47[9] = ' '
+		
+		addi $t0, $zero, 116
+		sb $t0, 18($v0) # internal_47[10] = 't'
+		
+		addi $t0, $zero, 121
+		sb $t0, 19($v0) # internal_47[11] = 'y'
+		
+		addi $t0, $zero, 112
+		sb $t0, 20($v0) # internal_47[12] = 'p'
+		
+		addi $t0, $zero, 101
+		sb $t0, 21($v0) # internal_47[13] = 'e'
+		
+		addi $t0, $zero, 32
+		sb $t0, 22($v0) # internal_47[14] = ' '
+		
+		addi $t0, $zero, 119
+		sb $t0, 23($v0) # internal_47[15] = 'w'
+		
+		addi $t0, $zero, 97
+		sb $t0, 24($v0) # internal_47[16] = 'a'
+		
+		addi $t0, $zero, 115
+		sb $t0, 25($v0) # internal_47[17] = 's'
+		
+		addi $t0, $zero, 32
+		sb $t0, 26($v0) # internal_47[18] = ' '
+		
+		addi $t0, $zero, 65
+		sb $t0, 27($v0) # internal_47[19] = 'A'
+		
+		addi $t0, $zero, 114
+		sb $t0, 28($v0) # internal_47[20] = 'r'
+		
+		addi $t0, $zero, 116
+		sb $t0, 29($v0) # internal_47[21] = 't'
+		
+		addi $t0, $zero, 105
+		sb $t0, 30($v0) # internal_47[22] = 'i'
+		
+		addi $t0, $zero, 99
+		sb $t0, 31($v0) # internal_47[23] = 'c'
+		
+		addi $t0, $zero, 108
+		sb $t0, 32($v0) # internal_47[24] = 'l'
+		
+		addi $t0, $zero, 101
+		sb $t0, 33($v0) # internal_47[25] = 'e'
+		
+		addi $t0, $zero, 32
+		sb $t0, 34($v0) # internal_47[26] = ' '
+		
+		addi $t0, $zero, 45
+		sb $t0, 35($v0) # internal_47[27] = '-'
+		
+		addi $t0, $zero, 10
+		sb $t0, 36($v0) # internal_47[28] = '\n'
+		
+		sb $zero, 37($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 28($sp) # internal_47 = "- dynamic type was Article -\n"
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 20($sp) # internal_49 = address of allocated object Int
+		
+		# Get method out_string of Cons
+		lw $t0, 220($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument self
+		lw $t0, 232($sp)
+		sw $t0, 4($sp) # Storing self
+		
+		# Argument internal_47
+		lw $t0, 40($sp)
+		sw $t0, 0($sp) # Storing internal_47
+		
+		# Calling function internal_50
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp) # internal_48 = result of internal_50
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_40
+		lw $t0, 68($sp)
+		sw $t0, 4($sp) # Storing internal_40
+		
+		# Argument internal_48
+		lw $t0, 36($sp)
+		sw $t0, 0($sp) # Storing internal_48
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 68($sp) # internal_40 = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# internal_40 = internal_48
+		lw $t0, 24($sp)
+		sw $t0, 56($sp)
+		
+		# Jumping to branch_end_8728344748960
+		j branch_end_8728344748960
+		
+		error_branch_8728344748960:
+		
+		branch_end_8728344748960:
+		
+		# Get attribute xcdr of self
+		lw $t0, 220($sp) # Get the address of self
+		lw $t1, 12($t0) # Get the attribute 'xcdr' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344708774
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344708774
+		j object_get_attribute_8728344708774
+		int_get_attribute_8728344708774:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp) # internal_51 = self.xcdr
+		j end_get_attribute_8728344708774
+		bool_get_attribute_8728344708774:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp) # internal_51 = self.xcdr
+		j end_get_attribute_8728344708774
+		object_get_attribute_8728344708774:
+		sw $t1, 12($sp) # internal_51 = self.xcdr
+		end_get_attribute_8728344708774:
+		
+		# Allocating Int 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 12
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_53 = address of allocated object Int
+		
+		# Get method print_list of BookList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_51
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_51
+		
+		# Calling function internal_54
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp) # internal_52 = result of internal_54
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 220
+		
+		jr $ra
+		
+	function___init___at_Nil:
+		# Function parameters
+		#   $ra = 4($sp)
+		#   self = 0($sp)
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_isNil_at_Nil:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Bool 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_print_list_at_Nil:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating Bool 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 1
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 0($sp) # internal_0 = address of allocated object Int
+		
+		# Loading return value in $v1
+		lw $v1, 0($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_Main:
+		# Function parameters
+		#   $ra = 8($sp)
+		#   self = 4($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -4
+		
+		# Allocating NUll to internal_0
+		sw $zero, 0($sp) # internal_0 = 0
+		
+		# Set attribute books of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_0
+		beq $t1, $zero, object_set_attribute_8728344709184
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344709184
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344709184
+		j object_set_attribute_8728344709184
+		int_set_attribute_8728344709184:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.books = internal_0
+		j end_set_attribute_8728344709184
+		bool_set_attribute_8728344709184:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.books = internal_0
+		j end_set_attribute_8728344709184
+		object_set_attribute_8728344709184:
+		sw $t1, 8($t0) # self.books = internal_0
+		end_set_attribute_8728344709184:
+		
+		# Loading return value in $v1
+		lw $v1, 4($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_main_at_Main:
+		# Function parameters
+		#   $ra = 108($sp)
+		#   self = 104($sp)
+		
+		# Reserving space for local variables
+		addi $sp, $sp, -104
+		
+		# Allocating Book
+		li $v0, 9
+		lw $a0, type_Book
+		syscall
+		la $t0, type_Book # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 96($sp) # internal_1 = address of allocated object Book
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_1
+		lw $t0, 104($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function function___init___at_Book
+		jal function___init___at_Book
+		lw $ra, 4($sp)
+		sw $v1, 104($sp) # internal_1 = result of function___init___at_Book
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 53 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 53
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 67
+		sb $t0, 8($v0) # internal_2[0] = 'C'
+		
+		addi $t0, $zero, 111
+		sb $t0, 9($v0) # internal_2[1] = 'o'
+		
+		addi $t0, $zero, 109
+		sb $t0, 10($v0) # internal_2[2] = 'm'
+		
+		addi $t0, $zero, 112
+		sb $t0, 11($v0) # internal_2[3] = 'p'
+		
+		addi $t0, $zero, 105
+		sb $t0, 12($v0) # internal_2[4] = 'i'
+		
+		addi $t0, $zero, 108
+		sb $t0, 13($v0) # internal_2[5] = 'l'
+		
+		addi $t0, $zero, 101
+		sb $t0, 14($v0) # internal_2[6] = 'e'
+		
+		addi $t0, $zero, 114
+		sb $t0, 15($v0) # internal_2[7] = 'r'
+		
+		addi $t0, $zero, 115
+		sb $t0, 16($v0) # internal_2[8] = 's'
+		
+		addi $t0, $zero, 44
+		sb $t0, 17($v0) # internal_2[9] = ','
+		
+		addi $t0, $zero, 32
+		sb $t0, 18($v0) # internal_2[10] = ' '
+		
+		addi $t0, $zero, 80
+		sb $t0, 19($v0) # internal_2[11] = 'P'
+		
+		addi $t0, $zero, 114
+		sb $t0, 20($v0) # internal_2[12] = 'r'
+		
+		addi $t0, $zero, 105
+		sb $t0, 21($v0) # internal_2[13] = 'i'
+		
+		addi $t0, $zero, 110
+		sb $t0, 22($v0) # internal_2[14] = 'n'
+		
+		addi $t0, $zero, 99
+		sb $t0, 23($v0) # internal_2[15] = 'c'
+		
+		addi $t0, $zero, 105
+		sb $t0, 24($v0) # internal_2[16] = 'i'
+		
+		addi $t0, $zero, 112
+		sb $t0, 25($v0) # internal_2[17] = 'p'
+		
+		addi $t0, $zero, 108
+		sb $t0, 26($v0) # internal_2[18] = 'l'
+		
+		addi $t0, $zero, 101
+		sb $t0, 27($v0) # internal_2[19] = 'e'
+		
+		addi $t0, $zero, 115
+		sb $t0, 28($v0) # internal_2[20] = 's'
+		
+		addi $t0, $zero, 44
+		sb $t0, 29($v0) # internal_2[21] = ','
+		
+		addi $t0, $zero, 32
+		sb $t0, 30($v0) # internal_2[22] = ' '
+		
+		addi $t0, $zero, 84
+		sb $t0, 31($v0) # internal_2[23] = 'T'
+		
+		addi $t0, $zero, 101
+		sb $t0, 32($v0) # internal_2[24] = 'e'
+		
+		addi $t0, $zero, 99
+		sb $t0, 33($v0) # internal_2[25] = 'c'
+		
+		addi $t0, $zero, 104
+		sb $t0, 34($v0) # internal_2[26] = 'h'
+		
+		addi $t0, $zero, 110
+		sb $t0, 35($v0) # internal_2[27] = 'n'
+		
+		addi $t0, $zero, 105
+		sb $t0, 36($v0) # internal_2[28] = 'i'
+		
+		addi $t0, $zero, 113
+		sb $t0, 37($v0) # internal_2[29] = 'q'
+		
+		addi $t0, $zero, 117
+		sb $t0, 38($v0) # internal_2[30] = 'u'
+		
+		addi $t0, $zero, 101
+		sb $t0, 39($v0) # internal_2[31] = 'e'
+		
+		addi $t0, $zero, 115
+		sb $t0, 40($v0) # internal_2[32] = 's'
+		
+		addi $t0, $zero, 44
+		sb $t0, 41($v0) # internal_2[33] = ','
+		
+		addi $t0, $zero, 32
+		sb $t0, 42($v0) # internal_2[34] = ' '
+		
+		addi $t0, $zero, 97
+		sb $t0, 43($v0) # internal_2[35] = 'a'
+		
+		addi $t0, $zero, 110
+		sb $t0, 44($v0) # internal_2[36] = 'n'
+		
+		addi $t0, $zero, 100
+		sb $t0, 45($v0) # internal_2[37] = 'd'
+		
+		addi $t0, $zero, 32
+		sb $t0, 46($v0) # internal_2[38] = ' '
+		
+		addi $t0, $zero, 84
+		sb $t0, 47($v0) # internal_2[39] = 'T'
+		
+		addi $t0, $zero, 111
+		sb $t0, 48($v0) # internal_2[40] = 'o'
+		
+		addi $t0, $zero, 111
+		sb $t0, 49($v0) # internal_2[41] = 'o'
+		
+		addi $t0, $zero, 108
+		sb $t0, 50($v0) # internal_2[42] = 'l'
+		
+		addi $t0, $zero, 115
+		sb $t0, 51($v0) # internal_2[43] = 's'
+		
+		sb $zero, 52($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 92($sp) # internal_2 = "Compilers, Principles, Techniques, and Tools"
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 31 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 31
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 65
+		sb $t0, 8($v0) # internal_3[0] = 'A'
+		
+		addi $t0, $zero, 104
+		sb $t0, 9($v0) # internal_3[1] = 'h'
+		
+		addi $t0, $zero, 111
+		sb $t0, 10($v0) # internal_3[2] = 'o'
+		
+		addi $t0, $zero, 44
+		sb $t0, 11($v0) # internal_3[3] = ','
+		
+		addi $t0, $zero, 32
+		sb $t0, 12($v0) # internal_3[4] = ' '
+		
+		addi $t0, $zero, 83
+		sb $t0, 13($v0) # internal_3[5] = 'S'
+		
+		addi $t0, $zero, 101
+		sb $t0, 14($v0) # internal_3[6] = 'e'
+		
+		addi $t0, $zero, 116
+		sb $t0, 15($v0) # internal_3[7] = 't'
+		
+		addi $t0, $zero, 104
+		sb $t0, 16($v0) # internal_3[8] = 'h'
+		
+		addi $t0, $zero, 105
+		sb $t0, 17($v0) # internal_3[9] = 'i'
+		
+		addi $t0, $zero, 44
+		sb $t0, 18($v0) # internal_3[10] = ','
+		
+		addi $t0, $zero, 32
+		sb $t0, 19($v0) # internal_3[11] = ' '
+		
+		addi $t0, $zero, 97
+		sb $t0, 20($v0) # internal_3[12] = 'a'
+		
+		addi $t0, $zero, 110
+		sb $t0, 21($v0) # internal_3[13] = 'n'
+		
+		addi $t0, $zero, 100
+		sb $t0, 22($v0) # internal_3[14] = 'd'
+		
+		addi $t0, $zero, 32
+		sb $t0, 23($v0) # internal_3[15] = ' '
+		
+		addi $t0, $zero, 85
+		sb $t0, 24($v0) # internal_3[16] = 'U'
+		
+		addi $t0, $zero, 108
+		sb $t0, 25($v0) # internal_3[17] = 'l'
+		
+		addi $t0, $zero, 108
+		sb $t0, 26($v0) # internal_3[18] = 'l'
+		
+		addi $t0, $zero, 109
+		sb $t0, 27($v0) # internal_3[19] = 'm'
+		
+		addi $t0, $zero, 97
+		sb $t0, 28($v0) # internal_3[20] = 'a'
+		
+		addi $t0, $zero, 110
+		sb $t0, 29($v0) # internal_3[21] = 'n'
+		
+		sb $zero, 30($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 88($sp) # internal_3 = "Aho, Sethi, and Ullman"
+		
+		# Allocating Int 8
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 8
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 80($sp) # internal_5 = address of allocated object Int
+		
+		# Get method initBook of Book
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 80($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 76($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -16 # Reserving space for arguments
+		sw $ra, 12($sp) # Storing return address
+		
+		# Argument internal_1
+		lw $t0, 112($sp)
+		sw $t0, 8($sp) # Storing internal_1
+		
+		# Argument internal_2
+		lw $t0, 108($sp)
+		sw $t0, 4($sp) # Storing internal_2
+		
+		# Argument internal_3
+		lw $t0, 104($sp)
+		sw $t0, 0($sp) # Storing internal_3
+		
+		# Calling function internal_6
+		lw $t0, 92($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 100($sp) # internal_4 = result of internal_6
+		addi $sp, $sp, 16 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument a_book
+		lw $t0, 112($sp)
+		sw $t0, 4($sp) # Storing a_book
+		
+		# Argument internal_4
+		lw $t0, 96($sp)
+		sw $t0, 0($sp) # Storing internal_4
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 112($sp) # a_book = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating Article
+		li $v0, 9
+		lw $a0, type_Article
+		syscall
+		la $t0, type_Article # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 68($sp) # internal_8 = address of allocated object Article
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_8
+		lw $t0, 76($sp)
+		sw $t0, 0($sp) # Storing internal_8
+		
+		# Calling function function___init___at_Article
+		jal function___init___at_Article
+		lw $ra, 4($sp)
+		sw $v1, 76($sp) # internal_8 = result of function___init___at_Article
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 28 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 28
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 84
+		sb $t0, 8($v0) # internal_9[0] = 'T'
+		
+		addi $t0, $zero, 104
+		sb $t0, 9($v0) # internal_9[1] = 'h'
+		
+		addi $t0, $zero, 101
+		sb $t0, 10($v0) # internal_9[2] = 'e'
+		
+		addi $t0, $zero, 32
+		sb $t0, 11($v0) # internal_9[3] = ' '
+		
+		addi $t0, $zero, 84
+		sb $t0, 12($v0) # internal_9[4] = 'T'
+		
+		addi $t0, $zero, 111
+		sb $t0, 13($v0) # internal_9[5] = 'o'
+		
+		addi $t0, $zero, 112
+		sb $t0, 14($v0) # internal_9[6] = 'p'
+		
+		addi $t0, $zero, 32
+		sb $t0, 15($v0) # internal_9[7] = ' '
+		
+		addi $t0, $zero, 49
+		sb $t0, 16($v0) # internal_9[8] = '1'
+		
+		addi $t0, $zero, 48
+		sb $t0, 17($v0) # internal_9[9] = '0'
+		
+		addi $t0, $zero, 48
+		sb $t0, 18($v0) # internal_9[10] = '0'
+		
+		addi $t0, $zero, 32
+		sb $t0, 19($v0) # internal_9[11] = ' '
+		
+		addi $t0, $zero, 67
+		sb $t0, 20($v0) # internal_9[12] = 'C'
+		
+		addi $t0, $zero, 68
+		sb $t0, 21($v0) # internal_9[13] = 'D'
+		
+		addi $t0, $zero, 95
+		sb $t0, 22($v0) # internal_9[14] = '_'
+		
+		addi $t0, $zero, 82
+		sb $t0, 23($v0) # internal_9[15] = 'R'
+		
+		addi $t0, $zero, 79
+		sb $t0, 24($v0) # internal_9[16] = 'O'
+		
+		addi $t0, $zero, 77
+		sb $t0, 25($v0) # internal_9[17] = 'M'
+		
+		addi $t0, $zero, 115
+		sb $t0, 26($v0) # internal_9[18] = 's'
+		
+		sb $zero, 27($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 64($sp) # internal_9 = "The Top 100 CD_ROMs"
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 16 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 16
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 85
+		sb $t0, 8($v0) # internal_10[0] = 'U'
+		
+		addi $t0, $zero, 108
+		sb $t0, 9($v0) # internal_10[1] = 'l'
+		
+		addi $t0, $zero, 97
+		sb $t0, 10($v0) # internal_10[2] = 'a'
+		
+		addi $t0, $zero, 110
+		sb $t0, 11($v0) # internal_10[3] = 'n'
+		
+		addi $t0, $zero, 111
+		sb $t0, 12($v0) # internal_10[4] = 'o'
+		
+		addi $t0, $zero, 102
+		sb $t0, 13($v0) # internal_10[5] = 'f'
+		
+		addi $t0, $zero, 102
+		sb $t0, 14($v0) # internal_10[6] = 'f'
+		
+		sb $zero, 15($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 60($sp) # internal_10 = "Ulanoff"
+		
+		# Allocating String
+		li $v0, 9
+		addi $a0, $zero, 20 # $a0 = length of string + 9 for 4 bytes for the type, 4 bytes for the length of the string and 1 byte for null-terminator
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		
+		addi $t0, $zero, 20
+		sw $t0, 4($v0) # Setting length of the string in the second word of the object
+		
+		addi $t0, $zero, 80
+		sb $t0, 8($v0) # internal_11[0] = 'P'
+		
+		addi $t0, $zero, 67
+		sb $t0, 9($v0) # internal_11[1] = 'C'
+		
+		addi $t0, $zero, 32
+		sb $t0, 10($v0) # internal_11[2] = ' '
+		
+		addi $t0, $zero, 77
+		sb $t0, 11($v0) # internal_11[3] = 'M'
+		
+		addi $t0, $zero, 97
+		sb $t0, 12($v0) # internal_11[4] = 'a'
+		
+		addi $t0, $zero, 103
+		sb $t0, 13($v0) # internal_11[5] = 'g'
+		
+		addi $t0, $zero, 97
+		sb $t0, 14($v0) # internal_11[6] = 'a'
+		
+		addi $t0, $zero, 122
+		sb $t0, 15($v0) # internal_11[7] = 'z'
+		
+		addi $t0, $zero, 105
+		sb $t0, 16($v0) # internal_11[8] = 'i'
+		
+		addi $t0, $zero, 110
+		sb $t0, 17($v0) # internal_11[9] = 'n'
+		
+		addi $t0, $zero, 101
+		sb $t0, 18($v0) # internal_11[10] = 'e'
+		
+		sb $zero, 19($v0) # Null-terminator at the end of the string
+		
+		sw $v0, 56($sp) # internal_11 = "PC Magazine"
+		
+		# Allocating Int 10
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 10
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 48($sp) # internal_13 = address of allocated object Int
+		
+		# Get method initArticle of Article
+		lw $t0, 68($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 48($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 44($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -20 # Reserving space for arguments
+		sw $ra, 16($sp) # Storing return address
+		
+		# Argument internal_8
+		lw $t0, 88($sp)
+		sw $t0, 12($sp) # Storing internal_8
+		
+		# Argument internal_9
+		lw $t0, 84($sp)
+		sw $t0, 8($sp) # Storing internal_9
+		
+		# Argument internal_10
+		lw $t0, 80($sp)
+		sw $t0, 4($sp) # Storing internal_10
+		
+		# Argument internal_11
+		lw $t0, 76($sp)
+		sw $t0, 0($sp) # Storing internal_11
+		
+		# Calling function internal_14
+		lw $t0, 64($sp)
+		jalr $t0
+		lw $ra, 16($sp)
+		sw $v1, 72($sp) # internal_12 = result of internal_14
+		addi $sp, $sp, 20 # Freeing space for arguments
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument an_article
+		lw $t0, 84($sp)
+		sw $t0, 4($sp) # Storing an_article
+		
+		# Argument internal_12
+		lw $t0, 64($sp)
+		sw $t0, 0($sp) # Storing internal_12
+		
+		# Calling function function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 84($sp) # an_article = result of function_assign
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating Nil
+		li $v0, 9
+		lw $a0, type_Nil
+		syscall
+		la $t0, type_Nil # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 40($sp) # internal_15 = address of allocated object Nil
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_15
+		lw $t0, 48($sp)
+		sw $t0, 0($sp) # Storing internal_15
+		
+		# Calling function function___init___at_Nil
+		jal function___init___at_Nil
+		lw $ra, 4($sp)
+		sw $v1, 48($sp) # internal_15 = result of function___init___at_Nil
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating Int 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 9
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 32($sp) # internal_17 = address of allocated object Int
+		
+		# Get method cons of Nil
+		lw $t0, 40($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 32($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 28($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_15
+		lw $t0, 52($sp)
+		sw $t0, 4($sp) # Storing internal_15
+		
+		# Argument a_book
+		lw $t0, 112($sp)
+		sw $t0, 0($sp) # Storing a_book
+		
+		# Calling function internal_18
+		lw $t0, 40($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 48($sp) # internal_16 = result of internal_18
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Allocating Int 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 9
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 20($sp) # internal_20 = address of allocated object Int
+		
+		# Get method cons of Cons
+		lw $t0, 36($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -12 # Reserving space for arguments
+		sw $ra, 8($sp) # Storing return address
+		
+		# Argument internal_16
+		lw $t0, 48($sp)
+		sw $t0, 4($sp) # Storing internal_16
+		
+		# Argument an_article
+		lw $t0, 84($sp)
+		sw $t0, 0($sp) # Storing an_article
+		
+		# Calling function internal_21
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp) # internal_19 = result of internal_21
+		addi $sp, $sp, 12 # Freeing space for arguments
+		
+		# Set attribute books of self
+		lw $t0, 104($sp) # $t0 = self
+		lw $t1, 24($sp) # $t1 = internal_19
+		beq $t1, $zero, object_set_attribute_8728344710051
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8728344710051
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8728344710051
+		j object_set_attribute_8728344710051
+		int_set_attribute_8728344710051:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.books = internal_19
+		j end_set_attribute_8728344710051
+		bool_set_attribute_8728344710051:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.books = internal_19
+		j end_set_attribute_8728344710051
+		object_set_attribute_8728344710051:
+		sw $t1, 8($t0) # self.books = internal_19
+		end_set_attribute_8728344710051:
+		
+		# Get attribute books of self
+		lw $t0, 104($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'books' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8728344710708
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8728344710708
+		j object_get_attribute_8728344710708
+		int_get_attribute_8728344710708:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp) # internal_22 = self.books
+		j end_get_attribute_8728344710708
+		bool_get_attribute_8728344710708:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp) # internal_22 = self.books
+		j end_get_attribute_8728344710708
+		object_get_attribute_8728344710708:
+		sw $t1, 12($sp) # internal_22 = self.books
+		end_get_attribute_8728344710708:
+		
+		# Allocating Int 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 12
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_24 = address of allocated object Int
+		
+		# Get method print_list of BookList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_22
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_22
+		
+		# Calling function internal_25
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp) # internal_23 = result of internal_25
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Loading return value in $v1
+		lw $v1, 8($sp)
+		
+		# Freeing space for local variables
+		addi $sp, $sp, 104
+		
+		jr $ra
+		
+	main:
+		# Reserving space for local variables
+		addi $sp, $sp, -16
+		
+		# Allocating Main
+		li $v0, 9
+		lw $a0, type_Main
+		syscall
+		la $t0, type_Main # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of th object
+		sw $a0, 4($v0) # Setting size in the second word of th object
+		sw $v0, 12($sp) # internal_0 = address of allocated object Main
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_0
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function function___init___at_Main
+		jal function___init___at_Main
+		lw $ra, 4($sp)
+		sw $v1, 20($sp) # internal_0 = result of function___init___at_Main
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Allocating Int 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int # $t0 = address of the type
+		sw $t0, 0($v0) # Setting type in the first word of the object
+		sw $a0, 4($v0) # Setting size in the second word of the object
+		addi $t0, $zero, 4
+		sw $t0, 8($v0) # Setting value in the third word of the object
+		sw $v0, 4($sp) # internal_2 = address of allocated object Int
+		
+		# Get method main of Main
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# Passing function arguments
+		addi $sp, $sp, -8 # Reserving space for arguments
+		sw $ra, 4($sp) # Storing return address
+		
+		# Argument internal_0
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function internal_3
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp) # internal_1 = result of internal_3
+		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Exit program
+		li $v0, 10
+		syscall
+		
+		

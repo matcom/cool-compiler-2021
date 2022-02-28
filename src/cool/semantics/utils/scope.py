@@ -306,7 +306,7 @@ class Scope:
                 self.parent.find_variable(var_name) if self.parent is not None else None
             )
 
-    def find_all_variables(self, var_name: str) -> List[VariableInfo]:
+    def find_all_variables_with_name(self, var_name: str) -> List[VariableInfo]:
         vars = []
         scope = self
         while scope is not None:

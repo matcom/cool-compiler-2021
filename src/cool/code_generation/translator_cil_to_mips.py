@@ -76,8 +76,13 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         for type_node in node.dottypes:
             self.visit(type_node)
         
+        for type_node in node.dottypes: 
+            self.register_word(self.to_data_type("name_size", type_node.name), str(len(type_node.name)))
+            self.register_asciiz(self.to_data_type("name", type_node.name), f'"{type_node.name}"')
+            self.register_empty_data()
+        
         self.register_space("buffer_input", 1024)
-        self.register_asciiz("debug_log", "\"debug_log\\n\"")
+        self.register_asciiz("debug_log", '"debug_log\\n"')
 
         for function_node in node.dotcode:
             self.visit(function_node)
@@ -86,14 +91,13 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
 
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
-        size = 4 * (2 + len(node.attributes))
+        size = 4 * (2 + len(node.attributes) + len(node.methods))
 
         self.register_word(f"type_{node.name}", str(size))
-        self.register_word(self.to_data_type("inherits_from", node.name),f"type_{node.parent}" if node.parent != "null" else "0")
-        self.register_word(self.to_data_type("attributes", node.name), str(len(node.attributes)))
-        self.register_word(self.to_data_type("name_size", node.name), str(len(node.name)))
-        self.register_asciiz(self.to_data_type("name", node.name), f'"{node.name}"')
-        
+        self.register_word(self.to_data_type("inherits_from", node.name), f"type_{node.parent}" if node.parent != "null" else "0")
+        self.register_word(self.to_data_type("name_address", node.name), f"type_{node.name}_name_size")
+        for method, function in node.methods:
+            self.register_word(self.to_data_type(method, node.name), function)
         self.register_empty_data()
 
     @visitor.when(cil.FunctionNode)
@@ -172,10 +176,11 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        self.register_comment(f"Calling function {node.method}")
-        self.register_instruction(mips.JumpAndLinkNode(node.method))
+        self.register_comment(f"Calling function {node.method_address}")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.method_address) + 4 * node.total_args + 4}($sp)"))
+        self.register_instruction(mips.JumpAndLinkRegisterNode("$t0"))
         self.register_instruction(mips.LoadWordNode("$ra", f"{4 * node.total_args}($sp)"))
-        self.register_instruction(mips.StoreWordNode("$v1", f"{self.offset_of(node.dest) + 4 * node.total_args + 4}($sp)").set_comment(f"{node.dest} = result of {node.method}"))
+        self.register_instruction(mips.StoreWordNode("$v1", f"{self.offset_of(node.dest) + 4 * node.total_args + 4}($sp)").set_comment(f"{node.dest} = result of {node.method_address}"))
         self.register_instruction(mips.AddiNode("$sp", "$sp", f"{4 * node.total_args + 4}").set_comment("Freeing space for arguments"))
     
     @visitor.when(cil.StaticCallNode)
@@ -398,7 +403,7 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         node_id = hash(node)
         self.register_comment(f"Get attribute {node.attr} of {node.instance}")
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.instance)}($sp)").set_comment(f"Get the address of {node.instance}"))
-        self.register_instruction(mips.LoadWordNode("$t1", f"{4 * (node.attr_index + 2)}($t0)").set_comment(f"Get the attribute '{node.attr}' from the instance"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"{4 * (node.attr_index + 2)}($t0)").set_comment(f"Get the attribute '{node.attr}' from the {node.instance}"))
 
         self.register_instruction(mips.LoadWordNode("$t2", "0($t1)"))
         self.register_instruction(mips.LoadAddressNode("$t3", "type_Int"))
@@ -437,7 +442,7 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_instruction(mips.JumpNode(f"end_get_attribute_{node_id}"))
 
         self.register_instruction(mips.LabelNode(f"object_get_attribute_{node_id}"))
-        self.register_instruction(mips.StoreWordNode("$t1",f"{self.offset_of(node.dest)}($sp)").set_comment(f"{node.dest} = {node.attr}"))
+        self.register_instruction(mips.StoreWordNode("$t1",f"{self.offset_of(node.dest)}($sp)").set_comment(f"{node.dest} = {node.instance}.{node.attr}"))
         self.register_instruction(mips.LabelNode(f"end_get_attribute_{node_id}"))
 
     @visitor.when(cil.SetAttributeNode)
@@ -488,6 +493,19 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_instruction(mips.LabelNode(f"object_set_attribute_{node_id}"))
         self.register_instruction(mips.StoreWordNode("$t1", f"{4 * (node.attr_index + 2)}($t0)").set_comment(f"{node.instance}.{node.attr} = {node.source}"))
         self.register_instruction(mips.LabelNode(f"end_set_attribute_{node_id}"))
+
+    @visitor.when(cil.GetMethodNode)
+    def visit(self, node: cil.GetMethodNode):
+        self.register_comment(f"Get method {node.method_name} of {node.type}")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.instance)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t0", "0($t0)"))
+        self.register_instruction(mips.AddiNode("$t0", "$t0", "12"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.method_index)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"8($t1)"))
+        self.register_instruction(mips.SllNode("$t1", "$t1", "2"))
+        self.register_instruction(mips.AddNode("$t0", "$t0", "$t1"))
+        self.register_instruction(mips.LoadWordNode("$t0", "0($t0)"))
+        self.register_instruction(mips.StoreWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
 
     @visitor.when(cil.ArrayNode)
     def visit(self, node: cil.ArrayNode):
@@ -543,7 +561,6 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_instruction(mips.LoadWordNode("$t2", f"{self.offset_of(node.dest)}($sp)").set_comment(f"{node.dest} = array {node.instance}[4 * {node.index}]"))
         self.register_instruction(mips.StoreWordNode("$t0", "8($t2)"))
 
-
     @visitor.when(cil.SetValueInIndexNode)
     def visit(self, node: cil.SetValueInIndexNode):
         self.register_comment(f"array {node.instance}[4 * {node.index}] = {node.source}")
@@ -579,69 +596,14 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_instruction(mips.LoadAddressNode("$t0", f"type_{node.name}"))
         self.register_instruction(mips.StoreWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
 
-    @visitor.when(cil.EqualAddressNode)
-    def visit(self, node: cil.EqualAddressNode):
-        self.register_comment(f"{node.dest} = EqualAddress({node.left}, {node.right})")
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
-        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
-        self.register_instruction(mips.SeqNode("$t2", "$t0", "$t1"))
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
-        self.register_instruction(mips.StoreWordNode("$t2", f"8($t0)"))
-    
-    @visitor.when(cil.EqualIntNode)
-    def visit(self, node: cil.EqualIntNode):
-        self.register_comment(f"{node.dest} = EqualInt({node.left}, {node.right})")
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
-        self.register_instruction(mips.LoadWordNode("$t0", f"8($t0)"))
-        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
-        self.register_instruction(mips.LoadWordNode("$t1", f"8($t1)"))
-        self.register_instruction(mips.SeqNode("$t2", "$t0", "$t1"))
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
-        self.register_instruction(mips.StoreWordNode("$t2", f"8($t0)"))
-
-    @visitor.when(cil.EqualStrNode)
-    def visit(self, node: cil.EqualStrNode):
-        self.register_comment(f"{node.dest} = EqualStr({node.left}, {node.right})")
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
-        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
-        self.register_instruction(mips.AddiNode("$t0", "$t0", "8"))
-        self.register_instruction(mips.AddiNode("$t1", "$t1", "8"))
-
-        self.register_empty_instruction()
-        self.register_comment(f"By default we assume the strings are equals")
-        self.register_instruction(mips.AddiNode("$t4", "$zero", "1"))
-        self.register_instruction(mips.LoadWordNode("$t5", f"{self.offset_of(node.dest)}($sp)"))
-        self.register_instruction(mips.StoreWordNode("$t4", f"8($t5)"))
-
-        self.register_empty_instruction()
-        self.register_instruction(mips.LabelNode("while_compare_strings_start"))
-        self.register_instruction(mips.LoadByteNode("$t2", "0($t0)"))
-        self.register_instruction(mips.LoadByteNode("$t3", "0($t1)"))
-
-        self.register_instruction(mips.BeqNode("$t2", "$t3", "while_compare_strings_update"))
-        
-        self.register_empty_instruction()
-        self.register_comment(f"The strings are no equals")
-        self.register_instruction(mips.LoadWordNode("$t5", f"{self.offset_of(node.dest)}($sp)"))
-        self.register_instruction(mips.StoreWordNode("$zero", f"8($t5)"))
-        self.register_instruction(mips.JumpNode("while_compare_strings_end"))
-        
-        self.register_empty_instruction()
-        self.register_instruction(mips.LabelNode("while_compare_strings_update"))
-        self.register_instruction(mips.AddiNode("$t0", "$t0", "1"))
-        self.register_instruction(mips.AddiNode("$t1", "$t1", "1"))
-        self.register_instruction(mips.BeqNode("$t2", "$zero", "while_compare_strings_end"))
-        self.register_instruction(mips.BeqNode("$t3", "$zero", "while_compare_strings_end"))
-        self.register_instruction(mips.JumpNode("while_compare_strings_start"))
-        self.register_instruction(mips.LabelNode("while_compare_strings_end"))
-
     @visitor.when(cil.TypeNameNode)
     def visit(self, node: cil.TypeNameNode):
         self.register_comment(f"{node.dest} = name of {node.source}")
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.source)}($sp)").set_comment(f"$t0 = {node.source}"))
         self.register_instruction(mips.LoadWordNode("$t1", "0($t0)").set_comment(f"$t1 = type of {node.source}"))
-        self.register_instruction(mips.LoadWordNode("$t2", "12($t1)").set_comment(f"$t1 = length of the name of {node.source}"))
-        self.register_instruction(mips.LoadAddressNode("$t3", "16($t1)").set_comment(f"$t1 = name of {node.source}"))
+        self.register_instruction(mips.LoadWordNode("$t2", "8($t1)").set_comment(f"$t2 = direction of the type name"))
+        self.register_instruction(mips.LoadAddressNode("$t3", "4($t2)").set_comment(f"$t3 = address of the name"))
+        self.register_instruction(mips.LoadWordNode("$t2", "0($t2)").set_comment(f"$t2 = length of the name"))
         self.register_empty_instruction()
 
         self.register_instruction(mips.AddiNode("$t2", "$t2", "9").set_comment(f"Setting space for the type, the size and the null byte"))
@@ -714,19 +676,31 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_instruction(mips.AddiNode("$t0", "$t0", "8").set_comment("Pointer to the first character of the string"))
         self.register_empty_instruction()
 
-        self.register_comment(f"Printing the string {node.str_addr}")
+        self.register_comment(f"Printing the String {node.str_addr}")
         self.register_instruction(mips.LoadInmediateNode("$v0", "4"))
         self.register_instruction(mips.MoveNode("$a0", "$t0"))
         self.register_instruction(mips.SystemCallNode())
 
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
-        self.register_comment(f"Printing the string {node.source}")
+        self.register_comment(f"Printing the Int {node.source}")
         self.register_instruction(mips.LoadInmediateNode("$v0", "1"))
         self.register_instruction(mips.LoadWordNode("$a0", f"{self.offset_of(node.source)}($sp)"))
         self.register_instruction(mips.LoadWordNode("$a0", "8($a0)"))
         self.register_instruction(mips.SystemCallNode())
     
+    @visitor.when(cil.PrintTypeNameNode)
+    def visit(self, node: cil.PrintTypeNameNode):
+        self.register_comment("Printing the type name")
+        self.register_empty_instruction()
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.address)}($sp)"))
+        self.register_instruction(mips.AddiNode("$t0", "$t0", "12"))
+        self.register_instruction(mips.LoadWordNode("$t0", "0($t0)"))
+        self.register_instruction(mips.AddiNode("$t0", "$t0", "4"))
+        self.register_instruction(mips.LoadInmediateNode("$v0", "4"))
+        self.register_instruction(mips.MoveNode("$a0", "$t0"))
+        self.register_instruction(mips.SystemCallNode())
+
     @visitor.when(cil.ReadStringNode)
     def visit(self, node: cil.ReadStringNode):
         self.register_instruction(mips.LoadInmediateNode("$v0", "8"))
@@ -734,17 +708,31 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_instruction(mips.LoadInmediateNode("$a1", "1024"))
         self.register_instruction(mips.SystemCallNode())
 
+
         self.register_empty_instruction()
         self.register_instruction(mips.XorNode("$t0", "$t0", "$t0").set_comment("Initializing counter"))
         self.register_instruction(mips.LabelNode("while_read_start"))
         self.register_instruction(mips.LoadByteNode("$t1", "buffer_input($t0)").set_comment("Loading the byte"))
-        self.register_instruction(mips.BeqNode("$t1", "$zero", "while_read_end"))
+        
+        # self.register_instruction(mips.LoadInmediateNode("$v0", "1"))
+        # self.register_instruction(mips.MoveNode("$a0", "$t1"))
+        # self.register_instruction(mips.SystemCallNode())
+
+        # self.register_instruction(mips.LoadInmediateNode("$v0", "1"))
+        # self.register_instruction(mips.LoadInmediateNode("$a0", "0"))
+        # self.register_instruction(mips.SystemCallNode())
+        
+        self.register_instruction(mips.AddiNode("$t2", "$zero", "10"))
+        self.register_instruction(mips.BeqNode("$t1", "$t2", "while_read_end"))
+        self.register_instruction(mips.AddiNode("$t2", "$zero", "13"))
+        self.register_instruction(mips.BeqNode("$t1", "$t2", "while_read_end"))
         self.register_instruction(mips.AddiNode("$t0", "$t0", "1").set_comment("Incrementing counter"))
         self.register_instruction(mips.JumpNode("while_read_start"))
         self.register_instruction(mips.LabelNode("while_read_end"))
 
-        self.register_instruction(mips.AddiNode("$t0", "$t0", "-1").set_comment("Decrementing counter to eliminate the '\\n'"))
-
+        # self.register_instruction(mips.LoadInmediateNode("$v0", "1"))
+        # self.register_instruction(mips.MoveNode("$a0", "$t0"))
+        # self.register_instruction(mips.SystemCallNode())
         self.register_empty_instruction()
         self.register_instruction(mips.AddiNode("$t0", "$t0", "9").set_comment("Adding space for the type, the size and the null byte"))
         self.register_instantiation("$t0")
@@ -823,21 +811,13 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_instruction(mips.DivNode("$t0", "$t1").set_comment("$t2 = $t0 / $t1"))
         self.register_instruction(mips.MoveFromLowNode("$t2"))
         self.postprocess_binary_int_operation(node, "Int")
-    
+
     @visitor.when(cil.XorNode)
     def visit(self, node: cil.XorNode):
         self.register_comment("Xor operation")
         self.preprocess_binary_operation(node)
         self.register_instruction(mips.XorNode("$t2", "$t0", "$t1").set_comment("$t0 = $t0 ^ $t1"))
         self.postprocess_binary_int_operation(node, "Int")
-
-    @visitor.when(cil.EqualNode)
-    def visit(self, node: cil.EqualNode):
-        self.register_comment("Equal operation")
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)").set_comment("Save in $t0 the left operand address"))
-        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)").set_comment("Save in $t1 the right operand address"))
-        self.register_instruction(mips.SeqNode("$t2", "$t0", "$t1").set_comment("$t2 = $t0 == $t1"))
-        self.postprocess_binary_int_operation(node, "Bool")
 
     @visitor.when(cil.LessThanNode)
     def visit(self, node: cil.LessThanNode):
@@ -852,7 +832,71 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.preprocess_binary_operation(node)
         self.register_instruction(mips.SleNode("$t2", "$t0", "$t1").set_comment("$t2 = $t0 <= $t1"))
         self.postprocess_binary_int_operation(node, "Bool")
+
+    @visitor.when(cil.EqualNode)
+    def visit(self, node: cil.EqualNode):
+        self.register_comment("Equal operation")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)").set_comment("Save in $t0 the left operand address"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)").set_comment("Save in $t1 the right operand address"))
+        self.register_instruction(mips.SeqNode("$t2", "$t0", "$t1").set_comment("$t2 = $t0 == $t1"))
+        self.postprocess_binary_int_operation(node, "Bool")
+
+    @visitor.when(cil.EqualAddressNode)
+    def visit(self, node: cil.EqualAddressNode):
+        self.register_comment(f"{node.dest} = EqualAddress({node.left}, {node.right})")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        self.register_instruction(mips.SeqNode("$t2", "$t0", "$t1"))
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        self.register_instruction(mips.StoreWordNode("$t2", f"8($t0)"))
     
+    @visitor.when(cil.EqualIntNode)
+    def visit(self, node: cil.EqualIntNode):
+        self.register_comment(f"{node.dest} = EqualInt({node.left}, {node.right})")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t0", f"8($t0)"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"8($t1)"))
+        self.register_instruction(mips.SeqNode("$t2", "$t0", "$t1"))
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        self.register_instruction(mips.StoreWordNode("$t2", f"8($t0)"))
+
+    @visitor.when(cil.EqualStrNode)
+    def visit(self, node: cil.EqualStrNode):
+        self.register_comment(f"{node.dest} = EqualStr({node.left}, {node.right})")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        self.register_instruction(mips.AddiNode("$t0", "$t0", "8"))
+        self.register_instruction(mips.AddiNode("$t1", "$t1", "8"))
+
+        self.register_empty_instruction()
+        self.register_comment(f"By default we assume the strings are equals")
+        self.register_instruction(mips.AddiNode("$t4", "$zero", "1"))
+        self.register_instruction(mips.LoadWordNode("$t5", f"{self.offset_of(node.dest)}($sp)"))
+        self.register_instruction(mips.StoreWordNode("$t4", f"8($t5)"))
+
+        self.register_empty_instruction()
+        self.register_instruction(mips.LabelNode("while_compare_strings_start"))
+        self.register_instruction(mips.LoadByteNode("$t2", "0($t0)"))
+        self.register_instruction(mips.LoadByteNode("$t3", "0($t1)"))
+
+        self.register_instruction(mips.BeqNode("$t2", "$t3", "while_compare_strings_update"))
+        
+        self.register_empty_instruction()
+        self.register_comment(f"The strings are no equals")
+        self.register_instruction(mips.LoadWordNode("$t5", f"{self.offset_of(node.dest)}($sp)"))
+        self.register_instruction(mips.StoreWordNode("$zero", f"8($t5)"))
+        self.register_instruction(mips.JumpNode("while_compare_strings_end"))
+        
+        self.register_empty_instruction()
+        self.register_instruction(mips.LabelNode("while_compare_strings_update"))
+        self.register_instruction(mips.AddiNode("$t0", "$t0", "1"))
+        self.register_instruction(mips.AddiNode("$t1", "$t1", "1"))
+        self.register_instruction(mips.BeqNode("$t2", "$zero", "while_compare_strings_end"))
+        self.register_instruction(mips.BeqNode("$t3", "$zero", "while_compare_strings_end"))
+        self.register_instruction(mips.JumpNode("while_compare_strings_start"))
+        self.register_instruction(mips.LabelNode("while_compare_strings_end"))
+
     @visitor.when(cil.HaltNode)
     def visit(self, node: cil.HaltNode):
         self.register_comment("Exit program")
@@ -869,6 +913,7 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_comment("Loading return value in $v1")
         self.register_instruction(mips.LoadWordNode("$v1", f"{offset}($sp)"))
 
+    
     def preprocess_binary_operation(self, node: cil.ArithmeticNode):
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)").set_comment("Save in $t0 the left operand address"))
         self.register_instruction(mips.LoadWordNode("$t0", "8($t0)").set_comment("Save in $t0 the left operand value"))
@@ -880,13 +925,3 @@ class CilToMipsTranslator(BaseCilToMipsVisitor):
         self.register_empty_instruction()
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)").set_comment(f"$t0 = {node.dest}"))
         self.register_instruction(mips.StoreWordNode("$t2", "8($t0)").set_comment(f"Setting value in the third word of the {t} object"))
-
-    @visitor.when(cil.AssertTypeNode)
-    def visit(self, node: cil.AssertTypeNode):
-        self.register_comment("Assert type")
-        self.register_empty_instruction()
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.address)}($sp)").set_comment("Save in $t0 the value address"))
-        self.register_instruction(mips.AddiNode("$t0", "$t0", "16"))
-        self.register_instruction(mips.LoadInmediateNode("$v0", "4"))
-        self.register_instruction(mips.MoveNode("$a0", "$t0"))
-        self.register_instruction(mips.SystemCallNode())

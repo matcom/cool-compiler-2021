@@ -109,7 +109,6 @@ class LessThanNode(ArithmeticNode):
 
 
 class EqualNode(ArithmeticNode):
-    equality_type: str = "Object"
     pass
 
 
@@ -117,12 +116,21 @@ class XorNode(ArithmeticNode):
     pass
 
 
+class GetMethodNode(InstructionNode):
+    def __init__(self, dest: str, instance: str, method_index: str, method_name: str, type: str) -> None:
+        self.dest: str = dest
+        self.instance: str = instance
+        self.method_index: str = method_index
+        self.method_name: str = method_name
+        self.type: str = type
+
 class GetAttributeNode(InstructionNode):
     def __init__(self, dest: str, instance: str, attr: str, attr_index: int) -> None:
         self.dest: str = dest
         self.instance: str = instance
         self.attr: str = attr
         self.attr_index: int = attr_index
+
 
 
 class SetAttributeNode(InstructionNode):
@@ -256,9 +264,9 @@ class StaticCallNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype: str, method: str, dest: str, total_args: int):
+    def __init__(self, xtype: str, method_address: str, dest: str, total_args: int):
         self.type = xtype
-        self.method = method
+        self.method_address = method_address
         self.dest = dest
         self.total_args = total_args
 
@@ -373,6 +381,6 @@ class HaltNode(InstructionNode):
         pass
 
 
-class AssertTypeNode(InstructionNode):
+class PrintTypeNameNode(InstructionNode):
     def __init__(self, address: str):
         self.address: str = address

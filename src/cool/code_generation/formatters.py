@@ -211,10 +211,14 @@ class CilFormatter:
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
         return (
-            f"{node.dest} = VCALL {node.type} {node.method}"
+            f"{node.dest} = VCALL {node.type} {node.method_address}"
             if node.comment == ""
-            else f"{node.dest} = VCALL {node.type} {node.method} # {node.comment}"
+            else f"{node.dest} = VCALL {node.type} {node.method_address} # {node.comment}"
         )
+
+    @visitor.when(cil.GetMethodNode)
+    def visit(self, node: cil.GetMethodNode):
+        return f"{node.dest} = GETMETHOD {node.instance} {node.method_index} # {node.method_name}"
 
     @visitor.when(cil.GetAttributeNode)
     def visit(self, node: cil.GetAttributeNode):
@@ -405,8 +409,8 @@ class CilFormatter:
         return (f"{node.dest} = ALLOCNULL") if node.comment == "" else f"{node.dest} = ALLOCNULL # {node.comment}"
 
 
-    @visitor.when(cil.AssertTypeNode)
-    def visit(self, node: cil.AssertTypeNode):
+    @visitor.when(cil.PrintTypeNameNode)
+    def visit(self, node: cil.PrintTypeNameNode):
         return f"ASSERT {node.address}"
 
 
