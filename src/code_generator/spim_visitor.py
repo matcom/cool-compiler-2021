@@ -425,8 +425,9 @@ class MIPSCodegen:
         self.visit(node.left, frame)
         self.add_line(f'move $t1, $v0') # get the address to the left Int instance 
         self.add_line(f'lw $t1, 4($t1)') # get the value of the instance
-
+        self.gen_push('$t1')
         self.visit(node.right, frame)
+        self.gen_pop('$t1')
         self.add_line(f'move $t2, $v0') # get the address to the right Int instance 
         self.add_line(f'lw $t2, 4($t2)') # get the value of the instance
 
@@ -447,7 +448,9 @@ class MIPSCodegen:
         self.add_line(f'move $t1, $v0') # get the address to the left Int instance 
         self.add_line(f'lw $t1, 4($t1)') # get the value of the instance
 
+        self.gen_push('$t1')
         self.visit(node.right, frame)
+        self.gen_pop('$t1')
         self.add_line(f'move $t2, $v0') # get the address to the right Int instance 
         self.add_line(f'lw $t2, 4($t2)') # get the value of the instance
 

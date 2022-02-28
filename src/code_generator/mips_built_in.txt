@@ -128,7 +128,7 @@ in_string_IO:
         la $t0, IO_Buffer
         sw $t0, 0($sp)
         addi $sp, $sp, -4
-		jal strlen
+	jal strlen
         addi $sp, $sp, 4
         lw $t0, 0($sp) # the length is now in $v0
 
@@ -146,9 +146,14 @@ in_string_IO:
         addi $t2, $t2, 1
         bgtz $t3, in_string_IO_loop
         addi $t2, $t2, -2
+
+        li $t4, 10
+        lb $t5, 0($t2)
+        bne $t5, $t4, in_string_IO_end
         li $t3, 0
         sb $t3, 0($t2)
 
+        in_string_IO_end:
         move $t0, $v0
 
         li $a0, 8
@@ -252,8 +257,9 @@ substr_String:
 
         lw $t7, 12($fp) # get the length perameter Int instance address
         lw $t2, 4($t7) # get the value of the Int
-
+        
         move $a0, $t2
+        addi $a0, $a0, 1
         li $v0, 9	
         syscall # allocate memory for the substring value
         
@@ -282,7 +288,7 @@ substr_String:
         j substr_String_loop2
 
         substr_String_eloop2:
-
+        sb $zero, 0($t4)
         move $t0, $v0
         la $t1, String
         
@@ -346,7 +352,7 @@ strlen:
         lw $a0, 12($fp)
         li $t0, 0
 strlen_loop:
-        lb $t1, 0($a0)
+        lbu $t1, 0($a0)
         beqz $t1, strlen_exit
         addu $a0, $a0, 1
         addu $t0, $t0, 1
@@ -445,8 +451,8 @@ compare:
 		lw $t0, 4($t0)
 		lw $t1, 4($t1)
 		compare_str_loop:
-		lb $t3, 0($t0)
-		lb $t4, 0($t1)
+		lbu $t3, 0($t0)
+		lbu $t4, 0($t1)
 		bne $t3, $t4, compare_false
 		beq $t3, $zero, compare_true
 		addi $t0, $t0, 1
@@ -528,7 +534,7 @@ concat_String:
         lw $t0, 4($t0) # the address of the value of the first String instance
         move $t1, $v0 # the address of the value of the result string
         concat_String_loop1:
-        lb $t3, 0($t0)
+        lbu $t3, 0($t0)
         beq $t3, $zero, concat_String_eloop1
         sb $t3, 0($t1)
         addi $t0, $t0, 1
@@ -540,7 +546,7 @@ concat_String:
         lw $t0, 12($fp)
         lw $t0, 4($t0)
         concat_String_loop2:
-        lb $t3, 0($t0)
+        lbu $t3, 0($t0)
         beq $t3, $zero, concat_String_eloop2
         sb $t3, 0($t1)
         addi $t0, $t0, 1

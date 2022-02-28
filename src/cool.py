@@ -62,6 +62,6 @@ mips_codegen.visit(cil, None)
 #print(mips_codegen.code)
 with open(f'output.out', 'w') as f:
     f.write(mips_codegen.code)
-# with open(f'{input_file[:-3]}.mips', 'w') as f:
-#     f.write(mips_codegen.code)
+with open(f'{input_file[:-3]}.mips', 'w') as f:
+    f.write(mips_codegen.code)
 exit(0)

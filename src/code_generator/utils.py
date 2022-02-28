@@ -1,7 +1,6 @@
 from cmp.semantic import IntType, ObjectType, StringType, BoolType
 from .ast_CIL import *
 from collections import deque
-import numpy as np 
 from itertools import chain
 from collections import OrderedDict
 
@@ -235,7 +234,7 @@ def bfs ( list, d ,s , m ):
         else :
             v = None    
         while v is not None:
-            if d[v.name] == np.inf:
+            if d[v.name] == -1:
                 d[v.name] = d[s.name] + 1
                 s = v
                 list.append(v) 
@@ -245,7 +244,7 @@ def bfs ( list, d ,s , m ):
 
 def init (context,d):
     for c in context.types.values():
-        d [c.name] = np.inf
+        d [c.name] = -1
     return d     
 
 def table (table):
@@ -253,7 +252,7 @@ def table (table):
     for k in (table.keys()):
         value = table[k]
         for c in value.keys(): 
-            if  table[k][c] != np.inf and table[k][c] != 0:
+            if  table[k][c] != -1 and table[k][c] != 0:
         
                 try:
                     d [c].append((k,table[k][c])) 
