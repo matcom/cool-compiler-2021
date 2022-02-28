@@ -29,6 +29,40 @@ abort_Object:
        
         jr $ra
 
+copy_Object:
+            # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+
+        lw $t7, 12($fp) # load the object address
+        lw $t6, 0($t7) # get the type info address
+        lw $t5, 0($t6) # get the size of the type
+
+        move $a0, $t5
+        li $v0, 9
+        syscall
+        move $t6, $v0
+copy_Object_loop:
+        lw $t4, 0($t7)
+        sw $t4, 0($t6)
+        addu $t7, $t7, 4
+        addu $t6, $t6, 4
+        addu $t5, $t5, -4
+        bgtz $t5, copy_Object_loop              
+        
+        
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
 
 
 out_string_IO:
@@ -390,6 +424,9 @@ compare:
 		la $t4, Bool
 		beq $t3, $t4, compare_branch1
 
+                la $t4, type
+                beq $t3, $t4, compare_branch1
+
 		la $t4, String
 		beq $t3, $t4, compare_branch2
 
@@ -449,6 +486,97 @@ concat_String:
         sw $fp, 0($sp)
         addi $sp, $sp, -4
         move $fp, $sp
+
+        lw $t0, 16($fp)
+        lw $t0, 4($t0) # the value of the first String instance
+
+        # call strlen with the string
+        sw $t0, 0($sp)
+        addi $sp, $sp, -4
+        jal strlen
+        addi $sp, $sp, 4
+        lw $t0, 0($sp)
+
+        #save the lenght of the first string
+        sw $v0, 0($sp)
+        addi $sp, $sp, -4
+
+
+        lw $t0, 16($fp)
+        lw $t0, 4($t0) # the value of the second String instance
+
+        # call strlen with the string
+        sw $t0, 0($sp)
+        addi $sp, $sp, -4
+        jal strlen
+        addi $sp, $sp, 4
+        lw $t0, 0($sp)
+
+        # pop the lenght of the first string from the stack
+        addi $sp, $sp, 4
+        lw $t0, 0($sp) 
+        
+        # get the total space for allocating the new string
+        addu $t0, $t0, $v0
+        addi $t0, $t0, 1
+
+        move $a0, $t0
+        li $v0, 9
+        syscall # at $v0 is the result string
+
+        lw $t0, 16($fp)
+        lw $t0, 4($t0) # the address of the value of the first String instance
+        move $t1, $v0 # the address of the value of the result string
+        concat_String_loop1:
+        lb $t3, 0($t0)
+        beq $t3, $zero, concat_String_eloop1
+        sb $t3, 0($t1)
+        addi $t0, $t0, 1
+        addi $t1, $t1, 1
+        j concat_String_loop1
+
+        concat_String_eloop1:
+
+        lw $t0, 12($fp)
+        lw $t0, 4($t0)
+        concat_String_loop2:
+        lb $t3, 0($t0)
+        beq $t3, $zero, concat_String_eloop2
+        sb $t3, 0($t1)
+        addi $t0, $t0, 1
+        addi $t1, $t1, 1
+        j concat_String_loop2
+        concat_String_eloop2:
+        sb $zero, 0($t1)
+
+        la $t0, String
+        move $t1, $v0
+
+        li $a0, 8
+        li $v0, 9
+        syscall
+
+        sw $t0, 0($v0)
+        sw $t1, 4($v0)
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+
+
+
+
+
+
+
+
+
+
 		
 
 

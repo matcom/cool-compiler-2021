@@ -32,9 +32,8 @@ class CIL:
         self.scope.functions.append(CILFuncNode('main', [], locals, instructions))
         
         self.scope.data.append(CILDataNode(f'str_empty', "\"\""))
-        self.table = bfs_init(self.scope.context)
+        #self.table = bfs_init(self.scope.context)
         types_ts = get_ts(self.scope.context)
-        self.to = types_ts
         infos = self.scope.infos = {}
         for type in types_ts:
             t = TypeInfo() 
@@ -139,10 +138,15 @@ class CIL:
             name = self.scope.add_new_local(node.expr.computed_type.name) 
             instruction = CILAssignNode(CILVariableNode(name), expr)
             self.scope.instructions.append(instruction)  
+            type = node.expr.computed_type.name
         elif node.expr.lex == 'self':
             name = f'self_{self.scope.current_class}' 
+            type = self.scope.current_class   
         else:
-            name = self.scope.find_local(node.expr.lex)           
+            name = self.scope.find_local(node.expr.lex)
+            type = node.expr.computed_type.name
+        if node.type is not None:
+            type = node.type         
         args = []
         args.append(CILArgNode(CILVariableNode(name)))
         for arg in node.arg:
@@ -157,9 +161,9 @@ class CIL:
         self.scope.instructions.extend(args)        
         
         if node.type is not None:
-            expression = CILVCallNode(node.type, node.id)
+            expression = CILVCallNode(node.type, node.id, True)
         else:         
-            expression = CILVCallNode(None, node.id)
+            expression = CILVCallNode(type, node.id)
         type = self.scope.ret_type_of_method(node.id, type)
         new_var = self.scope.add_new_local(type) 
         node_var = CILVariableNode(new_var)

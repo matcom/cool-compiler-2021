@@ -37,6 +37,13 @@ class MIPSCodegen:
 
     @visitor.when(CILProgramNode)
     def visit(self, node: CILProgramNode, frame):
+
+        self.set_tabs(1)
+        self.add_line(".data")
+        self.add_line(".align 4")
+        self.set_tabs(0)
+        self.add_line("type: .word 8")
+        self.add_line('')
         for t in node.types:
             self.visit(t, frame)
     
@@ -68,7 +75,7 @@ class MIPSCodegen:
         t = self.scope.types[node.id]
         methods_str = ' '.join(m.function_id for m in node.methods)
         assert len(node.methods) == len(t.methods_offset)
-        self.add_line(f"_{node.id}: .asciiz \"{node.id}\"")
+        self.add_line(f"_{node.id}: .asciiz \"{node.id}\\n\"")
         self.add_line("\t.data")
         self.add_line("\t.align 4")
         self.add_line(f"{node.id}: .word {t.size} _{node.id} {methods_str}")
@@ -229,13 +236,19 @@ class MIPSCodegen:
 
     @visitor.when(CILTypeOfNode) # Get the dynamic type of an instance
     def visit(self, node: CILTypeOfNode, frame):
-        register0 = '$v0'
-        register1 = '$v1'
-        var_addr = frame.get_addr(node.var.lex)
-        # register0 points to the heap
-        self.add_line(f'lw $t1, {var_addr}')
-        self.add_line('lw $v0, 0($t1)') 
-        return register0
+        self.add_line('li $a0, 8')
+        self.add_line('li $v0, 9')
+        self.add_line('syscall')
+        self.add_line('move $t0, $v0') # save the address of the allocated space
+
+        self.visit(node.var, frame)
+
+        self.add_line('la $t1, type')
+        self.add_line('lw $t2, 0($v0)') # get the type of the var
+        self.add_line('sw $t1, 0($t0)')
+        self.add_line('sw $t2, 4($t0)')
+        self.add_line('move $v0, $t0')
+        return '$v0'
 
     @visitor.when(CILCallNode) # I don't think this is necessary
     def visit(self, node: CILCallNode, frame):
@@ -250,18 +263,21 @@ class MIPSCodegen:
     def visit(self, node: CILVCallNode, frame):
         # the instance of type T is always the first argument to be passed to the function
         self.add_line(f'# calling the method {node.func} of type {node.type}')
-        instance = frame.arg_queue[0]
-        instance_addr = self.visit(instance, frame) # load into a register the address of the instance in the heap
 
-        register0 = '$v0'
-        # register0 has the dynamic type address of the instance 
-        # since every instance stores its type in the first word of the allocated memory
-        self.add_line(f'lw {register0}, 0({instance_addr})')
+        if node.static:
+            self.add_line(f'la $t0, {node.type}')
+        else:
+            instance = frame.arg_queue[0]
+            instance_addr = self.visit(instance, frame) # load into a register the address of the instance in the heap
+
+            # register0 has the dynamic type address of the instance 
+            # since every instance stores its type in the first word of the allocated memory
+            self.add_line(f'lw $t0, 0({instance_addr})')
 
         # use the information of the static type to get the location of the method in memory
         t = self.scope.types[node.type]
         try:
-            method_addr = t.get_method_addr(node.func, register0)
+            method_addr = t.get_method_addr(node.func, '$t0')
         except:
             print(node.func)
             print(t.id)
@@ -312,6 +328,19 @@ class MIPSCodegen:
         var_addr = frame.get_addr(node.lex)
         self.add_line(f'lw {register}, {var_addr}')
         return register
+        
+    @visitor.when(CILTypeConstantNode)
+    def visit(self, node: CILTypeConstantNode, frame):
+        print('here')
+        self.add_line('li $a0, 8')
+        self.add_line('li $v0, 9')
+        self.add_line('syscall')
+
+        self.add_line('la $t0, type')
+        self.add_line(f'la $t1, {node.lex}')
+        self.add_line('sw $t0, 0($v0)')
+        self.add_line('sw $t1, 4($v0)')
+        return '$v0'
 
     @visitor.when(CILPlusNode)
     def visit(self, node: CILPlusNode, frame):

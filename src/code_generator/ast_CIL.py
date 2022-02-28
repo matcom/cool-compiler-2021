@@ -270,9 +270,10 @@ class CILCallNode(CILExpressionNode):
 
 
 class CILVCallNode(CILExpressionNode):
-    def __init__(self, type, func):
+    def __init__(self, type, func, static=False):
         self.type = type
         self.func = func 
+        self.static = static
         
     def __str__(self):
         text = "VCallNode:\n"
