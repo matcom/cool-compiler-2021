@@ -207,7 +207,7 @@ class Type:
     def bypass(self) -> bool:
         return False
 
-    def get_ancestors(self):
+    def get_ancestors(self) -> List["Type"]:
         if self.parent is None:
             return [self]
         return [self] + self.parent.get_ancestors()
@@ -306,6 +306,17 @@ class Scope:
                 self.parent.find_variable(var_name) if self.parent is not None else None
             )
 
+    def find_all_variables_with_name(self, var_name: str) -> List[VariableInfo]:
+        vars = []
+        scope = self
+        while scope is not None:
+            if var_name in scope.locals:
+                vars.append(scope.locals[var_name])
+
+            scope = scope.parent
+
+        return vars
+
     def is_defined(self, var_name) -> bool:
         return self.find_variable(var_name) is not None
 
@@ -315,5 +326,23 @@ class Scope:
     def clear(self):
         self.children = []
 
+    def scope_to_string(self, tab: int = 0) -> str:
+        s = "    " * tab + "{"
+        for local in self.locals.values():
+            s += "\n" + "    " * (tab + 1) + f"{local.name}: {local.type.name}"
+
+        s += "\n" + "    " * (tab + 1) + f"children ({len(self.children)}): [\n"
+
+        for child in self.children:
+            s += child.scope_to_string(tab + 2) + ",\n"
+
+        s += "\n" + "    " * (tab + 1) + f"]"
+
+        s += "\n" + "    " * tab + "}"
+        return s
+
     def __len__(self):
         return len(self.locals)
+
+    def __str__(self) -> str:
+        return self.scope_to_string()

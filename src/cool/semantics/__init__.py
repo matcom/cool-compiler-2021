@@ -7,5 +7,6 @@ from .overridden import OverriddenMethodChecker, topological_sorting
 from .position_assigner import PositionAssigner
 from .type_builder_for_features import TypeBuilderForFeatures
 from .type_builder_for_inheritance import TypeBuilderForInheritance
+from .type_inference import InferenceChecker
 from .type_checker import TypeChecker
 from .type_collector import TypeCollector

@@ -1,5 +1,4 @@
 from typing import List
-from cool.code_generation.cil import PlusNode
 
 import cool.semantics.utils.astnodes as ast
 import cool.visitor as visitor
@@ -10,6 +9,8 @@ class PositionAssigner:
     def __init__(self, tokens: List[Token]):
         self.position = 0
         self.tokens = tokens
+
+        self.opar = 0
 
     def inc_position(self, count: int = 1):
         self.position += count
@@ -38,8 +39,8 @@ class PositionAssigner:
         """
         token = self.tokens[self.position]
         assert (
-            token.lex == "class"
-        ), f'Expected "class" instead of "{token.lex}" in {node.id}'
+            token.lex.lower() == "class"
+        ), f'{token.line, token.column} Expected "class" instead of "{token.lex}" in {node.id}'
 
         token = self.tokens[self.position + 1]
         node.set_main_position(token.line, token.column)
@@ -128,6 +129,9 @@ class PositionAssigner:
         let declaration-list in expr
         """
         token = self.tokens[self.position]
+
+        counter, token = self._skip_open_parentheses()
+
         node.set_main_position(token.line, token.column)
 
         self.inc_position()
@@ -154,6 +158,8 @@ class PositionAssigner:
 
         self.visit(node.expr)
 
+        self._skip_closed_parentheses()
+
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode):
         """
@@ -176,8 +182,10 @@ class PositionAssigner:
         *
         { block }
         """
+        self._skip_open_parentheses()
+
         token = self.tokens[self.position]
-        assert token.lex == "{", f'Expected "{{" instead of "{token.lex}" in block'
+        assert token.lex == "{", f'{token.line, token.column} Expected "{{" instead of "{token.lex}" in block'
 
         node.set_main_position(token.line, token.column)
         self.inc_position()  # edns after `{`
@@ -200,6 +208,7 @@ class PositionAssigner:
         ), f'Expected "}}" instead of "{token.lex}" at the end of a block'
 
         self.inc_position()  # ends after `}`
+        self._skip_closed_parentheses()
 
     @visitor.when(ast.ConditionalNode)
     def visit(self, node: ast.ConditionalNode):
@@ -292,6 +301,9 @@ class PositionAssigner:
         """
 
         token = self.tokens[self.position]
+
+        counter, token = self._skip_open_parentheses()
+
         node.set_main_position(token.line, token.column)
         node.id_position = token.line, token.column
 
@@ -305,7 +317,7 @@ class PositionAssigner:
             assert token.lex in (
                 ".",
                 "@",
-            ), f"Expected '.' or '@' instead of {token.lex}"
+            ), f"{token.line, token.column, counter} Expected '.' or '@' instead of {token.lex}"
 
             self.inc_position()  # ends after `.` or `@`
             token = self.tokens[self.position]
@@ -332,14 +344,16 @@ class PositionAssigner:
                 self.visit(arg)
 
                 token = self.tokens[self.position]
-                assert token.lex in (
-                    "," ")"
-                ), f"Expected ',' or ')' instead of {token.lex}"
-
-                self.inc_position()  # ends after `,` or `)`
+                # assert token.lex in (
+                #     "," ")"
+                # ), f"{token.line, token.column} Expected ',' or ')' instead of {token.lex}"
+                if token.lex == ",":
+                    self.inc_position()  # ends after `,` or `)`
             # ends after `)`
         else:
             self.inc_position()
+        
+        self._skip_closed_parentheses()  # ends after `)`
 
     @visitor.when(ast.IntegerNode)
     def visit(self, node: ast.IntegerNode):
@@ -364,11 +378,14 @@ class PositionAssigner:
         new type
         """
         token = self.tokens[self.position]
+        _, token = self._skip_open_parentheses()
         node.set_main_position(token.line, token.column)
 
         token = self.tokens[self.position + 1]
         node.type_position = token.line, token.column
         self.inc_position(2)  # ends after `type`
+
+        _, token = self._skip_closed_parentheses()
 
     @visitor.when(ast.NegationNode)
     def visit(self, node: ast.NegationNode):
@@ -414,6 +431,8 @@ class PositionAssigner:
         """
         expr operation expr
         """
+        self._skip_open_parentheses()
+        
         self.visit(node.left)
 
         token = self.tokens[self.position]
@@ -421,11 +440,13 @@ class PositionAssigner:
         self.inc_position()  # ends after `operation`
 
         self.visit(node.right)
+        self._skip_closed_parentheses()
 
     def _check_unary_operation(self, node: ast.UnaryNode):
         """
         operation expr
         """
+        self._skip_open_parentheses()
         token = self.tokens[self.position]
         node.operation_position = token.line, token.column
 
@@ -434,8 +455,27 @@ class PositionAssigner:
 
         self.inc_position()  # ends after `operation`
         self.visit(node.expr)
+        self._skip_closed_parentheses()
 
     def _atom_node(self, node: ast.Node):
         token = self.tokens[self.position]
         node.set_main_position(token.line, token.column)
         self.inc_position()  # ends after `atom`
+
+    def _skip_open_parentheses(self):
+        token = self.tokens[self.position]
+        while token.lex == "(":
+            self.opar += 1
+            self.inc_position()
+            token = self.tokens[self.position]
+        
+        return self.opar, token
+    
+    def _skip_closed_parentheses(self):
+        token = self.tokens[self.position]
+        while token.lex == ")":
+            self.opar -= 1
+            self.inc_position()
+            token = self.tokens[self.position]
+
+        return self.opar, token

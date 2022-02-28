@@ -1,11 +1,14 @@
 from typing import List, Union, Tuple, Optional
 
+from cool.semantics.utils.scope import Scope
+
 Feature = Union["MethodDeclarationNode", "AttrDeclarationNode"]
 
 
 class Node:
     line: int
     column: int
+    scope: Scope
 
     def set_main_position(self, line: int, col: int) -> "Node":
         self.line = line
@@ -68,12 +71,14 @@ class ParenthesisExpr(ExprNode):
 
 
 class BlockNode(ExprNode):
-    def __init__(self, expressions):
+    def __init__(self, expressions: List[ExprNode]):
         self.expressions: List[ExprNode] = expressions
 
 
 class LetNode(ExprNode):
-    def __init__(self, declarations, expr):
+    def __init__(
+        self, declarations: List[Tuple[str, str, Optional[ExprNode]]], expr: ExprNode
+    ):
         self.declarations: List[Tuple[str, str, Optional[ExprNode]]] = declarations
         self.expr: ExprNode = expr
 
@@ -90,20 +95,20 @@ class SwitchCaseNode(ExprNode):
 
 
 class AssignNode(ExprNode):
-    def __init__(self, idx, expr):
+    def __init__(self, idx: str, expr: ExprNode):
         self.id: str = idx
         self.expr: ExprNode = expr
 
 
 class ConditionalNode(ExprNode):
-    def __init__(self, ifx, then, elsex):
+    def __init__(self, ifx: ExprNode, then: ExprNode, elsex: ExprNode):
         self.if_expr: ExprNode = ifx
         self.then_expr: ExprNode = then
         self.else_expr: ExprNode = elsex
 
 
 class WhileNode(ExprNode):
-    def __init__(self, condition, body):
+    def __init__(self, condition: ExprNode, body: ExprNode):
         self.condition: ExprNode = condition
         self.body: ExprNode = body
 
@@ -121,12 +126,13 @@ class MethodCallNode(ExprNode):
 
 
 class AtomicNode(ExprNode):
-    def __init__(self, lex):
+    def __init__(self, lex: str):
         self.lex: str = lex
+        self.scope = None
 
 
 class UnaryNode(ExprNode):
-    def __init__(self, expr):
+    def __init__(self, expr: ExprNode):
         self.expr: ExprNode = expr
 
         self.operation_position: Tuple[int, int] = -1, -1

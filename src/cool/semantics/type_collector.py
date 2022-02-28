@@ -1,7 +1,7 @@
 from typing import List
 
 import cool.semantics.utils.errors as err
-import cool.semantics.utils.astnodes as ast
+import cool.semantics.utils.astnodes as cool
 import cool.visitor as visitor
 from cool.semantics.utils.scope import Context, SemanticError
 
@@ -22,7 +22,7 @@ class TypeCollector:
     def visit(self, node):
         pass
 
-    @visitor.when(ast.ProgramNode)
+    @visitor.when(cool.ProgramNode)
     def visit(self, node):
         self.context.create_type("AUTO_TYPE")
         self_type = self.context.create_type("SELF_TYPE")
@@ -55,8 +55,8 @@ class TypeCollector:
         for declaration in node.declarations:
             self.visit(declaration)
 
-    @visitor.when(ast.ClassDeclarationNode)
-    def visit(self, node: ast.ClassDeclarationNode):
+    @visitor.when(cool.ClassDeclarationNode)
+    def visit(self, node: cool.ClassDeclarationNode):
         try:
             self.context.create_type(node.id)
         except SemanticError:
