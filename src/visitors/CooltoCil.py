@@ -118,10 +118,10 @@ class BaseCOOLToCILVisitor:
         return cil.LabelNode(lname)
 
     def init_name(self, name):
-        return f'__init_at_{name}'
+        return '__ctor_{}'.format(name)
 
     def init_attr_name(self, name):
-        return f'__init_attr_at_{name}'
+        return '__attributes_ctor_{}'.format(name)
 
 
     def create_ctr(self, class_node, scope):
