@@ -838,7 +838,7 @@ class CCILToMIPSGenerator:
         )
         string = mips_ast.RegisterNode(node, T1)
         instructions.append(
-            mips_ast.LoadAddress(node, string, self.get_relative_location(node.target))
+            mips_ast.LoadWord(node, string, self.get_relative_location(node.target))
         )
 
         loop = self.generate_unique_label()
@@ -855,7 +855,7 @@ class CCILToMIPSGenerator:
         zero = mips_ast.RegisterNode(node, ZERO)
         exit = self.generate_unique_label()
         instructions.append(
-            mips_ast.BranchOnEqual(node, char, zero, mips_ast.Label(node,exit))
+            mips_ast.BranchOnEqual(node, char, zero, mips_ast.Label(node, exit))
         )
         instructions.append(
             mips_ast.Addi(node, string, string, mips_ast.Constant(node, 1))
@@ -864,7 +864,7 @@ class CCILToMIPSGenerator:
             mips_ast.Addi(node, count, count, mips_ast.Constant(node, 1))
         )
         instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop)))
-        instructions.append(mips_ast.LabelDeclaration(node,exit))
+        instructions.append(mips_ast.LabelDeclaration(node, exit))
         return instructions
 
     # @visitor.when(ccil_ast.EqualStrNode)
