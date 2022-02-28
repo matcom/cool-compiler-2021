@@ -75,7 +75,7 @@ class DotCodeVisitor:
                         self.add_comment('Calling main')
                         result = self.add_local('result')
                         self.add_inst(cil.ArgNode(instance))
-                        self.add_inst(cil.DynamicCallNode('Main', 'Main_main', result))
+                        self.add_inst(cil.DynamicCallNode(instance, 'main', result))
                         self.add_inst(cil.ReturnNode(0))
                         break
 
@@ -369,9 +369,9 @@ class DotCodeVisitor:
         else:
             obj = node.obj
         obj_dest = self.visit(obj, scope)
-        inst_type = self.add_local('inst_type')
-        self.add_inst(cil.TypeOfNode(obj_dest, inst_type))
-        self.add_inst(cil.ArgNode(obj_dest))
+        # inst_type = self.add_local('inst_type')
+        # self.add_inst(cil.TypeOfNode(obj_dest, inst_type))
+        # self.add_inst(cil.ArgNode(obj_dest))
 
         # allocate and push the args
         for arg in node.args:
@@ -380,7 +380,7 @@ class DotCodeVisitor:
 
         # call the function
         call_res = self.add_local('call_res')
-        self.add_inst(cil.DynamicCallNode(inst_type, node.id, call_res))
+        self.add_inst(cil.DynamicCallNode(obj_dest, node.id, call_res))
 
         return call_res
 
@@ -388,13 +388,17 @@ class DotCodeVisitor:
     def visit(self, node: ast.InstantiateNode, scope: Scope):
         self.add_comment(f'Instantiating type {node.lex}')
 
-        instance = self.add_local('instance')
-        self.add_inst(cil.AllocateNode(node.lex, instance))
         type_node = self.root.get_type(node.lex)
+        attr_values = []
         for attr in type_node.attributes:
             attr_expr = type_node.get_attr_node(attr)
-            attr_dest = self.visit(attr_expr, scope)
-            self.add_inst(cil.SetAttrNode(instance, attr, attr_dest))
+            attr_values.append(self.visit(attr_expr, scope))
+        instance = self.add_local('instance')
+        self.add_inst(cil.AllocateNode(node.lex, instance))
+        for attr, attr_value in zip(type_node.attributes, attr_values):
+            attr_index = type_node.attributes.index(attr)
+            attr_at = cil.AttributeAt(attr, attr_index)
+            self.add_inst(cil.SetAttrNode(instance, attr_at, attr_value))
         return instance
 
     @visitor.when(ast.StringNode)
@@ -404,32 +408,32 @@ class DotCodeVisitor:
             (node.lex if len(node.lex) < 20 else node.lex[:15] + '...')
         )
 
+        value = self.visit(node.lex, scope)
         str_instance = self.add_local('str_instance')
         self.add_inst(cil.AllocateNode('String', str_instance))
-        type_node = self.root.get_type('String')
-        for attr in type_node.attributes:
-            attr_dest = self.visit(node.lex, scope)
-            self.add_inst(cil.SetAttrNode(str_instance, attr, attr_dest))
+        attr_index = self.root.get_type('String').attributes.index('String_value')
+        attr_at = cil.AttributeAt('String_value', attr_index)
+        self.add_inst(cil.SetAttrNode(str_instance, attr_at, value))
         return str_instance
 
     @visitor.when(ast.IntegerNode)
     def visit(self, node: ast.IntegerNode, scope: Scope):
+        value = self.visit(int(node.lex), scope)
         int_instance = self.add_local('int_instance')
         self.add_inst(cil.AllocateNode('Int', int_instance))
-        type_node = self.root.get_type('Int')
-        for attr in type_node.attributes:
-            attr_dest = self.visit(int(node.lex), scope)
-            self.add_inst(cil.SetAttrNode(int_instance, attr, attr_dest))
+        attr_index = self.root.get_type('Int').attributes.index('Int_value')
+        attr_at = cil.AttributeAt('Int_value', attr_index)
+        self.add_inst(cil.SetAttrNode(int_instance, attr_at, value))
         return int_instance
 
     @visitor.when(ast.BooleanNode)
     def visit(self, node: ast.BooleanNode, scope: Scope):
+        value = self.visit(node.lex == 'true', scope)
         bool_instance = self.add_local('bool_instance')
         self.add_inst(cil.AllocateNode('Bool', bool_instance))
-        type_node = self.root.get_type('Bool')
-        for attr in type_node.attributes:
-            attr_dest = self.visit(node.lex == 'true', scope)
-            self.add_inst(cil.SetAttrNode(bool_instance, attr, attr_dest))
+        attr_index = self.root.get_type('Bool').attributes.index('Bool_value')
+        attr_at = cil.AttributeAt('Bool_Value', attr_index)
+        self.add_inst(cil.SetAttrNode(bool_instance, attr_at, value))
         return bool_instance
 
     @visitor.when(ast.VariableNode)

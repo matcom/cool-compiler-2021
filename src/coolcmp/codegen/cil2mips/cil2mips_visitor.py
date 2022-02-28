@@ -7,6 +7,7 @@ from coolcmp.utils import mips, registers
 
 class CILToMipsVisitor:
     def __init__(self):
+        self.cil_root: cil.ProgramNode | None = None
         self.data: Dict[str, mips.Node] = {}
         self.types: Dict[str, mips.Type] = {}
         self.functions: Dict[str, mips.FunctionNode] = {}
@@ -15,19 +16,22 @@ class CILToMipsVisitor:
     def add_inst(self, *inst: mips.InstructionNode) -> None:
         self.cur_function.instructions.extend(inst)
 
+    def get_address(self, var_name: str):
+        return self.cur_function.variable_address(var_name)
+
+    def get_method_index(self, name: str):
+        for i, method in enumerate(self.cil_root.all_methods):
+            if method == name:
+                return (i + 1) * 4
+        raise ValueError(f"Unexpected method: {name}")
+
     def build_init(self, node: cil.TypeNode) -> list[mips.InstructionNode]:
         t0 = registers.T[0]
         a0, v0, sp, fp, ra = registers.A0, registers.V0, registers.SP, registers.FP, registers.RA
 
         get_args_inst = [
-            mips.LANode(t0, node.name),
-            mips.SWNode(t0, 0, v0),
+
         ]
-        for i, _ in enumerate(node.attributes):
-            get_args_inst.extend([
-                mips.LWNode(t0, (i * 4 + 24, sp)),  # 24 size of the stack between $sp and the init args pushed
-                mips.SWNode(t0, (i + 1) * 4, v0)    # $v0 has a pointer to the memory reserved by malloc.
-            ])
 
         return [
             mips.SUBUNode(sp, sp, 24),
@@ -37,7 +41,8 @@ class CILToMipsVisitor:
 
             mips.LWNode(a0, node.name),
             mips.JALNode('malloc'),
-            *get_args_inst,
+            mips.LANode(t0, node.name),
+            mips.SWNode(t0, 0, v0),
 
             mips.LWNode(ra, (8, sp)),
             mips.LWNode(fp, (4, sp)),
@@ -52,6 +57,9 @@ class CILToMipsVisitor:
     @visitor.when(cil.ProgramNode)
     def visit(self, node: cil.ProgramNode):
         print("ProgramNode")
+
+        node.update_method_indexes()
+        self.cil_root = node
 
         for i in node.dot_types:
             self.visit(i)
@@ -70,16 +78,13 @@ class CILToMipsVisitor:
     def visit(self, node: cil.TypeNode):
         print(f"TypeNode {node.name} {node.methods}")
 
-        init = self.build_init(node)
-        print(f'_{node.name}_init:')
-        print('    ' + '\n    '.join(str(inst) for inst in init))
-
         type_ = mips.Type(
             label=node.name,
             attrs=list(node.attributes),
             methods=node.methods,
+            total_methods=node.total_methods,
             index=len(self.types),
-            init=init
+            init=self.build_init(node)
         )
 
         self.types[node.name] = type_
@@ -139,24 +144,30 @@ class CILToMipsVisitor:
     def visit(self, node: cil.AllocateNode):
         print(f"AllocateNode {node.type} {node.dest}")
 
-        # TODO: Finish this
-        type_ = self.types[node.type].index
-
-        t0 = registers.T[0]
-        t1 = registers.T[1]
+        dest_address = self.get_address(node.dest)
 
         self.add_inst(
             mips.CommentNode(f"<allocate:{node.type}-{node.dest}>"),
-            mips.LINode(t0, type_),
-            *mips.create_object_instructions(t0, t1),
+            mips.JALNode(f"_{node.type}_init"),
+            mips.SWNode(registers.V0, dest_address, registers.FP),
+            mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
         )
 
-        self.visit(node.dest)
+    @visitor.when(cil.SetAttrNode)
+    def visit(self, node: cil.SetAttrNode):
+        t0, fp = registers.T[0], registers.FP
 
-        address = self.cur_function.variable_address(node.dest)
+        inst_address = self.get_address(node.instance)
+        if node.value == 'void':
+            load_value_inst = mips.LWNode(t0, 'void')
+        else:
+            value_address = self.get_address(node.value)
+            load_value_inst = mips.LWNode(t0, (value_address, fp))
+
         self.add_inst(
-            mips.SWNode(registers.V0, address, registers.FP),
-            mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
+            load_value_inst,
+            # sum 1 to attr index because at offset 0 is the type pointer
+            mips.SWNode(t0, 4 * (node.attr.index + 1) + inst_address, fp)
         )
 
     @visitor.when(cil.PrintIntNode)
@@ -197,20 +208,49 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        print(f"DynamicCallNode {node.method} {node.type} {node.dest}")
+        print(f"DynamicCallNode {node.method} {node.obj} {node.dest}")
+
+        t0 = registers.T[0]
+        fp, v0 = registers.FP, registers.V0
+
+        obj_address = self.get_address(node.obj)
+        meth_offset = self.get_method_index(node.method)
+        dest_address = self.get_address(node.dest)
 
         self.add_inst(
-            mips.CommentNode(f"<dynamiccall:{node.type}>"),
-            mips.CommentNode(f"</dynamiccall:{node.type}>"),
+            mips.CommentNode(f"<dynamiccall:{node.obj}>"),
+            mips.LWNode(t0, (obj_address, fp)),     # get instance pointer
+            mips.LWNode(t0, (0, t0)),               # get instance type pointer at offset 0
+            mips.LWNode(t0, (meth_offset, t0)),     # get method
+            mips.JALNode(t0),
+            mips.SWNode(v0, dest_address, fp),
+            mips.CommentNode(f"</dynamiccall:{node.obj}>"),
         )
 
-    @visitor.when(cil.TypeOfNode)
-    def visit(self, node: cil.TypeOfNode):
-        r1, r2 = registers.T[0], registers.T[1]
+    @visitor.when(cil.ArgNode)
+    def visit(self, node: cil.ArgNode):
+        t0 = registers.T[0]
+        sp, fp = registers.SP, registers.FP
+
+        address = self.get_address(node.name)
+
         self.add_inst(
-            mips.CommentNode(f"<typeof:{node.obj}>"),
-            mips.CommentNode(f"</typeof:{node.obj}>"),
+            mips.CommentNode(f"<arg:{node.name}>"),
+            mips.LWNode(t0, (address, fp)),
+            mips.ADDINode(sp, sp, -4),
+            mips.SWNode(t0, 0, sp),
+            mips.CommentNode(f"</arg:{node.name}>"),
         )
+
+    # @visitor.when(cil.TypeOfNode)
+    # def visit(self, node: cil.TypeOfNode):
+    #     t0, t1 = registers.T[0], registers.T[1]
+    #     fp = registers.FP
+    #
+    #     self.add_inst(
+    #         mips.CommentNode(f"<typeof:{node.obj}>"),
+    #         mips.CommentNode(f"</typeof:{node.obj}>"),
+    #     )
 
     @visitor.when(cil.PlusNode)
     def visit(self, node: cil.PlusNode):

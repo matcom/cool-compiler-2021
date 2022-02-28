@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Tuple, Union
 
 from coolcmp.utils.registers import FP, Register, SP, DW, ARG, V0
-
+from coolcmp.utils import cil
 
 TYPES_LABELS = "__types_definition__"
 
@@ -14,10 +14,11 @@ class Node:
 
 
 class Type:
-    def __init__(self, label, attrs, methods, index, init: list[InstructionNode]):
+    def __init__(self, label, attrs, methods: list[cil.MethodAt], total_methods: int, index, init: list[InstructionNode]):
         self.label = label
         self.attrs = attrs
         self.methods = methods
+        self.total_methods = total_methods
         self.index = index
         self.init = init
 
@@ -106,7 +107,7 @@ class SWNode(InstructionNode):
         self.src = src
 
     def __str__(self):
-        return f"sw         {self.dest}, {self.offset}({self.src})"
+        return f"sw     {self.dest}, {self.offset}({self.src})"
 
 
 class LWNode(InstructionNode):
@@ -120,9 +121,9 @@ class LWNode(InstructionNode):
 
     def __str__(self):
         if isinstance(self.src, tuple):
-            return f'lw         {self.dest}, {self.src[0]}({self.src[1]})'
+            return f'lw     {self.dest}, {self.src[0]}({self.src[1]})'
         else:
-            return f'lw         {self.dest}, {self.src}'
+            return f'lw     {self.dest}, {self.src}'
 
 
 class LINode(InstructionNode):
@@ -135,7 +136,7 @@ class LINode(InstructionNode):
         self.value = value
 
     def __str__(self):
-        return f"li         {self.reg}, {self.value}"
+        return f"li     {self.reg}, {self.value}"
 
 
 class JALNode(InstructionNode):
@@ -148,7 +149,7 @@ class JALNode(InstructionNode):
         self.dest = dest
 
     def __str__(self):
-        return f"jal        {self.dest}"
+        return f"jal    {self.dest}"
 
 
 class LANode(InstructionNode):
@@ -161,7 +162,7 @@ class LANode(InstructionNode):
         self.label = label
 
     def __str__(self):
-        return f"la         {self.reg}, {self.label}"
+        return f"la     {self.reg}, {self.label}"
 
 
 class ADDNode(InstructionNode):
@@ -174,7 +175,7 @@ class ADDNode(InstructionNode):
         self.src2 = src2
 
     def __str__(self):
-        return f"add        {self.dest}, {self.src1}, {self.src2}"
+        return f"add    {self.dest}, {self.src1}, {self.src2}"
 
 
 class ADDINode(InstructionNode):
@@ -188,7 +189,7 @@ class ADDINode(InstructionNode):
         self.isrc = isrc
 
     def __str__(self):
-        return f"addi       {self.dest}, {self.src}, {self.isrc}"
+        return f"addi   {self.dest}, {self.src}, {self.isrc}"
 
 
 class ADDUNode(InstructionNode):
@@ -202,7 +203,7 @@ class ADDUNode(InstructionNode):
         self.r2 = r2
 
     def __str__(self):
-        return f"addu       {self.rdest}, {self.r1}, {self.r2}"
+        return f"addu   {self.rdest}, {self.r1}, {self.r2}"
 
 
 class SUBNode(InstructionNode):
@@ -215,7 +216,7 @@ class SUBNode(InstructionNode):
         self.r2 = r2
 
     def __str__(self):
-        return f"sub        {self.rdest}, {self.r1}, {self.r2}"
+        return f"sub    {self.rdest}, {self.r1}, {self.r2}"
 
 
 class SUBUNode(InstructionNode):
@@ -229,7 +230,7 @@ class SUBUNode(InstructionNode):
         self.r2 = r2
 
     def __str__(self):
-        return f"subu       {self.rdest}, {self.r1}, {self.r2}"
+        return f"subu   {self.rdest}, {self.r1}, {self.r2}"
 
 
 class JRNode(InstructionNode):
@@ -241,7 +242,7 @@ class JRNode(InstructionNode):
         self.dest = dest
 
     def __str__(self):
-        return f"jr         {str(self.dest)}"
+        return f"jr     {str(self.dest)}"
 
 
 class SLLNode(InstructionNode):
@@ -255,7 +256,7 @@ class SLLNode(InstructionNode):
         self.bits = bits
 
     def __str__(self):
-        return f"sll        {self.dest}, {self.src}, {self.bits}"
+        return f"sll    {self.dest}, {self.src}, {self.bits}"
 
 
 class MoveNode(InstructionNode):
@@ -269,7 +270,7 @@ class MoveNode(InstructionNode):
         self.reg2 = reg2
 
     def __str__(self):
-        return f"move       {self.reg1}, {self.reg2}"
+        return f"move   {self.reg1}, {self.reg2}"
 
 
 class SysCallNode(InstructionNode):
@@ -315,17 +316,17 @@ def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
     return [lw, addi]
 
 
-def create_object_instructions(r1: Register, r2: Register):
-    return [
-        SLLNode(r1, r1, 2),
-        LANode(r2, TYPES_LABELS),
-        ADDNode(r2, r2, r1),
-        LWNode(r2, (0, r2)),
-        LWNode(ARG[0], (4, r2)),
-        SLLNode(ARG[0], ARG[0], 2),
-        JALNode("malloc"),
-        MoveNode(ARG[2], ARG[0]),
-        MoveNode(ARG[0], r2),
-        MoveNode(ARG[1], V0),
-        JALNode("copy"),
-    ]
+# def create_object_instructions(r1: Register, r2: Register):
+#     return [
+#         SLLNode(r1, r1, 2),
+#         LANode(r2, TYPES_LABELS),
+#         ADDNode(r2, r2, r1),
+#         LWNode(r2, (0, r2)),
+#         LWNode(ARG[0], (4, r2)),
+#         SLLNode(ARG[0], ARG[0], 2),
+#         JALNode("malloc"),
+#         MoveNode(ARG[2], ARG[0]),
+#         MoveNode(ARG[0], r2),
+#         MoveNode(ARG[1], V0),
+#         JALNode("copy"),
+#     ]

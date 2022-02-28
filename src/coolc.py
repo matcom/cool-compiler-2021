@@ -1,6 +1,9 @@
 """
 Main entry point of COOL compiler
 """
+import os
+import subprocess
+
 from coolcmp.codegen.cil2mips.mips_formatter import MIPSFormatter
 from coolcmp.lexing_parsing.lexer import errors as lexer_errors
 from coolcmp.lexing_parsing.parser import parser, errors as parser_errors
@@ -12,12 +15,13 @@ from coolcmp.utils.ast_formatter import ASTFormatter
 from coolcmp.utils.cil_formatter import CILFormatter
 
 from coolcmp.utils.cil import ProgramNode
+from coolcmp.utils.registers import FP
 
 
-def main(cool_code: str, verbose: int):
+def main(cool_code: str, run: bool, verbose: bool):
     ast = parser.parse(cool_code)
 
-    if verbose > 0:
+    if verbose:
         ast_str = ASTFormatter().visit(ast)
         print(ast_str)
 
@@ -46,32 +50,45 @@ def main(cool_code: str, verbose: int):
     cil: ProgramNode
     cil = build_cil(ast, ctx, scope)
 
-    if verbose > 1:
+    if verbose:
         cil_str = CILFormatter().visit(cil)
         print(cil_str)
 
     mips = build_mips(cil, None, None)
+    mips_str = MIPSFormatter().visit(mips)
 
-    if verbose > 1:
-        mips_str = MIPSFormatter().visit(mips)
+    if verbose:
         print("Mips code:")
         print(mips_str)
 
+    if run:
+        executable_name = '__temp_code.mips'
+        with open(executable_name, 'x', encoding='utf8') as f:
+            f.write(mips_str)
+        print('=' * 20, 'Running SPIM', '=' * 20)
+        try:
+            subprocess.run(['spim', '-f', executable_name])
+        finally:
+            os.remove(executable_name)
+
 
 if __name__ == "__main__":
-    import sys
+    from argparse import ArgumentParser, FileType
 
-    if len(sys.argv) < 2:
-        print("Usage: python3 coolc.py program.cl [-v+]")
-        exit(1)
-    elif not sys.argv[1].endswith(".cl"):
-        print("COOl source code files must end with .cl extension.")
-        print("Usage: python3 coolc.py program.cl")
-        exit(1)
+    arg_parser = ArgumentParser()
+    arg_parser.add_argument(
+        '-r', type=bool, default=False,
+        help='If present the file compiled will be executed by SPIM.'
+    )
+    arg_parser.add_argument(
+        '-v', type=bool, default=False,
+        help='Verbose output.'
+    )
+    arg_parser.add_argument(
+        'file', type=FileType(mode='r', encoding='utf8'),
+        help='COOL source file.'
+    )
+    args = arg_parser.parse_args()
 
-    cool_program = open(sys.argv[1], encoding="utf8").read()
-    try:
-        verb_count = sys.argv[2].count("v")
-    except IndexError:
-        verb_count = 0
-    main(cool_program, verb_count)
+    cool_program = args.file.read()
+    main(cool_program, args.r, args.v)

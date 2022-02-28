@@ -108,7 +108,7 @@ class CILFormatter(object):
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        return f'{node.dest} = VCALL {node.type} {node.method}'
+        return f'{node.dest} = VCALL {node.obj} {node.method}'
 
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):

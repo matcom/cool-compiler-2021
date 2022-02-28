@@ -1,7 +1,7 @@
 from typing import List
 
 from coolcmp.utils import visitor
-from coolcmp.utils import mips
+from coolcmp.utils import mips, cil
 from coolcmp.codegen.cil2mips.templates import load_templates
 
 
@@ -21,6 +21,7 @@ class MIPSFormatter:
     @visitor.when(mips.ProgramNode)
     def visit(self, node: mips.ProgramNode):
         data = "# data\n.data\n" + "\n".join(self.visit(d) for d in node.data)
+        void = 'void:\n\t.word Void'
         type_defs = f"\n{mips.TYPES_LABELS}:\n" + "\n\n".join(
             [self.visit(t) for t in node.types]
         )
@@ -34,11 +35,21 @@ class MIPSFormatter:
                           "\n")
         template_code = load_templates()
 
-        return "\n".join([data, type_defs, functions, inits_seg, template_code])
+        return "\n".join([data, void, type_defs, functions, inits_seg, template_code])
 
     @visitor.when(mips.Type)
     def visit(self, node: mips.Type):
-        method_labels = "\n".join(f"\t.word\t{i}" for i in node.methods)
+        method_labels = ""
+        lm = cil.MethodAt('_', -1)
+        for m in node.methods:
+            if lm.index + 1 != m.index:
+                method_labels += f"\t.space\t{(m.index - lm.index - 1) * 4}\n"
+            method_labels += f"\t.word\t{m.name}\t\t# {m.index}\n"
+            lm = m
+        if lm.index != node.total_methods - 1:
+            method_labels += f"\t.space\t{(node.total_methods - 1 - lm.index) * 4}\n"
+
+        # method_labels = "\n".join(f"\t.word\t{m}" for m in node.methods)
         typename_label = f'\t.asciiz\t"{node.label}"'
 
         lines = [

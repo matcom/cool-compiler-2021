@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import types
+
 from coolcmp.utils import ast
 
 
@@ -17,6 +19,7 @@ class ProgramNode(Node):
         self.dot_types = dot_types
         self.dot_data = dot_data
         self.dot_code = dot_code
+        self.all_methods: list[MethodAt] = []
 
     def get_type(self, name: str):
         for type_ in self.dot_types:
@@ -33,17 +36,66 @@ class ProgramNode(Node):
         if value not in [data.value for data in self.dot_data]:
             self.dot_data.append(DataNode(f"s{len(self.dot_data) + 1}", value))
 
+    @staticmethod
+    def extract_meth_name(name: str):
+        return name[name.find('_') + 1:]
+
+    def update_method_indexes(self):
+        all_methods = set()
+        for type_ in self.dot_types:
+            all_methods.update([ProgramNode.extract_meth_name(m) for m in type_.methods])
+
+        self.all_methods = sorted(list(all_methods))
+        print('@@@@@', self.all_methods)
+        for type_ in self.dot_types:
+            new_methods = [
+                MethodAt(
+                    name=str(m),
+                    index=self.all_methods.index(ProgramNode.extract_meth_name(str(m)))
+                ) for m in sorted(type_.methods)
+            ]
+            type_.methods = new_methods
+            type_.total_methods = len(self.all_methods)
+
+
+class MethodAt:
+    def __init__(self, name: str, index: int = -1):
+        self.name = name
+        self.index = index
+
+    def __lt__(self, other: MethodAt):
+        return self.name.__lt__(other.name)
+
+    def __eq__(self, other: MethodAt):
+        return self.name == other.name
+
+    def __str__(self):
+        return self.name
+
+
+class AttributeAt:
+    def __init__(self, name: str, index: int = -1):
+        self.name = name
+        self.index = index
+
+    def __eq__(self, other: MethodAt):
+        return self.name == other.name
+
+    def __str__(self):
+        return self.name
+
 
 class TypeNode(Node):
     def __init__(self,
                  name: str,
                  attrs: list[str],
-                 methods: list[str],
+                 methods: list[MethodAt | str],
                  attr_expr_nodes: dict[str, ast.ExpressionNode] = None):
         self.name = name
         self.attributes = attrs
         self.methods = methods
         self.attr_expr_nodes = attr_expr_nodes or {}
+        self.total_methods: int | None = None
 
     # Add the expression node of the attributes, so when is created an instance
     #   get quick access to the instructions of the attribute initialization.
@@ -130,7 +182,7 @@ class GetAttrNode(InstructionNode):
 
 
 class SetAttrNode(InstructionNode):
-    def __init__(self, instance: str, attr: str, value: str):
+    def __init__(self, instance: str, attr: AttributeAt, value: str):
         self.instance = instance
         self.attr = attr
         self.value = value
@@ -184,8 +236,8 @@ class StaticCallNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
-        self.type = xtype
+    def __init__(self, obj: str, method: str, dest: str):
+        self.obj = obj
         self.method = method
         self.dest = dest
 
