@@ -31,22 +31,10 @@ class TypeChecker:
         if _char not in ''.join(chr(n) for n in range(ord('A'),ord('Z')+1)):
             self.errors.append((f'Class names must be capitalized'))
 
-        # attrs = []
-        # methods = []
-        # for feature in node.features:
-        #     if isinstance(feature,AttrDeclarationNode):
-        #         attrs.append(feature)
-        #     else:
-        #         methods.append(feature)
                 
         for attr, owner in self.current_type.all_attributes(): #definir atributos de los ancestros
             if owner != self.current_type:
                 scope.define_variable(attr.name, attr.type)
-        # for attr in attrs:
-        #     self.visit(attr, scope)
-
-        # for method in methods:
-        #     self.visit(method, scope.create_child())
         
         for feature in node.features:
             if isinstance(feature, AttrDeclarationNode):
@@ -62,7 +50,6 @@ class TypeChecker:
         if _char not in ''.join(chr(n) for n in range(ord('a'),ord('z')+1)):
             self.errors.append((f'Class names must be capitalized'))            
 
-        # for param_name, param_type in zip(self.current_method.param_names, self.current_method.param_types):
         for i in range(len(self.current_method.param_names)):
             ithParamName = self.current_method.param_names[i]
             ithParamType = self.current_method.param_types[i]
@@ -74,14 +61,8 @@ class TypeChecker:
                     self.errors.append('SELF_TYPE cannot be the type of a parameter.')
                     scope.define_variable(ithParamName, ErrorType())
                 else:
-                    # try:
-                    #     param_t = self.context.get_type(ithParamType.name)
-                    # except SemanticError as es:
-                    #     self.errors.append(es.text())
-                    #     param_t = ErrorType()
                     scope.define_variable(ithParamName, self.context.get_type(ithParamType.name))
             else:
-                # self.errors.append(f'Variable {ithParamName} is already defined in {self.current_method.name}.')
                 self.errors.append(_SemanticError %(node.token_list[0].lineno, node.token_list[0].col, f'Formal parameter {ithParamName} is multiply defined.'))
 
         if node.type != 'SELF_TYPE':
@@ -93,7 +74,6 @@ class TypeChecker:
 
         if not exprType.conforms_to(rType):
             self.errors.append(_TypeError %(node.body.token_list[0].lineno, node.body.token_list[0].col, f'Infered return type {exprType.name} of method {node.id} does not conform to declared return type {rType.name}.'))
-            # self.errors.append(f'{exprType.name} does not conform {rType.name}.')
 
     @visitor.when(ConditionalNode)
     def visit(self, node, scope):
@@ -127,14 +107,9 @@ class TypeChecker:
                 else:
                     var_type = self.current_type
             except SemanticError as e:
-                # self.errors.append(e.text)
                 self.errors.append(_TypeError %(node.decl_list[iteration].token_list[0].lineno, node.decl_list[iteration].token_list[2].col, f"Class {_t} of let-bound identifier {_id} is undefined."))
                 var_type = ErrorType()
 
-            # if scope.is_local(_id):
-            #     self.errors.append(f'Variable {_id} is already defined in {self.current_method.name}.')
-            # else:
-            #     scope.define_variable(_id, var_type)
 
             if _e is not None:
                 expr = self.visit(_e, scope.create_child()) 
@@ -223,7 +198,6 @@ class TypeChecker:
         self.visit(node.expr, scope)
         types = []
         t_set = set()
-        # for i, t, e in node.case_list:
         for i, t, e, token_list  in node.case_list:
             child_scope = scope.create_child()
             try:
@@ -239,7 +213,6 @@ class TypeChecker:
             except SemanticError as exc:
                 child_scope.define_variable(i, ErrorType())
                 self.errors.append(_TypeError % (token_list[2].lineno, token_list[2].col, f'Class {t} of case branch is undefined.'))
-                # self.errors.append(exc.text)
             
             types.append(self.visit(e, child_scope))
 
@@ -309,7 +282,6 @@ class TypeChecker:
                 ancestor_type = self.context.get_type(node.parent)
             except SemanticError as e:
                 ancestor_type = ErrorType()
-                # self.errors.append(e.text)
 
             if not obj_type.conforms_to(ancestor_type):
                 self.errors.append(_TypeError % (node.token_list[0].lineno, node.token_list[0].col, f'Expression type {obj_type.name} does not conform to declared static dispatch type {ancestor_type.name}.'))
@@ -321,13 +293,9 @@ class TypeChecker:
             method = ancestor_type.get_method(node.method, self.current_type, False)
         except SemanticError as e:
             self.errors.append(_AtributeError % (node.token_list[0].lineno, node.token_list[0].col, f'Dispatch to undefined method {node.method}'))
-            # self.errors.append(e.text)
             for arg in node.args:
                 self.visit(arg, scope)
             return ErrorType()
-
-        # if len(node.args) != len(method.param_names):
-        #     self.errors.append(f'Function {method.name} is already defined in {obj_type.name}.')
 
         if len(node.args) != len(method.param_types):
             self.errors.append(_SemanticError %(node.token_list[1].lineno, node.token_list[1].col, f"Method {method.name} called with wrong number of arguments"))
@@ -386,7 +354,6 @@ class TypeChecker:
                 return self.current_type
         except SemanticError as e:
             self.errors.append(_TypeError % (node.token_list[1].lineno, node.token_list[1].col, f"'new' used with undefined class {node.lex}."))
-            # self.errors.append(e.text)
             return ErrorType()
 
     @visitor.when(NotNode)
