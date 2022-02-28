@@ -4,7 +4,7 @@ from visitors.Collector import TypeCollector
 from visitors.Builder import TypeBuilder
 from visitors.Checker import TypeChecker
 from visitors.CooltoCil import COOLToCILVisitor
-from visitors.CiltoMips import CiltoMipsVisitor
+from visitors.CiltoMips import CILToMipsVisitor
 
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
@@ -40,6 +40,6 @@ class Pipeline():
                     self.coolToCil = COOLToCILVisitor(self.context)
                     cil_ast = self.coolToCil.visit(self.ast, scope)
                     
-                    self.cilToMips = CiltoMipsVisitor(self.context)
+                    self.cilToMips = CILToMipsVisitor()
                     self.mipsCode = self.cilToMips.visit(cil_ast)
         return

@@ -339,7 +339,7 @@ class CILToMipsVisitor:
             instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.right)))
             if isinstance(node.right, AttributeNode):
                 instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} {} {}'.format(r.t0, r.t0, r.t1))
+        instructions.append('{} {} {} {}'.format(o.mul, r.t0, r.t0, r.t1))
         instructions.extend(self.visit(node.dest))
         instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
         if isinstance(node.dest, AttributeNode):
@@ -877,7 +877,7 @@ class CILToMipsVisitor:
         instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.value)))
         if isinstance(node.value, AttributeNode):
             instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} {}'.format(o.xori, r.t0, r.t0))
+        instructions.append('{} {} {} {}'.format(o.xori, r.t0, r.t0, 1))
         instructions.extend(self.visit(node.dest))
         instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
         if isinstance(node.dest, AttributeNode):
