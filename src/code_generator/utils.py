@@ -1,6 +1,7 @@
 from cmp.semantic import IntType, ObjectType, StringType, BoolType
 from .ast_CIL import *
-
+from collections import deque
+import numpy as np 
 
 class CILScope:
     def __init__(self, context):
@@ -208,3 +209,88 @@ def dfs_visit_ts(context, u, list, visited):
         dfs_visit_ts(context, u.parent, list, visited)
     
     list.append(u)
+
+
+def bfs_init (context)  :
+    table = {}
+    d = {}
+    d = init(context, d)
+    for c in context.types.values():
+        list = deque()
+        list.append(c)
+        visit = []        
+        m = bfs( list, d.copy() , c,{})
+        
+        table [c.name] = m    
+    return table
+
+def bfs ( list, d ,s , m ):
+    d[s.name] = 0
+    while (len(list) > 0):
+        u  =  list.pop()
+        if u.parent is not None:
+            v = u.parent
+        else :
+            v = None    
+        while v is not None:
+            if d[v.name] == np.inf:
+                d[v.name] = d[s.name] + 1
+                s = v
+                list.append(v) 
+                
+            v = v.parent
+    return d           
+
+def init (context,d):
+    for c in context.types.values():
+        d [c.name] = np.inf
+    return d     
+
+def table (table):
+    d = {}
+    for k in (table.keys()):
+        value = table[k]
+        for c in value.keys(): 
+            if  table[k][c] != np.inf and table[k][c] != 0:
+        
+                try:
+                    d [c].append((k,table[k][c])) 
+                except:
+                   d [c] =  [(k,table[k][c])]    
+    return d 
+
+ 
+def order_case_branc_to(branchs, to):
+    d = {}
+    string = [] 
+    list = [branch.type for branch in branchs]
+    for s in to :
+        string.append(s.name)
+    for s in string:
+        try:
+            d[s] =  list.index(s)
+        except:
+            pass    
+    return d     
+        
+        
+def valid_case (table, branchs):
+    valid = {}
+    for key in branchs.keys():
+        try:
+            s =  table[key]
+        except:
+            continue     
+        order = sorted(s, key=lambda tu : tu[1])
+        for m in order:
+            try:
+               valid[key].append(m[0])
+            except:
+                valid[key] = [m[0]]
+    return valid            
+  
+            
+                     
+         
+        
+    

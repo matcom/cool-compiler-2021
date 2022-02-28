@@ -1,10 +1,13 @@
 from cmath import exp
+from copy import copy
 from parsing.ast import *
 from .ast_CIL import *
 from .utils import *
 from cmp.semantic import IOType, IntType, StringType, BoolType, ObjectType
 import cmp.visitor as visitor
-        
+from itertools import chain
+from collections import OrderedDict
+
     
 class CIL:
     def __init__(self, context):
@@ -32,8 +35,10 @@ class CIL:
         self.scope.functions.append(CILFuncNode('main', [], locals, instructions))
         
         self.scope.data.append(CILDataNode(f'str_empty', "\"\""))
-        #self.table = bfs_init(self.scope.context)
+        table_ = bfs_init(self.scope.context)
+        self.table = table(table_)
         types_ts = get_ts(self.scope.context)
+        self.to = types_ts
         infos = self.scope.infos = {}
         for type in types_ts:
             t = TypeInfo() 
@@ -253,17 +258,35 @@ class CIL:
         name_return =  self.scope.add_new_local(node.computed_type.name)
         return_ = CILVariableNode(name_return)
         
-        
+        order = order_case_branc_to(node.cases,self.to)
+        valid = valid_case(self.table,order)
+        s = list(valid.values())
+        iterator = chain(*s)
+        l = list(iterator)
+        m = list(OrderedDict.fromkeys(l))
+        print(m)
+            
         for case, index in zip(node.cases,range(0, len(node.cases))):
             if index != 0:
                 self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
+        
+            case_expr_type_of = CILTypeConstantNode(case.type)    
             
-            case_expr_type_of = CILTypeConstantNode(case.type)
+        #index  = 0
+        #for case in node.cases:
+            #s = m 
+            #for new_branch in m :
+               # try:
+                   # if new_branch in valid[case.type]:
+            #if index != 0:
+                #self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
             name_var_condition = self.scope.add_new_local(None)
             var_condition = CILVariableNode(name_var_condition)
+            case_expr_type_of = CILTypeConstantNode(case.type)
             self.scope.instructions.append(CILAssignNode(var_condition, CILNotEqualsNode(CILVariableNode(name_type_expr),case_expr_type_of)))
+            
             if index == len(node.cases) - 1:
-                self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
+                    self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
             else:
                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))
 
