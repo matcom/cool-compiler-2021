@@ -75,6 +75,9 @@ class CCILGenerator:
         self.program_types = OrderedDict({OBJECT: obj, IO: io, STRING: str})
         self.program_codes: List[FunctionNode] = builtin_methods
 
+        for builtin_name in [OBJECT, IO, STRING, INT, BOOL]:
+            self.add_data(f"{CLASS}{builtin_name}", builtin_name)
+
         for type in node.declarations:
             classx, class_code = self.visit(type)
             self.program_types[classx.id] = classx
@@ -93,7 +96,7 @@ class CCILGenerator:
     def visit(self, node: sem_ast.ClassDeclarationNode) -> CLASS_VISITOR_RESULT:
         self.reset_scope()
         self.current_type = node.id
-        self.add_data(f"class_{node.id}", node.id)
+        self.add_data(f"{CLASS}{node.id}", node.id)
 
         attributes: List[Attribute] = self.get_inherited_attributes(node)
         methods: List[Method] = []
@@ -302,60 +305,59 @@ class CCILGenerator:
         (case_expr_ops, case_expr_fv) = self.visit(node.case_expr)
 
         # Handling case expression is not void
-
         void_expr_error_ops = (
             self.throw_runtime_error(
                 f"case_{times}_void_expr_error",
                 f"RuntimeError: Case expression in {node.row}, {node.col} is void",
             )
-            if node.expr.type.name not in {STRING, INT, BOOL}
+            if node.case_expr.type.name not in {STRING, INT, BOOL}
             else []
         )
 
         # Storing the type of the resulting case expression
-        type_of = self.create_type_of(f"case_{times}_typeOf", extract_id(case_expr_fv))
+        expr_type = self.create_type_name(f"case_{times}_expr_type", case_expr_fv.id)
 
         # Final label where all branch must jump to
-        final_label_id = f"case_{times}_end"
-        final_label = LabelNode(final_label_id)
-
-        # Inconditional jump to final label
+        final_label = LabelNode(f"case_{times}_end")
         final_goto = GoToNode(final_label)
 
         # All branch must end in a var named like this
         pre_fvalue_id = f"case_{times}_pre_fv"
+        # Holds strings for comparsion
+        type_name_holder = self.add_local(f"case_{times}_type_name_holder", STRING)
+        equality_holder = self.add_local(f"case_{times}_eq_holder", INT)
+
         pattern_match_ops = self.init_default_values()
         branch_ops = []
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
-            branch_var_id = f"case_{times}_option_{i}"
-            branch_var = self.create_uninitialized_storage(
-                branch_var_id, option.branch_type.name
-            )
-
-            # Initializing var which holds the branch var type
-            branch_var_type_id = f"case_{times}_optionTypeOf_{i}"
-            branch_var_type_of = self.create_type_of(
-                branch_var_type_id, extract_id(branch_var)
-            )
-
-            # Initializng var which holds the comparison result between
-            # the case expression type of and branch var type of
-            select_branch_id = f"case_{times}_optionSelect_{i}"
-            select_branch = self.create_equality(
-                select_branch_id,
-                extract_id(type_of),
-                extract_id(branch_var_type_of),
+            branch_var = self.create_assignation(
+                f"case_{times}_option_{i}", option.branch_type.name, case_expr_fv.id
             )
 
             # Label that means the start of this branch logic
-            branch_label_id = f"case_{times}_branch_{i}"
-            branch_label = LabelNode(branch_label_id)
+            branch_label = LabelNode(f"case_{times}_branch_{i}")
 
-            # Conditional jump to the right branch label
-            if_op = IfNode(extract_id(branch_var_type_of), branch_label)
+            # Compare expr type with node branch type and all of
+            # it's successors
+            branch_selection_ops = []
+            for type_names in option.successors:
+                load_class_name = StorageNode(
+                    type_name_holder.id, LoadOpNode(f"{CLASS}{type_names}")
+                )
+                select_branch = StorageNode(
+                    equality_holder.id,
+                    EqualStrNode(extract_id(expr_type), extract_id(load_class_name)),
+                )
+                # Conditional jump to the right branch label
+                if_op = IfNode(extract_id(select_branch), branch_label)
+                branch_selection_ops += [load_class_name, select_branch, if_op]
+
             # Storing logic to jump to branch logic if this branch is selected
-            pattern_match_ops += [branch_var, branch_var_type_of, select_branch, if_op]
+            pattern_match_ops += [
+                branch_var,
+                *branch_selection_ops,
+            ]
 
             # Translating the branch logic
             (expr_ops, expr_fval) = self.visit(option.expr)
@@ -380,7 +382,7 @@ class CCILGenerator:
         operations = [
             *case_expr_ops,
             *void_expr_error_ops,
-            type_of,
+            expr_type,
             *pattern_match_ops,
             *pattern_match_error_ops,
             *branch_ops,
@@ -725,7 +727,7 @@ class CCILGenerator:
             "abort", params, self.dump_locals(), [load, print, abort], "self"
         )
         params = self.init_func_params(OBJECT)
-        get_name = self.create_current_type_name("get_name")
+        get_name = self.create_type_name("get_name", "self")
         type_name_func = FunctionNode(
             "type_name", params, self.dump_locals(), [get_name], get_name.id
         )
@@ -924,9 +926,12 @@ class CCILGenerator:
         self.add_local(idx, ADDRESS)
         return StorageNode(idx, GetTypeOpNode(target))
 
-    def create_equality(self, idx, left: AtomOpNode, right: AtomOpNode):
+    def create_equality(
+        self, idx, left: AtomOpNode, right: AtomOpNode, string: bool = False
+    ):
         self.add_local(idx, BOOL)
-        return StorageNode(idx, EqualIntNode(left, right))
+        op = EqualStrNode(left, right) if string else EqualIntNode(left, right)
+        return StorageNode(idx, op)
 
     def notifiy_and_abort(self, target: str) -> List[OperationNode]:
         print = PrintStrNode(target)
@@ -953,9 +958,9 @@ class CCILGenerator:
         self.add_local(idx, INT)
         return StorageNode(idx, ReadIntNode())
 
-    def create_current_type_name(self, idx: str):
+    def create_type_name(self, idx: str, target: str):
         self.add_local(idx, STRING)
-        return StorageNode(idx, CurrentTypeNameNode())
+        return StorageNode(idx, CurrentTypeNameNode(target))
 
     def create_length(self, idx: str, target: str):
         self.add_local(idx, INT)
@@ -1017,6 +1022,7 @@ class CCILGenerator:
         if idx in self.locals:
             raise Exception(f"Trying to insert {idx} again as local")
         self.locals[idx] = typex
+        return Local(idx, typex)
 
     def reset_locals(self):
         """

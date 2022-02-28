@@ -426,8 +426,9 @@ class FlowControlNode(OperationNode):
 
 
 class CurrentTypeNameNode(ReturnOpNode):
-    def __init__(self) -> None:
+    def __init__(self, target: str) -> None:
         super().__init__()
+        self.target = target
 
 
 class IfNode(FlowControlNode):
