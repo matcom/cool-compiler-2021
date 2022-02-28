@@ -331,7 +331,6 @@ class MIPSCodegen:
         
     @visitor.when(CILTypeConstantNode)
     def visit(self, node: CILTypeConstantNode, frame):
-        print('here')
         self.add_line('li $a0, 8')
         self.add_line('li $v0, 9')
         self.add_line('syscall')

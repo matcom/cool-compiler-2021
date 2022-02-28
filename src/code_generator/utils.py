@@ -286,9 +286,9 @@ def valid_case (table, branchs):
         order = sorted(s, key=lambda tu : tu[1])
         for m in order:
             try:
-               valid[key].append(m[0])
+               valid[key].append(m)
             except:
-                valid[key] = [m[0]]
+                valid[key] = [m]
     return valid  
 
 def return_list_valid_case(node, to, table ):
