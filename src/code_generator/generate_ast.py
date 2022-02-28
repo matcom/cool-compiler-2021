@@ -145,6 +145,8 @@ class CIL:
         else:
             name = self.scope.find_local(node.expr.lex)           
             type = node.expr.computed_type.name
+        if node.type is not None:
+            type = node.type
         args = []
         args.append(CILArgNode(CILVariableNode(name)))
         for arg in node.arg:
