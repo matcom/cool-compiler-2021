@@ -101,7 +101,9 @@ class CCILGenerator:
         func_nodes = []
         for feature in node.features:
             if isinstance(feature, sem_ast.AttrDeclarationNode):
-                attributes.append(Attribute(ATTR + feature.id, feature.type.name, feature.id))
+                attributes.append(
+                    Attribute(ATTR + feature.id, feature.type.name, feature.id)
+                )
                 attr_nodes.append(feature)
             else:
                 func_nodes.append(feature)
@@ -111,9 +113,7 @@ class CCILGenerator:
 
         self.reset_scope()
         # Explore all functions
-        self.ccil_cool_names.add_new_names(
-            *[(a.cool_id, a.id) for a in attributes]
-        )
+        self.ccil_cool_names.add_new_names(*[(a.cool_id, a.id) for a in attributes])
         class_code: List[FunctionNode] = []
         for func in func_nodes:
             f = self.visit(func)
@@ -555,29 +555,35 @@ class CCILGenerator:
 
         (expr_ops, expr_fval) = self.visit(node.expr)
 
+        if node.caller_type.name == STRING:
+            fval_id = f"call_str_{times}"
+            call = self.create_call(
+                fval_id, node.type.name, node.id, STRING, [extract_id(expr_fval), *args]
+            )
+            return [*expr_ops, *args_ops, call], call
+
         # Runtime error depending if expr is void or not
         error_ops = []
-        if node.expr.type.name not in {INT, STRING, BOOL}:
-            expr_fval_is_void = self.create_equality(
-                f"expr_is_void_{times}", extract_id(expr_fval), IntNode("0")
-            )
-            ok_label = LabelNode(f"expr_is_not_void_{times}")
-            if_is_not_void = IfFalseNode(extract_id(expr_fval_is_void), ok_label)
-            error_msg = self.add_data(
-                f"caller_void_err_{times}",
-                f"RuntimeError: expresion in {node.line}, {node.col} is void",
-            )
-            load_err = self.create_string_load_data(
-                f"caller_void_err_var_{times}", error_msg.id
-            )
-            print_and_abort = self.notifiy_and_abort(load_err.id)
-            error_ops = [
-                expr_fval_is_void,
-                if_is_not_void,
-                load_err,
-                *print_and_abort,
-                ok_label,
-            ]
+        expr_fval_is_void = self.create_equality(
+            f"expr_is_void_{times}", extract_id(expr_fval), IntNode("0")
+        )
+        ok_label = LabelNode(f"expr_is_not_void_{times}")
+        if_is_not_void = IfFalseNode(extract_id(expr_fval_is_void), ok_label)
+        error_msg = self.add_data(
+            f"caller_void_err_{times}",
+            f"RuntimeError: expresion in {node.line}, {node.col} is void",
+        )
+        load_err = self.create_string_load_data(
+            f"caller_void_err_var_{times}", error_msg.id
+        )
+        print_and_abort = self.notifiy_and_abort(load_err.id)
+        error_ops = [
+            expr_fval_is_void,
+            if_is_not_void,
+            load_err,
+            *print_and_abort,
+            ok_label,
+        ]
 
         # <expr>@type.id(arg1, arg2, ..., argn)
         if node.at_type is not None:
