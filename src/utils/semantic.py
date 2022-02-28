@@ -29,14 +29,21 @@ class Method:
         params = ', '.join(f'{n}: {t.name}' for n, t in zip(self.param_names, self.param_types))
         return f'[method] {self.name}({params}): {self.return_type.name};'
 
+
     def __eq__(self, other):
-        return (other.name == self.name and
-                other.return_type == self.return_type and
-                tuple(other.param_types) == tuple(self.param_types))
+        return other.name == self.name and \
+               other.return_type == self.return_type and \
+               other.param_types == self.param_types
+
+    # def __eq__(self, other):
+    #     return (other.name == self.name and
+    #             other.return_type == self.return_type and
+    #             tuple(other.param_types) == tuple(self.param_types))
 
 class Type:
     def __init__(self, name: str):
         self.name: str = name
+        self.depth = 0
         self.attributes_dict: OrderedDict[str, Attribute] = OrderedDict()
         self.methods_dict: OrderedDict[str, Method] = OrderedDict()
         self.parent: Optional['Type'] = None
@@ -199,6 +206,10 @@ class Context:
         except KeyError:
             raise SemanticError(f'Type "{name}" is not defined.')
 
+    def subtree(self, name : str):
+        type = self.get_type(name)
+        return (i for i in self.types.values() if i.conforms_to(type))
+
     def __str__(self):
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
 
@@ -218,11 +229,17 @@ class FunctionInfo:
         self.name = name
         self.params = params
 
+from random import randint
+count = 0
 class Scope:
     def __init__(self, parent: Optional['Scope'] = None):
+        global count
         self.locals: Dict[str, VariableInfo] = {}
         self.parent: Optional['Scope'] = parent
         self.children: List[Scope] = []
+        # self.id = randint(1,1000)
+        self.id = count
+        count+=1
 
     def create_child(self) -> 'Scope':
         child = Scope(self)
@@ -234,11 +251,18 @@ class Scope:
         self.locals[vname] = info
         return info
 
-    def find_variable(self, vname: str) -> Optional[VariableInfo]:
+    # def find_variable(self, vname: str) -> Optional[VariableInfo]:
+    #     try:
+    #         return self.locals[vname]
+    #     except KeyError:
+    #         return self.parent.find_variable(vname) if self.parent is not None else None
+
+    def find_variable(self, vname : str):
         try:
             return self.locals[vname]
         except KeyError:
             return self.parent.find_variable(vname) if self.parent is not None else None
+
 
     def is_defined(self, vname) -> bool:
         return self.find_variable(vname) is not None

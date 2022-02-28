@@ -13,7 +13,7 @@ class Pipeline():
         self.program = program
         self.parser = parser
         self.lexer = lexer
-        self.ast = self.parser.parse(lexer, program)
+        self.ast = self.parser.parse(self.lexer, self.program)
         self.errors = self.lexer.errors + self.parser.errors
         
         if len(self.errors) != 0:
