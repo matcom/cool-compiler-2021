@@ -717,11 +717,11 @@
     PARAM param_self;
 
     LOCAL local_position;
+    LOCAL local_1;
     LOCAL local_num;
-    LOCAL local_2;
     LOCAL local_3;
+    LOCAL local_4;
     LOCAL local_temp;
-    LOCAL local_5;
     LOCAL local_6;
     LOCAL local_7;
     LOCAL local_8;
@@ -734,34 +734,42 @@
     LOCAL local_15;
     LOCAL local_16;
     LOCAL local_17;
+    LOCAL local_18;
+    LOCAL local_19;
     LOCAL local_population_map;
 
-    local_3 = TYPEOF param_self;
+    local_1 = LOAD 0;
+    ARG local_1;
+    local_position = CALL Int_init;
+    local_4 = TYPEOF param_self;
     ARG param_self;
-    local_2 = VCALL local_3 9;
+    local_3 = VCALL local_4 9;
+    local_6 = LOAD 0;
+    ARG local_6;
+    local_temp = CALL Int_init;
     LABEL label_while_label_0;
-    local_5 = GETATTR local_position 0;
-    local_6 = GETATTR local_num 0;
-    local_7 = local_6 - local_5
-    ARG local_7;
-    local_8 = CALL Bool_init;
-    IF local_8 GOTO label_loop_label_0;
+    local_7 = GETATTR local_position 0;
+    local_8 = GETATTR local_num 0;
+    local_9 = local_8 - local_7
+    ARG local_9;
+    local_10 = CALL Bool_init;
+    IF local_10 GOTO label_loop_label_0;
     GOTO label_pool_label_0;
     LABEL label_loop_label_0;
-    local_11 = TYPEOF param_self;
+    local_13 = TYPEOF param_self;
     ARG param_self;
     ARG local_position;
-    local_10 = VCALL local_11 13;
-    local_12 = TYPEOF local_temp;
+    local_12 = VCALL local_13 13;
+    local_14 = TYPEOF local_temp;
     ARG local_temp;
-    ARG local_10;
-    local_9 = VCALL local_12 4;
-    local_13 = GETATTR local_position 0;
-    local_14 = LOAD 1;
-    ARG local_14;
-    local_15 = CALL Int_init;
-    local_16 = GETATTR local_15 0;
-    local_17 = local_13 + local_16
+    ARG local_12;
+    local_11 = VCALL local_14 4;
+    local_15 = GETATTR local_position 0;
+    local_16 = LOAD 1;
+    ARG local_16;
+    local_17 = CALL Int_init;
+    local_18 = GETATTR local_17 0;
+    local_19 = local_15 + local_18
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
     SETATTR param_self 0 local_population_map;

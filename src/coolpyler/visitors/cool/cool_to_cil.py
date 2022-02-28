@@ -573,8 +573,12 @@ class CoolToCilVisitor(object):
         lhs_local = self.get_local(node.id)
         if not any(lhs_local == l.name for l in self.locals):
             lhs_local = self.register_local(node.id)
-        rhs_local = self.visit(node.expr)
-        self.instructions.append(cil.AssignNode(lhs_local, rhs_local))
+        if node.expr is not None:
+            rhs_local = self.visit(node.expr)
+            self.instructions.append(cil.AssignNode(lhs_local, rhs_local))
+        else:
+            self.register_new("Int", self.register_num(0), dest=lhs_local)
+
         return lhs_local
 
     @visitor.when(type_checked.CoolCaseNode)
