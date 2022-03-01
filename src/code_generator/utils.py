@@ -197,17 +197,24 @@ class TypeInfo:
             
 def get_ts(context):
     list = []
+    heirs = {}
     visited = []
     for c in context.types.values():
         if c not in visited:
-            dfs_visit_ts(context, c, list, visited)
-    return list
+            dfs_visit_ts(context, c, list,heirs, visited)
+    return list, heirs
 
 
-def dfs_visit_ts(context, u, list, visited):
+def dfs_visit_ts(context, u, list, heirs, visited):
     visited.append(u)
-    if u.parent is not None and u.parent not in visited:
-        dfs_visit_ts(context, u.parent, list, visited)
+    if u.parent is not None:
+        try:
+            heirs[u.parent.name].append(u.name)
+        except KeyError:
+            heirs[u.parent.name] = [u.name]
+
+        if u.parent not in visited:
+            dfs_visit_ts(context, u.parent, list, heirs, visited)
     
     list.append(u)
 

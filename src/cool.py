@@ -48,7 +48,7 @@ if errors:
         
 cil_generator = CIL(context)
 cil = cil_generator.visit(ast)
-print(cil)
+#print(cil)
 cil_codegen = CILCodegen()
 code = cil_codegen.visit(cil)
 with open(f'output.cil', 'w') as f:
