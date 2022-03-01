@@ -133,10 +133,10 @@ class GotoNode(InstructionNode):
 
 
 class GotoIfNode(InstructionNode):
-    def __init__(self, condition, label):
+    def __init__(self, label, condition):
         super().__init__()
-        self.condition = condition
         self.label = label
+        self.condition = condition
 
     def __repr__(self):
         return f"GOTO {self.label} if {self.condition}"
