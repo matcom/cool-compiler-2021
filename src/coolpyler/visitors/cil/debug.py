@@ -145,16 +145,30 @@ class CILDebug:
 
     @visitor.when(cil.ConcatNode)
     def visit(self, node: cil.ConcatNode, indent=0, inline=False):
-        self.print(indent, inline, f"{node.dest} = concat({node.string1}, {node.string2}, {node.dest_lenght})")
+        self.print(
+            indent,
+            inline,
+            f"{node.dest} = concat({node.string1}, {node.string2}, {node.dest_lenght})",
+        )
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode, indent=0, inline=False):
-        self.print(indent, inline, f"{node.dest} = substr({node.string}, {node.index}, {node.n})")
+        self.print(
+            indent,
+            inline,
+            f"{node.dest} = substr({node.string}, {node.index}, {node.n})",
+        )
 
     @visitor.when(cil.ReadNode)
     def visit(self, node: cil.ReadNode, indent=0, inline=False):
-        self.print(indent, inline, f"{node.dest} = read({'str' if node.is_string else 'int'})")
+        self.print(
+            indent, inline, f"{node.dest} = read({'str' if node.is_string else 'int'})"
+        )
 
     @visitor.when(cil.PrintNode)
     def visit(self, node: cil.PrintNode, indent=0, inline=False):
-        self.print(indent, inline, f"print({'str' if node.is_string else 'int'}, {node.str_addr}")
+        self.print(
+            indent,
+            inline,
+            f"print({'str' if node.is_string else 'int'}, {node.str_addr}",
+        )

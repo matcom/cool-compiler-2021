@@ -418,7 +418,9 @@ class CoolToCilVisitor(object):
             attr_local = self.register_local(attr)
             self.instructions.append(cil.ArgNode(self_local))
             self.instructions.append(
-                cil.StaticCallNode(self.get_func_id(htype, f"{attr}___init"), attr_local,)
+                cil.StaticCallNode(
+                    self.get_func_id(htype, f"{attr}___init"), attr_local,
+                )
             )
             self.instructions.append(cil.SetAttrNode(self_local, i, attr_local))
         self.instructions.append(cil.ReturnNode(self_local))
@@ -442,7 +444,7 @@ class CoolToCilVisitor(object):
         self.register_param("self")
         if node.body is not None:
             sid = self.visit(node.body)
-        else: # Void
+        else:  # Void
             sid = self.register_new("Void")
         self.instructions.append(cil.ReturnNode(sid))
         return cil.FunctionNode(
@@ -618,14 +620,13 @@ class CoolToCilVisitor(object):
             t12, t21 = t1.conforms_to(t2), t2.conforms_to(t1)
             return 0 if t12 and t21 else 1 if t21 else -1
 
-        sorted_types = sorted(
-            node.expr.type.reachable,
-            key=cmp_to_key(compare_types),
-        )
+        sorted_types = sorted(node.expr.type.reachable, key=cmp_to_key(compare_types),)
 
         sorted_branches = sorted(
             node.case_branches,
-            key=cmp_to_key(lambda b1, b2: compare_types(b1.branch_type, b2.branch_type)),
+            key=cmp_to_key(
+                lambda b1, b2: compare_types(b1.branch_type, b2.branch_type)
+            ),
         )
 
         branch_labels = []
@@ -640,7 +641,9 @@ class CoolToCilVisitor(object):
                 branch_type_local = self.register_local()
                 self.instructions.append(cil.LoadNode(branch_type_local, btyp.name))
                 types_eq_local = self.register_local()
-                self.instructions.append(cil.MinusNode(types_eq_local, runtime_type_local, branch_type_local))
+                self.instructions.append(
+                    cil.MinusNode(types_eq_local, runtime_type_local, branch_type_local)
+                )
                 branch_label = self.get_label("case_branch")
                 branch_labels.append(branch_label)
                 self.instructions.append(cil.GotoIfNode(types_eq_local, branch_label))
