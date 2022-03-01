@@ -79,13 +79,12 @@ class FunctionNode(Node):
 
 
 class TypeNode(Node):
-    def __init__(self, data_label, type_label, attributes, methods, pos, defaults):
+    def __init__(self, data_label, type_label, attributes, methods, pos):
         self.data_label = data_label
         self.type_label = type_label
         self.attributes = attributes
         self.methods = methods
         self.pos = pos
-        self.defaults = defaults
 
 
 class InstructionNode(Node):

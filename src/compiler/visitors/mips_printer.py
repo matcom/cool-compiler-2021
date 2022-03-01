@@ -27,14 +27,14 @@ class MIPSPrintVisitor:
         names_table = f"{TYPE_LIST}:\n\t .word " + ", ".join(
             [f"{tp.data_label}" for tp in node.types]
         )
-        proto_table = f"{VIRTUAL_TABLE}:\n\t .word " + ", ".join(
-            [f"{tp.type_label}_proto" for tp in node.types]
+        virtual_table = f"{VIRTUAL_TABLE}:\n\t .word " + ", ".join(
+            [f"{tp.type_label}_dispatch" for tp in node.types]
         )
 
         types = "\n\n".join([self.visit(tp) for tp in node.types])
 
         code = "\n".join([self.visit(func) for func in node.text])
-        return f"{data_section_header}\n{static_strings}\n\n{names_table}\n\n{proto_table}\n\n{types}\n\t.text\n\t.globl main\n{code}"
+        return f"{data_section_header}\n{static_strings}\n\n{names_table}\n\n{virtual_table}\n\n{types}\n\n.text\n\t.globl main\n{code}"
 
     @visitor.when(StringConst)
     def visit(self, node):
@@ -46,18 +46,19 @@ class MIPSPrintVisitor:
         print(node.attributes)
         methods = ", ".join([f"{node.methods[m]}" for m in node.methods])
         dispatch_table = f"{node.type_label}_dispatch:\n\t .word {methods}"
-        proto_begin = f"{node.type_label}_proto:\n\t.word\t{node.pos}, {len(node.attributes)*4}, {node.type_label}_dispatch"
-        proto_attr = ", ".join(
-            [f'{node.defaults.get(attr,"0")}' for attr in node.attributes]
-        )
-        proto_end = f"{-1}"
-        proto = (
-            f"{proto_begin}, {proto_attr}, {proto_end}"
-            if proto_attr != ""
-            else f"{proto_begin}, {proto_end}"
-        )
+        # proto_begin = f"{node.type_label}_proto:\n\t.word\t{node.pos}, {len(node.attributes)*4}, {node.type_label}_dispatch"
+        # proto_attr = ", ".join(
+        #     [f'{node.defaults.get(attr,"0")}' for attr in node.attributes]
+        # )
+        # proto_end = f"{-1}"
+        # proto = (
+        #     f"{proto_begin}, {proto_attr}, {proto_end}"
+        #     if proto_attr != ""
+        #     else f"{proto_begin}, {proto_end}"
+        # )
 
-        return f"{dispatch_table}\n\n{proto}"
+        # return f"{dispatch_table}\n\n{proto}"
+        return f"{dispatch_table}"
 
     @visitor.when(SyscallNode)
     def visit(self, node):
@@ -101,7 +102,7 @@ class MIPSPrintVisitor:
 
     @visitor.when(JumpRegisterAndLinkNode)
     def visit(self, node):
-        return f"jal {self.visit(node.reg)}"
+        return f"jalr {self.visit(node.reg)}"
 
     @visitor.when(LoadWordNode)
     def visit(self, node):

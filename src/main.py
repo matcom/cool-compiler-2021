@@ -89,8 +89,10 @@ def main(args):
     cil_visitor = COOLToCILVisitor(context)
     cil_ast = cil_visitor.visit(ast, scope)
 
-    # cil_formatter = PrintCILVisitor()
-    # print(cil_formatter.visit(cil_ast))
+    print("*****************************CIL CODE **************************")
+    cil_formatter = PrintCILVisitor()
+    print(cil_formatter.visit(cil_ast))
+    print("*****************************CIL CODE **************************")
 
     cil_to_mips = CILToMIPSVisitor()
     mips_ast = cil_to_mips.visit(cil_ast)
@@ -101,11 +103,14 @@ def main(args):
     out_file = args.file.split(".")
     out_file[-1] = "mips"
     out_file = ".".join(out_file)
+    out_file = f"{args.file[:-3]}.mips"
 
     with open(out_file, "w") as f:
         f.write(mips_code)
         with open("src/compiler/visitors/mips_lib.asm") as f2:
             f.write("".join(f2.readlines()))
+
+    exit(0)
 
 
 if __name__ == "__main__":
