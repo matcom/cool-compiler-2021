@@ -1013,7 +1013,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(end_label)
         node.noted_value = nval
         
-        
     @visitor.when(TrueNode)
     def visit(self, node, scope):
         nval = self.define_internal_local()

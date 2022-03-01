@@ -2048,6 +2048,44 @@ jr $ra
 
 
 
+equal_str:
+addiu $sp $sp -24
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $a0 8($sp)
+sw $a1 12($sp)
+sw $t2 16($sp)
+sw $t3 20($sp)
+move $t0 $a0
+move $t1 $a1
+while_equal_str:
+lb $t2 0($t0)
+lb $t3 0($t1)
+bne $t2 $t3 equal_str_different_strings
+beq $t2 $zero first_end_equal_str
+beq $t3 $zero second_end_equal_str
+addi $t1 $t1 1
+addi $t0 $t0 1
+j while_equal_str
+equal_str_different_strings:
+move $v0 $zero
+j equal_str_end
+first_end_equal_str:
+beq $t3 $zero second_end_equal_str
+move $v0 $zero
+j equal_str_end
+second_end_equal_str:
+li $v0 1
+equal_str_end:
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $a0 8($sp)
+lw $a1 12($sp)
+lw $t2 16($sp)
+lw $t3 20($sp)
+addiu $sp $sp 24
+jr $ra
+
 allocate:
 addiu $sp $sp -12
 sw $a0 0($sp)
@@ -2086,159 +2124,6 @@ lw $a1 4($sp)
 lw $a2 8($sp)
 lw $t0 12($sp)
 addiu $sp $sp 16
-jr $ra
-
-length:
-addiu $sp $sp -8
-sw $t0 0($sp)
-sw $t1 4($sp)
-move $t0 $a0
-move $v0 $zero
-while_len:
-lb $t1 0($t0)
-beq $t1 $zero len_end
-addi $v0 $v0 1
-addiu $t0 $t0 1
-j while_len
-len_end:
-lw $t0 0($sp)
-lw $t1 4($sp)
-addiu $sp $sp 8
-jr $ra
-
-concat:
-addiu $sp $sp -24
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $a0 12($sp)
-sw $a1 16($sp)
-sw $ra 20($sp)
-move $t0 $a0
-move $t1 $a1
-addiu $a0 $a2 1
-li $t2 4
-div $a0 $t2
-mfhi $a0
-bne $a0 $zero concat_allign_size
-addiu $a0 $a2 1
-j concat_size_allignned
-concat_allign_size:
-sub $t2 $t2 $a0
-add $a0 $a2 $t2
-addiu $a0 $a0 1
-concat_size_allignned:
-jal allocate
-move $t2 $v0
-j first_while_concat_copy
-first_while_concat_copy:
-lb $a0 0($t0)
-beq $a0 $zero second_while_concat_copy
-sb $a0 0($t2)
-addiu $t0 $t0 1
-addiu $t2 $t2 1
-j first_while_concat_copy
-second_while_concat_copy:
-lb $a0 0($t1)
-beq $a0 $zero concat_end
-sb $a0 0($t2)
-addiu $t1 $t1 1
-addiu $t2 $t2 1
-j second_while_concat_copy
-concat_end:
-sb $zero 0($t2)
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $a0 12($sp)
-lw $a1 16($sp)
-lw $ra 20($sp)
-addiu $sp $sp 24
-jr $ra
-
-substr:
-addiu $sp $sp -32
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $t2 8($sp)
-sw $t3 12($sp)
-sw $a0 16($sp)
-sw $a1 20($sp)
-sw $a2 24($sp)
-sw $ra 28($sp)
-move $t0 $a0
-add $t0 $t0 $a1
-li $t1 4
-div $a2 $t1
-mfhi $t2
-bne $t2 $zero substr_allign_size
-move $t1 $a2
-j substr_new_chunk
-substr_allign_size:
-sub $t1 $t1 $t2
-add $t1 $t1 $a2
-substr_new_chunk:
-move $a0 $t1
-jal allocate
-move $t3 $v0
-move $t1 $zero
-while_substr_copy:
-beq $t1 $a2 substr_end
-lb $t2 0($t0)
-sb $t2 0($t3)
-addiu $t0 $t0 1
-addiu $t3 $t3 1
-addiu $t1 $t1 1
-j while_substr_copy
-substr_end:
-sb $zero 0($t3)
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $t2 8($sp)
-lw $t3 12($sp)
-lw $a0 16($sp)
-lw $a1 20($sp)
-lw $a2 24($sp)
-lw $ra 28($sp)
-addiu $sp $sp 32
-jr $ra
-
-equal_str:
-addiu $sp $sp -24
-sw $t0 0($sp)
-sw $t1 4($sp)
-sw $a0 8($sp)
-sw $a1 12($sp)
-sw $t2 16($sp)
-sw $t3 20($sp)
-move $t0 $a0
-move $t1 $a1
-while_equal_str:
-lb $t2 0($t0)
-lb $t3 0($t1)
-bne $t2 $t3 equal_str_different_strings
-beq $t2 $zero first_end_equal_str
-beq $t3 $zero second_end_equal_str
-addi $t1 $t1 1
-addi $t0 $t0 1
-j while_equal_str
-equal_str_different_strings:
-move $v0 $zero
-j equal_str_end
-first_end_equal_str:
-beq $t3 $zero second_end_equal_str
-move $v0 $zero
-j equal_str_end
-second_end_equal_str:
-li $v0 1
-equal_str_end:
-lw $t0 0($sp)
-lw $t1 4($sp)
-lw $a0 8($sp)
-lw $a1 12($sp)
-lw $t2 16($sp)
-lw $t3 20($sp)
-addiu $sp $sp 24
 jr $ra
 
 read_string:
@@ -2320,4 +2205,119 @@ lw $t3 16($sp)
 lw $t4 20($sp)
 lw $t5 24($sp)
 addiu $sp $sp 28
+jr $ra
+
+substr:
+addiu $sp $sp -32
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $t3 12($sp)
+sw $a0 16($sp)
+sw $a1 20($sp)
+sw $a2 24($sp)
+sw $ra 28($sp)
+move $t0 $a0
+add $t0 $t0 $a1
+li $t1 4
+div $a2 $t1
+mfhi $t2
+bne $t2 $zero substr_allign_size
+move $t1 $a2
+j substr_new_chunk
+substr_allign_size:
+sub $t1 $t1 $t2
+add $t1 $t1 $a2
+substr_new_chunk:
+move $a0 $t1
+jal allocate
+move $t3 $v0
+move $t1 $zero
+while_substr_copy:
+beq $t1 $a2 substr_end
+lb $t2 0($t0)
+sb $t2 0($t3)
+addiu $t0 $t0 1
+addiu $t3 $t3 1
+addiu $t1 $t1 1
+j while_substr_copy
+substr_end:
+sb $zero 0($t3)
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $t3 12($sp)
+lw $a0 16($sp)
+lw $a1 20($sp)
+lw $a2 24($sp)
+lw $ra 28($sp)
+addiu $sp $sp 32
+jr $ra
+
+concat:
+addiu $sp $sp -24
+sw $t0 0($sp)
+sw $t1 4($sp)
+sw $t2 8($sp)
+sw $a0 12($sp)
+sw $a1 16($sp)
+sw $ra 20($sp)
+move $t0 $a0
+move $t1 $a1
+addiu $a0 $a2 1
+li $t2 4
+div $a0 $t2
+mfhi $a0
+bne $a0 $zero concat_allign_size
+addiu $a0 $a2 1
+j concat_size_allignned
+concat_allign_size:
+sub $t2 $t2 $a0
+add $a0 $a2 $t2
+addiu $a0 $a0 1
+concat_size_allignned:
+jal allocate
+move $t2 $v0
+j first_while_concat_copy
+first_while_concat_copy:
+lb $a0 0($t0)
+beq $a0 $zero second_while_concat_copy
+sb $a0 0($t2)
+addiu $t0 $t0 1
+addiu $t2 $t2 1
+j first_while_concat_copy
+second_while_concat_copy:
+lb $a0 0($t1)
+beq $a0 $zero concat_end
+sb $a0 0($t2)
+addiu $t1 $t1 1
+addiu $t2 $t2 1
+j second_while_concat_copy
+concat_end:
+sb $zero 0($t2)
+lw $t0 0($sp)
+lw $t1 4($sp)
+lw $t2 8($sp)
+lw $a0 12($sp)
+lw $a1 16($sp)
+lw $ra 20($sp)
+addiu $sp $sp 24
+jr $ra
+
+length:
+addiu $sp $sp -8
+sw $t0 0($sp)
+sw $t1 4($sp)
+move $t0 $a0
+move $v0 $zero
+while_len:
+lb $t1 0($t0)
+beq $t1 $zero len_end
+addi $v0 $v0 1
+addiu $t0 $t0 1
+j while_len
+len_end:
+lw $t0 0($sp)
+lw $t1 4($sp)
+addiu $sp $sp 8
 jr $ra
