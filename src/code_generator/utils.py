@@ -290,6 +290,7 @@ def valid_case (table, branchs):
                 valid[key] = [m]
     return valid  
 
+
 def return_list_valid_case(node, to, table ):
         order = order_case_branc_to(node.cases,to)
         valid = valid_case(table,order)
@@ -297,7 +298,8 @@ def return_list_valid_case(node, to, table ):
         iterator = chain(*s)
         l = list(iterator)
         m = list(OrderedDict.fromkeys(l))
-        return m, valid         
+        new_cases = sorted(m, key=lambda tu : tu[1])
+        return new_cases, valid         
   
             
                      

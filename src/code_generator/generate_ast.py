@@ -1,5 +1,4 @@
-from cmath import exp
-from copy import copy
+
 from parsing.ast import *
 from .ast_CIL import *
 from .utils import *
@@ -245,14 +244,13 @@ class CIL:
           
     @visitor.when(CaseNode)
     def visit(self, node):
+        self.scope.aux_lo = []
         expr = self.visit(node.expr)
         self.expression_var_case = expr
         print("lolllllllllllllllllllllllllllllll")
-        order = order_case_branc_to(node.cases,self.to)
-        valid = valid_case(self.table,order)
-        print(valid)
+        new_cases, valid = return_list_valid_case(node, self.to, self.table)
+        print(new_cases)
         print("lolllllllllllllllllllllllllllllll")
-        #list, valid = return_list_valid_case(node,self.to,self.table)
         name = self.scope.add_new_local(node.expr.computed_type.name)
         var = CILVariableNode(name)
        
@@ -263,14 +261,11 @@ class CIL:
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name_type_expr), expr_type_of))     
        
         name_return =  self.scope.add_new_local(node.computed_type.name)
-        return_ = CILVariableNode(name_return)
-           
-        #for case, index in zip(node.cases,range(0, len(node.cases))):
-           # if index != 0:
-           #     self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
-        
-            #case_expr_type_of = CILTypeConstantNode(case.type)       
+        return_ = CILVariableNode(name_return)  
+        keys = [ key.type for key in node.cases ]
         index  = 0
+        expr = {}
+        #aqui agrego las ramas originales 
         for case in node.cases:
             name_var_condition = self.scope.add_new_local(None)
             var_condition = CILVariableNode(name_var_condition)
@@ -280,44 +275,59 @@ class CIL:
             case_expr_type_of = CILTypeConstantNode(case.type)
             self.scope.instructions.append(CILAssignNode(var_condition, CILNotEqualsNode(CILVariableNode(name_type_expr),case_expr_type_of)))
             
-            expr_attr = self.visit(case)
-            
-            if index == len(node.cases) - 1:
+            if index == len(node.cases) - 1 and len(new_cases) == 0 :
                     self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
             else:
                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))
-                
+            #aqui hay problema porque dentro del visit que llama al metodo que esta despues de este se crea un nuevo scope
+            #las nuevaslocales estan all_locals   
+            expr_attr = self.visit(case)
+            expr[case.type] = expr_attr
             self.scope.instructions.append(CILAssignNode(return_, expr_attr))    
-            self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))
             index += 1
-            # for new_branch in s :
-            #     print("lolllllllllllllllllllllllllllllll")
-            #     print(new_branch)
-            #     try:
-            #         if new_branch not in keys and new_branch in valid[case.type]:
-            #             print("entrooooo")
-            #             print(new_branch)
-            #             case_expr_type_of = CILTypeConstantNode(new_branch)    
-            #             self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
-            #             index +=1
-            #             list.remove(new_branch)
-            #             if index == len(node.cases) - 1:
-            #                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
-            #             else:
-            #                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))     
-            #             self.scope.instructions.append(CILAssignNode(return_, expr_attr)) 
-            #             self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))                       
-            #     except :
-            #         pass        
-        #self.scope.instructions.append(CILAssignNode(return_,CILExceptionNode("Exception in case ")))
+        artific = False
+        type = []
+        for (new_branch,i) in new_cases :
+            for name,j in zip(keys,range(0,len(keys))):
+                try: 
+                    can_ = False
+                    try:
+                        type.index(new_branch)
+                    except:
+                        can_= True    
+                            
+                    if can_  and new_branch not in keys and (new_branch,i) in valid[name]:  
+                        type.append(new_branch)
+                        artific =True   
+                        self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
+                        case_expr_type_of = CILTypeConstantNode(new_branch)  
+                        self.scope.instructions.append(CILAssignNode(var_condition, CILNotEqualsNode(CILVariableNode(name_type_expr),case_expr_type_of)))  
+                        if index == (len(node.cases) + len(new_cases)) :
+                            self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
+                        else:
+                            self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}'))) 
+                        self.scope.instructions.append(CILAssignNode(CILVariableNode(self.scope.aux_lo[j]), self.expression_var_case))  
+                        self.scope.instructions.append(CILAssignNode(return_, expr[name])) 
+                        self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))                       
+                        index +=1
+                except :
+                    pass 
+
+        if artific:
+            index-=1
+            self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index}'))
+            self.scope.instructions.append(CILAssignNode(return_,CILExceptionNode("Errorrr")))
+            self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}'))) 
         self.scope.instructions.append(CILLabelNode(f'case_end{ self.scope.case_count}'))
         self.scope.case_count += 1 
         return return_
+        #self.scope.instructions.append(CILAssignNode(return_,CILExceptionNode("Exception in case ")))
             
     @visitor.when(CaseAttrNode)
     def visit(self, node):  
         self.scope.locals.append({})
         local = self.scope.add_local(node.id, node.type)
+        self.scope.aux_lo.append(local)
         self.scope.instructions.append(CILAssignNode(CILVariableNode(local), self.expression_var_case))
 
         expression_branch = self.visit(node.expr)
@@ -455,3 +465,27 @@ class CIL:
         name = self.scope.add_new_local(node.lex)
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILVCallNode(node.lex, f"Init_{node.lex}")))
         return  CILVariableNode(name) 
+# for (new_branch,i) in s :
+#                 try:
+#                     if new_branch not in keys and (new_branch,i) in valid[case.type]:
+#                         try:
+#                             if type[new_branch] :
+#                                 new_cases.remove(new_branch)
+#                             else:
+#                                 type[new_branch] = True 
+#                                 new_cases.remove(new_branch)  
+#                         except:   
+#                             type[new_branch] = True      
+#                             self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
+#                             case_expr_type_of = CILTypeConstantNode(new_branch)  
+#                             self.scope.instructions.append(CILAssignNode(var_condition, CILNotEqualsNode(CILVariableNode(name_type_expr),case_expr_type_of)))  
+#                             new_cases.remove((new_branch,i))
+#                             if index == len(node.cases) - 1 and len(s) == 0  :
+#                                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
+#                             else:
+#                                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))     
+#                             self.scope.instructions.append(CILAssignNode(return_, expr_attr)) 
+#                             self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))                       
+#                             index +=1
+#                 except :
+#                     pass      
