@@ -83,7 +83,7 @@ class BaseCILToMIPSVisitor:
 
         return list(flatten([set_sp, pop_FP, pop_RA, final]))
 
-    def register_function(self, name, function: FunctionNode):
+    def register_function(self, name, function: mips.FunctionNode):
         self.text[name] = function
         self.current_function = function
         self.function_labels = {}
@@ -105,9 +105,6 @@ class BaseCILToMIPSVisitor:
             return self.get_local_var_index(name)
 
     def get_type_size(self, type_name):
-        print("---------------")
-        print(type_name, self.types[type_name].attributes)
-        print("---------------")
         return (len(self.types[type_name].attributes) + 1) * 4
 
 
@@ -120,7 +117,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node: ProgramNode) -> mips.ProgramNode:
 
         self.function_collector.collect(node)
-        self.data["default_str"] = mips.StringConst("default_str", "")
+        self.data["null_str"] = mips.StringConst("null_str", "")
 
         for dd in node.dotdata:
             self.visit(dd)
@@ -177,11 +174,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.current_function = function_node
         body = [self.visit(instruction) for instruction in node.instructions]
 
-        print(
-            f"*************Instructions at {self.function_collector.functions[node.name], node.name}*********************"
-        )
-        [print(i) for i in node.instructions]
-        print("***********************************")
         # Conventions of Final calle instrucctions
         final_callee = self.make_callee_final_instructions(function_node)
 
@@ -306,7 +298,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
             )
 
         instructions.append(mips.DivideNode(mips.T0, mips.T1))
-        instructions.append(mips.MoveFromLowNode(mips.MoveFromLowNode(mips.T2)))
+        instructions.append(mips.MoveFromLowNode(mips.T2))
         instructions.append(
             mips.StoreWordNode(mips.T2, self.get_var_location(node.dest))
         )
@@ -487,6 +479,37 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         instructions.append(
             mips.StoreWordNode(mips.A0, mips.RegisterRelativeLocation(mips.V0, 0))
         )
+        if self.types["Int"].pos == tp:
+            instructions.append(mips.LoadInmediateNode(mips.A0, 0))
+            instructions.append(
+                mips.StoreWordNode(mips.A0, mips.RegisterRelativeLocation(mips.V0, 4))
+            )
+        if self.types["String"].pos == tp:
+            instructions.append(mips.LoadAddressNode(mips.A0, "null_str"))
+            instructions.append(
+                mips.StoreWordNode(mips.A0, mips.RegisterRelativeLocation(mips.V0, 4))
+            )
+
+            instructions.append(mips.MoveNode(mips.A1, mips.V0))
+
+            int_type_index = self.types["Int"].pos
+            instructions.append(mips.LoadInmediateNode(mips.A0, 8))
+            instructions.append(mips.LoadInmediateNode(mips.V0, 9))
+            instructions.append(mips.SyscallNode())
+            instructions.append(mips.LoadInmediateNode(mips.A0, int_type_index))
+            instructions.append(
+                mips.StoreWordNode(mips.A0, mips.RegisterRelativeLocation(mips.V0, 0))
+            )
+            instructions.append(mips.LoadInmediateNode(mips.A0, 0))
+            instructions.append(
+                mips.StoreWordNode(mips.A0, mips.RegisterRelativeLocation(mips.V0, 4))
+            )
+            instructions.append(
+                mips.StoreWordNode(mips.V0, mips.RegisterRelativeLocation(mips.A1, 8))
+            )
+
+            instructions.append(mips.MoveNode(mips.V0, mips.A1))
+
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
@@ -513,16 +536,16 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         instructions.append(mips.LoadAddressNode(mips.A0, mips.TYPE_LIST))
 
-        tp_number = self.types[node.name].index
+        tp_number = self.types[node.name].pos
         instructions.append(
-            mips.AddInmediateUnsignedNode(mips.a0, mips.a0, tp_number * 4)
+            mips.AddInmediateUnsignedNode(mips.A0, mips.A0, tp_number * 4)
         )
         instructions.append(
-            mips.LoadWordNode(mips.a0, mips.RegisterRelativeLocation(mips.a0, 0))
+            mips.LoadWordNode(mips.A0, mips.RegisterRelativeLocation(mips.A0, 0))
         )
 
         instructions.append(
-            mips.StoreWordNode(mips.a0, self.get_var_location(node.dest))
+            mips.StoreWordNode(mips.A0, self.get_var_location(node.dest))
         )
 
         return instructions
@@ -536,6 +559,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         instructions = []
         function_to_call = self.function_collector.functions[node.function]
         instructions.append(mips.JumpAndLinkNode(function_to_call))
+
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
@@ -814,6 +838,8 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         if type(node.value) == int:
             instructions.append(mips.LoadInmediateNode(mips.A1, node.value))
+        elif isinstance(node.value, VoidNode):
+            instructions.append(mips.LoadInmediateNode(mips.A1, 0))
         else:
             instructions.append(
                 mips.LoadWordNode(mips.A1, self.get_var_location(node.value))

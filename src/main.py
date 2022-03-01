@@ -15,6 +15,7 @@ from compiler.visitors.cool2cil import COOLToCILVisitor
 from compiler.visitors.cil_formatter import PrintCILVisitor
 from compiler.visitors.cil2mips import CILToMIPSVisitor
 from compiler.visitors.mips_printer import MIPSPrintVisitor
+import os
 
 
 def main(args):
@@ -89,25 +90,22 @@ def main(args):
     cil_visitor = COOLToCILVisitor(context)
     cil_ast = cil_visitor.visit(ast, scope)
 
-    print("*****************************CIL CODE **************************")
-    cil_formatter = PrintCILVisitor()
-    print(cil_formatter.visit(cil_ast))
-    print("*****************************CIL CODE **************************")
-
     cil_to_mips = CILToMIPSVisitor()
     mips_ast = cil_to_mips.visit(cil_ast)
     printer = MIPSPrintVisitor()
     mips_code = printer.visit(mips_ast)
-    # print(mips_code)
 
     out_file = args.file.split(".")
     out_file[-1] = "mips"
     out_file = ".".join(out_file)
     out_file = f"{args.file[:-3]}.mips"
 
+    lib_path = os.path.abspath(
+        os.path.join(__file__, "../compiler/visitors/mips_lib.asm")
+    )
     with open(out_file, "w") as f:
         f.write(mips_code)
-        with open("src/compiler/visitors/mips_lib.asm") as f2:
+        with open(lib_path) as f2:
             f.write("".join(f2.readlines()))
 
     exit(0)

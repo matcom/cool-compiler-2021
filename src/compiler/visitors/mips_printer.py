@@ -42,22 +42,8 @@ class MIPSPrintVisitor:
 
     @visitor.when(TypeNode)
     def visit(self, node: TypeNode):
-        print(node.data_label, ":")
-        print(node.attributes)
         methods = ", ".join([f"{node.methods[m]}" for m in node.methods])
         dispatch_table = f"{node.type_label}_dispatch:\n\t .word {methods}"
-        # proto_begin = f"{node.type_label}_proto:\n\t.word\t{node.pos}, {len(node.attributes)*4}, {node.type_label}_dispatch"
-        # proto_attr = ", ".join(
-        #     [f'{node.defaults.get(attr,"0")}' for attr in node.attributes]
-        # )
-        # proto_end = f"{-1}"
-        # proto = (
-        #     f"{proto_begin}, {proto_attr}, {proto_end}"
-        #     if proto_attr != ""
-        #     else f"{proto_begin}, {proto_end}"
-        # )
-
-        # return f"{dispatch_table}\n\n{proto}"
         return f"{dispatch_table}"
 
     @visitor.when(SyscallNode)
@@ -75,7 +61,6 @@ class MIPSPrintVisitor:
     @visitor.when(FunctionNode)
     def visit(self, node):
         instr = [self.visit(instruction) for instruction in node.instructions]
-        # TODO la linea de abajo sobra, es necesaria mientras la traduccion del AST de CIL este incompleta
         instr2 = [inst for inst in instr if type(inst) == str]
         instructions = "\n\t".join(instr2)
         return f"{node.label}:\n\t{instructions}"

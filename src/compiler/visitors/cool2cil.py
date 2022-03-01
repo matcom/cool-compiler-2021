@@ -507,9 +507,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_param(self.vself)
         parent_type = self.context.get_type(node.id).parent
         if parent_type.name != "Object" and parent_type.name != "IO":
+            vtemp2 = self.define_internal_local()
             self.register_instruction(cil.ArgNode(self.vself.name))
             self.register_instruction(
-                cil.StaticCallNode(self.init_name(parent_type.name, attr=True), vtemp)
+                cil.StaticCallNode(self.init_name(parent_type.name, attr=True), vtemp2)
             )
 
         for feature, child_scope in zip(node.features, scope.children):

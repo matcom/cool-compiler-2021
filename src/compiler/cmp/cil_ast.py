@@ -22,6 +22,9 @@ class DataNode(Node):
         self.name = vname
         self.value = value
 
+    def __repr__(self):
+        return f"{self.value}"
+
 
 class FunctionNode(Node):
     def __init__(self, fname, params, localvars, instructions):
@@ -115,6 +118,9 @@ class SetAttribNode(InstructionNode):
         self.value = value
         self.computed_type = computed_type
 
+    def __repr__(self):
+        return f"SETATTR {self.obj} {self.attr} {self.value}"
+
 
 class GetIndexNode(InstructionNode):
     pass
@@ -128,6 +134,9 @@ class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):
         self.type = itype
         self.dest = dest
+
+    def __repr__(self):
+        return f"{self.dest} = ALLOCATE {self.type}"
 
 
 class ArrayNode(InstructionNode):
@@ -245,6 +254,9 @@ class LengthNode(InstructionNode):
     def __init__(self, dest, source):
         self.dest = dest
         self.source = source
+
+    def __repr__(self):
+        return f"{self.dest} = LENGTH {self.source}"
 
 
 class ConcatNode(InstructionNode):
