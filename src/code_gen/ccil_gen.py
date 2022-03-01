@@ -308,7 +308,7 @@ class CCILGenerator:
         void_expr_error_ops = (
             self.throw_runtime_error(
                 f"case_{times}_void_expr_error",
-                f"RuntimeError: Case expression in {node.row}, {node.col} is void",
+                f"RuntimeError: Case expression in {node.line}, {node.col} is void",
             )
             if node.case_expr.type.name not in {STRING, INT, BOOL}
             else []
