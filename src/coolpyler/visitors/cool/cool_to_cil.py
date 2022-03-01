@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import cmp_to_key
 from typing import List, Optional, Tuple
 
 import coolpyler.ast.cil.base as cil
@@ -607,11 +608,59 @@ class CoolToCilVisitor(object):
 
     @visitor.when(type_checked.CoolCaseNode)
     def visit(self, node: type_checked.CoolCaseNode) -> str:
-        raise NotImplementedError("CaseOf is not implemented")
+        expr_local = self.visit(node.expr)
 
-    @visitor.when(type_checked.CoolCaseBranchNode)
-    def visit(self, node: type_checked.CoolCaseBranchNode) -> str:
-        return self.visit(node.expr)
+        def compare_branches(b1, b2):
+            b12 = b1.branch_type.conforms_to(b2.branch_type)
+            b21 = b2.branch_type.conforms_to(b1.branch_type)
+            return 0 if b12 and b21 else 1 if b21 else -1
+
+        sorted_types = sorted(
+            node.expr.type.reachable,
+            key=cmp_to_key(compare_branches),
+        )
+
+        sorted_branches = sorted(
+            node.case_branches,
+            key=cmp_to_key(compare_branches),
+        )
+
+        branch_labels = []
+        for t in sorted_types:
+            for b in sorted_branches:
+                btyp = b.branch_type
+                if not t.conforms_to(btyp):
+                    continue
+
+                runtime_type_local = self.register_local()
+                self.instructions.append(cil.TypeOfNode(expr_local, runtime_type_local))
+                branch_type_local = self.register_local()
+                self.instructions.append(cil.LoadNode(branch_type_local, btyp.name))
+                types_eq_local = self.register_local()
+                self.instructions.append(cil.MinusNode(types_eq_local, runtime_type_local, branch_type_local))
+                branch_label = self.get_label("case_branch")
+                branch_labels.append(branch_label)
+                self.instructions.append(cil.GotoIfNode(types_eq_local, branch_label))
+                break
+
+        data = self.register_data("case_err", '"Case of did not match any branch!"')
+        instance = self.register_new("String", data)
+        self.instructions.append(cil.PrintNode(instance, True))
+        self.instructions.append(cil.ExitNode(1))
+
+        ret_local = self.register_local()
+
+        end_label = self.get_label("end_case")
+        for label, branch in zip(branch_labels, sorted_branches):
+            self.instructions.append(cil.LabelNode(label))
+            branch_local = self.register_local(branch.id)
+            self.instructions.append(cil.AssignNode(branch_local, expr_local))
+            branch_ret_local = self.visit(branch.expr)
+            self.instructions.append(cil.AssignNode(ret_local, branch_ret_local))
+            self.instructions.append(cil.GotoNode(end_label))
+        self.instructions.append(cil.LabelNode(end_label))
+
+        return ret_local
 
     @visitor.when(type_checked.CoolNewNode)
     def visit(self, node: type_checked.CoolNewNode) -> str:
