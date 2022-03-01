@@ -650,7 +650,7 @@ class CilToMIPS:
         self.memory_manager.save()
         reg1 = self.memory_manager.get_unused_register()
 
-        if node.value != "Void":
+        if node.value != "void":
             value_dir = self.search_mem(node.value)
             instructions.append(
                 mips.LoadWordNode(
