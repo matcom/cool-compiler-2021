@@ -8,17 +8,17 @@
   type Int {
     method Object_abort;
     method Int_type_name;
-    method Object_copy;
+    method Int_copy;
   }
   type Bool {
     method Object_abort;
     method Bool_type_name;
-    method Object_copy;
+    method Bool_copy;
   }
   type String {
     method Object_abort;
     method String_type_name;
-    method Object_copy;
+    method String_copy;
     method String_length;
     method String_concat;
     method String_substr;
@@ -26,7 +26,7 @@
   type IO {
     method Object_abort;
     method IO_type_name;
-    method Object_copy;
+    method IO_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -38,7 +38,7 @@
     attribute board_size;
     method Object_abort;
     method Board_type_name;
-    method Object_copy;
+    method Board_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -53,7 +53,7 @@
     attribute population_map;
     method Object_abort;
     method CellularAutomaton_type_name;
-    method Object_copy;
+    method CellularAutomaton_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -87,7 +87,7 @@
     attribute cells;
     method Object_abort;
     method Main_type_name;
-    method Object_copy;
+    method Main_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;

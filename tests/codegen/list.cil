@@ -8,17 +8,17 @@
   type Int {
     method Object_abort;
     method Int_type_name;
-    method Object_copy;
+    method Int_copy;
   }
   type Bool {
     method Object_abort;
     method Bool_type_name;
-    method Object_copy;
+    method Bool_copy;
   }
   type String {
     method Object_abort;
     method String_type_name;
-    method Object_copy;
+    method String_copy;
     method String_length;
     method String_concat;
     method String_substr;
@@ -26,7 +26,7 @@
   type IO {
     method Object_abort;
     method IO_type_name;
-    method Object_copy;
+    method IO_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -35,7 +35,7 @@
   type List {
     method Object_abort;
     method List_type_name;
-    method Object_copy;
+    method List_copy;
     method List_isNil;
     method List_head;
     method List_tail;
@@ -46,7 +46,7 @@
     attribute cdr;
     method Object_abort;
     method Cons_type_name;
-    method Object_copy;
+    method Cons_copy;
     method Cons_isNil;
     method Cons_head;
     method Cons_tail;
@@ -57,7 +57,7 @@
     attribute mylist;
     method Object_abort;
     method Main_type_name;
-    method Object_copy;
+    method Main_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;

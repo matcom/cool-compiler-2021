@@ -8,17 +8,17 @@
   type Int {
     method Object_abort;
     method Int_type_name;
-    method Object_copy;
+    method Int_copy;
   }
   type Bool {
     method Object_abort;
     method Bool_type_name;
-    method Object_copy;
+    method Bool_copy;
   }
   type String {
     method Object_abort;
     method String_type_name;
-    method Object_copy;
+    method String_copy;
     method String_length;
     method String_concat;
     method String_substr;
@@ -26,7 +26,7 @@
   type IO {
     method Object_abort;
     method IO_type_name;
-    method Object_copy;
+    method IO_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -36,21 +36,21 @@
     attribute io;
     method Object_abort;
     method A_type_name;
-    method Object_copy;
+    method A_copy;
     method A_out_a;
   }
   type B {
     attribute io;
     method Object_abort;
     method B_type_name;
-    method Object_copy;
+    method B_copy;
     method A_out_a;
     method B_out_b;
   }
   type C {
     method Object_abort;
     method C_type_name;
-    method Object_copy;
+    method C_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -60,7 +60,7 @@
   type D {
     method Object_abort;
     method D_type_name;
-    method Object_copy;
+    method D_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -71,7 +71,7 @@
   type Main {
     method Object_abort;
     method Main_type_name;
-    method Object_copy;
+    method Main_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;

@@ -95,7 +95,6 @@ class CoolToCilVisitor(object):
             type, args = "Void", []
         return self.register_new(type, *args, dest=dest)
 
-
     def register_object_abort(self):
         self.reset_state()
         self.register_param("self")
@@ -370,7 +369,7 @@ class CoolToCilVisitor(object):
             }
             self.methods[type.name] = {
                 method.name: (i, htype.name)
-                if method.name != "type_name"
+                if htype.name != "Object" or method.name not in ["type_name", "copy"]
                 else (i, type.name)
                 for i, (method, htype) in enumerate(type.all_methods())
             }

@@ -8,17 +8,17 @@
   type Int {
     method Object_abort;
     method Int_type_name;
-    method Object_copy;
+    method Int_copy;
   }
   type Bool {
     method Object_abort;
     method Bool_type_name;
-    method Object_copy;
+    method Bool_copy;
   }
   type String {
     method Object_abort;
     method String_type_name;
-    method Object_copy;
+    method String_copy;
     method String_length;
     method String_concat;
     method String_substr;
@@ -26,7 +26,7 @@
   type IO {
     method Object_abort;
     method IO_type_name;
-    method Object_copy;
+    method IO_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -37,7 +37,7 @@
     attribute edges;
     method Object_abort;
     method Graph_type_name;
-    method Object_copy;
+    method Graph_copy;
     method Graph_add_vertice;
     method Graph_print_E;
     method Graph_print_V;
@@ -47,7 +47,7 @@
     attribute out;
     method Object_abort;
     method Vertice_type_name;
-    method Object_copy;
+    method Vertice_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -64,7 +64,7 @@
     attribute weight;
     method Object_abort;
     method Edge_type_name;
-    method Object_copy;
+    method Edge_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -76,7 +76,7 @@
     attribute car;
     method Object_abort;
     method EList_type_name;
-    method Object_copy;
+    method EList_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -93,7 +93,7 @@
     attribute cdr;
     method Object_abort;
     method ECons_type_name;
-    method Object_copy;
+    method ECons_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -110,7 +110,7 @@
     attribute car;
     method Object_abort;
     method VList_type_name;
-    method Object_copy;
+    method VList_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -126,7 +126,7 @@
     attribute cdr;
     method Object_abort;
     method VCons_type_name;
-    method Object_copy;
+    method VCons_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -143,7 +143,7 @@
     attribute rest;
     method Object_abort;
     method Parse_type_name;
-    method Object_copy;
+    method Parse_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -160,7 +160,7 @@
     attribute g;
     method Object_abort;
     method Main_type_name;
-    method Object_copy;
+    method Main_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -175,7 +175,7 @@
   type BoolOp {
     method Object_abort;
     method BoolOp_type_name;
-    method Object_copy;
+    method BoolOp_copy;
     method BoolOp_and;
     method BoolOp_or;
   }

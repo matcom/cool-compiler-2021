@@ -8,17 +8,17 @@
   type Int {
     method Object_abort;
     method Int_type_name;
-    method Object_copy;
+    method Int_copy;
   }
   type Bool {
     method Object_abort;
     method Bool_type_name;
-    method Object_copy;
+    method Bool_copy;
   }
   type String {
     method Object_abort;
     method String_type_name;
-    method Object_copy;
+    method String_copy;
     method String_length;
     method String_concat;
     method String_substr;
@@ -26,7 +26,7 @@
   type IO {
     method Object_abort;
     method IO_type_name;
-    method Object_copy;
+    method IO_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
@@ -36,7 +36,7 @@
     attribute var;
     method Object_abort;
     method A_type_name;
-    method Object_copy;
+    method A_copy;
     method A_value;
     method A_set_var;
     method A_method1;
@@ -49,7 +49,7 @@
     attribute var;
     method Object_abort;
     method B_type_name;
-    method Object_copy;
+    method B_copy;
     method A_value;
     method A_set_var;
     method A_method1;
@@ -62,7 +62,7 @@
     attribute var;
     method Object_abort;
     method C_type_name;
-    method Object_copy;
+    method C_copy;
     method A_value;
     method A_set_var;
     method A_method1;
@@ -76,7 +76,7 @@
     attribute var;
     method Object_abort;
     method D_type_name;
-    method Object_copy;
+    method D_copy;
     method A_value;
     method A_set_var;
     method A_method1;
@@ -90,7 +90,7 @@
     attribute var;
     method Object_abort;
     method E_type_name;
-    method Object_copy;
+    method E_copy;
     method A_value;
     method A_set_var;
     method A_method1;
@@ -104,7 +104,7 @@
   type A2I {
     method Object_abort;
     method A2I_type_name;
-    method Object_copy;
+    method A2I_copy;
     method A2I_c2i;
     method A2I_i2c;
     method A2I_a2i;
@@ -119,7 +119,7 @@
     attribute flag;
     method Object_abort;
     method Main_type_name;
-    method Object_copy;
+    method Main_copy;
     method IO_out_string;
     method IO_out_int;
     method IO_in_string;
