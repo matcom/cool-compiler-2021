@@ -62,18 +62,17 @@
 .data
 
   data_0_abort_msg = "Program Halted!";
-  data_1_abort_msg = "Program Halted!";
-  data_2_type_name_Object = "Object";
-  data_3_type_name_Int = "Int";
-  data_4_type_name_Bool = "Bool";
-  data_5_type_name_String = "String";
-  data_6_type_name_IO = "IO";
-  data_7_type_name_Main = "Main";
-  data_8_type_name_Complex = "Complex";
-  data_9_string = "=)\n";
-  data_10_string = "=(\n";
-  data_11_string = "+";
-  data_12_string = "I";
+  data_1_type_name_Object = "Object";
+  data_2_type_name_Int = "Int";
+  data_3_type_name_Bool = "Bool";
+  data_4_type_name_String = "String";
+  data_5_type_name_IO = "IO";
+  data_6_type_name_Main = "Main";
+  data_7_type_name_Complex = "Complex";
+  data_8_string = "=)\n";
+  data_9_string = "=(\n";
+  data_10_string = "+";
+  data_11_string = "I";
 
 .code
 
@@ -107,28 +106,25 @@
     print(str, local_1
   }
 
-  function Object_copy {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-
-    local_0 = LOAD data_1_abort_msg;
-    ARG local_0;
-    local_1 = CALL String___init;
-    print(str, local_1
-  }
-
   function Object_type_name {
     PARAM param_self;
 
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_2_type_name_Object;
+    local_0 = LOAD data_1_type_name_Object;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Object_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Object;
+    RETURN local_copy;
   }
 
   function Int_type_name {
@@ -137,10 +133,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_3_type_name_Int;
+    local_0 = LOAD data_2_type_name_Int;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Int_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Int;
+    RETURN local_copy;
   }
 
   function Bool_type_name {
@@ -149,10 +154,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_4_type_name_Bool;
+    local_0 = LOAD data_3_type_name_Bool;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Bool_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Bool;
+    RETURN local_copy;
   }
 
   function String_type_name {
@@ -161,10 +175,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_5_type_name_String;
+    local_0 = LOAD data_4_type_name_String;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function String_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE String;
+    RETURN local_copy;
   }
 
   function IO_type_name {
@@ -173,10 +196,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_6_type_name_IO;
+    local_0 = LOAD data_5_type_name_IO;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function IO_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE IO;
+    RETURN local_copy;
   }
 
   function Main_type_name {
@@ -185,10 +217,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_7_type_name_Main;
+    local_0 = LOAD data_6_type_name_Main;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Main_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Main;
+    RETURN local_copy;
   }
 
   function Complex_type_name {
@@ -197,10 +238,25 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_8_type_name_Complex;
+    local_0 = LOAD data_7_type_name_Complex;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Complex_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+    LOCAL local_attr_copy;
+    LOCAL local_attr_copy;
+
+    local_copy = ALLOCATE Complex;
+    local_attr_copy = GETATTR param_self 0;
+    SETATTR local_copy 0 local_attr_copy;
+    local_attr_copy = GETATTR param_self 1;
+    SETATTR local_copy 1 local_attr_copy;
+    RETURN local_copy;
   }
 
   function IO_out_string {
@@ -390,7 +446,7 @@
     IF local_19 GOTO label_then_0;
     GOTO label_else_0;
     LABEL label_then_0;
-    local_21 = LOAD data_9_string;
+    local_21 = LOAD data_8_string;
     ARG local_21;
     local_22 = CALL String___init;
     local_23 = TYPEOF param_self;
@@ -399,7 +455,7 @@
     local_20 = VCALL local_23 3;
     GOTO label_continue_0;
     LABEL label_else_0;
-    local_25 = LOAD data_10_string;
+    local_25 = LOAD data_9_string;
     ARG local_25;
     local_26 = CALL String___init;
     local_27 = TYPEOF param_self;
@@ -534,7 +590,7 @@
     ARG param_self;
     ARG local_x;
     local_15 = VCALL local_16 4;
-    local_17 = LOAD data_11_string;
+    local_17 = LOAD data_10_string;
     ARG local_17;
     local_18 = CALL String___init;
     local_19 = TYPEOF local_15;
@@ -545,7 +601,7 @@
     ARG local_14;
     ARG local_y;
     local_13 = VCALL local_20 4;
-    local_21 = LOAD data_12_string;
+    local_21 = LOAD data_11_string;
     ARG local_21;
     local_22 = CALL String___init;
     local_23 = TYPEOF local_13;

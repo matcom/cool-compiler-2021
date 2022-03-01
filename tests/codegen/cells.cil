@@ -61,21 +61,20 @@
 .data
 
   data_0_abort_msg = "Program Halted!";
-  data_1_abort_msg = "Program Halted!";
-  data_2_type_name_Object = "Object";
-  data_3_type_name_Int = "Int";
-  data_4_type_name_Bool = "Bool";
-  data_5_type_name_String = "String";
-  data_6_type_name_IO = "IO";
-  data_7_type_name_CellularAutomaton = "CellularAutomaton";
-  data_8_type_name_Main = "Main";
-  data_9_string = "\n";
+  data_1_type_name_Object = "Object";
+  data_2_type_name_Int = "Int";
+  data_3_type_name_Bool = "Bool";
+  data_4_type_name_String = "String";
+  data_5_type_name_IO = "IO";
+  data_6_type_name_CellularAutomaton = "CellularAutomaton";
+  data_7_type_name_Main = "Main";
+  data_8_string = "\n";
+  data_9_string = "X";
   data_10_string = "X";
   data_11_string = "X";
   data_12_string = "X";
-  data_13_string = "X";
-  data_14_string = ".";
-  data_15_string = "         X         ";
+  data_13_string = ".";
+  data_14_string = "         X         ";
 
 .code
 
@@ -109,28 +108,25 @@
     print(str, local_1
   }
 
-  function Object_copy {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-
-    local_0 = LOAD data_1_abort_msg;
-    ARG local_0;
-    local_1 = CALL String___init;
-    print(str, local_1
-  }
-
   function Object_type_name {
     PARAM param_self;
 
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_2_type_name_Object;
+    local_0 = LOAD data_1_type_name_Object;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Object_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Object;
+    RETURN local_copy;
   }
 
   function Int_type_name {
@@ -139,10 +135,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_3_type_name_Int;
+    local_0 = LOAD data_2_type_name_Int;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Int_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Int;
+    RETURN local_copy;
   }
 
   function Bool_type_name {
@@ -151,10 +156,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_4_type_name_Bool;
+    local_0 = LOAD data_3_type_name_Bool;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Bool_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Bool;
+    RETURN local_copy;
   }
 
   function String_type_name {
@@ -163,10 +177,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_5_type_name_String;
+    local_0 = LOAD data_4_type_name_String;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function String_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE String;
+    RETURN local_copy;
   }
 
   function IO_type_name {
@@ -175,10 +198,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_6_type_name_IO;
+    local_0 = LOAD data_5_type_name_IO;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function IO_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE IO;
+    RETURN local_copy;
   }
 
   function CellularAutomaton_type_name {
@@ -187,10 +219,22 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_7_type_name_CellularAutomaton;
+    local_0 = LOAD data_6_type_name_CellularAutomaton;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function CellularAutomaton_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+    LOCAL local_attr_copy;
+
+    local_copy = ALLOCATE CellularAutomaton;
+    local_attr_copy = GETATTR param_self 0;
+    SETATTR local_copy 0 local_attr_copy;
+    RETURN local_copy;
   }
 
   function Main_type_name {
@@ -199,10 +243,22 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_8_type_name_Main;
+    local_0 = LOAD data_7_type_name_Main;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Main_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+    LOCAL local_attr_copy;
+
+    local_copy = ALLOCATE Main;
+    local_attr_copy = GETATTR param_self 0;
+    SETATTR local_copy 0 local_attr_copy;
+    RETURN local_copy;
   }
 
   function IO_out_string {
@@ -364,7 +420,7 @@
     LOCAL local_6;
 
     local_population_map = GETATTR param_self 0;
-    local_3 = LOAD data_9_string;
+    local_3 = LOAD data_8_string;
     ARG local_3;
     local_4 = CALL String___init;
     local_5 = TYPEOF local_population_map;
@@ -626,7 +682,7 @@
     ARG param_position;
     local_2 = VCALL local_3 10;
     local_4 = GETATTR local_2 0;
-    local_5 = LOAD data_10_string;
+    local_5 = LOAD data_9_string;
     ARG local_5;
     local_6 = CALL String___init;
     local_7 = GETATTR local_6 0;
@@ -653,7 +709,7 @@
     ARG param_position;
     local_17 = VCALL local_18 11;
     local_19 = GETATTR local_17 0;
-    local_20 = LOAD data_11_string;
+    local_20 = LOAD data_10_string;
     ARG local_20;
     local_21 = CALL String___init;
     local_22 = GETATTR local_21 0;
@@ -682,7 +738,7 @@
     ARG param_position;
     local_34 = VCALL local_35 12;
     local_36 = GETATTR local_34 0;
-    local_37 = LOAD data_12_string;
+    local_37 = LOAD data_11_string;
     ARG local_37;
     local_38 = CALL String___init;
     local_39 = GETATTR local_38 0;
@@ -718,12 +774,12 @@
     IF local_55 GOTO label_then_2;
     GOTO label_else_2;
     LABEL label_then_2;
-    local_56 = LOAD data_13_string;
+    local_56 = LOAD data_12_string;
     ARG local_56;
     local_57 = CALL String___init;
     GOTO label_continue_2;
     LABEL label_else_2;
-    local_58 = LOAD data_14_string;
+    local_58 = LOAD data_13_string;
     ARG local_58;
     local_59 = CALL String___init;
     LABEL label_continue_2;
@@ -839,7 +895,7 @@
     LOCAL local_25;
 
     local_1 = CALL CellularAutomaton___init;
-    local_2 = LOAD data_15_string;
+    local_2 = LOAD data_14_string;
     ARG local_2;
     local_3 = CALL String___init;
     local_4 = TYPEOF local_1;

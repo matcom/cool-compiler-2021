@@ -328,7 +328,6 @@ class CoolToCilVisitor(object):
 
     def register_builtins(self):
         self.register_object_abort()
-        self.register_object_copy()
 
         for type in self.methods:
             self.register_type_name(type)

@@ -57,43 +57,42 @@
 .data
 
   data_0_abort_msg = "Program Halted!";
-  data_1_abort_msg = "Program Halted!";
-  data_2_type_name_Object = "Object";
-  data_3_type_name_Int = "Int";
-  data_4_type_name_Bool = "Bool";
-  data_5_type_name_String = "String";
-  data_6_type_name_IO = "IO";
-  data_7_type_name_A2I = "A2I";
-  data_8_type_name_Main = "Main";
-  data_9_string = "0";
-  data_10_string = "1";
-  data_11_string = "2";
-  data_12_string = "3";
-  data_13_string = "4";
-  data_14_string = "5";
-  data_15_string = "6";
-  data_16_string = "7";
-  data_17_string = "8";
-  data_18_string = "9";
-  data_19_string = "0";
-  data_20_string = "1";
-  data_21_string = "2";
-  data_22_string = "3";
-  data_23_string = "4";
-  data_24_string = "5";
-  data_25_string = "6";
-  data_26_string = "7";
-  data_27_string = "8";
-  data_28_string = "9";
-  data_29_string = "";
-  data_30_string = "-";
-  data_31_string = "+";
-  data_32_string = "0";
-  data_33_string = "-";
-  data_34_string = "";
-  data_35_string = "678987";
-  data_36_string = " == ";
-  data_37_string = "\n";
+  data_1_type_name_Object = "Object";
+  data_2_type_name_Int = "Int";
+  data_3_type_name_Bool = "Bool";
+  data_4_type_name_String = "String";
+  data_5_type_name_IO = "IO";
+  data_6_type_name_A2I = "A2I";
+  data_7_type_name_Main = "Main";
+  data_8_string = "0";
+  data_9_string = "1";
+  data_10_string = "2";
+  data_11_string = "3";
+  data_12_string = "4";
+  data_13_string = "5";
+  data_14_string = "6";
+  data_15_string = "7";
+  data_16_string = "8";
+  data_17_string = "9";
+  data_18_string = "0";
+  data_19_string = "1";
+  data_20_string = "2";
+  data_21_string = "3";
+  data_22_string = "4";
+  data_23_string = "5";
+  data_24_string = "6";
+  data_25_string = "7";
+  data_26_string = "8";
+  data_27_string = "9";
+  data_28_string = "";
+  data_29_string = "-";
+  data_30_string = "+";
+  data_31_string = "0";
+  data_32_string = "-";
+  data_33_string = "";
+  data_34_string = "678987";
+  data_35_string = " == ";
+  data_36_string = "\n";
 
 .code
 
@@ -127,28 +126,25 @@
     print(str, local_1
   }
 
-  function Object_copy {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-
-    local_0 = LOAD data_1_abort_msg;
-    ARG local_0;
-    local_1 = CALL String___init;
-    print(str, local_1
-  }
-
   function Object_type_name {
     PARAM param_self;
 
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_2_type_name_Object;
+    local_0 = LOAD data_1_type_name_Object;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Object_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Object;
+    RETURN local_copy;
   }
 
   function Int_type_name {
@@ -157,10 +153,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_3_type_name_Int;
+    local_0 = LOAD data_2_type_name_Int;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Int_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Int;
+    RETURN local_copy;
   }
 
   function Bool_type_name {
@@ -169,10 +174,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_4_type_name_Bool;
+    local_0 = LOAD data_3_type_name_Bool;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Bool_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Bool;
+    RETURN local_copy;
   }
 
   function String_type_name {
@@ -181,10 +195,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_5_type_name_String;
+    local_0 = LOAD data_4_type_name_String;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function String_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE String;
+    RETURN local_copy;
   }
 
   function IO_type_name {
@@ -193,10 +216,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_6_type_name_IO;
+    local_0 = LOAD data_5_type_name_IO;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function IO_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE IO;
+    RETURN local_copy;
   }
 
   function A2I_type_name {
@@ -205,10 +237,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_7_type_name_A2I;
+    local_0 = LOAD data_6_type_name_A2I;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function A2I_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE A2I;
+    RETURN local_copy;
   }
 
   function Main_type_name {
@@ -217,10 +258,19 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_8_type_name_Main;
+    local_0 = LOAD data_7_type_name_Main;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
+  }
+
+  function Main_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Main;
+    RETURN local_copy;
   }
 
   function IO_out_string {
@@ -457,7 +507,7 @@
     LOCAL local_103;
 
     local_1 = GETATTR param_char 0;
-    local_2 = LOAD data_9_string;
+    local_2 = LOAD data_8_string;
     ARG local_2;
     local_3 = CALL String___init;
     local_4 = GETATTR local_3 0;
@@ -475,7 +525,7 @@
     GOTO label_continue_0;
     LABEL label_else_0;
     local_11 = GETATTR param_char 0;
-    local_12 = LOAD data_10_string;
+    local_12 = LOAD data_9_string;
     ARG local_12;
     local_13 = CALL String___init;
     local_14 = GETATTR local_13 0;
@@ -493,7 +543,7 @@
     GOTO label_continue_1;
     LABEL label_else_1;
     local_21 = GETATTR param_char 0;
-    local_22 = LOAD data_11_string;
+    local_22 = LOAD data_10_string;
     ARG local_22;
     local_23 = CALL String___init;
     local_24 = GETATTR local_23 0;
@@ -511,7 +561,7 @@
     GOTO label_continue_2;
     LABEL label_else_2;
     local_31 = GETATTR param_char 0;
-    local_32 = LOAD data_12_string;
+    local_32 = LOAD data_11_string;
     ARG local_32;
     local_33 = CALL String___init;
     local_34 = GETATTR local_33 0;
@@ -529,7 +579,7 @@
     GOTO label_continue_3;
     LABEL label_else_3;
     local_41 = GETATTR param_char 0;
-    local_42 = LOAD data_13_string;
+    local_42 = LOAD data_12_string;
     ARG local_42;
     local_43 = CALL String___init;
     local_44 = GETATTR local_43 0;
@@ -547,7 +597,7 @@
     GOTO label_continue_4;
     LABEL label_else_4;
     local_51 = GETATTR param_char 0;
-    local_52 = LOAD data_14_string;
+    local_52 = LOAD data_13_string;
     ARG local_52;
     local_53 = CALL String___init;
     local_54 = GETATTR local_53 0;
@@ -565,7 +615,7 @@
     GOTO label_continue_5;
     LABEL label_else_5;
     local_61 = GETATTR param_char 0;
-    local_62 = LOAD data_15_string;
+    local_62 = LOAD data_14_string;
     ARG local_62;
     local_63 = CALL String___init;
     local_64 = GETATTR local_63 0;
@@ -583,7 +633,7 @@
     GOTO label_continue_6;
     LABEL label_else_6;
     local_71 = GETATTR param_char 0;
-    local_72 = LOAD data_16_string;
+    local_72 = LOAD data_15_string;
     ARG local_72;
     local_73 = CALL String___init;
     local_74 = GETATTR local_73 0;
@@ -601,7 +651,7 @@
     GOTO label_continue_7;
     LABEL label_else_7;
     local_81 = GETATTR param_char 0;
-    local_82 = LOAD data_17_string;
+    local_82 = LOAD data_16_string;
     ARG local_82;
     local_83 = CALL String___init;
     local_84 = GETATTR local_83 0;
@@ -619,7 +669,7 @@
     GOTO label_continue_8;
     LABEL label_else_8;
     local_91 = GETATTR param_char 0;
-    local_92 = LOAD data_18_string;
+    local_92 = LOAD data_17_string;
     ARG local_92;
     local_93 = CALL String___init;
     local_94 = GETATTR local_93 0;
@@ -777,7 +827,7 @@
     IF local_7 GOTO label_then_10;
     GOTO label_else_10;
     LABEL label_then_10;
-    local_8 = LOAD data_19_string;
+    local_8 = LOAD data_18_string;
     ARG local_8;
     local_9 = CALL String___init;
     GOTO label_continue_10;
@@ -795,7 +845,7 @@
     IF local_17 GOTO label_then_11;
     GOTO label_else_11;
     LABEL label_then_11;
-    local_18 = LOAD data_20_string;
+    local_18 = LOAD data_19_string;
     ARG local_18;
     local_19 = CALL String___init;
     GOTO label_continue_11;
@@ -813,7 +863,7 @@
     IF local_27 GOTO label_then_12;
     GOTO label_else_12;
     LABEL label_then_12;
-    local_28 = LOAD data_21_string;
+    local_28 = LOAD data_20_string;
     ARG local_28;
     local_29 = CALL String___init;
     GOTO label_continue_12;
@@ -831,7 +881,7 @@
     IF local_37 GOTO label_then_13;
     GOTO label_else_13;
     LABEL label_then_13;
-    local_38 = LOAD data_22_string;
+    local_38 = LOAD data_21_string;
     ARG local_38;
     local_39 = CALL String___init;
     GOTO label_continue_13;
@@ -849,7 +899,7 @@
     IF local_47 GOTO label_then_14;
     GOTO label_else_14;
     LABEL label_then_14;
-    local_48 = LOAD data_23_string;
+    local_48 = LOAD data_22_string;
     ARG local_48;
     local_49 = CALL String___init;
     GOTO label_continue_14;
@@ -867,7 +917,7 @@
     IF local_57 GOTO label_then_15;
     GOTO label_else_15;
     LABEL label_then_15;
-    local_58 = LOAD data_24_string;
+    local_58 = LOAD data_23_string;
     ARG local_58;
     local_59 = CALL String___init;
     GOTO label_continue_15;
@@ -885,7 +935,7 @@
     IF local_67 GOTO label_then_16;
     GOTO label_else_16;
     LABEL label_then_16;
-    local_68 = LOAD data_25_string;
+    local_68 = LOAD data_24_string;
     ARG local_68;
     local_69 = CALL String___init;
     GOTO label_continue_16;
@@ -903,7 +953,7 @@
     IF local_77 GOTO label_then_17;
     GOTO label_else_17;
     LABEL label_then_17;
-    local_78 = LOAD data_26_string;
+    local_78 = LOAD data_25_string;
     ARG local_78;
     local_79 = CALL String___init;
     GOTO label_continue_17;
@@ -921,7 +971,7 @@
     IF local_87 GOTO label_then_18;
     GOTO label_else_18;
     LABEL label_then_18;
-    local_88 = LOAD data_27_string;
+    local_88 = LOAD data_26_string;
     ARG local_88;
     local_89 = CALL String___init;
     GOTO label_continue_18;
@@ -939,7 +989,7 @@
     IF local_97 GOTO label_then_19;
     GOTO label_else_19;
     LABEL label_then_19;
-    local_98 = LOAD data_28_string;
+    local_98 = LOAD data_27_string;
     ARG local_98;
     local_99 = CALL String___init;
     GOTO label_continue_19;
@@ -947,7 +997,7 @@
     local_101 = TYPEOF param_self;
     ARG param_self;
     local_100 = VCALL local_101 0;
-    local_102 = LOAD data_29_string;
+    local_102 = LOAD data_28_string;
     ARG local_102;
     local_103 = CALL String___init;
     LABEL label_continue_19;
@@ -1071,7 +1121,7 @@
     ARG local_17;
     local_13 = VCALL local_18 5;
     local_19 = GETATTR local_13 0;
-    local_20 = LOAD data_30_string;
+    local_20 = LOAD data_29_string;
     ARG local_20;
     local_21 = CALL String___init;
     local_22 = GETATTR local_21 0;
@@ -1120,7 +1170,7 @@
     ARG local_46;
     local_42 = VCALL local_47 5;
     local_48 = GETATTR local_42 0;
-    local_49 = LOAD data_31_string;
+    local_49 = LOAD data_30_string;
     ARG local_49;
     local_50 = CALL String___init;
     local_51 = GETATTR local_50 0;
@@ -1302,7 +1352,7 @@
     IF local_7 GOTO label_then_23;
     GOTO label_else_23;
     LABEL label_then_23;
-    local_8 = LOAD data_32_string;
+    local_8 = LOAD data_31_string;
     ARG local_8;
     local_9 = CALL String___init;
     GOTO label_continue_23;
@@ -1324,7 +1374,7 @@
     local_17 = VCALL local_18 8;
     GOTO label_continue_24;
     LABEL label_else_24;
-    local_20 = LOAD data_33_string;
+    local_20 = LOAD data_32_string;
     ARG local_20;
     local_21 = CALL String___init;
     local_23 = GETATTR param_i 0;
@@ -1396,7 +1446,7 @@
     IF local_7 GOTO label_then_25;
     GOTO label_else_25;
     LABEL label_then_25;
-    local_8 = LOAD data_34_string;
+    local_8 = LOAD data_33_string;
     ARG local_8;
     local_9 = CALL String___init;
     GOTO label_continue_25;
@@ -1469,7 +1519,7 @@
     LOCAL local_23;
 
     local_2 = CALL A2I___init;
-    local_3 = LOAD data_35_string;
+    local_3 = LOAD data_34_string;
     ARG local_3;
     local_4 = CALL String___init;
     local_5 = TYPEOF local_2;
@@ -1488,7 +1538,7 @@
     ARG param_self;
     ARG local_a;
     local_12 = VCALL local_13 4;
-    local_15 = LOAD data_36_string;
+    local_15 = LOAD data_35_string;
     ARG local_15;
     local_16 = CALL String___init;
     local_17 = TYPEOF param_self;
@@ -1499,7 +1549,7 @@
     ARG param_self;
     ARG local_b;
     local_18 = VCALL local_19 3;
-    local_21 = LOAD data_37_string;
+    local_21 = LOAD data_36_string;
     ARG local_21;
     local_22 = CALL String___init;
     local_23 = TYPEOF param_self;
