@@ -28,35 +28,35 @@ data_12: .asciiz ""
 .word 0
 data_13: .asciiz "Abort called from class "
 .word 0
-data_14: .asciiz "Substring out of range"
+data_14: .asciiz "Index out of range exception"
 .word 0
 data_15: .asciiz "A: Hello world\n"
 .word 0
-data_16: .asciiz "RuntimeError: Function call in a void instance"
+data_16: .asciiz "Function call in a void instance"
 .word 0
 data_17: .asciiz "B: Hello world\n"
 .word 0
-data_18: .asciiz "RuntimeError: Function call in a void instance"
+data_18: .asciiz "Function call in a void instance"
 .word 0
 data_19: .asciiz "C: Hello world\n"
 .word 0
-data_20: .asciiz "RuntimeError: Function call in a void instance"
+data_20: .asciiz "Function call in a void instance"
 .word 0
 data_21: .asciiz "D: Hello world\n"
 .word 0
-data_22: .asciiz "RuntimeError: Function call in a void instance"
+data_22: .asciiz "Function call in a void instance"
 .word 0
-data_23: .asciiz "RuntimeError: Function call in a void instance"
+data_23: .asciiz "Function call in a void instance"
 .word 0
-data_24: .asciiz "RuntimeError: Function call in a void instance"
+data_24: .asciiz "Function call in a void instance"
 .word 0
-data_25: .asciiz "RuntimeError: Function call in a void instance"
+data_25: .asciiz "Function call in a void instance"
 .word 0
-data_26: .asciiz "RuntimeError: Function call in a void instance"
+data_26: .asciiz "Function call in a void instance"
 .word 0
 data_27: .asciiz "Done.\n"
 .word 0
-data_28: .asciiz "RuntimeError: Function call in a void instance"
+data_28: .asciiz "Function call in a void instance"
 
 
 types_table:
@@ -87,7 +87,7 @@ type_1_dispatch:
 .word function_abort_at_Object
 .word function_type_name_at_Object
 .word function_copy_at_Object
-.word __init_at_Object
+.word __ctor_Object
 
 type_1_prototype:
 .word 0
@@ -104,7 +104,7 @@ type_2_dispatch:
 .word function_out_int_at_IO
 .word function_in_string_at_IO
 .word function_in_int_at_IO
-.word __init_at_IO
+.word __ctor_IO
 
 type_2_prototype:
 .word 1
@@ -120,7 +120,7 @@ type_3_dispatch:
 .word function_length_at_String
 .word function_concat_at_String
 .word function_substr_at_String
-.word __init_at_String
+.word __ctor_String
 
 type_3_prototype:
 .word 2
@@ -135,7 +135,7 @@ type_4_dispatch:
 .word function_abort_at_Object
 .word function_type_name_at_Object
 .word function_copy_at_Object
-.word __init_at_Int
+.word __ctor_Int
 
 type_4_prototype:
 .word 3
@@ -149,7 +149,7 @@ type_5_dispatch:
 .word function_abort_at_Object
 .word function_type_name_at_Object
 .word function_copy_at_Object
-.word __init_at_Bool
+.word __ctor_Bool
 
 type_5_prototype:
 .word 4
@@ -164,8 +164,8 @@ type_6_dispatch:
 .word function_copy_at_Object
 .word function_type_name_at_Object
 .word function_out_a_at_A
-.word __init_attr_at_A
-.word __init_at_A
+.word __attributes_ctor_A
+.word __ctor_A
 
 type_6_prototype:
 .word 5
@@ -181,8 +181,8 @@ type_7_dispatch:
 .word function_type_name_at_Object
 .word function_out_a_at_A
 .word function_out_b_at_B
-.word __init_attr_at_B
-.word __init_at_B
+.word __attributes_ctor_B
+.word __ctor_B
 
 type_7_prototype:
 .word 6
@@ -201,8 +201,8 @@ type_8_dispatch:
 .word function_out_int_at_IO
 .word function_out_string_at_IO
 .word function_out_c_at_C
-.word __init_attr_at_C
-.word __init_at_C
+.word __attributes_ctor_C
+.word __ctor_C
 
 type_8_prototype:
 .word 7
@@ -221,8 +221,8 @@ type_9_dispatch:
 .word function_out_string_at_IO
 .word function_out_c_at_C
 .word function_out_d_at_D
-.word __init_attr_at_D
-.word __init_at_D
+.word __attributes_ctor_D
+.word __ctor_D
 
 type_9_prototype:
 .word 8
@@ -240,8 +240,8 @@ type_10_dispatch:
 .word function_out_int_at_IO
 .word function_out_string_at_IO
 .word function_main_at_Main
-.word __init_attr_at_Main
-.word __init_at_Main
+.word __attributes_ctor_Main
+.word __ctor_Main
 
 type_10_prototype:
 .word 9
@@ -252,7 +252,7 @@ type_10_prototype:
 
 .text
 .globl main
-__init_at_Object:
+__ctor_Object:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -333,7 +333,7 @@ sw $t1 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -368,7 +368,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_IO:
+__ctor_IO:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -450,7 +450,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -474,7 +474,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -485,7 +485,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_String:
+__ctor_String:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -514,7 +514,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -20($fp)
@@ -583,7 +583,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -642,7 +642,7 @@ sw $v0 -44($fp)
 lw $t0 -44($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -653,7 +653,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_Int:
+__ctor_Int:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -684,7 +684,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_Bool:
+__ctor_Bool:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -722,7 +722,7 @@ addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
 addi $sp $sp -4
-jal __init_at_Main
+jal __ctor_Main
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 addi $sp $sp -4
@@ -739,14 +739,14 @@ addi $sp $sp 4
 li $v0 10
 syscall
 
-__init_attr_at_A:
+__attributes_ctor_A:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -12
-jal __init_at_IO
+addi $sp $sp -8
+jal __ctor_IO
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -16($fp)
@@ -754,7 +754,7 @@ lw $t0 0($fp)
 lw $t1 -16($fp)
 sw $t1 12($t0)
 lw $v0 0($fp)
-addi $sp $sp 12
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -767,13 +767,13 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -20
+addi $sp $sp -16
 la $t0 data_15
 sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t4 0($fp)
@@ -822,20 +822,20 @@ jalr $ra $t0
 addi $sp $sp 8
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 20
+addi $sp $sp 16
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_A:
+__ctor_A:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -12
+addi $sp $sp -8
 li $t0 5
 sll $t0 $t0 2
 la $t1 prototype_table
@@ -852,32 +852,32 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_A
+jal __attributes_ctor_A
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 12
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_attr_at_B:
+__attributes_ctor_B:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -8
+addi $sp $sp -4
 lw $t0 0($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_A
+jal __attributes_ctor_A
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 0($fp)
-addi $sp $sp 8
+addi $sp $sp 4
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -890,13 +890,13 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -20
+addi $sp $sp -16
 la $t0 data_17
 sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t4 0($fp)
@@ -945,20 +945,20 @@ jalr $ra $t0
 addi $sp $sp 8
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 20
+addi $sp $sp 16
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_B:
+__ctor_B:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -12
+addi $sp $sp -8
 li $t0 6
 sll $t0 $t0 2
 la $t1 prototype_table
@@ -975,18 +975,18 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_B
+jal __attributes_ctor_B
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 12
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_attr_at_C:
+__attributes_ctor_C:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1013,7 +1013,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 0($fp)
@@ -1054,7 +1054,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_C:
+__ctor_C:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1077,7 +1077,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_C
+jal __attributes_ctor_C
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -1088,7 +1088,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_attr_at_D:
+__attributes_ctor_D:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1098,7 +1098,7 @@ addi $sp $sp -4
 lw $t0 0($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_C
+jal __attributes_ctor_C
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 0($fp)
@@ -1121,7 +1121,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 0($fp)
@@ -1162,7 +1162,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_D:
+__ctor_D:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1185,7 +1185,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_D
+jal __attributes_ctor_D
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -1196,7 +1196,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_attr_at_Main:
+__attributes_ctor_Main:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1218,7 +1218,7 @@ addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
 addi $sp $sp -64
-jal __init_at_A
+jal __ctor_A
 sw $v0 -72($fp)
 lw $t0 -72($fp)
 li $t1 0
@@ -1247,7 +1247,7 @@ lw $t0 12($t0)
 jalr $ra $t0
 addi $sp $sp 4
 sw $v0 -64($fp)
-jal __init_at_B
+jal __ctor_B
 sw $v0 -60($fp)
 lw $t0 -60($fp)
 li $t1 0
@@ -1276,7 +1276,7 @@ lw $t0 16($t0)
 jalr $ra $t0
 addi $sp $sp 4
 sw $v0 -52($fp)
-jal __init_at_C
+jal __ctor_C
 sw $v0 -48($fp)
 lw $t0 -48($fp)
 li $t1 0
@@ -1305,7 +1305,7 @@ lw $t0 28($t0)
 jalr $ra $t0
 addi $sp $sp 4
 sw $v0 -40($fp)
-jal __init_at_D
+jal __ctor_D
 sw $v0 -36($fp)
 lw $t0 -36($fp)
 li $t1 0
@@ -1339,7 +1339,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 0($fp)
@@ -1380,7 +1380,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_Main:
+__ctor_Main:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1403,7 +1403,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_Main
+jal __attributes_ctor_Main
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
