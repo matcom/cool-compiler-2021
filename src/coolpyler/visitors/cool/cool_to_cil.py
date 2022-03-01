@@ -687,7 +687,7 @@ class CoolToCilVisitor(object):
 
     @visitor.when(type_checked.CoolIsVoidNode)
     def visit(self, node: type_checked.CoolIsVoidNode) -> str:
-        expr = node.expr
+        expr = self.visit(node.expr)
         ret_local = self.register_local()
         self.instructions.append(cil.TypeOfNode(expr, ret_local))
         return self.register_new("Bool", ret_local)
