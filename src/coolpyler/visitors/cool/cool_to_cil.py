@@ -612,19 +612,18 @@ class CoolToCilVisitor(object):
     def visit(self, node: type_checked.CoolCaseNode) -> str:
         expr_local = self.visit(node.expr)
 
-        def compare_branches(b1, b2):
-            b12 = b1.branch_type.conforms_to(b2.branch_type)
-            b21 = b2.branch_type.conforms_to(b1.branch_type)
-            return 0 if b12 and b21 else 1 if b21 else -1
+        def compare_types(t1, t2):
+            t12, t21 = t1.conforms_to(t2), t2.conforms_to(t1)
+            return 0 if t12 and t21 else 1 if t21 else -1
 
         sorted_types = sorted(
             node.expr.type.reachable,
-            key=cmp_to_key(compare_branches),
+            key=cmp_to_key(compare_types),
         )
 
         sorted_branches = sorted(
             node.case_branches,
-            key=cmp_to_key(compare_branches),
+            key=cmp_to_key(lambda b1, b2: compare_types(b1.branch_type, b2.branch_type)),
         )
 
         branch_labels = []
