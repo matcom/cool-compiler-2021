@@ -292,7 +292,9 @@ class CCILToMIPSGenerator:
         # TODO: SELF_TYPE
         if node.type == "SELF_TYPE":
             return []
-        size = self.get_attr_count(node.type) + WORD
+
+        # Allocate memory for object instance
+        size = self.get_attr_count(node.type) * WORD + WORD
         instructions.append(
             mips_ast.LoadImmediate(
                 node,
@@ -323,6 +325,23 @@ class CCILToMIPSGenerator:
                 ),
             )
         )
+
+        # Initialize attibutes
+        init_function = mips_ast.RegisterNode(node, T2)
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                init_function,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, WORD), mips_ast.RegisterNode(node, T0)
+                ),
+            )
+        )
+
+        instructions.extend(self.push_stack(node, mips_ast.RegisterNode(node, V0)))
+        instructions.append(mips_ast.JumpAndLink(node, init_function))
+        instructions.extend(self.pop_stack(node, mips_ast.RegisterNode(node, V0)))
+
         return instructions
 
     @visitor.when(ccil_ast.GetAttrOpNode)
@@ -340,7 +359,7 @@ class CCILToMIPSGenerator:
                 mips_ast.RegisterNode(node, V0),
                 mips_ast.MemoryIndexNode(
                     node,
-                    mips_ast.Constant(node, str(attr_offset)),
+                    mips_ast.Constant(node, attr_offset),
                     mips_ast.RegisterNode(node, T0),
                 ),
             )
@@ -395,6 +414,18 @@ class CCILToMIPSGenerator:
                     self.get_relative_location(node.new_value.value),
                 )
             )
+        # NOTE: Fix: instances should not be of type str
+        elif isinstance(node.new_value, str):
+            instructions.append(
+                mips_ast.LoadWord(
+                    node,
+                    reg_new_value,
+                    self.get_relative_location(node.new_value),
+                )
+            )
+        else:
+            raise Exception(f"Invalid type of ccil node: {type(node.new_value)}")
+
         instructions.append(
             mips_ast.StoreWord(
                 node,
@@ -884,7 +915,7 @@ class CCILToMIPSGenerator:
             if _type.id == typex:
                 for index, _attr in enumerate(_type.attributes):
                     if _attr.id == attr:
-                        return index + WORD
+                        return index * WORD + WORD
         raise Exception(f"Attribute {attr} not found in type {typex}")
 
     def get_attr_count(self, typex: str):
@@ -900,7 +931,6 @@ class CCILToMIPSGenerator:
         raise Exception("Type's function for inicialization not found")
 
     def get_method_index(self, typex: str, method: str) -> int:
-
         for _type in self.__types_table:
             if _type.id == typex:
                 for index, _method in enumerate(_type.methods):
