@@ -288,7 +288,9 @@ class CILBuilder:
         int_arg = VariableInfo("int")
         self.register_param(int_arg)
         result = self.define_internal_local()
-        self.register_instruction(ToStrNode(result, int_arg.name))
+        self.register_instruction(
+            ToStrNode(result, int_arg.name)
+        )  # TODO: Define PrintIntNode
         self.register_instruction(ReturnNode(VariableInfo(result).name))
 
     def io_instring(self):
@@ -437,10 +439,14 @@ class CILBuilder:
         else:
             self.register_instruction(AssignNode(node.id, expr))
 
+        return node.id
+
     @visitor.when(cool.CallNode)
     def visit(self, node):
         # TODO: Pending <expr>.id(<expr>,...,<expr>)
         # TODO: Pending <expr>@<type>.id(<expr>,...,<expr>)
+
+        # function_name = self.to_function_name(node.id, self.current_type.name)
 
         for arg in node.args:
             temp = self.define_internal_local()
@@ -448,21 +454,29 @@ class CILBuilder:
             self.register_instruction(AssignNode(temp, value))
             self.register_instruction(ArgNode(temp))
 
-        method_name = self.to_function_name(node.id, self.current_type.name)
-        result = self.define_internal_local()
-        self.register_instruction(StaticCallNode(method_name, result))
+        # if node.obj:
+        #     obj_value = self.visit(node.obj)
+        #     self.register_instruction()
 
-        return result
+        method_name = self.to_function_name(node.id, self.current_type.name)
+        solve = self.define_internal_local()
+        self.register_instruction(StaticCallNode(method_name, solve))
+
+        return solve
 
     @visitor.when(cool.IfNode)
     def visit(self, node):
+        # Result Variable
+        solve = self.define_internal_local()
+
         # IF condition GOTO label
         condition_value = self.visit(node.if_expr)
         then_label = "THEN_" + self.next_id()
-        self.register_instruction(GotoIfNode(condition_value, LabelNode(then_label)))
+        self.register_instruction(GotoIfNode(condition_value, then_label))
 
         # Else
-        self.visit(node.else_expr)
+        else_value = self.visit(node.else_expr)
+        self.register_instruction(AssignNode(solve, else_value))
 
         # GOTO end_label
         end_label = "END_IF_" + self.next_id()  # Example: END_IF_120
@@ -470,12 +484,13 @@ class CILBuilder:
 
         # Then label
         self.register_instruction(LabelNode(then_label))
-        self.visit(node.then_expr)
+        then_value = self.visit(node.then_expr)
+        self.register_instruction(AssignNode(solve, then_value))
 
         # end_label
         self.register_instruction(LabelNode(end_label))
 
-        # TODO: return something?
+        return solve
 
     @visitor.when(cool.WhileNode)
     def visit(self, node):
@@ -484,7 +499,7 @@ class CILBuilder:
         self.register_instruction(LabelNode(while_label))
 
         # Condition
-        c = self.visit(node.condition)  # TODO: pop from stack
+        c = self.visit(node.condition)
 
         # If condition GOTO body_label
         body_label = "BODY_" + self.next_id()
@@ -649,7 +664,9 @@ class CILBuilder:
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node):
-        1 if node.lex == "true" else 0
+        solve = self.define_internal_local()
+        self.register_instruction(AssignNode(solve, 1 if node.lex == "true" else 0))
+        return solve
 
     @visitor.when(cool.DefaultValueNode)
     def visit(self, node):
