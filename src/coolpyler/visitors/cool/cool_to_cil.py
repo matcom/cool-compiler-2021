@@ -476,8 +476,6 @@ class CoolToCilVisitor(object):
             self.instructions.append(cil.AssignNode(local_sid, rhs_local))
             return local_sid
 
-        local_sid = self.register_local(node.id)
-
         param_sid = self.get_param(node.id)
         if any(param_sid == p.name for p in self.params):
             self.instructions.append(cil.AssignNode(param_sid, rhs_local))
@@ -485,9 +483,9 @@ class CoolToCilVisitor(object):
 
         attr_id = self.get_attr_id(self.type, node.id)
         self.instructions.append(
-            cil.SetAttrNode(self.get_param("self"), attr_id, local_sid)
+            cil.SetAttrNode(self.get_param("self"), attr_id, rhs_local)
         )
-        return local_sid
+        return rhs_local
 
     @visitor.when(type_checked.CoolStaticDispatchNode)
     def visit(self, node: type_checked.CoolStaticDispatchNode) -> str:
