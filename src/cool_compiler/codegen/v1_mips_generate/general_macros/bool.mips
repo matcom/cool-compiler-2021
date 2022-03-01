@@ -2,7 +2,6 @@
 Bool_Name: .asciiz "Bool"
 Bool: .word  Bool_Name, 2, 
 Bool_parents: .word 1, 7, 0
-T: .asciiz ""
 
 .text
 .globl main
