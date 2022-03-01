@@ -28,6 +28,7 @@ class CoolToCIL(BaseCoolToCIL):
         self.program.try_add_data('_______error______', 'Abort called from class ')
         self.program.try_add_data('_______null_______', 'null')
         self.program.try_add_data('_______endline_______', '\n')
+        self.program.try_add_data('_______void_str_______', '')
 
         scope = Scope()
 
@@ -130,9 +131,18 @@ class CoolToCIL(BaseCoolToCIL):
             exp_list.append(ASTR.Comment(f"Fin De la Asignacion"))     
             self.new_type_func.expr += exp_list
         
-        elif node.type in [CoolInt, CoolBool]:
+        elif node.type == CoolInt:
             self.new_type_func.expr_push(ASTR.Assign('_', 0))
-            self.new_type_func.expr_push(ASTR.VCall('_', f'__{node.type.name.lower()}__new__', '_'))
+            self.new_type_func.expr_push(ASTR.VCall('_', f'__int__new__', '_'))
+            self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], '_'))
+        elif node.type == CoolBool:
+            self.new_type_func.expr_push(ASTR.Assign('_', 0))
+            self.new_type_func.expr_push(ASTR.VCall('_', f'__int__new__', '_'))
+            self.new_type_func.expr_push(ASTR.VCall('_', f'__bool__new__', '_'))
+            self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], '_'))
+        elif node.type == CoolStr:
+            self.new_type_func.expr_push(ASTR.Load('_', '_______void_str_______'))
+            self.new_type_func.expr_push(ASTR.VCall('_', f'__str__new__', '_'))
             self.new_type_func.expr_push(ASTR.SetAttr('self', self.currentType.attr[node.name], '_'))
         else: 
             self.new_type_func.expr_push(ASTR.Load('_', '_______null_______'))
@@ -325,13 +335,29 @@ class CoolToCIL(BaseCoolToCIL):
     def visit(self, node: AST.LetIn, scope: Scope):
         result_list = []
         let_scope = scope.create_child('let')
-        for name, _, expr in node.assing_list:
+        for name, atype, expr in node.assing_list:
             local_name = self.currentFunc.force_local(name, let_scope)
             if not expr is None:
                 result_list.append(ASTR.Comment(f'Eval Expression to Let {name}'))
                 result_list += self.visit(expr, let_scope)
                 result_list[-1].set_value(local_name)
                 result_list.append(ASTR.Comment(f'Fin de la asignacion Let {name}'))
+            elif atype == CoolInt:
+                result_list.append(ASTR.Assign('_', 0))
+                result_list.append(ASTR.VCall('_', f'__int__new__', '_'))
+                result_list.append(ASTR.Assign(name, '_'))
+            elif atype == CoolBool:
+                result_list.append(ASTR.Assign('_', 0))
+                result_list.append(ASTR.VCall('_', f'__int__new__', '_'))
+                result_list.append(ASTR.VCall('_', f'__bool__new__', '_'))
+                result_list.append(ASTR.Assign(name, '_'))
+            elif atype == CoolStr:
+                result_list.append(ASTR.Load('_', '_______void_str_______'))
+                result_list.append(ASTR.VCall('_', f'__str__new__', '_'))
+                result_list.append(ASTR.Assign(name, '_'))
+            else: 
+                result_list.append(ASTR.Load('_', '_______null_______'))
+                result_list.append(ASTR.Assign(name, '_'))
 
         
         return result_list + self.visit(node.expr, let_scope) 
