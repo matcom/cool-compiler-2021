@@ -136,6 +136,56 @@ Dentro de los errores chequeados en el ast de CIL se encuentra la comprobación 
 
 En el caso del _case_ se chequea que la expresión principal no sea de tipo _void_ y además, que se conforme a alguna rama en la ejecución de este. El algoritmo empleado para reconocer por cuál de las ramas continuará la ejecución del código comienza por: tomar el tipo de todas las ramas del _case_, llámese a este conjunto $A$; por cada elemento del conjunto $A$ se toma la cantidad de tipos dentro del propio conjunto que se conforman a $a_i, i \in [1, |A|]$ ,de modo que se obtienen los pares $<a_i, |\{a_j \leq a_i, \forall j, j\in[1, |A|]\}|>$. Se define $|\{a_j \leq a_i, \forall j, j\in[1, |A|]\}|$ como $a_{i_c}$. Tomando los elementos $a_i$ por el que menor $a_{i_c}$ tenga, se estará tomando los nodos más abajos en el árbol de tipos dentro de cada posible rama de este. Si se ordenan las ramas del _case_ por el que menor $a_{i_c}$ se obtendrá una lista. Luego se recorre esta generando por cada elemento el subconjunto $B_i$ donde $b_{i_i} \in B_i$ si $b_{i_i} <= a_i$. Se chequea si el tipo de la expresión principal del _case_ aparece en este subconjunto. En el caso de que aparezca, el case se resuelve yendo por la rama que posee el tipo $a_i$.
 
+#### Traducción de CIL a MIPS
+
+Para la generación de código MIPS se definió un _visitor_ sobre el _ast_ de CIL generado en una etapa anterior. Este _visitor_ produce un nuevo _ast_ que representan las secciones _.DATA_,  _.TEXT_ y las instrucciones en el código MIPS. Otro _visitor_ definido esta vez sobre los nodos del _ast_ del código MIPS se encarga de producir el código de MIPS que será ejecutado por el emulador SPIM. 
+
+**Representación de objetos en memoria**
+
+El principal desafío en esta etapa es decidir como representar las instancias de tipos en memoria. Los objetos en memoria se representan de la siguiente manera:
+
+| Dirección x | Dirección x + 4 | Dirección x + 8 | ...  | Dirección x + a * 4 |
+| ----------- | --------------- | --------------- | ---- | ------------------- |
+| Tipo        | Atributo 0      | Atributo 1      | ...  | Atributo a-1        |
+
+Por lo que un objeto es una zona continua de memoria de tamaño $1 + 4 * a$, donde $a$ es la cantidad de atributos que posee el objeto. El tipo y cada atributo son de tamaño $1$ _palabra_. 
+
+El campo _Tipo_ es un número entre $0$ y $n-1$, siendo $n$ la cantidad total de tipos definidos en el programa de COOL a compilar. Un atributo puede guardar un valor específico o dicho valor puede ser interpretado como la dirección en memoria de otro objeto.
+
+Para saber la cantidad de tipos y asignarles a cada uno un valor entre $0$ y $n$, en el _visitor_ sobre el _ast_ de CIL primero se recorren todos los tipos definidos por el código CIL, asignandoles valores disitntos de manera ordenada según se van descubriendo. Además, por cada tipo se guardan también los nombre de sus parámetros y métodos en el orden en que se definieron en el tipo.
+
+Para obtener o modificar un atributo específico de una instancia conociendo el nombre del atributo, se busca su índice en los atributos almacenados para el tipo en cuestión. Si el índice es $i$, entonces su valor estará en la dirección de memoria $(x+4) + (i * 4)$. 
+
+**Inicialización**
+
+Cuando se crea una nueva instancia mediante la instrucción de CIL  _ALLOCATE_ se conoce el tipo del objeto a crear. Esta información se aprovecha para inicializar con valores por defecto la instancia de acuerdo a su tipo. Los tipos primitivos de COOL se inicializan de forma específica. Para los demás tipos, el código CIL de la etapa anterior genera para cada tipo una función _init_ que se encarga de esta tarea, la cual es llamada en el código CIL y traducida a MIPS después.
+
+**LLamado de función dinámico**
+
+Para cada tipo, se guardan sus métodos en una lista llamada _dispatch_. Una lista _dispatch_ de $m$ métodos tiene la siguiente estructura
+
+| Dirección x | Dirección x + 4 | Dirección x  + 8 | ...  | Dirección x + (m-1) * 4 |
+| ----------- | --------------- | ---------------- | ---- | ----------------------- |
+| Método 0    | Método 1        | Método 2         | ...  | Método m-1              |
+
+Se tendrán $n$ listas, una por cada tipo. Cada celda es de una palabra y contiene la dirección a la primera instrucción del método correspondiente, o lo que es lo mismo, la dirección de la etiqueta generada para el método.
+
+Los métodos en la lista se encuentran en el mismo orden en que fueron definidos en el tipo.
+
+Estando una lista _dispatch_ específica, se decide la  ubicación del método buscado por un proceso análogo a los atributos en las instancias de los objetos explicado anteriormente. Si el índice del método dentro del tipo es $i$, entonces la dirección del método buscando estará en la dirección $x + 4 * i$.
+
+Ahora solo faltaría saber por cual de las listas _dispatch_ decidirse para buscar el método dado un tipo.
+
+Para eso se tiene otra lista llamada _virtual_. Su función es almacenar por cada tipo, la dirección a su lista _dispatch_ . La lista _virtual_ tiene la siguiente forma:
+
+| Dirección x  | Dirección x + 4 | Dirección x  + 8 | ...  | Dirección x + (n-1) * 4 |
+| ------------ | --------------- | ---------------- | ---- | ----------------------- |
+| _dispatch_ 0 | _dispatch_ 1    | _dispatch_ 2     | ...  | _dispatch_ n-1          |
+
+Recordar que $n$ es la cantidad de tipos.
+
+Dado una instancia en memoria, se puede ver su tipo en la primera de sus direcciones continuas. Luego se hace otro proceso análogo a como se buscaron los atributos y métodos. Se obtiene el índice del tipo de la instancia y se decide por cual _dispatch_ buscar el método que se quiere invocar. Si el índice del tipo es $i$, se buscará en la lista _dispatch_  en la posición $x + 4*i$.
+
 ## Licencia
 
 Este proyecto se encuentra bajo la Licencia (MIT License) - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
