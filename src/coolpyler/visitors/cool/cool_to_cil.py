@@ -412,6 +412,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.AllocateNode(node.type.name, self_local))
         for attr, (i, htype) in self.attrs[node.type.name].items():
             attr_local = self.register_local(attr)
+            self.instructions.append(cil.ArgNode(self_local))
             self.instructions.append(
                 cil.StaticCallNode(self.get_func_id(htype, f"{attr}_init"), attr_local,)
             )
@@ -434,6 +435,7 @@ class CoolToCilVisitor(object):
     @visitor.when(type_checked.CoolAttrDeclNode)
     def visit(self, node: type_checked.CoolAttrDeclNode) -> cil.FunctionNode:
         self.reset_state()
+        self.register_param("self")
         if node.body is not None:
             sid = self.visit(node.body)
         else: # Void
