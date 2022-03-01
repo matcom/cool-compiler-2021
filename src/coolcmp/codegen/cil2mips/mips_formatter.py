@@ -25,7 +25,7 @@ class MIPSFormatter:
         type_defs = f"\n{mips.TYPES_LABELS}:\n" + "\n\n".join(
             [self.visit(t) for t in node.types]
         )
-        functions = "\n# functions\n.text\n" + "\n".join(
+        functions = "\n# functions\n.text\n.globl main\n" + "\n".join(
             self.visit(f) for f in node.functions
         )
         inits_seg = ""

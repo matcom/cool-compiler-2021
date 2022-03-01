@@ -39,9 +39,9 @@ class DotTypesDataVisitor:
                 attrs=[],
                 methods=[
                     'IO_out_string',
-                    'Object_out_int',
-                    'Object_in_string',
+                    'IO_out_int',
                     'IO_in_string',
+                    'IO_in_int',
                 ]
             ),
             cil.TypeNode(

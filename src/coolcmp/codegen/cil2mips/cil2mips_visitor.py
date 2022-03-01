@@ -29,10 +29,6 @@ class CILToMipsVisitor:
         t0 = registers.T[0]
         a0, v0, sp, fp, ra = registers.A0, registers.V0, registers.SP, registers.FP, registers.RA
 
-        get_args_inst = [
-
-        ]
-
         return [
             mips.SUBUNode(sp, sp, 24),
             mips.SWNode(ra, 8, sp),
@@ -97,6 +93,9 @@ class CILToMipsVisitor:
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
         print(f"FunctionNode {node.name}")
+
+        sp = registers.SP
+
         params = [x.name for x in node.params]
         local_vars = [x.name for x in node.local_vars]
 
@@ -118,8 +117,11 @@ class CILToMipsVisitor:
             *push_instructions,
         )
 
+        stack_occupied = 0
         for instruction in node.instructions:
             self.visit(instruction)
+            if isinstance(instruction, cil.ArgNode):
+                stack_occupied += 4
 
         # Pop local vars
         pop_instructions = (
@@ -133,6 +135,12 @@ class CILToMipsVisitor:
             if self.cur_function.name == "main"
             else [mips.JRNode(registers.RA)]
         )
+
+        if stack_occupied:
+            self.add_inst(
+                mips.CommentNode('Pop args pushed'),
+                mips.ADDINode(sp, sp, stack_occupied),
+            )
 
         self.add_inst(
             *pop_instructions,

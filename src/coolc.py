@@ -58,6 +58,9 @@ def main(cool_code: str, run: bool, verbose: bool):
     mips_str = MIPSFormatter().visit(mips)
 
     if verbose:
+        examinable_file = '__debug_code.mips'
+        with open(examinable_file, 'w', encoding='utf8') as f:
+            f.write(mips_str)
         print("Mips code:")
         print(mips_str)
 
