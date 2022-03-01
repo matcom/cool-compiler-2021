@@ -439,7 +439,7 @@ class CoolToCilVisitor(object):
             sid = self.register_new("Void")
         self.instructions.append(cil.ReturnNode(sid))
         return cil.FunctionNode(
-            self.get_func_id(self.type, node.attr_info.name),
+            self.get_func_id(self.type, f"{node.attr_info.name}_init"),
             self.params,
             self.locals,
             self.instructions,
