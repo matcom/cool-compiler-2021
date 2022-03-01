@@ -1,0 +1,21 @@
+
+.text
+.globl main
+main:
+
+li $a0, 1000   # reserva memoria para el string
+li $v0, 9
+syscall         # En $v0 la instancia del nuevo string
+
+
+move $a0, $v0
+li $v0, 8
+li $a1 , 1000
+syscall
+move $s0 $a0
+
+li		$v0, 4		# system call #3 - print double
+syscall				# execute
+
+li		$v0, 10		# system call #4 - print string
+syscall				# execute

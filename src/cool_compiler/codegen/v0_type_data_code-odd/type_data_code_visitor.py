@@ -10,26 +10,6 @@ CoolBool = CoolTypeBuildInManager().find("Bool")
 CoolStr = CoolTypeBuildInManager().find("String")
 CoolObject = CoolTypeBuildInManager().find(OBJECT_NAME)
 
-def parent_list(node: AST.CoolClass):
-    parent_list = []
-    parent = node
-    while True:
-        if parent is None: break
-        parent_list.append(parent)
-        parent = parent.parent
-
-    parent_list.reverse()
-    return parent_list
-
-def new_name(name, _dict):
-    index = 0
-    while True:
-        try: 
-            _ = _dict[f'{name}_{index}']
-            index += 1
-        except KeyError:
-            _dict[f'{name}_{index}'] = 1
-            return f'{name}_{index}'
 
 class CILGenerate: 
     def __init__(self, errors) -> None:

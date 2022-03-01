@@ -1,0 +1,327 @@
+.data
+Int_Name: .asciiz "Int"
+Int: .word  Int_Name, 2, 
+
+.text
+.globl main
+main:
+    jal __int__input__
+    sw $v0, ($sp)
+
+    move $a0, $v0
+    jal __int__print__ # print number 
+
+    li $a0, -4
+    jal __int__new__
+    addi $sp, $sp, -4
+    sw $v0, ($sp)
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__sum__ # print number + 4
+
+    move $a0, $v0
+    jal __int__print__
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__sub__
+
+    move $a0, $v0
+    jal __int__print__ # print -4  - number
+
+    lw $a1, ($sp)   # -4
+    lw $a0, 4($sp)  # number
+    jal __int__sub__
+
+    move $a0, $v0
+    jal __int__print__ # print number - -4
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__mul__
+
+    move $a0, $v0
+    jal __int__print__ # print number * -4
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__div__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 / number
+
+    lw $a1, ($sp)   # -4
+    lw $a0, 4($sp)  # number
+    jal __int__div__
+
+    move $a0, $v0
+    jal __int__print__  # print number/ -4
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__le__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 < number
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__leq__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 <= number
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__eq__
+    move $s0, $v0
+
+    move $a0, $v0
+    jal __int__print__  # print -4 == number
+
+    move $a0, $s0
+    jal __int__neg__				
+    
+    move $a0, $v0
+    jal __int__print__  # print ! (-4 == numbe)
+
+    lw $a0, 4($sp)  # number
+    jal __int__complement__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 <= number
+
+    li	$v0, 10
+    syscall			
+
+#region
+#########################################################################################################
+___fin___:
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+#########################################################################################################
+
+__int__new__:
+# En $s6 self
+# En $a0 el valor del entero	
+# Return $v0 la instancia del nuevo int
+
+move $t2, $a0  #Salva el valor del entero  
+
+#Allocate a una class Int
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo Int
+
+la $t0, Int     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__int__print__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
+li $v0, 1
+move $a0, $t0  #Pinta el valor la propiedad **value** del int
+syscall
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__int__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
+
+li $v0, 5   #Lee un entero por la consola 
+syscall     #Guarda el entero en $v0
+
+move $s5, $ra    #Salva $ra en $s5 para saltar a crear un Int con el valor leido
+move $a0, $v0
+jal __int__new__ #En $v0 la instancia del nuevo entero 
+
+move $ra, $s5   #Reasigna $ra para salir de **input** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sum__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a sumando A 	
+# En $a1 la direccion del **Int** a sumando B 	
+# Return $v0 new **Int** con **value** A+B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del sumando A
+lw $t1, 4($a1)      #Lee la propiedad **value** del sumando B
+add $a0, $t0, $t1  #$a0 =  A + B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **sum** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sub__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sub	$a0, $t0, $t1   #$a0 =  A - B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A-B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__mul__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A*B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+mul	$a0, $t0, $t1   #$a0 =  A * B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A*B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **mul** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__div__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A/B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+div	$a0, $t0, $t1   #$a0 =  A/B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A/B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **div** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__le__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+slt	$a0, $t0, $t1   #$a0 =  A < B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__leq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sle	$a0, $t0, $t1   #$a0 =  A <= B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<=B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less_or_equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__eq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+seq	$a0, $t0, $t1   #$a0 =  A == B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A==B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__complement__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** ~A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+li $t1, 4294967295  # guarda 2^31 + 1
+xor $a0, $t1, $t0   
+add $a0, $a0, 1     
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con ~A en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **complement** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__neg__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** !A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+addi $a0, $t0, -1   #$a0 =  A - 1 => if A == 0 then $a0 = -1 else $a0 = 0
+mul  $a0, $a0, -1   #$a0 = -$a0   => if $a0 == 0 then $a0 = 0 else 1
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__clone__:
+# En $s6 self
+
+
+
+#endregion
+##########################################################################################################
