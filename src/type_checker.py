@@ -24,6 +24,7 @@ class TypeChecker:
         self.errors = errors
         self.scope_id = 0
         self.type_scope = {}
+        self.scope_completed = {}
 
     @visitor.on("node")
     def visit(self, node, scope):
@@ -31,19 +32,20 @@ class TypeChecker:
 
     @visitor.when(ProgramNode)
     def visit(self, node, scope=None, set_type=None):
+        self.scope_completed = {d.id: False for d in node.declarations}
         to_revisit = []
         scope = Scope(self.scope_id)
         self.scope_id += 1
         for declaration in node.declarations:
             child_scope = scope.create_child(self.scope_id)
             self.scope_id += 1
-            visited = self.visit(declaration, child_scope)
-            if not visited:
+            self.visit(declaration, child_scope)
+            if not self.scope_completed[declaration.id]:
                 to_revisit.append(declaration)
         while to_revisit:
             declaration = to_revisit.pop(0)
-            visited = self.visit(declaration, None)
-            if not visited:
+            self.visit(declaration, None)
+            if not self.scope_completed[declaration.id]:
                 to_revisit.append(declaration)
         return scope
 
@@ -64,15 +66,14 @@ class TypeChecker:
             BasicTypes.BOOL.value,
             BasicTypes.STRING.value,
             BasicTypes.IO.value,
-            BasicTypes.ERROR.value
-        }:
-            try:
+            BasicTypes.ERROR.value}:
+            if self.scope_completed[self.current_type.parent.name]:
                 parent_scope = self.type_scope[self.current_type.parent.name]
                 scope.parent.children.remove(scope)
                 scope.parent = parent_scope
                 parent_scope.children.append(scope)
-            except KeyError:
-                return False
+            else:
+                return
 
         # register all attributes before type check
         for feature in [f for f in node.features if isinstance(f, AttrDeclarationNode)]:
@@ -89,7 +90,8 @@ class TypeChecker:
 
         for feature in node.features:
             self.visit(feature, scope)
-        return True
+        self.scope_completed[self.current_type.name] = True
+        return
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode, scope: Scope, set_type=None):
@@ -147,14 +149,14 @@ class TypeChecker:
 
             if param_name == "self":
                 self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
-                    f'"self" is used as argument name in method: "{method.name}", type: "{self.current_type.name}". '
-                ))
+                                                     f'"self" is used as argument name in method: "{method.name}", type: "{self.current_type.name}". '
+                                                     ))
                 continue
 
             if param_name in var_added:
                 self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
-                    f'Argument "{param_name}" is multiply defined in method "{method.name}"'
-                ))
+                                                     f'Argument "{param_name}" is multiply defined in method "{method.name}"'
+                                                     ))
             else:
                 child_scope.define_variable(param_name, param_type)
                 var_added.append(param_name)
@@ -222,7 +224,7 @@ class TypeChecker:
             self.scope_id += 1
             if var == "self":
                 self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
-                    f'"self" is used as let variable'))
+                                                     f'"self" is used as let variable'))
                 self.visit(expr, child_scope)
                 continue
             try:
@@ -271,9 +273,9 @@ class TypeChecker:
         if var_type.name != BasicTypes.ERROR.value:
             if var_type.name in types_used:
                 self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
-                                                 f'In method "{self.current_method.name}", type "{self.current_type.name}", more than one '
-                                                 f'branch variable has type "{var_type.name}". '
-                                                 ))
+                                                     f'In method "{self.current_method.name}", type "{self.current_type.name}", more than one '
+                                                     f'branch variable has type "{var_type.name}". '
+                                                     ))
             types_used.add(var_type.name)
 
         self.scope_id += 1
@@ -301,7 +303,7 @@ class TypeChecker:
         error_type = self.context.get_type(BasicTypes.ERROR.value)
         if node.id == "self":
             self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
-                f'"self" variable is read-only'))
+                                                 f'"self" variable is read-only'))
             expr_type = self.visit(node.expr, scope)
             return expr_type
         var, scope_id = scope.my_find_var(node.id)
@@ -335,8 +337,8 @@ class TypeChecker:
             ancestor_type = self.context.get_type(node.ancestor_type)
             if not t0.conforms_to(ancestor_type):
                 self.errors.append(TYPE_ERROR % (node.lineno, node.colno,
-                    f'Type "{t0.name}" does not conform to "{ancestor_type.name}".'
-                ))
+                                                 f'Type "{t0.name}" does not conform to "{ancestor_type.name}".'
+                                                 ))
             t0 = ancestor_type
 
         try:
@@ -390,8 +392,8 @@ class TypeChecker:
             left_type = self.visit(node.left, scope)
             right_type = self.visit(node.right, scope)
             if (
-                left_type.name in {"Int", "String", "Bool"}
-                or right_type.name in {"Int", "String", "Bool"}
+                    left_type.name in {"Int", "String", "Bool"}
+                    or right_type.name in {"Int", "String", "Bool"}
             ) and left_type != right_type:
                 self.errors.append(
                     INVALID_OPERATION % (node.lineno, node.colno, left_type.name, right_type.name)
