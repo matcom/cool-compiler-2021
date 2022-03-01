@@ -198,6 +198,8 @@ def t_STRING_something(t):
             t.lexer.string_buffer += "\b"
         elif t.value == "t":  # \t tab
             t.lexer.string_buffer += "\t"
+        elif t.value == 'n':
+            t.lexer.string_buffer += '\n'
         elif t.value == "f":  # \f formfeed
             t.lexer.string_buffer += "\f"
         elif t.value == "\\":  # \\ backslash caracter
