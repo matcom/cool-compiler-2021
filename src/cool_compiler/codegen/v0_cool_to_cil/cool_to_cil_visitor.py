@@ -38,12 +38,20 @@ class CoolToCIL(BaseCoolToCIL):
             self.program.add_func(self.new_type_func)
 
         for cls in node.class_list:
+            _ = [self.map_type(parent.name) for parent in self.parent_list(cls.type)]   
+
+        for cls in node.class_list:
             self.visit(cls, scope)
+
+
 
         main = ASTR.Function('main')
         main.force_local('self', scope)
         # main.force_local(result, scope)
         main.expr_push(ASTR.ALLOCATE('self', 'Main'))
+        main.expr_push(ASTR.Comment(f'Assignacion de la insformacion de tipo a Main'))
+        main.expr_push(ASTR.Load('_', 'Main'))
+        main.expr_push(ASTR.SetAttr('self', 'type_name', '_'))
         main.expr_push(ASTR.Arg('self'))
         main.expr_push(ASTR.SimpleCall('new_ctr_Main'))
         main.expr_push(ASTR.Arg('self'))
@@ -99,10 +107,10 @@ class CoolToCIL(BaseCoolToCIL):
             self.new_type_func.expr_push(ASTR.Arg('self'))
             self.new_type_func.expr_push(ASTR.SimpleCall(f'new_ctr_{_type.parent.name}'))
 
-        self.new_type_func.expr_push(ASTR.Comment(f'Assignacion de la insformacion de tipo a la instancia'))
-        self.new_type_func.expr_push(ASTR.Load('_', _type.name))
-        self.new_type_func.expr_push(ASTR.SetAttr('self', 'type_name', '_'))
-        self.new_type_func.expr_push(ASTR.Comment(f'FIN de la assignacion de la insformacion de tipo a la instancia'))
+        # self.new_type_func.expr_push(ASTR.Comment(f'Assignacion de la insformacion de tipo a la instancia'))
+        # self.new_type_func.expr_push(ASTR.Load('_', _type.name))
+        # self.new_type_func.expr_push(ASTR.SetAttr('self', 'type_name', '_'))
+        # self.new_type_func.expr_push(ASTR.Comment(f'FIN de la assignacion de la insformacion de tipo a la instancia'))
 
     @visitor.when(AST.AtrDef)
     def visit(self, node: AST.AtrDef, scope: Scope):
@@ -341,7 +349,9 @@ class CoolToCIL(BaseCoolToCIL):
 
         expr_list = []
         end_label = self.new_name('case_end', self.label_list)
-        for name, atype , expr in node.case_list:
+        
+        sorted_case = sorted(node.case_list, key=lambda a: self.map_type(a[1].name), reverse=True)
+        for name, atype , expr in sorted_case:
             expr_cond_list.append(ASTR.Comment(f"Check Type To Case When Option Is {atype.name}"))
             step_label = self.new_name(f'{atype.name}_step_case', self.label_list)
             expr_cond_list.append(ASTR.Assign('_', self.map_type(atype.name)))
@@ -416,9 +426,14 @@ class CoolToCIL(BaseCoolToCIL):
     
     @visitor.when(AST.New)
     def visit(self, node: AST.New, scope: Scope):
+        new = self.currentFunc.local_push(f'new_{node.item.name}', scope)
         return [
-            ASTR.ALLOCATE('_', node.item.name),
-            ASTR.Arg('_'),
+            ASTR.Comment(f'Creando instancia de tipo {node.item.name}'),
+            ASTR.ALLOCATE(new, node.item.name),
+            ASTR.Comment(f'Assignacion de la insformacion de tipo a la instancia'),
+            ASTR.Load('_', node.item.name),
+            ASTR.SetAttr(new, 'type_name', '_'),
+            ASTR.Arg(new),
             ASTR.New(super_value, node.item.name)
         ]  
 

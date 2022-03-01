@@ -92,7 +92,7 @@ class MipsGenerate:
         if node.y == 'type_name': 
             attr_plus = 0
             attr = 'type_name'
-            _type = "SELF"
+            _type = ""
         else: 
             attr_name = node.y.split('@')
             _type = attr_name[0]
