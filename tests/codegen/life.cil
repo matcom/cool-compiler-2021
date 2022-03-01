@@ -201,7 +201,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -564,10 +564,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Board_columns___init {
@@ -576,10 +576,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Board_board_size___init {
@@ -588,10 +588,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Board_size_of_board {
@@ -887,10 +887,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD data_9_default_str;
-    ARG local_1;
-    local_0 = CALL String___init;
-    RETURN local_0;
+    local_0 = LOAD data_9_default_str;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
   }
 
   function CellularAutomaton_init {
@@ -3492,7 +3492,7 @@
     local_17 = TYPEOF param_self;
     ARG param_self;
     local_16 = VCALL local_17 24;
-    local_19 = CALL Void___init;
+    local_19 = CALL CellularAutomaton___init;
     local_20 = TYPEOF local_19;
     ARG local_19;
     ARG local_choice;

@@ -73,7 +73,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -532,10 +532,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Main_main {

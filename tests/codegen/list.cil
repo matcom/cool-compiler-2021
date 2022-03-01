@@ -95,7 +95,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -462,7 +462,7 @@
     LOCAL local_1;
     LOCAL local_2;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL Cons___init;
     local_2 = TYPEOF local_1;
     ARG local_1;
     ARG param_i;
@@ -493,10 +493,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Cons_cdr___init {
@@ -670,7 +670,7 @@
     LOCAL local_30;
     LOCAL local_31;
 
-    local_5 = CALL Void___init;
+    local_5 = CALL List___init;
     local_6 = LOAD 1;
     ARG local_6;
     local_7 = CALL Int___init;

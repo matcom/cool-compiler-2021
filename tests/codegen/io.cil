@@ -113,7 +113,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -479,7 +479,7 @@
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL IO___init;
     RETURN local_0;
   }
 
@@ -615,19 +615,19 @@
     LOCAL local_14;
     LOCAL local_15;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL A___init;
     local_2 = TYPEOF local_1;
     ARG local_1;
     local_0 = VCALL local_2 3;
-    local_4 = CALL Void___init;
+    local_4 = CALL B___init;
     local_5 = TYPEOF local_4;
     ARG local_4;
     local_3 = VCALL local_5 4;
-    local_7 = CALL Void___init;
+    local_7 = CALL C___init;
     local_8 = TYPEOF local_7;
     ARG local_7;
     local_6 = VCALL local_8 7;
-    local_10 = CALL Void___init;
+    local_10 = CALL D___init;
     local_11 = TYPEOF local_10;
     ARG local_10;
     local_9 = VCALL local_11 8;

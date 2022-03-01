@@ -231,7 +231,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -754,7 +754,7 @@
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL VList___init;
     RETURN local_0;
   }
 
@@ -763,7 +763,7 @@
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL EList___init;
     RETURN local_0;
   }
 
@@ -846,10 +846,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Vertice_out___init {
@@ -857,7 +857,7 @@
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL EList___init;
     RETURN local_0;
   }
 
@@ -952,10 +952,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Edge_to___init {
@@ -964,10 +964,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Edge_weight___init {
@@ -976,10 +976,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Edge_init {
@@ -1126,7 +1126,7 @@
     LOCAL local_1;
     LOCAL local_2;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL ECons___init;
     local_2 = TYPEOF local_1;
     ARG local_1;
     ARG param_e;
@@ -1349,7 +1349,7 @@
     LOCAL local_1;
     LOCAL local_2;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL VCons___init;
     local_2 = TYPEOF local_1;
     ARG local_1;
     ARG param_v;
@@ -1484,7 +1484,7 @@
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL BoolOp___init;
     RETURN local_0;
   }
 
@@ -1527,7 +1527,7 @@
     LOCAL local_33;
     LOCAL local_34;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL Graph___init;
     local_4 = TYPEOF param_self;
     ARG param_self;
     local_3 = VCALL local_4 5;
@@ -1624,7 +1624,7 @@
     LOCAL local_31;
     LOCAL local_32;
 
-    local_2 = CALL Void___init;
+    local_2 = CALL Vertice___init;
     local_4 = TYPEOF param_self;
     ARG param_self;
     ARG param_s;
@@ -1663,7 +1663,7 @@
     ARG param_self;
     ARG local_rest;
     local_23 = VCALL local_24 10;
-    local_27 = CALL Void___init;
+    local_27 = CALL Edge___init;
     local_29 = TYPEOF local_v;
     ARG local_v;
     local_28 = VCALL local_29 8;
@@ -1997,10 +1997,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD data_20_string;
-    ARG local_1;
-    local_0 = CALL String___init;
-    RETURN local_0;
+    local_0 = LOAD data_20_string;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
   }
 
   function Parse_a2i {

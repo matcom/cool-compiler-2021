@@ -79,21 +79,22 @@ class CoolToCilVisitor(object):
     def register_new(self, type: str, *args, dest: Optional[str] = None):
         if dest is None:
             dest = self.register_local()
-
-        if len(args) == 0:
-            if type == "Int" or type == "Bool":
-                args = [self.register_num(0)]
-            elif type == "String":
-                args = [self.register_data("default_str", '""')]
-            else:
-                type = "Void"
-
         for arg in args:
             self.instructions.append(cil.ArgNode(arg))
         self.instructions.append(
             cil.StaticCallNode(self.get_func_id(type, "__init"), dest)
         )
         return dest
+
+    def register_default(self, type: str, dest: Optional[str] = None):
+        if type == "Int" or type == "Bool":
+            args = [self.register_num(0)]
+        elif type == "String":
+            args = [self.register_data("default_str", '""')]
+        else:
+            type, args = "Void", []
+        return self.register_new(type, *args, dest=dest)
+
 
     def register_object_abort(self):
         self.reset_state()
@@ -452,8 +453,8 @@ class CoolToCilVisitor(object):
         self.register_param("self")
         if node.body is not None:
             sid = self.visit(node.body)
-        else:  # Default
-            sid = self.register_new(node.attr_info.type.name)
+        else:
+            sid = self.register_default(node.attr_info.type.name)
         self.instructions.append(cil.ReturnNode(sid))
         return cil.FunctionNode(
             self.get_func_id(self.type, f"{node.attr_info.name}___init"),
@@ -616,7 +617,7 @@ class CoolToCilVisitor(object):
             rhs_local = self.visit(node.expr)
             self.instructions.append(cil.AssignNode(lhs_local, rhs_local))
         else:
-            self.register_new(node.type.name, dest=lhs_local)
+            self.register_default(node.type.name, dest=lhs_local)
 
         return lhs_local
 

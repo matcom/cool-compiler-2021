@@ -156,7 +156,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -566,10 +566,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD data_12_default_str;
-    ARG local_1;
-    local_0 = CALL String___init;
-    RETURN local_0;
+    local_0 = LOAD data_12_default_str;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
   }
 
   function Book_author___init {
@@ -578,10 +578,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD data_12_default_str;
-    ARG local_1;
-    local_0 = CALL String___init;
-    RETURN local_0;
+    local_0 = LOAD data_12_default_str;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
   }
 
   function Book_initBook {
@@ -688,10 +688,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD data_12_default_str;
-    ARG local_1;
-    local_0 = CALL String___init;
-    RETURN local_0;
+    local_0 = LOAD data_12_default_str;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
   }
 
   function Article_initArticle {
@@ -792,7 +792,7 @@ _print;
     LOCAL local_2;
     LOCAL local_3;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL Cons___init;
     local_3 = TYPEOF local_new_cell;
     ARG local_new_cell;
     ARG param_hd;
@@ -811,7 +811,7 @@ _print;
     local_1 = TYPEOF param_self;
     ARG param_self;
     local_0 = VCALL local_1 0;
-    local_2 = CALL Void___init;
+    local_2 = CALL Book___init;
     RETURN local_2;
   }
 
@@ -825,7 +825,7 @@ _print;
     local_1 = TYPEOF param_self;
     ARG param_self;
     local_0 = VCALL local_1 0;
-    local_2 = CALL Void___init;
+    local_2 = CALL BookList___init;
     RETURN local_2;
   }
 
@@ -1070,7 +1070,7 @@ _print;
     LOCAL local_books;
     LOCAL local_25;
 
-    local_2 = CALL Void___init;
+    local_2 = CALL Book___init;
     local_3 = LOAD data_20_string;
     ARG local_3;
     local_4 = CALL String___init;
@@ -1082,7 +1082,7 @@ _print;
     ARG local_4;
     ARG local_6;
     local_1 = VCALL local_7 7;
-    local_10 = CALL Void___init;
+    local_10 = CALL Article___init;
     local_11 = LOAD data_22_string;
     ARG local_11;
     local_12 = CALL String___init;
@@ -1098,7 +1098,7 @@ _print;
     ARG local_14;
     ARG local_16;
     local_9 = VCALL local_17 9;
-    local_20 = CALL Void___init;
+    local_20 = CALL Nil___init;
     local_21 = TYPEOF local_20;
     ARG local_20;
     ARG local_a_book;

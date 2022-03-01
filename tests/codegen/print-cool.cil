@@ -69,7 +69,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -367,7 +367,7 @@
     LOCAL local_25;
     LOCAL local_26;
 
-    local_4 = CALL Void___init;
+    local_4 = CALL Object___init;
     local_5 = TYPEOF local_4;
     ARG local_4;
     local_3 = VCALL local_5 1;

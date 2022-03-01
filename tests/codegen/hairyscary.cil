@@ -142,7 +142,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -637,10 +637,10 @@
     LABEL label_case_branch_0;
     GOTO label_end_case_0;
     LABEL label_case_branch_1;
-    local_14 = CALL Void___init;
+    local_14 = CALL Bar___init;
     GOTO label_end_case_0;
     LABEL label_case_branch_2;
-    local_16 = CALL Void___init;
+    local_16 = CALL Razz___init;
     GOTO label_end_case_0;
     LABEL label_end_case_0;
     RETURN local_11;
@@ -851,7 +851,7 @@
     LABEL label_case_branch_3;
     GOTO label_end_case_1;
     LABEL label_case_branch_4;
-    local_11 = CALL Void___init;
+    local_11 = CALL Bar___init;
     GOTO label_end_case_1;
     LABEL label_end_case_1;
     RETURN local_8;
@@ -987,7 +987,7 @@ _doh;
     LABEL label_case_branch_5;
     GOTO label_end_case_2;
     LABEL label_case_branch_6;
-    local_11 = CALL Void___init;
+    local_11 = CALL Bar___init;
     GOTO label_end_case_2;
     LABEL label_end_case_2;
     RETURN local_8;
@@ -1075,7 +1075,7 @@ _doh;
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Bazz___init;
     RETURN local_0;
   }
 
@@ -1084,7 +1084,7 @@ _doh;
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Foo___init;
     RETURN local_0;
   }
 
@@ -1093,7 +1093,7 @@ _doh;
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Razz___init;
     RETURN local_0;
   }
 
@@ -1102,7 +1102,7 @@ _doh;
 
     LOCAL local_0;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Bar___init;
     RETURN local_0;
   }
 

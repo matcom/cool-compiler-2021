@@ -89,7 +89,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -415,7 +415,7 @@
     LOCAL local_26;
     LOCAL local_27;
 
-    local_2 = CALL Void___init;
+    local_2 = CALL Complex___init;
     local_3 = LOAD 1;
     ARG local_3;
     local_4 = CALL Int___init;
@@ -488,10 +488,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Complex_y___init {
@@ -500,10 +500,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD 0;
-    ARG local_1;
-    local_0 = CALL Int___init;
-    RETURN local_0;
+    local_0 = LOAD 0;
+    ARG local_0;
+    local_1 = CALL Int___init;
+    RETURN local_1;
   }
 
   function Complex_init {

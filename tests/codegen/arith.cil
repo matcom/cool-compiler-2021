@@ -218,7 +218,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL Main___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -700,7 +700,7 @@
     local_2 = GETATTR param_num1 0;
     local_3 = GETATTR param_num2 0;
     local_4 = local_2 + local_3
-    local_6 = CALL Void___init;
+    local_6 = CALL B___init;
     local_7 = TYPEOF local_6;
     ARG local_6;
     ARG local_x;
@@ -725,7 +725,7 @@
     local_x = CALL Int___init;
     local_3 = LOAD 1;
     local_2 = local_3 - param_num
-    local_5 = CALL Void___init;
+    local_5 = CALL C___init;
     local_6 = TYPEOF local_5;
     ARG local_5;
     ARG local_x;
@@ -773,7 +773,7 @@
     local_7 = GETATTR param_num1 0;
     local_8 = GETATTR param_num2 0;
     local_9 = local_7 - local_8
-    local_11 = CALL Void___init;
+    local_11 = CALL D___init;
     local_12 = TYPEOF local_11;
     ARG local_11;
     ARG local_x;
@@ -786,7 +786,7 @@
     local_14 = GETATTR param_num2 0;
     local_15 = GETATTR param_num1 0;
     local_16 = local_14 - local_15
-    local_18 = CALL Void___init;
+    local_18 = CALL D___init;
     local_19 = TYPEOF local_18;
     ARG local_18;
     ARG local_x;
@@ -852,7 +852,7 @@
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
     local_19 = CALL Void___init;
-    local_21 = CALL Void___init;
+    local_21 = CALL E___init;
     local_22 = TYPEOF local_21;
     ARG local_21;
     ARG local_x;
@@ -891,7 +891,7 @@
     local_2 = GETATTR param_num 0;
     local_3 = GETATTR param_num 0;
     local_4 = local_2 * local_3
-    local_6 = CALL Void___init;
+    local_6 = CALL E___init;
     local_7 = TYPEOF local_6;
     ARG local_6;
     ARG local_x;
@@ -928,7 +928,7 @@
     local_x = CALL Int___init;
     local_3 = LOAD 1;
     local_2 = local_3 - param_num
-    local_5 = CALL Void___init;
+    local_5 = CALL A___init;
     local_6 = TYPEOF local_5;
     ARG local_5;
     ARG local_x;
@@ -961,7 +961,7 @@
     local_5 = GETATTR local_4 0;
     local_6 = GETATTR param_num 0;
     local_7 = local_5 * local_6
-    local_9 = CALL Void___init;
+    local_9 = CALL E___init;
     local_10 = TYPEOF local_9;
     ARG local_9;
     ARG local_x;
@@ -1161,7 +1161,7 @@
     local_4 = CALL Int___init;
     local_5 = GETATTR local_4 0;
     local_6 = local_2 / local_5
-    local_8 = CALL Void___init;
+    local_8 = CALL A___init;
     local_9 = TYPEOF local_8;
     ARG local_8;
     ARG local_x;
@@ -2294,10 +2294,10 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_1 = LOAD data_23_string;
-    ARG local_1;
-    local_0 = CALL String___init;
-    RETURN local_0;
+    local_0 = LOAD data_23_string;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
   }
 
   function Main_avar___init {
@@ -2635,7 +2635,7 @@
     LOCAL local_5;
     LOCAL local_6;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL A2I___init;
     local_4 = TYPEOF param_self;
     ARG param_self;
     local_3 = VCALL local_4 8;
@@ -2836,7 +2836,7 @@
     LOCAL local_10;
     LOCAL local_11;
 
-    local_1 = CALL Void___init;
+    local_1 = CALL A2I___init;
     local_5 = TYPEOF param_var;
     ARG param_var;
     local_4 = VCALL local_5 3;
@@ -3104,7 +3104,7 @@
     LOCAL local_240;
     LOCAL local_241;
 
-    local_0 = CALL Void___init;
+    local_0 = CALL A___init;
     SETATTR param_self 1 local_0;
     LABEL label_while_label_2;
     local_flag = GETATTR param_self 3;
@@ -3172,7 +3172,7 @@
     IF local_34 GOTO label_then_35;
     GOTO label_else_35;
     LABEL label_then_35;
-    local_36 = CALL Void___init;
+    local_36 = CALL A___init;
     local_38 = TYPEOF param_self;
     ARG param_self;
     local_37 = VCALL local_38 9;
@@ -3181,7 +3181,7 @@
     ARG local_37;
     local_35 = VCALL local_39 4;
     SETATTR param_self 2 local_35;
-    local_41 = CALL Void___init;
+    local_41 = CALL B___init;
     local_43 = TYPEOF local_avar;
     ARG local_avar;
     local_42 = VCALL local_43 3;
@@ -3255,7 +3255,7 @@
     IF local_82 GOTO label_then_37;
     GOTO label_else_37;
     LABEL label_then_37;
-    local_84 = CALL Void___init;
+    local_84 = CALL A___init;
     local_86 = TYPEOF param_self;
     ARG param_self;
     local_85 = VCALL local_86 9;
@@ -3263,7 +3263,7 @@
     ARG local_84;
     ARG local_85;
     local_83 = VCALL local_87 4;
-    local_89 = CALL Void___init;
+    local_89 = CALL D___init;
     local_91 = TYPEOF local_avar;
     ARG local_avar;
     local_90 = VCALL local_91 3;
@@ -3290,7 +3290,7 @@
     IF local_102 GOTO label_then_38;
     GOTO label_else_38;
     LABEL label_then_38;
-    local_104 = CALL Void___init;
+    local_104 = CALL C___init;
     local_106 = TYPEOF local_avar;
     ARG local_avar;
     local_105 = VCALL local_106 3;
@@ -3322,7 +3322,7 @@ _method5;
     IF local_114 GOTO label_then_39;
     GOTO label_else_39;
     LABEL label_then_39;
-    local_116 = CALL Void___init;
+    local_116 = CALL C___init;
     local_118 = TYPEOF local_avar;
     ARG local_avar;
     local_117 = VCALL local_118 3;
@@ -3347,7 +3347,7 @@ _method5;
     IF local_126 GOTO label_then_40;
     GOTO label_else_40;
     LABEL label_then_40;
-    local_128 = CALL Void___init;
+    local_128 = CALL C___init;
     local_130 = TYPEOF local_avar;
     ARG local_avar;
     local_129 = VCALL local_130 3;
@@ -3373,7 +3373,7 @@ _method5;
     IF local_138 GOTO label_then_41;
     GOTO label_else_41;
     LABEL label_then_41;
-    local_141 = CALL Void___init;
+    local_141 = CALL D___init;
     local_143 = TYPEOF local_avar;
     ARG local_avar;
     local_142 = VCALL local_143 3;
@@ -3439,7 +3439,7 @@ _method5;
     GOTO label_else_43;
     LABEL label_then_43;
     local_x = CALL Void___init;
-    local_175 = CALL Void___init;
+    local_175 = CALL E___init;
     local_177 = TYPEOF local_avar;
     ARG local_avar;
     local_176 = VCALL local_177 3;
@@ -3491,7 +3491,7 @@ _method5;
     ARG param_self;
     ARG local_206;
     local_204 = VCALL local_207 3;
-    local_208 = CALL Void___init;
+    local_208 = CALL A2I___init;
     local_211 = TYPEOF local_a;
     ARG local_a;
     ARG local_r;
@@ -3522,7 +3522,7 @@ _method5;
     IF local_224 GOTO label_then_44;
     GOTO label_else_44;
     LABEL label_then_44;
-    local_225 = CALL Void___init;
+    local_225 = CALL A___init;
     GOTO label_continue_44;
     LABEL label_else_44;
     local_227 = GETATTR local_char 0;
@@ -3543,7 +3543,7 @@ _method5;
     local_235 = CALL Bool___init;
     GOTO label_continue_45;
     LABEL label_else_45;
-    local_237 = CALL Void___init;
+    local_237 = CALL A___init;
     local_239 = TYPEOF local_avar;
     ARG local_avar;
     local_238 = VCALL local_239 3;
