@@ -540,11 +540,9 @@
     PARAM param_i;
     PARAM param_rest;
 
-    LOCAL local_car;
-    LOCAL local_cdr;
 
-    SETATTR param_self 0 local_car;
-    SETATTR param_self 1 local_cdr;
+    SETATTR param_self 0 param_i;
+    SETATTR param_self 1 param_rest;
     RETURN param_self;
   }
 
@@ -657,9 +655,9 @@
     LOCAL local_18;
     LOCAL local_19;
     LOCAL local_20;
-    LOCAL local_mylist;
+    LOCAL local_21;
     LOCAL local_22;
-    LOCAL local_23;
+    LOCAL local_mylist;
     LOCAL local_24;
     LOCAL local_25;
     LOCAL local_26;
@@ -704,14 +702,15 @@
     ARG local_1;
     ARG local_19;
     local_0 = VCALL local_20 6;
-    SETATTR param_self 0 local_mylist;
+    SETATTR param_self 0 local_0;
     LABEL label_while_label_0;
+    local_mylist = GETATTR param_self 0;
     local_24 = TYPEOF local_mylist;
     ARG local_mylist;
-    local_23 = VCALL local_24 3;
+    local_22 = VCALL local_24 3;
     local_25 = LOAD 1;
-    local_22 = local_25 - local_23
-    ARG local_22;
+    local_21 = local_25 - local_22
+    ARG local_21;
     local_26 = CALL Bool___init;
     IF local_26 GOTO label_loop_label_0;
     GOTO label_pool_label_0;

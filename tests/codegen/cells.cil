@@ -402,9 +402,8 @@
     PARAM param_self;
     PARAM param_map;
 
-    LOCAL local_population_map;
 
-    SETATTR param_self 0 local_population_map;
+    SETATTR param_self 0 param_map;
     RETURN param_self;
   }
 
@@ -807,7 +806,6 @@
     LOCAL local_15;
     LOCAL local_16;
     LOCAL local_17;
-    LOCAL local_population_map;
 
     local_position = CALL Void___init;
     local_3 = TYPEOF param_self;
@@ -839,7 +837,7 @@
     local_17 = local_13 + local_16
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
-    SETATTR param_self 0 local_population_map;
+    SETATTR param_self 0 local_temp;
     RETURN param_self;
   }
 
@@ -872,8 +870,8 @@
     LOCAL local_2;
     LOCAL local_3;
     LOCAL local_4;
+    LOCAL local_5;
     LOCAL local_cells;
-    LOCAL local_6;
     LOCAL local_7;
     LOCAL local_countdown;
     LOCAL local_9;
@@ -902,10 +900,11 @@
     ARG local_1;
     ARG local_3;
     local_0 = VCALL local_4 7;
-    SETATTR param_self 0 local_cells;
+    SETATTR param_self 0 local_0;
+    local_cells = GETATTR param_self 0;
     local_7 = TYPEOF local_cells;
     ARG local_cells;
-    local_6 = VCALL local_7 8;
+    local_5 = VCALL local_7 8;
     local_9 = LOAD 20;
     ARG local_9;
     local_10 = CALL Int___init;

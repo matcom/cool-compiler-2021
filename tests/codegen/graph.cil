@@ -886,9 +886,8 @@
     PARAM param_self;
     PARAM param_n;
 
-    LOCAL local_num;
 
-    SETATTR param_self 0 local_num;
+    SETATTR param_self 0 param_n;
     RETURN param_self;
   }
 
@@ -983,13 +982,10 @@
     PARAM param_t;
     PARAM param_w;
 
-    LOCAL local_from;
-    LOCAL local_to;
-    LOCAL local_weight;
 
-    SETATTR param_self 0 local_from;
-    SETATTR param_self 1 local_to;
-    SETATTR param_self 2 local_weight;
+    SETATTR param_self 0 param_f;
+    SETATTR param_self 1 param_t;
+    SETATTR param_self 2 param_w;
     RETURN param_self;
   }
 
@@ -1253,11 +1249,9 @@
     PARAM param_e;
     PARAM param_rest;
 
-    LOCAL local_car;
-    LOCAL local_cdr;
 
-    SETATTR param_self 0 local_car;
-    SETATTR param_self 1 local_cdr;
+    SETATTR param_self 0 param_e;
+    SETATTR param_self 1 param_rest;
     RETURN param_self;
   }
 
@@ -1436,11 +1430,9 @@
     PARAM param_v;
     PARAM param_rest;
 
-    LOCAL local_car;
-    LOCAL local_cdr;
 
-    SETATTR param_self 0 local_car;
-    SETATTR param_self 1 local_cdr;
+    SETATTR param_self 0 param_v;
+    SETATTR param_self 1 param_rest;
     RETURN param_self;
   }
 
@@ -2247,7 +2239,7 @@
     LOCAL local_40;
     LOCAL local_41;
     LOCAL local_42;
-    LOCAL local_rest;
+    LOCAL local_43;
     LOCAL local_44;
     LOCAL local_45;
     LOCAL local_46;
@@ -2301,7 +2293,6 @@
     LOCAL local_94;
     LOCAL local_95;
     LOCAL local_96;
-    LOCAL local_97;
 
     local_1 = LOAD 0;
     ARG local_1;
@@ -2365,92 +2356,94 @@
     ARG local_31;
     ARG local_41;
     local_26 = VCALL local_42 5;
-    SETATTR param_self 1 local_rest;
+    SETATTR param_self 1 local_26;
     GOTO label_continue_14;
     LABEL label_else_14;
-    local_45 = GETATTR local_c 0;
-    local_46 = LOAD data_36_string;
-    ARG local_46;
-    local_47 = CALL String___init;
-    local_48 = GETATTR local_47 0;
-    local_49 = local_45 - local_48
-    local_50 = LOAD 1;
-    local_49 = local_50 - local_49
-    ARG local_49;
-    local_51 = CALL Bool___init;
-    IF local_51 GOTO label_then_15;
+    local_44 = GETATTR local_c 0;
+    local_45 = LOAD data_36_string;
+    ARG local_45;
+    local_46 = CALL String___init;
+    local_47 = GETATTR local_46 0;
+    local_48 = local_44 - local_47
+    local_49 = LOAD 1;
+    local_48 = local_49 - local_48
+    ARG local_48;
+    local_50 = CALL Bool___init;
+    IF local_50 GOTO label_then_15;
     GOTO label_else_15;
     LABEL label_then_15;
-    local_53 = GETATTR local_i 0;
-    local_54 = LOAD 1;
-    ARG local_54;
-    local_55 = CALL Int___init;
-    local_56 = GETATTR local_55 0;
-    local_57 = local_53 + local_56
-    local_59 = TYPEOF param_s;
+    local_52 = GETATTR local_i 0;
+    local_53 = LOAD 1;
+    ARG local_53;
+    local_54 = CALL Int___init;
+    local_55 = GETATTR local_54 0;
+    local_56 = local_52 + local_55
+    local_58 = TYPEOF param_s;
     ARG param_s;
-    local_58 = VCALL local_59 3;
-    local_60 = GETATTR local_58 0;
-    local_61 = GETATTR local_i 0;
-    local_62 = local_60 - local_61
-    local_63 = GETATTR local_62 0;
-    local_64 = LOAD 1;
-    ARG local_64;
-    local_65 = CALL Int___init;
-    local_66 = GETATTR local_65 0;
-    local_67 = local_63 - local_66
-    local_68 = TYPEOF param_s;
+    local_57 = VCALL local_58 3;
+    local_59 = GETATTR local_57 0;
+    local_60 = GETATTR local_i 0;
+    local_61 = local_59 - local_60
+    local_62 = GETATTR local_61 0;
+    local_63 = LOAD 1;
+    ARG local_63;
+    local_64 = CALL Int___init;
+    local_65 = GETATTR local_64 0;
+    local_66 = local_62 - local_65
+    local_67 = TYPEOF param_s;
     ARG param_s;
-    ARG local_57;
-    ARG local_67;
-    local_52 = VCALL local_68 5;
+    ARG local_56;
+    ARG local_66;
+    local_51 = VCALL local_67 5;
+    SETATTR param_self 1 local_51;
     GOTO label_continue_15;
     LABEL label_else_15;
-    local_69 = GETATTR local_int 0;
-    local_70 = LOAD 10;
-    ARG local_70;
-    local_71 = CALL Int___init;
-    local_72 = GETATTR local_71 0;
-    local_73 = local_69 * local_72
-    local_74 = GETATTR local_73 0;
-    local_77 = LOAD 1;
-    ARG local_77;
-    local_78 = CALL Int___init;
-    local_79 = TYPEOF param_s;
+    local_68 = GETATTR local_int 0;
+    local_69 = LOAD 10;
+    ARG local_69;
+    local_70 = CALL Int___init;
+    local_71 = GETATTR local_70 0;
+    local_72 = local_68 * local_71
+    local_73 = GETATTR local_72 0;
+    local_76 = LOAD 1;
+    ARG local_76;
+    local_77 = CALL Int___init;
+    local_78 = TYPEOF param_s;
     ARG param_s;
     ARG local_i;
-    ARG local_78;
-    local_76 = VCALL local_79 5;
-    local_80 = TYPEOF param_self;
+    ARG local_77;
+    local_75 = VCALL local_78 5;
+    local_79 = TYPEOF param_self;
     ARG param_self;
-    ARG local_76;
-    local_75 = VCALL local_80 9;
-    local_81 = GETATTR local_75 0;
-    local_82 = local_74 + local_81
-    local_83 = GETATTR local_i 0;
-    local_84 = LOAD 1;
-    ARG local_84;
-    local_85 = CALL Int___init;
-    local_86 = GETATTR local_85 0;
-    local_87 = local_83 + local_86
-    local_89 = GETATTR local_i 0;
-    local_90 = GETATTR local_j 0;
-    local_91 = local_89 - local_90
-    local_92 = LOAD 1;
-    local_91 = local_92 - local_91
-    ARG local_91;
-    local_93 = CALL Bool___init;
-    IF local_93 GOTO label_then_16;
+    ARG local_75;
+    local_74 = VCALL local_79 9;
+    local_80 = GETATTR local_74 0;
+    local_81 = local_73 + local_80
+    local_82 = GETATTR local_i 0;
+    local_83 = LOAD 1;
+    ARG local_83;
+    local_84 = CALL Int___init;
+    local_85 = GETATTR local_84 0;
+    local_86 = local_82 + local_85
+    local_88 = GETATTR local_i 0;
+    local_89 = GETATTR local_j 0;
+    local_90 = local_88 - local_89
+    local_91 = LOAD 1;
+    local_90 = local_91 - local_90
+    ARG local_90;
+    local_92 = CALL Bool___init;
+    IF local_92 GOTO label_then_16;
     GOTO label_else_16;
     LABEL label_then_16;
-    local_94 = LOAD data_37_string;
-    ARG local_94;
-    local_95 = CALL String___init;
+    local_93 = LOAD data_37_string;
+    ARG local_93;
+    local_94 = CALL String___init;
+    SETATTR param_self 1 local_94;
     GOTO label_continue_16;
     LABEL label_else_16;
-    local_96 = LOAD data_38_string;
-    ARG local_96;
-    local_97 = CALL String___init;
+    local_95 = LOAD data_38_string;
+    ARG local_95;
+    local_96 = CALL String___init;
     LABEL label_continue_16;
     LABEL label_continue_15;
     LABEL label_continue_14;

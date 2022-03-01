@@ -457,9 +457,9 @@
     LOCAL local_7;
     LOCAL local_8;
     LOCAL local_9;
-    LOCAL local_divisor;
+    LOCAL local_10;
     LOCAL local_11;
-    LOCAL local_12;
+    LOCAL local_divisor;
     LOCAL local_13;
     LOCAL local_14;
     LOCAL local_15;
@@ -502,8 +502,8 @@
     LOCAL local_52;
     LOCAL local_53;
     LOCAL local_54;
+    LOCAL local_55;
     LOCAL local_out;
-    LOCAL local_56;
     LOCAL local_57;
     LOCAL local_58;
     LOCAL local_59;
@@ -542,14 +542,15 @@
     local_8 = LOAD 2;
     ARG local_8;
     local_9 = CALL Int___init;
-    SETATTR param_self 2 local_divisor;
+    SETATTR param_self 2 local_9;
     LABEL label_while_label_1;
-    local_12 = GETATTR local_testee 0;
+    local_11 = GETATTR local_testee 0;
+    local_divisor = GETATTR param_self 2;
     local_13 = GETATTR local_divisor 0;
     local_14 = GETATTR local_divisor 0;
     local_15 = local_13 * local_14
     local_16 = GETATTR local_15 0;
-    local_17 = local_16 - local_12
+    local_17 = local_16 - local_11
     ARG local_17;
     local_18 = CALL Bool___init;
     IF local_18 GOTO label_then_0;
@@ -592,7 +593,7 @@
     local_41 = CALL Bool___init;
     LABEL label_continue_1;
     LABEL label_continue_0;
-    IF local_11 GOTO label_loop_label_1;
+    IF local_10 GOTO label_loop_label_1;
     GOTO label_pool_label_1;
     LABEL label_loop_label_1;
     local_42 = GETATTR local_divisor 0;
@@ -614,11 +615,12 @@
     IF local_54 GOTO label_then_2;
     GOTO label_else_2;
     LABEL label_then_2;
-    SETATTR param_self 0 local_out;
+    SETATTR param_self 0 local_testee;
+    local_out = GETATTR param_self 0;
     local_57 = TYPEOF param_self;
     ARG param_self;
     ARG local_out;
-    local_56 = VCALL local_57 4;
+    local_55 = VCALL local_57 4;
     local_59 = LOAD data_8_string;
     ARG local_59;
     local_60 = CALL String___init;

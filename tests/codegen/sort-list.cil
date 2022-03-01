@@ -650,11 +650,9 @@
     PARAM param_hd;
     PARAM param_tl;
 
-    LOCAL local_xcar;
-    LOCAL local_xcdr;
 
-    SETATTR param_self 0 local_xcar;
-    SETATTR param_self 1 local_xcdr;
+    SETATTR param_self 0 param_hd;
+    SETATTR param_self 1 param_tl;
     RETURN param_self;
   }
 
@@ -935,8 +933,8 @@
     PARAM param_i;
 
     LOCAL local_0;
-    LOCAL local_l;
     LOCAL local_j;
+    LOCAL local_2;
     LOCAL local_3;
     LOCAL local_4;
     LOCAL local_5;
@@ -944,7 +942,7 @@
     LOCAL local_7;
     LOCAL local_8;
     LOCAL local_9;
-    LOCAL local_10;
+    LOCAL local_l;
     LOCAL local_11;
     LOCAL local_12;
     LOCAL local_13;
@@ -953,25 +951,26 @@
     LOCAL local_16;
 
     local_0 = CALL Nil___init;
-    SETATTR param_self 0 local_l;
-    local_3 = LOAD 0;
-    ARG local_3;
-    local_4 = CALL Int___init;
+    SETATTR param_self 0 local_0;
+    local_2 = LOAD 0;
+    ARG local_2;
+    local_3 = CALL Int___init;
     LABEL label_while_label_0;
-    local_5 = GETATTR local_j 0;
-    local_6 = GETATTR param_i 0;
-    local_7 = local_6 - local_5
-    ARG local_7;
-    local_8 = CALL Bool___init;
-    IF local_8 GOTO label_loop_label_0;
+    local_4 = GETATTR local_j 0;
+    local_5 = GETATTR param_i 0;
+    local_6 = local_5 - local_4
+    ARG local_6;
+    local_7 = CALL Bool___init;
+    IF local_7 GOTO label_loop_label_0;
     GOTO label_pool_label_0;
     LABEL label_loop_label_0;
-    local_10 = CALL Cons___init;
-    local_11 = TYPEOF local_10;
-    ARG local_10;
+    local_9 = CALL Cons___init;
+    local_l = GETATTR param_self 0;
+    local_11 = TYPEOF local_9;
+    ARG local_9;
     ARG local_j;
     ARG local_l;
-    local_9 = VCALL local_11 16;
+    local_8 = VCALL local_11 16;
     local_12 = GETATTR local_j 0;
     local_13 = LOAD 1;
     ARG local_13;

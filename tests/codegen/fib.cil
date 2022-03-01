@@ -415,7 +415,6 @@
     LOCAL local_24;
     LOCAL local_25;
     LOCAL local_26;
-    LOCAL local_i;
 
     local_1 = LOAD 1;
     ARG local_1;

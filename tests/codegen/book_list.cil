@@ -584,11 +584,9 @@
     PARAM param_title_p;
     PARAM param_author_p;
 
-    LOCAL local_title;
-    LOCAL local_author;
 
-    SETATTR param_self 0 local_title;
-    SETATTR param_self 1 local_author;
+    SETATTR param_self 0 param_title_p;
+    SETATTR param_self 1 param_author_p;
     RETURN param_self;
   }
 
@@ -696,14 +694,13 @@
 
     LOCAL local_0;
     LOCAL local_1;
-    LOCAL local_per_title;
 
     local_1 = TYPEOF param_self;
     ARG param_self;
     ARG param_title_p;
     ARG param_author_p;
     local_0 = VCALL local_1 7;
-    SETATTR param_self 2 local_per_title;
+    SETATTR param_self 2 param_per_title_p;
     RETURN param_self;
   }
 
@@ -887,11 +884,9 @@ _print;
     PARAM param_hd;
     PARAM param_tl;
 
-    LOCAL local_xcar;
-    LOCAL local_xcdr;
 
-    SETATTR param_self 0 local_xcar;
-    SETATTR param_self 1 local_xcdr;
+    SETATTR param_self 0 param_hd;
+    SETATTR param_self 1 param_tl;
     RETURN param_self;
   }
 
@@ -1063,8 +1058,8 @@ _print;
     LOCAL local_20;
     LOCAL local_21;
     LOCAL local_22;
+    LOCAL local_23;
     LOCAL local_books;
-    LOCAL local_24;
     LOCAL local_25;
 
     local_2 = CALL Book___init;
@@ -1104,10 +1099,11 @@ _print;
     ARG local_19;
     ARG local_an_article;
     local_18 = VCALL local_22 8;
-    SETATTR param_self 0 local_books;
+    SETATTR param_self 0 local_18;
+    local_books = GETATTR param_self 0;
     local_25 = TYPEOF local_books;
     ARG local_books;
-    local_24 = VCALL local_25 11;
-    RETURN local_24;
+    local_23 = VCALL local_25 11;
+    RETURN local_23;
   }
 
