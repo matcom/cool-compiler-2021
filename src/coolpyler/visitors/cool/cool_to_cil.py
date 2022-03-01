@@ -118,16 +118,20 @@ class CoolToCilVisitor(object):
             )
         )
 
-    def register_object_copy(self):
+    def register_copy(self, type: str):
         self.reset_state()
-        self.register_param("self")
-        data = self.register_data("abort_msg", '"Program Halted!"')
-        instance = self.register_new("String", data)
-        self.instructions.append(cil.PrintNode(instance, True))
-        self.instructions.append(cil.ExitNode(1))
+        self_param = self.register_param("self")
+        copy_local = self.register_local("copy")
+        self.instructions.append(cil.AllocateNode(type, copy_local))
+        for attr, _ in self.attrs[type].values():
+            attr_copy_local = self.register_local("attr_copy")
+            self.instructions.append(cil.GetAttrNode(self_param, attr, attr_copy_local))
+            self.instructions.append(cil.SetAttrNode(copy_local, attr, attr_copy_local))
+
+        self.instructions.append(cil.ReturnNode(copy_local))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("Object", "copy"),
+                self.get_func_id(type, "copy"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -328,6 +332,7 @@ class CoolToCilVisitor(object):
 
         for type in self.methods:
             self.register_type_name(type)
+            self.register_copy(type)
 
         self.register_io_out_string()
         self.register_io_out_int()
