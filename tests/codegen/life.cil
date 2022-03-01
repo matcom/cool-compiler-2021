@@ -216,6 +216,14 @@
 
 .code
 
+  function Void_init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
   function main {
 
     LOCAL local_0;
@@ -465,6 +473,9 @@
   function Board_init {
 
     LOCAL local_self;
+    LOCAL local_rows;
+    LOCAL local_columns;
+    LOCAL local_board_size;
 
     local_self = ALLOCATE Board;
     local_rows = CALL Board_rows_init;
@@ -730,6 +741,10 @@
   function CellularAutomaton_init {
 
     LOCAL local_self;
+    LOCAL local_rows;
+    LOCAL local_columns;
+    LOCAL local_board_size;
+    LOCAL local_population_map;
 
     local_self = ALLOCATE CellularAutomaton;
     local_rows = CALL Board_rows_init;
@@ -2136,6 +2151,7 @@
     local_5 = TYPEOF param_self;
     ARG param_self;
     local_4 = VCALL local_5 11;
+    local_temp = CALL Void_init;
     LABEL label_while_label_1;
     local_7 = GETATTR local_position 0;
     local_8 = GETATTR local_num 0;
@@ -2480,6 +2496,7 @@
     LOCAL local_309;
     LOCAL local_310;
 
+    local_num = CALL Void_init;
     local_2 = LOAD data_40_string;
     ARG local_2;
     local_3 = CALL String_init;
@@ -3087,6 +3104,7 @@
     LOCAL local_25;
     LOCAL local_26;
 
+    local_ans = CALL Void_init;
     local_2 = LOAD data_86_string;
     ARG local_2;
     local_3 = CALL String_init;
@@ -3167,6 +3185,7 @@
     LOCAL local_25;
     LOCAL local_26;
 
+    local_ans = CALL Void_init;
     local_2 = LOAD data_90_string;
     ARG local_2;
     local_3 = CALL String_init;
@@ -3219,6 +3238,11 @@
   function Main_init {
 
     LOCAL local_self;
+    LOCAL local_rows;
+    LOCAL local_columns;
+    LOCAL local_board_size;
+    LOCAL local_population_map;
+    LOCAL local_cells;
 
     local_self = ALLOCATE Main;
     local_rows = CALL Board_rows_init;
@@ -3270,6 +3294,8 @@
     LOCAL local_29;
     LOCAL local_30;
 
+    local_continue = CALL Void_init;
+    local_choice = CALL Void_init;
     local_3 = LOAD data_94_string;
     ARG local_3;
     local_4 = CALL String_init;

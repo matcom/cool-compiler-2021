@@ -383,7 +383,6 @@ class CilToMIPS:
         instructions = []
         self.memory_manager.save()
 
-        typ = self.types[node.type]
         if (
             node.type == "String"
             or node.type == "Int"
@@ -391,7 +390,10 @@ class CilToMIPS:
             or node.type == "Object"
         ):
             reserved_bytes = 8
+        elif node.type == "Void":
+            reserved_bytes = 4
         else:
+            typ = self.types[node.type]
             reserved_bytes = (len(typ.attributes) + 1) * 4
 
         instructions.append(
@@ -408,18 +410,31 @@ class CilToMIPS:
 
         reg1 = self.memory_manager.get_unused_register()
 
-        instructions.append(
-            mips.LoadAddressNode(
-                reg1, mips.LabelNode(node.type), f"Save type address in register"
+        if node.type != "Void":
+            instructions.append(
+                mips.LoadAddressNode(
+                    reg1, mips.LabelNode(node.type), f"Save type address in register"
+                )
             )
-        )
-        instructions.append(
-            mips.StoreWordNode(
-                reg1,
-                mips.MemoryAddressRegisterNode(V0_REG, 0),
-                f"Save type address in firts position of memory allocated",
+            instructions.append(
+                mips.StoreWordNode(
+                    reg1,
+                    mips.MemoryAddressRegisterNode(V0_REG, 0),
+                    f"Save type address in firts position of memory allocated",
+                )
             )
-        )
+        else:
+            instructions.append(
+                mips.LoadInmediateNode(reg1, 0, f"Save value 0 in register")
+            )
+            instructions.append(
+                mips.StoreWordNode(
+                    reg1,
+                    mips.MemoryAddressRegisterNode(V0_REG, 0),
+                    f"Save value 0 in firts position of memory allocated",
+                )
+            )
+
         instructions.append(
             mips.AddiNode(
                 V0_REG,

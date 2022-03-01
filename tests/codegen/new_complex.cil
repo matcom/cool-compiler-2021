@@ -82,6 +82,14 @@
 
 .code
 
+  function Void_init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
   function main {
 
     LOCAL local_0;
@@ -455,6 +463,8 @@
   function Complex_init {
 
     LOCAL local_self;
+    LOCAL local_x;
+    LOCAL local_y;
 
     local_self = ALLOCATE Complex;
     local_x = CALL Complex_x_init;

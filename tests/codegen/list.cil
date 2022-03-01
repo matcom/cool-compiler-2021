@@ -83,6 +83,14 @@
 
 .code
 
+  function Void_init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
   function main {
 
     LOCAL local_0;
@@ -398,6 +406,8 @@
   function Cons_init {
 
     LOCAL local_self;
+    LOCAL local_car;
+    LOCAL local_cdr;
 
     local_self = ALLOCATE Cons;
     local_car = CALL Cons_car_init;
@@ -455,6 +465,7 @@
   function Main_init {
 
     LOCAL local_self;
+    LOCAL local_mylist;
 
     local_self = ALLOCATE Main;
     local_mylist = CALL Main_mylist_init;

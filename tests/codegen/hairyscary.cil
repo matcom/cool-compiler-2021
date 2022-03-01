@@ -129,6 +129,14 @@
 
 .code
 
+  function Void_init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
   function main {
 
     LOCAL local_0;
@@ -402,6 +410,11 @@
   function Foo_init {
 
     LOCAL local_self;
+    LOCAL local_h;
+    LOCAL local_g;
+    LOCAL local_i;
+    LOCAL local_a;
+    LOCAL local_b;
 
     local_self = ALLOCATE Foo;
     local_h = CALL Bazz_h_init;
@@ -443,6 +456,15 @@
   function Bar_init {
 
     LOCAL local_self;
+    LOCAL local_h;
+    LOCAL local_g;
+    LOCAL local_i;
+    LOCAL local_a;
+    LOCAL local_b;
+    LOCAL local_e;
+    LOCAL local_f;
+    LOCAL local_c;
+    LOCAL local_d;
 
     local_self = ALLOCATE Bar;
     local_h = CALL Bazz_h_init;
@@ -471,6 +493,13 @@
   function Razz_init {
 
     LOCAL local_self;
+    LOCAL local_h;
+    LOCAL local_g;
+    LOCAL local_i;
+    LOCAL local_a;
+    LOCAL local_b;
+    LOCAL local_e;
+    LOCAL local_f;
 
     local_self = ALLOCATE Razz;
     local_h = CALL Bazz_h_init;
@@ -495,6 +524,9 @@
   function Bazz_init {
 
     LOCAL local_self;
+    LOCAL local_h;
+    LOCAL local_g;
+    LOCAL local_i;
 
     local_self = ALLOCATE Bazz;
     local_h = CALL Bazz_h_init;
@@ -553,6 +585,10 @@
   function Main_init {
 
     LOCAL local_self;
+    LOCAL local_a;
+    LOCAL local_b;
+    LOCAL local_c;
+    LOCAL local_d;
 
     local_self = ALLOCATE Main;
     local_a = CALL Main_a_init;

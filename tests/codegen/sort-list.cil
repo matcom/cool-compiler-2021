@@ -120,6 +120,14 @@
 
 .code
 
+  function Void_init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
   function main {
 
     LOCAL local_0;
@@ -427,10 +435,13 @@
     LOCAL local_0;
     LOCAL local_1;
     LOCAL local_2;
+    LOCAL local_3;
 
     local_1 = TYPEOF param_self;
     ARG param_self;
     local_0 = VCALL local_1 0;
+    local_3 = LOAD 0;
+    ARG local_3;
     local_2 = CALL Int_init;
     RETURN local_2;
   }
@@ -514,6 +525,8 @@
   function Cons_init {
 
     LOCAL local_self;
+    LOCAL local_xcar;
+    LOCAL local_xcdr;
 
     local_self = ALLOCATE Cons;
     local_xcar = CALL Cons_xcar_init;
@@ -804,6 +817,7 @@
   function Main_init {
 
     LOCAL local_self;
+    LOCAL local_l;
 
     local_self = ALLOCATE Main;
     local_l = CALL Main_l_init;

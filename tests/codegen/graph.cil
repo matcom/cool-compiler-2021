@@ -225,6 +225,14 @@
 
 .code
 
+  function Void_init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
   function main {
 
     LOCAL local_0;
@@ -558,6 +566,8 @@
   function Graph_init {
 
     LOCAL local_self;
+    LOCAL local_vertices;
+    LOCAL local_edges;
 
     local_self = ALLOCATE Graph;
     local_vertices = CALL Graph_vertices_init;
@@ -629,6 +639,8 @@
   function Vertice_init {
 
     LOCAL local_self;
+    LOCAL local_num;
+    LOCAL local_out;
 
     local_self = ALLOCATE Vertice;
     local_num = CALL Vertice_num_init;
@@ -709,6 +721,9 @@
   function Edge_init {
 
     LOCAL local_self;
+    LOCAL local_from;
+    LOCAL local_to;
+    LOCAL local_weight;
 
     local_self = ALLOCATE Edge;
     local_from = CALL Edge_from_init;
@@ -806,6 +821,7 @@
   function EList_init {
 
     LOCAL local_self;
+    LOCAL local_car;
 
     local_self = ALLOCATE EList;
     local_car = CALL EList_car_init;
@@ -932,6 +948,8 @@
   function ECons_init {
 
     LOCAL local_self;
+    LOCAL local_car;
+    LOCAL local_cdr;
 
     local_self = ALLOCATE ECons;
     local_car = CALL EList_car_init;
@@ -1009,6 +1027,7 @@
   function VList_init {
 
     LOCAL local_self;
+    LOCAL local_car;
 
     local_self = ALLOCATE VList;
     local_car = CALL VList_car_init;
@@ -1093,6 +1112,8 @@
   function VCons_init {
 
     LOCAL local_self;
+    LOCAL local_car;
+    LOCAL local_cdr;
 
     local_self = ALLOCATE VCons;
     local_car = CALL VList_car_init;
@@ -1170,6 +1191,8 @@
   function Parse_init {
 
     LOCAL local_self;
+    LOCAL local_boolop;
+    LOCAL local_rest;
 
     local_self = ALLOCATE Parse;
     local_boolop = CALL Parse_boolop_init;
@@ -2144,6 +2167,9 @@
   function Main_init {
 
     LOCAL local_self;
+    LOCAL local_boolop;
+    LOCAL local_rest;
+    LOCAL local_g;
 
     local_self = ALLOCATE Main;
     local_boolop = CALL Parse_boolop_init;

@@ -61,6 +61,14 @@
 
 .code
 
+  function Void_init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
   function main {
 
     LOCAL local_0;
@@ -286,6 +294,11 @@
   function Main_init {
 
     LOCAL local_self;
+    LOCAL local_out;
+    LOCAL local_testee;
+    LOCAL local_divisor;
+    LOCAL local_stop;
+    LOCAL local_m;
 
     local_self = ALLOCATE Main;
     local_out = CALL Main_out_init;
