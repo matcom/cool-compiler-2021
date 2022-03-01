@@ -73,6 +73,20 @@ class TypeChecker:
                 parent_scope.children.append(scope)
             except KeyError:
                 return False
+
+        # register all attributes before type check
+        for feature in [f for f in node.features if isinstance(f, AttrDeclarationNode)]:
+            if feature.id == "self":
+                self.errors.append(SEMANTIC_ERROR % (feature.lineno, feature.colno,
+                                                     f'"self" is used as attribute name in class "{self.current_type.name}".'
+                                                     ))
+            var, _ = scope.my_find_var(feature.id)
+            attr_type = self.context.get_type(feature.type)
+            if var is not None:
+                self.errors.append(ATTR_ALREADY_DEFINED % (feature.lineno, feature.colno, feature.id))
+            else:
+                scope.define_variable(feature.id, attr_type)
+
         for feature in node.features:
             self.visit(feature, scope)
         return True
@@ -80,19 +94,8 @@ class TypeChecker:
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode, scope: Scope, set_type=None):
         # print('attr declaration')
-        if node.id == "self":
-            self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
-                f'"self" is used as attribute name in class "{self.current_type.name}".'
-            ))
-            if node.val is not None:
-                self.visit(node.val, scope)
-            return
-        var, _ = scope.my_find_var(node.id)
-        attr_type = self.context.get_type(node.type)
-        if var is not None:
-            self.errors.append(ATTR_ALREADY_DEFINED % (node.lineno, node.colno, node.id))
-        else:
-            scope.define_variable(node.id, attr_type)
+        var, scope_id = scope.my_find_var(node.id)
+        attr_type = var.type
 
         if node.val is not None:
             return_type = self.visit(node.val, scope)
@@ -347,6 +350,8 @@ class TypeChecker:
         else:
             for i in range(0, len(node.args)):
                 arg_type = self.visit(node.args[i], scope)
+                if arg_type.name == BasicTypes.SELF.value:
+                    arg_type = self.current_type
                 method_param_type = method.param_types[i]
                 if not arg_type.conforms_to(method_param_type):
                     self.errors.append(
