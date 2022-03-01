@@ -83,7 +83,7 @@ class CoolToCilVisitor(object):
         for arg in args:
             self.instructions.append(cil.ArgNode(arg))
         self.instructions.append(
-            cil.StaticCallNode(self.get_func_id(type, "init"), dest)
+            cil.StaticCallNode(self.get_func_id(type, "__init"), dest)
         )
         return dest
 
@@ -267,7 +267,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.ReturnNode(self_local))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("Object", "init"),
+                self.get_func_id("Object", "__init"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -283,7 +283,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.ReturnNode(self_local))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("Int", "init"),
+                self.get_func_id("Int", "__init"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -299,7 +299,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.ReturnNode(self_local))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("Bool", "init"),
+                self.get_func_id("Bool", "__init"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -315,7 +315,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.ReturnNode(self_local))
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("String", "init"),
+                self.get_func_id("String", "__init"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -379,7 +379,7 @@ class CoolToCilVisitor(object):
 
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id("Void", "init"),
+                self.get_func_id("Void", "__init"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -414,14 +414,14 @@ class CoolToCilVisitor(object):
             attr_local = self.register_local(attr)
             self.instructions.append(cil.ArgNode(self_local))
             self.instructions.append(
-                cil.StaticCallNode(self.get_func_id(htype, f"{attr}_init"), attr_local,)
+                cil.StaticCallNode(self.get_func_id(htype, f"{attr}___init"), attr_local,)
             )
             self.instructions.append(cil.SetAttrNode(self_local, i, attr_local))
         self.instructions.append(cil.ReturnNode(self_local))
 
         self.dotcode.append(
             cil.FunctionNode(
-                self.get_func_id(node.type.name, "init"),
+                self.get_func_id(node.type.name, "__init"),
                 self.params,
                 self.locals,
                 self.instructions,
@@ -442,7 +442,7 @@ class CoolToCilVisitor(object):
             sid = self.register_new("Void")
         self.instructions.append(cil.ReturnNode(sid))
         return cil.FunctionNode(
-            self.get_func_id(self.type, f"{node.attr_info.name}_init"),
+            self.get_func_id(self.type, f"{node.attr_info.name}___init"),
             self.params,
             self.locals,
             self.instructions,
