@@ -997,18 +997,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(end_label)
         node.ret_expr = ret
         
-        # var = self.define_internal_local()
-        # self.register_instruction(cil.ParentTypeNode(var, obj_type))
-        # self.register_instruction(cil.AssignNode(obj_type, var))
-
-        # self.register_instruction(cil.GotoNode(start_case_label))
-        
-        # self.register_instruction(cil.LabelNode(error_label))
-        # self.register_instruction(cil.ParamNode(self.instances[-1]))
-        # self.regster_instruction(cil.DynamicCallNode(var, self.to_function_name("abort", self.current_type.name), result))
-        
-        # self.register_instruction(cil.GotoNode(end_case_label))
-        # return result
 
     @visitor.when(TrueNode)
     def visit(self, node, scope):

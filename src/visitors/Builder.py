@@ -185,7 +185,6 @@ class TypeBuilder:
         nodes = {}
         nodes[_root.name] = _root
         
-        # l = self.context.types.keys()
         types = self.context.types
         for t in types.values(): # no se puede heredar de int ni de bool, y object lo hice a mano
             if t.name in ['Object']:

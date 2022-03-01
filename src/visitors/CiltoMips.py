@@ -178,6 +178,7 @@ class CILToMipsVisitor:
         
         return mipsCode
 
+# section nodes
     @visitor.when(TypeNode)
     def visit(self, node):
         name_label = self.build_data_label()
@@ -241,34 +242,8 @@ class CILToMipsVisitor:
         new_func.register_instructions( instructions)
         self.end_function()
 
-    @visitor.when(AssignNode)
-    def visit(self, node):
-        instructions = []
-
-        if isinstance(node.source, VoidNode):
-            register = r.zero
-        elif isinstance(node.source, int):
-            register = r.t0
-            instructions.append('{} {} {}'.format(o.li, r.t0, int(node.source)))
-        else:
-            register = r.t0
-            instructions.extend(self.visit(node.source))
-            instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.source)))
-            if isinstance(node.source, AttributeNode):
-                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        if isinstance(node.dest, AttributeNode):
-            self_var = self._current_function.params[0]
-            instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(self_var)))
-
-            index = self._types_section[node.dest.type].attributes.index(node.dest.name) + 3
-            instructions.append('{} {} {} {}'.format(o.addi, r.t1, r.t1, index * 4))
-            instructions.append('{} {} 0({})'.format(o.sw, register, r.t1))
-        else:
-            instructions.append('{} {} {}'.format(o.sw, register, self.find_var_loc(node.dest)))
-
-        return instructions
-
+# binary
+    # arithmetics
     @visitor.when(PlusNode)
     def visit(self, node):
         instructions = []
@@ -374,6 +349,140 @@ class CILToMipsVisitor:
 
         return instructions
 
+    #logics
+    @visitor.when(LessNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.extend(self.visit(node.left))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
+        if isinstance(node.left, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        instructions.extend(self.visit(node.right))
+        instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.right)))
+        if isinstance(node.right, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+        instructions.append('{} {} {} {}'.format(o.slt, r.t1, r.t0, r.t1))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.t1, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+    
+    @visitor.when(LessEqualNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.extend(self.visit(node.left))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
+        if isinstance(node.left, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        instructions.extend(self.visit(node.right))
+        instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.right)))
+        if isinstance(node.right, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        instructions.append('{} {} {} {}'.format(o.sle, r.t0, r.t0, r.t1))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+    @visitor.when(EqualNode)
+    def visit(self, node):
+        instructions = []
+
+        if type(node.left) == VoidNode:
+            instructions.append('{} {} {}'.format(o.li, r.t0, 0))
+        else:
+            instructions.extend(self.visit(node.left))
+            instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
+            if isinstance(node.left, AttributeNode):
+                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        if type(node.right) == VoidNode:
+            instructions.append('{} {} {}'.format(o.li, r.t1, 0))
+        else:
+            instructions.extend(self.visit(node.right))
+            instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.right)))
+            if isinstance(node.right, AttributeNode):
+                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        instructions.append('{} {} {} {}'.format(o.seq, r.t0, r.t0, r.t1))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+    @visitor.when(EqualStringNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.extend(self.visit(node.left))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
+        if isinstance(node.left, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+        instructions.append('{} {} {}'.format(o.move, r.a0, r.t0))
+
+        instructions.extend(self.visit(node.right))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.right)))
+        if isinstance(node.right, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+        instructions.append('{} {} {}'.format(o.move, r.a1, r.t0))
+
+        instructions.append('{} {}'.format(o.jal, "equal_str"))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.v0, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+# Unary
+    # arithmetics
+    @visitor.when(ComplementNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.extend(self.visit(node.value))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.value)))
+        if isinstance(node.value, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        instructions.append('{} {} {}'.format(o.not_bw, r.t0, r.t0))
+        instructions.append('{} {} {} {}'.format(o.addi, r.t0, r.t0, 1))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+    #logics
+    @visitor.when(NotNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.extend(self.visit(node.value))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.value)))
+        if isinstance(node.value, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+        instructions.append('{} {} {} {}'.format(o.xori, r.t0, r.t0, 1))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+# basics
     @visitor.when(AllocateNode)
     def visit(self, node):
         instructions = []
@@ -388,6 +497,56 @@ class CILToMipsVisitor:
         instructions.append('{} {} {}'.format(o.sw, r.v0, self.find_var_loc(node.dest)))
         if isinstance(node.dest, AttributeNode):
             instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+    @visitor.when(CopyNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.extend(self.visit(node.value))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.value)))
+        if isinstance(node.value, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+        instructions.append('{} {} 4({})'.format(o.lw, r.a0, r.t0))
+        instructions.append('{} {} {} {}'.format(o.sll, r.a0, r.a0, 2))
+        instructions.append('{} {}'.format(o.jal, "allocate"))
+        instructions.append('{} {} {}'.format(o.move, r.a2, r.a0))
+        instructions.append('{} {} {}'.format(o.move, r.a0, r.t0))
+        instructions.append('{} {} {}'.format(o.move, r.a1, r.v0))
+        instructions.append('{} {}'.format(o.jal, "copy"))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.v0, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+    @visitor.when(AssignNode)
+    def visit(self, node):
+        instructions = []
+
+        if isinstance(node.source, VoidNode):
+            register = r.zero
+        elif isinstance(node.source, int):
+            register = r.t0
+            instructions.append('{} {} {}'.format(o.li, r.t0, int(node.source)))
+        else:
+            register = r.t0
+            instructions.extend(self.visit(node.source))
+            instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.source)))
+            if isinstance(node.source, AttributeNode):
+                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        if isinstance(node.dest, AttributeNode):
+            self_var = self._current_function.params[0]
+            instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(self_var)))
+
+            index = self._types_section[node.dest.type].attributes.index(node.dest.name) + 3
+            instructions.append('{} {} {} {}'.format(o.addi, r.t1, r.t1, index * 4))
+            instructions.append('{} {} 0({})'.format(o.sw, register, r.t1))
+        else:
+            instructions.append('{} {} {}'.format(o.sw, register, self.find_var_loc(node.dest)))
 
         return instructions
 
@@ -406,6 +565,23 @@ class CILToMipsVisitor:
         instructions.append('{} {} 0({})'.format(o.lw, r.t1, r.t0))
         instructions.extend(self.visit(node.dest))
         instructions.append('{} {} {}'.format(o.sw, r.t1, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+    @visitor.when(NameNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.append('{} {} {}'.format(o.la, r.t0, 'types_table'))
+
+        tp_number = self._types_section[node.value].index
+        instructions.append('{} {} {} {}'.format(o.addi, r.t0, r.t0, tp_number * 4))
+        instructions.append('{} {} 0({})'.format(o.lw, r.t0, r.t0))
+        
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
         if isinstance(node.dest, AttributeNode):
             instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
 
@@ -468,6 +644,14 @@ class CILToMipsVisitor:
         
         return instructions
 
+    @visitor.when(ParamNode)
+    def visit(self, node):
+        return []
+
+    @visitor.when(VarNode)
+    def visit(self, node):
+        return []
+
     @visitor.when(ReturnNode)
     def visit(self, node):
         instructions = []
@@ -484,6 +668,16 @@ class CILToMipsVisitor:
         
         return instructions
 
+    @visitor.when(ExitNode)
+    def visit(self, node):
+        instructions = []
+        
+        instructions.append('{} {} {}'.format(o.li, r.v0, 10))
+        instructions.append('{}'.format(o.syscall))
+
+        return instructions
+
+# string 
     @visitor.when(LoadNode)
     def visit(self, node):
         instructions = []
@@ -509,95 +703,6 @@ class CILToMipsVisitor:
         
         return instructions
 
-    @visitor.when(PrintIntNode)
-    def visit(self, node):
-        instructions = []
-        
-        instructions.append('{} {} {}'.format(o.li, r.v0, 1))
-        instructions.extend(self.visit(node.value))
-        instructions.append('{} {} {}'.format(o.lw, r.a0, self.find_var_loc(node.value)))
-        if isinstance(node.value, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{}'.format(o.syscall))
-        
-        return instructions
-
-    @visitor.when(ExitNode)
-    def visit(self, node):
-        instructions = []
-        
-        instructions.append('{} {} {}'.format(o.li, r.v0, 10))
-        instructions.append('{}'.format(o.syscall))
-
-        return instructions
-
-    @visitor.when(CopyNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.extend(self.visit(node.value))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.value)))
-        if isinstance(node.value, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} 4({})'.format(o.lw, r.a0, r.t0))
-        instructions.append('{} {} {} {}'.format(o.sll, r.a0, r.a0, 2))
-        instructions.append('{} {}'.format(o.jal, "allocate"))
-        instructions.append('{} {} {}'.format(o.move, r.a2, r.a0))
-        instructions.append('{} {} {}'.format(o.move, r.a0, r.t0))
-        instructions.append('{} {} {}'.format(o.move, r.a1, r.v0))
-        instructions.append('{} {}'.format(o.jal, "copy"))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.v0, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
-    @visitor.when(GetAttribNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.extend(self.visit(node.obj))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.obj)))
-        if isinstance(node.obj, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        tp = self._types_section[node.computed_type]
-        offset = (tp.attributes.index(node.attr) + 3) * 4
-        instructions.append('{} {} {}({})'.format(o.lw, r.t1, offset, r.t0))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.t1, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
-    @visitor.when(ErrorNode)
-    def visit(self, node):
-        instructions = []
-
-        mips_label = self._data_section[node.data.name].label
-        instructions.append('{} {} {}'.format(o.li, r.v0, 4))
-        instructions.append('{} {} {}'.format(o.la, r.a0, mips_label))
-        instructions.append('{}'.format(o.syscall))
-        instructions.append('{} {} {}'.format(o.li, r.v0, 10))
-        instructions.append('{}'.format(o.syscall))
-
-        return instructions
-
-    @visitor.when(ReadIntNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.append('{} {} {}'.format(o.li, r.v0, 5))
-        instructions.append('{}'.format(o.syscall))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.v0, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
     @visitor.when(ReadStringNode)
     def visit(self, node):
         instructions = []
@@ -608,82 +713,6 @@ class CILToMipsVisitor:
         if isinstance(node.dest, AttributeNode):
             instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
 
-        return instructions
-
-    @visitor.when(SetAttribNode)
-    def visit(self, node):
-        instructions = []
-
-        tp = self._types_section[node.computed_type]
-        offset = (tp.attributes.index(node.attr) + 3) * 4
-
-        instructions.extend(self.visit(node.obj))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.obj)))
-        if isinstance(node.obj, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        if type(node.value) == int:
-            instructions.append('{} {} {}'.format(o.li, r.t1, node.value))
-        else:
-            instructions.extend(self.visit(node.value))
-            instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.value)))
-            if isinstance(node.value, AttributeNode):
-                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        instructions.append('{} {} {}({})'.format(o.sw, r.t1, offset, r.t0))
-
-        return instructions
-
-    @visitor.when(LessNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.extend(self.visit(node.left))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
-        if isinstance(node.left, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        instructions.extend(self.visit(node.right))
-        instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.right)))
-        if isinstance(node.right, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} {} {}'.format(o.slt, r.t1, r.t0, r.t1))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.t1, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
-    @visitor.when(GotoIfNode)
-    def visit(self, node):
-        instructions = []
-
-        mips_label = self.get_label(node.label)
-        instructions.extend(self.visit(node.condition))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.condition)))
-        if isinstance(node.condition, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} {} {}'.format(o.bne, r.t0, r.zero, mips_label))
-        
-        return instructions
-
-    @visitor.when(GotoNode)
-    def visit(self, node):
-        instructions = []
-        
-        mips_label = self.get_label(node.label)
-        instructions.append('{} {}'.format(o.j, mips_label))
-        
-        return instructions
-
-    @visitor.when(LabelNode)
-    def visit(self, node):
-        instructions = []
-        
-        mips_label = self.get_label(node.label)
-        instructions.append('{}:'.format(mips_label))
-        
         return instructions
 
     @visitor.when(SubstringNode)
@@ -760,68 +789,26 @@ class CILToMipsVisitor:
 
         return instructions
 
-    @visitor.when(EqualNode)
+# Int
+    @visitor.when(PrintIntNode)
     def visit(self, node):
         instructions = []
-
-        if type(node.left) == VoidNode:
-            instructions.append('{} {} {}'.format(o.li, r.t0, 0))
-        else:
-            instructions.extend(self.visit(node.left))
-            instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
-            if isinstance(node.left, AttributeNode):
-                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        if type(node.right) == VoidNode:
-            instructions.append('{} {} {}'.format(o.li, r.t1, 0))
-        else:
-            instructions.extend(self.visit(node.right))
-            instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.right)))
-            if isinstance(node.right, AttributeNode):
-                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        instructions.append('{} {} {} {}'.format(o.seq, r.t0, r.t0, r.t1))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
-    @visitor.when(NameNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.append('{} {} {}'.format(o.la, r.t0, 'types_table'))
-
-        tp_number = self._types_section[node.value].index
-        instructions.append('{} {} {} {}'.format(o.addi, r.t0, r.t0, tp_number * 4))
-        instructions.append('{} {} 0({})'.format(o.lw, r.t0, r.t0))
         
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
+        instructions.append('{} {} {}'.format(o.li, r.v0, 1))
+        instructions.extend(self.visit(node.value))
+        instructions.append('{} {} {}'.format(o.lw, r.a0, self.find_var_loc(node.value)))
+        if isinstance(node.value, AttributeNode):
             instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
+        instructions.append('{}'.format(o.syscall))
+        
         return instructions
 
-    @visitor.when(EqualStringNode)
+    @visitor.when(ReadIntNode)
     def visit(self, node):
         instructions = []
 
-        instructions.extend(self.visit(node.left))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
-        if isinstance(node.left, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} {}'.format(o.move, r.a0, r.t0))
-
-        instructions.extend(self.visit(node.right))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.right)))
-        if isinstance(node.right, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} {}'.format(o.move, r.a1, r.t0))
-
-        instructions.append('{} {}'.format(o.jal, "equal_str"))
+        instructions.append('{} {} {}'.format(o.li, r.v0, 5))
+        instructions.append('{}'.format(o.syscall))
         instructions.extend(self.visit(node.dest))
         instructions.append('{} {} {}'.format(o.sw, r.v0, self.find_var_loc(node.dest)))
         if isinstance(node.dest, AttributeNode):
@@ -829,70 +816,7 @@ class CILToMipsVisitor:
 
         return instructions
 
-    @visitor.when(ComplementNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.extend(self.visit(node.value))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.value)))
-        if isinstance(node.value, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        instructions.append('{} {} {}'.format(o.not_bw, r.t0, r.t0))
-        instructions.append('{} {} {} {}'.format(o.addi, r.t0, r.t0, 1))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
-    @visitor.when(LessEqualNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.extend(self.visit(node.left))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.left)))
-        if isinstance(node.left, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        instructions.extend(self.visit(node.right))
-        instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.right)))
-        if isinstance(node.right, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        instructions.append('{} {} {} {}'.format(o.sle, r.t0, r.t0, r.t1))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
-    @visitor.when(NotNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.extend(self.visit(node.value))
-        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.value)))
-        if isinstance(node.value, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-        instructions.append('{} {} {} {}'.format(o.xori, r.t0, r.t0, 1))
-        instructions.extend(self.visit(node.dest))
-        instructions.append('{} {} {}'.format(o.sw, r.t0, self.find_var_loc(node.dest)))
-        if isinstance(node.dest, AttributeNode):
-            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
-
-        return instructions
-
-    @visitor.when(VarNode)
-    def visit(self, node):
-        return []
-
-    @visitor.when(ParamNode)
-    def visit(self, node):
-        return []
-
+# attributes
     @visitor.when(AttributeNode)
     def visit(self, node):
         instructions = []
@@ -906,6 +830,138 @@ class CILToMipsVisitor:
 
         return instructions
     
+    @visitor.when(GetAttribNode)
+    def visit(self, node):
+        instructions = []
+
+        instructions.extend(self.visit(node.obj))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.obj)))
+        if isinstance(node.obj, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        tp = self._types_section[node.computed_type]
+        offset = (tp.attributes.index(node.attr) + 3) * 4
+        instructions.append('{} {} {}({})'.format(o.lw, r.t1, offset, r.t0))
+        instructions.extend(self.visit(node.dest))
+        instructions.append('{} {} {}'.format(o.sw, r.t1, self.find_var_loc(node.dest)))
+        if isinstance(node.dest, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        return instructions
+
+    @visitor.when(SetAttribNode)
+    def visit(self, node):
+        instructions = []
+
+        tp = self._types_section[node.computed_type]
+        offset = (tp.attributes.index(node.attr) + 3) * 4
+
+        instructions.extend(self.visit(node.obj))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.obj)))
+        if isinstance(node.obj, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        if type(node.value) == int:
+            instructions.append('{} {} {}'.format(o.li, r.t1, node.value))
+        else:
+            instructions.extend(self.visit(node.value))
+            instructions.append('{} {} {}'.format(o.lw, r.t1, self.find_var_loc(node.value)))
+            if isinstance(node.value, AttributeNode):
+                instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+
+        instructions.append('{} {} {}({})'.format(o.sw, r.t1, offset, r.t0))
+
+        return instructions
+
+# goto's
+    @visitor.when(GotoIfNode)
+    def visit(self, node):
+        instructions = []
+
+        mips_label = self.get_label(node.label)
+        instructions.extend(self.visit(node.condition))
+        instructions.append('{} {} {}'.format(o.lw, r.t0, self.find_var_loc(node.condition)))
+        if isinstance(node.condition, AttributeNode):
+            instructions.append('{} {} {} {}'.format(o.addi, r.sp, r.sp, 4))
+        instructions.append('{} {} {} {}'.format(o.bne, r.t0, r.zero, mips_label))
+        
+        return instructions
+
+    @visitor.when(GotoNode)
+    def visit(self, node):
+        instructions = []
+        
+        mips_label = self.get_label(node.label)
+        instructions.append('{} {}'.format(o.j, mips_label))
+        
+        return instructions
+    
+    @visitor.when(LabelNode)
+    def visit(self, node):
+        instructions = []
+        
+        mips_label = self.get_label(node.label)
+        instructions.append('{}:'.format(mips_label))
+        
+        return instructions
+
+# error
+    @visitor.when(ErrorNode)
+    def visit(self, node):
+        instructions = []
+
+        mips_label = self._data_section[node.data.name].label
+        instructions.append('{} {} {}'.format(o.li, r.v0, 4))
+        instructions.append('{} {} {}'.format(o.la, r.a0, mips_label))
+        instructions.append('{}'.format(o.syscall))
+        instructions.append('{} {} {}'.format(o.li, r.v0, 10))
+        instructions.append('{}'.format(o.syscall))
+
+        return instructions
+
+#
+    def string_equals(self):
+        instructions = []
+        
+        instructions.append('{}:'.format('equal_str'))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -24))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t0, 0, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t1, 4, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.a0, 8, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.a1, 12, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t2, 16, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t3, 20, r.sp))
+        instructions.append('{} {} {}'.format(o.move, r.t0, r.a0))
+        instructions.append('{} {} {}'.format(o.move, r.t1, r.a1))
+        instructions.append('{}:'.format('while_equal_str'))
+        instructions.append('{} {} {}({})'.format(o.lb, r.t2, 0, r.t0))
+        instructions.append('{} {} {}({})'.format(o.lb, r.t3, 0, r.t1))
+        instructions.append('{} {} {} {}'.format(o.bne, r.t2, r.t3, 'equal_str_different_strings'))
+        instructions.append('{} {} {} {}'.format(o.beq, r.t2, r.zero, 'first_end_equal_str'))
+        instructions.append('{} {} {} {}'.format(o.beq, r.t3, r.zero, 'second_end_equal_str'))
+        instructions.append('{} {} {} {}'.format(o.addi, r.t1, r.t1, 1))
+        instructions.append('{} {} {} {}'.format(o.addi, r.t0, r.t0, 1))
+        instructions.append('{} {}'.format(o.j, 'while_equal_str'))
+        instructions.append('{}:'.format('equal_str_different_strings'))
+        instructions.append('{} {} {}'.format(o.move, r.v0, r.zero))
+        instructions.append('{} {}'.format(o.j, 'equal_str_end'))
+        instructions.append('{}:'.format('first_end_equal_str'))
+        instructions.append('{} {} {} {}'.format(o.beq, r.t3, r.zero, 'second_end_equal_str'))
+        instructions.append('{} {} {}'.format(o.move, r.v0, r.zero))
+        instructions.append('{} {}'.format(o.j, 'equal_str_end'))
+        instructions.append('{}:'.format('second_end_equal_str'))
+        instructions.append('{} {} {}'.format(o.li, r.v0, 1))
+        instructions.append('{}:'.format('equal_str_end'))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t0, 0, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t1, 4, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.a0, 8, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.a1, 12, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t2, 16, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t3, 20, r.sp))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 24))
+        instructions.append('{} {}'.format(o.jr, r.ra))
+        
+        return instructions
     
     def allocate(self):
         instructions = []
@@ -957,25 +1013,88 @@ class CILToMipsVisitor:
         
         return instructions
     
-    def length(self):
+    def read_string(self):
         instructions = []
         
-        instructions.append('{}:'.format('length'))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -8))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t0, 0, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t1, 4, r.sp))
+        instructions.append('{}:'.format('read_string'))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -28))
+        instructions.append('{} {} {}({})'.format(o.sw, r.ra, 0, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t0, 4, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t1, 8, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.a0, 12, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.a1, 16, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.a2, 20, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t2, 24, r.sp))
+        instructions.append('{} {} {}'.format(o.li, r.t0, 8))
+        instructions.append('{} {} {} {}'.format(o.addi, r.a0, r.t0, 4))
+        instructions.append('{} {}'.format(o.jal, 'allocate'))
+        instructions.append('{} {} {}'.format(o.move, r.t1, r.v0))
+        instructions.append('{} {} {}'.format(o.move, r.t2, r.zero))
+        instructions.append('{}:'.format('while_read_string'))
+        instructions.append('{} {} {} {}'.format(o.addu, r.a0, r.t1, r.t2))
+        instructions.append('{} {} {} {}'.format(o.subu, r.a1, r.t0, r.t2))
+        instructions.append('{} {} {} {}'.format(o.addu, r.t2, r.t2, r.a1))
+        instructions.append('{} {}'.format(o.jal, 'read_string_up_to'))
+        instructions.append('{} {} {} {}'.format(o.beq, r.v0, r.zero, 'read_string_not_finished'))
+        instructions.append('{} {} {}'.format(o.move, r.v0, r.t1))
+        instructions.append('{} {}'.format(o.j, 'end_read_string'))
+        instructions.append('{}:'.format('read_string_not_finished'))
+        instructions.append('{} {} {} {}'.format(o.sll, r.t0, r.t0, 1))
+        instructions.append('{} {} {} {}'.format(o.addi, r.a0, r.t0, 4))
+        instructions.append('{} {}'.format(o.jal, 'allocate'))
+        instructions.append('{} {} {}'.format(o.move, r.a0, r.t1))
+        instructions.append('{} {} {}'.format(o.move, r.t1, r.v0))
+        instructions.append('{} {} {}'.format(o.move, r.a1, r.v0))
+        instructions.append('{} {} {}'.format(o.move, r.a2, r.t2))
+        instructions.append('{} {}'.format(o.jal, 'copy'))
+        instructions.append('{} {}'.format(o.j, 'while_read_string'))
+        instructions.append('{}:'.format('end_read_string'))
+        instructions.append('{} {} {}({})'.format(o.lw, r.ra, 0, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t0, 4, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t1, 8, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.a0, 12, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.a1, 16, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.a2, 20, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t2, 24, r.sp))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 28))
+        instructions.append('{} {}'.format(o.jr, r.ra))
+        instructions.append('{}:'.format('read_string_up_to'))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -28))
+        instructions.append('{} {} {}({})'.format(o.sw, r.ra, 0, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t0, 4, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t1, 8, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t2, 12, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t3, 16, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t4, 20, r.sp))
+        instructions.append('{} {} {}({})'.format(o.sw, r.t5, 24, r.sp))
         instructions.append('{} {} {}'.format(o.move, r.t0, r.a0))
-        instructions.append('{} {} {}'.format(o.move, r.v0, r.zero))
-        instructions.append('{}:'.format('while_len'))
+        instructions.append('{} {} {}'.format(o.move, r.t1, r.zero))
+        instructions.append('{} {} {}'.format(o.li, r.t2, 10))
+        instructions.append('{} {} {} {}'.format(o.addu, r.t3, r.t0, r.a1))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.a1, r.a1, 1))
+        instructions.append('{} {} {}'.format(o.li, r.v0, 8))
+        instructions.append('{}'.format(o.syscall))
+        instructions.append('{} {} {}({})'.format(o.lw, r.a0, 0, r.a0))
+        instructions.append('{} {} {} {}'.format(o.beq, r.a0, r.zero, 'eol_terminated'))
+        instructions.append('{} {} {}'.format(o.li, r.v0, 0))
+        instructions.append('{}:'.format('eol_check'))
+        instructions.append('{} {} {} {}'.format(o.beq, r.t0, r.t3, 'read_loop_continue'))
         instructions.append('{} {} {}({})'.format(o.lb, r.t1, 0, r.t0))
-        instructions.append('{} {} {} {}'.format(o.beq, r.t1, r.zero, 'len_end'))
-        instructions.append('{} {} {} {}'.format(o.addi, r.v0, r.v0, 1))
+        instructions.append('{} {} {} {}'.format(o.beq, r.t1, r.t2, 'eol_terminated'))
         instructions.append('{} {} {} {}'.format(o.addiu, r.t0, r.t0, 1))
-        instructions.append('{} {}'.format(o.j, 'while_len'))
-        instructions.append('{}:'.format('len_end'))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t0, 0, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t1, 4, r.sp))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 8))
+        instructions.append('{} {}'.format(o.j, 'eol_check'))
+        instructions.append('{}:'.format('eol_terminated'))
+        instructions.append('{} {} {}({})'.format(o.sb, r.zero, 0, r.t0))
+        instructions.append('{} {} {}'.format(o.li, r.v0, 1))
+        instructions.append('{}:'.format('read_loop_continue'))
+        instructions.append('{} {} {}({})'.format(o.lw, r.ra, 0, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t0, 4, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t1, 8, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t2, 12, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t3, 16, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t4, 20, r.sp))
+        instructions.append('{} {} {}({})'.format(o.lw, r.t5, 24, r.sp))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 28))
         instructions.append('{} {}'.format(o.jr, r.ra))
         
         return instructions
@@ -1087,137 +1206,31 @@ class CILToMipsVisitor:
         
         return instructions
     
-    def read_string(self):
+    def length(self):
         instructions = []
         
-        instructions.append('{}:'.format('read_string'))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -28))
-        instructions.append('{} {} {}({})'.format(o.sw, r.ra, 0, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t0, 4, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t1, 8, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.a0, 12, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.a1, 16, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.a2, 20, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t2, 24, r.sp))
-        instructions.append('{} {} {}'.format(o.li, r.t0, 8))
-        instructions.append('{} {} {} {}'.format(o.addi, r.a0, r.t0, 4))
-        instructions.append('{} {}'.format(o.jal, 'allocate'))
-        instructions.append('{} {} {}'.format(o.move, r.t1, r.v0))
-        instructions.append('{} {} {}'.format(o.move, r.t2, r.zero))
-        instructions.append('{}:'.format('while_read_string'))
-        instructions.append('{} {} {} {}'.format(o.addu, r.a0, r.t1, r.t2))
-        instructions.append('{} {} {} {}'.format(o.subu, r.a1, r.t0, r.t2))
-        instructions.append('{} {} {} {}'.format(o.addu, r.t2, r.t2, r.a1))
-        instructions.append('{} {}'.format(o.jal, 'read_string_up_to'))
-        instructions.append('{} {} {} {}'.format(o.beq, r.v0, r.zero, 'read_string_not_finished'))
-        instructions.append('{} {} {}'.format(o.move, r.v0, r.t1))
-        instructions.append('{} {}'.format(o.j, 'end_read_string'))
-        instructions.append('{}:'.format('read_string_not_finished'))
-        instructions.append('{} {} {} {}'.format(o.sll, r.t0, r.t0, 1))
-        instructions.append('{} {} {} {}'.format(o.addi, r.a0, r.t0, 4))
-        instructions.append('{} {}'.format(o.jal, 'allocate'))
-        instructions.append('{} {} {}'.format(o.move, r.a0, r.t1))
-        instructions.append('{} {} {}'.format(o.move, r.t1, r.v0))
-        instructions.append('{} {} {}'.format(o.move, r.a1, r.v0))
-        instructions.append('{} {} {}'.format(o.move, r.a2, r.t2))
-        instructions.append('{} {}'.format(o.jal, 'copy'))
-        instructions.append('{} {}'.format(o.j, 'while_read_string'))
-        instructions.append('{}:'.format('end_read_string'))
-        instructions.append('{} {} {}({})'.format(o.lw, r.ra, 0, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t0, 4, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t1, 8, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.a0, 12, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.a1, 16, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.a2, 20, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t2, 24, r.sp))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 28))
-        instructions.append('{} {}'.format(o.jr, r.ra))
-        instructions.append('{}:'.format('read_string_up_to'))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -28))
-        instructions.append('{} {} {}({})'.format(o.sw, r.ra, 0, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t0, 4, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t1, 8, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t2, 12, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t3, 16, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t4, 20, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t5, 24, r.sp))
-        instructions.append('{} {} {}'.format(o.move, r.t0, r.a0))
-        instructions.append('{} {} {}'.format(o.move, r.t1, r.zero))
-        instructions.append('{} {} {}'.format(o.li, r.t2, 10))
-        instructions.append('{} {} {} {}'.format(o.addu, r.t3, r.t0, r.a1))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.a1, r.a1, 1))
-        instructions.append('{} {} {}'.format(o.li, r.v0, 8))
-        instructions.append('{}'.format(o.syscall))
-        instructions.append('{} {} {}({})'.format(o.lw, r.a0, 0, r.a0))
-        instructions.append('{} {} {} {}'.format(o.beq, r.a0, r.zero, 'eol_terminated'))
-        instructions.append('{} {} {}'.format(o.li, r.v0, 0))
-        instructions.append('{}:'.format('eol_check'))
-        instructions.append('{} {} {} {}'.format(o.beq, r.t0, r.t3, 'read_loop_continue'))
-        instructions.append('{} {} {}({})'.format(o.lb, r.t1, 0, r.t0))
-        instructions.append('{} {} {} {}'.format(o.beq, r.t1, r.t2, 'eol_terminated'))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.t0, r.t0, 1))
-        instructions.append('{} {}'.format(o.j, 'eol_check'))
-        instructions.append('{}:'.format('eol_terminated'))
-        instructions.append('{} {} {}({})'.format(o.sb, r.zero, 0, r.t0))
-        instructions.append('{} {} {}'.format(o.li, r.v0, 1))
-        instructions.append('{}:'.format('read_loop_continue'))
-        instructions.append('{} {} {}({})'.format(o.lw, r.ra, 0, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t0, 4, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t1, 8, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t2, 12, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t3, 16, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t4, 20, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t5, 24, r.sp))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 28))
-        instructions.append('{} {}'.format(o.jr, r.ra))
-        
-        return instructions
-    
-    def string_equals(self):
-        instructions = []
-        
-        instructions.append('{}:'.format('equal_str'))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -24))
+        instructions.append('{}:'.format('length'))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, -8))
         instructions.append('{} {} {}({})'.format(o.sw, r.t0, 0, r.sp))
         instructions.append('{} {} {}({})'.format(o.sw, r.t1, 4, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.a0, 8, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.a1, 12, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t2, 16, r.sp))
-        instructions.append('{} {} {}({})'.format(o.sw, r.t3, 20, r.sp))
         instructions.append('{} {} {}'.format(o.move, r.t0, r.a0))
-        instructions.append('{} {} {}'.format(o.move, r.t1, r.a1))
-        instructions.append('{}:'.format('while_equal_str'))
-        instructions.append('{} {} {}({})'.format(o.lb, r.t2, 0, r.t0))
-        instructions.append('{} {} {}({})'.format(o.lb, r.t3, 0, r.t1))
-        instructions.append('{} {} {} {}'.format(o.bne, r.t2, r.t3, 'equal_str_different_strings'))
-        instructions.append('{} {} {} {}'.format(o.beq, r.t2, r.zero, 'first_end_equal_str'))
-        instructions.append('{} {} {} {}'.format(o.beq, r.t3, r.zero, 'second_end_equal_str'))
-        instructions.append('{} {} {} {}'.format(o.addi, r.t1, r.t1, 1))
-        instructions.append('{} {} {} {}'.format(o.addi, r.t0, r.t0, 1))
-        instructions.append('{} {}'.format(o.j, 'while_equal_str'))
-        instructions.append('{}:'.format('equal_str_different_strings'))
         instructions.append('{} {} {}'.format(o.move, r.v0, r.zero))
-        instructions.append('{} {}'.format(o.j, 'equal_str_end'))
-        instructions.append('{}:'.format('first_end_equal_str'))
-        instructions.append('{} {} {} {}'.format(o.beq, r.t3, r.zero, 'second_end_equal_str'))
-        instructions.append('{} {} {}'.format(o.move, r.v0, r.zero))
-        instructions.append('{} {}'.format(o.j, 'equal_str_end'))
-        instructions.append('{}:'.format('second_end_equal_str'))
-        instructions.append('{} {} {}'.format(o.li, r.v0, 1))
-        instructions.append('{}:'.format('equal_str_end'))
+        instructions.append('{}:'.format('while_len'))
+        instructions.append('{} {} {}({})'.format(o.lb, r.t1, 0, r.t0))
+        instructions.append('{} {} {} {}'.format(o.beq, r.t1, r.zero, 'len_end'))
+        instructions.append('{} {} {} {}'.format(o.addi, r.v0, r.v0, 1))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.t0, r.t0, 1))
+        instructions.append('{} {}'.format(o.j, 'while_len'))
+        instructions.append('{}:'.format('len_end'))
         instructions.append('{} {} {}({})'.format(o.lw, r.t0, 0, r.sp))
         instructions.append('{} {} {}({})'.format(o.lw, r.t1, 4, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.a0, 8, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.a1, 12, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t2, 16, r.sp))
-        instructions.append('{} {} {}({})'.format(o.lw, r.t3, 20, r.sp))
-        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 24))
+        instructions.append('{} {} {} {}'.format(o.addiu, r.sp, r.sp, 8))
         instructions.append('{} {}'.format(o.jr, r.ra))
         
         return instructions
     
     def define_util_functions(self):
-        instructions = [self.allocate(), self.copy(), self.length(), self.concat(), self.substring(), self.string_equals(), self.read_string()]
+        instructions = [self.string_equals(), self.allocate(), self.copy(), self.read_string(), self.substring(), self.concat(), self.length()]
         
         code = '\n\n'.join('\n'.join(i for i in j) for j in instructions)
         return code
