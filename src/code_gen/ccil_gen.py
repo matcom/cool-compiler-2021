@@ -262,8 +262,6 @@ class CCILGenerator:
     def visit(self, node: sem_ast.ConditionalNode) -> VISITOR_RESULT:
         times = self.times(node)
 
-        print(type(node.condition).__name__)
-        print(node.condition)
         (if_ops, if_fval) = self.visit(node.condition)
         (then_ops, then_fval) = self.visit(node.then_body)
         (else_ops, else_fval) = self.visit(node.else_body)
@@ -506,7 +504,6 @@ class CCILGenerator:
 
         fval = self.create_storage(fval_id, node.type.name, op)
         return ([*left_ops, *right_ops, fval], fval)
-
 
     @visitor.when(sem_ast.UnaryNode)
     def visit(self, node: sem_ast.UnaryNode) -> VISITOR_RESULT:
@@ -829,7 +826,7 @@ class CCILGenerator:
         substr = self.create_storage(
             "substr_var",
             STRING,
-            SubstringOpNode(IdNode(start_index.id), IdNode(take.id)),
+            SubstringOpNode(IdNode(start_index.id), IdNode(take.id), IdNode("self")),
         )
         goto_ok = GoToNode(ok_label)
         operations = [

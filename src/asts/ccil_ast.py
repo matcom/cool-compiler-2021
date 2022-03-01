@@ -14,7 +14,7 @@ class CCILProgram:
     code_section: List[FunctionNode]
     data_section: List[Data]
 
-    def __str__(self, all=False) -> str:
+    def __str__(self, all=True) -> str:
         types_section = self.types_section
         code_section = self.code_section
         if not all:
@@ -380,13 +380,14 @@ class ConcatOpNode(ChainOpNode):
 
 
 class SubstringOpNode(ReturnOpNode):
-    def __init__(self, start: AtomOpNode, length: AtomOpNode) -> None:
+    def __init__(self, start: AtomOpNode, length: AtomOpNode, target: IdNode) -> None:
         super().__init__()
         self.start = start
         self.length = length
+        self.target = target
 
     def __str__(self) -> str:
-        return f"substr {self.start.value} {self.length.value}"
+        return f"substr {self.target.value} {self.start.value} {self.length.value}"
 
 
 class AtomOpNode(ReturnOpNode):
