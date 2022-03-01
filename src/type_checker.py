@@ -11,7 +11,7 @@ SELF_IS_READONLY = '(%s, %s) - TypeError: Variable "self" is read-only.'
 LOCAL_ALREADY_DEFINED = '(%s, %s) - SemanticError: Variable "%s" is already defined in method "%s".'
 ATTR_ALREADY_DEFINED = '(%s, %s) - SemanticError: Attribute "%s" is already defined in ancestor class.'
 INCOMPATIBLE_TYPES = '(%s, %s) - TypeError: Cannot convert "%s" into "%s".'
-VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Variable "%s" is not defined in "%s".'
+VARIABLE_NOT_DEFINED = '(%s, %s) - NameError: Variable "%s" is not defined".'
 INVALID_OPERATION = '(%s, %s) - TypeError: Operation is not defined between "%s" and "%s".'
 METHOD_ARGS_UNMATCHED = '(%s, %s) - SemanticError: Method "%s" arguments do not match with definition.'
 
@@ -307,7 +307,7 @@ class TypeChecker:
         var, scope_id = scope.my_find_var(node.id)
         if var is None:
             self.errors.append(
-                VARIABLE_NOT_DEFINED % (node.lineno, node.colno, node.id, self.current_method.name)
+                VARIABLE_NOT_DEFINED % (node.lineno, node.colno, node.id)
             )
             var_type = error_type
         else:
@@ -435,7 +435,7 @@ class TypeChecker:
         var, scope_id = scope.my_find_var(node.lex)
         if var is None:
             self.errors.append(
-                VARIABLE_NOT_DEFINED % (node.lineno, node.colno, node.lex, self.current_method.name)
+                VARIABLE_NOT_DEFINED % (node.lineno, node.colno, node.lex)
             )
             error_type = self.context.get_type(BasicTypes.ERROR.value)
             return error_type
