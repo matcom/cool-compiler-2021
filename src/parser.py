@@ -49,7 +49,7 @@ def p_def_class(p):
               | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE SEMICOLON
     """
     if len(p) == 7:
-        p[0] = ast.ClassDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(2)), p[2], p[4])
+        p[0] = ast.ClassDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(2)), p[2], p[4], 'Object')
     else:
         p[0] = ast.ClassDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(2)), p[2], p[6], p[4])
 
@@ -355,7 +355,8 @@ def p_func_call(p):
     if len(p) == 7:
         p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])
     elif len(p) == 5:
-        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), None, p[1], p[3])
+        self = ast.VariableNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), 'self')
+        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), self, p[1], p[3])
     elif len(p) == 9:
         p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[5], p[7], p[3])
 
