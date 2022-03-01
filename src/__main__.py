@@ -7,7 +7,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]
     else:
-        # input_file = "./tests/codegen/fib.cl"
+        # input_file = "./tests/codegen/basic.cl"
         raise Exception("Incorrect number of arguments")
     
     program_file = open(input_file)

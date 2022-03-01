@@ -24,129 +24,129 @@ data_10: .asciiz ""
 .word 0
 data_11: .asciiz "Abort called from class "
 .word 0
-data_12: .asciiz "Substring out of range"
+data_12: .asciiz "Index out of range exception"
 .word 0
-data_13: .asciiz "RuntimeError: Function call in a void instance"
+data_13: .asciiz "Function call in a void instance"
 .word 0
-data_14: .asciiz "RuntimeError: Function call in a void instance"
+data_14: .asciiz "Function call in a void instance"
 .word 0
-data_15: .asciiz "RuntimeError: Function call in a void instance"
+data_15: .asciiz "Function call in a void instance"
 .word 0
 data_16: .asciiz "\n"
 .word 0
-data_17: .asciiz "RuntimeError: Function call in a void instance"
+data_17: .asciiz "Function call in a void instance"
 .word 0
-data_18: .asciiz "RuntimeError: Function call in a void instance"
+data_18: .asciiz "Function call in a void instance"
 .word 0
-data_19: .asciiz "RuntimeError: Function call in a void instance"
+data_19: .asciiz "Function call in a void instance"
 .word 0
 data_20: .asciiz "\n"
 .word 0
-data_21: .asciiz "RuntimeError: Function call in a void instance"
+data_21: .asciiz "Function call in a void instance"
 .word 0
 data_22: .asciiz "\n"
 .word 0
-data_23: .asciiz "RuntimeError: Function call in a void instance"
+data_23: .asciiz "Function call in a void instance"
 .word 0
-data_24: .asciiz "RuntimeError: Function call in a void instance"
+data_24: .asciiz "Function call in a void instance"
 .word 0
-data_25: .asciiz "RuntimeError: Function call in a void instance"
+data_25: .asciiz "Function call in a void instance"
 .word 0
 data_26: .asciiz " "
 .word 0
-data_27: .asciiz "RuntimeError: Function call in a void instance"
+data_27: .asciiz "Function call in a void instance"
 .word 0
 data_28: .asciiz " "
 .word 0
-data_29: .asciiz "RuntimeError: Function call in a void instance"
+data_29: .asciiz "Function call in a void instance"
 .word 0
 data_30: .asciiz " "
 .word 0
-data_31: .asciiz "RuntimeError: Division by zero"
+data_31: .asciiz "Division by zero exception"
 .word 0
-data_32: .asciiz "RuntimeError: Function call in a void instance"
+data_32: .asciiz "Function call in a void instance"
 .word 0
 data_33: .asciiz " "
 .word 0
-data_34: .asciiz "RuntimeError: Division by zero"
+data_34: .asciiz "Division by zero exception"
 .word 0
-data_35: .asciiz "RuntimeError: Function call in a void instance"
+data_35: .asciiz "Function call in a void instance"
 .word 0
 data_36: .asciiz " "
 .word 0
 data_37: .asciiz " "
 .word 0
-data_38: .asciiz "RuntimeError: Division by zero"
+data_38: .asciiz "Division by zero exception"
 .word 0
-data_39: .asciiz "RuntimeError: Function call in a void instance"
+data_39: .asciiz "Function call in a void instance"
 .word 0
 data_40: .asciiz " "
 .word 0
 data_41: .asciiz " "
 .word 0
-data_42: .asciiz "RuntimeError: Division by zero"
+data_42: .asciiz "Division by zero exception"
 .word 0
-data_43: .asciiz "RuntimeError: Function call in a void instance"
+data_43: .asciiz "Function call in a void instance"
 .word 0
 data_44: .asciiz " "
 .word 0
 data_45: .asciiz " "
 .word 0
-data_46: .asciiz "RuntimeError: Division by zero"
+data_46: .asciiz "Division by zero exception"
 .word 0
-data_47: .asciiz "RuntimeError: Function call in a void instance"
+data_47: .asciiz "Function call in a void instance"
 .word 0
 data_48: .asciiz " "
 .word 0
 data_49: .asciiz " "
 .word 0
-data_50: .asciiz "RuntimeError: Division by zero"
+data_50: .asciiz "Division by zero exception"
 .word 0
-data_51: .asciiz "RuntimeError: Function call in a void instance"
+data_51: .asciiz "Function call in a void instance"
 .word 0
 data_52: .asciiz " "
 .word 0
 data_53: .asciiz " "
 .word 0
-data_54: .asciiz "RuntimeError: Function call in a void instance"
+data_54: .asciiz "Function call in a void instance"
 .word 0
 data_55: .asciiz "X"
 .word 0
-data_56: .asciiz "RuntimeError: Function call in a void instance"
+data_56: .asciiz "Function call in a void instance"
 .word 0
 data_57: .asciiz "X"
 .word 0
-data_58: .asciiz "RuntimeError: Function call in a void instance"
+data_58: .asciiz "Function call in a void instance"
 .word 0
 data_59: .asciiz "X"
 .word 0
-data_60: .asciiz "RuntimeError: Function call in a void instance"
+data_60: .asciiz "Function call in a void instance"
 .word 0
 data_61: .asciiz "X"
 .word 0
-data_62: .asciiz "RuntimeError: Function call in a void instance"
+data_62: .asciiz "Function call in a void instance"
 .word 0
 data_63: .asciiz "X"
 .word 0
-data_64: .asciiz "RuntimeError: Function call in a void instance"
+data_64: .asciiz "Function call in a void instance"
 .word 0
 data_65: .asciiz "X"
 .word 0
-data_66: .asciiz "RuntimeError: Function call in a void instance"
+data_66: .asciiz "Function call in a void instance"
 .word 0
 data_67: .asciiz "X"
 .word 0
-data_68: .asciiz "RuntimeError: Function call in a void instance"
+data_68: .asciiz "Function call in a void instance"
 .word 0
 data_69: .asciiz "X"
 .word 0
-data_70: .asciiz "RuntimeError: Function call in a void instance"
+data_70: .asciiz "Function call in a void instance"
 .word 0
-data_71: .asciiz "RuntimeError: Function call in a void instance"
+data_71: .asciiz "Function call in a void instance"
 .word 0
 data_72: .asciiz "-"
 .word 0
-data_73: .asciiz "RuntimeError: Function call in a void instance"
+data_73: .asciiz "Function call in a void instance"
 .word 0
 data_74: .asciiz "X"
 .word 0
@@ -156,109 +156,109 @@ data_76: .asciiz "X"
 .word 0
 data_77: .asciiz "X"
 .word 0
-data_78: .asciiz "RuntimeError: Function call in a void instance"
+data_78: .asciiz "Function call in a void instance"
 .word 0
-data_79: .asciiz "RuntimeError: Function call in a void instance"
+data_79: .asciiz "Function call in a void instance"
 .word 0
-data_80: .asciiz "RuntimeError: Function call in a void instance"
+data_80: .asciiz "Function call in a void instance"
 .word 0
 data_81: .asciiz "\nPlease chose a number:\n"
 .word 0
-data_82: .asciiz "RuntimeError: Function call in a void instance"
+data_82: .asciiz "Function call in a void instance"
 .word 0
 data_83: .asciiz "\t1: A cross\n"
 .word 0
-data_84: .asciiz "RuntimeError: Function call in a void instance"
+data_84: .asciiz "Function call in a void instance"
 .word 0
 data_85: .asciiz "\t2: A slash from the upper left to lower right\n"
 .word 0
-data_86: .asciiz "RuntimeError: Function call in a void instance"
+data_86: .asciiz "Function call in a void instance"
 .word 0
 data_87: .asciiz "\t3: A slash from the upper right to lower left\n"
 .word 0
-data_88: .asciiz "RuntimeError: Function call in a void instance"
+data_88: .asciiz "Function call in a void instance"
 .word 0
 data_89: .asciiz "\t4: An X\n"
 .word 0
-data_90: .asciiz "RuntimeError: Function call in a void instance"
+data_90: .asciiz "Function call in a void instance"
 .word 0
 data_91: .asciiz "\t5: A greater than sign \n"
 .word 0
-data_92: .asciiz "RuntimeError: Function call in a void instance"
+data_92: .asciiz "Function call in a void instance"
 .word 0
 data_93: .asciiz "\t6: A less than sign\n"
 .word 0
-data_94: .asciiz "RuntimeError: Function call in a void instance"
+data_94: .asciiz "Function call in a void instance"
 .word 0
 data_95: .asciiz "\t7: Two greater than signs\n"
 .word 0
-data_96: .asciiz "RuntimeError: Function call in a void instance"
+data_96: .asciiz "Function call in a void instance"
 .word 0
 data_97: .asciiz "\t8: Two less than signs\n"
 .word 0
-data_98: .asciiz "RuntimeError: Function call in a void instance"
+data_98: .asciiz "Function call in a void instance"
 .word 0
 data_99: .asciiz "\t9: A 'V'\n"
 .word 0
-data_100: .asciiz "RuntimeError: Function call in a void instance"
+data_100: .asciiz "Function call in a void instance"
 .word 0
 data_101: .asciiz "\t10: An inverse 'V'\n"
 .word 0
-data_102: .asciiz "RuntimeError: Function call in a void instance"
+data_102: .asciiz "Function call in a void instance"
 .word 0
 data_103: .asciiz "\t11: Numbers 9 and 10 combined\n"
 .word 0
-data_104: .asciiz "RuntimeError: Function call in a void instance"
+data_104: .asciiz "Function call in a void instance"
 .word 0
 data_105: .asciiz "\t12: A full grid\n"
 .word 0
-data_106: .asciiz "RuntimeError: Function call in a void instance"
+data_106: .asciiz "Function call in a void instance"
 .word 0
 data_107: .asciiz "\t13: A 'T'\n"
 .word 0
-data_108: .asciiz "RuntimeError: Function call in a void instance"
+data_108: .asciiz "Function call in a void instance"
 .word 0
 data_109: .asciiz "\t14: A plus '+'\n"
 .word 0
-data_110: .asciiz "RuntimeError: Function call in a void instance"
+data_110: .asciiz "Function call in a void instance"
 .word 0
 data_111: .asciiz "\t15: A 'W'\n"
 .word 0
-data_112: .asciiz "RuntimeError: Function call in a void instance"
+data_112: .asciiz "Function call in a void instance"
 .word 0
 data_113: .asciiz "\t16: An 'M'\n"
 .word 0
-data_114: .asciiz "RuntimeError: Function call in a void instance"
+data_114: .asciiz "Function call in a void instance"
 .word 0
 data_115: .asciiz "\t17: An 'E'\n"
 .word 0
-data_116: .asciiz "RuntimeError: Function call in a void instance"
+data_116: .asciiz "Function call in a void instance"
 .word 0
 data_117: .asciiz "\t18: A '3'\n"
 .word 0
-data_118: .asciiz "RuntimeError: Function call in a void instance"
+data_118: .asciiz "Function call in a void instance"
 .word 0
 data_119: .asciiz "\t19: An 'O'\n"
 .word 0
-data_120: .asciiz "RuntimeError: Function call in a void instance"
+data_120: .asciiz "Function call in a void instance"
 .word 0
 data_121: .asciiz "\t20: An '8'\n"
 .word 0
-data_122: .asciiz "RuntimeError: Function call in a void instance"
+data_122: .asciiz "Function call in a void instance"
 .word 0
 data_123: .asciiz "\t21: An 'S'\n"
 .word 0
-data_124: .asciiz "RuntimeError: Function call in a void instance"
+data_124: .asciiz "Function call in a void instance"
 .word 0
 data_125: .asciiz "Your choice => "
 .word 0
-data_126: .asciiz "RuntimeError: Function call in a void instance"
+data_126: .asciiz "Function call in a void instance"
 .word 0
-data_127: .asciiz "RuntimeError: Function call in a void instance"
+data_127: .asciiz "Function call in a void instance"
 .word 0
 data_128: .asciiz "\n"
 .word 0
-data_129: .asciiz "RuntimeError: Function call in a void instance"
+data_129: .asciiz "Function call in a void instance"
 .word 0
 data_130: .asciiz "                         "
 .word 0
@@ -306,57 +306,57 @@ data_151: .asciiz " XX  XXXX XXXX  XX  "
 .word 0
 data_152: .asciiz "Would you like to continue with the next generation? \n"
 .word 0
-data_153: .asciiz "RuntimeError: Function call in a void instance"
+data_153: .asciiz "Function call in a void instance"
 .word 0
 data_154: .asciiz "Please use lowercase y or n for your answer [y]: "
 .word 0
-data_155: .asciiz "RuntimeError: Function call in a void instance"
+data_155: .asciiz "Function call in a void instance"
 .word 0
-data_156: .asciiz "RuntimeError: Function call in a void instance"
+data_156: .asciiz "Function call in a void instance"
 .word 0
 data_157: .asciiz "\n"
 .word 0
-data_158: .asciiz "RuntimeError: Function call in a void instance"
+data_158: .asciiz "Function call in a void instance"
 .word 0
 data_159: .asciiz "n"
 .word 0
 data_160: .asciiz "\n\n"
 .word 0
-data_161: .asciiz "RuntimeError: Function call in a void instance"
+data_161: .asciiz "Function call in a void instance"
 .word 0
 data_162: .asciiz "Would you like to choose a background pattern? \n"
 .word 0
-data_163: .asciiz "RuntimeError: Function call in a void instance"
+data_163: .asciiz "Function call in a void instance"
 .word 0
 data_164: .asciiz "Please use lowercase y or n for your answer [n]: "
 .word 0
-data_165: .asciiz "RuntimeError: Function call in a void instance"
+data_165: .asciiz "Function call in a void instance"
 .word 0
-data_166: .asciiz "RuntimeError: Function call in a void instance"
+data_166: .asciiz "Function call in a void instance"
 .word 0
 data_167: .asciiz "y"
 .word 0
 data_168: .asciiz "Welcome to the Game of Life.\n"
 .word 0
-data_169: .asciiz "RuntimeError: Function call in a void instance"
+data_169: .asciiz "Function call in a void instance"
 .word 0
 data_170: .asciiz "There are many initial states to choose from. \n"
 .word 0
-data_171: .asciiz "RuntimeError: Function call in a void instance"
+data_171: .asciiz "Function call in a void instance"
 .word 0
-data_172: .asciiz "RuntimeError: Function call in a void instance"
+data_172: .asciiz "Function call in a void instance"
 .word 0
-data_173: .asciiz "RuntimeError: Function call in a void instance"
+data_173: .asciiz "Function call in a void instance"
 .word 0
-data_174: .asciiz "RuntimeError: Function call in a void instance"
+data_174: .asciiz "Function call in a void instance"
 .word 0
-data_175: .asciiz "RuntimeError: Function call in a void instance"
+data_175: .asciiz "Function call in a void instance"
 .word 0
-data_176: .asciiz "RuntimeError: Function call in a void instance"
+data_176: .asciiz "Function call in a void instance"
 .word 0
-data_177: .asciiz "RuntimeError: Function call in a void instance"
+data_177: .asciiz "Function call in a void instance"
 .word 0
-data_178: .asciiz "RuntimeError: Function call in a void instance"
+data_178: .asciiz "Function call in a void instance"
 
 
 types_table:
@@ -383,7 +383,7 @@ type_1_dispatch:
 .word function_abort_at_Object
 .word function_type_name_at_Object
 .word function_copy_at_Object
-.word __init_at_Object
+.word __ctor_Object
 
 type_1_prototype:
 .word 0
@@ -400,7 +400,7 @@ type_2_dispatch:
 .word function_out_int_at_IO
 .word function_in_string_at_IO
 .word function_in_int_at_IO
-.word __init_at_IO
+.word __ctor_IO
 
 type_2_prototype:
 .word 1
@@ -416,7 +416,7 @@ type_3_dispatch:
 .word function_length_at_String
 .word function_concat_at_String
 .word function_substr_at_String
-.word __init_at_String
+.word __ctor_String
 
 type_3_prototype:
 .word 2
@@ -431,7 +431,7 @@ type_4_dispatch:
 .word function_abort_at_Object
 .word function_type_name_at_Object
 .word function_copy_at_Object
-.word __init_at_Int
+.word __ctor_Int
 
 type_4_prototype:
 .word 3
@@ -445,7 +445,7 @@ type_5_dispatch:
 .word function_abort_at_Object
 .word function_type_name_at_Object
 .word function_copy_at_Object
-.word __init_at_Bool
+.word __ctor_Bool
 
 type_5_prototype:
 .word 4
@@ -465,8 +465,8 @@ type_6_dispatch:
 .word function_out_string_at_IO
 .word function_board_init_at_Board
 .word function_size_of_board_at_Board
-.word __init_attr_at_Board
-.word __init_at_Board
+.word __attributes_ctor_Board
+.word __ctor_Board
 
 type_6_prototype:
 .word 5
@@ -506,8 +506,8 @@ type_7_dispatch:
 .word function_southeast_at_CellularAutomaton
 .word function_southwest_at_CellularAutomaton
 .word function_west_at_CellularAutomaton
-.word __init_attr_at_CellularAutomaton
-.word __init_at_CellularAutomaton
+.word __attributes_ctor_CellularAutomaton
+.word __ctor_CellularAutomaton
 
 type_7_prototype:
 .word 6
@@ -549,8 +549,8 @@ type_8_dispatch:
 .word function_southwest_at_CellularAutomaton
 .word function_west_at_CellularAutomaton
 .word function_main_at_Main
-.word __init_attr_at_Main
-.word __init_at_Main
+.word __attributes_ctor_Main
+.word __ctor_Main
 
 type_8_prototype:
 .word 7
@@ -566,31 +566,7 @@ type_8_prototype:
 
 .text
 .globl main
-main:
-addi $sp $sp -4
-sw $ra 0($sp)
-addi $sp $sp -4
-sw $fp 0($sp)
-addi $fp $sp 8
-addi $sp $sp -4
-jal __init_at_Main
-sw $v0 -12($fp)
-lw $t0 -12($fp)
-addi $sp $sp -4
-sw $t0 0($sp)
-jal function_main_at_Main
-addi $sp $sp 4
-sw $v0 -12($fp)
-li $v0 0
-addi $sp $sp 4
-lw $fp 0($sp)
-addi $sp $sp 4
-lw $ra 0($sp)
-addi $sp $sp 4
-li $v0 10
-syscall
-
-__init_at_Object:
+__ctor_Object:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -671,7 +647,7 @@ sw $t1 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -706,7 +682,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_IO:
+__ctor_IO:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -788,7 +764,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -812,7 +788,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -823,7 +799,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_String:
+__ctor_String:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -852,7 +828,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -20($fp)
@@ -921,7 +897,7 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -980,7 +956,7 @@ sw $v0 -44($fp)
 lw $t0 -44($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
@@ -991,7 +967,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_Int:
+__ctor_Int:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1022,7 +998,7 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_Bool:
+__ctor_Bool:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
@@ -1053,17 +1029,41 @@ lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_attr_at_Board:
+main:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -24
+addi $sp $sp -4
+jal __ctor_Main
+sw $v0 -12($fp)
+lw $t0 -12($fp)
+addi $sp $sp -4
+sw $t0 0($sp)
+jal function_main_at_Main
+addi $sp $sp 4
+sw $v0 -12($fp)
+li $v0 0
+addi $sp $sp 4
+lw $fp 0($sp)
+addi $sp $sp 4
+lw $ra 0($sp)
+addi $sp $sp 4
+li $v0 10
+syscall
+
+__attributes_ctor_Board:
+addi $sp $sp -4
+sw $ra 0($sp)
+addi $sp $sp -4
+sw $fp 0($sp)
+addi $fp $sp 8
+addi $sp $sp -12
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 0($fp)
@@ -1072,7 +1072,7 @@ sw $t1 20($t0)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -16($fp)
 lw $t0 0($fp)
@@ -1081,14 +1081,14 @@ sw $t1 16($t0)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 0($fp)
 lw $t1 -12($fp)
 sw $t1 12($t0)
 lw $v0 0($fp)
-addi $sp $sp 24
+addi $sp $sp 12
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -1101,7 +1101,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -20
+addi $sp $sp -8
 lw $t0 0($fp)
 li $t1 0
 seq $t0 $t0 $t1
@@ -1130,7 +1130,7 @@ jalr $ra $t0
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 20
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -1143,7 +1143,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -368
+addi $sp $sp -356
 lw $t0 4($fp)
 li $t1 0
 seq $t0 $t0 $t1
@@ -1179,7 +1179,7 @@ sw $t0 -364($fp)
 li $t0 15
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -308($fp)
 lw $t0 -364($fp)
@@ -1188,7 +1188,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -332($fp)
+sw $t1 -336($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -1196,25 +1196,25 @@ sw $t0 -328($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -324($fp)
+sw $t0 -320($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -320($fp)
-lw $t0 -332($fp)
+sw $t0 -324($fp)
+lw $t0 -336($fp)
 lw $t1 -328($fp)
 seq $t0 $t0 $t1
 sw $t0 -316($fp)
 lw $t0 -316($fp)
 bne $t0 $zero label_7
-lw $t0 -332($fp)
-lw $t1 -324($fp)
+lw $t0 -336($fp)
+lw $t1 -320($fp)
 seq $t0 $t0 $t1
 sw $t0 -316($fp)
 lw $t0 -316($fp)
 bne $t0 $zero label_8
-lw $t0 -332($fp)
-lw $t1 -320($fp)
+lw $t0 -336($fp)
+lw $t1 -324($fp)
 seq $t0 $t0 $t1
 sw $t0 -316($fp)
 lw $t0 -316($fp)
@@ -1230,9 +1230,9 @@ lw $t1 12($t0)
 sw $t1 -340($fp)
 lw $t0 -308($fp)
 lw $t1 12($t0)
-sw $t1 -336($fp)
+sw $t1 -332($fp)
 lw $t0 -340($fp)
-lw $t1 -336($fp)
+lw $t1 -332($fp)
 seq $t0 $t0 $t1
 sw $t0 -312($fp)
 j label_10
@@ -1242,10 +1242,10 @@ lw $t1 12($t0)
 sw $t1 -340($fp)
 lw $t0 -308($fp)
 lw $t1 12($t0)
-sw $t1 -336($fp)
+sw $t1 -332($fp)
 lw $t0 -340($fp)
 move $a0 $t0
-lw $t0 -336($fp)
+lw $t0 -332($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -312($fp)
@@ -1256,9 +1256,9 @@ lw $t1 12($t0)
 sw $t1 -340($fp)
 lw $t0 -308($fp)
 lw $t1 12($t0)
-sw $t1 -336($fp)
+sw $t1 -332($fp)
 lw $t0 -340($fp)
-lw $t1 -336($fp)
+lw $t1 -332($fp)
 seq $t0 $t0 $t1
 sw $t0 -312($fp)
 j label_10
@@ -1266,7 +1266,7 @@ label_10:
 lw $t0 -312($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -344($fp)
 lw $t0 -344($fp)
@@ -1277,7 +1277,7 @@ bne $t0 $zero label_41
 li $t0 16
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -260($fp)
 lw $t0 -364($fp)
@@ -1286,7 +1286,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -284($fp)
+sw $t1 -288($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -1294,25 +1294,25 @@ sw $t0 -280($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -276($fp)
+sw $t0 -272($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -272($fp)
-lw $t0 -284($fp)
+sw $t0 -276($fp)
+lw $t0 -288($fp)
 lw $t1 -280($fp)
 seq $t0 $t0 $t1
 sw $t0 -268($fp)
 lw $t0 -268($fp)
 bne $t0 $zero label_11
-lw $t0 -284($fp)
-lw $t1 -276($fp)
+lw $t0 -288($fp)
+lw $t1 -272($fp)
 seq $t0 $t0 $t1
 sw $t0 -268($fp)
 lw $t0 -268($fp)
 bne $t0 $zero label_12
-lw $t0 -284($fp)
-lw $t1 -272($fp)
+lw $t0 -288($fp)
+lw $t1 -276($fp)
 seq $t0 $t0 $t1
 sw $t0 -268($fp)
 lw $t0 -268($fp)
@@ -1328,9 +1328,9 @@ lw $t1 12($t0)
 sw $t1 -292($fp)
 lw $t0 -260($fp)
 lw $t1 12($t0)
-sw $t1 -288($fp)
+sw $t1 -284($fp)
 lw $t0 -292($fp)
-lw $t1 -288($fp)
+lw $t1 -284($fp)
 seq $t0 $t0 $t1
 sw $t0 -264($fp)
 j label_14
@@ -1340,10 +1340,10 @@ lw $t1 12($t0)
 sw $t1 -292($fp)
 lw $t0 -260($fp)
 lw $t1 12($t0)
-sw $t1 -288($fp)
+sw $t1 -284($fp)
 lw $t0 -292($fp)
 move $a0 $t0
-lw $t0 -288($fp)
+lw $t0 -284($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -264($fp)
@@ -1354,9 +1354,9 @@ lw $t1 12($t0)
 sw $t1 -292($fp)
 lw $t0 -260($fp)
 lw $t1 12($t0)
-sw $t1 -288($fp)
+sw $t1 -284($fp)
 lw $t0 -292($fp)
-lw $t1 -288($fp)
+lw $t1 -284($fp)
 seq $t0 $t0 $t1
 sw $t0 -264($fp)
 j label_14
@@ -1364,7 +1364,7 @@ label_14:
 lw $t0 -264($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -296($fp)
 lw $t0 -296($fp)
@@ -1375,7 +1375,7 @@ bne $t0 $zero label_39
 li $t0 20
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -212($fp)
 lw $t0 -364($fp)
@@ -1384,7 +1384,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -236($fp)
+sw $t1 -240($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -1392,25 +1392,25 @@ sw $t0 -232($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -228($fp)
+sw $t0 -224($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -224($fp)
-lw $t0 -236($fp)
+sw $t0 -228($fp)
+lw $t0 -240($fp)
 lw $t1 -232($fp)
 seq $t0 $t0 $t1
 sw $t0 -220($fp)
 lw $t0 -220($fp)
 bne $t0 $zero label_15
-lw $t0 -236($fp)
-lw $t1 -228($fp)
+lw $t0 -240($fp)
+lw $t1 -224($fp)
 seq $t0 $t0 $t1
 sw $t0 -220($fp)
 lw $t0 -220($fp)
 bne $t0 $zero label_16
-lw $t0 -236($fp)
-lw $t1 -224($fp)
+lw $t0 -240($fp)
+lw $t1 -228($fp)
 seq $t0 $t0 $t1
 sw $t0 -220($fp)
 lw $t0 -220($fp)
@@ -1426,9 +1426,9 @@ lw $t1 12($t0)
 sw $t1 -244($fp)
 lw $t0 -212($fp)
 lw $t1 12($t0)
-sw $t1 -240($fp)
+sw $t1 -236($fp)
 lw $t0 -244($fp)
-lw $t1 -240($fp)
+lw $t1 -236($fp)
 seq $t0 $t0 $t1
 sw $t0 -216($fp)
 j label_18
@@ -1438,10 +1438,10 @@ lw $t1 12($t0)
 sw $t1 -244($fp)
 lw $t0 -212($fp)
 lw $t1 12($t0)
-sw $t1 -240($fp)
+sw $t1 -236($fp)
 lw $t0 -244($fp)
 move $a0 $t0
-lw $t0 -240($fp)
+lw $t0 -236($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -216($fp)
@@ -1452,9 +1452,9 @@ lw $t1 12($t0)
 sw $t1 -244($fp)
 lw $t0 -212($fp)
 lw $t1 12($t0)
-sw $t1 -240($fp)
+sw $t1 -236($fp)
 lw $t0 -244($fp)
-lw $t1 -240($fp)
+lw $t1 -236($fp)
 seq $t0 $t0 $t1
 sw $t0 -216($fp)
 j label_18
@@ -1462,7 +1462,7 @@ label_18:
 lw $t0 -216($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -248($fp)
 lw $t0 -248($fp)
@@ -1473,7 +1473,7 @@ bne $t0 $zero label_37
 li $t0 21
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -164($fp)
 lw $t0 -364($fp)
@@ -1482,7 +1482,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -188($fp)
+sw $t1 -192($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -1490,25 +1490,25 @@ sw $t0 -184($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -180($fp)
+sw $t0 -176($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -176($fp)
-lw $t0 -188($fp)
+sw $t0 -180($fp)
+lw $t0 -192($fp)
 lw $t1 -184($fp)
 seq $t0 $t0 $t1
 sw $t0 -172($fp)
 lw $t0 -172($fp)
 bne $t0 $zero label_19
-lw $t0 -188($fp)
-lw $t1 -180($fp)
+lw $t0 -192($fp)
+lw $t1 -176($fp)
 seq $t0 $t0 $t1
 sw $t0 -172($fp)
 lw $t0 -172($fp)
 bne $t0 $zero label_20
-lw $t0 -188($fp)
-lw $t1 -176($fp)
+lw $t0 -192($fp)
+lw $t1 -180($fp)
 seq $t0 $t0 $t1
 sw $t0 -172($fp)
 lw $t0 -172($fp)
@@ -1524,9 +1524,9 @@ lw $t1 12($t0)
 sw $t1 -196($fp)
 lw $t0 -164($fp)
 lw $t1 12($t0)
-sw $t1 -192($fp)
+sw $t1 -188($fp)
 lw $t0 -196($fp)
-lw $t1 -192($fp)
+lw $t1 -188($fp)
 seq $t0 $t0 $t1
 sw $t0 -168($fp)
 j label_22
@@ -1536,10 +1536,10 @@ lw $t1 12($t0)
 sw $t1 -196($fp)
 lw $t0 -164($fp)
 lw $t1 12($t0)
-sw $t1 -192($fp)
+sw $t1 -188($fp)
 lw $t0 -196($fp)
 move $a0 $t0
-lw $t0 -192($fp)
+lw $t0 -188($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -168($fp)
@@ -1550,9 +1550,9 @@ lw $t1 12($t0)
 sw $t1 -196($fp)
 lw $t0 -164($fp)
 lw $t1 12($t0)
-sw $t1 -192($fp)
+sw $t1 -188($fp)
 lw $t0 -196($fp)
-lw $t1 -192($fp)
+lw $t1 -188($fp)
 seq $t0 $t0 $t1
 sw $t0 -168($fp)
 j label_22
@@ -1560,7 +1560,7 @@ label_22:
 lw $t0 -168($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -200($fp)
 lw $t0 -200($fp)
@@ -1571,7 +1571,7 @@ bne $t0 $zero label_35
 li $t0 25
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -116($fp)
 lw $t0 -364($fp)
@@ -1580,7 +1580,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -140($fp)
+sw $t1 -144($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -1588,25 +1588,25 @@ sw $t0 -136($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -132($fp)
+sw $t0 -128($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -128($fp)
-lw $t0 -140($fp)
+sw $t0 -132($fp)
+lw $t0 -144($fp)
 lw $t1 -136($fp)
 seq $t0 $t0 $t1
 sw $t0 -124($fp)
 lw $t0 -124($fp)
 bne $t0 $zero label_23
-lw $t0 -140($fp)
-lw $t1 -132($fp)
+lw $t0 -144($fp)
+lw $t1 -128($fp)
 seq $t0 $t0 $t1
 sw $t0 -124($fp)
 lw $t0 -124($fp)
 bne $t0 $zero label_24
-lw $t0 -140($fp)
-lw $t1 -128($fp)
+lw $t0 -144($fp)
+lw $t1 -132($fp)
 seq $t0 $t0 $t1
 sw $t0 -124($fp)
 lw $t0 -124($fp)
@@ -1622,9 +1622,9 @@ lw $t1 12($t0)
 sw $t1 -148($fp)
 lw $t0 -116($fp)
 lw $t1 12($t0)
-sw $t1 -144($fp)
+sw $t1 -140($fp)
 lw $t0 -148($fp)
-lw $t1 -144($fp)
+lw $t1 -140($fp)
 seq $t0 $t0 $t1
 sw $t0 -120($fp)
 j label_26
@@ -1634,10 +1634,10 @@ lw $t1 12($t0)
 sw $t1 -148($fp)
 lw $t0 -116($fp)
 lw $t1 12($t0)
-sw $t1 -144($fp)
+sw $t1 -140($fp)
 lw $t0 -148($fp)
 move $a0 $t0
-lw $t0 -144($fp)
+lw $t0 -140($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -120($fp)
@@ -1648,9 +1648,9 @@ lw $t1 12($t0)
 sw $t1 -148($fp)
 lw $t0 -116($fp)
 lw $t1 12($t0)
-sw $t1 -144($fp)
+sw $t1 -140($fp)
 lw $t0 -148($fp)
-lw $t1 -144($fp)
+lw $t1 -140($fp)
 seq $t0 $t0 $t1
 sw $t0 -120($fp)
 j label_26
@@ -1658,7 +1658,7 @@ label_26:
 lw $t0 -120($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -152($fp)
 lw $t0 -152($fp)
@@ -1669,7 +1669,7 @@ bne $t0 $zero label_33
 li $t0 28
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -68($fp)
 lw $t0 -364($fp)
@@ -1678,7 +1678,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -92($fp)
+sw $t1 -96($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -1686,25 +1686,25 @@ sw $t0 -88($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -84($fp)
+sw $t0 -80($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -80($fp)
-lw $t0 -92($fp)
+sw $t0 -84($fp)
+lw $t0 -96($fp)
 lw $t1 -88($fp)
 seq $t0 $t0 $t1
 sw $t0 -76($fp)
 lw $t0 -76($fp)
 bne $t0 $zero label_27
-lw $t0 -92($fp)
-lw $t1 -84($fp)
+lw $t0 -96($fp)
+lw $t1 -80($fp)
 seq $t0 $t0 $t1
 sw $t0 -76($fp)
 lw $t0 -76($fp)
 bne $t0 $zero label_28
-lw $t0 -92($fp)
-lw $t1 -80($fp)
+lw $t0 -96($fp)
+lw $t1 -84($fp)
 seq $t0 $t0 $t1
 sw $t0 -76($fp)
 lw $t0 -76($fp)
@@ -1720,9 +1720,9 @@ lw $t1 12($t0)
 sw $t1 -100($fp)
 lw $t0 -68($fp)
 lw $t1 12($t0)
-sw $t1 -96($fp)
+sw $t1 -92($fp)
 lw $t0 -100($fp)
-lw $t1 -96($fp)
+lw $t1 -92($fp)
 seq $t0 $t0 $t1
 sw $t0 -72($fp)
 j label_30
@@ -1732,10 +1732,10 @@ lw $t1 12($t0)
 sw $t1 -100($fp)
 lw $t0 -68($fp)
 lw $t1 12($t0)
-sw $t1 -96($fp)
+sw $t1 -92($fp)
 lw $t0 -100($fp)
 move $a0 $t0
-lw $t0 -96($fp)
+lw $t0 -92($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -72($fp)
@@ -1746,9 +1746,9 @@ lw $t1 12($t0)
 sw $t1 -100($fp)
 lw $t0 -68($fp)
 lw $t1 12($t0)
-sw $t1 -96($fp)
+sw $t1 -92($fp)
 lw $t0 -100($fp)
-lw $t1 -96($fp)
+lw $t1 -92($fp)
 seq $t0 $t0 $t1
 sw $t0 -72($fp)
 j label_30
@@ -1756,7 +1756,7 @@ label_30:
 lw $t0 -72($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -104($fp)
 lw $t0 -104($fp)
@@ -1767,7 +1767,7 @@ bne $t0 $zero label_31
 li $t0 5
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -64($fp)
 lw $t0 -64($fp)
@@ -1777,7 +1777,7 @@ sw $t0 0($t1)
 li $t0 5
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -60($fp)
 lw $t0 -60($fp)
@@ -1800,7 +1800,7 @@ label_31:
 li $t0 7
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -56($fp)
 lw $t0 -56($fp)
@@ -1810,7 +1810,7 @@ sw $t0 0($t1)
 li $t0 4
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 -52($fp)
@@ -1836,7 +1836,7 @@ label_33:
 li $t0 5
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -48($fp)
 lw $t0 -48($fp)
@@ -1846,7 +1846,7 @@ sw $t0 0($t1)
 li $t0 5
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -44($fp)
 lw $t0 -44($fp)
@@ -1872,7 +1872,7 @@ label_35:
 li $t0 3
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -40($fp)
 lw $t0 -40($fp)
@@ -1882,7 +1882,7 @@ sw $t0 0($t1)
 li $t0 7
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -36($fp)
@@ -1908,7 +1908,7 @@ label_37:
 li $t0 4
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -32($fp)
 lw $t0 -32($fp)
@@ -1918,7 +1918,7 @@ sw $t0 0($t1)
 li $t0 5
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -28($fp)
 lw $t0 -28($fp)
@@ -1944,7 +1944,7 @@ label_39:
 li $t0 4
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -24($fp)
 lw $t0 -24($fp)
@@ -1954,7 +1954,7 @@ sw $t0 0($t1)
 li $t0 4
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -1980,7 +1980,7 @@ label_41:
 li $t0 3
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -16($fp)
 lw $t0 -16($fp)
@@ -1990,7 +1990,7 @@ sw $t0 0($t1)
 li $t0 5
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
@@ -2010,20 +2010,20 @@ addi $sp $sp 4
 sw $t0 -352($fp)
 label_42:
 lw $v0 4($fp)
-addi $sp $sp 368
+addi $sp $sp 356
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_Board:
+__ctor_Board:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -20
+addi $sp $sp -8
 li $t0 5
 sll $t0 $t0 2
 la $t1 prototype_table
@@ -2040,28 +2040,28 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_Board
+jal __attributes_ctor_Board
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 20
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_attr_at_CellularAutomaton:
+__attributes_ctor_CellularAutomaton:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -24
+addi $sp $sp -8
 lw $t0 0($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_Board
+jal __attributes_ctor_Board
 addi $sp $sp 4
 sw $v0 -16($fp)
 la $t0 data_10
@@ -2069,14 +2069,14 @@ sw $t0 -12($fp)
 lw $t0 -12($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 0($fp)
 lw $t1 -12($fp)
 sw $t1 24($t0)
 lw $v0 0($fp)
-addi $sp $sp 24
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -2089,7 +2089,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -24
+addi $sp $sp -8
 lw $t0 0($fp)
 lw $t1 4($fp)
 addi $t1 $t1 24
@@ -2125,7 +2125,7 @@ jalr $ra $t0
 addi $sp $sp 8
 sw $v0 -12($fp)
 lw $v0 4($fp)
-addi $sp $sp 24
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -2138,11 +2138,11 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -128
+addi $sp $sp -112
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -116($fp)
 lw $t0 -116($fp)
@@ -2159,7 +2159,7 @@ sw $t0 -108($fp)
 lw $t0 -108($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -104($fp)
 lw $t0 0($fp)
@@ -2206,7 +2206,7 @@ sw $t1 -76($fp)
 lw $t0 -76($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -88($fp)
 lw $t0 -88($fp)
@@ -2304,7 +2304,7 @@ sw $t0 -56($fp)
 lw $t0 -56($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 0($fp)
@@ -2355,7 +2355,7 @@ sw $t0 -28($fp)
 lw $t0 -28($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -40($fp)
 lw $t0 -40($fp)
@@ -2367,7 +2367,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 0($fp)
@@ -2401,7 +2401,7 @@ jalr $ra $t0
 addi $sp $sp 8
 sw $v0 -12($fp)
 lw $v0 0($fp)
-addi $sp $sp 128
+addi $sp $sp 112
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -2414,7 +2414,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -24
+addi $sp $sp -8
 lw $t4 0($fp)
 lw $t4 24($t4)
 addi $sp $sp -4
@@ -2458,7 +2458,7 @@ jalr $ra $t0
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 24
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -2471,7 +2471,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -80
+addi $sp $sp -64
 lw $t4 4($fp)
 lw $t4 12($t4)
 addi $sp $sp -4
@@ -2483,7 +2483,7 @@ sw $t1 -44($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -32($fp)
 lw $t0 -32($fp)
@@ -2496,7 +2496,7 @@ sw $t0 -36($fp)
 lw $t0 -36($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -48($fp)
 lw $t0 -48($fp)
@@ -2512,7 +2512,7 @@ sw $t1 -52($fp)
 lw $t0 -52($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -64($fp)
 lw $t0 -64($fp)
@@ -2523,7 +2523,7 @@ bne $t0 $zero label_62
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -28($fp)
 lw $t4 4($fp)
@@ -2583,14 +2583,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -72($fp)
 label_63:
 lw $v0 -72($fp)
-addi $sp $sp 80
+addi $sp $sp 64
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -2603,7 +2603,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -92
+addi $sp $sp -76
 lw $t0 0($fp)
 lw $t1 12($t0)
 sw $t1 -56($fp)
@@ -2622,7 +2622,7 @@ sw $t0 -48($fp)
 lw $t0 -48($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -60($fp)
 lw $t0 -60($fp)
@@ -2631,7 +2631,7 @@ sw $t1 -72($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -44($fp)
 lw $t0 -44($fp)
@@ -2644,7 +2644,7 @@ sw $t1 -64($fp)
 lw $t0 -64($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -76($fp)
 lw $t0 -76($fp)
@@ -2670,7 +2670,7 @@ sw $t0 -28($fp)
 lw $t0 -28($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -40($fp)
 lw $t0 4($fp)
@@ -2712,14 +2712,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -84($fp)
 label_67:
 lw $v0 -84($fp)
-addi $sp $sp 92
+addi $sp $sp 76
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -2732,7 +2732,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -88
+addi $sp $sp -72
 lw $t4 4($fp)
 lw $t4 12($t4)
 addi $sp $sp -4
@@ -2759,7 +2759,7 @@ sw $t0 -44($fp)
 lw $t0 -44($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -56($fp)
 lw $t0 -56($fp)
@@ -2772,7 +2772,7 @@ sw $t1 -60($fp)
 lw $t0 -60($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -72($fp)
 lw $t0 -72($fp)
@@ -2798,7 +2798,7 @@ sw $t0 -28($fp)
 lw $t0 -28($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -40($fp)
 lw $t0 4($fp)
@@ -2840,14 +2840,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -80($fp)
 label_71:
 lw $v0 -80($fp)
-addi $sp $sp 88
+addi $sp $sp 72
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -2860,14 +2860,14 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -172
+addi $sp $sp -156
 lw $t0 0($fp)
 lw $t1 12($t0)
 sw $t1 -80($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -68($fp)
 lw $t0 -68($fp)
@@ -2880,7 +2880,7 @@ sw $t0 -72($fp)
 lw $t0 -72($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -84($fp)
 lw $t0 -84($fp)
@@ -2889,7 +2889,7 @@ sw $t1 -100($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -88($fp)
 lw $t0 -88($fp)
@@ -2925,7 +2925,7 @@ sw $t0 -92($fp)
 lw $t0 -92($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -104($fp)
 lw $t0 -104($fp)
@@ -2946,7 +2946,7 @@ sw $t0 -108($fp)
 lw $t0 -108($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -120($fp)
 lw $t0 0($fp)
@@ -2955,7 +2955,7 @@ sw $t1 -60($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -48($fp)
 lw $t0 -48($fp)
@@ -2968,7 +2968,7 @@ sw $t0 -52($fp)
 lw $t0 -52($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -64($fp)
 lw $t0 -120($fp)
@@ -2977,7 +2977,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -144($fp)
+sw $t1 -148($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -2985,25 +2985,25 @@ sw $t0 -140($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -136($fp)
+sw $t0 -132($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -132($fp)
-lw $t0 -144($fp)
+sw $t0 -136($fp)
+lw $t0 -148($fp)
 lw $t1 -140($fp)
 seq $t0 $t0 $t1
 sw $t0 -128($fp)
 lw $t0 -128($fp)
 bne $t0 $zero label_74
-lw $t0 -144($fp)
-lw $t1 -136($fp)
+lw $t0 -148($fp)
+lw $t1 -132($fp)
 seq $t0 $t0 $t1
 sw $t0 -128($fp)
 lw $t0 -128($fp)
 bne $t0 $zero label_75
-lw $t0 -144($fp)
-lw $t1 -132($fp)
+lw $t0 -148($fp)
+lw $t1 -136($fp)
 seq $t0 $t0 $t1
 sw $t0 -128($fp)
 lw $t0 -128($fp)
@@ -3019,9 +3019,9 @@ lw $t1 12($t0)
 sw $t1 -152($fp)
 lw $t0 -64($fp)
 lw $t1 12($t0)
-sw $t1 -148($fp)
+sw $t1 -144($fp)
 lw $t0 -152($fp)
-lw $t1 -148($fp)
+lw $t1 -144($fp)
 seq $t0 $t0 $t1
 sw $t0 -124($fp)
 j label_77
@@ -3031,10 +3031,10 @@ lw $t1 12($t0)
 sw $t1 -152($fp)
 lw $t0 -64($fp)
 lw $t1 12($t0)
-sw $t1 -148($fp)
+sw $t1 -144($fp)
 lw $t0 -152($fp)
 move $a0 $t0
-lw $t0 -148($fp)
+lw $t0 -144($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -124($fp)
@@ -3045,9 +3045,9 @@ lw $t1 12($t0)
 sw $t1 -152($fp)
 lw $t0 -64($fp)
 lw $t1 12($t0)
-sw $t1 -148($fp)
+sw $t1 -144($fp)
 lw $t0 -152($fp)
-lw $t1 -148($fp)
+lw $t1 -144($fp)
 seq $t0 $t0 $t1
 sw $t0 -124($fp)
 j label_77
@@ -3055,7 +3055,7 @@ label_77:
 lw $t0 -124($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -156($fp)
 lw $t0 -156($fp)
@@ -3069,7 +3069,7 @@ sw $t1 -40($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -28($fp)
 lw $t0 -28($fp)
@@ -3082,7 +3082,7 @@ sw $t0 -32($fp)
 lw $t0 -32($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -44($fp)
 lw $t0 4($fp)
@@ -3124,14 +3124,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -164($fp)
 label_81:
 lw $v0 -164($fp)
-addi $sp $sp 172
+addi $sp $sp 156
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -3144,11 +3144,11 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -188
+addi $sp $sp -172
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -136($fp)
 lw $t0 0($fp)
@@ -3157,7 +3157,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -160($fp)
+sw $t1 -164($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -3165,25 +3165,25 @@ sw $t0 -156($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -152($fp)
+sw $t0 -148($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -148($fp)
-lw $t0 -160($fp)
+sw $t0 -152($fp)
+lw $t0 -164($fp)
 lw $t1 -156($fp)
 seq $t0 $t0 $t1
 sw $t0 -144($fp)
 lw $t0 -144($fp)
 bne $t0 $zero label_82
-lw $t0 -160($fp)
-lw $t1 -152($fp)
+lw $t0 -164($fp)
+lw $t1 -148($fp)
 seq $t0 $t0 $t1
 sw $t0 -144($fp)
 lw $t0 -144($fp)
 bne $t0 $zero label_83
-lw $t0 -160($fp)
-lw $t1 -148($fp)
+lw $t0 -164($fp)
+lw $t1 -152($fp)
 seq $t0 $t0 $t1
 sw $t0 -144($fp)
 lw $t0 -144($fp)
@@ -3199,9 +3199,9 @@ lw $t1 12($t0)
 sw $t1 -168($fp)
 lw $t0 -136($fp)
 lw $t1 12($t0)
-sw $t1 -164($fp)
+sw $t1 -160($fp)
 lw $t0 -168($fp)
-lw $t1 -164($fp)
+lw $t1 -160($fp)
 seq $t0 $t0 $t1
 sw $t0 -140($fp)
 j label_85
@@ -3211,10 +3211,10 @@ lw $t1 12($t0)
 sw $t1 -168($fp)
 lw $t0 -136($fp)
 lw $t1 12($t0)
-sw $t1 -164($fp)
+sw $t1 -160($fp)
 lw $t0 -168($fp)
 move $a0 $t0
-lw $t0 -164($fp)
+lw $t0 -160($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -140($fp)
@@ -3225,9 +3225,9 @@ lw $t1 12($t0)
 sw $t1 -168($fp)
 lw $t0 -136($fp)
 lw $t1 12($t0)
-sw $t1 -164($fp)
+sw $t1 -160($fp)
 lw $t0 -168($fp)
-lw $t1 -164($fp)
+lw $t1 -160($fp)
 seq $t0 $t0 $t1
 sw $t0 -140($fp)
 j label_85
@@ -3235,7 +3235,7 @@ label_85:
 lw $t0 -140($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -172($fp)
 lw $t0 -172($fp)
@@ -3249,7 +3249,7 @@ sw $t1 -68($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -56($fp)
 lw $t0 -56($fp)
@@ -3285,7 +3285,7 @@ sw $t0 -60($fp)
 lw $t0 -60($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -72($fp)
 lw $t0 -72($fp)
@@ -3306,7 +3306,7 @@ sw $t0 -76($fp)
 lw $t0 -76($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -88($fp)
 lw $t0 -88($fp)
@@ -3315,7 +3315,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -112($fp)
+sw $t1 -116($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -3323,25 +3323,25 @@ sw $t0 -108($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -104($fp)
+sw $t0 -100($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -100($fp)
-lw $t0 -112($fp)
+sw $t0 -104($fp)
+lw $t0 -116($fp)
 lw $t1 -108($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
 bne $t0 $zero label_88
-lw $t0 -112($fp)
-lw $t1 -104($fp)
+lw $t0 -116($fp)
+lw $t1 -100($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
 bne $t0 $zero label_89
-lw $t0 -112($fp)
-lw $t1 -100($fp)
+lw $t0 -116($fp)
+lw $t1 -104($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
@@ -3357,9 +3357,9 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
-lw $t1 -116($fp)
+lw $t1 -112($fp)
 seq $t0 $t0 $t1
 sw $t0 -92($fp)
 j label_91
@@ -3369,10 +3369,10 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
 move $a0 $t0
-lw $t0 -116($fp)
+lw $t0 -112($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -92($fp)
@@ -3383,9 +3383,9 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
-lw $t1 -116($fp)
+lw $t1 -112($fp)
 seq $t0 $t0 $t1
 sw $t0 -92($fp)
 j label_91
@@ -3393,7 +3393,7 @@ label_91:
 lw $t0 -92($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -124($fp)
 lw $t0 -124($fp)
@@ -3407,7 +3407,7 @@ sw $t1 -48($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -36($fp)
@@ -3420,7 +3420,7 @@ sw $t0 -40($fp)
 lw $t0 -40($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 4($fp)
@@ -3462,7 +3462,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -3477,14 +3477,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -180($fp)
 label_97:
 lw $v0 -180($fp)
-addi $sp $sp 188
+addi $sp $sp 172
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -3497,7 +3497,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -184
+addi $sp $sp -168
 lw $t0 0($fp)
 lw $t1 12($t0)
 sw $t1 -148($fp)
@@ -3516,7 +3516,7 @@ sw $t0 -140($fp)
 lw $t0 -140($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -152($fp)
 lw $t0 -152($fp)
@@ -3525,7 +3525,7 @@ sw $t1 -164($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -136($fp)
 lw $t0 -136($fp)
@@ -3538,7 +3538,7 @@ sw $t1 -156($fp)
 lw $t0 -156($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -168($fp)
 lw $t0 -168($fp)
@@ -3552,7 +3552,7 @@ sw $t1 -68($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -56($fp)
 lw $t0 -56($fp)
@@ -3588,7 +3588,7 @@ sw $t0 -60($fp)
 lw $t0 -60($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -72($fp)
 lw $t0 -72($fp)
@@ -3609,7 +3609,7 @@ sw $t0 -76($fp)
 lw $t0 -76($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -88($fp)
 lw $t0 -88($fp)
@@ -3618,7 +3618,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -112($fp)
+sw $t1 -116($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -3626,25 +3626,25 @@ sw $t0 -108($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -104($fp)
+sw $t0 -100($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -100($fp)
-lw $t0 -112($fp)
+sw $t0 -104($fp)
+lw $t0 -116($fp)
 lw $t1 -108($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
 bne $t0 $zero label_100
-lw $t0 -112($fp)
-lw $t1 -104($fp)
+lw $t0 -116($fp)
+lw $t1 -100($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
 bne $t0 $zero label_101
-lw $t0 -112($fp)
-lw $t1 -100($fp)
+lw $t0 -116($fp)
+lw $t1 -104($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
@@ -3660,9 +3660,9 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
-lw $t1 -116($fp)
+lw $t1 -112($fp)
 seq $t0 $t0 $t1
 sw $t0 -92($fp)
 j label_103
@@ -3672,10 +3672,10 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
 move $a0 $t0
-lw $t0 -116($fp)
+lw $t0 -112($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -92($fp)
@@ -3686,9 +3686,9 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
-lw $t1 -116($fp)
+lw $t1 -112($fp)
 seq $t0 $t0 $t1
 sw $t0 -92($fp)
 j label_103
@@ -3696,7 +3696,7 @@ label_103:
 lw $t0 -92($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -124($fp)
 lw $t0 -124($fp)
@@ -3710,7 +3710,7 @@ sw $t1 -48($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -36($fp)
@@ -3723,7 +3723,7 @@ sw $t0 -40($fp)
 lw $t0 -40($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 4($fp)
@@ -3765,7 +3765,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -3780,14 +3780,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -176($fp)
 label_109:
 lw $v0 -176($fp)
-addi $sp $sp 184
+addi $sp $sp 168
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -3800,7 +3800,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -224
+addi $sp $sp -208
 lw $t0 0($fp)
 lw $t1 12($t0)
 sw $t1 -188($fp)
@@ -3819,7 +3819,7 @@ sw $t0 -180($fp)
 lw $t0 -180($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -192($fp)
 lw $t0 -192($fp)
@@ -3828,7 +3828,7 @@ sw $t1 -204($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -176($fp)
 lw $t0 -176($fp)
@@ -3841,7 +3841,7 @@ sw $t1 -196($fp)
 lw $t0 -196($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -208($fp)
 lw $t0 -208($fp)
@@ -3855,7 +3855,7 @@ sw $t1 -88($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -76($fp)
 lw $t0 -76($fp)
@@ -3868,7 +3868,7 @@ sw $t0 -80($fp)
 lw $t0 -80($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -92($fp)
 lw $t0 -92($fp)
@@ -3877,7 +3877,7 @@ sw $t1 -108($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -96($fp)
 lw $t0 -96($fp)
@@ -3913,7 +3913,7 @@ sw $t0 -100($fp)
 lw $t0 -100($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -112($fp)
 lw $t0 -112($fp)
@@ -3934,7 +3934,7 @@ sw $t0 -116($fp)
 lw $t0 -116($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -128($fp)
 lw $t0 0($fp)
@@ -3943,7 +3943,7 @@ sw $t1 -68($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -56($fp)
 lw $t0 -56($fp)
@@ -3956,7 +3956,7 @@ sw $t0 -60($fp)
 lw $t0 -60($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -72($fp)
 lw $t0 -128($fp)
@@ -3965,7 +3965,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -152($fp)
+sw $t1 -156($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -3973,25 +3973,25 @@ sw $t0 -148($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -144($fp)
+sw $t0 -140($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -140($fp)
-lw $t0 -152($fp)
+sw $t0 -144($fp)
+lw $t0 -156($fp)
 lw $t1 -148($fp)
 seq $t0 $t0 $t1
 sw $t0 -136($fp)
 lw $t0 -136($fp)
 bne $t0 $zero label_112
-lw $t0 -152($fp)
-lw $t1 -144($fp)
+lw $t0 -156($fp)
+lw $t1 -140($fp)
 seq $t0 $t0 $t1
 sw $t0 -136($fp)
 lw $t0 -136($fp)
 bne $t0 $zero label_113
-lw $t0 -152($fp)
-lw $t1 -140($fp)
+lw $t0 -156($fp)
+lw $t1 -144($fp)
 seq $t0 $t0 $t1
 sw $t0 -136($fp)
 lw $t0 -136($fp)
@@ -4007,9 +4007,9 @@ lw $t1 12($t0)
 sw $t1 -160($fp)
 lw $t0 -72($fp)
 lw $t1 12($t0)
-sw $t1 -156($fp)
+sw $t1 -152($fp)
 lw $t0 -160($fp)
-lw $t1 -156($fp)
+lw $t1 -152($fp)
 seq $t0 $t0 $t1
 sw $t0 -132($fp)
 j label_115
@@ -4019,10 +4019,10 @@ lw $t1 12($t0)
 sw $t1 -160($fp)
 lw $t0 -72($fp)
 lw $t1 12($t0)
-sw $t1 -156($fp)
+sw $t1 -152($fp)
 lw $t0 -160($fp)
 move $a0 $t0
-lw $t0 -156($fp)
+lw $t0 -152($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -132($fp)
@@ -4033,9 +4033,9 @@ lw $t1 12($t0)
 sw $t1 -160($fp)
 lw $t0 -72($fp)
 lw $t1 12($t0)
-sw $t1 -156($fp)
+sw $t1 -152($fp)
 lw $t0 -160($fp)
-lw $t1 -156($fp)
+lw $t1 -152($fp)
 seq $t0 $t0 $t1
 sw $t0 -132($fp)
 j label_115
@@ -4043,7 +4043,7 @@ label_115:
 lw $t0 -132($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -164($fp)
 lw $t0 -164($fp)
@@ -4057,7 +4057,7 @@ sw $t1 -48($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -36($fp)
@@ -4070,7 +4070,7 @@ sw $t0 -40($fp)
 lw $t0 -40($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 4($fp)
@@ -4112,7 +4112,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -4127,14 +4127,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -216($fp)
 label_121:
 lw $v0 -216($fp)
-addi $sp $sp 224
+addi $sp $sp 208
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -4147,7 +4147,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -220
+addi $sp $sp -204
 lw $t4 4($fp)
 lw $t4 12($t4)
 addi $sp $sp -4
@@ -4174,7 +4174,7 @@ sw $t0 -176($fp)
 lw $t0 -176($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -188($fp)
 lw $t0 -188($fp)
@@ -4187,7 +4187,7 @@ sw $t1 -192($fp)
 lw $t0 -192($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -204($fp)
 lw $t0 -204($fp)
@@ -4201,7 +4201,7 @@ sw $t1 -88($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -76($fp)
 lw $t0 -76($fp)
@@ -4214,7 +4214,7 @@ sw $t0 -80($fp)
 lw $t0 -80($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -92($fp)
 lw $t0 -92($fp)
@@ -4223,7 +4223,7 @@ sw $t1 -108($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -96($fp)
 lw $t0 -96($fp)
@@ -4259,7 +4259,7 @@ sw $t0 -100($fp)
 lw $t0 -100($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -112($fp)
 lw $t0 -112($fp)
@@ -4280,7 +4280,7 @@ sw $t0 -116($fp)
 lw $t0 -116($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -128($fp)
 lw $t0 0($fp)
@@ -4289,7 +4289,7 @@ sw $t1 -68($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -56($fp)
 lw $t0 -56($fp)
@@ -4302,7 +4302,7 @@ sw $t0 -60($fp)
 lw $t0 -60($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -72($fp)
 lw $t0 -128($fp)
@@ -4311,7 +4311,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -152($fp)
+sw $t1 -156($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -4319,25 +4319,25 @@ sw $t0 -148($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -144($fp)
+sw $t0 -140($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -140($fp)
-lw $t0 -152($fp)
+sw $t0 -144($fp)
+lw $t0 -156($fp)
 lw $t1 -148($fp)
 seq $t0 $t0 $t1
 sw $t0 -136($fp)
 lw $t0 -136($fp)
 bne $t0 $zero label_124
-lw $t0 -152($fp)
-lw $t1 -144($fp)
+lw $t0 -156($fp)
+lw $t1 -140($fp)
 seq $t0 $t0 $t1
 sw $t0 -136($fp)
 lw $t0 -136($fp)
 bne $t0 $zero label_125
-lw $t0 -152($fp)
-lw $t1 -140($fp)
+lw $t0 -156($fp)
+lw $t1 -144($fp)
 seq $t0 $t0 $t1
 sw $t0 -136($fp)
 lw $t0 -136($fp)
@@ -4353,9 +4353,9 @@ lw $t1 12($t0)
 sw $t1 -160($fp)
 lw $t0 -72($fp)
 lw $t1 12($t0)
-sw $t1 -156($fp)
+sw $t1 -152($fp)
 lw $t0 -160($fp)
-lw $t1 -156($fp)
+lw $t1 -152($fp)
 seq $t0 $t0 $t1
 sw $t0 -132($fp)
 j label_127
@@ -4365,10 +4365,10 @@ lw $t1 12($t0)
 sw $t1 -160($fp)
 lw $t0 -72($fp)
 lw $t1 12($t0)
-sw $t1 -156($fp)
+sw $t1 -152($fp)
 lw $t0 -160($fp)
 move $a0 $t0
-lw $t0 -156($fp)
+lw $t0 -152($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -132($fp)
@@ -4379,9 +4379,9 @@ lw $t1 12($t0)
 sw $t1 -160($fp)
 lw $t0 -72($fp)
 lw $t1 12($t0)
-sw $t1 -156($fp)
+sw $t1 -152($fp)
 lw $t0 -160($fp)
-lw $t1 -156($fp)
+lw $t1 -152($fp)
 seq $t0 $t0 $t1
 sw $t0 -132($fp)
 j label_127
@@ -4389,7 +4389,7 @@ label_127:
 lw $t0 -132($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -164($fp)
 lw $t0 -164($fp)
@@ -4403,7 +4403,7 @@ sw $t1 -48($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -36($fp)
@@ -4416,7 +4416,7 @@ sw $t0 -40($fp)
 lw $t0 -40($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 4($fp)
@@ -4458,7 +4458,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -4473,14 +4473,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -212($fp)
 label_133:
 lw $v0 -212($fp)
-addi $sp $sp 220
+addi $sp $sp 204
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -4493,7 +4493,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -180
+addi $sp $sp -164
 lw $t4 4($fp)
 lw $t4 12($t4)
 addi $sp $sp -4
@@ -4520,7 +4520,7 @@ sw $t0 -136($fp)
 lw $t0 -136($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -148($fp)
 lw $t0 -148($fp)
@@ -4533,7 +4533,7 @@ sw $t1 -152($fp)
 lw $t0 -152($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -164($fp)
 lw $t0 -164($fp)
@@ -4547,7 +4547,7 @@ sw $t1 -68($fp)
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -56($fp)
 lw $t0 -56($fp)
@@ -4583,7 +4583,7 @@ sw $t0 -60($fp)
 lw $t0 -60($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -72($fp)
 lw $t0 -72($fp)
@@ -4604,7 +4604,7 @@ sw $t0 -76($fp)
 lw $t0 -76($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -88($fp)
 lw $t0 -88($fp)
@@ -4613,7 +4613,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -112($fp)
+sw $t1 -116($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -4621,25 +4621,25 @@ sw $t0 -108($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -104($fp)
+sw $t0 -100($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -100($fp)
-lw $t0 -112($fp)
+sw $t0 -104($fp)
+lw $t0 -116($fp)
 lw $t1 -108($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
 bne $t0 $zero label_136
-lw $t0 -112($fp)
-lw $t1 -104($fp)
+lw $t0 -116($fp)
+lw $t1 -100($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
 bne $t0 $zero label_137
-lw $t0 -112($fp)
-lw $t1 -100($fp)
+lw $t0 -116($fp)
+lw $t1 -104($fp)
 seq $t0 $t0 $t1
 sw $t0 -96($fp)
 lw $t0 -96($fp)
@@ -4655,9 +4655,9 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
-lw $t1 -116($fp)
+lw $t1 -112($fp)
 seq $t0 $t0 $t1
 sw $t0 -92($fp)
 j label_139
@@ -4667,10 +4667,10 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
 move $a0 $t0
-lw $t0 -116($fp)
+lw $t0 -112($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -92($fp)
@@ -4681,9 +4681,9 @@ lw $t1 12($t0)
 sw $t1 -120($fp)
 lw $t0 0($fp)
 lw $t1 12($t0)
-sw $t1 -116($fp)
+sw $t1 -112($fp)
 lw $t0 -120($fp)
-lw $t1 -116($fp)
+lw $t1 -112($fp)
 seq $t0 $t0 $t1
 sw $t0 -92($fp)
 j label_139
@@ -4691,7 +4691,7 @@ label_139:
 lw $t0 -92($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -124($fp)
 lw $t0 -124($fp)
@@ -4705,7 +4705,7 @@ sw $t1 -48($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -36($fp)
@@ -4718,7 +4718,7 @@ sw $t0 -40($fp)
 lw $t0 -40($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 4($fp)
@@ -4760,7 +4760,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -4775,14 +4775,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -172($fp)
 label_145:
 lw $v0 -172($fp)
-addi $sp $sp 180
+addi $sp $sp 164
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -4795,7 +4795,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -672
+addi $sp $sp -656
 lw $t0 4($fp)
 li $t1 0
 seq $t0 $t0 $t1
@@ -4831,7 +4831,7 @@ sw $t0 -500($fp)
 lw $t0 -500($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -496($fp)
 lw $t0 -504($fp)
@@ -4840,7 +4840,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -532($fp)
+sw $t1 -536($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -4848,25 +4848,25 @@ sw $t0 -528($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -524($fp)
+sw $t0 -520($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -520($fp)
-lw $t0 -532($fp)
+sw $t0 -524($fp)
+lw $t0 -536($fp)
 lw $t1 -528($fp)
 seq $t0 $t0 $t1
 sw $t0 -516($fp)
 lw $t0 -516($fp)
 bne $t0 $zero label_148
-lw $t0 -532($fp)
-lw $t1 -524($fp)
+lw $t0 -536($fp)
+lw $t1 -520($fp)
 seq $t0 $t0 $t1
 sw $t0 -516($fp)
 lw $t0 -516($fp)
 bne $t0 $zero label_149
-lw $t0 -532($fp)
-lw $t1 -520($fp)
+lw $t0 -536($fp)
+lw $t1 -524($fp)
 seq $t0 $t0 $t1
 sw $t0 -516($fp)
 lw $t0 -516($fp)
@@ -4882,9 +4882,9 @@ lw $t1 12($t0)
 sw $t1 -540($fp)
 lw $t0 -496($fp)
 lw $t1 12($t0)
-sw $t1 -536($fp)
+sw $t1 -532($fp)
 lw $t0 -540($fp)
-lw $t1 -536($fp)
+lw $t1 -532($fp)
 seq $t0 $t0 $t1
 sw $t0 -512($fp)
 j label_151
@@ -4894,10 +4894,10 @@ lw $t1 12($t0)
 sw $t1 -540($fp)
 lw $t0 -496($fp)
 lw $t1 12($t0)
-sw $t1 -536($fp)
+sw $t1 -532($fp)
 lw $t0 -540($fp)
 move $a0 $t0
-lw $t0 -536($fp)
+lw $t0 -532($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -512($fp)
@@ -4908,9 +4908,9 @@ lw $t1 12($t0)
 sw $t1 -540($fp)
 lw $t0 -496($fp)
 lw $t1 12($t0)
-sw $t1 -536($fp)
+sw $t1 -532($fp)
 lw $t0 -540($fp)
-lw $t1 -536($fp)
+lw $t1 -532($fp)
 seq $t0 $t0 $t1
 sw $t0 -512($fp)
 j label_151
@@ -4918,7 +4918,7 @@ label_151:
 lw $t0 -512($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -544($fp)
 lw $t0 -544($fp)
@@ -4929,7 +4929,7 @@ bne $t0 $zero label_152
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -492($fp)
 lw $t0 -492($fp)
@@ -4939,7 +4939,7 @@ label_152:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -488($fp)
 lw $t0 -488($fp)
@@ -4983,7 +4983,7 @@ sw $t0 -432($fp)
 lw $t0 -432($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -428($fp)
 lw $t0 -436($fp)
@@ -4992,7 +4992,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -464($fp)
+sw $t1 -468($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -5000,25 +5000,25 @@ sw $t0 -460($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -456($fp)
+sw $t0 -452($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -452($fp)
-lw $t0 -464($fp)
+sw $t0 -456($fp)
+lw $t0 -468($fp)
 lw $t1 -460($fp)
 seq $t0 $t0 $t1
 sw $t0 -448($fp)
 lw $t0 -448($fp)
 bne $t0 $zero label_156
-lw $t0 -464($fp)
-lw $t1 -456($fp)
+lw $t0 -468($fp)
+lw $t1 -452($fp)
 seq $t0 $t0 $t1
 sw $t0 -448($fp)
 lw $t0 -448($fp)
 bne $t0 $zero label_157
-lw $t0 -464($fp)
-lw $t1 -452($fp)
+lw $t0 -468($fp)
+lw $t1 -456($fp)
 seq $t0 $t0 $t1
 sw $t0 -448($fp)
 lw $t0 -448($fp)
@@ -5034,9 +5034,9 @@ lw $t1 12($t0)
 sw $t1 -472($fp)
 lw $t0 -428($fp)
 lw $t1 12($t0)
-sw $t1 -468($fp)
+sw $t1 -464($fp)
 lw $t0 -472($fp)
-lw $t1 -468($fp)
+lw $t1 -464($fp)
 seq $t0 $t0 $t1
 sw $t0 -444($fp)
 j label_159
@@ -5046,10 +5046,10 @@ lw $t1 12($t0)
 sw $t1 -472($fp)
 lw $t0 -428($fp)
 lw $t1 12($t0)
-sw $t1 -468($fp)
+sw $t1 -464($fp)
 lw $t0 -472($fp)
 move $a0 $t0
-lw $t0 -468($fp)
+lw $t0 -464($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -444($fp)
@@ -5060,9 +5060,9 @@ lw $t1 12($t0)
 sw $t1 -472($fp)
 lw $t0 -428($fp)
 lw $t1 12($t0)
-sw $t1 -468($fp)
+sw $t1 -464($fp)
 lw $t0 -472($fp)
-lw $t1 -468($fp)
+lw $t1 -464($fp)
 seq $t0 $t0 $t1
 sw $t0 -444($fp)
 j label_159
@@ -5070,7 +5070,7 @@ label_159:
 lw $t0 -444($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -476($fp)
 lw $t0 -476($fp)
@@ -5081,7 +5081,7 @@ bne $t0 $zero label_160
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -424($fp)
 lw $t0 -424($fp)
@@ -5091,7 +5091,7 @@ label_160:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -420($fp)
 lw $t0 -420($fp)
@@ -5107,7 +5107,7 @@ sw $t0 -556($fp)
 lw $t0 -556($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -568($fp)
 lw $t0 -568($fp)
@@ -5148,7 +5148,7 @@ sw $t0 -364($fp)
 lw $t0 -364($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -360($fp)
 lw $t0 -368($fp)
@@ -5157,7 +5157,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -396($fp)
+sw $t1 -400($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -5165,25 +5165,25 @@ sw $t0 -392($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -388($fp)
+sw $t0 -384($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -384($fp)
-lw $t0 -396($fp)
+sw $t0 -388($fp)
+lw $t0 -400($fp)
 lw $t1 -392($fp)
 seq $t0 $t0 $t1
 sw $t0 -380($fp)
 lw $t0 -380($fp)
 bne $t0 $zero label_164
-lw $t0 -396($fp)
-lw $t1 -388($fp)
+lw $t0 -400($fp)
+lw $t1 -384($fp)
 seq $t0 $t0 $t1
 sw $t0 -380($fp)
 lw $t0 -380($fp)
 bne $t0 $zero label_165
-lw $t0 -396($fp)
-lw $t1 -384($fp)
+lw $t0 -400($fp)
+lw $t1 -388($fp)
 seq $t0 $t0 $t1
 sw $t0 -380($fp)
 lw $t0 -380($fp)
@@ -5199,9 +5199,9 @@ lw $t1 12($t0)
 sw $t1 -404($fp)
 lw $t0 -360($fp)
 lw $t1 12($t0)
-sw $t1 -400($fp)
+sw $t1 -396($fp)
 lw $t0 -404($fp)
-lw $t1 -400($fp)
+lw $t1 -396($fp)
 seq $t0 $t0 $t1
 sw $t0 -376($fp)
 j label_167
@@ -5211,10 +5211,10 @@ lw $t1 12($t0)
 sw $t1 -404($fp)
 lw $t0 -360($fp)
 lw $t1 12($t0)
-sw $t1 -400($fp)
+sw $t1 -396($fp)
 lw $t0 -404($fp)
 move $a0 $t0
-lw $t0 -400($fp)
+lw $t0 -396($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -376($fp)
@@ -5225,9 +5225,9 @@ lw $t1 12($t0)
 sw $t1 -404($fp)
 lw $t0 -360($fp)
 lw $t1 12($t0)
-sw $t1 -400($fp)
+sw $t1 -396($fp)
 lw $t0 -404($fp)
-lw $t1 -400($fp)
+lw $t1 -396($fp)
 seq $t0 $t0 $t1
 sw $t0 -376($fp)
 j label_167
@@ -5235,7 +5235,7 @@ label_167:
 lw $t0 -376($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -408($fp)
 lw $t0 -408($fp)
@@ -5246,7 +5246,7 @@ bne $t0 $zero label_168
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -356($fp)
 lw $t0 -356($fp)
@@ -5256,7 +5256,7 @@ label_168:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -352($fp)
 lw $t0 -352($fp)
@@ -5272,7 +5272,7 @@ sw $t0 -572($fp)
 lw $t0 -572($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -584($fp)
 lw $t0 -584($fp)
@@ -5313,7 +5313,7 @@ sw $t0 -296($fp)
 lw $t0 -296($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -292($fp)
 lw $t0 -300($fp)
@@ -5322,7 +5322,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -328($fp)
+sw $t1 -332($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -5330,25 +5330,25 @@ sw $t0 -324($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -320($fp)
+sw $t0 -316($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -316($fp)
-lw $t0 -328($fp)
+sw $t0 -320($fp)
+lw $t0 -332($fp)
 lw $t1 -324($fp)
 seq $t0 $t0 $t1
 sw $t0 -312($fp)
 lw $t0 -312($fp)
 bne $t0 $zero label_172
-lw $t0 -328($fp)
-lw $t1 -320($fp)
+lw $t0 -332($fp)
+lw $t1 -316($fp)
 seq $t0 $t0 $t1
 sw $t0 -312($fp)
 lw $t0 -312($fp)
 bne $t0 $zero label_173
-lw $t0 -328($fp)
-lw $t1 -316($fp)
+lw $t0 -332($fp)
+lw $t1 -320($fp)
 seq $t0 $t0 $t1
 sw $t0 -312($fp)
 lw $t0 -312($fp)
@@ -5364,9 +5364,9 @@ lw $t1 12($t0)
 sw $t1 -336($fp)
 lw $t0 -292($fp)
 lw $t1 12($t0)
-sw $t1 -332($fp)
+sw $t1 -328($fp)
 lw $t0 -336($fp)
-lw $t1 -332($fp)
+lw $t1 -328($fp)
 seq $t0 $t0 $t1
 sw $t0 -308($fp)
 j label_175
@@ -5376,10 +5376,10 @@ lw $t1 12($t0)
 sw $t1 -336($fp)
 lw $t0 -292($fp)
 lw $t1 12($t0)
-sw $t1 -332($fp)
+sw $t1 -328($fp)
 lw $t0 -336($fp)
 move $a0 $t0
-lw $t0 -332($fp)
+lw $t0 -328($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -308($fp)
@@ -5390,9 +5390,9 @@ lw $t1 12($t0)
 sw $t1 -336($fp)
 lw $t0 -292($fp)
 lw $t1 12($t0)
-sw $t1 -332($fp)
+sw $t1 -328($fp)
 lw $t0 -336($fp)
-lw $t1 -332($fp)
+lw $t1 -328($fp)
 seq $t0 $t0 $t1
 sw $t0 -308($fp)
 j label_175
@@ -5400,7 +5400,7 @@ label_175:
 lw $t0 -308($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -340($fp)
 lw $t0 -340($fp)
@@ -5411,7 +5411,7 @@ bne $t0 $zero label_176
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -288($fp)
 lw $t0 -288($fp)
@@ -5421,7 +5421,7 @@ label_176:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -284($fp)
 lw $t0 -284($fp)
@@ -5437,7 +5437,7 @@ sw $t0 -588($fp)
 lw $t0 -588($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -600($fp)
 lw $t0 -600($fp)
@@ -5478,7 +5478,7 @@ sw $t0 -228($fp)
 lw $t0 -228($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -224($fp)
 lw $t0 -232($fp)
@@ -5487,7 +5487,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -260($fp)
+sw $t1 -264($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -5495,25 +5495,25 @@ sw $t0 -256($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -252($fp)
+sw $t0 -248($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -248($fp)
-lw $t0 -260($fp)
+sw $t0 -252($fp)
+lw $t0 -264($fp)
 lw $t1 -256($fp)
 seq $t0 $t0 $t1
 sw $t0 -244($fp)
 lw $t0 -244($fp)
 bne $t0 $zero label_180
-lw $t0 -260($fp)
-lw $t1 -252($fp)
+lw $t0 -264($fp)
+lw $t1 -248($fp)
 seq $t0 $t0 $t1
 sw $t0 -244($fp)
 lw $t0 -244($fp)
 bne $t0 $zero label_181
-lw $t0 -260($fp)
-lw $t1 -248($fp)
+lw $t0 -264($fp)
+lw $t1 -252($fp)
 seq $t0 $t0 $t1
 sw $t0 -244($fp)
 lw $t0 -244($fp)
@@ -5529,9 +5529,9 @@ lw $t1 12($t0)
 sw $t1 -268($fp)
 lw $t0 -224($fp)
 lw $t1 12($t0)
-sw $t1 -264($fp)
+sw $t1 -260($fp)
 lw $t0 -268($fp)
-lw $t1 -264($fp)
+lw $t1 -260($fp)
 seq $t0 $t0 $t1
 sw $t0 -240($fp)
 j label_183
@@ -5541,10 +5541,10 @@ lw $t1 12($t0)
 sw $t1 -268($fp)
 lw $t0 -224($fp)
 lw $t1 12($t0)
-sw $t1 -264($fp)
+sw $t1 -260($fp)
 lw $t0 -268($fp)
 move $a0 $t0
-lw $t0 -264($fp)
+lw $t0 -260($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -240($fp)
@@ -5555,9 +5555,9 @@ lw $t1 12($t0)
 sw $t1 -268($fp)
 lw $t0 -224($fp)
 lw $t1 12($t0)
-sw $t1 -264($fp)
+sw $t1 -260($fp)
 lw $t0 -268($fp)
-lw $t1 -264($fp)
+lw $t1 -260($fp)
 seq $t0 $t0 $t1
 sw $t0 -240($fp)
 j label_183
@@ -5565,7 +5565,7 @@ label_183:
 lw $t0 -240($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -272($fp)
 lw $t0 -272($fp)
@@ -5576,7 +5576,7 @@ bne $t0 $zero label_184
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -220($fp)
 lw $t0 -220($fp)
@@ -5586,7 +5586,7 @@ label_184:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -216($fp)
 lw $t0 -216($fp)
@@ -5602,7 +5602,7 @@ sw $t0 -604($fp)
 lw $t0 -604($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -616($fp)
 lw $t0 -616($fp)
@@ -5643,7 +5643,7 @@ sw $t0 -160($fp)
 lw $t0 -160($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -156($fp)
 lw $t0 -164($fp)
@@ -5652,7 +5652,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -192($fp)
+sw $t1 -196($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -5660,25 +5660,25 @@ sw $t0 -188($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -184($fp)
+sw $t0 -180($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -180($fp)
-lw $t0 -192($fp)
+sw $t0 -184($fp)
+lw $t0 -196($fp)
 lw $t1 -188($fp)
 seq $t0 $t0 $t1
 sw $t0 -176($fp)
 lw $t0 -176($fp)
 bne $t0 $zero label_188
-lw $t0 -192($fp)
-lw $t1 -184($fp)
+lw $t0 -196($fp)
+lw $t1 -180($fp)
 seq $t0 $t0 $t1
 sw $t0 -176($fp)
 lw $t0 -176($fp)
 bne $t0 $zero label_189
-lw $t0 -192($fp)
-lw $t1 -180($fp)
+lw $t0 -196($fp)
+lw $t1 -184($fp)
 seq $t0 $t0 $t1
 sw $t0 -176($fp)
 lw $t0 -176($fp)
@@ -5694,9 +5694,9 @@ lw $t1 12($t0)
 sw $t1 -200($fp)
 lw $t0 -156($fp)
 lw $t1 12($t0)
-sw $t1 -196($fp)
+sw $t1 -192($fp)
 lw $t0 -200($fp)
-lw $t1 -196($fp)
+lw $t1 -192($fp)
 seq $t0 $t0 $t1
 sw $t0 -172($fp)
 j label_191
@@ -5706,10 +5706,10 @@ lw $t1 12($t0)
 sw $t1 -200($fp)
 lw $t0 -156($fp)
 lw $t1 12($t0)
-sw $t1 -196($fp)
+sw $t1 -192($fp)
 lw $t0 -200($fp)
 move $a0 $t0
-lw $t0 -196($fp)
+lw $t0 -192($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -172($fp)
@@ -5720,9 +5720,9 @@ lw $t1 12($t0)
 sw $t1 -200($fp)
 lw $t0 -156($fp)
 lw $t1 12($t0)
-sw $t1 -196($fp)
+sw $t1 -192($fp)
 lw $t0 -200($fp)
-lw $t1 -196($fp)
+lw $t1 -192($fp)
 seq $t0 $t0 $t1
 sw $t0 -172($fp)
 j label_191
@@ -5730,7 +5730,7 @@ label_191:
 lw $t0 -172($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -204($fp)
 lw $t0 -204($fp)
@@ -5741,7 +5741,7 @@ bne $t0 $zero label_192
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -152($fp)
 lw $t0 -152($fp)
@@ -5751,7 +5751,7 @@ label_192:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -148($fp)
 lw $t0 -148($fp)
@@ -5767,7 +5767,7 @@ sw $t0 -620($fp)
 lw $t0 -620($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -632($fp)
 lw $t0 -632($fp)
@@ -5808,7 +5808,7 @@ sw $t0 -92($fp)
 lw $t0 -92($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -88($fp)
 lw $t0 -96($fp)
@@ -5817,7 +5817,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -124($fp)
+sw $t1 -128($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -5825,25 +5825,25 @@ sw $t0 -120($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -116($fp)
+sw $t0 -112($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -112($fp)
-lw $t0 -124($fp)
+sw $t0 -116($fp)
+lw $t0 -128($fp)
 lw $t1 -120($fp)
 seq $t0 $t0 $t1
 sw $t0 -108($fp)
 lw $t0 -108($fp)
 bne $t0 $zero label_196
-lw $t0 -124($fp)
-lw $t1 -116($fp)
+lw $t0 -128($fp)
+lw $t1 -112($fp)
 seq $t0 $t0 $t1
 sw $t0 -108($fp)
 lw $t0 -108($fp)
 bne $t0 $zero label_197
-lw $t0 -124($fp)
-lw $t1 -112($fp)
+lw $t0 -128($fp)
+lw $t1 -116($fp)
 seq $t0 $t0 $t1
 sw $t0 -108($fp)
 lw $t0 -108($fp)
@@ -5859,9 +5859,9 @@ lw $t1 12($t0)
 sw $t1 -132($fp)
 lw $t0 -88($fp)
 lw $t1 12($t0)
-sw $t1 -128($fp)
+sw $t1 -124($fp)
 lw $t0 -132($fp)
-lw $t1 -128($fp)
+lw $t1 -124($fp)
 seq $t0 $t0 $t1
 sw $t0 -104($fp)
 j label_199
@@ -5871,10 +5871,10 @@ lw $t1 12($t0)
 sw $t1 -132($fp)
 lw $t0 -88($fp)
 lw $t1 12($t0)
-sw $t1 -128($fp)
+sw $t1 -124($fp)
 lw $t0 -132($fp)
 move $a0 $t0
-lw $t0 -128($fp)
+lw $t0 -124($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -104($fp)
@@ -5885,9 +5885,9 @@ lw $t1 12($t0)
 sw $t1 -132($fp)
 lw $t0 -88($fp)
 lw $t1 12($t0)
-sw $t1 -128($fp)
+sw $t1 -124($fp)
 lw $t0 -132($fp)
-lw $t1 -128($fp)
+lw $t1 -124($fp)
 seq $t0 $t0 $t1
 sw $t0 -104($fp)
 j label_199
@@ -5895,7 +5895,7 @@ label_199:
 lw $t0 -104($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -136($fp)
 lw $t0 -136($fp)
@@ -5906,7 +5906,7 @@ bne $t0 $zero label_200
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -84($fp)
 lw $t0 -84($fp)
@@ -5916,7 +5916,7 @@ label_200:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -80($fp)
 lw $t0 -80($fp)
@@ -5932,7 +5932,7 @@ sw $t0 -636($fp)
 lw $t0 -636($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -648($fp)
 lw $t0 -648($fp)
@@ -5973,7 +5973,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -28($fp)
@@ -5982,7 +5982,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -56($fp)
+sw $t1 -60($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -5990,25 +5990,25 @@ sw $t0 -52($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -48($fp)
+sw $t0 -44($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -44($fp)
-lw $t0 -56($fp)
+sw $t0 -48($fp)
+lw $t0 -60($fp)
 lw $t1 -52($fp)
 seq $t0 $t0 $t1
 sw $t0 -40($fp)
 lw $t0 -40($fp)
 bne $t0 $zero label_204
-lw $t0 -56($fp)
-lw $t1 -48($fp)
+lw $t0 -60($fp)
+lw $t1 -44($fp)
 seq $t0 $t0 $t1
 sw $t0 -40($fp)
 lw $t0 -40($fp)
 bne $t0 $zero label_205
-lw $t0 -56($fp)
-lw $t1 -44($fp)
+lw $t0 -60($fp)
+lw $t1 -48($fp)
 seq $t0 $t0 $t1
 sw $t0 -40($fp)
 lw $t0 -40($fp)
@@ -6024,9 +6024,9 @@ lw $t1 12($t0)
 sw $t1 -64($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -60($fp)
+sw $t1 -56($fp)
 lw $t0 -64($fp)
-lw $t1 -60($fp)
+lw $t1 -56($fp)
 seq $t0 $t0 $t1
 sw $t0 -36($fp)
 j label_207
@@ -6036,10 +6036,10 @@ lw $t1 12($t0)
 sw $t1 -64($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -60($fp)
+sw $t1 -56($fp)
 lw $t0 -64($fp)
 move $a0 $t0
-lw $t0 -60($fp)
+lw $t0 -56($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -36($fp)
@@ -6050,9 +6050,9 @@ lw $t1 12($t0)
 sw $t1 -64($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -60($fp)
+sw $t1 -56($fp)
 lw $t0 -64($fp)
-lw $t1 -60($fp)
+lw $t1 -56($fp)
 seq $t0 $t0 $t1
 sw $t0 -36($fp)
 j label_207
@@ -6060,7 +6060,7 @@ label_207:
 lw $t0 -36($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -68($fp)
 lw $t0 -68($fp)
@@ -6071,7 +6071,7 @@ bne $t0 $zero label_208
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -16($fp)
 lw $t0 -16($fp)
@@ -6081,7 +6081,7 @@ label_208:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
@@ -6097,11 +6097,11 @@ sw $t0 -652($fp)
 lw $t0 -652($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -664($fp)
 lw $v0 -664($fp)
-addi $sp $sp 672
+addi $sp $sp 656
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -6114,7 +6114,7 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -220
+addi $sp $sp -204
 lw $t0 4($fp)
 li $t1 0
 seq $t0 $t0 $t1
@@ -6148,7 +6148,7 @@ sw $v0 -164($fp)
 li $t0 3
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -160($fp)
 lw $t0 -164($fp)
@@ -6157,7 +6157,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -192($fp)
+sw $t1 -196($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -6165,25 +6165,25 @@ sw $t0 -188($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -184($fp)
+sw $t0 -180($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -180($fp)
-lw $t0 -192($fp)
+sw $t0 -184($fp)
+lw $t0 -196($fp)
 lw $t1 -188($fp)
 seq $t0 $t0 $t1
 sw $t0 -176($fp)
 lw $t0 -176($fp)
 bne $t0 $zero label_212
-lw $t0 -192($fp)
-lw $t1 -184($fp)
+lw $t0 -196($fp)
+lw $t1 -180($fp)
 seq $t0 $t0 $t1
 sw $t0 -176($fp)
 lw $t0 -176($fp)
 bne $t0 $zero label_213
-lw $t0 -192($fp)
-lw $t1 -180($fp)
+lw $t0 -196($fp)
+lw $t1 -184($fp)
 seq $t0 $t0 $t1
 sw $t0 -176($fp)
 lw $t0 -176($fp)
@@ -6199,9 +6199,9 @@ lw $t1 12($t0)
 sw $t1 -200($fp)
 lw $t0 -160($fp)
 lw $t1 12($t0)
-sw $t1 -196($fp)
+sw $t1 -192($fp)
 lw $t0 -200($fp)
-lw $t1 -196($fp)
+lw $t1 -192($fp)
 seq $t0 $t0 $t1
 sw $t0 -172($fp)
 j label_215
@@ -6211,10 +6211,10 @@ lw $t1 12($t0)
 sw $t1 -200($fp)
 lw $t0 -160($fp)
 lw $t1 12($t0)
-sw $t1 -196($fp)
+sw $t1 -192($fp)
 lw $t0 -200($fp)
 move $a0 $t0
-lw $t0 -196($fp)
+lw $t0 -192($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -172($fp)
@@ -6225,9 +6225,9 @@ lw $t1 12($t0)
 sw $t1 -200($fp)
 lw $t0 -160($fp)
 lw $t1 12($t0)
-sw $t1 -196($fp)
+sw $t1 -192($fp)
 lw $t0 -200($fp)
-lw $t1 -196($fp)
+lw $t1 -192($fp)
 seq $t0 $t0 $t1
 sw $t0 -172($fp)
 j label_215
@@ -6235,7 +6235,7 @@ label_215:
 lw $t0 -172($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -204($fp)
 lw $t0 -204($fp)
@@ -6276,7 +6276,7 @@ sw $v0 -108($fp)
 li $t0 2
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -104($fp)
 lw $t0 -108($fp)
@@ -6285,7 +6285,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -136($fp)
+sw $t1 -140($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -6293,25 +6293,25 @@ sw $t0 -132($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -128($fp)
+sw $t0 -124($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -124($fp)
-lw $t0 -136($fp)
+sw $t0 -128($fp)
+lw $t0 -140($fp)
 lw $t1 -132($fp)
 seq $t0 $t0 $t1
 sw $t0 -120($fp)
 lw $t0 -120($fp)
 bne $t0 $zero label_218
-lw $t0 -136($fp)
-lw $t1 -128($fp)
+lw $t0 -140($fp)
+lw $t1 -124($fp)
 seq $t0 $t0 $t1
 sw $t0 -120($fp)
 lw $t0 -120($fp)
 bne $t0 $zero label_219
-lw $t0 -136($fp)
-lw $t1 -124($fp)
+lw $t0 -140($fp)
+lw $t1 -128($fp)
 seq $t0 $t0 $t1
 sw $t0 -120($fp)
 lw $t0 -120($fp)
@@ -6327,9 +6327,9 @@ lw $t1 12($t0)
 sw $t1 -144($fp)
 lw $t0 -104($fp)
 lw $t1 12($t0)
-sw $t1 -140($fp)
+sw $t1 -136($fp)
 lw $t0 -144($fp)
-lw $t1 -140($fp)
+lw $t1 -136($fp)
 seq $t0 $t0 $t1
 sw $t0 -116($fp)
 j label_221
@@ -6339,10 +6339,10 @@ lw $t1 12($t0)
 sw $t1 -144($fp)
 lw $t0 -104($fp)
 lw $t1 12($t0)
-sw $t1 -140($fp)
+sw $t1 -136($fp)
 lw $t0 -144($fp)
 move $a0 $t0
-lw $t0 -140($fp)
+lw $t0 -136($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -116($fp)
@@ -6353,9 +6353,9 @@ lw $t1 12($t0)
 sw $t1 -144($fp)
 lw $t0 -104($fp)
 lw $t1 12($t0)
-sw $t1 -140($fp)
+sw $t1 -136($fp)
 lw $t0 -144($fp)
-lw $t1 -140($fp)
+lw $t1 -136($fp)
 seq $t0 $t0 $t1
 sw $t0 -116($fp)
 j label_221
@@ -6363,7 +6363,7 @@ label_221:
 lw $t0 -116($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -148($fp)
 lw $t0 -148($fp)
@@ -6376,7 +6376,7 @@ sw $t0 -100($fp)
 lw $t0 -100($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -96($fp)
 lw $t0 -96($fp)
@@ -6418,7 +6418,7 @@ sw $t0 -40($fp)
 lw $t0 -40($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -44($fp)
@@ -6427,7 +6427,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -72($fp)
+sw $t1 -76($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -6435,25 +6435,25 @@ sw $t0 -68($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -64($fp)
+sw $t0 -60($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -60($fp)
-lw $t0 -72($fp)
+sw $t0 -64($fp)
+lw $t0 -76($fp)
 lw $t1 -68($fp)
 seq $t0 $t0 $t1
 sw $t0 -56($fp)
 lw $t0 -56($fp)
 bne $t0 $zero label_225
-lw $t0 -72($fp)
-lw $t1 -64($fp)
+lw $t0 -76($fp)
+lw $t1 -60($fp)
 seq $t0 $t0 $t1
 sw $t0 -56($fp)
 lw $t0 -56($fp)
 bne $t0 $zero label_226
-lw $t0 -72($fp)
-lw $t1 -60($fp)
+lw $t0 -76($fp)
+lw $t1 -64($fp)
 seq $t0 $t0 $t1
 sw $t0 -56($fp)
 lw $t0 -56($fp)
@@ -6469,9 +6469,9 @@ lw $t1 12($t0)
 sw $t1 -80($fp)
 lw $t0 -36($fp)
 lw $t1 12($t0)
-sw $t1 -76($fp)
+sw $t1 -72($fp)
 lw $t0 -80($fp)
-lw $t1 -76($fp)
+lw $t1 -72($fp)
 seq $t0 $t0 $t1
 sw $t0 -52($fp)
 j label_228
@@ -6481,10 +6481,10 @@ lw $t1 12($t0)
 sw $t1 -80($fp)
 lw $t0 -36($fp)
 lw $t1 12($t0)
-sw $t1 -76($fp)
+sw $t1 -72($fp)
 lw $t0 -80($fp)
 move $a0 $t0
-lw $t0 -76($fp)
+lw $t0 -72($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -52($fp)
@@ -6495,9 +6495,9 @@ lw $t1 12($t0)
 sw $t1 -80($fp)
 lw $t0 -36($fp)
 lw $t1 12($t0)
-sw $t1 -76($fp)
+sw $t1 -72($fp)
 lw $t0 -80($fp)
-lw $t1 -76($fp)
+lw $t1 -72($fp)
 seq $t0 $t0 $t1
 sw $t0 -52($fp)
 j label_228
@@ -6505,7 +6505,7 @@ label_228:
 lw $t0 -52($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -84($fp)
 lw $t0 -84($fp)
@@ -6518,7 +6518,7 @@ sw $t0 -32($fp)
 lw $t0 -32($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -28($fp)
 lw $t0 -28($fp)
@@ -6530,7 +6530,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -6548,14 +6548,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -212($fp)
 label_233:
 lw $v0 -212($fp)
-addi $sp $sp 220
+addi $sp $sp 204
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -6568,11 +6568,11 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -96
+addi $sp $sp -80
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -84($fp)
 lw $t0 -84($fp)
@@ -6611,7 +6611,7 @@ sw $t0 -68($fp)
 lw $t0 -68($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -68($fp)
 label_236:
@@ -6628,7 +6628,7 @@ sw $t1 -48($fp)
 lw $t0 -48($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -60($fp)
 lw $t0 -60($fp)
@@ -6706,7 +6706,7 @@ sw $t1 -24($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
@@ -6719,7 +6719,7 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -28($fp)
 lw $t0 -28($fp)
@@ -6731,7 +6731,7 @@ lw $t1 0($fp)
 addi $t1 $t1 24
 sw $t0 0($t1)
 lw $v0 0($fp)
-addi $sp $sp 96
+addi $sp $sp 80
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -6744,11 +6744,11 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -1596
+addi $sp $sp -1580
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -1588($fp)
 la $t0 data_81
@@ -6756,7 +6756,7 @@ sw $t0 -1584($fp)
 lw $t0 -1584($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1580($fp)
 lw $t0 0($fp)
@@ -6794,7 +6794,7 @@ sw $t0 -1568($fp)
 lw $t0 -1568($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1564($fp)
 lw $t0 0($fp)
@@ -6832,7 +6832,7 @@ sw $t0 -1552($fp)
 lw $t0 -1552($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1548($fp)
 lw $t0 0($fp)
@@ -6870,7 +6870,7 @@ sw $t0 -1536($fp)
 lw $t0 -1536($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1532($fp)
 lw $t0 0($fp)
@@ -6908,7 +6908,7 @@ sw $t0 -1520($fp)
 lw $t0 -1520($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1516($fp)
 lw $t0 0($fp)
@@ -6946,7 +6946,7 @@ sw $t0 -1504($fp)
 lw $t0 -1504($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1500($fp)
 lw $t0 0($fp)
@@ -6984,7 +6984,7 @@ sw $t0 -1488($fp)
 lw $t0 -1488($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1484($fp)
 lw $t0 0($fp)
@@ -7022,7 +7022,7 @@ sw $t0 -1472($fp)
 lw $t0 -1472($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1468($fp)
 lw $t0 0($fp)
@@ -7060,7 +7060,7 @@ sw $t0 -1456($fp)
 lw $t0 -1456($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1452($fp)
 lw $t0 0($fp)
@@ -7098,7 +7098,7 @@ sw $t0 -1440($fp)
 lw $t0 -1440($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1436($fp)
 lw $t0 0($fp)
@@ -7136,7 +7136,7 @@ sw $t0 -1424($fp)
 lw $t0 -1424($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1420($fp)
 lw $t0 0($fp)
@@ -7174,7 +7174,7 @@ sw $t0 -1408($fp)
 lw $t0 -1408($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1404($fp)
 lw $t0 0($fp)
@@ -7212,7 +7212,7 @@ sw $t0 -1392($fp)
 lw $t0 -1392($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1388($fp)
 lw $t0 0($fp)
@@ -7250,7 +7250,7 @@ sw $t0 -1376($fp)
 lw $t0 -1376($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1372($fp)
 lw $t0 0($fp)
@@ -7288,7 +7288,7 @@ sw $t0 -1360($fp)
 lw $t0 -1360($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1356($fp)
 lw $t0 0($fp)
@@ -7326,7 +7326,7 @@ sw $t0 -1344($fp)
 lw $t0 -1344($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1340($fp)
 lw $t0 0($fp)
@@ -7364,7 +7364,7 @@ sw $t0 -1328($fp)
 lw $t0 -1328($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1324($fp)
 lw $t0 0($fp)
@@ -7402,7 +7402,7 @@ sw $t0 -1312($fp)
 lw $t0 -1312($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1308($fp)
 lw $t0 0($fp)
@@ -7440,7 +7440,7 @@ sw $t0 -1296($fp)
 lw $t0 -1296($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1292($fp)
 lw $t0 0($fp)
@@ -7478,7 +7478,7 @@ sw $t0 -1280($fp)
 lw $t0 -1280($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1276($fp)
 lw $t0 0($fp)
@@ -7516,7 +7516,7 @@ sw $t0 -1264($fp)
 lw $t0 -1264($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1260($fp)
 lw $t0 0($fp)
@@ -7554,7 +7554,7 @@ sw $t0 -1248($fp)
 lw $t0 -1248($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1244($fp)
 lw $t0 0($fp)
@@ -7592,7 +7592,7 @@ sw $t0 -1232($fp)
 lw $t0 -1232($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1228($fp)
 lw $t0 0($fp)
@@ -7659,7 +7659,7 @@ sw $t0 -1208($fp)
 lw $t0 -1208($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -1204($fp)
 lw $t0 0($fp)
@@ -7695,7 +7695,7 @@ sw $v0 -1196($fp)
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -1148($fp)
 lw $t0 -1588($fp)
@@ -7704,7 +7704,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -1172($fp)
+sw $t1 -1176($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -7712,25 +7712,25 @@ sw $t0 -1168($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -1164($fp)
+sw $t0 -1160($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -1160($fp)
-lw $t0 -1172($fp)
+sw $t0 -1164($fp)
+lw $t0 -1176($fp)
 lw $t1 -1168($fp)
 seq $t0 $t0 $t1
 sw $t0 -1156($fp)
 lw $t0 -1156($fp)
 bne $t0 $zero label_293
-lw $t0 -1172($fp)
-lw $t1 -1164($fp)
+lw $t0 -1176($fp)
+lw $t1 -1160($fp)
 seq $t0 $t0 $t1
 sw $t0 -1156($fp)
 lw $t0 -1156($fp)
 bne $t0 $zero label_294
-lw $t0 -1172($fp)
-lw $t1 -1160($fp)
+lw $t0 -1176($fp)
+lw $t1 -1164($fp)
 seq $t0 $t0 $t1
 sw $t0 -1156($fp)
 lw $t0 -1156($fp)
@@ -7746,9 +7746,9 @@ lw $t1 12($t0)
 sw $t1 -1180($fp)
 lw $t0 -1148($fp)
 lw $t1 12($t0)
-sw $t1 -1176($fp)
+sw $t1 -1172($fp)
 lw $t0 -1180($fp)
-lw $t1 -1176($fp)
+lw $t1 -1172($fp)
 seq $t0 $t0 $t1
 sw $t0 -1152($fp)
 j label_296
@@ -7758,10 +7758,10 @@ lw $t1 12($t0)
 sw $t1 -1180($fp)
 lw $t0 -1148($fp)
 lw $t1 12($t0)
-sw $t1 -1176($fp)
+sw $t1 -1172($fp)
 lw $t0 -1180($fp)
 move $a0 $t0
-lw $t0 -1176($fp)
+lw $t0 -1172($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -1152($fp)
@@ -7772,9 +7772,9 @@ lw $t1 12($t0)
 sw $t1 -1180($fp)
 lw $t0 -1148($fp)
 lw $t1 12($t0)
-sw $t1 -1176($fp)
+sw $t1 -1172($fp)
 lw $t0 -1180($fp)
-lw $t1 -1176($fp)
+lw $t1 -1172($fp)
 seq $t0 $t0 $t1
 sw $t0 -1152($fp)
 j label_296
@@ -7782,7 +7782,7 @@ label_296:
 lw $t0 -1152($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -1184($fp)
 lw $t0 -1184($fp)
@@ -7793,7 +7793,7 @@ bne $t0 $zero label_417
 li $t0 2
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -1100($fp)
 lw $t0 -1588($fp)
@@ -7802,7 +7802,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -1124($fp)
+sw $t1 -1128($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -7810,25 +7810,25 @@ sw $t0 -1120($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -1116($fp)
+sw $t0 -1112($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -1112($fp)
-lw $t0 -1124($fp)
+sw $t0 -1116($fp)
+lw $t0 -1128($fp)
 lw $t1 -1120($fp)
 seq $t0 $t0 $t1
 sw $t0 -1108($fp)
 lw $t0 -1108($fp)
 bne $t0 $zero label_297
-lw $t0 -1124($fp)
-lw $t1 -1116($fp)
+lw $t0 -1128($fp)
+lw $t1 -1112($fp)
 seq $t0 $t0 $t1
 sw $t0 -1108($fp)
 lw $t0 -1108($fp)
 bne $t0 $zero label_298
-lw $t0 -1124($fp)
-lw $t1 -1112($fp)
+lw $t0 -1128($fp)
+lw $t1 -1116($fp)
 seq $t0 $t0 $t1
 sw $t0 -1108($fp)
 lw $t0 -1108($fp)
@@ -7844,9 +7844,9 @@ lw $t1 12($t0)
 sw $t1 -1132($fp)
 lw $t0 -1100($fp)
 lw $t1 12($t0)
-sw $t1 -1128($fp)
+sw $t1 -1124($fp)
 lw $t0 -1132($fp)
-lw $t1 -1128($fp)
+lw $t1 -1124($fp)
 seq $t0 $t0 $t1
 sw $t0 -1104($fp)
 j label_300
@@ -7856,10 +7856,10 @@ lw $t1 12($t0)
 sw $t1 -1132($fp)
 lw $t0 -1100($fp)
 lw $t1 12($t0)
-sw $t1 -1128($fp)
+sw $t1 -1124($fp)
 lw $t0 -1132($fp)
 move $a0 $t0
-lw $t0 -1128($fp)
+lw $t0 -1124($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -1104($fp)
@@ -7870,9 +7870,9 @@ lw $t1 12($t0)
 sw $t1 -1132($fp)
 lw $t0 -1100($fp)
 lw $t1 12($t0)
-sw $t1 -1128($fp)
+sw $t1 -1124($fp)
 lw $t0 -1132($fp)
-lw $t1 -1128($fp)
+lw $t1 -1124($fp)
 seq $t0 $t0 $t1
 sw $t0 -1104($fp)
 j label_300
@@ -7880,7 +7880,7 @@ label_300:
 lw $t0 -1104($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -1136($fp)
 lw $t0 -1136($fp)
@@ -7891,7 +7891,7 @@ bne $t0 $zero label_415
 li $t0 3
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -1052($fp)
 lw $t0 -1588($fp)
@@ -7900,7 +7900,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -1076($fp)
+sw $t1 -1080($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -7908,25 +7908,25 @@ sw $t0 -1072($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -1068($fp)
+sw $t0 -1064($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -1064($fp)
-lw $t0 -1076($fp)
+sw $t0 -1068($fp)
+lw $t0 -1080($fp)
 lw $t1 -1072($fp)
 seq $t0 $t0 $t1
 sw $t0 -1060($fp)
 lw $t0 -1060($fp)
 bne $t0 $zero label_301
-lw $t0 -1076($fp)
-lw $t1 -1068($fp)
+lw $t0 -1080($fp)
+lw $t1 -1064($fp)
 seq $t0 $t0 $t1
 sw $t0 -1060($fp)
 lw $t0 -1060($fp)
 bne $t0 $zero label_302
-lw $t0 -1076($fp)
-lw $t1 -1064($fp)
+lw $t0 -1080($fp)
+lw $t1 -1068($fp)
 seq $t0 $t0 $t1
 sw $t0 -1060($fp)
 lw $t0 -1060($fp)
@@ -7942,9 +7942,9 @@ lw $t1 12($t0)
 sw $t1 -1084($fp)
 lw $t0 -1052($fp)
 lw $t1 12($t0)
-sw $t1 -1080($fp)
+sw $t1 -1076($fp)
 lw $t0 -1084($fp)
-lw $t1 -1080($fp)
+lw $t1 -1076($fp)
 seq $t0 $t0 $t1
 sw $t0 -1056($fp)
 j label_304
@@ -7954,10 +7954,10 @@ lw $t1 12($t0)
 sw $t1 -1084($fp)
 lw $t0 -1052($fp)
 lw $t1 12($t0)
-sw $t1 -1080($fp)
+sw $t1 -1076($fp)
 lw $t0 -1084($fp)
 move $a0 $t0
-lw $t0 -1080($fp)
+lw $t0 -1076($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -1056($fp)
@@ -7968,9 +7968,9 @@ lw $t1 12($t0)
 sw $t1 -1084($fp)
 lw $t0 -1052($fp)
 lw $t1 12($t0)
-sw $t1 -1080($fp)
+sw $t1 -1076($fp)
 lw $t0 -1084($fp)
-lw $t1 -1080($fp)
+lw $t1 -1076($fp)
 seq $t0 $t0 $t1
 sw $t0 -1056($fp)
 j label_304
@@ -7978,7 +7978,7 @@ label_304:
 lw $t0 -1056($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -1088($fp)
 lw $t0 -1088($fp)
@@ -7989,7 +7989,7 @@ bne $t0 $zero label_413
 li $t0 4
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -1004($fp)
 lw $t0 -1588($fp)
@@ -7998,7 +7998,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -1028($fp)
+sw $t1 -1032($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8006,25 +8006,25 @@ sw $t0 -1024($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -1020($fp)
+sw $t0 -1016($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -1016($fp)
-lw $t0 -1028($fp)
+sw $t0 -1020($fp)
+lw $t0 -1032($fp)
 lw $t1 -1024($fp)
 seq $t0 $t0 $t1
 sw $t0 -1012($fp)
 lw $t0 -1012($fp)
 bne $t0 $zero label_305
-lw $t0 -1028($fp)
-lw $t1 -1020($fp)
+lw $t0 -1032($fp)
+lw $t1 -1016($fp)
 seq $t0 $t0 $t1
 sw $t0 -1012($fp)
 lw $t0 -1012($fp)
 bne $t0 $zero label_306
-lw $t0 -1028($fp)
-lw $t1 -1016($fp)
+lw $t0 -1032($fp)
+lw $t1 -1020($fp)
 seq $t0 $t0 $t1
 sw $t0 -1012($fp)
 lw $t0 -1012($fp)
@@ -8040,9 +8040,9 @@ lw $t1 12($t0)
 sw $t1 -1036($fp)
 lw $t0 -1004($fp)
 lw $t1 12($t0)
-sw $t1 -1032($fp)
+sw $t1 -1028($fp)
 lw $t0 -1036($fp)
-lw $t1 -1032($fp)
+lw $t1 -1028($fp)
 seq $t0 $t0 $t1
 sw $t0 -1008($fp)
 j label_308
@@ -8052,10 +8052,10 @@ lw $t1 12($t0)
 sw $t1 -1036($fp)
 lw $t0 -1004($fp)
 lw $t1 12($t0)
-sw $t1 -1032($fp)
+sw $t1 -1028($fp)
 lw $t0 -1036($fp)
 move $a0 $t0
-lw $t0 -1032($fp)
+lw $t0 -1028($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -1008($fp)
@@ -8066,9 +8066,9 @@ lw $t1 12($t0)
 sw $t1 -1036($fp)
 lw $t0 -1004($fp)
 lw $t1 12($t0)
-sw $t1 -1032($fp)
+sw $t1 -1028($fp)
 lw $t0 -1036($fp)
-lw $t1 -1032($fp)
+lw $t1 -1028($fp)
 seq $t0 $t0 $t1
 sw $t0 -1008($fp)
 j label_308
@@ -8076,7 +8076,7 @@ label_308:
 lw $t0 -1008($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -1040($fp)
 lw $t0 -1040($fp)
@@ -8087,7 +8087,7 @@ bne $t0 $zero label_411
 li $t0 5
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -956($fp)
 lw $t0 -1588($fp)
@@ -8096,7 +8096,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -980($fp)
+sw $t1 -984($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8104,25 +8104,25 @@ sw $t0 -976($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -972($fp)
+sw $t0 -968($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -968($fp)
-lw $t0 -980($fp)
+sw $t0 -972($fp)
+lw $t0 -984($fp)
 lw $t1 -976($fp)
 seq $t0 $t0 $t1
 sw $t0 -964($fp)
 lw $t0 -964($fp)
 bne $t0 $zero label_309
-lw $t0 -980($fp)
-lw $t1 -972($fp)
+lw $t0 -984($fp)
+lw $t1 -968($fp)
 seq $t0 $t0 $t1
 sw $t0 -964($fp)
 lw $t0 -964($fp)
 bne $t0 $zero label_310
-lw $t0 -980($fp)
-lw $t1 -968($fp)
+lw $t0 -984($fp)
+lw $t1 -972($fp)
 seq $t0 $t0 $t1
 sw $t0 -964($fp)
 lw $t0 -964($fp)
@@ -8138,9 +8138,9 @@ lw $t1 12($t0)
 sw $t1 -988($fp)
 lw $t0 -956($fp)
 lw $t1 12($t0)
-sw $t1 -984($fp)
+sw $t1 -980($fp)
 lw $t0 -988($fp)
-lw $t1 -984($fp)
+lw $t1 -980($fp)
 seq $t0 $t0 $t1
 sw $t0 -960($fp)
 j label_312
@@ -8150,10 +8150,10 @@ lw $t1 12($t0)
 sw $t1 -988($fp)
 lw $t0 -956($fp)
 lw $t1 12($t0)
-sw $t1 -984($fp)
+sw $t1 -980($fp)
 lw $t0 -988($fp)
 move $a0 $t0
-lw $t0 -984($fp)
+lw $t0 -980($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -960($fp)
@@ -8164,9 +8164,9 @@ lw $t1 12($t0)
 sw $t1 -988($fp)
 lw $t0 -956($fp)
 lw $t1 12($t0)
-sw $t1 -984($fp)
+sw $t1 -980($fp)
 lw $t0 -988($fp)
-lw $t1 -984($fp)
+lw $t1 -980($fp)
 seq $t0 $t0 $t1
 sw $t0 -960($fp)
 j label_312
@@ -8174,7 +8174,7 @@ label_312:
 lw $t0 -960($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -992($fp)
 lw $t0 -992($fp)
@@ -8185,7 +8185,7 @@ bne $t0 $zero label_409
 li $t0 6
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -908($fp)
 lw $t0 -1588($fp)
@@ -8194,7 +8194,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -932($fp)
+sw $t1 -936($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8202,25 +8202,25 @@ sw $t0 -928($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -924($fp)
+sw $t0 -920($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -920($fp)
-lw $t0 -932($fp)
+sw $t0 -924($fp)
+lw $t0 -936($fp)
 lw $t1 -928($fp)
 seq $t0 $t0 $t1
 sw $t0 -916($fp)
 lw $t0 -916($fp)
 bne $t0 $zero label_313
-lw $t0 -932($fp)
-lw $t1 -924($fp)
+lw $t0 -936($fp)
+lw $t1 -920($fp)
 seq $t0 $t0 $t1
 sw $t0 -916($fp)
 lw $t0 -916($fp)
 bne $t0 $zero label_314
-lw $t0 -932($fp)
-lw $t1 -920($fp)
+lw $t0 -936($fp)
+lw $t1 -924($fp)
 seq $t0 $t0 $t1
 sw $t0 -916($fp)
 lw $t0 -916($fp)
@@ -8236,9 +8236,9 @@ lw $t1 12($t0)
 sw $t1 -940($fp)
 lw $t0 -908($fp)
 lw $t1 12($t0)
-sw $t1 -936($fp)
+sw $t1 -932($fp)
 lw $t0 -940($fp)
-lw $t1 -936($fp)
+lw $t1 -932($fp)
 seq $t0 $t0 $t1
 sw $t0 -912($fp)
 j label_316
@@ -8248,10 +8248,10 @@ lw $t1 12($t0)
 sw $t1 -940($fp)
 lw $t0 -908($fp)
 lw $t1 12($t0)
-sw $t1 -936($fp)
+sw $t1 -932($fp)
 lw $t0 -940($fp)
 move $a0 $t0
-lw $t0 -936($fp)
+lw $t0 -932($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -912($fp)
@@ -8262,9 +8262,9 @@ lw $t1 12($t0)
 sw $t1 -940($fp)
 lw $t0 -908($fp)
 lw $t1 12($t0)
-sw $t1 -936($fp)
+sw $t1 -932($fp)
 lw $t0 -940($fp)
-lw $t1 -936($fp)
+lw $t1 -932($fp)
 seq $t0 $t0 $t1
 sw $t0 -912($fp)
 j label_316
@@ -8272,7 +8272,7 @@ label_316:
 lw $t0 -912($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -944($fp)
 lw $t0 -944($fp)
@@ -8283,7 +8283,7 @@ bne $t0 $zero label_407
 li $t0 7
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -860($fp)
 lw $t0 -1588($fp)
@@ -8292,7 +8292,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -884($fp)
+sw $t1 -888($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8300,25 +8300,25 @@ sw $t0 -880($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -876($fp)
+sw $t0 -872($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -872($fp)
-lw $t0 -884($fp)
+sw $t0 -876($fp)
+lw $t0 -888($fp)
 lw $t1 -880($fp)
 seq $t0 $t0 $t1
 sw $t0 -868($fp)
 lw $t0 -868($fp)
 bne $t0 $zero label_317
-lw $t0 -884($fp)
-lw $t1 -876($fp)
+lw $t0 -888($fp)
+lw $t1 -872($fp)
 seq $t0 $t0 $t1
 sw $t0 -868($fp)
 lw $t0 -868($fp)
 bne $t0 $zero label_318
-lw $t0 -884($fp)
-lw $t1 -872($fp)
+lw $t0 -888($fp)
+lw $t1 -876($fp)
 seq $t0 $t0 $t1
 sw $t0 -868($fp)
 lw $t0 -868($fp)
@@ -8334,9 +8334,9 @@ lw $t1 12($t0)
 sw $t1 -892($fp)
 lw $t0 -860($fp)
 lw $t1 12($t0)
-sw $t1 -888($fp)
+sw $t1 -884($fp)
 lw $t0 -892($fp)
-lw $t1 -888($fp)
+lw $t1 -884($fp)
 seq $t0 $t0 $t1
 sw $t0 -864($fp)
 j label_320
@@ -8346,10 +8346,10 @@ lw $t1 12($t0)
 sw $t1 -892($fp)
 lw $t0 -860($fp)
 lw $t1 12($t0)
-sw $t1 -888($fp)
+sw $t1 -884($fp)
 lw $t0 -892($fp)
 move $a0 $t0
-lw $t0 -888($fp)
+lw $t0 -884($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -864($fp)
@@ -8360,9 +8360,9 @@ lw $t1 12($t0)
 sw $t1 -892($fp)
 lw $t0 -860($fp)
 lw $t1 12($t0)
-sw $t1 -888($fp)
+sw $t1 -884($fp)
 lw $t0 -892($fp)
-lw $t1 -888($fp)
+lw $t1 -884($fp)
 seq $t0 $t0 $t1
 sw $t0 -864($fp)
 j label_320
@@ -8370,7 +8370,7 @@ label_320:
 lw $t0 -864($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -896($fp)
 lw $t0 -896($fp)
@@ -8381,7 +8381,7 @@ bne $t0 $zero label_405
 li $t0 8
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -812($fp)
 lw $t0 -1588($fp)
@@ -8390,7 +8390,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -836($fp)
+sw $t1 -840($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8398,25 +8398,25 @@ sw $t0 -832($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -828($fp)
+sw $t0 -824($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -824($fp)
-lw $t0 -836($fp)
+sw $t0 -828($fp)
+lw $t0 -840($fp)
 lw $t1 -832($fp)
 seq $t0 $t0 $t1
 sw $t0 -820($fp)
 lw $t0 -820($fp)
 bne $t0 $zero label_321
-lw $t0 -836($fp)
-lw $t1 -828($fp)
+lw $t0 -840($fp)
+lw $t1 -824($fp)
 seq $t0 $t0 $t1
 sw $t0 -820($fp)
 lw $t0 -820($fp)
 bne $t0 $zero label_322
-lw $t0 -836($fp)
-lw $t1 -824($fp)
+lw $t0 -840($fp)
+lw $t1 -828($fp)
 seq $t0 $t0 $t1
 sw $t0 -820($fp)
 lw $t0 -820($fp)
@@ -8432,9 +8432,9 @@ lw $t1 12($t0)
 sw $t1 -844($fp)
 lw $t0 -812($fp)
 lw $t1 12($t0)
-sw $t1 -840($fp)
+sw $t1 -836($fp)
 lw $t0 -844($fp)
-lw $t1 -840($fp)
+lw $t1 -836($fp)
 seq $t0 $t0 $t1
 sw $t0 -816($fp)
 j label_324
@@ -8444,10 +8444,10 @@ lw $t1 12($t0)
 sw $t1 -844($fp)
 lw $t0 -812($fp)
 lw $t1 12($t0)
-sw $t1 -840($fp)
+sw $t1 -836($fp)
 lw $t0 -844($fp)
 move $a0 $t0
-lw $t0 -840($fp)
+lw $t0 -836($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -816($fp)
@@ -8458,9 +8458,9 @@ lw $t1 12($t0)
 sw $t1 -844($fp)
 lw $t0 -812($fp)
 lw $t1 12($t0)
-sw $t1 -840($fp)
+sw $t1 -836($fp)
 lw $t0 -844($fp)
-lw $t1 -840($fp)
+lw $t1 -836($fp)
 seq $t0 $t0 $t1
 sw $t0 -816($fp)
 j label_324
@@ -8468,7 +8468,7 @@ label_324:
 lw $t0 -816($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -848($fp)
 lw $t0 -848($fp)
@@ -8479,7 +8479,7 @@ bne $t0 $zero label_403
 li $t0 9
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -764($fp)
 lw $t0 -1588($fp)
@@ -8488,7 +8488,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -788($fp)
+sw $t1 -792($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8496,25 +8496,25 @@ sw $t0 -784($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -780($fp)
+sw $t0 -776($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -776($fp)
-lw $t0 -788($fp)
+sw $t0 -780($fp)
+lw $t0 -792($fp)
 lw $t1 -784($fp)
 seq $t0 $t0 $t1
 sw $t0 -772($fp)
 lw $t0 -772($fp)
 bne $t0 $zero label_325
-lw $t0 -788($fp)
-lw $t1 -780($fp)
+lw $t0 -792($fp)
+lw $t1 -776($fp)
 seq $t0 $t0 $t1
 sw $t0 -772($fp)
 lw $t0 -772($fp)
 bne $t0 $zero label_326
-lw $t0 -788($fp)
-lw $t1 -776($fp)
+lw $t0 -792($fp)
+lw $t1 -780($fp)
 seq $t0 $t0 $t1
 sw $t0 -772($fp)
 lw $t0 -772($fp)
@@ -8530,9 +8530,9 @@ lw $t1 12($t0)
 sw $t1 -796($fp)
 lw $t0 -764($fp)
 lw $t1 12($t0)
-sw $t1 -792($fp)
+sw $t1 -788($fp)
 lw $t0 -796($fp)
-lw $t1 -792($fp)
+lw $t1 -788($fp)
 seq $t0 $t0 $t1
 sw $t0 -768($fp)
 j label_328
@@ -8542,10 +8542,10 @@ lw $t1 12($t0)
 sw $t1 -796($fp)
 lw $t0 -764($fp)
 lw $t1 12($t0)
-sw $t1 -792($fp)
+sw $t1 -788($fp)
 lw $t0 -796($fp)
 move $a0 $t0
-lw $t0 -792($fp)
+lw $t0 -788($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -768($fp)
@@ -8556,9 +8556,9 @@ lw $t1 12($t0)
 sw $t1 -796($fp)
 lw $t0 -764($fp)
 lw $t1 12($t0)
-sw $t1 -792($fp)
+sw $t1 -788($fp)
 lw $t0 -796($fp)
-lw $t1 -792($fp)
+lw $t1 -788($fp)
 seq $t0 $t0 $t1
 sw $t0 -768($fp)
 j label_328
@@ -8566,7 +8566,7 @@ label_328:
 lw $t0 -768($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -800($fp)
 lw $t0 -800($fp)
@@ -8577,7 +8577,7 @@ bne $t0 $zero label_401
 li $t0 10
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -716($fp)
 lw $t0 -1588($fp)
@@ -8586,7 +8586,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -740($fp)
+sw $t1 -744($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8594,25 +8594,25 @@ sw $t0 -736($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -732($fp)
+sw $t0 -728($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -728($fp)
-lw $t0 -740($fp)
+sw $t0 -732($fp)
+lw $t0 -744($fp)
 lw $t1 -736($fp)
 seq $t0 $t0 $t1
 sw $t0 -724($fp)
 lw $t0 -724($fp)
 bne $t0 $zero label_329
-lw $t0 -740($fp)
-lw $t1 -732($fp)
+lw $t0 -744($fp)
+lw $t1 -728($fp)
 seq $t0 $t0 $t1
 sw $t0 -724($fp)
 lw $t0 -724($fp)
 bne $t0 $zero label_330
-lw $t0 -740($fp)
-lw $t1 -728($fp)
+lw $t0 -744($fp)
+lw $t1 -732($fp)
 seq $t0 $t0 $t1
 sw $t0 -724($fp)
 lw $t0 -724($fp)
@@ -8628,9 +8628,9 @@ lw $t1 12($t0)
 sw $t1 -748($fp)
 lw $t0 -716($fp)
 lw $t1 12($t0)
-sw $t1 -744($fp)
+sw $t1 -740($fp)
 lw $t0 -748($fp)
-lw $t1 -744($fp)
+lw $t1 -740($fp)
 seq $t0 $t0 $t1
 sw $t0 -720($fp)
 j label_332
@@ -8640,10 +8640,10 @@ lw $t1 12($t0)
 sw $t1 -748($fp)
 lw $t0 -716($fp)
 lw $t1 12($t0)
-sw $t1 -744($fp)
+sw $t1 -740($fp)
 lw $t0 -748($fp)
 move $a0 $t0
-lw $t0 -744($fp)
+lw $t0 -740($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -720($fp)
@@ -8654,9 +8654,9 @@ lw $t1 12($t0)
 sw $t1 -748($fp)
 lw $t0 -716($fp)
 lw $t1 12($t0)
-sw $t1 -744($fp)
+sw $t1 -740($fp)
 lw $t0 -748($fp)
-lw $t1 -744($fp)
+lw $t1 -740($fp)
 seq $t0 $t0 $t1
 sw $t0 -720($fp)
 j label_332
@@ -8664,7 +8664,7 @@ label_332:
 lw $t0 -720($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -752($fp)
 lw $t0 -752($fp)
@@ -8675,7 +8675,7 @@ bne $t0 $zero label_399
 li $t0 11
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -668($fp)
 lw $t0 -1588($fp)
@@ -8684,7 +8684,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -692($fp)
+sw $t1 -696($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8692,25 +8692,25 @@ sw $t0 -688($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -684($fp)
+sw $t0 -680($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -680($fp)
-lw $t0 -692($fp)
+sw $t0 -684($fp)
+lw $t0 -696($fp)
 lw $t1 -688($fp)
 seq $t0 $t0 $t1
 sw $t0 -676($fp)
 lw $t0 -676($fp)
 bne $t0 $zero label_333
-lw $t0 -692($fp)
-lw $t1 -684($fp)
+lw $t0 -696($fp)
+lw $t1 -680($fp)
 seq $t0 $t0 $t1
 sw $t0 -676($fp)
 lw $t0 -676($fp)
 bne $t0 $zero label_334
-lw $t0 -692($fp)
-lw $t1 -680($fp)
+lw $t0 -696($fp)
+lw $t1 -684($fp)
 seq $t0 $t0 $t1
 sw $t0 -676($fp)
 lw $t0 -676($fp)
@@ -8726,9 +8726,9 @@ lw $t1 12($t0)
 sw $t1 -700($fp)
 lw $t0 -668($fp)
 lw $t1 12($t0)
-sw $t1 -696($fp)
+sw $t1 -692($fp)
 lw $t0 -700($fp)
-lw $t1 -696($fp)
+lw $t1 -692($fp)
 seq $t0 $t0 $t1
 sw $t0 -672($fp)
 j label_336
@@ -8738,10 +8738,10 @@ lw $t1 12($t0)
 sw $t1 -700($fp)
 lw $t0 -668($fp)
 lw $t1 12($t0)
-sw $t1 -696($fp)
+sw $t1 -692($fp)
 lw $t0 -700($fp)
 move $a0 $t0
-lw $t0 -696($fp)
+lw $t0 -692($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -672($fp)
@@ -8752,9 +8752,9 @@ lw $t1 12($t0)
 sw $t1 -700($fp)
 lw $t0 -668($fp)
 lw $t1 12($t0)
-sw $t1 -696($fp)
+sw $t1 -692($fp)
 lw $t0 -700($fp)
-lw $t1 -696($fp)
+lw $t1 -692($fp)
 seq $t0 $t0 $t1
 sw $t0 -672($fp)
 j label_336
@@ -8762,7 +8762,7 @@ label_336:
 lw $t0 -672($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -704($fp)
 lw $t0 -704($fp)
@@ -8773,7 +8773,7 @@ bne $t0 $zero label_397
 li $t0 12
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -620($fp)
 lw $t0 -1588($fp)
@@ -8782,7 +8782,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -644($fp)
+sw $t1 -648($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8790,25 +8790,25 @@ sw $t0 -640($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -636($fp)
+sw $t0 -632($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -632($fp)
-lw $t0 -644($fp)
+sw $t0 -636($fp)
+lw $t0 -648($fp)
 lw $t1 -640($fp)
 seq $t0 $t0 $t1
 sw $t0 -628($fp)
 lw $t0 -628($fp)
 bne $t0 $zero label_337
-lw $t0 -644($fp)
-lw $t1 -636($fp)
+lw $t0 -648($fp)
+lw $t1 -632($fp)
 seq $t0 $t0 $t1
 sw $t0 -628($fp)
 lw $t0 -628($fp)
 bne $t0 $zero label_338
-lw $t0 -644($fp)
-lw $t1 -632($fp)
+lw $t0 -648($fp)
+lw $t1 -636($fp)
 seq $t0 $t0 $t1
 sw $t0 -628($fp)
 lw $t0 -628($fp)
@@ -8824,9 +8824,9 @@ lw $t1 12($t0)
 sw $t1 -652($fp)
 lw $t0 -620($fp)
 lw $t1 12($t0)
-sw $t1 -648($fp)
+sw $t1 -644($fp)
 lw $t0 -652($fp)
-lw $t1 -648($fp)
+lw $t1 -644($fp)
 seq $t0 $t0 $t1
 sw $t0 -624($fp)
 j label_340
@@ -8836,10 +8836,10 @@ lw $t1 12($t0)
 sw $t1 -652($fp)
 lw $t0 -620($fp)
 lw $t1 12($t0)
-sw $t1 -648($fp)
+sw $t1 -644($fp)
 lw $t0 -652($fp)
 move $a0 $t0
-lw $t0 -648($fp)
+lw $t0 -644($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -624($fp)
@@ -8850,9 +8850,9 @@ lw $t1 12($t0)
 sw $t1 -652($fp)
 lw $t0 -620($fp)
 lw $t1 12($t0)
-sw $t1 -648($fp)
+sw $t1 -644($fp)
 lw $t0 -652($fp)
-lw $t1 -648($fp)
+lw $t1 -644($fp)
 seq $t0 $t0 $t1
 sw $t0 -624($fp)
 j label_340
@@ -8860,7 +8860,7 @@ label_340:
 lw $t0 -624($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -656($fp)
 lw $t0 -656($fp)
@@ -8871,7 +8871,7 @@ bne $t0 $zero label_395
 li $t0 13
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -572($fp)
 lw $t0 -1588($fp)
@@ -8880,7 +8880,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -596($fp)
+sw $t1 -600($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8888,25 +8888,25 @@ sw $t0 -592($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -588($fp)
+sw $t0 -584($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -584($fp)
-lw $t0 -596($fp)
+sw $t0 -588($fp)
+lw $t0 -600($fp)
 lw $t1 -592($fp)
 seq $t0 $t0 $t1
 sw $t0 -580($fp)
 lw $t0 -580($fp)
 bne $t0 $zero label_341
-lw $t0 -596($fp)
-lw $t1 -588($fp)
+lw $t0 -600($fp)
+lw $t1 -584($fp)
 seq $t0 $t0 $t1
 sw $t0 -580($fp)
 lw $t0 -580($fp)
 bne $t0 $zero label_342
-lw $t0 -596($fp)
-lw $t1 -584($fp)
+lw $t0 -600($fp)
+lw $t1 -588($fp)
 seq $t0 $t0 $t1
 sw $t0 -580($fp)
 lw $t0 -580($fp)
@@ -8922,9 +8922,9 @@ lw $t1 12($t0)
 sw $t1 -604($fp)
 lw $t0 -572($fp)
 lw $t1 12($t0)
-sw $t1 -600($fp)
+sw $t1 -596($fp)
 lw $t0 -604($fp)
-lw $t1 -600($fp)
+lw $t1 -596($fp)
 seq $t0 $t0 $t1
 sw $t0 -576($fp)
 j label_344
@@ -8934,10 +8934,10 @@ lw $t1 12($t0)
 sw $t1 -604($fp)
 lw $t0 -572($fp)
 lw $t1 12($t0)
-sw $t1 -600($fp)
+sw $t1 -596($fp)
 lw $t0 -604($fp)
 move $a0 $t0
-lw $t0 -600($fp)
+lw $t0 -596($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -576($fp)
@@ -8948,9 +8948,9 @@ lw $t1 12($t0)
 sw $t1 -604($fp)
 lw $t0 -572($fp)
 lw $t1 12($t0)
-sw $t1 -600($fp)
+sw $t1 -596($fp)
 lw $t0 -604($fp)
-lw $t1 -600($fp)
+lw $t1 -596($fp)
 seq $t0 $t0 $t1
 sw $t0 -576($fp)
 j label_344
@@ -8958,7 +8958,7 @@ label_344:
 lw $t0 -576($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -608($fp)
 lw $t0 -608($fp)
@@ -8969,7 +8969,7 @@ bne $t0 $zero label_393
 li $t0 14
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -524($fp)
 lw $t0 -1588($fp)
@@ -8978,7 +8978,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -548($fp)
+sw $t1 -552($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -8986,25 +8986,25 @@ sw $t0 -544($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -540($fp)
+sw $t0 -536($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -536($fp)
-lw $t0 -548($fp)
+sw $t0 -540($fp)
+lw $t0 -552($fp)
 lw $t1 -544($fp)
 seq $t0 $t0 $t1
 sw $t0 -532($fp)
 lw $t0 -532($fp)
 bne $t0 $zero label_345
-lw $t0 -548($fp)
-lw $t1 -540($fp)
+lw $t0 -552($fp)
+lw $t1 -536($fp)
 seq $t0 $t0 $t1
 sw $t0 -532($fp)
 lw $t0 -532($fp)
 bne $t0 $zero label_346
-lw $t0 -548($fp)
-lw $t1 -536($fp)
+lw $t0 -552($fp)
+lw $t1 -540($fp)
 seq $t0 $t0 $t1
 sw $t0 -532($fp)
 lw $t0 -532($fp)
@@ -9020,9 +9020,9 @@ lw $t1 12($t0)
 sw $t1 -556($fp)
 lw $t0 -524($fp)
 lw $t1 12($t0)
-sw $t1 -552($fp)
+sw $t1 -548($fp)
 lw $t0 -556($fp)
-lw $t1 -552($fp)
+lw $t1 -548($fp)
 seq $t0 $t0 $t1
 sw $t0 -528($fp)
 j label_348
@@ -9032,10 +9032,10 @@ lw $t1 12($t0)
 sw $t1 -556($fp)
 lw $t0 -524($fp)
 lw $t1 12($t0)
-sw $t1 -552($fp)
+sw $t1 -548($fp)
 lw $t0 -556($fp)
 move $a0 $t0
-lw $t0 -552($fp)
+lw $t0 -548($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -528($fp)
@@ -9046,9 +9046,9 @@ lw $t1 12($t0)
 sw $t1 -556($fp)
 lw $t0 -524($fp)
 lw $t1 12($t0)
-sw $t1 -552($fp)
+sw $t1 -548($fp)
 lw $t0 -556($fp)
-lw $t1 -552($fp)
+lw $t1 -548($fp)
 seq $t0 $t0 $t1
 sw $t0 -528($fp)
 j label_348
@@ -9056,7 +9056,7 @@ label_348:
 lw $t0 -528($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -560($fp)
 lw $t0 -560($fp)
@@ -9067,7 +9067,7 @@ bne $t0 $zero label_391
 li $t0 15
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -476($fp)
 lw $t0 -1588($fp)
@@ -9076,7 +9076,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -500($fp)
+sw $t1 -504($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -9084,25 +9084,25 @@ sw $t0 -496($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -492($fp)
+sw $t0 -488($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -488($fp)
-lw $t0 -500($fp)
+sw $t0 -492($fp)
+lw $t0 -504($fp)
 lw $t1 -496($fp)
 seq $t0 $t0 $t1
 sw $t0 -484($fp)
 lw $t0 -484($fp)
 bne $t0 $zero label_349
-lw $t0 -500($fp)
-lw $t1 -492($fp)
+lw $t0 -504($fp)
+lw $t1 -488($fp)
 seq $t0 $t0 $t1
 sw $t0 -484($fp)
 lw $t0 -484($fp)
 bne $t0 $zero label_350
-lw $t0 -500($fp)
-lw $t1 -488($fp)
+lw $t0 -504($fp)
+lw $t1 -492($fp)
 seq $t0 $t0 $t1
 sw $t0 -484($fp)
 lw $t0 -484($fp)
@@ -9118,9 +9118,9 @@ lw $t1 12($t0)
 sw $t1 -508($fp)
 lw $t0 -476($fp)
 lw $t1 12($t0)
-sw $t1 -504($fp)
+sw $t1 -500($fp)
 lw $t0 -508($fp)
-lw $t1 -504($fp)
+lw $t1 -500($fp)
 seq $t0 $t0 $t1
 sw $t0 -480($fp)
 j label_352
@@ -9130,10 +9130,10 @@ lw $t1 12($t0)
 sw $t1 -508($fp)
 lw $t0 -476($fp)
 lw $t1 12($t0)
-sw $t1 -504($fp)
+sw $t1 -500($fp)
 lw $t0 -508($fp)
 move $a0 $t0
-lw $t0 -504($fp)
+lw $t0 -500($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -480($fp)
@@ -9144,9 +9144,9 @@ lw $t1 12($t0)
 sw $t1 -508($fp)
 lw $t0 -476($fp)
 lw $t1 12($t0)
-sw $t1 -504($fp)
+sw $t1 -500($fp)
 lw $t0 -508($fp)
-lw $t1 -504($fp)
+lw $t1 -500($fp)
 seq $t0 $t0 $t1
 sw $t0 -480($fp)
 j label_352
@@ -9154,7 +9154,7 @@ label_352:
 lw $t0 -480($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -512($fp)
 lw $t0 -512($fp)
@@ -9165,7 +9165,7 @@ bne $t0 $zero label_389
 li $t0 16
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -428($fp)
 lw $t0 -1588($fp)
@@ -9174,7 +9174,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -452($fp)
+sw $t1 -456($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -9182,25 +9182,25 @@ sw $t0 -448($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -444($fp)
+sw $t0 -440($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -440($fp)
-lw $t0 -452($fp)
+sw $t0 -444($fp)
+lw $t0 -456($fp)
 lw $t1 -448($fp)
 seq $t0 $t0 $t1
 sw $t0 -436($fp)
 lw $t0 -436($fp)
 bne $t0 $zero label_353
-lw $t0 -452($fp)
-lw $t1 -444($fp)
+lw $t0 -456($fp)
+lw $t1 -440($fp)
 seq $t0 $t0 $t1
 sw $t0 -436($fp)
 lw $t0 -436($fp)
 bne $t0 $zero label_354
-lw $t0 -452($fp)
-lw $t1 -440($fp)
+lw $t0 -456($fp)
+lw $t1 -444($fp)
 seq $t0 $t0 $t1
 sw $t0 -436($fp)
 lw $t0 -436($fp)
@@ -9216,9 +9216,9 @@ lw $t1 12($t0)
 sw $t1 -460($fp)
 lw $t0 -428($fp)
 lw $t1 12($t0)
-sw $t1 -456($fp)
+sw $t1 -452($fp)
 lw $t0 -460($fp)
-lw $t1 -456($fp)
+lw $t1 -452($fp)
 seq $t0 $t0 $t1
 sw $t0 -432($fp)
 j label_356
@@ -9228,10 +9228,10 @@ lw $t1 12($t0)
 sw $t1 -460($fp)
 lw $t0 -428($fp)
 lw $t1 12($t0)
-sw $t1 -456($fp)
+sw $t1 -452($fp)
 lw $t0 -460($fp)
 move $a0 $t0
-lw $t0 -456($fp)
+lw $t0 -452($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -432($fp)
@@ -9242,9 +9242,9 @@ lw $t1 12($t0)
 sw $t1 -460($fp)
 lw $t0 -428($fp)
 lw $t1 12($t0)
-sw $t1 -456($fp)
+sw $t1 -452($fp)
 lw $t0 -460($fp)
-lw $t1 -456($fp)
+lw $t1 -452($fp)
 seq $t0 $t0 $t1
 sw $t0 -432($fp)
 j label_356
@@ -9252,7 +9252,7 @@ label_356:
 lw $t0 -432($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -464($fp)
 lw $t0 -464($fp)
@@ -9263,7 +9263,7 @@ bne $t0 $zero label_387
 li $t0 17
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -380($fp)
 lw $t0 -1588($fp)
@@ -9272,7 +9272,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -404($fp)
+sw $t1 -408($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -9280,25 +9280,25 @@ sw $t0 -400($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -396($fp)
+sw $t0 -392($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -392($fp)
-lw $t0 -404($fp)
+sw $t0 -396($fp)
+lw $t0 -408($fp)
 lw $t1 -400($fp)
 seq $t0 $t0 $t1
 sw $t0 -388($fp)
 lw $t0 -388($fp)
 bne $t0 $zero label_357
-lw $t0 -404($fp)
-lw $t1 -396($fp)
+lw $t0 -408($fp)
+lw $t1 -392($fp)
 seq $t0 $t0 $t1
 sw $t0 -388($fp)
 lw $t0 -388($fp)
 bne $t0 $zero label_358
-lw $t0 -404($fp)
-lw $t1 -392($fp)
+lw $t0 -408($fp)
+lw $t1 -396($fp)
 seq $t0 $t0 $t1
 sw $t0 -388($fp)
 lw $t0 -388($fp)
@@ -9314,9 +9314,9 @@ lw $t1 12($t0)
 sw $t1 -412($fp)
 lw $t0 -380($fp)
 lw $t1 12($t0)
-sw $t1 -408($fp)
+sw $t1 -404($fp)
 lw $t0 -412($fp)
-lw $t1 -408($fp)
+lw $t1 -404($fp)
 seq $t0 $t0 $t1
 sw $t0 -384($fp)
 j label_360
@@ -9326,10 +9326,10 @@ lw $t1 12($t0)
 sw $t1 -412($fp)
 lw $t0 -380($fp)
 lw $t1 12($t0)
-sw $t1 -408($fp)
+sw $t1 -404($fp)
 lw $t0 -412($fp)
 move $a0 $t0
-lw $t0 -408($fp)
+lw $t0 -404($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -384($fp)
@@ -9340,9 +9340,9 @@ lw $t1 12($t0)
 sw $t1 -412($fp)
 lw $t0 -380($fp)
 lw $t1 12($t0)
-sw $t1 -408($fp)
+sw $t1 -404($fp)
 lw $t0 -412($fp)
-lw $t1 -408($fp)
+lw $t1 -404($fp)
 seq $t0 $t0 $t1
 sw $t0 -384($fp)
 j label_360
@@ -9350,7 +9350,7 @@ label_360:
 lw $t0 -384($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -416($fp)
 lw $t0 -416($fp)
@@ -9361,7 +9361,7 @@ bne $t0 $zero label_385
 li $t0 18
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -332($fp)
 lw $t0 -1588($fp)
@@ -9370,7 +9370,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -356($fp)
+sw $t1 -360($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -9378,25 +9378,25 @@ sw $t0 -352($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -348($fp)
+sw $t0 -344($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -344($fp)
-lw $t0 -356($fp)
+sw $t0 -348($fp)
+lw $t0 -360($fp)
 lw $t1 -352($fp)
 seq $t0 $t0 $t1
 sw $t0 -340($fp)
 lw $t0 -340($fp)
 bne $t0 $zero label_361
-lw $t0 -356($fp)
-lw $t1 -348($fp)
+lw $t0 -360($fp)
+lw $t1 -344($fp)
 seq $t0 $t0 $t1
 sw $t0 -340($fp)
 lw $t0 -340($fp)
 bne $t0 $zero label_362
-lw $t0 -356($fp)
-lw $t1 -344($fp)
+lw $t0 -360($fp)
+lw $t1 -348($fp)
 seq $t0 $t0 $t1
 sw $t0 -340($fp)
 lw $t0 -340($fp)
@@ -9412,9 +9412,9 @@ lw $t1 12($t0)
 sw $t1 -364($fp)
 lw $t0 -332($fp)
 lw $t1 12($t0)
-sw $t1 -360($fp)
+sw $t1 -356($fp)
 lw $t0 -364($fp)
-lw $t1 -360($fp)
+lw $t1 -356($fp)
 seq $t0 $t0 $t1
 sw $t0 -336($fp)
 j label_364
@@ -9424,10 +9424,10 @@ lw $t1 12($t0)
 sw $t1 -364($fp)
 lw $t0 -332($fp)
 lw $t1 12($t0)
-sw $t1 -360($fp)
+sw $t1 -356($fp)
 lw $t0 -364($fp)
 move $a0 $t0
-lw $t0 -360($fp)
+lw $t0 -356($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -336($fp)
@@ -9438,9 +9438,9 @@ lw $t1 12($t0)
 sw $t1 -364($fp)
 lw $t0 -332($fp)
 lw $t1 12($t0)
-sw $t1 -360($fp)
+sw $t1 -356($fp)
 lw $t0 -364($fp)
-lw $t1 -360($fp)
+lw $t1 -356($fp)
 seq $t0 $t0 $t1
 sw $t0 -336($fp)
 j label_364
@@ -9448,7 +9448,7 @@ label_364:
 lw $t0 -336($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -368($fp)
 lw $t0 -368($fp)
@@ -9459,7 +9459,7 @@ bne $t0 $zero label_383
 li $t0 19
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -284($fp)
 lw $t0 -1588($fp)
@@ -9468,7 +9468,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -308($fp)
+sw $t1 -312($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -9476,25 +9476,25 @@ sw $t0 -304($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -300($fp)
+sw $t0 -296($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -296($fp)
-lw $t0 -308($fp)
+sw $t0 -300($fp)
+lw $t0 -312($fp)
 lw $t1 -304($fp)
 seq $t0 $t0 $t1
 sw $t0 -292($fp)
 lw $t0 -292($fp)
 bne $t0 $zero label_365
-lw $t0 -308($fp)
-lw $t1 -300($fp)
+lw $t0 -312($fp)
+lw $t1 -296($fp)
 seq $t0 $t0 $t1
 sw $t0 -292($fp)
 lw $t0 -292($fp)
 bne $t0 $zero label_366
-lw $t0 -308($fp)
-lw $t1 -296($fp)
+lw $t0 -312($fp)
+lw $t1 -300($fp)
 seq $t0 $t0 $t1
 sw $t0 -292($fp)
 lw $t0 -292($fp)
@@ -9510,9 +9510,9 @@ lw $t1 12($t0)
 sw $t1 -316($fp)
 lw $t0 -284($fp)
 lw $t1 12($t0)
-sw $t1 -312($fp)
+sw $t1 -308($fp)
 lw $t0 -316($fp)
-lw $t1 -312($fp)
+lw $t1 -308($fp)
 seq $t0 $t0 $t1
 sw $t0 -288($fp)
 j label_368
@@ -9522,10 +9522,10 @@ lw $t1 12($t0)
 sw $t1 -316($fp)
 lw $t0 -284($fp)
 lw $t1 12($t0)
-sw $t1 -312($fp)
+sw $t1 -308($fp)
 lw $t0 -316($fp)
 move $a0 $t0
-lw $t0 -312($fp)
+lw $t0 -308($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -288($fp)
@@ -9536,9 +9536,9 @@ lw $t1 12($t0)
 sw $t1 -316($fp)
 lw $t0 -284($fp)
 lw $t1 12($t0)
-sw $t1 -312($fp)
+sw $t1 -308($fp)
 lw $t0 -316($fp)
-lw $t1 -312($fp)
+lw $t1 -308($fp)
 seq $t0 $t0 $t1
 sw $t0 -288($fp)
 j label_368
@@ -9546,7 +9546,7 @@ label_368:
 lw $t0 -288($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -320($fp)
 lw $t0 -320($fp)
@@ -9557,7 +9557,7 @@ bne $t0 $zero label_381
 li $t0 20
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -236($fp)
 lw $t0 -1588($fp)
@@ -9566,7 +9566,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -260($fp)
+sw $t1 -264($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -9574,25 +9574,25 @@ sw $t0 -256($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -252($fp)
+sw $t0 -248($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -248($fp)
-lw $t0 -260($fp)
+sw $t0 -252($fp)
+lw $t0 -264($fp)
 lw $t1 -256($fp)
 seq $t0 $t0 $t1
 sw $t0 -244($fp)
 lw $t0 -244($fp)
 bne $t0 $zero label_369
-lw $t0 -260($fp)
-lw $t1 -252($fp)
+lw $t0 -264($fp)
+lw $t1 -248($fp)
 seq $t0 $t0 $t1
 sw $t0 -244($fp)
 lw $t0 -244($fp)
 bne $t0 $zero label_370
-lw $t0 -260($fp)
-lw $t1 -248($fp)
+lw $t0 -264($fp)
+lw $t1 -252($fp)
 seq $t0 $t0 $t1
 sw $t0 -244($fp)
 lw $t0 -244($fp)
@@ -9608,9 +9608,9 @@ lw $t1 12($t0)
 sw $t1 -268($fp)
 lw $t0 -236($fp)
 lw $t1 12($t0)
-sw $t1 -264($fp)
+sw $t1 -260($fp)
 lw $t0 -268($fp)
-lw $t1 -264($fp)
+lw $t1 -260($fp)
 seq $t0 $t0 $t1
 sw $t0 -240($fp)
 j label_372
@@ -9620,10 +9620,10 @@ lw $t1 12($t0)
 sw $t1 -268($fp)
 lw $t0 -236($fp)
 lw $t1 12($t0)
-sw $t1 -264($fp)
+sw $t1 -260($fp)
 lw $t0 -268($fp)
 move $a0 $t0
-lw $t0 -264($fp)
+lw $t0 -260($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -240($fp)
@@ -9634,9 +9634,9 @@ lw $t1 12($t0)
 sw $t1 -268($fp)
 lw $t0 -236($fp)
 lw $t1 12($t0)
-sw $t1 -264($fp)
+sw $t1 -260($fp)
 lw $t0 -268($fp)
-lw $t1 -264($fp)
+lw $t1 -260($fp)
 seq $t0 $t0 $t1
 sw $t0 -240($fp)
 j label_372
@@ -9644,7 +9644,7 @@ label_372:
 lw $t0 -240($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -272($fp)
 lw $t0 -272($fp)
@@ -9655,7 +9655,7 @@ bne $t0 $zero label_379
 li $t0 21
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Int
+jal __ctor_Int
 addi $sp $sp 4
 sw $v0 -188($fp)
 lw $t0 -1588($fp)
@@ -9664,7 +9664,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -212($fp)
+sw $t1 -216($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -9672,25 +9672,25 @@ sw $t0 -208($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -204($fp)
+sw $t0 -200($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -200($fp)
-lw $t0 -212($fp)
+sw $t0 -204($fp)
+lw $t0 -216($fp)
 lw $t1 -208($fp)
 seq $t0 $t0 $t1
 sw $t0 -196($fp)
 lw $t0 -196($fp)
 bne $t0 $zero label_373
-lw $t0 -212($fp)
-lw $t1 -204($fp)
+lw $t0 -216($fp)
+lw $t1 -200($fp)
 seq $t0 $t0 $t1
 sw $t0 -196($fp)
 lw $t0 -196($fp)
 bne $t0 $zero label_374
-lw $t0 -212($fp)
-lw $t1 -200($fp)
+lw $t0 -216($fp)
+lw $t1 -204($fp)
 seq $t0 $t0 $t1
 sw $t0 -196($fp)
 lw $t0 -196($fp)
@@ -9706,9 +9706,9 @@ lw $t1 12($t0)
 sw $t1 -220($fp)
 lw $t0 -188($fp)
 lw $t1 12($t0)
-sw $t1 -216($fp)
+sw $t1 -212($fp)
 lw $t0 -220($fp)
-lw $t1 -216($fp)
+lw $t1 -212($fp)
 seq $t0 $t0 $t1
 sw $t0 -192($fp)
 j label_376
@@ -9718,10 +9718,10 @@ lw $t1 12($t0)
 sw $t1 -220($fp)
 lw $t0 -188($fp)
 lw $t1 12($t0)
-sw $t1 -216($fp)
+sw $t1 -212($fp)
 lw $t0 -220($fp)
 move $a0 $t0
-lw $t0 -216($fp)
+lw $t0 -212($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -192($fp)
@@ -9732,9 +9732,9 @@ lw $t1 12($t0)
 sw $t1 -220($fp)
 lw $t0 -188($fp)
 lw $t1 12($t0)
-sw $t1 -216($fp)
+sw $t1 -212($fp)
 lw $t0 -220($fp)
-lw $t1 -216($fp)
+lw $t1 -212($fp)
 seq $t0 $t0 $t1
 sw $t0 -192($fp)
 j label_376
@@ -9742,7 +9742,7 @@ label_376:
 lw $t0 -192($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -224($fp)
 lw $t0 -224($fp)
@@ -9755,7 +9755,7 @@ sw $t0 -184($fp)
 lw $t0 -184($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -180($fp)
 lw $t0 -180($fp)
@@ -9767,7 +9767,7 @@ sw $t0 -176($fp)
 lw $t0 -176($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -172($fp)
 lw $t0 -172($fp)
@@ -9782,7 +9782,7 @@ sw $t0 -168($fp)
 lw $t0 -168($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -164($fp)
 lw $t0 -164($fp)
@@ -9797,7 +9797,7 @@ sw $t0 -160($fp)
 lw $t0 -160($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -156($fp)
 lw $t0 -156($fp)
@@ -9812,7 +9812,7 @@ sw $t0 -152($fp)
 lw $t0 -152($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -148($fp)
 lw $t0 -148($fp)
@@ -9827,7 +9827,7 @@ sw $t0 -144($fp)
 lw $t0 -144($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -140($fp)
 lw $t0 -140($fp)
@@ -9842,7 +9842,7 @@ sw $t0 -136($fp)
 lw $t0 -136($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -132($fp)
 lw $t0 -132($fp)
@@ -9857,7 +9857,7 @@ sw $t0 -128($fp)
 lw $t0 -128($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -124($fp)
 lw $t0 -124($fp)
@@ -9872,7 +9872,7 @@ sw $t0 -120($fp)
 lw $t0 -120($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -116($fp)
 lw $t0 -116($fp)
@@ -9887,7 +9887,7 @@ sw $t0 -112($fp)
 lw $t0 -112($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -108($fp)
 lw $t0 -108($fp)
@@ -9902,7 +9902,7 @@ sw $t0 -104($fp)
 lw $t0 -104($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -100($fp)
 lw $t0 -100($fp)
@@ -9917,7 +9917,7 @@ sw $t0 -96($fp)
 lw $t0 -96($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -92($fp)
 lw $t0 -92($fp)
@@ -9932,7 +9932,7 @@ sw $t0 -88($fp)
 lw $t0 -88($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -84($fp)
 lw $t0 -84($fp)
@@ -9947,7 +9947,7 @@ sw $t0 -80($fp)
 lw $t0 -80($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -76($fp)
 lw $t0 -76($fp)
@@ -9962,7 +9962,7 @@ sw $t0 -72($fp)
 lw $t0 -72($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -68($fp)
 lw $t0 -68($fp)
@@ -9977,7 +9977,7 @@ sw $t0 -64($fp)
 lw $t0 -64($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -60($fp)
 lw $t0 -60($fp)
@@ -9992,7 +9992,7 @@ sw $t0 -56($fp)
 lw $t0 -56($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -52($fp)
 lw $t0 -52($fp)
@@ -10007,7 +10007,7 @@ sw $t0 -48($fp)
 lw $t0 -48($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -44($fp)
 lw $t0 -44($fp)
@@ -10022,7 +10022,7 @@ sw $t0 -40($fp)
 lw $t0 -40($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -36($fp)
 lw $t0 -36($fp)
@@ -10037,7 +10037,7 @@ sw $t0 -32($fp)
 lw $t0 -32($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -28($fp)
 lw $t0 -28($fp)
@@ -10052,7 +10052,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -20($fp)
@@ -10067,14 +10067,14 @@ sw $t0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -1192($fp)
 label_418:
 lw $v0 -1192($fp)
-addi $sp $sp 1596
+addi $sp $sp 1580
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -10087,13 +10087,13 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -136
+addi $sp $sp -120
 la $t0 data_10
 sw $t0 -128($fp)
 lw $t0 -128($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -128($fp)
 la $t0 data_152
@@ -10101,7 +10101,7 @@ sw $t0 -124($fp)
 lw $t0 -124($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -120($fp)
 lw $t0 0($fp)
@@ -10139,7 +10139,7 @@ sw $t0 -108($fp)
 lw $t0 -108($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -104($fp)
 lw $t0 0($fp)
@@ -10206,7 +10206,7 @@ sw $t0 -84($fp)
 lw $t0 -84($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -80($fp)
 lw $t0 0($fp)
@@ -10244,7 +10244,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -128($fp)
@@ -10253,7 +10253,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -48($fp)
+sw $t1 -52($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -10261,25 +10261,25 @@ sw $t0 -44($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -40($fp)
+sw $t0 -36($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -36($fp)
-lw $t0 -48($fp)
+sw $t0 -40($fp)
+lw $t0 -52($fp)
 lw $t1 -44($fp)
 seq $t0 $t0 $t1
 sw $t0 -32($fp)
 lw $t0 -32($fp)
 bne $t0 $zero label_427
-lw $t0 -48($fp)
-lw $t1 -40($fp)
+lw $t0 -52($fp)
+lw $t1 -36($fp)
 seq $t0 $t0 $t1
 sw $t0 -32($fp)
 lw $t0 -32($fp)
 bne $t0 $zero label_428
-lw $t0 -48($fp)
-lw $t1 -36($fp)
+lw $t0 -52($fp)
+lw $t1 -40($fp)
 seq $t0 $t0 $t1
 sw $t0 -32($fp)
 lw $t0 -32($fp)
@@ -10295,9 +10295,9 @@ lw $t1 12($t0)
 sw $t1 -56($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -52($fp)
+sw $t1 -48($fp)
 lw $t0 -56($fp)
-lw $t1 -52($fp)
+lw $t1 -48($fp)
 seq $t0 $t0 $t1
 sw $t0 -28($fp)
 j label_430
@@ -10307,10 +10307,10 @@ lw $t1 12($t0)
 sw $t1 -56($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -52($fp)
+sw $t1 -48($fp)
 lw $t0 -56($fp)
 move $a0 $t0
-lw $t0 -52($fp)
+lw $t0 -48($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -28($fp)
@@ -10321,9 +10321,9 @@ lw $t1 12($t0)
 sw $t1 -56($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -52($fp)
+sw $t1 -48($fp)
 lw $t0 -56($fp)
-lw $t1 -52($fp)
+lw $t1 -48($fp)
 seq $t0 $t0 $t1
 sw $t0 -28($fp)
 j label_430
@@ -10331,7 +10331,7 @@ label_430:
 lw $t0 -28($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -60($fp)
 lw $t0 -60($fp)
@@ -10342,7 +10342,7 @@ bne $t0 $zero label_431
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -16($fp)
 lw $t0 -16($fp)
@@ -10352,14 +10352,14 @@ label_431:
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -68($fp)
 label_432:
 lw $v0 -68($fp)
-addi $sp $sp 136
+addi $sp $sp 120
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -10372,13 +10372,13 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -136
+addi $sp $sp -120
 la $t0 data_10
 sw $t0 -128($fp)
 lw $t0 -128($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -128($fp)
 la $t0 data_160
@@ -10386,7 +10386,7 @@ sw $t0 -124($fp)
 lw $t0 -124($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -120($fp)
 lw $t0 0($fp)
@@ -10424,7 +10424,7 @@ sw $t0 -108($fp)
 lw $t0 -108($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -104($fp)
 lw $t0 0($fp)
@@ -10462,7 +10462,7 @@ sw $t0 -92($fp)
 lw $t0 -92($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -88($fp)
 lw $t0 0($fp)
@@ -10529,7 +10529,7 @@ sw $t0 -24($fp)
 lw $t0 -24($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -20($fp)
 lw $t0 -128($fp)
@@ -10538,7 +10538,7 @@ sll $t1 $t1 2
 la $t0 types_table
 add $t0 $t0 $t1
 lw $t1 0($t0)
-sw $t1 -48($fp)
+sw $t1 -52($fp)
 la $t0 types_table
 addi $t0 $t0 12
 lw $t0 0($t0)
@@ -10546,25 +10546,25 @@ sw $t0 -44($fp)
 la $t0 types_table
 addi $t0 $t0 8
 lw $t0 0($t0)
-sw $t0 -40($fp)
+sw $t0 -36($fp)
 la $t0 types_table
 addi $t0 $t0 16
 lw $t0 0($t0)
-sw $t0 -36($fp)
-lw $t0 -48($fp)
+sw $t0 -40($fp)
+lw $t0 -52($fp)
 lw $t1 -44($fp)
 seq $t0 $t0 $t1
 sw $t0 -32($fp)
 lw $t0 -32($fp)
 bne $t0 $zero label_441
-lw $t0 -48($fp)
-lw $t1 -40($fp)
+lw $t0 -52($fp)
+lw $t1 -36($fp)
 seq $t0 $t0 $t1
 sw $t0 -32($fp)
 lw $t0 -32($fp)
 bne $t0 $zero label_442
-lw $t0 -48($fp)
-lw $t1 -36($fp)
+lw $t0 -52($fp)
+lw $t1 -40($fp)
 seq $t0 $t0 $t1
 sw $t0 -32($fp)
 lw $t0 -32($fp)
@@ -10580,9 +10580,9 @@ lw $t1 12($t0)
 sw $t1 -56($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -52($fp)
+sw $t1 -48($fp)
 lw $t0 -56($fp)
-lw $t1 -52($fp)
+lw $t1 -48($fp)
 seq $t0 $t0 $t1
 sw $t0 -28($fp)
 j label_444
@@ -10592,10 +10592,10 @@ lw $t1 12($t0)
 sw $t1 -56($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -52($fp)
+sw $t1 -48($fp)
 lw $t0 -56($fp)
 move $a0 $t0
-lw $t0 -52($fp)
+lw $t0 -48($fp)
 move $a1 $t0
 jal equal_str
 sw $v0 -28($fp)
@@ -10606,9 +10606,9 @@ lw $t1 12($t0)
 sw $t1 -56($fp)
 lw $t0 -20($fp)
 lw $t1 12($t0)
-sw $t1 -52($fp)
+sw $t1 -48($fp)
 lw $t0 -56($fp)
-lw $t1 -52($fp)
+lw $t1 -48($fp)
 seq $t0 $t0 $t1
 sw $t0 -28($fp)
 j label_444
@@ -10616,7 +10616,7 @@ label_444:
 lw $t0 -28($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -60($fp)
 lw $t0 -60($fp)
@@ -10627,7 +10627,7 @@ bne $t0 $zero label_445
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -16($fp)
 lw $t0 -16($fp)
@@ -10637,27 +10637,27 @@ label_445:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $t0 -12($fp)
 sw $t0 -68($fp)
 label_446:
 lw $v0 -68($fp)
-addi $sp $sp 136
+addi $sp $sp 120
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_CellularAutomaton:
+__ctor_CellularAutomaton:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -24
+addi $sp $sp -8
 li $t0 6
 sll $t0 $t0 2
 la $t1 prototype_table
@@ -10674,35 +10674,35 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_CellularAutomaton
+jal __attributes_ctor_CellularAutomaton
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 24
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_attr_at_Main:
+__attributes_ctor_Main:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -28
+addi $sp $sp -8
 lw $t0 0($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_CellularAutomaton
+jal __attributes_ctor_CellularAutomaton
 addi $sp $sp 4
 sw $v0 -16($fp)
 lw $t0 0($fp)
 lw $t1 -12($fp)
 sw $t1 28($t0)
 lw $v0 0($fp)
-addi $sp $sp 28
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
@@ -10715,11 +10715,11 @@ sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -144
+addi $sp $sp -124
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -132($fp)
 la $t0 data_10
@@ -10727,7 +10727,7 @@ sw $t0 -128($fp)
 lw $t0 -128($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -128($fp)
 la $t0 data_168
@@ -10735,7 +10735,7 @@ sw $t0 -124($fp)
 lw $t0 -124($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -120($fp)
 lw $t0 0($fp)
@@ -10773,7 +10773,7 @@ sw $t0 -108($fp)
 lw $t0 -108($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_String
+jal __ctor_String
 addi $sp $sp 4
 sw $v0 -104($fp)
 lw $t0 0($fp)
@@ -10844,7 +10844,7 @@ label_454:
 li $t0 1
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -80($fp)
 lw $t0 -80($fp)
@@ -10878,7 +10878,7 @@ addi $sp $sp 4
 sw $v0 -72($fp)
 lw $t0 -72($fp)
 sw $t0 -128($fp)
-jal __init_at_CellularAutomaton
+jal __ctor_CellularAutomaton
 sw $v0 -68($fp)
 lw $t0 -68($fp)
 li $t1 0
@@ -10999,7 +10999,7 @@ bne $t0 $zero label_465
 li $t0 0
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_at_Bool
+jal __ctor_Bool
 addi $sp $sp 4
 sw $v0 -28($fp)
 lw $t0 -28($fp)
@@ -11100,20 +11100,20 @@ label_471:
 j label_451
 label_472:
 lw $v0 0($fp)
-addi $sp $sp 144
+addi $sp $sp 124
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)
 addi $sp $sp 4
 jr $ra
 
-__init_at_Main:
+__ctor_Main:
 addi $sp $sp -4
 sw $ra 0($sp)
 addi $sp $sp -4
 sw $fp 0($sp)
 addi $fp $sp 8
-addi $sp $sp -28
+addi $sp $sp -8
 li $t0 7
 sll $t0 $t0 2
 la $t1 prototype_table
@@ -11130,11 +11130,11 @@ sw $v0 -16($fp)
 lw $t0 -16($fp)
 addi $sp $sp -4
 sw $t0 0($sp)
-jal __init_attr_at_Main
+jal __attributes_ctor_Main
 addi $sp $sp 4
 sw $v0 -12($fp)
 lw $v0 -12($fp)
-addi $sp $sp 28
+addi $sp $sp 8
 lw $fp 0($sp)
 addi $sp $sp 4
 lw $ra 0($sp)

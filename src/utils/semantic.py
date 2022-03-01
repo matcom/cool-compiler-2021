@@ -206,9 +206,14 @@ class Context:
         except KeyError:
             raise SemanticError(f'Type "{name}" is not defined.')
 
-    def subtree(self, name : str):
+    def type_offsprings(self, name : str):
         type = self.get_type(name)
-        return (i for i in self.types.values() if i.conforms_to(type))
+        conforming = []
+        for t in self.types:
+            tt = self.types[t]
+            if tt.conforms_to(type):
+                conforming.append(tt)
+        return conforming
 
     def __str__(self):
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
@@ -250,7 +255,7 @@ class Scope:
         info = VariableInfo(vname, vtype)
         self.locals[vname] = info
         return info
-
+    
     # def find_variable(self, vname: str) -> Optional[VariableInfo]:
     #     try:
     #         return self.locals[vname]

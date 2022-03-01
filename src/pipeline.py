@@ -6,6 +6,7 @@ from visitors.Checker import TypeChecker
 from visitors.CooltoCil import COOLToCILVisitor
 from visitors.CiltoMips import CILToMipsVisitor
 
+
 class Pipeline():
     def __init__(self, program, lexer, parser, verbose=False):
         self.context: Context = Context()

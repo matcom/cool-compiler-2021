@@ -252,12 +252,12 @@ class OverrideACK:
             method, owner = self.current_type.parent.get_method(node.id, self.current_type, False, get_owner=True)
             
             if current_method.return_type != method.return_type: 
-                self.errors.append(_SemanticError % (node.token_list[4].lineno, node.token_list[4].col, f'In redefined method {current_method.name}, return type {current_method.return_type.name} is diferent from original return type {method.return_type.name}.'))
+                self.errors.append(_SemanticError % (node.token_list[4].lineno, node.token_list[4].col, f'In redefined method {current_method.name}, return type {current_method.return_type.name} is different from original return type {method.return_type.name}.'))
             if len(current_method.param_types) != len(method.param_types):
                 self.errors.append(_SemanticError % (node.token_list[0].lineno, node.token_list[0].col, f'Incompatible number of formal parameters in redefined method {current_method.name}.'))
             else:
                 for pt1, pt2 in zip(current_method.param_types, method.param_types):
                     if pt1 != pt2:
-                        self.errors.append(_SemanticError % (node.token_list[0].lineno, node.token_list[0].col, f'In redefined method {current_method.name}, parameter type {pt1.name} is diferent from original type {pt2.name}.'))
+                        self.errors.append(_SemanticError % (node.token_list[0].lineno, node.token_list[0].col, f'In redefined method {current_method.name}, parameter type {pt1.name} is different from original type {pt2.name}.'))
         except:
             pass
