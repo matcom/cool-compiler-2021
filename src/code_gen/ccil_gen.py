@@ -328,7 +328,9 @@ class CCILGenerator:
         equality_holder = self.add_local(f"case_{times}_eq_holder", INT)
 
         pattern_match_ops = self.init_default_values()
+
         branch_ops = []
+        visited_types = set() # To optimize and reduce redundant calling
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
             branch_var = self.create_assignation(
@@ -343,6 +345,10 @@ class CCILGenerator:
             branch_selection_ops = []
             if option.successors[0] != OBJECT:
                 for type_names in option.successors:
+                    if type_names in visited_types:
+                        continue
+                    visited_types.add(type_names)
+
                     load_class_name = StorageNode(
                         type_name_holder.id, LoadOpNode(f"{CLASS}{type_names}")
                     )
