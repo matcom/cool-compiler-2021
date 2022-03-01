@@ -3,10 +3,6 @@ LET = "let_"
 ATTR = "attr_"
 CLASS = "class_"
 
-CASE_INIT = "init_case"
-CASE_END = "end_case"
-CASE_BRANCH = "case_branch"
-
 # Registers
 ZERO = 0
 AT = 1
