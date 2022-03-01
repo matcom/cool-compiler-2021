@@ -132,7 +132,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Main___init;
+    local_0 = CALL Void___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -146,7 +146,7 @@
     local_0 = LOAD data_0_abort_msg;
     ARG local_0;
     local_1 = CALL String___init;
-    print(str, local_1
+    print(str, local_1)
   }
 
   function Object_type_name {
@@ -352,7 +352,7 @@
     PARAM param_self;
 
 
-    print(str, param_str
+    print(str, param_str)
     RETURN param_self;
   }
 
@@ -361,7 +361,7 @@
     PARAM param_self;
 
 
-    print(int, param_int
+    print(int, param_int)
     RETURN param_self;
   }
 
@@ -497,7 +497,7 @@
     LOCAL local_2;
     LOCAL local_3;
 
-    local_1 = CALL Cons___init;
+    local_1 = CALL Void___init;
     local_3 = TYPEOF local_new_cell;
     ARG local_new_cell;
     ARG param_hd;
@@ -533,7 +533,7 @@
     local_1 = TYPEOF param_self;
     ARG param_self;
     local_0 = VCALL local_1 0;
-    local_2 = CALL List___init;
+    local_2 = CALL Void___init;
     RETURN local_2;
   }
 
@@ -619,8 +619,11 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_1 = LOAD 0;
+    ARG local_1;
+    local_0 = CALL Int___init;
     RETURN local_0;
   }
 
@@ -747,7 +750,7 @@
     IF local_5 GOTO label_then_0;
     GOTO label_else_0;
     LABEL label_then_0;
-    local_7 = CALL Cons___init;
+    local_7 = CALL Void___init;
     local_8 = TYPEOF local_7;
     ARG local_7;
     ARG param_i;
@@ -755,7 +758,7 @@
     local_6 = VCALL local_8 16;
     GOTO label_continue_0;
     LABEL label_else_0;
-    local_10 = CALL Cons___init;
+    local_10 = CALL Void___init;
     local_xcdr = GETATTR param_self 1;
     local_13 = TYPEOF local_xcdr;
     ARG local_xcdr;
@@ -782,7 +785,7 @@
     LOCAL local_5;
     LOCAL local_6;
 
-    local_1 = CALL Cons___init;
+    local_1 = CALL Void___init;
     local_xcar = GETATTR param_self 0;
     local_xcdr = GETATTR param_self 1;
     local_5 = TYPEOF local_xcdr;
@@ -886,7 +889,7 @@
     LOCAL local_1;
     LOCAL local_2;
 
-    local_1 = CALL Cons___init;
+    local_1 = CALL Void___init;
     local_2 = TYPEOF local_1;
     ARG local_1;
     ARG param_i;
@@ -949,8 +952,9 @@
     LOCAL local_14;
     LOCAL local_15;
     LOCAL local_16;
+    LOCAL local_17;
 
-    local_0 = CALL Nil___init;
+    local_0 = CALL Void___init;
     SETATTR param_self 0 local_0;
     local_2 = LOAD 0;
     ARG local_2;
@@ -964,7 +968,7 @@
     IF local_7 GOTO label_loop_label_0;
     GOTO label_pool_label_0;
     LABEL label_loop_label_0;
-    local_9 = CALL Cons___init;
+    local_9 = CALL Void___init;
     local_l = GETATTR param_self 0;
     local_11 = TYPEOF local_9;
     ARG local_9;
@@ -979,6 +983,7 @@
     local_16 = local_12 + local_15
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
+    local_17 = CALL Void___init;
     RETURN local_l;
   }
 

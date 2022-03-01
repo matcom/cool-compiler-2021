@@ -95,7 +95,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Main___init;
+    local_0 = CALL Void___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -109,7 +109,7 @@
     local_0 = LOAD data_0_abort_msg;
     ARG local_0;
     local_1 = CALL String___init;
-    print(str, local_1
+    print(str, local_1)
   }
 
   function Object_type_name {
@@ -294,7 +294,7 @@
     PARAM param_self;
 
 
-    print(str, param_str
+    print(str, param_str)
     RETURN param_self;
   }
 
@@ -303,7 +303,7 @@
     PARAM param_self;
 
 
-    print(int, param_int
+    print(int, param_int)
     RETURN param_self;
   }
 
@@ -462,7 +462,7 @@
     LOCAL local_1;
     LOCAL local_2;
 
-    local_1 = CALL Cons___init;
+    local_1 = CALL Void___init;
     local_2 = TYPEOF local_1;
     ARG local_1;
     ARG param_i;
@@ -491,8 +491,11 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_1 = LOAD 0;
+    ARG local_1;
+    local_0 = CALL Int___init;
     RETURN local_0;
   }
 
@@ -665,8 +668,9 @@
     LOCAL local_28;
     LOCAL local_29;
     LOCAL local_30;
+    LOCAL local_31;
 
-    local_5 = CALL List___init;
+    local_5 = CALL Void___init;
     local_6 = LOAD 1;
     ARG local_6;
     local_7 = CALL Int___init;
@@ -724,6 +728,7 @@
     local_29 = VCALL local_30 5;
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
-    RETURN void;
+    local_31 = CALL Void___init;
+    RETURN local_31;
   }
 

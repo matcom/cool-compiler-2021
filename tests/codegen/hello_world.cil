@@ -69,7 +69,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Main___init;
+    local_0 = CALL Void___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -83,7 +83,7 @@
     local_0 = LOAD data_0_abort_msg;
     ARG local_0;
     local_1 = CALL String___init;
-    print(str, local_1
+    print(str, local_1)
   }
 
   function Object_type_name {
@@ -217,7 +217,7 @@
     PARAM param_self;
 
 
-    print(str, param_str
+    print(str, param_str)
     RETURN param_self;
   }
 
@@ -226,7 +226,7 @@
     PARAM param_self;
 
 
-    print(int, param_int
+    print(int, param_int)
     RETURN param_self;
   }
 

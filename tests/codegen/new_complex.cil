@@ -74,10 +74,8 @@
   data_7_type_name_Complex = "Complex";
   data_8_string = "=)\n";
   data_9_string = "=(\n";
-  data_10_string = "=)\n";
-  data_11_string = "=(\n";
-  data_12_string = "+";
-  data_13_string = "I";
+  data_10_string = "+";
+  data_11_string = "I";
 
 .code
 
@@ -94,7 +92,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Main___init;
+    local_0 = CALL Void___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -108,7 +106,7 @@
     local_0 = LOAD data_0_abort_msg;
     ARG local_0;
     local_1 = CALL String___init;
-    print(str, local_1
+    print(str, local_1)
   }
 
   function Object_type_name {
@@ -269,7 +267,7 @@
     PARAM param_self;
 
 
-    print(str, param_str
+    print(str, param_str)
     RETURN param_self;
   }
 
@@ -278,7 +276,7 @@
     PARAM param_self;
 
 
-    print(int, param_int
+    print(int, param_int)
     RETURN param_self;
   }
 
@@ -435,7 +433,7 @@
     LOCAL local_41;
     LOCAL local_42;
 
-    local_2 = CALL Complex___init;
+    local_2 = CALL Void___init;
     local_3 = LOAD 1;
     ARG local_3;
     local_4 = CALL Int___init;
@@ -496,7 +494,7 @@
     IF local_27 GOTO label_then_1;
     GOTO label_else_1;
     LABEL label_then_1;
-    local_36 = LOAD data_10_string;
+    local_36 = LOAD data_8_string;
     ARG local_36;
     local_37 = CALL String___init;
     local_38 = TYPEOF param_self;
@@ -505,7 +503,7 @@
     local_35 = VCALL local_38 3;
     GOTO label_continue_1;
     LABEL label_else_1;
-    local_40 = LOAD data_11_string;
+    local_40 = LOAD data_9_string;
     ARG local_40;
     local_41 = CALL String___init;
     local_42 = TYPEOF param_self;
@@ -536,8 +534,11 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_1 = LOAD 0;
+    ARG local_1;
+    local_0 = CALL Int___init;
     RETURN local_0;
   }
 
@@ -545,8 +546,11 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_1 = LOAD 0;
+    ARG local_1;
+    local_0 = CALL Int___init;
     RETURN local_0;
   }
 
@@ -640,7 +644,7 @@
     ARG param_self;
     ARG local_x;
     local_15 = VCALL local_16 4;
-    local_17 = LOAD data_12_string;
+    local_17 = LOAD data_10_string;
     ARG local_17;
     local_18 = CALL String___init;
     local_19 = TYPEOF local_15;
@@ -651,7 +655,7 @@
     ARG local_14;
     ARG local_y;
     local_13 = VCALL local_20 4;
-    local_21 = LOAD data_13_string;
+    local_21 = LOAD data_11_string;
     ARG local_21;
     local_22 = CALL String___init;
     local_23 = TYPEOF local_13;

@@ -127,20 +127,19 @@
   data_9_type_name_Cons = "Cons";
   data_10_type_name_Nil = "Nil";
   data_11_type_name_Main = "Main";
-  data_12_string = "title:      ";
-  data_13_string = "\n";
-  data_14_string = "author:     ";
-  data_15_string = "\n";
+  data_12_default_str = "";
+  data_13_string = "title:      ";
+  data_14_string = "\n";
+  data_15_string = "author:     ";
   data_16_string = "periodical:  ";
-  data_17_string = "\n";
-  data_18_case_err = "Case of did not match any branch!";
-  data_19_string = "- dynamic type was Article -\n";
-  data_20_string = "- dynamic type was Book -\n";
-  data_21_string = "Compilers, Principles, Techniques, and Tools";
-  data_22_string = "Aho, Sethi, and Ullman";
-  data_23_string = "The Top 100 CD_ROMs";
-  data_24_string = "Ulanoff";
-  data_25_string = "PC Magazine";
+  data_17_case_err = "Case of did not match any branch!";
+  data_18_string = "- dynamic type was Article -\n";
+  data_19_string = "- dynamic type was Book -\n";
+  data_20_string = "Compilers, Principles, Techniques, and Tools";
+  data_21_string = "Aho, Sethi, and Ullman";
+  data_22_string = "The Top 100 CD_ROMs";
+  data_23_string = "Ulanoff";
+  data_24_string = "PC Magazine";
 
 .code
 
@@ -157,7 +156,7 @@
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = CALL Main___init;
+    local_0 = CALL Void___init;
     ARG local_0;
     local_1 = CALL Main_main;
   }
@@ -171,7 +170,7 @@
     local_0 = LOAD data_0_abort_msg;
     ARG local_0;
     local_1 = CALL String___init;
-    print(str, local_1
+    print(str, local_1)
   }
 
   function Object_type_name {
@@ -434,7 +433,7 @@
     PARAM param_self;
 
 
-    print(str, param_str
+    print(str, param_str)
     RETURN param_self;
   }
 
@@ -443,7 +442,7 @@
     PARAM param_self;
 
 
-    print(int, param_int
+    print(int, param_int)
     RETURN param_self;
   }
 
@@ -565,8 +564,11 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_1 = LOAD data_12_default_str;
+    ARG local_1;
+    local_0 = CALL String___init;
     RETURN local_0;
   }
 
@@ -574,8 +576,11 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_1 = LOAD data_12_default_str;
+    ARG local_1;
+    local_0 = CALL String___init;
     RETURN local_0;
   }
 
@@ -616,7 +621,7 @@
     LOCAL local_20;
     LOCAL local_21;
 
-    local_3 = LOAD data_12_string;
+    local_3 = LOAD data_13_string;
     ARG local_3;
     local_4 = CALL String___init;
     local_5 = TYPEOF param_self;
@@ -628,14 +633,14 @@
     ARG local_2;
     ARG local_title;
     local_1 = VCALL local_7 3;
-    local_8 = LOAD data_13_string;
+    local_8 = LOAD data_14_string;
     ARG local_8;
     local_9 = CALL String___init;
     local_10 = TYPEOF local_1;
     ARG local_1;
     ARG local_9;
     local_0 = VCALL local_10 3;
-    local_14 = LOAD data_14_string;
+    local_14 = LOAD data_15_string;
     ARG local_14;
     local_15 = CALL String___init;
     local_16 = TYPEOF param_self;
@@ -647,7 +652,7 @@
     ARG local_13;
     ARG local_author;
     local_12 = VCALL local_18 3;
-    local_19 = LOAD data_15_string;
+    local_19 = LOAD data_14_string;
     ARG local_19;
     local_20 = CALL String___init;
     local_21 = TYPEOF local_12;
@@ -681,8 +686,11 @@
     PARAM param_self;
 
     LOCAL local_0;
+    LOCAL local_1;
 
-    local_0 = CALL Void___init;
+    local_1 = LOAD data_12_default_str;
+    ARG local_1;
+    local_0 = CALL String___init;
     RETURN local_0;
   }
 
@@ -740,7 +748,7 @@ _print;
     ARG local_3;
     ARG local_per_title;
     local_2 = VCALL local_8 3;
-    local_9 = LOAD data_17_string;
+    local_9 = LOAD data_14_string;
     ARG local_9;
     local_10 = CALL String___init;
     local_11 = TYPEOF local_2;
@@ -784,7 +792,7 @@ _print;
     LOCAL local_2;
     LOCAL local_3;
 
-    local_1 = CALL Cons___init;
+    local_1 = CALL Void___init;
     local_3 = TYPEOF local_new_cell;
     ARG local_new_cell;
     ARG param_hd;
@@ -803,7 +811,7 @@ _print;
     local_1 = TYPEOF param_self;
     ARG param_self;
     local_0 = VCALL local_1 0;
-    local_2 = CALL Book___init;
+    local_2 = CALL Void___init;
     RETURN local_2;
   }
 
@@ -817,7 +825,7 @@ _print;
     local_1 = TYPEOF param_self;
     ARG param_self;
     local_0 = VCALL local_1 0;
-    local_2 = CALL BookList___init;
+    local_2 = CALL Void___init;
     RETURN local_2;
   }
 
@@ -949,12 +957,12 @@ _print;
     local_7 = LOAD Book;
     local_8 = local_6 - local_7
     IF local_8 GOTO label_case_branch_1;
-    local_9 = LOAD data_18_case_err;
+    local_9 = LOAD data_17_case_err;
     ARG local_9;
     local_10 = CALL String___init;
-    print(str, local_10
+    print(str, local_10)
     LABEL label_case_branch_0;
-    local_14 = LOAD data_19_string;
+    local_14 = LOAD data_18_string;
     ARG local_14;
     local_15 = CALL String___init;
     local_16 = TYPEOF param_self;
@@ -963,7 +971,7 @@ _print;
     local_13 = VCALL local_16 3;
     GOTO label_end_case_0;
     LABEL label_case_branch_1;
-    local_19 = LOAD data_20_string;
+    local_19 = LOAD data_19_string;
     ARG local_19;
     local_20 = CALL String___init;
     local_21 = TYPEOF param_self;
@@ -1062,11 +1070,11 @@ _print;
     LOCAL local_books;
     LOCAL local_25;
 
-    local_2 = CALL Book___init;
-    local_3 = LOAD data_21_string;
+    local_2 = CALL Void___init;
+    local_3 = LOAD data_20_string;
     ARG local_3;
     local_4 = CALL String___init;
-    local_5 = LOAD data_22_string;
+    local_5 = LOAD data_21_string;
     ARG local_5;
     local_6 = CALL String___init;
     local_7 = TYPEOF local_2;
@@ -1074,14 +1082,14 @@ _print;
     ARG local_4;
     ARG local_6;
     local_1 = VCALL local_7 7;
-    local_10 = CALL Article___init;
-    local_11 = LOAD data_23_string;
+    local_10 = CALL Void___init;
+    local_11 = LOAD data_22_string;
     ARG local_11;
     local_12 = CALL String___init;
-    local_13 = LOAD data_24_string;
+    local_13 = LOAD data_23_string;
     ARG local_13;
     local_14 = CALL String___init;
-    local_15 = LOAD data_25_string;
+    local_15 = LOAD data_24_string;
     ARG local_15;
     local_16 = CALL String___init;
     local_17 = TYPEOF local_10;
@@ -1090,7 +1098,7 @@ _print;
     ARG local_14;
     ARG local_16;
     local_9 = VCALL local_17 9;
-    local_20 = CALL Nil___init;
+    local_20 = CALL Void___init;
     local_21 = TYPEOF local_20;
     ARG local_20;
     ARG local_a_book;

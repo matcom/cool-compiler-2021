@@ -170,5 +170,5 @@ class CILDebug:
         self.print(
             indent,
             inline,
-            f"print({'str' if node.is_string else 'int'}, {node.str_addr}",
+            f"print({'str' if node.is_string else 'int'}, {node.str_addr})",
         )
