@@ -341,17 +341,20 @@ class CCILGenerator:
             # Compare expr type with node branch type and all of
             # it's successors
             branch_selection_ops = []
-            for type_names in option.successors:
-                load_class_name = StorageNode(
-                    type_name_holder.id, LoadOpNode(f"{CLASS}{type_names}")
-                )
-                select_branch = StorageNode(
-                    equality_holder.id,
-                    EqualStrNode(extract_id(expr_type), extract_id(load_class_name)),
-                )
-                # Conditional jump to the right branch label
-                if_op = IfNode(extract_id(select_branch), branch_label)
-                branch_selection_ops += [load_class_name, select_branch, if_op]
+            if option.successors[0] != OBJECT:
+                for type_names in option.successors:
+                    load_class_name = StorageNode(
+                        type_name_holder.id, LoadOpNode(f"{CLASS}{type_names}")
+                    )
+                    select_branch = StorageNode(
+                        equality_holder.id,
+                        EqualStrNode(extract_id(expr_type), extract_id(load_class_name)),
+                    )
+                    # Conditional jump to the right branch label
+                    if_op = IfNode(extract_id(select_branch), branch_label)
+                    branch_selection_ops += [load_class_name, select_branch, if_op]
+            else:
+                branch_selection_ops = [GoToNode(branch_label)]
 
             # Storing logic to jump to branch logic if this branch is selected
             pattern_match_ops += [
