@@ -420,46 +420,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         return instructions
 
-    # @visitor.when(AllocateNode)
-    # def visit(self, node: AllocateNode):
-    #     instructions = []
-
-    #     tp = 0
-    #     if node.type.isnumeric():
-    #         tp = node.type
-    #     else:
-    #         tp = self.types[node.type].pos
-
-    #     # reg1 = t0 reg2 = t1
-    #     instructions.extend(mips.push_to_stack(mips.T0))
-    #     instructions.extend(mips.push_to_stack(mips.T1))
-    #     instructions.append(mips.LoadInmediateNode(mips.T0, tp))
-
-    #     instructions.append(mips.ShiftLeftLogicalNode(mips.T0, mips.T0, 2))
-    #     instructions.append(mips.LoadAddressNode(mips.T1, mips.VIRTUAL_TABLE))
-    #     instructions.append(mips.AddUnsignedNode(mips.T1, mips.T1, mips.T0))
-    #     instructions.append(
-    #         mips.LoadWordNode(mips.T1, mips.RegisterRelativeLocation(mips.T1, 0))
-    #     )
-    #     instructions.append(
-    #         mips.LoadWordNode(mips.A0, mips.RegisterRelativeLocation(mips.T1, 4))
-    #     )
-    #     instructions.append(mips.ShiftLeftLogicalNode(mips.A0, mips.A0, 2))
-    #     instructions.append(mips.JumpAndLinkNode("malloc"))
-    #     instructions.append(mips.MoveNode(mips.A1, mips.A0))
-    #     instructions.append(mips.MoveNode(mips.A0, mips.T1))
-    #     instructions.append(mips.MoveNode(mips.A1, mips.V0))
-    #     instructions.append(mips.JumpAndLinkNode("copy"))
-
-    #     instructions.extend(mips.pop_from_stack(mips.T1))
-    #     instructions.extend(mips.pop_from_stack(mips.T0))
-
-    #     instructions.append(
-    #         mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
-    #     )
-
-    #     return instructions
-
     @visitor.when(AllocateNode)
     def visit(self, node: AllocateNode):
         instructions = []
