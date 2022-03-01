@@ -59,8 +59,14 @@ class CoolToCilVisitor(object):
         return local
 
     def register_data(self, name: str, value: str):
-        data_id = f"data_{len(self.dotdata)}_{name}"
-        self.dotdata.append(cil.DataNode(data_id, value))
+        for data in self.dotdata:
+            if data.value == value:
+                data_id = data.name
+                break
+        else:
+            data_id = f"data_{len(self.dotdata)}_{name}"
+            self.dotdata.append(cil.DataNode(data_id, value))
+
         return_sid = self.register_local()
         self.instructions.append(cil.LoadNode(return_sid, data_id))
         return return_sid
@@ -76,9 +82,11 @@ class CoolToCilVisitor(object):
 
         if len(args) == 0:
             if type == "Int" or type == "Bool":
-                self.instructions.append(cil.ArgNode(self.register_num(0)))
+                args = [self.register_num(0)]
             elif type == "String":
-                self.instructions.append(cil.ArgNode(self.register_data("")))
+                args = [self.register_data("default_str", '""')]
+            else:
+                type = "Void"
 
         for arg in args:
             self.instructions.append(cil.ArgNode(arg))
@@ -444,8 +452,8 @@ class CoolToCilVisitor(object):
         self.register_param("self")
         if node.body is not None:
             sid = self.visit(node.body)
-        else:  # Void
-            sid = self.register_new("Void")
+        else:  # Default
+            sid = self.register_new(node.attr_info.type.name)
         self.instructions.append(cil.ReturnNode(sid))
         return cil.FunctionNode(
             self.get_func_id(self.type, f"{node.attr_info.name}___init"),
@@ -585,7 +593,7 @@ class CoolToCilVisitor(object):
         # Label pool
         self.instructions.append(cil.LabelNode(pool_label))
 
-        return "void"
+        return self.register_new("Void")
 
     @visitor.when(type_checked.CoolBlockNode)
     def visit(self, node: type_checked.CoolBlockNode) -> str:
@@ -608,7 +616,7 @@ class CoolToCilVisitor(object):
             rhs_local = self.visit(node.expr)
             self.instructions.append(cil.AssignNode(lhs_local, rhs_local))
         else:
-            self.register_new("Void", dest=lhs_local)
+            self.register_new(node.type.name, dest=lhs_local)
 
         return lhs_local
 
