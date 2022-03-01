@@ -13,10 +13,10 @@ class ProgramNode(Node):
 
 
 class TypeNode(Node):
-    def __init__(self, name, attributes=[], methods=[]):
+    def __init__(self, name):
         self.name = name
-        self.attributes = attributes
-        self.methods = methods
+        self.attributes = []
+        self.methods = []
 
 
 class DataNode(Node):
@@ -31,12 +31,6 @@ class FunctionNode(Node):
         self.params = params
         self.localvars = localvars
         self.instructions = instructions
-
-    # def __str__(self):
-    #     print("NAME:", self.name)
-    #     # print("PARAMS:", self.params)
-    #     # print("LOCALS:", self.localvars)
-    #     print("INSTRUCTIONS", self.instructions)
 
 
 class ParamNode(Node):
@@ -127,6 +121,10 @@ class SetAttribNode(InstructionNode):
         self.attr = attr
 
 
+class ArrayNode(InstructionNode):
+    pass
+
+
 class GetIndexNode(InstructionNode):
     pass
 
@@ -141,10 +139,6 @@ class AllocateNode(InstructionNode):
         self.dest = dest
 
 
-class ArrayNode(InstructionNode):
-    pass
-
-
 class TypeOfNode(InstructionNode):
     def __init__(self, obj, dest):
         self.obj = obj
@@ -152,7 +146,8 @@ class TypeOfNode(InstructionNode):
 
 
 class LabelNode(InstructionNode):
-    pass
+    def __init__(self, name):
+        self.name = name
 
 
 class GotoNode(InstructionNode):
@@ -242,12 +237,6 @@ class CopyNode(InstructionNode):
         self.source = source
 
 
-class STRNode(InstructionNode):
-    def __init__(self, dest, source):
-        self.dest = dest
-        self.source = source
-
-
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
@@ -257,6 +246,18 @@ class TypeNameNode(InstructionNode):
     def __init__(self, dest, source):
         self.dest = dest
         self.source = source
+
+
+class DefaultValueNode(InstructionNode):
+    def __init__(self, dest, typex):
+        self.dest = dest
+        self.type = typex
+
+
+class IsVoidNode(InstructionNode):
+    def __init__(self, dest, value):
+        self.dest = dest
+        self.value = value
 
 
 class PrintVisitor(object):
@@ -301,7 +302,7 @@ class PrintVisitor(object):
 
     @visitor.when(AssignNode)
     def visit(self, node):
-        return f"{node.dest} = {node.source}"
+        return f"{node.dest} <- {node.source}"
 
     @visitor.when(PlusNode)
     def visit(self, node):
@@ -318,6 +319,38 @@ class PrintVisitor(object):
     @visitor.when(DivNode)
     def visit(self, node):
         return f"{node.dest} = {node.left} / {node.right}"
+
+    @visitor.when(LessNode)
+    def visit(self, node):
+        return f"{node.dest} = {node.left} < {node.right}"
+
+    @visitor.when(LessEqualNode)
+    def visit(self, node):
+        return f"{node.dest} = {node.left} <= {node.right}"
+
+    @visitor.when(EqualNode)
+    def visit(self, node):
+        return f"{node.dest} = {node.left} == {node.right}"
+
+    @visitor.when(NotNode)
+    def visit(self, node):
+        return f"{node.dest} = NOT {node.expr}"
+
+    @visitor.when(IntComplementNode)
+    def visit(self, node):
+        return f"{node.dest} = ~ {node.expr}"
+
+    @visitor.when(LabelNode)
+    def visit(self, node):
+        return f"LABEL {node.name}"
+
+    @visitor.when(GotoNode)
+    def visit(self, node):
+        return f"GOTO {node.label}"
+
+    @visitor.when(GotoIfNode)
+    def visit(self, node):
+        return f"IF {node.condition} GOTO {node.label}"
 
     @visitor.when(AllocateNode)
     def visit(self, node):
@@ -379,6 +412,10 @@ class PrintVisitor(object):
     def visit(self, node):
         return f"{node.dest} = LENGTH {node.source}"
 
+    @visitor.when(LoadNode)
+    def visit(self, node):
+        return f"{node.dest} = LOAD {node.msg}"
+
     @visitor.when(ConcatNode)
     def visit(self, node):
         return f"{node.dest} = CONCAT {node.left} {node.right}"
@@ -386,6 +423,14 @@ class PrintVisitor(object):
     @visitor.when(SubstringNode)
     def visit(self, node):
         return f"{node.dest} = SUBSTRING {node.source} {node.id} {node.length}"
+
+    @visitor.when(DefaultValueNode)
+    def visit(self, node):
+        return f"{node.dest} = DEFAULT {node.type}"
+
+    @visitor.when(IsVoidNode)
+    def visit(self, node):
+        return f"{node.dest} = ISVOID {node.value}"
 
 
 # printer = PrintVisitor()

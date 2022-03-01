@@ -44,7 +44,9 @@ def pipeline(input_file: Path, output_file: Path = None):
     # define grammar
     grammar, idx, type_id, string, num = define_cool_grammar()
 
-    tokens, pos_data = tokenize_cool_text(grammar, idx, type_id, string, num, text, errors)
+    tokens, pos_data = tokenize_cool_text(
+        grammar, idx, type_id, string, num, text, errors
+    )
     # print(tokens)
 
     if len(errors) > 0:
@@ -54,18 +56,20 @@ def pipeline(input_file: Path, output_file: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    parse, operations = parser([t.token_type for t in tokens], [t.lex for t in tokens], pos_data, text)
+    parse, operations = parser(
+        [t.token_type for t in tokens], [t.lex for t in tokens], pos_data, text
+    )
 
     # print("Parse")
     # print(parse)
 
     if len(errors) > 0:
         report_and_exit(errors)
-        
-    #get parsing tree
+
+    # get parsing tree
     ast = evaluate_reverse_parse(parse, operations, tokens)
 
-    #printing tree
+    # printing tree
     # formatter = FormatVisitorST()
     # tree = formatter.visit(ast)
     # print(tree)
@@ -81,16 +85,20 @@ def pipeline(input_file: Path, output_file: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    # cool_to_cil_visitor = CILBuilder(errors)
-    # cil_ast = cool_to_cil_visitor.visit(ast)
+    cool_to_cil_visitor = CILBuilder(errors)
+    cil_ast = cool_to_cil_visitor.visit(ast)
 
-    # formatter = PrintVisitor()
-    # tree = formatter.visit(cil_ast)
-    # print(tree)
+    formatter = PrintVisitor()
+    tree = formatter.visit(cil_ast)
+    print(tree)
 
     # if output_file is None:
     #     output_file = input.with_suffix(".mips")
 
 
 if __name__ == "__main__":
+    # input_file = Path(
+    #     "/home/amanda/Documents/Facultad/Compilacion/cool-compiler-2021/customized_tests/test_hello_world.cl"
+    # )
+    # pipeline(input_file)
     typer.run(pipeline)
