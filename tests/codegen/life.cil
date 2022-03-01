@@ -487,8 +487,23 @@
     RETURN local_self;
   }
 
+  function Board_rows_init {
 
 
+    RETURN [];
+  }
+
+  function Board_columns_init {
+
+
+    RETURN [];
+  }
+
+  function Board_board_size_init {
+
+
+    RETURN [];
+  }
 
   function Board_size_of_board {
     PARAM param_self;
@@ -758,6 +773,11 @@
     RETURN local_self;
   }
 
+  function CellularAutomaton_population_map_init {
+
+
+    RETURN [];
+  }
 
   function CellularAutomaton_init {
     PARAM param_self;
@@ -3258,6 +3278,11 @@
     RETURN local_self;
   }
 
+  function Main_cells_init {
+
+
+    RETURN [];
+  }
 
   function Main_main {
     PARAM param_self;

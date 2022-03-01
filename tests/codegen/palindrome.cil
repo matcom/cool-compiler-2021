@@ -481,6 +481,11 @@
     RETURN local_0;
   }
 
+  function Main_i_init {
+
+
+    RETURN [];
+  }
 
   function Main_main {
     PARAM param_self;

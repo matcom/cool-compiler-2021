@@ -345,7 +345,7 @@
     ARG param_self;
     ARG local_2;
     local_1 = VCALL local_11 3;
-    local_14 = TYPEOF <coolpyler.ast.cool.type_checked.CoolVarNode object at 0x7f79757a8490>;
+    local_14 = TYPEOF <coolpyler.ast.cool.type_checked.CoolVarNode object at 0x7f00b00a1550>;
     ARG local_14;
     local_15 = CALL Bool_init;
     local_16 = TYPEOF local_15;

@@ -32,43 +32,8 @@
     method IO_in_string;
     method IO_in_int;
   }
-  type A {
-    attribute io;
-    method Object_abort;
-    method A_type_name;
-    method Object_copy;
-    method A_out_a;
-  }
-  type B {
-    attribute io;
-    method Object_abort;
-    method B_type_name;
-    method Object_copy;
-    method A_out_a;
-    method B_out_b;
-  }
-  type C {
-    method Object_abort;
-    method C_type_name;
-    method Object_copy;
-    method IO_out_string;
-    method IO_out_int;
-    method IO_in_string;
-    method IO_in_int;
-    method C_out_c;
-  }
-  type D {
-    method Object_abort;
-    method D_type_name;
-    method Object_copy;
-    method IO_out_string;
-    method IO_out_int;
-    method IO_in_string;
-    method IO_in_int;
-    method C_out_c;
-    method D_out_d;
-  }
   type Main {
+    attribute test;
     method Object_abort;
     method Main_type_name;
     method Object_copy;
@@ -88,16 +53,9 @@
   data_4_type_name_Bool = "Bool";
   data_5_type_name_String = "String";
   data_6_type_name_IO = "IO";
-  data_7_type_name_A = "A";
-  data_8_type_name_B = "B";
-  data_9_type_name_C = "C";
-  data_10_type_name_D = "D";
-  data_11_type_name_Main = "Main";
-  data_12_string = "A: Hello world\n";
-  data_13_string = "B: Hello world\n";
-  data_14_string = "C: Hello world\n";
-  data_15_string = "D: Hello world\n";
-  data_16_string = "Done.\n";
+  data_7_type_name_Main = "Main";
+  data_8_string = "Hello World!";
+  data_9_string = "String";
 
 .code
 
@@ -203,61 +161,13 @@
     RETURN local_1;
   }
 
-  function A_type_name {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-
-    local_0 = LOAD data_7_type_name_A;
-    ARG local_0;
-    local_1 = CALL String_init;
-    RETURN local_1;
-  }
-
-  function B_type_name {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-
-    local_0 = LOAD data_8_type_name_B;
-    ARG local_0;
-    local_1 = CALL String_init;
-    RETURN local_1;
-  }
-
-  function C_type_name {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-
-    local_0 = LOAD data_9_type_name_C;
-    ARG local_0;
-    local_1 = CALL String_init;
-    RETURN local_1;
-  }
-
-  function D_type_name {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-
-    local_0 = LOAD data_10_type_name_D;
-    ARG local_0;
-    local_1 = CALL String_init;
-    RETURN local_1;
-  }
-
   function Main_type_name {
     PARAM param_self;
 
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_11_type_name_Main;
+    local_0 = LOAD data_7_type_name_Main;
     ARG local_0;
     local_1 = CALL String_init;
     RETURN local_1;
@@ -379,133 +289,14 @@
     RETURN local_self;
   }
 
-  function A_init {
-
-    LOCAL local_self;
-    LOCAL local_io;
-
-    local_self = ALLOCATE A;
-    local_io = CALL A_io_init;
-    SETATTR local_self 0 local_io;
-    RETURN local_self;
-  }
-
-  function A_io_init {
-
-    LOCAL local_0;
-
-    local_0 = CALL IO_init;
-    RETURN local_0;
-  }
-
-  function A_out_a {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_io;
-    LOCAL local_2;
-    LOCAL local_3;
-    LOCAL local_4;
-
-    local_io = GETATTR param_self 0;
-    local_2 = LOAD data_12_string;
-    ARG local_2;
-    local_3 = CALL String_init;
-    local_4 = TYPEOF local_io;
-    ARG local_io;
-    ARG local_3;
-    local_0 = VCALL local_4 3;
-    RETURN local_0;
-  }
-
-  function B_init {
-
-    LOCAL local_self;
-    LOCAL local_io;
-
-    local_self = ALLOCATE B;
-    local_io = CALL A_io_init;
-    SETATTR local_self 0 local_io;
-    RETURN local_self;
-  }
-
-  function B_out_b {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_io;
-    LOCAL local_2;
-    LOCAL local_3;
-    LOCAL local_4;
-
-    local_io = GETATTR param_self 0;
-    local_2 = LOAD data_13_string;
-    ARG local_2;
-    local_3 = CALL String_init;
-    local_4 = TYPEOF local_io;
-    ARG local_io;
-    ARG local_3;
-    local_0 = VCALL local_4 3;
-    RETURN local_0;
-  }
-
-  function C_init {
-
-    LOCAL local_self;
-
-    local_self = ALLOCATE C;
-    RETURN local_self;
-  }
-
-  function C_out_c {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-    LOCAL local_2;
-    LOCAL local_3;
-
-    local_1 = LOAD data_14_string;
-    ARG local_1;
-    local_2 = CALL String_init;
-    local_3 = TYPEOF param_self;
-    ARG param_self;
-    ARG local_2;
-    local_0 = VCALL local_3 3;
-    RETURN local_0;
-  }
-
-  function D_init {
-
-    LOCAL local_self;
-
-    local_self = ALLOCATE D;
-    RETURN local_self;
-  }
-
-  function D_out_d {
-    PARAM param_self;
-
-    LOCAL local_0;
-    LOCAL local_1;
-    LOCAL local_2;
-    LOCAL local_3;
-
-    local_1 = LOAD data_15_string;
-    ARG local_1;
-    local_2 = CALL String_init;
-    local_3 = TYPEOF param_self;
-    ARG param_self;
-    ARG local_2;
-    local_0 = VCALL local_3 3;
-    RETURN local_0;
-  }
-
   function Main_init {
 
     LOCAL local_self;
+    LOCAL local_test;
 
     local_self = ALLOCATE Main;
+    local_test = CALL Main_test_init;
+    SETATTR local_self 0 local_test;
     RETURN local_self;
   }
 
@@ -516,42 +307,25 @@
     LOCAL local_1;
     LOCAL local_2;
     LOCAL local_3;
-    LOCAL local_4;
-    LOCAL local_5;
-    LOCAL local_6;
-    LOCAL local_7;
-    LOCAL local_8;
-    LOCAL local_9;
-    LOCAL local_10;
-    LOCAL local_11;
-    LOCAL local_12;
-    LOCAL local_13;
-    LOCAL local_14;
-    LOCAL local_15;
 
-    local_1 = CALL A_init;
-    local_2 = TYPEOF local_1;
+    local_1 = LOAD data_8_string;
     ARG local_1;
-    local_0 = VCALL local_2 3;
-    local_4 = CALL B_init;
-    local_5 = TYPEOF local_4;
-    ARG local_4;
-    local_3 = VCALL local_5 4;
-    local_7 = CALL C_init;
-    local_8 = TYPEOF local_7;
-    ARG local_7;
-    local_6 = VCALL local_8 7;
-    local_10 = CALL D_init;
-    local_11 = TYPEOF local_10;
-    ARG local_10;
-    local_9 = VCALL local_11 8;
-    local_13 = LOAD data_16_string;
-    ARG local_13;
-    local_14 = CALL String_init;
-    local_15 = TYPEOF param_self;
+    local_2 = CALL String_init;
+    local_3 = TYPEOF param_self;
     ARG param_self;
-    ARG local_14;
-    local_12 = VCALL local_15 3;
-    RETURN local_12;
+    ARG local_2;
+    local_0 = VCALL local_3 3;
+    RETURN local_0;
+  }
+
+  function Main_test_init {
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_9_string;
+    ARG local_0;
+    local_1 = CALL String_init;
+    RETURN local_1;
   }
 

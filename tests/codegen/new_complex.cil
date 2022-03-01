@@ -474,7 +474,17 @@
     RETURN local_self;
   }
 
+  function Complex_x_init {
 
+
+    RETURN [];
+  }
+
+  function Complex_y_init {
+
+
+    RETURN [];
+  }
 
   function Complex_init {
     PARAM param_self;

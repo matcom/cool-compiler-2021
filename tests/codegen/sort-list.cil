@@ -536,7 +536,17 @@
     RETURN local_self;
   }
 
+  function Cons_xcar_init {
 
+
+    RETURN [];
+  }
+
+  function Cons_xcdr_init {
+
+
+    RETURN [];
+  }
 
   function Cons_isNil {
     PARAM param_self;
@@ -825,6 +835,11 @@
     RETURN local_self;
   }
 
+  function Main_l_init {
+
+
+    RETURN [];
+  }
 
   function Main_iota {
     PARAM param_self;

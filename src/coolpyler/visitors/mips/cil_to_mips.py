@@ -650,14 +650,19 @@ class CilToMIPS:
         self.memory_manager.save()
         reg1 = self.memory_manager.get_unused_register()
 
-        value_dir = self.search_mem(node.value)
-        instructions.append(
-            mips.LoadWordNode(
-                reg1,
-                mips.MemoryAddressRegisterNode(FP_REG, value_dir),
-                f"Obtain return value",
+        if node.value != "Void":
+            value_dir = self.search_mem(node.value)
+            instructions.append(
+                mips.LoadWordNode(
+                    reg1,
+                    mips.MemoryAddressRegisterNode(FP_REG, value_dir),
+                    f"Obtain return value",
+                )
             )
-        )
+        else:
+            instructions.append(
+                mips.LoadInmediateNode(reg1, 0, f"Return Void (value 0)",)
+            )
 
         instructions.append(
             mips.AddiNode(SP_REG, SP_REG, -4, f"remove prev $fp from stack")

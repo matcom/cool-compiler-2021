@@ -332,6 +332,13 @@
     RETURN local_self;
   }
 
+  function CellularAutomaton_population_map_init {
+
+    LOCAL local_0;
+
+    local_0 = CALL Void_init;
+    RETURN local_0;
+  }
 
   function CellularAutomaton_init {
     PARAM param_self;
@@ -789,6 +796,13 @@
     RETURN local_self;
   }
 
+  function Main_cells_init {
+
+    LOCAL local_0;
+
+    local_0 = CALL Void_init;
+    RETURN local_0;
+  }
 
   function Main_main {
     PARAM param_self;

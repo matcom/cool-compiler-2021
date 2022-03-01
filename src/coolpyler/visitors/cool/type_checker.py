@@ -51,7 +51,9 @@ class TypeCheckerVisitor:
         self.types = node.types
         classes = [self.visit(c, scope.create_child()) for c in node.classes]
 
-        return type_checked.CoolProgramNode(node.lineno, node.columnno, list(self.types.values()), classes)
+        return type_checked.CoolProgramNode(
+            node.lineno, node.columnno, list(self.types.values()), classes
+        )
 
     @visitor.when(type_built.CoolClassNode)
     def visit(self, node, scope):
@@ -77,28 +79,27 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolAttrDeclNode)
     def visit(self, node, scope):
-        if node.body != [] and node.attr_info is not None:
+        if node.body != []:
             exp = self.visit(node.body, scope)
-            node_type = node.attr_info.type
 
-            if exp.type.name == "SELF_TYPE" and not self.exp_type.conforms_to(
-                node_type
-            ):
-                self.errors.append(
-                    errors.IncompatibleTypesError(
-                        node.lineno, node.columnno, node_type.name, self.exp_type.name
+            if node.attr_info is not None:
+                node_type = node.attr_info.type
+
+                # TODO: SELF_TYPE
+
+                if node.body is not None and not exp.type.conforms_to(node_type):
+                    self.errors.append(
+                        errors.IncompatibleTypesError(
+                            node.lineno, node.columnno, node_type.name, exp.type.name
+                        )
                     )
-                )
 
-            elif exp.type.name != "SELF_TYPE" and not exp.type.conforms_to(node_type):
-                self.errors.append(
-                    errors.IncompatibleTypesError(
-                        node.lineno, node.columnno, node_type.name, exp.type.name
-                    )
-                )
-
-            return type_built.CoolAttrDeclNode(
+            return type_checked.CoolAttrDeclNode(
                 node.lineno, node.columnno, node.attr_info, exp
+            )
+        else:
+            return type_checked.CoolAttrDeclNode(
+                node.lineno, node.columnno, node.attr_info, None
             )
 
     @visitor.when(type_built.CoolMethodDeclNode)
