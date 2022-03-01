@@ -72,19 +72,6 @@ class MipsGenerate:
     #stack_pointer = 0
     #bsp = self.base_stack_pointer
 
-    @visitor.when(AST.Param)
-    def visit(self, node: AST.Param):
-        self.stack.list.append(node.x)
-        return [ASTR.Header_Comment(f'Parametro {node.x} en stackpoiner + {self.stack.initial_index}')]  
-
-    @visitor.when(AST.Local)
-    def visit(self, node: AST.Local):
-        self.stack.list.append(node.x)
-        return [
-            ASTR.AddI('$sp', '$sp', -4), 
-            ASTR.Comment(
-            f'Push local var {node.x} stackpointer {self.stack.initial_index}')
-        ]
 
     @visitor.when(AST.ALLOCATE)
     def visit(self, node: AST.ALLOCATE):
@@ -491,11 +478,7 @@ class MipsGenerate:
                 ASTR.Comment(f"if $t1==$t0 then jump {label_memory}")
                 ]
 
-    @ visitor.when(AST.Label) 
-    def visit(self,node:AST.Label):
-        return [ASTR.Label(node.x),
-                ASTR.Comment(f"Crea el label {node.x} ")
-                ]  
+
 
     @visitor.when(AST.CheckType)
     def visit(self,node:AST.CheckType):

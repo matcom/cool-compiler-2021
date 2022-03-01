@@ -226,7 +226,6 @@ class SLT (CmpNotJump): #<
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
         super().__init__( 'slt' ,r_dest, r_src_1, r_src_2)
 
-
 class SLE(CmpNotJump):  # <=
     def __init__(self ,r_dest, r_src_1, r_src_2) -> None:
             super().__init__( 'sle' ,r_dest, r_src_1, r_src_2)
