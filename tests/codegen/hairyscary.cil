@@ -124,13 +124,14 @@
   data_8_type_name_Razz = "Razz";
   data_9_type_name_Bazz = "Bazz";
   data_10_type_name_Main = "Main";
-  data_11_case_err = "Case of did not match any branch!";
-  data_12_eol = "\n";
-  data_13_under = "_";
-  data_14_meth = "doh";
-  data_15_meth = "printh";
-  data_16_meth = "out_int";
-  data_17_string = "do nothing";
+  data_11_sep_cat = " ++ ";
+  data_12_case_err = "Case of did not match any branch!";
+  data_13_eol = "\n";
+  data_14_under = "_";
+  data_15_meth = "doh";
+  data_16_meth = "printh";
+  data_17_meth = "out_int";
+  data_18_string = "do nothing";
 
 .code
 
@@ -497,32 +498,46 @@
   function String_length {
     PARAM param_self;
 
+    LOCAL local_str_attr;
     LOCAL local_length;
-    LOCAL local_1;
+    LOCAL local_2;
 
-    param_self = length(local_length)
+    local_str_attr = GETATTR param_self 0;
+    local_str_attr = length(local_length)
     ARG local_length;
-    local_1 = CALL Int___init;
-    RETURN local_1;
+    local_2 = CALL Int___init;
+    RETURN local_2;
   }
 
   function String_concat {
     PARAM param_self;
     PARAM param_other;
 
+    LOCAL local_0;
+    LOCAL local_1;
+    LOCAL local_self_str_attr;
+    LOCAL local_self_str_attr;
     LOCAL local_concat;
     LOCAL local_self_len;
     LOCAL local_other_len;
     LOCAL local_concat_len;
-    LOCAL local_4;
+    LOCAL local_8;
 
-    local_self_len = length(param_self)
-    local_other_len = length(param_other)
+    local_0 = LOAD data_11_sep_cat;
+    ARG local_0;
+    local_1 = CALL String___init;
+    print(str, param_self)
+    print(str, local_1)
+    print(str, param_other)
+    local_self_str_attr = GETATTR param_self 0;
+    local_self_str_attr = GETATTR param_other 0;
+    local_self_len = length(local_self_str_attr)
+    local_other_len = length(local_self_str_attr)
     local_concat_len = local_self_len + local_other_len
     local_concat = concat(param_self, param_other, local_concat_len)
     ARG local_concat;
-    local_4 = CALL String___init;
-    RETURN local_4;
+    local_8 = CALL String___init;
+    RETURN local_8;
   }
 
   function String_substr {
@@ -530,10 +545,15 @@
     PARAM param_i;
     PARAM param_l;
 
+    LOCAL local_self_str_local;
     LOCAL local_substr;
+    LOCAL local_2;
 
-    local_substr = substr(param_self, param_i, param_l)
-    RETURN local_substr;
+    local_self_str_local = GETATTR param_self 0;
+    local_substr = substr(local_self_str_local, param_i, param_l)
+    ARG local_substr;
+    local_2 = CALL String___init;
+    RETURN local_2;
   }
 
   function Object___init {
@@ -635,7 +655,7 @@
     local_7 = LOAD Foo;
     local_8 = local_6 - local_7
     IF local_8 GOTO label_case_branch_2;
-    local_9 = LOAD data_11_case_err;
+    local_9 = LOAD data_12_case_err;
     ARG local_9;
     local_10 = CALL String___init;
     print(str, local_10)
@@ -704,13 +724,13 @@
 
     local_a = GETATTR param_self 3;
     local_2 = TYPEOF local_a;
-    local_4 = LOAD data_12_eol;
+    local_4 = LOAD data_13_eol;
     ARG local_4;
     local_5 = CALL String___init;
-    local_6 = LOAD data_13_under;
+    local_6 = LOAD data_14_under;
     ARG local_6;
     local_7 = CALL String___init;
-    local_8 = LOAD data_14_meth;
+    local_8 = LOAD data_15_meth;
     ARG local_8;
     local_9 = CALL String___init;
     local_tname_local = VCALL local_2 1;
@@ -723,13 +743,13 @@
     local_10 = GETATTR local_0 0;
     local_g = GETATTR param_self 1;
     local_13 = TYPEOF local_g;
-    local_15 = LOAD data_12_eol;
+    local_15 = LOAD data_13_eol;
     ARG local_15;
     local_16 = CALL String___init;
-    local_17 = LOAD data_13_under;
+    local_17 = LOAD data_14_under;
     ARG local_17;
     local_18 = CALL String___init;
-    local_19 = LOAD data_14_meth;
+    local_19 = LOAD data_15_meth;
     ARG local_19;
     local_20 = CALL String___init;
     local_tname_local = VCALL local_13 1;
@@ -743,13 +763,13 @@
     local_22 = local_10 + local_21
     local_23 = GETATTR local_22 0;
     local_25 = TYPEOF param_self;
-    local_27 = LOAD data_12_eol;
+    local_27 = LOAD data_13_eol;
     ARG local_27;
     local_28 = CALL String___init;
-    local_29 = LOAD data_13_under;
+    local_29 = LOAD data_14_under;
     ARG local_29;
     local_30 = CALL String___init;
-    local_31 = LOAD data_14_meth;
+    local_31 = LOAD data_15_meth;
     ARG local_31;
     local_32 = CALL String___init;
     local_tname_local = VCALL local_25 1;
@@ -763,13 +783,13 @@
     local_34 = local_23 + local_33
     local_35 = GETATTR local_34 0;
     local_37 = TYPEOF param_self;
-    local_39 = LOAD data_12_eol;
+    local_39 = LOAD data_13_eol;
     ARG local_39;
     local_40 = CALL String___init;
-    local_41 = LOAD data_13_under;
+    local_41 = LOAD data_14_under;
     ARG local_41;
     local_42 = CALL String___init;
-    local_43 = LOAD data_15_meth;
+    local_43 = LOAD data_16_meth;
     ARG local_43;
     local_44 = CALL String___init;
     local_tname_local = VCALL local_37 1;
@@ -863,13 +883,13 @@
     LOCAL local_8;
 
     local_1 = TYPEOF param_self;
-    local_3 = LOAD data_12_eol;
+    local_3 = LOAD data_13_eol;
     ARG local_3;
     local_4 = CALL String___init;
-    local_5 = LOAD data_13_under;
+    local_5 = LOAD data_14_under;
     ARG local_5;
     local_6 = CALL String___init;
-    local_7 = LOAD data_14_meth;
+    local_7 = LOAD data_15_meth;
     ARG local_7;
     local_8 = CALL String___init;
     local_tname_local = VCALL local_1 1;
@@ -896,13 +916,13 @@
     LOCAL local_8;
 
     local_1 = TYPEOF param_self;
-    local_3 = LOAD data_12_eol;
+    local_3 = LOAD data_13_eol;
     ARG local_3;
     local_4 = CALL String___init;
-    local_5 = LOAD data_13_under;
+    local_5 = LOAD data_14_under;
     ARG local_5;
     local_6 = CALL String___init;
-    local_7 = LOAD data_15_meth;
+    local_7 = LOAD data_16_meth;
     ARG local_7;
     local_8 = CALL String___init;
     local_tname_local = VCALL local_1 1;
@@ -975,7 +995,7 @@
     local_4 = LOAD Razz;
     local_5 = local_3 - local_4
     IF local_5 GOTO label_case_branch_4;
-    local_6 = LOAD data_11_case_err;
+    local_6 = LOAD data_12_case_err;
     ARG local_6;
     local_7 = CALL String___init;
     print(str, local_7)
@@ -1057,13 +1077,13 @@ _doh;
     local_2 = GETATTR local_0 0;
     local_g = GETATTR param_self 1;
     local_5 = TYPEOF local_g;
-    local_7 = LOAD data_12_eol;
+    local_7 = LOAD data_13_eol;
     ARG local_7;
     local_8 = CALL String___init;
-    local_9 = LOAD data_13_under;
+    local_9 = LOAD data_14_under;
     ARG local_9;
     local_10 = CALL String___init;
-    local_11 = LOAD data_14_meth;
+    local_11 = LOAD data_15_meth;
     ARG local_11;
     local_12 = CALL String___init;
     local_tname_local = VCALL local_5 1;
@@ -1078,13 +1098,13 @@ _doh;
     local_15 = GETATTR local_14 0;
     local_e = GETATTR param_self 5;
     local_18 = TYPEOF local_e;
-    local_20 = LOAD data_12_eol;
+    local_20 = LOAD data_13_eol;
     ARG local_20;
     local_21 = CALL String___init;
-    local_22 = LOAD data_13_under;
+    local_22 = LOAD data_14_under;
     ARG local_22;
     local_23 = CALL String___init;
-    local_24 = LOAD data_14_meth;
+    local_24 = LOAD data_15_meth;
     ARG local_24;
     local_25 = CALL String___init;
     local_tname_local = VCALL local_18 1;
@@ -1098,13 +1118,13 @@ _doh;
     local_27 = local_15 + local_26
     local_28 = GETATTR local_27 0;
     local_30 = TYPEOF param_self;
-    local_32 = LOAD data_12_eol;
+    local_32 = LOAD data_13_eol;
     ARG local_32;
     local_33 = CALL String___init;
-    local_34 = LOAD data_13_under;
+    local_34 = LOAD data_14_under;
     ARG local_34;
     local_35 = CALL String___init;
-    local_36 = LOAD data_14_meth;
+    local_36 = LOAD data_15_meth;
     ARG local_36;
     local_37 = CALL String___init;
     local_tname_local = VCALL local_30 1;
@@ -1118,13 +1138,13 @@ _doh;
     local_39 = local_28 + local_38
     local_40 = GETATTR local_39 0;
     local_42 = TYPEOF param_self;
-    local_44 = LOAD data_12_eol;
+    local_44 = LOAD data_13_eol;
     ARG local_44;
     local_45 = CALL String___init;
-    local_46 = LOAD data_13_under;
+    local_46 = LOAD data_14_under;
     ARG local_46;
     local_47 = CALL String___init;
-    local_48 = LOAD data_15_meth;
+    local_48 = LOAD data_16_meth;
     ARG local_48;
     local_49 = CALL String___init;
     local_tname_local = VCALL local_42 1;
@@ -1195,7 +1215,7 @@ _doh;
     local_4 = LOAD Bazz;
     local_5 = local_3 - local_4
     IF local_5 GOTO label_case_branch_6;
-    local_6 = LOAD data_11_case_err;
+    local_6 = LOAD data_12_case_err;
     ARG local_6;
     local_7 = CALL String___init;
     print(str, local_7)
@@ -1222,13 +1242,13 @@ _doh;
     LOCAL local_8;
 
     local_1 = TYPEOF param_self;
-    local_3 = LOAD data_12_eol;
+    local_3 = LOAD data_13_eol;
     ARG local_3;
     local_4 = CALL String___init;
-    local_5 = LOAD data_13_under;
+    local_5 = LOAD data_14_under;
     ARG local_5;
     local_6 = CALL String___init;
-    local_7 = LOAD data_15_meth;
+    local_7 = LOAD data_16_meth;
     ARG local_7;
     local_8 = CALL String___init;
     local_tname_local = VCALL local_1 1;
@@ -1259,13 +1279,13 @@ _doh;
 
     local_h = GETATTR param_self 0;
     local_2 = TYPEOF param_self;
-    local_4 = LOAD data_12_eol;
+    local_4 = LOAD data_13_eol;
     ARG local_4;
     local_5 = CALL String___init;
-    local_6 = LOAD data_13_under;
+    local_6 = LOAD data_14_under;
     ARG local_6;
     local_7 = CALL String___init;
-    local_8 = LOAD data_16_meth;
+    local_8 = LOAD data_17_meth;
     ARG local_8;
     local_9 = CALL String___init;
     local_tname_local = VCALL local_2 1;
@@ -1369,7 +1389,7 @@ _doh;
     LOCAL local_0;
     LOCAL local_1;
 
-    local_0 = LOAD data_17_string;
+    local_0 = LOAD data_18_string;
     ARG local_0;
     local_1 = CALL String___init;
     RETURN local_1;
