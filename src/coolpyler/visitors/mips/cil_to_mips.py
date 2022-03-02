@@ -747,7 +747,7 @@ class CilToMIPS:
 
         string_dir = self.search_mem(node.string)
         instructions.append(
-            mips.LoadAddressNode(
+            mips.LoadWordNode(
                 ARG_REGISTERS[0],
                 mips.MemoryAddressRegisterNode(FP_REG, string_dir),
                 f"Calculate Lenght",
@@ -760,15 +760,12 @@ class CilToMIPS:
         instructions.append(
             mips.LoadByteNode(reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0))
         )
+
         instructions.append(mips.BeqzNode(reg2, mips.LabelNode(exit)))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(reg1, reg1, 1))
         instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
-
-        # instructions.append(mips.LoadInmediateNode(V0_REG, 1, f"PRINT"))
-        # instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
-        # instructions.append(mips.SyscallNode())
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
@@ -778,6 +775,10 @@ class CilToMIPS:
                 f"Save Calculated Length",
             )
         )
+
+        # instructions.append(mips.LoadInmediateNode(V0_REG, 1, f"PRINT"))
+        # instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
+        # instructions.append(mips.SyscallNode())
 
         self.memory_manager.clean()
         return instructions
@@ -816,13 +817,13 @@ class CilToMIPS:
 
         string1_dir = self.search_mem(node.string1)
         instructions.append(
-            mips.LoadAddressNode(
+            mips.LoadWordNode(
                 ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string1_dir)
             )
         )
         string2_dir = self.search_mem(node.string2)
         instructions.append(
-            mips.LoadAddressNode(
+            mips.LoadWordNode(
                 ARG_REGISTERS[2], mips.MemoryAddressRegisterNode(FP_REG, string2_dir)
             )
         )
@@ -963,12 +964,12 @@ class CilToMIPS:
         instructions.append(mips.SyscallNode())
 
         instructions.append(
-            mips.LoadAddressNode(reg2, mips.MemoryAddressRegisterNode(V0_REG, 0))
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
 
         string_dir = self.search_mem(node.string)
         instructions.append(
-            mips.LoadAddressNode(
+            mips.LoadWordNode(
                 ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string_dir)
             )
         )
