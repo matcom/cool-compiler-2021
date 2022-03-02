@@ -67,7 +67,7 @@ class CilToMIPS:
             return index * 4
         except ValueError:
             index = self.params.index(id)
-            return -index * 4 - 4
+            return (index - len(self.params)) * 4
 
     def load_value_to_reg(self, reg, id: str):
         instructions = []
