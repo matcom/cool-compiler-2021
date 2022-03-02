@@ -997,13 +997,14 @@ class CilToMIPS:
         instructions.append(
             mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
         )
+        instructions.append(mips.BeqzNode(reg3, mips.LabelNode(exit)))
         instructions.append(
             mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
-        instructions.append(mips.BeqzNode(reg1, mips.LabelNode(exit)))
+
         instructions.append(mips.AddiNode(V0_REG, V0_REG, 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
-        # instructions.append(mips.AddiNode(reg3, reg3, 1))
+        instructions.append(mips.AddiNode(reg3, reg3, -1))
         instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
 
