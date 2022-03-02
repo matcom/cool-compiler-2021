@@ -274,11 +274,15 @@ class CoolToCilVisitor(object):
         l_param = self.register_param("l")
 
         self_str_local = self.register_local("self_str_local")
+        i_param_local = self.register_local("i_local")
+        l_param_local = self.register_local("l_local")
         ret_local = self.register_local("substr")
 
         self.instructions.append(cil.GetAttrNode(self_param, 0, self_str_local))
+        self.instructions.append(cil.GetAttrNode(i_param, 0, i_param_local))
+        self.instructions.append(cil.GetAttrNode(l_param, 0, l_param_local))
         self.instructions.append(
-            cil.SubstringNode(ret_local, self_str_local, l_param, i_param)
+            cil.SubstringNode(ret_local, self_str_local, l_param_local, i_param_local)
         )
         self.instructions.append(
             cil.ReturnNode(self.register_new("String", ret_local))
