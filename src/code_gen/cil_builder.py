@@ -316,22 +316,22 @@ class CILBuilder:
         self.add_builtin_functions()
 
         # Add entry function and call Main.main()
-        self.current_function = FunctionNode("entry", [], [], [])
-        self.code.append(self.current_function)
+        # self.current_function = FunctionNode("entry", [], [], [])
+        # self.code.append(self.current_function)
 
-        instance = "l_instance"
-        self.register_instruction(LocalNode(instance))
+        # instance = "l_instance"
+        # self.register_instruction(LocalNode(instance))
 
-        result = "l_result"
-        self.register_instruction(LocalNode(result))
+        # result = "l_result"
+        # self.register_instruction(LocalNode(result))
 
-        main_method_name = self.to_function_name("Main", "main")
-        self.register_instruction(AllocateNode("Main", instance))
-        self.register_instruction(ArgNode(instance))
-        self.register_instruction(StaticCallNode(main_method_name, result))
-        self.register_instruction(ReturnNode(0))
+        # main_method_name = self.to_function_name("Main", "main")
+        # self.register_instruction(AllocateNode("Main", instance))
+        # self.register_instruction(ArgNode(instance))
+        # self.register_instruction(StaticCallNode(main_method_name, result))
+        # self.register_instruction(ReturnNode(0))
 
-        self.current_function = None
+        # self.current_function = None
 
         for declaration in node.declarations:
             self.visit(declaration)
@@ -446,7 +446,14 @@ class CILBuilder:
         # TODO: Pending <expr>.id(<expr>,...,<expr>)
         # TODO: Pending <expr>@<type>.id(<expr>,...,<expr>)
 
-        # function_name = self.to_function_name(node.id, self.current_type.name)
+        function_name = (
+            self.to_function_name(node.id, self.current_type.name)
+            if not node.at_type
+            else self.to_function_name(node.id, node.at_type)
+        )
+
+        if node.obj:
+            self.visit(node.obj)
 
         for arg in node.args:
             temp = self.define_internal_local()
@@ -454,13 +461,8 @@ class CILBuilder:
             self.register_instruction(AssignNode(temp, value))
             self.register_instruction(ArgNode(temp))
 
-        # if node.obj:
-        #     obj_value = self.visit(node.obj)
-        #     self.register_instruction()
-
-        method_name = self.to_function_name(node.id, self.current_type.name)
         solve = self.define_internal_local()
-        self.register_instruction(StaticCallNode(method_name, solve))
+        self.register_instruction(StaticCallNode(function_name, solve))
 
         return solve
 
