@@ -56,7 +56,7 @@ Utilizando la herramienta `lex` se implementó el tokenizador de texto utilizand
 
 ----
 
-La herramienta `yacc` permite la creación de parsers con gramáticas LALR(1) y la construcción del árbol de sintaxis abstracta mediante gramáticas atributadas. En esta fase se definió la gramatica y la jerarquía de clases a utilizar para construir el AST.
+La herramienta `yacc` permite la creación de parsers con gramáticas LALR(1) y la construcción del árbol de sintaxis abstracta mediante gramáticas atributadas. En esta fase se definió la gramática y la jerarquía de clases a utilizar para construir el AST.
 
 A continuación definimos la gramática LALR(1) utilizada.
 
@@ -160,7 +160,7 @@ EL lenguaje CIL está dividido en tres secciones:
 
 **1.**   type:  Se definen los tipos (clases) con sus atributos y el encabezado de sus métodos como se explica en la bibliogarfia de la asignatura.  
 
-Se conoce que el ast producido por el parser tiene como nodo raiz un ProgramNode que está formado por nodos ClassDeclarationNode que son las clases, y estos a su vez por nodos AttrDeclarationNode y FunctionDeclarationNode que son las definiciones de los atributos y los métodos de una clase. Cuando se visita un ClassDeclarationNode, se crean los nodos CILTypeNode que contienen una lista de CILAttributesNode y una lista de CILMethodNode, los cuales solo contienen el nombre del método y el nombre de la función que lo defino en la sección code.
+Se conoce que el ast producido por el parser tiene como nodo raíz un ProgramNode que está formado por nodos ClassDeclarationNode que son las clases, y estos a su vez por nodos AttrDeclarationNode y FunctionDeclarationNode que son las definiciones de los atributos y los métodos de una clase. Cuando se visita un ClassDeclarationNode, se crean los nodos CILTypeNode que contienen una lista de CILAttributesNode y una lista de CILMethodNode, los cuales solo contienen el nombre del método y el nombre de la función que lo defino en la sección code.
 
 ```
 type A {
@@ -169,11 +169,11 @@ type A {
 }
 ```
 
-Como se sabe los métodos y los atributos de un tipo deben siempre definirse en un mismo orden y si un tipo A hereda de B, A debe tener acceso a los atributos y métodos de su padre y de los demás ancestros de él hasta llegar a Object. Para lograr esto se tomaron en orden topológico todos los nodos de las clases y al recorrerlo se fueron agregando los atributos del padre y métodos en el mismo orden, y por último los suyos. De esta forma, cuando se llega a un nodo su padre tiene ya todos sus atributos y métodos definidos, asi como los del los ancestros en orden de aparición. Además, por una mayor comodidad en la implentación, todas las variables o atributos almacenan un tipo además de su nombre, dejando el trabajo de la memorio para la segunda fase de generación.  
+Como se sabe los métodos y los atributos de un tipo deben siempre definirse en un mismo orden y si un tipo A hereda de B, A debe tener acceso a los atributos y métodos de su padre y de los demás ancestros de él hasta llegar a Object. Para lograr esto se tomaron en orden topológico todos los nodos de las clases y al recorrerlo se fueron agregando los atributos del padre y métodos en el mismo orden, y por último los suyos. De esta forma, cuando se llega a un nodo su padre tiene ya todos sus atributos y métodos definidos, asi como los del los ancestros en orden de aparición. Además, por una mayor comodidad en la implementación, todas las variables o atributos almacenan un tipo además de su nombre, dejando el trabajo de la memoria para la segunda fase de generación.  
 
 Además a cada tipo se le añade un método especial, el init, que va a ser llamado cada vez que se inicialice una clase desde el código de COOL. Por cada atributo declarado en la clase y que se le asigna una expresión, se van a añadir las instrucciones responsables de inicializar esos valores. Este método va a ser invocado pasándole como argumento la referencia de la variable a la que se le desea asignar este tipo. 
 
-Para el caso de los tipos basicos Int, String y Bool, además de añadir el método init, se define un atributo value que contendrá su valor, asignándole cero en la función si no se provee de ninguna expresión de definición; y para el tipo Object e IO, el método init solo se encarga de retornar la instancia de la clase. 
+Para el caso de los tipos basicos Int, String y Bool, además de añadir el método init, se define un atributo value que contendrá su valor, asignándole cero en la función si no se provee de ninguna expresión de definición; y para el tipo Object e IO, el método init solo se encarga de retornar la instancia de la clase,este mismo método init es el llamado cuando en el lenguaje COOL se utiliza la expresión "new".  
 
 Los tipos built-in quedan implementadas de la siguiente forma:
 
@@ -235,7 +235,7 @@ type IO {
 
 Un método en el AST devuelto por el parser es un FunctionDeclarationNode este en CIL se convertirá en un CILFuntionDeclarationNode, como se mencionó se deben guardar en una parte de la sección code las variables para esto se creará una subsección .local para las mismas y una sección subsección del .code también pero anterior a la .local es .param en donde están todos los parámetros de la función delcarada.  Para crear las variables se utiliza un alias que depende de su nombre original, esto se realizó porque una variable de un método o un argumento pueden  llamarse como un atributo de la clase y a la vez en una expresión let pueden utilizarse nombres de variables que estén en los parámetros o en otro let más externo, este alias posibillita que la variable al crearla sea única y  no sobrescriba variables creadas en otro entorno accesible. 
 
-Como se conoce en el lenguaje COOL solo existen expresiones y en el lenguaje CIL se tienen tanto expresiones como instrucciones, por tanto una expresión COOL se traduce a una lista de istrucciones CIL ya sean de asignación o de cambio del valor de un atributo, ifgoto, goto, label, entre otras. Una asignación en CIL puede ser la traducción de una asignación de COOL  o puede ser creada para llevar una expresión de Cool distinta de asignacion a una instrucción en CIL, ejemplo cuando queremos realizar una operación  suma  en COOL cuando una de las partes izquierda o derecha no es un nodo atómico debemos separar en en una asignación a una nueva variable creada en CIL que guarde la expresión de esa parte que no es un nodo atómico y luego a esta sumarla con la parte que si es atómica.
+Como se conoce en el lenguaje COOL solo existen expresiones y en el lenguaje CIL se tienen tanto expresiones como instrucciones, por tanto una expresión COOL se traduce a una lista de istrucciones CIL ya sean de asignación o de cambio del valor de un atributo, ifgoto, goto, label, entre otras. Una asignación en CIL puede ser la traducción de una `asignación` de COOL  o puede ser creada para llevar una expresión de Cool distinta de asignacion a una instrucción en CIL, ejemplo cuando queremos realizar una operación  suma  en COOL cuando una de las partes izquierda o derecha no es un nodo atómico debemos separar en en una asignación a una nueva variable creada en CIL que guarde la expresión de esa parte que no es un nodo atómico y luego a esta sumarla con la parte que si es atómica, lo mismo pasa para todas las expresiones binarias.
 
 Un caso de especial consideración dentro de las expresiones de COOL es el `case`, el comportamiento esperado es que se compute el tipo dinámico de la expresión de del `case` y se seleccione la rama del tipo ancestro más cercano a dicho tipo. Para resolver esto se recorrieron las ramas del case en orden topológico inverso de acuerdo a su tipo, por lo que visitamos los tipos más especializadas primero, y por cada de rama generamos código para que los descendientes que no tienen una rama asignada sean dirigidos a esta rama. Al final se genera el código de la expresión resultado de cada rama. A continuación presentamos un sencillo pseudocódigo con la idea general del algoritmo
 
@@ -256,7 +256,13 @@ for branch in case:
     generate_code()
 ```
 
+En el caso de una expresión `block` en cool , para llevarla a CIL recorremos todas las exresiones que la compongan , cada una sabe como convertirse al lenguaje CIl y luego retornamos la q devolvió la última expresión del `block`. 
 
+En el caso del `let` se debe crear un nuevo ámbito de variable que te permita definir varibles que ya están definidas  y a la ves utilizar las anteriores creadas, luego se crean tantas variables como tenga el `let` y tambien para cada una de las expresiones de las mismas y a estas se les asigna lo q devuelve cada una de las expresiones  y luego  se procede a crear una nueva variable que guarde lo q retorne el recorrido q se le realiza a la expresión in del `let `. 
+
+Para las expresiones unarias en el caso del `prime` lo que se hace es restarle al valor cero la expresión que devuelve el recorrido de la expresión del `prime`, en el caso del `not` se devuelve una nueva variable que guarda el valor de un nuevo NodoCIL CILNotNode que guarda la expresión del `not` la segunda parte de generación de código es el encargado de procesar dicha expresión . En la expresion `isvoid` se recorre la variable y se crea una nueva para asignarle el resultado de este proceso para luego esta pasarla como parámetro y llamar a una función creada llamada `isvoid` que se implementará en la segunda parte de generación de código. El proceso de llamado de funciones en CIL a traves de las expresiones VCALL o CALL estas se utilizan en dependencia de cómo lo necesite la segunda parte de generación de código.
+
+Cuando se encuentra un nodo string en el ast se agrega a la seccion .`data` y para utilizarlo se utiliza la función `load` de CIL que es agregada a  la lista de instrucciones. Para los valores boleanos se crean un expresión `equals`  entre 0 y 1 para el False y entre 0 y 0 para el True , esta expresión se le asigna a  una nueva variable y es lo que se retorna. En el caso de las variables si esta es un atributo se crea una nueva variable que se e asignará el resultado de  hacer `get attr` y si es una varible local se busca en el scope. Cada vez q se crea una varible esta se añade al scope y a esta se le asigna el valor de una expresión que esta expresión es un nuevo nodo creado que pertenece al lenguaje CIL  , estas asignaciónes se añaden a la lista de instrucciones al igual que aquellas instrucciones de CIL que se necesitan para convertir una expresión del leguaje COOL a CIL.
 
 **Generación de código MIPS**
 
@@ -271,7 +277,7 @@ A continuación definiremos las ideas seguidas para la representación de los ti
 1. El valor de los atributos de una clase son independientes para cada instancia de la clase, sin embargo, los métodos de la clase son globales para todas las instancias. Esto permite separar la información global del tipo en memoria estática y la información de las instancias en memoria dinámica.
 
 2. Los identificadores de las clases en COOL son únicos y por tanto los identificadores de los tipos también lo son. Esto permite utilizar su nombre como alias a la dirección de memoria donde se almacena la información del tipo. La información que se decidió almacenar sobre los tipos fue su tamaño (para la creación dinámica de instancias mediante `copy`), su representación como string (para la implementación de `type_name`) y las direcciones de los métodos del tipo.
-    
+   
     ```mips
         .data
     <type_str> : .asciiz <type_str_value>
@@ -396,8 +402,7 @@ El segundo recorrido se encarga de generar el código MIPS del programa, la idea
 
 - Retorno de operadores: Dado que los operadores tienen un tipo de retorno bien definido debido a las reglas de tipado de COOL los operadores se encarga de almacenar el resultado de la operacion en instancias de la clase de su tipo, las operaciones aritméticas crean instancias de tipo `Int` y las operaciones de comparación de tipo `Bool`.
 
-        
-
+  ​      
 
 
 
