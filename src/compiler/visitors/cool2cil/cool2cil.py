@@ -1,5 +1,5 @@
-from ..cmp import cil_ast as cil
-from ..cmp.ast import (
+from ...cmp import cil_ast as cil
+from ...cmp.ast import (
     AssignNode,
     AttrDeclarationNode,
     BlockNode,
@@ -29,7 +29,7 @@ from ..cmp.ast import (
     VariableNode,
     VoidNode,
 )
-from ..cmp.semantic import (
+from ...cmp.semantic import (
     Context,
     Method,
     Scope,

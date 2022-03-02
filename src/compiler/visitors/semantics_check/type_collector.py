@@ -1,8 +1,5 @@
-from typing import Dict, List, Optional, Tuple
-from compiler.cmp.utils import Token
-from compiler.visitors.utils import AUTOTYPE_ERROR
-import compiler.visitors.visitor as visitor
-from ..cmp.semantic import (
+from ...cmp.utils import Token
+from ...cmp.semantic import (
     SemanticError,
     Type,
     Context,
@@ -14,7 +11,10 @@ from ..cmp.semantic import (
     SelfType,
     AutoType,
 )
-from ..cmp.ast import ProgramNode, ClassDeclarationNode
+from ...cmp.ast import ProgramNode, ClassDeclarationNode
+from ..utils import AUTOTYPE_ERROR
+from typing import Dict, List, Optional, Tuple
+import compiler.visitors.visitor as visitor
 
 built_in_types = []
 

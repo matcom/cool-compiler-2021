@@ -1,10 +1,10 @@
-from ..cmp.ast import (
+from ...cmp.ast import (
     ProgramNode,
     ClassDeclarationNode,
     AttrDeclarationNode,
     FuncDeclarationNode,
 )
-from ..cmp.semantic import (
+from ...cmp.semantic import (
     Context,
     SemanticError,
     ErrorType,
@@ -13,7 +13,7 @@ from ..cmp.semantic import (
     SelfType,
     Type,
 )
-from .utils import (
+from ..utils import (
     ALREADY_DEFINED,
     MAIN_CLASS_ERROR,
     MAIN_PROGRAM_ERROR,
