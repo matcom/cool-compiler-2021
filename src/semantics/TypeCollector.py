@@ -1,7 +1,7 @@
 from parsing.ast import *
-from cmp.semantic import SemanticError, Context
-from cmp.semantic import ObjectType, StringType, IntType, BoolType, IOType, SelfType
-import cmp.visitor as visitor 
+from .semantic import SemanticError, Context
+from .semantic import ObjectType, StringType, IntType, BoolType, IOType, SelfType
+import utils.visitor as visitor 
 from .utils import is_base_class
 
 

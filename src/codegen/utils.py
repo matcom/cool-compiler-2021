@@ -1,4 +1,4 @@
-from cmp.semantic import IntType, ObjectType, StringType, BoolType
+from semantics.semantic import IntType, ObjectType, StringType, BoolType
 from .ast_CIL import *
 from collections import deque
 from itertools import chain

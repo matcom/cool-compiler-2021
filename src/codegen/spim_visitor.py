@@ -1,4 +1,4 @@
-import cmp.visitor as visitor
+import utils.visitor as visitor
 from .spim_scope import *
 from .ast_CIL import *
 
@@ -63,7 +63,7 @@ class MIPSCodegen:
             self.visit(f, frame)
             self.add_line('')
 
-        with open('./code_generator/mips_built_in.txt') as file:
+        with open('./codegen/mips_built_in.txt') as file:
             self.code += file.read()
 
     @visitor.when(CILTypeNode)
@@ -276,13 +276,8 @@ class MIPSCodegen:
 
         # use the information of the static type to get the location of the method in memory
         t = self.scope.types[node.type]
-        try:
-            method_addr = t.get_method_addr(node.func, '$t0')
-        except:
-            print(node.func)
-            print(t.id)
-            print('shdglsdglsjdg0000000000000')
-            print(t.methods_offset)
+        method_addr = t.get_method_addr(node.func, '$t0')
+      
         
         self.add_line(f'lw $v1, {method_addr}')
         self.add_line(f'jal $v1') # calls the method and by convention methods return in $v0

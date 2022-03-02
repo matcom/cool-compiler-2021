@@ -1,8 +1,8 @@
 from parsing.ast import *
 from .utils import find_parent_type, is_base_class
-from cmp.semantic import Scope, SemanticError
-from cmp.semantic import ObjectType, IntType, StringType, BoolType, ErrorType, SelfType
-import cmp.visitor as visitor
+from .semantic import Scope, SemanticError
+from .semantic import ObjectType, IntType, StringType, BoolType, ErrorType, SelfType
+import utils.visitor as visitor
 
 
 SELF_IS_READONLY = "SemanticError: Cannot assign to 'self'."

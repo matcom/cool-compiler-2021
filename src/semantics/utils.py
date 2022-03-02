@@ -1,5 +1,5 @@
 from parsing.ast import *
-from cmp.semantic import ErrorType, ObjectType, SelfType 
+from .semantic import ErrorType, ObjectType, SelfType 
 
 
 def find_parent_type(current_type, type1, type2):

@@ -1,13 +1,13 @@
 import sys
 from parsing.parser import COOL_Parser
 from parsing.lexer import COOL_Lexer
-from tours.TypeCollector import TypeCollector
-from tours.TypeBuilder import TypeBuilder
-from tours.TypeChecker import TypeChecker
-from code_generator.generate_ast import CIL
-from code_generator.cil_codegen import CILCodegen
-from code_generator.spim_scope import MIPSScopeBuilder
-from code_generator.spim_visitor import MIPSCodegen
+from semantics.TypeCollector import TypeCollector
+from semantics.TypeBuilder import TypeBuilder
+from semantics.TypeChecker import TypeChecker
+from codegen.generate_ast import CIL
+from codegen.cil_codegen import CILCodegen
+from codegen.spim_scope import MIPSScopeBuilder
+from codegen.spim_visitor import MIPSCodegen
 input_file = sys.argv[1]
 with open(input_file, 'r') as f:
     s = f.read()
@@ -51,8 +51,7 @@ cil = cil_generator.visit(ast)
 #print(cil)
 cil_codegen = CILCodegen()
 code = cil_codegen.visit(cil)
-with open(f'output.cil', 'w') as f:
-    f.write(code)
+
 
 mips_scope_builder = MIPSScopeBuilder()
 scope = mips_scope_builder.visit(cil)
@@ -60,8 +59,8 @@ scope = mips_scope_builder.visit(cil)
 mips_codegen = MIPSCodegen(scope)
 mips_codegen.visit(cil, None)
 #print(mips_codegen.code)
-with open(f'output.out', 'w') as f:
-    f.write(mips_codegen.code)
 with open(f'{input_file[:-3]}.mips', 'w') as f:
     f.write(mips_codegen.code)
+with open(f'{input_file[:-3]}.cil', 'w') as f:
+    f.write(code)
 exit(0)
