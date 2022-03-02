@@ -328,14 +328,18 @@
     PARAM param_l;
 
     LOCAL local_self_str_local;
+    LOCAL local_i_local;
+    LOCAL local_l_local;
     LOCAL local_substr;
-    LOCAL local_2;
+    LOCAL local_4;
 
     local_self_str_local = GETATTR param_self 0;
-    local_substr = substr(local_self_str_local, param_i, param_l)
+    local_i_local = GETATTR param_i 0;
+    local_l_local = GETATTR param_l 0;
+    local_substr = substr(local_self_str_local, local_i_local, local_l_local)
     ARG local_substr;
-    local_2 = CALL String___init;
-    RETURN local_2;
+    local_4 = CALL String___init;
+    RETURN local_4;
   }
 
   function Object___init {
@@ -653,6 +657,7 @@
     local_34 = CALL Int___init;
     local_35 = GETATTR local_34 0;
     local_36 = local_32 - local_35
+    local_36 = local_36 * local_36
     local_37 = LOAD 1;
     local_36 = local_37 - local_36
     ARG local_36;

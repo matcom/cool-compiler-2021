@@ -314,14 +314,18 @@
     PARAM param_l;
 
     LOCAL local_self_str_local;
+    LOCAL local_i_local;
+    LOCAL local_l_local;
     LOCAL local_substr;
-    LOCAL local_2;
+    LOCAL local_4;
 
     local_self_str_local = GETATTR param_self 0;
-    local_substr = substr(local_self_str_local, param_i, param_l)
+    local_i_local = GETATTR param_i 0;
+    local_l_local = GETATTR param_l 0;
+    local_substr = substr(local_self_str_local, local_i_local, local_l_local)
     ARG local_substr;
-    local_2 = CALL String___init;
-    RETURN local_2;
+    local_4 = CALL String___init;
+    RETURN local_4;
   }
 
   function Object___init {
@@ -520,6 +524,7 @@
     local_12 = CALL Int___init;
     local_13 = GETATTR local_12 0;
     local_14 = local_10 - local_13
+    local_14 = local_14 * local_14
     local_15 = LOAD 1;
     local_14 = local_15 - local_14
     ARG local_14;
@@ -556,6 +561,7 @@
     local_31 = CALL Int___init;
     local_32 = GETATTR local_31 0;
     local_33 = local_29 - local_32
+    local_33 = local_33 * local_33
     local_34 = LOAD 1;
     local_33 = local_34 - local_33
     ARG local_33;
@@ -642,6 +648,7 @@
     local_53 = VCALL local_70 5;
     local_78 = GETATTR local_53 0;
     local_79 = local_52 - local_78
+    local_79 = local_79 * local_79
     local_80 = LOAD 1;
     local_79 = local_80 - local_79
     ARG local_79;
@@ -750,8 +757,8 @@
     LOCAL local_5;
     LOCAL local_6;
     LOCAL local_7;
+    LOCAL local_8;
     LOCAL local_tname_local;
-    LOCAL local_9;
     LOCAL local_10;
     LOCAL local_11;
     LOCAL local_12;
@@ -761,16 +768,16 @@
     LOCAL local_16;
     LOCAL local_17;
     LOCAL local_18;
+    LOCAL local_19;
     LOCAL local_tname_local;
-    LOCAL local_20;
     LOCAL local_21;
     LOCAL local_22;
     LOCAL local_23;
     LOCAL local_24;
     LOCAL local_25;
     LOCAL local_26;
+    LOCAL local_27;
     LOCAL local_tname_local;
-    LOCAL local_28;
     LOCAL local_29;
     LOCAL local_30;
     LOCAL local_31;
@@ -780,8 +787,8 @@
     LOCAL local_35;
     LOCAL local_36;
     LOCAL local_37;
+    LOCAL local_38;
     LOCAL local_tname_local;
-    LOCAL local_39;
     LOCAL local_40;
     LOCAL local_41;
     LOCAL local_42;
@@ -791,126 +798,128 @@
     LOCAL local_46;
     LOCAL local_47;
     LOCAL local_48;
+    LOCAL local_49;
     LOCAL local_tname_local;
-    LOCAL local_50;
     LOCAL local_51;
     LOCAL local_52;
     LOCAL local_53;
     LOCAL local_54;
     LOCAL local_55;
+    LOCAL local_56;
 
-    local_1 = LOAD 1;
-    ARG local_1;
-    local_2 = CALL Int___init;
-    local_3 = LOAD 1;
-    local_0 = local_3 - local_2
+    local_2 = LOAD 1;
+    ARG local_2;
+    local_3 = CALL Int___init;
+    local_1 = GETATTR local_3 0;
+    local_4 = LOAD 1;
+    local_0 = local_4 - local_1
     SETATTR param_self 0 local_0;
-    local_5 = LOAD data_13_string;
-    ARG local_5;
-    local_6 = CALL String___init;
-    local_7 = TYPEOF param_self;
-    local_9 = LOAD data_8_eol;
-    ARG local_9;
-    local_10 = CALL String___init;
-    local_11 = LOAD data_9_under;
-    ARG local_11;
-    local_12 = CALL String___init;
-    local_13 = LOAD data_14_meth;
-    ARG local_13;
-    local_14 = CALL String___init;
-    local_tname_local = VCALL local_7 1;
-    print(str, local_tname_local)
-    print(str, local_12)
-    print(str, local_14)
-    print(str, local_10)
-    ARG param_self;
+    local_6 = LOAD data_13_string;
     ARG local_6;
-    local_4 = VCALL local_7 3;
-    local_18 = TYPEOF param_self;
-    local_20 = LOAD data_8_eol;
-    ARG local_20;
-    local_21 = CALL String___init;
-    local_22 = LOAD data_9_under;
-    ARG local_22;
-    local_23 = CALL String___init;
-    local_24 = LOAD data_15_meth;
-    ARG local_24;
-    local_25 = CALL String___init;
-    local_tname_local = VCALL local_18 1;
+    local_7 = CALL String___init;
+    local_8 = TYPEOF param_self;
+    local_10 = LOAD data_8_eol;
+    ARG local_10;
+    local_11 = CALL String___init;
+    local_12 = LOAD data_9_under;
+    ARG local_12;
+    local_13 = CALL String___init;
+    local_14 = LOAD data_14_meth;
+    ARG local_14;
+    local_15 = CALL String___init;
+    local_tname_local = VCALL local_8 1;
     print(str, local_tname_local)
-    print(str, local_23)
-    print(str, local_25)
-    print(str, local_21)
+    print(str, local_13)
+    print(str, local_15)
+    print(str, local_11)
     ARG param_self;
-    local_17 = VCALL local_18 5;
-    local_26 = TYPEOF param_self;
-    local_28 = LOAD data_8_eol;
-    ARG local_28;
-    local_29 = CALL String___init;
-    local_30 = LOAD data_9_under;
-    ARG local_30;
-    local_31 = CALL String___init;
-    local_32 = LOAD data_12_meth;
-    ARG local_32;
-    local_33 = CALL String___init;
-    local_tname_local = VCALL local_26 1;
+    ARG local_7;
+    local_5 = VCALL local_8 3;
+    local_19 = TYPEOF param_self;
+    local_21 = LOAD data_8_eol;
+    ARG local_21;
+    local_22 = CALL String___init;
+    local_23 = LOAD data_9_under;
+    ARG local_23;
+    local_24 = CALL String___init;
+    local_25 = LOAD data_15_meth;
+    ARG local_25;
+    local_26 = CALL String___init;
+    local_tname_local = VCALL local_19 1;
     print(str, local_tname_local)
-    print(str, local_31)
-    print(str, local_33)
-    print(str, local_29)
+    print(str, local_24)
+    print(str, local_26)
+    print(str, local_22)
     ARG param_self;
-    ARG local_17;
-    local_16 = VCALL local_26 7;
-    IF local_16 GOTO label_then_3;
+    local_18 = VCALL local_19 5;
+    local_27 = TYPEOF param_self;
+    local_29 = LOAD data_8_eol;
+    ARG local_29;
+    local_30 = CALL String___init;
+    local_31 = LOAD data_9_under;
+    ARG local_31;
+    local_32 = CALL String___init;
+    local_33 = LOAD data_12_meth;
+    ARG local_33;
+    local_34 = CALL String___init;
+    local_tname_local = VCALL local_27 1;
+    print(str, local_tname_local)
+    print(str, local_32)
+    print(str, local_34)
+    print(str, local_30)
+    ARG param_self;
+    ARG local_18;
+    local_17 = VCALL local_27 7;
+    IF local_17 GOTO label_then_3;
     GOTO label_else_3;
     LABEL label_then_3;
-    local_35 = LOAD data_16_string;
-    ARG local_35;
-    local_36 = CALL String___init;
-    local_37 = TYPEOF param_self;
-    local_39 = LOAD data_8_eol;
-    ARG local_39;
-    local_40 = CALL String___init;
-    local_41 = LOAD data_9_under;
-    ARG local_41;
-    local_42 = CALL String___init;
-    local_43 = LOAD data_14_meth;
-    ARG local_43;
-    local_44 = CALL String___init;
-    local_tname_local = VCALL local_37 1;
-    print(str, local_tname_local)
-    print(str, local_42)
-    print(str, local_44)
-    print(str, local_40)
-    ARG param_self;
+    local_36 = LOAD data_16_string;
     ARG local_36;
-    local_34 = VCALL local_37 3;
-    local_15 = local_34;
+    local_37 = CALL String___init;
+    local_38 = TYPEOF param_self;
+    local_40 = LOAD data_8_eol;
+    ARG local_40;
+    local_41 = CALL String___init;
+    local_42 = LOAD data_9_under;
+    ARG local_42;
+    local_43 = CALL String___init;
+    local_44 = LOAD data_14_meth;
+    ARG local_44;
+    local_45 = CALL String___init;
+    local_tname_local = VCALL local_38 1;
+    print(str, local_tname_local)
+    print(str, local_43)
+    print(str, local_45)
+    print(str, local_41)
+    ARG param_self;
+    ARG local_37;
+    local_35 = VCALL local_38 3;
+    local_16 = local_35;
     GOTO label_continue_3;
     LABEL label_else_3;
-    local_46 = LOAD data_17_string;
-    ARG local_46;
-    local_47 = CALL String___init;
-    local_48 = TYPEOF param_self;
-    local_50 = LOAD data_8_eol;
-    ARG local_50;
-    local_51 = CALL String___init;
-    local_52 = LOAD data_9_under;
-    ARG local_52;
-    local_53 = CALL String___init;
-    local_54 = LOAD data_14_meth;
-    ARG local_54;
-    local_55 = CALL String___init;
-    local_tname_local = VCALL local_48 1;
-    print(str, local_tname_local)
-    print(str, local_53)
-    print(str, local_55)
-    print(str, local_51)
-    ARG param_self;
+    local_47 = LOAD data_17_string;
     ARG local_47;
-    local_45 = VCALL local_48 3;
-    local_15 = local_45;
+    local_48 = CALL String___init;
+    local_49 = TYPEOF param_self;
+    local_51 = LOAD data_8_eol;
+    ARG local_51;
+    local_52 = CALL String___init;
+    local_53 = LOAD data_9_under;
+    ARG local_53;
+    local_54 = CALL String___init;
+    local_55 = LOAD data_14_meth;
+    ARG local_55;
+    local_56 = CALL String___init;
+    local_tname_local = VCALL local_49 1;
+    print(str, local_tname_local)
+    print(str, local_54)
+    print(str, local_56)
+    print(str, local_52)
+    ARG param_self;
+    ARG local_48;
+    local_46 = VCALL local_49 3;
+    local_16 = local_46;
     LABEL label_continue_3;
-    RETURN local_15;
+    RETURN local_16;
   }
 

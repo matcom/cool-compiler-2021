@@ -360,14 +360,18 @@
     PARAM param_l;
 
     LOCAL local_self_str_local;
+    LOCAL local_i_local;
+    LOCAL local_l_local;
     LOCAL local_substr;
-    LOCAL local_2;
+    LOCAL local_4;
 
     local_self_str_local = GETATTR param_self 0;
-    local_substr = substr(local_self_str_local, param_i, param_l)
+    local_i_local = GETATTR param_i 0;
+    local_l_local = GETATTR param_l 0;
+    local_substr = substr(local_self_str_local, local_i_local, local_l_local)
     ARG local_substr;
-    local_2 = CALL String___init;
-    RETURN local_2;
+    local_4 = CALL String___init;
+    RETURN local_4;
   }
 
   function Object___init {
@@ -643,6 +647,7 @@
     local_3 = CALL Int___init;
     local_4 = GETATTR local_3 0;
     local_5 = local_1 - local_4
+    local_5 = local_5 * local_5
     local_6 = LOAD 1;
     local_5 = local_6 - local_5
     ARG local_5;
@@ -799,6 +804,7 @@
     local_15 = local_11 - local_14
     local_16 = GETATTR local_15 0;
     local_17 = local_1 - local_16
+    local_17 = local_17 * local_17
     local_18 = LOAD 1;
     local_17 = local_18 - local_17
     ARG local_17;
@@ -969,6 +975,7 @@
     local_13 = CALL String___init;
     local_14 = GETATTR local_13 0;
     local_15 = local_11 - local_14
+    local_15 = local_15 * local_15
     local_16 = LOAD 1;
     local_15 = local_16 - local_15
     ARG local_15;
@@ -1012,6 +1019,7 @@
     local_35 = CALL String___init;
     local_36 = GETATTR local_35 0;
     local_37 = local_33 - local_36
+    local_37 = local_37 * local_37
     local_38 = LOAD 1;
     local_37 = local_38 - local_37
     ARG local_37;
@@ -1057,6 +1065,7 @@
     local_59 = CALL String___init;
     local_60 = GETATTR local_59 0;
     local_61 = local_57 - local_60
+    local_61 = local_61 * local_61
     local_62 = LOAD 1;
     local_61 = local_62 - local_61
     ARG local_61;
@@ -1083,6 +1092,7 @@
     local_72 = CALL Int___init;
     local_73 = GETATTR local_72 0;
     local_74 = local_70 - local_73
+    local_74 = local_74 * local_74
     local_75 = LOAD 1;
     local_74 = local_75 - local_74
     ARG local_74;

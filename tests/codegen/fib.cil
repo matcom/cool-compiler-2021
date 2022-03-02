@@ -307,14 +307,18 @@
     PARAM param_l;
 
     LOCAL local_self_str_local;
+    LOCAL local_i_local;
+    LOCAL local_l_local;
     LOCAL local_substr;
-    LOCAL local_2;
+    LOCAL local_4;
 
     local_self_str_local = GETATTR param_self 0;
-    local_substr = substr(local_self_str_local, param_i, param_l)
+    local_i_local = GETATTR param_i 0;
+    local_l_local = GETATTR param_l 0;
+    local_substr = substr(local_self_str_local, local_i_local, local_l_local)
     ARG local_substr;
-    local_2 = CALL String___init;
-    RETURN local_2;
+    local_4 = CALL String___init;
+    RETURN local_4;
   }
 
   function Object___init {
@@ -547,6 +551,7 @@
     LOCAL local_26;
     LOCAL local_27;
     LOCAL local_28;
+    LOCAL local_29;
 
     local_1 = LOAD 1;
     ARG local_1;
@@ -561,40 +566,42 @@
     local_8 = CALL Int___init;
     local_c = local_8;
     LABEL label_while_label_0;
-    local_10 = GETATTR param_i 0;
-    local_11 = LOAD 0;
-    ARG local_11;
-    local_12 = CALL Int___init;
-    local_13 = GETATTR local_12 0;
-    local_14 = local_10 - local_13
-    local_15 = LOAD 1;
-    local_14 = local_15 - local_14
-    ARG local_14;
-    local_16 = CALL Bool___init;
-    local_17 = LOAD 1;
-    local_9 = local_17 - local_16
+    local_11 = GETATTR param_i 0;
+    local_12 = LOAD 0;
+    ARG local_12;
+    local_13 = CALL Int___init;
+    local_14 = GETATTR local_13 0;
+    local_15 = local_11 - local_14
+    local_15 = local_15 * local_15
+    local_16 = LOAD 1;
+    local_15 = local_16 - local_15
+    ARG local_15;
+    local_17 = CALL Bool___init;
+    local_10 = GETATTR local_17 0;
+    local_18 = LOAD 1;
+    local_9 = local_18 - local_10
     ARG local_9;
-    local_18 = CALL Bool___init;
-    local_19 = GETATTR local_18 0;
-    IF local_19 GOTO label_loop_label_0;
+    local_19 = CALL Bool___init;
+    local_20 = GETATTR local_19 0;
+    IF local_20 GOTO label_loop_label_0;
     GOTO label_pool_label_0;
     LABEL label_loop_label_0;
-    local_20 = GETATTR local_a 0;
-    local_21 = GETATTR local_b 0;
-    local_22 = local_20 + local_21
-    local_c = local_22;
-    local_23 = GETATTR param_i 0;
-    local_24 = LOAD 1;
-    ARG local_24;
-    local_25 = CALL Int___init;
-    local_26 = GETATTR local_25 0;
-    local_27 = local_23 - local_26
-    param_i = local_27;
+    local_21 = GETATTR local_a 0;
+    local_22 = GETATTR local_b 0;
+    local_23 = local_21 + local_22
+    local_c = local_23;
+    local_24 = GETATTR param_i 0;
+    local_25 = LOAD 1;
+    ARG local_25;
+    local_26 = CALL Int___init;
+    local_27 = GETATTR local_26 0;
+    local_28 = local_24 - local_27
+    param_i = local_28;
     local_b = local_a;
     local_a = local_c;
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
-    local_28 = CALL Void___init;
+    local_29 = CALL Void___init;
     RETURN local_c;
   }
 
