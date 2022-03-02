@@ -1,7 +1,7 @@
-from re import L
-from soupsieve import select
+#from re import L
+#from soupsieve import select
 
-from src.cmp.cil import InstructionNode
+#from src.cmp.cil import InstructionNode
 
 
 class MIPS_Node:
@@ -13,16 +13,16 @@ class ProgramNode(MIPS_Node):
         self.data = data
         self.text = code
 
-class MIPSDataNode(MIPS_Node):
+class DataNode(MIPS_Node):
         pass
     
-class MIPSInstructionNode(MIPS_Node):
+class InstructionNode(MIPS_Node):
         pass
     
-class DataTransferNode(MIPSInstructionNode):
+class DataTransferNode(InstructionNode):
     pass
 
-class ProcedureNode(MIPSInstructionNode):
+class ProcedureNode(InstructionNode):
     def __init__(self, label):
         self.label = label
         self.instructions = []
@@ -46,7 +46,7 @@ class StoreWordNode(DataTransferWithOffset):
 class LoadNode(DataTransferNode):
     def __init__(self,dest,value):
         self.destination = dest
-        self.value
+        self.value = value
 
 class LoadInmediate(LoadNode):
     def __str__(self):
@@ -65,10 +65,10 @@ class MoveNode(DataTransferNode):
         return f"move {self.destination} {self.source}"
 
 
-class DataTypeNode(MIPSDataNode):
-    def __init__(self, name, datatype,vt_values):
-        self.name = name
+class DataTypeNode(DataNode):
+    def __init__(self,datatype,name,vt_values):
         self.datatype = datatype
+        self.name = name
         self.vt_values = vt_values
 
     def __str__(self):
@@ -77,7 +77,7 @@ class DataTypeNode(MIPSDataNode):
             values += f", {value}"
         return f"{self.name} : {self.datatype}{values}"
     
-class ArithAnfLogicNode(MIPSInstructionNode):
+class ArithAnfLogicNode(InstructionNode):
     def __init__(self, destination,left,right):
         self.destination = destination
         self.left = left

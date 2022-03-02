@@ -14,6 +14,8 @@ from pathlib import Path
 from errors import InvalidInputFileError
 from cool_visitor import FormatVisitor
 from code_gen.cil_builder import CILBuilder
+from code_gen.mips_builder import MIPSBuilder
+from code_gen.mips_writer import MIPSWriter
 from cmp.cil import PrintVisitor
 import typer
 
@@ -29,7 +31,7 @@ def report_and_exit(errors):
 
 def pipeline(input_file: Path, output_file: Path = None):
     errors = []
-
+    
     if not input_file.is_file:
         errors.append(InvalidInputFileError(str(input_file)))
 
@@ -92,13 +94,10 @@ def pipeline(input_file: Path, output_file: Path = None):
     tree = formatter.visit(cil_ast)
     print(tree)
 
-    # if output_file is None:
-    #     output_file = input.with_suffix(".mips")
+    
 
 
 if __name__ == "__main__":
-    # input_file = Path(
-    #     "/home/amanda/Documents/Facultad/Compilacion/cool-compiler-2021/customized_tests/test_hello_world.cl"
-    # )
-    # pipeline(input_file)
+    #input_file = Path("/home/sandra/Desktop/FinalProjects/Compiler/cool-compiler-2021/customized_tests/test_hello_world.cl")
+    #pipeline(input_file)
     typer.run(pipeline)

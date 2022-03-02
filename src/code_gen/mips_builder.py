@@ -1,16 +1,16 @@
-from atexit import register
-from email.quoprimime import body_length
+#from atexit import register
+#from email.quoprimime import body_length
 import enum
-from operator import le
-from tkinter.tix import Select
+#from operator import le
+#from tkinter.tix import Select
 from attr import attr
 
-from soupsieve import select
+#from soupsieve import select
 import cmp.visitor as visitor
 import cmp.cil as cil
 import random
 
-import mips_nodes as mips
+from code_gen import mips_nodes as mips
 
 
 
@@ -93,7 +93,7 @@ class MemoryManager:
 
 
 class MIPSBuilder:
-    def __init__(self,errors):
+    def __init__(self):
         self.mips_code = ""
         self.main_procedure = mips.ProcedureNode("main")
         self.current_procedure = self.main_procedure
@@ -101,8 +101,8 @@ class MIPSBuilder:
         self.data = []
         self.params = []
         self.locals = []
-        self.types = dict()
-        self.attr_offset = dict()
+        self.types = {}
+        self.attr_offset = {}
         self.memo = MemoryManager()
     
     
@@ -142,9 +142,9 @@ class MIPSBuilder:
     
     def generate_attr_offset(self,type):
         attributes = self.types[type].attributes
-        
-        for i,attr in attributes:
-            self.attr_offset[attr] = 4(i+1)
+        self.attr_offset[type]={}
+        for i,attr in enumerate(attributes):
+            self.attr_offset[type][attr] = 4*(i+1)
             
         
     
@@ -154,16 +154,17 @@ class MIPSBuilder:
     
     @visitor.when(cil.ProgramNode)
     def visit(self, node):
-        for type in node.types:
+        for type in node.dottypes:
             self.visit(type)
+            self.generate_attr_offset(type.name)
         
-        self.generate_attr_offset
+        
         self.generate_exception_messages()
                 
-        for str_data in node.data:
+        for str_data in node.dotdata:
             self.visit(str_data)
         
-        for instruction in node.code:
+        for instruction in node.dotcode:
             self.visit(instruction)
         
         
@@ -197,7 +198,7 @@ class MIPSBuilder:
             
     @visitor.when(cil.DataNode)
     def visit(self, node):
-        self.register_data(mips.DataTypeNode,'.ascii',node.vname,[node.value])
+        self.register_data(mips.DataTypeNode,'.ascii',node.name,[node.value])
 
     
         
@@ -222,7 +223,6 @@ class MIPSBuilder:
         self.register_instruction(mips.LoadWordNode,reg,offset,fp)
         self.register_push(reg)
         
-        
         self.memo.clean()
         
         
@@ -239,28 +239,33 @@ class MIPSBuilder:
         self.register_instruction(mips.CommentNode,"New $fp")
         self.register_instruction(mips.MoveNode, fp, sp)
         
-        self.register_comment("Reserving space for locals")
+        self.register_instruction(mips.CommentNode,"Reserving space for locals")
         self.register_instruction(mips.AddiNode, sp, sp, -4*len(node.localvars))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 
-        self.register_instruction(mips.CommentNode("Executing instructions"))
+        for local in node.localvars:
+            self.locals.append(local.name)
+
+        self.register_instruction(mips.CommentNode,"Executing instructions")
         for inst in node.instructions:
             self.visit(inst)
             
 
-        self.register_instruction(mips.CommentNode("Restoring saved $ra"))
+        self.register_instruction(mips.CommentNode,"Restoring saved $ra")
         self.register_instruction(mips.LoadWordNode, ra, RA_OFFSET, fp)#stored $ra
        
 
-        self.register_comment("Restoring saved $fp")
+        self.register_instruction(mips.CommentNode,"Restoring saved $fp")
         self.register_instruction(mips.LoadWordNode, fp, OLD_FP_OFFSET, fp)#stored (old)$fp
-
-        AR = 4*(len(node.localvars) + len(node.arguments) + 2)
+        
+        
+        #Cual de las dos????
+        AR = 4*(len(node.localvars) + len(node.params) + 2)
         #AR = 4*(len(node.localvars) + 2)
         
-        self.register_instruction(mips.CommentNode("Cleaning stack after call"))
+        self.register_instruction(mips.CommentNode,"Cleaning stack after call")
         self.register_instruction(mips.AddiNode, sp, sp, AR)
         
-        self.register_instruction(mips.CommentNode("Return jump"))
+        self.register_instruction(mips.CommentNode,"Return jump")
         self.register_instruction(mips.JumpRegister, ra)
 
         self.text.append(self.current_procedure)    
@@ -284,7 +289,7 @@ class MIPSBuilder:
     #All return value is saved in register a1    
     @visitor.when(cil.ReturnNode)
     def visit(self,node): 
-        offset = self.get_offset()
+        offset = self.get_offset(node.value)
         self.register_instruction(mips.LoadWordNode,a1,offset,fp)
             
     @visitor.when(cil.GotoNode)
@@ -377,26 +382,13 @@ class MIPSBuilder:
         self.register_instruction(mips.LoadInmediate,v0,SYSCALL_EXIT)
         self.register_instruction(mips.SyscallNode)
                                                   
-    #PENDIENTEEEEEEEE    
-    @visitor.when(cil.CopyNode)
-    def visit(self,node):     
-        self.register_instruction(mips.CommentNode,"CopyNode")
-        
-        self.register_instruction(mips.CommentNode,"Printing Abort Message")
-        self.register_instruction(mips.LoadAddress,a0,ABORT_SIGNAL)
-        self.register_instruction(mips.LoadInmediate,v0,SYSCALL_PRINT_STR)
-        self.register_instruction(mips.SyscallNode)
-        
-        self.register_instruction(mips.CommentNode,"Aborting execution")
-        self.register_instruction(mips.LoadInmediate,v0,SYSCALL_EXIT)
-        self.register_instruction(mips.SyscallNode)
     
     @visitor.when(cil.StaticCallNode)
     def visit(self,node):
         
         self.register_instruction(mips.JumpAndLink,node.function)
         
-        dest_offset = self.get_offset()
+        dest_offset = self.get_offset(node.dest)
         self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
         
     @visitor.when(cil.GetAttribNode)
@@ -406,13 +398,13 @@ class MIPSBuilder:
         reg1 = self.memo.get_unused_reg()
         reg2 = self.memo.get_unused_reg()
         
-        instance_offset = self.get_offset()
+        instance_offset = self.get_offset(node.type)
         self.register_instruction(mips.LoadWordNode,reg1,instance_offset,fp)
         
-        attr_offs = self.attr_offset[node.attr]
+        attr_offs = self.attr_offset[node.type][node.attr]
         self.register_instruction(mips.LoadWordNode,reg2,attr_offs,reg1)
         
-        dest_offs = self.get_offset()
+        dest_offs = self.get_offset(node.dest)
         self.register_instruction(mips.StoreWordNode,reg2,dest_offs,fp)
         
     
@@ -428,21 +420,60 @@ class MIPSBuilder:
         value_offset = self.get_offset(node.value)
         self.register_instruction(mips.LoadWordNode,reg2,value_offset,fp)
         
-        attr_os = self.attr_offset[node.attr]
+        attr_os = self.attr_offset[node.type][node.attr]
         self.register_instruction(mips.StoreWordNode,reg2,attr_os,reg1)
 
         self.memo.clean()
         
+        
+     #PENDIENTEEEEEEEE    
+    @visitor.when(cil.CopyNode)
+    def visit(self,node):     
+        self.register_instruction(mips.CommentNode,"CopyNode")
+        
+        self.register_instruction(mips.CommentNode,"Printing Abort Message")
+        self.register_instruction(mips.LoadAddress,a0,ABORT_SIGNAL)
+        self.register_instruction(mips.LoadInmediate,v0,SYSCALL_PRINT_STR)
+        self.register_instruction(mips.SyscallNode)
+        
+        self.register_instruction(mips.CommentNode,"Aborting execution")
+        self.register_instruction(mips.LoadInmediate,v0,SYSCALL_EXIT)
+        self.register_instruction(mips.SyscallNode)    
                 
     #Incompleto
     @visitor.when(cil.TypeOfNode)
     def visit(self,node):
-        self.memo.save()
+        #self.memo.save()
         
-        reg1 = self.get_offset()
-        reg2 = self.get_offset()
+        #reg1 = self.get_offset()
+        #reg2 = self.get_offset()
+        pass
+    
         
     @visitor.when(cil.TypeNameNode)
+    def visit(self,node):
+        pass
+    @visitor.when(cil.PrintNode)
+    def visit(self,node):
+        pass
+    
+    @visitor.when(cil.ToStrNode)
+    def visit(self,node):
+        pass
+    @visitor.when(cil.ReadNode)
+    def visit(self,node):
+        pass
+    @visitor.when(cil.LengthNode)
+    def visit(self,node):
+        pass
+    @visitor.when(cil.ConcatNode)
+    def visit(self,node):
+        pass
+    @visitor.when(cil.SubstringNode)
+    def visit(self,node):
+        pass 
+    
+    @visitor.when(cil.PrefixNode)
     def visit(self,node):
         pass
     
