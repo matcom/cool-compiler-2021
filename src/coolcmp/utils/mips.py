@@ -12,7 +12,7 @@ Memory = Union[str, int]
 class Node:
     pass
 
-
+DW = 4
 class Type:
     def __init__(self, label, attrs, methods: list[cil.MethodAt], total_methods: int, index, init: list[InstructionNode]):
         self.label = label
@@ -56,8 +56,7 @@ class FunctionNode(Node):
 
     def param_address(self, name: str):
         index = self.params.index(name)
-        params_amount = len(self.params)
-        offset = (params_amount - 1 - index) * DW
+        offset = index * DW
         return offset
 
     def variable_address(self, name: str):
