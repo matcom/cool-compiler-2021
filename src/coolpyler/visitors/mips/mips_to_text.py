@@ -84,7 +84,7 @@ class MIPSGenerator:
     @visitor.when(mips.StoreByteNode)
     def visit(self, node: mips.StoreByteNode):
         return (
-            f"\tlb {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
+            f"\tsb {self.visit(node.left)}, {self.visit(node.right)} \t#{node.comment}"
         )
 
     @visitor.when(mips.LoadByteNode)

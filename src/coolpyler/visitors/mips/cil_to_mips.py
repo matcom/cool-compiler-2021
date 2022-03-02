@@ -792,9 +792,7 @@ class CilToMIPS:
         instructions.append(mips.SyscallNode())
 
         instructions.append(
-            mips.LoadAddressNode(
-                reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
-            )
+            mips.LoadAddressNode(reg2, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
 
         string1_dir = self.search_mem(node.string1)
@@ -817,12 +815,10 @@ class CilToMIPS:
 
         instructions.append(mips.BeqzNode(reg1, mips.LabelNode(exit1)))
         instructions.append(
-            mips.StoreByteNode(
-                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
-            )
+            mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
 
-        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(V0_REG, V0_REG, 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
         instructions.append(mips.JumpNode(loop1))
         instructions.append(mips.LabelInstructionNode(exit1))
@@ -832,12 +828,10 @@ class CilToMIPS:
             mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[2], 0))
         )
         instructions.append(
-            mips.StoreByteNode(
-                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
-            )
+            mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
         instructions.append(mips.BeqzNode(reg1, mips.LabelNode(exit2)))
-        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(V0_REG, V0_REG, 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[2], ARG_REGISTERS[2], 1))
         instructions.append(mips.JumpNode(loop2))
         instructions.append(mips.LabelInstructionNode(exit2))
@@ -950,9 +944,7 @@ class CilToMIPS:
         instructions.append(mips.SyscallNode())
 
         instructions.append(
-            mips.LoadAddressNode(
-                reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
-            )
+            mips.LoadAddressNode(reg2, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
 
         string_dir = self.search_mem(node.string)
@@ -968,12 +960,10 @@ class CilToMIPS:
             mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
         )
         instructions.append(
-            mips.StoreByteNode(
-                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
-            )
+            mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
         instructions.append(mips.BeqzNode(reg3, mips.LabelNode(exit)))
-        instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
+        instructions.append(mips.AddiNode(V0_REG, V0_REG, 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
         instructions.append(mips.AddiNode(reg3, reg3, 1))
         instructions.append(mips.JumpNode(loop))
