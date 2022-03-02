@@ -148,8 +148,8 @@ class CoolToCilVisitor(object):
 
     def register_io_out_string(self):
         self.reset_state()
-        str_param = self.register_param("str")
         self_param = self.register_param("self")
+        str_param = self.register_param("str")
 
         self.instructions.append(cil.PrintNode(str_param, True))
         self.instructions.append(cil.ReturnNode(self_param))
