@@ -972,20 +972,17 @@ class CilToMIPS:
                 f"Obtain substring",
             )
         )
-
-        lenght_index = self.search_mem(node.index)
-        instructions.append(
-            mips.LoadWordNode(
-                reg4, mips.MemoryAddressRegisterNode(FP_REG, lenght_index)
-            )
-        )
-
         instructions.append(mips.LoadInmediateNode(V0_REG, 9))
-        instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
+        instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg3))
         instructions.append(mips.SyscallNode())
 
         instructions.append(
             mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(V0_REG, 0))
+        )
+
+        dir_index = self.search_mem(node.index)
+        instructions.append(
+            mips.LoadWordNode(reg4, mips.MemoryAddressRegisterNode(FP_REG, dir_index))
         )
 
         string_dir = self.search_mem(node.string)
@@ -994,7 +991,7 @@ class CilToMIPS:
                 ARG_REGISTERS[1], mips.MemoryAddressRegisterNode(FP_REG, string_dir)
             )
         )
-        instructions.append(mips.AddNode(ARG_REGISTERS[1], ARG_REGISTERS[1], reg3))
+        instructions.append(mips.AddNode(ARG_REGISTERS[1], ARG_REGISTERS[1], reg4))
 
         instructions.append(mips.LabelInstructionNode(loop))
         instructions.append(
@@ -1003,10 +1000,10 @@ class CilToMIPS:
         instructions.append(
             mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
-        instructions.append(mips.BeqzNode(reg3, mips.LabelNode(exit)))
+        instructions.append(mips.BeqzNode(reg1, mips.LabelNode(exit)))
         instructions.append(mips.AddiNode(V0_REG, V0_REG, 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
-        instructions.append(mips.AddiNode(reg3, reg3, 1))
+        # instructions.append(mips.AddiNode(reg3, reg3, 1))
         instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
 
