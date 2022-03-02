@@ -53,6 +53,9 @@
   data_5_type_name_IO = "IO";
   data_6_type_name_Main = "Main";
   data_7_string = "Hello, World.\n";
+  data_8_eol = "\n";
+  data_9_under = "_";
+  data_10_meth = "out_string";
 
 .code
 
@@ -343,11 +346,32 @@
     LOCAL local_1;
     LOCAL local_2;
     LOCAL local_3;
+    LOCAL local_tname_local;
+    LOCAL local_5;
+    LOCAL local_6;
+    LOCAL local_7;
+    LOCAL local_8;
+    LOCAL local_9;
+    LOCAL local_10;
 
     local_1 = LOAD data_7_string;
     ARG local_1;
     local_2 = CALL String___init;
     local_3 = TYPEOF param_self;
+    local_5 = LOAD data_8_eol;
+    ARG local_5;
+    local_6 = CALL String___init;
+    local_7 = LOAD data_9_under;
+    ARG local_7;
+    local_8 = CALL String___init;
+    local_9 = LOAD data_10_meth;
+    ARG local_9;
+    local_10 = CALL String___init;
+    local_tname_local = VCALL local_3 1;
+    print(str, local_tname_local)
+    print(str, local_8)
+    print(str, local_10)
+    print(str, local_6)
     ARG param_self;
     ARG local_2;
     local_0 = VCALL local_3 3;
