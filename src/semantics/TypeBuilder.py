@@ -1,7 +1,7 @@
 from parsing.ast import *
-from cmp.semantic import SemanticError
-from cmp.semantic import ErrorType, StringType, IntType, BoolType, ObjectType, SelfType 
-import cmp.visitor as visitor 
+from .semantic import SemanticError
+from .semantic import ErrorType, StringType, IntType, BoolType, ObjectType, SelfType 
+import utils.visitor as visitor 
 
 
 CANNOT_INHERIT = "SemanticError: Class %s cannot inherit class %s."

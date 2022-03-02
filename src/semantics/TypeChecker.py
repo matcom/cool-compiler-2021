@@ -1,8 +1,8 @@
 from parsing.ast import *
 from .utils import find_parent_type, is_base_class
-from cmp.semantic import Scope, SemanticError
-from cmp.semantic import ObjectType, IntType, StringType, BoolType, ErrorType, SelfType
-import cmp.visitor as visitor
+from .semantic import Scope, SemanticError
+from .semantic import ObjectType, IntType, StringType, BoolType, ErrorType, SelfType
+import utils.visitor as visitor
 
 
 SELF_IS_READONLY = "SemanticError: Cannot assign to 'self'."
@@ -174,6 +174,7 @@ class TypeChecker:
             obj_type = scope.find_variable('self').type
         
         try:
+            obj_type = self.context.get_type(obj_type.name)
             method = obj_type.get_method(node.id)
             if (node.arg is None and method.arg is None) or (len(node.arg) == len(method.param_types)):
                 if node.arg is not None:
@@ -250,8 +251,8 @@ class TypeChecker:
 
         if scope.is_local(node.id):
             scope.remove_variable(node.id)
-        else:  
-            scope.define_variable(node.id, var_type)
+         
+        scope.define_variable(node.id, var_type)
 
         node.computed_type = var_type
         
@@ -362,13 +363,7 @@ class TypeChecker:
                 node.computed_type = ErrorType()
         else:
             if left_type == right_type:
-                if left_type == StringType() or left_type == IntType() or left_type == BoolType():
-                    node.computed_type = BoolType()
-                else:
-                    e = OPERATION_NOT_DEFINED.replace('%s', "equals", 1).replace('%s', left_type.name, 1)
-                    location = node.left.location
-                    self.errors.append(f'{location} - {e}')
-                    node.computed_type = ErrorType() 
+                node.computed_type = BoolType()
             else:
                 if is_base_class(left_type.name) or is_base_class(right_type.name):
                     self.errors.append(f'{node.symbol_location} - {INVALID_BASIC_COMPARISON}')

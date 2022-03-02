@@ -9,8 +9,6 @@ class COOL_Parser:
         self.tokens = COOL_Lexer.tokens
 
     def parse(self, input_string):
-        #l = COOL_Lexer()
-        #l.build()
         self.lex = COOL_Lexer()
         self.errors = []
         self.parser = yacc.yacc(module=self)
@@ -52,7 +50,6 @@ class COOL_Parser:
         parent_location = (p.lineno(4), p.lexpos(4))
         p[0] = ClassDeclarationNode(location,(p[2], type_location),p[6],p[4], parent_location)
         
-
     @staticmethod
     def p_feature_list_empty(p):
         'feature_list :'
@@ -75,7 +72,6 @@ class COOL_Parser:
         location = (p.lineno(1), p.lexpos(1))
         type_location = (p.lineno(3), p.lexpos(3))
         p[0] = AttrDeclarationNode(location,p[1],(p[3], type_location))
-
 
     @staticmethod
     def p_attr_exp(p):
@@ -151,8 +147,7 @@ class COOL_Parser:
         location = (p.lineno(1), p.lexpos(1))
         type_location = (p.lineno(3), p.lexpos(3))
         p[0] = VarDeclarationNode(location,p[1],(p[3], type_location),p[5])
-        
-        
+              
     @staticmethod
     def p_case_list_single(p):
         'case_list : branch'
