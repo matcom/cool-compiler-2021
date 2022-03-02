@@ -730,15 +730,19 @@ class CoolToCilVisitor(object):
     @visitor.when(type_checked.CoolTildeNode)
     def visit(self, node: type_checked.CoolTildeNode) -> str:
         ret_local = self.register_local()
+        attr = self.register_local()
         sid = self.visit(node.expr)
-        self.instructions.append(cil.MinusNode(ret_local, self.register_num(1), sid))
+        self.instructions.append(cil.GetAttrNode(sid, 0, attr))
+        self.instructions.append(cil.MinusNode(ret_local, self.register_num(1), attr))
         return ret_local
 
     @visitor.when(type_checked.CoolNotNode)
     def visit(self, node: type_checked.CoolNotNode) -> str:
         ret_local = self.register_local()
+        attr = self.register_local()
         sid = self.visit(node.expr)
-        self.instructions.append(cil.MinusNode(ret_local, self.register_num(1), sid))
+        self.instructions.append(cil.GetAttrNode(sid, 0, attr))
+        self.instructions.append(cil.MinusNode(ret_local, self.register_num(1), attr))
         return self.register_new("Bool", ret_local)
 
     @visitor.when(type_checked.CoolIsVoidNode)
@@ -777,6 +781,7 @@ class CoolToCilVisitor(object):
 
         cond_local = self.register_local()
         self.instructions.append(cil.MinusNode(cond_local, left_value, right_value))
+        self.instructions.append(cil.StarNode(cond_local, cond_local, cond_local))
         self.instructions.append(
             cil.MinusNode(cond_local, self.register_num(1), cond_local)
         )
