@@ -214,9 +214,9 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<printstring:{node.addr}>"),
-            mips.LWNode(a0, (address, fp)),
-            mips.ADDINode(a0, a0, 4),
-            mips.LINode(v0, 4),
+            mips.LWNode(registers.T[0], (4, registers.FP)),
+            mips.ADDUNode(registers.A0, registers.T[0], 4),
+            mips.LINode(registers.V0, 4),
             mips.SysCallNode(),
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
