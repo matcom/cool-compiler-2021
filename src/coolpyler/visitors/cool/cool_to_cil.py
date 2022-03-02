@@ -615,7 +615,9 @@ class CoolToCilVisitor(object):
 
         # IF condition GOTO loop
         while_ret = self.visit(node.cond)
-        self.instructions.append(cil.GotoIfNode(while_ret, loop_label))
+        while_ret_attr = self.register_local()
+        self.instructions.append(cil.GetAttrNode(while_ret, 0, while_ret_attr))
+        self.instructions.append(cil.GotoIfNode(while_ret_attr, loop_label))
 
         # GOTO pool
         self.instructions.append(cil.GotoNode(pool_label))
