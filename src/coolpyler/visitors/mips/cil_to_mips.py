@@ -778,6 +778,7 @@ class CilToMIPS:
         reg2 = self.memory_manager.get_unused_register()
 
         lenght_dir = self.search_mem(node.dest_lenght)
+
         instructions.append(
             mips.LoadWordNode(
                 reg1,
@@ -785,6 +786,7 @@ class CilToMIPS:
                 f"Concat two Strings",
             )
         )
+        instructions.append(mips.AddiNode(reg1, reg1, 1))
         instructions.append(mips.LoadInmediateNode(V0_REG, 9))
         instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
         instructions.append(mips.SyscallNode())
@@ -812,12 +814,7 @@ class CilToMIPS:
         instructions.append(
             mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
         )
-        instructions.append(
-            mips.StoreByteNode(
-                reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
-            )
-        )
-        instructions.append(mips.BeqzNode(ARG_REGISTERS[1], mips.LabelNode(exit1)))
+
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
         instructions.append(mips.JumpNode(loop1))
@@ -832,7 +829,7 @@ class CilToMIPS:
                 reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
             )
         )
-        instructions.append(mips.BeqzNode(ARG_REGISTERS[2], mips.LabelNode(exit2)))
+        instructions.append(mips.BeqzNode(reg1, mips.LabelNode(exit2)))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[2], ARG_REGISTERS[2], 1))
         instructions.append(mips.JumpNode(loop2))
