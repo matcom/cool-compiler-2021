@@ -248,7 +248,7 @@ class CoolToCilVisitor(object):
         concat_len_local = self.register_local("concat_len")
 
         self.instructions.append(cil.LengthNode(self_len_local, self_str_local))
-        self.instructions.append(cil.LengthNode(other_len_local, other_len_local))
+        self.instructions.append(cil.LengthNode(other_len_local, other_str_local))
         self.instructions.append(
             cil.PlusNode(concat_len_local, self_len_local, other_len_local)
         )

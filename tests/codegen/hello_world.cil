@@ -289,7 +289,7 @@
     local_self_str_attr = GETATTR param_self 0;
     local_other_str_attr = GETATTR param_other 0;
     local_self_len = length(local_self_str_attr)
-    local_other_len = length(local_other_len)
+    local_other_len = length(local_other_str_attr)
     local_concat_len = local_self_len + local_other_len
     local_concat = concat(param_self, param_other, local_concat_len)
     ARG local_concat;
