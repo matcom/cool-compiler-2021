@@ -99,6 +99,12 @@ class CILDebug:
             indent, inline, f"SETATTR {node.instance} {node.attr} {node.source};"
         )
 
+    @visitor.when(cil.AssignNode)
+    def visit(self, node: cil.AssignNode, indent=0, inline=False):
+        self.print(
+            indent, inline, f"{node.dest} = {node.source};"
+        )
+
     @visitor.when(cil.AllocateNode)
     def visit(self, node: cil.AllocateNode, indent=0, inline=False):
         self.print(indent, inline, f"{node.dest} = ALLOCATE {node.type};")
