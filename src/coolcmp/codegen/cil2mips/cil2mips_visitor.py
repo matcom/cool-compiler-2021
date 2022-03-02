@@ -163,9 +163,10 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.SetAttrNode)
     def visit(self, node: cil.SetAttrNode):
-        t0, fp = registers.T[0], registers.FP
+        t0 = registers.T[0]
+        v0, fp = registers.V0, registers.FP
 
-        inst_address = self.get_address(node.instance)
+        # inst_address = self.get_address(node.instance)
         if node.value == 'void':
             load_value_inst = mips.LWNode(t0, 'void')
         else:
@@ -173,9 +174,11 @@ class CILToMipsVisitor:
             load_value_inst = mips.LWNode(t0, (value_address, fp))
 
         self.add_inst(
-            load_value_inst,
+            mips.CommentNode(f"<setattribute:{node.attr.name}-{node.instance}>"),
             # sum 1 to attr index because at offset 0 is the type pointer
-            mips.SWNode(t0, 4 * (node.attr.index + 1) + inst_address, fp)
+            load_value_inst,
+            mips.SWNode(t0, 4 * (node.attr.index + 1), v0),
+            mips.CommentNode(f"</setattribute:{node.attr.name}-{node.instance}>"),
         )
 
     @visitor.when(cil.PrintIntNode)
