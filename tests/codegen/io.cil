@@ -354,8 +354,8 @@
   }
 
   function IO_out_string {
-    PARAM param_str;
     PARAM param_self;
+    PARAM param_str;
 
 
     print(str, param_str)
