@@ -26,6 +26,7 @@ from asts.mips_ast import (
     Multiply,
     Not,
     RegisterNode,
+    StoreByte,
     StoreWord,
     Sub,
     Subu,
@@ -194,4 +195,8 @@ class MIPSGenerator:
 
     @visitor.when(LoadByte)
     def visit(self, node: LoadByte) -> str:
-        return f"\tlb {self.visit(node.left)} {self.visit(node.right)}"
+        return f"\tlb {self.visit(node.left)}, {self.visit(node.right)}"
+
+    @visitor.when(StoreByte)
+    def visit(self, node: StoreByte) -> str:
+        return f"\tsb {self.visit(node.left)}, {self.visit(node.right)}"

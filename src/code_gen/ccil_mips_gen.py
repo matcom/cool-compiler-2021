@@ -1,7 +1,9 @@
-from typing import Tuple, Union, Dict, List
+from typing import Dict, List, Tuple
+
+from asts import ccil_ast, mips_ast
 from utils import visitor
-from asts import mips_ast, ccil_ast
 from utils import visitor
+
 from .constants import *
 
 WORD = 4
@@ -10,52 +12,15 @@ Location = Dict[Tuple[str, str], mips_ast.MemoryIndexNode]
 
 
 class CCILToMIPSGenerator:
+    """
+    This class transform CCIL AST to MIPS AST using visitor pattern
+    """
+
     def __init__(self) -> None:
         self.__id = 0
         self.__types_table: List[ccil_ast.Class] = []
         self.__location: Location = {}
         self.__current_function: ccil_ast.FunctionNode
-
-    def push_stack(self, node, register: mips_ast.RegisterNode):
-        stack_pointer = mips_ast.RegisterNode(node, SP)
-        instructions = []
-        instructions.append(
-            mips_ast.Addi(
-                node,
-                stack_pointer,
-                stack_pointer,
-                mips_ast.Constant(node, -1 * DOUBLE_WORD),
-            )
-        )
-        instructions.append(
-            mips_ast.StoreWord(
-                node,
-                register,
-                mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, 0), stack_pointer
-                ),
-            )
-        )
-        return instructions
-
-    def pop_stack(self, node, register: mips_ast.RegisterNode):
-        stack_pointer = mips_ast.RegisterNode(node, SP)
-        instructions = []
-        instructions.append(
-            mips_ast.LoadWord(
-                node,
-                register,
-                mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, 0), stack_pointer
-                ),
-            )
-        )
-        instructions.append(
-            mips_ast.Addi(
-                node, stack_pointer, stack_pointer, mips_ast.Constant(node, DOUBLE_WORD)
-            )
-        )
-        return instructions
 
     @visitor.on("node")
     def visit(self, node):
@@ -116,7 +81,7 @@ class CCILToMIPSGenerator:
         frame_pointer = mips_ast.RegisterNode(node, FP)
 
         for index, local in enumerate(node.locals):
-            self.set_relative_location(
+            self._set_relative_location(
                 local.id,
                 mips_ast.MemoryIndexNode(
                     node,
@@ -127,7 +92,7 @@ class CCILToMIPSGenerator:
                 ),
             )
         for index, param in enumerate(node.params):
-            self.set_relative_location(
+            self._set_relative_location(
                 param.id,
                 mips_ast.MemoryIndexNode(
                     node,
@@ -138,8 +103,8 @@ class CCILToMIPSGenerator:
                 ),
             )
 
-        instructions.extend(self.push_stack(node, return_address))
-        instructions.extend(self.push_stack(node, frame_pointer))
+        instructions.extend(self._push_stack(node, return_address))
+        instructions.extend(self._push_stack(node, frame_pointer))
         instructions.append(
             mips_ast.Addi(
                 node, frame_pointer, stack_pointer, mips_ast.Constant(node, 16)
@@ -156,7 +121,7 @@ class CCILToMIPSGenerator:
 
         for op in node.operations:
             instructions.extend(self.visit(op))
-        ret_location = self.get_relative_location(node.ret)
+        ret_location = self._get_relative_location(node.ret)
         ret_register = mips_ast.RegisterNode(node, V0)
         instructions.append(mips_ast.LoadWord(node, ret_register, ret_location))
 
@@ -165,8 +130,8 @@ class CCILToMIPSGenerator:
                 node, stack_pointer, stack_pointer, mips_ast.Constant(node, frame_size)
             )
         )
-        instructions.extend(self.pop_stack(node, frame_pointer))
-        instructions.extend(self.pop_stack(node, return_address))
+        instructions.extend(self._pop_stack(node, frame_pointer))
+        instructions.extend(self._pop_stack(node, return_address))
 
         if node.id == "main":
             instructions.append(
@@ -182,7 +147,7 @@ class CCILToMIPSGenerator:
 
     @visitor.when(ccil_ast.StorageNode)
     def visit(self, node: ccil_ast.StorageNode):
-        location_id = self.get_relative_location(node.id)
+        location_id = self._get_relative_location(node.id)
         instructions = []
         instructions.extend(self.visit(node.operation))
         instructions.append(
@@ -197,7 +162,7 @@ class CCILToMIPSGenerator:
             mips_ast.LoadWord(
                 node,
                 mips_ast.RegisterNode(node, V0),
-                self.get_relative_location(node.value),
+                self._get_relative_location(node.value),
             )
         )
         return instructions
@@ -220,9 +185,9 @@ class CCILToMIPSGenerator:
         instructions = []
         for arg in node.args:
             instructions.append(
-                mips_ast.LoadWord(node, reg, self.get_relative_location(arg.value))
+                mips_ast.LoadWord(node, reg, self._get_relative_location(arg.value))
             )
-            instructions.extend(self.push_stack(node, reg))
+            instructions.extend(self._push_stack(node, reg))
         instructions.append(mips_ast.JumpAndLink(node, mips_ast.Label(node, node.id)))
 
         if len(node.args) > 0:
@@ -241,7 +206,7 @@ class CCILToMIPSGenerator:
     def visit(self, node: ccil_ast.VCallOpNode):
         instructions = []
 
-        obj_location = self.get_relative_location(node.args[0].value)
+        obj_location = self._get_relative_location(node.args[0].value)
         reg_obj = mips_ast.RegisterNode(node, T0)
         instructions.append(mips_ast.LoadWord(node, reg_obj, obj_location))
 
@@ -254,7 +219,7 @@ class CCILToMIPSGenerator:
             )
         )
         register_function = mips_ast.RegisterNode(node, T2)
-        function_index = self.get_method_index(node.type, node.id)
+        function_index = self._get_method_index(node.type, node.id)
         instructions.append(
             mips_ast.LoadWord(
                 node,
@@ -267,9 +232,9 @@ class CCILToMIPSGenerator:
         reg_arg = mips_ast.RegisterNode(node, T3)
         for arg in node.args:
             instructions.append(
-                mips_ast.LoadWord(node, reg_arg, self.get_relative_location(arg.value))
+                mips_ast.LoadWord(node, reg_arg, self._get_relative_location(arg.value))
             )
-            instructions.extend(self.push_stack(node, reg_arg))
+            instructions.extend(self._push_stack(node, reg_arg))
         instructions.append(mips_ast.JumpAndLink(node, register_function))
 
         if len(node.args) > 0:
@@ -294,7 +259,7 @@ class CCILToMIPSGenerator:
             return []
 
         # Allocate memory for object instance
-        size = self.get_attr_count(node.type) * WORD + WORD
+        size = self._get_attr_count(node.type) * WORD + WORD
         instructions.append(
             mips_ast.LoadImmediate(
                 node,
@@ -338,17 +303,17 @@ class CCILToMIPSGenerator:
             )
         )
 
-        instructions.extend(self.push_stack(node, mips_ast.RegisterNode(node, V0)))
+        instructions.extend(self._push_stack(node, mips_ast.RegisterNode(node, V0)))
         instructions.append(mips_ast.JumpAndLink(node, init_function))
-        instructions.extend(self.pop_stack(node, mips_ast.RegisterNode(node, V0)))
+        instructions.extend(self._pop_stack(node, mips_ast.RegisterNode(node, V0)))
 
         return instructions
 
     @visitor.when(ccil_ast.GetAttrOpNode)
     def visit(self, node: ccil_ast.GetAttrOpNode):
         instructions = []
-        attr_offset = self.get_attr_index(node.instance_type, node.attr)
-        location_object = self.get_relative_location(node.instance)
+        attr_offset = self._get_attr_index(node.instance_type, node.attr)
+        location_object = self._get_relative_location(node.instance)
 
         instructions.append(
             mips_ast.LoadWord(node, mips_ast.RegisterNode(node, T0), location_object)
@@ -374,7 +339,7 @@ class CCILToMIPSGenerator:
             mips_ast.LoadWord(
                 node,
                 mips_ast.RegisterNode(node, T0),
-                self.get_relative_location(node.atom.value),
+                self._get_relative_location(node.atom.value),
             )
         )
         instructions.append(
@@ -392,8 +357,8 @@ class CCILToMIPSGenerator:
     def visit(self, node: ccil_ast.SetAttrOpNode):
         instructions = []
 
-        attr_offset = self.get_attr_index(node.instance_type, node.attr)
-        object_location = self.get_relative_location(node.instance)
+        attr_offset = self._get_attr_index(node.instance_type, node.attr)
+        object_location = self._get_relative_location(node.instance)
 
         instructions.append(
             mips_ast.LoadWord(node, mips_ast.RegisterNode(node, T0), object_location)
@@ -411,7 +376,7 @@ class CCILToMIPSGenerator:
                 mips_ast.LoadWord(
                     node,
                     reg_new_value,
-                    self.get_relative_location(node.new_value.value),
+                    self._get_relative_location(node.new_value.value),
                 )
             )
         # NOTE: Fix: instances should not be of type str
@@ -420,7 +385,7 @@ class CCILToMIPSGenerator:
                 mips_ast.LoadWord(
                     node,
                     reg_new_value,
-                    self.get_relative_location(node.new_value),
+                    self._get_relative_location(node.new_value),
                 )
             )
         else:
@@ -447,7 +412,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.left, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_left, self.get_relative_location(node.left.value)
+                    node, reg_left, self._get_relative_location(node.left.value)
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
@@ -461,7 +426,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.right, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_right, self.get_relative_location(node.right.value)
+                    node, reg_right, self._get_relative_location(node.right.value)
                 )
             )
         elif isinstance(node.right, ccil_ast.ConstantNode):
@@ -486,7 +451,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.left, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_left, self.get_relative_location(node.left.value)
+                    node, reg_left, self._get_relative_location(node.left.value)
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
@@ -500,7 +465,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.right, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_right, self.get_relative_location(node.right.value)
+                    node, reg_right, self._get_relative_location(node.right.value)
                 )
             )
         elif isinstance(node.right, ccil_ast.ConstantNode):
@@ -525,7 +490,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.left, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_left, self.get_relative_location(node.left.value)
+                    node, reg_left, self._get_relative_location(node.left.value)
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
@@ -539,7 +504,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.right, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_right, self.get_relative_location(node.right.value)
+                    node, reg_right, self._get_relative_location(node.right.value)
                 )
             )
         elif isinstance(node.right, ccil_ast.ConstantNode):
@@ -564,7 +529,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.left, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_left, self.get_relative_location(node.left.value)
+                    node, reg_left, self._get_relative_location(node.left.value)
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
@@ -578,7 +543,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.right, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_right, self.get_relative_location(node.right.value)
+                    node, reg_right, self._get_relative_location(node.right.value)
                 )
             )
         elif isinstance(node.right, ccil_ast.ConstantNode):
@@ -603,7 +568,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.left, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_left, self.get_relative_location(node.left.value)
+                    node, reg_left, self._get_relative_location(node.left.value)
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
@@ -617,7 +582,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.right, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_right, self.get_relative_location(node.right.value)
+                    node, reg_right, self._get_relative_location(node.right.value)
                 )
             )
         elif isinstance(node.right, ccil_ast.ConstantNode):
@@ -642,7 +607,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.left, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_left, self.get_relative_location(node.left.value)
+                    node, reg_left, self._get_relative_location(node.left.value)
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
@@ -656,7 +621,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.right, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_right, self.get_relative_location(node.right.value)
+                    node, reg_right, self._get_relative_location(node.right.value)
                 )
             )
         elif isinstance(node.right, ccil_ast.ConstantNode):
@@ -681,7 +646,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.left, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_left, self.get_relative_location(node.left.value)
+                    node, reg_left, self._get_relative_location(node.left.value)
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
@@ -695,7 +660,7 @@ class CCILToMIPSGenerator:
         if isinstance(node.right, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg_right, self.get_relative_location(node.right.value)
+                    node, reg_right, self._get_relative_location(node.right.value)
                 )
             )
         elif isinstance(node.right, ccil_ast.ConstantNode):
@@ -726,7 +691,7 @@ class CCILToMIPSGenerator:
         elif isinstance(node.atom, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg, self.get_relative_location(node.atom.value)
+                    node, reg, self._get_relative_location(node.atom.value)
                 )
             )
         instructions.append(mips_ast.Not(node, reg, reg))
@@ -747,7 +712,7 @@ class CCILToMIPSGenerator:
         elif isinstance(node.atom, ccil_ast.IdNode):
             instructions.append(
                 mips_ast.LoadWord(
-                    node, reg, self.get_relative_location(node.atom.value)
+                    node, reg, self._get_relative_location(node.atom.value)
                 )
             )
         instructions.append(mips_ast.Xori(node, reg, reg, mips_ast.Constant(node, "1")))
@@ -772,7 +737,7 @@ class CCILToMIPSGenerator:
             mips_ast.LoadWord(
                 node,
                 mips_ast.RegisterNode(node, T0),
-                self.get_relative_location(node.eval_value.value),
+                self._get_relative_location(node.eval_value.value),
             )
         )
         instructions.append(
@@ -809,7 +774,7 @@ class CCILToMIPSGenerator:
             mips_ast.LoadWord(
                 node,
                 mips_ast.RegisterNode(node, A0),
-                self.get_relative_location(node.id),
+                self._get_relative_location(node.id),
             )
         )
 
@@ -828,7 +793,7 @@ class CCILToMIPSGenerator:
             mips_ast.LoadWord(
                 node,
                 mips_ast.RegisterNode(node, A0),
-                self.get_relative_location(node.id),
+                self._get_relative_location(node.id),
             )
         )
 
@@ -869,10 +834,10 @@ class CCILToMIPSGenerator:
         )
         string = mips_ast.RegisterNode(node, T1)
         instructions.append(
-            mips_ast.LoadWord(node, string, self.get_relative_location(node.target))
+            mips_ast.LoadWord(node, string, self._get_relative_location(node.target))
         )
 
-        loop = self.generate_unique_label()
+        loop = self._generate_unique_label()
         instructions.append(mips_ast.LabelDeclaration(node, loop))
 
         char = mips_ast.RegisterNode(node, T2)
@@ -884,7 +849,7 @@ class CCILToMIPSGenerator:
             )
         )
         zero = mips_ast.RegisterNode(node, ZERO)
-        exit = self.generate_unique_label()
+        exit = self._generate_unique_label()
         instructions.append(
             mips_ast.BranchOnEqual(node, char, zero, mips_ast.Label(node, exit))
         )
@@ -898,19 +863,220 @@ class CCILToMIPSGenerator:
         instructions.append(mips_ast.LabelDeclaration(node, exit))
         return instructions
 
-    # @visitor.when(ccil_ast.EqualStrNode)
-    # def visit(self, node: ccil_ast.EqualStrNode):
-    #     pass
+    @visitor.when(ccil_ast.EqualStrNode)
+    def visit(self, node: ccil_ast.EqualStrNode):
+        instructions = []
+        left_string = mips_ast.RegisterNode(node, T0)
+        right_string = mips_ast.RegisterNode(node, T1)
 
-    # @visitor.when(ccil_ast.ConcatOpNode)
-    # def visit(self, node: ccil_ast.ConcatOpNode):
-    #     pass
+        instructions.append(
+            mips_ast.LoadWord(
+                node, left_string, self._get_relative_location(node.left.value)
+            )
+        )
+        instructions.append(
+            mips_ast.LoadWord(
+                node, right_string, self._get_relative_location(node.right.value)
+            )
+        )
+        left_char = mips_ast.RegisterNode(node, T2)
+        right_char = mips_ast.RegisterNode(node, T3)
+        loop = self._generate_unique_label()
+        instructions.append(mips_ast.LabelDeclaration(node, loop))
+        instructions.append(
+            mips_ast.LoadByte(
+                node,
+                left_char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), left_string),
+            )
+        )
+        instructions.append(
+            mips_ast.LoadByte(
+                node,
+                right_char,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), right_string
+                ),
+            )
+        )
+
+        equals_end = self._generate_unique_label()
+        not_equals_end = self._generate_unique_label()
+
+        zero = mips_ast.RegisterNode(node, ZERO)
+        instructions.append(
+            mips_ast.BranchOnNotEqual(
+                node, left_char, right_char, mips_ast.Label(node, not_equals_end)
+            )
+        )
+        instructions.append(
+            mips_ast.BranchOnEqual(
+                node, left_char, zero, mips_ast.Label(node, equals_end)
+            )
+        )
+
+        instructions.append(
+            mips_ast.Addi(node, left_string, left_string, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(node, right_string, right_string, mips_ast.Constant(node, 1))
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop)))
+
+        end = self._generate_unique_label()
+        result = mips_ast.RegisterNode(node, V0)
+        instructions.append(mips_ast.LabelDeclaration(node, equals_end))
+        instructions.append(
+            mips_ast.LoadImmediate(node, result, mips_ast.Constant(node, 1))
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, end)))
+        instructions.append(mips_ast.LabelDeclaration(node, not_equals_end))
+        instructions.append(
+            mips_ast.LoadImmediate(node, result, mips_ast.Constant(node, 0))
+        )
+        instructions.append(mips_ast.LabelDeclaration(node, end))
+        return instructions
+
+    @visitor.when(ccil_ast.ConcatOpNode)
+    def visit(self, node: ccil_ast.ConcatOpNode):
+        instructions = []
+        string_a = mips_ast.RegisterNode(node, T0)
+        string_b = mips_ast.RegisterNode(node, T1)
+
+        len_a = mips_ast.RegisterNode(node, T4)
+        len_b = mips_ast.RegisterNode(node, T3)
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node, string_a, self._get_relative_location(node.source)
+            )
+        )
+        instructions.extend(self._push_stack(node, string_a))
+        instructions.append(mips_ast.JumpAndLink(node, mips_ast.Label(node, "length")))
+        instructions.extend(self._pop_stack(node, string_a))
+        instructions.append(mips_ast.Move(node, len_a, mips_ast.RegisterNode(node, V0)))
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node, string_b, self._get_relative_location(node.target)
+            )
+        )
+        instructions.extend(self._push_stack(node, string_b))
+        instructions.append(mips_ast.JumpAndLink(node, mips_ast.Label(node, "length")))
+        instructions.extend(self._pop_stack(node, string_b))
+
+        instructions.append(mips_ast.Move(node, len_b, mips_ast.RegisterNode(node, V0)))
+
+        instructions.append(
+            mips_ast.Add(node, mips_ast.RegisterNode(node, A0), len_a, len_b)
+        )
+        instructions.append(
+            mips_ast.Addi(
+                node,
+                mips_ast.RegisterNode(node, A0),
+                mips_ast.RegisterNode(node, A0),
+                mips_ast.Constant(node, 1),
+            )
+        )
+        instructions.append(
+            mips_ast.LoadImmediate(
+                node, mips_ast.RegisterNode(node, V0), mips_ast.Constant(node, 9)
+            )
+        )
+        instructions.append(mips_ast.Syscall(node))
+
+        concat_string = mips_ast.RegisterNode(node, V0)
+        concat_char = mips_ast.RegisterNode(node, T6)
+        char = mips_ast.RegisterNode(node, T5)
+        instructions.append(mips_ast.Move(node, concat_char, concat_string))
+
+        loop_string_a = self._generate_unique_label()
+        end_loop_string_a = self._generate_unique_label()
+        instructions.append(mips_ast.LabelDeclaration(node, loop_string_a))
+        instructions.append(
+            mips_ast.LoadByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), string_a),
+            )
+        )
+        instructions.append(
+            mips_ast.BranchOnEqual(
+                node,
+                char,
+                mips_ast.RegisterNode(node, ZERO),
+                mips_ast.Label(node, end_loop_string_a),
+            )
+        )
+        instructions.append(
+            mips_ast.StoreByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), concat_char),
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(node, string_a, string_a, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(node, concat_char, concat_char, mips_ast.Constant(node, 1))
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop_string_a)))
+        instructions.append(mips_ast.LabelDeclaration(node, end_loop_string_a))
+
+        loop_string_b = self._generate_unique_label()
+        end_loop_string_b = self._generate_unique_label()
+        instructions.append(mips_ast.LabelDeclaration(node, loop_string_b))
+        instructions.append(
+            mips_ast.LoadByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), string_b),
+            )
+        )
+        instructions.append(
+            mips_ast.BranchOnEqual(
+                node,
+                char,
+                mips_ast.RegisterNode(node, ZERO),
+                mips_ast.Label(node, end_loop_string_b),
+            )
+        )
+        instructions.append(
+            mips_ast.StoreByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), concat_char),
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(node, string_b, string_b, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(node, concat_char, concat_char, mips_ast.Constant(node, 1))
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop_string_b)))
+        instructions.append(mips_ast.LabelDeclaration(node, end_loop_string_b))
+
+        instructions.append(
+            mips_ast.StoreByte(
+                node,
+                mips_ast.RegisterNode(node, ZERO),
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), concat_char),
+            )
+        )
+
+        return instructions
 
     # @visitor.when(ccil_ast.SubstringOpNode)
     # def visit(self, node: ccil_ast.SubstringOpNode):
+    #     instructions = []
+    #     substring = mips_ast.RegisterNode(node, V0)
+    #     instructions.append()
+
     #     pass
 
-    def get_attr_index(self, typex: str, attr: str):
+    def _get_attr_index(self, typex: str, attr: str):
         for _type in self.__types_table:
             if _type.id == typex:
                 for index, _attr in enumerate(_type.attributes):
@@ -918,19 +1084,19 @@ class CCILToMIPSGenerator:
                         return index * WORD + WORD
         raise Exception(f"Attribute {attr} not found in type {typex}")
 
-    def get_attr_count(self, typex: str):
+    def _get_attr_count(self, typex: str):
         for _type in self.__types_table:
             if _type.id == typex:
                 return len(_type.attributes)
         raise Exception("Type declaration not found")
 
-    def get_init_function(self, typex: str):
+    def _get_init_function(self, typex: str):
         for _type in self.__types_table:
             if _type.id == typex:
                 return _type.init_operations
         raise Exception("Type's function for inicialization not found")
 
-    def get_method_index(self, typex: str, method: str) -> int:
+    def _get_method_index(self, typex: str, method: str) -> int:
         for _type in self.__types_table:
             if _type.id == typex:
                 for index, _method in enumerate(_type.methods):
@@ -939,7 +1105,7 @@ class CCILToMIPSGenerator:
 
         raise Exception(f"Method implementation not found:{typex} {method}")
 
-    def get_class_method(self, typex: str, method: str) -> str:
+    def _get_class_method(self, typex: str, method: str) -> str:
         for _type in self.__types_table:
             if _type.id == typex:
                 for _method in _type.methods:
@@ -947,12 +1113,53 @@ class CCILToMIPSGenerator:
                         return _method.function.id
         raise Exception(f"Method implementation not found")
 
-    def get_relative_location(self, id: str):
+    def _get_relative_location(self, id: str):
         return self.__location[self.__current_function.id, id]
 
-    def set_relative_location(self, id: str, memory: mips_ast.MemoryIndexNode):
+    def _set_relative_location(self, id: str, memory: mips_ast.MemoryIndexNode):
         self.__location[self.__current_function.id, id] = memory
 
-    def generate_unique_label(self):
+    def _generate_unique_label(self):
         self.__id += 1
         return f"label_{self.__id}"
+
+    def _push_stack(self, node, register: mips_ast.RegisterNode):
+        stack_pointer = mips_ast.RegisterNode(node, SP)
+        instructions = []
+        instructions.append(
+            mips_ast.Addi(
+                node,
+                stack_pointer,
+                stack_pointer,
+                mips_ast.Constant(node, -1 * DOUBLE_WORD),
+            )
+        )
+        instructions.append(
+            mips_ast.StoreWord(
+                node,
+                register,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), stack_pointer
+                ),
+            )
+        )
+        return instructions
+
+    def _pop_stack(self, node, register: mips_ast.RegisterNode):
+        stack_pointer = mips_ast.RegisterNode(node, SP)
+        instructions = []
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                register,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), stack_pointer
+                ),
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(
+                node, stack_pointer, stack_pointer, mips_ast.Constant(node, DOUBLE_WORD)
+            )
+        )
+        return instructions

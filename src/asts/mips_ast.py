@@ -267,6 +267,12 @@ class LoadByte(BinaryOpNode):
     def __init__(self, node, left, right) -> None:
         super().__init__(node, left, right)
 
+class StoreByte(BinaryOpNode):
+    """
+    This node represents `sb` instruction in MIPS
+    """
+    def __init__(self, node, left, right) -> None:
+        super().__init__(node, left, right)
 
 class LoadWord(BinaryOpNode):
     """
