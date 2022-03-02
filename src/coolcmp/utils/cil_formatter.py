@@ -21,7 +21,7 @@ class CILFormatter(object):
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
         attributes = '\n    '.join(f'attribute {x}' for x in node.attributes)
-        methods = '\n    '.join(f'method {m}' for m in node.methods)
+        methods = '\n    '.join(f'method {m}: {f}' for m, f in node.methods.items())
 
         return (
             f'type {node.name} {{' +

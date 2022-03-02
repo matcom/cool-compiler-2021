@@ -3,6 +3,7 @@ from __future__ import annotations
 import types
 
 from coolcmp.utils import ast
+from coolcmp.utils import extract_meth_name
 
 
 class Node:
@@ -19,7 +20,7 @@ class ProgramNode(Node):
         self.dot_types = dot_types
         self.dot_data = dot_data
         self.dot_code = dot_code
-        self.all_methods: list[MethodAt] = []
+        self.all_methods: list[str] = []
 
     def get_type(self, name: str):
         for type_ in self.dot_types:
@@ -36,41 +37,47 @@ class ProgramNode(Node):
         if value not in [data.value for data in self.dot_data]:
             self.dot_data.append(DataNode(f"s{len(self.dot_data) + 1}", value))
 
-    @staticmethod
-    def extract_meth_name(name: str):
-        return name[name.find('_') + 1:]
-
     def update_method_indexes(self):
         all_methods = set()
         for type_ in self.dot_types:
-            all_methods.update([ProgramNode.extract_meth_name(m) for m in type_.methods])
+            all_methods.update([extract_meth_name(m) for m in type_.methods.values()])
 
         self.all_methods = sorted(list(all_methods))
-        print('@@@@@', self.all_methods)
         for type_ in self.dot_types:
+            meths = type_.methods
             new_methods = [
                 MethodAt(
-                    name=str(m),
-                    index=self.all_methods.index(ProgramNode.extract_meth_name(str(m)))
-                ) for m in sorted(type_.methods)
+                    name=meths[m],
+                    index=self.all_methods.index(extract_meth_name(meths[m]))
+                ) for m in meths
             ]
-            type_.methods = new_methods
+            type_.methods = sorted(new_methods)
             type_.total_methods = len(self.all_methods)
 
 
 class MethodAt:
     def __init__(self, name: str, index: int = -1):
-        self.name = name
+        self.tname = (name, )
         self.index = index
 
+    @property
+    def name(self):
+        return self.tname[0]
+
     def __lt__(self, other: MethodAt):
-        return self.name.__lt__(other.name)
+        return extract_meth_name(self.name).__lt__(extract_meth_name(other.name))
 
     def __eq__(self, other: MethodAt):
         return self.name == other.name
 
+    def __hash__(self):
+        return hash(self.name)
+
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f'MethodAt({self.name}, {self.index})'
 
 
 class AttributeAt:
@@ -89,7 +96,7 @@ class TypeNode(Node):
     def __init__(self,
                  name: str,
                  attrs: list[str],
-                 methods: list[MethodAt | str],
+                 methods: dict[MethodAt | str, str],
                  attr_expr_nodes: dict[str, ast.ExpressionNode] = None):
         self.name = name
         self.attributes = attrs

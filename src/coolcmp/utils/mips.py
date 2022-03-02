@@ -14,7 +14,7 @@ class Node:
 
 DW = 4
 class Type:
-    def __init__(self, label, attrs, methods: list[cil.MethodAt], total_methods: int, index, init: list[InstructionNode]):
+    def __init__(self, label, attrs, methods: dict[cil.MethodAt, str], total_methods: int, index, init: list[InstructionNode]):
         self.label = label
         self.attrs = attrs
         self.methods = methods

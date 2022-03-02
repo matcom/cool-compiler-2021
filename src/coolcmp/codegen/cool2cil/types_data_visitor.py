@@ -28,51 +28,51 @@ class DotTypesDataVisitor:
             cil.TypeNode(
                 name='Object',
                 attrs=[],
-                methods=[
-                    'Object_abort',
-                    'Object_type_name',
-                    'Object_copy',
-                ]
+                methods={
+                    'Object_abort': 'Object_abort',
+                    'Object_type_name': 'Object_type_name',
+                    'Object_copy': 'Object_copy',
+                }
             ),
             cil.TypeNode(
                 name='IO',
                 attrs=[],
-                methods=[
-                    'IO_out_string',
-                    'IO_out_int',
-                    'IO_in_string',
-                    'IO_in_int',
-                ]
+                methods={
+                    'IO_out_string': 'IO_out_string',
+                    'IO_out_int': 'IO_out_int',
+                    'IO_in_string': 'IO_in_string',
+                    'IO_in_int': 'IO_in_int',
+                }
             ),
             cil.TypeNode(
                 name='String',
                 attrs=[
                     'String_value',
                 ],
-                methods=[
-                    'String_length',
-                    'String_concat',
-                    'String_substr',
-                ]
+                methods={
+                    'String_length': 'String_length',
+                    'String_concat': 'String_concat',
+                    'String_substr': 'String_substr',
+                }
             ),
             cil.TypeNode(
                 name='Bool',
                 attrs=[
                     'Bool_value',
                 ],
-                methods=[]
+                methods={}
             ),
             cil.TypeNode(
                 name='Int',
                 attrs=[
                     'Int_value',
                 ],
-                methods=[]
+                methods={}
             ),
             cil.TypeNode(
                 name='Void',
                 attrs=[],
-                methods=[]
+                methods={}
             ),
         ]
 
@@ -85,7 +85,7 @@ class DotTypesDataVisitor:
     def visit(self, node: ast.ClassDeclarationNode):
         type_ = self.context.get_type(node.id)
         type_attributes: list[str] = []
-        type_methods: list[str] = []
+        type_methods: dict[str, str] = {}
         type_node = cil.TypeNode(
             name=type_.name,
             attrs=type_attributes,
@@ -100,7 +100,7 @@ class DotTypesDataVisitor:
             # if owner.name in ('Object', 'IO', 'String', 'String', 'Bool', 'Int', ):
             #     func_target = meth.name
             # else:
-            type_methods.append(f'{node.id}_{meth.name}')
+            type_methods[f'{node.id}_{meth.name}'] = f'{owner.name}_{meth.name}'
 
         self.types.append(type_node)
 
