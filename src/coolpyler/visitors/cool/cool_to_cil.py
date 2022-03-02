@@ -238,7 +238,7 @@ class CoolToCilVisitor(object):
         # }}}
 
         self_str_local = self.register_local("self_str_attr")
-        other_str_local = self.register_local("self_str_attr")
+        other_str_local = self.register_local("other_str_attr")
         self.instructions.append(cil.GetAttrNode(self_param, 0, self_str_local))
         self.instructions.append(cil.GetAttrNode(other_param, 0, other_str_local))
 
