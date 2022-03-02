@@ -42,8 +42,8 @@ def define_cool_grammar(print_grammar=False):
         "<feature-list> <def-attr> <def-func>"
     )
     param_list, param_list_rest, param = G.NonTerminals("<param-list> <param-list-rest> <param>")
-    expr, comp, arith, term, factor, element, atom = G.NonTerminals(
-        "<expr> <comp> <arith> <term> <factor> <element> <atom>"
+    expr, not_exp, comp, arith, term, factor, element, atom = G.NonTerminals(
+        "<expr> <not_exp> <comp> <arith> <term> <factor> <element> <atom>"
     )
     identifiers_list, identifier_init = G.NonTerminals("<ident-list> <ident-init>")
     block, case_block, case_item = G.NonTerminals("<block> <case-block> <case-item>")
@@ -104,9 +104,9 @@ def define_cool_grammar(print_grammar=False):
 
     expr %= idx + larrow + expr, lambda h, s: AssignNode(s[1], s[3], s[2])
     expr %= let + identifiers_list + inx + expr, lambda h, s: LetNode(s[2], s[4], s[1])
+    expr %= notx + comp, lambda h, s: NotNode(s[2], s[1])  
     expr %= comp, lambda h, s: s[1]
 
-    # igual, deberia considerarse registrar estos tokens
     identifiers_list %= (
         identifier_init + comma + identifiers_list,
         lambda h, s: [s[1]] + s[3],
@@ -120,11 +120,13 @@ def define_cool_grammar(print_grammar=False):
     identifier_init %= idx + colon + type_id, lambda h, s: VarDeclarationNode(s[1], s[3])
 
     comp %= comp + less + arith, lambda h, s: LessNode(s[1], s[3], s[2])
+    comp %= comp + less + notx + arith, lambda h, s: LessNode(s[1], NotNode(s[4], s[3]) , s[2])
     comp %= comp + equal + arith, lambda h, s: EqualNode(s[1], s[3], s[2])
+    comp %= comp + equal + notx + arith, lambda h, s: EqualNode(s[1], NotNode(s[4], s[3]) , s[2])    
     comp %= comp + lesseq + arith, lambda h, s: LessEqualNode(s[1], s[3], s[2])
+    comp %= comp + lesseq + notx + arith, lambda h, s: LessEqualNode(s[1], NotNode(s[4], s[3]) , s[2])
     comp %= arith, lambda h, s: s[1]
 
-    arith %= notx + term, lambda h, s: NotNode(s[2], s[1]) 
     arith %= arith + plus + term, lambda h, s: PlusNode(s[1], s[3], s[2])
     arith %= arith + minus + term, lambda h, s: MinusNode(s[1], s[3], s[2])
     arith %= term, lambda h, s: s[1]
