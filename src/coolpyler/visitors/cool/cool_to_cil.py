@@ -530,6 +530,23 @@ class CoolToCilVisitor(object):
         typeof_local = self.register_local()
         self.instructions.append(cil.TypeOfNode(sid, typeof_local))
 
+        # debug print {{{
+        tnlocal = self.register_local("tname_local")
+        eol = self.register_data("eol", '"\\n"')
+        eol = self.register_new("String", eol)
+        under = self.register_data("under", '"_"')
+        under = self.register_new("String", under)
+        meth = self.register_data("meth", f'"{node.id}"')
+        meth = self.register_new("String", meth)
+        self.instructions.append(
+            cil.DynamicCallNode(typeof_local, self.get_method_id("Object", "type_name"), tnlocal)
+        )
+        self.instructions.append(cil.PrintNode(tnlocal, True))
+        self.instructions.append(cil.PrintNode(under, True))
+        self.instructions.append(cil.PrintNode(meth, True))
+        self.instructions.append(cil.PrintNode(eol, True))
+        # }}}
+
         self.instructions.extend(args)
         method_id = self.get_method_id(node.expr.type.name, node.id)
         self.instructions.append(
