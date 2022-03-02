@@ -377,6 +377,7 @@ class DotCodeVisitor:
         for arg in node.args:
             arg_dest = self.visit(arg, scope)
             self.add_inst(cil.ArgNode(arg_dest))
+        self.add_inst(cil.ArgNode(obj_dest))
 
         # call the function
         call_res = self.add_local('call_res')
