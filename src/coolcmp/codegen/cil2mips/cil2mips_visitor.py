@@ -208,11 +208,15 @@ class CILToMipsVisitor:
     @visitor.when(cil.PrintStringNode)
     def visit(self, node: cil.PrintStringNode):
         """ """
-        address = self.cur_function.variable_address(node.addr)
+        t0 = registers.T[0]
+        a0, v0, fp = registers.ARG[0], registers.V0, registers.FP
+        address = self.get_address(node.addr)
+
         self.add_inst(
             mips.CommentNode(f"<printstring:{node.addr}>"),
-            mips.LINode(registers.V0, 4),
-            mips.LWNode(registers.ARG[0], (address, registers.FP)),
+            mips.LWNode(a0, (address, fp)),
+            mips.ADDINode(a0, a0, 4),
+            mips.LINode(v0, 4),
             mips.SysCallNode(),
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
