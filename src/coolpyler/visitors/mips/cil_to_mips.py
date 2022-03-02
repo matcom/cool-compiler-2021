@@ -236,8 +236,15 @@ class CilToMIPS:
         reg2 = self.memory_manager.get_unused_register()
         reg3 = self.memory_manager.get_unused_register()
 
-        instructions.extend(self.load_value_to_reg(reg1, node.left))
-        instructions.extend(self.load_value_to_reg(reg2, node.right))
+        right_dir = self.search_mem(node.right)
+        left_dir = self.search_mem(node.left)
+
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, right_dir))
+        )
+        instructions.append(
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, left_dir))
+        )
 
         instructions.append(mips.SubNode(reg3, reg1, reg2, f"Minus"))
 
@@ -261,8 +268,15 @@ class CilToMIPS:
         reg1 = self.memory_manager.get_unused_register()
         reg2 = self.memory_manager.get_unused_register()
 
-        instructions.extend(self.load_value_to_reg(reg1, node.left))
-        instructions.extend(self.load_value_to_reg(reg2, node.right))
+        right_dir = self.search_mem(node.right)
+        left_dir = self.search_mem(node.left)
+
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, right_dir))
+        )
+        instructions.append(
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, left_dir))
+        )
 
         instructions.append(mips.MultNode(reg1, reg2, f"Mult"))
 
@@ -288,8 +302,15 @@ class CilToMIPS:
         reg1 = self.memory_manager.get_unused_register()
         reg2 = self.memory_manager.get_unused_register()
 
-        instructions.extend(self.load_value_to_reg(reg1, node.left))
-        instructions.extend(self.load_value_to_reg(reg2, node.right))
+        right_dir = self.search_mem(node.right)
+        left_dir = self.search_mem(node.left)
+
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, right_dir))
+        )
+        instructions.append(
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, left_dir))
+        )
 
         instructions.append(mips.DivNode(reg1, reg2, f"Div"))
 
