@@ -269,11 +269,12 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             # e.text
             # errors
         if errors:
-            print_errors('\n'.join(errors))
+            # print_errors('\n'.join(errors))
+            print_errors(errors[-1])
             # InferenceTypeChecker(context, errors).visit(ast, Scope())
             # CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
             # Execution(context).visit(ast, Scope())
-        
+            exit(1)
         ### code generation ###          
             
     # return "\n".join(errors) 

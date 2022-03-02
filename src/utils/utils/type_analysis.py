@@ -32,6 +32,7 @@ class TypeCollector(object):
         # defining methods
         object_type.define_method('abort', [], [], object_type)
         object_type.define_method('get_type', [], [], str_type)
+        object_type.define_method('type_name', ['str'], [str_type], str_type)
         object_type.define_method('copy', [], [], object_type)
         str_type.define_method('length', [], [], int_type)
         str_type.define_method('concat', ['str'], [str_type], str_type)
