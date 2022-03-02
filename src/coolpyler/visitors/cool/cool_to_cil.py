@@ -211,8 +211,10 @@ class CoolToCilVisitor(object):
     def register_string_length(self):
         self.reset_state()
         self_param = self.register_param("self")
+        str_local = self.register_local("str_attr")
         length_local = self.register_local("length")
-        self.instructions.append(cil.LengthNode(self_param, length_local))
+        self.instructions.append(cil.GetAttrNode(self_param, 0, str_local))
+        self.instructions.append(cil.LengthNode(str_local, length_local))
         self.instructions.append(cil.ReturnNode(self.register_new("Int", length_local)))
         self.dotcode.append(
             cil.FunctionNode(
@@ -228,13 +230,25 @@ class CoolToCilVisitor(object):
         self_param = self.register_param("self")
         other_param = self.register_param("other")
 
+        # debug print {{{
+        sep = self.register_new("String", self.register_data("sep_cat", '" ++ "'))
+        self.instructions.append(cil.PrintNode(self_param, True))
+        self.instructions.append(cil.PrintNode(sep, True))
+        self.instructions.append(cil.PrintNode(other_param, True))
+        # }}}
+
+        self_str_local = self.register_local("self_str_attr")
+        other_str_local = self.register_local("self_str_attr")
+        self.instructions.append(cil.GetAttrNode(self_param, 0, self_str_local))
+        self.instructions.append(cil.GetAttrNode(other_param, 0, other_str_local))
+
         concat_local = self.register_local("concat")
         self_len_local = self.register_local("self_len")
         other_len_local = self.register_local("other_len")
         concat_len_local = self.register_local("concat_len")
 
-        self.instructions.append(cil.LengthNode(self_len_local, self_param))
-        self.instructions.append(cil.LengthNode(other_len_local, other_param))
+        self.instructions.append(cil.LengthNode(self_len_local, self_str_local))
+        self.instructions.append(cil.LengthNode(other_len_local, self_str_local))
         self.instructions.append(
             cil.PlusNode(concat_len_local, self_len_local, other_len_local)
         )
@@ -258,11 +272,17 @@ class CoolToCilVisitor(object):
         self_param = self.register_param("self")
         i_param = self.register_param("i")
         l_param = self.register_param("l")
+
+        self_str_local = self.register_local("self_str_local")
         ret_local = self.register_local("substr")
+
+        self.instructions.append(cil.GetAttrNode(self_param, 0, self_str_local))
         self.instructions.append(
-            cil.SubstringNode(ret_local, self_param, l_param, i_param)
+            cil.SubstringNode(ret_local, self_str_local, l_param, i_param)
         )
-        self.instructions.append(cil.ReturnNode(ret_local))
+        self.instructions.append(
+            cil.ReturnNode(self.register_new("String", ret_local))
+        )
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("String", "substr"),
