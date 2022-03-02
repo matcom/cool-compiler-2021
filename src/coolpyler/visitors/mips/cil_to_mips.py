@@ -71,7 +71,7 @@ class CilToMIPS:
 
     def load_value_to_reg(self, reg, id: str):
         instructions = []
-        if id.isdigit():
+        if id.isnumeric():
             instructions.append(mips.LoadInmediateNode(reg, int(id), f"value is int"))
         elif id == "true" or id == "false":
             instructions.append(mips.LoadInmediateNode(reg, id, f"value is bool"))
@@ -81,7 +81,7 @@ class CilToMIPS:
                 mips.StoreWordNode(
                     reg,
                     mips.MemoryAddressRegisterNode(FP_REG, obj1_dir),
-                    f"Value is string",
+                    f"Value is direction",
                 )
             )
         return instructions
@@ -196,10 +196,24 @@ class CilToMIPS:
         reg2 = self.memory_manager.get_unused_register()
         reg3 = self.memory_manager.get_unused_register()
 
-        instructions.extend(self.load_value_to_reg(reg1, node.left))
-        instructions.extend(self.load_value_to_reg(reg2, node.right))
+        right_dir = self.search_mem(node.right)
+        left_dir = self.search_mem(node.left)
+
+        instructions.append(
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, right_dir))
+        )
+        instructions.append(
+            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, left_dir))
+        )
+
+        # instructions.extend(self.load_value_to_reg(reg1, node.left))
+        # instructions.extend(self.load_value_to_reg(reg2, node.right))
 
         instructions.append(mips.AddNode(reg3, reg1, reg2, f"Plus"))
+
+        # instructions.append(mips.LoadInmediateNode(V0_REG, 1, f"PRINT"))
+        # instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg3))
+        # instructions.append(mips.SyscallNode())
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
@@ -752,6 +766,10 @@ class CilToMIPS:
         instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
 
+        # instructions.append(mips.LoadInmediateNode(V0_REG, 1, f"PRINT"))
+        # instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
+        # instructions.append(mips.SyscallNode())
+
         dest_dir = self.search_mem(node.dest)
         instructions.append(
             mips.StoreWordNode(
@@ -786,6 +804,7 @@ class CilToMIPS:
                 f"Concat two Strings",
             )
         )
+
         instructions.append(mips.AddiNode(reg1, reg1, 1))
         instructions.append(mips.LoadInmediateNode(V0_REG, 9))
         instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
