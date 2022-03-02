@@ -1,5 +1,5 @@
 class Main inherits IO {
-    number: Int <- 5;
+    number: Int <- 6;
 
     main () : Object {
         testing_fibonacci(number)
@@ -7,11 +7,11 @@ class Main inherits IO {
 
     testing_fibonacci(n: Int) : IO {{
         out_string("Iterative Fibonacci : ");
-        out_int(iterative_fibonacci(5));
+        out_int(iterative_fibonacci(n));
         out_string("\\n");
 
         out_string("Recursive Fibonacci : ");
-        out_int(recursive_fibonacci(5));
+        out_int(recursive_fibonacci(n));
         out_string("\\n");
     }};
 

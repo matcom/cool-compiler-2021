@@ -1,14 +1,15 @@
 from compiler.cmp.grammar import G
 from compiler.lexer.lex import CoolLexer
 from compiler.parser.parser import LR1Parser, evaluate_reverse_parse
-from compiler.visitors.cool2cil.cil_formatter import PrintCILVisitor
+from compiler.visitors.cil2mips.cil2mips import CILToMIPSVisitor
+from compiler.visitors.cil2mips.mips_printer import MIPSPrintVisitor
 from compiler.visitors.cool2cil.cool2cil import COOLToCILVisitor
-from compiler.visitors.semantics_check.formatter import FormatVisitor
 from compiler.visitors.semantics_check.type_builder import TypeBuilder
 from compiler.visitors.semantics_check.type_checker import TypeChecker
 from compiler.visitors.semantics_check.type_collector import TypeCollector
 from compiler.visitors.semantics_check.type_inferencer import TypeInferencer
 from sys import exit
+import os
 
 
 def main(args):
@@ -83,8 +84,23 @@ def main(args):
     cil_visitor = COOLToCILVisitor(context)
     cil_ast = cil_visitor.visit(ast, scope)
 
-    # cil_formatter = PrintCILVisitor()
-    # print(cil_formatter.visit(cil_ast))
+    # CIL to MIPS
+    cil_to_mips = CILToMIPSVisitor()
+    mips_ast = cil_to_mips.visit(cil_ast)
+    printer = MIPSPrintVisitor()
+    mips_code = printer.visit(mips_ast)
+
+    # Output MIPS file
+    out_file = f"{args.file[:-3]}.mips"
+    lib_path = os.path.abspath(
+        os.path.join(__file__, "../compiler/visitors/cil2mips/mips_lib.asm")
+    )
+    with open(out_file, "w") as f:
+        f.write(mips_code)
+        with open(lib_path) as f2:
+            f.write("".join(f2.readlines()))
+
+    exit(0)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-# AST
 class Node:
     pass
 
@@ -44,17 +43,13 @@ class LocalNode(Node):
 
 
 class InstructionNode(Node):
-    def __init__(self):
-        self.leader = False
+    pass
 
 
 class AssignNode(InstructionNode):
     def __init__(self, dest, source):
         self.dest = dest
         self.source = source
-
-    def __repr__(self):
-        return f"{self.dest} = {self.source}"
 
 
 class ArithmeticNode(InstructionNode):
@@ -89,11 +84,10 @@ class LessNode(ArithmeticNode):
 
 
 class EqualNode(ArithmeticNode):
-    def __repr__(self):
-        return f"{self.dest} = {self.left} == {self.right}"
+    pass
 
 
-class EqualStrNode(ArithmeticNode):
+class EqualStrNode(EqualNode):
     pass
 
 
@@ -103,9 +97,6 @@ class GetAttribNode(InstructionNode):
         self.obj = obj
         self.attr = attr
         self.computed_type = computed_type
-
-    def __repr__(self):
-        return f"{self.dest} = GETATTR {self.obj} {self.attr}"
 
 
 class SetAttribNode(InstructionNode):
@@ -139,24 +130,15 @@ class TypeOfNode(InstructionNode):
         self.obj = obj
         self.dest = dest
 
-    def __repr__(self):
-        return f"{self.dest} = TYPEOF {self.obj}"
-
 
 class LabelNode(InstructionNode):
     def __init__(self, label):
         self.label = label
 
-    def __repr__(self):
-        return f"LABEL {self.label}:"
-
 
 class GotoNode(InstructionNode):
     def __init__(self, label):
         self.label = label
-
-    def __repr__(self):
-        return f"GOTO {self.label}"
 
 
 class GotoIfNode(InstructionNode):
@@ -164,17 +146,11 @@ class GotoIfNode(InstructionNode):
         self.condition = condition
         self.label = label
 
-    def __repr__(self):
-        return f"GOTO {self.label} if {self.condition}"
-
 
 class StaticCallNode(InstructionNode):
     def __init__(self, function, dest):
         self.function = function
         self.dest = dest
-
-    def __repr__(self):
-        return f"{self.dest} = CALL {self.function}"
 
 
 class DynamicCallNode(InstructionNode):
@@ -184,33 +160,21 @@ class DynamicCallNode(InstructionNode):
         self.dest = dest
         self.computed_type = computed_type
 
-    def __repr__(self):
-        return f"{self.dest} = VCALL {self.type} {self.method}"
-
 
 class ArgNode(InstructionNode):
     def __init__(self, name):
         self.name = name
-
-    def __repr__(self):
-        return f"ARG {self.name}"
 
 
 class ReturnNode(InstructionNode):
     def __init__(self, value=None):
         self.value = value
 
-    def __repr__(self):
-        return f"RETURN {self.value}"
-
 
 class LoadNode(InstructionNode):
     def __init__(self, dest, msg):
         self.dest = dest
         self.msg = msg
-
-    def __repr__(self):
-        return f"{self.dest} LOAD {self.msg}"
 
 
 class ExitNode(InstructionNode):
@@ -222,17 +186,11 @@ class TypeNameNode(InstructionNode):
         self.dest = dest
         self.source = source
 
-    def __repr__(self):
-        return f"{self.dest} = TYPENAME {self.source}"
-
 
 class NameNode(InstructionNode):
     def __init__(self, dest, name):
         self.dest = dest
         self.name = name
-
-    def __repr__(self):
-        return f"{self.dest} = NAME {self.name}"
 
 
 class CopyNode(InstructionNode):
@@ -277,9 +235,6 @@ class PrintStrNode(InstructionNode):
     def __init__(self, value):
         self.value = value
 
-    def __repr__(self):
-        return f"PRINTSTR {self.value}"
-
 
 class PrintIntNode(InstructionNode):
     def __init__(self, value):
@@ -299,6 +254,3 @@ class VoidNode(InstructionNode):
 class ErrorNode(InstructionNode):
     def __init__(self, data_node):
         self.data_node = data_node
-
-    def __repr__(self):
-        return f"ERROR {self.data_node}"
