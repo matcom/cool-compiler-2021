@@ -559,6 +559,7 @@
     LOCAL local_10;
 
     local_1 = CALL Cons___init;
+    local_new_cell = local_1;
     local_3 = TYPEOF local_new_cell;
     local_5 = LOAD data_11_eol;
     ARG local_5;
@@ -1094,6 +1095,7 @@
     ARG param_i;
     ARG param_self;
     local_6 = VCALL local_8 16;
+    local_0 = local_6;
     GOTO label_continue_0;
     LABEL label_else_0;
     local_17 = CALL Cons___init;
@@ -1135,6 +1137,7 @@
     ARG local_xcar;
     ARG local_18;
     local_16 = VCALL local_28 16;
+    local_0 = local_16;
     LABEL label_continue_0;
     RETURN local_0;
   }
@@ -1458,10 +1461,10 @@
     LOCAL local_7;
     LOCAL local_8;
     LOCAL local_9;
+    LOCAL local_10;
     LOCAL local_l;
-    LOCAL local_11;
+    LOCAL local_12;
     LOCAL local_tname_local;
-    LOCAL local_13;
     LOCAL local_14;
     LOCAL local_15;
     LOCAL local_16;
@@ -1473,51 +1476,56 @@
     LOCAL local_22;
     LOCAL local_23;
     LOCAL local_24;
+    LOCAL local_25;
 
     local_0 = CALL Nil___init;
     SETATTR param_self 0 local_0;
     local_2 = LOAD 0;
     ARG local_2;
     local_3 = CALL Int___init;
+    local_j = local_3;
     LABEL label_while_label_0;
     local_4 = GETATTR local_j 0;
     local_5 = GETATTR param_i 0;
     local_6 = local_5 - local_4
     ARG local_6;
     local_7 = CALL Bool___init;
-    IF local_7 GOTO label_loop_label_0;
+    local_8 = GETATTR local_7 0;
+    IF local_8 GOTO label_loop_label_0;
     GOTO label_pool_label_0;
     LABEL label_loop_label_0;
-    local_9 = CALL Cons___init;
+    local_10 = CALL Cons___init;
     local_l = GETATTR param_self 0;
-    local_11 = TYPEOF local_9;
-    local_13 = LOAD data_11_eol;
-    ARG local_13;
-    local_14 = CALL String___init;
-    local_15 = LOAD data_12_under;
-    ARG local_15;
-    local_16 = CALL String___init;
-    local_17 = LOAD data_14_meth;
-    ARG local_17;
-    local_18 = CALL String___init;
-    local_tname_local = VCALL local_11 1;
+    local_12 = TYPEOF local_10;
+    local_14 = LOAD data_11_eol;
+    ARG local_14;
+    local_15 = CALL String___init;
+    local_16 = LOAD data_12_under;
+    ARG local_16;
+    local_17 = CALL String___init;
+    local_18 = LOAD data_14_meth;
+    ARG local_18;
+    local_19 = CALL String___init;
+    local_tname_local = VCALL local_12 1;
     print(str, local_tname_local)
-    print(str, local_16)
-    print(str, local_18)
-    print(str, local_14)
-    ARG local_9;
+    print(str, local_17)
+    print(str, local_19)
+    print(str, local_15)
+    ARG local_10;
     ARG local_j;
     ARG local_l;
-    local_8 = VCALL local_11 16;
-    local_19 = GETATTR local_j 0;
-    local_20 = LOAD 1;
-    ARG local_20;
-    local_21 = CALL Int___init;
-    local_22 = GETATTR local_21 0;
-    local_23 = local_19 + local_22
+    local_9 = VCALL local_12 16;
+    local_l = local_9;
+    local_20 = GETATTR local_j 0;
+    local_21 = LOAD 1;
+    ARG local_21;
+    local_22 = CALL Int___init;
+    local_23 = GETATTR local_22 0;
+    local_24 = local_20 + local_23
+    local_j = local_24;
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
-    local_24 = CALL Void___init;
+    local_25 = CALL Void___init;
     RETURN local_l;
   }
 
