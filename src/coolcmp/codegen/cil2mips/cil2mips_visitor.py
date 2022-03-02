@@ -165,7 +165,6 @@ class CILToMipsVisitor:
     def visit(self, node: cil.SetAttrNode):
         t0 = registers.T[0]
         v0, fp = registers.V0, registers.FP
-
         # inst_address = self.get_address(node.instance)
         if node.value == 'void':
             load_value_inst = mips.LWNode(t0, 'void')
@@ -217,6 +216,7 @@ class CILToMipsVisitor:
             mips.LWNode(registers.T[0], (4, registers.FP)),
             mips.ADDUNode(registers.A0, registers.T[0], 4),
             mips.LINode(registers.V0, 4),
+            mips.LWNode(registers.A0, (0, registers.A0)),
             mips.SysCallNode(),
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
