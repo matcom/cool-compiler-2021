@@ -253,7 +253,7 @@ class CoolToCilVisitor(object):
             cil.PlusNode(concat_len_local, self_len_local, other_len_local)
         )
         self.instructions.append(
-            cil.ConcatNode(concat_local, self_param, other_param, concat_len_local)
+            cil.ConcatNode(concat_local, self_str_local, other_str_local, concat_len_local)
         )
         self.instructions.append(
             cil.ReturnNode(self.register_new("String", concat_local))
