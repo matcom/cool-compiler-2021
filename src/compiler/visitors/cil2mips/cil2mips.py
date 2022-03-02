@@ -1,14 +1,49 @@
-from compiler.cmp import mips_ast as mips
-from compiler.cmp.cil_ast import *
-from compiler.visitors import visitor
-
-
-def flatten(iterable):
-    for item in iterable:
-        try:
-            yield from flatten(item)
-        except TypeError:
-            yield item
+from ...cmp import mips_ast as mips
+from ...cmp.cil_ast import (
+    AllocateNode,
+    ArgNode,
+    ArithmeticNode,
+    AssignNode,
+    ComplementNode,
+    ConcatNode,
+    CopyNode,
+    DataNode,
+    DivNode,
+    DynamicCallNode,
+    EqualNode,
+    EqualStrNode,
+    ErrorNode,
+    ExitNode,
+    FunctionNode,
+    GetAttribNode,
+    GotoIfNode,
+    GotoNode,
+    LabelNode,
+    LengthNode,
+    LeqNode,
+    LessNode,
+    LoadNode,
+    MinusNode,
+    NameNode,
+    PlusNode,
+    PrintIntNode,
+    PrintStrNode,
+    ProgramNode,
+    ReadIntNode,
+    ReadStrNode,
+    ReturnNode,
+    SetAttribNode,
+    StarNode,
+    StaticCallNode,
+    SubstringNode,
+    TypeNameNode,
+    TypeNode,
+    TypeOfNode,
+    VoidNode,
+)
+from ...visitors import visitor
+from .utils import flatten
+from typing import Optional
 
 
 class FunctionCollectorVisitor:
@@ -25,12 +60,12 @@ class FunctionCollectorVisitor:
         pass
 
     @visitor.when(ProgramNode)
-    def collect(self, node):
+    def collect(self, node: ProgramNode):
         for func in node.dotcode:
             self.collect(func)
 
     @visitor.when(FunctionNode)
-    def collect(self, node):
+    def collect(self, node: FunctionNode):
         if node.name == "entry":
             self.functions[node.name] = "main"
         else:
@@ -42,7 +77,7 @@ class BaseCILToMIPSVisitor:
         self.data = {}
         self.text = {}
         self.types = {}
-        self.current_function: mips.FunctionNode = None
+        self.current_function: Optional[mips.FunctionNode] = None
         self.pushed_args = 0
         self.label_count = 0
         self.type_count = 0
@@ -167,14 +202,14 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
                 new_label = self.make_function_label()
                 self.function_labels[inst.label] = new_label
 
-        # Conventions of Init intructions of the calle function
+        # Conventions of Init intructions of the callee function
         init_callee = self.make_callee_init_instructions(function_node)
 
         # Body instructions
         self.current_function = function_node
         body = [self.visit(instruction) for instruction in node.instructions]
 
-        # Conventions of Final calle instrucctions
+        # Conventions of Final callee instructions
         final_callee = self.make_callee_final_instructions(function_node)
 
         total_instructions = list(flatten(init_callee + body + final_callee))
@@ -185,7 +220,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node: AssignNode):
         instructions = []
 
-        if type(node.source) == VoidNode:
+        if isinstance(node.source, VoidNode):
             instructions.append(
                 mips.StoreWordNode(mips.ZERO, self.get_var_location(node.dest))
             )
@@ -205,172 +240,52 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         return instructions
 
     @visitor.when(PlusNode)
-    def visit(self, node):
-        instructions = []
-
-        if type(node.left) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T0, node.left))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T0, self.get_var_location(node.left))
-            )
-
-        if type(node.right) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T1, node.right))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T1, self.get_var_location(node.right))
-            )
-
-        instructions.append(mips.AddNode(mips.T2, mips.T0, mips.T1))
-        instructions.append(
-            mips.StoreWordNode(mips.T2, self.get_var_location(node.dest))
-        )
-
-        return instructions
+    def visit(self, node: PlusNode):
+        instructions = [mips.AddNode(mips.T2, mips.T0, mips.T1)]
+        return self.numeric_operation(node, instructions)
 
     @visitor.when(MinusNode)
-    def visit(self, node):
-        instructions = []
-
-        if type(node.left) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T0, node.left))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T0, self.get_var_location(node.left))
-            )
-
-        if type(node.right) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T1, node.right))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T1, self.get_var_location(node.right))
-            )
-
-        instructions.append(mips.SubNode(mips.T2, mips.T0, mips.T1))
-        instructions.append(
-            mips.StoreWordNode(mips.T2, self.get_var_location(node.dest))
-        )
-
-        return instructions
+    def visit(self, node: MinusNode):
+        instructions = [mips.SubNode(mips.T2, mips.T0, mips.T1)]
+        return self.numeric_operation(node, instructions)
 
     @visitor.when(StarNode)
-    def visit(self, node):
-        instructions = []
-
-        if type(node.left) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T0, node.left))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T0, self.get_var_location(node.left))
-            )
-
-        if type(node.right) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T1, node.right))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T1, self.get_var_location(node.right))
-            )
-
-        instructions.append(mips.MultiplyNode(mips.T2, mips.T0, mips.T1))
-        instructions.append(
-            mips.StoreWordNode(mips.T2, self.get_var_location(node.dest))
-        )
-
-        return instructions
+    def visit(self, node: StarNode):
+        instructions = [mips.MultiplyNode(mips.T2, mips.T0, mips.T1)]
+        return self.numeric_operation(node, instructions)
 
     @visitor.when(DivNode)
-    def visit(self, node):
-        instructions = []
-
-        if type(node.left) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T0, node.left))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T0, self.get_var_location(node.left))
-            )
-
-        if type(node.right) == int:
-            instructions.append(mips.LoadInmediateNode(mips.T1, node.right))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.T1, self.get_var_location(node.right))
-            )
-
-        instructions.append(mips.DivideNode(mips.T0, mips.T1))
-        instructions.append(mips.MoveFromLowNode(mips.T2))
-        instructions.append(
-            mips.StoreWordNode(mips.T2, self.get_var_location(node.dest))
-        )
-
-        return instructions
+    def visit(self, node: DivNode):
+        instructions = [
+            mips.DivideNode(mips.T0, mips.T1),
+            mips.MoveFromLowNode(mips.T2),
+        ]
+        return self.numeric_operation(node, instructions)
 
     @visitor.when(LeqNode)
-    def visit(self, node):
-        instructions = []
-
-        if type(node.left) == int:
-            instructions.append(mips.LoadInmediateNode(mips.A0, node.left))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.A0, self.get_var_location(node.left))
-            )
-
-        if type(node.right) == int:
-            instructions.append(mips.LoadInmediateNode(mips.A1, node.right))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.A1, self.get_var_location(node.right))
-            )
-
-        instructions.append(mips.JumpAndLinkNode("less_equal"))
-        instructions.append(
-            mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
-        )
-
-        return instructions
+    def visit(self, node: LeqNode):
+        return self.boolean_operation(node, "less_equal")
 
     @visitor.when(LessNode)
-    def visit(self, node):
-        instructions = []
-
-        if type(node.left) == int:
-            instructions.append(mips.LoadInmediateNode(mips.A0, node.left))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.A0, self.get_var_location(node.left))
-            )
-
-        if type(node.right) == int:
-            instructions.append(mips.LoadInmediateNode(mips.A1, node.rigth))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.A1, self.get_var_location(node.right))
-            )
-
-        instructions.append(mips.JumpAndLinkNode("less"))
-        instructions.append(
-            mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
-        )
-
-        return instructions
+    def visit(self, node: LessNode):
+        return self.boolean_operation(node, "less")
 
     @visitor.when(EqualNode)
-    def visit(self, node):
+    def visit(self, node: EqualNode):
         instructions = []
 
-        if type(node.left) == int:
+        if isinstance(node.left, int):
             instructions.append(mips.LoadInmediateNode(mips.A0, node.left))
-        elif type(node.left) == VoidNode:
+        elif isinstance(node.left, VoidNode):
             instructions.append(mips.LoadInmediateNode(mips.A0, 0))
         else:
             instructions.append(
                 mips.LoadWordNode(mips.A0, self.get_var_location(node.left))
             )
 
-        if type(node.right) == int:
+        if isinstance(node.right, int):
             instructions.append(mips.LoadInmediateNode(mips.A1, node.right))
-        elif type(node.right) == VoidNode:
+        elif isinstance(node.right, VoidNode):
             instructions.append(mips.LoadInmediateNode(mips.A1, 0))
         else:
             instructions.append(
@@ -386,7 +301,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         return instructions
 
     @visitor.when(EqualStrNode)
-    def visit(self, node):
+    def visit(self, node: EqualStrNode):
         instructions = []
 
         instructions.append(
@@ -402,10 +317,10 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         return instructions
 
     @visitor.when(ComplementNode)
-    def visit(self, node):
+    def visit(self, node: ComplementNode):
         instructions = []
 
-        if type(node.obj) == int:
+        if isinstance(node.obj, int):
             instructions.append(mips.LoadInmediateNode(mips.T0, node.obj))
         else:
             instructions.append(
@@ -491,7 +406,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         return instructions
 
     @visitor.when(NameNode)
-    def visit(self, node):
+    def visit(self, node: NameNode):
         instructions = []
 
         instructions.append(mips.LoadAddressNode(mips.A0, mips.TYPE_LIST))
@@ -568,7 +483,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node: ArgNode):
         self.pushed_args += 1
         instructions = []
-        if type(node.name) == int:
+        if isinstance(node.name, int):
             instructions.append(mips.LoadInmediateNode(mips.A0, node.name))
             instructions.extend(mips.push_to_stack(mips.A0))
         else:
@@ -580,7 +495,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         return instructions
 
     @visitor.when(ReturnNode)
-    def visit(self, node):
+    def visit(self, node: ReturnNode):
         instructions = []
         if node.value is None:
             instructions.append(mips.LoadInmediateNode(mips.V0, 0))
@@ -608,107 +523,66 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         return instructions
 
     @visitor.when(LengthNode)
-    def visit(self, node):
+    def visit(self, node: LengthNode):
         instructions = []
-
         instructions.append(
             mips.LoadWordNode(mips.A0, self.get_var_location(node.source))
         )
-
         instructions.append(mips.JumpAndLinkNode("len"))
-
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
-
         return instructions
 
     @visitor.when(ConcatNode)
-    def visit(self, node):
+    def visit(self, node: ConcatNode):
         instructions = []
-
         instructions.append(
             mips.LoadWordNode(mips.A0, self.get_var_location(node.prefix))
         )
-
         instructions.append(
             mips.LoadWordNode(mips.A1, self.get_var_location(node.suffix))
         )
-
         instructions.append(
             mips.LoadWordNode(mips.A2, self.get_var_location(node.length))
         )
-
         instructions.append(mips.JumpAndLinkNode("concat"))
-
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
-
         return instructions
 
     @visitor.when(SubstringNode)
-    def visit(self, node):
-        instructions = []
-
-        instructions.append(
+    def visit(self, node: SubstringNode):
+        instructions = [
             mips.LoadWordNode(mips.A0, self.get_var_location(node.str_value))
-        )
-
-        if type(node.index) == int:
-            instructions.append(mips.LoadInmediateNode(mips.A1, node.index))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.A1, self.get_var_location(node.index))
+        ]
+        instructions.extend(
+            self.jump_and_link_node_instructions(
+                node.index, node.length, node.dest, "substr", mips.A1, mips.A2, mips.V0
             )
-
-        if type(node.length) == int:
-            instructions.append(mips.LoadInmediateNode(mips.A2, node.length))
-        else:
-            instructions.append(
-                mips.LoadWordNode(mips.A2, self.get_var_location(node.length))
-            )
-
-        instructions.append(mips.JumpAndLinkNode("substr"))
-        instructions.append(
-            mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
         return instructions
 
     @visitor.when(ReadStrNode)
-    def visit(self, node):
+    def visit(self, node: ReadStrNode):
         instructions = []
         instructions.append(mips.JumpAndLinkNode("read_str"))
-
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
-
         return instructions
 
     @visitor.when(PrintIntNode)
-    def visit(self, node):
-        instructions = []
-        instructions.append(mips.LoadInmediateNode(mips.V0, 1))
-        instructions.append(
-            mips.LoadWordNode(mips.A0, self.get_var_location(node.value))
-        )
-        instructions.append(mips.SyscallNode())
-
-        return instructions
+    def visit(self, node: PrintIntNode):
+        return self.print_instructions(node, 1)
 
     @visitor.when(PrintStrNode)
-    def visit(self, node):
-        instructions = []
-        instructions.append(mips.LoadInmediateNode(mips.V0, 4))
-        instructions.append(
-            mips.LoadWordNode(mips.A0, self.get_var_location(node.value))
-        )
-        instructions.append(mips.SyscallNode())
-        return instructions
+    def visit(self, node: PrintStrNode):
+        return self.print_instructions(node, 4)
 
     @visitor.when(ErrorNode)
-    def visit(self, node):
+    def visit(self, node: ErrorNode):
         instructions = []
 
         mips_label = self.data[node.data_node.name].label
@@ -724,45 +598,39 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     @visitor.when(TypeNameNode)
     def visit(self, node: TypeNameNode):
         instructions = []
-
         instructions.append(
             mips.LoadWordNode(mips.A0, self.get_var_location(node.source))
         )
         instructions.append(
             mips.LoadWordNode(mips.A0, mips.RegisterRelativeLocation(mips.A0, 0))
         )
-
         instructions.append(mips.ShiftLeftLogicalNode(mips.A0, mips.A0, 2))
         instructions.append(mips.LoadAddressNode(mips.A1, mips.TYPE_LIST))
         instructions.append(mips.AddUnsignedNode(mips.A0, mips.A0, mips.A1))
         instructions.append(
             mips.LoadWordNode(mips.A0, mips.RegisterRelativeLocation(mips.A0, 0))
         )
-
         instructions.append(
             mips.StoreWordNode(mips.A0, self.get_var_location(node.dest))
         )
-
         return instructions
 
     @visitor.when(ExitNode)
-    def visit(self, node):
+    def visit(self, node: ExitNode):
         instructions = []
         instructions.append(mips.LoadInmediateNode(mips.V0, 10))
         instructions.append(mips.SyscallNode())
-
         return instructions
 
     @visitor.when(GetAttribNode)
     def visit(self, node: GetAttribNode):
-
         instructions = []
 
-        dest = node.dest if type(node.dest) == str else node.dest.name
-        obj = node.obj if type(node.obj) == str else node.obj.name
+        dest = node.dest if isinstance(node.dest, str) else node.dest.name
+        obj = node.obj if isinstance(node.obj, str) else node.obj.name
         comp_type = (
             node.computed_type
-            if type(node.computed_type) == str
+            if isinstance(node.computed_type, str)
             else node.computed_type.name
         )
 
@@ -770,33 +638,30 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         tp = self.types[comp_type]
         offset = (tp.attributes.index(node.attr) + 1) * 4
+
         instructions.append(
             mips.LoadWordNode(mips.A1, mips.RegisterRelativeLocation(mips.A0, offset))
         )
-
         instructions.append(mips.StoreWordNode(mips.A1, self.get_var_location(dest)))
-
         return instructions
 
     @visitor.when(SetAttribNode)
     def visit(self, node: SetAttribNode):
-
         instructions = []
 
-        obj = node.obj if type(node.obj) == str else node.obj.name
+        obj = node.obj if isinstance(node.obj, str) else node.obj.name
         comp_type = (
             node.computed_type
-            if type(node.computed_type) == str
+            if isinstance(node.computed_type, str)
             else node.computed_type.name
         )
 
         tp = self.types[comp_type]
-        # offset = 4 + tp.attributes.index(node.attr) * 4
         offset = (tp.attributes.index(node.attr) + 1) * 4
 
         instructions.append(mips.LoadWordNode(mips.A0, self.get_var_location(obj)))
 
-        if type(node.value) == int:
+        if isinstance(node.value, int):
             instructions.append(mips.LoadInmediateNode(mips.A1, node.value))
         elif isinstance(node.value, VoidNode):
             instructions.append(mips.LoadInmediateNode(mips.A1, 0))
@@ -808,19 +673,16 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         instructions.append(
             mips.StoreWordNode(mips.A1, mips.RegisterRelativeLocation(mips.A0, offset))
         )
-
         return instructions
 
     @visitor.when(CopyNode)
-    def visit(self, node):
+    def visit(self, node: CopyNode):
         instructions = []
         # reg1 T0 reg2 A3
         instructions.extend(mips.push_to_stack(mips.T0))
-
         instructions.append(
             mips.LoadWordNode(mips.T0, self.get_var_location(node.source))
         )
-
         instructions.append(
             mips.LoadWordNode(mips.A0, mips.RegisterRelativeLocation(mips.T0, 4))
         )
@@ -830,16 +692,14 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         instructions.append(mips.MoveNode(mips.A0, mips.T0))
         instructions.append(mips.MoveNode(mips.A1, mips.V0))
         instructions.append(mips.JumpAndLinkNode("copy"))
-
         instructions.extend(mips.pop_from_stack(mips.T0))
-
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
         return instructions
 
     @visitor.when(GotoIfNode)
-    def visit(self, node):
+    def visit(self, node: GotoIfNode):
         instructions = []
 
         local_label = self.function_labels[node.label]
@@ -847,24 +707,68 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         instructions.append(
             mips.LoadWordNode(mips.A0, self.get_var_location(node.condition))
         )
-
         instructions.append(mips.BranchOnNotEqualNode(mips.A0, mips.ZERO, local_label))
-
         return instructions
 
     @visitor.when(GotoNode)
-    def visit(self, node):
+    def visit(self, node: GotoNode):
         local_label = self.function_labels[node.label]
         return [mips.JumpNode(local_label)]
 
     @visitor.when(ReadIntNode)
-    def visit(self, node):
+    def visit(self, node: ReadIntNode):
         instructions = []
-
         instructions.append(mips.LoadInmediateNode(mips.V0, 5))
         instructions.append(mips.SyscallNode())
         instructions.append(
             mips.StoreWordNode(mips.V0, self.get_var_location(node.dest))
         )
+        return instructions
 
+    def add_node_instruction(self, node, register: mips.Register):
+        if isinstance(node, int):
+            return mips.LoadInmediateNode(register, node)
+        else:
+            return mips.LoadWordNode(register, self.get_var_location(node))
+
+    def numeric_operation(self, node, instructions):
+        return self.generate_instructions(
+            node.left, node.right, node.dest, instructions, mips.T0, mips.T1, mips.T2
+        )
+
+    def boolean_operation(self, node, op: str):
+        return self.jump_and_link_node_instructions(
+            node.left, node.right, node.dest, op, mips.A0, mips.A1, mips.V0
+        )
+
+    def jump_and_link_node_instructions(self, node0, node1, dest, op, reg0, reg1, reg2):
+        instructions = [mips.JumpAndLinkNode(op)]
+        return self.generate_instructions(
+            node0, node1, dest, instructions, reg0, reg1, reg2
+        )
+
+    def generate_instructions(
+        self,
+        node0,
+        node1,
+        dest,
+        specific_instructions,
+        reg0: mips.Register,
+        reg1: mips.Register,
+        reg2: mips.Register,
+    ):
+        instructions = []
+        instructions.append(self.add_node_instruction(node0, reg0))
+        instructions.append(self.add_node_instruction(node1, reg1))
+        instructions.extend(specific_instructions)
+        instructions.append(mips.StoreWordNode(reg2, self.get_var_location(dest)))
+        return instructions
+
+    def print_instructions(self, node, n):
+        instructions = []
+        instructions.append(mips.LoadInmediateNode(mips.V0, n))
+        instructions.append(
+            mips.LoadWordNode(mips.A0, self.get_var_location(node.value))
+        )
+        instructions.append(mips.SyscallNode())
         return instructions

@@ -1,20 +1,14 @@
 from compiler.cmp.grammar import G
 from compiler.lexer.lex import CoolLexer
 from compiler.parser.parser import LR1Parser, evaluate_reverse_parse
-from compiler.visitors.cool2cil.cil_formatter import PrintCILVisitor
+from compiler.visitors.cil2mips.cil2mips import CILToMIPSVisitor
+from compiler.visitors.cil2mips.mips_printer import MIPSPrintVisitor
 from compiler.visitors.cool2cil.cool2cil import COOLToCILVisitor
-from compiler.visitors.semantics_check.formatter import FormatVisitor
 from compiler.visitors.semantics_check.type_builder import TypeBuilder
 from compiler.visitors.semantics_check.type_checker import TypeChecker
 from compiler.visitors.semantics_check.type_collector import TypeCollector
 from compiler.visitors.semantics_check.type_inferencer import TypeInferencer
 from sys import exit
-
-# from compiler.visitors.cool2cil import COOLToCILVisitor
-from compiler.visitors.cool2cil import COOLToCILVisitor
-from compiler.visitors.cil_formatter import PrintCILVisitor
-from compiler.visitors.cil2mips import CILToMIPSVisitor
-from compiler.visitors.mips_printer import MIPSPrintVisitor
 import os
 
 
@@ -70,38 +64,36 @@ def main(args):
     if checker.errors:
         exit(1)
 
-    # # Inferencing Autotype
-    # inferencer = TypeInferencer(context, manager)
-    # inferencer.visit(ast, scope)
-    # for e in inferencer.errors:
-    #     print(f"{pos} - {type(e).__name__}: {str(e)}")
-    # if inferencer.errors:
-    #     exit(1)
+    # Inferencing Autotype
+    inferencer = TypeInferencer(context, manager)
+    inferencer.visit(ast, scope)
+    for e in inferencer.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if inferencer.errors:
+        exit(1)
 
-    # # Last check without autotypes
-    # checker = TypeChecker(context, manager)
-    # checker.visit(ast)
-    # for (e, pos) in checker.errors:
-    #     print(f"{pos} - {type(e).__name__}: {str(e)}")
-    # if checker.errors:
-    #     exit(1)
+    # Last check without autotypes
+    checker = TypeChecker(context, manager)
+    checker.visit(ast)
+    for (e, pos) in checker.errors:
+        print(f"{pos} - {type(e).__name__}: {str(e)}")
+    if checker.errors:
+        exit(1)
 
     # COOL to CIL
     cil_visitor = COOLToCILVisitor(context)
     cil_ast = cil_visitor.visit(ast, scope)
 
+    # CIL to MIPS
     cil_to_mips = CILToMIPSVisitor()
     mips_ast = cil_to_mips.visit(cil_ast)
     printer = MIPSPrintVisitor()
     mips_code = printer.visit(mips_ast)
 
-    out_file = args.file.split(".")
-    out_file[-1] = "mips"
-    out_file = ".".join(out_file)
+    # Output MIPS file
     out_file = f"{args.file[:-3]}.mips"
-
     lib_path = os.path.abspath(
-        os.path.join(__file__, "../compiler/visitors/mips_lib.asm")
+        os.path.join(__file__, "../compiler/visitors/cil2mips/mips_lib.asm")
     )
     with open(out_file, "w") as f:
         f.write(mips_code)
