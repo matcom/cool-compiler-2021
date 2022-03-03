@@ -119,7 +119,7 @@ class StringNode(DataNode):
         self.value = value
 
     def __str__(self):
-        return f"{self.label}: .asciiz {repr(self.value)[1:-1]}"
+        return f"{self.label}: .asciiz {self.value}"
 
 
 class SWNode(InstructionNode):
