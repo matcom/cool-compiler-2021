@@ -250,9 +250,9 @@ def t_start_comment(t):
 
 
 # A comment start with " (* "
-def t_COMMENT_start(t):
-    r"\(\*"
-    t.lexer.comment_count += 1
+# def t_COMMENT_start(t):
+#     r"\(\*"
+#     t.lexer.comment_count += 1
 
 
 # A comment can has as many lines as it wants.. until the end comment " *) "
@@ -264,13 +264,13 @@ def t_COMMENT_newline(t):
 # A comment finish with " *) "
 def t_COMMENT_end(t):
     r"\*\)"
-    if t.lexer.comment_count == 0:
-        t.lexer.pop_state()
-        t.value = t.lexer.string_buffer
-        t.type = "COMMENT"
+    # if t.lexer.comment_count == 0:
+    t.lexer.pop_state()
+    t.value = t.lexer.string_buffer
+    t.type = "COMMENT"
         # return t
-    else:
-        t.lexer.comment_count -= 1
+    # else:
+    #     t.lexer.comment_count -= 1
 
 
 # any caracter in a COMMENT
