@@ -1227,12 +1227,17 @@ class CCILToMIPSGenerator:
                 node,
                 attr_total,
                 mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, DOUBLE_WORD), object_type
+                    node, mips_ast.Constant(node, 3 * WORD), object_type
                 ),
             )
         )
         instructions.append(
             mips_ast.Addi(node, attr_total, attr_total, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Multiply(
+                node, attr_total, attr_total, mips_ast.Constant(node, WORD)
+            )
         )
         instructions.append(
             mips_ast.Move(node, mips_ast.RegisterNode(node, A0), attr_total)
@@ -1273,13 +1278,15 @@ class CCILToMIPSGenerator:
             )
         )
         instructions.append(
-            mips_ast.Addi(node, object, object, mips_ast.Constant(node, 1))
+            mips_ast.Addi(node, object, object, mips_ast.Constant(node, WORD))
         )
         instructions.append(
-            mips_ast.Addi(node, object_copy, object_copy, mips_ast.Constant(node, 1))
+            mips_ast.Addi(node, object_copy, object_copy, mips_ast.Constant(node, WORD))
         )
         instructions.append(
-            mips_ast.Addi(node, attr_total, attr_total, mips_ast.Constant(node, -1))
+            mips_ast.Addi(
+                node, attr_total, attr_total, mips_ast.Constant(node, -1 * WORD)
+            )
         )
         instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop)))
 
@@ -1287,7 +1294,7 @@ class CCILToMIPSGenerator:
 
         instructions.append(
             mips_ast.StoreWord(
-                node, object_copy, self._get_relative_location(node.dest)
+                node, mips_ast.RegisterNode(node, V0), self._get_relative_location(node.dest)
             )
         )
         return instructions
@@ -1497,7 +1504,9 @@ class CCILToMIPSGenerator:
                 mips_ast.LoadWord(
                     node,
                     left_value,
-                    mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, WORD), reg_left),
+                    mips_ast.MemoryIndexNode(
+                        node, mips_ast.Constant(node, WORD), reg_left
+                    ),
                 )
             )
         elif isinstance(node.left, ccil_ast.ConstantNode):
