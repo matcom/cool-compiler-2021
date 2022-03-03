@@ -1,4 +1,5 @@
-.PHONY: clean
+.DEFAULT_GOAL := info
+.PHONY: clean, info, main, test
 
 CODE := code.cl
 FILE_NAME := $(shell echo $(CODE) | cut -d '.' -f 1)
@@ -19,3 +20,5 @@ install:
 	@python -m pip install -r ../requirements.txt
 	@sudo apt-get install spim
 
+info:
+	@echo "Cool Compiler 2021 - CodersUP"
