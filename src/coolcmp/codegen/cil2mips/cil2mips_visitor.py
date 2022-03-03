@@ -365,20 +365,36 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
-        if isinstance(node.value, int):
-            self.add_inst(mips.LINode(registers.V0, node.value))
-        elif node.value is None:
-            pass
-            # self.visit(node.value)
-            # address = self.cur_function.variable_address(node.value)
-            # self.add_inst(mips.LWNode(registers.V0, (address, registers.FP)))
+        v0, fp = registers.V0, registers.FP
+
+        if node.value is not None:
+            if isinstance(node.value, int):
+                load_to_v0 = mips.LINode(v0, node.value)
+            else:
+                dest_offset = self.get_address(node.value)
+                load_to_v0 = mips.LWNode(v0, (dest_offset, fp))
+
+            self.add_inst(
+                mips.CommentNode(f"<return:{node.value}>"),
+                load_to_v0,
+                mips.CommentNode(f"</return:{node.value}>"),
+            )
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
         # if isinstance(node.dest, int):
         #     self.add_inst(mips.LINode(registers.T[0], node.dest))
+        dest_offset = self.get_address('result')
+        src_offset = self.get_address('value')
+        index_offset = self.get_address('index_value')
+        length_offset = self.get_address('length_value')
+
         self.add_inst(
             mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]"),
+            mips.LWNode(registers.ARG[0], (src_offset, registers.FP)),
+            mips.LWNode(registers.ARG[1], (length_offset, registers.FP)),
+            mips.LWNode(registers.ARG[2], (index_offset, registers.FP)),
+            mips.JALNode('substr'),
+            mips.SWNode(registers.V0, dest_offset, registers.FP),
             mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]")
         )
-        pass
