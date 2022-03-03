@@ -29,6 +29,7 @@ from asts.parser_ast import (
     StringNode,
     VarDeclarationNode,
     VariableNode,
+    ParamNode,
 )
 from parsing.errors import SyntacticError
 
