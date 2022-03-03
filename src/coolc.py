@@ -61,8 +61,8 @@ def main(cool_code: str, run: bool, verbose: bool):
         examinable_file = '__debug_code.mips'
         with open(examinable_file, 'w', encoding='utf8') as f:
             f.write(mips_str)
-        print("Mips code:")
-        print(mips_str)
+        # print("Mips code:")
+        # print(mips_str)
 
     if run:
         executable_name = '__temp_code.mips'

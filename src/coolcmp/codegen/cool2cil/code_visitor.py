@@ -178,11 +178,9 @@ class DotCodeVisitor:
                     cil.ParamNode('self'),
                 ],
                 local_vars=[
-                    cil.LocalNode('value'),
                     cil.LocalNode('_length'),
                 ],
                 instructions=[
-                    cil.GetAttrNode('value', 'self', 'String_value'),
                     cil.LengthNode('_length', 'value'),
                     cil.ReturnNode('_length'),
                 ]
@@ -194,14 +192,10 @@ class DotCodeVisitor:
                     cil.ParamNode('other_str'),
                 ],
                 local_vars=[
-                    cil.LocalNode('value'),
-                    cil.LocalNode('other_value'),
                     cil.LocalNode('result'),
                 ],
                 instructions=[
-                    cil.GetAttrNode('value', 'self', 'String_value'),
-                    cil.GetAttrNode('other_value', 'other_str', 'String_value'),
-                    cil.ConcatNode('result', 'value', 'other_value'),
+                    cil.ConcatNode('result', 'self', 'other_str'),
                     cil.ReturnNode('result'),
                 ]
             ),
@@ -213,15 +207,9 @@ class DotCodeVisitor:
                     cil.ParamNode('length'),
                 ],
                 local_vars=[
-                    cil.LocalNode('value'),
-                    cil.LocalNode('index_value'),
-                    cil.LocalNode('length_value'),
                     cil.LocalNode('result'),
                 ],
                 instructions=[
-                    cil.GetAttrNode('value', 'self', 'String_value'),
-                    cil.GetAttrNode('index_value', 'index', 'Int_value'),
-                    cil.GetAttrNode('length_value', 'length', 'Int_value'),
                     cil.SubstringNode('result', 'value', 'index_value', 'length_value'),
                     cil.ReturnNode('result'),
                 ]

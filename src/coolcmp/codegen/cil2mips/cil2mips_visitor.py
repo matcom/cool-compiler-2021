@@ -254,13 +254,13 @@ class CILToMipsVisitor:
         dest_address = self.get_address(node.dest)
 
         self.add_inst(
-            mips.CommentNode(f"<dynamiccall:{node.obj}>"),
+            mips.CommentNode(f"<dynamiccall:{node.obj}-{node.method}-{node.dest}>"),
             mips.LWNode(t0, (obj_address, fp)),     # get instance pointer
             mips.LWNode(t0, (0, t0)),               # get instance type pointer at offset 0
             mips.LWNode(t0, (meth_offset, t0)),     # get method
             mips.JALRNode(t0),
             mips.SWNode(v0, dest_address, fp),
-            mips.CommentNode(f"</dynamiccall:{node.obj}>"),
+            mips.CommentNode(f"</dynamiccall:{node.obj}-{node.method}-{node.dest}>"),
         )
 
     @visitor.when(cil.ArgNode)
@@ -397,4 +397,26 @@ class CILToMipsVisitor:
             mips.JALNode('substr'),
             mips.SWNode(registers.V0, dest_offset, registers.FP),
             mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]")
+        )
+
+    @visitor.when(cil.TypeNameNode)
+    def visit(self, node: cil.TypeNameNode):
+        t0, t1, fp, v0 = registers.T[0], registers.T[1], registers.FP, registers.V0
+
+        type_ = self.types['Object']
+        src_offset = self.get_address(node.src)
+        dest_offset = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
+        )
+
+        self.visit(cil.AllocateNode('String', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t0, (src_offset, fp)),
+            mips.LWNode(t0, (type_.name_offset, t0)),
+            mips.LWNode(t1, (dest_offset, fp)),
+            mips.SWNode(t0, 4, t1),
+            mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
         )

@@ -28,11 +28,14 @@ class Type:
         self.index = index
         self.init = init
 
-    def get_attr_index(self, name):
-        print(self.label, '--->', self.attrs)
+    def get_attr_index(self, name: str) -> int:
         return self.attrs.index(name) + 1
 
-    def length(self):
+    @property
+    def name_offset(self) -> int:
+        return (self.total_methods + 1) * 4
+
+    def length(self) -> int:
         return len(self.attrs)
 
     def __str__(self):
