@@ -881,12 +881,18 @@ class CCILGenerator:
 
         attributes = [Attribute("value", INT, "value")]
         int_class = Class(
-            INT, attributes, [], self.define_builtin_init_func(INT, attributes)
+            INT,
+            attributes,
+            object_class.methods,
+            self.define_builtin_init_func(INT, attributes),
         )
 
         attributes = [Attribute("value", BOOL, "value")]
         bool_class = Class(
-            BOOL, attributes, [], self.define_builtin_init_func(BOOL, attributes)
+            BOOL,
+            attributes,
+            object_class.methods,
+            self.define_builtin_init_func(BOOL, attributes),
         )
 
         return [object_class, io_class, string_class, int_class, bool_class], [
