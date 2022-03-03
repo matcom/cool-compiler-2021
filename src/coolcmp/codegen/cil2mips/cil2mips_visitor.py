@@ -204,23 +204,16 @@ class CILToMipsVisitor:
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
         print(f"PrintIntNode {node.addr}")
+        t0 = registers.T[0]
+        a0, v0, fp = registers.ARG[0], registers.V0, registers.FP
+        address = self.get_address(node.addr)
+
         self.add_inst(
             mips.CommentNode(f"<printint:{node.addr}>"),
+            mips.LWNode(t0, (address, fp)),
+            mips.ADDUNode(a0, t0, 4),
             mips.LINode(registers.V0, 1),
-        )
-
-        if isinstance(node.addr, int):
-            self.add_inst(
-                mips.LINode(registers.ARG[0], node.addr),
-                mips.SysCallNode(),
-                mips.CommentNode(f"</printint:{node.addr}>"),
-            )
-            return
-
-        address = self.cur_function.variable_address(node.addr)
-
-        self.add_inst(
-            mips.LWNode(registers.ARG[0], (address, registers.FP)),
+            mips.LWNode(a0, (0, a0)),
             mips.SysCallNode(),
             mips.CommentNode(f"</printint:{node.addr}>"),
         )
@@ -234,7 +227,7 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<printstring:{node.addr}>"),
-            mips.LWNode(registers.T[0], (4, registers.FP)),
+            mips.LWNode(registers.T[0], (address, registers.FP)),
             mips.ADDUNode(registers.A0, registers.T[0], 4),
             mips.LINode(registers.V0, 4),
             mips.LWNode(registers.A0, (0, registers.A0)),
