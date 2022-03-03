@@ -168,6 +168,8 @@ class CILToMipsVisitor:
         # inst_address = self.get_address(node.instance)
         if node.value == 'void':
             load_value_inst = mips.LWNode(t0, 'void')
+        elif isinstance(node.value, int):
+            load_value_inst = mips.LINode(t0, node.value)
         else:
             value_address = self.get_address(node.value)
             load_value_inst = mips.LWNode(t0, (value_address, fp))
@@ -370,3 +372,13 @@ class CILToMipsVisitor:
             # self.visit(node.value)
             # address = self.cur_function.variable_address(node.value)
             # self.add_inst(mips.LWNode(registers.V0, (address, registers.FP)))
+
+    @visitor.when(cil.SubstringNode)
+    def visit(self, node: cil.SubstringNode):
+        # if isinstance(node.dest, int):
+        #     self.add_inst(mips.LINode(registers.T[0], node.dest))
+        self.add_inst(
+            mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]"),
+            mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]")
+        )
+        pass
