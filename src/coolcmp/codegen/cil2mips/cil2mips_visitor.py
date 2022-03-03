@@ -258,7 +258,7 @@ class CILToMipsVisitor:
             mips.LWNode(t0, (obj_address, fp)),     # get instance pointer
             mips.LWNode(t0, (0, t0)),               # get instance type pointer at offset 0
             mips.LWNode(t0, (meth_offset, t0)),     # get method
-            mips.JALNode(t0),
+            mips.JALRNode(t0),
             mips.SWNode(v0, dest_address, fp),
             mips.CommentNode(f"</dynamiccall:{node.obj}>"),
         )
