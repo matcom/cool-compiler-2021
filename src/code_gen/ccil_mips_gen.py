@@ -36,6 +36,8 @@ class CCILToMIPSGenerator:
             word_directive = [
                 mips_ast.Label(node, classx.id),
                 mips_ast.Label(node, classx.init_operations.id),
+                mips_ast.Label(node, f"class_{classx.id}"),
+                mips_ast.Label(node, self._get_attr_count(classx.id)),
             ]
             for method in classx.methods:
                 word_directive.append(mips_ast.Label(node, method.function.id))
@@ -947,9 +949,7 @@ class CCILToMIPSGenerator:
         len_b = mips_ast.RegisterNode(node, T3)
 
         instructions.append(
-            mips_ast.LoadWord(
-                node, string_a, self._get_relative_location(node.source)
-            )
+            mips_ast.LoadWord(node, string_a, self._get_relative_location(node.source))
         )
         instructions.extend(self._push_stack(node, string_a))
         instructions.append(mips_ast.JumpAndLink(node, mips_ast.Label(node, "length")))
@@ -957,9 +957,7 @@ class CCILToMIPSGenerator:
         instructions.append(mips_ast.Move(node, len_a, mips_ast.RegisterNode(node, V0)))
 
         instructions.append(
-            mips_ast.LoadWord(
-                node, string_b, self._get_relative_location(node.target)
-            )
+            mips_ast.LoadWord(node, string_b, self._get_relative_location(node.target))
         )
         instructions.extend(self._push_stack(node, string_b))
         instructions.append(mips_ast.JumpAndLink(node, mips_ast.Label(node, "length")))
@@ -1068,13 +1066,218 @@ class CCILToMIPSGenerator:
 
         return instructions
 
-    # @visitor.when(ccil_ast.SubstringOpNode)
-    # def visit(self, node: ccil_ast.SubstringOpNode):
-    #     instructions = []
-    #     substring = mips_ast.RegisterNode(node, V0)
-    #     instructions.append()
+    @visitor.when(ccil_ast.SubstringOpNode)
+    def visit(self, node: ccil_ast.SubstringOpNode):
+        instructions = []
+        substring = mips_ast.RegisterNode(node, V0)
+        substring_length = mips_ast.RegisterNode(node, A0)
+        instructions.append(
+            mips_ast.LoadWord(
+                node, substring_length, self._get_relative_location(node.length.value)
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(
+                node, substring_length, substring_length, mips_ast.Constant(node, 1)
+            )
+        )
+        instructions.append(
+            mips_ast.LoadImmediate(node, substring, mips_ast.Constant(node, 9))
+        )
+        instructions.append(mips_ast.Syscall(node))
 
-    #     pass
+        char_string = mips_ast.RegisterNode(node, T0)
+        char_substring = mips_ast.RegisterNode(node, T1)
+        char = mips_ast.RegisterNode(node, T2)
+        start = mips_ast.RegisterNode(node, T3)
+
+        loop = self._generate_unique_label()
+        end = self._generate_unique_label()
+
+        instructions.append(mips_ast.Move(node, char_substring, substring))
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node, char_string, self._get_relative_location(node.target.value)
+            )
+        )
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node, start, self._get_relative_location(node.start.value)
+            )
+        )
+        instructions.append(mips_ast.Add(node, char_string, char_string, start))
+        instructions.append(
+            mips_ast.Addi(
+                node, substring_length, substring_length, mips_ast.Constant(node, -1)
+            )
+        )
+        instructions.append(mips_ast.LabelDeclaration(node, loop))
+
+        zero = mips_ast.RegisterNode(node, ZERO)
+        instructions.append(
+            mips_ast.BranchOnEqual(
+                node, substring_length, zero, mips_ast.Label(node, end)
+            )
+        )
+        instructions.append(
+            mips_ast.LoadByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), char_string),
+            )
+        )
+        instructions.append(
+            mips_ast.StoreByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), char_substring
+                ),
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(node, char_string, char_string, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(
+                node, char_substring, char_substring, mips_ast.Constant(node, 1)
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(
+                node, substring_length, substring_length, mips_ast.Constant(node, -1)
+            )
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop)))
+        instructions.append(mips_ast.LabelDeclaration(node, end))
+        instructions.append(
+            mips_ast.StoreByte(
+                node,
+                zero,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), char_substring
+                ),
+            )
+        )
+        return instructions
+
+    @visitor.when(ccil_ast.CurrentTypeNameNode)
+    def visit(self, node: ccil_ast.CurrentTypeNameNode):
+        instructions = []
+        result = mips_ast.RegisterNode(node, V0)
+
+        object = mips_ast.RegisterNode(node, T0)
+        instructions.append(
+            mips_ast.LoadWord(node, object, self._get_relative_location(node.target))
+        )
+        object_type = mips_ast.RegisterNode(node, T1)
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                object_type,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), object),
+            )
+        )
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                result,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, DOUBLE_WORD), object_type
+                ),
+            )
+        )
+        return instructions
+
+    @visitor.when(ccil_ast.ShallowCopyOpNode)
+    def visit(self, node: ccil_ast.ShallowCopyOpNode):
+        instructions = []
+        object = mips_ast.RegisterNode(node, T0)
+        object_type = mips_ast.RegisterNode(node, T1)
+        attr_total = mips_ast.RegisterNode(node, T2)
+
+        instructions.append(
+            mips_ast.LoadWord(node, object, self._get_relative_location(node.source))
+        )
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                object_type,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), object),
+            )
+        )
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                attr_total,
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, DOUBLE_WORD), object_type
+                ),
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(node, attr_total, attr_total, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Move(node, mips_ast.RegisterNode(node, A0), attr_total)
+        )
+        instructions.append(
+            mips_ast.LoadImmediate(
+                node, mips_ast.RegisterNode(node, V0), mips_ast.Constant(node, 9)
+            )
+        )
+        instructions.append(mips_ast.Syscall(node))
+
+        object_copy = mips_ast.RegisterNode(node, T3)
+        section = mips_ast.RegisterNode(node, T4)
+        zero = mips_ast.RegisterNode(node, ZERO)
+        loop = self._generate_unique_label()
+        end = self._generate_unique_label()
+
+        instructions.append(
+            mips_ast.Move(node, object_copy, mips_ast.RegisterNode(node, V0))
+        )
+
+        instructions.append(mips_ast.LabelDeclaration(node, loop))
+        instructions.append(
+            mips_ast.BranchOnEqual(node, attr_total, zero, mips_ast.Label(node, end))
+        )
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                section,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), object),
+            )
+        )
+        instructions.append(
+            mips_ast.StoreWord(
+                node,
+                section,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), object_copy),
+            )
+        )
+        instructions.append(
+            mips_ast.Addi(node, object, object, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(node, object_copy, object_copy, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(node, attr_total, attr_total, mips_ast.Constant(node, -1))
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop)))
+
+        instructions.append(mips_ast.LabelDeclaration(node, end))
+
+        instructions.append(
+            mips_ast.StoreWord(
+                node, object_copy, self._get_relative_location(node.dest)
+            )
+        )
+        return instructions
 
     def _get_attr_index(self, typex: str, attr: str):
         for _type in self.__types_table:
@@ -1088,20 +1291,20 @@ class CCILToMIPSGenerator:
         for _type in self.__types_table:
             if _type.id == typex:
                 return len(_type.attributes)
-        raise Exception("Type declaration not found")
+        raise Exception(f"Type declaration not found: {typex}")
 
     def _get_init_function(self, typex: str):
         for _type in self.__types_table:
             if _type.id == typex:
                 return _type.init_operations
-        raise Exception("Type's function for inicialization not found")
+        raise Exception(f"Type's function for inicialization not found: {typex}")
 
     def _get_method_index(self, typex: str, method: str) -> int:
         for _type in self.__types_table:
             if _type.id == typex:
                 for index, _method in enumerate(_type.methods):
                     if _method.id == method:
-                        return index * WORD + DOUBLE_WORD
+                        return index * WORD + WORD + WORD + DOUBLE_WORD
 
         raise Exception(f"Method implementation not found:{typex} {method}")
 
