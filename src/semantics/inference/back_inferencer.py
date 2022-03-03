@@ -244,7 +244,7 @@ class BackInferencer:
 
     @visitor.when(MethodCallNode)
     def visit(self, node: MethodCallNode, scope) -> MethodCallNode:
-        caller_type: Type = node.caller_type.heads[0]
+        caller_type: Type = node.caller_type.swap_self_type(self.current_type).heads[0]
         method: Method = caller_type.get_method(node.id)
 
         new_args = []
