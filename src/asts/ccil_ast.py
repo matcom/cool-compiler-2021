@@ -417,6 +417,11 @@ class IntNode(ConstantNode):
         super().__init__(value)
 
 
+class BoolNode(ConstantNode):
+    def __init__(self, value: str) -> None:
+        super().__init__(value)
+
+
 class FlowControlNode(OperationNode):
     """
     Base class for all flow control operations like If, Label, goto, etc...
