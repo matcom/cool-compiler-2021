@@ -14,13 +14,23 @@ class Node:
 
 DW = 4
 class Type:
-    def __init__(self, label, attrs, methods: dict[cil.MethodAt, str], total_methods: int, index, init: list[InstructionNode]):
+    def __init__(self,
+                 label: str,
+                 attrs: list[str],
+                 methods: dict[cil.MethodAt, str],
+                 total_methods: int,
+                 index: int,
+                 init: list[InstructionNode]):
         self.label = label
         self.attrs = attrs
         self.methods = methods
         self.total_methods = total_methods
         self.index = index
         self.init = init
+
+    def get_attr_index(self, name):
+        print(self.label, '--->', self.attrs)
+        return self.attrs.index(name) + 1
 
     def length(self):
         return len(self.attrs)

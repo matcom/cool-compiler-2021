@@ -3,7 +3,7 @@ from typing import Dict
 
 from coolcmp.utils import cil, visitor
 from coolcmp.utils import mips, registers
-
+from coolcmp.utils import extract_class_name
 
 class CILToMipsVisitor:
     def __init__(self):
@@ -178,6 +178,25 @@ class CILToMipsVisitor:
             load_value_inst,
             mips.SWNode(t0, 4 * (node.attr.index + 1), v0),
             mips.CommentNode(f"</setattribute:{node.attr.name}-{node.instance}>"),
+        )
+
+    @visitor.when(cil.GetAttrNode)
+    def visit(self, node: cil.GetAttrNode):
+        t0, fp = registers.T[0], registers.FP
+
+        print(node.src, node.attr, node.dest)
+
+        dest_offset = self.get_address(node.dest)
+        src_offset = self.get_address(node.src)
+        class_ = extract_class_name(node.attr)
+        attr_offset = self.types[class_].get_attr_index(node.attr) * 4
+
+        self.add_inst(
+            mips.CommentNode(f"<getattribute:{node.attr}-{node.src}>"),
+            mips.LWNode(t0, (src_offset, fp)),
+            mips.LWNode(t0, (attr_offset, t0)),
+            mips.SWNode(t0, dest_offset, fp),
+            mips.CommentNode(f"</getattribute:{node.attr}-{node.src}>"),
         )
 
     @visitor.when(cil.PrintIntNode)

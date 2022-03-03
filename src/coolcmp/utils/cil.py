@@ -3,7 +3,7 @@ from __future__ import annotations
 import types
 
 from coolcmp.utils import ast
-from coolcmp.utils import extract_meth_name
+from coolcmp.utils import extract_feat_name
 
 
 class Node:
@@ -40,7 +40,7 @@ class ProgramNode(Node):
     def update_method_indexes(self):
         all_methods = set()
         for type_ in self.dot_types:
-            all_methods.update([extract_meth_name(m) for m in type_.methods.values()])
+            all_methods.update([extract_feat_name(m) for m in type_.methods.values()])
 
         self.all_methods = sorted(list(all_methods))
         for type_ in self.dot_types:
@@ -48,7 +48,7 @@ class ProgramNode(Node):
             new_methods = [
                 MethodAt(
                     name=meths[m],
-                    index=self.all_methods.index(extract_meth_name(meths[m]))
+                    index=self.all_methods.index(extract_feat_name(meths[m]))
                 ) for m in meths
             ]
             type_.methods = sorted(new_methods)
@@ -65,7 +65,7 @@ class MethodAt:
         return self.tname[0]
 
     def __lt__(self, other: MethodAt):
-        return extract_meth_name(self.name).__lt__(extract_meth_name(other.name))
+        return extract_feat_name(self.name).__lt__(extract_feat_name(other.name))
 
     def __eq__(self, other: MethodAt):
         return self.name == other.name

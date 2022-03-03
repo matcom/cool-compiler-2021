@@ -200,7 +200,7 @@ class DotCodeVisitor:
                 ],
                 instructions=[
                     cil.GetAttrNode('value', 'self', 'String_value'),
-                    cil.GetAttrNode('other_value', 'other', 'String_value'),
+                    cil.GetAttrNode('other_value', 'other_str', 'String_value'),
                     cil.ConcatNode('result', 'value', 'other_value'),
                     cil.ReturnNode('result'),
                 ]
@@ -239,8 +239,8 @@ class DotCodeVisitor:
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
         self.add_function(f'{self.current_type}_{node.id}')
 
-        local_name = self.add_local(f'_name', internal=False)
-        self.add_inst(cil.GetAttrNode(local_name, 'self', f'{self.current_type}__name'))
+        # local_name = self.add_local(f'_name', internal=False)
+        # self.add_inst(cil.GetAttrNode(local_name, 'self', f'{self.current_type}__name'))
         for local in scope.all_locals():
             if local.is_param:
                 self.add_param(local.name)
