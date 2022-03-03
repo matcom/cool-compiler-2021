@@ -552,6 +552,8 @@
     LOCAL local_27;
     LOCAL local_28;
     LOCAL local_29;
+    LOCAL local_30;
+    LOCAL local_31;
 
     local_1 = LOAD 1;
     ARG local_1;
@@ -589,19 +591,23 @@
     local_21 = GETATTR local_a 0;
     local_22 = GETATTR local_b 0;
     local_23 = local_21 + local_22
-    local_c = local_23;
-    local_24 = GETATTR param_i 0;
-    local_25 = LOAD 1;
-    ARG local_25;
-    local_26 = CALL Int___init;
-    local_27 = GETATTR local_26 0;
-    local_28 = local_24 - local_27
-    param_i = local_28;
+    ARG local_23;
+    local_24 = CALL Int___init;
+    local_c = local_24;
+    local_25 = GETATTR param_i 0;
+    local_26 = LOAD 1;
+    ARG local_26;
+    local_27 = CALL Int___init;
+    local_28 = GETATTR local_27 0;
+    local_29 = local_25 - local_28
+    ARG local_29;
+    local_30 = CALL Int___init;
+    param_i = local_30;
     local_b = local_a;
     local_a = local_c;
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
-    local_29 = CALL Void___init;
+    local_31 = CALL Void___init;
     RETURN local_c;
   }
 

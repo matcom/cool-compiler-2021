@@ -734,7 +734,7 @@ class CoolToCilVisitor(object):
         sid = self.visit(node.expr)
         self.instructions.append(cil.GetAttrNode(sid, 0, attr))
         self.instructions.append(cil.MinusNode(ret_local, self.register_num(1), attr))
-        return ret_local
+        return self.register_new("Bool", ret_local)
 
     @visitor.when(type_checked.CoolNotNode)
     def visit(self, node: type_checked.CoolNotNode) -> str:
@@ -814,7 +814,7 @@ class CoolToCilVisitor(object):
 
         ret_local = self.register_local()
         self.instructions.append(cil.PlusNode(ret_local, left_value, right_value))
-        return ret_local
+        return self.register_new("Int", ret_local)
 
     @visitor.when(type_checked.CoolMinusNode)
     def visit(self, node: type_checked.CoolMinusNode) -> str:
@@ -828,7 +828,7 @@ class CoolToCilVisitor(object):
 
         ret_local = self.register_local()
         self.instructions.append(cil.MinusNode(ret_local, left_value, right_value))
-        return ret_local
+        return self.register_new("Int", ret_local)
 
     @visitor.when(type_checked.CoolMultNode)
     def visit(self, node: type_checked.CoolMultNode) -> str:
@@ -842,7 +842,7 @@ class CoolToCilVisitor(object):
 
         ret_local = self.register_local()
         self.instructions.append(cil.StarNode(ret_local, left_value, right_value))
-        return ret_local
+        return self.register_new("Int", ret_local)
 
     @visitor.when(type_checked.CoolDivNode)
     def visit(self, node: type_checked.CoolDivNode) -> str:
@@ -856,7 +856,7 @@ class CoolToCilVisitor(object):
 
         ret_local = self.register_local()
         self.instructions.append(cil.DivNode(ret_local, left_value, right_value))
-        return ret_local
+        return self.register_new("Int", ret_local)
 
     @visitor.when(type_checked.CoolIntNode)
     def visit(self, node: type_checked.CoolIntNode) -> str:

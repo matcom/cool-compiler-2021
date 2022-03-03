@@ -902,8 +902,8 @@
     LOCAL local_6;
     LOCAL local_7;
     LOCAL local_8;
+    LOCAL local_9;
     LOCAL local_y;
-    LOCAL local_10;
     LOCAL local_11;
     LOCAL local_12;
     LOCAL local_13;
@@ -911,31 +911,37 @@
     LOCAL local_15;
     LOCAL local_16;
     LOCAL local_17;
+    LOCAL local_18;
+    LOCAL local_19;
 
     local_x = GETATTR param_self 0;
     local_1 = GETATTR local_x 0;
     local_3 = GETATTR local_x 0;
     local_4 = LOAD 1;
     local_2 = local_4 - local_3
-    local_5 = GETATTR local_2 0;
-    local_6 = local_1 - local_5
-    local_6 = local_6 * local_6
-    local_7 = LOAD 1;
-    local_6 = local_7 - local_6
-    ARG local_6;
-    local_8 = CALL Bool___init;
+    ARG local_2;
+    local_5 = CALL Bool___init;
+    local_6 = GETATTR local_5 0;
+    local_7 = local_1 - local_6
+    local_7 = local_7 * local_7
+    local_8 = LOAD 1;
+    local_7 = local_8 - local_7
+    ARG local_7;
+    local_9 = CALL Bool___init;
     local_y = GETATTR param_self 1;
-    local_10 = GETATTR local_y 0;
-    local_12 = GETATTR local_y 0;
-    local_13 = LOAD 1;
-    local_11 = local_13 - local_12
-    local_14 = GETATTR local_11 0;
-    local_15 = local_10 - local_14
-    local_15 = local_15 * local_15
-    local_16 = LOAD 1;
-    local_15 = local_16 - local_15
-    ARG local_15;
-    local_17 = CALL Bool___init;
+    local_11 = GETATTR local_y 0;
+    local_13 = GETATTR local_y 0;
+    local_14 = LOAD 1;
+    local_12 = local_14 - local_13
+    ARG local_12;
+    local_15 = CALL Bool___init;
+    local_16 = GETATTR local_15 0;
+    local_17 = local_11 - local_16
+    local_17 = local_17 * local_17
+    local_18 = LOAD 1;
+    local_17 = local_18 - local_17
+    ARG local_17;
+    local_19 = CALL Bool___init;
     RETURN param_self;
   }
 
@@ -951,19 +957,22 @@
     LOCAL local_6;
     LOCAL local_7;
     LOCAL local_8;
+    LOCAL local_9;
 
     local_y = GETATTR param_self 1;
     local_1 = GETATTR local_y 0;
     local_3 = GETATTR local_y 0;
     local_4 = LOAD 1;
     local_2 = local_4 - local_3
-    local_5 = GETATTR local_2 0;
-    local_6 = local_1 - local_5
-    local_6 = local_6 * local_6
-    local_7 = LOAD 1;
-    local_6 = local_7 - local_6
-    ARG local_6;
-    local_8 = CALL Bool___init;
+    ARG local_2;
+    local_5 = CALL Bool___init;
+    local_6 = GETATTR local_5 0;
+    local_7 = local_1 - local_6
+    local_7 = local_7 * local_7
+    local_8 = LOAD 1;
+    local_7 = local_8 - local_7
+    ARG local_7;
+    local_9 = CALL Bool___init;
     RETURN param_self;
   }
 
@@ -979,19 +988,22 @@
     LOCAL local_6;
     LOCAL local_7;
     LOCAL local_8;
+    LOCAL local_9;
 
     local_x = GETATTR param_self 0;
     local_1 = GETATTR local_x 0;
     local_3 = GETATTR local_x 0;
     local_4 = LOAD 1;
     local_2 = local_4 - local_3
-    local_5 = GETATTR local_2 0;
-    local_6 = local_1 - local_5
-    local_6 = local_6 * local_6
-    local_7 = LOAD 1;
-    local_6 = local_7 - local_6
-    ARG local_6;
-    local_8 = CALL Bool___init;
+    ARG local_2;
+    local_5 = CALL Bool___init;
+    local_6 = GETATTR local_5 0;
+    local_7 = local_1 - local_6
+    local_7 = local_7 * local_7
+    local_8 = LOAD 1;
+    local_7 = local_8 - local_7
+    ARG local_7;
+    local_9 = CALL Bool___init;
     RETURN param_self;
   }
 

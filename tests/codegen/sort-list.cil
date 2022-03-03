@@ -1481,6 +1481,7 @@
     LOCAL local_23;
     LOCAL local_24;
     LOCAL local_25;
+    LOCAL local_26;
 
     local_0 = CALL Nil___init;
     SETATTR param_self 0 local_0;
@@ -1526,10 +1527,12 @@
     local_22 = CALL Int___init;
     local_23 = GETATTR local_22 0;
     local_24 = local_20 + local_23
-    local_j = local_24;
+    ARG local_24;
+    local_25 = CALL Int___init;
+    local_j = local_25;
     GOTO label_while_label_0;
     LABEL label_pool_label_0;
-    local_25 = CALL Void___init;
+    local_26 = CALL Void___init;
     RETURN local_l;
   }
 
