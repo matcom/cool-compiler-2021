@@ -4,10 +4,11 @@ import ast_cool_print
 import type_collector
 import type_builder
 import type_checker
-import translate_cool_cil
 from lexer import tokenize
 from parser import parse
 from testers import test_parser
+from translate_cool_cil import COOLToCILVisitor
+from translate_cil_mips import CILToMIPSVisitor
 
 #################################################################################
 # To use this script execute in terminal:                                       #
@@ -35,7 +36,7 @@ if execute_mode == "test":
 
 # RUN
 programs_files = [
-    file for file in os.listdir(program_directory) if file.endswith("methods1.cl")
+    file for file in os.listdir(program_directory) if file.endswith("primes.cl")
 ]
 for program_file in programs_files:
     input("Press enter to analyze " + program_file)
@@ -67,7 +68,7 @@ for program_file in programs_files:
                 print(str(tree))
 
     # To run semantic
-    elif module_to_execute == "semantic":
+    elif module_to_execute == "all":
         with open(program_route, "r", encoding="UTF-8") as f:
             # program_route = program_route[: len(program_route) - 3] + "_error.txt"
             # with open(program_route, "r", encoding="UTF-8") as f1:
@@ -87,10 +88,10 @@ for program_file in programs_files:
             checker = type_checker.TypeChecker(context, errors)
             scope = checker.visit(ast)
 
-            print(errors)
-            # translate = translate_cool_cil.TranslateCool2Cil(context)
-            # tree = translate.visit(ast)
-            # print('jasdwqe')
+            cool_to_cil = COOLToCILVisitor(context)
+            cil_ast = cool_to_cil.visit(ast)
+            cil_to_mips = CILToMIPSVisitor()
+            mips_code = cil_to_mips.visit(cil_ast)
 
     else:
         print("Invalid section to execute: " + module_to_execute)

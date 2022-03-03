@@ -293,7 +293,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         pass
 
     @visitor.when(COOL_AST.ProgramNode)
-    def visit(self, node, scope=None):
+    def visit(self, node: COOL_AST.ProgramNode, scope=None):
         scope = Scope()
         self.current_function = self.register_function('main')
         instance = self.define_internal_local(scope=scope, name="instance")
@@ -321,7 +321,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         return CIL_AST.Program(self.dottypes, self.dotdata, self.dotcode)
 
     @visitor.when(COOL_AST.ClassDeclarationNode)
-    def visit(self, node, scope):
+    def visit(self, node: COOL_AST.ClassDeclarationNode, scope):
         self.current_type = self.context.get_type(node.id)
 
         # Handle all the .TYPE section
@@ -331,7 +331,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         scope.define_cil_local("self", self.current_type.name, self.current_type)
 
-        func_declarations = [f for f in node.features if isinstance(f, COOL_AST.ClassDeclarationNode)]
+        func_declarations = [f for f in node.features if isinstance(f, COOL_AST.FuncDeclarationNode)]
         attr_declarations = [a for a in node.features if isinstance(a, COOL_AST.AttrDeclarationNode)]
         for attr in attr_declarations:
             scope.define_cil_local(attr.id, attr.id, node.id)
@@ -356,15 +356,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_type = None
 
     @visitor.when(COOL_AST.FuncDeclarationNode)
-    def visit(self, node, scope):
-        self.current_method = self.current_type.get_method(node.id)
-        self.dottypes[self.current_type.name].methods[node.id] = f'{self.current_type.name}.{node.node}'
+    def visit(self, node: COOL_AST.FuncDeclarationNode, scope):
+        self.current_method = self.current_type.get_method(node.id)[0]
+        self.dottypes[self.current_type.name].methods[node.id] = f'{self.current_type.name}.{node.id}'
         cil_method_name = self.to_function_name(node.id, self.current_type.name)
         self.current_function = self.register_function(cil_method_name)
 
         self.register_param(VariableInfo('self', self.current_type))
-        for p in node.params:
-            self.register_param(VariableInfo(p.name, p.param_type))
+        for p_name, p_type in node.params:
+            self.register_param(VariableInfo(p_name, p_type))
 
         value = self.visit(node.body, scope)
 
@@ -372,8 +372,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_method = None
 
     @visitor.when(COOL_AST.AttrDeclarationNode)
-    def visit(self, node, scope):
+    def visit(self, node: COOL_AST.AttrDeclarationNode, scope):
         instance = None
+
+        if node.val is not None:
+            expr = self.visit(node.val, scope)
+            self.register_instruction(CIL_AST.SetAttr('self', node.id, expr, self.current_type.name))
+            return
 
         if node.type in ['Int', 'Bool']:
             instance = self.define_internal_local(scope=scope, name="instance")
@@ -392,14 +397,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(
                 CIL_AST.Call(result_init, f'{node.type}_init', [CIL_AST.Arg(value), CIL_AST.Arg(instance)], node.type))
 
-        if node.val is None:
-            self.register_instruction(CIL_AST.SetAttr('self', node.id, instance, self.current_type.name))
-        else:
-            expr = self.visit(node.val, scope)
-            self.register_instruction(CIL_AST.SetAttr('self', node.id, expr, self.current_type.name))
+        self.register_instruction(CIL_AST.SetAttr('self', node.id, instance, self.current_type.name))
+
 
     @visitor.when(COOL_AST.AssignNode)
-    def visit(self, node, scope):
+    def visit(self, node: COOL_AST.AssignNode, scope):
         expr_local = self.visit(node.expr, scope)
         result_local = self.define_internal_local(scope=scope, name="result")
         cil_node_name = scope.find_cil_local(node.id)
@@ -414,14 +416,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         return expr_local
 
     @visitor.when(COOL_AST.BlockNode)
-    def visit(self, node, scope):
+    def visit(self, node: COOL_AST.BlockNode, scope):
         result_local = None
         for e in node.expr_list:
             result_local = self.visit(e, scope)
         return result_local
 
     @visitor.when(COOL_AST.ConditionalNode)
-    def visit(self, node, scope):
+    def visit(self, node: COOL_AST.ConditionalNode, scope):
         result_local = self.define_internal_local(scope=scope, name="result")
 
         cond_value = self.visit(node.if_expr, scope)
@@ -443,7 +445,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         return result_local
 
     @visitor.when(COOL_AST.LoopNode)
-    def visit(self, node, scope):
+    def visit(self, node: COOL_AST.LoopNode, scope):
         result_local = self.define_internal_local(scope=scope, name="result")
 
         loop_init_label = self.get_label()
@@ -474,7 +476,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         call_args.append(CIL_AST.Arg(expr_value))
 
         if node.ancestor_type is None:
-            dynamic_type = node.obj.computed_type.name
+            o_type = self.current_type if node.obj.computed_type.name == 'SELF_TYPE' else node.obj.computed_type
+            dynamic_type = o_type.name
             self.register_instruction(CIL_AST.VCall(result_local, node.id, call_args, dynamic_type, expr_value))
         else:
             static_instance = self.define_internal_local(scope=scope, name='static_instance')
@@ -524,7 +527,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         return result_local
 
     @visitor.when(COOL_AST.CaseNode)
-    def visit(self, node, scope):
+    def visit(self, node: COOL_AST.CaseNode, scope):
         result_local = self.define_internal_local(scope=scope, name="result")
         case_expr = self.visit(node.expr, scope)
 
@@ -535,19 +538,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         tag_lst = []
         action_dict = {}
-        for action in node.actions:
+        for action in node.branch_list:
             tag = self.context.get_type(action.type).tag
             tag_lst.append(tag)
             action_dict[tag] = action
         tag_lst.sort()
 
         for t in reversed(tag_lst):
-            action = action_dict[t]
+            action: COOL_AST.BranchNode = action_dict[t]
             self.register_instruction(CIL_AST.Label(label))
             label = self.get_label()
 
-            action_Type = self.context.get_type(action.type)
-            self.register_instruction(CIL_AST.Action(case_expr, action_Type.tag, action_Type.max_tag, label))
+            action_type = self.context.get_type(action.type)
+            self.register_instruction(CIL_AST.Action(case_expr, action_type.tag, action_type.max_tag, label))
 
             action_scope = scope.create_child()
             action_id = self.define_internal_local(scope=action_scope, name=action.id, cool_var_name=action.id)
@@ -600,8 +603,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         left_value = self.visit(node.left, scope)
         right_value = self.visit(node.right, scope)
 
-        self.register_instruction(CIL_AST.GetAttr(left_local, left_value, "value", node.left.computed_type.name))
-        self.register_instruction(CIL_AST.GetAttr(right_local, right_value, "value", node.right.computed_type.name))
+        l_type = self.current_type if node.left.computed_type.name == 'SELF_TYPE' else node.left.computed_type
+        r_type = self.current_type if node.right.computed_type.name == 'SELF_TYPE' else node.right.computed_type
+
+        self.register_instruction(CIL_AST.GetAttr(left_local, left_value, "value", l_type.name))
+        self.register_instruction(CIL_AST.GetAttr(right_local, right_value, "value", r_type.name))
 
         if isinstance(node, COOL_AST.PlusNode):
             self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "+"))
@@ -627,7 +633,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         expr_value = self.visit(node.expr, scope)
 
-        self.register_instruction(CIL_AST.GetAttr(expr_local, expr_value, "value", node.expr.computed_type.name))
+        e_type = self.current_type if node.expr.computed_type.name == 'SELF_TYPE' else node.expr.computed_type
+        self.register_instruction(CIL_AST.GetAttr(expr_local, expr_value, "value", e_type.name))
         self.register_instruction(CIL_AST.UnaryOperator(op_local, expr_local, "~"))
 
         # Allocate Int result
@@ -646,7 +653,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         expr_value = self.visit(node.expr, scope)
 
-        self.register_instruction(CIL_AST.GetAttr(expr_local, expr_value, "value", node.expr.computed_type.name))
+        e_type = self.current_type if node.expr.computed_type.name == 'SELF_TYPE' else node.expr.computed_type
+        self.register_instruction(CIL_AST.GetAttr(expr_local, expr_value, "value", e_type.name))
         self.register_instruction(CIL_AST.UnaryOperator(op_local, expr_local, "not"))
 
         # Allocate Bool result
@@ -667,28 +675,32 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         left_value = self.visit(node.left, scope)
         right_value = self.visit(node.right, scope)
 
-        self.register_instruction(CIL_AST.GetAttr(left_local, left_value, "value", node.left.computed_type.name))
-        self.register_instruction(CIL_AST.GetAttr(right_local, right_value, "value", node.right.computed_type.name))
+        l_type = self.current_type if node.left.computed_type.name == 'SELF_TYPE' else node.left.computed_type
+        r_type = self.current_type if node.right.computed_type.name == 'SELF_TYPE' else node.right.computed_type
+
+        if isinstance(node, COOL_AST.LessNode) or isinstance(node, COOL_AST.LessEqualNode):
+            self.register_instruction(CIL_AST.GetAttr(left_local, left_value, "value", l_type.name))
+            self.register_instruction(CIL_AST.GetAttr(right_local, right_value, "value", r_type.name))
 
         if isinstance(node, COOL_AST.LessNode):
             self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "<"))
-        elif isinstance(node, COOL_AST.LessNode):
+        elif isinstance(node, COOL_AST.LessEqualNode):
             self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "<="))
         elif isinstance(node, COOL_AST.EqualNode):
-            if node.left.computed_type.name == 'String':
+            if l_type.name == 'String':
                 self.register_instruction(
                     CIL_AST.Call(op_local, 'String_equals', [CIL_AST.Arg(right_value), CIL_AST.Arg(left_value)],
                                  'String'))
-            elif node.left.computed_type.name in ['Int', 'Bool']:
+            elif l_type.name in ['Int', 'Bool']:
                 self.register_instruction(
-                    CIL_AST.GetAttr(left_local, left_value, "value", node.left.computed_type.name))
+                    CIL_AST.GetAttr(left_local, left_value, "value", l_type.name))
                 self.register_instruction(
-                    CIL_AST.GetAttr(right_local, right_value, "value", node.right.computed_type.name))
+                    CIL_AST.GetAttr(right_local, right_value, "value", r_type.name))
+                self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "="))
             else:
                 self.register_instruction(CIL_AST.Assign(left_local, left_value))
                 self.register_instruction(CIL_AST.Assign(right_local, right_value))
-
-            self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "="))
+                self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "="))
 
         # Allocate Bool result
         self.register_instruction(CIL_AST.Allocate('Bool', self.context.get_type('Bool').tag, result_local))
