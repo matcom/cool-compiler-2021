@@ -161,6 +161,17 @@ class JALNode(InstructionNode):
         return f"jal    {self.dest}"
 
 
+class JALRNode(InstructionNode):
+    """
+    jump and link to register value
+    """
+    def __init__(self, reg: Register):
+        self.reg = reg
+    
+    def __str__(self):
+        return f"jalr    {self.reg}"
+
+
 class LANode(InstructionNode):
     """
     load address | la $1, label | $1 = Address of label
