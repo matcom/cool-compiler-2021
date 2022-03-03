@@ -87,10 +87,13 @@ class CILBuilder:
         return str(self._count)
 
     def to_function_name(self, method_name, type_name):
-        return f"function_{method_name}_at_{type_name}"
+        return f"{type_name}_{method_name}"
 
     def to_data_name(self, type_name, value):
         return f"{type_name}_{value}"
+
+    def to_attr_name(self, type_name, attr_name):
+        return f"{type_name}_{attr_name}"
 
     @property
     def params(self):
@@ -118,7 +121,7 @@ class CILBuilder:
         return function_node
 
     def register_local(self, vinfo):
-        vinfo.name = f"local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.current_function.localvars)}"
+        vinfo.name = f"local_{self.current_function.name}_{vinfo.name}_{len(self.current_function.localvars)}"
         local_node = LocalNode(vinfo.name)
         self.current_function.localvars.append(local_node)
         return vinfo.name
@@ -130,7 +133,7 @@ class CILBuilder:
         return vinfo
 
     def build_internal_vname(self, vname):
-        vname = f"{self.internal_count}_{self.current_function.name[9:]}_{vname}"
+        vname = f"{self.internal_count}_{self.current_function.name}_{vname}"
         self.internal_count += 1
         return vname
 
@@ -146,21 +149,36 @@ class CILBuilder:
     def is_attribute(self, vname):
         return vname not in [var.name for var in self.current_function.localvars]
 
+    # def builtin_constructor(self):
+    #     built = ["Object", "IO", "Int", "Bool", "String"]
+    #     for c in built:
+
+    #         self.code.append(LabelIL(c, "Constructor", True))
+    #         self.code.append(PushIL())  # No result, but needed in logic
+    #         self.code.append(ReturnIL())
+
     def build_constructor(self, node):
+        # self_var = self.define_internal_local()
+        # self.register_instruction(AllocateNode(node.id, self_var))
+
         attributeNodes = [
             feat for feat in node.features if isinstance(feat, cool.AttrDeclarationNode)
         ]
 
         expr_list = []
         for attr in attributeNodes:  # Assign default value first
-            assign = cool.AssignNode(attr.id, cool.DefaultValueNode(attr.type))
+            assign = cool.AssignNode(
+                self.to_attr_name(self.current_type.name, attr.id),
+                cool.DefaultValueNode(attr.type),
+            )
             expr_list.append(assign)
 
         for attr in attributeNodes:  # Assign init_expr if not None
             if attr.init_exp:
-                assign = cool.AssignNode(attr.id, attr.init_exp)
+                assign = cool.AssignNode(
+                    self.to_attr_name(self.current_type.name, attr.id), attr.init_exp
+                )
                 expr_list.append(assign)
-
         body = cool.BlockNode(expr_list)
         self.current_type.define_method("constructor", [], [], "Object")
         return cool.FuncDeclarationNode("constructor", [], "Object", body)
@@ -315,23 +333,25 @@ class CILBuilder:
 
         self.add_builtin_functions()
 
-        # Add entry function and call Main.main()
-        # self.current_function = FunctionNode("entry", [], [], [])
-        # self.code.append(self.current_function)
+        self.current_function = FunctionNode("main", [], [], [])
+        self.code.append(self.current_function)
 
-        # instance = "l_instance"
-        # self.register_instruction(LocalNode(instance))
+        instance = self.define_internal_local()
+        result = self.define_internal_local()
 
-        # result = "l_result"
-        # self.register_instruction(LocalNode(result))
+        main_constructor = self.to_function_name("constructor", "Main")
+        main_method_name = self.to_function_name("Main", "main")
 
-        # main_method_name = self.to_function_name("Main", "main")
-        # self.register_instruction(AllocateNode("Main", instance))
-        # self.register_instruction(ArgNode(instance))
-        # self.register_instruction(StaticCallNode(main_method_name, result))
-        # self.register_instruction(ReturnNode(0))
+        # Get instance from constructor
+        self.register_instruction(StaticCallNode(main_constructor, instance))
 
-        # self.current_function = None
+        # Pass instance as parameter and call Main_main
+        self.register_instruction(ArgNode(instance))
+        self.register_instruction(StaticCallNode(main_method_name, result))
+
+        self.register_instruction(ReturnNode(0))
+
+        self.current_function = None
 
         for declaration in node.declarations:
             self.visit(declaration)
@@ -625,7 +645,9 @@ class CILBuilder:
     @visitor.when(cool.InstantiateNode)  # NewNode
     def visit(self, node):
         new_local = self.define_internal_local()
-        self.register_instruction(AllocateNode(node.lex, new_local))
+        self.register_instruction(
+            StaticCallNode(self.to_function_name("constructor", node.lex), new_local)
+        )
 
         return new_local
 
