@@ -228,7 +228,7 @@ class TypesInferencer:
 
     @visitor.when(ComplementNode)
     def visit(self, node: ComplementNode, scope: Scope) -> types_ast.ComplementNode:
-        expr = self.visit(node.expr)
+        expr = self.visit(node.expr,scope)
         new_node = types_ast.ComplementNode(expr, node)
         new_node.type = self._reduce_to_type(node.inferenced_type, node)
         return new_node

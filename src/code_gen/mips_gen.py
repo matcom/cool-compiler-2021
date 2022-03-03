@@ -26,6 +26,7 @@ from asts.mips_ast import (
     Multiply,
     Not,
     RegisterNode,
+    SpaceDirective,
     StoreByte,
     StoreWord,
     Sub,
@@ -104,6 +105,10 @@ class MIPSGenerator:
     @visitor.when(WordDirective)
     def visit(self, node: WordDirective) -> str:
         return ".word " + (" ".join(self.visit(i) for i in node.list))
+
+    @visitor.when(SpaceDirective)
+    def visit(self, node: SpaceDirective) -> str:
+        return ".space " + (" ".join(self.visit(i) for i in node.list))
 
     @visitor.when(AsciizDirective)
     def visit(self, node: AsciizDirective) -> str:

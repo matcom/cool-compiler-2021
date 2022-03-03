@@ -374,6 +374,13 @@ class AsciizDirective(AssemblerDirective):
     def __init__(self, node, list) -> None:
         super().__init__(node, list)
 
+class SpaceDirective(AssemblerDirective):
+    """
+    This node represents `.space` assembler directive
+    """
+
+    def __init__(self, node, list) -> None:
+        super().__init__(node, list)
 
 class Syscall(InstructionNode):
     """
