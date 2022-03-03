@@ -1,0 +1,15 @@
+# Template for isvoid function:
+# Arguments
+# a0: pointer to instance
+# Returns
+# $v0: 1 if type of instance is Void, false in other case
+isvoid:
+    la      $t0, Void
+    lw      $t1, 0($a0)
+    beq     $t0, $t1, _is_void
+    li,     $v0, 0    
+    j		_end_is_void
+_is_void:
+    li      $v0, 1
+_end_is_void:
+    jr $ra
