@@ -437,8 +437,9 @@ class CILToMipsVisitor:
         self.visit(cil.AllocateNode('String', node.dest))
 
         self.add_inst(
-            mips.LWNode(t0, (src_offset, fp)).with_comm('Load pointer to instance'),
-            mips.ADDINode(t0, t0, name_offset),
-            mips.SWNode(t0, 4, v0),
+            mips.LWNode(t0, (src_offset, fp))       .with_comm('Load pointer to self'),
+            mips.LWNode(t0, (0, t0))                .with_comm('Load pointer to type of self'),
+            mips.ADDINode(t0, t0, name_offset)      .with_comm('Point to name of type'),
+            mips.SWNode(t0, 4, v0)                  .with_comm('Save name of the type in the new string'),
             mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
         )
