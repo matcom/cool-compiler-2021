@@ -210,7 +210,7 @@ class DotCodeVisitor:
                     cil.LocalNode('result'),
                 ],
                 instructions=[
-                    cil.SubstringNode('result', 'value', 'index_value', 'length_value'),
+                    cil.SubstringNode('result', 'value', 'index', 'length'),
                     cil.ReturnNode('result'),
                 ]
             )

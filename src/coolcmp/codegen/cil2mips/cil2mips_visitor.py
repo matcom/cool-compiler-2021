@@ -382,21 +382,47 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
-        # if isinstance(node.dest, int):
-        #     self.add_inst(mips.LINode(registers.T[0], node.dest))
-        dest_offset = self.get_address('result')
-        src_offset = self.get_address('value')
-        index_offset = self.get_address('index_value')
-        length_offset = self.get_address('length_value')
+        print(node.src, node.dest, node.index, node.length)
+        input()
+        t1 = registers.T[1]
+        fp = registers.FP
+        a0, a1, a2 = registers.ARG[0], registers.ARG[1], registers.ARG[2]
+        v0 = registers.V0
+
+        self.add_inst(mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]"))
+
+        self.visit(cil.AllocateNode('String', node.dest))
+
+        src_address = self.get_address('self')
+        dest_address = self.get_address(node.dest)
+        index_address = self.get_address(node.index)
+        length_address = self.get_address(node.length)
+        print(src_address, dest_address, index_address, length_address)
+        input()
+        push_src = (
+            mips.LWNode(a0, (src_address, fp)),
+            mips.LWNode(a0, (4, a0))
+        )
+        push_length = (
+            mips.LWNode(a1, (length_address, fp)),
+            mips.LWNode(a1, (4, a1))
+        )
+        push_index = (
+            mips.LWNode(a2, (index_address, fp)),
+            mips.LWNode(a2, (4, a2))
+        )
 
         self.add_inst(
-            mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]"),
-            mips.LWNode(registers.ARG[0], (src_offset, registers.FP)),
-            mips.LWNode(registers.ARG[1], (length_offset, registers.FP)),
-            mips.LWNode(registers.ARG[2], (index_offset, registers.FP)),
+            *push_src,
+            *push_length,
+            *push_index,
             mips.JALNode('substr'),
-            mips.SWNode(registers.V0, dest_offset, registers.FP),
-            mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]")
+        )
+
+        self.add_inst(
+            mips.LWNode(t1, (dest_address, fp)),
+            mips.SWNode(v0, 4, t1),
+            mips.CommentNode(f"</substr:>{node.dest}[{node.index}:{node.length}]")
         )
 
     @visitor.when(cil.TypeNameNode)
