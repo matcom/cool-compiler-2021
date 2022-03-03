@@ -123,7 +123,10 @@ jal __str__length__
 
 lw $t0, 4($v0)      #Lee la propiedad **value** del **Int** que devuelve length 
 
+beq $t0,$zero, jline
 addi $t0, $t0, -1   #Resta uno al length para eliminar el '\n'
+
+jline:
 sw $t0, 4($v0)      #Actualiza la propieded **value** del **Int** length
 
 addi $sp, $sp, -4
