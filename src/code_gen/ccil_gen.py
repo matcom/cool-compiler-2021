@@ -515,7 +515,7 @@ class CCILGenerator:
                 f"Pattern match failure visiting binary expression with {type(node).__name__}"
             )
 
-        fval = self.create_storage(fval_id, node.type.name, op)
+        fval = self.create_storage(fval_id, BOOL, op)
         return ([*left_ops, *right_ops, fval], fval)
 
     @visitor.when(sem_ast.UnaryNode)
@@ -536,7 +536,7 @@ class CCILGenerator:
                     f"Redundant isVoid expression in {node.line}, {node.col}."
                     f" Type {node.expr.type.name} will always evaluate to false"
                 )
-                op = IntNode("0")
+                op = BoolNode("0")
             else:
                 op = EqualIntNode(IdNode(fval_id), IntNode("0"))
         elif node_type == sem_ast.NotNode:
@@ -684,7 +684,7 @@ class CCILGenerator:
         bool_id = f"bool_{times}"
         value = "0" if node.value == "false" else "1"
 
-        bool_node = self.create_int(bool_id, value)
+        bool_node = self.create_bool(bool_id, value)
         return [bool_node], bool_node
 
     def create_class_init_func(
@@ -959,6 +959,10 @@ class CCILGenerator:
     def create_int(self, idx: str, value: str):
         self.add_local(idx, INT)
         return StorageNode(idx, IntNode(value))
+
+    def create_bool(self, idx: str, value: str):
+        self.add_local(idx, BOOL)
+        return StorageNode(idx, BoolNode(value))
 
     def create_int_to_str(self, idx: str, target: str):
         self.add_local(str, STRING)
