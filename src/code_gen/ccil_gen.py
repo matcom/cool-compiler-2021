@@ -71,8 +71,10 @@ class CCILGenerator:
         self.data = [DEFAULT_STR]
         self.reset_locals()
 
-        [obj, io, str], builtin_methods = self.define_built_ins()
-        self.program_types = OrderedDict({OBJECT: obj, IO: io, STRING: str})
+        [obj, io, str, int, bool], builtin_methods = self.define_built_ins()
+        self.program_types = OrderedDict(
+            {OBJECT: obj, IO: io, STRING: str, INT: int, BOOL: bool}
+        )
         self.program_codes: List[FunctionNode] = builtin_methods
 
         for builtin_name in [OBJECT, IO, STRING, INT, BOOL]:
@@ -515,7 +517,7 @@ class CCILGenerator:
                 f"Pattern match failure visiting binary expression with {type(node).__name__}"
             )
 
-        fval = self.create_storage(fval_id, node.type.name, op)
+        fval = self.create_storage(fval_id, BOOL, op)
         return ([*left_ops, *right_ops, fval], fval)
 
     @visitor.when(sem_ast.UnaryNode)
@@ -536,7 +538,7 @@ class CCILGenerator:
                     f"Redundant isVoid expression in {node.line}, {node.col}."
                     f" Type {node.expr.type.name} will always evaluate to false"
                 )
-                op = IntNode("0")
+                op = BoolNode("0")
             else:
                 op = EqualIntNode(IdNode(fval_id), IntNode("0"))
         elif node_type == sem_ast.NotNode:
@@ -684,7 +686,7 @@ class CCILGenerator:
         bool_id = f"bool_{times}"
         value = "0" if node.value == "false" else "1"
 
-        bool_node = self.create_int(bool_id, value)
+        bool_node = self.create_bool(bool_id, value)
         return [bool_node], bool_node
 
     def create_class_init_func(
@@ -696,7 +698,7 @@ class CCILGenerator:
         self.reset_scope()
 
         init_params = self.init_func_params(node.id)
-        self.ccil_cool_names.add_new_name_pair("self", node.id)
+        # self.ccil_cool_names.add_new_name_pair("self", node.id)
 
         # First operation, initalizing parent attributes
         init_parent = self.create_call(
@@ -720,7 +722,7 @@ class CCILGenerator:
         return FunctionNode(
             f"init_{node.id}",
             init_params,
-            to_vars(self.locals, Local),
+            self.dump_locals(),
             init_attr_ops,
             dummy_return.id,
         )
@@ -758,7 +760,7 @@ class CCILGenerator:
                 Method("type_name", type_name_func),
                 Method("copy", copy_func),
             ],
-            self.define_empty_init_func(OBJECT),
+            self.define_builtin_init_func(OBJECT),
         )
 
         # Defining IO class methods
@@ -797,7 +799,7 @@ class CCILGenerator:
                 Method("in_string", in_string_func),
                 Method("in_int", in_int_func),
             ],
-            self.define_empty_init_func(IO),
+            self.define_builtin_init_func(IO),
         )
 
         # Defining substring class methods
@@ -864,19 +866,30 @@ class CCILGenerator:
         substr_func = FunctionNode(
             "substr", params, self.dump_locals(), operations, substr.id
         )
+        attributes = [Attribute("value", STRING, "value")]
         string_class = Class(
             STRING,
-            [],
+            attributes,
             [
                 *object_class.methods,
                 Method("length", lenght_func),
                 Method("concat", concat_func),
                 Method("substr", substr_func),
             ],
-            self.define_empty_init_func(STRING),
+            self.define_builtin_init_func(STRING, attributes),
         )
 
-        return [object_class, io_class, string_class], [
+        attributes = [Attribute("value", INT, "value")]
+        int_class = Class(
+            INT, attributes, [], self.define_builtin_init_func(INT, attributes)
+        )
+
+        attributes = [Attribute("value", BOOL, "value")]
+        bool_class = Class(
+            BOOL, attributes, [], self.define_builtin_init_func(BOOL, attributes)
+        )
+
+        return [object_class, io_class, string_class, int_class, bool_class], [
             abort_func,
             type_name_func,
             copy_func,
@@ -960,6 +973,10 @@ class CCILGenerator:
         self.add_local(idx, INT)
         return StorageNode(idx, IntNode(value))
 
+    def create_bool(self, idx: str, value: str):
+        self.add_local(idx, BOOL)
+        return StorageNode(idx, BoolNode(value))
+
     def create_int_to_str(self, idx: str, target: str):
         self.add_local(str, STRING)
         return StorageNode(idx, StrOpNode(target))
@@ -1002,16 +1019,38 @@ class CCILGenerator:
             "main", [], self.dump_locals(), [program, execute], execute.id
         )
 
-    def define_empty_init_func(self, class_name: str):
+    def define_builtin_init_func(
+        self, class_name: str, attributes: List[Attribute] = []
+    ):
+        self.reset_locals()
         params = self.init_func_params(class_name)
         dummy_return = self.create_storage(
             f"init_type_{class_name}_ret", INT, IntNode(0)
         )
+
+        set_default_ops: List[OperationNode] = self.init_default_values()
+        string_default = int_default = False
+        for attr in attributes:
+            if attr.type == STRING:
+                value = IdNode(EMPTY)
+                string_default = True
+            else:
+                value = IdNode(ZERO)
+                int_default = True
+            set_default_ops.append(SetAttrOpNode("self", attr.id, value, class_name))
+
+        if not string_default:
+            set_default_ops.pop(1)
+            del self.locals[EMPTY]
+        if not int_default:
+            set_default_ops.pop(0)
+            del self.locals[ZERO]
+
         return FunctionNode(
             f"init_{class_name}",
             params,
             self.dump_locals(),
-            [dummy_return],
+            [*set_default_ops, dummy_return],
             dummy_return.id,
         )
 

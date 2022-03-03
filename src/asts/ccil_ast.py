@@ -18,7 +18,7 @@ class CCILProgram:
         types_section = self.types_section
         code_section = self.code_section
         if not all:
-            types_section = self.types_section[3:]
+            types_section = self.types_section[5:]
             code_section = self.code_section[10:]
 
         ident = "\t"
@@ -39,7 +39,7 @@ class Class:
     methods: List[Method]
     init_operations: FunctionNode
 
-    def __str__(self, all=False) -> str:
+    def __str__(self, all=True) -> str:
         ident = "\t\t"
         attributes = "\n".join(ident + str(a) for a in self.attributes)
         methods = "\n".join(ident + str(m) for m in self.methods)
@@ -413,6 +413,11 @@ class ConstantNode(AtomOpNode):
 
 
 class IntNode(ConstantNode):
+    def __init__(self, value: str) -> None:
+        super().__init__(value)
+
+
+class BoolNode(ConstantNode):
     def __init__(self, value: str) -> None:
         super().__init__(value)
 
