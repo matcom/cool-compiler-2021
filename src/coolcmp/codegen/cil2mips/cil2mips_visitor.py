@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import Dict
 
+import reg as reg
+
 from coolcmp.utils import cil, visitor
 from coolcmp.utils import mips, registers
 from coolcmp.utils import extract_class_name
@@ -237,7 +239,7 @@ class CILToMipsVisitor:
             mips.LWNode(t0, (obj_address, fp)),     # get instance pointer
             mips.LWNode(t0, (0, t0)),               # get instance type pointer at offset 0
             mips.LWNode(t0, (meth_offset, t0)),     # get method
-            mips.JALRNode(t0),
+            mips.JALRNode(t0)                       .with_comm(f'Jump to {node.method}'),
             mips.SWNode(v0, dest_address, fp),
             mips.CommentNode(f"</dynamiccall:{node.obj}-{node.method}-{node.dest}>"),
         )
@@ -409,7 +411,7 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.TypeNameNode)
     def visit(self, node: cil.TypeNameNode):
-        t0, t1, fp, v0 = registers.T[0], registers.T[1], registers.FP, registers.V0
+        t0, fp, v0 = registers.T[0], registers.FP, registers.V0
 
         name_offset = self.types['Object'].name_offset
         src_offset = self.get_address(node.src)
@@ -426,4 +428,27 @@ class CILToMipsVisitor:
             mips.ADDINode(t0, t0, name_offset)      .with_comm('Point to name of type'),
             mips.SWNode(t0, 4, v0)                  .with_comm('Save name of the type in the new string'),
             mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
+        )
+
+    @visitor.when(cil.IsVoidNode)
+    def visit(self, node: cil.IsVoidNode):
+        t0 = registers.T[0]
+        a0 = registers.ARG[0]
+        fp, v0 = registers.FP, registers.V0
+
+        src = self.get_address(node.src)
+        dest = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<isvoid:{node.dest}-{node.src}>"),
+        )
+
+        self.visit(cil.AllocateNode('Bool', node.dest))
+
+        self.add_inst(
+            mips.LWNode(a0, (src, fp))      .with_comm('Push instance pointer'),
+            mips.JALNode('isvoid'),
+            mips.LWNode(t0, (dest, fp))     .with_comm('Load Bool pointer'),
+            mips.SWNode(v0, 4, t0)          .with_comm('Save isvoid result as value of Bool'),
+            mips.CommentNode(f"</isvoid:{node.dest}-{node.src}>"),
         )

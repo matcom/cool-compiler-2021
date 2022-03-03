@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import List, Tuple, Union
 
+import self as self
+
 from coolcmp.utils.registers import FP, Register, SP, DW, ARG, V0
 from coolcmp.utils import cil
 
@@ -120,6 +122,15 @@ class StringNode(DataNode):
 
     def __str__(self):
         return f"{self.label}: .asciiz {self.value}"
+
+
+class LabelNode(InstructionNode):
+    def __init__(self, label: str):
+        super().__init__()
+        self.label = label
+
+    def __str__(self):
+        return f"{self.label}:"
 
 
 class SWNode(InstructionNode):
@@ -292,6 +303,21 @@ class JRNode(InstructionNode):
 
     def __str__(self):
         return f"jr     {str(self.dest)}"
+
+
+class BEQNode(InstructionNode):
+    """
+    branch on equal | beq $1, $2, 100 | if($1 == $2) go to PC + 4 + 100
+    Test if registers are equal.
+    """
+    def __init__(self, reg1: Register, reg2: Register, label: str):
+        super().__init__()
+        self.reg1 = reg1
+        self.reg2 = reg2
+        self.label = label
+
+    def __str__(self):
+        return f"beq    {self.reg1}, {self.reg2}, {self.label}"
 
 
 class SLLNode(InstructionNode):

@@ -38,6 +38,9 @@ class DotTypesDataVisitor:
                 name='IO',
                 attrs=[],
                 methods={
+                    'IO_abort': 'Object_abort',
+                    'IO_type_name': 'Object_type_name',
+                    'IO_copy': 'Object_copy',
                     'IO_out_string': 'IO_out_string',
                     'IO_out_int': 'IO_out_int',
                     'IO_in_string': 'IO_in_string',
@@ -50,6 +53,9 @@ class DotTypesDataVisitor:
                     'String_value',
                 ],
                 methods={
+                    'String_abort': 'Object_abort',
+                    'String_type_name': 'Object_type_name',
+                    'String_copy': 'Object_copy',
                     'String_length': 'String_length',
                     'String_concat': 'String_concat',
                     'String_substr': 'String_substr',
@@ -60,19 +66,31 @@ class DotTypesDataVisitor:
                 attrs=[
                     'Bool_value',
                 ],
-                methods={}
+                methods={
+                    'Bool_abort': 'Object_abort',
+                    'Bool_type_name': 'Object_type_name',
+                    'Bool_copy': 'Object_copy',
+                }
             ),
             cil.TypeNode(
                 name='Int',
                 attrs=[
                     'Int_value',
                 ],
-                methods={}
+                methods={
+                    'Int_abort': 'Object_abort',
+                    'Int_type_name': 'Object_type_name',
+                    'Int_copy': 'Object_copy',
+                }
             ),
             cil.TypeNode(
                 name='Void',
                 attrs=[],
-                methods={}
+                methods={
+                    'Void_abort': 'Object_abort',
+                    'Void_type_name': 'Object_type_name',
+                    'Void_copy': 'Object_copy',
+                }
             ),
         ]
 
