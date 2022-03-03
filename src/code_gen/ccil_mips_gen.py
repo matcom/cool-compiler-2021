@@ -56,19 +56,6 @@ class CCILToMIPSGenerator:
                     mips_ast.AsciizDirective(node, [mips_ast.Label(node, d.value)]),
                 )
             )
-        for builtin_type in ("Int", "Bool"):
-            word_directive = [
-                mips_ast.Label(node, builtin_type),
-                mips_ast.Label(node, builtin_type),
-                mips_ast.Label(node, f"class_{builtin_type}"),
-                mips_ast.Label(node, 1),
-            ]
-            data.append(
-                (
-                    mips_ast.LabelDeclaration(node, builtin_type),
-                    mips_ast.WordDirective(node, word_directive),
-                )
-            )
         data.append(
             (
                 mips_ast.LabelDeclaration(node, "buffer"),
@@ -191,38 +178,27 @@ class CCILToMIPSGenerator:
         )
         return instructions
 
+    @visitor.when(ccil_ast.BoolNode)
+    def visit(self, node: ccil_ast.BoolNode):
+        instructions = []
+
+        t7 = mips_ast.RegisterNode(node, T7)
+        instructions.append(
+            mips_ast.LoadImmediate(node, t7, mips_ast.Constant(node, node.value))
+        )
+        instructions.extend(self._set_new_bool(node))
+
+        return instructions
+
     @visitor.when(ccil_ast.IntNode)
     def visit(self, node: ccil_ast.IntNode):
         instructions = []
 
-        v0 = mips_ast.RegisterNode(node, V0)
-        a0 = mips_ast.RegisterNode(node, A0)
-
+        t7 = mips_ast.RegisterNode(node, T7)
         instructions.append(
-            mips_ast.LoadImmediate(node, a0, mips_ast.Constant(node, 2 * WORD))
+            mips_ast.LoadImmediate(node, t7, mips_ast.Constant(node, node.value))
         )
-        instructions.append(
-            mips_ast.LoadImmediate(node, v0, mips_ast.Constant(node, 9))
-        )
-        instructions.append(mips_ast.Syscall(node))
-        t0 = mips_ast.RegisterNode(node, T0)
-        instructions.append(mips_ast.LoadAddress(node, t0, mips_ast.Label(node, "Int")))
-        instructions.append(
-            mips_ast.StoreWord(
-                node, t0, mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), v0)
-            )
-        )
-
-        instructions.append(
-            mips_ast.LoadImmediate(node, t0, mips_ast.Constant(node, node.value))
-        )
-        instructions.append(
-            mips_ast.StoreWord(
-                node,
-                t0,
-                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, WORD), v0),
-            )
-        )
+        instructions.extend(self._set_new_int(node))
         return instructions
 
     @visitor.when(ccil_ast.CallOpNode)
