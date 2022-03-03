@@ -427,9 +427,23 @@ class FlowControlNode(OperationNode):
 
 
 class CurrentTypeNameNode(ReturnOpNode):
-    def __init__(self, target: str) -> None:
+    def __init__(self, target: str, static_type: str) -> None:
         super().__init__()
         self.target = target
+        self.static_type = static_type
+
+    def __str__(self) -> str:
+        return f"type_name {self.target}"
+
+
+class ShallowCopyOpNode(OperationNode):
+    def __init__(self, dest: str, source: str) -> None:
+        super().__init__()
+        self.dest = dest
+        self.source = source
+
+    def __str__(self) -> str:
+        return f"copy {self.dest} {self.source}"
 
 
 class IfNode(FlowControlNode):

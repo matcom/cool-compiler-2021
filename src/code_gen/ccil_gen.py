@@ -315,7 +315,9 @@ class CCILGenerator:
         )
 
         # Storing the type of the resulting case expression
-        expr_type = self.create_type_name(f"case_{times}_expr_type", case_expr_fv.id)
+        expr_type = self.create_type_name(
+            f"case_{times}_expr_type", case_expr_fv.id, node.case_expr.type.name
+        )
 
         # Final label where all branch must jump to
         final_label = LabelNode(f"case_{times}_end")
@@ -330,7 +332,7 @@ class CCILGenerator:
         pattern_match_ops = self.init_default_values()
 
         branch_ops = []
-        visited_types = set() # To optimize and reduce redundant calling
+        visited_types = set()  # To optimize and reduce redundant calling
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
             branch_var = self.create_assignation(
@@ -354,7 +356,9 @@ class CCILGenerator:
                     )
                     select_branch = StorageNode(
                         equality_holder.id,
-                        EqualStrNode(extract_id(expr_type), extract_id(load_class_name)),
+                        EqualStrNode(
+                            extract_id(expr_type), extract_id(load_class_name)
+                        ),
                     )
                     # Conditional jump to the right branch label
                     if_op = IfNode(extract_id(select_branch), branch_label)
@@ -732,14 +736,19 @@ class CCILGenerator:
             "abort", params, self.dump_locals(), [load, print, abort], "self"
         )
         params = self.init_func_params(OBJECT)
-        get_name = self.create_type_name("get_name", "self")
+        get_name = self.create_type_name("get_name", "self", OBJECT)
         type_name_func = FunctionNode(
             "type_name", params, self.dump_locals(), [get_name], get_name.id
         )
         params = self.init_func_params(OBJECT)
-        new_instance = self.create_new_type("copy", SELFTYPE)
+        new_instance = self.create_new_type("shallow_copy", SELFTYPE)
+        update_instance = ShallowCopyOpNode(new_instance.id, "self")
         copy_func = FunctionNode(
-            "copy", params, self.dump_locals(), [new_instance], new_instance.id
+            "copy",
+            params,
+            self.dump_locals(),
+            [new_instance, update_instance],
+            new_instance.id,
         )
         object_class = Class(
             OBJECT,
@@ -963,9 +972,9 @@ class CCILGenerator:
         self.add_local(idx, INT)
         return StorageNode(idx, ReadIntNode())
 
-    def create_type_name(self, idx: str, target: str):
+    def create_type_name(self, idx: str, target: str, static_type: str):
         self.add_local(idx, STRING)
-        return StorageNode(idx, CurrentTypeNameNode(target))
+        return StorageNode(idx, CurrentTypeNameNode(target, static_type))
 
     def create_length(self, idx: str, target: str):
         self.add_local(idx, INT)
