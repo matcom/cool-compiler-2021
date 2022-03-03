@@ -21,7 +21,7 @@ class CCILToMIPSGenerator:
         self.__types_table: List[ccil_ast.Class] = []
         self.__location: Location = {}
         self.__current_function: ccil_ast.FunctionNode
-        self.buffer_size = 20
+        self.buffer_size = 1000
 
     @visitor.on("node")
     def visit(self, node):
@@ -748,6 +748,13 @@ class CCILToMIPSGenerator:
                 node, mips_ast.RegisterNode(node, V0), mips_ast.Constant(node, 5)
             )
         )
+        instructions.append(mips_ast.Syscall(node))
+        instructions.append(
+            mips_ast.Move(
+                node, mips_ast.RegisterNode(node, T7), mips_ast.RegisterNode(node, V0)
+            )
+        )
+        instructions.extend(self._set_new_int(node))
         return instructions
 
     @visitor.when(ccil_ast.Abort)
@@ -1126,9 +1133,7 @@ class CCILToMIPSGenerator:
             mips_ast.LoadWord(
                 node,
                 start,
-                mips_ast.MemoryIndexNode(
-                    node, mips_ast.Constant(node, WORD), start
-                ),
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, WORD), start),
             )
         )
         instructions.append(mips_ast.Add(node, char_string, char_string, start))
@@ -1196,7 +1201,7 @@ class CCILToMIPSGenerator:
     @visitor.when(ccil_ast.CurrentTypeNameNode)
     def visit(self, node: ccil_ast.CurrentTypeNameNode):
         instructions = []
-        result = mips_ast.RegisterNode(node, V0)
+        result = mips_ast.RegisterNode(node, T7)
 
         object = mips_ast.RegisterNode(node, T0)
         instructions.append(
@@ -1220,6 +1225,7 @@ class CCILToMIPSGenerator:
                 ),
             )
         )
+        instructions.extend(self._set_new_string(node))
         return instructions
 
     @visitor.when(ccil_ast.ShallowCopyOpNode)
@@ -1312,6 +1318,102 @@ class CCILToMIPSGenerator:
     @visitor.when(ccil_ast.ReadStrNode)
     def visit(self, node: ccil_ast.ReadStrNode):
         instructions = []
+
+        a0 = mips_ast.RegisterNode(node, A0)
+        a1 = mips_ast.RegisterNode(node, A1)
+        v0 = mips_ast.RegisterNode(node, V0)
+        t7 = mips_ast.RegisterNode(node, T7)
+        instructions.append(
+            mips_ast.LoadAddress(node, a0, mips_ast.Label(node, "buffer"))
+        )
+        instructions.append(
+            mips_ast.LoadImmediate(node, a1, mips_ast.Constant(node, self.buffer_size))
+        )
+        instructions.append(
+            mips_ast.LoadImmediate(node, v0, mips_ast.Constant(node, 8))
+        )
+        instructions.append(mips_ast.Syscall(node))
+        instructions.append(
+            mips_ast.LoadAddress(node, t7, mips_ast.Label(node, "buffer"))
+        )
+        instructions.extend(self._set_new_string(node))
+
+        instructions.extend(self._push_stack(node, v0))
+        instructions.append(mips_ast.JumpAndLink(node, mips_ast.Label(node, "length")))
+        instructions.extend(self._pop_stack(node, a0))
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                a0,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, WORD), v0),
+            )
+        )
+        # instructions.append(mips_ast.Addi(node, a0, a0, mips_ast.Constant(node, 1)))
+        instructions.append(
+            mips_ast.LoadImmediate(node, v0, mips_ast.Constant(node, 9))
+        )
+        instructions.append(mips_ast.Syscall(node))
+
+        char = mips_ast.RegisterNode(node, T0)
+        string = mips_ast.RegisterNode(node, T1)
+        buffer_string = mips_ast.RegisterNode(node, T2)
+        buffer_char = mips_ast.RegisterNode(node, T3)
+        string_char = mips_ast.RegisterNode(node, T4)
+        zero = mips_ast.RegisterNode(node, ZERO)
+        instructions.append(mips_ast.Move(node, string, v0))
+        instructions.append(
+            mips_ast.LoadAddress(node, buffer_string, mips_ast.Label(node, "buffer"))
+        )
+        instructions.append(mips_ast.Move(node, buffer_char, buffer_string))
+        instructions.append(mips_ast.Move(node, string_char, string))
+
+        loop = self._generate_unique_label()
+        end = self._generate_unique_label()
+
+        instructions.append(mips_ast.LabelDeclaration(node, loop))
+        instructions.append(
+            mips_ast.LoadByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), buffer_char),
+            )
+        )
+        instructions.append(
+            mips_ast.StoreByte(
+                node,
+                char,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), string_char),
+            )
+        )
+        new_line = mips_ast.RegisterNode(node, T9)
+        instructions.append(
+            mips_ast.LoadImmediate(node, new_line, mips_ast.Constant(node, 10))
+        )
+        instructions.append(
+            mips_ast.BranchOnEqual(node, char, new_line, mips_ast.Label(node, end))
+        )
+
+        instructions.append(
+            mips_ast.Addi(node, buffer_char, buffer_char, mips_ast.Constant(node, 1))
+        )
+        instructions.append(
+            mips_ast.Addi(node, string_char, string_char, mips_ast.Constant(node, 1))
+        )
+        instructions.append(mips_ast.Jump(node, mips_ast.Label(node, loop)))
+        instructions.append(mips_ast.LabelDeclaration(node, end))
+
+        instructions.append(
+            mips_ast.StoreByte(
+                node,
+                zero,
+                mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, 0), string_char),
+            )
+        )
+
+        instructions.append(mips_ast.Move(node, t7, string))
+        instructions.extend(self._set_new_string(node))
+
         return instructions
 
     def _get_attr_index(self, typex: str, attr: str):
@@ -1468,6 +1570,21 @@ class CCILToMIPSGenerator:
             )
         )
         instructions.append(mips_ast.Syscall(node))
+        instructions.append(
+            mips_ast.LoadAddress(
+                node, mips_ast.RegisterNode(node, T8), mips_ast.Label(node, "Int")
+            )
+        )
+
+        instructions.append(
+            mips_ast.StoreWord(
+                node,
+                mips_ast.RegisterNode(node, T8),
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), mips_ast.RegisterNode(node, V0)
+                ),
+            )
+        )
 
         instructions.append(
             mips_ast.StoreWord(
@@ -1493,6 +1610,21 @@ class CCILToMIPSGenerator:
             )
         )
         instructions.append(mips_ast.Syscall(node))
+        instructions.append(
+            mips_ast.LoadAddress(
+                node, mips_ast.RegisterNode(node, T8), mips_ast.Label(node, "Bool")
+            )
+        )
+
+        instructions.append(
+            mips_ast.StoreWord(
+                node,
+                mips_ast.RegisterNode(node, T8),
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), mips_ast.RegisterNode(node, V0)
+                ),
+            )
+        )
 
         instructions.append(
             mips_ast.StoreWord(
@@ -1518,7 +1650,21 @@ class CCILToMIPSGenerator:
             )
         )
         instructions.append(mips_ast.Syscall(node))
+        instructions.append(
+            mips_ast.LoadAddress(
+                node, mips_ast.RegisterNode(node, T8), mips_ast.Label(node, "String")
+            )
+        )
 
+        instructions.append(
+            mips_ast.StoreWord(
+                node,
+                mips_ast.RegisterNode(node, T8),
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, 0), mips_ast.RegisterNode(node, V0)
+                ),
+            )
+        )
         instructions.append(
             mips_ast.StoreWord(
                 node,

@@ -67,12 +67,6 @@ class VarDeclarationNode(ExpressionNode):
         self.type = typex
         self.expr = expression
 
-class ParamNode(ExpressionNode):
-     def __init__(self, idx, typex):
-        Node.__init__(self)
-        self.id = idx
-        self.type = typex
-
 
 class AssignNode(ExpressionNode):
     def __init__(self, idx, expr):
