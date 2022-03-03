@@ -383,7 +383,6 @@ class CILToMipsVisitor:
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
         print(node.src, node.dest, node.index, node.length)
-        input()
         t1 = registers.T[1]
         fp = registers.FP
         a0, a1, a2 = registers.ARG[0], registers.ARG[1], registers.ARG[2]
@@ -398,7 +397,6 @@ class CILToMipsVisitor:
         index_address = self.get_address(node.index)
         length_address = self.get_address(node.length)
         print(src_address, dest_address, index_address, length_address)
-        input()
         push_src = (
             mips.LWNode(a0, (src_address, fp)),
             mips.LWNode(a0, (4, a0))
@@ -429,9 +427,8 @@ class CILToMipsVisitor:
     def visit(self, node: cil.TypeNameNode):
         t0, t1, fp, v0 = registers.T[0], registers.T[1], registers.FP, registers.V0
 
-        type_ = self.types['Object']
+        name_offset = self.types['Object'].name_offset
         src_offset = self.get_address(node.src)
-        dest_offset = self.get_address(node.dest)
 
         self.add_inst(
             mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
@@ -440,9 +437,8 @@ class CILToMipsVisitor:
         self.visit(cil.AllocateNode('String', node.dest))
 
         self.add_inst(
-            mips.LWNode(t0, (src_offset, fp)),
-            mips.LWNode(t0, (type_.name_offset, t0)),
-            mips.LWNode(t1, (dest_offset, fp)),
-            mips.SWNode(t0, 4, t1),
+            mips.LWNode(t0, (src_offset, fp)).with_comm('Load pointer to instance'),
+            mips.ADDINode(t0, t0, name_offset),
+            mips.SWNode(t0, 4, v0),
             mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
         )

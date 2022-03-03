@@ -66,9 +66,13 @@ class MIPSFormatter:
             self.visit(ins) for ins in node.instructions
         )
 
-    @visitor.when(mips.Node)
-    def visit(self, node: mips.Node):
+    @visitor.when(mips.DataNode)
+    def visit(self, node: mips.DataNode):
         return str(node)
+
+    @visitor.when(mips.InstructionNode)
+    def visit(self, node: mips.InstructionNode):
+        return str(node) + node.comment
 
     # @visitor.when(mips.JALNode)
     # def visit(self, node: mips.JALNode):

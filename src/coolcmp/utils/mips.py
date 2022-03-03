@@ -80,11 +80,25 @@ class FunctionNode(Node):
 
 
 class InstructionNode(Node):
-    pass
+    def __init__(self):
+        self._comment: str = ''
+
+    def with_comm(self, comment: str) -> InstructionNode:
+        self._comment = comment
+        return self
+
+    @property
+    def comment(self):
+        return f"\t\t\t# {self._comment}" if self._comment else ""
+
+    @comment.setter
+    def comment(self, comment: str):
+        self._comment = comment
 
 
 class CommentNode(InstructionNode):
     def __init__(self, text: str):
+        super().__init__()
         self.text = text
 
     def __str__(self):
@@ -114,6 +128,7 @@ class SWNode(InstructionNode):
     Copy from register to memory.
     """
     def __init__(self, dest: Register, offset: int, src: Memory):
+        super().__init__()
         self.dest = dest
         self.offset = offset
         self.src = src
@@ -128,14 +143,15 @@ class LWNode(InstructionNode):
     Copy from memory to register.
     """
     def __init__(self, dest: Register, src: tuple[int, Memory] | str):
+        super().__init__()
         self.dest = dest
         self.src = src
 
     def __str__(self):
         if isinstance(self.src, tuple):
-            return f'lw     {self.dest}, {self.src[0]}({self.src[1]})'
+            return f"lw     {self.dest}, {self.src[0]}({self.src[1]})"
         else:
-            return f'lw     {self.dest}, {self.src}'
+            return f"lw     {self.dest}, {self.src}"
 
 
 class LINode(InstructionNode):
@@ -144,6 +160,7 @@ class LINode(InstructionNode):
     Loads immediate value into register.
     """
     def __init__(self, reg: Register, value: int):
+        super().__init__()
         self.reg = reg
         self.value = value
 
@@ -158,6 +175,7 @@ class JALNode(InstructionNode):
     This saves the return address in $ra.
     """
     def __init__(self, dest: str):
+        super().__init__()
         self.dest = dest
 
     def __str__(self):
@@ -169,6 +187,7 @@ class JALRNode(InstructionNode):
     jump and link to register value
     """
     def __init__(self, reg: Register):
+        super().__init__()
         self.reg = reg
     
     def __str__(self):
@@ -181,6 +200,7 @@ class LANode(InstructionNode):
     Loads computed address of label (not its contents) into register.
     """
     def __init__(self, reg: Register, label: str):
+        super().__init__()
         self.reg = reg
         self.label = label
 
@@ -193,6 +213,7 @@ class ADDNode(InstructionNode):
     add | add $1, $2, $3 | $1 = $2 + $3
     """
     def __init__(self, dest: Register, src1: Register | int, src2: Register | int):
+        super().__init__()
         self.dest = dest
         self.src1 = src1
         self.src2 = src2
@@ -207,6 +228,7 @@ class ADDINode(InstructionNode):
     "Immediate" means a constant number.
     """
     def __init__(self, dest: Register, src: Register | int, isrc: Register | int):
+        super().__init__()
         self.dest = dest
         self.src = src
         self.isrc = isrc
@@ -221,6 +243,7 @@ class ADDUNode(InstructionNode):
     Values are treated as unsigned integers, not two's complement integers.
     """
     def __init__(self, rdest: Register, r1: Register, r2: Register | int):
+        super().__init__()
         self.rdest = rdest
         self.r1 = r1
         self.r2 = r2
@@ -234,6 +257,7 @@ class SUBNode(InstructionNode):
     subtract | sub $1, $2, $3 | $1 = $2 - $3
     """
     def __init__(self, rdest: Register, r1: Register, r2: Register | int):
+        super().__init__()
         self.rdest = rdest
         self.r1 = r1
         self.r2 = r2
@@ -248,6 +272,7 @@ class SUBUNode(InstructionNode):
     Values are treated as unsigned integers, not two's complement integers.
     """
     def __init__(self, rdest: Register, r1: Register, r2: Register | int):
+        super().__init__()
         self.rdest = rdest
         self.r1 = r1
         self.r2 = r2
@@ -262,6 +287,7 @@ class JRNode(InstructionNode):
     For switch, procedure return.
     """
     def __init__(self, dest: Register):
+        super().__init__()
         self.dest = dest
 
     def __str__(self):
@@ -274,6 +300,7 @@ class SLLNode(InstructionNode):
     sll $1, $2, 10 -> $1 = $2<<10
     """
     def __init__(self, dest: Register, src: Register, bits: int):
+        super().__init__()
         self.dest = dest
         self.src = src
         self.bits = bits
@@ -289,6 +316,7 @@ class MoveNode(InstructionNode):
     """
 
     def __init__(self, reg1: Register, reg2: Register):
+        super().__init__()
         self.reg1 = reg1
         self.reg2 = reg2
 
@@ -297,6 +325,9 @@ class MoveNode(InstructionNode):
 
 
 class SysCallNode(InstructionNode):
+    def __init__(self):
+        super().__init__()
+
     def __str__(self):
         return "syscall"
 
@@ -306,7 +337,8 @@ class PrintIntNode(SysCallNode):
     print_int | $a0 = integer to be printed | code in v0 = 1
     Print integer number (32 bit).
     """
-    pass
+    def __init__(self):
+        super().__init__()
 
 
 class PrintStringNode(SysCallNode):
@@ -314,7 +346,8 @@ class PrintStringNode(SysCallNode):
     print_string | $a0 = address of string in memory | code in v0 = 4
     Print null-terminated character string.
     """
-    pass
+    def __init__(self):
+        super().__init__()
 
 
 def push_register_instructions(reg_name: str) -> List[InstructionNode]:
