@@ -287,38 +287,55 @@ class CILToMipsVisitor:
         assuming left and right operands are ints
         """
         t0, t1, t2 = registers.T[0], registers.T[1], registers.T[2]
+        fp = registers.FP
         dest_address = self.cur_function.variable_address(node.dest)
-
-        self.visit(node.left)
-        self.visit(node.right)
-
-        def handle_set_register_value(reg: registers.Register, value: int | str):
-            if isinstance(value, int):
-                self.add_inst(mips.LINode(reg, value))
-            else:
-                address = self.cur_function.variable_address(value)
-                self.add_inst(mips.LWNode(reg, (address, registers.FP)))
+        
+        left_offset = self.get_address(node.left)
+        right_offset = self.get_address(node.right)
+        dest_offset = self.get_address(node.dest)
 
         self.add_inst(mips.CommentNode(f"<sum:{node.dest}<-{node.left}+{node.right}>"))
-        handle_set_register_value(t0, node.left)
-        handle_set_register_value(t1, node.right)
+
         self.add_inst(
-            mips.ADDNode(t2, t0, t1),
-            mips.SWNode(t2, dest_address, registers.FP),
-            mips.CommentNode(f"</sum:{node.dest}<-{node.left}+{node.right}>"),
+            mips.CommentNode(f"<plus:{node.dest}<-{node.left}+{node.right}>"),
+            mips.LWNode(t0, (left_offset, fp)) .with_comm(' load Int_value at offset 4'),
+            mips.LWNode(t0, (4, t0)),
+            mips.LWNode(t1, (right_offset, fp)) .with_comm('load Int_value at offset 4'),
+            mips.LWNode(t1, (4, t1)),
+            mips.ADDNode(t2, t0, t1) .with_comm('subtract the integer values'),
+        )
+
+        self.visit(cil.AllocateNode('Int', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t1, (dest_offset, fp)),
+            mips.SWNode(t2, 4, t1),
+            mips.CommentNode(f"</plus:{node.dest}<-{node.left}+{node.right}>"),
         )
 
     @visitor.when(cil.MinusNode)
     def visit(self, node: cil.MinusNode):
         t0, t1, t2 = registers.T[0], registers.T[1], registers.T[2]
+        fp = registers.FP
+        left_offset = self.get_address(node.left)
+        right_offset = self.get_address(node.right)
+        dest_offset = self.get_address(node.dest)
 
         self.add_inst(
-            mips.CommentNode(f"<minus:{node.dest}<-{node.left}+{node.right}>"),
-            mips.LWNode(t0, (4, node.left)),  # load Int_value at offset 4
-            mips.LWNode(t1, (4, node.right)),  # load Int_value at offset 4
+            mips.CommentNode(f"<minus:{node.dest}<-{node.left}-{node.right}>"),
+            mips.LWNode(t0, (left_offset, fp)),  # load Int_value at offset 4
+            mips.LWNode(t0, (4, t0)),
+            mips.LWNode(t1, (right_offset, fp)),  # load Int_value at offset 4
+            mips.LWNode(t1, (4, t1)),
             mips.SUBNode(t2, t0, t1),  # subtract the integer values
-            # allocate here new Int with the value in t0 as Int_value
-            mips.CommentNode(f"</minus:{node.dest}<-{node.left}+{node.right}>"),
+        )
+
+        self.visit(cil.AllocateNode('Int', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t1, (dest_offset, fp)),
+            mips.SWNode(t2, 4, t1),
+            mips.CommentNode(f"</minus:{node.dest}<-{node.left}-{node.right}>"),
         )
 
     @visitor.when(cil.LoadNode)
