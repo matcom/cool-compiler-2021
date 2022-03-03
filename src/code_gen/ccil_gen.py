@@ -829,10 +829,10 @@ class CCILGenerator:
             "max_take", INT, SumOpNode(IdNode(start_index.id), IdNode(take.id))
         )
         upper_bound = self.create_storage(
-            "upper_bound", INT, LessOpNode(extract_id(length), extract_id(max_take))
+            "upper_bound", BOOL, LessOpNode(extract_id(length), extract_id(max_take))
         )
         lesser_bound = self.create_storage(
-            "lesser_bound", INT, LessOpNode(IdNode(start_index.id), IntNode("0"))
+            "lesser_bound", BOOL, LessOpNode(IdNode(start_index.id), IntNode("0"))
         )
         error_label = LabelNode("substring_error")
         ok_label = LabelNode("substring_success")
