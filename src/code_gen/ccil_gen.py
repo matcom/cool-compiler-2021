@@ -118,7 +118,8 @@ class CCILGenerator:
         self.ccil_cool_names.add_new_names(*[(a.cool_id, a.id) for a in attributes])
         init_func = self.create_class_init_func(node, attr_nodes)
 
-        # self.reset_scope()
+        self.reset_scope()
+        self.ccil_cool_names.add_new_names(*[(a.cool_id, a.id) for a in attributes])
         # Explore all functions
         class_code: List[FunctionNode] = []
         for func in func_nodes:
@@ -249,12 +250,19 @@ class CCILGenerator:
 
         ccil_id, is_attr = self.ccil_cool_names.get_value_position(node.id)
 
+        print(is_attr, node.id, ccil_id)
         if is_attr:
             # Assignation occurring to an attribute Go update the attribute
             set_attr = SetAttrOpNode(
                 "self", ccil_id, extract_id(expr_fval), self.current_type
             )
-            return [*expr_ops, set_attr], expr_fval
+            attr_val = self.create_assignation(
+                f"local_attr_{node.id}_{self.times(node, node.id)}",
+                node.type.name,
+                expr_fval.id,
+                reuse=False,
+            )
+            return [*expr_ops, set_attr, attr_val], attr_val
 
         self.update_locals(expr_fval.id, ccil_id)
         expr_fval.id = ccil_id
@@ -565,6 +573,8 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.MethodCallNode)
     def visit(self, node: sem_ast.MethodCallNode) -> VISITOR_RESULT:
+        call_id = f"call_{self.times(node, extra='call')}"
+        vcall_id = f"vcall_{self.times(node, extra='vcall')}"
         times = self.times(node)
 
         # Translate all call arguments to ccil
@@ -578,9 +588,8 @@ class CCILGenerator:
 
         # id(arg1, arg2, ..., argn)
         if node.expr is None:
-            fval_id = f"vcall_{times}"
             call = self.create_vcall(
-                fval_id,
+                vcall_id,
                 node.type.name,
                 node.id,
                 node.caller_type.name,
@@ -591,9 +600,8 @@ class CCILGenerator:
         (expr_ops, expr_fval) = self.visit(node.expr)
 
         if node.caller_type.name == STRING:
-            fval_id = f"call_str_{times}"
             call = self.create_call(
-                fval_id, node.type.name, node.id, STRING, [extract_id(expr_fval), *args]
+                call_id, node.type.name, node.id, STRING, [extract_id(expr_fval), *args]
             )
             return [*expr_ops, *args_ops, call], call
 
@@ -622,9 +630,8 @@ class CCILGenerator:
 
         # <expr>@type.id(arg1, arg2, ..., argn)
         if node.at_type is not None:
-            fval_id = f"call_{times}"
             call = self.create_call(
-                fval_id,
+                call_id,
                 node.type.name,
                 make_unique_func_id(node.id, node.caller_type.name),
                 node.caller_type.name,
@@ -633,9 +640,8 @@ class CCILGenerator:
             return [*expr_ops, *error_ops, *args_ops, call], call
 
         # <expr>.id(arg1, arg2, ..., argn)
-        fval_id = f"vcall_{times}"
         call = self.create_vcall(
-            fval_id,
+            vcall_id,
             node.type.name,
             node.id,
             node.caller_type.name,
@@ -922,8 +928,10 @@ class CCILGenerator:
     def init_func_params(self, typex: str):
         return [Parameter("self", typex)]
 
-    def create_assignation(self, idx: str, type_idx: str, target: str):
-        self.add_local(idx, type_idx)
+    def create_assignation(self, idx: str, type_idx: str, target: str, reuse=False):
+        self.add_local(idx, type_idx) if not reuse else self.soft_add_local(
+            idx, type_idx
+        )
         return StorageNode(idx, IdNode(target))
 
     def create_uninitialized_storage(self, idx: str, type_idx: str):
@@ -1090,8 +1098,17 @@ class CCILGenerator:
 
     def add_local(self, idx: str, typex: str):
         if idx in self.locals:
-            raise Exception(f"Trying to insert {idx} again as local")
+            raise KeyError(f"Trying to insert {idx} again as local")
         self.locals[idx] = typex
+        return Local(idx, typex)
+
+    def soft_add_local(self, idx: str, typex: str):
+        try:
+            print(f"Addin {idx}")
+            return self.add_local(idx, typex)
+        except KeyError:
+            pass
+        print(f"Skipin {idx}")
         return Local(idx, typex)
 
     def reset_locals(self):
