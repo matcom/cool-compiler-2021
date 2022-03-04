@@ -588,7 +588,9 @@ class CoolToCilVisitor(object):
 
         # IF condition GOTO then_label
         cond_ret = self.visit(node.cond)
-        self.instructions.append(cil.GotoIfNode(cond_ret, then_label))
+        cond_ret_attr = self.register_local()
+        self.instructions.append(cil.GetAttrNode(cond_ret, 0, cond_ret_attr))
+        self.instructions.append(cil.GotoIfNode(cond_ret_attr, then_label))
 
         # GOTO else_label
         self.instructions.append(cil.GotoNode(else_label))
