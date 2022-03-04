@@ -250,7 +250,6 @@ class CCILGenerator:
 
         ccil_id, is_attr = self.ccil_cool_names.get_value_position(node.id)
 
-        print(is_attr, node.id, ccil_id)
         if is_attr:
             # Assignation occurring to an attribute Go update the attribute
             set_attr = SetAttrOpNode(
@@ -260,7 +259,6 @@ class CCILGenerator:
                 f"local_attr_{node.id}_{self.times(node, node.id)}",
                 node.type.name,
                 expr_fval.id,
-                reuse=False,
             )
             return [*expr_ops, set_attr, attr_val], attr_val
 
@@ -518,12 +516,17 @@ class CCILGenerator:
         node_type = type(node)
         # Boolean Binary Nodes
         if node_type == sem_ast.EqualsNode:
-            op = (
-                EqualIntNode(left_id, right_id)
-                if node.left.type.name != STRING
-                else EqualStrNode(left_id, right_id)
-            )
-            fval_id = f"eq_{times}"
+            if node.left.type.name == STRING:
+                fval_id = f"eq_str_{times}"
+                op = EqualStrNode(left_id, right_id)
+            if node.left.type.name in {INT, BOOL}:
+                fval_id = (
+                    f"eq_{'int' if node.left.type.name == INT else 'bool'}_{times}"
+                )
+                op = EqualIntNode(left_id, right_id)
+            else:
+                fval_id = f"eq_addr_{times}"
+                op = EqualAddrNode(left_id, right_id)
         elif node_type == sem_ast.LessNode:
             op = LessOpNode(left_id, right_id)
             fval_id = f"le_{times}"
@@ -558,7 +561,7 @@ class CCILGenerator:
                 )
                 op = BoolNode("0")
             else:
-                op = EqualIntNode(IdNode(fval_id), IntNode("0"))
+                op = IsVoidOpNode(expr_id)
         elif node_type == sem_ast.NotNode:
             fval_id = f"not_{times}"
             op = NotOpNode(expr_id)
@@ -1103,13 +1106,9 @@ class CCILGenerator:
         return Local(idx, typex)
 
     def soft_add_local(self, idx: str, typex: str):
-        try:
-            print(f"Addin {idx}")
-            return self.add_local(idx, typex)
-        except KeyError:
-            pass
-        print(f"Skipin {idx}")
-        return Local(idx, typex)
+        if not idx in self.locals:
+            self.locals[idx] = typex
+        return Local(idx, self.locals[idx])
 
     def reset_locals(self):
         """
