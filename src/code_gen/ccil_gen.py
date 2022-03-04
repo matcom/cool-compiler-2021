@@ -480,7 +480,7 @@ class CCILGenerator:
             # Generating divison by zero runtime error
             ok_label = LabelNode(f"ok_div_{times}")
             right_id_is_zero = self.create_equality(
-                f"check_right_zero_{times}", left_id, IntNode("0")
+                f"check_right_zero_{times}", right_id, IntNode("0")
             )
             if_id_is_not_zero = IfFalseNode(extract_id(right_id_is_zero), ok_label)
             error_msg = self.add_data(
