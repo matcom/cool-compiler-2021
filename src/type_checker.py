@@ -41,7 +41,7 @@ from cmp.semantic import Context
 from cmp.semantic import Scope
 from cmp.utils import find_least_type
 import copy
-from errors import TypeError
+from errors import TypeError, NameError
 
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
@@ -66,8 +66,26 @@ class TypeChecker:
     def visit(self, node):
         scope = Scope()
         self.context = copy.copy(node.context)
+
+        #visit class in order
+        parent_children_dict = {}
+        initial_nodes = []
+        visited = {}
         for declaration in node.declarations:
-            self.visit(declaration, scope.create_child())
+            try:
+                visited[declaration.id] # checking is visited
+            except:
+                visited[declaration.id] = True
+                if declaration.parent is None or declaration.parent.lex in ["IO", "Int", "String", "Bool"]: # is node has no parent, mark it to visit it first later
+                    initial_nodes.append(declaration)
+                else:
+                    try:
+                        parent_children_dict[declaration.parent.lex].append(declaration)
+                    except:
+                        parent_children_dict[declaration.parent.lex] = [declaration]
+
+        for declaration in initial_nodes:
+            self.visit(declaration, scope.create_child(), parent_children_dict)
 
         self.context = None
         self.current_type = None
@@ -76,7 +94,7 @@ class TypeChecker:
         return scope
 
     @visitor.when(ClassDeclarationNode)
-    def visit(self, node, scope):
+    def visit(self, node, scope, parent_children_dict):
         self.current_type = self.context.get_type(node.id)
         scope.define_variable("self", self.current_type)
 
@@ -85,6 +103,13 @@ class TypeChecker:
 
         for feature in node.features:
             self.visit(feature, scope)
+        
+        try:
+            children = parent_children_dict[node.id]
+            for child in children:
+                self.visit(child, scope.create_child(), parent_children_dict)
+        except:
+            return
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
@@ -98,10 +123,13 @@ class TypeChecker:
         if typex.name == "SELF_TYPE":
             typex = self.current_type
 
+
         if node.init_exp != None:
             init_expr_type = self.visit(node.init_exp, scope)
+
             if not init_expr_type.conforms_to(typex):
-                self.errors.append(INCOMPATIBLE_TYPES % (init_expr_type, typex))
+                line, col = node.token.location
+                self.errors.append(TypeError(line, col,INCOMPATIBLE_TYPES % (init_expr_type.name, typex.name)))
 
         return typex
 
@@ -137,10 +165,9 @@ class TypeChecker:
 
         body_type = self.visit(node.body, child_scope)
 
-        if not body_type.conforms_to(method_return_type):
-            self.errors.append(
-                INCOMPATIBLE_TYPES % (body_type.name, method_return_type.name)
-            )
+        if not body_type.conforms_to(method_return_type):#aqui se debe poner
+            node_row, node_col = node.body.token.location
+            self.errors.append(TypeError( node_row, node_col, INCOMPATIBLE_TYPES % (body_type.name, method_return_type.name)))
 
         if self.current_type.parent is not None:
             try:
@@ -194,7 +221,6 @@ class TypeChecker:
     def visit(self, node, scope):
         if node.id.lex == "self":
             self.errors.append(SELF_IS_READONLY)
-
         var_type = None
         if not scope.is_defined(node.id.lex):
             self.errors.append(
@@ -208,7 +234,7 @@ class TypeChecker:
         if not expr_type.conforms_to(var_type):
             self.errors.append(INCOMPATIBLE_TYPES % (expr_type.name, var_type.name))
 
-        return var_type
+        return expr_type
 
     @visitor.when(CallNode)
     def visit(self, node, scope):
@@ -388,7 +414,8 @@ class TypeChecker:
         if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
             right_type != int_type and right_type.name != "AUTO_TYPE"
         ):
-            self.errors.append(INVALID_OPERATION % (left_type.name, right_type.name))
+            node_row, node_col = node.token.location
+            self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
 
         return self.context.get_type("Bool")
 
@@ -420,8 +447,9 @@ class TypeChecker:
         typex = self.visit(node.expr, scope)
 
         if typex != bool_type and not typex.name == "AUTO_TYPE":
+            line, col = node.token.location
             self.errors.append(
-                f"Expression after 'not' must be Bool, current is {typex.name}"
+                TypeError(line, col, f"Expression after 'not' must be Bool, current is {typex.name}")
             )
             return ErrorType()
 
@@ -433,8 +461,9 @@ class TypeChecker:
         typex = self.visit(node.expr, scope)
 
         if typex != int_type and not typex.name == "AUTO_TYPE":
+            node_row, node_col = node.token.location
             self.errors.append(
-                f"Expression after '~' must be Int, current is {typex.name}"
+                TypeError( node_row, node_col,f"Expression after '~' must be Int, current is {typex.name}")
             )
             return ErrorType()
 
@@ -448,8 +477,9 @@ class TypeChecker:
     def visit(self, node, scope):
         var = scope.find_variable(node.lex)
         if var is None:
+            node_row, node_col = node.token.location
             self.errors.append(
-                VARIABLE_NOT_DEFINED % (node.lex, self.current_method.name)
+                NameError( node_row, node_col,VARIABLE_NOT_DEFINED % (node.lex, self.current_method.name))
             )
             return ErrorType()
         return var.type

@@ -147,7 +147,7 @@ def define_cool_grammar(print_grammar=False):
     element %= case + expr + of + case_block + esac, lambda h, s: CaseNode(s[2], s[4], s[1])
     element %= new + type_id, lambda h, s: InstantiateNode(s[2], s[1])
     element %= opar + expr + cpar, lambda h, s: s[2]
-    element %= ocur + block + ccur, lambda h, s: BlockNode(s[2])
+    element %= ocur + block + ccur, lambda h, s: BlockNode(s[2], s[1])
     element %= (element + dot + func_call, lambda h, s: CallNode(*s[3], obj=s[1], token = s[2]))#arreglar
     element %= (
         element + at + type_id + dot + func_call,

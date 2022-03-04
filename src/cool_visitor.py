@@ -245,7 +245,8 @@ class FormatVisitorST(object):
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, tabs=0):
-        params = ", ".join(":".join(param) for param in node.params)
+        # params = ", ".join(":".join(param) for param in node.params)
+        params = ", ".join(":".join(param_name.lex).join(param_type.lex) for param_name, param_type in node.params)
         ans = (
             "\\__\\__" * tabs
             + f"\\__FuncDeclarationNode: {node.id}({params}) : {node.type} {{ <body>}}"
@@ -519,7 +520,7 @@ class CopyVisitor(object):
     @visitor.when(NotNode)
     def visit(self, node):
         expr = self.visit(node.expr)
-        return NotNode(exp, node.token)
+        return NotNode(expr, node.token)
 
     @visitor.when(IsvoidNode)
     def visit(self, node):
