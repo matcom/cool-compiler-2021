@@ -1,4 +1,4 @@
-(* class Main inherits IO {
+class Main inherits IO {
     msg : String <- "Hello World";
 
     main() : IO{
@@ -6,9 +6,9 @@
     };
 };
 
-*)
 
-     class Main {
+
+(*     class Main {
     main (): Object {
         0
     };
@@ -24,3 +24,4 @@ class Point {
         self;
     } };
 };
+*)

@@ -1,6 +1,8 @@
 #from atexit import register
 #from email.quoprimime import body_length
 import enum
+from ssl import ALERT_DESCRIPTION_BAD_CERTIFICATE_HASH_VALUE
+from turtle import left
 #from operator import le
 #from tkinter.tix import Select
 from attr import attr
@@ -20,6 +22,10 @@ FUNCTION_OFFSET = 4
 RA_OFFSET = 8
 OLD_FP_OFFSET = 4
 
+#str attributes offsets
+LENGTH_ATTR_OFFSET = 4
+CHARS_ATTR_OFFSET = 8
+
 FP_ARGS_DISTANCE = 3 # how far finishes $fp from arguments in method call
 FP_LOCALS_DISTANCE = 0 # how far finishes $fp from localvars in method call
 
@@ -30,6 +36,10 @@ DISPATCH_VOID = "dispatch_on_void"#MIPS
 ZERO_DIVISION = "division_by_zero"#MIPS
 SUBSTR_OUT_RANGE = "substr_out_of_range"#MIPS
 HEAP_OVERFLOW = "heap_overflow"
+STRING_SIZE = 12
+VOID = "void"
+STR_CMP = "string_comparer"
+EMPTY_STRING = "empty_string"
 
 #temporary registers
 t0 = "$t0"
@@ -71,6 +81,13 @@ SYSCALL_READ_STR = 8
 SYSCALL_SBRK = 9
 SYSCALL_EXIT = 10
 
+SELF_TYPE = "SELF_TYPE"
+INT = "Int"
+BOOL = "Bool"
+STRING = "String"
+OBJECT = "Object"
+IO = "IO"
+
 class MemoryManager:
     def __init__(self):
         self.all_reg = [t0,t1,t2,t3,t4,t5,t6,t7,t8,t9]
@@ -97,6 +114,7 @@ class MIPSBuilder:
         self.mips_code = ""
         self.main_procedure = mips.ProcedureNode("main")
         self.current_procedure = self.main_procedure
+        self.main_size = 0
         self.text = [self.main_procedure]
         self.data = []
         self.params = []
@@ -112,7 +130,7 @@ class MIPSBuilder:
             return -4*index
         elif x in self.params:
             index = self.params.index(x)
-            return (-4 * (len(self.locals)+len(self.params)))-4
+            return (-4 * (len(self.locals)+len(self.params)))+4
     
     def register_instruction(self, instruction_type, *args):
         instruction = instruction_type(*args)
@@ -140,12 +158,28 @@ class MIPSBuilder:
         self.register_data(mips.DataTypeNode, SUBSTR_OUT_RANGE, '.asciiz', ['"Substring out of range"'])
         self.register_data(mips.DataTypeNode, HEAP_OVERFLOW, '.asciiz', ['"Heap overflow"'])
     
+    
     def generate_attr_offset(self,type):
         attributes = self.types[type].attributes
         self.attr_offset[type]={}
         for i,attr in enumerate(attributes):
             self.attr_offset[type][attr] = 4*(i+1)
             
+    #def register_main_allocation(self):
+    #    self.register_instruction(mips.CommentNode,"Allocating Main instance")
+    #    self.register_instruction(mips.MoveNode,fp,sp)
+    #    self.register_instruction(mips.AddiNode,sp,sp,-4)
+    #    
+    #    self.register_instruction(mips.CommentNode,"Allocating Main instance")
+    #    #Allocate
+    #    self.register_instruction(mips.LoadInmediate,v0,SYSCALL_SBRK)
+    #    self.register_instruction(mips.LoadInmediate,a0,self.main_size)
+    #    self.register_instruction(mips.SyscallNode)
+    #    self.register_instruction(mips.StoreWordNode,v0,0,fp)
+    #    
+    #    self.register_instruction(mips.CommentNode,"Calling Main Constructor")
+    #    self.register_push(fp)
+    #    self.register_instruction(mips.JumpAndLink,"Main_constructor")
         
     
     @visitor.on("node")
@@ -173,8 +207,9 @@ class MIPSBuilder:
 
     @visitor.when(cil.TypeNode)
     def visit(self, node):
-        
         self.types[node.name] = node
+        if node.name == "Main":
+            self.main_size = (len(node.attributes)+1)*4
         values = []
         for func in node.methods:
             values.append(func[1])
@@ -214,6 +249,7 @@ class MIPSBuilder:
         
         self.memo.clean()
         
+    
     @visitor.when(cil.ArgNode)                                          
     def visit(self,node):
         self.memo.save()
@@ -229,6 +265,10 @@ class MIPSBuilder:
         
     @visitor.when(cil.FunctionNode)
     def visit(self,node):
+        
+        locals_save = self.locals
+        params_save = self.params
+        self.locals, self.params = [], []
         self.current_procedure = mips.ProcedureNode(node.name)
 
         self.register_instruction(mips.CommentNode,"Pushing $ra")
@@ -244,6 +284,9 @@ class MIPSBuilder:
 
         for local in node.localvars:
             self.locals.append(local.name)
+            
+        for param in node.params:
+            self.params.append(param.name)
 
         self.register_instruction(mips.CommentNode,"Executing instructions")
         for inst in node.instructions:
@@ -257,8 +300,6 @@ class MIPSBuilder:
         self.register_instruction(mips.CommentNode,"Restoring saved $fp")
         self.register_instruction(mips.LoadWordNode, fp, OLD_FP_OFFSET, fp)#stored (old)$fp
         
-        
-        #Cual de las dos????
         AR = 4*(len(node.localvars) + len(node.params) + 2)
         #AR = 4*(len(node.localvars) + 2)
         
@@ -268,7 +309,9 @@ class MIPSBuilder:
         self.register_instruction(mips.CommentNode,"Return jump")
         self.register_instruction(mips.JumpRegister, ra)
 
-        self.text.append(self.current_procedure)    
+        self.text.append(self.current_procedure)
+        self.locals = locals_save
+        self.params = params_save    
         
   
     @visitor.when(cil.LoadNode)
@@ -288,9 +331,12 @@ class MIPSBuilder:
         
     #All return value is saved in register a1    
     @visitor.when(cil.ReturnNode)
-    def visit(self,node): 
-        offset = self.get_offset(node.value)
-        self.register_instruction(mips.LoadWordNode,a1,offset,fp)
+    def visit(self,node):
+        if isinstance(node.value,int):
+            self.register_instruction(mips.LoadInmediate,a1,node.value)
+        else: 
+            offset = self.get_offset(node.value)
+            self.register_instruction(mips.LoadWordNode,a1,offset,fp)
             
     @visitor.when(cil.GotoNode)
     def visit(self,node):
@@ -312,8 +358,6 @@ class MIPSBuilder:
         reg = self.memo.get_unused_reg()
         self.register_instruction(mips.LoadAddress,reg,node.type)
         self.register_instruction(mips.StoreWordNode,reg,0,v0)
-        
-        
         self.memo.clean()
         
     @visitor.when(cil.AssignNode)
@@ -330,8 +374,6 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,reg,dest_offset,fp)
 
         self.memo.clean()        
-        
-        
         
     
     @visitor.when(cil.PlusNode)
@@ -391,6 +433,36 @@ class MIPSBuilder:
         dest_offset = self.get_offset(node.dest)
         self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
         
+        
+    @visitor.when(cil.DynamicCallNode)
+    def visit(self,node):
+        self.memo.save()
+        
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+        
+        instance_offset = self.get_offset(node.instance)
+        self.register_instruction(mips.CommentNode,"Getting type of instance")
+        self.register_instruction(mips.LoadWordNode,reg1,instance_offset,fp)
+        
+        #getting method offset
+        _methods = self.types[node.type].methods
+        meth_offset = _methods.index(node.method)
+        self.register_instruction(mips.LoadWordNode,reg2,meth_offset*4,reg1)
+        
+        self.register_instruction(mips.JumpAndLink,reg2)
+        
+        #putting the return vslue in destination
+        dest_offset = self.get_offset(node.dest)
+        self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
+        
+        self.memo.clean()
+        
+        
+        
+        
+        
+        
     @visitor.when(cil.GetAttribNode)
     def visit(self, node):
         self.memo.save()
@@ -398,7 +470,7 @@ class MIPSBuilder:
         reg1 = self.memo.get_unused_reg()
         reg2 = self.memo.get_unused_reg()
         
-        instance_offset = self.get_offset(node.type)
+        instance_offset = self.get_offset(node.instance)
         self.register_instruction(mips.LoadWordNode,reg1,instance_offset,fp)
         
         attr_offs = self.attr_offset[node.type][node.attr]
@@ -414,7 +486,7 @@ class MIPSBuilder:
         reg1 = self.memo.get_unused_reg()
         reg2 = self.memo.get_unused_reg()
         
-        instance_offset = self.get_offset(node.type)
+        instance_offset = self.get_offset(node.instance)
         self.register_instruction(mips.LoadWordNode,reg1,instance_offset,fp)
         
         value_offset = self.get_offset(node.value)
@@ -423,6 +495,108 @@ class MIPSBuilder:
         attr_os = self.attr_offset[node.type][node.attr]
         self.register_instruction(mips.StoreWordNode,reg2,attr_os,reg1)
 
+        self.memo.clean()
+    
+    @visitor.when(cil.DefaultValueNode)
+    def visit(self,node):
+        self.memo.save()
+        reg = self.memo.get_unused_reg()
+        dest_offset = self.get_offset(node.dest)
+        if node.type in [INT,BOOL]:
+            self.register_instruction(mips.LoadInmediate,reg,0)
+            self.register_instruction(mips.StoreWordNode,reg,dest_offset,fp)
+        elif node.type == STRING:
+            self.register_instruction(mips.LoadInmediate,reg,0)
+            self.register_instruction(mips.StoreWordNode, reg, LENGTH_ATTR_OFFSET, v0) #pq en vo esta el allocate
+            self.register_instruction(mips.LoadAddress, reg, EMPTY_STRING)
+            self.register_instruction(mips.StoreWordNode, reg, CHARS_ATTR_OFFSET, v0)
+        else:
+            self.register_instruction(mips.LoadAddress, reg, VOID)
+            self.register_instruction(mips.StoreWordNode, reg, dest_offset, fp)
+            
+        self.memo.clean()
+        
+        
+    @visitor.when(cil.PlusNode)
+    def visit(self,node):
+        self.memo.save()
+        reg_l = self.memo.get_unused_reg()
+        reg_r = self.memo.get_unused_reg()
+        reg_dest = self.memo.get_unused_reg()
+        
+        left_offset = self.get_offset(node.left)
+        right_offset = self.get_offset(node.right)
+        
+        self.register_instruction(mips.LoadWordNode,reg_l,left_offset,fp)
+        self.register_instruction(mips.LoadWordNode,reg_r,right_offset,fp)
+        
+        self.register_instruction(mips.AddNode,reg_dest,reg_l,reg_r)
+        
+        offset = self.get_offset(node.dest)
+        self.register_instruction(mips.StoreWordNode,reg_dest,offset,fp)
+        
+        self.memo.clean()
+    
+    @visitor.when(cil.MinusNode)
+    def visit(self,node):
+        self.memo.save()
+        reg_l = self.memo.get_unused_reg()
+        reg_r = self.memo.get_unused_reg()
+        reg_dest = self.memo.get_unused_reg()
+        
+        left_offset = self.get_offset(node.left)
+        right_offset = self.get_offset(node.right)
+        
+        self.register_instruction(mips.LoadWordNode,reg_l,left_offset,fp)
+        self.register_instruction(mips.LoadWordNode,reg_r,right_offset,fp)
+        
+        self.register_instruction(mips.SubNode,reg_dest,reg_l,reg_r)
+        
+        offset = self.get_offset(node.dest)
+        self.register_instruction(mips.StoreWordNode,reg_dest,offset,fp)
+        
+        self.memo.clean()
+        
+    @visitor.when(cil.StarNode)
+    def visit(self,node):
+        self.memo.save()
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+        
+        
+        left_offset = self.get_offset(node.left)
+        right_offset = self.get_offset(node.right)
+        
+        self.register_instruction(mips.LoadWordNode,reg1,left_offset,fp)
+        self.register_instruction(mips.LoadWordNode,reg2,right_offset,fp)
+        
+        self.register_instruction(mips.MultNode,reg1,reg2)
+        
+        dest_offset = self.get_offset(node.dest)
+        self.register_instruction(mips.MoveFromHi,reg1)
+        self.register_instruction(mips.StoreWordNode,reg1,dest_offset,fp)
+        
+        self.memo.clean()
+    
+    @visitor.when(cil.DivNode)
+    def visit(self,node):
+        self.memo.save()
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+        
+        
+        left_offset = self.get_offset(node.left)
+        right_offset = self.get_offset(node.right)
+        
+        self.register_instruction(mips.LoadWordNode,reg1,left_offset,fp)
+        self.register_instruction(mips.LoadWordNode,reg2,right_offset,fp)
+        
+        self.register_instruction(mips.DivideNode,reg1,reg2)
+        
+        dest_offset = self.get_offset(node.dest)
+        self.register_instruction(mips.MoveFromLo,reg1)
+        self.register_instruction(mips.StoreWordNode,reg1,dest_offset,fp)
+        
         self.memo.clean()
         
         

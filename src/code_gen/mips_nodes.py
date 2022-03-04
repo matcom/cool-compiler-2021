@@ -4,6 +4,9 @@
 #from src.cmp.cil import InstructionNode
 
 
+from matplotlib.pyplot import cla
+
+
 class MIPS_Node:
     pass
 
@@ -94,7 +97,34 @@ class AddiNode(ArithAnfLogicNode):
 class SubNode(ArithAnfLogicNode):
     def __str__(self):
         return f"sub {self.destination}, {self.left}, {self.right}"
+
+class HiLoOperationNode(InstructionNode):
+    def __init__(self,left,right):
+        self.left = left
+        self.right = right
     
+class MultNode(HiLoOperationNode):
+     def __str__(self):
+        return f'mult {self.left}, {self.right}'
+
+class DivideNode(HiLoOperationNode):
+     def __str__(self):
+        return f'div {self.left}, {self.right}'
+
+class MoveFromHi(InstructionNode):
+    def __init__(self,register):
+        self.register = register
+        
+    def __str__(self):
+        return f'mfhi {self.register}'
+    
+class MoveFromLo(InstructionNode):
+    def __init__(self,register):
+        self.register = register
+        
+    def __str__(self):
+        return f'mflo {self.register}'
+        
 class ConditionalBranch(InstructionNode):
     def __init__(self,c1,c2,jump):
         self.c1 = c1
