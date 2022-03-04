@@ -584,6 +584,36 @@ class CCILToMIPSGenerator:
 
         return instructions
 
+    @visitor.when(ccil_ast.EqualAddrNode)
+    def visit(self, node: ccil_ast.EqualAddrNode):
+        instructions = []
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                mips_ast.RegisterNode(node, T5),
+                self._get_relative_location(node.left.value),
+            )
+        )
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                mips_ast.RegisterNode(node, T6),
+                self._get_relative_location(node.right.value),
+            )
+        )
+        instructions.append(
+            mips_ast.Equal(
+                node,
+                mips_ast.RegisterNode(node, T7),
+                mips_ast.RegisterNode(node, T5),
+                mips_ast.RegisterNode(node, T6),
+            )
+        )
+        instructions.extend(self._set_new_bool(node))
+
+        return instructions
+
     @visitor.when(ccil_ast.NegOpNode)
     def visit(self, node: ccil_ast.NotOpNode):
         instructions = []
