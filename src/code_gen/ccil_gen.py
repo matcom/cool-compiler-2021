@@ -683,8 +683,9 @@ class CCILGenerator:
     def visit(self, node: sem_ast.BooleanNode) -> VISITOR_RESULT:
         times = self.times(node)
 
+        print(node.value)
         bool_id = f"bool_{times}"
-        value = "0" if node.value == "false" else "1"
+        value = "1" if node.value else "0"
 
         bool_node = self.create_bool(bool_id, value)
         return [bool_node], bool_node
