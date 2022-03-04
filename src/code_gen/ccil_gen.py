@@ -1108,7 +1108,7 @@ class CCILGenerator:
         self.ccil_cool_names = Scope()
 
     def add_warning(self, msg: str):
-        self.add_warning(f"Warning: {msg}")
+        self.warnings.append(f"Warning: {msg}")
 
     def get_inherited_attributes(self, node: sem_ast.ClassDeclarationNode):
         return (
