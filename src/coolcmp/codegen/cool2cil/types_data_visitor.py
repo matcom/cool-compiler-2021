@@ -151,6 +151,8 @@ class DotTypesDataVisitor:
         for declaration in node.declarations:
             self.visit(declaration)
 
+        self.visit(node.expr)
+
     @visitor.when(ast.CaseBranchNode)
     def visit(self, node: ast.CaseBranchNode):
         self.visit(node.expr)
