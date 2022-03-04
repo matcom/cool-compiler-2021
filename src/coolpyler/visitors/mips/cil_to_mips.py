@@ -206,14 +206,7 @@ class CilToMIPS:
             mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, left_dir))
         )
 
-        # instructions.extend(self.load_value_to_reg(reg1, node.left))
-        # instructions.extend(self.load_value_to_reg(reg2, node.right))
-
         instructions.append(mips.AddNode(reg3, reg1, reg2, f"Plus"))
-
-        # instructions.append(mips.LoadInmediateNode(V0_REG, 1, f"PRINT"))
-        # instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg3))
-        # instructions.append(mips.SyscallNode())
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
@@ -246,7 +239,7 @@ class CilToMIPS:
             mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, left_dir))
         )
 
-        instructions.append(mips.SubNode(reg3, reg1, reg2, f"Minus"))
+        instructions.append(mips.SubNode(reg3, reg2, reg1, f"Minus"))
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
@@ -312,7 +305,7 @@ class CilToMIPS:
             mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, left_dir))
         )
 
-        instructions.append(mips.DivNode(reg1, reg2, f"Div"))
+        instructions.append(mips.DivNode(reg2, reg1, f"Div"))
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(mips.MoveFromLo(reg1))  # TODO: Hi_REG ???
