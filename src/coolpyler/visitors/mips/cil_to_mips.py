@@ -844,8 +844,8 @@ class CilToMIPS:
         self.memory_manager.clean()
         return instructions
 
-    @visitor.when(cil.GotoIfEqStrNode)
-    def visit(self, node: cil.GotoIfEqStrNode):
+    @visitor.when(cil.StrEqNode)
+    def visit(self, node: cil.StrEqNode):
         instructions = []
         self.memory_manager.save()
 
@@ -875,16 +875,12 @@ class CilToMIPS:
 
         instructions.append(mips.LabelInstructionNode(loop1))
 
-        instructions.append(
-            mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
-        )
-
         instructions.append(mips.BeqzNode(reg1, exit1))
         instructions.append(
-            mips.StoreByteNode(reg1_, mips.MemoryAddressRegisterNode(reg1, 0))
+            mips.LoadByteNode(reg1_, mips.MemoryAddressRegisterNode(reg1, 0))
         )
         instructions.append(
-            mips.StoreByteNode(reg2_, mips.MemoryAddressRegisterNode(reg2, 0))
+            mips.LoadByteNode(reg2_, mips.MemoryAddressRegisterNode(reg2, 0))
         )
 
         instructions.append(mips.BeqzNode(reg1_, exit1))
@@ -905,11 +901,11 @@ class CilToMIPS:
         instructions.append(mips.JumpNode(exit_false))
 
         instructions.append(mips.LabelInstructionNode(exit_true))
-        instructions.append(mips.AddiNode(reg3, 1))
+        instructions.append(mips.LoadInmediateNode(reg3, 1))
         instructions.append(mips.JumpNode(end))
 
         instructions.append(mips.LabelInstructionNode(exit_false))
-        instructions.append(mips.AddiNode(reg3, 0))
+        instructions.append(mips.LoadInmediateNode(reg3, 0))
         instructions.append(mips.JumpNode(end))
 
         instructions.append(mips.LabelInstructionNode(end))

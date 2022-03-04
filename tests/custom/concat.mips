@@ -8,9 +8,9 @@ data_3_type_name_Bool: .asciiz "Bool"
 data_4_type_name_String: .asciiz "String"
 data_5_type_name_IO: .asciiz "IO"
 data_6_type_name_Main: .asciiz "Main"
-data_7_string: .asciiz "x"
-data_8_string: .asciiz "o"
-data_9_string: .asciiz "xo"
+data_7_string: .asciiz "a"
+data_8_string: .asciiz "b"
+data_9_string: .asciiz "ab"
 data_10_string: .asciiz "false"
 data_11_string: .asciiz "true"
 Object: .word Object_abort,Object_type_name,Object_copy
@@ -22,257 +22,6 @@ Main: .word Object_abort,Main_type_name,Main_copy,IO_out_string,IO_out_int,IO_in
 
 	.text
 Void___init:
-	move $t5, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 4 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t5, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 9 	#Allocating instance of type Void
-	li $a0, 4 	#Save 4 bytes
-	syscall 	#
-	li $t8, 0 	#Save value 0 in register
-	sw $t8, 0($v0) 	#Save value 0 in firts position of memory allocated
-	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
-	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t2, 0($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t2, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-main:
-	move $t3, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 8 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t3, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	jal Main___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t7, 0($sp) 	#Obtain return value from stack
-	sw $t7, 0($fp) 	#
-	addi $sp,  $sp, 0 	#Remove args from stack
-	lw $t4, 0($fp) 	#Obtain alue of Arg
-	sw $t4, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal Main_main 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t0, 0($sp) 	#Obtain return value from stack
-	sw $t0, 4($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	li $v0, 10 	#EXIT
-	syscall 	#
-Object_abort:
-	move $t4, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 8 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t4, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	la $t2, data_0_abort_msg 	#LOAD
-	sw $t2, 0($fp) 	#Save loaded value in destination
-	lw $t5, 0($fp) 	#Obtain alue of Arg
-	sw $t5, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal String___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t3, 0($sp) 	#Obtain return value from stack
-	sw $t3, 4($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	li $v0, 4 	#PRINT
-	lw $t0, 4($fp) 	#
-	lw $a0, 0($t0) 	#
-	syscall 	#
-	li $v0, 10 	#EXIT
-	syscall 	#
-Object_type_name:
-	move $t6, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 8 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t6, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	la $t1, data_1_type_name_Object 	#LOAD
-	sw $t1, 0($fp) 	#Save loaded value in destination
-	lw $t0, 0($fp) 	#Obtain alue of Arg
-	sw $t0, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal String___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t1, 0($sp) 	#Obtain return value from stack
-	sw $t1, 4($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t1, 4($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -8 	#Remove locals from Stack
-	sw $t1, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-Object_copy:
-	move $t7, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 4 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t7, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 9 	#Allocating instance of type Object
-	li $a0, 8 	#Save 8 bytes
-	syscall 	#
-	la $t8, Object 	#Save type address in register
-	sw $t8, 0($v0) 	#Save type address in firts position of memory allocated
-	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
-	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t8, 0($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t8, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-Int_type_name:
-	move $t7, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 8 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t7, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	la $t0, data_2_type_name_Int 	#LOAD
-	sw $t0, 0($fp) 	#Save loaded value in destination
-	lw $t0, 0($fp) 	#Obtain alue of Arg
-	sw $t0, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal String___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t1, 0($sp) 	#Obtain return value from stack
-	sw $t1, 4($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t0, 4($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -8 	#Remove locals from Stack
-	sw $t0, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-Int_copy:
-	move $t6, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 4 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t6, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 9 	#Allocating instance of type Int
-	li $a0, 8 	#Save 8 bytes
-	syscall 	#
-	la $t1, Int 	#Save type address in register
-	sw $t1, 0($v0) 	#Save type address in firts position of memory allocated
-	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
-	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t6, 0($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t6, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-Bool_type_name:
-	move $t9, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 8 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t9, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	la $t4, data_3_type_name_Bool 	#LOAD
-	sw $t4, 0($fp) 	#Save loaded value in destination
-	lw $t3, 0($fp) 	#Obtain alue of Arg
-	sw $t3, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal String___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t7, 0($sp) 	#Obtain return value from stack
-	sw $t7, 4($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t2, 4($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -8 	#Remove locals from Stack
-	sw $t2, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-Bool_copy:
-	move $t2, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 4 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t2, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 9 	#Allocating instance of type Bool
-	li $a0, 8 	#Save 8 bytes
-	syscall 	#
-	la $t2, Bool 	#Save type address in register
-	sw $t2, 0($v0) 	#Save type address in firts position of memory allocated
-	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
-	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t7, 0($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t7, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-String_type_name:
-	move $t6, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 8 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t6, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	la $t1, data_4_type_name_String 	#LOAD
-	sw $t1, 0($fp) 	#Save loaded value in destination
-	lw $t2, 0($fp) 	#Obtain alue of Arg
-	sw $t2, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal String___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t4, 0($sp) 	#Obtain return value from stack
-	sw $t4, 4($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t9, 4($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -8 	#Remove locals from Stack
-	sw $t9, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-String_copy:
 	move $t0, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 4 	#push local vars
@@ -280,11 +29,160 @@ String_copy:
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
 	sw $t0, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 9 	#Allocating instance of type String
+	li $v0, 9 	#Allocating instance of type Void
+	li $a0, 4 	#Save 4 bytes
+	syscall 	#
+	li $t5, 0 	#Save value 0 in register
+	sw $t5, 0($v0) 	#Save value 0 in firts position of memory allocated
+	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
+	sw $v0, 0($fp) 	#Save instance address in destination
+	lw $t5, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -4 	#Remove locals from Stack
+	sw $t5, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+main:
+	move $t1, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 8 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t1, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	jal Main___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t7, 0($sp) 	#Obtain return value from stack
+	sw $t7, 0($fp) 	#
+	addi $sp,  $sp, 0 	#Remove args from stack
+	lw $t9, 0($fp) 	#Obtain alue of Arg
+	sw $t9, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal Main_main 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t9, 0($sp) 	#Obtain return value from stack
+	sw $t9, 4($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	li $v0, 10 	#EXIT
+	syscall 	#
+Object_abort:
+	move $t7, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 8 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t7, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	la $t0, data_0_abort_msg 	#LOAD
+	sw $t0, 0($fp) 	#Save loaded value in destination
+	lw $t2, 0($fp) 	#Obtain alue of Arg
+	sw $t2, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal String___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t9, 0($sp) 	#Obtain return value from stack
+	sw $t9, 4($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	li $v0, 4 	#PRINT
+	lw $t4, 4($fp) 	#
+	lw $a0, 0($t4) 	#
+	syscall 	#
+	li $v0, 10 	#EXIT
+	syscall 	#
+Object_type_name:
+	move $t3, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 8 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t3, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	la $t1, data_1_type_name_Object 	#LOAD
+	sw $t1, 0($fp) 	#Save loaded value in destination
+	lw $t8, 0($fp) 	#Obtain alue of Arg
+	sw $t8, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal String___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t0, 0($sp) 	#Obtain return value from stack
+	sw $t0, 4($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	lw $t3, 4($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -8 	#Remove locals from Stack
+	sw $t3, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+Object_copy:
+	move $t6, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 4 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t6, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	li $v0, 9 	#Allocating instance of type Object
 	li $a0, 8 	#Save 8 bytes
 	syscall 	#
-	la $t5, String 	#Save type address in register
-	sw $t5, 0($v0) 	#Save type address in firts position of memory allocated
+	la $t4, Object 	#Save type address in register
+	sw $t4, 0($v0) 	#Save type address in firts position of memory allocated
+	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
+	sw $v0, 0($fp) 	#Save instance address in destination
+	lw $t0, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -4 	#Remove locals from Stack
+	sw $t0, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+Int_type_name:
+	move $t0, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 8 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t0, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	la $t2, data_2_type_name_Int 	#LOAD
+	sw $t2, 0($fp) 	#Save loaded value in destination
+	lw $t6, 0($fp) 	#Obtain alue of Arg
+	sw $t6, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal String___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t8, 0($sp) 	#Obtain return value from stack
+	sw $t8, 4($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	lw $t5, 4($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -8 	#Remove locals from Stack
+	sw $t5, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+Int_copy:
+	move $t0, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 4 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t0, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	li $v0, 9 	#Allocating instance of type Int
+	li $a0, 8 	#Save 8 bytes
+	syscall 	#
+	la $t9, Int 	#Save type address in register
+	sw $t9, 0($v0) 	#Save type address in firts position of memory allocated
 	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
 	sw $v0, 0($fp) 	#Save instance address in destination
 	lw $t4, 0($fp) 	#Obtain return value
@@ -296,46 +194,148 @@ String_copy:
 	sw $t4, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
-IO_type_name:
-	move $t5, $fp 	#save previous FP value
+Bool_type_name:
+	move $t9, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 8 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t5, 0($sp) 	#
+	sw $t9, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	la $t5, data_5_type_name_IO 	#LOAD
+	la $t5, data_3_type_name_Bool 	#LOAD
 	sw $t5, 0($fp) 	#Save loaded value in destination
-	lw $t4, 0($fp) 	#Obtain alue of Arg
-	sw $t4, 0($sp) 	#Save Arg in Stack
+	lw $t3, 0($fp) 	#Obtain alue of Arg
+	sw $t3, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
-	lw $t2, 0($sp) 	#Obtain return value from stack
-	sw $t2, 4($fp) 	#
+	lw $t7, 0($sp) 	#Obtain return value from stack
+	sw $t7, 4($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t4, 4($fp) 	#Obtain return value
+	lw $t7, 4($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -8 	#Remove locals from Stack
-	sw $t4, 0($sp) 	#
+	sw $t7, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
-IO_copy:
-	move $t3, $fp 	#save previous FP value
+Bool_copy:
+	move $t9, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 4 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t3, 0($sp) 	#
+	sw $t9, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	li $v0, 9 	#Allocating instance of type Bool
+	li $a0, 8 	#Save 8 bytes
+	syscall 	#
+	la $t4, Bool 	#Save type address in register
+	sw $t4, 0($v0) 	#Save type address in firts position of memory allocated
+	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
+	sw $v0, 0($fp) 	#Save instance address in destination
+	lw $t9, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -4 	#Remove locals from Stack
+	sw $t9, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+String_type_name:
+	move $t7, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 8 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t7, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	la $t9, data_4_type_name_String 	#LOAD
+	sw $t9, 0($fp) 	#Save loaded value in destination
+	lw $t5, 0($fp) 	#Obtain alue of Arg
+	sw $t5, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal String___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t1, 0($sp) 	#Obtain return value from stack
+	sw $t1, 4($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	lw $t2, 4($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -8 	#Remove locals from Stack
+	sw $t2, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+String_copy:
+	move $t7, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 4 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t7, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	li $v0, 9 	#Allocating instance of type String
+	li $a0, 8 	#Save 8 bytes
+	syscall 	#
+	la $t5, String 	#Save type address in register
+	sw $t5, 0($v0) 	#Save type address in firts position of memory allocated
+	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
+	sw $v0, 0($fp) 	#Save instance address in destination
+	lw $t1, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -4 	#Remove locals from Stack
+	sw $t1, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+IO_type_name:
+	move $t4, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 8 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t4, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	la $t6, data_5_type_name_IO 	#LOAD
+	sw $t6, 0($fp) 	#Save loaded value in destination
+	lw $t6, 0($fp) 	#Obtain alue of Arg
+	sw $t6, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal String___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t0, 0($sp) 	#Obtain return value from stack
+	sw $t0, 4($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	lw $t9, 4($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -8 	#Remove locals from Stack
+	sw $t9, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+IO_copy:
+	move $t9, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 4 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t9, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
 	li $v0, 9 	#Allocating instance of type IO
 	li $a0, 4 	#Save 4 bytes
 	syscall 	#
-	la $t5, IO 	#Save type address in register
-	sw $t5, 0($v0) 	#Save type address in firts position of memory allocated
+	la $t6, IO 	#Save type address in register
+	sw $t6, 0($v0) 	#Save type address in firts position of memory allocated
 	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
 	sw $v0, 0($fp) 	#Save instance address in destination
 	lw $t8, 0($fp) 	#Obtain return value
@@ -348,105 +348,105 @@ IO_copy:
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 Main_type_name:
-	move $t6, $fp 	#save previous FP value
+	move $t4, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 8 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t6, 0($sp) 	#
+	sw $t4, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
 	la $t8, data_6_type_name_Main 	#LOAD
 	sw $t8, 0($fp) 	#Save loaded value in destination
-	lw $t7, 0($fp) 	#Obtain alue of Arg
-	sw $t7, 0($sp) 	#Save Arg in Stack
+	lw $t4, 0($fp) 	#Obtain alue of Arg
+	sw $t4, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
 	lw $t6, 0($sp) 	#Obtain return value from stack
 	sw $t6, 4($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t0, 4($fp) 	#Obtain return value
+	lw $t1, 4($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -8 	#Remove locals from Stack
-	sw $t0, 0($sp) 	#
+	sw $t1, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 Main_copy:
-	move $t3, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 4 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t3, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 9 	#Allocating instance of type Main
-	li $a0, 4 	#Save 4 bytes
-	syscall 	#
-	la $t8, Main 	#Save type address in register
-	sw $t8, 0($v0) 	#Save type address in firts position of memory allocated
-	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
-	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t6, 0($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t6, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-IO_out_string:
-	move $t1, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 0 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t1, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 4 	#PRINT
-	lw $t5, -4($fp) 	#
-	lw $a0, 0($t5) 	#
-	syscall 	#
-	lw $t1, -8($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, 0 	#Remove locals from Stack
-	sw $t1, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-IO_out_int:
-	move $t8, $fp 	#save previous FP value
-	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 0 	#push local vars
-	sw $ra, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t8, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	li $v0, 1 	#PRINT
-	lw $t5, -4($fp) 	#
-	lw $a0, 0($t5) 	#
-	syscall 	#
-	lw $t2, -8($fp) 	#Obtain return value
-	addi $sp,  $sp, -4 	#remove prev $fp from stack
-	lw $fp, 0($sp) 	#
-	addi $sp,  $sp, -4 	#remove prev $ra from stack
-	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, 0 	#Remove locals from Stack
-	sw $t2, 0($sp) 	#
-	addi $sp,  $sp, 4 	#Save return value in Stack
-	jr $ra 	#RETURN
-IO_in_string:
 	move $t9, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 4 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
 	sw $t9, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	li $v0, 9 	#Allocating instance of type Main
+	li $a0, 4 	#Save 4 bytes
+	syscall 	#
+	la $t1, Main 	#Save type address in register
+	sw $t1, 0($v0) 	#Save type address in firts position of memory allocated
+	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
+	sw $v0, 0($fp) 	#Save instance address in destination
+	lw $t8, 0($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, -4 	#Remove locals from Stack
+	sw $t8, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+IO_out_string:
+	move $t0, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 0 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t0, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	li $v0, 4 	#PRINT
+	lw $t6, -4($fp) 	#
+	lw $a0, 0($t6) 	#
+	syscall 	#
+	lw $t4, -8($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, 0 	#Remove locals from Stack
+	sw $t4, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+IO_out_int:
+	move $t5, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 0 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t5, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $fp in stack
+	li $v0, 1 	#PRINT
+	lw $t4, -4($fp) 	#
+	lw $a0, 0($t4) 	#
+	syscall 	#
+	lw $t9, -8($fp) 	#Obtain return value
+	addi $sp,  $sp, -4 	#remove prev $fp from stack
+	lw $fp, 0($sp) 	#
+	addi $sp,  $sp, -4 	#remove prev $ra from stack
+	lw $ra, 0($sp) 	#
+	addi $sp,  $sp, 0 	#Remove locals from Stack
+	sw $t9, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Save return value in Stack
+	jr $ra 	#RETURN
+IO_in_string:
+	move $t7, $fp 	#save previous FP value
+	move $fp, $sp 	#FP <- SP
+	addi $sp,  $sp, 4 	#push local vars
+	sw $ra, 0($sp) 	#
+	addi $sp,  $sp, 4 	#Push prev $ra in stack
+	sw $t7, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
 	li $v0, 5 	#READ
 	syscall 	#
@@ -461,12 +461,12 @@ IO_in_string:
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 IO_in_int:
-	move $t7, $fp 	#save previous FP value
+	move $t2, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 4 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t7, 0($sp) 	#
+	sw $t2, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
 	li $v0, 8 	#READ
 	syscall 	#
@@ -481,169 +481,144 @@ IO_in_int:
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 String_length:
-	move $t2, $fp 	#save previous FP value
+	move $t8, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 12 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t2, 0($sp) 	#
+	sw $t8, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	lw $t4, -4($fp) 	#Dir of instance of attribute to get
-	lw $t3, 0($t4) 	#Load attribute in index 0
-	sw $t3, 0($fp) 	#Save obtained attribute in destination
+	lw $t5, -4($fp) 	#Dir of instance of attribute to get
+	lw $t4, 0($t5) 	#Load attribute in index 0
+	sw $t4, 0($fp) 	#Save obtained attribute in destination
 	lw $a0, 0($fp) 	#Calculate Lenght
-	li $t1, 0 	#
+	li $t6, 0 	#
 loop1:
-	lb $t7, 0($a0) 	#
-	beqz $t7, exit1 	#
+	lb $t2, 0($a0) 	#
+	beqz $t2, exit1 	#
 	addi $a0,  $a0, 1 	#
-	addi $t1,  $t1, 1 	#
+	addi $t6,  $t6, 1 	#
 	j loop1 	#
 exit1:
-	sw $t1, 4($fp) 	#Save Calculated Length
-	lw $t5, 4($fp) 	#Obtain alue of Arg
-	sw $t5, 0($sp) 	#Save Arg in Stack
+	sw $t6, 4($fp) 	#Save Calculated Length
+	lw $t2, 4($fp) 	#Obtain alue of Arg
+	sw $t2, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal Int___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
-	lw $t9, 0($sp) 	#Obtain return value from stack
-	sw $t9, 8($fp) 	#
+	lw $t3, 0($sp) 	#Obtain return value from stack
+	sw $t3, 8($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t0, 8($fp) 	#Obtain return value
+	lw $t5, 8($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -12 	#Remove locals from Stack
-	sw $t0, 0($sp) 	#
+	sw $t5, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 String_concat:
-	move $t0, $fp 	#save previous FP value
+	move $t1, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 28 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t0, 0($sp) 	#
+	sw $t1, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	lw $t1, -8($fp) 	#Dir of instance of attribute to get
-	lw $t8, 0($t1) 	#Load attribute in index 0
-	sw $t8, 0($fp) 	#Save obtained attribute in destination
+	lw $t6, -8($fp) 	#Dir of instance of attribute to get
+	lw $t4, 0($t6) 	#Load attribute in index 0
+	sw $t4, 0($fp) 	#Save obtained attribute in destination
 	lw $t1, -4($fp) 	#Dir of instance of attribute to get
-	lw $t5, 0($t1) 	#Load attribute in index 0
-	sw $t5, 4($fp) 	#Save obtained attribute in destination
+	lw $t0, 0($t1) 	#Load attribute in index 0
+	sw $t0, 4($fp) 	#Save obtained attribute in destination
 	lw $a0, 0($fp) 	#Calculate Lenght
-	li $t9, 0 	#
+	li $t8, 0 	#
 loop2:
 	lb $t6, 0($a0) 	#
 	beqz $t6, exit2 	#
 	addi $a0,  $a0, 1 	#
-	addi $t9,  $t9, 1 	#
+	addi $t8,  $t8, 1 	#
 	j loop2 	#
 exit2:
-	sw $t9, 12($fp) 	#Save Calculated Length
+	sw $t8, 12($fp) 	#Save Calculated Length
 	lw $a0, 4($fp) 	#Calculate Lenght
-	li $t7, 0 	#
+	li $t4, 0 	#
 loop3:
-	lb $t3, 0($a0) 	#
-	beqz $t3, exit3 	#
+	lb $t7, 0($a0) 	#
+	beqz $t7, exit3 	#
 	addi $a0,  $a0, 1 	#
-	addi $t7,  $t7, 1 	#
+	addi $t4,  $t4, 1 	#
 	j loop3 	#
 exit3:
-	sw $t7, 16($fp) 	#Save Calculated Length
-	lw $t3, 16($fp) 	#
-	lw $t1, 12($fp) 	#
-	add $t8,  $t3, $t1 	#Plus
-	sw $t8, 20($fp) 	#Save result of plus
-	lw $t3, 20($fp) 	#Concat two Strings
-	addi $t3,  $t3, 1 	#
-	li $v0, 9 	#
-	move $a0, $t3 	#
-	syscall 	#
-	la $t8, 0($v0) 	#
-	lw $a1, 0($fp) 	#
-	lw $a2, 4($fp) 	#
-loop4:
-	lb $t3, 0($a1) 	#
-	beqz $t3, exit4 	#
-	sb $t3, 0($v0) 	#
-	addi $v0,  $v0, 1 	#
-	addi $a1,  $a1, 1 	#
-	j loop4 	#
-exit4:
-loop5:
-	lb $t3, 0($a2) 	#
-	sb $t3, 0($v0) 	#
-	beqz $t3, exit5 	#
-	addi $v0,  $v0, 1 	#
-	addi $a2,  $a2, 1 	#
-	j loop5 	#
-exit5:
-	sw $t8, 8($fp) 	#Save concated Strings
-	lw $t9, 8($fp) 	#Obtain alue of Arg
-	sw $t9, 0($sp) 	#Save Arg in Stack
+	sw $t4, 16($fp) 	#Save Calculated Length
+	lw $t8, 16($fp) 	#
+	lw $t2, 12($fp) 	#
+	add $t5,  $t8, $t2 	#Plus
+	sw $t5, 20($fp) 	#Save result of plus
+	lw $t3, 8($fp) 	#Obtain alue of Arg
+	sw $t3, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
-	lw $t5, 0($sp) 	#Obtain return value from stack
-	sw $t5, 24($fp) 	#
+	lw $t0, 0($sp) 	#Obtain return value from stack
+	sw $t0, 24($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t2, 24($fp) 	#Obtain return value
+	lw $t9, 24($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -28 	#Remove locals from Stack
-	sw $t2, 0($sp) 	#
+	sw $t9, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 String_substr:
-	move $t2, $fp 	#save previous FP value
+	move $t5, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 20 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t2, 0($sp) 	#
+	sw $t5, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	lw $t0, -12($fp) 	#Dir of instance of attribute to get
-	lw $t7, 0($t0) 	#Load attribute in index 0
-	sw $t7, 0($fp) 	#Save obtained attribute in destination
+	lw $t3, -12($fp) 	#Dir of instance of attribute to get
+	lw $t2, 0($t3) 	#Load attribute in index 0
+	sw $t2, 0($fp) 	#Save obtained attribute in destination
 	lw $t7, -8($fp) 	#Dir of instance of attribute to get
-	lw $t3, 0($t7) 	#Load attribute in index 0
-	sw $t3, 4($fp) 	#Save obtained attribute in destination
-	lw $t9, -4($fp) 	#Dir of instance of attribute to get
-	lw $t7, 0($t9) 	#Load attribute in index 0
-	sw $t7, 8($fp) 	#Save obtained attribute in destination
+	lw $t2, 0($t7) 	#Load attribute in index 0
+	sw $t2, 4($fp) 	#Save obtained attribute in destination
+	lw $t4, -4($fp) 	#Dir of instance of attribute to get
+	lw $t5, 0($t4) 	#Load attribute in index 0
+	sw $t5, 8($fp) 	#Save obtained attribute in destination
 	lw $t1, 8($fp) 	#Obtain substring
-	move $t5, $t1 	#
-	addi $t5,  $t5, 1 	#
+	move $t6, $t1 	#
+	addi $t6,  $t6, 1 	#
 	li $v0, 9 	#
-	move $a0, $t5 	#
+	move $a0, $t6 	#
 	syscall 	#
-	la $t2, 0($v0) 	#
+	la $t8, 0($v0) 	#
 	lw $t7, 4($fp) 	#
 	lw $a1, 0($fp) 	#
 	add $a1,  $a1, $t7 	#
-loop6:
-	lb $t3, 0($a1) 	#
-	beqz $t1, exit6 	#
-	sb $t3, 0($v0) 	#
+loop4:
+	lb $t5, 0($a1) 	#
+	beqz $t1, exit4 	#
+	sb $t5, 0($v0) 	#
 	addi $v0,  $v0, 1 	#
 	addi $a1,  $a1, 1 	#
 	addi $t1,  $t1, -1 	#
-	j loop6 	#
-exit6:
-	li $t3, 0 	#
-	sb $t3, 0($v0) 	#
-	sw $t2, 12($fp) 	#Save substring
-	lw $t2, 12($fp) 	#Obtain alue of Arg
-	sw $t2, 0($sp) 	#Save Arg in Stack
+	j loop4 	#
+exit4:
+	li $t5, 0 	#
+	sb $t5, 0($v0) 	#
+	sw $t8, 12($fp) 	#Save substring
+	lw $t4, 12($fp) 	#Obtain alue of Arg
+	sw $t4, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
-	lw $t7, 0($sp) 	#Obtain return value from stack
-	sw $t7, 16($fp) 	#
+	lw $t6, 0($sp) 	#Obtain return value from stack
+	sw $t6, 16($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
 	lw $t8, 16($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
@@ -665,44 +640,44 @@ Object___init:
 	li $v0, 9 	#Allocating instance of type Object
 	li $a0, 8 	#Save 8 bytes
 	syscall 	#
-	la $t2, Object 	#Save type address in register
-	sw $t2, 0($v0) 	#Save type address in firts position of memory allocated
+	la $t7, Object 	#Save type address in register
+	sw $t7, 0($v0) 	#Save type address in firts position of memory allocated
 	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
 	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t8, 0($fp) 	#Obtain return value
+	lw $t2, 0($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t8, 0($sp) 	#
+	sw $t2, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 Int___init:
-	move $t5, $fp 	#save previous FP value
+	move $t6, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 4 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t5, 0($sp) 	#
+	sw $t6, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
 	li $v0, 9 	#Allocating instance of type Int
 	li $a0, 8 	#Save 8 bytes
 	syscall 	#
-	la $t4, Int 	#Save type address in register
-	sw $t4, 0($v0) 	#Save type address in firts position of memory allocated
+	la $t8, Int 	#Save type address in register
+	sw $t8, 0($v0) 	#Save type address in firts position of memory allocated
 	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
 	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t0, -4($fp) 	#Obtain value from source dir
-	lw $t5, 0($fp) 	#Dir of instance of attribute to set
-	sw $t0, 0($t5) 	#Save value in attribute of index 0
-	lw $t0, 0($fp) 	#Obtain return value
+	lw $t5, -4($fp) 	#Obtain value from source dir
+	lw $t9, 0($fp) 	#Dir of instance of attribute to set
+	sw $t5, 0($t9) 	#Save value in attribute of index 0
+	lw $t2, 0($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t0, 0($sp) 	#
+	sw $t2, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 Bool___init:
@@ -716,29 +691,29 @@ Bool___init:
 	li $v0, 9 	#Allocating instance of type Bool
 	li $a0, 8 	#Save 8 bytes
 	syscall 	#
-	la $t3, Bool 	#Save type address in register
-	sw $t3, 0($v0) 	#Save type address in firts position of memory allocated
+	la $t8, Bool 	#Save type address in register
+	sw $t8, 0($v0) 	#Save type address in firts position of memory allocated
 	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
 	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t1, -4($fp) 	#Obtain value from source dir
-	lw $t7, 0($fp) 	#Dir of instance of attribute to set
-	sw $t1, 0($t7) 	#Save value in attribute of index 0
-	lw $t0, 0($fp) 	#Obtain return value
+	lw $t7, -4($fp) 	#Obtain value from source dir
+	lw $t2, 0($fp) 	#Dir of instance of attribute to set
+	sw $t7, 0($t2) 	#Save value in attribute of index 0
+	lw $t8, 0($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t0, 0($sp) 	#
+	sw $t8, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 String___init:
-	move $t5, $fp 	#save previous FP value
+	move $t2, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 4 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t5, 0($sp) 	#
+	sw $t2, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
 	li $v0, 9 	#Allocating instance of type String
 	li $a0, 8 	#Save 8 bytes
@@ -747,209 +722,229 @@ String___init:
 	sw $t3, 0($v0) 	#Save type address in firts position of memory allocated
 	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
 	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t1, -4($fp) 	#Obtain value from source dir
-	lw $t7, 0($fp) 	#Dir of instance of attribute to set
-	sw $t1, 0($t7) 	#Save value in attribute of index 0
-	lw $t9, 0($fp) 	#Obtain return value
+	lw $t6, -4($fp) 	#Obtain value from source dir
+	lw $t3, 0($fp) 	#Dir of instance of attribute to set
+	sw $t6, 0($t3) 	#Save value in attribute of index 0
+	lw $t3, 0($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t9, 0($sp) 	#
+	sw $t3, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 Main___init:
-	move $t9, $fp 	#save previous FP value
+	move $t6, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
 	addi $sp,  $sp, 4 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t9, 0($sp) 	#
+	sw $t6, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
 	li $v0, 9 	#Allocating instance of type Main
 	li $a0, 4 	#Save 4 bytes
 	syscall 	#
-	la $t5, Main 	#Save type address in register
-	sw $t5, 0($v0) 	#Save type address in firts position of memory allocated
+	la $t8, Main 	#Save type address in register
+	sw $t8, 0($v0) 	#Save type address in firts position of memory allocated
 	addi $v0,  $v0, 4 	#Move offset of instance (type addres is in index -1)
 	sw $v0, 0($fp) 	#Save instance address in destination
-	lw $t2, 0($fp) 	#Obtain return value
+	lw $t3, 0($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
 	addi $sp,  $sp, -4 	#Remove locals from Stack
-	sw $t2, 0($sp) 	#
+	sw $t3, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN
 Main_main:
-	move $t3, $fp 	#save previous FP value
+	move $t5, $fp 	#save previous FP value
 	move $fp, $sp 	#FP <- SP
-	addi $sp,  $sp, 108 	#push local vars
+	addi $sp,  $sp, 104 	#push local vars
 	sw $ra, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $ra in stack
-	sw $t3, 0($sp) 	#
+	sw $t5, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Push prev $fp in stack
-	la $t8, data_7_string 	#LOAD
-	sw $t8, 8($fp) 	#Save loaded value in destination
-	lw $t0, 8($fp) 	#Obtain alue of Arg
-	sw $t0, 0($sp) 	#Save Arg in Stack
+	la $t2, data_7_string 	#LOAD
+	sw $t2, 8($fp) 	#Save loaded value in destination
+	lw $t3, 8($fp) 	#Obtain alue of Arg
+	sw $t3, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
 	lw $t2, 0($sp) 	#Obtain return value from stack
 	sw $t2, 12($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	la $t3, data_8_string 	#LOAD
-	sw $t3, 16($fp) 	#Save loaded value in destination
-	lw $t1, 16($fp) 	#Obtain alue of Arg
-	sw $t1, 0($sp) 	#Save Arg in Stack
+	la $t6, data_8_string 	#LOAD
+	sw $t6, 16($fp) 	#Save loaded value in destination
+	lw $t7, 16($fp) 	#Obtain alue of Arg
+	sw $t7, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
-	lw $t9, 0($sp) 	#Obtain return value from stack
-	sw $t9, 20($fp) 	#
+	lw $t7, 0($sp) 	#Obtain return value from stack
+	sw $t7, 20($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t1, 12($fp) 	#Typeof
-	lw $t0, -4($t1) 	#
-	sw $t0, 24($fp) 	#Save type value in destination
-	lw $t3, 12($fp) 	#Obtain alue of Arg
+	lw $t6, 12($fp) 	#Typeof
+	lw $t1, -4($t6) 	#
+	sw $t1, 24($fp) 	#Save type value in destination
+	lw $t2, 12($fp) 	#Obtain alue of Arg
+	sw $t2, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	lw $t3, 20($fp) 	#Obtain alue of Arg
 	sw $t3, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
-	lw $t5, 20($fp) 	#Obtain alue of Arg
-	sw $t5, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	lw $t8, 24($fp) 	#get type dir for Dynamic Call
-	lw $t6, 16($t8) 	#Get method of index 4
-	jalr $t6 	#Jump to function
+	lw $t2, 24($fp) 	#get type dir for Dynamic Call
+	lw $t8, 16($t2) 	#Get method of index 4
+	jalr $t8 	#Jump to function
 	addi $sp,  $sp, -4 	#
-	lw $t8, 0($sp) 	#Obtain return value from stack
-	sw $t8, 4($fp) 	#Save return value in destination
+	lw $t2, 0($sp) 	#Obtain return value from stack
+	sw $t2, 4($fp) 	#Save return value in destination
 	addi $sp,  $sp, -8 	#Remove Args from Stack
-	lw $t0, 4($fp) 	#Obtain value to assign
-	sw $t0, 0($fp) 	#Assign value
-	lw $t5, 0($fp) 	#Dir of instance of attribute to get
-	lw $t7, 0($t5) 	#Load attribute in index 0
-	sw $t7, 32($fp) 	#Save obtained attribute in destination
-	la $t4, data_9_string 	#LOAD
-	sw $t4, 36($fp) 	#Save loaded value in destination
-	lw $t8, 36($fp) 	#Obtain alue of Arg
-	sw $t8, 0($sp) 	#Save Arg in Stack
+	lw $t6, 4($fp) 	#Dir of instance of attribute to get
+	lw $t7, 0($t6) 	#Load attribute in index 0
+	sw $t7, 28($fp) 	#Save obtained attribute in destination
+	la $t7, data_9_string 	#LOAD
+	sw $t7, 32($fp) 	#Save loaded value in destination
+	lw $t7, 32($fp) 	#Obtain alue of Arg
+	sw $t7, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
-	lw $t3, 0($sp) 	#Obtain return value from stack
-	sw $t3, 40($fp) 	#
+	lw $t7, 0($sp) 	#Obtain return value from stack
+	sw $t7, 36($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t6, 40($fp) 	#Dir of instance of attribute to get
-	lw $t0, 0($t6) 	#Load attribute in index 0
-	sw $t0, 44($fp) 	#Save obtained attribute in destination
-	lw $t6, 44($fp) 	#
-	lw $t4, 32($fp) 	#
-	sub $t3,  $t4, $t6 	#Minus
-	sw $t3, 48($fp) 	#Save result of minus
-	lw $t9, 48($fp) 	#Mov comparisson value to register
-	beqz $t9, label_then_1 	#Compare values in registers and jump to label_then_1 if the second is greater than 0
+	lw $t0, 36($fp) 	#Dir of instance of attribute to get
+	lw $t4, 0($t0) 	#Load attribute in index 0
+	sw $t4, 40($fp) 	#Save obtained attribute in destination
+	lw $t5, 28($fp) 	#
+	lw $t2, 40($fp) 	#
+loop5:
+	beqz $t5, exit5 	#
+	lb $t9, 0($t5) 	#
+	lb $t1, 0($t2) 	#
+	beqz $t9, exit5 	#
+	beqz $t1, exit6 	#
+	addi $t5,  $t5, 1 	#
+	addi $t2,  $t2, 1 	#
+	beq $t5, $t2, loop5 	#
+	j exit8 	#
+exit5:
+	beqz $t1, exit7 	#
+	j exit8 	#
+exit6:
+	beqz $t9, exit7 	#
+	j exit8 	#
+exit7:
+	li $t4, 1 	#
+	j exit9 	#
+exit8:
+	li $t4, 0 	#
+	j exit9 	#
+exit9:
+	sw $t4, 44($fp) 	#
+	lw $t8, 44($fp) 	#Mov comparisson value to register
+	beqz $t8, label_then_1 	#Compare values in registers and jump to label_then_1 if the second is greater than 0
 label_else_1:
-	li $t5, 0 	#Load Int
-	sw $t5, 56($fp) 	#Save loaded value in destination
-	lw $t5, 56($fp) 	#Obtain alue of Arg
-	sw $t5, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal Bool___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t7, 0($sp) 	#Obtain return value from stack
-	sw $t7, 60($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t8, 60($fp) 	#Obtain value to assign
-	sw $t8, 52($fp) 	#Assign value
-	j label_continue_1 	#Jump to label_continue_1
-label_then_1:
-	li $t1, 1 	#Load Int
-	sw $t1, 64($fp) 	#Save loaded value in destination
-	lw $t8, 64($fp) 	#Obtain alue of Arg
-	sw $t8, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal Bool___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t8, 0($sp) 	#Obtain return value from stack
-	sw $t8, 68($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t2, 68($fp) 	#Obtain value to assign
-	sw $t2, 52($fp) 	#Assign value
-label_continue_1:
-	lw $t8, 52($fp) 	#Dir of instance of attribute to get
-	lw $t7, 0($t8) 	#Load attribute in index 0
-	sw $t7, 72($fp) 	#Save obtained attribute in destination
-	lw $t8, 72($fp) 	#Mov comparisson value to register
-	bgtz $t8, label_then_0 	#Compare values in registers and jump to label_then_0 if the second is greater than 0
-label_else_0:
-	la $t4, data_10_string 	#LOAD
-	sw $t4, 80($fp) 	#Save loaded value in destination
-	lw $t3, 80($fp) 	#Obtain alue of Arg
-	sw $t3, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	jal String___init 	#Jump to function and save link
-	addi $sp,  $sp, -4 	#
-	lw $t7, 0($sp) 	#Obtain return value from stack
-	sw $t7, 84($fp) 	#
-	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t1, -4($fp) 	#Typeof
-	lw $t6, -4($t1) 	#
-	sw $t6, 88($fp) 	#Save type value in destination
-	lw $t4, -4($fp) 	#Obtain alue of Arg
-	sw $t4, 0($sp) 	#Save Arg in Stack
-	addi $sp,  $sp, 4 	#Move Stack
-	lw $t9, 84($fp) 	#Obtain alue of Arg
+	li $t1, 0 	#Load Int
+	sw $t1, 52($fp) 	#Save loaded value in destination
+	lw $t9, 52($fp) 	#Obtain alue of Arg
 	sw $t9, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
-	lw $t7, 88($fp) 	#get type dir for Dynamic Call
+	jal Bool___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t2, 0($sp) 	#Obtain return value from stack
+	sw $t2, 56($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	lw $t1, 56($fp) 	#Obtain value to assign
+	sw $t1, 48($fp) 	#Assign value
+	j label_continue_1 	#Jump to label_continue_1
+label_then_1:
+	li $t4, 1 	#Load Int
+	sw $t4, 60($fp) 	#Save loaded value in destination
+	lw $t0, 60($fp) 	#Obtain alue of Arg
+	sw $t0, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal Bool___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t8, 0($sp) 	#Obtain return value from stack
+	sw $t8, 64($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	lw $t4, 64($fp) 	#Obtain value to assign
+	sw $t4, 48($fp) 	#Assign value
+label_continue_1:
+	lw $t5, 48($fp) 	#Dir of instance of attribute to get
+	lw $t3, 0($t5) 	#Load attribute in index 0
+	sw $t3, 68($fp) 	#Save obtained attribute in destination
+	lw $t5, 68($fp) 	#Mov comparisson value to register
+	bgtz $t5, label_then_0 	#Compare values in registers and jump to label_then_0 if the second is greater than 0
+label_else_0:
+	la $t2, data_10_string 	#LOAD
+	sw $t2, 76($fp) 	#Save loaded value in destination
+	lw $t6, 76($fp) 	#Obtain alue of Arg
+	sw $t6, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	jal String___init 	#Jump to function and save link
+	addi $sp,  $sp, -4 	#
+	lw $t4, 0($sp) 	#Obtain return value from stack
+	sw $t4, 80($fp) 	#
+	addi $sp,  $sp, -4 	#Remove args from stack
+	lw $t9, -4($fp) 	#Typeof
+	lw $t5, -4($t9) 	#
+	sw $t5, 84($fp) 	#Save type value in destination
+	lw $t7, -4($fp) 	#Obtain alue of Arg
+	sw $t7, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	lw $t9, 80($fp) 	#Obtain alue of Arg
+	sw $t9, 0($sp) 	#Save Arg in Stack
+	addi $sp,  $sp, 4 	#Move Stack
+	lw $t7, 84($fp) 	#get type dir for Dynamic Call
 	lw $t5, 12($t7) 	#Get method of index 3
 	jalr $t5 	#Jump to function
 	addi $sp,  $sp, -4 	#
 	lw $t7, 0($sp) 	#Obtain return value from stack
-	sw $t7, 76($fp) 	#Save return value in destination
+	sw $t7, 72($fp) 	#Save return value in destination
 	addi $sp,  $sp, -8 	#Remove Args from Stack
-	lw $t2, 76($fp) 	#Obtain value to assign
-	sw $t2, 28($fp) 	#Assign value
+	lw $t6, 72($fp) 	#Obtain value to assign
+	sw $t6, 0($fp) 	#Assign value
 	j label_continue_0 	#Jump to label_continue_0
 label_then_0:
-	la $t4, data_11_string 	#LOAD
-	sw $t4, 96($fp) 	#Save loaded value in destination
-	lw $t0, 96($fp) 	#Obtain alue of Arg
-	sw $t0, 0($sp) 	#Save Arg in Stack
+	la $t8, data_11_string 	#LOAD
+	sw $t8, 92($fp) 	#Save loaded value in destination
+	lw $t7, 92($fp) 	#Obtain alue of Arg
+	sw $t7, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
 	jal String___init 	#Jump to function and save link
 	addi $sp,  $sp, -4 	#
-	lw $t5, 0($sp) 	#Obtain return value from stack
-	sw $t5, 100($fp) 	#
+	lw $t4, 0($sp) 	#Obtain return value from stack
+	sw $t4, 96($fp) 	#
 	addi $sp,  $sp, -4 	#Remove args from stack
-	lw $t7, -4($fp) 	#Typeof
-	lw $t0, -4($t7) 	#
-	sw $t0, 104($fp) 	#Save type value in destination
-	lw $t2, -4($fp) 	#Obtain alue of Arg
-	sw $t2, 0($sp) 	#Save Arg in Stack
+	lw $t1, -4($fp) 	#Typeof
+	lw $t9, -4($t1) 	#
+	sw $t9, 100($fp) 	#Save type value in destination
+	lw $t3, -4($fp) 	#Obtain alue of Arg
+	sw $t3, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
-	lw $t1, 100($fp) 	#Obtain alue of Arg
-	sw $t1, 0($sp) 	#Save Arg in Stack
+	lw $t6, 96($fp) 	#Obtain alue of Arg
+	sw $t6, 0($sp) 	#Save Arg in Stack
 	addi $sp,  $sp, 4 	#Move Stack
-	lw $t9, 104($fp) 	#get type dir for Dynamic Call
-	lw $t5, 12($t9) 	#Get method of index 3
-	jalr $t5 	#Jump to function
+	lw $t4, 100($fp) 	#get type dir for Dynamic Call
+	lw $t2, 12($t4) 	#Get method of index 3
+	jalr $t2 	#Jump to function
 	addi $sp,  $sp, -4 	#
-	lw $t9, 0($sp) 	#Obtain return value from stack
-	sw $t9, 92($fp) 	#Save return value in destination
+	lw $t4, 0($sp) 	#Obtain return value from stack
+	sw $t4, 88($fp) 	#Save return value in destination
 	addi $sp,  $sp, -8 	#Remove Args from Stack
-	lw $t8, 92($fp) 	#Obtain value to assign
-	sw $t8, 28($fp) 	#Assign value
+	lw $t8, 88($fp) 	#Obtain value to assign
+	sw $t8, 0($fp) 	#Assign value
 label_continue_0:
-	lw $t7, 28($fp) 	#Obtain return value
+	lw $t0, 0($fp) 	#Obtain return value
 	addi $sp,  $sp, -4 	#remove prev $fp from stack
 	lw $fp, 0($sp) 	#
 	addi $sp,  $sp, -4 	#remove prev $ra from stack
 	lw $ra, 0($sp) 	#
-	addi $sp,  $sp, -108 	#Remove locals from Stack
-	sw $t7, 0($sp) 	#
+	addi $sp,  $sp, -104 	#Remove locals from Stack
+	sw $t0, 0($sp) 	#
 	addi $sp,  $sp, 4 	#Save return value in Stack
 	jr $ra 	#RETURN

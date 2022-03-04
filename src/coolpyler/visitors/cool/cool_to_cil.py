@@ -804,6 +804,10 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.GetAttrNode(right, 0, right_value))
 
         cond_local = self.register_local()
+        if node.left_expr.type.name == "String":
+            self.instructions.append(cil.StrEqNode(cond_local, left_value, right_value))
+            return self.register_new("Bool", cond_local)
+
         self.instructions.append(cil.MinusNode(cond_local, left_value, right_value))
 
         ret_local = self.register_local()

@@ -133,6 +133,10 @@ class CILDebug:
     def visit(self, node: cil.GotoIfEqNode, indent=0, inline=False):
         self.print(indent, inline, f"IF {node.cond} = 0 GOTO {node.label};")
 
+    @visitor.when(cil.StrEqNode)
+    def visit(self, node: cil.StrEqNode, indent=0, inline=False):
+        self.print(indent, inline, f"{node.dest} = streq({node.str1}, {node.str2});")
+
     @visitor.when(cil.StaticCallNode)
     def visit(self, node: cil.StaticCallNode, indent=0, inline=False):
         self.print(indent, inline, f"{node.dest} = CALL {node.function};")
