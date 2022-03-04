@@ -893,7 +893,7 @@ class CilToMIPS:
         instructions.append(mips.AddiNode(reg1, reg1, 1))
         instructions.append(mips.AddiNode(reg2, reg2, 1))
 
-        instructions.append(mips.BeqNode(reg1, reg2, loop1))
+        instructions.append(mips.BeqNode(reg1_, reg2_, loop1))
         instructions.append(mips.JumpNode(exit_false))
 
         instructions.append(mips.LabelInstructionNode(exit1))
@@ -901,7 +901,6 @@ class CilToMIPS:
         instructions.append(mips.JumpNode(exit_false))
 
         instructions.append(mips.LabelInstructionNode(exit2))
-
         instructions.append(mips.BeqzNode(reg1_, exit_true))
         instructions.append(mips.JumpNode(exit_false))
 
