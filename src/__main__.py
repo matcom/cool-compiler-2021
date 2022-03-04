@@ -1,3 +1,6 @@
+from code_gen.ccil_gen import CCILGenerator
+from code_gen.ccil_mips_gen import CCILToMIPSGenerator
+from code_gen.mips_gen import MIPSGenerator
 from debbuging.type_logger import TypeLogger
 import sys
 
@@ -46,11 +49,12 @@ def run_pipeline(program_ast):
     change = True
     back = BackInferencer(context)
 
+    # import pdb; pdb.set_trace()
     back_ast, change = back.visit(hard_ast)
     while change:
         back_ast, change = back.visit(back_ast)
 
-    types = TypesInferencer()
+    types = TypesInferencer(context)
     types_ast = types.visit(back_ast)
     errors += types.errors
 
@@ -70,7 +74,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "debbuging/tests/Auto/call1.cl"
+        input_file = "debbuging/tests_ccil/simple.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
@@ -91,7 +95,21 @@ def main():
             print(error)
         exit(1)
 
-    run_pipeline(ast)
+    type_ast = run_pipeline(ast)
+    ccil_gen = CCILGenerator()
+    ccil_ast = ccil_gen.visit(type_ast)
+    print(str(ccil_ast))
+
+    ccil_mips_gen = CCILToMIPSGenerator()
+    mips_ast = ccil_mips_gen.visit(ccil_ast)
+
+    mips_gen = MIPSGenerator()
+    mips_code = mips_gen.visit(mips_ast)
+
+    out_file = input_file.split(".")[0]
+    path_to_file =f"{out_file}.mips"
+    with open(path_to_file, "w") as f:
+        f.write(mips_code)
 
 
 main()
