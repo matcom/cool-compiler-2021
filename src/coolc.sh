@@ -1,13 +1,9 @@
-# Incluya aquí las instrucciones necesarias para ejecutar su compilador
-
 INPUT_FILE=$1
 OUTPUT_FILE=${INPUT_FILE:0: -2}mips
 
-# Si su compilador no lo hace ya, aquí puede imprimir la información de contacto
-echo "COOL-Compiler v0.0.1"        # TODO: Recuerde cambiar estas
-# echo "Copyright (c) 2021: Samuel David Suárez Roddríguez, Enmanuel Verdesia Suárez"    # TODO: líneas a los valores correctos
+echo "COOL-Compiler v0.0.1"
+echo "Copyright (c) 2021: Samuel David Suárez Roddríguez, Enmanuel Verdesia Suárez"
 
-# Llamar al compilador
 echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
 
-python3 coolc.py $INPUT_FILE
+python3 coolc.py -r file $INPUT_FILE
