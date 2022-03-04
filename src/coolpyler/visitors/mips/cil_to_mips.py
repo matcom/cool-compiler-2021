@@ -1165,7 +1165,7 @@ class CilToMIPS:
         instructions.append(mips.SyscallNode())
         instructions.append(
             mips.StoreWordNode(
-                ARG_REGISTERS[0],
+                V0_REG,
                 mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
                 f"Save readed value",
             )
