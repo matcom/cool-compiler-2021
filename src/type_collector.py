@@ -1,4 +1,4 @@
-from cmp.semantic import SemanticError
+from cmp.semantic import SemanticError as SError
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import (
     VoidType,
@@ -15,7 +15,7 @@ from cmp.semantic import Context
 from ast_nodes import ProgramNode, ClassDeclarationNode
 import cmp.visitor as visitor
 from cool_visitor import CopyVisitor
-
+from errors import SemanticError
 
 class TypeCollector(object):
     def __init__(self, errors=[]):
@@ -61,5 +61,6 @@ class TypeCollector(object):
     def visit(self, node):
         try:
             self.context.create_type(node.id)
-        except SemanticError as error:
-            self.errors.append(error.text)
+        except SError as error:
+            node_row, node_col = node.token.location
+            self.errors.append(SemanticError(node_row, node_col, error.text))

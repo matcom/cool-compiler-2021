@@ -96,12 +96,15 @@ class CaseItemNode(ExpressionNode):
 
 
 class CallNode(ExpressionNode):
-    def __init__(self, idx, args, obj=None, at_type=None, token = Token("", "", (0,0))):
+    def __init__(self, idx, args, obj=None, at_type=None, token = Token("", "", (-1,-1))):
         self.obj = obj
         self.id = idx
         self.args = args
         self.at_type = at_type
-        self.token = token
+        if token.location[0] == -1:
+            self.token = idx
+        else:
+            self.token = token
 
 
 class BlockNode(ExpressionNode):

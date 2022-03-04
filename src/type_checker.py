@@ -1,3 +1,4 @@
+from email import message
 import cmp.nbpackage
 import cmp.visitor as visitor
 
@@ -33,7 +34,7 @@ from ast_nodes import (
 )
 from cool_visitor import FormatVisitor
 
-from cmp.semantic import SemanticError
+from cmp.semantic import SemanticError as SError
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import VoidType, ErrorType, IntType
 from cmp.semantic import Context
@@ -41,7 +42,7 @@ from cmp.semantic import Context
 from cmp.semantic import Scope
 from cmp.utils import find_least_type
 import copy
-from errors import TypeError, NameError
+from errors import TypeError, NameError, SemanticError, AttributeError
 
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
@@ -116,7 +117,7 @@ class TypeChecker:
         try:
             typex = self.context.get_type(node.type.lex)
 
-        except SemanticError as e:
+        except SError as e:
             self.errors.append(e)
             return ErrorType()
 
@@ -182,7 +183,7 @@ class TypeChecker:
                             f"an ancestor of {self.current_type.name}",
                         )
                     )
-            except SemanticError:
+            except SError:
                 pass
 
         try:
@@ -192,7 +193,7 @@ class TypeChecker:
 
             return return_type
 
-        except SemanticError as e:
+        except SError as e:
             self.errors.append(e)
             return ErrorType()
 
@@ -206,7 +207,7 @@ class TypeChecker:
             self.errors.append(SELF_IS_READONLY)
         try:
             static_type = self.context.get_type(node.type.lex)
-        except SemanticError as error:
+        except SError as error:
             self.errors.append(error.text)
             static_type = ErrorType()
 
@@ -254,25 +255,29 @@ class TypeChecker:
                 node_at_type = self.context.get_type(node.at_type.lex)
                 method = node_at_type.get_method(node.id.lex)
                 if not typex.conforms_to(node_at_type):
+                    node_row, node_col = node.token.location
                     self.errors.append(
-                        f"The static type to the left of @ ({typex.name}) must conform to the type specified to the right of @ ({node_at_type.name}) "
+                        TypeError(node_row, node_col, f"Expression type {typex.name} does not conform to declared static dispatch type {node_at_type.name}.")
                     )
                     return ErrorType()
             else:
                 method = typex.get_method(node.id.lex)
-        except SemanticError as error:
-            self.errors.append(error.text)
+        except SError as error:
+            node_col, node_row = node.token.location
+            self.errors.append(AttributeError(node_col, node_row ,error.text))
             return ErrorType()
 
         if len(method.param_names) != len(node.args):
+            node_row, node_col = node.id.location
             self.errors.append(
-                f"There is no definition of {method.name} that takes {len(node.args)} arguments "
+               SemanticError(node_row, node_col, f"There is no definition of {method.name} that takes {len(node.args)} arguments ")
             )
 
         for arg, ptype in zip(node.args, method.param_types):
             arg_type = self.visit(arg, scope)
             if not arg_type.conforms_to(ptype):
-                self.errors.append(INCOMPATIBLE_TYPES % (arg_type.name, ptype.name))
+                node_row, node_col = arg.token.location # verificar si esto siempre da ok
+                self.errors.append(TypeError(node_row, node_col,f"In call of method {node.id.lex} parameter of type {arg_type.name} does not conforms to declared type {ptype.name}"))
 
         if method.return_type == self.context.get_type("SELF_TYPE"):
             return typex
@@ -284,8 +289,9 @@ class TypeChecker:
         predicate_type = self.visit(node.if_expr, scope)
 
         if predicate_type.name != "Bool" and predicate_type.name != "AUTO_TYPE":
+            node_row, node_col = node.token.location
             self.errors.append(
-                f"Expression after 'if' must be bool, current is {predicate_type.name}"
+               TypeError(node_row, node_col, f"Expression after 'if' must be Bool, current type is {predicate_type.name}")
             )
             return ErrorType()
 
@@ -336,7 +342,7 @@ class TypeChecker:
                 static_type = self.current_type
             scope.define_variable(node.id, static_type)
 
-        except SemanticError as e:
+        except SError as e:
             self.errors.append(e)
             return ErrorType()
 
@@ -352,12 +358,19 @@ class TypeChecker:
         self.visit(node.expr, scope)
 
         current_case_type = None
+        case_types_found = []
         for item in node.case_items:
-            child_scope = scope.create_child()
-            case_item_type = self.visit(item, child_scope)
-            current_case_type = find_least_type(
-                current_case_type, case_item_type, self.context
-            )
+            if not ( item.type.lex in case_types_found):
+                case_types_found.append(item.type.lex)
+                child_scope = scope.create_child()
+                case_item_type = self.visit(item, child_scope)
+                current_case_type = find_least_type(
+                    current_case_type, case_item_type, self.context
+                )
+            else:
+                line, col = item.type.location
+                self.errors.append(SemanticError(line, col, f"Duplicate branch {item.type.lex} in case statement"))
+
 
         return current_case_type
 
@@ -365,10 +378,14 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             static_type = self.context.get_type(node.type.lex)
-            scope.define_variable(node.id.lex, static_type)
-        except SemanticError as e:
-            self.errors.append(e)
-            return ErrorType()
+            try:
+                scope.define_variable(node.id.lex, static_type)
+            except SError as e:
+                self.errors.append(e)
+                return ErrorType()
+        except SError as e:
+            node_row, node_col = node.type.location
+            self.errors.append(TypeError(node_row, node_col, f"Class {node.type.lex} of case branch is undefined."))
 
         typex = self.visit(node.expr, scope)
 
@@ -382,7 +399,7 @@ class TypeChecker:
                 return self.current_type
 
             return typex
-        except SemanticError as error:
+        except SError as error:
             self.errors.append(error.text)
             return ErrorType()
 

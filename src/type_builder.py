@@ -1,5 +1,5 @@
 import copy
-from cmp.semantic import SemanticError
+from cmp.semantic import SemanticError as SError
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import VoidType, IntType, ErrorType, StringType, BoolType
 from cmp.semantic import Context
@@ -13,7 +13,7 @@ import cmp.visitor as visitor
 from tset import Tset
 from collections import deque
 from cool_visitor import CopyVisitor
-
+from errors import SemanticError
 
 class TypeBuilder:
     def __init__(self, errors=[]):
@@ -109,7 +109,7 @@ class TypeBuilder:
                     parent_child_dict[parent_type].append(class_declaration)
                 except:  # KeyError
                     parent_child_dict[parent_type] = [class_declaration]
-            except SemanticError:  # parent is None or not definition provided
+            except SError:  # parent is None or not definition provided
                 queue.append(class_declaration)
 
         main_round = 0
@@ -147,7 +147,7 @@ class TypeBuilder:
                     '"main" method in class Main does not receive any parameters'
                 )
             # modify in semantic get_method in order to get some ancestor where the method is already defined
-        except SemanticError:
+        except SError:
             self.errors.append("A class Main with a method main most be provided")
 
         # ----------------------------------------------------
@@ -174,13 +174,14 @@ class TypeBuilder:
             try:
                 parent_type = self.get_type(node.parent.lex)
                 self.current_type.set_parent(parent_type)
-            except SemanticError as error:
-                self.errors.append(error.text)
+            except SError as error:
+                node_row, node_col = node.parent.location
+                self.errors.append(SemanticError(node_row, node_col, error.text))
         else:
             object_type = self.context.get_type("Object")
             try:
                 self.current_type.set_parent(object_type)
-            except SemanticError as error:
+            except SError as error:
                 self.errors.append(error.text)
 
         for feature in node.features:
@@ -196,7 +197,7 @@ class TypeBuilder:
             self.current_type.define_method(
                 node.id.lex, param_names, param_types, return_type
             )
-        except SemanticError as error:
+        except SError as error:
             # print("--------aqui se esta reportando el error del metodo doble---------")
             self.errors.append(error.text)
 
@@ -205,12 +206,12 @@ class TypeBuilder:
         try:
             attr_type = self.get_type(node.type.lex)
             self.current_type.define_attribute(node.id.lex, attr_type)
-        except SemanticError as error:
+        except SError as error:
             self.errors.append(error.text)
 
     def get_type(self, tname):
         try:
             return self.context.get_type(tname)
-        except SemanticError as error:
+        except SError as error:
             self.errors.append(error.text)
             return ErrorType()

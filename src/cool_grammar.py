@@ -160,7 +160,7 @@ def define_cool_grammar(print_grammar=False):
     case_block %= case_item, lambda h, s: [s[1]]
     case_item %= (
         idx + colon + type_id + rarrow + expr + semi,
-        lambda h, s: CaseItemNode(s[1], s[3], s[5]),
+        lambda h, s: CaseItemNode(s[1], s[3], s[5], s[4]),
     )
 
     atom %= num, lambda h, s: ConstantNumNode(s[1])

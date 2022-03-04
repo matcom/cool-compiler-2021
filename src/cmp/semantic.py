@@ -235,7 +235,7 @@ class Context:
 
     def create_type(self, name: str):
         if name in self.types:
-            raise SemanticError(f"Type with the same name ({name}) already in context.")
+            raise SemanticError(f"Type with the same name {name} already in context.")
         typex = self.types[name] = Type(name)
         return typex
 
@@ -266,6 +266,9 @@ class VariableInfo:
     def __init__(self, name, vtype):
         self.name = name
         self.type = vtype
+
+    def __str__(self):
+        return f"{self.name}: {self.type}"
 
 
 class Scope:
@@ -302,3 +305,12 @@ class Scope:
 
     def is_local(self, vname):
         return any(True for x in self.locals if x.name == vname)
+
+    def __str__(self):
+        output = "LOCALS: \n"
+        output += "\n".join(str(x) for x in self.locals)
+        output += "\n"
+        output += "PARENT:"
+        output += str(self.parent)
+        output += "\n"
+        return output
