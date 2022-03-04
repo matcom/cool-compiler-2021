@@ -75,7 +75,7 @@ class DotCodeVisitor:
                         self.add_comment('Calling main')
                         result = self.add_local('result')
                         self.add_inst(cil.ArgNode(instance))
-                        self.add_inst(cil.DynamicCallNode(instance, 'main', result))
+                        self.add_inst(cil.DynamicCallNode(instance, 'main', result, 'Main'))
                         self.add_inst(cil.ReturnNode(0))
                         break
 
@@ -369,7 +369,7 @@ class DotCodeVisitor:
 
         # call the function
         call_res = self.add_local('call_res')
-        self.add_inst(cil.DynamicCallNode(obj_dest, node.id, call_res))
+        self.add_inst(cil.DynamicCallNode(obj_dest, node.id, call_res, node.obj_dyn_type))
 
         return call_res
 

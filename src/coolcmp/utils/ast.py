@@ -2,7 +2,6 @@
 Cool AST.
 """
 from __future__ import annotations
-from typing import Type
 
 
 class Node:
@@ -176,8 +175,15 @@ class CallNode(ExpressionNode):
         self.id = idx
         self.args = args
         self.type = typex
+        self.obj_dyn_type: str | None = None
 
         self.parent_pos = (-1, -1)
+
+    def update_obj_dynamic_type(self, type_name: str):
+        if self.type is not None:
+            self.obj_dyn_type = self.type
+        else:
+            self.obj_dyn_type = type_name
 
 
 class AtomicNode(ExpressionNode):

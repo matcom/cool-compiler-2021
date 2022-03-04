@@ -20,6 +20,7 @@ from coolcmp.utils.registers import (
     ra
 )
 
+
 class CILToMipsVisitor:
     def __init__(self):
         self.cil_root: cil.ProgramNode | None = None
@@ -39,24 +40,6 @@ class CILToMipsVisitor:
             if method == name:
                 return (i + 1) * 4
         raise ValueError(f"Unexpected method: {name}")
-
-    def build_init(self, node: cil.TypeNode) -> list[mips.InstructionNode]:
-        return [
-            mips.SUBUNode(sp, sp, 24),
-            mips.SWNode(ra, 8, sp),
-            mips.SWNode(fp, 4, sp),
-            mips.ADDUNode(fp, sp, 20),
-
-            mips.LWNode(a0, node.name),
-            mips.JALNode('malloc'),
-            mips.LANode(t0, node.name),
-            mips.SWNode(t0, 0, v0),
-
-            mips.LWNode(ra, (8, sp)),
-            mips.LWNode(fp, (4, sp)),
-            mips.ADDUNode(sp, sp, 24),
-            mips.JRNode(ra),
-        ]
 
     @visitor.on("node")
     def visit(self, node):
@@ -82,13 +65,29 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
+        init = [
+            mips.SUBUNode(sp, sp, 24),
+            mips.SWNode(ra, 8, sp),
+            mips.SWNode(fp, 4, sp),
+            mips.ADDUNode(fp, sp, 20),
+
+            mips.LWNode(a0, node.name),
+            mips.JALNode('malloc'),
+            mips.LANode(t0, node.name),
+            mips.SWNode(t0, 0, v0),
+
+            mips.LWNode(ra, (8, sp)),
+            mips.LWNode(fp, (4, sp)),
+            mips.ADDUNode(sp, sp, 24),
+            mips.JRNode(ra),
+        ]
         type_ = mips.Type(
             label=node.name,
             attrs=list(node.attributes),
             methods=node.methods,
             total_methods=node.total_methods,
             index=len(self.types),
-            init=self.build_init(node)
+            init=init
         )
 
         self.types[node.name] = type_
@@ -120,11 +119,8 @@ class CILToMipsVisitor:
             *push_instructions,
         )
 
-        stack_occupied = 0
         for instruction in node.instructions:
             self.visit(instruction)
-            if isinstance(instruction, cil.ArgNode):
-                stack_occupied += 4
 
         # Pop local vars
         pop_instructions = (
@@ -138,12 +134,6 @@ class CILToMipsVisitor:
             if self.cur_function.name == "main"
             else [mips.JRNode(ra)]
         )
-
-        if stack_occupied:
-            self.add_inst(
-                mips.CommentNode('Pop args pushed'),
-                mips.ADDINode(sp, sp, stack_occupied),
-            )
 
         self.add_inst(
             *pop_instructions,
@@ -232,14 +222,16 @@ class CILToMipsVisitor:
         obj_address = self.get_address(node.obj)
         meth_offset = self.get_method_index(node.method)
         dest_address = self.get_address(node.dest)
+        args_space = self.cil_root.get_function(f"{node.dtype}_{node.method}").args_space
 
         self.add_inst(
             mips.CommentNode(f"<dynamiccall:{node.obj}-{node.method}-{node.dest}>"),
-            mips.LWNode(t0, (obj_address, fp)),     # get instance pointer
-            mips.LWNode(t0, (0, t0)),               # get instance type pointer at offset 0
-            mips.LWNode(t0, (meth_offset, t0)),     # get method
-            mips.JALRNode(t0)                       .with_comm(f'Jump to {node.method}'),
+            mips.LWNode(t0, (obj_address, fp))      .with_comm("Get instance pointer"),
+            mips.LWNode(t0, (0, t0))                .with_comm("Get type pointer at offset 0"),
+            mips.LWNode(t0, (meth_offset, t0))      .with_comm(f"Get method: {node.method}"),
+            mips.JALRNode(t0)                       .with_comm(f"Jump to {node.method}"),
             mips.SWNode(v0, dest_address, fp),
+            mips.ADDINode(sp, sp, args_space)       .with_comm("Pop args pushed"),
             mips.CommentNode(f"</dynamiccall:{node.obj}-{node.method}-{node.dest}>"),
         )
 
@@ -422,4 +414,29 @@ class CILToMipsVisitor:
             mips.LWNode(t0, (dest, fp))     .with_comm('Load Bool pointer'),
             mips.SWNode(v0, 4, t0)          .with_comm('Save isvoid result as value of Bool'),
             mips.CommentNode(f"</isvoid:{node.dest}-{node.src}>"),
+        )
+
+    @visitor.when(cil.LabelNode)
+    def visit(self, node: cil.LabelNode):
+        self.add_inst(
+            mips.LabelNode(node.name),
+        )
+
+    @visitor.when(cil.GotoNode)
+    def visit(self, node: cil.GotoNode):
+        self.add_inst(
+            mips.JNode(node.label),
+        )
+
+    @visitor.when(cil.GotoIfNode)
+    def visit(self, node: cil.GotoIfNode):
+        condition = self.get_address(node.condition)
+
+        self.add_inst(
+            mips.CommentNode(f"<gotoif:{node.condition}-{node.label}>"),
+            mips.LWNode(t0, (condition, fp)),
+            mips.LWNode(t0, (4, t0)),
+            mips.LINode(t1, 1),
+            mips.BEQNode(t0, t1, node.label),
+            mips.CommentNode(f"</gotoif:{node.condition}-{node.label}>"),
         )

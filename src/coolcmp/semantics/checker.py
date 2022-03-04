@@ -250,6 +250,9 @@ class TypeChecker:
         else:
             obj_type = self.visit(node.obj, scope)
 
+        _, owner = obj_type.get_method(node.id, get_owner=True)
+        node.update_obj_dynamic_type(owner.name)
+
         if node.type is not None:
             try:
                 anc_type = self.context.get_type(node.type)

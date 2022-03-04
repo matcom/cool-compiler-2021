@@ -318,6 +318,19 @@ class BEQNode(InstructionNode):
         return f"beq    {self.reg1}, {self.reg2}, {self.label}"
 
 
+class JNode(InstructionNode):
+    """
+    jump | j 1000 | go to address 1000
+    Jump to target address
+    """
+    def __init__(self, label: str):
+        super().__init__()
+        self.label = label
+
+    def __str__(self):
+        return f"j      {self.label}"
+
+
 class SLLNode(InstructionNode):
     """
     shift left logical by a constant number of bits

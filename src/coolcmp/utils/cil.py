@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import types
-
 from coolcmp.utils import ast
 from coolcmp.utils import extract_feat_name
 
@@ -22,10 +20,16 @@ class ProgramNode(Node):
         self.dot_code = dot_code
         self.all_methods: list[str] = []
 
-    def get_type(self, name: str):
+    def get_type(self, name: str) -> TypeNode:
         for type_ in self.dot_types:
             if type_.name == name:
                 return type_
+
+    def get_function(self, name: str) -> FunctionNode:
+        for func in self.dot_code:
+            if func.name == name:
+                return func
+        raise ValueError(f'Unexpected function name: {name}')
 
     def get_data_name(self, value: str):
         for data in self.dot_data:
@@ -131,6 +135,13 @@ class FunctionNode(Node):
         self.params = params
         self.local_vars = local_vars
         self.instructions = instructions
+
+    @property
+    def args_space(self):
+        """
+        Returns the size of the space used by this function args in the stack.
+        """
+        return len(self.params) * 4
 
 
 class ParamNode(Node):
@@ -243,10 +254,11 @@ class StaticCallNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, obj: str, method: str, dest: str):
+    def __init__(self, obj: str, method: str, dest: str, dtype: str):
         self.obj = obj
         self.method = method
         self.dest = dest
+        self.dtype = dtype
 
 
 class ArgNode(InstructionNode):
