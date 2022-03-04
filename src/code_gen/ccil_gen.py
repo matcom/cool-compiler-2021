@@ -523,7 +523,7 @@ class CCILGenerator:
             if node.left.type.name == STRING:
                 fval_id = f"eq_str_{times}"
                 op = EqualStrNode(left_id, right_id)
-            if node.left.type.name in {INT, BOOL}:
+            elif node.left.type.name in {INT, BOOL}:
                 fval_id = (
                     f"eq_{'int' if node.left.type.name == INT else 'bool'}_{times}"
                 )
