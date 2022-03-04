@@ -131,17 +131,28 @@ class GotoIfGtNode(InstructionNode):
         self.cond = cond
         self.label = label
 
+
 class GotoIfLtNode(InstructionNode):
     def __init__(self, cond, label) -> None:
         super().__init__()
         self.cond = cond
         self.label = label
 
+
 class GotoIfEqNode(InstructionNode):
     def __init__(self, cond, label) -> None:
         super().__init__()
         self.cond = cond
         self.label = label
+
+
+class GotoIfEqStrNode(InstructionNode):
+    def __init__(self, str1, str2, label, dest) -> None:
+        super().__init__()
+        self.str1 = str1
+        self.str2 = str2
+        self.label = label
+        self.dest = dest
 
 
 class StaticCallNode(InstructionNode):

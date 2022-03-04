@@ -137,6 +137,10 @@ class MIPSGenerator:
     def visit(self, node: mips.BeqzNode):
         return f"\tbeqz {self.visit(node.left)}, {str(node.right)} \t#{node.comment}"
 
+    @visitor.when(mips.BeqNode)
+    def visit(self, node: mips.BeqNode):
+        return f"\tbeq {self.visit(node.left)}, {self.visit(node.middle)}, {str(node.right)} \t#{node.comment}"
+
     @visitor.when(mips.JumpNode)
     def visit(self, node: mips.JumpNode):
         return f"\tj {node.address} \t#{node.comment}"

@@ -155,6 +155,11 @@ class BeqzNode(BinaryOpNode):
         super().__init__(register, target, comment)
 
 
+class BeqNode(TernaryOpNode):
+    def __init__(self, register1, register2, target, comment=""):
+        super().__init__(register1, register2, target, comment)
+
+
 class JumpNode(InstructionNode):
     def __init__(self, address, comment=""):
         super().__init__(comment)
