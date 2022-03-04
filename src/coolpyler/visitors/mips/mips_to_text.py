@@ -125,9 +125,9 @@ class MIPSGenerator:
     def visit(self, node: mips.AddiNode):
         return f"\taddi {self.visit(node.left)},  {self.visit(node.middle)}, {str(node.right)} \t#{node.comment}"
 
-    @visitor.when(mips.BgtNode)
-    def visit(self, node: mips.BgtNode):
-        return f"\tbgt {self.visit(node.left)},  {self.visit(node.middle)}, {str(node.right)} \t#{node.comment}"
+    @visitor.when(mips.BgtzNode)
+    def visit(self, node: mips.BgtzNode):
+        return f"\tbgtz {self.visit(node.left)}, {str(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.BeqzNode)
     def visit(self, node: mips.BeqzNode):

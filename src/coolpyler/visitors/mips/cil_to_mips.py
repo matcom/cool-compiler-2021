@@ -538,22 +538,17 @@ class CilToMIPS:
 
         cond_dir = self.search_mem(node.cond)
         reg1 = self.memory_manager.get_unused_register()
-        reg2 = self.memory_manager.get_unused_register()
 
         instructions.append(
-            mips.LoadInmediateNode(reg1, 0, f"Move 0 to register for comparisson")
-        )
-        instructions.append(
             mips.LoadWordNode(
-                reg2,
+                reg1,
                 mips.MemoryAddressRegisterNode(FP_REG, cond_dir),
                 f"Mov comparisson value to register",
             )
         )
         instructions.append(
-            mips.BgtNode(
+            mips.BgtzNode(
                 reg1,
-                reg2,
                 node.label,
                 f"Compare values in registers and jump to {node.label} if the second is greater than 0",
             )

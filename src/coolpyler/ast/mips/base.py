@@ -140,9 +140,9 @@ class AddiNode(TernaryOpNode):
         super().__init__(register_dest, register_left, value, comment)
 
 
-class BgtNode(TernaryOpNode):
-    def __init__(self, register_left, register_right, target, comment=""):
-        super().__init__(register_left, register_right, target, comment)
+class BgtzNode(BinaryOpNode):
+    def __init__(self, register_left, target, comment=""):
+        super().__init__(register_left, target, comment)
 
 
 class BeqzNode(BinaryOpNode):
