@@ -307,14 +307,23 @@ class CCILGenerator:
         (case_expr_ops, case_expr_fv) = self.visit(node.case_expr)
 
         # Handling case expression is not void
-        void_expr_error_ops = (
-            self.throw_runtime_error(
+        void_expr_error_ops: List[OperationNode] = []
+        if node.case_expr.type.name not in {STRING, INT, BOOL}:
+            case_expr_is_void = self.create_equality(
+                f"case_{times}_is_void", IdNode(case_expr_fv.id), IntNode("0")
+            )
+            is_not_void = LabelNode(f"case_{times}_expr_not_void")
+            case_expr_if_void = IfFalseNode(IdNode(case_expr_is_void.id), is_not_void)
+            runtime_error_ops = self.throw_runtime_error(
                 f"case_{times}_void_expr_error",
                 f"RuntimeError: Case expression in {node.line}, {node.col} is void",
             )
-            if node.case_expr.type.name not in {STRING, INT, BOOL}
-            else []
-        )
+            void_expr_error_ops = [
+                case_expr_is_void,
+                case_expr_if_void,
+                *runtime_error_ops,
+                is_not_void,
+            ]
 
         # Storing the type of the resulting case expression
         expr_type = self.create_type_name(
