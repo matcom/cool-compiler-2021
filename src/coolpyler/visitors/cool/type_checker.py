@@ -457,7 +457,7 @@ class TypeCheckerVisitor:
         exp = self.visit(node.expr, scope)
         return type_checked.CoolParenthNode(node.lineno, node.columnno, exp, exp.type)
 
-    def visit_arithmetic_operands(self, node, scope, type):
+    def visit_same_type_operands(self, node, scope, type):
         left = self.visit(node.left_expr, scope)
         right = self.visit(node.right_expr, scope)
         if not left.type.conforms_to(type) or not right.type.conforms_to(type):
@@ -471,7 +471,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolPlusNode)
     def visit(self, node, scope):
         int_type = self.get_type("Int")
-        left, right = self.visit_arithmetic_operands(node, scope, int_type)
+        left, right = self.visit_same_type_operands(node, scope, int_type)
         return type_checked.CoolPlusNode(
             node.lineno, node.columnno, left, right, int_type
         )
@@ -479,7 +479,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolMinusNode)
     def visit(self, node, scope):
         int_type = self.get_type("Int")
-        left, right = self.visit_arithmetic_operands(node, scope, int_type)
+        left, right = self.visit_same_type_operands(node, scope, int_type)
         return type_checked.CoolMinusNode(
             node.lineno, node.columnno, left, right, int_type
         )
@@ -487,7 +487,7 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolDivNode)
     def visit(self, node, scope):
         int_type = self.get_type("Int")
-        left, right = self.visit_arithmetic_operands(node, scope, int_type)
+        left, right = self.visit_same_type_operands(node, scope, int_type)
         return type_checked.CoolDivNode(
             node.lineno, node.columnno, left, right, int_type
         )
@@ -495,12 +495,21 @@ class TypeCheckerVisitor:
     @visitor.when(type_built.CoolMultNode)
     def visit(self, node, scope):
         int_type = self.get_type("Int")
-        left, right = self.visit_arithmetic_operands(node, scope, int_type)
+        left, right = self.visit_same_type_operands(node, scope, int_type)
         return type_checked.CoolMultNode(
             node.lineno, node.columnno, left, right, int_type
         )
 
-    def visit_comparison_operands(self, node, scope):
+    @visitor.when(type_built.CoolLeqNode)
+    def visit(self, node, scope):
+        int_type = self.get_type("Int")
+        left, right = self.visit_same_type_operands(node, scope, int_type)
+        return type_checked.CoolLeqNode(
+            node.lineno, node.columnno, left, right, self.get_type("Bool")
+        )
+
+    @visitor.when(type_built.CoolEqNode)
+    def visit(self, node, scope):
         left = self.visit(node.left_expr, scope)
         right = self.visit(node.right_expr, scope)
 
@@ -524,25 +533,14 @@ class TypeCheckerVisitor:
                     )
                 )
 
-        return left, right
-
-    @visitor.when(type_built.CoolLeqNode)
-    def visit(self, node, scope):
-        left, right = self.visit_comparison_operands(node, scope)
-        return type_checked.CoolLeqNode(
-            node.lineno, node.columnno, left, right, self.get_type("Bool")
-        )
-
-    @visitor.when(type_built.CoolEqNode)
-    def visit(self, node, scope):
-        left, right = self.visit_comparison_operands(node, scope)
         return type_checked.CoolEqNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )
 
     @visitor.when(type_built.CoolLeNode)
     def visit(self, node, scope):
-        left, right = self.visit_comparison_operands(node, scope)
+        int_type = self.get_type("Int")
+        left, right = self.visit_same_type_operands(node, scope, int_type)
         return type_checked.CoolLeNode(
             node.lineno, node.columnno, left, right, self.get_type("Bool")
         )

@@ -274,7 +274,7 @@ class CilToMIPS:
         instructions.append(mips.MultNode(reg1, reg2, f"Mult"))
 
         dest_dir = self.search_mem(node.dest)
-        instructions.append(mips.MoveFromHi(reg1))  # TODO: Lo_REG ???
+        instructions.append(mips.MoveFromLo(reg1))  # TODO: Lo_REG ???
 
         instructions.append(
             mips.StoreWordNode(

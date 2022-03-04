@@ -779,12 +779,32 @@ class CoolToCilVisitor(object):
         right_value = self.register_local()
         self.instructions.append(cil.GetAttrNode(right, 0, right_value))
 
+        # debug print {{{
+        eol = self.register_new("String", self.register_data("eol", '"\\n"'))
+        self.instructions.append(cil.PrintNode(left, False))
+        self.instructions.append(cil.PrintNode(eol, True))
+        self.instructions.append(cil.PrintNode(right, False))
+        self.instructions.append(cil.PrintNode(eol, True))
+        # }}}
+
         cond_local = self.register_local()
         self.instructions.append(cil.MinusNode(cond_local, left_value, right_value))
+        # debug print {{{
+        self.instructions.append(cil.PrintNode(self.register_new("Int", cond_local), False))
+        self.instructions.append(cil.PrintNode(eol, True))
+        # }}}
         self.instructions.append(cil.StarNode(cond_local, cond_local, cond_local))
+        # debug print {{{
+        self.instructions.append(cil.PrintNode(self.register_new("Int", cond_local), False))
+        self.instructions.append(cil.PrintNode(eol, True))
+        # }}}
         self.instructions.append(
             cil.MinusNode(cond_local, self.register_num(1), cond_local)
         )
+        # debug print {{{
+        self.instructions.append(cil.PrintNode(self.register_new("Int", cond_local), False))
+        self.instructions.append(cil.PrintNode(eol, True))
+        # }}}
 
         return self.register_new("Bool", cond_local)
 
