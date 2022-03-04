@@ -875,7 +875,6 @@ class CilToMIPS:
 
         instructions.append(mips.LabelInstructionNode(loop1))
 
-        instructions.append(mips.BeqzNode(reg1, exit1))
         instructions.append(
             mips.LoadByteNode(reg1_, mips.MemoryAddressRegisterNode(reg1, 0))
         )
