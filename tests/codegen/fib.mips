@@ -23,14 +23,9 @@ IO_Name: .asciiz "IO"
 IO: .word IO_Name, 1, IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
 Main_parents: .word 1, 6, 7, 0, 
 Main_Name: .asciiz "Main"
-Main: .word Main_Name, 1, Main_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Main_main, 
-Complex_parents: .word 1, 6, 8, 0, 
-Complex_Name: .asciiz "Complex"
-Complex: .word Complex_Name, 3, Complex_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Complex_init, Complex_print, Complex_reflect_0, Complex_reflect_X, Complex_reflect_Y, 
-string_0: .asciiz "=(\n"
-string_1: .asciiz "=)\n"
-string_2: .asciiz "+"
-string_3: .asciiz "I"
+Main: .word Main_Name, 1, Main_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Main_main, Main_fib, 
+string_0: .asciiz "Enter n to find nth fibonacci number!\n"
+string_1: .asciiz "\n"
 
 .text
 .globl main
@@ -75,175 +70,97 @@ addi $sp, $sp, 8     #
 jr $ra                               #
 
 Main_main:     #
-#Parametro self en stackpoiner + 52
-addi $sp, $sp, -4     #Push local var c stackpointer 48
-addi $sp, $sp, -4     #Push local var new_Complex@0 stackpointer 44
-addi $sp, $sp, -4     #Push local var instance_dynamic_to_init@0 stackpointer 40
-addi $sp, $sp, -4     #Push local var param_0_to_init@0 stackpointer 36
-addi $sp, $sp, -4     #Push local var param_1_to_init@0 stackpointer 32
-addi $sp, $sp, -4     #Push local var ref_eq@_a@0 stackpointer 28
-addi $sp, $sp, -4     #Push local var ref_eq@_b@0 stackpointer 24
-addi $sp, $sp, -4     #Push local var instance_dynamic_to_reflect_X@0 stackpointer 20
-addi $sp, $sp, -4     #Push local var instance_dynamic_to_reflect_Y@0 stackpointer 16
-addi $sp, $sp, -4     #Push local var instance_dynamic_to_reflect_0@0 stackpointer 12
-addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 8
+#Parametro self en stackpoiner + 20
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var param_0_to_fib@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_out_int@0 stackpointer 8
 addi $sp, $sp, -4     #Push local var param_0_to_out_string@1 stackpointer 4
 addi $sp, $sp, -4     #Push local var $ra stackpointer 0
 sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main
-#Eval Expression to Let c
-#Evalua la Expresion para el DinamicDispatch init
-#Creando instancia de tipo Complex
-#Allocate a una class Complex
-#atributo type_name en puntero + 0
-#atributo x en puntero + 4
-#atributo y en puntero + 8
-li $a0, 12      #
-li $v0, 9      #
-syscall
-sw $v0, 44($sp)      #Guardando en la variable local new_Complex@0 puntero de la instancia de la clase Complex
-#Assignacion de la insformacion de tipo a la instancia
-la $t0, Complex      #
-move $s4, $t0      #
-lw $t0, 44($sp)      #Instancia de la clase 
-move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
-sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
-lw $t0, 44($sp)      #Lee el valor de la var new_Complex@0
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con new_Complex@0
-jal new_ctr_Complex                               #
-sw $v0, 40($sp)      #Asigna el resultado de la funcion
-#Fin de la exprecion previa al DinamicDispatch init
-#Evalua el parametro 0 para el CastingDispatch init
-li $s4, 1      #
-lw $s6, 52($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__new__                               #
-sw $v0, 36($sp)      #
-#Fin del paramentro 0 al CastingDispatch init
-#Evalua el parametro 1 para el CastingDispatch init
-li $s4, 1      #
-lw $s6, 52($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__new__                               #
-sw $v0, 32($sp)      #
-#Fin del paramentro 1 al CastingDispatch init
-lw $t0, 40($sp)      #Lee el valor de la var instance_dynamic_to_init@0
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_init@0
-lw $t0, 40($sp)      #Lee el valor de la var param_0_to_init@0
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con param_0_to_init@0
-lw $t0, 40($sp)      #Lee el valor de la var param_1_to_init@0
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con param_1_to_init@0
-lw $t0, 52($sp)      #
-lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Complex
-lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion init
-jal $t3                               #
-sw $v0, 48($sp)      #Asigna el resultado de la funcion
-#Fin de la asignacion Let c
-#Evalua la condicion de un If
-#Evaluando el operado izquierdo de una operacion ref_eq
-#Evalua la Expresion para el DinamicDispatch reflect_Y
-#Evalua la Expresion para el DinamicDispatch reflect_X
-#Get Local Var c
-#Fin de la exprecion previa al DinamicDispatch reflect_X
-lw $t0, 48($sp)      #Lee el valor de la var c
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con c
-lw $t0, 52($sp)      #
-lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Complex
-lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion reflect_X
-jal $t3                               #
-sw $v0, 16($sp)      #Asigna el resultado de la funcion
-#Fin de la exprecion previa al DinamicDispatch reflect_Y
-lw $t0, 16($sp)      #Lee el valor de la var instance_dynamic_to_reflect_Y@0
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_reflect_Y@0
-lw $t0, 20($sp)      #
-lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Complex
-lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion reflect_Y
-jal $t3                               #
-sw $v0, 28($sp)      #Asigna el resultado de la funcion
-#Resolucion del operado izquierdo de una operacion ref_eq
-#Evaluando el operado derecho de una operacion ref_eq
-#Evalua la Expresion para el DinamicDispatch reflect_0
-#Get Local Var c
-#Fin de la exprecion previa al DinamicDispatch reflect_0
-lw $t0, 48($sp)      #Lee el valor de la var c
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con c
-lw $t0, 52($sp)      #
-lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Complex
-lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion reflect_0
-jal $t3                               #
-sw $v0, 24($sp)      #Asigna el resultado de la funcion
-#Resolucion del operado derecha de una operacion ref_eq
-lw $t0, 28($sp)      #
-lw $t1, 24($sp)      #
-seq $a0, $t1, $t0     #
-lw $s6, 52($sp)      #Guarda self
-jal __int__new__                               #
-move $s4, $v0      #
-move $a0, $v0      #
-lw $s6, 52($sp)      #Guarda self
-jal __bool__new__                               #
-move $s4, $v0      #
-#Fin de la evaluacion de la condicion de un IF
-#Check Condition And Try Jump
-move $t0, $s4      #Guarda el parametro 0 -> _
-lw $t1, 4($t0)      #Lee la propiedad **value** del bool
-li $t0, 1      #Carga un 1 para comparar
-beq $t0, $t1, then_Main_main_0     #
-#Else case
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
 #StaticDispatch out_string
 #Evalua el parametro 0 para el CastingDispatch out_string
 la $t0, string_0      #
 move $s4, $t0      #
-lw $s6, 52($sp)      #Guarda self
+lw $s6, 20($sp)      #Guarda self
 move $a0, $s4      #Guarda el parametro 0 -> _
 jal __str__new__                               #
-sw $v0, 8($sp)      #
+sw $v0, 16($sp)      #
 #Fin del paramentro 0 al CastingDispatch out_string
-lw $t0, 52($sp)      #Lee el valor de la var self
+lw $t0, 20($sp)      #Lee el valor de la var self
 addi $sp, $sp, -4     #
 sw $t0, 0($sp)      #Push a la pila con self
-lw $t0, 12($sp)      #Lee el valor de la var param_0_to_out_string@0
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_out_string@0
 addi $sp, $sp, -4     #
 sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
-lw $t0, 60($sp)      #
+lw $t0, 28($sp)      #
 lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Main
 lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
 jal $t3                               #
 move $s4, $v0      #Asigna el resultado de la funcion
-j fin_Main_main_0                               #
-then_Main_main_0:
-#Then case
+#Inicio del paso 1 de una sequencia Block
+#StaticDispatch out_int
+#Evalua el parametro 0 para el CastingDispatch out_int
+#StaticDispatch fib
+#Evalua el parametro 0 para el CastingDispatch fib
+#StaticDispatch in_int
+lw $t0, 20($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Main
+lw $t3, 24($t1)      #Buscando el metodo dinamico para la funcion in_int
+jal $t3                               #
+sw $v0, 12($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch fib
+lw $t0, 20($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 16($sp)      #Lee el valor de la var param_0_to_fib@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_fib@0
+lw $t0, 28($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Main
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion fib
+jal $t3                               #
+sw $v0, 8($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch out_int
+lw $t0, 20($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_out_int@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_int@0
+lw $t0, 28($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Main
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion out_int
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 2 de una sequencia Block
 #StaticDispatch out_string
 #Evalua el parametro 0 para el CastingDispatch out_string
 la $t0, string_1      #
 move $s4, $t0      #
-lw $s6, 52($sp)      #Guarda self
+lw $s6, 20($sp)      #Guarda self
 move $a0, $s4      #Guarda el parametro 0 -> _
 jal __str__new__                               #
 sw $v0, 4($sp)      #
 #Fin del paramentro 0 al CastingDispatch out_string
-lw $t0, 52($sp)      #Lee el valor de la var self
+lw $t0, 20($sp)      #Lee el valor de la var self
 addi $sp, $sp, -4     #
 sw $t0, 0($sp)      #Push a la pila con self
 lw $t0, 8($sp)      #Lee el valor de la var param_0_to_out_string@1
 addi $sp, $sp, -4     #
 sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@1
-lw $t0, 60($sp)      #
+lw $t0, 28($sp)      #
 lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Main
 lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
 jal $t3                               #
 move $s4, $v0      #Asigna el resultado de la funcion
-fin_Main_main_0:
-#Fin de un If
 move $v0, $s4      #Return _
 lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
-addi $sp, $sp, 56     #
+addi $sp, $sp, 24     #
 jr $ra                               #
 
 new_ctr_IO:     #
@@ -259,259 +176,6 @@ lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
 addi $sp, $sp, 8     #
 jr $ra                               #
 
-new_ctr_Complex:     #
-#Parametro self en stackpoiner + 4
-addi $sp, $sp, -4     #Push local var $ra stackpointer 0
-sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Complex
-lw $t0, 4($sp)      #Lee el valor de la var self
-addi $sp, $sp, -4     #
-sw $t0, 0($sp)      #Push a la pila con self
-jal new_ctr_IO                               #
-li $s4, 0      #
-lw $s6, 4($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__new__                               #
-move $s4, $v0      #
-lw $t0, 4($sp)      #Instancia de la clase Complex
-move $t1, $s4      #Guarda el valor que se le asignara a la propieded x
-sw $t1, 4($t0)      #Setea la propiedad x con el valor de _
-li $s4, 0      #
-lw $s6, 4($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__new__                               #
-move $s4, $v0      #
-lw $t0, 4($sp)      #Instancia de la clase Complex
-move $t1, $s4      #Guarda el valor que se le asignara a la propieded y
-sw $t1, 8($t0)      #Setea la propiedad y con el valor de _
-lw $v0, 4($sp)      #Return self
-lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
-addi $sp, $sp, 8     #
-jr $ra                               #
-
-Complex_init:     #
-#Parametro self en stackpoiner + 28
-#Parametro a@0 en stackpoiner + 24
-#Parametro b@0 en stackpoiner + 20
-addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 16
-addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 12
-addi $sp, $sp, -4     #Push local var int_eq@_a@1 stackpointer 8
-addi $sp, $sp, -4     #Push local var int_eq@_b@1 stackpointer 4
-addi $sp, $sp, -4     #Push local var $ra stackpointer 0
-sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Complex_init
-#Inicio de una secuencia Block
-#Inicio del paso 0 de una sequencia Block
-#Evaluando el operado izquierdo de una operacion int_eq
-#Get Self Property x
-lw $t0, 28($sp)      #Instancia de la clase Complex
-lw $t1, 4($t0)      #Lee la propiedad x
-sw $t1, 16($sp)      #Guarda el valor de la propiedad x en la variable local int_eq@_a@0
-#Resolucion del operado izquierdo de una operacion int_eq
-#Evaluando el operado derecho de una operacion int_eq
-#Get Local Var a
-lw $t0, 24($sp)      #
-sw $t0, 12($sp)      #
-#Resolucion del operado derecha de una operacion int_eq
-lw $s6, 28($sp)      #Guarda self
-lw $a0, 16($sp)      #Guarda el parametro 0 -> int_eq@_a@0
-lw $a1, 12($sp)      #Guarda el parametro 1 -> int_eq@_b@0
-jal __int__eq__                               #
-move $s4, $v0      #
-move $a0, $v0      #
-lw $s6, 28($sp)      #Guarda self
-jal __bool__new__                               #
-move $s4, $v0      #
-#Inicio del paso 1 de una sequencia Block
-#Evaluando el operado izquierdo de una operacion int_eq
-#Get Self Property y
-lw $t0, 28($sp)      #Instancia de la clase Complex
-lw $t1, 8($t0)      #Lee la propiedad y
-sw $t1, 8($sp)      #Guarda el valor de la propiedad y en la variable local int_eq@_a@1
-#Resolucion del operado izquierdo de una operacion int_eq
-#Evaluando el operado derecho de una operacion int_eq
-#Get Local Var b
-lw $t0, 20($sp)      #
-sw $t0, 4($sp)      #
-#Resolucion del operado derecha de una operacion int_eq
-lw $s6, 28($sp)      #Guarda self
-lw $a0, 8($sp)      #Guarda el parametro 0 -> int_eq@_a@1
-lw $a1, 4($sp)      #Guarda el parametro 1 -> int_eq@_b@1
-jal __int__eq__                               #
-move $s4, $v0      #
-move $a0, $v0      #
-lw $s6, 28($sp)      #Guarda self
-jal __bool__new__                               #
-move $s4, $v0      #
-#Inicio del paso 2 de una sequencia Block
-#Get Local Var self
-lw $t0, 28($sp)      #
-move $s4, $t0      #
-move $v0, $s4      #Return _
-lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
-addi $sp, $sp, 32     #
-jr $ra                               #
-
-Complex_reflect_X:     #
-#Parametro self en stackpoiner + 12
-addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 8
-addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 4
-addi $sp, $sp, -4     #Push local var $ra stackpointer 0
-sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Complex_reflect_X
-#Inicio de una secuencia Block
-#Inicio del paso 0 de una sequencia Block
-#Evaluando el operado izquierdo de una operacion int_eq
-#Get Self Property y
-lw $t0, 12($sp)      #Instancia de la clase Complex
-lw $t1, 8($t0)      #Lee la propiedad y
-sw $t1, 8($sp)      #Guarda el valor de la propiedad y en la variable local int_eq@_a@0
-#Resolucion del operado izquierdo de una operacion int_eq
-#Evaluando el operado derecho de una operacion int_eq
-#Evaluando la expression de una operacion unaria
-#Get Self Property y
-lw $t0, 12($sp)      #Instancia de la clase Complex
-lw $t1, 8($t0)      #Lee la propiedad y
-move $s4, $t1      #Guarda el valor de la propiedad y en la variable local _
-#FIN expression de una operacion unaria
-lw $s6, 12($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__complement__                               #
-sw $v0, 4($sp)      #
-#Resolucion del operado derecha de una operacion int_eq
-lw $s6, 12($sp)      #Guarda self
-lw $a0, 8($sp)      #Guarda el parametro 0 -> int_eq@_a@0
-lw $a1, 4($sp)      #Guarda el parametro 1 -> int_eq@_b@0
-jal __int__eq__                               #
-move $s4, $v0      #
-move $a0, $v0      #
-lw $s6, 12($sp)      #Guarda self
-jal __bool__new__                               #
-move $s4, $v0      #
-#Inicio del paso 1 de una sequencia Block
-#Get Local Var self
-lw $t0, 12($sp)      #
-move $s4, $t0      #
-move $v0, $s4      #Return _
-lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
-addi $sp, $sp, 16     #
-jr $ra                               #
-
-Complex_reflect_Y:     #
-#Parametro self en stackpoiner + 12
-addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 8
-addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 4
-addi $sp, $sp, -4     #Push local var $ra stackpointer 0
-sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Complex_reflect_Y
-#Inicio de una secuencia Block
-#Inicio del paso 0 de una sequencia Block
-#Evaluando el operado izquierdo de una operacion int_eq
-#Get Self Property x
-lw $t0, 12($sp)      #Instancia de la clase Complex
-lw $t1, 4($t0)      #Lee la propiedad x
-sw $t1, 8($sp)      #Guarda el valor de la propiedad x en la variable local int_eq@_a@0
-#Resolucion del operado izquierdo de una operacion int_eq
-#Evaluando el operado derecho de una operacion int_eq
-#Evaluando la expression de una operacion unaria
-#Get Self Property x
-lw $t0, 12($sp)      #Instancia de la clase Complex
-lw $t1, 4($t0)      #Lee la propiedad x
-move $s4, $t1      #Guarda el valor de la propiedad x en la variable local _
-#FIN expression de una operacion unaria
-lw $s6, 12($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__complement__                               #
-sw $v0, 4($sp)      #
-#Resolucion del operado derecha de una operacion int_eq
-lw $s6, 12($sp)      #Guarda self
-lw $a0, 8($sp)      #Guarda el parametro 0 -> int_eq@_a@0
-lw $a1, 4($sp)      #Guarda el parametro 1 -> int_eq@_b@0
-jal __int__eq__                               #
-move $s4, $v0      #
-move $a0, $v0      #
-lw $s6, 12($sp)      #Guarda self
-jal __bool__new__                               #
-move $s4, $v0      #
-#Inicio del paso 1 de una sequencia Block
-#Get Local Var self
-lw $t0, 12($sp)      #
-move $s4, $t0      #
-move $v0, $s4      #Return _
-lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
-addi $sp, $sp, 16     #
-jr $ra                               #
-
-Complex_reflect_0:     #
-#Parametro self en stackpoiner + 20
-addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 16
-addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 12
-addi $sp, $sp, -4     #Push local var int_eq@_a@1 stackpointer 8
-addi $sp, $sp, -4     #Push local var int_eq@_b@1 stackpointer 4
-addi $sp, $sp, -4     #Push local var $ra stackpointer 0
-sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Complex_reflect_0
-#Inicio de una secuencia Block
-#Inicio del paso 0 de una sequencia Block
-#Evaluando el operado izquierdo de una operacion int_eq
-#Get Self Property x
-lw $t0, 20($sp)      #Instancia de la clase Complex
-lw $t1, 4($t0)      #Lee la propiedad x
-sw $t1, 16($sp)      #Guarda el valor de la propiedad x en la variable local int_eq@_a@0
-#Resolucion del operado izquierdo de una operacion int_eq
-#Evaluando el operado derecho de una operacion int_eq
-#Evaluando la expression de una operacion unaria
-#Get Self Property x
-lw $t0, 20($sp)      #Instancia de la clase Complex
-lw $t1, 4($t0)      #Lee la propiedad x
-move $s4, $t1      #Guarda el valor de la propiedad x en la variable local _
-#FIN expression de una operacion unaria
-lw $s6, 20($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__complement__                               #
-sw $v0, 12($sp)      #
-#Resolucion del operado derecha de una operacion int_eq
-lw $s6, 20($sp)      #Guarda self
-lw $a0, 16($sp)      #Guarda el parametro 0 -> int_eq@_a@0
-lw $a1, 12($sp)      #Guarda el parametro 1 -> int_eq@_b@0
-jal __int__eq__                               #
-move $s4, $v0      #
-move $a0, $v0      #
-lw $s6, 20($sp)      #Guarda self
-jal __bool__new__                               #
-move $s4, $v0      #
-#Inicio del paso 1 de una sequencia Block
-#Evaluando el operado izquierdo de una operacion int_eq
-#Get Self Property y
-lw $t0, 20($sp)      #Instancia de la clase Complex
-lw $t1, 8($t0)      #Lee la propiedad y
-sw $t1, 8($sp)      #Guarda el valor de la propiedad y en la variable local int_eq@_a@1
-#Resolucion del operado izquierdo de una operacion int_eq
-#Evaluando el operado derecho de una operacion int_eq
-#Evaluando la expression de una operacion unaria
-#Get Self Property y
-lw $t0, 20($sp)      #Instancia de la clase Complex
-lw $t1, 8($t0)      #Lee la propiedad y
-move $s4, $t1      #Guarda el valor de la propiedad y en la variable local _
-#FIN expression de una operacion unaria
-lw $s6, 20($sp)      #Guarda self
-move $a0, $s4      #Guarda el parametro 0 -> _
-jal __int__complement__                               #
-sw $v0, 4($sp)      #
-#Resolucion del operado derecha de una operacion int_eq
-lw $s6, 20($sp)      #Guarda self
-lw $a0, 8($sp)      #Guarda el parametro 0 -> int_eq@_a@1
-lw $a1, 4($sp)      #Guarda el parametro 1 -> int_eq@_b@1
-jal __int__eq__                               #
-move $s4, $v0      #
-move $a0, $v0      #
-lw $s6, 20($sp)      #Guarda self
-jal __bool__new__                               #
-move $s4, $v0      #
-#Inicio del paso 2 de una sequencia Block
-#Get Local Var self
-lw $t0, 20($sp)      #
-move $s4, $t0      #
-move $v0, $s4      #Return _
-lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
-addi $sp, $sp, 24     #
-jr $ra                               #
-
 IO_out_string:     #
 #Parametro self en stackpoiner + 4
 #Parametro string en stackpoiner + 0
@@ -520,6 +184,181 @@ sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la 
 lw $s6, 8($sp)      #Guarda self
 lw $a0, 4($sp)      #Guarda el parametro 0 -> string
 jal __str__print__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+IO_in_int:     #
+#Parametro self en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion IO_in_int
+lw $s6, 4($sp)      #Guarda self
+jal __int__input__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Main_fib:     #
+#Parametro self en stackpoiner + 44
+#Parametro i@0 en stackpoiner + 40
+addi $sp, $sp, -4     #Push local var a stackpointer 36
+addi $sp, $sp, -4     #Push local var b stackpointer 32
+addi $sp, $sp, -4     #Push local var c stackpointer 28
+addi $sp, $sp, -4     #Push local var sum@_a@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var sum@_b@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var rest@_a@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var rest@_b@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_fib
+#Eval Expression to Let a
+li $s4, 1      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 36($sp)      #
+#Fin de la asignacion Let a
+#Eval Expression to Let b
+li $s4, 0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 32($sp)      #
+#Fin de la asignacion Let b
+#Eval Expression to Let c
+li $s4, 0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 28($sp)      #
+#Fin de la asignacion Let c
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Inicio de un While
+j while_cond_0                               #
+while_back_0:
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable c
+#Evaluando el operado izquierdo de una operacion sum
+#Get Local Var a
+lw $t0, 36($sp)      #
+sw $t0, 24($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+#Get Local Var b
+lw $t0, 32($sp)      #
+sw $t0, 20($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 44($sp)      #Guarda self
+lw $a0, 24($sp)      #Guarda el parametro 0 -> sum@_a@0
+lw $a1, 20($sp)      #Guarda el parametro 1 -> sum@_b@0
+jal __int__sum__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 28($sp)      #
+lw $t0, 28($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable i
+#Evaluando el operado izquierdo de una operacion rest
+#Get Local Var i
+lw $t0, 40($sp)      #
+sw $t0, 16($sp)      #
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 12($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 44($sp)      #Guarda self
+lw $a0, 16($sp)      #Guarda el parametro 0 -> rest@_a@0
+lw $a1, 12($sp)      #Guarda el parametro 1 -> rest@_b@0
+jal __int__sub__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 40($sp)      #
+lw $t0, 40($sp)      #
+move $s4, $t0      #
+#Inicio del paso 2 de una sequencia Block
+#Asignando un nuevo valor a la variable b
+#Get Local Var a
+lw $t0, 36($sp)      #
+move $s4, $t0      #
+move $t0, $s4      #
+sw $t0, 32($sp)      #
+lw $t0, 32($sp)      #
+move $s4, $t0      #
+#Inicio del paso 3 de una sequencia Block
+#Asignando un nuevo valor a la variable a
+#Get Local Var c
+lw $t0, 28($sp)      #
+move $s4, $t0      #
+move $t0, $s4      #
+sw $t0, 36($sp)      #
+lw $t0, 36($sp)      #
+move $s4, $t0      #
+#Fin del cuerpo e inicio de la condicion de un While
+while_cond_0:
+#Evaluando la expression de una operacion unaria
+#Evaluando el operado izquierdo de una operacion int_eq
+#Get Local Var i
+lw $t0, 40($sp)      #
+sw $t0, 8($sp)      #
+#Resolucion del operado izquierdo de una operacion int_eq
+#Evaluando el operado derecho de una operacion int_eq
+li $s4, 0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 4($sp)      #
+#Resolucion del operado derecha de una operacion int_eq
+lw $s6, 44($sp)      #Guarda self
+lw $a0, 8($sp)      #Guarda el parametro 0 -> int_eq@_a@0
+lw $a1, 4($sp)      #Guarda el parametro 1 -> int_eq@_b@0
+jal __int__eq__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 44($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#FIN expression de una operacion unaria
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__neg__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 44($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, while_back_0     #
+#Fin de la condicion de un While
+lw $t0, 44($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var c
+lw $t0, 28($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 48     #
+jr $ra                               #
+
+IO_out_int:     #
+#Parametro self en stackpoiner + 4
+#Parametro number en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion IO_out_int
+lw $s6, 8($sp)      #Guarda self
+lw $a0, 4($sp)      #Guarda el parametro 0 -> number
+jal __int__print__                               #
 lw $ra, 0($sp)      #
 addi $sp, $sp, 12     #
 jr $ra                               #
@@ -541,13 +380,7 @@ new_ctr_String:     #Esta funcion no se invoca en la ejecucion del programa
 
 new_ctr_SELF_TYPE:     #Esta funcion no se invoca en la ejecucion del programa
 
-Complex_print:     #Esta funcion no se invoca en la ejecucion del programa
-
-IO_in_int:     #Esta funcion no se invoca en la ejecucion del programa
-
 IO_in_string:     #Esta funcion no se invoca en la ejecucion del programa
-
-IO_out_int:     #Esta funcion no se invoca en la ejecucion del programa
 
 String_length:     #Esta funcion no se invoca en la ejecucion del programa
 

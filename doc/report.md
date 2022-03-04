@@ -143,7 +143,43 @@ redefinir, en el caso particular del compilador de cool se redefinio de la maner
     ...
 ```
 
-Aprovechando la caracteristica de que la gramatica se encuentra recogida en una clase, se desarrollaro algunas herramientas
+Aprovechando la caracteristica de que la gramatica se encuentra recogida en una clase, se desarrollaron algunas herramientas
 para realizar la inversion de la dependencia entre la gramatica y el ast, mediante el patrón **Factory**. Desde el módulo
 parser se definió un enum con los nombres de los nodos que la clase parser le pasará a la fatoria de nodos, además de un
 decorador que enlace un método con el nombre del nodo que el mismo creará
+
+
+
+
+#generacion de codigo Mips
+Para el inicio de la creación de código Mips partimos de la base de una librería escrita en este lenguaje la cual contendría gran parte de las herramientas con las que no apoyaríamos y así nos evitábamos la doble escritura del código . La librería es una herramienta simple , en ella se encuentra a modo de macro la implementación de todas las funcione de IO , como IO_out_string,IO_in_Int ,entre otras, las cuales tratábamos como funciones nativas o especiales, dado que en la conversión de CIL no teníamos contemplado el desglose de la implementación de estos métodos , solo detectamos que hay un llamado a estos e inmediatamente tenemos preconcebido el código asociado. Además  de las de tipo , entrada y salida de información , tenemos otras macros, las correspondientes al tipo string ,como substring , concat, lenght , las cuales se muestran en la documentación como funciones integradas a este tipo. Otras macro  en esta librería van asociadas al tipo object y a sus métodos como Copy , Abort y Type Name.
+Se utilizó  una creación de tipo Int , Bool , String , la cuales contienen en su primera palabra la caracterización del tipo y en la segunda la propiedad value del tipo , por lo que en cada utilización de alguna operación que involucre alguno de estos tipos, son tratados de esta manera y siempre que se tenga una salida de algún dato de este tipo , se reserva memoria y se crea una nueva instancia que sera el valor de retorno.
+Las operaciones entre los tipos enteros , no las podiamos realizar de manera natural debido a la representación que describimos anteriormente , por lo que también tenemos predefinidas los métodos básicos de operaciones aritméticas tomando como entrada los registros de propósito general $a0 y $a1 , dentro de esta se enmascara un poco el paso intermedio que se realiza antes de llegar a la manera natural de resolver las operaciones y creando un tipo nuevo de entero como resultado. De manera similar ocurre con las comparaciones que devuelven un valor de verdad. La relevancia de esta manera de tener los datos nos ayudó bastante para tener un chuequeo del tipo utilizado y simplificar algunas especificidades del lenguaje COOL.
+
+A la hora de recorrer el código intermedio centramos nuestra conversión en crear una definición de cada clase , con sus funciones y atributos, ademas del nombre y luego las instancias de estas, las cuales se salvaban y mantenían validas en el programa a través de la pila. Posteriormente se desarrolla el código especifico de cada función utilizada y se utilizan los saltos para entrelazar mas de una.A continuacion mostramos un ejemplo de la representacion en codigo Mips de la clase Main:
+
+```python
+	Main_Name: .asciiz "Main"
+	Main: .word Main_Name, 4, Main_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, 		IO_out_string, Parse_read_input, Parse_parse_line, Parse_c2i, Parse_a2i, Parse_a2i_aux, Main_main, 
+
+    .....
+
+```
+
+Otro punto importante en la generación de nuestro código Mips  fue la utilización de la pila y el mapeo que utilizamos a alto nivel para mantener un orden en esta. La creación de la clase “Stack” es la estructura encargada de que los parámetros recibidos y los puntos de retornos de los saltos fueran los correctos entre llamado, la cueal cuenta con lo siguiente:
+
+```python
+    ...
+    class Stack:
+    def __init__(self, node) -> None:
+        self.name = node.name
+        self.init_size = len(node.param) + len(node.local) + 1
+        self.list = []
+        self.local_push = 0 
+    .....
+
+```
+
+
+ La estructura contiene unos métodos los cuales se encargan de su llenado y vaciado siempre teniendo en cuenta que cada dato era insertado de 4 en 4 con respecto al registro $sp. Cada argumento de las funciones son pasados a la pila antes de su llamado siendo luego los métodos los encargados de utilizarlos y dejar la pila , luego de su culminación , sin estos elementos. EL cambio del valor del $ra fue un tema importante con el que nos topamos por lo que también seguimos la linea de ponerlo dentro de la pila y luego asignándoselo al nuevo $ra para que la función pudiera retornar al punto especifico donde fue llamado y no creara conflictos.
+

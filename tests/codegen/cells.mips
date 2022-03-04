@@ -1,20 +1,32 @@
 .data
+_______error______: .asciiz "Abort called from class "
+_______null_______: .asciiz "null"
+_______endline_______: .asciiz "\n"
+_______void_str_______: .asciiz ""
 Bool_parents: .word 1, 2, 0, 
-Bool: .word Bool_parents, Object_abort, Object_copy, Object_type_name, 
+Bool_Name: .asciiz "Bool"
+Bool: .word Bool_Name, 2, Bool_parents, Object_abort, Object_copy, Object_type_name, 
 Int_parents: .word 1, 3, 0, 
-Int: .word Int_parents, Object_abort, Object_copy, Object_type_name, 
+Int_Name: .asciiz "Int"
+Int: .word Int_Name, 2, Int_parents, Object_abort, Object_copy, Object_type_name, 
 String_parents: .word 1, 4, 0, 
-String: .word String_parents, Object_abort, Object_copy, Object_type_name, String_concat, String_length, String_substr, 
+String_Name: .asciiz "String"
+String: .word String_Name, 2, String_parents, Object_abort, Object_copy, Object_type_name, String_concat, String_length, String_substr, 
 SELF_TYPE_parents: .word 1, 5, 0, 
-SELF_TYPE: .word SELF_TYPE_parents, Object_abort, Object_copy, Object_type_name, 
+SELF_TYPE_Name: .asciiz "SELF_TYPE"
+SELF_TYPE: .word SELF_TYPE_Name, 1, SELF_TYPE_parents, Object_abort, Object_copy, Object_type_name, 
 Object_parents: .word 1, 0, 
-Object: .word Object_parents, Object_abort, Object_copy, Object_type_name, 
+Object_Name: .asciiz "Object"
+Object: .word Object_Name, 1, Object_parents, Object_abort, Object_copy, Object_type_name, 
 IO_parents: .word 1, 6, 0, 
-IO: .word IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
+IO_Name: .asciiz "IO"
+IO: .word IO_Name, 1, IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
 CellularAutomaton_parents: .word 1, 6, 7, 0, 
-CellularAutomaton: .word CellularAutomaton_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, CellularAutomaton_init, CellularAutomaton_print, CellularAutomaton_num_cells, CellularAutomaton_cell, CellularAutomaton_cell_left_neighbor, CellularAutomaton_cell_right_neighbor, CellularAutomaton_cell_at_next_evolution, CellularAutomaton_evolve, 
+CellularAutomaton_Name: .asciiz "CellularAutomaton"
+CellularAutomaton: .word CellularAutomaton_Name, 2, CellularAutomaton_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, CellularAutomaton_init, CellularAutomaton_print, CellularAutomaton_num_cells, CellularAutomaton_cell, CellularAutomaton_cell_left_neighbor, CellularAutomaton_cell_right_neighbor, CellularAutomaton_cell_at_next_evolution, CellularAutomaton_evolve, 
 Main_parents: .word 1, 8, 0, 
-Main: .word Main_parents, Object_abort, Object_copy, Object_type_name, Main_main, 
+Main_Name: .asciiz "Main"
+Main: .word Main_Name, 2, Main_parents, Object_abort, Object_copy, Object_type_name, Main_main, 
 string_0: .asciiz "\n"
 string_1: .asciiz "X"
 string_2: .asciiz "X"
@@ -25,678 +37,1717 @@ string_6: .asciiz "         X         "
 
 .text
 .globl main
-main:
-addi $sp, $sp, -4          #Push local var self stackpointer 20
-addi $sp, $sp, -4          #Push local var instance stackpointer 16
-addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
-#Allocate a una class Main puntero en sp + 12
+main:     #
+addi $sp, $sp, -4     #Push local var self stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion main
+#Allocate a una class Main
 #atributo type_name en puntero + 0
 #atributo cells en puntero + 4
-li $a0, 8
-li $v0, 9
+li $a0, 8      #
+li $v0, 9      #
 syscall
-sw $v0, 12($sp)          #Reservando memoria para una instancia de tipo Main
-lw $t0, 12($sp)          #Lee de la pila instance en 12 para assignar
-sw $t0, 16($sp)          #Escribe en la pila el valor que se le asigno a self
-la $t0, Main
-sw $t0, 8($sp)          #Cargando el nombre del tipo desde el data
-lw $t0, 12($sp)          #Buscando en la pila la variable instance y guarda la direccion a la que apunta
-lw $t1, 8($sp)          #Buscando el valor que se va a guardar en la propiedad
-sw $t1, 0($t0)          #Seteando el valor en la direccion de la memoria del objeto          #Assignando el nombre del tipo en el campo type
-lw $t0, 12($sp)          #Saca de la pila instance
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance
-jal Main_main          #Call a la function Main_main
-sw $s0, 4($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-li $v0, 10
+sw $v0, 4($sp)      #Guardando en la variable local self puntero de la instancia de la clase Main
+#Assignacion de la insformacion de tipo a Main
+la $t0, Main      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Main                               #
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal Main_main                               #
+li $v0, 10      #
 syscall
 
-Main_main:
-#Parametro self en stackpoiner + 88
-addi $sp, $sp, -4          #Push local var step@block@0 stackpointer 84
-addi $sp, $sp, -4          #Push local var instance_to_call_init@0 stackpointer 80
-addi $sp, $sp, -4          #Push local var param_0_to_init@0 stackpointer 76
-addi $sp, $sp, -4          #Push local var result@assing@cells@0 stackpointer 72
-addi $sp, $sp, -4          #Push local var step@block@1 stackpointer 68
-addi $sp, $sp, -4          #Push local var instance_to_call_print@0 stackpointer 64
-addi $sp, $sp, -4          #Push local var step@block@2 stackpointer 60
-addi $sp, $sp, -4          #Push local var countdown stackpointer 56
-addi $sp, $sp, -4          #Push local var result@while@0 stackpointer 52
-addi $sp, $sp, -4          #Push local var step@block@3 stackpointer 48
-addi $sp, $sp, -4          #Push local var instance_to_call_evolve@0 stackpointer 44
-addi $sp, $sp, -4          #Push local var step@block@4 stackpointer 40
-addi $sp, $sp, -4          #Push local var instance_to_call_print@1 stackpointer 36
-addi $sp, $sp, -4          #Push local var rest@_a@0 stackpointer 32
-addi $sp, $sp, -4          #Push local var rest@_b@0 stackpointer 28
-addi $sp, $sp, -4          #Push local var result@assing@countdown@0 stackpointer 24
-addi $sp, $sp, -4          #Push local var cond@while@0 stackpointer 20
-addi $sp, $sp, -4          #Push local var less@_a@0 stackpointer 16
-addi $sp, $sp, -4          #Push local var less@_b@0 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main          #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block
-jal new_ctr_CellularAutomaton          #Call a la function new_ctr_CellularAutomaton
-sw $s0, 76($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la exprecion previa al Dispatch init
-la $t0, string_6
-sw $t0, 72($sp)          #Fin del paramentro 0 al Dispatch init
-lw $t0, 76($sp)          #Saca de la pila instance_to_call_init@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_init@0
-lw $t0, 76($sp)          #Saca de la pila param_0_to_init@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_init@0
-lw $t0, 84($sp)          #Sacando la instancia de la pila (en 76) de una clase que hereda de CellularAutomaton
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de CellularAutomaton
-lw $t3, 32($t1)          #Buscando el metodo dinamico para la funcion init
-jal $t3          #Call a la function $t3
-sw $s0, 68($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la expresion lista para ser asignada
-lw $t0, 84($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
-lw $t1, 68($sp)          #Buscando el valor que se va a guardar en la propiedad
-sw $t1, 4($t0)          #Seteando el valor en la direccion de la memoria del objeto
-lw $t0, 84($sp)          #Buscando la instancia de la clase Main en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad cells
-sw $t1, 80($sp)          #Salvando el valor de la propiedad cells en la pila en el valor local step@block@0          #Inicio del paso 1 de una sequencia Block
-lw $t0, 84($sp)          #Buscando la instancia de la clase Main en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad cells
-sw $t1, 60($sp)          #Salvando el valor de la propiedad cells en la pila en el valor local instance_to_call_print@0          #Fin de la exprecion previa al Dispatch print
-lw $t0, 60($sp)          #Saca de la pila instance_to_call_print@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_print@0
-lw $t0, 64($sp)          #Sacando la instancia de la pila (en 60) de una clase que hereda de CellularAutomaton
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de CellularAutomaton
-lw $t3, 36($t1)          #Buscando el metodo dinamico para la funcion print
-jal $t3          #Call a la function $t3
-sw $s0, 64($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Inicio del paso 2 de una sequencia Block
-li $t0, 20          #Guarda el numbero que se va a asignar
-sw $t0, 52($sp)          #Escribe en la pila el numero que se le asigno a countdown          #Fin de la asignacion Let countdown          #Inicio de un While
-j while_cond_1          #Salta para f{label} 
-while_back_1 :           #Crea el label while_back_1           #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block
-lw $t0, 84($sp)          #Buscando la instancia de la clase Main en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad cells
-sw $t1, 40($sp)          #Salvando el valor de la propiedad cells en la pila en el valor local instance_to_call_evolve@0          #Fin de la exprecion previa al Dispatch evolve
-lw $t0, 40($sp)          #Saca de la pila instance_to_call_evolve@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_evolve@0
-lw $t0, 44($sp)          #Sacando la instancia de la pila (en 40) de una clase que hereda de CellularAutomaton
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de CellularAutomaton
-lw $t3, 60($t1)          #Buscando el metodo dinamico para la funcion evolve
-jal $t3          #Call a la function $t3
-sw $s0, 44($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Inicio del paso 1 de una sequencia Block
-lw $t0, 84($sp)          #Buscando la instancia de la clase Main en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad cells
-sw $t1, 32($sp)          #Salvando el valor de la propiedad cells en la pila en el valor local instance_to_call_print@1          #Fin de la exprecion previa al Dispatch print
-lw $t0, 32($sp)          #Saca de la pila instance_to_call_print@1
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_print@1
-lw $t0, 36($sp)          #Sacando la instancia de la pila (en 32) de una clase que hereda de CellularAutomaton
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de CellularAutomaton
-lw $t3, 36($t1)          #Buscando el metodo dinamico para la funcion print
-jal $t3          #Call a la function $t3
-sw $s0, 36($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Inicio del paso 2 de una sequencia Block
-lw $t0, 52($sp)          #Lee de la pila countdown en 52 para assignar
-sw $t0, 28($sp)          #Escribe en la pila el valor que se le asigno a rest@_a@0          #Resolucion del operado izquierdo de una opercion rest
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 24($sp)          #Escribe en la pila el numero que se le asigno a rest@_b@0          #Resolucion del operado derecha de una opercion rest
-lw $t0, 28($sp)          #poner en registro $t0 lo que hay en 28
-lw $t1, 24($sp)          #poner en registro $t1 lo que hay en f'{stack_plus_opr_2}
-sub $t0, $t0, $t1          #poner en registro $t0 la suma 
-sw $t0, 20($sp)          #poner en 20 el resultado de la suma           #Fin de la expresion lista para ser asignada
-lw $t0, 20($sp)          #Lee de la pila result@assing@countdown@0 en 20 para assignar
-sw $t0, 52($sp)          #Escribe en la pila el valor que se le asigno a countdown
-lw $t0, 52($sp)          #Lee de la pila countdown en 52 para assignar
-sw $t0, 48($sp)          #Escribe en la pila el valor que se le asigno a result@while@0
-while_cond_1 :           #Crea el label while_cond_1           #Fin del cuerpo e inicio de la condicion de un While
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 12($sp)          #Escribe en la pila el numero que se le asigno a less@_a@0          #Resolucion del operado izquierdo de una opercion less
-lw $t0, 52($sp)          #Lee de la pila countdown en 52 para assignar
-sw $t0, 8($sp)          #Escribe en la pila el valor que se le asigno a less@_b@0          #Resolucion del operado derecha de una opercion less
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 16($sp)          #Cargar el valor de la pos  16 a $t1 pa comparar
-beq $t0 $t1 while_back_1          #if $t1==$t0 then jump while_back_1          #Fin de la condicion de un While
-lw $t0, 84($sp)          #Lee de la pila self en 84 para assignar
-sw $t0, 56($sp)          #Escribe en la pila el valor que se le asigno a step@block@2          #Inicio del paso 3 de una sequencia Block
-lw $t0, 84($sp)          #Lee de la pila self en 84 para assignar
-sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 88          #Limpia la pila
-jr $ra          #Final de la function main
+new_ctr_Main:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Object                               #
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase Main
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded cells
+sw $t1, 4($t0)      #Setea la propiedad cells con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
 
-new_ctr_CellularAutomaton:
-addi $sp, $sp, -4          #Push local var self stackpointer 16
-addi $sp, $sp, -4          #Push local var instance stackpointer 12
-addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_CellularAutomaton
-#Allocate a una class CellularAutomaton puntero en sp + 8
+Main_main:     #
+#Parametro self en stackpoiner + 48
+addi $sp, $sp, -4     #Push local var new_CellularAutomaton@0 stackpointer 44
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_init@0 stackpointer 40
+addi $sp, $sp, -4     #Push local var param_0_to_init@0 stackpointer 36
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var countdown stackpointer 28
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_evolve@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@1 stackpointer 20
+addi $sp, $sp, -4     #Push local var rest@_a@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var rest@_b@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var less@_a@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var less@_b@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable cells
+#Evalua la Expresion para el DinamicDispatch init
+#Creando instancia de tipo CellularAutomaton
+#Allocate a una class CellularAutomaton
 #atributo type_name en puntero + 0
 #atributo population_map en puntero + 4
+li $a0, 8      #
+li $v0, 9      #
+syscall
+sw $v0, 44($sp)      #Guardando en la variable local new_CellularAutomaton@0 puntero de la instancia de la clase CellularAutomaton
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, CellularAutomaton      #
+move $s4, $t0      #
+lw $t0, 44($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 44($sp)      #Lee el valor de la var new_CellularAutomaton@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_CellularAutomaton@0
+jal new_ctr_CellularAutomaton                               #
+sw $v0, 40($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch init
+#Evalua el parametro 0 para el CastingDispatch init
+la $t0, string_6      #
+move $s4, $t0      #
+lw $s6, 48($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 36($sp)      #
+#Fin del paramentro 0 al CastingDispatch init
+lw $t0, 40($sp)      #Lee el valor de la var instance_dynamic_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_init@0
+lw $t0, 40($sp)      #Lee el valor de la var param_0_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_init@0
+lw $t0, 48($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion init
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 48($sp)      #Instancia de la clase Main
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded cells
+sw $t1, 4($t0)      #Setea la propiedad cells con el valor de _
+lw $t0, 48($sp)      #Instancia de la clase Main
+lw $t1, 4($t0)      #Lee la propiedad cells
+move $s4, $t1      #Guarda el valor de la propiedad cells en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property cells
+lw $t0, 48($sp)      #Instancia de la clase Main
+lw $t1, 4($t0)      #Lee la propiedad cells
+sw $t1, 32($sp)      #Guarda el valor de la propiedad cells en la variable local instance_dynamic_to_print@0
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 32($sp)      #Lee el valor de la var instance_dynamic_to_print@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@0
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 2 de una sequencia Block
+#Eval Expression to Let countdown
+li $s4, 20      #
+lw $s6, 48($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 28($sp)      #
+#Fin de la asignacion Let countdown
+#Inicio de un While
+j while_cond_1                               #
+while_back_1:
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch evolve
+#Get Self Property cells
+lw $t0, 48($sp)      #Instancia de la clase Main
+lw $t1, 4($t0)      #Lee la propiedad cells
+sw $t1, 24($sp)      #Guarda el valor de la propiedad cells en la variable local instance_dynamic_to_evolve@0
+#Fin de la exprecion previa al DinamicDispatch evolve
+lw $t0, 24($sp)      #Lee el valor de la var instance_dynamic_to_evolve@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_evolve@0
+lw $t0, 28($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 68($t1)      #Buscando el metodo dinamico para la funcion evolve
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property cells
+lw $t0, 48($sp)      #Instancia de la clase Main
+lw $t1, 4($t0)      #Lee la propiedad cells
+sw $t1, 20($sp)      #Guarda el valor de la propiedad cells en la variable local instance_dynamic_to_print@1
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 20($sp)      #Lee el valor de la var instance_dynamic_to_print@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@1
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 2 de una sequencia Block
+#Asignando un nuevo valor a la variable countdown
+#Evaluando el operado izquierdo de una operacion rest
+#Get Local Var countdown
+lw $t0, 28($sp)      #
+sw $t0, 16($sp)      #
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 48($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 12($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 48($sp)      #Guarda self
+lw $a0, 16($sp)      #Guarda el parametro 0 -> rest@_a@0
+lw $a1, 12($sp)      #Guarda el parametro 1 -> rest@_b@0
+jal __int__sub__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 28($sp)      #
+lw $t0, 28($sp)      #
+move $s4, $t0      #
+#Fin del cuerpo e inicio de la condicion de un While
+while_cond_1:
+#Evaluando el operado izquierdo de una operacion less
+li $s4, 0      #
+lw $s6, 48($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 8($sp)      #
+#Resolucion del operado izquierdo de una operacion less
+#Evaluando el operado derecho de una operacion less
+#Get Local Var countdown
+lw $t0, 28($sp)      #
+sw $t0, 4($sp)      #
+#Resolucion del operado derecha de una operacion less
+lw $s6, 48($sp)      #Guarda self
+lw $a0, 8($sp)      #Guarda el parametro 0 -> less@_a@0
+lw $a1, 4($sp)      #Guarda el parametro 1 -> less@_b@0
+jal __int__le__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 48($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, while_back_1     #
+#Fin de la condicion de un While
+lw $t0, 48($sp)      #
+move $s4, $t0      #
+#Inicio del paso 3 de una sequencia Block
+#Get Local Var self
+lw $t0, 48($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 52     #
+jr $ra                               #
+
+new_ctr_Object:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Object
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_CellularAutomaton:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_CellularAutomaton
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+la $t0, _______void_str_______      #
+move $s4, $t0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+lw $t0, 4($sp)      #Instancia de la clase CellularAutomaton
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded population_map
+sw $t1, 4($t0)      #Setea la propiedad population_map con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+CellularAutomaton_init:     #
+#Parametro self en stackpoiner + 8
+#Parametro map@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_init
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable population_map
+#Get Local Var map
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+lw $t0, 8($sp)      #Instancia de la clase CellularAutomaton
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded population_map
+sw $t1, 4($t0)      #Setea la propiedad population_map con el valor de _
+lw $t0, 8($sp)      #Instancia de la clase CellularAutomaton
+lw $t1, 4($t0)      #Lee la propiedad population_map
+move $s4, $t1      #Guarda el valor de la propiedad population_map en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var self
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+CellularAutomaton_print:     #
+#Parametro self en stackpoiner + 16
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_concat@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_concat@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_print
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+#Evalua la Expresion para el DinamicDispatch concat
+#Get Self Property population_map
+lw $t0, 16($sp)      #Instancia de la clase CellularAutomaton
+lw $t1, 4($t0)      #Lee la propiedad population_map
+sw $t1, 12($sp)      #Guarda el valor de la propiedad population_map en la variable local instance_dynamic_to_concat@0
+#Fin de la exprecion previa al DinamicDispatch concat
+#Evalua el parametro 0 para el CastingDispatch concat
+la $t0, string_0      #
+move $s4, $t0      #
+lw $s6, 16($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch concat
+lw $t0, 12($sp)      #Lee el valor de la var instance_dynamic_to_concat@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_concat@0
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_concat@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_concat@0
+lw $t0, 20($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 24($t1)      #Buscando el metodo dinamico para la funcion concat
+jal $t3                               #
+sw $v0, 4($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 16($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var self
+lw $t0, 16($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 20     #
+jr $ra                               #
+
+CellularAutomaton_evolve:     #
+#Parametro self en stackpoiner + 44
+addi $sp, $sp, -4     #Push local var position stackpointer 40
+addi $sp, $sp, -4     #Push local var num stackpointer 36
+addi $sp, $sp, -4     #Push local var temp stackpointer 32
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_concat@0 stackpointer 28
+addi $sp, $sp, -4     #Push local var param_0_to_cell_at_next_evolution@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var param_0_to_concat@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var sum@_a@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var sum@_b@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var less@_a@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var less@_b@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_evolve
+li $s4, 0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 40($sp)      #
+#Eval Expression to Let num
+#StaticDispatch num_cells
+lw $t0, 44($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 48($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion num_cells
+jal $t3                               #
+sw $v0, 36($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let num
+la $t0, _______void_str_______      #
+move $s4, $t0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 32($sp)      #
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Inicio de un While
+j while_cond_0                               #
+while_back_0:
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable temp
+#Evalua la Expresion para el DinamicDispatch concat
+#Get Local Var temp
+lw $t0, 32($sp)      #
+sw $t0, 28($sp)      #
+#Fin de la exprecion previa al DinamicDispatch concat
+#Evalua el parametro 0 para el CastingDispatch concat
+#StaticDispatch cell_at_next_evolution
+#Evalua el parametro 0 para el CastingDispatch cell_at_next_evolution
+#Get Local Var position
+lw $t0, 40($sp)      #
+sw $t0, 24($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell_at_next_evolution
+lw $t0, 44($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 28($sp)      #Lee el valor de la var param_0_to_cell_at_next_evolution@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell_at_next_evolution@0
+lw $t0, 52($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 64($t1)      #Buscando el metodo dinamico para la funcion cell_at_next_evolution
+jal $t3                               #
+sw $v0, 20($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch concat
+lw $t0, 28($sp)      #Lee el valor de la var instance_dynamic_to_concat@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_concat@0
+lw $t0, 24($sp)      #Lee el valor de la var param_0_to_concat@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_concat@0
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 24($t1)      #Buscando el metodo dinamico para la funcion concat
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $t0, $s4      #
+sw $t0, 32($sp)      #
+lw $t0, 32($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable position
+#Evaluando el operado izquierdo de una operacion sum
+#Get Local Var position
+lw $t0, 40($sp)      #
+sw $t0, 16($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+li $s4, 1      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 12($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 44($sp)      #Guarda self
+lw $a0, 16($sp)      #Guarda el parametro 0 -> sum@_a@0
+lw $a1, 12($sp)      #Guarda el parametro 1 -> sum@_b@0
+jal __int__sum__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 40($sp)      #
+lw $t0, 40($sp)      #
+move $s4, $t0      #
+#Fin del cuerpo e inicio de la condicion de un While
+while_cond_0:
+#Evaluando el operado izquierdo de una operacion less
+#Get Local Var position
+lw $t0, 40($sp)      #
+sw $t0, 8($sp)      #
+#Resolucion del operado izquierdo de una operacion less
+#Evaluando el operado derecho de una operacion less
+#Get Local Var num
+lw $t0, 36($sp)      #
+sw $t0, 4($sp)      #
+#Resolucion del operado derecha de una operacion less
+lw $s6, 44($sp)      #Guarda self
+lw $a0, 8($sp)      #Guarda el parametro 0 -> less@_a@0
+lw $a1, 4($sp)      #Guarda el parametro 1 -> less@_b@0
+jal __int__le__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 44($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, while_back_0     #
+#Fin de la condicion de un While
+lw $t0, 44($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable population_map
+#Get Local Var temp
+lw $t0, 32($sp)      #
+move $s4, $t0      #
+lw $t0, 44($sp)      #Instancia de la clase CellularAutomaton
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded population_map
+sw $t1, 4($t0)      #Setea la propiedad population_map con el valor de _
+lw $t0, 44($sp)      #Instancia de la clase CellularAutomaton
+lw $t1, 4($t0)      #Lee la propiedad population_map
+move $s4, $t1      #Guarda el valor de la propiedad population_map en la variable local _
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 44($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 48     #
+jr $ra                               #
+
+new_ctr_IO:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_IO
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Object                               #
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+String_concat:     #
+#Parametro self en stackpoiner + 4
+#Parametro string en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion String_concat
+lw $s6, 8($sp)      #Guarda self
+lw $a0, 4($sp)      #Guarda el parametro 0 -> string
+jal __str__concat__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+IO_out_string:     #
+#Parametro self en stackpoiner + 4
+#Parametro string en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion IO_out_string
+lw $s6, 8($sp)      #Guarda self
+lw $a0, 4($sp)      #Guarda el parametro 0 -> string
+jal __str__print__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+CellularAutomaton_num_cells:     #
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_num_cells
+#Evalua la Expresion para el DinamicDispatch length
+#Get Self Property population_map
+lw $t0, 8($sp)      #Instancia de la clase CellularAutomaton
+lw $t1, 4($t0)      #Lee la propiedad population_map
+sw $t1, 4($sp)      #Guarda el valor de la propiedad population_map en la variable local instance_dynamic_to_length@0
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_length@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_length@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+CellularAutomaton_cell_at_next_evolution:     #
+#Parametro self en stackpoiner + 68
+#Parametro position@0 en stackpoiner + 64
+addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 60
+addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 56
+addi $sp, $sp, -4     #Push local var sum@_a@0 stackpointer 52
+addi $sp, $sp, -4     #Push local var sum@_b@0 stackpointer 48
+addi $sp, $sp, -4     #Push local var sum@_a@1 stackpointer 44
+addi $sp, $sp, -4     #Push local var sum@_b@1 stackpointer 40
+addi $sp, $sp, -4     #Push local var str_eq@_a@0 stackpointer 36
+addi $sp, $sp, -4     #Push local var str_eq@_b@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var param_0_to_cell@0 stackpointer 28
+addi $sp, $sp, -4     #Push local var str_eq@_a@1 stackpointer 24
+addi $sp, $sp, -4     #Push local var str_eq@_b@1 stackpointer 20
+addi $sp, $sp, -4     #Push local var param_0_to_cell_left_neighbor@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var str_eq@_a@2 stackpointer 12
+addi $sp, $sp, -4     #Push local var str_eq@_b@2 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_cell_right_neighbor@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell_at_next_evolution
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion int_eq
+#Evaluando el operado izquierdo de una operacion sum
+#Evaluando el operado izquierdo de una operacion sum
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#StaticDispatch cell
+#Evalua el parametro 0 para el CastingDispatch cell
+#Get Local Var position
+lw $t0, 64($sp)      #
+sw $t0, 28($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell
+lw $t0, 68($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 32($sp)      #Lee el valor de la var param_0_to_cell@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell@0
+lw $t0, 76($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cell
+jal $t3                               #
+sw $v0, 36($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_1      #
+move $s4, $t0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 32($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 68($sp)      #Guarda self
+lw $a0, 36($sp)      #Guarda el parametro 0 -> str_eq@_a@0
+lw $a1, 32($sp)      #Guarda el parametro 1 -> str_eq@_b@0
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 68($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_CellularAutomaton_cell_at_next_evolution_0     #
+#Else case
+li $s4, 0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+j fin_CellularAutomaton_cell_at_next_evolution_0                               #
+then_CellularAutomaton_cell_at_next_evolution_0:
+#Then case
+li $s4, 1      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_CellularAutomaton_cell_at_next_evolution_0:
+#Fin de un If
+move $t0, $s4      #
+sw $t0, 44($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#StaticDispatch cell_left_neighbor
+#Evalua el parametro 0 para el CastingDispatch cell_left_neighbor
+#Get Local Var position
+lw $t0, 64($sp)      #
+sw $t0, 16($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell_left_neighbor
+lw $t0, 68($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_cell_left_neighbor@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell_left_neighbor@0
+lw $t0, 76($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion cell_left_neighbor
+jal $t3                               #
+sw $v0, 24($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_2      #
+move $s4, $t0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 20($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 68($sp)      #Guarda self
+lw $a0, 24($sp)      #Guarda el parametro 0 -> str_eq@_a@1
+lw $a1, 20($sp)      #Guarda el parametro 1 -> str_eq@_b@1
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 68($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_CellularAutomaton_cell_at_next_evolution_1     #
+#Else case
+li $s4, 0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+j fin_CellularAutomaton_cell_at_next_evolution_1                               #
+then_CellularAutomaton_cell_at_next_evolution_1:
+#Then case
+li $s4, 1      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_CellularAutomaton_cell_at_next_evolution_1:
+#Fin de un If
+move $t0, $s4      #
+sw $t0, 40($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 68($sp)      #Guarda self
+lw $a0, 44($sp)      #Guarda el parametro 0 -> sum@_a@1
+lw $a1, 40($sp)      #Guarda el parametro 1 -> sum@_b@1
+jal __int__sum__                               #
+sw $v0, 52($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#StaticDispatch cell_right_neighbor
+#Evalua el parametro 0 para el CastingDispatch cell_right_neighbor
+#Get Local Var position
+lw $t0, 64($sp)      #
+sw $t0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell_right_neighbor
+lw $t0, 68($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_cell_right_neighbor@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell_right_neighbor@0
+lw $t0, 76($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 60($t1)      #Buscando el metodo dinamico para la funcion cell_right_neighbor
+jal $t3                               #
+sw $v0, 12($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_3      #
+move $s4, $t0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 8($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 68($sp)      #Guarda self
+lw $a0, 12($sp)      #Guarda el parametro 0 -> str_eq@_a@2
+lw $a1, 8($sp)      #Guarda el parametro 1 -> str_eq@_b@2
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 68($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_CellularAutomaton_cell_at_next_evolution_2     #
+#Else case
+li $s4, 0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+j fin_CellularAutomaton_cell_at_next_evolution_2                               #
+then_CellularAutomaton_cell_at_next_evolution_2:
+#Then case
+li $s4, 1      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_CellularAutomaton_cell_at_next_evolution_2:
+#Fin de un If
+move $t0, $s4      #
+sw $t0, 48($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 68($sp)      #Guarda self
+lw $a0, 52($sp)      #Guarda el parametro 0 -> sum@_a@0
+lw $a1, 48($sp)      #Guarda el parametro 1 -> sum@_b@0
+jal __int__sum__                               #
+sw $v0, 60($sp)      #
+#Resolucion del operado izquierdo de una operacion int_eq
+#Evaluando el operado derecho de una operacion int_eq
+li $s4, 1      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 56($sp)      #
+#Resolucion del operado derecha de una operacion int_eq
+lw $s6, 68($sp)      #Guarda self
+lw $a0, 60($sp)      #Guarda el parametro 0 -> int_eq@_a@0
+lw $a1, 56($sp)      #Guarda el parametro 1 -> int_eq@_b@0
+jal __int__eq__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 68($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_CellularAutomaton_cell_at_next_evolution_3     #
+#Else case
+la $t0, string_4      #
+move $s4, $t0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+j fin_CellularAutomaton_cell_at_next_evolution_3                               #
+then_CellularAutomaton_cell_at_next_evolution_3:
+#Then case
+la $t0, string_5      #
+move $s4, $t0      #
+lw $s6, 68($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+fin_CellularAutomaton_cell_at_next_evolution_3:
+#Fin de un If
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 72     #
+jr $ra                               #
+
+String_length:     #
+#Parametro self en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion String_length
+lw $s6, 4($sp)      #Guarda self
+jal __str__length__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+CellularAutomaton_cell:     #
+#Parametro self en stackpoiner + 20
+#Parametro position@0 en stackpoiner + 16
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_substr@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_1_to_substr@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Self Property population_map
+lw $t0, 20($sp)      #Instancia de la clase CellularAutomaton
+lw $t1, 4($t0)      #Lee la propiedad population_map
+sw $t1, 12($sp)      #Guarda el valor de la propiedad population_map en la variable local instance_dynamic_to_substr@0
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+#Get Local Var position
+lw $t0, 16($sp)      #
+sw $t0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+li $s4, 1      #
+lw $s6, 20($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 12($sp)      #Lee el valor de la var instance_dynamic_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@0
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@0
+lw $t0, 12($sp)      #Lee el valor de la var param_1_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@0
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 24     #
+jr $ra                               #
+
+CellularAutomaton_cell_left_neighbor:     #
+#Parametro self en stackpoiner + 40
+#Parametro position@0 en stackpoiner + 36
+addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 28
+addi $sp, $sp, -4     #Push local var rest@_a@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var rest@_b@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var param_0_to_cell@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var rest@_a@1 stackpointer 12
+addi $sp, $sp, -4     #Push local var rest@_b@1 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_cell@1 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell_left_neighbor
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion int_eq
+#Get Local Var position
+lw $t0, 36($sp)      #
+sw $t0, 32($sp)      #
+#Resolucion del operado izquierdo de una operacion int_eq
+#Evaluando el operado derecho de una operacion int_eq
+li $s4, 0      #
+lw $s6, 40($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 28($sp)      #
+#Resolucion del operado derecha de una operacion int_eq
+lw $s6, 40($sp)      #Guarda self
+lw $a0, 32($sp)      #Guarda el parametro 0 -> int_eq@_a@0
+lw $a1, 28($sp)      #Guarda el parametro 1 -> int_eq@_b@0
+jal __int__eq__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 40($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_CellularAutomaton_cell_left_neighbor_0     #
+#Else case
+#StaticDispatch cell
+#Evalua el parametro 0 para el CastingDispatch cell
+#Evaluando el operado izquierdo de una operacion rest
+#Get Local Var position
+lw $t0, 36($sp)      #
+sw $t0, 24($sp)      #
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 40($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 20($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 40($sp)      #Guarda self
+lw $a0, 24($sp)      #Guarda el parametro 0 -> rest@_a@0
+lw $a1, 20($sp)      #Guarda el parametro 1 -> rest@_b@0
+jal __int__sub__                               #
+sw $v0, 16($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell
+lw $t0, 40($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_cell@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell@0
+lw $t0, 48($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cell
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+j fin_CellularAutomaton_cell_left_neighbor_0                               #
+then_CellularAutomaton_cell_left_neighbor_0:
+#Then case
+#StaticDispatch cell
+#Evalua el parametro 0 para el CastingDispatch cell
+#Evaluando el operado izquierdo de una operacion rest
+#StaticDispatch num_cells
+lw $t0, 40($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 44($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion num_cells
+jal $t3                               #
+sw $v0, 12($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 40($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 8($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 40($sp)      #Guarda self
+lw $a0, 12($sp)      #Guarda el parametro 0 -> rest@_a@1
+lw $a1, 8($sp)      #Guarda el parametro 1 -> rest@_b@1
+jal __int__sub__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell
+lw $t0, 40($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_cell@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell@1
+lw $t0, 48($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cell
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+fin_CellularAutomaton_cell_left_neighbor_0:
+#Fin de un If
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 44     #
+jr $ra                               #
+
+CellularAutomaton_cell_right_neighbor:     #
+#Parametro self en stackpoiner + 40
+#Parametro position@0 en stackpoiner + 36
+addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 28
+addi $sp, $sp, -4     #Push local var rest@_a@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var rest@_b@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var sum@_a@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var sum@_b@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_cell@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_cell@1 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell_right_neighbor
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion int_eq
+#Get Local Var position
+lw $t0, 36($sp)      #
+sw $t0, 32($sp)      #
+#Resolucion del operado izquierdo de una operacion int_eq
+#Evaluando el operado derecho de una operacion int_eq
+#Evaluando el operado izquierdo de una operacion rest
+#StaticDispatch num_cells
+lw $t0, 40($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 44($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion num_cells
+jal $t3                               #
+sw $v0, 24($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 40($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 20($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 40($sp)      #Guarda self
+lw $a0, 24($sp)      #Guarda el parametro 0 -> rest@_a@0
+lw $a1, 20($sp)      #Guarda el parametro 1 -> rest@_b@0
+jal __int__sub__                               #
+sw $v0, 28($sp)      #
+#Resolucion del operado derecha de una operacion int_eq
+lw $s6, 40($sp)      #Guarda self
+lw $a0, 32($sp)      #Guarda el parametro 0 -> int_eq@_a@0
+lw $a1, 28($sp)      #Guarda el parametro 1 -> int_eq@_b@0
+jal __int__eq__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 40($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_CellularAutomaton_cell_right_neighbor_0     #
+#Else case
+#StaticDispatch cell
+#Evalua el parametro 0 para el CastingDispatch cell
+#Evaluando el operado izquierdo de una operacion sum
+#Get Local Var position
+lw $t0, 36($sp)      #
+sw $t0, 16($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+li $s4, 1      #
+lw $s6, 40($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 12($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 40($sp)      #Guarda self
+lw $a0, 16($sp)      #Guarda el parametro 0 -> sum@_a@0
+lw $a1, 12($sp)      #Guarda el parametro 1 -> sum@_b@0
+jal __int__sum__                               #
+sw $v0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell
+lw $t0, 40($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_cell@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell@0
+lw $t0, 48($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cell
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+j fin_CellularAutomaton_cell_right_neighbor_0                               #
+then_CellularAutomaton_cell_right_neighbor_0:
+#Then case
+#StaticDispatch cell
+#Evalua el parametro 0 para el CastingDispatch cell
+li $s4, 0      #
+lw $s6, 40($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch cell
+lw $t0, 40($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_cell@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cell@1
+lw $t0, 48($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de CellularAutomaton
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cell
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+fin_CellularAutomaton_cell_right_neighbor_0:
+#Fin de un If
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 44     #
+jr $ra                               #
+
+String_substr:     #
+#Parametro self en stackpoiner + 8
+#Parametro index en stackpoiner + 4
+#Parametro count en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion String_substr
+lw $s6, 12($sp)      #Guarda self
+lw $a0, 8($sp)      #Guarda el parametro 0 -> index
+lw $a1, 4($sp)      #Guarda el parametro 1 -> count
+jal __str__substr__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+new_ctr_Bool:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_Int:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_String:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_SELF_TYPE:     #Esta funcion no se invoca en la ejecucion del programa
+
+IO_in_int:     #Esta funcion no se invoca en la ejecucion del programa
+
+IO_in_string:     #Esta funcion no se invoca en la ejecucion del programa
+
+IO_out_int:     #Esta funcion no se invoca en la ejecucion del programa
+
+Object_copy:     #Esta funcion no se invoca en la ejecucion del programa
+
+Object_type_name:     #Esta funcion no se invoca en la ejecucion del programa
+
+Object_abort:     #Esta funcion no se invoca en la ejecucion del programa
+
+###########################################################################region
+#########################################################################################################
+___fin___:
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+#########################################################################################################
+
+__int__new__:
+# En $s6 self
+# En $a0 el valor del entero	
+# Return $v0 la instancia del nuevo int
+
+move $t2, $a0  #Salva el valor del entero  
+
+#Allocate a una class Int
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
 li $a0, 8
 li $v0, 9
+syscall  #en $v0 la instancia del nuevo Int
+
+la $t0, Int     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__int__print__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
+li $v0, 1
+move $a0, $t0  #Pinta el valor la propiedad **value** del int
 syscall
-sw $v0, 8($sp)          #Reservando memoria para una instancia de tipo CellularAutomaton
-lw $t0, 8($sp)          #Lee de la pila instance en 8 para assignar
-sw $t0, 12($sp)          #Escribe en la pila el valor que se le asigno a self
-la $t0, CellularAutomaton
-sw $t0, 4($sp)          #Cargando el nombre del tipo desde el data
-lw $t0, 8($sp)          #Buscando en la pila la variable instance y guarda la direccion a la que apunta
-lw $t1, 4($sp)          #Buscando el valor que se va a guardar en la propiedad
-sw $t1, 0($t0)          #Seteando el valor en la direccion de la memoria del objeto          #Assignando el nombre del tipo en el campo type
-lw $s0, 8($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 16          #Limpia la pila
-jr $ra
 
-CellularAutomaton_init:
-#Parametro self en stackpoiner + 24
-#Parametro map@0 en stackpoiner + 20
-addi $sp, $sp, -4          #Push local var step@block@0 stackpointer 16
-addi $sp, $sp, -4          #Push local var result@assing@population_map@0 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_init          #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block
-lw $t0, 16($sp)          #Lee de la pila map@0 en 16 para assignar
-sw $t0, 8($sp)          #Escribe en la pila el valor que se le asigno a result@assing@population_map@0          #Fin de la expresion lista para ser asignada
-lw $t0, 20($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
-lw $t1, 8($sp)          #Buscando el valor que se va a guardar en la propiedad
-sw $t1, 4($t0)          #Seteando el valor en la direccion de la memoria del objeto
-lw $t0, 20($sp)          #Buscando la instancia de la clase CellularAutomaton en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad population_map
-sw $t1, 12($sp)          #Salvando el valor de la propiedad population_map en la pila en el valor local step@block@0          #Inicio del paso 1 de una sequencia Block
-lw $t0, 20($sp)          #Lee de la pila self en 20 para assignar
-sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 24          #Limpia la pila
-jr $ra          #Final de la function init
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
 
-CellularAutomaton_print:
-#Parametro self en stackpoiner + 28
-addi $sp, $sp, -4          #Push local var step@block@0 stackpointer 24
-addi $sp, $sp, -4          #Push local var instance_to_call_concat@0 stackpointer 20
-addi $sp, $sp, -4          #Push local var param_0_to_concat@0 stackpointer 16
-addi $sp, $sp, -4          #Push local var param_0_to_out_string@0 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_print          #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block
-lw $t0, 24($sp)          #Buscando la instancia de la clase CellularAutomaton en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad population_map
-sw $t1, 16($sp)          #Salvando el valor de la propiedad population_map en la pila en el valor local instance_to_call_concat@0          #Fin de la exprecion previa al Dispatch concat
-la $t0, string_0
-sw $t0, 12($sp)          #Fin del paramentro 0 al Dispatch concat
-lw $t0, 16($sp)          #Saca de la pila instance_to_call_concat@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_concat@0
-lw $t0, 16($sp)          #Saca de la pila param_0_to_concat@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_concat@0
-lw $t0, 24($sp)          #Sacando la instancia de la pila (en 16) de una clase que hereda de String
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 16($t1)          #Buscando el metodo dinamico para la funcion concat
-jal $t3          #Call a la function $t3
-sw $s0, 8($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin del paramentro 0 al StaticDispatch out_string
-lw $t0, 24($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch out_string
-lw $t0, 12($sp)          #Saca de la pila param_0_to_out_string@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_out_string@0          #Agrega a la pila el paramentro 1 al StaticDispatch out_string
-jal IO_out_string          #Call a la function IO_out_string
-sw $s0, 20($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Inicio del paso 1 de una sequencia Block
-lw $t0, 24($sp)          #Lee de la pila self en 24 para assignar
-sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 28          #Limpia la pila
-jr $ra          #Final de la function print
+##########################################################################################################
+__int__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
 
-CellularAutomaton_evolve:
-#Parametro self en stackpoiner + 84
-addi $sp, $sp, -4          #Push local var position stackpointer 80
-addi $sp, $sp, -4          #Push local var num stackpointer 76
-addi $sp, $sp, -4          #Push local var temp stackpointer 72
-addi $sp, $sp, -4          #Push local var step@block@0 stackpointer 68
-addi $sp, $sp, -4          #Push local var result@while@0 stackpointer 64
-addi $sp, $sp, -4          #Push local var step@block@1 stackpointer 60
-addi $sp, $sp, -4          #Push local var instance_to_call_concat@0 stackpointer 56
-addi $sp, $sp, -4          #Push local var param_0_to_cell_at_next_evolution@0 stackpointer 52
-addi $sp, $sp, -4          #Push local var param_0_to_concat@0 stackpointer 48
-addi $sp, $sp, -4          #Push local var result@assing@temp@0 stackpointer 44
-addi $sp, $sp, -4          #Push local var sum@_a@0 stackpointer 40
-addi $sp, $sp, -4          #Push local var sum@_b@0 stackpointer 36
-addi $sp, $sp, -4          #Push local var result@assing@position@0 stackpointer 32
-addi $sp, $sp, -4          #Push local var cond@while@0 stackpointer 28
-addi $sp, $sp, -4          #Push local var less@_a@0 stackpointer 24
-addi $sp, $sp, -4          #Push local var less@_b@0 stackpointer 20
-addi $sp, $sp, -4          #Push local var step@block@2 stackpointer 16
-addi $sp, $sp, -4          #Push local var result@assing@population_map@0 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_evolve
-lw $t0, 80($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch num_cells
-jal CellularAutomaton_num_cells          #Call a la function CellularAutomaton_num_cells
-sw $s0, 72($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la asignacion Let num          #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block          #Inicio de un While
-j while_cond_0          #Salta para f{label} 
-while_back_0 :           #Crea el label while_back_0           #Inicio de una secuencia Block          #Inicio del paso 0 de una sequencia Block
-lw $t0, 68($sp)          #Lee de la pila temp en 68 para assignar
-sw $t0, 52($sp)          #Escribe en la pila el valor que se le asigno a instance_to_call_concat@0          #Fin de la exprecion previa al Dispatch concat
-lw $t0, 76($sp)          #Lee de la pila position en 76 para assignar
-sw $t0, 48($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_cell_at_next_evolution@0          #Fin del paramentro 0 al StaticDispatch cell_at_next_evolution
-lw $t0, 80($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell_at_next_evolution
-lw $t0, 52($sp)          #Saca de la pila param_0_to_cell_at_next_evolution@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell_at_next_evolution@0          #Agrega a la pila el paramentro 1 al StaticDispatch cell_at_next_evolution
-jal CellularAutomaton_cell_at_next_evolution          #Call a la function CellularAutomaton_cell_at_next_evolution
-sw $s0, 44($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin del paramentro 0 al Dispatch concat
-lw $t0, 52($sp)          #Saca de la pila instance_to_call_concat@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_concat@0
-lw $t0, 48($sp)          #Saca de la pila param_0_to_concat@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_concat@0
-lw $t0, 60($sp)          #Sacando la instancia de la pila (en 52) de una clase que hereda de String
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 16($t1)          #Buscando el metodo dinamico para la funcion concat
-jal $t3          #Call a la function $t3
-sw $s0, 40($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Fin de la expresion lista para ser asignada
-lw $t0, 40($sp)          #Lee de la pila result@assing@temp@0 en 40 para assignar
-sw $t0, 68($sp)          #Escribe en la pila el valor que se le asigno a temp
-lw $t0, 68($sp)          #Lee de la pila temp en 68 para assignar
-sw $t0, 56($sp)          #Escribe en la pila el valor que se le asigno a step@block@1          #Inicio del paso 1 de una sequencia Block
-lw $t0, 76($sp)          #Lee de la pila position en 76 para assignar
-sw $t0, 36($sp)          #Escribe en la pila el valor que se le asigno a sum@_a@0          #Resolucion del operado izquierdo de una opercion sum
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 32($sp)          #Escribe en la pila el numero que se le asigno a sum@_b@0          #Resolucion del operado derecha de una opercion sum
-lw $t0, 36($sp)          #poner en registro $t0 lo que hay en 36
-lw $t1, 32($sp)          #poner en registro $t1 lo que hay en 32
-add $t0, $t0, $t1          #en $t0 pon el resultado de la suma
-sw $t0, 28($sp)          #poner en la posicion 28 el resultado           #Fin de la expresion lista para ser asignada
-lw $t0, 28($sp)          #Lee de la pila result@assing@position@0 en 28 para assignar
-sw $t0, 76($sp)          #Escribe en la pila el valor que se le asigno a position
-lw $t0, 76($sp)          #Lee de la pila position en 76 para assignar
-sw $t0, 60($sp)          #Escribe en la pila el valor que se le asigno a result@while@0
-while_cond_0 :           #Crea el label while_cond_0           #Fin del cuerpo e inicio de la condicion de un While
-lw $t0, 76($sp)          #Lee de la pila position en 76 para assignar
-sw $t0, 20($sp)          #Escribe en la pila el valor que se le asigno a less@_a@0          #Resolucion del operado izquierdo de una opercion less
-lw $t0, 72($sp)          #Lee de la pila num en 72 para assignar
-sw $t0, 16($sp)          #Escribe en la pila el valor que se le asigno a less@_b@0          #Resolucion del operado derecha de una opercion less
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 24($sp)          #Cargar el valor de la pos  24 a $t1 pa comparar
-beq $t0 $t1 while_back_0          #if $t1==$t0 then jump while_back_0          #Fin de la condicion de un While
-lw $t0, 80($sp)          #Lee de la pila self en 80 para assignar
-sw $t0, 64($sp)          #Escribe en la pila el valor que se le asigno a step@block@0          #Inicio del paso 1 de una sequencia Block
-lw $t0, 68($sp)          #Lee de la pila temp en 68 para assignar
-sw $t0, 8($sp)          #Escribe en la pila el valor que se le asigno a result@assing@population_map@0          #Fin de la expresion lista para ser asignada
-lw $t0, 80($sp)          #Buscando en la pila la variable self y guarda la direccion a la que apunta
-lw $t1, 8($sp)          #Buscando el valor que se va a guardar en la propiedad
-sw $t1, 4($t0)          #Seteando el valor en la direccion de la memoria del objeto
-lw $t0, 80($sp)          #Buscando la instancia de la clase CellularAutomaton en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad population_map
-sw $t1, 12($sp)          #Salvando el valor de la propiedad population_map en la pila en el valor local step@block@2          #Inicio del paso 2 de una sequencia Block
-lw $t0, 80($sp)          #Lee de la pila self en 80 para assignar
-sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 84          #Limpia la pila
-jr $ra          #Final de la function evolve
+li $v0, 5   #Lee un entero por la consola 
+syscall     #Guarda el entero en $v0
+
+move $s5, $ra    #Salva $ra en $s5 para saltar a crear un Int con el valor leido
+move $a0, $v0
+jal __int__new__ #En $v0 la instancia del nuevo entero 
+
+move $ra, $s5   #Reasigna $ra para salir de **input** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sum__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a sumando A 	
+# En $a1 la direccion del **Int** a sumando B 	
+# Return $v0 new **Int** con **value** A+B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del sumando A
+lw $t1, 4($a1)      #Lee la propiedad **value** del sumando B
+add $a0, $t0, $t1  #$a0 =  A + B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **sum** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sub__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sub	$a0, $t0, $t1   #$a0 =  A - B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A-B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__mul__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A*B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+mul	$a0, $t0, $t1   #$a0 =  A * B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A*B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **mul** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__div__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A/B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+div	$a0, $t0, $t1   #$a0 =  A/B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A/B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **div** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__le__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+slt	$a0, $t0, $t1   #$a0 =  A < B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__leq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sle	$a0, $t0, $t1   #$a0 =  A <= B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<=B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less_or_equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__eq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+seq	$a0, $t0, $t1   #$a0 =  A == B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A==B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__complement__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** ~A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+li $t1, 4294967295  # guarda 2^31 + 1
+xor $a0, $t1, $t0   
+add $a0, $a0, 1     
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con ~A en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **complement** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__neg__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** !A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+addi $a0, $t0, -1   #$a0 =  A - 1 => if A == 0 then $a0 = -1 else $a0 = 0
+mul  $a0, $a0, -1   #$a0 = -$a0   => if $a0 == 0 then $a0 = 0 else 1
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__clone__:
+# En $s6 self
 
 
-IO_out_string:
+
+#region
+##########################################################################################
+__bool__new__:
+# En $s6 self
+# En $a0 instancia de Int para convertir 	
+# Return $v0 la instancia del nuevo Bool
+
+lw $t0, 4($a0) # Guardando el valor la propiedad de **value**
+
+li $t1, 1
+beq $t0, $t1, __bool__ok_value__  #Comparando el valor con 1
+li $t1, 0
+beq $t0, $t1, __bool__ok_value__  #Comparando el valor con 0
+
+# Si el valor no es ni cero ni uno cierra el programa 
+li		$v0, 4		# system call #4 - print string
+la		$a0, Bool_Name
+syscall				# execute
+li		$v0, 1		# system call #4 - print string
+move	$a0, $t0
+syscall				# execute
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+__bool__ok_value__:
+la $t0, Bool     #Carga la direccion de memoria de la definicion de tipo Bool
+sw $t0, ($a0)    #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+
+move $v0, $a0
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Bool
+
+##########################################################################################################
+__bool__if_go_to__:
+# En $s6 self
+# En $a0 instancia de Bool a evaluar 
+# En $a1 direccion a la que saltar  
+# Return $v0 la instancia del nuevo Bool
+
+lw $t0, 4($a0)  #Guarda el valor de la propiedad **value** del Bool
+li $t1, 1       #Guarda 1 en $t0 para comparar con la propiedad **value**
+
+beq	$t0, $t1, __go_to__	# if $t0 == $t1 then __go_to__
+jr $ra          #esta funcion solo termina si el bool es false 
+__go_to__:
+j $a1   # La condicion se cumple salta hacia el segundo parametro
+
+##########################################################################################################
+__bool__check__type__:
+# En $s6 **self**
+# En $a0 direccion de memoria de la lista de ancestro de un typo 
+# En $a1 identificador numerico de un tipo
+
+li $v0, 1       # Por default devuelve 1
+__check__type__loop__:
+    lw $t0, ($a0)       #Lee el id de un typo 
+    beq $t0, $zero, __check__type__false__
+    beq $t0, $a1, __check__type__end__
+    addi $a0, $a0, 4
+    j __check__type__loop__
+
+__check__type__false__: 
+    li $v0, 0
+__check__type__end__:
+    jr $ra
+
+#region
+#############################################################################################
+__str__new__:
+# En $s6 self
+# En $a0 el direccion de memoria que apunta a un string	
+# Return $v0 la instancia del nuevo string
+
+move $t2, $a0  #Salva la direccion de memoria  
+
+#Allocate a una class String
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo String
+
+la $t0, String     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__str__print__:
+# En $s6 **self**
+# En $a0 la direccion del **String** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
 li $v0, 4
-lw $a0, 0($sp)
+move $a0, $t0  #Pinta el valor la propiedad **value** del String
 syscall
-lw $a0, 4($sp)
-addi $sp, $sp, 8
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__str__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **String**
+
+addi $sp, $sp, -4
+sw $ra ($sp)   #Salva $ra en 12($sp)
+addi $sp, $sp, -4
+sw $s6, ($sp)    #Salva self en 8($sp)
+
+li $a0, 1000    # reserva memoria para el string
+li $v0, 9       
+syscall         # En $v0 direccion de memoria del nuevo string
+
+move $a0, $v0   # Asigan la direccion del nuevo string para llamar a la funcion de leer
+li $v0, 8       # Leer un string de la consola 
+li $a1 , 1000   
+syscall         # En $a0 el string leido en la consola 
+jal __str__new__ #En $v0 la instancia del nuevo entero 
+move $a0, $v0
+
+addi $sp, $sp, -4
+sw $v0, ($sp)    #Salva el nuevo string en 4($sp)
+
+move $s6, $v0   #cambia sefl por el nuevo string 
+jal __str__length__
+
+lw $t0, 4($v0)      #Lee la propiedad **value** del **Int** que devuelve length 
+
+beq $t0,$zero, jline
+addi $t0, $t0, -1   #Resta uno al length para eliminar el '\n'
+
+jline:
+sw $t0, 4($v0)      #Actualiza la propieded **value** del **Int** length
+
+addi $sp, $sp, -4
+sw $v0, ($sp)       #Salva el length en ($sp)
+
+li $a0, 0
+jal __int__new__    #Crea un nuevo entero con **value** 0
+
+lw $s6, 4($sp)      #Self = al string leido en la consola 
+move $a0, $v0       #index = 0 
+lw $a1, ($sp)       #count = length - 1 
+
+jal __str__substr__ #En $v0 el substring sin '\n'
+
+lw $s6, 8($sp)   #Reasigna Self para salir de **input** volver a la funcion anterior 
+lw $ra, 12($sp)  #Reasigna $ra para salir de **input** volver a la funcion anterior
+addi $sp, $sp, 16 #Limpia la pila 
+jr $ra          #Devuelve en $v0 el subsstring leido por la consola 
+
+##########################################################################################################
+__str__length__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
+
+li $t0 , 0       # len result
+lw $t2 , 4($s6)  # Leer la propiedad value a self
+
+loop_len:
+lb  $t3, ($t2)  # Guarda la primara letra
+beq $t3, $zero, end_len  
+add $t0, $t0, 1 # Suma al contador 
+add $t2, $t2, 1  # Mueve el punteron del string en 1 
+j loop_len
+
+end_len:
+move $a0, $t0
+move $s5, $ra
+jal __int__new__
+move $ra, $s5
 jr $ra
-CellularAutomaton_num_cells:
-#Parametro self en stackpoiner + 16
-addi $sp, $sp, -4          #Push local var instance_to_call_length@0 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_num_cells
-lw $t0, 12($sp)          #Buscando la instancia de la clase CellularAutomaton en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad population_map
-sw $t1, 8($sp)          #Salvando el valor de la propiedad population_map en la pila en el valor local instance_to_call_length@0          #Fin de la exprecion previa al Dispatch length
-lw $t0, 8($sp)          #Saca de la pila instance_to_call_length@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_length@0
-lw $t0, 12($sp)          #Sacando la instancia de la pila (en 8) de una clase que hereda de String
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 20($t1)          #Buscando el metodo dinamico para la funcion length
-jal $t3          #Call a la function $t3
-sw $s0, 4($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 16          #Limpia la pila
-jr $ra          #Final de la function num_cells
 
-CellularAutomaton_cell_at_next_evolution:
-#Parametro self en stackpoiner + 108
-#Parametro position@0 en stackpoiner + 104
-addi $sp, $sp, -4          #Push local var cond@if_else@0 stackpointer 100
-addi $sp, $sp, -4          #Push local var int_eq@_a@0 stackpointer 96
-addi $sp, $sp, -4          #Push local var int_eq@_b@0 stackpointer 92
-addi $sp, $sp, -4          #Push local var sum@_a@0 stackpointer 88
-addi $sp, $sp, -4          #Push local var sum@_b@0 stackpointer 84
-addi $sp, $sp, -4          #Push local var sum@_a@1 stackpointer 80
-addi $sp, $sp, -4          #Push local var sum@_b@1 stackpointer 76
-addi $sp, $sp, -4          #Push local var cond@if_else@1 stackpointer 72
-addi $sp, $sp, -4          #Push local var int_eq@_a@1 stackpointer 68
-addi $sp, $sp, -4          #Push local var int_eq@_b@1 stackpointer 64
-addi $sp, $sp, -4          #Push local var param_0_to_cell@0 stackpointer 60
-addi $sp, $sp, -4          #Push local var result@if@0 stackpointer 56
-addi $sp, $sp, -4          #Push local var cond@if_else@2 stackpointer 52
-addi $sp, $sp, -4          #Push local var int_eq@_a@2 stackpointer 48
-addi $sp, $sp, -4          #Push local var int_eq@_b@2 stackpointer 44
-addi $sp, $sp, -4          #Push local var param_0_to_cell_left_neighbor@0 stackpointer 40
-addi $sp, $sp, -4          #Push local var result@if@1 stackpointer 36
-addi $sp, $sp, -4          #Push local var cond@if_else@3 stackpointer 32
-addi $sp, $sp, -4          #Push local var int_eq@_a@3 stackpointer 28
-addi $sp, $sp, -4          #Push local var int_eq@_b@3 stackpointer 24
-addi $sp, $sp, -4          #Push local var param_0_to_cell_right_neighbor@0 stackpointer 20
-addi $sp, $sp, -4          #Push local var result@if@2 stackpointer 16
-addi $sp, $sp, -4          #Push local var result@if@3 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell_at_next_evolution
-lw $t0, 100($sp)          #Lee de la pila position@0 en 100 para assignar
-sw $t0, 56($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_cell@0          #Fin del paramentro 0 al StaticDispatch cell
-lw $t0, 104($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell
-lw $t0, 60($sp)          #Saca de la pila param_0_to_cell@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell@0          #Agrega a la pila el paramentro 1 al StaticDispatch cell
-jal CellularAutomaton_cell          #Call a la function CellularAutomaton_cell
-sw $s0, 64($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
-la $t0, string_1
-sw $t0, 60($sp)          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 64($sp)          #carga en $t1 lo que hay en 64 
-lw $t2, 60($sp)          #carga en $t2 lo que hay en 60 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 68($sp)          #Pon en la posicion 68 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 68($sp)          #Cargar el valor de la pos  68 a $t1 pa comparar
-beq $t0 $t1 then_CellularAutomaton_cell_at_next_evolution_0          #if $t1==$t0 then jump then_CellularAutomaton_cell_at_next_evolution_0          #Else case
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 52($sp)          #Escribe en la pila el numero que se le asigno a result@if@0
-j fin_CellularAutomaton_cell_at_next_evolution_0          #Salta para f{label} 
-then_CellularAutomaton_cell_at_next_evolution_0 :           #Crea el label then_CellularAutomaton_cell_at_next_evolution_0           #Then case
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 52($sp)          #Escribe en la pila el numero que se le asigno a result@if@0
-fin_CellularAutomaton_cell_at_next_evolution_0 :           #Crea el label fin_CellularAutomaton_cell_at_next_evolution_0           #Fin de un If
-lw $t0, 52($sp)          #Lee de la pila result@if@0 en 52 para assignar
-sw $t0, 76($sp)          #Escribe en la pila el valor que se le asigno a sum@_a@1          #Resolucion del operado izquierdo de una opercion sum
-lw $t0, 100($sp)          #Lee de la pila position@0 en 100 para assignar
-sw $t0, 36($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_cell_left_neighbor@0          #Fin del paramentro 0 al StaticDispatch cell_left_neighbor
-lw $t0, 104($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell_left_neighbor
-lw $t0, 40($sp)          #Saca de la pila param_0_to_cell_left_neighbor@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell_left_neighbor@0          #Agrega a la pila el paramentro 1 al StaticDispatch cell_left_neighbor
-jal CellularAutomaton_cell_left_neighbor          #Call a la function CellularAutomaton_cell_left_neighbor
-sw $s0, 44($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
-la $t0, string_2
-sw $t0, 40($sp)          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 44($sp)          #carga en $t1 lo que hay en 44 
-lw $t2, 40($sp)          #carga en $t2 lo que hay en 40 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 48($sp)          #Pon en la posicion 48 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 48($sp)          #Cargar el valor de la pos  48 a $t1 pa comparar
-beq $t0 $t1 then_CellularAutomaton_cell_at_next_evolution_1          #if $t1==$t0 then jump then_CellularAutomaton_cell_at_next_evolution_1          #Else case
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 32($sp)          #Escribe en la pila el numero que se le asigno a result@if@1
-j fin_CellularAutomaton_cell_at_next_evolution_1          #Salta para f{label} 
-then_CellularAutomaton_cell_at_next_evolution_1 :           #Crea el label then_CellularAutomaton_cell_at_next_evolution_1           #Then case
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 32($sp)          #Escribe en la pila el numero que se le asigno a result@if@1
-fin_CellularAutomaton_cell_at_next_evolution_1 :           #Crea el label fin_CellularAutomaton_cell_at_next_evolution_1           #Fin de un If
-lw $t0, 32($sp)          #Lee de la pila result@if@1 en 32 para assignar
-sw $t0, 72($sp)          #Escribe en la pila el valor que se le asigno a sum@_b@1          #Resolucion del operado derecha de una opercion sum
-lw $t0, 76($sp)          #poner en registro $t0 lo que hay en 76
-lw $t1, 72($sp)          #poner en registro $t1 lo que hay en 72
-add $t0, $t0, $t1          #en $t0 pon el resultado de la suma
-sw $t0, 84($sp)          #poner en la posicion 84 el resultado           #Resolucion del operado izquierdo de una opercion sum
-lw $t0, 100($sp)          #Lee de la pila position@0 en 100 para assignar
-sw $t0, 16($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_cell_right_neighbor@0          #Fin del paramentro 0 al StaticDispatch cell_right_neighbor
-lw $t0, 104($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell_right_neighbor
-lw $t0, 20($sp)          #Saca de la pila param_0_to_cell_right_neighbor@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell_right_neighbor@0          #Agrega a la pila el paramentro 1 al StaticDispatch cell_right_neighbor
-jal CellularAutomaton_cell_right_neighbor          #Call a la function CellularAutomaton_cell_right_neighbor
-sw $s0, 24($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion int_eq
-la $t0, string_3
-sw $t0, 20($sp)          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 24($sp)          #carga en $t1 lo que hay en 24 
-lw $t2, 20($sp)          #carga en $t2 lo que hay en 20 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 28($sp)          #Pon en la posicion 28 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 28($sp)          #Cargar el valor de la pos  28 a $t1 pa comparar
-beq $t0 $t1 then_CellularAutomaton_cell_at_next_evolution_2          #if $t1==$t0 then jump then_CellularAutomaton_cell_at_next_evolution_2          #Else case
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 12($sp)          #Escribe en la pila el numero que se le asigno a result@if@2
-j fin_CellularAutomaton_cell_at_next_evolution_2          #Salta para f{label} 
-then_CellularAutomaton_cell_at_next_evolution_2 :           #Crea el label then_CellularAutomaton_cell_at_next_evolution_2           #Then case
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 12($sp)          #Escribe en la pila el numero que se le asigno a result@if@2
-fin_CellularAutomaton_cell_at_next_evolution_2 :           #Crea el label fin_CellularAutomaton_cell_at_next_evolution_2           #Fin de un If
-lw $t0, 12($sp)          #Lee de la pila result@if@2 en 12 para assignar
-sw $t0, 80($sp)          #Escribe en la pila el valor que se le asigno a sum@_b@0          #Resolucion del operado derecha de una opercion sum
-lw $t0, 84($sp)          #poner en registro $t0 lo que hay en 84
-lw $t1, 80($sp)          #poner en registro $t1 lo que hay en 80
-add $t0, $t0, $t1          #en $t0 pon el resultado de la suma
-sw $t0, 92($sp)          #poner en la posicion 92 el resultado           #Resolucion del operado izquierdo de una opercion int_eq
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 88($sp)          #Escribe en la pila el numero que se le asigno a int_eq@_b@0          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 92($sp)          #carga en $t1 lo que hay en 92 
-lw $t2, 88($sp)          #carga en $t2 lo que hay en 88 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 96($sp)          #Pon en la posicion 96 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 96($sp)          #Cargar el valor de la pos  96 a $t1 pa comparar
-beq $t0 $t1 then_CellularAutomaton_cell_at_next_evolution_3          #if $t1==$t0 then jump then_CellularAutomaton_cell_at_next_evolution_3          #Else case
-la $t0, string_4
-sw $t0, 8($sp)
-j fin_CellularAutomaton_cell_at_next_evolution_3          #Salta para f{label} 
-then_CellularAutomaton_cell_at_next_evolution_3 :           #Crea el label then_CellularAutomaton_cell_at_next_evolution_3           #Then case
-la $t0, string_5
-sw $t0, 8($sp)
-fin_CellularAutomaton_cell_at_next_evolution_3 :           #Crea el label fin_CellularAutomaton_cell_at_next_evolution_3           #Fin de un If
-lw $t0, 8($sp)          #Lee de la pila result@if@3 en 8 para assignar
-sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 108          #Limpia la pila
-jr $ra          #Final de la function cell_at_next_evolution
+###########################################################################################################
+__str__substr__:
+# En $s6 **self**
+# En $a0 **Int** el indece en el que inicia el sub
+# En $a1 **Int** cantidad de caracteres que tiene el sub
 
-CellularAutomaton_cell:
-#Parametro self en stackpoiner + 28
-#Parametro position@0 en stackpoiner + 24
-addi $sp, $sp, -4          #Push local var instance_to_call_substr@0 stackpointer 20
-addi $sp, $sp, -4          #Push local var param_0_to_substr@0 stackpointer 16
-addi $sp, $sp, -4          #Push local var param_1_to_substr@0 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell
-lw $t0, 24($sp)          #Buscando la instancia de la clase CellularAutomaton en la pila
-lw $t1, 4($t0)          #Buscando el valor de la propiedad population_map
-sw $t1, 16($sp)          #Salvando el valor de la propiedad population_map en la pila en el valor local instance_to_call_substr@0          #Fin de la exprecion previa al Dispatch substr
-lw $t0, 20($sp)          #Lee de la pila position@0 en 20 para assignar
-sw $t0, 12($sp)          #Escribe en la pila el valor que se le asigno a param_0_to_substr@0          #Fin del paramentro 0 al Dispatch substr
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 8($sp)          #Escribe en la pila el numero que se le asigno a param_1_to_substr@0          #Fin del paramentro 1 al Dispatch substr
-lw $t0, 16($sp)          #Saca de la pila instance_to_call_substr@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila instance_to_call_substr@0
-lw $t0, 16($sp)          #Saca de la pila param_0_to_substr@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_substr@0
-lw $t0, 16($sp)          #Saca de la pila param_1_to_substr@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_1_to_substr@0
-lw $t0, 28($sp)          #Sacando la instancia de la pila (en 16) de una clase que hereda de String
-lw $t1, 0($t0)          #Leyendo el tipo de la instancia que hereda de String
-lw $t3, 24($t1)          #Buscando el metodo dinamico para la funcion substr
-jal $t3          #Call a la function $t3
-sw $s0, 4($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 28          #Limpia la pila
-jr $ra          #Final de la function cell
+lw $t0, 4($s6)  # Lee la propiedad value de **sefl**
+lw $t1, 4($a0)  # Lee la propiedad value del **Int** indice 
+lw $t2, 4($a1)  # Lee la propiedad value del **Int** length 
 
-CellularAutomaton_cell_left_neighbor:
-#Parametro self en stackpoiner + 56
-#Parametro position@0 en stackpoiner + 52
-addi $sp, $sp, -4          #Push local var cond@if_else@0 stackpointer 48
-addi $sp, $sp, -4          #Push local var int_eq@_a@0 stackpointer 44
-addi $sp, $sp, -4          #Push local var int_eq@_b@0 stackpointer 40
-addi $sp, $sp, -4          #Push local var result@if@0 stackpointer 36
-addi $sp, $sp, -4          #Push local var rest@_a@0 stackpointer 32
-addi $sp, $sp, -4          #Push local var rest@_b@0 stackpointer 28
-addi $sp, $sp, -4          #Push local var param_0_to_cell@0 stackpointer 24
-addi $sp, $sp, -4          #Push local var rest@_a@1 stackpointer 20
-addi $sp, $sp, -4          #Push local var rest@_b@1 stackpointer 16
-addi $sp, $sp, -4          #Push local var param_0_to_cell@1 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell_left_neighbor
-lw $t0, 48($sp)          #Lee de la pila position@0 en 48 para assignar
-sw $t0, 40($sp)          #Escribe en la pila el valor que se le asigno a int_eq@_a@0          #Resolucion del operado izquierdo de una opercion int_eq
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 36($sp)          #Escribe en la pila el numero que se le asigno a int_eq@_b@0          #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 40($sp)          #carga en $t1 lo que hay en 40 
-lw $t2, 36($sp)          #carga en $t2 lo que hay en 36 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 44($sp)          #Pon en la posicion 44 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 44($sp)          #Cargar el valor de la pos  44 a $t1 pa comparar
-beq $t0 $t1 then_CellularAutomaton_cell_left_neighbor_0          #if $t1==$t0 then jump then_CellularAutomaton_cell_left_neighbor_0          #Else case
-lw $t0, 48($sp)          #Lee de la pila position@0 en 48 para assignar
-sw $t0, 28($sp)          #Escribe en la pila el valor que se le asigno a rest@_a@0          #Resolucion del operado izquierdo de una opercion rest
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 24($sp)          #Escribe en la pila el numero que se le asigno a rest@_b@0          #Resolucion del operado derecha de una opercion rest
-lw $t0, 28($sp)          #poner en registro $t0 lo que hay en 28
-lw $t1, 24($sp)          #poner en registro $t1 lo que hay en f'{stack_plus_opr_2}
-sub $t0, $t0, $t1          #poner en registro $t0 la suma 
-sw $t0, 20($sp)          #poner en 20 el resultado de la suma           #Fin del paramentro 0 al StaticDispatch cell
-lw $t0, 52($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell
-lw $t0, 24($sp)          #Saca de la pila param_0_to_cell@0
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell@0          #Agrega a la pila el paramentro 1 al StaticDispatch cell
-jal CellularAutomaton_cell          #Call a la function CellularAutomaton_cell
-sw $s0, 32($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-j fin_CellularAutomaton_cell_left_neighbor_0          #Salta para f{label} 
-then_CellularAutomaton_cell_left_neighbor_0 :           #Crea el label then_CellularAutomaton_cell_left_neighbor_0           #Then case
-lw $t0, 52($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch num_cells
-jal CellularAutomaton_num_cells          #Call a la function CellularAutomaton_num_cells
-sw $s0, 16($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion rest
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 12($sp)          #Escribe en la pila el numero que se le asigno a rest@_b@1          #Resolucion del operado derecha de una opercion rest
-lw $t0, 16($sp)          #poner en registro $t0 lo que hay en 16
-lw $t1, 12($sp)          #poner en registro $t1 lo que hay en f'{stack_plus_opr_2}
-sub $t0, $t0, $t1          #poner en registro $t0 la suma 
-sw $t0, 8($sp)          #poner en 8 el resultado de la suma           #Fin del paramentro 0 al StaticDispatch cell
-lw $t0, 52($sp)          #Saca de la pila self
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell
-lw $t0, 12($sp)          #Saca de la pila param_0_to_cell@1
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell@1          #Agrega a la pila el paramentro 1 al StaticDispatch cell
-jal CellularAutomaton_cell          #Call a la function CellularAutomaton_cell
-sw $s0, 32($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-fin_CellularAutomaton_cell_left_neighbor_0 :           #Crea el label fin_CellularAutomaton_cell_left_neighbor_0           #Fin de un If
-lw $t0, 32($sp)          #Lee de la pila result@if@0 en 32 para assignar
-sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 56          #Limpia la pila
-jr $ra          #Final de la function cell_left_neighbor
+li $t3, 0        # Contador para iterar el string en busqueda de indice  
+li $t4, 1        # Contador para iterar el string hasta llegar al length
 
-CellularAutomaton_cell_right_neighbor:
-#Parametro self en stackpoiner + 56
-#Parametro position@0 en stackpoiner + 52
-addi $sp, $sp, -4          #Push local var cond@if_else@0 stackpointer 48
-addi $sp, $sp, -4          #Push local var int_eq@_a@0 stackpointer 44
-addi $sp, $sp, -4          #Push local var int_eq@_b@0 stackpointer 40
-addi $sp, $sp, -4          #Push local var rest@_a@0 stackpointer 36
-addi $sp, $sp, -4          #Push local var rest@_b@0 stackpointer 32
-addi $sp, $sp, -4          #Push local var result@if@0 stackpointer 28
-addi $sp, $sp, -4          #Push local var sum@_a@0 stackpointer 24
-addi $sp, $sp, -4          #Push local var sum@_b@0 stackpointer 20
-addi $sp, $sp, -4          #Push local var param_0_to_cell@0 stackpointer 16
-addi $sp, $sp, -4          #Push local var param_0_to_cell@1 stackpointer 12
-addi $sp, $sp, -4          #Push local var @result stackpointer 8
-addi $sp, $sp, -4          #Push local var $ra stackpointer 4
-sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion CellularAutomaton_cell_right_neighbor
-lw $t0, 48($sp)          #Lee de la pila position@0 en 48 para assignar
-sw $t0, 40($sp)          #Escribe en la pila el valor que se le asigno a int_eq@_a@0          #Resolucion del operado izquierdo de una opercion int_eq
-lw $t0, 52($sp)          #Saca de la pila self
+addi $t5, $t2, 1
+move $a0, $t5      # reserva memoria para el string
+li $v0,9
+syscall           # En $v0 la direccion de memoria del nuevo string
+move $t5, $v0    
+
+beq $t2, $zero, end_sub_string
+
+find_index:
+    beq	 $t3, $t1, find_length	# si el contador es el indice comiensa a crear el sub
+    add	 $t0, $t0, 1		    # mueve el puntero del string de self
+    add	 $t3, $t3, 1	        # mueve el contador 
+    j find_index
+
+find_length:
+    lb	 $t6, ($t0)			# Lee la primera letra del string self  
+    sb	 $t6, ($t5)         # guarda la primera letra del string self en el nuevo string
+    beq	 $t2, $t4, end_sub_string	# si el contador del tamaño es igual a j end
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    add	 $t0, $t0, 1		# Mueve el puntero del string self
+    add	 $t4, $t4, 1	    # Contador de tamaño += 1 
+    j find_length
+    
+end_sub_string:
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    sb	 $zero, ($t5)         # guarda la primera letra del string self en el nuevo string
+
+    addi $sp, $sp, -4
+    sw $ra, ($sp)   # Guarda en la pila $ra
+
+    move $a0, $v0       # Pasa como parametros la direccion de memoria del string
+    jal __str__new__    # En $v0 la instancia del nuevos string
+
+    lw $ra, ($sp)       # Reasigna $ra para volver al la funcion anterior 
+    addi $sp, $sp, 4    #  Limpia la pila 
+    jr $ra              # Return instancia del substring en $v0
+
+############################################################################################################
+__str__concat__:
+# En $s6 **self**
+# En #a0 instancia de otro string
+
 addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch num_cells
-jal CellularAutomaton_num_cells          #Call a la function CellularAutomaton_num_cells
-sw $s0, 32($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila          #Resolucion del operado izquierdo de una opercion rest
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 28($sp)          #Escribe en la pila el numero que se le asigno a rest@_b@0          #Resolucion del operado derecha de una opercion rest
-lw $t0, 32($sp)          #poner en registro $t0 lo que hay en 32
-lw $t1, 28($sp)          #poner en registro $t1 lo que hay en f'{stack_plus_opr_2}
-sub $t0, $t0, $t1          #poner en registro $t0 la suma 
-sw $t0, 36($sp)          #poner en 36 el resultado de la suma           #Resolucion del operado derecha de una opercion int_eq
-lw $t1, 40($sp)          #carga en $t1 lo que hay en 40 
-lw $t2, 36($sp)          #carga en $t2 lo que hay en 36 
-seq $t3, $t2, $t1          #$t3 = $t2 == $ t1
-sw $t3, 44($sp)          #Pon en la posicion 44 el valor de $t3          #Fin de la evaluacion de la condicion de un IF
-li $t0, 1          #Cargar 1 a $t0 pa comparar
-lw $t1, 44($sp)          #Cargar el valor de la pos  44 a $t1 pa comparar
-beq $t0 $t1 then_CellularAutomaton_cell_right_neighbor_0          #if $t1==$t0 then jump then_CellularAutomaton_cell_right_neighbor_0          #Else case
-lw $t0, 48($sp)          #Lee de la pila position@0 en 48 para assignar
-sw $t0, 20($sp)          #Escribe en la pila el valor que se le asigno a sum@_a@0          #Resolucion del operado izquierdo de una opercion sum
-li $t0, 1          #Guarda el numbero que se va a asignar
-sw $t0, 16($sp)          #Escribe en la pila el numero que se le asigno a sum@_b@0          #Resolucion del operado derecha de una opercion sum
-lw $t0, 20($sp)          #poner en registro $t0 lo que hay en 20
-lw $t1, 16($sp)          #poner en registro $t1 lo que hay en 16
-add $t0, $t0, $t1          #en $t0 pon el resultado de la suma
-sw $t0, 12($sp)          #poner en la posicion 12 el resultado           #Fin del paramentro 0 al StaticDispatch cell
-lw $t0, 52($sp)          #Saca de la pila self
+sw $s6, ($sp)       #Salva **self**
 addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell
-lw $t0, 16($sp)          #Saca de la pila param_0_to_cell@0
+sw $a0, ($sp)       #Salva el string que se paso como parametro 
 addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell@0          #Agrega a la pila el paramentro 1 al StaticDispatch cell
-jal CellularAutomaton_cell          #Call a la function CellularAutomaton_cell
-sw $s0, 24($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-j fin_CellularAutomaton_cell_right_neighbor_0          #Salta para f{label} 
-then_CellularAutomaton_cell_right_neighbor_0 :           #Crea el label then_CellularAutomaton_cell_right_neighbor_0           #Then case
-li $t0, 0          #Guarda el numbero que se va a asignar
-sw $t0, 8($sp)          #Escribe en la pila el numero que se le asigno a param_0_to_cell@1          #Fin del paramentro 0 al StaticDispatch cell
-lw $t0, 52($sp)          #Saca de la pila self
+sw $ra, ($sp)       #Salva $ra para saber a donde retornar 
+
+jal __str__length__
 addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch cell
-lw $t0, 12($sp)          #Saca de la pila param_0_to_cell@1
-addi $sp, $sp, -4
-sw $t0, 0($sp)          #Mete para la pila param_0_to_cell@1          #Agrega a la pila el paramentro 1 al StaticDispatch cell
-jal CellularAutomaton_cell          #Call a la function CellularAutomaton_cell
-sw $s0, 24($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
-fin_CellularAutomaton_cell_right_neighbor_0 :           #Crea el label fin_CellularAutomaton_cell_right_neighbor_0           #Fin de un If
-lw $t0, 24($sp)          #Lee de la pila result@if@0 en 24 para assignar
-sw $t0, 4($sp)          #Escribe en la pila el valor que se le asigno a @result
-lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
-lw $ra, 0($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
-addi $sp, $sp, 56          #Limpia la pila
-jr $ra          #Final de la function cell_right_neighbor
+lw $t0, 4($v0)      #Lee el valor de la propiedad **value**
+sw $t0, ($sp)       #Salva el valor del primer length 
+
+lw $t0, 8($sp)
+move $s6, $t0       #Cambia self por el otro string
+jal __str__length__
+lw $t0, ($sp)       #Lee el lenght del string self
+lw $t1, 4($v0)      #Lee el valor de la pripiedad value del resultado de la funcion length 
+add $t0, $t0, $t1   # Suma los length de ambos string
+
+add $t0, $t0, 1 
+move $a0, $t0
+li $v0, 9
+syscall             # Reserva espacion para un string de tamaño length1 + length2
+#En $v0 el nuevo string 
+
+move $t3, $v0
+lw $t2, 8($sp)      #Lee el string que se paso por parametro  
+lw $t1, 4($t2)      #Lee la propiedad **value** del string
+lw $t2, 12($sp)     #Lee self
+lw $t0, 4($t2)      #Lee la propiedad **value** de self 
+
+loop_str1:
+    lb   $t2, ($t0)       # primera letra del puntero al string self
+    beq  $t2, $zero, loop_str2 
+    add  $t0, $t0, 1      # mueve el puntero del string self
+    sb   $t2, ($t3)       # guarda la letra en el nuevo string 
+    add  $t3, $t3, 1      # mueve el puntero del nuevo string
+    j loop_str1
+
+loop_str2:
+    lb   $t2, ($t1)       # primera letra del puntero al string str1
+    beq  $t2, $zero, end_concat
+    add  $t1, $t1, 1    # mueve el puntero del string str1
+    sb   $t2, ($t3)     # guarda la letra en el nuevo string 
+    add  $t3,  $t3, 1   # mueve el puntero del nuevo string
+    j loop_str1
+
+end_concat:
+    move $a0, $v0
+    jal __str__new__
+    lw $ra, 4($sp)
+    lw $s6, 12($sp)
+    addi $sp, $sp, 16 #Limpia la pila
+    jr $ra            # Return en $v0 la nueva instancia de self
+
+############################################################################################################
+__str__cmp__:
+# En $s6 **self**
+# En $a0 instancia de str1
+# En $a1 instancia de str2
+
+addi $sp, $sp -4
+sw $ra, ($sp)
+
+lw $t0, 4($a0)     #Lee la propiedad **value** de str1
+lw $t1, 4($a1)     #Lee la propiedad **value** de str2
+li $a0, 1       # True por default
+
+str_cmp_loop:
+    lb $t2, ($t0)   #Lee una letra de str1
+    lb $t3, ($t1)   #Lee una letra de str2
+    addi $t0, $t0, 1
+    addi $t1, $t1, 1
+    beq $t2, $zero, cmp_end_to_zero     #Se llego al fin del str1
+    beq $t3, $zero, cmp_end_to_zero     #Se llego al fin del str2
+    beq $t2, $t3,   str_cmp_loop        #Continua comparando si son iguales 
+    j str_cmp_false
+
+cmp_end_to_zero:
+    beq $t2, $t3,  end_str_cmp         #Chequea que ambos hallan llegado al final 
+    j str_cmp_false
+
+str_cmp_false:
+    li $a0, 0       #Cambia el defaul True por False 
+end_str_cmp:
+    jal __int__new__    #Crea un Int que luego se debe cambiar por bool
+    lw $ra, ($sp)       #Lee $ra para retornar 
+    addi $sp, $sp, 4    #Limpia la pila 
+    jr $ra              #En $v0 un Int que hay que cambiar por Bool
 
