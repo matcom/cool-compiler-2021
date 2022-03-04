@@ -970,7 +970,7 @@ class CilToMIPS:
         instructions.append(mips.SyscallNode())
 
         instructions.append(
-            mips.LoadWordNode(reg2, mips.MemoryAddressRegisterNode(V0_REG, 0))
+            mips.LoadAddressNode(reg2, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
 
         dir_index = self.search_mem(node.index)
