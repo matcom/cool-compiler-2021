@@ -164,8 +164,8 @@ class CoolToCilVisitor(object):
 
     def register_io_out_int(self):
         self.reset_state()
-        int_param = self.register_param("int")
         self_param = self.register_param("self")
+        int_param = self.register_param("int")
 
         self.instructions.append(cil.PrintNode(int_param, False))
         self.instructions.append(cil.ReturnNode(self_param))
@@ -214,7 +214,7 @@ class CoolToCilVisitor(object):
         str_local = self.register_local("str_attr")
         length_local = self.register_local("length")
         self.instructions.append(cil.GetAttrNode(self_param, 0, str_local))
-        self.instructions.append(cil.LengthNode(str_local, length_local))
+        self.instructions.append(cil.LengthNode(length_local, str_local))
         self.instructions.append(cil.ReturnNode(self.register_new("Int", length_local)))
         self.dotcode.append(
             cil.FunctionNode(
@@ -230,12 +230,12 @@ class CoolToCilVisitor(object):
         self_param = self.register_param("self")
         other_param = self.register_param("other")
 
-        # debug print {{{
-        sep = self.register_new("String", self.register_data("sep_cat", '" ++ "'))
-        self.instructions.append(cil.PrintNode(self_param, True))
-        self.instructions.append(cil.PrintNode(sep, True))
-        self.instructions.append(cil.PrintNode(other_param, True))
-        # }}}
+        # # debug print {{{
+        # sep = self.register_new("String", self.register_data("sep_cat", '" ++ "'))
+        # self.instructions.append(cil.PrintNode(self_param, True))
+        # self.instructions.append(cil.PrintNode(sep, True))
+        # self.instructions.append(cil.PrintNode(other_param, True))
+        # # }}}
 
         self_str_local = self.register_local("self_str_attr")
         other_str_local = self.register_local("other_str_attr")
@@ -554,22 +554,22 @@ class CoolToCilVisitor(object):
         typeof_local = self.register_local()
         self.instructions.append(cil.TypeOfNode(sid, typeof_local))
 
-        # debug print {{{
-        tnlocal = self.register_local("tname_local")
-        eol = self.register_data("eol", '"\\n"')
-        eol = self.register_new("String", eol)
-        under = self.register_data("under", '"_"')
-        under = self.register_new("String", under)
-        meth = self.register_data("meth", f'"{node.id}"')
-        meth = self.register_new("String", meth)
-        self.instructions.append(
-            cil.DynamicCallNode(typeof_local, self.get_method_id("Object", "type_name"), tnlocal)
-        )
-        self.instructions.append(cil.PrintNode(tnlocal, True))
-        self.instructions.append(cil.PrintNode(under, True))
-        self.instructions.append(cil.PrintNode(meth, True))
-        self.instructions.append(cil.PrintNode(eol, True))
-        # }}}
+        # # debug print {{{
+        # tnlocal = self.register_local("tname_local")
+        # eol = self.register_data("eol", '"\\n"')
+        # eol = self.register_new("String", eol)
+        # under = self.register_data("under", '"_"')
+        # under = self.register_new("String", under)
+        # meth = self.register_data("meth", f'"{node.id}"')
+        # meth = self.register_new("String", meth)
+        # self.instructions.append(
+        #     cil.DynamicCallNode(typeof_local, self.get_method_id("Object", "type_name"), tnlocal)
+        # )
+        # self.instructions.append(cil.PrintNode(tnlocal, True))
+        # self.instructions.append(cil.PrintNode(under, True))
+        # self.instructions.append(cil.PrintNode(meth, True))
+        # self.instructions.append(cil.PrintNode(eol, True))
+        # # }}}
 
         self.instructions.extend(args)
         method_id = self.get_method_id(node.expr.type.name, node.id)
