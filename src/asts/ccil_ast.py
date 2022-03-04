@@ -291,19 +291,23 @@ class ArithmeticOpNode(BinaryOpNode):
 
 
 class SumOpNode(ArithmeticOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} + {self.right.value}"
 
 
 class MinusOpNode(ArithmeticOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} - {self.right.value}"
 
 
 class MultOpNode(ArithmeticOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} * {self.right.value}"
 
 
 class DivOpNode(ArithmeticOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} / {self.right.value}"
 
 
 class ComparisonOpNode(BinaryOpNode):
@@ -311,23 +315,28 @@ class ComparisonOpNode(BinaryOpNode):
 
 
 class EqualIntNode(ComparisonOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} =(Int) {self.right.value}"
 
 
 class EqualStrNode(ComparisonOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} =(Str) {self.right.value}"
 
 
 class EqualAddrNode(ComparisonOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} =(Addr) {self.right.value}"
 
 
 class LessOrEqualOpNode(ComparisonOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} <= {self.right.value}"
 
 
 class LessOpNode(ComparisonOpNode):
-    pass
+    def __str__(self) -> str:
+        return f"{self.left.value} < {self.right.value}"
 
 
 class UnaryOpNode(ReturnOpNode):
