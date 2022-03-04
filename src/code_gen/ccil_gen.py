@@ -332,9 +332,7 @@ class CCILGenerator:
             ]
 
         # Storing the type of the resulting case expression
-        expr_type = self.create_type_name(
-            f"case_{times}_expr_type", case_expr_fv.id, node.case_expr.type.name
-        )
+        expr_type = self.create_type_name(f"case_{times}_expr_type", case_expr_fv.id)
 
         # Final label where all branch must jump to
         final_label = LabelNode(f"case_{times}_end")
@@ -751,14 +749,22 @@ class CCILGenerator:
         # Defining Object class methods
         self.reset_scope()
         params = self.init_func_params(OBJECT)
-        abort_msg = self.add_data("abort_msg", "RuntimeError: Execution aborted")
-        load = self.create_string_load_data("abort_temp", abort_msg.id)
-        [print, abort] = self.notifiy_and_abort(load.id)
+        abort_msg = self.add_data("abort_msg", "Abort called from class ")
+        part1 = self.create_string_load_data("abort_var1", abort_msg.id)
+        part2 = self.create_type_name("abort_var2", "self")
+        abort_local_msg = self.create_storage(
+            "abort_local_msg", STRING, ConcatOpNode(part1.id, part2.id)
+        )
+        [print, abort] = self.notifiy_and_abort(abort_local_msg.id)
         abort_func = FunctionNode(
-            "abort", params, self.dump_locals(), [load, print, abort], "self"
+            "abort",
+            params,
+            self.dump_locals(),
+            [part1, part2, abort_local_msg, print, abort],
+            "self",
         )
         params = self.init_func_params(OBJECT)
-        get_name = self.create_type_name("get_name", "self", OBJECT)
+        get_name = self.create_type_name("get_name", "self")
         type_name_func = FunctionNode(
             "type_name", params, self.dump_locals(), [get_name], get_name.id
         )
@@ -1017,9 +1023,9 @@ class CCILGenerator:
         self.add_local(idx, INT)
         return StorageNode(idx, ReadIntNode())
 
-    def create_type_name(self, idx: str, target: str, static_type: str):
+    def create_type_name(self, idx: str, target: str):
         self.add_local(idx, STRING)
-        return StorageNode(idx, CurrentTypeNameNode(target, static_type))
+        return StorageNode(idx, TypeNameOpNode(target))
 
     def create_length(self, idx: str, target: str):
         self.add_local(idx, INT)
