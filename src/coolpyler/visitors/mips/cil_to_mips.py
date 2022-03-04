@@ -524,8 +524,60 @@ class CilToMIPS:
 
         return [mips.JumpNode(node.label, f"Jump to {node.label}")]
 
-    @visitor.when(cil.GotoIfNode)
-    def visit(self, node: cil.GotoIfNode):
+    @visitor.when(cil.GotoIfLTNode)
+    def visit(self, node: cil.GotoIfLTNode):
+        instructions = []
+        self.memory_manager.save()
+
+        cond_dir = self.search_mem(node.cond)
+        reg1 = self.memory_manager.get_unused_register()
+
+        instructions.append(
+            mips.LoadWordNode(
+                reg1,
+                mips.MemoryAddressRegisterNode(FP_REG, cond_dir),
+                f"Mov comparisson value to register",
+            )
+        )
+        instructions.append(
+            mips.BltzNode(
+                reg1,
+                node.label,
+                f"Compare values in registers and jump to {node.label} if the second is greater than 0",
+            )
+        )
+
+        self.memory_manager.clean()
+        return instructions
+
+    @visitor.when(cil.GotoIfEqNode)
+    def visit(self, node: cil.GotoIfEqNode):
+        instructions = []
+        self.memory_manager.save()
+
+        cond_dir = self.search_mem(node.cond)
+        reg1 = self.memory_manager.get_unused_register()
+
+        instructions.append(
+            mips.LoadWordNode(
+                reg1,
+                mips.MemoryAddressRegisterNode(FP_REG, cond_dir),
+                f"Mov comparisson value to register",
+            )
+        )
+        instructions.append(
+            mips.BeqzNode(
+                reg1,
+                node.label,
+                f"Compare values in registers and jump to {node.label} if the second is greater than 0",
+            )
+        )
+
+        self.memory_manager.clean()
+        return instructions
+
+    @visitor.when(cil.GotoIfGtNode)
+    def visit(self, node: cil.GotoIfGtNode):
         instructions = []
         self.memory_manager.save()
 
@@ -770,7 +822,7 @@ class CilToMIPS:
             mips.LoadByteNode(reg2, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0))
         )
 
-        instructions.append(mips.BeqzNode(reg2, mips.LabelNode(exit)))
+        instructions.append(mips.BeqzNode(reg2, exit))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(reg1, reg1, 1))
         instructions.append(mips.JumpNode(loop))
@@ -842,7 +894,7 @@ class CilToMIPS:
             mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
         )
 
-        instructions.append(mips.BeqzNode(reg1, mips.LabelNode(exit1)))
+        instructions.append(mips.BeqzNode(reg1, exit1))
         instructions.append(
             mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
@@ -859,7 +911,7 @@ class CilToMIPS:
         instructions.append(
             mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
-        instructions.append(mips.BeqzNode(reg1, mips.LabelNode(exit2)))
+        instructions.append(mips.BeqzNode(reg1, exit2))
         instructions.append(mips.AddiNode(V0_REG, V0_REG, 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[2], ARG_REGISTERS[2], 1))
         instructions.append(mips.JumpNode(loop2))
@@ -922,7 +974,7 @@ class CilToMIPS:
                 reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[0], 0)
             )
         )
-        instructions.append(mips.BeqzNode(reg3, mips.LabelNode(exit)))
+        instructions.append(mips.BeqzNode(reg3, exit))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(ARG_REGISTERS[1], ARG_REGISTERS[1], 1))
         instructions.append(mips.AddiNode(reg3, reg3, 1))
@@ -990,7 +1042,7 @@ class CilToMIPS:
         instructions.append(
             mips.LoadByteNode(reg1, mips.MemoryAddressRegisterNode(ARG_REGISTERS[1], 0))
         )
-        instructions.append(mips.BeqzNode(reg3, mips.LabelNode(exit)))
+        instructions.append(mips.BeqzNode(reg3, exit))
         instructions.append(
             mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
         )
