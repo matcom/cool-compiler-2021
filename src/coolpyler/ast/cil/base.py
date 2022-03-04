@@ -125,7 +125,13 @@ class GotoNode(InstructionNode):
         self.label = label
 
 
-class GotoIfNode(InstructionNode):
+class GotoIfLtNode(InstructionNode):
+    def __init__(self, cond, label) -> None:
+        super().__init__()
+        self.cond = cond
+        self.label = label
+
+class GotoIfEqNode(InstructionNode):
     def __init__(self, cond, label) -> None:
         super().__init__()
         self.cond = cond
