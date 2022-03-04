@@ -131,7 +131,7 @@ class MIPSGenerator:
 
     @visitor.when(mips.BltzNode)
     def visit(self, node: mips.BgtzNode):
-        return f"\tbgtz {self.visit(node.left)}, {str(node.right)} \t#{node.comment}"
+        return f"\tbltz {self.visit(node.left)}, {str(node.right)} \t#{node.comment}"
 
     @visitor.when(mips.BeqzNode)
     def visit(self, node: mips.BeqzNode):
