@@ -637,7 +637,6 @@ class CCILToMIPSGenerator:
 
         return instructions
 
-
     @visitor.when(ccil_ast.NegOpNode)
     def visit(self, node: ccil_ast.NotOpNode):
         instructions = []
@@ -1466,27 +1465,28 @@ class CCILToMIPSGenerator:
                 mips_ast.MemoryIndexNode(node, mips_ast.Constant(node, WORD), v0),
             )
         )
-        # instructions.append(mips_ast.Addi(node, a0, a0, mips_ast.Constant(node, 1)))
-        instructions.append(
-            mips_ast.LoadImmediate(node, v0, mips_ast.Constant(node, 9))
-        )
-        instructions.append(mips_ast.Syscall(node))
+        instructions.append(mips_ast.Addi(node, a0, a0, mips_ast.Constant(node, 1)))
 
+        loop = self._generate_unique_label()
+        end = self._generate_unique_label()
+        zero = mips_ast.RegisterNode(node, ZERO)
         char = mips_ast.RegisterNode(node, T0)
         string = mips_ast.RegisterNode(node, T1)
         buffer_string = mips_ast.RegisterNode(node, T2)
         buffer_char = mips_ast.RegisterNode(node, T3)
         string_char = mips_ast.RegisterNode(node, T4)
-        zero = mips_ast.RegisterNode(node, ZERO)
+
+        instructions.append(
+            mips_ast.LoadImmediate(node, v0, mips_ast.Constant(node, 9))
+        )
+        instructions.append(mips_ast.Syscall(node))
+
         instructions.append(mips_ast.Move(node, string, v0))
         instructions.append(
             mips_ast.LoadAddress(node, buffer_string, mips_ast.Label(node, "buffer"))
         )
         instructions.append(mips_ast.Move(node, buffer_char, buffer_string))
         instructions.append(mips_ast.Move(node, string_char, string))
-
-        loop = self._generate_unique_label()
-        end = self._generate_unique_label()
 
         instructions.append(mips_ast.LabelDeclaration(node, loop))
         instructions.append(
@@ -1509,6 +1509,9 @@ class CCILToMIPSGenerator:
         )
         instructions.append(
             mips_ast.BranchOnEqual(node, char, new_line, mips_ast.Label(node, end))
+        )
+        instructions.append(
+            mips_ast.BranchOnEqual(node, char, zero, mips_ast.Label(node, end))
         )
 
         instructions.append(
