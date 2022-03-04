@@ -329,24 +329,19 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
-        t0 = registers.T[0]
-        dest_address = self.cur_function.variable_address(node.dest)
-
-        self.add_inst(mips.CommentNode(f"<assignode:{node.dest}-{node.source}>"))
+        t0, fp = registers.T[0], registers.FP
+        dest = self.get_address(node.dest)
 
         if isinstance(node.source, int):
-            self.add_inst(
-                mips.LINode(t0, node.source),
-                mips.SWNode(t0, dest_address, registers.FP),
-            )
+            load_inst = mips.LINode(t0, node.source)
         else:
-            self.visit(node.source)
-            source_address = self.cur_function.variable_address(node.source)
-            self.add_inst(
-                mips.LWNode(t0, (source_address, registers.FP)),
-                mips.SWNode(t0, dest_address, registers.FP),
-            )
+            src = self.get_address(node.source)
+            load_inst = mips.LWNode(t0, (src, fp))
+
         self.add_inst(
+            mips.CommentNode(f"<assignode:{node.dest}-{node.source}>"),
+            load_inst,
+            mips.SWNode(t0, dest, fp),
             mips.CommentNode(f"</assignode:{node.dest}-{node.source}>"),
         )
 
