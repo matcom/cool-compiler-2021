@@ -284,9 +284,12 @@ class CCILGenerator:
 
         # Setting the final operation which will simbolize the return value of this expr
         pre_fvalue_id = f"if_{times}_pre_fv"
-        self.update_locals(then_fval.id, pre_fvalue_id)
-        self.update_locals(else_fval.id, pre_fvalue_id)
-        then_fval.id = else_fval.id = pre_fvalue_id
+        pre_fvalue_then = self.create_assignation(
+            pre_fvalue_id, node.type.name, then_fval.id
+        )
+        pre_fvalue_else = self.create_assignation(
+            pre_fvalue_id, node.type.name, else_fval.id, reuse=True
+        )
 
         fvalue_id = f"if_{times}_fv"
         fvalue = self.create_assignation(fvalue_id, node.type.name, pre_fvalue_id)
@@ -296,9 +299,11 @@ class CCILGenerator:
                 *if_ops,
                 if_false,
                 *then_ops,
+                pre_fvalue_then,
                 goto_endif,
                 else_label,
                 *else_ops,
+                pre_fvalue_else,
                 endif_label,
                 fvalue,
             ],
