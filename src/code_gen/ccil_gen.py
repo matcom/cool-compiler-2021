@@ -375,7 +375,7 @@ class CCILGenerator:
                 branch_selection_ops = [GoToNode(branch_label)]
 
             # Storing logic to jump to branch logic if this branch is selected
-            pattern_match_ops += (branch_selection_ops,)
+            pattern_match_ops += branch_selection_ops
 
             branch_var = self.create_assignation(
                 f"case_{times}_option_{i}", option.branch_type.name, case_expr_fv.id
