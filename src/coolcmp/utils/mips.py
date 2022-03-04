@@ -1,8 +1,6 @@
 from __future__ import annotations
 from typing import List, Tuple, Union
 
-import self as self
-
 from coolcmp.utils.registers import FP, Register, SP, DW, ARG, V0
 from coolcmp.utils import cil
 

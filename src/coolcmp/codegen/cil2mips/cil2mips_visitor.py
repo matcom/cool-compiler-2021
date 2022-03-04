@@ -1,8 +1,6 @@
 from __future__ import annotations
 from typing import Dict
 
-import reg as reg
-
 from coolcmp.utils import cil, visitor
 from coolcmp.utils import mips, registers
 from coolcmp.utils import extract_class_name
