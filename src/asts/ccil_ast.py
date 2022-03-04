@@ -318,6 +318,10 @@ class EqualStrNode(ComparisonOpNode):
     pass
 
 
+class EqualAddrNode(ComparisonOpNode):
+    pass
+
+
 class LessOrEqualOpNode(ComparisonOpNode):
     pass
 
@@ -347,6 +351,21 @@ class NotOpNode(UnaryOpNode):
 class NegOpNode(UnaryOpNode):
     def __str__(self) -> str:
         return f"neg {self.atom.value}"
+
+
+class IsVoidOpNode(UnaryOpNode):
+    def __str__(self) -> str:
+        return f"isvoid {self.atom.value}"
+
+
+class CurrentTypeNameNode(ReturnOpNode):
+    def __init__(self, target: str, static_type: str) -> None:
+        super().__init__()
+        self.target = target
+        self.static_type = static_type
+
+    def __str__(self) -> str:
+        return f"type_name {self.target}"
 
 
 class ChainOpNode(ReturnOpNode):
@@ -429,16 +448,6 @@ class FlowControlNode(OperationNode):
 
     def __init__(self) -> None:
         super().__init__()
-
-
-class CurrentTypeNameNode(ReturnOpNode):
-    def __init__(self, target: str, static_type: str) -> None:
-        super().__init__()
-        self.target = target
-        self.static_type = static_type
-
-    def __str__(self) -> str:
-        return f"type_name {self.target}"
 
 
 class ShallowCopyOpNode(OperationNode):
