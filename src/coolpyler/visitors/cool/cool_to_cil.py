@@ -590,7 +590,7 @@ class CoolToCilVisitor(object):
         cond_ret = self.visit(node.cond)
         cond_ret_attr = self.register_local()
         self.instructions.append(cil.GetAttrNode(cond_ret, 0, cond_ret_attr))
-        self.instructions.append(cil.GotoIfNode(cond_ret_attr, then_label))
+        self.instructions.append(cil.GotoIfGtNode(cond_ret_attr, then_label))
 
         # Label else_label
         self.instructions.append(cil.LabelNode(else_label))
@@ -621,7 +621,7 @@ class CoolToCilVisitor(object):
         while_ret = self.visit(node.cond)
         while_ret_attr = self.register_local()
         self.instructions.append(cil.GetAttrNode(while_ret, 0, while_ret_attr))
-        self.instructions.append(cil.GotoIfNode(while_ret_attr, loop_label))
+        self.instructions.append(cil.GotoIfGtNode(while_ret_attr, loop_label))
 
         # GOTO pool
         self.instructions.append(cil.GotoNode(pool_label))
@@ -697,7 +697,7 @@ class CoolToCilVisitor(object):
                 )
                 branch_label = self.get_label("case_branch")
                 branch_labels.append(branch_label)
-                self.instructions.append(cil.GotoIfNode(types_eq_local, branch_label))
+                self.instructions.append(cil.GotoIfGtNode(types_eq_local, branch_label))
                 break
 
         data = self.register_data("case_err", '"Case of did not match any branch!"')
@@ -763,11 +763,35 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.GetAttrNode(right, 0, right_value))
 
         cond_local = self.register_local()
-        self.instructions.append(cil.MinusNode(cond_local, right_value, left_value))
+        self.instructions.append(cil.MinusNode(cond_local, left_value, right_value))
         self.instructions.append(
             cil.PlusNode(cond_local, cond_local, self.register_num(1))
         )
-        return self.register_new("Bool", cond_local)
+
+        ret_local = self.register_local()
+        then_label = self.get_label("then")
+        else_label = self.get_label("else")
+        continue_label = self.get_label("continue")
+
+        # IF condition GOTO then_label
+        self.instructions.append(cil.GotoIfLtNode(cond_local, then_label))
+
+        # Label else_label
+        self.instructions.append(cil.LabelNode(else_label))
+        else_ret = self.register_new("Bool", self.register_num(0))
+        self.instructions.append(cil.AssignNode(ret_local, else_ret))
+        # GoTo continue_label
+        self.instructions.append(cil.GotoNode(continue_label))
+
+        # Label then_label
+        self.instructions.append(cil.LabelNode(then_label))
+        then_ret = self.register_new("Bool", self.register_num(1))
+        self.instructions.append(cil.AssignNode(ret_local, then_ret))
+
+        # Label continue_label
+        self.instructions.append(cil.LabelNode(continue_label))
+
+        return ret_local
 
     @visitor.when(type_checked.CoolEqNode)
     def visit(self, node: type_checked.CoolEqNode) -> str:
@@ -779,34 +803,33 @@ class CoolToCilVisitor(object):
         right_value = self.register_local()
         self.instructions.append(cil.GetAttrNode(right, 0, right_value))
 
-        # debug print {{{
-        eol = self.register_new("String", self.register_data("eol", '"\\n"'))
-        self.instructions.append(cil.PrintNode(left, False))
-        self.instructions.append(cil.PrintNode(eol, True))
-        self.instructions.append(cil.PrintNode(right, False))
-        self.instructions.append(cil.PrintNode(eol, True))
-        # }}}
-
         cond_local = self.register_local()
         self.instructions.append(cil.MinusNode(cond_local, left_value, right_value))
-        # debug print {{{
-        self.instructions.append(cil.PrintNode(self.register_new("Int", cond_local), False))
-        self.instructions.append(cil.PrintNode(eol, True))
-        # }}}
-        self.instructions.append(cil.StarNode(cond_local, cond_local, cond_local))
-        # debug print {{{
-        self.instructions.append(cil.PrintNode(self.register_new("Int", cond_local), False))
-        self.instructions.append(cil.PrintNode(eol, True))
-        # }}}
-        self.instructions.append(
-            cil.MinusNode(cond_local, self.register_num(1), cond_local)
-        )
-        # debug print {{{
-        self.instructions.append(cil.PrintNode(self.register_new("Int", cond_local), False))
-        self.instructions.append(cil.PrintNode(eol, True))
-        # }}}
 
-        return self.register_new("Bool", cond_local)
+        ret_local = self.register_local()
+        then_label = self.get_label("then")
+        else_label = self.get_label("else")
+        continue_label = self.get_label("continue")
+
+        # IF condition GOTO then_label
+        self.instructions.append(cil.GotoIfEqNode(cond_local, then_label))
+
+        # Label else_label
+        self.instructions.append(cil.LabelNode(else_label))
+        else_ret = self.register_new("Bool", self.register_num(0))
+        self.instructions.append(cil.AssignNode(ret_local, else_ret))
+        # GoTo continue_label
+        self.instructions.append(cil.GotoNode(continue_label))
+
+        # Label then_label
+        self.instructions.append(cil.LabelNode(then_label))
+        then_ret = self.register_new("Bool", self.register_num(1))
+        self.instructions.append(cil.AssignNode(ret_local, then_ret))
+
+        # Label continue_label
+        self.instructions.append(cil.LabelNode(continue_label))
+
+        return ret_local
 
     @visitor.when(type_checked.CoolLeNode)
     def visit(self, node: type_checked.CoolLeNode) -> str:
@@ -819,8 +842,32 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.GetAttrNode(right, 0, right_value))
 
         cond_local = self.register_local()
-        self.instructions.append(cil.MinusNode(cond_local, right_value, left_value))
-        return self.register_new("Bool", cond_local)
+        self.instructions.append(cil.MinusNode(cond_local, left_value, right_value))
+
+        ret_local = self.register_local()
+        then_label = self.get_label("then")
+        else_label = self.get_label("else")
+        continue_label = self.get_label("continue")
+
+        # IF condition GOTO then_label
+        self.instructions.append(cil.GotoIfLtNode(cond_local, then_label))
+
+        # Label else_label
+        self.instructions.append(cil.LabelNode(else_label))
+        else_ret = self.register_new("Bool", self.register_num(0))
+        self.instructions.append(cil.AssignNode(ret_local, else_ret))
+        # GoTo continue_label
+        self.instructions.append(cil.GotoNode(continue_label))
+
+        # Label then_label
+        self.instructions.append(cil.LabelNode(then_label))
+        then_ret = self.register_new("Bool", self.register_num(1))
+        self.instructions.append(cil.AssignNode(ret_local, then_ret))
+
+        # Label continue_label
+        self.instructions.append(cil.LabelNode(continue_label))
+
+        return ret_local
 
     @visitor.when(type_checked.CoolPlusNode)
     def visit(self, node: type_checked.CoolPlusNode) -> str:

@@ -121,9 +121,17 @@ class CILDebug:
     def visit(self, node: cil.GotoNode, indent=0, inline=False):
         self.print(indent, inline, f"GOTO {node.label};")
 
-    @visitor.when(cil.GotoIfNode)
-    def visit(self, node: cil.GotoIfNode, indent=0, inline=False):
-        self.print(indent, inline, f"IF {node.cond} GOTO {node.label};")
+    @visitor.when(cil.GotoIfGtNode)
+    def visit(self, node: cil.GotoIfGtNode, indent=0, inline=False):
+        self.print(indent, inline, f"IF {node.cond} > 0 GOTO {node.label};")
+
+    @visitor.when(cil.GotoIfLtNode)
+    def visit(self, node: cil.GotoIfLtNode, indent=0, inline=False):
+        self.print(indent, inline, f"IF {node.cond} < 0 GOTO {node.label};")
+
+    @visitor.when(cil.GotoIfEqNode)
+    def visit(self, node: cil.GotoIfEqNode, indent=0, inline=False):
+        self.print(indent, inline, f"IF {node.cond} = 0 GOTO {node.label};")
 
     @visitor.when(cil.StaticCallNode)
     def visit(self, node: cil.StaticCallNode, indent=0, inline=False):

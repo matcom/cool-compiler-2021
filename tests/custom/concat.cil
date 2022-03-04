@@ -52,6 +52,11 @@
   data_4_type_name_String = "String";
   data_5_type_name_IO = "IO";
   data_6_type_name_Main = "Main";
+  data_7_string = "x";
+  data_8_string = "o";
+  data_9_string = "xo";
+  data_10_string = "false";
+  data_11_string = "true";
 
 .code
 
@@ -353,7 +358,7 @@
   function Main_main {
     PARAM param_self;
 
-    LOCAL local_0;
+    LOCAL local_a;
     LOCAL local_1;
     LOCAL local_2;
     LOCAL local_3;
@@ -363,22 +368,76 @@
     LOCAL local_7;
     LOCAL local_8;
     LOCAL local_9;
+    LOCAL local_10;
+    LOCAL local_11;
+    LOCAL local_12;
+    LOCAL local_13;
+    LOCAL local_14;
+    LOCAL local_15;
+    LOCAL local_16;
+    LOCAL local_17;
+    LOCAL local_18;
+    LOCAL local_19;
+    LOCAL local_20;
+    LOCAL local_21;
+    LOCAL local_22;
+    LOCAL local_23;
+    LOCAL local_24;
+    LOCAL local_25;
+    LOCAL local_26;
 
-    local_1 = LOAD 65505;
-    ARG local_1;
-    local_2 = CALL Int___init;
-    local_3 = GETATTR local_2 0;
-    local_4 = LOAD 65505;
+    local_2 = LOAD data_7_string;
+    ARG local_2;
+    local_3 = CALL String___init;
+    local_4 = LOAD data_8_string;
     ARG local_4;
-    local_5 = CALL Int___init;
-    local_6 = GETATTR local_5 0;
-    local_7 = local_3 * local_6
-    ARG local_7;
-    local_8 = CALL Int___init;
-    local_9 = TYPEOF param_self;
+    local_5 = CALL String___init;
+    local_6 = TYPEOF local_3;
+    ARG local_3;
+    ARG local_5;
+    local_1 = VCALL local_6 4;
+    local_a = local_1;
+    local_8 = GETATTR local_a 0;
+    local_9 = LOAD data_9_string;
+    ARG local_9;
+    local_10 = CALL String___init;
+    local_11 = GETATTR local_10 0;
+    local_12 = local_8 - local_11
+    IF local_12 = 0 GOTO label_then_1;
+    LABEL label_else_1;
+    local_14 = LOAD 0;
+    ARG local_14;
+    local_15 = CALL Bool___init;
+    local_13 = local_15;
+    GOTO label_continue_1;
+    LABEL label_then_1;
+    local_16 = LOAD 1;
+    ARG local_16;
+    local_17 = CALL Bool___init;
+    local_13 = local_17;
+    LABEL label_continue_1;
+    local_18 = GETATTR local_13 0;
+    IF local_18 > 0 GOTO label_then_0;
+    LABEL label_else_0;
+    local_20 = LOAD data_10_string;
+    ARG local_20;
+    local_21 = CALL String___init;
+    local_22 = TYPEOF param_self;
     ARG param_self;
-    ARG local_8;
-    local_0 = VCALL local_9 4;
-    RETURN local_0;
+    ARG local_21;
+    local_19 = VCALL local_22 3;
+    local_7 = local_19;
+    GOTO label_continue_0;
+    LABEL label_then_0;
+    local_24 = LOAD data_11_string;
+    ARG local_24;
+    local_25 = CALL String___init;
+    local_26 = TYPEOF param_self;
+    ARG param_self;
+    ARG local_25;
+    local_23 = VCALL local_26 3;
+    local_7 = local_23;
+    LABEL label_continue_0;
+    RETURN local_7;
   }
 

@@ -524,8 +524,8 @@ class CilToMIPS:
 
         return [mips.JumpNode(node.label, f"Jump to {node.label}")]
 
-    @visitor.when(cil.GotoIfLTNode)
-    def visit(self, node: cil.GotoIfLTNode):
+    @visitor.when(cil.GotoIfLtNode)
+    def visit(self, node: cil.GotoIfLtNode):
         instructions = []
         self.memory_manager.save()
 
