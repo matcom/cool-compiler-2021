@@ -346,9 +346,6 @@ class CCILGenerator:
         visited_types = set()  # To optimize and reduce redundant calling
         for (i, option) in enumerate(node.options):
             # Initializing the branch var
-            branch_var = self.create_assignation(
-                f"case_{times}_option_{i}", option.branch_type.name, case_expr_fv.id
-            )
 
             # Label that means the start of this branch logic
             branch_label = LabelNode(f"case_{times}_branch_{i}")
@@ -378,10 +375,13 @@ class CCILGenerator:
                 branch_selection_ops = [GoToNode(branch_label)]
 
             # Storing logic to jump to branch logic if this branch is selected
-            pattern_match_ops += [
-                branch_var,
-                *branch_selection_ops,
-            ]
+            pattern_match_ops += (branch_selection_ops,)
+
+            branch_var = self.create_assignation(
+                f"case_{times}_option_{i}", option.branch_type.name, case_expr_fv.id
+            )
+            self.ccil_cool_names = self.ccil_cool_names.create_child()
+            self.ccil_cool_names.add_new_name_pair(option.id, branch_var.id)
 
             # Translating the branch logic
             (expr_ops, expr_fval) = self.visit(option.expr)
@@ -390,6 +390,7 @@ class CCILGenerator:
             expr_fval.id = pre_fvalue_id
             # Translating to ccil of branch logic
             branch_ops += [branch_label, *expr_ops, final_goto]
+            self.ccil_cool_names = self.ccil_cool_names.get_parent
 
         self.locals[pre_fvalue_id] = node.type.name
 
@@ -429,13 +430,13 @@ class CCILGenerator:
         end_loop_label = LabelNode(end_loop_label_id)
 
         # Setting control flow instructions ifFalse & GoTo
-        if_false = IfFalseNode(cond_fval, end_loop_label)
+        if_false = IfFalseNode(extract_id(cond_fval), end_loop_label)
         go_to = GoToNode(loop_label)
 
         fval = self.create_uninitialized_storage(f"loop_{times}_fv", VOID)
         # Loop Nodes have void return type, how to express it??
         return (
-            [*cond_ops, loop_label, if_false, *body_ops, go_to, end_loop_label, fval],
+            [loop_label, *cond_ops, if_false, *body_ops, go_to, end_loop_label, fval],
             fval,
         )
 
@@ -692,7 +693,6 @@ class CCILGenerator:
     def visit(self, node: sem_ast.BooleanNode) -> VISITOR_RESULT:
         times = self.times(node)
 
-        print(node.value)
         bool_id = f"bool_{times}"
         value = "1" if node.value else "0"
 

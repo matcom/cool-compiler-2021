@@ -2,6 +2,7 @@ PARAM = "param_"
 LET = "let_"
 ATTR = "attr_"
 CLASS = "class_"
+CASE = "case_"
 
 # Registers
 ZERO = 0
