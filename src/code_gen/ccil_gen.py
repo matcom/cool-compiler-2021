@@ -315,8 +315,8 @@ class CCILGenerator:
         # Handling case expression is not void
         void_expr_error_ops: List[OperationNode] = []
         if node.case_expr.type.name not in {STRING, INT, BOOL}:
-            case_expr_is_void = self.create_equality(
-                f"case_{times}_is_void", IdNode(case_expr_fv.id), IntNode("0")
+            case_expr_is_void = self.create_isvoid(
+                f"case_{times}_is_void", IdNode(case_expr_fv.id)
             )
             is_not_void = LabelNode(f"case_{times}_expr_not_void")
             case_expr_if_void = IfFalseNode(IdNode(case_expr_is_void.id), is_not_void)
@@ -437,7 +437,7 @@ class CCILGenerator:
         if_false = IfFalseNode(extract_id(cond_fval), end_loop_label)
         go_to = GoToNode(loop_label)
 
-        fval = self.create_uninitialized_storage(f"loop_{times}_fv", VOID)
+        fval = self.create_uninitialized_storage(f"loop_{times}_fv", OBJECT)
         # Loop Nodes have void return type, how to express it??
         return (
             [loop_label, *cond_ops, if_false, *body_ops, go_to, end_loop_label, fval],
@@ -608,8 +608,8 @@ class CCILGenerator:
 
         # Runtime error depending if expr is void or not
         error_ops = []
-        expr_fval_is_void = self.create_equality(
-            f"expr_is_void_{times}", extract_id(expr_fval), IntNode("0")
+        expr_fval_is_void = self.create_isvoid(
+            f"expr_is_void_{times}", extract_id(expr_fval)
         )
         ok_label = LabelNode(f"expr_is_not_void_{times}")
         if_is_not_void = IfFalseNode(extract_id(expr_fval_is_void), ok_label)
@@ -945,6 +945,7 @@ class CCILGenerator:
 
     def create_uninitialized_storage(self, idx: str, type_idx: str):
         self.add_local(idx, type_idx)
+        self.init_default_values()
         return StorageNode(idx, ZERO if type_idx != STRING else EMPTY)
 
     def create_storage(self, idx: str, type_idx: str, op: ReturnOpNode):
@@ -993,6 +994,10 @@ class CCILGenerator:
         self.add_local(idx, BOOL)
         op = EqualStrNode(left, right) if string else EqualIntNode(left, right)
         return StorageNode(idx, op)
+
+    def create_isvoid(self, idx: str, atom: IdNode):
+        self.add_local(idx, BOOL)
+        return StorageNode(idx, IsVoidOpNode(atom))
 
     def notifiy_and_abort(self, target: str) -> List[OperationNode]:
         print = PrintStrNode(target)
