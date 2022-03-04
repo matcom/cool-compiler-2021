@@ -1306,8 +1306,8 @@ class CCILToMIPSGenerator:
         instructions.extend(self._set_new_string(node))
         return instructions
 
-    @visitor.when(ccil_ast.CurrentTypeNameNode)
-    def visit(self, node: ccil_ast.CurrentTypeNameNode):
+    @visitor.when(ccil_ast.TypeNameOpNode)
+    def visit(self, node: ccil_ast.TypeNameOpNode):
         instructions = []
         result = mips_ast.RegisterNode(node, T7)
 
