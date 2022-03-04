@@ -14,6 +14,7 @@ METHOD_VISITOR_RESULT = FunctionNode
 ATTR_VISITOR_RESULT = List[OperationNode]
 
 DEFAULT_STR = Data("default_str", "")
+END_LINE = Data("line_end", r"\n")
 ZERO = "zero"
 EMPTY = "empty"
 
@@ -68,7 +69,7 @@ class CCILGenerator:
 
     @visitor.when(sem_ast.ProgramNode)
     def visit(self, node: sem_ast.ProgramNode) -> None:
-        self.data = [DEFAULT_STR]
+        self.data = [DEFAULT_STR, END_LINE]
         self.reset_locals()
 
         [obj, io, str, int, bool], builtin_methods = self.define_built_ins()
@@ -757,15 +758,19 @@ class CCILGenerator:
         abort_msg = self.add_data("abort_msg", "Abort called from class ")
         part1 = self.create_string_load_data("abort_var1", abort_msg.id)
         part2 = self.create_type_name("abort_var2", "self")
-        abort_local_msg = self.create_storage(
-            "abort_local_msg", STRING, ConcatOpNode(part1.id, part2.id)
+        abort_local_msg1 = self.create_storage(
+            "abort_local_msg1", STRING, ConcatOpNode(part1.id, part2.id)
         )
-        [print, abort] = self.notifiy_and_abort(abort_local_msg.id)
+        line_end = self.create_string_load_data("line_end", END_LINE.id)
+        abort_local_msg2 = self.create_storage(
+            "abort_local_msg2", STRING, ConcatOpNode(abort_local_msg1.id, line_end.id)
+        )
+        [print, abort] = self.notifiy_and_abort(abort_local_msg2.id)
         abort_func = FunctionNode(
             "abort",
             params,
             self.dump_locals(),
-            [part1, part2, abort_local_msg, print, abort],
+            [part1, part2, line_end, abort_local_msg1, abort_local_msg2, print, abort],
             "self",
         )
         params = self.init_func_params(OBJECT)
