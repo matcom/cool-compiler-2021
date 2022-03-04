@@ -951,6 +951,7 @@ class CilToMIPS:
         reg2 = self.memory_manager.get_unused_register()
         reg3 = self.memory_manager.get_unused_register()
         reg4 = self.memory_manager.get_unused_register()
+        reg5 = self.memory_manager.get_unused_register()
 
         lenght_dir = self.search_mem(node.n)
         instructions.append(
@@ -960,8 +961,12 @@ class CilToMIPS:
                 f"Obtain substring",
             )
         )
+
+        instructions.append(mips.MoveNode(reg5, reg3))
+        instructions.append(mips.AddiNode(reg5, reg5, 1))
+
         instructions.append(mips.LoadInmediateNode(V0_REG, 9))
-        instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg3))
+        instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg5))
         instructions.append(mips.SyscallNode())
 
         instructions.append(
@@ -995,6 +1000,11 @@ class CilToMIPS:
         instructions.append(mips.AddiNode(reg3, reg3, -1))
         instructions.append(mips.JumpNode(loop))
         instructions.append(mips.LabelInstructionNode(exit))
+
+        instructions.append(mips.LoadInmediateNode(reg1, 0))
+        instructions.append(
+            mips.StoreByteNode(reg1, mips.MemoryAddressRegisterNode(V0_REG, 0))
+        )
 
         dest_dir = self.search_mem(node.dest)
         instructions.append(
