@@ -116,6 +116,7 @@ class BackInferencer:
         body_type = new_body_node.inferenced_type
         new_node.inferenced_type, changed = unify(decl_type, body_type)
         new_node.inferenced_type.swap_self_type(self.current_type, back=True)
+        body_type.swap_self_type(self.current_type, back=True)
         self.changed |= changed
         return new_node
 
