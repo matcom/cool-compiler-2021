@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import List, Tuple, Union
+from typing import List, Union
 
-from coolcmp.utils.registers import FP, Register, SP, DW, ARG, V0
+from coolcmp.utils.registers import Register, sp, dw
 from coolcmp.utils import cil
 
 TYPES_LABELS = "__types_definition__"
@@ -12,7 +12,7 @@ Memory = Union[str, int]
 class Node:
     pass
 
-DW = 4
+
 class Type:
     def __init__(self,
                  label: str,
@@ -64,12 +64,12 @@ class FunctionNode(Node):
     def local_address(self, name: str):
         index = self.local_vars.index(name)
         locals_amount = len(self.local_vars)
-        offset = (locals_amount + 2 - index) * DW
+        offset = (locals_amount + 2 - index) * dw
         return -offset
 
     def param_address(self, name: str):
         index = self.params.index(name)
-        offset = index * DW
+        offset = index * dw
         return offset
 
     def variable_address(self, name: str):
@@ -379,8 +379,8 @@ def push_register_instructions(reg_name: str) -> List[InstructionNode]:
     addi $sp, $sp, -4
     sw <reg_name>, 0($sp)
     """
-    addi = ADDINode(SP, SP, -DW)
-    sw = SWNode(reg_name, 0, SP)
+    addi = ADDINode(sp, sp, -dw)
+    sw = SWNode(reg_name, 0, sp)
 
     return [addi, sw]
 
@@ -390,8 +390,8 @@ def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
     lw <reg_name>, 0($sp)
     addi $sp, $sp, 4
     """
-    lw = LWNode(reg_name, (0, SP))
-    addi = ADDINode(SP, SP, DW)
+    lw = LWNode(reg_name, (0, sp))
+    addi = ADDINode(sp, sp, dw)
 
     return [lw, addi]
 

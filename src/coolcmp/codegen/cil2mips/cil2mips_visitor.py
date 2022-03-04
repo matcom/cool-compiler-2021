@@ -4,6 +4,21 @@ from typing import Dict
 from coolcmp.utils import cil, visitor
 from coolcmp.utils import mips, registers
 from coolcmp.utils import extract_class_name
+from coolcmp.utils.registers import (
+    t0,
+    t1,
+    t2,
+
+    a0,
+    a1,
+    a2,
+    dw,
+
+    v0,
+    fp,
+    sp,
+    ra
+)
 
 class CILToMipsVisitor:
     def __init__(self):
@@ -26,9 +41,6 @@ class CILToMipsVisitor:
         raise ValueError(f"Unexpected method: {name}")
 
     def build_init(self, node: cil.TypeNode) -> list[mips.InstructionNode]:
-        t0 = registers.T[0]
-        a0, v0, sp, fp, ra = registers.A0, registers.V0, registers.SP, registers.FP, registers.RA
-
         return [
             mips.SUBUNode(sp, sp, 24),
             mips.SWNode(ra, 8, sp),
@@ -87,22 +99,20 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
-        sp = registers.SP
-
         params = [x.name for x in node.params]
         local_vars = [x.name for x in node.local_vars]
 
-        local_vars_size = len(local_vars) * registers.DW
+        local_vars_size = len(local_vars) * dw
 
         self.cur_function = mips.FunctionNode(node.name, params, local_vars)
         self.functions[node.name] = self.cur_function
 
         # Push local vars
         push_instructions = (
-            mips.push_register_instructions(registers.RA)
-            + mips.push_register_instructions(registers.FP)
-            + [mips.ADDINode(registers.FP, registers.SP, 8)]
-            + [mips.ADDINode(registers.SP, registers.SP, -local_vars_size)]
+            mips.push_register_instructions(ra)
+            + mips.push_register_instructions(fp)
+            + [mips.ADDINode(fp, sp, 8)]
+            + [mips.ADDINode(sp, sp, -local_vars_size)]
         )
 
         self.add_inst(
@@ -118,15 +128,15 @@ class CILToMipsVisitor:
 
         # Pop local vars
         pop_instructions = (
-            [mips.ADDINode(registers.SP, registers.SP, local_vars_size)]
-            + mips.pop_register_instructions(registers.FP)
-            + mips.pop_register_instructions(registers.RA)
+            [mips.ADDINode(sp, sp, local_vars_size)]
+            + mips.pop_register_instructions(fp)
+            + mips.pop_register_instructions(ra)
         )
 
         return_instructions = (
-            [mips.LINode(registers.V0, 10), mips.SysCallNode()]
+            [mips.LINode(v0, 10), mips.SysCallNode()]
             if self.cur_function.name == "main"
-            else [mips.JRNode(registers.RA)]
+            else [mips.JRNode(ra)]
         )
 
         if stack_occupied:
@@ -148,15 +158,12 @@ class CILToMipsVisitor:
         self.add_inst(
             mips.CommentNode(f"<allocate:{node.type}-{node.dest}>"),
             mips.JALNode(f"_{node.type}_init"),
-            mips.SWNode(registers.V0, dest_address, registers.FP),
+            mips.SWNode(v0, dest_address, fp),
             mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
         )
 
     @visitor.when(cil.SetAttrNode)
     def visit(self, node: cil.SetAttrNode):
-        t0 = registers.T[0]
-        v0, fp = registers.V0, registers.FP
-        # inst_address = self.get_address(node.instance)
         if node.value == 'void':
             load_value_inst = mips.LWNode(t0, 'void')
         elif isinstance(node.value, int):
@@ -175,8 +182,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.GetAttrNode)
     def visit(self, node: cil.GetAttrNode):
-        t0, fp = registers.T[0], registers.FP
-
         dest_offset = self.get_address(node.dest)
         src_offset = self.get_address(node.src)
         class_ = extract_class_name(node.attr)
@@ -192,15 +197,13 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
-        t0 = registers.T[0]
-        a0, v0, fp = registers.ARG[0], registers.V0, registers.FP
         address = self.get_address(node.addr)
 
         self.add_inst(
             mips.CommentNode(f"<printint:{node.addr}>"),
             mips.LWNode(t0, (address, fp)),
             mips.ADDUNode(a0, t0, 4),
-            mips.LINode(registers.V0, 1),
+            mips.LINode(v0, 1),
             mips.LWNode(a0, (0, a0)),
             mips.SysCallNode(),
             mips.CommentNode(f"</printint:{node.addr}>"),
@@ -208,26 +211,22 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.PrintStringNode)
     def visit(self, node: cil.PrintStringNode):
-        """ """
-        t0 = registers.T[0]
-        a0, v0, fp = registers.ARG[0], registers.V0, registers.FP
         address = self.get_address(node.addr)
+        self_address = self.get_address('self')
 
         self.add_inst(
             mips.CommentNode(f"<printstring:{node.addr}>"),
-            mips.LWNode(registers.T[0], (address, registers.FP)),
-            mips.ADDUNode(registers.A0, registers.T[0], 4),
-            mips.LINode(registers.V0, 4),
-            mips.LWNode(registers.A0, (0, registers.A0)),
+            mips.LWNode(t0, (address, fp)),
+            mips.ADDUNode(a0, t0, 4),
+            mips.LINode(v0, 4),
+            mips.LWNode(a0, (0, a0)),
             mips.SysCallNode(),
+            mips.LWNode(t0, (self_address, fp)),
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        t0 = registers.T[0]
-        fp, v0 = registers.FP, registers.V0
-
         obj_address = self.get_address(node.obj)
         meth_offset = self.get_method_index(node.method)
         dest_address = self.get_address(node.dest)
@@ -244,9 +243,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
-        t0 = registers.T[0]
-        sp, fp = registers.SP, registers.FP
-
         address = self.get_address(node.name)
 
         self.add_inst(
@@ -262,9 +258,6 @@ class CILToMipsVisitor:
         """
         assuming left and right operands are ints
         """
-        t0, t1, t2 = registers.T[0], registers.T[1], registers.T[2]
-        fp = registers.FP
-
         left_offset = self.get_address(node.left)
         right_offset = self.get_address(node.right)
         dest_offset = self.get_address(node.dest)
@@ -290,8 +283,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.MinusNode)
     def visit(self, node: cil.MinusNode):
-        t0, t1, t2 = registers.T[0], registers.T[1], registers.T[2]
-        fp = registers.FP
         left_offset = self.get_address(node.left)
         right_offset = self.get_address(node.right)
         dest_offset = self.get_address(node.dest)
@@ -315,19 +306,17 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
-        t0 = registers.T[0]
         dest_address = self.cur_function.variable_address(node.dest)
 
         self.add_inst(
             mips.CommentNode(f"<loadnode:{node.dest}-{node.msg}>"),
             mips.LANode(t0, self.data[node.msg].label),
-            mips.SWNode(t0, dest_address, registers.FP),
+            mips.SWNode(t0, dest_address, fp),
             mips.CommentNode(f"</loadnode:{node.dest}-{node.msg}>"),
         )
 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
-        t0, fp = registers.T[0], registers.FP
         dest = self.get_address(node.dest)
 
         if isinstance(node.source, int):
@@ -345,8 +334,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
-        v0, fp = registers.V0, registers.FP
-
         if node.value is not None:
             if isinstance(node.value, int):
                 load_to_v0 = mips.LINode(v0, node.value)
@@ -362,11 +349,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.SubstringNode)
     def visit(self, node: cil.SubstringNode):
-        t1 = registers.T[1]
-        fp = registers.FP
-        a0, a1, a2 = registers.ARG[0], registers.ARG[1], registers.ARG[2]
-        v0 = registers.V0
-
         self.add_inst(mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]"))
 
         self.visit(cil.AllocateNode('String', node.dest))
@@ -404,8 +386,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.TypeNameNode)
     def visit(self, node: cil.TypeNameNode):
-        t0, fp, v0 = registers.T[0], registers.FP, registers.V0
-
         name_offset = self.types['Object'].name_offset
         src_offset = self.get_address(node.src)
 
@@ -425,10 +405,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.IsVoidNode)
     def visit(self, node: cil.IsVoidNode):
-        t0 = registers.T[0]
-        a0 = registers.ARG[0]
-        fp, v0 = registers.FP, registers.V0
-
         src = self.get_address(node.src)
         dest = self.get_address(node.dest)
 

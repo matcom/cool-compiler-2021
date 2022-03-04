@@ -1,6 +1,3 @@
-DW = 4
-
-
 class Register:
     def __init__(self, name: str):
         self.name = name
@@ -9,13 +6,30 @@ class Register:
         return f"${self.name}"
 
 
-T = [Register(f"t{i}") for i in range(9)]
-ARG = [Register(f"a{i}") for i in range(4)]
-ZERO = Register("zero")
-LOW = Register("low")
-V0 = Register("v0")
-V1 = Register("v1")
-A0 = Register("a0")
-FP = Register("fp")
-SP = Register("sp")
-RA = Register("ra")
+# Double word
+dw = 4
+
+# Temporal
+t0 = Register("t0")
+t1 = Register("t1")
+t2 = Register("t2")
+
+# Argument
+a0 = Register("a0")
+a1 = Register("a1")
+a2 = Register("a2")
+
+# Zero
+zero = Register("zero")
+
+# Return
+v0 = Register("v0")
+
+# Frame Pointer
+fp = Register("fp")
+
+# Stack Pointer
+sp = Register("sp")
+
+# RA
+ra = Register("ra")

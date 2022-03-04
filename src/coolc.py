@@ -15,7 +15,6 @@ from coolcmp.utils.ast_formatter import ASTFormatter
 from coolcmp.utils.cil_formatter import CILFormatter
 
 from coolcmp.utils.cil import ProgramNode
-from coolcmp.utils.registers import FP
 
 
 def main(cool_code: str, run: bool, verbose: bool):
