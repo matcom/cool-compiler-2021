@@ -399,7 +399,7 @@ class CCILGenerator:
             self.update_locals(expr_fval.id, pre_fvalue_id)
             expr_fval.id = pre_fvalue_id
             # Translating to ccil of branch logic
-            branch_ops += [branch_label, *expr_ops, final_goto]
+            branch_ops += [branch_label, branch_var, *expr_ops, final_goto]
             self.ccil_cool_names = self.ccil_cool_names.get_parent
 
         self.locals[pre_fvalue_id] = node.type.name
