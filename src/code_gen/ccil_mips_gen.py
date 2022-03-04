@@ -650,6 +650,41 @@ class CCILToMIPSGenerator:
         )
         return instructions
 
+    @visitor.when(ccil_ast.IfNode)
+    def visit(self, node: ccil_ast.IfFalseNode):
+        instructions = []
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                mips_ast.RegisterNode(node, T0),
+                self._get_relative_location(node.eval_value.value),
+            )
+        )
+
+        instructions.append(
+            mips_ast.LoadWord(
+                node,
+                mips_ast.RegisterNode(node, T1),
+                mips_ast.MemoryIndexNode(
+                    node, mips_ast.Constant(node, WORD), mips_ast.RegisterNode(node, T0)
+                ),
+            )
+        )
+        instructions.append(
+            mips_ast.LoadImmediate(
+                node, mips_ast.RegisterNode(node, T2), mips_ast.Constant(node, 1)
+            )
+        )
+        instructions.append(
+            mips_ast.BranchOnEqual(
+                node,
+                mips_ast.RegisterNode(node, T1),
+                mips_ast.RegisterNode(node, T2),
+                mips_ast.Label(node, node.target.id),
+            )
+        )
+        return instructions
+
     @visitor.when(ccil_ast.GoToNode)
     def visit(self, node: ccil_ast.GoToNode):
         instructions = []
@@ -1294,7 +1329,9 @@ class CCILToMIPSGenerator:
 
         instructions.append(
             mips_ast.StoreWord(
-                node, mips_ast.RegisterNode(node, V0), self._get_relative_location(node.dest)
+                node,
+                mips_ast.RegisterNode(node, V0),
+                self._get_relative_location(node.dest),
             )
         )
         return instructions
