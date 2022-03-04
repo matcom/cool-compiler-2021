@@ -112,9 +112,10 @@ class BackInferencer:
         new_body_node = self.visit(node.body, scope)
         body_type = new_body_node.inferenced_type.swap_self_type(self.current_type)
         new_node = MethodDeclarationNode(new_params, node.type, new_body_node, node)
-        decl_type = node.inferenced_type
+        decl_type = node.inferenced_type.clone().swap_self_type(self.current_type)
         body_type = new_body_node.inferenced_type
         new_node.inferenced_type, changed = unify(decl_type, body_type)
+        new_node.inferenced_type.swap_self_type(self.current_type, back=True)
         self.changed |= changed
         return new_node
 
