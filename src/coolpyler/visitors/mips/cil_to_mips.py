@@ -1152,26 +1152,26 @@ class CilToMIPS:
     @visitor.when(cil.ReadNode)
     def visit(self, node: cil.ReadNode):
         instructions = []
-        self.memory_manager.save()
-
-        dest_dir = self.search_mem(node.dest)
-
-        if node.is_string:
-            n = 5
-        else:
-            n = 8
-
-        instructions.append(mips.LoadInmediateNode(V0_REG, n, f"READ"))
-        instructions.append(mips.SyscallNode())
-        instructions.append(
-            mips.StoreWordNode(
-                V0_REG,
-                mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
-                f"Save readed value",
-            )
-        )
-
-        self.memory_manager.clean()
+        # self.memory_manager.save()
+        #
+        # dest_dir = self.search_mem(node.dest)
+        #
+        # if node.is_string:
+        #     n = 5
+        # else:
+        #     n = 8
+        #
+        # instructions.append(mips.LoadInmediateNode(V0_REG, n, f"READ"))
+        # instructions.append(mips.SyscallNode())
+        # instructions.append(
+        #     mips.StoreWordNode(
+        #         V0_REG,
+        #         mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+        #         f"Save readed value",
+        #     )
+        # )
+        #
+        # self.memory_manager.clean()
         return instructions
 
     @visitor.when(cil.PrintNode)
