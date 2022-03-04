@@ -1,6 +1,6 @@
 class Main inherits IO {
     main(): IO {
-        (let a: String <- "hello, ", b: String <- "world\n" in
-         out_string(a.concat(b).substr(7, 7)))
+        -- let a: String <- "x".concat("o") in if a = "00000xoo" then out_string("true") else out_string("false") fi
+        out_int(65505*65505)
     };
 };
