@@ -592,19 +592,17 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.GetAttrNode(cond_ret, 0, cond_ret_attr))
         self.instructions.append(cil.GotoIfNode(cond_ret_attr, then_label))
 
-        # GOTO else_label
-        self.instructions.append(cil.GotoNode(else_label))
+        # Label else_label
+        self.instructions.append(cil.LabelNode(else_label))
+        else_ret = self.visit(node.else_expr)
+        self.instructions.append(cil.AssignNode(return_local, else_ret))
+        # GoTo continue_label
+        self.instructions.append(cil.GotoNode(continue_label))
 
         # Label then_label
         self.instructions.append(cil.LabelNode(then_label))
         then_ret = self.visit(node.then_expr)
         self.instructions.append(cil.AssignNode(return_local, then_ret))
-        self.instructions.append(cil.GotoNode(continue_label))
-
-        # Label else_label
-        self.instructions.append(cil.LabelNode(else_label))
-        else_ret = self.visit(node.else_expr)
-        self.instructions.append(cil.AssignNode(return_local, else_ret))
 
         # Label continue_label
         self.instructions.append(cil.LabelNode(continue_label))
