@@ -115,11 +115,11 @@ class CCILGenerator:
                 func_nodes.append(feature)
 
         # Create init func using attributes and their expressions
+        self.ccil_cool_names.add_new_names(*[(a.cool_id, a.id) for a in attributes])
         init_func = self.create_class_init_func(node, attr_nodes)
 
-        self.reset_scope()
+        # self.reset_scope()
         # Explore all functions
-        self.ccil_cool_names.add_new_names(*[(a.cool_id, a.id) for a in attributes])
         class_code: List[FunctionNode] = []
         for func in func_nodes:
             f = self.visit(func)
@@ -705,10 +705,10 @@ class CCILGenerator:
         attr_nodes: List[sem_ast.AttrDeclarationNode],
     ):
         self.reset_locals()
-        self.reset_scope()
 
+        self.ccil_cool_names = self.ccil_cool_names.create_child()
+        self.ccil_cool_names.add_new_name_pair("self", "self")
         init_params = self.init_func_params(node.id)
-        # self.ccil_cool_names.add_new_name_pair("self", node.id)
 
         # First operation, initalizing parent attributes
         init_parent = self.create_call(
@@ -728,6 +728,7 @@ class CCILGenerator:
         dummy_return = self.create_storage(f"init_type_{node.id}_ret", INT, IntNode(0))
         init_attr_ops.append(dummy_return)
 
+        self.ccil_cool_names = self.ccil_cool_names.get_parent
         # return init function
         return FunctionNode(
             f"init_{node.id}",
