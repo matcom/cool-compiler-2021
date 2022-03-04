@@ -146,13 +146,12 @@ class GotoIfEqNode(InstructionNode):
         self.label = label
 
 
-class GotoIfEqStrNode(InstructionNode):
-    def __init__(self, str1, str2, label, dest) -> None:
+class StrEqNode(InstructionNode):
+    def __init__(self, dest, str1, str2) -> None:
         super().__init__()
+        self.dest = dest
         self.str1 = str1
         self.str2 = str2
-        self.label = label
-        self.dest = dest
 
 
 class StaticCallNode(InstructionNode):
