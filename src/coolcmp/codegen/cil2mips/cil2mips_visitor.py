@@ -198,6 +198,7 @@ class CILToMipsVisitor:
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
         address = self.get_address(node.addr)
+        self_address = self.get_address('self')
 
         self.add_inst(
             mips.CommentNode(f"<printint:{node.addr}>"),
@@ -206,6 +207,7 @@ class CILToMipsVisitor:
             mips.LINode(v0, 1),
             mips.LWNode(a0, (0, a0)),
             mips.SysCallNode(),
+            mips.LWNode(v0, (self_address, fp)),
             mips.CommentNode(f"</printint:{node.addr}>"),
         )
 
@@ -221,7 +223,7 @@ class CILToMipsVisitor:
             mips.LINode(v0, 4),
             mips.LWNode(a0, (0, a0)),
             mips.SysCallNode(),
-            mips.LWNode(t0, (self_address, fp)),
+            mips.LWNode(v0, (self_address, fp)),
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
 
