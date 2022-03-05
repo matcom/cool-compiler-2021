@@ -148,7 +148,9 @@ class CILBuilder:
         return data_node
 
     def is_attribute(self, vname):
-        return vname not in [var.name for var in self.current_function.localvars]
+        return vname not in [var.name for var in self.current_function.localvars] and (
+            vname not in [param.name for param in self.current_function.params]
+        )
 
     # def builtin_constructor(self):
     #     built = ["Object", "IO", "Int", "Bool", "String"]
