@@ -185,10 +185,10 @@ class CILBuilder:
             self.register_instruction(DefaultValueNode(default_var, attr.type))
             self.register_instruction(
                 SetAttribNode(
-                    node.id,
+                    self_var,
                     self.to_attr_name(self.current_type.name, attr.id),
                     default_var,
-                    self_var,
+                    node.id,
                 )
             )
 
@@ -197,10 +197,10 @@ class CILBuilder:
                 init_expr_value = self.visit(attr.init_exp)
                 self.register_instruction(
                     SetAttribNode(
-                        node.id,
+                        self_var,
                         self.to_attr_name(self.current_type.name, attr.id),
                         init_expr_value,
-                        self_var,
+                        node.id,
                     )
                 )
 
