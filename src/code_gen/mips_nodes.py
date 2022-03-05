@@ -41,10 +41,18 @@ class DataTransferWithOffset(DataTransferNode):
 class LoadWordNode(DataTransferWithOffset):
     def __str__(self):
         return f'lw {self.source}, {str(self.offset)}({self.destination})'
+    
+class LoadByteNode(DataTransferWithOffset):
+    def __str__(self):
+        return f'lb {self.source}, {str(self.offset)}({self.destination})'
         
 class StoreWordNode(DataTransferWithOffset):
     def __str__(self):
         return f'sw {self.source}, {str(self.offset)}({self.destination})'
+    
+class StoreByteNode(DataTransferWithOffset):
+    def __str__(self):
+        return f'sb {self.source}, {str(self.offset)}({self.destination})'
     
 class LoadNode(DataTransferNode):
     def __init__(self,dest,value):

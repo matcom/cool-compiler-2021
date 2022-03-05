@@ -237,10 +237,13 @@ class CopyNode(InstructionNode):
         self.source = source
 
 
-class PrintNode(InstructionNode):
+class PrintStrNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
 
+class PrintIntNode(InstructionNode):
+    def __init__(self, str_addr):
+        self.int_addr = str_addr
 
 class TypeNameNode(InstructionNode):
     def __init__(self, dest, source):
