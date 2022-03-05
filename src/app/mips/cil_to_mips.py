@@ -33,10 +33,6 @@ class LabelGenerator:
         self.type_count += 1
         return f'type_{self.type_count}'
 
-    def generate_data_label(self):
-        self.data_count += 1
-        return f'data_{self.data_count}'
-
     def generate_code_label(self):
         self.code_count += 1
         return f'L_{self.code_count}'
@@ -56,9 +52,6 @@ class CILToMIPSVisitor:
 
     def generate_type_label(self):
         return self._label_generator.generate_type_label()
-
-    def generate_data_label(self):
-        return self._label_generator.generate_data_label()
 
     def generate_code_label(self):
         return self._label_generator.generate_code_label()
@@ -131,8 +124,7 @@ class CILToMIPSVisitor:
 
     @visitor.when(cil.TypeNode)
     def visit(self, node):
-        name_label = self.generate_data_label()
-        self._data_section[node.name] = mips.StringConst(name_label, node.name)
+        self._data_section[node.name] = mips.StringConst(node.name, node.name)
 
         type_label = self.generate_type_label()
         methods = {key: value
@@ -140,15 +132,14 @@ class CILToMIPSVisitor:
         defaults = []
         if node.name == "String":
             defaults = [('value', 'default_str'), ('length', 'type_4_proto')]
-        new_type = mips.MIPSType(type_label, name_label, node.attributes, methods, len(
+        new_type = mips.MIPSType(type_label, node.name, node.attributes, methods, len(
             self._types), default=defaults)
 
         self._types[node.name] = new_type
 
     @visitor.when(cil.DataNode)
     def visit(self, node):
-        label = self.generate_data_label()
-        self._data_section[node.name] = mips.StringConst(label, node.value)
+        self._data_section[node.name] = mips.StringConst(node.name, node.value)
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node):
@@ -339,7 +330,7 @@ class CILToMIPSVisitor:
         instructions = []
 
         string_location = mips.LabelRelativeLocation(
-            self._data_section[node.msg.name].label, 0)
+            node.msg.name, 0)
         reg = self.memory_manager.get_reg_for_var(node.dest)
         if reg is None:
             instructions.append(mips.LoadAddressNode(
