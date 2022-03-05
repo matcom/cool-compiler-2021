@@ -180,6 +180,7 @@ class CILBuilder:
                     node.id,
                     self.to_attr_name(self.current_type.name, attr.id),
                     default_var,
+                    node.id,
                 )
             )
 
@@ -188,9 +189,10 @@ class CILBuilder:
                 init_expr_value = self.visit(attr.init_exp)
                 self.register_instruction(
                     SetAttribNode(
-                        node.type,
+                        node.id,
                         self.to_attr_name(self.current_type.name, attr.id),
                         init_expr_value,
+                        node.id,
                     )
                 )
 
@@ -470,7 +472,9 @@ class CILBuilder:
         expr = self.visit(node.expr)
 
         if self.is_attribute(node.id):
-            self.register_instruction(SetAttribNode("self", node.id, expr))
+            self.register_instruction(
+                SetAttribNode("self", node.id, expr, self.current_type.name)
+            )
         else:
             self.register_instruction(AssignNode(node.id, expr))
 
@@ -699,7 +703,9 @@ class CILBuilder:
     def visit(self, node):
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
-        return idx
+        solve = self.define_internal_local()
+        self.register_instruction(LoadNode(solve,idx))
+        return solve
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node):

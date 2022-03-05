@@ -108,17 +108,19 @@ class IntComplementNode(UnaryNode):
 
 
 class GetAttribNode(InstructionNode):
-    def __init__(self, dest, typex, attr):
+    def __init__(self, dest, instance, attr, typex):
         self.dest = dest
-        self.type = typex
+        self.instance = instance
         self.attr = attr
+        self.type = typex
 
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, typex, attr, value):
-        self.type = typex
+    def __init__(self, instance, attr, value, typex):
+        self.instance = instance
         self.value = value
         self.attr = attr
+        self.type = typex
 
 
 class ArrayNode(InstructionNode):
@@ -168,10 +170,11 @@ class StaticCallNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
-        self.type = xtype
+    def __init__(self, instance, method, dest, typex):
+        self.instance = instance
         self.method = method
         self.dest = dest
+        self.type = typex
 
 
 class ArgNode(InstructionNode):
