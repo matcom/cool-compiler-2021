@@ -240,7 +240,7 @@ class PrintNode(InstructionNode):
         self.str_addr = str_addr
 
 
-class Complement(InstructionNode):
+class ComplementNode(InstructionNode):
     def __init__(self, dest, source):
         self.source = source
         self.dest = dest
