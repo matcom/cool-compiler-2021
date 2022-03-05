@@ -495,7 +495,6 @@ class CILBuilder:
             if not node.at_type
             else self.to_function_name(node.id, node.at_type)
         )
-
         if node.obj:
             self.visit(node.obj)
 
@@ -721,7 +720,7 @@ class CILBuilder:
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
         solve = self.define_internal_local()
-        self.register_instruction(LoadNode(solve, idx))
+        self.register_instruction(LoadNode(solve, VariableInfo(idx, False, node.lex)))
         return solve
 
     @visitor.when(cool.BooleanNode)
