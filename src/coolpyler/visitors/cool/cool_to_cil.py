@@ -685,7 +685,6 @@ class CoolToCilVisitor(object):
                 if not t.conforms_to(btyp):
                     continue
 
-                self.instructions.append(cil.CommentNode(f"Start of branch {t.name}"))
                 runtime_type_local = self.register_local()
                 self.instructions.append(cil.TypeOfNode(expr_local, runtime_type_local))
                 branch_type_local = self.register_local()
@@ -697,7 +696,6 @@ class CoolToCilVisitor(object):
                 branch_label = self.get_label("case_branch")
                 branch_labels.append((branch_label, b))
                 self.instructions.append(cil.GotoIfEqNode(types_eq_local, branch_label))
-                self.instructions.append(cil.CommentNode(f""))
                 break
 
         data = self.register_data("case_err", '"Case of did not match any branch!"')

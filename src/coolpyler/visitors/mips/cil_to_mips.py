@@ -1276,4 +1276,3 @@ class CilToMIPS:
 
         self.memory_manager.clean()
         return instructions
-
