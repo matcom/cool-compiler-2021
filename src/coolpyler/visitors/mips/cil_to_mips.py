@@ -1156,43 +1156,43 @@ class CilToMIPS:
     @visitor.when(cil.ReadNode)
     def visit(self, node: cil.ReadNode):
         instructions = []
-        # self.memory_manager.save()
+        self.memory_manager.save()
 
-        # dest_dir = self.search_mem(node.dest)
+        dest_dir = self.search_mem(node.dest)
 
-        # if node.is_string:
-        #     n = 8
+        if node.is_string:
+            n = 8
 
-        #     instructions.append(mips.LoadInmediateNode(V0_REG, 9))
-        #     instructions.append(mips.LoadInmediateNode(ARG_REGISTERS[0], 2000))
-        #     instructions.append(mips.SyscallNode())
+            instructions.append(mips.LoadInmediateNode(V0_REG, 9))
+            instructions.append(mips.LoadInmediateNode(ARG_REGISTERS[0], 2000))
+            instructions.append(mips.SyscallNode())
 
-        #     instructions.append(mips.MoveNode(ARG_REGISTERS[0], V0_REG))
-        #     instructions.append(mips.LoadInmediateNode(ARG_REGISTERS[1], 2001))
+            instructions.append(mips.MoveNode(ARG_REGISTERS[0], V0_REG))
+            instructions.append(mips.LoadInmediateNode(ARG_REGISTERS[1], 2001))
 
-        #     instructions.append(mips.LoadInmediateNode(V0_REG, n, f"READ string"))
-        #     instructions.append(mips.SyscallNode())
+            instructions.append(mips.LoadInmediateNode(V0_REG, n, f"READ string"))
+            instructions.append(mips.SyscallNode())
 
-        #     instructions.append(
-        #         mips.StoreWordNode(
-        #             ARG_REGISTERS[0],
-        #             mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
-        #             f"Save readed value",
-        #         )
-        #     )
+            instructions.append(
+                mips.StoreWordNode(
+                    ARG_REGISTERS[0],
+                    mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                    f"Save readed value",
+                )
+            )
 
-        # else:
-        #     n = 5
+        else:
+            n = 5
 
-        #     instructions.append(mips.LoadInmediateNode(V0_REG, n, f"READ"))
-        #     instructions.append(mips.SyscallNode())
-        #     instructions.append(
-        #         mips.StoreWordNode(
-        #             V0_REG,
-        #             mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
-        #             f"Save readed value",
-        #         )
-        #     )
+            instructions.append(mips.LoadInmediateNode(V0_REG, n, f"READ"))
+            instructions.append(mips.SyscallNode())
+            instructions.append(
+                mips.StoreWordNode(
+                    V0_REG,
+                    mips.MemoryAddressRegisterNode(FP_REG, dest_dir),
+                    f"Save readed value",
+                )
+            )
 
         self.memory_manager.clean()
         return instructions
