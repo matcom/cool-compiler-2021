@@ -153,13 +153,18 @@ class CILBuilder:
             vname not in [param.name for param in self.current_function.params]
         )
 
-    # def builtin_constructor(self):
-    #     built = ["Object", "IO", "Int", "Bool", "String"]
-    #     for c in built:
+    def add_builtin_constructors(self):
+        builtin_types = ["Object", "IO", "Int", "Bool", "String"]
+        for typex in builtin_types:
+            self.current_function = FunctionNode(
+                self.to_function_name("constructor", typex), [], [], []
+            )
+            instance = self.define_internal_local()
+            self.register_instruction(AllocateNode(typex, instance))
+            self.register_instruction(ReturnNode(instance))
+            self.code.append(self.current_function)
 
-    #         self.code.append(LabelIL(c, "Constructor", True))
-    #         self.code.append(PushIL())  # No result, but needed in logic
-    #         self.code.append(ReturnIL())
+        self.current_function = None
 
     def build_constructor(self, node):
         self.current_function = self.register_function(
@@ -183,7 +188,7 @@ class CILBuilder:
                     node.id,
                     self.to_attr_name(self.current_type.name, attr.id),
                     default_var,
-                    node.id,
+                    self_var,
                 )
             )
 
@@ -195,7 +200,7 @@ class CILBuilder:
                         node.id,
                         self.to_attr_name(self.current_type.name, attr.id),
                         init_expr_value,
-                        node.id,
+                        self_var,
                     )
                 )
 
@@ -349,6 +354,7 @@ class CILBuilder:
         self.context = node.context
 
         self.add_builtin_functions()
+        self.add_builtin_constructors()
 
         self.current_function = FunctionNode("main", [], [], [])
         self.code.append(self.current_function)
