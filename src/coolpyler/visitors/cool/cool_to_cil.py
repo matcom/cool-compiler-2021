@@ -949,7 +949,7 @@ class CoolToCilVisitor(object):
         if any(param_sid == p.name for p in self.params):
             return param_sid
 
-        local_sid = self.register_local(node.value)
+        local_sid = self.register_local()
         attr_id = self.get_attr_id(self.type, node.value)
         self.instructions.append(
             cil.GetAttrNode(self.get_param("self"), attr_id, local_sid)
