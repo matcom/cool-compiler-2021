@@ -410,9 +410,13 @@ class PrintVisitor(object):
     def visit(self, node):
         return f"{node.dest} = READ"
 
-    @visitor.when(PrintNode)
+    @visitor.when(PrintStrNode)
     def visit(self, node):
-        return f"PRINT {node.str_addr}"
+        return f"PRINT STR{node.str_addr}"
+
+    @visitor.when(PrintIntNode)
+    def visit(self, node):
+        return f"PRINT INT{node.str_addr}"
 
     @visitor.when(LengthNode)
     def visit(self, node):
