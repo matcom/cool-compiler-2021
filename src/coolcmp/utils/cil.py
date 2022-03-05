@@ -107,6 +107,7 @@ class TypeNode(Node):
         self.methods = methods
         self.attr_expr_nodes = attr_expr_nodes or {}
         self.total_methods: int | None = None
+        self.init_locals: list[LocalNode] = []
 
     # Add the expression node of the attributes, so when is created an instance
     #   get quick access to the instructions of the attribute initialization.
@@ -115,6 +116,9 @@ class TypeNode(Node):
 
     def get_attr_node(self, attr: str):
         return self.attr_expr_nodes.get(attr)
+
+    def add_local(self, local: LocalNode):
+        return self.init_locals.append(local)
 
 
 class DataNode(Node):
@@ -362,9 +366,8 @@ class LessEqualNode(CompareNode):
 
 
 class EqualNode(CompareNode):
-    def __init__(self, dest: str, left: str, right: str, by_value: bool):
+    def __init__(self, dest: str, left: str, right: str):
         super().__init__(dest, left, right)
-        self.by_value = by_value
 
 
 class IsVoidNode(InstructionNode):
@@ -377,3 +380,8 @@ class TypeNameNode(InstructionNode):
     def __init__(self, dest: str, src: str):
         self.dest = dest
         self.src = src
+
+
+class InitNode(InstructionNode):
+    def __init__(self, type_name: str):
+        self.type_name = type_name

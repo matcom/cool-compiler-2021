@@ -29,15 +29,18 @@ class DotTypesDataVisitor:
                 name='Object',
                 attrs=[],
                 methods={
+                    'Object__init': 'Object__init',
                     'Object_abort': 'Object_abort',
                     'Object_type_name': 'Object_type_name',
                     'Object_copy': 'Object_copy',
+                    # 'Object__eq': 'Object__eq',
                 }
             ),
             cil.TypeNode(
                 name='IO',
                 attrs=[],
                 methods={
+                    'IO__init': 'IO__init',
                     'IO_abort': 'Object_abort',
                     'IO_type_name': 'Object_type_name',
                     'IO_copy': 'Object_copy',
@@ -53,6 +56,7 @@ class DotTypesDataVisitor:
                     'String_value',
                 ],
                 methods={
+                    'String__init': 'String__init',
                     'String_abort': 'Object_abort',
                     'String_type_name': 'Object_type_name',
                     'String_copy': 'Object_copy',
@@ -67,9 +71,12 @@ class DotTypesDataVisitor:
                     'Bool_value',
                 ],
                 methods={
+                    'Bool__init': 'Bool__init',
                     'Bool_abort': 'Object_abort',
                     'Bool_type_name': 'Object_type_name',
                     'Bool_copy': 'Object_copy',
+                    # 'Bool__lt': 'Bool__lt',
+                    # 'Bool__lte': 'Bool__lte',
                 }
             ),
             cil.TypeNode(
@@ -78,15 +85,21 @@ class DotTypesDataVisitor:
                     'Int_value',
                 ],
                 methods={
+                    'Int__init': 'Int__init',
                     'Int_abort': 'Object_abort',
                     'Int_type_name': 'Object_type_name',
                     'Int_copy': 'Object_copy',
+                    # 'Int__plus': 'Int__plus',
+                    # 'Int__minus': 'Int__minus',
+                    # 'Int__star': 'Int__star',
+                    # 'Int__div': 'Int__div',
                 }
             ),
             cil.TypeNode(
                 name='Void',
                 attrs=[],
                 methods={
+                    'Void_init': 'Void__init',
                     'Void_abort': 'Object_abort',
                     'Void_type_name': 'Object_type_name',
                     'Void_copy': 'Object_copy',

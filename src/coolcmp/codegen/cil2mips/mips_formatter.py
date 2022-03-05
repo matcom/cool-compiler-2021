@@ -28,14 +28,14 @@ class MIPSFormatter:
         functions = "\n# functions\n.text\n.globl main\n" + "\n".join(
             self.visit(f) for f in node.functions
         )
-        inits_seg = ""
-        for type_ in node.types:
-            inits_seg += (f"_{type_.label}_init:\n\t" +
-                          "\n\t".join(str(inst) for inst in type_.init) +
-                          "\n")
+        # inits_seg = ""
+        # for type_ in node.types:
+        #     inits_seg += (f"_{type_.label}_init:\n\t" +
+        #                   "\n\t".join(str(inst) for inst in type_.init) +
+        #                   "\n")
         template_code = load_templates()
 
-        return "\n".join([data, void, type_defs, functions, inits_seg, template_code])
+        return "\n".join([data, void, type_defs, functions, template_code])     # , inits_seg
 
     @visitor.when(mips.Type)
     def visit(self, node: mips.Type):

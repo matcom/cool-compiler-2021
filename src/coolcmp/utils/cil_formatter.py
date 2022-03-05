@@ -35,6 +35,7 @@ class CILFormatter(object):
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
+        print(node.name)
         params = '\n    '.join(self.visit(x) for x in node.params)
         local_vars = '\n    '.join(self.visit(x) for x in node.local_vars)
         instructions = '\n    '.join(self.visit(x) for x in node.instructions)
@@ -165,3 +166,7 @@ class CILFormatter(object):
     @visitor.when(cil.TypeNameNode)
     def visit(self, node: cil.TypeNameNode):
         return f'{node.dest} = TYPENAME {node.src}'
+
+    @visitor.when(cil.InitNode)
+    def visit(self, node: cil.InitNode):
+        return f'INIT {node.type_name}'

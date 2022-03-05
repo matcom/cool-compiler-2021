@@ -65,32 +65,42 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
-        init = [
-            mips.SUBUNode(sp, sp, 24),
-            mips.SWNode(ra, 8, sp),
-            mips.SWNode(fp, 4, sp),
-            mips.ADDUNode(fp, sp, 20),
-
-            mips.LWNode(a0, node.name),
-            mips.JALNode('malloc'),
-            mips.LANode(t0, node.name),
-            mips.SWNode(t0, 0, v0),
-
-            mips.LWNode(ra, (8, sp)),
-            mips.LWNode(fp, (4, sp)),
-            mips.ADDUNode(sp, sp, 24),
-            mips.JRNode(ra),
-        ]
+        # init = [
+        #     mips.SUBUNode(sp, sp, 24),
+        #     mips.SWNode(ra, 8, sp),
+        #     mips.SWNode(fp, 4, sp),
+        #     mips.ADDUNode(fp, sp, 20),
+        #     mips.ADDINode(sp, sp, -len(node.init_locals)),
+        #
+        #     mips.LWNode(a0, node.name),
+        #     mips.JALNode('malloc'),
+        #     mips.LANode(t0, node.name),
+        #     mips.SWNode(t0, 0, v0),
+        #
+        #     mips.LWNode(ra, (8, sp)),
+        #     mips.LWNode(fp, (4, sp)),
+        #     mips.ADDUNode(sp, sp, 24),
+        #     mips.JRNode(ra),
+        # ]
         type_ = mips.Type(
             label=node.name,
             attrs=list(node.attributes),
             methods=node.methods,
             total_methods=node.total_methods,
             index=len(self.types),
-            init=init
+            # init=init
         )
 
         self.types[node.name] = type_
+
+    @visitor.when(cil.InitNode)
+    def visit(self, node: cil.InitNode):
+        self.add_inst(
+            mips.LWNode(a0, node.type_name),
+            mips.JALNode('malloc'),
+            mips.LANode(t0, node.type_name),
+            mips.SWNode(t0, 0, v0),
+        )
 
     @visitor.when(cil.DataNode)
     def visit(self, node: cil.DataNode):
@@ -98,6 +108,7 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
+        print(node.name, [p.name for p in node.params], [l.name for l in node.local_vars])
         params = [x.name for x in node.params]
         local_vars = [x.name for x in node.local_vars]
 
@@ -147,7 +158,7 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<allocate:{node.type}-{node.dest}>"),
-            mips.JALNode(f"_{node.type}_init"),
+            mips.JALNode(f"{node.type}__init"),
             mips.SWNode(v0, dest_address, fp),
             mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
         )
@@ -219,6 +230,7 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
+        print(self.cur_function.name, self.cur_function.params, self.cur_function.local_vars)
         obj_address = self.get_address(node.obj)
         meth_offset = self.get_method_index(node.method)
         dest_address = self.get_address(node.dest)
@@ -233,6 +245,17 @@ class CILToMipsVisitor:
             mips.SWNode(v0, dest_address, fp),
             mips.ADDINode(sp, sp, args_space)       .with_comm("Pop args pushed"),
             mips.CommentNode(f"</dynamiccall:{node.obj}-{node.method}-{node.dest}>"),
+        )
+
+    @visitor.when(cil.StaticCallNode)
+    def visit(self, node: cil.StaticCallNode):
+        dest = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<staticcall:{node.function}-{node.dest}>"),
+            mips.JALNode(node.function),
+            mips.SWNode(v0, dest, fp),
+            mips.CommentNode(f"</staticcall:{node.function}-{node.dest}>"),
         )
 
     @visitor.when(cil.ArgNode)
@@ -260,11 +283,11 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<plus:{node.dest}<-{node.left}+{node.right}>"),
-            mips.LWNode(t0, (left_offset, fp)) .with_comm(' load Int_value at offset 4'),
-            mips.LWNode(t0, (4, t0)),
-            mips.LWNode(t1, (right_offset, fp)) .with_comm('load Int_value at offset 4'),
-            mips.LWNode(t1, (4, t1)),
-            mips.ADDNode(t2, t0, t1) .with_comm('subtract the integer values'),
+            mips.LWNode(t0, (left_offset, fp)),
+            mips.LWNode(t0, (4, t0))                .with_comm('Load Int_value at offset 4'),
+            mips.LWNode(t1, (right_offset, fp)),
+            mips.LWNode(t1, (4, t1))                .with_comm('Load Int_value at offset 4'),
+            mips.ADDNode(t2, t0, t1)                .with_comm('Add the integer values'),
         )
 
         self.visit(cil.AllocateNode('Int', node.dest))

@@ -15,6 +15,7 @@ class DotCodeVisitor:
         self.code = cil_root.dot_code
         self.current_function: cil.FunctionNode | None = None
         self.current_type: str | None = None
+        self.current_init: cil.FunctionNode | None = None
         self.label_count = -1
 
     def new_label(self, name: str) -> cil.LabelNode:
@@ -71,7 +72,9 @@ class DotCodeVisitor:
                         # void = self.add_local('void', internal=False)
                         # self.add_inst(cil.AssignNode(void, void_dest))
                         main_scope = deepcopy(scope.get_tagged_scope('Main'))
-                        instance = self.visit(ast.InstantiateNode('Main'), main_scope)
+                        instance = self.add_local('main_instance')
+                        # instance = self.visit(ast.InstantiateNode('Main'), main_scope)
+                        self.add_inst(cil.StaticCallNode('Main__init', instance))
                         self.add_comment('Calling main')
                         result = self.add_local('result')
                         self.add_inst(cil.ArgNode(instance))
@@ -86,6 +89,14 @@ class DotCodeVisitor:
         # add the default functions of COOL
         # TODO: add missing instructions
         self.code += [
+            cil.FunctionNode(
+                name='Object__init',
+                params=[],
+                local_vars=[],
+                instructions=[
+                    cil.InitNode('Object'),
+                ]
+            ),
             cil.FunctionNode(
                 name='Object_abort',
                 params=[
@@ -120,6 +131,28 @@ class DotCodeVisitor:
                 instructions=[
                     cil.AssignNode('self_copy', 'self'),
                     cil.ReturnNode('self_copy'),
+                ]
+            ),
+            # cil.FunctionNode(
+            #      name='Object__eq',
+            #      params=[
+            #          cil.ParamNode('self'),
+            #          cil.ParamNode('other_bool'),
+            #      ],
+            #      local_vars=[
+            #          cil.LocalNode('result'),
+            #      ],
+            #      instructions=[
+            #          cil.EqualNode('result', 'self', 'other_bool'),
+            #          cil.ReturnNode('result'),
+            #      ]
+            # ),
+            cil.FunctionNode(
+                name='IO__init',
+                params=[],
+                local_vars=[],
+                instructions=[
+                    cil.InitNode('IO'),
                 ]
             ),
             cil.FunctionNode(
@@ -173,6 +206,14 @@ class DotCodeVisitor:
                 ]
             ),
             cil.FunctionNode(
+                name='String__init',
+                params=[],
+                local_vars=[],
+                instructions=[
+                    cil.InitNode('String'),
+                ]
+            ),
+            cil.FunctionNode(
                 name='String_length',
                 params=[
                     cil.ParamNode('self'),
@@ -213,15 +254,145 @@ class DotCodeVisitor:
                     cil.SubstringNode('result', 'value', 'index', 'length'),
                     cil.ReturnNode('result'),
                 ]
-            )
+            ),
+            cil.FunctionNode(
+                name='Bool__init',
+                params=[],
+                local_vars=[],
+                instructions=[
+                    cil.InitNode('Bool'),
+                ]
+            ),
+            # cil.FunctionNode(
+            #     name='Bool__lt',
+            #     params=[
+            #         cil.ParamNode('self'),
+            #         cil.ParamNode('other_bool'),
+            #     ],
+            #     local_vars=[
+            #         cil.LocalNode('result'),
+            #     ],
+            #     instructions=[
+            #         cil.LessThanNode('result', 'self', 'other_bool'),
+            #         cil.ReturnNode('result'),
+            #     ]
+            # ),
+            # cil.FunctionNode(
+            #     name='Bool__lte',
+            #     params=[
+            #         cil.ParamNode('self'),
+            #         cil.ParamNode('other_bool'),
+            #     ],
+            #     local_vars=[
+            #         cil.LocalNode('result'),
+            #     ],
+            #     instructions=[
+            #         cil.LessEqualNode('result', 'self', 'other_bool'),
+            #         cil.ReturnNode('result'),
+            #     ]
+            # ),
+            cil.FunctionNode(
+                name='Int__init',
+                params=[],
+                local_vars=[],
+                instructions=[
+                    cil.InitNode('Int'),
+                ]
+            ),
+            # cil.FunctionNode(
+            #     name='Int__plus',
+            #     params=[
+            #         cil.ParamNode('self'),
+            #         cil.ParamNode('other_int'),
+            #     ],
+            #     local_vars=[
+            #         cil.LocalNode('result'),
+            #     ],
+            #     instructions=[
+            #         cil.PlusNode('result', 'self', 'other_int'),
+            #         cil.ReturnNode('result'),
+            #     ]
+            # ),
+            # cil.FunctionNode(
+            #     name='Int__minus',
+            #     params=[
+            #         cil.ParamNode('self'),
+            #         cil.ParamNode('other_int'),
+            #     ],
+            #     local_vars=[
+            #         cil.LocalNode('result'),
+            #     ],
+            #     instructions=[
+            #         cil.MinusNode('result', 'self', 'other_int'),
+            #         cil.ReturnNode('result'),
+            #     ]
+            # ),
+            # cil.FunctionNode(
+            #     name='Int__star',
+            #     params=[
+            #         cil.ParamNode('self'),
+            #         cil.ParamNode('other_int'),
+            #     ],
+            #     local_vars=[
+            #         cil.LocalNode('result'),
+            #     ],
+            #     instructions=[
+            #         cil.StarNode('result', 'self', 'other_int'),
+            #         cil.ReturnNode('result'),
+            #     ]
+            # ),
+            # cil.FunctionNode(
+            #     name='Int__div',
+            #     params=[
+            #         cil.ParamNode('self'),
+            #         cil.ParamNode('other_int'),
+            #     ],
+            #     local_vars=[
+            #         cil.LocalNode('result'),
+            #     ],
+            #     instructions=[
+            #         cil.DivNode('result', 'self', 'other_int'),
+            #         cil.ReturnNode('result'),
+            #     ]
+            # ),
+            cil.FunctionNode(
+                name='Void__init',
+                params=[],
+                local_vars=[],
+                instructions=[
+                    cil.InitNode('Void'),
+                ]
+            ),
         ]
 
     @visitor.when(ast.ClassDeclarationNode)
     def visit(self, node: ast.ClassDeclarationNode, scope: Scope):
         self.current_type = node.id
-        methods = (f for f in node.features if isinstance(f, ast.FuncDeclarationNode))
-        for method in methods:
-            self.visit(method, scope.get_tagged_scope(method.id))
+        init = cil.FunctionNode(
+            name=f'{node.id}__init',
+            params=[],
+            local_vars=[],
+            instructions=[
+                cil.InitNode(node.id),
+            ]
+        )
+        self.root.dot_code.append(init)
+        self.current_init = init
+
+        for feat in node.features:
+            if isinstance(feat, ast.AttrDeclarationNode):
+                print(f'Visiting {feat.id}')
+                self.visit(feat, scope)
+            elif isinstance(feat, ast.FuncDeclarationNode):
+                self.visit(feat, scope.get_tagged_scope(feat.id))
+
+    @visitor.when(ast.AttrDeclarationNode)
+    def visit(self, node: ast.AttrDeclarationNode, scope: Scope):
+        self.current_function = self.current_init
+        self.add_local(node.id, internal=False)
+
+        if node.expr is not None:
+            self.visit(node.expr, scope)
 
     @visitor.when(ast.FuncDeclarationNode)
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
@@ -375,6 +546,7 @@ class DotCodeVisitor:
 
     @visitor.when(ast.InstantiateNode)
     def visit(self, node: ast.InstantiateNode, scope: Scope):
+        self.current_function = self.current_init
         self.add_comment(f'Instantiating type {node.lex}')
 
         type_node = self.root.get_type(node.lex)
@@ -469,7 +641,7 @@ class DotCodeVisitor:
         left_dest = self.visit(node.left, scope)
         right_dest = self.visit(node.right, scope)
         comp_res = self.add_local('comp_res')
-        self.add_inst(cil.EqualNode(comp_res, left_dest, right_dest, by_value))
+        self.add_inst(cil.EqualNode(comp_res, left_dest, right_dest))
         return comp_res
 
     @visitor.when(ast.IsVoidNode)
