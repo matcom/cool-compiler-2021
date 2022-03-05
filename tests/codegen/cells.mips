@@ -207,54 +207,54 @@ L_1:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $a2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t8, 0($sp)
 	addi $sp, $sp, -4
-	sw $t8, 0($sp)
+	sw $a0, 0($sp)
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	li $t8, 0
-	sll $t8 $t8 2
-	la $t4, proto_table
-	addu $t4 $t4 $t8
-	lw $t4, 0($t4)
-	lw $a0, 4($t4)
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	addi $sp, $sp, -4
+	sw $t8, 0($sp)
+	li $t6, 0
+	sll $t6 $t6 2
+	la $t8, proto_table
+	addu $t8 $t8 $t6
+	lw $t8, 0($t8)
+	lw $a0, 4($t8)
 	sll $a0 $a0 2
 	jal malloc
 	move $a2 $a0
-	move $a0 $t4
+	move $a0 $t8
 	move $a1 $v0
 	jal copy
-	lw $t4, 0($sp)
-	addi $sp, $sp, 4
 	lw $t8, 0($sp)
+	addi $sp, $sp, 4
+	lw $t6, 0($sp)
 	addi $sp, $sp, 4
 	move $t0 $v0
 	move $v0 $t0
-	lw $t8, 0($sp)
-	addi $sp, $sp, 4
-	lw $a2, 0($sp)
+	lw $t6, 0($sp)
 	addi $sp, $sp, 4
 	lw $a1, 0($sp)
 	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
 	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
-	lw $t4, 0($sp)
+	lw $t8, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -266,40 +266,40 @@ L_2:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	lw $t1, 0($fp)
-	la $t0, data_8 + 0
+	lw $t0, 0($fp)
+	la $t1, data_8 + 0
 	li $v0, 4
-	move $a0 $t0
+	move $a0 $t1
 	syscall
-	lw $a0, 0($t1)
+	lw $a0, 0($t0)
 	sll $a0 $a0 2
 	la $a1, type_name_table
 	addu $a0 $a0 $a1
 	lw $a0, 0($a0)
-	move $t0 $a0
+	move $t1 $a0
 	li $v0, 4
-	move $a0 $t0
+	move $a0 $t1
 	syscall
-	la $t0, data_9 + 0
+	la $t1, data_9 + 0
 	li $v0, 4
-	move $a0 $t0
+	move $a0 $t1
 	syscall
 	li $v0, 10
 	syscall
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	lw $a1, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -313,11 +313,11 @@ L_3:
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
 	lw $t0, 0($fp)
 	lw $a0, 0($t0)
 	sll $a0 $a0 2
@@ -331,11 +331,11 @@ L_3:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	move $v0 $t0
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
@@ -349,15 +349,15 @@ L_4:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
+	sw $a2, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $a0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	addi $sp, $sp, -4
-	sw $a1, 0($sp)
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
-	sw $a2, 0($sp)
+	sw $a1, 0($sp)
 	lw $t0, 0($fp)
 	lw $a0, 4($t0)
 	sll $a0 $a0 2
@@ -368,15 +368,15 @@ L_4:
 	jal copy
 	move $t0 $v0
 	move $v0 $t0
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
 	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -388,54 +388,54 @@ L_5:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
+	sw $a2, 0($sp)
+	addi $sp, $sp, -4
+	sw $t2, 0($sp)
+	addi $sp, $sp, -4
+	sw $t9, 0($sp)
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
 	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 	addi $sp, $sp, -4
-	sw $a2, 0($sp)
+	sw $t2, 0($sp)
 	addi $sp, $sp, -4
-	sw $t7, 0($sp)
-	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	addi $sp, $sp, -4
-	sw $t7, 0($sp)
-	li $t4, 1
-	sll $t4 $t4 2
-	la $t7, proto_table
-	addu $t7 $t7 $t4
-	lw $t7, 0($t7)
-	lw $a0, 4($t7)
+	sw $t9, 0($sp)
+	li $t2, 1
+	sll $t2 $t2 2
+	la $t9, proto_table
+	addu $t9 $t9 $t2
+	lw $t9, 0($t9)
+	lw $a0, 4($t9)
 	sll $a0 $a0 2
 	jal malloc
 	move $a2 $a0
-	move $a0 $t7
+	move $a0 $t9
 	move $a1 $v0
 	jal copy
-	lw $t7, 0($sp)
+	lw $t9, 0($sp)
 	addi $sp, $sp, 4
-	lw $t4, 0($sp)
+	lw $t2, 0($sp)
 	addi $sp, $sp, 4
 	move $t0 $v0
 	move $v0 $t0
-	lw $t7, 0($sp)
-	addi $sp, $sp, 4
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
 	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
-	lw $t4, 0($sp)
+	lw $t9, 0($sp)
+	addi $sp, $sp, 4
+	lw $t2, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -447,28 +447,28 @@ L_6:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	lw $t0, 0($fp)
-	lw $t1, 4($fp)
-	lw $a1, 12($t0)
-	move $t0 $a1
+	lw $t1, 0($fp)
+	lw $t0, 4($fp)
+	lw $a1, 12($t1)
+	move $t1 $a1
 	li $v0, 4
-	move $a0 $t0
+	move $a0 $t1
 	syscall
-	move $v0 $t1
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
+	move $v0 $t0
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	lw $a1, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -480,28 +480,28 @@ L_7:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	lw $t0, 0($fp)
-	lw $t1, 4($fp)
-	lw $a1, 12($t0)
-	move $t0 $a1
+	lw $t1, 0($fp)
+	lw $t0, 4($fp)
+	lw $a1, 12($t1)
+	move $t1 $a1
 	li $v0, 1
-	move $a0 $t0
+	move $a0 $t1
 	syscall
-	move $v0 $t1
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
+	move $v0 $t0
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	lw $a1, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -566,39 +566,41 @@ L_10:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -12
 	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
+	sw $a2, 0($sp)
+	addi $sp, $sp, -4
+	sw $t8, 0($sp)
+	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
 	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 	addi $sp, $sp, -4
 	sw $t6, 0($sp)
-	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	addi $sp, $sp, -4
-	sw $a2, 0($sp)
 	lw $t0, 0($fp)
 	addi $sp, $sp, -4
-	sw $t6, 0($sp)
+	sw $t8, 0($sp)
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	li $t6, 2
-	sll $t6 $t6 2
-	la $t1, proto_table
-	addu $t1 $t1 $t6
-	lw $t1, 0($t1)
-	lw $a0, 4($t1)
+	sw $t6, 0($sp)
+	li $t8, 2
+	sll $t8 $t8 2
+	la $t6, proto_table
+	addu $t6 $t6 $t8
+	lw $t6, 0($t6)
+	lw $a0, 4($t6)
 	sll $a0 $a0 2
 	jal malloc
 	move $a2 $a0
-	move $a0 $t1
+	move $a0 $t6
 	move $a1 $v0
 	jal copy
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
 	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $t8, 0($sp)
 	addi $sp, $sp, 4
 	move $t1 $v0
 	sw $t0, 12($t1)
@@ -612,19 +614,21 @@ L_10:
 	addi $sp, $sp, 4
 	sw $t0, 16($t1)
 	move $v0 $t1
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
 	lw $t6, 0($sp)
 	addi $sp, $sp, 4
 	lw $a1, 0($sp)
 	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t8, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 12
 	lw $fp, 0($sp)
@@ -657,16 +661,6 @@ L_12:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -24
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
@@ -674,24 +668,32 @@ L_12:
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t2, 0($fp)
-	lw $t1, 4($fp)
-	lw $a1, 12($t1)
-	move $t0 $a1
-	lw $a1, 12($t2)
-	move $t4 $a1
-	lw $a1, 16($t1)
-	move $t3 $a1
-	lw $a1, 16($t2)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	lw $t3, 0($fp)
+	lw $t0, 4($fp)
+	lw $a1, 12($t0)
+	move $t2 $a1
+	lw $a1, 12($t3)
 	move $t1 $a1
+	lw $a1, 16($t0)
+	move $t0 $a1
+	lw $a1, 16($t3)
+	move $t3 $a1
+	lw $a1, 12($t0)
+	move $t0 $a1
 	lw $a1, 12($t3)
 	move $t3 $a1
-	lw $a1, 12($t1)
-	move $t1 $a1
-	add $t3 $t3 $t1
-	move $a0 $t0
-	move $a1 $t4
-	move $a2 $t3
+	add $t0 $t0 $t3
+	move $a0 $t2
+	move $a1 $t1
+	move $a2 $t0
 	jal concat
 	move $t0 $v0
 	addi $sp, $sp, -4
@@ -700,6 +702,14 @@ L_12:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	move $v0 $t0
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t2, 0($sp)
@@ -707,16 +717,6 @@ L_12:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t4, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 24
 	lw $fp, 0($sp)
@@ -728,16 +728,6 @@ L_13:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -32
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
@@ -745,23 +735,33 @@ L_13:
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t2, 0($fp)
-	lw $t1, 4($fp)
-	lw $t0, 8($fp)
-	lw $a1, 12($t0)
-	move $t4 $a1
+	addi $sp, $sp, -4
+	sw $t4, 0($sp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	lw $t0, 0($fp)
+	lw $t2, 4($fp)
+	lw $t1, 8($fp)
 	lw $a1, 12($t1)
-	move $t1 $a1
+	move $t4 $a1
 	lw $a1, 12($t2)
-	move $t2 $a1
-	lw $a1, 16($t0)
 	move $t3 $a1
-	add $t0 $t2 $t1
-	move $a0 $t3
-	move $a1 $t0
+	lw $a1, 12($t0)
+	move $t0 $a1
+	lw $a1, 16($t1)
+	move $t2 $a1
+	add $t1 $t0 $t3
+	move $a0 $t2
+	move $a1 $t1
 	jal less
-	move $t0 $v0
-	bne $t0 $zero L_29
+	move $t1 $v0
+	bne $t1 $zero L_29
 	j L_30
 	L_29:
 	li $v0, 4
@@ -771,8 +771,8 @@ L_13:
 	syscall
 	L_30:
 	move $a0 $t4
-	move $a1 $t1
-	move $a2 $t2
+	move $a1 $t3
+	move $a2 $t0
 	jal substr
 	move $t0 $v0
 	addi $sp, $sp, -4
@@ -781,6 +781,16 @@ L_13:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	move $v0 $t0
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t4, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t2, 0($sp)
@@ -788,16 +798,6 @@ L_13:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t4, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 32
 	lw $fp, 0($sp)
@@ -809,13 +809,70 @@ L_14:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
+	sw $t1, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $a2, 0($sp)
+	addi $sp, $sp, -4
+	sw $t8, 0($sp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
 	sw $a1, 0($sp)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	lw $t0, 0($fp)
+	addi $sp, $sp, -4
+	sw $t8, 0($sp)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	li $t8, 3
+	sll $t8 $t8 2
+	la $t6, proto_table
+	addu $t6 $t6 $t8
+	lw $t6, 0($t6)
+	lw $a0, 4($t6)
+	sll $a0 $a0 2
+	jal malloc
+	move $a2 $a0
+	move $a0 $t6
+	move $a1 $v0
+	jal copy
+	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $t8, 0($sp)
+	addi $sp, $sp, 4
+	move $t1 $v0
+	sw $t0, 12($t1)
+	move $v0 $t1
+	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t8, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
+	addi $sp, $sp, 4
+	addi $sp, $sp, 4
+	lw $fp, 0($sp)
+	addi $sp, $sp, 4
+	jr $ra
+L_15:
+	addi $sp, $sp, -4
+	sw $fp, 0($sp)
+	addi $fp, $sp, 4
+	addi $sp, $sp, -4
 	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
@@ -824,12 +881,20 @@ L_14:
 	sw $t7, 0($sp)
 	addi $sp, $sp, -4
 	sw $t8, 0($sp)
-	lw $t1, 0($fp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	lw $t0, 0($fp)
 	addi $sp, $sp, -4
 	sw $t7, 0($sp)
 	addi $sp, $sp, -4
 	sw $t8, 0($sp)
-	li $t7, 3
+	li $t7, 4
 	sll $t7 $t7 2
 	la $t8, proto_table
 	addu $t8 $t8 $t7
@@ -845,9 +910,17 @@ L_14:
 	addi $sp, $sp, 4
 	lw $t7, 0($sp)
 	addi $sp, $sp, 4
-	move $t0 $v0
-	sw $t1, 12($t0)
-	move $v0 $t0
+	move $t1 $v0
+	sw $t0, 12($t1)
+	move $v0 $t1
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
 	lw $t8, 0($sp)
 	addi $sp, $sp, 4
 	lw $t7, 0($sp)
@@ -855,75 +928,6 @@ L_14:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
-	addi $sp, $sp, 4
-	addi $sp, $sp, 4
-	lw $fp, 0($sp)
-	addi $sp, $sp, 4
-	jr $ra
-L_15:
-	addi $sp, $sp, -4
-	sw $fp, 0($sp)
-	addi $fp, $sp, 4
-	addi $sp, $sp, -4
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	addi $sp, $sp, -4
-	sw $a2, 0($sp)
-	addi $sp, $sp, -4
-	sw $t7, 0($sp)
-	lw $t0, 0($fp)
-	addi $sp, $sp, -4
-	sw $t7, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	li $t7, 4
-	sll $t7 $t7 2
-	la $t0, proto_table
-	addu $t0 $t0 $t7
-	lw $t0, 0($t0)
-	lw $a0, 4($t0)
-	sll $a0 $a0 2
-	jal malloc
-	move $a2 $a0
-	move $a0 $t0
-	move $a1 $v0
-	jal copy
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t7, 0($sp)
-	addi $sp, $sp, 4
-	move $t1 $v0
-	sw $t0, 12($t1)
-	move $v0 $t1
-	lw $t7, 0($sp)
-	addi $sp, $sp, 4
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -935,16 +939,16 @@ L_16:
 	addi $fp, $sp, 4
 	addi $sp, $sp, 0
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
-	lw $t0, 0($fp)
-	lw $t1, 4($fp)
-	sw $t0, 12($t1)
-	move $v0 $t1
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t1, 0($fp)
+	lw $t0, 4($fp)
+	sw $t1, 12($t0)
+	move $v0 $t0
 	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 0
 	lw $fp, 0($sp)
@@ -956,14 +960,6 @@ L_17:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -52
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
@@ -971,22 +967,30 @@ L_17:
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t1, 0($fp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	lw $t2, 0($fp)
 	la $t0, data_9 + 0
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_10
 	move $t0 $v0
 	addi $sp, $sp, 4
-	move $t3 $t0
-	lw $a1, 12($t1)
-	move $t0 $a1
 	move $t0 $t0
-	move $a0 $t0
+	lw $a1, 12($t2)
+	move $t1 $a1
+	move $t3 $t1
+	move $a0 $t3
 	li $a1, 0
 	jal equals
-	move $t2 $v0
-	bne $t2 $zero L_31
+	move $t1 $v0
+	bne $t1 $zero L_31
 	j L_32
 	L_31:
 	li $v0, 4
@@ -996,10 +1000,10 @@ L_17:
 	syscall
 	L_32:
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t0, 0($t0)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, 0($t3)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -1010,13 +1014,13 @@ L_17:
 	jal $a1
 	move $t0 $v0
 	addi $sp, $sp, 8
-	move $t3 $t0
-	move $t0 $t1
+	move $t1 $t0
+	move $t0 $t2
 	move $a0 $t0
 	li $a1, 0
 	jal equals
-	move $t2 $v0
-	bne $t2 $zero L_33
+	move $t3 $v0
+	bne $t3 $zero L_33
 	j L_34
 	L_33:
 	li $v0, 4
@@ -1028,7 +1032,7 @@ L_17:
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
-	sw $t3, 0($sp)
+	sw $t1, 0($sp)
 	lw $t0, 0($t0)
 	la $a1, proto_table
 	sll $a2 $t0 2
@@ -1040,7 +1044,15 @@ L_17:
 	jal $a1
 	move $t0 $v0
 	addi $sp, $sp, 8
-	move $v0 $t1
+	move $v0 $t2
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t2, 0($sp)
@@ -1048,14 +1060,6 @@ L_17:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 52
 	lw $fp, 0($sp)
@@ -1067,17 +1071,17 @@ L_18:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -20
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
 	lw $t0, 0($fp)
 	lw $a1, 12($t0)
 	move $t0 $a1
@@ -1109,17 +1113,17 @@ L_18:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	move $v0 $t0
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
 	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 20
 	lw $fp, 0($sp)
@@ -1131,14 +1135,6 @@ L_19:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -32
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
@@ -1146,24 +1142,32 @@ L_19:
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t1, 0($fp)
-	lw $t0, 4($fp)
-	move $t2 $t1
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	lw $t0, 0($fp)
+	lw $t2, 4($fp)
+	move $t1 $t0
 	li $a0, 1
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	jal L_14
-	move $t1 $v0
+	move $t0 $v0
 	addi $sp, $sp, 4
-	move $t3 $t1
-	lw $a1, 12($t0)
+	move $t3 $t0
+	lw $a1, 12($t2)
 	move $t0 $a1
-	move $t0 $t0
-	move $a0 $t0
+	move $t2 $t0
+	move $a0 $t2
 	li $a1, 0
 	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_37
+	move $t0 $v0
+	bne $t0 $zero L_37
 	j L_38
 	L_37:
 	li $v0, 4
@@ -1173,12 +1177,12 @@ L_19:
 	syscall
 	L_38:
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t0, 0($t0)
+	lw $t0, 0($t2)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -1190,6 +1194,14 @@ L_19:
 	move $t0 $v0
 	addi $sp, $sp, 12
 	move $v0 $t0
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t2, 0($sp)
@@ -1197,14 +1209,6 @@ L_19:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 32
 	lw $fp, 0($sp)
@@ -1216,20 +1220,6 @@ L_20:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -144
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t5, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
-	sw $t6, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
@@ -1237,68 +1227,82 @@ L_20:
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t5, 0($fp)
+	addi $sp, $sp, -4
+	sw $t4, 0($sp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t5, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	lw $t1, 0($fp)
 	lw $t2, 4($fp)
 	li $a0, 0
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	jal L_14
-	move $t6 $v0
+	move $t5 $v0
 	addi $sp, $sp, 4
-	lw $a0, 0($t5)
+	lw $a0, 0($t1)
 	sll $a0 $a0 2
 	la $a1, type_name_table
 	addu $a0 $a0 $a1
 	lw $a0, 0($a0)
 	move $t4 $a0
-	la $t1, type_name_table
-	addiu $t1 $t1 12
-	lw $t1, 0($t1)
+	la $t3, type_name_table
+	addiu $t3 $t3 12
+	lw $t3, 0($t3)
 	la $t0, type_name_table
 	addiu $t0 $t0 16
 	lw $t0, 0($t0)
-	la $t3, type_name_table
-	addiu $t3 $t3 8
-	lw $t3, 0($t3)
-	move $a0 $t4
-	move $a1 $t1
-	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_39
-	move $a0 $t4
-	move $a1 $t0
-	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_39
+	la $t6, type_name_table
+	addiu $t6 $t6 8
+	lw $t6, 0($t6)
 	move $a0 $t4
 	move $a1 $t3
 	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_40
+	move $t3 $v0
+	bne $t3 $zero L_39
+	move $a0 $t4
+	move $a1 $t0
+	jal equals
+	move $t3 $v0
+	bne $t3 $zero L_39
+	move $a0 $t4
+	move $a1 $t6
+	jal equals
+	move $t3 $v0
+	bne $t3 $zero L_40
 	j L_41
 	L_39:
-	lw $a1, 12($t5)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	lw $a1, 12($t6)
-	move $t1 $a1
+	lw $a1, 12($t5)
+	move $t3 $a1
 	move $a0 $t0
-	move $a1 $t1
+	move $a1 $t3
 	jal equals
 	move $t0 $v0
 	j L_42
 	L_40:
-	lw $a1, 12($t5)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	lw $a1, 12($t6)
-	move $t1 $a1
+	lw $a1, 12($t5)
+	move $t3 $a1
 	move $a0 $t0
-	move $a1 $t1
+	move $a1 $t3
 	jal equal_str
 	move $t0 $v0
 	j L_42
 	L_41:
-	move $a0 $t5
-	move $a1 $t6
+	move $a0 $t1
+	move $a1 $t5
 	jal equals
 	move $t0 $v0
 	L_42:
@@ -1312,12 +1316,12 @@ L_20:
 	bne $t0 $zero L_43
 	j L_48
 	L_43:
-	move $t1 $t2
-	move $a0 $t1
+	move $t0 $t2
+	move $a0 $t0
 	li $a1, 0
 	jal equals
-	move $t0 $v0
-	bne $t0 $zero L_44
+	move $t1 $v0
+	bne $t1 $zero L_44
 	j L_45
 	L_44:
 	li $v0, 4
@@ -1327,8 +1331,8 @@ L_20:
 	syscall
 	L_45:
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	lw $t0, 0($t1)
+	sw $t0, 0($sp)
+	lw $t0, 0($t0)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -1340,6 +1344,55 @@ L_20:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	lw $a1, 12($t0)
+	move $t1 $a1
+	li $a0, 1
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	jal L_14
+	move $t0 $v0
+	addi $sp, $sp, 4
+	lw $a1, 12($t0)
+	move $t0 $a1
+	sub $t0 $t1 $t0
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	jal L_14
+	move $t0 $v0
+	addi $sp, $sp, 4
+	move $t0 $t0
+	move $t1 $t2
+	move $a0 $t1
+	li $a1, 0
+	jal equals
+	move $t2 $v0
+	bne $t2 $zero L_46
+	j L_47
+	L_46:
+	li $v0, 4
+	la $a0, data_16
+	syscall
+	li $v0, 10
+	syscall
+	L_47:
+	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, 0($t1)
+	la $a1, proto_table
+	sll $a2 $t0 2
+	addu $a1 $a1 $a2
+	lw $a1, 0($a1)
+	lw $a1, 8($a1)
+	addiu $a1 $a1 40
+	lw $a1, 0($a1)
+	jal $a1
+	move $t0 $v0
+	addi $sp, $sp, 8
+	move $t0 $t0
+	j L_51
+	L_48:
+	lw $a1, 12($t1)
 	move $t0 $a1
 	li $a0, 1
 	addi $sp, $sp, -4
@@ -1361,15 +1414,15 @@ L_20:
 	li $a1, 0
 	jal equals
 	move $t0 $v0
-	bne $t0 $zero L_46
-	j L_47
-	L_46:
+	bne $t0 $zero L_49
+	j L_50
+	L_49:
 	li $v0, 4
-	la $a0, data_16
+	la $a0, data_17
 	syscall
 	li $v0, 10
 	syscall
-	L_47:
+	L_50:
 	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
@@ -1386,57 +1439,22 @@ L_20:
 	move $t0 $v0
 	addi $sp, $sp, 8
 	move $t0 $t0
-	j L_51
-	L_48:
-	lw $a1, 12($t5)
-	move $t1 $a1
-	li $a0, 1
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	jal L_14
-	move $t0 $v0
-	addi $sp, $sp, 4
-	lw $a1, 12($t0)
-	move $t0 $a1
-	sub $t0 $t1 $t0
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	jal L_14
-	move $t0 $v0
-	addi $sp, $sp, 4
-	move $t3 $t0
-	move $t0 $t2
-	move $a0 $t0
-	li $a1, 0
-	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_49
-	j L_50
-	L_49:
-	li $v0, 4
-	la $a0, data_17
-	syscall
-	li $v0, 10
-	syscall
-	L_50:
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t3, 0($sp)
-	lw $t0, 0($t0)
-	la $a1, proto_table
-	sll $a2 $t0 2
-	addu $a1 $a1 $a2
-	lw $a1, 0($a1)
-	lw $a1, 8($a1)
-	addiu $a1 $a1 40
-	lw $a1, 0($a1)
-	jal $a1
-	move $t0 $v0
-	addi $sp, $sp, 8
-	move $t0 $t0
 	L_51:
 	move $v0 $t0
+	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t5, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t4, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t2, 0($sp)
@@ -1444,20 +1462,6 @@ L_20:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $t6, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t5, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t4, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 144
 	lw $fp, 0($sp)
@@ -1469,20 +1473,6 @@ L_21:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -144
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t5, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
-	sw $t6, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
@@ -1490,14 +1480,28 @@ L_21:
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t3, 0($fp)
-	lw $t2, 4($fp)
-	move $t0 $t2
-	move $a0 $t0
+	addi $sp, $sp, -4
+	sw $t4, 0($sp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t5, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	lw $t1, 0($fp)
+	lw $t3, 4($fp)
+	move $t2 $t3
+	move $a0 $t2
 	li $a1, 0
 	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_52
+	move $t0 $v0
+	bne $t0 $zero L_52
 	j L_53
 	L_52:
 	li $v0, 4
@@ -1507,8 +1511,8 @@ L_21:
 	syscall
 	L_53:
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	lw $t0, 0($t0)
+	sw $t2, 0($sp)
+	lw $t0, 0($t2)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -1520,75 +1524,75 @@ L_21:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	lw $a1, 12($t0)
-	move $t1 $a1
+	move $t0 $a1
 	li $a0, 1
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	jal L_14
-	move $t0 $v0
+	move $t2 $v0
 	addi $sp, $sp, 4
-	lw $a1, 12($t0)
-	move $t0 $a1
-	sub $t0 $t1 $t0
+	lw $a1, 12($t2)
+	move $t2 $a1
+	sub $t0 $t0 $t2
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_14
-	move $t6 $v0
+	move $t2 $v0
 	addi $sp, $sp, 4
-	lw $a0, 0($t3)
+	lw $a0, 0($t1)
 	sll $a0 $a0 2
 	la $a1, type_name_table
 	addu $a0 $a0 $a1
 	lw $a0, 0($a0)
-	move $t1 $a0
-	la $t0, type_name_table
-	addiu $t0 $t0 12
-	lw $t0, 0($t0)
-	la $t4, type_name_table
-	addiu $t4 $t4 16
-	lw $t4, 0($t4)
+	move $t0 $a0
+	la $t6, type_name_table
+	addiu $t6 $t6 12
+	lw $t6, 0($t6)
 	la $t5, type_name_table
-	addiu $t5 $t5 8
+	addiu $t5 $t5 16
 	lw $t5, 0($t5)
-	move $a0 $t1
-	move $a1 $t0
+	la $t4, type_name_table
+	addiu $t4 $t4 8
+	lw $t4, 0($t4)
+	move $a0 $t0
+	move $a1 $t6
 	jal equals
-	move $t0 $v0
-	bne $t0 $zero L_54
-	move $a0 $t1
-	move $a1 $t4
-	jal equals
-	move $t0 $v0
-	bne $t0 $zero L_54
-	move $a0 $t1
+	move $t6 $v0
+	bne $t6 $zero L_54
+	move $a0 $t0
 	move $a1 $t5
 	jal equals
-	move $t0 $v0
-	bne $t0 $zero L_55
+	move $t6 $v0
+	bne $t6 $zero L_54
+	move $a0 $t0
+	move $a1 $t4
+	jal equals
+	move $t6 $v0
+	bne $t6 $zero L_55
 	j L_56
 	L_54:
-	lw $a1, 12($t3)
-	move $t1 $a1
-	lw $a1, 12($t6)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	move $a0 $t1
-	move $a1 $t0
+	lw $a1, 12($t2)
+	move $t2 $a1
+	move $a0 $t0
+	move $a1 $t2
 	jal equals
 	move $t0 $v0
 	j L_57
 	L_55:
-	lw $a1, 12($t3)
-	move $t1 $a1
-	lw $a1, 12($t6)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	move $a0 $t1
-	move $a1 $t0
+	lw $a1, 12($t2)
+	move $t2 $a1
+	move $a0 $t0
+	move $a1 $t2
 	jal equal_str
 	move $t0 $v0
 	j L_57
 	L_56:
-	move $a0 $t3
-	move $a1 $t6
+	move $a0 $t1
+	move $a1 $t2
 	jal equals
 	move $t0 $v0
 	L_57:
@@ -1608,13 +1612,13 @@ L_21:
 	jal L_14
 	move $t0 $v0
 	addi $sp, $sp, 4
-	move $t0 $t0
-	move $t1 $t2
-	move $a0 $t1
+	move $t2 $t0
+	move $t0 $t3
+	move $a0 $t0
 	li $a1, 0
 	jal equals
-	move $t2 $v0
-	bne $t2 $zero L_59
+	move $t1 $v0
+	bne $t1 $zero L_59
 	j L_60
 	L_59:
 	li $v0, 4
@@ -1624,10 +1628,10 @@ L_21:
 	syscall
 	L_60:
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, 0($t1)
+	addi $sp, $sp, -4
+	sw $t2, 0($sp)
+	lw $t0, 0($t0)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -1641,7 +1645,7 @@ L_21:
 	move $t0 $t0
 	j L_64
 	L_61:
-	lw $a1, 12($t3)
+	lw $a1, 12($t1)
 	move $t1 $a1
 	li $a0, 1
 	addi $sp, $sp, -4
@@ -1658,12 +1662,12 @@ L_21:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	move $t1 $t0
-	move $t0 $t2
-	move $a0 $t0
+	move $t2 $t3
+	move $a0 $t2
 	li $a1, 0
 	jal equals
-	move $t2 $v0
-	bne $t2 $zero L_62
+	move $t0 $v0
+	bne $t0 $zero L_62
 	j L_63
 	L_62:
 	li $v0, 4
@@ -1673,10 +1677,10 @@ L_21:
 	syscall
 	L_63:
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t1, 0($sp)
-	lw $t0, 0($t0)
+	lw $t0, 0($t2)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -1690,6 +1694,20 @@ L_21:
 	move $t0 $t0
 	L_64:
 	move $v0 $t0
+	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t5, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t4, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t2, 0($sp)
@@ -1697,20 +1715,6 @@ L_21:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $t6, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t5, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t4, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 144
 	lw $fp, 0($sp)
@@ -1721,20 +1725,6 @@ L_22:
 	sw $fp, 0($sp)
 	addi $fp, $sp, 4
 	addi $sp, $sp, -336
-	addi $sp, $sp, -4
-	sw $t4, 0($sp)
-	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t5, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
-	sw $t6, 0($sp)
 	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
@@ -1747,11 +1737,25 @@ L_22:
 	sw $t8, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t4, 0($fp)
-	lw $t3, 4($fp)
-	move $t2 $t4
+	addi $sp, $sp, -4
+	sw $t4, 0($sp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t5, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	lw $t3, 0($fp)
+	lw $t2, 4($fp)
 	move $t1 $t3
-	move $a0 $t1
+	move $t4 $t2
+	move $a0 $t4
 	li $a1, 0
 	jal equals
 	move $t0 $v0
@@ -1765,10 +1769,10 @@ L_22:
 	syscall
 	L_66:
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
+	sw $t4, 0($sp)
 	addi $sp, $sp, -4
-	sw $t2, 0($sp)
-	lw $t0, 0($t1)
+	sw $t1, 0($sp)
+	lw $t0, 0($t4)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -1777,68 +1781,68 @@ L_22:
 	addiu $a1 $a1 40
 	lw $a1, 0($a1)
 	jal $a1
-	move $t7 $v0
+	move $t1 $v0
 	addi $sp, $sp, 8
 	la $t0, data_22 + 0
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_10
-	move $t6 $v0
+	move $t4 $v0
 	addi $sp, $sp, 4
-	lw $a0, 0($t7)
+	lw $a0, 0($t1)
 	sll $a0 $a0 2
 	la $a1, type_name_table
 	addu $a0 $a0 $a1
 	lw $a0, 0($a0)
 	move $t5 $a0
-	la $t1, type_name_table
-	addiu $t1 $t1 12
-	lw $t1, 0($t1)
-	la $t2, type_name_table
-	addiu $t2 $t2 16
-	lw $t2, 0($t2)
 	la $t0, type_name_table
-	addiu $t0 $t0 8
+	addiu $t0 $t0 12
 	lw $t0, 0($t0)
-	move $a0 $t5
-	move $a1 $t1
-	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_67
-	move $a0 $t5
-	move $a1 $t2
-	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_67
+	la $t6, type_name_table
+	addiu $t6 $t6 16
+	lw $t6, 0($t6)
+	la $t7, type_name_table
+	addiu $t7 $t7 8
+	lw $t7, 0($t7)
 	move $a0 $t5
 	move $a1 $t0
 	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_68
+	move $t0 $v0
+	bne $t0 $zero L_67
+	move $a0 $t5
+	move $a1 $t6
+	jal equals
+	move $t0 $v0
+	bne $t0 $zero L_67
+	move $a0 $t5
+	move $a1 $t7
+	jal equals
+	move $t0 $v0
+	bne $t0 $zero L_68
 	j L_69
 	L_67:
-	lw $a1, 12($t7)
-	move $t1 $a1
-	lw $a1, 12($t6)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	move $a0 $t1
-	move $a1 $t0
+	lw $a1, 12($t4)
+	move $t1 $a1
+	move $a0 $t0
+	move $a1 $t1
 	jal equals
 	move $t0 $v0
 	j L_70
 	L_68:
-	lw $a1, 12($t7)
-	move $t1 $a1
-	lw $a1, 12($t6)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	move $a0 $t1
-	move $a1 $t0
+	lw $a1, 12($t4)
+	move $t1 $a1
+	move $a0 $t0
+	move $a1 $t1
 	jal equal_str
 	move $t0 $v0
 	j L_70
 	L_69:
-	move $a0 $t7
-	move $a1 $t6
+	move $a0 $t1
+	move $a1 $t4
 	jal equals
 	move $t0 $v0
 	L_70:
@@ -1870,14 +1874,14 @@ L_22:
 	move $t0 $t0
 	L_73:
 	lw $a1, 12($t0)
-	move $t0 $a1
-	move $t2 $t4
-	move $t1 $t3
-	move $a0 $t1
+	move $t1 $a1
+	move $t5 $t3
+	move $t0 $t2
+	move $a0 $t0
 	li $a1, 0
 	jal equals
-	move $t5 $v0
-	bne $t5 $zero L_74
+	move $t4 $v0
+	bne $t4 $zero L_74
 	j L_75
 	L_74:
 	li $v0, 4
@@ -1887,127 +1891,127 @@ L_22:
 	syscall
 	L_75:
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
-	sw $t2, 0($sp)
-	lw $t1, 0($t1)
+	sw $t5, 0($sp)
+	lw $t0, 0($t0)
 	la $a1, proto_table
-	sll $a2 $t1 2
+	sll $a2 $t0 2
 	addu $a1 $a1 $a2
 	lw $a1, 0($a1)
 	lw $a1, 8($a1)
 	addiu $a1 $a1 44
 	lw $a1, 0($a1)
 	jal $a1
-	move $t7 $v0
+	move $t6 $v0
 	addi $sp, $sp, 8
-	la $t1, data_22 + 0
+	la $t0, data_22 + 0
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
+	sw $t0, 0($sp)
 	jal L_10
-	move $t2 $v0
+	move $t5 $v0
 	addi $sp, $sp, 4
-	lw $a0, 0($t7)
+	lw $a0, 0($t6)
 	sll $a0 $a0 2
 	la $a1, type_name_table
 	addu $a0 $a0 $a1
 	lw $a0, 0($a0)
-	move $t6 $a0
-	la $t1, type_name_table
-	addiu $t1 $t1 12
-	lw $t1, 0($t1)
-	la $t5, type_name_table
-	addiu $t5 $t5 16
-	lw $t5, 0($t5)
+	move $t4 $a0
+	la $t0, type_name_table
+	addiu $t0 $t0 12
+	lw $t0, 0($t0)
+	la $t7, type_name_table
+	addiu $t7 $t7 16
+	lw $t7, 0($t7)
 	la $t8, type_name_table
 	addiu $t8 $t8 8
 	lw $t8, 0($t8)
-	move $a0 $t6
-	move $a1 $t1
+	move $a0 $t4
+	move $a1 $t0
 	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_76
+	move $t0 $v0
+	bne $t0 $zero L_76
+	move $a0 $t4
+	move $a1 $t7
+	jal equals
+	move $t0 $v0
+	bne $t0 $zero L_76
+	move $a0 $t4
+	move $a1 $t8
+	jal equals
+	move $t0 $v0
+	bne $t0 $zero L_77
+	j L_78
+	L_76:
+	lw $a1, 12($t6)
+	move $t0 $a1
+	lw $a1, 12($t5)
+	move $t4 $a1
+	move $a0 $t0
+	move $a1 $t4
+	jal equals
+	move $t0 $v0
+	j L_79
+	L_77:
+	lw $a1, 12($t6)
+	move $t0 $a1
+	lw $a1, 12($t5)
+	move $t4 $a1
+	move $a0 $t0
+	move $a1 $t4
+	jal equal_str
+	move $t0 $v0
+	j L_79
+	L_78:
 	move $a0 $t6
 	move $a1 $t5
 	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_76
-	move $a0 $t6
-	move $a1 $t8
-	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_77
-	j L_78
-	L_76:
-	lw $a1, 12($t7)
-	move $t1 $a1
-	lw $a1, 12($t2)
-	move $t2 $a1
-	move $a0 $t1
-	move $a1 $t2
-	jal equals
-	move $t1 $v0
-	j L_79
-	L_77:
-	lw $a1, 12($t7)
-	move $t1 $a1
-	lw $a1, 12($t2)
-	move $t2 $a1
-	move $a0 $t1
-	move $a1 $t2
-	jal equal_str
-	move $t1 $v0
-	j L_79
-	L_78:
-	move $a0 $t7
-	move $a1 $t2
-	jal equals
-	move $t1 $v0
+	move $t0 $v0
 	L_79:
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
+	sw $t0, 0($sp)
 	jal L_15
-	move $t1 $v0
+	move $t0 $v0
 	addi $sp, $sp, 4
-	lw $a1, 12($t1)
-	move $t1 $a1
-	bne $t1 $zero L_80
+	lw $a1, 12($t0)
+	move $t0 $a1
+	bne $t0 $zero L_80
 	j L_81
 	L_80:
 	li $a0, 1
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	jal L_14
-	move $t1 $v0
+	move $t0 $v0
 	addi $sp, $sp, 4
-	move $t1 $t1
+	move $t0 $t0
 	j L_82
 	L_81:
 	li $a0, 0
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	jal L_14
-	move $t1 $v0
+	move $t0 $v0
 	addi $sp, $sp, 4
-	move $t1 $t1
+	move $t0 $t0
 	L_82:
-	lw $a1, 12($t1)
-	move $t1 $a1
-	add $t0 $t0 $t1
+	lw $a1, 12($t0)
+	move $t0 $a1
+	add $t0 $t1 $t0
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_14
 	move $t0 $v0
 	addi $sp, $sp, 4
 	lw $a1, 12($t0)
-	move $t5 $a1
-	move $t0 $t4
-	move $t2 $t3
+	move $t4 $a1
+	move $t1 $t3
+	move $t2 $t2
 	move $a0 $t2
 	li $a1, 0
 	jal equals
-	move $t1 $v0
-	bne $t1 $zero L_83
+	move $t0 $v0
+	bne $t0 $zero L_83
 	j L_84
 	L_83:
 	li $v0, 4
@@ -2019,7 +2023,7 @@ L_22:
 	addi $sp, $sp, -4
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $t1, 0($sp)
 	lw $t0, 0($t2)
 	la $a1, proto_table
 	sll $a2 $t0 2
@@ -2029,49 +2033,49 @@ L_22:
 	addiu $a1 $a1 48
 	lw $a1, 0($a1)
 	jal $a1
-	move $t0 $v0
+	move $t1 $v0
 	addi $sp, $sp, 8
-	la $t1, data_22 + 0
+	la $t0, data_22 + 0
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
+	sw $t0, 0($sp)
 	jal L_10
-	move $t2 $v0
+	move $t6 $v0
 	addi $sp, $sp, 4
-	lw $a0, 0($t0)
+	lw $a0, 0($t1)
 	sll $a0 $a0 2
 	la $a1, type_name_table
 	addu $a0 $a0 $a1
 	lw $a0, 0($a0)
-	move $t1 $a0
+	move $t5 $a0
+	la $t0, type_name_table
+	addiu $t0 $t0 12
+	lw $t0, 0($t0)
+	la $t2, type_name_table
+	addiu $t2 $t2 16
+	lw $t2, 0($t2)
 	la $t3, type_name_table
-	addiu $t3 $t3 12
+	addiu $t3 $t3 8
 	lw $t3, 0($t3)
-	la $t6, type_name_table
-	addiu $t6 $t6 16
-	lw $t6, 0($t6)
-	la $t4, type_name_table
-	addiu $t4 $t4 8
-	lw $t4, 0($t4)
-	move $a0 $t1
+	move $a0 $t5
+	move $a1 $t0
+	jal equals
+	move $t0 $v0
+	bne $t0 $zero L_85
+	move $a0 $t5
+	move $a1 $t2
+	jal equals
+	move $t0 $v0
+	bne $t0 $zero L_85
+	move $a0 $t5
 	move $a1 $t3
 	jal equals
-	move $t3 $v0
-	bne $t3 $zero L_85
-	move $a0 $t1
-	move $a1 $t6
-	jal equals
-	move $t3 $v0
-	bne $t3 $zero L_85
-	move $a0 $t1
-	move $a1 $t4
-	jal equals
-	move $t3 $v0
-	bne $t3 $zero L_86
+	move $t0 $v0
+	bne $t0 $zero L_86
 	j L_87
 	L_85:
-	lw $a1, 12($t0)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	lw $a1, 12($t2)
+	lw $a1, 12($t6)
 	move $t1 $a1
 	move $a0 $t0
 	move $a1 $t1
@@ -2079,9 +2083,9 @@ L_22:
 	move $t0 $v0
 	j L_88
 	L_86:
-	lw $a1, 12($t0)
+	lw $a1, 12($t1)
 	move $t0 $a1
-	lw $a1, 12($t2)
+	lw $a1, 12($t6)
 	move $t1 $a1
 	move $a0 $t0
 	move $a1 $t1
@@ -2089,8 +2093,8 @@ L_22:
 	move $t0 $v0
 	j L_88
 	L_87:
-	move $a0 $t0
-	move $a1 $t2
+	move $a0 $t1
+	move $a1 $t6
 	jal equals
 	move $t0 $v0
 	L_88:
@@ -2123,11 +2127,11 @@ L_22:
 	L_91:
 	lw $a1, 12($t0)
 	move $t0 $a1
-	add $t0 $t5 $t0
+	add $t0 $t4 $t0
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_14
-	move $t1 $v0
+	move $t2 $v0
 	addi $sp, $sp, 4
 	li $a0, 1
 	addi $sp, $sp, -4
@@ -2135,39 +2139,39 @@ L_22:
 	jal L_14
 	move $t5 $v0
 	addi $sp, $sp, 4
-	lw $a0, 0($t1)
+	lw $a0, 0($t2)
 	sll $a0 $a0 2
 	la $a1, type_name_table
 	addu $a0 $a0 $a1
 	lw $a0, 0($a0)
-	move $t2 $a0
-	la $t4, type_name_table
-	addiu $t4 $t4 12
-	lw $t4, 0($t4)
+	move $t4 $a0
 	la $t0, type_name_table
-	addiu $t0 $t0 16
+	addiu $t0 $t0 12
 	lw $t0, 0($t0)
+	la $t1, type_name_table
+	addiu $t1 $t1 16
+	lw $t1, 0($t1)
 	la $t3, type_name_table
 	addiu $t3 $t3 8
 	lw $t3, 0($t3)
-	move $a0 $t2
-	move $a1 $t4
-	jal equals
-	move $t4 $v0
-	bne $t4 $zero L_92
-	move $a0 $t2
+	move $a0 $t4
 	move $a1 $t0
 	jal equals
-	move $t4 $v0
-	bne $t4 $zero L_92
-	move $a0 $t2
+	move $t0 $v0
+	bne $t0 $zero L_92
+	move $a0 $t4
+	move $a1 $t1
+	jal equals
+	move $t0 $v0
+	bne $t0 $zero L_92
+	move $a0 $t4
 	move $a1 $t3
 	jal equals
-	move $t4 $v0
-	bne $t4 $zero L_93
+	move $t0 $v0
+	bne $t0 $zero L_93
 	j L_94
 	L_92:
-	lw $a1, 12($t1)
+	lw $a1, 12($t2)
 	move $t0 $a1
 	lw $a1, 12($t5)
 	move $t1 $a1
@@ -2177,7 +2181,7 @@ L_22:
 	move $t0 $v0
 	j L_95
 	L_93:
-	lw $a1, 12($t1)
+	lw $a1, 12($t2)
 	move $t0 $a1
 	lw $a1, 12($t5)
 	move $t1 $a1
@@ -2187,7 +2191,7 @@ L_22:
 	move $t0 $v0
 	j L_95
 	L_94:
-	move $a0 $t1
+	move $a0 $t2
 	move $a1 $t5
 	jal equals
 	move $t0 $v0
@@ -2220,6 +2224,20 @@ L_22:
 	move $t0 $t0
 	L_98:
 	move $v0 $t0
+	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t5, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t4, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t8, 0($sp)
@@ -2232,20 +2250,6 @@ L_22:
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
 	addi $sp, $sp, 4
-	lw $t6, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t5, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
-	addi $sp, $sp, 4
-	lw $t4, 0($sp)
-	addi $sp, $sp, 4
 	addi $sp, $sp, 336
 	lw $fp, 0($sp)
 	addi $sp, $sp, 4
@@ -2256,40 +2260,40 @@ L_23:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -120
 	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
+	sw $a2, 0($sp)
+	addi $sp, $sp, -4
+	sw $t2, 0($sp)
+	addi $sp, $sp, -4
+	sw $t8, 0($sp)
+	addi $sp, $sp, -4
+	sw $t3, 0($sp)
+	addi $sp, $sp, -4
+	sw $t9, 0($sp)
+	addi $sp, $sp, -4
 	sw $t4, 0($sp)
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
 	addi $sp, $sp, -4
 	sw $t5, 0($sp)
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
 	sw $a1, 0($sp)
 	addi $sp, $sp, -4
 	sw $t6, 0($sp)
+	lw $t4, 0($fp)
 	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	addi $sp, $sp, -4
-	sw $a2, 0($sp)
-	addi $sp, $sp, -4
-	sw $t7, 0($sp)
-	addi $sp, $sp, -4
-	sw $t2, 0($sp)
-	addi $sp, $sp, -4
-	sw $t3, 0($sp)
+	sw $t8, 0($sp)
 	addi $sp, $sp, -4
 	sw $t9, 0($sp)
-	lw $t3, 0($fp)
-	addi $sp, $sp, -4
-	sw $t7, 0($sp)
-	addi $sp, $sp, -4
-	sw $t9, 0($sp)
-	li $t7, 3
-	sll $t7 $t7 2
+	li $t8, 3
+	sll $t8 $t8 2
 	la $t9, proto_table
-	addu $t9 $t9 $t7
+	addu $t9 $t9 $t8
 	lw $t9, 0($t9)
 	lw $a0, 4($t9)
 	sll $a0 $a0 2
@@ -2300,10 +2304,10 @@ L_23:
 	jal copy
 	lw $t9, 0($sp)
 	addi $sp, $sp, 4
-	lw $t7, 0($sp)
+	lw $t8, 0($sp)
 	addi $sp, $sp, 4
 	move $t2 $v0
-	move $t0 $t3
+	move $t0 $t4
 	move $a0 $t0
 	li $a1, 0
 	jal equals
@@ -2330,35 +2334,35 @@ L_23:
 	jal $a1
 	move $t0 $v0
 	addi $sp, $sp, 4
-	move $t1 $t0
+	move $t5 $t0
 	addi $sp, $sp, -4
-	sw $t2, 0($sp)
+	sw $t5, 0($sp)
 	addi $sp, $sp, -4
-	sw $t9, 0($sp)
-	li $t2, 2
-	sll $t2 $t2 2
-	la $t9, proto_table
-	addu $t9 $t9 $t2
-	lw $t9, 0($t9)
-	lw $a0, 4($t9)
+	sw $t1, 0($sp)
+	li $t5, 2
+	sll $t5 $t5 2
+	la $t1, proto_table
+	addu $t1 $t1 $t5
+	lw $t1, 0($t1)
+	lw $a0, 4($t1)
 	sll $a0 $a0 2
 	jal malloc
 	move $a2 $a0
-	move $a0 $t9
+	move $a0 $t1
 	move $a1 $v0
 	jal copy
-	lw $t9, 0($sp)
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
-	lw $t2, 0($sp)
+	lw $t5, 0($sp)
 	addi $sp, $sp, 4
-	move $t4 $v0
+	move $t3 $v0
 	L_101:
 	lw $a1, 12($t2)
+	move $t1 $a1
+	lw $a1, 12($t5)
 	move $t0 $a1
-	lw $a1, 12($t1)
-	move $t5 $a1
-	move $a0 $t0
-	move $a1 $t5
+	move $a0 $t1
+	move $a1 $t0
 	jal less
 	move $t0 $v0
 	addi $sp, $sp, -4
@@ -2371,13 +2375,13 @@ L_23:
 	bne $t0 $zero L_102
 	j L_107
 	L_102:
-	move $t5 $t2
-	move $t6 $t3
-	move $a0 $t6
+	move $t6 $t2
+	move $t0 $t4
+	move $a0 $t0
 	li $a1, 0
 	jal equals
-	move $t0 $v0
-	bne $t0 $zero L_103
+	move $t1 $v0
+	bne $t1 $zero L_103
 	j L_104
 	L_103:
 	li $v0, 4
@@ -2387,10 +2391,10 @@ L_23:
 	syscall
 	L_104:
 	addi $sp, $sp, -4
-	sw $t6, 0($sp)
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
-	sw $t5, 0($sp)
-	lw $t0, 0($t6)
+	sw $t6, 0($sp)
+	lw $t0, 0($t0)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -2401,13 +2405,13 @@ L_23:
 	jal $a1
 	move $t0 $v0
 	addi $sp, $sp, 8
-	move $t0 $t0
-	move $t4 $t4
-	move $a0 $t4
+	move $t6 $t0
+	move $t1 $t3
+	move $a0 $t1
 	li $a1, 0
 	jal equals
-	move $t5 $v0
-	bne $t5 $zero L_105
+	move $t0 $v0
+	bne $t0 $zero L_105
 	j L_106
 	L_105:
 	li $v0, 4
@@ -2417,10 +2421,10 @@ L_23:
 	syscall
 	L_106:
 	addi $sp, $sp, -4
-	sw $t4, 0($sp)
+	sw $t1, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	lw $t0, 0($t4)
+	sw $t6, 0($sp)
+	lw $t0, 0($t1)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -2431,9 +2435,9 @@ L_23:
 	jal $a1
 	move $t0 $v0
 	addi $sp, $sp, 8
-	move $t4 $t0
+	move $t3 $t0
 	lw $a1, 12($t2)
-	move $t2 $a1
+	move $t1 $a1
 	li $a0, 1
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
@@ -2442,7 +2446,7 @@ L_23:
 	addi $sp, $sp, 4
 	lw $a1, 12($t0)
 	move $t0 $a1
-	add $t0 $t2 $t0
+	add $t0 $t1 $t0
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_14
@@ -2451,36 +2455,36 @@ L_23:
 	move $t2 $t0
 	j L_101
 	L_107:
-	sw $t4, 12($t3)
-	move $t0 $t3
+	sw $t3, 12($t4)
+	move $t0 $t4
 	move $t0 $t0
 	move $t0 $t0
 	move $v0 $t0
-	lw $t9, 0($sp)
-	addi $sp, $sp, 4
-	lw $t3, 0($sp)
-	addi $sp, $sp, 4
-	lw $t2, 0($sp)
-	addi $sp, $sp, 4
-	lw $t7, 0($sp)
-	addi $sp, $sp, 4
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
 	lw $t6, 0($sp)
 	addi $sp, $sp, 4
 	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	lw $t5, 0($sp)
 	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	lw $t4, 0($sp)
+	addi $sp, $sp, 4
+	lw $t9, 0($sp)
+	addi $sp, $sp, 4
+	lw $t3, 0($sp)
+	addi $sp, $sp, 4
+	lw $t8, 0($sp)
+	addi $sp, $sp, 4
+	lw $t2, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 120
 	lw $fp, 0($sp)
@@ -2492,19 +2496,19 @@ L_24:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -8
 	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	addi $sp, $sp, -4
+	sw $a2, 0($sp)
+	addi $sp, $sp, -4
 	sw $t4, 0($sp)
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
 	sw $a1, 0($sp)
-	addi $sp, $sp, -4
-	sw $t1, 0($sp)
-	addi $sp, $sp, -4
-	sw $a2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
@@ -2532,19 +2536,19 @@ L_24:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	move $v0 $t1
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
 	lw $a1, 0($sp)
 	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
 	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	lw $t4, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 8
 	lw $fp, 0($sp)
@@ -2556,21 +2560,21 @@ L_25:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -4
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t5, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t5, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
 	lw $t0, 0($fp)
 	addi $sp, $sp, -4
 	sw $t5, 0($sp)
@@ -2594,21 +2598,21 @@ L_25:
 	addi $sp, $sp, 4
 	move $t1 $v0
 	sw $t1, 12($t0)
-	lw $t3, 0($sp)
-	addi $sp, $sp, 4
-	lw $a2, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, 0($sp)
-	addi $sp, $sp, 4
 	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	lw $t5, 0($sp)
 	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t3, 0($sp)
+	addi $sp, $sp, 4
+	lw $a2, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 4
 	lw $fp, 0($sp)
@@ -2620,14 +2624,6 @@ L_26:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -148
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
@@ -2635,22 +2631,30 @@ L_26:
 	sw $t2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
-	lw $t1, 0($fp)
+	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	lw $t2, 0($fp)
 	la $t0, data_29 + 0
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_10
 	move $t0 $v0
 	addi $sp, $sp, 4
-	move $t0 $t0
+	move $t1 $t0
 	jal L_24
-	move $t2 $v0
-	move $t3 $t2
+	move $t0 $v0
+	move $t3 $t0
 	move $a0 $t3
 	li $a1, 0
 	jal equals
-	move $t2 $v0
-	bne $t2 $zero L_108
+	move $t0 $v0
+	bne $t0 $zero L_108
 	j L_109
 	L_108:
 	li $v0, 4
@@ -2662,7 +2666,7 @@ L_26:
 	addi $sp, $sp, -4
 	sw $t3, 0($sp)
 	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $t1, 0($sp)
 	lw $t0, 0($t3)
 	la $a1, proto_table
 	sll $a2 $t0 2
@@ -2674,15 +2678,15 @@ L_26:
 	jal $a1
 	move $t0 $v0
 	addi $sp, $sp, 8
-	sw $t0, 12($t1)
-	lw $a1, 12($t1)
+	sw $t0, 12($t2)
+	lw $a1, 12($t2)
 	move $t0 $a1
-	move $t2 $t0
-	move $a0 $t2
+	move $t0 $t0
+	move $a0 $t0
 	li $a1, 0
 	jal equals
-	move $t0 $v0
-	bne $t0 $zero L_110
+	move $t1 $v0
+	bne $t1 $zero L_110
 	j L_111
 	L_110:
 	li $v0, 4
@@ -2692,8 +2696,8 @@ L_26:
 	syscall
 	L_111:
 	addi $sp, $sp, -4
-	sw $t2, 0($sp)
-	lw $t0, 0($t2)
+	sw $t0, 0($sp)
+	lw $t0, 0($t0)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -2721,9 +2725,9 @@ L_26:
 	lw $a1, 12($t0)
 	move $t0 $a1
 	lw $a1, 12($t3)
-	move $t2 $a1
+	move $t1 $a1
 	move $a0 $t0
-	move $a1 $t2
+	move $a1 $t1
 	jal less
 	move $t0 $v0
 	addi $sp, $sp, -4
@@ -2736,14 +2740,14 @@ L_26:
 	bne $t0 $zero L_113
 	j L_118
 	L_113:
-	lw $a1, 12($t1)
+	lw $a1, 12($t2)
 	move $t0 $a1
 	move $t0 $t0
 	move $a0 $t0
 	li $a1, 0
 	jal equals
-	move $t2 $v0
-	bne $t2 $zero L_114
+	move $t1 $v0
+	bne $t1 $zero L_114
 	j L_115
 	L_114:
 	li $v0, 4
@@ -2765,10 +2769,10 @@ L_26:
 	jal $a1
 	move $t0 $v0
 	addi $sp, $sp, 4
-	lw $a1, 12($t1)
+	lw $a1, 12($t2)
 	move $t0 $a1
-	move $t2 $t0
-	move $a0 $t2
+	move $t1 $t0
+	move $a0 $t1
 	li $a1, 0
 	jal equals
 	move $t0 $v0
@@ -2782,8 +2786,8 @@ L_26:
 	syscall
 	L_117:
 	addi $sp, $sp, -4
-	sw $t2, 0($sp)
-	lw $t0, 0($t2)
+	sw $t1, 0($sp)
+	lw $t0, 0($t1)
 	la $a1, proto_table
 	sll $a2 $t0 2
 	addu $a1 $a1 $a2
@@ -2795,16 +2799,16 @@ L_26:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	lw $a1, 12($t3)
-	move $t2 $a1
+	move $t0 $a1
 	li $a0, 1
 	addi $sp, $sp, -4
 	sw $a0, 0($sp)
 	jal L_14
-	move $t0 $v0
+	move $t1 $v0
 	addi $sp, $sp, 4
-	lw $a1, 12($t0)
-	move $t0 $a1
-	sub $t0 $t2 $t0
+	lw $a1, 12($t1)
+	move $t1 $a1
+	sub $t0 $t0 $t1
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	jal L_14
@@ -2814,7 +2818,15 @@ L_26:
 	j L_112
 	L_118:
 	move $t0 $zero
-	move $v0 $t1
+	move $v0 $t2
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
 	lw $t3, 0($sp)
 	addi $sp, $sp, 4
 	lw $t2, 0($sp)
@@ -2822,14 +2834,6 @@ L_26:
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 148
 	lw $fp, 0($sp)
@@ -2841,40 +2845,40 @@ L_27:
 	addi $fp, $sp, 4
 	addi $sp, $sp, -8
 	addi $sp, $sp, -4
-	sw $a0, 0($sp)
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	addi $sp, $sp, -4
-	sw $a1, 0($sp)
-	addi $sp, $sp, -4
-	sw $t6, 0($sp)
-	addi $sp, $sp, -4
 	sw $t1, 0($sp)
 	addi $sp, $sp, -4
 	sw $a2, 0($sp)
 	addi $sp, $sp, -4
 	sw $t9, 0($sp)
 	addi $sp, $sp, -4
+	sw $a0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $a1, 0($sp)
+	addi $sp, $sp, -4
 	sw $t6, 0($sp)
 	addi $sp, $sp, -4
 	sw $t9, 0($sp)
-	li $t6, 6
-	sll $t6 $t6 2
-	la $t9, proto_table
-	addu $t9 $t9 $t6
-	lw $t9, 0($t9)
-	lw $a0, 4($t9)
+	addi $sp, $sp, -4
+	sw $t6, 0($sp)
+	li $t9, 6
+	sll $t9 $t9 2
+	la $t6, proto_table
+	addu $t6 $t6 $t9
+	lw $t6, 0($t6)
+	lw $a0, 4($t6)
 	sll $a0 $a0 2
 	jal malloc
 	move $a2 $a0
-	move $a0 $t9
+	move $a0 $t6
 	move $a1 $v0
 	jal copy
-	lw $t9, 0($sp)
-	addi $sp, $sp, 4
 	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $t9, 0($sp)
 	addi $sp, $sp, 4
 	move $t1 $v0
 	addi $sp, $sp, -4
@@ -2883,21 +2887,21 @@ L_27:
 	move $t0 $v0
 	addi $sp, $sp, 4
 	move $v0 $t1
+	lw $t6, 0($sp)
+	addi $sp, $sp, 4
+	lw $a1, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
 	lw $t9, 0($sp)
 	addi $sp, $sp, 4
 	lw $a2, 0($sp)
 	addi $sp, $sp, 4
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4
-	lw $t6, 0($sp)
-	addi $sp, $sp, 4
-	lw $a1, 0($sp)
-	addi $sp, $sp, 4
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	lw $a0, 0($sp)
 	addi $sp, $sp, 4
 	addi $sp, $sp, 8
 	lw $fp, 0($sp)

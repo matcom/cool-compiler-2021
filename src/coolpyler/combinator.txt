@@ -1,0 +1,55 @@
+program := many1(class >> semicolon)
+
+class := classWord >> TYPE >> optional(inheritance) >> o_curly >> many(feature >> semicolon) >> c_curly
+
+inheritance := inheritsWord >> TYPE
+
+feature := (ID >> o_bracket >> sepBy1(formal,comma) >> colon >> o_curly >> expression >> c_curly) ^ (ID >> colon >>TYPE >> assign >> expression)
+
+formal := ID >> colon >> TYPE
+
+expression := choice(
+	boolean,
+	string, //por definir
+	integer, // por definir
+	ID, // por
+	o_bracket >> expression >> c_bracket,
+	notWord >> expression,
+	expression >> comparator >> expression,
+	tilde >> expression,
+	expression >> arithmeticOperator >> expression,
+	isvoidWord >> expression,
+	newWord >> TYPE,
+	caseWord >> expresssion >> ofWord >> many1(ID >> colon >> TYPE >> arrow)
+)
+
+
+
+
+
+
+
+
+
+
+// atomics
+semicolon = char(";")
+classWord = string("class")
+inheritsWord = string('inherits')
+o_curly = char("{")
+c_curly = char("}")
+o_bracket = char("(")
+c_bracket = char(")")
+comma = char(",")
+assign = string("<-")
+true = string("true")
+false = string("false")
+boolean = true | false 
+ID = regex(lowercase)
+notWord = string("not")
+comparer = EQ | LT | LTE
+isvoidWord = string("isvoid")
+arrow = string("=>")
+
+//utils
+optional(p) = times(p,0,1)
