@@ -167,9 +167,10 @@ class JumpNode(InstructionNode):
 
 
 class NotNode(InstructionNode):
-    def __init__(self, number, comment=""):
+    def __init__(self, dest, source, comment=""):
         super().__init__(comment)
-        self.number = number
+        self.dest = dest
+        self.source = source
 
 
 class JumpRegisterNode(InstructionNode):

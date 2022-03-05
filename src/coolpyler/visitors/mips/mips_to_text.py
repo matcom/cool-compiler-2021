@@ -167,5 +167,5 @@ class MIPSGenerator:
 
     @visitor.when(mips.NotNode)
     def visit(self, node: mips.NotNode):
-        return f"\tnot {node.number} \t#{node.comment}"
+        return f"\tnot {node.dest}, {node.source} \t#{node.comment}"
 

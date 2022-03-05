@@ -1254,3 +1254,34 @@ class CilToMIPS:
         instructions.append(mips.LoadInmediateNode(V0_REG, 10, f"EXIT"))
         instructions.append(mips.SyscallNode())
         return instructions
+
+    @visitor.when(cil.CommentNode)
+    def visit(self, node: cil.CommentNode):
+        instructions = []
+        self.memory_manager.save()
+
+        source_dir = self.search_mem(node.source)
+        dest_dir = self.search_mem(node.dest)
+
+        reg1 = self.memory_manager.get_unused_register()
+        reg2 = self.memory_manager.get_unused_register()
+
+        instructions.append(
+            instructions.append(
+                mips.LoadWordNode(
+                    reg1, mips.MemoryAddressRegisterNode(FP_REG, source_dir)
+                )
+            )
+        )
+        instructions.append(mips.NotNode(reg2, reg1))
+        instructions.append(
+            instructions.append(
+                mips.StoreWordNode(
+                    reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir)
+                )
+            )
+        )
+
+        self.memory_manager.clean()
+        return instructions
+
