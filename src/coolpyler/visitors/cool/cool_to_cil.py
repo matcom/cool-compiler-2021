@@ -146,6 +146,20 @@ class CoolToCilVisitor(object):
             )
         )
 
+    def register_io_init(self):
+        self.reset_state()
+        self_local = self.register_local("self")
+        self.instructions.append(cil.AllocateNode("IO", self_local))
+        self.instructions.append(cil.ReturnNode(self_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id("IO", "__init"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
     def register_io_out_string(self):
         self.reset_state()
         self_param = self.register_param("self")
@@ -230,13 +244,6 @@ class CoolToCilVisitor(object):
         self_param = self.register_param("self")
         other_param = self.register_param("other")
 
-        # # debug print {{{
-        # sep = self.register_new("String", self.register_data("sep_cat", '" ++ "'))
-        # self.instructions.append(cil.PrintNode(self_param, True))
-        # self.instructions.append(cil.PrintNode(sep, True))
-        # self.instructions.append(cil.PrintNode(other_param, True))
-        # # }}}
-
         self_str_local = self.register_local("self_str_attr")
         other_str_local = self.register_local("other_str_attr")
         self.instructions.append(cil.GetAttrNode(self_param, 0, self_str_local))
@@ -253,7 +260,9 @@ class CoolToCilVisitor(object):
             cil.PlusNode(concat_len_local, self_len_local, other_len_local)
         )
         self.instructions.append(
-            cil.ConcatNode(concat_local, self_str_local, other_str_local, concat_len_local)
+            cil.ConcatNode(
+                concat_local, self_str_local, other_str_local, concat_len_local
+            )
         )
         self.instructions.append(
             cil.ReturnNode(self.register_new("String", concat_local))
@@ -284,9 +293,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(
             cil.SubstringNode(ret_local, self_str_local, l_param_local, i_param_local)
         )
-        self.instructions.append(
-            cil.ReturnNode(self.register_new("String", ret_local))
-        )
+        self.instructions.append(cil.ReturnNode(self.register_new("String", ret_local)))
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("String", "substr"),
@@ -375,6 +382,7 @@ class CoolToCilVisitor(object):
         self.register_string_substr()
 
         self.register_object_init()
+        self.register_io_init()
         self.register_int_init()
         self.register_bool_init()
         self.register_string_init()
@@ -554,23 +562,6 @@ class CoolToCilVisitor(object):
         typeof_local = self.register_local()
         self.instructions.append(cil.TypeOfNode(sid, typeof_local))
 
-        # # debug print {{{
-        # tnlocal = self.register_local("tname_local")
-        # eol = self.register_data("eol", '"\\n"')
-        # eol = self.register_new("String", eol)
-        # under = self.register_data("under", '"_"')
-        # under = self.register_new("String", under)
-        # meth = self.register_data("meth", f'"{node.id}"')
-        # meth = self.register_new("String", meth)
-        # self.instructions.append(
-        #     cil.DynamicCallNode(typeof_local, self.get_method_id("Object", "type_name"), tnlocal)
-        # )
-        # self.instructions.append(cil.PrintNode(tnlocal, True))
-        # self.instructions.append(cil.PrintNode(under, True))
-        # self.instructions.append(cil.PrintNode(meth, True))
-        # self.instructions.append(cil.PrintNode(eol, True))
-        # # }}}
-
         self.instructions.extend(args)
         method_id = self.get_method_id(node.expr.type.name, node.id)
         self.instructions.append(
@@ -671,7 +662,9 @@ class CoolToCilVisitor(object):
             t12, t21 = t1.conforms_to(t2), t2.conforms_to(t1)
             return 0 if t12 and t21 else 1 if t21 else -1
 
-        sorted_types = sorted(node.expr.type.reachable, key=cmp_to_key(compare_types),)
+        sorted_types = sorted(
+            node.expr.type.reachable.values(), key=cmp_to_key(compare_types),
+        )
 
         sorted_branches = sorted(
             node.case_branches,
@@ -687,17 +680,19 @@ class CoolToCilVisitor(object):
                 if not t.conforms_to(btyp):
                     continue
 
+                self.instructions.append(cil.CommentNode(f"Start of branch {t.name}"))
                 runtime_type_local = self.register_local()
                 self.instructions.append(cil.TypeOfNode(expr_local, runtime_type_local))
                 branch_type_local = self.register_local()
-                self.instructions.append(cil.LoadNode(branch_type_local, btyp.name))
+                self.instructions.append(cil.LoadNode(branch_type_local, t.name))
                 types_eq_local = self.register_local()
                 self.instructions.append(
                     cil.MinusNode(types_eq_local, runtime_type_local, branch_type_local)
                 )
                 branch_label = self.get_label("case_branch")
-                branch_labels.append(branch_label)
-                self.instructions.append(cil.GotoIfGtNode(types_eq_local, branch_label))
+                branch_labels.append((branch_label, b))
+                self.instructions.append(cil.GotoIfEqNode(types_eq_local, branch_label))
+                self.instructions.append(cil.CommentNode(f""))
                 break
 
         data = self.register_data("case_err", '"Case of did not match any branch!"')
@@ -708,7 +703,7 @@ class CoolToCilVisitor(object):
         ret_local = self.register_local()
 
         end_label = self.get_label("end_case")
-        for label, branch in zip(branch_labels, sorted_branches):
+        for label, branch in branch_labels:
             self.instructions.append(cil.LabelNode(label))
             branch_local = self.register_local(branch.id)
             self.instructions.append(cil.AssignNode(branch_local, expr_local))
@@ -955,7 +950,6 @@ class CoolToCilVisitor(object):
             return param_sid
 
         local_sid = self.register_local(node.value)
-        # print((node.type.name, node.value))
         attr_id = self.get_attr_id(self.type, node.value)
         self.instructions.append(
             cil.GetAttrNode(self.get_param("self"), attr_id, local_sid)

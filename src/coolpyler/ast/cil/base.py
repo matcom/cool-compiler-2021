@@ -2,6 +2,11 @@ class CILAstNode:
     pass
 
 
+class CommentNode(CILAstNode):
+    def __init__(self, comment="") -> None:
+        self.comment = comment
+
+
 class ProgramNode(CILAstNode):
     def __init__(self, dottypes, dotdata, dotcode):
         self.dottypes = dottypes
