@@ -324,9 +324,7 @@ class CILBuilder:
         int_arg = VariableInfo("int")
         self.register_param(int_arg)
         result = self.define_internal_local()
-        self.register_instruction(
-            ToStrNode(result, int_arg.name)
-        )  
+        self.register_instruction(ToStrNode(result, int_arg.name))
         self.register_instruction(PrintIntNode(result))
         self.register_instruction(ReturnNode(VariableInfo(result).name))
 
@@ -361,11 +359,8 @@ class CILBuilder:
         main_constructor = self.to_function_name("constructor", "Main")
         main_method_name = self.to_function_name("Main", "main")
 
-        # Get instance from allocate
-        self.register_instruction(AllocateNode("Main", instance))
-        self.register_instruction(
-            StaticCallNode(main_constructor, self.define_internal_local())
-        )
+        # Get instance from constructor
+        self.register_instruction(StaticCallNode(main_constructor, instance))
 
         # Pass instance as parameter and call Main_main
         self.register_instruction(ArgNode(instance))
