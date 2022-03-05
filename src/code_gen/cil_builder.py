@@ -158,9 +158,6 @@ class CILBuilder:
     #         self.code.append(ReturnIL())
 
     def build_constructor(self, node):
-        # self_var = self.define_internal_local()
-        # self.register_instruction(AllocateNode(node.id, self_var))
-
         attributeNodes = [
             feat for feat in node.features if isinstance(feat, cool.AttrDeclarationNode)
         ]
@@ -179,6 +176,7 @@ class CILBuilder:
                     self.to_attr_name(self.current_type.name, attr.id), attr.init_exp
                 )
                 expr_list.append(assign)
+
         body = cool.BlockNode(expr_list)
         self.current_type.define_method("constructor", [], [], "Object")
         return cool.FuncDeclarationNode("constructor", [], "Object", body)
@@ -342,8 +340,11 @@ class CILBuilder:
         main_constructor = self.to_function_name("constructor", "Main")
         main_method_name = self.to_function_name("Main", "main")
 
-        # Get instance from constructor
-        self.register_instruction(StaticCallNode(main_constructor, instance))
+        # Get instance from allocate
+        self.register_instruction(AllocateNode("Main", instance))
+        self.register_instruction(
+            StaticCallNode(main_constructor, self.define_internal_local())
+        )
 
         # Pass instance as parameter and call Main_main
         self.register_instruction(ArgNode(instance))
@@ -644,12 +645,14 @@ class CILBuilder:
     # Unary operators
     @visitor.when(cool.InstantiateNode)  # NewNode
     def visit(self, node):
-        new_local = self.define_internal_local()
+        instance = self.define_internal_local()
+        solve = self.define_internal_local()
+        self.register_instruction(AllocateNode(node.lex, instance))
         self.register_instruction(
-            StaticCallNode(self.to_function_name("constructor", node.lex), new_local)
+            StaticCallNode(self.to_function_name("constructor", node.lex), solve)
         )
 
-        return new_local
+        return solve
 
     @visitor.when(cool.IsvoidNode)
     def visit(self, node):
