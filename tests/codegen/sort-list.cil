@@ -448,6 +448,14 @@
     RETURN local_self;
   }
 
+  function IO___init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE IO;
+    RETURN local_self;
+  }
+
   function Int___init {
     PARAM param_value;
 

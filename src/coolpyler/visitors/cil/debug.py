@@ -105,9 +105,7 @@ class CILDebug:
 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode, indent=0, inline=False):
-        self.print(
-            indent, inline, f"{node.dest} = {node.source};"
-        )
+        self.print(indent, inline, f"{node.dest} = {node.source};")
 
     @visitor.when(cil.AllocateNode)
     def visit(self, node: cil.AllocateNode, indent=0, inline=False):

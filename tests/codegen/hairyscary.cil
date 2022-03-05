@@ -554,6 +554,14 @@
     RETURN local_self;
   }
 
+  function IO___init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE IO;
+    RETURN local_self;
+  }
+
   function Int___init {
     PARAM param_value;
 
@@ -633,18 +641,24 @@
     LOCAL local_n;
     LOCAL local_16;
 
+    -- Start of branch Bar
     local_0 = TYPEOF param_self;
     local_1 = LOAD Bar;
     local_2 = local_0 - local_1
-    IF local_2 > 0 GOTO label_case_branch_0;
+    IF local_2 = 0 GOTO label_case_branch_0;
+    --
+    -- Start of branch Razz
     local_3 = TYPEOF param_self;
     local_4 = LOAD Razz;
     local_5 = local_3 - local_4
-    IF local_5 > 0 GOTO label_case_branch_1;
+    IF local_5 = 0 GOTO label_case_branch_1;
+    --
+    -- Start of branch Foo
     local_6 = TYPEOF param_self;
     local_7 = LOAD Foo;
     local_8 = local_6 - local_7
-    IF local_8 > 0 GOTO label_case_branch_2;
+    IF local_8 = 0 GOTO label_case_branch_2;
+    --
     local_9 = LOAD data_11_case_err;
     ARG local_9;
     local_10 = CALL String___init;
@@ -871,14 +885,18 @@
     LOCAL local_n;
     LOCAL local_11;
 
+    -- Start of branch Bar
     local_0 = TYPEOF param_self;
     local_1 = LOAD Bar;
     local_2 = local_0 - local_1
-    IF local_2 > 0 GOTO label_case_branch_3;
+    IF local_2 = 0 GOTO label_case_branch_3;
+    --
+    -- Start of branch Razz
     local_3 = TYPEOF param_self;
     local_4 = LOAD Razz;
     local_5 = local_3 - local_4
-    IF local_5 > 0 GOTO label_case_branch_4;
+    IF local_5 = 0 GOTO label_case_branch_4;
+    --
     local_6 = LOAD data_11_case_err;
     ARG local_6;
     local_7 = CALL String___init;
@@ -1019,33 +1037,69 @@ _doh;
     LOCAL local_6;
     LOCAL local_7;
     LOCAL local_8;
-    LOCAL local_n;
-    LOCAL local_n;
+    LOCAL local_9;
+    LOCAL local_10;
     LOCAL local_11;
+    LOCAL local_12;
+    LOCAL local_13;
+    LOCAL local_14;
+    LOCAL local_n;
+    LOCAL local_n;
+    LOCAL local_17;
+    LOCAL local_n;
+    LOCAL local_19;
+    LOCAL local_n;
+    LOCAL local_21;
 
+    -- Start of branch Bar
     local_0 = TYPEOF param_self;
-    local_1 = LOAD Foo;
+    local_1 = LOAD Bar;
     local_2 = local_0 - local_1
-    IF local_2 > 0 GOTO label_case_branch_5;
+    IF local_2 = 0 GOTO label_case_branch_5;
+    --
+    -- Start of branch Razz
     local_3 = TYPEOF param_self;
-    local_4 = LOAD Bazz;
+    local_4 = LOAD Razz;
     local_5 = local_3 - local_4
-    IF local_5 > 0 GOTO label_case_branch_6;
-    local_6 = LOAD data_11_case_err;
-    ARG local_6;
-    local_7 = CALL String___init;
-    print(str, local_7)
+    IF local_5 = 0 GOTO label_case_branch_6;
+    --
+    -- Start of branch Foo
+    local_6 = TYPEOF param_self;
+    local_7 = LOAD Foo;
+    local_8 = local_6 - local_7
+    IF local_8 = 0 GOTO label_case_branch_7;
+    --
+    -- Start of branch Bazz
+    local_9 = TYPEOF param_self;
+    local_10 = LOAD Bazz;
+    local_11 = local_9 - local_10
+    IF local_11 = 0 GOTO label_case_branch_8;
+    --
+    local_12 = LOAD data_11_case_err;
+    ARG local_12;
+    local_13 = CALL String___init;
+    print(str, local_13)
     LABEL label_case_branch_5;
     local_n = param_self;
-    local_8 = local_n;
+    local_14 = local_n;
     GOTO label_end_case_2;
     LABEL label_case_branch_6;
     local_n = param_self;
-    local_11 = CALL Bar___init;
-    local_8 = local_11;
+    local_17 = CALL Bar___init;
+    local_14 = local_17;
+    GOTO label_end_case_2;
+    LABEL label_case_branch_7;
+    local_n = param_self;
+    local_19 = CALL Razz___init;
+    local_14 = local_19;
+    GOTO label_end_case_2;
+    LABEL label_case_branch_8;
+    local_n = param_self;
+    local_21 = CALL Foo___init;
+    local_14 = local_21;
     GOTO label_end_case_2;
     LABEL label_end_case_2;
-    RETURN local_8;
+    RETURN local_14;
   }
 
   function Bazz_i___init {

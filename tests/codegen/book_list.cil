@@ -529,6 +529,14 @@
     RETURN local_self;
   }
 
+  function IO___init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE IO;
+    RETURN local_self;
+  }
+
   function Int___init {
     PARAM param_value;
 
@@ -965,14 +973,18 @@ _print;
     local_2 = TYPEOF local_xcar;
     ARG local_xcar;
     local_0 = VCALL local_2 8;
+    -- Start of branch Article
     local_3 = TYPEOF local_0;
     local_4 = LOAD Article;
     local_5 = local_3 - local_4
-    IF local_5 > 0 GOTO label_case_branch_0;
+    IF local_5 = 0 GOTO label_case_branch_0;
+    --
+    -- Start of branch Book
     local_6 = TYPEOF local_0;
     local_7 = LOAD Book;
     local_8 = local_6 - local_7
-    IF local_8 > 0 GOTO label_case_branch_1;
+    IF local_8 = 0 GOTO label_case_branch_1;
+    --
     local_9 = LOAD data_17_case_err;
     ARG local_9;
     local_10 = CALL String___init;

@@ -260,7 +260,9 @@ class CoolToCilVisitor(object):
             cil.PlusNode(concat_len_local, self_len_local, other_len_local)
         )
         self.instructions.append(
-            cil.ConcatNode(concat_local, self_str_local, other_str_local, concat_len_local)
+            cil.ConcatNode(
+                concat_local, self_str_local, other_str_local, concat_len_local
+            )
         )
         self.instructions.append(
             cil.ReturnNode(self.register_new("String", concat_local))
@@ -291,9 +293,7 @@ class CoolToCilVisitor(object):
         self.instructions.append(
             cil.SubstringNode(ret_local, self_str_local, l_param_local, i_param_local)
         )
-        self.instructions.append(
-            cil.ReturnNode(self.register_new("String", ret_local))
-        )
+        self.instructions.append(cil.ReturnNode(self.register_new("String", ret_local)))
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("String", "substr"),
@@ -662,7 +662,9 @@ class CoolToCilVisitor(object):
             t12, t21 = t1.conforms_to(t2), t2.conforms_to(t1)
             return 0 if t12 and t21 else 1 if t21 else -1
 
-        sorted_types = sorted(node.expr.type.reachable.values(), key=cmp_to_key(compare_types),)
+        sorted_types = sorted(
+            node.expr.type.reachable.values(), key=cmp_to_key(compare_types),
+        )
 
         sorted_branches = sorted(
             node.case_branches,
