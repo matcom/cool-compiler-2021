@@ -98,22 +98,6 @@ class CILToMIPSVisitor:
         return self._labels_map[label]
 
     @visitor.on('node')
-    def collect_func_names(self, node):
-        pass
-
-    @visitor.when(cil.ProgramNode)
-    def collect_func_names(self, node):
-        for func in node.dotcode:
-            self.collect_func_names(func)
-
-    @visitor.when(cil.FunctionNode)
-    def collect_func_names(self, node):
-        if node.name == "entry":
-            self._name_func_map[node.name] = 'main'
-        else:
-            self._name_func_map[node.name] = self.generate_code_label()
-
-    @visitor.on('node')
     def collect_labels_in_func(self, node):
         pass
 
@@ -132,9 +116,6 @@ class CILToMIPSVisitor:
 
     @visitor.when(cil.ProgramNode)
     def visit(self, node):
-        # Get functions names
-        self.collect_func_names(node)
-
         self._data_section["default_str"] = mips.StringConst("default_str", "")
         # Convert CIL ProgramNode to MIPS ProgramNode
         for tp in node.dottypes:
@@ -154,7 +135,7 @@ class CILToMIPSVisitor:
         self._data_section[node.name] = mips.StringConst(name_label, node.name)
 
         type_label = self.generate_type_label()
-        methods = {key: self._name_func_map[value]
+        methods = {key: value
                    for key, value in node.methods}
         defaults = []
         if node.name == "String":
@@ -173,7 +154,7 @@ class CILToMIPSVisitor:
     def visit(self, node):
         used_regs_finder = UsedRegisterFinder()
 
-        label = self._name_func_map[node.name]
+        label = "main" if node.name == "entry" else node.name
         params = [param.name for param in node.params]
         localvars = [local.name for local in node.localvars]
         size_for_locals = len(localvars) * mips.ATTR_SIZE
@@ -260,7 +241,7 @@ class CILToMIPSVisitor:
     @visitor.when(cil.StaticCallNode)
     def visit(self, node):
         instructions = []
-        label = self._name_func_map[node.function]
+        label = node.function
         instructions.append(mips.JumpAndLinkNode(label))
 
         reg = self.memory_manager.get_reg_for_var(node.dest)

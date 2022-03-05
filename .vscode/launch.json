@@ -11,7 +11,8 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/src",
-            "args": ["../tests/codegen/list.cl"]
+            "args": ["../tests/codegen/hello_world.cl"],
+            "env": {"PYTHONPATH": "${workspaceFolder}/src/"}
         }
     ]
 }
