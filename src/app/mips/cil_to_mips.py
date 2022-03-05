@@ -29,9 +29,7 @@ class LabelGenerator:
         self.type_count = 0
         self.code_count = 0
 
-    def generate_type_label(self):
-        self.type_count += 1
-        return f'type_{self.type_count}'
+
 
     def generate_code_label(self):
         self.code_count += 1
@@ -50,8 +48,7 @@ class CILToMIPSVisitor:
         self._pushed_args = 0
         self._labels_map = {}
 
-    def generate_type_label(self):
-        return self._label_generator.generate_type_label()
+
 
     def generate_code_label(self):
         return self._label_generator.generate_code_label()
@@ -126,13 +123,13 @@ class CILToMIPSVisitor:
     def visit(self, node):
         self._data_section[node.name] = mips.StringConst(node.name, node.name)
 
-        type_label = self.generate_type_label()
+
         methods = {key: value
                    for key, value in node.methods}
         defaults = []
         if node.name == "String":
-            defaults = [('value', 'default_str'), ('length', 'type_4_proto')]
-        new_type = mips.MIPSType(type_label, node.name, node.attributes, methods, len(
+            defaults = [('value', 'default_str'), ('length', 'type_Int_proto')]
+        new_type = mips.MIPSType(f"type_{node.name}", node.name, node.attributes, methods, len(
             self._types), default=defaults)
 
         self._types[node.name] = new_type

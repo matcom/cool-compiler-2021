@@ -49,7 +49,8 @@ class PrintVisitor:
         proto_begin = f"{node.label}_proto:\n\t.word\t{node.index}\n\t.word\t{node.size}\n\t.word\t{node.label}_dispatch"
         proto_attr = "\n".join(
             [f'\t.word\t{node._default_attributes.get(attr, "0")}' for attr in node.attributes])
-        proto_end = f"\t.word\t{OBJECT_MARK}"
+        # proto_end = f"\t.word\t{OBJECT_MARK}"
+        proto_end =""
         proto = f"{proto_begin}\n{proto_attr}\n{proto_end}" if proto_attr != "" else f"{proto_begin}\n{proto_end}"
 
         return f'{dispatch_table}\n\n{proto}'
