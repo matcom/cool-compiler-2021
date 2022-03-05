@@ -169,4 +169,4 @@ class CILFormatter(object):
 
     @visitor.when(cil.InitNode)
     def visit(self, node: cil.InitNode):
-        return f'INIT {node.type_name}'
+        return f'{node.dest} = INIT {node.type_name}'

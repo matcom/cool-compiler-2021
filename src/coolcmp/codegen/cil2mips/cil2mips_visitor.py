@@ -95,11 +95,13 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.InitNode)
     def visit(self, node: cil.InitNode):
+        dest = self.get_address(node.dest)
         self.add_inst(
             mips.LWNode(a0, node.type_name),
             mips.JALNode('malloc'),
-            mips.LANode(t0, node.type_name),
-            mips.SWNode(t0, 0, v0),
+            mips.LANode(t0, node.type_name)     .with_comm(f"Get pointer to type {node.type_name}"),
+            mips.SWNode(t0, 0, v0)              .with_comm(f"Set type pointer as attr"),
+            mips.SWNode(v0, dest, fp),
         )
 
     @visitor.when(cil.DataNode)
@@ -152,16 +154,16 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</function:{node.name}>"),
         )
 
-    @visitor.when(cil.AllocateNode)
-    def visit(self, node: cil.AllocateNode):
-        dest_address = self.get_address(node.dest)
-
-        self.add_inst(
-            mips.CommentNode(f"<allocate:{node.type}-{node.dest}>"),
-            mips.JALNode(f"{node.type}__init"),
-            mips.SWNode(v0, dest_address, fp),
-            mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
-        )
+    # @visitor.when(cil.AllocateNode)
+    # def visit(self, node: cil.AllocateNode):
+    #     dest_address = self.get_address(node.dest)
+    #
+    #     self.add_inst(
+    #         mips.CommentNode(f"<allocate:{node.type}-{node.dest}>"),
+    #         mips.JALNode(f"{node.type}__init"),
+    #         mips.SWNode(v0, dest_address, fp),
+    #         mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
+    #     )
 
     @visitor.when(cil.SetAttrNode)
     def visit(self, node: cil.SetAttrNode):
@@ -177,7 +179,7 @@ class CILToMipsVisitor:
             mips.CommentNode(f"<setattribute:{node.attr.name}-{node.instance}>"),
             # sum 1 to attr index because at offset 0 is the type pointer
             load_value_inst,
-            mips.SWNode(t0, 4 * (node.attr.index + 1), v0),
+            mips.SWNode(t0, 4 * (node.attr.index + 1), v0)      .with_comm(f"Set attr '{node.attr}' of {node.instance} = {node.value}"),
             mips.CommentNode(f"</setattribute:{node.attr.name}-{node.instance}>"),
         )
 
@@ -283,14 +285,15 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<plus:{node.dest}<-{node.left}+{node.right}>"),
-            mips.LWNode(t0, (left_offset, fp)),
+            mips.LWNode(t0, (left_offset, fp))      .with_comm(f"Load Int {node.left}"),
             mips.LWNode(t0, (4, t0))                .with_comm('Load Int_value at offset 4'),
-            mips.LWNode(t1, (right_offset, fp)),
+            mips.LWNode(t1, (right_offset, fp))     .with_comm(f"Load Int {node.right}"),
             mips.LWNode(t1, (4, t1))                .with_comm('Load Int_value at offset 4'),
             mips.ADDNode(t2, t0, t1)                .with_comm('Add the integer values'),
         )
 
-        self.visit(cil.AllocateNode('Int', node.dest))
+        # self.visit(cil.AllocateNode('Int', node.dest))
+        self.visit(cil.StaticCallNode('Int__init', node.dest))
 
         self.add_inst(
             mips.LWNode(t1, (dest_offset, fp)),
@@ -313,7 +316,8 @@ class CILToMipsVisitor:
             mips.SUBNode(t2, t0, t1),  # subtract the integer values
         )
 
-        self.visit(cil.AllocateNode('Int', node.dest))
+        # self.visit(cil.AllocateNode('Int', node.dest))
+        self.visit(cil.StaticCallNode('Int__init', node.dest))
 
         self.add_inst(
             mips.LWNode(t1, (dest_offset, fp)),
@@ -368,7 +372,8 @@ class CILToMipsVisitor:
     def visit(self, node: cil.SubstringNode):
         self.add_inst(mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]"))
 
-        self.visit(cil.AllocateNode('String', node.dest))
+        # self.visit(cil.AllocateNode('String', node.dest))
+        self.visit(cil.StaticCallNode('String__init', node.dest))
 
         src_address = self.get_address('self')
         dest_address = self.get_address(node.dest)
@@ -410,7 +415,8 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
         )
 
-        self.visit(cil.AllocateNode('String', node.dest))
+        # self.visit(cil.AllocateNode('String', node.dest))
+        self.visit(cil.StaticCallNode('String__init', node.dest))
 
         self.add_inst(
             mips.LWNode(t0, (src_offset, fp))       .with_comm('Load pointer to self'),
@@ -429,7 +435,8 @@ class CILToMipsVisitor:
             mips.CommentNode(f"<isvoid:{node.dest}-{node.src}>"),
         )
 
-        self.visit(cil.AllocateNode('Bool', node.dest))
+        # self.visit(cil.AllocateNode('Bool', node.dest))
+        self.visit(cil.StaticCallNode('Bool__init', node.dest))
 
         self.add_inst(
             mips.LWNode(a0, (src, fp))      .with_comm('Push instance pointer'),
