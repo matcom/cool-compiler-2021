@@ -101,9 +101,15 @@ class CoolToCilVisitor(object):
         self_type = self.register_local("self_type")
         type_name = self.register_local("type")
         self.instructions.append(cil.TypeOfNode(param_self, self_type))
-        self.instructions.append(cil.DynamicCallNode(self_type, self.get_method_id("Object", "type_name"), type_name))
+        self.instructions.append(
+            cil.DynamicCallNode(
+                self_type, self.get_method_id("Object", "type_name"), type_name
+            )
+        )
         eol = self.register_new("String", self.register_data("eol", '"\\n"'))
-        msg = self.register_new("String", self.register_data("abort_msg", '"Abort called from class "'))
+        msg = self.register_new(
+            "String", self.register_data("abort_msg", '"Abort called from class "')
+        )
         self.instructions.append(cil.PrintNode(msg, True))
         self.instructions.append(cil.PrintNode(type_name, True))
         self.instructions.append(cil.PrintNode(eol, True))
@@ -206,7 +212,9 @@ class CoolToCilVisitor(object):
         len_local = self.register_local("len")
         self.instructions.append(cil.LengthNode(len_local, str_local))
         len_minus_one_local = self.register_local("len_minus_one")
-        self.instructions.append(cil.MinusNode(len_minus_one_local, len_local, self.register_num(1)))
+        self.instructions.append(
+            cil.MinusNode(len_minus_one_local, len_local, self.register_num(1))
+        )
 
         then_label = self.get_label("then")
         else_label = self.get_label("else")
@@ -215,13 +223,23 @@ class CoolToCilVisitor(object):
         has_eol_local = self.register_local("has_eol")
         eol_local = self.register_data("eol", '"\\n"')
         last_char_local = self.register_local("last_char")
-        self.instructions.append(cil.SubstringNode(last_char_local, str_local, self.register_num(1), len_minus_one_local))
-        self.instructions.append(cil.StrEqNode(has_eol_local, last_char_local, eol_local))
+        self.instructions.append(
+            cil.SubstringNode(
+                last_char_local, str_local, self.register_num(1), len_minus_one_local
+            )
+        )
+        self.instructions.append(
+            cil.StrEqNode(has_eol_local, last_char_local, eol_local)
+        )
         self.instructions.append(cil.GotoIfEqNode(has_eol_local, then_label))
 
         # Label else_label
         self.instructions.append(cil.LabelNode(else_label))
-        self.instructions.append(cil.SubstringNode(str_local, str_local, len_minus_one_local, self.register_num(0)))
+        self.instructions.append(
+            cil.SubstringNode(
+                str_local, str_local, len_minus_one_local, self.register_num(0)
+            )
+        )
         self.instructions.append(cil.ReturnNode(self.register_new("String", str_local)))
 
         # Label then_label
