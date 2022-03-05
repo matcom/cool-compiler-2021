@@ -1270,6 +1270,7 @@ class CilToMIPS:
             mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, source_dir))
         )
         instructions.append(mips.NotNode(reg2, reg1))
+        instructions.append(mips.AddiNode(reg2, reg2, 1))
         instructions.append(
             mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
         )
