@@ -1,0 +1,434 @@
+.types
+
+  type Object {
+    method Object_abort;
+    method Object_type_name;
+    method Object_copy;
+  }
+  type Int {
+    method Object_abort;
+    method Int_type_name;
+    method Int_copy;
+  }
+  type Bool {
+    method Object_abort;
+    method Bool_type_name;
+    method Bool_copy;
+  }
+  type String {
+    method Object_abort;
+    method String_type_name;
+    method String_copy;
+    method String_length;
+    method String_concat;
+    method String_substr;
+  }
+  type IO {
+    method Object_abort;
+    method IO_type_name;
+    method IO_copy;
+    method IO_out_string;
+    method IO_out_int;
+    method IO_in_string;
+    method IO_in_int;
+  }
+  type Main {
+    method Object_abort;
+    method Main_type_name;
+    method Main_copy;
+    method IO_out_string;
+    method IO_out_int;
+    method IO_in_string;
+    method IO_in_int;
+    method Main_main;
+  }
+
+.data
+
+  data_0_abort_msg = "Program Halted!";
+  data_1_type_name_Object = "Object";
+  data_2_type_name_Int = "Int";
+  data_3_type_name_Bool = "Bool";
+  data_4_type_name_String = "String";
+  data_5_type_name_IO = "IO";
+  data_6_type_name_Main = "Main";
+  data_7_string = "a";
+  data_8_string = "b";
+  data_9_string = "abc";
+  data_10_string = "false";
+  data_11_string = "true";
+
+.code
+
+  function Void___init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Void;
+    RETURN local_self;
+  }
+
+  function main {
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = CALL Main___init;
+    ARG local_0;
+    local_1 = CALL Main_main;
+  }
+
+  function Object_abort {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_0_abort_msg;
+    ARG local_0;
+    local_1 = CALL String___init;
+    print(str, local_1)
+  }
+
+  function Object_type_name {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_1_type_name_Object;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
+  }
+
+  function Object_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Object;
+    RETURN local_copy;
+  }
+
+  function Int_type_name {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_2_type_name_Int;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
+  }
+
+  function Int_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Int;
+    RETURN local_copy;
+  }
+
+  function Bool_type_name {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_3_type_name_Bool;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
+  }
+
+  function Bool_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Bool;
+    RETURN local_copy;
+  }
+
+  function String_type_name {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_4_type_name_String;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
+  }
+
+  function String_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE String;
+    RETURN local_copy;
+  }
+
+  function IO_type_name {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_5_type_name_IO;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
+  }
+
+  function IO_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE IO;
+    RETURN local_copy;
+  }
+
+  function Main_type_name {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+
+    local_0 = LOAD data_6_type_name_Main;
+    ARG local_0;
+    local_1 = CALL String___init;
+    RETURN local_1;
+  }
+
+  function Main_copy {
+    PARAM param_self;
+
+    LOCAL local_copy;
+
+    local_copy = ALLOCATE Main;
+    RETURN local_copy;
+  }
+
+  function IO_out_string {
+    PARAM param_self;
+    PARAM param_str;
+
+
+    print(str, param_str)
+    RETURN param_self;
+  }
+
+  function IO_out_int {
+    PARAM param_self;
+    PARAM param_int;
+
+
+    print(int, param_int)
+    RETURN param_self;
+  }
+
+  function IO_in_string {
+    PARAM param_self;
+
+    LOCAL local_str;
+
+    local_str = read(str)
+    RETURN local_str;
+  }
+
+  function IO_in_int {
+    PARAM param_self;
+
+    LOCAL local_int;
+
+    local_int = read(int)
+    RETURN local_int;
+  }
+
+  function String_length {
+    PARAM param_self;
+
+    LOCAL local_str_attr;
+    LOCAL local_length;
+    LOCAL local_2;
+
+    local_str_attr = GETATTR param_self 0;
+    local_length = length(local_str_attr)
+    ARG local_length;
+    local_2 = CALL Int___init;
+    RETURN local_2;
+  }
+
+  function String_concat {
+    PARAM param_self;
+    PARAM param_other;
+
+    LOCAL local_self_str_attr;
+    LOCAL local_other_str_attr;
+    LOCAL local_concat;
+    LOCAL local_self_len;
+    LOCAL local_other_len;
+    LOCAL local_concat_len;
+    LOCAL local_6;
+
+    local_self_str_attr = GETATTR param_self 0;
+    local_other_str_attr = GETATTR param_other 0;
+    local_self_len = length(local_self_str_attr)
+    local_other_len = length(local_other_str_attr)
+    local_concat_len = local_self_len + local_other_len
+    local_concat = concat(local_self_str_attr, local_other_str_attr, local_concat_len)
+    ARG local_concat;
+    local_6 = CALL String___init;
+    RETURN local_6;
+  }
+
+  function String_substr {
+    PARAM param_self;
+    PARAM param_i;
+    PARAM param_l;
+
+    LOCAL local_self_str_local;
+    LOCAL local_i_local;
+    LOCAL local_l_local;
+    LOCAL local_substr;
+    LOCAL local_4;
+
+    local_self_str_local = GETATTR param_self 0;
+    local_i_local = GETATTR param_i 0;
+    local_l_local = GETATTR param_l 0;
+    local_substr = substr(local_self_str_local, local_i_local, local_l_local)
+    ARG local_substr;
+    local_4 = CALL String___init;
+    RETURN local_4;
+  }
+
+  function Object___init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Object;
+    RETURN local_self;
+  }
+
+  function IO___init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE IO;
+    RETURN local_self;
+  }
+
+  function Int___init {
+    PARAM param_value;
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Int;
+    SETATTR local_self 0 param_value;
+    RETURN local_self;
+  }
+
+  function Bool___init {
+    PARAM param_value;
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Bool;
+    SETATTR local_self 0 param_value;
+    RETURN local_self;
+  }
+
+  function String___init {
+    PARAM param_value;
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE String;
+    SETATTR local_self 0 param_value;
+    RETURN local_self;
+  }
+
+  function Main___init {
+
+    LOCAL local_self;
+
+    local_self = ALLOCATE Main;
+    RETURN local_self;
+  }
+
+  function Main_main {
+    PARAM param_self;
+
+    LOCAL local_0;
+    LOCAL local_1;
+    LOCAL local_2;
+    LOCAL local_3;
+    LOCAL local_4;
+    LOCAL local_5;
+    LOCAL local_6;
+    LOCAL local_7;
+    LOCAL local_8;
+    LOCAL local_9;
+    LOCAL local_10;
+    LOCAL local_11;
+    LOCAL local_12;
+    LOCAL local_13;
+    LOCAL local_14;
+    LOCAL local_15;
+    LOCAL local_16;
+    LOCAL local_17;
+    LOCAL local_18;
+    LOCAL local_19;
+    LOCAL local_20;
+    LOCAL local_21;
+
+    local_2 = LOAD data_7_string;
+    ARG local_2;
+    local_3 = CALL String___init;
+    local_4 = LOAD data_8_string;
+    ARG local_4;
+    local_5 = CALL String___init;
+    local_6 = TYPEOF local_3;
+    ARG local_3;
+    ARG local_5;
+    local_1 = VCALL local_6 4;
+    local_7 = GETATTR local_1 0;
+    local_8 = LOAD data_9_string;
+    ARG local_8;
+    local_9 = CALL String___init;
+    local_10 = GETATTR local_9 0;
+    local_11 = streq(local_7, local_10);
+    ARG local_11;
+    local_12 = CALL Bool___init;
+    local_13 = GETATTR local_12 0;
+    IF local_13 > 0 GOTO label_then_0;
+    LABEL label_else_0;
+    local_15 = LOAD data_10_string;
+    ARG local_15;
+    local_16 = CALL String___init;
+    local_17 = TYPEOF param_self;
+    ARG param_self;
+    ARG local_16;
+    local_14 = VCALL local_17 3;
+    local_0 = local_14;
+    GOTO label_continue_0;
+    LABEL label_then_0;
+    local_19 = LOAD data_11_string;
+    ARG local_19;
+    local_20 = CALL String___init;
+    local_21 = TYPEOF param_self;
+    ARG param_self;
+    ARG local_20;
+    local_18 = VCALL local_21 3;
+    local_0 = local_18;
+    LABEL label_continue_0;
+    RETURN local_0;
+  }
+

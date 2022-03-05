@@ -18,6 +18,10 @@ class CILDebug:
     def visit(self, node):
         pass
 
+    @visitor.when(cil.CommentNode)
+    def visit(self, node: cil.CommentNode, indent=0, inline=False):
+        self.print(indent, inline, f"-- {node.comment}".strip())
+
     @visitor.when(cil.ProgramNode)
     def visit(self, node: cil.ProgramNode, indent=0, inline=False):
         self.print(indent, inline, ".types\n")

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import itertools as itt
-from typing import List, Optional, OrderedDict
+from typing import Dict, List, Optional, OrderedDict, Set
 
 import coolpyler.errors as errors
 
@@ -81,7 +81,7 @@ class Type:
         self.methods: List[Method] = []
         self.parent: Optional[Type] = None
 
-        self.reachable: List[Type] = [self]
+        self.reachable: Dict[str, Type] = {self.name: self}
         self.sealed = False
 
     def set_parent(self, parent: Type) -> None:
@@ -89,10 +89,15 @@ class Type:
             raise TypeError(f"Parent type is already set for `{self.name}`.")
         if parent.sealed:
             raise SemanticError(f"Cannot inherit from `{parent.name}`.")
-        if parent in self.reachable:
+        if parent.name in self.reachable:
             raise SemanticError(f"Cycle in hierarchy involving `{self.name}`.")
         self.parent = parent
-        self.parent.reachable.extend(self.reachable)  # TODO
+        self.parent.update_reachable(self.reachable)
+
+    def update_reachable(self, reachable: Dict[str, Type]):
+        self.reachable.update(reachable)  # TODO
+        if self.parent is not None:
+            self.parent.update_reachable(self.reachable)
 
     def get_attribute(self, name: str) -> Attribute:
         try:
