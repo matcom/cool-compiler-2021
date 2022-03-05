@@ -172,7 +172,7 @@ class TypeBuilder:
 
         if node.parent is not None:
             try:
-                parent_type = self.get_type(node.parent.lex)
+                parent_type = self.get_type(node.parent)
                 self.current_type.set_parent(parent_type)
             except SError as error:
                 node_row, node_col = node.parent.location
@@ -192,8 +192,8 @@ class TypeBuilder:
         param_names = [fname.lex for fname, ftype in node.params]
 
         try:
-            param_types = [self.get_type(ftype.lex) for fname, ftype in node.params]
-            return_type = self.get_type(node.type.lex)
+            param_types = [self.get_type(ftype) for fname, ftype in node.params]
+            return_type = self.get_type(node.type)
             self.current_type.define_method(
                 node.id.lex, param_names, param_types, return_type
             )
@@ -205,12 +205,7 @@ class TypeBuilder:
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
         try:
-            try:
-                attr_type = self.context.get_type(node.type.lex)
-            except SError as error:
-                attr_type = ErrorType()
-                node_row, node_col = node.type.location
-                self.errors.append(TypeError(node_row, node_col,error.text))
+            attr_type = self.get_type(node.type)
             self.current_type.define_attribute(node.id.lex, attr_type)
         except SError as error:
             node_row, node_col = node.id.location
@@ -218,7 +213,8 @@ class TypeBuilder:
 
     def get_type(self, ntype):
         try:
-            return self.context.get_type(ntype)
+            return self.context.get_type(ntype.lex)
         except SError as error:
-            self.errors.append(error.text)
+            node_row, node_col = ntype.location
+            self.errors.append(TypeError(node_row, node_col,error.text))
             return ErrorType()
