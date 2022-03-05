@@ -28,7 +28,8 @@ from cmp.cil import (
     SubstringNode,
     ToStrNode,
     ReadNode,
-    PrintNode,
+    PrintStrNode,
+    PrintIntNode,
     PlusNode,
     MinusNode,
     StarNode,
@@ -315,7 +316,7 @@ class CILBuilder:
         self.params.append(ParamNode("self"))
         str_arg = VariableInfo("str")
         self.register_param(str_arg)
-        self.register_instruction(PrintNode(str_arg.name))
+        self.register_instruction(PrintStrNode(str_arg.name))
         self.register_instruction(ReturnNode("self"))
 
     def io_outint(self):
@@ -325,7 +326,8 @@ class CILBuilder:
         result = self.define_internal_local()
         self.register_instruction(
             ToStrNode(result, int_arg.name)
-        )  # TODO: Define PrintIntNode
+        )  
+        self.register_instruction(PrintIntNode(result))
         self.register_instruction(ReturnNode(VariableInfo(result).name))
 
     def io_instring(self):

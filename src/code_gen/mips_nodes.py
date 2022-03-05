@@ -1,7 +1,10 @@
-from re import L
-from soupsieve import select
+#from re import L
+#from soupsieve import select
 
-from src.cmp.cil import InstructionNode
+#from src.cmp.cil import InstructionNode
+
+
+from matplotlib.pyplot import cla
 
 
 class MIPS_Node:
@@ -13,16 +16,16 @@ class ProgramNode(MIPS_Node):
         self.data = data
         self.text = code
 
-class MIPSDataNode(MIPS_Node):
+class DataNode(MIPS_Node):
         pass
     
-class MIPSInstructionNode(MIPS_Node):
+class InstructionNode(MIPS_Node):
         pass
     
-class DataTransferNode(MIPSInstructionNode):
+class DataTransferNode(InstructionNode):
     pass
 
-class ProcedureNode(MIPSInstructionNode):
+class ProcedureNode(InstructionNode):
     def __init__(self, label):
         self.label = label
         self.instructions = []
@@ -38,15 +41,23 @@ class DataTransferWithOffset(DataTransferNode):
 class LoadWordNode(DataTransferWithOffset):
     def __str__(self):
         return f'lw {self.source}, {str(self.offset)}({self.destination})'
+    
+class LoadByteNode(DataTransferWithOffset):
+    def __str__(self):
+        return f'lb {self.source}, {str(self.offset)}({self.destination})'
         
 class StoreWordNode(DataTransferWithOffset):
     def __str__(self):
         return f'sw {self.source}, {str(self.offset)}({self.destination})'
     
+class StoreByteNode(DataTransferWithOffset):
+    def __str__(self):
+        return f'sb {self.source}, {str(self.offset)}({self.destination})'
+    
 class LoadNode(DataTransferNode):
     def __init__(self,dest,value):
         self.destination = dest
-        self.value
+        self.value = value
 
 class LoadInmediate(LoadNode):
     def __str__(self):
@@ -65,10 +76,10 @@ class MoveNode(DataTransferNode):
         return f"move {self.destination} {self.source}"
 
 
-class DataTypeNode(MIPSDataNode):
-    def __init__(self, name, datatype,vt_values):
-        self.name = name
+class DataTypeNode(DataNode):
+    def __init__(self,datatype,name,vt_values):
         self.datatype = datatype
+        self.name = name
         self.vt_values = vt_values
 
     def __str__(self):
@@ -77,7 +88,7 @@ class DataTypeNode(MIPSDataNode):
             values += f", {value}"
         return f"{self.name} : {self.datatype}{values}"
     
-class ArithAnfLogicNode(MIPSInstructionNode):
+class ArithAnfLogicNode(InstructionNode):
     def __init__(self, destination,left,right):
         self.destination = destination
         self.left = left
@@ -94,7 +105,34 @@ class AddiNode(ArithAnfLogicNode):
 class SubNode(ArithAnfLogicNode):
     def __str__(self):
         return f"sub {self.destination}, {self.left}, {self.right}"
+
+class HiLoOperationNode(InstructionNode):
+    def __init__(self,left,right):
+        self.left = left
+        self.right = right
     
+class MultNode(HiLoOperationNode):
+     def __str__(self):
+        return f'mult {self.left}, {self.right}'
+
+class DivideNode(HiLoOperationNode):
+     def __str__(self):
+        return f'div {self.left}, {self.right}'
+
+class MoveFromHi(InstructionNode):
+    def __init__(self,register):
+        self.register = register
+        
+    def __str__(self):
+        return f'mfhi {self.register}'
+    
+class MoveFromLo(InstructionNode):
+    def __init__(self,register):
+        self.register = register
+        
+    def __str__(self):
+        return f'mflo {self.register}'
+        
 class ConditionalBranch(InstructionNode):
     def __init__(self,c1,c2,jump):
         self.c1 = c1
