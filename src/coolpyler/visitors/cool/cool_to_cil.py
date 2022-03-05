@@ -207,8 +207,27 @@ class CoolToCilVisitor(object):
         self.instructions.append(cil.LengthNode(len_local, str_local))
         len_minus_one_local = self.register_local("len_minus_one")
         self.instructions.append(cil.MinusNode(len_minus_one_local, len_local, self.register_num(1)))
+
+        then_label = self.get_label("then")
+        else_label = self.get_label("else")
+
+        # IF condition GOTO then_label
+        has_eol_local = self.register_local("has_eol")
+        eol_local = self.register_data("eol", '"\\n"')
+        last_char_local = self.register_local("last_char")
+        self.instructions.append(cil.SubstringNode(last_char_local, str_local, self.register_num(1), len_minus_one_local))
+        self.instructions.append(cil.StrEqNode(has_eol_local, last_char_local, eol_local))
+        self.instructions.append(cil.GotoIfEqNode(has_eol_local, then_label))
+
+        # Label else_label
+        self.instructions.append(cil.LabelNode(else_label))
         self.instructions.append(cil.SubstringNode(str_local, str_local, len_minus_one_local, self.register_num(0)))
         self.instructions.append(cil.ReturnNode(self.register_new("String", str_local)))
+
+        # Label then_label
+        self.instructions.append(cil.LabelNode(then_label))
+        self.instructions.append(cil.ReturnNode(self.register_new("String", str_local)))
+
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("IO", "in_string"),
@@ -551,13 +570,6 @@ class CoolToCilVisitor(object):
             arg_sid = self.visit(arg_expr)
             args.append(cil.ArgNode(arg_sid))
 
-        # # debug print {{{
-        # eol = self.register_new("String", self.register_data("eol", '"\\n"'))
-        # debug = self.register_new("String", self.register_data("static_func", self.get_func_id(node.static_type.name, node.id)))
-        # self.instructions.append(cil.PrintNode(debug, True))
-        # self.instructions.append(cil.PrintNode(eol, True))
-        # # }}}
-
         self.instructions.extend(args)
         self.instructions.append(
             cil.StaticCallNode(
@@ -579,23 +591,6 @@ class CoolToCilVisitor(object):
 
         typeof_local = self.register_local()
         self.instructions.append(cil.TypeOfNode(sid, typeof_local))
-
-        # # debug print {{{
-        # tnlocal = self.register_local("tname_local")
-        # eol = self.register_data("eol", '"\\n"')
-        # eol = self.register_new("String", eol)
-        # under = self.register_data("under", '"_"')
-        # under = self.register_new("String", under)
-        # meth = self.register_data("meth", f'"{node.id}"')
-        # meth = self.register_new("String", meth)
-        # self.instructions.append(
-        #     cil.DynamicCallNode(typeof_local, self.get_method_id("Object", "type_name"), tnlocal)
-        # )
-        # self.instructions.append(cil.PrintNode(tnlocal, True))
-        # self.instructions.append(cil.PrintNode(under, True))
-        # self.instructions.append(cil.PrintNode(meth, True))
-        # self.instructions.append(cil.PrintNode(eol, True))
-        # # }}}
 
         self.instructions.extend(args)
         method_id = self.get_method_id(node.expr.type.name, node.id)
