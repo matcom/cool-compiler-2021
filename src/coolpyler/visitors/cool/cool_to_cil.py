@@ -543,7 +543,7 @@ class CoolToCilVisitor(object):
         self.instructions.extend(args)
         self.instructions.append(
             cil.StaticCallNode(
-                self.get_func_id(node.static_type, node.id), return_local
+                self.get_func_id(node.static_type.name, node.id), return_local
             )
         )
         return return_local
