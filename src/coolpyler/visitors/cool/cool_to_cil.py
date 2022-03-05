@@ -733,8 +733,8 @@ class CoolToCilVisitor(object):
         attr = self.register_local()
         sid = self.visit(node.expr)
         self.instructions.append(cil.GetAttrNode(sid, 0, attr))
-        self.instructions.append(cil.MinusNode(ret_local, self.register_num(1), attr))
-        return self.register_new("Bool", ret_local)
+        self.instructions.append(cil.ComplementNode(ret_local, attr))
+        return self.register_new("Int", ret_local)
 
     @visitor.when(type_checked.CoolNotNode)
     def visit(self, node: type_checked.CoolNotNode) -> str:
