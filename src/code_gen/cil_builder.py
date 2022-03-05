@@ -693,18 +693,30 @@ class CILBuilder:
 
     @visitor.when(cool.ConstantNumNode)
     def visit(self, node):
-        return node.lex
+        solve = self.define_internal_local()
+        self.register_instruction(AssignNode(solve, int(node.lex)))
+        return solve
 
     @visitor.when(cool.VariableNode)
     def visit(self, node):
-        return node.lex
+        solve = self.define_internal_local()
+
+        if self.is_attribute(node.lex):
+            self.register_instruction(
+                GetAttribNode(
+                    solve, self.current_type.name, node.lex, self.current_type.name
+                )
+            )
+        else:
+            self.register_instruction(AssignNode(solve, node.lex))
+        return solve
 
     @visitor.when(cool.StringNode)
     def visit(self, node):
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
         solve = self.define_internal_local()
-        self.register_instruction(LoadNode(solve,idx))
+        self.register_instruction(LoadNode(solve, idx))
         return solve
 
     @visitor.when(cool.BooleanNode)
