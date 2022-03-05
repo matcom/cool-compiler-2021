@@ -197,6 +197,11 @@ class CoolToCilVisitor(object):
         self.register_param("self")
         str_local = self.register_local("str")
         self.instructions.append(cil.ReadNode(str_local, True))
+        len_local = self.register_local("len")
+        self.instructions.append(cil.LengthNode(len_local, str_local))
+        len_minus_one_local = self.register_local("len_minus_one")
+        self.instructions.append(cil.MinusNode(len_minus_one_local, len_local, self.register_num(1)))
+        self.instructions.append(cil.SubstringNode(str_local, str_local, len_minus_one_local, self.register_num(0)))
         self.instructions.append(cil.ReturnNode(self.register_new("String", str_local)))
         self.dotcode.append(
             cil.FunctionNode(
@@ -212,7 +217,7 @@ class CoolToCilVisitor(object):
         self.register_param("self")
         int_local = self.register_local("int")
         self.instructions.append(cil.ReadNode(int_local, False))
-        self.instructions.append(cil.ReturnNode(self.register_new("String", int_local)))
+        self.instructions.append(cil.ReturnNode(self.register_new("Int", int_local)))
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id("IO", "in_int"),
