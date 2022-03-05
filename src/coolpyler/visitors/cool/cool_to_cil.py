@@ -97,10 +97,16 @@ class CoolToCilVisitor(object):
 
     def register_object_abort(self):
         self.reset_state()
-        self.register_param("self")
-        data = self.register_data("abort_msg", '"Program Halted!"')
-        instance = self.register_new("String", data)
-        self.instructions.append(cil.PrintNode(instance, True))
+        param_self = self.register_param("self")
+        self_type = self.register_local("self_type")
+        type_name = self.register_local("type")
+        self.instructions.append(cil.TypeOfNode(param_self, self_type))
+        self.instructions.append(cil.DynamicCallNode(self_type, self.get_method_id("Object", "type_name"), type_name))
+        eol = self.register_new("String", self.register_data("eol", '"\\n"'))
+        msg = self.register_new("String", self.register_data("abort_msg", '"Abort called from class "'))
+        self.instructions.append(cil.PrintNode(msg, True))
+        self.instructions.append(cil.PrintNode(type_name, True))
+        self.instructions.append(cil.PrintNode(eol, True))
         self.instructions.append(cil.ExitNode(1))
         self.dotcode.append(
             cil.FunctionNode(
