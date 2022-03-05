@@ -15,9 +15,6 @@ test:
 lexer parser semantic codegen:
 	pytest ../tests --tb=no --disable-warnings -m=$@
 
-.PHONY: test-done
-test-done: lexer parser semantic
-
 .PHONY: style
 style:
 	for f in $$(find . -name '*.py'); do [ -f $$f ] && echo "Formatting $$f" && black $$f && isort --profile black $$f; done
