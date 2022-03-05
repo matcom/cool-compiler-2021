@@ -28,11 +28,19 @@ def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printin
     # Give the lexer some input
     lexer.input(data)
 
+    lessequal = grammar.__getitem__("<=")
+    rarrow = grammar.__getitem__("=>")
+    larrow = grammar.__getitem__("<-")
+    
     fixed_tokens_names = {
         t.Name: (t.Name, t)
         for t in grammar.terminals
-        if t not in {idx, type_id, string, num}
+        if t not in {idx, type_id, string, num, lessequal, rarrow, larrow}
     }
+
+    fixed_tokens_names["larrow"] = ("<-", larrow)
+    fixed_tokens_names["rarrow"] = ("=>", rarrow)
+    fixed_tokens_names["lessequal"] = ("<=", lessequal)
 
     tokens = []
     pos_data = []
@@ -52,18 +60,15 @@ def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printin
             try:
                 tval, ttype = fixed_tokens_names[tok.type]
             except:
-                try:  # for <=, ->, <- #this may be unnecessary
-                    tval, ttype = fixed_tokens_names[tok.value]
-                except:
-                    tval = tok.value
-                    if tok.type == "string":
-                        ttype = string
-                    elif tok.type == "id":
-                        ttype = idx
-                    elif tok.type == "type_id":
-                        ttype = type_id
-                    else:
-                        ttype = num
+                tval = tok.value
+                if tok.type == "string":
+                    ttype = string
+                elif tok.type == "id":
+                    ttype = idx
+                elif tok.type == "type_id":
+                    ttype = type_id
+                else:
+                    ttype = num
             tokens.append(Token(tval, ttype, (tok.lineno, find_column(data, tok.lexpos))))
 
     if printing:

@@ -452,8 +452,9 @@ class TypeChecker:
                 and left_type.name != "AUTO_TYPE"
                 and right_type.name != "AUTO_TYPE"
             ):
+                node_row, node_col = node.token.location
                 self.errors.append(
-                    f"One of the expressions of '=' operator is of type Int, String or Bool, the other must have the same static type. Left type: {left_type.name}.Right type: {right_type.name}"
+                    TypeError(node_row, node_col, f"One of the expressions of '=' operator is of type Int, String or Bool, the other must have the same static type. Left type: {left_type.name}. Right type: {right_type.name}")
                 )
 
         return self.context.get_type("Bool")

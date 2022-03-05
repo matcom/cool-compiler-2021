@@ -119,37 +119,6 @@ def t_comments_eof(t):
 
 
 # Rules for initial state (default state)
-
-#Object identifiers
-def t_id(t):
-    r"[a-z][a-zA-Z_0-9]*"
-    t.type = reserved.get(
-        t.value.lower(), "id"
-    )  # Check for reserved words. If it isn't a reserved word is categorized as identifier
-    return t
-
-#Type identifiers
-def t_type_id(t):
-    r"[A-Z][a-zA-Z_0-9]*"
-    value_in_lowercase = t.value.lower()
-    if value_in_lowercase != "false" and value_in_lowercase != "true":
-        t.type = reserved.get(
-            value_in_lowercase, "type_id"
-        ) # Check for reserved words. If it isn't a reserved word is categorized as identifier
-    else:
-        t.type = "type_id"#this may be extra as t.type is already setted as type_id 
-    # t.lexpos = t.lexpos - t.lexer.last_new_line_pos + 1
-    return t
-
-# matching int numbers
-def t_int(t):
-    r"\d+"
-    t.value = int(t.value)
-    # r'\d+(\.\d*)?' float numbers
-    # t.value = float(t.value)
-    return t
-
-
 def t_comment1(t):
     r"\--.*"
     pass
@@ -157,7 +126,7 @@ def t_comment1(t):
 
 
 def t_string(t):# se va a develve el string vacio cada vez que no se puede matchear el string completo
-    r"\" "#xq habria que seguir analizando el string cuando se ha encontrado un caracter null y se ha de parar en otros casos?
+    r'\"'#xq habria que seguir analizando el string cuando se ha encontrado un caracter null y se ha de parar en otros casos?
     string_list = []
     text = t.lexer.lexdata
     initial = t.lexer.lexpos
@@ -221,6 +190,35 @@ def t_string(t):# se va a develve el string vacio cada vez que no se puede match
         t.lexer.lexpos = index
         return t
 
+
+#Object identifiers
+def t_id(t):
+    r'[a-z][a-zA-Z_0-9]*'
+    t.type = reserved.get(
+        t.value.lower(), "id"
+    )  # Check for reserved words. If it isn't a reserved word is categorized as identifier
+    return t
+
+#Type identifiers
+def t_type_id(t):
+    r'[A-Z][a-zA-Z_0-9]*'
+    value_in_lowercase = t.value.lower()
+    if value_in_lowercase != "false" and value_in_lowercase != "true":
+        t.type = reserved.get(
+            value_in_lowercase, "type_id"
+        ) # Check for reserved words. If it isn't a reserved word is categorized as identifier
+    else:
+        t.type = "type_id"#this may be extra as t.type is already setted as type_id 
+    # t.lexpos = t.lexpos - t.lexer.last_new_line_pos + 1
+    return t
+
+# matching int numbers
+def t_int(t):
+    r"\d+"
+    t.value = int(t.value)
+    # r'\d+(\.\d*)?' float numbers
+    # t.value = float(t.value)
+    return t
 
 # Define a rule so we can track line numbers
 def t_newline(t):
