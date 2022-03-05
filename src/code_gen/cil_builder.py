@@ -69,6 +69,7 @@ class CILBuilder:
         self._count = 0
         self.internal_count = 0
         self.context = None
+        self.self_var = "self"
 
     def generate_next_method_id(self):
         self.method_count += 1
@@ -158,28 +159,44 @@ class CILBuilder:
     #         self.code.append(ReturnIL())
 
     def build_constructor(self, node):
+        self.current_function = self.register_function(
+            self.to_function_name("constructor", node.id)
+        )
+        self.current_type.define_method("constructor", [], [], "Object")
+
+        self_var = self.define_internal_local()
+
+        self.register_instruction(AllocateNode(node.id, self_var))
+
         attributeNodes = [
             feat for feat in node.features if isinstance(feat, cool.AttrDeclarationNode)
         ]
 
-        expr_list = []
         for attr in attributeNodes:  # Assign default value first
-            assign = cool.AssignNode(
-                self.to_attr_name(self.current_type.name, attr.id),
-                cool.DefaultValueNode(attr.type),
+            default_var = self.define_internal_local()
+            self.register_instruction(DefaultValueNode(default_var, attr.type))
+            self.register_instruction(
+                SetAttribNode(
+                    node.id,
+                    self.to_attr_name(self.current_type.name, attr.id),
+                    default_var,
+                    node.id,
+                )
             )
-            expr_list.append(assign)
 
         for attr in attributeNodes:  # Assign init_expr if not None
             if attr.init_exp:
-                assign = cool.AssignNode(
-                    self.to_attr_name(self.current_type.name, attr.id), attr.init_exp
+                init_expr_value = self.visit(attr.init_exp)
+                self.register_instruction(
+                    SetAttribNode(
+                        node.id,
+                        self.to_attr_name(self.current_type.name, attr.id),
+                        init_expr_value,
+                        node.id,
+                    )
                 )
-                expr_list.append(assign)
 
-        body = cool.BlockNode(expr_list)
-        self.current_type.define_method("constructor", [], [], "Object")
-        return cool.FuncDeclarationNode("constructor", [], "Object", body)
+        self.register_instruction(ReturnNode(self_var))
 
     def add_builtin_functions(self):
         # Object
@@ -380,7 +397,7 @@ class CILBuilder:
 
         type_node = self.register_type(self.current_type.name)
 
-        constructor = self.build_constructor(node)
+        self.build_constructor(node)
 
         visited_func = []
         current_type = self.current_type
@@ -406,7 +423,6 @@ class CILBuilder:
         type_node.attributes.reverse()
         type_node.methods.reverse()
 
-        self.visit(constructor)
         for feature in node.features:
             self.visit(feature)
 
@@ -456,7 +472,9 @@ class CILBuilder:
         expr = self.visit(node.expr)
 
         if self.is_attribute(node.id):
-            self.register_instruction(SetAttribNode("self", node.id, expr))
+            self.register_instruction(
+                SetAttribNode("self", node.id, expr, self.current_type.name)
+            )
         else:
             self.register_instruction(AssignNode(node.id, expr))
 
@@ -646,13 +664,11 @@ class CILBuilder:
     @visitor.when(cool.InstantiateNode)  # NewNode
     def visit(self, node):
         instance = self.define_internal_local()
-        solve = self.define_internal_local()
-        self.register_instruction(AllocateNode(node.lex, instance))
         self.register_instruction(
-            StaticCallNode(self.to_function_name("constructor", node.lex), solve)
+            StaticCallNode(self.to_function_name("constructor", node.lex), instance)
         )
 
-        return solve
+        return instance
 
     @visitor.when(cool.IsvoidNode)
     def visit(self, node):
@@ -677,17 +693,31 @@ class CILBuilder:
 
     @visitor.when(cool.ConstantNumNode)
     def visit(self, node):
-        return node.lex
+        solve = self.define_internal_local()
+        self.register_instruction(AssignNode(solve, int(node.lex)))
+        return solve
 
     @visitor.when(cool.VariableNode)
     def visit(self, node):
-        return node.lex
+        solve = self.define_internal_local()
+
+        if self.is_attribute(node.lex):
+            self.register_instruction(
+                GetAttribNode(
+                    solve, self.current_type.name, node.lex, self.current_type.name
+                )
+            )
+        else:
+            self.register_instruction(AssignNode(solve, node.lex))
+        return solve
 
     @visitor.when(cool.StringNode)
     def visit(self, node):
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
-        return idx
+        solve = self.define_internal_local()
+        self.register_instruction(LoadNode(solve, idx))
+        return solve
 
     @visitor.when(cool.BooleanNode)
     def visit(self, node):
