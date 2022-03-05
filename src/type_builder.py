@@ -13,7 +13,7 @@ import cmp.visitor as visitor
 from tset import Tset
 from collections import deque
 from cool_visitor import CopyVisitor
-from errors import SemanticError
+from errors import SemanticError, TypeError
 
 class TypeBuilder:
     def __init__(self, errors=[]):
@@ -198,20 +198,27 @@ class TypeBuilder:
                 node.id.lex, param_names, param_types, return_type
             )
         except SError as error:
+            node_row, node_col = node.id.location
             # print("--------aqui se esta reportando el error del metodo doble---------")
-            self.errors.append(error.text)
+            self.errors.append(SemanticError(node_row, node_col,error.text))
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
         try:
-            attr_type = self.get_type(node.type.lex)
+            try:
+                attr_type = self.context.get_type(node.type.lex)
+            except SError as error:
+                attr_type = ErrorType()
+                node_row, node_col = node.type.location
+                self.errors.append(TypeError(node_row, node_col,error.text))
             self.current_type.define_attribute(node.id.lex, attr_type)
         except SError as error:
-            self.errors.append(error.text)
+            node_row, node_col = node.id.location
+            self.errors.append(SemanticError(node_row, node_col,error.text))
 
-    def get_type(self, tname):
+    def get_type(self, ntype):
         try:
-            return self.context.get_type(tname)
+            return self.context.get_type(ntype)
         except SError as error:
             self.errors.append(error.text)
             return ErrorType()

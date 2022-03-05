@@ -56,11 +56,11 @@ class Type:
             raise SemanticError(f"Is not possible to inherit from {parent.name}")
         self.parent = parent
 
-    def get_attribute(self, name: str, visited=None):
+    def get_attribute(self, name: str, index: int, visited=None):
         if visited is None:
             visited = []
         try:
-            return next(attr for attr in self.attributes if attr.name == name)
+            return next((attr, index) for attr in self.attributes if attr.name == name)
         except StopIteration:
             visited.append(self.name)
             if self.parent is None:
@@ -72,7 +72,7 @@ class Type:
                     raise SemanticError(
                         f'Attribute "{name}" is not defined in {self.name}.'
                     )
-                return self.parent.get_attribute(name, visited=visited)
+                return self.parent.get_attribute(name, index + 1, visited=visited)
             except SemanticError:
                 raise SemanticError(
                     f'Attribute "{name}" is not defined in {self.name}.'
@@ -80,14 +80,18 @@ class Type:
 
     def define_attribute(self, name: str, typex):
         try:
-            self.get_attribute(name)
+            attr, index = self.get_attribute(name, 0)
         except SemanticError:
             attribute = Attribute(name, typex)
             self.attributes.append(attribute)
             return attribute
         else:
+            if index > 0:
+                mssg = "an inherited class"
+            else:
+                mssg = self.name
             raise SemanticError(
-                f'Attribute "{name}" is already defined in {self.name}.'
+                f'Attribute "{name}" is already defined in {mssg}.'
             )
 
     def get_method(self, name: str, non_rec=False, visited=None):
