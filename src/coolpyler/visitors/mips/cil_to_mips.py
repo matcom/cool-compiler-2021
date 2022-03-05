@@ -1255,8 +1255,8 @@ class CilToMIPS:
         instructions.append(mips.SyscallNode())
         return instructions
 
-    @visitor.when(cil.CommentNode)
-    def visit(self, node: cil.CommentNode):
+    @visitor.when(cil.ComplementNode)
+    def visit(self, node: cil.ComplementNode):
         instructions = []
         self.memory_manager.save()
 
@@ -1267,19 +1267,11 @@ class CilToMIPS:
         reg2 = self.memory_manager.get_unused_register()
 
         instructions.append(
-            instructions.append(
-                mips.LoadWordNode(
-                    reg1, mips.MemoryAddressRegisterNode(FP_REG, source_dir)
-                )
-            )
+            mips.LoadWordNode(reg1, mips.MemoryAddressRegisterNode(FP_REG, source_dir))
         )
         instructions.append(mips.NotNode(reg2, reg1))
         instructions.append(
-            instructions.append(
-                mips.StoreWordNode(
-                    reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir)
-                )
-            )
+            mips.StoreWordNode(reg2, mips.MemoryAddressRegisterNode(FP_REG, dest_dir))
         )
 
         self.memory_manager.clean()
