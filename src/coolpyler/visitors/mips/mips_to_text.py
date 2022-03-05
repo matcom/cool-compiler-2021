@@ -164,3 +164,8 @@ class MIPSGenerator:
     @visitor.when(mips.JumpRegisterLinkNode)
     def visit(self, node: mips.JumpRegisterLinkNode):
         return f"\tjalr {self.visit(node.register)} \t#{node.comment}"
+
+    @visitor.when(mips.NotNode)
+    def visit(self, node: mips.NotNode):
+        return f"\tnot {node.number} \t#{node.comment}"
+

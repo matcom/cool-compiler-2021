@@ -238,3 +238,9 @@ class PrintNode(InstructionNode):
     def __init__(self, str_addr, is_string):
         self.is_string = is_string
         self.str_addr = str_addr
+
+
+class Complement(InstructionNode):
+    def __init__(self, dest, source):
+        self.source = source
+        self.dest = dest
