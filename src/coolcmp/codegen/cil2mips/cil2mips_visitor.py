@@ -418,6 +418,59 @@ class CILToMipsVisitor:
 
         self.add_inst(mips.CommentNode(f"</length:{node.dest}=len({node.src})>"))
 
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node: cil.ConcatNode):
+        self.add_inst(mips.CommentNode(f"<concat:{node.dest}={node.str1}+{node.str2}>"))
+
+        self.visit(cil.AllocateNode('String', node.dest))
+
+        str1_address = self.get_address(node.str1)
+        str2_address = self.get_address(node.str2)
+        dest_address = self.get_address(node.dest)
+
+        # Calc length of str1 and save it in t0
+        length_of_str1 = (
+            mips.LWNode(a0, (str1_address, fp)),
+            mips.LWNode(a0, (4, a0)),
+            mips.JALNode('length'),
+            mips.MoveNode(t0, v0)
+        )
+        # Calc length of str2 and save it in t1
+        length_of_str2 = (
+            mips.LWNode(a0, (str2_address, fp)),
+            mips.LWNode(a0, (4, a0)),
+            mips.JALNode('length'),
+            mips.MoveNode(t1, v0)
+        )
+
+        push_str1 = (
+            mips.LWNode(a0, (str1_address, fp)),
+            mips.LWNode(a0, (4, a0))
+        )
+        push_str2 = (
+            mips.LWNode(a1, (str2_address, fp)),
+            mips.LWNode(a1, (4, a1))
+        )
+        push_length = (
+            mips.ADDNode(a2, t0, t1),
+        )
+
+        self.add_inst(
+            *length_of_str1,
+            *length_of_str2,
+            *push_str1,
+            *push_str2,
+            *push_length,
+            mips.JALNode('concat'),
+        )
+
+        self.add_inst(
+            mips.LWNode(t1, (dest_address, fp)),
+            mips.SWNode(v0, 4, t1)
+        )
+
+        self.add_inst(mips.CommentNode(f"</concat:{node.dest}={node.str1}+{node.str2}>"))
+
     @visitor.when(cil.TypeNameNode)
     def visit(self, node: cil.TypeNameNode):
         name_offset = self.types['Object'].name_offset
