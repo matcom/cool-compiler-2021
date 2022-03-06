@@ -217,6 +217,26 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
 
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node: cil.ReadIntNode):
+        address = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<readint:{node.dest}>"),
+            mips.LINode(v0, 5),
+            mips.SysCallNode(),
+            mips.MoveNode(t2, v0)
+        )
+
+        self.visit(cil.AllocateNode('Int', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t1, (address, fp)),
+            mips.SWNode(t2, 4, t1),
+            mips.LWNode(v0, (address, fp)),
+            mips.CommentNode(f"</readint:{node.dest}>")
+        )
+
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
         obj_address = self.get_address(node.obj)
