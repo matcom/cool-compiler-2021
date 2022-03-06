@@ -70,7 +70,7 @@ class CILBuilder:
         self._count = 0
         self.internal_count = 0
         self.context = None
-        self.self_var = "self"
+        self.self_var = None
 
     def generate_next_method_id(self):
         self.method_count += 1
@@ -173,6 +173,7 @@ class CILBuilder:
         self.current_type.define_method("constructor", [], [], "Object")
 
         self_var = self.define_internal_local()
+        self.self_var = self_var
 
         self.register_instruction(AllocateNode(node.id, self_var))
 
@@ -708,7 +709,7 @@ class CILBuilder:
         if self.is_attribute(node.lex):
             self.register_instruction(
                 GetAttribNode(
-                    solve, self.current_type.name, node.lex, self.current_type.name
+                    solve, "self", self.to_attr_name(self.current_type.name, node.lex), self.current_type.name
                 )
             )
         else:
@@ -720,7 +721,7 @@ class CILBuilder:
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
         solve = self.define_internal_local()
-        self.register_instruction(LoadNode(solve, VariableInfo(idx, False, node.lex)))
+        self.register_instruction(LoadNode(solve, VariableInfo(idx,None, False, node.lex)))
         return solve
 
     @visitor.when(cool.BooleanNode)

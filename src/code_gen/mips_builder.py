@@ -16,6 +16,7 @@ TYPENAME_OFFSET = 0
 FUNCTION_OFFSET = 4
 RA_OFFSET = 8
 OLD_FP_OFFSET = 4
+TYPEINFO_ATTR_OFFSET = 0
 
 #str attributes offsets
 LENGTH_ATTR_OFFSET = 4
@@ -130,7 +131,7 @@ class MIPSBuilder:
             return -4*index
         elif x in self.params:
             index = self.params.index(x)
-            return (-4 * (len(self.locals)+len(self.params)))+4
+            return (-4 * (len(self.locals)+index))
     
     def register_instruction(self, instruction_type, *args):
         instruction = instruction_type(*args)
@@ -325,8 +326,7 @@ class MIPSBuilder:
         self.register_instruction(mips.CommentNode,"Restoring saved $fp")
         self.register_instruction(mips.LoadWordNode, fp, OLD_FP_OFFSET, fp)#stored (old)$fp
         
-        AR = 4*(len(node.localvars) + len(node.params) + 2)
-        #AR = 4*(len(node.localvars) + 2)
+        AR = 4*(len(node.localvars) + 2)
         
         self.register_instruction(mips.CommentNode,"Cleaning stack after call")
         self.register_instruction(mips.AddiNode, sp, sp, AR)
@@ -365,7 +365,7 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
 
         reg = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadAddress,reg,STRING)
+        self.register_instruction(mips.LoadAddress,reg,f'{STRING}_name')
         self.register_instruction(mips.StoreWordNode,reg,0,v0)
 
         #storing string length
@@ -415,13 +415,13 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)        
         
         reg = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadAddress,reg,node.type)
+        self.register_instruction(mips.LoadAddress,reg,'f{node.type}_name')
         self.register_instruction(mips.StoreWordNode,reg,0,v0)
         self.memo.clean()
         
     @visitor.when(cil.AssignNode)
     def visit(self,node):
-        self.save()
+        self.memo.save()
         
         reg = self.memo.get_unused_reg()
         
@@ -437,7 +437,7 @@ class MIPSBuilder:
     
     @visitor.when(cil.PlusNode)
     def visit(self,node):
-        self.save()
+        self.memo.save()
         
         reg1 = self.memo.get_unused_reg()
         reg2 = self.memo.get_unused_reg()
@@ -455,7 +455,7 @@ class MIPSBuilder:
     
     @visitor.when(cil.MinusNode)
     def visit(self,node):
-        self.save()
+        self.memo.save()
         
         reg1 = self.memo.get_unused_reg()
         reg2 = self.memo.get_unused_reg()
@@ -539,7 +539,7 @@ class MIPSBuilder:
         
         dest_offs = self.get_offset(node.dest)
         self.register_instruction(mips.StoreWordNode,reg2,dest_offs,fp)
-        
+        self.memo.clean()
     
     @visitor.when(cil.SetAttribNode)
     def visit(self, node):
@@ -574,7 +574,7 @@ class MIPSBuilder:
 
             self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
             reg = self.memo.get_unused_reg()
-            self.register_instruction(mips.LoadAddress,reg,STRING)
+            self.register_instruction(mips.LoadAddress,reg,f'{STRING}_name')
             self.register_instruction(mips.StoreWordNode,reg,0,v0)
         
             self.register_instruction(mips.LoadInmediate,reg,0)
@@ -740,7 +740,7 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
 
         reg = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadAddress,reg,STRING)
+        self.register_instruction(mips.LoadAddress,reg,f'{STRING}_name')
         self.register_instruction(mips.StoreWordNode,reg,0,v0)
 
         #storing string length
@@ -771,14 +771,20 @@ class MIPSBuilder:
         self.register_instruction(mips.LoadInmediate, v0, SYSCALL_PRINT_INT)
         self.register_instruction(mips.SyscallNode)
     
-    #Incompleto
+
     @visitor.when(cil.TypeOfNode)
     def visit(self,node):
-        #self.memo.save()
+        self.memo.save()
+        obj_offset = self.get_offset(node.obj)
+        dest_offset = self.get_offset(node.dest)
         
-        #reg1 = self.get_offset()
-        #reg2 = self.get_offset()
-        pass
+        reg1 = self.memo.get_unused_reg()
+        self.register_instruction(mips.CommentNode,"Executing typeof")
+        self.register_instruction(mips.LoadWordNode, reg1, obj_offset, fp)
+        self.register_instruction(mips.LoadWordNode, reg1, TYPEINFO_ATTR_OFFSET, reg1)
+        self.register_instruction(mips.StoreWordNode, reg1, dest_offset, fp)
+
+        self.memo.clean()
     
         
     @visitor.when(cil.TypeNameNode)
