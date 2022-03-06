@@ -1,14 +1,10 @@
 import sys
-
-
-
 from .error import CoolError
 from .lexer import CoolLexer
 from .parser import CoolParser
 from .codegen import CoolToCIL, MipsGenerate
 from .semantic import *
 from .types import CoolTypeBuildInManager
-# from .codegen import CILGenerate
 
 path = ""
 if len(sys.argv) > 1:
