@@ -1,7 +1,7 @@
 class Node:
     def __init__(self, line_no: int, col_no: int):
-        self.lineno = line_no
-        self.colno = col_no
+        self.line_no = line_no
+        self.col_no = col_no
         self.computed_type = None
 
 

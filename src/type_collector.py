@@ -66,7 +66,7 @@ class TypeCollector(object):
             typex = self.context.create_type(node)
             typex.set_parent(self.context.types[BasicTypes.OBJECT.value])
         except SemanticError as error:
-            self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno, error.text))
+            self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no, error.text))
             node.id = BasicTypes.ERROR.value
 
 

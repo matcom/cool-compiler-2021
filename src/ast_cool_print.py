@@ -9,7 +9,7 @@ class FormatVisitor(object):
 
     @visitor.when(ProgramNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__ProgramNode {node.lineno} [<class> ... <class>]"
+        ans = "\t" * tabs + f"\\__ProgramNode {node.line_no} [<class> ... <class>]"
         statements = "\n".join(
             self.visit(child, tabs + 1) for child in node.declarations
         )
@@ -20,7 +20,7 @@ class FormatVisitor(object):
         parent = "" if node.parent is None else f": {node.parent}"
         ans = (
             "\t" * tabs
-            + f"\\__ClassDeclarationNode {node.lineno}: class {node.id} {parent} {{ <feature> ... <feature> }}"
+            + f"\\__ClassDeclarationNode {node.line_no}: class {node.id} {parent} {{ <feature> ... <feature> }}"
         )
         features = "\n".join(self.visit(child, tabs + 1) for child in node.features)
         return f"{ans}\n{features}"
@@ -30,7 +30,7 @@ class FormatVisitor(object):
         params = ", ".join(":".join(param) for param in node.params)
         ans = (
             "\t" * tabs
-            + f"\\__FuncDeclarationNode {node.lineno}: def {node.id}({params}) : {node.type} -> <body>"
+            + f"\\__FuncDeclarationNode {node.line_no}: def {node.id}({params}) : {node.type} -> <body>"
         )
         body = self.visit(node.body, tabs + 1)
         return f"{ans}\n{body}"
@@ -39,7 +39,7 @@ class FormatVisitor(object):
     def visit(self, node, tabs=0):
         ans = (
             "\t" * tabs
-            + f"\\__AttrDeclarationNode {node.lineno}: {node.id} : {node.type} <- <value>"
+            + f"\\__AttrDeclarationNode {node.line_no}: {node.id} : {node.type} <- <value>"
         )
         if node.val is None:
             return f"{ans}"
@@ -50,7 +50,7 @@ class FormatVisitor(object):
     def visit(self, node, tabs=0):
         ans = (
             "\t" * tabs
-            + f"\\__ConditionalNode {node.lineno}: if <expr> then <expr> else <expr>"
+            + f"\\__ConditionalNode {node.line_no}: if <expr> then <expr> else <expr>"
         )
         if_expr = self.visit(node.if_expr, tabs + 1)
         then_expr = self.visit(node.then_expr, tabs + 1)
@@ -59,21 +59,21 @@ class FormatVisitor(object):
 
     @visitor.when(LoopNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__LoopNode {node.lineno}: while <condition> -> <body>"
+        ans = "\t" * tabs + f"\\__LoopNode {node.line_no}: while <condition> -> <body>"
         condition = self.visit(node.condition, tabs + 1)
         body = self.visit(node.body, tabs + 1)
         return f"{ans}\n{condition}\n{body}"
 
     @visitor.when(BlockNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__BlockNode {node.lineno}: (<expr_list>)"
+        ans = "\t" * tabs + f"\\__BlockNode {node.line_no}: (<expr_list>)"
         for child in node.expr_list:
             ans += "\n" + self.visit(child, tabs + 1)
         return f"{ans}"
 
     @visitor.when(LetNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__LetNode {node.lineno}: let <vars> in <body>"
+        ans = "\t" * tabs + f"\\__LetNode {node.line_no}: let <vars> in <body>"
         params = "\t" * (tabs + 1) + f"\\__vars:"
         for child in node.var_list:
             params += (
@@ -90,7 +90,7 @@ class FormatVisitor(object):
     def visit(self, node, tabs=0):
         ans = (
             "\t" * tabs
-            + f"\\__CaseNode {node.lineno}: case <expr> of <branch_list> esac"
+            + f"\\__CaseNode {node.line_no}: case <expr> of <branch_list> esac"
         )
         expr = self.visit(node.expr, tabs + 1)
         branches = ""
@@ -106,7 +106,7 @@ class FormatVisitor(object):
 
     @visitor.when(AssignNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__AssignNode {node.lineno}: {node.id} <- <expr>"
+        ans = "\t" * tabs + f"\\__AssignNode {node.line_no}: {node.id} <- <expr>"
         expr = self.visit(node.expr, tabs + 1)
         return f"{ans}\n{expr}"
 
@@ -114,7 +114,7 @@ class FormatVisitor(object):
     def visit(self, node, tabs=0):
         ans = (
             "\t" * tabs
-            + f"\\__CallNode {node.lineno}: <obj>.{node.id}@{node.ancestor_type}(<expr>, ..., <expr>)"
+            + f"\\__CallNode {node.line_no}: <obj>.{node.id}@{node.ancestor_type}(<expr>, ..., <expr>)"
         )
         obj_value = self.visit(node.obj, tabs + 2)
         if not obj_value:
@@ -135,26 +135,26 @@ class FormatVisitor(object):
 
     @visitor.when(AtomicNode)
     def visit(self, node, tabs=0):
-        return "\t" * tabs + f"\\__ {node.__class__.__name__} {node.lineno}: {node.lex}"
+        return "\t" * tabs + f"\\__ {node.__class__.__name__} {node.line_no}: {node.lex}"
 
     @visitor.when(InstantiateNode)
     def visit(self, node, tabs=0):
-        return "\t" * tabs + f"\\__ InstantiateNode {node.lineno}: new {node.lex}()"
+        return "\t" * tabs + f"\\__ InstantiateNode {node.line_no}: new {node.lex}()"
 
     @visitor.when(NotNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__ NotNode {node.lineno}: not <expr>"
+        ans = "\t" * tabs + f"\\__ NotNode {node.line_no}: not <expr>"
         expr = self.visit(node.expr, tabs + 1)
         return f"{ans}\n{expr}"
 
     @visitor.when(IsVoidNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__ IsVoidNode {node.lineno}: not <expr>"
+        ans = "\t" * tabs + f"\\__ IsVoidNode {node.line_no}: not <expr>"
         expr = self.visit(node.expr, tabs + 1)
         return f"{ans}\n{expr}"
 
     @visitor.when(IntCompNode)
     def visit(self, node, tabs=0):
-        ans = "\t" * tabs + f"\\__ TildeNode {node.lineno}: not <expr>"
+        ans = "\t" * tabs + f"\\__ TildeNode {node.line_no}: not <expr>"
         expr = self.visit(node.expr, tabs + 1)
         return f"{ans}\n{expr}"

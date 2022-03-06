@@ -26,9 +26,9 @@ class TypeBuilder:
             try:
                 main_type.get_method("main")
             except SemanticError as error:
-                self.errors.append(TYPE_ERROR % (node.lineno, node.colno, error.text))
+                self.errors.append(TYPE_ERROR % (node.line_no, node.col_no, error.text))
         except SemanticError as error:
-            self.errors.append(TYPE_ERROR % (node.lineno, node.colno, error.text))
+            self.errors.append(TYPE_ERROR % (node.line_no, node.col_no, error.text))
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
@@ -36,7 +36,7 @@ class TypeBuilder:
             self.current_type = self.context.get_type(node.id)
         except SemanticError as error:
             # it should be registered in type_collector
-            self.errors.append(TYPE_ERROR % (node.lineno, node.colno, error.text))
+            self.errors.append(TYPE_ERROR % (node.line_no, node.col_no, error.text))
             return
 
         if node.parent is not None:
@@ -48,13 +48,13 @@ class TypeBuilder:
                     BasicTypes.STRING.value,
                     BasicTypes.INT.value,
                 ]:
-                    self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
+                    self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no,
                                                      'No class can inherit from "Bool", "String" or "Int"'))
 
                 current = parent_type
                 while True:
                     if current.name == node.id:
-                        self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno,
+                        self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no,
                                                          f'Cyclic inheritance between classes "{node.id}" and "{node.parent}".'
                                                          ))
                         parent_type = self.context.get_type(BasicTypes.OBJECT.value)
@@ -63,7 +63,7 @@ class TypeBuilder:
                         break
                     current = current.parent
             except SemanticError as error:
-                self.errors.append(TYPE_ERROR % (node.lineno, node.colno, error.text))
+                self.errors.append(TYPE_ERROR % (node.line_no, node.col_no, error.text))
                 parent_type = self.context.get_type(BasicTypes.ERROR.value)
                 node.parent = BasicTypes.ERROR.value
             self.current_type.set_parent(parent_type)
@@ -76,14 +76,14 @@ class TypeBuilder:
         try:
             typex = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(TYPE_ERROR % (node.lineno, node.colno, error.text))
+            self.errors.append(TYPE_ERROR % (node.line_no, node.col_no, error.text))
             typex = self.context.get_type(BasicTypes.ERROR.value)
             node.type = BasicTypes.OBJECT.value
 
         try:
             self.current_type.define_attribute(node.id, typex)
         except SemanticError as error:
-            self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno, error.text))
+            self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no, error.text))
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node):
@@ -95,17 +95,17 @@ class TypeBuilder:
             try:
                 typex = self.context.get_type(param[1])
             except SemanticError as error:
-                self.errors.append(TYPE_ERROR % (node.lineno, node.colno, error.text))
+                self.errors.append(TYPE_ERROR % (node.line_no, node.col_no, error.text))
                 typex = self.context.get_type(BasicTypes.ERROR.value)
             param_types.append(typex)
 
         try:
             typex = self.context.get_type(node.type)
         except SemanticError as error:
-            self.errors.append(TYPE_ERROR % (node.lineno, node.colno, error.text))
+            self.errors.append(TYPE_ERROR % (node.line_no, node.col_no, error.text))
             typex = self.context.get_type(BasicTypes.ERROR.value)
 
         try:
             self.current_type.define_method(node.id, param_names, param_types, typex)
         except SemanticError as error:
-            self.errors.append(SEMANTIC_ERROR % (node.lineno, node.colno, error.text))
+            self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no, error.text))
