@@ -92,13 +92,14 @@ class TypeBuilder:
         method.tset = Tset(parent_tset)
 
         # ------checking for in order definitions and cyclic heritage
+        self.check_cycles(node.declarations)
+
         parent_child_dict = {}
         queue = deque()
         visited = {}
         not_visited = []  # ++
-
         for class_declaration in node.declarations:
-            not_visited.append(class_declaration)  # ++
+            not_visited.append(class_declaration)  # ++            
             if not (class_declaration.parent is None):
                 parent_type = class_declaration.parent.lex
             else:
@@ -112,30 +113,22 @@ class TypeBuilder:
             except SError:  # parent is None or not definition provided
                 queue.append(class_declaration)
 
-        main_round = 0
         while not_visited:  # ++
-            main_round += 1
             while queue:
                 class_declaration = queue.popleft()
                 try:
-                    class_visited, roundn = visited[class_declaration]  # .id
-
-                    if roundn == main_round:
-                        self.errors.append(
-                            f"{class_declaration.id} is involved in a cyclic heritage"
-                        )
-
+                    class_visited = visited[class_declaration]  # .id
                 except:
                     not_visited.remove(class_declaration)
                     try:
                         children = parent_child_dict[class_declaration.id]
                         for declaration in children:
                             queue.append(declaration)
-                    except:  # no es padre de nadie
+                    except:  # no one inherits from this class
                         pass
 
                     self.visit(class_declaration)
-                    visited[class_declaration] = (True, main_round)  # .id
+                    visited[class_declaration] = True  # .id
 
             if not_visited:
                 queue.append(not_visited[0])
@@ -149,10 +142,6 @@ class TypeBuilder:
             # modify in semantic get_method in order to get some ancestor where the method is already defined
         except SError:
             self.errors.append("A class Main with a method main most be provided")
-
-        # ----------------------------------------------------
-        # for declaration in node.declarations:
-        #     self.visit(declaration)
 
         copy_visitor = CopyVisitor()
         newAst = copy_visitor.visit(node)
@@ -218,3 +207,58 @@ class TypeBuilder:
             node_row, node_col = ntype.location
             self.errors.append(TypeError(node_row, node_col,error.text))
             return ErrorType()
+
+    def check_cycles(self, class_declarations):
+        # checking for cycles
+        paths = []
+        modified_paths = paths
+
+        for class_declaration in class_declarations:
+            if not (class_declaration.parent is None):
+                d = class_declaration.id
+                p = class_declaration.parent.lex
+
+                modified_paths = paths
+
+                already_in_some_path = False
+                for i in range(0,len(paths)):
+                    path = paths[i]
+                    if path[-1] == d:
+                        if not (p in path):
+                            modified_paths[i] = path + [p]
+                            # add parent to last pos
+                        else:
+                            # error
+                            node_row, node_col = class_declaration.parent.location
+                            self.errors.append(
+                                SemanticError(node_row, node_col, f"Class {class_declaration.id}, or an ancestor of {class_declaration.id}, is involved in an inheritance cycle.")
+                            )
+                        already_in_some_path = True
+
+                    elif path[0] == p:
+                        if not (d in path):
+                            # add himself to first pos
+                            modified_paths[i] = [d] + path
+                        else:
+                            # error
+                            node_row, node_col = class_declaration.parent.location
+                            self.errors.append(
+                                SemanticError(node_row, node_col, f"Class {class_declaration.id}, or an ancestor of {class_declaration.id}, is involved in an inheritance cycle.")
+                            )
+                        already_in_some_path = True
+                        
+                    elif p in path:
+                        # duplicate list
+                        indx = path.index(p)
+                        modified_paths = modified_paths + [[d] + path[indx:len(path)]] 
+                        already_in_some_path = True
+
+                if not already_in_some_path: 
+                    if d != p:
+                        modified_paths = paths + [[d, p]]
+                    else: # class inherits from itself
+                        node_row, node_col = class_declaration.parent.location
+                        self.errors.append(
+                            SemanticError(node_row, node_col, f"Class {class_declaration.id}, or an ancestor of {class_declaration.id}, is involved in an inheritance cycle.")
+                        )
+                paths = modified_paths
