@@ -158,6 +158,11 @@ class MIPSBuilder:
         self.register_data(mips.DataTypeNode, ZERO_DIVISION, '.asciiz', ['"Division by zero"'])
         self.register_data(mips.DataTypeNode, SUBSTR_OUT_RANGE, '.asciiz', ['"Substring out of range"'])
         self.register_data(mips.DataTypeNode, HEAP_OVERFLOW, '.asciiz', ['"Heap overflow"'])
+        
+    def generate_extra_static_labels(self):
+        self.register_data(mips.DataTypeNode, VOID, '.word', [-1])
+        self.register_data(mips.DataTypeNode, EMPTY_STRING, '.asciiz', ['""'])
+        self.register_data(mips.DataTypeNode, INPUT_STR_BUFFER, '.space', [BUFFER_SIZE])
     
     
     def generate_attr_offset(self,type):
