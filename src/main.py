@@ -22,8 +22,9 @@ def report_and_exit(errors):
     if len(errors) == 0:
         raise typer.Exit(code=0)
 
-    for error in errors:
-        typer.echo(error)
+    typer.echo(errors[0])
+    # for error in errors:
+    #     typer.echo(error)
     raise typer.Exit(code=1)
 
 

@@ -141,7 +141,7 @@ class TypeBuilder:
                 )
             # modify in semantic get_method in order to get some ancestor where the method is already defined
         except SError:
-            self.errors.append("A class Main with a method main most be provided")
+            self.errors.append(SemanticError(0, 0 ,"A class Main with a method main most be provided"))
 
         copy_visitor = CopyVisitor()
         newAst = copy_visitor.visit(node)
@@ -161,7 +161,7 @@ class TypeBuilder:
 
         if node.parent is not None:
             try:
-                parent_type = self.get_type(node.parent)
+                parent_type = self.get_type(node.parent, f"declared as {node.id}'s parent")
                 self.current_type.set_parent(parent_type)
             except SError as error:
                 node_row, node_col = node.parent.location
@@ -181,8 +181,8 @@ class TypeBuilder:
         param_names = [fname.lex for fname, ftype in node.params]
 
         try:
-            param_types = [self.get_type(ftype) for fname, ftype in node.params]
-            return_type = self.get_type(node.type)
+            param_types = [self.get_type(ftype, f"of formal parameter {fname.lex}") for fname, ftype in node.params]
+            return_type = self.get_type(node.type, f"marked in '{node.id.lex}' as return type")
             self.current_type.define_method(
                 node.id.lex, param_names, param_types, return_type
             )
@@ -193,19 +193,23 @@ class TypeBuilder:
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
+        if node.id.lex == "self":
+            node_row, node_col = node.id.location
+            self.errors.append(SemanticError(node_row, node_col,"'self' cannot be the name of an attribute."))
+            return
         try:
-            attr_type = self.get_type(node.type)
+            attr_type = self.get_type(node.type, f"of attribute {node.id.lex}")
             self.current_type.define_attribute(node.id.lex, attr_type)
         except SError as error:
             node_row, node_col = node.id.location
             self.errors.append(SemanticError(node_row, node_col,error.text))
 
-    def get_type(self, ntype):
+    def get_type(self, ntype, comp_error_mesg):
         try:
             return self.context.get_type(ntype.lex)
         except SError as error:
             node_row, node_col = ntype.location
-            self.errors.append(TypeError(node_row, node_col,error.text))
+            self.errors.append(TypeError(node_row, node_col, f"Type {ntype.lex} " + comp_error_mesg + " is not defined."))
             return ErrorType()
 
     def check_cycles(self, class_declarations):

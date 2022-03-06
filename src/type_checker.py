@@ -148,10 +148,18 @@ class TypeChecker:
         param_used = {}
 
         for i, param_name in enumerate(param_names):
+            if param_name == "self":
+                param_n, param_t = node.params[i]
+                node_row, node_col = param_n.location
+                self.errors.append(
+                    SemanticError(node_row, node_col ,f"'self' cannot be the name of a formal parameter.")
+                )
             try:
                 param_used[param_name]
+                param_n, param_t = node.params[i]
+                node_row, node_col = param_n.location
                 self.errors.append(
-                    f"More tan one param in method {node.id} has the name {param_name}"
+                    SemanticError(node_row, node_col ,f"Formal parameter '{param_name}' multiply defined in method '{node.id.lex}'")
                 )
             except:
                 param_used[param_name] = True
@@ -168,21 +176,38 @@ class TypeChecker:
 
         if not body_type.conforms_to(method_return_type):#aqui se debe poner
             node_row, node_col = node.body.token.location
-            self.errors.append(TypeError( node_row, node_col, INCOMPATIBLE_TYPES % (body_type.name, method_return_type.name)))
+            self.errors.append(TypeError( node_row, node_col, f"Inferred return type '{body_type.name}' of method '{node.id.lex}' does not conform to declared return type '{method_return_type.name}'."))
 
         if self.current_type.parent is not None:
             try:
                 parent_method = self.current_type.parent.get_method(
                     self.current_method.name
                 )
-                if parent_method != self.current_method:
-                    self.errors.append(
-                        WRONG_SIGNATURE
-                        % (
-                            parent_method.name,
-                            f"an ancestor of {self.current_type.name}",
-                        )
-                    )
+                # ensure same return type of redefined method
+                if parent_method.return_type != self.current_method.return_type:
+                    node_row, node_col = node.type.location
+                    self.errors.append(SemanticError(node_row, node_col, f"In redefined method '{node.id.lex}', return type {self.current_method.return_type.name} is different from original return type {parent_method.return_type.name}."))
+                
+                # redefined method most have same number of parameters
+                if len(parent_method.param_names) != len(self.current_method.param_names):
+                    node_row, node_col = node.id.location
+                    self.errors.append(SemanticError(node_row, node_col, f"Incompatible number of formal parameters in redefined method '{node.id.lex}'."))                    
+                    len_parent_params = len(parent_method.param_names)
+                    len_current_params = len(self.current_method.param_names)
+                    if len_current_params >= len_parent_params:
+                        max_len = len_parent_params
+                    else:
+                        max_len = len_current_params
+                else:
+                    max_len = len(parent_method.param_names)
+
+                # check that each param has the same type as in the original method
+                for i in range(0, max_len):
+                    if self.current_method.param_types[i] != parent_method.param_types[i]:
+                        param_i_name, param_i_type = node.params[i]
+                        node_row, node_col = param_i_name.location
+                        self.errors.append(SemanticError(node_row, node_col, f"In redefined method '{node.id.lex}', type {self.current_method.param_types[i].name} of parameter {param_i_name.lex} is different from original type {parent_method.param_types[i].name}."))                    
+                    
             except SError:
                 pass
 
@@ -200,8 +225,9 @@ class TypeChecker:
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
         if scope.is_local(node.id.lex):
+            node_row, node_col = id.location
             self.errors.append(
-                LOCAL_ALREADY_DEFINED % (node.id, self.current_method.name)
+                SemanticError(node_row, node_col, LOCAL_ALREADY_DEFINED % (node.id, self.current_method.name))
             )
         elif node.id.lex == "self":
             self.errors.append(SELF_IS_READONLY)
@@ -221,7 +247,8 @@ class TypeChecker:
     @visitor.when(AssignNode)
     def visit(self, node, scope):
         if node.id.lex == "self":
-            self.errors.append(SELF_IS_READONLY)
+            node_row, node_col = node.token.location
+            self.errors.append(SemanticError(node_row, node_col, "Cannot assign to 'self'. " + SELF_IS_READONLY))
         var_type = None
         if not scope.is_defined(node.id.lex):
             self.errors.append(
@@ -307,8 +334,9 @@ class TypeChecker:
         bool_type = self.context.get_type("Bool")
 
         if condition_type != bool_type and condition_type.name != "AUTO_TYPE":
+            node_row, node_col = node.token.location
             self.errors.append(
-                f"Expression after 'while' must be bool, current is {condition_type.name}"
+                TypeError(node_row, node_col, f"Expression in 'while' condition must be bool, current type is {condition_type.name}")
             )
             return ErrorType()
 
@@ -334,6 +362,9 @@ class TypeChecker:
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
+        if node.id == "self":
+            node_row, node_col = node.token.location
+            self.errors.append(SemanticError(node_row, node_col, "'self' cannot be bound in a 'let' expression. " + SELF_IS_READONLY))
 
         static_type = None
         try:
@@ -343,13 +374,17 @@ class TypeChecker:
             scope.define_variable(node.id, static_type)
 
         except SError as e:
-            self.errors.append(e)
+            node_row, node_col = node.type.location
+            self.errors.append(
+               TypeError(node_row, node_col, e.text)
+            )
             return ErrorType()
 
         if node.expr != None:
             typex = self.visit(node.expr, scope)
             if not typex.conforms_to(static_type):
-                self.errors.append(INCOMPATIBLE_TYPES % (typex, static_type))
+                line, col = node.token.location
+                self.errors.append(TypeError(line, col, INCOMPATIBLE_TYPES % (typex.name, static_type.name)))
 
         return static_type
 
@@ -397,10 +432,10 @@ class TypeChecker:
             typex = self.context.get_type(node.lex.lex)
             if typex.name == "SELF_TYPE":
                 return self.current_type
-
             return typex
         except SError as error:
-            self.errors.append(error.text)
+            node_row, node_col = node.lex.location
+            self.errors.append(TypeError(node_row, node_col, f"Type {node.lex.lex} of 'new' expression is not defined."))
             return ErrorType()
 
     @visitor.when(IsvoidNode)
