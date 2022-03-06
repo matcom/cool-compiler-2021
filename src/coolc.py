@@ -17,7 +17,7 @@ from coolcmp.utils.cil_formatter import CILFormatter
 from coolcmp.utils.cil import ProgramNode
 
 
-def main(cool_code: str, run: bool, verbose: bool):
+def main(filename: str, cool_code: str, run: bool, verbose: bool):
     ast = parser.parse(cool_code)
 
     if verbose:
@@ -56,22 +56,22 @@ def main(cool_code: str, run: bool, verbose: bool):
     mips = build_mips(cil, None, None)
     mips_str = MIPSFormatter().visit(mips)
 
+    mips_file = filename + '.mips'
+
+    with open(mips_file, 'w') as fd:
+        fd.write(mips_str)
+
     if verbose:
         examinable_file = '__debug_code.mips'
         with open(examinable_file, 'w', encoding='utf8') as f:
             f.write(mips_str)
-        # print("Mips code:")
-        # print(mips_str)
 
     if run:
-        executable_name = '__temp_code.mips'
-        with open(executable_name, 'x', encoding='utf8') as f:
-            f.write(mips_str)
         print('=' * 20, 'Running SPIM', '=' * 20)
         try:
-            subprocess.run(['spim', '-f', executable_name])
+            subprocess.run(['spim', '-f', mips_file])
         finally:
-            os.remove(executable_name)
+            os.remove(mips_file)
 
 
 if __name__ == "__main__":
@@ -92,5 +92,6 @@ if __name__ == "__main__":
     )
     args = arg_parser.parse_args()
 
-    cool_program = args.file.read()
-    main(cool_program, args.r, args.v)
+    filename = args.file.name.split(".")[0]
+    cool_code = args.file.read()
+    main(filename, cool_code, args.r, args.v)
