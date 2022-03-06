@@ -513,25 +513,25 @@ class MIPSBuilder:
         reg1 = self.memo.get_unused_reg()
     
         #getting method offset
-        _methods = self.types[node.type].methods
-        _function = None
-        
-        for (meth,func) in _methods:
-            if node.method == meth:
-                _function = func
-        
-        _functions =  [func for (meth,func) in (_methods)]
-        meth_offset = _functions.index(_function)
-        
-        self.register_instruction(mips.LoadAddress,reg1,node.type)
-        reg2 = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadWordNode,reg2,meth_offset*4,reg1)
-        
-        self.register_instruction(mips.JumpAndLink,reg2)
-        
-        #putting the return vslue in destination
-        dest_offset = self.get_offset(node.dest)
-        self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
+        #_methods = self.types[node.type].methods
+        #_function = None
+        #
+        #for (meth,func) in _methods:
+        #    if node.method == meth:
+        #        _function = func
+        #
+        #_functions =  [func for (meth,func) in (_methods)]
+        #meth_offset = _functions.index(_function)
+        #
+        #self.register_instruction(mips.LoadAddress,reg1,node.type)
+        #reg2 = self.memo.get_unused_reg()
+        #self.register_instruction(mips.LoadWordNode,reg2,meth_offset*4,reg1)
+        #
+        #self.register_instruction(mips.JumpAndLink,reg2)
+        #
+        ##putting the return vslue in destination
+        #dest_offset = self.get_offset(node.dest)
+        #self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
         
         self.memo.clean()
         
