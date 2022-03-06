@@ -6,6 +6,7 @@
 import cmp.visitor as visitor
 import cmp.cil as cil
 import random
+import enum
 
 from code_gen import mips_nodes as mips
 
@@ -128,10 +129,10 @@ class MIPSBuilder:
     def get_offset(self,x):
         if x in self.locals:
             index = self.locals.index(x)
-            return -4*index
+            return 4*index
         elif x in self.params:
             index = self.params.index(x)
-            return (-4 * (len(self.locals)+index))
+            return (4 * (-len(self.params)+index))
     
     def register_instruction(self, instruction_type, *args):
         instruction = instruction_type(*args)
@@ -144,7 +145,7 @@ class MIPSBuilder:
         
     def register_push(self, reg):
         self.register_instruction(mips.StoreWordNode, reg, 0, sp)
-        self.register_instruction(mips.AddiNode, sp, sp, -4)
+        self.register_instruction(mips.AddiNode, sp, sp, 4)
 
     def register_pop(self, reg):
         self.register_instruction(mips.LoadWordNode, reg, 4, sp)
@@ -222,7 +223,7 @@ class MIPSBuilder:
             self.visit(type)
             self.generate_attr_offset(type.name)
         
-        
+        self.generate_extra_static_labels
         self.generate_exception_messages()
                 
         for str_data in node.dotdata:
@@ -263,7 +264,7 @@ class MIPSBuilder:
             
     @visitor.when(cil.DataNode)
     def visit(self, node):
-        self.register_data(mips.DataTypeNode,'.ascii',node.name,[node.value])
+        self.register_data(mips.DataTypeNode,'.asciiz',node.name,[node.value])
 
     
         
@@ -296,22 +297,27 @@ class MIPSBuilder:
         
     @visitor.when(cil.FunctionNode)
     def visit(self,node):
-        
+        self.memo.save()
         locals_save = self.locals
         params_save = self.params
         self.locals, self.params = [], []
         self.current_procedure = mips.ProcedureNode(node.name)
+        
+        saved_fp = self.memo.get_unused_reg()
+        self.register_instruction(mips.MoveNode, saved_fp, fp)
+        
+        self.register_instruction(mips.CommentNode,"New $fp")
+        self.register_instruction(mips.MoveNode, fp, sp)
+        
+        self.register_instruction(mips.CommentNode,"Reserving space for locals")
+        self.register_instruction(mips.AddiNode, sp, sp, 4*len(node.localvars))   
 
         self.register_instruction(mips.CommentNode,"Pushing $ra")
         self.register_push(ra)
 
         self.register_instruction(mips.CommentNode,"Saving $fp")
-        self.register_push(fp)
-        self.register_instruction(mips.CommentNode,"New $fp")
-        self.register_instruction(mips.MoveNode, fp, sp)
-        
-        self.register_instruction(mips.CommentNode,"Reserving space for locals")
-        self.register_instruction(mips.AddiNode, sp, sp, -4*len(node.localvars))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+        self.register_push(saved_fp)
+        self.memo.clean()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 
         for local in node.localvars:
             self.locals.append(local.name)
@@ -323,15 +329,16 @@ class MIPSBuilder:
         for inst in node.instructions:
             self.visit(inst)
             
-
-        self.register_instruction(mips.CommentNode,"Restoring saved $ra")
-        self.register_instruction(mips.LoadWordNode, ra, RA_OFFSET, fp)#stored $ra
-       
-
         self.register_instruction(mips.CommentNode,"Restoring saved $fp")
-        self.register_instruction(mips.LoadWordNode, fp, OLD_FP_OFFSET, fp)#stored (old)$fp
+        self.register_instruction(mips.AddiNode,sp,sp,-4)
+        self.register_instruction(mips.LoadWordNode,fp,0,sp)
         
-        AR = 4*(len(node.localvars) + 2)
+        self.register_instruction(mips.CommentNode,"Restoring saved $ra")
+        self.register_instruction(mips.AddiNode,sp,sp,-4)
+        self.register_instruction(mips.LoadWordNode,fp,0,sp)
+
+        
+        AR = -4*(len(node.localvars))
         
         self.register_instruction(mips.CommentNode,"Cleaning stack after call")
         self.register_instruction(mips.AddiNode, sp, sp, AR)
@@ -370,7 +377,7 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
 
         reg = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadAddress,reg,f'{STRING}_name')
+        self.register_instruction(mips.LoadAddress,reg,STRING)
         self.register_instruction(mips.StoreWordNode,reg,0,v0)
 
         #storing string length
@@ -420,7 +427,7 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)        
         
         reg = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadAddress,reg,'f{node.type}_name')
+        self.register_instruction(mips.LoadAddress,reg,node.type)
         self.register_instruction(mips.StoreWordNode,reg,0,v0)
         self.memo.clean()
         
@@ -496,24 +503,28 @@ class MIPSBuilder:
         
         dest_offset = self.get_offset(node.dest)
         self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
-        self.register_instruction(mips.AddiNode,sp,sp,self.pushed_args * 4)
+        self.register_instruction(mips.AddiNode,sp,sp,self.pushed_args * -4)
         self.pushed_args = 0
         
         
     @visitor.when(cil.DynamicCallNode)
     def visit(self,node):
         self.memo.save()
-        
         reg1 = self.memo.get_unused_reg()
-        reg2 = self.memo.get_unused_reg()
-        
-        instance_offset = self.get_offset(node.instance)
-        self.register_instruction(mips.CommentNode,"Getting type of instance")
-        self.register_instruction(mips.LoadWordNode,reg1,instance_offset,fp)
-        
+    
         #getting method offset
         _methods = self.types[node.type].methods
-        meth_offset = _methods.index(node.method)
+        _function = None
+        
+        for (meth,func) in _methods:
+            if node.method == meth:
+                _function = func
+        
+        _functions =  [func for (meth,func) in (_methods)]
+        meth_offset = _functions.index(_function)
+        
+        self.register_instruction(mips.LoadAddress,reg1,node.type)
+        reg2 = self.memo.get_unused_reg()
         self.register_instruction(mips.LoadWordNode,reg2,meth_offset*4,reg1)
         
         self.register_instruction(mips.JumpAndLink,reg2)
@@ -579,7 +590,7 @@ class MIPSBuilder:
 
             self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
             reg = self.memo.get_unused_reg()
-            self.register_instruction(mips.LoadAddress,reg,f'{STRING}_name')
+            self.register_instruction(mips.LoadAddress,reg,STRING)
             self.register_instruction(mips.StoreWordNode,reg,0,v0)
         
             self.register_instruction(mips.LoadInmediate,reg,0)
@@ -745,7 +756,7 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
 
         reg = self.memo.get_unused_reg()
-        self.register_instruction(mips.LoadAddress,reg,f'{STRING}_name')
+        self.register_instruction(mips.LoadAddress,reg,STRING)
         self.register_instruction(mips.StoreWordNode,reg,0,v0)
 
         #storing string length
