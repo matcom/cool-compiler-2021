@@ -31,7 +31,7 @@ def report_and_exit(errors):
 
 def pipeline(input_file: Path, output_file: Path = None):
     errors = []
-    
+
     if not input_file.is_file:
         errors.append(InvalidInputFileError(str(input_file)))
 
@@ -93,23 +93,22 @@ def pipeline(input_file: Path, output_file: Path = None):
     formatter = PrintVisitor()
     tree = formatter.visit(cil_ast)
     print(tree)
-    
-    cil_to_mips_visitor = MIPSBuilder()
-    mips_ast = cil_to_mips_visitor.visit(cil_ast)
-    
-    mips_writer = MIPSWriter()
-    output = mips_writer(mips_ast)
-    
-    output = '\n'.join(mips_writer.output)
 
-    if output_file is None:
-        output_file = input.with_suffix(".mips")
-    
-    output_file.write_text(output)
+    # cil_to_mips_visitor = MIPSBuilder()
+    # mips_ast = cil_to_mips_visitor.visit(cil_ast)
 
+    # mips_writer = MIPSWriter()
+    # output = mips_writer(mips_ast)
+
+    # output = '\n'.join(mips_writer.output)
+
+    # if output_file is None:
+    #     output_file = input.with_suffix(".mips")
+
+    # output_file.write_text(output)
 
 
 if __name__ == "__main__":
-    input_file = Path("/home/sandra/Desktop/FinalProjects/Compiler/cool-compiler-2021/customized_tests/test_hello_world.cl")
-    pipeline(input_file)
-    #typer.run(pipeline)
+    # input_file = Path("/home/sandra/Desktop/FinalProjects/Compiler/cool-compiler-2021/customized_tests/test_hello_world.cl")
+    # pipeline(input_file)
+    typer.run(pipeline)
