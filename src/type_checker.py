@@ -242,8 +242,9 @@ class TypeChecker:
             self.errors.append(SemanticError(node_row, node_col, "Cannot assign to 'self'. " + SELF_IS_READONLY))
         var_type = None
         if not scope.is_defined(node.id.lex):
+            node_row, node_col = node.id.location
             self.errors.append(
-                VARIABLE_NOT_DEFINED % (node.id, self.current_method.name)
+                NameError(node_row, node_col, VARIABLE_NOT_DEFINED % (node.id.lex, self.current_method.name))
             )
             var_type = ErrorType()
         else:
@@ -251,7 +252,8 @@ class TypeChecker:
 
         expr_type = self.visit(node.expr, scope)
         if not expr_type.conforms_to(var_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (expr_type.name, var_type.name))
+            node_row, node_col = node.token.location
+            self.errors.append(TypeError(node_row, node_col, f"Inferred type {expr_type.name} of assigned expression does not conforms to type {var_type.name} of variable '{node.id.lex}'"))
 
         return expr_type
 
@@ -362,14 +364,12 @@ class TypeChecker:
             static_type = self.context.get_type(node.type.lex)
             if static_type.name == "SELF_TYPE":
                 static_type = self.current_type
-            # scope.define_variable(node.id, static_type)
 
         except SError as e:
             node_row, node_col = node.type.location
             self.errors.append(
                TypeError(node_row, node_col, e.text)
             )
-            # return ErrorType()
             static_type = ErrorType()
 
         if node.expr != None:
@@ -406,14 +406,10 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             static_type = self.context.get_type(node.type.lex)
-            try:
-                scope.define_variable(node.id.lex, static_type)
-            except SError as e:
-                self.errors.append(e)
-                return ErrorType()
+            scope.define_variable(node.id.lex, static_type)
         except SError as e:
             node_row, node_col = node.type.location
-            self.errors.append(TypeError(node_row, node_col, f"Class {node.type.lex} of case branch is undefined."))
+            self.errors.append(TypeError(node_row, node_col, f"Type {node.type.lex} of case branch is undefined."))
 
         typex = self.visit(node.expr, scope)
 

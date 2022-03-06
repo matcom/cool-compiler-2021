@@ -153,7 +153,6 @@ class TypeBuilder:
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
-        # print(f"------------visiting class {node.id}------------")
         self.current_type = self.context.get_type(node.id)
 
         if node.parent is not None:
@@ -167,8 +166,9 @@ class TypeBuilder:
             object_type = self.context.get_type("Object")
             try:
                 self.current_type.set_parent(object_type)
-            except SError as error:
-                self.errors.append(error.text)
+            except SError as error: # this is actually an intern error, a class parent most not be setted twice (is valid to note that the intention to inherit from a prohibited class is considered a semantic error)
+                node_row, node_col = node.token.location
+                self.errors.append(SemanticError(node_row, node_col, error.text))
 
         for feature in node.features:
             self.visit(feature)
