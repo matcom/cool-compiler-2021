@@ -57,32 +57,21 @@ from cmp.semantic import Scope
 
 
 class CILBuilder:
-    def __init__(self, errors=[]):
+    def __init__(self):
         self.types = []
         self.code = []
         self.data = []
         self.current_type = None
         self.current_function = None
-        self.errors = errors
-        self.method_count = 0
         self.string_count = 0
-        self.temp_vars_count = 0
         self._count = 0
         self.internal_count = 0
         self.context = None
         self.self_var = "self"
 
-    def generate_next_method_id(self):
-        self.method_count += 1
-        return "method_" + str(self.method_count)
-
     def generate_next_string_id(self):
         self.string_count += 1
         return "string_" + str(self.string_count)
-
-    def generate_next_tvar_id(self):
-        self.temp_vars_count += 1
-        return "v_" + str(self.temp_vars_count)
 
     def next_id(self):
         self._count += 1
@@ -142,11 +131,6 @@ class CILBuilder:
     def define_internal_local(self):
         vinfo = VariableInfo("internal", None)
         return self.register_local(vinfo)
-
-    def register_data(self, name, value):
-        data_node = DataNode(name, value)
-        self.data.append(data_node)
-        return data_node
 
     def is_attribute(self, vname):
         return vname not in [var.name for var in self.current_function.localvars] and (
@@ -346,6 +330,16 @@ class CILBuilder:
         self.register_instruction(ReadNode(ret_vinfo))  # TODO: ReadInt?
         self.register_instruction(ReturnNode(ret_vinfo))
 
+    def reset_state(self):
+        self.types = []
+        self.code = []
+        self.data = []
+        self.current_type = None
+        self.current_function = None
+        self.string_count = 0
+        self._count = 0
+        self.context = None
+
     @visitor.on("node")
     def visit(self, node=None, return_var=None):
         pass
@@ -382,18 +376,7 @@ class CILBuilder:
 
         program_node = ProgramNode(self.types, self.data, self.code)
 
-        # Reset state
-        self.types = []
-        self.code = []
-        self.data = []
-        self.current_type = None
-        self.current_function = None
-        self.errors = []
-        self.method_count = 0
-        self.string_count = 0
-        self.temp_vars_count = 0
-        self._count = 0
-        self.context = None
+        self.reset_state()
 
         return program_node
 
