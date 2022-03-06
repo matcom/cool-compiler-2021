@@ -54,8 +54,12 @@ class CILToMipsVisitor:
             self.visit(i)
         for i in node.dot_data:
             self.visit(i)
-        for i in node.dot_code:
-            self.visit(i)
+        for func in node.dot_code:
+            if func.name == 'main':
+                self.visit(func)
+        for func in node.dot_code:
+            if func.name != 'main':
+                self.visit(func)
 
         return mips.ProgramNode(
             list(self.data.values()),
@@ -192,9 +196,9 @@ class CILToMipsVisitor:
 
         self.add_inst(
             mips.CommentNode(f"<getattribute:{node.attr}-{node.src}>"),
-            mips.LWNode(t0, (src_offset, fp)),
-            mips.LWNode(t0, (attr_offset, t0)),
-            mips.SWNode(t0, dest_offset, fp),
+            mips.LWNode(t0, (src_offset, fp))       .with_comm(f"Get instance: {node.src}"),
+            mips.LWNode(t0, (attr_offset, t0))      .with_comm(f"Get attribute: {node.attr}"),
+            mips.SWNode(t0, dest_offset, fp)        .with_comm(f"Store attribute in local {node.dest}"),
             mips.CommentNode(f"</getattribute:{node.attr}-{node.src}>"),
         )
 
