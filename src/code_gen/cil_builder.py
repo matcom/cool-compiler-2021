@@ -705,7 +705,6 @@ class CILBuilder:
     @visitor.when(cool.VariableNode)
     def visit(self, node):
         solve = self.define_internal_local()
-
         if self.is_attribute(node.lex):
             self.register_instruction(
                 GetAttribNode(
