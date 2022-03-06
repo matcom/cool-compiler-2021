@@ -194,7 +194,8 @@ class CILBuilder:
 
         for attr in attributeNodes:  # Assign init_expr if not None
             if attr.init_exp:
-                init_expr_value = self.visit(attr.init_exp)
+                init_expr_value = self.define_internal_local()
+                self.visit(attr.init_exp, init_expr_value)
                 self.register_instruction(
                     SetAttribNode(
                         node.id,
@@ -346,11 +347,11 @@ class CILBuilder:
         self.register_instruction(ReturnNode(ret_vinfo))
 
     @visitor.on("node")
-    def visit(self, node=None):
+    def visit(self, node=None, return_var=None):
         pass
 
     @visitor.when(cool.ProgramNode)
-    def visit(self, node):
+    def visit(self, node, return_var=None):
         self.context = node.context
 
         self.add_builtin_functions()
@@ -397,7 +398,7 @@ class CILBuilder:
         return program_node
 
     @visitor.when(cool.ClassDeclarationNode)
-    def visit(self, node):
+    def visit(self, node, return_var=None):
         self.current_type = self.context.get_type(node.id)
 
         type_node = self.register_type(self.current_type.name)
@@ -432,11 +433,11 @@ class CILBuilder:
             self.visit(feature)
 
     @visitor.when(cool.AttrDeclarationNode)
-    def visit(self, node):
+    def visit(self, node, return_var=None):
         pass
 
     @visitor.when(cool.FuncDeclarationNode)
-    def visit(self, node):
+    def visit(self, node, return_var=None):
         self.current_method = self.current_type.get_method(node.id)
 
         # Add function to .CODE
@@ -450,7 +451,8 @@ class CILBuilder:
             self.current_function.params.append(ParamNode(pname))
 
         # Body
-        value = self.visit(node.body)
+        value = self.define_internal_local()
+        self.visit(node.body, value)
 
         # Return
         if isinstance(self.current_method.return_type, VoidType):
@@ -461,87 +463,65 @@ class CILBuilder:
         self.current_method = None
         self.current_function = None
 
-    @visitor.when(cool.VarDeclarationNode)
-    def visit(self, node, return_var=None):
-        # Add LOCAL variable
-        local = LocalNode(node.id)
-        self.current_function.localvars.append(local)
-
-        # Add Assignment Node
-        if node.expr:
-            expr = self.visit(node.expr)
-            self.register_instruction(AssignNode(local.id, expr))
-        else:
-            self.register_instruction(DefaultValueNode(local))
-
-        self.register_instruction(AssignNode(return_var,local))
-
     @visitor.when(cool.AssignNode)
-    def visit(self, node):
-        expr = self.visit(node.expr)
+    def visit(self, node, return_var):
+        self.visit(node.expr, return_var)
 
         if self.is_attribute(node.id):
             self.register_instruction(
-                SetAttribNode("self", node.id, expr, self.current_type.name)
+                SetAttribNode("self", node.id, return_var, self.current_type.name)
             )
         else:
-            self.register_instruction(AssignNode(node.id, expr))
-
-        return node.id
+            self.register_instruction(AssignNode(node.id, return_var))
 
     @visitor.when(cool.CallNode)
-    def visit(self, node):
+    def visit(self, node, return_var):
         # TODO: Pending test <expr>.id(<expr>,...,<expr>)
         # TODO: Pending test <expr>@<type>.id(<expr>,...,<expr>)
 
         instance = self.define_internal_local()
         if node.obj:
-            instance = self.visit(node.obj)
+            self.visit(node.obj, instance)
 
         else:
-            instance = self.self_var
+            self.register_instruction(AssignNode(instance, self.self_var))
+
+        instance_type = None
+        if not node.at_type:
+            instance_type = self.define_internal_local()
+            self.register_instruction(TypeOfNode(instance, instance_type))
 
         self.register_instruction(ArgNode(instance))
         for arg in node.args:
-            temp = self.define_internal_local()
-            value = self.visit(arg)
-            self.register_instruction(AssignNode(temp, value))
-            self.register_instruction(ArgNode(temp))
-
-        solve = self.define_internal_local()
+            arg_value = self.define_internal_local()
+            self.visit(arg, arg_value)
+            self.register_instruction(ArgNode(arg_value))
 
         if node.at_type:
             self.register_instruction(
-                StaticCallNode(self.to_function_name(node.id, node.at_type), solve)
+                StaticCallNode(self.to_function_name(node.id, node.at_type), return_var)
             )
 
         else:
-            instance_type = self.define_internal_local()
-            self.register_instruction(TypeOfNode(instance, instance_type))
             self.register_instruction(
                 DynamicCallNode(
                     instance,
                     node.id,
-                    solve,
+                    return_var,
                     instance_type,
                 )
             )
 
-        return solve
-
     @visitor.when(cool.IfNode)
-    def visit(self, node):
-        # Result Variable
-        solve = self.define_internal_local()
-
+    def visit(self, node, return_var):
         # IF condition GOTO label
-        condition_value = self.visit(node.if_expr)
+        condition_value = self.define_internal_local()
+        self.visit(node.if_expr, condition_value)
         then_label = "THEN_" + self.next_id()
         self.register_instruction(GotoIfNode(condition_value, then_label))
 
         # Else
-        else_value = self.visit(node.else_expr)
-        self.register_instruction(AssignNode(solve, else_value))
+        self.visit(node.else_expr, return_var)
 
         # GOTO end_label
         end_label = "END_IF_" + self.next_id()  # Example: END_IF_120
@@ -549,22 +529,20 @@ class CILBuilder:
 
         # Then label
         self.register_instruction(LabelNode(then_label))
-        then_value = self.visit(node.then_expr)
-        self.register_instruction(AssignNode(solve, then_value))
+        self.visit(node.then_expr, return_var)
 
         # end_label
         self.register_instruction(LabelNode(end_label))
 
-        return solve
-
     @visitor.when(cool.WhileNode)
-    def visit(self, node):
+    def visit(self, node, return_var):
         # While label
         while_label = "WHILE_" + self.next_id()
         self.register_instruction(LabelNode(while_label))
 
         # Condition
-        c = self.visit(node.condition)
+        c = self.define_internal_local()
+        self.visit(node.condition, c)
 
         # If condition GOTO body_label
         body_label = "BODY_" + self.next_id()
@@ -584,184 +562,176 @@ class CILBuilder:
         # End while label
         self.register_instruction(LabelNode(end_while_label))
 
-        solve = self.define_internal_local()
-        self.register_instruction(DefaultValueNode(solve, "Void"))
-
-        return solve
+        self.register_instruction(DefaultValueNode(return_var, "Void"))
 
     @visitor.when(cool.BlockNode)
-    def visit(self, node):
-        value = None
+    def visit(self, node, return_var):
         for expr in node.expression_list:
-            value = self.visit(expr)
-
-        return value
+            self.visit(expr, return_var)
 
     @visitor.when(cool.LetNode)
-    def visit(self, node):
+    def visit(self, node, return_var):
         for var_dec in node.identifiers:
             self.visit(var_dec.expr)
-            self.current_function.localvars.append(LocalNode(var_dec.id))
 
-        return self.visit(node.body)
+        self.visit(node.body, return_var)
+
+    @visitor.when(cool.VarDeclarationNode)
+    def visit(self, node, return_var=None):
+        # Add LOCAL variable
+        local = LocalNode(node.id)
+        self.current_function.localvars.append(local)
+
+        # Add Assignment Node
+        if node.expr:
+            self.visit(node.expr, local.id)
+        else:
+            self.register_instruction(DefaultValueNode(local, node.type))
 
     @visitor.when(cool.CaseNode)
-    def visit(self, node):
-        expr_value = self.visit(node.expr)
-        solve = self.define_internal_local()
-        for case_item in node.case_items:
-            item_expr_value = self.define_internal_local()
-             self.visit(case_item)
+    def visit(self, node, return_var=None):
+        pass  # TODO: Pending!!!
+
+        # expr_value = self.visit(node.expr)
+        # solve = self.define_internal_local()
+        # for case_item in node.case_items:
+        #     item_expr_value = self.define_internal_local()
+        #      self.visit(case_item)
 
     @visitor.when(cool.CaseItemNode)
-    def visit(self, node):
+    def visit(self, node, return_var=None):
         pass  # TODO: Pending!!!
 
     # Arithmetic and comparison operators
     @visitor.when(cool.PlusNode)
-    def visit(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
+    def visit(self, node, return_var):
+        left = self.define_internal_local()
+        self.visit(node.left, left)
 
-        solve = self.define_internal_local()
-        self.register_instruction(PlusNode(solve, left, right))
+        right = self.define_internal_local()
+        self.visit(node.right, right)
 
-        return solve
+        self.register_instruction(PlusNode(return_var, left, right))
 
     @visitor.when(cool.MinusNode)
-    def visit(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
+    def visit(self, node, return_var):
+        left = self.define_internal_local()
+        self.visit(node.left, left)
 
-        solve = self.define_internal_local()
-        self.register_instruction(MinusNode(solve, left, right))
+        right = self.define_internal_local()
+        self.visit(node.right, right)
 
-        return solve
+        self.register_instruction(MinusNode(return_var, left, right))
 
     @visitor.when(cool.StarNode)
-    def visit(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
+    def visit(self, node, return_var):
+        left = self.define_internal_local()
+        self.visit(node.left, left)
 
-        solve = self.define_internal_local()
-        self.register_instruction(StarNode(solve, left, right))
+        right = self.define_internal_local()
+        self.visit(node.right, right)
 
-        return solve
+        self.register_instruction(StarNode(return_var, left, right))
 
     @visitor.when(cool.DivNode)
-    def visit(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
+    def visit(self, node, return_var):
+        left = self.define_internal_local()
+        self.visit(node.left, left)
 
-        solve = self.define_internal_local()
-        self.register_instruction(DivNode(solve, left, right))
+        right = self.define_internal_local()
+        self.visit(node.right, right)
 
-        return solve
+        self.register_instruction(DivNode(return_var, left, right))
 
     @visitor.when(cool.LessEqualNode)
-    def visit(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
+    def visit(self, node, return_var):
+        left = self.define_internal_local()
+        self.visit(node.left, left)
 
-        solve = self.define_internal_local()
-        self.register_instruction(LessEqualNode(solve, left, right))
+        right = self.define_internal_local()
+        self.visit(node.right, right)
 
-        return solve
+        self.register_instruction(LessEqualNode(return_var, left, right))
 
     @visitor.when(cool.LessNode)
-    def visit(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
+    def visit(self, node, return_var):
+        left = self.define_internal_local()
+        self.visit(node.left, left)
 
-        solve = self.define_internal_local()
-        self.register_instruction(LessNode(solve, left, right))
+        right = self.define_internal_local()
+        self.visit(node.right, right)
 
-        return solve
+        self.register_instruction(LessNode(return_var, left, right))
 
     @visitor.when(cool.EqualNode)
-    def visit(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
+    def visit(self, node, return_var):
+        left = self.define_internal_local()
+        self.visit(node.left, left)
 
-        solve = self.define_internal_local()
-        self.register_instruction(EqualNode(solve, left, right))
+        right = self.define_internal_local()
+        self.visit(node.right, right)
 
-        return solve
+        self.register_instruction(EqualNode(return_var, left, right))
 
     # Unary operators
     @visitor.when(cool.InstantiateNode)  # NewNode
-    def visit(self, node):
-        instance = self.define_internal_local()
+    def visit(self, node, return_var):
         self.register_instruction(
-            StaticCallNode(self.to_function_name("constructor", node.lex), instance)
+            StaticCallNode(self.to_function_name("constructor", node.lex), return_var)
         )
 
-        return instance
-
     @visitor.when(cool.IsvoidNode)
-    def visit(self, node):
-        value = self.visit(node.expr)
-        solve = self.define_internal_local()
-        self.register_instruction(IsVoidNode(solve, value))
-        return solve
+    def visit(self, node, return_var):
+        value = self.define_internal_local()
+        self.visit(node.expr, value)
+        self.register_instruction(IsVoidNode(return_var, value))
 
     @visitor.when(cool.NotNode)
-    def visit(self, node):
-        value = self.visit(node.expr)
-        solve = self.define_internal_local()
-        self.register_instruction(NotNode(solve, value))
-        return solve
+    def visit(self, node, return_var):
+        value = self.define_internal_local()
+        self.visit(node.expr, value)
+        self.register_instruction(NotNode(return_var, value))
 
     @visitor.when(cool.NegNode)
-    def visit(self, node):
-        value = self.visit(node.expr)
-        solve = self.define_internal_local()
-        self.register_instruction(IntComplementNode(solve, value))
-        return solve
+    def visit(self, node, return_var):
+        value = self.define_internal_local()
+        self.visit(node.expr, value)
+        self.register_instruction(IntComplementNode(return_var, value))
 
     @visitor.when(cool.ConstantNumNode)
-    def visit(self, node):
-        solve = self.define_internal_local()
-        self.register_instruction(AssignNode(solve, int(node.lex)))
-        return solve
+    def visit(self, node, return_var):
+        self.register_instruction(AssignNode(return_var, int(node.lex)))
 
     @visitor.when(cool.VariableNode)
-    def visit(self, node):
-        solve = self.define_internal_local()
-
+    def visit(self, node, return_var):
         if self.is_attribute(node.lex):
             self.register_instruction(
                 GetAttribNode(
-                    solve,
+                    return_var,
                     "self",
                     self.to_attr_name(self.current_type.name, node.lex),
                     self.current_type.name,
                 )
             )
         elif node.lex == "self":
-            self.register_instruction(AssignNode(solve, self.self_var))
+            self.register_instruction(AssignNode(return_var, self.self_var))
         else:
-            self.register_instruction(AssignNode(solve, node.lex))
-        return solve
+            self.register_instruction(AssignNode(return_var, node.lex))
 
     @visitor.when(cool.StringNode)
-    def visit(self, node):
+    def visit(self, node, return_var):
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
-        solve = self.define_internal_local()
         self.register_instruction(
-            LoadNode(solve, VariableInfo(idx, None, False, node.lex))
+            LoadNode(return_var, VariableInfo(idx, None, False, node.lex))
         )
-        return solve
 
     @visitor.when(cool.BooleanNode)
-    def visit(self, node):
-        solve = self.define_internal_local()
-        self.register_instruction(AssignNode(solve, 1 if node.lex == "true" else 0))
-        return solve
+    def visit(self, node, return_var):
+        self.register_instruction(
+            AssignNode(return_var, 1 if node.lex == "true" else 0)
+        )
 
     @visitor.when(cool.DefaultValueNode)
-    def visit(self, node):
-        solve = self.define_internal_local()
-        self.register_instruction(DefaultValueNode(solve, node.type))
-        return solve
+    def visit(self, node, return_var):
+        self.register_instruction(DefaultValueNode(return_var, node.type))
