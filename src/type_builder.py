@@ -99,24 +99,21 @@ class TypeBuilder:
         visited = {}
         not_visited = []  # ++
         for class_declaration in node.declarations:
-            not_visited.append(class_declaration)  # ++            
-            if not (class_declaration.parent is None):
-                parent_type = class_declaration.parent.lex
-            else:
-                parent_type = None
+            not_visited.append(class_declaration)  
             try:
+                parent_type = class_declaration.parent.lex
                 self.context.get_type(parent_type)
                 try:
                     parent_child_dict[parent_type].append(class_declaration)
                 except:  # KeyError
                     parent_child_dict[parent_type] = [class_declaration]
-            except SError:  # parent is None or not definition provided
+            except Exception:  # parent is None or not definition provided
                 queue.append(class_declaration)
 
         while not_visited:  # ++
             while queue:
                 class_declaration = queue.popleft()
-                try:
+                try: # avoid redefining classes involved in a ciclyc heritage
                     class_visited = visited[class_declaration]  # .id
                 except:
                     not_visited.remove(class_declaration)

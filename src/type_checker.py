@@ -44,6 +44,7 @@ from cmp.utils import find_least_type
 import copy
 from errors import TypeError, NameError, SemanticError, AttributeError
 
+# some predefined errors
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
 SELF_IS_READONLY = 'Variable "self" is read-only.'
 LOCAL_ALREADY_DEFINED = 'Variable "%s" is already defined in method "%s".'
@@ -68,25 +69,38 @@ class TypeChecker:
         scope = Scope()
         self.context = copy.copy(node.context)
 
-        #visit class in order
+        #visit classes in order (from tree root to leaves)
         parent_children_dict = {}
         initial_nodes = []
         visited = {}
+        self.class_to_visit = []
+        self.class_visited = {}
         for declaration in node.declarations:
             try:
-                visited[declaration.id] # checking is visited
+                visited[declaration.id] # checking if visited
             except:
                 visited[declaration.id] = True
+                self.class_visited[declaration.id] = False
+                self.class_to_visit.append(declaration)
                 if declaration.parent is None or declaration.parent.lex in ["IO", "Int", "String", "Bool"]: # is node has no parent, mark it to visit it first later
                     initial_nodes.append(declaration)
                 else:
                     try:
-                        parent_children_dict[declaration.parent.lex].append(declaration)
-                    except:
-                        parent_children_dict[declaration.parent.lex] = [declaration]
+                        self.context.get_type(declaration.parent.lex)
+                        try:
+                            parent_children_dict[declaration.parent.lex].append(declaration)
+                        except:
+                            parent_children_dict[declaration.parent.lex] = [declaration]
+                    except: # add declarations where parent is not defined
+                        initial_nodes.append(declaration)
 
-        for declaration in initial_nodes:
+        for declaration in initial_nodes: # first visit root nodes
             self.visit(declaration, scope.create_child(), parent_children_dict)
+
+        while self.class_to_visit: # visiting classes involved in ciclyc heritage
+            declaration = self.class_to_visit[0]
+            self.visit(declaration, scope.create_child(), parent_children_dict)
+            
 
         self.context = None
         self.current_type = None
@@ -96,6 +110,9 @@ class TypeChecker:
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope, parent_children_dict):
+        self.class_to_visit.remove(node)
+        self.class_visited[node.id] = True # arked class as visited
+
         self.current_type = self.context.get_type(node.id)
         scope.define_variable("self", self.current_type)
 
@@ -107,8 +124,9 @@ class TypeChecker:
         
         try:
             children = parent_children_dict[node.id]
-            for child in children:
-                self.visit(child, scope.create_child(), parent_children_dict)
+            for child in children:# after initialization, each parent class visits its children (note the child scope creation) 
+                if not self.class_visited[child.id]:
+                    self.visit(child, scope.create_child(), parent_children_dict)
         except:
             return
 
@@ -116,9 +134,8 @@ class TypeChecker:
     def visit(self, node, scope):
         try:
             typex = self.context.get_type(node.type.lex)
-
         except SError as e:
-            self.errors.append(e)
+            # ERROR already reported in type builder
             return ErrorType()
 
         if typex.name == "SELF_TYPE":
@@ -142,6 +159,7 @@ class TypeChecker:
             method_return_type = self.current_type
 
         child_scope = scope.create_child()
+
         # ------------parameters most have differente names------------
         param_names = self.current_method.param_names
         param_types = self.current_method.param_types
@@ -166,11 +184,6 @@ class TypeChecker:
                 child_scope.define_variable(param_name, param_types[i])
 
         # -------------------------------------------------------------
-
-        # for i in range(len(self.current_method.param_names)):
-        #     child_scope.define_variable(
-        #         self.current_method.param_names[i], self.current_method.param_types[i]
-        #     )
 
         body_type = self.visit(node.body, child_scope)
 
@@ -209,7 +222,7 @@ class TypeChecker:
                         self.errors.append(SemanticError(node_row, node_col, f"In redefined method '{node.id.lex}', type {self.current_method.param_types[i].name} of parameter {param_i_name.lex} is different from original type {parent_method.param_types[i].name}."))                    
                     
             except SError:
-                pass
+                pass # parent has no method named like this
 
         try:
             return_type = self.context.get_type(node.type.lex)
@@ -219,30 +232,8 @@ class TypeChecker:
             return return_type
 
         except SError as e:
-            self.errors.append(e)
+            # Error already reported in type builder
             return ErrorType()
-
-    @visitor.when(VarDeclarationNode)
-    def visit(self, node, scope):
-        if scope.is_local(node.id.lex):
-            node_row, node_col = id.location
-            self.errors.append(
-                SemanticError(node_row, node_col, LOCAL_ALREADY_DEFINED % (node.id, self.current_method.name))
-            )
-        elif node.id.lex == "self":
-            self.errors.append(SELF_IS_READONLY)
-        try:
-            static_type = self.context.get_type(node.type.lex)
-        except SError as error:
-            self.errors.append(error.text)
-            static_type = ErrorType()
-
-        expr_type = self.visit(node.expr, scope)
-        if not expr_type.conforms_to(static_type):
-            self.errors.append(INCOMPATIBLE_TYPES % (expr_type.name, static_type.name))
-
-        scope.define_variable(node.id.lex, static_type)
-        return static_type
 
     @visitor.when(AssignNode)
     def visit(self, node, scope):
@@ -371,14 +362,15 @@ class TypeChecker:
             static_type = self.context.get_type(node.type.lex)
             if static_type.name == "SELF_TYPE":
                 static_type = self.current_type
-            scope.define_variable(node.id, static_type)
+            # scope.define_variable(node.id, static_type)
 
         except SError as e:
             node_row, node_col = node.type.location
             self.errors.append(
                TypeError(node_row, node_col, e.text)
             )
-            return ErrorType()
+            # return ErrorType()
+            static_type = ErrorType()
 
         if node.expr != None:
             typex = self.visit(node.expr, scope)
@@ -386,6 +378,7 @@ class TypeChecker:
                 line, col = node.token.location
                 self.errors.append(TypeError(line, col, INCOMPATIBLE_TYPES % (typex.name, static_type.name)))
 
+        scope.define_variable(node.id, static_type)
         return static_type
 
     @visitor.when(CaseNode)
