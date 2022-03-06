@@ -462,7 +462,7 @@ class CILBuilder:
         self.current_function = None
 
     @visitor.when(cool.VarDeclarationNode)
-    def visit(self, node):
+    def visit(self, node, return_var=None):
         # Add LOCAL variable
         local = LocalNode(node.id)
         self.current_function.localvars.append(local)
@@ -471,6 +471,10 @@ class CILBuilder:
         if node.expr:
             expr = self.visit(node.expr)
             self.register_instruction(AssignNode(local.id, expr))
+        else:
+            self.register_instruction(DefaultValueNode(local))
+
+        self.register_instruction(AssignNode(return_var,local))
 
     @visitor.when(cool.AssignNode)
     def visit(self, node):
@@ -487,8 +491,8 @@ class CILBuilder:
 
     @visitor.when(cool.CallNode)
     def visit(self, node):
-        # TODO: Pending <expr>.id(<expr>,...,<expr>)
-        # TODO: Pending <expr>@<type>.id(<expr>,...,<expr>)
+        # TODO: Pending test <expr>.id(<expr>,...,<expr>)
+        # TODO: Pending test <expr>@<type>.id(<expr>,...,<expr>)
 
         instance = self.define_internal_local()
         if node.obj:
@@ -603,7 +607,11 @@ class CILBuilder:
 
     @visitor.when(cool.CaseNode)
     def visit(self, node):
-        pass  # TODO: Pending!!!
+        expr_value = self.visit(node.expr)
+        solve = self.define_internal_local()
+        for case_item in node.case_items:
+            item_expr_value = self.define_internal_local()
+             self.visit(case_item)
 
     @visitor.when(cool.CaseItemNode)
     def visit(self, node):
@@ -724,7 +732,10 @@ class CILBuilder:
         if self.is_attribute(node.lex):
             self.register_instruction(
                 GetAttribNode(
-                    solve, self.current_type.name, node.lex, self.current_type.name
+                    solve,
+                    "self",
+                    self.to_attr_name(self.current_type.name, node.lex),
+                    self.current_type.name,
                 )
             )
         elif node.lex == "self":
@@ -738,7 +749,9 @@ class CILBuilder:
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
         solve = self.define_internal_local()
-        self.register_instruction(LoadNode(solve, VariableInfo(idx, False, node.lex)))
+        self.register_instruction(
+            LoadNode(solve, VariableInfo(idx, None, False, node.lex))
+        )
         return solve
 
     @visitor.when(cool.BooleanNode)
