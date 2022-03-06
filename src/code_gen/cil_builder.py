@@ -490,14 +490,14 @@ class CILBuilder:
         # TODO: Pending <expr>.id(<expr>,...,<expr>)
         # TODO: Pending <expr>@<type>.id(<expr>,...,<expr>)
 
-        function_name = (
-            self.to_function_name(node.id, self.current_type.name)
-            if not node.at_type
-            else self.to_function_name(node.id, node.at_type)
-        )
+        instance = self.define_internal_local()
         if node.obj:
-            self.visit(node.obj)
+            instance = self.visit(node.obj)
 
+        else:
+            instance = self.self_var
+
+        self.register_instruction(ArgNode(instance))
         for arg in node.args:
             temp = self.define_internal_local()
             value = self.visit(arg)
@@ -505,7 +505,23 @@ class CILBuilder:
             self.register_instruction(ArgNode(temp))
 
         solve = self.define_internal_local()
-        self.register_instruction(StaticCallNode(function_name, solve))
+
+        if node.at_type:
+            self.register_instruction(
+                StaticCallNode(self.to_function_name(node.id, node.at_type), solve)
+            )
+
+        else:
+            instance_type = self.define_internal_local()
+            self.register_instruction(TypeOfNode(instance, instance_type))
+            self.register_instruction(
+                DynamicCallNode(
+                    instance,
+                    node.id,
+                    solve,
+                    instance_type,
+                )
+            )
 
         return solve
 
@@ -711,6 +727,8 @@ class CILBuilder:
                     solve, self.current_type.name, node.lex, self.current_type.name
                 )
             )
+        elif node.lex == "self":
+            self.register_instruction(AssignNode(solve, self.self_var))
         else:
             self.register_instruction(AssignNode(solve, node.lex))
         return solve
