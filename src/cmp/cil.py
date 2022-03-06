@@ -246,8 +246,8 @@ class PrintStrNode(InstructionNode):
 
 
 class PrintIntNode(InstructionNode):
-    def __init__(self, str_addr):
-        self.int_addr = str_addr
+    def __init__(self, int_addr):
+        self.int_addr = int_addr
 
 
 class TypeNameNode(InstructionNode):
@@ -414,7 +414,7 @@ class PrintVisitor(object):
 
     @visitor.when(PrintStrNode)
     def visit(self, node):
-        return f"PRINT STR {node.str_addr}"
+        return f"PRINT STR{node.str_addr}"
 
     @visitor.when(PrintIntNode)
     def visit(self, node):

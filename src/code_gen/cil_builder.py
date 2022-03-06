@@ -67,7 +67,7 @@ class CILBuilder:
         self._count = 0
         self.internal_count = 0
         self.context = None
-        self.self_var = "self"
+        self.self_var = None
 
     def generate_next_string_id(self):
         self.string_count += 1
@@ -157,6 +157,7 @@ class CILBuilder:
         self.current_type.define_method("constructor", [], [], "Object")
 
         self_var = self.define_internal_local()
+        self.self_var = self_var
 
         self.register_instruction(AllocateNode(node.id, self_var))
 
@@ -169,10 +170,10 @@ class CILBuilder:
             self.register_instruction(DefaultValueNode(default_var, attr.type))
             self.register_instruction(
                 SetAttribNode(
-                    node.id,
+                    self_var,
                     self.to_attr_name(self.current_type.name, attr.id),
                     default_var,
-                    self_var,
+                    node.id,
                 )
             )
 
@@ -182,10 +183,10 @@ class CILBuilder:
                 self.visit(attr.init_exp, init_expr_value)
                 self.register_instruction(
                     SetAttribNode(
-                        node.id,
+                        self_var,
                         self.to_attr_name(self.current_type.name, attr.id),
                         init_expr_value,
-                        self_var,
+                        node.id,
                     )
                 )
 
