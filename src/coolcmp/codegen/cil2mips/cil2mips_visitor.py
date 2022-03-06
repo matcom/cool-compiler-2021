@@ -398,6 +398,26 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</substr:>{node.dest}[{node.index}:{node.length}]")
         )
 
+    @visitor.when(cil.LengthNode)
+    def visit(self, node: cil.LengthNode):
+        self.add_inst(mips.CommentNode(f"<length:{node.dest}=len({node.src})>"))
+
+        self.visit(cil.AllocateNode('Int', node.dest))
+
+        src_address = self.get_address(node.src)
+        dest_address = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.LWNode(a0, (src_address, fp)),
+            mips.LWNode(a0, (4, a0)),
+            mips.JALNode('length'),
+
+            mips.LWNode(t1, (dest_address, fp)),
+            mips.SWNode(v0, 4, t1),
+        )
+
+        self.add_inst(mips.CommentNode(f"</length:{node.dest}=len({node.src})>"))
+
     @visitor.when(cil.TypeNameNode)
     def visit(self, node: cil.TypeNameNode):
         name_offset = self.types['Object'].name_offset

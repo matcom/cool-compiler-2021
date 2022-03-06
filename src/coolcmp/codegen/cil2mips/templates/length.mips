@@ -1,0 +1,26 @@
+# Template for length function:
+# Arguments
+# a0 Address of start of string
+# Returns
+# $v0: size of string
+length:
+    addiu $sp $sp -8
+    sw $t0 0($sp)
+    sw $t1 4($sp)
+
+    move $t0 $a0                                     # Move to t0 the address to begin
+    move $v0 $zero                                   # Set v0 to zero
+
+length_loop:
+    lb $t1 0($t0)                                    # Save in t1 first byte of address
+    beq $t1 $zero length_end                         # Finish object if t1 is zero
+    addi $v0 $v0 1                                   # Increase count in v0
+    addiu $t0 $t0 1                                  # Increase address pointer
+    j length_loop                                    # Finish loop
+
+length_end:
+    lw $t0 0($sp)
+    lw $t1 4($sp)
+    addiu $sp $sp 8
+
+    jr $ra
