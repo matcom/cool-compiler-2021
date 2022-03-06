@@ -93,6 +93,7 @@ class DotCodeVisitor:
                 ],
                 local_vars=[],
                 instructions=[
+                    cil.AbortNode(),
                     cil.ReturnNode(),
                 ]
             ),

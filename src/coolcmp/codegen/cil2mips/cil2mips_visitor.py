@@ -533,3 +533,16 @@ class CILToMipsVisitor:
             mips.BEQNode(t0, t1, node.label),
             mips.CommentNode(f"</gotoif:{node.condition}-{node.label}>"),
         )
+
+    @visitor.when(cil.AbortNode)
+    def visit(self, node: cil.AbortNode):
+        self.add_inst(
+            mips.CommentNode("<abort>"),
+            mips.LINode(v0, 4) .with_comm("Print halted message"),
+            mips.LANode(a0, "s2"),
+            mips.SysCallNode(),
+
+            mips.LINode(v0, 10) .with_comm("Finish program execution"),
+            mips.SysCallNode(),
+            mips.CommentNode("</abort>")
+        )
