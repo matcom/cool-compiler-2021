@@ -6,7 +6,6 @@ from parser_automatons import (
 from methods import compute_firsts, compute_local_first, compute_follows
 from cmp.automata import State
 from errors import shift_reduce_error, invalid_sentence_error, SyntacticError
-from utils import find_column
 
 class ShiftReduceParser:
     SHIFT = "SHIFT"
@@ -24,7 +23,7 @@ class ShiftReduceParser:
     def _build_parsing_table(self):
         raise NotImplementedError()
 
-    def __call__(self, w, values, pos, text):
+    def __call__(self, w):
         stack = [0]
         cursor = 0
         output = []
@@ -32,7 +31,7 @@ class ShiftReduceParser:
 
         while True:
             state = stack[-1]
-            lookahead = w[cursor]
+            lookahead = w[cursor].token_type
             if self.verbose:
                 print(stack, "<---||--->", w[cursor:])
 
@@ -41,11 +40,12 @@ class ShiftReduceParser:
                 action, tag = self.action[state, lookahead]
 
             except KeyError:
+                current_token = w[cursor]
                 self.errors.append(
                     SyntacticError(
-                        pos[cursor][0],
-                        find_column(text, pos[cursor][1]),
-                        "ERROR at or near "+ str(values[cursor])
+                        current_token.location[0],
+                        current_token.location[1],
+                        "ERROR at or near "+ str(current_token.lex)
                     )
                 )
 
@@ -70,21 +70,23 @@ class ShiftReduceParser:
                 return output, operations
             # Invalid case
             else:
+                current_token = w[cursor]
                 self.errors.append(
                     SyntacticError(
-                        pos[cursor][0],
-                        find_column(text, pos[cursor][1]),
-                        "ERROR at or near"+ str(values[cursor])
+                        current_token.location[0],
+                        current_token.location[1],
+                        "ERROR at or near"+ str(current_token.lex)
                     )
                 )
                 return output, operations
              # "Invalid case. Sentence given does not belong to the grammar",
 
             if cursor >= len(w):  # or not stack
+                current_token = w[cursor]
                 self.errors.append(
                     SyntacticError(
-                        pos[cursor][-1],
-                        find_column(text, pos[cursor][-1]),
+                        current_token.location[0],
+                        current_token.location[1],
                         "Exceed word length while looking for a viable derivation. Sentence given does not belong to the grammar",
                     )
                 )

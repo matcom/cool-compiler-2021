@@ -126,7 +126,7 @@ class AttributeError(CoolCompilerError):
 
 class SemanticError(CoolCompilerError):
     """
-    Any kind of semantic error
+    Any kind of semantic error (like class redefinition)
     """
 
     def __init__(self, line, column, msg) -> None:

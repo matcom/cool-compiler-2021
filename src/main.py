@@ -1,6 +1,7 @@
 from lexical_analizer import tokenize_cool_text
 from cool_grammar import define_cool_grammar
 from cool_visitor import FormatVisitorST
+from visitor_type_ast import FormatVisitorTypedAst
 
 from type_collector import TypeCollector
 from type_builder import TypeBuilder
@@ -24,6 +25,7 @@ def report_and_exit(errors):
     if len(errors) == 0:
         raise typer.Exit(code=0)
 
+    # typer.echo(errors[0])
     for error in errors:
         typer.echo(error)
     raise typer.Exit(code=1)
@@ -46,10 +48,7 @@ def pipeline(input_file: Path, output_file: Path = None):
     # define grammar
     grammar, idx, type_id, string, num = define_cool_grammar()
 
-    tokens, pos_data = tokenize_cool_text(
-        grammar, idx, type_id, string, num, text, errors
-    )
-    # print(tokens)
+    tokens = tokenize_cool_text(grammar, idx, type_id, string, num, text, errors)
 
     if len(errors) > 0:
         report_and_exit(errors)
@@ -58,30 +57,28 @@ def pipeline(input_file: Path, output_file: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    parse, operations = parser(
-        [t.token_type for t in tokens], [t.lex for t in tokens], pos_data, text
-    )
-
-    # print("Parse")
-    # print(parse)
+    parse, operations = parser(tokens)
 
     if len(errors) > 0:
         report_and_exit(errors)
 
     # get parsing tree
     ast = evaluate_reverse_parse(parse, operations, tokens)
-
-    # printing tree
+    # print("-------------------------------Initial AST-------------------------------")
     # formatter = FormatVisitorST()
     # tree = formatter.visit(ast)
     # print(tree)
-
+    
     visitors = [TypeCollector(errors), TypeBuilder(errors)]
     for visitor in visitors:
         ast = visitor.visit(ast)
 
-    # formatter = FormatVisitor()
-    # tree = formatter.visit(ast)
+    type_checker = TypeChecker(errors)
+    scope, typed_ast = type_checker.visit(ast)
+
+    # formatter = FormatVisitorTypedAst()
+    # print("-------------------------------Typed AST-------------------------------")
+    # tree = formatter.visit(typed_ast)
     # print(tree)
 
     if len(errors) > 0:

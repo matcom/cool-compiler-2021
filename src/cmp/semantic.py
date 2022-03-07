@@ -56,11 +56,11 @@ class Type:
             raise SemanticError(f"Is not possible to inherit from {parent.name}")
         self.parent = parent
 
-    def get_attribute(self, name: str, visited=None):
+    def get_attribute(self, name: str, index: int, visited=None):
         if visited is None:
             visited = []
         try:
-            return next(attr for attr in self.attributes if attr.name == name)
+            return next((attr, index) for attr in self.attributes if attr.name == name)
         except StopIteration:
             visited.append(self.name)
             if self.parent is None:
@@ -72,7 +72,7 @@ class Type:
                     raise SemanticError(
                         f'Attribute "{name}" is not defined in {self.name}.'
                     )
-                return self.parent.get_attribute(name, visited=visited)
+                return self.parent.get_attribute(name, index + 1, visited=visited)
             except SemanticError:
                 raise SemanticError(
                     f'Attribute "{name}" is not defined in {self.name}.'
@@ -80,14 +80,18 @@ class Type:
 
     def define_attribute(self, name: str, typex):
         try:
-            self.get_attribute(name)
+            attr, index = self.get_attribute(name, 0)
         except SemanticError:
             attribute = Attribute(name, typex)
             self.attributes.append(attribute)
             return attribute
         else:
+            if index > 0:
+                mssg = "an inherited class"
+            else:
+                mssg = self.name
             raise SemanticError(
-                f'Attribute "{name}" is already defined in {self.name}.'
+                f'Attribute "{name}" is already defined in {mssg}.'
             )
 
     def get_method(self, name: str, non_rec=False, visited=None):
@@ -235,7 +239,7 @@ class Context:
 
     def create_type(self, name: str):
         if name in self.types:
-            raise SemanticError(f"Type with the same name ({name}) already in context.")
+            raise SemanticError(f"Type with the same name {name} already in context.")
         typex = self.types[name] = Type(name)
         return typex
 
@@ -269,6 +273,9 @@ class VariableInfo:
         self.data = data
         self.is_attr = is_attr
         self.offset = None
+
+    def __str__(self):
+        return f"{self.name}: {self.type}"
 
 
 class Scope:
@@ -305,3 +312,12 @@ class Scope:
 
     def is_local(self, vname):
         return any(True for x in self.locals if x.name == vname)
+
+    def __str__(self):
+        output = "LOCALS: \n"
+        output += "\n".join(str(x) for x in self.locals)
+        output += "\n"
+        output += "PARENT:"
+        output += str(self.parent)
+        output += "\n"
+        return output
