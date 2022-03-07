@@ -17,14 +17,14 @@ class MIPSWriter(object):
     def visit(self, node:mips.ProgramNode):
         self.emit(".data")
         self.black()
-        for data in node.dotdata:
+        for data in node.data:
             self.emit(str(data))
 
         self.black()
         self.emit(".text")
         self.emit(".globl main")
         self.black()
-        for proc in node.dottext:
+        for proc in node.text:
             self.emit(f'{proc.label}:')
             self.tabs += 4
             for inst in proc.instructions:
