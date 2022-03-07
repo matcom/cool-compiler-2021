@@ -10,7 +10,7 @@ OBJECT_MARK = -1
 INSTANCE_METADATA_SIZE = 4
 
 TYPENAMES_TABLE_LABEL = "type_name_table"
-PROTO_TABLE_LABEL = "proto_table"
+SHELLS_TABLE_LABEL = "shells_table"
 
 
 class Register():
@@ -344,7 +344,7 @@ def create_object(reg1, reg2):
     instructions = []
 
     instructions.append(ShiftLeftLogicalNode(reg1, reg1, 2))
-    instructions.append(LoadAddressNode(reg2, PROTO_TABLE_LABEL))
+    instructions.append(LoadAddressNode(reg2, SHELLS_TABLE_LABEL))
     instructions.append(AddUnsignedNode(reg2, reg2, reg1))
     instructions.append(LoadWordNode(reg2, RegisterRelativeLocation(reg2, 0)))
     instructions.append(LoadWordNode(

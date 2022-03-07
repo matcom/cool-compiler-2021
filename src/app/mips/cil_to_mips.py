@@ -85,7 +85,7 @@ class CILToMIPSVisitor:
                    for key, value in node.methods}
         defaults = []
         if node.name == "String":
-            defaults = [('value', 'default_str'), ('length', 'type_Int_proto')]
+            defaults = [('value', 'default_str'), ('length', 'type_Int_shell')]
         new_type = mips.MIPSType(f"type_{node.name}", node.name, node.attributes, methods, len(
             self._types), default=defaults)
 
@@ -464,7 +464,7 @@ class CILToMIPSVisitor:
             reg, self.get_var_location(node.type)))
 
         instructions.append(mips.LoadAddressNode(
-            mips.ARG_REGISTERS[1], mips.PROTO_TABLE_LABEL))
+            mips.ARG_REGISTERS[1], mips.SHELLS_TABLE_LABEL))
         
         instructions.append(mips.ShiftLeftLogicalNode(
             mips.ARG_REGISTERS[2], reg, 2))

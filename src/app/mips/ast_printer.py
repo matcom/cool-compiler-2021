@@ -29,13 +29,13 @@ class PrintVisitor:
         names_table = f"{TYPENAMES_TABLE_LABEL}:\n" + \
             "\n".join(
                 [f"\t.word\t{tp.string_name_label}" for tp in node.types])
-        proto_table = f"{PROTO_TABLE_LABEL}:\n" + \
-            "\n".join([f"\t.word\t{tp.label}_proto" for tp in node.types])
+        shells_table = f"{SHELLS_TABLE_LABEL}:\n" + \
+            "\n".join([f"\t.word\t{tp.label}_shell" for tp in node.types])
 
         types = "\n\n".join([self.visit(tp) for tp in node.types])
 
         code = "\n".join([self.visit(func) for func in node.functions])
-        return f'{data_section_header}\n{static_strings}\n\n{names_table}\n\n{proto_table}\n\n{types}\n\t.text\n\t.globl main\n{code}'
+        return f'{data_section_header}\n{static_strings}\n\n{names_table}\n\n{shells_table}\n\n{types}\n\t.text\n\t.globl main\n{code}'
 
     @visitor.when(StringConst)
     def visit(self, node):
@@ -46,13 +46,13 @@ class PrintVisitor:
         methods = "\n".join(
             [f"\t.word\t {node.methods[k]}" for k in node.methods])
         dispatch_table = f"{node.label}_dispatch:\n{methods}"
-        proto_begin = f"{node.label}_proto:\n\t.word\t{node.index}\n\t.word\t{node.size}\n\t.word\t{node.label}_dispatch"
-        proto_attr = "\n".join(
+        shell_begin = f"{node.label}_shell:\n\t.word\t{node.index}\n\t.word\t{node.size}\n\t.word\t{node.label}_dispatch"
+        shell_attr = "\n".join(
             [f'\t.word\t{node._default_attributes.get(attr, "0")}' for attr in node.attributes])
 
-        proto = f"{proto_begin}\n{proto_attr}\n" if proto_attr != "" else f"{proto_begin}\n"
+        shell = f"{shell_begin}\n{shell_attr}\n" if shell_attr != "" else f"{shell_begin}\n"
 
-        return f'{dispatch_table}\n\n{proto}'
+        return f'{dispatch_table}\n\n{shell}'
 
     @visitor.when(SyscallNode)
     def visit(self, node):
