@@ -1,6 +1,7 @@
 from lexical_analizer import tokenize_cool_text
 from cool_grammar import define_cool_grammar
 from cool_visitor import FormatVisitorST
+from visitor_type_ast import FormatVisitorTypedAst
 
 from type_collector import TypeCollector
 from type_builder import TypeBuilder
@@ -56,17 +57,15 @@ def pipeline(input_file: Path, output_file: Path = None):
 
     parse, operations = parser(tokens)
 
-    # print("Parse")
-    # print(parse)
-
     if len(errors) > 0:
         report_and_exit(errors)
         
     #get parsing tree
     ast = evaluate_reverse_parse(parse, operations, tokens)
-    formatter = FormatVisitorST()
-    tree = formatter.visit(ast)
-    print(tree)
+    # print("-------------------------------Initial AST-------------------------------")
+    # formatter = FormatVisitorST()
+    # tree = formatter.visit(ast)
+    # print(tree)
     
     visitors = [TypeCollector(errors), TypeBuilder(errors)]
     for visitor in visitors:
@@ -75,9 +74,10 @@ def pipeline(input_file: Path, output_file: Path = None):
     type_checker = TypeChecker(errors)
     scope, typed_ast = type_checker.visit(ast)
 
-    formatter = FormatVisitor()
-    tree = formatter.visit(typed_ast)
-    print(tree)
+    # formatter = FormatVisitorTypedAst()
+    # print("-------------------------------Typed AST-------------------------------")
+    # tree = formatter.visit(typed_ast)
+    # print(tree)
 
     if len(errors) > 0:
         report_and_exit(errors)

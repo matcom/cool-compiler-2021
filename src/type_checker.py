@@ -2,7 +2,7 @@ from email import message
 import cmp.nbpackage
 import cmp.visitor as visitor
 
-from ast_nodes import Node, ProgramNode, ExpressionNode
+from ast_nodes import LessEqualNode, LessNode, Node, ProgramNode, ExpressionNode
 from ast_nodes import ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
 from ast_nodes import VarDeclarationNode, AssignNode, CallNode
 from ast_nodes import (
@@ -142,28 +142,33 @@ class TypeChecker:
         else:
             parent = node.parent.lex
 
-        self.tast_class_nodes.append(cool_type_nodes.ClassDeclarationNode(node.id.lex, parent, new_features))
+        self.tast_class_nodes.append(cool_type_nodes.ClassDeclarationNode(node.id.lex, new_features, parent))
         
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
+        type_not_found = False
         try:
             typex = self.context.get_type(node.type.lex)
+
+            if typex.name == "SELF_TYPE":
+                typex = self.current_type
+
         except SError as e:
             # ERROR already reported in type builder
-            return ErrorType()
-
-        if typex.name == "SELF_TYPE":
-            typex = self.current_type
-
+            # return ErrorType()
+            type_not_found = True
 
         if node.init_exp != None:
             init_expr_type, init_exp  = self.visit(node.init_exp, scope)
+            if type_not_found:
+                return cool_type_nodes.AttrDeclarationNode(node.id.lex, node.type.lex, init_exp)
 
             if not init_expr_type.conforms_to(typex):
                 line, col = node.token.location
                 self.errors.append(TypeError(line, col,INCOMPATIBLE_TYPES % (init_expr_type.name, typex.name)))
-
+        else:
+            init_exp = None
         # return typex AQUI SE RETORNABA UN TIPO PERO NO ES NECESARIO
         return cool_type_nodes.AttrDeclarationNode(node.id.lex, node.type.lex, init_exp)
 
@@ -241,16 +246,16 @@ class TypeChecker:
             except SError:
                 pass # parent has no method named like this
 
-        try:
-            return_type = self.context.get_type(node.type.lex)
-            # if return_type.name == "SELF_TYPE":
-            #     return self.current_type
-            # return return_type ESTAS LINEAS ESTAN DE MAS PUES NO HACE FALTA RETORNAR TIPO
+        # try:
+        #     return_type = self.context.get_type(node.type.lex)
+        #     # if return_type.name == "SELF_TYPE":
+        #     #     return self.current_type
+        #     # return return_type ESTAS LINEAS ESTAN DE MAS PUES NO HACE FALTA RETORNAR TIPO
 
-        except SError as e:
-            # Error already reported in type builder
-            # return ErrorType()
-            pass #it is not necessary to return a type in func declaration ndoes
+        # except SError as e:
+        #     # Error already reported in type builder
+        #     # return ErrorType()
+        #     pass #it is not necessary to return a type in func declaration ndoes
 
         return cool_type_nodes.FuncDeclarationNode(node.id.lex, new_params, node.type.lex, body_exp)
 
@@ -307,7 +312,7 @@ class TypeChecker:
                     self.errors.append(
                         TypeError(node_row, node_col, f"Expression type {typex.name} does not conform to declared static dispatch type {node_at_type.name}.")
                     )
-                    return (ErrorType(), cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, ErrorType()))
+                    return (ErrorType(), cool_type_nodes.CallNode(node.id.lex, new_args, obj_exp, at_type, typex, ErrorType()))
 
             else:
                 at_type = None
@@ -315,7 +320,7 @@ class TypeChecker:
         except SError as error:
             node_col, node_row = node.token.location
             self.errors.append(AttributeError(node_col, node_row ,error.text))
-            return (ErrorType(), cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, ErrorType()))
+            return (ErrorType(), cool_type_nodes.CallNode(node.id.lex, new_args, obj_exp, at_type, typex, ErrorType()))
 
 
         if len(method.param_names) != len(node.args):
@@ -324,8 +329,10 @@ class TypeChecker:
                SemanticError(node_row, node_col, f"There is no definition of {method.name} that takes {len(node.args)} arguments ")
             )
 
-        # for i in range(0, node.args):
+        n_method_args = len(method.param_names) 
         for i, arg in enumerate(node.args):
+            if n_method_args == i:
+                break
             arg_type = arg_types[i]
             ptype = method.param_types[i]
             if not arg_type.conforms_to(ptype):
@@ -333,10 +340,10 @@ class TypeChecker:
                 self.errors.append(TypeError(node_row, node_col,f"In call of method {node.id.lex} parameter of type {arg_type.name} does not conforms to declared type {ptype.name}"))
 
         if method.return_type == self.context.get_type("SELF_TYPE"):
-            return (typex, cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, typex))
+            return (typex, cool_type_nodes.CallNode(node.id.lex, new_args, obj_exp, at_type, typex, typex))
 
 
-        return (method.return_type, cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, method.return_type))
+        return (method.return_type, cool_type_nodes.CallNode(node.id.lex, new_args, obj_exp, at_type, typex, method.return_type))
 
     @visitor.when(IfNode)
     def visit(self, node, scope):
@@ -480,7 +487,7 @@ class TypeChecker:
         return (bool_type, cool_type_nodes.IsvoidNode(node_exp, bool_type))
 
 
-    @visitor.when(ArithmeticOperation)
+    @visitor.when(PlusNode)
     def visit(self, node, scope):
         int_type = self.context.get_type("Int")
         left_type, left_exp_node = self.visit(node.left, scope)
@@ -492,10 +499,52 @@ class TypeChecker:
             node_row, node_col = node.token.location
             self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
 
-        return (int_type, cool_type_nodes.ArithmeticOperation(left_exp_node, right_exp_node, int_type))
+        return (int_type, cool_type_nodes.PlusNode(left_exp_node, right_exp_node, int_type))
+
+    @visitor.when(MinusNode)
+    def visit(self, node, scope):
+        int_type = self.context.get_type("Int")
+        left_type, left_exp_node = self.visit(node.left, scope)
+        right_type, right_exp_node = self.visit(node.right, scope)
+
+        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
+            right_type != int_type and right_type.name != "AUTO_TYPE"
+        ):
+            node_row, node_col = node.token.location
+            self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
+
+        return (int_type, cool_type_nodes.MinusNode(left_exp_node, right_exp_node, int_type))
+
+    @visitor.when(StarNode)
+    def visit(self, node, scope):
+        int_type = self.context.get_type("Int")
+        left_type, left_exp_node = self.visit(node.left, scope)
+        right_type, right_exp_node = self.visit(node.right, scope)
+
+        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
+            right_type != int_type and right_type.name != "AUTO_TYPE"
+        ):
+            node_row, node_col = node.token.location
+            self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
+
+        return (int_type, cool_type_nodes.StarNode(left_exp_node, right_exp_node, int_type))
+
+    @visitor.when(DivNode)
+    def visit(self, node, scope):
+        int_type = self.context.get_type("Int")
+        left_type, left_exp_node = self.visit(node.left, scope)
+        right_type, right_exp_node = self.visit(node.right, scope)
+
+        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
+            right_type != int_type and right_type.name != "AUTO_TYPE"
+        ):
+            node_row, node_col = node.token.location
+            self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
+
+        return (int_type, cool_type_nodes.DivNode(left_exp_node, right_exp_node, int_type))
 
 
-    @visitor.when(ComparisonOperation)
+    @visitor.when(LessNode)
     def visit(self, node, scope):
         int_type = self.context.get_type("Int")
         left_type, left_exp_node = self.visit(node.left, scope)
@@ -508,7 +557,23 @@ class TypeChecker:
             self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
 
         bool_type =  self.context.get_type("Bool")
-        return (bool_type, cool_type_nodes.ComparisonOperation(left_exp_node, right_exp_node, bool_type))
+        return (bool_type, cool_type_nodes.LessNode(left_exp_node, right_exp_node, bool_type))
+
+
+    @visitor.when(LessEqualNode)
+    def visit(self, node, scope):
+        int_type = self.context.get_type("Int")
+        left_type, left_exp_node = self.visit(node.left, scope)
+        right_type, right_exp_node, = self.visit(node.right, scope)
+
+        if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
+            right_type != int_type and right_type.name != "AUTO_TYPE"
+        ):
+            node_row, node_col = node.token.location
+            self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
+
+        bool_type =  self.context.get_type("Bool")
+        return (bool_type, cool_type_nodes.LessEqualNode(left_exp_node, right_exp_node, bool_type))
 
     @visitor.when(EqualNode)
     def visit(self, node, scope):
