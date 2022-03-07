@@ -36,12 +36,6 @@ class CILToMIPSVisitor:
     def clean_pushed_args(self):
         self._pushed_args = 0
 
-    def get_free_reg(self):
-        return self._registers_manager.get_free_reg()
-
-    def free_reg(self, reg):
-        self._registers_manager.free_reg(reg)
-
     def in_entry_function(self):
         return self._actual_function.label == 'main'
 
@@ -71,7 +65,6 @@ class CILToMIPSVisitor:
     @visitor.when(cil.ProgramNode)
     def visit(self, node):
         self._data_section["default_str"] = mips.StringConst("default_str", "")
-        # Convert CIL ProgramNode to MIPS ProgramNode
         for tp in node.dottypes:
             self.visit(tp)
 
