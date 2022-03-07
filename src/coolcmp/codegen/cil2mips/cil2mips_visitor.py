@@ -257,8 +257,6 @@ class CILToMipsVisitor:
         right_offset = self.get_address(node.right)
         dest_offset = self.get_address(node.dest)
 
-        self.add_inst(mips.CommentNode(f"<sum:{node.dest}<-{node.left}+{node.right}>"))
-
         self.add_inst(
             mips.CommentNode(f"<plus:{node.dest}<-{node.left}+{node.right}>"),
             mips.LWNode(t0, (left_offset, fp))      .with_comm(f"Load Int {node.left}"),
