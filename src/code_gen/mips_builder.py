@@ -456,11 +456,13 @@ class MIPSBuilder:
         
         reg = self.memo.get_unused_reg()
         
-        source_offset = self.get_offset(node.source)
+        if isinstance(node.source,int):
+            self.register_instruction(mips.LoadInmediate,reg,node.source)
+        else:
+            source_offset = self.get_offset(node.source)
+            self.register_instruction(mips.LoadWordNode,reg,source_offset,fp)
+            
         dest_offset = self.get_offset(node.dest)
-        
-        self.register_instruction(mips.LoadWordNode,reg,source_offset,fp)
-        
         self.register_instruction(mips.StoreWordNode,reg,dest_offset,fp)
 
         self.memo.clean()        
