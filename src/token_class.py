@@ -1,4 +1,3 @@
-from sympy import to_cnf
 from match_class import Match
 
 class Token:

@@ -1,8 +1,6 @@
 #Tokens terminals
 from enum import Enum, auto
 from typing import List
-
-from sympy import sec
 from ast_cool_hierarchy import *
 
 
@@ -104,3 +102,33 @@ class CallNodeWrapper():
         args=list(args)
         s=VariableNode(args[0],args[1],'self')
         return CallNode(args[0],args[1],s,*args[2:])              
+
+class StringWrapper():
+    def __new__(cls,*args):
+        line,col, lex = args
+        lex = lex[1:-1]
+        n_lex=""
+        string_backslash=False
+        for t in lex:
+            if not string_backslash:  # if the previosur chat is not '\'
+                if t == "\\":
+                    string_backslash = True  # backslash caracter
+                else:
+                    n_lex+= t  # no backslash caracter situation
+            else:
+                string_backslash = False
+                if t == "b":  # \b backspace
+                    n_lex += "\b"
+                elif t == "t":  # \t tab
+                    n_lex += "\t"
+                elif t == 'n':
+                    n_lex += '\n'
+                elif t == "f":  # \f formfeed
+                    n_lex += "\f"
+                elif t == "\\":  # \\ backslash caracter
+                    n_lex += "\\"
+                    string_backslash = True
+                else:
+                    n_lex += t
+
+        return StringNode(line,col,n_lex)

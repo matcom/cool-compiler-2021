@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Tuple
 
 class Match(ABC):
     @abstractmethod
@@ -6,9 +7,9 @@ class Match(ABC):
         pass
 
     @abstractmethod
-    def add_matcher(self, sty: tuple[str, str, str]):
+    def add_matcher(self, sty: Tuple[str, str, str]):
         pass
 
     @abstractmethod
-    def match(self, mathcstr, pos) -> tuple[str, str, str]:
+    def match(self, mathcstr, pos) -> Tuple[str, str, str]:
         pass

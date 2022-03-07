@@ -1,5 +1,5 @@
 from collections import deque
-from typing import List,Dict,Iterable
+from typing import List,Dict,Iterable,Union
 from itertools import chain
 import inspect
 import os.path
@@ -18,13 +18,13 @@ class Grammar:
         if attr_decoder:
             self.attr_decoder=attr_decoder
         self.name:str=name
-        self.start_symbol: NonTerminal | None = None
+        self.start_symbol: Union[NonTerminal, None] = None
         self.eof: EOF = EOF()
         self.epsilon: Epsilon = Epsilon()
-        self.terminals: List[Terminal | EOF] = [self.eof, self.epsilon]
+        self.terminals: List[Terminal] = [self.eof, self.epsilon]
         self.non_terminals: List[NonTerminal] = []
         self.productions: List[Production] = list()
-        self.firsts: Dict[Sentence, set[Terminal]] | None = None
+        self.firsts: Union[Dict[Sentence, set[Terminal]] , None] = None
 
     # NonTerminal(name, grammar)
     def nonTerminals(self, *names):
@@ -60,7 +60,7 @@ class Grammar:
                     first_sent.remove(self.epsilon)
             return first_sent
 
-    def compute_firsts(self, item: "Sentence" = None, accepts_eps=True) -> set[Terminal]:
+    def compute_firsts(self, item: "Sentence" = None, accepts_eps=True) -> Set[Terminal]:
         if self.firsts is None:
             self.firsts = {Sentence(s): ({s} if isinstance(s, Terminal) else set()) for s in
                                    chain(self.terminals, self.non_terminals)}

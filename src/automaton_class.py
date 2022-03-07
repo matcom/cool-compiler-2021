@@ -1,12 +1,11 @@
 from collections import deque
 from itertools import repeat,chain
-from turtle import pen
-from typing import Set
+from typing import Set,Union
 from state_class import State
 
 class Automaton:
     def __init__(self):
-        self.start: State|None = None
+        self.start: Union[State , None] = None
         self.states: Set[State] = set()
         self.finals: Set[State] = set()
         self.counter = 1

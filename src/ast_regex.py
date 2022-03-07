@@ -2,7 +2,7 @@ from enum import Enum, auto
 from automaton_class import Automaton
 from state_class import State
 from token_class import Token
-
+from typing import Union
 import string
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -14,7 +14,7 @@ ALPHABET = set(chain.from_iterable([string.printable,SPECIAL])) - INVALID
 DIGIT = set(iter(string.digits))
 NONDIGIT = ALPHABET - DIGIT
 
-def any_escaper(left: Token |None, right: Token |None):
+def any_escaper(left: Union[Token ,None], right: Union[Token,None]):
     if left.lexeme == "." and right.lexeme == "." or left.lexeme =="\\" and right.lexeme != ".":
         lex = right.lexeme
         res= DIGIT if lex=="d" else NONDIGIT if lex=="D" else ALPHABET if lex=="." else lex
@@ -57,16 +57,16 @@ class Node(ABC):
 
 
 class BinaryNode(Node, ABC):
-    def __init__(self,left:Node | Token, right:Node | Token):
-        self.left:Node | Token=left
-        self.right:Node | Token=right
+    def __init__(self,left:Union[Node,Token], right:Union[Node,Token]):
+        self.left:Union[Node,Token]=left
+        self.right:Union[Node,Token]=right
 
     def __str__(self) -> str:
         return f"LEFT: {self.left} \ RIGHT: {self.right}"    
 
 
 class UnaryNode(Node, ABC):
-    def __init__(self,left:Node|Token):
+    def __init__(self,left:Union[Node,Token]):
         self.left=left
 
     def __str__(self) -> str:
@@ -74,7 +74,7 @@ class UnaryNode(Node, ABC):
 
 # A | B
 class UnionNode(BinaryNode):
-    def __init__(self, left: Node | Token, right: Node | Token):
+    def __init__(self, left:Union[Node,Token], right: Union[Node,Token]):
         super().__init__(left, right)
 
     def shift(self):
@@ -84,7 +84,7 @@ class UnionNode(BinaryNode):
 
 # A + B
 class ConcatenationNode(BinaryNode):
-    def __init__(self, left: Node | Token, right: Node | Token):
+    def __init__(self, left: Union[Node,Token], right: Union[Node,Token]):
         super().__init__(left, right)
 
     def shift(self):
@@ -94,7 +94,7 @@ class ConcatenationNode(BinaryNode):
 
 #s* 0-many times
 class ClousureStarNode(UnaryNode):
-    def __init__(self, left: Node | Token):
+    def __init__(self, left: Union[Node,Token]):
         super().__init__(left)
 
     def shift(self):
@@ -104,7 +104,7 @@ class ClousureStarNode(UnaryNode):
 
 #s+ at least one time
 class ClousurePlusNode(UnaryNode):
-    def __init__(self, left: Node | Token):
+    def __init__(self, left: Union[Node,Token]):
         super().__init__(left)
 
     def shift(self):
@@ -118,7 +118,7 @@ class ClousurePlusNode(UnaryNode):
 
 #s? 0-1 times
 class ClousureMayNode(UnaryNode):
-    def __init__(self, left: Node | Token):
+    def __init__(self, left: Union[Node,Token]):
         super().__init__(left)
 
     def shift(self):
@@ -127,7 +127,7 @@ class ClousureMayNode(UnaryNode):
 
 #(c)
 class GrouperNode(UnaryNode):
-    def __init__(self, left: Node | Token):
+    def __init__(self, left: Union[Node,Token]):
         super().__init__(left)
 
     def shift(self):
@@ -135,7 +135,7 @@ class GrouperNode(UnaryNode):
 
 #[ElemSet]
 class SetterNode(UnaryNode):
-    def __init__(self, left: Node | Token):
+    def __init__(self, left: Union[Node,Token]):
         super().__init__(left)
 
     def shift(self):
@@ -144,7 +144,7 @@ class SetterNode(UnaryNode):
 
 #[^ ElemSet]
 class NoSetterNode(UnaryNode):
-    def __init__(self, left: Node | Token):
+    def __init__(self, left: Union[Node,Token]):
         super().__init__(left)
 
     def shift(self):
@@ -153,7 +153,7 @@ class NoSetterNode(UnaryNode):
 
 # . or \
 class AnyEscaperNode(BinaryNode):
-    def __init__(self, left: Node | Token, right: Node | Token):
+    def __init__(self, left: Union[Node,Token], right: Union[Node,Token]):
         super().__init__(left, right)
 
     def shift(self):
@@ -161,7 +161,7 @@ class AnyEscaperNode(BinaryNode):
 
 # May be a . \ or token 
 class ElemSetComNode(BinaryNode):
-    def __init__(self, left: Node | Token, right: Node | Token):
+    def __init__(self, left: Union[Node,Token], right: Union[Node,Token]):
         super().__init__(left, right)
 
     def shift(self):
@@ -177,7 +177,7 @@ class ElemSetComNode(BinaryNode):
 
 #[a-c] abc
 class RangeNode(BinaryNode):
-    def __init__(self, left: Node | Token, right: Node | Token):
+    def __init__(self, left: Union[Node,Token], right: Union[Node,Token]):
         super().__init__(left, right)
 
     def shift(self):
@@ -193,7 +193,7 @@ class RangeNode(BinaryNode):
 
 # a Token Char needs to be converted into a automaton to have a way to be shifted 
 class CharNode(UnaryNode):
-    def __init__(self, left: Node | Token):
+    def __init__(self, left: Union[Node,Token]):
         super().__init__(left)
 
     def shift(self):

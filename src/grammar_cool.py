@@ -1,6 +1,4 @@
 import os
-
-from numpy import isin
 from grammar_class import Grammar
 import ast_cool_hierarchy as ast
 import ast_cool_h_extender as to_ast
@@ -246,7 +244,7 @@ Resoluted !=  Resoluted + dot + obj_id + lparen + Arg_list + rparen / (ast.CallN
 
 Atom != integer / (ast.ConstantNumNode, ) \
     | obj_id / (ast.VariableNode, ) \
-    | string / (ast.StringNode, ) \
+    | string / (to_ast.StringWrapper, ) \
     | Bool / (ast.BoolNode, ) \
     | lparen + Expr + rparen / (1,) \
     | new_ + type_id / (ast.InstantiateNode,(1,)) \
