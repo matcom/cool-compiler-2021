@@ -37,23 +37,21 @@ Cada una de estas componentes será explicada con mayor detenimiento a continuac
 
 Para esta componente se utilizó el paquete de Python PLY lex.
 
-# FILL #
-Pon aquí majomeno como funciona el Lexer
-#
+Basicamente nos auxiliamos de todo el poder que nos brinda PLY y las expresiones regulares, lo que nos causó mayor problema
+fueron los comentarios y los strings, en cuyos casos se utilizaron expresiones regulares para detectar el comienzo, y se usaron algoritmos
+creados por nosotros para formar el string o ignorar el comentario hasta su fin, siempre manteniendo actualizado el número de línea
+para poder brindar mejores mensajes de error y poder pasar los tests
 
 ## Parser
 Para el parser se ha utilizado el paquete de Python PLY yacc.
 
-# FILL #
-Pon aqui majomeno como funciona el parser.
-#
-
+Usamos la facilidad que nos brinda esta biblioteca, y usando una gramática generamos un ast de Cool
 
 ## Semantic Checker
 Esta componente se ha dividido a su vez en 3 componentes principales:
 - Type Collector: encargado de recolectar los tipos.
-- Type Checker: encargado de hacer chequeo de tipos.
 - Type Builder: encargado de construir los tipos.
+- Type Checker: encargado de hacer chequeo de tipos.
 
 Cada una de estas sub-componentes serán explicadas a continuación.
 ### Type Collector
@@ -63,7 +61,16 @@ Durante la recolección de tipos se visitan todas las declaraciones de clases, s
 - Herencia cíclica
 - Redefinición de clases
 - Nombres de clase no válidos
-  
+
+### Type builder
+A los tipos creados en la fase anterior se le añaden todos sus atributos y métodos.
+
+**Errores detectados**:
+- Mal uso de herencia
+- Uso de tipos no definidos 
+- Problemas de nombrado de atributos y métodos
+- Redefinición de atributos
+- Redefinición incorrecta de métodos
 
 ### Type checker
 En esta fase se evalúa la correctitud de todas las expresiones del lenguaje y se decide el tipo estático de cada una de ellas.
@@ -75,26 +82,12 @@ En esta fase se evalúa la correctitud de todas las expresiones del lenguaje y s
 - mal usos de `self` y `SELF_TYPE`
 - mal usos del `case` 
 
-
-### Type builder
-A los tipos creados en la fase anterior se le añaden todos sus atributos y métodos. Además se verifica que se cumplan los requerimientos de un programa válido de Cool q son tener una clase `Main` con su método `main`.
-
-**Errores detectados**:
-- Mal uso de herencia
-- Uso de tipos no definidos 
-- Problemas de nombrado de atributos y métodos
-- Redefinición de atributos
-- Redefinición incorrecta de métodos
-- No definición de la clase `Main` o su método `main`
-- Incorrecta definición del método `main`
-
 ## Code Generator
 Esta componente a su vez está constituida por 2 sub-componentes:
-- COOL-CIL Converter: encargado de convertir el código COOL a código CIL.
-- CIL-MIPS Converter: encargado de convertir el código CIL a código MIPS.
+- COOL-CIL Converter: encargado de convertir el ast de Cool a un ast de CIL
+- CIL-MIPS Converter: encargado de convertir ast de CIL ast de MIPS.
 
 ### COOL-CIL Converter
-El lenguaje CIL utilizado es bastante parecido al estudiado en clases.
 En esta etapa del proceso de compilación, requirió especial atención la generación de las expresiones *case*. Para ello se requiere ordenar las instrucciones de tal modo que se asegure el emparejamiento del tipo de la expresión principal con el tipo más específico declarado en las ramas del *case*.   
 
 **Errores detectados**:
