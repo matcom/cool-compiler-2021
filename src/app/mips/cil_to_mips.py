@@ -139,9 +139,10 @@ class CILToMIPSVisitor:
         self._data_section[node.name] = mips.StringConst(node.name, node.value)
 
     @visitor.when(cil.FunctionNode)
-    def visit(self, node):
-        used_regs_finder = UsedRegisterFinder()
-
+    def visit(self, node:cil.FunctionNode):
+        # used_regs_finder = UsedRegisterFinder()
+        if node.name == "init_attr_at_Cons":
+            a= 5
         label = "main" if node.name == "entry" else node.name
         params = [param.name for param in node.params]
         localvars = [local.name for local in node.localvars]
@@ -196,6 +197,7 @@ class CILToMIPSVisitor:
 
         final_instructions.append(mips.AddInmediateNode(
             mips.SP_REG, mips.SP_REG, size_for_locals))
+        final_instructions.append(mips.AddInmediateNode(mips.FP_REG,mips.SP_REG,-8))
         final_instructions.extend(mips.pop_register(mips.FP_REG))
         final_instructions.extend(mips.pop_register(mips.RA_REG))
 
@@ -231,12 +233,19 @@ class CILToMIPSVisitor:
     def visit(self, node):
         instructions = []
         label = node.function
+        if label == "function_main_at_Main":
+            a= 5
         instructions.append(mips.JumpAndLinkNode(label))
 
         # reg = self.memory_manager.get_reg_for_var(node.dest)
         # if reg is None:
+        # if node.dest == 'local_at_Cons_internal_1':
+        #     a= 5
+        # try:
         instructions.append(mips.StoreWordNode(
             mips.V0_REG, self.get_var_location(node.dest)))
+        # except ValueError:
+        #     instructions.append(mips.MoveNode(mips.REGISTERS[0],mips.V0_REG)) # no fucking clue why this works
         # else:
         #     instructions.append(mips.MoveNode(reg, mips.V0_REG))
 
@@ -250,8 +259,8 @@ class CILToMIPSVisitor:
     def visit(self, node):
         instructions = []
 
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
 
         reg1 = None
         if type(node.source) == cil.VoidNode:
@@ -273,8 +282,8 @@ class CILToMIPSVisitor:
         # else:
         #     instructions.append(mips.MoveNode(reg2, reg1))
 
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         return instructions
 
@@ -289,16 +298,16 @@ class CILToMIPSVisitor:
             tp = self._types[node.type].index
 
 
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
         
 
         instructions.append(mips.LoadInmediateNode(mips.ARG_REGISTERS[0], tp))
 
         instructions.extend(mips.create_object(mips.ARG_REGISTERS[0], mips.ARG_REGISTERS[1] ))
 
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         # reg3 = self.memory_manager.get_reg_for_var(node.dest)
         # if reg3 is None:
@@ -337,12 +346,12 @@ class CILToMIPSVisitor:
             node.msg.name, 0)
         # reg = self.memory_manager.get_reg_for_var(node.dest)
         # if reg is None:
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
         instructions.append(mips.LoadAddressNode(
             mips.ARG_REGISTERS[0], string_location))
         instructions.append(mips.StoreWordNode(
             mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
         # else:
         #     instructions.append(mips.LoadAddressNode(reg, string_location))
 
@@ -355,7 +364,7 @@ class CILToMIPSVisitor:
 
         # reg = self.memory_manager.get_reg_for_var(node.value)
         # if reg is None:
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
 
         instructions.append(mips.LoadWordNode(
             mips.ARG_REGISTERS[0], self.get_var_location(node.value)))
@@ -364,7 +373,7 @@ class CILToMIPSVisitor:
 
         instructions.append(mips.SyscallNode())
 
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         return instructions
 
@@ -375,13 +384,13 @@ class CILToMIPSVisitor:
 
         # reg = self.memory_manager.get_reg_for_var(node.value)
         # if reg is None:
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
         instructions.append(mips.LoadWordNode(
             mips.ARG_REGISTERS[0], self.get_var_location(node.value)))
         # else:
         #     instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg))
         instructions.append(mips.SyscallNode())
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         return instructions
 
@@ -392,8 +401,8 @@ class CILToMIPSVisitor:
         # reg1 = self.memory_manager.get_reg_for_var(node.source)
         # pushed = False
         # if reg1 is None:
-        reg1 = mips.ARG_REGISTERS[0]
-        instructions.extend(mips.push_register(reg1))
+        reg1 = mips.REGISTERS[0]
+        # instructions.extend(mips.push_register(reg1))
         instructions.append(mips.LoadWordNode(
             reg1, self.get_var_location(node.source)))
         # pushed = True
@@ -419,7 +428,7 @@ class CILToMIPSVisitor:
             mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
         # else:
         #     instructions.append(mips.MoveNode(reg2, mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.pop_register(reg1))
+        # instructions.extend(mips.pop_register(reg1))
 
         return instructions
 
@@ -443,8 +452,8 @@ class CILToMIPSVisitor:
         # reg = self.memory_manager.get_reg_for_var(obj)
         # if reg is None:
         reg = mips.ARG_REGISTERS[0]
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
 
         instructions.append(mips.LoadWordNode(
             reg, self.get_var_location(obj)))
@@ -460,8 +469,8 @@ class CILToMIPSVisitor:
             mips.ARG_REGISTERS[1], self.get_var_location(dest)))
         # else:
         #     instructions.append(mips.MoveNode(reg, mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
         return instructions
 
     @visitor.when(cil.SetAttribNode)
@@ -477,8 +486,8 @@ class CILToMIPSVisitor:
 
         # reg1 = self.memory_manager.get_reg_for_var(obj)
         # if reg1 is None:
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
 
         reg1 = mips.ARG_REGISTERS[0]
         instructions.append(mips.LoadWordNode(
@@ -491,15 +500,16 @@ class CILToMIPSVisitor:
         else:
             # reg2 = self.memory_manager.get_reg_for_var(node.value)
             # if reg2 is None:
+            word_to_load = self.get_var_location(node.value) if type(node.value).__name__ =='str' else 0
             reg2 = mips.ARG_REGISTERS[1]
             instructions.append(mips.LoadWordNode(
-                reg2, self.get_var_location(node.value)))
+                reg2, word_to_load))
 
         instructions.append(mips.StoreWordNode(
             reg2, mips.RegisterRelativeLocation(reg1, offset)))
 
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         return instructions
 
@@ -511,7 +521,7 @@ class CILToMIPSVisitor:
         # reg = self.memory_manager.get_reg_for_var(node.source)
         # if reg is None:
         reg = mips.ARG_REGISTERS[0]
-        instructions.extend(mips.push_register(reg))
+        # instructions.extend(mips.push_register(reg))
         instructions.append(mips.LoadWordNode(
             reg, self.get_var_location(node.source)))
         # pushed = True
@@ -526,7 +536,7 @@ class CILToMIPSVisitor:
             mips.V0_REG, self.get_var_location(node.dest)))
         # else:
         #     instructions.append(mips.MoveNode(reg, mips.V0_REG))
-        instructions.extend(mips.pop_register(reg))
+        # instructions.extend(mips.pop_register(reg))
 
         return instructions
 
@@ -534,8 +544,8 @@ class CILToMIPSVisitor:
     def visit(self, node):
         instructions = []
 
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
 
         if type(node.left) == int:
             instructions.append(mips.LoadInmediateNode(
@@ -574,8 +584,8 @@ class CILToMIPSVisitor:
         # else:
         #     instructions.append(mips.MoveNode(reg, mips.V0_REG))
 
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         return instructions
 
@@ -583,28 +593,28 @@ class CILToMIPSVisitor:
     def visit(self, node):
         instructions = []
 
-        reg = self.memory_manager.get_reg_for_var(node.left)
-        if reg is None:
-            instructions.append(mips.LoadWordNode(
-                mips.ARG_REGISTERS[0], self.get_var_location(node.left)))
-        else:
-            instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg))
+        # reg = self.memory_manager.get_reg_for_var(node.left)
+        # if reg is None:
+        instructions.append(mips.LoadWordNode(
+            mips.ARG_REGISTERS[0], self.get_var_location(node.left)))
+        # else:
+        #     instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg))
 
-        reg = self.memory_manager.get_reg_for_var(node.right)
-        if reg is None:
-            instructions.append(mips.LoadWordNode(
-                mips.ARG_REGISTERS[1], self.get_var_location(node.right)))
-        else:
-            instructions.append(mips.MoveNode(mips.ARG_REGISTERS[1], reg))
+        # reg = self.memory_manager.get_reg_for_var(node.right)
+        # if reg is None:
+        instructions.append(mips.LoadWordNode(
+            mips.ARG_REGISTERS[1], self.get_var_location(node.right)))
+        # else:
+        #     instructions.append(mips.MoveNode(mips.ARG_REGISTERS[1], reg))
 
         instructions.append(mips.JumpAndLinkNode("equal_str"))
 
-        reg = self.memory_manager.get_reg_for_var(node.dest)
-        if reg is None:
-            instructions.append(mips.StoreWordNode(
-                mips.V0_REG, self.get_var_location(node.dest)))
-        else:
-            instructions.append(mips.MoveNode(reg, mips.V0_REG))
+        # reg = self.memory_manager.get_reg_for_var(node.dest)
+        # if reg is None:
+        instructions.append(mips.StoreWordNode(
+            mips.V0_REG, self.get_var_location(node.dest)))
+        # else:
+        #     instructions.append(mips.MoveNode(reg, mips.V0_REG))
 
         return instructions
 
@@ -642,8 +652,8 @@ class CILToMIPSVisitor:
     def visit(self, node):
         instructions = []
 
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
         # reg1 = self.memory_manager.get_reg_for_var(node.obj)
         # if reg1 is None:
         reg1 = mips.ARG_REGISTERS[0]
@@ -660,16 +670,16 @@ class CILToMIPSVisitor:
         #     instructions.append(mips.LoadWordNode(
         #         reg2, mips.RegisterRelativeLocation(reg1, 0)))
 
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         return instructions
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node):
         instructions = []
-        instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.push_register(mips.ARG_REGISTERS[1]))
 
         comp_tp = self._types[node.computed_type]
         method_index = list(comp_tp.methods).index(node.method)
@@ -708,8 +718,8 @@ class CILToMIPSVisitor:
         # else:
         #     instructions.append(mips.MoveNode(reg, mips.V0_REG))
 
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
-        instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[1]))
+        # instructions.extend(mips.pop_register(mips.ARG_REGISTERS[0]))
 
         if self._pushed_args > 0:
             instructions.append(mips.AddInmediateNode(
@@ -737,11 +747,11 @@ class CILToMIPSVisitor:
     def visit(self, node):
         instructions = []
 
-        save = False
-        reg = self.memory_manager.get_reg_for_var(node.dest)
-        if reg is None:
-            reg = mips.ARG_REGISTERS[0]
-            save = True
+        # save = False
+        # reg = self.memory_manager.get_reg_for_var(node.dest)
+        # if reg is None:
+        reg = mips.ARG_REGISTERS[0]
+        # save = True
 
         instructions.append(mips.LoadAddressNode(
             reg, mips.TYPENAMES_TABLE_LABEL))
@@ -752,9 +762,9 @@ class CILToMIPSVisitor:
         instructions.append(mips.LoadWordNode(
             reg, mips.RegisterRelativeLocation(reg, 0)))
 
-        if save:
-            instructions.append(mips.StoreWordNode(
-                reg, self.get_var_location(node.dest)))
+        # if save:
+        instructions.append(mips.StoreWordNode(
+            reg, self.get_var_location(node.dest)))
 
         return instructions
 
@@ -810,29 +820,29 @@ class CILToMIPSVisitor:
             reg1 = mips.ARG_REGISTERS[0]
             instructions.append(mips.LoadInmediateNode(reg1, node.left))
         else:
-            reg1 = self.memory_manager.get_reg_for_var(node.left)
-            if reg1 is None:
-                reg1 = mips.ARG_REGISTERS[0]
-                instructions.append(mips.LoadWordNode(
-                    reg1, self.get_var_location(node.left)))
+            # reg1 = self.memory_manager.get_reg_for_var(node.left)
+            # if reg1 is None:
+            reg1 = mips.ARG_REGISTERS[0]
+            instructions.append(mips.LoadWordNode(
+                reg1, self.get_var_location(node.left)))
 
         if type(node.right) == int:
             instructions.append(mips.LoadInmediateNode(reg2, node.right))
         else:
-            reg2 = self.memory_manager.get_reg_for_var(node.right)
-            if reg2 is None:
-                reg2 = mips.ARG_REGISTERS[1]
-                instructions.append(mips.LoadWordNode(
-                    reg2, self.get_var_location(node.right)))
+            # reg2 = self.memory_manager.get_reg_for_var(node.right)
+            # if reg2 is None:
+            reg2 = mips.ARG_REGISTERS[1]
+            instructions.append(mips.LoadWordNode(
+                reg2, self.get_var_location(node.right)))
 
-        reg3 = self.memory_manager.get_reg_for_var(node.dest)
-        if reg3 is None:
-            instructions.append(mips.SubNode(
-                mips.ARG_REGISTERS[0], reg1, reg2))
-            instructions.append(mips.StoreWordNode(
-                mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
-        else:
-            instructions.append(mips.SubNode(reg3, reg1, reg2))
+        # reg3 = self.memory_manager.get_reg_for_var(node.dest)
+        # if reg3 is None:
+        instructions.append(mips.SubNode(
+            mips.ARG_REGISTERS[0], reg1, reg2))
+        instructions.append(mips.StoreWordNode(
+            mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
+        # else:
+        #     instructions.append(mips.SubNode(reg3, reg1, reg2))
 
         return instructions
 
@@ -845,30 +855,30 @@ class CILToMIPSVisitor:
             reg1 = mips.ARG_REGISTERS[0]
             instructions.append(mips.LoadInmediateNode(reg1, node.left))
         else:
-            reg1 = self.memory_manager.get_reg_for_var(node.left)
-            if reg1 is None:
-                reg1 = mips.ARG_REGISTERS[0]
-                instructions.append(mips.LoadWordNode(
-                    reg1, self.get_var_location(node.left)))
+            # reg1 = self.memory_manager.get_reg_for_var(node.left)
+            # if reg1 is None:
+            reg1 = mips.ARG_REGISTERS[0]
+            instructions.append(mips.LoadWordNode(
+                reg1, self.get_var_location(node.left)))
 
         if type(node.right) == int:
             reg2 = mips.ARG_REGISTERS[1]
             instructions.append(mips.LoadInmediateNode(reg2, node.right))
         else:
-            reg2 = self.memory_manager.get_reg_for_var(node.right)
-            if reg2 is None:
-                reg2 = mips.ARG_REGISTERS[1]
-                instructions.append(mips.LoadWordNode(
-                    reg2, self.get_var_location(node.right)))
+            # reg2 = self.memory_manager.get_reg_for_var(node.right)
+            # if reg2 is None:
+            reg2 = mips.ARG_REGISTERS[1]
+            instructions.append(mips.LoadWordNode(
+                reg2, self.get_var_location(node.right)))
 
-        reg3 = self.memory_manager.get_reg_for_var(node.dest)
-        if reg3 is None:
-            instructions.append(mips.MultiplyNode(
-                mips.ARG_REGISTERS[0], reg1, reg2))
-            instructions.append(mips.StoreWordNode(
-                mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
-        else:
-            instructions.append(mips.MultiplyNode(reg3, reg1, reg2))
+        # reg3 = self.memory_manager.get_reg_for_var(node.dest)
+        # if reg3 is None:
+        instructions.append(mips.MultiplyNode(
+            mips.ARG_REGISTERS[0], reg1, reg2))
+        instructions.append(mips.StoreWordNode(
+            mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
+        # else:
+        #     instructions.append(mips.MultiplyNode(reg3, reg1, reg2))
 
         return instructions
 
@@ -881,30 +891,30 @@ class CILToMIPSVisitor:
             reg1 = mips.ARG_REGISTERS[0]
             instructions.append(mips.LoadInmediateNode(reg1, node.left))
         else:
-            reg1 = self.memory_manager.get_reg_for_var(node.left)
-            if reg1 is None:
-                reg1 = mips.ARG_REGISTERS[0]
-                instructions.append(mips.LoadWordNode(
-                    reg1, self.get_var_location(node.left)))
+            # reg1 = self.memory_manager.get_reg_for_var(node.left)
+            # if reg1 is None:
+            reg1 = mips.ARG_REGISTERS[0]
+            instructions.append(mips.LoadWordNode(
+                reg1, self.get_var_location(node.left)))
 
         if type(node.right) == int:
             reg2 = mips.ARG_REGISTERS[1]
             instructions.append(mips.LoadInmediateNode(reg2, node.right))
         else:
-            reg2 = self.memory_manager.get_reg_for_var(node.right)
-            if reg2 is None:
-                reg2 = mips.ARG_REGISTERS[1]
-                instructions.append(mips.LoadWordNode(
-                    reg2, self.get_var_location(node.right)))
+            # reg2 = self.memory_manager.get_reg_for_var(node.right)
+            # if reg2 is None:
+            reg2 = mips.ARG_REGISTERS[1]
+            instructions.append(mips.LoadWordNode(
+                reg2, self.get_var_location(node.right)))
 
         instructions.append(mips.DivideNode(reg1, reg2))
-        reg3 = self.memory_manager.get_reg_for_var(node.dest)
-        if reg3 is None:
-            instructions.append(mips.MoveFromLowNode(mips.ARG_REGISTERS[0]))
-            instructions.append(mips.StoreWordNode(
-                mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
-        else:
-            instructions.append(mips.MoveFromLowNode(reg3))
+        # reg3 = self.memory_manager.get_reg_for_var(node.dest)
+        # if reg3 is None:
+        instructions.append(mips.MoveFromLowNode(mips.ARG_REGISTERS[0]))
+        instructions.append(mips.StoreWordNode(
+            mips.ARG_REGISTERS[0], self.get_var_location(node.dest)))
+        # else:
+        #     instructions.append(mips.MoveFromLowNode(reg3))
 
         return instructions
 
@@ -918,22 +928,22 @@ class CILToMIPSVisitor:
             reg1 = mips.ARG_REGISTERS[0]
             instructions.append(mips.LoadInmediateNode(reg1, node.obj))
         else:
-            reg1 = self.memory_manager.get_reg_for_var(node.obj)
-            if reg1 is None:
-                reg1 = mips.ARG_REGISTERS[0]
-                instructions.append(mips.LoadWordNode(
-                    reg1, self.get_var_location(node.obj)))
+            # reg1 = self.memory_manager.get_reg_for_var(node.obj)
+            # if reg1 is None:
+            reg1 = mips.ARG_REGISTERS[0]
+            instructions.append(mips.LoadWordNode(
+                reg1, self.get_var_location(node.obj)))
 
-        reg2 = self.memory_manager.get_reg_for_var(node.dest)
-        if reg2 is None:
-            reg2 = mips.ARG_REGISTERS[1]
-            instructions.append(mips.ComplementNode(reg2, reg1))
-            instructions.append(mips.AddInmediateNode(reg2, reg2, 1))
-            instructions.append(mips.StoreWordNode(
-                reg2, self.get_var_location(node.dest)))
-        else:
-            instructions.append(mips.ComplementNode(reg2, reg1))
-            instructions.append(mips.AddInmediateNode(reg2, reg2, 1))
+        # reg2 = self.memory_manager.get_reg_for_var(node.dest)
+        # if reg2 is None:
+        reg2 = mips.ARG_REGISTERS[1]
+        instructions.append(mips.ComplementNode(reg2, reg1))
+        instructions.append(mips.AddInmediateNode(reg2, reg2, 1))
+        instructions.append(mips.StoreWordNode(
+            reg2, self.get_var_location(node.dest)))
+        # else:
+        #     instructions.append(mips.ComplementNode(reg2, reg1))
+        #     instructions.append(mips.AddInmediateNode(reg2, reg2, 1))
 
         return instructions
 
@@ -946,31 +956,31 @@ class CILToMIPSVisitor:
             instructions.append(mips.LoadInmediateNode(
                 mips.ARG_REGISTERS[0], node.left))
         else:
-            reg = self.memory_manager.get_reg_for_var(node.left)
-            if reg is None:
-                instructions.append(mips.LoadWordNode(
-                    mips.ARG_REGISTERS[0], self.get_var_location(node.left)))
-            else:
-                instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg))
+            # reg = self.memory_manager.get_reg_for_var(node.left)
+            # if reg is None:
+            instructions.append(mips.LoadWordNode(
+                mips.ARG_REGISTERS[0], self.get_var_location(node.left)))
+            # else:
+            #     instructions.append(mips.MoveNode(mips.ARG_REGISTERS[0], reg))
 
         if type(node.right) == int:
             instructions.append(mips.LoadInmediateNode(
                 mips.ARG_REGISTERS[1], node.right))
         else:
-            reg = self.memory_manager.get_reg_for_var(node.right)
-            if reg is None:
-                instructions.append(mips.LoadWordNode(
-                    mips.ARG_REGISTERS[1], self.get_var_location(node.right)))
-            else:
-                instructions.append(mips.MoveNode(mips.ARG_REGISTERS[1], reg))
+            # reg = self.memory_manager.get_reg_for_var(node.right)
+            # if reg is None:
+            instructions.append(mips.LoadWordNode(
+                mips.ARG_REGISTERS[1], self.get_var_location(node.right)))
+            # else:
+            #     instructions.append(mips.MoveNode(mips.ARG_REGISTERS[1], reg))
 
         instructions.append(mips.JumpAndLinkNode('less_equal'))
-        reg = self.memory_manager.get_reg_for_var(node.dest)
-        if reg is None:
-            instructions.append(mips.StoreWordNode(
-                mips.V0_REG, self.get_var_location(node.dest)))
-        else:
-            instructions.append(mips.MoveNode(reg, mips.V0_REG))
+        # reg = self.memory_manager.get_reg_for_var(node.dest)
+        # if reg is None:
+        instructions.append(mips.StoreWordNode(
+            mips.V0_REG, self.get_var_location(node.dest)))
+        # else:
+        #     instructions.append(mips.MoveNode(reg, mips.V0_REG))
 
         return instructions
 

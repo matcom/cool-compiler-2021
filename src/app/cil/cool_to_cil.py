@@ -430,9 +430,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.init_name(node.id, attr=True))
         self.register_param(self.vself)
         if node.parent != 'Object' and node.parent != 'IO':
+            vtemp2 = self.define_internal_local()
             self.register_instruction(cil.ArgNode(self.vself.name))
             self.register_instruction(cil.StaticCallNode(
-                self.init_name(node.parent, attr=True), vtemp))
+                self.init_name(node.parent, attr=True), vtemp2))
         attr_declarations = (f for f in node.features if isinstance(
             f, cool.AttrDeclarationNode))
         for feature in attr_declarations:

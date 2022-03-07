@@ -49,9 +49,8 @@ class PrintVisitor:
         proto_begin = f"{node.label}_proto:\n\t.word\t{node.index}\n\t.word\t{node.size}\n\t.word\t{node.label}_dispatch"
         proto_attr = "\n".join(
             [f'\t.word\t{node._default_attributes.get(attr, "0")}' for attr in node.attributes])
-        # proto_end = f"\t.word\t{OBJECT_MARK}"
-        proto_end =""
-        proto = f"{proto_begin}\n{proto_attr}\n{proto_end}" if proto_attr != "" else f"{proto_begin}\n{proto_end}"
+
+        proto = f"{proto_begin}\n{proto_attr}\n" if proto_attr != "" else f"{proto_begin}\n"
 
         return f'{dispatch_table}\n\n{proto}'
 
@@ -69,6 +68,7 @@ class PrintVisitor:
 
     @visitor.when(FunctionNode)
     def visit(self, node):
+        
         instr = [self.visit(instruction) for instruction in node.instructions]
         # TODO la linea de abajo sobra, es necesaria mientras la traduccion del AST de CIL este incompleta
         instr2 = [inst for inst in instr if type(inst) == str]
@@ -77,6 +77,8 @@ class PrintVisitor:
 
     @visitor.when(AddInmediateNode)
     def visit(self, node):
+        if f'addi {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.value)}' == 'addi $sp, $sp, 8':
+            a= 5
         return f'addi {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.value)}'
 
     @visitor.when(StoreWordNode)
@@ -97,7 +99,7 @@ class PrintVisitor:
 
     @visitor.when(JumpRegisterAndLinkNode)
     def visit(self, node):
-        return f'jal {self.visit(node.reg)}'
+        return f'jalr {self.visit(node.reg)}'
 
     @visitor.when(LoadWordNode)
     def visit(self, node):
