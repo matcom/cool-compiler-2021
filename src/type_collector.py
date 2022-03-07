@@ -60,7 +60,7 @@ class TypeCollector(object):
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         try:
-            self.context.create_type(node.id)
-        except SError as error:
-            node_row, node_col = node.token.location
+            self.context.create_type(node.id.lex)
+        except SError as error: # class alerady defined
+            node_row, node_col = node.id.location
             self.errors.append(SemanticError(node_row, node_col, error.text))

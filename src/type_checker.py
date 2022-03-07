@@ -77,10 +77,10 @@ class TypeChecker:
         self.class_visited = {}
         for declaration in node.declarations:
             try:
-                visited[declaration.id] # checking if visited
+                visited[declaration.id.lex] # checking if visited
             except:
-                visited[declaration.id] = True
-                self.class_visited[declaration.id] = False
+                visited[declaration.id.lex] = True
+                self.class_visited[declaration.id.lex] = False
                 self.class_to_visit.append(declaration)
                 if declaration.parent is None or declaration.parent.lex in ["IO", "Int", "String", "Bool"]: # is node has no parent, mark it to visit it first later
                     initial_nodes.append(declaration)
@@ -111,9 +111,9 @@ class TypeChecker:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope, parent_children_dict):
         self.class_to_visit.remove(node)
-        self.class_visited[node.id] = True # arked class as visited
+        self.class_visited[node.id.lex] = True # arked class as visited
 
-        self.current_type = self.context.get_type(node.id)
+        self.current_type = self.context.get_type(node.id.lex)
         scope.define_variable("self", self.current_type)
 
         for attr in self.current_type.attributes:
@@ -123,9 +123,9 @@ class TypeChecker:
             self.visit(feature, scope)
         
         try:
-            children = parent_children_dict[node.id]
-            for child in children:# after initialization, each parent class visits its children (note the child scope creation) 
-                if not self.class_visited[child.id]:
+            children = parent_children_dict[node.id.lex]
+            for child in children: # after initialization, each parent class visits its children (note the child scope creation) 
+                if not self.class_visited[child.id.lex]:
                     self.visit(child, scope.create_child(), parent_children_dict)
         except:
             return
@@ -168,7 +168,7 @@ class TypeChecker:
         for i, param_name in enumerate(param_names):
             if param_name == "self":
                 param_n, param_t = node.params[i]
-                node_row, node_col = param_n.location
+                node_row, node_col = param_n.location # location of param name
                 self.errors.append(
                     SemanticError(node_row, node_col ,f"'self' cannot be the name of a formal parameter.")
                 )
@@ -187,9 +187,9 @@ class TypeChecker:
 
         body_type = self.visit(node.body, child_scope)
 
-        if not body_type.conforms_to(method_return_type):#aqui se debe poner
+        if not body_type.conforms_to(method_return_type):
             node_row, node_col = node.body.token.location
-            self.errors.append(TypeError( node_row, node_col, f"Inferred return type '{body_type.name}' of method '{node.id.lex}' does not conform to declared return type '{method_return_type.name}'."))
+            self.errors.append(TypeError( node_row, node_col, f"Inferred return type '{body_type.name}' of method '{node.id.lex}' (the type of the last expression) does not conform to declared return type '{method_return_type.name}'."))
 
         if self.current_type.parent is not None:
             try:
@@ -275,7 +275,7 @@ class TypeChecker:
                 node_at_type = self.context.get_type(node.at_type.lex)
                 method = node_at_type.get_method(node.id.lex)
                 if not typex.conforms_to(node_at_type):
-                    node_row, node_col = node.token.location
+                    node_row, node_col = node.at_type.location # maybe in node.obj
                     self.errors.append(
                         TypeError(node_row, node_col, f"Expression type {typex.name} does not conform to declared static dispatch type {node_at_type.name}.")
                     )
@@ -296,7 +296,7 @@ class TypeChecker:
         for arg, ptype in zip(node.args, method.param_types):
             arg_type = self.visit(arg, scope)
             if not arg_type.conforms_to(ptype):
-                node_row, node_col = arg.token.location # verificar si esto siempre da ok
+                node_row, node_col = arg.token.location 
                 self.errors.append(TypeError(node_row, node_col,f"In call of method {node.id.lex} parameter of type {arg_type.name} does not conforms to declared type {ptype.name}"))
 
         if method.return_type == self.context.get_type("SELF_TYPE"):
@@ -309,7 +309,7 @@ class TypeChecker:
         predicate_type = self.visit(node.if_expr, scope)
 
         if predicate_type.name != "Bool" and predicate_type.name != "AUTO_TYPE":
-            node_row, node_col = node.token.location
+            node_row, node_col = node.if_expr.token.location
             self.errors.append(
                TypeError(node_row, node_col, f"Expression after 'if' must be Bool, current type is {predicate_type.name}")
             )
@@ -327,7 +327,7 @@ class TypeChecker:
         bool_type = self.context.get_type("Bool")
 
         if condition_type != bool_type and condition_type.name != "AUTO_TYPE":
-            node_row, node_col = node.token.location
+            node_row, node_col = node.condition.token.location
             self.errors.append(
                 TypeError(node_row, node_col, f"Expression in 'while' condition must be bool, current type is {condition_type.name}")
             )
@@ -375,7 +375,7 @@ class TypeChecker:
         if node.expr != None:
             typex = self.visit(node.expr, scope)
             if not typex.conforms_to(static_type):
-                line, col = node.token.location
+                line, col = node.expr.token.location
                 self.errors.append(TypeError(line, col, INCOMPATIBLE_TYPES % (typex.name, static_type.name)))
 
         scope.define_variable(node.id, static_type)
@@ -388,7 +388,7 @@ class TypeChecker:
         current_case_type = None
         case_types_found = []
         for item in node.case_items:
-            if not ( item.type.lex in case_types_found):
+            if not (item.type.lex in case_types_found):
                 case_types_found.append(item.type.lex)
                 child_scope = scope.create_child()
                 case_item_type = self.visit(item, child_scope)
@@ -489,7 +489,7 @@ class TypeChecker:
         typex = self.visit(node.expr, scope)
 
         if typex != bool_type and not typex.name == "AUTO_TYPE":
-            line, col = node.token.location
+            line, col = node.expr.token.location
             self.errors.append(
                 TypeError(line, col, f"Expression after 'not' must be Bool, current is {typex.name}")
             )
@@ -503,7 +503,7 @@ class TypeChecker:
         typex = self.visit(node.expr, scope)
 
         if typex != int_type and not typex.name == "AUTO_TYPE":
-            node_row, node_col = node.token.location
+            node_row, node_col = node.expr.token.location
             self.errors.append(
                 TypeError( node_row, node_col,f"Expression after '~' must be Int, current is {typex.name}")
             )

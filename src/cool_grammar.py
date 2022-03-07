@@ -71,11 +71,11 @@ def define_cool_grammar(print_grammar=False):
 
     def_class %= (
         classx + type_id + ocur + feature_list + ccur + semi,
-        lambda h, s: ClassDeclarationNode(s[2].lex, s[4], s[1]),
+        lambda h, s: ClassDeclarationNode(s[2], s[4], s[1]),
     )
     def_class %= (
         classx + type_id + inherits + type_id + ocur + feature_list + ccur + semi,
-        lambda h, s: ClassDeclarationNode(s[2].lex, s[6], s[1], s[4]), # aqui hay que buscar otra alternativa a simplemente pasar el lexema pues a la hora de dar errores estaria bien decir que el tipo que se refencia noe sta definido
+        lambda h, s: ClassDeclarationNode(s[2], s[6], s[1], s[4]), # aqui hay que buscar otra alternativa a simplemente pasar el lexema pues a la hora de dar errores estaria bien decir que el tipo que se refencia noe sta definido
     )
 
     feature_list %= def_attr + semi + feature_list, lambda h, s: [s[1]] + s[3]

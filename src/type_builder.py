@@ -118,7 +118,7 @@ class TypeBuilder:
                 except:
                     not_visited.remove(class_declaration)
                     try:
-                        children = parent_child_dict[class_declaration.id]
+                        children = parent_child_dict[class_declaration.id.lex]
                         for declaration in children:
                             queue.append(declaration)
                     except:  # no one inherits from this class
@@ -134,7 +134,7 @@ class TypeBuilder:
             main_meth = self.context.get_type("Main").get_method("main", non_rec=True)
             if len(main_meth.param_names) > 0:
                 self.errors.append(
-                    '"main" method in class Main does not receive any parameters'
+                    SemanticError(0, 0, '"main" method in class Main does not receive any parameters')
                 )
             # modify in semantic get_method in order to get some ancestor where the method is already defined
         except SError:
@@ -153,12 +153,12 @@ class TypeBuilder:
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
-        self.current_type = self.context.get_type(node.id)
+        self.current_type = self.context.get_type(node.id.lex)
 
         if node.parent is not None:
             try:
-                parent_type = self.get_type(node.parent, f"declared as {node.id}'s parent")
-                self.current_type.set_parent(parent_type)
+                parent_type = self.get_type(node.parent, f"declared as {node.id.lex}'s parent") 
+                self.current_type.set_parent(parent_type) # set parent type if defined
             except SError as error:
                 node_row, node_col = node.parent.location
                 self.errors.append(SemanticError(node_row, node_col, error.text))
@@ -183,7 +183,7 @@ class TypeBuilder:
             self.current_type.define_method(
                 node.id.lex, param_names, param_types, return_type
             )
-        except SError as error:
+        except SError as error: # method already defined
             node_row, node_col = node.id.location
             # print("--------aqui se esta reportando el error del metodo doble---------")
             self.errors.append(SemanticError(node_row, node_col,error.text))
@@ -197,7 +197,7 @@ class TypeBuilder:
         try:
             attr_type = self.get_type(node.type, f"of attribute {node.id.lex}")
             self.current_type.define_attribute(node.id.lex, attr_type)
-        except SError as error:
+        except SError as error: # attribute already defined
             node_row, node_col = node.id.location
             self.errors.append(SemanticError(node_row, node_col,error.text))
 
@@ -216,7 +216,7 @@ class TypeBuilder:
 
         for class_declaration in class_declarations:
             if not (class_declaration.parent is None):
-                d = class_declaration.id
+                d = class_declaration.id.lex
                 p = class_declaration.parent.lex
 
                 modified_paths = paths
@@ -232,7 +232,7 @@ class TypeBuilder:
                             # error
                             node_row, node_col = class_declaration.parent.location
                             self.errors.append(
-                                SemanticError(node_row, node_col, f"Class {class_declaration.id}, or an ancestor of {class_declaration.id}, is involved in an inheritance cycle.")
+                                SemanticError(node_row, node_col, f"Class {class_declaration.id.lex}, or an ancestor of {class_declaration.id.lex}, is involved in an inheritance cycle.")
                             )
                         already_in_some_path = True
 
@@ -244,7 +244,7 @@ class TypeBuilder:
                             # error
                             node_row, node_col = class_declaration.parent.location
                             self.errors.append(
-                                SemanticError(node_row, node_col, f"Class {class_declaration.id}, or an ancestor of {class_declaration.id}, is involved in an inheritance cycle.")
+                                SemanticError(node_row, node_col, f"Class {class_declaration.id.lex}, or an ancestor of {class_declaration.id.lex}, is involved in an inheritance cycle.")
                             )
                         already_in_some_path = True
                         
@@ -260,6 +260,6 @@ class TypeBuilder:
                     else: # class inherits from itself
                         node_row, node_col = class_declaration.parent.location
                         self.errors.append(
-                            SemanticError(node_row, node_col, f"Class {class_declaration.id}, or an ancestor of {class_declaration.id}, is involved in an inheritance cycle.")
+                            SemanticError(node_row, node_col, f"Class {class_declaration.id.lex}, or an ancestor of {class_declaration.id.lex}, is involved in an inheritance cycle.")
                         )
                 paths = modified_paths
