@@ -316,10 +316,10 @@ class CILBuilder:
         self.params.append(ParamNode("self"))
         int_arg = VariableInfo("int")
         self.register_param(int_arg)
-        result = self.define_internal_local()
-        self.register_instruction(ToStrNode(result, int_arg.name))
-        self.register_instruction(PrintIntNode(result))
-        self.register_instruction(ReturnNode(VariableInfo(result).name))
+        # result = self.define_internal_local()
+        # self.register_instruction(ToStrNode(result, int_arg.name))
+        self.register_instruction(PrintIntNode(int_arg))
+        self.register_instruction(ReturnNode("self"))
 
     def io_instring(self):
         self.params.append(ParamNode("self"))
@@ -499,11 +499,14 @@ class CILBuilder:
             instance_type = self.define_internal_local()
             self.register_instruction(TypeOfNode(instance, instance_type))
 
-        self.register_instruction(ArgNode(instance))
+        args = [instance]
         for arg in node.args:
             arg_value = self.define_internal_local()
             self.visit(arg, arg_value)
-            self.register_instruction(ArgNode(arg_value))
+            args.append(arg_value)
+
+        for arg in args:
+            self.register_instruction(ArgNode(arg))
 
         if node.at_type:
             self.register_instruction(
