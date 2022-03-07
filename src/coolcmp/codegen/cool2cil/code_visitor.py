@@ -100,6 +100,7 @@ class DotCodeVisitor:
                 ],
                 local_vars=[],
                 instructions=[
+                    cil.AbortNode(),
                     cil.ReturnNode(),
                 ]
             ),
@@ -210,7 +211,7 @@ class DotCodeVisitor:
                     cil.LocalNode('_length'),
                 ],
                 instructions=[
-                    cil.LengthNode('_length', 'value'),
+                    cil.LengthNode('self', '_length'),
                     cil.ReturnNode('_length'),
                 ]
             ),

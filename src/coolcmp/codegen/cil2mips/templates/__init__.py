@@ -1,5 +1,5 @@
 def load_templates() -> str:
-    template_names = ["malloc.mips", "copy.mips", "substr.mips", "isvoid.mips"]
+    template_names = ["malloc.mips", "copy.mips", "substr.mips", "isvoid.mips", "length.mips", "concat.mips"]
     code_templates = ["\n# Templates"]
 
     for tname in template_names:
