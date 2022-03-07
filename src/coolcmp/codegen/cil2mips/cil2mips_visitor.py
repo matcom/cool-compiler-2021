@@ -10,6 +10,10 @@ from coolcmp.utils.registers import (
     t1,
     t2,
 
+    s0,
+    s1,
+    s2,
+
     a0,
     a1,
     a2,
@@ -343,7 +347,7 @@ class CILToMipsVisitor:
             mips.SWNode(t0, dest_address, fp),
             mips.CommentNode(f"</loadnode:{node.dest}-{node.msg}>"),
         )
-
+ 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
         dest = self.get_address(node.dest)
@@ -568,19 +572,30 @@ class CILToMipsVisitor:
     @visitor.when(cil.ReadStringNode)
     def visit(self, node: cil.ReadStringNode):
         self.add_inst(mips.CommentNode(f"<readstring:{node.dest}>"))
-
-        self.visit(cil.AllocateNode("String", node.dest))
-
+        
         address = self.get_address(node.dest)
 
         self.add_inst(
-            mips.LWNode(t0, (address, fp)),
-            mips.LWNode(a0, (4, t0)),
-            mips.LINode(a1, 1024),
+            mips.LINode(a0, 512), # TODO: Dynamic string length
+            mips.JALNode('malloc'),
+            mips.MoveNode(t2, v0)
+        )
+        self.add_inst(
+            mips.MoveNode(a0, t2),
+            mips.LINode(a1, 512),
             mips.LINode(v0, 8),
             mips.SysCallNode(),
+        )
+        self.visit(cil.StaticCallNode('String__init', node.dest))
+        self.add_inst(
+            mips.LWNode(t0, (address, fp)),
+            mips.SWNode(t2, 4, t0)
+        )
 
-            mips.LWNode(v0, (address, fp)),
+        # Remove eol
+        self.add_inst(
+            mips.MoveNode(a0, t2),
+            mips.JALNode('remove_eol')
         )
 
         self.add_inst(mips.CommentNode(f"</readstring:{node.dest}>"))

@@ -33,3 +33,7 @@ sp = Register("sp")
 
 # RA
 ra = Register("ra")
+
+s0 = Register("s0")
+s1 = Register("s1")
+s2 = Register("s2")
