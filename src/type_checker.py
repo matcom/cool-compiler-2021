@@ -356,10 +356,10 @@ class TypeChecker:
             self.errors.append(
                TypeError(node_row, node_col, f"Expression after 'if' must be Bool, current type is {predicate_type.name}")
             )
-            return (ErrorType(), cool_type_nodes.IfNode(if_node, else_node, then_node, ErrorType()))
+            return (ErrorType(), cool_type_nodes.IfNode(if_node, then_node, else_node, ErrorType()))
 
         least_type = find_least_type(then_type, else_type, self.context)
-        return (least_type, cool_type_nodes.IfNode(if_node, else_node, then_node, least_type))
+        return (least_type, cool_type_nodes.IfNode(if_node, then_node, else_node, least_type))
 
 
     @visitor.when(WhileNode)
