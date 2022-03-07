@@ -189,8 +189,10 @@ class CoolToCilConverter(Converter):
 
     @visitor.when(BlockNode)
     def visit(self, node, scope):
+        
         for expression, child in zip(node.expr_list, scope.children):
             value = self.visit(expression, child)
+            
 
         return value
 

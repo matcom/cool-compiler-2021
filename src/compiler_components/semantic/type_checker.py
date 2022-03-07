@@ -41,7 +41,7 @@ class TypeChecker:
             if isinstance(feat, FuncDeclarationNode):
                 self.visit(feat,mscope.create_child())
             else:
-                self.visit(feat, ascope)
+                self.visit(feat, ascope.create_child())
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node:AttrDeclarationNode,scope:Scope):
@@ -298,8 +298,8 @@ class TypeChecker:
         node.type = self.context.get_type("Bool", node.line)
         
 
-    @visitor.when(ArithmeticNode)
-    def visit(self, node:ArithmeticNode,scope:Scope):
+    @visitor.when(MathNode)
+    def visit(self, node:MathNode,scope:Scope):
         self.visit(node.left,scope.create_child())
         self.visit(node.right,scope.create_child())
         if node.left.type != self.context.get_type("Int", node.line) or node.right.type != self.context.get_type("Int", node.line):
@@ -307,6 +307,7 @@ class TypeChecker:
         
         node.type = self.context.get_type("Int", node.line)
         
+    
 
     @visitor.when(MinorNode)
     def visit(self, node:MinorNode,scope:Scope):

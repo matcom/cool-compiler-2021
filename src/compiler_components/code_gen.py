@@ -1,8 +1,11 @@
 from .compiler_component import CompilerComponent
 from .semantic_checker import SemanticChecker
-from .cool_cil_converter import CoolToCilConverter
+from .cool_to_cil import CoolToCil
 from .cil_mips_converter import CilToMipsConverter
-from .code_generator.mips_formatter import get_formatter
+from . import cil
+from .cil_to_mips import CilToMips
+from .cil import get_formatter
+from . import mips
 
 
 class CodeGenerator(CompilerComponent):
@@ -19,14 +22,16 @@ class CodeGenerator(CompilerComponent):
         self.scope = self.semantic_checker.scope
         self.ast = self.semantic_checker.ast
 
-        cool_cil_converter = CoolToCilConverter(self.context)
-        cil_tree = cool_cil_converter.visit(self.ast, self.scope)
+        cool2cil = CoolToCil(self.context)
+        f = cil.get_formatter()
+        c = cool2cil.visit(self.ast, self.scope)
+        # print(f(c))
 
-        cil_mips_converter = CilToMipsConverter()
-        mips_tree = cil_mips_converter.visit(cil_tree)
-        mips_formatter = get_formatter()
+        cil2mips = CilToMips()
+        d = cil2mips.visit(c)
+        e = mips.get_formatter()
 
-        self.mips_text = mips_formatter(mips_tree)
+        self.mips_text = e(d)
 
     def has_errors(self):
         return False

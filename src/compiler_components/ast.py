@@ -280,6 +280,8 @@ class BinaryNode(ExpressionNode):
 class ArithmeticNode(BinaryNode):
     pass
 
+class MathNode(ArithmeticNode):
+    pass
 
 class ConstantNumNode(AtomicNode):
     pass
@@ -331,19 +333,19 @@ class InstantiateNode(AtomicNode):
         return '\t' * tabs + f'\\__ InstantiateNode: new {node.lex}()'
 
 
-class PlusNode(ArithmeticNode):
+class PlusNode(MathNode):
     pass
 
 
-class MinusNode(ArithmeticNode):
+class MinusNode(MathNode):
     pass
 
 
-class StarNode(ArithmeticNode):
+class StarNode(MathNode):
     pass
 
 
-class DivNode(ArithmeticNode):
+class DivNode(MathNode):
     pass
 
 

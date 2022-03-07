@@ -92,7 +92,7 @@ class Tokenizer:
                 s += rest_data[index]
                 break
 
-            if rest_data[index] == '\n' or rest_data[index] == '\000':
+            if rest_data[index] == '\n' or rest_data[index] == "\0":
                 s = t.lexer.lexdata.split('\n')
                 count = 0
                 for i in range(t.lexer.lineno - 1):
@@ -101,7 +101,7 @@ class Tokenizer:
                 posAtLine = t.lexer.lexpos - count - t.lexer.lineno + 2
                 if rest_data[index] == '\n':
                     self.errors.append("(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ") - LexicographicError: Unterminated string constant")
-                if rest_data[index] == '\000':
+                if rest_data[index] == '\0':
                     self.errors.append("(" + str(t.lexer.lineno) + ", " + str(posAtLine) + ") - LexicographicError: String contains null character")
                 t.lexer.lineno+=1
                 return
@@ -128,7 +128,8 @@ class Tokenizer:
                     s+='\f'
                 elif rest_data[index] == '\n' or rest_data[index] == 'n':
                     s+='\n'
-                    t.lexer.lineno += 1
+                    if rest_data[index] == '\n':
+                        t.lexer.lineno += 1
                 else:
                     s+= rest_data[index]
             else:

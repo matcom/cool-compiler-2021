@@ -1,8 +1,138 @@
-from .mips_nodes import *
 from . import visitor
+from .ast import *
 
+class MipsNode:
+    pass
+
+class MipsProgramNode(MipsNode):
+    def __init__(self, dotdata, dotcode):
+        self.dotdata = dotdata
+        self.dotcode = dotcode
+
+# string
+class MipsStringNode(MipsNode):
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+class MipsWordNode(MipsNode):
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+class MipsTableNode(MipsNode):
+    def __init__(self , type_name,methods):
+        self.type_name = type_name
+        self.methods = methods
+
+# jumps
+class MipsJumpNode(MipsNode):
+    def __init__(self, label):
+        self.label = label
+
+class MipsJumpAtAddressNode(MipsJumpNode):
+    pass
+
+class MipsJRNode(MipsJumpNode):
+    pass
+
+class MipsJALRNode(MipsJumpNode):
+    pass
+
+
+# stack
+class MipsLWNode(MipsNode):
+    def __init__(self, dest, src):
+        self.src = src
+        self.dest = dest
+
+class MipsLINode(MipsNode):
+    def __init__(self, dest, src):
+        self.src = src
+        self.dest = dest
+
+class MipsLANode(MipsNode):
+    def __init__(self, dest, src):
+        self.src = src
+        self.dest = dest
+
+class MipsSWNode(MipsNode):
+    def __init__(self, src, dest):
+        self.src = src
+        self.dest = dest
+
+
+# syscall
+class MipsSyscallNode(MipsNode):
+    pass
+
+
+# move
+class MipsMoveNode(MipsNode):
+    def __init__(self, dest, src):
+        self.src = src
+        self.dest = dest
+
+
+# arithmetic
+class MipsArithmeticNode:
+    def __init__(self, param1, param2, param3):
+        self.param1 = param1
+        self.param2 = param2
+        self.param3 = param3
+
+class MipsAddNode(MipsArithmeticNode):
+    pass
+
+class MipsAddiuNode(MipsArithmeticNode):
+    pass
+
+class MipsMinusNode(MipsArithmeticNode):
+    pass
+
+class MipsStarNode(MipsArithmeticNode):
+    pass
+
+class MipsDivNode(MipsArithmeticNode):
+    pass
+
+class MipsNEGNode(MipsNode):
+    def __init__(self, dest, src):
+        self.dest = dest
+        self.src = src
+
+# comp
+class MipsComparerNode(MipsNode):
+    def __init__(self, param1, param2, label):
+        self.param1 = param1
+        self.param2 = param2
+        self.label = label
+
+class MipsBEQNode(MipsComparerNode):
+    pass
+
+class MipsBNENode(MipsComparerNode):
+    pass
+
+class MipsBLTNode(MipsComparerNode):
+    pass
+
+class MipsBLENode(MipsComparerNode):
+    pass
+
+
+
+# label
+class MipsLabelNode(MipsNode):
+    def __init__(self, name):
+        self.name = name
+
+class MipsCommentNode(MipsNode):
+    def __init__(self, comment):
+        self.comment = '\n #' + comment + '\n'
 
 def get_formatter():
+
     class PrintVisitor(object):
         @visitor.on('node')
         def visit(self, node):
@@ -16,8 +146,8 @@ def get_formatter():
             _salto_para_abort: .asciiz "\n"
             _buffer:    .space      2048
             _void:      .asciiz       ""
-             '''
-
+             '''    
+            
             dotcode = '\n'.join(self.visit(t) for t in node.dotcode)
             dotcode += '''\n
 
@@ -25,7 +155,7 @@ function_Ctr_at_Object:
             move $fp, $sp
             sw $ra, 0($sp)
             addiu $sp, $sp, -4
-
+            
             la $t1, Object_name
 			lw $t2, 4($fp)
 			sw $t1, 0($t2)
@@ -50,7 +180,7 @@ function_Init_at_Object:
             move $fp, $sp
             sw $ra, 0($sp)
             addiu $sp, $sp, -4
-
+            
             lw $a0, 4($fp)
 
             lw $ra, 0($fp)
@@ -156,7 +286,7 @@ function_copy_at_Object:
             lw $a0, 4($fp)
             lw $a0, 8($a0)
             j end
-
+        
         not_string:
             lw $a0, 4($fp)
             move $t2, $a0 
@@ -175,7 +305,7 @@ function_copy_at_Object:
             addiu $t2, $t2, 4
             addiu $t1, $t1, -4
             bne $t1, $zero, copy
-
+            
             move $a0, $v0
 
         end:
@@ -197,7 +327,7 @@ function_length_at_String:
             addiu $a0, $a0, 1
             addiu $s0, $s0, 1
             bne $t0, $zero, length
-
+            
             lw $ra, 0($fp)
             addiu $sp, $sp, 12
             lw $fp, 0($sp)
@@ -214,7 +344,7 @@ function_concat_at_String:
             sw $s1, 0($sp)
             addiu $sp, $sp, -4
             jal function_length_at_String
-
+            
             sw $a0, 0($sp)
             addiu $sp, $sp, -4
 
@@ -311,7 +441,7 @@ function_comparer_string:
             sw $s1, 0($sp)
             addiu $sp, $sp, -4
             jal function_length_at_String
-
+            
             sw $a0, 0($sp)
             addiu $sp, $sp, -4
 
@@ -460,9 +590,9 @@ function_in_string_at_IO:
             return f'\t\t\t{node.name}:     .word     {node.value}'
 
         @visitor.when(MipsTableNode)
-        def visit(self, node: MipsTableNode):
-            return f'__virtual_table__{node.type_name}:\n' + '\n'.join(f"\t\t\t .word {m}" for m in node.methods)
-
+        def visit(self , node:MipsTableNode):
+            return f'__virtual_table__{node.type_name}:\n' + '\n'.join( f"\t\t\t .word {m}" for m in node.methods)
+            
         # jumps
         @visitor.when(MipsJumpNode)
         def visit(self, node):
@@ -497,15 +627,19 @@ function_in_string_at_IO:
         def visit(self, node):
             return f'\t\t\tsw {node.src}, {node.dest}'
 
+
         # syscall
         @visitor.when(MipsSyscallNode)
         def visit(self, node):
             return '\t\t\tsyscall'
 
+
         # move
         @visitor.when(MipsMoveNode)
         def visit(self, node):
             return f'\t\t\tmove {node.dest}, {node.src}'
+
+
 
         # arithmetic
         @visitor.when(MipsAddNode)
@@ -549,14 +683,16 @@ function_in_string_at_IO:
         def visit(self, node):
             return f'\t\t\tble {node.param1}, {node.param2}, {node.label}'
 
+
+
         # label
         @visitor.when(MipsLabelNode)
         def visit(self, node):
             return f'{node.name}:'
-
+        
         @visitor.when(MipsCommentNode)
         def visit(self, node):
             return node.comment
 
     printer = PrintVisitor()
-    return lambda ast: printer.visit(ast)
+    return (lambda ast: printer.visit(ast))
