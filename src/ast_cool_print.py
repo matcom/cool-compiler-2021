@@ -135,7 +135,9 @@ class FormatVisitor(object):
 
     @visitor.when(AtomicNode)
     def visit(self, node, tabs=0):
-        return "\t" * tabs + f"\\__ {node.__class__.__name__} {node.line_no}: {node.lex}"
+        return (
+            "\t" * tabs + f"\\__ {node.__class__.__name__} {node.line_no}: {node.lex}"
+        )
 
     @visitor.when(InstantiateNode)
     def visit(self, node, tabs=0):

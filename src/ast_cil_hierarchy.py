@@ -266,4 +266,3 @@ class Copy(Expr):
     def __init__(self, type, local_dest):
         self.type = type
         self.local_dest = local_dest
-

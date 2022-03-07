@@ -42,8 +42,5 @@ cil_ast = cool_to_cil.visit(cool_ast)
 cil_to_mips = CILToMIPSVisitor()
 mips_code = cil_to_mips.visit(cil_ast)
 
-with open(f'{sys.argv[1][:-3]}.mips', 'w') as f:
-    f.write(f'{mips_code}')
-
-
-
+with open(f"{sys.argv[1][:-3]}.mips", "w") as f:
+    f.write(f"{mips_code}")

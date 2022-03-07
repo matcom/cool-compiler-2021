@@ -49,9 +49,13 @@ def p_def_class(p):
               | CLASS TYPE_ID INHERITS TYPE_ID LBRACE feature_list RBRACE SEMICOLON
     """
     if len(p) == 7:
-        p[0] = ast.ClassDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(2)), p[2], p[4], 'Object')
+        p[0] = ast.ClassDeclarationNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(2)), p[2], p[4], "Object"
+        )
     else:
-        p[0] = ast.ClassDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(2)), p[2], p[6], p[4])
+        p[0] = ast.ClassDeclarationNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(2)), p[2], p[6], p[4]
+        )
 
 
 def p_feature_list(p):
@@ -83,16 +87,22 @@ def p_attr_def(p):
              | OBJECT_ID COLON type ASSIGN expr
     """
     if len(p) == 4:
-        p[0] = ast.AttrDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3])
+        p[0] = ast.AttrDeclarationNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3]
+        )
     else:
-        p[0] = ast.AttrDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])
+        p[0] = ast.AttrDeclarationNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5]
+        )
 
 
 def p_meth_def(p):
     """
     meth_def : OBJECT_ID LPAREN param_list RPAREN COLON type LBRACE expr RBRACE
     """
-    p[0] = ast.FuncDeclarationNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[6], p[8])
+    p[0] = ast.FuncDeclarationNode(
+        p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[6], p[8]
+    )
 
 
 def p_param_list(p):
@@ -133,12 +143,18 @@ def p_expr(p):
          | comparer
     """
     operator = p.slice[2].type if len(p) > 2 else None
-    if operator == 'LT':
-        p[0] = ast.LessNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'LTEQ':
-        p[0] = ast.LessEqualNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'EQ':
-        p[0] = ast.EqualNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
+    if operator == "LT":
+        p[0] = ast.LessNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "LTEQ":
+        p[0] = ast.LessEqualNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "EQ":
+        p[0] = ast.EqualNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
     else:
         p[0] = p[1]
 
@@ -150,10 +166,14 @@ def p_open_expr_lvl1(p):
                    | open_expr_lvl2
     """
     operator = p.slice[2].type if len(p) > 2 else None
-    if operator == 'PLUS':
-        p[0] = ast.PlusNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'MINUS':
-        p[0] = ast.MinusNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
+    if operator == "PLUS":
+        p[0] = ast.PlusNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "MINUS":
+        p[0] = ast.MinusNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
     else:
         p[0] = p[1]
 
@@ -165,10 +185,14 @@ def p_open_expr_lvl2(p):
                    | open_expr_lvl3
     """
     operator = p.slice[2].type if len(p) > 2 else None
-    if operator == 'MULT':
-        p[0] = ast.StarNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'DIV':
-        p[0] = ast.DivNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
+    if operator == "MULT":
+        p[0] = ast.StarNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "DIV":
+        p[0] = ast.DivNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
     else:
         p[0] = p[1]
 
@@ -180,10 +204,14 @@ def p_open_expr_lvl3(p):
                    | open_expr
     """
     first_token = p.slice[1].type if len(p) > 1 else None
-    if first_token == 'ISVOID':
-        p[0] = ast.IsVoidNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2])
-    elif first_token == 'INT_COMP':
-        p[0] = ast.IntCompNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1])
+    if first_token == "ISVOID":
+        p[0] = ast.IsVoidNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2]
+        )
+    elif first_token == "INT_COMP":
+        p[0] = ast.IntCompNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1]
+        )
     else:
         p[0] = p[1]
 
@@ -195,11 +223,15 @@ def p_open_expr(p):
               | NOT expr
     """
     first_token = p.slice[1].type if len(p) > 1 else None
-    if first_token == 'LET':
-        p[0] = ast.LetNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4])
-    elif first_token == 'OBJECT_ID':
-        p[0] = ast.AssignNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3])
-    elif first_token == 'NOT':
+    if first_token == "LET":
+        p[0] = ast.LetNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4]
+        )
+    elif first_token == "OBJECT_ID":
+        p[0] = ast.AssignNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3]
+        )
+    elif first_token == "NOT":
         p[0] = ast.NotNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2])
 
 
@@ -211,12 +243,18 @@ def p_comparer(p):
              | arith
     """
     operator = p.slice[2].type if len(p) > 2 else None
-    if operator == 'LT':
-        p[0] = ast.LessNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'LTEQ':
-        p[0] = ast.LessEqualNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'EQ':
-        p[0] = ast.EqualNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
+    if operator == "LT":
+        p[0] = ast.LessNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "LTEQ":
+        p[0] = ast.LessEqualNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "EQ":
+        p[0] = ast.EqualNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
     else:
         p[0] = p[1]
 
@@ -230,10 +268,14 @@ def p_arith(p):
     operator = p.slice[2].type if len(p) > 2 else None
     if operator is None:
         p[0] = p[1]
-    elif operator == 'PLUS':
-        p[0] = ast.PlusNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'MINUS':
-        p[0] = ast.MinusNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
+    elif operator == "PLUS":
+        p[0] = ast.PlusNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "MINUS":
+        p[0] = ast.MinusNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
 
 
 def p_term(p):
@@ -245,10 +287,14 @@ def p_term(p):
     operator = p.slice[2].type if len(p) > 2 else None
     if operator is None:
         p[0] = p[1]
-    elif operator == 'MULT':
-        p[0] = ast.StarNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
-    elif operator == 'DIV':
-        p[0] = ast.DivNode(p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3])
+    elif operator == "MULT":
+        p[0] = ast.StarNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
+    elif operator == "DIV":
+        p[0] = ast.DivNode(
+            p.lineno(2), find_column(p.lexer.lexdata, p.lexpos(2)), p[1], p[3]
+        )
 
 
 def p_factor(p):
@@ -258,10 +304,14 @@ def p_factor(p):
            | atom
     """
     first_token = p.slice[1].type if len(p) > 1 else None
-    if first_token == 'ISVOID':
-        p[0] = ast.IsVoidNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2])
-    elif first_token == 'INT_COMP':
-        p[0] = ast.IntCompNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2])
+    if first_token == "ISVOID":
+        p[0] = ast.IsVoidNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2]
+        )
+    elif first_token == "INT_COMP":
+        p[0] = ast.IntCompNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2]
+        )
     else:
         p[0] = p[1]
 
@@ -282,27 +332,45 @@ def p_atom(p):
     """
     first_token = p.slice[1].type if len(p) > 1 else None
     second_token = p.slice[2].type if len(p) > 2 else None
-    if first_token == 'INTEGER':
-        p[0] = ast.ConstantNumNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1])
-    elif first_token == 'OBJECT_ID' and second_token is None:
-        p[0] = ast.VariableNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1])
-    elif first_token == 'STRING':
-        p[0] = ast.StringNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1])
-    elif first_token == 'BOOL':
-        p[0] = ast.BoolNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1])
-    elif first_token == 'LPAREN':
+    if first_token == "INTEGER":
+        p[0] = ast.ConstantNumNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1]
+        )
+    elif first_token == "OBJECT_ID" and second_token is None:
+        p[0] = ast.VariableNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1]
+        )
+    elif first_token == "STRING":
+        p[0] = ast.StringNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1]
+        )
+    elif first_token == "BOOL":
+        p[0] = ast.BoolNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1]
+        )
+    elif first_token == "LPAREN":
         p[0] = p[2]
-    elif first_token == 'NEW':
-        p[0] = ast.InstantiateNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2])
-    elif first_token == 'IF':
-        p[0] = ast.ConditionalNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4], p[6])
-    elif first_token == 'WHILE':
-        p[0] = ast.LoopNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4])
-    elif first_token == 'LBRACE':
-        p[0] = ast.BlockNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2])
-    elif first_token == 'CASE':
-        p[0] = ast.CaseNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4])
-    elif first_token == 'func_call':
+    elif first_token == "NEW":
+        p[0] = ast.InstantiateNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2]
+        )
+    elif first_token == "IF":
+        p[0] = ast.ConditionalNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4], p[6]
+        )
+    elif first_token == "WHILE":
+        p[0] = ast.LoopNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4]
+        )
+    elif first_token == "LBRACE":
+        p[0] = ast.BlockNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2]
+        )
+    elif first_token == "CASE":
+        p[0] = ast.CaseNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[2], p[4]
+        )
+    elif first_token == "func_call":
         p[0] = p[1]
 
 
@@ -329,9 +397,9 @@ def p_let_var_list(p):
         p[0] = [(p[1], p[3], None)]
     elif len(p) == 8:
         p[0] = [(p[1], p[3], p[5])] + p[7]
-    elif fourth_token == 'ASSIGN':
+    elif fourth_token == "ASSIGN":
         p[0] = [(p[1], p[3], p[5])]
-    elif fourth_token == 'COMMA':
+    elif fourth_token == "COMMA":
         p[0] = [(p[1], p[3], None)] + p[5]
 
 
@@ -341,9 +409,17 @@ def p_branch_list(p):
                 | OBJECT_ID COLON type ACTION expr SEMICOLON branch_list
     """
     if len(p) == 7:
-        p[0] = [ast.BranchNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])]
+        p[0] = [
+            ast.BranchNode(
+                p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5]
+            )
+        ]
     else:
-        p[0] = [ast.BranchNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])] + p[7]
+        p[0] = [
+            ast.BranchNode(
+                p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5]
+            )
+        ] + p[7]
 
 
 def p_func_call(p):
@@ -353,12 +429,25 @@ def p_func_call(p):
               | atom AT TYPE_ID DOT OBJECT_ID LPAREN arg_list RPAREN
     """
     if len(p) == 7:
-        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5])
+        p[0] = ast.CallNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[3], p[5]
+        )
     elif len(p) == 5:
-        self = ast.VariableNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), 'self')
-        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), self, p[1], p[3])
+        self = ast.VariableNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), "self"
+        )
+        p[0] = ast.CallNode(
+            p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), self, p[1], p[3]
+        )
     elif len(p) == 9:
-        p[0] = ast.CallNode(p.lineno(1), find_column(p.lexer.lexdata, p.lexpos(1)), p[1], p[5], p[7], p[3])
+        p[0] = ast.CallNode(
+            p.lineno(1),
+            find_column(p.lexer.lexdata, p.lexpos(1)),
+            p[1],
+            p[5],
+            p[7],
+            p[3],
+        )
 
 
 def p_arg_list(p):
@@ -397,10 +486,15 @@ def p_empty(p):
 def p_error(p):
     if p is None:
         line_no = find_last_line(input_text)
-        errors.append('(%s, 0) - SyntacticError: ERROR at or near EOF' % line_no)
+        errors.append("(%s, 0) - SyntacticError: ERROR at or near EOF" % line_no)
     else:
         col_no = find_column(p.lexer.lexdata, p.lexpos)
-        errors.append(('(%s, %s) - SyntacticError: ERROR at or near "%s"'.format(p) % (p.lineno, col_no, p.value)))
+        errors.append(
+            (
+                '(%s, %s) - SyntacticError: ERROR at or near "%s"'.format(p)
+                % (p.lineno, col_no, p.value)
+            )
+        )
 
 
 def parse(text: str) -> (yacc.LRParser, list):

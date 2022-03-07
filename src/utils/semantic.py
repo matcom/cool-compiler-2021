@@ -264,16 +264,17 @@ class Context:
         self.types = {}
         self.graph = {}
         self.classes = {}
-        self.graph['Object'] = ['IO', 'String', 'Bool', 'Int']
-        self.graph['IO'] = []
-        self.graph['String'] = []
-        self.graph['Int'] = []
-        self.graph['Bool'] = []
+        self.graph["Object"] = ["IO", "String", "Bool", "Int"]
+        self.graph["IO"] = []
+        self.graph["String"] = []
+        self.graph["Int"] = []
+        self.graph["Bool"] = []
 
     def create_type(self, node):
         if node.id in self.types:
             raise SemanticError(
-                f'Type with the same name ({node.id}) already in context.')
+                f"Type with the same name ({node.id}) already in context."
+            )
         typex = self.types[node.id] = Type(node.id)
         self.classes[node.id] = node
         if not self.graph.__contains__(node.id):
@@ -290,12 +291,12 @@ class Context:
         except KeyError:
             raise SemanticError(f'Type "{name}" is not defined.')
 
-    def set_type_tags(self, node='Object', tag=0):
+    def set_type_tags(self, node="Object", tag=0):
         self.types[node].tag = tag
         for i, t in enumerate(self.graph[node]):
             self.set_type_tags(t, tag + i + 1)
 
-    def set_type_max_tags(self, node='Object'):
+    def set_type_max_tags(self, node="Object"):
         if not self.graph[node]:
             self.types[node].max_tag = self.types[node].tag
         else:
@@ -369,11 +370,19 @@ class Scope:
             return None
 
     def find_cil_local(self, vname, index=None):
-        locals = self.cil_locals.items() if index is None else itt.islice(self.cil_locals.items(), index)
+        locals = (
+            self.cil_locals.items()
+            if index is None
+            else itt.islice(self.cil_locals.items(), index)
+        )
         try:
             return next(cil_name for name, cil_name in locals if name == vname)
         except StopIteration:
-            return self.parent.find_cil_local(vname, self.index) if (self.parent is not None) else None
+            return (
+                self.parent.find_cil_local(vname, self.index)
+                if (self.parent is not None)
+                else None
+            )
 
     def find_variable(self, vname, index=None):
         locals = self.locals if index is None else itt.islice(self.locals, index)

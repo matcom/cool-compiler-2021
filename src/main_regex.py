@@ -12,7 +12,7 @@ class RegexExpr:
         self.automaton: Automaton = automaton
 
     def match(self, input, pos=0):
-        len_input=len(input)
+        len_input = len(input)
         current = self.automaton.start
         match = ""
         while pos < len_input:
@@ -22,7 +22,8 @@ class RegexExpr:
             current = current[char]
             match += char
             pos += 1
-        return (match,True) if current.final else (match,False)
+        return (match, True) if current.final else (match, False)
+
 
 class RegexCompilator:
     class SimpleMatch(Match):
@@ -38,17 +39,17 @@ class RegexCompilator:
         def match(self, match, pos):
             to_match = match[pos]
             if to_match in self.match_:
-                return (self.match_[to_match], to_match, (False,[]),True)
+                return (self.match_[to_match], to_match, (False, []), True)
             else:
-                return (self.match_[""], to_match, (False,[]),True)
+                return (self.match_[""], to_match, (False, []), True)
 
     def __init__(self):
         self.tokenizer = Lexer(RegexCompilator.SimpleMatch())
         self.parser = Parser(ast)
 
     def compile(self, regex):
-        regex_tokens,_ = self.tokenizer(regex)
-        regex_ast,_ = self.parser(regex_tokens)
+        regex_tokens, _ = self.tokenizer(regex)
+        regex_ast, _ = self.parser(regex_tokens)
         nfa = regex_ast.shift()
         dfa = nfa.dfa_contructor()
         return RegexExpr(dfa)

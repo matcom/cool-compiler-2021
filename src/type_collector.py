@@ -12,8 +12,8 @@ from utils.semantic import (
     Type,
 )
 
-TYPE_ERROR = '(%s, %s) - TypeError: %s'
-SEMANTIC_ERROR = '(%s, %s) - SemanticError: %s'
+TYPE_ERROR = "(%s, %s) - TypeError: %s"
+SEMANTIC_ERROR = "(%s, %s) - SemanticError: %s"
 
 
 class TypeCollector(object):
