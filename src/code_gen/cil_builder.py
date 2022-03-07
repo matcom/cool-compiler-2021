@@ -1,7 +1,7 @@
 import cmp.nbpackage
 import cmp.visitor as visitor
 
-import ast_nodes as cool
+import ast_typed_nodes as cool
 
 from cmp.cil import (
     ProgramNode,
@@ -316,9 +316,7 @@ class CILBuilder:
         self.params.append(ParamNode("self"))
         int_arg = VariableInfo("int")
         self.register_param(int_arg)
-        # result = self.define_internal_local()
-        # self.register_instruction(ToStrNode(result, int_arg.name))
-        self.register_instruction(PrintIntNode(int_arg))
+        self.register_instruction(PrintIntNode(int_arg.name))
         self.register_instruction(ReturnNode("self"))
 
     def io_instring(self):
