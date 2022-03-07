@@ -41,8 +41,10 @@ from cmp.semantic import Context
 
 from cmp.semantic import Scope
 from cmp.utils import find_least_type
+
 import copy
 from errors import TypeError, NameError, SemanticError, AttributeError
+import ast_typed_nodes as cool_type_nodes
 
 # some predefined errors
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
@@ -94,6 +96,9 @@ class TypeChecker:
                     except: # add declarations where parent is not defined
                         initial_nodes.append(declaration)
 
+        # initialize a list for classDeclNodes of typed ast
+        self.tast_class_nodes = []
+
         for declaration in initial_nodes: # first visit root nodes
             self.visit(declaration, scope.create_child(), parent_children_dict)
 
@@ -106,7 +111,7 @@ class TypeChecker:
         self.current_type = None
         self.current_method = None
 
-        return scope
+        return (scope, cool_type_nodes.ProgramNode(self.tast_class_nodes, copy.copy(self.context)))
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope, parent_children_dict):
@@ -119,8 +124,10 @@ class TypeChecker:
         for attr in self.current_type.attributes:
             scope.define_variable(attr.name, attr.type)
 
+        new_features = []
         for feature in node.features:
-            self.visit(feature, scope)
+            feature_node = self.visit(feature, scope)
+            new_features.append(feature_node)
         
         try:
             children = parent_children_dict[node.id.lex]
@@ -128,7 +135,15 @@ class TypeChecker:
                 if not self.class_visited[child.id.lex]:
                     self.visit(child, scope.create_child(), parent_children_dict)
         except:
-            return
+            # return
+            pass
+        if node.parent is None:
+            parent = None
+        else:
+            parent = node.parent.lex
+
+        self.tast_class_nodes.append(cool_type_nodes.ClassDeclarationNode(node.id.lex, parent, new_features))
+        
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node, scope):
@@ -143,13 +158,14 @@ class TypeChecker:
 
 
         if node.init_exp != None:
-            init_expr_type = self.visit(node.init_exp, scope)
+            init_expr_type, init_exp  = self.visit(node.init_exp, scope)
 
             if not init_expr_type.conforms_to(typex):
                 line, col = node.token.location
                 self.errors.append(TypeError(line, col,INCOMPATIBLE_TYPES % (init_expr_type.name, typex.name)))
 
-        return typex
+        # return typex AQUI SE RETORNABA UN TIPO PERO NO ES NECESARIO
+        return cool_type_nodes.AttrDeclarationNode(node.id.lex, node.type.lex, init_exp)
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node, scope):
@@ -163,18 +179,19 @@ class TypeChecker:
         # ------------parameters most have differente names------------
         param_names = self.current_method.param_names
         param_types = self.current_method.param_types
-        param_used = {}
+        param_used = {} # VERIFICAR SI ESTOS TIPOS SON STRING O DE LOS .NAME
+        new_params = []
 
         for i, param_name in enumerate(param_names):
+            param_n, param_t = node.params[i] # AQUI A ESTO NO LE DEBERIA PREGUNTAR POR EL LEX?
+            new_params.append((param_n.lex, param_t.lex))
             if param_name == "self":
-                param_n, param_t = node.params[i]
                 node_row, node_col = param_n.location # location of param name
                 self.errors.append(
                     SemanticError(node_row, node_col ,f"'self' cannot be the name of a formal parameter.")
                 )
             try:
                 param_used[param_name]
-                param_n, param_t = node.params[i]
                 node_row, node_col = param_n.location
                 self.errors.append(
                     SemanticError(node_row, node_col ,f"Formal parameter '{param_name}' multiply defined in method '{node.id.lex}'")
@@ -185,7 +202,7 @@ class TypeChecker:
 
         # -------------------------------------------------------------
 
-        body_type = self.visit(node.body, child_scope)
+        body_type, body_exp = self.visit(node.body, child_scope)
 
         if not body_type.conforms_to(method_return_type):
             node_row, node_col = node.body.token.location
@@ -226,14 +243,16 @@ class TypeChecker:
 
         try:
             return_type = self.context.get_type(node.type.lex)
-            if return_type.name == "SELF_TYPE":
-                return self.current_type
-
-            return return_type
+            # if return_type.name == "SELF_TYPE":
+            #     return self.current_type
+            # return return_type ESTAS LINEAS ESTAN DE MAS PUES NO HACE FALTA RETORNAR TIPO
 
         except SError as e:
             # Error already reported in type builder
-            return ErrorType()
+            # return ErrorType()
+            pass #it is not necessary to return a type in func declaration ndoes
+
+        return cool_type_nodes.FuncDeclarationNode(node.id.lex, new_params, node.type.lex, body_exp)
 
     @visitor.when(AssignNode)
     def visit(self, node, scope):
@@ -250,28 +269,37 @@ class TypeChecker:
         else:
             var_type = scope.find_variable(node.id.lex).type
 
-        expr_type = self.visit(node.expr, scope)
+        expr_type, exp_node = self.visit(node.expr, scope)
         if not expr_type.conforms_to(var_type):
             node_row, node_col = node.token.location
             self.errors.append(TypeError(node_row, node_col, f"Inferred type {expr_type.name} of assigned expression does not conforms to type {var_type.name} of variable '{node.id.lex}'"))
 
-        return expr_type
+        return (expr_type, cool_type_nodes.AssignNode(node.id.lex, exp_node, expr_type))
 
     @visitor.when(CallNode)
     def visit(self, node, scope):
         auto_type = self.context.get_type("AUTO_TYPE")
         typex = None
         if node.obj is not None:
-            typex = self.visit(node.obj, scope)
+            typex, obj_exp = self.visit(node.obj, scope)
             if typex == auto_type:
                 return auto_type
 
         else:
             typex = self.current_type
+            obj_exp = None
 
+        new_args = []
+        arg_types = []
+        for arg in node.args: # visiting arguments in case of earlier return
+            arg_type, arg_node = self.visit(arg, scope)
+            new_args.append(arg_node)
+            arg_types.append(arg_type)
+            
         method = None
         try:
             if not( node.at_type is None):
+                at_type = node.at_type.lex
                 node_at_type = self.context.get_type(node.at_type.lex)
                 method = node_at_type.get_method(node.id.lex)
                 if not typex.conforms_to(node_at_type):
@@ -279,13 +307,16 @@ class TypeChecker:
                     self.errors.append(
                         TypeError(node_row, node_col, f"Expression type {typex.name} does not conform to declared static dispatch type {node_at_type.name}.")
                     )
-                    return ErrorType()
+                    return (ErrorType(), cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, ErrorType()))
+
             else:
+                at_type = None
                 method = typex.get_method(node.id.lex)
         except SError as error:
             node_col, node_row = node.token.location
             self.errors.append(AttributeError(node_col, node_row ,error.text))
-            return ErrorType()
+            return (ErrorType(), cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, ErrorType()))
+
 
         if len(method.param_names) != len(node.args):
             node_row, node_col = node.id.location
@@ -293,37 +324,41 @@ class TypeChecker:
                SemanticError(node_row, node_col, f"There is no definition of {method.name} that takes {len(node.args)} arguments ")
             )
 
-        for arg, ptype in zip(node.args, method.param_types):
-            arg_type = self.visit(arg, scope)
+        # for i in range(0, node.args):
+        for i, arg in enumerate(node.args):
+            arg_type = arg_types[i]
+            ptype = method.param_types[i]
             if not arg_type.conforms_to(ptype):
                 node_row, node_col = arg.token.location 
                 self.errors.append(TypeError(node_row, node_col,f"In call of method {node.id.lex} parameter of type {arg_type.name} does not conforms to declared type {ptype.name}"))
 
         if method.return_type == self.context.get_type("SELF_TYPE"):
-            return typex
+            return (typex, cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, typex))
 
-        return method.return_type
+
+        return (method.return_type, cool_type_nodes.CallNode(obj_exp, node.id.lex, new_args, at_type, typex, method.return_type))
 
     @visitor.when(IfNode)
     def visit(self, node, scope):
-        predicate_type = self.visit(node.if_expr, scope)
+        predicate_type, if_node = self.visit(node.if_expr, scope)
+        then_type, then_node = self.visit(node.then_expr, scope)
+        else_type, else_node = self.visit(node.else_expr, scope)
 
         if predicate_type.name != "Bool" and predicate_type.name != "AUTO_TYPE":
             node_row, node_col = node.if_expr.token.location
             self.errors.append(
                TypeError(node_row, node_col, f"Expression after 'if' must be Bool, current type is {predicate_type.name}")
             )
-            return ErrorType()
-
-        then_type = self.visit(node.then_expr, scope)
-        else_type = self.visit(node.else_expr, scope)
+            return (ErrorType(), cool_type_nodes.IfNode(if_node, else_node, then_node, ErrorType()))
 
         least_type = find_least_type(then_type, else_type, self.context)
-        return least_type
+        return (least_type, cool_type_nodes.IfNode(if_node, else_node, then_node, least_type))
+
 
     @visitor.when(WhileNode)
     def visit(self, node, scope):
-        condition_type = self.visit(node.condition, scope)
+        condition_type, condition_node = self.visit(node.condition, scope)
+        body_type, body_node = self.visit(node.body, scope)
         bool_type = self.context.get_type("Bool")
 
         if condition_type != bool_type and condition_type.name != "AUTO_TYPE":
@@ -331,27 +366,33 @@ class TypeChecker:
             self.errors.append(
                 TypeError(node_row, node_col, f"Expression in 'while' condition must be bool, current type is {condition_type.name}")
             )
-            return ErrorType()
+            return (ErrorType(), cool_type_nodes.WhileNode(condition_node, body_node, ErrorType()))
 
-        return self.context.get_type("Object")
+        obj_type = self.context.get_type("Object")
+        return (obj_type, cool_type_nodes.WhileNode(condition_node, body_node, obj_type))
 
     @visitor.when(BlockNode)
     def visit(self, node, scope):
         typex = None
+        new_exp_list = []
         for expr in node.expression_list:
-            typex = self.visit(expr, scope)
+            typex, node_exp = self.visit(expr, scope)
+            new_exp_list.append(node_exp)
 
-        return typex
+        return (typex, cool_type_nodes.BlockNode(new_exp_list, typex))
 
     @visitor.when(LetNode)
     def visit(self, node, scope):
 
         child_scope = scope.create_child()
 
+        new_var_list = []
         for var_dec in node.identifiers:
-            self.visit(var_dec, child_scope)
+            var_type, var_node = self.visit(var_dec, child_scope)
+            new_var_list.append(var_node)
 
-        return self.visit(node.body, child_scope)
+        exp_type, body_exp =  self.visit(node.body, child_scope)
+        return (exp_type, cool_type_nodes.LetNode(new_var_list, body_exp, exp_type))
 
     @visitor.when(VarDeclarationNode)
     def visit(self, node, scope):
@@ -373,25 +414,28 @@ class TypeChecker:
             static_type = ErrorType()
 
         if node.expr != None:
-            typex = self.visit(node.expr, scope)
+            typex, node_exp = self.visit(node.expr, scope)
             if not typex.conforms_to(static_type):
                 line, col = node.expr.token.location
                 self.errors.append(TypeError(line, col, INCOMPATIBLE_TYPES % (typex.name, static_type.name)))
+        else:
+            node_exp = None
 
         scope.define_variable(node.id, static_type)
-        return static_type
+        return (static_type, cool_type_nodes.VarDeclarationNode(node.id, node.type.lex, node_exp, static_type))
 
     @visitor.when(CaseNode)
     def visit(self, node, scope):
-        self.visit(node.expr, scope)
-
+        exp_node_type, node_exp = self.visit(node.expr, scope)
+        new_case_items = []
         current_case_type = None
         case_types_found = []
         for item in node.case_items:
             if not (item.type.lex in case_types_found):
                 case_types_found.append(item.type.lex)
                 child_scope = scope.create_child()
-                case_item_type = self.visit(item, child_scope)
+                case_item_type, item_node = self.visit(item, child_scope)
+                new_case_items.append(item_node)
                 current_case_type = find_least_type(
                     current_case_type, case_item_type, self.context
                 )
@@ -400,7 +444,8 @@ class TypeChecker:
                 self.errors.append(SemanticError(line, col, f"Duplicate branch {item.type.lex} in case statement"))
 
 
-        return current_case_type
+        return (current_case_type, cool_type_nodes.CaseNode(node_exp, new_case_items, current_case_type))
+
 
     @visitor.when(CaseItemNode)
     def visit(self, node, scope):
@@ -411,9 +456,9 @@ class TypeChecker:
             node_row, node_col = node.type.location
             self.errors.append(TypeError(node_row, node_col, f"Type {node.type.lex} of case branch is undefined."))
 
-        typex = self.visit(node.expr, scope)
+        typex, node_exp = self.visit(node.expr, scope)
+        return (typex, cool_type_nodes.CaseItemNode(node.id.lex, node.type.lex, node_exp, typex))
 
-        return typex
 
     @visitor.when(InstantiateNode)  # NewNode
     def visit(self, node, scope):
@@ -421,22 +466,25 @@ class TypeChecker:
             typex = self.context.get_type(node.lex.lex)
             if typex.name == "SELF_TYPE":
                 return self.current_type
-            return typex
+            return (typex, cool_type_nodes.InstantiateNode(node.lex.lex, typex))
+
         except SError as error:
             node_row, node_col = node.lex.location
             self.errors.append(TypeError(node_row, node_col, f"Type {node.lex.lex} of 'new' expression is not defined."))
-            return ErrorType()
+            return (ErrorType(), cool_type_nodes.InstantiateNode(node.lex.lex, ErrorType()))
 
     @visitor.when(IsvoidNode)
     def visit(self, node, scope):
-        self.visit(node.expr, scope)
-        return self.context.get_type("Bool")
+        type_exp, node_exp = self.visit(node.expr, scope)
+        bool_type =  self.context.get_type("Bool")
+        return (bool_type, cool_type_nodes.IsvoidNode(node_exp, bool_type))
+
 
     @visitor.when(ArithmeticOperation)
     def visit(self, node, scope):
         int_type = self.context.get_type("Int")
-        left_type = self.visit(node.left, scope)
-        right_type = self.visit(node.right, scope)
+        left_type, left_exp_node = self.visit(node.left, scope)
+        right_type, right_exp_node = self.visit(node.right, scope)
 
         if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
             right_type != int_type and right_type.name != "AUTO_TYPE"
@@ -444,13 +492,14 @@ class TypeChecker:
             node_row, node_col = node.token.location
             self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
 
-        return int_type
+        return (int_type, cool_type_nodes.ArithmeticOperation(left_exp_node, right_exp_node, int_type))
+
 
     @visitor.when(ComparisonOperation)
     def visit(self, node, scope):
         int_type = self.context.get_type("Int")
-        left_type = self.visit(node.left, scope)
-        right_type = self.visit(node.right, scope)
+        left_type, left_exp_node = self.visit(node.left, scope)
+        right_type, right_exp_node, = self.visit(node.right, scope)
 
         if (left_type != int_type and left_type.name != "AUTO_TYPE") or (
             right_type != int_type and right_type.name != "AUTO_TYPE"
@@ -458,7 +507,8 @@ class TypeChecker:
             node_row, node_col = node.token.location
             self.errors.append(TypeError( node_row, node_col, INVALID_OPERATION % (left_type.name, right_type.name)))
 
-        return self.context.get_type("Bool")
+        bool_type =  self.context.get_type("Bool")
+        return (bool_type, cool_type_nodes.ComparisonOperation(left_exp_node, right_exp_node, bool_type))
 
     @visitor.when(EqualNode)
     def visit(self, node, scope):
@@ -467,8 +517,8 @@ class TypeChecker:
         bool_type = self.context.get_type("Bool")
         built_in_types = [int_type, string_type, bool_type]
 
-        left_type = self.visit(node.left, scope)
-        right_type = self.visit(node.right, scope)
+        left_type, left_exp_node = self.visit(node.left, scope)
+        right_type, right_exp_node = self.visit(node.right, scope)
 
         if left_type in built_in_types or right_type in built_in_types:
             if (
@@ -481,39 +531,43 @@ class TypeChecker:
                     TypeError(node_row, node_col, f"One of the expressions of '=' operator is of type Int, String or Bool, the other must have the same static type. Left type: {left_type.name}. Right type: {right_type.name}")
                 )
 
-        return self.context.get_type("Bool")
+        return (bool_type, cool_type_nodes.EqualNode(left_exp_node, right_exp_node, bool_type))
+
 
     @visitor.when(NotNode)
     def visit(self, node, scope):
         bool_type = self.context.get_type("Bool")
-        typex = self.visit(node.expr, scope)
+        typex, exp_node = self.visit(node.expr, scope)
 
         if typex != bool_type and not typex.name == "AUTO_TYPE":
             line, col = node.expr.token.location
             self.errors.append(
                 TypeError(line, col, f"Expression after 'not' must be Bool, current is {typex.name}")
             )
-            return ErrorType()
+            return (ErrorType(), cool_type_nodes.NotNode(exp_node, ErrorType()))
 
-        return bool_type
+        return (bool_type, cool_type_nodes.NotNode(exp_node, bool_type))
+
 
     @visitor.when(NegNode)
     def visit(self, node, scope):
         int_type = self.context.get_type("Int")
-        typex = self.visit(node.expr, scope)
+        typex, exp_node = self.visit(node.expr, scope)
 
         if typex != int_type and not typex.name == "AUTO_TYPE":
             node_row, node_col = node.expr.token.location
             self.errors.append(
                 TypeError( node_row, node_col,f"Expression after '~' must be Int, current is {typex.name}")
             )
-            return ErrorType()
+            return (ErrorType(), cool_type_nodes.NegNode(exp_node, ErrorType()))
 
-        return int_type
+        return (int_type, cool_type_nodes.NegNode(exp_node, int_type))
+
 
     @visitor.when(ConstantNumNode)
     def visit(self, node, scope):
-        return self.context.get_type("Int")
+        node_type = self.context.get_type("Int")
+        return (node_type, cool_type_nodes.ConstantNumNode(node.lex, node_type))
 
     @visitor.when(VariableNode)
     def visit(self, node, scope):
@@ -523,13 +577,16 @@ class TypeChecker:
             self.errors.append(
                 NameError( node_row, node_col,VARIABLE_NOT_DEFINED % (node.lex, self.current_method.name))
             )
-            return ErrorType()
-        return var.type
+            return (ErrorType(), cool_type_nodes.VariableNode(node.lex, ErrorType()))
+
+        return (var.type, cool_type_nodes.VariableNode(node.lex, var.type))
 
     @visitor.when(StringNode)
     def visit(self, node, scope):
-        return self.context.get_type("String")
+        node_type = self.context.get_type("String")
+        return (node_type, cool_type_nodes.StringNode(node.lex, node_type))
 
     @visitor.when(BooleanNode)
     def visit(self, node, scope):
-        return self.context.get_type("Bool")
+        node_type = self.context.get_type("Bool")
+        return (node_type, cool_type_nodes.BooleanNode(node.lex, node_type))

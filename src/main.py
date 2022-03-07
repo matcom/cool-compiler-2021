@@ -22,9 +22,9 @@ def report_and_exit(errors):
     if len(errors) == 0:
         raise typer.Exit(code=0)
 
-    typer.echo(errors[0])
-    # for error in errors:
-    #     typer.echo(error)
+    # typer.echo(errors[0])
+    for error in errors:
+        typer.echo(error)
     raise typer.Exit(code=1)
 
 
@@ -64,28 +64,20 @@ def pipeline(input_file: Path, output_file: Path = None):
         
     #get parsing tree
     ast = evaluate_reverse_parse(parse, operations, tokens)
-    # print("AST")
-    # print(ast)
-    #printing tree
     formatter = FormatVisitorST()
     tree = formatter.visit(ast)
-    # print(tree)
-
-    # type_visitor = TypeCollector(errors)
-    # ast = type_visitor.visit(ast)
-    # print("Type visitor tree")
-    # print(ast.context)
-
+    print(tree)
+    
     visitors = [TypeCollector(errors), TypeBuilder(errors)]
     for visitor in visitors:
         ast = visitor.visit(ast)
 
     type_checker = TypeChecker(errors)
-    scope = type_checker.visit(ast)
+    scope, typed_ast = type_checker.visit(ast)
 
-    # formatter = FormatVisitor()
-    # tree = formatter.visit(ast)
-    # print(tree)
+    formatter = FormatVisitor()
+    tree = formatter.visit(typed_ast)
+    print(tree)
 
     if len(errors) > 0:
         report_and_exit(errors)
