@@ -20,13 +20,11 @@ class Type:
                  methods: dict[cil.MethodAt, str],
                  total_methods: int,
                  index: int):
-                 # init: list[InstructionNode]
         self.label = label
         self.attrs = attrs
         self.methods = methods
         self.total_methods = total_methods
         self.index = index
-        # self.init = init
 
     def get_attr_index(self, name: str) -> int:
         return self.attrs.index(name) + 1

@@ -69,30 +69,12 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
-        # init = [
-        #     mips.SUBUNode(sp, sp, 24),
-        #     mips.SWNode(ra, 8, sp),
-        #     mips.SWNode(fp, 4, sp),
-        #     mips.ADDUNode(fp, sp, 20),
-        #     mips.ADDINode(sp, sp, -len(node.init_locals)),
-        #
-        #     mips.LWNode(a0, node.name),
-        #     mips.JALNode('malloc'),
-        #     mips.LANode(t0, node.name),
-        #     mips.SWNode(t0, 0, v0),
-        #
-        #     mips.LWNode(ra, (8, sp)),
-        #     mips.LWNode(fp, (4, sp)),
-        #     mips.ADDUNode(sp, sp, 24),
-        #     mips.JRNode(ra),
-        # ]
         type_ = mips.Type(
             label=node.name,
             attrs=list(node.attributes),
             methods=node.methods,
             total_methods=node.total_methods,
             index=len(self.types),
-            # init=init
         )
 
         self.types[node.name] = type_

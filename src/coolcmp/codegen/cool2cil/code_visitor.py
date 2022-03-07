@@ -70,14 +70,7 @@ class DotCodeVisitor:
                     for feature in class_.features:
                         if isinstance(feature, ast.FuncDeclarationNode) and feature.id == 'main':
                             self.add_function('main')
-                            # void = self.add_local('void', internal=False)
-                            # self.add_inst(cil.AllocateNode('<void>', void))
-                            # void_dest = self.visit(ast.InstantiateNode('Void'), scope)
-                            # void = self.add_local('void', internal=False)
-                            # self.add_inst(cil.AssignNode(void, void_dest))
-                            main_scope = scope.get_tagged_scope('Main')
                             instance = self.add_local('main_instance')
-                            # instance = self.visit(ast.InstantiateNode('Main'), main_scope)
                             self.add_inst(cil.StaticCallNode('Main__init', instance))
                             self.add_comment('Calling main')
                             result = self.add_local('result')
@@ -136,20 +129,6 @@ class DotCodeVisitor:
                     cil.ReturnNode('self_copy'),
                 ]
             ),
-            # cil.FunctionNode(
-            #      name='Object__eq',
-            #      params=[
-            #          cil.ParamNode('self'),
-            #          cil.ParamNode('other_bool'),
-            #      ],
-            #      local_vars=[
-            #          cil.LocalNode('result'),
-            #      ],
-            #      instructions=[
-            #          cil.EqualNode('result', 'self', 'other_bool'),
-            #          cil.ReturnNode('result'),
-            #      ]
-            # ),
             cil.FunctionNode(
                 name='IO__init',
                 params=[],
@@ -275,34 +254,6 @@ class DotCodeVisitor:
                     cil.ReturnNode('instance'),
                 ]
             ),
-            # cil.FunctionNode(
-            #     name='Bool__lt',
-            #     params=[
-            #         cil.ParamNode('self'),
-            #         cil.ParamNode('other_bool'),
-            #     ],
-            #     local_vars=[
-            #         cil.LocalNode('result'),
-            #     ],
-            #     instructions=[
-            #         cil.LessThanNode('result', 'self', 'other_bool'),
-            #         cil.ReturnNode('result'),
-            #     ]
-            # ),
-            # cil.FunctionNode(
-            #     name='Bool__lte',
-            #     params=[
-            #         cil.ParamNode('self'),
-            #         cil.ParamNode('other_bool'),
-            #     ],
-            #     local_vars=[
-            #         cil.LocalNode('result'),
-            #     ],
-            #     instructions=[
-            #         cil.LessEqualNode('result', 'self', 'other_bool'),
-            #         cil.ReturnNode('result'),
-            #     ]
-            # ),
             cil.FunctionNode(
                 name='Int__init',
                 params=[],
@@ -314,62 +265,6 @@ class DotCodeVisitor:
                     cil.ReturnNode('instance'),
                 ]
             ),
-            # cil.FunctionNode(
-            #     name='Int__plus',
-            #     params=[
-            #         cil.ParamNode('self'),
-            #         cil.ParamNode('other_int'),
-            #     ],
-            #     local_vars=[
-            #         cil.LocalNode('result'),
-            #     ],
-            #     instructions=[
-            #         cil.PlusNode('result', 'self', 'other_int'),
-            #         cil.ReturnNode('result'),
-            #     ]
-            # ),
-            # cil.FunctionNode(
-            #     name='Int__minus',
-            #     params=[
-            #         cil.ParamNode('self'),
-            #         cil.ParamNode('other_int'),
-            #     ],
-            #     local_vars=[
-            #         cil.LocalNode('result'),
-            #     ],
-            #     instructions=[
-            #         cil.MinusNode('result', 'self', 'other_int'),
-            #         cil.ReturnNode('result'),
-            #     ]
-            # ),
-            # cil.FunctionNode(
-            #     name='Int__star',
-            #     params=[
-            #         cil.ParamNode('self'),
-            #         cil.ParamNode('other_int'),
-            #     ],
-            #     local_vars=[
-            #         cil.LocalNode('result'),
-            #     ],
-            #     instructions=[
-            #         cil.StarNode('result', 'self', 'other_int'),
-            #         cil.ReturnNode('result'),
-            #     ]
-            # ),
-            # cil.FunctionNode(
-            #     name='Int__div',
-            #     params=[
-            #         cil.ParamNode('self'),
-            #         cil.ParamNode('other_int'),
-            #     ],
-            #     local_vars=[
-            #         cil.LocalNode('result'),
-            #     ],
-            #     instructions=[
-            #         cil.DivNode('result', 'self', 'other_int'),
-            #         cil.ReturnNode('result'),
-            #     ]
-            # ),
             cil.FunctionNode(
                 name='Void__init',
                 params=[],
@@ -422,8 +317,6 @@ class DotCodeVisitor:
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
         self.add_function(f'{self.current_type}_{node.id}')
 
-        # local_name = self.add_local(f'_name', internal=False)
-        # self.add_inst(cil.GetAttrNode(local_name, 'self', f'{self.current_type}__name'))
         for local in scope.all_locals():
             if local.is_param:
                 self.add_param(local.name)
@@ -552,9 +445,6 @@ class DotCodeVisitor:
         else:
             obj = node.obj
         obj_dest = self.visit(obj, scope)
-        # inst_type = self.add_local('inst_type')
-        # self.add_inst(cil.TypeOfNode(obj_dest, inst_type))
-        # self.add_inst(cil.ArgNode(obj_dest))
 
         # allocate and push the args
         for arg in node.args:
@@ -571,7 +461,6 @@ class DotCodeVisitor:
     @visitor.when(ast.InstantiateNode)
     def visit(self, node: ast.InstantiateNode, scope: Scope):
         self.add_comment(f'Instantiating type {node.lex}')
-        # self.add_inst(cil.StaticCallNode(f'{node.lex}__init', instance))
 
         type_node = self.root.get_type(node.lex)
         attr_values = []
@@ -579,7 +468,6 @@ class DotCodeVisitor:
             attr_expr = type_node.get_attr_node(attr)
             attr_values.append(self.visit(attr_expr, scope))
         instance = self.add_local(f'inst_of_{node.lex}')
-        # self.add_inst(cil.AllocateNode(node.lex, instance))
         self.add_inst(cil.StaticCallNode(f'{node.lex}__init', instance))
         for attr, attr_value in zip(type_node.attributes, attr_values):
             attr_index = type_node.attributes.index(attr)
@@ -596,7 +484,6 @@ class DotCodeVisitor:
 
         value = self.visit(node.lex, scope)
         str_instance = self.add_local('str_instance')
-        # self.add_inst(cil.AllocateNode('String', str_instance))
         self.add_inst(cil.StaticCallNode('String__init', str_instance))
         attr_index = self.root.get_type('String').attributes.index('String_value')
         attr_at = cil.AttributeAt('String_value', attr_index)
@@ -607,7 +494,6 @@ class DotCodeVisitor:
     def visit(self, node: ast.IntegerNode, scope: Scope):
         value = self.visit(int(node.lex), scope)
         int_instance = self.add_local('int_instance')
-        # self.add_inst(cil.AllocateNode('Int', int_instance))
         self.add_inst(cil.StaticCallNode('Int__init', int_instance))
         attr_index = self.root.get_type('Int').attributes.index('Int_value')
         attr_at = cil.AttributeAt('Int_value', attr_index)
@@ -618,7 +504,6 @@ class DotCodeVisitor:
     def visit(self, node: ast.BooleanNode, scope: Scope):
         value = self.visit(node.lex == 'true', scope)
         bool_instance = self.add_local('bool_instance')
-        # self.add_inst(cil.AllocateNode('Bool', bool_instance))
         self.add_inst(cil.StaticCallNode('Bool__init', bool_instance))
         attr_index = self.root.get_type('Bool').attributes.index('Bool_value')
         attr_at = cil.AttributeAt('Bool_Value', attr_index)
