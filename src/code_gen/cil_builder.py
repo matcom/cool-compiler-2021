@@ -315,9 +315,11 @@ class CILBuilder:
         int_arg = VariableInfo("int")
         self.register_param(int_arg)
         result = self.define_internal_local()
-        self.register_instruction(ToStrNode(result, int_arg.name))
-        self.register_instruction(PrintIntNode(result))
-        self.register_instruction(ReturnNode(VariableInfo(result).name))
+        #self.register_instruction(ToStrNode(result, int_arg.name))
+        self.register_instruction(PrintIntNode(int_arg.name))
+        #self.register_instruction(ReturnNode(VariableInfo(result).name))
+        self.register_instruction(ReturnNode("self"))
+        
 
     def io_instring(self):
         self.params.append(ParamNode("self"))
@@ -359,7 +361,7 @@ class CILBuilder:
         result = self.define_internal_local()
 
         main_constructor = self.to_function_name("constructor", "Main")
-        main_method_name = self.to_function_name("Main", "main")
+        main_method_name = self.to_function_name("main", "Main")
 
         # Get instance from constructor
         self.register_instruction(StaticCallNode(main_constructor, instance))
@@ -468,7 +470,7 @@ class CILBuilder:
             self.visit(node.obj, instance)
 
         else:
-            self.register_instruction(AssignNode(instance, self.self_var))
+            self.register_instruction(AssignNode(instance, "self"))
 
         instance_type = None
         if not node.at_type:
@@ -697,8 +699,6 @@ class CILBuilder:
                     self.current_type.name,
                 )
             )
-        elif node.lex == "self":
-            self.register_instruction(AssignNode(return_var, self.self_var))
         else:
             self.register_instruction(AssignNode(return_var, node.lex))
 
