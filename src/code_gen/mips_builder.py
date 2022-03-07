@@ -341,22 +341,7 @@ class MIPSBuilder:
         for inst in node.instructions:
             self.visit(inst)
             
-        self.register_instruction(mips.CommentNode,"Restoring saved $fp")
-        self.register_instruction(mips.AddiNode,sp,sp,-4)
-        self.register_instruction(mips.LoadWordNode,fp,0,sp)
         
-        self.register_instruction(mips.CommentNode,"Restoring saved $ra")
-        self.register_instruction(mips.AddiNode,sp,sp,-4)
-        self.register_instruction(mips.LoadWordNode,ra,0,sp)
-
-        
-        AR = -4*(len(node.localvars))
-        
-        self.register_instruction(mips.CommentNode,"Cleaning stack after call")
-        self.register_instruction(mips.AddiNode, sp, sp, AR)
-        
-        self.register_instruction(mips.CommentNode,"Return jump")
-        self.register_instruction(mips.JumpRegister, ra)
 
         self.text.append(self.current_procedure)
         self.locals = locals_save
@@ -423,7 +408,25 @@ class MIPSBuilder:
         else: 
             offset = self.get_offset(node.value)
             self.register_instruction(mips.LoadWordNode,a1,offset,fp)
+        
+        self.register_instruction(mips.CommentNode,"Restoring saved $fp")
+        self.register_instruction(mips.AddiNode,sp,sp,-4)
+        self.register_instruction(mips.LoadWordNode,fp,0,sp)
+        
+        self.register_instruction(mips.CommentNode,"Restoring saved $ra")
+        self.register_instruction(mips.AddiNode,sp,sp,-4)
+        self.register_instruction(mips.LoadWordNode,ra,0,sp)
+
+        
+        AR = -4*(len(self.locals))
+        
+        self.register_instruction(mips.CommentNode,"Cleaning stack after call")
+        self.register_instruction(mips.AddiNode, sp, sp, AR)
+        
+        self.register_instruction(mips.CommentNode,"Return jump")
+        self.register_instruction(mips.JumpRegister, ra)    
             
+    
     @visitor.when(cil.GotoNode)
     def visit(self,node):
         self.register_instruction(mips.CommentNode,"Executing Goto")
@@ -495,8 +498,21 @@ class MIPSBuilder:
     def visit(self,node):
         self.memo.save()
         self.register_instruction(mips.CommentNode,"Executing Dynamic Call")
+        
         reg1 = self.memo.get_unused_reg()
+        inst_offset = self.get_offset(node.instance_type)
+        self.register_instruction(mips.LoadWordNode,reg1,inst_offset,fp)
+        
+        #getting function
+        reg2 = self.memo.get_unused_reg()
+        self.register_instruction(mips.LoadWordNode,reg2,node.method_index*4,reg1)  
+
+        self.register_instruction(mips.JumpRegister,reg2)
     
+        #putting the return vslue in destination
+        dest_offset = self.get_offset(node.dest)
+        self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
+        
         #getting method offset
         #_methods = self.types[node.type].methods
         #_function = None
@@ -780,6 +796,13 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode, reg1, dest_offset, fp)
 
         self.memo.clean()
+    
+    @visitor.when(cil.ExitNode)
+    def visit(self,node):
+        self.register_instruction(mips.LoadInmediate,v0,SYSCALL_EXIT)
+        self.register_instruction(mips.SyscallNode)
+        
+        
     
     @visitor.when(cil.CopyNode)
     def visit(self,node):     

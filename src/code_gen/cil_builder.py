@@ -46,6 +46,7 @@ from cmp.cil import (
     GetAttribNode,
     DefaultValueNode,
     IsVoidNode,
+    ExitNode,
 )
 from cool_visitor import FormatVisitor
 
@@ -394,7 +395,8 @@ class CILBuilder:
         self.register_instruction(ArgNode(instance))
         self.register_instruction(StaticCallNode(main_method_name, result))
 
-        self.register_instruction(ReturnNode(0))
+        #self.register_instruction(ReturnNode(0))
+        self.register_instruction(ExitNode())
 
         self.current_function = None
 
@@ -488,10 +490,11 @@ class CILBuilder:
     def visit(self, node, return_var):
         # TODO: Pending test <expr>.id(<expr>,...,<expr>)
         # TODO: Pending test <expr>@<type>.id(<expr>,...,<expr>)
-
+        obj_type = self.current_type.name
         instance = self.define_internal_local()
         if node.obj:
             self.visit(node.obj, instance)
+            obj_type = node.obj.static_type.name
 
         else:
             self.register_instruction(AssignNode(instance, "self"))
@@ -516,7 +519,7 @@ class CILBuilder:
             )
 
         else:
-            method_index = self.get_method_id(node.obj.static_type.name, node.id)
+            method_index = self.get_method_id(obj_type, node.id)
             self.register_instruction(
                 DynamicCallNode(instance_type, method_index, return_var)
             )
