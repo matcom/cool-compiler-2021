@@ -3,7 +3,6 @@
 #from operator import le
 #from tkinter.tix import Select
 #from soupsieve import select
-from soupsieve import select
 import cmp.visitor as visitor
 import cmp.cil as cil
 import random
