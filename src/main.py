@@ -87,7 +87,7 @@ def pipeline(input_file: Path, output_file: Path = None):
     if len(errors) > 0:
         report_and_exit(errors)
 
-    cool_to_cil_visitor = CILBuilder(errors)
+    cool_to_cil_visitor = CILBuilder()
     cil_ast = cool_to_cil_visitor.visit(ast)
 
     formatter = PrintVisitor()

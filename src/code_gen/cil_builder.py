@@ -68,6 +68,8 @@ class CILBuilder:
         self.internal_count = 0
         self.context = None
         self.self_var = None
+        self.methods = {}
+        self.attrs = {}
 
     def generate_next_string_id(self):
         self.string_count += 1
@@ -352,6 +354,28 @@ class CILBuilder:
         self.add_builtin_functions()
         self.add_builtin_constructors()
 
+        for type in self.context.types.values():
+            self.attrs[type.name] = {
+                attr.name: (i, htype.name)
+                for i, (attr, htype) in enumerate(type.all_attributes())
+            }
+            self.methods[type.name] = {
+                method.name: (i, htype.name)
+                if htype.name != "Object" or method.name not in ["type_name", "copy"]
+                else (i, type.name)
+                for i, (method, htype) in enumerate(type.all_methods())
+            }
+        # self.dottypes.append(
+        #     cil.TypeNode(
+        #         type.name,
+        #         list(self.attrs[type.name].keys()),
+        #         [
+        #             self.get_func_id(htype, method)
+        #             for method, (_, htype) in self.methods[type.name].items()
+        #         ],
+        #     )
+        # )
+
         self.current_function = FunctionNode("main", [], [], [])
         self.code.append(self.current_function)
 
@@ -359,7 +383,7 @@ class CILBuilder:
         result = self.define_internal_local()
 
         main_constructor = self.to_function_name("constructor", "Main")
-        main_method_name = self.to_function_name("Main", "main")
+        main_method_name = self.to_function_name("main", "Main")
 
         # Get instance from constructor
         self.register_instruction(StaticCallNode(main_constructor, instance))
@@ -468,7 +492,7 @@ class CILBuilder:
             self.visit(node.obj, instance)
 
         else:
-            self.register_instruction(AssignNode(instance, self.self_var))
+            self.register_instruction(AssignNode(instance, "self"))
 
         instance_type = None
         if not node.at_type:
@@ -576,11 +600,12 @@ class CILBuilder:
     def visit(self, node, return_var=None):
         pass  # TODO: Pending!!!
 
-        # expr_value = self.visit(node.expr)
+        # expr_value = self.define_internal_local()
+        # self.visit(node.expr, expr_value)
         # solve = self.define_internal_local()
         # for case_item in node.case_items:
         #     item_expr_value = self.define_internal_local()
-        #      self.visit(case_item)
+        #     self.visit(case_item.)
 
     @visitor.when(cool.CaseItemNode)
     def visit(self, node, return_var=None):
@@ -697,8 +722,6 @@ class CILBuilder:
                     self.current_type.name,
                 )
             )
-        elif node.lex == "self":
-            self.register_instruction(AssignNode(return_var, self.self_var))
         else:
             self.register_instruction(AssignNode(return_var, node.lex))
 
