@@ -10,4 +10,4 @@ echo "Copyright (c) 2019: Thalia Blanco, Nadia Gonzalez, Jose A. Labourdette"
 # Llamar al compilador
 #echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
 
-python main.py $INPUT_FILE
+python main_.py $INPUT_FILE
