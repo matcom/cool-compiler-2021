@@ -170,11 +170,10 @@ class StaticCallNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, instance, method, dest, typex):
-        self.instance = instance
-        self.method = method
+    def __init__(self, instance_type, method_index, dest):
+        self.instance_type = instance_type
+        self.method_index = method_index
         self.dest = dest
-        self.type = typex
 
 
 class ArgNode(InstructionNode):
@@ -382,7 +381,7 @@ class PrintVisitor(object):
 
     @visitor.when(DynamicCallNode)
     def visit(self, node):
-        return f"{node.dest} = VCALL {node.type} {node.method}"
+        return f"{node.dest} = VCALL {node.instance_type} {node.method_index}"
 
     @visitor.when(ArgNode)
     def visit(self, node):

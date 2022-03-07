@@ -63,7 +63,7 @@ class TypeChecker:
         self.errors = errors
 
     @visitor.on("node")
-    def visit(self, node, scope=None):
+    def visit(self, node, scope=None, parent_children_dict=None):
         pass
 
     @visitor.when(ProgramNode)
@@ -107,11 +107,13 @@ class TypeChecker:
             self.visit(declaration, scope.create_child(), parent_children_dict)
             
 
+        program_node = (scope, cool_type_nodes.ProgramNode(self.tast_class_nodes, copy.copy(self.context)))
+
         self.context = None
         self.current_type = None
         self.current_method = None
-
-        return (scope, cool_type_nodes.ProgramNode(self.tast_class_nodes, copy.copy(self.context)))
+        
+        return program_node
 
     @visitor.when(ClassDeclarationNode)
     def visit(self, node, scope, parent_children_dict):

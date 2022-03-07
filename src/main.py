@@ -64,11 +64,12 @@ def pipeline(input_file: Path, output_file: Path = None):
 
     # get parsing tree
     ast = evaluate_reverse_parse(parse, operations, tokens)
+
     # print("-------------------------------Initial AST-------------------------------")
     # formatter = FormatVisitorST()
     # tree = formatter.visit(ast)
     # print(tree)
-    
+
     visitors = [TypeCollector(errors), TypeBuilder(errors)]
     for visitor in visitors:
         ast = visitor.visit(ast)
@@ -85,7 +86,7 @@ def pipeline(input_file: Path, output_file: Path = None):
         report_and_exit(errors)
 
     cool_to_cil_visitor = CILBuilder()
-    cil_ast = cool_to_cil_visitor.visit(ast)
+    cil_ast = cool_to_cil_visitor.visit(typed_ast)
 
     formatter = PrintVisitor()
     tree = formatter.visit(cil_ast)

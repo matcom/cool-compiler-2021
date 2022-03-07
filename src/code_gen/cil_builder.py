@@ -100,6 +100,10 @@ class CILBuilder:
     def instructions(self):
         return self.current_function.instructions
 
+    def get_method_id(self, typex, name):
+        method_id, _ = self.methods[typex][name]
+        return method_id
+
     def register_instruction(self, instruction):
         self.current_function.instructions.append(instruction)
 
@@ -512,13 +516,9 @@ class CILBuilder:
             )
 
         else:
+            method_index = self.get_method_id(node.obj.static_type.name, node.id)
             self.register_instruction(
-                DynamicCallNode(
-                    instance,
-                    node.id,
-                    return_var,
-                    instance_type,
-                )
+                DynamicCallNode(instance_type, method_index, return_var)
             )
 
     @visitor.when(cool.IfNode)

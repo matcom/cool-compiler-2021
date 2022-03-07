@@ -11,7 +11,7 @@
 
 class Main inherits IO{
     main (): Object {
-	self@IO.out_int((new Point)@Point.init(5, 6))
+	self.out_int((new Point).init(5, 6))
         
     };
 };
