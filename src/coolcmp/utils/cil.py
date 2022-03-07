@@ -366,8 +366,7 @@ class LessEqualNode(CompareNode):
 
 
 class EqualNode(CompareNode):
-    def __init__(self, dest: str, left: str, right: str):
-        super().__init__(dest, left, right)
+    pass
 
 
 class IsVoidNode(InstructionNode):

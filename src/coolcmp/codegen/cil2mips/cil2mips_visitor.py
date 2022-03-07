@@ -139,17 +139,6 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</function:{node.name}>"),
         )
 
-    # @visitor.when(cil.AllocateNode)
-    # def visit(self, node: cil.AllocateNode):
-    #     dest_address = self.get_address(node.dest)
-    #
-    #     self.add_inst(
-    #         mips.CommentNode(f"<allocate:{node.type}-{node.dest}>"),
-    #         mips.JALNode(f"{node.type}__init"),
-    #         mips.SWNode(v0, dest_address, fp),
-    #         mips.CommentNode(f"</allocate:{node.type}-{node.dest}>"),
-    #     )
-
     @visitor.when(cil.SetAttrNode)
     def visit(self, node: cil.SetAttrNode):
         if node.value == 'void':
@@ -279,7 +268,6 @@ class CILToMipsVisitor:
             mips.ADDNode(t2, t0, t1)                .with_comm('Add the integer values'),
         )
 
-        # self.visit(cil.AllocateNode('Int', node.dest))
         self.visit(cil.StaticCallNode('Int__init', node.dest))
 
         self.add_inst(
@@ -303,7 +291,6 @@ class CILToMipsVisitor:
             mips.SUBNode(t2, t0, t1),  # subtract the integer values
         )
 
-        # self.visit(cil.AllocateNode('Int', node.dest))
         self.visit(cil.StaticCallNode('Int__init', node.dest))
 
         self.add_inst(
@@ -359,7 +346,6 @@ class CILToMipsVisitor:
     def visit(self, node: cil.SubstringNode):
         self.add_inst(mips.CommentNode(f"<substr:>{node.dest}[{node.index}:{node.length}]"))
 
-        # self.visit(cil.AllocateNode('String', node.dest))
         self.visit(cil.StaticCallNode('String__init', node.dest))
 
         src_address = self.get_address('self')
@@ -402,7 +388,6 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
         )
 
-        # self.visit(cil.AllocateNode('String', node.dest))
         self.visit(cil.StaticCallNode('String__init', node.dest))
 
         self.add_inst(
@@ -422,7 +407,6 @@ class CILToMipsVisitor:
             mips.CommentNode(f"<isvoid:{node.dest}-{node.src}>"),
         )
 
-        # self.visit(cil.AllocateNode('Bool', node.dest))
         self.visit(cil.StaticCallNode('Bool__init', node.dest))
 
         self.add_inst(
@@ -456,4 +440,67 @@ class CILToMipsVisitor:
             mips.LINode(t1, 1),
             mips.BEQNode(t0, t1, node.label),
             mips.CommentNode(f"</gotoif:{node.condition}-{node.label}>"),
+        )
+
+    @visitor.when(cil.LessThanNode)
+    def visit(self, node: cil.LessThanNode):
+        left = self.get_address(node.left)
+        right = self.get_address(node.right)
+        dest = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<less than: {node.dest} <- {node.left} < {node.right}>"),
+        )
+
+        self.visit(cil.StaticCallNode("Bool__init", node.dest))
+
+        self.add_inst(
+            mips.LWNode(a0, (left, fp)),
+            mips.LWNode(a1, (right, fp)),
+            mips.JALNode("less_than"),
+            mips.LWNode(t0, (dest, fp)),
+            mips.SWNode(v0, 4, t0),
+            mips.CommentNode(f"</less than: {node.dest} <- {node.left} < {node.right}>"),
+        )
+
+    @visitor.when(cil.LessEqualNode)
+    def visit(self, node: cil.LessEqualNode):
+        left = self.get_address(node.left)
+        right = self.get_address(node.right)
+        dest = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<less equal: {node.dest} <- {node.left} <= {node.right}>"),
+        )
+
+        self.visit(cil.StaticCallNode("Bool__init", node.dest))
+
+        self.add_inst(
+            mips.LWNode(a0, (left, fp)),
+            mips.LWNode(a1, (right, fp)),
+            mips.JALNode("less_equal"),
+            mips.LWNode(t0, (dest, fp)),
+            mips.SWNode(v0, 4, t0),
+            mips.CommentNode(f"</less equal: {node.dest} <- {node.left} <= {node.right}>"),
+        )
+
+    @visitor.when(cil.EqualNode)
+    def visit(self, node: cil.EqualNode):
+        left = self.get_address(node.left)
+        right = self.get_address(node.right)
+        dest = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<equal: {node.dest} <- {node.left} = {node.right}>"),
+        )
+
+        self.visit(cil.StaticCallNode("Bool__init", node.dest))
+
+        self.add_inst(
+            mips.LWNode(a0, (left, fp)),
+            mips.LWNode(a1, (right, fp)),
+            mips.JALNode("equal"),
+            mips.LWNode(t0, (dest, fp)),
+            mips.SWNode(v0, 4, t0),
+            mips.CommentNode(f"<equal: {node.dest} <- {node.left} = {node.right}>"),
         )
