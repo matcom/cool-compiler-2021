@@ -170,3 +170,7 @@ class CILFormatter(object):
     @visitor.when(cil.InitNode)
     def visit(self, node: cil.InitNode):
         return f'{node.dest} = INIT {node.type_name}'
+
+    @visitor.when(cil.AbortNode)
+    def visit(self, node: cil.AbortNode):
+        return f'ABORT'

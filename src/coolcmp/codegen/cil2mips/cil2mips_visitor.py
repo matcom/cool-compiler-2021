@@ -1,4 +1,5 @@
 from __future__ import annotations
+from audioop import add
 from typing import Dict
 
 from coolcmp.utils import cil, visitor
@@ -216,6 +217,26 @@ class CILToMipsVisitor:
             mips.SysCallNode(),
             mips.LWNode(v0, (self_address, fp)),
             mips.CommentNode(f"</printstring:{node.addr}>"),
+        )
+
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node: cil.ReadIntNode):
+        address = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<readint:{node.dest}>"),
+            mips.LINode(v0, 5),
+            mips.SysCallNode(),
+            mips.MoveNode(t2, v0)
+        )
+
+        self.visit(cil.AllocateNode("Int", node.dest))
+
+        self.add_inst(
+            mips.LWNode(t1, (address, fp)),
+            mips.SWNode(t2, 4, t1),
+            mips.LWNode(v0, (address, fp)),
+            mips.CommentNode(f"</readint:{node.dest}>")
         )
 
     @visitor.when(cil.DynamicCallNode)
@@ -457,3 +478,36 @@ class CILToMipsVisitor:
             mips.BEQNode(t0, t1, node.label),
             mips.CommentNode(f"</gotoif:{node.condition}-{node.label}>"),
         )
+
+    @visitor.when(cil.AbortNode)
+    def visit(self, node: cil.AbortNode):
+        self.add_inst(
+            mips.CommentNode("<abort>"),
+            mips.LINode(v0, 4) .with_comm("Print halted message"),
+            mips.LANode(a0, "s2"),
+            mips.SysCallNode(),
+
+            mips.LINode(v0, 10) .with_comm("Finish program execution"),
+            mips.SysCallNode(),
+            mips.CommentNode("</abort>")
+        )
+
+    @visitor.when(cil.ReadStringNode)
+    def visit(self, node: cil.ReadStringNode):
+        self.add_inst(mips.CommentNode(f"<readstring:{node.dest}>"))
+
+        self.visit(cil.AllocateNode("String", node.dest))
+
+        address = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.LWNode(t0, (address, fp)),
+            mips.LWNode(a0, (4, t0)),
+            mips.LINode(a1, 1024),
+            mips.LINode(v0, 8),
+            mips.SysCallNode(),
+
+            mips.LWNode(v0, (address, fp)),
+        )
+
+        self.add_inst(mips.CommentNode(f"</readstring:{node.dest}>"))
