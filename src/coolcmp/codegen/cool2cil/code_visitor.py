@@ -401,7 +401,6 @@ class DotCodeVisitor:
 
         for feat in node.features:
             if isinstance(feat, ast.AttrDeclarationNode):
-                print(f'Visiting {feat.id}')
                 self.visit(feat, scope)
             elif isinstance(feat, ast.FuncDeclarationNode):
                 self.visit(feat, scope.get_tagged_scope(feat.id))
@@ -571,7 +570,6 @@ class DotCodeVisitor:
 
     @visitor.when(ast.InstantiateNode)
     def visit(self, node: ast.InstantiateNode, scope: Scope):
-        self.current_function = self.current_init
         self.add_comment(f'Instantiating type {node.lex}')
         # self.add_inst(cil.StaticCallNode(f'{node.lex}__init', instance))
 
@@ -580,7 +578,7 @@ class DotCodeVisitor:
         for attr in type_node.attributes:
             attr_expr = type_node.get_attr_node(attr)
             attr_values.append(self.visit(attr_expr, scope))
-            instance = self.add_local(f'inst_of_{node.lex}')
+        instance = self.add_local(f'inst_of_{node.lex}')
         # self.add_inst(cil.AllocateNode(node.lex, instance))
         self.add_inst(cil.StaticCallNode(f'{node.lex}__init', instance))
         for attr, attr_value in zip(type_node.attributes, attr_values):
@@ -598,7 +596,8 @@ class DotCodeVisitor:
 
         value = self.visit(node.lex, scope)
         str_instance = self.add_local('str_instance')
-        self.add_inst(cil.AllocateNode('String', str_instance))
+        # self.add_inst(cil.AllocateNode('String', str_instance))
+        self.add_inst(cil.StaticCallNode('String__init', str_instance))
         attr_index = self.root.get_type('String').attributes.index('String_value')
         attr_at = cil.AttributeAt('String_value', attr_index)
         self.add_inst(cil.SetAttrNode(str_instance, attr_at, value))
@@ -619,7 +618,8 @@ class DotCodeVisitor:
     def visit(self, node: ast.BooleanNode, scope: Scope):
         value = self.visit(node.lex == 'true', scope)
         bool_instance = self.add_local('bool_instance')
-        self.add_inst(cil.AllocateNode('Bool', bool_instance))
+        # self.add_inst(cil.AllocateNode('Bool', bool_instance))
+        self.add_inst(cil.StaticCallNode('Bool__init', bool_instance))
         attr_index = self.root.get_type('Bool').attributes.index('Bool_value')
         attr_at = cil.AttributeAt('Bool_Value', attr_index)
         self.add_inst(cil.SetAttrNode(bool_instance, attr_at, value))

@@ -114,7 +114,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
-        print(node.name, [p.name for p in node.params], [l.name for l in node.local_vars])
         params = [x.name for x in node.params]
         local_vars = [x.name for x in node.local_vars]
 
@@ -179,11 +178,14 @@ class CILToMipsVisitor:
             value_address = self.get_address(node.value)
             load_value_inst = mips.LWNode(t0, (value_address, fp))
 
+        instance = self.get_address(node.instance)
+
         self.add_inst(
             mips.CommentNode(f"<setattribute:{node.attr.name}-{node.instance}>"),
             # sum 1 to attr index because at offset 0 is the type pointer
             load_value_inst,
-            mips.SWNode(t0, 4 * (node.attr.index + 1), v0)      .with_comm(f"Set attr '{node.attr}' of {node.instance} = {node.value}"),
+            mips.LWNode(t1, (instance, fp)),
+            mips.SWNode(t0, 4 * (node.attr.index + 1), t1)      .with_comm(f"Set attr '{node.attr}' of {node.instance} = {node.value}"),
             mips.CommentNode(f"</setattribute:{node.attr.name}-{node.instance}>"),
         )
 
@@ -236,7 +238,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        print(self.cur_function.name, self.cur_function.params, self.cur_function.local_vars)
         obj_address = self.get_address(node.obj)
         meth_offset = self.get_method_index(node.method)
         dest_address = self.get_address(node.dest)
