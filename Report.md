@@ -12,7 +12,7 @@ El proyecto implementa un compilador capaz de interpretar el lenguaje COOL
 "The Classroom Object-Oriented Language". La solución está desarrollada en python.
 
 
-## Lexer y Parser
+## Lexer y Parser (Utilizando PLY)
 Para el desarrollo del lexer y el parser se utilizó la herramienta de parsing **PLY**.
 Esta es una implementación en python de lex/yacc.
 
@@ -213,6 +213,70 @@ hacerlas nodos propios capaces de almacenar la línea en la que se encuentran. U
 es el caso de la expresión **Case**: cada elemento de la `branch_list` es un nodo. Sucede
 muy a menudo que estos son escritos en otras líneas del programa, y de ocurrir algún error en ellos
 se informaría que se encuentra en la línea en la que se empezó a definir la expresión del Case.
+
+## Lexer y Parser (Generado)
+
+Para resolver el problema de Parsing del Lenguaje Cool desarrollamos dos alternativas: 
+
+- Hacer un generador de parser y lexer, con un motor de expresiones regulares para este último.
+
+- Generar el parser y lexer haciendo uso de PLY.
+
+Si se desea emplear la primera, en el archivo `coolc.sh` se requiere que el archivo sea `main_.py` 
+y para la segunda `main.py`.
+
+Para la primera alternativa, desarrollamos un parser LR(1) cuya implementación se encuentra ubicada 
+en la carpeta `parsers.py`, junto a la del parser SHIFT-REDUCE. Para la construcción de autómata se 
+emplea la clase Automaton ubicada en el archivo `automaton_class.py`.  Para la construcción de los 
+Símbolos, Producciones, No Terminales, Terminales, Item LR(1), se emplean las clases implementadas en 
+el archivo `grammar_classes.py`, y para la Gramática, el archivo `grammar_class.py`. Las clases Parser 
+y Lexer, definidas en los archivos `parser_base.py` y `lexer_base.py` son empleadas como estructuras 
+bases para el análisis sintáctico y léxico.
+
+Para generar las gramáticas de los lenguajes que estaremos necesitando, se requiere la entrada de un
+string que hace referencia al nombre con el que se desean crear los archivos de parser y lexer asociados
+a dicha gramática. Se sugiere que el nombre coincida con el de la gramática.  
+
+En el proyecto generamos una gramática que define el lenguaje de expresiones regulares que requerimos 
+para el motor de regex, que utilizamos para machear los tokens del lenguaje Cool, durante el análisis 
+léxico. Dicha gramática fue creada con el nombre **regex** (`regex_grammar = Grammar("regex")`) y se 
+encuentra ubicada en el archivo `grammar_regex.py`. 
+
+En ese dicho archivo se generan los terminales de la gramática haciendo: 
+`terminal=regex_grammar.terminal((token_name, lexeme, (extra)))` , el campo extra es una tupla opcional,
+que no es empleada en la gramática de Regex pero sí en la de Cool . Para generar los no terminales es 
+similar: `Noterminal=regex_grammar.nonTerminals("Noterminal")`. Por convenio los terminales se inician 
+con letra minúscula y los no terminales con mayúscula. Las producciones tienen la forma: 
+`Noterminal != FormaOracional + FormaOracional / atributos` (las formas oracionales pueden ser o no épsilon). 
+
+Las gramáticas pueden contar con un método que especifique la forma en que son tratados los atributos, 
+el cual ha de ser proporcionado en el momento en que se crea la gramática (`(grammar = Grammar("a",meth_attrs)`),
+o por defecto, emplea uno que tiene implementado; en el caso de la gramática de `regex` se emplea el que se
+tiene empleado por defecto. Las clases de su AST, se encuentran en el archivo `ast_regex.py`. Ya definidos 
+todos los terminales, no terminales y producciones se generan el parser y lexer :`regex_parser.py` y `regex_lexer.py`.
+
+Para generar dicha gramática se requiere estar ubicado en la ruta en que se encuentra `grammar_regex.py`
+y correr el comando `python grammar_regex.py`. Con ello se generan los archivos asociados a su parser y 
+lexer  `parser_regex.py` y `lexer_regex.py`. En el proyecto ya fueron ejecutados dichos comandos.
+
+Para generar el motor de expresiones regulares se emplea el archivo `main_regex.py` en el que se genera el
+compilador de una determinada expresión regular, y retorna, a partir de una determinada entrada, si la 
+expresión regular la reconoce. Nuestro motor de expresiones regulares reconoce solo caracteres ASCII y 
+algunos UTF-8 (solo los comprendidos en los casos de prueba).
+
+Luego este motor de expresiones regulares es empleado por la clase CoolMatch ubicada en el archivo 
+`match_cool_class.py`, para machear los tokens del lexer de Cool. Los identificadores de dichos tokens, 
+junto a otras clases necesarias para los atributos, se encuentran ubicados en `ast_cool_h_extender.py`. 
+
+En el archivo `gramar_cool.py` se encuentran todos los terminales, no terminales y producciones asociados
+al lenguaje Cool. Dicha gramática se crea también con una función especificada (ubicada también en este archivo),
+para el tratamiento de sus atributos, ya que se tienen que tener en cuenta otras condiciones que no se tienen 
+en la función que proporciona la clase Grammar por defecto (como lo son la obtención de las filas y columnas 
+de sus argumentos). Luego, generar el parser y lexer de Cool es posible ubicándose en la ruta en la que se 
+encuentra ubicado este archivo, y corriendo el comando `python grammar_cool.py`. 
+
+Esta gramática es análoga a la que se encuentran en los archivos `lexer.py` y `parser.py`, lo que estas 
+se llevan a cabo con las especificaciones de PLY.
 
 
 ## Análisis Semántico
