@@ -1,11 +1,10 @@
 from typing import Iterable, List
 
-
 class Symbol:
-    def __init__(self, name: str):
-        self.name: str = name
+    def __init__(self, name:str):
+        self.name:str = name
 
-    def __str__(self) -> str:
+    def __str__(self)->str:
         return self.name
 
     def __repr__(self):
@@ -25,36 +24,36 @@ class Symbol:
             return AttrSentence(Sentence(self), other)
         else:
             raise TypeError(f"Invalid type: {type(other)}")
-
-    def __add__(self, other) -> "Sentence":
+    
+    def __add__(self, other)->"Sentence":
         if isinstance(other, Symbol):
             return Sentence(self, other)
-        if isinstance(other, AttrSentence):
-            return AttrSentence(Sentence(self) + other.sentence, other.attr)
+        if isinstance(other,AttrSentence):
+            return AttrSentence(Sentence(self)+other.sentence,other.attr)    
         raise TypeError(f"Invalid type: {other}")
 
-    def __or__(self, other) -> "OrSentence":
-        if isinstance(other, Symbol):
+    def __or__(self, other)->"OrSentence":
+        if isinstance(other,Symbol):    
             return OrSentence(Sentence(self), Sentence(other))
-        if isinstance(other, (Sentence)) or isinstance(other, (AttrSentence)):
+        if isinstance(other, (Sentence)) or isinstance(other,(AttrSentence)):
             return OrSentence(Sentence(self), other)
         raise TypeError(f"Invalid type: {other}")
 
-
+    
 class Terminal(Symbol):
-    def __init__(self, name: str, matcher: str, type=None):
+    def __init__(self, name:str, matcher:str, type=None):
         super().__init__(name)
-        self.matcher: str = matcher
-        self.type = type
-
+        self.matcher:str=matcher
+        self.type=type
+    
 
 class AttrSentence:
-    def __init__(self, sentence: "Sentence", attr):
+    def __init__(self, sentence:"Sentence", attr):
         self.sentence: Sentence = sentence
         self.attr = attr
 
     def __str__(self) -> str:
-        return f"{self.sentence} / {self.attr}"
+        return f"{self.sentence} / {self.attr}"    
 
     def __repr__(self):
         return str(self)
@@ -63,35 +62,31 @@ class AttrSentence:
         return hash(self)
 
     def __eq__(self, other) -> bool:
-        return hash(self) == hash(other)
+        return hash(self)==hash(other)
 
     def __or__(self, other):
         if isinstance(other, Symbol):
             return OrSentence(self, Sentence(other))
         if isinstance(other, Sentence) or isinstance(other, AttrSentence):
-            return OrSentence(self, other)
+            return OrSentence(self,other)
         raise TypeError(f"Invalid type: {type(other)}")
 
 
 class Sentence:
-    def __init__(self, *args: Symbol):
-        self.symbols = (
-            (args[0],)
-            if len(args) == 1
-            else tuple(x for x in args if not isinstance(x, Epsilon))
-        )
+    def __init__(self, *args:Symbol):
+        self.symbols=(args[0],) if len(args)==1 else  tuple(x for x in args if not isinstance(x,Epsilon))
 
     def __repr__(self):
-        x = " ".join(map(repr, self.symbols))
+        x=" ".join(map(repr,self.symbols))
         return x
 
     def __hash__(self) -> int:
         return hash(self.symbols)
 
-    def __eq__(self, other) -> bool:
-        return hash(self) == hash(other)
+    def __eq__(self,other)->bool:
+        return hash(self)==hash(other)
 
-    def __len__(self) -> int:
+    def __len__(self)->int:
         return len(self.symbols)
 
     def __iter__(self):
@@ -105,26 +100,26 @@ class Sentence:
             return Sentence(*(self.symbols + (other,)))
         if isinstance(other, Sentence):
             return Sentence(*(self.symbols + other.symbols))
-        if isinstance(other, AttrSentence):
-            return AttrSentence(self + other.sentence, other.attr)
+        if isinstance(other,AttrSentence):
+            return AttrSentence(self+other.sentence,other.attr)    
         raise TypeError(f"Invalid type: {type(other)}")
 
     def __or__(self, other):
         if isinstance(other, Symbol):
             return OrSentence(self, Sentence(other))
-        if isinstance(other, Sentence) or isinstance(other, AttrSentence):
+        if isinstance(other, Sentence) or isinstance(other,AttrSentence):
             return OrSentence(self, other)
         raise TypeError(f"Invalid type: {type(other)}")
 
 
 class OrSentence:
-    def __init__(self, *args):
-        self.sentences = list(args)
-
+    def __init__(self,*args):
+        self.sentences=list(args)
+    
     def __repr__(self):
-        rep = [f"| {x}" for x in self.sentences]
+        rep= [f"| {x}" for x in self.sentences]
         return rep
-
+        
     def __iter__(self):
         return iter(self.sentences)
 
@@ -133,9 +128,9 @@ class OrSentence:
             self.sentences.append(Sentence(other))
         elif isinstance(other, Sentence) or isinstance(other, AttrSentence):
             self.sentences.append(other)
-        else:
+        else:    
             raise TypeError(f"Invalid type: {type(other)}")
-        return self
+        return self    
 
 
 class Epsilon(Terminal):
@@ -157,33 +152,33 @@ class EOF(Terminal):
         return "$"
 
     def __repr__(self):
-        return "$"
+        return "$"    
 
 
 class NonTerminal(Symbol):
-    def __init__(self, name: str, grammar):
+    def __init__(self, name:str, grammar):
         super().__init__(name)
-        self.grammar = grammar
-        self.productions: List[Production] = []
+        self.grammar=grammar
+        self.productions:List[Production]=[]
 
     def __ne__(self, other):
-        if isinstance(other, Symbol):
-            production = Production(self, Sentence(other))
-
-        elif isinstance(other, AttrSentence):
-            production = Production(self, other.sentence, other.attr)
-
+        if isinstance(other,Symbol):
+            production=Production(self,Sentence(other))
+        
+        elif isinstance(other,AttrSentence):
+            production=Production(self,other.sentence,other.attr)
+            
         elif isinstance(other, Sentence):
-            production = Production(self, other)
+            production = Production(self, other)    
 
         elif isinstance(other, OrSentence):
             for s in other.sentences:
                 self.__ne__(s)
-            return
-
+            return 
+        
         else:
             raise TypeError(f"Invalid type: {type(other)}")
-
+        
         if self.grammar.start_symbol is None:
             self.grammar.start_symbol = self
 
@@ -195,17 +190,17 @@ class NonTerminal(Symbol):
 
 
 class Production:
-    def __init__(self, non_terminal: NonTerminal, sentence: Sentence, attr=None):
-        self.left: NonTerminal = non_terminal
-        self.right: Sentence = sentence
-        self.attr = attr
+    def __init__(self, non_terminal:NonTerminal, sentence:Sentence,attr=None):
+        self.left:NonTerminal= non_terminal
+        self.right:Sentence = sentence
+        self.attr=attr
 
     def __str__(self):
-        attr_rep = self.attr if self.attr else ""
+        attr_rep=self.attr if self.attr else ""
         return f"{self.left} != {self.right} {attr_rep} "
 
     def __repr__(self):
-        attr_rep = self.attr if self.attr else ""
+        attr_rep=self.attr if self.attr else ""
         return f"{self.left} != {self.right} {attr_rep} "
 
     def __hash__(self):
@@ -217,39 +212,34 @@ class Production:
     def __iter__(self):
         yield self.left
         yield self.right
-
+    
 
 class Item:
-    def __init__(
-        self, production: Production, pos: int = 0, lookaheads: Iterable[Symbol] = None
-    ):
+    def __init__(self, production: Production, pos: int = 0, lookaheads: Iterable[Symbol] = None):
         self.production = production
         self.pos = pos
-        if isinstance(self.production.right[0], Epsilon):
-            self.pos += 1  # reduce
-        if lookaheads:
-            self.lookaheads = tuple(sorted(set(lookaheads), key=hash))
-        else:
-            self.lookaheads = tuple()
+        if isinstance(self.production.right[0],Epsilon): self.pos+=1 #reduce
+        if lookaheads: self.lookaheads=tuple(sorted(set(lookaheads),key=hash))
+        else: self.lookaheads=tuple()
 
     def __str__(self):
-        item_right = " ".join(map(repr, self.production.right[: self.pos])) + "."
-        item_right += " ".join(map(repr, self.production.right[self.pos :])) + ", "
+        item_right = " ".join(map(repr, self.production.right[:self.pos])) + "."
+        item_right += " ".join(map(repr, self.production.right[self.pos:])) + ", "
         item_right += "/".join(map(repr, self.lookaheads))
-        return f"{self.production.left} -> {item_right}"
-
+        return f'{self.production.left} -> {item_right}'
+        
     def __repr__(self):
-        item_right = " ".join(map(repr, self.production.right[: self.pos])) + "."
-        item_right += " ".join(map(repr, self.production.right[self.pos :])) + ", "
+        item_right = " ".join(map(repr, self.production.right[:self.pos])) + "."
+        item_right += " ".join(map(repr, self.production.right[self.pos:])) + ", "
         item_right += "/".join(map(repr, self.lookaheads))
-        return f"{self.production.left} -> {item_right}"
+        return f'{self.production.left} -> {item_right}'
 
     def __hash__(self):
         return hash((self.production, self.pos, tuple(self.lookaheads)))
-
+    
     def __eq__(self, other):
         return hash(self) == hash(other)
-
+    
     @property
     def is_reduce(self):
         return self.pos == len(self.production.right)
@@ -262,13 +252,13 @@ class Item:
     @property
     def next_item(self):
         if not self.is_reduce:
-            return Item(self.production, self.pos + 1, self.lookaheads)
+            return Item(self.production, self.pos + 1, self.lookaheads)    
 
     @property
     def center(self):
-        return Item(self.production, self.pos)
+        return Item(self.production,self.pos)
 
     @property
     def preview(self):
-        p = self.production.right[self.pos + 1 :]
+        p = self.production.right[self.pos + 1:]
         return [Sentence(*(p + (lookahead,))) for lookahead in self.lookaheads]

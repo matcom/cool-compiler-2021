@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Tuple
 
-
 class Match(ABC):
     @abstractmethod
     def initialize(self):

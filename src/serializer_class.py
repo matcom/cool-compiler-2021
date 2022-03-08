@@ -1,13 +1,12 @@
 import sys
 
-import pickle, lzma, base64, io
-
+import pickle,lzma,base64,io
 
 class Serializer:
-    # override the python serializer
+    #override the python serializer
     class Find(pickle.Unpickler):
-        def find_class(self, name, global_name):
-            return super().find_class(name, global_name)
+        def find_class(self,name,global_name):
+            return super().find_class(name,global_name)
 
     def serializer(self):
         compressor = lzma.LZMACompressor()
@@ -23,5 +22,5 @@ class Serializer:
         decoded = base64.b85decode(to_deserializ)
         decompressed = decompressor.decompress(decoded)
         pickled = Serializer.Find(io.BytesIO(decompressed))
-        h = pickled.load()
+        h=pickled.load()
         return h

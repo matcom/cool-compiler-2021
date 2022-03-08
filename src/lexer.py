@@ -174,10 +174,8 @@ def t_STRING_end(t):
 
 def t_STRING_null(t):
     r"\0"
-    errors.append(
-        "(%s, %s) - LexicographicError: STRING NULL ERROR"
-        % (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos))
-    )
+    errors.append("(%s, %s) - LexicographicError: STRING NULL ERROR" %
+                  (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos)))
     t.lexer.skip(1)
 
 
@@ -200,8 +198,8 @@ def t_STRING_something(t):
             t.lexer.string_buffer += "\b"
         elif t.value == "t":  # \t tab
             t.lexer.string_buffer += "\t"
-        elif t.value == "n":
-            t.lexer.string_buffer += "\n"
+        elif t.value == 'n':
+            t.lexer.string_buffer += '\n'
         elif t.value == "f":  # \f formfeed
             t.lexer.string_buffer += "\f"
         elif t.value == "\\":  # \\ backslash caracter
@@ -225,8 +223,8 @@ def t_STRING_error(t):
 def t_STRING_eof(t):
     if t.lexer.current_state():
         errors.append(
-            "(%s, %s) - LexicographicError: EOF ERROR IN STRING STATE"
-            % (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos))
+            "(%s, %s) - LexicographicError: EOF ERROR IN STRING STATE" %
+            (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos))
         )
 
 
@@ -270,7 +268,7 @@ def t_COMMENT_end(t):
     t.lexer.pop_state()
     t.value = t.lexer.string_buffer
     t.type = "COMMENT"
-    # return t
+        # return t
     # else:
     #     t.lexer.comment_count -= 1
 

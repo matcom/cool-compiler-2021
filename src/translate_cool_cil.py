@@ -31,7 +31,7 @@ class BaseCOOLToCILVisitor:
 
     def get_label(self):
         self.label_count += 1
-        return f"label_{self.label_count}"
+        return f'label_{self.label_count}'
 
     def register_param(self, vinfo):
         param_node = CIL_AST.ParamDec(vinfo.name)
@@ -49,15 +49,13 @@ class BaseCOOLToCILVisitor:
         self.localvars.append(local_node)
         return var_name
 
-    def define_internal_local(
-        self, scope, name="internal", cool_var_name=None, class_type=None
-    ):
+    def define_internal_local(self, scope, name="internal", cool_var_name=None, class_type=None):
         if class_type != None:
-            cilname = f"{class_type}.{name}"
+            cilname = f'{class_type}.{name}'
             scope.define_cil_local(cool_var_name, cilname, None)
             self.register_local(cilname)
         else:
-            cilname = f"{name}_{len(self.localvars)}"
+            cilname = f'{name}_{len(self.localvars)}'
             scope.define_cil_local(cool_var_name, cilname, None)
             self.register_local(cilname)
         return cilname
@@ -67,7 +65,7 @@ class BaseCOOLToCILVisitor:
         return instruction
 
     def to_function_name(self, method_name, type_name):
-        return f"{type_name}.{method_name}"
+        return f'{type_name}.{method_name}'
 
     def register_function(self, function_name):
         function_node = CIL_AST.Function(function_name, [], [], [])
@@ -83,282 +81,206 @@ class BaseCOOLToCILVisitor:
         return name in self.dotdata.keys
 
     def register_data(self, value):
-        vname = f"s_{len(self.dotdata)}"
+        vname = f's_{len(self.dotdata)}'
         self.dotdata[vname] = value
         return vname
 
     def register_builtin_types(self, scope):
-        for t in ["Object", "Int", "String", "Bool", "IO"]:
+        for t in ['Object', 'Int', 'String', 'Bool', 'IO']:
             builtin_type = self.context.get_type(t)
             cil_type = self.register_type(t)
-            cil_type.attributes = [f"{attr.name}" for attr in builtin_type.attributes]
-            cil_type.methods = {
-                f"{m}": f"{c}.{m}" for c, m in builtin_type.get_all_methods()
-            }
-            if t in ["Int", "String", "Bool"]:
-                cil_type.attributes.append("value")
+            cil_type.attributes = [f'{attr.name}' for attr in builtin_type.attributes]
+            cil_type.methods = {f'{m}': f'{c}.{m}' for c, m in builtin_type.get_all_methods()}
+            if t in ['Int', 'String', 'Bool']:
+                cil_type.attributes.append('value')
 
         # ----------------Object---------------------
         # init
-        self.current_function = self.register_function("Object_init")
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function('Object_init')
+        self.register_param(VariableInfo('self', None))
         self.register_instruction(CIL_AST.Return(None))
 
         # abort
-        self.current_function = self.register_function(
-            self.to_function_name("abort", "Object")
-        )
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function(self.to_function_name('abort', 'Object'))
+        self.register_param(VariableInfo('self', None))
         msg = self.define_internal_local(scope=scope, name="msg")
-        key_msg = ""
+        key_msg = ''
         for s in self.dotdata.keys():
-            if self.dotdata[s] == "Abort called from class ":
+            if self.dotdata[s] == 'Abort called from class ':
                 key_msg = s
         self.register_instruction(CIL_AST.LoadStr(key_msg, msg))
         self.register_instruction(CIL_AST.PrintString(msg))
         type_name = self.define_internal_local(scope=scope, name="type_name")
-        self.register_instruction(CIL_AST.TypeOf("self", type_name))
+        self.register_instruction(CIL_AST.TypeOf('self', type_name))
         self.register_instruction(CIL_AST.PrintString(type_name))
         eol_local = self.define_internal_local(scope=scope, name="eol")
         for s in self.dotdata.keys():
-            if self.dotdata[s] == "\n":
+            if self.dotdata[s] == '\n':
                 eol = s
         self.register_instruction(CIL_AST.LoadStr(eol, eol_local))
         self.register_instruction(CIL_AST.PrintString(eol_local))
         self.register_instruction(CIL_AST.Halt())
 
         # type_name
-        self.current_function = self.register_function(
-            self.to_function_name("type_name", "Object")
-        )
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function(self.to_function_name('type_name', 'Object'))
+        self.register_param(VariableInfo('self', None))
         type_name = self.define_internal_local(scope=scope, name="type_name")
-        self.register_instruction(CIL_AST.TypeOf("self", type_name))
+        self.register_instruction(CIL_AST.TypeOf('self', type_name))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("String", self.context.get_type("String").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('String', self.context.get_type('String').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "String_init",
-                [CIL_AST.Arg(type_name), CIL_AST.Arg(instance)],
-                "String",
-            )
-        )
+            CIL_AST.Call(result_init, 'String_init', [CIL_AST.Arg(type_name), CIL_AST.Arg(instance)], "String"))
         self.register_instruction(CIL_AST.Return(instance))
 
         # copy
-        self.current_function = self.register_function(
-            self.to_function_name("copy", "Object")
-        )
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function(self.to_function_name('copy', 'Object'))
+        self.register_param(VariableInfo('self', None))
         copy = self.define_internal_local(scope=scope, name="copy")
-        self.register_instruction(CIL_AST.Copy("self", copy))
+        self.register_instruction(CIL_AST.Copy('self', copy))
         self.register_instruction(CIL_AST.Return(copy))
 
         # ----------------IO---------------------
         # init
-        self.current_function = self.register_function("IO_init")
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function('IO_init')
+        self.register_param(VariableInfo('self', None))
         self.register_instruction(CIL_AST.Return(None))
 
         # out_string
-        self.current_function = self.register_function(
-            self.to_function_name("out_string", "IO")
-        )
-        self.register_param(VariableInfo("self", None))
-        self.register_param(VariableInfo("x", None))
+        self.current_function = self.register_function(self.to_function_name('out_string', 'IO'))
+        self.register_param(VariableInfo('self', None))
+        self.register_param(VariableInfo('x', None))
         v = self.define_internal_local(scope=scope, name="v")
-        self.register_instruction(CIL_AST.GetAttr(v, "x", "value", "String"))
+        self.register_instruction(CIL_AST.GetAttr(v, 'x', 'value', 'String'))
         self.register_instruction(CIL_AST.PrintString(v))
-        self.register_instruction(CIL_AST.Return("self"))
+        self.register_instruction(CIL_AST.Return('self'))
 
         # out_int
-        self.current_function = self.register_function(
-            self.to_function_name("out_int", "IO")
-        )
-        self.register_param(VariableInfo("self", None))
-        self.register_param(VariableInfo("x", None))
+        self.current_function = self.register_function(self.to_function_name('out_int', 'IO'))
+        self.register_param(VariableInfo('self', None))
+        self.register_param(VariableInfo('x', None))
         v = self.define_internal_local(scope=scope, name="v")
-        self.register_instruction(CIL_AST.GetAttr(v, "x", "value", "Int"))
+        self.register_instruction(CIL_AST.GetAttr(v, 'x', 'value', 'Int'))
         self.register_instruction(CIL_AST.PrintInteger(v))
-        self.register_instruction(CIL_AST.Return("self"))
+        self.register_instruction(CIL_AST.Return('self'))
 
         # in_string
-        self.current_function = self.register_function(
-            self.to_function_name("in_string", "IO")
-        )
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function(self.to_function_name('in_string', 'IO'))
+        self.register_param(VariableInfo('self', None))
         msg = self.define_internal_local(scope=scope, name="read_str")
         self.register_instruction(CIL_AST.ReadString(msg))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("String", self.context.get_type("String").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('String', self.context.get_type('String').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "String_init",
-                [CIL_AST.Arg(msg), CIL_AST.Arg(instance)],
-                "String",
-            )
-        )
+            CIL_AST.Call(result_init, 'String_init', [CIL_AST.Arg(msg), CIL_AST.Arg(instance)], "String"))
         self.register_instruction(CIL_AST.Return(instance))
 
         # in_int
-        self.current_function = self.register_function(
-            self.to_function_name("in_int", "IO")
-        )
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function(self.to_function_name('in_int', 'IO'))
+        self.register_param(VariableInfo('self', None))
         number = self.define_internal_local(scope=scope, name="read_int")
         self.register_instruction(CIL_AST.ReadInteger(number))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("Int", self.context.get_type("Int").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('Int', self.context.get_type('Int').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Int_init",
-                [CIL_AST.Arg(number), CIL_AST.Arg(instance)],
-                "Int",
-            )
-        )
+            CIL_AST.Call(result_init, 'Int_init', [CIL_AST.Arg(number), CIL_AST.Arg(instance)], "Int"))
         self.register_instruction(CIL_AST.Return(instance))
 
         # ----------------String---------------------
         # init
-        self.current_function = self.register_function("String_init")
-        self.register_param(VariableInfo("self", None))
-        self.register_param(VariableInfo("v", None))
-        self.register_instruction(CIL_AST.SetAttr("self", "value", "v", "String"))
+        self.current_function = self.register_function('String_init')
+        self.register_param(VariableInfo('self', None))
+        self.register_param(VariableInfo('v', None))
+        self.register_instruction(CIL_AST.SetAttr('self', 'value', 'v', 'String'))
         self.register_instruction(CIL_AST.Return(None))
 
         # length
-        self.current_function = self.register_function(
-            self.to_function_name("length", "String")
-        )
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function(self.to_function_name('length', 'String'))
+        self.register_param(VariableInfo('self', None))
         length_result = self.define_internal_local(scope=scope, name="length")
-        self.register_instruction(CIL_AST.Length("self", length_result))
+        self.register_instruction(CIL_AST.Length('self', length_result))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("Int", self.context.get_type("Int").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('Int', self.context.get_type('Int').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Int_init",
-                [CIL_AST.Arg(length_result), CIL_AST.Arg(instance)],
-                "Int",
-            )
-        )
+            CIL_AST.Call(result_init, 'Int_init', [CIL_AST.Arg(length_result), CIL_AST.Arg(instance)], "Int"))
         self.register_instruction(CIL_AST.Return(instance))
 
         # concat
-        self.current_function = self.register_function(
-            self.to_function_name("concat", "String")
-        )
-        self.register_param(VariableInfo("self", None))
-        self.register_param(VariableInfo("s", None))
+        self.current_function = self.register_function(self.to_function_name('concat', 'String'))
+        self.register_param(VariableInfo('self', None))
+        self.register_param(VariableInfo('s', None))
 
         str1 = self.define_internal_local(scope=scope, name="str1")
-        self.register_instruction(CIL_AST.GetAttr(str1, "self", "value", "String"))
+        self.register_instruction(CIL_AST.GetAttr(str1, 'self', 'value', 'String'))
         len1 = self.define_internal_local(scope=scope, name="len1")
-        self.register_instruction(
-            CIL_AST.Call(len1, "String.length", [CIL_AST.Arg("self")], "String")
-        )
+        self.register_instruction(CIL_AST.Call(len1, 'String.length', [CIL_AST.Arg('self')], 'String'))
 
         str2 = self.define_internal_local(scope=scope, name="str2")
-        self.register_instruction(CIL_AST.GetAttr(str2, "s", "value", "String"))
+        self.register_instruction(CIL_AST.GetAttr(str2, 's', 'value', 'String'))
         len2 = self.define_internal_local(scope=scope, name="len2")
-        self.register_instruction(
-            CIL_AST.Call(len2, "String.length", [CIL_AST.Arg("s")], "String")
-        )
+        self.register_instruction(CIL_AST.Call(len2, 'String.length', [CIL_AST.Arg('s')], 'String'))
 
         local_len1 = self.define_internal_local(scope=scope, name="local_len1")
-        self.register_instruction(CIL_AST.GetAttr(local_len1, len1, "value", "Int"))
+        self.register_instruction(CIL_AST.GetAttr(local_len1, len1, 'value', 'Int'))
         local_len2 = self.define_internal_local(scope=scope, name="local_len2")
-        self.register_instruction(CIL_AST.GetAttr(local_len2, len2, "value", "Int"))
+        self.register_instruction(CIL_AST.GetAttr(local_len2, len2, 'value', 'Int'))
 
         concat_result = self.define_internal_local(scope=scope, name="concat")
-        self.register_instruction(
-            CIL_AST.Concat(str1, local_len1, str2, local_len2, concat_result)
-        )
+        self.register_instruction(CIL_AST.Concat(str1, local_len1, str2, local_len2, concat_result))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("String", self.context.get_type("String").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('String', self.context.get_type('String').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "String_init",
-                [CIL_AST.Arg(concat_result), CIL_AST.Arg(instance)],
-                "String",
-            )
-        )
+            CIL_AST.Call(result_init, 'String_init', [CIL_AST.Arg(concat_result), CIL_AST.Arg(instance)], "String"))
         self.register_instruction(CIL_AST.Return(instance))
 
         # substr
-        self.current_function = self.register_function(
-            self.to_function_name("substr", "String")
-        )
-        self.register_param(VariableInfo("self", None))
-        self.register_param(VariableInfo("i", None))
-        self.register_param(VariableInfo("l", None))
+        self.current_function = self.register_function(self.to_function_name('substr', 'String'))
+        self.register_param(VariableInfo('self', None))
+        self.register_param(VariableInfo('i', None))
+        self.register_param(VariableInfo('l', None))
         i_value = self.define_internal_local(scope=scope, name="i_value")
-        self.register_instruction(CIL_AST.GetAttr(i_value, "i", "value", "Int"))
+        self.register_instruction(CIL_AST.GetAttr(i_value, 'i', 'value', 'Int'))
         l_value = self.define_internal_local(scope=scope, name="l_value")
-        self.register_instruction(CIL_AST.GetAttr(l_value, "l", "value", "Int"))
+        self.register_instruction(CIL_AST.GetAttr(l_value, 'l', 'value', 'Int'))
         subs_result = self.define_internal_local(scope=scope, name="subs_result")
-        self.register_instruction(CIL_AST.SubStr(i_value, l_value, "self", subs_result))
+        self.register_instruction(CIL_AST.SubStr(i_value, l_value, 'self', subs_result))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("String", self.context.get_type("String").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('String', self.context.get_type('String').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "String_init",
-                [CIL_AST.Arg(subs_result), CIL_AST.Arg(instance)],
-                "String",
-            )
-        )
+            CIL_AST.Call(result_init, 'String_init', [CIL_AST.Arg(subs_result), CIL_AST.Arg(instance)], "String"))
         self.register_instruction(CIL_AST.Return(instance))
 
         # ----------------Bool---------------------
         # init
-        self.current_function = self.register_function("Bool_init")
-        self.register_param(VariableInfo("self", None))
-        self.register_param(VariableInfo("v", None))
-        self.register_instruction(CIL_AST.SetAttr("self", "value", "v", "Bool"))
+        self.current_function = self.register_function('Bool_init')
+        self.register_param(VariableInfo('self', None))
+        self.register_param(VariableInfo('v', None))
+        self.register_instruction(CIL_AST.SetAttr('self', 'value', 'v', 'Bool'))
         self.register_instruction(CIL_AST.Return(None))
 
         # ----------------Int---------------------
         # init
-        self.current_function = self.register_function("Int_init")
-        self.register_param(VariableInfo("self", None))
-        self.register_param(VariableInfo("v", None))
-        self.register_instruction(CIL_AST.SetAttr("self", "value", "v", "Int"))
+        self.current_function = self.register_function('Int_init')
+        self.register_param(VariableInfo('self', None))
+        self.register_param(VariableInfo('v', None))
+        self.register_instruction(CIL_AST.SetAttr('self', 'value', 'v', 'Int'))
         self.register_instruction(CIL_AST.Return(None))
 
     def build_string_equals_function(self, scope):
-        self.current_function = self.register_function("String_equals")
-        self.register_param(VariableInfo("str1", None))
-        self.register_param(VariableInfo("str2", None))
+        self.current_function = self.register_function('String_equals')
+        self.register_param(VariableInfo('str1', None))
+        self.register_param(VariableInfo('str2', None))
 
         str1 = self.define_internal_local(scope=scope, name="str1")
-        self.register_instruction(CIL_AST.GetAttr(str1, "str1", "value", "String"))
+        self.register_instruction(CIL_AST.GetAttr(str1, 'str1', 'value', 'String'))
 
         str2 = self.define_internal_local(scope=scope, name="str2")
-        self.register_instruction(CIL_AST.GetAttr(str2, "str2", "value", "String"))
+        self.register_instruction(CIL_AST.GetAttr(str2, 'str2', 'value', 'String'))
 
         result = self.define_internal_local(scope=scope, name="comparison_result")
         self.register_instruction(CIL_AST.StringEquals(str1, str2, result))
@@ -366,36 +288,26 @@ class BaseCOOLToCILVisitor:
 
 
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
-    @visitor.on("node")
+    @visitor.on('node')
     def visit(self, node, scope):
         pass
 
     @visitor.when(COOL_AST.ProgramNode)
     def visit(self, node: COOL_AST.ProgramNode, scope=None):
         scope = Scope()
-        self.current_function = self.register_function("main")
+        self.current_function = self.register_function('main')
         instance = self.define_internal_local(scope=scope, name="instance")
         result = self.define_internal_local(scope=scope, name="result")
+        self.register_instruction(CIL_AST.Allocate('Main', self.context.get_type('Main').tag, instance))
+        self.register_instruction(CIL_AST.Call(result, 'Main_init', [CIL_AST.Arg(instance)], "Main"))
         self.register_instruction(
-            CIL_AST.Allocate("Main", self.context.get_type("Main").tag, instance)
-        )
-        self.register_instruction(
-            CIL_AST.Call(result, "Main_init", [CIL_AST.Arg(instance)], "Main")
-        )
-        self.register_instruction(
-            CIL_AST.Call(
-                result,
-                self.to_function_name("main", "Main"),
-                [CIL_AST.Arg(instance)],
-                "Main",
-            )
-        )
+            CIL_AST.Call(result, self.to_function_name('main', 'Main'), [CIL_AST.Arg(instance)], "Main"))
         self.register_instruction(CIL_AST.Return(None))
         self.current_function = None
 
-        self.register_data("Abort called from class ")
-        self.register_data("\n")
-        self.dotdata["empty_str"] = ""
+        self.register_data('Abort called from class ')
+        self.register_data('\n')
+        self.dotdata['empty_str'] = ''
 
         # Add built-in types in .TYPES section
         self.register_builtin_types(scope)
@@ -414,35 +326,23 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         # Handle all the .TYPE section
         cil_type = self.register_type(self.current_type.name)
-        cil_type.attributes = [
-            f"{attr.name}" for c, attr in self.current_type.get_all_attributes()
-        ]
-        cil_type.methods = {
-            f"{m}": f"{c}.{m}" for c, m in self.current_type.get_all_methods()
-        }
+        cil_type.attributes = [f'{attr.name}' for c, attr in self.current_type.get_all_attributes()]
+        cil_type.methods = {f'{m}': f'{c}.{m}' for c, m in self.current_type.get_all_methods()}
 
         scope.define_cil_local("self", self.current_type.name, self.current_type)
 
-        func_declarations = [
-            f for f in node.features if isinstance(f, COOL_AST.FuncDeclarationNode)
-        ]
-        attr_declarations = [
-            a for a in node.features if isinstance(a, COOL_AST.AttrDeclarationNode)
-        ]
+        func_declarations = [f for f in node.features if isinstance(f, COOL_AST.FuncDeclarationNode)]
+        attr_declarations = [a for a in node.features if isinstance(a, COOL_AST.AttrDeclarationNode)]
         for attr in attr_declarations:
             scope.define_cil_local(attr.id, attr.id, node.id)
 
         # -------------------------Init---------------------------------
-        self.current_function = self.register_function(f"{node.id}_init")
-        self.register_param(VariableInfo("self", None))
+        self.current_function = self.register_function(f'{node.id}_init')
+        self.register_param(VariableInfo('self', None))
 
         # Init parents recursively
         result = self.define_internal_local(scope=scope, name="result")
-        self.register_instruction(
-            CIL_AST.Call(
-                result, f"{node.parent}_init", [CIL_AST.Arg("self")], node.parent
-            )
-        )
+        self.register_instruction(CIL_AST.Call(result, f'{node.parent}_init', [CIL_AST.Arg('self')], node.parent))
         self.register_instruction(CIL_AST.Return(None))
 
         for attr in attr_declarations:
@@ -458,13 +358,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(COOL_AST.FuncDeclarationNode)
     def visit(self, node: COOL_AST.FuncDeclarationNode, scope):
         self.current_method = self.current_type.get_method(node.id)[0]
-        self.dottypes[self.current_type.name].methods[
-            node.id
-        ] = f"{self.current_type.name}.{node.id}"
+        self.dottypes[self.current_type.name].methods[node.id] = f'{self.current_type.name}.{node.id}'
         cil_method_name = self.to_function_name(node.id, self.current_type.name)
         self.current_function = self.register_function(cil_method_name)
 
-        self.register_param(VariableInfo("self", self.current_type))
+        self.register_param(VariableInfo('self', self.current_type))
         for p_name, p_type in node.params:
             self.register_param(VariableInfo(p_name, p_type))
 
@@ -479,51 +377,28 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         if node.val is not None:
             expr = self.visit(node.val, scope)
-            self.register_instruction(
-                CIL_AST.SetAttr("self", node.id, expr, self.current_type.name)
-            )
+            self.register_instruction(CIL_AST.SetAttr('self', node.id, expr, self.current_type.name))
             return
 
-        if node.type in ["Int", "Bool"]:
+        if node.type in ['Int', 'Bool']:
             instance = self.define_internal_local(scope=scope, name="instance")
-            self.register_instruction(
-                CIL_AST.Allocate(
-                    node.type, self.context.get_type(node.type).tag, instance
-                )
-            )
+            self.register_instruction(CIL_AST.Allocate(node.type, self.context.get_type(node.type).tag, instance))
             value = self.define_internal_local(scope=scope, name="value")
             self.register_instruction(CIL_AST.LoadInt(0, value))
             result_init = self.define_internal_local(scope=scope, name="result_init")
             self.register_instruction(
-                CIL_AST.Call(
-                    result_init,
-                    f"{node.type}_init",
-                    [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
-                    node.type,
-                )
-            )
-        elif node.type == "String":
+                CIL_AST.Call(result_init, f'{node.type}_init', [CIL_AST.Arg(value), CIL_AST.Arg(instance)], node.type))
+        elif node.type == 'String':
             instance = self.define_internal_local(scope=scope, name="instance")
-            self.register_instruction(
-                CIL_AST.Allocate(
-                    node.type, self.context.get_type(node.type).tag, instance
-                )
-            )
+            self.register_instruction(CIL_AST.Allocate(node.type, self.context.get_type(node.type).tag, instance))
             value = self.define_internal_local(scope=scope, name="value")
-            self.register_instruction(CIL_AST.LoadStr("empty_str", value))
+            self.register_instruction(CIL_AST.LoadStr('empty_str', value))
             result_init = self.define_internal_local(scope=scope, name="result_init")
             self.register_instruction(
-                CIL_AST.Call(
-                    result_init,
-                    f"{node.type}_init",
-                    [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
-                    node.type,
-                )
-            )
+                CIL_AST.Call(result_init, f'{node.type}_init', [CIL_AST.Arg(value), CIL_AST.Arg(instance)], node.type))
 
-        self.register_instruction(
-            CIL_AST.SetAttr("self", node.id, instance, self.current_type.name)
-        )
+        self.register_instruction(CIL_AST.SetAttr('self', node.id, instance, self.current_type.name))
+
 
     @visitor.when(COOL_AST.AssignNode)
     def visit(self, node: COOL_AST.AssignNode, scope):
@@ -534,12 +409,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if self.is_defined_param(node.id):
             self.register_instruction(CIL_AST.Assign(node.id, expr_local))
         elif self.current_type.has_attr(node.id):
-            cil_type_name = "self"
-            self.register_instruction(
-                CIL_AST.SetAttr(
-                    cil_type_name, node.id, expr_local, self.current_type.name
-                )
-            )
+            cil_type_name = 'self'
+            self.register_instruction(CIL_AST.SetAttr(cil_type_name, node.id, expr_local, self.current_type.name))
         else:
             self.register_instruction(CIL_AST.Assign(cil_node_name, expr_local))
         return expr_local
@@ -605,38 +476,16 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         call_args.append(CIL_AST.Arg(expr_value))
 
         if node.ancestor_type is None:
-            o_type = (
-                self.current_type
-                if node.obj.computed_type.name == "SELF_TYPE"
-                else node.obj.computed_type
-            )
+            o_type = self.current_type if node.obj.computed_type.name == 'SELF_TYPE' else node.obj.computed_type
             dynamic_type = o_type.name
-            self.register_instruction(
-                CIL_AST.VCall(
-                    result_local, node.id, call_args, dynamic_type, expr_value
-                )
-            )
+            self.register_instruction(CIL_AST.VCall(result_local, node.id, call_args, dynamic_type, expr_value))
         else:
-            static_instance = self.define_internal_local(
-                scope=scope, name="static_instance"
-            )
+            static_instance = self.define_internal_local(scope=scope, name='static_instance')
             self.register_instruction(
-                CIL_AST.Allocate(
-                    node.ancestor_type,
-                    self.context.get_type(node.ancestor_type).tag,
-                    static_instance,
-                )
-            )
+                CIL_AST.Allocate(node.ancestor_type, self.context.get_type(node.ancestor_type).tag, static_instance))
 
             self.register_instruction(
-                CIL_AST.VCall(
-                    result_local,
-                    node.id,
-                    call_args,
-                    node.ancestor_type,
-                    static_instance,
-                )
-            )
+                CIL_AST.VCall(result_local, node.id, call_args, node.ancestor_type, static_instance))
 
         return result_local
 
@@ -648,54 +497,28 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
                 var_expr_value = self.visit(var_expr, let_scope)
             else:
                 instance = None
-                if var_type in ["Int", "Bool"]:
-                    instance = self.define_internal_local(
-                        scope=let_scope, name="instance"
-                    )
+                if var_type in ['Int', 'Bool']:
+                    instance = self.define_internal_local(scope=let_scope, name="instance")
                     self.register_instruction(
-                        CIL_AST.Allocate(
-                            var_type, self.context.get_type(var_type).tag, instance
-                        )
-                    )
+                        CIL_AST.Allocate(var_type, self.context.get_type(var_type).tag, instance))
                     value = self.define_internal_local(scope=let_scope, name="value")
                     self.register_instruction(CIL_AST.LoadInt(0, value))
-                    result_init = self.define_internal_local(
-                        scope=let_scope, name="result_init"
-                    )
+                    result_init = self.define_internal_local(scope=let_scope, name="result_init")
                     self.register_instruction(
-                        CIL_AST.Call(
-                            result_init,
-                            f"{var_type}_init",
-                            [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
-                            var_type,
-                        )
-                    )
-                elif var_type == "String":
-                    instance = self.define_internal_local(
-                        scope=let_scope, name="instance"
-                    )
+                        CIL_AST.Call(result_init, f'{var_type}_init', [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
+                                     var_type))
+                elif var_type == 'String':
+                    instance = self.define_internal_local(scope=let_scope, name="instance")
                     self.register_instruction(
-                        CIL_AST.Allocate(
-                            var_type, self.context.get_type(var_type).tag, instance
-                        )
-                    )
+                        CIL_AST.Allocate(var_type, self.context.get_type(var_type).tag, instance))
                     value = self.define_internal_local(scope=let_scope, name="value")
-                    self.register_instruction(CIL_AST.LoadStr("empty_str", value))
-                    result_init = self.define_internal_local(
-                        scope=let_scope, name="result_init"
-                    )
+                    self.register_instruction(CIL_AST.LoadStr('empty_str', value))
+                    result_init = self.define_internal_local(scope=let_scope, name="result_init")
                     self.register_instruction(
-                        CIL_AST.Call(
-                            result_init,
-                            f"{var_type}_init",
-                            [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
-                            var_type,
-                        )
-                    )
+                        CIL_AST.Call(result_init, f'{var_type}_init', [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
+                                     var_type))
                 var_expr_value = instance
-            let_var = self.define_internal_local(
-                scope=let_scope, name=var_name, cool_var_name=var_name
-            )
+            let_var = self.define_internal_local(scope=let_scope, name=var_name, cool_var_name=var_name)
             self.register_instruction(CIL_AST.Assign(let_var, var_expr_value))
 
         body_value = self.visit(node.body, let_scope)
@@ -727,14 +550,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             label = self.get_label()
 
             action_type = self.context.get_type(action.type)
-            self.register_instruction(
-                CIL_AST.Action(case_expr, action_type.tag, action_type.max_tag, label)
-            )
+            self.register_instruction(CIL_AST.Action(case_expr, action_type.tag, action_type.max_tag, label))
 
             action_scope = scope.create_child()
-            action_id = self.define_internal_local(
-                scope=action_scope, name=action.id, cool_var_name=action.id
-            )
+            action_id = self.define_internal_local(scope=action_scope, name=action.id, cool_var_name=action.id)
             self.register_instruction(CIL_AST.Assign(action_id, case_expr))
             expr_result = self.visit(action.action, action_scope)
 
@@ -742,7 +561,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(CIL_AST.Goto(exit_label))
 
         self.register_instruction(CIL_AST.Label(label))
-        self.register_instruction(CIL_AST.Goto("case_no_match_error"))
+        self.register_instruction(CIL_AST.Goto('case_no_match_error'))
         self.register_instruction(CIL_AST.Label(exit_label))
         return result_local
 
@@ -752,33 +571,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         result_init = self.define_internal_local(scope=scope, name="init")
 
         if node.lex == "SELF_TYPE":
+            self.register_instruction(CIL_AST.Allocate(self.current_type.name, self.current_type.tag, result_local))
             self.register_instruction(
-                CIL_AST.Allocate(
-                    self.current_type.name, self.current_type.tag, result_local
-                )
-            )
-            self.register_instruction(
-                CIL_AST.Call(
-                    result_init,
-                    f"{self.current_type.name}_init",
-                    [result_local],
-                    self.current_type.name,
-                )
-            )
+                CIL_AST.Call(result_init, f'{self.current_type.name}_init', [result_local], self.current_type.name))
         else:
+            self.register_instruction(CIL_AST.Allocate(node.lex, self.context.get_type(node.lex).tag, result_local))
             self.register_instruction(
-                CIL_AST.Allocate(
-                    node.lex, self.context.get_type(node.lex).tag, result_local
-                )
-            )
-            self.register_instruction(
-                CIL_AST.Call(
-                    result_init,
-                    f"{node.lex}_init",
-                    [CIL_AST.Arg(result_local)],
-                    self.current_type.name,
-                )
-            )
+                CIL_AST.Call(result_init, f'{node.lex}_init', [CIL_AST.Arg(result_local)], self.current_type.name))
 
         return result_local
 
@@ -788,18 +587,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         result_local = self.define_internal_local(scope=scope, name="isvoid_result")
         self.register_instruction(CIL_AST.IsVoid(result_local, expre_value))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("Bool", self.context.get_type("Bool").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('Bool', self.context.get_type('Bool').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Bool_init",
-                [CIL_AST.Arg(result_local), CIL_AST.Arg(instance)],
-                "Bool",
-            )
-        )
+            CIL_AST.Call(result_init, 'Bool_init', [CIL_AST.Arg(result_local), CIL_AST.Arg(instance)], "Bool"))
         return instance
 
     @visitor.when(COOL_AST.ArithBinaryNode)
@@ -812,54 +603,26 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         left_value = self.visit(node.left, scope)
         right_value = self.visit(node.right, scope)
 
-        l_type = (
-            self.current_type
-            if node.left.computed_type.name == "SELF_TYPE"
-            else node.left.computed_type
-        )
-        r_type = (
-            self.current_type
-            if node.right.computed_type.name == "SELF_TYPE"
-            else node.right.computed_type
-        )
+        l_type = self.current_type if node.left.computed_type.name == 'SELF_TYPE' else node.left.computed_type
+        r_type = self.current_type if node.right.computed_type.name == 'SELF_TYPE' else node.right.computed_type
 
-        self.register_instruction(
-            CIL_AST.GetAttr(left_local, left_value, "value", l_type.name)
-        )
-        self.register_instruction(
-            CIL_AST.GetAttr(right_local, right_value, "value", r_type.name)
-        )
+        self.register_instruction(CIL_AST.GetAttr(left_local, left_value, "value", l_type.name))
+        self.register_instruction(CIL_AST.GetAttr(right_local, right_value, "value", r_type.name))
 
         if isinstance(node, COOL_AST.PlusNode):
-            self.register_instruction(
-                CIL_AST.BinaryOperator(op_local, left_local, right_local, "+")
-            )
+            self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "+"))
         elif isinstance(node, COOL_AST.MinusNode):
-            self.register_instruction(
-                CIL_AST.BinaryOperator(op_local, left_local, right_local, "-")
-            )
+            self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "-"))
         elif isinstance(node, COOL_AST.StarNode):
-            self.register_instruction(
-                CIL_AST.BinaryOperator(op_local, left_local, right_local, "*")
-            )
+            self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "*"))
         elif isinstance(node, COOL_AST.DivNode):
-            self.register_instruction(
-                CIL_AST.BinaryOperator(op_local, left_local, right_local, "/")
-            )
+            self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "/"))
 
         # Allocate Int result
-        self.register_instruction(
-            CIL_AST.Allocate("Int", self.context.get_type("Int").tag, result_local)
-        )
+        self.register_instruction(CIL_AST.Allocate('Int', self.context.get_type('Int').tag, result_local))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Int_init",
-                [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)],
-                "Int",
-            )
-        )
+            CIL_AST.Call(result_init, 'Int_init', [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)], "Int"))
         return result_local
 
     @visitor.when(COOL_AST.IntCompNode)
@@ -870,29 +633,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         expr_value = self.visit(node.expr, scope)
 
-        e_type = (
-            self.current_type
-            if node.expr.computed_type.name == "SELF_TYPE"
-            else node.expr.computed_type
-        )
-        self.register_instruction(
-            CIL_AST.GetAttr(expr_local, expr_value, "value", e_type.name)
-        )
+        e_type = self.current_type if node.expr.computed_type.name == 'SELF_TYPE' else node.expr.computed_type
+        self.register_instruction(CIL_AST.GetAttr(expr_local, expr_value, "value", e_type.name))
         self.register_instruction(CIL_AST.UnaryOperator(op_local, expr_local, "~"))
 
         # Allocate Int result
-        self.register_instruction(
-            CIL_AST.Allocate("Int", self.context.get_type("Int").tag, result_local)
-        )
+        self.register_instruction(CIL_AST.Allocate('Int', self.context.get_type('Int').tag, result_local))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Int_init",
-                [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)],
-                "Int",
-            )
-        )
+            CIL_AST.Call(result_init, 'Int_init', [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)], "Int"))
 
         return result_local
 
@@ -904,29 +653,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
         expr_value = self.visit(node.expr, scope)
 
-        e_type = (
-            self.current_type
-            if node.expr.computed_type.name == "SELF_TYPE"
-            else node.expr.computed_type
-        )
-        self.register_instruction(
-            CIL_AST.GetAttr(expr_local, expr_value, "value", e_type.name)
-        )
+        e_type = self.current_type if node.expr.computed_type.name == 'SELF_TYPE' else node.expr.computed_type
+        self.register_instruction(CIL_AST.GetAttr(expr_local, expr_value, "value", e_type.name))
         self.register_instruction(CIL_AST.UnaryOperator(op_local, expr_local, "not"))
 
         # Allocate Bool result
-        self.register_instruction(
-            CIL_AST.Allocate("Bool", self.context.get_type("Bool").tag, result_local)
-        )
+        self.register_instruction(CIL_AST.Allocate('Bool', self.context.get_type('Bool').tag, result_local))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Bool_init",
-                [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)],
-                "Bool",
-            )
-        )
+            CIL_AST.Call(result_init, 'Bool_init', [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)], "Bool"))
 
         return result_local
 
@@ -940,75 +675,38 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         left_value = self.visit(node.left, scope)
         right_value = self.visit(node.right, scope)
 
-        l_type = (
-            self.current_type
-            if node.left.computed_type.name == "SELF_TYPE"
-            else node.left.computed_type
-        )
-        r_type = (
-            self.current_type
-            if node.right.computed_type.name == "SELF_TYPE"
-            else node.right.computed_type
-        )
+        l_type = self.current_type if node.left.computed_type.name == 'SELF_TYPE' else node.left.computed_type
+        r_type = self.current_type if node.right.computed_type.name == 'SELF_TYPE' else node.right.computed_type
 
-        if isinstance(node, COOL_AST.LessNode) or isinstance(
-            node, COOL_AST.LessEqualNode
-        ):
-            self.register_instruction(
-                CIL_AST.GetAttr(left_local, left_value, "value", l_type.name)
-            )
-            self.register_instruction(
-                CIL_AST.GetAttr(right_local, right_value, "value", r_type.name)
-            )
+        if isinstance(node, COOL_AST.LessNode) or isinstance(node, COOL_AST.LessEqualNode):
+            self.register_instruction(CIL_AST.GetAttr(left_local, left_value, "value", l_type.name))
+            self.register_instruction(CIL_AST.GetAttr(right_local, right_value, "value", r_type.name))
 
         if isinstance(node, COOL_AST.LessNode):
-            self.register_instruction(
-                CIL_AST.BinaryOperator(op_local, left_local, right_local, "<")
-            )
+            self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "<"))
         elif isinstance(node, COOL_AST.LessEqualNode):
-            self.register_instruction(
-                CIL_AST.BinaryOperator(op_local, left_local, right_local, "<=")
-            )
+            self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "<="))
         elif isinstance(node, COOL_AST.EqualNode):
-            if l_type.name == "String":
+            if l_type.name == 'String':
                 self.register_instruction(
-                    CIL_AST.Call(
-                        op_local,
-                        "String_equals",
-                        [CIL_AST.Arg(right_value), CIL_AST.Arg(left_value)],
-                        "String",
-                    )
-                )
-            elif l_type.name in ["Int", "Bool"]:
+                    CIL_AST.Call(op_local, 'String_equals', [CIL_AST.Arg(right_value), CIL_AST.Arg(left_value)],
+                                 'String'))
+            elif l_type.name in ['Int', 'Bool']:
                 self.register_instruction(
-                    CIL_AST.GetAttr(left_local, left_value, "value", l_type.name)
-                )
+                    CIL_AST.GetAttr(left_local, left_value, "value", l_type.name))
                 self.register_instruction(
-                    CIL_AST.GetAttr(right_local, right_value, "value", r_type.name)
-                )
-                self.register_instruction(
-                    CIL_AST.BinaryOperator(op_local, left_local, right_local, "=")
-                )
+                    CIL_AST.GetAttr(right_local, right_value, "value", r_type.name))
+                self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "="))
             else:
                 self.register_instruction(CIL_AST.Assign(left_local, left_value))
                 self.register_instruction(CIL_AST.Assign(right_local, right_value))
-                self.register_instruction(
-                    CIL_AST.BinaryOperator(op_local, left_local, right_local, "=")
-                )
+                self.register_instruction(CIL_AST.BinaryOperator(op_local, left_local, right_local, "="))
 
         # Allocate Bool result
-        self.register_instruction(
-            CIL_AST.Allocate("Bool", self.context.get_type("Bool").tag, result_local)
-        )
+        self.register_instruction(CIL_AST.Allocate('Bool', self.context.get_type('Bool').tag, result_local))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Bool_init",
-                [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)],
-                "Bool",
-            )
-        )
+            CIL_AST.Call(result_init, 'Bool_init', [CIL_AST.Arg(op_local), CIL_AST.Arg(result_local)], "Bool"))
         return result_local
 
     @visitor.when(COOL_AST.VariableNode)
@@ -1016,12 +714,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if self.is_defined_param(node.lex):
             return node.lex
         elif self.current_type.has_attr(node.lex):
-            result_local = self.define_internal_local(
-                scope=scope, name=node.lex, class_type=self.current_type.name
-            )
-            self.register_instruction(
-                CIL_AST.GetAttr(result_local, "self", node.lex, self.current_type.name)
-            )
+            result_local = self.define_internal_local(scope=scope, name=node.lex, class_type=self.current_type.name)
+            self.register_instruction(CIL_AST.GetAttr(result_local, 'self', node.lex, self.current_type.name))
             return result_local
         else:
             return scope.find_cil_local(node.lex)
@@ -1029,20 +723,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(COOL_AST.ConstantNumNode)
     def visit(self, node: COOL_AST.ConstantNumNode, scope):
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("Int", self.context.get_type("Int").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('Int', self.context.get_type('Int').tag, instance))
         value = self.define_internal_local(scope=scope, name="value")
         self.register_instruction(CIL_AST.LoadInt(node.lex, value))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Int_init",
-                [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
-                "Int",
-            )
-        )
+            CIL_AST.Call(result_init, 'Int_init', [CIL_AST.Arg(value), CIL_AST.Arg(instance)], "Int"))
         return instance
 
     @visitor.when(COOL_AST.StringNode)
@@ -1058,18 +744,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         result_local = self.define_internal_local(scope=scope)
         self.register_instruction(CIL_AST.LoadStr(str_name, result_local))
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("String", self.context.get_type("String").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('String', self.context.get_type('String').tag, instance))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "String_init",
-                [CIL_AST.Arg(result_local), CIL_AST.Arg(instance)],
-                "String",
-            )
-        )
+            CIL_AST.Call(result_init, 'String_init', [CIL_AST.Arg(result_local), CIL_AST.Arg(instance)], "String"))
         return instance
 
     @visitor.when(COOL_AST.BoolNode)
@@ -1078,18 +756,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         if str(node.lex) == "True":
             boolean = 1
         instance = self.define_internal_local(scope=scope, name="instance")
-        self.register_instruction(
-            CIL_AST.Allocate("Bool", self.context.get_type("Bool").tag, instance)
-        )
+        self.register_instruction(CIL_AST.Allocate('Bool', self.context.get_type('Bool').tag, instance))
         value = self.define_internal_local(scope=scope, name="value")
         self.register_instruction(CIL_AST.LoadInt(boolean, value))
         result_init = self.define_internal_local(scope=scope, name="result_init")
         self.register_instruction(
-            CIL_AST.Call(
-                result_init,
-                "Bool_init",
-                [CIL_AST.Arg(value), CIL_AST.Arg(instance)],
-                "Bool",
-            )
-        )
+            CIL_AST.Call(result_init, 'Bool_init', [CIL_AST.Arg(value), CIL_AST.Arg(instance)], "Bool"))
         return instance

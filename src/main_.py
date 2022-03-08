@@ -15,12 +15,9 @@ from match_cool_class import CoolMatch
 if not len(sys.argv) > 1:
     exit(1)
 
-lexer = Lexer(CoolMatch(), to_ast.TOKEN_TYPE)
-astsum = {
-    k: v
-    for k, v in chain.from_iterable([to_ast.__dict__.items(), ast.__dict__.items()])
-}
-parser = Parser(astsum, to_ast.TOKEN_TYPE)
+lexer= Lexer(CoolMatch(),to_ast.TOKEN_TYPE)
+astsum =  { k:v  for k,v in chain.from_iterable([to_ast.__dict__.items(), ast.__dict__.items()])}
+parser=Parser(astsum,to_ast.TOKEN_TYPE)
 
 input_file = sys.argv[1]
 with open(input_file, encoding="utf-8") as file:
@@ -52,5 +49,5 @@ cil_ast = cool_to_cil.visit(cool_ast)
 cil_to_mips = CILToMIPSVisitor()
 mips_code = cil_to_mips.visit(cil_ast)
 
-with open(f"{sys.argv[1][:-3]}.mips", "w") as f:
-    f.write(f"{mips_code}")
+with open(f'{sys.argv[1][:-3]}.mips', 'w') as f:
+    f.write(f'{mips_code}')

@@ -2,9 +2,8 @@ import utils.visitor as visitor
 from ast_cool_hierarchy import *
 from utils.semantic import SemanticError, BasicTypes
 
-TYPE_ERROR = "(%s, %s) - TypeError: %s"
-SEMANTIC_ERROR = "(%s, %s) - SemanticError: %s"
-
+TYPE_ERROR = '(%s, %s) - TypeError: %s'
+SEMANTIC_ERROR = '(%s, %s) - SemanticError: %s'
 
 class TypeBuilder:
     def __init__(self, context, errors=None):
@@ -49,26 +48,15 @@ class TypeBuilder:
                     BasicTypes.STRING.value,
                     BasicTypes.INT.value,
                 ]:
-                    self.errors.append(
-                        SEMANTIC_ERROR
-                        % (
-                            node.line_no,
-                            node.col_no,
-                            'No class can inherit from "Bool", "String" or "Int"',
-                        )
-                    )
+                    self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no,
+                                                     'No class can inherit from "Bool", "String" or "Int"'))
 
                 current = parent_type
                 while True:
                     if current.name == node.id:
-                        self.errors.append(
-                            SEMANTIC_ERROR
-                            % (
-                                node.line_no,
-                                node.col_no,
-                                f'Cyclic inheritance between classes "{node.id}" and "{node.parent}".',
-                            )
-                        )
+                        self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no,
+                                                         f'Cyclic inheritance between classes "{node.id}" and "{node.parent}".'
+                                                         ))
                         parent_type = self.context.get_type(BasicTypes.OBJECT.value)
                         break
                     if current.name == BasicTypes.OBJECT.value:
