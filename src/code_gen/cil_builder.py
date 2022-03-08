@@ -481,7 +481,7 @@ class CILBuilder:
 
         if self.is_attribute(node.id):
             self.register_instruction(
-                SetAttribNode("self", node.id, return_var, self.current_type.name)
+                SetAttribNode("self", self.to_attr_name(self.current_type.name, node.id), return_var, self.current_type.name)
             )
         else:
             self.register_instruction(AssignNode(node.id, return_var))
@@ -566,7 +566,7 @@ class CILBuilder:
 
         # Body
         self.register_instruction(LabelNode(body_label))
-        self.visit(node.body)
+        self.visit(node.body, self.define_internal_local())
 
         # GOTO while label
         self.register_instruction(GotoNode(while_label))
@@ -584,7 +584,7 @@ class CILBuilder:
     @visitor.when(cool.LetNode)
     def visit(self, node, return_var):
         for var_dec in node.identifiers:
-            self.visit(var_dec.expr)
+            self.visit(var_dec)
 
         self.visit(node.body, return_var)
 
@@ -596,7 +596,7 @@ class CILBuilder:
 
         # Add Assignment Node
         if node.expr:
-            self.visit(node.expr, local.id)
+            self.visit(node.expr, local.name)
         else:
             self.register_instruction(DefaultValueNode(local, node.type))
 

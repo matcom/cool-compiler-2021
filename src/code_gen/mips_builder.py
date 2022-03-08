@@ -91,7 +91,9 @@ IO = "IO"
 
 class MemoryManager:
     def __init__(self):
-        self.all_reg = [t0,t1,t2,t3,t4,t5,t6,t7,t8,t9]
+        #self.all_reg = [t0,t1,t2,t3,t4,t5,t6,t7,t8,t9]
+        self.all_reg = [t0,t1,t2,t3,t4,t5,t9]
+        
         self.used_reg = []
         self.stored = []
         
@@ -205,17 +207,16 @@ class MIPSBuilder:
         self.text.append(self.current_procedure)
             
     def generate_copy(self):
-        #copies from t1 to t0 a0 bytes
+        #copies from t1 to t6 a0 bytes
         self.memo.save()
-        self.memo.get_unused_reg()
         self.current_procedure = mips.ProcedureNode(COPY)
 
         self.register_instruction(mips.Label, "copy_loop")
         self.register_instruction(mips.BranchOnEqualNode, zero, a0, "copy_end")
-        self.register_instruction(mips.LoadByteNode, t7, 0, t1)
-        self.register_instruction(mips.StoreByteNode, t7, 0, t0)
-        self.register_instruction(mips.AddiNode, t0, t0, 1)
-        self.register_instruction(mips.AddiNode, t1, t1, 1)
+        self.register_instruction(mips.LoadByteNode, t8, 0, t7)
+        self.register_instruction(mips.StoreByteNode, t8, 0, t6)
+        self.register_instruction(mips.AddiNode, t6, t6, 1)
+        self.register_instruction(mips.AddiNode, t7, t7, 1)
         self.register_instruction(mips.AddiNode, a0, a0, -1)
         self.register_instruction(mips.Jump, "copy_loop")
 
@@ -269,19 +270,6 @@ class MIPSBuilder:
         self.register_data(mips.DataTypeNode,'.word',node.name,values)
         self.register_data(mips.DataTypeNode, '.asciiz',f'{node.name}_cname', [f'"{node.name}"'])
         
-        
-        #Filling type type info
-        #self.register_instruction(mips.CommentNode(f"Filling {node.name} VT"))
-        #self.register_instruction(mips.LoadAddress,t0,node.name)
-        #self.register_instruction(mips.LoadAddress,t1,f'{node.name}_cname')
-        
-        #self.register_instruction(mips.StoreWordNode,t1,TYPENAME_OFFSET,t0) 
-        
-        #Filling type VT
-        #for i,func in enumerate(node.methods):
-        #    offset = FUNCTION_OFFSET*i
-        #    self.register_instruction(mips.LoadAddress,t1,func.name)
-        #    self.register_instruction(mips.StoreWordNode,t1,offset,t0)
             
     @visitor.when(cil.DataNode)
     def visit(self, node):
@@ -356,21 +344,6 @@ class MIPSBuilder:
         self.text.append(self.current_procedure)
         self.locals = locals_save
         self.params = params_save    
-        
-  
-    #@visitor.when(cil.LoadNode)
-    #def visit(self,node):
-    #    self.memo.save()
-    #    reg = self.memo.used_reg()
-    #    
-    #    if isinstance(node.msg,int):
-    #        self.register_instruction(mips.LoadInmediate,reg,node.msg)
-    #    else:
-    #        self.register_instruction(mips.LoadAddress,reg,node.msg)
-    #    
-    #    offset = self.get_offset(node.dest)
-    #    self.register_instruction(mips.StoreWordNode,reg,offset,fp)
-    #    self.memo.clean()
     
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
@@ -525,28 +498,6 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
         self.register_instruction(mips.AddiNode,sp,sp,self.pushed_args * -4)
         self.pushed_args = 0
-        
-        #getting method offset
-        #_methods = self.types[node.type].methods
-        #_function = None
-        #
-        #for (meth,func) in _methods:
-        #    if node.method == meth:
-        #        _function = func
-        #
-        #_functions =  [func for (meth,func) in (_methods)]
-        #meth_offset = _functions.index(_function)
-        #
-        #self.register_instruction(mips.LoadAddress,reg1,node.type)
-        #reg2 = self.memo.get_unused_reg()
-        #self.register_instruction(mips.LoadWordNode,reg2,meth_offset*4,reg1)
-        #
-        #self.register_instruction(mips.JumpAndLink,reg2)
-        #
-        ##putting the return vslue in destination
-        #dest_offset = self.get_offset(node.dest)
-        #self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
-        
         self.memo.clean()
         
         
@@ -679,7 +630,7 @@ class MIPSBuilder:
         self.register_instruction(mips.MultNode,reg1,reg2)
         
         dest_offset = self.get_offset(node.dest)
-        self.register_instruction(mips.MoveFromHi,reg1)
+        self.register_instruction(mips.MoveFromLo,reg1)
         self.register_instruction(mips.StoreWordNode,reg1,dest_offset,fp)
         
         self.memo.clean()
@@ -722,12 +673,12 @@ class MIPSBuilder:
 
         self.register_instruction(mips.CommentNode,"Saving reference to read string")
         reg1 = self.memo.get_unused_reg()
-        if reg1 != t1:
-            if t1 in self.memo.used_reg:
-                self.register_instruction(mips.MoveNode,reg1,t1)
-            else:
-                self.memo.clean()
-        self.register_instruction(mips.MoveNode, t1, a0)
+        #if reg1 != t1:
+        #    if t1 in self.memo.used_reg:
+        #        self.register_instruction(mips.MoveNode,reg1,t1)
+        #    else:
+        #        self.memo.clean()
+        self.register_instruction(mips.MoveNode, t7, a0)
 
         self.register_instruction(mips.CommentNode,"Calculating str length")
         self.register_instruction(mips.JumpAndLink, LENGTH)
@@ -736,23 +687,21 @@ class MIPSBuilder:
         self.register_instruction(mips.CommentNode,"Allocating char array for new string")
         self.register_instruction(mips.LoadInmediate, v0, SYSCALL_SBRK)
         self.register_instruction(mips.SyscallNode)
-        if t0 in self.memo.used_reg:
-            reg2 = self.memo.get_unused_reg()
-            self.register_instruction(mips.MoveNode,reg2,t0)
-        self.register_instruction(mips.MoveNode, t0, v0)
+
+        self.register_instruction(mips.MoveNode, t6, v0)
         
         reg3 = self.memo.get_unused_reg()
         self.register_instruction(mips.MoveNode, reg3, v0)#saving pointer to char array
 
         reg4 = self.memo.get_unused_reg()
-        self.register_instruction(mips.AddNode, a0, a0, -1)
+        #self.register_instruction(mips.AddNode, a0, a0, -1)
         self.register_instruction(mips.MoveNode, reg4, a0)#saving length
 
         self.register_instruction(mips.CommentNode,"Copying bytes from one char array to another")
         self.register_instruction(mips.JumpAndLink, COPY)
 
         self.register_instruction(mips.CommentNode,"Null-terminating the string")
-        self.register_instruction(mips.StoreByteNode, zero, 0, t0)
+        self.register_instruction(mips.StoreByteNode, zero, 0, t6)
 
         self.register_instruction(mips.CommentNode,"Allocating new String instance")
         _size = STRING_SIZE
