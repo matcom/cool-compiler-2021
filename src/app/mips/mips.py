@@ -1,5 +1,3 @@
-from itertools import chain
-
 ATTR_SIZE = 4
 RESGISTER_SIZE = 4
 REGISTER_NAMES = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9']
