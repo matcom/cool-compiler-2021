@@ -123,18 +123,6 @@ class SetAttribNode(InstructionNode):
         self.type = typex
 
 
-class ArrayNode(InstructionNode):
-    pass
-
-
-class GetIndexNode(InstructionNode):
-    pass
-
-
-class SetIndexNode(InstructionNode):
-    pass
-
-
 class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):
         self.type = itype
@@ -205,22 +193,12 @@ class ConcatNode(InstructionNode):
         self.right = right
 
 
-class PrefixNode(InstructionNode):
-    pass
-
-
 class SubstringNode(InstructionNode):
     def __init__(self, dest, source, idx, length):
         self.dest = dest
         self.source = source
         self.id = idx
         self.length = length
-
-
-class ToStrNode(InstructionNode):
-    def __init__(self, dest, ivalue):
-        self.dest = dest
-        self.ivalue = ivalue
 
 
 class ReadNode(InstructionNode):
@@ -403,9 +381,9 @@ class PrintVisitor(object):
     def visit(self, node):
         return f"{node.dest} = TYPE_NAME {node.source}"
 
-    @visitor.when(ToStrNode)
-    def visit(self, node):
-        return f"{node.dest} = STR {node.ivalue}"
+    # @visitor.when(ToStrNode)
+    # def visit(self, node):
+    #     return f"{node.dest} = STR {node.ivalue}"
 
     @visitor.when(ReadNode)
     def visit(self, node):

@@ -11,7 +11,6 @@ from cmp.cil import (
     ParamNode,
     LocalNode,
     AssignNode,
-    ArithmeticNode,
     AllocateNode,
     TypeOfNode,
     LabelNode,
@@ -24,9 +23,7 @@ from cmp.cil import (
     LoadNode,
     LengthNode,
     ConcatNode,
-    PrefixNode,
     SubstringNode,
-    ToStrNode,
     ReadNode,
     PrintStrNode,
     PrintIntNode,
@@ -599,14 +596,47 @@ class CILBuilder:
 
     @visitor.when(cool.CaseNode)
     def visit(self, node, return_var=None):
-        pass  # TODO: Pending!!!
+        def least_type(type_set):
+            solve = self.context.get_type(type_set[0])
+            for item in type_set[1:]:
+                typex = self.context.get_type(item)
+                solve = find_least_type(solve, typex)
 
-        # expr_value = self.define_internal_local()
-        # self.visit(node.expr, expr_value)
-        # solve = self.define_internal_local()
-        # for case_item in node.case_items:
-        #     item_expr_value = self.define_internal_local()
-        #     self.visit(case_item.)
+            while solve is not None:
+                if type_b.conforms_to(solve):
+                    return solve
+                solve = solve.parent
+
+            return None
+            return solve.name if not solve else "Object"
+
+        expr_value = self.define_internal_local()
+        self.visit(node.expr, expr_value)
+
+        types = [case_item.type for case_item in node.case_items]
+        types.append(node.expr.static_type.name)
+
+        _least_type = least_type(types)
+        print("-----------Least TYpE:", _least_type)
+        asserted_item = None
+        for case_item in node.case_items:
+            if case_item.type == _least_type:
+                asserted_item = case_item
+                break
+
+        if not asserted_item:
+            self.register_instruction(
+                StaticCallNode(
+                    self.to_function_name("abort", "Object"),
+                    return_var,
+                )
+            )
+            return
+
+        self.localvars.append(LocalNode(asserted_item.id))
+        self.register_instruction(AssignNode(asserted_item.id, expr_value))
+
+        self.visit(asserted_item.expr, return_var)
 
     @visitor.when(cool.CaseItemNode)
     def visit(self, node, return_var=None):
