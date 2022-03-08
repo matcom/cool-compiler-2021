@@ -104,7 +104,9 @@ class NotNode(UnaryNode):
 
 
 class IntComplementNode(UnaryNode):
-    pass
+    def __init__(self, dest, source):
+        self.source = source
+        self.dest = dest
 
 
 class GetAttribNode(InstructionNode):
@@ -243,6 +245,11 @@ class IsVoidNode(InstructionNode):
     def __init__(self, dest, value):
         self.dest = dest
         self.value = value
+        
+class ExitNode(InstructionNode):
+    def __init__(self):
+        pass
+        
 
 
 class PrintVisitor(object):
@@ -421,6 +428,8 @@ class PrintVisitor(object):
     def visit(self, node):
         return f"{node.dest} = ISVOID {node.value}"
 
-
+    @visitor.when(ExitNode)
+    def visit(self, node):
+        return f"EXIT"
 # printer = PrintVisitor()
 # return lambda ast: printer.visit(ast)
