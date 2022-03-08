@@ -1,6 +1,10 @@
 from .mips import *
 import app.shared.visitor as visitor
 from app.mips.utils import auxiliar_functions
+from app.mips.memory_operations import memory_operations
+from app.mips.boolean_operations import boolean_operations
+from app.mips.string_operations import string_operations
+from app.mips.IO_operations import IO_operations
 
 
 class PrintVisitor:
@@ -181,4 +185,4 @@ class PrintVisitor:
 
     
     def register_auxiliary(self):
-        return auxiliar_functions
+        return memory_operations + boolean_operations + string_operations + IO_operations
