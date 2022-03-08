@@ -11,19 +11,6 @@ global input_text
 tokens = lexer.tokens
 
 
-# precedence = (
-#     ('right', 'ASSIGN'),
-#     ('right', 'NOT'),
-#     ('nonassoc', 'LTEQ', 'LT', 'EQ'),
-#     ('left', 'PLUS', 'MINUS'),
-#     ('left', 'MULT', 'DIV'),
-#     ('right', 'ISVOID'),
-#     ('right', 'INT_COMP'),
-#     ('left', 'AT'),
-#     ('left', 'DOT'),
-# )
-
-
 def p_program(p):
     """
     program : class_list
