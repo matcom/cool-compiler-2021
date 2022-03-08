@@ -1,0 +1,12 @@
+# Removes end eol from string address:
+# Arguments
+# a0: string address
+remove_eol:
+    lb $t1,4($a0)    # Load character at index
+    addi $a0,$a0,1      # Increment index
+    bnez $t1,remove_eol     # Loop until the end of string is reached
+    beq $a1,$a0,remove_eol_skip    # Do not remove \n when string = maxlength
+    subu $a0,$a0,2     # If above not true, Backtrack index to '\n'
+    sb $0, 4($a0)    # Add the terminating character in its place
+remove_eol_skip:
+    jr $ra

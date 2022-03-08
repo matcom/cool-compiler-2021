@@ -385,3 +385,7 @@ class InitNode(InstructionNode):
     def __init__(self, dest: str, type_name: str):
         self.type_name = type_name
         self.dest = dest
+
+
+class AbortNode(InstructionNode):
+    pass

@@ -5,6 +5,9 @@ def load_templates() -> str:
         "substr.mips",
         "isvoid.mips",
         "less_than.mips",
+        "length.mips",
+        "concat.mips",
+        "remove_eol.mips",
         "less_equal.mips",
         "equal.mips",
     ]

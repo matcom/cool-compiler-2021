@@ -1,4 +1,5 @@
 from __future__ import annotations
+from audioop import add
 from typing import Dict
 
 from coolcmp.utils import cil, visitor
@@ -8,6 +9,10 @@ from coolcmp.utils.registers import (
     t0,
     t1,
     t2,
+
+    s0,
+    s1,
+    s2,
 
     a0,
     a1,
@@ -207,6 +212,26 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</printstring:{node.addr}>"),
         )
 
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node: cil.ReadIntNode):
+        address = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<readint:{node.dest}>"),
+            mips.LINode(v0, 5),
+            mips.SysCallNode(),
+            mips.MoveNode(t2, v0)
+        )
+
+        self.visit(cil.AllocateNode('Int', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t1, (address, fp)),
+            mips.SWNode(t2, 4, t1),
+            mips.LWNode(v0, (address, fp)),
+            mips.CommentNode(f"</readint:{node.dest}>")
+        )
+
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
         obj_address = self.get_address(node.obj)
@@ -307,7 +332,7 @@ class CILToMipsVisitor:
             mips.SWNode(t0, dest_address, fp),
             mips.CommentNode(f"</loadnode:{node.dest}-{node.msg}>"),
         )
-
+ 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
         dest = self.get_address(node.dest)
@@ -376,6 +401,79 @@ class CILToMipsVisitor:
             mips.SWNode(v0, 4, t1),
             mips.CommentNode(f"</substr:>{node.dest}[{node.index}:{node.length}]")
         )
+
+    @visitor.when(cil.LengthNode)
+    def visit(self, node: cil.LengthNode):
+        self.add_inst(mips.CommentNode(f"<length:{node.dest}=len({node.src})>"))
+
+        self.visit(cil.AllocateNode('Int', node.dest))
+
+        src_address = self.get_address(node.src)
+        dest_address = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.LWNode(a0, (src_address, fp)),
+            mips.LWNode(a0, (4, a0)),
+            mips.JALNode('length'),
+
+            mips.LWNode(t1, (dest_address, fp)),
+            mips.SWNode(v0, 4, t1),
+        )
+
+        self.add_inst(mips.CommentNode(f"</length:{node.dest}=len({node.src})>"))
+
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node: cil.ConcatNode):
+        self.add_inst(mips.CommentNode(f"<concat:{node.dest}={node.str1}+{node.str2}>"))
+
+        self.visit(cil.AllocateNode('String', node.dest))
+
+        str1_address = self.get_address(node.str1)
+        str2_address = self.get_address(node.str2)
+        dest_address = self.get_address(node.dest)
+
+        # Calc length of str1 and save it in t0
+        length_of_str1 = (
+            mips.LWNode(a0, (str1_address, fp)),
+            mips.LWNode(a0, (4, a0)),
+            mips.JALNode('length'),
+            mips.MoveNode(t0, v0)
+        )
+        # Calc length of str2 and save it in t1
+        length_of_str2 = (
+            mips.LWNode(a0, (str2_address, fp)),
+            mips.LWNode(a0, (4, a0)),
+            mips.JALNode('length'),
+            mips.MoveNode(t1, v0)
+        )
+
+        push_str1 = (
+            mips.LWNode(a0, (str1_address, fp)),
+            mips.LWNode(a0, (4, a0))
+        )
+        push_str2 = (
+            mips.LWNode(a1, (str2_address, fp)),
+            mips.LWNode(a1, (4, a1))
+        )
+        push_length = (
+            mips.ADDNode(a2, t0, t1),
+        )
+
+        self.add_inst(
+            *length_of_str1,
+            *length_of_str2,
+            *push_str1,
+            *push_str2,
+            *push_length,
+            mips.JALNode('concat'),
+        )
+
+        self.add_inst(
+            mips.LWNode(t1, (dest_address, fp)),
+            mips.SWNode(v0, 4, t1)
+        )
+
+        self.add_inst(mips.CommentNode(f"</concat:{node.dest}={node.str1}+{node.str2}>"))
 
     @visitor.when(cil.TypeNameNode)
     def visit(self, node: cil.TypeNameNode):
@@ -502,3 +600,47 @@ class CILToMipsVisitor:
             mips.SWNode(v0, 4, t0),
             mips.CommentNode(f"<equal: {node.dest} <- {node.left} = {node.right}>"),
         )
+
+    @visitor.when(cil.AbortNode)
+    def visit(self, node: cil.AbortNode):
+        self.add_inst(
+            mips.CommentNode("<abort>"),
+            mips.LINode(v0, 4) .with_comm("Print halted message"),
+            mips.LANode(a0, "s2"),
+            mips.SysCallNode(),
+
+            mips.LINode(v0, 10) .with_comm("Finish program execution"),
+            mips.SysCallNode(),
+            mips.CommentNode("</abort>")
+        )
+
+    @visitor.when(cil.ReadStringNode)
+    def visit(self, node: cil.ReadStringNode):
+        self.add_inst(mips.CommentNode(f"<readstring:{node.dest}>"))
+        
+        address = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.LINode(a0, 512), # TODO: Dynamic string length
+            mips.JALNode('malloc'),
+            mips.MoveNode(t2, v0)
+        )
+        self.add_inst(
+            mips.MoveNode(a0, t2),
+            mips.LINode(a1, 512),
+            mips.LINode(v0, 8),
+            mips.SysCallNode(),
+        )
+        self.visit(cil.StaticCallNode('String__init', node.dest))
+        self.add_inst(
+            mips.LWNode(t0, (address, fp)),
+            mips.SWNode(t2, 4, t0)
+        )
+
+        # Remove eol
+        self.add_inst(
+            mips.MoveNode(a0, t2),
+            mips.JALNode('remove_eol')
+        )
+
+        self.add_inst(mips.CommentNode(f"</readstring:{node.dest}>"))

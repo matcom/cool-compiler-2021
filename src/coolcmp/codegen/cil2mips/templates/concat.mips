@@ -1,0 +1,54 @@
+# Template for concat function:
+# Arguments
+# a0: Address of string 1
+# a1 Address of string 2
+# a2 size of string 1 + size of string 2
+concat:
+    addiu $sp $sp -24
+    sw $t0 0($sp)
+    sw $t1 4($sp)
+    sw $t2 8($sp)
+    sw $a0 12($sp)
+    sw $a1 16($sp)
+    sw $ra 20($sp)
+    move $t0 $a0
+    move $t1 $a1
+    addiu $a0 $a2 1
+    li $t2 4
+    div $a0 $t2
+    mfhi $a0
+    bne $a0 $zero concat_allign_size
+    addiu $a0 $a2 1
+    j concat_size_alligned
+concat_allign_size:
+    sub $t2 $t2 $a0
+    add $a0 $a2 $t2
+    addiu $a0 $a0 1
+concat_size_alligned:
+    jal malloc
+    move $t2 $v0
+    j concat_copy_first_loop
+concat_copy_first_loop:
+    lb $a0 0($t0)
+    beq $a0 $zero concat_copy_second_loop
+    sb $a0 0($t2)
+    addiu $t0 $t0 1
+    addiu $t2 $t2 1
+    j concat_copy_first_loop
+concat_copy_second_loop:
+    lb $a0 0($t1)
+    beq $a0 $zero concat_end
+    sb $a0 0($t2)
+    addiu $t1 $t1 1
+    addiu $t2 $t2 1
+    j concat_copy_second_loop
+concat_end:
+    sb $zero 0($t2)
+    lw $t0 0($sp)
+    lw $t1 4($sp)
+    lw $t2 8($sp)
+    lw $a0 12($sp)
+    lw $a1 16($sp)
+    lw $ra 20($sp)
+    addiu $sp $sp 24
+    jr $ra
