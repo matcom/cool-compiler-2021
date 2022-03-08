@@ -1,7 +1,19 @@
 import utils.visitor as visitor
-from ast_hierarchy import *
+from ast_cool_hierarchy import *
 from utils.semantic import SemanticError, Context, BasicTypes
-from utils.semantic import ObjType, IntType, StrType, SelfType, AutoType, BoolType, ErrorType, Type
+from utils.semantic import (
+    ObjType,
+    IntType,
+    StrType,
+    SelfType,
+    AutoType,
+    BoolType,
+    ErrorType,
+    Type,
+)
+
+TYPE_ERROR = "(%s, %s) - TypeError: %s"
+SEMANTIC_ERROR = "(%s, %s) - SemanticError: %s"
 
 
 class TypeCollector(object):
@@ -51,10 +63,10 @@ class TypeCollector(object):
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         try:
-            typex = self.context.create_type(node.id)
+            typex = self.context.create_type(node)
             typex.set_parent(self.context.types[BasicTypes.OBJECT.value])
         except SemanticError as error:
-            self.errors.append(f'(Line {node.lineno}) {error.text}')
+            self.errors.append(SEMANTIC_ERROR % (node.line_no, node.col_no, error.text))
             node.id = BasicTypes.ERROR.value
 
 
