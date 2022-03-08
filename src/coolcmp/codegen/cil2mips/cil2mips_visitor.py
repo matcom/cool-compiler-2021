@@ -370,6 +370,27 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</divide:{node.dest}<-{node.left}-{node.right}>"),
         )
 
+    @visitor.when(cil.NegationNode)
+    def visit(self, node: cil.NegationNode):
+        src_offset = self.get_address(node.src)
+        dest_offset = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<negate:{node.dest}<-~{node.src}>"),
+            mips.LWNode(t0, (src_offset, fp)),
+            mips.LWNode(t0, (4, t0)),
+            mips.XORINode(t1, t0, 1)
+        )
+
+        self.visit(cil.StaticCallNode('Bool__init', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t0, (dest_offset, fp)),
+            mips.SWNode(t1, 4, t0),
+            mips.CommentNode(f"</negate:{node.dest}<-~{node.src}>"),
+        )
+
+
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
         dest_address = self.cur_function.variable_address(node.dest)

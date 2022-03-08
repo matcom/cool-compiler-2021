@@ -312,6 +312,16 @@ class DIVNode(InstructionNode):
         return f"div    {self.rdest}, {self.r1}, {self.r2}"
 
 
+class XORINode(InstructionNode):
+    def __init__(self, dest: Register, r1: Register, value: int):
+        super().__init__()
+        self.dest = dest
+        self.r1 = r1
+        self.value = value
+    
+    def __str__(self):
+        return f"xori    {self.dest}, {self.r1}, {self.value}"
+
 
 class JRNode(InstructionNode):
     """
