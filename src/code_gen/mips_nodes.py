@@ -198,9 +198,18 @@ class BranchOnLessOrEqNode(ConditionalBranch):
     def __str__(self):
         return f"ble {self.c1}, {self.c2}, {self.jump}"
 
+class BranchOnNotEqZero(InstructionNode):
+    def __init__(self,reg,label):
+        self.reg = reg
+        self.label = label
+        
+    def __str__(self):
+        return f'bnez {self.reg}, {self.label}'
+        
+
 
 class ComparisonNode(InstructionNode):
-    def __init__(self, m1, m2, dest):
+    def __init__(self, dest,m1, m2 ):
         self.m1 = m1
         self.m2 = m2
         self.destination = dest
@@ -208,14 +217,17 @@ class ComparisonNode(InstructionNode):
 
 class SetOnLessThan(ComparisonNode):
     def __str__(self):
-        return f"slt {self.dest}, {self.m1}, {self.m2}"
+        return f"slt {self.destination}, {self.m1}, {self.m2}"
 
 
-class SetOnLessThanInmediate(ComparisonNode):
+class SetOnLessOrEq(ComparisonNode):
     def __str__(self):
-        return f"slt {self.dest}, {self.m1}, {self.m2}"
+        return f"sle {self.destination}, {self.m1}, {self.m2}"
 
-
+class SetEq(ComparisonNode):
+    def __str__(self):
+        return f"seq {self.destination}, {self.m1}, {self.m2}"
+    
 class UnconditionalJumpNode(InstructionNode):
     def __init__(self, jump):
         self.jump = jump
