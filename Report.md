@@ -216,16 +216,12 @@ se informaría que se encuentra en la línea en la que se empezó a definir la e
 
 ## Lexer y Parser (Generado)
 
-Para resolver el problema de Parsing del Lenguaje Cool desarrollamos dos alternativas: 
+Para resolver el problema de Parsing del Lenguaje Cool también otra alternativa, además de la de usar **PLY**: hacer un generador de parser y lexer, con un motor de expresiones regulares para este último.
 
-- Hacer un generador de parser y lexer, con un motor de expresiones regulares para este último.
-
-- Generar el parser y lexer haciendo uso de PLY.
-
-Si se desea emplear la primera, en el archivo `coolc.sh` se requiere que el archivo sea `main_.py` 
+Si se desea emplear la primera alternativa, en el archivo `coolc.sh` se requiere que el archivo a emplear sea `main_generated.py` 
 y para la segunda `main.py`.
 
-Para la primera alternativa, desarrollamos un parser LR(1) cuya implementación se encuentra ubicada 
+Desarrollamos un parser LR(1) cuya implementación se encuentra ubicada 
 en la carpeta `parsers.py`, junto a la del parser SHIFT-REDUCE. Para la construcción de autómata se 
 emplea la clase Automaton ubicada en el archivo `automaton_class.py`.  Para la construcción de los 
 Símbolos, Producciones, No Terminales, Terminales, Item LR(1), se emplean las clases implementadas en 
