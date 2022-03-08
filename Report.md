@@ -216,12 +216,11 @@ se informaría que se encuentra en la línea en la que se empezó a definir la e
 
 ## Lexer y Parser (Generado)
 
-Para resolver el problema de Parsing del Lenguaje Cool también otra alternativa, además de la de usar **PLY**: hacer un generador de parser y lexer, con un motor de expresiones regulares para este último.
+Para resolver el problema de Parsing del Lenguaje Cool, además de usar **PLY**, se implementa un generador de parser y lexer, con un motor de expresiones regulares para este último.
 
-Si se desea emplear la primera alternativa, en el archivo `coolc.sh` se requiere que el archivo a emplear sea `main_generated.py` 
-y para la segunda `main.py`.
+Si se desea emplear el lexer y parser con **PLY**, en el archivo `coolc.sh` se requiere que el archivo a emplear sea `main.py`, en cambio, si se desea emplear el generador implementado,el archivo a emplear es `main_generated.py`.
 
-Desarrollamos un parser LR(1) cuya implementación se encuentra ubicada 
+El parser generado es LR(1) cuya implementación se encuentra ubicada 
 en la carpeta `parsers.py`, junto a la del parser SHIFT-REDUCE. Para la construcción de autómata se 
 emplea la clase Automaton ubicada en el archivo `automaton_class.py`.  Para la construcción de los 
 Símbolos, Producciones, No Terminales, Terminales, Item LR(1), se emplean las clases implementadas en 
@@ -229,12 +228,12 @@ el archivo `grammar_classes.py`, y para la Gramática, el archivo `grammar_class
 y Lexer, definidas en los archivos `parser_base.py` y `lexer_base.py` son empleadas como estructuras 
 bases para el análisis sintáctico y léxico.
 
-Para generar las gramáticas de los lenguajes que estaremos necesitando, se requiere la entrada de un
+Para generar las gramáticas de los lenguajes, se requiere la entrada de un
 string que hace referencia al nombre con el que se desean crear los archivos de parser y lexer asociados
 a dicha gramática. Se sugiere que el nombre coincida con el de la gramática.  
 
-En el proyecto generamos una gramática que define el lenguaje de expresiones regulares que requerimos 
-para el motor de regex, que utilizamos para machear los tokens del lenguaje Cool, durante el análisis 
+En el proyecto se implementa una gramática que define el lenguaje de expresiones regulares, que se requiere 
+para el motor de regex, y poder machear los tokens del lenguaje Cool, durante el análisis 
 léxico. Dicha gramática fue creada con el nombre **regex** (`regex_grammar = Grammar("regex")`) y se 
 encuentra ubicada en el archivo `grammar_regex.py`. 
 
