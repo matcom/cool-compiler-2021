@@ -28,17 +28,18 @@ class DotTypesDataVisitor:
         self.types += [
             cil.TypeNode(
                 name='Object',
+                parent='_NoParent',
                 attrs=[],
                 methods={
                     'Object__init': 'Object__init',
                     'Object_abort': 'Object_abort',
                     'Object_type_name': 'Object_type_name',
                     'Object_copy': 'Object_copy',
-                    # 'Object__eq': 'Object__eq',
                 }
             ),
             cil.TypeNode(
                 name='IO',
+                parent='Object',
                 attrs=[],
                 methods={
                     'IO__init': 'IO__init',
@@ -53,6 +54,7 @@ class DotTypesDataVisitor:
             ),
             cil.TypeNode(
                 name='String',
+                parent='Object',
                 attrs=[
                     'String_value',
                 ],
@@ -68,6 +70,7 @@ class DotTypesDataVisitor:
             ),
             cil.TypeNode(
                 name='Bool',
+                parent='Object',
                 attrs=[
                     'Bool_value',
                 ],
@@ -76,12 +79,11 @@ class DotTypesDataVisitor:
                     'Bool_abort': 'Object_abort',
                     'Bool_type_name': 'Object_type_name',
                     'Bool_copy': 'Object_copy',
-                    # 'Bool__lt': 'Bool__lt',
-                    # 'Bool__lte': 'Bool__lte',
                 }
             ),
             cil.TypeNode(
                 name='Int',
+                parent='Object',
                 attrs=[
                     'Int_value',
                 ],
@@ -90,14 +92,11 @@ class DotTypesDataVisitor:
                     'Int_abort': 'Object_abort',
                     'Int_type_name': 'Object_type_name',
                     'Int_copy': 'Object_copy',
-                    # 'Int__plus': 'Int__plus',
-                    # 'Int__minus': 'Int__minus',
-                    # 'Int__star': 'Int__star',
-                    # 'Int__div': 'Int__div',
                 }
             ),
             cil.TypeNode(
                 name='Void',
+                parent='Object',
                 attrs=[],
                 methods={
                     'Void_init': 'Void__init',
@@ -120,6 +119,7 @@ class DotTypesDataVisitor:
         type_methods: dict[str, str] = {}
         type_node = cil.TypeNode(
             name=type_.name,
+            parent=type_.parent.name,
             attrs=type_attributes,
             methods=type_methods
         )

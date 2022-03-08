@@ -16,11 +16,13 @@ class Node:
 class Type:
     def __init__(self,
                  label: str,
+                 parent: str | None,
                  attrs: list[str],
                  methods: dict[cil.MethodAt, str],
                  total_methods: int,
                  index: int):
         self.label = label
+        self.parent = parent
         self.attrs = attrs
         self.methods = methods
         self.total_methods = total_methods
@@ -31,7 +33,7 @@ class Type:
 
     @property
     def name_offset(self) -> int:
-        return (self.total_methods + 1) * 4
+        return (self.total_methods + 2) * 4
 
     def length(self) -> int:
         return len(self.attrs)
@@ -392,7 +394,7 @@ class NEGNode(InstructionNode):
         self.src = src
 
     def __str__(self):
-        return f"neg {self.dest}, {self.src}"
+        return f"neg    {self.dest}, {self.src}"
 
 
 def push_register_instructions(reg_name: str) -> List[InstructionNode]:

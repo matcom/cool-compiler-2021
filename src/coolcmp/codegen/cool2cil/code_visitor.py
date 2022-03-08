@@ -539,24 +539,16 @@ class DotCodeVisitor:
     def visit(self, node: ast.LessEqualNode, scope: Scope):
         return self.build_binary_node(cil.LessEqualNode, node, scope)
 
+    @visitor.when(ast.EqualNode)
+    def visit(self, node: ast.EqualNode, scope: Scope):
+        return self.build_binary_node(cil.EqualNode, node, scope)
+
     def build_binary_node(self, new_node_cls, node: ast.BinaryNode, scope: Scope):
         left_dest = self.visit(node.left, scope)
         right_dest = self.visit(node.right, scope)
         oper_dest = self.add_local('oper_dest')
         self.add_inst(new_node_cls(oper_dest, left_dest, right_dest))
         return oper_dest
-
-    @visitor.when(ast.EqualNode)
-    def visit(self, node: ast.EqualNode, scope: Scope):
-        by_value = isinstance(
-            node.left,
-            (ast.StringNode, ast.BooleanNode, ast.IntegerNode, )
-        )
-        left_dest = self.visit(node.left, scope)
-        right_dest = self.visit(node.right, scope)
-        comp_res = self.add_local('comp_res')
-        self.add_inst(cil.EqualNode(comp_res, left_dest, right_dest))
-        return comp_res
 
     @visitor.when(ast.IsVoidNode)
     def visit(self, node: ast.IsVoidNode, scope: Scope):

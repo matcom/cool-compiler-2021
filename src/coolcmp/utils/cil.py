@@ -99,10 +99,12 @@ class AttributeAt:
 class TypeNode(Node):
     def __init__(self,
                  name: str,
+                 parent: str | None,
                  attrs: list[str],
                  methods: dict[MethodAt | str, str],
                  attr_expr_nodes: dict[str, ast.ExpressionNode] = None):
         self.name = name
+        self.parent = parent
         self.attributes = attrs
         self.methods = methods
         self.attr_expr_nodes = attr_expr_nodes or {}

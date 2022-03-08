@@ -5,11 +5,6 @@ from coolcmp.utils import mips, cil
 from coolcmp.codegen.cil2mips.templates import load_templates
 
 
-def generate_type_labels(types: List[mips.Type]):
-    type_label_lines = [f"\t.word \t\t {t.label}" for t in types]
-    return f"{mips.PROTOTYPES}:\n" + "\n".join(type_label_lines) + "\n"
-
-
 class MIPSFormatter:
     def __init__(self):
         pass
@@ -22,17 +17,13 @@ class MIPSFormatter:
     def visit(self, node: mips.ProgramNode):
         data = "# data\n.data\n" + "\n".join(self.visit(d) for d in node.data)
         void = 'void:\n\t.word Void'
-        type_defs = f"\n{mips.TYPES_LABELS}:\n" + "\n\n".join(
-            [self.visit(t) for t in node.types]
+        type_defs = (
+            "\n_NoParent:\t\t# label for Object parent reference\n\n" +
+            "\n\n".join(self.visit(t) for t in node.types)
         )
         functions = "\n# functions\n.text\n.globl main\n" + "\n".join(
             self.visit(f) for f in node.functions
         )
-        # inits_seg = ""
-        # for type_ in node.types:
-        #     inits_seg += (f"_{type_.label}_init:\n\t" +
-        #                   "\n\t".join(str(inst) for inst in type_.init) +
-        #                   "\n")
         template_code = load_templates()
 
         return "\n".join([data, void, type_defs, functions, template_code])     # , inits_seg
@@ -49,13 +40,14 @@ class MIPSFormatter:
         if lm.index != node.total_methods - 1:
             method_labels += f"\t.space\t{(node.total_methods - 1 - lm.index) * 4}\n"
 
-        # method_labels = "\n".join(f"\t.word\t{m}" for m in node.methods)
+        parent_name = f"\t.word\t{node.parent}"
         typename_label = f'\t.asciiz\t"{node.label}"'
 
         lines = [
             f"{node.label}:",
             f"\t.word\t{(node.length() + 1) * 4}",
             method_labels,
+            parent_name,
             typename_label,
         ]
         return "\n".join(lines).replace("\n\n", "\n")

@@ -77,6 +77,7 @@ class CILToMipsVisitor:
     def visit(self, node: cil.TypeNode):
         type_ = mips.Type(
             label=node.name,
+            parent=node.parent,
             attrs=list(node.attributes),
             methods=node.methods,
             total_methods=node.total_methods,
@@ -340,6 +341,8 @@ class CILToMipsVisitor:
 
         if isinstance(node.source, int):
             load_inst = mips.LINode(t0, node.source)
+        elif node.source == "void":
+            load_inst = mips.LANode(t0, "void")
         else:
             src = self.get_address(node.source)
             load_inst = mips.LWNode(t0, (src, fp))
