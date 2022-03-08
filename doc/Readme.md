@@ -264,7 +264,7 @@ se copia la sección prototype del objeto, y se instancian cada uno de sus atrib
 prototype posee la dirección de memoria correspondiente a la tabla de dispatch del objeto. Esta dirección es la que es
 usada para hacer los llamados a los métodos de la clase. 
 
-Cada vez que se intente llamar de un método de una clase lo primero que se hace es buscar la dirección de la tabla de 
+Cada vez que se intente llamar a un método de una clase lo primero que se hace es buscar la dirección de la tabla de 
 dispatch del objeto al cual se le está haciendo el llamado, y luego el índice del método que se está llamando, 
 para luego efectuar un jump and link (jal) a la dirección a la que apunta la tabla de dispatch sumando cuatro veces el 
 índice de dicho método. 
@@ -287,7 +287,9 @@ correspondiente al tipo especificado.
 
 En conclusión, si se hace ```(new B).foo1()``` se llama al método foo1 en B haciendo uso de la tabla de dispatch del 
 objeto B que se creó, sin embargo, si se hace ```(new B)@A.foo1()``` se llama al método foo1 en A haciendo uso de la 
-tabla de dispatch del prototype del objeto A.
+tabla de dispatch del prototype del objeto A. Mientras que si se hace ```object.foo1()``` en una función que reciba 
+un parámetro de tipo A, pero a la que se le está pasando un objeto de tipo B, se llamará al método correspondiente en B,
+utilizando la tabla de dispatch del objeto que se está pasando como parámetro.
 
 El índice del método en la tabla de dispatch es calculado en tiempo de compilación usando el índice del método
 en el array de métodos de cada tipo recolectado durante la traducción de Cil a Mips. Para que estos índices coincidan
