@@ -194,7 +194,7 @@ El fichero MIPSAst contiene la definición de las clases necesarias para represe
 El fichero CilToMipsVisitor visita cada nodo del AST de CIL y lo traduce a sus correspondientes
 instrucciones en codigo Mips. Gran dificultad trajo en esta fase el uso correcto de las tablas de dispatch
 y los atributos de clase en combinación con la herencia, haciendo necesaria una especificación sobre la
-representación en memoria que tendría cada objeto. Sobre esto útimo podemos explicar que se decidió representar
+**representación en memoria** que tendría cada objeto. Sobre esto útimo podemos explicar que se decidió representar
 los objetos como:
 - Marca de clase (4 bytes): Un entero usado para identificar cada tipo del programa.
 - Tamaño (4 bytes): Un entero empleado para representar el tamaño, en doble palabras, de la representación del objeto
@@ -217,6 +217,106 @@ objeto del tipo padre (polimorfismo).
 Finalmente, el fichero MipsAstFormatter es el encargado de transformar el AST de MIPS a formato string para
 luego escribir este en el archivo final.
 
+# Invocación de métodos virtuales
+Para mostrar como se resolvió la invocación de métodos virtuales usaremos un ejemplo. Supongamos que tenemos una clase A
+que posee las funciones foo1 y foo2, y una clase B que hereda de A que posee las funciones foo1 (Sobreescribiendo a foo1
+en A) y foo3. 
+
+El código MIPS a continuación corresponde a la plantilla que se genera para las clases A y B respectivamente cuando 
+el programa es compilado.
+ 
+```MIPS
+type_6_dispatch:
+	.word	 function_abort_at_Object
+	.word	 function_copy_at_Object
+	.word	 function_type_name_at_Object
+	.word	 function_foo1_at_A
+	.word	 function_foo2_at_A
+	.word	 __init_attr_at_A
+	.word	 __init_at_A
+
+type_6_prototype:
+	.word	5
+	.word	4
+	.word	type_6_dispatch
+	.word	-1
+
+
+type_7_dispatch:
+	.word	 function_abort_at_Object
+	.word	 function_copy_at_Object
+	.word	 function_type_name_at_Object
+	.word	 function_foo1_at_B
+	.word	 function_foo2_at_A
+	.word	 function_foo3_at_B
+	.word	 __init_attr_at_B
+	.word	 __init_at_B
+
+type_7_prototype:
+	.word	6
+	.word	4
+	.word	type_7_dispatch
+	.word	-1
+```
+
+Al instanciar un objeto se copia la plantilla correspondiente a la representacion en memoria de dicho objeto, es decir,
+se copia la sección prototype del objeto, y se instancian cada uno de sus atributos de forma recursiva. La sección 
+prototype posee la dirección de memoria correspondiente a la tabla de dispatch del objeto. Esta dirección es la que es
+usada para hacer los llamados a los métodos de la clase. 
+
+Cada vez que se intente llamar de un método de una clase lo primero que se hace es buscar la dirección de la tabla de 
+dispatch del objeto al cual se le está haciendo el llamado, y luego el índice del método que se está llamando, 
+para luego efectuar un jump and link (jal) a la dirección a la que apunta la tabla de dispatch sumando cuatro veces el 
+índice de dicho método. 
+
+Ahora, observemos que la tabla de dispatch de la clase B posee todos los métodos de la clase A en 
+el mismo orden que esta, es decir, el offset correspondiente al método foo1 es el mismo para la clase A y para la clase
+B. De esta forma si se utiliza un objeto de 
+tipo B como si fuera de tipo A, llamando a un método del mismo, digamos foo1, entonces el compilador solo tiene que 
+ocuparse de buscar el índice del método dentro de la clase A y la dirección de la tabla de dispatch del objeto que se 
+está usando (guardada en la sección de memoria correspondiente a dicho objeto), luego, como el índice del método en A 
+corresponde con el índice del método sobreescrito en B solo faltaría sumarle dicho offset a la tabla de dispatch para 
+obtener el método que debe usarse, en este caso ```function_foo1_at_B```. La clase ***DynamicCallNode*** de Cil es la 
+encargada de manejar la lógica de los llamados a métodos virtuales a objetos cuando se traduce de Cil a Mips.  
+
+La clase ***StaticCallNode*** de Cil es usada explícitamente para los llamados a un método de un tipo en específico 
+usando la sintaxis ```object@TYPE.method()``` definida en COOL. Esta clase, en vez de buscar la tabla de dispatch 
+correspondiente al objeto que se está llamando, busca la tabla de dispatch del objeto que se especifica luego del 
+caracter @, de esta forma, una vez calculado el offset de dicho método, este corresponderá precisamente al método 
+correspondiente al tipo especificado.
+
+En conclusión, si se hace ```(new B).foo1()``` se llama al método foo1 en B haciendo uso de la tabla de dispatch del 
+objeto B que se creó, sin embargo, si se hace ```(new B)@A.foo1()``` se llama al método foo1 en A haciendo uso de la 
+tabla de dispatch del prototype del objeto A.
+
+El índice del método en la tabla de dispatch es calculado en tiempo de compilación usando el índice del método
+en el array de métodos de cada tipo recolectado durante la traducción de Cil a Mips. Para que estos índices coincidan
+se colocaron, para cada tipo, primeramente los métodos correspondientes al padre, y luego los métodos correspondientes 
+específicamente al hijo, ordenados estos últimos de forma lexicográfica.
+
+# Boxing/Unboxing
+
+Para el proceso de boxing-unboxing se utilizó un mecanismo similar al de las funciones virtuales. Cuando se necesite 
+acceder a un atributo de un objeto, se toma la dirección en memoria del objeto y el índice de dicho atributo dentro del 
+objeto, utilizando el índice del nombre del atributo en el 
+array de attributos recolectado durante la traducción de Cil a Mips. Estos índices son los que se usan siempre que es 
+necesario obtener o cambiar un atributo a un objeto, y se definen de forma unívoca durante el ya mencionado proceso de 
+recolección. 
+
+Los atributos de cada objeto se encuentran colocados luego de la dirección de la tabla de dispatch del mismo (tres doble
+palabras luego de la dirección de memoria del objeto). Además, el índice de un atributo para una clase hijo coincide con
+la del mismo atributo para la clase padre, haciendo posible de esta forma el uso de los atributos durante el polimorfismo.
+
+Los objetos de tipo Int, Bool y String poseen un atributo llamado _value_ que es usado para guardar el valor del objeto,
+en los dos primeros casos, y la dirección de memoria donde se encuentra la cadena de caracteres real, en el tercer caso. 
+Este atributo es el usado para el trabajo con dichos objetos.
+
+Para las operaciones aritméticas y de comparación fue necesario tomar el valor real de los objetos que se operan haciéndole
+unboxing a los mismos, y luego operando dichos valores directamente. Haciéndole boxing a la respuesta para poder luego
+guardarla. Por ejemplo, si se desea comparar dos enteros, estos serán dos objetos en memoria que poseen luego de la tabla 
+dispatch un entero correspondiente al valor real de los mismos, el proceso de unboxing consiste en tomar dichos valores
+y compararlos, para luego instanciar un objeto de tipo Bool y colocarle luego de la tabla de dispatch (en el
+atributo value) el resultado.
 
 # Gramática <a name="grammar"></a> 
 
