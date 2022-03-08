@@ -12,8 +12,8 @@ from app.semantics.type_collector import TypeCollector
 from app.semantics.inference.soft_inferencer import SoftInferencer
 from app.semantics.inference.deep_inferrer import DeepInferrer
 from app.cil.cool_to_cil import COOLToCILVisitor
-from app.mips.cil_to_mips import CILToMIPSVisitor
-from app.mips.ast_printer import PrintVisitor
+from app.mips.cil_to_mips import CILToMIPSVisitor, MIPSCode
+# from app.mips.ast_printer import PrintVisitor
 
 
 def notify_failures(errors):
@@ -78,7 +78,7 @@ def app(input: Path, output: Path = None):
 
     cil_to_mips = CILToMIPSVisitor()
     mips_ast = cil_to_mips.visit(cil_ast)
-    printer = PrintVisitor()
+    printer = MIPSCode()
     mips_code = printer.visit(mips_ast)
 
     out_file = str(input).split(".")

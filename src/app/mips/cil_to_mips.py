@@ -1,10 +1,8 @@
-import itertools as itt
-
 import app.shared.visitor as visitor
 import app.cil.ast_cil as cil
 from app.mips import mips
-from random import choice
-from collections import defaultdict
+from app.mips.utils import *
+
 
 
 class CILToMIPSVisitor:
@@ -216,21 +214,182 @@ class CILToMIPSVisitor:
         return cil.SubstringNode.visit(node,self,mips)
 
 
-    def hello():
-# less:
-#     blt $a0 $a1 less_true
-#     li $v0 0
-#     j less_end
+class MIPSCode:
+    @visitor.on('node')
+    def visit(self, node):
+        pass
 
-# less_true:
-#     li $v0 1
+    @visitor.when(mips.Register)
+    def visit(self, node):
+        return f'${node.name}'
 
-# less_end:
-#     jr $ra
-        instructions = []
-        instructions.append(mips.BranchOnLessThanNode(mips.ARG_REGISTERS[0],mips.ARG_REGISTERS[1], "less_true_1"))
-        instructions.append(mips.LoadInmediateNode(mips.V0_REG,0))
-        instructions.append(mips.JumpNode("less_end_1"))
-        instructions.append(mips.LabelNode("less_true_1"))
-        instructions.append(mips.LoadInmediateNode(mips.V0_REG,1))
-        instructions.append(mips.LabelNode("less_end_1"))
+    @visitor.when(int)
+    def visit(self, node):
+        return str(node)
+
+    @visitor.when(str)
+    def visit(self, node):
+        return node
+
+    @visitor.when(mips.ProgramNode)
+    def visit(self, node):
+        data_section_header = "\t.data"
+        static_strings = '\n'.join([self.visit(string_const)
+                                    for string_const in node.data])
+
+        names_table = f"{mips.TYPENAMES_TABLE_LABEL}:\n" + \
+            "\n".join(
+                [f"\t.word\t{tp.string_name_label}" for tp in node.types])
+        shells_table = f"{mips.SHELLS_TABLE_LABEL}:\n" + \
+            "\n".join([f"\t.word\t{tp.label}_shell" for tp in node.types])
+
+        types = "\n\n".join([self.visit(tp) for tp in node.types])
+
+        code = "\n".join([self.visit(func) for func in node.functions])
+
+        auxiliar = self.register_auxiliary()
+        return f'{data_section_header}\n{static_strings}\n\n{names_table}\n\n{shells_table}\n\n{types}\n\t.text\n\t.globl main\n{code}\n{auxiliar}'
+
+    @visitor.when(mips.StringConst)
+    def visit(self, node):
+        return f'{node.label}: .asciiz "{node.string}"'
+
+    @visitor.when(mips.MIPSType)
+    def visit(self, node):
+        methods = "\n".join(
+            [f"\t.word\t {node.methods[k]}" for k in node.methods])
+        dispatch_table = f"{node.label}_dispatch:\n{methods}"
+        shell_begin = f"{node.label}_shell:\n\t.word\t{node.index}\n\t.word\t{node.size}\n\t.word\t{node.label}_dispatch"
+        shell_attr = "\n".join(
+            [f'\t.word\t{node._default_attributes.get(attr, "0")}' for attr in node.attributes])
+
+        shell = f"{shell_begin}\n{shell_attr}\n" if shell_attr != "" else f"{shell_begin}\n"
+
+        return f'{dispatch_table}\n\n{shell}'
+
+    @visitor.when(mips.SyscallNode)
+    def visit(self, node):
+        return 'syscall'
+
+    @visitor.when(mips.LabelRelativeLocation)
+    def visit(self, node):
+        return f'{node.label} + {node.offset}'
+
+    @visitor.when(mips.RegisterRelativeLocation)
+    def visit(self, node):
+        return f'{node.offset}({self.visit(node.register)})'
+
+    @visitor.when(mips.FunctionNode)
+    def visit(self, node):
+        
+        instr = [self.visit(instruction) for instruction in node.instructions]
+        # TODO la linea de abajo sobra, es necesaria mientras la traduccion del AST de CIL este incompleta
+        instr2 = [inst for inst in instr if type(inst) == str]
+        instructions = "\n\t".join(instr2)
+        return f'{node.label}:\n\t{instructions}'
+
+    @visitor.when(mips.AddInmediateNode)
+    def visit(self, node):
+        if f'addi {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.value)}' == 'addi $sp, $sp, 8':
+            a= 5
+        return f'addi {self.visit(node.dest)}, {self.visit(node.src)}, {self.visit(node.value)}'
+
+    @visitor.when(mips.StoreWordNode)
+    def visit(self, node):
+        return f'sw {self.visit(node.reg)}, {self.visit(node.addr)}'
+
+    @visitor.when(mips.LoadInmediateNode)
+    def visit(self, node):
+        return f'li {self.visit(node.reg)}, {self.visit(node.value)}'
+
+    @visitor.when(mips.JumpAndLinkNode)
+    def visit(self, node):
+        return f'jal {node.label}'
+
+    @visitor.when(mips.JumpRegister)
+    def visit(self, node):
+        return f'jr {self.visit(node.reg)}'
+
+    @visitor.when(mips.JumpRegisterAndLinkNode)
+    def visit(self, node):
+        return f'jalr {self.visit(node.reg)}'
+
+    @visitor.when(mips.LoadWordNode)
+    def visit(self, node):
+        return f'lw {self.visit(node.reg)}, {self.visit(node.addr)}'
+
+    @visitor.when(mips.LoadByteNode)
+    def visit(self, node):
+        return f'lb {self.visit(node.reg)}, {self.visit(node.addr)}'
+
+    @visitor.when(mips.LoadAddressNode)
+    def visit(self, node):
+        return f'la {self.visit(node.reg)}, {self.visit(node.label)}'
+
+    @visitor.when(mips.MoveNode)
+    def visit(self, node):
+        return f'move {self.visit(node.reg1)} {self.visit(node.reg2 )}'
+
+    @visitor.when(mips.ShiftLeftLogicalNode)
+    def visit(self, node):
+        return f"sll {self.visit(node.dest)} {self.visit(node.src)} {node.bits}"
+
+    @visitor.when(mips.AddInmediateUnsignedNode)
+    def visit(self, node):
+        return f"addiu {self.visit(node.dest)} {self.visit(node.src)} {self.visit(node.value)}"
+
+    @visitor.when(mips.AddUnsignedNode)
+    def visit(self, node):
+        return f"addu {self.visit(node.dest)} {self.visit(node.sum1)} {self.visit(node.sum2)}"
+
+    @visitor.when(mips.LabelNode)
+    def visit(self, node):
+        return f"{node.name}:"
+
+    @visitor.when(mips.BranchOnNotEqualNode)
+    def visit(self, node):
+        return f"bne {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
+    
+    @visitor.when(mips.BranchOnEqualNode)
+    def visit(self, node):
+        return f"beq {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
+
+    @visitor.when(mips.BranchOnLessEqualNode)
+    def visit(self, node):
+        return f"ble {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
+
+    @visitor.when(mips.BranchOnLessThanNode)
+    def visit(self, node):
+        return f"blt {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
+
+    @visitor.when(mips.JumpNode)
+    def visit(self, node):
+        return f"j {node.label}"
+
+    @visitor.when(mips.AddNode)
+    def visit(self, node):
+        return f"add {self.visit(node.reg1)} {self.visit(node.reg2)} {self.visit(node.reg3)}"
+
+    @visitor.when(mips.SubNode)
+    def visit(self, node):
+        return f"sub {self.visit(node.reg1)} {self.visit(node.reg2)} {self.visit(node.reg3)}"
+
+    @visitor.when(mips.MultiplyNode)
+    def visit(self, node):
+        return f"mul {self.visit(node.reg1)} {self.visit(node.reg2)} {self.visit(node.reg3)}"
+
+    @visitor.when(mips.DivideNode)
+    def visit(self, node):
+        return f"div {self.visit(node.reg1)} {self.visit(node.reg2)}"
+
+    @visitor.when(mips.ComplementNode)
+    def visit(self, node):
+        return f"not {self.visit(node.reg1)} {self.visit(node.reg2)}"
+
+    @visitor.when(mips.MoveFromLowNode)
+    def visit(self, node):
+        return f"mflo {self.visit(node.reg)}"
+
+    
+    def register_auxiliary(self):
+        return memory_operations + boolean_operations + string_operations + IO_operations    
