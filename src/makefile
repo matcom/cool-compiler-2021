@@ -10,7 +10,7 @@ clean:
 	
 	rm -rf CIL/__pycache__
 	rm -rf MIPS/__pycache__
-	rm -rf Tools/__pycache__
+	rm -rf Tools/ 
 	rm -rf Parser/__pycache__
 	rm -rf Semantic/__pycache__
 
@@ -19,7 +19,4 @@ clean:
 	rm -rf ../.pytest_cache
 	
 test:
-	pytest-3 ../tests -v --tb=short -m=${TAG} -p no:warnings
-
-test-2:
 	pytest ../tests -v --tb=short -m=${TAG} -p no:warnings
