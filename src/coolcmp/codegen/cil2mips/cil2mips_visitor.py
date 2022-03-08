@@ -22,7 +22,8 @@ from coolcmp.utils.registers import (
     v0,
     fp,
     sp,
-    ra
+    ra,
+    zero
 )
 
 
@@ -223,7 +224,7 @@ class CILToMipsVisitor:
             mips.MoveNode(t2, v0)
         )
 
-        self.visit(cil.AllocateNode('Int', node.dest))
+        self.visit(cil.StaticCallNode("Int__init", node.dest))
 
         self.add_inst(
             mips.LWNode(t1, (address, fp)),
@@ -406,7 +407,7 @@ class CILToMipsVisitor:
     def visit(self, node: cil.LengthNode):
         self.add_inst(mips.CommentNode(f"<length:{node.dest}=len({node.src})>"))
 
-        self.visit(cil.AllocateNode('Int', node.dest))
+        self.visit(cil.StaticCallNode("Int__init", node.dest))
 
         src_address = self.get_address(node.src)
         dest_address = self.get_address(node.dest)
@@ -426,7 +427,7 @@ class CILToMipsVisitor:
     def visit(self, node: cil.ConcatNode):
         self.add_inst(mips.CommentNode(f"<concat:{node.dest}={node.str1}+{node.str2}>"))
 
-        self.visit(cil.AllocateNode('String', node.dest))
+        self.visit(cil.StaticCallNode("String__init", node.dest))
 
         str1_address = self.get_address(node.str1)
         str2_address = self.get_address(node.str2)
@@ -644,3 +645,23 @@ class CILToMipsVisitor:
         )
 
         self.add_inst(mips.CommentNode(f"</readstring:{node.dest}>"))
+
+    @visitor.when(cil.ComplementNode)
+    def visit(self, node: cil.ComplementNode):
+        src = self.get_address(node.src)
+        dest = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"</complement:{node.dest}>"),
+        )
+
+        self.visit(cil.StaticCallNode('Int__init', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t0, (src, fp)),
+            mips.LWNode(t0, (4, t0)),
+            mips.NEGNode(t0, t0),
+            mips.LWNode(t1, (dest, fp)),
+            mips.SWNode(t0, 4, t1),
+            mips.CommentNode(f"</complement:{node.dest}>"),
+        )

@@ -385,6 +385,16 @@ class PrintStringNode(SysCallNode):
         super().__init__()
 
 
+class NEGNode(InstructionNode):
+    def __init__(self, dest: Register, src: Register):
+        super().__init__()
+        self.dest = dest
+        self.src = src
+
+    def __str__(self):
+        return f"neg {self.dest}, {self.src}"
+
+
 def push_register_instructions(reg_name: str) -> List[InstructionNode]:
     """
     addi $sp, $sp, -4
@@ -405,19 +415,3 @@ def pop_register_instructions(reg_name: str) -> List[InstructionNode]:
     addi = ADDINode(sp, sp, dw)
 
     return [lw, addi]
-
-
-# def create_object_instructions(r1: Register, r2: Register):
-#     return [
-#         SLLNode(r1, r1, 2),
-#         LANode(r2, TYPES_LABELS),
-#         ADDNode(r2, r2, r1),
-#         LWNode(r2, (0, r2)),
-#         LWNode(ARG[0], (4, r2)),
-#         SLLNode(ARG[0], ARG[0], 2),
-#         JALNode("malloc"),
-#         MoveNode(ARG[2], ARG[0]),
-#         MoveNode(ARG[0], r2),
-#         MoveNode(ARG[1], V0),
-#         JALNode("copy"),
-#     ]
