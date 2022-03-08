@@ -108,6 +108,7 @@ def main():
 
     out_file = input_file.split(".")[0]
     path_to_file =f"{out_file}.mips"
+    # path_to_file = "output.asm"
     with open(path_to_file, "w") as f:
         f.write(mips_code)
 
