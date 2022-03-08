@@ -665,12 +665,15 @@ class CCILToMIPSGenerator:
                 )
             )
         instructions.append(mips_ast.Not(node, value, value))
-        instructions.extend(self._set_new_bool(node))
+        instructions.append(
+            mips_ast.Addi(node, value, value, mips_ast.Constant(node, 1))
+        )
+        instructions.extend(self._set_new_int(node))
 
         return instructions
 
     @visitor.when(ccil_ast.NotOpNode)
-    def visit(self, node: ccil_ast.NegOpNode):
+    def visit(self, node: ccil_ast.NotOpNode):
         instructions = []
 
         value = mips_ast.RegisterNode(node, T7)
@@ -699,7 +702,7 @@ class CCILToMIPSGenerator:
         instructions.append(
             mips_ast.Xori(node, value, value, mips_ast.Constant(node, "1"))
         )
-        instructions.extend(self._set_new_int(node))
+        instructions.extend(self._set_new_bool(node))
 
         return instructions
 
