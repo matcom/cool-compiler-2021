@@ -324,6 +324,52 @@ class CILToMipsVisitor:
             mips.CommentNode(f"</minus:{node.dest}<-{node.left}-{node.right}>"),
         )
 
+    @visitor.when(cil.StarNode)
+    def visit(self, node: cil.StarNode):
+        left_offset = self.get_address(node.left)
+        right_offset = self.get_address(node.right)
+        dest_offset = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<star:{node.dest}<-{node.left}-{node.right}>"),
+            mips.LWNode(t0, (left_offset, fp)),  # load Int_value at offset 4
+            mips.LWNode(t0, (4, t0)),
+            mips.LWNode(t1, (right_offset, fp)),  # load Int_value at offset 4
+            mips.LWNode(t1, (4, t1)),
+            mips.MULTNode(t2, t0, t1),  # multiply the integer values
+        )
+
+        self.visit(cil.StaticCallNode('Int__init', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t1, (dest_offset, fp)),
+            mips.SWNode(t2, 4, t1),
+            mips.CommentNode(f"</star:{node.dest}<-{node.left}-{node.right}>"),
+        )
+    
+    @visitor.when(cil.DivNode)
+    def visit(self, node: cil.DivNode):
+        left_offset = self.get_address(node.left)
+        right_offset = self.get_address(node.right)
+        dest_offset = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<divide:{node.dest}<-{node.left}-{node.right}>"),
+            mips.LWNode(t0, (left_offset, fp)),  # load Int_value at offset 4
+            mips.LWNode(t0, (4, t0)),
+            mips.LWNode(t1, (right_offset, fp)),  # load Int_value at offset 4
+            mips.LWNode(t1, (4, t1)),
+            mips.DIVNode(t2, t0, t1),  # divide the integer values
+        )
+
+        self.visit(cil.StaticCallNode('Int__init', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t1, (dest_offset, fp)),
+            mips.SWNode(t2, 4, t1),
+            mips.CommentNode(f"</divide:{node.dest}<-{node.left}-{node.right}>"),
+        )
+
     @visitor.when(cil.LoadNode)
     def visit(self, node: cil.LoadNode):
         dest_address = self.cur_function.variable_address(node.dest)

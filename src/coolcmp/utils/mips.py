@@ -287,7 +287,30 @@ class SUBUNode(InstructionNode):
         self.r2 = r2
 
     def __str__(self):
-        return f"subu   {self.rdest}, {self.r1}, {self.r2}"
+        return f"subu    {self.rdest}, {self.r1}, {self.r2}"
+
+
+class MULTNode(InstructionNode):
+    def __init__(self, rdest: Register, r1: Register, r2: Register):
+        super().__init__()
+        self.rdest = rdest
+        self.r1 = r1
+        self.r2 = r2
+    
+    def __str__(self):
+        return f"mul    {self.rdest}, {self.r1}, {self.r2}"
+
+
+class DIVNode(InstructionNode):
+    def __init__(self, rdest: Register, r1: Register, r2: Register):
+        super().__init__()
+        self.rdest = rdest
+        self.r1 = r1
+        self.r2 = r2
+    
+    def __str__(self):
+        return f"div    {self.rdest}, {self.r1}, {self.r2}"
+
 
 
 class JRNode(InstructionNode):
