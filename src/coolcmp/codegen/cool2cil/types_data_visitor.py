@@ -22,7 +22,8 @@ class DotTypesDataVisitor:
     @visitor.when(ast.ProgramNode)
     def visit(self, node: ast.ProgramNode):
         self.root.set_data('""')
-        self.root.set_data('"halted\n"')
+        self.root.set_data('"Abort called from class "')
+        self.root.set_data('"\n"')
 
         # add Object, IO, String, Bool, Int and <void> to types
         self.types += [

@@ -217,6 +217,16 @@ class LANode(InstructionNode):
         return f"la     {self.reg}, {self.label}"
 
 
+class NOTNode(InstructionNode):
+    def __init__(self, dest: Register, src: Register):
+        super().__init__()
+        self.dest = dest
+        self.src = src
+    
+    def __str__(self):
+        return f"not    {self.dest}, {self.src}"
+
+
 class ADDNode(InstructionNode):
     """
     add | add $1, $2, $3 | $1 = $2 + $3

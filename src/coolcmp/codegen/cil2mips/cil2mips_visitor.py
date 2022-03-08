@@ -552,7 +552,7 @@ class CILToMipsVisitor:
         src_offset = self.get_address(node.src)
 
         self.add_inst(
-            mips.CommentNode(f"</typename:{node.dest}-{node.src}>"),
+            mips.CommentNode(f"<typename:{node.dest}-{node.src}>"),
         )
 
         self.visit(cil.StaticCallNode('String__init', node.dest))
@@ -674,12 +674,31 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.AbortNode)
     def visit(self, node: cil.AbortNode):
+        type_name_address = self.get_address('typename')
+
         self.add_inst(
             mips.CommentNode("<abort>"),
-            mips.LINode(v0, 4) .with_comm("Print halted message"),
+            # "Abort called from class "
+            mips.LINode(v0, 4),
             mips.LANode(a0, "s2"),
             mips.SysCallNode(),
+        )
 
+        self.visit(cil.TypeNameNode('typename', 'self'))
+
+        self.add_inst(
+            # Typename
+            mips.LWNode(a0, (type_name_address, fp)),
+            mips.LWNode(a0, (4, a0)),
+            mips.LINode(v0, 4),
+            mips.SysCallNode(),
+
+            # \n
+            mips.LINode(v0, 4),
+            mips.LANode(a0, 's3'),
+            mips.SysCallNode(),
+
+            # Abort
             mips.LINode(v0, 10) .with_comm("Finish program execution"),
             mips.SysCallNode(),
             mips.CommentNode("</abort>")
@@ -730,7 +749,7 @@ class CILToMipsVisitor:
         self.add_inst(
             mips.LWNode(t0, (src, fp)),
             mips.LWNode(t0, (4, t0)),
-            mips.NEGNode(t0, t0),
+            mips.NOTNode(t0, t0),
             mips.LWNode(t1, (dest, fp)),
             mips.SWNode(t0, 4, t1),
             mips.CommentNode(f"</complement:{node.dest}>"),

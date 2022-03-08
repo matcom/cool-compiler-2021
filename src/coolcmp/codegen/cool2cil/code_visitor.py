@@ -97,6 +97,7 @@ class DotCodeVisitor:
                 name='Object_abort',
                 params=[
                     cil.ParamNode('self'),
+                    cil.ParamNode('typename')
                 ],
                 local_vars=[],
                 instructions=[
