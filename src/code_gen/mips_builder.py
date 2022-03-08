@@ -123,6 +123,16 @@ class MIPSBuilder:
         self.memo = MemoryManager()
         self.pushed_args = 0
     
+    def print(self,x):
+        self.memo.save()
+        self.register_instruction(mips.CommentNode,"------------Printeooooo")
+        reg = self.memo.get_unused_reg()
+        self.register_instruction(mips.LoadInmediate,reg,x)
+        self.register_instruction(mips.MoveNode,a0,reg)
+        self.register_instruction(mips.LoadInmediate,v0,4)
+        self.register_instruction(mips.SyscallNode)
+        self.register_instruction(mips.CommentNode,"------------Fiiiin")
+        
     
     def get_offset(self,x):
         if x in self.locals:
@@ -496,6 +506,7 @@ class MIPSBuilder:
         
     @visitor.when(cil.DynamicCallNode)
     def visit(self,node):
+        #self.print(node.instance_type)
         self.memo.save()
         self.register_instruction(mips.CommentNode,"Executing Dynamic Call")
         
@@ -512,6 +523,8 @@ class MIPSBuilder:
         #putting the return vslue in destination
         dest_offset = self.get_offset(node.dest)
         self.register_instruction(mips.StoreWordNode,a1,dest_offset,fp)
+        self.register_instruction(mips.AddiNode,sp,sp,self.pushed_args * -4)
+        self.pushed_args = 0
         
         #getting method offset
         #_methods = self.types[node.type].methods

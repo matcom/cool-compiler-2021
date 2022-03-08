@@ -220,7 +220,7 @@ class Jump(UnconditionalJumpNode):
 
 class JumpRegister(UnconditionalJumpNode):
     def __str__(self):
-        return f"jr {self.jump}"
+        return f"jalr {self.jump}"
 
 
 class JumpAndLink(UnconditionalJumpNode):
