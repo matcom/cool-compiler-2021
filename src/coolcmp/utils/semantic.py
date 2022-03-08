@@ -236,8 +236,8 @@ class Scope:
     def __len__(self) -> int:
         return len(self.locals)
 
-    def create_child(self, tag_type: str = None) -> Scope:
-        child = Scope(tag_type, self)
+    def create_child(self, tag: str = None) -> Scope:
+        child = Scope(tag, self)
         self.children.append(child)
         return child
 

@@ -200,7 +200,7 @@ class JALRNode(InstructionNode):
         self.reg = reg
     
     def __str__(self):
-        return f"jalr    {self.reg}"
+        return f"jalr   {self.reg}"
 
 
 class LANode(InstructionNode):

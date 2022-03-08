@@ -133,15 +133,14 @@ class TypeChecker:
 
     @visitor.when(BlockNode)
     def visit(self, node: BlockNode, scope: Scope):
-        child_scope = scope.create_child()
         ret_type = ErrorType()
         for expr in node.expressions:
-            ret_type = self.visit(expr, child_scope)
+            ret_type = self.visit(expr, scope)
         return ret_type
 
     @visitor.when(LetNode)
     def visit(self, node: LetNode, scope: Scope):
-        child_scope = scope.create_child()
+        child_scope = scope.create_child(tag='_let_node')
         for declaration in node.declarations:
             self.visit(declaration, child_scope)
 
@@ -168,8 +167,7 @@ class TypeChecker:
 
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode, scope: Scope):
-        child_scope = scope.create_child()
-        self.visit(node.expr, child_scope)
+        self.visit(node.expr, scope)
 
         case_types = []
         reported_types = []
@@ -182,6 +180,7 @@ class TypeChecker:
             else:
                 case_types.append(type_)
 
+        child_scope = scope.create_child(tag='_case_branch')
         types = [
             self.visit(case, child_scope)
             for case in node.cases
@@ -225,8 +224,8 @@ class TypeChecker:
     @visitor.when(ConditionalNode)
     def visit(self, node: ConditionalNode, scope: Scope):
         if_type = self.visit(node.if_expr, scope)
-        then_type = self.visit(node.then_expr, scope.create_child())
-        else_type = self.visit(node.else_expr, scope.create_child())
+        then_type = self.visit(node.then_expr, scope)
+        else_type = self.visit(node.else_expr, scope)
 
         if if_type != self.context.get_type('Bool'):
             self.errors.append(err.INCOMPATIBLE_TYPES % (node.pos, if_type.name, 'Bool'))

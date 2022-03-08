@@ -265,6 +265,7 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
+        print(self.cur_function.name, [p for p in self.cur_function.params], [l for l in self.cur_function.local_vars])
         address = self.get_address(node.name)
 
         self.add_inst(

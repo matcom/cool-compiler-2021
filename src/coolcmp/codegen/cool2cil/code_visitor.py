@@ -340,9 +340,9 @@ class DotCodeVisitor:
 
     @visitor.when(ast.LetNode)
     def visit(self, node: ast.LetNode, scope: Scope):
-        scope = scope.children.pop(0)
+        let_scope = scope.children.pop(0)
         for let_declaration in node.declarations:
-            self.visit(let_declaration, scope)
+            self.visit(let_declaration, let_scope)
 
         return self.visit(node.expr, scope)
 
@@ -352,7 +352,6 @@ class DotCodeVisitor:
 
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode, scope: Scope):
-        scope = scope.children.pop(0)
         last_expr = None
         for expr in node.expressions:
             last_expr = self.visit(expr, scope)
@@ -361,16 +360,29 @@ class DotCodeVisitor:
 
     @visitor.when(ast.CaseBranchNode)
     def visit(self, node: ast.CaseBranchNode, scope: Scope):
-        pass
+        # self.add_inst(cil.AssignNode)
+        raise NotImplementedError()
 
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode, scope: Scope):
-        pass
+        raise NotImplementedError()
+        # self.visit(node.expr, scope)
+        #
+        # for case in node.cases:
+        #     self.add_inst(self.new_label(f'case_branch'))
+        #     self.visit(case, scope.children.pop(0))
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
         expr_dest = self.visit(node.expr, scope)
         self.add_inst(cil.AssignNode(node.id, expr_dest))
+        variable = scope.find_variable(node.id)
+        if variable.is_attr:
+            attr_name = f'{self.current_type}_{node.id}'
+            print(self.current_type, self.root.get_type(self.current_type).attributes)
+            attr_index = self.root.get_type(self.current_type).attributes.index(attr_name)
+            attr_at = cil.AttributeAt(attr_name, attr_index)
+            self.add_inst(cil.SetAttrNode('self', attr_at, expr_dest))
         return expr_dest
 
     @visitor.when(ast.ConditionalNode)
@@ -397,11 +409,11 @@ class DotCodeVisitor:
         cond_res = self.add_local('cond_res')
         if_dest = self.visit(node.if_expr, scope)
         self.add_inst(cil.GotoIfNode(if_dest, then_label.name))
-        else_dest = self.visit(node.else_expr, scope.children[1])
+        else_dest = self.visit(node.else_expr, scope)
         self.add_inst(cil.AssignNode(cond_res, else_dest))
         self.add_inst(cil.GotoNode(endif_label.name))
         self.add_inst(then_label)
-        then_dest = self.visit(node.then_expr, scope.children[0])
+        then_dest = self.visit(node.then_expr, scope)
         self.add_inst(cil.AssignNode(cond_res, then_dest))
         self.add_inst(endif_label)
         return cond_res
