@@ -5,8 +5,8 @@ from utils import compare_errors, first_error_only_line
 # tests_dir = __file__.rpartition('/')[0] + '/semantic/'
 # tests = [(file) for file in os.listdir(tests_dir) if file.endswith('self4.cl')]
 
-tests_dir = __file__.rpartition("/")[0] + "/parser/"
-tests = [(file) for file in os.listdir(tests_dir) if file.endswith("block3.cl")]
+tests_dir = __file__.rpartition("/")[0] + "/codegen/"
+tests = [(file) for file in os.listdir(tests_dir) if file.endswith("hello_world.cl")]
 
 
 @pytest.mark.semantic

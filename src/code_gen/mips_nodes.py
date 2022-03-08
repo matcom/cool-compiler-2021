@@ -100,6 +100,14 @@ class DataTypeNode(DataNode):
         return f"{self.name} : {self.datatype}{values}"
 
 
+class NotNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+        
+    def __str__(self):
+        return f"not {self.dest}, {self.source}"
+
 class ArithAnfLogicNode(InstructionNode):
     def __init__(self, destination, left, right):
         self.destination = destination

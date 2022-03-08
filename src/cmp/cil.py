@@ -104,7 +104,9 @@ class NotNode(UnaryNode):
 
 
 class IntComplementNode(UnaryNode):
-    pass
+    def __init__(self, dest, source):
+        self.source = source
+        self.dest = dest
 
 
 class GetAttribNode(InstructionNode):

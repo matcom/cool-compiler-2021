@@ -657,7 +657,21 @@ class MIPSBuilder:
         
         self.memo.clean()
         
-           
+    @visitor.when(cil.IntComplementNode)
+    def visit(self,node):
+        self.memory_manager.save()
+
+        source_offset = self.get_offset(node.source)
+        dest_offset = self.get_offset(node.dest)
+
+        reg1 = self.memo.get_unused_register()
+        reg2 = self.memo.get_unused_register()
+
+        self.register_instruction(mips.LoadWordNode,reg1,source_offset,fp)
+        self.register_instruction(mips.NotNode,reg2,reg1)
+        self.register_instruction(mips.AddiNode,reg2,reg2,1)
+        self.register_instruction(mips.StoreWordNode,reg2,dest_offset,fp)
+        self.memo.clean()
     
           
     #READSTRING      

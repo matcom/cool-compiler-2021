@@ -1,0 +1,721 @@
+.data
+
+Object : .word, Object_abort, Object_copy, Object_type_name
+Object_cname : .asciiz, "Object"
+IO : .word, Object_abort, Object_copy, Object_type_name, IO_out_string, IO_out_int, IO_in_string, IO_in_int
+IO_cname : .asciiz, "IO"
+String : .word, Object_abort, Object_copy, Object_type_name, String_length, String_concat, String_substr
+String_cname : .asciiz, "String"
+Int : .word, Object_abort, Object_copy, Object_type_name
+Int_cname : .asciiz, "Int"
+Bool : .word, Object_abort, Object_copy, Object_type_name
+Bool_cname : .asciiz, "Bool"
+Main : .word, Object_abort, Object_copy, Object_type_name, IO_out_string, IO_out_int, IO_in_string, IO_in_int, Main_main, Main_constructor
+Main_cname : .asciiz, "Main"
+void : .word, -1
+empty_string : .asciiz, ""
+input_str_buffer : .space, 1024
+abort_signal : .asciiz, "Program execution aborted"
+case_missmatch : .asciiz, "Execution of a case statement without a matching branch"
+case_on_void : .asciiz, "Case on void"
+dispatch_on_void : .asciiz, "Dispatch on void"
+division_by_zero : .asciiz, "Division by zero"
+substr_out_of_range : .asciiz, "Substring out of range"
+heap_overflow : .asciiz, "Heap overflow"
+
+.text
+.globl main
+
+length:
+    li $t1, 0
+    length_loop:
+    lb $t5, 0($a0)
+    beq $zero, $t5, length_end
+    add $t1, $t1, 1
+    add $a0, $a0, 1
+    j length_loop
+    length_end:
+    move $a0 $t1
+    j $ra
+copy:
+    copy_loop:
+    beq $zero, $a0, copy_end
+    lb $t7, 0($t1)
+    sb $t7, 0($t0)
+    addi $t0, $t0, 1
+    addi $t1, $t1, 1
+    addi $a0, $a0, -1
+    j copy_loop
+    copy_end:
+    j $ra
+Object_abort:
+    move $t6 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 0
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t6, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing RuntimeError
+    #Printing Abort Message
+    la $a0, abort_signal
+    li $v0, 4
+    syscall
+    #Aborting execution
+    li $v0, 10
+    syscall
+Object_copy:
+    move $t9 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t9, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+Object_type_name:
+    move $t9 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t9, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+IO_out_string:
+    move $t0 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 0
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t0, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #PrintStringNode
+    lw $a0, -4($fp)
+    lw $a0, 8($a0)
+    li $v0, 4
+    syscall
+    #Executing Return
+    lw $a1, -8($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, 0
+    #Return jump
+    jalr $ra
+IO_out_int:
+    move $t8 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 0
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t8, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #PrintIntNode
+    lw $a0, -4($fp)
+    li $v0, 1
+    syscall
+    #Executing Return
+    lw $a1, -8($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, 0
+    #Return jump
+    jalr $ra
+IO_in_string:
+    move $t3 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t3, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #ReadStrNode
+    #Reading String to buffer
+    la $a0, input_str_buffer
+    li $a1, 1024
+    li $v0, 8
+    syscall
+    #Saving reference to read string
+    move $t0 $t1
+    move $t1 $a0
+    #Calculating str length
+    jal length
+    #Allocating char array for new string
+    li $v0, 9
+    syscall
+    move $t9 $t0
+    move $t0 $v0
+    move $t8 $v0
+    add $a0, $a0, -1
+    move $t3 $a0
+    #Copying bytes from one char array to another
+    jal copy
+    #Null-terminating the string
+    sb $zero, 0($t0)
+    #Allocating new String instance
+    li $v0, 9
+    li $a0, 12
+    syscall
+    sw $v0, 0($fp)
+    la $t4, String
+    sw $t4, 0($v0)
+    #Storing length and reference to char array
+    sw $t3, 4($v0)
+    sw $t8, 8($v0)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+IO_in_int:
+    move $t8 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t8, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #ReadStrNode
+    #Reading String to buffer
+    la $a0, input_str_buffer
+    li $a1, 1024
+    li $v0, 8
+    syscall
+    #Saving reference to read string
+    move $t3 $t1
+    move $t1 $a0
+    #Calculating str length
+    jal length
+    #Allocating char array for new string
+    li $v0, 9
+    syscall
+    move $t0 $v0
+    move $t7 $v0
+    add $a0, $a0, -1
+    move $t9 $a0
+    #Copying bytes from one char array to another
+    jal copy
+    #Null-terminating the string
+    sb $zero, 0($t0)
+    #Allocating new String instance
+    li $v0, 9
+    li $a0, 12
+    syscall
+    sw $v0, 0($fp)
+    la $t6, String
+    sw $t6, 0($v0)
+    #Storing length and reference to char array
+    sw $t9, 4($v0)
+    sw $t7, 8($v0)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+String_length:
+    move $t7 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t7, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Length
+    lw $t4, -4($fp)
+    lw $t4, 4($t4)
+    sw $t4, 0($fp)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+String_concat:
+    move $t7 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t7, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+String_substr:
+    move $t0 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t0, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+Object_constructor:
+    move $t3 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t3, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Allocate
+    li $v0, 9
+    li $a0, 4
+    syscall
+    sw $v0, 0($fp)
+    la $t8, Object
+    sw $t8, 0($v0)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+IO_constructor:
+    move $t3 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t3, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Allocate
+    li $v0, 9
+    li $a0, 4
+    syscall
+    sw $v0, 0($fp)
+    la $t8, IO
+    sw $t8, 0($v0)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+Int_constructor:
+    move $t7 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t7, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Allocate
+    li $v0, 9
+    li $a0, 8
+    syscall
+    sw $v0, 0($fp)
+    la $t3, Int
+    sw $t3, 0($v0)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+Bool_constructor:
+    move $t0 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t0, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Allocate
+    li $v0, 9
+    li $a0, 8
+    syscall
+    sw $v0, 0($fp)
+    la $t3, Bool
+    sw $t3, 0($v0)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+String_constructor:
+    move $t6 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 4
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t6, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Allocate
+    li $v0, 9
+    li $a0, 12
+    syscall
+    sw $v0, 0($fp)
+    la $t8, String
+    sw $t8, 0($v0)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -4
+    #Return jump
+    jalr $ra
+main:
+    move $t6 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 8
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t6, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Static Call
+    jal Main_constructor
+    sw $a1, 0($fp)
+    addi $sp, $sp, 0
+    #Receiving Arg local_main_internal_0
+    lw $t6, 0($fp)
+    sw $t6, 0($sp)
+    addi $sp, $sp, 4
+    #Executing Static Call
+    jal Main_main
+    sw $a1, 4($fp)
+    addi $sp, $sp, -4
+    li $v0, 10
+    syscall
+Main_constructor:
+    move $t3 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 20
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t3, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing Allocate
+    li $v0, 9
+    li $a0, 12
+    syscall
+    sw $v0, 0($fp)
+    la $t9, Main
+    sw $t9, 0($v0)
+    #Executing DefaultValue
+    li $t3, 0
+    sw $t3, 4($fp)
+    #Executing SetAttr
+    lw $t7, 0($fp)
+    lw $t9, 4($fp)
+    sw $t9, 4($t7)
+    #Executing DefaultValue
+    li $t6, 0
+    sw $t6, 8($fp)
+    #Executing SetAttr
+    lw $t8, 0($fp)
+    lw $t3, 8($fp)
+    sw $t3, 8($t8)
+    #Executing Assign
+    li $t7, 1
+    sw $t7, 12($fp)
+    #Executing SetAttr
+    lw $t7, 0($fp)
+    lw $t8, 12($fp)
+    sw $t8, 4($t7)
+    #Executing Assign
+    li $t6, 2
+    sw $t6, 16($fp)
+    #Executing SetAttr
+    lw $t7, 0($fp)
+    lw $t0, 16($fp)
+    sw $t0, 8($t7)
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -20
+    #Return jump
+    jalr $ra
+Main_main:
+    move $t0 $fp
+    #New $fp
+    move $fp $sp
+    #Reserving space for locals
+    addi $sp, $sp, 48
+    #Pushing $ra
+    sw $ra, 0($sp)
+    addi $sp, $sp, 4
+    #Saving $fp
+    sw $t0, 0($sp)
+    addi $sp, $sp, 4
+    #Executing instructions
+    #Executing GetAttr
+    lw $t9, -4($fp)
+    lw $t0, 4($t9)
+    sw $t0, 4($fp)
+    #Executing GetAttr
+    lw $t3, -4($fp)
+    lw $t7, 8($t3)
+    sw $t7, 8($fp)
+    #Executing Plus Operation
+    lw $t6, 4($fp)
+    lw $t3, 8($fp)
+    add $t7, $t6, $t3
+    sw $t7, 0($fp)
+    #Executing GetAttr
+    lw $t9, -4($fp)
+    lw $t7, 4($t9)
+    sw $t7, 12($fp)
+    #Executing GetAttr
+    lw $t8, -4($fp)
+    lw $t6, 8($t8)
+    sw $t6, 16($fp)
+    #Executing Minus Operation
+    lw $t6, 12($fp)
+    lw $t9, 16($fp)
+    sub $t7, $t6, $t9
+    sw $t7, 0($fp)
+    #Executing GetAttr
+    lw $t8, -4($fp)
+    lw $t9, 4($t8)
+    sw $t9, 20($fp)
+    #Executing GetAttr
+    lw $t6, -4($fp)
+    lw $t0, 8($t6)
+    sw $t0, 24($fp)
+    #Executing Div Operation
+    lw $t7, 20($fp)
+    lw $t9, 24($fp)
+    div $t7, $t9
+    mflo $t7
+    sw $t7, 0($fp)
+    #Executing Assign
+    lw $t6, -4($fp)
+    sw $t6, 28($fp)
+    #Executing typeof
+    lw $t0, 28($fp)
+    lw $t0, 0($t0)
+    sw $t0, 32($fp)
+    #Executing GetAttr
+    lw $t3, -4($fp)
+    lw $t6, 8($t3)
+    sw $t6, 40($fp)
+    #Executing GetAttr
+    lw $t9, -4($fp)
+    lw $t3, 4($t9)
+    sw $t3, 44($fp)
+    #Executing Star Operation
+    lw $t9, 40($fp)
+    lw $t8, 44($fp)
+    mult $t9, $t8
+    mflo $t9
+    sw $t9, 36($fp)
+    #Receiving Arg local_Main_main_internal_7
+    lw $t8, 28($fp)
+    sw $t8, 0($sp)
+    addi $sp, $sp, 4
+    #Receiving Arg local_Main_main_internal_9
+    lw $t8, 36($fp)
+    sw $t8, 0($sp)
+    addi $sp, $sp, 4
+    #Executing Dynamic Call
+    lw $t3, 32($fp)
+    lw $t0, 16($t3)
+    jalr $t0
+    sw $a1, 0($fp)
+    addi $sp, $sp, -8
+    #Executing Return
+    lw $a1, 0($fp)
+    #Restoring saved $fp
+    addi $sp, $sp, -4
+    lw $fp, 0($sp)
+    #Restoring saved $ra
+    addi $sp, $sp, -4
+    lw $ra, 0($sp)
+    #Cleaning stack after call
+    addi $sp, $sp, -48
+    #Return jump
+    jalr $ra
