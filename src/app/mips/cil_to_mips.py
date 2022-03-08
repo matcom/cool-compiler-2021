@@ -63,7 +63,7 @@ class CILToMIPSVisitor:
         print(type(node))
 
     @visitor.when(cil.ProgramNode)
-    def visit(self, node):
+    def visit(self, node:cil.ProgramNode):
         self._data_section["default_str"] = mips.StringConst("default_str", "")
         for tp in node.dottypes:
             self.visit(tp)
@@ -97,8 +97,6 @@ class CILToMIPSVisitor:
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node:cil.FunctionNode):
-        if node.name == "init_attr_at_Cons":
-            a= 5
         label = "main" if node.name == "entry" else node.name
         params = [param.name for param in node.params]
         localvars = [local.name for local in node.localvars]
