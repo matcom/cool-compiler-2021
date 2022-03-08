@@ -392,7 +392,7 @@ class CILBuilder:
         self.register_instruction(ArgNode(instance))
         self.register_instruction(StaticCallNode(main_method_name, result))
 
-        #self.register_instruction(ReturnNode(0))
+        # self.register_instruction(ReturnNode(0))
         self.register_instruction(ExitNode())
 
         self.current_function = None
@@ -478,15 +478,18 @@ class CILBuilder:
 
         if self.is_attribute(node.id):
             self.register_instruction(
-                SetAttribNode("self", self.to_attr_name(self.current_type.name, node.id), return_var, self.current_type.name)
+                SetAttribNode(
+                    "self",
+                    self.to_attr_name(self.current_type.name, node.id),
+                    return_var,
+                    self.current_type.name,
+                )
             )
         else:
             self.register_instruction(AssignNode(node.id, return_var))
 
     @visitor.when(cool.CallNode)
     def visit(self, node, return_var):
-        # TODO: Pending test <expr>.id(<expr>,...,<expr>)
-        # TODO: Pending test <expr>@<type>.id(<expr>,...,<expr>)
         obj_type = self.current_type.name
         instance = self.define_internal_local()
         if node.obj:
@@ -733,7 +736,12 @@ class CILBuilder:
     def visit(self, node, return_var):
         value = self.define_internal_local()
         self.visit(node.expr, value)
-        self.register_instruction(NotNode(return_var, value))
+        constant = self.define_internal_local()
+        self.register_instruction(
+            StaticCallNode(self.to_function_name("constructor", "Bool"), constant)
+        )
+        self.register_instruction(AssignNode(constant, 1))
+        self.register_instruction(MinusNode(return_var, constant, value))
 
     @visitor.when(cool.NegNode)
     def visit(self, node, return_var):
