@@ -8,7 +8,7 @@
 
 ## Introducción
 
-El proyecto presenta un compilador capaz de interpretar el lenguaje COOL 
+El proyecto implementa un compilador capaz de interpretar el lenguaje COOL 
 "The Classroom Object-Oriented Language". La solución está desarrollada en python.
 
 
@@ -17,7 +17,7 @@ Para el desarrollo del lexer y el parser se utilizó la herramienta de parsing *
 Esta es una implementación en python de lex/yacc.
 
 ### Gramática
-La Grámatica usada es libre de contexto y de recursión extrema izquierda. Debido a la forma
+La gramática usada es libre de contexto y de recursión extrema izquierda. Debido a la forma
 en la que esta es definida, no presenta problemas de ambigüedad
 
 ```
@@ -126,22 +126,23 @@ type : TYPE_ID
         
 empty :
 ```
-Las expresiones del lenguaje pueden separarse en dos grupos: las que se conoce 
-bien donde empiezan y terminan, y las que no. En el primer grupo están todas las expresiones 
-que tienen un terminal específico para comenzarlas y otro para terminarlas, y esos 
-terminales siempre van a ser los mismos. Por ejemplo las condiciones
-empiezan con `IF` y termina con `FI`, los ciclos con `WHILE` y `POOL`. En el segundo
-grupo se encuentran las que empiezan o terminan con no terminales. 
+Las expresiones del lenguaje pueden separarse en dos grupos:
 
-En este segundo grupo precisamente es donde se presentan los problemas de precedencia 
-o conflictos y la gramática tiene que encontrar una forma de solucionarlos. La definición
-del lenguaje deja claro que las expresiones let, not y assign consumen todos los tokens
-que vienen detrás. Luego con un nivel de precedencia mayor están las expresiones de
-comparación, y luego las aritméticas. Para bajar al mínimo la precedencia de las 
-expresiones let, assign y not se utilizan los no terminales `open_expr_lvlx`. Una expresión
-intenta encontrar todas las comparaciones o ariteméticas antes del terminal que marca el 
-comienzo de la expresión let, assign o not. Luego todo el torrente de tokens que viene detrás
-sabe que pertenecen al cuerpo de estas expresiones (que es también una expresión).
+- Las que se conoce donde empiezan y terminan. Estas tienen un terminal específico 
+  para iniciarlas y otro para finalizarlas, y esos terminales siempre van a ser los mismos. 
+  Por ejemplo las condiciones empiezan con `IF` y termina con `FI`, los ciclos con `WHILE` y `POOL`. 
+
+- Las que no cumplen la condición anterior. Estas empiezan o terminan con no terminales. 
+  En este grupo se presentan problemas de precedencia o conflictos y la gramática tiene 
+  que encontrar una forma de solucionarlos. 
+  
+La definición del lenguaje deja claro que las expresiones **let**, **assign** y **not** 
+consumen todos los tokens que le siguen. Luego, con un nivel de precedencia mayor, están las expresiones 
+de comparación y después las aritméticas. Para disminuir al mínimo la precedencia de las expresiones let, assign y not se utilizan los no 
+terminales `open_expr_lvlx`. Una expresión intenta encontrar todas las comparaciones o expresiones 
+aritméticas antes del terminal que marca el comienzo de la expresión let, assign o not. Luego,
+toda la cadena de tokens que sigue se sabe que pertenece al cuerpo de estas expresiones 
+(que es también una expresión).
 
 Para garantizar la precedencia correcta en las expresiones de comparación y aritméticas se
 usa la distinción entre comparador, arith, término, factor y átomo. Donde un átomo se puede
@@ -177,7 +178,7 @@ def t_newline(t):
 
 ## Parser
 
-En la implementación del parser se utiliza `ast_hierarchy.py`.En este se definen los
+En la implementación del parser se utiliza `ast_hierarchy.py`. En este se definen los
 nodos del árbol que se construirá en el parser. Las reglas de gramática mostradas 
 anteriormente se definen en python utilizando la biblioteca `ply`:
 
@@ -209,9 +210,9 @@ Los nodos del ast que se crean tienen en común los dos primeros argumentos:
 la fila y la columna en la que se encuentran. Por esta razón existen estructuras que podían 
 ser representadas fácilmente como una tupla de datos, sin embargo tenía más sentido 
 hacerlas nodos propios capaces de almacenar la línea en la que se encuentran. Un ejemplo
-es el caso de la expresión Case: cada elemento de la `branch_list` es un nodo. Y es que sucede
+es el caso de la expresión **Case**: cada elemento de la `branch_list` es un nodo. Sucede
 muy a menudo que estos son escritos en otras líneas del programa, y de ocurrir algún error en ellos
-se informaría que se encuentra en la lína en la que se empezó a definir la expresión del Case.
+se informaría que se encuentra en la línea en la que se empezó a definir la expresión del Case.
 
 
 ## Análisis Semántico
@@ -222,27 +223,29 @@ Para el análisis semántico seguimos un patrón visitor. Se hacen 3 recorridos 
 - [Type Builder](/src/type_builder.py)
 - [Type Checker](/src/type_checker.py)
 
-En el `TypeCollector` se hace un primer recorrido por el AST recolectando todos los tipos. También se añaden 
-los tipos predefinidos por el lenguaje COOL.
+En el `TypeCollector` se hace un primer recorrido por el AST recolectando todos los tipos. 
+También se añaden los tipos predefinidos por el lenguaje COOL.
 
-En el `TypeBuilder` se analizan los cuerpos de cada clase. Por cada atributo o función visitado se crea ese feature
-en el tipo definido en el contexto. Adicionalmente se comprueba que los tipos utilizados para esos atributos, los
-tipos de retorno de las funciones y los tipos de los parámetros de las funciones sean tipos declarados ya en el 
-contexto.
+En el `TypeBuilder` se analizan los cuerpos de cada clase. Por cada atributo o función visitado
+se crea ese feature en el tipo definido en el contexto. Adicionalmente se comprueba que los tipos
+utilizados para esos atributos, los tipos de retorno y de los parámetros de las funciones sean 
+tipos declarados ya en el contexto.
 
-En el `TypeChecker` se hace un análisis semántico a profundidad. Se visitan todos los nodos del ast y se comprueba
-que se correspondan los tipos esperados, se comprueba que los llamados a funciones sean con el número de argumentos
-y el tipo de argumentos requeridos. Además se comprueba que se usen variables ya definidas en los **scopes**, y es
-que precisamente en este recorrido es en el que se crean los scopes de las variables del programa. Para resolver los
-problemas de herencia de atributos se asigna a la propiedad parent del scope que crea la clase que hereda, el scope
-creado por la clase heredada. Esta técnica es usada cada vez que interesa crear scopes específicos para ciertas
+En el `TypeChecker` se hace un análisis semántico a profundidad. Se visitan todos los
+nodos del ast y se comprueba que se correspondan los tipos esperados y
+que los llamados a funciones sean con el número y tipo de argumentos requeridos. 
+Además se comprueba que se usen variables ya definidas en los **scopes**, 
+y es que precisamente en este recorrido es en el que se crean los scopes de las 
+variables del programa. Para resolver los problemas de herencia de atributos se asigna
+a la propiedad parent del scope que crea la clase que hereda, el scope creado por la 
+clase heredada. Esta técnica es usada cada vez que interesa crear scopes específicos para ciertas
 secciones.
 
 ## Generador de Código
 
-El objetivo ahora es bajar de **COOL** que es un lenguaje de alto nivel que usa el concepto de herencia y polimorfismo,
-hasta código MIPS, que es bajo nivel donde está plano todo ese código. Como esta traducción del programa no es
-inmediata utilizamos un lenguaje intermedio que es CIL que nos facilita este cambio. Entonces se realizan dos
+El objetivo de esta etapa es bajar de **COOL**, que es un lenguaje de alto nivel que usa el concepto de herencia y polimorfismo,
+hasta código **MIPS**, que es de bajo nivel y donde está plano todo ese código. Como esta traducción del programa no es
+inmediata utilizamos un lenguaje intermedio que es **CIL** que nos facilita este cambio. Entonces se realizan dos
 traducciones: de **COOL** a **CIL**, y de **CIL** a **MIPS**
 
 ### Cool a CIL
@@ -270,7 +273,7 @@ creando actualmente de CIL.
 Para esta traducción se recorrerá ahora el ast de CIL generado en el proceso anterior. El primer problema a solucionar
 es como representar los objetos en memoria. Como convenio tendremos 5 secciones del espacio reservado 
 para el objeto: La primera de estas (el offset 0) representa la posición en la que fue visitado ese tipo en un recorrido
-DFS partiendo por el tipo Object y visitando todos los hijos de cada tipo (un recorrido por el arbol de jerarquía de
+DFS partiendo por el tipo Object y visitando todos los hijos de cada tipo (un recorrido por el árbol de jerarquía de
 clases). La segunda sección es la encargada de representar el nombre de la clase, y lo que contendrá es la dirección
 del segmento de datos donde está contenido. La tercera representa la cantidad de posiciones que ocupa ese objeto en
 memoria, todas las clases a lo sumo ocupan 4 posiciones: 3 para estas 3 secciones que hemos visto y 1 para la próxima
@@ -299,7 +302,7 @@ primer atributo de una clase A tendremos que referirnos al offset 16 (5ta posici
 Hasta ahora se ha visto la representación en memoria de los objetos, se verá ahora la estrategia para llamar funciones.
 Para almacenar los argumentos de la función se utiliza la pila, son pusheados en orden contrario al que se piden
 para que se puedan sacar en orden luego utilizando el stack pointer (registro $sp) como referencia. Las funciones
-tambien definen variables temporales y para almacenarlas se utilizará tambien la pila, como la cantidad de locals se 
+también definen variables temporales y para almacenarlas se utilizará también la pila, como la cantidad de locals se 
 conoce en CIL entonces se conoce el espacio que ocupan y se conoce además el orden que tienen. Nuevamente se puede 
 acceder a ellos usando el stack pointer que está contenido en el registro $sp. El valor de retorno de una función 
 estará siempre contenido en el registro $a1.
