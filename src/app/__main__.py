@@ -85,11 +85,6 @@ def app(input: Path, output: Path = None):
     out_file[-1] = "mips"
     out_file = ".".join(out_file)
 
-    with open(out_file, 'w') as f:
-        f.write(mips_code)
-        with open("app/mips/mips_lib.asm") as f2:
-            f.write("".join(f2.readlines()))
-
     typer.Exit(code=0)
 
 

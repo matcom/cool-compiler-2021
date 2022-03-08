@@ -1,9 +1,9 @@
 from .mips import *
 import app.shared.visitor as visitor
+from app.mips.utils import auxiliar_functions
 
 
 class PrintVisitor:
-
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -35,7 +35,9 @@ class PrintVisitor:
         types = "\n\n".join([self.visit(tp) for tp in node.types])
 
         code = "\n".join([self.visit(func) for func in node.functions])
-        return f'{data_section_header}\n{static_strings}\n\n{names_table}\n\n{shells_table}\n\n{types}\n\t.text\n\t.globl main\n{code}'
+
+        auxiliar = self.register_auxiliary()
+        return f'{data_section_header}\n{static_strings}\n\n{names_table}\n\n{shells_table}\n\n{types}\n\t.text\n\t.globl main\n{code}\n{auxiliar}'
 
     @visitor.when(StringConst)
     def visit(self, node):
@@ -105,6 +107,10 @@ class PrintVisitor:
     def visit(self, node):
         return f'lw {self.visit(node.reg)}, {self.visit(node.addr)}'
 
+    @visitor.when(LoadByteNode)
+    def visit(self, node):
+        return f'lb {self.visit(node.reg)}, {self.visit(node.addr)}'
+
     @visitor.when(LoadAddressNode)
     def visit(self, node):
         return f'la {self.visit(node.reg)}, {self.visit(node.label)}'
@@ -132,6 +138,18 @@ class PrintVisitor:
     @visitor.when(BranchOnNotEqualNode)
     def visit(self, node):
         return f"bne {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
+    
+    @visitor.when(BranchOnEqualNode)
+    def visit(self, node):
+        return f"beq {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
+
+    @visitor.when(BranchOnLessEqualNode)
+    def visit(self, node):
+        return f"ble {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
+
+    @visitor.when(BranchOnLessThanNode)
+    def visit(self, node):
+        return f"blt {self.visit(node.reg1)} {self.visit(node.reg2)} {node.label}"
 
     @visitor.when(JumpNode)
     def visit(self, node):
@@ -160,3 +178,7 @@ class PrintVisitor:
     @visitor.when(MoveFromLowNode)
     def visit(self, node):
         return f"mflo {self.visit(node.reg)}"
+
+    
+    def register_auxiliary(self):
+        return auxiliar_functions

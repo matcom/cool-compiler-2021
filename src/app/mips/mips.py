@@ -132,7 +132,10 @@ class LoadWordNode(InstructionNode):
         self.reg = reg
         self.addr = addr
 
-
+class LoadByteNode(InstructionNode):
+    def __init__(self, reg, addr):
+        self.reg = reg
+        self.addr = addr
 class SyscallNode(InstructionNode):
     pass
 
@@ -197,6 +200,25 @@ class BranchOnNotEqualNode(InstructionNode):
         self.reg1 = reg1
         self.reg2 = reg2
         self.label = label
+
+class BranchOnEqualNode(InstructionNode):
+    def __init__(self, reg1, reg2, label):
+        self.reg1 = reg1
+        self.reg2 = reg2
+        self.label = label
+
+class BranchOnLessEqualNode(InstructionNode):
+    def __init__(self, reg1, reg2,label):
+        self.reg1 = reg1
+        self.reg2 = reg2
+        self.label = label
+
+class BranchOnLessThanNode(InstructionNode):
+    def __init__(self, reg1, reg2,label):
+        self.reg1 = reg1
+        self.reg2 = reg2
+        self.label = label
+
 
 
 class JumpNode(InstructionNode):

@@ -63,8 +63,8 @@ class CILToMIPSVisitor:
         print(type(node))
 
     @visitor.when(cil.ProgramNode)
-    def visit(self, node:cil.ProgramNode):
-        return cil.ProgramNode.visit(node,self,mips)
+    def visit(self, node:cil.ProgramNode):        
+        return cil.ProgramNode.visit(node,self,mips) 
 
     @visitor.when(cil.TypeNode)
     def visit(self, node):
@@ -215,3 +215,22 @@ class CILToMIPSVisitor:
     def visit(self, node):
         return cil.SubstringNode.visit(node,self,mips)
 
+
+    def hello():
+# less:
+#     blt $a0 $a1 less_true
+#     li $v0 0
+#     j less_end
+
+# less_true:
+#     li $v0 1
+
+# less_end:
+#     jr $ra
+        instructions = []
+        instructions.append(mips.BranchOnLessThanNode(mips.ARG_REGISTERS[0],mips.ARG_REGISTERS[1], "less_true_1"))
+        instructions.append(mips.LoadInmediateNode(mips.V0_REG,0))
+        instructions.append(mips.JumpNode("less_end_1"))
+        instructions.append(mips.LabelNode("less_true_1"))
+        instructions.append(mips.LoadInmediateNode(mips.V0_REG,1))
+        instructions.append(mips.LabelNode("less_end_1"))
