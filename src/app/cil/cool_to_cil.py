@@ -1,4 +1,4 @@
-import app.cil.ast_cil as cil
+import app.cil.cil as cil
 import app.shared.visitor as visitor
 from app.semantics.tools.scope import VariableInfo
 from app.semantics.tools.errors import AttributeError

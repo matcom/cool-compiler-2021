@@ -1,5 +1,5 @@
 import app.shared.visitor as visitor
-import app.cil.ast_cil as cil
+import app.cil.cil as cil
 from app.mips import mips
 from app.mips.utils import *
 
@@ -389,7 +389,6 @@ class MIPSCode:
     @visitor.when(mips.MoveFromLowNode)
     def visit(self, node):
         return f"mflo {self.visit(node.reg)}"
-
     
     def register_auxiliary(self):
         return memory_operations + boolean_operations + string_operations + IO_operations    
