@@ -26,9 +26,9 @@ class Function(AST):
     def __init__(self, name, params=[], localvars=[], instructions=[]):
         super(Function, self).__init__()
         self.name = name
-        self.params = params  # list of Param
-        self.localvars = localvars  # list of LocalDec
-        self.instructions = instructions  # list of Instructions
+        self.params = params
+        self.localvars = localvars
+        self.instructions = instructions
 
 
 class Expr(AST):

@@ -324,7 +324,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: COOL_AST.ClassDeclarationNode, scope):
         self.current_type = self.context.get_type(node.id)
 
-        # Handle all the .TYPE section
         cil_type = self.register_type(self.current_type.name)
         cil_type.attributes = [f'{attr.name}' for c, attr in self.current_type.get_all_attributes()]
         cil_type.methods = {f'{m}': f'{c}.{m}' for c, m in self.current_type.get_all_methods()}
@@ -336,18 +335,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         for attr in attr_declarations:
             scope.define_cil_local(attr.id, attr.id, node.id)
 
-        # -------------------------Init---------------------------------
         self.current_function = self.register_function(f'{node.id}_init')
         self.register_param(VariableInfo('self', None))
-
-        # Init parents recursively
         result = self.define_internal_local(scope=scope, name="result")
         self.register_instruction(CIL_AST.Call(result, f'{node.parent}_init', [CIL_AST.Arg('self')], node.parent))
         self.register_instruction(CIL_AST.Return(None))
 
         for attr in attr_declarations:
             self.visit(attr, scope)
-        # ---------------------------------------------------------------
         self.current_function = None
 
         for feature in func_declarations:
