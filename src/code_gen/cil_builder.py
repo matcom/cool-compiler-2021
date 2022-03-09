@@ -1,3 +1,4 @@
+
 import cmp.nbpackage
 import cmp.visitor as visitor
 
@@ -37,6 +38,7 @@ from cmp.cil import (
     LessNode,
     LessEqualNode,
     EqualNode,
+    StrEqualNode,
     RuntimeErrorNode,
     CopyNode,
     TypeNameNode,
@@ -800,8 +802,11 @@ class CILBuilder:
 
         right = self.define_internal_local()
         self.visit(node.right, right)
-
-        self.register_instruction(EqualNode(return_var, left, right))
+        
+        if node.left.static_type.name == "String":
+            self.register_instruction(StrEqualNode(return_var, left, right))
+        else:
+            self.register_instruction(EqualNode(return_var, left, right))
 
     # Unary operators
     @visitor.when(cool.InstantiateNode)  # NewNode

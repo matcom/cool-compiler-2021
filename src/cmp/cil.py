@@ -92,6 +92,8 @@ class LessEqualNode(ArithmeticNode):
 class EqualNode(ArithmeticNode):
     pass
 
+class StrEqualNode(ArithmeticNode):
+    pass
 
 class UnaryNode(InstructionNode):
     def __init__(self, dest, expr):
@@ -324,6 +326,10 @@ class PrintVisitor(object):
         return f"{node.dest} = {node.left} <= {node.right}"
 
     @visitor.when(EqualNode)
+    def visit(self, node):
+        return f"{node.dest} = {node.left} == {node.right}"
+    
+    @visitor.when(StrEqualNode)
     def visit(self, node):
         return f"{node.dest} = {node.left} == {node.right}"
 
