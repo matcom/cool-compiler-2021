@@ -1,6 +1,3 @@
-from dis import Instruction
-from random import choice
-
 import coolpyler.ast.cil.base as cil
 import coolpyler.ast.mips.base as mips
 import coolpyler.utils.visitor as visitor
@@ -17,8 +14,6 @@ SP_REG = mips.RegisterNode("sp")
 RA_REG = mips.RegisterNode("ra")
 V0_REG = mips.RegisterNode("v0")
 V1_REG = mips.RegisterNode("v1")
-ZERO_REG = mips.RegisterNode("zero")
-LOW_REG = mips.RegisterNode("lo")
 
 
 class MemoryManager:
@@ -29,7 +24,7 @@ class MemoryManager:
 
     def get_unused_register(self):
         possibles = list(set(self.registers).difference(set(self.used)))
-        reg = choice(possibles)
+        reg = possibles[0]
         self.used.append(reg)
         return reg
 
@@ -274,7 +269,7 @@ class CilToMIPS:
         instructions.append(mips.MultNode(reg1, reg2, f"Mult"))
 
         dest_dir = self.search_mem(node.dest)
-        instructions.append(mips.MoveFromLo(reg1))  # TODO: Lo_REG ???
+        instructions.append(mips.MoveFromLo(reg1))
 
         instructions.append(
             mips.StoreWordNode(
@@ -308,7 +303,7 @@ class CilToMIPS:
         instructions.append(mips.DivNode(reg2, reg1, f"Div"))
 
         dest_dir = self.search_mem(node.dest)
-        instructions.append(mips.MoveFromLo(reg1))  # TODO: Hi_REG ???
+        instructions.append(mips.MoveFromLo(reg1))
 
         instructions.append(
             mips.StoreWordNode(
@@ -802,9 +797,6 @@ class CilToMIPS:
 
         reg1 = self.memory_manager.get_unused_register()
         reg2 = self.memory_manager.get_unused_register()
-        # reg3 = self.memory_manager.get_unused_register()
-
-        # instructions.append(mips.LoadInmediateNode(reg3, "eol"))
 
         loop = f"loop{self.get_loop_count()}"
         exit = f"exit{self.get_exit_count()}"
@@ -826,7 +818,6 @@ class CilToMIPS:
         )
 
         instructions.append(mips.BeqzNode(reg2, exit))
-        # instructions.append(mips.BeqNode(reg2, reg3, exit))
         instructions.append(mips.AddiNode(ARG_REGISTERS[0], ARG_REGISTERS[0], 1))
         instructions.append(mips.AddiNode(reg1, reg1, 1))
         instructions.append(mips.JumpNode(loop))
@@ -840,10 +831,6 @@ class CilToMIPS:
                 f"Save Calculated Length",
             )
         )
-
-        # instructions.append(mips.LoadInmediateNode(V0_REG, 1, f"PRINT"))
-        # instructions.append(mips.MoveNode(ARG_REGISTERS[0], reg1))
-        # instructions.append(mips.SyscallNode())
 
         self.memory_manager.clean()
         return instructions
