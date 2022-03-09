@@ -368,7 +368,9 @@ class DotCodeVisitor:
         ret_exp = self.visit(node.expr, scope)
         typename = self.add_local('typename')
         end_label = self.new_label('end')
-        runtime_error_label = self.new_label('runtime_error')
+        case_match_re_label = self.new_label('case_match_re')
+        expr_void_re_label = self.new_label('expr_void_re')
+
 
         self.add_inst(cil.TypeNameNode(typename, ret_exp))
 
@@ -387,19 +389,18 @@ class DotCodeVisitor:
             self.add_inst(cil.GotoIfNode(cond, label.name))
 
         # Does not conform to anyone => Runtime error
-        self.add_inst(cil.GotoNode(runtime_error_label.name))
+        self.add_inst(cil.GotoNode(case_match_re_label.name))
 
         for case, label in zip(node.cases, branch_labels):
             self.add_inst(label)
             self.visit(case, scope) # TODO: Handle correct scope
             self.add_inst(cil.GotoNode(end_label.name))
 
-        # TODO: Handle Runtime Errors
-        self.add_inst(runtime_error_label)
-        runtime_error_msg = self.add_local('runtime_error_msg')
-        self.add_inst(cil.StaticCallNode('String__init', runtime_error_msg))
-        self.add_inst(cil.LoadNode(runtime_error_msg, 's4'))
-        self.add_inst(cil.PrintStringNode(runtime_error_msg))
+        # Handle Runtime Errors
+        self.add_inst(case_match_re_label)
+        self.add_inst(cil.CaseMatchRuntimeErrorNode())
+        self.add_inst(expr_void_re_label)
+        self.add_inst(cil.ExprVoidRuntimeErrorNode())
 
         self.add_inst(end_label)
 

@@ -755,3 +755,27 @@ class CILToMipsVisitor:
             mips.SWNode(t0, 4, t1),
             mips.CommentNode(f"</complement:{node.dest}>"),
         )
+
+    @visitor.when(cil.CaseMatchRuntimeErrorNode)
+    def visit(self, node: cil.CaseMatchRuntimeErrorNode):
+        self.add_inst(
+            mips.CommentNode(f"<case-match-runtime-error>"),
+            mips.LINode(v0, 4),
+            mips.LANode(a0, 's4'),
+            mips.SysCallNode(),
+            mips.LINode(v0, 10),
+            mips.SysCallNode(),
+            mips.CommentNode(f"</case-match-runtime-error>"),
+        )
+
+    @visitor.when(cil.ExprVoidRuntimeErrorNode)
+    def visit(self, node: cil.ExprVoidRuntimeErrorNode):
+        self.add_inst(
+            mips.CommentNode(f"<expr-void-runtime-error>"),
+            mips.LINode(v0, 4),
+            mips.LANode(a0, 's5'),
+            mips.SysCallNode(),
+            mips.LINode(v0, 10),
+            mips.SysCallNode(),
+            mips.CommentNode(f"</expr-void-runtime-error>")
+        )

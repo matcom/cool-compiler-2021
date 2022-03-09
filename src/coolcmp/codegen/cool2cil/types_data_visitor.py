@@ -24,7 +24,8 @@ class DotTypesDataVisitor:
         self.root.set_data('""')
         self.root.set_data('"Abort called from class "')
         self.root.set_data('"\n"')
-        self.root.set_data('"RuntimeError: Case statement without a match branch"')
+        self.root.set_data('"RuntimeError: Case statement without a match branch\n"')
+        self.root.set_data('"RuntimeError: Expression is void\n"')
 
         # add Object, IO, String, Bool, Int and <void> to types
         self.types += [

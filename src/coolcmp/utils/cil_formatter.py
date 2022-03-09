@@ -174,3 +174,11 @@ class CILFormatter(object):
     @visitor.when(cil.AbortNode)
     def visit(self, node: cil.AbortNode):
         return f'ABORT'
+
+    @visitor.when(cil.CaseMatchRuntimeErrorNode)
+    def visit(self, node: cil.CaseMatchRuntimeErrorNode):
+        return f'CASE_MATCH_RUNTIME_ERROR'
+
+    @visitor.when(cil.ExprVoidRuntimeErrorNode)
+    def visit(self, node: cil.ExprVoidRuntimeErrorNode):
+        return f'EXPR_VOID_RUNTIME_ERROR'
