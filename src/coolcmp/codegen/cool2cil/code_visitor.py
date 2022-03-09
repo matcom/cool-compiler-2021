@@ -344,7 +344,7 @@ class DotCodeVisitor:
         for let_declaration in node.declarations:
             self.visit(let_declaration, let_scope)
 
-        return self.visit(node.expr, scope)
+        return self.visit(node.expr, let_scope)
 
     @visitor.when(ast.ParenthesisExpr)
     def visit(self, node: ast.ParenthesisExpr, scope: Scope):
@@ -379,7 +379,6 @@ class DotCodeVisitor:
         variable = scope.find_variable(node.id)
         if variable.is_attr:
             attr_name = f'{self.current_type}_{node.id}'
-            print(self.current_type, self.root.get_type(self.current_type).attributes)
             attr_index = self.root.get_type(self.current_type).attributes.index(attr_name)
             attr_at = cil.AttributeAt(attr_name, attr_index)
             self.add_inst(cil.SetAttrNode('self', attr_at, expr_dest))
