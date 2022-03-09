@@ -75,7 +75,7 @@ def define_cool_grammar(print_grammar=False):
     )
     def_class %= (
         classx + type_id + inherits + type_id + ocur + feature_list + ccur + semi,
-        lambda h, s: ClassDeclarationNode(s[2], s[6], s[1], s[4]), # aqui hay que buscar otra alternativa a simplemente pasar el lexema pues a la hora de dar errores estaria bien decir que el tipo que se refencia noe sta definido
+        lambda h, s: ClassDeclarationNode(s[2], s[6], s[1], s[4]), 
     )
 
     feature_list %= def_attr + semi + feature_list, lambda h, s: [s[1]] + s[3]
@@ -83,12 +83,12 @@ def define_cool_grammar(print_grammar=False):
     feature_list %= G.Epsilon, lambda h, s: []
 
     def_attr %= (
-        idx + colon + type_id + larrow + expr, # el token podria ser el del id en estos 3
+        idx + colon + type_id + larrow + expr, 
         lambda h, s: AttrDeclarationNode(s[1], s[3], s[5], s[4]),
     )
     def_attr %= idx + colon + type_id, lambda h, s: AttrDeclarationNode(s[1], s[3], token = s[2])
 
-    def_func %= (#verificar el token que se manda
+    def_func %= (
         idx + opar + param_list + cpar + colon + type_id + ocur + expr + ccur,
         lambda h, s: FuncDeclarationNode(s[1], s[3], s[6], s[8], s[2]),
     )
@@ -99,7 +99,6 @@ def define_cool_grammar(print_grammar=False):
 
     param_list_rest %= comma + param + param_list_rest, lambda h, s: [s[2]] + s[3]
     param_list_rest %= comma + param, lambda h, s: [s[2]]
-    #aqui podria ser conveniente annadir un token para registrar la pos ante un error
     param %= idx + colon + type_id, lambda h, s: (s[1], s[3])
 
     expr %= idx + larrow + expr, lambda h, s: AssignNode(s[1], s[3], s[2])
@@ -119,7 +118,7 @@ def define_cool_grammar(print_grammar=False):
     )
     identifier_init %= idx + colon + type_id, lambda h, s: VarDeclarationNode(s[1], s[3])
 
-    comp %= comp + less + arith, lambda h, s: LessNode(s[1], s[3], s[2])
+    comp %= comp + less + arith, lambda h, s: LessNode(s[1], s[3], s[2]) # this expression do not associate, so call comp instead of arith
     comp %= comp + less + notx + arith, lambda h, s: LessNode(s[1], NotNode(s[4], s[3]) , s[2])
     comp %= comp + equal + arith, lambda h, s: EqualNode(s[1], s[3], s[2])
     comp %= comp + equal + notx + arith, lambda h, s: EqualNode(s[1], NotNode(s[4], s[3]) , s[2])    
@@ -148,7 +147,7 @@ def define_cool_grammar(print_grammar=False):
     element %= new + type_id, lambda h, s: InstantiateNode(s[2], s[1])
     element %= opar + expr + cpar, lambda h, s: s[2]
     element %= ocur + block + ccur, lambda h, s: BlockNode(s[2], s[1])
-    element %= (element + dot + func_call, lambda h, s: CallNode(*s[3], obj=s[1], token = s[2]))#arreglar
+    element %= (element + dot + func_call, lambda h, s: CallNode(*s[3], obj=s[1], token = s[2]))
     element %= (
         element + at + type_id + dot + func_call,
         lambda h, s: CallNode(*s[5], obj=s[1], at_type=s[3], token = s[2]),
