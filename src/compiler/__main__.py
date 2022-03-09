@@ -3,6 +3,7 @@ from visitors.code_gen.ccil_mips_gen import CCILToMIPSGenerator
 from visitors.code_gen.mips_gen import MIPSGenerator
 from visitors.ast_print.type_logger import TypeLogger
 import sys
+import typer
 
 from lexing import Lexer
 from parsing import Parser
@@ -21,7 +22,27 @@ def format_errors(errors, s=""):
     return s[:]
 
 
-def semantics_pipeline(program_ast):
+def lexing_pipeline(program):
+    lexer = Lexer()
+    tokens = list(lexer.tokenize(program))
+    if lexer.errors:
+        for error in lexer.errors:
+            print(error)
+        exit(1)
+    return tokens
+
+
+def parsing_pipeline(program):
+    parser = Parser(Lexer())
+    ast = parser.parse(program)
+    if parser.errors:
+        for error in parser.errors:
+            print(error)
+        exit(1)
+    return ast
+
+
+def semantics_pipeline(program_ast, cool_ast):
 
     collector = TypeCollector()
     collector.visit(program_ast)
@@ -56,9 +77,10 @@ def semantics_pipeline(program_ast):
     types_ast = types.visit(back_ast)
     errors += types.errors
 
-    logger = TypeLogger(context)
-    log = logger.visit(back_ast, back_ast.scope)
-    print(log)
+    if cool_ast:
+        logger = TypeLogger(context)
+        log = logger.visit(back_ast, back_ast.scope)
+        print(log)
 
     if len(errors) > 0:
         s = format_errors(errors)
@@ -68,34 +90,33 @@ def semantics_pipeline(program_ast):
     return types_ast
 
 
-def main():
-    if len(sys.argv) > 1:
-        input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
-    else:
-        input_file = "../tests/normal/abort1.cl"
-    #   raise Exception("Incorrect number of arguments")
-
+def main(
+    input_file: str,
+    ccil: bool = typer.Option(
+        False,
+        help="Create <program>.ccil file corresponding to the ccil code generated during compilation ",
+    ),
+    cool_ast: bool = typer.Option(False, help="Prints program's COOL AST"),
+):
+    """
+    Welcome to CoolCows Compiler! 
+    """
     program_file = open(input_file)
     program = program_file.read()
     program_file.close()
+    out_file = input_file.split(".")[0]
 
-    lexer = Lexer()
-    tokens = list(lexer.tokenize(program))
-    if lexer.errors:
-        for error in lexer.errors:
-            print(error)
-        exit(1)
+    tokens = lexing_pipeline(program)
+    ast = parsing_pipeline(program)
+    type_ast = semantics_pipeline(ast, cool_ast)
 
-    parser = Parser(Lexer())
-    ast = parser.parse(program)
-    if parser.errors:
-        for error in parser.errors:
-            print(error)
-        exit(1)
-
-    type_ast = semantics_pipeline(ast)
     ccil_gen = CCILGenerator()
     ccil_ast = ccil_gen.visit(type_ast)
+
+    if ccil:
+        path_to_file = f"{out_file}.ccil"
+        with open(path_to_file, "w") as f:
+            f.write(str(ccil_ast))
 
     ccil_mips_gen = CCILToMIPSGenerator()
     mips_ast = ccil_mips_gen.visit(ccil_ast)
@@ -103,11 +124,10 @@ def main():
     mips_gen = MIPSGenerator()
     mips_code = mips_gen.visit(mips_ast)
 
-    out_file = input_file.split(".")[0]
     path_to_file = f"{out_file}.mips"
-    # path_to_file = "output.asm"
     with open(path_to_file, "w") as f:
         f.write(mips_code)
 
 
-main()
+if __name__ == "__main__":
+    typer.run(main)
