@@ -65,31 +65,29 @@ clase a su vez posee un conjunto de atributos y de funciones. Las expresiones qu
 dichas funciones son el corazón del lenguaje.
 En la imagen *1* se pueden apreciar varios niveles intermedios de esta gramática, lo cuales, precisamente, definen diferentes tipos de expresiones:
 
-1. $<comp>$, que representa las operaciones de comparación entre elementos.
+1.  **< comp >** , que representa las operaciones de comparación entre elementos.
 
-2. $<arith>$, que engloba a las operaciones de suma y
+2.  **< arith >** , que engloba a las operaciones de suma y
 resta.
 
-3. $<term>$, para la multiplicación y división.
+3.  **< term >** , para la multiplicación y división.
 
-4. $<factor>$, como representación de los operadores
+4.  **< factor >** , como representación de los operadores
 unarios isvoid y opuesto.
 
-5. $<element>$ para las condicionales (*if-then-else*, *while* y *case*), la instanciación con *new*, las expresiones entre paréntsis, los block, los dispatch.
+5. **< element >** para las condicionales (*if-then-else*, *while* y *case*), la instanciación con *new*, las expresiones entre paréntsis, los block, los dispatch.
 
-6. $<atom>$ como el nivel más básico, donde se ex-
+6. **< atom >** como el nivel más básico, donde se ex-
 cuentran los números, ids, las expresiones boolea-
 nas y los strings.
 
-![](../img/grammar.png)
-
-Figura 1: Fragmento de la gramática de Cool.
+![Figura 1.!](../img/grammar.png "Fragmento de la gramática de Cool.")
 
 
 ## Análisis sintáctico
 
 ### Tokenizer 
-Para tokenizar la entrada se utilizó una herramienta bastante útil y práctica: PLY (https://www.dabeaz.com/ply/ply.html), la cual consiste en una implementación en python de las herramientas de parsing *Lex* y *Yacc*. Mediante el módulo lex que esta provee, es posible acceder a un analizador léxico ya implementado.
+Para tokenizar la entrada se utilizó una herramienta bastante útil y práctica: [PLY](https://www.dabeaz.com/ply/ply.html), la cual consiste en una implementación en python de las herramientas de parsing *Lex* y *Yacc*. Mediante el módulo lex que esta provee, es posible acceder a un analizador léxico ya implementado.
 
 Para utilizarlo, se definieron una serie de reglas que orientaran al tokenizador como trabajar en las cadenas de entrada. En el archivo
 token rules se pueden observar las reglas utilizadas, las cuáles consisten fundamentalmente en definiciones de los patrones que sigue cada token deseado, con la ayuda de expresiones regulares. En este sentido, se
@@ -111,7 +109,7 @@ La construcción de este árbol o ast (*abstract syntax tree*) es la base del re
 
 Cada nodo posee los elementos que lo caracterizan, por ejemplo el *ClassDeclarationNode* cuenta con tokens como: el *id* que representa el nombre de la clase, un *parent* o tipo del que hereda (que puede ser *None* en caso de no existir), y la lista de *features*, o sea de definiciones de los métodos y atributos que posee. Además se añade un *token* que permita ubicar el inicio de la declaración en el código de entrada. 
 
-![](../img/classdec.png)
+![Ast Nodes.](../img/classdec.png "ClassDeclarationNode in cool ast")
 
 ## Chequeo semántico:
 
