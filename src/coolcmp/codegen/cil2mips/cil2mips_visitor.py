@@ -44,7 +44,7 @@ class CILToMipsVisitor:
     def get_method_index(self, name: str):
         for i, method in enumerate(self.cil_root.all_methods):
             if method == name:
-                return (i + 1) * 4
+                return (i + 2) * 4
         raise ValueError(f"Unexpected method: {name}")
 
     @visitor.on("node")

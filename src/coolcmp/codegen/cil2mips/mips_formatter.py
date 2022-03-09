@@ -18,7 +18,7 @@ class MIPSFormatter:
         data = "# data\n.data\n" + "\n".join(self.visit(d) for d in node.data)
         void = 'void:\n\t.word Void'
         type_defs = (
-            "\n_NoParent:\t\t# label for Object parent reference\n\n" +
+            "\n_NoParent:\t\t# label for Object parent reference\n\t.word\t0\n\n" +
             "\n\n".join(self.visit(t) for t in node.types)
         )
         functions = "\n# functions\n.text\n.globl main\n" + "\n".join(
@@ -46,8 +46,8 @@ class MIPSFormatter:
         lines = [
             f"{node.label}:",
             f"\t.word\t{(node.length() + 1) * 4}",
-            method_labels,
             parent_name,
+            method_labels,
             typename_label,
         ]
         return "\n".join(lines).replace("\n\n", "\n")
