@@ -1,10 +1,8 @@
 from dataclasses import dataclass
 from typing import  Any, Dict
 from enum import Enum, auto
-from grammar_classes import Epsilon
-from state_class import State
-from automaton_class import Automaton
-from grammar_classes import Item, Terminal
+from automaton_class import Automaton, State
+from grammar_classes import Item, Terminal, Epsilon
 from serializer_class import Serializer
 from token_class import Token
 
