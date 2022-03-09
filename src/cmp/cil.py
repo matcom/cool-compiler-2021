@@ -245,11 +245,11 @@ class IsVoidNode(InstructionNode):
     def __init__(self, dest, value):
         self.dest = dest
         self.value = value
-        
+
+
 class ExitNode(InstructionNode):
     def __init__(self):
         pass
-        
 
 
 class PrintVisitor(object):
@@ -350,11 +350,11 @@ class PrintVisitor(object):
 
     @visitor.when(SetAttribNode)
     def visit(self, node):
-        return f" SETATTR {node.type} {node.attr} {node.value}"
+        return f" SETATTR {node.instance} {node.attr} {node.value}"
 
     @visitor.when(GetAttribNode)
     def visit(self, node):
-        return f" {node.dest} = GETATTR {node.type} {node.attr}"
+        return f" {node.dest} = GETATTR {node.instance} {node.attr}"
 
     @visitor.when(TypeOfNode)
     def visit(self, node):
@@ -410,7 +410,7 @@ class PrintVisitor(object):
 
     @visitor.when(LoadNode)
     def visit(self, node):
-        return f"{node.dest} = LOAD {node.msg.name}"
+        return f"{node.dest} = LOAD {node.msg}"
 
     @visitor.when(ConcatNode)
     def visit(self, node):
@@ -431,5 +431,7 @@ class PrintVisitor(object):
     @visitor.when(ExitNode)
     def visit(self, node):
         return f"EXIT"
+
+
 # printer = PrintVisitor()
 # return lambda ast: printer.visit(ast)
