@@ -1,6 +1,5 @@
 from enum import Enum, auto
-from automaton_class import Automaton
-from state_class import State
+from automaton_class import Automaton,State
 from token_class import Token
 from typing import Union
 import string
