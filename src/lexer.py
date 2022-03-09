@@ -6,12 +6,12 @@ global errors
 global input_text
 
 tokens = [
-    "INTEGER",  # Non-empty strings of digits 0-9
-    "ID",  # Letters, digits, and the underscore character
-    "TYPE_ID",  # Begin with a capital letter
-    "OBJECT_ID",  # Begin with a lower case letter
+    "INTEGER",
+    "ID",
+    "TYPE_ID",
+    "OBJECT_ID",
     "self",
-    "SELF_TYPE",  # Other identifiers
+    "SELF_TYPE",
     "BOOL",
     "STRING",
     "COMMENT",
@@ -128,27 +128,21 @@ def t_TYPES(t):
     return t
 
 
-# Strings are enclosed in double quotes "..."
+# Strings double quotes "..."
 t_STRING_ignore = ""
 
 
-# A string start with " caracter
+# A string start with "
 def t_start_string(t):
     r"\""
-    t.lexer.push_state("STRING")  # Changes the lexing state and saves old on stack
+    t.lexer.push_state("STRING")
     t.lexer.string_backslash = False
-    t.lexer.string_buffer = ""  # start string with no chart
+    t.lexer.string_buffer = ""
 
 
-# A non-escaped newline character may not appear in a string. Example:
-# "This \
-# is OK"
-
-# "This is not
-# OK"
 def t_STRING_newline(t):
     r"\n"
-    if not t.lexer.string_backslash:  # FATAL ERROR
+    if not t.lexer.string_backslash:
         errors.append(
             "(%s, %s) - LexicographicError: STRING ERROR NON-ESCAPED NEWLINE CHARACTER"
             % (t.lexer.lineno, find_column(t.lexer.lexdata, t.lexpos))
@@ -159,7 +153,7 @@ def t_STRING_newline(t):
     t.lexer.lineno += 1
 
 
-# A string ends with " caracter
+# A string ends with "
 def t_STRING_end(t):
     r"\""
     if t.lexer.string_backslash:
@@ -179,19 +173,13 @@ def t_STRING_null(t):
     t.lexer.skip(1)
 
 
-# Within a string, a sequence ‘\c’ denotes the character ‘c’, with the exception of the following:
-# \b backspace
-# \t tab
-# \f formfeed
-# \\ backslash caracter
-# A string may not contain the null
 def t_STRING_something(t):
     r"[^\n]"
-    if not t.lexer.string_backslash:  # if the previosur chat is not '\'
+    if not t.lexer.string_backslash:  # if the previous chat is not '\'
         if t.value == "\\":
-            t.lexer.string_backslash = True  # backslash caracter
+            t.lexer.string_backslash = True  # backslash
         else:
-            t.lexer.string_buffer += t.value  # no backslash caracter situation
+            t.lexer.string_buffer += t.value  # no backslash
     else:
         t.lexer.string_backslash = False
         if t.value == "b":  # \b backspace
@@ -200,9 +188,9 @@ def t_STRING_something(t):
             t.lexer.string_buffer += "\t"
         elif t.value == 'n':
             t.lexer.string_buffer += '\n'
-        elif t.value == "f":  # \f formfeed
+        elif t.value == "f":  # \f
             t.lexer.string_buffer += "\f"
-        elif t.value == "\\":  # \\ backslash caracter
+        elif t.value == "\\":  # \\ backslash
             t.lexer.string_buffer += "\\"
             t.lexer.string_backslash = True
         else:
@@ -218,7 +206,6 @@ def t_STRING_error(t):
     t.lexer.skip(1)
 
 
-# A string may not contain EOF
 # STRING EOF handling
 def t_STRING_eof(t):
     if t.lexer.current_state():
@@ -228,58 +215,43 @@ def t_STRING_eof(t):
         )
 
 
-# Exist two forms of comments in Cool:
-# Type1: Any characters between two dashes “--” and the next newline (or EOF, if there is no next newline)
-# Type2: Enclosing text in (∗ . . . ∗)
 t_COMMENT_ignore = ""
 
 
-# COMMENT TYPE 1:  “--” and the next newline (or EOF, if there is no next newline)
+# COMMENT:  “--” and the next newline (or EOF, if there is no next newline)
 def t_COMMENT(t):
     r"\-\-[^\n]*"
     t.value = t.value[2:]
-    # return t
 
 
-# COMMENT TYPE 2:  enclosing text in (∗ . . . ∗)
+# COMMENT:  enclosing text in (∗ . . . ∗)
 def t_start_comment(t):
     r"\(\*"
-    t.lexer.push_state("COMMENT")  # Changes the lexing state and saves old on stack
+    t.lexer.push_state("COMMENT")
     t.lexer.comment_count = 0
     t.lexer.string_buffer = ""
 
 
-# A comment start with " (* "
-# def t_COMMENT_start(t):
-#     r"\(\*"
-#     t.lexer.comment_count += 1
-
-
-# A comment can has as many lines as it wants.. until the end comment " *) "
+# COMMENT: newline
 def t_COMMENT_newline(t):
     r"\n+"
     t.lexer.lineno += len(t.value)
 
 
-# A comment finish with " *) "
+# COMMENT: end " *) "
 def t_COMMENT_end(t):
     r"\*\)"
-    # if t.lexer.comment_count == 0:
     t.lexer.pop_state()
     t.value = t.lexer.string_buffer
     t.type = "COMMENT"
-        # return t
-    # else:
-    #     t.lexer.comment_count -= 1
 
 
-# any caracter in a COMMENT
 def t_COMMENT_something(t):
     r"[^\n]"
     t.lexer.string_buffer += t.value
 
 
-# Comment Error handling
+# COMMENT: Error handling
 def t_COMMENT_error(t):
     col = find_column(t.lexer.lexdata, t.lexpos)
     errors.append(
@@ -288,8 +260,7 @@ def t_COMMENT_error(t):
     t.lexer.skip(1)
 
 
-# comment may not contain EOF
-# Comment EOF handling
+# COMMENT: EOF handling
 def t_COMMENT_eof(t):
     if t.lexer.current_state():
         col = find_column(t.lexer.lexdata, t.lexpos)
@@ -302,7 +273,7 @@ def t_COMMENT_eof(t):
 t_ignore = " \t\r\f"
 
 
-# Define a rule so we can track line numbers
+# Line numbers
 def t_newline(t):
     r"\n+"
     t.lexer.lineno += len(t.value)
