@@ -141,7 +141,6 @@ class CILBuilder:
         return vname not in [var.name for var in self.current_function.localvars] and (
             vname not in [param.name for param in self.current_function.params]
         )
-
     def add_builtin_constructors(self):
         builtin_types = ["Object", "IO", "Int", "Bool", "String"]
         for typex in builtin_types:
@@ -224,6 +223,7 @@ class CILBuilder:
         io_type.methods = obj_functions + functions
 
         # String
+        self.attrs["String"] = {"length": (0, "Int"), "str_ref": (1,"String")}
         functions = [
             self.cil_predef_method("copy", "String", self.object_copy),
             self.cil_predef_method("type_name", "String", self.object_type_name),
@@ -239,6 +239,7 @@ class CILBuilder:
         string_type.methods = obj_functions + functions
 
         # Int
+        #self.attrs["Int"] = {"value": (0, "Int")}
         int_type = TypeNode("Int")
         int_type.attributes = [VariableInfo("value", is_attr=True).name]
         int_type.methods = obj_functions + [
@@ -247,6 +248,7 @@ class CILBuilder:
         ]
 
         # Bool
+        #self.attrs["Bool"] = {"value": (0, "Int")}
         bool_type = TypeNode("Bool")
         bool_type.attributes = [VariableInfo("value", is_attr=True).name]
         bool_type.methods = obj_functions + [
@@ -331,18 +333,19 @@ class CILBuilder:
 
         for attr in self.attrs[self.current_type.name].keys():
             attr_copy_local = self.define_internal_local()
+            attr_name = self.to_attr_name(self.current_type.name, attr) if self.current_type.name not in ["Int", "String", "Bool"] else attr
             self.register_instruction(
                 GetAttribNode(
                     attr_copy_local,
                     "self",
-                    self.to_attr_name(self.current_type.name, attr),
+                    attr_name,
                     self.current_type.name,
                 )
             )
             self.register_instruction(
                 SetAttribNode(
                     copy_local,
-                    self.to_attr_name(self.current_type.name, attr),
+                    attr_name,
                     attr_copy_local,
                     self.current_type.name,
                 )
