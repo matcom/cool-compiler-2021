@@ -104,7 +104,10 @@ class ASTFormatter(object):
     @visitor.when(CaseNode)
     def visit(self, node: CaseNode, tabs: int = 0):
         cases = []
-        for _id, _type, _expr in node.cases:
+        for case in node.cases:
+            _id = case.id
+            _type = case.type
+            _expr = case.expr
             expr = self.visit(_expr, tabs + 3)
             cases.append('  ' * tabs +
                          f'\\__CaseNode: {_id} : {_type} =>\n{expr}')

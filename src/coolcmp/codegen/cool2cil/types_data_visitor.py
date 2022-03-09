@@ -24,6 +24,7 @@ class DotTypesDataVisitor:
         self.root.set_data('""')
         self.root.set_data('"Abort called from class "')
         self.root.set_data('"\n"')
+        self.root.set_data('"RuntimeError: Case statement without a match branch"')
 
         # add Object, IO, String, Bool, Int and <void> to types
         self.types += [
@@ -175,6 +176,8 @@ class DotTypesDataVisitor:
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode):
         self.visit(node.expr)
+        for case in node.cases:
+            self.visit(case)
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode):
