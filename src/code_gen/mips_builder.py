@@ -3,7 +3,7 @@
 # from operator import le
 # from tkinter.tix import Select
 # from soupsieve import select
-from re import S
+
 import cmp.visitor as visitor
 import cmp.cil as cil
 import random
@@ -958,11 +958,6 @@ class MIPSBuilder:
 
         self.register_instruction(mips.CommentNode, "Saving reference to read string")
         reg1 = self.memo.get_unused_reg()
-        # if reg1 != t1:
-        #    if t1 in self.memo.used_reg:
-        #        self.register_instruction(mips.MoveNode,reg1,t1)
-        #    else:
-        #        self.memo.clean()
         self.register_instruction(mips.MoveNode, t7, a0)
 
         self.register_instruction(mips.CommentNode, "Calculating str length")
@@ -982,7 +977,7 @@ class MIPSBuilder:
         )  # saving pointer to char array
 
         reg4 = self.memo.get_unused_reg()
-        # self.register_instruction(mips.AddNode, a0, a0, -1)
+        self.register_instruction(mips.AddNode, a0, a0, -1)  ####??????????
         self.register_instruction(mips.MoveNode, reg4, a0)  # saving length
 
         self.register_instruction(
