@@ -3,6 +3,9 @@
 main:
 	# Compiling the compiler :)
 
+sample:
+	python compiler/__main__.py
+
 clean:
 	rm -rf build/*
 	rm -rf ../tests/*/*.mips
