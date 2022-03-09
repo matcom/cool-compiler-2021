@@ -198,17 +198,21 @@ class CILBuilder:
 
     def add_builtin_functions(self):
         # Object
-        obj_functions = [
-            self.cil_predef_method("abort", "Object", self.object_abort),
-            self.cil_predef_method("copy", "Object", self.object_copy),
-            self.cil_predef_method("type_name", "Object", self.object_type_name),
-        ]
+        obj_functions = [self.cil_predef_method("abort", "Object", self.object_abort)]
         object_type = TypeNode("Object")
         object_type.attributes = []
-        object_type.methods = obj_functions
+        object_type.methods = obj_functions.copy()
+        object_type.methods.append(
+            self.cil_predef_method("copy", "Object", self.object_copy)
+        )
+        object_type.methods.append(
+            self.cil_predef_method("type_name", "Object", self.object_type_name)
+        )
 
         # "IO"
         functions = [
+            self.cil_predef_method("copy", "IO", self.object_copy),
+            self.cil_predef_method("type_name", "IO", self.object_type_name),
             self.cil_predef_method("out_string", "IO", self.io_outstring),
             self.cil_predef_method("out_int", "IO", self.io_outint),
             self.cil_predef_method("in_string", "IO", self.io_instring),
@@ -220,6 +224,8 @@ class CILBuilder:
 
         # String
         functions = [
+            self.cil_predef_method("copy", "String", self.object_copy),
+            self.cil_predef_method("type_name", "String", self.object_type_name),
             self.cil_predef_method("length", "String", self.string_length),
             self.cil_predef_method("concat", "String", self.string_concat),
             self.cil_predef_method("substr", "String", self.string_substr),
@@ -234,12 +240,18 @@ class CILBuilder:
         # Int
         int_type = TypeNode("Int")
         int_type.attributes = [VariableInfo("value", is_attr=True).name]
-        int_type.methods = obj_functions
+        int_type.methods = obj_functions + [
+            self.cil_predef_method("copy", "Int", self.object_copy),
+            self.cil_predef_method("type_name", "Int", self.object_type_name),
+        ]
 
         # Bool
         bool_type = TypeNode("Bool")
         bool_type.attributes = [VariableInfo("value", is_attr=True).name]
-        bool_type.methods = obj_functions
+        bool_type.methods = obj_functions + [
+            self.cil_predef_method("copy", "Bool", self.object_copy),
+            self.cil_predef_method("type_name", "Bool", self.object_type_name),
+        ]
 
         for typex in [object_type, io_type, string_type, int_type, bool_type]:
             self.types.append(typex)
@@ -259,6 +271,22 @@ class CILBuilder:
         self.current_type = None
 
         return (mname, self.to_function_name(mname, cname))
+
+    def register_copy(self):
+        self.current_function = FunctionNode(
+            self.to_function_name("copy", self.current_type.name), [], [], []
+        )
+        self.object_copy()
+        self.code.append(self.current_function)
+        self.current_function = None
+
+    def register_type_name(self):
+        self.current_function = FunctionNode(
+            self.to_function_name("type_name", self.current_type.name), [], [], []
+        )
+        self.object_type_name()
+        self.code.append(self.current_function)
+        self.current_function = None
 
     def string_length(self):
         self.params.append(ParamNode("self"))
@@ -297,15 +325,43 @@ class CILBuilder:
 
     def object_copy(self):
         self.params.append(ParamNode("self"))
-        ret_vinfo = self.define_internal_local()
-        self.register_instruction(CopyNode(ret_vinfo, "self"))
-        self.register_instruction(ReturnNode(ret_vinfo))
+        copy_local = self.define_internal_local()
+        self.register_instruction(AllocateNode(self.current_type.name, copy_local))
+
+        for attr in self.attrs[self.current_type.name].keys():
+            attr_copy_local = self.define_internal_local()
+            self.register_instruction(
+                GetAttribNode(
+                    attr_copy_local,
+                    "self",
+                    self.to_attr_name(self.current_type.name, attr),
+                    self.current_type.name,
+                )
+            )
+            self.register_instruction(
+                SetAttribNode(
+                    copy_local,
+                    self.to_attr_name(self.current_type.name, attr),
+                    attr_copy_local,
+                    self.current_type.name,
+                )
+            )
+
+        self.register_instruction(ReturnNode(copy_local))
 
     def object_type_name(self):
         self.params.append(ParamNode("self"))
-        ret_vinfo = self.define_internal_local()
-        self.register_instruction(TypeNameNode(ret_vinfo, "self"))
-        self.register_instruction(ReturnNode(ret_vinfo))
+        solve = self.define_internal_local()
+        self.data.append(
+            DataNode(f"type_name_{self.current_type.name}", f"{self.current_type.name}")
+        )
+        self.register_instruction(AllocateNode("String", solve))
+        type_name = self.define_internal_local()
+        self.register_instruction(
+            LoadNode(type_name, f"type_name_{self.current_type.name}")
+        )
+        self.register_instruction(AssignNode(solve, type_name))
+        self.register_instruction(ReturnNode(solve))
 
     def io_outstring(self):
         self.params.append(ParamNode("self"))
@@ -351,9 +407,6 @@ class CILBuilder:
     def visit(self, node, return_var=None):
         self.context = node.context
 
-        self.add_builtin_functions()
-        self.add_builtin_constructors()
-
         for type in self.context.types.values():
             self.attrs[type.name] = {
                 attr.name: (i, htype.name)
@@ -397,6 +450,9 @@ class CILBuilder:
 
         self.current_function = None
 
+        self.add_builtin_functions()
+        self.add_builtin_constructors()
+
         for declaration in node.declarations:
             self.visit(declaration)
 
@@ -410,8 +466,10 @@ class CILBuilder:
     def visit(self, node, return_var=None):
         self.current_type = self.context.get_type(node.id)
 
-        type_node = self.register_type(self.current_type.name)
+        self.register_copy()
+        self.register_type_name()
 
+        type_node = self.register_type(self.current_type.name)
         self.build_constructor(node)
 
         visited_func = []
@@ -438,6 +496,21 @@ class CILBuilder:
         type_node.attributes.reverse()
         type_node.methods.reverse()
 
+        index = type_node.methods.index(
+            ("copy", self.to_function_name("copy", "Object"))
+        )
+        type_node.methods[index] = (
+            "copy",
+            self.to_function_name("copy", self.current_type.name),
+        )
+
+        index = type_node.methods.index(
+            ("type_name", self.to_function_name("type_name", "Object"))
+        )
+        type_node.methods[index] = (
+            "type_name",
+            self.to_function_name("type_name", self.current_type.name),
+        )
         for feature in node.features:
             self.visit(feature)
 
