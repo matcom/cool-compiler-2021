@@ -92,21 +92,28 @@ def pipeline(input_file: Path, output_file: Path = None):
     tree = formatter.visit(cil_ast)
     print(tree)
 
-    # cil_to_mips_visitor = MIPSBuilder()
-    # mips_ast = cil_to_mips_visitor.visit(cil_ast)
+    cil_to_mips_visitor = MIPSBuilder()
+    mips_ast = cil_to_mips_visitor.visit(cil_ast)
 
-    # mips_writer = MIPSWriter()
-    # output = mips_writer(mips_ast)
+    mips_writer = MIPSWriter()
+    output = mips_writer.visit(mips_ast)
 
-    # output = '\n'.join(mips_writer.output)
+    output = '\n'.join(mips_writer.output)
 
-    # if output_file is None:
-    #     output_file = input.with_suffix(".mips")
+    if output_file is None:
+        output_file = input_file.with_suffix(".mips")
 
-    # output_file.write_text(output)
+    with output_file.open("w") as file:
+        print(output, file=file)
+        
+    #with open(f'{input_file[:-3]}.mips','w') as f:
+    #    f.write(f'{output}')
+    #output_file.write_text(output)
 
 
 if __name__ == "__main__":
-    # input_file = Path("/home/sandra/Desktop/FinalProjects/Compiler/cool-compiler-2021/customized_tests/test_hello_world.cl")
-    # pipeline(input_file)
+    #input_file = Path("/home/sandra/Desktop/FinalProjects/Compiler/cool-compiler-2021/customized_tests/code_gen/test_goto_if.cl")
+    #output_file =  Path("/home/sandra/Desktop/FinalProjects/Compiler/cool-compiler-2021/customized_tests/test_hello_world.mips")
+
+    #pipeline()
     typer.run(pipeline)

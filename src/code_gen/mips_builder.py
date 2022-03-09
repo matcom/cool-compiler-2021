@@ -653,14 +653,15 @@ class MIPSBuilder:
         self.memo.clean()
 
     @visitor.when(cil.IntComplementNode)
-    def visit(self, node):
-        self.memory_manager.save()
+    def visit(self,node):
+        self.register_instruction(mips.CommentNode,"Executing Int Complement")
+        self.memo.save()
 
         source_offset = self.get_offset(node.source)
         dest_offset = self.get_offset(node.dest)
 
-        reg1 = self.memo.get_unused_register()
-        reg2 = self.memo.get_unused_register()
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
 
         self.register_instruction(mips.LoadWordNode, reg1, source_offset, fp)
         self.register_instruction(mips.NotNode, reg2, reg1)
@@ -671,6 +672,7 @@ class MIPSBuilder:
           
     @visitor.when(cil.LessNode)
     def visit(self,node):
+        self.register_instruction(mips.CommentNode,"Executing Less Operation")
         self.memo.save()
         r_left = self.memo.get_unused_reg()
         r_right = self.memo.get_unused_reg()
@@ -697,6 +699,7 @@ class MIPSBuilder:
         
     @visitor.when(cil.LessEqualNode)
     def visit(self,node):
+        self.register_instruction(mips.CommentNode,"Executing Less Equal Operation")
         self.memo.save()
         r_left = self.memo.get_unused_reg()
         r_right = self.memo.get_unused_reg()
@@ -723,6 +726,7 @@ class MIPSBuilder:
     
     @visitor.when(cil.EqualNode)
     def visit(self,node):
+        self.register_instruction(mips.CommentNode,"Executing Equal Operation")
         self.memo.save()
         r_left = self.memo.get_unused_reg()
         r_right = self.memo.get_unused_reg()
@@ -747,9 +751,148 @@ class MIPSBuilder:
         
         self.memo.clean()
     
-    #READSTRING      
-    @visitor.when(cil.ReadNode)
+    @visitor.when(cil.SubstringNode)
     def visit(self, node):
+        self.register_instruction(mips.CommentNode,"Executing Substring")
+
+        #self.detect_substring_out_of_range(node.idx.offset, node.length.offset, node.source.offset)
+
+        #allocating new char array
+        if isinstance(node.length,int):
+            self.register_instruction(mips.LoadInmediate,s0,node.length)
+        else:
+            length_off = self.get_offset(node.length)
+            self.register_instruction(mips.LoadWordNode, s0, length_off, fp)#salvando el length del substr
+        self.register_instruction(mips.MoveNode, a0, s0)
+        self.register_instruction(mips.AddiNode, a0, a0, 1)
+        self.register_instruction(mips.LoadInmediate, v0, SYSCALL_SBRK)
+        self.register_instruction(mips.SyscallNode)
+        self.register_instruction(mips.MoveNode, t6, v0)#saving the dest char arr in t6
+
+        #loading ref to char array of source string
+        self.register_instruction(mips.CommentNode,"Loading reference to char array of source string")
+        
+        source_off = self.get_offset(node.source)
+        self.register_instruction(mips.LoadWordNode, t7, source_off, fp)
+        self.register_instruction(mips.LoadWordNode, t7, CHARS_ATTR_OFFSET, t7)
+        
+        if isinstance(node.index,int):
+            self.register_instruction(mips.LoadInmediate,s2,node.index)
+        else:
+            index_offset = self.get_offset(node.index)
+            self.register_instruction(mips.LoadWordNode,s2,index_offset,fp)
+        
+        self.register_instruction(mips.AddNode, t7, t7, s2)#saving the source char arr in t7
+
+        self.register_instruction(mips.MoveNode, s1, t6)
+
+        #this copies from t7 to t6 a0 bytes
+        self.register_instruction(mips.CommentNode,"Copying bytes from one char array to another")
+        self.register_instruction(mips.MoveNode, a0, s0)
+        self.register_instruction(mips.JumpAndLink, COPY)
+
+        self.register_instruction(mips.CommentNode,"Null-terminating the string")
+        self.register_instruction(mips.StoreByteNode, zero, 0, t0)
+
+        self.register_instruction(mips.CommentNode,"Allocating new String instance")
+        dest_offset = self.get_offset(node.dest)
+        _size = STRING_SIZE
+        self.register_instruction(mips.LoadInmediate,v0,SYSCALL_SBRK)
+        self.register_instruction(mips.LoadInmediate,a0,_size)
+        self.register_instruction(mips.SyscallNode)
+
+        self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
+        reg = self.memo.get_unused_reg()
+        self.register_instruction(mips.LoadAddress,reg,STRING)
+        self.register_instruction(mips.StoreWordNode,reg,0,v0)
+        
+
+        #storing string length
+        self.register_instruction(mips.CommentNode,"Storing length and reference to char array")
+        if isinstance(node.length,int):
+            self.register_instruction(mips.LoadInmediate,s0,node.length)
+        else:
+            length_off = self.get_offset(node.length)
+            self.register_instruction(mips.LoadWordNode, s0, length_off, fp)
+        self.register_instruction(mips.StoreWordNode, s0, LENGTH_ATTR_OFFSET, v0)
+
+        #storing string chars ref
+        self.register_instruction(mips.StoreWordNode, s1, CHARS_ATTR_OFFSET, v0)
+    
+    @visitor.when(cil.ConcatNode)
+    def visit(self, node):
+        self.memo.save()
+        left_offset = self.get_offset(node.left)
+        right_offset = self.get_offset(node.right)
+        #cargar los length
+        self.register_instruction(mips.CommentNode,"Loading length")
+        self.register_instruction(mips.LoadWordNode, s1, left_offset, fp)
+        self.register_instruction(mips.LoadWordNode, s1, LENGTH_ATTR_OFFSET, s1)
+        self.register_instruction(mips.LoadWordNode, s2, right_offset, fp)
+        self.register_instruction(mips.LoadWordNode, s2, LENGTH_ATTR_OFFSET, s2)
+
+        reg1 = self.memo.get_unused_reg() #sum of lengths
+        self.register_instruction(mips.AddNode, reg1, s1, s2)
+
+        #crear el nuevo array de bytes
+        self.register_instruction(mips.CommentNode,"Allocating new char array")
+        self.register_instruction(mips.MoveNode, a0, reg1)
+        self.register_instruction(mips.AddiNode, a0, a0, 1)
+        self.register_instruction(mips.LoadInmediate, v0, SYSCALL_SBRK)
+        self.register_instruction(mips.SyscallNode)
+        self.register_instruction(mips.MoveNode, t6, v0)#saving the dest char arr in t6
+        
+        reg2 = self.memo.get_unused_reg()
+        self.register_instruction(mips.MoveNode, reg2, v0)
+
+        self.register_instruction(mips.CommentNode,"Copying bytes from first string")
+        self.register_instruction(mips.LoadWordNode, t7, left_offset, fp)
+        self.register_instruction(mips.LoadWordNode, t7, CHARS_ATTR_OFFSET, t7)
+        self.register_instruction(mips.MoveNode, a0, s1)
+        self.register_instruction(mips.JumpAndLink, COPY)
+
+        self.register_instruction(mips.CommentNode,"Copying bytes from second string")
+        self.register_instruction(mips.LoadWordNode, t7, right_offset, fp)
+        self.register_instruction(mips.LoadWordNode, t7, CHARS_ATTR_OFFSET, t7)
+        self.register_instruction(mips.MoveNode, a0, s2)
+        self.register_instruction(mips.JumpAndLink, COPY)
+
+        self.register_instruction(mips.CommentNode,"Null-terminating the string")
+        self.register_instruction(mips.StoreByteNode, zero, 0, t6)
+
+        self.register_instruction(mips.CommentNode,"Allocating new String instance")
+        dest_offset = self.get_offset(node.dest)
+        _size = STRING_SIZE
+        self.register_instruction(mips.LoadInmediate,v0,SYSCALL_SBRK)
+        self.register_instruction(mips.LoadInmediate,a0,_size)
+        self.register_instruction(mips.SyscallNode)
+
+        self.register_instruction(mips.StoreWordNode,v0,dest_offset,fp)
+        reg3 = self.memo.get_unused_reg()
+        self.register_instruction(mips.LoadAddress,reg3,STRING)
+        self.register_instruction(mips.StoreWordNode,reg3,0,v0)
+
+        #storing string length
+        self.register_instruction(mips.CommentNode,"Storing length and reference to char array")
+        self.register_instruction(mips.StoreWordNode, reg1, LENGTH_ATTR_OFFSET, v0)
+
+        #storing string chars ref
+        self.register_instruction(mips.StoreWordNode, reg2, CHARS_ATTR_OFFSET, v0)
+    
+        self.memo.clean()
+        
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node):
+        dest_off = self.get_offset(node.dest)
+        self.register_instruction(mips.CommentNode,"ReadIntNode")
+        self.register_instruction(mips.LoadInmediate, v0, SYSCALL_READ_INT)
+        self.register_instruction(mips.SyscallNode)
+        self.register_instruction(mips.StoreWordNode, v0, dest_off, fp)
+        
+        
+          
+    @visitor.when(cil.ReadStringNode)
+    def visit(self,node):
         self.memo.save()
         self.register_instruction(mips.CommentNode, "ReadStrNode")
         self.register_instruction(mips.CommentNode, "Reading String to buffer")
@@ -817,7 +960,11 @@ class MIPSBuilder:
         # storing string chars ref
         self.register_instruction(mips.StoreWordNode, reg3, CHARS_ATTR_OFFSET, v0)
         self.memo.clean()
-
+        
+        
+        
+    
+          
     @visitor.when(cil.PrintStrNode)
     def visit(self, node):
         self.register_instruction(mips.CommentNode, "PrintStringNode")
@@ -851,7 +998,24 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode, reg1, dest_offset, fp)
 
         self.memo.clean()
-
+    
+    @visitor.when(cil.IsVoidNode)
+    def visit(self, node):
+        self.register_instruction(mips.CommentNode,"Executing IsVoid")
+        self.memo.save()
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+        source_off = self.get_offset(node.value)
+        dest_off = self.get_offset(node.dest)
+        
+        self.register_instruction(mips.LoadWordNode, reg1, source_off, fp)
+        self.register_instruction(mips.LoadAddress, reg2, VOID)
+        self.register_instruction(mips.SetEq, reg1, reg1, reg2)
+         
+        self.register_instruction(mips.StoreWordNode, reg1, dest_off, fp)
+        self.memo.clean()
+    
+    
     @visitor.when(cil.ExitNode)
     def visit(self, node):
         self.register_instruction(mips.LoadInmediate, v0, SYSCALL_EXIT)
@@ -862,22 +1026,6 @@ class MIPSBuilder:
         self.register_instruction(mips.Label,node.name)
     
     @visitor.when(cil.CopyNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(cil.TypeNameNode)
-    def visit(self, node):
-        pass
-
-    # @visitor.when(cil.ToStrNode)
-    # def visit(self,node):
-    #     pass
-
-    @visitor.when(cil.ConcatNode)
-    def visit(self, node):
-        pass
-
-    @visitor.when(cil.SubstringNode)
     def visit(self, node):
         pass
     

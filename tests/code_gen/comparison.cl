@@ -4,10 +4,11 @@ class Main inherits IO{
     b : Int;
     main (): Object {
         {
+             
             a < b;
             a <= b;
             a = b;
-            out_string("Default value for Int should be 0");
+            out_string(if a <= b then "a<=b" else "a>b" fi);
         }
     };
 };
