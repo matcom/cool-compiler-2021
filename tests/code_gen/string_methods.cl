@@ -6,7 +6,7 @@ class Main inherits IO{
     d : String <- "Second sentence.";
     main (): Object {
         {
-            out_string(c.concat(d));
+            out_string(c.concat(d)); 
             out_string(c.substr(0, c.length()));
         }
     };

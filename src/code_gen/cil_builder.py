@@ -359,7 +359,14 @@ class CILBuilder:
         self.register_instruction(AllocateNode("String", solve))
         type_name = self.define_internal_local()
         self.register_instruction(
-            LoadNode(type_name, f"type_name_{self.current_type.name}")
+            LoadNode(
+                type_name,
+                VariableInfo(
+                f"type_name_{self.current_type.name}",
+                None,
+                False,
+                f"{self.current_type.name}")
+            )
         )
         self.register_instruction(AssignNode(solve, type_name))
         self.register_instruction(ReturnNode(solve))

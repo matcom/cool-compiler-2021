@@ -417,7 +417,7 @@ class PrintVisitor(object):
 
     @visitor.when(LoadNode)
     def visit(self, node):
-        return f"{node.dest} = LOAD {node.msg}"
+        return f"{node.dest} = LOAD {node.msg.name}"
 
     @visitor.when(ConcatNode)
     def visit(self, node):

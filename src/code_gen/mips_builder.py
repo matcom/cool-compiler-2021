@@ -792,7 +792,7 @@ class MIPSBuilder:
         self.register_instruction(mips.JumpAndLink, COPY)
 
         self.register_instruction(mips.CommentNode,"Null-terminating the string")
-        self.register_instruction(mips.StoreByteNode, zero, 0, t0)
+        self.register_instruction(mips.StoreByteNode, zero, 0, t6)
 
         self.register_instruction(mips.CommentNode,"Allocating new String instance")
         dest_offset = self.get_offset(node.dest)
