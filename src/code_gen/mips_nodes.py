@@ -107,6 +107,15 @@ class NotNode(InstructionNode):
         
     def __str__(self):
         return f"not {self.dest}, {self.source}"
+    
+    
+class NegNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+        
+    def __str__(self):
+        return f"neg {self.dest}, {self.source}"
 
 class ArithAnfLogicNode(InstructionNode):
     def __init__(self, destination, left, right):
@@ -205,6 +214,14 @@ class BranchOnNotEqZero(InstructionNode):
         
     def __str__(self):
         return f'bnez {self.reg}, {self.label}'
+    
+class BranchOnEqZero(InstructionNode):
+    def __init__(self,reg,label):
+        self.reg = reg
+        self.label = label
+        
+    def __str__(self):
+        return f'beqz {self.reg}, {self.label}'
         
 
 

@@ -3,6 +3,7 @@
 # from operator import le
 # from tkinter.tix import Select
 # from soupsieve import select
+from re import S
 import cmp.visitor as visitor
 import cmp.cil as cil
 import random
@@ -229,9 +230,50 @@ class MIPSBuilder:
 
         self.text.append(self.current_procedure)
 
+    def generate_str_cmp(self):
+        self.current_procedure = mips.ProcedureNode(STR_CMP)
+
+        #comparing lengths
+        self.register_instruction(mips.CommentNode, "Comparing lengths")
+        self.register_instruction(mips.LoadWordNode, s0, LENGTH_ATTR_OFFSET, t6) #length offset
+        self.register_instruction(mips.LoadWordNode, s1, LENGTH_ATTR_OFFSET, t7)
+        self.register_instruction(mips.SetEq,a0,s0,s1)
+        
+        self.register_instruction(mips.BranchOnEqZero,a0,"end_loop")
+        
+        #comparing char by char
+        self.register_instruction(mips.CommentNode, "Comparing char by char")
+        self.register_instruction(mips.LoadWordNode, s0, CHARS_ATTR_OFFSET, t6) #char array pointer offset
+        self.register_instruction(mips.LoadWordNode, s1, CHARS_ATTR_OFFSET, t7)
+
+        #char by char loop
+        self.register_instruction(mips.Label, "strcmp_loop")
+        self.register_instruction(mips.LoadInmediate,s2,0)
+        self.register_instruction(mips.LoadByteNode, s2, 0, s0)
+        
+        self.register_instruction(mips.LoadInmediate,s3,0)
+        self.register_instruction(mips.LoadByteNode, s3, 0, s1)
+        
+        self.register_instruction(mips.SetEq,a0,s2,s3)
+        self.register_instruction(mips.BranchOnEqZero,a0,"end_loop")
+        
+
+        self.register_instruction(mips.BranchOnEqZero,s3, "end_loop")
+        self.register_instruction(mips.BranchOnEqZero,s2, "end_loop")
+        self.register_instruction(mips.AddiNode,s0,s0,1)
+        self.register_instruction(mips.AddiNode,s1,s1,1)
+        
+        self.register_instruction(mips.Jump, "strcmp_loop")
+
+        self.register_instruction(mips.Label, "end_loop")
+        self.register_instruction(mips.JumpRegister, ra)
+
+        self.text.append(self.current_procedure)
+        
     def generate_auxiliar_procedures(self):
         self.generate_str_length()
         self.generate_copy()
+        self.generate_str_cmp()
 
     @visitor.on("node")
     def visit(self, node=None):
@@ -750,6 +792,19 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,r_dest,dest_off,fp)
         
         self.memo.clean()
+        
+    @visitor.when(cil.StrEqualNode)
+    def visit(self,node):
+        self.register_instruction(mips.CommentNode,"Executing StrEqual Operation")
+        left_off = self.get_offset(node.left)
+        right_off = self.get_offset(node.right)
+        self.register_instruction(mips.LoadWordNode, t6, left_off, fp)
+        self.register_instruction(mips.LoadWordNode, t7, right_off, fp)
+
+        self.register_instruction(mips.JumpAndLink, STR_CMP)
+        dest_off = self.get_offset(node.dest)
+        self.register_instruction(mips.StoreWordNode, a0, dest_off, fp)
+    
     
     @visitor.when(cil.SubstringNode)
     def visit(self, node):
