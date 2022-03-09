@@ -196,10 +196,10 @@ class ConcatNode(InstructionNode):
 
 
 class SubstringNode(InstructionNode):
-    def __init__(self, dest, source, idx, length):
+    def __init__(self, dest, source, index, length):
         self.dest = dest
         self.source = source
-        self.id = idx
+        self.index = index
         self.length = length
 
 
@@ -330,7 +330,7 @@ class PrintVisitor(object):
 
     @visitor.when(IntComplementNode)
     def visit(self, node):
-        return f"{node.dest} = ~ {node.expr}"
+        return f"{node.dest} = ~ {node.source}"
 
     @visitor.when(LabelNode)
     def visit(self, node):
@@ -418,7 +418,7 @@ class PrintVisitor(object):
 
     @visitor.when(SubstringNode)
     def visit(self, node):
-        return f"{node.dest} = SUBSTRING {node.source} {node.id} {node.length}"
+        return f"{node.dest} = SUBSTRING {node.source} {node.index} {node.length}"
 
     @visitor.when(DefaultValueNode)
     def visit(self, node):
