@@ -300,6 +300,27 @@ a la propiedad parent del scope que crea la clase que hereda, el scope creado po
 clase heredada. Esta técnica es usada cada vez que interesa crear scopes específicos para ciertas
 secciones.
 
+Un caso que prestó especial atención es el retorno de funciones que fueran **SELF_TYPE**. En tiempo de compilación no
+se puede asumir que el tipo de retorno de una función con **SELF_TYPE** puede ser sustituido por el tipo de la clase, y es
+que si se asume esto entonces se perdería todo el sentido del término y ejemplos como el siguiente no podrían ser 
+reconocidos.
+```
+class A {
+    f() : SELF_TYPE { self };
+};
+
+class B inherits A { };
+
+class Main {
+    x : B <- (new B).f();
+    main() : B { x };
+};
+```
+La herencia exige un comportamiento y es por ello que se mantiene este tipo de retorno **SELF_TYPE**. EL análisis de 
+las expresiones dispatch fue el que puso en plenitud la definición de **SELF_TYPE** y es que se le intentará asignar
+como tipo de retorno a la expresión, el tipo del objeto al que se le manda a invocar la función. De esta forma es que 
+se obtiene en el proyecto el chequeo de tipos para este tipo especial.
+
 ## Generador de Código
 
 El objetivo de esta etapa es bajar de **COOL**, que es un lenguaje de alto nivel que usa el concepto de herencia y polimorfismo,
@@ -358,7 +379,8 @@ párrafo anterior. Aquí se definirán primero los atributos heredados (en el or
 los atributos definidos en ella.
 
 El offset se incrementa en 4 con cada posición, por lo que si queremos referirnos al valor del 
-primer atributo de una clase A tendremos que referirnos al offset 16 (5ta posición (5-1)*4=16)
+primer atributo de una clase A tendremos que referirnos al offset 16 (5ta posición (5-1)*4=16). Como se puede apreciar
+cada posición contiene el tamaño de 1 **word**
 
 | Sección 1 | Sección 2 | Sección 3 |       Sección 4       | Sección 5 |
 |:---------:|:---------:|:---------:|:---------------------:|:---------:|
