@@ -65,7 +65,6 @@ class CCILToMIPSGenerator:
         )
 
         functions = []
-        print(node.entry_func)
         functions.extend(self.visit(node.entry_func))
 
         for classx in node.types_section:
