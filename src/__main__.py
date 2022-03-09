@@ -74,7 +74,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "debbuging/tests_ccil/simple.cl"
+        input_file = "debbuging/tests_ccil/life.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
@@ -107,7 +107,7 @@ def main():
     mips_code = mips_gen.visit(mips_ast)
 
     out_file = input_file.split(".")[0]
-    path_to_file =f"{out_file}.mips"
+    path_to_file = f"{out_file}.mips"
     # path_to_file = "output.asm"
     with open(path_to_file, "w") as f:
         f.write(mips_code)
