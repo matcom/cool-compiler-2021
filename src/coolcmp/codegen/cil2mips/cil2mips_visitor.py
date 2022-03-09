@@ -239,12 +239,23 @@ class CILToMipsVisitor:
         obj_address = self.get_address(node.obj)
         meth_offset = self.get_method_index(node.method)
         dest_address = self.get_address(node.dest)
-        args_space = self.cil_root.get_function(f"{node.dtype}_{node.method}").args_space
+        args_space = self.cil_root.get_function(
+            f"{node.type or node.dtype}_{node.method}"
+        ).args_space
+
+        if node.type is None:
+            get_type_inst = (
+                mips.LWNode(t0, (obj_address, fp))      .with_comm("Get instance pointer"),
+                mips.LWNode(t0, (0, t0))                .with_comm("Get type pointer at offset 0"),
+            )
+        else:
+            get_type_inst = (
+                mips.LANode(t0, node.type),
+            )
 
         self.add_inst(
             mips.CommentNode(f"<dynamiccall:{node.obj}-{node.method}-{node.dest}>"),
-            mips.LWNode(t0, (obj_address, fp))      .with_comm("Get instance pointer"),
-            mips.LWNode(t0, (0, t0))                .with_comm("Get type pointer at offset 0"),
+            *get_type_inst,
             mips.LWNode(t0, (meth_offset, t0))      .with_comm(f"Get method: {node.method}"),
             mips.JALRNode(t0)                       .with_comm(f"Jump to {node.method}"),
             mips.SWNode(v0, dest_address, fp),
@@ -265,7 +276,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
-        print(self.cur_function.name, [p for p in self.cur_function.params], [l for l in self.cur_function.local_vars])
         address = self.get_address(node.name)
 
         self.add_inst(

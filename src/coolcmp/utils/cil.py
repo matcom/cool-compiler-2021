@@ -260,10 +260,11 @@ class StaticCallNode(InstructionNode):
 
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, obj: str, method: str, dest: str, dtype: str):
+    def __init__(self, obj: str, method: str, dest: str, type_: str | None, dtype: str):
         self.obj = obj
         self.method = method
         self.dest = dest
+        self.type = type_
         self.dtype = dtype
 
 
