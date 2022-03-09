@@ -162,17 +162,25 @@ class Point{
 
  (* class Main inherits IO{
     main (): Object {
-	self@IO.out_int((new Point)@Point.init(5, 6))
-        
+	self.out_int((new Point).init(5, 6))
     };
 };
 
-class Point{
+class Point inherits Main{
     x: Int;
     y: Int;
+    a: Point;
+    s: String;
 
-    init(x0: AUTO_TYPE, y0: AUTO_TYPE): AUTO_TYPE {
-	x0 + y0 
+    init(x0: AUTO_TYPE, y0: AUTO_TYPE): AUTO_TYPE {{
+    a <- new Point;
+    s <- "Hello World";
+    case a of
+        b: Int => x0 + y0;
+        d: String => s;
+        c: Main => new Main;
+    esac;
+    }
     };
 };
 *)
