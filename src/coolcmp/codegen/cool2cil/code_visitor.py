@@ -492,7 +492,7 @@ class DotCodeVisitor:
         obj_dest = self.visit(obj, scope)
 
         # allocate and push the args
-        for arg in node.args:
+        for arg in reversed(node.args):
             arg_dest = self.visit(arg, scope)
             self.add_inst(cil.ArgNode(arg_dest))
         self.add_inst(cil.ArgNode(obj_dest))
