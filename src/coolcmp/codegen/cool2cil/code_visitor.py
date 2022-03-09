@@ -360,17 +360,49 @@ class DotCodeVisitor:
 
     @visitor.when(ast.CaseBranchNode)
     def visit(self, node: ast.CaseBranchNode, scope: Scope):
-        # self.add_inst(cil.AssignNode)
-        raise NotImplementedError()
+        self.visit(node.expr, scope)
 
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode, scope: Scope):
-        raise NotImplementedError()
-        # self.visit(node.expr, scope)
-        #
-        # for case in node.cases:
-        #     self.add_inst(self.new_label(f'case_branch'))
-        #     self.visit(case, scope.children.pop(0))
+        self.add_comment("Case of")
+        ret_exp = self.visit(node.expr, scope)
+        typename = self.add_local('typename')
+        end_label = self.new_label('end')
+        case_match_re_label = self.new_label('case_match_re')
+        expr_void_re_label = self.new_label('expr_void_re')
+
+
+        self.add_inst(cil.TypeNameNode(typename, ret_exp))
+
+        branch_labels = [self.new_label('case_branch') for _ in node.cases]
+
+        # TODO: use conform instead of match
+        for case, label in zip(node.cases, branch_labels):
+            self.add_comment(f"Check for case branch {case.type}")
+            branch_local = self.add_local('branch_local')
+            self.add_inst(cil.StaticCallNode(f'{case.type}__init', branch_local))
+            branch_local_typename = self.add_local('branch_local_typename')
+            self.add_inst(cil.TypeNameNode(branch_local_typename, branch_local))
+            cond = self.add_local('case_cond')
+
+            self.add_inst(cil.EqualNode(cond, typename, branch_local_typename))
+            self.add_inst(cil.GotoIfNode(cond, label.name))
+
+        # Does not conform to anyone => Runtime error
+        self.add_inst(cil.GotoNode(case_match_re_label.name))
+
+        for case, label in zip(node.cases, branch_labels):
+            self.add_inst(label)
+            self.visit(case, scope) # TODO: Handle correct scope
+            self.add_inst(cil.GotoNode(end_label.name))
+
+        # Handle Runtime Errors
+        self.add_inst(case_match_re_label)
+        self.add_inst(cil.CaseMatchRuntimeErrorNode())
+        self.add_inst(expr_void_re_label)
+        self.add_inst(cil.ExprVoidRuntimeErrorNode())
+
+        self.add_inst(end_label)
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):

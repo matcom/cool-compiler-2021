@@ -391,3 +391,15 @@ class InitNode(InstructionNode):
 
 class AbortNode(InstructionNode):
     pass
+
+
+class RuntimeErrorNode(InstructionNode):
+    pass
+
+
+class CaseMatchRuntimeErrorNode(RuntimeError):
+    pass
+
+
+class ExprVoidRuntimeErrorNode(RuntimeError):
+    pass
