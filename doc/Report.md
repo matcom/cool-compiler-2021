@@ -81,7 +81,10 @@ unarios isvoid y opuesto.
 cuentran los números, ids, las expresiones boolea-
 nas y los strings.
 
-**IMAGEN** Figura 1: Fragmento de la gramática de Cool.
+![](../img/grammar.png)
+
+Figura 1: Fragmento de la gramática de Cool.
+
 
 ## Análisis sintáctico
 
