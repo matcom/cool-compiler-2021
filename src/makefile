@@ -1,7 +1,6 @@
 .PHONY: clean
 
 main:
-	# Compiling the compiler :)
 
 clean:
 	rm -rf build/*
@@ -9,4 +8,9 @@ clean:
 
 test:
 	pytest ../tests -v --tb=short -m=${TAG}
+ 
+install:
+	pip install -r ../requirements.txt
+
+
 
