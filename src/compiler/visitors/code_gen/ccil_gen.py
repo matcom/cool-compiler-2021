@@ -18,24 +18,6 @@ END_LINE = Data("line_end", r"\n")
 ZERO = "zero"
 EMPTY = "empty"
 
-# TODO:
-# See how typeof should work, a special kind of equality?
-# Define abort nodes with a text:
-# * Dispatch on a void class (Done)
-# * Case expr is void
-# * No pattern match in case (Done)
-# * Division by zero (Done)
-# * Substring out of range (Done)
-# * Heap Overflow (don't know yet how to handle this)
-
-# TEST:
-# * Built in methods
-
-
-# BOSS:
-# Test there are no runtimes errors during generation
-# Test that generation is correct
-
 
 # CCIL stands for Cool Cows Intermediate Language ;)
 class CCILGenerator:

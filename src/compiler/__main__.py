@@ -4,8 +4,8 @@ from visitors.code_gen.mips_gen import MIPSGenerator
 from visitors.ast_print.type_logger import TypeLogger
 import sys
 
-from visitors.lexing import Lexer
-from visitors.parsing import Parser
+from lexing import Lexer
+from parsing import Parser
 from visitors.semantics import TypeBuilder, TypeCollector
 from visitors.semantics.inference import (
     SoftInferencer,
@@ -16,13 +16,12 @@ from visitors.semantics.inference import (
 
 
 def format_errors(errors, s=""):
-    # errors.sort(key=lambda x: x[0])
     for error in errors:
         s += error[1] + "\n"
     return s[:]
 
 
-def run_pipeline(program_ast):
+def semantics_pipeline(program_ast):
 
     collector = TypeCollector()
     collector.visit(program_ast)
@@ -49,7 +48,6 @@ def run_pipeline(program_ast):
     change = True
     back = BackInferencer(context)
 
-    # import pdb; pdb.set_trace()
     back_ast, change = back.visit(hard_ast)
     while change:
         back_ast, change = back.visit(back_ast)
@@ -74,7 +72,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "tests/normal/simple.cl"
+        input_file = "../tests/normal/abort1.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)
@@ -95,10 +93,9 @@ def main():
             print(error)
         exit(1)
 
-    type_ast = run_pipeline(ast)
+    type_ast = semantics_pipeline(ast)
     ccil_gen = CCILGenerator()
     ccil_ast = ccil_gen.visit(type_ast)
-    print(str(ccil_ast))
 
     ccil_mips_gen = CCILToMIPSGenerator()
     mips_ast = ccil_mips_gen.visit(ccil_ast)

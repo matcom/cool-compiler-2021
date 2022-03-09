@@ -10,4 +10,4 @@ echo "Copyright (c) 2021: Adrian, Rodrigo"    # TODO: líneas a los valores corr
 # Llamar al compilador
 # echo "Compiling $INPUT_FILE into $OUTPUT_FILE"
 
-exec python3 compiler/__main__.py $INPUT_FILE
+exec python3 compiler $INPUT_FILE

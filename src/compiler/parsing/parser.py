@@ -31,7 +31,7 @@ from asts.parser_ast import (
     VariableNode,
     ParamNode,
 )
-from visitors.parsing.errors import SyntacticError
+from .errors import SyntacticError
 
 
 class Parser:
