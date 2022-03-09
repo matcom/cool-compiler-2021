@@ -1,14 +1,7 @@
 # COOL: Proyecto de Compilación
-
-La evaluación de la asignatura Complementos de Compilación, inscrita en el programa del 4to año de la Licenciatura en Ciencia de la Computación de la Facultad de Matemática y Computación de la
-Universidad de La Habana, consiste este curso en la implementación de un compilador completamente
-funcional para el lenguaje _COOL_.
-
-_COOL (Classroom Object-Oriented Language)_ es un pequeño lenguaje que puede ser implementado con un esfuerzo razonable en un semestre del curso. Aun así, _COOL_ mantiene muchas de las características de los lenguajes de programación modernos, incluyendo orientación a objetos, tipado estático y manejo automático de memoria.
-
 ### Sobre el Lenguaje COOL
 
-Ud. podrá encontrar la especificación formal del lenguaje COOL en el documento _"COOL Language Reference Manual"_, que se distribuye junto con el presente texto.
+Ud. podrá encontrar la especificación formal del lenguaje COOL en el documento _"COOL Language Reference Manual"_, en la carpeta *doc* en el directorio raiz del proyecto.
 
 ## Código Fuente
 
