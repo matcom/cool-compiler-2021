@@ -37,7 +37,7 @@ from asts.mips_ast import (
     WordDirective,
     Xori,
 )
-from utils import visitor
+from visitors.utils import visitor
 
 
 class MIPSGenerator:

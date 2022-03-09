@@ -1,11 +1,11 @@
-from utils import visitor
+from visitors.utils import visitor
 import asts.types_ast as sem_ast  # Semantic generated ast
 from asts.ccil_ast import *  # CCIL generated ast
-from typing import OrderedDict, Set, Tuple, List, Dict
-from code_gen.tools import *
+from typing import OrderedDict, Tuple, List, Dict
+from visitors.code_gen.tools import *
 from collections import OrderedDict
 
-from code_gen.constants import *
+from visitors.code_gen.constants import *
 
 # All operations that define an expression and where it is stored
 VISITOR_RESULT = Tuple[List[OperationNode], StorageNode]

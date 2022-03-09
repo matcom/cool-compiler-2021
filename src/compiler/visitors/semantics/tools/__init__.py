@@ -1,6 +1,6 @@
-from semantics.tools.context import Context
-from semantics.tools.scope import Scope
-from semantics.tools.type import (
+from visitors.semantics.tools.context import Context
+from visitors.semantics.tools.scope import Scope
+from visitors.semantics.tools.type import (
     ErrorType,
     SelfType,
     TypeBag,
@@ -11,5 +11,5 @@ from semantics.tools.type import (
     smart_add,
     try_conform,
     Type,
-    unify
+    unify,
 )

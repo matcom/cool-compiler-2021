@@ -1,10 +1,10 @@
 from typing import List, Tuple
-from semantics.tools.context import Context
-from semantics.tools.errors import InternalError
-from semantics.tools.type import Type, join_list
-from utils import visitor
+from visitors.semantics.tools.context import Context
+from visitors.semantics.tools.errors import InternalError
+from visitors.semantics.tools.type import Type, join_list
+from visitors.utils import visitor
 
-from semantics.tools import TypeBag, Scope
+from visitors.semantics.tools import TypeBag, Scope
 import asts.types_ast as types_ast
 from asts.inferencer_ast import (
     BinaryNode,
@@ -228,7 +228,7 @@ class TypesInferencer:
 
     @visitor.when(ComplementNode)
     def visit(self, node: ComplementNode, scope: Scope) -> types_ast.ComplementNode:
-        expr = self.visit(node.expr,scope)
+        expr = self.visit(node.expr, scope)
         new_node = types_ast.ComplementNode(expr, node)
         new_node.type = self._reduce_to_type(node.inferenced_type, node)
         return new_node

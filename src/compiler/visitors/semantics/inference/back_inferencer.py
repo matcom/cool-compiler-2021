@@ -1,37 +1,37 @@
 from copy import copy, deepcopy
-from semantics.tools.errors import SemanticError
 from typing import Tuple
 
-from semantics.tools.type import Method, SelfType, Type
-from semantics.tools import Context, Scope, TypeBag, join, join_list, unify
-from utils import visitor
 from asts.inferencer_ast import (
-    ParamNode,
-    ProgramNode,
-    ClassDeclarationNode,
-    MethodDeclarationNode,
+    AssignNode,
     AttrDeclarationNode,
+    AttrDeclarationNode,
+    BinaryNode,
     BlocksNode,
-    ConditionalNode,
+    BooleanNode,
     CaseNode,
     CaseOptionNode,
-    LoopNode,
-    LetNode,
-    VarDeclarationNode,
-    AssignNode,
-    MethodCallNode,
-    BinaryNode,
-    BooleanNode,
     ClassDeclarationNode,
+    ClassDeclarationNode,
+    ConditionalNode,
     InstantiateNode,
     IntNode,
-    ProgramNode,
-    AttrDeclarationNode,
+    LetNode,
+    LoopNode,
+    MethodCallNode,
+    MethodDeclarationNode,
     Node,
+    ParamNode,
+    ProgramNode,
+    ProgramNode,
     StringNode,
     UnaryNode,
+    VarDeclarationNode,
     VariableNode,
 )
+from visitors.semantics.tools import Context, Scope, TypeBag, join, join_list, unify
+from visitors.semantics.tools.errors import SemanticError
+from visitors.semantics.tools.type import Method, SelfType, Type
+from visitors.utils import visitor
 
 
 class BackInferencer:

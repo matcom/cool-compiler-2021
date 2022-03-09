@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
-from semantics.tools.type import Type
+from visitors.semantics.tools.type import Type
 
 
 @dataclass(frozen=True)

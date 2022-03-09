@@ -1,5 +1,6 @@
 from inspect import currentframe
 from typing import Type
+
 import asts.inferencer_ast as inf_ast
 from asts.parser_ast import (
     ArithmeticNode,
@@ -34,10 +35,7 @@ from asts.parser_ast import (
     VarDeclarationNode,
     VariableNode,
 )
-
-from utils import visitor
-from semantics.tools.errors import SemanticError, AttributeError
-from semantics.tools import (
+from visitors.semantics.tools import (
     Context,
     Scope,
     SelfType,
@@ -47,6 +45,8 @@ from semantics.tools import (
     join_list,
     smart_add,
 )
+from visitors.semantics.tools.errors import AttributeError, SemanticError
+from visitors.utils import visitor
 
 
 class SoftInferencer:

@@ -1,4 +1,3 @@
-from semantics.tools.errors import InternalError, AttributeError
 from asts.inferencer_ast import (
     ArithmeticNode,
     AssignNode,
@@ -33,12 +32,11 @@ from asts.inferencer_ast import (
     VarDeclarationNode,
     VariableNode,
 )
-from semantics.tools.type import Type
-from utils import visitor
-from semantics.tools import (
+from visitors.semantics.tools import (
     Context,
     Scope,
     SelfType,
+    Type,
     TypeBag,
     conforms,
     equal,
@@ -46,6 +44,8 @@ from semantics.tools import (
     join_list,
     smart_add,
 )
+from visitors.semantics.tools.errors import AttributeError, InternalError
+from visitors.utils import visitor
 
 
 class HardInferencer:

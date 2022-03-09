@@ -1,5 +1,5 @@
-from semantics.tools.errors import *
-from semantics.tools.type import TypeBag, Type, SelfType
+from visitors.semantics.tools.errors import *
+from visitors.semantics.tools.type import TypeBag, Type, SelfType
 from typing import Dict, List, Union
 
 

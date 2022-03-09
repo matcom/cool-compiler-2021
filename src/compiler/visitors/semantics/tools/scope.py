@@ -1,5 +1,5 @@
 from typing import Optional
-from semantics.tools.type import TypeBag, ErrorType
+from visitors.semantics.tools.type import TypeBag, ErrorType
 import itertools as itt
 
 
@@ -89,4 +89,3 @@ class Scope:
         for child in self.children:
             s = child.get_all_names(s, level + 1)
         return s
-

@@ -1,4 +1,4 @@
-from semantics.tools.errors import *
+from visitors.semantics.tools.errors import *
 from typing import List, Set, Tuple
 from collections import OrderedDict
 

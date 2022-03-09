@@ -1,13 +1,13 @@
-from code_gen.ccil_gen import CCILGenerator
-from code_gen.ccil_mips_gen import CCILToMIPSGenerator
-from code_gen.mips_gen import MIPSGenerator
-from debbuging.type_logger import TypeLogger
+from visitors.code_gen.ccil_gen import CCILGenerator
+from visitors.code_gen.ccil_mips_gen import CCILToMIPSGenerator
+from visitors.code_gen.mips_gen import MIPSGenerator
+from visitors.ast_print.type_logger import TypeLogger
 import sys
 
-from lexing import Lexer
-from parsing import Parser
-from semantics import TypeBuilder, TypeCollector
-from semantics.inference import (
+from visitors.lexing import Lexer
+from visitors.parsing import Parser
+from visitors.semantics import TypeBuilder, TypeCollector
+from visitors.semantics.inference import (
     SoftInferencer,
     HardInferencer,
     BackInferencer,
@@ -74,7 +74,7 @@ def main():
     if len(sys.argv) > 1:
         input_file = sys.argv[1]  # + " " + sys.argv[2] + " " + sys.argv[3]
     else:
-        input_file = "debbuging/tests_ccil/life.cl"
+        input_file = "tests/normal/simple.cl"
     #   raise Exception("Incorrect number of arguments")
 
     program_file = open(input_file)

@@ -1,4 +1,4 @@
-from utils import visitor
+from visitors.utils import visitor
 from asts.inferencer_ast import (
     AssignNode,
     AtomicNode,
@@ -20,7 +20,7 @@ from asts.inferencer_ast import (
     VarDeclarationNode,
     LoopNode,
 )
-from semantics.tools import Context, Scope
+from visitors.semantics.tools import Context, Scope
 
 
 class TypeLogger(object):

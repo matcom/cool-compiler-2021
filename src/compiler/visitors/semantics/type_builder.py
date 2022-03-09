@@ -1,14 +1,13 @@
-from semantics.tools.type import Type
-from utils import visitor
 from asts.parser_ast import (
-    Node,
-    ProgramNode,
+    AttrDeclarationNode,
     ClassDeclarationNode,
     MethodDeclarationNode,
-    AttrDeclarationNode,
+    Node,
+    ProgramNode,
 )
-from semantics.tools.errors import SemanticError
-from semantics.tools import TypeBag, Context
+from visitors.utils import visitor
+from visitors.semantics.tools import Context, TypeBag, Type
+from visitors.semantics.tools.errors import SemanticError
 
 
 class TypeBuilder:

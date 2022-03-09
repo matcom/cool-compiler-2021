@@ -1,8 +1,7 @@
 from typing import Dict, List, Tuple
 
 from asts import ccil_ast, mips_ast
-from utils import visitor
-from utils import visitor
+from visitors.utils import visitor
 
 from .constants import *
 
