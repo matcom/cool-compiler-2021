@@ -2,7 +2,9 @@ import pytest
 import os
 from utils import compare_errors
 
-tests_dir = __file__.rpartition('/')[0] + '/parser/'
+# tests_dir = __file__.rpartition('/')[0] + '/parser/'
+tests_dir = "../tests/parser/"
+
 tests = [(file) for file in os.listdir(tests_dir) if file.endswith('.cl')]
 
 @pytest.mark.parser

@@ -11,6 +11,24 @@ from Mips import CILToMIPS, MIPSPrinter
 def main(file):
 
     ###INPUT###
+    #print("file")
+    #print(file)
+    #print(len(file))
+    
+    file = file[0:len(file) - 2]
+    
+    #print("New")
+    #print(file)
+    #print(len(file))
+    
+    
+    #print("HW")
+    #print("hello_wrtld.cl")
+    #print(len("hello_world.cl"))
+    
+    #print("Equals??")
+    #print(str(file) == "hello_world.cl")
+    
     try:
         f_input = open(file, 'r')
         code = f_input.read()

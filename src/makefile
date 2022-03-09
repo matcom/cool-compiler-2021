@@ -10,7 +10,7 @@ test:
 	pytest ../tests -v --tb=short -m=${TAG}
  
 install:
-	pip install ../requeriments.txt
+	pip install -r ../requirements.txt
 
 
 
