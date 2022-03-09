@@ -15,7 +15,7 @@ def main(file):
     #print(file)
     #print(len(file))
     
-    file = file[0:len(file) - 2]
+    # file = file[0:len(file) - 2]
     
     #print("New")
     #print(file)
