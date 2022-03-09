@@ -891,9 +891,17 @@ class MIPSBuilder:
     
         self.memo.clean()
         
-    
-    #READSTRING      
-    @visitor.when(cil.ReadNode)
+    @visitor.when(cil.ReadIntNode)
+    def visit(self, node):
+        dest_off = self.get_offset(node.dest)
+        self.register_instruction(mips.CommentNode,"ReadIntNode")
+        self.register_instruction(mips.LoadInmediate, v0, SYSCALL_READ_INT)
+        self.register_instruction(mips.SyscallNode)
+        self.register_instruction(mips.StoreWordNode, v0, dest_off, fp)
+        
+        
+          
+    @visitor.when(cil.ReadStringNode)
     def visit(self,node):
         self.memo.save()
         self.register_instruction(mips.CommentNode,"ReadStrNode")
@@ -994,6 +1002,23 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode, reg1, dest_offset, fp)
 
         self.memo.clean()
+    
+    @visitor.when(cil.IsVoidNode)
+    def visit(self, node):
+        self.register_instruction(mips.CommentNode,"Executing IsVoid")
+        self.memo.save()
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+        source_off = self.get_offset(node.value)
+        dest_off = self.get_offset(node.dest)
+        
+        self.register_instruction(mips.LoadWordNode, reg1, source_off, fp)
+        self.register_instruction(mips.LoadAddress, reg2, VOID)
+        self.register_instruction(mips.SetEq, reg1, reg1, reg2)
+         
+        self.register_instruction(mips.StoreWordNode, reg1, dest_off, fp)
+        self.memo.clean()
+    
     
     @visitor.when(cil.ExitNode)
     def visit(self,node):

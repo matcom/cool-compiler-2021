@@ -203,10 +203,13 @@ class SubstringNode(InstructionNode):
         self.length = length
 
 
-class ReadNode(InstructionNode):
+class ReadStringNode(InstructionNode):
     def __init__(self, dest):
         self.dest = dest
 
+class ReadIntNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
 
 class RuntimeErrorNode(InstructionNode):
     def __init__(self, signal):
@@ -392,10 +395,14 @@ class PrintVisitor(object):
     # def visit(self, node):
     #     return f"{node.dest} = STR {node.ivalue}"
 
-    @visitor.when(ReadNode)
+    @visitor.when(ReadStringNode)
     def visit(self, node):
-        return f"{node.dest} = READ"
+        return f"{node.dest} = READ STR"
 
+    @visitor.when(ReadIntNode)
+    def visit(self, node):
+        return f"{node.dest} = READ INT"
+    
     @visitor.when(PrintStrNode)
     def visit(self, node):
         return f"PRINT STR{node.str_addr}"

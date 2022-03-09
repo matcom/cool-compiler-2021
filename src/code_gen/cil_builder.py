@@ -24,7 +24,8 @@ from cmp.cil import (
     LengthNode,
     ConcatNode,
     SubstringNode,
-    ReadNode,
+    ReadStringNode,
+    ReadIntNode,
     PrintStrNode,
     PrintIntNode,
     PlusNode,
@@ -324,13 +325,13 @@ class CILBuilder:
     def io_instring(self):
         self.params.append(ParamNode("self"))
         ret_vinfo = self.define_internal_local()
-        self.register_instruction(ReadNode(ret_vinfo))
+        self.register_instruction(ReadStringNode(ret_vinfo))
         self.register_instruction(ReturnNode(ret_vinfo))
 
     def io_inint(self):
         self.params.append(ParamNode("self"))
         ret_vinfo = self.define_internal_local()
-        self.register_instruction(ReadNode(ret_vinfo))  # TODO: ReadInt?
+        self.register_instruction(ReadIntNode(ret_vinfo))  # TODO: ReadInt?
         self.register_instruction(ReturnNode(ret_vinfo))
 
     def reset_state(self):
