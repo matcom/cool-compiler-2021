@@ -317,6 +317,12 @@ o funciones que se definen en él, o en clases ancestras) y estos atributos tien
 y la sección `Code` donde están definidas todas las funciones del programa, siendo la primera de ellas la que se usa 
 como función de inicio.
 
+El gran mérito de este cambio de lenguaje está en generar instrucciones (definidas como nodos en el ast de CIL) a partir
+de las expresiones de COOL. Estas instrucciones, si bien no están definidas de manera inmediata en mips, son más 
+cercanas a su paradigma de programación. Cuando se realize el próximo cambio de lenguaje cada una de estas instrucciones
+podrían acabar siendo varias instrucciones MIPS, pero el hecho de cambiar el sentido del lenguaje hace que sea más
+cómoda la equivalencia.
+
 Para hacer instancias de los tipos de Cool se crea una función especial en CIL, que no es más que una especie de 
 constructor, que inicializa cada uno de los atributos de esa clase.
 
