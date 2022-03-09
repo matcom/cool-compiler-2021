@@ -116,11 +116,16 @@ class CILBuilder:
         self.code.append(function_node)
         return function_node
 
-    def register_local(self, vinfo):
-        vinfo.name = f"local_{self.current_function.name}_{vinfo.name}_{len(self.current_function.localvars)}"
-        local_node = LocalNode(vinfo.name)
+    def get_local(self, name):
+        return f"local_{name}"
+
+    def register_local(self, name=None):
+        local_name = (
+            f"local_{name}" if name else f"local_{len(self.current_function.localvars)}"
+        )
+        local_node = LocalNode(local_name)
         self.current_function.localvars.append(local_node)
-        return vinfo.name
+        return local_name
 
     def register_param(self, vinfo):
         vinfo.name = self.build_internal_vname(vinfo.name)
@@ -128,19 +133,22 @@ class CILBuilder:
         self.params.append(arg_node)
         return vinfo
 
+    def get_param(self, name):
+        return f"param_{name}"
+
     def build_internal_vname(self, vname):
-        vname = f"{self.internal_count}_{self.current_function.name}_{vname}"
+        vname = f"param_{vname}"
         self.internal_count += 1
         return vname
 
     def define_internal_local(self):
-        vinfo = VariableInfo("internal", None)
-        return self.register_local(vinfo)
+        return self.register_local()
 
     def is_attribute(self, vname):
         return vname not in [var.name for var in self.current_function.localvars] and (
             vname not in [param.name for param in self.current_function.params]
         )
+
     def add_builtin_constructors(self):
         builtin_types = ["Object", "IO", "Int", "Bool", "String"]
         for typex in builtin_types:
@@ -223,7 +231,7 @@ class CILBuilder:
         io_type.methods = obj_functions + functions
 
         # String
-        self.attrs["String"] = {"length": (0, "Int"), "str_ref": (1,"String")}
+        self.attrs["String"] = {"length": (0, "Int"), "str_ref": (1, "String")}
         functions = [
             self.cil_predef_method("copy", "String", self.object_copy),
             self.cil_predef_method("type_name", "String", self.object_type_name),
@@ -239,18 +247,18 @@ class CILBuilder:
         string_type.methods = obj_functions + functions
 
         # Int
-        #self.attrs["Int"] = {"value": (0, "Int")}
+        # self.attrs["Int"] = {"value": (0, "Int")}
         int_type = TypeNode("Int")
-        int_type.attributes = [VariableInfo("value", is_attr=True).name]
+        int_type.attributes = [VariableInfo("value").name]
         int_type.methods = obj_functions + [
             self.cil_predef_method("copy", "Int", self.object_copy),
             self.cil_predef_method("type_name", "Int", self.object_type_name),
         ]
 
         # Bool
-        #self.attrs["Bool"] = {"value": (0, "Int")}
+        # self.attrs["Bool"] = {"value": (0, "Int")}
         bool_type = TypeNode("Bool")
-        bool_type.attributes = [VariableInfo("value", is_attr=True).name]
+        bool_type.attributes = [VariableInfo("value").name]
         bool_type.methods = obj_functions + [
             self.cil_predef_method("copy", "Bool", self.object_copy),
             self.cil_predef_method("type_name", "Bool", self.object_type_name),
@@ -333,7 +341,11 @@ class CILBuilder:
 
         for attr in self.attrs[self.current_type.name].keys():
             attr_copy_local = self.define_internal_local()
-            attr_name = self.to_attr_name(self.current_type.name, attr) if self.current_type.name not in ["Int", "String", "Bool"] else attr
+            attr_name = (
+                self.to_attr_name(self.current_type.name, attr)
+                if self.current_type.name not in ["Int", "String", "Bool"]
+                else attr
+            )
             self.register_instruction(
                 GetAttribNode(
                     attr_copy_local,
@@ -365,10 +377,10 @@ class CILBuilder:
             LoadNode(
                 type_name,
                 VariableInfo(
-                f"type_name_{self.current_type.name}",
-                None,
-                False,
-                f"{self.current_type.name}")
+                    f"type_name_{self.current_type.name}",
+                    None,
+                    f"{self.current_type.name}",
+                ),
             )
         )
         self.register_instruction(AssignNode(solve, type_name))
@@ -541,7 +553,7 @@ class CILBuilder:
         # Add params
         self.current_function.params.append(ParamNode("self"))
         for pname, _ in node.params:
-            self.current_function.params.append(ParamNode(pname))
+            self.register_param(VariableInfo(pname))
 
         # Body
         value = self.define_internal_local()
@@ -560,17 +572,24 @@ class CILBuilder:
     def visit(self, node, return_var):
         self.visit(node.expr, return_var)
 
-        if self.is_attribute(node.id):
-            self.register_instruction(
-                SetAttribNode(
-                    "self",
-                    self.to_attr_name(self.current_type.name, node.id),
-                    return_var,
-                    self.current_type.name,
-                )
+        local_id = self.get_local(node.id)
+        if any(local_id == l.name for l in self.current_function.localvars):
+            self.register_instruction(AssignNode(local_id, return_var))
+            return
+
+        param_id = self.get_param(node.id)
+        if any(param_id == p.name for p in self.current_function.params):
+            self.register_instruction(AssignNode(param_id, return_var))
+            return
+
+        self.register_instruction(
+            SetAttribNode(
+                "self",
+                self.to_attr_name(self.current_type.name, node.id),
+                return_var,
+                self.current_type.name,
             )
-        else:
-            self.register_instruction(AssignNode(node.id, return_var))
+        )
 
     @visitor.when(cool.CallNode)
     def visit(self, node, return_var):
@@ -675,58 +694,69 @@ class CILBuilder:
     @visitor.when(cool.VarDeclarationNode)
     def visit(self, node, return_var=None):
         # Add LOCAL variable
-        local = LocalNode(node.id)
-        self.current_function.localvars.append(local)
+        idx = self.get_local(node.id)
+        if not any(idx == l.name for l in self.current_function.localvars):
+            self.register_local(node.id)
 
         # Add Assignment Node
         if node.expr:
-            self.visit(node.expr, local.name)
+            self.visit(node.expr, idx)
         else:
-            self.register_instruction(DefaultValueNode(local, node.type))
+            self.register_instruction(DefaultValueNode(idx, node.type))
 
-    #@visitor.when(cool.CaseNode)
-    #def visit(self, node, return_var=None):
-    #    def least_type(type_set):
-    #        solve = self.context.get_type(type_set[0])
-    #        for item in type_set[1:]:
-    #            typex = self.context.get_type(item)
-    #            solve = find_least_type(solve, typex)
+    @visitor.when(cool.CaseNode)
+    def visit(self, node, return_var=None):
+        def get_least_type():
+            expr_type = node.expr.static_type
+            conformed_types = []
+            for case_item in node.case_items:
+                case_type = self.context.get_type(case_item.type)
+                if expr_type.conforms_to(case_type):
+                    conformed_types.append(case_type.name)
 
-    #        while solve is not None:
-    #            if type_b.conforms_to(solve):
-    #                return solve
-    #            solve = solve.parent
+            least_type = None
+            solve = expr_type
+            while solve is not None:
+                if solve.name in conformed_types:
+                    least_type = solve.name
+                    break
+                solve = solve.parent
 
-    #        return None
-    #        return solve.name if not solve else "Object"
+            return least_type
 
-    #    expr_value = self.define_internal_local()
-    #    self.visit(node.expr, expr_value)
+        expr_value = self.define_internal_local()
+        self.visit(node.expr, expr_value)
 
-    #    types = [case_item.type for case_item in node.case_items]
-    #    types.append(node.expr.static_type.name)
+        least_type = get_least_type()
 
-    #    _least_type = least_type(types)
-    #    print("-----------Least TYpE:", _least_type)
-    #    asserted_item = None
-    #    for case_item in node.case_items:
-    #        if case_item.type == _least_type:
-    #            asserted_item = case_item
-    #            break
+        asserted_item = None
+        for case_item in node.case_items:
+            if case_item.type == least_type:
+                asserted_item = case_item
+                break
 
-    #    if not asserted_item:
-    #        self.register_instruction(
-    #            StaticCallNode(
-    #                self.to_function_name("abort", "Object"),
-    #                return_var,
-    #            )
-    #        )
-    #        return
+        if not asserted_item:
+            self.data.append(
+                DataNode("runtime_error", "No branch can be selected for evaluation")
+            )
+            error = self.define_internal_local()
+            self.register_instruction(
+                LoadNode(
+                    error,
+                    VariableInfo(
+                        "runtime_error",
+                        None,
+                        "No branch can be selected for evaluation",
+                    ),
+                )
+            )
+            self.register_instruction(RuntimeErrorNode(error))
+            return
 
-    #    self.localvars.append(LocalNode(asserted_item.id))
-    #    self.register_instruction(AssignNode(asserted_item.id, expr_value))
+        new_local = self.register_local(asserted_item.id)
+        self.register_instruction(AssignNode(new_local, expr_value))
 
-    #    self.visit(asserted_item.expr, return_var)
+        self.visit(asserted_item.expr, return_var)
 
     @visitor.when(cool.CaseItemNode)
     def visit(self, node, return_var=None):
@@ -839,24 +869,31 @@ class CILBuilder:
 
     @visitor.when(cool.VariableNode)
     def visit(self, node, return_var):
-        if self.is_attribute(node.lex):
-            self.register_instruction(
-                GetAttribNode(
-                    return_var,
-                    "self",
-                    self.to_attr_name(self.current_type.name, node.lex),
-                    self.current_type.name,
-                )
+        local_id = self.get_local(node.lex)
+        if any(local_id == l.name for l in self.current_function.localvars):
+            self.register_instruction(AssignNode(return_var, local_id))
+            return
+
+        param_id = self.get_param(node.lex)
+        if any(param_id == p.name for p in self.current_function.params):
+            self.register_instruction(AssignNode(return_var, param_id))
+            return
+
+        self.register_instruction(
+            GetAttribNode(
+                return_var,
+                "self",
+                self.to_attr_name(self.current_type.name, node.lex),
+                self.current_type.name,
             )
-        else:
-            self.register_instruction(AssignNode(return_var, node.lex))
+        )
 
     @visitor.when(cool.StringNode)
     def visit(self, node, return_var):
         idx = self.generate_next_string_id()
         self.data.append(DataNode(idx, node.lex))
         self.register_instruction(
-            LoadNode(return_var, VariableInfo(idx, None, False, node.lex))
+            LoadNode(return_var, VariableInfo(idx, None, node.lex))
         )
 
     @visitor.when(cool.BooleanNode)

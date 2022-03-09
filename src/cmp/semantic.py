@@ -90,9 +90,7 @@ class Type:
                 mssg = "an inherited class"
             else:
                 mssg = self.name
-            raise SemanticError(
-                f'Attribute "{name}" is already defined in {mssg}.'
-            )
+            raise SemanticError(f'Attribute "{name}" is already defined in {mssg}.')
 
     def get_method(self, name: str, non_rec=False, visited=None):
         if visited is None:
@@ -267,12 +265,10 @@ class Context:
 
 
 class VariableInfo:
-    def __init__(self, name, vtype=None, is_attr=False, data=None):
+    def __init__(self, name, vtype=None, data=None):
         self.name = name
         self.type = vtype
         self.data = data
-        self.is_attr = is_attr
-        self.offset = None
 
     def __str__(self):
         return f"{self.name}: {self.type}"
