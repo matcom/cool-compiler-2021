@@ -597,7 +597,7 @@ class DotCodeVisitor:
 
     @visitor.when(ast.VariableNode)
     def visit(self, node: ast.VariableNode, _):
-        return node.lex
+        return 'instance' if self.current_is_init else node.lex
 
     @visitor.when(ast.PlusNode)
     def visit(self, node: ast.PlusNode, scope: Scope):

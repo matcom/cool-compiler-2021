@@ -51,6 +51,7 @@ class TypeChecker:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node: ClassDeclarationNode, scope: Scope):
         self.current_type = self.context.get_type(node.id)
+        scope.define_variable('self', self.current_type)
 
         # visit features
         for feature in node.features:
@@ -286,9 +287,14 @@ class TypeChecker:
 
     @visitor.when(VariableNode)
     def visit(self, node: VariableNode, scope: Scope):
+        print(scope.tag, node.lex)
         var = scope.find_variable(node.lex)
         if var is None:
-            self.errors.append(err.VARIABLE_NOT_DEFINED % (node.pos, node.lex, self.current_method.name))
+            self.errors.append(err.VARIABLE_NOT_DEFINED % (
+                node.pos,
+                node.lex,
+                self.current_method.name if self.current_method is not None else self.current_type.name)
+            )
             return ErrorType()
         return var.type
 
