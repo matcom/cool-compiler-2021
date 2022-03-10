@@ -874,6 +874,11 @@ class CILBuilder:
 
     @visitor.when(cool.VariableNode)
     def visit(self, node, return_var):
+
+        if node.lex == "self":
+            self.register_instruction(AssignNode(return_var, "self"))
+            return
+
         local_id = self.get_local(node.lex)
         if any(local_id == l.name for l in self.current_function.localvars):
             self.register_instruction(AssignNode(return_var, local_id))
