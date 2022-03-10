@@ -2,7 +2,7 @@
 
 
 class Main inherits IO{
-    a : A <- new A;
+    a : A <- new B;
     b : B <- new B;
     c : String <- "First sentence.";
     d : String <- "Second sentence.";
@@ -10,10 +10,10 @@ class Main inherits IO{
     main (): Object {
         {
             out_string(
-                (case c of
-                    h:String => h <- "Modified.";
-                    f:A => d;
-                esac).concat(d)
+                (case a of
+                    h:A => new A;
+                    f:B => new B;
+                esac).type_name()
             ); 
         }
     };

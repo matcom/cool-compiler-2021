@@ -370,11 +370,9 @@ class CILBuilder:
 
     def object_type_name(self):
         self.params.append(ParamNode("self"))
-        # solve = self.define_internal_local()
         self.data.append(
             DataNode(f"type_name_{self.current_type.name}", f"{self.current_type.name}")
         )
-        # self.register_instruction(AllocateNode("String", solve))
         type_name = self.define_internal_local()
         self.register_instruction(
             LoadNode(
@@ -386,7 +384,6 @@ class CILBuilder:
                 ),
             )
         )
-        # self.register_instruction(AssignNode(solve, type_name))
         self.register_instruction(ReturnNode(type_name))
 
     def io_outstring(self):
@@ -715,7 +712,7 @@ class CILBuilder:
         def get_children(static_type):
             children = []
             for t in self.context.types.values():
-                 if t.conforms_to(static_type):
+                 if t.conforms_to(static_type) and t.name != "AUTO_TYPE":
                      children.append(t)
 
             return children

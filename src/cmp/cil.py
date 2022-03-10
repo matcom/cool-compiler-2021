@@ -136,7 +136,7 @@ class AllocateNode(InstructionNode):
 
 
 class TypeOfNode(InstructionNode):
-    def __init__(self, obj, dest,flag = False,typex = None):
+    def __init__(self, obj, dest, flag=False, typex=None):
         self.obj = obj
         self.dest = dest
         self.flag = flag
