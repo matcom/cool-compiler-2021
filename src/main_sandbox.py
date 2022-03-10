@@ -4,8 +4,8 @@ import ast_cool_print
 import type_collector
 import type_builder
 import type_checker
-from lexer_ply import tokenize
-from parser_ply import parse
+from lexer import tokenize
+from parser import parse
 from testers import test_parser
 from translate_cool_cil import COOLToCILVisitor
 from translate_cil_mips import CILToMIPSVisitor

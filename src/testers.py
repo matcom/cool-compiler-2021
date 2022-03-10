@@ -1,7 +1,7 @@
 import os
 
-from lexer_ply import tokenize
-from parser_ply import parse
+from lexer import tokenize
+from parser import parse
 
 
 def find_files(file_directory):
