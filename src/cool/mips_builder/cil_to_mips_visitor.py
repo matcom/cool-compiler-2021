@@ -139,7 +139,7 @@ heap_overflow: .asciiz "Runtime Error: Heap overflow.\n"
         self.text_section+= 'beqz $t1 end_method_compute_distance\n' #No encontre al padre y llegue a Object
         self.text_section+= 'lw  $t1,8($t1)\n' #Cargar al padre
         self.text_section+= 'addi $a1,$a1,1\n' #Aumentar el contador de padres encontrados
-        # self.text_section+= 'bge $a1,$s1,end_method_compute_distance'
+        self.text_section+= 'bge $a1,$s1 end_method_compute_distance'
         self.text_section+= 'j loop_distance_types\n' #Repetir
 
         #Saltar a esta seccion si encontre en $t1 al ancestro $t2
