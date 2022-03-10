@@ -33,7 +33,7 @@ ZERO_DIVISION = "division_by_zero"  # MIPS
 SUBSTR_OUT_RANGE = "substr_out_of_range"  # MIPS
 HEAP_OVERFLOW = "heap_overflow"
 STRING_SIZE = 12
-VOID = "void"
+VOID = "Void"
 STR_CMP = "string_comparer"
 EMPTY_STRING = "empty_string"
 LENGTH = "length"
@@ -604,6 +604,16 @@ class MIPSBuilder:
             )  # pq en vo esta el allocate
             self.register_instruction(mips.LoadAddress, reg, EMPTY_STRING)
             self.register_instruction(mips.StoreWordNode, reg, CHARS_ATTR_OFFSET, v0)
+        elif node.type != VOID:
+            _size = (len(self.types[node.type].attributes) + 1) * 4
+            self.register_instruction(mips.LoadInmediate, v0, SYSCALL_SBRK)
+            self.register_instruction(mips.LoadInmediate, a0, _size)
+            self.register_instruction(mips.SyscallNode)
+
+            self.register_instruction(mips.StoreWordNode, v0, dest_offset, fp)
+            reg = self.memo.get_unused_reg()
+            self.register_instruction(mips.LoadAddress, reg, node.type)
+            self.register_instruction(mips.StoreWordNode, reg, 0, v0)
         else:
             self.register_instruction(mips.LoadAddress, reg, VOID)
             self.register_instruction(mips.StoreWordNode, reg, dest_offset, fp)

@@ -369,11 +369,11 @@ class CILBuilder:
 
     def object_type_name(self):
         self.params.append(ParamNode("self"))
-        solve = self.define_internal_local()
+        # solve = self.define_internal_local()
         self.data.append(
             DataNode(f"type_name_{self.current_type.name}", f"{self.current_type.name}")
         )
-        self.register_instruction(AllocateNode("String", solve))
+        # self.register_instruction(AllocateNode("String", solve))
         type_name = self.define_internal_local()
         self.register_instruction(
             LoadNode(
@@ -385,8 +385,8 @@ class CILBuilder:
                 ),
             )
         )
-        self.register_instruction(AssignNode(solve, type_name))
-        self.register_instruction(ReturnNode(solve))
+        # self.register_instruction(AssignNode(solve, type_name))
+        self.register_instruction(ReturnNode(type_name))
 
     def io_outstring(self):
         self.params.append(ParamNode("self"))

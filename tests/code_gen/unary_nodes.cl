@@ -1,5 +1,5 @@
 class Main inherits IO{
-    a : Int;
+    a : Int <- 2;
     b : Int;
     c: Bool;
     main (): Object {
