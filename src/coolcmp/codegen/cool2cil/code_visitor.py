@@ -509,6 +509,13 @@ class DotCodeVisitor:
 
     @visitor.when(ast.InstantiateNode)
     def visit(self, node: ast.InstantiateNode, scope: Scope):
+        if node.lex == 'String':
+            return self.visit(ast.StringNode(''), scope)
+        elif node.lex == 'Bool':
+            return self.visit(ast.BooleanNode('false'), scope)
+        elif node.lex == 'Int':
+            return self.visit(ast.IntegerNode('0'), scope)
+
         self.add_comment(f'Instantiating type {node.lex}')
 
         type_node = self.root.get_type(node.lex)
