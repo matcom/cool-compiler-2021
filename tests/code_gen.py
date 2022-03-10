@@ -3,8 +3,8 @@ import os
 from utils import compare_outputs
 
 
-tests_dir = __file__.rpartition("/")[0] + "/code_gen/"
-tests = [(file) for file in os.listdir(tests_dir) if file.endswith(".cl")]
+tests_dir = __file__.rpartition("/")[0] + "/codegen/"
+tests = [(file) for file in os.listdir(tests_dir) if file.endswith("hairyscary.cl")]
 
 # @pytest.mark.lexer
 # @pytest.mark.parser

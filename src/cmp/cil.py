@@ -92,8 +92,10 @@ class LessEqualNode(ArithmeticNode):
 class EqualNode(ArithmeticNode):
     pass
 
+
 class StrEqualNode(ArithmeticNode):
     pass
+
 
 class UnaryNode(InstructionNode):
     def __init__(self, dest, expr):
@@ -134,7 +136,7 @@ class AllocateNode(InstructionNode):
 
 
 class TypeOfNode(InstructionNode):
-    def __init__(self, obj, dest,flag = False,typex = None):
+    def __init__(self, obj, dest, flag=False, typex=None):
         self.obj = obj
         self.dest = dest
         self.flag = flag
@@ -256,6 +258,13 @@ class IsVoidNode(InstructionNode):
         self.value = value
 
 
+class CompareTypes(InstructionNode):
+    def __init__(self, dest, typeof, typex: str):
+        self.dest = dest
+        self.typeof = typeof
+        self.type = typex
+
+
 class ExitNode(InstructionNode):
     def __init__(self):
         pass
@@ -332,7 +341,7 @@ class PrintVisitor(object):
     @visitor.when(EqualNode)
     def visit(self, node):
         return f"{node.dest} = {node.left} == {node.right}"
-    
+
     @visitor.when(StrEqualNode)
     def visit(self, node):
         return f"{node.dest} = {node.left} == {node.right}"
@@ -444,6 +453,10 @@ class PrintVisitor(object):
     @visitor.when(IsVoidNode)
     def visit(self, node):
         return f"{node.dest} = ISVOID {node.value}"
+
+    @visitor.when(CompareTypes)
+    def visit(self, node):
+        return f"{node.dest} = {node.typeof} TYPE_EQUALS {node.type}"
 
     @visitor.when(ExitNode)
     def visit(self, node):

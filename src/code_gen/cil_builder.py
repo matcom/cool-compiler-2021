@@ -47,6 +47,7 @@ from cmp.cil import (
     DefaultValueNode,
     IsVoidNode,
     ExitNode,
+    CompareTypes
 )
 from cool_visitor import FormatVisitor
 
@@ -369,11 +370,9 @@ class CILBuilder:
 
     def object_type_name(self):
         self.params.append(ParamNode("self"))
-        # solve = self.define_internal_local()
         self.data.append(
             DataNode(f"type_name_{self.current_type.name}", f"{self.current_type.name}")
         )
-        # self.register_instruction(AllocateNode("String", solve))
         type_name = self.define_internal_local()
         self.register_instruction(
             LoadNode(
@@ -385,7 +384,6 @@ class CILBuilder:
                 ),
             )
         )
-        # self.register_instruction(AssignNode(solve, type_name))
         self.register_instruction(ReturnNode(type_name))
 
     def io_outstring(self):
@@ -711,57 +709,78 @@ class CILBuilder:
 
     @visitor.when(cool.CaseNode)
     def visit(self, node, return_var=None):
-        def get_least_type():
-            expr_type = node.expr.static_type
-            conformed_types = []
-            for case_item in node.case_items:
-                case_type = self.context.get_type(case_item.type)
-                if expr_type.conforms_to(case_type):
-                    conformed_types.append(case_type.name)
+        def get_children(static_type):
+            children = []
+            for t in self.context.types.values():
+                 if t.conforms_to(static_type) and t.name != "AUTO_TYPE":
+                     children.append(t)
 
-            least_type = None
-            solve = expr_type
+            return children
+
+        def get_least_type(expr_dynamic_type):
+            case_item_types = [case_item.type for case_item in node.case_items]
+            solve = expr_dynamic_type
             while solve is not None:
-                if solve.name in conformed_types:
-                    least_type = solve.name
-                    break
+                if solve.name in case_item_types:
+                    return solve.name
                 solve = solve.parent
 
-            return least_type
+            return None
+
+        def get_asserted_branch(least_type:str):
+            for case_item in node.case_items:
+                if case_item.type == least_type:
+                    return case_item
+            return None
 
         expr_value = self.define_internal_local()
         self.visit(node.expr, expr_value)
 
-        least_type = get_least_type()
+        possible_dynamic_types = get_children(node.expr.static_type)
 
-        asserted_item = None
-        for case_item in node.case_items:
-            if case_item.type == least_type:
-                asserted_item = case_item
-                break
+        branch_labels = []
+        for t in possible_dynamic_types:
+            dynamic_type = self.define_internal_local()
+            self.register_instruction(TypeOfNode(expr_value, dynamic_type))
 
-        if not asserted_item:
-            self.data.append(
-                DataNode("runtime_error", "No branch can be selected for evaluation")
+            label = "BRANCH" + self.next_id()
+            equals = self.define_internal_local()
+            self.register_instruction(CompareTypes(equals, dynamic_type, t.name))
+            self.register_instruction(GotoIfNode(equals,label))
+
+            least_type = get_least_type(t)
+            asserted_branch = get_asserted_branch(least_type)
+            branch_labels.append((asserted_branch, label))
+        
+
+        self.data.append(
+            DataNode("runtime_error", "No branch can be selected for evaluation")
+        )
+        error = self.define_internal_local()
+        self.register_instruction(
+            LoadNode(
+                error,
+                VariableInfo(
+                    "runtime_error",
+                    None,
+                    "No branch can be selected for evaluation",
+                ),
             )
-            error = self.define_internal_local()
-            self.register_instruction(
-                LoadNode(
-                    error,
-                    VariableInfo(
-                        "runtime_error",
-                        None,
-                        "No branch can be selected for evaluation",
-                    ),
-                )
-            )
-            self.register_instruction(RuntimeErrorNode(error))
-            return
+        )
+        self.register_instruction(RuntimeErrorNode(error))
 
-        new_local = self.register_local(asserted_item.id)
-        self.register_instruction(AssignNode(new_local, expr_value))
+        end_case_label = "END_CASE_" + self.next_id()
+        for branch, label in branch_labels:
+            if not branch:
+                continue
+            self.register_instruction(LabelNode(label))
+            new_local = self.register_local(branch.id)
+            self.register_instruction(AssignNode(new_local, expr_value))
 
-        self.visit(asserted_item.expr, return_var)
+            self.visit(branch.expr, return_var)
+            self.register_instruction(GotoNode(end_case_label))
+
+        self.register_instruction(LabelNode(end_case_label))
 
     @visitor.when(cool.CaseItemNode)
     def visit(self, node, return_var=None):

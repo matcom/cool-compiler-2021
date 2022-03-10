@@ -802,6 +802,24 @@ class MIPSBuilder:
         self.register_instruction(mips.StoreWordNode,r_dest,dest_off,fp)
         
         self.memo.clean()
+
+    @visitor.when(cil.CompareTypes)
+    def visit(self,node):
+        self.memo.save()
+        reg1 = self.memo.get_unused_reg()
+        reg2 = self.memo.get_unused_reg()
+
+        typeof_offset = self.get_offset(node.typeof)
+        self.register_instruction(mips.LoadWordNode,reg1,typeof_offset,fp)
+        self.register_instruction(mips.LoadAddress,reg2,node.type)
+
+        self.register_instruction(mips.SetEq,a2,reg1,reg2)
+        dest_offset = self.get_offset(node.dest)
+        self.register_instruction(mips.StoreWordNode,a2,dest_offset,fp)
+
+        self.memo.clean()
+
+
         
     @visitor.when(cil.StrEqualNode)
     def visit(self,node):
