@@ -1048,14 +1048,20 @@ class MIPSBuilder:
     @visitor.when(cil.TypeOfNode)
     def visit(self, node):
         self.memo.save()
-        obj_offset = self.get_offset(node.obj)
-        dest_offset = self.get_offset(node.dest)
-
-        reg1 = self.memo.get_unused_reg()
-        self.register_instruction(mips.CommentNode, "Executing typeof")
-        self.register_instruction(mips.LoadWordNode, reg1, obj_offset, fp)
-        self.register_instruction(mips.LoadWordNode, reg1, TYPEINFO_ATTR_OFFSET, reg1)
-        self.register_instruction(mips.StoreWordNode, reg1, dest_offset, fp)
+        if node.flag:
+            self.register_instruction(mips.CommentNode, "Executing typeof")
+            reg1 = self.memo.get_unused_reg()
+            self.register_instruction(mips.LoadAddress,reg1,node.type)
+            dest_offset = self.get_offset(node.dest)
+            self.register_instruction(mips.StoreWordNode, reg1, dest_offset, fp)
+        else:
+            obj_offset = self.get_offset(node.obj)
+            dest_offset = self.get_offset(node.dest)
+            reg1 = self.memo.get_unused_reg()
+            self.register_instruction(mips.CommentNode, "Executing typeof")
+            self.register_instruction(mips.LoadWordNode, reg1, obj_offset, fp)
+            self.register_instruction(mips.LoadWordNode, reg1, TYPEINFO_ATTR_OFFSET, reg1)
+            self.register_instruction(mips.StoreWordNode, reg1, dest_offset, fp)
 
         self.memo.clean()
     

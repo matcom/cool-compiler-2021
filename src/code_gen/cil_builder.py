@@ -607,7 +607,10 @@ class CILBuilder:
         instance_type = None
         if not node.at_type:
             instance_type = self.define_internal_local()
-            self.register_instruction(TypeOfNode(instance, instance_type))
+            if obj_type in ["Int","Bool"]:
+                self.register_instruction(TypeOfNode(instance, instance_type,True,obj_type))
+            else:
+                self.register_instruction(TypeOfNode(instance, instance_type))
 
         args = [instance]
         for arg in node.args:
