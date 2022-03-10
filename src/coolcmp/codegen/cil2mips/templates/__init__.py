@@ -10,6 +10,7 @@ def load_templates() -> str:
         "remove_eol.mips",
         "less_equal.mips",
         "equal.mips",
+        "conforms.mips"
     ]
     code_templates = ["\n# Templates"]
 

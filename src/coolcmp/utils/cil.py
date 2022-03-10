@@ -198,6 +198,10 @@ class DivNode(ArithmeticNode):
     pass
 
 
+class ConformsNode(ArithmeticNode):
+    pass
+
+
 class GetAttrNode(InstructionNode):
     def __init__(self, dest: str, src: str, attr: str):
         self.dest = dest

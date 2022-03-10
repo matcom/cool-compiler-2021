@@ -182,3 +182,7 @@ class CILFormatter(object):
     @visitor.when(cil.ExprVoidRuntimeErrorNode)
     def visit(self, node: cil.ExprVoidRuntimeErrorNode):
         return f'EXPR_VOID_RUNTIME_ERROR'
+
+    @visitor.when(cil.ConformsNode)
+    def visit(sel, node: cil.ConformsNode):
+        return f'{node.dest} = CONFORMS {node.left} {node.right}'

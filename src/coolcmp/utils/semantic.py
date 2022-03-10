@@ -210,6 +210,13 @@ class Context:
     def __str__(self) -> str:
         return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
 
+    def type_depth(self, type_: Type):
+        depth = 0
+        while type_.parent:
+            depth += 1
+            type_ = type_.parent
+        return depth
+
     def __repr__(self) -> str:
         return str(self)
 

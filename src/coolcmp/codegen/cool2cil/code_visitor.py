@@ -2,14 +2,14 @@ from __future__ import annotations
 from copy import deepcopy
 
 from coolcmp.utils import ast, cil, visitor
-from coolcmp.utils.semantic import Scope
+from coolcmp.utils.semantic import Context, Scope
 
 
 class DotCodeVisitor:
     """
     Builds the .CODE section.
     """
-    def __init__(self, cil_root: cil.ProgramNode):
+    def __init__(self, cil_root: cil.ProgramNode, context: Context):
         super().__init__()
         self.root = cil_root
         self.code = cil_root.dot_code
@@ -17,6 +17,7 @@ class DotCodeVisitor:
         self.current_type: str | None = None
         self.current_init: cil.FunctionNode | None = None
         self.label_count = -1
+        self.context = context
 
     def new_label(self, name: str) -> cil.LabelNode:
         self.label_count += 1
@@ -371,29 +372,32 @@ class DotCodeVisitor:
         case_match_re_label = self.new_label('case_match_re')
         expr_void_re_label = self.new_label('expr_void_re')
 
-
         self.add_inst(cil.TypeNameNode(typename, ret_exp))
 
+        def get_depth(x: ast.CaseBranchNode):
+            return self.context.type_depth(self.context.get_type(x.type))
+
+        node.cases.sort(key=lambda x: get_depth(x), reverse=True)
         branch_labels = [self.new_label('case_branch') for _ in node.cases]
 
-        # TODO: use conform instead of match
         for case, label in zip(node.cases, branch_labels):
             self.add_comment(f"Check for case branch {case.type}")
             branch_local = self.add_local('branch_local')
             self.add_inst(cil.StaticCallNode(f'{case.type}__init', branch_local))
-            branch_local_typename = self.add_local('branch_local_typename')
-            self.add_inst(cil.TypeNameNode(branch_local_typename, branch_local))
             cond = self.add_local('case_cond')
 
-            self.add_inst(cil.EqualNode(cond, typename, branch_local_typename))
+            self.add_inst(cil.ConformsNode(cond, ret_exp, branch_local))
             self.add_inst(cil.GotoIfNode(cond, label.name))
 
         # Does not conform to anyone => Runtime error
         self.add_inst(cil.GotoNode(case_match_re_label.name))
+        child_scope = scope.children.pop(0)
 
         for case, label in zip(node.cases, branch_labels):
             self.add_inst(label)
-            self.visit(case, scope) # TODO: Handle correct scope
+            idx = self.add_local(case.id)
+            idx = self.add_inst(cil.AssignNode(idx, ret_exp))
+            self.visit(case, child_scope)
             self.add_inst(cil.GotoNode(end_label.name))
 
         # Handle Runtime Errors

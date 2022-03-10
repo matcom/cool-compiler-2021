@@ -779,3 +779,32 @@ class CILToMipsVisitor:
             mips.SysCallNode(),
             mips.CommentNode(f"</expr-void-runtime-error>")
         )
+
+    @visitor.when(cil.ConformsNode)
+    def visit(self, node: cil.ConformsNode):
+        left_offset = self.get_address(node.left)
+        right_offset = self.get_address(node.right)
+        dest_offset = self.get_address(node.dest)
+
+        self.add_inst(
+            mips.CommentNode(f"<conforms:{node.dest}<-{node.left}-{node.right}>"),
+        )
+
+        # Get the left type
+        self.add_inst(
+            mips.LWNode(t0, (left_offset, fp))      .with_comm("Load left pointer to self"),
+            mips.LWNode(a0, (0, t0))                .with_comm("Load left pointer to type of self"),
+
+            mips.LWNode(t0, (right_offset, fp))      .with_comm("Load left pointer to self"),
+            mips.LWNode(a1, (0, t0))                .with_comm("Load left pointer to type of self"),
+            mips.JALNode('conforms'),
+            mips.MoveNode(s0, v0)
+        )
+
+        self.visit(cil.StaticCallNode('Bool__init', node.dest))
+
+        self.add_inst(
+            mips.LWNode(t0, (dest_offset, fp)),
+            mips.SWNode(s0, 4, t0),
+            mips.CommentNode(f"</conforms:{node.dest}<-{node.left}-{node.right}>"),
+        )
