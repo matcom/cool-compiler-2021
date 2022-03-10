@@ -101,3 +101,27 @@ En esta etapa del proceso de compilación, requirió especial atención la gener
 ### CIL-MIPS Converter
 Para esta fase se ejecuta un recorrido por los nodos de CIL, creando las instrucciones equivalentes en MIPS. Como apoyo a la hora de generar las instrucciones en MIPS, se utilizó
 
+El código para llamar las funciones y crearlas tiene estrecha relación con el diseño del Registro de Activación.
+
+Las principales ideas durante la implementación del Registro de Activación son:
+- El resultado siempre se guarda en el acumulador.
+- Los parámetros son guardados en el Registro de Activación y son introducidos antes de llamar en orden inverso.
+- Es necesario guardar la dirección de retorno.
+- Se utiliza el $fp como guía para obtener tanto los parámetros como las variables locales, por lo que conviene guardarlo antes de llamar y recuperarlo al volver.
+- El cuerpo es quien introduce las variables locales.
+- El iésimo parámetro está en $fp + 4(i + 1) y la iésima variable local está en $fp -4(i + 1).
+
+En este caso se asume que los registros están sucios, entonces no hay necesidad de guardarlos y recuperarlos antes y después de los llamados, lo cual mantiene simple el código, y podría ser hasta más eficiente.
+
+La representación de los objetos se implementó siguiendo las siguientes ideas:
+- Los objetos se guardan en memoria de forma contigua.
+- Cada atributo está ubicado en el mismo compartimento del objeto.
+- Cuando se llama a un método el objeto es self.
+- El id de clase es la dirección asociada al string que contiene su nombre.
+- El tamaño es el entero que representa la cantidad de word que componen el objeto.
+- Se tiene un Dispatch Ptr, que representa un puntero a una tabla de métodos.
+- Si X hereda de Y, la representación de X es igual a la de Y, excepto que se adicionan nuevos espacios para el resto de atributos.
+- Los atributos están de forma consecutiva.
+- Cada atributo está ubicado en el mismo corrimiento para todas las subclases.
+
+A cada clase se le asigna un puntero a una dirección de memoria que indexa todos sus métodos(Dispatch Ptr), incluyendo los heredados. De esta forma se logra que los métodos y los atributos de una clase A y todas sus subclases, se encuentren en los mismos compartimentos.
