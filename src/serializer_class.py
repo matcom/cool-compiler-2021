@@ -1,5 +1,3 @@
-import sys
-
 import pickle,lzma,base64,io
 
 class Serializer:
