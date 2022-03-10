@@ -365,13 +365,14 @@ class DotCodeVisitor:
 
     @visitor.when(ast.CaseBranchNode)
     def visit(self, node: ast.CaseBranchNode, scope: Scope):
-        self.visit(node.expr, scope)
+        return self.visit(node.expr, scope)
 
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode, scope: Scope):
         self.add_comment("Case of")
         ret_exp = self.visit(node.expr, scope)
         typename = self.add_local('typename')
+        case_ret = self.add_local('case_ret')
         end_label = self.new_label('end')
         case_match_re_label = self.new_label('case_match_re')
         expr_void_re_label = self.new_label('expr_void_re')
@@ -396,12 +397,17 @@ class DotCodeVisitor:
         # Does not conform to anyone => Runtime error
         self.add_inst(cil.GotoNode(case_match_re_label.name))
 
+        # print("*" * 10)
+        # print("scope", scope, len(scope.children))
+        # print("*" * 10)
+        # input()
         for case, label in zip(node.cases, branch_labels):
             child_scope = scope.children.pop(0)
             self.add_inst(label)
             idx = self.add_local(case.id, internal=False)
             self.add_inst(cil.AssignNode(idx, ret_exp))
-            self.visit(case, child_scope)
+            branch_ret = self.visit(case, child_scope)
+            self.add_inst(cil.AssignNode(case_ret, branch_ret))
             self.add_inst(cil.GotoNode(end_label.name))
 
         # Handle Runtime Errors
@@ -412,7 +418,7 @@ class DotCodeVisitor:
 
         self.add_inst(end_label)
         self.add_inst(cil.ReturnNode(ret_exp))
-        return ret_exp
+        return case_ret
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
