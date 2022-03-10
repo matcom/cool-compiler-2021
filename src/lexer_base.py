@@ -1,8 +1,6 @@
 from typing import List
-
-from token_class import Token, tokenizer
-from match_class import Match
-from serializer_class import Serializer
+from generated_utils.token_class import Match, Token, tokenizer
+from generated_utils.serializer_class import Serializer
 
 class LexerTable(list, Serializer):
     def __init__(self, ignore, eof, eoline):

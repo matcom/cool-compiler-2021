@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import  Any, Dict
 from enum import Enum, auto
-from automaton_class import Automaton, State
-from grammar_classes import Item, Terminal, Epsilon
-from serializer_class import Serializer
-from token_class import Token
+from generated_utils.automaton_class import Automaton, State
+from generated_utils.grammar_classes import Item, Terminal, Epsilon
+from generated_utils.serializer_class import Serializer
+from generated_utils.token_class import Token
 
 @dataclass
 class ParserSymbol:

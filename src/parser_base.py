@@ -1,4 +1,4 @@
-from parsers import parser_shr,ParserTable
+from parser_shr_lr1 import parser_shr,ParserTable
 
 class Parser:
     def __init__(self, ast_class, token_type=None):

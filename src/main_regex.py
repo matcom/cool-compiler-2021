@@ -1,10 +1,10 @@
 from typing import Dict
 
-from automaton_class import Automaton
+from generated_utils.automaton_class import Automaton
 import ast_regex as ast
 from lexer_regex import Lexer
 from parser_regex import Parser
-from match_class import Match
+from generated_utils.token_class import Match
 
 
 class RegexExpr:

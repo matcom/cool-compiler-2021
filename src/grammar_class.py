@@ -1,14 +1,14 @@
 from collections import deque
-from typing import List,Dict,Iterable,Union,Set
+from typing import Dict, Union,Set
 from itertools import chain
 import inspect
 import os.path
 
 from lexer_base import *
 from parser_base import Parser
-from parsers import parser_lr1
-from automaton_class import *
-from grammar_classes import *
+from parser_shr_lr1 import parser_lr1
+from generated_utils.automaton_class import *
+from generated_utils.grammar_classes import *
 
 
 

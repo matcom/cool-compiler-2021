@@ -1,6 +1,6 @@
 from enum import Enum, auto
-from automaton_class import Automaton,State
-from token_class import Token
+from generated_utils.automaton_class import Automaton,State
+from generated_utils.token_class import Token
 from typing import Union
 import string
 from abc import ABC, abstractmethod
