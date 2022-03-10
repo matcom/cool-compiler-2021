@@ -76,7 +76,7 @@ class DotCodeVisitor:
                             self.add_comment('Calling main')
                             result = self.add_local('result')
                             self.add_inst(cil.ArgNode(instance))
-                            self.add_inst(cil.DynamicCallNode(instance, 'main', result, 'Main'))
+                            self.add_inst(cil.DynamicCallNode(instance, 'main', result, None, 'Main'))
                             self.add_inst(cil.ReturnNode(0))
                             break
 
@@ -496,14 +496,14 @@ class DotCodeVisitor:
         obj_dest = self.visit(obj, scope)
 
         # allocate and push the args
-        for arg in node.args:
+        for arg in reversed(node.args):
             arg_dest = self.visit(arg, scope)
             self.add_inst(cil.ArgNode(arg_dest))
         self.add_inst(cil.ArgNode(obj_dest))
 
         # call the function
         call_res = self.add_local('call_res')
-        self.add_inst(cil.DynamicCallNode(obj_dest, node.id, call_res, node.obj_dyn_type))
+        self.add_inst(cil.DynamicCallNode(obj_dest, node.id, call_res, node.type, node.obj_dyn_type))
 
         return call_res
 
