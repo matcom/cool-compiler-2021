@@ -1,5 +1,5 @@
 import ast_cool_hierarchy as ast
-import lexer_ply as lexer
+import lexer.ply as lexer
 import ply.yacc as yacc
 
 from utils.utils import find_column, find_last_line
