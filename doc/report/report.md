@@ -3,7 +3,6 @@
 *Rodrigo D. Pino Trueba C412*
 *Adrián Rodríguez Portales C412*
 
-
 # CLI 
 
 Para ejecutar el compilador es necesario tener instalado `typer` y `ply`.
