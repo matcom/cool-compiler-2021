@@ -391,15 +391,12 @@ class DotCodeVisitor:
 
         # Does not conform to anyone => Runtime error
         self.add_inst(cil.GotoNode(case_match_re_label.name))
-        child_scope = scope.children.pop(0)
 
         for case, label in zip(node.cases, branch_labels):
+            child_scope = scope.children.pop(0)
             self.add_inst(label)
             idx = self.add_local(case.id, internal=False)
             self.add_inst(cil.AssignNode(idx, ret_exp))
-            var = child_scope.find_variable(case.id)
-            var.name = idx
-
             self.visit(case, child_scope)
             self.add_inst(cil.GotoNode(end_label.name))
 

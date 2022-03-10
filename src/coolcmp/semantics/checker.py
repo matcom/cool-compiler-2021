@@ -180,9 +180,8 @@ class TypeChecker:
             else:
                 case_types.append(type_)
 
-        child_scope = scope.create_child(tag='_case_branch')
         types = [
-            self.visit(case, child_scope)
+            self.visit(case, scope)
             for case in node.cases
         ]
 
@@ -194,6 +193,7 @@ class TypeChecker:
 
     @visitor.when(CaseBranchNode)
     def visit(self, node: CaseBranchNode, scope: Scope):
+        child_scope = scope.create_child('_case_branch')
         try:
             id_type = self.context.get_type(node.type)
         except SemanticError:
@@ -203,9 +203,9 @@ class TypeChecker:
         if node.id == 'self':
             self.errors.append(err.SELF_INVALID_ID % (node.pos, ))
         else:
-            scope.define_variable(node.id, id_type)
+            child_scope.define_variable(node.id, id_type)
 
-        return self.visit(node.expr, scope)
+        return self.visit(node.expr, child_scope)
 
     @visitor.when(AssignNode)
     def visit(self, node: AssignNode, scope: Scope):
