@@ -395,8 +395,11 @@ class DotCodeVisitor:
 
         for case, label in zip(node.cases, branch_labels):
             self.add_inst(label)
-            idx = self.add_local(case.id)
-            idx = self.add_inst(cil.AssignNode(idx, ret_exp))
+            idx = self.add_local(case.id, internal=False)
+            self.add_inst(cil.AssignNode(idx, ret_exp))
+            var = child_scope.find_variable(case.id)
+            var.name = idx
+
             self.visit(case, child_scope)
             self.add_inst(cil.GotoNode(end_label.name))
 
