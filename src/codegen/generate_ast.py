@@ -64,14 +64,14 @@ class CIL:
     @visitor.when(ClassDeclarationNode)
     def visit(self, node):
         self.scope.current_class = node.id
-        attributes = []
+        self.scope.attributes = {}
         features = []
         methods = []
         locals  = []
         type_info = self.scope.infos[node.id]
         
         for a in type_info.attrs:   
-            attributes.append(CILAttributeNode(a.name, a.type))
+            self.scope.attributes[a.name] = CILAttributeNode(a.name, a.type)
         methods.append(CILMethodNode(f'Init_{node.id}', f'Init_{node.id}'))         
         
         for m in type_info.methods.keys():        
@@ -101,7 +101,7 @@ class CIL:
         init_class = self.scope.create_init_class(features, locals)    
         self.scope.functions.append(init_class)  
         
-        return CILTypeNode(node.id, attributes, methods)
+        return CILTypeNode(node.id, self.scope.attributes.values(), methods)
             
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
@@ -242,8 +242,6 @@ class CIL:
         self.scope.instructions.append(CILLabelNode(f'pool_{count}'))
 
         return var_return
-    
-
 
     @visitor.when(CaseNode)
     def visit(self, node):
@@ -305,9 +303,6 @@ class CIL:
         self.scope.instructions.append(CILLabelNode(f'case_{self.scope.case_count}_end'))
         self.scope.case_count += 1
         return var_result
-
-
-   
             
     @visitor.when(CaseAttrNode)
     def visit(self, node):  
@@ -332,11 +327,19 @@ class CIL:
         local = self.scope.find_local(node.id.lex)
 
         if local is not None:
-            self.scope.instructions.append(CILAssignNode(CILVariableNode(local.id), variable))
+            if local.type == 'Object' and node.expr.computed_type.name in ['Int', 'Bool']:
+                self.scope.instructions.append(CILAssignNode(CILVariableNode(local.id), CILBoxNode(variable, node.expr.computed_type.name)))
+            else:
+                self.scope.instructions.append(CILAssignNode(CILVariableNode(local.id), variable))
             return CILVariableNode(local.id)
         else:
-            self.scope.instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.id.lex), variable))
-            return var
+            if self.scope.attributes[node.id.lex].type.name == 'Object' and node.expr.computed_type.name in ['Int', 'Bool']:
+                var1 = CILVariableNode(self.scope.add_new_local('Object'))
+                self.scope.instructions.append(CILAssignNode(var1, CILBoxNode(variable, node.expr.computed_type.name)))
+                self.scope.instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.id.lex), var1))
+            else:
+                self.scope.instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.id.lex), variable))
+            return CILGetAttribute(CILVariableNode(f'self_{self.scope.current_class}'), self.scope.current_class, CILVariableNode(node.id.lex))
                                      
     @visitor.when(BinaryNode)
     def visit(self, node):
@@ -450,27 +453,3 @@ class CIL:
         name = self.scope.add_new_local(node.lex)
         self.scope.instructions.append(CILAssignNode(CILVariableNode(name), CILVCallNode(node.lex, f"Init_{node.lex}")))
         return  CILVariableNode(name) 
-# for (new_branch,i) in s :
-#                 try:
-#                     if new_branch not in keys and (new_branch,i) in valid[case.type]:
-#                         try:
-#                             if type[new_branch] :
-#                                 new_cases.remove(new_branch)
-#                             else:
-#                                 type[new_branch] = True 
-#                                 new_cases.remove(new_branch)  
-#                         except:   
-#                             type[new_branch] = True      
-#                             self.scope.instructions.append(CILLabelNode(f'branch_{self.scope.case_count}_{index-1}')) 
-#                             case_expr_type_of = CILTypeConstantNode(new_branch)  
-#                             self.scope.instructions.append(CILAssignNode(var_condition, CILNotEqualsNode(CILVariableNode(name_type_expr),case_expr_type_of)))  
-#                             new_cases.remove((new_branch,i))
-#                             if index == len(node.cases) - 1 and len(s) == 0  :
-#                                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'case_end{self.scope.case_count}')))
-#                             else:
-#                                 self.scope.instructions.append(CILIfGotoNode(var_condition,CILLabelNode(f'branch_{self.scope.case_count}_{index}')))     
-#                             self.scope.instructions.append(CILAssignNode(return_, expr_attr)) 
-#                             self.scope.instructions.append(CILGotoNode(CILLabelNode(f'case_end{self.scope.case_count}')))                       
-#                             index +=1
-#                 except :
-#                     pass      

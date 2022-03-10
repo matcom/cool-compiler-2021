@@ -213,6 +213,18 @@ class CILExpressionNode(CILNode):
     pass
 
 
+class CILBoxNode(CILExpressionNode):
+    def __init__(self, var, type):
+        self.var = var
+        self.type = type
+        
+    def __str__(self):
+        text = "CILBoxNode:\n"
+        text += f"var: {self.var}\n"
+        text += f"type: {self.type}\n"
+        return text   
+
+
 class CILBinaryOperationNode(CILExpressionNode):
     def __init__(self, left, right):
         self.left = left
@@ -305,9 +317,11 @@ class CILAtomicNode(CILExpressionNode):
 class CILVariableNode(CILAtomicNode):
     pass   
 
+
 class CILExceptionNode(CILAtomicNode):
     pass
   
+
 class CILTypeConstantNode(CILAtomicNode):
     pass               
            
@@ -349,7 +363,7 @@ class CILEqualsNode(CILBinaryOperationNode):
 class CILNotEqualsNode(CILBinaryOperationNode):
     pass
 
+
 class CILNotNode(CILExpressionNode):
     def __init__(self, var):
-        self.var = var
-                
+        self.var = var              
