@@ -94,9 +94,9 @@ def main(
     input_file: str,
     ccil: bool = typer.Option(
         False,
-        help="Create <program>.ccil file corresponding to the ccil code generated during compilation ",
+        help="Create a <program>.ccil file corresponding to the ccil code generated during compilation ",
     ),
-    cool_ast: bool = typer.Option(False, help="Prints program's COOL AST"),
+    cool_ast: bool = typer.Option(False, help="Print COOL AST"),
 ):
     """
     Welcome to CoolCows Compiler! 
