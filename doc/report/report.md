@@ -120,32 +120,36 @@ Esto permite usar una gramática ambigua y evita tener que definir más producci
 
 # Semántica e Inferencia
 
-Nuestro proyecto hace uso de `AUTO_TYPE` con la que incorpora inferencia de tipos al lenguage Cool. La inferencia se realiza varias en distintos vistores. En nuestra implementación debido a que le inferencia se apoya fuertemente sobre el reglas semánticas, el chequeo semántico se realiza a la par que la inferencia, y dividido de igual manera por los visitores.
+Nuestro proyecto hace uso de `AUTO_TYPE` con la que incorpora inferencia de tipos al lenguage Cool. La inferencia se realiza varias veces en distintos vistores. En nuestra implementación debido a que le inferencia se apoya fuertemente sobre el reglas semánticas, el chequeo semántico se realiza a la par que la inferencia, y dividido de igual manera por los visitores.
 
-La idea principal para realizar la inferencia es considerar todo declaración como `AUTO_TYPE` no como un tipo específico sino como un conjunto de tipos, donde inicialmente ese conjunto esta compuesto por todos los tipos definidos en un programa Cool. Los tipos declarados específicamente como `Int` o `String` se consideran conjuntos con un solo elemento.
+La idea principal para realizar la inferencia es considerar todo declaración  `AUTO_TYPE` no como un tipo específico sino como un conjunto de tipos, donde inicialmente ese conjunto esta compuesto por todos los tipos definidos en un programa Cool. Los tipos declarados específicamente como `Int` o `String` se consideran conjuntos con un solo elemento.
 
-En  Cool muchas veces las expresiones se ven obligadas a conformarse a un tipo definido por el usuario. Deben corresponder con el tipo definido de una variable, argumento o retorno de una función. También debe obedecer las reglas semánticas, cuando están presente frente a una operación aritmética, o en una posición donde se espera que el resultado sea `Bool`. Para reducir los conjuntos de tipos en presencia de `AUTO_TYPE` realizamos lo siguiente:
+En  Cool muchas veces las expresiones se ven obligadas a conformarse a un tipo definido por el usuario. Deben corresponder con el tipo definido de una variable, argumento o retorno de una función. También deben obedecer las reglas semánticas, cuando están presente frente a una operación aritmética, o en una posición donde se espera que el resultado sea `Bool`. Para reducir los conjuntos de tipos en presencia de `AUTO_TYPE` realizamos lo siguiente:
 
 1. Cuando el tipo declarado de una variable esta bien definido (diferente de `AUTO_TYPE`) , se eliminan  del conjunto de tipos inferidos de la expresión los elementos que no conforman a dicho tipo bien definido.
 
-2. Cuando el tipo declarado de una variable es `AUTO_TYPE`, esta se puede reducir analizando que valores debe tener para conformarse con los tipos de la expresión inferida.
+2. Cuando el tipo declarado de una variable es `AUTO_TYPE`, esta se puede reducir analizando que valores debe tener para que los tipos de la expresión inferida se conformen con el.
 
 3. Cuando ambos tipos, tanto el definido como el inferido son `AUTO_TYPES` se busca que valores puede tener el segundo para conformarse al primero, y que valores el primero para que el segundo se conforme.
 
 Para tratar cada caso el inferenciador se divide en tres partes:
 
 1. **soft inferencer** que aplica la primera regla y tercera regla. Se le llama **soft** porque perdona y no realiza ningún tipo de chequeo semántico y permite cosas como que un conjunto  tengo dentro de si dos tipos sin un ancestro común.
-2. **hard inferencer ** aplica la primera y la tercera regla, y fuerza el chequeo semántico sobre todas las expresiones. No permite tipos sin ancestros comunes dentro de un mismo conjunto.
+2. **hard inferencer ** aplica la primera y la tercera regla, y fuerza el chequeo semántico sobre todas las expresiones. No permite bolsas de tipos sin ancestros comunes dentro de un mismo conjunto.
 3. **back inferencer** aplica la segunda y tercera regla. Dada las expresiones trata de reducir los conjuntos de los tipos definidos como `AUTO_TYPE` (e.g. parámetros de una función, retorno de una función, o declaración de  variables)
 4. **types inferencer** reduce todos los conjuntos de tipos de cada nodo al mayor ancestro en todos los casos, excepto cuando se trata del valor de retorno de una función, en el que reduce al ancestro común más cercano de los tipos del conjunto.
 
 Cada inferenciador se ejecuta secuencialmente, una sola vez, exceptuando por el **back inferencer** que puede ejecutarse tantas veces como sea necesario.
 
+
+
+## Soft Inferencer
+
 El **soft inferencer** es permisivo pues como es el primero en leer el programa, puede que un conjunto de tipos inválidos en la línea 5 se vuelva válido más adelante en el código.
 
-En este ejemplo no funcional donde el tipo de `a`  puede ser cualquiera, al leer `a.f()`, se reducen los tipos de a de  {`Object`, `String`, `IO`, `Int`, `Bool`, `Main`, `A`, `B`} a tan solo {`A`, `B`}. No obstante `A` y `B` no tienen un ancestro común dentro del conjunto, luego `a` posee un tipo invalido.
+En este ejemplo no funcional (Lanza `RuntimeError` debido a que `a` es `Void`) donde el tipo de `a`  puede ser cualquiera, al leer `a.f()`, se reducen los tipos de a de  {`Object`, `String`, `IO`, `Int`, `Bool`, `Main`, `A`, `B`} a tan solo {`A`, `B`}. No obstante `A` y `B` no tienen un ancestro común dentro del conjunto, luego `a` posee un tipo invalido. Lanzar una excepción en este momento puede crear un falso positivo pues se puede corregir más adelante ya que el programa no se ha leído completamente.
 
-Luego cuando se lee `a.g()` el conjunto de tipos se reduce a  solo {`A`}.
+Luego cuando se lee `a.g()` el conjunto de tipos se reduce a  solo {`A`}. Estos tipos inferidos se guardan para los próximos visitores del chequeo semántico.
 
 ```c#
 class Main {
@@ -162,25 +166,44 @@ class A {
 		3 + 3
 	}
 	metod g():String{
-		"yisus"
+		"g"
 	}
 	
 };
 class B {
 	method f():String{
-		"3 + 3"
+		"f"
 	}
-};
+}
 ```
+
+## Herramientas para la Inferencia
+
+### Join
+
+La operación `join` cuando se busca encontrar el tipo mas general entre dos bolsas de tipos, es buscar el ancestro común más cercano al que todos los tipos de ambas bolsas se conformaran. Si ese tipo se encuentra dentro de alguna de las dos bolsas se utiliza, si no, se añade.
+
+Esta operación se utiliza sobre los expresiones `if` y `case of`.
+
+### Conform 
+
+`conform`  se utiliza para saber si una bolsa de tipos `a` conforma con otra `b`, se analizan todos sus subtipos de `a` y se desechan los que no conformen con ningún subtipo de `b`.
+
+Se ejecuta durante el chequeo del **soft inferencer** y el **hard inferencer**, para reducir el tipo de las expresiones a base de un tipo declarado o una regla semántica.
+
+### Unify
+
+Con `unify` se halla la intersección entre dos bolsas de tipos. Se ejecuta en el **back inferencer** para reducir las tipos declarados a partir de las expresión inferida.
 
 ## SELF_TYPE
 
-La combinación de `SELF_TYPE` con `AUTO_TYPE` trajo sus problemas, sobre todo porque funciona como un comodín que puede tener un tipo dependiendo de las circunstancia. Logramos una mejor integración entre estos fue posible intercambiando el `SELF_TYPE` por la clase donde se encuentra analizando en ese momento.
+Los `AUTO_TYPE` no incluyen dentro de su bolsa de tipo al tipo especial `SELF_TYPE`.
 
+La combinación de `SELF_TYPE` con `AUTO_TYPE` trajo sus problemas, sobre todo porque funciona como un comodín que puede tener un tipo dependiendo de las circunstancia. Logramos una mejor integración entre estos fue posible intercambiando el `SELF_TYPE` por el tipo según donde se estuviera analizando el código. Después se intercambiaba para atrás, en caso de que no se pueda, significa que no cumple las reglas de la semántica y se lanza como error después de finalizada la inferencia.
 
 # Generación de Código Intermedio
 
-Para producir código CIL se toma como principal el guía el capitulo 7 del libro de `Cool Compilers`  por su simpleza y facilidad luego para traducirlo a MIPS.
+Para producir código CIL se toma como principal el guía el capitulo 7 del libro de `Cool Compilers`.
 
 El programa original se divide en tres secciones:
 
@@ -204,26 +227,28 @@ Se almacenan todos las cadenas definidos por el usuario en el programa Cool. Ade
 
 ## Code
 
-Cada expresión de Cool tiene una representación en secuencia de operaciones en CIL. Se asegura siempre que dentro de esa secuencia haya una instrucción que guarde en una variable local el resultado final de dicha expresión. 
+Cada expresión de Cool se representa como una  secuencia de operaciones en CIL. Se asegura siempre que dentro de esa secuencia haya una instrucción que guarde en una variable local el resultado final de dicha expresión. 
 
-Las expresiones no siempre tienen la misma secuencia de instrucciones, pues necesitan muchas veces del valor de sus sub-expresiones. El workflow para producir una serie de operaciones para una expresión es:
+La secuencia de instrucciones de una expresión varían de acuerdo a las secuencias de instrucciones de sus  sub-expresiones respectivas. Para producir código CIL a partir de una expresión:
 
 1. Produce las operaciones de todas sus sub-expresiones
-2. Produce las operaciones propias, sustituyendo donde se necesite cierta sub-expresion  por la variable local donde esta guardada su resultado final.
-3. Organiza las operaciones, crea una variable local donde se almacene el valor final propio y retorna
+2. Produce las operaciones propias. Cuando se necesite el valor de una sub-expresión se busca la variable local que almacena el resultado final de dicha sub-expresión.
+3. Organiza las operaciones propias y de sus sub-expresiones de una manera que tenga sentido
+4. Finalmente crea una variable local donde se almacene el valor final propio.
 
-Existen ciertas expresiones que en CIL se pueden reducir hasta un punto y no mas, como la igualdad entre dos variables de tipo `String`, o como obtener un substring.
+En CIL se trata de desglosar las expresiones en las instrucciones con el nivel más bajo posible. Existen casos para lo cual lo anterior no es posible como la comparación de  `String`  y las operaciones `built-in` que se realizan sobre estos.
 
-Existen otras que no es necesario que lleguen a smips como el operador unario `isVoid`. Como en smips todo son enteros, se puede saber dado el tipo estático si tiene sentido calcularlo. Para una variable de tipo `Int`, `String` o `Bool`, `isVoid` siempre retorna falso, en cambio con los demás tipos se evalúa la dirección de memoria, si esta es 0 (Equivalente a `Void` en nuestra implementación) el resultado de la expresión es `true` o `1` sino es `false` o `0`.
+Se añaden `warnings` al compilador cuando el programador tiene una expresión permitida, pero sin sentido, como `isVoid 3`, o algún otro tipo que no pueda ser `Void`.
 
 Durante la generación de código se genera también las excepciones que pueden ser lanzadas durante la ejecución:
 
-+ División entre cero
++ División por cero
 + El despacho ocurre desde un tipo sin inicializar (`Void`)
 + El rango del substring no es válido
++ La expresión del `case of` es `Void`
 + Ninguna rama de algún `case of` es igual al tipo de la expresión
 
-Es posible para el usuario definir variables con mismos nombres con distintos contextos, para tratar con esto se reutilizan una versión simplificada del `Scope` de la semántica, donde se almacenan según el contexto la variable definida por el usuario y su traducción a Cool. Gracias a esto, en el ejemplo siguiente se conoce siempre  a que variable `x` se refiere el programa:
+Es posible para el usuario definir variables con mismos nombres con distintos contextos, para tratar con esto se reutilizan una versión simplificada del `Scope` de la semántica, donde se almacenan según el contexto la variable definida por el usuario y su traducción a Cool. Esto permite que en el ejemplo siguiente se conozca siempre  a que variable `x` se refiere el programa:
 
 ```assembly
 # COOL
@@ -232,6 +257,9 @@ let x:int = 3
 # CIL
 local let_x_0
 local let_x_1
+
+let_x_0 = 3
+let_x_1 = 4
 ...
 ```
 
@@ -377,6 +405,12 @@ f = <in_expr_fval> # Almacena el resultado final de la expresion let
 
 #### Case Of
 
+Para los `case of` las ramas desde la semántica son organizadas para que los tipos más general se quede siempre al fondo.
+
+Durante la generación de código de la expresión `case of`, cuando se busca si conforman con el tipo`A` se compara también con todos sus subtipos. Se le añade la optimización que si ya existe ese subtipo de `A` declarado en el `case of` entonces no se añade nuevamente.
+
+Para el caso de `Object` específico no se compara con ningún subtipo, sencillamente se pone la operación `goto`
+
 **Cool Input**
 
 ```
@@ -440,7 +474,7 @@ goto end_case
 label end_case
 ```
 
-#### *Dispatch* Estático
+#### Despacho Dinámico 1
 
 **Cool Input**
 
@@ -451,30 +485,60 @@ label end_case
 **CCIL Output**
 
 ```assembly
+<init self> # EL primer argumento es el objeto desde el que se llama
 <init arg1>
 <init arg2>
 ...
 <init argn>
-r = call <func_id> n
+r = vcall <func_id> 
 ```
 
-#### *Dispatch* Dinámico
+#### Despacho Dinámico 2
 
 **Cool Input**
 
 ```
-<type1>@<type2>.<func_id>(<arg1>, <arg2>, ..., <argn>);
+<expr>.<func_id>(<arg1>, <arg2>, ..., <argn>);
 ```
 
 **CCIL Output**
 
 ```assembly
+# Se realiza la expresion
+<init_expr_locals>
+<do_expr>
+
+<init expr_fval> # El primer argumento es una variable local con el tipo de la expresión
 <init arg1>
 <init arg2>
 ...
 <init argn>
-t = allocate <type2> # It needs to give the same attributes that type one has
-r = vcall t <func_id>  n
+r = vcall <func_id> 
+```
+
+#### Despacho Estático
+
+**Cool Input**
+
+```
+<expr>@<type1>.<func_id>(<arg1>, <arg2>, ..., <argn>);
+```
+
+**CCIL Output**
+
+```assembly
+# Se realiza la expresion
+<init_expr_locals>
+<do_expr>
+
+t = allocate <type1> # Crea el tipo donde se busca la funcion por su nombre único
+
+<init expr_fval> # El primer argumento es una variable local con el tipo de la expresión
+<init arg1>
+<init arg2>
+...
+<init argn>
+r = ccall t <func_id>  n
 ```
 
 #### Declaración de un método
@@ -482,7 +546,7 @@ r = vcall t <func_id>  n
 **Cool Input**
 
 ```
-<function_id>(<arg1>:<type1>, ..., <argn>:<typen>) : <return_type>
+<function_id>(<par1>:<type1>, ..., <parn>:<typen>) : <return_type>
 {
 	<function_expression>
 }
@@ -492,10 +556,10 @@ r = vcall t <func_id>  n
 
 ```assembly
 function <function_id> {
-	param <arg1>
-	param <arg2>
+	param <par1>
+	param <par2>
 	...
-	param <argn>
+	param <parn>
 	local <id1>
 	local <id2>
 	...
@@ -549,7 +613,7 @@ t = 3 + 5
 
 ---
 
-###### More than one
+###### Varios operadores
 
 **Cool Input**
 
@@ -560,14 +624,13 @@ t = 3 + 5
 **CCIL Output**
 
 ```assembly
-# Naive
 t1 = 5 + 7
 t2 = 3 + t1
 ```
 
 ---
 
-###### Using non commutative operations
+###### En operaciones no conmutativas
 
 ```python
 3 - 5 - 7
@@ -576,8 +639,8 @@ t2 = 3 + t1
 ```
 
 ```assembly
-t = 3 - 5
-t = t - 7
+t1 = 3 - 5
+t2 = t - 7
 ```
 
 ---
@@ -591,16 +654,16 @@ t = t - 7
 **CCIL Output**
 
 ```
-t = 100 / 20
-t = t / 5
-t = t / 2
+t1 = 100 / 20
+t2 = t1 / 5
+t3 = t2 / 2
 ```
 
 
 
 ## Lenguaje CCIL
 
-Definición del lenguaje CCIL. Tomamos como No Terminales sólo las palabras que empiecen con  mayúsculas. El resto de palabras  y símbolos se consideran como Terminales.
+Definición del lenguaje CCIL(Cool Cows Intermediate Language). Tomamos como No Terminales sólo las palabras que empiecen con  mayúsculas. El resto de palabras  y símbolos se consideran como Terminales.
 
 $$
 \begin{array}{rcl}
