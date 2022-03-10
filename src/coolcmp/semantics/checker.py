@@ -249,8 +249,11 @@ class TypeChecker:
         else:
             obj_type = self.visit(node.obj, scope)
 
-        _, owner = obj_type.get_method(node.id, get_owner=True)
-        node.update_obj_dynamic_type(owner.name)
+        try:
+            _, owner = obj_type.get_method(node.id, get_owner=True)
+            node.update_obj_dynamic_type(owner.name)
+        except SemanticError:
+            pass
 
         if node.type is not None:
             try:
