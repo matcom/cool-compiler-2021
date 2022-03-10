@@ -433,33 +433,36 @@ class DotCodeVisitor:
     @visitor.when(ast.ConditionalNode)
     def visit(self, node: ast.ConditionalNode, scope: Scope):
         """
-        Note that the 'else' branch comes before the 'then' branch.
-
         <local vars>
         if_dest = <if_expr>
         IF if_dest GOTO then
-        else_dest = <else_expr>
-        cond_res = else_dest
-        GOTO endif
+        GOTO else
         LABEL then
         then_dest = <then_expr>
         cond_res = then_dest
+        GOTO endif
+        LABEL else
+        else_dest = <else_expr>
+        cond_res = else_dest
         LABEL endif
         """
         self.add_comment('Conditional if-else')
 
         then_label = self.new_label('then')
+        else_label = self.new_label('else')
         endif_label = self.new_label('endif')
 
         cond_res = self.add_local('cond_res')
         if_dest = self.visit(node.if_expr, scope)
         self.add_inst(cil.GotoIfNode(if_dest, then_label.name))
-        else_dest = self.visit(node.else_expr, scope)
-        self.add_inst(cil.AssignNode(cond_res, else_dest))
-        self.add_inst(cil.GotoNode(endif_label.name))
+        self.add_inst(cil.GotoNode(else_label.name))
         self.add_inst(then_label)
         then_dest = self.visit(node.then_expr, scope)
         self.add_inst(cil.AssignNode(cond_res, then_dest))
+        self.add_inst(cil.GotoNode(endif_label.name))
+        self.add_inst(else_label)
+        else_dest = self.visit(node.else_expr, scope)
+        self.add_inst(cil.AssignNode(cond_res, else_dest))
         self.add_inst(endif_label)
         return cond_res
 
@@ -509,8 +512,7 @@ class DotCodeVisitor:
         for arg in reversed(node.args):
             arg_dest = self.visit(arg, scope)
             self.add_inst(cil.ArgNode(arg_dest))
-        if not self.current_is_init:
-            self.add_inst(cil.ArgNode(obj_dest))
+        self.add_inst(cil.ArgNode('instance' if self.current_is_init else obj_dest))
 
         # call the function
         call_res = self.add_local('call_res')
