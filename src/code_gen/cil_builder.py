@@ -169,43 +169,27 @@ class CILBuilder:
         self.current_function = self.register_function(
             self.to_function_name("constructor", node.id)
         )
+
+        self.params.append(ParamNode("self"))
         self.current_type.define_method("constructor", [], [], "Object")
 
-        self_var = self.define_internal_local()
-        self.self_var = self_var
 
-        self.register_instruction(AllocateNode(node.id, self_var))
+        for attr, (_, typex) in self.attrs[self.current_type.name].items():
+            instance = self.define_internal_local()
+            self.register_instruction(ArgNode("self"))
+            self.register_instruction(StaticCallNode(
+                self.to_function_name(f"{attr}_constructor",typex),
+                instance
+            ))
+            self.register_instruction(SetAttribNode(
+                "self",
+                self.to_attr_name(node.id, attr),
+                instance,
+                node.id
+            ))
 
-        attributeNodes = [
-            feat for feat in node.features if isinstance(feat, cool.AttrDeclarationNode)
-        ]
-
-        for attr in attributeNodes:  # Assign default value first
-            default_var = self.define_internal_local()
-            self.register_instruction(DefaultValueNode(default_var, attr.type))
-            self.register_instruction(
-                SetAttribNode(
-                    self_var,
-                    self.to_attr_name(self.current_type.name, attr.id),
-                    default_var,
-                    node.id,
-                )
-            )
-
-        for attr in attributeNodes:  # Assign init_expr if not None
-            if attr.init_exp:
-                init_expr_value = self.define_internal_local()
-                self.visit(attr.init_exp, init_expr_value)
-                self.register_instruction(
-                    SetAttribNode(
-                        self_var,
-                        self.to_attr_name(self.current_type.name, attr.id),
-                        init_expr_value,
-                        node.id,
-                    )
-                )
-
-        self.register_instruction(ReturnNode(self_var))
+        
+        self.register_instruction(ReturnNode("self"))
 
     def add_builtin_functions(self):
         # Object
@@ -441,17 +425,7 @@ class CILBuilder:
                 else (i, type.name)
                 for i, (method, htype) in enumerate(type.all_methods())
             }
-        # self.dottypes.append(
-        #     cil.TypeNode(
-        #         type.name,
-        #         list(self.attrs[type.name].keys()),
-        #         [
-        #             self.get_func_id(htype, method)
-        #             for method, (_, htype) in self.methods[type.name].items()
-        #         ],
-        #     )
-        # )
-
+        print("ATTRIBUTES", self.attrs)
         self.current_function = FunctionNode("main", [], [], [])
         self.code.append(self.current_function)
 
@@ -493,7 +467,6 @@ class CILBuilder:
         self.register_type_name()
 
         type_node = self.register_type(self.current_type.name)
-        self.build_constructor(node)
 
         visited_func = []
         current_type = self.current_type
@@ -519,6 +492,8 @@ class CILBuilder:
         type_node.attributes.reverse()
         type_node.methods.reverse()
 
+        self.build_constructor(node)
+
         index = type_node.methods.index(
             ("copy", self.to_function_name("copy", "Object"))
         )
@@ -539,7 +514,23 @@ class CILBuilder:
 
     @visitor.when(cool.AttrDeclarationNode)
     def visit(self, node, return_var=None):
-        pass
+        self.current_function = self.register_function(self.to_function_name(f"{node.id}_constructor", self.current_type.name))
+
+        self.params.append(ParamNode("self"))
+         
+        # Assign init_expr if not None
+        if node.init_exp:
+            init_expr_value = self.define_internal_local()
+            self.visit(node.init_exp, init_expr_value)
+            self.register_instruction(ReturnNode(init_expr_value))
+                
+        else: # Assign default value 
+            default_var = self.define_internal_local()
+            self.register_instruction(DefaultValueNode(default_var, node.type))
+            self.register_instruction(ReturnNode(default_var))
+        
+        self.current_function = None
+
 
     @visitor.when(cool.FuncDeclarationNode)
     def visit(self, node, return_var=None):
