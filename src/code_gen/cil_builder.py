@@ -490,55 +490,23 @@ class CILBuilder:
 
         type_node = self.register_type(self.current_type.name)
 
-        visited_func = []
         current_type = self.current_type
         while current_type is not None:
             attributes = [
                 (node.id + "_" + attr.name) for attr in current_type.attributes
             ]
-            methods = [
-                func.name
-                for func in current_type.methods
-                if func.name not in visited_func
-            ]
-            visited_func.extend(methods)
+           
             type_node.attributes.extend(attributes[::-1])
-            type_node.methods.extend(
-                [
-                    (item, self.to_function_name(item, current_type.name))
-                    for item in methods[::-1]
-                ]
-            )
+           
             current_type = current_type.parent
 
         type_node.attributes.reverse()
-        type_node.methods.reverse()
 
+        type_node.methods = [(method_name, self.to_function_name(method_name, typex)) for method_name,(_, typex) in self.methods[node.id].items()]
+        print(type_node.methods)
         self.build_constructor(node)
 
-        index = type_node.methods.index(
-            ("abort", self.to_function_name("abort", "Object"))
-        )
-        type_node.methods[index] = (
-            "abort",
-            self.to_function_name("abort", self.current_type.name),
-        )
-
-        index = type_node.methods.index(
-            ("copy", self.to_function_name("copy", "Object"))
-        )
-        type_node.methods[index] = (
-            "copy",
-            self.to_function_name("copy", self.current_type.name),
-        )
-
-        index = type_node.methods.index(
-            ("type_name", self.to_function_name("type_name", "Object"))
-        )
-        type_node.methods[index] = (
-            "type_name",
-            self.to_function_name("type_name", self.current_type.name),
-        )
+       
         for feature in node.features:
             self.visit(feature)
 
