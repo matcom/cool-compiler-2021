@@ -463,12 +463,12 @@ class CILToMipsVisitor:
             mips.LWNode(a0, (4, a0))
         )
         push_length = (
-            mips.LWNode(a1, (length_address, fp)),
-            mips.LWNode(a1, (4, a1))
+            mips.LWNode(a2, (length_address, fp)),
+            mips.LWNode(a2, (4, a2))
         )
         push_index = (
-            mips.LWNode(a2, (index_address, fp)),
-            mips.LWNode(a2, (4, a2))
+            mips.LWNode(a1, (index_address, fp)),
+            mips.LWNode(a1, (4, a1))
         )
 
         self.add_inst(
