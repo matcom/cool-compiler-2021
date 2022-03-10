@@ -99,15 +99,12 @@ def t_comments_ccom(t):
         # return t
         t.lexer.begin("INITIAL")
         
-def t_comments_any(t):
-    # r'[^\s\{\}\'\"]+'
-    r'[^\s\'\"]+'
-    # t.lexer.skip(1)
-
 # For bad characters. In this case we just skip over everything but (* or *)
 def t_comments_error(t):
     t.lexer.skip(1)
 
+def t_comments_anycharacter(t):
+    "."
 
 # EOF handling rule
 def t_comments_eof(t):
