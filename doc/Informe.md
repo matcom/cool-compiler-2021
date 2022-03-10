@@ -1,6 +1,9 @@
 # Informe de Complementos de Compilación
+
 ## Datos Generales
+
 ### Autores
+
 - Yansaro Rodríguez Páez
 - Javier Alejandro Valdés González
 - Osmany Pérez Rodríguez
@@ -8,7 +11,8 @@
 ## Uso del compilador
 
 ## Requisitos para ejecutar el compilador
-Para la ejecución es necesario `Python >= 3.7` e instalar los requerimientos listados en *requirements.txt*. Esto se hace de manera fácil con la instrucción *pip install -r requirements.txt*. 
+
+Para la ejecución es necesario `Python >= 3.7` e instalar los requerimientos listados en _requirements.txt_. Esto se hace de manera fácil con la instrucción _pip install -r requirements.txt_.
 
 Para correr los tests se debe ejecutar `make test`. Para esto es necesario tener instalado `make`. Para ejecutar un archivo especifico se debe correr
 
@@ -16,8 +20,8 @@ Para correr los tests se debe ejecutar `make test`. Para esto es necesario tener
 python3 -m app $INPUT_FILE
 ```
 
-
 ## Pipeline
+
 El programa cuenta con las siguientes etapas:
 
 1. Lexer
@@ -25,41 +29,45 @@ El programa cuenta con las siguientes etapas:
 3. Recolección de tipos
 4. Construcción de tipos
 5. Chequeo de tipos
-7. Cool a CIL
-8. CIL a MIPS
+6. Cool a CIL
+7. CIL a MIPS
 
 Cada parte del proceso será discutida en detalle durante las siguientes secciones.
 
 ## Lexer
 
-En el proceso de tokenizacion se uso la libreria SLY. En esta etapa se ignoran los comentarios de linea asi como los espacios en blanco. Para un mejor reporte de errores se dividio la etapa en varios estados: 
+En el proceso de tokenizacion se uso la libreria SLY. En esta etapa se ignoran los comentarios de linea asi como los espacios en blanco. Para un mejor reporte de errores se dividio la etapa en varios estados:
 
-   - MAIN
-   - block_comment
-   - strings
+- MAIN
+- block_comment
+- strings
 
 En cada uno de estos estados se ejecuta un proceso de tokenización especializado. En el caso de los `block_comment` se maneja el caso de comentarios identados, y en string se manejan errores especificos como "No debe existir el caracter NULL" o "String no terminado".
+
+#### Detalles sobre la implementacion:
+
+Se uso una clase `BaseLexer` donde se implementa la forma de manejar un error no esperado, asi como el metodo _leave_context_ usado para regresar al estado de lexer anterior.
+
+_sly_ no brinda soporte para llevar un seguimiento de la linea por la q vamos, por lo que en cada cambio de linea(`\n`), aumentamos el numero de linea correspondiente y lo asociamos al token.
 
 ### Gramática de Cool
 
 La gramática utilizada es libre de contexto y de recursión extrema izquierda. Esto trae consigo que se presenten problemas de ambigüedad que son resueltos con la definición de reglas de precedencia en la implementación del parser. (El el caso de SLY esto se resuelve ordenando los valores en la propiedad `precedence` de la clase `Parser`)
 
 ## Parsing
+
 El parser se encarga de contruir el AST haciendo uso de los nodos definidos en (parser/ast). Los metodos del parser están precedidos por un decorador que especifica que producción va a analizar el método, y este a su vez devuelve el resultado de parsear el nodo del AST correspondiente.
-
-
 
 ## Análisis Semántico
 
-### Recolección de tipos 
+### Recolección de tipos
 
 Para la recoleccion de tipos, al igual que para la mayoria de las etapas del proyecto se utiliza el patron `visitor`. Aqui se realiza un recorrido por el AST generado en la etapa de parsing, definiendo en el contexto los tipos encontrados y chequeando si ocurre alguno de los siguentes errores:
 
 **Errores detectados**:
+
 - Herencia cíclica
-- Herencia no valida(no se deben redefinir  `Int`, `Bool` o `String`)
-
-
+- Herencia no valida(no se deben redefinir `Int`, `Bool` o `String`)
 
 ### Construcción de tipos
 
@@ -69,25 +77,23 @@ En esta etapa se verifica primeramente que el programa ofrecido sea valido, esto
 
 - Redefinición en un hijo sin conservar la cantidad de argumentos o tipo de retorno
 - Redefinición de atributos
-- Uso de tipos no definidos 
+- Uso de tipos no definidos
 - No definición de la clase `Main` o su método `main`
 - Incorrecta definición del método `main`
 
 ### Chequeo de tipos
 
-El chequeo de tipos se dividió en dos etapas. Primeramente se realiza un recorrido sin profundidad, infiriendo los tipos declarados conforme su anotación, llamando a este recorrido `ShahahallowInferrer` o con su nombre mas conocido `LadyGagaInferrer` (😂). Luego se realiza otro recorrido con la información de los tipos inferidos en el recorrido anterior. 
+El chequeo de tipos se dividió en dos etapas. Primeramente se realiza un recorrido sin profundidad, infiriendo los tipos declarados conforme su anotación, llamando a este recorrido `ShahahallowInferrer` o con su nombre mas conocido `LadyGagaInferrer` (😂). Luego se realiza otro recorrido con la información de los tipos inferidos en el recorrido anterior.
 
-En este ultimo recorrido `DeepInferer` también conocido como `BradleyCooperInferer` se infiere el tipo mas especifico y se verifica q este tipo se conforme con el tipo de la anotación, aquí se incluyen los chequeos para los `case`, verificar que los operadores aritméticos solo puedan ser utilizados con `Int`,  etc. Es necesario destacar aquí el uso de dos tipos inferidos para cada nodo, un `inferred_type` y un `execution_inferred_type`. Esto ultimo se usa por la siguiente razón:
+En este ultimo recorrido `DeepInferer` también conocido como `BradleyCooperInferer` se infiere el tipo mas especifico y se verifica q este tipo se conforme con el tipo de la anotación, aquí se incluyen los chequeos para los `case`, verificar que los operadores aritméticos solo puedan ser utilizados con `Int`, etc. Es necesario destacar aquí el uso de dos tipos inferidos para cada nodo, un `inferred_type` y un `execution_inferred_type`. Esto ultimo se usa por la siguiente razón:
 
-​	Asumamos que tenemos una clase `A` en la que se define un método `bar` que devuelve `self` y `foo` devolviendo `true`.  y que también tenemos una clase hija `B` que sobrescribe `bar` devolviendo `self` pero anotado como `A` y `foo` retornando `false` . En el proceso de chequeo de tipos `B.test()` tiene q devolver `A` ya que así esta anotado, pero es necesario saber que el tipo real es `B` en el proceso de ejecución. Pues `B.bar().foo()` debería retornar `false` como esta definido en `self`(`B`) 
+​ Asumamos que tenemos una clase `A` en la que se define un método `bar` que devuelve `self` y `foo` devolviendo `true`. y que también tenemos una clase hija `B` que sobrescribe `bar` devolviendo `self` pero anotado como `A` y `foo` retornando `false` . En el proceso de chequeo de tipos `B.test()` tiene q devolver `A` ya que así esta anotado, pero es necesario saber que el tipo real es `B` en el proceso de ejecución. Pues `B.bar().foo()` debería retornar `false` como esta definido en `self`(`B`)
 
 **Errores detectados**:
 
 - Incompatibilidad de tipos
 - Uso de variables, tipos y métodos no definidos
-- mal usos del `case` 
-
-
+- mal usos del `case`
 
 ## COOL a CIL
 
@@ -101,45 +107,45 @@ CIL es un lenguaje intermedio 3-address pero a su vez orientado a objetos, esto 
 
 - Dispatch desde void
 - Index out of range
-- Ejecución de un *case* sin que ocurra algún emparejamiento con alguna rama.
+- Ejecución de un _case_ sin que ocurra algún emparejamiento con alguna rama.
 - División por cero
 
 ## CIL a MIPS
 
+A la hora de traducir de código CIL a MIPS es necesario apoyarse del patrón visitor nuevamente que tiene como punto de partida el AST de CIL que genera el paso anterior. El código MIPS tiene dos secciones que lo divide: .DATA (se crean referencias a objetos con un valor predeterminado o a otras direcciones de memoria) y .TEXT( se define como tal la lógica del código con las instrucciones que esto conlleva). Después se realiza otro visitor sencillo donde se traduce el AST de MIPS a código en sí, cada intrucción recibe una representación en un string y esto posteriormente en un archivo que finalmente será ejecutado en SPIM.
 
-A la hora de traducir de código CIL a MIPS es necesario apoyarse del patrón visitor nuevamente que tiene como punto de partida el AST de CIL que genera el paso anterior. El código MIPS tiene dos secciones que lo divide: .DATA (se crean referencias a objetos con un valor predeterminado o a otras direcciones de memoria) y .TEXT( se define como tal la lógica del código con las instrucciones que esto conlleva). Después se realiza otro visitor sencillo donde se traduce el AST de MIPS a código en sí, cada intrucción recibe una representación en un string y esto posteriormente en un archivo que finalmente será ejecutado en SPIM. 
 ### CIL Type en memoria.
 
-Al no soportar MIPS instrucciones orientadas a objetos es necesario elaborar una variante para la representación de un tipo de CIL, necesitamos para esto el nombre del tipo. Para almacenar los datos del objeto se utilizo el patrón *Prototype*, algo parecido a lo que realiza JavaScript con sus objetos. Para cada tipo existe un prototype el cual es copiado a la dirección del objeto creado en cada creación almacenando también en el prototype los valores por defecto de cada objeto. Luego para los métodos del objeto se almacenan sus direcciones en lo que es conocido como `tabla dispatch`:
+Al no soportar MIPS instrucciones orientadas a objetos es necesario elaborar una variante para la representación de un tipo de CIL, necesitamos para esto el nombre del tipo. Para almacenar los datos del objeto se utilizo el patrón _Prototype_, algo parecido a lo que realiza JavaScript con sus objetos. Para cada tipo existe un prototype el cual es copiado a la dirección del objeto creado en cada creación almacenando también en el prototype los valores por defecto de cada objeto. Luego para los métodos del objeto se almacenan sus direcciones en lo que es conocido como `tabla dispatch`:
 
 En conclusión, los prototypes se usan como valor por default de un objeto de un tipo especifico a la hora de su creación, todo tipo tiene un prototype asignado.
 
 ### Objetos en MIPS.
+
 La representación de un objeto en CIL una vez que se traduce a MIPS seria la siguiente:
 
- - Type(`1 word`): es un mapeo a un número entero que mapea a un tipo. La lista `shells_table` permite acceder al espacio de memoria donde está almacenado el tipo a través de ese número entero que hace función de índice. 
- - Size (`1 word`): tamaño en words del tipo. La suma de la cantidad de atributos + 3 (estos campos que se están explicando en este momento).
- - DispatchTable (`1 word`): Dirección a la tabla dispatch del objeto. Esta contiene las direcciones de las funciones del tipo como tal.
- - Attributes (`n words`):  Direcciones de los atributos en memoria, estos se almacenan con el nombre de la clase y el nombre del atributo.
+- Type(`1 word`): es un mapeo a un número entero que mapea a un tipo. La lista `shells_table` permite acceder al espacio de memoria donde está almacenado el tipo a través de ese número entero que hace función de índice.
+- Size (`1 word`): tamaño en words del tipo. La suma de la cantidad de atributos + 3 (estos campos que se están explicando en este momento).
+- DispatchTable (`1 word`): Dirección a la tabla dispatch del objeto. Esta contiene las direcciones de las funciones del tipo como tal.
+- Attributes (`n words`): Direcciones de los atributos en memoria, estos se almacenan con el nombre de la clase y el nombre del atributo.
 
 Un objeto cuya dirección inicial en memoria sea x queda de la siguiente forma:
 
-| Dirección x | Dirección x + 4 | Dirección x + 8      | Dirección x + 8      |... | Dirección x + (a + 2 ) * 4 |
-| ----------- | --------------- | ---------------------| ---------------------|--- | -------------------------- |
-| Tipo        | Tamaño          | Tabla de dispatch    | Atributo $0$         |... | Atributo $a$               |
-
+| Dirección x | Dirección x + 4 | Dirección x + 8   | Dirección x + 8 | ... | Dirección x + (a + 2 ) \* 4 |
+| ----------- | --------------- | ----------------- | --------------- | --- | --------------------------- |
+| Tipo        | Tamaño          | Tabla de dispatch | Atributo $0$    | ... | Atributo $a$                |
 
 **Llamado dinámico a una función**
 
-Para cada tipo, se guardan sus métodos en una lista llamada type_\<tipo>_dispatch. Esta tiene la siguiente estructura, partiendo de que su inicio es en la dirección x.
+Para cada tipo, se guardan sus métodos en una lista llamada type\_\<tipo>\_dispatch. Esta tiene la siguiente estructura, partiendo de que su inicio es en la dirección x.
 
-| Dirección x | Dirección x + 4 | Dirección x  + 8 | ... | Dirección x + (m-1) * 4 |
-| ----------- | --------------- | ---------------- | --- | ----------------------- |
-| Método 0    | Método 1        | Método 2         | ... | Método m-1              |
+| Dirección x | Dirección x + 4 | Dirección x + 8 | ... | Dirección x + (m-1) \* 4 |
+| ----------- | --------------- | --------------- | --- | ------------------------ |
+| Método 0    | Método 1        | Método 2        | ... | Método m-1               |
 
-Por cada uno de los tipos se crea una de estas tablas, que contiene (cantidad de métodos) * words espacio de memoria asignado. Cada elemento entonces apunta a la eiqueta donde se define la función.
+Por cada uno de los tipos se crea una de estas tablas, que contiene (cantidad de métodos) \* words espacio de memoria asignado. Cada elemento entonces apunta a la eiqueta donde se define la función.
 
-Dichas funciones  en la lista están en el orden en el que fueron definidos, que si heredan por defecto vienen con los métodos de los ancestros en su inicio a través del procesamiento para generar el código CIL.
+Dichas funciones en la lista están en el orden en el que fueron definidos, que si heredan por defecto vienen con los métodos de los ancestros en su inicio a través del procesamiento para generar el código CIL.
 
 Una vez que se tiene el tipo al que se le realiza el llamado, dada la estructura del objeto es fácil saber a que dispatch table se requiere hacer la visita. Con el apoyo de un índice se accede entonces al método apropiado.
 
@@ -151,9 +157,9 @@ Donde $n$ es la cantidad de tipos, los nombres de las tablas dispactch están re
 
 Y entonces para el llamado al método deseado se hace un proceso análogo de indexar con un índice conocido mediante el procesamiento y las variables del código que almacenan dicha información. Luego, se obtiene la dirección al método y se hace un jump a dicha etiqueta.
 
-
 ## Estructura
-```bash 
+
+```bash
 ├── app
 │   ├── cil
 │   │   ├── cil.py
@@ -226,4 +232,4 @@ Y entonces para el llamado al método deseado se hace un proceso análogo de ind
 └── Readme.md
 ```
 
-En shared se encuentran los errores base y la implementación del patrón *visitor* usando decoradores
+En shared se encuentran los errores base y la implementación del patrón _visitor_ usando decoradores
