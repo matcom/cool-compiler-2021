@@ -25,7 +25,7 @@ CHARS_ATTR_OFFSET = 8
 FP_ARGS_DISTANCE = 3  # how far finishes $fp from arguments in method call
 FP_LOCALS_DISTANCE = 0  # how far finishes $fp from localvars in method call
 
-ABORT_SIGNAL = "abort_signal"  # CIL
+ABORT_SIGNAL = "ABORT_SIGNAL"  # CIL
 CASE_MISSMATCH = "case_missmatch"  # CIL
 CASE_VOID = "case_on_void"  # MIPS
 DISPATCH_VOID = "dispatch_on_void"  # MIPS
@@ -316,15 +316,15 @@ class MIPSBuilder:
     def visit(self, node):
         self.register_data(mips.DataTypeNode, ".asciiz", node.name, [f'"{node.value}"'])
 
-    @visitor.when(cil.ParamNode)
-    def visit(self, node):
-        self.memo.save()
-        reg = self.memo.get_unused_reg()
+    #@visitor.when(cil.ParamNode)
+    #def visit(self, node):
+    #    self.memo.save()
+    #    reg = self.memo.get_unused_reg()
 
-        self.params.append(node.name)
+    #    self.params.append(node.name)
 
-        self.register_instruction(mips.LoadInmediate, reg, node.name)
-        self.register_instruction(mips.StoreWordNode, reg, len(self.params) * 4, fp)
+    #    self.register_instruction(mips.LoadInmediate, reg, node.name)
+    #    self.register_instruction(mips.StoreWordNode, reg, len(self.params) * 4, fp)
 
         self.memo.clean()
 
@@ -502,7 +502,7 @@ class MIPSBuilder:
     def visit(self, node):
         self.register_instruction(mips.CommentNode, "Executing RuntimeError")
         self.register_instruction(mips.CommentNode, "Printing Abort Message")
-        self.register_instruction(mips.LoadAddress, a0, ABORT_SIGNAL)
+        self.register_instruction(mips.LoadAddress, a0, node.msg)
         self.register_instruction(mips.LoadInmediate, v0, SYSCALL_PRINT_STR)
         self.register_instruction(mips.SyscallNode)
 

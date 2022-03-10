@@ -69,7 +69,6 @@ class CILBuilder:
         self._count = 0
         self.internal_count = 0
         self.context = None
-        self.self_var = None
         self.methods = {}
         self.attrs = {}
 
@@ -158,9 +157,10 @@ class CILBuilder:
             self.current_function = FunctionNode(
                 self.to_function_name("constructor", typex), [], [], []
             )
-            instance = self.define_internal_local()
-            self.register_instruction(AllocateNode(typex, instance))
-            self.register_instruction(ReturnNode(instance))
+            self.params.append(ParamNode("self"))
+            # instance = self.define_internal_local()
+            # self.register_instruction(AllocateNode(typex, instance))
+            self.register_instruction(ReturnNode("self"))
             self.code.append(self.current_function)
 
         self.current_function = None
@@ -169,12 +169,13 @@ class CILBuilder:
         self.current_function = self.register_function(
             self.to_function_name("constructor", node.id)
         )
+        self.params.append(ParamNode("self"))
         self.current_type.define_method("constructor", [], [], "Object")
 
-        self_var = self.define_internal_local()
-        self.self_var = self_var
+        # self_var = self.define_internal_local()
+        # self.self_var = self_var
 
-        self.register_instruction(AllocateNode(node.id, self_var))
+        # self.register_instruction(AllocateNode(node.id, self_var))
 
         attributeNodes = [
             feat for feat in node.features if isinstance(feat, cool.AttrDeclarationNode)
@@ -185,7 +186,7 @@ class CILBuilder:
             self.register_instruction(DefaultValueNode(default_var, attr.type))
             self.register_instruction(
                 SetAttribNode(
-                    self_var,
+                    "self",
                     self.to_attr_name(self.current_type.name, attr.id),
                     default_var,
                     node.id,
@@ -198,30 +199,29 @@ class CILBuilder:
                 self.visit(attr.init_exp, init_expr_value)
                 self.register_instruction(
                     SetAttribNode(
-                        self_var,
+                        "self",
                         self.to_attr_name(self.current_type.name, attr.id),
                         init_expr_value,
                         node.id,
                     )
                 )
 
-        self.register_instruction(ReturnNode(self_var))
+        self.register_instruction(ReturnNode("self"))
 
     def add_builtin_functions(self):
         # Object
-        obj_functions = [self.cil_predef_method("abort", "Object", self.object_abort)]
         object_type = TypeNode("Object")
         object_type.attributes = []
-        object_type.methods = obj_functions.copy()
-        object_type.methods.append(
-            self.cil_predef_method("copy", "Object", self.object_copy)
-        )
-        object_type.methods.append(
+        object_type.methods = [
+            self.cil_predef_method("abort", "Object", self.object_abort),
+            self.cil_predef_method("copy", "Object", self.object_copy),
             self.cil_predef_method("type_name", "Object", self.object_type_name)
-        )
+        ]
+
 
         # "IO"
         functions = [
+            self.cil_predef_method("abort", "IO", self.object_abort),
             self.cil_predef_method("copy", "IO", self.object_copy),
             self.cil_predef_method("type_name", "IO", self.object_type_name),
             self.cil_predef_method("out_string", "IO", self.io_outstring),
@@ -231,11 +231,12 @@ class CILBuilder:
         ]
         io_type = TypeNode("IO")
         io_type.attributes = []
-        io_type.methods = obj_functions + functions
+        io_type.methods =  functions
 
         # String
         self.attrs["String"] = {"length": (0, "Int"), "str_ref": (1, "String")}
         functions = [
+            self.cil_predef_method("abort", "String", self.object_abort),
             self.cil_predef_method("copy", "String", self.object_copy),
             self.cil_predef_method("type_name", "String", self.object_type_name),
             self.cil_predef_method("length", "String", self.string_length),
@@ -247,13 +248,14 @@ class CILBuilder:
             VariableInfo("length").name,
             VariableInfo("str_ref").name,
         ]
-        string_type.methods = obj_functions + functions
+        string_type.methods =  functions
 
         # Int
         # self.attrs["Int"] = {"value": (0, "Int")}
         int_type = TypeNode("Int")
         int_type.attributes = [VariableInfo("value").name]
-        int_type.methods = obj_functions + [
+        int_type.methods =  [
+            self.cil_predef_method("abort", "Int", self.object_abort),
             self.cil_predef_method("copy", "Int", self.object_copy),
             self.cil_predef_method("type_name", "Int", self.object_type_name),
         ]
@@ -262,7 +264,8 @@ class CILBuilder:
         # self.attrs["Bool"] = {"value": (0, "Int")}
         bool_type = TypeNode("Bool")
         bool_type.attributes = [VariableInfo("value").name]
-        bool_type.methods = obj_functions + [
+        bool_type.methods =  [
+            self.cil_predef_method("abort", "Bool", self.object_abort),
             self.cil_predef_method("copy", "Bool", self.object_copy),
             self.cil_predef_method("type_name", "Bool", self.object_type_name),
         ]
@@ -278,7 +281,11 @@ class CILBuilder:
             self.to_function_name(mname, cname), [], [], []
         )
 
-        specif_code()
+        #specif_code()
+        if mname == "abort":     #Agregado por Sandra
+            specif_code(cname)
+        else:
+            specif_code()
 
         self.code.append(self.current_function)
         self.current_function = None
@@ -286,6 +293,14 @@ class CILBuilder:
 
         return (mname, self.to_function_name(mname, cname))
 
+    def register_abort(self):
+        self.current_function = FunctionNode(
+            self.to_function_name("abort", self.current_type.name), [], [], []
+        )
+        self.object_abort(self.current_type.name)
+        self.code.append(self.current_function)
+        self.current_function = None
+        
     def register_copy(self):
         self.current_function = FunctionNode(
             self.to_function_name("copy", self.current_type.name), [], [], []
@@ -334,8 +349,12 @@ class CILBuilder:
         )
         self.register_instruction(ReturnNode(ret_vinfo))
 
-    def object_abort(self):
-        self.register_instruction(RuntimeErrorNode("ABORT_SIGNAL"))
+    def object_abort(self,type):
+        self.data.append(
+            DataNode(f"abort_{type}", f"Abort called from class {type}\n")
+        )
+        error = f"abort_{type}"
+        self.register_instruction(RuntimeErrorNode(error))
 
     def object_copy(self):
         self.params.append(ParamNode("self"))
@@ -437,10 +456,11 @@ class CILBuilder:
             }
             self.methods[type.name] = {
                 method.name: (i, htype.name)
-                if htype.name != "Object" or method.name not in ["type_name", "copy"]
+                if htype.name != "Object" or method.name not in ["abort","type_name", "copy"]
                 else (i, type.name)
                 for i, (method, htype) in enumerate(type.all_methods())
             }
+        # print("METHODS", self.methods)
         # self.dottypes.append(
         #     cil.TypeNode(
         #         type.name,
@@ -455,16 +475,20 @@ class CILBuilder:
         self.current_function = FunctionNode("main", [], [], [])
         self.code.append(self.current_function)
 
-        instance = self.define_internal_local()
-        result = self.define_internal_local()
+        
 
         main_constructor = self.to_function_name("constructor", "Main")
         main_method_name = self.to_function_name("main", "Main")
 
         # Get instance from constructor
+        a = self.define_internal_local()
+        self.register_instruction(AllocateNode("Main", a))
+        self.register_instruction(ArgNode(a))
+        instance= self.define_internal_local()
         self.register_instruction(StaticCallNode(main_constructor, instance))
 
         # Pass instance as parameter and call Main_main
+        result = self.define_internal_local()
         self.register_instruction(ArgNode(instance))
         self.register_instruction(StaticCallNode(main_method_name, result))
 
@@ -489,10 +513,13 @@ class CILBuilder:
     def visit(self, node, return_var=None):
         self.current_type = self.context.get_type(node.id)
 
+        self.register_abort()
         self.register_copy()
         self.register_type_name()
 
         type_node = self.register_type(self.current_type.name)
+        
+        
         self.build_constructor(node)
 
         visited_func = []
@@ -518,6 +545,14 @@ class CILBuilder:
 
         type_node.attributes.reverse()
         type_node.methods.reverse()
+
+        index = type_node.methods.index(
+            ("abort", self.to_function_name("abort", "Object"))
+        )
+        type_node.methods[index] = (
+            "abort",
+            self.to_function_name("abort", self.current_type.name),
+        )
 
         index = type_node.methods.index(
             ("copy", self.to_function_name("copy", "Object"))
@@ -756,17 +791,7 @@ class CILBuilder:
         self.data.append(
             DataNode("runtime_error", "No branch can be selected for evaluation")
         )
-        error = self.define_internal_local()
-        self.register_instruction(
-            LoadNode(
-                error,
-                VariableInfo(
-                    "runtime_error",
-                    None,
-                    "No branch can be selected for evaluation",
-                ),
-            )
-        )
+        error = "runtime_error"
         self.register_instruction(RuntimeErrorNode(error))
 
         end_case_label = "END_CASE_" + self.next_id()
@@ -863,6 +888,9 @@ class CILBuilder:
     # Unary operators
     @visitor.when(cool.InstantiateNode)  # NewNode
     def visit(self, node, return_var):
+        _self = self.define_internal_local()
+        self.register_instruction(AllocateNode(node.lex, _self))
+        self.register_instruction(ArgNode(_self))
         self.register_instruction(
             StaticCallNode(self.to_function_name("constructor", node.lex), return_var)
         )
