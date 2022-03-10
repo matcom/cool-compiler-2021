@@ -236,7 +236,6 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        obj_address = self.get_address(node.obj)
         meth_offset = self.get_method_index(node.method)
         dest_address = self.get_address(node.dest)
         args_space = self.cil_root.get_function(
@@ -244,6 +243,7 @@ class CILToMipsVisitor:
         ).args_space
 
         if node.type is None:
+            obj_address = self.get_address(node.obj)
             get_type_inst = (
                 mips.LWNode(t0, (obj_address, fp))      .with_comm("Get instance pointer"),
                 mips.LWNode(t0, (0, t0))                .with_comm("Get type pointer at offset 0"),
@@ -276,6 +276,7 @@ class CILToMipsVisitor:
 
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
+        print(self.cur_function.name, node.name)
         address = self.get_address(node.name)
 
         self.add_inst(

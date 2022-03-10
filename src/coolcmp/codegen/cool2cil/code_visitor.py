@@ -49,6 +49,10 @@ class DotCodeVisitor:
     def add_comment(self, text: str):
         self.add_inst(cil.CommentNode(text))
 
+    @property
+    def current_is_init(self):
+        return self.current_function.name == self.current_init.name
+
     @visitor.on('node')
     def visit(self, node: ast.Node, scope: Scope):
         raise NotImplementedError()
@@ -417,7 +421,13 @@ class DotCodeVisitor:
             attr_name = f'{self.current_type}_{node.id}'
             attr_index = self.root.get_type(self.current_type).attributes.index(attr_name)
             attr_at = cil.AttributeAt(attr_name, attr_index)
-            self.add_inst(cil.SetAttrNode('self', attr_at, expr_dest))
+            self.add_inst(
+                cil.SetAttrNode(
+                    instance='instance' if self.current_is_init else 'self',
+                    attr=attr_at,
+                    value=expr_dest
+                )
+            )
         return expr_dest
 
     @visitor.when(ast.ConditionalNode)
@@ -499,11 +509,20 @@ class DotCodeVisitor:
         for arg in reversed(node.args):
             arg_dest = self.visit(arg, scope)
             self.add_inst(cil.ArgNode(arg_dest))
-        self.add_inst(cil.ArgNode(obj_dest))
+        if not self.current_is_init:
+            self.add_inst(cil.ArgNode(obj_dest))
 
         # call the function
         call_res = self.add_local('call_res')
-        self.add_inst(cil.DynamicCallNode(obj_dest, node.id, call_res, node.type, node.obj_dyn_type))
+        self.add_inst(
+            cil.DynamicCallNode(
+                obj='instance' if self.current_is_init else obj_dest,
+                method=node.id,
+                dest=call_res,
+                type_=node.type,
+                dtype=node.obj_dyn_type
+            )
+        )
 
         return call_res
 
@@ -528,7 +547,13 @@ class DotCodeVisitor:
         for attr, attr_value in zip(type_node.attributes, attr_values):
             attr_index = type_node.attributes.index(attr)
             attr_at = cil.AttributeAt(attr, attr_index)
-            self.add_inst(cil.SetAttrNode(instance, attr_at, attr_value))
+            self.add_inst(
+                cil.SetAttrNode(
+                    instance='instance' if self.current_is_init else instance,
+                    attr=attr_at,
+                    value=attr_value
+                )
+            )
         return instance
 
     @visitor.when(ast.StringNode)
