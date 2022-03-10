@@ -411,6 +411,8 @@ class DotCodeVisitor:
         self.add_inst(cil.ExprVoidRuntimeErrorNode())
 
         self.add_inst(end_label)
+        self.add_inst(cil.ReturnNode(ret_exp))
+        return ret_exp
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
