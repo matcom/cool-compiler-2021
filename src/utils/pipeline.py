@@ -40,7 +40,7 @@ def check_semantics(program: str, debug: bool = False):
     else:
         TypeCollector(context, errors).visit(ast)
         TypeBuilder(context, errors).visit(ast)
-        CyclicDependency(context, errors)
+        # CyclicDependency(context, errors)
         if not errors:
             TypeChecker(context, errors).visit(ast, scope)
 
@@ -163,7 +163,7 @@ def test_context(program_file: str, debug: bool = False):
     ast = parse(program, debug)
     TypeCollector(context, errors).visit(ast)
     TypeBuilder(context, errors).visit(ast)
-    CyclicDependency(context, errors)
+    # CyclicDependency(context, errors)
     if not errors:
         print(context)
     else:
@@ -183,7 +183,7 @@ def test_inference(program_file: str, debug: bool = False):
     else:
         TypeCollector(context, errors).visit(ast)
         TypeBuilder(context, errors).visit(ast)
-        CyclicDependency(context, errors)
+        # CyclicDependency(context, errors)
         if not errors:
             InferenceTypeChecker(context, errors).visit(ast, Scope())
             print(CodeBuilder().visit(ast, 0))
@@ -205,7 +205,7 @@ def test_execution(program_file: str, debug: bool = False):
     else:
         TypeCollector(context, errors).visit(ast)
         TypeBuilder(context, errors).visit(ast)
-        CyclicDependency(context, errors)
+        # CyclicDependency(context, errors)
         if not errors:
             InferenceTypeChecker(context, errors).visit(ast, Scope())
             print(CodeBuilder().visit(ast, 0))
