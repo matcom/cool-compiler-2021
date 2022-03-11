@@ -761,6 +761,7 @@ class CILToMipsVisitor:
             mips.LWNode(t0, (src, fp)),
             mips.LWNode(t0, (4, t0)),
             mips.NOTNode(t0, t0),
+            mips.ADDINode(t0, t0, 1),
             mips.LWNode(t1, (dest, fp)),
             mips.SWNode(t0, 4, t1),
             mips.CommentNode(f"</complement:{node.dest}>"),
