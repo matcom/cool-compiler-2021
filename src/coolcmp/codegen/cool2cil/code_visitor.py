@@ -430,11 +430,8 @@ class DotCodeVisitor:
 
         # Sort cases and scopes
         sorted_cases: List[Tuple[ast.CaseBranchNode, Scope]] = []
-        print('visiting for, type:', self.current_type)
         for case in node.cases:
-            print('wtffffff!')
             child_scope = scope.children.pop(0)
-            print('poped in case the scope', child_scope.tag, f'(child of {scope.tag})')
             sorted_cases.append((case, child_scope))
         sorted_cases.sort(key=lambda x: get_depth(x[0]), reverse=True)
 
@@ -442,11 +439,9 @@ class DotCodeVisitor:
 
         for (case, scope), label in zip(sorted_cases, branch_labels):
             self.add_comment(f"Check for case branch {case.type}")
-            branch_local = self.add_local('branch_local')
-            self.add_inst(cil.StaticCallNode(f'{case.type}__init', branch_local))
             cond = self.add_local('case_cond')
 
-            self.add_inst(cil.ConformsNode(cond, ret_exp, branch_local))
+            self.add_inst(cil.ConformsNode(cond, ret_exp, case.type))
             self.add_inst(cil.GotoIfNode(cond, label.name))
 
         # Does not conform to anyone => Runtime error
