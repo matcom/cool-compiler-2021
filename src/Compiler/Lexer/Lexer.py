@@ -38,7 +38,7 @@ class COOL_Lexer:
 
     def t_BOOL_TYPE(self, t):
         r'(true|false)'
-        t.value = True if t == "true" else False
+        t.value = True if t.value == "true" else False
         t.type = "BOOLEAN"
         return t
     

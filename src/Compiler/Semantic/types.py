@@ -40,13 +40,29 @@ class COOL_Type:
         self.attr[name] = {'expresion': expr, 'type': _type}
         return True
     
-    def get_func_type(self, name):
+    def get_func(self, name):
         current = self
         while not current is None:
             if not current.func.get(name) is None:
                 return current.func[name]
             current = current.parent
         return None
+    
+    def get_func_context(self, name):
+        current = self
+        while not current is None:
+            if not current.func.get(name) is None:
+                return current
+            current = current.parent
+        return None
+    
+    def get_all_parents(self):
+        parents = list()
+        current = self.parent
+        while not current is None:
+            parents.append(current)
+            current = current.parent
+        return parents
     
     def get_attr_type(self, name):
         current = self
@@ -55,6 +71,17 @@ class COOL_Type:
                 return current.attr[name]['type']
             current = current.parent
         return None
+    
+    def get_all_attr(self):
+        attr = list()
+        current = self
+        while not current is None:
+            attr += list(current.attr.keys())[::-1]
+            current = current.parent
+        return attr[::-1]
+
+    def get_all_func(self):
+        return list(self.func.keys())
     
     def __str__(self):
         return self.name
@@ -126,6 +153,8 @@ class cool_type:
             "String": self.STRING,
             "IO": self.IO
         }
+        
+        self.basic_types = self.defined_types.copy()
 
 def cyclic_inheritance(_type):
     current = _type

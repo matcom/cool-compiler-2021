@@ -14,8 +14,12 @@ class COOL_Semantic_Checker:
     def visit(self, node, scope):
         pass
     
+    
     @visitor.when(ast.Program)
     def visit(self, node : ast.Program, scope_root = None):
+        """
+        node.classes -> [ Class ... ]
+        """
         scope_root = COOL_Scope(None, None)
         
         for _class in node.classes:
@@ -23,33 +27,34 @@ class COOL_Semantic_Checker:
                 sys.stdout.write(f'({_class.lineno}, {_class.linepos}) - {SEMERROR2 % _class.name}\n')
                 self.errors = True
                 return None
+            COOL_Scope(_class.name, scope_root)
         
-        for _class in node.classes:
-            if not _class.parent is None and scope_root.get_type(_class.parent) is None:
+        for (_class, _scope) in zip(node.classes, scope_root.children):
+            if not _class.parent is None and _scope.get_type(_class.parent) is None:
                 sys.stdout.write(f'({_class.lineno}, {_class.linepos}) - {TYPERROR14 % (_class.name, _class.parent)}\n')
                 self.errors = True
                 return None
-            elif _class.parent in scope_root.ctype.not_inherits_type:
+            elif _class.parent in _scope.ctype.not_inherits_type:
                 sys.stdout.write(f'({_class.lineno}, {_class.linepos}) - {SEMERROR3 % (_class.name, _class.parent)}\n')
                 self.errors = True
                 return None
             else:
-                parent = scope_root.ctype.OBJECT if _class.parent is None else scope_root.get_type(_class.parent)
-                scope_root.ctype.defined_types[_class.name].parent = parent
-            if cyclic_inheritance(scope_root.get_type(_class.name)):
+                parent = _scope.ctype.OBJECT if _class.parent is None else _scope.get_type(_class.parent)
+                _scope.ctype.defined_types[_class.name].parent = parent
+            if cyclic_inheritance(_scope.get_type(_class.name)):
                 sys.stdout.write(f'({_class.lineno}, {_class.linepos}) - {SEMERROR6 % (_class.name, _class.name)}\n')
                 self.errors = True
                 return None
             
-        for _class in node.classes:
+        for (_class, _scope) in zip(node.classes, scope_root.children):
             for _method in _class.features:
                 if type(_method) is ast.ClassMethod:
-                    if scope_root.get_var(_class.name, _method.name) == scope_root.ctype.SELF:
+                    if _scope.get_var(_class.name, _method.name) == _scope.ctype.SELF:
                         sys.stdout.write(f'({_method.lineno}, {_method.linepos}) - {SEMERROR12 % "a method"}\n')
                         self.errors = True
                         return None
                     
-                    return_type = scope_root.get_type(_method.return_type)
+                    return_type = _scope.get_type(_method.return_type)
         
                     if return_type is None:
                         sys.stdout.write(f'({_method.lineno}, {_method.linepos}) - {TYPERROR11 % _method.return_type}\n')
@@ -58,9 +63,9 @@ class COOL_Semantic_Checker:
                     
                     func = {'formal_params':{}, 'return_type': return_type}
                     for param in _method.formal_params:
-                        func['formal_params'][param.name] = scope_root.get_type(param.param_type)
+                        func['formal_params'][param.name] = _scope.get_type(param.param_type)
                     
-                    ret = scope_root.get_type(_class.name).add_func(_method.name, func)
+                    ret = _scope.get_type(_class.name).add_func(_method.name, func)
                     if ret is None:
                         sys.stdout.write(f'({_method.lineno}, {_method.linepos}) - {SEMERROR8 % _method.name}\n')
                         self.errors = True
@@ -72,19 +77,19 @@ class COOL_Semantic_Checker:
                         return None
                 
                 else:
-                    if scope_root.get_var(_class.name, _method.name) == scope_root.ctype.SELF:
+                    if _scope.get_var(_class.name, _method.name) == _scope.ctype.SELF:
                         sys.stdout.write(f'({_method.lineno}, {_method.linepos}) - {SEMERROR12 % "an attribute"}\n')
                         self.errors = True
                         return None
             
-                    attr_type = scope_root.get_type(_method.attr_type)
+                    attr_type = _scope.get_type(_method.attr_type)
         
                     if attr_type is None:
                         sys.stdout.write(f'({_method.lineno}, {_method.linepos}) - {TYPERROR11 % _method.attr_type}\n')
                         self.errors = True
                         return None
                     
-                    ret = scope_root.get_type(_class.name).add_attr(_method.name, attr_type, _method.init_expr)
+                    ret = _scope.get_type(_class.name).add_attr(_method.name, attr_type, _method.init_expr)
                     if ret is None:
                         sys.stdout.write(f'({_method.lineno}, {_method.linepos}) - {SEMERROR9 % _method.name}\n')
                         self.errors = True
@@ -95,9 +100,13 @@ class COOL_Semantic_Checker:
                         self.errors = True
                         return None
                              
-        
-        for _class in node.classes:
-            if self.visit(_class, scope_root) is None:
+        for _class1 in node.classes:
+            for _class2 in node.classes:
+                if _class2.name == _class1.parent:
+                    _class1.parent = _class2
+                    
+        for (_class, _scope) in zip(node.classes, scope_root.children):
+            if self.visit(_class, _scope) is None:
                 return None
         
         return scope_root
@@ -105,6 +114,11 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Class)
     def visit(self, node, scope):
+        """
+        node.name -> str
+        node.parent -> Class
+        node.features -> [ ClassMethod/ClassAttribute ... ]
+        """
         for meth in node.features:
             if self.visit(meth, COOL_Scope(node.name, scope)) is None:
                 return None
@@ -113,6 +127,12 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.ClassMethod)
     def visit(self, node, scope):
+        """
+        node.name -> str
+        node.formal_params -> [ FormalParameter ... ]
+        node.return_type -> str
+        node.body -> Expr
+        """
         return_type = scope.get_type(node.return_type)
 
         for param in node.formal_params:
@@ -145,12 +165,20 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.ClassAttribute)
     def visit(self, node, scope):
+        """
+        node.name -> str
+        node.attr_type -> str
+        node.init_expr -> Expr
+        """
         attr_type = scope.get_type(node.attr_type)
         
         if not node.init_expr is None:
             expr_type = scope.get_type(self.visit(node.init_expr, scope))
             
             if expr_type is None:
+                if not self.errors:
+                    sys.stdout.write(f'({node.init_expr.lineno}, {node.init_expr.linepos}) - {NAMERROR1 % node.init_expr.name}\n')
+                self.errors = True
                 return None
             
             if expr_type == scope.ctype.SELF or attr_type == scope.ctype.SELF:
@@ -175,6 +203,10 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.FormalParameter)
     def visit(self, node, scope):
+        """
+        node.name -> str
+        node.param_type -> str
+        """
         param_type = scope.get_type(node.param_type)
         if param_type is None:
             sys.stdout.write(f'({node.lineno}, {node.linepos}) - {TYPERROR11 % node.param_type}\n')
@@ -192,6 +224,11 @@ class COOL_Semantic_Checker:
 
     @visitor.when(ast.Formal)
     def visit(self, node, scope):
+        """
+        node.name -> str
+        node.param_type -> str
+        node.init_expr -> Expr/None
+        """
         param_type = scope.get_type(node.param_type)
         if param_type is None:
             sys.stdout.write(f'({node.lineno}, {node.linepos}) - {TYPERROR11 % node.param_type}\n')
@@ -207,6 +244,9 @@ class COOL_Semantic_Checker:
             expr_type = scope.get_type(self.visit(node.init_expr, scope))
             
             if expr_type is None:
+                if not self.errors:
+                    sys.stdout.write(f'({node.init_expr.lineno}, {node.init_expr.linepos}) - {NAMERROR1 % node.init_expr.name}\n')
+                self.errors = True
                 return None
             
             if expr_type == scope.ctype.VOID:
@@ -231,11 +271,12 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Object)
     def visit(self, node, scope):
+        """
+        node.name -> str
+        """
         obj_type = scope.get_var(scope.classname, node.name)
         
         if obj_type is None:
-            sys.stdout.write(f'({node.lineno}, {node.linepos}) - {NAMERROR1 % node.name}\n')
-            self.errors = True
             return None
 
         node.static_type = obj_type
@@ -251,6 +292,9 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Integer)
     def visit(self, node, scope):
+        """
+        node.content -> int
+        """
         return_type = scope.ctype.INT
         node.static_type = return_type
         return return_type
@@ -258,6 +302,9 @@ class COOL_Semantic_Checker:
 
     @visitor.when(ast.String)
     def visit(self, node, scope):
+        """
+        node.content -> str
+        """
         return_type = scope.ctype.STRING
         node.static_type = return_type
         return return_type
@@ -265,6 +312,9 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Boolean)
     def visit(self, node, scope):
+        """
+        node.content -> bool
+        """
         return_type = scope.ctype.BOOL
         node.static_type = return_type
         return return_type
@@ -272,6 +322,9 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.NewObject)
     def visit(self, node, scope):
+        """
+        node.type -> int
+        """
         new_type = scope.get_type(node.type)
         
         if new_type is None:
@@ -285,7 +338,13 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.IsVoid)
     def visit(self, node, scope):
+        """
+        node.expr -> Expr
+        """
         if self.visit(node.expr, scope) is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.expr.lineno}, {node.expr.linepos}) - {NAMERROR1 % node.expr.name}\n')
+            self.errors = True
             return None
         
         node.static_type = scope.ctype.BOOL
@@ -294,6 +353,10 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Assignment)
     def visit(self, node, scope):
+        """
+        node.instance -> Object
+        node.expr -> Expr
+        """
         if scope.get_var(scope.classname, node.instance.name) == scope.ctype.SELF:
             sys.stdout.write(f'({node.lineno}, {node.linepos}) - {SEMERROR10}\n')
             self.errors = True
@@ -302,6 +365,9 @@ class COOL_Semantic_Checker:
         
         expr_type = scope.get_type(self.visit(node.expr, scope))
         if expr_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.expr.lineno}, {node.expr.linepos}) - {NAMERROR1 % node.expr.name}\n')
+            self.errors = True
             return None
         
         if expr_type == scope.ctype.SELF or instance_type == scope.ctype.SELF:
@@ -325,11 +391,17 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Block)
     def visit(self, node, scope):
+        """
+        node.expr_list -> [ Expr ... ]
+        """
         return_type = scope.ctype.VOID
         
         for expr in node.expr_list:
             return_type = scope.get_type(self.visit(expr, scope))
             if return_type is None:
+                if not self.errors:
+                    sys.stdout.write(f'({node.expr.lineno}, {node.expr.linepos}) - {NAMERROR1 % node.expr.name}\n')
+                self.errors = True
                 return None
         
         node.static_type = return_type
@@ -338,8 +410,16 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.DynamicDispatch)
     def visit(self, node, scope):
+        """
+        node.instance -> Expr
+        node.method -> str
+        node.arguments -> [ Expr ... ]
+        """
         instance_type = scope.get_type(self.visit(node.instance, scope))
         if instance_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.instance.lineno}, {node.instance.linepos}) - {NAMERROR1 % node.instance.name}\n')
+            self.errors = True
             return None
         
         if instance_type == scope.ctype.VOID:
@@ -353,19 +433,22 @@ class COOL_Semantic_Checker:
         node_args = []
         for arg in node.arguments:
             _type = scope.get_type(self.visit(arg, scope))
+            if _type is None:
+                if not self.errors:
+                    sys.stdout.write(f'({arg.lineno}, {arg.linepos}) - {NAMERROR1 % arg.name}\n')
+                self.errors = True
+                return None
+            
             if _type == scope.ctype.SELF:
                 _type = scope.get_type(scope.classname)
             node_args.append(_type)
-        
-        if None in node_args:
-            return None
         
         if scope.get_var(scope.classname, node.method) == scope.ctype.SELF:
             sys.stdout.write(f'({node.lineno}, {node.linepos}) - {SEMERROR12 % "a dispatch call"}\n')
             self.errors = True
             return None
         
-        _method = instance_type.get_func_type(node.method)        
+        _method = instance_type.get_func(node.method)        
         if _method is None:
             sys.stdout.write(f'({node.lineno}, {node.linepos}) - {ATTRERROR1 % node.method}\n')
             self.errors = True
@@ -394,8 +477,17 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.StaticDispatch)
     def visit(self, node, scope):
+        """
+        node.instance -> Expr
+        node.dispatch_type -> str
+        node.method -> str
+        node.arguments -> [ Expr ... ]
+        """
         instance_type = scope.get_type(self.visit(node.instance, scope))
         if instance_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.instance.lineno}, {node.instance.linepos}) - {NAMERROR1 % node.instance.name}\n')
+            self.errors = True
             return None
         
         if instance_type == scope.ctype.VOID:
@@ -418,19 +510,22 @@ class COOL_Semantic_Checker:
         node_args = []
         for arg in node.arguments:
             _type = scope.get_type(self.visit(arg, scope))
+            if _type is None:
+                if not self.errors:
+                    sys.stdout.write(f'({arg.lineno}, {arg.linepos}) - {NAMERROR1 % arg.name}\n')
+                self.errors = True
+                return None
+            
             if _type == scope.ctype.SELF:
                 _type = scope.get_type(scope.classname)
             node_args.append(_type)
-        
-        if None in node_args:
-            return None
         
         if scope.get_var(scope.classname, node.method) == scope.ctype.SELF:
             sys.stdout.write(f'({node.lineno}, {node.linepos}) - {SEMERROR12 % "a dispatch call"}\n')
             self.errors = True
             return None
         
-        _method = instance_type.get_func_type(node.method)
+        _method = instance_type.get_func(node.method)
         if _method is None:
             sys.stdout.write(f'({node.lineno}, {node.linepos}) - {ATTRERROR1 % node.method}\n')
             self.errors = True
@@ -459,6 +554,10 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Let)
     def visit(self, node, scope):
+        """
+        node.declarations -> [ Formal ... ]
+        node.body -> Expr
+        """
         new_scope = COOL_Scope(scope.classname, scope)
         
         for declaration in node.declarations:
@@ -473,6 +572,9 @@ class COOL_Semantic_Checker:
         body_type = scope.get_type(self.visit(node.body, new_scope))
         
         if body_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.body.lineno}, {node.body.linepos}) - {NAMERROR1 % node.body.name}\n')
+            self.errors = True
             return None
         
         node.static_type = body_type
@@ -481,9 +583,17 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.If)
     def visit(self, node, scope):
+        """
+        node.predicate -> Expr
+        node.then_body -> Expr
+        node.else_body -> Expr
+        """
         pred_type = scope.get_type(self.visit(node.predicate, scope))
         
         if pred_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.predicate.lineno}, {node.predicate.linepos}) - {NAMERROR1 % node.predicate.name}\n')
+            self.errors = True
             return None
         
         if pred_type != scope.ctype.BOOL:
@@ -494,11 +604,17 @@ class COOL_Semantic_Checker:
         if_type = scope.get_type(self.visit(node.then_body, scope))
         
         if if_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.then_body.lineno}, {node.then_body.linepos}) - {NAMERROR1 % node.then_body.name}\n')
+            self.errors = True
             return None
         
         else_type = scope.get_type(self.visit(node.else_body, scope))
         
         if else_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.else_body.lineno}, {node.else_body.linepos}) - {NAMERROR1 % node.else_body.name}\n')
+            self.errors = True
             return None
         
         return_type = if_type
@@ -517,9 +633,16 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.WhileLoop)
     def visit(self, node, scope):
+        """
+        node.predicate -> Expr
+        node.body -> Expr
+        """
         pred_type = scope.get_type(self.visit(node.predicate, scope))
         
         if pred_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.predicate.lineno}, {node.predicate.linepos}) - {NAMERROR1 % node.predicate.name}\n')
+            self.errors = True
             return None
         
         if pred_type != scope.ctype.BOOL:
@@ -530,6 +653,9 @@ class COOL_Semantic_Checker:
         body_type = scope.get_type(self.visit(node.body, scope))
         
         if body_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.body.lineno}, {node.body.linepos}) - {NAMERROR1 % node.body.name}\n')
+            self.errors = True
             return None
         
         node.static_type = scope.ctype.OBJECT
@@ -538,8 +664,15 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Case)
     def visit(self, node, scope):
+        """
+        node.expr -> Expr
+        node.actions -> Action
+        """
         type_expr = scope.get_type(self.visit(node.expr, scope))
         if type_expr is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.expr.lineno}, {node.expr.linepos}) - {NAMERROR1 % node.expr.name}\n')
+            self.errors = True
             return None
         
         if type_expr == scope.ctype.VOID:
@@ -599,6 +732,11 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Action)
     def visit(self, node, scope):
+        """
+        node.name -> str
+        node.action_type -> str
+        node.body -> Expr
+        """
         _type = scope.get_type(node.action_type)
         if _type is None:
             self.errors = True
@@ -612,6 +750,9 @@ class COOL_Semantic_Checker:
         return_type = scope.get_type(self.visit(node.body, new_scope))
         
         if return_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.body.lineno}, {node.body.linepos}) - {NAMERROR1 % node.body.name}\n')
+            self.errors = True
             return None
         
         node.static_type = return_type
@@ -620,13 +761,19 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.IntegerComplement)
     def visit(self, node, scope):
+        """
+        node.integer_expr -> Expr
+        """
         type_expr = scope.get_type(self.visit(node.integer_expr, scope))
         
         if type_expr is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.integer_expr.lineno}, {node.integer_expr.linepos}) - {NAMERROR1 % node.integer_expr.name}\n')
+            self.errors = True
             return None
         
         if type_expr != scope.ctype.INT:
-            sys.stdout.write(f'({node.lineno}, {node.linepos}) - {TYPERROR3 % ("~", type_expr, scope.ctype.INT)}\n')
+            sys.stdout.write(f'({node.lineno}, {node.linepos}) - {TYPERROR3 % (node.symbol, type_expr, scope.ctype.INT)}\n')
             self.errors = True
             return None
         
@@ -637,9 +784,15 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.BooleanComplement)
     def visit(self, node, scope):
+        """
+        node.boolean_expr -> Expr
+        """
         type_expr = scope.get_type(self.visit(node.boolean_expr, scope))
         
         if type_expr is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.boolean_expr.lineno}, {node.boolean_expr.linepos}) - {NAMERROR1 % node.boolean_expr.name}\n')
+            self.errors = True
             return None
         
         if type_expr != scope.ctype.BOOL:
@@ -654,14 +807,24 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Addition)
     def visit(self, node, scope):
+        """
+        node.first -> Expr
+        node.second -> Expr
+        """
         left_type = scope.get_type(self.visit(node.first, scope))
         
         if left_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.first.lineno}, {node.first.linepos}) - {NAMERROR1 % node.first.name}\n')
+            self.errors = True
             return None
         
         right_type = scope.get_type(self.visit(node.second, scope))
         
         if right_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.second.lineno}, {node.second.linepos}) - {NAMERROR1 % node.second.name}\n')
+            self.errors = True
             return None
         
         if left_type != scope.ctype.INT or right_type != scope.ctype.INT:
@@ -676,14 +839,24 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Subtraction)
     def visit(self, node, scope):
+        """
+        node.first -> Expr
+        node.second -> Expr
+        """
         left_type = scope.get_type(self.visit(node.first, scope))
         
         if left_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.first.lineno}, {node.first.linepos}) - {NAMERROR1 % node.first.name}\n')
+            self.errors = True
             return None
         
         right_type = scope.get_type(self.visit(node.second, scope))
         
         if right_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.second.lineno}, {node.second.linepos}) - {NAMERROR1 % node.second.name}\n')
+            self.errors = True
             return None
         
         if left_type != scope.ctype.INT or right_type != scope.ctype.INT:
@@ -698,14 +871,24 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Multiplication)
     def visit(self, node, scope):
+        """
+        node.first -> Expr
+        node.second -> Expr
+        """
         left_type = scope.get_type(self.visit(node.first, scope))
         
         if left_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.first.lineno}, {node.first.linepos}) - {NAMERROR1 % node.first.name}\n')
+            self.errors = True
             return None
         
         right_type = scope.get_type(self.visit(node.second, scope))
         
         if right_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.second.lineno}, {node.second.linepos}) - {NAMERROR1 % node.second.name}\n')
+            self.errors = True
             return None
         
         if left_type != scope.ctype.INT or right_type != scope.ctype.INT:
@@ -720,14 +903,24 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Division)
     def visit(self, node, scope):
+        """
+        node.first -> Expr
+        node.second -> Expr
+        """
         left_type = scope.get_type(self.visit(node.first, scope))
         
         if left_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.first.lineno}, {node.first.linepos}) - {NAMERROR1 % node.first.name}\n')
+            self.errors = True
             return None
         
         right_type = scope.get_type(self.visit(node.second, scope))
         
         if right_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.second.lineno}, {node.second.linepos}) - {NAMERROR1 % node.second.name}\n')
+            self.errors = True
             return None
         
         if left_type != scope.ctype.INT or right_type != scope.ctype.INT:
@@ -742,14 +935,24 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.Equal)
     def visit(self, node, scope):
+        """
+        node.first -> Expr
+        node.second -> Expr
+        """
         left_type = scope.get_type(self.visit(node.first, scope))
         
         if left_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.first.lineno}, {node.first.linepos}) - {NAMERROR1 % node.first.name}\n')
+            self.errors = True
             return None
         
         right_type = scope.get_type(self.visit(node.second, scope))
         
         if right_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.second.lineno}, {node.second.linepos}) - {NAMERROR1 % node.second.name}\n')
+            self.errors = True
             return None
         
         if left_type in scope.ctype.not_inherits_type or right_type in scope.ctype.not_inherits_type:
@@ -771,14 +974,24 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.LessThan)
     def visit(self, node, scope):
+        """
+        node.first -> Expr
+        node.second -> Expr
+        """
         left_type = scope.get_type(self.visit(node.first, scope))
         
         if left_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.first.lineno}, {node.first.linepos}) - {NAMERROR1 % node.first.name}\n')
+            self.errors = True
             return None
         
         right_type = scope.get_type(self.visit(node.second, scope))
         
         if right_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.second.lineno}, {node.second.linepos}) - {NAMERROR1 % node.second.name}\n')
+            self.errors = True
             return None
         
         if left_type != scope.ctype.INT or right_type != scope.ctype.INT:
@@ -793,14 +1006,24 @@ class COOL_Semantic_Checker:
     
     @visitor.when(ast.LessThanOrEqual)
     def visit(self, node, scope):
+        """
+        node.first -> Expr
+        node.second -> Expr
+        """
         left_type = scope.get_type(self.visit(node.first, scope))
         
         if left_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.first.lineno}, {node.first.linepos}) - {NAMERROR1 % node.first.name}\n')
+            self.errors = True
             return None
         
         right_type = scope.get_type(self.visit(node.second, scope))
         
         if right_type is None:
+            if not self.errors:
+                sys.stdout.write(f'({node.second.lineno}, {node.second.linepos}) - {NAMERROR1 % node.second.name}\n')
+            self.errors = True
             return None
         
         if left_type != scope.ctype.INT or right_type != scope.ctype.INT:

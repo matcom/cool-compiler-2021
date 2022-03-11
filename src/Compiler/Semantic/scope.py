@@ -1,5 +1,9 @@
-from defer import return_value
 from Semantic.types import *
+
+class VariableInfo:
+    def __init__(self, name, vtype):
+        self.name = name
+        self.type = vtype
 
 class COOL_Scope:
     
@@ -9,11 +13,20 @@ class COOL_Scope:
         self.parent = parent
         self.children = list()
         self.var = dict()
+        self.child_index = 0
         
         if not parent is None:
             self.parent.children.append(self)
             self.ctype = parent.ctype
-    
+            
+    def next_child(self):
+        child = self.children[self.child_index]
+        
+        self.child_index += 1
+        if self.child_index >= len(self.children):
+            self.child_index = 0
+        
+        return child
     
     def set_type(self, name):
         current_scope = self

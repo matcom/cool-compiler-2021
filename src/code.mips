@@ -1,0 +1,524 @@
+
+################ OBJECT ################
+
+function_copy_at_Object:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $a0, 4($sp)
+    lw      $a0, 0($a0)
+    jal     create_instance
+    lw      $a2, 0($v0)
+    lw      $a2, 0($a2)
+    move    $a1, $v0
+    lw      $a0, 4($sp)
+    jal     copy
+    move    $v0, $a1
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+function_abort_at_Object:
+    lw      $t0, 0($sp)
+    lw      $t0, 0($t0)
+    lw      $s0, 8($t0)
+    la      $a0, abort_message
+    li      $v0, 4
+    syscall
+    move    $a0, $s0
+    li      $v0, 4
+    syscall
+    la      $a0, eol
+    li      $v0, 4
+    syscall
+    li      $v0, 10
+    syscall
+
+function_type_name_at_Object:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $a0, 4($sp)
+    lw      $a0, 0($a0)
+    lw      $a0, 8($a0)
+    jal     str_assigment_from_str
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+################   IO   ################
+
+function_out_string_at_IO:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $a0, 8($sp)
+    lw      $a0, 4($a0)
+    li      $v0, 4
+    syscall
+    lw      $v0, 4($sp)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+function_out_int_at_IO:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $a0, 8($sp)
+    lw      $a0, 4($a0)
+    li      $v0, 1
+    syscall
+    lw      $v0, 4($sp)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+function_in_string_at_IO:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    li      $v0, 9
+    li      $a0, 4
+    syscall
+    move    $a0, $v0
+
+    move    $s0, $sp
+    _loop:
+    li      $v0, 8
+    li      $a1, 2
+    syscall
+    lb      $t0, 0($a0)
+    beq     $t0, 0xA, _end
+    beq     $t0, 0x0, _end
+    sb      $t0, -1($sp)
+    addi    $sp, $sp, -1
+    j       _loop
+    _end:
+
+    sub     $a0, $s0, $sp
+    move    $s1, $a0
+    addi    $a0, $a0, 1
+    move    $sp, $s0
+    li      $v0, 9
+    syscall
+    move    $a0, $v0
+    _copy:
+    beq     $s1, $zero, _end_copy
+    lb      $t1, -1($s0)
+    sb      $t1, 0($v0)
+    addi    $s0, $s0, -1
+    addi    $s1, $s1, -1
+    addi    $v0, $v0, 1
+    j       _copy
+    _end_copy:
+
+    jal     str_assigment_from_str
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+function_in_int_at_IO:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    la      $a0, type_Int
+    jal     create_instance
+    move    $s0, $v0
+    li      $v0, 5
+    syscall
+    sw      $v0, 4($s0)
+    move    $v0, $s0
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+################ STRING ################
+
+function_length_at_String:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $a0, 4($sp)     # cargar variabke de tipo string
+    lw      $a0, 4($a0)     # cargar direccion del string
+    jal     str_length
+    move    $s0, $v0
+    la      $a0, type_Int
+    jal     create_instance
+    sw      $s0, 4($v0)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+function_concat_at_String:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $a0, 4($sp)
+    addi    $sp, $sp, -4
+    sw      $a0, 0($sp)
+    jal     function_length_at_String
+    lw      $s1, 4($v0)
+    addi    $sp, $sp, 4
+    lw      $a0, 8($sp)
+    addi    $sp, $sp, -4
+    sw      $a0, 0($sp)
+    jal     function_length_at_String
+    lw      $s2, 4($v0)
+    addi    $sp, $sp, 4
+    add     $a0, $s1, $s2
+    addi    $a0, $a0, 1
+    li      $v0, 9
+    syscall
+    move    $s3, $v0
+    lw      $a0, 4($sp)     # cargar la primera variabke de tipo string
+    lw      $a0, 4($a0)     # cargar direccion del string
+    move    $a1, $v0
+    move    $a2, $s1
+    jal     copy
+    lw      $a0, 8($sp)     # cargar la segunda variabke de tipo string
+    lw      $a0, 4($a0)     # cargar direccion del string
+    add     $a1, $a1, $s1
+    move    $a2, $s2
+    jal     copy
+    move    $a0, $s3
+    jal     str_assigment_from_str
+    lw      $ra, 0($sp)
+    addi    $sp, $sp 4
+    jr      $ra
+
+function_substr_at_String:
+    addi    $sp, $sp, -8
+    sw      $ra, 0($sp)
+    la      $a0, type_String
+    jal     create_instance
+    sw      $v0, 4($sp)
+    lw      $a0, 16($sp)
+    lw      $a0, 4($a0)
+    addi    $a0, $a0, 1
+    li      $v0, 9
+    syscall
+    lw      $a0, 8($sp)
+    lw      $a0, 4($a0)
+    lw      $t0, 12($sp)
+    lw      $t0, 4($t0)
+    add     $a0, $a0, $t0
+    move    $a1, $v0
+    lw      $a2, 16($sp)
+    lw      $a2, 4($a2)
+    jal     copy
+    lw      $v0, 4($sp)
+    sw      $a1, 4($v0)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 8
+    jr      $ra
+
+################ UTILS ################
+
+# Arg:
+# $a0 Direccion del tipo a partir del cual se quiere crear una instancia
+# Return:
+# $v0 Direccion del espacio en memoria de la nueva instancia
+
+create_instance:
+    addi    $sp, $sp, -8
+    sw      $ra, 0($sp)
+    sw      $a0, 4($sp)
+    
+    li      $v0, 9
+    lw      $a0, 0($a0)
+    syscall
+
+    lw      $t0, 4($sp)
+    sw      $t0, 0($v0)
+
+    la      $t1, type_String
+    bne     $t1, $t0, not_str
+    la      $t0, empty_string
+    sw      $t0, 4($v0)
+    not_str:
+
+    lw      $a0, 4($sp)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 8
+
+    jr      $ra
+
+
+# Arg:
+# $a0 Origen de la copia
+# $a1 Destino de la copia
+# $a2 Tamaño de la copia
+
+copy:
+    addi    $sp, $sp, -12
+    sw      $a0, 0($sp)
+    sw      $a1, 4($sp)
+    sw      $a2, 8($sp)
+
+loop_copy:
+    beq     $a2, $zero, end_loop_copy
+    lb      $t0, 0($a0)
+    sb      $t0, 0($a1)
+    addi    $a0, $a0, 1
+    addi    $a1, $a1, 1
+    addi    $a2, $a2, -1
+    j loop_copy
+
+end_loop_copy:
+    lw      $a0, 0($sp)
+    lw      $a1, 4($sp)
+    lw      $a2, 8($sp)
+    addi    $sp, $sp, 12
+    jr      $ra
+
+
+# Arg:
+# $a0 Direccion de la instancia a asignar
+# Return:
+# $v0 Direccion a la nueva instancia
+
+val_assigment:
+    addi    $sp, $sp, -8
+    sw      $ra, 0($sp)
+    sw      $a0, 4($sp)
+
+    lw      $a0, 0($a0)
+    jal     create_instance
+
+    lw      $a0, 4($sp)
+    move    $a1, $v0
+    lw      $a2, 0($a0)
+    lw      $a2, 0($a2)
+
+    jal     copy
+
+    move    $v0, $a1
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 8
+    jr      $ra
+
+# Desde una instancia
+str_assigment:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $a0, 4($a0)
+    jal     str_assigment_from_str
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+# Desde un string
+str_assigment_from_str:
+    addi    $sp, $sp, -20
+    sw      $ra, 0($sp)
+    sw      $s0, 4($sp)
+    sw      $a0, 8($sp)
+
+    sw      $a0, 12($sp)
+    la      $a0, type_String
+    jal     create_instance
+    sw      $v0, 16($sp)
+    lw      $a0, 12($sp)
+    jal     str_length
+    addi    $s0, $v0, 1
+    move    $a0, $s0
+    li      $v0, 9
+    syscall
+    lw      $a0, 12($sp)
+    move    $a1, $v0
+    move    $a2, $s0
+    jal     copy
+    lw      $v0, 16($sp)
+    sw      $a1, 4($v0)
+
+    lw      $a0, 8($sp)
+    lw      $s0, 4($sp)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 20
+    jr      $ra
+
+ref_assigment:
+    move    $v0, $a0
+    jr      $ra
+
+
+# Arg:
+# $a0 Direccion de la primera instancia
+# $a1 Direccion de la segunda instancia
+# Return:
+# $v0 Booleano que indica si ambas instancias son iguales segun
+#     el criterio de comparacion definido en sus tipos
+
+val_equal:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    lw      $t0, 0($a0)
+    lw      $t0, 0($t0)
+
+    addi    $s0, $zero, 1
+
+    loop_val_equal:
+    beq     $t0, $zero, are_val_equal
+    lw      $t1, 0($a0)
+    lw      $t2, 0($a1)
+    bne     $t1, $t2, not_val_equal
+    addi    $a0, $a0, 4
+    addi    $a1, $a1, 4
+    addi    $t0, $t0, -4
+    j       loop_val_equal
+    not_val_equal:
+    move    $s0, $zero
+    are_val_equal:
+
+    la      $a0, type_Bool
+    jal     create_instance
+    sw      $s0, 4($v0)
+
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+str_equal:
+    addi    $sp, $sp, -24
+    sw      $ra, 0($sp)
+    sw      $s6, 4($sp)
+    sw      $s0, 8($sp)
+    sw      $s1, 12($sp)
+    sw      $a0, 16($sp)
+    sw      $s2, 20($sp)
+
+    addi    $s6, $zero, 1
+    lw      $t0, 0($a0)
+    lw      $t1, 0($a1)
+    bne     $t0, $t1, not_str_equal
+    move    $s0, $a0
+    move    $s1, $a1
+    lw      $a0, 4($a0)
+    jal     str_length
+    move    $s2, $v0
+    lw      $a0, 4($s1)
+    jal     str_length
+    bne     $s2, $v0, not_str_equal
+    lw      $a0, 4($s0)
+    lw      $a1, 4($s1)
+    loop_str_equal:
+    lb      $t0, 0($a0)
+    lb      $t1, 0($a1)
+    beq     $t0, $zero, first_equal_zero
+    beq     $t1, $zero, second_equal_zero
+    bne     $t0, $t1, not_str_equal
+    addi    $a0, $a0, 1
+    addi    $a1, $a1, 1
+    j       loop_str_equal
+    first_equal_zero:
+    beq     $t1, $zero, are_str_equal
+    j       not_str_equal
+    second_equal_zero:
+    beq     $t0, $zero, are_str_equal
+    j       not_str_equal
+    not_str_equal:
+    move    $s6, $zero
+    are_str_equal:
+
+    la      $a0, type_Bool
+    jal     create_instance
+    sw      $s6, 4($v0)
+
+    lw      $s2, 20($sp)
+    lw      $a0, 16($sp)
+    lw      $s1, 12($sp)
+    lw      $s0, 8($sp)
+    lw      $s6, 4($sp)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 24
+    jr      $ra
+
+ref_equal:
+    addi    $sp, $sp, -12
+    sw      $ra, 0($sp)
+    sw      $s0, 4($sp)
+    sw      $a0, 8($sp)
+    addi    $s0, $zero, 1
+    bne     $a0, $a1, not_ref_equal
+    j       are_ref_equal
+    not_ref_equal:
+    move    $s0, $zero
+    are_ref_equal:
+
+    la      $a0, type_Bool
+    jal     create_instance
+    sw      $s0, 4($v0)
+
+    lw      $a0, 8($sp)
+    lw      $s0, 4($sp)
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 12
+    jr      $ra
+
+# Arg:
+# $a0 Direccion del string
+# Return:
+# $v0 Longitud del string
+
+str_length:
+    addi    $sp, $sp, -4
+    sw      $a0, 0($sp)
+    move    $v0, $zero
+    loop_length:
+    lb      $t0, 0($a0)
+    beq     $t0, $zero, end_loop_length
+    addi    $v0, $v0, 1
+    addi    $a0, $a0, 1
+    j       loop_length
+    end_loop_length:
+    lw      $a0, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
+
+runtime_error:
+    li      $v0, 4
+    syscall
+    li      $v0, 10
+    syscall
+
+get_number_action:
+    addi    $sp, $sp, -4
+    sw      $ra, 0($sp)
+    
+    lw      $s0, 4($sp)                 # Carga <expr 0> en $s0
+    lw      $s0, 0($s0)                 # Carga el tipo de <expr 0> en $s0
+    _loop_1:
+    beq     $s0, $zero, _end_loop_1     
+    lw      $a0, 8($s0)                 # Carga el nombre del tipo de <expr 0> en $a0
+    jal     str_assigment_from_str
+    move    $a0, $v0                    # Mueve la instancia de str del nombre del tipo de <expr 0> a $a0
+    lw      $s2, 8($sp)                 # Carga la instancia de int del numero de actions en $s2
+    lw      $s2, 4($s2)                 # Carga el numero de actions en $s2
+    move    $s3, $sp                    # Guarda el estado actual de $sp en $s3
+    _loop_2:
+    beq     $s2, $zero, _end_loop_2
+    lw      $a1, 12($sp)                # Carga el tipo del action (instancia str)
+    move    $s4, $sp
+    move    $sp, $s3
+    jal     str_equal
+    move    $sp, $s4
+    lw      $t1, 4($v0)
+    li      $t2, 1
+    beq     $t1, $t2, get_number
+    addi    $s2, $s2, -1
+    addi    $sp, $sp, 4
+    j       _loop_2
+    _end_loop_2:
+    lw      $s0, 20($s0)
+    move    $sp, $s3
+    j       _loop_1
+    _end_loop_1:
+    move    $sp, $s3
+    li      $s0, -1
+    j       fin
+    get_number:
+    move    $sp, $s3
+    lw      $t0, 8($sp)
+    lw      $t0, 4($t0)
+    sub     $s0, $t0, $s2
+    fin:
+    la      $a0, type_Int
+    jal     create_instance
+    sw      $s0, 4($v0)
+    
+    lw      $ra, 0($sp)
+    addi    $sp, $sp, 4
+    jr      $ra
