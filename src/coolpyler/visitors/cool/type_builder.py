@@ -35,12 +35,6 @@ class TypeBuilderVisitor:
 
         object_type.define_method("abort", [], [], object_type)
         object_type.define_method("type_name", [], [], string_type)
-        # object_type.define_method("copy", [], [], semantic.SelfType(object_type))
-
-        # io_type.define_method(
-        #     "out_string", ["x"], [string_type], semantic.SelfType(io_type)
-        # )
-        # io_type.define_method("out_int", ["x"], [int_type], semantic.SelfType(io_type))
 
         object_type.define_method("copy", [], [], object_type)
 
@@ -83,11 +77,6 @@ class TypeBuilderVisitor:
         except semantic.BaseSemanticError as e:
             self.errors.append(e.with_pos(node.lineno, node.columnno))
 
-        # attr_info = self.current_type.define_attribute("self", self.current_type)
-        # self_attr = type_built.CoolAttrDeclNode(
-        #     node.lineno, node.columnno, attr_info, None
-        # )
-        # features = [self_attr] + [self.visit(feat) for feat in node.features]
         features = [self.visit(feat) for feat in node.features]
 
         return type_built.CoolClassNode(
@@ -106,7 +95,7 @@ class TypeBuilderVisitor:
             attr_info = self.current_type.define_attribute(node.id, type)
         except semantic.BaseSemanticError as e:
             self.errors.append(e.with_pos(node.lineno, node.columnno))
-            attr_info = None  # TODO: check
+            attr_info = None
 
         body = self.visit(node.body) if node.body is not None else None
         return type_built.CoolAttrDeclNode(
@@ -115,7 +104,6 @@ class TypeBuilderVisitor:
 
     @visitor.when(type_collected.CoolMethodDeclNode)
     def visit(self, node: type_collected.CoolMethodDeclNode):
-        # print(node.param_names)
         param_types = []
         for ptype_name in node.param_types:
             try:
@@ -137,7 +125,7 @@ class TypeBuilderVisitor:
             )
         except semantic.BaseSemanticError as e:
             self.errors.append(e.with_pos(node.lineno, node.columnno))
-            method_info = None  # TODO: check
+            method_info = None
 
         body = self.visit(node.body)
 
