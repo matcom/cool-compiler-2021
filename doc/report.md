@@ -30,7 +30,9 @@ Para la implementación del compilador de `COOL` se dividió el proceso de desar
 
 Para el análisis léxico se utilizó el módulo `ply` de `Python`, el cual permite generar esta parte del proceso de manera automática simplemente definiendo el conjunto de tokens del lenguaje.
 
-...TODO: Más cosas aquí
+Se emplearon dos estados exclusivos para el automata ademas del incial, uno para tokenizar los string y otros para los comentarios que ocupan multiples lineas.
+
+Al concluir esta fase se obtuvo cada uno de los tokens relevantes involcrados en el codigo fuente, estos almacenan su lexema, tipo de token, asi como la linea y columna correspondiente, para mejorar la informacion de los errores en las siguientes fases.
 
 ## Parsing
 
