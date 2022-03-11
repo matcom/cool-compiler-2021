@@ -268,15 +268,14 @@ class Scope:
         return any(True for x in self.locals if x.name == vname)
 
     def get_tagged_scope(self, tag: str) -> Scope | None:
-        scope = None
-        if self.tag == tag:
-            scope = self
-        else:
-            for child in self.children:
-                if (child_scope := child.get_tagged_scope(tag)) is not None:
-                    scope = child_scope
-                    break
-        return scope
+        pending = [self]
+        while pending:
+            actual = pending.pop(0)
+            if actual.tag == tag:
+                return actual
+            else:
+                pending.extend(actual.children)
+        raise ValueError(f'Unexpected tag "{tag}" in scope "{self.tag}"')
 
     def all_locals(self) -> list[VariableInfo]:
         if self.parent is None:

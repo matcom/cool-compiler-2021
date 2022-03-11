@@ -68,8 +68,14 @@ class DotCodeVisitor:
         print(scope)
         # build the code functions
         for class_ in node.declarations:
-            print(f'visiting {class_.id} with scope {scope.get_tagged_scope(class_.id).tag} and childrens {[c.tag for c in scope.get_tagged_scope(class_.id).children]}')
-            self.visit(class_, deepcopy(scope.get_tagged_scope(class_.id)))
+            print('_' * 10, 'in classes')
+            tagged_scope = scope.get_tagged_scope(class_.id)
+            print(f'visiting class {class_.id}')
+            print(f'with scope {tagged_scope.tag} and childrens {[c.tag for c in tagged_scope.children]}')
+            # print(deepcopy(scope.get_tagged_scope(class_.id)))
+            print('_' * 10)
+
+            self.visit(class_, deepcopy(tagged_scope))
 
             # build the entry function:
             for class_ in node.declarations:
@@ -307,8 +313,8 @@ class DotCodeVisitor:
         type_node = self.root.get_type(self.current_type)
         for attr_name in type_node.attributes:
             attr = self.add_local(extract_feat_name(attr_name), internal=False)
-            attr_expr, scope = type_node.get_attr_node(attr_name)
-            attr_value = self.visit(attr_expr, scope)
+            attr_expr, attr_scope = type_node.get_attr_node(attr_name)
+            attr_value = self.visit(attr_expr, attr_scope)
             attr_index = type_node.attributes.index(attr_name)
             attr_at = cil.AttributeAt(attr_name, attr_index)
             self.add_inst(cil.SetAttrNode('self', attr_at, attr_value))
@@ -319,8 +325,13 @@ class DotCodeVisitor:
             #     visited_attrs.append(feat.id)
             #     self.visit(feat, scope)
             if isinstance(feat, ast.FuncDeclarationNode):
-                print(scope.tag, [c.tag for c in scope.children], feat.id)
-                self.visit(feat, scope.get_tagged_scope(feat.id))
+                print('_' * 10, 'in feats', f'{node.id}: {feat.id}')
+                tagged_scope = scope.get_tagged_scope(feat.id)
+                print(f'visiting method "{feat.id}" from scope "{scope.tag}"')
+                print(f'with child scope "{tagged_scope.tag}" and childrens {[c.tag for c in tagged_scope.children]}')
+                # print(deepcopy(scope.get_tagged_scope(feat.id)))
+                print('_' * 10)
+                self.visit(feat, tagged_scope)
 
         init.instructions.append(cil.ReturnNode('self'))
 
@@ -379,6 +390,7 @@ class DotCodeVisitor:
 
     @visitor.when(ast.LetNode)
     def visit(self, node: ast.LetNode, scope: Scope):
+        print('wtfffffffff!')
         let_scope = scope.children.pop(0)
         for let_declaration in node.declarations:
             self.visit(let_declaration, let_scope)
@@ -420,6 +432,7 @@ class DotCodeVisitor:
         sorted_cases: List[Tuple[ast.CaseBranchNode, Scope]] = []
         print('visiting for, type:', self.current_type)
         for case in node.cases:
+            print('wtffffff!')
             child_scope = scope.children.pop(0)
             print('poped in case the scope', child_scope.tag, f'(child of {scope.tag})')
             sorted_cases.append((case, child_scope))
