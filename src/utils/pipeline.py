@@ -122,8 +122,8 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
                 errors.append(f'({lineno}, {column}) - LexicographicError: Unterminated string constant')
 
             pass
-        if verbose:
-            print(t)
+        # if verbose:
+        #     print(t)
 
     return errors, program, tokens
 
