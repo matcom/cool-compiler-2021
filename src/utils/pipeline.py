@@ -13,7 +13,7 @@ from utils.inference import InferenceTypeChecker
 from utils.instance import Execution
 from utils.type_analysis import TypeBuilder, TypeChecker, TypeCollector, PositionateTokensInAST, TypeBuilderFeature
 from utils.auxiliar_methods import erase_multiline_comment
-
+from utils.cool_to_cil import COOLToCILVisitor
 app = typer.Typer()
 
 
@@ -281,7 +281,7 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
                 print_errors(item)
             exit(1)
         ### code generation ###          
-            
+        COOLToCILVisitor(context).visit(ast,scope)    
     # return "\n".join(errors) 
     
 if __name__ == '__main__':

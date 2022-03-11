@@ -1,3 +1,4 @@
+from atexit import register
 from semantic import *
 from utils import ast_nodes_cil as cil
 from utils import ast_nodes as cool
@@ -80,7 +81,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.ReturnNode(0))
         self.current_function = None
         
-        for declaration, child_scope in zip(node.declarations, scope.children):
+        for declaration, child_scope in zip(node.class_list, scope.children):
             self.visit(declaration, child_scope)
 
         return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
@@ -88,12 +89,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.ClassDecNode)
     def visit(self, node, scope):
         ####################################################################
-        # node.id -> str
+        # node.name -> str
         # node.parent -> str
-        # node.features -> [ FuncDeclarationNode/AttrDeclarationNode ... ]
+        # node.data -> [ FuncDeclarationNode/AttrDeclarationNode ... ]
         ####################################################################
         
-        self.current_type = self.context.get_type(node.id)
+        self.current_type = self.context.get_type(node.name)
         
         # Your code here!!! (Handle all the .TYPE section)
         current_type_cil = self.register_type(self.current_type.name)
@@ -110,13 +111,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.MethodDecNode)
     def visit(self, node, scope):
         ###############################
-        # node.id -> str
+        # node.name -> str
         # node.params -> [ (str, str) ... ]
         # node.type -> str
-        # node.body -> [ ExpressionNode ... ]
+        # node.expr -> [ ExpressionNode ... ]
         ###############################
         
-        self.current_method = self.current_type.get_method(node.id)
+        self.current_method = self.current_type.get_method(node.name)
         
         # Your code here!!! (Handle PARAMS)
         #registro la funcion, devuelve un funcNode del ast de CIL
@@ -130,7 +131,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             current_method_cil.params.append(cil.ParamNode(param))
 
         # Your code here!!! (Handle RETURN)
-        #scope = node.scope
+        scope = node.scope
         value = self.visit(self.current_method.expr, scope)
     
         return_node = cil.ReturnNode(value)
@@ -162,12 +163,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.MethodCallNode)
     def visit(self, node, scope):
         ###############################
-        # node.obj -> AtomicNode
-        # node.id -> str
-        # node.args -> [ ExpressionNode ... ]
+        # node.atom -> AtomicNode
+        # node.idx -> str
+        # node.exprlist -> [ ExpressionNode ... ]
         ###############################
         
         # Your code here!!!
+        
         pass
 
     @visitor.when(cool.NumberNode)
@@ -188,14 +190,15 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # Your code here!!!
         pass
 
-    @visitor.when(cool.InstantiateNode)##?????????????###
+    @visitor.when(cool.NewNode)##?????????????before InstantiateNode???????????###
     def visit(self, node, scope):
         ###############################
-        # node.lex -> str
+        # node.type -> str
         ###############################
         
         # Your code here!!!
-        pass
+        instance = self.define_internal_local()
+        self.register_instruction(cil.AllocateNode(node.type, instance))
 
     @visitor.when(cool.PlusNode)
     def visit(self, node, scope):
