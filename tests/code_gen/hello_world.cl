@@ -1,5 +1,5 @@
 class Main inherits IO {
    main(): IO {
-	out_string("Hello, World.\n")
+	out_string(in_string())
    };
 };

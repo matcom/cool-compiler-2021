@@ -222,6 +222,14 @@ class BranchOnEqZero(InstructionNode):
         
     def __str__(self):
         return f'beqz {self.reg}, {self.label}'
+    
+class BranchOnGreaterZero(InstructionNode):
+    def __init__(self,reg,label):
+        self.reg = reg
+        self.label = label
+        
+    def __str__(self):
+        return f'bgtz {self.reg}, {self.label}'
         
 
 
