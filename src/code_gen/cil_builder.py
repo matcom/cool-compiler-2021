@@ -411,7 +411,7 @@ class CILBuilder:
     def io_inint(self):
         self.params.append(ParamNode("self"))
         ret_vinfo = self.define_internal_local()
-        self.register_instruction(ReadIntNode(ret_vinfo))  # TODO: ReadInt?
+        self.register_instruction(ReadIntNode(ret_vinfo))  
         self.register_instruction(ReturnNode(ret_vinfo))
 
     def reset_state(self):
@@ -763,7 +763,7 @@ class CILBuilder:
 
     @visitor.when(cool.CaseItemNode)
     def visit(self, node, return_var=None):
-        pass  # TODO: Pending!!!
+        pass 
 
     # Arithmetic and comparison operators
     @visitor.when(cool.PlusNode)

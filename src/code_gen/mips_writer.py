@@ -1,5 +1,3 @@
-#from cool.utils.config import *
-#import cool.structs.mips_ast_hierarchy as mips
 import code_gen.mips_nodes as mips
 import cmp.visitor as visitor
 

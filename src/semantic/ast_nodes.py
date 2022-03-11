@@ -86,7 +86,6 @@ class CaseNode(ExpressionNode):
         self.case_items = case_items
         self.token = token
 
-#este no existe en la otra jerarquia
 class CaseItemNode(ExpressionNode):
     def __init__(self, idx, typex, exp, token):
         self.id = idx
@@ -119,7 +118,6 @@ class AtomicNode(ExpressionNode):
         self.token = token
 
 
-#aqui y abajo se llama symbol
 class UnaryNode(ExpressionNode):
     def __init__(self, expr, token):
         self.expr = expr

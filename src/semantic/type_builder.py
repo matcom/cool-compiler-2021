@@ -185,7 +185,6 @@ class TypeBuilder:
             )
         except SError as error: # method already defined
             node_row, node_col = node.id.location
-            # print("--------aqui se esta reportando el error del metodo doble---------")
             self.errors.append(SemanticError(node_row, node_col,error.text))
 
     @visitor.when(AttrDeclarationNode)

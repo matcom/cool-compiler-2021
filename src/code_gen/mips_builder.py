@@ -1,9 +1,3 @@
-# from atexit import register
-# from email.quoprimime import body_length
-# from operator import le
-# from tkinter.tix import Select
-# from soupsieve import select
-
 import cmp.visitor as visitor
 import cmp.cil as cil
 import random
@@ -91,7 +85,6 @@ IO = "IO"
 
 class MemoryManager:
     def __init__(self):
-        # self.all_reg = [t0,t1,t2,t3,t4,t5,t6,t7,t8,t9]
         self.all_reg = [t0, t1, t2, t3, t4, t5, t9]
 
         self.used_reg = []
@@ -215,9 +208,6 @@ class MIPSBuilder:
         # copies from t1 to t6 a0 bytes
         self.memo.save()
         self.current_procedure = mips.ProcedureNode(COPY)
-        #r = self.memo.get_unused_reg()
-        #self.register_instruction(mips.LoadInmediate,r,-1)
-        #self.register_instruction(mips.BranchOnEqualNode,r,a0,"copy_end")
 
         self.register_instruction(mips.Label, "copy_loop")
         self.register_instruction(mips.BranchOnEqualNode, zero, a0, "copy_end")
@@ -859,8 +849,6 @@ class MIPSBuilder:
     def visit(self, node):
         self.register_instruction(mips.CommentNode,"Executing Substring")
 
-        #self.detect_substring_out_of_range(node.idx.offset, node.length.offset, node.source.offset)
-
         #allocating new char array
         if isinstance(node.length,int):
             self.register_instruction(mips.LoadInmediate,s0,node.length)
@@ -1028,22 +1016,11 @@ class MIPSBuilder:
             mips.MoveNode, reg3, v0
         )  # saving pointer to char array
 
-        
-        
-        #self.register_instruction(mips.AddNode, a0, a0, -1)  ####??????????
-        
-        
-
         self.register_instruction(
             mips.CommentNode, "Copying bytes from one char array to another"
         )
         self.register_instruction(mips.JumpAndLink, "Input")
-        
-        
-        #self.register_instruction(mips.CommentNode, "Null-terminating the string")
-        #self.register_instruction(mips.StoreByteNode, zero, 0, t6)
 
-        
         self.register_instruction(mips.CommentNode, "Allocating new String instance")
         _size = STRING_SIZE
         self.register_instruction(mips.LoadInmediate, v0, SYSCALL_SBRK)
@@ -1142,8 +1119,6 @@ class MIPSBuilder:
     def visit(self, node):
         pass
     
-    
-    
-    @visitor.when(cil.LocalNode)  #No hace falta
+    @visitor.when(cil.LocalNode)  
     def visit(self,node):
         pass

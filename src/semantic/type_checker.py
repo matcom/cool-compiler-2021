@@ -158,7 +158,6 @@ class TypeChecker:
 
         except SError as e:
             # ERROR already reported in type builder
-            # return ErrorType()
             type_not_found = True
 
         if node.init_exp != None:
@@ -171,7 +170,6 @@ class TypeChecker:
                 self.errors.append(TypeError(line, col,INCOMPATIBLE_TYPES % (init_expr_type.name, typex.name)))
         else:
             init_exp = None
-        # return typex AQUI SE RETORNABA UN TIPO PERO NO ES NECESARIO
         return cool_type_nodes.AttrDeclarationNode(node.id.lex, node.type.lex, init_exp)
 
     @visitor.when(FuncDeclarationNode)
@@ -186,11 +184,11 @@ class TypeChecker:
         # ------------parameters most have differente names------------
         param_names = self.current_method.param_names
         param_types = self.current_method.param_types
-        param_used = {} # VERIFICAR SI ESTOS TIPOS SON STRING O DE LOS .NAME
+        param_used = {} 
         new_params = []
 
         for i, param_name in enumerate(param_names):
-            param_n, param_t = node.params[i] # AQUI A ESTO NO LE DEBERIA PREGUNTAR POR EL LEX?
+            param_n, param_t = node.params[i] 
             new_params.append((param_n.lex, param_t.lex))
             if param_name == "self":
                 node_row, node_col = param_n.location # location of param name
@@ -247,17 +245,6 @@ class TypeChecker:
                     
             except SError:
                 pass # parent has no method named like this
-
-        # try:
-        #     return_type = self.context.get_type(node.type.lex)
-        #     # if return_type.name == "SELF_TYPE":
-        #     #     return self.current_type
-        #     # return return_type ESTAS LINEAS ESTAN DE MAS PUES NO HACE FALTA RETORNAR TIPO
-
-        # except SError as e:
-        #     # Error already reported in type builder
-        #     # return ErrorType()
-        #     pass #it is not necessary to return a type in func declaration ndoes
 
         return cool_type_nodes.FuncDeclarationNode(node.id.lex, new_params, node.type.lex, body_exp)
 

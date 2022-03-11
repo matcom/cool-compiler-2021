@@ -29,7 +29,6 @@ class TypeCollector(object):
     @visitor.when(ProgramNode)
     def visit(self, node):
         self.context = Context()
-        # TODO: Es necesario crear estos tipos especificos?
         self.context.types["Object"] = ObjectType()
         self.context.types["Int"] = IntType()
         self.context.types["String"] = StringType()
