@@ -8,4 +8,4 @@ echo "Cool Compiler v0.1"
 echo "Copyright (c) 2022: Luis Lara, Carlos Arrieta"
 
 # Llamar al compilador
-python main.py $INPUT_FILE
+python3 main.py $INPUT_FILE
