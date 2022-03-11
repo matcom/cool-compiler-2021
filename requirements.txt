@@ -1,6 +1,5 @@
 ply
 pytest
-itertools
 typing
 enum
 collections
