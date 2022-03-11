@@ -23,6 +23,7 @@ def print_error(errors):
     if errors: exit(1)
 
 def main(input_file, cil_file, output_file):
+    print('Hoooooooo')
     try:
         text = open(input_file, 'r').read()
     except FileNotFoundError:
