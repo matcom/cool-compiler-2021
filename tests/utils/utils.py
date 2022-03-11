@@ -49,7 +49,7 @@ def compare_errors(compiler_path: str, cool_file_path: str, error_file_path: str
         if platform.system() == 'Windows':
             sp = subprocess.run(['python', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
         else:
-            sp = subprocess.run(['python3.9', compiler_path[:-2]+"py", cool_file_path], capture_output=True, timeout=timeout)
+            sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
         return_code, output = sp.returncode, sp.stdout.decode()
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
@@ -74,7 +74,7 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
         if platform.system() == 'Windows':
             sp = subprocess.run(['python', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
         else:
-            sp = subprocess.run(['python3.9', compiler_path[:-2]+"py", cool_file_path], capture_output=True, timeout=timeout)
+            sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
         assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
