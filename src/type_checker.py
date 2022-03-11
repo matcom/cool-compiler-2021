@@ -458,6 +458,10 @@ class TypeChecker:
 
     @visitor.when(CaseItemNode)
     def visit(self, node, scope):
+        if node.id.lex == "self":
+            node_row, node_col = node.id.location
+            self.errors.append(SemanticError(node_row, node_col, "'self' cannot be bound in a 'case' expression. " + SELF_IS_READONLY))
+
         try:
             static_type = self.context.get_type(node.type.lex)
             scope.define_variable(node.id.lex, static_type)
