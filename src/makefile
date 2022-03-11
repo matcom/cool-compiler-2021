@@ -19,7 +19,4 @@ clean:
 	rm -rf ../.pytest_cache
 	
 test:
-	pytest ../tests -v --tb=short -m=${TAG} -p no:warnings
-
-test3:
 	pytest-3 ../tests -v --tb=short -m=${TAG} -p no:warnings
