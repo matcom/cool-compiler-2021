@@ -85,4 +85,26 @@ Este tipo de expresión tuvo un tratamiento especial debido a que la evaluación
 
 ## Generación de código intermedio: CIL -> MIPS
 
-Una vez tenemos el AST de `CIL`, solo resta el paso final, generar el código final `MIPS` que será el que se ejecutará desde el emulador `spim`. Para esto definimos un visitor encargado de esta tarea,
+Una vez tenemos el AST de `CIL`, solo resta el paso final, generar el código final `MIPS` que será el que se ejecutará desde el emulador `spim`. Para esto definimos un visitor encargado de traducir cada instrucción.
+
+### Representación de Instancias en Memoria
+
+Para representar los objetos de `CIL` en memoria desde `MIPS` usamos la siguiente notación:
+
+```
+Type: # Nombre del tipo
+  .word 4 # Valor
+  .word <Padre> # Label del tipo padre
+
+  # Métodos de la instancia
+  .word Type__init
+  .word Type__abort
+  .
+  .
+  .
+  #
+  .word Type_type_name # Label para direccionar el string del typename
+  .asciiz "Type" # Typename (String del tipo)
+```
+
+Por lo visto anteriormente cada tipo contiene información relacionada con este, como la lista de atributos, métodos, el string correspondiente a su typename, así como una referencia al address del label de su padre. Todos los tipos son tratados como instancias de clases, incluyendo los `BUILT_IN` como `Int, String y Bool` en los que podemos ver su valor en el offset 4 de su dirección. Los métodos se representan con labels que son definidos posteriormente en la sección `.text` de `MIPS`. Existe un label especial llamado `main` que será el encargado de correr el programa, su función es instanciar el tipo `Main` y ejecutar sus instrucciones.
