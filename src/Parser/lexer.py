@@ -73,7 +73,7 @@ class Lexer:
     def t_comments_eof(self, t):
         self.update_column(t)
         if t.lexer.level > 0:
-            self.errors.append(LexicographicError(EOF_COMMENT , t.lineno, t.column))
+            self.errors.append(LexicographicError('EOF in comment' , t.lineno, t.column))
     
     #########################################################################
     ##                        Rules for string                             ##
@@ -109,14 +109,14 @@ class Lexer:
         t.lexer.linestart = t.lexer.lexpos 
 
         if not t.lexer.backslash:
-            self.errors.append(LexicographicError(UNDETERMINATED_STRING, t.lineno, t.column))
+            self.errors.append(LexicographicError('Undeterminated string constant', t.lineno, t.column))
             t.lexer.begin('INITIAL')
 
     def t_strings_nill(self, t):
         r'\0'
         self.update_column(t)
   
-        self.errors.append(LexicographicError(NULL_STRING, t.lineno, t.column))
+        self.errors.append(LexicographicError('String contains null character', t.lineno, t.column))
 
     def t_strings_consume(self, t):
         r'[^\n]'
@@ -146,7 +146,7 @@ class Lexer:
     def t_strings_eof(self, t):
         self.update_column(t)
      
-        self.errors.append(LexicographicError(EOF_STRING, t.lineno, t.column))
+        self.errors.append(LexicographicError('EOF in string constant', t.lineno, t.column))
     
     #########################################################################
     ##                      Rules for simple tokens                        ##
@@ -286,7 +286,7 @@ class Lexer:
 
     def t_error(self, t):
         self.update_column(t)
-        self.errors.append(LexicographicError(UNKNOWN_TOKEN % t.value[0], t.lineno, t.column))
+        self.errors.append(LexicographicError(f'ERROR "{t.value[0]}"', t.lineno, t.column))
         t.lexer.skip(1)
 
     @property
@@ -303,5 +303,5 @@ class Lexer:
         self.lexer.lineno = 1
         self.lexer.linestart = 0
         if len(tokens) == 0:
-            self.errors.append(SyntaticError(ERROR % 'EOF', 0, 0))
+            self.errors.append(SyntaticError('ERROR at or near "EOF"' , 0, 0))
         return tokens
