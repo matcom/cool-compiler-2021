@@ -15,7 +15,7 @@ ERROR_FORMAT = r'^\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*-\s*(\w+)\s*:(.*)$'
 
 def parse_error(error: str):
     merror = re.fullmatch(ERROR_FORMAT, error)
-    assert merror,  error
+    assert merror, BAD_ERROR_FORMAT % error
 
     return (t(x) for t, x in zip([int, int, str, str], merror.groups()))
 
