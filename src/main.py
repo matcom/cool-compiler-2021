@@ -22,7 +22,7 @@ def print_error(errors):
         print(x)
     if errors: exit(1)
 
-def main(input_file, cil_file, output_file):
+def main(input_file, output_file):
     print('Hoooooooo')
     try:
         text = open(input_file, 'r').read()
@@ -66,7 +66,6 @@ def main(input_file, cil_file, output_file):
 
 if __name__=='__main__':
     print('11111')
-    cil_file = sys.argv[2]
     input_file = sys.argv[1]
-    output_file = sys.argv[3]
-    main(input_file, cil_file, output_file)
+    output_file = sys.argv[2]
+    main(input_file, output_file)
