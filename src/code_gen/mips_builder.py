@@ -177,7 +177,7 @@ class MIPSBuilder:
 
     def generate_extra_static_labels(self):
         self.register_data(mips.DataTypeNode, ".word", VOID, [-1])
-        self.register_data(mips.DataTypeNode, ".asciiz", EMPTY_STRING, ['""'])
+        self.register_data(mips.DataTypeNode, ".asciiz", EMPTY_STRING, ['"\"\""'])
         self.register_data(mips.DataTypeNode, ".space", INPUT_STR_BUFFER, [BUFFER_SIZE])
 
     def generate_attr_offset(self, type):
@@ -200,8 +200,8 @@ class MIPSBuilder:
         self.register_instruction(mips.LoadByteNode, reg2, 0, a0)
         self.register_instruction(mips.BranchOnEqualNode, zero, reg2, "length_end")
 
-        self.register_instruction(mips.AddNode, reg1, reg1, 1)
-        self.register_instruction(mips.AddNode, a0, a0, 1)
+        self.register_instruction(mips.AddiNode, reg1, reg1, 1)
+        self.register_instruction(mips.AddiNode, a0, a0, 1)
         self.register_instruction(mips.Jump, "length_loop")
 
         self.register_instruction(mips.Label, "length_end")
@@ -215,6 +215,9 @@ class MIPSBuilder:
         # copies from t1 to t6 a0 bytes
         self.memo.save()
         self.current_procedure = mips.ProcedureNode(COPY)
+        #r = self.memo.get_unused_reg()
+        #self.register_instruction(mips.LoadInmediate,r,-1)
+        #self.register_instruction(mips.BranchOnEqualNode,r,a0,"copy_end")
 
         self.register_instruction(mips.Label, "copy_loop")
         self.register_instruction(mips.BranchOnEqualNode, zero, a0, "copy_end")
@@ -229,17 +232,44 @@ class MIPSBuilder:
         self.register_instruction(mips.Jump, ra)
 
         self.text.append(self.current_procedure)
+        self.memo.clean()
+        
+        
+    def generate_input(self):
+        # copies from t7 to t6 a0 bytes
+        self.memo.save()
+        reg4 = self.memo.get_unused_reg()
+        reg5 = self.memo.get_unused_reg()
+        
+        self.current_procedure = mips.ProcedureNode("Input")
+
+        self.register_instruction(mips.Label, "input_loop")
+    
+        self.register_instruction(mips.LoadByteNode, t8, 0, t7)
+        self.register_instruction(mips.StoreByteNode, t8, 0, t6)
+        
+        self.register_instruction(mips.AddiNode, t6, t6, 1)
+        self.register_instruction(mips.AddiNode, t7, t7, 1)
+        self.register_instruction(mips.BranchOnGreaterZero,t8,"input_loop")
+        self.register_instruction(mips.AddiNode,t6,t6,-2)
+        
+        self.register_instruction(mips.LoadInmediate,reg4,10)
+        self.register_instruction(mips.LoadByteNode,reg5,0,t6)
+        self.register_instruction(mips.BranchOnNotEqualNode,reg4,reg5,"input_end")
+        self.register_instruction(mips.LoadInmediate,t8,0)
+        self.register_instruction(mips.StoreByteNode,t8,0,t6)
+        
+        self.register_instruction(mips.Label, "input_end")
+        self.register_instruction(mips.Jump, ra)
+
+        self.text.append(self.current_procedure)
+        
+        
+ 
 
     def generate_str_cmp(self):
         self.current_procedure = mips.ProcedureNode(STR_CMP)
 
-        #comparing lengths
-        self.register_instruction(mips.CommentNode, "Comparing lengths")
-        self.register_instruction(mips.LoadWordNode, s0, LENGTH_ATTR_OFFSET, t6) #length offset
-        self.register_instruction(mips.LoadWordNode, s1, LENGTH_ATTR_OFFSET, t7)
-        self.register_instruction(mips.SetEq,a0,s0,s1)
-        
-        self.register_instruction(mips.BranchOnEqZero,a0,"end_loop")
         
         #comparing char by char
         self.register_instruction(mips.CommentNode, "Comparing char by char")
@@ -274,6 +304,7 @@ class MIPSBuilder:
         self.generate_str_length()
         self.generate_copy()
         self.generate_str_cmp()
+        self.generate_input()
 
     @visitor.on("node")
     def visit(self, node=None):
@@ -316,17 +347,7 @@ class MIPSBuilder:
     def visit(self, node):
         self.register_data(mips.DataTypeNode, ".asciiz", node.name, [f'"{node.value}"'])
 
-    #@visitor.when(cil.ParamNode)
-    #def visit(self, node):
-    #    self.memo.save()
-    #    reg = self.memo.get_unused_reg()
 
-    #    self.params.append(node.name)
-
-    #    self.register_instruction(mips.LoadInmediate, reg, node.name)
-    #    self.register_instruction(mips.StoreWordNode, reg, len(self.params) * 4, fp)
-
-        self.memo.clean()
 
     @visitor.when(cil.ArgNode)
     def visit(self, node):
@@ -991,9 +1012,12 @@ class MIPSBuilder:
         self.register_instruction(mips.CommentNode, "Calculating str length")
         self.register_instruction(mips.JumpAndLink, LENGTH)
 
+        reg4 = self.memo.get_unused_reg()
+        self.register_instruction(mips.MoveNode, reg4, a0)  # saving length
         self.register_instruction(
             mips.CommentNode, "Allocating char array for new string"
         )
+        self.register_instruction(mips.AddNode, a0, a0, 1)  ####??????????
         self.register_instruction(mips.LoadInmediate, v0, SYSCALL_SBRK)
         self.register_instruction(mips.SyscallNode)
 
@@ -1004,18 +1028,22 @@ class MIPSBuilder:
             mips.MoveNode, reg3, v0
         )  # saving pointer to char array
 
-        reg4 = self.memo.get_unused_reg()
-        self.register_instruction(mips.AddNode, a0, a0, -1)  ####??????????
-        self.register_instruction(mips.MoveNode, reg4, a0)  # saving length
+        
+        
+        #self.register_instruction(mips.AddNode, a0, a0, -1)  ####??????????
+        
+        
 
         self.register_instruction(
             mips.CommentNode, "Copying bytes from one char array to another"
         )
-        self.register_instruction(mips.JumpAndLink, COPY)
+        self.register_instruction(mips.JumpAndLink, "Input")
+        
+        
+        #self.register_instruction(mips.CommentNode, "Null-terminating the string")
+        #self.register_instruction(mips.StoreByteNode, zero, 0, t6)
 
-        self.register_instruction(mips.CommentNode, "Null-terminating the string")
-        self.register_instruction(mips.StoreByteNode, zero, 0, t6)
-
+        
         self.register_instruction(mips.CommentNode, "Allocating new String instance")
         _size = STRING_SIZE
         self.register_instruction(mips.LoadInmediate, v0, SYSCALL_SBRK)
@@ -1033,6 +1061,7 @@ class MIPSBuilder:
         self.register_instruction(
             mips.CommentNode, "Storing length and reference to char array"
         )
+        self.register_instruction(mips.AddiNode,reg4,reg4,-1)
         self.register_instruction(mips.StoreWordNode, reg4, LENGTH_ATTR_OFFSET, v0)
 
         # storing string chars ref
