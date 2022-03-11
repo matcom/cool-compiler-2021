@@ -20,7 +20,7 @@ from MIPS.mips import MIPS
 def print_error(errors):
     for x in errors:
         print(x)
-    if errors: exit(1)
+    if errors: exit(0)
 
 def main(input_file, output_file):
     print('Hoooooooo')
