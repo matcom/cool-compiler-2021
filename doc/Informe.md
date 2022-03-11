@@ -248,7 +248,7 @@ CIL es un lenguaje intermedio 3-address pero a su vez orientado a objetos, esto 
 
 - `.TYPE`: se guarda lo que en equivalencia se puede llamar las clases, aunque no hay ningún inicializado por defecto y los métodos lo que contienen es como una referencia a la definición real de la función que se implementará en `.CODE`
 - `.DATA`: se declaran las variables que representan valores constantes en la ejecución.
-- `.CODE`: implementación de las funciones que son referenciadas en las definiciones de clases, con la particularidad que la primera es la que representa el inicio del programa; lo que comunmente es el método main.
+- `.CODE`: implementación de las funciones que son referenciadas en las definiciones de clases, con la particularidad que la primera es la que representa el inicio del programa; lo que comúnmente es el método main.
 
 **Errores detectados**:
 
@@ -259,7 +259,7 @@ CIL es un lenguaje intermedio 3-address pero a su vez orientado a objetos, esto 
 
 ## CIL a MIPS
 
-A la hora de traducir de código CIL a MIPS es necesario apoyarse del patrón visitor nuevamente que tiene como punto de partida el AST de CIL que genera el paso anterior. El código MIPS tiene dos secciones que lo divide: .DATA (se crean referencias a objetos con un valor predeterminado o a otras direcciones de memoria) y .TEXT( se define como tal la lógica del código con las instrucciones que esto conlleva). Después se realiza otro visitor sencillo donde se traduce el AST de MIPS a código en sí, cada intrucción recibe una representación en un string y esto posteriormente en un archivo que finalmente será ejecutado en SPIM.
+A la hora de traducir de código CIL a MIPS es necesario apoyarse del patrón visitor nuevamente que tiene como punto de partida el AST de CIL que genera el paso anterior. El código MIPS tiene dos secciones que lo divide: .DATA (se crean referencias a objetos con un valor predeterminado o a otras direcciones de memoria) y .TEXT( se define como tal la lógica del código con las instrucciones que esto conlleva). Después se realiza otro visitor sencillo donde se traduce el AST de MIPS a código en sí, cada instrucción recibe una representación en un string y esto posteriormente en un archivo que finalmente será ejecutado en SPIM.
 
 ### CIL Type en memoria
 
@@ -290,7 +290,7 @@ Para cada tipo, se guardan sus métodos en una lista llamada type\_\<tipo>\_disp
 | ----------- | --------------- | --------------- | --- | ------------------------ |
 | Método 0    | Método 1        | Método 2        | ... | Método m-1               |
 
-Por cada uno de los tipos se crea una de estas tablas, que contiene (cantidad de métodos) \* words espacio de memoria asignado. Cada elemento entonces apunta a la eiqueta donde se define la función.
+Por cada uno de los tipos se crea una de estas tablas, que contiene (cantidad de métodos) \* words espacio de memoria asignado. Cada elemento entonces apunta a la etiqueta donde se define la función.
 
 Dichas funciones en la lista están en el orden en el que fueron definidos, que si heredan por defecto vienen con los métodos de los ancestros en su inicio a través del procesamiento para generar el código CIL.
 
@@ -300,7 +300,7 @@ Una vez que se tiene el tipo al que se le realiza el llamado, dada la estructura
 | -------------- | ----------------- | ----------------- | --- | ------------------------- |
 | _dispatch_ $0$ | _dispatch_ $1$    | _dispatch_ $2$    | ... | _dispatch_ $n - 1$        |
 
-Donde $n$ es la cantidad de tipos, los nombres de las tablas dispactch están representadas con el nombre del tipo pero aquí para propósitos demostrativos se le asigna un número entero que es el mismo que se muestra en la estructura de un objeto cuando se habla del campo `Tipo`.
+Donde $n$ es la cantidad de tipos, los nombres de las tablas dispatch están representadas con el nombre del tipo pero aquí para propósitos demostrativos se le asigna un número entero que es el mismo que se muestra en la estructura de un objeto cuando se habla del campo `Tipo`.
 
 Y entonces para el llamado al método deseado se hace un proceso análogo de indexar con un índice conocido mediante el procesamiento y las variables del código que almacenan dicha información. Luego, se obtiene la dirección al método y se hace un jump a dicha etiqueta.
 
