@@ -16,7 +16,7 @@ def add_ext(d, node1, node2):
 
 
 class InferenceTypeChecker:
-    def __init__(self, context: Context, errors):
+    def __init__(self, context: Context, errors, program):
         self.context: Context = context
         self.current_type: Type = None
         self.current_method: Method = None
@@ -38,6 +38,7 @@ class InferenceTypeChecker:
             'base': self.get_tuple_type_base,
             'join': self.get_tuple_type_join
         }
+        self.program = program
 
     @visitor.on('node')
     def visit(self, node, scope):
@@ -49,9 +50,9 @@ class InferenceTypeChecker:
             scope = Scope()
         for item in node.class_list:
             self.visit(item, scope.create_child())
-        #print('\n'.join([str(i) for i in self.extension.items()]))
+            
         self.update()
-        ReplaceTypes(self.context, self.errors).visit(node, scope)
+        ReplaceTypes(self.context, self.errors, self.program).visit(node, scope)
 
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode, scope: Scope):
@@ -68,6 +69,7 @@ class InferenceTypeChecker:
         var_attr_info = scope.define_variable(node.name, var_type)  # scope
         tuple_var = 'var', var_attr_info
         exp = self.visit(node.expr, scope.create_child()) if node.expr is not None else None
+        
         if node._type == "AUTO_TYPE":
             attr_type = self.context.get_type(node._type)
             attr = self.current_type.attributes[node.name]
@@ -163,7 +165,7 @@ class InferenceTypeChecker:
             self.extension[then_] = []
 
         else_ = self.visit(node.else_expr,scope.create_child())
-        if else_[0] == 'join':
+        if else_ is not None and else_[0] == 'join':
             self.extension[else_] = []
 
         tuple_join = 'join', then_, else_
@@ -176,8 +178,12 @@ class InferenceTypeChecker:
     def visit(self, node: ast.CaseNode, scope: Scope):
         self.visit(node.expr,scope)
         for id_,type_,exp_ in node.params:
-            var_info = scope.define_variable(id_,self.context.get_type(type_))
-            self.visit(exp_,scope.create_child())
+            try:
+                var_info = scope.define_variable(id_,self.context.get_type(type_))
+                self.visit(exp_,scope.create_child())
+            except SemanticError:
+                pass
+        
         return 'base', self.context.get_type('Object')
 
     @visitor.when(ast.BlockNode)
@@ -198,7 +204,9 @@ class InferenceTypeChecker:
         if inst[0] == 'base' and node.idx in set(m.name for m, _ in type_inst.all_methods(True)):
             method = type_inst.get_method(node.idx)
 
+            counter = min(len(node.exprlist), len(method.param_types))
             for i, exp in enumerate(node.exprlist):
+                if i == counter: break
                 arg = self.visit(exp, scope)
                 tuple_param = 'param', method, i
                 param_type = method.param_types[i]
@@ -301,10 +309,10 @@ class InferenceTypeChecker:
         left_op = self.visit(node.left, scope)
         right_op = self.visit(node.right, scope)
 
-        if left_op[0] != 'base':
+        if left_op is not None and left_op[0] != 'base':
             add_ext(self.extension, ('base', self.context.get_type('Int')), left_op)
 
-        if right_op[0] != 'base':
+        if right_op is not None and right_op[0] != 'base':
             add_ext(self.extension, ('base', self.context.get_type('Int')), right_op)
             
         return 'base', self.context.get_type('Int')
@@ -313,16 +321,19 @@ class InferenceTypeChecker:
         left_op = self.visit(node.left, scope)
         right_op = self.visit(node.right, scope)
 
-        if left_op[0] != 'base':
+        if left_op is not None and left_op[0] != 'base':
             add_ext(self.extension, ('base', self.context.get_type('Int')), left_op)
 
-        if right_op[0] != 'base':
+        if right_op is not None and right_op[0] != 'base':
             add_ext(self.extension, ('base', self.context.get_type('Int')), right_op)
         
         return 'base', self.context.get_type('Bool')
 
     def update(self):
-        q = deque(e for e in self.extension if e[0] == 'base')
+        for item in self.extension:
+            pass
+
+        q = deque(e for e in self.extension if e is not None and e[0] == 'base')
         visited_base = set()
         while len(q) > 0:
             base = q.popleft()
@@ -330,7 +341,7 @@ class InferenceTypeChecker:
                 continue
             self.update_visit(base, visited_base)
 
-        q = deque(j for j in self.extension if j[0] == 'join')
+        q = deque(j for j in self.extension if j is not None and j[0] == 'join')
         visited_join  = set()
         while len(q) > 0:
             join = q.popleft()
@@ -339,7 +350,7 @@ class InferenceTypeChecker:
             self.update_visit_join(join,visited_join)
             
         for t in self.extension:
-            if t not in visited_base and t not in visited_join:
+            if t not in visited_base and t not in visited_join and t is not None:
                 self.dfunc[t[0]](t, self.context.get_type('Object'))
 
     def update_visit(self, base, visited):
@@ -347,7 +358,7 @@ class InferenceTypeChecker:
         q = deque([base])
         while q:
             current = q.popleft()
-            if current not in visited:
+            if current not in visited and current is not None:
                 visited.add(current)
                 self.dfunc[current[0]](current, new_type)
                 q.extend(self.extension[current])
@@ -412,11 +423,21 @@ class InferenceTypeChecker:
 
 
 class ReplaceTypes:
-    def __init__(self, context: Context, errors):
+    def __init__(self, context: Context, errors, program):
         self.context: Context = context
         self.current_type: Type = None
         self.current_method: Method = None
         self.errors = errors
+        self.program = program
+
+    def get_tokencolumn(self, str, pos):
+        column = 1
+        temp_pos = pos
+        while str[temp_pos] != '\n':
+            if temp_pos == 0: break
+            temp_pos -= 1
+            column += 1
+        return column if column > 1 else 2
 
     @visitor.on('node')
     def visit(self, node, scope):
@@ -452,7 +473,7 @@ class ReplaceTypes:
         if attr_type.name == "AUTO_TYPE":
             if attr_info.type.name == "AUTO_TYPE":
                 node._type = 'Object'
-                # self.errors.append('InferenceError:No se pudo inferir el tipo')
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - InferenceError: Cannot infer type for attribute "{node.name}".')
             else:
                 node._type = attr_info.type.name
 
@@ -464,7 +485,7 @@ class ReplaceTypes:
             if var_info is not None:
                 if var_info.type.name == "AUTO_TYPE":
                     node.type = 'Object'
-                    #self.errors.append('InferenceError:No se pudo inferir el tipo')
+                    self.errors.append(f'({node.p_types_pos[i][0]}, {node.p_types_pos[i][0]}) - InferenceError: Cannot infer type for attribute "{var_info.name}".')
                 else:
                     node.params[i] = ast.ParamNode(param.name, var_info.type.name)
         self.visit(node.expr, scope)
@@ -472,7 +493,7 @@ class ReplaceTypes:
         if node.type == "AUTO_TYPE":
             if self.current_method.return_type.name == "AUTO_TYPE":
                 node.type = 'Object'
-                #self.errors.append('InferenceError:No se pudo inferir el tipo')
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - InferenceError: Cannot infer type for attribute "{node.name}".')
             else:
                 node.type = self.current_method.return_type.name
 
@@ -493,7 +514,7 @@ class ReplaceTypes:
             if type_var == "AUTO_TYPE":
                 if var_info.type.name == "AUTO_TYPE":
                     node.declaration[i] = (id_var, 'Object', expr)
-                    # self.errors.append('InferenceError:No se pudo inferir el tipo')
+                    self.errors.append(f'({node.dec_types_pos[i][0]}, {node.dec_types_pos[i][1]}) - InferenceError: Cannot infer type for attribute "{id_var}".')
                 node.declaration[i] = (id_var, var_info.type.name, expr)
         self.visit(node.expr, scope.children[i_child])
 

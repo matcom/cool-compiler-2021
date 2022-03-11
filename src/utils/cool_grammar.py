@@ -64,14 +64,6 @@ def p_method(p):
     elif len(p) == 10:
         p[0] = ast.MethodDecNode(p[1], p[6], p[8], p[3])
 
-# def p_method_error(p):
-#     '''method : ID OPAR CPAR COLON TYPE OBRACE error CBRACE
-#               | ID OPAR param_list CPAR COLON TYPE OBRACE error CBRACE'''
-#     if len(p) == 9:
-#         errors.append((p.lineno(7), p.lexpos(7), '', 'CBRACE'))
-#     elif len(p) == 10:
-#         errors.append((p.lineno(8), p.lexpos(8), '', 'CBRACE'))
-    
     
 
 
@@ -104,9 +96,7 @@ def p_expr(p):
     elif p[1] == '{':
         p[0] = ast.BlockNode(p[2])
 
-# def p_expr_error(p):
-#     '''expr : error'''
-#     errors.append((p.lineno(1), p.lexpos(1), '', p[1].value))
+
 
 def p_comp(p):
     '''comp : arith LESS arith
@@ -173,7 +163,9 @@ def p_atom(p):
             | IF expr THEN expr ELSE expr FI
             | NOT expr'''
 
-    if len(p) == 4:
+    if p[1] == 'not':
+        p[0] = ast.NegationNode(p[2])
+    elif len(p) == 4:
         p[0] = p[2]
     elif len(p) == 3:
         p[0] = ast.NewNode(p[2])
@@ -181,8 +173,6 @@ def p_atom(p):
         p[0] = ast.VariableNode(p[1])
     elif len(p) == 8:
         p[0] = ast.ConditionalNode(p[2], p[4], p[6])
-    elif p[1] == 'not':
-        p[0] = ast.NegationNode(p[2])
 
 
 def p_atom_funccall(p):
@@ -254,7 +244,7 @@ def p_function_call(p):
     elif len(p) == 7:
         p[0] = ast.MethodCallNode(p[3], p[5], p[1])
     elif len(p) == 9:
-        p[0] = ast.MethodCallNode(p[3], p[7], p[1], p[3])
+        p[0] = ast.MethodCallNode(p[5], p[7], p[1], p[3])
 
 
 def p_expr_list(p):
