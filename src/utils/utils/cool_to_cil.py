@@ -1,5 +1,5 @@
 from atexit import register
-from semantic import *
+from .semantic import *
 from utils import ast_nodes_cil as cil
 from utils import ast_nodes as cool
 from utils import visitor
@@ -190,7 +190,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # Your code here!!!
         pass
 
-    @visitor.when(cool.NewNode)##?????????????before InstantiateNode???????????###
+    @visitor.when(cool.NewNode)
     def visit(self, node, scope):
         ###############################
         # node.type -> str
@@ -220,7 +220,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # Your code here!!!
         pass
 
-    @visitor.when(cool.StarNode)
+    @visitor.when(cool.TimesNode)
     def visit(self, node, scope):
         ###############################
         # node.left -> ExpressionNode
