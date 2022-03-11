@@ -2,4 +2,3 @@ ply
 pytest
 pytest-ordering
 typing
-inspect
