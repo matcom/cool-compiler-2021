@@ -73,14 +73,14 @@ class Type:
         else:
             raise SemanticError(f'Attribute "{name}" is already defined in {self.name}.')
 
-    def get_method(self, name: str):
+    def get_method(self, name: str, owner=False):
         try:
-            return self.methods[name]
+            return self.methods[name] if not owner else (self.methods[name], self)
         except KeyError:
             if self.parent is None:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
             try:
-                return self.parent.get_method(name)
+                return self.parent.get_method(name, owner)
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
 

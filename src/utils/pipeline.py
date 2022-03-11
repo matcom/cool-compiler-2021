@@ -6,7 +6,7 @@ import typer
 from cool_grammar import parser, errors as parser_errors
 from cool_lexer import lexer, lexer_errors
 from utils.ast_nodes import Token
-from utils.cyclic_dependency import CyclicDependency
+from utils.cyclic_dependency import CyclicDependency, MethodChecker
 from utils.formatter import Formatter, CodeBuilder
 from utils.semantic import Context, Scope
 from utils.inference import InferenceTypeChecker
@@ -272,6 +272,7 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
                 print_errors(item)
             exit(1)
         CyclicDependency(context, errors)
+        MethodChecker(context, errors, program).visit(ast)
         InferenceTypeChecker(context, errors, program).visit(ast, scope)
 
         TypeChecker(context, errors, program).visit(ast, scope)

@@ -222,13 +222,13 @@ class TypeBuilderFeature:
                 param_types.append(self.context.get_type(typex))
             except SemanticError:
                 param_types.append(ErrorType())
-                line, lexpos = node.p_types_positions[i]
+                line, lexpos = node.p_types_pos[i]
                 self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Undefined param type "{typex}" in method "{node.name}", in class "{self.current_type.name}"')
         try:
             return_type = self.context.get_type(node.type)
         except SemanticError:
             return_type = ErrorType()
-            line, lexpos = node.r_types_position
+            line, lexpos = node.r_types_pos
             self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Undefined return type "{node.type}" in method "{node.name}", in class "{self.current_type.name}"')
         try:
             self.current_type.define_method(node.name, param_names, param_types, return_type)
@@ -340,24 +340,24 @@ class TypeChecker:
             if id_ == 'self':
                 l, lp = node.dec_names_pos[pos]
                 self.errors.append(f'({l}, {lp}) - SemanticError: "self" cannot be bound in a "let" expression')
-            else:
-                try:
-                    if type_ != "SELF_TYPE": 
-                        var_type = self.context.get_type(type_)
-                    else: 
-                        var_type = self.current_type
-                    
-                except SemanticError:
-                    line, lexpos = node.dec_types_pos[pos]
-                    self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Type "{type_}" is not defined')
-                    var_type = ErrorType()
+                continue
+            try:
+                if type_ != "SELF_TYPE": 
+                    var_type = self.context.get_type(type_)
+                else: 
+                    var_type = self.current_type
+                
+            except SemanticError:
+                line, lexpos = node.dec_types_pos[pos]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Type "{type_}" is not defined')
+                var_type = ErrorType()
             scope.define_variable(id_, var_type)
             
             expr_type = None
             if exp is not None:
                 expr_type = self.visit(exp, scope.create_child())
             if expr_type is not None and not expr_type.conforms_to(var_type):
-                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, self.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{var_type.name}".')
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{var_type.name}".')
             
             # if exp is not None:
             #     return_type = self.visit(exp, sc)
