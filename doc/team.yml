@@ -1,10 +1,7 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Samuel David Suarez Rodriguez
+    github: samueldsr99
+    group: C412
+  - name: Enmanuel Verdesia Suarez
+    github: svex99
+    group: C411

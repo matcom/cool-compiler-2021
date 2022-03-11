@@ -40,12 +40,6 @@ def main(filename: str, cool_code: str, run: bool, verbose: bool):
             print(error)
         exit(1)
 
-    # print('-' * 40)
-    # print(ctx)
-    # print('-' * 40)
-    # print(scope)
-    # print('-' * 40)
-
     cil: ProgramNode
     cil = build_cil(ast, ctx, scope)
 
@@ -61,29 +55,25 @@ def main(filename: str, cool_code: str, run: bool, verbose: bool):
     with open(mips_file, 'w') as fd:
         fd.write(mips_str)
 
-    if verbose:
-        examinable_file = '__debug_code.mips'
-        with open(examinable_file, 'w', encoding='utf8') as f:
-            f.write(mips_str)
-
     if run:
         print('=' * 20, 'Running SPIM', '=' * 20)
-        try:
-            subprocess.run(['spim', '-f', mips_file])
-        finally:
-            os.remove(mips_file)
+        subprocess.run(['spim', '-f', mips_file])
 
 
 if __name__ == "__main__":
-    from argparse import ArgumentParser, FileType
+    from argparse import ArgumentParser, FileType, BooleanOptionalAction
 
     arg_parser = ArgumentParser()
     arg_parser.add_argument(
-        '-r', type=bool, default=False,
-        help='If present the file compiled will be executed by SPIM.'
+        '--out', required=False,
+        help='Name for .mips generated file after compilation.'
     )
     arg_parser.add_argument(
-        '-v', type=bool, default=False,
+        '--run', default=False, action=BooleanOptionalAction,
+        help='Execute the file compiled with SPIM.'
+    )
+    arg_parser.add_argument(
+        '--verbose', default=False, action=BooleanOptionalAction,
         help='Verbose output.'
     )
     arg_parser.add_argument(
@@ -92,6 +82,12 @@ if __name__ == "__main__":
     )
     args = arg_parser.parse_args()
 
-    filename = args.file.name.split(".")[0]
+    full_name = args.file.name
+    filename = full_name[full_name.rfind('/') + 1:full_name.rfind('.')]
     cool_code = args.file.read()
-    main(filename, cool_code, args.r, args.v)
+    main(
+        filename=args.out or filename,
+        cool_code=cool_code,
+        run=args.run,
+        verbose=args.verbose
+    )

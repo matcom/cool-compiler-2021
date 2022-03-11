@@ -31,3 +31,46 @@ Usted es libre de estructurar su reporte escrito como más conveniente le parezc
 ## Sobre la Fecha de Entrega
 
 Se realizarán recogidas parciales del proyecto a lo largo del curso. En el Canal de Telegram se anunciará la fecha y requisitos de cada entrega.
+
+
+**^^^^^ BORRAR ^^^^^**
+
+## Como usar el compilador
+
+Para compilar un fichero de COOL se puede usar el comando:
+
+```
+python3 coolc.py "path/to/file.cl"
+```
+
+Este compila el fichero `file.cl` y almacena el codigo generado en un fichero del msimo nombre pero pero con extension `.mips`, ubicado en la carpeta raiz donde se ejecuto el comando.
+
+Se pueden consultar las demas opciones de la linea de comandos para el compilador ejecutando `python3 coolc.py -h`.
+
+```
+usage: coolc.py [-h] [--out OUT] [--run | --no-run] [--verbose | --no-verbose] file
+
+positional arguments:
+  file                  COOL source file.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --out OUT             Name for .mips generated file after compilation.
+  --run, --no-run       Execute the file compiled with SPIM. (default: False)
+  --verbose, --no-verbose
+                        Verbose output. (default: False)
+```
+
+- `--out`: modifica el fichero de salida para el `.mips` generado, que por defecto es creado con el mismo nombre del fichero de COOL y en la direccion raiz donde se esta ejecutando el compilador.
+- `--run`: facilita la ejecucion del programa escriton en COOL ejecutando automaticamente el fichero `.mips` de salida. Para realizar dicha accion es necesario tener `spim` instalado y en el path.
+- `--verbose`: imprime en consola el AST generado despues de concluido el analisis lexico, parsing y analisis semantico, asi como el codigo intermedio (CIL) generado previamente a la generacion de codigo final. 
+
+## Requeriemientos
+
+### Ambiente de ejecucion
+
+El proyecto fue desarrollado y probado bajo un ambiente en `Python 3.9.5`, asi que se espera compatibilidad con esta version y superiores (`3.9+`). No se garantiza la correctitud del compilador o que este sea ejecutable en versiones inferiores.
+
+### Dependencias
+
+La unica dependencia del compilador es `ply==3.11`, la cual puede ser instalada ejecutando el comando `python3 -m pip install ply==3.11`.

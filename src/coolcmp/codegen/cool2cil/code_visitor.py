@@ -65,15 +65,9 @@ class DotCodeVisitor:
         # has access to void through that attribute in every class.
         # So, pop it to avoid repeated locals.
         scope.locals.pop(0)
-        print(scope)
         # build the code functions
         for class_ in node.declarations:
-            print('_' * 10, 'in classes')
             tagged_scope = scope.get_tagged_scope(class_.id)
-            print(f'visiting class {class_.id}')
-            print(f'with scope {tagged_scope.tag} and childrens {[c.tag for c in tagged_scope.children]}')
-            # print(deepcopy(scope.get_tagged_scope(class_.id)))
-            print('_' * 10)
 
             self.visit(class_, deepcopy(tagged_scope))
 
@@ -325,12 +319,7 @@ class DotCodeVisitor:
             #     visited_attrs.append(feat.id)
             #     self.visit(feat, scope)
             if isinstance(feat, ast.FuncDeclarationNode):
-                print('_' * 10, 'in feats', f'{node.id}: {feat.id}')
                 tagged_scope = scope.get_tagged_scope(feat.id)
-                print(f'visiting method "{feat.id}" from scope "{scope.tag}"')
-                print(f'with child scope "{tagged_scope.tag}" and childrens {[c.tag for c in tagged_scope.children]}')
-                # print(deepcopy(scope.get_tagged_scope(feat.id)))
-                print('_' * 10)
                 self.visit(feat, tagged_scope)
 
         init.instructions.append(cil.ReturnNode('self'))
@@ -390,7 +379,6 @@ class DotCodeVisitor:
 
     @visitor.when(ast.LetNode)
     def visit(self, node: ast.LetNode, scope: Scope):
-        print('wtfffffffff!')
         let_scope = scope.children.pop(0)
         for let_declaration in node.declarations:
             self.visit(let_declaration, let_scope)
