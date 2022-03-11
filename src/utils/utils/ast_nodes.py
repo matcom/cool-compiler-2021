@@ -170,4 +170,3 @@ class StringNode(AtomicNode):
 
 class BooleanNode(AtomicNode):
     pass
-
