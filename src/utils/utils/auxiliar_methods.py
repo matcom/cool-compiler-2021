@@ -21,7 +21,7 @@ def erase_multiline_comment(str):
         elif str[i] == '\t':
             result += '    '
             column += 4
-            i += 4
+            i += 1
             continue
 
         if comm_init == 0:

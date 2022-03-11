@@ -110,6 +110,29 @@ class Type:
     def bypass(self):
         return False
 
+    def join(self, other):
+        if isinstance(self, ErrorType):
+            return other
+        if isinstance(other, ErrorType):
+            return self
+
+        self_ancestors = set(self.get_ancestors())
+
+        current_type = other
+        while current_type is not None:
+            if current_type in self_ancestors:
+                break
+            current_type = current_type.parent
+        return current_type
+
+    # @staticmethod
+    def multi_join(types):
+        static_type = types[0]
+        for t in types[1:]:
+            static_type = static_type.join(t)
+        return static_type
+
+
     def __str__(self):
         output = f'type {self.name}'
         # parent = '' if self.parent is None else f' : {self.parent.name}'
@@ -203,7 +226,7 @@ class Context:
 
     def create_type(self, name: str):
         if name in self.types:
-            raise SemanticError(f'Type with the same name ({name}) already in context.')
+            raise SemanticError(f'Type ({name}) already in context.')
         typex = self.types[name] = Type(name)
         return typex
 

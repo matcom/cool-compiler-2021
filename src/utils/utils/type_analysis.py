@@ -7,10 +7,21 @@ from utils import ast_nodes as ast
 from utils import visitor
 
 class TypeCollector(object):
-    def __init__(self, context: Context, errors):
+    def __init__(self, context: Context, errors, program):
         self.context = context
         self.errors = errors
+        self.program = program
     
+    def get_tokencolumn(self, str, pos):
+        column = 1
+        temp_pos = pos
+        while str[temp_pos] != '\n':
+            if temp_pos == 0: break
+            temp_pos -= 1
+            column += 1
+        return column if column > 1 else 2
+
+
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -32,7 +43,7 @@ class TypeCollector(object):
         # defining methods
         object_type.define_method('abort', [], [], object_type)
         object_type.define_method('get_type', [], [], str_type)
-        object_type.define_method('type_name', ['str'], [str_type], str_type)
+        object_type.define_method('type_name', [], [], str_type)
         object_type.define_method('copy', [], [], object_type)
         str_type.define_method('length', [], [], int_type)
         str_type.define_method('concat', ['str'], [str_type], str_type)
@@ -49,16 +60,26 @@ class TypeCollector(object):
     def visit(self, node: ast.ClassDecNode):
         try:
             self.context.create_type(node.name)
-        except SemanticError as e:
-            self.errors.append(e.text)
+        except SemanticError:
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Invalid redefinition of class "{node.name}"')
 
 
 class TypeBuilder:
-    def __init__(self, context: Context, errors):
+    def __init__(self, context: Context, errors, program):
         self.context: Context = context
         self.current_type: Type = None
         self.errors = errors
+        self.program = program
     
+    def get_tokencolumn(self, str, pos):
+        column = 1
+        temp_pos = pos
+        while str[temp_pos] != '\n':
+            if temp_pos == 0: break
+            temp_pos -= 1
+            column += 1
+        return column if column > 1 else 2
+
     @visitor.on('node')
     def visit(self, node):
         pass
@@ -74,18 +95,31 @@ class TypeBuilder:
        
         if node.parent is not None:
             if node.parent in ['Int', 'Bool', 'String', 'SELF_TYPE']:
-                self.errors.append('La clase \'{node.name}\' no puede heredar de \'{node.parent}\'')
+                line, lexpos = node.parent_pos
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: Class "{node.name}" cannot inherits from "{node.parent}"')
+            
             try:
-                self.current_type.set_parent(self.context.get_type(node.parent))
-            except SemanticError as e:
-                self.errors.append(e.text)
-                
+                parent_type = self.current_type.set_parent(self.context.get_type(node.parent))
+            except SemanticError:
+                line, lexpos = node.parent_pos
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Parent type for class "{node.name}" is an undefined type "{node.parent}"')
+
+            # try:
+            #     self.current_type.set_parent(parent_type)
+            # except SemanticError:
+            #     self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Parent type is already set for "{node.name}"')   
         else:
-            obj = self.context.get_type('Object')
-            self.current_type.set_parent(obj)
+            # obj = self.context.get_type('Object')
+            # self.current_type.set_parent(obj)
+
+            try:
+                self.current_type.set_parent(self.context.get_type("Object"))
+            except SemanticError:
+                if node.name not in ["Int","String","Bool","IO","Object","SELF_TYPE"]:
+                    self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Parent type is already set for "{node.name}"') 
         
-        for item in node.data:
-             self.visit(item)
+        # for item in node.data:
+        #      self.visit(item)
 
     @visitor.when(ast.MethodDecNode)
     def visit(self, node: ast.MethodDecNode):
@@ -115,10 +149,91 @@ class TypeBuilder:
         try:
             type_ = self.context.get_type(node._type)
             self.current_type.define_attribute(node.name, type_)
-        except SemanticError as e:
-            self.errors.append(e.text)
-            self.current_type.define_attribute(node.name, ErrorType())
+        except SemanticError:
+            pass
+            # self.errors.append(
+                # f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) \
+                #     - SemanticError: Method "{self.name}" already defined in \
+                #         {self.current_type.name}')
+            # self.errors.append(e.text)
+            # self.current_type.define_attribute(node.name, ErrorType())
 
+
+class TypeBuilderFeature:
+    def __init__(self, context: Context, errors, program):
+        self.context = context
+        self.current_type = None
+        self.errors = errors
+        self.program = program
+    
+    def get_tokencolumn(self, str, pos):
+        column = 1
+        temp_pos = pos
+        while str[temp_pos] != '\n':
+            if temp_pos == 0: break
+            temp_pos -= 1
+            column += 1
+        return column if column > 1 else 2
+
+    @visitor.on('node')
+    def visit(self, node):
+        pass
+
+    @visitor.when(ast.ProgramNode)
+    def visit(self, node: ast.ProgramNode):
+        for item in node.class_list:
+            self.visit(item)
+
+    @visitor.when(ast.ClassDecNode)
+    def visit(self, node: ast.ClassDecNode):
+        self.current_type = self.context.get_type(node.name)
+
+        for data in node.data:
+            self.visit(data)
+
+        self.current_type = self.context.get_type(node.name)
+        
+    
+    @visitor.when(ast.AttributeDecNode)
+    def visit(self, node: ast.AttributeDecNode):
+        line, lexpos = node.type_pos
+        try:
+            attr_type = self.context.get_type(node._type)
+        except SemanticError:
+            attr_type = ErrorType()
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Undefined type "{node._type}" for attribute "{node.name}" in class "{self.current_type.name}"')
+
+        try:
+            self.current_type.define_attribute(node.name, attr_type)
+        except SemanticError:
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: Attribute "{node.name}" is already defined in "{self.current_type.name}".')
+    
+    @visitor.when(ast.MethodDecNode)
+    def visit(self, node: ast.MethodDecNode):
+        param_names = []
+        param_types = []
+
+        # (name, typex)
+        for i, param in enumerate(node.params):
+            name = param.name
+            typex = param.type
+            param_names.append(name)
+            try:
+                param_types.append(self.context.get_type(typex))
+            except SemanticError:
+                param_types.append(ErrorType())
+                line, lexpos = node.p_types_positions[i]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Undefined param type "{typex}" in method "{node.name}", in class "{self.current_type.name}"')
+        try:
+            return_type = self.context.get_type(node.type)
+        except SemanticError:
+            return_type = ErrorType()
+            line, lexpos = node.r_types_position
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Undefined return type "{node.type}" in method "{node.name}", in class "{self.current_type.name}"')
+        try:
+            self.current_type.define_method(node.name, param_names, param_types, return_type)
+        except SemanticError:
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Method "{node.name}" already defined in {self.current_type.name}')
 
 class TypeChecker:
     def __init__(self, context: Context, errors, program):
@@ -150,25 +265,37 @@ class TypeChecker:
 
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode, scope: Scope):
-        try:
-            self.current_type = self.context.get_type(node.name)
-        except SemanticError as e:
-            self.errors.append(e.text)
-        for item in node.data:
+        self.current_type = self.context.get_type(node.name)
+        
+        attributes = [att for att in node.data if isinstance(att, ast.AttributeDecNode)]
+        methods = [meth for meth in node.data if isinstance(meth, ast.MethodDecNode)]
+        
+        for attr, attr_owner in self.current_type.all_attributes():
+            if attr_owner != self.current_type:
+                scope.define_variable(attr.name, attr.type)
+
+        for item in attributes:
+            self.visit(item, scope)
+        
+        for item in methods:
             self.visit(item, scope.create_child())
     
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode, scope: Scope):
         if node.name == 'self':
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Cannot set "self" as attribute of a class.')
-
-        attr_type = self.current_type if node._type == 'SELF_TYPE' else self.context.get_type(node._type)
+        try:
+            attr_type = self.current_type if node._type == 'SELF_TYPE' else self.context.get_type(node._type)
+        except SemanticError: attr_type = ErrorType()
+        
+        scope.define_variable('self', self.current_type)
+        self.current_attribute = self.current_type.get_attribute(node.name)
+        self.current_method = None
 
         if node.expr is not None:
             expr_type = self.visit(node.expr, scope.create_child())
-            if not expr_type.conforms_to(attr_type):
+            if expr_type is not None and not expr_type.conforms_to(attr_type):
                 self.errors.append(f'({node.expr_pos[0]}, {node.expr_pos[1]}) - TypeError: Cannot convert "{expr_type.name}" into "{attr_type.name}".')
-
         scope.define_variable(node.name, attr_type)
     
     @visitor.when(ast.MethodDecNode)
@@ -193,7 +320,7 @@ class TypeChecker:
 
         expr_type = self.visit(node.expr, scope)
 
-        if not expr_type.conforms_to(return_type):
+        if expr_type is not None and not expr_type.conforms_to(return_type):
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{return_type.name}".')
 
     # expresiones
@@ -248,13 +375,14 @@ class TypeChecker:
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
         var_type = scope.find_variable(node.idx)
-        if var_type.name == "self":
-            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Variable "self" is read-only.')
-
-        type_ = self.visit(node.expr, scope.create_child())
         if var_type is None:
             self.error.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - NameError: Variable "{self.idx}" is not defined in "{self.current_method.name}".')
         else:
+            if var_type.name == "self":
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Variable "self" is read-only.')
+
+            type_ = self.visit(node.expr, scope.create_child())
+        
             if not type_.conforms_to(var_type.type):
                 self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{type_.name}" into "{var_type.type.name}".')
             # if type_ is not None:
@@ -271,11 +399,11 @@ class TypeChecker:
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode, scope: Scope):
         type_ = ErrorType()
-        sc = scope.create_child()
-        if not node.expr:
-            self.errors.append('Los bloques deben contener al menos una expresión.')
+        # sc = scope.create_child()
+        # if not node.expr:
+        #     self.errors.append('Los bloques deben contener al menos una expresión.')
         for expr in node.expr:
-            type_ = self.visit(expr, sc)    
+            type_ = self.visit(expr, scope)    
         return type_
 
     @visitor.when(ast.MethodCallNode)
@@ -289,22 +417,28 @@ class TypeChecker:
         if node.type is not None:
             try:
                 parent_type = self.context.get_type(node.type)
-            except SemanticError as e:
+            except SemanticError:
                 parent_type = ErrorType()
                 line, lexpos = node.type_position
-                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Type "{node.type}" is not defined')
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)})\
+                     - TypeError: Type "{node.type}" is not defined')
 
             if not obj_type.conforms_to(parent_type):
                 line, lexpos = node.type_position
-                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Class "{obj_type.name}" has no an ancestor class "{parent_type.name}".')
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)})\
+                     - TypeError: Class "{obj_type.name}" has no an ancestor \
+                         class "{parent_type.name}".')
         else:
             parent_type = obj_type
 
         try:
             method = parent_type.get_method(node.idx)
-        except SemanticError as e:
+        except SemanticError:
             line, lexpos = node.id_position
-            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - AttributeError: Dispatch undefined method "{node.idx}" from type {obj_type.name}')
+            self.errors.append(
+                f'({line}, {self.get_tokencolumn(self.program, lexpos)})\
+                     - AttributeError: Dispatch undefined method "{node.idx}"\
+                          from type {obj_type.name}')
             for arg in node.exprlist:
                 self.visit(arg, scope)
             return ErrorType()
@@ -313,11 +447,12 @@ class TypeChecker:
             line, lexpos = node.id_position
             self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: Method "{method.name}" of type "{obj_type.name}" called with wrong number of arguments. Expected {len(node.exprlist)} instead of {len(method.param_names)}')
 
-        for i, arg in enumerate(node.exprlist):
-            arg_type = self.visit(arg, scope)
-            if not arg_type.conforms_to(method.param_types[i]):
-                line, lexpos = node.exprlist_positions[i]
-                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Cannot convert "{arg_type.name}" into "{method.param_types[i].name}".')
+        else:
+            for i, arg in enumerate(node.exprlist):
+                arg_type = self.visit(arg, scope)
+                if not arg_type.conforms_to(method.param_types[i]):
+                    line, lexpos = node.exprlist_positions[i]
+                    self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Cannot convert "{arg_type.name}" into "{method.param_types[i].name}".')
 
         return method.return_type if method.return_type.name != 'SELF_TYPE' else parent_type
 
@@ -327,8 +462,10 @@ class TypeChecker:
         if if_type != self.context.get_type('Bool'):
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{if_type.name}" into "Bool".')
 
-        self.visit(node.then_expr, scope.create_child())
-        self.visit(node.else_expr, scope.create_child())
+        then_ = self.visit(node.then_expr, scope.create_child())
+        else_ = self.visit(node.else_expr, scope.create_child())
+
+        return then_.join(else_)
         
     @visitor.when(ast.NewNode)
     def visit(self, node: ast.NewNode, scope: Scope):
@@ -354,15 +491,16 @@ class TypeChecker:
             self.errors.append('La expresión del \'case\' no puede ser nula.')
         t = []
         v = []
-        sc = scope.create_child()
         for pos, (id_, type_, expr) in enumerate(node.params):
+            sc = scope.create_child()
             try:
-                if type_ == 'SELF_TYPE':
-                    sc.define_variable(id_, self.context.get_type(type_))
-                    current_type = self.current_type
+                if type_ != 'SELF_TYPE':
+                    t_ = self.context.get_type(type_)
+                    sc.define_variable(id_, t_)
                 else:
                     line, lexpos = node.cases_positions[pos]
-                    self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: "{type_.name}" cannot be a static type of a case branch.')
+                    type_
+                    self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: "{type_}" cannot be a static type of a case branch.')
             except SemanticError:
                 sc.define_variable(id_, ErrorType())
                 line, lexpos = node.cases_positions[pos]
@@ -375,15 +513,8 @@ class TypeChecker:
 
             v.append(type_)
             t.append(self.visit(expr, sc))
-            # if scope.is_local_variable(id_):
-            #     self.errors.append(f'La variable \'{id_}\' ya ha sido definida.')
-            # else:
-            #     sc.define_variable(id_, current_type)
-                
-            # if expr is not None:
-                # self.visit(expr, sc)
         
-        return return_type
+        return Type.multi_join(t)
         
 
     # variable
@@ -395,8 +526,11 @@ class TypeChecker:
     def visit(self, node: ast.VariableNode, scope: Scope):
         var_ = scope.find_variable(node.lex)
         if var_ is None:
-            self.errors.append(#f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - NameError: Variable "%s" is not defined in "%s".')
-                f'La variable {node.lex} no ha sido definida definida')
+            if self.current_attribute is not None:
+                name = self.current_attribute.name
+            else:
+                name = self.current_method.name
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - NameError: Variable "{node.lex}" is not defined in "{name}".')
             return ErrorType()
         return var_.type
 
@@ -456,8 +590,9 @@ class TypeChecker:
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         bool_type = self.context.get_type('Bool')
+        int_type = self.context.get_type('Int')
 
-        if right == bool_type and left == bool_type:
+        if right == int_type and left == int_type:
             return bool_type
         else:
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<" is not defined between "{left.name}" and "{right.name}".') 
@@ -468,8 +603,9 @@ class TypeChecker:
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         bool_type = self.context.get_type('Bool')
+        int_type = self.context.get_type('Int')
 
-        if right == bool_type and left == bool_type:
+        if right == int_type and left == int_type:
             return bool_type
         else:
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<=" is not defined between "{left.name}" and "{right.name}".') 
@@ -481,8 +617,8 @@ class TypeChecker:
         left = self.visit(node.left, scope)
 
         types_ = ['Int', 'Bool', 'String']
-        if (right.name not in types_ or left.name not in types_) and right.name != left.name:
-            self.errors.append('({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: For operation "=" if one of the expression has static type Int, Bool or String, then the other must have the same static type')
+        if (right.name in types_ or left.name in types_) and right.name != left.name:
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: For operation "=" if one of the expression has static type Int, Bool or String, then the other must have the same static type')
         
         return self.context.get_type('Bool')     
 

@@ -11,7 +11,7 @@ from utils.formatter import Formatter, CodeBuilder
 from utils.semantic import Context, Scope
 from utils.inference import InferenceTypeChecker
 from utils.instance import Execution
-from utils.type_analysis import TypeBuilder, TypeChecker, TypeCollector, PositionateTokensInAST
+from utils.type_analysis import TypeBuilder, TypeChecker, TypeCollector, PositionateTokensInAST, TypeBuilderFeature
 from utils.auxiliar_methods import erase_multiline_comment
 
 app = typer.Typer()
@@ -260,20 +260,25 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
 
     else:
         PositionateTokensInAST(tokens).visit(ast)
-        TypeCollector(context, errors).visit(ast)
-        TypeBuilder(context, errors).visit(ast)
-        CyclicDependency(context, errors)
-        # try:
-        TypeChecker(context, errors, program).visit(ast, scope)
-        # except Exception as e:
-            # e.text
-            # errors
+        TypeCollector(context, errors, program).visit(ast)
         if errors:
-            # print_errors('\n'.join(errors))
-            print_errors(errors[-1])
-            # InferenceTypeChecker(context, errors).visit(ast, Scope())
-            # CodeBuilder().visit(ast, 0) # se puede ver el codigo transformado
-            # Execution(context).visit(ast, Scope())
+            for item in errors:
+                print_errors(item)
+            exit(1)
+        TypeBuilder(context, errors, program).visit(ast)
+        TypeBuilderFeature(context, errors, program).visit(ast)
+        if errors:
+            for item in errors:
+                print_errors(item)
+            exit(1)
+        CyclicDependency(context, errors)
+        InferenceTypeChecker(context, errors, program).visit(ast, scope)
+
+        TypeChecker(context, errors, program).visit(ast, scope)
+        
+        if errors:
+            for item in errors:
+                print_errors(item)
             exit(1)
         ### code generation ###          
             
@@ -281,12 +286,3 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
     
 if __name__ == '__main__':
     app()
-    # test_execution("testing/inference/program10.cl")
-    # test_execution("tests/lexer/comment1.cl")
-    # tokenize("tests/lexer/comment1.cl")
-    # tokenize("tests/lexer/string1.cl")
-    # tokenize("tests/lexer/string4.cl")
-    
-    #final_execution('../../tests/parser/assignment2.cl','')
-    
-    # final_execution('tests/lexer/c.cl',0)
