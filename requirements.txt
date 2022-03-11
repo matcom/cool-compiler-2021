@@ -1,5 +1,6 @@
 ply
 pytest
+pytest-ordering
 typing
 collections
 inspect
