@@ -85,8 +85,6 @@ class TypeCheckerVisitor:
             if node.attr_info is not None:
                 node_type = node.attr_info.type
 
-                # TODO: SELF_TYPE
-
                 if node.body is not None and not exp.type.conforms_to(node_type):
                     self.errors.append(
                         errors.IncompatibleTypesError(
@@ -118,23 +116,7 @@ class TypeCheckerVisitor:
 
             body = self.visit(node.body, method_scope)
 
-            if (
-                self.current_method.return_type.name == "SELF_TYPE"
-                and not body.type.conforms_to(self.current_type)
-            ):
-                self.errors.append(
-                    errors.IncompatibleTypesError(
-                        node.lineno,
-                        node.columnno,
-                        body.type.name,
-                        self.current_type.name,
-                    )
-                )
-
-            elif (
-                self.current_method.return_type.name != "SELF_TYPE"
-                and not body.type.conforms_to(self.current_method.return_type)
-            ):
+            if not body.type.conforms_to(self.current_method.return_type):
                 self.errors.append(
                     errors.IncompatibleTypesError(
                         node.lineno,
@@ -171,11 +153,6 @@ class TypeCheckerVisitor:
 
         args = [self.visit(arg, scope) for arg in node.args]
 
-        if exp.type.name == "AUTO_TYPE":
-            return type_checked.CoolDispatchNode(
-                node.lineno, node.columnno, exp, node.id, args, exp.type
-            )
-
         try:
             method = exp.type.get_method(node.id)
         except semantic.BaseSemanticError as e:
@@ -202,11 +179,6 @@ class TypeCheckerVisitor:
                         node.lineno, node.columnno, arg.type.name, ptype.name
                     )
                 )
-
-        if method.return_type.name == "SELF_TYPE":
-            return type_checked.CoolDispatchNode(
-                node.lineno, node.columnno, exp, node.id, args, exp.type
-            )
 
         return type_checked.CoolDispatchNode(
             node.lineno, node.columnno, exp, node.id, args, method.return_type
@@ -306,14 +278,7 @@ class TypeCheckerVisitor:
             right_type = right_exp.type
             # decl_list.append(idx, _type, right_exp)
 
-        if typex.name == "SELF_TYPE" and not right_type.conforms_to(self.current_type):
-            self.errors.append(
-                errors.IncompatibleTypesError(
-                    node.lineno, node.columnno, right_type.name, self.current_type.name,
-                )
-            )
-
-        elif typex.name != "SELF_TYPE" and not right_type.conforms_to(typex):
+        if not right_type.conforms_to(typex):
             self.errors.append(
                 errors.IncompatibleTypesError(
                     node.lineno, node.columnno, right_type.name, typex.name
@@ -614,9 +579,6 @@ class TypeCheckerVisitor:
 
     @visitor.when(type_built.CoolNewNode)
     def visit(self, node, scope):
-        if node.type_name == "SELF_TYPE":
-            type_checked.CoolNewNode(node.lineno, node.columnno, self.current_type)
-
         try:
             type = self.get_type(node.type_name)
         except semantic.BaseSemanticError as e:
