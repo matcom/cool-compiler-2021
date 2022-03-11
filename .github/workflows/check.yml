@@ -6,17 +6,7 @@
 # We need to make sure the checked-in `index.js` actually matches what we expect it to be.
 name: Check dist/
 
-on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-  pull_request:
-    paths-ignore:
-      - '**.md'
-  workflow_dispatch:
-
+on: [push, pull_request]
 jobs:
   check-dist:
     runs-on: ubuntu-latest
