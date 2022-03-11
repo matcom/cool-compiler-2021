@@ -1,3 +1,8 @@
 ply
 pytest
-pytest-ordering
+re
+itertools
+typing
+enum
+collections
+inspect
