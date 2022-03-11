@@ -17,7 +17,7 @@ Para utilizar _El Compi_ y ejecutar un programa en el lenguaje COOL se han de se
 $ pip install -r requirements.txt
 ```
 
-2- Para compilar un código dado en COOL a ensamblador, ejecute:
+2- Para compilar un código dado en COOL a MIPS, ejecute:
 
 ```bash
 $ ./coolc.sh <path_to_file/file_name.cl>
@@ -47,13 +47,9 @@ _El Compi_, para tener la funcionalidad completa de un compilador, transita por 
 
 Más adelante se analizan a profundidad cada una.
 
-El código fuente del proyecto se encuentra en la carpeta _src_. En esta se hallan distribuidos los scripts según su funcionalidad.
+El código fuente del proyecto se encuentra en la carpeta **src**. En esta se hallan distribuidos los scripts por módulos según su funcionalidad. 
 
-**FOTO de los archivos del proyecto**
-
-Si lo miramos como módulos, podemos decir que el módulo de lexe... en _code_gen_ encontramos todo lo referente al proceso de generación de código... en tools todo los utils para...
-
-**COMPLETAR**
+En el módulo de **parsing** se halla definida nuestra gramática, y se brindan herramientas para trabajar con el lexer de **PLY** y el parser LR1 definido. El módulo **semantic** implementa los nodos del ast de **Cool** con que se trabaja y los recorridos para las definiciones de tipos y el chequeo semántico en general. En **code_gen** encontramos todo lo referente al proceso de generación de código, desde los nodos de **CIL** hasta los de **MIPS** y el pipeline para hacer dichas conversiones. Finalmente, en **cmp** se mantienen algunos útiles proporcionados por el claustro de Compilación, algunos adaptados a los requerimientos del proyecto actual.   
 
 Analicemos ahora los prometidos detalles de implementacion y diseño tan anunciados.
 
@@ -174,4 +170,73 @@ El tipo dinámico **C** no se conoce hasta el momento de ejecución, que es cuan
 
 ### De CIL a MIPS:
 
-...
+Para la generación de código MIPS se definió un visitor sobre el ast de CIL generado en el paso anterior, este visitor generará a su vez un ast de MIPS que representa las secciones  .data y .text con sus instrucciones; donde cada nodo conoce su representación en MIPS. Posteriormente se visitará en nodo principal del ast de MIPS y se producirá el código que será ejecutado por el emulador de SPIM.
+
+ Al visitar el cil.Program se visitarán los nodos de la sección dottype, para representar en .data la tabla de métodos virtuales, para cuando se produzcan llamadas a métodos no estáticos. Por cada TypeNode se registra en .data un label con el nombre del tipo, .word como tipo de almacenamiento, y una serie de labels, cada una correspondiente a un método del tipo.
+
+```mips
+Object : .word, Object_abort, Object_copy, Object_type_name
+```
+
+  Para acceder a un método específico de un tipo se busca en la dirección de memoria dada por el label correspondiente a este, sumada con el índice correspodiente al método, multiplicado por 4 este índice está dado por el orden en que se declararon los métodos, aquí se hallará un puntero al método deseado.
+
+El siguiente paso es visitar la sección dotdata, para registrar los strings declarados en el código de COOL, de la siguiente forma:
+
+```
+string_1 : .asciiz, "Hello, World.\n"
+```
+
+Finalmente se visitarán los nodos de la sección dotcode, que corresponden a las instrucciones del programa.
+
+Cada uno de estos nodos es un FunctionNode, en cada uno se van generando nodos del ast siguiendo la siguiente línea:
+
+- Se reserva el espacio de las variables locales correspondientes a la función.
+
+- Se actualiza el frame pointer #$fp# con el stack pointer.
+
+- Se guarda  la dirección de retorno $ra en la pila.
+
+- Se guarda el frame pointer anterior en la pila.
+
+- Se visitan las instrucciones de la función.
+
+- Se restaura el puntero al bloque remplazándolo con el que había sido almacenado.
+
+- Se restaura la dirección de retorno.
+
+- Se libera el espacio que había sido reservado en la pila.
+
+  Siempre se conocerá el offset, con respecto a $fp correspondiete a las variables locales y parámetros que se utilizan en el cuerpo de una función.
+
+  Para realizar llamadas a funciones que reciban argumentos es obligatorio guardar los argumentos en la pila antes de llamar a la función.
+
+  El recorrido por las instrucciones no  es presenta gran complejidad, es simplemente traducir sencillas expresiones de CIL a expresiones de MIPS, sin embargo hay algunos casos interesantes que vale la pena destacar.
+
+  - La reserva dinámica de memoria para instanciar tipos se realiza mediante Allocate, el compilador reservará un espacio de tamaño (CantidadAtributos + 1) * 4. En los primeros 4 bytes ser guarda la dirección del tipo de la instancia, y en las siguientes palabras están reservadas para los atributos. 
+
+  La representación de las instancias de tipos en memoria se estructuró así:
+
+  |   Tipo    | Atributo 1  | Atributo 2  | .... |  Atributo n   |
+  | :-------: | :---------: | :---------: | :--: | :-----------: |
+  | Dirección | Dirección+4 | Dirección+8 |      | Dirección+4*n |
+
+  - Existen dos tipos de llamados a funciones, llamado estático y dinámico.
+
+     El llamado estático es muy sencillo es simplementer saltar al label dado mediante la función de MIPS **jal** y al retornar, liberar el espacio en la pila correspondiente a los argumentos pasados a la función.
+
+    Por otro lado el llamado dinámico es más complejo, pues dada la instancia y el índice del método, se busca en la pila la instancia, se toma la posición 0 que corresponde a la dirección(d) de su tipo, y a partir de esta se obtiene la función que está en d + 4 * i. Luego se salta al label de la función  y por último se libera el espacio en la pila correspondiente a los argumentos pasados.
+
+    Mucho nodos son importantes entre ellos los que corresponden a la entrada y salida, a las operaciones sobre cadenas, y operaciones lógicas y aritméticas, estos llevan más trabajo con la lógica de MIPS que no consideramos necesario de abordar.  
+
+    
+
+   
+
+  
+
+  
+
+  
+
+
+
