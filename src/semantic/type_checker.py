@@ -2,10 +2,10 @@ from email import message
 import cmp.nbpackage
 import cmp.visitor as visitor
 
-from ast_nodes import LessEqualNode, LessNode, Node, ProgramNode, ExpressionNode
-from ast_nodes import ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
-from ast_nodes import VarDeclarationNode, AssignNode, CallNode
-from ast_nodes import (
+from semantic.ast_nodes import LessEqualNode, LessNode, Node, ProgramNode, ExpressionNode
+from semantic.ast_nodes import ClassDeclarationNode, FuncDeclarationNode, AttrDeclarationNode
+from semantic.ast_nodes import VarDeclarationNode, AssignNode, CallNode
+from semantic.ast_nodes import (
     AtomicNode,
     BinaryNode,
     ArithmeticOperation,
@@ -18,7 +18,7 @@ from ast_nodes import (
     BlockNode,
     IsvoidNode,
 )
-from ast_nodes import (
+from semantic.ast_nodes import (
     ConstantNumNode,
     VariableNode,
     InstantiateNode,
@@ -32,7 +32,7 @@ from ast_nodes import (
     BooleanNode,
     StringNode,
 )
-from cool_visitor import FormatVisitor
+from semantic.cool_visitor import FormatVisitor
 
 from cmp.semantic import SemanticError as SError
 from cmp.semantic import Attribute, Method, Type
@@ -43,8 +43,8 @@ from cmp.semantic import Scope
 from cmp.utils import find_least_type
 
 import copy
-from errors import TypeError, NameError, SemanticError, AttributeError
-import ast_typed_nodes as cool_type_nodes
+from cmp.errors import TypeError, NameError, SemanticError, AttributeError
+import code_gen.ast_typed_nodes as cool_type_nodes
 
 # some predefined errors
 WRONG_SIGNATURE = 'Method "%s" already defined in "%s" with a different signature.'
@@ -458,6 +458,10 @@ class TypeChecker:
 
     @visitor.when(CaseItemNode)
     def visit(self, node, scope):
+        if node.id.lex == "self":
+            node_row, node_col = node.id.location
+            self.errors.append(SemanticError(node_row, node_col, "'self' cannot be bound in a 'case' expression. " + SELF_IS_READONLY))
+
         try:
             static_type = self.context.get_type(node.type.lex)
             scope.define_variable(node.id.lex, static_type)

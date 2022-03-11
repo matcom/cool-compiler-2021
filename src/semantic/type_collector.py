@@ -12,10 +12,10 @@ from cmp.semantic import (
     IOType,
 )
 from cmp.semantic import Context
-from ast_nodes import ProgramNode, ClassDeclarationNode
+from semantic.ast_nodes import ProgramNode, ClassDeclarationNode
 import cmp.visitor as visitor
-from cool_visitor import CopyVisitor
-from errors import SemanticError
+from semantic.cool_visitor import CopyVisitor
+from cmp.errors import SemanticError
 
 class TypeCollector(object):
     def __init__(self, errors=[]):

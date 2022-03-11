@@ -2,7 +2,7 @@
 import cmp.nbpackage
 import cmp.visitor as visitor
 
-import ast_typed_nodes as cool
+import code_gen.ast_typed_nodes as cool
 
 from cmp.cil import (
     ProgramNode,
@@ -49,7 +49,7 @@ from cmp.cil import (
     ExitNode,
     CompareTypes
 )
-from cool_visitor import FormatVisitor
+from semantic.cool_visitor import FormatVisitor
 
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import VoidType, ErrorType, IntType

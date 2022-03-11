@@ -1,5 +1,5 @@
 from cmp.pycompiler import Grammar
-from ast_nodes import (
+from semantic.ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     FuncDeclarationNode,
@@ -118,12 +118,12 @@ def define_cool_grammar(print_grammar=False):
     )
     identifier_init %= idx + colon + type_id, lambda h, s: VarDeclarationNode(s[1], s[3])
 
-    comp %= comp + less + arith, lambda h, s: LessNode(s[1], s[3], s[2]) # this expression do not associate, so call comp instead of arith
-    comp %= comp + less + notx + arith, lambda h, s: LessNode(s[1], NotNode(s[4], s[3]) , s[2])
-    comp %= comp + equal + arith, lambda h, s: EqualNode(s[1], s[3], s[2])
-    comp %= comp + equal + notx + arith, lambda h, s: EqualNode(s[1], NotNode(s[4], s[3]) , s[2])    
-    comp %= comp + lesseq + arith, lambda h, s: LessEqualNode(s[1], s[3], s[2])
-    comp %= comp + lesseq + notx + arith, lambda h, s: LessEqualNode(s[1], NotNode(s[4], s[3]) , s[2])
+    comp %= arith + less + arith, lambda h, s: LessNode(s[1], s[3], s[2]) 
+    comp %= arith + less + notx + expr, lambda h, s: LessNode(s[1], NotNode(s[4], s[3]) , s[2])
+    comp %= arith + equal + arith, lambda h, s: EqualNode(s[1], s[3], s[2])
+    comp %= arith + equal + notx + expr, lambda h, s: EqualNode(s[1], NotNode(s[4], s[3]) , s[2])    
+    comp %= arith + lesseq + arith, lambda h, s: LessEqualNode(s[1], s[3], s[2])
+    comp %= arith + lesseq + notx + expr, lambda h, s: LessEqualNode(s[1], NotNode(s[4], s[3]) , s[2])
     comp %= arith, lambda h, s: s[1]
 
     arith %= arith + plus + term, lambda h, s: PlusNode(s[1], s[3], s[2])

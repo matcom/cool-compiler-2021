@@ -3,17 +3,17 @@ from cmp.semantic import SemanticError as SError
 from cmp.semantic import Attribute, Method, Type
 from cmp.semantic import VoidType, IntType, ErrorType, StringType, BoolType
 from cmp.semantic import Context
-from ast_nodes import (
+from semantic.ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     AttrDeclarationNode,
     FuncDeclarationNode,
 )
 import cmp.visitor as visitor
-from tset import Tset
+from semantic.tset import Tset
 from collections import deque
-from cool_visitor import CopyVisitor
-from errors import SemanticError, TypeError
+from semantic.cool_visitor import CopyVisitor
+from cmp.errors import SemanticError, TypeError
 
 class TypeBuilder:
     def __init__(self, errors=[]):
