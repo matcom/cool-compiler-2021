@@ -12,10 +12,11 @@ class SemanticError(Exception):
 
 
 class Attribute:
-    def __init__(self, name: str, typex: Type, node: ast.ExpressionNode):
+    def __init__(self, name: str, typex: Type, node: ast.ExpressionNode, scope: Scope = None):
         self.name = name
         self.type = typex
         self.node = node
+        self.scope = scope
 
     def __str__(self) -> str:
         return f'[attrib] {self.name} : {self.type.name};'
@@ -233,7 +234,7 @@ class VariableInfo:
 
 
 class Scope:
-    def __init__(self, tag: str = None, parent: Scope = None):
+    def __init__(self, tag: str, parent: Scope = None):
         self.locals: list[VariableInfo] = []
         self.tag = tag
         self.parent = parent
@@ -243,7 +244,7 @@ class Scope:
     def __len__(self) -> int:
         return len(self.locals)
 
-    def create_child(self, tag: str = None) -> Scope:
+    def create_child(self, tag: str) -> Scope:
         child = Scope(tag, self)
         self.children.append(child)
         return child
@@ -268,7 +269,7 @@ class Scope:
 
     def get_tagged_scope(self, tag: str) -> Scope | None:
         scope = None
-        if self.tag is not None and self.tag == tag:
+        if self.tag == tag:
             scope = self
         else:
             for child in self.children:

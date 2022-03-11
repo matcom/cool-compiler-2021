@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from coolcmp.utils import ast
 from coolcmp.utils import extract_feat_name
+from coolcmp.utils.semantic import Scope
 
 
 class Node:
@@ -102,7 +103,7 @@ class TypeNode(Node):
                  parent: str | None,
                  attrs: list[str],
                  methods: dict[MethodAt | str, str],
-                 attr_expr_nodes: dict[str, ast.ExpressionNode] = None):
+                 attr_expr_nodes: dict[str, tuple[ast.ExpressionNode, Scope]] = None):
         self.name = name
         self.parent = parent
         self.attributes = attrs
@@ -113,10 +114,10 @@ class TypeNode(Node):
 
     # Add the expression node of the attributes, so when is created an instance
     #   get quick access to the instructions of the attribute initialization.
-    def add_attr_node(self, attr: str, node: ast.ExpressionNode | int | str):
-        self.attr_expr_nodes[attr] = node
+    def add_attr_node(self, attr: str, node: ast.ExpressionNode | int | str, scope: Scope):
+        self.attr_expr_nodes[attr] = (node, scope)
 
-    def get_attr_node(self, attr: str):
+    def get_attr_node(self, attr: str) -> tuple[ast.ExpressionNode | int | str, Scope]:
         return self.attr_expr_nodes.get(attr)
 
     def add_local(self, local: LocalNode):

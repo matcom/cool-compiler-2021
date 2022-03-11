@@ -73,10 +73,9 @@ class TypeChecker:
         for feature in node.features:
             if isinstance(feature, AttrDeclarationNode):
                 self.visit(feature, scope)
-            elif isinstance(feature, FuncDeclarationNode):
+        for feature in node.features:
+            if isinstance(feature, FuncDeclarationNode):
                 self.visit(feature, scope.create_child(feature.id))
-            else:
-                raise Exception(f'Invalid feature at class {node.id}')
 
     @visitor.when(AttrDeclarationNode)
     def visit(self, node: AttrDeclarationNode, scope: Scope):
@@ -101,6 +100,7 @@ class TypeChecker:
             if not expr_type.conforms_to(attr_type):
                 self.errors.append(err.INCOMPATIBLE_TYPES % (node.expr_pos, expr_type.name, attr_type.name))
 
+        self.current_type.get_attribute(node.id).scope = scope
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node: FuncDeclarationNode, scope: Scope):

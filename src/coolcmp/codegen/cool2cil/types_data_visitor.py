@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 
 from coolcmp.utils import visitor, ast, cil
 from coolcmp.utils.semantic import Context, Type
@@ -129,7 +130,7 @@ class DotTypesDataVisitor:
 
         for attr, _ in type_.all_attributes():
             type_attributes.append(f'{type_.name}_{attr.name}')
-            type_node.add_attr_node(f'{node.id}_{attr.name}', attr.node)
+            type_node.add_attr_node(f'{node.id}_{attr.name}', attr.node, deepcopy(attr.scope))
 
         for meth, owner in type_.all_methods():
             # if owner.name in ('Object', 'IO', 'String', 'String', 'Bool', 'Int', ):

@@ -2,7 +2,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import List, Tuple
 
-from coolcmp.utils import ast, cil, visitor
+from coolcmp.utils import ast, cil, visitor, extract_feat_name
 from coolcmp.utils.semantic import Context, Scope
 
 
@@ -65,10 +65,10 @@ class DotCodeVisitor:
         # has access to void through that attribute in every class.
         # So, pop it to avoid repeated locals.
         scope.locals.pop(0)
-
+        print(scope)
         # build the code functions
         for class_ in node.declarations:
-            print(f'visiting {class_.id} with scope {scope.get_tagged_scope(class_.id).tag}')
+            print(f'visiting {class_.id} with scope {scope.get_tagged_scope(class_.id).tag} and childrens {[c.tag for c in scope.get_tagged_scope(class_.id).children]}')
             self.visit(class_, deepcopy(scope.get_tagged_scope(class_.id)))
 
             # build the entry function:
@@ -303,24 +303,47 @@ class DotCodeVisitor:
         self.root.dot_code.append(init)
         self.current_init = init
 
+        self.current_function = self.current_init
+        type_node = self.root.get_type(self.current_type)
+        for attr_name in type_node.attributes:
+            attr = self.add_local(extract_feat_name(attr_name), internal=False)
+            attr_expr, scope = type_node.get_attr_node(attr_name)
+            attr_value = self.visit(attr_expr, scope)
+            attr_index = type_node.attributes.index(attr_name)
+            attr_at = cil.AttributeAt(attr_name, attr_index)
+            self.add_inst(cil.SetAttrNode('self', attr_at, attr_value))
+            self.add_inst(cil.AssignNode(attr, attr_value))
+
         for feat in node.features:
-            if isinstance(feat, ast.AttrDeclarationNode):
-                self.visit(feat, scope)
-            elif isinstance(feat, ast.FuncDeclarationNode):
+            # if isinstance(feat, ast.AttrDeclarationNode):
+            #     visited_attrs.append(feat.id)
+            #     self.visit(feat, scope)
+            if isinstance(feat, ast.FuncDeclarationNode):
+                print(scope.tag, [c.tag for c in scope.children], feat.id)
                 self.visit(feat, scope.get_tagged_scope(feat.id))
 
         init.instructions.append(cil.ReturnNode('self'))
 
-    @visitor.when(ast.AttrDeclarationNode)
-    def visit(self, node: ast.AttrDeclarationNode, scope: Scope):
-        self.current_function = self.current_init
-        attr = self.add_local(node.id, internal=False)
+    # @visitor.when(ast.AttrDeclarationNode)
+    # def visit(self, node: ast.AttrDeclarationNode, scope: Scope):
+    #     self.current_function = self.current_init
+    #     attr = self.add_local(node.id, internal=False)
+    #
+    #     attr_index = self.root.get_type(self.current_type).attributes.index(f'{self.current_type}_{node.id}')
+    #     if node.expr is not None:
+    #         result = self.visit(node.expr, scope)
+    #         self.add_inst(cil.SetAttrNode('self', cil.AttributeAt(attr, attr_index), result))
+    #         self.add_inst(cil.AssignNode(attr, result))
+    #     else:
+    #         type_node = self.root.get_type(self.current_type)
+    #         attr_expr = type_node.get_attr_node(node.id)
+    #         attr_value = self.visit(attr_expr, scope)
+    #         attr_index = type_node.attributes.index(node.id)
+    #         attr_at = cil.AttributeAt(node.id, attr_index)
+    #         self.add_inst(
+    #             cil.SetAttrNode('self', attr_at, attr_value)
+    #         )
 
-        attr_index = self.root.get_type(self.current_type).attributes.index(f'{self.current_type}_{node.id}')
-        if node.expr is not None:
-            result = self.visit(node.expr, scope)
-            self.add_inst(cil.SetAttrNode('self', cil.AttributeAt(attr, attr_index), result))
-            self.add_inst(cil.AssignNode(attr, result))
 
     @visitor.when(ast.FuncDeclarationNode)
     def visit(self, node: ast.FuncDeclarationNode, scope: Scope):
@@ -395,8 +418,10 @@ class DotCodeVisitor:
 
         # Sort cases and scopes
         sorted_cases: List[Tuple[ast.CaseBranchNode, Scope]] = []
+        print('visiting for, type:', self.current_type)
         for case in node.cases:
             child_scope = scope.children.pop(0)
+            print('poped in case the scope', child_scope.tag, f'(child of {scope.tag})')
             sorted_cases.append((case, child_scope))
         sorted_cases.sort(key=lambda x: get_depth(x[0]), reverse=True)
 
@@ -547,19 +572,19 @@ class DotCodeVisitor:
 
         self.add_comment(f'Instantiating type {node.lex}')
 
-        type_node = self.root.get_type(node.lex)
-        attr_values = []
-        for attr in type_node.attributes:
-            attr_expr = type_node.get_attr_node(attr)
-            attr_values.append(self.visit(attr_expr, scope))
+        # type_node = self.root.get_type(node.lex)
+        # attr_values = []
+        # for attr in type_node.attributes:
+        #     attr_expr = type_node.get_attr_node(attr)
+        #     attr_values.append(self.visit(attr_expr, scope))
         instance = self.add_local(f'inst_of_{node.lex}')
         self.add_inst(cil.StaticCallNode(f'{node.lex}__init', instance))
-        for attr, attr_value in zip(type_node.attributes, attr_values):
-            attr_index = type_node.attributes.index(attr)
-            attr_at = cil.AttributeAt(attr, attr_index)
-            self.add_inst(
-                cil.SetAttrNode(instance, attr_at, attr_value)
-            )
+        # for attr, attr_value in zip(type_node.attributes, attr_values):
+        #     attr_index = type_node.attributes.index(attr)
+        #     attr_at = cil.AttributeAt(attr, attr_index)
+        #     self.add_inst(
+        #         cil.SetAttrNode(instance, attr_at, attr_value)
+        #     )
         return instance
 
     @visitor.when(ast.StringNode)
