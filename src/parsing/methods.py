@@ -10,7 +10,7 @@ from cmp.pycompiler import (
     Grammar,
 )
 from cmp.utils import ContainerSet
-from errors import parsing_table_error, invalid_sentence_error
+from cmp.errors import parsing_table_error, invalid_sentence_error
 from cmp.automata import State
 
 

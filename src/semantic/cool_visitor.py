@@ -1,5 +1,5 @@
 import cmp.visitor as visitor
-from ast_nodes import (
+from semantic.ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     FuncDeclarationNode,

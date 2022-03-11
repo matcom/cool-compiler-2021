@@ -1,7 +1,7 @@
 # https://www.dabeaz.com/ply/ply.html
 # file for PLY rules
 
-from errors import (
+from cmp.errors import (
     tokenizer_error,
     LexicographicError,
     UnexpectedCharError,

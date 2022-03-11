@@ -1,19 +1,19 @@
-from lexical_analizer import tokenize_cool_text
-from cool_grammar import define_cool_grammar
-from cool_visitor import FormatVisitorST
-from visitor_type_ast import FormatVisitorTypedAst
+from parsing.lexical_analizer import tokenize_cool_text
+from parsing.cool_grammar import define_cool_grammar
+from semantic.cool_visitor import FormatVisitorST
+from parsing.visitor_type_ast import FormatVisitorTypedAst
 
-from type_collector import TypeCollector
-from type_builder import TypeBuilder
-from type_checker import TypeChecker
+from semantic.type_collector import TypeCollector
+from semantic.type_builder import TypeBuilder
+from semantic.type_checker import TypeChecker
 
-from shift_reduce_parsers import LR1Parser, DerivationTree
-from errors import parsing_table_error, Error
+from parsing.shift_reduce_parsers import LR1Parser, DerivationTree
+from cmp.errors import parsing_table_error, Error
 
 from cmp.evaluation import evaluate_reverse_parse
 from pathlib import Path
-from errors import InvalidInputFileError
-from cool_visitor import FormatVisitor
+from cmp.errors import InvalidInputFileError
+from semantic.cool_visitor import FormatVisitor
 from code_gen.cil_builder import CILBuilder
 from code_gen.mips_builder import MIPSBuilder
 from code_gen.mips_writer import MIPSWriter

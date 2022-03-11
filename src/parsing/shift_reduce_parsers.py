@@ -1,11 +1,11 @@
-from parser_automatons import (
+from parsing.parser_automatons import (
     build_LR0_automaton,
     build_LR1_automaton,
     build_LALR_automaton,
 )
-from methods import compute_firsts, compute_local_first, compute_follows
+from parsing.methods import compute_firsts, compute_local_first, compute_follows
 from cmp.automata import State
-from errors import shift_reduce_error, invalid_sentence_error, SyntacticError
+from cmp.errors import shift_reduce_error, invalid_sentence_error, SyntacticError
 
 class ShiftReduceParser:
     SHIFT = "SHIFT"

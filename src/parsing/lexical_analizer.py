@@ -1,7 +1,6 @@
 import ply.lex as lex
-import tokens_rules as tokens_rules
+import parsing.tokens_rules as tokens_rules
 from cmp.utils import Token
-from utils import find_column
 
 def pprint_tokens(tokens):
     indent = 0
@@ -17,6 +16,9 @@ def pprint_tokens(tokens):
                 indent += 1
     print(" ".join([str(t.token_type) for t in pending]))
 
+def find_column(input, lexpos):
+    line_start = input.rfind('\n', 0, lexpos) + 1
+    return (lexpos - line_start) + 1
 
 def tokenize_cool_text(grammar, idx, type_id, string, num, data, errors, printing=False):
     # lexer starts with: lexpos = 0, lineno = 1, last_new_line = 0

@@ -1,5 +1,5 @@
 from cmp.pycompiler import Grammar
-from ast_nodes import (
+from semantic.ast_nodes import (
     ProgramNode,
     ClassDeclarationNode,
     FuncDeclarationNode,
