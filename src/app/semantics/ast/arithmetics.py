@@ -5,8 +5,8 @@ from app.semantics.constants import *
 
 
 class ArithmeticNode(BinaryNode):
-    def shallow_infer(node, scope, shallow_inferrer):
-        left_node, right_node = shallow_inferrer._arithmetic_operation(
+    def soft_infer(node, scope, soft_inferrer):
+        left_node, right_node = soft_inferrer._arithmetic_operation(
             node, scope)
         if isinstance(node, parser_node.PlusNode):
             arith_node = PlusNode(left_node, right_node, node)
@@ -19,7 +19,7 @@ class ArithmeticNode(BinaryNode):
         else:
             raise Exception("Unknown arithmetic node detected")
 
-        arith_node.inferred_type = shallow_inferrer.context.get_type(
+        arith_node.inferenced_type = soft_inferrer.context.get_type(
             INT_TYPE)
         return arith_node
 

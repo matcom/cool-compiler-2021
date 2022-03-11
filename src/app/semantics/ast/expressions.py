@@ -22,10 +22,10 @@ class BlocksNode(ExpressionNode):
         self.expr_list = expr_list
 
     @staticmethod
-    def shallow_infer(node, scope, shallow_inferrer):
+    def soft_infer(node, scope, soft_inferrer):
         new_expr_list = []
         for expr in node.expr_list:
-            new_expr_list.append(shallow_inferrer.visit(expr, scope))
+            new_expr_list.append(soft_inferrer.visit(expr, scope))
 
         block_node = inf_ast.BlocksNode(new_expr_list, node)
         block_node.inferred_type = block_node.expr_list[-1].inferred_type
@@ -50,22 +50,22 @@ class ConditionalNode(ExpressionNode):
         self.else_body = else_node
 
     @staticmethod
-    def shallow_infer(node, scope, shallow_inferrer):
-        condition_node = shallow_inferrer.visit(node.cond, scope)
+    def soft_infer(node, scope, soft_inferrer):
+        condition_node = soft_inferrer.visit(node.cond, scope)
 
-        condition_type = condition_node.inferred_type
-        bool_type = shallow_inferrer.context.get_type(BOOL_TYPE)
+        condition_type = condition_node.inferenced_type
+        bool_type = soft_inferrer.context.get_type(BOOL_TYPE)
 
         condition_clone = condition_type.clone()
         if not conforms(condition_type, bool_type):
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node,
                 f"TypeError: If's condition type({condition_clone.name})"
                 " does not conforms to Bool type.",
             )
 
-        then_node = shallow_inferrer.visit(node.then_expr, scope)
-        else_node = shallow_inferrer.visit(node.else_expr, scope)
+        then_node = soft_inferrer.visit(node.then_expr, scope)
+        else_node = soft_inferrer.visit(node.else_expr, scope)
 
         if_node = inf_ast.ConditionalNode(
             condition_node, then_node, else_node, node)
@@ -116,7 +116,7 @@ class CaseNode(ExpressionNode):
         self.options: List[CaseOptionNode] = options
 
     @staticmethod
-    def shallow_infer(node, scope, deep_inferrer):
+    def soft_infer(node, scope, deep_inferrer):
         expr_node = deep_inferrer.visit(node.expr, scope)
 
         types_visited = set()
@@ -168,7 +168,7 @@ class CaseOptionNode(ExpressionNode):
         self.type = node.type
 
     @staticmethod
-    def shallow_infer(node, scope, deep_inferrer):
+    def soft_infer(node, scope, deep_inferrer):
         try:
             node_type = deep_inferrer.context.get_type(
                 node.type, selftype=False, autotype=False)
@@ -201,22 +201,22 @@ class LoopNode(ExpressionNode):
         self.condition = condition
         self.body = body
 
-    def shallow_infer(node, scope, shallow_inferrer):
-        condition_node = shallow_inferrer.visit(node.cond, scope)
-        condition_type = condition_node.inferred_type
+    def soft_infer(node, scope, soft_inferrer):
+        condition_node = soft_inferrer.visit(node.cond, scope)
+        condition_type = condition_node.inferenced_type
 
-        bool_type = shallow_inferrer.context.get_type(BOOL_TYPE)
+        bool_type = soft_inferrer.context.get_type(BOOL_TYPE)
         condition_clone = condition_type.clone()
         if not conforms(condition_type, bool_type):
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node,
                 f"TypeError: Loop condition type({condition_clone.name})"
                 " does not conforms to Bool type.",
             )
 
-        body_node = shallow_inferrer.visit(node.body, scope)
+        body_node = soft_inferrer.visit(node.body, scope)
         loop_node = inf_ast.LoopNode(condition_node, body_node, node)
-        loop_node.inferred_type = shallow_inferrer.context.get_type(
+        loop_node.inferenced_type = soft_inferrer.context.get_type(
             OBJECT_TYPE)
         return loop_node
 
@@ -248,14 +248,14 @@ class LetNode(ExpressionNode):
         self.in_expr = in_expr
 
     @staticmethod
-    def shallow_infer(node, scope, shallow_inferrer):
+    def soft_infer(node, scope, soft_inferrer):
         child = scope.create_child()
 
         new_decl_list = []
         for var in node.decl_list:
-            new_decl_list.append(shallow_inferrer.visit(var, child))
+            new_decl_list.append(soft_inferrer.visit(var, child))
 
-        in_expr_node = shallow_inferrer.visit(node.expr, child)
+        in_expr_node = soft_inferrer.visit(node.expr, child)
 
         let_node = inf_ast.LetNode(new_decl_list, in_expr_node, node)
         let_node.inferred_type = in_expr_node.inferred_type
@@ -284,17 +284,17 @@ class VarDeclarationNode(ExpressionNode):
         self.index = None
         self.type = node.type
 
-    def shallow_infer(node, scope, shallow_inferrer):
+    def soft_infer(node, scope, soft_inferrer):
         var_decl_node = inf_ast.VarDeclarationNode(node)
 
         try:
-            node_type = shallow_inferrer.context.get_type(node.type)
+            node_type = soft_inferrer.context.get_type(node.type)
         except SemanticError as err:
             node_type = TypeBag(set(), [])
-            shallow_inferrer.add_error(node, err.text)
+            soft_inferrer.add_error(node, err.text)
 
         if node.id == "self":
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node,
                 "SemanticError: Cannot bound self in a let expression.",
             )
@@ -306,19 +306,19 @@ class VarDeclarationNode(ExpressionNode):
         var_decl_node.inferred_type = node_type
 
         if node.expr:
-            expr_node = shallow_inferrer.visit(node.expr, scope)
-            expr_type: TypeBag = expr_node.inferred_type
-            added_type = expr_type.add_self_type(shallow_inferrer.current_type)
+            expr_node = soft_inferrer.visit(node.expr, scope)
+            expr_type: TypeBag = expr_node.inferenced_type
+            added_type = expr_type.add_self_type(soft_inferrer.current_type)
             expr_clone = expr_type.clone()
             if not conforms(expr_type, node_type):
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     f"TypeError: Variable '{node.id}' expression type"
                     f" ({expr_clone.name}) does not conforms to declared"
                     f" type({node_type.name}).",
                 )
             if added_type:
-                expr_type.remove_self_type(shallow_inferrer.current_type)
+                expr_type.remove_self_type(soft_inferrer.current_type)
             var_decl_node.expr = expr_node
             var_decl_node.inferred_type = expr_node.inferred_type
 
@@ -359,14 +359,14 @@ class AssignNode(ExpressionNode):
         self.expr = expr
         self.defined = False
 
-    def shallow_infer(node, scope, shallow_inferrer):
+    def soft_infer(node, scope, soft_inferrer):
 
-        expr_node = shallow_inferrer.visit(node.expr, scope)
+        expr_node = soft_inferrer.visit(node.expr, scope)
         assign_node = inf_ast.AssignNode(expr_node, node)
 
         var = scope.find_variable(node.id)
         if var is None:
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node,
                 f"SemanticError: Cannot assign new value to"
                 f"{node.id} because it is not defined in the current scope",
@@ -375,24 +375,24 @@ class AssignNode(ExpressionNode):
             decl_type = var.get_type()
             assign_node.defined = True
             if var.name == "self":
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     "SemanticError: Cannot assign new value. "
                     "Variable 'self' is Read-Only.",
                 )
 
-            expr_type: TypeBag = expr_node.inferred_type
-            added_type = expr_type.add_self_type(shallow_inferrer.current_type)
+            expr_type: TypeBag = expr_node.inferenced_type
+            added_type = expr_type.add_self_type(soft_inferrer.current_type)
             expr_name = expr_type.name
             if not conforms(expr_type, decl_type):
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     f"TypeError: Cannot assign new value to variable '{node.id}'."
                     f" Expression type({expr_name}) does not conforms to"
                     f" declared type ({decl_type.name}).",
                 )
             if added_type:
-                expr_type.remove_self_type(shallow_inferrer.current_type)
+                expr_type.remove_self_type(soft_inferrer.current_type)
 
         assign_node.inferred_type = expr_node.inferred_type
         return assign_node
@@ -435,41 +435,41 @@ class MethodCallNode(ExpressionNode):
         self.type = node.static_type
         self.static_type = node.static_type
 
-    def shallow_infer_static(node, scope, shallow_inferrer):
+    def soft_infer_static(node, scope, soft_inferrer):
         caller_type: TypeBag
         if node.expr == 'self':
             #expr_node = None
-            caller_type = TypeBag({shallow_inferrer.current_type})
+            caller_type = TypeBag({soft_inferrer.current_type})
         elif node.static_type is None:
-            expr_node = shallow_inferrer.visit(node.expr, scope)
-            caller_type = expr_node.inferred_type
+            expr_node = soft_inferrer.visit(node.expr, scope)
+            caller_type = expr_node.inferenced_type
         else:
             try:
-                caller_type = shallow_inferrer.context.get_type(
+                caller_type = soft_inferrer.context.get_type(
                     node.static_type, selftype=False, autotype=False
                 )
             except SemanticError as err:
                 caller_type = TypeBag(set())
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node, err + " While setting dispatch caller.")
 
-            expr_node = shallow_inferrer.visit(node.expr, scope)
-            expr_type = expr_node.inferred_type
-            added_type = expr_type.add_self_type(shallow_inferrer.current_type)
+            expr_node = soft_inferrer.visit(node.expr, scope)
+            expr_type = expr_node.inferenced_type
+            added_type = expr_type.add_self_type(soft_inferrer.current_type)
             expr_name = expr_type.generate_name()
             if not conforms(expr_type, caller_type):
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     f"TypeError: Cannot effect dispatch because expression"
                     f" type({expr_name}) does not conforms to"
                     f" caller type({caller_type.name}).",
                 )
             if added_type:
-                expr_type.remove_self_type(shallow_inferrer.current_type)
+                expr_type.remove_self_type(soft_inferrer.current_type)
 
         methods = None
         if len(caller_type.type_set) > 1:
-            methods_by_name = shallow_inferrer.context.get_method_by_name(
+            methods_by_name = soft_inferrer.context.get_method_by_name(
                 node.id, len(node.args))
             types = [typex for typex, _ in methods_by_name]
             caller_type_name = caller_type.generate_name()
@@ -479,7 +479,7 @@ class MethodCallNode(ExpressionNode):
                     (typex, typex.get_method(node.id)) for typex in caller_type.heads
                 ]
             else:
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     f"AtributeError: There is no method '{node.id}'"
                     f" that recieves {len(node.args)} arguments in"
@@ -487,19 +487,19 @@ class MethodCallNode(ExpressionNode):
                 )
         elif len(caller_type.type_set) == 1:
             caller = caller_type.heads[0]
-            caller = shallow_inferrer.current_type if isinstance(
+            caller = soft_inferrer.current_type if isinstance(
                 caller, SelfType) else caller
             try:
                 methods = [(caller, caller.get_method(node.id))]
             except AttributeError as err:
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     err.text,
                 )
 
         new_args = []
         for i in range(len(node.args)):
-            new_args.append(shallow_inferrer.visit(node.args[i], scope))
+            new_args.append(soft_inferrer.visit(node.args[i], scope))
 
         method_call_node = inf_ast.MethodCallNode(
             caller_type, expr_node, new_args, node
@@ -517,18 +517,18 @@ class MethodCallNode(ExpressionNode):
             method_call_node.inferred_type = TypeBag(set())
         return method_call_node
 
-    def shallow_infer_dynamic(node, scope, shallow_inferrer):
+    def soft_infer_dynamic(node, scope, soft_inferrer):
 
         caller_type: TypeBag
         if node.expr == 'self':
-            caller_type = TypeBag({shallow_inferrer.current_type})
+            caller_type = TypeBag({soft_inferrer.current_type})
         else:
-            expr_node = shallow_inferrer.visit(node.expr, scope)
-            caller_type = expr_node.inferred_type
+            expr_node = soft_inferrer.visit(node.expr, scope)
+            caller_type = expr_node.inferenced_type
 
         methods = None
         if len(caller_type.type_set) > 1:
-            methods_by_name = shallow_inferrer.context.get_method_by_name(
+            methods_by_name = soft_inferrer.context.get_method_by_name(
                 node.id, len(node.args))
             types = [typex for typex, _ in methods_by_name]
             caller_type_name = caller_type.generate_name()
@@ -538,7 +538,7 @@ class MethodCallNode(ExpressionNode):
                     (typex, typex.get_method(node.id)) for typex in caller_type.heads
                 ]
             else:
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     f"AtributeError: There is no method '{node.id}'"
                     f" that recieves {len(node.args)} arguments in"
@@ -546,19 +546,19 @@ class MethodCallNode(ExpressionNode):
                 )
         elif len(caller_type.type_set) == 1:
             caller = caller_type.heads[0]
-            caller = shallow_inferrer.current_type if isinstance(
+            caller = soft_inferrer.current_type if isinstance(
                 caller, SelfType) else caller
             try:
                 methods = [(caller, caller.get_method(node.id))]
             except AttributeError as err:
-                shallow_inferrer.add_error(
+                soft_inferrer.add_error(
                     node,
                     err.text,
                 )
 
         new_args = []
         for i in range(len(node.args)):
-            new_args.append(shallow_inferrer.visit(node.args[i], scope))
+            new_args.append(soft_inferrer.visit(node.args[i], scope))
         node.static_type = None
         method_call_node = inf_ast.MethodCallNode(
             caller_type, expr_node, new_args, node
