@@ -2,8 +2,10 @@ name: Run
 
 on: [push, pull_request]
 
-
 jobs:
+  lexer:
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
 
