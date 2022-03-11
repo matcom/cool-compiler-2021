@@ -17,6 +17,19 @@ class TypeChecker:
         self.errors = errors
 
     @visitor.on('node')
+    def collect_features(self, node):
+        pass
+
+    @visitor.when(AttrDeclarationNode)
+    def collect_features(self, node: AttrDeclarationNode, scope: Scope):
+        try:
+            attr_type = self.context.get_type(node.type) if node.type != 'SELF_TYPE' else self.current_type
+        except SemanticError:
+            attr_type = ErrorType()
+            self.errors.append(err.UNDEFINED_TYPE % (node.type_pos, node.type))
+        scope.define_variable(node.id, attr_type, is_attr=True)
+
+    @visitor.on('node')
     def visit(self, node, scope):
         pass
 
@@ -53,6 +66,9 @@ class TypeChecker:
         self.current_type = self.context.get_type(node.id)
         scope.define_variable('self', self.current_type)
 
+        for feature in node.features:
+            self.collect_features(feature, scope)
+
         # visit features
         for feature in node.features:
             if isinstance(feature, AttrDeclarationNode):
@@ -85,7 +101,6 @@ class TypeChecker:
             if not expr_type.conforms_to(attr_type):
                 self.errors.append(err.INCOMPATIBLE_TYPES % (node.expr_pos, expr_type.name, attr_type.name))
 
-        scope.define_variable(node.id, attr_type, is_attr=True)
 
     @visitor.when(FuncDeclarationNode)
     def visit(self, node: FuncDeclarationNode, scope: Scope):
