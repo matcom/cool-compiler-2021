@@ -18,7 +18,6 @@ from CIL.cil import CIL
 from MIPS.mips import MIPS
 
 def print_error(errors):
-    print(len(errors))
     for x in errors:
         print(x)
     if errors: exit(1)
