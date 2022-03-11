@@ -72,7 +72,7 @@ class AttrDeclarationNode(DeclarationNode):
             return attr_node
 
         expr_node = soft_inferrer.visit(node.body, scope)
-        expr_type: TypeBag = expr_node.inferenced_type
+        expr_type: TypeBag = expr_node.inferred_type
         added_type = expr_type.add_self_type(soft_inferrer.current_type)
 
         expr_name = expr_type.generate_name()
@@ -149,7 +149,7 @@ class MethodDeclarationNode(DeclarationNode):
         ret_type_decl: TypeBag = current_method.return_type
 
         body_node = soft_inferrer.visit(node.body, scope)
-        ret_type_expr = body_node.inferenced_type
+        ret_type_expr = body_node.inferred_type
         added_self = ret_type_expr.add_self_type(soft_inferrer.current_type)
 
         ret_expr_name = ret_type_expr.generate_name()

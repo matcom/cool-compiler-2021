@@ -10,7 +10,7 @@ class IsVoidNode(UnaryNode):
     def soft_infer(node, scope, soft_inferrer):
         node_expr = soft_inferrer.visit(node.expr, scope)
         is_void_node = IsVoidNode(node_expr, node)
-        is_void_node.inferenced_type = soft_inferrer.context.get_type(
+        is_void_node.inferred_type = soft_inferrer.context.get_type(
             BOOL_TYPE)
         return is_void_node
 

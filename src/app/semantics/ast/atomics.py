@@ -75,7 +75,7 @@ class InstantiateNode(ExpressionNode):
 class BooleanNode(AtomicNode):
     def soft_infer(node, _, soft_inferrer):
         bool_node = BooleanNode(node)
-        bool_node.inferenced_type = soft_inferrer.context.get_type(
+        bool_node.inferred_type = soft_inferrer.context.get_type(
             BOOL_TYPE)
         return bool_node
 
@@ -88,7 +88,7 @@ class BooleanNode(AtomicNode):
 class IntNode(AtomicNode):
     def soft_infer(node, _, soft_inferrer):
         int_node = IntNode(node)
-        int_node.inferenced_type = soft_inferrer.context.get_type(INT_TYPE)
+        int_node.inferred_type = soft_inferrer.context.get_type(INT_TYPE)
         return int_node
 
     def deep_infer(node, _, deep_inferrer):
@@ -100,7 +100,7 @@ class IntNode(AtomicNode):
 class StringNode(AtomicNode):
     def soft_infer(node, _, soft_inferrer):
         string_node = StringNode(node)
-        string_node.inferenced_type = soft_inferrer.context.get_type(
+        string_node.inferred_type = soft_inferrer.context.get_type(
             STRING_TYPE)
         return string_node
 

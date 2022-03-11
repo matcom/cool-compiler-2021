@@ -19,7 +19,7 @@ class ArithmeticNode(BinaryNode):
         else:
             raise Exception("Unknown arithmetic node detected")
 
-        arith_node.inferenced_type = soft_inferrer.context.get_type(
+        arith_node.inferred_type = soft_inferrer.context.get_type(
             INT_TYPE)
         return arith_node
 

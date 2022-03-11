@@ -53,7 +53,7 @@ class ConditionalNode(ExpressionNode):
     def soft_infer(node, scope, soft_inferrer):
         condition_node = soft_inferrer.visit(node.cond, scope)
 
-        condition_type = condition_node.inferenced_type
+        condition_type = condition_node.inferred_type
         bool_type = soft_inferrer.context.get_type(BOOL_TYPE)
 
         condition_clone = condition_type.clone()
@@ -203,7 +203,7 @@ class LoopNode(ExpressionNode):
 
     def soft_infer(node, scope, soft_inferrer):
         condition_node = soft_inferrer.visit(node.cond, scope)
-        condition_type = condition_node.inferenced_type
+        condition_type = condition_node.inferred_type
 
         bool_type = soft_inferrer.context.get_type(BOOL_TYPE)
         condition_clone = condition_type.clone()
@@ -216,7 +216,7 @@ class LoopNode(ExpressionNode):
 
         body_node = soft_inferrer.visit(node.body, scope)
         loop_node = inf_ast.LoopNode(condition_node, body_node, node)
-        loop_node.inferenced_type = soft_inferrer.context.get_type(
+        loop_node.inferred_type = soft_inferrer.context.get_type(
             OBJECT_TYPE)
         return loop_node
 
@@ -307,7 +307,7 @@ class VarDeclarationNode(ExpressionNode):
 
         if node.expr:
             expr_node = soft_inferrer.visit(node.expr, scope)
-            expr_type: TypeBag = expr_node.inferenced_type
+            expr_type: TypeBag = expr_node.inferred_type
             added_type = expr_type.add_self_type(soft_inferrer.current_type)
             expr_clone = expr_type.clone()
             if not conforms(expr_type, node_type):
@@ -381,7 +381,7 @@ class AssignNode(ExpressionNode):
                     "Variable 'self' is Read-Only.",
                 )
 
-            expr_type: TypeBag = expr_node.inferenced_type
+            expr_type: TypeBag = expr_node.inferred_type
             added_type = expr_type.add_self_type(soft_inferrer.current_type)
             expr_name = expr_type.name
             if not conforms(expr_type, decl_type):
@@ -442,7 +442,7 @@ class MethodCallNode(ExpressionNode):
             caller_type = TypeBag({soft_inferrer.current_type})
         elif node.static_type is None:
             expr_node = soft_inferrer.visit(node.expr, scope)
-            caller_type = expr_node.inferenced_type
+            caller_type = expr_node.inferred_type
         else:
             try:
                 caller_type = soft_inferrer.context.get_type(
@@ -454,7 +454,7 @@ class MethodCallNode(ExpressionNode):
                     node, err + " While setting dispatch caller.")
 
             expr_node = soft_inferrer.visit(node.expr, scope)
-            expr_type = expr_node.inferenced_type
+            expr_type = expr_node.inferred_type
             added_type = expr_type.add_self_type(soft_inferrer.current_type)
             expr_name = expr_type.generate_name()
             if not conforms(expr_type, caller_type):
@@ -524,7 +524,7 @@ class MethodCallNode(ExpressionNode):
             caller_type = TypeBag({soft_inferrer.current_type})
         else:
             expr_node = soft_inferrer.visit(node.expr, scope)
-            caller_type = expr_node.inferenced_type
+            caller_type = expr_node.inferred_type
 
         methods = None
         if len(caller_type.type_set) > 1:
