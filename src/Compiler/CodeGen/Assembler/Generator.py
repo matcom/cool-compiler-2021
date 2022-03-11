@@ -1,4 +1,4 @@
-from dis import Instruction
+
 from CodeGen.Assembler.mips_data import *
 from CodeGen.Intermediate import cil
 from Semantic import visitor
