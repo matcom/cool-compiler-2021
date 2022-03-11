@@ -287,7 +287,6 @@ class TypeChecker:
 
     @visitor.when(VariableNode)
     def visit(self, node: VariableNode, scope: Scope):
-        print(scope.tag, node.lex)
         var = scope.find_variable(node.lex)
         if var is None:
             self.errors.append(err.VARIABLE_NOT_DEFINED % (
