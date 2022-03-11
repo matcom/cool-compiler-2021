@@ -1,16 +1,5 @@
 name: Validate Python e2e
-on: 
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-  pull_request:
-    paths-ignore:
-      - '**.md'
-  schedule:
-    - cron: 30 3 * * *
-
+on: [push, pull_request]
 jobs:
   default-version:
     name: Setup default version
