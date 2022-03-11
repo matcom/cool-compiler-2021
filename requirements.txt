@@ -1,6 +1,5 @@
 ply
 pytest
-re
 itertools
 typing
 enum
