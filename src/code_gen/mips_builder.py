@@ -4,7 +4,6 @@
 # from tkinter.tix import Select
 # from soupsieve import select
 
-from soupsieve import select
 import cmp.visitor as visitor
 import cmp.cil as cil
 import random
@@ -271,13 +270,6 @@ class MIPSBuilder:
     def generate_str_cmp(self):
         self.current_procedure = mips.ProcedureNode(STR_CMP)
 
-        ##comparing lengths
-        #self.register_instruction(mips.CommentNode, "Comparing lengths")
-        #self.register_instruction(mips.LoadWordNode, s0, LENGTH_ATTR_OFFSET, t6) #length offset
-        #self.register_instruction(mips.LoadWordNode, s1, LENGTH_ATTR_OFFSET, t7)
-        #self.register_instruction(mips.SetEq,a0,s0,s1)
-        #
-        #self.register_instruction(mips.BranchOnEqZero,a0,"end_loop")
         
         #comparing char by char
         self.register_instruction(mips.CommentNode, "Comparing char by char")
