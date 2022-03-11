@@ -164,7 +164,7 @@ class DotCodeVisitor:
                 local_vars=[],
                 instructions=[
                     cil.PrintStringNode('str_addr'),
-                    cil.ReturnNode(),
+                    cil.ReturnNode('self'),
                 ]
             ),
             cil.FunctionNode(
@@ -176,7 +176,7 @@ class DotCodeVisitor:
                 local_vars=[],
                 instructions=[
                     cil.PrintIntNode('int_addr'),
-                    cil.ReturnNode(),
+                    cil.ReturnNode('self'),
                 ]
             ),
             cil.FunctionNode(
@@ -566,6 +566,15 @@ class DotCodeVisitor:
         self.add_inst(
             cil.DynamicCallNode(obj_dest, node.id, call_res, node.type, node.obj_dyn_type)
         )
+
+        # update attrs refs
+        for attr, _ in self.context.get_type(self.current_type).all_attributes():
+            self.add_inst(cil.GetAttrNode(attr.name, 'self', f'{self.current_type}_{attr.name}'))
+
+        # for local in self.current_function.local_vars:
+        #     if local.is_attr and local.name != 'self':
+        #         print('updating attr', local.name)
+        #         self.add_inst(cil.GetAttrNode(local.name, 'self', f'{self.current_type}_{local.name}'))
 
         return call_res
 
