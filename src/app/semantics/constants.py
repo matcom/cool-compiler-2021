@@ -1,6 +1,3 @@
-
-from lib2to3.pgen2.token import STRING
-
 # Built-in Types
 OBJECT_TYPE = "Object"
 STRING_TYPE = 'String'
