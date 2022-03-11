@@ -26,10 +26,11 @@ class ProgramNode(Node):
         self.declarations = declarations
         self.scope = scope
 
-    def shallow_infer(node, scope, shallow_inferrer):
+    @staticmethod
+    def soft_infer(node, scope, soft_inferrer):
         new_classes = []
         for declaration in node.classes:
-            new_classes.append(shallow_inferrer.visit(
+            new_classes.append(soft_inferrer.visit(
                 declaration, scope.create_child()))
 
         program = inf_ast.ProgramNode(new_classes, scope, node)

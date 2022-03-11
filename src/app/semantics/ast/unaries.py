@@ -7,10 +7,10 @@ from app.semantics.tools import (
 
 
 class IsVoidNode(UnaryNode):
-    def shallow_infer(node, scope, shallow_inferrer):
-        node_expr = shallow_inferrer.visit(node.expr, scope)
+    def soft_infer(node, scope, soft_inferrer):
+        node_expr = soft_inferrer.visit(node.expr, scope)
         is_void_node = IsVoidNode(node_expr, node)
-        is_void_node.inferenced_type = shallow_inferrer.context.get_type(
+        is_void_node.inferenced_type = soft_inferrer.context.get_type(
             BOOL_TYPE)
         return is_void_node
 
@@ -23,14 +23,14 @@ class IsVoidNode(UnaryNode):
 
 
 class NotNode(UnaryNode):
-    def shallow_infer(node, scope, shallow_inferrer):
-        expr_node = shallow_inferrer.visit(node.expr, scope)
+    def soft_infer(node, scope, soft_inferrer):
+        expr_node = soft_inferrer.visit(node.expr, scope)
 
         expr_type = expr_node.inferenced_type
         expr_clone = expr_type.clone()
-        bool_type = shallow_inferrer.context.get_type(BOOL_TYPE)
+        bool_type = soft_inferrer.context.get_type(BOOL_TYPE)
         if not conforms(expr_type, bool_type):
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node,
                 f"TypeError: Not's expresion type ({expr_clone.name} does not"
                 " conforms to Bool type",
@@ -60,14 +60,14 @@ class NotNode(UnaryNode):
 
 
 class ComplementNode(UnaryNode):
-    def shallow_infer(node, scope, shallow_inferrer):
-        expr_node = shallow_inferrer.visit(node.expr, scope)
+    def soft_infer(node, scope, soft_inferrer):
+        expr_node = soft_inferrer.visit(node.expr, scope)
 
         expr_type = expr_node.inferenced_type
         expr_clone = expr_type.clone()
-        int_type = shallow_inferrer.context.get_type("Int")
+        int_type = soft_inferrer.context.get_type("Int")
         if not conforms(expr_type, int_type):
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node,
                 f"TypeError: ~ expresion type({expr_clone.name}) does not"
                 " conforms to Int type",

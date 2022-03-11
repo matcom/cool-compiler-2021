@@ -15,19 +15,19 @@ class ClassDeclarationNode(DeclarationNode):
         self.id = node.id
         self.parent = node.parent
 
-    def shallow_infer(node, scope, shallow_inferrer):
-        shallow_inferrer.current_type = shallow_inferrer.context.get_type(
+    def soft_infer(node, scope, soft_inferrer):
+        soft_inferrer.current_type = soft_inferrer.context.get_type(
             node.id, unpacked=True)
         scope.define_variable(
-            "self", shallow_inferrer.context.get_type(SELF_TYPE))
+            "self", soft_inferrer.context.get_type(SELF_TYPE))
 
-        for attr in shallow_inferrer.current_type.attributes:
+        for attr in soft_inferrer.current_type.attributes:
             if attr.name != "self":
                 scope.define_variable(attr.name, attr.type)
 
         new_features = []
         for feature in node.features:
-            new_features.append(shallow_inferrer.visit(feature, scope))
+            new_features.append(soft_inferrer.visit(feature, scope))
 
         class_node = inf_ast.ClassDeclarationNode(new_features, node)
         return class_node
@@ -60,33 +60,33 @@ class AttrDeclarationNode(DeclarationNode):
         self.type = node.type
 
     @staticmethod
-    def shallow_infer(node, scope, shallow_inferrer):
+    def soft_infer(node, scope, soft_inferrer):
         if node.id == "self":
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node, "SemanticError: An attribute cannot be named 'self'")
-        node_type = shallow_inferrer.current_type.get_attribute(node.id).type
+        node_type = soft_inferrer.current_type.get_attribute(node.id).type
 
         attr_node = inf_ast.AttrDeclarationNode(node)
         if not node.body:
             attr_node.inferenced_type = node_type
             return attr_node
 
-        expr_node = shallow_inferrer.visit(node.body, scope)
+        expr_node = soft_inferrer.visit(node.body, scope)
         expr_type: TypeBag = expr_node.inferenced_type
-        added_type = expr_type.add_self_type(shallow_inferrer.current_type)
+        added_type = expr_type.add_self_type(soft_inferrer.current_type)
 
         expr_name = expr_type.generate_name()
         if not conforms(expr_type, node_type):
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node,
                 (
-                    f"TypeError: In class '{shallow_inferrer.current_type.name}'"
+                    f"TypeError: In class '{soft_inferrer.current_type.name}'"
                     f" '{node.id}' expression type({expr_name}) does not conforms"
                     f" to declared type ({node_type.name})."
                 ),
             )
         if added_type:
-            expr_type.remove_self_type(shallow_inferrer.current_type)
+            expr_type.remove_self_type(soft_inferrer.current_type)
 
         attr_node.expr = expr_node
         attr_node.inferenced_type = expr_type
@@ -131,10 +131,10 @@ class MethodDeclarationNode(DeclarationNode):
         self.body = body
 
     @staticmethod
-    def shallow_infer(node, scope, shallow_inferrer):
+    def soft_infer(node, scope, soft_inferrer):
 
         scope = scope.create_child()
-        current_method = shallow_inferrer.current_type.get_method(node.id)
+        current_method = soft_inferrer.current_type.get_method(node.id)
 
         new_params = []
         param_names = list(zip(node.param_names[0], node.param_names[1]))
@@ -148,21 +148,21 @@ class MethodDeclarationNode(DeclarationNode):
 
         ret_type_decl: TypeBag = current_method.return_type
 
-        body_node = shallow_inferrer.visit(node.body, scope)
+        body_node = soft_inferrer.visit(node.body, scope)
         ret_type_expr = body_node.inferenced_type
-        added_self = ret_type_expr.add_self_type(shallow_inferrer.current_type)
+        added_self = ret_type_expr.add_self_type(soft_inferrer.current_type)
 
         ret_expr_name = ret_type_expr.generate_name()
         if not conforms(ret_type_expr, ret_type_decl):
-            shallow_inferrer.add_error(
+            soft_inferrer.add_error(
                 node.body,
-                f"TypeError: In Class '{shallow_inferrer.current_type.name}' method"
+                f"TypeError: In Class '{soft_inferrer.current_type.name}' method"
                 f" '{current_method.name}' return expression type({ret_expr_name})"
                 f" does not conforms to declared return type ({ret_type_decl.name})",
             )
 
         if added_self:
-            ret_type_expr.remove_self_type(shallow_inferrer.current_type)
+            ret_type_expr.remove_self_type(soft_inferrer.current_type)
 
         method_node = inf_ast.MethodDeclarationNode(
             new_params, node.type, body_node, node

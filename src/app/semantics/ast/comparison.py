@@ -9,11 +9,11 @@ class ComparerNode(BinaryNode):
 
 class LessNode(ComparerNode):
     @staticmethod
-    def shallow_infer(node, scope, shallow_inferrer):
-        left_node, right_node = shallow_inferrer._arithmetic_operation(
+    def soft_infer(node, scope, soft_inferrer):
+        left_node, right_node = soft_inferrer._arithmetic_operation(
             node, scope)
         less_node = LessNode(left_node, right_node, node)
-        less_node.inferenced_type = shallow_inferrer.context.get_type(
+        less_node.inferenced_type = soft_inferrer.context.get_type(
             BOOL_TYPE)
         return less_node
 
@@ -29,11 +29,11 @@ class LessNode(ComparerNode):
 class LessOrEqualNode(ComparerNode):
 
     @staticmethod
-    def shallow_infer(node, scope, shallow_inferrer):
-        left_node, right_node = shallow_inferrer._arithmetic_operation(
+    def soft_infer(node, scope, soft_inferrer):
+        left_node, right_node = soft_inferrer._arithmetic_operation(
             node, scope)
         lesseq_node = LessOrEqualNode(left_node, right_node, node)
-        lesseq_node.inferenced_type = shallow_inferrer.context.get_type(
+        lesseq_node.inferenced_type = soft_inferrer.context.get_type(
             BOOL_TYPE)
         return lesseq_node
 
@@ -47,12 +47,12 @@ class LessOrEqualNode(ComparerNode):
 
 
 class EqualsNode(ComparerNode):
-    def shallow_infer(node, scope, shallow_inferrer):
-        left_node = shallow_inferrer.visit(node.left_expr, scope)
-        right_node = shallow_inferrer.visit(node.right_expr, scope)
+    def soft_infer(node, scope, soft_inferrer):
+        left_node = soft_inferrer.visit(node.left_expr, scope)
+        right_node = soft_inferrer.visit(node.right_expr, scope)
 
         equal_node = EqualsNode(left_node, right_node, node)
-        equal_node.inferenced_type = shallow_inferrer.context.get_type(
+        equal_node.inferenced_type = soft_inferrer.context.get_type(
             BOOL_TYPE)
         return equal_node
 

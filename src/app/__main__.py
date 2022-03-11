@@ -9,7 +9,7 @@ from app.parser import CoolParser
 from app.semantics.ast import ProgramNode
 from app.semantics.type_builder import TypeBuilder
 from app.semantics.type_collector import TypeCollector
-from app.semantics.inference.soft_inferencer import SoftInferencer
+from app.semantics.inference.soft_inferencer import SoftInferrer
 from app.semantics.inference.deep_inferrer import DeepInferrer
 from app.cil.cool_to_cil import COOLToCILVisitor
 from app.mips.cil_to_mips import CILToMIPSVisitor, MIPSCode
@@ -54,7 +54,7 @@ def app(input: Path, output: Path = None):
     builder.visit(ast)
     errors += builder.errors
 
-    soft = SoftInferencer(context)
+    soft = SoftInferrer(context)
     soft_ast: ProgramNode = soft.visit(ast)
     errors += soft.errors
 
