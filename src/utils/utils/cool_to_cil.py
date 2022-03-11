@@ -97,10 +97,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_type = self.context.get_type(node.name)
         
         # Your code here!!! (Handle all the .TYPE section)
-        current_type_cil = self.register_type(self.current_type.name)
+        self.current_type = self.register_type(self.current_type.name)
         for attr in self.current_type.attributes:
             self.visit(attr,scope)
-            current_type_cil.attributes.append(attr.name)
+            self.current_type.attributes.append(attr.name)
            
         func_declarations = (f for f in node.data if isinstance(f, cool.MethodDecNode))
         for feature, child_scope in zip(func_declarations, scope.children):
@@ -142,12 +142,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.AttributeDecNode)
     def visit(self, node, scope):
         ###############################
-        # node.id -> str
+        # node.name -> str
         # node.type -> str
         # node.expr -> ExpressionNode
         ###############################
-        
-        # Your code here!!!
         pass
 
     @visitor.when(cool.AssignNode)
