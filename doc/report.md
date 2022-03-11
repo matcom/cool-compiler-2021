@@ -32,17 +32,17 @@ Para el análisis léxico se utilizó el módulo `ply` de `Python`, el cual perm
 
 Se emplearon dos estados exclusivos para el automata ademas del incial, uno para tokenizar los string y otros para los comentarios que ocupan multiples lineas.
 
-Al concluir esta fase se obtuvo cada uno de los tokens relevantes involcrados en el codigo fuente, estos almacenan su lexema, tipo de token, asi como la linea y columna correspondiente, para mejorar la informacion de los errores en las siguientes fases.
+Al concluir esta fase se obtuvo cada uno de los tokens relevantes involcrados en el codigo fuente, estos almacenan su lexema y tipo de token.
 
 ## Parsing
 
-De igual manera se utilizó `ply` para la fase de parsing debido a que soporta varios tipos de parsers como el parser `LALR(1)` que resuelve de manera eficiente la gramática de `COOL`, esta gramática se definió en base al archivo oficial de `COOL` [cool-manual](./cool-manual.pdf). De esta manera se construye el AST que se usará en las fases de análisis semántico.
+De igual manera se utilizó `ply` para la fase de parsing debido a que soporta varios tipos de parsers como el parser `LALR(1)` que resuelve de manera eficiente la gramática de `COOL`, esta gramática se definió en base al manual oficial de `COOL` [cool-manual](./cool-manual.pdf), definida en su pagina 16.
 
-...TODO: Más cosas aquí
+En esta fase se establecio la precedencia de los operadores de acuerdo al manual en la seccion 11.1. Se establecieron las reglas de la gramatica de forma apropiada para obtener el AST una vez finalizado el proceso de parsing de los tokens y asegurar que cada nodo almacena la la linea y columna correspondiente al token, esto permite mejorar la informacion de los errores en el chequeo semantico.
 
 ## Recolección de tipos
 
-Esta fase se encarga de recorrer el AST generado previamente y definir los tipos del lenguaje. Entre estos tipos tenemos los BUILT_IN (Bool, String, Int, IO, Object), así como los tipos definidos en el código por el usuario en las declaraciones de clases. En un recorrido posterior se realiza el chequeo y asignación de padres de tipos, debido a que en el lenguaje las declaraciones de clases se pueden en cualquier orden, por lo que es necesario recolectar los tipos primeramente. En esta fase se resuelven también las excepciones de herencia cíclica.
+Esta fase se encarga de recorrer el AST generado previamente y definir los tipos del lenguaje. Entre estos tipos tenemos los BUILT_IN (Bool, String, Int, IO, Object), así como los tipos definidos en el código por el usuario en las declaraciones de clases. En un recorrido posterior se realiza el chequeo y asignación de padres de tipos, debido a que en el lenguaje las declaraciones de clases se pueden encontrar en cualquier orden, por lo que es necesario recolectar los tipos primeramente. En esta fase se resuelven también las excepciones de herencia cíclica.
 
 La lógica para esta fase se implementó en el archivo `collector.py`
 
@@ -54,8 +54,20 @@ La lógica para esta fase se implementó en el archivo `builder.py`
 
 ## Chequeo de tipos
 
-Esta fase es la encargada de validar el uso correcto de los tipos definidos en el programa. Determina que las asignaciones de las variables sean a tipos correctos, así como los argumentos de funciones, etc.
-...TODO: hablar aqui de esto
+Esta fase es la encargada de validar el uso correcto de los tipos definidos en el programa y detectar otros errores definidos dentro de la semantica de COOL, estos errores con su correspondiente descripcion pueden ser encontrados bajo el fichero `errors.py`.
+
+Por ejemplo entre ellos se encuentran:
+- Verificar que las asignaciones de las variables sea el tipo adecuado a su definicion, así como los argumentos de funciones.
+- `self` es de solo lectura.
+- no violar el numero de argumentos y los tipos de estos cuando se sobreescribe una funcion.
+- No usar variables que no esten definidas previamente en el contexto.
+- Evitar herencia de los tipos Int, String y Bool.
+- Verficar el correcto uso de los operadores +, -, /, *, <, <=, =, etc.
+- Evitar ramas duplicadas en el `case of`.
+
+En este recorrido sobre el AST ademas se crea el scope del programa para cada una de las clases, funciones, el `let in` y el `case of`. Los scopes establecen una jerarquia de herencia, de tal forma que el scope de una clase es hijo del scope de la clase que esta hereda, el scope de una funcion es hijo del scope de la clase en que esta se encuentra definida y los scopes de los `let in` y `case of` son hijos del scope del contexto en que se encuentren.
+
+Los scopes permiten ocultar las definiciones de variables de los contextos superiores. La salida de este recorrido sobre el AST es el scope raiz resultante de la visita a cada uno de los nodos.
 
 La lógica para esta fase se implementó en el archivo `checker.py`
 
@@ -95,7 +107,7 @@ Para representar los objetos de `CIL` en memoria desde `MIPS` usamos la siguient
 
 ```
 Type: # Nombre del tipo
-  .word 4 # Valor
+  .word 4 # Espacio necesario para una instancia de este tipo
   .word <Padre> # Label del tipo padre
 
   # Métodos de la instancia
@@ -109,4 +121,10 @@ Type: # Nombre del tipo
   .asciiz "Type" # Typename (String del tipo)
 ```
 
+Esta definicion se encuentra en la seccion del `.data` de MIPS y se puede decir que sirve de esqueleto para la las instancias.
+
 Por lo visto anteriormente cada tipo contiene información relacionada con este, como la lista de atributos, métodos, el string correspondiente a su typename, así como una referencia al address del label de su padre. Todos los tipos son tratados como instancias de clases, incluyendo los `BUILT_IN` como `Int, String y Bool` en los que podemos ver su valor en el offset 4 de su dirección. Los métodos se representan con labels que son definidos posteriormente en la sección `.text` de `MIPS`. Existe un label especial llamado `main` que será el encargado de correr el programa, su función es instanciar el tipo `Main` y ejecutar sus instrucciones.
+
+Cada una de las instancias posee como primer atributo un puntero a su tipo correspondiente (ubicado en `.data`). En los bytes continuos almacena cada uno de sus atributos.
+
+Para resolver el metodo de una instancia primeramente se resuelve el tipo de la intancia, al cual apunta el primer byte de esta. Este puntero mas el offset del metodo permite encontrar el label de la funcion correspondiente en mips e invocarla.
