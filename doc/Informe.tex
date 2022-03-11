@@ -65,6 +65,15 @@ Jorge Mederos Alvarado
 \vspace*{\fill}
 \end{titlepage}
 
+
+\section*{Ejecución}
+puede usar el siguiente comando en la consola, desde la carpeta $src$ para la ejecución del compilador.
+
+\begin{lstlisting}
+python -m coolpyler <archivo.cl>
+\end{lstlisting}
+
+
 \section*{Estructura}
 Todo el código se encuentra dentro de la carpeta $coolplayer$, ubicada en $src$.
 
@@ -124,11 +133,8 @@ El pipeline completo se encuentra en $\_\_main\_\_.py$ y se resume de la siguien
 
 El proceso se realiza de izuierda a derecha, recibiendo código de COOL y retornando código de MIPS. En letra negra se tiene el lexer, el parser y los visitors. En letra azul se tiene la entrada y salida de cada uno.
 
-\section*{Lexer}
-
-\section*{Parser}
-
-\section*{Semántica}
+\section*{Lexer y Parser}
+La implementación del lexer y el parser se realizó utilizando la biblioteca sly, una version mas actualizada de ply. Esta permite la definición de los tokens y la grámatica a partir de clases y decoradores que se aplican a los metodos que luego manejarán la estructura resultante. Es importante destacar que en el parser es donde se decidió resolver los nodos de tipo call que omiten la expresion sobre la que se invoca el método, añadiendo un nodo variable con referencia a self en su lugar.
 
 \subsection*{Jerarquía de AST}
 Como se mencionó anteriormente, los AST´s de la carpeta $cool$ cumplen con una jerarquía. Siendo $base$ el ancestro mayor. De esta forma, los nodos de todos los AST's serán descendientes de los nodos definidos en $base$. Luego, no fue necesario reescribir el código de los AST que sirven de entrada y salida para cada visitor (los cuales tienen, potencialmente, sutiles diferencias entre ellos). Si un la definición de un nodo de un AST no cambia con respecto al de la pasada anterior, este hereda de ese nodo anterior sin necesidad de redefinirlo. Si un nodo cambia con respecto a la pasada anterior, entonces heredará del nodo de $base$ correspondiente y se redefinirá.\\
@@ -169,11 +175,43 @@ Una vez recolectados y construidos todos los tipos del programa (y almacenados e
 
 - El resto de los nodos se comporta de forma bastante intuitiva. El block visitará todas sus expresiones y su retorno tendrá al tipo de la última de estas. La asignación verificará la existencia del $id$ a asignar en el scope y que su tipo coincida con el tipo de la expresion de la parte derecha (después de visitarla). Las expresiones aritméticas visitarán ambos hijos para verificar que tengan tipo entero. Para el if then else se visitan las tres expresiones, luego se revisa que la expresión $if$ sea de tipo booleano y se retorna como tipo, al ancestro común más cercano de las expresiones $then$ y $else$. Las expresiones atómicas retornarán un nodo con su tipo correspondiente (el nodo variable se busca en el scope y da error si el $id$ no existe).
 
-\section*{CoolToCilVisitor}
+\section*{Generación de código}
+\subsection*{CoolToCilVisitor}
+El Los nodos del AST de CIL son los mismos dados por los profesores en tercer año, con ligerísimas modificaciones. Para armar los nods del AST de MIPS seguimos la idea de que todos los espacios de memoria están identificados por un string único. Cada vez que se visita un nodo de tipo expresión, teniendo en cuenta que el resultado de evaluar una expresión siempre termina guardado en un espacio de memoria, entonces el resultado de cada visit a expresiones será un string (el espacio de memoria que apunta al resultado). Al inicio de $cool\_to\_cil.py$ se tiene una serie de funciones auxiliares útiles para manejar el estado y registrar en lo que luego será el .data de MIPS, los objetos necesarios en los distintos casos.
+Es importante destacar la visita a \code{ProgramNode} para generar las funciones builtin y algunas que necsitan un manejo especial. Estas functiones son implementadas directamente utilizando nodos del AST de CIL, donde tenemos acceso a algunos nodos especiales que tendrán un significado diferente al generar el codigo MIPS y que deben ser accesibles al programador de COOL. Como ejemplo de esto tenemos la generación de la funcion \code{type\_name}, la cual se genera para cada tipo simulando un override la funcion \code{type\_name} de Object, otro ejemplo de esto es la generación de un constructor para el tipo \code{Void}, lo cual facilita mucho el resto del trabajo con los tipos, dado que no necsitamos en muchos casos manejarlo de forma especial.
 
-\section*{CilToMipsVisitor}
-Los nodos instrucciones del AST de MIPS tienen una propiedad común $comment$ sólo utilizada para el debuggeo. Los nombres de los registros se definen al inicio para facilitar el acceso a estos. Al indexar REGISTERS entre 0 y 9, se obtienen los registros de propósito general y al indexar ARG$\_$Registers entre 0 y 3, se obtienen los registros que normalmente se usan para argumentos. El resto de los registros tienen nombres sugerentes, tales como V0$\_$REG. La clase MemoryManager maneja los registros que en cada momento están libres y ocpuados, con métodos para obtener registros, copiar el estado actual y retornar el estado a uno previamente copiado.\\
-Al visitar el \code{ProgramNode} de CIL, se visitan primero los dotdata (\code{DataNode}) para llenar la sección .data de MIPS con los strings almacenados estáticamente y los dottypes (\code{TypeNode}) para construir en .data la tabla de métodos virtuales para los llamados a función que no sean estáticos. Por cada \code{TypeNode} que se visite, se pone en .data una línea con el nombre del tipo, ".word" como tipo de almacenamiento y una serie de lables separados por coma, uno por cada método del tipo en cuestión. Al buscar en la dirección de memoria representada por un label con el nombre de cada tipo, sumada con el índice del método (se tiene la información de los índices de los métodos, dados por el orden en que fueron declarados en un tipo) multiplicado por 4, se accede a un word que en el que está la dirección de memoria del método que se quiere llamar dinámicamente. Esta tabla es necesaria pues en los llamados virtuales, es posible que hasta tiempo de ejecución no se conozca el tipo de la expresión a la que se le está haciendo dispatch y por tanto, que definición de método es la que se quiere llamar.\\
+La implementacion del \code{CaseOf} resultó interesante, dado que en tiempo de ejecución resulta complejo resolver la relacion de herencia entre los tipos, y por tanto sería engorroso resolver la rama del \code{CaseOf} que se debe ejecutar; lo que hacemos es que en tiempo de compilacion generamos el equivalente a una serie de if-else para todos los posibles tipos derivados del tipo estático del objecto sobre el cual se esta haciendo pattern-matching y para cada caso resolvemos en tiempo de compilación la rama que debería ejecutarse y generamos su codigo en el cuerpo de correspondiente de la condicional.
+
+
+\subsection*{CilToMipsVisitor}
+Los nodos instrucciones del AST de MIPS tienen una propiedad común $comment$ sólo utilizada para el debuggeo. Los nombres de los registros se definen al inicio para facilitar el acceso a estos como se muestra a continuación.
+
+\begin{lstlisting}
+REGISTER_NAMES = ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9"]
+ARG_REGISTERS_NAMES = ["a0", "a1", "a2", "a3"]
+
+INSTANCE_METADATA_SIZE = 4
+
+REGISTERS = [mips.RegisterNode(name) for name in REGISTER_NAMES]
+ARG_REGISTERS = [mips.RegisterNode(name) for name in ARG_REGISTERS_NAMES]
+FP_REG = mips.RegisterNode("fp")
+SP_REG = mips.RegisterNode("sp")
+RA_REG = mips.RegisterNode("ra")
+V0_REG = mips.RegisterNode("v0")
+V1_REG = mips.RegisterNode("v1")
+\end{lstlisting}
+
+Al indexar REGISTERS entre 0 y 9, se obtienen los registros de propósito general y al indexar ARG$\_$Registers entre 0 y 3, se obtienen los registros que normalmente se usan para argumentos. El resto de los registros tienen nombres sugerentes, tales como V0$\_$REG. La clase MemoryManager maneja los registros que en cada momento están libres y ocpuados, con métodos para obtener registros, copiar el estado actual y retornar el estado a uno previamente copiado.\\
+Al visitar el \code{ProgramNode} de CIL, se visitan primero los dotdata (\code{DataNode}) para llenar la sección .data de MIPS con los strings almacenados estáticamente y los dottypes (\code{TypeNode}) para construir en .data la tabla de métodos virtuales para los llamados a función que no sean estáticos. A continuación se muestra la tabla de métodos virtuales para el prohrama "hello world":
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{./5}
+\caption{}
+\label{fig:5}
+\end{figure}
+
+Por cada \code{TypeNode} que se visite, se pone en .data una línea con el nombre del tipo, ".word" como tipo de almacenamiento y una serie de lables separados por coma, uno por cada método del tipo en cuestión. Al buscar en la dirección de memoria representada por un label con el nombre de cada tipo, sumada con el índice del método (se tiene la información de los índices de los métodos, dados por el orden en que fueron declarados en un tipo) multiplicado por 4, se accede a un word que en el que está la dirección de memoria del método que se quiere llamar dinámicamente. Esta tabla es necesaria pues en los llamados virtuales, es posible que hasta tiempo de ejecución no se conozca el tipo de la expresión a la que se le está haciendo dispatch y por tanto, que definición de método es la que se quiere llamar.\\
 Luego de terminada la sección .data, se procede a visitar todas las instrucciones de CIL para convertirlas en instrucciones MIPS. Cada visita a un nodo instrucción retornará una lista con los nodos MIPS que equivalen a esa instrucción de CIL. A continuación se explican los aspectos más importantes de los llamados a funciones, el manejo de las direcciones de memoria y el uso de la tabla de métodos virtuales:\\
 
 - Al visitar un FunctionNode se agrega primeramente un nodo label para marcar el inicio del método y poder saltar hacia él. Luego se agregan instrucciones para salvar en un registro el valor actual del registro FP y se mueve hacia FP el valor actual del SP (la pila). Luego se guardan en la pila las variables locales (cada una 4 bytes), se guarda el valor del registro RA para saber hacia dónde tiene que retornar el método actual en caso de que una de las instrucciones del mismo sea un llamado a otro método y se guarda el valor que se había salvado previamente del FP para no perder el FP anterior luego de retornar. En este punto, el FP marca la dirección del método en la pila, de forma que hacia abajo están los argumentos que se guardaron en esta antes de llamar a la función (4 bytes or cada uno) y hacia arriba todas las variables locales, seguidas por el RA anterior, seguido a su vez por el FP anterior\\
@@ -186,11 +224,11 @@ Otro aspecto importante a explicar es la reserva dinámica de memoria para insta
 
 El resto de los nodos tienen comportamientos más intuitivos para cumplir con las instrucciones de CIL respectivas. Se puede destacar los nodos \code{ConcatNode}, \code{LengthNode} y \code{SubstrinNode} por los extensos tamaños de sus códigos de visita, pero es simplemente mucha lógica de MIPS que no es importante explicar.
 
-\section*{MipsToTextVisitor}
+\subsection*{MipsToTextVisitor}
 Visitor muy sencillo. Cada nodo del ast de MIPS tiene una forma de imprimirse. A estas alturas no queda proceso complicado por realizar.
 
-
-
+\section*{Boxing y Unboxing}
+Todos nuestros tipos incluyendo los tipos básicos están almacenados en el Heap y en una instancia exactamente igual a la de los tipos definidos por el usuario. El usuario por supuesto no tiene acceso para modificar los attrs en estos tipos básicos. En el momento de realizar operaciones entre estos tipos, se traen a la pila, se realiza la operacion y se crea una nueva instancia en el Heap donde se almacena el resultado.
 
 
 
