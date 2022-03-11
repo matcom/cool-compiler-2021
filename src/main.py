@@ -65,6 +65,7 @@ def main(input_file, cil_file, output_file):
     exit(0)
 
 if __name__=='__main__':
+    print('11111')
     cil_file = sys.argv[2]
     input_file = sys.argv[1]
     output_file = sys.argv[3]
