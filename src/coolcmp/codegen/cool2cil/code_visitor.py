@@ -1,5 +1,6 @@
 from __future__ import annotations
 from copy import deepcopy
+from typing import List, Tuple
 
 from coolcmp.utils import ast, cil, visitor
 from coolcmp.utils.semantic import Context, Scope
@@ -392,10 +393,16 @@ class DotCodeVisitor:
         def get_depth(x: ast.CaseBranchNode):
             return self.context.type_depth(self.context.get_type(x.type))
 
-        node.cases.sort(key=lambda x: get_depth(x), reverse=True)
-        branch_labels = [self.new_label('case_branch') for _ in node.cases]
+        # Sort cases and scopes
+        sorted_cases: List[Tuple[ast.CaseBranchNode, Scope]] = []
+        for case in node.cases:
+            child_scope = scope.children.pop(0)
+            sorted_cases.append((case, child_scope))
+        sorted_cases.sort(key=lambda x: get_depth(x[0]), reverse=True)
 
-        for case, label in zip(node.cases, branch_labels):
+        branch_labels = [self.new_label('case_branch') for _ in sorted_cases]
+
+        for (case, scope), label in zip(sorted_cases, branch_labels):
             self.add_comment(f"Check for case branch {case.type}")
             branch_local = self.add_local('branch_local')
             self.add_inst(cil.StaticCallNode(f'{case.type}__init', branch_local))
@@ -407,12 +414,7 @@ class DotCodeVisitor:
         # Does not conform to anyone => Runtime error
         self.add_inst(cil.GotoNode(case_match_re_label.name))
 
-        # print("*" * 10)
-        # print("scope", scope, len(scope.children))
-        # print("*" * 10)
-        # input()
-        for case, label in zip(node.cases, branch_labels):
-            child_scope = scope.children.pop(0)
+        for (case, child_scope), label in zip(sorted_cases, branch_labels):
             self.add_inst(label)
             idx = self.add_local(case.id, internal=False)
             self.add_inst(cil.AssignNode(idx, ret_exp))
