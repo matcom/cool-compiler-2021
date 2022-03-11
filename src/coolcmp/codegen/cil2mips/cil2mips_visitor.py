@@ -722,7 +722,7 @@ class CILToMipsVisitor:
         address = self.get_address(node.dest)
 
         self.add_inst(
-            mips.LINode(a0, 512), # TODO: Dynamic string length
+            mips.LINode(a0, 512),
             mips.JALNode('malloc'),
             mips.MoveNode(t2, v0)
         )
