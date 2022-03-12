@@ -1,3 +1,4 @@
+from cmath import exp
 from semantics.semantic import IntType, ObjectType, StringType, BoolType
 from .ast_CIL import *
 from collections import deque
@@ -158,12 +159,10 @@ class CILScope:
 
         for id, type, expr, inst in attributes:
             if expr is not None:
+                _expr, _ = expr
                 instructions.extend(inst)
-                if not isinstance(expr, CILAtomicNode):
-                    variable = CILVariableNode(self.add_new_local(type))
-                    instructions.append(CILAssignNode(variable, expr))
-                else:   
-                    variable = expr
+                variable = CILVariableNode(self.add_new_local(type))
+                instructions.append(CILAssignNode(variable, _expr))
             elif type == 'Int':
                 variable = CILNumberNode(0)
             elif type == 'String':
@@ -174,6 +173,11 @@ class CILScope:
                 instructions.append(CILAssignNode(variable, CILEqualsNode(CILNumberNode(0), CILNumberNode(1))))
             else:
                 variable = None
+            
+            if expr is not None:
+                _, t = expr
+                if type == 'Object' and not t.ref:
+                    instructions.append(CILAssignNode(variable, CILBoxNode(variable, t.name)))
             
             if variable is not None:
                 instructions.append(CILSetAttributeNode(CILVariableNode(f'self_{self.current_class}'), self.current_class, CILVariableNode(id), variable)) 

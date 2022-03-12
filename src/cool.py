@@ -51,6 +51,8 @@ cil = cil_generator.visit(ast)
 #print(cil)
 cil_codegen = CILCodegen()
 code = cil_codegen.visit(cil)
+with open(f'{input_file[:-3]}.cil', 'w') as f:
+    f.write(code)
 
 
 mips_scope_builder = MIPSScopeBuilder()
@@ -61,6 +63,5 @@ mips_codegen.visit(cil, None)
 #print(mips_codegen.code)
 with open(f'{input_file[:-3]}.mips', 'w') as f:
     f.write(mips_codegen.code)
-with open(f'{input_file[:-3]}.cil', 'w') as f:
-    f.write(code)
+
 exit(0)
