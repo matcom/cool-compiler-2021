@@ -1,5 +1,4 @@
 from Semantic.scope import VariableInfo
-from Semantic import visitor
 import itertools as itt
 
 

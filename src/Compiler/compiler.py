@@ -1,11 +1,8 @@
-from ntpath import join
 from CodeGen.Intermediate.Generator import COOLToCILVisitor
 from CodeGen.Intermediate.cil import Scope
 from CodeGen.Assembler.Generator import CILToSPIMVisitor
-from CodeGen.Assembler.mips import MIPSVisitor
 from Semantic.Semantic import COOL_Semantic_Checker 
 from Parser.Parser import COOL_Parser
-from Semantic.scope import COOL_Scope
 from Lexer.Lexer import COOL_Lexer
 import sys
 
