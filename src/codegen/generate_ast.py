@@ -34,11 +34,10 @@ class CIL:
         self.scope.functions.append(CILFuncNode('main', [], locals, instructions))
         
         self.scope.data.append(CILDataNode(f'str_empty', "\"\""))
-        table_ = bfs_init(self.scope.context)
-        self.table = table(table_)
+
         types_ts, types_heirs = get_ts(self.scope.context)
         self.types_ts = types_ts
-        self.types_heirs = types_heirs
+        self.hierarchy_branch = hierarchy_branch(self.scope.context)
         infos = self.scope.infos = {}
         for type in types_ts:
             t = TypeInfo() 
@@ -58,7 +57,7 @@ class CIL:
             types.append(type)
         
         # Add built-in types and functions
-        types.extend(self.scope.create_builtin_types())     
+        types.extend(self.scope.create_builtin_types(self.hierarchy_branch))     
         
         return CILProgramNode(types, self.scope.data, self.scope.functions)
     
@@ -102,7 +101,7 @@ class CIL:
         init_class = self.scope.create_init_class(features, locals)    
         self.scope.functions.append(init_class)  
         
-        return CILTypeNode(node.id, self.scope.attributes.values(), methods)
+        return CILTypeNode(node.id, self.scope.attributes.values(), methods, self.hierarchy_branch[node.id])
             
     @visitor.when(AttrDeclarationNode)
     def visit(self, node):
@@ -271,31 +270,13 @@ class CIL:
             # use the topological sort computed in the ProgramNode to sort the types of the branches of the case         
             case_types = [case.type for case in node.cases]
             case_types = sorted(case_types, key=lambda t: types_ts_pos[t], reverse=True)
-            least_ancestor = {}
-            case_labels = {}
+
             for type in case_types:
-                least_ancestor[type] = type
-                case_labels[type] = CILLabelNode(f'case_{self.scope.case_count}_{type}')
-                try:
-                    queue = self.types_heirs[type].copy() # place the children class
-                except KeyError: # last type in a branch of the Type Tree
-                    queue = None
-                while queue: # travel to all descendants
-                    descendant = queue.pop()
-                    try:
-                        # this type was visited by a type that is later in 
-                        # the topological order so is more close to the type in the class hierarchy
-                        least_ancestor[descendant]
-                        continue
-                    except KeyError:
-                        least_ancestor[descendant] = type
-                        try:
-                            queue = self.types_heirs[descendant] + queue
-                        except KeyError:
-                            pass
-            for type, lancestor in least_ancestor.items():
-                self.scope.instructions.append(CILAssignNode(type_comp_var, CILEqualsNode(type_expr_var, CILTypeConstantNode(type), ref)))
-                self.scope.instructions.append(CILIfGotoNode(type_comp_var, case_labels[lancestor]))
+                label = CILLabelNode(f'case_{self.scope.case_count}_{type}')
+                
+
+                self.scope.instructions.append(CILAssignNode(type_comp_var, CILConformsNode(type_expr_var, CILTypeConstantNode(type))))
+                self.scope.instructions.append(CILIfGotoNode(type_comp_var, label))
         
         result_name = self.scope.add_new_local(node.computed_type.name)
         var_result = CILVariableNode(result_name)

@@ -73,12 +73,13 @@ class MIPSCodegen:
         self.add_line(".data")
         self.set_tabs(0)
         t = self.scope.types[node.id]
+        discovery_time, finish_time = node.hierarchy_branch
         methods_str = ' '.join(m.function_id for m in node.methods)
         assert len(node.methods) == len(t.methods_offset)
         self.add_line(f"_{node.id}: .asciiz \"{node.id}\\n\"")
         self.add_line("\t.data")
         self.add_line("\t.align 4")
-        self.add_line(f"{node.id}: .word {t.size} _{node.id} {methods_str}")
+        self.add_line(f"{node.id}: .word {t.size} _{node.id} {discovery_time} {finish_time} {methods_str}")
         self.add_line('')
 
     @visitor.when(CILDataNode)
@@ -235,18 +236,9 @@ class MIPSCodegen:
 
     @visitor.when(CILTypeOfNode) # Get the dynamic type of an instance
     def visit(self, node: CILTypeOfNode, frame):
-        self.add_line('li $a0, 8')
-        self.add_line('li $v0, 9')
-        self.add_line('syscall')
-        self.add_line('move $t0, $v0') # save the address of the allocated space
-
         self.visit(node.var, frame)
 
-        self.add_line('la $t1, type')
-        self.add_line('lw $t2, 0($v0)') # get the type of the var
-        self.add_line('sw $t1, 0($t0)')
-        self.add_line('sw $t2, 4($t0)')
-        self.add_line('move $v0, $t0')
+        self.add_line('lw $v0, 0($v0)') # get the type of the var
         return '$v0'
 
     @visitor.when(CILCallNode) # I don't think this is necessary
@@ -319,14 +311,8 @@ class MIPSCodegen:
         
     @visitor.when(CILTypeConstantNode)
     def visit(self, node: CILTypeConstantNode, frame):
-        self.add_line('li $a0, 8')
-        self.add_line('li $v0, 9')
-        self.add_line('syscall')
-
-        self.add_line('la $t0, type')
-        self.add_line(f'la $t1, {node.lex}')
-        self.add_line('sw $t0, 0($v0)')
-        self.add_line('sw $t1, 4($v0)')
+      
+        self.add_line(f'la $v0, {node.lex}')
         return '$v0'
 
     @visitor.when(CILPlusNode)
@@ -396,7 +382,7 @@ class MIPSCodegen:
         self.gen_push('$v0')
         self.visit(node.right, frame)
         self.gen_pop('$t1')
-        self.add_line(f'move $t2, $v0') # get the address to the right Int instance 
+        self.add_line(f'move $t2, $v0') # get the value of the right Int instance 
 
         
         self.add_line(f'slt $t4, $t2, $t1')  # r < l?
@@ -470,6 +456,38 @@ class MIPSCodegen:
         self.add_line('lw $t0, 4($v0) # unbox something')
         self.add_line('move $v0, $t0')
         return '$v0'
+
+    @visitor.when(CILConformsNode)
+    def visit(self, node: CILConformsNode, frame):
+        self.visit(node.left, frame)
+        self.gen_push('$v0')
+        self.visit(node.right, frame)
+        self.add_line('move $t1, $v0')
+        self.gen_pop('$t0')
+
+        #Load discovery time of left 
+        self.add_line('# Check conform')
+
+        self.add_line('lw $t0, 8($t0)')
+        self.add_line('lw $t2, 8($t1)') #Load discovery time of rigth
+        self.add_line('lw $t3, 12($t1)') #Load finish time of rigth
+
+        self.add_line('slt $t1, $t0, $t2') # first condition
+        self.add_line('li $t2, 1')
+        self.add_line(f'xor $t1, $t1, $t2')
+        self.add_line(f'andi $t1, $t1, 0x01') # get the last bit
+
+          
+        self.add_line(f'slt $t4, $t3, $t0')  # r < l?
+        self.add_line(f'li $t3, 1')
+        self.add_line(f'xor $t3, $t3, $t4')
+        self.add_line(f'andi $v0, $t3, 0x01') # get the last bit
+        self.add_line('and $v0, $v0, $t1')
+        return '$v0'
+
+
+
+
 
 
         

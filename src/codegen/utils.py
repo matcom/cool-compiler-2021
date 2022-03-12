@@ -67,7 +67,7 @@ class CILScope:
         method = type_class.get_method(name_meth)
         return method.return_type.name
 
-    def create_builtin_types(self):
+    def create_builtin_types(self, hierarchy_branch):
         types = []
         
         obj_methods = [
@@ -76,7 +76,7 @@ class CILScope:
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
         ]
-        types.append(CILTypeNode('Object', [], obj_methods))
+        types.append(CILTypeNode('Object', [], obj_methods, hierarchy_branch['Object']))
         init_Object = CILFuncNode(
             'Init_Object', 
             [CILParamNode('self', None)], 
@@ -90,7 +90,7 @@ class CILScope:
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
         ]
-        types.append(CILTypeNode('Int', [CILAttributeNode('value', None)], int_methods))
+        types.append(CILTypeNode('Int', [CILAttributeNode('value', None)], int_methods, hierarchy_branch['Int']))
         init_int = CILFuncNode(
             'Init_Int', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
@@ -107,7 +107,7 @@ class CILScope:
             CILMethodNode('concat', 'concat_String'),
             CILMethodNode('substr', 'substr_String'),
         ]
-        types.append(CILTypeNode('String', [CILAttributeNode('value', None)], str_methods))
+        types.append(CILTypeNode('String', [CILAttributeNode('value', None)], str_methods, hierarchy_branch['String']))
         init_string = CILFuncNode(
             'Init_String', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
@@ -121,7 +121,7 @@ class CILScope:
             CILMethodNode('type_name', 'type_name_Object'),
             CILMethodNode('copy', 'copy_Object'),
         ]
-        types.append(CILTypeNode('Bool', [CILAttributeNode('value', None)], bool_methods))
+        types.append(CILTypeNode('Bool', [CILAttributeNode('value', None)], bool_methods, hierarchy_branch['Bool']))
         init_bool = CILFuncNode(
             'Init_Bool', 
             [CILParamNode('self', None), CILParamNode('v', None)], 
@@ -139,7 +139,7 @@ class CILScope:
             CILMethodNode('in_string', 'in_string_IO'),
             CILMethodNode('in_int', 'in_int_IO'),
         ]
-        types.append(CILTypeNode('IO', [], io_methods))
+        types.append(CILTypeNode('IO', [], io_methods, hierarchy_branch['IO']))
         init_IO = CILFuncNode(
             'Init_IO', 
             [CILParamNode('self', None)], 
@@ -223,18 +223,34 @@ def dfs_visit_ts(context, u, list, heirs, visited):
     list.append(u)
 
 
-def bfs_init (context)  :
-    table = {}
-    d = {}
-    d = init(context, d)
-    for c in context.types.values():
-        list = deque()
-        list.append(c)
-        visit = []        
-        m = bfs( list, d.copy() , c,{})
-        
-        table [c.name] = m    
-    return table
+def hierarchy_branch(context):
+    heirs = {}
+
+    for type in context.types.values():
+        if type.parent is not None:
+            try:
+                heirs[type.parent.name].append(type.name)
+            except:
+                heirs[type.parent.name] = [type.name]
+    
+    branch = {}
+
+    hierarchy_branch_visit(context, branch, heirs, "Object", 0)
+    return branch
+
+def hierarchy_branch_visit(context, branch, heirs, type, time):
+    discovery_time = time
+    finish_time = discovery_time
+    try:
+        for heir in heirs[type]:
+            finish_time = hierarchy_branch_visit(context, branch, heirs, heir, finish_time + 1)
+    except:
+        pass
+    
+    branch[type] = (discovery_time, finish_time)
+    return finish_time
+
+
 
 def bfs ( list, d ,s , m ):
     d[s.name] = 0

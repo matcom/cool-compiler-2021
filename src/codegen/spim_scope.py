@@ -40,7 +40,7 @@ class TypeInfo:
     
     def get_method_addr(self, method, register):
         offset = self.methods_offset[method]
-        return f'{(offset + 2) * WSIZE}({register})'
+        return f'{(offset + 4) * WSIZE}({register})'
     
     def __str__(self):
         r = '--------------------Type----------------\n'
