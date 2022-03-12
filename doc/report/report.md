@@ -404,7 +404,45 @@ El segundo recorrido se encarga de generar el código MIPS del programa, la idea
 
 - Retorno de operadores: Dado que los operadores tienen un tipo de retorno bien definido debido a las reglas de tipado de COOL los operadores se encarga de almacenar el resultado de la operacion en instancias de la clase de su tipo, las operaciones aritméticas crean instancias de tipo `Int` y las operaciones de comparación de tipo `Bool`.
 
-  ​      
+**Tipos por valor**
+
+En la especificación de COOL todos los tipos del lenguaje se especifican como tipos por referencia, por motivos de mejorar la eficiencia del uso de la memoria se implementaron los tipos básicos `Int` y `Bool` como tipos por valor lo cual nos brinda ciertos beneficios:
+
+- Al ser un tipo por valor para cada instancia solo se guarda en memoria su valor, a diferencia de si fuera un tipo por referencia se guardaría su valor, el puntero a la estructura `TypeInfo` y la dirección de memoria de la instancia.
+- Debido a que no se implementaron mecanismos de liberación de memoria dinámica automáticos esto ayuda a liberar de forma automática la memoria utilizada dado que estos valores se almacenan en la pila.
+- Las operaciones son más rápidas dado que no hay que estar redireccionando en memoria dinámica para buscar los valores.
+
+Los principales problemas a resolver durante la implementación fueron:
+
+- Upcasting/Downcasting:
+
+  ```
+  (* Upcasting *)
+  a : Object <- 10;
+  
+  (* Downcasting *)
+  b : Int <- case a of
+  	x : Int => x;
+  	esac;
+  ```
+
+  Para permitir el upcasting/downcasting entre tipos que se representan de forma distinta en memoria utilizamos la información obtenida durante el análisis semántico, asociamos a cada variable de CIL su tipo estático, así tenemos información sobre si lo que almacena esa variable es un valor o una referencia. Luego cuando se genera una asignación de CIL se comprueba el tipo estático del miembro izquierdo y derecho, para los casos `(RType, RType)` y `(VType, VType)` se procede a copiar el valor de una variable hacia la otra. En el caso `(RType, VType)` se realiza el boxing (`CILBoxNode`) del tipo por valor, es decir se guarda el valor que está en la pila en una instancia de la clase `VType` la cual solo se instancia para estos casos. La definición de estas clases (`Int` y `Bool`) se realizó de acuerdo a la especificación de COOL y tienen un atributo llamado `value` para almacenar el valor. En el caso (`VType, RType`) se realiza el unboxing (`CILUnboxNode`) de la instancia de la clase `VType` correspondiente retornando el valor de su atributo `value`.
+
+  > Nota: `RType` se refiere a un tipo por referencia y `VType` a un tipo por valor
+
+- Expresión case
+
+  La implementación propuesta de la expresión case utilizaba la instrucción `TYPEOF` para poder elegir la rama a evaluar, sin embargo, en los tipos por valor no tenemos una referencia a la información del tipo por tanto se tuvo que tratar como un caso especial, para ello se aprovechó el hecho de que las ramas se recorren en orden topológico inverso  según su tipo y por tanto la primera rama válida para evaluar es la rama a escoger dado que los tipos por valor en este caso no permiten que hereden de ellos.
+
+  Cuando el tipo de retorno del case es `Object` debemos realizar un casteo antes de retornar la evaluación de una rama que retorne un tipo por valor, no obstante esto se resuelve con el boxing/unboxing automático discutido anteriormente.
+
+- Dispatch
+
+  ```
+  (1).type_name()
+  ```
+
+  Los tipos por valor pueden usar los métodos heredados de `Object` pero no tienen acceso a la información del tipo para obtener la dirección del método, para resolver esto implementamos métodos built-in para los tipos por valor, estos no sobrescriben los de la implementación de su clase dado que los métodos de una clase `VType` tienen el mismo identificador que los de la clase `Object` al ser heredados. Durante la generación de código MIPS sabemos si la variable de CIL ejecutando un dispatch es una variable de tipo por valor o por referencia y hacemos el binding dinámico de los métodos o llamamos a los built-int de los tipos por valor según corresponda.
 
 
 
