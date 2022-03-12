@@ -8,7 +8,7 @@ Para compilar un fichero de COOL se puede usar el comando:
 python3 coolc.py "path/to/file.cl"
 ```
 
-Este compila el fichero `file.cl` y almacena el código generado en un fichero del mismo nombre pero pero con extension `.mips`, ubicado en la carpeta raíz donde se ejecutó el comando.
+Este compila el fichero `file.cl` y almacena el código generado en un fichero del mismo nombre pero pero con extension `.mips`.
 
 Se pueden consultar las demás opciones de la línea de comandos para el compilador ejecutando `python3 coolc.py -h`.
 
@@ -26,7 +26,7 @@ optional arguments:
                         Verbose output. (default: False)
 ```
 
-- `--out`: modifica el fichero de salida para el `.mips` generado, que por defecto es creado con el mismo nombre del fichero de COOL y en la dirección raíz donde se está ejecutando el compilador.
+- `--out`: modifica el fichero de salida para el `.mips` generado, que por defecto es creado con el mismo nombre del fichero de COOL.
 - `--run`: facilita la ejecución del programa escrito en COOL ejecutando automáticamente el fichero `.mips` de salida. Para realizar dicha acción es necesario tener `spim` instalado y en el path.
 - `--verbose`: imprime en consola el AST generado después de concluido el análisis lexico, parsing y análisis semántico, asi como el código intermedio (CIL) generado previamente a la generación de código final. 
 

@@ -83,7 +83,7 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
 
     full_name = args.file.name
-    filename = full_name[full_name.rfind('/') + 1:full_name.rfind('.')]
+    filename = full_name[:full_name.rfind('.')]
     cool_code = args.file.read()
     main(
         filename=args.out or filename,
