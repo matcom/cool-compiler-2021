@@ -1,3 +1,5 @@
+######################################## Object ######################################
+
 abort_Object:
         # calling conventions
         sw $ra, 0($sp)
@@ -28,6 +30,9 @@ abort_Object:
         lw $ra, 0($sp)
        
         jr $ra
+
+
+
 
 copy_Object:
             # calling conventions
@@ -64,7 +69,203 @@ copy_Object_loop:
         jr $ra
 
 
+type_name_Object:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
 
+        lw $t7, 12($fp) # get the instance address
+        lw $t6, 0($t7) # get the type info address
+        lw $t5, 4($t6) # get the type name
+
+        # create the String class instance to return
+        li $a0, 8
+        li $v0, 9
+        syscall   
+
+        la $t1, String
+        sw $t1, 0($v0)
+        sw $t5, 4($v0)
+        
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+############################################### End Object ####################################################
+
+
+################################################ Int ##########################################################
+
+abort_Int:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+		
+        la $a0, ObjectAbortMessage
+        li $v0, 4
+        syscall
+
+        la $t0, Int
+        lw $t0, 4($t0)
+
+        move $a0, $t0
+        li $v0, 4
+        syscall
+		
+        li $v0, 10
+        syscall
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+
+copy_Int:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+
+        lw $v0, 12($fp) # load the object address
+      
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+type_name_Int:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+        la $t6, Int # get the type info address
+        lw $t5, 4($t6) # get the type name
+
+        # create the String class instance to return
+        li $a0, 8
+        li $v0, 9
+        syscall   
+
+        la $t1, String
+        sw $t1, 0($v0)
+        sw $t5, 4($v0)
+        
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+########################################################## End Int ############################################################
+
+
+########################################################### Bool #############################################################
+
+abort_Bool:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+		
+        la $a0, ObjectAbortMessage
+        li $v0, 4
+        syscall
+
+    
+        la $t0, Bool
+        lw $t0, 4($t0)
+
+        move $a0, $t0
+        li $v0, 4
+        syscall
+		
+        li $v0, 10
+        syscall
+
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+
+copy_Bool:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+
+        lw $v0, 12($fp) # load the object address
+      
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+       
+        jr $ra
+
+type_name_Bool:
+        # calling conventions
+        sw $ra, 0($sp)
+        addi $sp, $sp, -4
+        sw $fp, 0($sp)
+        addi $sp, $sp, -4
+        move $fp, $sp
+
+        la $t6, Bool # get the type info address
+        lw $t5, 4($t6) # get the type name
+
+        # create the String class instance to return
+        li $a0, 8
+        li $v0, 9
+        syscall   
+
+        la $t1, String
+        sw $t1, 0($v0)
+        sw $t5, 4($v0)
+        
+        # calling conventions
+        addi $sp, $sp, 4
+        lw $fp, 0($sp)
+        addi $sp, $sp, 4
+        lw $ra, 0($sp)
+        
+        jr $ra
+
+################################################################## End Bool ########################################################
 out_string_IO:
         # calling conventions
         sw $ra, 0($sp)
@@ -97,8 +298,7 @@ out_int_IO:
         addi $sp, $sp, -4
         move $fp, $sp
 
-        lw $v1, 12($fp)
-        lw $a0, 4($v1)
+        lw $a0, 12($fp)
         li $v0, 1
         syscall
         
@@ -183,16 +383,7 @@ in_int_IO:
 
         li $v0, 5
         syscall
-        move $t0, $v0
-
-        li $v0, 9
-        li $a0, 8
-        syscall
-
-        la $t1, Int
-        sw $t1, 0($v0)
-        sw $t0, 4($v0)
-
+      
 
         # calling conventions
         addi $sp, $sp, 4
@@ -212,34 +403,7 @@ in_int_IO:
 
 
 
-type_name_Object:
-        # calling conventions
-        sw $ra, 0($sp)
-        addi $sp, $sp, -4
-        sw $fp, 0($sp)
-        addi $sp, $sp, -4
-        move $fp, $sp
 
-        lw $t7, 12($fp) # get the instance address
-        lw $t6, 0($t7) # get the type info address
-        lw $t5, 4($t6) # get the type name
-
-        # create the String class instance to return
-        li $a0, 8
-        li $v0, 9
-        syscall   
-
-        la $t1, String
-        sw $t1, 0($v0)
-        sw $t5, 4($v0)
-        
-        # calling conventions
-        addi $sp, $sp, 4
-        lw $fp, 0($sp)
-        addi $sp, $sp, 4
-        lw $ra, 0($sp)
-        
-        jr $ra
 
 substr_String:
         # calling conventions
@@ -252,12 +416,10 @@ substr_String:
         lw $t7, 20($fp) # get the String instance address
         lw $t0, 4($t7) # get the value of the source String
 
-        lw $t7, 16($fp) # get the start parameter Int instance address
-        lw $t1, 4($t7) # get the value of the Int
+        lw $t1, 16($fp) # get the start parameter Int instance address
 
-        lw $t7, 12($fp) # get the length perameter Int instance address
-        lw $t2, 4($t7) # get the value of the Int
-        
+        lw $t2, 12($fp) # get the length perameter Int instance address
+      
         move $a0, $t2
         addi $a0, $a0, 1
         li $v0, 9	
@@ -323,13 +485,7 @@ isvoid:
         li $t0, 1
         isvoid_end:
                 
-        li $a0, 8
-        li $v0, 9
-        syscall
-
-        la $t1, Bool
-        sw $t1, 0($v0)
-        sw $t0, 4($v0)
+        move $v0, $t0
 
         # calling conventions
         addi $sp, $sp, 4
@@ -390,17 +546,6 @@ length_String:
         addi $sp, $sp, 4
         lw $t0, 0($sp)
 
-
-        move $t0, $v0
-
-        # allocate space for the Int instace
-        li $a0, 8
-        li $v0, 9
-        syscall
-
-        la $t1, Int
-        sw $t1, 0($v0)
-        sw $t0, 4($v0)
       
         # calling conventions
         addi $sp, $sp, 4
@@ -421,6 +566,9 @@ compare:
 
 		lw $t0, 12($fp)
 		lw $t1, 16($fp)
+                lw $t2, 20($fp)
+
+                beqz $t2, compare_values 
 
 		lw $t3, 0($t0)
 
@@ -468,12 +616,7 @@ compare:
 
 		compare_end:
 
-		li $a0, 8
-		li $v0, 9
-		syscall
-		la $t1, Bool
-		sw $t1, 0($v0)
-		sw $t0, 4($v0)
+		move $v0, $t0
 
 
         # calling conventions

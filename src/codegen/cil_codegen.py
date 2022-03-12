@@ -115,9 +115,14 @@ class CILCodegen:
     def visit(self, node: CILExpressionNode):
         pass
 
+    @visitor.when(CILUnboxNode)
+    def visit(self, node: CILUnboxNode):
+        return f'UNBOX {node.var.lex}'  
+
     @visitor.when(CILBoxNode)
     def visit(self, node: CILBoxNode):
         return f'BOX {node.var.lex} {node.type}'
+
 
     @visitor.when(CILBinaryOperationNode)
     def visit(self, node: CILBinaryOperationNode):

@@ -178,8 +178,7 @@ class MIPSCodegen:
     @visitor.when(CILIfGotoNode)
     def visit(self, node: CILIfGotoNode, frame):
         value_addr = frame.get_addr(node.var.lex)
-        self.add_line(f'lw $t1, {value_addr}')
-        self.add_line(f'lw $t0, 4($t1)')
+        self.add_line(f'lw $t0, {value_addr}')
         self.add_line(f'bne $t0, $zero, {node.label.id}')
         
     @visitor.when(CILGotoNode)
@@ -264,22 +263,24 @@ class MIPSCodegen:
         # the instance of type T is always the first argument to be passed to the function
         self.add_line(f'# calling the method {node.func} of type {node.type}')
 
-        if node.static:
-            self.add_line(f'la $t0, {node.type}')
+        if node.type in ['Bool', 'Int']:
+            self.add_line(f'la $v1, {node.func}_{node.type}')
         else:
-            instance = frame.arg_queue[0]
-            instance_addr = self.visit(instance, frame) # load into a register the address of the instance in the heap
+            if node.static:
+                self.add_line(f'la $t0, {node.type}')
+            else:
+                instance = frame.arg_queue[0]
+                instance_addr = self.visit(instance, frame) # load into a register the address of the instance in the heap
 
-            # register0 has the dynamic type address of the instance 
-            # since every instance stores its type in the first word of the allocated memory
-            self.add_line(f'lw $t0, 0({instance_addr})')
+                # register0 has the dynamic type address of the instance 
+                # since every instance stores its type in the first word of the allocated memory
+                self.add_line(f'lw $t0, 0({instance_addr})')
 
-        # use the information of the static type to get the location of the method in memory
-        t = self.scope.types[node.type]
-        method_addr = t.get_method_addr(node.func, '$t0')
-      
-        
-        self.add_line(f'lw $v1, {method_addr}')
+            # use the information of the static type to get the location of the method in memory
+            t = self.scope.types[node.type]
+            method_addr = t.get_method_addr(node.func, '$t0')
+            self.add_line(f'lw $v1, {method_addr}')
+
         self.add_line(f'jal $v1') # calls the method and by convention methods return in $v0
         for a in frame.arg_queue:
             self.gen_pop('$v1')
@@ -304,15 +305,7 @@ class MIPSCodegen:
     @visitor.when(CILNumberNode)
     def visit(self, node: CILNumberNode, frame):
         register = '$v0'
-        self.add_line(f'# Creating Int instance for atomic {node.lex}')
-        self.add_line(f'li $a0, 8')
-        self.add_line(f'li $v0, 9')
-        self.add_line(f'syscall')
-
-        self.add_line(f'la $t0, Int')
-        self.add_line(f'li $t1, {node.lex}')
-        self.add_line(f'sw $t0, 0($v0)')
-        self.add_line(f'sw $t1, 4($v0)')
+        self.add_line(f'li $v0, {node.lex}')
         self.add_line(f'')
         return register
 
@@ -341,18 +334,11 @@ class MIPSCodegen:
         register0 = '$v0'
         self.add_line(f'# computes the sum of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
         self.visit(node.left, frame) # in $v0 is the address of the Int instance 
-        self.add_line(f'lw $t0, 4($v0)')
-        self.gen_push('$t0')
+        self.gen_push('$v0')
         self.visit(node.right, frame)
         self.gen_pop('$t0')
-        self.add_line(f'lw $t1, 4($v0)')
-        self.add_line(f'add $t0, $t0, $t1')
-        self.add_line(f'li $a0, 8')
-        self.add_line(f'li $v0, 9')
-        self.add_line(f'syscall')
-        self.add_line(f'la $t1, Int')
-        self.add_line(f'sw $t1, 0($v0)')
-        self.add_line(f'sw $t0, 4($v0)')
+        self.add_line(f'move $t1, $v0')
+        self.add_line(f'add $v0, $t0, $t1')
         return register0
 
     @visitor.when(CILMinusNode)
@@ -360,39 +346,25 @@ class MIPSCodegen:
         register0 = '$v0'
         self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
         self.visit(node.left, frame) # in $v0 is the address of the Int instance 
-        self.add_line(f'lw $t0, 4($v0)')
-        self.gen_push('$t0')
+        self.gen_push('$v0')
         self.visit(node.right, frame)
-        self.add_line(f'lw $t1, 4($v0)')
         self.gen_pop('$t0')
-        self.add_line(f'sub $t0, $t0, $t1')
-        self.add_line(f'li $a0, 8')
-        self.add_line(f'li $v0, 9')
-        self.add_line(f'syscall')
-        self.add_line(f'la $t1, Int')
-        self.add_line(f'sw $t1, 0($v0)')
-        self.add_line(f'sw $t0, 4($v0)')
+        self.add_line(f'move $t1, $v0')
+        self.add_line(f'sub $v0, $t0, $t1')
         return register0
 
     
     @visitor.when(CILStarNode)
     def visit(self, node: CILStarNode, frame):
         register0 = '$v0'
-        self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
+        self.add_line(f'# computes the product of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
         self.visit(node.left, frame) # in $v0 is the address of the Int instance 
-        self.add_line(f'lw $t0, 4($v0)')
-        self.gen_push('$t0')
+        self.gen_push('$v0')
         self.visit(node.right, frame)
-        self.add_line(f'lw $t1, 4($v0)')
         self.gen_pop('$t0')
+        self.add_line(f'move $t1, $v0')
         self.add_line(f'mult $t0, $t1')
-        self.add_line(f'mflo $t0')
-        self.add_line(f'li $a0, 8')
-        self.add_line(f'li $v0, 9')
-        self.add_line(f'syscall')
-        self.add_line(f'la $t1, Int')
-        self.add_line(f'sw $t1, 0($v0)')
-        self.add_line(f'sw $t0, 4($v0)')
+        self.add_line(f'mflo $v0')
         return register0
 
     @visitor.when(CILDivNode)
@@ -400,76 +372,53 @@ class MIPSCodegen:
         register0 = '$v0'
         self.add_line(f'# computes the sub of (node.left.to_string) and (node.right.to_string) and stores it at {register0}')
         self.visit(node.left, frame) # in $v0 is the address of the Int instance 
-        self.add_line(f'lw $t0, 4($v0)')
-        self.gen_push('$t0')
+        self.gen_push('$v0')
         self.visit(node.right, frame)
-        self.add_line(f'lw $t1, 4($v0)')
         self.gen_pop('$t0')
+        self.add_line(f'move $t1, $v0')
         self.add_line(f'div $t0, $t1')
-        self.add_line(f'mflo $t0')
-        self.add_line(f'li $a0, 8')
-        self.add_line(f'li $v0, 9')
-        self.add_line(f'syscall')
-        self.add_line(f'la $t1, Int')
-        self.add_line(f'sw $t1, 0($v0)')
-        self.add_line(f'sw $t0, 4($v0)')
+        self.add_line(f'mflo $v0')
         return register0
 
     @visitor.when(CILLessNode)
     def visit(self, node: CILLessNode, frame):
         self.visit(node.left, frame)
-        self.add_line(f'move $t1, $v0') # get the address to the left Int instance 
-        self.add_line(f'lw $t1, 4($t1)') # get the value of the instance
-        self.gen_push('$t1')
+        self.gen_push('$v0')
         self.visit(node.right, frame)
         self.gen_pop('$t1')
         self.add_line(f'move $t2, $v0') # get the address to the right Int instance 
-        self.add_line(f'lw $t2, 4($t2)') # get the value of the instance
-
-        
-        self.add_line(f'slt $t3, $t1, $t2') # l < r ?
-
-        self.add_line(f'la $t4, Bool')
-        self.add_line(f'li $a0, 8')
-        self.add_line(f'li $v0, 9')
-        self.add_line('syscall')
-        self.add_line(f'sw $t4, 0($v0)')
-        self.add_line(f'sw $t3, 4($v0)')
+        self.add_line(f'slt $v0, $t1, $t2') # l < r ?
         return '$v0'
 
     @visitor.when(CILElessNode)
     def visit(self, node: CILElessNode, frame):
         self.visit(node.left, frame)
-        self.add_line(f'move $t1, $v0') # get the address to the left Int instance 
-        self.add_line(f'lw $t1, 4($t1)') # get the value of the instance
-
-        self.gen_push('$t1')
+        self.gen_push('$v0')
         self.visit(node.right, frame)
         self.gen_pop('$t1')
         self.add_line(f'move $t2, $v0') # get the address to the right Int instance 
-        self.add_line(f'lw $t2, 4($t2)') # get the value of the instance
 
         
         self.add_line(f'slt $t4, $t2, $t1')  # r < l?
         self.add_line(f'li $t3, 1')
         self.add_line(f'xor $t3, $t3, $t4')
-        self.add_line(f'andi $t3, $t3, 0x01') # get the last bit
-
-        self.add_line(f'la $t4, Bool')
-        self.add_line(f'li $a0, 8')
-        self.add_line(f'li $v0, 9')
-        self.add_line('syscall')
-        self.add_line(f'sw $t4, 0($v0)')
-        self.add_line(f'sw $t3, 4($v0)')
+        self.add_line(f'andi $v0, $t3, 0x01') # get the last bit
         return '$v0'
 
     @visitor.when(CILEqualsNode)
     def visit(self, node: CILEqualsNode, frame):
+
+        if node.ref:
+            self.add_line('li $t0, 1')
+        else:
+            self.add_line('li $t0, 0')
+        self.gen_push('$t0')
         self.visit(node.left, frame)
         self.gen_push('$v0')
         self.visit(node.right, frame)
         self.gen_push('$v0')
         self.add_line('jal compare')
+        self.gen_pop('$t0')
         self.gen_pop('$t0')
         self.gen_pop('$t0')
         return '$v0'
@@ -484,22 +433,44 @@ class MIPSCodegen:
         self.add_line('jal compare')
         self.gen_pop('$t0')
         self.gen_pop('$t0')
-        self.add_line('lw $t0, 4($v0)')
+        self.add_line('move $t0, $v0')
         self.add_line('li $t1, 1')
         self.add_line('xor $t0, $t0, $t1')
-        self.add_line('andi $t0, $t0, 0x01')
-        self.add_line('sw $t0, 4($v0)')
+        self.add_line('andi $v0, $t0, 0x01')
         return '$v0'
         
     @visitor.when(CILNotNode)
     def visit(self, node: CILNotNode, frame):
         self.visit(node.var, frame)
-        self.add_line('lw $t0, 4($v0)')
+        self.add_line('move $t0, $v0')
         self.add_line('li $t1, 1')
         self.add_line('xor $t0, $t0, $t1')
         self.add_line('andi $t0, $t0, 0x01')
+        self.add_line('move $v0, $t0')
+        return '$v0'
+
+
+    @visitor.when(CILBoxNode)
+    def visit(self, node: CILBoxNode, frame):
+        print("Boxing shit")
+        self.add_line('# boxing some stuff')
+        self.visit(node.var, frame)
+        self.add_line('move $t0, $v0 # boxing some stuff')
+        self.add_line('li $a0, 8')
+        self.add_line('li $v0, 9')
+        self.add_line('syscall')
+        self.add_line(f'la $t1, {node.type}')
+        self.add_line('sw $t1, 0($v0)')
         self.add_line('sw $t0, 4($v0)')
         return '$v0'
+
+    @visitor.when(CILUnboxNode)
+    def visit(self, node: CILUnboxNode, frame):
+        self.visit(node.var, frame)
+        self.add_line('lw $t0, 4($v0) # unbox something')
+        self.add_line('move $v0, $t0')
+        return '$v0'
+
 
         
 

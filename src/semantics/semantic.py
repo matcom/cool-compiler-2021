@@ -43,6 +43,7 @@ class Type:
         self.attributes = []
         self.methods = []
         self.parent = None
+        self.ref = True
 
     def set_parent(self, parent):
         self.parent = parent
@@ -172,6 +173,7 @@ class IntType(Type):
     def __init__(self):
         Type.__init__(self, 'Int')
         Type.set_parent(self, ObjectType())
+        self.ref = False
 
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, IntType)
@@ -190,6 +192,7 @@ class BoolType(Type):
     def __init__(self):
         Type.__init__(self, 'Bool')
         Type.set_parent(self, ObjectType())
+        self.ref = False
     
     def __eq__(self, other):
         return other.name == self.name or isinstance(other, BoolType)
