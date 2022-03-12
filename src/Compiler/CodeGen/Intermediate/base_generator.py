@@ -13,6 +13,8 @@ class BaseCOOLToCILVisitor:
         self.labels = 0
         self.types_names = dict()
         self.init_attr_functions = dict()
+        self.Main_class = False
+        self.main_method = False
     
     @property
     def params(self):
@@ -91,11 +93,13 @@ class BaseCOOLToCILVisitor:
         result = self.define_internal_local()
         ret = self.define_internal_local()
         main_method_name = self.to_function_name('main', 'Main')
-        self.register_instruction(cil.AllocateNode('type_Main', instance0))
-        self.register_instruction(cil.ArgNode(instance0))
-        self.register_instruction(cil.StaticCallNode('function_initialize_Main_attributes', instance1))
-        self.register_instruction(cil.ArgNode(instance1))
-        self.register_instruction(cil.StaticCallNode(main_method_name, result))
+        if self.Main_class:
+            self.register_instruction(cil.AllocateNode('type_Main', instance0))
+            self.register_instruction(cil.ArgNode(instance0))
+            self.register_instruction(cil.StaticCallNode('function_initialize_Main_attributes', instance1))
+            if self.main_method:
+                self.register_instruction(cil.ArgNode(instance1))
+                self.register_instruction(cil.StaticCallNode(main_method_name, result))
         self.register_instruction(cil.EndProgramNode())
         self.current_function = None
         

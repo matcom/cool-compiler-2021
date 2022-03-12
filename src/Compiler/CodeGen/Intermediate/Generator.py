@@ -26,13 +26,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         """
         self.program_node = node
         cil_scope = cil.Scope()
-        self.define_entry_function()
-        self.predefined_types()
         
         for _class in node.classes:
+            if _class.name == 'Main':
+                self.Main_class = True
+                for f in _class.features:
+                    if f.name == 'main':
+                        self.main_method = True
             data = self.register_data(_class.name)
             self.types_names[_class.name] = data
             cil_scope.create_child()
+        
+        self.define_entry_function()
+        self.predefined_types()
         
         for _class, child_scope, ch_cil_scope in zip(node.classes, scope.children, cil_scope.children):
             self.visit(_class, child_scope, ch_cil_scope)
@@ -568,6 +574,18 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         """
         value1 = self.visit(node.first, scope, cil_scope)
         value2 = self.visit(node.second, scope, cil_scope)
+    
+        denominador = self.define_internal_local()
+        div_by_cero = cil.LabelNode(self.define_label())
+        fine = cil.LabelNode(self.define_label())
+        self.register_instruction(cil.AllocateNode(f'type_Int', denominador, 0))
+        self.register_instruction(cil.BranchEqualNode(value2, denominador, div_by_cero.name))
+        self.register_instruction(cil.GotoNode(fine.name))
+        self.register_instruction(div_by_cero)
+        data = self.register_data(f'({node.lineno}, {node.linepos}) - RuntimeError: Division by zero\\n')
+        self.register_instruction(cil.RunTimeNode(data.name))
+        self.register_instruction(fine)
+        
         vname = self.define_internal_local()
         self.register_instruction(cil.DivNode(vname, value1, value2))
         return vname
