@@ -235,24 +235,6 @@ Un FunctionDeclarationNode en el AST devuelto por el parser se convierte en CIL 
 
 Como se conoce en el lenguaje COOL solo existen expresiones y en el lenguaje CIL se tienen tanto expresiones como instrucciones, por tanto una expresión COOL se traduce a una lista de instrucciones CIL ya sean de asignación o de cambio del valor de un atributo, ifgoto, goto, label, entre otras. Una asignación en CIL puede ser la traducción de una `asignación` de COOL  o puede ser creada para llevar una expresión de COOL distinta de asignación a una instrucción en CIL, un ejemplo es cuando queremos realizar una operación suma en COOL y una de las partes (izquierda o derecha) no es un nodo atómico, debemos separar en en una asignación a una nueva variable creada en CIL que guarde la expresión de esa parte que y luego a esta sumarla con la parte que si es atómica, lo mismo pasa para todas las expresiones binarias.
 
-Un caso de especial consideración dentro de las expresiones de COOL es el `case`, el comportamiento esperado es que se compute el tipo dinámico de la expresión de del `case` y se seleccione la rama del tipo ancestro más cercano a dicho tipo. Para resolver esto se recorrieron las ramas del case en orden topológico inverso de acuerdo a su tipo, por lo que visitamos los tipos más especializadas primero, y por cada de rama generamos código para que los descendientes que no tienen una rama asignada sean dirigidos a esta rama. Al final se genera el código de la expresión resultado de cada rama. A continuación presentamos un sencillo pseudocódigo con la idea general del algoritmo
-
-```
-branches = {}
-for type in reversed_toplogic_order(case.types):
-    branches[type] = type
-    for heir in type.heirs():
-        try:
-            branches[heir]
-        except:
-            branches[heir] = type
-
-for type, branch_type in branches:
-    assign_branch(type, branch_type)
-
-for branch in case:
-    generate_code()
-```
 
 La conversión de la lógica del `loop`, así como la del `conditional`, a código CIL fue muy sencilla. Con la ayuda de los labels y de las expresiones ifGoto y goto se decidía cuales eran las próximas instrucciones a ejecutar haciendo saltos en el código. 
 
@@ -278,7 +260,7 @@ El primer recorrido del AST del lenguaje CIL se realiza con el objetivo de crear
 A continuación definiremos las ideas seguidas para la representación de los tipos en memoria.
 1. El valor de los atributos de una clase son independientes para cada instancia de la clase, sin embargo, los métodos de la clase son globales para todas las instancias. Esto permite separar la información global del tipo en memoria estática y la información de las instancias en memoria dinámica.
 
-2. Los identificadores de las clases en COOL son únicos y por tanto los identificadores de los tipos también lo son. Esto permite utilizar su nombre como alias a la dirección de memoria donde se almacena la información del tipo. La información que se decidió almacenar sobre los tipos fue su tamaño (para la creación dinámica de instancias mediante `copy`), su representación como string (para la implementación de `type_name`) y las direcciones de los métodos del tipo.
+2. Los identificadores de las clases en COOL son únicos y por tanto los identificadores de los tipos también lo son. Esto permite utilizar su nombre como alias a la dirección de memoria donde se almacena la información del tipo. La información que se decidió almacenar sobre los tipos fue su tamaño (para la creación dinámica de instancias mediante `copy`), su representación como string (para la implementación de `type_name`), el tiempo de descubrimiento y finalización en el grafo de la jerarquía de tipos (implementación del case), y las direcciones de los métodos del tipo.
    
     ```mips
         .data
@@ -328,7 +310,7 @@ class TypeInfo:
     
     def get_method_addr(self, method, register):
         offset = self.methods_offset[method]
-        return f'{(offset + 1) * WSIZE}({register})'
+        return f'{(offset + 3) * WSIZE}({register})'
 ```
 Otro aspecto fundamental a tener en cuenta durante la generación de MIPS es el manejo de memoria durante el llamado a funciones, para la resolución de este problema es común la adopción de convenciones por lo que en este caso nos hemos adherido a las convenciones propuestas por `gcc`. Estas convenciones se definen en torno a una estructura llamada *procedure call frame* la cual definimos a continuación.
 
@@ -445,6 +427,11 @@ Los principales problemas a resolver durante la implementación fueron:
   Los tipos por valor pueden usar los métodos heredados de `Object` pero no tienen acceso a la información del tipo para obtener la dirección del método, para resolver esto implementamos métodos built-in para los tipos por valor, estos no sobrescriben los de la implementación de su clase dado que los métodos de una clase `VType` tienen el mismo identificador que los de la clase `Object` al ser heredados. Durante la generación de código MIPS sabemos si la variable de CIL ejecutando un dispatch es una variable de tipo por valor o por referencia y hacemos el binding dinámico de los métodos o llamamos a los built-int de los tipos por valor según corresponda.
 
 
+
+**Optimización del case**
+
+
+Un caso de especial consideración dentro de las expresiones de COOL es el `case`, el comportamiento esperado es que se compute el tipo dinámico de la expresión del `case` y se seleccione la rama del tipo ancestro más cercano a dicho tipo. Para resolver esto se recorre el árbol de clases iniciando por Object utilizando un DFS y para cada clase se almacena su tiempo de descrubimiento `dt` y tiempo de finalización `ft`, estos tiempos se guardan en la estructura `TypeInfo` que se almacena en memoria estática para cada tipo. Luego recorremos las ramas del case en orden descendente de acuerdo a su tiempo de descubrimiento y comprobamos si el tipo de la expresión del case (obtenido mediante una operación `TYPEOF`) conforma con el tipo de dicha rama. Esto se traduce a la creación de un `CILConformsNode` el cual cuando es procesado de la siguiente forma `T1 CONFORMS TO T2 <=> dt(T2) <= dt(T1) <= ft(T2)`, dado que el `dt` y `ft` se almacenan en la memoria esta comprobación se realiza en $ \Omicron(1) $, como se recorre en orden descendente de acuerdo al `dt` la primera rama que cumpla esta condición es el ancestro más cercano, dado que a lo sumo debemos recorrer todas las ramas del case esto es $\Omicron(n)$ donde $n$ es la cantidad de ramas.
 
 
 

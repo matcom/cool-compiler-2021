@@ -23,10 +23,11 @@ class CILProgramNode(CILNode):
         
 
 class CILTypeNode(CILNode):
-    def __init__(self, id, attributes, methods):
+    def __init__(self, id, attributes, methods, hierarchy_branch):
         self.id = id
         self.attributes = attributes
         self.methods = methods
+        self.hierarchy_branch = hierarchy_branch
 
     def __str__(self):
         text = "TypeNode:\n"
@@ -382,3 +383,8 @@ class CILNotEqualsNode(CILBinaryOperationNode):
 class CILNotNode(CILExpressionNode):
     def __init__(self, var):
         self.var = var              
+
+class CILConformsNode(CILExpressionNode):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right

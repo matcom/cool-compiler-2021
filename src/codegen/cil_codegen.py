@@ -223,3 +223,9 @@ class CILCodegen:
     @visitor.when(CILNotNode)
     def visit(self, node: CILNotNode):
         return f'~ {self.var.lex}'
+
+    @visitor.when(CILConformsNode)
+    def visit(self, node: CILConformsNode):
+        l = self.visit(node.left)
+        r = self.visit(node.right)
+        return f'{l} CONFORMS TO {r}'
