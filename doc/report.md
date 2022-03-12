@@ -9,7 +9,7 @@
 
 Para ejecuta el compilador basta con escribir
 
-`bash coolc <filename>.cl` TODO: Finish this
+`bash coolc <filename>.cl`
 
 ## Arquitectura
 
@@ -57,12 +57,13 @@ La lógica para esta fase se implementó en el archivo `builder.py`
 Esta fase es la encargada de validar el uso correcto de los tipos definidos en el programa y detectar otros errores definidos dentro de la semantica de COOL, estos errores con su correspondiente descripcion pueden ser encontrados bajo el fichero `errors.py`.
 
 Por ejemplo entre ellos se encuentran:
+
 - Verificar que las asignaciones de las variables sea el tipo adecuado a su definicion, así como los argumentos de funciones.
 - `self` es de solo lectura.
 - no violar el numero de argumentos y los tipos de estos cuando se sobreescribe una funcion.
 - No usar variables que no esten definidas previamente en el contexto.
 - Evitar herencia de los tipos Int, String y Bool.
-- Verficar el correcto uso de los operadores +, -, /, *, <, <=, =, etc.
+- Verficar el correcto uso de los operadores +, -, /, \*, <, <=, =, etc.
 - Evitar ramas duplicadas en el `case of`.
 
 En este recorrido sobre el AST ademas se crea el scope del programa para cada una de las clases, funciones, el `let in` y el `case of`. Los scopes establecen una jerarquia de herencia, de tal forma que el scope de una clase es hijo del scope de la clase que esta hereda, el scope de una funcion es hijo del scope de la clase en que esta se encuentra definida y los scopes de los `let in` y `case of` son hijos del scope del contexto en que se encuentren.
@@ -88,8 +89,6 @@ Para compilar el código en `COOL` a un lenguaje de bajo nivel como `MIPS`, se u
 - Conforms
 
   `<var> = CONFORMS <expr> <Type>`: Usada para saber si el resultado de `<expr>` conforma el tipo `<Type>`. Se creó por la necesidad de saber en tiempo de ejecución si el tipo que retorna la expresión en un `case of` podía ser asignado a una rama de un tipo dado.
-
-...TODO: Si hay algún otro que no sepa mencionarlo aquí
 
 Dicho esto, se implementaron 2 visitors encargados de generar el código en `CIL`. El primero se encuentra en el archivo `types_data_visitor.py` y es el encargado de definir las secciones `.TYPES` y `.DATA`, en donde se alojarán los tipos definidos en `COOL` y los datos constantes (mensajes de excepción, strings definidos en el código, ...) respectivamente. El segundo visitor encontrado en el archivo `code_visitor.py` se encarga de generar la sección `.CODE` en la cual se encuentra toda la lógica del programa. Ambos visitors fueron encargados de devolver un AST de `CIL` para el próximo paso de generación de código.
 
