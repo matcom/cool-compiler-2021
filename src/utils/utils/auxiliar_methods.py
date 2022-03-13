@@ -71,17 +71,3 @@ def erase_multiline_comment(str):
 
     return errors, result
 
-
-#### testing method
-
-# def read_file(file_name: str):
-#     with open(file_name, 'r') as f: 
-#         s = f.read()
-#     return s
-
-# s = read_file('../tests/lexer/iis1.cl')
-
-# e = erase_multiline_comment(s)
-
-# print(e[0])
-# print(e[1])

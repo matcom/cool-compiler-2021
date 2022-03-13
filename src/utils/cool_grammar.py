@@ -82,7 +82,7 @@ def p_expr(p):
             | WHILE expr LOOP expr POOL
             | LET declaration_list IN expr
             | CASE expr OF case_list ESAC
-            | comp'''
+            | notcomp'''
     if len(p) == 2:
         p[0] = p[1]
     elif p[1] == 'while':
@@ -96,12 +96,19 @@ def p_expr(p):
     elif p[1] == '{':
         p[0] = ast.BlockNode(p[2])
 
+def p_notcomp(p):
+    '''notcomp : NOT comp
+               | comp'''
+    if len(p) == 3:
+        p[0] = ast.NegationNode(p[2])
+    else:
+        p[0] = p[1]
 
 
 def p_comp(p):
-    '''comp : arith LESS arith
-            | arith LESSEQUAL arith
-            | arith EQUAL arith
+    '''comp : comp LESS notarith
+            | comp LESSEQUAL notarith
+            | comp EQUAL notarith
             | arith'''
 
     if len(p) == 4:
@@ -114,6 +121,14 @@ def p_comp(p):
     elif len(p) == 2:
         p[0] = p[1]
 
+
+def p_notarith(p):
+    '''notarith : NOT arith
+                | arith'''
+    if len(p) == 3:
+        p[0] = ast.NegationNode(p[2])
+    else:
+        p[0] = p[1]
 
 def p_arith(p):
     '''arith : arith PLUS term
@@ -160,12 +175,9 @@ def p_atom(p):
     '''atom : ID
             | NEW TYPE
             | OPAR expr CPAR
-            | IF expr THEN expr ELSE expr FI
-            | NOT expr'''
+            | IF expr THEN expr ELSE expr FI'''
 
-    if p[1] == 'not':
-        p[0] = ast.NegationNode(p[2])
-    elif len(p) == 4:
+    if len(p) == 4:
         p[0] = p[2]
     elif len(p) == 3:
         p[0] = ast.NewNode(p[2])

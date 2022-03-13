@@ -86,7 +86,7 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
     program = read_file(program_file)
 
     errors, program = erase_multiline_comment(program)
-    program = erase_single_line_comment(program) #### Aca es el error
+    program = erase_single_line_comment(program)
     
     lexer.input(program)
     tokens = []
