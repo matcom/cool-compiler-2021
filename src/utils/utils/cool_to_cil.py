@@ -1,6 +1,6 @@
-from atexit import register
-from pickle import TRUE
-from turtle import right
+# from atexit import register
+# from pickle import TRUE
+# from turtle import right
 from .semantic import *
 from utils import ast_nodes_cil as cil
 from utils import ast_nodes as cool
