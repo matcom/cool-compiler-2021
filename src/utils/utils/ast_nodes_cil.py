@@ -65,8 +65,13 @@ class DivNode(ArithmeticNode):
 class GetAttribNode(InstructionNode):
     pass
 
+
 class SetAttribNode(InstructionNode):
-    pass
+    def __init__(self, instance, attr, source):#,attr_index):
+        self.instance: str = instance
+        self.attr: str = attr
+        self.source: str = source
+        #self.attr_index: int = attr_index
 
 class GetIndexNode(InstructionNode):
     pass
@@ -144,6 +149,10 @@ class ReadNode(InstructionNode):
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+class AllocateNullNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
 
 def get_formatter():
 

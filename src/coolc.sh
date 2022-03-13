@@ -13,8 +13,8 @@ echo "Copyright (c) 2021: Yasmin Cisneros Cimadevila & Jessy Gigato Izquierdo"  
 
 if [[ $(pwd) == *src ]] 
 then
-    python utils/pipeline.py final-execution "${INPUT_FILE}" "${OUTPUT_FILE}"
+    python3.9 utils/pipeline.py final-execution "${INPUT_FILE}" "${OUTPUT_FILE}"
 else
     cd src
-    python utils/pipeline.py final-execution "${INPUT_FILE}" "${OUTPUT_FILE}"
+    python3.9 utils/pipeline.py final-execution "${INPUT_FILE}" "${OUTPUT_FILE}"
 fi

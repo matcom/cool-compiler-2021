@@ -98,6 +98,12 @@ class Type:
             plain[attr.name] = (attr, self)
         return plain.values() if clean else plain
 
+    def include_attribute(self,id_attr):
+        return id_attr in self.all_attributes(False).keys()
+
+    def include_method(self,id_method):
+        return id_method in self.all_methods(False).keys()
+
     def all_methods(self, clean=True):
         plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
         for method in self.methods.values():

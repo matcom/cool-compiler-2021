@@ -1,11 +1,13 @@
 from atexit import register
+from pickle import TRUE
+from turtle import right
 from .semantic import *
 from utils import ast_nodes_cil as cil
 from utils import ast_nodes as cool
 from utils import visitor
 
 class BaseCOOLToCILVisitor:
-    def __init__(self, context):
+    def __init__(self, context,dict_attr,dict_method):
         self.dottypes = []
         self.dotdata = []
         self.dotcode = []
@@ -13,6 +15,8 @@ class BaseCOOLToCILVisitor:
         self.current_method = None
         self.current_function = None
         self.context = context
+        self.dict_attr = dict_attr
+        self.dict_method = dict_method
     
     @property
     def params(self):
@@ -59,6 +63,11 @@ class BaseCOOLToCILVisitor:
         self.dotdata.append(data_node)
         return data_node
 
+    def add_basic_types():
+        pass
+
+    def add_basic_methods():
+        pass
 
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
@@ -75,6 +84,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         instance = self.define_internal_local()
         result = self.define_internal_local()
         main_method_name = self.to_function_name('main', 'Main')
+        #inicializar atributos de la clase main?
         self.register_instruction(cil.AllocateNode('Main', instance))
         self.register_instruction(cil.ArgNode(instance))
         self.register_instruction(cil.StaticCallNode(main_method_name, result))
@@ -97,15 +107,23 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.current_type = self.context.get_type(node.name)
         
         # Your code here!!! (Handle all the .TYPE section)
-        self.current_type = self.register_type(self.current_type.name)
-        for attr in self.current_type.attributes:
+        current_type_cil = self.register_type(self.current_type.name)
+        all_attributes =  [attr for attr,_ in self.current_type.all_attributes(True)]
+        for attr in all_attributes:
             self.visit(attr,scope)
-            self.current_type.attributes.append(attr.name)
+            current_type_cil.attributes.append(attr.name)
            
-        func_declarations = (f for f in node.data if isinstance(f, cool.MethodDecNode))
-        for feature, child_scope in zip(func_declarations, scope.children):
-            self.visit(feature, child_scope)
-                
+        #?? los metodos de las clases padres coinciden con los scopes hijos ??
+        all_methods = [method  for method,_ in self.current_type.all_methods(True)]
+        i = 0
+        for attr in self.current_type.attributes:
+            i += attr.expr != None  
+
+        for i,method in enumerate(all_methods,start=i):
+            self.visit(method, scope.children[i])
+            function_name = self.to_function_name(method.name,current_type_cil.name)
+            current_type_cil.methods.append((method.name,function_name))
+
         self.current_type = None
                 
     @visitor.when(cool.MethodDecNode)
@@ -129,13 +147,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         current_method_cil.params.append(cil.ParamNode("self"))
         for param in self.current_method.params_name:
             current_method_cil.params.append(cil.ParamNode(param))
-
+            
         # Your code here!!! (Handle RETURN)
         scope = node.scope
         value = self.visit(self.current_method.expr, scope)
     
-        return_node = cil.ReturnNode(value)
-        self.register_instruction(return_node)
+        # if value is None:
+        #     value = 0
+        self.register_instruction(cil.ReturnNode(value))
 
         self.current_method = None
 
@@ -151,12 +170,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.AssignNode)
     def visit(self, node, scope):
         ###############################
-        # node.id -> str
+        # node.idx -> str
         # node.expr -> ExpressionNode
         ###############################
         
-        # Your code here!!!
-        pass
+        #var_ = scope.find_variable(node.idx)
+        right = self.visit(node.expr,scope)
+        self.register_instruction(cil.AssignNode(node.idx,right))
+        return right
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node, scope):
@@ -166,9 +187,17 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.exprlist -> [ ExpressionNode ... ]
         ###############################
         
-        # Your code here!!!
+        args = [self.visit(node.atom)]#self
+        for param in node.exprlist:
+            args.append(self.visit(param,scope))
+            
+        for arg in args:
+            self.register_instruction(cil.ArgNode(arg))
         
-        pass
+        result = self.define_internal_local()
+        function_name = self.to_function_name(node.idx,node.type.name)
+        self.register_instruction(cil.DynamicCallNode(node.type.name,function_name,result))
+        return result
 
     @visitor.when(cool.NumberNode)
     def visit(self, node, scope):
@@ -176,27 +205,36 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.lex -> str
         ###############################
         
-        # Your code here!!! (Pretty easy ;-))
-        pass
+        return self.define_internal_local()
 
     @visitor.when(cool.VariableNode)
     def visit(self, node, scope):
         ###############################
         # node.lex -> str
         ###############################
-        
-        # Your code here!!!
-        pass
+        name = ""
+        for local_var in self.localvars:
+            if local_var.name == node.lex:
+                return local_var.name
 
     @visitor.when(cool.NewNode)
     def visit(self, node, scope):
         ###############################
         # node.type -> str
-        ###############################
-        
-        # Your code here!!!
+        ###################
+
         instance = self.define_internal_local()
         self.register_instruction(cil.AllocateNode(node.type, instance))
+        type_name = node.type
+        list_attr = self.dict_attr[type_name]
+        for attr in list_attr:
+            #att-> .name,.expr,._type
+            if attr.expr is not None:
+                source = self.visit(attr.expr,scope)
+                self.register_instruction(cil. SetAttribNode(instance,attr.name,source))
+            else:
+                 self.register_instruction(cil.AllocateNullNode(attr.name))
+        return instance
 
     @visitor.when(cool.PlusNode)
     def visit(self, node, scope):
@@ -205,8 +243,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.right -> ExpressionNode
         ###############################
         
-        # Your code here!!!
-        pass
+        result = self.define_internal_local()
+        left = self.visit(node.left,scope)
+        right = self.visit(node.right,scope)
+        self.register_instruction(cil.PlusNode(result,left,right))
+        return result
 
     @visitor.when(cool.MinusNode)
     def visit(self, node, scope):
@@ -215,8 +256,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.right -> ExpressionNode
         ###############################
         
-        # Your code here!!!
-        pass
+        result = self.define_internal_local()
+        left = self.visit(node.left,scope)
+        right = self.visit(node.right,scope)
+        self.register_instruction(cil.MinusNode(result,left,right))
+        return result
 
     @visitor.when(cool.TimesNode)
     def visit(self, node, scope):
@@ -225,8 +269,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.right -> ExpressionNode
         ###############################
         
-        # Your code here!!!
-        pass
+        result = self.define_internal_local()
+        left = self.visit(node.left,scope)
+        right = self.visit(node.right,scope)
+        self.register_instruction(cil.StarNode(result,left,right))
+        return result
 
     @visitor.when(cool.DivNode)
     def visit(self, node, scope):
@@ -235,9 +282,22 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # node.right -> ExpressionNode
         ###############################
         
+        result = self.define_internal_local()
+        left = self.visit(node.left,scope)
+        right = self.visit(node.right,scope)
+        self.register_instruction(cil.DivNode(result,left,right))
+        return result
+        
+    @visitor.when(cool.StringNode)
+    def visit(self, node, scope):
+        ###############################
+        # node.lex -> str
+        ###############################
+        
         # Your code here!!!
         pass
-        
+
+    
     # ======================================================================
 
 

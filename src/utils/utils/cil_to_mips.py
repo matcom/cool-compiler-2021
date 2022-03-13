@@ -2,17 +2,39 @@ from utils import visitor
 from utils import ast_nodes_cil as cil
 
 
-class CILToMIPSVisitor:
+class BaseCILToMIPSVisitor:
+    def __init__(self, context):
+        self.dotdata = []
+        self.dottext = []
+        self.context = context
+
+        # self.current_type = None
+        # self.current_method = None
+        # self.current_function = None
+
+    
+        
+class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     @visitor.on('node')
     def visit(self, node):
         pass
     
     @visitor.when(cil.ProgramNode)
     def visit(self, node, scope):
-        pass
+        for type_node in node.dottypes:
+            self.visit(type_node)
+
+        for function_node in node.dotcode:
+            self.visit(function_node)
+
+        for data_node in node.data:
+            self.visit(data_node)
+        
+        return #mips.programNode o el string del programa de mips???
     
     @visitor.when(cil.TypeNode)
     def visit(self, node, scope):
+        #por cada atributo reservo una palabra
         pass
 
     @visitor.when(cil.DataNode)
