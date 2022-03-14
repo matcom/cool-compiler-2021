@@ -120,11 +120,27 @@ Esto permite usar una gramática ambigua y evita tener que definir más producci
 
 # Semántica e Inferencia
 
+El análisis de la semántica se divide en 3 componentes:
+
+* `Colección de tipos`: Reconocer todos los tipos definidos por el usuario.
+* `Construcción de tipos`
+* `Chequeo semántico`
+
+## Colección de tipos
+
+Utilizando el patrón visitor se recorren todas los tipos definidos, se hayan sus padres y se verifica que no hayan herencias ilegales (heredar de `Int`, `String` o `Bool`) ni herencias circulares. Se ordenan las clases en orden descendente partiendo de la clase más general.
+
+## Construcción de tipos
+
+Se visitan todos los objetos y se almacena la interfaz de cada uno. Sus métodos y atributos. Los tipos que heredan de otros también se les define los atributos de sus padres.
+
+## Chequeo semántico
+
 Nuestro proyecto hace uso de `AUTO_TYPE` con la que incorpora inferencia de tipos al lenguage Cool. La inferencia se realiza varias veces en distintos vistores. En nuestra implementación debido a que le inferencia se apoya fuertemente sobre el reglas semánticas, el chequeo semántico se realiza a la par que la inferencia, y dividido de igual manera por los visitores.
 
 La idea principal para realizar la inferencia es considerar todo declaración  `AUTO_TYPE` no como un tipo específico sino como un conjunto de tipos, donde inicialmente ese conjunto esta compuesto por todos los tipos definidos en un programa Cool. Los tipos declarados específicamente como `Int` o `String` se consideran conjuntos con un solo elemento.
 
-En  Cool muchas veces las expresiones se ven obligadas a conformarse a un tipo definido por el usuario. Deben corresponder con el tipo definido de una variable, argumento o retorno de una función. También deben obedecer las reglas semánticas, cuando están presente frente a una operación aritmética, o en una posición donde se espera que el resultado sea `Bool`. Para reducir los conjuntos de tipos en presencia de `AUTO_TYPE` realizamos lo siguiente:
+En  Cool muchas veces las expresiones se ven obligadas a conformarse a un tipo definido por el usuario. Deben corresponder con el tipo definido de una variable, argumento o retorno de una función. También deben obedecer las reglas semánticas, cuando están presente frente a una operación aritmética, o en una posición donde se espera que el resultado sea un tipo pre-definido (e.g `Bool`). Para reducir el conjuntos de tipos de una expresión se realizan las siguientes operaciones:
 
 1. Cuando el tipo declarado de una variable esta bien definido (diferente de `AUTO_TYPE`) , se eliminan  del conjunto de tipos inferidos de la expresión los elementos que no conforman a dicho tipo bien definido.
 
@@ -132,7 +148,7 @@ En  Cool muchas veces las expresiones se ven obligadas a conformarse a un tipo d
 
 3. Cuando ambos tipos, tanto el definido como el inferido son `AUTO_TYPES` se busca que valores puede tener el segundo para conformarse al primero, y que valores el primero para que el segundo se conforme.
 
-Para tratar cada caso el inferenciador se divide en tres partes:
+Para tratar cada caso el inferenciador se divide en cuatro partes:
 
 1. **soft inferencer** que aplica la primera regla y tercera regla. Se le llama **soft** porque perdona y no realiza ningún tipo de chequeo semántico y permite cosas como que un conjunto  tengo dentro de si dos tipos sin un ancestro común.
 2. **hard inferencer ** aplica la primera y la tercera regla, y fuerza el chequeo semántico sobre todas las expresiones. No permite bolsas de tipos sin ancestros comunes dentro de un mismo conjunto.
@@ -141,9 +157,7 @@ Para tratar cada caso el inferenciador se divide en tres partes:
 
 Cada inferenciador se ejecuta secuencialmente, una sola vez, exceptuando por el **back inferencer** que puede ejecutarse tantas veces como sea necesario.
 
-
-
-## Soft Inferencer
+### Soft Inferencer
 
 El **soft inferencer** es permisivo pues como es el primero en leer el programa, puede que un conjunto de tipos inválidos en la línea 5 se vuelva válido más adelante en el código.
 
@@ -177,29 +191,33 @@ class B {
 }
 ```
 
-## Herramientas para la Inferencia
+### Herramientas para la Inferencia
 
-### Join
+#### Join
 
 La operación `join` cuando se busca encontrar el tipo mas general entre dos bolsas de tipos, es buscar el ancestro común más cercano al que todos los tipos de ambas bolsas se conformaran. Si ese tipo se encuentra dentro de alguna de las dos bolsas se utiliza, si no, se añade.
 
-Esta operación se utiliza sobre los expresiones `if` y `case of`.
+Esta operación se utiliza para analizar los resultados de las distintas ramas de las expresiones `if` y `case of`.
 
-### Conform 
+#### Conform
 
 `conform`  se utiliza para saber si una bolsa de tipos `a` conforma con otra `b`, se analizan todos sus subtipos de `a` y se desechan los que no conformen con ningún subtipo de `b`.
 
 Se ejecuta durante el chequeo del **soft inferencer** y el **hard inferencer**, para reducir el tipo de las expresiones a base de un tipo declarado o una regla semántica.
 
-### Unify
+#### Unify
 
 Con `unify` se halla la intersección entre dos bolsas de tipos. Se ejecuta en el **back inferencer** para reducir las tipos declarados a partir de las expresión inferida.
 
-## SELF_TYPE
+### Case Of
+
+Durante el útlimo visitor de la semántica (**Types Inferencer**) se organizan las ramas de la expresión `case of` en orden de especifidad. Las que tienen un tipo más específico primero.
+
+### SELF_TYPE
 
 Los `AUTO_TYPE` no incluyen dentro de su bolsa de tipo al tipo especial `SELF_TYPE`.
 
-La combinación de `SELF_TYPE` con `AUTO_TYPE` trajo sus problemas, sobre todo porque funciona como un comodín que puede tener un tipo dependiendo de las circunstancia. Logramos una mejor integración entre estos fue posible intercambiando el `SELF_TYPE` por el tipo según donde se estuviera analizando el código. Después se intercambiaba para atrás, en caso de que no se pueda, significa que no cumple las reglas de la semántica y se lanza como error después de finalizada la inferencia.
+La combinación de `SELF_TYPE` con `AUTO_TYPE` trajo sus problemas, sobre todo porque funciona como un comodín que puede tener un tipo dependiendo de las circunstancia. Logramos una mejor integración entre estos fue posible intercambiando el `SELF_TYPE` por el tipo según donde se estuviera analizando el código. Después se intercambiaba para atrás, en caso de que no se pueda, significa que no cumple las reglas de la semántica y se lanza como error después de finalizada el chequeo semántico.
 
 # Generación de Código Intermedio
 
