@@ -413,12 +413,27 @@ class CoolToCilVisitor(object):
             )
         )
 
-    def register_builtins(self):
+    def register_conforms_to(self, type, parent=None):
+        self.reset_state()
+        ret_local = self.register_new("Bool", self.register_num(1))
+        self.instructions.append(cil.ReturnNode(ret_local))
+        self.dotcode.append(
+            cil.FunctionNode(
+                self.get_func_id(type, "__conforms_to"),
+                self.params,
+                self.locals,
+                self.instructions,
+            )
+        )
+
+    def register_builtins(self, types):
         self.register_object_abort()
 
-        for type in self.methods:
-            self.register_type_name(type)
-            self.register_copy(type)
+        for type in types:
+            self.register_conforms_to(type.name, type.parent)
+
+            self.register_type_name(type.name)
+            self.register_copy(type.name)
 
         self.register_io_out_string()
         self.register_io_out_int()
@@ -447,19 +462,30 @@ class CoolToCilVisitor(object):
                 attr.name: (i, htype.name)
                 for i, (attr, htype) in enumerate(type.all_attributes())
             }
+            object_specials, generated_specials = (
+                ["type_name", "copy"],
+                ["__conforms_to"],
+            )
             self.methods[type.name] = {
-                method.name: (i, htype.name)
-                if htype.name != "Object" or method.name not in ["type_name", "copy"]
-                else (i, type.name)
+                method.name: (i + len(generated_specials), htype.name)
+                if (htype.name != "Object" or method.name not in object_specials)
+                else (i + len(generated_specials), type.name)
                 for i, (method, htype) in enumerate(type.all_methods())
             }
+
+            for i, special in enumerate(generated_specials):
+                self.methods[type.name][special] = (i, type.name)
+
+            sorted_methods = sorted(
+                self.methods[type.name].items(), key=lambda kv: kv[1][0]
+            )
             self.dottypes.append(
                 cil.TypeNode(
                     type.name,
                     list(self.attrs[type.name].keys()),
                     [
                         self.get_func_id(htype, method)
-                        for method, (_, htype) in self.methods[type.name].items()
+                        for method, (_, htype) in sorted_methods
                     ],
                 )
             )
@@ -489,7 +515,7 @@ class CoolToCilVisitor(object):
             cil.FunctionNode("main", self.params, self.locals, self.instructions)
         )
 
-        self.register_builtins()
+        self.register_builtins(node.types)
 
         for cool_class in node.classes:
             self.visit(cool_class)
