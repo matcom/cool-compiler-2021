@@ -415,8 +415,39 @@ class CoolToCilVisitor(object):
 
     def register_conforms_to(self, type, parent=None):
         self.reset_state()
-        ret_local = self.register_new("Bool", self.register_num(1))
-        self.instructions.append(cil.ReturnNode(ret_local))
+        other_param = self.register_param("other_type")
+
+        type_local = self.register_local()
+        self.instructions.append(cil.LoadNode(type_local, type))
+
+        then_label = self.get_label("then")
+
+        # IF condition GOTO then_label
+        types_eq_local = self.register_local()
+        self.instructions.append(cil.MinusNode(types_eq_local, type_local, other_param))
+        self.instructions.append(cil.GotoIfEqNode(types_eq_local, then_label))
+
+        # Label else_label
+        if parent is None:
+            false_local = self.register_new("Bool", self.register_num(0))
+            self.instructions.append(cil.ReturnNode(false_local))
+        else:
+            recursive_local = self.register_local("rec_call")
+            parent_type_local = self.register_local()
+            self.instructions.append(cil.LoadNode(parent_type_local, parent))
+            method_id = self.get_method_id("Object", "__conforms_to")
+            self.instructions.append(cil.ArgNode(other_param))
+            self.instructions.append(
+                cil.DynamicCallNode(parent_type_local, method_id, recursive_local)
+            )
+            self.instructions.append(cil.ReturnNode(recursive_local))
+
+        # Label then_label
+        self.instructions.append(cil.LabelNode(then_label))
+        self.instructions.append(
+            cil.ReturnNode(self.register_new("Bool", self.register_num(1)))
+        )
+
         self.dotcode.append(
             cil.FunctionNode(
                 self.get_func_id(type, "__conforms_to"),
@@ -430,7 +461,7 @@ class CoolToCilVisitor(object):
         self.register_object_abort()
 
         for type in types:
-            self.register_conforms_to(type.name, type.parent)
+            self.register_conforms_to(type.name, type.parent and type.parent.name)
 
             self.register_type_name(type.name)
             self.register_copy(type.name)
@@ -736,10 +767,6 @@ class CoolToCilVisitor(object):
             t12, t21 = t1.conforms_to(t2), t2.conforms_to(t1)
             return 0 if t12 and t21 else 1 if t21 else -1
 
-        sorted_types = sorted(
-            node.expr.type.reachable.values(), key=cmp_to_key(compare_types),
-        )
-
         sorted_branches = sorted(
             node.case_branches,
             key=cmp_to_key(
@@ -748,24 +775,30 @@ class CoolToCilVisitor(object):
         )
 
         branch_labels = []
-        for t in sorted_types:
-            for b in sorted_branches:
-                btyp = b.branch_type
-                if not t.conforms_to(btyp):
-                    continue
+        for b in sorted_branches:
+            btyp = b.branch_type
 
-                runtime_type_local = self.register_local()
-                self.instructions.append(cil.TypeOfNode(expr_local, runtime_type_local))
-                branch_type_local = self.register_local()
-                self.instructions.append(cil.LoadNode(branch_type_local, t.name))
-                types_eq_local = self.register_local()
-                self.instructions.append(
-                    cil.MinusNode(types_eq_local, runtime_type_local, branch_type_local)
+            types_conform_local = self.register_local()
+            runtime_type_local = self.register_local()
+            self.instructions.append(cil.TypeOfNode(expr_local, runtime_type_local))
+            branch_type_local = self.register_local()
+            self.instructions.append(cil.LoadNode(branch_type_local, btyp.name))
+            self.instructions.append(cil.ArgNode(branch_type_local))
+            self.instructions.append(
+                cil.DynamicCallNode(
+                    runtime_type_local,
+                    self.get_method_id("Object", "__conforms_to"),
+                    types_conform_local,
                 )
-                branch_label = self.get_label("case_branch")
-                branch_labels.append((branch_label, b))
-                self.instructions.append(cil.GotoIfEqNode(types_eq_local, branch_label))
-                break
+            )
+            branch_label = self.get_label("case_branch")
+            branch_labels.append((branch_label, b))
+            self.instructions.append(
+                cil.GetAttrNode(types_conform_local, 0, types_conform_local)
+            )
+            self.instructions.append(
+                cil.GotoIfGtNode(types_conform_local, branch_label)
+            )
 
         data = self.register_data("case_err", '"Case of did not match any branch!"')
         instance = self.register_new("String", data)
