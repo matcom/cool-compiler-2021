@@ -228,7 +228,11 @@ El resto de los nodos tienen comportamientos más intuitivos para cumplir con la
 Visitor muy sencillo. Cada nodo del ast de MIPS tiene una forma de imprimirse. A estas alturas no queda proceso complicado por realizar.
 
 \section*{Boxing y Unboxing}
-Todos nuestros tipos incluyendo los tipos básicos están almacenados en el Heap y en una instancia exactamente igual a la de los tipos definidos por el usuario. El usuario por supuesto no tiene acceso para modificar los attrs en estos tipos básicos. En el momento de realizar operaciones entre estos tipos, se traen a la pila, se realiza la operacion y se crea una nueva instancia en el Heap donde se almacena el resultado.
+Para los tipos básicos (Int, Bool, String) se realiza un manejo especial de la memoria en tiempo de compilación con el objetivo de minimizar la cantidad de información que almacenamos en el heap y la cantidad de indirecciones en el codigo generado. La estrategia que se sigue es que siempre que una expresión tenga tipo estático de uno de estos tipos básicos, se almacena el valor de la expresión (en el caso de los String el valor es la dirección donde comienza el string en memoria) en el stack. Es necesario para la realización de algunas operaciones mover estos valores al heap y en algunos casos traerlos de vuelta a la pila. Siempre que se realiza una asignación (declaración de let, asignación, paso de argumentos de las funciones, asignación de una rama del caseof), se revisan el tipo estático del identificador al que se le va a dar el valor de la expresión y el de la propia expresión, pueden darse tres casos en este punto:
+
+- ambos son tipos básicos o ambos son tipos no básicos, en cuyo caso se procede a copiar el valor de la posición de memoria de la derecha hacia la de la izquierda.
+- si el tipo de la izquierda es un tipo básico y el de la derecha no, se realiza un proceso de unboxing, donde básicamente traemos el valor del objeto, desde el heap hacia el stack.
+- si el tipo de la derecha es un tipo básico y el de la izquierda no, se realiza un proceso de boxing, donde movemos el valor del objeto hacia el heap y lo envolvemos en una instancia del tipo correspondiente.
 
 
 
