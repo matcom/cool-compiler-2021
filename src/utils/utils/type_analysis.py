@@ -656,6 +656,11 @@ class TypeChecker:
     def visit(self, node: ast.StringNode, scope: Scope):
         return self.context.get_type('String')
 
+    # Parenthesis
+    @visitor.when(ast.ExprParNode)
+    def visit(self, node: ast.ExprParNode, scope: Scope):
+        return self.visit(node.expr, scope)
+
       
 class PositionateTokensInAST:
     def __init__(self, tokens):
@@ -706,7 +711,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode):
         token = self.tokens[self.position]
-        assert (token.value == "class"), f'Expected "class" instead of "{token.value}" in {node.name}'
+        assert (token.value.lower() == "class"), f'Expected "class" instead of "{token.value}" in {node.name}'
 
         token = self.tokens[self.position + 1]
         node.set_position(token.line, token.lexpos)
@@ -769,6 +774,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.LetNode)
     def visit(self, node: ast.LetNode):
         token = self.tokens[self.position]
+        
         node.set_position(token.line, token.lexpos)
         self.inc_position()
 
@@ -969,4 +975,18 @@ class PositionateTokensInAST:
     @visitor.when(ast.EqualNode)
     def visit(self, node: ast.EqualNode):
         self.binary_op(node)
+
+    @visitor.when(ast.ExprParNode)
+    def visit(self, node: ast.ExprParNode):
+        token = self.tokens[self.position]
+        assert token.value == "(", f'Expected "(" instead of "{token.value}" in parenthesis expression'
+        self.inc_position()
+
+        self.visit(node.expr)
+
+        token = self.tokens[self.position]
+        assert token.value == ")", f'Expected ")" instead of "{token.value}" in parenthesis expression'
+        self.inc_position()
+
+
 

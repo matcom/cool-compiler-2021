@@ -178,7 +178,8 @@ def p_atom(p):
             | IF expr THEN expr ELSE expr FI'''
 
     if len(p) == 4:
-        p[0] = p[2]
+        p[0] = ast.ExprParNode(p[2])
+        # p[0] = p[2]
     elif len(p) == 3:
         p[0] = ast.NewNode(p[2])
     elif len(p) == 2:

@@ -117,6 +117,11 @@ class NewNode(ExprNode):
         self.type = type_
         self.type_position = (-1, -1)
 
+class ExprParNode(ExprNode):
+    def __init__(self, expr):
+        self.expr = expr
+        self.expr_pos = (-1, -1)
+
 class AtomicNode(ExprNode):
     def __init__(self, lex):
         self.lex: str = lex

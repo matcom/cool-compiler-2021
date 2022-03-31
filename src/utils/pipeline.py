@@ -254,11 +254,12 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
 
     if parser_errors:  
         for (line, lexpos, _, value) in parser_errors:
-            totallines = program.count('\n')
+            current_line = line - program.count('\n')
             col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
-            print_errors(f'({line - totallines}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
+            print_errors(f'({current_line}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
         exit(1)
 
+    # print(program)
     else:
         PositionateTokensInAST(tokens).visit(ast)
         TypeCollector(context, errors, program).visit(ast)

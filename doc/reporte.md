@@ -21,6 +21,7 @@ La estructura del compilador la modelamos de la siguiente manera:
     - AST CIL-MIPS
     - Generación del archivo .mips 
 
+
 ## Tokenización y Parser
 Para la construcción del lexer y el parser se utiliza la biblioteca `ply` de python, que provee herramientas para la generación del AST a partir de una gramática. El método de parseo utilizado fue `LALR`.
 

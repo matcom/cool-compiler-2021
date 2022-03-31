@@ -305,6 +305,10 @@ class InferenceTypeChecker:
             return 'base', self.context.get_type(node.type)
         return 'base', self.context.get_type('Object')
 
+    @visitor.when(ast.ExprParNode)
+    def visit(self, node: ast.NewNode, scope: Scope):
+        return self.visit(node.expr, scope)
+
     def visit_op_int(self, node: ast.BinaryNode, scope: Scope):
         left_op = self.visit(node.left, scope)
         right_op = self.visit(node.right, scope)
@@ -549,4 +553,6 @@ class ReplaceTypes:
         self.visit(node.then_expr,scope.children[0])
         self.visit(node.else_expr,scope.children[1])
 
-        
+    @visitor.when(ast.ExprParNode)
+    def visit(self, node: ast.ExprParNode, scope: Scope):
+        self.visit(node.expr, scope)  
