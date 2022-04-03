@@ -456,16 +456,15 @@ class ReplaceTypes:
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode, scope: Scope):
         self.current_type = self.context.get_type(node.name)
-        i_attr = 0
-        i_method = 0
+        i_index = 0
         for item in node.data:
             if isinstance(item, ast.MethodDecNode):
-                self.visit(item, scope.children[i_attr])
-                i_attr += 1
+                self.visit(item, scope.children[i_index])
+                i_index += 1
             elif isinstance(item, ast.AttributeDecNode):
                 if item.expr is not None:
-                    item.index = i_attr
-                    i_attr += 1
+                    item.index = i_index
+                    i_index += 1
                 self.visit(item, scope)
 
     @visitor.when(ast.AttributeDecNode)
