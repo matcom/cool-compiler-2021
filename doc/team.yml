@@ -1,10 +1,10 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Juan José López Martínez
+    github: [@jotacib3](https://github.com/jotacib3)
+    group: C411
+  - name: Juan Carlos Esquivel Lamis
+    github: [@jesquivel960729](https://github.com/jesquivel960729)
+    group: C411
+  - name: Ariel Plasencia Díaz
+    github: [@ArielXL](https://github.com/ArielXL)
+    group: C412
