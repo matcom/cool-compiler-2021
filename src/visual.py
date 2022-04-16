@@ -16,6 +16,7 @@ from lexing.lexer import Lexer
 from parsing.parser import Parser
 from semantic.semantic import SemanticAnalyzer
 from utils.notification import NotificationWindow
+from code_generation.code_generation import CodeGeneration
 
 class MainWindow(QMainWindow):
 
@@ -41,6 +42,7 @@ class MainWindow(QMainWindow):
         self.ui.actionReport.triggered.connect(self.report)
         self.ui.actionAboutAuthors.triggered.connect(self.about_authors)
 
+        self.set_enable(True)
         self.new_code()
 
     def clear_windows(self):
@@ -73,7 +75,6 @@ class MainWindow(QMainWindow):
         self.ui.tabCOOLMenu.setTabEnabled(0, True)
         self.ui.tabCOOLMenu.setCurrentIndex(0)
         self.clear_windows()
-        self.set_enable(False)
 
     def dialog_critical(self, s):
         dlg = QMessageBox(self)
@@ -98,7 +99,6 @@ class MainWindow(QMainWindow):
             self.update_status()
             self.clear_windows()
             self.go_dialog(0)
-        self.set_enable(True)
     
     def save(self, path, text):
         try:
@@ -213,29 +213,27 @@ class MainWindow(QMainWindow):
             if ok:
                 ok, ast, context, scope = self.semantic(ast)
                 if ok:
-                    # TODO : la parte de generacion de codigo
-                    pass
-                    # self.code_generation(ast, context, scope)
+                    self.code_generation(ast, context, scope)
 
-                    # NotificationWindow.success('Listo', 
-                    #     '''
-                    #         <html>
-                    #             <body>
-                    #                 <span style="color:green;">
-                    #                     <p>El análisis ha termiando.</p>
-                    #                     <p>Todos los resultados están listos.</p>
-                    #                     <p></p>
-                    #                 </span>
-                    #             </body>
-                    #         </html>
-                    #     ''')
-                    # self.go_dialog(6)
+                    NotificationWindow.success('Listo', 
+                        '''
+                            <html>
+                                <body>
+                                    <span style="color:green;">
+                                        <p>El análisis ha termiando.</p>
+                                        <p>Todos los resultados están listos.</p>
+                                        <p></p>
+                                    </span>
+                                </body>
+                            </html>
+                        ''')
+                    self.go_dialog(5)
 
     def code_generation(self, ast, context, scope):
-        # code_generation = CodeGeneration(ast, context, scope, '', debug=False)
-        # mips_code, cil_ast = code_generation.code_generation()
+        code_generation = CodeGeneration(ast, context, scope, '', debug=False)
+        mips_code = code_generation.code_generation()
         
-        # self.ui.textMIPS.setPlainText(f'{self.ui.textMIPS.toPlainText()}{mips_code}')
+        self.ui.textMIPS.setPlainText(f'{self.ui.textMIPS.toPlainText()}{mips_code}')
 
         NotificationWindow.success('Listo', 
                 '''
@@ -269,7 +267,7 @@ class MainWindow(QMainWindow):
                         </body>
                     </html>
                 ''', callback=lambda: self.help())
-            self.go_dialog(7)
+            self.go_dialog(6)
             return False, ast, context, scope
         else:
             self.ui.textContext.setPlainText(f'{self.ui.textContext.toPlainText()}{context}')
@@ -307,7 +305,7 @@ class MainWindow(QMainWindow):
                         </body>
                     </html>
                 ''', callback=lambda: self.help())
-            self.go_dialog(7)
+            self.go_dialog(6)
             return False, ast
         else:
             path = './parsing/parser.out'
@@ -379,7 +377,7 @@ class MainWindow(QMainWindow):
                         </body>
                     </html>
                 ''', callback=lambda: self.help())
-            self.go_dialog(7)
+            self.go_dialog(6)
             return False, lexer
         else:
             NotificationWindow.success('Listo', 

@@ -28,7 +28,7 @@ class Utils:
         parser.add_argument('output_file', type=str, 
                                 help='Path of the MIPS program.')
         parser.add_argument('-d', '--debug', action='store_true', 
-                            dest='debug', default=False, 
+                            dest='debug', default=True, 
                                 help='Save all files for debugging.')
 
         return parser.parse_args()
@@ -86,3 +86,11 @@ class Utils:
     @staticmethod
     def IsBasicType(type_name : str) -> bool:
         return type_name in ['String', 'Int', 'Object', 'Bool', 'SELF_TYPE', 'IO']
+
+    @staticmethod
+    def CreateName1(element:str, name:str, name1:str, type:str):
+        return f'{element}_{name}_{name1}_{type}'
+
+    @staticmethod
+    def CreateName2(element:str, obj:str, type:str):
+        return f'{element}_{obj}_{type}'

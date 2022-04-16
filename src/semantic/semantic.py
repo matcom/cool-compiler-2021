@@ -19,7 +19,6 @@ class SemanticAnalyzer:
         collector = TypeCollector(self.errors)
         collector.visit(self.ast)
         self.context = collector.context
-        # print(self.context)
         Utils.Write(self.debug_path, '.context', str(self.context)) if self.debug else None
 
         builder = TypeBuilder(self.context, self.errors)
@@ -27,7 +26,6 @@ class SemanticAnalyzer:
 
         checker = VarCollector(self.context, self.errors)
         self.scope = checker.visit(self.ast)
-        # print(self.scope)
         Utils.Write(self.debug_path, '.scope', str(self.scope)) if self.debug else None
 
         checker = TypeChecker(self.context, self.errors)

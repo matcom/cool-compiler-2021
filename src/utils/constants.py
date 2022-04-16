@@ -1,4 +1,4 @@
-INT='Int'
+INT = 'Int'
 BOOL = 'Bool'
 STRING = 'String'
 OBJECT = 'Object'

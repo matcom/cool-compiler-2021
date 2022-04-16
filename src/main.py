@@ -1,5 +1,3 @@
-import sys
-
 from pathlib import Path
 from utils.errors import *
 from utils.utils import Utils
@@ -109,6 +107,8 @@ class Compiler:
         code_generation = CodeGeneration(self.ast, self.context, self.scope, self.debug_path)
         self.mips_code = code_generation.code_generation()
         self.output_file.write_text(self.mips_code)
+
+        # print('COMPLETED CODE GENERATION!!!')
 
 
 def main():

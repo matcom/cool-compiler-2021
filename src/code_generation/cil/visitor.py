@@ -1,21 +1,21 @@
 import re
+import random
+import string
+
 from utils.ast import *
 from utils import visitor
 from semantic.tools import *
 from semantic.types import *
-from utils.ast import AssignNode
-from code_generation.cil.nodes import *
+from utils.constants import *
 from utils.utils import Utils
-from code_generation.cil.built_in.Object.object_functions import build_object_functions
-from code_generation.cil.built_in.IO.IO_functions import build_io_functions
-from code_generation.cil.built_in.Bool.bool_functions import build_bool_functions
-from code_generation.cil.built_in.Int.int_functions import build_int_functions
-from code_generation.cil.built_in.String.string_functions import build_string_functions
-from constants import INT, LOCAL, STRING, BOOL, OBJECT, IO, MAIN, VOID, VISITOR_NODE, ENTRY, SELF_LOWERCASE, FUNCTION, ATTRIBUTE, TYPE, DATA, CODE, LOCAL
-from code_generation.cil.utils import *
+from utils.ast import AssignNode
 from collections import defaultdict
-import random
-import string
+from code_generation.cil.nodes import *
+from code_generation.cil.built_in.IO.IO_functions import build_io_functions
+from code_generation.cil.built_in.Int.int_functions import build_int_functions
+from code_generation.cil.built_in.Bool.bool_functions import build_bool_functions
+from code_generation.cil.built_in.Object.object_functions import build_object_functions
+from code_generation.cil.built_in.String.string_functions import build_string_functions
 
 def randStr(chars = string.ascii_lowercase + string.digits, N=10):
 	return ''.join(random.choice(chars) for _ in range(N))
@@ -24,7 +24,7 @@ COUNT = 0
 
 def increment():
     global COUNT
-    COUNT = COUNT+1
+    COUNT = COUNT + 1
 
 class Visitor:
     def __init__(self, context):
@@ -117,7 +117,7 @@ class Visitor:
 
         for attr, a_type in attrs:
             cil_type.attributes.append(
-                (attr.name, create_name2(ATTRIBUTE, attr.name, a_type.name)))
+                (attr.name, Utils.CreateName2(ATTRIBUTE, attr.name, a_type.name)))
             if attr.expr:
                 constr.body.expr_list.append(AssignNode(attr.name, attr.expr))
             elif attr.type == INT:
@@ -133,7 +133,7 @@ class Visitor:
 
         for method, mtype in self.current[TYPE].all_methods():
             cil_type.methods.append(
-                (method.name, create_name2(FUNCTION, method.name, mtype.name)))
+                (method.name, Utils.CreateName2(FUNCTION, method.name, mtype.name)))
 
         func_declarations += [
             f for f in node.features if isinstance(f, FuncDeclarationNode)]
@@ -144,7 +144,7 @@ class Visitor:
     def visit(self, node: FuncDeclarationNode, scope: Scope):
         current_method = self.current[TYPE].get_method(node.id, node.pos)
 
-        name = create_name2(FUNCTION, node.id, self.current[TYPE].name)
+        name = Utils.CreateName2(FUNCTION, node.id, self.current[TYPE].name)
         function_node = CILFunctionNode(name, [], [], [], COUNT)
         increment()
         self.cil_program_node_info[CODE].append(function_node)

@@ -8,8 +8,10 @@ UI_FILES	:= about_authors compiler_COOL help orientation
 
 main: ## Compiling the compiler :)
 	@echo "Compiling the compiler :)"
-#	for ui_file in $(UI_FILES); do pyuic5 -x ./uis/$${ui_file}.ui -o ./uis/$${ui_file}.py; done
-#	python3 utils/remove_character.py
+
+compile: ## Compiling the compiler :)
+	for ui_file in $(UI_FILES); do pyuic5 -x ./uis/$${ui_file}.ui -o ./uis/$${ui_file}.py; done
+	python3 utils/remove_character.py
 
 visual: ## Open the app desktop ;)
 	python3 visual.py
@@ -32,6 +34,15 @@ clean: ## Remove temporary files
 	rm -rf ../tests/*/*.mips
 
 my_clean: ## Remove others temporary files
+	rm -rf __pycache__/
+	rm -rf code_generation/__pycache__/
+	rm -rf code_generation/cil/__pycache__/
+	rm -rf code_generation/cil/built_in/Bool/__pycache__/
+	rm -rf code_generation/cil/built_in/Int/__pycache__/
+	rm -rf code_generation/cil/built_in/IO/__pycache__/
+	rm -rf code_generation/cil/built_in/Object/__pycache__/
+	rm -rf code_generation/cil/built_in/String/__pycache__/
+	rm -rf code_generation/mips/__pycache__/
 	rm -rf debug/*.*
 	rm -rf lexing/__pycache__/
 	rm -rf parsing/__pycache__/

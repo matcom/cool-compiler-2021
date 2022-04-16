@@ -1,5 +1,5 @@
 from code_generation.cil.nodes import *
-from constants import INT, SELF_LOWERCASE
+from utils.constants import INT, SELF_LOWERCASE
 
 def build_int_functions(index=None):
     type_name_params = [CILParamNode(SELF_LOWERCASE, INT)]

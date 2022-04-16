@@ -1,5 +1,5 @@
 from code_generation.cil.nodes import *
-from constants import INT, STRING, SELF_LOWERCASE
+from utils.constants import INT, STRING, SELF_LOWERCASE
 
 
 def build_string_functions(index=None):

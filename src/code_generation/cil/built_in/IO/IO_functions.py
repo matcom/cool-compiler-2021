@@ -1,5 +1,5 @@
 from code_generation.cil.nodes import *
-from constants import INT, IO, STRING, SELF_LOWERCASE
+from utils.constants import INT, IO, STRING, SELF_LOWERCASE
 
 def build_io_functions(index=None):
     out_string_params = [CILParamNode(SELF_LOWERCASE, IO), CILParamNode("word", STRING)]

@@ -1,7 +1,7 @@
-from constants import TYPE, CODE, DATA
+from utils.constants import *
+
 class CILNode:
     pass
-
 
 class CILFunctionNode(CILNode):
     def __init__(self, fname, params, local_variables, instructions, idx=None):

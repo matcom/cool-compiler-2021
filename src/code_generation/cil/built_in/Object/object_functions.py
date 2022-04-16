@@ -1,5 +1,5 @@
 from code_generation.cil.nodes import *
-from constants import OBJECT, SELF_LOWERCASE
+from utils.constants import OBJECT, SELF_LOWERCASE
 
 def build_object_functions(index=None):
     abort_params = [CILParamNode(SELF_LOWERCASE, OBJECT)]

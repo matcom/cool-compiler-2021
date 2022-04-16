@@ -1,14 +1,11 @@
 import re
+
 from enum import Enum
+from utils import visitor
+from utils.constants import *
 from typing import List, Dict
 from collections import OrderedDict
-
-from utils import visitor
 from code_generation.cil.nodes import *
-from semantic.types import Attribute
-from semantic.tools import VariableInfo
-from constants import INT, IO, VISITOR_NODE, BOOL, STRING, OBJECT, SELF_LOWERCASE
-
 
 class SymbolNode:
     def __init__(self, name, is_live=False, next_use=None):
@@ -557,7 +554,6 @@ class MipsVisitor:
         self.code.append(f'li ${destination}, 1')
         self.code.append(f'{end_label}:')
         self.loop_idx += 1
-
 
 class CilToMips(MipsVisitor):
     @visitor.on(VISITOR_NODE)

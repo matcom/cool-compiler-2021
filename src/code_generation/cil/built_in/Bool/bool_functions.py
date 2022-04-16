@@ -1,5 +1,5 @@
 from code_generation.cil.nodes import *
-from constants import BOOL, SELF_LOWERCASE
+from utils.constants import BOOL, SELF_LOWERCASE
 
 def build_bool_functions(index=None):
     type_name_params = [CILParamNode(SELF_LOWERCASE, BOOL)]
