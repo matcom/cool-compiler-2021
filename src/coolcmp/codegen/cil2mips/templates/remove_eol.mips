@@ -1,0 +1,10 @@
+# Removes end eol from string address:
+# Arguments
+# a0: string address
+remove_eol:
+	lb $t1, 0($a0)
+	addi $a0, $a0, 1
+	bnez $t1, remove_eol
+	subu $a0, $a0, 2
+	sb $0, 0($a0)
+	jr $ra

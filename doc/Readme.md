@@ -1,33 +1,41 @@
 # Documentación
 
-## Readme
+## Como usar el compilador
 
-Modifique el contenido de este documento para documentar de forma clara y concisa los siguientes aspectos:
+Para compilar un fichero de COOL se puede usar el comando:
 
-- Cómo ejecutar (y compilar si es necesario) su compilador.
-- Requisitos adicionales, dependencias, configuración, etc.
-- Opciones adicionales que tenga su compilador.
+```
+python3 coolc.py "path/to/file.cl"
+```
 
-## Sobre los Equipos de Desarrollo
+Este compila el fichero `file.cl` y almacena el código generado en un fichero del mismo nombre pero pero con extension `.mips`.
 
-Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o 3 integrantes. El proyecto de Compilación será recogido y evaluado únicamente a través de Github. Es imprescindible tener una cuenta de Github para cada participante, y que su proyecto esté correctamente hosteado en esta plataforma. 
+Se pueden consultar las demás opciones de la línea de comandos para el compilador ejecutando `python3 coolc.py -h`.
 
-**⚠️ NOTA**: Debe completar el archivo `team.yml` con los datos correctos de cada miembro de su equipo.
+```
+usage: coolc.py [-h] [--out OUT] [--run | --no-run] [--verbose | --no-verbose] file
 
-## Sobre los Materiales a Entregar
+positional arguments:
+  file                  COOL source file.
 
-Para la evaluación del proyecto Ud. debe entregar un informe en formato PDF (`report.pdf`) en esta carpeta, que resuma de manera organizada y comprensible la arquitectura e implementación de su compilador.
-El documento no tiene límite de extensión.
-En él explicará en más detalle su solución a los problemas que, durante la implementación de cada una de las fases del proceso de compilación, hayan requerido de Ud. especial atención.
+optional arguments:
+  -h, --help            show this help message and exit
+  --out OUT             Name for .mips generated file after compilation.
+  --run, --no-run       Execute the file compiled with SPIM. (default: False)
+  --verbose, --no-verbose
+                        Verbose output. (default: False)
+```
 
-## Estructura del reporte
+- `--out`: modifica el fichero de salida para el `.mips` generado, que por defecto es creado con el mismo nombre del fichero de COOL.
+- `--run`: facilita la ejecución del programa escrito en COOL ejecutando automáticamente el fichero `.mips` de salida. Para realizar dicha acción es necesario tener `spim` instalado y en el path.
+- `--verbose`: imprime en consola el AST generado después de concluido el análisis lexico, parsing y análisis semántico, asi como el código intermedio (CIL) generado previamente a la generación de código final. 
 
-Usted es libre de estructurar su reporte escrito como más conveniente le parezca. A continuación le sugerimos algunas secciones que no deberían faltar, aunque puede mezclar, renombrar y organizarlas de la manera que mejor le parezca:
+## Requerimientos
 
-- **Uso del compilador**: detalles sobre las opciones de líneas de comando, si tiene opciones adicionales (e.j., `--ast` genera un AST en JSON, etc.). Básicamente lo mismo que pondrá en este Readme.
-- **Arquitectura del compilador**: una explicación general de la arquitectura, en cuántos módulos se divide el proyecto, cuantas fases tiene, qué tipo de gramática se utiliza, y en general, como se organiza el proyecto. Una buena imagen siempre ayuda.
-- **Problemas técnicos**: detalles sobre cualquier problema teórico o técnico interesante que haya necesitado resolver de forma particular.
+### Ambiente de ejecución
 
-## Sobre la Fecha de Entrega
+El proyecto fue desarrollado y probado bajo un ambiente en `Python 3.9.5`, asi que se espera compatibilidad con esta version y superiores (`3.9+`). No se garantiza la correctitud del compilador o que este sea ejecutable en versiones inferiores.
 
-Se realizarán recogidas parciales del proyecto a lo largo del curso. En el Canal de Telegram se anunciará la fecha y requisitos de cada entrega.
+### Dependencias
+
+La única dependencia del compilador es `ply==3.11`, la cual puede ser instalada ejecutando el comando `python3 -m pip install ply==3.11`.

@@ -1,0 +1,64 @@
+# Template for substring function:
+# Arguments
+# a0 Address to start of string
+# a1 Address to start of substring
+# a2 Size of substring
+# Returns
+# $v0: Address to start of substring
+substr:
+    # Push register values
+    addiu $sp $sp -32
+    sw $t0 0($sp)
+    sw $t1 4($sp)
+    sw $t2 8($sp)
+    sw $t3 12($sp)
+    sw $a0 16($sp)
+    sw $a1 20($sp)
+    sw $a2 24($sp)
+    sw $ra 28($sp)
+
+    move $t0 $a0
+    add $t0 $t0 $a1
+    li $t1 4
+
+    div $a2 $t1
+    mfhi $t2
+
+    bne $t2 $zero substr_align_size
+    move $t1 $a2
+    j substr_new_block
+
+substr_align_size:
+    sub $t1 $t1 $t2
+    add $t1 $t1 $a2
+
+substr_new_block:
+    move $a0 $t1
+    jal malloc
+    move $t3 $v0
+    move $t1 $zero
+
+substr_copy_loop:
+    beq $t1 $a2 substr_end
+    lb $t2 0($t0)
+    sb $t2 0($t3)
+    addiu $t0 $t0 1
+    addiu $t3 $t3 1
+    addiu $t1 $t1 1
+    j substr_copy_loop
+
+substr_end:
+    sb $zero 0($t3)
+
+    # Pop register values
+    lw $t0 0($sp)
+    lw $t1 4($sp)
+    lw $t2 8($sp)
+    lw $t3 12($sp)
+    lw $a0 16($sp)
+    lw $a1 20($sp)
+    lw $a2 24($sp)
+    lw $ra 28($sp)
+    addiu $sp $sp 32
+
+    jr $ra

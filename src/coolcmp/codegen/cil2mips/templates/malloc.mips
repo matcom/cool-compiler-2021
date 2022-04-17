@@ -1,0 +1,21 @@
+malloc:
+    addiu $sp $sp -12                                # Save content of registers in sp
+    sw $a0 0($sp)
+    sw $t0 4($sp)
+    sw $t1 8($sp)
+
+    li $t0 4
+    div $a0 $t0                                      # Size of string / wordsize
+    mfhi $t1                                         # t2 holds remainder of division
+
+    sub $t0 $t0 $t1                                  # Convert t1 to multiple of 4
+    add $a0 $a0 $t0
+
+    li $v0 9
+    syscall
+
+    lw $a0 0($sp)                                    # Return original content to registers
+    lw $t0 4($sp)
+    lw $t1 8($sp)
+    addiu $sp $sp 12
+    jr $ra
