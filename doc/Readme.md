@@ -1,33 +1,83 @@
 # Documentación
 
-## Readme
+## Uso del compilador
 
-Modifique el contenido de este documento para documentar de forma clara y concisa los siguientes aspectos:
+El presente compilador fue desarrollado en el sistema operativo Ubuntu 20.4, donde se utilizo Python 3.8.10 como lenguaje de programación.
 
-- Cómo ejecutar (y compilar si es necesario) su compilador.
-- Requisitos adicionales, dependencias, configuración, etc.
-- Opciones adicionales que tenga su compilador.
+El proyecto en general tienen los siguientes requerimientos iniciales para su ejecución:
+• ply
+• pytest
+• pytest-ordering
 
-## Sobre los Equipos de Desarrollo
+Para instalar todas las dependencias basta con ejecutar el siguiente comando en el directoria de raı́z:
 
-Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o 3 integrantes. El proyecto de Compilación será recogido y evaluado únicamente a través de Github. Es imprescindible tener una cuenta de Github para cada participante, y que su proyecto esté correctamente hosteado en esta plataforma. 
+```bash
+$ pip install -r requirements.txt
+```
 
-**⚠️ NOTA**: Debe completar el archivo `team.yml` con los datos correctos de cada miembro de su equipo.
+En particular como todo el proyecto fue realizado en python3, también cabe destacar que para los test de prueba se debe emplear la herramienta
+pytest3. Por otra parte, para instalar las dependencias también se debe usar el comando pip3.
 
-## Sobre los Materiales a Entregar
+**NOTA**: El compilador no fue probado en versiones anteriores de python por lo que no se tiene conocimientos de su correcto funcionamiento.
 
-Para la evaluación del proyecto Ud. debe entregar un informe en formato PDF (`report.pdf`) en esta carpeta, que resuma de manera organizada y comprensible la arquitectura e implementación de su compilador.
-El documento no tiene límite de extensión.
-En él explicará en más detalle su solución a los problemas que, durante la implementación de cada una de las fases del proceso de compilación, hayan requerido de Ud. especial atención.
+##Estructura del proyecto
 
-## Estructura del reporte
+.
+├── CIL  
+│   ├── ast.py  
+│   ├── cil.py   
+├── coolc.sh  
+├── main.py  
+├── makefile  
+├── MIPS  
+│   ├── mips.py     
+├── Parser  
+│   ├── ast.py  
+│   ├── lexer.py  
+│   ├── parser.out  
+│   ├── parser.py  
+│   ├── parsetab.py  
+├── Semantic  
+│   ├── builder.py  
+│   ├── checker.py  
+│   ├── collector.py  
+└── Tools  
+    ├── context.py  
+    ├── errors.py  
+    ├── messages.py  
+    ├── scope.py  
+    ├── tokens.py  
+    ├── utils.py  
+    └── visitor.py  
 
-Usted es libre de estructurar su reporte escrito como más conveniente le parezca. A continuación le sugerimos algunas secciones que no deberían faltar, aunque puede mezclar, renombrar y organizarlas de la manera que mejor le parezca:
+## Compilando su proyecto
+Una vez dentro de la carpeta cool-compiler-2021 se abre una terminal y se ejecutan los siguientes comandos :
 
-- **Uso del compilador**: detalles sobre las opciones de líneas de comando, si tiene opciones adicionales (e.j., `--ast` genera un AST en JSON, etc.). Básicamente lo mismo que pondrá en este Readme.
-- **Arquitectura del compilador**: una explicación general de la arquitectura, en cuántos módulos se divide el proyecto, cuantas fases tiene, qué tipo de gramática se utiliza, y en general, como se organiza el proyecto. Una buena imagen siempre ayuda.
-- **Problemas técnicos**: detalles sobre cualquier problema teórico o técnico interesante que haya necesitado resolver de forma particular.
+```bash
+$ cd src
+$ make clean
+$ make
+```
 
-## Sobre la Fecha de Entrega
+El primer comando es el encargado de cambiar el directorio actual al directorio source, en donde se encuentra el fichero principar para ejecutar el compilador. Este comando puede ser ignorado si la terminal se abre desde el directorio source.
 
-Se realizarán recogidas parciales del proyecto a lo largo del curso. En el Canal de Telegram se anunciará la fecha y requisitos de cada entrega.
+El segundo comando el el encargado de limpiar toda las basura y residuos que pueden quedar dentro de la estructura de ficheros de las ejecuciones
+anteriores.
+
+Por último el tercer comando es el encargado de compilar el resultado final, para este caso este comando es innecesario pues la ejecución del compilador no depende de una compilación previa, pues este se ejecuta directamente desde consola con python. Por este motivo este comando solo mostrara un mensaje simbólico al usuario.
+
+## Ejecutando su proyecto
+
+En el proyecto se incluye el archivo /src/coolc.sh el cual es el encargado de ejecutar el compilador. Este muestra inicialmente un mensaje con el nombre del compilador y los nombres de los autores, seguido de esto se pasa a ejecutar las instrucciones pertinente. Al ejecutar este archivo se debe pasar un argumento que seria el nombre del fichero que se quiere compilar. Para un mejor visualización en la terminal se debe ejecutar el siguiente comando:
+
+```bash
+$ ./coolc.sh <input_file.cl>
+```
+
+El argumento <input file.cl> especifica el nombre del fichero, y como se trata de un compilador del lenguaje COOL la extensión de este siempre debe ser un .cl. Una vez terminado el proceso de compilación la salida de este es otro fichero de igual nombre pero ahora con la extensión .mips. Otro forma de ejecutar el compilador es mediante el siguiente comando:
+
+```bash
+python3 main.py <input_file.cl> <output_file.mips>
+```
+
+Si se fijan en este caso, se debe pasar tanto el fichero de entrada como el fichero de salida, lo cual puede traer algunas consecuencia a la hora de pasar incorrectamente los argumentos. Para el caso del fichero de entrada puede suceder que no se escriba bien el nombre del mismo o que se le de una extensión no permitida, lo cual puede terminal en errores del programa a la hora de la ejecución.

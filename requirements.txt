@@ -1,2 +1,4 @@
-pytest
+ply
+pytest==4.6.9
 pytest-ordering
+typing
