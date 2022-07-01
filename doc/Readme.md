@@ -1,33 +1,40 @@
 # Documentación
 
-## Readme
+**Nombre** | **Grupo** | **Github**
+--|--|--
+Laura Brito Guerrero | C412 | [@LauryGirl](https://github.com/LauryGirl)
+Sheyla Cruz Castro | C412 | [@sheycc](https://github.com/sheycc)
+Ariel Antonio Huerta Martín | C412 | [@huertaariel1](https://github.com/huertaariel1)
 
-Modifique el contenido de este documento para documentar de forma clara y concisa los siguientes aspectos:
+# Uso del compilador
 
-- Cómo ejecutar (y compilar si es necesario) su compilador.
-- Requisitos adicionales, dependencias, configuración, etc.
-- Opciones adicionales que tenga su compilador.
+Para utilizar el compilador es necesario instalar todas las dependencias utilizadas por este como
+son los paquetes `ply` para la generación del lexer y el parser, y para la ejecución de los tests, `pytest`
+y `pytest-ordering`, todo esto se logra ejecutando el fichero `requirements.txt` de la forma: 
 
-## Sobre los Equipos de Desarrollo
+```bash
+pip install -r requirements.txt
+```
 
-Para desarrollar el compilador del lenguaje COOL se trabajará en equipos de 2 o 3 integrantes. El proyecto de Compilación será recogido y evaluado únicamente a través de Github. Es imprescindible tener una cuenta de Github para cada participante, y que su proyecto esté correctamente hosteado en esta plataforma. 
+Para ejecutar el compilador es necesario correr el archivo ```cool.sh``` ubicado en `/src/` dando como entrada la dirección del archivo a compilar de la siguiente forma:
 
-**⚠️ NOTA**: Debe completar el archivo `team.yml` con los datos correctos de cada miembro de su equipo.
+```bash
+cd src/
+./cool.sh '../tests/codegen/arith.cl'
+```
 
-## Sobre los Materiales a Entregar
+El archivo principal del compilador es `main.py`, módulo que contiene toda la lógica del compilador, si desea ejecutarlo debe pasar como argumento el `path` del fichero **.cl** con código fuente de COOL que se desea compilar, de la siguiente forma:
 
-Para la evaluación del proyecto Ud. debe entregar un informe en formato PDF (`report.pdf`) en esta carpeta, que resuma de manera organizada y comprensible la arquitectura e implementación de su compilador.
-El documento no tiene límite de extensión.
-En él explicará en más detalle su solución a los problemas que, durante la implementación de cada una de las fases del proceso de compilación, hayan requerido de Ud. especial atención.
+```bash
+python3 main.py '../tests/codegen/arith.cl'
+```
 
-## Estructura del reporte
+Un archivo en el mismo path del código fuente será creado, con el mismo nombre, pero con extensión **.mips** que puede ser ejecutado con **spim**.
 
-Usted es libre de estructurar su reporte escrito como más conveniente le parezca. A continuación le sugerimos algunas secciones que no deberían faltar, aunque puede mezclar, renombrar y organizarlas de la manera que mejor le parezca:
+Para ejecutar las pruebas localmente, debe tener instalado `Python 3.7`, `pip` y `make` que normalmente viene incluido en Linux, para hacerlo ejecute los siguientes comandos:
 
-- **Uso del compilador**: detalles sobre las opciones de líneas de comando, si tiene opciones adicionales (e.j., `--ast` genera un AST en JSON, etc.). Básicamente lo mismo que pondrá en este Readme.
-- **Arquitectura del compilador**: una explicación general de la arquitectura, en cuántos módulos se divide el proyecto, cuantas fases tiene, qué tipo de gramática se utiliza, y en general, como se organiza el proyecto. Una buena imagen siempre ayuda.
-- **Problemas técnicos**: detalles sobre cualquier problema teórico o técnico interesante que haya necesitado resolver de forma particular.
-
-## Sobre la Fecha de Entrega
-
-Se realizarán recogidas parciales del proyecto a lo largo del curso. En el Canal de Telegram se anunciará la fecha y requisitos de cada entrega.
+```bash
+cd src/
+make clean
+make test
+```
