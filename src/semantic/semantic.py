@@ -1,0 +1,517 @@
+from utils.errors import SemanticError
+from collections import OrderedDict
+import itertools as itt
+
+
+class Attribute:
+    def __init__(self, name, typex, index, tok=None):
+        self.name = name
+        self.type = typex
+        self.index = index
+        self.expr = None
+
+    def __str__(self):
+        return f'[attrib] {self.name} : {self.type.name};'
+
+    def __repr__(self):
+        return str(self)
+
+
+class Method:
+    def __init__(self, name, param_names, params_types, return_type):
+        self.name = name
+        self.param_names = param_names
+        self.param_types = params_types
+        self.return_type = return_type
+
+    def __str__(self):
+        params = ', '.join(f'{n}:{t.name}' for n, t in zip(
+            self.param_names, self.param_types))
+        return f'[method] {self.name}({params}): {self.return_type.name};'
+
+    def __eq__(self, other):
+        return other.name == self.name and \
+            other.return_type == self.return_type and \
+            other.param_types == self.param_types
+
+
+class MethodError(Method):
+    def __init__(self, name, param_names, param_types, return_types):
+        super().__init__(name, param_names, param_types, return_types)
+
+    def __str__(self):
+        return f'[method] {self.name} ERROR'
+
+
+class Type:
+    def __init__(self, name: str, pos, parent=True):
+        if name == 'ObjectType':
+            return ObjectType(pos)
+        self.name = name
+        self.attributes = {}
+        self.methods = {}
+        if parent:
+            self.parent = ObjectType(pos)
+        else:
+            self.parent = None
+        self.pos = pos
+
+    def set_parent(self, parent):
+        if type(self.parent) != ObjectType and self.parent is not None:
+            error_msg = f'Parent type is already set for {self.name}.'
+            raise SemanticError(error_msg, *self.pos)
+        self.parent = parent
+
+    def get_attribute(self, name: str, pos=None):
+        try:
+            return self.attributes[name]
+        except KeyError:
+            if self.parent is None:
+                error_msg = f'Attribute {name} is not defined in {self.name}.'
+                raise SemanticError(error_msg, *pos)
+            try:
+                return self.parent.get_attribute(name, pos)
+            except:
+                error_msg = f'Attribute {name} is not defined in {self.name}.'
+                raise SemanticError(error_msg, *pos)
+
+    def define_attribute(self, name: str, typex, pos):
+        try:
+            self.attributes[name]
+        except KeyError:
+            try:
+                self.get_attribute(name, pos)
+            except:
+                self.attributes[name] = attribute = Attribute(
+                    name, typex, len(self.attributes))
+                return attribute
+            else:
+                error_msg = f'Attribute {name} is an attribute of an inherit class.'
+                raise SemanticError(error_msg, *pos)
+        else:
+            error_msg = f'Attribute {name} is multiply defined in class.'
+            raise SemanticError(error_msg, *pos)
+
+    def get_method(self, name: str, pos=None):
+        try:
+            return self.methods[name]
+        except KeyError:
+            error_msg = f'Method {name} is not defined in {self.name}.'
+            if self.parent is None:
+                raise SemanticError(error_msg, *pos)
+            try:
+                return self.parent.get_method(name, pos)
+            except:
+                raise SemanticError(error_msg, *pos)
+
+    def define_method(self, name: str, param_names: list, param_types: list, return_type, pos=(0, 0)):
+        if name in self.methods:
+            error_msg = f'Method {name} is multiply defined'
+            raise SemanticError(error_msg, *pos)
+
+        method = self.methods[name] = Method(
+            name, param_names, param_types, return_type)
+        return method
+
+    def has_attr(self, name: str):
+        try:
+            attr_name = self.get_attribute(name)
+        except:
+            return False
+        else:
+            return True
+
+    def change_type(self, method, nparm, newtype):
+        idx = method.param_names.index(nparm)
+        method.param_types[idx] = newtype
+
+    def all_attributes(self, clean=True):
+        plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
+        for attr in self.attributes.values():
+            plain[attr.name] = (attr, self)
+        return plain.values() if clean else plain
+
+    def all_methods(self, clean=True):
+        plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
+        for method in self.methods.values():
+            plain[method.name] = (method, self)
+        return plain.values() if clean else plain
+
+    # code generator
+    def get_all_attributes(self):
+        all_attributes = self.parent and self.parent.get_all_attributes() or []
+        all_attributes += [(self.name, attr)
+                           for attr in self.attributes.values()]
+        return all_attributes
+
+    # code generator
+    def get_all_methods(self):
+        all_methods = self.parent and self.parent.get_all_methods() or []
+        all_methods += [(self.name, method) for method in self.methods]
+        return all_methods
+
+    def conforms_to(self, other):
+        return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
+
+    def bypass(self):
+        return False
+
+    def __str__(self):
+        output = f'type {self.name}'
+        parent = '' if self.parent is None else f' : {self.parent.name}'
+        output += parent
+        output += ' {'
+        output += '\n\t' if self.attributes or self.methods else ''
+        output += '\n\t'.join(str(x) for x in self.attributes.values())
+        output += '\n\t' if self.attributes else ''
+        output += '\n\t'.join(str(x) for x in self.methods.values())
+        output += '\n' if self.methods else ''
+        output += '}\n'
+        return output
+
+    def __repr__(self):
+        return str(self)
+
+
+class ErrorType(Type):
+    def __init__(self, pos=(0, 0)):
+        Type.__init__(self, '<error>', pos)
+
+    def conforms_to(self, other):
+        return True
+
+    def bypass(self):
+        return True
+
+    def __eq__(self, other):
+        return isinstance(other, ErrorType)
+
+    def __ne__(self, other):
+        return not isinstance(other, ErrorType)
+
+
+class VoidType(Type):
+    def __init__(self, pos=(0, 0)):
+        Type.__init__(self, 'Void', pos)
+
+    def conforms_to(self, other):
+        return True
+
+    def bypass(self):
+        return True
+
+    def __eq__(self, other):
+        return isinstance(other, VoidType)
+
+
+class BoolType(Type):
+    def __init__(self, pos=(0, 0)):
+        self.name = 'Bool'
+        self.attributes = {}
+        self.methods = {}
+        self.parent = None
+        self.pos = pos
+        # self.init_methods()
+
+    def init_methods(self):
+        self.define_method('abort', [], [], self)
+        self.define_method('type_name', [], [], StringType())
+        self.define_method('copy', [], [], SelfType())
+
+    def conforms_to(self, other):
+        return other.name == 'Object' or other.name == self.name
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, BoolType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, BoolType)
+
+
+class SelfType(Type):
+    def __init__(self, pos=(0, 0)):
+        self.name = 'SELF_TYPE'
+        self.attributes = {}
+        self.methods = {}
+        self.parent = None
+        self.pos = pos
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, SelfType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, SelfType)
+
+
+class IntType(Type):
+    def __init__(self, pos=(0, 0)):
+        self.name = 'Int'
+        self.attributes = {}
+        self.methods = {}
+        self.parent = None
+        self.pos = pos
+        # self.init_methods()
+
+    def init_methods(self):
+        self.define_method('abort', [], [], self)
+        self.define_method('type_name', [], [], Type('String', (0, 0), False))
+        self.define_method('copy', [], [], SelfType())
+
+    def conforms_to(self, other):
+        return other.name == 'Object' or other.name == self.name
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, IntType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, IntType)
+
+
+class StringType(Type):
+    def __init__(self, pos=(0, 0)):
+        self.name = 'String'
+        self.attributes = {}
+        self.methods = {}
+        self.parent = None
+        self.pos = pos
+        self.init_methods()
+
+    def init_methods(self):
+        # self.define_method('abort', [], [], self)
+        # self.define_method('type_name', [], [], self)
+        # self.define_method('copy', [], [], SelfType())
+        self.define_method('length', [], [], IntType())
+        self.define_method('concat', ['s'], [self], self)
+        self.define_method('substr', ['i', 'l'], [IntType(), IntType()], self)
+
+    def conforms_to(self, other):
+        return other.name == 'Object' or other.name == self.name
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, StringType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, StringType)
+
+
+class ObjectType(Type):
+    def __init__(self, pos=(0, 0)):
+        self.name = 'Object'
+        self.attributes = {}
+        self.methods = {}
+        self.parent = None
+        self.pos = pos
+        self.init_methods()
+
+    def init_methods(self):
+        self.define_method('abort', [], [], self)
+        self.define_method('type_name', [], [], StringType())
+        self.define_method('copy', [], [], SelfType())
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, ObjectType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, ObjectType)
+
+
+class IOType(Type):
+    def __init__(self, pos=(0, 0)):
+        self.name = 'IO'
+        self.attributes = {}
+        self.methods = {}
+        self.parent = ObjectType(pos)
+        self.pos = pos
+        self.init_methods()
+
+    def init_methods(self):
+        self.define_method('out_string', ['x'], [StringType()], SelfType())
+        self.define_method('out_int', ['x'], [IntType()], SelfType())
+        self.define_method('in_string', [], [], StringType())
+        self.define_method('in_int', [], [], IntType())
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, IOType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, IOType)
+
+
+class AutoType(Type):
+    def __init__(self):
+        Type.__init__(self, 'AUTO_TYPE')
+
+    def __eq__(self, other):
+        return other.name == self.name or isinstance(other, AutoType)
+
+    def __ne__(self, other):
+        return other.name != self.name and not isinstance(other, AutoType)
+
+
+class Context:
+    def __init__(self):
+        self.types = {}
+        self.graph = {}
+        self.create_graph()
+
+    def create_graph(self):
+        self.graph['Object'] = ['IO', 'String', 'Bool', 'Int']
+        self.graph['IO'] = []
+        self.graph['String'] = []
+        self.graph['Int'] = []
+        self.graph['Bool'] = []
+
+    def update_graph(self):
+        for tname, _ in self.types.items():
+            if not tname in ['Object', 'IO', 'String', 'Bool', 'Int', 'SELF_TYPE']:
+                self._update_graph(tname)
+
+    def _update_graph(self, name):
+        parentName = self.types[name].parent.name
+
+        if not self.graph.__contains__(name):
+            self.graph[name] = []
+        if self.graph.__contains__(parentName):
+            self.graph[parentName].append(name)
+        else:
+            self.graph[parentName] = [name]
+
+    def create_type(self, name, pos):
+        if name in self.types:
+            error_text = 'Classes may not be redefined.'
+            raise SemanticError(error_text, *pos)
+        typex = self.types[name] = Type(name, pos)
+
+        return typex
+
+    def get_type(self, name: str, pos=None):
+        try:
+            return self.types[name]
+        except KeyError:
+            error_text = f'Type {name} is not defined.'
+            raise SemanticError(error_text, *pos)
+
+    def set_type_tags(self, node='Object', tag=0):
+        self.types[node].tag = tag
+        for i, t in enumerate(self.graph[node]):
+            self.set_type_tags(t, tag + i + 1)
+
+    def set_type_max_tags(self, node='Object'):
+        if not self.graph[node]:
+            self.types[node].max_tag = self.types[node].tag
+        else:
+            for t in self.graph[node]:
+                self.set_type_max_tags(t)
+            maximum = 0
+            for t in self.graph[node]:
+                maximum = max(maximum, self.types[t].max_tag)
+            self.types[node].max_tag = maximum
+
+    def __str__(self):
+        return '{\n\t' + '\n\t'.join(y for x in self.types.values() for y in str(x).split('\n')) + '\n}'
+
+    def __repr__(self):
+        return str(self)
+
+
+class VariableInfo:
+    def __init__(self, name, vtype, index=None):
+        self.name = name
+        self.type = vtype
+        self.index = index
+
+    def __str__(self):
+        return f'{self.name} : {self.type.name}'
+
+    def __repr__(self):
+        return str(self)
+
+
+class Scope:
+    def __init__(self, parent=None):
+        self.locals = []
+        self.attributes = []
+        self.parent = parent
+        self.children = []
+        self.expr_dict = {}
+        self.functions = {}
+        self.cil_locals = {}
+        self.index = 0 if parent is None else len(parent)
+
+    def __len__(self):
+        return len(self.locals)
+
+    def __repr__(self):
+        return str(self)
+
+    def create_child(self):
+        child = Scope(self)
+        self.children.append(child)
+        return child
+
+    def define_variable(self, vname, vtype):
+        info = VariableInfo(vname, vtype)
+        if info not in self.locals:
+            self.locals.append(info)
+        return info
+
+    def find_variable(self, vname, index=None):
+        locals = self.attributes + self.locals
+        locals = locals if index is None else itt.islice(locals, index)
+        try:
+            return next(x for x in locals if x.name == vname)
+        except StopIteration:
+            return self.parent.find_variable(vname, index) if self.parent is not None else None
+
+    def find_local(self, vname, index=None):
+        locals = self.locals if index is None else itt.islice(
+            self.locals, index)
+        try:
+            return next(x for x in locals if x.name == vname)
+        except StopIteration:
+            return self.parent.find_local(vname, self.index) if self.parent is not None else None
+
+    def define_cil_local(self, vname, cil_name, vtype=None):
+        self.define_variable(vname, vtype)
+        self.cil_locals[vname] = cil_name
+
+    def get_cil_local(self, vname):
+        if self.cil_locals.__contains__(vname):
+            return self.cil_locals[vname]
+        return None
+
+    def find_cil_local(self, vname, index=None):
+        locals = self.cil_locals.items() if index is None else itt.islice(
+            self.cil_locals.items(), index)
+        try:
+            return next(cil_name for name, cil_name in locals if name == vname)
+        except StopIteration:
+            return self.parent.find_cil_local(vname, self.index) if (self.parent is not None) else None
+
+    def find_attribute(self, vname, index=None):
+        locals = self.attributes if index is None else itt.islice(
+            self.attributes, index)
+        try:
+            return next(x for x in locals if x.name == vname)
+        except StopIteration:
+            return self.parent.find_attribute(vname, index) if self.parent is not None else None
+
+    def get_class_scope(self):
+        if self.parent == None or self.parent.parent == None:
+            return self
+        return self.parent.get_class_scope()
+
+    def is_defined(self, vname):
+        return self.find_variable(vname) is not None
+
+    def is_defined_cil_local(self, vname):
+        return self.find_cil_local(vname) is not None
+
+    def is_local(self, vname):
+        return any(True for x in self.locals if x.name == vname)
+
+    def remove_local(self, vname):
+        self.locals = [local for local in self.locals if local.name != vname]
+
+    def define_attribute(self, attr):
+        self.attributes.append(attr)
