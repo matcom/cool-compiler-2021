@@ -1,3 +1,4 @@
+from attr import attrib
 from .semantic import Attribute, Method, Type
 from .semantic import Context, Scope
 from .semantic import SemanticError, ErrorType
@@ -57,11 +58,24 @@ class InferenceTypeChecker:
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode, scope: Scope):
         self.current_type = self.context.get_type(node.name)
-        for item in node.data:
-            if isinstance(item, ast.MethodDecNode):
-                self.visit(item, scope.create_child())
-            elif isinstance(item, ast.AttributeDecNode):
-                self.visit(item, scope)
+        methods = [
+            item for item in node.data
+            if isinstance(item, ast.MethodDecNode)
+        ]
+        attributes = [
+            item for item in node.data
+            if isinstance(item, ast.AttributeDecNode)
+        ]
+        for att in attributes:
+            self.visit(att, scope)
+        for meth in methods:
+            self.visit(meth, scope.create_child())
+        
+        # for item in node.data:
+        #     if isinstance(item, ast.MethodDecNode):
+        #         self.visit(item, scope.create_child())
+        #     elif isinstance(item, ast.AttributeDecNode):
+        #         self.visit(item, scope)
 
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode, scope: Scope):
@@ -479,16 +493,34 @@ class ReplaceTypes:
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode, scope: Scope):
         self.current_type = self.context.get_type(node.name)
+        
+        methods = [
+            item for item in node.data
+            if isinstance(item, ast.MethodDecNode)
+        ]
+        attributes = [
+            item for item in node.data
+            if isinstance(item, ast.AttributeDecNode)
+        ]
         i_index = 0
-        for item in node.data:
-            if isinstance(item, ast.MethodDecNode):
-                self.visit(item, scope.children[i_index])
-                i_index += 1
-            elif isinstance(item, ast.AttributeDecNode):
-                if item.expr is not None:
-                    item.index = i_index
+        for att in attributes:
+            if att.expr is not None:
+                    att.index = i_index
                     i_index += 1
-                self.visit(item, scope)
+            self.visit(att, scope)
+        for i_index, meth in enumerate(methods, start=i_index):
+            self.visit(meth, scope.children[i_index])
+        
+        # i_index = 0
+        # for item in node.data:
+        #     if isinstance(item, ast.MethodDecNode):
+        #         self.visit(item, scope.children[i_index])
+        #         i_index += 1
+        #     elif isinstance(item, ast.AttributeDecNode):
+        #         if item.expr is not None:
+        #             item.index = i_index
+        #             i_index += 1
+        #         self.visit(item, scope)
 
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode, scope: Scope):
