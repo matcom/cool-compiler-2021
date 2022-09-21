@@ -263,21 +263,27 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
     else:
         PositionateTokensInAST(tokens).visit(ast)
         TypeCollector(context, errors, program).visit(ast)
+
         if errors:
             for item in errors:
                 print_errors(item)
             exit(1)
+            
         TypeBuilder(context, errors, program).visit(ast)
         cyclicDependency(context, errors, program, ast)
+
         if errors:
             for item in errors:
                 print_errors(item)
             exit(1)
+            
         TypeBuilderFeature(context, errors, program).visit(ast)
+
         if errors:
             for item in errors:
                 print_errors(item)
             exit(1)
+            
         # CyclicDependency(context, errors)
         MethodChecker(context, errors, program).visit(ast)
         InferenceTypeChecker(context, errors, program).visit(ast, scope)

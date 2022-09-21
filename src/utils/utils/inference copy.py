@@ -183,30 +183,7 @@ class InferenceTypeChecker:
                 self.visit(exp_,scope.create_child())
             except SemanticError:
                 pass
-            
         
-        defined_nodes = []
-        not_defined_nodes = []
-        case_nodes = []
-        for _id, _type, _expr in node.params:
-            new_scope = scope.create_child()
-
-            try:
-                case_type = self.context.get_type(_type)
-                var_info = new_scope.define_variable(_id, case_type)
-                # self.variables[var_info] = VariableInfoNode(var_info.type, var_info)
-            except SemanticError:
-                pass
-
-            case_node = self.visit(_expr, new_scope)
-            if isinstance(case_node, ast.AtomicNode):
-                defined_nodes.append(case_node)
-            else:
-                not_defined_nodes.append(case_node)
-            case_nodes.append(case_node)
-                
-        return 'base', Type.multi_join([e[1] for e in case_nodes if e is not None])
-
         return 'base', self.context.get_type('Object')
 
     @visitor.when(ast.BlockNode)
@@ -582,7 +559,4 @@ class ReplaceTypes:
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode, scope: Scope):
         self.visit(node.expr, scope)
-        # for item in
-        
-        for i, (_, _, _expr) in enumerate(node.params):
-            self.visit(_expr, scope.children[i]) 
+        # for item in 
