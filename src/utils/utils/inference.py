@@ -49,6 +49,9 @@ class InferenceTypeChecker:
     def visit(self, node: ast.ProgramNode, scope: Scope):
         if scope is None:
             scope = Scope()
+            
+        node.scope = scope
+        
         for item in node.class_list:
             self.visit(item, scope.create_child())
             
@@ -56,7 +59,9 @@ class InferenceTypeChecker:
         ReplaceTypes(self.context, self.errors, self.program).visit(node, scope)
 
     @visitor.when(ast.ClassDecNode)
-    def visit(self, node: ast.ClassDecNode, scope: Scope):
+    def visit(self, node: ast.ClassDecNode, scope: Scope):    
+        node.scope = scope
+        
         self.current_type = self.context.get_type(node.name)
         methods = [
             item for item in node.data
@@ -78,7 +83,9 @@ class InferenceTypeChecker:
         #         self.visit(item, scope)
 
     @visitor.when(ast.AttributeDecNode)
-    def visit(self, node: ast.AttributeDecNode, scope: Scope):
+    def visit(self, node: ast.AttributeDecNode, scope: Scope):    
+        node.scope = scope
+        
         var_type = self.context.get_type(node._type)
         var_attr_info = scope.define_variable(node.name, var_type)  # scope
         tuple_var = 'var', var_attr_info
@@ -96,7 +103,9 @@ class InferenceTypeChecker:
             add_ext(self.extension, tuple_var, tuple_attr)
 
     @visitor.when(ast.MethodDecNode)
-    def visit(self, node: ast.MethodDecNode, scope: Scope):
+    def visit(self, node: ast.MethodDecNode, scope: Scope):    
+        node.scope = scope
+        
         self.current_method = self.current_type.get_method(node.name)
         scope.define_variable('self', self.current_type)#define self
         params_name = self.current_method.param_names
@@ -111,18 +120,23 @@ class InferenceTypeChecker:
                 add_ext(self.extension, tuple_var, tuple_param)
                 add_ext(self.extension, tuple_param, tuple_var)
         body_exp = self.visit(node.expr, scope)
+        
         if self.current_method.return_type.name == "AUTO_TYPE":
             tuple_ret = 'ret', self.current_method
             add_ext(self.extension,  body_exp, tuple_ret)
 
     @visitor.when(ast.WhileNode)
-    def visit(self, node: ast.WhileNode, scope: Scope):
+    def visit(self, node: ast.WhileNode, scope: Scope):    
+        node.scope = scope
+        
         self.visit(node.cond, scope)
         self.visit(node.data, scope.create_child())
         return ('base', self.context.get_type("Object"))
 
     @visitor.when(ast.LetNode)
-    def visit(self, node: ast.LetNode, scope: Scope):
+    def visit(self, node: ast.LetNode, scope: Scope):    
+        node.scope = scope
+        
         for dec in node.declaration:
             id_var, type_var, expr = dec
             try:
@@ -148,7 +162,9 @@ class InferenceTypeChecker:
         return exp_body
 
     @visitor.when(ast.AssignNode)
-    def visit(self, node: ast.AssignNode, scope: Scope):
+    def visit(self, node: ast.AssignNode, scope: Scope):    
+        node.scope = scope
+        
         var = scope.find_variable(node.idx)
         tuple_var = 'var', var
         expr = self.visit(node.expr, scope.create_child())
@@ -169,7 +185,9 @@ class InferenceTypeChecker:
         return expr
 
     @visitor.when(ast.ConditionalNode)
-    def visit(self, node: ast.ConditionalNode, scope: Scope):
+    def visit(self, node: ast.ConditionalNode, scope: Scope):    
+        node.scope = scope
+        
         if_ = self.visit(node.if_expr,scope)
 
         add_ext(self.extension,('base', self.context.get_type('Bool')), if_)
@@ -189,8 +207,10 @@ class InferenceTypeChecker:
         #return 'base', self.context.get_type('Object')
 
     @visitor.when(ast.CaseNode)
-    def visit(self, node: ast.CaseNode, scope: Scope):
-        self.visit(node.expr,scope)
+    def visit(self, node: ast.CaseNode, scope: Scope):    
+        node.scope = scope
+        
+        self.visit(node.expr, scope)
         for id_,type_,exp_ in node.params:
             try:
                 var_info = scope.define_variable(id_,self.context.get_type(type_))
@@ -221,10 +241,12 @@ class InferenceTypeChecker:
                 
         return 'base', Type.multi_join([e[1] for e in case_nodes if e is not None])
 
-        return 'base', self.context.get_type('Object')
+        # return 'base', self.context.get_type('Object')
 
     @visitor.when(ast.BlockNode)
-    def visit(self, node: ast.BlockNode, scope: Scope):
+    def visit(self, node: ast.BlockNode, scope: Scope):    
+        node.scope = scope
+        
         final_exp = None
         current_scope = scope.create_child()
 
@@ -233,87 +255,112 @@ class InferenceTypeChecker:
         return final_exp
 
     @visitor.when(ast.MethodCallNode)
-    def visit(self, node: ast.MethodCallNode, scope: Scope):
+    def visit(self, node: ast.MethodCallNode, scope: Scope):    
+        node.scope = scope
+        
         if node.atom is None:
             node.atom = ast.VariableNode('self')
         inst = self.visit(node.atom, scope)
-        type_inst = self.dfunc_type[inst[0]](inst)
-        if inst[0] == 'base' and node.idx in set(m.name for m, _ in type_inst.all_methods(True)):
-            method = type_inst.get_method(node.idx)
+        if inst is not None:
+            type_inst = self.dfunc_type[inst[0]](inst)
+            if inst[0] == 'base' and node.idx in set(m.name for m, _ in type_inst.all_methods(True)):
+                method = type_inst.get_method(node.idx)
 
-            counter = min(len(node.exprlist), len(method.param_types))
-            for i, exp in enumerate(node.exprlist):
-                if i == counter: break
-                arg = self.visit(exp, scope)
-                tuple_param = 'param', method, i
-                param_type = method.param_types[i]
-                if arg is not None:
-                    if arg[0] == 'base':
-                        if param_type.name == 'AUTO_TYPE':
-                            add_ext(self.extension, arg, tuple_param)
-                    else:
-                        if method.param_types[i].name != 'AUTO_TYPE':
-                            add_ext(self.extension, tuple_param, arg)
+                counter = min(len(node.exprlist), len(method.param_types))
+                for i, exp in enumerate(node.exprlist):
+                    if i == counter: break
+                    arg = self.visit(exp, scope)
+                    tuple_param = 'param', method, i
+                    param_type = method.param_types[i]
+                    if arg is not None:
+                        if arg[0] == 'base':
+                            if param_type.name == 'AUTO_TYPE':
+                                add_ext(self.extension, arg, tuple_param)
                         else:
-                            add_ext(self.extension, arg, tuple_param)
-                            add_ext(self.extension, tuple_param, arg)
-            if method.return_type.name == 'AUTO_TYPE':
-                return 'ret', method
-            ret_type = method.return_type if method.return_type != 'SELF_TYPE' else type_inst
-            return 'base', ret_type
+                            if method.param_types[i].name != 'AUTO_TYPE':
+                                add_ext(self.extension, tuple_param, arg)
+                            else:
+                                add_ext(self.extension, arg, tuple_param)
+                                add_ext(self.extension, tuple_param, arg)
+                if method.return_type.name == 'AUTO_TYPE':
+                    return 'ret', method
+                ret_type = method.return_type if method.return_type != 'SELF_TYPE' else type_inst
+                return 'base', ret_type
 
         for arg in node.exprlist:
             self.visit(arg, scope)
         return 'base', self.context.get_type('Object')
 
     @visitor.when(ast.MinusNode)
-    def visit(self, node: ast.MinusNode, scope: Scope):
+    def visit(self, node: ast.MinusNode, scope: Scope):    
+        node.scope = scope
+        
         return self.visit_op_int(node, scope)
 
     @visitor.when(ast.PlusNode)
-    def visit(self, node: ast.PlusNode, scope: Scope):
+    def visit(self, node: ast.PlusNode, scope: Scope):    
+        node.scope = scope
+        
         return self.visit_op_int(node, scope)
 
     @visitor.when(ast.DivNode)
-    def visit(self, node: ast.DivNode, scope: Scope):
+    def visit(self, node: ast.DivNode, scope: Scope):    
+        node.scope = scope
+        
         int_type = self.context.get_type('Int')
         return self.visit_op_int(node, scope)
 
     @visitor.when(ast.TimesNode)
-    def visit(self, node: ast.TimesNode, scope: Scope):
+    def visit(self, node: ast.TimesNode, scope: Scope):    
+        node.scope = scope
+        
         int_type = self.context.get_type('Int')
         return self.visit_op_int(node, scope)
 
     @visitor.when(ast.LessNode)
-    def visit(self, node: ast.LessNode, scope: Scope):
+    def visit(self, node: ast.LessNode, scope: Scope):    
+        node.scope = scope
+        
         int_type = self.context.get_type('Int')
         bool_type = self.context.get_type('Bool')
         return self.visit_op_bool(node, scope)
 
     @visitor.when(ast.LessEqualNode)
-    def visit(self, node: ast.LessEqualNode, scope: Scope):
+    def visit(self, node: ast.LessEqualNode, scope: Scope):    
+        node.scope = scope
+        
         return self.visit_op_bool(node, scope)
 
     @visitor.when(ast.EqualNode)
-    def visit(self, node: ast.EqualNode, scope: Scope):
+    def visit(self, node: ast.EqualNode, scope: Scope):    
+        node.scope = scope
+        
         self.visit(node.left, scope)
         self.visit(node.right, scope)
         return 'base', self.context.get_type('Bool')
 
     @visitor.when(ast.StringNode)
-    def visit(self, node: ast.StringNode, scope: Scope):
+    def visit(self, node: ast.StringNode, scope: Scope):    
+        node.scope = scope
+        
         return 'base', self.context.get_type('String')
 
     @visitor.when(ast.NumberNode)
-    def visit(self, node: ast.NumberNode, scope: Scope):
+    def visit(self, node: ast.NumberNode, scope: Scope):    
+        node.scope = scope
+        
         return 'base', self.context.get_type('Int')
 
     @visitor.when(ast.BooleanNode)
-    def visit(self, node: ast.BooleanNode, scope: Scope):
+    def visit(self, node: ast.BooleanNode, scope: Scope):    
+        node.scope = scope
+        
         return 'base', self.context.get_type('Bool')
 
     @visitor.when(ast.VariableNode)
-    def visit(self, node: ast.VariableNode, scope: Scope):
+    def visit(self, node: ast.VariableNode, scope: Scope):    
+        node.scope = scope
+        
         var_info = scope.find_variable(node.lex)
         if var_info is not None:
             if var_info.type.name == 'AUTO_TYPE':
@@ -322,31 +369,43 @@ class InferenceTypeChecker:
                 return 'base', var_info.type
 
     @visitor.when(ast.ComplementNode)
-    def visit(self, node: ast.ComplementNode, scope: Scope):
+    def visit(self, node: ast.ComplementNode, scope: Scope):    
+        node.scope = scope
+        
         self.visit(node.expr, scope)
         return 'base', self.context.get_type('Int')
 
     @visitor.when(ast.NegationNode)
-    def visit(self, node: ast.NegationNode, scope: Scope):
+    def visit(self, node: ast.NegationNode, scope: Scope):    
+        node.scope = scope
+        
         self.visit(node.expr, scope)
         return 'base', self.context.get_type('Bool')
 
     @visitor.when(ast.IsVoidNode)
-    def visit(self, node: ast.IsVoidNode, scope: Scope):
+    def visit(self, node: ast.IsVoidNode, scope: Scope):    
+        node.scope = scope
+        
         self.visit(node.expr, scope)
         return 'base', self.context.get_type('Bool')
 
     @visitor.when(ast.NewNode)
-    def visit(self, node: ast.NewNode, scope: Scope):
+    def visit(self, node: ast.NewNode, scope: Scope):    
+        node.scope = scope
+        
         if node.type in self.context.types:
             return 'base', self.context.get_type(node.type)
         return 'base', self.context.get_type('Object')
 
     @visitor.when(ast.ExprParNode)
-    def visit(self, node: ast.NewNode, scope: Scope):
+    def visit(self, node: ast.NewNode, scope: Scope):    
+        node.scope = scope
+        
         return self.visit(node.expr, scope)
 
-    def visit_op_int(self, node: ast.BinaryNode, scope: Scope):
+    def visit_op_int(self, node: ast.BinaryNode, scope: Scope):    
+        node.scope = scope
+        
         left_op = self.visit(node.left, scope)
         right_op = self.visit(node.right, scope)
 
@@ -358,7 +417,9 @@ class InferenceTypeChecker:
             
         return 'base', self.context.get_type('Int')
 
-    def visit_op_bool(self, node: ast.BinaryNode, scope: Scope):
+    def visit_op_bool(self, node: ast.BinaryNode, scope: Scope):    
+        node.scope = scope
+        
         left_op = self.visit(node.left, scope)
         right_op = self.visit(node.right, scope)
 
@@ -486,12 +547,16 @@ class ReplaceTypes:
 
     @visitor.when(ast.ProgramNode)
     def visit(self, node: ast.ProgramNode, scope: Scope):
+        scope = node.scope
+        
         for i, c in enumerate(node.class_list):
             self.visit(c, scope.children[i])
         return scope
 
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode, scope: Scope):
+        scope = node.scope
+        
         self.current_type = self.context.get_type(node.name)
         
         methods = [
@@ -524,6 +589,8 @@ class ReplaceTypes:
 
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode, scope: Scope):
+        scope = node.scope
+        
         attr_type = self.context.get_type(node._type)
         attr_info = scope.find_variable(node.name)
         if node.expr is not None:
@@ -537,6 +604,8 @@ class ReplaceTypes:
 
     @visitor.when(ast.MethodDecNode)
     def visit(self, node: ast.MethodDecNode, scope: Scope):
+        scope = node.scope
+        
         self.current_method = self.current_type.get_method(node.name)
         for i, param in enumerate(node.params):
             var_info = scope.find_variable(param.name)
@@ -557,11 +626,15 @@ class ReplaceTypes:
 
     @visitor.when(ast.WhileNode)
     def visit(self, node: ast.WhileNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.cond, scope)
         self.visit(node.data, scope.children[0])
 
     @visitor.when(ast.LetNode)
     def visit(self, node: ast.LetNode, scope: Scope):
+        scope = node.scope
+        
         i_child = 0
         for i, dec in enumerate(node.declaration):
             id_var, type_var, expr = dec
@@ -578,41 +651,57 @@ class ReplaceTypes:
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.expr, scope.children[0])
 
     @visitor.when(ast.MethodCallNode)
     def visit(self, node: ast.MethodCallNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.atom, scope)
         for expr in node.exprlist:
             self.visit(expr, scope)
 
     @visitor.when(ast.BinaryNode)
     def visit(self, node: ast.BinaryNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.left, scope)
         self.visit(node.right, scope)
 
     @visitor.when(ast.UnaryNode)
     def visit(self, node: ast.UnaryNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.expr, scope)
 
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode, scope: Scope):
+        scope = node.scope
+        
         current_scope = scope.children[0]
         for expr in node.expr:
             self.visit(expr, current_scope)
 
     @visitor.when(ast.ConditionalNode)
     def visit(self, node: ast.ConditionalNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.if_expr,scope)
         self.visit(node.then_expr,scope.children[0])
         self.visit(node.else_expr,scope.children[1])
 
     @visitor.when(ast.ExprParNode)
     def visit(self, node: ast.ExprParNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.expr, scope)  
         
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode, scope: Scope):
+        scope = node.scope
+        
         self.visit(node.expr, scope)
         # for item in
         

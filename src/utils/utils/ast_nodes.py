@@ -1,3 +1,5 @@
+from .semantic import Scope
+
 class Token:
     def __init__(self, type, value, line, lexpos):
         self.type = type
@@ -8,6 +10,7 @@ class Token:
 class Node:
     line: int
     lexpos: int
+    scope: Scope
 
     def set_line_lexpos(self, line, lexpos):
         self.line = line
