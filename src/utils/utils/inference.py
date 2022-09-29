@@ -261,6 +261,7 @@ class InferenceTypeChecker:
         if node.atom is None:
             node.atom = ast.VariableNode('self')
         inst = self.visit(node.atom, scope)
+        
         if inst is not None:
             type_inst = self.dfunc_type[inst[0]](inst)
             if inst[0] == 'base' and node.idx in set(m.name for m, _ in type_inst.all_methods(True)):
