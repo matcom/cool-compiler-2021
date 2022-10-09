@@ -297,7 +297,3 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # Your code here!!!
         pass
 
-    
-    # ======================================================================
-
-

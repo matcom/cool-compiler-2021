@@ -15,6 +15,8 @@ from utils.type_analysis import TypeBuilder, TypeChecker, TypeCollector, Positio
 from utils.auxiliar_methods import erase_multiline_comment
 from utils.cool_to_cil import COOLToCILVisitor
 from utils.collect_dec import CollectDeclarationsDict, get_declarations_dict
+from utils.code_generation import COOLwithNULL
+
 app = typer.Typer()
 
 
@@ -297,11 +299,13 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
 
         ### code generation ###  
         
-        dict_attr, dict_method = {}, {}
-        CollectDeclarationsDict(dict_attr, dict_method, context).visit(ast)
-        get_declarations_dict(dict_attr, dict_method)
+        COOLwithNULL(context).visit(ast)
+        ast
+        # dict_attr, dict_method = {}, {}
+        # CollectDeclarationsDict(dict_attr, dict_method, context).visit(ast)
+        # get_declarations_dict(dict_attr, dict_method)
         
-        COOLToCILVisitor(context).visit(ast,scope)   
+        # COOLToCILVisitor(context).visit(ast,scope)   
 
     
 if __name__ == '__main__':
