@@ -193,7 +193,15 @@ class COOLwithNULL_Type:
 
     @visitor.when(cool.MethodDecNode)
     def visit(self, node: cool.MethodDecNode, scope: Scope):
-        pass
+        node.scope = scope
+        self.current_method = self.current_type.get_method(node.name)
+        self.current_attribute = None
+        
+        scope.define_variable("self", self.current_type)
+
+        ######
+
+        expr_type = self.visit(node.body, scope)
     
     ###############
     # expressions #
@@ -239,6 +247,12 @@ class COOLwithNULL_Type:
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
        pass
+   
+    @visitor.when(cool.ParenthesisNode)
+    def visit(self, node: cool.ParenthesisNode, scope: Scope):
+        node.scope = scope
+        self.visit(node.expr, scope)
+   
     
     ####################
     # unary operations #
@@ -246,11 +260,21 @@ class COOLwithNULL_Type:
 
     @visitor.when(cool.NegationNode)
     def visit(self, node: cool.NegationNode, scope: Scope):
-        pass
+        type_ = self.visit(node.expr, scope)
+        if type_ == self.context.get_type("Bool"):
+            return type_
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - TypeError: Operation "not" is not defined for "{type_.name}".')
+        
+        return ErrorType()
 
     @visitor.when(cool.ComplementNode)
     def visit(self, node: cool.ComplementNode, scope: Scope):
-        pass
+        type_ = self.visit(node.expr, scope)
+        if type_ == self.context.get_type("Int"):
+            return type_
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - TypeError: Operation "~" is not defined for "{type_.name}".')
+        
+        return ErrorType()
 
 
     #####################
@@ -259,27 +283,69 @@ class COOLwithNULL_Type:
     
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope: Scope):
-        pass
+        l_type = self.visit(node.left, scope)
+        r_type = self.visit(node.right, scope)
+
+        if l_type == r_type == self.context.get_type("Int"):
+            return self.context.get_type("Int")
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "+" is not defined between "{l_type.name}" and "{r_type.name}".')
+        
+        return ErrorType()
 
     @visitor.when(cool.MinusNode)
     def visit(self, node: cool.MinusNode, scope: Scope):
-        pass
+        l_type = self.visit(node.left, scope)
+        r_type = self.visit(node.right, scope)
+
+        if l_type == r_type == self.context.get_type("Int"):
+            return self.context.get_type("Int")
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "-" is not defined between "{l_type.name}" and "{r_type.name}".')
+        
+        return ErrorType()
 
     @visitor.when(cool.TimesNode)
     def visit(self, node: cool.TimesNode, scope: Scope):
-        pass
+        l_type = self.visit(node.left, scope)
+        r_type = self.visit(node.right, scope)
+
+        if l_type == r_type == self.context.get_type("Int"):
+            return self.context.get_type("Int")
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "*" is not defined between "{l_type.name}" and "{r_type.name}".')
+        
+        return ErrorType()
 
     @visitor.when(cool.DivNode)
     def visit(self, node: cool.DivNode, scope: Scope):
-        pass
+        l_type = self.visit(node.left, scope)
+        r_type = self.visit(node.right, scope)
+
+        if l_type == r_type == self.context.get_type("Int"):
+            return self.context.get_type("Int")
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "/" is not defined between "{l_type.name}" and "{r_type.name}".')
+        
+        return ErrorType()
 
     @visitor.when(cool.LessEqualNode)
     def visit(self, node: cool.LessEqualNode, scope: Scope):
-        pass
+        l_type = self.visit(node.left, scope)
+        r_type = self.visit(node.right, scope)
+
+        if l_type == r_type == self.context.get_type("Bool"):
+            return self.context.get_type("Int")
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "/" is not defined between "{l_type.name}" and "{r_type.name}".')
+        
+        return ErrorType()
 
     @visitor.when(cool.LessNode)
     def visit(self, node: cool.LessNode, scope: Scope):
-        pass
+        l_type = self.visit(node.left, scope)
+        r_type = self.visit(node.right, scope)
+
+        if l_type == r_type == self.context.get_type("Bool"):
+            return self.context.get_type("Int")
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "/" is not defined between "{l_type.name}" and "{r_type.name}".')
+        
+        return ErrorType()
 
     @visitor.when(cool.EqualNode)
     def visit(self, node: cool.EqualNode, scope: Scope):
