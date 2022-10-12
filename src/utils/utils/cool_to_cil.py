@@ -2,9 +2,9 @@
 # from pickle import TRUE
 # from turtle import right
 from .semantic import *
-from utils import ast_nodes_cil as cil
-from utils import ast_nodes as cool
-from utils import visitor
+from . import ast_nodes_cil as cil
+from . import ast_nodes as cool
+from . import visitor
 
 class BaseCOOLToCILVisitor:
     def __init__(self, context,dict_attr,dict_method):

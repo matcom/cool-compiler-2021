@@ -196,57 +196,111 @@ class COOLwithNULL_Type:
         node.scope = scope
         self.current_method = self.current_type.get_method(node.name)
         self.current_attribute = None
-        
         scope.define_variable("self", self.current_type)
 
-        ######
+        for param_name, param_type in zip(self.current_method.param_names, self.current_method.param_types):
+            if scope.is_local(param_name):
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - SemanticError: Variable "{param_name}" is already defined in method "{self.current_method.name}".')
+            else:
+                if param_type.name != "SELF_TYPE":
+                    try:
+                        scope.define_variable(param_name, self.context.get_type(param_type.name))
+                    except SemanticError:
+                        scope.define_variable(param_name, ErrorType())  
+                else:
+                    self.errors.append('(0, 0) - TypeError: "SELF_TYPE" cannot be a static type of a parameter.')
+                    scope.define_variable(param_name, ErrorType())
+        
+        try:
+            ret_type = (self.context.get_type(node.type) if node.type != "SELF_TYPE" else self.current_type)
+        except SemanticError:
+            ret_type = ErrorType()
 
         expr_type = self.visit(node.body, scope)
+        if not expr_type.conforms_to(ret_type):
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{ret_type.name}".')
+
     
     ###############
     # expressions #
     ###############
     
-    @visitor.when(cool.LetNode)
-    def visit(self, node: cool.LetNode, scope: Scope):
-        pass
-
+    
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope: Scope):
-        pass
+        node.scope = scope
+        var_info = scope.find_variable(node.idx)
+
+        if var_info.name == "self":
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - SemanticError: Variable "self" is read-only.')
+
+        expr_type = self.visit(node.expr, scope)
+        if var_info is None:
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - NameError: Variable "{node.idx}" is not defined in "{self.current_method.name}".')
+        else:
+            if not expr_type.conforms_to(var_info.type):
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{var_info.type.name}".')
+        return expr_type
+
+    
+    @visitor.when(cool.LetNode)
+    def visit(self, node: cool.LetNode, scope: Scope):
+        node.scope = scope
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
-        pass
+        node.scope = scope
+        return_type = ErrorType()
+        
+        for expr in node.expressions:
+            return_type = self.visit(expr, scope)
+        
+        return return_type
 
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope: Scope):
-        pass
+        node.scope = scope
+        
+        if_type = self.visit(node.if_expr, scope)
+        ##
+        if if_type != self.context.get_type("Bool"):
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - TypeError: Cannot convert "{if_type.name}" into "Bool".')
+        
+        then_type = self.visit(node.then_expr, scope)
+        else_type = self.visit(node.else_expr, scope)
+        
+        return then_type.join(else_type)
 
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope: Scope):
-        pass
+        node.scope = scope
+        
+        cond = self.visit(node.cond, scope)
+        if cond != self.context.get_type("Bool"):
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - TypeError: Cannot convert "{cond.name}" into "Bool".')
+
+        self.visit(node.body, scope)
+        return self.context.get_type("Object")
 
     @visitor.when(cool.CaseNode)
     def visit(self, node: cool.CaseNode, scope: Scope):
-        pass
+        node.scope = scope
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope: Scope):
-        pass
+        node.scope = scope
     
-
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
-        pass
+        node.scope = scope
 
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope: Scope):
-        pass
+        node.scope = scope
     
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
-       pass
+        node.scope = scope
    
     @visitor.when(cool.ParenthesisNode)
     def visit(self, node: cool.ParenthesisNode, scope: Scope):
@@ -332,7 +386,7 @@ class COOLwithNULL_Type:
 
         if l_type == r_type == self.context.get_type("Bool"):
             return self.context.get_type("Int")
-        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "/" is not defined between "{l_type.name}" and "{r_type.name}".')
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<=" is not defined between "{l_type.name}" and "{r_type.name}".')
         
         return ErrorType()
 
@@ -343,7 +397,7 @@ class COOLwithNULL_Type:
 
         if l_type == r_type == self.context.get_type("Bool"):
             return self.context.get_type("Int")
-        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "/" is not defined between "{l_type.name}" and "{r_type.name}".')
+        self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<" is not defined between "{l_type.name}" and "{r_type.name}".')
         
         return ErrorType()
 
