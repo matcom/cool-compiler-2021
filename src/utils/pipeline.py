@@ -230,10 +230,23 @@ def print_list(list):
     for item in list:
         print(item)
 
+def ast_null(ast, context, errors, program, scope):
+    COOLwithNULL(context).visit(ast)
+    COOLwithNULL_Type(context, errors, program).visit(ast, scope)
+    
+    
+###########################
+##### FINAL EXECUTION #####
+###########################
+
 @app.command()
 def final_execution(program_file, program_file_out, debug: bool = False, verbose=False):
     context = Context()
     scope = Scope()
+    
+    ###########
+    ## LEXER ##
+    ###########
     
     errors, program, tokens = tokenize(program_file, debug, verbose)
 
@@ -246,6 +259,10 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         for e in errors:
             print_errors(e)
         exit(1)
+
+    ############
+    ## PARSER ##
+    ############
 
     ast = parse(program, debug=debug)
 
@@ -261,7 +278,10 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             print_errors(f'({current_line}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
         exit(1)
 
-    # print(program)
+    ##############
+    ## SEMANTIC ##
+    ##############
+    
     else:
         PositionateTokensInAST(tokens).visit(ast)
         TypeCollector(context, errors, program).visit(ast)
@@ -297,11 +317,13 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
                 print_errors(item)
             exit(1)
 
-        ### code generation ###  
+        #######################
+        ### CODE GENERATION ###  
+        #######################
         
-        COOLwithNULL(context).visit(ast)
-        COOLwithNULL_Type(context, error, program).visit(ast, scope)
-        ast
+        # Modificando el ast para que soporte los tipos vacios (null)
+        ast_null(ast, context, errors, program, scope)
+
         # dict_attr, dict_method = {}, {}
         # CollectDeclarationsDict(dict_attr, dict_method, context).visit(ast)
         # get_declarations_dict(dict_attr, dict_method)

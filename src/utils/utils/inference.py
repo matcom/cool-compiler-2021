@@ -523,8 +523,6 @@ class InferenceTypeChecker:
 
     def get_tuple_type_base(self, t):
         return t[1]
-
-
 class ReplaceTypes:
     def __init__(self, context: Context, errors, program):
         self.context: Context = context
@@ -708,3 +706,9 @@ class ReplaceTypes:
         
         for i, (_, _, _expr) in enumerate(node.params):
             self.visit(_expr, scope.children[i]) 
+
+    @visitor.when(ast.ParenthesisNode)
+    def visit(self, node: ast.ParenthesisNode, scope: Scope):
+        scope = node.scope
+        self.visit(node.expr, scope)
+        

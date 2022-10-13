@@ -1,3 +1,4 @@
+from symbol import return_stmt
 from . import ast_nodes as cool
 from .semantic import *
 from . import visitor
@@ -104,18 +105,22 @@ class COOLwithNULL:
         if node.expr is None:
             expr = None
             if node._type == "Int":
-                expr = cool.IntegerNode("0")
+                expr = cool.NumberNode("0")
             elif node._type == "Bool":
                 expr = cool.BooleanNode("false")
             elif node._type == "String":
                 expr = cool.StringNode('""')
             else:
+                ## adicion del indicador de vacio
                 expr = NullNode()
             return cool.AssignNode(node.name, expr)
         return cool.AssignNode(node.name, deepcopy(node.expr))
 
+
+# analiza de nuevo los tipos y recopila errores, 
+# esto no es necesario pero la recopilacion de errores se me hizo mas facil
 class COOLwithNULL_Type:
-    def __init__(self, context: Context, errors: List[str], program: str):
+    def __init__(self, context: Context, errors: list, program: str):
         self.context: Context = context
         self.errors = errors
         self.current_type = None
@@ -199,7 +204,7 @@ class COOLwithNULL_Type:
         scope.define_variable("self", self.current_type)
 
         for param_name, param_type in zip(self.current_method.param_names, self.current_method.param_types):
-            if scope.is_local(param_name):
+            if scope.is_local_variable(param_name):
                 self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - SemanticError: Variable "{param_name}" is already defined in method "{self.current_method.name}".')
             else:
                 if param_type.name != "SELF_TYPE":
@@ -216,7 +221,8 @@ class COOLwithNULL_Type:
         except SemanticError:
             ret_type = ErrorType()
 
-        expr_type = self.visit(node.body, scope)
+        expr_type = self.visit(node.expr, scope)
+        1
         if not expr_type.conforms_to(ret_type):
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{ret_type.name}".')
 
@@ -243,10 +249,33 @@ class COOLwithNULL_Type:
         return expr_type
 
     
-    @visitor.when(cool.LetNode) ### to do
+    @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):
         node.scope = scope
         
+        for i, (_id, _type, _expr) in enumerate(node.declaration):
+            
+            if _id == "self":
+                line, lexpos = node.declaration_names_positions[i]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: "self" cannot be bound in a "let" expression')
+                continue
+
+            try:
+                var_static_type = (self.context.get_type(_type) if _type != "SELF_TYPE" else self.current_type)
+            
+            except SemanticError:
+                line, lexpos = node.declaration_types_positions[i]
+                self.errors.append( f'({line}, {self.get_tokencolumn(self.program,lexpos)}) - TypeError: Type "{_type}" is not defined')
+                var_static_type = ErrorType()
+
+            scope.define_variable(_id, var_static_type)
+
+            expr_type = (self.visit(_expr, scope.create_child()) if _expr is not None else None)
+            
+            if expr_type is not None and not expr_type.conforms_to(var_static_type):
+                self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - TypeError: Cannot convert "{expr_type.name}" into "{var_static_type.name}".')
+
+        return self.visit(node.expr, scope.create_child())
         
         
 
@@ -255,7 +284,7 @@ class COOLwithNULL_Type:
         node.scope = scope
         return_type = ErrorType()
         
-        for expr in node.expressions:
+        for expr in node.expr:
             return_type = self.visit(expr, scope)
         
         return return_type
@@ -282,28 +311,95 @@ class COOLwithNULL_Type:
         if cond != self.context.get_type("Bool"):
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program,node.lexpos)}) - TypeError: Cannot convert "{cond.name}" into "Bool".')
 
-        self.visit(node.body, scope)
+        self.visit(node.data, scope)
         return self.context.get_type("Object")
 
-    @visitor.when(cool.CaseNode) ### to do
+    @visitor.when(cool.CaseNode) 
     def visit(self, node: cool.CaseNode, scope: Scope):
         node.scope = scope
 
-    @visitor.when(cool.MethodCallNode) ### to finish
+        self.visit(node.expr, scope)
+        types = []
+        visited = set()
+        for i, (_id, _type, _expr) in enumerate(node.params):
+            _scope = scope.create_child()
+            try:
+                if _type != "SELF_TYPE":
+                    _scope.define_variable(_id, self.context.get_type(_type))
+                else:
+                    self.errors.append('(%d, %d) - TypeError: "%s" cannot be a static type of a case branch.' % _type)
+            except SemanticError:
+                _scope.define_variable(_id, ErrorType())
+                line, lexpos = node.cases_positions[i]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Class "{_type}" of case branch is undefined')
+
+            if _type in visited:
+                line, lexpos = node.cases_positions[i]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: Duplicate branch "{_type}" in case statement')
+
+            visited.add(_type)
+            types.append(self.visit(_expr, _scope))
+
+        return Type.multi_join(types)
+
+
+    @visitor.when(cool.MethodCallNode) 
     def visit(self, node: cool.MethodCallNode, scope: Scope):
         node.scope = scope
-        
+        entre = None
         if node.atom is None:
             node.atom = cool.VariableNode("self")
+            entre = 1
         atom_type = self.visit(node.atom, scope)
+        atom_type
         
-        #####
+        if node.type is None:
+            ancestor_type = atom_type
+        else:
+            try:
+                ancestor_type = self.context.get_type(node.type)
+            except SemanticError:
+                ancestor_type = ErrorType()
+                line, lexpos = node.type_position
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Type "{node.type}" is not defined')
+
+            if not atom_type.conforms_to(ancestor_type):
+                line, lexpos = node.type_position
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Class "{atom_type.name}" has no an ancestor class "{ancestor_type.name}".')
+
+        try:
+            entre
+            method = ancestor_type.get_method(node.idx)
+        except SemanticError:
+            line, lexpos = node.id_position
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - AttributeError: Dispatch undefined method "{node.idx}" from type {atom_type.name}')
+
+            for exp in node.exprlist:
+                self.visit(exp, scope)
+            return ErrorType()
+
+        expr_count = len(node.exprlist)
+        params_count = len(method.param_names)
+        if expr_count != params_count:
+            line, lexpos = node.id_position
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - SemanticError: Method "{method.name}" of type "{atom_type.name}" called with wrong number of arguments. Expected {params_count} instead of {args_count}')
+
+        number_of_args = min(expr_count, params_count)
+        for i, arg in enumerate(node.exprlist[:number_of_args]):
+            arg_type = self.visit(arg, scope)
+            if not arg_type.conforms_to(method.param_types[i]):
+                line, lexpos = node.args_positions[i]
+                self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Cannot convert "{arg_type.name}" into "{method.param_types[i].name}".')
+
+        return (method.return_type if method.return_type.name != "SELF_TYPE" else ancestor_type)
+
     
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
         node.scope = scope
         
         variable = scope.find_variable(node.lex)
+        
         if variable is not None:
             return variable.type
         else:
@@ -323,10 +419,11 @@ class COOLwithNULL_Type:
         node.scope = scope
                 
         try:
-            if node.lex == "SELF_TYPE":
+            if node.type == "SELF_TYPE":
                 return self.current_type
             else:
-                return self.context.get_type(node.lex)
+                ret_type = self.context.get_type(node.type)
+                return ret_type
         except SemanticError:
             line, lexpos = node.type_position
             self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Using "new" expresion with undefined type "{node.lex}"')
@@ -341,8 +438,8 @@ class COOLwithNULL_Type:
         self.visit(node.expr, scope)
         return self.context.get_type("Bool")
    
-    @visitor.when(cool.ParenthesisNode)
-    def visit(self, node: cool.ParenthesisNode, scope: Scope):
+    @visitor.when(cool.ExprParNode)
+    def visit(self, node: cool.ExprParNode, scope: Scope):
         node.scope = scope
         return self.visit(node.expr, scope)
    
@@ -423,8 +520,8 @@ class COOLwithNULL_Type:
         l_type = self.visit(node.left, scope)
         r_type = self.visit(node.right, scope)
 
-        if l_type == r_type == self.context.get_type("Bool"):
-            return self.context.get_type("Int")
+        if l_type == r_type == self.context.get_type("Int"):
+            return self.context.get_type("Bool")
         self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<=" is not defined between "{l_type.name}" and "{r_type.name}".')
         
         return ErrorType()
@@ -434,8 +531,8 @@ class COOLwithNULL_Type:
         l_type = self.visit(node.left, scope)
         r_type = self.visit(node.right, scope)
 
-        if l_type == r_type == self.context.get_type("Bool"):
-            return self.context.get_type("Int")
+        if l_type == r_type == self.context.get_type("Int"):
+            return self.context.get_type("Bool")
         self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Operation "<" is not defined between "{l_type.name}" and "{r_type.name}".')
         
         return ErrorType()
