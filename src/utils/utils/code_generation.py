@@ -243,9 +243,12 @@ class COOLwithNULL_Type:
         return expr_type
 
     
-    @visitor.when(cool.LetNode)
+    @visitor.when(cool.LetNode) ### to do
     def visit(self, node: cool.LetNode, scope: Scope):
         node.scope = scope
+        
+        
+        
 
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope: Scope):
@@ -282,30 +285,66 @@ class COOLwithNULL_Type:
         self.visit(node.body, scope)
         return self.context.get_type("Object")
 
-    @visitor.when(cool.CaseNode)
+    @visitor.when(cool.CaseNode) ### to do
     def visit(self, node: cool.CaseNode, scope: Scope):
         node.scope = scope
 
-    @visitor.when(cool.MethodCallNode)
+    @visitor.when(cool.MethodCallNode) ### to finish
     def visit(self, node: cool.MethodCallNode, scope: Scope):
         node.scope = scope
+        
+        if node.atom is None:
+            node.atom = cool.VariableNode("self")
+        atom_type = self.visit(node.atom, scope)
+        
+        #####
     
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope: Scope):
         node.scope = scope
+        
+        variable = scope.find_variable(node.lex)
+        if variable is not None:
+            return variable.type
+        else:
+            # get the name in the att or the meth
+            if self.current_attribute is not None:
+                name = self.current_attribute.name
+            else:
+                name = self.current_method.name
+
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - NameError: Variable "{node.lex}" is not defined in "{name}".')
+            
+            return ErrorType()
+        
 
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope: Scope):
         node.scope = scope
+                
+        try:
+            if node.lex == "SELF_TYPE":
+                return self.current_type
+            else:
+                return self.context.get_type(node.lex)
+        except SemanticError:
+            line, lexpos = node.type_position
+            self.errors.append(f'({line}, {self.get_tokencolumn(self.program, lexpos)}) - TypeError: Using "new" expresion with undefined type "{node.lex}"')
+            
+            return ErrorType()
+        
     
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope: Scope):
         node.scope = scope
+        
+        self.visit(node.expr, scope)
+        return self.context.get_type("Bool")
    
     @visitor.when(cool.ParenthesisNode)
     def visit(self, node: cool.ParenthesisNode, scope: Scope):
         node.scope = scope
-        self.visit(node.expr, scope)
+        return self.visit(node.expr, scope)
    
     
     ####################
@@ -403,7 +442,15 @@ class COOLwithNULL_Type:
 
     @visitor.when(cool.EqualNode)
     def visit(self, node: cool.EqualNode, scope: Scope):
-        pass
+        node.scope = scope
+        l_type = self.visit(node.left, scope)
+        r_type = self.visit(node.right, scope)
+
+        types_ = ("Bool", "Int", "String")
+        if l_type.name != r_type.name and (l_type.name in types_ or l_type.name in types_):
+            self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: For operation "=" if one of the expression has static type Int, Bool or String, then the other must have the same static type')
+        
+        return self.context.get_type("Bool")
     
     
     ##############
