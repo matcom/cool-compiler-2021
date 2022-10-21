@@ -5,11 +5,13 @@ from . import visitor
 from typing import Any, Dict, List, Optional, Tuple
 from copy import deepcopy
 
+##
 # creación del átomo y tipo que representará el NULL
- 
+##
 class NullNode(cool.AtomicNode):
     def __init__(self):
         super().__init__("NULL")
+
 
 class NullType(Type):
     def __init__(self):
@@ -573,5 +575,4 @@ class COOLwithNULL_Type:
     def visit(self, node: NullNode, scope: Scope):
         node.scope = scope
         return NullType()
-
 

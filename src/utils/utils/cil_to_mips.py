@@ -1,5 +1,5 @@
-from utils import visitor
-from utils import ast_nodes_cil as cil
+from . import visitor
+from . import ast_nodes_cil as cil
 
 
 class BaseCILToMIPSVisitor:

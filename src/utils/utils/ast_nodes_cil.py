@@ -11,10 +11,11 @@ class ProgramNode(Node):
         self.dotcode = dotcode
 
 class TypeNode(Node):
-    def __init__(self, name):
+    def __init__(self, name, parent=None):
         self.name = name
         self.attributes = []
         self.methods = []
+        self.parent = parent
 
 class DataNode(Node):
     def __init__(self, vname, value):
@@ -33,8 +34,9 @@ class ParamNode(Node):
         self.name = name
 
 class LocalNode(Node):
-    def __init__(self, name):
+    def __init__(self, name, type="Object"):
         self.name = name
+        self.type = type
 
 class InstructionNode(Node):
     pass
@@ -44,34 +46,57 @@ class AssignNode(InstructionNode):
         self.dest = dest
         self.source = source
 
+class ParentNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.source = source
+        self.dest = dest
+
+#######################
+##### ARITHMETICS #####
+#######################
+
 class ArithmeticNode(InstructionNode):
     def __init__(self, dest, left, right):
         self.dest = dest
         self.left = left
         self.right = right
 
-class PlusNode(ArithmeticNode):
+class PlusNode(ArithmeticNode): #
     pass
 
-class MinusNode(ArithmeticNode):
+class MinusNode(ArithmeticNode): #
     pass
 
-class StarNode(ArithmeticNode):
+class StarNode(ArithmeticNode): #
     pass
 
-class DivNode(ArithmeticNode):
+class DivNode(ArithmeticNode): #
     pass
 
-class GetAttribNode(InstructionNode):
+class EqualNode(ArithmeticNode): #
+    pass
+
+class XorNode(ArithmeticNode): #
+    pass
+
+class LessEqualNode(ArithmeticNode): #
+    pass
+
+class LessThanNode(ArithmeticNode): #
+    pass
+
+
+
+class GetAttribNode(InstructionNode): #
     pass
 
 
 class SetAttribNode(InstructionNode):
-    def __init__(self, instance, attr, source):#,attr_index):
+    def __init__(self, instance, attr, source, attrindex):
         self.instance: str = instance
         self.attr: str = attr
         self.source: str = source
-        #self.attr_index: int = attr_index
+        self.attr_index: int = attrindex
 
 class GetIndexNode(InstructionNode):
     pass
@@ -79,15 +104,52 @@ class GetIndexNode(InstructionNode):
 class SetIndexNode(InstructionNode):
     pass
 
+class GetMethodNode(InstructionNode):
+    def __init__(self, dest, instance, methodindex, methodname, type):
+        self.dest = dest
+        self.instance = instance
+        self.method_index = methodindex
+        self.method_name = methodname
+        self.type = type
+
+class SetMethodNode(InstructionNode):
+    def __init__(self, dest, instance, attr, attrindex):
+        self.dest = dest
+        self.instance = instance
+        self.attr = attr
+        self.attr_index = attrindex 
+
+
 class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):
         self.type = itype
         self.dest = dest
+        
+class AllocateIntNode(InstructionNode):
+    def __init__(self, dest, value):
+        self.dest = dest
+        self.value = value
+        
+class AllocateStringNode(InstructionNode):
+    def __init__(self, dest, value):
+        self.dest = dest
+        self.value = value
 
-class ArrayNode(InstructionNode):
-    pass
+class AllocateBoolNode(InstructionNode):
+    def __init__(self, dest, value):
+        self.dest = dest
+        self.value = value
 
-class TypeOfNode(InstructionNode):
+class AllocateNullNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
+class ArrayNode(InstructionNode): #
+    def __init__(self, dest, size):
+        self.dest = dest
+        self.size = size
+
+class TypeOfNode(InstructionNode): #
     def __init__(self, obj, dest):
         self.obj = obj
         self.dest = dest
