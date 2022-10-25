@@ -15,7 +15,7 @@ class TypeNode(Node):
         self.name = name
         self.attributes = []
         self.methods = []
-        self.parent = parent
+        self.parent = parent if parent is not None else "null"
 
 class DataNode(Node):
     def __init__(self, vname, value):
@@ -85,10 +85,21 @@ class LessEqualNode(ArithmeticNode): #
 class LessThanNode(ArithmeticNode): #
     pass
 
+class CommentNode(Node):
+    def __init__(self, comment: str):
+        self.comment = '# ' + comment
+        
+class EndOfLineNode(Node):
+    def __init__(self):
+        self.text = '\n'
 
 
 class GetAttribNode(InstructionNode): #
-    pass
+    def __init__(self, dest, instance, attr, attr_index):
+        self.dest = dest
+        self.instance = instance
+        self.attr = attr
+        self.attr_index = attr_index
 
 
 class SetAttribNode(InstructionNode):
@@ -99,10 +110,16 @@ class SetAttribNode(InstructionNode):
         self.attr_index: int = attrindex
 
 class GetIndexNode(InstructionNode):
-    pass
+    def __init__(self, dest, instance, index):
+        self.dest = dest
+        self.instance = instance
+        self.index = index
 
 class SetIndexNode(InstructionNode):
-    pass
+    def __init__(self, instance, index, source):
+        self.instance = instance
+        self.index = index
+        self.source = source
 
 class GetMethodNode(InstructionNode):
     def __init__(self, dest, instance, methodindex, methodname, type):
@@ -119,6 +136,17 @@ class SetMethodNode(InstructionNode):
         self.attr = attr
         self.attr_index = attrindex 
 
+class GetValueInIndexNode(InstructionNode):
+    def __init__(self, dest, instance, index):
+        self.dest = dest
+        self.instance = instance
+        self.index = index
+
+class SetValueInIndexNode(InstructionNode):
+    def __init__(self, instance, index, source):
+        self.instance = instance
+        self.index = index
+        self.source = source
 
 class AllocateNode(InstructionNode):
     def __init__(self, itype, dest):
@@ -134,11 +162,40 @@ class AllocateStringNode(InstructionNode):
     def __init__(self, dest, value):
         self.dest = dest
         self.value = value
+        
+    @property
+    def string(self):
+        stopvalues = [
+            ('\\n', '\n'), 
+            ('\\t', '\t'), 
+            ('\\f', '\f'), 
+            ('\\b', '\b')
+        ]
+        s = self.value
+        for old, new in stopvalues:
+            s = s.replace(old, new)
+        return s[1:-1]
+    
+    @property
+    def length(self):
+        stopvalues = ['\\n', '\\t', '\\b', '\\f']
+        lenvalue = 0
+        for item in stopvalues:
+            lenvalue += self.value.count(item)
+        return len(self.value)  - lenvalue -  2
+    
 
 class AllocateBoolNode(InstructionNode):
     def __init__(self, dest, value):
         self.dest = dest
         self.value = value
+        
+class AllocateBuildInNode(InstructionNode):
+    def __init__(self, dest, value, typename):
+        self.dest = dest
+        self.value = value
+        self.typename = typename ## int or bool
+       
 
 class AllocateNullNode(InstructionNode):
     def __init__(self, dest):
@@ -155,24 +212,30 @@ class TypeOfNode(InstructionNode): #
         self.dest = dest
 
 class LabelNode(InstructionNode):
-    pass
-
+    def __init__(self, label):
+        self.label = label
+        
 class GotoNode(InstructionNode):
-    pass
-
+    def __init__(self, addr):
+        self.addr = addr
+        
 class GotoIfNode(InstructionNode):
-    pass
+    def __init__(self, cond, addr):
+        self.condition = cond
+        self.address = addr
 
 class StaticCallNode(InstructionNode):
-    def __init__(self, function, dest):
+    def __init__(self, function, dest, argscount):
         self.function = function
         self.dest = dest
+        self.total_args = argscount
 
 class DynamicCallNode(InstructionNode):
-    def __init__(self, xtype, method, dest):
+    def __init__(self, xtype, method, dest, argscount):
         self.type = xtype
-        self.method = method
+        self.method_addr = method
         self.dest = dest
+        self.total_args = argscount
 
 class ArgNode(InstructionNode):
     def __init__(self, name):
@@ -188,10 +251,15 @@ class LoadNode(InstructionNode):
         self.msg = msg
 
 class LengthNode(InstructionNode):
-    pass
+    def __init__(self, dest, str_address):
+        self.dest = dest
+        self.str_address = str_address
 
 class ConcatNode(InstructionNode):
-    pass
+    def __init__(self, dest, s1, s2):
+        self.dest = dest
+        self.str1 = s1
+        self.str2 = s2
 
 class PrefixNode(InstructionNode):
     pass

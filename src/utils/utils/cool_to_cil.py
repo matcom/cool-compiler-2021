@@ -52,8 +52,8 @@ class BaseCOOLToCILVisitor:
         self.dotcode.append(function_node)
         return function_node
     
-    def register_type(self, name):
-        type_node = cil.TypeNode(name)
+    def register_type(self, name, parent):
+        type_node = cil.TypeNode(name, parent)
         self.dottypes.append(type_node)
         return type_node
 
@@ -63,11 +63,22 @@ class BaseCOOLToCILVisitor:
         self.dotdata.append(data_node)
         return data_node
 
+    def register_comment(self, comm):
+        self.register_instruction(cil.CommentNode(comm))
+
+    def register_EOL(self):
+        self.register_instruction(cil.EndOfLineNode())
+
     def add_basic_types():
         pass
 
     def add_basic_methods():
         pass
+    
+    def add_main_funct():
+        pass
+    
+    
 
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
@@ -75,7 +86,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         pass
     
     @visitor.when(cool.ProgramNode)
-    def visit(self, node, scope):
+    def visit(self, node: cool.ProgramNode, scope):
         ######################################################
         # node.declarations -> [ ClassDeclarationNode ... ]
         ######################################################
@@ -189,7 +200,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         
         args = [self.visit(node.atom)]#self
         for param in node.exprlist:
-            args.append(self.visit(param,scope))
+            args.append(self.visit(param, scope))
             
         for arg in args:
             self.register_instruction(cil.ArgNode(arg))
