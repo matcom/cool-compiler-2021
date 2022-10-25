@@ -238,8 +238,10 @@ class DynamicCallNode(InstructionNode):
         self.total_args = argscount
 
 class ArgNode(InstructionNode):
-    def __init__(self, name):
+    def __init__(self, name, arg_index, total_args):
         self.name = name
+        self.arg_index = arg_index
+        self.total_args = total_args
 
 class ReturnNode(InstructionNode):
     def __init__(self, value=None):

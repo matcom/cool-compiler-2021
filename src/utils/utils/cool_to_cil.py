@@ -6,6 +6,20 @@ from . import ast_nodes_cil as cil
 from . import ast_nodes as cool
 from . import visitor
 
+def methods_declaration_order(t: Type):
+    method_decl = []
+    all_methods = t.all_methods()
+    visited = set()
+    for method, _ in all_methods:
+        if method.name in visited:
+            continue
+
+        method_decl.append(
+            [(x, y) for x, y in all_methods[::-1] if x.name == method.name][0]
+        )
+        visited.add(method.name)
+    return method_decl
+
 class BaseCOOLToCILVisitor:
     def __init__(self, context,dict_attr,dict_method):
         self.dottypes = []
@@ -72,11 +86,96 @@ class BaseCOOLToCILVisitor:
     def add_basic_types():
         pass
 
-    def add_basic_methods():
-        pass
+    def add_arith_methods(self):
+        ### ADD FUNCTION ###
+        self.register_comment("ADD FUNCTION")
+        self.current_function = self.register_function()
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.PlusNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+        
+        ### MINUS FUNCTION ###
+        self.register_comment("MINUS FUNCTION")
+        self.current_function = self.register_function()
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.MinusNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+        
+        ### TIMES FUNCTION ###
+        self.current_function = self.register_function()
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.StarNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+
+        ### DIV FUNCTION ###
+        self.current_function = self.register_function()
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.DivNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+        
+        ### LESS THAN FUNCTION ###
+        self.current_function = self.register_function()
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.LessThanNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+        
+        ### LESS EQUAL FUNCTION ###
+        self.current_function = self.register_function()
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.LessEqualNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result))
+        
+        ### XOR FUNCTION ###
+        self.current_function = self.register_function()
+        self.current_function.params.append(cil.ParamNode("a"))
+        self.current_function.params.append(cil.ParamNode("b"))
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        self.register_instruction(cil.XorNode(result, "a", "b"))
+        self.register_instruction(cil.ReturnNode(result)) 
+        
+        
+    def add_basic_methods(self):
+        self.add_arith_methods()
     
-    def add_main_funct():
-        pass
+    def add_main_funct(self):
+        self.current_function = self.register_function("main")
+        local_main = self.define_internal_local()
+        local_result = self.define_internal_local()
+        method_index = self.define_internal_local()
+        method_address = self.define_internal_local()
+
+        self.register_instruction(cil.AllocateNode("Main", local_main))
+        self.register_instruction(cil.ArgNode(local_main, 0, 1))
+        self.register_instruction(cil.StaticCallNode(self.to_function_name("init", "Main"), local_main, 1))
+        self.register_EOL()
+
+        all_methods = methods_declaration_order(self.context.get_type("Main"))
+        i = [m.name for m, _ in all_methods].index("main")
+        self.register_instruction(cil.AllocateIntNode(method_index, f"{i}"))
+        self.register_instruction(cil.GetMethodNode(method_address, local_main, method_index, "main", "Main"))
+
+        self.register_instruction(cil.ArgNode(local_main, 0, 1))
+        self.register_instruction(cil.DynamicCallNode("Main", method_address, local_result, 1))
+        
     
     
 
